@@ -373,7 +373,7 @@ jobs:
       #   id: restore_qt
       #   uses: actions/cache/restore@v6
       #   with:
-      #     key: thin-qt-macos-${{ matrix.soc }}-${{ matrix.qt_version }}
+      #     key: Qt-${{ steps.resolve_qt_version.outputs.version }}-macOS-${{ matrix.soc }}-${{ matrix.qt_modules }}-thin
       #     path: ${{ github.workspace }}/Qt
 
       # Using jurplel/install-qt-action to install Qt without using brew
@@ -383,13 +383,14 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           cache: true
+          cache-key-prefix: Qt
           dir: ${{ github.workspace }}
           modules: ${{ matrix.qt_modules }}
           version: ${{ matrix.qt_version }}
 
-      # - name: "[macOS] Create thin Qt libraries"
-      #   if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
-      #   run: .ci/thin_macos_qtlib.sh
+      - name: "[macOS] Create thin Qt libraries"
+        if: matrix.os == 'macOS'
+        run: .ci/thin_macos_qtlib.sh
 
       # - name: "[macOS] Cache thin Qt libraries"
       #   if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
@@ -406,6 +407,7 @@ jobs:
           aqtsource: git+https://github.com/miurahr/aqtinstall.git
           cache: true
           cache-key-prefix: Qt
+          # dir: ${{ github.workspace }}
           modules: ${{ matrix.qt_modules }}
           version: ${{ matrix.qt_version }}
 
