@@ -196,7 +196,10 @@ void RemotePublicDecksModel::addTreeItem(const ServerInfo_DeckStorage_TreeItem &
     entry.bannerCardName = QString::fromStdString(file.banner_card_name());
     entry.bannerCardProvider = QString::fromStdString(file.banner_card_provider());
     entry.colorIdentity = QString::fromStdString(file.color_identity());
-    const QString tagsString = QString::fromStdString(file.tags());
-    entry.tags = tagsString.split(QLatin1Char(','), Qt::SkipEmptyParts);
+    QStringList tags;
+    for (const auto &tag : file.tags()) {
+        tags.append(QString::fromStdString(tag));
+    }
+    entry.tags = tags;
     decks.append(entry);
 }

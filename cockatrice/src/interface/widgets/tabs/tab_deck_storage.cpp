@@ -394,11 +394,7 @@ void TabDeckStorage::uploadDeck(const QString &filePath, const QString &targetPa
     cmd.set_path(targetPath.toStdString());
     cmd.set_deck_list(deckString.toStdString());
 
-    const CardRef bannerCard = deck.getBannerCard();
-    cmd.set_banner_card_name(bannerCard.name.toStdString());
-    cmd.set_banner_card_provider(bannerCard.providerId.toStdString());
     cmd.set_color_identity(getDeckColorIdentity(deck, CardDatabaseManager::query()).toStdString());
-    cmd.set_tags(deck.getTags().join(QStringLiteral(",")).toStdString());
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &TabDeckStorage::uploadFinished);

@@ -11,6 +11,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../cards/additional_info/deck_color_identity.h"
 #include "../client/network/interfaces/deck_stats_interface.h"
 #include "../client/network/interfaces/tapped_out_interface.h"
 #include "../deck_editor/deck_state_manager.h"
@@ -324,7 +325,7 @@ bool AbstractTabDeckEditor::actSaveDeck()
         Command_DeckUpload cmd;
         cmd.set_deck_id(static_cast<google::protobuf::uint32>(loadedDeck.lastLoadInfo.remoteDeckId));
         cmd.set_deck_list(deckString.toStdString());
-        cmd.set_tags(loadedDeck.deckList.getTags().join(QStringLiteral(",")).toStdString());
+        cmd.set_color_identity(getDeckColorIdentity(loadedDeck.deckList, CardDatabaseManager::query()).toStdString());
 
         PendingCommand *pend = AbstractClient::prepareSessionCommand(cmd);
         connect(pend, &PendingCommand::finished, this, &AbstractTabDeckEditor::saveDeckRemoteFinished);
