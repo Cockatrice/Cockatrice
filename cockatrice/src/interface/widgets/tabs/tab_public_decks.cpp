@@ -33,7 +33,7 @@ TabPublicDecks::TabPublicDecks(TabSupervisor *_tabSupervisor, AbstractClient *_c
     model = new RemotePublicDecksModel(client, this);
     cardSize = SettingsCache::instance().cardsDisplay().getVisualDeckStorageCardSize();
 
-    titleLabel = new QLabel(tr("Public decks of %1").arg(userName), this);
+    titleLabel = new QLabel(tr("Public decks of %1").arg(userName.toHtmlEscaped()), this);
     QFont titleFont = titleLabel->font();
     titleFont.setBold(true);
     titleLabel->setFont(titleFont);
@@ -116,7 +116,8 @@ QString TabPublicDecks::getTabText() const
 
 void TabPublicDecks::retranslateUi()
 {
-    titleLabel->setText(tr("Public decks of %1").arg(userName));
+    // The username is another user's data, so escape it for the AutoText QLabel.
+    titleLabel->setText(tr("Public decks of %1").arg(userName.toHtmlEscaped()));
     emptyLabel->setText(tr("This user has not published any decks."));
     refreshButton->setToolTip(tr("Refresh"));
     quickSettingsWidget->setToolTip(tr("Public Decks Settings"));

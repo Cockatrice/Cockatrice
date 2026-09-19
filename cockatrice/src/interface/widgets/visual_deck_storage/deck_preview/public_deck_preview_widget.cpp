@@ -96,7 +96,10 @@ void PublicDeckPreviewWidget::setEntry(const RemotePublicDecksModel::DeckEntry &
 
     // The deck name is the overlay text on the banner, like the local preview.
     bannerCardDisplayWidget->setOverlayText(entry.name);
-    setToolTip(entry.name);
+    // The deck name comes from another user's record, and Qt tooltips are
+    // rendered as AutoText, so escape and bound it to keep it readable text
+    // (the overlay painted onto the banner is already a plain painter draw).
+    setToolTip(entry.name.left(200).toHtmlEscaped());
     setBaseAccessibleName(entry.name);
 
     tagsFlowWidget->clearLayout();
