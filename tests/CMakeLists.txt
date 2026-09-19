@@ -27,13 +27,13 @@ add_executable(latency_tracker_test latency_tracker_test.cpp)
 add_test(NAME loader_local_matching_test COMMAND loader_local_matching_test)
 add_executable(
   ${VERSION_STRING_CPP}
-  loader_local_matching_test
-  loader_local_matching_test.cpp
   ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network/update/client/release_channel.cpp
   ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/cache_settings.cpp
   ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/card_counter_settings.cpp
   ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/shortcuts_settings.cpp
   ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/card_picture_loader/card_picture_loader_local.cpp
+  loader_local_matching_test
+  loader_local_matching_test.cpp
 )
 target_include_directories(loader_local_matching_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src)
 
