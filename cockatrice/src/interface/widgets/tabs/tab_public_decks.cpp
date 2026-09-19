@@ -119,10 +119,16 @@ void TabPublicDecks::retranslateUi()
 {
     // The username is another user's data, so escape it for the AutoText QLabel.
     titleLabel->setText(tr("Public decks of %1").arg(userName.toHtmlEscaped()));
-    emptyLabel->setText(tr("This user has not published any decks."));
+    // The same choice rebuildGrid makes, so a language change does not swap
+    // the "no match" variant for the "nothing published" one.
+    emptyLabel->setText(model->totalCount() > 0 ? tr("No decks match your filters.")
+                                                : tr("This user has not published any decks."));
     refreshButton->setToolTip(tr("Refresh"));
     refreshButton->setAccessibleName(tr("Refresh"));
     quickSettingsWidget->setToolTip(tr("Public Decks Settings"));
+    // Re-show the status so a visible loading message picks up the new language
+    // instead of staying stale; if nothing is shown it just stays hidden.
+    updateLoadingState(model->isLoading());
     emit tabTextChanged(this, getTabText());
 }
 
