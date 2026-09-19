@@ -313,6 +313,10 @@ void IntentUrlParser::startNextChain()
     connect(finalIntent, &Intent::finished, this, [this]() { chainEnded(true); });
     connect(finalIntent, &Intent::failed, this, [this]() { chainEnded(false); });
     connect(finalIntent, &Intent::cancelled, this, [this]() { chainEnded(false); });
+    // Backstop: if the final intent is destroyed without emitting a terminal
+    // signal (e.g. a network error dropped it while running), end the chain so
+    // later links are not queued and dropped for the rest of the session.
+    chainBackstopConnection = connect(finalIntent, &QObject::destroyed, this, &IntentUrlParser::onChainIntentDestroyed);
 
     chain.intents.first()->execute();
 }
@@ -320,6 +324,7 @@ void IntentUrlParser::startNextChain()
 void IntentUrlParser::chainEnded(bool chainSucceeded)
 {
     chainRunning = false;
+    QObject::disconnect(chainBackstopConnection);
 
     const PendingIntentChain chain = pendingChains.takeFirst();
 
@@ -336,6 +341,15 @@ void IntentUrlParser::chainEnded(bool chainSucceeded)
     if (!chainRunning && pendingChains.isEmpty()) {
         emit urlChainFinished(mainWindow->getRemoteClient()->getStatus() == StatusLoggedIn);
     }
+}
+
+void IntentUrlParser::onChainIntentDestroyed()
+{
+    if (!chainRunning) {
+        return;
+    }
+    qCWarning(UrlParserLog) << "Share-link intent destroyed without a terminal signal; ending its chain";
+    chainEnded(false);
 }
 
 void IntentUrlParser::restorePreviousServer(const PendingIntentChain &chain)

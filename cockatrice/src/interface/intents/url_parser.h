@@ -1,5 +1,6 @@
 #ifndef COCKATRICE_URL_PARSER_H
 #define COCKATRICE_URL_PARSER_H
+
 #include <QList>
 #include <QObject>
 #include <QUrlQuery>
@@ -29,7 +30,6 @@ struct PendingIntentChain
     QString migrationTargetHost;
     QString migrationTargetPort;
     bool pendingRestore = false;
-    bool succeeded = false;
 };
 
 /**
@@ -60,12 +60,16 @@ private:
     [[nodiscard]] bool isConnectedTo(const QString &hostname, const QString &port) const;
     void startNextChain();
     void chainEnded(bool chainSucceeded);
+    void onChainIntentDestroyed();
     void restorePreviousServer(const PendingIntentChain &chain);
     void restoreToPreviousServer(const PendingIntentChain &chain);
 
     MainWindow *mainWindow;
     QList<PendingIntentChain> pendingChains;
     bool chainRunning = false;
+    // Disconnects the destroyed-signal backstop once a chain ends, so an old
+    // intent's deferred deletion cannot end the chain that runs after it.
+    QMetaObject::Connection chainBackstopConnection;
 };
 
 #endif // COCKATRICE_URL_PARSER_H
