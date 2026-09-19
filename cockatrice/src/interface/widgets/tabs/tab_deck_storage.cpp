@@ -44,7 +44,8 @@
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/utility/string_limits.h>
 
-namespace {
+namespace
+{
 // How long to wait after the last visibility change before reading back the
 // Public/Private column, in milliseconds.
 constexpr int VISIBILITY_REFRESH_DELAY = 500;
@@ -860,6 +861,7 @@ void TabDeckStorage::onShareFromTreeTimeout()
 
 void TabDeckStorage::actPublishDeck()
 {
+    visibilityFailures.clear();
     const auto selection = serverDirView->getCurrentSelection();
     for (const auto *node : selection) {
         Command_DeckSetVisibility cmd;
@@ -889,15 +891,33 @@ void TabDeckStorage::actPublishDeck()
 
 void TabDeckStorage::setVisibilityFinished(const Response &r, const CommandContainer & /*commandContainer*/)
 {
-    if (r.response_code() != Response::RespOk) {
-        QMessageBox::critical(this, tr("Error"),
-                              tr("Failed to change deck visibility on server (response code %1).")
-                                  .arg(QString::number(static_cast<int>(r.response_code()))));
+    if (r.response_code() == Response::RespOk) {
+        if (visibilityRefreshStarted) {
+            visibilityRefreshTimer->start();
+        }
+        return;
+    }
+
+    // Collect batch failures and surface them once, when publishing quiets
+    // down, instead of stacking one modal dialog per rejected node.
+    const QString message = tr("Failed to change deck visibility on server (response code %1).")
+                                .arg(QString::number(static_cast<int>(r.response_code())));
+    if (visibilityRefreshStarted) {
+        visibilityFailures.append(message);
+        visibilityRefreshTimer->start();
+    } else {
+        QMessageBox::critical(this, tr("Error"), message);
     }
 }
 
 void TabDeckStorage::onVisibilityRefreshTimeout()
 {
     visibilityRefreshStarted = false;
+    if (!visibilityFailures.isEmpty()) {
+        QMessageBox::critical(
+            this, tr("Error"),
+            tr("Failed to change the visibility of %n selected deck(s).", "", visibilityFailures.size()));
+        visibilityFailures.clear();
+    }
     serverDirView->refreshTree();
 }
