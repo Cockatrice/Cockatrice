@@ -106,6 +106,7 @@ TabPublicDecks::TabPublicDecks(TabSupervisor *_tabSupervisor, AbstractClient *_c
     connect(quickSettingsWidget, &PublicDecksQuickSettingsWidget::showTagFilterChanged, this,
             &TabPublicDecks::updateTagsVisibility);
 
+    retranslateUi();
     model->refresh(userName);
 }
 
@@ -120,6 +121,7 @@ void TabPublicDecks::retranslateUi()
     titleLabel->setText(tr("Public decks of %1").arg(userName.toHtmlEscaped()));
     emptyLabel->setText(tr("This user has not published any decks."));
     refreshButton->setToolTip(tr("Refresh"));
+    refreshButton->setAccessibleName(tr("Refresh"));
     quickSettingsWidget->setToolTip(tr("Public Decks Settings"));
     emit tabTextChanged(this, getTabText());
 }
