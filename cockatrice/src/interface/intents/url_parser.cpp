@@ -204,26 +204,45 @@ Intent *IntentUrlParser::createOpenDeckIntent(const QUrlQuery &query, PendingInt
 
     RemoteClient *client = mainWindow->getRemoteClient();
 
-    // When the link would move us away from a live session, ask first — the
-    // open deck download needs the connection the user already has. Remember
-    // the link's target so a failed or cancelled chain can restore the session
-    // this chain moved away from.
-    const bool migrating =
-        client->getStatus() == StatusLoggedIn && !isConnectedTo(ctx->serverContext.hostname, ctx->serverContext.port);
-    if (migrating) {
+    // The open deck download needs a connection to the link's server. Ask before
+    // taking the session anywhere it isn't already, naming the host we would
+    // connect to. Remember the link's target when it moves us away from a live
+    // session so a failed or cancelled chain can restore the session it left.
+    const bool alreadyConnected = isConnectedTo(ctx->serverContext.hostname, ctx->serverContext.port);
+    if (!alreadyConnected) {
         const QString target = QStringLiteral("%1:%2").arg(ctx->serverContext.hostname, ctx->serverContext.port);
-        const QString current =
-            QStringLiteral("%1:%2").arg(client->serverName(), QString::number(client->serverPort()));
-        const QMessageBox::StandardButton answer = QMessageBox::question(
-            mainWindow, tr("Open shared deck"),
-            tr("Opening this share link connects you to %1 instead of %2.\n\nContinue?").arg(target, current),
-            QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-        if (answer != QMessageBox::Yes) {
-            return nullptr;
+
+        if (client->getStatus() == StatusLoggedIn) {
+            const QString current =
+                QStringLiteral("%1:%2").arg(client->serverName(), QString::number(client->serverPort()));
+            const QMessageBox::StandardButton answer = QMessageBox::question(
+                mainWindow, tr("Open shared deck"),
+                tr("Opening this share link connects you to %1 instead of %2.\n\nContinue?").arg(target, current),
+                QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+            if (answer != QMessageBox::Yes) {
+                return nullptr;
+            }
+            chain.migrationTargetHost = ctx->serverContext.hostname;
+            chain.migrationTargetPort = ctx->serverContext.port;
+            chain.pendingRestore = true;
+        } else {
+            // Fresh connection is harmless to wander away from, but a server the
+            // client has never been configured for deserves a harder warning (no
+            // by default) so a stray link cannot silently steer the client there.
+            const bool knownHost = SettingsCache::instance().servers().findHostIndex(ctx->serverContext.hostname) >= 0;
+            const QMessageBox::StandardButton answer =
+                knownHost
+                    ? QMessageBox::question(mainWindow, tr("Open shared deck"),
+                                            tr("Opening this share link connects you to %1.\n\nContinue?").arg(target))
+                    : QMessageBox::warning(mainWindow, tr("Open shared deck"),
+                                           tr("Opening this share link connects you to %1, a server you have "
+                                              "never connected to before.\n\nContinue?")
+                                               .arg(target),
+                                           QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+            if (answer != QMessageBox::Yes) {
+                return nullptr;
+            }
         }
-        chain.migrationTargetHost = ctx->serverContext.hostname;
-        chain.migrationTargetPort = ctx->serverContext.port;
-        chain.pendingRestore = true;
     }
 
     ContextConnectToServer *serverContext = &ctx->serverContext;
