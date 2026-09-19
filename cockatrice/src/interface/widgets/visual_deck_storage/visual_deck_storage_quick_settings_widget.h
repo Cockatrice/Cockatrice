@@ -27,10 +27,12 @@ class VisualDeckStorageQuickSettingsWidget : public SettingsButtonWidget
     QCheckBox *showBannerCardComboBoxCheckBox;
     QCheckBox *showTagFilterCheckBox;
     QCheckBox *showTagsOnDeckPreviewsCheckBox;
+    QCheckBox *showUploadTimeCheckBox;
     QLabel *unusedColorIdentitiesOpacityLabel;
     QSpinBox *unusedColorIdentitiesOpacitySpinBox;
     QLabel *deckPreviewTooltipLabel;
     QComboBox *deckPreviewTooltipComboBox;
+    QWidget *deckPreviewTooltipWidget;
     CardSizeWidget *cardSizeWidget;
 
 public:
@@ -46,6 +48,15 @@ public:
 
     explicit VisualDeckStorageQuickSettingsWidget(QWidget *parent = nullptr);
 
+    /**
+     * @brief Hides the controls that do not apply to the public decks tab.
+     *
+     * The public decks tab reuses this widget for its quick settings menu but
+     * has no folders, banner selection or per-deck tooltip, so those controls
+     * are hidden while every shared key keeps syncing with SettingsCache.
+     */
+    void setPublicDecksMode(bool enabled);
+
     void retranslateUi();
 
     [[nodiscard]] bool getShowFolders() const;
@@ -54,6 +65,7 @@ public:
     [[nodiscard]] bool getShowBannerCardComboBox() const;
     [[nodiscard]] bool getShowTagFilter() const;
     [[nodiscard]] bool getShowTagsOnDeckPreviews() const;
+    [[nodiscard]] bool getShowUploadTime() const;
     [[nodiscard]] int getUnusedColorIdentitiesOpacity() const;
     [[nodiscard]] TooltipType getDeckPreviewTooltip() const;
     [[nodiscard]] int getCardSize() const;
@@ -65,6 +77,7 @@ signals:
     void showBannerCardComboBoxChanged(bool enabled);
     void showTagFilterChanged(bool enabled);
     void showTagsOnDeckPreviewsChanged(bool enabled);
+    void showUploadTimeChanged(bool enabled);
     void unusedColorIdentitiesOpacityChanged(int opacity);
     void deckPreviewTooltipChanged(TooltipType tooltip);
     void cardSizeChanged(int scale);

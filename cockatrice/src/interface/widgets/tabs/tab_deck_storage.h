@@ -11,6 +11,7 @@
 #include "../interface/widgets/server/remote/remote_decklist_tree_widget.h"
 #include "tab.h"
 
+#include <QStringList>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 
 struct LoadedDeck;
@@ -42,7 +43,10 @@ private:
 
     QAction *aOpenLocalDeck, *aRenameLocal, *aUpload, *aNewLocalFolder, *aDeleteLocalDeck;
     QAction *aOpenDecksFolder;
-    QAction *aOpenRemoteDeck, *aDownload, *aShareDecks, *aNewFolder, *aDeleteRemoteDeck;
+    QAction *aOpenRemoteDeck, *aDownload, *aShareDecks, *aPublishDeck, *aNewFolder, *aDeleteRemoteDeck;
+    bool visibilityRefreshStarted = false;
+    QTimer *visibilityRefreshTimer;
+    QStringList visibilityFailures;
     QString getTargetPath() const;
 
     void setRemoteEnabled(bool enabled);
@@ -89,6 +93,10 @@ private slots:
     void onServerSelectionChanged();
     void shareFromTreeFinished(const Response &r, const CommandContainer &commandContainer);
     void onShareFromTreeTimeout();
+
+    void actPublishDeck();
+    void setVisibilityFinished(const Response &r, const CommandContainer &commandContainer);
+    void onVisibilityRefreshTimeout();
 
     void actDeleteRemoteDeck();
     void deleteFolderFinished(const Response &response, const CommandContainer &commandContainer);
