@@ -331,9 +331,17 @@ int main(int argc, char *argv[])
     // URL connects to the server named in the URL, so the window's own startup
     // auto-connect must not race against it (two connectToServer calls tear
     // each other down via doDisconnectFromServer).
-    const bool hasUrlActivation = std::any_of(startupFiles.begin(), startupFiles.end(), [](const QString &file) {
+    bool hasUrlActivation = std::any_of(startupFiles.begin(), startupFiles.end(), [](const QString &file) {
         return file.startsWith(QStringLiteral("cockatrice://"));
     });
+#ifdef Q_OS_MAC
+    // On macOS the launch can arrive through the URL scheme instead of as a
+    // positional argument (captured in pendingMacUrls); count those too or the
+    // window would auto-connect into the link's own connection attempt.
+    hasUrlActivation = hasUrlActivation ||
+                       std::any_of(pendingMacUrls.cbegin(), pendingMacUrls.cend(),
+                                   [](const QString &url) { return url.startsWith(QStringLiteral("cockatrice://")); });
+#endif
     ui.setSkipStartupAutoConnect(hasUrlActivation);
 
     auto handleActivation = [&ui](const QString &file) {
