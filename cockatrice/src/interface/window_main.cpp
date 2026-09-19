@@ -708,6 +708,12 @@ void MainWindow::applyStartupDestination()
         return;
     }
 
+    // A cockatrice:// link owns the startup connection while its chain runs;
+    // connecting here would race (and tear down) the link's own connection.
+    if (skipStartupAutoConnect) {
+        return;
+    }
+
     const int destination = SettingsCache::instance().tabs().getStartupTabIndex();
     if (destination != StartupTab::StartupTabServer && destination != StartupTab::StartupTabServerRoom) {
         return;
@@ -936,6 +942,16 @@ void MainWindow::onUrlChainFinished(bool connected)
     if (connected || !skipStartupAutoConnect || getRemoteClient()->getStatus() != StatusDisconnected) {
         return;
     }
+
+    if (startupDestinationConnectsToServer()) {
+        // Users whose startup tab is a Server / Server Room connect through the
+        // startup destination, not through auto-connect; retry that instead.
+        qCInfo(WindowMainStartupAutoconnectLog) << "URL chain ended without a connection; retrying startup destination";
+        skipStartupAutoConnect = false;
+        applyStartupDestination();
+        return;
+    }
+
     qCInfo(WindowMainStartupAutoconnectLog) << "URL chain ended without a connection; retrying startup connect";
     skipStartupAutoConnect = false;
     attemptStartupAutoConnect();
