@@ -134,11 +134,14 @@ void SingleInstanceManager::handleNewConnection()
             socket->write(ACK_MESSAGE);
             socket->flush();
 
-            emit filesReceived(files);
-
-            // Reset buffer (single message use-case)
+            // Drop the payload from the buffer before handling it: the handlers
+            // run synchronously and can spin a nested event loop (e.g. a modal
+            // dialog) that re-reads this socket, which would re-parse and re-emit
+            // the same files.
             buffer->clear();
             *expectedSize = 0;
+
+            emit filesReceived(files);
 
             socket->disconnectFromServer();
             return;
