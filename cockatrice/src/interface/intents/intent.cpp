@@ -28,6 +28,7 @@ void Intent::runDependency(Intent *dependency)
         this->execute();
     });
     connect(dependency, &Intent::failed, this, &Intent::failed);
+    connect(dependency, &Intent::cancelled, this, &Intent::cancelled);
 
     dependency->execute();
 }
