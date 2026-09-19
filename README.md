@@ -148,16 +148,16 @@ You can then
 
 <br>
 
-The following flags (with their non-default values) can be passed to `cmake`:
-| Flag                       | Description                                                                                                                                   |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `-DWITH_SERVER=1`          | Build <kbd>Servatrice</kbd> server                                                                                                            |
-| `-DWITH_CLIENT=0`          | Don't build <kbd>Cockatrice</kbd> client                                                                                                      |
-| `-DWITH_ORACLE=0`          | Don't build <kbd>Oracle</kbd> card database tool                                                                                              |
-| `-DCMAKE_BUILD_TYPE=Debug` | Compile in debug mode<br> Enables extra logging output, debug symbols, and much more verbose compiler warnings                                |
-| `-DWARNING_AS_ERROR=0`     | Don't treat compilation warnings as errors in debug mode                                                                                      |
-| `-DUPDATE_TRANSLATIONS=1`  |  Configure `make` to update the translation .ts files for new strings in the source code<br> **Note:** `make clean` will remove the .ts files |
-| `-DTEST=1`                 | Enable regression tests<br> **Note:** `make test` to run tests, *googletest* will be downloaded if not available                              |
+The following flags can be passed to **CMake**:
+| Flag                    | Default   | Description                                                                                                                                      |
+| ----------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `-DWITH_CLIENT`         | `1`       | Build <kbd>Cockatrice</kbd> client                                                                                                               |
+| `-DWITH_ORACLE`         | `1`       | Build <kbd>Oracle</kbd> card database tool                                                                                                       |
+| `-DWITH_SERVER`         | `0`       | Build <kbd>Servatrice</kbd> server                                                                                                               |
+| `-DCMAKE_BUILD_TYPE`    | `Release` | Build type<br> Set `Debug` for extra logging output, debug symbols, and m ch more verbose compiler warnings                                      |
+| `-DWARNING_AS_ERROR`    | `1`       | Treat compilation warnings as errors in debug mode                                                                                               |
+| `-DUPDATE_TRANSLATIONS` | `0`       | Configure `CMake` to update the translation .ts files with new strings from the source code<br> **Note:** `make clean` will remove the .ts files |
+| `-DTEST`                | `0`       | Run regression tests<br> **Note:** `make test` to run tests, *googletest* will be downloaded if not available                                    |
 
 
 # Run
