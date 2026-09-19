@@ -43,7 +43,11 @@ bool IntentOpenSharedDeck::checkPrecondition() const
 void IntentOpenSharedDeck::onPreconditionSatisfied()
 {
     // Resolve the share token to its items first; a share can contain more than
-    // one deck, and each item is downloaded by id.
+    // one deck, and each item is downloaded by id. Time the round trip like the
+    // downloads, so a silent server cannot hang the chain forever.
+    listPhase = true;
+    downloadTimer->start();
+
     Command_DeckShareList cmd;
     cmd.set_token(context->shareToken.toStdString());
 
@@ -59,6 +63,9 @@ void IntentOpenSharedDeck::onPreconditionNotSatisfied()
 
 void IntentOpenSharedDeck::listShareFinished(const Response &response, const CommandContainer & /* commandContainer */)
 {
+    downloadTimer->stop();
+    listPhase = false;
+
     if (response.response_code() != Response::RespOk) {
         emitFailed(tr("The shared deck could not be found or has expired"));
         return;
@@ -177,6 +184,12 @@ void IntentOpenSharedDeck::onItemFailure(const QString &reason)
 
 void IntentOpenSharedDeck::onDownloadTimeout()
 {
+    // The list phase has no preview dialog yet to report progress into; fail the
+    // whole intent instead of letting the shared deck hang in limbo.
+    if (listPhase) {
+        emitFailed(tr("Timed out while loading the shared deck"));
+        return;
+    }
     onItemFailure(tr("Timed out while downloading the shared deck"));
 }
 

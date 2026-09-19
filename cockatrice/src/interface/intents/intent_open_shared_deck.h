@@ -51,6 +51,7 @@ private:
     QMap<int, QString> itemNames;
     QList<int> pendingItemIds;
     QList<LoadedDeck> loadedDecks;
+    bool listPhase = true;
     int currentItemId = 0;
     int totalItems = 0;
     int completedItems = 0;
