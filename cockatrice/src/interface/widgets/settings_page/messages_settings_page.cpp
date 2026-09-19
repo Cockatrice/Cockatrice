@@ -151,12 +151,7 @@ MessagesSettingsPage::MessagesSettingsPage()
 
 void MessagesSettingsPage::updateColor(const QString &value)
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0))
     QColor colorToSet = QColor::fromString("#" + value);
-#else
-    QColor colorToSet;
-    colorToSet.setNamedColor("#" + value);
-#endif
     if (colorToSet.isValid()) {
         SettingsCache::instance().chat().setChatMentionColor(value);
         updateMentionPreview();
@@ -165,12 +160,7 @@ void MessagesSettingsPage::updateColor(const QString &value)
 
 void MessagesSettingsPage::updateHighlightColor(const QString &value)
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0))
     QColor colorToSet = QColor::fromString("#" + value);
-#else
-    QColor colorToSet;
-    colorToSet.setNamedColor("#" + value);
-#endif
     if (colorToSet.isValid()) {
         SettingsCache::instance().chat().setChatHighlightColor(value);
         updateHighlightPreview();

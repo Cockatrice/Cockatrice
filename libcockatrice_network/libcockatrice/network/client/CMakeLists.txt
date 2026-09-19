@@ -12,7 +12,7 @@ target_include_directories(libcockatrice_network_client INTERFACE .)
 
 target_link_libraries(
   libcockatrice_network_client
-  INTERFACE ${COCKATRICE_QT_VERSION_NAME}::Network ${COCKATRICE_QT_VERSION_NAME}::WebSockets
+  INTERFACE ${QT_MAIN_VERSION_STRING}::Network ${QT_MAIN_VERSION_STRING}::WebSockets
             libcockatrice_network_client_abstract libcockatrice_network_client_local
             libcockatrice_network_client_remote
 )

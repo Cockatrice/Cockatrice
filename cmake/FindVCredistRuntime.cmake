@@ -1,16 +1,13 @@
 # Find the MS Visual Studio VC redistributable package
 
-if(WIN32)
+if(WIN32) # Windows (including 64bit)
   set(VCREDISTRUNTIME_FOUND "NO")
 
   if(CMAKE_SIZEOF_VOID_P EQUAL 8) # 64-bit
     set(REDIST_ARCH x64)
-  else()
-    set(REDIST_ARCH x86)
   endif()
 
-  # VS 2017 uses vcredist_ARCH.exe, VS 2022 uses vc_redist.ARCH.exe
-  set(REDIST_FILE_NAMES vcredist_${REDIST_ARCH}.exe vcredist.${REDIST_ARCH}.exe vc_redist.${REDIST_ARCH}.exe)
+  set(REDIST_FILE_NAMES vc_redist.${REDIST_ARCH}.exe)
 
   set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
   include(InstallRequiredSystemLibraries)
