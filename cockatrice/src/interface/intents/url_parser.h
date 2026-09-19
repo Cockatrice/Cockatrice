@@ -9,6 +9,30 @@ class MainWindow;
 struct ContextJoinGame;
 
 /**
+ * @brief One queued intent chain with the session-migration bookkeeping for it.
+ *
+ * The restore fields are per-chain on purpose: chains are parsed while earlier
+ * ones are still queued, so parser-wide state would let one chain's failure
+ * consume the restore data another chain recorded.
+ */
+struct PendingIntentChain
+{
+    QList<Intent *> intents;
+
+    // Snapshot of the session in place when this chain started running, so a
+    // queued chain follows whichever server the chain before it settled on.
+    QString previousServerHost;
+    QString previousServerPort;
+
+    // Recorded at parse time when the user confirmed migrating away from a live
+    // session to the host/port named by the link.
+    QString migrationTargetHost;
+    QString migrationTargetPort;
+    bool pendingRestore = false;
+    bool succeeded = false;
+};
+
+/**
  * @brief Parses cockatrice:// links and runs them as serialized intent chains.
  *
  * Links are parsed by action (joingame/opendeck) and translated into an intent
@@ -30,28 +54,18 @@ signals:
     void urlChainFinished(bool connected);
 
 private:
-    Intent *createJoinGameIntent(const QUrlQuery &query, QList<Intent *> &chain);
-    Intent *createOpenDeckIntent(const QUrlQuery &query, QList<Intent *> &chain);
+    Intent *createJoinGameIntent(const QUrlQuery &query, PendingIntentChain &chain);
+    Intent *createOpenDeckIntent(const QUrlQuery &query, PendingIntentChain &chain);
     QString generateJoinGameMessage(const ContextJoinGame &context, const QString &gameDescription);
     [[nodiscard]] bool isConnectedTo(const QString &hostname, const QString &port) const;
     void startNextChain();
-    void chainEnded();
-    void restorePreviousServer();
-    void restoreToPreviousServer();
+    void chainEnded(bool chainSucceeded);
+    void restorePreviousServer(const PendingIntentChain &chain);
+    void restoreToPreviousServer(const PendingIntentChain &chain);
 
     MainWindow *mainWindow;
-    QList<QList<Intent *>> pendingChains;
+    QList<PendingIntentChain> pendingChains;
     bool chainRunning = false;
-    bool currentChainSucceeded = false;
-
-    // Set when an open-deck link migrates the session to another server. If the
-    // chain then fails or is cancelled while still on that server, the previous
-    // session is restored (reconnect if credentials are saved, else disconnect).
-    QString migrationTargetHost;
-    QString migrationTargetPort;
-    QString previousServerHost;
-    QString previousServerPort;
-    bool pendingRestore = false;
 };
 
 #endif // COCKATRICE_URL_PARSER_H

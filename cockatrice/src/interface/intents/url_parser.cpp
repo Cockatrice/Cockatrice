@@ -40,7 +40,7 @@ void IntentUrlParser::handle(const QString &urlStr)
 
     qCDebug(UrlParserLog) << "Parsing intent URL, action:" << action;
 
-    QList<Intent *> chain;
+    PendingIntentChain chain;
     Intent *firstIntent = nullptr;
     if (action == "joingame") {
         firstIntent = createJoinGameIntent(query, chain);
@@ -64,7 +64,7 @@ void IntentUrlParser::handle(const QString &urlStr)
     startNextChain();
 }
 
-Intent *IntentUrlParser::createJoinGameIntent(const QUrlQuery &query, QList<Intent *> &chain)
+Intent *IntentUrlParser::createJoinGameIntent(const QUrlQuery &query, PendingIntentChain &chain)
 {
     auto showError = [this](const QString &message) { QMessageBox::warning(mainWindow, tr("Open game"), message); };
 
@@ -116,14 +116,15 @@ Intent *IntentUrlParser::createJoinGameIntent(const QUrlQuery &query, QList<Inte
     // chain finishes (or fails) it deletes the whole tree.
     auto joinGameIntent = new IntentJoinServerGame(mainWindow->getTabSupervisor(), client, std::move(ctx));
     joinGameIntent->setParent(this);
-    chain.append(joinGameIntent);
+    chain.intents.append(joinGameIntent);
     connect(joinGameIntent, &Intent::failed, this, [showError](const QString &reason) { showError(reason); });
 
     Intent *firstIntent = joinGameIntent;
     if (!isConnectedTo(serverContext->hostname, serverContext->port)) {
-        auto getLoginCredentialsIntent = new IntentGetLoginCredentials(serverContext, /*promptForMissingCredentials=*/true);
+        auto getLoginCredentialsIntent =
+            new IntentGetLoginCredentials(serverContext, /*promptForMissingCredentials=*/true);
         getLoginCredentialsIntent->setParent(joinGameIntent);
-        chain.insert(0, getLoginCredentialsIntent);
+        chain.intents.insert(0, getLoginCredentialsIntent);
 
         connect(getLoginCredentialsIntent, &Intent::finished, joinGameIntent, &Intent::execute);
         connect(getLoginCredentialsIntent, &Intent::failed, joinGameIntent, &Intent::failed);
@@ -169,7 +170,7 @@ QString IntentUrlParser::generateJoinGameMessage(const ContextJoinGame &context,
                    : tr("Join game \"%1\" (#%2) on %3?").arg(gameDescription, gameIdStr, server);
 }
 
-Intent *IntentUrlParser::createOpenDeckIntent(const QUrlQuery &query, QList<Intent *> &chain)
+Intent *IntentUrlParser::createOpenDeckIntent(const QUrlQuery &query, PendingIntentChain &chain)
 {
     auto showError = [this](const QString &message) {
         QMessageBox::warning(mainWindow, tr("Open shared deck"), message);
@@ -205,7 +206,8 @@ Intent *IntentUrlParser::createOpenDeckIntent(const QUrlQuery &query, QList<Inte
 
     // When the link would move us away from a live session, ask first — the
     // open deck download needs the connection the user already has. Remember
-    // the current session so a failed or cancelled chain can restore it.
+    // the link's target so a failed or cancelled chain can restore the session
+    // this chain moved away from.
     const bool migrating =
         client->getStatus() == StatusLoggedIn && !isConnectedTo(ctx->serverContext.hostname, ctx->serverContext.port);
     if (migrating) {
@@ -219,11 +221,9 @@ Intent *IntentUrlParser::createOpenDeckIntent(const QUrlQuery &query, QList<Inte
         if (answer != QMessageBox::Yes) {
             return nullptr;
         }
-        migrationTargetHost = ctx->serverContext.hostname;
-        migrationTargetPort = ctx->serverContext.port;
-        previousServerHost = client->serverName();
-        previousServerPort = QString::number(client->serverPort());
-        pendingRestore = true;
+        chain.migrationTargetHost = ctx->serverContext.hostname;
+        chain.migrationTargetPort = ctx->serverContext.port;
+        chain.pendingRestore = true;
     }
 
     ContextConnectToServer *serverContext = &ctx->serverContext;
@@ -233,14 +233,15 @@ Intent *IntentUrlParser::createOpenDeckIntent(const QUrlQuery &query, QList<Inte
     auto openDeckIntent =
         new IntentOpenSharedDeck(mainWindow->getTabSupervisor(), client, CardDatabaseManager::query(), std::move(ctx));
     openDeckIntent->setParent(this);
-    chain.append(openDeckIntent);
+    chain.intents.append(openDeckIntent);
     connect(openDeckIntent, &Intent::failed, this, [showError](const QString &reason) { showError(reason); });
 
     Intent *firstIntent = openDeckIntent;
     if (!isConnectedTo(serverContext->hostname, serverContext->port)) {
-        auto getLoginCredentialsIntent = new IntentGetLoginCredentials(serverContext, /*promptForMissingCredentials=*/true);
+        auto getLoginCredentialsIntent =
+            new IntentGetLoginCredentials(serverContext, /*promptForMissingCredentials=*/true);
         getLoginCredentialsIntent->setParent(openDeckIntent);
-        chain.insert(0, getLoginCredentialsIntent);
+        chain.intents.insert(0, getLoginCredentialsIntent);
 
         connect(getLoginCredentialsIntent, &Intent::finished, openDeckIntent, &Intent::execute);
         connect(getLoginCredentialsIntent, &Intent::failed, openDeckIntent, &Intent::failed);
@@ -267,38 +268,47 @@ void IntentUrlParser::startNextChain()
         return;
     }
     chainRunning = true;
-    currentChainSucceeded = false;
 
-    const QList<Intent *> chain = pendingChains.takeFirst();
-    if (chain.isEmpty()) {
+    PendingIntentChain &chain = pendingChains.first();
+    if (chain.intents.isEmpty()) {
+        pendingChains.removeFirst();
         chainRunning = false;
+        startNextChain();
         return;
+    }
+
+    // Snapshot the session this chain moves away from now that it actually
+    // runs. Chains are parsed while earlier ones are still queued, so a capture
+    // at parse time would follow whichever server the chain before it settled
+    // on, not the one the user is really on when this link is handled.
+    if (chain.pendingRestore) {
+        RemoteClient *client = mainWindow->getRemoteClient();
+        chain.previousServerHost = client->serverName();
+        chain.previousServerPort = QString::number(client->serverPort());
     }
 
     // Only the last intent completes the chain; its terminal signal ends the
     // whole run. Cancellation of an intermediate intent (e.g. declined login
     // prompt) is forwarded onto the last intent in the chain builders above.
-    Intent *finalIntent = chain.last();
-    connect(finalIntent, &Intent::finished, this, [this]() {
-        currentChainSucceeded = true;
-        chainEnded();
-    });
-    connect(finalIntent, &Intent::failed, this, &IntentUrlParser::chainEnded);
-    connect(finalIntent, &Intent::cancelled, this, &IntentUrlParser::chainEnded);
+    Intent *finalIntent = chain.intents.last();
+    connect(finalIntent, &Intent::finished, this, [this]() { chainEnded(true); });
+    connect(finalIntent, &Intent::failed, this, [this]() { chainEnded(false); });
+    connect(finalIntent, &Intent::cancelled, this, [this]() { chainEnded(false); });
 
-    chain.first()->execute();
+    chain.intents.first()->execute();
 }
 
-void IntentUrlParser::chainEnded()
+void IntentUrlParser::chainEnded(bool chainSucceeded)
 {
     chainRunning = false;
 
+    const PendingIntentChain chain = pendingChains.takeFirst();
+
     // Only a failed or cancelled chain restores the session the link migrated
     // away from; a successful one leaves the user where they are.
-    if (pendingRestore && !currentChainSucceeded) {
-        restorePreviousServer();
+    if (chain.pendingRestore && !chainSucceeded) {
+        restorePreviousServer(chain);
     }
-    pendingRestore = false;
 
     startNextChain();
 
@@ -309,9 +319,9 @@ void IntentUrlParser::chainEnded()
     }
 }
 
-void IntentUrlParser::restorePreviousServer()
+void IntentUrlParser::restorePreviousServer(const PendingIntentChain &chain)
 {
-    if (previousServerHost.isEmpty()) {
+    if (chain.previousServerHost.isEmpty()) {
         return;
     }
 
@@ -324,46 +334,47 @@ void IntentUrlParser::restorePreviousServer()
     // deciding mid-connect would strand the user offline from their previous
     // server.
     if (status == StatusDisconnected || status == StatusLoggedIn) {
-        restoreToPreviousServer();
+        restoreToPreviousServer(chain);
         return;
     }
     auto waitConnection = std::make_shared<QMetaObject::Connection>();
-    *waitConnection = connect(client, &RemoteClient::statusChanged, this, [this, client, waitConnection]() {
+    *waitConnection = connect(client, &RemoteClient::statusChanged, this, [this, chain, client, waitConnection]() {
         const ClientStatus settled = client->getStatus();
         if (settled == StatusDisconnected || settled == StatusLoggedIn) {
             QObject::disconnect(*waitConnection);
-            restoreToPreviousServer();
+            restoreToPreviousServer(chain);
         }
     });
 }
 
-void IntentUrlParser::restoreToPreviousServer()
+void IntentUrlParser::restoreToPreviousServer(const PendingIntentChain &chain)
 {
     RemoteClient *client = mainWindow->getRemoteClient();
 
     // Back on the previous server already → nothing to undo.
-    if (client->serverName().compare(previousServerHost, Qt::CaseInsensitive) == 0 &&
-        QString::number(client->serverPort()) == previousServerPort) {
+    if (client->serverName().compare(chain.previousServerHost, Qt::CaseInsensitive) == 0 &&
+        QString::number(client->serverPort()) == chain.previousServerPort) {
         return;
     }
 
     // When logged in somewhere, only intervene if that somewhere is the server
     // the link moved us to; if the user went elsewhere on their own, leave them.
     if (client->getStatus() == StatusLoggedIn) {
-        const bool onMigrationTarget = client->serverName().compare(migrationTargetHost, Qt::CaseInsensitive) == 0 &&
-                                       QString::number(client->serverPort()) == migrationTargetPort;
+        const bool onMigrationTarget =
+            client->serverName().compare(chain.migrationTargetHost, Qt::CaseInsensitive) == 0 &&
+            QString::number(client->serverPort()) == chain.migrationTargetPort;
         if (!onMigrationTarget) {
             return;
         }
 
         ServersSettings &servers = SettingsCache::instance().servers();
-        const int index = servers.findServerIndex(previousServerHost, previousServerPort);
-        if (index >= 0 && servers.hasLoginData(previousServerHost, previousServerPort)) {
+        const int index = servers.findServerIndex(chain.previousServerHost, chain.previousServerPort);
+        if (index >= 0 && servers.hasLoginData(chain.previousServerHost, chain.previousServerPort)) {
             const QString username =
                 servers.getValue(QString("username%1").arg(index), "server", "server_details").toString();
             const QString password =
                 servers.getValue(QString("password%1").arg(index), "server", "server_details").toString();
-            client->connectToServer(previousServerHost, previousServerPort.toUInt(), username, password);
+            client->connectToServer(chain.previousServerHost, chain.previousServerPort.toUInt(), username, password);
             return;
         }
         client->disconnectFromServer();
@@ -377,12 +388,12 @@ void IntentUrlParser::restoreToPreviousServer()
     // The link's connection attempt failed: reconnect to the previous server
     // when credentials are saved, otherwise stay offline.
     ServersSettings &servers = SettingsCache::instance().servers();
-    const int index = servers.findServerIndex(previousServerHost, previousServerPort);
-    if (index >= 0 && servers.hasLoginData(previousServerHost, previousServerPort)) {
+    const int index = servers.findServerIndex(chain.previousServerHost, chain.previousServerPort);
+    if (index >= 0 && servers.hasLoginData(chain.previousServerHost, chain.previousServerPort)) {
         const QString username =
             servers.getValue(QString("username%1").arg(index), "server", "server_details").toString();
         const QString password =
             servers.getValue(QString("password%1").arg(index), "server", "server_details").toString();
-        client->connectToServer(previousServerHost, previousServerPort.toUInt(), username, password);
+        client->connectToServer(chain.previousServerHost, chain.previousServerPort.toUInt(), username, password);
     }
 }
