@@ -1,5 +1,8 @@
 #include "remote_public_decks_model.h"
 
+#include "../../../client/settings/cache_settings.h"
+
+#include <QTimer>
 #include <algorithm>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_deck_list_other_user.pb.h>
@@ -7,10 +10,26 @@
 #include <libcockatrice/protocol/pb/response_deck_list.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_deckstorage.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/settings/network_settings.h>
 
 RemotePublicDecksModel::RemotePublicDecksModel(AbstractClient *_client, QObject *parent)
     : QAbstractListModel(parent), client(_client)
 {
+    // The ping sweep can drop a pending command without ever emitting finished,
+    // so loading must not be a latch: time it out and clear it when the client
+    // goes away, or the tab is stuck on the loading state for the session.
+    loadingTimeoutTimer = new QTimer(this);
+    loadingTimeoutTimer->setSingleShot(true);
+    loadingTimeoutTimer->setInterval(
+        static_cast<int>((static_cast<qint64>(SettingsCache::instance().network().getTimeOut()) + 1) *
+                         SettingsCache::instance().network().getKeepAlive() * 1000));
+    connect(loadingTimeoutTimer, &QTimer::timeout, this, &RemotePublicDecksModel::onLoadingTimeout);
+    connect(client, &AbstractClient::statusChanged, this, [this](ClientStatus status) {
+        if (status == StatusDisconnected) {
+            loadingTimeoutTimer->stop();
+            setLoading(false);
+        }
+    });
 }
 
 int RemotePublicDecksModel::rowCount(const QModelIndex &parent) const
@@ -136,11 +155,18 @@ void RemotePublicDecksModel::refresh(const QString &userName)
         return;
     }
     setLoading(true);
+    loadingTimeoutTimer->start();
     Command_DeckListOtherUser cmd;
     cmd.set_user_name(userName.toStdString());
     PendingCommand *pend = client->prepareSessionCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &RemotePublicDecksModel::decksReceived);
     client->sendCommand(pend);
+}
+
+void RemotePublicDecksModel::onLoadingTimeout()
+{
+    setLoading(false);
+    emit loadFailed(tr("The server did not respond in time. Try again."));
 }
 
 void RemotePublicDecksModel::clear()
@@ -161,6 +187,7 @@ void RemotePublicDecksModel::setLoading(bool value)
 void RemotePublicDecksModel::decksReceived(const Response &response, const CommandContainer & /*commandContainer*/)
 {
     setLoading(false);
+    loadingTimeoutTimer->stop();
     if (response.response_code() != Response::RespOk) {
         emit loadFailed(tr("Failed to load the user's public decks (server response code %1).")
                             .arg(QString::number(static_cast<int>(response.response_code()))));

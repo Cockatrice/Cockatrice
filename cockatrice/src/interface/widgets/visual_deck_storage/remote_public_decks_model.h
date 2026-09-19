@@ -16,6 +16,7 @@
 
 class AbstractClient;
 class CommandContainer;
+class QTimer;
 class Response;
 class ServerInfo_DeckStorage_Folder;
 class ServerInfo_DeckStorage_TreeItem;
@@ -103,6 +104,7 @@ signals:
 
 private slots:
     void decksReceived(const Response &response, const CommandContainer &commandContainer);
+    void onLoadingTimeout();
 
 private:
     void addFolder(const ServerInfo_DeckStorage_Folder &folder);
@@ -111,6 +113,7 @@ private:
     void setLoading(bool value);
 
     AbstractClient *client;
+    QTimer *loadingTimeoutTimer;
     QList<DeckEntry> decks;
     QList<int> visibleIndices; ///< Row indices into `decks` that pass the current filters.
     bool loading = false;
