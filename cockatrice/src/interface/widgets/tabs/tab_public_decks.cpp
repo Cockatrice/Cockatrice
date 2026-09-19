@@ -6,9 +6,9 @@
 #include "../visual_deck_storage/deck_preview/deck_preview_color_identity_filter_widget.h"
 #include "../visual_deck_storage/deck_preview/public_deck_preview_widget.h"
 #include "../visual_deck_storage/remote_public_decks_model.h"
+#include "../visual_deck_storage/visual_deck_storage_quick_settings_widget.h"
 #include "../visual_deck_storage/visual_deck_storage_search_widget.h"
 #include "../visual_deck_storage/visual_deck_storage_tag_filter_widget.h"
-#include "public_decks_quick_settings_widget.h"
 #include "tab_supervisor.h"
 
 #include <QDateTime>
@@ -61,7 +61,8 @@ TabPublicDecks::TabPublicDecks(TabSupervisor *_tabSupervisor, AbstractClient *_c
     refreshButton = new QToolButton(this);
     refreshButton->setIcon(QPixmap("theme:icons/reload"));
     refreshButton->setFixedSize(32, 32);
-    quickSettingsWidget = new PublicDecksQuickSettingsWidget(this);
+    quickSettingsWidget = new VisualDeckStorageQuickSettingsWidget(this);
+    quickSettingsWidget->setPublicDecksMode(true);
 
     auto *filterLayout = new QHBoxLayout;
     filterLayout->addWidget(colorIdentityFilter);
@@ -101,9 +102,9 @@ TabPublicDecks::TabPublicDecks(TabSupervisor *_tabSupervisor, AbstractClient *_c
     connect(colorIdentityFilter, &DeckPreviewColorIdentityFilterWidget::filterModeChanged, this,
             &TabPublicDecks::updateColorFilter);
     connect(tagFilterWidget, &VisualDeckStorageTagFilterWidget::filterChanged, this, &TabPublicDecks::updateTagFilter);
-    connect(quickSettingsWidget, &PublicDecksQuickSettingsWidget::cardSizeChanged, this,
+    connect(quickSettingsWidget, &VisualDeckStorageQuickSettingsWidget::cardSizeChanged, this,
             &TabPublicDecks::updateCardSize);
-    connect(quickSettingsWidget, &PublicDecksQuickSettingsWidget::showTagFilterChanged, this,
+    connect(quickSettingsWidget, &VisualDeckStorageQuickSettingsWidget::showTagFilterChanged, this,
             &TabPublicDecks::updateTagsVisibility);
 
     retranslateUi();

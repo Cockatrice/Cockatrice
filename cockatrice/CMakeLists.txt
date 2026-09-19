@@ -385,7 +385,6 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/api/edhrec/display/top_tags/edhrec_top_tags_api_response_display_widget.cpp
     src/interface/widgets/tabs/api/edhrec/tab_edhrec.cpp
     src/interface/widgets/tabs/api/edhrec/tab_edhrec_main.cpp
-    src/interface/widgets/tabs/public_decks_quick_settings_widget.cpp
     src/interface/widgets/tabs/tab.cpp
     src/interface/widgets/tabs/tab_account.cpp
     src/interface/widgets/tabs/tab_admin.cpp

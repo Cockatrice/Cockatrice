@@ -13,11 +13,11 @@ class CommandContainer;
 class DeckPreviewColorIdentityFilterWidget;
 class FlowWidget;
 class PublicDeckPreviewWidget;
-class PublicDecksQuickSettingsWidget;
 class QLabel;
 class QToolButton;
 class RemotePublicDecksModel;
 class Response;
+class VisualDeckStorageQuickSettingsWidget;
 class VisualDeckStorageSearchWidget;
 class VisualDeckStorageTagFilterWidget;
 
@@ -69,7 +69,7 @@ private:
     DeckPreviewColorIdentityFilterWidget *colorIdentityFilter;
     VisualDeckStorageTagFilterWidget *tagFilterWidget;
     QToolButton *refreshButton;
-    PublicDecksQuickSettingsWidget *quickSettingsWidget;
+    VisualDeckStorageQuickSettingsWidget *quickSettingsWidget;
     QLabel *titleLabel;
     QLabel *statusLabel;
     QLabel *emptyLabel;
