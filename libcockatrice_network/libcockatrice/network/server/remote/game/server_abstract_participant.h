@@ -53,6 +53,9 @@ class Command_DeckSelect;
 class Command_SetSideboardLock;
 class Command_ChangeZoneProperties;
 class Command_SetPlaymat;
+class Command_ReportMatchResult;
+class Command_AdvanceTournament;
+class Command_TournamentSettingsSelect;
 
 class Server_AbstractParticipant : public Server_ArrowTarget, public ServerInfo_User_Container
 {
@@ -175,6 +178,13 @@ public:
     cmdReverseTurn(const Command_ReverseTurn & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage &ges);
     virtual Response::ResponseCode
     cmdChangeZoneProperties(const Command_ChangeZoneProperties &cmd, ResponseContainer &rc, GameEventStorage &ges);
+    virtual Response::ResponseCode
+    cmdReportMatchResult(const Command_ReportMatchResult &cmd, ResponseContainer &rc, GameEventStorage &ges);
+    virtual Response::ResponseCode
+    cmdAdvanceTournament(const Command_AdvanceTournament &cmd, ResponseContainer &rc, GameEventStorage &ges);
+    virtual Response::ResponseCode cmdTournamentSettingsSelect(const Command_TournamentSettingsSelect &cmd,
+                                                               ResponseContainer &rc,
+                                                               GameEventStorage &ges);
 
     Response::ResponseCode processGameCommand(const GameCommand &command, ResponseContainer &rc, GameEventStorage &ges);
     void sendGameEvent(const GameEventContainer &event);
