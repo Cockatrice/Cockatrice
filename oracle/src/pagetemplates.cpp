@@ -112,7 +112,7 @@ bool SimpleDownloadFilePage::validatePage()
             return false;
         }
 
-        progressLabel->setText(tr("Downloading (0MB)"));
+        progressLabel->setText(tr("Downloading (0 MB)"));
         // show an infinite progressbar
         progressBar->setMaximum(0);
         progressBar->setMinimum(0);
