@@ -1,5 +1,6 @@
 #include "view_zone.h"
 
+#include "../../client/settings/cache_settings.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
 #include "../../game/zones/view_zone_logic.h"
@@ -11,11 +12,13 @@
 #include <QGraphicsSceneWheelEvent>
 #include <QPainter>
 #include <QtMath>
+#include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/protocol/pb/command_dump_zone.pb.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/protocol/pb/response_dump_zone.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 
 /**
  * @param parent the parent QGraphicsWidget containing the reveal zone
@@ -253,7 +256,9 @@ ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, Ca
 
 void ZoneViewZone::setFilterString(const QString &_filterString)
 {
-    filterString = FilterString(_filterString);
+    const CardsDisplaySettings &cardsDisplay = SettingsCache::instance().cardsDisplay();
+    filterString = FilterString(_filterString, cardsDisplay.getCardLang(),
+                                static_cast<CardSearchLanguage>(cardsDisplay.getCardSearchLanguage()));
     reorganizeCards();
 }
 

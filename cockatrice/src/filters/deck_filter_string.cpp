@@ -43,6 +43,17 @@ NumericValue <- [0-9]+
 
 static std::once_flag init;
 
+// The peglib parser is a single permanent object, so the rule actions below cannot see
+// per-instance state. The card language that the nested [[card name]] search matches
+// against is passed through this thread-local context, which is live only while a
+// DeckFilterString is being parsed, and copied into the nested FilterString closures.
+struct DeckSearchLanguageContext
+{
+    QString searchLanguage;
+    CardSearchLanguage searchLanguageMode = CardSearchLanguage::English;
+};
+thread_local DeckSearchLanguageContext deckSearchLanguageContext;
+
 static void setupParserRules()
 {
     // plumbing
@@ -116,7 +127,9 @@ static void setupParserRules()
 
     // actual functionality
     search["DeckContentQuery"] = [](const peg::SemanticValues &sv) -> DeckFilter {
-        auto cardFilter = FilterString(std::any_cast<QString>(sv[0]));
+        const QString searchLanguage = deckSearchLanguageContext.searchLanguage;
+        const CardSearchLanguage searchLanguageMode = deckSearchLanguageContext.searchLanguageMode;
+        auto cardFilter = FilterString(std::any_cast<QString>(sv[0]), searchLanguage, searchLanguageMode);
         auto numberMatcher = sv.size() > 1 ? std::any_cast<NumberMatcher>(sv[1]) : [](int count) { return count > 0; };
 
         return [=](const DeckSearchData &data) -> bool {
@@ -186,7 +199,9 @@ DeckFilterString::DeckFilterString()
     _error = "Not initialized";
 }
 
-DeckFilterString::DeckFilterString(const QString &expr)
+DeckFilterString::DeckFilterString(const QString &expr,
+                                   const QString &searchLanguage,
+                                   CardSearchLanguage searchLanguageMode)
 {
     QByteArray ba = expr.simplified().toUtf8();
 
@@ -198,6 +213,8 @@ DeckFilterString::DeckFilterString(const QString &expr)
         filter = [](const DeckSearchData &) { return true; };
         return;
     }
+
+    deckSearchLanguageContext = DeckSearchLanguageContext{searchLanguage, searchLanguageMode};
 
     search.set_logger([&](size_t /*ln*/, size_t col, const std::string &msg) {
         _error = QString("Error at position %1: %2").arg(col).arg(QString::fromStdString(msg));
