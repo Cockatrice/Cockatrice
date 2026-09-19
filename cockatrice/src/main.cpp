@@ -44,6 +44,7 @@
 #include <QMessageBox>
 #include <QSystemTrayIcon>
 #include <QTranslator>
+#include <QUrl>
 #include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/rng/rng_sfmt.h>
@@ -177,6 +178,18 @@ QString const generateClientID()
     return strClientID;
 }
 
+static QString redactActivationUrl(const QString &url)
+{
+    // Activation URLs carry secrets in their query string (e.g. the deck share
+    // token); log only the scheme and the action (cockatrice://opendeck), never
+    // the parameters.
+    if (!url.startsWith(QStringLiteral("cockatrice://"))) {
+        return url;
+    }
+    const QUrl parsed(url);
+    return parsed.scheme() + "://" + parsed.host();
+}
+
 int main(int argc, char *argv[])
 {
 #ifdef Q_OS_WIN
@@ -273,7 +286,12 @@ int main(int argc, char *argv[])
     SingleInstanceManager instance;
 
     if (hasActivationFiles) {
-        qInfo() << "Activation launch, files:" << startupFiles;
+        QStringList redactedFiles;
+        redactedFiles.reserve(startupFiles.size());
+        for (const QString &file : startupFiles) {
+            redactedFiles.append(redactActivationUrl(file));
+        }
+        qCInfo(MainLog) << "Activation launch, files:" << redactedFiles;
         // Activation launch: hand off to the primary instance if one is
         // running, otherwise become the primary ourselves. Do this before
         // constructing the main window so a hand-off exits cheaply.
@@ -346,7 +364,7 @@ int main(int argc, char *argv[])
 
     auto handleActivation = [&ui](const QString &file) {
         if (file.startsWith("cockatrice://")) {
-            qInfo() << "Handling URL activation:" << file;
+            qCInfo(MainLog) << "Handling URL activation:" << redactActivationUrl(file);
             // Route through the window's persistent url parser: it serializes
             // link chains so activations handed over while another chain is
             // still connecting do not connect concurrently.
