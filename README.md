@@ -99,9 +99,9 @@ You can also have a look at our `Todo List` in our [Code Documentation](https://
 
 There are various places where useful information for different needs are maintained:
 - [Official Code Documentation](https://cockatrice.github.io/docs/) 
-- [Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki) `Community supported`
+- [Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki) <kbd>Community supported</kbd>
 - [Official Webpage](https://cockatrice.github.io/)
-- [Official README](https://github.com/Cockatrice/Cockatrice/blob/master/README.md) `This file`
+- [Official README](https://github.com/Cockatrice/Cockatrice/blob/master/README.md) <kbd>This file</kbd>
 
 Cockatrice tries to use the [Google Developer Documentation Style Guide](https://developers.google.com/style/) to ensure consistent documentation. We encourage you to improve the documentation by suggesting edits based on this guide.
 
