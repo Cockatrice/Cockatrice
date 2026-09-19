@@ -7,6 +7,7 @@
 #include "flow_widget.h"
 
 #include <QHBoxLayout>
+#include <QKeyEvent>
 #include <QResizeEvent>
 #include <QScrollArea>
 #include <QSizePolicy>
@@ -80,10 +81,15 @@ FlowWidget::FlowWidget(QWidget *parent,
 /**
  * @brief Adds a widget to the flow layout within the FlowWidget.
  *
+ * The widget is filtered for arrow-key events so keyboard navigation between
+ * the flow items keeps working even when the flow sits inside a QScrollArea,
+ * which swallows arrow keys before they can reach FlowWidget::keyPressEvent.
+ *
  * @param widget_to_add The widget to add to the flow layout.
  */
-void FlowWidget::addWidget(QWidget *widget_to_add) const
+void FlowWidget::addWidget(QWidget *widget_to_add)
 {
+    widget_to_add->installEventFilter(this);
     flowLayout->addWidget(widget_to_add);
 }
 
@@ -175,6 +181,66 @@ void FlowWidget::setMinimumSizeToMaxSizeHint()
 QLayoutItem *FlowWidget::itemAt(int index) const
 {
     return flowLayout->itemAt(index);
+}
+
+void FlowWidget::keyPressEvent(QKeyEvent *event)
+{
+    if (moveFocus(event)) {
+        event->accept();
+        return;
+    }
+    QWidget::keyPressEvent(event);
+}
+
+bool FlowWidget::eventFilter(QObject *watched, QEvent *event)
+{
+    if (event->type() == QEvent::KeyPress && moveFocus(static_cast<QKeyEvent *>(event))) {
+        return true;
+    }
+    return QWidget::eventFilter(watched, event);
+}
+
+bool FlowWidget::moveFocus(QKeyEvent *event)
+{
+    // Keyboard navigation between the flow items: arrow keys move focus just
+    // like clicking the sibling tiles would. Only items that can take keyboard
+    // focus (e.g. the deck-preview tiles in shared-deck links) are visited.
+    const bool moveForward = event->key() == Qt::Key_Right || event->key() == Qt::Key_Down;
+    const bool moveBackward = event->key() == Qt::Key_Left || event->key() == Qt::Key_Up;
+    if (!moveForward && !moveBackward) {
+        return false;
+    }
+
+    QList<QWidget *> focusableItems;
+    for (int i = 0; i < flowLayout->count(); ++i) {
+        QWidget *item = flowLayout->itemAt(i)->widget();
+        if (item != nullptr && (item->focusPolicy() & Qt::TabFocus)) {
+            focusableItems.append(item);
+        }
+    }
+
+    if (focusableItems.isEmpty()) {
+        return false;
+    }
+
+    int currentIndex = -1;
+    for (int i = 0; i < focusableItems.size(); ++i) {
+        if (focusableItems.at(i)->hasFocus()) {
+            currentIndex = i;
+            break;
+        }
+    }
+
+    const int delta = moveForward ? 1 : -1;
+    int nextIndex;
+    if (currentIndex < 0) {
+        nextIndex = moveForward ? 0 : focusableItems.size() - 1;
+    } else {
+        nextIndex = (currentIndex + delta + focusableItems.size()) % focusableItems.size();
+    }
+    focusableItems.value(nextIndex)->setFocus();
+    event->accept();
+    return true;
 }
 
 int FlowWidget::count() const
