@@ -1,10 +1,11 @@
 @page custom_card_pictures Custom Card Pictures
 
-There are three ways to make Cockatrice use custom artwork for your cards:
+There are four ways to make Cockatrice use custom artwork for your cards:
 
 - Placing image files in the **CUSTOM pictures folder**.
 - Providing a **custom card database** that points each printing at a picture URL via the `picurl` property.
 - Writing your **own download URL templates**.
+- Setting an **image override** for a single card from inside the deck editor.
 
 Each of these is described below. If pictures are missing or wrong, see @ref fixing_card_pictures instead.
 
@@ -109,3 +110,26 @@ wiki for more examples and ideas.
 \attention Keep in mind that templates using `!name!` or `!set:muid!` resolve by name or multiverse ID, not by the
 exact printing. Only the Scryfall `!set:uuid!` templates always return the exact printing requested. See
 @ref fixing_card_pictures for more on this.
+
+# Image Overrides
+
+The quickest way to give one card custom art is an image override: right-click the card in the deck editor's printing
+selector and open the **Image Overrides** submenu of the context menu.
+
+- **Load Custom Image...** — choose a picture file (the dialog suggests PNG, JPG/JPEG and WebP); it becomes that card's
+  artwork immediately.
+- **One entry per alternate printing** of the card, labeled `<set> <collector number>` (hovering an entry previews that
+  printing's artwork). Selecting one makes the card use that exact printing's picture, so e.g. a basic land can be shown
+  with any of its artworks.
+- **Clear Custom Image** — removes the stored override and returns the card to normal resolution. It is only available
+  while the card has a stored override.
+
+Overrides are stored as `.png` files in `<pictures directory>/downloadedPics/`, under the "Naming scheme" configured on
+the Storage settings page, and are matched the same way as downloaded images. Because local files are checked before any
+URL is requested, an override always wins over downloaded artwork and `picurl` for that card. The override exists only on
+the machine it was created on - it is not part of the deck file - so a card with a stored override shows normally on
+another computer.
+
+\attention If you also keep a matching file in the CUSTOM folder, that file is matched before the override. When you
+change an override, use **Clear Custom Image** so the stored `.png` is replaced; manually deleting the file in
+`downloadedPics/` has the same effect.

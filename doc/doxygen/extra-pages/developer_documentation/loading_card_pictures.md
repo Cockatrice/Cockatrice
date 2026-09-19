@@ -98,7 +98,7 @@ Clearing the network cache (CardPictureLoader::clearNetworkCache()) also clears 
 Before any network request is issued, CardPictureLoaderWorker hands the ExactCard to CardPictureLoaderLocal, which
 tries to find a matching picture on disk. If a local picture is found, it is used and no network request is made.
 
-CardPictureLoaderLocal searches two locations:
+CardPictureLoaderLocal searches three locations:
 
 - The **CUSTOM folder** (`<pictures directory>/CUSTOM/`). Every file in it is indexed recursively by its base name
   (both `baseName` and `completeBaseName`, so a file named `ExampleCard.jpg` is indexed as `ExampleCard`). The index is rebuilt
@@ -106,24 +106,52 @@ CardPictureLoaderLocal searches two locations:
   client (changing the configured pictures directory only reassigns the search paths; the next timer tick rebuilds the index).
 - The **set-named subfolders** of the pictures directory: `<pictures directory>/<set code>/` and
   `<pictures directory>/downloadedPics/<set code>/`.
+- The **root of the `downloadedPics` folder** (`<pictures directory>/downloadedPics/`). The export naming schemes without a
+  set-folder part write their files straight into `downloadedPics/`, so this is where flat-scheme downloads and the
+  local overrides described below are matched.
 
 For each candidate folder, the loader generates file-name variants from the card's corrected name, set code, collector
 number and provider ID using the import naming schemes (Card Name + Provider ID, Card Name + Set + Collector,
-Set + Collector + Card Name, Card Name + Set, Card Name), each tried with both `_` and `-` as separator. A file matches
-if its name starts with one of the variants - the extension is free - and the first variant that yields a readable
-image wins. For example, the file `Example Card_EXM_43.png` in the `EXM` set folder matches the card with
-corrected name `Example Card`, set code `EXM` and collector number `43`.
+Set + Collector + Card Name, Card Name + Set, Card Name), each tried with both `_` and `-` as separator. A file is
+accepted when its name without the extension *equals* the variant exactly - the extension itself is free - and the
+first variant that yields a readable image wins. For example, the file `Example Card_EXM_43.png` in the `EXM` set
+folder matches the card with corrected name `Example Card`, set code `EXM` and collector number `43`.
 
 \attention The file-name variants use the *corrected* card name, so split cards are stored under their joined name: the
 "Example // Card" card is matched by a file named `ExampleCard.*`.
 
-The naming schemes are duplicated in the user-facing page @ref custom_card_pictures, which also documents how to
-set up a custom card database that provides pictures via the CUSTOM folder and the `picurl` printing property.
+The naming schemes are also documented in the user-facing page @ref custom_card_pictures, which additionally covers
+the CUSTOM folder workflow, `picurl` and download URL templates.
 
 When the filesystem cache method is selected on the "Storage" settings page, downloaded images are additionally written
-into `<pictures directory>/downloadedPics/` using the configured export naming scheme (as `.png` files). Existing files
-are never overwritten, so a provider outage can permanently leave a wrong image in that folder until it is deleted
-manually - the user-facing troubleshooting guide @ref fixing_card_pictures covers how to do this.
+into `<pictures directory>/downloadedPics/` using the configured export naming scheme (as `.png` files). The two export
+schemes with a set-folder part (`Set Folder / Name + Provider ID` and `Set Folder / Name + Set Name + Collector`) write
+into `downloadedPics/<set code>/`; the three flat schemes write directly into `downloadedPics/`. Automatic cache writes
+never overwrite an existing file, so a provider outage can permanently leave an outdated image in that folder until it
+is deleted manually - the user-facing troubleshooting guide @ref fixing_card_pictures covers how to do this. Explicit
+image overrides (see below) are the exception and always overwrite.
+
+# Local Image Overrides
+
+Beyond the generic on-disk lookup above, individual printings can be given explicit artwork that wins over every other
+source without touching the CUSTOM folder or any download URL. This is the "Image Overrides" submenu of the context menu
+that opens when you right-click a card in the deck editor's printing selector.
+
+- **Load Custom Image...** asks for a picture file and installs it for the card through
+  CardPictureLoader::saveCardImageToLocalStorage() with `allowOverwrite == true`.
+- **One entry per alternate printing** (labeled `<set> <collector number>`): selecting one hands the card to
+  CardPictureLoader::installPrintingOverride(), which resolves that printing's artwork - enqueueing a load and waiting
+  for the `CardInfo::pixmapUpdated` signal if it is not cached yet - and persists it for the card.
+- **Clear Custom Image** calls CardPictureLoader::deleteAllLocalOverrides() to remove every stored override image of the
+  card, after which normal resolution resumes. The entry is only enabled while CardPictureLoader::hasLocalOverrides()
+  reports at least one stored file.
+
+Overrides are stored as `.png` files in `downloadedPics/` under the export naming scheme configured on the "Storage"
+settings page - which is exactly why the local matcher also looks into the `downloadedPics/` root (see above). They are
+written with `allowOverwrite == true`, so an override always replaces whatever the filesystem cache previously saved for
+that spelling; only *automatic* cache writes are prevented from clobbering it. Overriding a card with its own current
+printing is a no-op (the UI omits it from the menu), and an override whose artwork fails to resolve surfaces the
+"failed" card back instead of a silent no-op while any override already on disk is left in place and re-displayed.
 
 # URL Generation and Resolution
 
@@ -141,21 +169,12 @@ For each set, CardPictureToLoad::populateSetUrls() builds an ordered URL list:
 2. The configured download URL templates, in priority order (Deck Editor → "URL Download Priority").
 
 URL templates are transformed into concrete URLs by CardPictureToLoad::transformUrl(), which substitutes reference
-points. The following placeholders are available:
+points. `!name!`, `!setcode!` and friends substitute card and printing data, while the `!set:<property>!` and
+`!prop:<property>!` reference points resolve a property of the printing or of the card respectively. The canonical list
+of all reference points with examples, including the `_fill_with_` and `_substr_` modifiers, lives in
+@ref custom_card_pictures.
 
-| Placeholder                     | Description                                                                                                                        | Example                                      |
-| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| `!name!`                        | Card name                                                                                                                          | `Example Card`                               |
-| `!name_lower!`                  | Card name, lower case                                                                                                              | `example card`                               |
-| `!corrected_name!`              | Corrected card name                                                                                                                | `ExampleCard` (instead of "Example // Card") |
-| `!corrected_name_lower!`        | Corrected card name, lower case                                                                                                    | `examplecard`                                |
-| `!sflang!`                      | Scryfall language code for the current client language; defaults to English when the language has no localized images              | `en`, `zhs`                                  |
-| `!setcode!` / `!setcode_lower!` | Set code                                                                                                                           | `EXM` / `exm`                                |
-| `!setname!` / `!setname_lower!` | Full set name                                                                                                                      | `Exemplary Set` / `exemplary set`            |
-| `!set:<property>!`              | A property of this printing, e.g. `muid` (Gatherer multiverse ID), `uuid` (Scryfall UUID), `num` (collector number), `rarity`      | `373549`                                     |
-| `!prop:<property>!`             | A property of the card, e.g. `side` (front/back), `colors`, `cmc`, `coloridentity`, `type`, `pt`, and the format legality statuses | `front`                                      |
-
-The `!set:...!` and `!prop:...!` placeholders also support two modifiers:
+The `!set:...!` and `!prop:...!` reference points also support two modifiers:
 
 - `_fill_with_<text>` pads the value with the given text, right-aligned, e.g. `!set:num_fill_with_000!` turns collector
   number `1` into `001`. If the value is longer than the fill text, the template is invalidated.

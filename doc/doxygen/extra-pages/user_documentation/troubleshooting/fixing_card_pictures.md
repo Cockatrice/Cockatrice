@@ -28,7 +28,7 @@ valid URLs. If you suspect the list has been modified or corrupted, press 'Reset
 defaults.
 
 For information on how to add your own custom URL templates, see the 'How to add a custom URL' link in the same
-settings section, or @subpage custom_card_pictures for a full reference of the URL reference points, the CUSTOM
+settings section, or @ref custom_card_pictures for a full reference of the URL reference points, the CUSTOM
 pictures folder, and custom card databases.
 
 # Check Your Local Picture Folder
@@ -42,6 +42,9 @@ Cockatrice checks the following locations, in order:
 - The custom pictures folder (recursively indexed by file name).
 - `<pictures directory>/<set code>/<card file name>`
 - `<pictures directory>/downloadedPics/<set code>/<card file name>`
+- `<pictures directory>/downloadedPics/<card file name>` (for export naming schemes without a set folder)
+
+A file only matches when its name without the extension equals one of the recognized scheme patterns exactly.
 
 The following import naming schemes are recognized (using both `_` and `-` as separators). The canonical table with
 concrete example file names is on @ref custom_card_pictures:
@@ -57,6 +60,10 @@ concrete example file names is on @ref custom_card_pictures:
 If a picture you downloaded or placed manually is wrong, stale, or corrupted, delete the offending file. Pay special
 attention to the `downloadedPics` subfolder: this is where the filesystem caching method writes downloaded images, and
 after a provider outage it can permanently contain the wrong printing until you delete it manually.
+
+If a card persistently shows artwork you assigned yourself, you may have an **image override** set for it. Right-click
+the card in the deck editor's printing selector and use 'Image Overrides' → 'Clear Custom Image' to remove it (or
+delete the stored `.png` in `downloadedPics/`). See @ref custom_card_pictures for details.
 
 See @ref loading_card_pictures for details on how local images are loaded.
 
