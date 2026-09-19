@@ -36,7 +36,9 @@ class FilterString
 {
 public:
     FilterString();
-    explicit FilterString(const QString &exp);
+    explicit FilterString(const QString &exp,
+                          const QString &searchLanguage = QString(),
+                          CardSearchLanguage searchLanguageMode = CardSearchLanguage::English);
     [[nodiscard]] bool check(const CardData &card) const
     {
         if (card.isNull()) {
@@ -55,17 +57,6 @@ public:
     {
         return _error;
     }
-
-    /**
-     * @brief Sets the card language plain-text name and text queries run against.
-     *
-     * The peg parser rules are set up once per process, so this propagates to
-     * every FilterString instance created through the shared parser.
-     *
-     * @param searchLanguage Empty string for English only, otherwise the card language code.
-     * @param searchLanguageMode The search language mode from CardSearchLanguage.
-     */
-    void setSearchLanguage(const QString &searchLanguage, CardSearchLanguage searchLanguageMode);
 
 private:
     QString _error;

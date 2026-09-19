@@ -35,6 +35,7 @@ private:
     QTimer dirtyTimer;
     QString searchLanguage;
     CardSearchLanguage searchLanguageMode = CardSearchLanguage::English;
+    QString searchText;
 
     /** The translation table that will be used for sanitizeCardName. */
     static QMap<wchar_t, wchar_t> characterTranslation;

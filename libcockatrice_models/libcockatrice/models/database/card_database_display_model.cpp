@@ -239,9 +239,9 @@ void CardDatabaseDisplayModel::setFilterTree(FilterTree *_filterTree)
 
 void CardDatabaseDisplayModel::setStringFilter(const QString &_src)
 {
+    searchText = _src;
     delete filterString;
-    filterString = new FilterString(_src);
-    filterString->setSearchLanguage(searchLanguage, searchLanguageMode);
+    filterString = new FilterString(_src, searchLanguage, searchLanguageMode);
     dirty();
 }
 
@@ -255,7 +255,7 @@ void CardDatabaseDisplayModel::setSearchLanguage(const QString &searchLang, Card
     searchLanguageMode = mode;
 
     if (filterString != nullptr) {
-        filterString->setSearchLanguage(searchLanguage, searchLanguageMode);
+        setStringFilter(searchText);
     }
     dirty();
 }

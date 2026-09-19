@@ -74,13 +74,18 @@ NumericValue <- [0-9]+
 
 static std::once_flag init;
 
-// The peg parser rules are set up once per process, which means the GenericQuery/
-// OracleQuery lambdas cannot capture per-instance state. The card language the
-// plain-text name and text queries search in is therefore kept here and applied
-// by those lambdas; every FilterString shares it because it reflects a single
-// global user setting.
-static QString globalSearchLanguage;
-static CardSearchLanguage globalSearchLanguageMode = CardSearchLanguage::English;
+// The peglib parser rules (and therefore their rule actions) are set up once per
+// process, so a rule action cannot capture per-instance state. The card language
+// plain-text name and text queries search in is therefore handed to the GenericQuery
+// and OracleQuery rule actions through this thread-local context, which is live only
+// while a FilterString is being parsed. The rule actions copy it into the filter
+// closures they produce, so card evaluation never reads process-global state.
+struct SearchLanguageContext
+{
+    QString searchLanguage;
+    CardSearchLanguage searchLanguageMode = CardSearchLanguage::English;
+};
+thread_local SearchLanguageContext searchLanguageContext;
 
 namespace
 {
@@ -365,9 +370,11 @@ static void setupParserRules()
 
     search["OracleQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         const auto matcher = std::any_cast<StringMatcher>(sv[0]);
+        const QString searchLanguage = searchLanguageContext.searchLanguage;
+        const CardSearchLanguage searchLanguageMode = searchLanguageContext.searchLanguageMode;
         return [=](const CardData &x) {
-            return matchesInSearchLanguage(x->getText(), x->getLocalizedText(globalSearchLanguage),
-                                           globalSearchLanguage, globalSearchLanguageMode, matcher);
+            return matchesInSearchLanguage(x->getText(), x->getLocalizedText(searchLanguage), searchLanguage,
+                                           searchLanguageMode, matcher);
         };
     };
 
@@ -445,9 +452,11 @@ static void setupParserRules()
     };
     search["GenericQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         const auto matcher = std::any_cast<StringMatcher>(sv[0]);
+        const QString searchLanguage = searchLanguageContext.searchLanguage;
+        const CardSearchLanguage searchLanguageMode = searchLanguageContext.searchLanguageMode;
         return [=](const CardData &x) {
-            return matchesInSearchLanguage(x->getName(), x->getLocalizedName(globalSearchLanguage),
-                                           globalSearchLanguage, globalSearchLanguageMode, matcher);
+            return matchesInSearchLanguage(x->getName(), x->getLocalizedName(searchLanguage), searchLanguage,
+                                           searchLanguageMode, matcher);
         };
     };
 
@@ -463,7 +472,7 @@ FilterString::FilterString()
     _error = "Not initialized";
 }
 
-FilterString::FilterString(const QString &expr)
+FilterString::FilterString(const QString &expr, const QString &searchLanguage, CardSearchLanguage searchLanguageMode)
 {
     QByteArray ba = expr.simplified().toUtf8();
 
@@ -476,6 +485,8 @@ FilterString::FilterString(const QString &expr)
         return;
     }
 
+    searchLanguageContext = SearchLanguageContext{searchLanguage, searchLanguageMode};
+
     search.set_logger([&](size_t /*ln*/, size_t col, const std::string &msg) {
         _error = QString("Error at position %1: %2").arg(col).arg(QString::fromStdString(msg));
     });
@@ -484,10 +495,4 @@ FilterString::FilterString(const QString &expr)
         qCInfo(FilterStringLog).nospace() << "FilterString error for " << expr << "; " << qPrintable(_error);
         result = [](const CardData &) -> bool { return false; };
     }
-}
-
-void FilterString::setSearchLanguage(const QString &searchLanguage, CardSearchLanguage searchLanguageMode)
-{
-    globalSearchLanguage = searchLanguage;
-    globalSearchLanguageMode = searchLanguageMode;
 }
