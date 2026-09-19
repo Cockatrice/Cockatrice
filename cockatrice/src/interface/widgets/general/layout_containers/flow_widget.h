@@ -29,7 +29,7 @@ public:
                Qt::ScrollBarPolicy horizontalPolicy,
                Qt::ScrollBarPolicy verticalPolicy);
 
-    void addWidget(QWidget *widget_to_add) const;
+    void addWidget(QWidget *widget_to_add);
     void insertWidgetAtIndex(QWidget *toInsert, int index);
     void removeWidget(QWidget *widgetToRemove) const;
     void clearLayout();
@@ -44,10 +44,15 @@ public slots:
     void setSpacing(int hSpacing, int vSpacing);
 
 protected:
+    bool eventFilter(QObject *watched, QEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
 
 private:
+    /// @brief Moves keyboard focus to an adjacent flow item for an arrow-key event.
+    /// @return True when the event was an arrow key and was handled.
+    bool moveFocus(QKeyEvent *event);
+
     Qt::Orientation flowDirection;
     QHBoxLayout *mainLayout;
     FlowLayout *flowLayout;
