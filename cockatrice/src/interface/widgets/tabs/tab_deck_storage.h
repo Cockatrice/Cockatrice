@@ -11,6 +11,7 @@
 #include "../interface/widgets/server/remote/remote_decklist_tree_widget.h"
 #include "tab.h"
 
+#include <QStringList>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 
 struct LoadedDeck;
@@ -45,6 +46,7 @@ private:
     QAction *aOpenRemoteDeck, *aDownload, *aShareDecks, *aPublishDeck, *aNewFolder, *aDeleteRemoteDeck;
     bool visibilityRefreshStarted = false;
     QTimer *visibilityRefreshTimer;
+    QStringList visibilityFailures;
     QString getTargetPath() const;
 
     void setRemoteEnabled(bool enabled);
