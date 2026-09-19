@@ -543,6 +543,7 @@ void RemoteClient::doDisconnectFromServer()
         delete i;
     }
     pendingCommands.clear();
+    clearLatencyStats();
 
     setStatus(StatusDisconnected);
     if (websocket->isValid()) {

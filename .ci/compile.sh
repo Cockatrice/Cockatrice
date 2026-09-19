@@ -149,6 +149,9 @@ if [[ $MAKE_TEST ]]; then
 fi
 if [[ $USE_CCACHE ]]; then
   flags+=("-DUSE_CCACHE=1")
+  # PCH-aware caching is required or ccache refuses to cache any TU that
+  # consumes a precompiled header, silently recompiling everything on every run.
+  ccache --set-config sloppiness=pch_defines,time_macros
   if [[ $CCACHE_SIZE ]]; then
     # note, this setting persists after running the script
     ccache --max-size "$CCACHE_SIZE"
@@ -159,6 +162,7 @@ if [[ $PACKAGE_TYPE ]]; then
 fi
 if [[ $USE_VCPKG ]]; then
   flags+=("-DUSE_VCPKG=1")
+  flags+=("-DVCPKG_INSTALL_OPTIONS=--x-abi-tools-use-exact-versions")
 fi
 
 # Add cmake --build flags

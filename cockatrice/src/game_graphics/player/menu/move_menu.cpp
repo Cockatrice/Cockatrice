@@ -1,5 +1,6 @@
 #include "move_menu.h"
 
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
 #include "../card_menu_action_type.h"

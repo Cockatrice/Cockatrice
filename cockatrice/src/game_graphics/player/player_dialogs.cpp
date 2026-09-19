@@ -8,6 +8,7 @@
 
 #include <QInputDialog>
 #include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/utility/string_limits.h>
 
 PlayerDialogs::PlayerDialogs(PlayerGraphicsItem *_player, PlayerActions *_playerActions)
     : QObject(_player), player(_player), playerActions(_playerActions)

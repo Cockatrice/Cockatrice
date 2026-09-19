@@ -1,0 +1,9 @@
+syntax = "proto2";
+import "moderator_commands.proto";
+
+message Command_ReportUserInfo {
+    extend ModeratorCommand {
+        optional Command_ReportUserInfo ext = 1204;
+    }
+    optional string user_name = 1;
+}

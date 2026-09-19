@@ -35,6 +35,7 @@ public:
     void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
     void refreshSelectionForIndex(const QPersistentModelIndex &persistent);
     void clearAllDisplayWidgets();
+    void addCardWidgets(const QPersistentModelIndex &persistent);
 
     DeckListModel *deckListModel;
     QItemSelectionModel *selectionModel;

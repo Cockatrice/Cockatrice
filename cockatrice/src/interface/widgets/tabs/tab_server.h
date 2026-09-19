@@ -10,6 +10,8 @@
 #include "tab.h"
 
 #include <QGroupBox>
+#include <QHash>
+#include <QSet>
 #include <QTextBrowser>
 #include <QTreeWidget>
 
@@ -49,19 +51,30 @@ class TabServer : public Tab
     Q_OBJECT
 signals:
     void roomJoined(const ServerInfo_Room &info, bool setCurrent);
+    void roomJoinFailed(int roomId);
 private slots:
     void processServerMessageEvent(const Event_ServerMessage &event);
-    void joinRoom(int id, bool setCurrent);
-    void joinRoomFinished(const Response &resp, const CommandContainer &commandContainer, const QVariant &extraData);
+    void joinRoomFinished(const Response &resp,
+                          const CommandContainer &commandContainer,
+                          const QVariant &extraData,
+                          int roomId);
 
 private:
+    void leaveAndRejoinRoom(int roomId, bool setCurrent);
+
     AbstractClient *client;
     RoomSelector *roomSelector;
     QTextBrowser *serverInfoBox;
     bool shouldEmitUpdate = false;
+    /** Room ids with a join command in flight, mapped to whether the tab should be focused once it opens. */
+    QHash<int, bool> pendingRoomJoins;
+    /** Room ids for which a stale-membership heal (leave + rejoin) is currently in flight. Released as soon as the
+     *  rejoin has been answered, so a heal is attempted at most once per join. */
+    QSet<int> healedRoomJoins;
 
 public:
     TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client);
+    void joinRoom(int id, bool setCurrent);
     void retranslateUi() override;
     [[nodiscard]] QString getTabText() const override
     {

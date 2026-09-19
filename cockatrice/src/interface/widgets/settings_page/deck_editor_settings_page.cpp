@@ -1,6 +1,7 @@
 #include "deck_editor_settings_page.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../pixel_map_generator.h"
 #include "update/card_spoiler/spoiler_background_updater.h"
 
 #include <QFileDialog>
@@ -10,12 +11,16 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QToolBar>
+#include <libcockatrice/settings/download_settings.h>
+#include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/utility/macros.h>
 
 DeckEditorSettingsPage::DeckEditorSettingsPage()
 {
-    picDownloadCheckBox.setChecked(SettingsCache::instance().getPicDownload());
-    connect(&picDownloadCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setPicDownload);
+    picDownloadCheckBox.setChecked(SettingsCache::instance().downloads().getPicDownload());
+    connect(&picDownloadCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().downloads(),
+            &DownloadSettings::setPicDownload);
 
     urlLinkLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
     urlLinkLabel.setOpenExternalLinks(true);
@@ -25,7 +30,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     auto *lpGeneralGrid = new QGridLayout;
     auto *lpSpoilerGrid = new QGridLayout;
 
-    mcDownloadSpoilersCheckBox.setChecked(SettingsCache::instance().getDownloadSpoilersStatus());
+    mcDownloadSpoilersCheckBox.setChecked(SettingsCache::instance().downloads().getDownloadSpoilersStatus());
 
     mpSpoilerSavePathLineEdit = new QLineEdit(SettingsCache::instance().getSpoilerCardDatabasePath());
     mpSpoilerSavePathLineEdit->setReadOnly(true);
@@ -49,15 +54,15 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     urlList->addItems(SettingsCache::instance().downloads().getAllURLs());
 
     aAdd = new QAction(this);
-    aAdd->setIcon(QPixmap("theme:icons/increment"));
+    aAdd->setIcon(themePixmap(QStringLiteral("icons/increment")));
     connect(aAdd, &QAction::triggered, this, &DeckEditorSettingsPage::actAddURL);
 
     aEdit = new QAction(this);
-    aEdit->setIcon(QPixmap("theme:icons/pencil"));
+    aEdit->setIcon(themePixmap(QStringLiteral("icons/pencil")));
     connect(aEdit, &QAction::triggered, this, &DeckEditorSettingsPage::actEditURL);
 
     aRemove = new QAction(this);
-    aRemove->setIcon(QPixmap("theme:icons/decrement"));
+    aRemove->setIcon(themePixmap(QStringLiteral("icons/decrement")));
     connect(aRemove, &QAction::triggered, this, &DeckEditorSettingsPage::actRemoveURL);
 
     auto *urlToolBar = new QToolBar;
@@ -87,8 +92,8 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     lpSpoilerGrid->addWidget(&infoOnSpoilersLabel, 3, 0, 1, 3, Qt::AlignTop);
 
     // On a change to the checkbox, hide/un-hide the other fields
-    connect(&mcDownloadSpoilersCheckBox, &QCheckBox::toggled, &SettingsCache::instance(),
-            &SettingsCache::setDownloadSpoilerStatus);
+    connect(&mcDownloadSpoilersCheckBox, &QCheckBox::toggled, &SettingsCache::instance().downloads(),
+            &DownloadSettings::setDownloadSpoilerStatus);
     connect(&mcDownloadSpoilersCheckBox, &QCheckBox::toggled, this, &DeckEditorSettingsPage::setSpoilersEnabled);
 
     mpGeneralGroupBox = new QGroupBox;
@@ -103,7 +108,8 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 
     setLayout(lpMainLayout);
 
-    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &DeckEditorSettingsPage::retranslateUi);
+    connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this,
+            &DeckEditorSettingsPage::retranslateUi);
     retranslateUi();
 }
 
@@ -203,7 +209,7 @@ void DeckEditorSettingsPage::spoilerPathButtonClicked()
     }
 
     mpSpoilerSavePathLineEdit->setText(lsPath + "/spoiler.xml");
-    SettingsCache::instance().setSpoilerDatabasePath(lsPath + "/spoiler.xml");
+    SettingsCache::instance().paths().setSpoilerDatabasePath(lsPath + "/spoiler.xml");
 }
 
 void DeckEditorSettingsPage::setSpoilersEnabled(bool anInput)

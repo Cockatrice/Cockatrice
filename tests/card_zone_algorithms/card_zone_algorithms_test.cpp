@@ -134,6 +134,35 @@ TEST_F(AddCardAlgorithmTest, MidListInsertionPreservesOrder)
     EXPECT_EQ(knownList.at(2), &b);
 }
 
+// Reconnecting to a game rebuilds zones from a ServerInfo_Zone. Non-coordinate zones
+// (hand, piles, stack) report x == 0 on every card, so inserting each rebuilt card at
+// that index would reverse the received server order. Appending (-1) keeps it.
+TEST_F(AddCardAlgorithmTest, RebuildInsertAtZeroReversesServerOrder)
+{
+    MockCard a, b, c;
+    CardZoneAlgorithms::addCardToList(knownList, &a, 0, false);
+    CardZoneAlgorithms::addCardToList(knownList, &b, 0, false);
+    CardZoneAlgorithms::addCardToList(knownList, &c, 0, false);
+
+    EXPECT_EQ(knownList.size(), 3);
+    EXPECT_EQ(knownList.at(0), &c);
+    EXPECT_EQ(knownList.at(1), &b);
+    EXPECT_EQ(knownList.at(2), &a);
+}
+
+TEST_F(AddCardAlgorithmTest, RebuildAppendPreservesServerOrder)
+{
+    MockCard a, b, c;
+    CardZoneAlgorithms::addCardToList(knownList, &a, -1, false);
+    CardZoneAlgorithms::addCardToList(knownList, &b, -1, false);
+    CardZoneAlgorithms::addCardToList(knownList, &c, -1, false);
+
+    EXPECT_EQ(knownList.size(), 3);
+    EXPECT_EQ(knownList.at(0), &a);
+    EXPECT_EQ(knownList.at(1), &b);
+    EXPECT_EQ(knownList.at(2), &c);
+}
+
 TEST_F(AddCardAlgorithmTest, KeepAnnotationsFalsePassedThrough)
 {
     MockCard card;

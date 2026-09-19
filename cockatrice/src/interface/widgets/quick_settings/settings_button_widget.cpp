@@ -1,5 +1,7 @@
 #include "settings_button_widget.h"
 
+#include "../../pixel_map_generator.h"
+
 #include <QApplication>
 #include <QHBoxLayout>
 #include <QMouseEvent>
@@ -8,7 +10,7 @@
 SettingsButtonWidget::SettingsButtonWidget(QWidget *parent)
     : QWidget(parent), button(new QToolButton(this)), popup(new SettingsPopupWidget(nullptr))
 {
-    button->setIcon(QPixmap("theme:icons/cogwheel"));
+    button->setIcon(themePixmap(QStringLiteral("icons/cogwheel")));
     button->setCheckable(true);
     button->setFixedSize(32, 32);
     connect(button, &QToolButton::clicked, this, &SettingsButtonWidget::togglePopup);
@@ -18,6 +20,13 @@ SettingsButtonWidget::SettingsButtonWidget(QWidget *parent)
     layout->addWidget(button);
     layout->setContentsMargins(0, 0, 0, 0);
     setLayout(layout);
+}
+
+SettingsButtonWidget::~SettingsButtonWidget()
+{
+    // We don't parent the popup because it might lead to better behavior on certain window managers.
+    // So we have to manually delete it
+    popup->deleteLater();
 }
 
 void SettingsButtonWidget::addSettingsWidget(QWidget *toAdd) const
@@ -103,11 +112,7 @@ void SettingsButtonWidget::onPopupClosed() const
 
 void SettingsButtonWidget::mousePressEvent(QMouseEvent *event)
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     if (popup->isVisible() && !popup->geometry().contains(event->globalPosition().toPoint())) {
-#else
-    if (popup->isVisible() && !popup->geometry().contains(event->globalPos())) {
-#endif
         popup->close();
     }
     QWidget::mousePressEvent(event);

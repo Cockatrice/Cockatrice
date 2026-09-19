@@ -1,7 +1,7 @@
 #include "passwordhasher.h"
 
 #include <QCryptographicHash>
-#include <libcockatrice/rng/rng_sfmt.h>
+#include <libcockatrice/utility/cryptoutil.h>
 
 QString PasswordHasher::computeHash(const QString &password, const QString &salt)
 {
@@ -21,12 +21,28 @@ QString PasswordHasher::generateRandomSalt(const int len)
     static const char alphanum[] = "0123456789"
                                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                    "abcdefghijklmnopqrstuvwxyz";
+    const int size = sizeof(alphanum) - 1;
+
+    // Two bytes per character, corrected for modulo bias via rejection sampling.
+    const int bucketSize = 65536 / size;
+    const int limit = bucketSize * size;
 
     QString ret;
-    int size = sizeof(alphanum) - 1;
-
+    ret.reserve(len);
+    QByteArray random = CryptoUtil::randomBytes(len * 2);
+    int bytesUsed = 0;
     for (int i = 0; i < len; ++i) {
-        ret.append(alphanum[rng->rand(0, size)]);
+        unsigned int value;
+        do {
+            if (bytesUsed >= random.size()) {
+                random = CryptoUtil::randomBytes(len * 2);
+                bytesUsed = 0;
+            }
+            value = static_cast<unsigned int>(static_cast<unsigned char>(random.at(bytesUsed))) << 8 |
+                    static_cast<unsigned int>(static_cast<unsigned char>(random.at(bytesUsed + 1)));
+            bytesUsed += 2;
+        } while (value >= limit);
+        ret.append(alphanum[value / bucketSize]);
     }
 
     return ret;
@@ -34,5 +50,5 @@ QString PasswordHasher::generateRandomSalt(const int len)
 
 QString PasswordHasher::generateActivationToken()
 {
-    return QCryptographicHash::hash(generateRandomSalt().toUtf8(), QCryptographicHash::Md5).toBase64().left(16);
+    return QString(CryptoUtil::randomBytes(16).toBase64().left(16));
 }

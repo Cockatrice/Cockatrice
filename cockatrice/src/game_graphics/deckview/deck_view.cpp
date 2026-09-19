@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/deck_list/deck_list.h>
-#include <libcockatrice/deck_list/tree/deck_list_card_node.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 
 DeckViewCardDragItem::DeckViewCardDragItem(DeckViewCard *_item,
                                            const QPointF &_hotSpot,
@@ -77,11 +77,12 @@ DeckViewCard::DeckViewCard(QGraphicsItem *parent, const CardRef &cardRef, const 
 {
     setAcceptHoverEvents(true);
 
-    connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
-        Q_UNUSED(_roundCardCorners);
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::roundCardCornersChanged, this,
+            [this](bool _roundCardCorners) {
+                Q_UNUSED(_roundCardCorners);
 
-        update();
-    });
+                update();
+            });
 }
 
 DeckViewCard::~DeckViewCard()
@@ -99,7 +100,8 @@ void DeckViewCard::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     pen.setJoinStyle(Qt::MiterJoin);
     pen.setColor(originZone == DECK_ZONE_MAIN ? Qt::green : Qt::red);
     painter->setPen(pen);
-    qreal cardRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * (CardDimensions::WIDTH_F - 3) : 0.0;
+    qreal cardRadius =
+        SettingsCache::instance().cardsDisplay().getRoundCardCorners() ? 0.05 * (CardDimensions::WIDTH_F - 3) : 0.0;
     painter->drawRoundedRect(QRectF(1.5, 1.5, CardDimensions::WIDTH_F - 3, CardDimensions::HEIGHT_F - 3), cardRadius,
                              cardRadius);
     painter->restore();
@@ -378,12 +380,10 @@ void DeckViewScene::rebuildTree()
             addItem(container);
         }
 
-        for (int j = 0; j < currentZone->size(); j++) {
-            auto *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
-            if (!currentCard) {
-                continue;
-            }
-
+        // Cards in custom zones nested under a board are regular board cards in-game.
+        // They are collected recursively (like every other consumer) and reported with
+        // the top-level board zone as their origin, so that sideboard plans keep working.
+        for (auto *currentCard : deck->getCardNodes({currentZone->getName()})) {
             for (int k = 0; k < currentCard->getNumber(); ++k) {
                 auto *newCard = new DeckViewCard(container, currentCard->toCardRef(), currentZone->getName());
                 container->addCard(newCard);

@@ -1,0 +1,9 @@
+syntax = "proto2";
+import "game_commands.proto";
+import "serverinfo_playerproperties.proto";
+message Command_SetPlaymat {
+    extend GameCommand {
+        optional Command_SetPlaymat ext = 1035;
+    }
+    optional ServerInfo_PlayerProperties.PlaymatParams playmat_params = 1;
+}

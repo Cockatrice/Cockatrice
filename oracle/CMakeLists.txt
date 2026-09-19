@@ -23,11 +23,12 @@ set(oracle_SOURCES
     src/pages.cpp
     src/pagetemplates.cpp
     src/parsehelpers.cpp
-    src/qt-json/json.cpp
+    src/raw_json_scanner.cpp
     ../cockatrice/src/client/settings/cache_settings.cpp
     ../cockatrice/src/client/settings/card_counter_settings.cpp
     ../cockatrice/src/client/settings/shortcuts_settings.cpp
     ../cockatrice/src/client/network/update/client/release_channel.cpp
+    ../cockatrice/src/interface/pixel_map_generator.cpp
     ../cockatrice/src/interface/theme_config.cpp
     ../cockatrice/src/interface/theme_manager.cpp
     ../cockatrice/src/interface/widgets/quick_settings/settings_button_widget.cpp
@@ -64,11 +65,7 @@ set(oracle_RESOURCES oracle.qrc)
 # ------------------------
 # Qt resources
 # ------------------------
-if(Qt6_FOUND)
-  qt6_add_resources(oracle_RESOURCES_RCC ${oracle_RESOURCES})
-elseif(Qt5_FOUND)
-  qt5_add_resources(oracle_RESOURCES_RCC ${oracle_RESOURCES})
-endif()
+qt6_add_resources(oracle_RESOURCES_RCC ${oracle_RESOURCES})
 
 # ------------------------
 # Include directories
@@ -106,37 +103,18 @@ set(ORACLE_MAC_QM_INSTALL_DIR "oracle.app/Contents/Resources/translations")
 set(ORACLE_UNIX_QM_INSTALL_DIR "share/oracle/translations")
 set(ORACLE_WIN32_QM_INSTALL_DIR "translations")
 
-if(Qt6_FOUND)
-  # Qt6 Translations are linked after the executable is created in manual mode
-  qt6_add_executable(
-    oracle
-    WIN32
-    MACOSX_BUNDLE
-    ${oracle_SOURCES}
-    ${oracle_RESOURCES_RCC}
-    ${oracle_MOC_SRCS}
-    MANUAL_FINALIZATION
-  )
-elseif(Qt5_FOUND)
-  # Qt5 Translations need to be linked at executable creation time
-  if(Qt5LinguistTools_FOUND)
-    if(UPDATE_TRANSLATIONS)
-      qt5_create_translation(oracle_QM ${translate_SRCS} ${oracle_TS})
-    else()
-      qt5_add_translation(oracle_QM ${oracle_TS})
-    endif()
-  endif()
-  add_executable(oracle WIN32 MACOSX_BUNDLE ${oracle_MOC_SRCS} ${oracle_QM} ${oracle_RESOURCES_RCC} ${oracle_SOURCES})
-  if(UNIX)
-    if(APPLE)
-      install(FILES ${oracle_QM} DESTINATION ${ORACLE_MAC_QM_INSTALL_DIR})
-    else()
-      install(FILES ${oracle_QM} DESTINATION ${ORACLE_UNIX_QM_INSTALL_DIR})
-    endif()
-  elseif(WIN32)
-    install(FILES ${oracle_QM} DESTINATION ${ORACLE_WIN32_QM_INSTALL_DIR})
-  endif()
-endif()
+# Qt6 Translations are linked after the executable is created in manual mode
+qt6_add_executable(
+  oracle
+  WIN32
+  MACOSX_BUNDLE
+  ${oracle_SOURCES}
+  ${oracle_RESOURCES_RCC}
+  ${oracle_MOC_SRCS}
+  MANUAL_FINALIZATION
+)
+
+target_precompile_headers(oracle PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtwidgets_pch.h")
 
 # ------------------------
 # Link libraries
@@ -285,7 +263,7 @@ endif()
 # ------------------------
 # Qt translations
 # ------------------------
-if(Qt6_FOUND AND Qt6LinguistTools_FOUND)
+if(Qt6LinguistTools_FOUND)
   #Qt6 Translations happen after the executable is built up
   if(UPDATE_TRANSLATIONS)
     qt6_add_translations(
@@ -312,6 +290,4 @@ if(Qt6_FOUND AND Qt6LinguistTools_FOUND)
   endif()
 endif()
 
-if(Qt6_FOUND)
-  qt6_finalize_target(oracle)
-endif()
+qt6_finalize_target(oracle)

@@ -15,7 +15,7 @@ class Replay : public AbstractGame
     Q_OBJECT
 
 public:
-    explicit Replay(QObject *_parent, GameReplay *_replay, bool isLocalGame);
+    explicit Replay(QObject *_parent, const GameReplay *_replay, bool isLocalGame);
 };
 
 #endif // COCKATRICE_REPLAY_H

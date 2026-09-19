@@ -1,0 +1,11 @@
+syntax = "proto2";
+import "moderator_commands.proto";
+
+message Command_ReportResolve {
+    extend ModeratorCommand {
+        optional Command_ReportResolve ext = 1202;
+    }
+    required int32 report_id = 1;
+    optional string resolution_note = 2;
+    optional bool dismissed = 3;
+}

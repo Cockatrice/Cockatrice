@@ -5,7 +5,7 @@
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
 #include <google/protobuf/text_format.h>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/utility/string_limits.h>
 
 // FastFieldValuePrinter is added in protobuf 3.4, going out of our way to add the old FieldValuePrinter is not worth it
 #if GOOGLE_PROTOBUF_VERSION > 3004000

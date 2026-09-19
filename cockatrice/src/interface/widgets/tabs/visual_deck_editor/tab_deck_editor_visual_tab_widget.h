@@ -50,6 +50,17 @@ class TabDeckEditorVisualTabWidget : public QTabWidget
 
 public:
     /**
+     * @brief Sub-tab order in the container; addNewTab() is called in this order.
+     */
+    enum TabIndex
+    {
+        VisualDeckView,
+        VisualDatabaseDisplay,
+        DeckAnalytics,
+        SampleHand,
+    };
+
+    /**
      * @brief Construct the tab widget with required models.
      * @param parent Parent widget.
      * @param _deckEditor Pointer to the deck editor instance.

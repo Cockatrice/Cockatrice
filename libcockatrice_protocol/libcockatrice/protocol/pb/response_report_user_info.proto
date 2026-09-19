@@ -1,0 +1,21 @@
+syntax = "proto2";
+import "response.proto";
+import "serverinfo_report.proto";
+
+message Response_ReportUserInfo {
+    extend Response {
+        optional Response_ReportUserInfo ext = 1211;
+    }
+
+    optional string user_name = 1;
+    optional int32 total_reports = 2;
+    optional int32 total_bans = 3;
+    optional int32 total_warns = 4;
+    optional int64 registration_time = 5;
+    optional bool is_admin = 6;
+    optional bool is_active = 7;
+    optional string admin_notes = 8;
+    repeated ServerInfo_Report recent_reports = 9;
+    // Last known login of the user, epoch seconds; 0 = unknown.
+    optional int64 last_login = 10;
+}

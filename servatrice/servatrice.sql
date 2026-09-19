@@ -20,11 +20,14 @@ CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   PRIMARY KEY  (`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
-INSERT INTO cockatrice_schema_version VALUES(34);
+INSERT INTO cockatrice_schema_version VALUES(36);
 
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
+  -- Bitfield of staff levels: 1 = admin (implies moderator), 2 = moderator,
+  -- 4 = judge, 8 = developer. Operators set these by hand with
+  -- "UPDATE cockatrice_users SET admin = ...".
   `admin` tinyint(1) NOT NULL,
   `name` varchar(35) NOT NULL,
   `realname` varchar(255) NOT NULL,
@@ -41,8 +44,10 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `privlevelStartDate` datetime NOT NULL,
   `privlevelEndDate` datetime NOT NULL,
   `passwordLastChangedDate` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `force_password_change` tinyint(1) NOT NULL DEFAULT 0,
   `leftPawnColorOverride` varchar(255),
   `rightPawnColorOverride` varchar(255),
+  `card_art_params` TEXT DEFAULT NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `name` (`name`),
   KEY `token` (`token`),
@@ -232,6 +237,52 @@ CREATE TABLE IF NOT EXISTS `cockatrice_warnings` (
   INDEX `idx_user_name` (`user_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `cockatrice_reports` (
+ `id`                  int(11) unsigned NOT NULL AUTO_INCREMENT,
+ `reporter_id`         int(7) unsigned NULL,
+ `reporter_name`       varchar(35) NOT NULL,
+ `reported_user_id`    int(7) unsigned NULL,
+ `reported_user_name`  varchar(35) NOT NULL,
+ `game_id`             int(7) unsigned NULL,
+ `room_id`             int(7) unsigned NULL,
+ `category`            varchar(255) NOT NULL,
+ `description`         text NOT NULL,
+ `chat_log`            mediumtext NULL,
+ `created_at`          datetime NOT NULL,
+ `resolution_time`     datetime NULL,
+ `status`              enum('open','assigned','resolved','dismissed') NOT NULL DEFAULT 'open',
+ `assigned_to`         int(7) unsigned NULL,
+ `resolved_by`         int(7) unsigned NULL,
+ `resolution_note`     text,
+ `notified`            tinyint(1) NOT NULL DEFAULT 0,
+ PRIMARY KEY (`id`),
+ INDEX `idx_status`    (`status`),
+ INDEX `idx_created`   (`created_at`),
+ INDEX `idx_reporter_id_created` (`reporter_id`, `created_at`),
+ INDEX `idx_reported_user_name` (`reported_user_name`),
+ INDEX `idx_status_created` (`status`, `created_at`),
+ FOREIGN KEY (`reporter_id`)      REFERENCES `cockatrice_users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+ FOREIGN KEY (`reported_user_id`) REFERENCES `cockatrice_users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+ FOREIGN KEY (`assigned_to`)      REFERENCES `cockatrice_users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+ FOREIGN KEY (`resolved_by`)      REFERENCES `cockatrice_users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `cockatrice_report_comments` (
+ `id`                  int(11) unsigned NOT NULL AUTO_INCREMENT,
+ `report_id`           int(11) unsigned NOT NULL,
+ `author_name`         varchar(35) NOT NULL,
+ `author_id`           int(7) unsigned NULL,
+ `comment_text`        text NOT NULL,
+ `created_at`          datetime NOT NULL,
+ `is_moderator`        tinyint(1) NOT NULL DEFAULT 0,
+ `notified`            tinyint(1) NOT NULL DEFAULT 0,
+ PRIMARY KEY (`id`),
+ INDEX `idx_report_id` (`report_id`),
+ INDEX `idx_notified`  (`notified`),
+ FOREIGN KEY (`report_id`) REFERENCES `cockatrice_reports`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+ FOREIGN KEY (`author_id`) REFERENCES `cockatrice_users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `cockatrice_log` (
   `log_time` datetime NOT NULL,
   `sender_id` int(7) unsigned NULL,
@@ -300,3 +351,19 @@ CREATE TABLE IF NOT EXISTS `cockatrice_audit` (
   PRIMARY KEY  (`id`),
   KEY `user_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `cockatrice_card_art_name_rules` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `card_name` varchar(255) NOT NULL,
+  `card_provider_id` varchar(255) NOT NULL,
+  `mode` enum('ALLOW','DENY') NOT NULL,
+  `reason` varchar(255) DEFAULT NULL,
+  `created_by` int(7) unsigned DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_provider_card_name` (`card_provider_id`, `card_name`),
+  KEY `idx_mode` (`mode`),
+  FOREIGN KEY (`created_by`) REFERENCES `cockatrice_users`(`id`)
+  ON DELETE SET NULL
+  ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;

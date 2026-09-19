@@ -1,4 +1,5 @@
 syntax = "proto2";
+import "developer_commands.proto";
 message ModeratorCommand {
     enum ModeratorCommandType {
         BAN_FROM_SERVER = 1000;
@@ -11,6 +12,20 @@ message ModeratorCommand {
         FORCE_ACTIVATE_USER = 1007;
         GET_ADMIN_NOTES = 1008;
         UPDATE_ADMIN_NOTES = 1009;
+        ADD_CARD_ART_RULE = 1010;
+        REMOVE_CARD_ART_RULE = 1011;
+        LIST_CARD_ART_RULES = 1012;
+        GET_USER_SESSIONS = 1013;
+        GET_USER_ALTS = 1014;
+        GET_MODERATOR_LAST_LOGINS = 1015;
+        RESET_USER_PASSWORD = 1016;
+        REMOVE_USER_AVATAR = 1017;
+        REPORT_LIST = 1200;
+        REPORT_ASSIGN = 1201;
+        REPORT_RESOLVE = 1202;
+        REPLAY_DOWNLOAD_BY_GAME_ID = 1203;
+        REPORT_USER_INFO = 1204;
+        REPORT_STATS = 1205;
     }
     extensions 100 to max;
 }
@@ -66,6 +81,9 @@ message Command_ViewLogHistory {
     extend ModeratorCommand {
         optional Command_ViewLogHistory ext = 1005;
     }
+    extend DeveloperCommand {
+        optional Command_ViewLogHistory dev_ext = 1001;
+    }
     optional string user_name = 1;       // user that created message
     optional string ip_address = 2;      // ip address of user that created message
     optional string game_name = 3;       // client id of user that created the message
@@ -105,4 +123,58 @@ message Command_UpdateAdminNotes {
     }
     optional string user_name = 1;
     optional string notes = 2;
+}
+
+message Command_AddCardArtRule {
+    extend ModeratorCommand {
+        optional Command_AddCardArtRule ext = 1010;
+    }
+
+    optional string card_name = 1;
+    optional string card_provider_id = 2;
+    optional string mode = 3; // "ALLOW" or "DENY"
+    optional string reason = 4;
+}
+
+message Command_RemoveCardArtRule {
+    extend ModeratorCommand {
+        optional Command_RemoveCardArtRule ext = 1011;
+    }
+
+    optional string card_name = 1;
+    optional string card_provider_id = 2;
+}
+
+message Command_ListCardArtRules {
+    extend ModeratorCommand {
+        optional Command_ListCardArtRules ext = 1012;
+    }
+}
+
+message Command_GetUserSessions {
+    extend ModeratorCommand {
+        optional Command_GetUserSessions ext = 1013;
+    }
+    optional string user_name = 1;
+    optional uint32 limit = 2 [default = 110];
+}
+
+message Command_GetUserAlts {
+    extend ModeratorCommand {
+        optional Command_GetUserAlts ext = 1014;
+    }
+    optional string user_name = 1;
+}
+
+message Command_GetModeratorLastLogins {
+    extend ModeratorCommand {
+        optional Command_GetModeratorLastLogins ext = 1015;
+    }
+}
+
+message Command_RemoveUserAvatar {
+    extend ModeratorCommand {
+        optional Command_RemoveUserAvatar ext = 1017;
+    }
+    optional string user_name = 1;
 }

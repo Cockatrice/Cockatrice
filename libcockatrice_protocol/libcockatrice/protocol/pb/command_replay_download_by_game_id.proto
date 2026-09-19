@@ -1,0 +1,9 @@
+syntax = "proto2";
+import "moderator_commands.proto";
+
+message Command_ReplayDownloadByGameId {
+    extend ModeratorCommand {
+        optional Command_ReplayDownloadByGameId ext = 1203;
+    }
+    required sint32 game_id = 1;
+}

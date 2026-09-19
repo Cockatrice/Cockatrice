@@ -27,6 +27,7 @@ class CommandContainer;
 class SessionCommand;
 class ModeratorCommand;
 class AdminCommand;
+class DeveloperCommand;
 
 class Command_Ping;
 class Command_Login;
@@ -98,6 +99,12 @@ private:
     {
         return Response::RespFunctionNotAllowed;
     }
+    Response::ResponseCode processDeveloperCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
+    virtual Response::ResponseCode
+    processExtendedDeveloperCommand(int /* cmdType */, const DeveloperCommand & /* cmd */, ResponseContainer & /* rc */)
+    {
+        return Response::RespFunctionNotAllowed;
+    }
 
     void resetIdleTimer();
 private slots:
@@ -129,7 +136,7 @@ public:
         return timeRunning - lastDataReceived;
     }
     bool addSaidMessageSize(int size);
-    void processCommandContainer(const CommandContainer &cont);
+    virtual void processCommandContainer(const CommandContainer &cont);
 
     void sendProtocolItem(const Response &item);
     void sendProtocolItem(const SessionEvent &item);

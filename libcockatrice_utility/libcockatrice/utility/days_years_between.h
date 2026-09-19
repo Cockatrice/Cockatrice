@@ -1,3 +1,6 @@
+#ifndef COCKATRICE_DAYS_YEARS_BETWEEN_H
+#define COCKATRICE_DAYS_YEARS_BETWEEN_H
+
 #include <QDateTime>
 
 inline static QPair<int, int> getDaysAndYearsBetween(const QDate &then, const QDate &now)
@@ -6,3 +9,5 @@ inline static QPair<int, int> getDaysAndYearsBetween(const QDate &then, const QD
     int days = then.addYears(years).daysTo(now);
     return {days, years};
 }
+
+#endif // COCKATRICE_DAYS_YEARS_BETWEEN_H

@@ -142,6 +142,12 @@ public:
         return parent;
     }
 
+    /** @param newParent Reparent this node. The new parent takes ownership. */
+    void setParent(InnerDecklistNode *newParent)
+    {
+        parent = newParent;
+    }
+
     /**
      * @brief Compute the depth of this node in the tree.
      * @return Distance from the root (root = 0, children = 1, etc.).
@@ -173,11 +179,10 @@ public:
 
     /**
      * @name XML serialization
-     * These methods support reading and writing decks from/to
+     * This method supports writing this node and its children to the
      * Cockatrice deck XML format.
      * @{
      */
-    virtual bool readElement(QXmlStreamReader *xml) = 0;
     virtual void writeElement(QXmlStreamWriter *xml) = 0;
     /// @}
 };

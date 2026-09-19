@@ -2,7 +2,7 @@
 <context>
     <name>AbstractCounter</name>
     <message>
-        <location filename="src/game/board/abstract_counter.cpp" line="81"/>
+        <location filename="src/game_graphics/board/abstract_counter.cpp" line="85"/>
         <source>&amp;Set counter...</source>
         <translation>Nombre de marqueur&amp;s…</translation>
     </message>
@@ -10,12 +10,12 @@
 <context>
     <name>AbstractCounterDialog</name>
     <message>
-        <location filename="src/game/board/abstract_counter.cpp" line="207"/>
+        <location filename="src/game_graphics/board/abstract_counter.cpp" line="197"/>
         <source>Set counter</source>
         <translation>Nombre de marqueurs</translation>
     </message>
     <message>
-        <location filename="src/game/board/abstract_counter.cpp" line="208"/>
+        <location filename="src/game_graphics/board/abstract_counter.cpp" line="198"/>
         <source>New value for counter &apos;%1&apos;:</source>
         <translation>Nouvelle valeur des marqueurs « %1 » :</translation>
     </message>
@@ -36,62 +36,62 @@
 <context>
     <name>AbstractTabDeckEditor</name>
     <message>
-        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="243"/>
+        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="216"/>
         <source>Open in new tab</source>
         <translation>Ouvrir dans un nouvel onglet</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="267"/>
+        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="241"/>
         <source>Are you sure?</source>
         <translation>Êtes-vous sûr ?</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="268"/>
+        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="242"/>
         <source>The decklist has been modified.
 Do you want to save the changes?</source>
         <translation>La liste de deck a été modifiée.
 Voulez-vous enregistrer les modifications ?</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="322"/>
-        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="338"/>
-        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="361"/>
-        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="390"/>
-        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="409"/>
-        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="532"/>
+        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="299"/>
+        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="315"/>
+        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="339"/>
+        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="369"/>
+        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="388"/>
+        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="517"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="322"/>
+        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="299"/>
         <source>Could not open deck at %1</source>
         <translation>N&apos;a pas pu ouvrir le deck à %1</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="338"/>
+        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="315"/>
         <source>Could not save remote deck</source>
         <translation>N&apos;a pas pu sauvegarder le deck distant</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="362"/>
-        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="391"/>
+        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="340"/>
+        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="370"/>
         <source>The deck could not be saved.
 Please check that the directory is writable and try again.</source>
         <translation>Le deck n&apos;a pas pu être enregistré.
 Vérifiez que le répertoire ne soit pas en lecture seule et réessayez.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="374"/>
+        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="352"/>
         <source>Save deck</source>
         <translation>Sauvegarder le deck</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="409"/>
+        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="388"/>
         <source>The deck could not be saved.</source>
         <translation>Le deck n&apos;a pas pu être enregistré.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="532"/>
+        <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="517"/>
         <source>There are no cards in your deck to be exported</source>
         <translation>Il n&apos;y a pas de cartes dans le deck à exporter</translation>
     </message>
@@ -101,18 +101,18 @@ Vérifiez que le répertoire ne soit pas en lecture seule et réessayez.</transl
     <message>
         <location filename="src/interface/widgets/deck_analytics/add_analytics_panel_dialog.cpp" line="10"/>
         <source>Add Analytics Panel</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter un panneau d&apos;analyse</translation>
     </message>
 </context>
 <context>
     <name>AdminNotesDialog</name>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="286"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="298"/>
         <source>Update Notes</source>
         <translation>Notes de mises à jour</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="299"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="311"/>
         <source>Admin Notes for %1</source>
         <translation>Notes d&apos;administrateur pour %1</translation>
     </message>
@@ -129,172 +129,227 @@ Vérifiez que le répertoire ne soit pas en lecture seule et réessayez.</transl
         <source>Sideboard</source>
         <translation>Réserve</translation>
     </message>
+    <message>
+        <location filename="src/interface/widgets/printing_selector/all_zones_card_amount_widget.cpp" line="34"/>
+        <source>Tokens</source>
+        <translation>Jetons</translation>
+    </message>
 </context>
 <context>
     <name>AppearanceSettingsPage</name>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="446"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="93"/>
         <source> seconds</source>
         <translation>secondes</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="659"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="329"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="659"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="329"/>
         <source>Could not create themes directory at &apos;%1&apos;.</source>
         <translation>N&apos;a pas pu créer le dossier Thèmes à &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="724"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="399"/>
         <source>Theme settings</source>
         <translation>Paramètres du thème</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="725"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="400"/>
         <source>Current theme:</source>
         <translation>Thème actuel :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="726"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="401"/>
         <source>Open themes folder</source>
         <translation>Ouvrir le dossier des thèmes</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="727"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="406"/>
         <source>Home tab background source:</source>
         <translation>Source d&apos;arrière-plan de l&apos;onglet Accueil:</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="728"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="407"/>
         <source>Home tab background shuffle frequency:</source>
         <translation>Fréquence de mélange de l&apos;arrière-plan de l&apos;onglet Accueil:</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="729"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="408"/>
         <source>Disabled</source>
         <translation>Désactivé</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="730"/>
-        <source>Display card name of background in bottom right:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="732"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="414"/>
         <source>Menu settings</source>
         <translation>Options du Menu</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="733"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="415"/>
         <source>Show keyboard shortcuts in right-click menus</source>
         <translation>Montrer les raccourcis clavier dans les menus clic-droit</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="734"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="416"/>
         <source>Show game filter toolbar above list in room tab</source>
-        <translation type="unfinished"/>
+        <translation>Afficher les barres d&apos;outil et de recherche au-dessus de la liste des parties dans l&apos;onglet salon.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="736"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="424"/>
         <source>Card rendering</source>
         <translation>Rendu des cartes</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="737"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="425"/>
         <source>Display card names on cards having a picture</source>
         <translation>Afficher les noms des cartes ayant une image</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="738"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="426"/>
         <source>Auto-Rotate cards with sideways layout</source>
         <translation>Rotation automatique des cartes avec disposition horizontale</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="740"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="420"/>
         <source>Override all card art with personal set preference (Pre-ProviderID change behavior)</source>
         <translation>Remplacer toutes les illustrations de cartes par les préférences personnelles (comportement avant modification du ProviderID)</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="742"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="34"/>
+        <source>Light</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="35"/>
+        <source>Dark</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="37"/>
+        <source>System</source>
+        <translation>Système</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="402"/>
+        <source>Active theme palette:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="403"/>
+        <source>Edit theme palette</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="405"/>
+        <source>Home tab settings</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="409"/>
+        <source>Display card name of background in bottom right</source>
+        <translation>Afficher le nom de la carte d&apos;arrière-plan en bas à droite</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="411"/>
+        <source>Styling settings</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="412"/>
+        <source>Style user list</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="418"/>
+        <source>Card printings</source>
+        <translation>Images de la carte</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="422"/>
         <source>Bump sets that the deck contains cards from to the top in the printing selector</source>
         <translation>Mettre en avant que ce deck contient des cartes depuis le sommet, dans le sélecteur d&apos;impression</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="743"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="427"/>
         <source>Scale cards on mouse over</source>
         <translation>Agrandir les cartes lors du survol du curseur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="744"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="428"/>
         <source>Use rounded card corners</source>
         <translation>Utiliser des bords de cartes arrondis</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="746"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="431"/>
+        <source>Card layout</source>
+        <translation>Disposition de la carte</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="433"/>
         <source>Minimum overlap percentage of cards on the stack and in vertical hand</source>
         <translation>Pourcentage minimum de chevauchement des cartes dans la pile et dans la main verticale</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="747"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="434"/>
         <source>Maximum initial height for card view window:</source>
         <translation>Hauteur initiale maximale pour la fenêtre d&apos;affichage des cartes :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="748"/>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="750"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="435"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="437"/>
         <source> rows</source>
         <translation>lignes</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="749"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="436"/>
         <source>Maximum expanded height for card view window:</source>
         <translation>Hauteur étendue maximale pour la fenêtre d&apos;affichage des cartes :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="752"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="439"/>
         <source>Card counters</source>
         <translation>Marqueurs sur la carte</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="756"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="443"/>
         <source>Counter %1</source>
         <translation>Marqueur %1</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="759"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="446"/>
         <source>Hand layout</source>
         <translation>Disposition de la main</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="760"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="447"/>
         <source>Display hand horizontally (wastes space)</source>
         <translation>Afficher la main horizontalement (perte d&apos;espace)</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="761"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="448"/>
         <source>Enable left justification</source>
         <translation>Activer la justification à gauche</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="763"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="450"/>
         <source>Table grid layout</source>
         <translation>Disposition en forme de grille</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="764"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="451"/>
         <source>Invert vertical coordinate</source>
         <translation>Inverser la disposition du champ de bataille</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="765"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="452"/>
         <source>Minimum player count for multi-column layout:</source>
         <translation>Nombre minimum de joueurs pour la disposition multi-colonnes :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="766"/>
+        <location filename="src/interface/widgets/settings_page/appearance_settings_page.cpp" line="429"/>
         <source>Maximum font size for information displayed on cards:</source>
         <translation>Taille maximale de la police pour les informations affichées sur les cartes  :</translation>
     </message>
@@ -302,14 +357,14 @@ Vérifiez que le répertoire ne soit pas en lecture seule et réessayez.</transl
 <context>
     <name>ArchidektApiResponseDeckDisplayWidget</name>
     <message>
-        <location filename="src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_display_widget.cpp" line="92"/>
+        <location filename="src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_display_widget.cpp" line="136"/>
         <source>Back to results</source>
-        <translation type="unfinished"/>
+        <translation>Retour aux résultats</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_display_widget.cpp" line="93"/>
+        <location filename="src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_display_widget.cpp" line="137"/>
         <source>Open Deck in Deck Editor</source>
-        <translation type="unfinished"/>
+        <translation>Ouvrir le deck dans l&apos;éditeur de deck</translation>
     </message>
 </context>
 <context>
@@ -333,112 +388,112 @@ Vérifiez que le répertoire ne soit pas en lecture seule et réessayez.</transl
 <context>
     <name>BanDialog</name>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="31"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="39"/>
         <source>ban &amp;user name</source>
         <translation>bannir &amp;nom d&apos;utilisateur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="35"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="43"/>
         <source>ban &amp;IP address</source>
         <translation>bannir &amp;adresse IP</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="39"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="47"/>
         <source>ban client I&amp;D</source>
         <translation>bannir &amp;ID du client</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="53"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="62"/>
         <source>Ban type</source>
         <translation>Type du bannissement</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="56"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="65"/>
         <source>&amp;permanent ban</source>
         <translation>&amp;bannissement permanent</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="57"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="66"/>
         <source>&amp;temporary ban</source>
         <translation>bannissement &amp;temporaire</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="60"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="69"/>
         <source>&amp;Days:</source>
         <translation>&amp;Jours :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="66"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="75"/>
         <source>&amp;Hours:</source>
         <translation>&amp;Heures :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="72"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="81"/>
         <source>&amp;Minutes:</source>
         <translation>&amp;Minutes :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="87"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="96"/>
         <source>Duration of the ban</source>
         <translation>Durée du bannissement</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="90"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="99"/>
         <source>Please enter the reason for the ban.
 This is only saved for moderators and cannot be seen by the banned person.</source>
         <translation>Veuillez expliquer la raison du bannissement.
 Cette information sera consultable uniquement par les modérateurs et ne sera pas visible par la personne bannie.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="95"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="104"/>
         <source>Please enter the reason for the ban that will be visible to the banned person.</source>
         <translation>Veuillez expliquer la raison du bannissement. Cette information sera visible par la personne bannie.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="98"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="107"/>
         <source>Redact all messages from this user in all rooms</source>
         <translation>Censurer tous les messages de cet utilisateur dans toutes les salles</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="100"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="109"/>
         <source>&amp;OK</source>
         <translation>&amp;OK</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="103"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="112"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Annuler</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="122"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="131"/>
         <source>Ban user from server</source>
         <translation>Bannir le joueur du serveur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="204"/>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="212"/>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="219"/>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="227"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="213"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="221"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="229"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="238"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="205"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="214"/>
         <source>You have to select a name-based, IP-based, clientId based, or some combination of the three to place a ban.</source>
         <translation>Vous devez choisir un bannissement à partir du nom, de l&apos;adresse IP, de l&apos;ID du client, ou une combinaison des trois.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="213"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="222"/>
         <source>You must have a value in the name ban when selecting the name ban checkbox.</source>
         <translation>Vous devez remplir le champ du nom du banni en le choisissant dans la liste.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="220"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="230"/>
         <source>You must have a value in the ip ban when selecting the ip ban checkbox.</source>
         <translation>Vous devez saisir l&apos;adresse IP du banni en le choisissant dans la liste.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="228"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="239"/>
         <source>You must have a value in the clientid ban when selecting the clientid ban checkbox.</source>
         <translation>Vous devez saisir l&apos;ID du client banni en le choisissant dans la liste.</translation>
     </message>
@@ -446,57 +501,121 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
 <context>
     <name>BetaReleaseChannel</name>
     <message>
-        <location filename="src/client/network/update/client/release_channel.cpp" line="210"/>
+        <location filename="src/client/network/update/client/release_channel.cpp" line="211"/>
         <source>Beta</source>
         <translation>Beta</translation>
     </message>
     <message>
-        <location filename="src/client/network/update/client/release_channel.cpp" line="236"/>
+        <location filename="src/client/network/update/client/release_channel.cpp" line="237"/>
         <source>No reply received from the release update server.</source>
         <translation>Le serveur de mise à jour ne répond pas.</translation>
     </message>
     <message>
-        <location filename="src/client/network/update/client/release_channel.cpp" line="245"/>
+        <location filename="src/client/network/update/client/release_channel.cpp" line="246"/>
         <source>Invalid reply received from the release update server.</source>
         <translation>Réponse reçue du serveur de mise à jour de version invalide .</translation>
     </message>
     <message>
-        <location filename="src/client/network/update/client/release_channel.cpp" line="278"/>
+        <location filename="src/client/network/update/client/release_channel.cpp" line="280"/>
         <source>No reply received from the file update server.</source>
         <translation>Le serveur de mise à jour de fichier ne répond pas.</translation>
     </message>
 </context>
 <context>
+    <name>CardArtPreviewWidget</name>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_card_settings_dialog.cpp" line="65"/>
+        <source>No card selected</source>
+        <translation>Aucune carte sélectionné</translation>
+    </message>
+</context>
+<context>
+    <name>CardArtRulesModel</name>
+    <message>
+        <location filename="src/interface/widgets/tabs/tab_card_art_rules.cpp" line="65"/>
+        <source>Card</source>
+        <translation>Carte</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/tabs/tab_card_art_rules.cpp" line="67"/>
+        <source>ProviderId</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/tabs/tab_card_art_rules.cpp" line="69"/>
+        <source>Mode</source>
+        <translation>Mode</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/tabs/tab_card_art_rules.cpp" line="71"/>
+        <source>Reason</source>
+        <translation>Raison</translation>
+    </message>
+</context>
+<context>
     <name>CardDatabaseModel</name>
     <message>
-        <location filename="../libcockatrice_models/libcockatrice/models/database/card_database_model.cpp" line="65"/>
+        <location filename="../libcockatrice_models/libcockatrice/models/database/card_database_model.cpp" line="68"/>
         <source>Name</source>
         <translation>Nom</translation>
     </message>
     <message>
-        <location filename="../libcockatrice_models/libcockatrice/models/database/card_database_model.cpp" line="67"/>
+        <location filename="../libcockatrice_models/libcockatrice/models/database/card_database_model.cpp" line="70"/>
         <source>Sets</source>
         <translation>Éditions</translation>
     </message>
     <message>
-        <location filename="../libcockatrice_models/libcockatrice/models/database/card_database_model.cpp" line="69"/>
+        <location filename="../libcockatrice_models/libcockatrice/models/database/card_database_model.cpp" line="72"/>
         <source>Mana cost</source>
         <translation>Coût de mana</translation>
     </message>
     <message>
-        <location filename="../libcockatrice_models/libcockatrice/models/database/card_database_model.cpp" line="71"/>
+        <location filename="../libcockatrice_models/libcockatrice/models/database/card_database_model.cpp" line="74"/>
         <source>Card type</source>
         <translation>Type de carte</translation>
     </message>
     <message>
-        <location filename="../libcockatrice_models/libcockatrice/models/database/card_database_model.cpp" line="73"/>
+        <location filename="../libcockatrice_models/libcockatrice/models/database/card_database_model.cpp" line="76"/>
         <source>P/T</source>
         <translation>F/E</translation>
     </message>
     <message>
-        <location filename="../libcockatrice_models/libcockatrice/models/database/card_database_model.cpp" line="75"/>
+        <location filename="../libcockatrice_models/libcockatrice/models/database/card_database_model.cpp" line="78"/>
         <source>Color(s)</source>
         <translation>Couleur(s)</translation>
+    </message>
+</context>
+<context>
+    <name>CardDatabaseView</name>
+    <message>
+        <location filename="src/interface/widgets/deck_editor/card_database_view.cpp" line="135"/>
+        <source>Add to Deck</source>
+        <translation>Ajouter au deck</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/deck_editor/card_database_view.cpp" line="136"/>
+        <source>Add to Sideboard</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/deck_editor/card_database_view.cpp" line="137"/>
+        <source>Select Printing</source>
+        <translation>Choisir l&apos;image</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/deck_editor/card_database_view.cpp" line="145"/>
+        <source>Show on EDHRec (Commander)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/deck_editor/card_database_view.cpp" line="148"/>
+        <source>Show on EDHRec (Card)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/deck_editor/card_database_view.cpp" line="152"/>
+        <source>Show Related cards</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -533,7 +652,7 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="../libcockatrice_filters/libcockatrice/filters/filter_card.cpp" line="64"/>
         <source>Name (Exact)</source>
-        <translation type="unfinished"/>
+        <translation>Nom (Exact)</translation>
     </message>
     <message>
         <location filename="../libcockatrice_filters/libcockatrice/filters/filter_card.cpp" line="66"/>
@@ -627,22 +746,22 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
 <context>
     <name>CardInfoPictureWidget</name>
     <message>
-        <location filename="src/interface/widgets/cards/card_info_picture_widget.cpp" line="375"/>
+        <location filename="src/interface/widgets/cards/card_info_picture_widget.cpp" line="373"/>
         <source>View related cards</source>
         <translation>Voir les cartes associées</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/cards/card_info_picture_widget.cpp" line="420"/>
+        <location filename="src/interface/widgets/cards/card_info_picture_widget.cpp" line="418"/>
         <source>Add card to deck</source>
         <translation>Ajouter la carte au deck</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/cards/card_info_picture_widget.cpp" line="433"/>
+        <location filename="src/interface/widgets/cards/card_info_picture_widget.cpp" line="431"/>
         <source>Mainboard</source>
         <translation>Deck principal</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/cards/card_info_picture_widget.cpp" line="439"/>
+        <location filename="src/interface/widgets/cards/card_info_picture_widget.cpp" line="437"/>
         <source>Sideboard</source>
         <translation>Réserve</translation>
     </message>
@@ -657,7 +776,7 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/interface/widgets/cards/card_info_text_widget.cpp" line="69"/>
         <source>Set:</source>
-        <translation type="unfinished"/>
+        <translation>Édition :</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/cards/card_info_text_widget.cpp" line="71"/>
@@ -665,12 +784,12 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/interface/widgets/cards/card_info_text_widget.cpp" line="85"/>
+        <location filename="src/interface/widgets/cards/card_info_text_widget.cpp" line="86"/>
         <source>Related cards:</source>
         <translation>Cartes associées :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/cards/card_info_text_widget.cpp" line="101"/>
+        <location filename="src/interface/widgets/cards/card_info_text_widget.cpp" line="102"/>
         <source>Unknown card:</source>
         <translation>Carte inconnue :</translation>
     </message>
@@ -678,126 +797,144 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
 <context>
     <name>CardMenu</name>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="276"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="312"/>
         <source>Re&amp;veal to...</source>
         <translation>Révéler à...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="452"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="490"/>
         <source>&amp;All players</source>
         <translation>&amp;Tous les joueurs</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="357"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="395"/>
         <source>View related cards</source>
         <translation>Voir les cartes associées</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="405"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="442"/>
         <source>Token: </source>
         <translation>Jeton :</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="422"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="459"/>
         <source>All tokens</source>
         <translation>Tout les jetons</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="445"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="483"/>
         <source>&amp;Select All</source>
         <translation>&amp;Sélectionner Tout</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="446"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="484"/>
         <source>S&amp;elect Row</source>
         <translation>Sél&amp;ectionne une ligne</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="447"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="485"/>
         <source>S&amp;elect Column</source>
         <translation>Sél&amp;ectionne une colonne</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="449"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="487"/>
         <source>&amp;Play</source>
         <translation>&amp;Jouer</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="450"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="488"/>
         <source>&amp;Hide</source>
         <translation>&amp;Cacher</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="451"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="489"/>
         <source>Play &amp;Face Down</source>
         <translation>Jouer &amp;Face Cachée</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="454"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="492"/>
         <source>&amp;Tap / Untap</source>
         <extracomment>Turn sideways or back again</extracomment>
         <translation>&amp;Engager / Dégager</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="455"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="493"/>
         <source>Skip &amp;untapping</source>
-        <translation type="unfinished"/>
+        <translation>Ne pas dégager</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="457"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="495"/>
         <source>T&amp;urn Over</source>
         <extracomment>Turn face up/face down</extracomment>
         <translation>Reto&amp;urner</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="460"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="498"/>
         <source>&amp;Peek at card face</source>
         <translation>&amp;Regarder furtivement la carte face cachée</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="461"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="499"/>
         <source>&amp;Clone</source>
         <translation>&amp;Cloner</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="462"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="500"/>
         <source>Attac&amp;h to card...</source>
         <translation>Attac&amp;her à une carte...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="463"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="501"/>
         <source>Unattac&amp;h</source>
         <translation>Détac&amp;her</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="464"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="502"/>
         <source>&amp;Draw arrow...</source>
         <translation>&amp;Tracer une flèche...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="465"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="503"/>
         <source>&amp;Set annotation...</source>
         <translation>&amp;Annoter...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="467"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="504"/>
+        <source>Reduce life by power</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="506"/>
         <source>Ca&amp;rd counters</source>
         <translation>Ma&amp;rqueurs sur la carte</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="472"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="511"/>
         <source>&amp;Add counter (%1)</source>
         <translation>&amp;Ajouter un marqueur (%1)</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="475"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="514"/>
         <source>&amp;Remove counter (%1)</source>
         <translation>&amp;Retirer un marqueur (%1)</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/card_menu.cpp" line="478"/>
+        <location filename="src/game_graphics/player/menu/card_menu.cpp" line="517"/>
         <source>&amp;Set counters (%1)...</source>
         <translation>&amp;Changer le nombre de marqueurs (%1)...</translation>
+    </message>
+</context>
+<context>
+    <name>CardPictureLoaderCacheMethod</name>
+    <message>
+        <location filename="src/interface/card_picture_loader/card_picture_loader_cache_method.h" line="24"/>
+        <source>Network Cache</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/card_picture_loader/card_picture_loader_cache_method.h" line="25"/>
+        <source>Filesystem</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -811,133 +948,133 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
 <context>
     <name>CardZoneLogic</name>
     <message>
-        <location filename="src/game/zones/logic/card_zone_logic.cpp" line="179"/>
+        <location filename="src/game/zones/card_zone_logic.cpp" line="184"/>
         <source>their hand</source>
         <comment>nominative</comment>
         <translation>sa main</translation>
     </message>
     <message>
-        <location filename="src/game/zones/logic/card_zone_logic.cpp" line="179"/>
+        <location filename="src/game/zones/card_zone_logic.cpp" line="184"/>
         <source>%1&apos;s hand</source>
         <comment>nominative</comment>
         <translation>main de %1</translation>
     </message>
     <message>
-        <location filename="src/game/zones/logic/card_zone_logic.cpp" line="183"/>
+        <location filename="src/game/zones/card_zone_logic.cpp" line="188"/>
         <source>their library</source>
         <comment>look at zone</comment>
         <translation>sa bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/game/zones/logic/card_zone_logic.cpp" line="184"/>
+        <location filename="src/game/zones/card_zone_logic.cpp" line="189"/>
         <source>%1&apos;s library</source>
         <comment>look at zone</comment>
         <translation>bibliothèque de %1</translation>
     </message>
     <message>
-        <location filename="src/game/zones/logic/card_zone_logic.cpp" line="186"/>
+        <location filename="src/game/zones/card_zone_logic.cpp" line="191"/>
         <source>of their library</source>
         <comment>top cards of zone,</comment>
         <translation>de sa bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/game/zones/logic/card_zone_logic.cpp" line="187"/>
+        <location filename="src/game/zones/card_zone_logic.cpp" line="192"/>
         <source>of %1&apos;s library</source>
         <comment>top cards of zone</comment>
         <translation>de la bibliothèque de %1</translation>
     </message>
     <message>
-        <location filename="src/game/zones/logic/card_zone_logic.cpp" line="189"/>
+        <location filename="src/game/zones/card_zone_logic.cpp" line="194"/>
         <source>their library</source>
         <comment>reveal zone</comment>
         <translation>sa bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/game/zones/logic/card_zone_logic.cpp" line="190"/>
+        <location filename="src/game/zones/card_zone_logic.cpp" line="195"/>
         <source>%1&apos;s library</source>
         <comment>reveal zone</comment>
         <translation>bibliothèque de %1</translation>
     </message>
     <message>
-        <location filename="src/game/zones/logic/card_zone_logic.cpp" line="192"/>
+        <location filename="src/game/zones/card_zone_logic.cpp" line="197"/>
         <source>their library</source>
         <comment>shuffle</comment>
         <translation>sa bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/game/zones/logic/card_zone_logic.cpp" line="192"/>
+        <location filename="src/game/zones/card_zone_logic.cpp" line="197"/>
         <source>%1&apos;s library</source>
         <comment>shuffle</comment>
         <translation>bibliothèque de %1</translation>
     </message>
     <message>
-        <location filename="src/game/zones/logic/card_zone_logic.cpp" line="194"/>
+        <location filename="src/game/zones/card_zone_logic.cpp" line="199"/>
         <source>their library</source>
         <comment>nominative</comment>
         <translation>sa bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/game/zones/logic/card_zone_logic.cpp" line="194"/>
+        <location filename="src/game/zones/card_zone_logic.cpp" line="199"/>
         <source>%1&apos;s library</source>
         <comment>nominative</comment>
         <translation>bibliothèque de %1</translation>
     </message>
     <message>
-        <location filename="src/game/zones/logic/card_zone_logic.cpp" line="197"/>
+        <location filename="src/game/zones/card_zone_logic.cpp" line="202"/>
         <source>their graveyard</source>
         <comment>nominative</comment>
         <translation>son cimetière</translation>
     </message>
     <message>
-        <location filename="src/game/zones/logic/card_zone_logic.cpp" line="197"/>
+        <location filename="src/game/zones/card_zone_logic.cpp" line="202"/>
         <source>%1&apos;s graveyard</source>
         <comment>nominative</comment>
         <translation>le cimetière de %1</translation>
     </message>
     <message>
-        <location filename="src/game/zones/logic/card_zone_logic.cpp" line="199"/>
+        <location filename="src/game/zones/card_zone_logic.cpp" line="204"/>
         <source>their exile</source>
         <comment>nominative</comment>
         <translation>sa zone d&apos;exil</translation>
     </message>
     <message>
-        <location filename="src/game/zones/logic/card_zone_logic.cpp" line="199"/>
+        <location filename="src/game/zones/card_zone_logic.cpp" line="204"/>
         <source>%1&apos;s exile</source>
         <comment>nominative</comment>
         <translation>la zone d&apos;exil de %1</translation>
     </message>
     <message>
-        <location filename="src/game/zones/logic/card_zone_logic.cpp" line="203"/>
+        <location filename="src/game/zones/card_zone_logic.cpp" line="208"/>
         <source>their sideboard</source>
         <comment>look at zone</comment>
         <translation>sa réserve</translation>
     </message>
     <message>
-        <location filename="src/game/zones/logic/card_zone_logic.cpp" line="204"/>
+        <location filename="src/game/zones/card_zone_logic.cpp" line="209"/>
         <source>%1&apos;s sideboard</source>
         <comment>look at zone</comment>
         <translation>la réserve de %1</translation>
     </message>
     <message>
-        <location filename="src/game/zones/logic/card_zone_logic.cpp" line="206"/>
+        <location filename="src/game/zones/card_zone_logic.cpp" line="211"/>
         <source>their sideboard</source>
         <comment>nominative</comment>
         <translation>sa réserve</translation>
     </message>
     <message>
-        <location filename="src/game/zones/logic/card_zone_logic.cpp" line="207"/>
+        <location filename="src/game/zones/card_zone_logic.cpp" line="212"/>
         <source>%1&apos;s sideboard</source>
         <comment>nominative</comment>
         <translation>la réserve de %1</translation>
     </message>
     <message>
-        <location filename="src/game/zones/logic/card_zone_logic.cpp" line="212"/>
+        <location filename="src/game/zones/card_zone_logic.cpp" line="217"/>
         <source>their custom zone &apos;%1&apos;</source>
         <comment>nominative</comment>
         <translation>sa zone personnalisée &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="src/game/zones/logic/card_zone_logic.cpp" line="213"/>
+        <location filename="src/game/zones/card_zone_logic.cpp" line="218"/>
         <source>%1&apos;s custom zone &apos;%2&apos;</source>
         <comment>nominative</comment>
         <translation>La zone personnalisée &apos;%2&apos; de %1</translation>
@@ -960,15 +1097,420 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     </message>
 </context>
 <context>
+    <name>ColorButton</name>
+    <message>
+        <location filename="src/interface/palette_editor/color_button.cpp" line="10"/>
+        <source>Click to pick a color</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/color_button.cpp" line="26"/>
+        <source>Pick colour</source>
+        <translation>Choisir la couleur</translation>
+    </message>
+</context>
+<context>
+    <name>ConnectionController</name>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="134"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="300"/>
+        <source>The server has reached its maximum user capacity, please check back later.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="138"/>
+        <source>There are too many concurrent connections from your address.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="142"/>
+        <source>Banned by moderator</source>
+        <translation>Banni par le modérateur</translation>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="145"/>
+        <source>Expected end time: %1</source>
+        <translation>Heure de fin estimé: %1</translation>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="147"/>
+        <source>This ban lasts indefinitely.</source>
+        <translation>Ce bannissement dure indéfiniment.</translation>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="155"/>
+        <source>Scheduled server shutdown.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="159"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="538"/>
+        <source>Invalid username.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="163"/>
+        <source>You have been logged out due to logging in at another location.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="170"/>
+        <source>Connection closed</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="171"/>
+        <source>The server has terminated your connection.
+Reason: %1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message numerus="yes">
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="176"/>
+        <source>The server is going to be restarted in %n minute(s).
+All running games will be lost.
+Reason for shutdown: %1</source>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="181"/>
+        <source>Scheduled server shutdown</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="219"/>
+        <source>Failed Login</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="220"/>
+        <source>Your client seems to be missing features this server requires for connection.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="221"/>
+        <source>To update your client, go to &apos;Help -&gt; Check for Client Updates&apos;.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="228"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="235"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="248"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="253"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="258"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="267"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="275"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="305"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="363"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="367"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="371"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="376"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="380"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="393"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="400"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="406"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="413"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="420"/>
+        <source>Error</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="229"/>
+        <source>Incorrect username or password. Please check your authentication information and try again.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="236"/>
+        <source>There is already an active session using this user name.
+Please close that session first and re-login.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="243"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="358"/>
+        <source>You are banned until %1.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="244"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="359"/>
+        <source>You are banned indefinitely.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="259"/>
+        <source>This server requires user registration. Do you want to register now?</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="268"/>
+        <source>This server requires client IDs. Your client is either failing to generate an ID or you are running a modified client.
+Please close and reopen your client to try again.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="276"/>
+        <source>An internal error has occurred, please close and reopen Cockatrice before trying again.
+If the error persists, ensure you are running the latest version of the software and if needed contact the software developers.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="285"/>
+        <source>Account activation</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="286"/>
+        <source>Your account has not been activated yet.
+You need to provide the activation token received in the activation email.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="299"/>
+        <source>Server Full</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="306"/>
+        <source>Unknown login error: %1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="307"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="382"/>
+        <source>
+This usually means that your client version is out of date, and the server sent a reply your client doesn&apos;t understand.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="321"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="326"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="331"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="340"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="344"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="353"/>
+        <source>Registration denied</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="322"/>
+        <source>Registration is currently disabled on this server</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="327"/>
+        <source>There is already an existing account with the same user name.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="332"/>
+        <source>It&apos;s mandatory to specify a valid email address when registering.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="345"/>
+        <source>It appears you are attempting to register a new account on this server yet you already have an account registered with the email provided. This server restricts the number of accounts a user can register per address. Please contact the server operator for further assistance or to obtain your credential information.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="353"/>
+        <source>Password too short.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="372"/>
+        <source>Registration failed for a technical problem on the server.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="376"/>
+        <source>The connection to the server has been lost.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="381"/>
+        <source>Unknown registration error: %1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="393"/>
+        <source>Account activation failed</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="400"/>
+        <source>Socket error: %1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="406"/>
+        <source>Server timeout</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="414"/>
+        <source>You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server.
+Local version is %1, remote version is %2.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="421"/>
+        <source>Your Cockatrice client is obsolete. Please update your Cockatrice version.
+Local version is %1, remote version is %2.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="430"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="440"/>
+        <source>Success</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="430"/>
+        <source>Registration accepted.
+Will now login.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="440"/>
+        <source>Account activation accepted.
+Will now login.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="446"/>
+        <source>Information</source>
+        <translation>Information</translation>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="447"/>
+        <source>This server supports additional features that your client doesn't have.
+This is most likely not a problem, but this message might mean there is a new version of Cockatrice available or this server is running a custom or pre-release version.
+
+To update your client, go to Help -&gt; Check for Updates.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="456"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="466"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="475"/>
+        <source>Reset Password</source>
+        <translation>Réinitialiser le mot de passe</translation>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="457"/>
+        <source>Your password has been reset successfully, you can now log in using the new credentials.</source>
+        <translation>Votre mot de passe à été réinitialisé avec succes, vous pouvez maintenant vous connecter avec le nouveau mot de passe.</translation>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="467"/>
+        <source>Failed to reset user account password, please contact the server operator to reset your password.</source>
+        <translation>Échec de la réinitialisation du mot de passe. Veuillez contacter l&apos;administrateur du serveur pour réinitialiser votre mot de passe.</translation>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="476"/>
+        <source>Activation request received, please check your email for an activation token.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="500"/>
+        <source>Connecting to %1...</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="505"/>
+        <source>Registering to %1 as %2...</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="509"/>
+        <source>Disconnected</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="513"/>
+        <source>Connected, logging in at %1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="524"/>
+        <source>Requesting forgotten password to %1 as %2...</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="542"/>
+        <source>Your username must respect these rules:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="544"/>
+        <source>is %1 - %2 characters long</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="545"/>
+        <source>can %1 contain lowercase characters</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="545"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="547"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="550"/>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="557"/>
+        <source>NOT</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="547"/>
+        <source>can %1 contain uppercase characters</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="550"/>
+        <source>can %1 contain numeric characters</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="553"/>
+        <source>can contain the following punctuation: %1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="557"/>
+        <source>first character can %1 be a punctuation mark</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="564"/>
+        <source>no unacceptable language as specified by these server rules:</source>
+        <comment>note that the following lines will not be translated</comment>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="570"/>
+        <source>can not contain any of the following words: %1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="576"/>
+        <source>can not match any of the following expressions: %1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/network/connection_controller/remote_connection_controller.cpp" line="583"/>
+        <source>You may only use A-Z, a-z, 0-9, _, ., and - in your username.</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>CustomZoneMenu</name>
     <message>
-        <location filename="src/game/player/menu/custom_zone_menu.cpp" line="18"/>
+        <location filename="src/game_graphics/player/menu/custom_zone_menu.cpp" line="19"/>
         <source>C&amp;ustom Zones</source>
         <translation>Zones pe&amp;rsonnalisés</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/custom_zone_menu.cpp" line="23"/>
-        <location filename="src/game/player/menu/custom_zone_menu.cpp" line="37"/>
+        <location filename="src/game_graphics/player/menu/custom_zone_menu.cpp" line="24"/>
+        <location filename="src/game_graphics/player/menu/custom_zone_menu.cpp" line="38"/>
         <source>View custom zone &apos;%1&apos;</source>
         <translation>Voir la zone personnalisée &apos;%1&apos;</translation>
     </message>
@@ -976,32 +1518,37 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
 <context>
     <name>DeckAnalyticsWidget</name>
     <message>
-        <location filename="src/interface/widgets/deck_analytics/deck_analytics_widget.cpp" line="65"/>
+        <location filename="src/interface/widgets/deck_analytics/deck_analytics_widget.cpp" line="70"/>
         <source>Add Panel</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter un panneau</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_analytics/deck_analytics_widget.cpp" line="66"/>
+        <location filename="src/interface/widgets/deck_analytics/deck_analytics_widget.cpp" line="71"/>
         <source>Remove Panel</source>
-        <translation type="unfinished"/>
+        <translation>Enlever un Panneau</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_analytics/deck_analytics_widget.cpp" line="67"/>
+        <location filename="src/interface/widgets/deck_analytics/deck_analytics_widget.cpp" line="72"/>
         <source>Save Layout</source>
-        <translation type="unfinished"/>
+        <translation>Sauver cette disposition</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_analytics/deck_analytics_widget.cpp" line="68"/>
+        <location filename="src/interface/widgets/deck_analytics/deck_analytics_widget.cpp" line="73"/>
         <source>Load Layout</source>
+        <translation>Charger une disposition</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/deck_analytics/deck_analytics_widget.cpp" line="74"/>
+        <source>Include Sideboard</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>DeckEditorCardDatabaseDockWidget</name>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_card_database_dock_widget.cpp" line="49"/>
+        <location filename="src/interface/widgets/deck_editor/deck_editor_card_database_dock_widget.cpp" line="46"/>
         <source>Card Database</source>
-        <translation type="unfinished"/>
+        <translation>Base de données de cartes</translation>
     </message>
 </context>
 <context>
@@ -1015,47 +1562,17 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
 <context>
     <name>DeckEditorDatabaseDisplayWidget</name>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="35"/>
+        <location filename="src/interface/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="28"/>
         <source>Search by card name (or search expressions)</source>
         <translation>Rechercher par nom de carte (ou expression de recherche)</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="188"/>
-        <source>Add to Deck</source>
-        <translation>Ajouter au deck</translation>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="189"/>
-        <source>Add to Sideboard</source>
-        <translation>Ajouter à la réserve</translation>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="190"/>
-        <source>Select Printing</source>
-        <translation>Choisir l&apos;impression</translation>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="193"/>
-        <source>Show on EDHRec (Commander)</source>
-        <translation>Afficher sur EDHRec (Commandant)</translation>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="197"/>
-        <source>Show on EDHRec (Card)</source>
-        <translation>Afficher sur EDHRec (carte)</translation>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="205"/>
-        <source>Show Related cards</source>
-        <translation>Afficher les cartes associées</translation>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="241"/>
+        <location filename="src/interface/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="127"/>
         <source>Add card to &amp;maindeck</source>
         <translation>Ajouter la carte au &amp;deck</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="242"/>
+        <location filename="src/interface/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="128"/>
         <source>Add card to &amp;sideboard</source>
         <translation>Ajouter carte à la ré&amp;serve</translation>
     </message>
@@ -1065,7 +1582,7 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="131"/>
         <source>Loading Database...</source>
-        <translation type="unfinished"/>
+        <translation>Chargement de la base de données...</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="153"/>
@@ -1088,72 +1605,72 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
         <translation>Couleurs</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="718"/>
+        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="721"/>
         <source>Select Printing</source>
         <translation>Choisir l&apos;impression</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="734"/>
+        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="737"/>
         <source>Deck</source>
         <translation>Deck</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="736"/>
+        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="739"/>
         <source>Deck &amp;name:</source>
         <translation>&amp;Nom du deck :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="737"/>
+        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="740"/>
         <source>Banner Card/Tags Visibility Settings</source>
         <translation>Paramètres de visibilité de la carte bannière et des étiquettes</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="738"/>
+        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="741"/>
         <source>Show banner card selection menu</source>
         <translation>Montrer le menu de sélection de carte bannière</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="739"/>
+        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="742"/>
         <source>Show tags selection menu</source>
         <translation>Montrer le menu de sélection d&apos;étiquettes</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="740"/>
+        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="743"/>
         <source>&amp;Comments:</source>
         <translation>&amp;Commentaires :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="741"/>
+        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="744"/>
         <source>Group by:</source>
         <translation>Grouper par :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="742"/>
+        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="745"/>
         <source>Format:</source>
-        <translation type="unfinished"/>
+        <translation>Format :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="744"/>
+        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="747"/>
         <source>Hash:</source>
         <translation>Empreinte :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="746"/>
+        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="749"/>
         <source>&amp;Increment number</source>
         <translation>Augmenter quant&amp;ité</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="747"/>
+        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="750"/>
         <source>&amp;Decrement number</source>
         <translation>&amp;Diminuer quantité</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="748"/>
+        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="751"/>
         <source>&amp;Remove row</source>
         <translation>&amp;Retirer la ligne</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="749"/>
+        <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="752"/>
         <source>Swap card to/from sideboard</source>
         <translation>Échanger la carte vers/depuis la réserve</translation>
     </message>
@@ -1161,17 +1678,17 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
 <context>
     <name>DeckEditorFilterDockWidget</name>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_filter_dock_widget.cpp" line="137"/>
+        <location filename="src/interface/widgets/deck_editor/deck_editor_filter_dock_widget.cpp" line="139"/>
         <source>Filters</source>
         <translation>Filtres</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_filter_dock_widget.cpp" line="139"/>
+        <location filename="src/interface/widgets/deck_editor/deck_editor_filter_dock_widget.cpp" line="141"/>
         <source>&amp;Clear all filters</source>
         <translation>&amp;Effacer tous les filtres</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_editor_filter_dock_widget.cpp" line="140"/>
+        <location filename="src/interface/widgets/deck_editor/deck_editor_filter_dock_widget.cpp" line="142"/>
         <source>Delete selected</source>
         <translation>Enlever la sélection</translation>
     </message>
@@ -1302,168 +1819,112 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
 <context>
     <name>DeckEditorSettingsPage</name>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1250"/>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1313"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="181"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="237"/>
         <source>Update Spoilers</source>
         <translation>Mettre à jour les spoilers</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1144"/>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1180"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="115"/>
         <source>Success</source>
         <translation>Réussite</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1144"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="115"/>
         <source>Download URLs have been reset.</source>
         <translation>Les URLs de téléchargement ont été réinitialisées.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1180"/>
-        <source>Downloaded card pictures have been reset.</source>
-        <translation>Les images des cartes téléchargées ont été supprimées.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1183"/>
-        <source>Error</source>
-        <translation>Erreur</translation>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1183"/>
-        <source>One or more downloaded card pictures could not be cleared.</source>
-        <translation>Une ou plusieurs images de cartes téléchargées n&apos;ont pas pu être supprimées.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1190"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="121"/>
         <source>Add URL</source>
         <translation>Ajouter une URL</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1190"/>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1210"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="121"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="141"/>
         <source>URL:</source>
         <translation>URL :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1210"/>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1315"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="141"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="239"/>
         <source>Edit URL</source>
         <translation>Modifier l&apos;URL</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1307"/>
-        <source>Network Cache Size:</source>
-        <translation>Taille du cache du réseau :</translation>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1309"/>
-        <source>Redirect Cache TTL:</source>
-        <translation>Rediriger le TTL du cache :</translation>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1310"/>
-        <source>How long cached redirects for urls are valid for.</source>
-        <translation>Combien de temps les redirections mises en cache pour les URL sont-elles valides.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1311"/>
-        <source>Picture Cache Size:</source>
-        <translation>Taille du cache des images :</translation>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1314"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="238"/>
         <source>Add New URL</source>
         <translation>Ajouter Nouveau Lien</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1316"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="240"/>
         <source>Remove URL</source>
         <translation>Effacer Lien</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1317"/>
-        <source>Day(s)</source>
-        <translation>Jour(s)</translation>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1239"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="170"/>
         <source>Updating...</source>
         <translation>Mise à jour...</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1269"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="200"/>
         <source>Choose path</source>
         <translation>Choisir le chemin</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1295"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="226"/>
         <source>URL Download Priority</source>
         <translation>URL de téléchargement prioritaire</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1296"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="227"/>
         <source>Spoilers</source>
         <translation>Spoilers</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1297"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="228"/>
         <source>Download Spoilers Automatically</source>
         <translation>Télécharger automatiquement les spoilers</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1298"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="229"/>
         <source>Spoiler Location:</source>
         <translation>Emplacement des spoilers :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1299"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="230"/>
         <source>Last Change</source>
         <translation>Dernier changement</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1300"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="231"/>
         <source>Spoilers download automatically on launch</source>
         <translation>Télécharger automatiquement les spoilers au lancement</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1301"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="232"/>
         <source>Press the button to manually update without relaunching</source>
         <translation>Appuyez sur le bouton pour mettre à jour manuellement sans redémarrer.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1302"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="233"/>
         <source>Do not close settings until manual update is complete</source>
         <translation>Ne pas fermer la fenêtre des paramètres avant la mise à jour manuelle complète.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1303"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="234"/>
         <source>Download card pictures on the fly</source>
         <translation>Télécharger les images des cartes à la volée</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1304"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="235"/>
         <source>How to add a custom URL</source>
         <translation>Comment ajouter une URL personnalisée</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1305"/>
-        <source>Delete Downloaded Images</source>
-        <translation>Supprimer les images téléchargées</translation>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1306"/>
+        <location filename="src/interface/widgets/settings_page/deck_editor_settings_page.cpp" line="236"/>
         <source>Reset Download URLs</source>
         <translation>Réinitialiser les URL de téléchargement </translation>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1308"/>
-        <source>On-disk cache for downloaded pictures</source>
-        <translation>Cache pour les images téléchargées</translation>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1312"/>
-        <source>In-memory cache for pictures not currently on screen</source>
-        <translation>Cache en mémoire pour les imges non affichées actuellement</translation>
     </message>
 </context>
 <context>
@@ -1471,32 +1932,32 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="56"/>
         <source>Undo</source>
-        <translation type="unfinished"/>
+        <translation>Défaire</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="57"/>
         <source>Redo</source>
-        <translation type="unfinished"/>
+        <translation>Refaire</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="58"/>
         <source>Undo/Redo history</source>
-        <translation type="unfinished"/>
+        <translation>Historique</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="59"/>
         <source>Click on an entry to revert to that point in the history.</source>
-        <translation type="unfinished"/>
+        <translation>Clickez sur une ligne pour retourner à ce point dans l&apos;historique.</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="71"/>
         <source>[redo] </source>
-        <translation type="unfinished"/>
+        <translation>[refaire]</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="88"/>
         <source>[undo] </source>
-        <translation type="unfinished"/>
+        <translation>[défaire]</translation>
     </message>
 </context>
 <context>
@@ -1530,12 +1991,12 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
 <context>
     <name>DeckLoader</name>
     <message>
-        <location filename="src/interface/deck_loader/deck_loader.cpp" line="27"/>
+        <location filename="src/interface/deck_loader/deck_loader.cpp" line="28"/>
         <source>Common deck formats (%1)</source>
         <translation>Formats de decks courants (%1)</translation>
     </message>
     <message>
-        <location filename="src/interface/deck_loader/deck_loader.cpp" line="27"/>
+        <location filename="src/interface/deck_loader/deck_loader.cpp" line="28"/>
         <source>All files (*.*)</source>
         <translation>Tous les fichiers (*.*)</translation>
     </message>
@@ -1729,57 +2190,57 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="113"/>
         <source>Rename deck to &quot;%1&quot; from &quot;%2&quot;</source>
-        <translation type="unfinished"/>
+        <translation>Renommer le deck de &quot;%2&quot; à &quot;%1&quot;</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="126"/>
         <source>Updated comments (was %1 chars, now %2 chars)</source>
-        <translation type="unfinished"/>
+        <translation>Mis à jour les commentaires (étaient %1 caractères, maintenant %2)</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="139"/>
         <source>Set banner card to %1 (%2)</source>
-        <translation type="unfinished"/>
+        <translation>Définir %1 (%2) comme carte de couverture</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="152"/>
         <source>Tags changed</source>
-        <translation type="unfinished"/>
+        <translation>Tags modifiés</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="164"/>
         <source>Set format to %1</source>
-        <translation type="unfinished"/>
+        <translation>Changer le format à %1</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="182"/>
         <source>Added (%1): %2 (%3) %4</source>
-        <translation type="unfinished"/>
+        <translation>Ajouté (%1): %2 (%3) %4</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="257"/>
+        <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="264"/>
         <source>Moved to %1 1 × &quot;%2&quot; (%3)</source>
-        <translation type="unfinished"/>
+        <translation>Bougé %1 1 × &quot;%2&quot; (%3)</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="275"/>
+        <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="282"/>
         <source>Removed &quot;%1&quot; (all copies)</source>
-        <translation type="unfinished"/>
+        <translation>Retiré &quot;%1&quot; (toutes les copies)</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="299"/>
+        <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="306"/>
         <source>%1 1 × &quot;%2&quot; (%3)</source>
-        <translation type="unfinished"/>
+        <translation>%1 1 × &quot;%2&quot; (%3)</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="300"/>
+        <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="307"/>
         <source>Added</source>
-        <translation type="unfinished"/>
+        <translation>Ajoutée</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="300"/>
+        <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="307"/>
         <source>Removed</source>
-        <translation type="unfinished"/>
+        <translation>Retirée</translation>
     </message>
 </context>
 <context>
@@ -1799,75 +2260,75 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
 <context>
     <name>DeckViewContainer</name>
     <message>
-        <location filename="src/game/deckview/deck_view_container.cpp" line="123"/>
+        <location filename="src/game_graphics/deckview/deck_view_container.cpp" line="123"/>
         <source>Load deck...</source>
         <translation>Charger un deck...</translation>
     </message>
     <message>
-        <location filename="src/game/deckview/deck_view_container.cpp" line="124"/>
+        <location filename="src/game_graphics/deckview/deck_view_container.cpp" line="124"/>
         <source>Load remote deck...</source>
         <translation>Charger un deck distant...</translation>
     </message>
     <message>
-        <location filename="src/game/deckview/deck_view_container.cpp" line="125"/>
+        <location filename="src/game_graphics/deckview/deck_view_container.cpp" line="125"/>
         <source>Load from clipboard...</source>
         <translation>Charger depuis le presse-papier...</translation>
     </message>
     <message>
-        <location filename="src/game/deckview/deck_view_container.cpp" line="126"/>
+        <location filename="src/game_graphics/deckview/deck_view_container.cpp" line="126"/>
         <source>Load from website...</source>
         <translation>Charger depuis un site web...</translation>
     </message>
     <message>
-        <location filename="src/game/deckview/deck_view_container.cpp" line="127"/>
+        <location filename="src/game_graphics/deckview/deck_view_container.cpp" line="127"/>
         <source>Unload deck</source>
         <translation>Annuler le chargement du deck</translation>
     </message>
     <message>
-        <location filename="src/game/deckview/deck_view_container.cpp" line="128"/>
+        <location filename="src/game_graphics/deckview/deck_view_container.cpp" line="128"/>
         <source>Ready to start</source>
         <translation>Prêt à démarrer</translation>
     </message>
     <message>
-        <location filename="src/game/deckview/deck_view_container.cpp" line="129"/>
+        <location filename="src/game_graphics/deckview/deck_view_container.cpp" line="129"/>
         <source>Force start</source>
         <translation>Forcer le démarrage</translation>
     </message>
     <message>
-        <location filename="src/game/deckview/deck_view_container.cpp" line="197"/>
+        <location filename="src/game_graphics/deckview/deck_view_container.cpp" line="197"/>
         <source>Sideboard unlocked</source>
         <translation>Réserve déverrouillée</translation>
     </message>
     <message>
-        <location filename="src/game/deckview/deck_view_container.cpp" line="199"/>
+        <location filename="src/game_graphics/deckview/deck_view_container.cpp" line="199"/>
         <source>Sideboard locked</source>
         <translation>Réserve verrouillée</translation>
     </message>
     <message>
-        <location filename="src/game/deckview/deck_view_container.cpp" line="267"/>
-        <location filename="src/game/deckview/deck_view_container.cpp" line="279"/>
+        <location filename="src/game_graphics/deckview/deck_view_container.cpp" line="269"/>
+        <location filename="src/game_graphics/deckview/deck_view_container.cpp" line="281"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="src/game/deckview/deck_view_container.cpp" line="267"/>
+        <location filename="src/game_graphics/deckview/deck_view_container.cpp" line="269"/>
         <source>The selected file could not be loaded.</source>
         <translation>Le fichier sélectionné n&apos;a pas pu être chargé.</translation>
     </message>
     <message>
-        <location filename="src/game/deckview/deck_view_container.cpp" line="279"/>
+        <location filename="src/game_graphics/deckview/deck_view_container.cpp" line="281"/>
         <source>Deck is greater than maximum file size.</source>
         <translation>Le deck est plus grand que la taille maximum de fichier.</translation>
     </message>
     <message>
-        <location filename="src/game/deckview/deck_view_container.cpp" line="342"/>
+        <location filename="src/game_graphics/deckview/deck_view_container.cpp" line="344"/>
         <source>Are you sure you want to force start?
 This will kick all non-ready players from the game.</source>
         <translation>Êtes-vous sûr de vouloir forcer le démarrage ?
 Cela va éjecter de la partie tous les joueurs non prêts à démarrer.</translation>
     </message>
     <message>
-        <location filename="src/game/deckview/deck_view_container.cpp" line="344"/>
+        <location filename="src/game_graphics/deckview/deck_view_container.cpp" line="346"/>
         <source>Cockatrice</source>
         <translation>Cockatrice</translation>
     </message>
@@ -1968,7 +2429,7 @@ Voulez-vous convertir le deck au format .cod ?</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_connect.cpp" line="92"/>
-        <location filename="src/interface/widgets/dialogs/dlg_connect.cpp" line="287"/>
+        <location filename="src/interface/widgets/dialogs/dlg_connect.cpp" line="281"/>
         <source>Webpage</source>
         <translation>Page web</translation>
     </message>
@@ -2008,37 +2469,37 @@ Voulez-vous convertir le deck au format .cod ?</translation>
         <translation>Se connecter au serveur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_connect.cpp" line="301"/>
+        <location filename="src/interface/widgets/dialogs/dlg_connect.cpp" line="295"/>
         <source>Server URL</source>
         <translation>URL du serveur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_connect.cpp" line="304"/>
+        <location filename="src/interface/widgets/dialogs/dlg_connect.cpp" line="298"/>
         <source>Communication Port</source>
         <translation>Port de communication</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_connect.cpp" line="309"/>
+        <location filename="src/interface/widgets/dialogs/dlg_connect.cpp" line="303"/>
         <source>Unique Server Name</source>
         <translation>Nom de serveur unique</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_connect.cpp" line="335"/>
+        <location filename="src/interface/widgets/dialogs/dlg_connect.cpp" line="329"/>
         <source>Connection Warning</source>
         <translation>Avertissement de connexion</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_connect.cpp" line="335"/>
+        <location filename="src/interface/widgets/dialogs/dlg_connect.cpp" line="329"/>
         <source>You need to name your new connection profile.</source>
         <translation>Vous devez attribuer un nom à votre nouveau profil de connexion.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_connect.cpp" line="350"/>
+        <location filename="src/interface/widgets/dialogs/dlg_connect.cpp" line="344"/>
         <source>Connect Warning</source>
         <translation>Avertissement de connexion</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_connect.cpp" line="350"/>
+        <location filename="src/interface/widgets/dialogs/dlg_connect.cpp" line="344"/>
         <source>The player name can&apos;t be empty.</source>
         <translation>Le nom du joueur ne peut être vide.</translation>
     </message>
@@ -2133,7 +2594,7 @@ Voulez-vous convertir le deck au format .cod ?</translation>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_create_game.cpp" line="106"/>
         <source>Create game as judge</source>
-        <translation type="unfinished"/>
+        <translation>Créer une partie en tant que juge</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_create_game.cpp" line="118"/>
@@ -2151,17 +2612,17 @@ Voulez-vous convertir le deck au format .cod ?</translation>
         <translation>Créer une partie</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_create_game.cpp" line="232"/>
+        <location filename="src/interface/widgets/dialogs/dlg_create_game.cpp" line="233"/>
         <source>Game information</source>
         <translation>Informations sur la partie</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_create_game.cpp" line="322"/>
+        <location filename="src/interface/widgets/dialogs/dlg_create_game.cpp" line="323"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_create_game.cpp" line="322"/>
+        <location filename="src/interface/widgets/dialogs/dlg_create_game.cpp" line="323"/>
         <source>Server error.</source>
         <translation>Erreur serveur.</translation>
     </message>
@@ -2169,97 +2630,97 @@ Voulez-vous convertir le deck au format .cod ?</translation>
 <context>
     <name>DlgCreateToken</name>
     <message>
-        <location filename="src/game/dialogs/dlg_create_token.cpp" line="31"/>
+        <location filename="src/game_graphics/dialogs/dlg_create_token.cpp" line="31"/>
         <source>&amp;Name:</source>
         <translation>&amp;Nom :</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_create_token.cpp" line="32"/>
+        <location filename="src/game_graphics/dialogs/dlg_create_token.cpp" line="32"/>
         <source>Token</source>
         <translation>Jeton</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_create_token.cpp" line="42"/>
+        <location filename="src/game_graphics/dialogs/dlg_create_token.cpp" line="42"/>
         <source>C&amp;olor:</source>
         <translation>C&amp;ouleur :</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_create_token.cpp" line="44"/>
+        <location filename="src/game_graphics/dialogs/dlg_create_token.cpp" line="44"/>
         <source>white</source>
         <translation>blanc</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_create_token.cpp" line="45"/>
+        <location filename="src/game_graphics/dialogs/dlg_create_token.cpp" line="45"/>
         <source>blue</source>
         <translation>bleu</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_create_token.cpp" line="46"/>
+        <location filename="src/game_graphics/dialogs/dlg_create_token.cpp" line="46"/>
         <source>black</source>
         <translation>noir</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_create_token.cpp" line="47"/>
+        <location filename="src/game_graphics/dialogs/dlg_create_token.cpp" line="47"/>
         <source>red</source>
         <translation>rouge</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_create_token.cpp" line="48"/>
+        <location filename="src/game_graphics/dialogs/dlg_create_token.cpp" line="48"/>
         <source>green</source>
         <translation>vert</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_create_token.cpp" line="49"/>
+        <location filename="src/game_graphics/dialogs/dlg_create_token.cpp" line="49"/>
         <source>multicolor</source>
         <translation>multicolore</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_create_token.cpp" line="50"/>
+        <location filename="src/game_graphics/dialogs/dlg_create_token.cpp" line="50"/>
         <source>colorless</source>
         <translation>incolore</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_create_token.cpp" line="53"/>
+        <location filename="src/game_graphics/dialogs/dlg_create_token.cpp" line="53"/>
         <source>&amp;P/T:</source>
         <translation>&amp;F/E :</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_create_token.cpp" line="58"/>
+        <location filename="src/game_graphics/dialogs/dlg_create_token.cpp" line="58"/>
         <source>&amp;Annotation:</source>
         <translation>&amp;Annotation :</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_create_token.cpp" line="63"/>
+        <location filename="src/game_graphics/dialogs/dlg_create_token.cpp" line="63"/>
         <source>&amp;Destroy token when it leaves the table</source>
         <translation>&amp;Detruire le jeton lorsqu&apos;il quitte le champ de bataille</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_create_token.cpp" line="66"/>
+        <location filename="src/game_graphics/dialogs/dlg_create_token.cpp" line="66"/>
         <source>Create face-down (Only hides name)</source>
         <translation>Créer face-cachée (cache seulement le nom)</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_create_token.cpp" line="81"/>
+        <location filename="src/game_graphics/dialogs/dlg_create_token.cpp" line="81"/>
         <source>Token data</source>
         <translation>Données du jeton</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_create_token.cpp" line="88"/>
+        <location filename="src/game_graphics/dialogs/dlg_create_token.cpp" line="88"/>
         <source>Show &amp;all tokens</source>
         <translation>Afficher &amp;tous les jetons</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_create_token.cpp" line="90"/>
+        <location filename="src/game_graphics/dialogs/dlg_create_token.cpp" line="90"/>
         <source>Show tokens from this &amp;deck</source>
         <translation>Afficher les jetons présents dans ce &amp;deck</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_create_token.cpp" line="128"/>
+        <location filename="src/game_graphics/dialogs/dlg_create_token.cpp" line="129"/>
         <source>Choose token from list</source>
         <translation>Choisir un jeton dans la liste</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_create_token.cpp" line="146"/>
+        <location filename="src/game_graphics/dialogs/dlg_create_token.cpp" line="147"/>
         <source>Create token</source>
         <translation>Créer un jeton</translation>
     </message>
@@ -2293,7 +2754,7 @@ Voulez-vous convertir le deck au format .cod ?</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_default_tags_editor.cpp" line="71"/>
-        <location filename="src/interface/widgets/dialogs/dlg_default_tags_editor.cpp" line="119"/>
+        <location filename="src/interface/widgets/dialogs/dlg_default_tags_editor.cpp" line="120"/>
         <source>✖</source>
         <translation>✖</translation>
     </message>
@@ -2308,12 +2769,12 @@ Voulez-vous convertir le deck au format .cod ?</translation>
         <translation>Le nom de l&apos;étiquette ne peut pas être vide !</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_default_tags_editor.cpp" line="102"/>
+        <location filename="src/interface/widgets/dialogs/dlg_default_tags_editor.cpp" line="103"/>
         <source>Duplicate Tag</source>
         <translation>Étiquette dupliquée</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_default_tags_editor.cpp" line="102"/>
+        <location filename="src/interface/widgets/dialogs/dlg_default_tags_editor.cpp" line="103"/>
         <source>This tag already exists.</source>
         <translation>Cette étiquette existe déjà.</translation>
     </message>
@@ -2500,12 +2961,12 @@ Pour enlever votre avatar actuel, confirmez sans choisir une nouvelle image.</tr
         <translation>Entrez le nom du jeton :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_edit_tokens.cpp" line="155"/>
+        <location filename="src/interface/widgets/dialogs/dlg_edit_tokens.cpp" line="156"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_edit_tokens.cpp" line="156"/>
+        <location filename="src/interface/widgets/dialogs/dlg_edit_tokens.cpp" line="157"/>
         <source>The chosen name conflicts with an existing card or token.
 Make sure to enable the &apos;Token&apos; set in the &quot;Manage sets&quot; dialog to display them correctly.</source>
         <translation>Le nom choisi est en conflit avec une carte ou un jeton existant.
@@ -2530,12 +2991,12 @@ Assurez-vous d&apos;activer l&apos;édition « Fausse édition contenant les je
         <translation>Indéfini</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_edit_user.cpp" line="35"/>
+        <location filename="src/interface/widgets/dialogs/dlg_edit_user.cpp" line="36"/>
         <source>Real name:</source>
         <translation>Nom réel :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_edit_user.cpp" line="58"/>
+        <location filename="src/interface/widgets/dialogs/dlg_edit_user.cpp" line="59"/>
         <source>Edit user profile</source>
         <translation>Modifier le profil utilisateur</translation>
     </message>
@@ -2573,113 +3034,113 @@ Assurez-vous d&apos;activer l&apos;édition « Fausse édition contenant les je
         <translation>2 heures</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="25"/>
+        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="27"/>
         <source>Hide &apos;buddies only&apos; games</source>
         <translation>Ne pas afficher les parties « amis uniquement »</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="28"/>
+        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="30"/>
         <source>Hide full games</source>
         <translation>Cacher les parties pleines</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="31"/>
+        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="33"/>
         <source>Hide games that have started</source>
         <translation>Cacher les parties qui ont commencées</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="34"/>
+        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="36"/>
         <source>Hide password protected games</source>
         <translation>Cacher les parties protégées par un mot de passe</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="37"/>
+        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="39"/>
         <source>Hide &apos;ignored user&apos; games</source>
         <translation>Cacher les parties des utilisateurs ignorés</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="40"/>
+        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="42"/>
         <source>Hide games not created by buddies</source>
         <oldsource>Hide games not created by buddy</oldsource>
-        <translation type="unfinished"/>
+        <translation>Cacher les parties non-crées par vos amis</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="43"/>
+        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="45"/>
         <source>Hide games with forced open decklists</source>
         <translation>Masquer les parties avec les listes de decks ouvertes forcées</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="51"/>
+        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="53"/>
         <source>&amp;Newer than:</source>
         <translation>&amp;Créées avant :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="56"/>
+        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="58"/>
         <source>Game &amp;description:</source>
         <translation>&amp;Description de la partie :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="60"/>
+        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="62"/>
         <source>&amp;Creator name:</source>
         <translation>Nom du &amp;créateur :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="70"/>
+        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="72"/>
         <source>General</source>
         <translation>Général</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="86"/>
+        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="88"/>
         <source>&amp;Game types</source>
         <translation>Types de &amp;partie</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="91"/>
+        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="94"/>
         <source>at &amp;least:</source>
         <translation>au &amp;moins :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="98"/>
+        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="101"/>
         <source>at &amp;most:</source>
         <translation>au &amp;plus :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="111"/>
+        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="114"/>
         <source>Maximum player count</source>
         <translation>Nombre de joueurs maximum</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="123"/>
+        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="126"/>
         <source>Restrictions</source>
         <translation>Restrictions</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="126"/>
+        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="129"/>
         <source>Show games only if &amp;spectators can watch</source>
         <translation>Montrer les parties uniquement si les %spectateurs peuvent observer</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="131"/>
+        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="134"/>
         <source>Show spectator password p&amp;rotected games</source>
         <translation>Montrer les parties où les spectateurs doivent ent&amp;rer un mot de passe</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="133"/>
+        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="136"/>
         <source>Show only if spectators can ch&amp;at</source>
         <translation>Montrer uniquement si les spectateurs peuvent p&amp;arler</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="135"/>
+        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="138"/>
         <source>Show only if spectators can see &amp;hands</source>
         <translation>Montrer uniquement si les spectateurs peuvent voir les &amp;mains</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="145"/>
+        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="148"/>
         <source>Spectators</source>
         <translation>Spectateurs</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="178"/>
+        <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="181"/>
         <source>Filter games</source>
         <translation>Flitrer les parties</translation>
     </message>
@@ -2957,68 +3418,68 @@ https://tappedout.net/mtg-decks/your-deck-name/</translation>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_local_game_options.cpp" line="15"/>
         <source>Players:</source>
-        <translation type="unfinished"/>
+        <translation>Joueurs :</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_local_game_options.cpp" line="26"/>
         <source>General</source>
-        <translation type="unfinished"/>
+        <translation>Général</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_local_game_options.cpp" line="29"/>
         <source>Starting life total:</source>
-        <translation type="unfinished"/>
+        <translation>Total de vie initial :</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_local_game_options.cpp" line="40"/>
         <source>Game setup options</source>
-        <translation type="unfinished"/>
+        <translation>Options de configuration de la partie</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_local_game_options.cpp" line="43"/>
         <source>Remember settings</source>
-        <translation type="unfinished"/>
+        <translation>Conserver les paramètres</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_local_game_options.cpp" line="62"/>
         <source>Local game options</source>
-        <translation type="unfinished"/>
+        <translation>Options de configuration de partie locale</translation>
     </message>
 </context>
 <context>
     <name>DlgMoveTopCardsUntil</name>
     <message>
-        <location filename="src/game/dialogs/dlg_move_top_cards_until.cpp" line="17"/>
+        <location filename="src/game_graphics/dialogs/dlg_move_top_cards_until.cpp" line="17"/>
         <source>Card name (or search expressions):</source>
         <translation>Nom de la carte (ou expression de recherche) :</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_move_top_cards_until.cpp" line="26"/>
+        <location filename="src/game_graphics/dialogs/dlg_move_top_cards_until.cpp" line="26"/>
         <source>Number of hits:</source>
         <translation>Nombre de cartes trouvées :</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_move_top_cards_until.cpp" line="36"/>
+        <location filename="src/game_graphics/dialogs/dlg_move_top_cards_until.cpp" line="36"/>
         <source>Auto play hits</source>
         <translation>Jouer les cartes trouvées automatiquement</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_move_top_cards_until.cpp" line="51"/>
+        <location filename="src/game_graphics/dialogs/dlg_move_top_cards_until.cpp" line="51"/>
         <source>Put top cards on stack until...</source>
         <translation>Placer la carte du dessus sur la pile jusqu&apos;à...</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_move_top_cards_until.cpp" line="82"/>
+        <location filename="src/game_graphics/dialogs/dlg_move_top_cards_until.cpp" line="82"/>
         <source>No cards matching the search expression exists in the card database. Proceed anyways?</source>
         <translation>Aucune carte ne correspondant à l&apos;expression recherchée n&apos;existe dans la base de données de cartes. Continuer malgré tout ?</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_move_top_cards_until.cpp" line="84"/>
+        <location filename="src/game_graphics/dialogs/dlg_move_top_cards_until.cpp" line="84"/>
         <source>Cockatrice</source>
         <translation>Cockatrice</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_move_top_cards_until.cpp" line="96"/>
+        <location filename="src/game_graphics/dialogs/dlg_move_top_cards_until.cpp" line="96"/>
         <source>Invalid filter</source>
         <translation>Filtre invalide</translation>
     </message>
@@ -3077,40 +3538,40 @@ Your email will be used to verify your account.</source>
         <translation>Indéfini</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_register.cpp" line="317"/>
+        <location filename="src/interface/widgets/dialogs/dlg_register.cpp" line="318"/>
         <source>Real name:</source>
         <translation>Nom réel :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_register.cpp" line="352"/>
+        <location filename="src/interface/widgets/dialogs/dlg_register.cpp" line="353"/>
         <source>Register to server</source>
         <translation>S&apos;enregistrer sur le serveur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_register.cpp" line="361"/>
-        <location filename="src/interface/widgets/dialogs/dlg_register.cpp" line="364"/>
-        <location filename="src/interface/widgets/dialogs/dlg_register.cpp" line="367"/>
-        <location filename="src/interface/widgets/dialogs/dlg_register.cpp" line="372"/>
+        <location filename="src/interface/widgets/dialogs/dlg_register.cpp" line="362"/>
+        <location filename="src/interface/widgets/dialogs/dlg_register.cpp" line="365"/>
+        <location filename="src/interface/widgets/dialogs/dlg_register.cpp" line="368"/>
+        <location filename="src/interface/widgets/dialogs/dlg_register.cpp" line="373"/>
         <source>Registration Warning</source>
         <translation>Avertissement d&apos;enregistrement</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_register.cpp" line="361"/>
+        <location filename="src/interface/widgets/dialogs/dlg_register.cpp" line="362"/>
         <source>Your password is too short.</source>
         <translation>Mot de passe trop court</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_register.cpp" line="364"/>
+        <location filename="src/interface/widgets/dialogs/dlg_register.cpp" line="365"/>
         <source>Your passwords do not match, please try again.</source>
         <translation>Vos mots de passe ne correspondent pas, veuillez réessayer.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_register.cpp" line="368"/>
+        <location filename="src/interface/widgets/dialogs/dlg_register.cpp" line="369"/>
         <source>Your email addresses do not match, please try again.</source>
         <translation>Vos adresses mail ne correspondent pas, veuillez réessayer.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_register.cpp" line="372"/>
+        <location filename="src/interface/widgets/dialogs/dlg_register.cpp" line="373"/>
         <source>The player name can&apos;t be empty.</source>
         <translation>Le nom du joueur ne peut pas être vide.</translation>
     </message>
@@ -3118,17 +3579,17 @@ Your email will be used to verify your account.</source>
 <context>
     <name>DlgRollDice</name>
     <message>
-        <location filename="src/game/dialogs/dlg_roll_dice.cpp" line="12"/>
+        <location filename="src/game_graphics/dialogs/dlg_roll_dice.cpp" line="12"/>
         <source>Number of sides:</source>
         <translation>Nombre de faces:</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_roll_dice.cpp" line="19"/>
+        <location filename="src/game_graphics/dialogs/dlg_roll_dice.cpp" line="19"/>
         <source>Number of dice:</source>
         <translation>Nombre de dés:</translation>
     </message>
     <message>
-        <location filename="src/game/dialogs/dlg_roll_dice.cpp" line="40"/>
+        <location filename="src/game_graphics/dialogs/dlg_roll_dice.cpp" line="40"/>
         <source>Roll Dice</source>
         <translation>Lancer les dés</translation>
     </message>
@@ -3163,28 +3624,28 @@ Your email will be used to verify your account.</source>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_select_set_for_cards.cpp" line="182"/>
         <source>Bulk modified printings.</source>
-        <translation type="unfinished"/>
+        <translation>Impressions modifiées en groupe.</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_select_set_for_cards.cpp" line="189"/>
         <source>Cleared all printing information.</source>
-        <translation type="unfinished"/>
+        <translation>Toutes les informations d&apos;impressions ont été supprimées.</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_select_set_for_cards.cpp" line="198"/>
         <source>Set all printings to preferred.</source>
-        <translation type="unfinished"/>
+        <translation>Définir toutes les impressions comme préférées.</translation>
     </message>
 </context>
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1883"/>
+        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="159"/>
         <source>Unknown Error loading card database</source>
         <translation>Erreur inconnue lors du chargement de la base de données de cartes.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1891"/>
+        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="167"/>
         <source>Your card database is invalid.
 
 Cockatrice may not function correctly with an invalid database
@@ -3201,7 +3662,7 @@ Vous devrez peut-être redémarrer Oracle pour mettre à jour votre base de donn
 Voulez-vous changer l&apos;emplacement de votre base de données ?</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1897"/>
+        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="173"/>
         <source>Your card database version is too old.
 
 This can cause problems loading card information or images
@@ -3218,7 +3679,7 @@ Généralement, il suffit de redémarrer oracle pour mettre à jour votre base d
 Voulez-vous changer l&apos;emplacement de votre base de données ?</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1903"/>
+        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="179"/>
         <source>Your card database did not finish loading
 
 Please file a ticket at https://github.com/Cockatrice/Cockatrice/issues with your cards.xml attached
@@ -3231,7 +3692,7 @@ Veuillez ouvrir un ticket sur https://github.com/Cockatrice/Cockatrice/issues av
  Voulez-vous changer l&apos;emplacement des données ?</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1909"/>
+        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="185"/>
         <source>File Error loading your card database.
 
 Would you like to change your database location setting?</source>
@@ -3240,7 +3701,7 @@ Would you like to change your database location setting?</source>
 Voulez-vous changer l&apos;emplacement de votre base de données ?</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1913"/>
+        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="189"/>
         <source>Your card database was loaded but contains no cards.
 
 Would you like to change your database location setting?</source>
@@ -3249,7 +3710,7 @@ Would you like to change your database location setting?</source>
 Voulez-vous changer l&apos;emplacement de votre base de données ?</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1917"/>
+        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="193"/>
         <source>Unknown card database load status
 
 Please file a ticket at https://github.com/Cockatrice/Cockatrice/issues
@@ -3262,59 +3723,64 @@ Veuillez ouvrir un ticket sur https://github.com/Cockatrice/Cockatrice/issues
 Voulez-vous changer l&apos;emplacement de votre base de données ?</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1925"/>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1935"/>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1945"/>
+        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="201"/>
+        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="211"/>
+        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="221"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1936"/>
+        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="212"/>
         <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>Le chemin d&apos;accès vers votre répertoire de decks est invalide. Voulez-vous redéfinir le chemin d&apos;accès ?</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1946"/>
+        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="222"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>Le chemin d&apos;accès vers votre répertoire d&apos;illustrations de cartes est invalide. Voulez-vous redéfinir le chemin d&apos;accès ?</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1958"/>
+        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="234"/>
         <source>Settings</source>
         <translation>Paramètres</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1960"/>
+        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="236"/>
         <source>General</source>
         <translation>Général</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1961"/>
+        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="237"/>
         <source>Appearance</source>
         <translation>Apparence</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1962"/>
+        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="238"/>
         <source>User Interface</source>
         <translation>Interface utilisateur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1963"/>
+        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="239"/>
+        <source>Storage</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="240"/>
         <source>Card Sources</source>
         <translation>Origine de carte</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1964"/>
+        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="241"/>
         <source>Chat</source>
         <translation>Chat</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1965"/>
+        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="242"/>
         <source>Sound</source>
         <translation>Son</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1966"/>
+        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="243"/>
         <source>Shortcuts</source>
         <translation>Raccourcis</translation>
     </message>
@@ -3408,9 +3874,9 @@ Vous pouvez toujours modifier ce comportement dans l&apos;onglet « Général »
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="63"/>
-        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="205"/>
-        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="212"/>
-        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="227"/>
+        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="206"/>
+        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="213"/>
+        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="245"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
@@ -3463,31 +3929,31 @@ Veuillez s&apos;il vous plaît visiter la page de téléchargement, pour mettre 
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="150"/>
-        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="161"/>
+        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="162"/>
         <source>Update Available</source>
         <translation>Mise à jour disponible</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="151"/>
-        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="162"/>
+        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="163"/>
         <source>A new version of Cockatrice is available!</source>
         <translation>Une nouvelle version de Cockatrice est disponible !</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="151"/>
-        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="162"/>
+        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="163"/>
         <source>New version</source>
         <translation>Nouvelle version</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="152"/>
-        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="163"/>
+        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="164"/>
         <source>Released</source>
         <translation>Sortie</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="153"/>
-        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="164"/>
+        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="165"/>
         <source>Changelog</source>
         <translation>Notes de version</translation>
     </message>
@@ -3497,51 +3963,51 @@ Veuillez s&apos;il vous plaît visiter la page de téléchargement, pour mettre 
         <translation>Voulez-vous mettre à jour maintenant ?</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="166"/>
+        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="167"/>
         <source>Unfortunately, the automatic updater failed to find a compatible download. 
 You may have to manually download the new version.</source>
         <translation>Malheureusement, la mise à jour automatique n&apos;a pas pu trouver un téléchargement compatible.
 Vous allez peut-être devoir télécharger manuellement la nouvelle version.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="169"/>
+        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="170"/>
         <source>Please check the &lt;a href=&quot;%1&quot;&gt;releases page&lt;/a&gt; on our Github and download the build for your system.</source>
         <translation>Veuillez vérifier la &lt;a href=&quot;%1&quot;&gt;page &quot;releases&quot;&lt;/a&gt; sur notre Github et télécharger le programme pour votre système.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="206"/>
-        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="214"/>
-        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="228"/>
+        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="207"/>
+        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="215"/>
+        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="246"/>
         <source>Update Error</source>
         <translation>Erreur de mise à jour</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="207"/>
+        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="208"/>
         <source>An error occurred while checking for updates:</source>
         <translation>Une erreur est survenur pendant la vérification des mises à jour :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="215"/>
+        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="216"/>
         <source>An error occurred while downloading an update:</source>
         <translation>Une erreur est survenue pendant le téléchargement de la mise à jour :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="220"/>
+        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="221"/>
         <source>Installing...</source>
         <translation>Installation...</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="229"/>
+        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="247"/>
         <source>Cockatrice is unable to open the installer.</source>
         <translation>Cockatrice n&apos;a pas pu ouvrir l&apos;installateur.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="230"/>
+        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="248"/>
         <source>Try to update manually by closing Cockatrice and running the installer.</source>
         <translation>Essayer de mettre à jour manuellement en fermant Cockatrice et en exécutant l&apos;installateur.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="231"/>
+        <location filename="src/interface/widgets/dialogs/dlg_update.cpp" line="249"/>
         <source>Download location</source>
         <translation>Répertoire de téléchargement</translation>
     </message>
@@ -3569,131 +4035,131 @@ Vous allez peut-être devoir télécharger manuellement la nouvelle version.</tr
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="54"/>
         <source>Draw Probability Settings</source>
-        <translation type="unfinished"/>
+        <translation>Options de probabilité de pioche</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="56"/>
         <source>Criteria:</source>
-        <translation type="unfinished"/>
+        <translation>Critère :</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="57"/>
         <source>Card Name</source>
-        <translation type="unfinished"/>
+        <translation>Nom de la carte</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="58"/>
         <source>Type</source>
-        <translation type="unfinished"/>
+        <translation>Type</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="59"/>
         <source>Subtype</source>
-        <translation type="unfinished"/>
+        <translation>Sous-type</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="60"/>
         <source>Mana Value</source>
-        <translation type="unfinished"/>
+        <translation>Valeur de Mana</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="62"/>
         <source>Exactness:</source>
-        <translation type="unfinished"/>
+        <translation>Exactitude :</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="63"/>
         <source>At least</source>
-        <translation type="unfinished"/>
+        <translation>Au moins</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="64"/>
         <source>Exactly</source>
-        <translation type="unfinished"/>
+        <translation>Exactement</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="66"/>
         <source>Quantity (N):</source>
-        <translation type="unfinished"/>
+        <translation>Quantité (N) :</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="67"/>
         <source>Cards drawn (M):</source>
-        <translation type="unfinished"/>
+        <translation>Cartes piochées (M) :</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="70"/>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="71"/>
         <source> cards</source>
-        <translation type="unfinished"/>
+        <translation>cartes</translation>
     </message>
 </context>
 <context>
     <name>DrawProbabilityWidget</name>
     <message>
-        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="100"/>
+        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="98"/>
         <source>Draw Probability</source>
-        <translation type="unfinished"/>
+        <translation>Probabilité de pioche</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="100"/>
+        <source>Probability of drawing</source>
+        <translation>Probabilité de piocher</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="102"/>
-        <source>Probability of drawing</source>
-        <translation type="unfinished"/>
+        <source>Card Name</source>
+        <translation>Nom de la carte</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="103"/>
+        <source>Type</source>
+        <translation>Type</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="104"/>
-        <source>Card Name</source>
-        <translation type="unfinished"/>
+        <source>Subtype</source>
+        <translation>Sous-type</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="105"/>
-        <source>Type</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="106"/>
-        <source>Subtype</source>
-        <translation type="unfinished"/>
+        <source>Mana Value</source>
+        <translation>Valeur de Mana</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="107"/>
-        <source>Mana Value</source>
-        <translation type="unfinished"/>
+        <source>At least</source>
+        <translation>Au moins</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="109"/>
-        <source>At least</source>
-        <translation type="unfinished"/>
+        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="108"/>
+        <source>Exactly</source>
+        <translation>Exactement</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="110"/>
-        <source>Exactly</source>
-        <translation type="unfinished"/>
+        <source>card(s) having drawn at least</source>
+        <translation>Carte(s) ayant au moins pioché</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="112"/>
-        <source>card(s) having drawn at least</source>
-        <translation type="unfinished"/>
+        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="111"/>
+        <source>cards</source>
+        <translation>cartes</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="113"/>
-        <source>cards</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="115"/>
         <source>Category</source>
-        <translation type="unfinished"/>
+        <translation>Catégorie</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="115"/>
+        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="113"/>
         <source>Qty</source>
-        <translation type="unfinished"/>
+        <translation>Qté</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="115"/>
+        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="113"/>
         <source>Odds (%)</source>
-        <translation type="unfinished"/>
+        <translation>Chances (%)</translation>
     </message>
 </context>
 <context>
@@ -3770,7 +4236,7 @@ Vous allez peut-être devoir télécharger manuellement la nouvelle version.</tr
     <message>
         <location filename="src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.cpp" line="40"/>
         <source>Game Changers</source>
-        <translation type="unfinished"/>
+        <translation>Cartes à impact</translation>
     </message>
 </context>
 <context>
@@ -3778,7 +4244,7 @@ Vous allez peut-être devoir télécharger manuellement la nouvelle version.</tr
     <message>
         <location filename="src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.cpp" line="40"/>
         <source>Budget</source>
-        <translation type="unfinished"/>
+        <translation>Budget</translation>
     </message>
 </context>
 <context>
@@ -3805,7 +4271,7 @@ Vous allez peut-être devoir télécharger manuellement la nouvelle version.</tr
 <context>
     <name>FilterBuilder</name>
     <message>
-        <location filename="src/filters/filter_builder.cpp" line="28"/>
+        <location filename="src/filters/filter_builder.cpp" line="30"/>
         <source>Type your filter here</source>
         <translation>Tapez votre filtre ici</translation>
     </message>
@@ -3836,22 +4302,22 @@ Vous allez peut-être devoir télécharger manuellement la nouvelle version.</tr
 <context>
     <name>GameEventHandler</name>
     <message>
-        <location filename="src/game/game_event_handler.cpp" line="412"/>
+        <location filename="src/game/game_event_handler.cpp" line="438"/>
         <source>kicked by game host or moderator</source>
         <translation>Éjecté par l&apos;hôte de la partie ou un modérateur</translation>
     </message>
     <message>
-        <location filename="src/game/game_event_handler.cpp" line="415"/>
+        <location filename="src/game/game_event_handler.cpp" line="441"/>
         <source>player left the game</source>
         <translation>joueur a quitté la partie</translation>
     </message>
     <message>
-        <location filename="src/game/game_event_handler.cpp" line="418"/>
+        <location filename="src/game/game_event_handler.cpp" line="444"/>
         <source>player disconnected from server</source>
         <translation>joueur déconnecté du serveur</translation>
     </message>
     <message>
-        <location filename="src/game/game_event_handler.cpp" line="422"/>
+        <location filename="src/game/game_event_handler.cpp" line="448"/>
         <source>reason unknown</source>
         <translation>raison inconnue</translation>
     </message>
@@ -3859,140 +4325,140 @@ Vous allez peut-être devoir télécharger manuellement la nouvelle version.</tr
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="236"/>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="239"/>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="242"/>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="245"/>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="248"/>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="251"/>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="254"/>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="257"/>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="366"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="238"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="241"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="244"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="247"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="250"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="253"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="256"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="259"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="368"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="236"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="238"/>
         <source>Please join the appropriate room first.</source>
         <translation>Veuillez d&apos;abord rejoindre le bon salon.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="239"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="241"/>
         <source>Wrong password.</source>
         <translation>Mot de passe incorrect.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="242"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="244"/>
         <source>Spectators are not allowed in this game.</source>
         <translation>Les spectateurs ne sont pas autorisés dans cette partie.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="245"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="247"/>
         <source>The game is already full.</source>
         <translation>Cette partie est déjà complète.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="248"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="250"/>
         <source>The game does not exist any more.</source>
         <translation>La partie n&apos;existe plus.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="251"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="253"/>
         <source>This game is only open to registered users.</source>
         <translation>Cette partie n&apos;est accessible qu&apos;aux joueurs enregistrés.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="254"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="256"/>
         <source>This game is only open to its creator&apos;s buddies.</source>
         <translation>Cette partie n&apos;est accessible qu&apos;aux amis de son créateur.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="257"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="259"/>
         <source>You are being ignored by the creator of this game.</source>
         <translation>Vous avez été ignoré par le créateur de la partie.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="298"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="300"/>
         <source>Join Game</source>
         <translation>Rejoindre la partie</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="301"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="303"/>
         <source>Spectate Game</source>
         <translation>Rejoindre la partie comme spectateur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="304"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="306"/>
         <source>Game Information</source>
         <translation>Informations sur la partie</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="317"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="319"/>
         <source>Join Game as Judge</source>
-        <translation type="unfinished"/>
+        <translation>Joindre la partie comme juge</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="322"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="324"/>
         <source>Spectate Game as Judge</source>
-        <translation type="unfinished"/>
+        <translation>Joindre la partie comme juge spectateur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="351"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="353"/>
         <source>Join game</source>
         <translation>Rejoindre partie</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="351"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="353"/>
         <source>Password:</source>
         <translation>Mot de passe :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="366"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="368"/>
         <source>Please join the respective room first.</source>
         <translation>Veuillez d&apos;abord rejoindre le bon salon.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="409"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="414"/>
         <source>&amp;Filter games</source>
         <translation>&amp;Filtrer les jeux</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="410"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="415"/>
         <source>C&amp;lear filter</source>
         <translation>Effacer les fi&amp;ltres</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="412"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="417"/>
         <source>C&amp;reate</source>
         <translation>C&amp;réer</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="413"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="419"/>
         <source>&amp;Join</source>
         <translation>Re&amp;joindre</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="414"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="420"/>
         <source>Join as judge</source>
-        <translation type="unfinished"/>
+        <translation>Joindre en tant que juge</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="415"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="421"/>
         <source>J&amp;oin as spectator</source>
         <translation>Rej&amp;oindre en tant que spectateur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="416"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="422"/>
         <source>Join as judge spectator</source>
-        <translation type="unfinished"/>
+        <translation>Joindre comme juge spectateur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="437"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="443"/>
         <source>Games shown: %1 / %2</source>
         <translation>Parties affichées : %1 / %2</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector.cpp" line="439"/>
+        <location filename="src/interface/widgets/server/game_selector.cpp" line="445"/>
         <source>Games</source>
         <translation>Parties</translation>
     </message>
@@ -4000,138 +4466,138 @@ Vous allez peut-être devoir télécharger manuellement la nouvelle version.</tr
 <context>
     <name>GameSelectorQuickFilterToolBar</name>
     <message>
-        <location filename="src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp" line="52"/>
+        <location filename="src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp" line="50"/>
         <source>All types</source>
-        <translation type="unfinished"/>
+        <translation>Tous les types</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp" line="104"/>
+        <location filename="src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp" line="142"/>
         <source>Filter by game name...</source>
-        <translation type="unfinished"/>
+        <translation>Filtrer par nom de partie...</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp" line="105"/>
+        <location filename="src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp" line="143"/>
         <source>Filter by game type/format</source>
-        <translation type="unfinished"/>
+        <translation>Filtrer par type/format de partie....</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp" line="106"/>
+        <location filename="src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp" line="144"/>
         <source>Hide games not created by buddies</source>
-        <translation type="unfinished"/>
+        <translation>Cacher les parties non-crées par vos amis</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp" line="107"/>
+        <location filename="src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp" line="145"/>
         <source>Hide full games</source>
-        <translation type="unfinished"/>
+        <translation>Cacher les parties pleines</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp" line="108"/>
+        <location filename="src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp" line="146"/>
         <source>Hide started games</source>
-        <translation type="unfinished"/>
+        <translation>Cacher les parties commencées</translation>
     </message>
 </context>
 <context>
     <name>GamesModel</name>
     <message>
-        <location filename="src/interface/widgets/server/games_model.cpp" line="38"/>
+        <location filename="src/interface/widgets/server/games_model.cpp" line="34"/>
         <source>&gt;1 day</source>
         <translation>&gt; 1 jour</translation>
     </message>
     <message numerus="yes">
-        <location filename="src/interface/widgets/server/games_model.cpp" line="47"/>
+        <location filename="src/interface/widgets/server/games_model.cpp" line="43"/>
         <source>%1%2 hr</source>
         <comment>short age in hours</comment>
         <translation><numerusform>%1%2 h</numerusform><numerusform>%1%2 h</numerusform><numerusform>%1%2 h</numerusform></translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/games_model.cpp" line="49"/>
+        <location filename="src/interface/widgets/server/games_model.cpp" line="45"/>
         <source>new</source>
         <translation>Nouveau</translation>
     </message>
     <message numerus="yes">
-        <location filename="src/interface/widgets/server/games_model.cpp" line="52"/>
+        <location filename="src/interface/widgets/server/games_model.cpp" line="48"/>
         <source>%1%2 min</source>
         <comment>short age in minutes</comment>
         <translation><numerusform>%1%2 min</numerusform><numerusform>%1%2 min</numerusform><numerusform>%1%2 min</numerusform></translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/games_model.cpp" line="148"/>
+        <location filename="src/interface/widgets/server/games_model.cpp" line="149"/>
         <source>password</source>
         <translation>mot de passe</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/games_model.cpp" line="150"/>
+        <location filename="src/interface/widgets/server/games_model.cpp" line="152"/>
         <source>buddies only</source>
         <translation>amis uniquement</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/games_model.cpp" line="152"/>
+        <location filename="src/interface/widgets/server/games_model.cpp" line="155"/>
         <source>reg. users only</source>
         <translation>joueurs enregistrés uniquement</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/games_model.cpp" line="154"/>
+        <location filename="src/interface/widgets/server/games_model.cpp" line="158"/>
         <source>open decklists</source>
         <translation>Ouvrir les listes de deck</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/games_model.cpp" line="186"/>
         <location filename="src/interface/widgets/server/games_model.cpp" line="191"/>
+        <location filename="src/interface/widgets/server/games_model.cpp" line="196"/>
         <source>can chat</source>
         <translation>peut discuter</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/games_model.cpp" line="188"/>
+        <location filename="src/interface/widgets/server/games_model.cpp" line="193"/>
         <source>see hands</source>
         <translation>voir les mains</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/games_model.cpp" line="193"/>
+        <location filename="src/interface/widgets/server/games_model.cpp" line="198"/>
         <source>can see hands</source>
         <translation>peut voir les mains</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/games_model.cpp" line="198"/>
+        <location filename="src/interface/widgets/server/games_model.cpp" line="203"/>
         <source>not allowed</source>
         <translation>non autorisé</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/games_model.cpp" line="216"/>
+        <location filename="src/interface/widgets/server/games_model.cpp" line="222"/>
         <source>Room</source>
         <translation>Salon</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/games_model.cpp" line="220"/>
+        <location filename="src/interface/widgets/server/games_model.cpp" line="226"/>
         <source>Age</source>
         <translation>Âge</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/games_model.cpp" line="228"/>
+        <location filename="src/interface/widgets/server/games_model.cpp" line="234"/>
         <source>Description</source>
         <translation>Description</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/games_model.cpp" line="230"/>
+        <location filename="src/interface/widgets/server/games_model.cpp" line="236"/>
         <source>Creator</source>
         <translation>Créateur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/games_model.cpp" line="232"/>
+        <location filename="src/interface/widgets/server/games_model.cpp" line="238"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/games_model.cpp" line="234"/>
+        <location filename="src/interface/widgets/server/games_model.cpp" line="240"/>
         <source>Restrictions</source>
         <translation>Restrictions</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/games_model.cpp" line="238"/>
+        <location filename="src/interface/widgets/server/games_model.cpp" line="244"/>
         <source>Players</source>
         <translation>Joueurs</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/games_model.cpp" line="246"/>
+        <location filename="src/interface/widgets/server/games_model.cpp" line="252"/>
         <source>Spectators</source>
         <translation>Spectateurs</translation>
     </message>
@@ -4139,143 +4605,158 @@ Vous allez peut-être devoir télécharger manuellement la nouvelle version.</tr
 <context>
     <name>GeneralSettingsPage</name>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="392"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="390"/>
         <source>Reset all paths</source>
         <translation>Réinitialiser tous les chemins</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="199"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="183"/>
         <source>All paths have been reset</source>
         <translation>Les chemins ont été réinitialisés</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="274"/>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="284"/>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="294"/>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="304"/>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="314"/>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="324"/>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="334"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="261"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="272"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="283"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="294"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="305"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="316"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="327"/>
         <source>Choose path</source>
         <translation>Choisir un chemin d&apos;accès</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="362"/>
-        <source>Personal settings</source>
-        <translation>Paramètres personnels</translation>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="356"/>
+        <source>Language settings</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="363"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="357"/>
         <source>Language:</source>
         <translation>Langue :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="366"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="359"/>
+        <source>Version settings</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="360"/>
+        <source>Card database</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="361"/>
+        <source>Startup settings</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="364"/>
         <source>Paths (editing disabled in portable mode)</source>
         <translation>Chemins (édition impossible en mode portable)</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="368"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="366"/>
         <source>Paths</source>
         <translation>Chemins d’accès</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="371"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="369"/>
         <source>How to help with translations</source>
         <translation>Comment aider avec les traductions</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="372"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="370"/>
         <source>Decks directory:</source>
         <translation>Répertoire des decks :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="373"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="371"/>
         <source>Filters directory:</source>
         <translation>Répertoire des filtres :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="374"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="372"/>
         <source>Replays directory:</source>
         <translation>Répertoire des replays :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="375"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="373"/>
         <source>Pictures directory:</source>
         <translation>Répertoire des images :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="376"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="374"/>
         <source>Card database:</source>
         <translation>Base de données des cartes :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="377"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="375"/>
         <source>Custom database directory:</source>
         <translation>Répertoire de la base de données personnalisé</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="378"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="376"/>
         <source>Token database:</source>
         <translation>Bases de données des jetons :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="379"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="377"/>
         <source>Update channel</source>
         <translation>Branche de la mise à jour :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="380"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="378"/>
         <source>Check for client updates on startup</source>
         <translation>Vérifier les mises à jour du client au démarrage</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="381"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="379"/>
         <source>Check for card database updates on startup</source>
         <translation>Vérifier les mises à jour de la base de données des cartes au démarrage...</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="382"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="380"/>
         <source>Don&apos;t check</source>
         <translation>Ne pas vérifier</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="384"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="382"/>
         <source>Prompt for update</source>
         <translation>Confirmer les mises à jour</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="386"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="384"/>
         <source>Always update in the background</source>
         <translation>Toujours mettre à jour en tâche de fond</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="387"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="385"/>
         <source>Check for card database updates every</source>
         <translation>Vérifier les mises à jour de la base de données des cartes tous les</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="388"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="386"/>
         <source> days</source>
         <translation>jour(s)</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="389"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="387"/>
         <source>Notify if a feature supported by the server is missing in my client</source>
         <translation>M&apos;avertir si une fonctionnalité supportée par le serveur est manquante sur mon client.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="390"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="388"/>
         <source>Automatically run Oracle when running a new version of Cockatrice</source>
         <translation>Lancer Oracle automatiquement quand Cockatrice a été mis à jour.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="391"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="389"/>
         <source>Show tips on startup</source>
         <translation>Afficher les astuces au démarrage.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="400"/>
+        <location filename="src/interface/widgets/settings_page/general_settings_page.cpp" line="398"/>
         <source>Last update check on %1 (%2 days ago)</source>
         <translation>Dernière vérification de mise à jour le %1 (il y a %2 jours)</translation>
     </message>
@@ -4283,47 +4764,47 @@ Vous allez peut-être devoir télécharger manuellement la nouvelle version.</tr
 <context>
     <name>GraveyardMenu</name>
     <message>
-        <location filename="src/game/player/menu/grave_menu.cpp" line="98"/>
+        <location filename="src/game_graphics/player/menu/grave_menu.cpp" line="100"/>
         <source>&amp;Graveyard</source>
         <translation>&amp;Cimetière</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/grave_menu.cpp" line="100"/>
+        <location filename="src/game_graphics/player/menu/grave_menu.cpp" line="102"/>
         <source>&amp;View graveyard</source>
         <translation>&amp;Voir le cimetière</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/grave_menu.cpp" line="103"/>
+        <location filename="src/game_graphics/player/menu/grave_menu.cpp" line="105"/>
         <source>&amp;Move graveyard to...</source>
         <translation>&amp;Déplacer le cimetière vers...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/grave_menu.cpp" line="104"/>
+        <location filename="src/game_graphics/player/menu/grave_menu.cpp" line="106"/>
         <source>&amp;Top of library</source>
         <translation>&amp;Dessus de la bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/grave_menu.cpp" line="105"/>
+        <location filename="src/game_graphics/player/menu/grave_menu.cpp" line="107"/>
         <source>&amp;Bottom of library</source>
         <translation>&amp;Dessous de la bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/grave_menu.cpp" line="73"/>
+        <location filename="src/game_graphics/player/menu/grave_menu.cpp" line="74"/>
         <source>&amp;All players</source>
         <translation>&amp;Tous les joueurs</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/grave_menu.cpp" line="106"/>
+        <location filename="src/game_graphics/player/menu/grave_menu.cpp" line="108"/>
         <source>&amp;Hand</source>
         <translation>&amp;Main</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/grave_menu.cpp" line="107"/>
+        <location filename="src/game_graphics/player/menu/grave_menu.cpp" line="109"/>
         <source>&amp;Exile</source>
         <translation>&amp;Exil</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/grave_menu.cpp" line="109"/>
+        <location filename="src/game_graphics/player/menu/grave_menu.cpp" line="111"/>
         <source>Reveal random card to...</source>
         <translation>Révéler une carte au hasard à...</translation>
     </message>
@@ -4331,88 +4812,88 @@ Vous allez peut-être devoir télécharger manuellement la nouvelle version.</tr
 <context>
     <name>HandMenu</name>
     <message>
-        <location filename="src/game/player/menu/hand_menu.cpp" line="108"/>
+        <location filename="src/game_graphics/player/menu/hand_menu.cpp" line="112"/>
         <source>&amp;Hand</source>
         <translation>&amp;Main</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/hand_menu.cpp" line="111"/>
+        <location filename="src/game_graphics/player/menu/hand_menu.cpp" line="115"/>
         <source>&amp;View hand</source>
         <translation>&amp;Voir la main</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/hand_menu.cpp" line="113"/>
+        <location filename="src/game_graphics/player/menu/hand_menu.cpp" line="117"/>
         <source>Sort hand by...</source>
-        <translation type="unfinished"/>
+        <translation>Trier la main par...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/hand_menu.cpp" line="114"/>
+        <location filename="src/game_graphics/player/menu/hand_menu.cpp" line="118"/>
         <source>Name</source>
-        <translation type="unfinished"/>
+        <translation>Nom</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/hand_menu.cpp" line="115"/>
+        <location filename="src/game_graphics/player/menu/hand_menu.cpp" line="119"/>
         <source>Type</source>
-        <translation type="unfinished"/>
+        <translation>Type</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/hand_menu.cpp" line="116"/>
+        <location filename="src/game_graphics/player/menu/hand_menu.cpp" line="120"/>
         <source>Mana Value</source>
-        <translation type="unfinished"/>
+        <translation>Valeur de Mana</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/hand_menu.cpp" line="118"/>
+        <location filename="src/game_graphics/player/menu/hand_menu.cpp" line="122"/>
         <source>Take &amp;mulligan (Choose hand size)</source>
-        <translation type="unfinished"/>
+        <translation>Mulligan (choix du nombre de cartes)</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/hand_menu.cpp" line="119"/>
+        <location filename="src/game_graphics/player/menu/hand_menu.cpp" line="123"/>
         <source>Take mulligan (Same hand size)</source>
-        <translation type="unfinished"/>
+        <translation>Mulligan (Même nombre de cartes)</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/hand_menu.cpp" line="120"/>
+        <location filename="src/game_graphics/player/menu/hand_menu.cpp" line="124"/>
         <source>Take mulligan (Hand size - 1)</source>
-        <translation type="unfinished"/>
+        <translation>Mulligan (-1 carte)</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/hand_menu.cpp" line="122"/>
+        <location filename="src/game_graphics/player/menu/hand_menu.cpp" line="126"/>
         <source>&amp;Move hand to...</source>
         <translation>&amp;Déplacer la main vers…</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/hand_menu.cpp" line="123"/>
+        <location filename="src/game_graphics/player/menu/hand_menu.cpp" line="127"/>
         <source>&amp;Top of library</source>
         <translation>&amp;Dessus de la bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/hand_menu.cpp" line="124"/>
+        <location filename="src/game_graphics/player/menu/hand_menu.cpp" line="128"/>
         <source>&amp;Bottom of library</source>
         <translation>&amp;Dessous de la bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/hand_menu.cpp" line="125"/>
+        <location filename="src/game_graphics/player/menu/hand_menu.cpp" line="129"/>
         <source>&amp;Graveyard</source>
         <translation>&amp;Cimetière</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/hand_menu.cpp" line="126"/>
+        <location filename="src/game_graphics/player/menu/hand_menu.cpp" line="130"/>
         <source>&amp;Exile</source>
         <translation>&amp;Exil</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/hand_menu.cpp" line="128"/>
+        <location filename="src/game_graphics/player/menu/hand_menu.cpp" line="132"/>
         <source>&amp;Reveal hand to...</source>
         <translation>&amp;Révéler la main à...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/hand_menu.cpp" line="129"/>
-        <location filename="src/game/player/menu/hand_menu.cpp" line="132"/>
+        <location filename="src/game_graphics/player/menu/hand_menu.cpp" line="133"/>
+        <location filename="src/game_graphics/player/menu/hand_menu.cpp" line="136"/>
         <source>All players</source>
-        <translation type="unfinished"/>
+        <translation>Tous les joueurs</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/hand_menu.cpp" line="131"/>
+        <location filename="src/game_graphics/player/menu/hand_menu.cpp" line="135"/>
         <source>Reveal r&amp;andom card to...</source>
         <translation>Révéler une c&amp;arte au hasard à...</translation>
     </message>
@@ -4420,52 +4901,52 @@ Vous allez peut-être devoir télécharger manuellement la nouvelle version.</tr
 <context>
     <name>HomeWidget</name>
     <message>
-        <location filename="src/interface/widgets/general/home_widget.cpp" line="200"/>
+        <location filename="src/interface/widgets/general/home_widget.cpp" line="204"/>
         <source>Create New Deck</source>
         <translation>Créer un Nouveau Deck</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/general/home_widget.cpp" line="204"/>
+        <location filename="src/interface/widgets/general/home_widget.cpp" line="208"/>
         <source>Browse Decks</source>
         <translation>Parcourir les Decks</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/general/home_widget.cpp" line="208"/>
+        <location filename="src/interface/widgets/general/home_widget.cpp" line="212"/>
         <source>Browse Card Database</source>
         <translation>Parcourir la Base de Carte</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/general/home_widget.cpp" line="212"/>
+        <location filename="src/interface/widgets/general/home_widget.cpp" line="216"/>
         <source>Browse EDHRec</source>
         <translation>Parcourir EDHRec</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/general/home_widget.cpp" line="215"/>
+        <location filename="src/interface/widgets/general/home_widget.cpp" line="219"/>
         <source>Browse Archidekt</source>
-        <translation type="unfinished"/>
+        <translation>Parcourir Archidekt</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/general/home_widget.cpp" line="218"/>
+        <location filename="src/interface/widgets/general/home_widget.cpp" line="222"/>
         <source>View Replays</source>
         <translation>Voir les replays</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/general/home_widget.cpp" line="222"/>
+        <location filename="src/interface/widgets/general/home_widget.cpp" line="226"/>
         <source>Quit</source>
         <translation>Quitter</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/general/home_widget.cpp" line="237"/>
+        <location filename="src/interface/widgets/general/home_widget.cpp" line="241"/>
         <source>Connecting...</source>
         <translation>Connection...</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/general/home_widget.cpp" line="241"/>
+        <location filename="src/interface/widgets/general/home_widget.cpp" line="245"/>
         <source>Connect</source>
         <translation>Se connecter</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/general/home_widget.cpp" line="247"/>
+        <location filename="src/interface/widgets/general/home_widget.cpp" line="251"/>
         <source>Play</source>
         <translation>Jouer</translation>
     </message>
@@ -4473,213 +4954,213 @@ Vous allez peut-être devoir télécharger manuellement la nouvelle version.</tr
 <context>
     <name>LibraryMenu</name>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="208"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="211"/>
         <source>&amp;Library</source>
         <translation>&amp;Bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="211"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="214"/>
         <source>&amp;View library</source>
         <translation>&amp;Voir la bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="212"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="215"/>
         <source>View &amp;top cards of library...</source>
         <translation>Voir les cartes du &amp;dessus de la bibliothèque...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="213"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="216"/>
         <source>View bottom cards of library...</source>
         <translation>Voir les cartes du dessous de la bibliothèque...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="214"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="217"/>
         <source>Reveal &amp;library to...</source>
         <translation>Révéler la &amp;bibliothèque à...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="215"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="218"/>
         <source>Lend library to...</source>
         <translation>Prêter la bibliothèque à...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="216"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="219"/>
         <source>Reveal &amp;top cards to...</source>
         <translation>Révéler les cartes du &amp;dessus à...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="217"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="220"/>
         <source>&amp;Top of library...</source>
         <translation>&amp;Dessus de la bibliothèque...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="218"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="221"/>
         <source>&amp;Bottom of library...</source>
         <translation>&amp;Dessous de la bibliothèque...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="219"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="222"/>
         <source>&amp;Always reveal top card</source>
         <translation>&amp;Toujours révéler la carte du dessus</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="220"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="223"/>
         <source>&amp;Always look at top card</source>
         <translation>&amp;Toujours voir la carte du dessus</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="221"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="224"/>
         <source>&amp;Open deck in deck editor</source>
         <translation>&amp;Ouvrir le deck dans l&apos;éditeur</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="223"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="226"/>
         <source>&amp;Draw card</source>
         <translation>&amp;Piocher une carte</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="224"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="227"/>
         <source>D&amp;raw cards...</source>
         <translation>P&amp;iocher plusieurs cartes...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="225"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="228"/>
         <source>&amp;Undo last draw</source>
         <translation>&amp;Annuler la dernière pioche</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="227"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="230"/>
         <source>Shuffle</source>
         <translation>Mélanger</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="229"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="232"/>
         <source>&amp;Play top card</source>
         <translation>&amp;Jouer la carte du dessus</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="230"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="233"/>
         <source>Play top card &amp;face down</source>
         <translation>Jouer la carte du dessus &amp;face cachée</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="231"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="234"/>
         <source>Put top card on &amp;bottom</source>
         <translation>Placer la carte du dessus au-&amp;dessous</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="232"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="235"/>
         <source>Move top card to grave&amp;yard</source>
         <translation>Mettre la carte du dessus dans le cime&amp;tière</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="233"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="236"/>
         <source>Move top card to e&amp;xile</source>
         <translation>E&amp;xiler la carte du dessus</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="234"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="237"/>
         <source>Move top cards to &amp;graveyard...</source>
         <translation>Mettre les cartes du dessus dans le &amp;cimetière...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="235"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="238"/>
         <source>Move top cards to graveyard face down...</source>
-        <translation type="unfinished"/>
+        <translation>Mettre les cartes du dessus dans le cimetière face cachées...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="236"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="239"/>
         <source>Move top cards to &amp;exile...</source>
         <translation>&amp;Exiler les cartes du dessus...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="237"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="240"/>
         <source>Move top cards to exile face down...</source>
-        <translation type="unfinished"/>
+        <translation>Exiler les cartes du dessus face cachées...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="238"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="241"/>
         <source>Put top cards on stack &amp;until...</source>
         <translation>Placer les cartes du dessus sur la pile &amp;jusqu&apos;à...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="239"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="242"/>
         <source>Shuffle top cards...</source>
         <translation>Mélanger les cartes du dessus...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="241"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="244"/>
         <source>&amp;Draw bottom card</source>
         <translation>&amp;Piocher la carte du dessous </translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="242"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="245"/>
         <source>D&amp;raw bottom cards...</source>
         <translation>P&amp;iocher les cartes du dessous...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="243"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="246"/>
         <source>&amp;Play bottom card</source>
         <translation>&amp;Jouer la carte du dessous</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="244"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="247"/>
         <source>Play bottom card &amp;face down</source>
         <translation>Jouer la carte du dessous &amp;face cachée</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="245"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="248"/>
         <source>Move bottom card to grave&amp;yard</source>
         <translation>Mettre la carte du dessous dans le cime&amp;tière</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="246"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="249"/>
         <source>Move bottom card to e&amp;xile</source>
         <translation>E&amp;xiler la carte du dessous</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="247"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="250"/>
         <source>Move bottom cards to &amp;graveyard...</source>
         <translation>Mettre les cartes du dessus dans le &amp;cimetière...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="248"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="251"/>
         <source>Move bottom cards to graveyard face down...</source>
-        <translation type="unfinished"/>
+        <translation>Mettre les cartes du dessous dans le cimetières face cachées...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="249"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="252"/>
         <source>Move bottom cards to &amp;exile...</source>
         <translation>&amp;Exiler les cartes du dessous...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="250"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="253"/>
         <source>Move bottom cards to exile face down...</source>
-        <translation type="unfinished"/>
+        <translation>Exiler les cartes du dessous face cachées...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="251"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="254"/>
         <source>Put bottom card on &amp;top</source>
         <translation>Placer la carte du dessous au-&amp;dessus</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="252"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="255"/>
         <source>Shuffle bottom cards...</source>
         <translation>Mélanger les cartes du dessous...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="260"/>
-        <location filename="src/game/player/menu/library_menu.cpp" line="294"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="263"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="299"/>
         <source>&amp;All players</source>
         <translation>&amp;Tous les joueurs</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="329"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="340"/>
         <source>Reveal top cards of library</source>
         <translation>Révéler les cartes du dessus de la bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/library_menu.cpp" line="330"/>
+        <location filename="src/game_graphics/player/menu/library_menu.cpp" line="341"/>
         <source>Number of cards: (max. %1)</source>
         <translation>Nombre de cartes : (max. %1)</translation>
     </message>
@@ -4687,641 +5168,273 @@ Vous allez peut-être devoir télécharger manuellement la nouvelle version.</tr
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="src/interface/window_main.cpp" line="108"/>
-        <location filename="src/interface/window_main.cpp" line="461"/>
-        <source>The server has reached its maximum user capacity, please check back later.</source>
-        <translation>Le serveur a atteint sa capacité maximale de joueurs simultanés, veuillez réessayer plus tard.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="111"/>
-        <source>There are too many concurrent connections from your address.</source>
-        <translation>Il y a trop de connexions simultanées depuis votre ordinateur.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="114"/>
-        <source>Banned by moderator</source>
-        <translation>Banni par un modérateur</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="117"/>
-        <source>Expected end time: %1</source>
-        <translation>Fin théorique : %1</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="119"/>
-        <source>This ban lasts indefinitely.</source>
-        <translation>Banni définitivement.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="125"/>
-        <source>Scheduled server shutdown.</source>
-        <translation>Fermeture prévue du serveur.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="128"/>
-        <location filename="src/interface/window_main.cpp" line="476"/>
-        <source>Invalid username.</source>
-        <translation>Nom d&apos;utilisateur non valide.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="131"/>
-        <source>You have been logged out due to logging in at another location.</source>
-        <translation>Vous avez avez été déconnecté pour avoir changé d&apos;endroit.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="136"/>
-        <source>Connection closed</source>
-        <translation>Connexion fermée</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="137"/>
-        <source>The server has terminated your connection.
-Reason: %1</source>
-        <translation>Le serveur a coupé votre connexion.
-Raison: %1</translation>
-    </message>
-    <message numerus="yes">
-        <location filename="src/interface/window_main.cpp" line="142"/>
-        <source>The server is going to be restarted in %n minute(s).
-All running games will be lost.
-Reason for shutdown: %1</source>
-        <translation><numerusform>Le serveur redémarrera dans %n minute.
-Aucune partie en cours ne sera sauvegardée.
-Raison de la fermeture : %1</numerusform><numerusform>Le serveur redémarrera dans %n minutes.
-Aucune partie en cours ne sera sauvegardée.
-Raison de la fermeture : %1</numerusform><numerusform>Le serveur redémarrera dans %n minutes.
-Aucune partie en cours ne sera sauvegardée.
-Raison de la fermeture : %1</numerusform></translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="147"/>
-        <source>Scheduled server shutdown</source>
-        <translation>Fermeture prévue du serveur</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="186"/>
-        <location filename="src/interface/window_main.cpp" line="196"/>
-        <source>Success</source>
-        <translation>Réussite</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="186"/>
-        <source>Registration accepted.
-Will now login.</source>
-        <translation>Enregistrement accepté.
-Connexion en cours.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="196"/>
-        <source>Account activation accepted.
-Will now login.</source>
-        <translation>Activation du compte acceptée.
-Connexion en cours.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="246"/>
-        <location filename="src/interface/window_main.cpp" line="253"/>
+        <location filename="src/interface/window_main.cpp" line="159"/>
+        <location filename="src/interface/window_main.cpp" line="166"/>
         <source>Player %1</source>
         <translation>Joueur %1</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="266"/>
+        <location filename="src/interface/window_main.cpp" line="179"/>
         <source>Load replay</source>
         <translation>Charger replay</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="318"/>
+        <location filename="src/interface/window_main.cpp" line="236"/>
         <source>About Cockatrice</source>
         <translation>À propos de Cockatrice</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="320"/>
+        <location filename="src/interface/window_main.cpp" line="238"/>
         <source>Version</source>
         <translation>Version</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="321"/>
+        <location filename="src/interface/window_main.cpp" line="239"/>
         <source>Cockatrice Webpage</source>
         <translation>Page web de Cockatrice</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="321"/>
+        <location filename="src/interface/window_main.cpp" line="239"/>
         <source>Project Manager:</source>
         <translation>Chef de projet:</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="322"/>
+        <location filename="src/interface/window_main.cpp" line="240"/>
         <source>Past Project Managers:</source>
         <translation>Anciens chefs de projet:</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="323"/>
+        <location filename="src/interface/window_main.cpp" line="241"/>
         <source>Developers:</source>
         <translation>Développeurs :</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="324"/>
+        <location filename="src/interface/window_main.cpp" line="242"/>
         <source>Our Developers</source>
         <translation>Nos développeurs</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="325"/>
+        <location filename="src/interface/window_main.cpp" line="243"/>
         <source>Help Develop!</source>
         <translation>Aidez à développer !</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="326"/>
+        <location filename="src/interface/window_main.cpp" line="244"/>
         <source>Translators:</source>
         <translation>Traducteurs :</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="327"/>
+        <location filename="src/interface/window_main.cpp" line="245"/>
         <source>Our Translators</source>
         <translation>Nos traducteurs</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="328"/>
+        <location filename="src/interface/window_main.cpp" line="246"/>
         <source>Help Translate!</source>
         <translation>Aidez à traduire !</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="328"/>
+        <location filename="src/interface/window_main.cpp" line="246"/>
         <source>Support:</source>
         <translation>Assistance :</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="329"/>
+        <location filename="src/interface/window_main.cpp" line="247"/>
         <source>Report an Issue</source>
         <translation>Signaler un problème</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="330"/>
+        <location filename="src/interface/window_main.cpp" line="248"/>
         <source>Troubleshooting</source>
         <translation>Dépannage</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="331"/>
+        <location filename="src/interface/window_main.cpp" line="249"/>
         <source>F.A.Q.</source>
         <translation>F.À.Q.</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="375"/>
-        <location filename="src/interface/window_main.cpp" line="403"/>
-        <location filename="src/interface/window_main.cpp" line="407"/>
-        <location filename="src/interface/window_main.cpp" line="420"/>
-        <location filename="src/interface/window_main.cpp" line="424"/>
-        <location filename="src/interface/window_main.cpp" line="428"/>
-        <location filename="src/interface/window_main.cpp" line="436"/>
-        <location filename="src/interface/window_main.cpp" line="441"/>
-        <location filename="src/interface/window_main.cpp" line="465"/>
-        <location filename="src/interface/window_main.cpp" line="566"/>
-        <location filename="src/interface/window_main.cpp" line="570"/>
-        <location filename="src/interface/window_main.cpp" line="574"/>
-        <location filename="src/interface/window_main.cpp" line="577"/>
-        <location filename="src/interface/window_main.cpp" line="580"/>
-        <location filename="src/interface/window_main.cpp" line="590"/>
-        <location filename="src/interface/window_main.cpp" line="597"/>
-        <location filename="src/interface/window_main.cpp" line="604"/>
-        <location filename="src/interface/window_main.cpp" line="610"/>
-        <location filename="src/interface/window_main.cpp" line="1278"/>
-        <location filename="src/interface/window_main.cpp" line="1330"/>
+        <location filename="src/interface/window_main.cpp" line="902"/>
+        <location filename="src/interface/window_main.cpp" line="954"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="375"/>
-        <source>Server timeout</source>
-        <translation>Délai de la demande dépassé</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="394"/>
-        <source>Failed Login</source>
-        <translation>Connexion échouée</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="395"/>
-        <source>Your client seems to be missing features this server requires for connection.</source>
-        <translation>Il semble que certaines fonctionnalités nécessaires à la connexion à ce serveur sont absentes de votre client.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="396"/>
-        <source>To update your client, go to &apos;Help -&gt; Check for Client Updates&apos;.</source>
-        <translation>Pour mettre à jour Cockatrice, allez dans « Aide -&gt; Vérifier les mises à jour&apos; ».</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="404"/>
-        <source>Incorrect username or password. Please check your authentication information and try again.</source>
-        <translation>Nom d&apos;utilisateur ou mot de passe incorrect. Veuillez vérifier vos identifiants et réessayer.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="408"/>
-        <source>There is already an active session using this user name.
-Please close that session first and re-login.</source>
-        <translation>Il y a déjà une session ouverte avec le même nom d&apos;utilisateur.
-Fermez cette session puis reconnectez vous.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="414"/>
-        <location filename="src/interface/window_main.cpp" line="560"/>
-        <source>You are banned until %1.</source>
-        <translation>Vous êtes banni jusqu&apos;au %1</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="416"/>
-        <location filename="src/interface/window_main.cpp" line="562"/>
-        <source>You are banned indefinitely.</source>
-        <translation>Vous êtes banni indéfiniment.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="429"/>
-        <source>This server requires user registration. Do you want to register now?</source>
-        <translation>Vous devez être enregistré pour accéder à ce serveur. Voulez-vous vous enregistrer ?</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="437"/>
-        <source>This server requires client IDs. Your client is either failing to generate an ID or you are running a modified client.
-Please close and reopen your client to try again.</source>
-        <translation>Ce serveur requiert un ID de client. Soit votre client a échoué lors de la génération d&apos;un ID, soit vous utilisez un client modifié.
-Veuillez fermer et rouvrir votre client pour réessayer.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="442"/>
-        <source>An internal error has occurred, please close and reopen Cockatrice before trying again.
-If the error persists, ensure you are running the latest version of the software and if needed contact the software developers.</source>
-        <translation>Une erreur interne est survenue. Veuillez fermer et rouvrir Cockatrice avant de réessayer.
-Si l&apos;erreur persiste, vérifiez que utilisez la dernière version du logiciel, ou contactez les développeurs si nécessaire.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="448"/>
-        <source>Account activation</source>
-        <translation>Activation du compte</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="449"/>
-        <source>Your account has not been activated yet.
-You need to provide the activation token received in the activation email.</source>
-        <translation>Votre compte n&apos;a pas encore été activé.
-Vous devez activer le jeton de l&apos;activation reçu dans le mail d&apos;activation.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="460"/>
-        <source>Server Full</source>
-        <translation>Serveur complet</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="466"/>
-        <source>Unknown login error: %1</source>
-        <translation>Erreur de connexion inconnue : %1</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="467"/>
-        <location filename="src/interface/window_main.cpp" line="582"/>
-        <source>
-This usually means that your client version is out of date, and the server sent a reply your client doesn&apos;t understand.</source>
-        <translation>
-Cela veut généralement dire que votre client n&apos;est plus à jour, et que le serveur a envoyé une réponse que votre client ne comprend pas.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="479"/>
-        <source>Your username must respect these rules:</source>
-        <translation>Votre nom d&apos;utilisateur doit respecter ces règles :</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="481"/>
-        <source>is %1 - %2 characters long</source>
-        <translation>est long de %1 - %2 caractères</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="482"/>
-        <source>can %1 contain lowercase characters</source>
-        <translation>peut %1 contenir des caractères minuscules</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="482"/>
-        <location filename="src/interface/window_main.cpp" line="484"/>
-        <location filename="src/interface/window_main.cpp" line="487"/>
-        <location filename="src/interface/window_main.cpp" line="493"/>
-        <source>NOT</source>
-        <translation>PAS</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="484"/>
-        <source>can %1 contain uppercase characters</source>
-        <translation>peut %1 contenir des caractères majuscules</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="487"/>
-        <source>can %1 contain numeric characters</source>
-        <translation>peut %1 contenir des caractères numériques</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="490"/>
-        <source>can contain the following punctuation: %1</source>
-        <translation>peut contenir la ponctuation suivante : %1</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="493"/>
-        <source>first character can %1 be a punctuation mark</source>
-        <translation>le premier caractère peut %1 être une marque de ponctuation</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="500"/>
-        <source>no unacceptable language as specified by these server rules:</source>
-        <comment>note that the following lines will not be translated</comment>
-        <translation>Pas de langage inacceptable comme spécifié par ces règles du serveur:</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="506"/>
-        <source>can not contain any of the following words: %1</source>
-        <translation>ne peut contenir les mots suivants : %1</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="512"/>
-        <source>can not match any of the following expressions: %1</source>
-        <translation>ne correspond à aucune des expressions suivantes : %1</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="518"/>
-        <source>You may only use A-Z, a-z, 0-9, _, ., and - in your username.</source>
-        <translation>Vous pouvez utiliser seulement A-Z, a-z, 0-9, _, ., et - dans votre nom d&apos;utilisateur</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="528"/>
-        <location filename="src/interface/window_main.cpp" line="532"/>
-        <location filename="src/interface/window_main.cpp" line="536"/>
-        <location filename="src/interface/window_main.cpp" line="544"/>
-        <location filename="src/interface/window_main.cpp" line="548"/>
-        <location filename="src/interface/window_main.cpp" line="555"/>
-        <source>Registration denied</source>
-        <translation>Enregistrement refusé</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="529"/>
-        <source>Registration is currently disabled on this server</source>
-        <translation>L&apos;enregistrement est désactivé sur ce serveur</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="533"/>
-        <source>There is already an existing account with the same user name.</source>
-        <translation>Il existe déjà un compte avec le même nom d&apos;utilisateur.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="537"/>
-        <source>It&apos;s mandatory to specify a valid email address when registering.</source>
-        <translation>Il est obligatoire de spécifier une adresse e-mail valide lors de l&apos;enregistrement.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="549"/>
-        <source>It appears you are attempting to register a new account on this server yet you already have an account registered with the email provided. This server restricts the number of accounts a user can register per address.  Please contact the server operator for further assistance or to obtain your credential information.</source>
-        <translation>Il semble que vous essayez d&apos;enregistrer un nouveau compte alors que vous en avez déjà un enregistré avec cet e-mail sur ce serveur. Ce serveur restreint le nombre de comptes par e-mail. Veuillez contacter l&apos;administrateur du serveur pour obtenir vos identifiants ou plus d&apos;informations.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="555"/>
-        <source>Password too short.</source>
-        <translation>Mot de passe trop court.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="574"/>
-        <source>Registration failed for a technical problem on the server.</source>
-        <translation>Enregistrement échoué lié à un problème technique du serveur.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="577"/>
-        <source>The connection to the server has been lost.</source>
-        <translation>La connexion au serveur a été perdue.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="581"/>
-        <source>Unknown registration error: %1</source>
-        <translation>Erreur d&apos;enregistrement inconnue : %1</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="590"/>
-        <source>Account activation failed</source>
-        <translation>Activation du compte échouée</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="597"/>
-        <source>Socket error: %1</source>
-        <translation>Erreur de socket : %1</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="605"/>
-        <source>You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server.
-Local version is %1, remote version is %2.</source>
-        <translation>Vous tentez de vous connecter à un serveur obsolète. Veuillez utiliser une ancienne version de Cockatrice, ou connectez-vous à un serveur approprié.
-La version locale est %1, la version distante est %2.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="611"/>
-        <source>Your Cockatrice client is obsolete. Please update your Cockatrice version.
-Local version is %1, remote version is %2.</source>
-        <translation>Votre client Cockatrice est obsolète. Veuillez mettre à jour votre version de Cockatrice.
-La version locale est %1, la nouvelle version est %2.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="621"/>
-        <source>Connecting to %1...</source>
-        <translation>Connexion à %1...</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="625"/>
-        <source>Registering to %1 as %2...</source>
-        <translation>Enregistrement de %1 en tant que %2...</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="628"/>
-        <source>Disconnected</source>
-        <translation>Déconnecté</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="631"/>
-        <source>Connected, logging in at %1</source>
-        <translation>Connecté, connexion à %1</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="639"/>
-        <location filename="src/interface/window_main.cpp" line="644"/>
-        <location filename="src/interface/window_main.cpp" line="649"/>
-        <source>Requesting forgotten password to %1 as %2...</source>
-        <translation>Envoi de la requête de mot de passe oublié à %1 en tant que %2...</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="660"/>
+        <location filename="src/interface/window_main.cpp" line="295"/>
         <source>&amp;Connect...</source>
         <translation>&amp;Connecter...</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="661"/>
+        <location filename="src/interface/window_main.cpp" line="296"/>
         <source>&amp;Disconnect</source>
         <translation>&amp;Déconnecter</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="662"/>
+        <location filename="src/interface/window_main.cpp" line="297"/>
         <source>Start &amp;local game...</source>
         <translation>Démarrer une partie &amp;locale...</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="663"/>
+        <location filename="src/interface/window_main.cpp" line="298"/>
         <source>&amp;Watch replay...</source>
         <translation>&amp;Regarder un replay...</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="664"/>
+        <location filename="src/interface/window_main.cpp" line="299"/>
         <source>&amp;Full screen</source>
         <translation>&amp;Plein écran</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="665"/>
+        <location filename="src/interface/window_main.cpp" line="300"/>
         <source>&amp;Register to server...</source>
         <translation>S&apos;enregistrer sur le serveur...</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="666"/>
+        <location filename="src/interface/window_main.cpp" line="301"/>
         <source>&amp;Restore password...</source>
         <translation>&amp;Restaurer le mot de passe...</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="667"/>
+        <location filename="src/interface/window_main.cpp" line="302"/>
         <source>&amp;Settings...</source>
         <translation>&amp;Paramètres...</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="669"/>
+        <location filename="src/interface/window_main.cpp" line="304"/>
         <source>&amp;Exit</source>
         <translation>&amp;Quitter</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="672"/>
+        <location filename="src/interface/window_main.cpp" line="307"/>
         <source>A&amp;ctions</source>
         <translation>Actions</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="674"/>
+        <location filename="src/interface/window_main.cpp" line="309"/>
         <source>&amp;Cockatrice</source>
         <translation>&amp;Cockatrice</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="677"/>
+        <location filename="src/interface/window_main.cpp" line="312"/>
         <source>C&amp;ard Database</source>
         <translation>B&amp;ase de données de cartes</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="678"/>
+        <location filename="src/interface/window_main.cpp" line="313"/>
         <source>&amp;Manage sets...</source>
         <translation>&amp;Gérer les éditions...</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="679"/>
+        <location filename="src/interface/window_main.cpp" line="314"/>
         <source>Edit custom &amp;tokens...</source>
         <translation>Éditer les &amp;jetons personnalisés…</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="680"/>
+        <location filename="src/interface/window_main.cpp" line="315"/>
         <source>Open custom image folder</source>
         <translation>Ouvrir le dossier d&apos;images personnalisées</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="681"/>
+        <location filename="src/interface/window_main.cpp" line="316"/>
         <source>Open custom sets folder</source>
         <translation>Ouvrir le dossier d&apos;éditions personnalisées</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="682"/>
+        <location filename="src/interface/window_main.cpp" line="317"/>
         <source>Add custom sets/cards</source>
         <translation>Ajouter des éditions / cartes personnalisées</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="683"/>
+        <location filename="src/interface/window_main.cpp" line="318"/>
         <source>Reload card database</source>
         <translation>Recharger la base de cartes</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="685"/>
+        <location filename="src/interface/window_main.cpp" line="320"/>
         <source>Tabs</source>
         <translation>Onglets</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="687"/>
+        <location filename="src/interface/window_main.cpp" line="322"/>
         <source>&amp;Help</source>
         <translation>A&amp;ide</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="688"/>
+        <location filename="src/interface/window_main.cpp" line="323"/>
         <source>&amp;About Cockatrice</source>
         <translation>À propos de Cock&amp;atrice</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="689"/>
+        <location filename="src/interface/window_main.cpp" line="324"/>
         <source>&amp;Tip of the Day</source>
         <translation>&amp;Conseil du jour</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="690"/>
+        <location filename="src/interface/window_main.cpp" line="325"/>
         <source>Check for Client Updates</source>
         <translation>Vérifier les mises à jour</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="691"/>
+        <location filename="src/interface/window_main.cpp" line="326"/>
         <source>Check for Card Updates...</source>
         <translation>Vérifier les mises à jour des cartes…</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="692"/>
+        <location filename="src/interface/window_main.cpp" line="327"/>
         <source>Check for Card Updates (Automatic)</source>
         <translation>Vérifier les mises à jour des cartes (automatiquement)</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="693"/>
+        <location filename="src/interface/window_main.cpp" line="328"/>
         <source>Show Status Bar</source>
         <translation>Montrer la barre de statut</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="694"/>
+        <location filename="src/interface/window_main.cpp" line="329"/>
         <source>View &amp;Debug Log</source>
         <translation>Voir journal de &amp;Debug</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="695"/>
+        <location filename="src/interface/window_main.cpp" line="330"/>
         <source>Open Settings Folder</source>
         <translation>Ouvrir le dossier des paramètres</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="697"/>
+        <location filename="src/interface/window_main.cpp" line="332"/>
         <source>Show/Hide</source>
         <translation>Montrer/Cacher</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1011"/>
+        <location filename="src/interface/window_main.cpp" line="630"/>
         <source>New Version</source>
         <translation>Nouvelle version</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1012"/>
+        <location filename="src/interface/window_main.cpp" line="631"/>
         <source>Congratulations on updating to Cockatrice %1!
 Oracle will now launch to update your card database.</source>
         <translation>Bravo pour avoir mis à jour Cockatrice %1 !
 Oracle va maintenant se lancer pour mettre à jour votre base de données de cartes.</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1016"/>
+        <location filename="src/interface/window_main.cpp" line="635"/>
         <source>Cockatrice installed</source>
         <translation>Installation de Cockatrice terminée</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1017"/>
+        <location filename="src/interface/window_main.cpp" line="636"/>
         <source>Congratulations on installing Cockatrice %1!
 Oracle will now launch to install the initial card database.</source>
         <translation>Félicitations ! Vous venez d&apos;installer Cockatrice %1 !
 Oracle va maintenant se lancer pour installer la base de données de cartes initiale.</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1151"/>
+        <location filename="src/interface/window_main.cpp" line="761"/>
         <source>Card database</source>
         <translation>Base de données de cartes</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1153"/>
+        <location filename="src/interface/window_main.cpp" line="763"/>
         <source>Cockatrice is unable to load the card database.
 Do you want to update your card database now?
 If unsure or first time user, choose &quot;Yes&quot;</source>
@@ -5330,29 +5443,29 @@ Voulez-vous la mettre à jour maintenant ?
 Si vous n’êtes pas sûr, ou si c&apos;est la première fois que vous jouez, choisissez « Oui ».</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1157"/>
-        <location filename="src/interface/window_main.cpp" line="1182"/>
+        <location filename="src/interface/window_main.cpp" line="767"/>
+        <location filename="src/interface/window_main.cpp" line="799"/>
         <source>Yes</source>
         <translation>Oui</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1158"/>
-        <location filename="src/interface/window_main.cpp" line="1183"/>
+        <location filename="src/interface/window_main.cpp" line="768"/>
+        <location filename="src/interface/window_main.cpp" line="801"/>
         <source>No</source>
         <translation>Non</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1159"/>
+        <location filename="src/interface/window_main.cpp" line="769"/>
         <source>Open settings</source>
         <translation>Ouvrir les paramètres</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1174"/>
+        <location filename="src/interface/window_main.cpp" line="791"/>
         <source>New sets found</source>
         <translation>Nouvelles éditions détectées</translation>
     </message>
     <message numerus="yes">
-        <location filename="src/interface/window_main.cpp" line="1176"/>
+        <location filename="src/interface/window_main.cpp" line="793"/>
         <source>%n new set(s) found in the card database
 Set code(s): %1
 Do you want to enable it/them?</source>
@@ -5365,17 +5478,22 @@ Code(s) d&apos;édition(s) : %1
 Voulez-vous l&apos;(les) activer ?</numerusform></translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1184"/>
+        <location filename="src/interface/window_main.cpp" line="800"/>
+        <source>Yes, always enable</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/window_main.cpp" line="802"/>
         <source>View sets</source>
         <translation>Voir les éditions</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1203"/>
+        <location filename="src/interface/window_main.cpp" line="827"/>
         <source>Welcome</source>
         <translation>Bienvenue</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1204"/>
+        <location filename="src/interface/window_main.cpp" line="828"/>
         <source>Hi! It seems like you're running this version of Cockatrice for the first time.
 All the sets in the card database have been enabled.
 Read more about changing the set order or disabling specific sets and consequent effects in the &quot;Manage Sets&quot; dialog.</source>
@@ -5384,169 +5502,135 @@ Toutes les éditions de la base de données de cartes ont été activées.
 Pour plus d&apos;informations sur la modification de l&apos;ordre des éditions, la désactivation d&apos;éditions spécifiques, et leurs effets, consultez le menu « Gérer les éditions… ».</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1224"/>
-        <location filename="src/interface/window_main.cpp" line="1384"/>
+        <location filename="src/interface/window_main.cpp" line="848"/>
         <source>Information</source>
         <translation>Informations</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1224"/>
+        <location filename="src/interface/window_main.cpp" line="848"/>
         <source>A card database update is already running.</source>
         <translation>Une mise à jour de la base de données de cartes est déjà en cours.</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1279"/>
+        <location filename="src/interface/window_main.cpp" line="903"/>
         <source>Unable to run the card database updater: </source>
         <translation>Impossible de lancer la mise à jour de la base de données de cartes :</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1288"/>
+        <location filename="src/interface/window_main.cpp" line="912"/>
         <source>Card database update running.</source>
         <translation>Une mise à jour de la base de données de cartes est en cours.</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1306"/>
+        <location filename="src/interface/window_main.cpp" line="930"/>
         <source>Failed to start. The file might be missing, or permissions might be incorrect.</source>
         <translation>Échec au démarrage. Le fichier peut être manquant, ou les permissions sont incorrectes.</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1309"/>
+        <location filename="src/interface/window_main.cpp" line="933"/>
         <source>The process crashed some time after starting successfully.</source>
         <translation>Le processus a échoué quelque temps après avoir démarré avec succès.</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1313"/>
+        <location filename="src/interface/window_main.cpp" line="937"/>
         <source>Timed out. The process took too long to respond. The last waitFor...() function timed out.</source>
         <translation>Temps limite dépassé. Le processus a pris trop longtemps pour répondre. La dernière fonction waitFor...() a terminé.</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1316"/>
+        <location filename="src/interface/window_main.cpp" line="940"/>
         <source>An error occurred when attempting to write to the process. For example, the process may not be running, or it may have closed its input channel.</source>
         <translation>Une erreur a eu lieu en essayant d&apos;écrire vers le processus. Par exemple, le processus pourrait ne pas tourner, ou il pourrait avoir son canal d&apos;entrée fermé.</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1320"/>
+        <location filename="src/interface/window_main.cpp" line="944"/>
         <source>An error occurred when attempting to read from the process. For example, the process may not be running.</source>
         <translation>Une erreur a eu lieu en essayant d&apos;écrire vers le processus. Par exemple, le processus pourrait ne pas tourner, ou il pourrait avoir son canal de sortie inactif.</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1325"/>
+        <location filename="src/interface/window_main.cpp" line="949"/>
         <source>Unknown error occurred.</source>
         <translation>Une erreur inconnue est arrivée.</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1330"/>
+        <location filename="src/interface/window_main.cpp" line="954"/>
         <source>The card database updater exited with an error:
 %1</source>
         <translation>L&apos;outil de mise à jour de la base de données de cartes s&apos;est arrêté avec l&apos;erreur :
 %1</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1385"/>
-        <source>This server supports additional features that your client doesn't have.
-This is most likely not a problem, but this message might mean there is a new version of Cockatrice available or this server is running a custom or pre-release version.
-
-To update your client, go to Help -&gt; Check for Updates.</source>
-        <translation>Le serveur supporte des fonctionnalités que votre client n&apos;a pas.
-Ce n&apos;est probablement pas un problème, mais ce message peut signifier qu&apos;il y a une nouvelle version de Cockatrice disponible, ou que ce serveur utilise une version pre-release ou personnalisée.
-
-Pour mettre à jour votre client, allez dans « Aide -&gt; Vérifier les mises à jour ».</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="1404"/>
-        <location filename="src/interface/window_main.cpp" line="1413"/>
-        <location filename="src/interface/window_main.cpp" line="1419"/>
-        <location filename="src/interface/window_main.cpp" line="1447"/>
-        <location filename="src/interface/window_main.cpp" line="1451"/>
+        <location filename="src/interface/window_main.cpp" line="1019"/>
+        <location filename="src/interface/window_main.cpp" line="1028"/>
+        <location filename="src/interface/window_main.cpp" line="1034"/>
+        <location filename="src/interface/window_main.cpp" line="1062"/>
+        <location filename="src/interface/window_main.cpp" line="1066"/>
         <source>Load sets/cards</source>
         <translation>Charger des éditions/cartes</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1413"/>
+        <location filename="src/interface/window_main.cpp" line="1028"/>
         <source>Selected file cannot be found.</source>
         <translation>Le fichier sélectionné n&apos;a pas pu être trouvé.</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1419"/>
+        <location filename="src/interface/window_main.cpp" line="1034"/>
         <source>You can only import XML databases at this time.</source>
         <translation>Il n&apos;est actuellement possible que d&apos;importer des bases de données XML.</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1448"/>
+        <location filename="src/interface/window_main.cpp" line="1063"/>
         <source>The new sets/cards have been added successfully.
 Cockatrice will now reload the card database.</source>
         <translation>Les nouvelles éditions/cartes ont été ajoutées avec succès.
 Cockactrice va maintenant recharger la base de données de cartes.</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="1451"/>
+        <location filename="src/interface/window_main.cpp" line="1066"/>
         <source>Sets/cards failed to import.</source>
         <translation>Échec de l&apos;importation des éditions/cartes.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="1502"/>
-        <location filename="src/interface/window_main.cpp" line="1512"/>
-        <location filename="src/interface/window_main.cpp" line="1521"/>
-        <source>Reset Password</source>
-        <translation>Réinitialiser le mot de passe</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="1503"/>
-        <source>Your password has been reset successfully, you can now log in using the new credentials.</source>
-        <translation>Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter en utilisant vos nouveaux identifiants.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="1513"/>
-        <source>Failed to reset user account password, please contact the server operator to reset your password.</source>
-        <translation>Échec de la réinitialisation du mot de passe du compte. Veuillez contacter l&apos;administrateur du serveur pour réinitialiser votre mot de passe.</translation>
-    </message>
-    <message>
-        <location filename="src/interface/window_main.cpp" line="1522"/>
-        <source>Activation request received, please check your email for an activation token.</source>
-        <translation>Demande d&apos;activation reçue, vérifiez votre courrier électronique pour un jeton d&apos;activation.</translation>
     </message>
 </context>
 <context>
     <name>ManaBaseConfigDialog</name>
     <message>
-        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp" line="46"/>
+        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp" line="47"/>
         <source>Mana Base Configuration</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp" line="48"/>
+        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp" line="49"/>
         <source>Display type:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp" line="51"/>
+        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp" line="52"/>
         <source>pie</source>
-        <translation type="unfinished"/>
+        <translation>camembert</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp" line="51"/>
+        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp" line="52"/>
         <source>bar</source>
-        <translation type="unfinished"/>
+        <translation>barre</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp" line="51"/>
+        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp" line="52"/>
         <source>combinedBar</source>
-        <translation type="unfinished"/>
+        <translation>barreCombinée</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp" line="53"/>
+        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp" line="54"/>
         <source>Filter Colors (optional):</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp" line="55"/>
-        <source>OK</source>
-        <translation type="unfinished"/>
+        <translation>Filtrer par couleurs (optionnel) :</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp" line="56"/>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp" line="57"/>
         <source>Cancel</source>
-        <translation type="unfinished"/>
+        <translation>Annuler</translation>
     </message>
 </context>
 <context>
@@ -5562,47 +5646,47 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config_dialog.cpp" line="55"/>
         <source>Group By:</source>
-        <translation type="unfinished"/>
+        <translation>Grouper par :</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config_dialog.cpp" line="56"/>
         <source>type</source>
-        <translation type="unfinished"/>
+        <translation>type</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config_dialog.cpp" line="57"/>
         <source>color</source>
-        <translation type="unfinished"/>
+        <translation>couleur</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config_dialog.cpp" line="58"/>
         <source>subtype</source>
-        <translation type="unfinished"/>
+        <translation>sous-type</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config_dialog.cpp" line="59"/>
         <source>power</source>
-        <translation type="unfinished"/>
+        <translation>force</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config_dialog.cpp" line="60"/>
         <source>toughness</source>
-        <translation type="unfinished"/>
+        <translation>endurance</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config_dialog.cpp" line="62"/>
         <source>Filters (optional):</source>
-        <translation type="unfinished"/>
+        <translation>Filtres (optionnel) :</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config_dialog.cpp" line="64"/>
         <source>Show main bar row</source>
-        <translation type="unfinished"/>
+        <translation>Montrer la ligne d&apos;aggrégat principale </translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config_dialog.cpp" line="65"/>
         <source>Show per-category rows</source>
-        <translation type="unfinished"/>
+        <translation>Monter les lignes de chaque catégorie</translation>
     </message>
 </context>
 <context>
@@ -5616,29 +5700,29 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
 <context>
     <name>ManaDevotionConfigDialog</name>
     <message>
-        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_devotion/mana_devotion_config_dialog.cpp" line="46"/>
-        <source>Display type:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_devotion/mana_devotion_config_dialog.cpp" line="47"/>
-        <source>pie</source>
-        <translation type="unfinished"/>
+        <source>Display type:</source>
+        <translation>Type de charte :</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_devotion/mana_devotion_config_dialog.cpp" line="48"/>
-        <source>bar</source>
-        <translation type="unfinished"/>
+        <source>pie</source>
+        <translation>camembert</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_devotion/mana_devotion_config_dialog.cpp" line="49"/>
-        <source>combinedBar</source>
-        <translation type="unfinished"/>
+        <source>bar</source>
+        <translation>barre</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_devotion/mana_devotion_config_dialog.cpp" line="51"/>
+        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_devotion/mana_devotion_config_dialog.cpp" line="50"/>
+        <source>combinedBar</source>
+        <translation>barre combinée</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_devotion/mana_devotion_config_dialog.cpp" line="52"/>
         <source>Filter Colors (optional):</source>
-        <translation type="unfinished"/>
+        <translation>Filtrer par couleurs (optionnel) :</translation>
     </message>
 </context>
 <context>
@@ -5659,22 +5743,22 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_config_dialog.cpp" line="49"/>
         <source>pie</source>
-        <translation type="unfinished"/>
+        <translation>camembert</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_config_dialog.cpp" line="50"/>
         <source>bar</source>
-        <translation type="unfinished"/>
+        <translation>barre</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_config_dialog.cpp" line="52"/>
         <source>Colors:</source>
-        <translation type="unfinished"/>
+        <translation>Couleurs :</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_config_dialog.cpp" line="54"/>
         <source>Show per-color rows</source>
-        <translation type="unfinished"/>
+        <translation>Montrer une ligne par couleur</translation>
     </message>
 </context>
 <context>
@@ -5687,7 +5771,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_single_display_widget.cpp" line="48"/>
         <source>%1 mana (%2 cards)</source>
-        <translation type="unfinished"/>
+        <translation>%1 mana (%2 cartes)</translation>
     </message>
 </context>
 <context>
@@ -5695,621 +5779,626 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_widget.cpp" line="14"/>
         <source>Mana Production + Devotion</source>
-        <translation type="unfinished"/>
+        <translation>Production de Mana + Dévotion</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_widget.cpp" line="120"/>
         <source>Mana Distribution Settings</source>
-        <translation type="unfinished"/>
+        <translation>Options pour Distribution de Mana</translation>
     </message>
 </context>
 <context>
     <name>MessageLogWidget</name>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="34"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="34"/>
         <source> from play</source>
         <translation>depuis le jeu</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="36"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="36"/>
         <source> from their graveyard</source>
         <translation> depuis son cimetière</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="38"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="38"/>
         <source> from exile</source>
         <translation> depuis l&apos;exil</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="40"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="40"/>
         <source> from their hand</source>
         <translation> depuis sa main</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="45"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="45"/>
         <source>the top card of %1&apos;s library</source>
         <translation>la carte du dessus de la bibliothèque de %1</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="47"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="47"/>
         <source>the top card of their library</source>
         <translation>le carte du dessus de sa bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="52"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="52"/>
         <source> from the top of %1&apos;s library</source>
         <translation>à partir du dessus de la bibliothèque de %1</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="54"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="54"/>
         <source> from the top of their library</source>
         <translation>du dessus de sa bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="60"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="60"/>
         <source>the bottom card of %1&apos;s library</source>
         <translation>la carte du dessous de la bibliothèque de %1</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="62"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="62"/>
         <source>the bottom card of their library</source>
         <translation>la carte du dessous de sa bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="67"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="67"/>
         <source> from the bottom of %1&apos;s library</source>
         <translation>à partir du dessous de la bibliothèque de %1</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="69"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="69"/>
         <source> from the bottom of their library</source>
         <translation>du dessous de sa bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="74"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="74"/>
         <source> from %1&apos;s library</source>
         <translation>de la bibliothèque de %1</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="76"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="76"/>
         <source> from their library</source>
         <translation>depuis sa bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="80"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="80"/>
         <source> from sideboard</source>
         <translation>depuis sa réserve</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="82"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="82"/>
         <source> from the stack</source>
         <translation>depuis la pile</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="84"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="84"/>
         <source> from custom zone &apos;%1&apos;</source>
         <translation> depuis la zone personnalisée &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="110"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="110"/>
         <source>%1 is now keeping the top card %2 revealed.</source>
         <translation>%1 garde maintenant la carte du dessus de sa bibliothèque %2 révélée.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="111"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="111"/>
         <source>%1 is not revealing the top card %2 any longer.</source>
         <translation>%1 ne révèle plus la carte du dessus de sa bibliothèque %2.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="118"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="118"/>
         <source>%1 can now look at top card %2 at any time.</source>
         <translation>%1 peut maintenant regarder la carte du dessus de sa bibliothèque %2 à n&apos;importe quel moment.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="119"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="119"/>
         <source>%1 no longer can look at top card %2 at any time.</source>
         <translation>%1 ne peut plus regarder la carte du dessus de sa bibliothèque %2 à n&apos;importe quel moment.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="126"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="129"/>
         <source>%1 attaches %2 to %3&apos;s %4.</source>
         <translation>%1 attache %2 à %4 de %3.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="137"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="140"/>
         <source>%1 has conceded the game.</source>
         <translation>%1 a concédé la partie.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="146"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="149"/>
         <source>%1 has unconceded the game.</source>
         <translation>%1 reste dans la partie.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="156"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="159"/>
         <source>%1 has restored connection to the game.</source>
         <translation>%1 est revenu dans la partie.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="160"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="163"/>
         <source>%1 has lost connection to the game.</source>
         <translation>%1 a perdu la connexion à la partie.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="176"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="179"/>
         <source>%1 points from their %2 to themselves.</source>
         <translation>%1 se cible avec son %2.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="179"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="182"/>
         <source>%1 points from their %2 to %3.</source>
         <translation>%1 cible %3 avec son %2.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="184"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="187"/>
         <source>%1 points from %2&apos;s %3 to themselves.</source>
         <translation>%1 se cible avec %3 de %2.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="189"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="192"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <translation>%1 cible %4 avec %3 de %2.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="197"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="200"/>
         <source>%1 points from their %2 to their %3.</source>
         <translation>%1 cible de son %3 vers son %2.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="201"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="204"/>
         <source>%1 points from their %2 to %3&apos;s %4.</source>
         <translation>%1 cible %3 de %4 avec %2.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="207"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="210"/>
         <source>%1 points from %2&apos;s %3 to their own %4.</source>
         <translation>%1 cible son %4 avec %3 de %2.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="213"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="216"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <translation>%1 cible %5 de %4 avec %3 de %2.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="227"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="230"/>
         <source>%1 creates a face down token.</source>
         <translation>%1 crée un jeton face-cachée.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="229"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="232"/>
         <source>%1 creates token: %2%3.</source>
         <translation>%1 crée un jeton %2%3.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="240"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="243"/>
         <source>%1 has loaded a deck (%2).</source>
         <translation>%1 a chargé un deck (%2).</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="242"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="245"/>
         <source>%1 has loaded a deck with %2 sideboard cards (%3).</source>
         <translation>%1 a chargé un deck avec %2 cartes en réserve (%3).</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="252"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="255"/>
         <source>%1 destroys %2.</source>
         <translation>%1 détruit %2.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="287"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="290"/>
         <source>a card</source>
         <translation>une carte</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="293"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="296"/>
         <source>%1 gives %2 control over %3.</source>
         <translation>%1 donne le contrôle de %2 à %3.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="305"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="308"/>
         <source>%1 puts %2 into play%3 face down.</source>
         <translation>%1 met %2 en jeu%3 face cachée.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="307"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="310"/>
         <source>%1 puts %2 into play%3.</source>
         <translation>%1 met %2 en jeu %3.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="311"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="314"/>
         <source>%1 puts %2%3 into their graveyard face down.</source>
-        <translation type="unfinished"/>
+        <translation>%1 met %2%3 dans leur cimetière face cachée.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="313"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="316"/>
         <source>%1 puts %2%3 into their graveyard.</source>
         <translation>%1 met %2%3 dans son cimetière.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="317"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="320"/>
         <source>%1 exiles %2%3 face down.</source>
-        <translation type="unfinished"/>
+        <translation>%1 exile %2%3 face cachée.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="319"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="322"/>
         <source>%1 exiles %2%3.</source>
         <translation>%1 exile %2%3.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="322"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="325"/>
         <source>%1 moves %2%3 to their hand.</source>
         <translation>%1 met %2%3 dans sa main.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="325"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="328"/>
         <source>%1 puts %2%3 into their library.</source>
         <translation>%1 met %2%3 dans sa bibliothèque.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="327"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="330"/>
         <source>%1 puts %2%3 onto the bottom of their library.</source>
         <translation>%1 met %2%3 au-dessous de sa bibliothèque.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="329"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="332"/>
         <source>%1 puts %2%3 on top of their library.</source>
         <translation>%1 met %2%3 au-dessus de sa bibliothèque.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="333"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="336"/>
         <source>%1 puts %2%3 into their library %4 cards from the top.</source>
         <translation>%1 met %2%3 dans sa bibliothèque %4 cartes depuis le dessus</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="336"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="339"/>
         <source>%1 moves %2%3 to sideboard.</source>
         <translation>%1 met %2%3 à sa réserve.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="340"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="343"/>
         <source>%1 plays %2%3 face down.</source>
-        <translation type="unfinished"/>
+        <translation>%1 joue %2%3 face cachée.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="342"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="345"/>
         <source>%1 plays %2%3.</source>
         <translation>%1 joue %2%3.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="347"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="350"/>
         <source>%1 moves %2%3 to custom zone &apos;%4&apos; face down.</source>
-        <translation type="unfinished"/>
+        <translation>%1 déplace %2%3 vers la zone personnalisée %4 face cachée.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="349"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="352"/>
         <source>%1 moves %2%3 to custom zone &apos;%4&apos;.</source>
         <translation>%1 déplace %2%3 vers la zone personnalisée &apos;%4&apos;.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="370"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="373"/>
         <source>%1 tries to draw from an empty library</source>
         <translation>%1 essaie de piocher dans une bibliothèque vide</translation>
     </message>
     <message numerus="yes">
-        <location filename="src/game/log/message_log_widget.cpp" line="372"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="375"/>
         <source>%1 draws %2 card(s).</source>
         <translation><numerusform>%1 pioche %2 carte.</numerusform><numerusform>%1 pioche %2 cartes.</numerusform><numerusform>%1 pioche %2 carte(s).</numerusform></translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="382"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="385"/>
         <source>%1 is looking at %2.</source>
         <translation>%1 regarde %2.</translation>
     </message>
     <message numerus="yes">
-        <location filename="src/game/log/message_log_widget.cpp" line="387"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="390"/>
         <source>%1 is looking at the %4 %3 card(s) %2.</source>
         <comment>top card for singular, top %3 cards for plural</comment>
         <translation><numerusform>%1 regarde la %4 %3 carte %2.</numerusform><numerusform>%1 regarde les %4 %3 cartes %2.</numerusform><numerusform>%1 regarde la / les %4 %3 carte(s) %2.</numerusform></translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="391"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="394"/>
         <source>bottom</source>
         <translation>dessous</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="391"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="394"/>
         <source>top</source>
         <translation>dessus</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="399"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="402"/>
         <source>%1 turns %2 face-down.</source>
         <translation>%1 retourne %2 face cachée.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="402"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="405"/>
         <source>%1 turns %2 face-up.</source>
         <translation>%1 retourne %2 face visible.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="408"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="411"/>
         <source>The game has been closed.</source>
         <translation>La partie a été fermée.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="413"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="416"/>
         <source>The game has started.</source>
         <translation>La partie commence.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="418"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="421"/>
         <source>You are flooding the game. Please wait a couple of seconds.</source>
         <translation>Vous floodez la partie. Veuillez patienter quelques secondes.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="424"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="427"/>
         <source>%1 has joined the game.</source>
         <translation>%1 a rejoint la partie.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="430"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="433"/>
         <source>%1 is now watching the game.</source>
         <translation>%1 est maintenant spectateur.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="435"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="438"/>
         <source>You have been kicked out of the game.</source>
         <translation>Vous avez été expulsé de la partie.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="441"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="444"/>
         <source>%1 has left the game (%2).</source>
         <translation>%1 a quitté la partie (%2).</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="449"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="452"/>
         <source>%1 is not watching the game any more (%2).</source>
         <translation>%1 n&apos;observe plus la partie (%2).</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="456"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="459"/>
         <source>%1 is not ready to start the game any more.</source>
         <translation>%1 n&apos;est plus prêt à démarrer la partie.</translation>
     </message>
     <message numerus="yes">
-        <location filename="src/game/log/message_log_widget.cpp" line="465"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="468"/>
         <source>%1 shuffles their deck and draws a new hand of %2 card(s).</source>
         <translation><numerusform>%1 mélange son deck et pioche une nouvelle main de %2 carte.</numerusform><numerusform>%1 mélange sa bibliothèque et pioche une nouvelle main de %2 cartes.</numerusform><numerusform>%1 mélange sa bibliothèque et pioche une nouvelle main de %2 carte(s).</numerusform></translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="470"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="473"/>
         <source>%1 shuffles their deck and draws a new hand.</source>
         <translation>%1 mélange sa bibliothèque et pioche une nouvelle main.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="476"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="479"/>
         <source>You are watching a replay of game #%1.</source>
         <translation>Vous regardez un replay de la partie n° %1.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="481"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="484"/>
         <source>%1 is ready to start the game.</source>
         <translation>%1 est prêt à démarrer la partie.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="507"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="510"/>
         <source>cards</source>
         <comment>an unknown amount of cards</comment>
         <translation>cartes</translation>
     </message>
     <message numerus="yes">
-        <location filename="src/game/log/message_log_widget.cpp" line="509"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="512"/>
         <source>%1 card(s)</source>
         <comment>a card for singular, %1 cards for plural</comment>
         <translation><numerusform>%1 carte</numerusform><numerusform>%1 cartes</numerusform><numerusform>%1 carte(s)</numerusform></translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="518"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="521"/>
         <source>%1 lends %2 to %3.</source>
         <translation>%1 prêtes %2 à %3.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="523"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="526"/>
         <source>%1 reveals %2 to %3.</source>
         <translation>%1 révèle %2 à %3.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="529"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="532"/>
         <source>%1 reveals %2.</source>
         <translation>%1 révèle %2.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="535"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="538"/>
         <source>%1 randomly reveals %2%3 to %4.</source>
         <translation>%1 révèle au hasard %2%3 à %4.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="541"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="544"/>
         <source>%1 randomly reveals %2%3.</source>
         <translation>%1 révèle au hasard %2%3.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="549"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="552"/>
         <source>%1 peeks at face down card #%2.</source>
         <translation>%1 regarde furtivement la carte face cachée n° %2.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="553"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="556"/>
         <source>%1 peeks at face down card #%2: %3.</source>
         <translation>%1 regarde furtivement la carte face cachée n° %2 : %3.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="559"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="562"/>
         <source>%1 reveals %2%3 to %4.</source>
         <translation>%1 révèle %2%3 à %4.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="566"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="569"/>
         <source>%1 reveals %2%3.</source>
         <translation>%1 révèle %2%3.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="573"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="576"/>
         <source>%1 reversed turn order, now it&apos;s %2.</source>
         <translation>%1 a inversé l&apos;ordre des tours, c&apos;est maintenant %2.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="575"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="578"/>
         <source>reversed</source>
         <translation>inversé</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="575"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="578"/>
         <source>normal</source>
         <translation>normal</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="583"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="586"/>
         <source>Heads</source>
         <translation>Face</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="583"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="586"/>
         <source>Tails</source>
         <translation>Pile</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="584"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="587"/>
         <source>%1 flipped a coin. It landed as %2.</source>
         <translation>%1 a lancé une pièce. Il a fait %2.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="588"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="591"/>
         <source>%1 rolls a %2 with a %3-sided die.</source>
         <translation>%1 a fait %2 avec un dé %3 faces.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="595"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="598"/>
         <source>%1 flips %2 coins. There are %3 heads and %4 tails.</source>
         <translation>%1 lances %2 pièces. Il y&apos;a %3 faces et %4 piles.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="605"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="608"/>
         <source>%1 rolls a %2-sided dice %3 times: %4.</source>
         <translation>%1 lances un dé à %2-faces %3 fois: %4.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="633"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="636"/>
         <source>%1&apos;s turn.</source>
         <translation>Tour de %1</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="639"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="642"/>
         <source>%1 sets annotation of %2 to %3.</source>
         <translation>%1 met l&apos;annotation %3 à %2.</translation>
     </message>
     <message numerus="yes">
-        <location filename="src/game/log/message_log_widget.cpp" line="650"/>
-        <source>%1 places %2 &quot;%3&quot; counter(s) on %4 (now %5).</source>
-        <translation><numerusform>%1 place %2 &quot;%3&quot; compteur sur %4 (désormais %5).</numerusform><numerusform>%1 place %2 &quot;%3&quot; compteurs sur %4 (désormais %5).</numerusform><numerusform>%1 place %2 &quot;%3&quot; compteur(s) sur %4 (désormais %5).</numerusform></translation>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="653"/>
+        <source>%1 places %2 %3%4 counter(s) on %5 (now %6).</source>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message numerus="yes">
-        <location filename="src/game/log/message_log_widget.cpp" line="652"/>
-        <source>%1 removes %2 &quot;%3&quot; counter(s) from %4 (now %5).</source>
-        <translation><numerusform>%1 retire %2 &quot;%3&quot; compteur sur %4 (désormais %5).</numerusform><numerusform>%1 retire %2 &quot;%3&quot; compteurs sur %4 (désormais %5).</numerusform><numerusform>%1 retire %2 &quot;%3&quot; compteur(s) sur %4 (désormais %5).</numerusform></translation>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="655"/>
+        <source>%1 removes %2 %3%4 counter(s) from %5 (now %6).</source>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="670"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="814"/>
+        <source>%1 failed to undo their last draw.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="675"/>
         <source>%1 sets counter %2 to %3 (%4%5).</source>
         <translation>%1 met les marqueurs %2 à %3 (%4%5).</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="682"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="687"/>
         <source>%1 sets %2 to not untap normally.</source>
         <translation>%2 de %1 ne se dégagera pas lors de l&apos;étape de dégagement.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="684"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="689"/>
         <source>%1 sets %2 to untap normally.</source>
         <translation>%2 de %1 se dégagera lors de l&apos;étape de dégagement.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="703"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="708"/>
         <source>%1 removes the PT of %2.</source>
         <translation>%1 retire la F/E de %2.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="708"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="713"/>
         <source>%1 changes the PT of %2 from nothing to %4.</source>
         <translation>%1 met la F/E de %2 à %4.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="711"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="716"/>
         <source>%1 changes the PT of %2 from %3 to %4.</source>
         <translation>%1 passe la F/E de %2 de %3 à %4.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="720"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="725"/>
         <source>%1 has locked their sideboard.</source>
         <translation>%1 a verrouillé sa réserve.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="723"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="728"/>
         <source>%1 has unlocked their sideboard.</source>
         <translation>%1 a déverrouillé sa réserve.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="741"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="746"/>
         <source>%1 taps their permanents.</source>
         <translation>%1 engage ses permanents.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="741"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="746"/>
         <source>%1 untaps their permanents.</source>
         <translation>%1 dégage ses permanents.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="744"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="749"/>
         <source>%1 taps %2.</source>
         <translation>%1 engage %2.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="744"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="749"/>
         <source>%1 untaps %2.</source>
         <translation>%1 dégage %2.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="760"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="765"/>
         <source>%1 shuffles %2.</source>
         <translation>%1 mélange %2.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="764"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="769"/>
         <source>%1 shuffles the bottom %3 cards of %2.</source>
         <translation>%1 mélange les %3 cartes du dessous de la bibliothèque de %2.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="769"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="774"/>
         <source>%1 shuffles the top %3 cards of %2.</source>
         <translation>%1 mélange les %3 cartes du dessus de la bibliothèque de %2.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="774"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="779"/>
         <source>%1 shuffles cards %3 - %4 of %2.</source>
         <translation>%1 mélange les cartes %3 - %4 de %2.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="789"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="794"/>
         <source>%1 unattaches %2.</source>
         <translation>%1 détache %2.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="797"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="802"/>
         <source>%1 undoes their last draw.</source>
         <translation>%1 annule sa dernière pioche.</translation>
     </message>
     <message>
-        <location filename="src/game/log/message_log_widget.cpp" line="800"/>
+        <location filename="src/game_graphics/log/message_log_widget.cpp" line="805"/>
         <source>%1 undoes their last draw (%2).</source>
         <translation>%1 annule sa dernière pioche (%2).</translation>
     </message>
@@ -6317,110 +6406,115 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
 <context>
     <name>MessagesSettingsPage</name>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1556"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="255"/>
         <source>Word1 Word2 Word3</source>
         <translation>Mot1 Mot2 Mot3</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1557"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="256"/>
         <source>Add New Message</source>
         <translation>Ajouter un message</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1558"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="257"/>
         <source>Edit Message</source>
         <translation>Éditer le message</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1559"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="258"/>
         <source>Remove Message</source>
         <translation>Supprimer le message</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1508"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="206"/>
         <source>Add message</source>
         <translation>Ajouter message</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1508"/>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1521"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="206"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="219"/>
         <source>Message:</source>
         <translation>Message :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1521"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="219"/>
         <source>Edit message</source>
         <translation>Éditer le message</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1539"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="237"/>
         <source>Chat settings</source>
         <translation>Paramètres du chat</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1540"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="238"/>
         <source>Custom alert words</source>
         <translation>Mots d&apos;alertes personnalisées</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1541"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="239"/>
         <source>Enable chat mentions</source>
         <translation>Activer les mentions dans le chat</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1542"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="240"/>
         <source>Enable mention completer</source>
         <translation>Activer les mentions dans le chat</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1543"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="241"/>
         <source>In-game message macros</source>
         <translation>Macros de message en jeu</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1545"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="243"/>
         <source>How to use in-game message macros</source>
         <translation>Comment utiliser les macro pour les messages en jeu</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1546"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="244"/>
         <source>Ignore chat room messages sent by unregistered users</source>
         <translation>Ignorer les messages dans le chat principal envoyés par des joueurs non enregistrés.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1547"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="245"/>
         <source>Ignore private messages sent by unregistered users</source>
         <translation>Ignorer les messages privés envoyés par des joueurs non enregistrés.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1548"/>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1549"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="246"/>
+        <source>Ignore private messages sent by non-buddy users</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="247"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="248"/>
         <source>Invert text color</source>
         <translation>Inverser la couleur du texte</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1550"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="249"/>
         <source>Enable desktop notifications for private messages</source>
         <translation>Activer les notifications de bureau pour les messages privés.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1551"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="250"/>
         <source>Enable desktop notification for mentions</source>
         <translation>Activer les notifications de bureau pour les mentions.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1552"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="251"/>
         <source>Enable room message history on join</source>
         <translation>Activer l&apos;historique des messages du chat principal dès la connexion</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1553"/>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1554"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="252"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="253"/>
         <source>(Color is hexadecimal)</source>
         <translation>(La couleur est hexadécimale)</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1555"/>
+        <location filename="src/interface/widgets/settings_page/messages_settings_page.cpp" line="254"/>
         <source>Separate words with a space, alphanumeric characters only</source>
         <translation>Séparer les mots avec un espace, seulement les caractères alphanumériques</translation>
     </message>
@@ -6428,42 +6522,42 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
 <context>
     <name>MoveMenu</name>
     <message>
-        <location filename="src/game/player/menu/move_menu.cpp" line="7"/>
+        <location filename="src/game_graphics/player/menu/move_menu.cpp" line="8"/>
         <source>Move to</source>
         <translation>Déplacer vers</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/move_menu.cpp" line="63"/>
+        <location filename="src/game_graphics/player/menu/move_menu.cpp" line="72"/>
         <source>&amp;Top of library in random order</source>
         <translation>&amp;Dessus de la bibliothèque dans un ordre aléatoire</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/move_menu.cpp" line="64"/>
+        <location filename="src/game_graphics/player/menu/move_menu.cpp" line="73"/>
         <source>X cards from the top of library...</source>
         <translation>X cartes du dessus de la bibliothèque...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/move_menu.cpp" line="65"/>
+        <location filename="src/game_graphics/player/menu/move_menu.cpp" line="74"/>
         <source>&amp;Bottom of library in random order</source>
         <translation>&amp;Dessous de la bibliothèque dans un ordre aléatoire</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/move_menu.cpp" line="66"/>
+        <location filename="src/game_graphics/player/menu/move_menu.cpp" line="75"/>
         <source>T&amp;able</source>
-        <translation type="unfinished"/>
+        <translation>Tableau</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/move_menu.cpp" line="67"/>
+        <location filename="src/game_graphics/player/menu/move_menu.cpp" line="76"/>
         <source>&amp;Hand</source>
         <translation>&amp;Main</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/move_menu.cpp" line="68"/>
+        <location filename="src/game_graphics/player/menu/move_menu.cpp" line="77"/>
         <source>&amp;Graveyard</source>
         <translation>&amp;Cimetière</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/move_menu.cpp" line="69"/>
+        <location filename="src/game_graphics/player/menu/move_menu.cpp" line="78"/>
         <source>&amp;Exile</source>
         <translation>&amp;Exil</translation>
     </message>
@@ -6476,47 +6570,47 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
         <translation>Type de carte</translation>
     </message>
     <message>
-        <location filename="../libcockatrice_card/libcockatrice/card/game_specific_terms.h" line="37"/>
+        <location filename="../libcockatrice_card/libcockatrice/card/game_specific_terms.h" line="38"/>
         <source>Mana Value</source>
         <translation>Valeur de Mana</translation>
     </message>
     <message>
-        <location filename="../libcockatrice_card/libcockatrice/card/game_specific_terms.h" line="39"/>
+        <location filename="../libcockatrice_card/libcockatrice/card/game_specific_terms.h" line="41"/>
         <source>Color(s)</source>
         <translation>Couleur(s)</translation>
     </message>
     <message>
-        <location filename="../libcockatrice_card/libcockatrice/card/game_specific_terms.h" line="41"/>
+        <location filename="../libcockatrice_card/libcockatrice/card/game_specific_terms.h" line="44"/>
         <source>Loyalty</source>
         <translation>Loyauté</translation>
     </message>
     <message>
-        <location filename="../libcockatrice_card/libcockatrice/card/game_specific_terms.h" line="43"/>
+        <location filename="../libcockatrice_card/libcockatrice/card/game_specific_terms.h" line="47"/>
         <source>Main Card Type</source>
         <translation>Type de carte principal</translation>
     </message>
     <message>
-        <location filename="../libcockatrice_card/libcockatrice/card/game_specific_terms.h" line="45"/>
+        <location filename="../libcockatrice_card/libcockatrice/card/game_specific_terms.h" line="50"/>
         <source>Mana Cost</source>
         <translation>Coût de mana</translation>
     </message>
     <message>
-        <location filename="../libcockatrice_card/libcockatrice/card/game_specific_terms.h" line="47"/>
+        <location filename="../libcockatrice_card/libcockatrice/card/game_specific_terms.h" line="53"/>
         <source>P/T</source>
         <translation>F/E</translation>
     </message>
     <message>
-        <location filename="../libcockatrice_card/libcockatrice/card/game_specific_terms.h" line="49"/>
+        <location filename="../libcockatrice_card/libcockatrice/card/game_specific_terms.h" line="56"/>
         <source>Side</source>
         <translation>Côté</translation>
     </message>
     <message>
-        <location filename="../libcockatrice_card/libcockatrice/card/game_specific_terms.h" line="51"/>
+        <location filename="../libcockatrice_card/libcockatrice/card/game_specific_terms.h" line="59"/>
         <source>Layout</source>
         <translation>Design</translation>
     </message>
     <message>
-        <location filename="../libcockatrice_card/libcockatrice/card/game_specific_terms.h" line="53"/>
+        <location filename="../libcockatrice_card/libcockatrice/card/game_specific_terms.h" line="62"/>
         <source>Color Identity</source>
         <translation>Identité couleur</translation>
     </message>
@@ -6537,6 +6631,152 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
         <location filename="src/interface/widgets/general/layout_containers/overlap_control_widget.cpp" line="28"/>
         <source>Overlap direction:</source>
         <translation>Direction de superposition :</translation>
+    </message>
+</context>
+<context>
+    <name>PaletteEditorDialog</name>
+    <message>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="126"/>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="181"/>
+        <source>Reset</source>
+        <translation>Réinitialiser</translation>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="127"/>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="182"/>
+        <source>Apply</source>
+        <translation>Appliquer</translation>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="128"/>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="183"/>
+        <source>Save &amp;&amp; Apply</source>
+        <translation>Sauvegarder &amp;&amp; Appliquer</translation>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="146"/>
+        <source>▼  Edit Palette</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="146"/>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="177"/>
+        <source>▶  Edit Palette</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="162"/>
+        <source>Palette Editor — %1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="163"/>
+        <source>&lt;b&gt;Palette Editor&lt;/b&gt; &amp;nbsp;·&amp;nbsp; %1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="170"/>
+        <source>This theme ships no default palette files</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="172"/>
+        <source>Replace current colours with the theme author&apos;s defaults</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="175"/>
+        <source>Switch between the light and dark palette files</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="176"/>
+        <source>Editing:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="178"/>
+        <source>Show or hide the per-role colour grid for manual tweaks</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="179"/>
+        <source>↺  Revert to theme default</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="184"/>
+        <source>Discard unsaved edits and restore the last saved palette</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="185"/>
+        <source>Preview this palette without saving to disk</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="186"/>
+        <source>Write palette-%1.toml and reload the theme</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="190"/>
+        <source>Cannot save: this theme has no directory on disk</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="262"/>
+        <source>Save failed</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="263"/>
+        <source>Could not write %1 to:
+%2</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="287"/>
+        <source>No default found</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_editor_dialog.cpp" line="288"/>
+        <source>No default palette file found for the &quot;%1&quot; scheme.</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>PaletteGridWidget</name>
+    <message>
+        <location filename="src/interface/palette_editor/palette_grid_widget.cpp" line="77"/>
+        <source>Active</source>
+        <translation>Actif</translation>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_grid_widget.cpp" line="77"/>
+        <source>Disabled</source>
+        <translation>Désactivé</translation>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_grid_widget.cpp" line="77"/>
+        <source>Inactive</source>
+        <translation>Inactif</translation>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_grid_widget.cpp" line="79"/>
+        <source>Normal interactive state</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_grid_widget.cpp" line="80"/>
+        <source>Widget is disabled / not interactive</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/palette_grid_widget.cpp" line="81"/>
+        <source>Window is in background / unfocused</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -6605,57 +6845,57 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
 <context>
     <name>PhasesToolbar</name>
     <message>
-        <location filename="src/game/phases_toolbar.cpp" line="155"/>
+        <location filename="src/game_graphics/phases_toolbar.cpp" line="161"/>
         <source>Untap step</source>
         <translation>Étape de dégagement</translation>
     </message>
     <message>
-        <location filename="src/game/phases_toolbar.cpp" line="157"/>
+        <location filename="src/game_graphics/phases_toolbar.cpp" line="163"/>
         <source>Upkeep step</source>
         <translation>Étape d&apos;entretien</translation>
     </message>
     <message>
-        <location filename="src/game/phases_toolbar.cpp" line="159"/>
+        <location filename="src/game_graphics/phases_toolbar.cpp" line="165"/>
         <source>Draw step</source>
         <translation>Étape de pioche</translation>
     </message>
     <message>
-        <location filename="src/game/phases_toolbar.cpp" line="161"/>
+        <location filename="src/game_graphics/phases_toolbar.cpp" line="167"/>
         <source>First main phase</source>
         <translation>Première phase principale</translation>
     </message>
     <message>
-        <location filename="src/game/phases_toolbar.cpp" line="163"/>
+        <location filename="src/game_graphics/phases_toolbar.cpp" line="169"/>
         <source>Beginning of combat step</source>
         <translation>Étape de début de combat</translation>
     </message>
     <message>
-        <location filename="src/game/phases_toolbar.cpp" line="165"/>
+        <location filename="src/game_graphics/phases_toolbar.cpp" line="171"/>
         <source>Declare attackers step</source>
         <translation>Étape de déclaration des attaquants</translation>
     </message>
     <message>
-        <location filename="src/game/phases_toolbar.cpp" line="167"/>
+        <location filename="src/game_graphics/phases_toolbar.cpp" line="173"/>
         <source>Declare blockers step</source>
         <translation>Étape de déclaration des bloqueurs</translation>
     </message>
     <message>
-        <location filename="src/game/phases_toolbar.cpp" line="169"/>
+        <location filename="src/game_graphics/phases_toolbar.cpp" line="175"/>
         <source>Combat damage step</source>
         <translation>Étape d&apos;assignation des blessures de combat</translation>
     </message>
     <message>
-        <location filename="src/game/phases_toolbar.cpp" line="171"/>
+        <location filename="src/game_graphics/phases_toolbar.cpp" line="177"/>
         <source>End of combat step</source>
         <translation>Étape de fin de combat</translation>
     </message>
     <message>
-        <location filename="src/game/phases_toolbar.cpp" line="173"/>
+        <location filename="src/game_graphics/phases_toolbar.cpp" line="179"/>
         <source>Second main phase</source>
         <translation>Seconde phase principale</translation>
     </message>
     <message>
-        <location filename="src/game/phases_toolbar.cpp" line="175"/>
+        <location filename="src/game_graphics/phases_toolbar.cpp" line="181"/>
         <source>End of turn step</source>
         <translation>Phase de fin de tour</translation>
     </message>
@@ -6663,7 +6903,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
 <context>
     <name>PictureLoader</name>
     <message>
-        <location filename="src/interface/card_picture_loader/card_picture_to_load.cpp" line="254"/>
+        <location filename="src/interface/card_picture_loader/card_picture_to_load.cpp" line="255"/>
         <source>en</source>
         <comment>code for scryfall's language property, not available for all languages</comment>
         <translation>fr</translation>
@@ -6672,151 +6912,142 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
 <context>
     <name>PlayerActions</name>
     <message>
-        <location filename="src/game/player/player_actions.cpp" line="175"/>
-        <source>View top cards of library</source>
-        <translation>Voir les cartes du dessus de la bibliothèque</translation>
-    </message>
-    <message>
-        <location filename="src/game/player/player_actions.cpp" line="176"/>
-        <location filename="src/game/player/player_actions.cpp" line="189"/>
-        <location filename="src/game/player/player_actions.cpp" line="249"/>
-        <location filename="src/game/player/player_actions.cpp" line="278"/>
-        <location filename="src/game/player/player_actions.cpp" line="313"/>
-        <location filename="src/game/player/player_actions.cpp" line="358"/>
-        <location filename="src/game/player/player_actions.cpp" line="450"/>
-        <location filename="src/game/player/player_actions.cpp" line="645"/>
-        <location filename="src/game/player/player_actions.cpp" line="768"/>
-        <source>Number of cards: (max. %1)</source>
-        <translation>Nombre de cartes : (max. %1)</translation>
-    </message>
-    <message>
-        <location filename="src/game/player/player_actions.cpp" line="188"/>
-        <source>View bottom cards of library</source>
-        <translation>Voir les cartes du dessous de la bibliothèque</translation>
-    </message>
-    <message>
-        <location filename="src/game/player/player_actions.cpp" line="248"/>
-        <source>Shuffle top cards of library</source>
-        <translation>Mélanger les cartes du dessus de la bibliothèque</translation>
-    </message>
-    <message>
-        <location filename="src/game/player/player_actions.cpp" line="277"/>
-        <source>Shuffle bottom cards of library</source>
-        <translation>Mélanger les cartes du dessous de la bibliothèque</translation>
-    </message>
-    <message>
-        <location filename="src/game/player/player_actions.cpp" line="312"/>
-        <source>Draw hand</source>
-        <translation>Piocher une main</translation>
-    </message>
-    <message>
-        <location filename="src/game/player/player_actions.cpp" line="314"/>
-        <source>0 and lower are in comparison to current hand size</source>
-        <translation>0 et moins sont en comparaison avec la taille actuelle de la main</translation>
-    </message>
-    <message>
-        <location filename="src/game/player/player_actions.cpp" line="357"/>
-        <source>Draw cards</source>
-        <translation>Piocher des cartes</translation>
-    </message>
-    <message>
-        <location filename="src/game/player/player_actions.cpp" line="423"/>
-        <location filename="src/game/player/player_actions.cpp" line="428"/>
-        <location filename="src/game/player/player_actions.cpp" line="618"/>
-        <location filename="src/game/player/player_actions.cpp" line="623"/>
+        <location filename="src/game/player/player_actions.cpp" line="426"/>
+        <location filename="src/game/player/player_actions.cpp" line="431"/>
+        <location filename="src/game/player/player_actions.cpp" line="624"/>
+        <location filename="src/game/player/player_actions.cpp" line="629"/>
         <source>grave</source>
-        <translation type="unfinished"/>
+        <translation>cimetière</translation>
     </message>
     <message>
-        <location filename="src/game/player/player_actions.cpp" line="433"/>
-        <location filename="src/game/player/player_actions.cpp" line="438"/>
-        <location filename="src/game/player/player_actions.cpp" line="628"/>
-        <location filename="src/game/player/player_actions.cpp" line="633"/>
+        <location filename="src/game/player/player_actions.cpp" line="436"/>
+        <location filename="src/game/player/player_actions.cpp" line="441"/>
+        <location filename="src/game/player/player_actions.cpp" line="634"/>
+        <location filename="src/game/player/player_actions.cpp" line="639"/>
         <source>exile</source>
+        <translation>exile</translation>
+    </message>
+</context>
+<context>
+    <name>PlayerDialogs</name>
+    <message>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="66"/>
+        <source>View top cards of library</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/game/player/player_actions.cpp" line="449"/>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="67"/>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="78"/>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="89"/>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="100"/>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="111"/>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="123"/>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="139"/>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="163"/>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="174"/>
+        <source>Number of cards: (max. %1)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="77"/>
+        <source>View bottom cards of library</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="88"/>
+        <source>Shuffle top cards of library</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="99"/>
+        <source>Shuffle bottom cards of library</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="110"/>
+        <source>Draw hand</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="112"/>
+        <source>0 and lower are in comparison to current hand size</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="123"/>
+        <source>Draw cards</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="138"/>
         <source>Move top cards to %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/game/player/player_actions.cpp" line="644"/>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="162"/>
         <source>Move bottom cards to %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/game/player/player_actions.cpp" line="767"/>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="174"/>
         <source>Draw bottom cards</source>
-        <translation>Piocher les cartes du dessous</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/game/player/player_actions.cpp" line="871"/>
-        <location filename="src/game/player/player_actions.cpp" line="917"/>
-        <source>C&amp;reate another %1 token</source>
-        <translation>C&amp;réer un autre jeton %1</translation>
-    </message>
-    <message>
-        <location filename="src/game/player/player_actions.cpp" line="1045"/>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="205"/>
         <source>Create tokens</source>
-        <translation>Créer des jetons</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/game/player/player_actions.cpp" line="1045"/>
-        <location filename="src/game/player/player_actions.cpp" line="1583"/>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="205"/>
         <source>Number:</source>
-        <translation>Nombre :</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/game/player/player_actions.cpp" line="1209"/>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="239"/>
         <source>Place card X cards from top of library</source>
-        <translation>Placer les X cartes depuis le dessus de la bibliothèque</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/game/player/player_actions.cpp" line="1210"/>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="240"/>
         <source>Which position should this card be placed:</source>
-        <translation>Dans quelle position cette carte doit-elle être placée :</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/game/player/player_actions.cpp" line="1210"/>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="240"/>
         <source>(max. %1)</source>
-        <translation>(max. %1)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/game/player/player_actions.cpp" line="1369"/>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="254"/>
         <source>Change power/toughness</source>
-        <translation>Changer la force/l&apos;endurance</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/game/player/player_actions.cpp" line="1369"/>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="254"/>
         <source>Change stats to:</source>
-        <translation>Changer les stats pour :</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/game/player/player_actions.cpp" line="1489"/>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="271"/>
         <source>Set annotation</source>
-        <translation>Annoter</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/game/player/player_actions.cpp" line="1490"/>
+        <location filename="src/game_graphics/player/player_dialogs.cpp" line="272"/>
         <source>Please enter the new annotation:</source>
-        <translation>Veuillez entrer la nouvelle annotation :</translation>
-    </message>
-    <message>
-        <location filename="src/game/player/player_actions.cpp" line="1583"/>
-        <source>Set counters</source>
-        <translation>Définir les marqueurs</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>PlayerMenu</name>
     <message>
-        <location filename="src/game/player/menu/player_menu.cpp" line="90"/>
+        <location filename="src/game_graphics/player/menu/player_menu.cpp" line="96"/>
         <source>Player &quot;%1&quot;</source>
         <translation>Joueur &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/player_menu.cpp" line="97"/>
+        <location filename="src/game_graphics/player/menu/player_menu.cpp" line="103"/>
         <source>&amp;Counters</source>
         <translation>&amp;Marqueurs</translation>
     </message>
@@ -6830,12 +7061,16 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
 This setting means you'll only see the default printing for each card, instead of being able to select a printing, and will not see the printings other people have selected.
 
 </source>
-        <translation type="unfinished"/>
+        <translation>Le sélecteur d&apos;impressions est désactivé car l&apos;option d&apos;écraser toutes les impressions avec des éditions personnalisées est activée.
+
+Cette option fait que vous ne verrez que l&apos;impression par défaut pour chaque carte, au lieu de pouvoir sélectionner une impression. Vous ne verrez pas les impressions que les autres joueurs ont sélectionnés pour eux-mêmes.
+
+</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/printing_disabled_info_widget.cpp" line="49"/>
         <source>Enable printings again</source>
-        <translation type="unfinished"/>
+        <translation>Ré-activer les impressions</translation>
     </message>
 </context>
 <context>
@@ -6846,30 +7081,30 @@ This setting means you'll only see the default printing for each card, instead o
         <translation>Afficher les boutons de navigation</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/printing_selector/printing_selector.cpp" line="155"/>
+        <location filename="src/interface/widgets/printing_selector/printing_selector.cpp" line="162"/>
         <source>Printing Selector</source>
-        <translation type="unfinished"/>
+        <translation>Sélection d&apos;impression</translation>
     </message>
 </context>
 <context>
     <name>PrintingSelectorCardOverlayWidget</name>
     <message>
-        <location filename="src/interface/widgets/printing_selector/printing_selector_card_overlay_widget.cpp" line="199"/>
+        <location filename="src/interface/widgets/printing_selector/printing_selector_card_overlay_widget.cpp" line="202"/>
         <source>Preference</source>
         <translation>Préférence</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/printing_selector/printing_selector_card_overlay_widget.cpp" line="207"/>
+        <location filename="src/interface/widgets/printing_selector/printing_selector_card_overlay_widget.cpp" line="210"/>
         <source>Pin Printing</source>
         <translation>Épingler Imprimer</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/printing_selector/printing_selector_card_overlay_widget.cpp" line="214"/>
+        <location filename="src/interface/widgets/printing_selector/printing_selector_card_overlay_widget.cpp" line="217"/>
         <source>Unpin Printing</source>
         <translation>Désépingler Imprimer</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/printing_selector/printing_selector_card_overlay_widget.cpp" line="222"/>
+        <location filename="src/interface/widgets/printing_selector/printing_selector_card_overlay_widget.cpp" line="225"/>
         <source>Show Related cards</source>
         <translation>Afficher les cartes associées</translation>
     </message>
@@ -6934,63 +7169,63 @@ This setting means you'll only see the default printing for each card, instead o
     <message>
         <location filename="src/interface/widgets/printing_selector/printing_selector_placeholder_widget.cpp" line="41"/>
         <source>Select a card to view its available printings</source>
-        <translation type="unfinished"/>
+        <translation>Sélectionnez une carte pour voir ses impressions</translation>
     </message>
 </context>
 <context>
     <name>PtMenu</name>
     <message>
-        <location filename="src/game/player/menu/pt_menu.cpp" line="6"/>
+        <location filename="src/game_graphics/player/menu/pt_menu.cpp" line="7"/>
         <source>Power / toughness</source>
         <translation>Force / Endurance</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/pt_menu.cpp" line="52"/>
+        <location filename="src/game_graphics/player/menu/pt_menu.cpp" line="63"/>
         <source>&amp;Increase power</source>
         <translation>&amp;Augmenter la force</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/pt_menu.cpp" line="53"/>
+        <location filename="src/game_graphics/player/menu/pt_menu.cpp" line="64"/>
         <source>&amp;Decrease power</source>
         <translation>&amp;Diminuer la force</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/pt_menu.cpp" line="54"/>
+        <location filename="src/game_graphics/player/menu/pt_menu.cpp" line="65"/>
         <source>I&amp;ncrease toughness</source>
         <translation>A&amp;ugmenter l&apos;endurance</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/pt_menu.cpp" line="55"/>
+        <location filename="src/game_graphics/player/menu/pt_menu.cpp" line="66"/>
         <source>D&amp;ecrease toughness</source>
         <translation>D&amp;iminuer l&apos;endurance</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/pt_menu.cpp" line="56"/>
+        <location filename="src/game_graphics/player/menu/pt_menu.cpp" line="67"/>
         <source>In&amp;crease power and toughness</source>
         <translation>Au&amp;gmenter la force et l&apos;endurance</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/pt_menu.cpp" line="57"/>
+        <location filename="src/game_graphics/player/menu/pt_menu.cpp" line="68"/>
         <source>Dec&amp;rease power and toughness</source>
         <translation>Dim&amp;inuer la force et l&apos;endurance</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/pt_menu.cpp" line="58"/>
+        <location filename="src/game_graphics/player/menu/pt_menu.cpp" line="69"/>
         <source>Increase power and decrease toughness</source>
         <translation>Augmenter la force et diminuer l&apos;endurance</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/pt_menu.cpp" line="59"/>
+        <location filename="src/game_graphics/player/menu/pt_menu.cpp" line="70"/>
         <source>Decrease power and increase toughness</source>
         <translation>Diminuer la force et augmenter l&apos;endurance</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/pt_menu.cpp" line="60"/>
+        <location filename="src/game_graphics/player/menu/pt_menu.cpp" line="71"/>
         <source>Set &amp;power and toughness...</source>
         <translation>Changer la &amp;force et l&apos;endurance...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/pt_menu.cpp" line="61"/>
+        <location filename="src/game_graphics/player/menu/pt_menu.cpp" line="72"/>
         <source>Reset p&amp;ower and toughness</source>
         <translation>Réinitialiser la f&amp;orce et l&apos;endurance</translation>
     </message>
@@ -6998,37 +7233,37 @@ This setting means you'll only see the default printing for each card, instead o
 <context>
     <name>QMenuBar</name>
     <message>
-        <location filename="src/interface/window_main.cpp" line="765"/>
+        <location filename="src/interface/window_main.cpp" line="400"/>
         <source>Services</source>
         <translation>Services</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="766"/>
+        <location filename="src/interface/window_main.cpp" line="401"/>
         <source>Hide %1</source>
         <translation>Cacher %1</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="767"/>
+        <location filename="src/interface/window_main.cpp" line="402"/>
         <source>Hide Others</source>
         <translation>Cacher les autres</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="768"/>
+        <location filename="src/interface/window_main.cpp" line="403"/>
         <source>Show All</source>
         <translation>Montrer tout</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="769"/>
+        <location filename="src/interface/window_main.cpp" line="404"/>
         <source>Preferences...</source>
         <translation>Préférences...</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="770"/>
+        <location filename="src/interface/window_main.cpp" line="405"/>
         <source>Quit %1</source>
         <translation>Quitter %1</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="771"/>
+        <location filename="src/interface/window_main.cpp" line="406"/>
         <source>About %1</source>
         <translation>À propos %1</translation>
     </message>
@@ -7036,17 +7271,17 @@ This setting means you'll only see the default printing for each card, instead o
 <context>
     <name>QObject</name>
     <message>
-        <location filename="src/interface/window_main.cpp" line="85"/>
+        <location filename="src/interface/window_main.cpp" line="80"/>
         <source>Cockatrice card database (*.xml)</source>
         <translation>Base de données de cartes Cockatrice (*.xml)</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="86"/>
+        <location filename="src/interface/window_main.cpp" line="81"/>
         <source>All files (*.*)</source>
         <translation>Tous les fichiers (*.*)</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="268"/>
+        <location filename="src/interface/window_main.cpp" line="181"/>
         <source>Cockatrice replays (*.cor)</source>
         <translation>Replays Cockatrice (*.cor)</translation>
     </message>
@@ -7084,7 +7319,13 @@ You will not be able to manage printing preferences on a per-deck basis, or see 
 You will have to use the Set Manager, available through Card Database -&gt; Manage Sets.
 
 Are you sure you would like to enable this feature?</source>
-        <translation type="unfinished"/>
+        <translation>L&apos;activation de cette option désactivera l&apos;utilisation du sélecteur d&apos;impression.
+
+Vous ne pourrez plus gérer les préférences d&apos;impression pour chaque deck ni voir les impressions sélectionnées par d&apos;autres joueurs.
+
+Vous devrez utiliser le Gestionnaire d&apos;extensions, accessible via : Base de données de cartes -&gt; Gérer les extensions.
+
+Êtes-vous sûr de vouloir activer cette option ?</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/override_printing_warning.cpp" line="17"/>
@@ -7095,121 +7336,194 @@ You can now choose printings on a per-deck basis in the Deck Editor and configur
 You can also use the Set Manager to adjust custom sort order for printings in the Printing Selector (other sort orders like alphabetical or release date are available).
 
 Are you sure you would like to disable this feature?</source>
-        <translation type="unfinished"/>
+        <translation>Désactiver cette option activera la sélection d&apos;impression.
+
+Vous pouvez désormais choisir les impressions pour chaque deck dans l&apos;éditeur de deck et configurer l&apos;impression ajoutée par défaut en l&apos;épinglant dans la sélection d&apos;impression.
+
+Vous pouvez également utiliser le gestionnaire de d&apos;extension pour personnaliser l&apos;ordre de tri des impressions dans la sélection d&apos;impression (d&apos;autres ordres de tri, comme l&apos;ordre alphabétique ou la date de parution, sont disponibles).
+
+Êtes-vous sûr de vouloir désactiver cette option ?</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/override_printing_warning.cpp" line="27"/>
         <source>Confirm Change</source>
-        <translation type="unfinished"/>
+        <translation>Confirmer le changement</translation>
     </message>
 </context>
 <context>
     <name>QPlatformTheme</name>
     <message>
-        <location filename="src/interface/window_main.cpp" line="774"/>
+        <location filename="src/interface/window_main.cpp" line="409"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="775"/>
+        <location filename="src/interface/window_main.cpp" line="410"/>
         <source>Save</source>
         <translation>Sauvegarder</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="776"/>
+        <location filename="src/interface/window_main.cpp" line="411"/>
         <source>Save All</source>
         <translation>Sauvegarder tout</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="777"/>
+        <location filename="src/interface/window_main.cpp" line="412"/>
         <source>Open</source>
         <translation>Ouvrir</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="778"/>
+        <location filename="src/interface/window_main.cpp" line="413"/>
         <source>&amp;Yes</source>
         <translation>&amp;Oui</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="779"/>
+        <location filename="src/interface/window_main.cpp" line="414"/>
         <source>Yes to &amp;All</source>
         <translation>Dire oui à tout</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="780"/>
+        <location filename="src/interface/window_main.cpp" line="415"/>
         <source>&amp;No</source>
         <translation>&amp;Non</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="781"/>
+        <location filename="src/interface/window_main.cpp" line="416"/>
         <source>N&amp;o to All</source>
         <translation>Dire non à tout</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="782"/>
+        <location filename="src/interface/window_main.cpp" line="417"/>
         <source>Abort</source>
         <translation>Abandonner</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="783"/>
+        <location filename="src/interface/window_main.cpp" line="418"/>
         <source>Retry</source>
         <translation>Réessayer</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="784"/>
+        <location filename="src/interface/window_main.cpp" line="419"/>
         <source>Ignore</source>
         <translation>Ignorer</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="785"/>
+        <location filename="src/interface/window_main.cpp" line="420"/>
         <source>Close</source>
         <translation>Fermer</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="786"/>
+        <location filename="src/interface/window_main.cpp" line="421"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="787"/>
+        <location filename="src/interface/window_main.cpp" line="422"/>
         <source>Discard</source>
         <translation>Effacer</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="788"/>
+        <location filename="src/interface/window_main.cpp" line="423"/>
         <source>Help</source>
         <translation>Aide</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="789"/>
+        <location filename="src/interface/window_main.cpp" line="424"/>
         <source>Apply</source>
         <translation>Appliquer</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="790"/>
+        <location filename="src/interface/window_main.cpp" line="425"/>
         <source>Reset</source>
         <translation>Réinitialiser</translation>
     </message>
     <message>
-        <location filename="src/interface/window_main.cpp" line="791"/>
+        <location filename="src/interface/window_main.cpp" line="426"/>
         <source>Restore Defaults</source>
         <translation>Remettre à zéro</translation>
     </message>
 </context>
 <context>
+    <name>QuickSetupPanel</name>
+    <message>
+        <location filename="src/interface/palette_editor/quick_setup_panel.cpp" line="60"/>
+        <source>%1%</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/quick_setup_panel.cpp" line="68"/>
+        <source>&lt;b&gt;Quick Setup&lt;/b&gt;</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/quick_setup_panel.cpp" line="69"/>
+        <source>Generate all palette roles automatically from a single accent colour</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/quick_setup_panel.cpp" line="70"/>
+        <source>Accent:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/quick_setup_panel.cpp" line="71"/>
+        <source>Primary hue. Used directly for highlights and links.
+At high intensity it also tints buttons and backgrounds.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/quick_setup_panel.cpp" line="73"/>
+        <source>Intensity:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/quick_setup_panel.cpp" line="74"/>
+        <source>Subtle</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/quick_setup_panel.cpp" line="75"/>
+        <source>Full colour</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/quick_setup_panel.cpp" line="76"/>
+        <source>0–30  Subtle tint — only highlights and links change hue
+30–70  Accented — buttons, tooltips, and borders join in
+70–100 Full colour — backgrounds, everything</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/quick_setup_panel.cpp" line="79"/>
+        <source>70%</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/quick_setup_panel.cpp" line="81"/>
+        <source>Generate ↓</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/palette_editor/quick_setup_panel.cpp" line="82"/>
+        <source>Derive all palette roles from the accent colour above.
+Fine-tune individual colours in the grid afterwards.</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>RemoteDeckList_TreeModel</name>
     <message>
-        <location filename="src/interface/widgets/server/remote/remote_decklist_tree_widget.cpp" line="168"/>
+        <location filename="src/interface/widgets/server/remote/remote_decklist_tree_widget.cpp" line="181"/>
         <source>Name</source>
         <translation>Nom</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/remote/remote_decklist_tree_widget.cpp" line="170"/>
+        <location filename="src/interface/widgets/server/remote/remote_decklist_tree_widget.cpp" line="183"/>
         <source>ID</source>
         <translation>ID</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/remote/remote_decklist_tree_widget.cpp" line="172"/>
+        <location filename="src/interface/widgets/server/remote/remote_decklist_tree_widget.cpp" line="185"/>
         <source>Upload time</source>
         <translation>Temps de chargement</translation>
     </message>
@@ -7217,32 +7531,32 @@ Are you sure you would like to disable this feature?</source>
 <context>
     <name>RemoteReplayList_TreeModel</name>
     <message>
-        <location filename="src/interface/widgets/server/remote/remote_replay_list_tree_widget.cpp" line="148"/>
+        <location filename="src/interface/widgets/server/remote/remote_replay_list_tree_widget.cpp" line="156"/>
         <source>ID</source>
         <translation>ID</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/remote/remote_replay_list_tree_widget.cpp" line="150"/>
+        <location filename="src/interface/widgets/server/remote/remote_replay_list_tree_widget.cpp" line="158"/>
         <source>Name</source>
         <translation>Nom</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/remote/remote_replay_list_tree_widget.cpp" line="152"/>
+        <location filename="src/interface/widgets/server/remote/remote_replay_list_tree_widget.cpp" line="160"/>
         <source>Players</source>
         <translation>Joueurs</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/remote/remote_replay_list_tree_widget.cpp" line="154"/>
+        <location filename="src/interface/widgets/server/remote/remote_replay_list_tree_widget.cpp" line="162"/>
         <source>Keep</source>
         <translation>Garder</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/remote/remote_replay_list_tree_widget.cpp" line="156"/>
+        <location filename="src/interface/widgets/server/remote/remote_replay_list_tree_widget.cpp" line="164"/>
         <source>Time started</source>
         <translation>Le temps a commencé</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/remote/remote_replay_list_tree_widget.cpp" line="158"/>
+        <location filename="src/interface/widgets/server/remote/remote_replay_list_tree_widget.cpp" line="166"/>
         <source>Duration (sec)</source>
         <translation>Durée (sec)</translation>
     </message>
@@ -7250,37 +7564,37 @@ Are you sure you would like to disable this feature?</source>
 <context>
     <name>RfgMenu</name>
     <message>
-        <location filename="src/game/player/menu/rfg_menu.cpp" line="60"/>
+        <location filename="src/game_graphics/player/menu/rfg_menu.cpp" line="61"/>
         <source>&amp;Exile</source>
         <translation>&amp;Exil</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/rfg_menu.cpp" line="62"/>
+        <location filename="src/game_graphics/player/menu/rfg_menu.cpp" line="63"/>
         <source>&amp;View exile</source>
         <translation>&amp;Voir la zone d&apos;exil</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/rfg_menu.cpp" line="65"/>
+        <location filename="src/game_graphics/player/menu/rfg_menu.cpp" line="66"/>
         <source>&amp;Move exile to...</source>
         <translation>&amp;Déplacer la zone d&apos;exil vers...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/rfg_menu.cpp" line="66"/>
+        <location filename="src/game_graphics/player/menu/rfg_menu.cpp" line="67"/>
         <source>&amp;Top of library</source>
         <translation>&amp;Dessus de la bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/rfg_menu.cpp" line="67"/>
+        <location filename="src/game_graphics/player/menu/rfg_menu.cpp" line="68"/>
         <source>&amp;Bottom of library</source>
         <translation>&amp;Dessous de la bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/rfg_menu.cpp" line="68"/>
+        <location filename="src/game_graphics/player/menu/rfg_menu.cpp" line="69"/>
         <source>&amp;Hand</source>
         <translation>&amp;Main</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/rfg_menu.cpp" line="69"/>
+        <location filename="src/game_graphics/player/menu/rfg_menu.cpp" line="70"/>
         <source>&amp;Graveyard</source>
         <translation>&amp;Cimetière</translation>
     </message>
@@ -7326,9 +7640,9 @@ Are you sure you would like to disable this feature?</source>
 <context>
     <name>SayMenu</name>
     <message>
-        <location filename="src/game/player/menu/say_menu.cpp" line="16"/>
+        <location filename="src/game_graphics/player/menu/say_menu.cpp" line="17"/>
         <source>S&amp;ay</source>
-        <translation type="unfinished"/>
+        <translation>Dire</translation>
     </message>
 </context>
 <context>
@@ -7367,27 +7681,27 @@ Are you sure you would like to disable this feature?</source>
 <context>
     <name>SetsModel</name>
     <message>
-        <location filename="../libcockatrice_models/libcockatrice/models/database/card_set/card_sets_model.cpp" line="84"/>
+        <location filename="../libcockatrice_models/libcockatrice/models/database/card_set/card_sets_model.cpp" line="89"/>
         <source>Enabled</source>
         <translation>Activée</translation>
     </message>
     <message>
-        <location filename="../libcockatrice_models/libcockatrice/models/database/card_set/card_sets_model.cpp" line="86"/>
+        <location filename="../libcockatrice_models/libcockatrice/models/database/card_set/card_sets_model.cpp" line="91"/>
         <source>Set type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="../libcockatrice_models/libcockatrice/models/database/card_set/card_sets_model.cpp" line="88"/>
+        <location filename="../libcockatrice_models/libcockatrice/models/database/card_set/card_sets_model.cpp" line="93"/>
         <source>Set code</source>
         <translation>Code</translation>
     </message>
     <message>
-        <location filename="../libcockatrice_models/libcockatrice/models/database/card_set/card_sets_model.cpp" line="90"/>
+        <location filename="../libcockatrice_models/libcockatrice/models/database/card_set/card_sets_model.cpp" line="95"/>
         <source>Long name</source>
         <translation>Nom complet</translation>
     </message>
     <message>
-        <location filename="../libcockatrice_models/libcockatrice/models/database/card_set/card_sets_model.cpp" line="92"/>
+        <location filename="../libcockatrice_models/libcockatrice/models/database/card_set/card_sets_model.cpp" line="97"/>
         <source>Release date</source>
         <translation>Date de sortie</translation>
     </message>
@@ -7395,53 +7709,53 @@ Are you sure you would like to disable this feature?</source>
 <context>
     <name>ShortcutSettingsPage</name>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1731"/>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1754"/>
+        <location filename="src/interface/widgets/settings_page/shortcut_settings_page.cpp" line="102"/>
+        <location filename="src/interface/widgets/settings_page/shortcut_settings_page.cpp" line="125"/>
         <source>Restore all default shortcuts</source>
         <translation>Réinitialiser tous les raccourcis</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1732"/>
+        <location filename="src/interface/widgets/settings_page/shortcut_settings_page.cpp" line="103"/>
         <source>Do you really want to restore all default shortcuts?</source>
         <translation>Êtes-vous sûr de vouloir réinitialiser tous les raccourcis ?</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1739"/>
+        <location filename="src/interface/widgets/settings_page/shortcut_settings_page.cpp" line="110"/>
         <source>Clear all default shortcuts</source>
         <translation>Effacer tous les raccourcis par défaut</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1740"/>
+        <location filename="src/interface/widgets/settings_page/shortcut_settings_page.cpp" line="111"/>
         <source>Do you really want to clear all shortcuts?</source>
         <translation>Êtes-vous sûr de vouloir effacer tous les raccourcis ?</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1749"/>
+        <location filename="src/interface/widgets/settings_page/shortcut_settings_page.cpp" line="120"/>
         <source>Section:</source>
         <translation>Section :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1750"/>
+        <location filename="src/interface/widgets/settings_page/shortcut_settings_page.cpp" line="121"/>
         <source>Action:</source>
         <translation>Action :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1751"/>
+        <location filename="src/interface/widgets/settings_page/shortcut_settings_page.cpp" line="122"/>
         <source>Shortcut:</source>
         <translation>Raccourci :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1753"/>
+        <location filename="src/interface/widgets/settings_page/shortcut_settings_page.cpp" line="124"/>
         <source>How to set custom shortcuts</source>
         <translation>Comment assigner des raccourcis personnalisés</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1755"/>
+        <location filename="src/interface/widgets/settings_page/shortcut_settings_page.cpp" line="126"/>
         <source>Clear all shortcuts</source>
         <translation>Effacer tous les raccourcis</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1756"/>
+        <location filename="src/interface/widgets/settings_page/shortcut_settings_page.cpp" line="127"/>
         <source>Search by shortcut name</source>
         <translation>Rechercher par nom de raccourci</translation>
     </message>
@@ -7496,12 +7810,12 @@ Please check your shortcut settings!</source>
 <context>
     <name>SideboardMenu</name>
     <message>
-        <location filename="src/game/player/menu/sideboard_menu.cpp" line="20"/>
+        <location filename="src/game_graphics/player/menu/sideboard_menu.cpp" line="22"/>
         <source>&amp;Sideboard</source>
         <translation>&amp;Réserve</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/sideboard_menu.cpp" line="21"/>
+        <location filename="src/game_graphics/player/menu/sideboard_menu.cpp" line="23"/>
         <source>&amp;View sideboard</source>
         <translation>&amp;Voir la réserve</translation>
     </message>
@@ -7509,27 +7823,27 @@ Please check your shortcut settings!</source>
 <context>
     <name>SoundSettingsPage</name>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1633"/>
+        <location filename="src/interface/widgets/settings_page/sound_settings_page.cpp" line="81"/>
         <source>Enable &amp;sounds</source>
         <translation>Activer les &amp;sons</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1634"/>
+        <location filename="src/interface/widgets/settings_page/sound_settings_page.cpp" line="82"/>
         <source>Current sounds theme:</source>
         <translation>Thème sonore actuel:</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1635"/>
+        <location filename="src/interface/widgets/settings_page/sound_settings_page.cpp" line="83"/>
         <source>Test system sound engine</source>
         <translation>Tester les effets sonores</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1636"/>
+        <location filename="src/interface/widgets/settings_page/sound_settings_page.cpp" line="84"/>
         <source>Sound settings</source>
         <translation>Paramètres de son</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="1637"/>
+        <location filename="src/interface/widgets/settings_page/sound_settings_page.cpp" line="85"/>
         <source>Master volume</source>
         <translation>Volume principal</translation>
     </message>
@@ -7601,14 +7915,144 @@ Please check your shortcut settings!</source>
         <translation>Réponse invalide reçue de la part du serveur de mise à jour.</translation>
     </message>
     <message>
-        <location filename="src/client/network/update/client/release_channel.cpp" line="176"/>
+        <location filename="src/client/network/update/client/release_channel.cpp" line="177"/>
         <source>No reply received from the tag update server.</source>
         <translation>Aucune réponse reçue de la part du serveur de mise à jour des tags.</translation>
     </message>
     <message>
-        <location filename="src/client/network/update/client/release_channel.cpp" line="183"/>
+        <location filename="src/client/network/update/client/release_channel.cpp" line="184"/>
         <source>Invalid reply received from the tag update server.</source>
         <translation>Réponse invalide reçue de la part du serveur de mise à jour des tags.</translation>
+    </message>
+</context>
+<context>
+    <name>StorageSettingsPage</name>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="178"/>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="191"/>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="200"/>
+        <source>Success</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="178"/>
+        <source>Cached card pictures have been reset.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="191"/>
+        <source>Downloaded card pictures have been reset.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="193"/>
+        <source>Error</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="193"/>
+        <source>One or more downloaded card pictures could not be cleared.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="200"/>
+        <source>In-memory (currently loaded) card pictures have been reset.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="205"/>
+        <source>Card Picture Loader Caching Method:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="208"/>
+        <source>The network cache is the preferred way of storing images. Downloaded images are stored here until the size of the cache exceeds the configured size. Cockatrice automatically monitors this cache and deletes the least recently seen card images to ensure the cache does not exceed the configured size.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="213"/>
+        <source>Writing card images directly to a folder on your hard drive is another way of storing images. This does not change how Cockatrice accesses or downloads images. Cockatrice will NOT automatically monitor and clear this folder, so if you enable this option, it is up to you to ensure sufficient available space. It should also be noted that if a provider outage causes you to download the wrong picture (i.e. wrong printing) you will be stuck with it until you manually delete the file, as opposed to using the network cache, which automatically rotates and thus correct errors after a while.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="221"/>
+        <source>This is the in-memory picture cache used by the application at runtime. It determines how much memory (RAM) Cockatrice can use before it has to fetch card images from the hard disk again. Increasing this will allow more card images to be displayed at once but shouldn&apos;t be necessary. Clearing this will make Cockatrice reload all images from the network cache or the disk.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="226"/>
+        <source>Delete Cached Images</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="227"/>
+        <source>Delete Saved Images</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="228"/>
+        <source>Clear In-Memory Images</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="230"/>
+        <source>Card Picture Loader Cache Method</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="231"/>
+        <source>Network Cache</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="232"/>
+        <source>Filesystem</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="233"/>
+        <source>In-Memory Picture Cache</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="235"/>
+        <source>Network Cache Size:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="236"/>
+        <source>On-disk cache for downloaded pictures</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="237"/>
+        <source>Redirect Cache TTL:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="238"/>
+        <source>How long cached redirects for urls are valid for.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="239"/>
+        <source>Picture Cache Size:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="240"/>
+        <source>In-memory cache for pictures not currently on screen</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="241"/>
+        <source>Naming scheme:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/storage_settings_page.cpp" line="243"/>
+        <source>Day(s)</source>
+        <translation>Jour(s)</translation>
     </message>
 </context>
 <context>
@@ -7746,123 +8190,171 @@ Please check your shortcut settings!</source>
     <name>TabArchidekt</name>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="77"/>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="333"/>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="387"/>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="336"/>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="390"/>
         <source>Desc.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="104"/>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="391"/>
-        <source>AND</source>
-        <translation type="unfinished"/>
+        <translation>Desc.</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="105"/>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="392"/>
-        <source>Require ALL selected colors</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="109"/>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="394"/>
-        <source>Deck name...</source>
-        <translation type="unfinished"/>
+        <source>AND</source>
+        <translation>ET</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="113"/>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="106"/>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="395"/>
-        <source>Owner...</source>
-        <translation type="unfinished"/>
+        <source>Require ALL selected colors</source>
+        <translation>TOUTES les couleurs sélectionnées obligatoires</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="120"/>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="396"/>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="110"/>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="397"/>
+        <source>Deck name...</source>
+        <translation>Nom du deck...</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="114"/>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="398"/>
+        <source>Owner...</source>
+        <translation>Propriétaire...</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="121"/>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="399"/>
         <source>Packages</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="127"/>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="397"/>
-        <source>Advanced Filters</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="205"/>
-        <source>Bracket:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="207"/>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="261"/>
-        <source>Any</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="241"/>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="399"/>
-        <source>Contains card...</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="245"/>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="128"/>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="400"/>
+        <source>Advanced Filters</source>
+        <translation>Filtres avancés</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="206"/>
+        <source>Bracket:</source>
+        <translation>Catégorie :</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="208"/>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="262"/>
+        <source>Any</source>
+        <translation>Tous</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="242"/>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="402"/>
+        <source>Contains card...</source>
+        <translation>Contient la carte...</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="246"/>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="403"/>
         <source>Commander...</source>
-        <translation type="unfinished"/>
+        <translation>Commandant...</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="249"/>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="401"/>
-        <source>Tag...</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="254"/>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="250"/>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="404"/>
+        <source>Tag...</source>
+        <translation>Tag...</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="255"/>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="407"/>
         <source>Deck Size</source>
-        <translation type="unfinished"/>
+        <translation>Taille du deck</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="269"/>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="270"/>
         <source>Cards:</source>
-        <translation type="unfinished"/>
+        <translation>Cartes :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="333"/>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="387"/>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="336"/>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="390"/>
         <source>Asc.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="386"/>
-        <source>Sort by:</source>
-        <translation type="unfinished"/>
+        <translation>Asc.</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="389"/>
+        <source>Sort by:</source>
+        <translation>Trier par :</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="392"/>
         <source>Filter by:</source>
-        <translation type="unfinished"/>
+        <translation>Filtrer par :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="408"/>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="411"/>
         <source>Display Settings</source>
-        <translation type="unfinished"/>
+        <translation>Options d&apos;affichage</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="123"/>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="406"/>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="124"/>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="409"/>
         <source>Search</source>
-        <translation type="unfinished"/>
+        <translation>Rechercher</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="213"/>
-        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="403"/>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="214"/>
+        <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="406"/>
         <source>Formats</source>
-        <translation type="unfinished"/>
+        <translation>Formats</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.h" line="88"/>
         <source>Archidekt: </source>
+        <translation>Archidekt : </translation>
+    </message>
+</context>
+<context>
+    <name>TabCardArtRules</name>
+    <message>
+        <location filename="src/interface/widgets/tabs/tab_card_art_rules.cpp" line="162"/>
+        <source>Card:</source>
+        <translation>Carte:</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/tabs/tab_card_art_rules.cpp" line="163"/>
+        <source>ProviderId:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/tabs/tab_card_art_rules.cpp" line="164"/>
+        <source>Mode:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/tabs/tab_card_art_rules.cpp" line="165"/>
+        <source>Reason:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/tabs/tab_card_art_rules.cpp" line="192"/>
+        <source>Type a card name...</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/tabs/tab_card_art_rules.cpp" line="254"/>
+        <source>Add rule</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/tabs/tab_card_art_rules.cpp" line="255"/>
+        <source>Remove rule</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/tabs/tab_card_art_rules.cpp" line="256"/>
+        <source>Refresh</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/tabs/tab_card_art_rules.h" line="58"/>
+        <source>Card Art Rules</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -7891,7 +8383,7 @@ Please check your shortcut settings!</source>
     <message>
         <location filename="src/interface/widgets/tabs/tab_deck_editor.cpp" line="101"/>
         <source>Card Database</source>
-        <translation type="unfinished"/>
+        <translation>Base de données de cartes</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/tab_deck_editor.cpp" line="105"/>
@@ -7914,7 +8406,7 @@ Please check your shortcut settings!</source>
         <translation>Réinitialiser l&apos;interface</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_editor.cpp" line="83"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_editor.cpp" line="82"/>
         <source>Deck: %1</source>
         <translation>Deck : %1</translation>
     </message>
@@ -7922,55 +8414,49 @@ Please check your shortcut settings!</source>
 <context>
     <name>TabDeckEditorVisual</name>
     <message>
-        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="118"/>
+        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="129"/>
         <source>Visual Deck: %1</source>
         <translation>Deck visuel : %1</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="297"/>
+        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="294"/>
         <source>&amp;Visual Deck Editor</source>
         <translation>&amp;Éditeur de deck visuel</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="299"/>
-        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="305"/>
+        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="296"/>
+        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="302"/>
         <source>Card Info</source>
         <translation>Infos de la carte</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="300"/>
-        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="306"/>
+        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="297"/>
+        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="303"/>
         <source>Deck</source>
         <translation>Deck</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="301"/>
-        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="307"/>
-        <source>Filters</source>
-        <translation>Filtres</translation>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="303"/>
+        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="300"/>
         <source>&amp;View</source>
         <translation>&amp;Voir</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="308"/>
+        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="305"/>
         <source>Printing</source>
         <translation>Imprimer</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="311"/>
+        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="308"/>
         <source>Visible</source>
         <translation>Visible</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="312"/>
+        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="309"/>
         <source>Floating</source>
         <translation>Flottant</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="315"/>
+        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="312"/>
         <source>Reset layout</source>
         <translation>Réinitialiser l&apos;interface</translation>
     </message>
@@ -7978,22 +8464,22 @@ Please check your shortcut settings!</source>
 <context>
     <name>TabDeckEditorVisualTabWidget</name>
     <message>
-        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp" line="56"/>
+        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp" line="62"/>
         <source>Visual Deck View</source>
         <translation>Vue de deck visuel</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp" line="57"/>
+        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp" line="63"/>
         <source>Visual Database Display</source>
         <translation>Affichage visuel de la base de données</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp" line="58"/>
+        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp" line="64"/>
         <source>Deck Analytics</source>
         <translation>Analyse de deck</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp" line="59"/>
+        <location filename="src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp" line="65"/>
         <source>Sample Hand</source>
         <translation>Exemple de main</translation>
     </message>
@@ -8001,134 +8487,134 @@ Please check your shortcut settings!</source>
 <context>
     <name>TabDeckStorage</name>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="166"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="167"/>
         <source>Local file system</source>
         <translation>Système de fichier local</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="167"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="168"/>
         <source>Server deck storage</source>
         <translation>Serveur de stockage de deck</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="169"/>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="172"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="170"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="173"/>
         <source>Open in deck editor</source>
         <translation>Ouvrir dans l&apos;éditeur de deck</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="170"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="171"/>
         <source>Rename deck or folder</source>
         <translation>Renommer le deck ou le dossier</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="171"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="172"/>
         <source>Upload deck</source>
         <translation>Envoyer deck</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="173"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="174"/>
         <source>Download deck</source>
         <translation>Télécharger deck</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="174"/>
         <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="175"/>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="374"/>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="510"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="176"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="380"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="523"/>
         <source>New folder</source>
         <translation>Nouveau dossier</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="176"/>
         <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="177"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="178"/>
         <source>Delete</source>
         <translation>Supprimer</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="178"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="179"/>
         <source>Open decks folder</source>
         <translation>Ouvrir le dossier des decks</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="259"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="263"/>
         <source>Rename local folder</source>
         <translation>Renommer le dossier local</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="259"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="263"/>
         <source>Rename local file</source>
         <translation>Renommer le fichier local</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="262"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="266"/>
         <source>New name:</source>
         <translation>Nouveau nom :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="277"/>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="312"/>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="334"/>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="351"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="281"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="316"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="340"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="357"/>
         <source>Error</source>
         <translation>Érreur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="277"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="281"/>
         <source>Rename failed</source>
         <translation>Renommage échoué</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="312"/>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="334"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="316"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="340"/>
         <source>Invalid deck file</source>
         <translation>Fichier de deck invalide</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="321"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="325"/>
         <source>Enter deck name</source>
         <translation>Entrez le nom du deck</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="321"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="325"/>
         <source>This decklist does not have a name.
 Please enter a name:</source>
         <translation>Ce deck n&apos;a pas de nom.
 Veuillez entrer un nom:</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="326"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="331"/>
         <source>Unnamed deck</source>
         <translation>Deck sans nom</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="351"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="357"/>
         <source>Failed to upload deck to server</source>
         <translation>Erreur lors de l&apos;importation du deck sur le serveur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="389"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="396"/>
         <source>Delete local file</source>
         <translation>Supprimer fichier local</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="389"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="396"/>
         <source>Are you sure you want to delete the selected files?</source>
         <translation>Êtes-vous certain de vouloir supprimer les fichiers sélectionnés ?</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="546"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="561"/>
         <source>Delete remote decks</source>
         <translation>Supprimer les decks dinstants</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="546"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="561"/>
         <source>Are you sure you want to delete the selected decks?</source>
         <translation>Êtes-vous certain de vouloir supprimer les decks sélectionnés ?</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="374"/>
-        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="510"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="380"/>
+        <location filename="src/interface/widgets/tabs/tab_deck_storage.cpp" line="523"/>
         <source>Name of new folder:</source>
         <translation>Nom du nouveau dossier :</translation>
     </message>
@@ -8200,191 +8686,191 @@ Veuillez entrer un nom:</translation>
 <context>
     <name>TabGame</name>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="266"/>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="276"/>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="903"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="273"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="283"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="923"/>
         <source>Replay</source>
         <translation>Replay</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="266"/>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="276"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="273"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="283"/>
         <source>Game</source>
         <translation>Partie</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="270"/>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="344"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="277"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="354"/>
         <source>Player List</source>
         <translation>Liste des joueurs</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="280"/>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="342"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="287"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="352"/>
         <source>Card Info</source>
         <translation>Infos de la carte</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="281"/>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="343"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="288"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="353"/>
         <source>Messages</source>
         <translation>Messages</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="283"/>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="347"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="290"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="357"/>
         <source>Replay Timeline</source>
         <translation>Historique des replays</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="288"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="297"/>
         <source>&amp;Phases</source>
         <translation>&amp;Phases</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="291"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="300"/>
         <source>&amp;Game</source>
         <translation>&amp;Partie</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="293"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="302"/>
         <source>Next &amp;phase</source>
         <translation>Étape &amp;suivante</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="296"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="305"/>
         <source>Next phase with &amp;action</source>
         <translation>Étape suivante avec &amp;action</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="299"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="308"/>
         <source>Next &amp;turn</source>
         <translation>&amp;Tour suivant</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="302"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="311"/>
         <source>Reverse turn order</source>
         <translation>Inverser l&apos;ordre des tours</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="305"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="314"/>
         <source>&amp;Remove all local arrows</source>
         <translation>&amp;Retirer toutes les flèches locales</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="308"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="317"/>
         <source>Rotate View Cl&amp;ockwise</source>
         <translation>Pivoter la vue dans le sens h&amp;oraire</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="311"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="320"/>
         <source>Rotate View Co&amp;unterclockwise</source>
         <translation>Pivoter la vue dans le sens &amp;anti-horaire</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="314"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="323"/>
         <source>Game &amp;information</source>
         <translation>&amp;Informations sur la partie</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="317"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="327"/>
         <source>Un&amp;concede</source>
         <translation>Annuler la &amp;concession</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="319"/>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="816"/>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="837"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="329"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="829"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="850"/>
         <source>&amp;Concede</source>
         <translation>&amp;Concéder</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="326"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="336"/>
         <source>&amp;Leave game</source>
         <translation>&amp;Quitter la partie</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="324"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="334"/>
         <source>C&amp;lose replay</source>
         <translation>Fermer &amp;le replay</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="330"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="340"/>
         <source>&amp;Focus Chat</source>
         <translation>&amp;Focus sur le chat</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="333"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="343"/>
         <source>&amp;Say:</source>
         <translation>&amp;Dire :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="337"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="347"/>
         <source>Selected cards</source>
         <translation>Cartes sélectionnées</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="340"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="350"/>
         <source>&amp;View</source>
         <translation>&amp;Voir</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="351"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="361"/>
         <source>Visible</source>
         <translation>Visible</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="352"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="362"/>
         <source>Floating</source>
         <translation>Flottant</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="355"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="365"/>
         <source>Reset layout</source>
         <translation>Réinitialiser l&apos;interface</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="487"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="499"/>
         <source>Concede</source>
         <translation>Concéder</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="487"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="499"/>
         <source>Are you sure you want to concede this game?</source>
         <translation>Êtes-vous sûr de vouloir concéder la partie ?</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="492"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="505"/>
         <source>Unconcede</source>
         <translation>Rester dans la partie</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="493"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="506"/>
         <source>You have already conceded.  Do you want to return to this game?</source>
         <translation>Vous avez déjà concédé la partie. Voulez-vous la reprendre ?</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="510"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="524"/>
         <source>Leave game</source>
         <translation>Quitter la partie</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="510"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="524"/>
         <source>Are you sure you want to leave this game?</source>
         <translation>Êtes-vous sûr de vouloir quitter la partie ?</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="626"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="637"/>
         <source>A player has joined game #%1</source>
         <translation>Un joueur a rejoint la partie #%1.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="627"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="638"/>
         <source>%1 has joined the game</source>
         <translation>%1 a rejoint la partie.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="636"/>
+        <location filename="src/interface/widgets/tabs/tab_game.cpp" line="647"/>
         <source>You have been kicked out of the game.</source>
         <translation>Vous avez été expulsé de la partie.</translation>
     </message>
@@ -8443,115 +8929,115 @@ Veuillez entrer un nom:</translation>
         <translation>Vous devez sélectionner un nombre valide de jours à identifier.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="146"/>
+        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="150"/>
         <source>Username: </source>
         <translation>Nom d&apos;utilisateur:</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="150"/>
+        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="154"/>
         <source>IP Address: </source>
         <translation>Adresse IP :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="154"/>
+        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="158"/>
         <source>Game Name: </source>
         <translation>Nom de la partie :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="158"/>
+        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="162"/>
         <source>GameID: </source>
         <translation>ID de la partie :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="162"/>
+        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="166"/>
         <source>Message: </source>
         <translation>Message :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="167"/>
+        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="171"/>
         <source>Main Room</source>
         <translation>Salon principal</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="168"/>
+        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="172"/>
         <source>Game Room</source>
         <translation>Salon de jeu</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="169"/>
+        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="173"/>
         <source>Private Chat</source>
         <translation>Chat privé</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="171"/>
+        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="175"/>
         <source>Past X Days: </source>
         <translation>Les X derniers jours :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="172"/>
+        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="176"/>
         <source>Today</source>
         <translation>Aujourd&apos;hui</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="173"/>
+        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="177"/>
         <source>Last Hour</source>
         <translation>La dernière heure</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="177"/>
+        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="181"/>
         <source>Maximum Results: </source>
         <translation>Résultats maximum :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="181"/>
+        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="185"/>
         <source>At least one filter is required.
 The more information you put in, the more specific your results will be.</source>
         <translation>Au moins un filtre est requis.
 Plus vous entrez d&apos;informations, meilleurs seront les résultats.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="184"/>
+        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="188"/>
         <source>Get User Logs</source>
         <translation>Obtenir les journaux de l&apos;utilisateur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="188"/>
+        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="192"/>
         <source>Clear Filters</source>
         <translation>Effacer les filtres</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="204"/>
+        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="208"/>
         <source>Filters</source>
         <translation>Filtres</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="214"/>
+        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="218"/>
         <source>Log Locations</source>
         <translation>Emplacement des journaux</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="223"/>
+        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="227"/>
         <source>Date Range</source>
         <translation>Intervalle de dates</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="230"/>
+        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="234"/>
         <source>Maximum Results</source>
         <translation>Résultats maximum</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="267"/>
-        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="273"/>
+        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="271"/>
+        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="277"/>
         <source>Message History</source>
         <translation>Historique des messages</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="268"/>
+        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="272"/>
         <source>Failed to collect message history information.</source>
         <translation>Impossible de récupérer l&apos;historique des messages.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="274"/>
+        <location filename="src/interface/widgets/tabs/tab_logs.cpp" line="278"/>
         <source>There are no messages for the selected filters.</source>
         <translation>Il n&apos;y a pas de messages pour les filtres sélectionnés.</translation>
     </message>
@@ -8569,27 +9055,27 @@ Plus vous entrez d&apos;informations, meilleurs seront les résultats.</translat
         <translation>&amp;Quitter</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_message.cpp" line="86"/>
+        <location filename="src/interface/widgets/tabs/tab_message.cpp" line="87"/>
         <source>%1 - Private chat</source>
         <translation>%1 - Chat privé</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_message.cpp" line="114"/>
+        <location filename="src/interface/widgets/tabs/tab_message.cpp" line="116"/>
         <source>This user is ignoring you, they cannot see your messages in main chat and you cannot join their games.</source>
         <translation>Cet utilisateur vous ignore, il ne peut pas voir vos messages dans le chat principal et vous ne pouvez pas rejoindre ses parties.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_message.cpp" line="144"/>
+        <location filename="src/interface/widgets/tabs/tab_message.cpp" line="150"/>
         <source>Private message from</source>
         <translation>Message privé de</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_message.cpp" line="161"/>
+        <location filename="src/interface/widgets/tabs/tab_message.cpp" line="167"/>
         <source>%1 has left the server.</source>
         <translation>%1 a quitté le serveur.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_message.cpp" line="167"/>
+        <location filename="src/interface/widgets/tabs/tab_message.cpp" line="173"/>
         <source>%1 has joined the server.</source>
         <translation>%1 a rejoint le serveur.</translation>
     </message>
@@ -8597,180 +9083,180 @@ Plus vous entrez d&apos;informations, meilleurs seront les résultats.</translat
 <context>
     <name>TabReplays</name>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="198"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="200"/>
         <source>Local file system</source>
         <translation>Système de fichier local</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="199"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="201"/>
         <source>Server replay storage</source>
         <translation>Stockage du serveur de replays</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="201"/>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="206"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="203"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="208"/>
         <source>Watch replay</source>
         <translation>Voir replay</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="202"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="204"/>
         <source>Rename</source>
         <translation>Renommer</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="203"/>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="317"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="205"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="323"/>
         <source>New folder</source>
         <translation>Nouveau fichier</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="204"/>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="209"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="206"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="211"/>
         <source>Delete</source>
         <translation>Supprimer</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="205"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="207"/>
         <source>Open replays folder</source>
         <translation>Ouvrir le dossier des Replays</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="207"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="209"/>
         <source>Download replay</source>
         <translation>Télécharger replay</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="208"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="210"/>
         <source>Toggle expiration lock</source>
         <translation>Changer le verrouillage de l&apos;expiration</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="210"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="212"/>
         <source>Get replay share code</source>
         <translation>Obtenir le code de partage du replay</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="212"/>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="568"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="214"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="582"/>
         <source>Look up replay by share code</source>
         <translation>Regarder un replay depuis un code de partage</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="281"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="287"/>
         <source>Rename local folder</source>
         <translation>Renommer le dossier local</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="281"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="287"/>
         <source>Rename local file</source>
         <translation>Renommer le fichier local</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="284"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="290"/>
         <source>New name:</source>
         <translation>Nouveau nom:</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="299"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="305"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="299"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="305"/>
         <source>Rename failed</source>
         <translation>Renommage échoué</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="317"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="323"/>
         <source>Name of new folder:</source>
         <translation>Nom du nouveau fichier:</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="332"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="339"/>
         <source>Delete local file</source>
         <translation>Supprimer fichier local</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="332"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="339"/>
         <source>Are you sure you want to delete the selected files?</source>
         <translation>Êtes-vous certain de vouloir supprimer les fichiers sélectionnés?</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="492"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="505"/>
         <source>Are you sure you want to delete the selected replays?</source>
         <translation>Êtes-vous certain de vouloir supprimer cet enregistrement?</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="539"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="553"/>
         <source>Failed to get code</source>
         <translation>Echec d&apos;obtention du code</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="541"/>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="602"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="555"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="616"/>
         <source>Either this server does not support replay sharing, or does not permit replay sharing for you.</source>
         <translation>Soit ce serveur ne prend pas en charge le partage de replay, soit il ne vous autorise pas à partager des replays.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="547"/>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="595"/>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="607"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="561"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="609"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="621"/>
         <source>Failed</source>
         <translation>Échec</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="547"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="561"/>
         <source>Could not get replay code</source>
         <translation>Impossible d&apos;obtenir le code de replay</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="555"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="569"/>
         <source>Replay Share Code</source>
         <translation>Code de Partage de Replay</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="557"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="571"/>
         <source>Others can use this code to add the replay to their list of remote replays:
 %1</source>
         <translation>D&apos;autres peuvent utiliser ce code pour ajouter la replay à leur liste de replay distantes :%1</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="559"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="573"/>
         <source>Copy to clipboard</source>
         <translation>Copier vers le presse-papier</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="568"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="582"/>
         <source>Replay share code</source>
         <translation>Code de partage de replay</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="589"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="603"/>
         <source>Replay code found</source>
         <translation>Code de replay trouvé</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="590"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="604"/>
         <source>Replay was added, or you already had access to it.</source>
         <translation>Le replay a été ajoutée, ou vous y aviez déjà accès.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="595"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="609"/>
         <source>Replay code not found</source>
         <translation>Code de replay non trouvé</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="600"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="614"/>
         <source>Failed to submit code</source>
         <translation>Échec de l&apos;envoi du code</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="607"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="621"/>
         <source>Unexpected error</source>
         <translation>Erreur inattendue</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="491"/>
+        <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="504"/>
         <source>Delete remote replay</source>
         <translation>Supprimer le replay distant</translation>
     </message>
@@ -8783,47 +9269,62 @@ Plus vous entrez d&apos;informations, meilleurs seront les résultats.</translat
 <context>
     <name>TabRoom</name>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_room.cpp" line="146"/>
+        <location filename="src/interface/widgets/tabs/tab_room.cpp" line="67"/>
+        <source>Friends</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/tabs/tab_room.cpp" line="68"/>
+        <source>Online</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/tabs/tab_room.cpp" line="69"/>
+        <source>Ignored</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/tabs/tab_room.cpp" line="161"/>
         <source>&amp;Say:</source>
         <translation>&amp;Dire :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_room.cpp" line="147"/>
+        <location filename="src/interface/widgets/tabs/tab_room.cpp" line="162"/>
         <source>Chat</source>
         <translation>Chat</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_room.cpp" line="148"/>
+        <location filename="src/interface/widgets/tabs/tab_room.cpp" line="163"/>
         <source>&amp;Room</source>
         <translation>&amp;Salon</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_room.cpp" line="149"/>
+        <location filename="src/interface/widgets/tabs/tab_room.cpp" line="164"/>
         <source>&amp;Leave room</source>
         <translation>&amp;Quitter le salon</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_room.cpp" line="150"/>
+        <location filename="src/interface/widgets/tabs/tab_room.cpp" line="165"/>
         <source>&amp;Clear chat</source>
         <translation>Effacer le &amp;Chat</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_room.cpp" line="151"/>
+        <location filename="src/interface/widgets/tabs/tab_room.cpp" line="166"/>
         <source>Chat Settings...</source>
         <translation>Paramètres du chat...</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_room.cpp" line="163"/>
+        <location filename="src/interface/widgets/tabs/tab_room.cpp" line="178"/>
         <source> mentioned you.</source>
         <translation>vous a mentionné.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_room.cpp" line="171"/>
+        <location filename="src/interface/widgets/tabs/tab_room.cpp" line="186"/>
         <source>Click to view</source>
         <translation>Cliquer pour voir</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_room.cpp" line="215"/>
+        <location filename="src/interface/widgets/tabs/tab_room.cpp" line="231"/>
         <source>You are flooding the chat. Please wait a couple of seconds.</source>
         <translation>Vous floodez le chat. Veuillez patienter quelques secondes.</translation>
     </message>
@@ -8836,30 +9337,30 @@ Plus vous entrez d&apos;informations, meilleurs seront les résultats.</translat
         <translation>Serveur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_server.cpp" line="200"/>
-        <location filename="src/interface/widgets/tabs/tab_server.cpp" line="205"/>
-        <location filename="src/interface/widgets/tabs/tab_server.cpp" line="210"/>
-        <location filename="src/interface/widgets/tabs/tab_server.cpp" line="215"/>
+        <location filename="src/interface/widgets/tabs/tab_server.cpp" line="214"/>
+        <location filename="src/interface/widgets/tabs/tab_server.cpp" line="219"/>
+        <location filename="src/interface/widgets/tabs/tab_server.cpp" line="224"/>
+        <location filename="src/interface/widgets/tabs/tab_server.cpp" line="229"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_server.cpp" line="201"/>
+        <location filename="src/interface/widgets/tabs/tab_server.cpp" line="215"/>
         <source>Failed to join the server room: it doesn&apos;t exist on the server.</source>
         <translation>Impossible de rejoindre le salon: il n&apos;existe pas sur le serveur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_server.cpp" line="206"/>
+        <location filename="src/interface/widgets/tabs/tab_server.cpp" line="220"/>
         <source>The server thinks you are in the server room but your client is unable to display it. Try restarting your client.</source>
         <translation>Le serveur considère que vous êtes dans le salon mais votre client est incapable de l&apos;afficher. Essayez en relançant votre client.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_server.cpp" line="211"/>
+        <location filename="src/interface/widgets/tabs/tab_server.cpp" line="225"/>
         <source>You do not have the required permission to join this server room.</source>
         <translation>Vous n&apos;avez pas la permission requise pour rejoindre ce salon.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_server.cpp" line="216"/>
+        <location filename="src/interface/widgets/tabs/tab_server.cpp" line="230"/>
         <source>Failed to join the server room due to an unknown error: %1.</source>
         <translation>Impossible de rejoindre le salon à cause d&apos;un erreur inconnue: %1</translation>
     </message>
@@ -8867,97 +9368,97 @@ Plus vous entrez d&apos;informations, meilleurs seront les résultats.</translat
 <context>
     <name>TabSupervisor</name>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="208"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="217"/>
         <source>Deck Editor</source>
         <translation>Éditeur de deck</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="209"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="218"/>
         <source>Visual Deck Editor</source>
         <translation>Éditeur de deck visuel</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="210"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="219"/>
         <source>EDHRec</source>
         <translation>EDHrec</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="211"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="220"/>
         <source>Archidekt</source>
-        <translation type="unfinished"/>
+        <translation>Archidekt</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="212"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="221"/>
         <source>Home</source>
         <translation>Accueil</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="213"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="222"/>
         <source>&amp;Visual Deck Storage</source>
         <translation>Stockage &amp;visuel de decks</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="214"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="223"/>
         <source>Visual Database Display</source>
         <translation>Affichage visuel de la base de données</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="215"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="224"/>
         <source>Server</source>
         <translation>Serveur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="216"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="225"/>
         <source>Account</source>
         <translation>Compte</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="217"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="226"/>
         <source>Deck Storage</source>
         <translation>Stockage de deck</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="218"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="227"/>
         <source>Game Replays</source>
         <translation>Replays de parties</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="219"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="228"/>
         <source>Administration</source>
         <translation>Administration</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="220"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="229"/>
         <source>Logs</source>
         <translation>Journaux</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="279"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="293"/>
         <source>Are you sure?</source>
         <translation>Êtes-vous sûr ?</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="280"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="294"/>
         <source>There are still open games. Are you sure you want to quit?</source>
         <translation>Il y a encore des parties en cours. Êtes-vous sûr de vouloir quitter ?</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="1007"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="1075"/>
         <source>Click to view</source>
         <translation>Cliquer pour regarder</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="1035"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="1104"/>
         <source>Your buddy %1 has signed on!</source>
         <translation>Votre ami %1 s&apos;est inscrit !</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="1076"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="1148"/>
         <source>Unknown Event</source>
         <translation>Événement inconnu</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="1077"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="1149"/>
         <source>The server has sent you a message that your client does not understand.
 This message might mean there is a new version of Cockatrice available or this server is running a custom or pre-release version.
 
@@ -8968,39 +9469,39 @@ Ce message peut signifier qu&apos;il y a une nouvelle version de Cockatrice disp
 Pour mettre à jour votre client, allez dans « Aide -&gt; Vérifier les mises à jour ».</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="1082"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="1154"/>
         <source>Idle Timeout</source>
         <translation>Temporisation inactive</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="1082"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="1154"/>
         <source>You are about to be logged out due to inactivity.</source>
         <translation>Vous allez d&apos;être déconnecté en raison de l&apos;inactivité.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="1086"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="1158"/>
         <source>Promotion</source>
         <translation>Promotion</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="1087"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="1159"/>
         <source>You have been promoted. Please log out and back in for changes to take effect.</source>
         <translation>Vous avez été promu modérateur. Veuillez vous reloguer pour que les changements prennent effet.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="1091"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="1163"/>
         <source>Warned</source>
         <translation>Averti</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="1092"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="1164"/>
         <source>You have received a warning due to %1.
 Please refrain from engaging in this activity or further actions may be taken against you. If you have any questions, please private message a moderator.</source>
         <translation>You avez reçu un avertissement pour la raison : %1.
 Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre vous. Si vous avez des questions, veuillez contacter un modérateur en privé.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="1106"/>
+        <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="1179"/>
         <source>You have received the following message from the server.
 (custom messages like these could be untranslated)</source>
         <translation>Vous avez reçu le message suivant du serveur.
@@ -9010,12 +9511,12 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
 <context>
     <name>TabVisualDatabaseDisplay</name>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_visual_database_display.h" line="26"/>
+        <location filename="src/interface/widgets/tabs/tab_visual_database_display.h" line="29"/>
         <source>Database Display</source>
-        <translation type="unfinished"/>
+        <translation>Affichage visuel de la bade de données</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/tabs/tab_visual_database_display.h" line="27"/>
+        <location filename="src/interface/widgets/tabs/tab_visual_database_display.h" line="28"/>
         <source>Visual Database Display</source>
         <translation>Affichage visuel de la base de données</translation>
     </message>
@@ -9054,42 +9555,42 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
 <context>
     <name>TranslateCounterName</name>
     <message>
-        <location filename="src/game/board/translate_counter_name.cpp" line="4"/>
+        <location filename="src/game_graphics/board/translate_counter_name.cpp" line="4"/>
         <source>Life</source>
         <translation>Points de vie</translation>
     </message>
     <message>
-        <location filename="src/game/board/translate_counter_name.cpp" line="5"/>
+        <location filename="src/game_graphics/board/translate_counter_name.cpp" line="5"/>
         <source>White</source>
         <translation>Blanc</translation>
     </message>
     <message>
-        <location filename="src/game/board/translate_counter_name.cpp" line="6"/>
+        <location filename="src/game_graphics/board/translate_counter_name.cpp" line="6"/>
         <source>Blue</source>
         <translation>Bleu</translation>
     </message>
     <message>
-        <location filename="src/game/board/translate_counter_name.cpp" line="7"/>
+        <location filename="src/game_graphics/board/translate_counter_name.cpp" line="7"/>
         <source>Black</source>
         <translation>Noir</translation>
     </message>
     <message>
-        <location filename="src/game/board/translate_counter_name.cpp" line="8"/>
+        <location filename="src/game_graphics/board/translate_counter_name.cpp" line="8"/>
         <source>Red</source>
         <translation>Rouge</translation>
     </message>
     <message>
-        <location filename="src/game/board/translate_counter_name.cpp" line="9"/>
+        <location filename="src/game_graphics/board/translate_counter_name.cpp" line="9"/>
         <source>Green</source>
         <translation>Vert</translation>
     </message>
     <message>
-        <location filename="src/game/board/translate_counter_name.cpp" line="10"/>
+        <location filename="src/game_graphics/board/translate_counter_name.cpp" line="10"/>
         <source>Colorless</source>
         <translation>Incolore</translation>
     </message>
     <message>
-        <location filename="src/game/board/translate_counter_name.cpp" line="11"/>
+        <location filename="src/game_graphics/board/translate_counter_name.cpp" line="11"/>
         <source>Other</source>
         <translation>Autre</translation>
     </message>
@@ -9097,9 +9598,67 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
 <context>
     <name>UpdateDownloader</name>
     <message>
-        <location filename="src/client/network/update/client/update_downloader.cpp" line="51"/>
+        <location filename="src/client/network/update/client/update_downloader.cpp" line="53"/>
         <source>Could not open the file for reading.</source>
         <translation>Impossible d&apos;ouvrir le fichier en lecture.</translation>
+    </message>
+</context>
+<context>
+    <name>UserCardArtSettingsDialog</name>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_card_settings_dialog.cpp" line="98"/>
+        <source>Card Art Settings</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_card_settings_dialog.cpp" line="131"/>
+        <source>Type a card name...</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_card_settings_dialog.cpp" line="190"/>
+        <source>Card name:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_card_settings_dialog.cpp" line="191"/>
+        <source>Card ProviderId:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_card_settings_dialog.cpp" line="192"/>
+        <source>Left margin (%):</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_card_settings_dialog.cpp" line="193"/>
+        <source>Right margin (%):</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_card_settings_dialog.cpp" line="194"/>
+        <source>Vertical offset:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_card_settings_dialog.cpp" line="195"/>
+        <source>Zoom:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_card_settings_dialog.cpp" line="197"/>
+        <source>Parameters</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_card_settings_dialog.cpp" line="204"/>
+        <source>Preview</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_card_settings_dialog.cpp" line="208"/>
+        <source>Remove Banner Card</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -9219,7 +9778,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="173"/>
         <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="196"/>
-        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="200"/>
+        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="201"/>
         <source>Ban History</source>
         <translation>Historique des bannissements</translation>
     </message>
@@ -9234,77 +9793,87 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
         <translation>Le joueur n&apos;a jamais été banni.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="201"/>
+        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="202"/>
         <source>Failed to collect ban information.</source>
         <translation>Impossible de collecter les informations de bannissement.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="211"/>
-        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="232"/>
-        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="236"/>
+        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="213"/>
+        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="234"/>
+        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="239"/>
         <source>Warning History</source>
         <translation>Historique des avertissements</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="216"/>
+        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="218"/>
         <source>Warning Time;Moderator;User Name;Reason</source>
         <translation>Heure d&apos;avertissement;Modérateur;Nom d&apos;utilisateur;Raison</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="233"/>
+        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="235"/>
         <source>User has never been warned.</source>
         <translation>Le joueur n&apos;a jamais reçu d&apos;avertissement.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="237"/>
+        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="240"/>
         <source>Failed to collect warning information.</source>
         <translation>Impossible de collecter les informations d&apos;avertissements.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="245"/>
+        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="249"/>
         <source>Failed to get admin notes.</source>
         <translation>Impossible de récupérer les notes d&apos;administrateur.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="262"/>
-        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="265"/>
+        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="266"/>
+        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="269"/>
         <source>Success</source>
         <translation>Succès</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="263"/>
+        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="267"/>
         <source>Successfully promoted user.</source>
         <translation>L&apos;utilisateur a été promu avec succès.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="265"/>
+        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="269"/>
         <source>Successfully demoted user.</source>
         <translation>L&apos;utilisateur a été rétrogradé avec succès.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="245"/>
-        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="270"/>
-        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="272"/>
+        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="479"/>
+        <source>Kick Player</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="480"/>
+        <source>Are you sure you want to kick this player from the game?</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="249"/>
+        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="274"/>
+        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="276"/>
         <source>Failed</source>
         <translation>Échec</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="270"/>
+        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="274"/>
         <source>Failed to promote user.</source>
         <translation>L&apos;utilisateur n&apos;a pas été promu.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="272"/>
+        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="276"/>
         <source>Failed to demote user.</source>
         <translation>L&apos;utilisateur n&apos;a pas été rétrogradé.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="358"/>
+        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="363"/>
         <source>Copy hash to clipboard</source>
         <translation>Copier le hash</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="378"/>
+        <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="383"/>
         <source>Remove this user&apos;s messages</source>
         <translation>Supprimer les messages de cet utilisateur</translation>
     </message>
@@ -9312,326 +9881,554 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
 <context>
     <name>UserInfoBox</name>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="79"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="82"/>
         <source>Location:</source>
         <translation>Localisation :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="81"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="84"/>
         <source>Account Age:</source>
         <translation>Ancienneté du compte :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="83"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="86"/>
         <source>Edit</source>
         <translation>Éditer</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="84"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="87"/>
         <source>Change password</source>
         <translation>Changer le mot de passe</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="85"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="88"/>
         <source>Change avatar</source>
         <translation>Changer l&apos;avatar</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="127"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="124"/>
         <source>Administrator</source>
         <translation>Administrateur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="129"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="126"/>
         <source>Moderator</source>
         <translation>Modérateur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="131"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="128"/>
         <source>Registered user</source>
         <translation>Joueur enregistré</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="133"/>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="144"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="130"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="143"/>
         <source>Unregistered user</source>
         <translation>Joueur non enregistré</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="136"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="134"/>
         <source>Judge</source>
         <translation>Arbitre</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="154"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="153"/>
         <source>Unknown</source>
         <translation>Inconnu</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="323"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="371"/>
         <source>The entered password does not match your account.</source>
         <translation>Le mot de passe est incorrect</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="316"/>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="337"/>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="361"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="352"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="364"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="385"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="409"/>
         <source>Information</source>
         <translation>Information</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="316"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="364"/>
         <source>User information updated.</source>
         <translation>Informations de l&apos;utilisateur mises à jour.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="268"/>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="319"/>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="323"/>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="327"/>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="340"/>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="343"/>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="346"/>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="350"/>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="364"/>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="368"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="272"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="348"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="367"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="371"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="375"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="388"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="391"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="394"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="398"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="412"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="416"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="71"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="74"/>
         <source>User Information</source>
         <translation>Informations utilisateur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="78"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="81"/>
         <source>Real Name:</source>
         <translation>Nom réel :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="80"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="83"/>
         <source>User Level:</source>
         <translation>Rang :</translation>
     </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="89"/>
+        <source>Edit Banner Card</source>
+        <translation type="unfinished"/>
+    </message>
     <message numerus="yes">
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="172"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="173"/>
         <source>%n Year(s), </source>
         <comment>amount of years (only shown if more than 0)</comment>
         <translation><numerusform>%n année.</numerusform><numerusform>%n années.</numerusform><numerusform>%n année(s).</numerusform></translation>
     </message>
     <message numerus="yes">
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="175"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="176"/>
         <source>%10%n Day(s) %20</source>
         <comment>amount of years (if more than 0), amount of days, date in local short format</comment>
         <translation><numerusform>%10%n jour %20</numerusform><numerusform>%10%n jours %20</numerusform><numerusform>%10%n jour(s) %20</numerusform></translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="231"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="233"/>
         <source>Enter Password</source>
         <translation>Saisir le mot de passe</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="232"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="234"/>
         <source>Password verification is required in order to change your email address</source>
         <translation>La vérification du mot de passe est requise pour changer votre adresse e-mail</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="269"/>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="328"/>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="351"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="273"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="376"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="399"/>
         <source>An error occurred while trying to update your user information.</source>
         <translation>Une erreur est survenue lors de la mise à jour de vos informations personnelles.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="320"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="349"/>
+        <source>The selected card is blacklisted on this server or another error occurred.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="353"/>
+        <source>Banner card removed.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="353"/>
+        <source>Banner card updated.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="368"/>
         <source>This server does not permit you to update your user informations.</source>
         <translation>Ce serveur ne vous permet pas de mettre à jour vos informations personnelles.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="337"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="385"/>
         <source>Password changed.</source>
         <translation>Mot de passe changé.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="340"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="388"/>
         <source>This server does not permit you to change your password.</source>
         <translation>Ce serveur ne vous permet pas de changer votre mot de passe.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="343"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="391"/>
         <source>The new password is too short.</source>
         <translation>Le nouveau mot de passe est trop court.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="346"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="394"/>
         <source>The old password is incorrect.</source>
         <translation>L&apos;ancien mot de passe est incorrect.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="361"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="409"/>
         <source>Avatar updated.</source>
         <translation>Avatar mis à jour.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="364"/>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="412"/>
         <source>This server does not permit you to update your avatar.</source>
         <translation>Ce serveur ne vous permet pas de mettre à jour votre avatar.</translation>
     </message>
     <message>
+        <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="416"/>
+        <source>An error occured while trying to update your avatar.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
         <location filename="src/interface/widgets/server/user/user_info_box.cpp" line="368"/>
-        <source>An error occured while trying to updater your avatar.</source>
-        <translation>Une erreur est survenue lors de la mise à jour de votre avatar.</translation>
+        <source>This server does not permit you to update your user informations.</source>
+        <oldsource>An error occured while trying to updater your avatar.</oldsource>
+        <translation>Ce serveur ne vous permet pas de mettre à jour vos informations personnelles.</translation>
+    </message>
+</context>
+<context>
+    <name>UserInfoPopup</name>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="300"/>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="406"/>
+        <source>Games</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="397"/>
+        <source>Chat</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="397"/>
+        <source>Open private chat</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="402"/>
+        <source>Profile</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="402"/>
+        <source>View user profile</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="406"/>
+        <source>Show this user&apos;s games</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="414"/>
+        <source>− Buddy</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="414"/>
+        <source>Remove from buddy list</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="418"/>
+        <source>+ Buddy</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="418"/>
+        <source>Add to buddy list</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="423"/>
+        <source>− Ignore</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="423"/>
+        <source>Remove from ignore list</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="427"/>
+        <source>+ Ignore</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="427"/>
+        <source>Add to ignore list</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="440"/>
+        <source>Ban</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="440"/>
+        <source>Ban from server</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="441"/>
+        <source>Warn</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="441"/>
+        <source>Warn user</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="442"/>
+        <source>Ban log</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="442"/>
+        <source>View ban history</source>
+        <translation>Voir l&apos;historique de bannissements</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="443"/>
+        <source>Warn log</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="443"/>
+        <source>View warning history</source>
+        <translation>Voir l&apos;historique d&apos;avertissements</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="456"/>
+        <source>Notes</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="456"/>
+        <source>View admin notes</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="461"/>
+        <source>− Mod</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="461"/>
+        <source>Demote from moderator</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="465"/>
+        <source>+ Mod</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="465"/>
+        <source>Promote to moderator</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="470"/>
+        <source>− Judge</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="470"/>
+        <source>Demote from judge</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="474"/>
+        <source>+ Judge</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="474"/>
+        <source>Promote to judge</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="508"/>
+        <source>Join game</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="513"/>
+        <source>Spectate</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="555"/>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="632"/>
+        <source>Loading games…</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="593"/>
+        <source>Could not load games.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/server/user/user_info_popup.cpp" line="601"/>
+        <source>No active games.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>UserInterfaceSettingsPage</name>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="960"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="209"/>
         <source>General interface settings</source>
         <translation>Paramètres généraux de l&apos;interface</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="961"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="210"/>
         <source>&amp;Double-click cards to play them (instead of single-click)</source>
         <translation>&amp;Double cliquer sur les cartes pour les jouer (au lieu d&apos;un simple clic)</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="962"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="211"/>
         <source>&amp;Clicking plays all selected cards (instead of just the clicked card)</source>
         <translation>&amp;Cliquer joue toutes les cartes sélectionnées (à la place de seulement la carte cliquée)</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="963"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="212"/>
         <source>&amp;Play all nonlands onto the stack (not the battlefield) by default</source>
         <translation>&amp;Jouer toutes les cartes non terrain dans la pile (pas sur le champ de bataille) par défaut</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="964"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="213"/>
         <source>Do not delete &amp;arrows inside of subphases</source>
-        <translation type="unfinished"/>
+        <translation>Ne pas effacer les flèches lors de sous-phases</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="965"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="214"/>
         <source>Close card view window when last card is removed</source>
         <translation>Fermer la fenêtre d&apos;affichage des cartes lorsque la dernière carte est supprimée</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="966"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="215"/>
         <source>Auto focus search bar when card view window is opened</source>
         <translation>Focalise automatiquement la barre de recherche lorsque la fenêtre d&apos;affichage des cartes est ouverte</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="967"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="216"/>
         <source>Annotate card text on tokens</source>
         <translation>Annoter le texte des cartes sur les jetons</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="968"/>
-        <source>Show selection counter during drag selection</source>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="217"/>
+        <source>Show selection count during drag selection</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="969"/>
-        <source>Show total selection counter</source>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="218"/>
+        <source>Show total selection count</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="970"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="219"/>
+        <source>Show subtype breakdown in selection tally</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="220"/>
         <source>Use tear-off menus, allowing right click menus to persist on screen</source>
         <translation>Utiliser les menus détachables, permettant les clics droits sur les rendre persistants</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="971"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="222"/>
+        <source>Keep game chat focused when clicking in game (Note: disables card view search bar)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="224"/>
         <source>Notifications settings</source>
         <translation>Paramètres des notifications</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="972"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="225"/>
         <source>Enable notifications in taskbar</source>
         <translation>Activer les notifications dans la barre des tâches</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="973"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="226"/>
         <source>Notify in the taskbar for game events while you are spectating</source>
         <translation>Notifier dans la barre des tâches pour les évènements des parties quand vous y êtes spectateur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="974"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="227"/>
         <source>Notify in the taskbar when users in your buddy list connect</source>
         <translation>Notifier dans la barre des tâches quand un ami se connecte</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="975"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="228"/>
         <source>Animation settings</source>
         <translation>Paramètres des animations</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="976"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="229"/>
         <source>&amp;Tap/untap animation</source>
         <translation>&amp;Animation d&apos;engagement / dégagement</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="977"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="230"/>
         <source>Deck editor/storage settings</source>
         <translation>Paramètres d&apos;éditeur et de stockage de deck</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="978"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="231"/>
         <source>Open deck in new tab by default</source>
         <translation>Ouvre le deck dans un nouvel onglet par défaut</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="979"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="232"/>
         <source>Use visual deck storage in game lobby</source>
         <translation>Utiliser le stockage visuel de decks dans le lobby des parties</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="980"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="233"/>
         <source>Use selection animation for Visual Deck Storage</source>
         <translation>Utilisez l&apos;animation de sélection pour le stockage visuel des deck</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="982"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="235"/>
         <source>When adding a tag in the visual deck storage to a .txt deck:</source>
         <translation>Lorsque vous ajoutez une étiquette dans le stockage visuel du deck à un deck stocké comme un fichier .txt :</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="984"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="237"/>
         <source>do nothing</source>
         <translation>ne rien faire</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="986"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="239"/>
         <source>ask to convert to .cod</source>
         <translation>demander à convertir en fichier .cod</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="988"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="241"/>
         <source>always convert to .cod</source>
         <translation>toujours convertir en fichier .cod</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="989"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="242"/>
         <source>Default deck editor type</source>
         <translation>Type d&apos;éditeur de deck par défaut</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="990"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="243"/>
         <source>Classic Deck Editor</source>
         <translation>Éditeur de deck classique</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="991"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="244"/>
         <source>Visual Deck Editor</source>
         <translation>Éditeur de deck visuel</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="992"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="245"/>
         <source>Replay settings</source>
         <translation>Paramètres du replay</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="993"/>
+        <location filename="src/interface/widgets/settings_page/user_interface_settings_page.cpp" line="246"/>
         <source>Buffer time for backwards skip via shortcut:</source>
         <translation>Temps de tampon pour les sauts en arrière via un raccourci :</translation>
     </message>
@@ -9639,22 +10436,22 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
 <context>
     <name>UserListWidget</name>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="445"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="865"/>
         <source>Users connected to server: %1</source>
         <translation>Joueurs connectés au serveur : %1</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="448"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="868"/>
         <source>Users in this room: %1</source>
         <translation>Joueurs dans ce salon : %1</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="451"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="871"/>
         <source>Buddies online: %1 / %2</source>
         <translation>Amis connectés : %1 / %2</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="454"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="874"/>
         <source>Ignored users online: %1 / %2</source>
         <translation>Joueurs sur liste noire connectés : %1 / %2</translation>
     </message>
@@ -9662,34 +10459,44 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
 <context>
     <name>UtilityMenu</name>
     <message>
-        <location filename="src/game/player/menu/utility_menu.cpp" line="89"/>
+        <location filename="src/game_graphics/player/menu/utility_menu.cpp" line="113"/>
         <source>Increment all card counters</source>
         <translation>Incrémenter tous les marqueurs de la carte</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/utility_menu.cpp" line="90"/>
+        <location filename="src/game_graphics/player/menu/utility_menu.cpp" line="114"/>
         <source>&amp;Untap all permanents</source>
         <translation>&amp;Dégager tous les permanents</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/utility_menu.cpp" line="91"/>
+        <location filename="src/game_graphics/player/menu/utility_menu.cpp" line="115"/>
         <source>R&amp;oll die...</source>
         <translation>L&amp;ancer un dé...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/utility_menu.cpp" line="92"/>
+        <location filename="src/game_graphics/player/menu/utility_menu.cpp" line="116"/>
+        <source>Flip coin</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/game_graphics/player/menu/utility_menu.cpp" line="117"/>
         <source>&amp;Create token...</source>
         <translation>&amp;Créer un jeton...</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/utility_menu.cpp" line="93"/>
+        <location filename="src/game_graphics/player/menu/utility_menu.cpp" line="118"/>
         <source>C&amp;reate another token</source>
         <translation>C&amp;réer un autre jeton</translation>
     </message>
     <message>
-        <location filename="src/game/player/menu/utility_menu.cpp" line="94"/>
+        <location filename="src/game_graphics/player/menu/utility_menu.cpp" line="119"/>
         <source>Cr&amp;eate predefined token</source>
         <translation>C&amp;réer un jeton prédéfini</translation>
+    </message>
+    <message>
+        <location filename="src/game_graphics/player/menu/utility_menu.h" line="36"/>
+        <source>C&amp;reate another %1 token</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -9697,23 +10504,23 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp" line="52"/>
         <source>Exact match</source>
-        <translation type="unfinished"/>
+        <translation>Correspondance exacte</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp" line="53"/>
         <source>Includes</source>
-        <translation type="unfinished"/>
+        <translation>Inclus</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp" line="54"/>
         <source>Include / Exclude</source>
         <oldsource>Mode: Includes</oldsource>
-        <translation type="unfinished"/>
+        <translation>Inclure / Exclure</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp" line="56"/>
         <source>How selected and unselected colors are combined in the filter</source>
-        <translation type="unfinished"/>
+        <translation>Comment les couleurs sélectionnées ou non sont combinées dans le filtre</translation>
     </message>
 </context>
 <context>
@@ -9721,7 +10528,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_save_load_widget.cpp" line="51"/>
         <source>Search filter...</source>
-        <translation type="unfinished"/>
+        <translation>Filtre de recherche...</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_save_load_widget.cpp" line="52"/>
@@ -9742,138 +10549,138 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
 <context>
     <name>VisualDatabaseDisplayFilterToolbarWidget</name>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="142"/>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="144"/>
         <source>Sort by</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="143"/>
-        <source>Filter by</source>
-        <translation type="unfinished"/>
+        <translation>Trier par</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="145"/>
-        <source>Save and load filters</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="146"/>
-        <source>Filter by exact card name</source>
-        <translation type="unfinished"/>
+        <source>Filter by</source>
+        <translation>Filtrer par</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="147"/>
-        <source>Filter by card main-type</source>
-        <translation type="unfinished"/>
+        <source>Save and load filters</source>
+        <translation>Sauvegarder et charger les filtres</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="148"/>
-        <source>Filter by card sub-type</source>
-        <translation type="unfinished"/>
+        <source>Filter by exact card name</source>
+        <translation>Filtrer par nom exact de carte</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="149"/>
-        <source>Filter by set</source>
-        <translation type="unfinished"/>
+        <source>Filter by card main-type</source>
+        <translation>Filtrer par type principal de carte</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="150"/>
-        <source>Filter by format legality</source>
-        <translation type="unfinished"/>
+        <source>Filter by card sub-type</source>
+        <translation>Filtrer par sous-type de carte</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="151"/>
+        <source>Filter by set</source>
+        <translation>Filtrer par extension</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="152"/>
-        <source>Save/Load</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="153"/>
-        <source>Name</source>
-        <translation type="unfinished"/>
+        <source>Filter by format legality</source>
+        <translation>Filtrer par légalité dans le format</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="154"/>
-        <source>Main Type</source>
-        <translation type="unfinished"/>
+        <source>Save/Load</source>
+        <translation>Sauvegarder/Charger</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="155"/>
-        <source>Sub Type</source>
-        <translation type="unfinished"/>
+        <source>Name</source>
+        <translation>Nom</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="156"/>
-        <source>Sets</source>
-        <translation type="unfinished"/>
+        <source>Main Type</source>
+        <translation>Type Principal</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="157"/>
+        <source>Sub Type</source>
+        <translation>Sous-type</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="158"/>
+        <source>Sets</source>
+        <translation>Éditions</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="159"/>
         <source>Formats</source>
-        <translation type="unfinished"/>
+        <translation>Formats</translation>
     </message>
 </context>
 <context>
     <name>VisualDatabaseDisplayFormatLegalityFilterWidget</name>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_format_legality_filter_widget.cpp" line="71"/>
-        <source>Show formats with at least:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_format_legality_filter_widget.cpp" line="72"/>
-        <source> cards</source>
-        <translation type="unfinished"/>
+        <source>Show formats with at least:</source>
+        <translation>Montrer les formats avec au moins :</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_format_legality_filter_widget.cpp" line="73"/>
-        <source>Do not display formats with less than this amount of cards in the database</source>
-        <translation type="unfinished"/>
+        <source> cards</source>
+        <translation>cartes</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_format_legality_filter_widget.cpp" line="74"/>
+        <source>Do not display formats with less than this amount of cards in the database</source>
+        <translation>Ne pas afficher les formats dont le nombre est inférieur à ce nombre dans la base de données</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_format_legality_filter_widget.cpp" line="75"/>
         <source>Filter mode (AND/OR/NOT conjunctions of filters)</source>
-        <translation type="unfinished"/>
+        <translation>Mode de filtre (conjonctions AND/OR/NOT de filtres)</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_format_legality_filter_widget.cpp" line="182"/>
         <source>Mode: Exact Match</source>
-        <translation type="unfinished"/>
+        <translation>Mode : correspondance exacte</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_format_legality_filter_widget.cpp" line="182"/>
         <source>Mode: Includes</source>
-        <translation type="unfinished"/>
+        <translation>Mode : inclure</translation>
     </message>
 </context>
 <context>
     <name>VisualDatabaseDisplayMainTypeFilterWidget</name>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp" line="66"/>
-        <source>Show main types with at least:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp" line="67"/>
-        <source> cards</source>
-        <translation type="unfinished"/>
+        <source>Show main types with at least:</source>
+        <translation>Montrer les types principaux avec au moins :</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp" line="68"/>
+        <source> cards</source>
+        <translation>cartes</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp" line="69"/>
         <source>Do not display card main-types with less than this amount of cards in the database</source>
         <translation>Ne pas afficher les types principaux de cartes dont le nombre est inférieur à ce montant dans la base de données</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp" line="69"/>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp" line="70"/>
         <source>Filter mode (AND/OR/NOT conjunctions of filters)</source>
         <translation>Mode de filtre (conjonctions AND/OR/NOT de filtres)</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp" line="177"/>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp" line="178"/>
         <source>Mode: Exact Match</source>
         <translation>Mode : correspondance exacte</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp" line="177"/>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp" line="178"/>
         <source>Mode: Includes</source>
         <translation>Mode : inclure</translation>
     </message>
@@ -9881,27 +10688,27 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
 <context>
     <name>VisualDatabaseDisplayNameFilterWidget</name>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp" line="55"/>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp" line="56"/>
         <source>Filter by name... (Exact match)</source>
-        <translation type="unfinished"/>
+        <translation>Filtrer par nom... (Correspondance exacte)</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp" line="56"/>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp" line="57"/>
         <source>Load from Deck</source>
         <translation>Charger depuis un deck</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp" line="57"/>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp" line="58"/>
         <source>Apply all card names in currently loaded deck as exact match name filters</source>
         <translation>Appliquer tous les noms de cartes du deck actuellement chargé comme filtres de nom exacts</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp" line="58"/>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp" line="59"/>
         <source>Load from Clipboard</source>
         <translation>Charger depuis le presse-papier...</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp" line="59"/>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp" line="60"/>
         <source>Apply all card names in clipboard as exact match name filters</source>
         <translation>Appliquer tous les noms de cartes du presse-papier comme filtres de nom exacts</translation>
     </message>
@@ -9909,7 +10716,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
 <context>
     <name>VisualDatabaseDisplayRecentSetFilterSettingsWidget</name>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp" line="43"/>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp" line="44"/>
         <source>Filter to most recent sets</source>
         <translation>Filtrer par extensions récentes</translation>
     </message>
@@ -9917,19 +10724,19 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
 <context>
     <name>VisualDatabaseDisplaySetFilterWidget</name>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp" line="57"/>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp" line="58"/>
         <source>Search sets...</source>
         <translation>Rechercher les extensions...</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp" line="87"/>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp" line="256"/>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp" line="88"/>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp" line="257"/>
         <source>Mode: Exact Match</source>
         <translation>Mode : correspondance exacte</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp" line="87"/>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp" line="256"/>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp" line="88"/>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp" line="257"/>
         <source>Mode: Includes</source>
         <translation>Mode : inclure</translation>
     </message>
@@ -9937,37 +10744,37 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
 <context>
     <name>VisualDatabaseDisplaySubTypeFilterWidget</name>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp" line="26"/>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp" line="27"/>
         <source>Search subtypes...</source>
         <translation>Rechercher par sous-types...</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp" line="71"/>
-        <source>Show sub types with at least:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp" line="72"/>
-        <source> cards</source>
-        <translation type="unfinished"/>
+        <source>Show sub types with at least:</source>
+        <translation>Montrer les sous-types avec au moins : </translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp" line="73"/>
+        <source> cards</source>
+        <translation>cartes</translation>
+    </message>
+    <message>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp" line="74"/>
         <source>Do not display card sub-types with less than this amount of cards in the database</source>
         <translation>Ne pas afficher les sous-types de cartes dont le nombre est inférieur à ce montant dans la base de données</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp" line="74"/>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp" line="75"/>
         <source>Filter mode (AND/OR/NOT conjunctions of filters)</source>
         <translation>Mode de filtre (conjonctions AND/OR/NOT de filtres)</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp" line="185"/>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp" line="186"/>
         <source>Mode: Exact Match</source>
         <translation>Mode : correspondance exacte</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp" line="185"/>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp" line="186"/>
         <source>Mode: Includes</source>
         <translation>Mode : inclure</translation>
     </message>
@@ -9975,30 +10782,30 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
 <context>
     <name>VisualDatabaseDisplayWidget</name>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_widget.cpp" line="55"/>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_widget.cpp" line="62"/>
         <source>Search by card name (or search expressions)</source>
         <translation>Rechercher par nom de carte (ou expression de recherche)</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_widget.cpp" line="65"/>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_widget.cpp" line="71"/>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_widget.cpp" line="200"/>
         <source>Visual</source>
-        <translation type="unfinished"/>
+        <translation>Visuel</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_widget.cpp" line="179"/>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_widget.cpp" line="174"/>
         <source>Loading database ...</source>
         <translation>Chargement de la base de données...</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/visual_database_display/visual_database_display_widget.cpp" line="180"/>
+        <location filename="src/interface/widgets/visual_database_display/visual_database_display_widget.cpp" line="175"/>
         <source>Clear all filters</source>
         <translation>Effacer tous les filtres</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_widget.cpp" line="193"/>
         <source>Table</source>
-        <translation type="unfinished"/>
+        <translation>Tableau</translation>
     </message>
 </context>
 <context>
@@ -10006,43 +10813,43 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp" line="89"/>
         <source>Group by:</source>
-        <translation type="unfinished"/>
+        <translation>Grouper par :</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp" line="90"/>
         <source>Change how cards are divided into categories/groups.</source>
-        <translation type="unfinished"/>
+        <translation>Configurez comment les cartes sont divisées en groupes/catégories.</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp" line="91"/>
         <source>Sort by:</source>
-        <translation type="unfinished"/>
+        <translation>Trier par :</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp" line="92"/>
         <source>Click and drag to change the sort order within the groups</source>
-        <translation type="unfinished"/>
+        <translation>Cliquer et glisser pour changer l&apos;ordre de tri dans les groupes.</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp" line="93"/>
         <source>Configure how cards are sorted within their groups</source>
-        <translation type="unfinished"/>
+        <translation>Configurez le mode de tri des cartes dans leurs groupes</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp" line="94"/>
-        <location filename="src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp" line="121"/>
+        <location filename="src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp" line="123"/>
         <source>Toggle Layout: Overlap</source>
-        <translation type="unfinished"/>
+        <translation>Mode d&apos;affichage : Superposé</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp" line="96"/>
+        <location filename="src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp" line="97"/>
         <source>Change how cards are displayed within zones (i.e. overlapped or fully visible.)</source>
-        <translation type="unfinished"/>
+        <translation>Modifier l&apos;affichage des cartes dans les zones (i.e. superposées ou entièrement visibles).</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp" line="118"/>
+        <location filename="src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp" line="119"/>
         <source>Toggle Layout: Flat</source>
-        <translation type="unfinished"/>
+        <translation>Mode d&apos;affichage : Plat</translation>
     </message>
 </context>
 <context>
@@ -10050,7 +10857,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/interface/widgets/visual_deck_editor/visual_deck_editor_placeholder_widget.cpp" line="40"/>
         <source>Add cards using the search bar or database tab to have them appear here</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter des cartes via la barre de recherche ou l&apos;onglet base de données pour qu&apos;elles apparaissent ici</translation>
     </message>
 </context>
 <context>
@@ -10069,17 +10876,17 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
 <context>
     <name>VisualDeckEditorWidget</name>
     <message>
-        <location filename="src/interface/widgets/visual_deck_editor/visual_deck_editor_widget.cpp" line="207"/>
+        <location filename="src/interface/widgets/visual_deck_editor/visual_deck_editor_widget.cpp" line="216"/>
         <source>Type a card name here for suggestions from the database...</source>
-        <translation type="unfinished"/>
+        <translation>Tapez un nom de carte ici pour des suggestions de la base de données...</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/visual_deck_editor/visual_deck_editor_widget.cpp" line="208"/>
+        <location filename="src/interface/widgets/visual_deck_editor/visual_deck_editor_widget.cpp" line="217"/>
         <source>Quick search and add card</source>
         <translation>Recherche et ajout rapide d&apos;une carte</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/visual_deck_editor/visual_deck_editor_widget.cpp" line="209"/>
+        <location filename="src/interface/widgets/visual_deck_editor/visual_deck_editor_widget.cpp" line="218"/>
         <source>Search for closest match in the database (with auto-suggestions) and add preferred printing to the deck on pressing enter</source>
         <translation>Recherchez la correspondance la plus proche dans la base de données (avec suggestions automatiques) et ajoutez l&apos;impression souhaitée au deck en appuyant sur Entrée</translation>
     </message>
@@ -10107,7 +10914,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/interface/widgets/visual_deck_storage/visual_deck_storage_quick_settings_widget.cpp" line="131"/>
         <source>Show Color Identity</source>
-        <translation type="unfinished"/>
+        <translation>Montrer l&apos;identité de couleur</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_deck_storage/visual_deck_storage_quick_settings_widget.cpp" line="132"/>
@@ -10197,43 +11004,43 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
 <context>
     <name>WarningDialog</name>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="128"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="137"/>
         <source>Which warning would you like to send?</source>
         <translation>Quel avertissement voudriez-vous envoyer ?</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="136"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="145"/>
         <source>Redact all messages from this user in all rooms</source>
         <translation>Censurer tous les messages de cet utilisateur dans toutes les salles</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="138"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="147"/>
         <source>&amp;OK</source>
         <translation>&amp;OK</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="141"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="150"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Annuler</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="156"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="165"/>
         <source>Warn user for misconduct</source>
         <translation>Envoyer un avertissement au joueur pour mauvaise conduite</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="162"/>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="168"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="171"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="177"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="163"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="172"/>
         <source>User name to send a warning to can not be blank, please specify a user to warn.</source>
         <translation>Le nom d&apos;utilisateur du joueur à avertir ne peut pas être vide, merci d&apos;entrer un joueur à avertir.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="169"/>
+        <location filename="src/interface/widgets/server/user/user_list_widget.cpp" line="178"/>
         <source>Warning to use can not be blank, please select a valid warning to send.</source>
         <translation>L&apos;avertissement à utiliser ne peut pas être vide, merci de sélectionner un avertissement valide à envoyer.</translation>
     </message>
@@ -10241,133 +11048,133 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
 <context>
     <name>WndSets</name>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="35"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="36"/>
         <source>Move selected set to the top</source>
         <translation>Déplacer l&apos;édition sélectionnée tout en haut</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="42"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="43"/>
         <source>Move selected set up</source>
         <translation>Déplacer l&apos;édition sélectionnée vers le haut</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="49"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="50"/>
         <source>Move selected set down</source>
         <translation>Déplacer l&apos;édition sélectionnée vers le bas</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="56"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="57"/>
         <source>Move selected set to the bottom</source>
         <translation>Déplacer l&apos;édition sélectionnée tout en bas</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="64"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="65"/>
         <source>Search by set name, code, or type</source>
         <translation>Rechercher par ensemble de nom, code ou type</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="69"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="70"/>
         <source>Default order</source>
         <translation>Ordre par défaut</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="70"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="71"/>
         <source>Restore original art priority order</source>
         <translation>Restaurer l&apos;ordre original de priorité artistique</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="106"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="107"/>
         <source>Enable all sets</source>
         <translation>Activer toutes les éditions</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="107"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="108"/>
         <source>Disable all sets</source>
         <translation>Désactiver toutes les éditions</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="108"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="109"/>
         <source>Enable selected set(s)</source>
         <translation>Activer l(es) édition(s) sélectionnée(s)</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="109"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="110"/>
         <source>Disable selected set(s)</source>
         <translation>Désactiver l(es) éditions(s) sélectionné(s)</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="125"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="126"/>
         <source>Deck Editor</source>
         <translation>Éditeur de deck</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="125"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="126"/>
         <source>Use CTRL+A to select all sets in the view.</source>
         <translation>Utiliser Ctrl+A pour sélectionner toutes les éditions dans la vue actuelle.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="126"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="127"/>
         <source>Only cards in enabled sets will appear in the card list of the deck editor.</source>
         <translation>Seules les cartes des éditions activées apparaitront dans la liste de cartes de l&apos;éditeur de deck.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="127"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="128"/>
         <source>Image priority is decided in the following order:</source>
         <translation>La priorité des images est décidé dans l&apos;ordre suivant:</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="128"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="129"/>
         <source>first the CUSTOM Folder (%1), then the Enabled Sets in this dialog (Top to Bottom)</source>
         <comment>%1 is a link to the wiki</comment>
         <translation>D&apos;abord le dossier PERSONNALISÉ (%1), puis les éditions activées dans cette fenêtre (de haut en bas)</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="157"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="158"/>
         <source>Include cards rebalanced for Alchemy [requires restart]</source>
         <translation>Inclure les cartes rééquilibrées pour Alchemy [nécessite un redémarrage]</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="127"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="128"/>
         <source>Card Art</source>
         <translation>Images des cartes</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="132"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="133"/>
         <source>How to use custom card art</source>
         <translation>Comment utiliser une illustration personnalisée de carte</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="136"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="137"/>
         <source>Hints</source>
         <translation>Astuces</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="139"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="140"/>
         <source>Note</source>
         <translation>Note</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="143"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="144"/>
         <source>Sorting by column allows you to find a set while not changing set priority.</source>
         <translation>Trier par colonne vous permet de trouver une édition sans changer la priorité des éditions.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="144"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="145"/>
         <source>To enable ordering again, click the column header until this message disappears.</source>
         <translation>Pour trier à nouveau, cliquez sur l&apos;entête de la colonne jusqu&apos;à ce que ce message disparaisse.</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="147"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="148"/>
         <source>Use the current sorting as the set priority instead</source>
         <translation>Utiliser le tri actuel comme ordre de priorité des éditions</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="148"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="149"/>
         <source>Sorts the set priority using the same column</source>
         <translation>Sortir la priorité sur la même colonne</translation>
     </message>
     <message>
-        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="187"/>
+        <location filename="src/interface/widgets/dialogs/dlg_manage_sets.cpp" line="188"/>
         <source>Manage sets</source>
         <translation>Gérer les éditions</translation>
     </message>
@@ -10375,72 +11182,72 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
 <context>
     <name>ZoneViewWidget</name>
     <message>
-        <location filename="src/game/zones/view_zone_widget.cpp" line="61"/>
+        <location filename="src/game_graphics/zones/view_zone_widget.cpp" line="61"/>
         <source>Search by card name (or search expressions)</source>
         <translation>Rechercher par nom de carte (ou expression de recherche)</translation>
     </message>
     <message>
-        <location filename="src/game/zones/view_zone_widget.cpp" line="229"/>
+        <location filename="src/game_graphics/zones/view_zone_widget.cpp" line="234"/>
         <source>Ungrouped</source>
         <translation>Non groupé</translation>
     </message>
     <message>
-        <location filename="src/game/zones/view_zone_widget.cpp" line="230"/>
+        <location filename="src/game_graphics/zones/view_zone_widget.cpp" line="235"/>
         <source>Group by Type</source>
         <translation>Grouper par Types</translation>
     </message>
     <message>
-        <location filename="src/game/zones/view_zone_widget.cpp" line="231"/>
+        <location filename="src/game_graphics/zones/view_zone_widget.cpp" line="236"/>
         <source>Group by Mana Value</source>
         <translation>Grouper par Valeur de Mana</translation>
     </message>
     <message>
-        <location filename="src/game/zones/view_zone_widget.cpp" line="232"/>
+        <location filename="src/game_graphics/zones/view_zone_widget.cpp" line="237"/>
         <source>Group by Color</source>
         <translation>Grouper par Couleurs</translation>
     </message>
     <message>
-        <location filename="src/game/zones/view_zone_widget.cpp" line="239"/>
+        <location filename="src/game_graphics/zones/view_zone_widget.cpp" line="244"/>
         <source>Unsorted</source>
         <translation>Non trié</translation>
     </message>
     <message>
-        <location filename="src/game/zones/view_zone_widget.cpp" line="240"/>
+        <location filename="src/game_graphics/zones/view_zone_widget.cpp" line="245"/>
         <source>Sort by Name</source>
         <translation>Trier par Nom</translation>
     </message>
     <message>
-        <location filename="src/game/zones/view_zone_widget.cpp" line="241"/>
+        <location filename="src/game_graphics/zones/view_zone_widget.cpp" line="246"/>
         <source>Sort by Type</source>
         <translation>Trier par Type</translation>
     </message>
     <message>
-        <location filename="src/game/zones/view_zone_widget.cpp" line="242"/>
+        <location filename="src/game_graphics/zones/view_zone_widget.cpp" line="247"/>
         <source>Sort by Mana Cost</source>
         <translation>Trier par Coût de Mana</translation>
     </message>
     <message>
-        <location filename="src/game/zones/view_zone_widget.cpp" line="243"/>
+        <location filename="src/game_graphics/zones/view_zone_widget.cpp" line="248"/>
         <source>Sort by Colors</source>
         <translation>Trier par Couleurs</translation>
     </message>
     <message>
-        <location filename="src/game/zones/view_zone_widget.cpp" line="244"/>
+        <location filename="src/game_graphics/zones/view_zone_widget.cpp" line="249"/>
         <source>Sort by P/T</source>
         <translation>Trier par F/E</translation>
     </message>
     <message>
-        <location filename="src/game/zones/view_zone_widget.cpp" line="245"/>
+        <location filename="src/game_graphics/zones/view_zone_widget.cpp" line="250"/>
         <source>Sort by Set</source>
         <translation>Trier par extension</translation>
     </message>
     <message>
-        <location filename="src/game/zones/view_zone_widget.cpp" line="249"/>
+        <location filename="src/game_graphics/zones/view_zone_widget.cpp" line="254"/>
         <source>shuffle when closing</source>
         <translation>mélanger en quittant</translation>
     </message>
     <message>
-        <location filename="src/game/zones/view_zone_widget.cpp" line="250"/>
+        <location filename="src/game_graphics/zones/view_zone_widget.cpp" line="255"/>
         <source>pile view</source>
         <translation>vue de la pile</translation>
     </message>
@@ -10448,7 +11255,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
 <context>
     <name>i18n</name>
     <message>
-        <location filename="src/client/settings/cache_settings.cpp" line="175"/>
+        <location filename="src/client/settings/cache_settings.cpp" line="187"/>
         <source>English</source>
         <translation>Français (French)</translation>
     </message>
@@ -10456,12 +11263,12 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
 <context>
     <name>main</name>
     <message>
-        <location filename="src/main.cpp" line="230"/>
+        <location filename="src/main.cpp" line="232"/>
         <source>Connect on startup</source>
         <translation>Connecter au démarrage</translation>
     </message>
     <message>
-        <location filename="src/main.cpp" line="231"/>
+        <location filename="src/main.cpp" line="233"/>
         <source>Debug to file</source>
         <translation>Débuguer dans journal</translation>
     </message>
@@ -10475,7 +11282,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     </message>
     <message>
         <location filename="src/client/settings/shortcuts_settings.h" line="50"/>
-        <location filename="src/client/settings/shortcuts_settings.h" line="756"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="770"/>
         <source>Deck Editor</source>
         <translation>Éditeur de deck</translation>
     </message>
@@ -10556,7 +11363,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     </message>
     <message>
         <location filename="src/client/settings/shortcuts_settings.h" line="84"/>
-        <location filename="src/client/settings/shortcuts_settings.h" line="765"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="779"/>
         <source>Replays</source>
         <translation>Replays</translation>
     </message>
@@ -10671,129 +11478,129 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
         <translation>Charger un deck…</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="227"/>
-        <location filename="src/client/settings/shortcuts_settings.h" line="283"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="231"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="287"/>
         <source>Load Deck from Clipboard...</source>
         <translation>Charger un deck depuis le presse-papier…</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="231"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="235"/>
         <source>Edit Deck in Clipboard, Annotated</source>
         <translation>Éditer le deck dans le presse-papier, avec annotations</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="235"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="239"/>
         <source>Edit Deck in Clipboard</source>
         <translation>Éditer le deck dans le presse-papier</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="238"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="242"/>
         <source>New Deck</source>
         <translation>Nouveau deck</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="242"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="246"/>
         <source>Open Custom Pictures Folder</source>
         <translation>Ouvrir le dossier d&apos;images personnalisées</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="245"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="249"/>
         <source>Print Deck...</source>
         <translation>Imprimer le deck…</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="248"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="252"/>
         <source>Delete Card</source>
         <translation>Supprimer la carte</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="251"/>
-        <location filename="src/client/settings/shortcuts_settings.h" line="731"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="255"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="745"/>
         <source>Reset Layout</source>
         <translation>Réinitialiser l&apos;interface</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="254"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="258"/>
         <source>Save Deck</source>
         <translation>Sauvegarder le deck</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="257"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="261"/>
         <source>Save Deck as...</source>
         <translation>Sauvegarder le deck sous…</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="261"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="265"/>
         <source>Save Deck to Clipboard, Annotated</source>
         <translation>Copier le deck annoté</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="265"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="269"/>
         <source>Save Deck to Clipboard, Annotated (No Set Info)</source>
         <translation>Copier le deck, avec annotations (sans information d&apos;extension)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="269"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="273"/>
         <source>Save Deck to Clipboard</source>
         <translation>Copier le deck</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="273"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="277"/>
         <source>Save Deck to Clipboard (No Set Info)</source>
         <translation>Copier le deck (sans information d&apos;extension)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="276"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="280"/>
         <source>Load Local Deck...</source>
         <translation>Charger un deck local…</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="279"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="283"/>
         <source>Load Remote Deck...</source>
         <translation>Charger un deck distant…</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="289"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="297"/>
         <source>Set Ready to Start</source>
         <translation>Marquer prêt à démarrer</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="293"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="301"/>
         <source>Toggle Sideboard Lock</source>
         <translation>Verrouiller / déverrouiller la réserve</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="398"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="406"/>
         <source>Add Green Counter</source>
         <translation>Ajouter un marqueur vert</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="401"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="409"/>
         <source>Remove Green Counter</source>
         <translation>Retirer un marqueur vert</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="404"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="412"/>
         <source>Set Green Counters...</source>
         <translation>Nombre de marqueurs verts…</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="389"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="397"/>
         <source>Add Red Counter</source>
         <translation>Ajouter un marqueur rouge</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="392"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="400"/>
         <source>Remove Red Counter</source>
         <translation>Retirer un marqueur rouge</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="395"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="403"/>
         <source>Set Red Counters...</source>
         <translation>Nombre de marqueurs rouges…</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="353"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="361"/>
         <source>Add Life Counter</source>
         <translation>Gagner 1 point de vie</translation>
     </message>
@@ -10803,724 +11610,744 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
         <translation>Montrer la barre de statut</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="286"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="227"/>
+        <source>Load deck from online service...</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/settings/shortcuts_settings.h" line="291"/>
+        <source>Load from website...</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/settings/shortcuts_settings.h" line="294"/>
         <source>Unload Deck</source>
         <translation>Annuler le chargement du deck</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="296"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="304"/>
         <source>Force Start</source>
         <translation>Forcer le démarrage</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="299"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="307"/>
         <source>Add Card Counter (F)</source>
         <translation>Ajouter un marqueur de carte (F)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="302"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="310"/>
         <source>Remove Card Counter (F)</source>
         <translation>Retirer un marqueur de carte (F)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="305"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="313"/>
         <source>Set Card Counters (F)...</source>
         <translation>Nombre de marqueurs de carte (F)...</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="308"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="316"/>
         <source>Add Card Counter (E)</source>
         <translation>Ajouter un marqueur de carte (E)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="311"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="319"/>
         <source>Remove Card Counter (E)</source>
         <translation>Retirer un marqueur de carte (E)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="314"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="322"/>
         <source>Set Card Counters (E)...</source>
         <translation>Nombre de marqueurs de carte (E)...</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="317"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="325"/>
         <source>Add Card Counter(D)</source>
         <translation>Ajouter un marqueur de carte (D)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="320"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="328"/>
         <source>Remove Card Counter (D)</source>
         <translation>Retirer un marqueur de carte (D)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="323"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="331"/>
         <source>Set Card Counters (D)...</source>
         <translation>Nombre de marqueurs de carte (D)...</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="326"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="334"/>
         <source>Add Card Counter (C)</source>
         <translation>Ajouter un marqueur de carte (C)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="329"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="337"/>
         <source>Remove Card Counter (C)</source>
         <translation>Retirer un marqueur de carte (C)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="332"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="340"/>
         <source>Set Card Counters (C)...</source>
         <translation>Nombre de marqueurs de carte (C)...</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="335"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="343"/>
         <source>Add Card Counter (B)</source>
         <translation>Ajouter un marqueur de carte (B)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="338"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="346"/>
         <source>Remove Card Counter (B)</source>
         <translation>Retirer un marqueur de carte (B)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="341"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="349"/>
         <source>Set Card Counters (B)...</source>
         <translation>Nombre de marqueurs de carte (B)...</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="344"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="352"/>
         <source>Add Card Counter (A)</source>
         <translation>Ajouter un marqueur de carte (A)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="347"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="355"/>
         <source>Remove Card Counter (A)</source>
         <translation>Retirer un marqueur de carte (A)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="350"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="358"/>
         <source>Set Card Counters (A)...</source>
         <translation>Nombre de marqueurs de carte (A)...</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="356"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="364"/>
         <source>Remove Life Counter</source>
         <translation>Perdre 1 point de vie</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="359"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="367"/>
         <source>Set Life Counters...</source>
         <translation>Nombre de points de vie…</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="362"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="370"/>
         <source>Add White Counter</source>
         <translation>Ajouter un marqueur blanc</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="365"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="373"/>
         <source>Remove White Counter</source>
         <translation>Retirer un marqueur blanc</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="368"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="376"/>
         <source>Set White Counters...</source>
         <translation>Nombre de marqueurs blancs…</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="371"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="379"/>
         <source>Add Blue Counter</source>
         <translation>Ajouter un marqueur bleu</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="374"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="382"/>
         <source>Remove Blue Counter</source>
         <translation>Retirer un marqueur bleu</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="377"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="385"/>
         <source>Set Blue Counters...</source>
         <translation>Nombre de marqueurs bleus…</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="380"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="388"/>
         <source>Add Black Counter</source>
         <translation>Ajouter un marqueur noir</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="383"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="391"/>
         <source>Remove Black Counter</source>
         <translation>Retirer un marqueur noir</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="386"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="394"/>
         <source>Set Black Counters...</source>
         <translation>Nombre de marqueurs noirs…</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="407"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="415"/>
         <source>Add Colorless Counter</source>
         <translation>Ajouter un marqueur incolore</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="410"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="418"/>
         <source>Remove Colorless Counter</source>
         <translation>Retirer un marqueur incolore</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="413"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="421"/>
         <source>Set Colorless Counters...</source>
         <translation>Nombre de marqueurs incolores…</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="416"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="424"/>
         <source>Add Other Counter</source>
         <translation>Ajouter un autre marqueur</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="419"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="427"/>
         <source>Remove Other Counter</source>
         <translation>Supprimer un autre marqueur</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="422"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="430"/>
         <source>Set Other Counters...</source>
         <translation>Mettre d&apos;autres compteurs...</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="426"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="434"/>
         <source>Increment all card counters</source>
         <translation>Incrémenter tous les marqueurs de la carte</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="429"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="437"/>
         <source>Add Power (+1/+0)</source>
         <translation>Augmenter la force (+1/+0)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="432"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="440"/>
         <source>Remove Power (-1/-0)</source>
         <translation>Diminuer la force (-1/-0)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="435"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="443"/>
         <source>Move Toughness to Power (+1/-1)</source>
         <translation>Endurance vers force (+1/-1)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="438"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="446"/>
         <source>Add Toughness (+0/+1)</source>
         <translation>Augmenter l&apos;endurance (+0/+1)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="441"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="449"/>
         <source>Remove Toughness (-0/-1)</source>
         <translation>Diminuer l&apos;endurance (-0/-1)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="444"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="452"/>
         <source>Move Power to Toughness (-1/+1)</source>
         <translation>Force vers endurance (-1/+1)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="447"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="455"/>
         <source>Add Power and Toughness (+1/+1)</source>
         <translation>Augmenter la force et l&apos;endurance (+1/+1)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="450"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="458"/>
         <source>Remove Power and Toughness (-1/-1)</source>
         <translation>Diminuer la force et l&apos;endurance (-1/-1)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="453"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="461"/>
         <source>Set Power and Toughness...</source>
         <translation>Changer la force et l&apos;endurance…</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="456"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="464"/>
         <source>Reset Power and Toughness</source>
         <translation>Réinitialiser la force et l&apos;endurance</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="459"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="467"/>
         <source>Untap</source>
         <translation>Dégager</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="463"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="471"/>
         <source>Upkeep</source>
         <translation>Entretien</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="465"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="473"/>
         <source>Draw</source>
         <translation>Piocher</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="466"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="474"/>
         <source>First Main Phase</source>
         <translation>Première phase principale</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="469"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="477"/>
         <source>Start Combat</source>
         <translation>Début de combat</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="473"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="481"/>
         <source>Attack</source>
         <translation>Attaquer</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="475"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="483"/>
         <source>Block</source>
         <translation>Bloquer</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="477"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="485"/>
         <source>Damage</source>
         <translation>Blessures</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="478"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="486"/>
         <source>End Combat</source>
         <translation>Fin de combat</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="481"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="489"/>
         <source>Second Main Phase</source>
         <translation>Seconde phase principale</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="485"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="493"/>
         <source>End</source>
         <translation>Fin</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="486"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="494"/>
         <source>Next Phase</source>
         <translation>Phase suivante</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="489"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="497"/>
         <source>Next Phase Action</source>
         <translation>Étape suivante avec action</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="492"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="500"/>
         <source>Next Turn</source>
         <translation>Tour suivant</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="495"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="503"/>
         <source>Hide Card in Reveal Window</source>
         <translation>Cache la carte dans la fenêtre Révéler</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="498"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="506"/>
         <source>Tap / Untap Card</source>
         <translation>Engage / dégager la carte</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="501"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="509"/>
         <source>Untap All</source>
         <translation>Tout dégager</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="504"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="512"/>
         <source>Toggle Skip Untapping</source>
         <oldsource>Toggle Untap</oldsource>
-        <translation type="unfinished"/>
+        <translation>Activer / désactiver le désengagment</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="507"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="515"/>
         <source>Turn Card Over</source>
         <translation>Retourner la carte</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="510"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="518"/>
         <source>Peek Card</source>
         <translation>Regarder la carte</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="513"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="521"/>
         <source>Play Card</source>
         <translation>Jouer la carte</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="516"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="524"/>
         <source>Play Card, Face Down</source>
-        <translation type="unfinished"/>
+        <translation>Jouer la carte, face cachée</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="519"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="527"/>
         <source>Attach Card...</source>
         <translation>Attacher la carte…</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="522"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="530"/>
         <source>Unattach Card</source>
         <translation>Détacher la carte</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="525"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="533"/>
         <source>Clone Card</source>
         <translation>Cloner la carte</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="528"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="536"/>
         <source>Create Token...</source>
         <translation>Créer un jeton…</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="531"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="539"/>
         <source>Create All Related Tokens</source>
         <translation>Créer tous les jetons associés</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="534"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="542"/>
         <source>Create Another Token</source>
         <translation>Créer un autre jeton</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="537"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="545"/>
         <source>Set Annotation...</source>
         <translation>Annoter…</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="540"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="548"/>
+        <source>Reduce Life by Power</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/settings/shortcuts_settings.h" line="551"/>
         <source>Select All Cards in Zone</source>
         <translation>Sélectionne toutes les cartes dans la zone</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="543"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="554"/>
         <source>Select All Cards in Row</source>
         <translation>Sélectionne toutes les cartes dans la ligne</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="546"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="557"/>
         <source>Select All Cards in Column</source>
         <translation>Sélectionne toutes les cartes dans la colonne</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="549"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="560"/>
         <source>Reveal Selected Cards to All Players</source>
-        <translation type="unfinished"/>
+        <translation>Révéler les cartes sélectionnées à tous les joueurs</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="552"/>
-        <location filename="src/client/settings/shortcuts_settings.h" line="617"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="563"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="628"/>
         <source>Bottom of Library</source>
         <translation>Dessous de la bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="555"/>
-        <location filename="src/client/settings/shortcuts_settings.h" line="576"/>
-        <location filename="src/client/settings/shortcuts_settings.h" line="606"/>
-        <location filename="src/client/settings/shortcuts_settings.h" line="636"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="566"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="587"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="617"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="647"/>
         <source>Exile</source>
         <translation>Exil</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="558"/>
-        <location filename="src/client/settings/shortcuts_settings.h" line="572"/>
-        <location filename="src/client/settings/shortcuts_settings.h" line="595"/>
-        <location filename="src/client/settings/shortcuts_settings.h" line="625"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="569"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="583"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="606"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="636"/>
         <source>Graveyard</source>
         <translation>Cimetière</translation>
     </message>
     <message>
         <location filename="src/client/settings/shortcuts_settings.h" line="76"/>
-        <location filename="src/client/settings/shortcuts_settings.h" line="562"/>
-        <location filename="src/client/settings/shortcuts_settings.h" line="570"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="573"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="581"/>
         <source>Hand</source>
         <translation>Main</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="563"/>
-        <location filename="src/client/settings/shortcuts_settings.h" line="644"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="574"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="655"/>
         <source>Top of Library</source>
         <translation>Dessus de la bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="592"/>
-        <location filename="src/client/settings/shortcuts_settings.h" line="622"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="603"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="633"/>
         <source>Battlefield, Face Down</source>
         <translation>Champ de bataille, face cachée</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="566"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="577"/>
         <source>Battlefield</source>
         <translation>Champ de bataille</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="574"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="585"/>
         <source>Library</source>
         <translation>Bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="577"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="588"/>
         <source>Sideboard</source>
         <translation>Réserve</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="580"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="591"/>
         <source>Top Cards of Library</source>
         <translation>Cartes du dessus de la bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="583"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="594"/>
         <source>Bottom Cards of Library</source>
         <translation>Cartes du dessous de la bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="586"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="597"/>
         <source>Close Recent View</source>
         <translation>Fermer la vue récente</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="589"/>
-        <location filename="src/client/settings/shortcuts_settings.h" line="621"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="600"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="632"/>
         <source>Stack</source>
         <translation>Pile</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="598"/>
-        <location filename="src/client/settings/shortcuts_settings.h" line="628"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="609"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="639"/>
         <source>Graveyard (Multiple)</source>
         <translation>Cimetière (plusieurs)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="602"/>
-        <location filename="src/client/settings/shortcuts_settings.h" line="632"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="613"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="643"/>
         <source>Graveyard (Multiple), Face Down</source>
-        <translation type="unfinished"/>
+        <translation>Cimetière (plusieurs), faces cachées</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="607"/>
-        <location filename="src/client/settings/shortcuts_settings.h" line="637"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="618"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="648"/>
         <source>Exile (Multiple)</source>
         <translation>Exil (plusieurs)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="611"/>
-        <location filename="src/client/settings/shortcuts_settings.h" line="641"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="622"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="652"/>
         <source>Exile (Multiple), Face Down</source>
-        <translation type="unfinished"/>
+        <translation>Exiler(plusieurs), faces cachées</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="614"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="625"/>
         <source>Stack Until Found</source>
         <translation>Empiler jusqu&apos;à ce que trouvé</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="647"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="658"/>
         <source>Draw Bottom Card</source>
         <translation>Piocher la carte du dessous </translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="650"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="661"/>
         <source>Draw Multiple Cards from Bottom...</source>
         <translation>Piocher plusieurs cartes du dessous...</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="653"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="664"/>
         <source>Draw Arrow...</source>
         <translation>Tracer une flèche…</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="656"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="667"/>
         <source>Remove Local Arrows</source>
         <translation>Retirer les flèches locales</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="659"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="670"/>
         <source>Leave Game</source>
         <translation>Quitter la partie</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="663"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="674"/>
         <source>Concede</source>
         <translation>Concéder</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="664"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="675"/>
         <source>Roll Dice...</source>
         <translation>Lancer un dé…</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="667"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="678"/>
+        <source>Flip Coin</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/client/settings/shortcuts_settings.h" line="681"/>
         <source>Shuffle Library</source>
         <translation>Mélanger la bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="670"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="684"/>
         <source>Shuffle Top Cards of Library</source>
         <translation>Mélanger les cartes du dessus de la bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="673"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="687"/>
         <source>Shuffle Bottom Cards of Library</source>
         <translation>Mélanger les cartes du dessous de la bibliothèque</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="676"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="690"/>
         <source>Mulligan</source>
         <translation>Mulligan</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="679"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="693"/>
         <source>Mulligan (Same hand size)</source>
-        <translation type="unfinished"/>
+        <translation>Mulligan (Même nombre de cartes)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="682"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="696"/>
         <source>Mulligan (Hand size - 1)</source>
-        <translation type="unfinished"/>
+        <translation>Mulligan (-1 carte)</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="685"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="699"/>
         <source>Draw a Card</source>
         <translation>Piocher une carte</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="688"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="702"/>
         <source>Draw Multiple Cards...</source>
         <translation>Piocher plusieurs cartes…</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="691"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="705"/>
         <source>Undo Draw</source>
         <translation>Annuler la dernière pioche</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="694"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="708"/>
         <source>Always Reveal Top Card</source>
         <translation>Toujours révéler la carte du dessus</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="697"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="711"/>
         <source>Always Look At Top Card</source>
         <translation>Toujours révéler la carte du dessus</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="700"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="714"/>
         <source>Sort Hand by Name</source>
-        <translation type="unfinished"/>
+        <translation>Trier la main par nom</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="703"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="717"/>
         <source>Sort Hand by Type</source>
-        <translation type="unfinished"/>
+        <translation>Trier la main par type</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="706"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="720"/>
         <source>Sort Hand by Mana Value</source>
-        <translation type="unfinished"/>
+        <translation>Trier la main par Valeur de Mana</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="709"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="723"/>
         <source>Reveal Hand to All Players</source>
-        <translation type="unfinished"/>
+        <translation>Révéler la main à tous les joueurs</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="713"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="727"/>
         <source>Reveal Random Card to All Players</source>
-        <translation type="unfinished"/>
+        <translation>Révéler une carte aléatoire à tous les joueurs</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="716"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="730"/>
         <source>Rotate View Clockwise</source>
         <translation>Pivoter la vue dans le sens horaire</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="719"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="733"/>
         <source>Rotate View Counterclockwise</source>
         <translation>Pivoter la vue dans le sens anti-horaire</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="722"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="736"/>
         <source>Unfocus Text Box</source>
         <translation>Lâcher le focus de la boîte de texte</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="725"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="739"/>
         <source>Focus Chat</source>
         <translation>Focus sur le chat</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="728"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="742"/>
         <source>Clear Chat</source>
         <translation>Effacer le chat</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="734"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="748"/>
         <source>Refresh</source>
         <translation>Rafraichir</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="737"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="751"/>
         <source>Skip Forward</source>
         <translation>Avance en avant</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="740"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="754"/>
         <source>Skip Backward</source>
         <translation>Avant en arrière</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="743"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="757"/>
         <source>Skip Forward by a lot</source>
         <translation>Avance beaucoup en avant</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="746"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="760"/>
         <source>Skip Backward by a lot</source>
         <translation>Avance beaucoup en arrière</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="749"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="763"/>
         <source>Play/Pause</source>
         <translation>Jouer/Pause</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="752"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="766"/>
         <source>Toggle Fast Forward</source>
         <translation>Activer l&apos;avance rapide</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="758"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="772"/>
         <source>Home</source>
         <translation>Accueil</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="759"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="773"/>
         <source>Visual Deck Storage</source>
         <translation>Stockage visuel de deck</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="763"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="777"/>
         <source>Deck Storage</source>
         <translation>Stockage de deck</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="767"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="781"/>
         <source>Server</source>
         <translation>Serveur</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="769"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="783"/>
         <source>Account</source>
         <translation>Compte</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="770"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="784"/>
         <source>Administration</source>
         <translation>Administration</translation>
     </message>
     <message>
-        <location filename="src/client/settings/shortcuts_settings.h" line="774"/>
+        <location filename="src/client/settings/shortcuts_settings.h" line="788"/>
         <source>Logs</source>
         <translation>Journaux</translation>
     </message>

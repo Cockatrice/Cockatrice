@@ -3,10 +3,14 @@
 #include "settings_manager.h"
 
 const QStringList DownloadSettings::DEFAULT_DOWNLOAD_URLS = {
-    "https://api.scryfall.com/cards/!set:uuid!?format=image&face=!prop:side!",
-    "https://api.scryfall.com/cards/multiverse/!set:muid!?format=image",
+    "https://cards.scryfall.io/large/!prop:side!/!set:uuid_substr_0_1!/!set:uuid_substr_1_1!/!set:uuid!.jpg",
+    "https://api.scryfall.com/cards/!set:uuid!?format=image&face=!prop:side!&lang=!sflang!",
+    "https://api.scryfall.com/cards/multiverse/!set:muid!?format=image&lang=!sflang!",
     "https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!set:muid!&type=card",
     "https://gatherer.wizards.com/Handlers/Image.ashx?name=!name!&type=card"};
+
+const QString DownloadSettings::SCRYFALL_NAMED_LOCALIZED_URL =
+    "https://api.scryfall.com/cards/named?fuzzy=!localizedName!&lang=!sflang!&format=image&face=!prop:side!";
 
 DownloadSettings::DownloadSettings(const QString &settingPath, QObject *parent = nullptr)
     : SettingsManager(settingPath + "downloads.ini", "downloads", QString(), parent)
@@ -26,4 +30,38 @@ QStringList DownloadSettings::getAllURLs() const
 void DownloadSettings::resetToDefaultURLs()
 {
     setValue(QVariant::fromValue(DEFAULT_DOWNLOAD_URLS), "urls");
+}
+
+bool DownloadSettings::addLocalizedScryfallUrl()
+{
+    const QStringList urls = getAllURLs();
+    if (urls.contains(SCRYFALL_NAMED_LOCALIZED_URL)) {
+        return false;
+    }
+    QStringList updated = urls;
+    updated.prepend(SCRYFALL_NAMED_LOCALIZED_URL);
+    setDownloadUrls(updated);
+    return true;
+}
+
+bool DownloadSettings::getPicDownload() const
+{
+    return getValue("pictureDownload", QString(), QString(), true).toBool();
+}
+
+void DownloadSettings::setPicDownload(bool _picDownload)
+{
+    setValue(_picDownload, "pictureDownload");
+    emit picDownloadChanged();
+}
+
+bool DownloadSettings::getDownloadSpoilersStatus() const
+{
+    return getValue("downloadSpoilers", QString(), QString(), false).toBool();
+}
+
+void DownloadSettings::setDownloadSpoilerStatus(bool _spoilerStatus)
+{
+    setValue(_spoilerStatus, "downloadSpoilers");
+    emit downloadSpoilerStatusChanged();
 }

@@ -1,6 +1,7 @@
 #include "deck_list.h"
 
 #include "deck_list_memento.h"
+#include "deck_list_plain_text_parser.h"
 #include "tree/abstract_deck_list_node.h"
 #include "tree/deck_list_card_node.h"
 #include "tree/inner_deck_list_node.h"
@@ -8,24 +9,136 @@
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QFile>
-#include <QRegularExpression>
 #include <QSet>
 #include <QTextStream>
 #include <algorithm>
 
-#if QT_VERSION < 0x050600
-// qHash on QRegularExpression was added in 5.6, FIX IT
-uint qHash(const QRegularExpression &key, uint seed) noexcept
-{
-    return qHash(key.pattern(), seed); // call qHash on pattern QString instead
-}
-#endif
-
 static const QString CURRENT_SIDEBOARD_PLAN_KEY = "";
+
+/**
+ * @brief Parses a floating point XML attribute into a clamped playmat parameter.
+ *
+ * Falls back to @p fallback when the attribute is missing or malformed, so
+ * malformed deck files cannot produce degenerate art rectangles (e.g. a zoom
+ * of 0 dividing by zero).
+ *
+ * @param valueString Raw attribute text.
+ * @param fallback Value used when the text cannot be parsed.
+ * @param min Lower clamp bound.
+ * @param max Upper clamp bound.
+ * @return The parsed value clamped to [min, max], or @p fallback.
+ */
+static double parseClampedParam(const QString &valueString, double fallback, double min, double max)
+{
+    bool ok = false;
+    const double value = valueString.toDouble(&ok);
+    if (!ok) {
+        return fallback;
+    }
+    return qBound(min, value, max);
+}
+
+/**
+ * @brief Reads a `bannerCard` element from the XML stream.
+ *
+ * @param xml Reader positioned at the element.
+ * @return The referenced card.
+ */
+static CardRef readBannerCard(QXmlStreamReader *xml)
+{
+    QString providerId = xml->attributes().value("providerId").toString();
+    QString cardName = xml->readElementText();
+    return {cardName, providerId};
+}
+
+/**
+ * @brief Reads a `playmatCard` element from the XML stream.
+ *
+ * Attribute values are read before readElementText consumes the element, and
+ * the params are clamped to the same ranges as the settings dialog and the
+ * remote player-properties path so malformed deck files cannot produce
+ * degenerate art rectangles (e.g. a zoom of 0 dividing by zero).
+ *
+ * @param xml Reader positioned at the element.
+ * @return The referenced card plus its clamped positioning parameters.
+ */
+static PlaymatInfo readPlaymatCard(QXmlStreamReader *xml)
+{
+    QString providerId = xml->attributes().value("providerId").toString();
+    QString marginLStr = xml->attributes().value("marginPctL").toString();
+    QString marginRStr = xml->attributes().value("marginPctR").toString();
+    QString vOffStr = xml->attributes().value("verticalOffset").toString();
+    QString zoomStr = xml->attributes().value("zoom").toString();
+    QString cardName = xml->readElementText();
+
+    return {
+        .card = {cardName, providerId},
+        .params = {.marginPctL = parseClampedParam(marginLStr, 0.07, 0.0, 0.95),
+                   .marginPctR = parseClampedParam(marginRStr, 0.07, 0.0, 0.95),
+                   .verticalOffset = parseClampedParam(vOffStr, 0.33, 0.0, 1.0),
+                   .zoom = parseClampedParam(zoomStr, 1.0, 0.1, 4.0)},
+    };
+}
 
 bool DeckList::Metadata::isEmpty() const
 {
-    return name.isEmpty() && comments.isEmpty() && bannerCard.isEmpty() && tags.isEmpty();
+    return name.isEmpty() && comments.isEmpty() && bannerCard.isEmpty() && tags.isEmpty() && playmat.card.isEmpty();
+}
+
+bool DeckList::Metadata::readElement(QXmlStreamReader *xml, const QString &childName)
+{
+    if (childName == "lastLoadedTimestamp") {
+        lastLoadedTimestamp = xml->readElementText();
+    } else if (childName == "deckname") {
+        name = xml->readElementText();
+    } else if (childName == "format") {
+        gameFormat = xml->readElementText();
+    } else if (childName == "comments") {
+        comments = xml->readElementText();
+    } else if (childName == "bannerCard") {
+        bannerCard = readBannerCard(xml);
+    } else if (childName == "playmatCard") {
+        playmat = readPlaymatCard(xml);
+    } else if (childName == "tags") {
+        tags.clear(); // Clear existing tags
+        while (xml->readNextStartElement()) {
+            if (xml->name().toString() == "tag") {
+                tags.append(xml->readElementText());
+            }
+        }
+    } else {
+        return false;
+    }
+    return true;
+}
+
+void DeckList::Metadata::write(QXmlStreamWriter *xml) const
+{
+    xml->writeTextElement("lastLoadedTimestamp", lastLoadedTimestamp);
+    xml->writeTextElement("deckname", name);
+    xml->writeTextElement("format", gameFormat);
+    xml->writeStartElement("bannerCard");
+    xml->writeAttribute("providerId", bannerCard.providerId);
+    xml->writeCharacters(bannerCard.name);
+    xml->writeEndElement();
+    if (!playmat.card.isEmpty()) {
+        xml->writeStartElement("playmatCard");
+        xml->writeAttribute("providerId", playmat.card.providerId);
+        xml->writeAttribute("marginPctL", QString::number(playmat.params.marginPctL, 'f', 4));
+        xml->writeAttribute("marginPctR", QString::number(playmat.params.marginPctR, 'f', 4));
+        xml->writeAttribute("verticalOffset", QString::number(playmat.params.verticalOffset, 'f', 4));
+        xml->writeAttribute("zoom", QString::number(playmat.params.zoom, 'f', 4));
+        xml->writeCharacters(playmat.card.name);
+        xml->writeEndElement();
+    }
+    xml->writeTextElement("comments", comments);
+
+    // Write tags
+    xml->writeStartElement("tags");
+    for (const QString &tag : tags) {
+        xml->writeTextElement("tag", tag);
+    }
+    xml->writeEndElement();
 }
 
 DeckList::DeckList()
@@ -62,26 +175,10 @@ bool DeckList::readElement(QXmlStreamReader *xml)
 {
     const QString childName = xml->name().toString();
     if (xml->isStartElement()) {
-        if (childName == "lastLoadedTimestamp") {
-            metadata.lastLoadedTimestamp = xml->readElementText();
-        } else if (childName == "deckname") {
-            metadata.name = xml->readElementText();
-        } else if (childName == "format") {
-            metadata.gameFormat = xml->readElementText();
-        } else if (childName == "comments") {
-            metadata.comments = xml->readElementText();
-        } else if (childName == "bannerCard") {
-            QString providerId = xml->attributes().value("providerId").toString();
-            QString cardName = xml->readElementText();
-            metadata.bannerCard = {cardName, providerId};
-        } else if (childName == "tags") {
-            metadata.tags.clear(); // Clear existing tags
-            while (xml->readNextStartElement()) {
-                if (xml->name().toString() == "tag") {
-                    metadata.tags.append(xml->readElementText());
-                }
-            }
-        } else if (childName == "zone") {
+        if (metadata.readElement(xml, childName)) {
+            return true;
+        }
+        if (childName == "zone") {
             tree.readZoneElement(xml);
         } else if (childName == "sideboard_plan") {
             SideboardPlan newSideboardPlan;
@@ -95,31 +192,12 @@ bool DeckList::readElement(QXmlStreamReader *xml)
     return true;
 }
 
-static void writeMetadata(QXmlStreamWriter *xml, const DeckList::Metadata &metadata)
-{
-    xml->writeTextElement("lastLoadedTimestamp", metadata.lastLoadedTimestamp);
-    xml->writeTextElement("deckname", metadata.name);
-    xml->writeTextElement("format", metadata.gameFormat);
-    xml->writeStartElement("bannerCard");
-    xml->writeAttribute("providerId", metadata.bannerCard.providerId);
-    xml->writeCharacters(metadata.bannerCard.name);
-    xml->writeEndElement();
-    xml->writeTextElement("comments", metadata.comments);
-
-    // Write tags
-    xml->writeStartElement("tags");
-    for (const QString &tag : metadata.tags) {
-        xml->writeTextElement("tag", tag);
-    }
-    xml->writeEndElement();
-}
-
 void DeckList::write(QXmlStreamWriter *xml) const
 {
     xml->writeStartElement("cockatrice_deck");
     xml->writeAttribute("version", "1");
 
-    writeMetadata(xml, metadata);
+    metadata.write(xml);
 
     // Write zones
     tree.write(xml);
@@ -132,6 +210,27 @@ void DeckList::write(QXmlStreamWriter *xml) const
     xml->writeEndElement(); // Close "cockatrice_deck"
 }
 
+bool DeckList::seekToNextElement(QXmlStreamReader *xml)
+{
+    while (!xml->atEnd()) {
+        xml->readNext();
+        if (xml->isStartElement()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void DeckList::readDeckBody(QXmlStreamReader *xml)
+{
+    while (!xml->atEnd()) {
+        xml->readNext();
+        if (!readElement(xml)) {
+            break;
+        }
+    }
+}
+
 bool DeckList::loadFromXml(QXmlStreamReader *xml)
 {
     if (xml->error()) {
@@ -140,19 +239,11 @@ bool DeckList::loadFromXml(QXmlStreamReader *xml)
     }
 
     cleanList();
-    while (!xml->atEnd()) {
-        xml->readNext();
-        if (xml->isStartElement()) {
-            if (xml->name().toString() != "cockatrice_deck") {
-                return false;
-            }
-            while (!xml->atEnd()) {
-                xml->readNext();
-                if (!readElement(xml)) {
-                    break;
-                }
-            }
+    while (seekToNextElement(xml)) {
+        if (xml->name().toString() != "cockatrice_deck") {
+            return false;
         }
+        readDeckBody(xml);
     }
     refreshDeckHash();
     if (xml->error()) {
@@ -208,160 +299,12 @@ bool DeckList::loadFromStream_Plain(QTextStream &in,
                                     bool preserveMetadata,
                                     const std::function<QString(const QString &)> &cardNameNormalizer)
 {
-    const QRegularExpression reCardLine(R"(^\s*[\w\[\(\{].*$)", QRegularExpression::UseUnicodePropertiesOption);
-    const QRegularExpression reEmpty("^\\s*$");
-    const QRegularExpression reComment(R"([\w\[\(\{].*$)", QRegularExpression::UseUnicodePropertiesOption);
-    const QRegularExpression reSBMark("^\\s*sb:\\s*(.+)", QRegularExpression::CaseInsensitiveOption);
-    const QRegularExpression reSBComment("^sideboard\\b.*$", QRegularExpression::CaseInsensitiveOption);
-    const QRegularExpression reDeckComment("^((main)?deck(list)?|mainboard)\\b",
-                                           QRegularExpression::CaseInsensitiveOption);
-
-    // Regex for advanced card parsing
-    const QRegularExpression reMultiplier(R"(^[xX\(\[]*(\d+)[xX\*\)\]]* ?(.+))");
-
-    // Regex for extracting set code and collector number with attached symbols
-    const QRegularExpression reHyphenFormat(R"(\((\w{3,})\)\s+(\w{3,})-(\d+[^\w\s]*))");
-    const QRegularExpression reRegularFormat(R"(\((\w{3,})\)\s+(\d+[^\w\s]*))");
-
-    cleanList(preserveMetadata);
-
-    auto inputs = in.readAll().trimmed().split('\n');
-    auto max_line = inputs.size();
-
-    // Start at the first empty line before the first card line
-    auto deckStart = inputs.indexOf(reCardLine);
-    if (deckStart == -1) {
-        if (inputs.indexOf(reComment) == -1) {
-            return false; // Input is empty
-        }
-        deckStart = max_line;
-    } else {
-        deckStart = inputs.lastIndexOf(reEmpty, deckStart);
-        if (deckStart == -1) {
-            deckStart = 0;
-        }
+    if (!preserveMetadata) {
+        metadata = {};
     }
-
-    // find sideboard position, if marks are used this won't be needed
-    int sBStart = -1;
-    if (inputs.indexOf(reSBMark, deckStart) == -1) {
-        sBStart = inputs.indexOf(reSBComment, deckStart);
-        if (sBStart == -1) {
-            sBStart = inputs.indexOf(reEmpty, deckStart + 1);
-            if (sBStart == -1) {
-                sBStart = max_line;
-            }
-            auto nextCard = inputs.indexOf(reCardLine, sBStart + 1);
-            if (inputs.indexOf(reEmpty, nextCard + 1) != -1) {
-                sBStart = max_line;
-            }
-        }
-    }
-
-    int index = 0;
-    QRegularExpressionMatch match;
-
-    // Parse name and comments
-    while (index < deckStart) {
-        const auto &current = inputs.at(index++);
-        if (!current.contains(reEmpty)) {
-            match = reComment.match(current);
-            metadata.name = match.captured();
-            break;
-        }
-    }
-    while (index < deckStart) {
-        const auto &current = inputs.at(index++);
-        if (!current.contains(reEmpty)) {
-            match = reComment.match(current);
-            metadata.comments += match.captured() + '\n';
-        }
-    }
-    metadata.comments.chop(1);
-
-    // Discard empty lines
-    while (index < max_line && inputs.at(index).contains(reEmpty)) {
-        ++index;
-    }
-
-    // Discard line if it starts with deck or mainboard, all cards until the sideboard starts are in the mainboard
-    if (inputs.at(index).contains(reDeckComment)) {
-        ++index;
-    }
-
-    // Parse decklist
-    for (; index < max_line; ++index) {
-        // check if line is a card
-        match = reCardLine.match(inputs.at(index));
-        if (!match.hasMatch()) {
-            continue;
-        }
-
-        QString cardName = match.captured().simplified();
-        bool sideboard = false;
-
-        // Sideboard detection
-        if (sBStart < 0) {
-            match = reSBMark.match(cardName);
-            if (match.hasMatch()) {
-                sideboard = true;
-                cardName = match.captured(1);
-            }
-        } else {
-            if (index == sBStart) {
-                continue;
-            }
-            sideboard = index > sBStart;
-        }
-
-        // Extract set code, collector number, and foil
-        QString setCode;
-        QString collectorNumber;
-        bool isFoil = false;
-
-        // Check for foil status at the end of the card name
-        if (cardName.endsWith("*F*", Qt::CaseInsensitive)) {
-            isFoil = true;
-            cardName.chop(3); // Remove the "*F*" from the card name
-        }
-        Q_UNUSED(isFoil);
-
-        // Attempt to match the hyphen-separated format (PLST-2094)
-        match = reHyphenFormat.match(cardName);
-        if (match.hasMatch()) {
-            setCode = match.captured(2).toUpper();
-            collectorNumber = match.captured(3);
-            cardName = cardName.left(match.capturedStart()).trimmed();
-        } else {
-            // Attempt to match the regular format (PLST) 2094
-            match = reRegularFormat.match(cardName);
-            if (match.hasMatch()) {
-                setCode = match.captured(1).toUpper();
-                collectorNumber = match.captured(2);
-                cardName = cardName.left(match.capturedStart()).trimmed();
-            }
-        }
-
-        // check if a specific amount is mentioned
-        int amount = 1;
-        match = reMultiplier.match(cardName);
-        if (match.hasMatch()) {
-            amount = match.captured(1).toInt();
-            cardName = match.captured(2);
-        }
-
-        // Normalize the card name
-        cardName = cardNameNormalizer(cardName);
-
-        // Determine the zone (mainboard/sideboard)
-        QString zoneName = sideboard ? DECK_ZONE_SIDE : DECK_ZONE_MAIN;
-
-        // make new entry in decklist
-        tree.addCard(cardName, amount, zoneName, -1, setCode, collectorNumber);
-    }
-
+    bool ok = DeckListPlainText::parse(in, cardNameNormalizer, metadata, tree);
     refreshDeckHash();
-    return true;
+    return ok;
 }
 
 bool DeckList::loadFromFile_Plain(QIODevice *device, const std::function<QString(const QString &)> &cardNameNormalizer)
@@ -373,6 +316,10 @@ bool DeckList::loadFromFile_Plain(QIODevice *device, const std::function<QString
 bool DeckList::saveToStream_Plain(QTextStream &stream, bool prefixSideboardCards, bool slashTappedOutSplitCards) const
 {
     auto writeToStream = [&stream, prefixSideboardCards, slashTappedOutSplitCards](const auto node, const auto card) {
+        // The maybeboard is scratch space and never exported.
+        if (node->getName() == DECK_ZONE_MAYBEBOARD) {
+            return;
+        }
         if (prefixSideboardCards && node->getName() == DECK_ZONE_SIDE) {
             stream << "SB: ";
         }

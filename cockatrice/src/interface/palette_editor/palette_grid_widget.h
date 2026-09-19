@@ -22,12 +22,16 @@ public:
     void loadPalette(const PaletteConfig &cfg);
     PaletteConfig currentPaletteConfig() const;
 
+signals:
+    void paletteChanged();
+
 private:
     void buildGrid(QWidget *host);
     void changeEvent(QEvent *e);
     void refreshChromePalettes();
 
     QMap<QPalette::ColorGroup, QMap<QPalette::ColorRole, ColorButton *>> colorButtons;
+    QMap<AppColor::Role, ColorButton *> appColorButtons;
     QScrollArea *scroll;
     QWidget *gridHost;
     QVBoxLayout *layout;

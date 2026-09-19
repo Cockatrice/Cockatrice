@@ -5,6 +5,7 @@
 
 #include <QPainterPath>
 #include <QStylePainter>
+#include <libcockatrice/settings/cards_display_settings.h>
 
 /**
  * @brief Constructs a CardPictureEnlargedWidget.
@@ -17,11 +18,12 @@ CardInfoPictureEnlargedWidget::CardInfoPictureEnlargedWidget(QWidget *parent) : 
     setWindowFlags(Qt::ToolTip); // Keeps this widget on top of everything
     setAttribute(Qt::WA_TranslucentBackground);
 
-    connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
-        Q_UNUSED(_roundCardCorners);
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::roundCardCornersChanged, this,
+            [this](bool _roundCardCorners) {
+                Q_UNUSED(_roundCardCorners);
 
-        update();
-    });
+                update();
+            });
 }
 
 /**
@@ -50,11 +52,28 @@ void CardInfoPictureEnlargedWidget::loadPixmap(const QSize &size)
  * @param size The desired size for the pixmap.
  *
  * Sets the widget's pixmap to the card image and resizes the widget to match the specified size. Triggers a repaint.
+ *
+ * When the image is not yet cached, the pixmap is cleared (instead of showing a stale previous card) and the widget
+ * refreshes automatically once the card image finishes loading.
  */
 void CardInfoPictureEnlargedWidget::setCardPixmap(const ExactCard &_card, const QSize size)
 {
+    if (card.getCardPtr()) {
+        disconnect(card.getCardPtr().data(), nullptr, this, nullptr);
+    }
+
     card = _card;
+
+    // Clear any previous card's art so we never paint a stale pixmap while the new image loads
+    enlargedPixmap = QPixmap();
     loadPixmap(size);
+
+    if (card.getCardPtr()) {
+        connect(card.getCardPtr().data(), &CardInfo::pixmapUpdated, this, [this]() {
+            loadPixmap(this->size());
+            update();
+        });
+    }
 
     setFixedSize(size); // Set the widget size to the enlarged size
 
@@ -99,7 +118,8 @@ void CardInfoPictureEnlargedWidget::paintEvent(QPaintEvent *event)
     QPoint topLeft{(width() - scaledLogicalSize.width()) / 2, (height() - scaledLogicalSize.height()) / 2};
 
     // Rounded corner radius based on logical width
-    qreal radius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * scaledLogicalSize.width() : 0.0;
+    qreal radius =
+        SettingsCache::instance().cardsDisplay().getRoundCardCorners() ? 0.05 * scaledLogicalSize.width() : 0.0;
 
     QStylePainter painter(this);
     // Fill the background with transparent color to ensure rounded corners are rendered properly

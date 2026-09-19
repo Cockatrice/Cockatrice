@@ -8,7 +8,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/utility/string_limits.h>
 
 DlgEditAvatar::DlgEditAvatar(QWidget *parent) : QDialog(parent), image()
 {

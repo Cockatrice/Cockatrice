@@ -134,7 +134,7 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
         // If there's no need to update, tell them that. However we still allow them to run the
         // downloader themselves if there's a compatible build
         QMessageBox::information(
-            this, tr("No Update Available"),
+            window(), tr("No Update Available"),
             tr("Cockatrice is up to date!") + "<br><br>" +
                 tr("You are already running the latest version available in the chosen release channel.") + "<br>" +
                 "<b>" + tr("Current version") + QString(":</b> %1<br>").arg(VERSION_STRING) + "<b>" +
@@ -147,7 +147,7 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
     if (isCompatible) {
         int reply;
         reply = QMessageBox::question(
-            this, tr("Update Available"),
+            window(), tr("Update Available"),
             tr("A new version of Cockatrice is available!") + "<br><br>" + "<b>" + tr("New version") +
                 QString(":</b> %1<br>").arg(release->getName()) + "<b>" + tr("Released") +
                 QString(":</b> %1 (<a href=\"%2\">").arg(publishDate, release->getDescriptionUrl()) + tr("Changelog") +
@@ -156,10 +156,12 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
 
         if (reply == QMessageBox::Yes) {
             downloadUpdate(release->getName());
+        } else {
+            closeDialog();
         }
     } else {
         QMessageBox::information(
-            this, tr("Update Available"),
+            window(), tr("Update Available"),
             tr("A new version of Cockatrice is available!") + "<br><br>" + "<b>" + tr("New version") +
                 QString(":</b> %1<br>").arg(release->getName()) + "<b>" + tr("Released") +
                 QString(":</b> %1 (<a href=\"%2\">").arg(publishDate, release->getDescriptionUrl()) + tr("Changelog") +

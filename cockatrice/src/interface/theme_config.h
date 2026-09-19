@@ -3,8 +3,24 @@
 
 #include <QColor>
 #include <QMap>
+#include <QObject>
 #include <QPalette>
 #include <QString>
+
+// Application-specific color roles, layered on top of the fixed QPalette role
+// set. Stored in the same palette-<scheme>.toml under an [AppColors] section
+// and editable from the palette editor, so theme authors can control colors
+// beyond what Qt's palette can express.
+namespace AppColor
+{
+Q_NAMESPACE
+enum Role
+{
+    AccentStrong,
+    AccentSoft,
+};
+Q_ENUM_NS(Role)
+} // namespace AppColor
 
 struct ThemeConfig
 {
@@ -21,7 +37,16 @@ struct ThemeConfig
 struct PaletteConfig
 {
     QMap<QPalette::ColorGroup, QMap<QPalette::ColorRole, QColor>> colors;
+    QMap<AppColor::Role, QColor> appColors;
 
+    bool operator==(const PaletteConfig &rhs) const
+    {
+        return colors == rhs.colors && appColors == rhs.appColors;
+    }
+    bool operator!=(const PaletteConfig &rhs) const
+    {
+        return !(*this == rhs);
+    }
     bool hasPalette() const;
     QString toToml() const;
 

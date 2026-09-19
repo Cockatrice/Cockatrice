@@ -21,11 +21,16 @@
 #define SERVERGAME_H
 
 #include "../server_response_containers.h"
+#include "game_config.h"
+#include "server_deck_validation_strategy.h"
+#include "server_game_lifecycle_strategy.h"
+#include "server_match_result_strategy.h"
 
 #include <QDateTime>
 #include <QMap>
 #include <QMutex>
 #include <QObject>
+#include <QScopedPointer>
 #include <QSet>
 #include <QStringList>
 #include <libcockatrice/protocol/pb/event_leave.pb.h>
@@ -78,6 +83,12 @@ private:
     QList<GameReplay *> replayList;
     GameReplay *currentReplay;
 
+    QScopedPointer<Server_DeckValidationStrategy> deckValidationStrategy;
+
+    QScopedPointer<Server_GameLifecycleStrategy> lifecycleStrategy;
+
+    QScopedPointer<Server_MatchResultStrategy> matchResultStrategy;
+
     void createGameStateChangedEvent(Event_GameStateChanged *event,
                                      Server_AbstractParticipant *recipient,
                                      bool omniscient,
@@ -92,21 +103,7 @@ private slots:
 
 public:
     mutable QRecursiveMutex gameMutex;
-    Server_Game(const ServerInfo_User &_creatorInfo,
-                int _gameId,
-                const QString &_description,
-                const QString &_password,
-                int _maxPlayers,
-                const QList<int> &_gameTypes,
-                bool _onlyBuddies,
-                bool _onlyRegistered,
-                bool _spectatorsAllowed,
-                bool _spectatorsNeedPassword,
-                bool _spectatorsCanTalk,
-                bool _spectatorsSeeEverything,
-                int _startingLifeTotal,
-                bool _shareDecklistsOnLoad,
-                Server_Room *parent);
+    Server_Game(const GameConfig &config, Server_Room *parent);
     ~Server_Game() override;
     Server_Room *getRoom() const
     {
@@ -126,6 +123,8 @@ public:
         return gameStarted;
     }
     int getPlayerCount() const;
+    /// Total cards across all players' zones. Takes gameMutex itself.
+    int getCardsInGame() const;
     int getSpectatorCount() const;
     QMap<int, Server_AbstractPlayer *> getPlayers() const;
     Server_AbstractPlayer *getPlayer(int id) const;
@@ -221,6 +220,20 @@ public:
                                                                                    GameEventStorageItem::SendToOthers,
                                 int privatePlayerId = -1);
     void returnCardsFromPlayer(GameEventStorage &ges, Server_AbstractPlayer *player);
+
+    /** @brief Get the current deck validation strategy (non-owning). */
+    Server_DeckValidationStrategy *getDeckValidationStrategy() const
+    {
+        return deckValidationStrategy.data();
+    }
+    /** @brief Replace the deck validation strategy; takes ownership of @p strategy. */
+    void setDeckValidationStrategy(Server_DeckValidationStrategy *strategy);
+
+    /** @brief Get the current game lifecycle strategy (non-owning). */
+    Server_GameLifecycleStrategy *getLifecycleStrategy() const
+    {
+        return lifecycleStrategy.data();
+    }
 };
 
 #endif

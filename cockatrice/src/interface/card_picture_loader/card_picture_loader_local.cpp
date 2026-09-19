@@ -7,15 +7,16 @@
 #include <QDirIterator>
 #include <QMovie>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/settings/paths_settings.h>
 
 static constexpr int REFRESH_INTERVAL_MS = 10 * 1000;
 
 CardPictureLoaderLocal::CardPictureLoaderLocal(QObject *parent)
-    : QObject(parent), picsPath(SettingsCache::instance().getPicsPath()),
-      customPicsPath(SettingsCache::instance().getCustomPicsPath())
+    : QObject(parent), picsPath(SettingsCache::instance().paths().getPicsPath()),
+      customPicsPath(SettingsCache::instance().paths().getCustomPicsPath())
 {
     // Hook up signals to settings
-    connect(&SettingsCache::instance(), &SettingsCache::picsPathChanged, this,
+    connect(&SettingsCache::instance().paths(), &PathsSettings::picsPathChanged, this,
             &CardPictureLoaderLocal::picsPathChanged);
 
     refreshIndex();
@@ -93,6 +94,10 @@ QImage CardPictureLoaderLocal::tryLoadCardImageFromDisk(const QString &setName,
             candidatePaths << picsPath + "/downloadedPics/" + setName + "/" + nameVariant;
         }
 
+        // Non-set-folder export schemes (e.g., Name_Set_Collector) write straight into
+        // downloadedPics/; check there as a fallback so local overrides round-trip.
+        candidatePaths << picsPath + "/downloadedPics/" + nameVariant;
+
         for (const QString &path : candidatePaths) {
             QFileInfo fileInfo(path);
             QDir dir = fileInfo.dir();
@@ -104,7 +109,8 @@ QImage CardPictureLoaderLocal::tryLoadCardImageFromDisk(const QString &setName,
 
             QStringList files = dir.entryList(QDir::Files);
             for (const QString &file : files) {
-                if (!file.startsWith(baseName)) {
+                QFileInfo fi(file);
+                if (fi.completeBaseName() != baseName) {
                     continue;
                 }
 
@@ -127,6 +133,6 @@ QImage CardPictureLoaderLocal::tryLoadCardImageFromDisk(const QString &setName,
 
 void CardPictureLoaderLocal::picsPathChanged()
 {
-    picsPath = SettingsCache::instance().getPicsPath();
-    customPicsPath = SettingsCache::instance().getCustomPicsPath();
+    picsPath = SettingsCache::instance().paths().getPicsPath();
+    customPicsPath = SettingsCache::instance().paths().getCustomPicsPath();
 }

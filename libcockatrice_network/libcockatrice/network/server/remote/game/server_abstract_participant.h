@@ -52,6 +52,7 @@ class Command_SetSideboardPlan;
 class Command_DeckSelect;
 class Command_SetSideboardLock;
 class Command_ChangeZoneProperties;
+class Command_SetPlaymat;
 
 class Server_AbstractParticipant : public Server_ArrowTarget, public ServerInfo_User_Container
 {
@@ -124,6 +125,8 @@ public:
     cmdSetSideboardPlan(const Command_SetSideboardPlan &cmd, ResponseContainer &rc, GameEventStorage &ges);
     virtual Response::ResponseCode
     cmdSetSideboardLock(const Command_SetSideboardLock &cmd, ResponseContainer &rc, GameEventStorage &ges);
+    virtual Response::ResponseCode
+    cmdSetPlaymat(const Command_SetPlaymat &cmd, ResponseContainer &rc, GameEventStorage &ges);
     virtual Response::ResponseCode cmdGameSay(const Command_GameSay &cmd, ResponseContainer &rc, GameEventStorage &ges);
     virtual Response::ResponseCode cmdShuffle(const Command_Shuffle &cmd, ResponseContainer &rc, GameEventStorage &ges);
     virtual Response::ResponseCode

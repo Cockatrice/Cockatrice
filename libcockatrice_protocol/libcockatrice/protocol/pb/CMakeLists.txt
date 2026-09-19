@@ -25,6 +25,7 @@ set(PROTO_FILES
     command_dump_zone.proto
     command_flip_card.proto
     command_game_say.proto
+    command_get_server_stats.proto
     command_inc_card_counter.proto
     command_inc_counter.proto
     command_kick_from_game.proto
@@ -35,10 +36,20 @@ set(PROTO_FILES
     command_ready_start.proto
     command_replay_delete_match.proto
     command_replay_download.proto
+    command_replay_download_by_game_id.proto
     command_replay_get_code.proto
     command_replay_list.proto
     command_replay_modify_match.proto
     command_replay_submit_code.proto
+    command_report.proto
+    command_report_add_comment.proto
+    command_report_assign.proto
+    command_report_details.proto
+    command_report_list.proto
+    command_report_my_list.proto
+    command_report_resolve.proto
+    command_report_stats.proto
+    command_report_user_info.proto
     command_reveal_cards.proto
     command_reverse_turn.proto
     command_roll_die.proto
@@ -46,6 +57,7 @@ set(PROTO_FILES
     command_set_card_attr.proto
     command_set_card_counter.proto
     command_set_counter.proto
+    command_set_playmat.proto
     command_set_sideboard_lock.proto
     command_set_sideboard_plan.proto
     command_shuffle.proto
@@ -60,6 +72,7 @@ set(PROTO_FILES
     context_ready_start.proto
     context_set_sideboard_lock.proto
     context_undo_draw.proto
+    developer_commands.proto
     event_add_to_list.proto
     event_attach_card.proto
     event_change_zone_properties.proto
@@ -78,7 +91,6 @@ set(PROTO_FILES
     event_game_joined.proto
     event_game_log_notice.proto
     event_game_say.proto
-    event_game_state_changed.proto
     event_game_state_changed.proto
     event_join.proto
     event_join_room.proto
@@ -122,6 +134,7 @@ set(PROTO_FILES
     response_activate.proto
     response_adjust_mod.proto
     response_ban_history.proto
+    response_card_art_rule_entry.proto
     response_deck_download.proto
     response_deck_list.proto
     response_deck_upload.proto
@@ -129,6 +142,7 @@ set(PROTO_FILES
     response_forgotpasswordrequest.proto
     response_get_admin_notes.proto
     response_get_games_of_user.proto
+    response_get_server_stats.proto
     response_get_user_info.proto
     response_join_room.proto
     response_list_users.proto
@@ -136,8 +150,19 @@ set(PROTO_FILES
     response_password_salt.proto
     response_register.proto
     response_replay_download.proto
+    response_replay_download_by_game_id.proto
     response_replay_get_code.proto
     response_replay_list.proto
+    response_report_details.proto
+    response_report_list.proto
+    response_report_my_list.proto
+    response_report_stats.proto
+    response_report_user_info.proto
+    response_moderator_last_logins.proto
+    response_remove_user_avatar.proto
+    response_reset_user_password.proto
+    response_user_alts.proto
+    response_user_sessions.proto
     response_viewlog_history.proto
     response_warn_history.proto
     response_warn_list.proto
@@ -153,13 +178,17 @@ set(PROTO_FILES
     serverinfo_deckstorage.proto
     serverinfo_game.proto
     serverinfo_gametype.proto
+    serverinfo_moderator_login.proto
     serverinfo_player.proto
     serverinfo_playerping.proto
     serverinfo_playerproperties.proto
     serverinfo_replay.proto
     serverinfo_replay_match.proto
+    serverinfo_report.proto
     serverinfo_room.proto
     serverinfo_user.proto
+    serverinfo_user_alt.proto
+    serverinfo_user_session.proto
     serverinfo_warning.proto
     serverinfo_zone.proto
     session_commands.proto

@@ -8,6 +8,7 @@
 #include <QRegularExpression>
 #include <QResizeEvent>
 #include <QSize>
+#include <libcockatrice/settings/visual_deck_storage_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
 
 ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, const QString &_colorIdentity)
@@ -21,7 +22,8 @@ ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, const QString &_colorI
 
     populateManaSymbolWidgets();
 
-    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageDrawUnusedColorIdentitiesChanged, this,
+    connect(&SettingsCache::instance().visualDeckStorage(),
+            &VisualDeckStorageSettings::visualDeckStorageDrawUnusedColorIdentitiesChanged, this,
             &ColorIdentityWidget::toggleUnusedVisibility);
 }
 
@@ -39,8 +41,13 @@ void ColorIdentityWidget::populateManaSymbolWidgets()
     // clear old layout
     QtUtils::clearLayoutRec(layout);
 
+    // The freshly created symbols haven't been sized yet, so force the next resize pass
+    // to apply the symbol size again.
+    lastIconSize = -1;
+    lastWidth = -1;
+
     // populate mana symbols
-    if (SettingsCache::instance().getVisualDeckStorageDrawUnusedColorIdentities()) {
+    if (SettingsCache::instance().visualDeckStorage().getVisualDeckStorageDrawUnusedColorIdentities()) {
         for (const QString symbol : fullColorIdentity) {
             auto *manaSymbol = new ManaSymbolWidget(this, symbol, symbols.contains(symbol));
             layout->addWidget(manaSymbol);
@@ -71,20 +78,33 @@ void ColorIdentityWidget::toggleUnusedVisibility()
 void ColorIdentityWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-    QList<ManaSymbolWidget *> manaSymbols = findChildren<ManaSymbolWidget *>();
 
-    if (!manaSymbols.isEmpty()) {
-        int totalWidth = event->size().width();
-        int totalHeight = totalWidth / 6; // Set height to 1/4 of the width
-        setFixedHeight(totalHeight);
+    const int totalWidth = event->size().width();
+    if (totalWidth == lastWidth && lastIconSize != -1) {
+        return;
+    }
+    lastWidth = totalWidth;
 
-        int spacing = layout->spacing();
-        int count = manaSymbols.size();
-        int availableWidth = totalWidth - (spacing * (count - 1));
-        int iconSize = qMin(availableWidth / count, totalHeight); // Ensure icons fit within the new height
+    const int totalHeight = totalWidth / 6; // Set height to 1/4 of the width
+    setFixedHeight(totalHeight);
 
-        for (ManaSymbolWidget *manaSymbol : manaSymbols) {
-            manaSymbol->setFixedSize(iconSize, iconSize);
+    const int count = layout->count();
+    if (count == 0) {
+        return;
+    }
+
+    const int spacing = layout->spacing();
+    const int availableWidth = totalWidth - (spacing * (count - 1));
+    const int iconSize = qMin(availableWidth / count, totalHeight); // Ensure icons fit within the new height
+
+    if (iconSize == lastIconSize) {
+        return;
+    }
+    lastIconSize = iconSize;
+
+    for (int i = 0; i < count; ++i) {
+        if (auto *w = qobject_cast<ManaSymbolWidget *>(layout->itemAt(i)->widget())) {
+            w->setFixedSize(iconSize, iconSize);
         }
     }
 }

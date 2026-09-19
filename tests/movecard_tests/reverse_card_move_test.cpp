@@ -1,3 +1,4 @@
+#include "game/game_config.h"
 #include "game/server_abstract_player.h"
 #include "game/server_card.h"
 #include "game/server_cardzone.h"
@@ -22,7 +23,21 @@ TEST(ReverseCardMoveTest, MoveCardFromBottomTest)
     // instantiate a fake server instance
     FakeServer server;
     Server_Room room(0, 0, "", "", "", "", false, "", {}, &server);
-    Server_Game game(user, 1, "", "", 2, QList<int>(), false, false, false, false, false, false, 20, false, &room);
+    GameConfig config{.creatorInfo = user,
+                      .gameId = 1,
+                      .description = QString(),
+                      .password = QString(),
+                      .maxPlayers = 2,
+                      .gameTypes = QList<int>(),
+                      .onlyBuddies = false,
+                      .onlyRegistered = false,
+                      .spectatorsAllowed = false,
+                      .spectatorsNeedPassword = false,
+                      .spectatorsCanTalk = false,
+                      .spectatorsSeeEverything = false,
+                      .startingLifeTotal = 20,
+                      .shareDecklistsOnLoad = false};
+    Server_Game game(config, &room);
     Server_AbstractPlayer player(&game, 1, user, false, nullptr);
     Server_CardZone deckZone(&player, ZoneNames::DECK, true, ServerInfo_Zone::PublicZone);
     Server_CardZone exileZone(&player, ZoneNames::EXILE, true, ServerInfo_Zone::PublicZone);

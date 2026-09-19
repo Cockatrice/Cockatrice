@@ -7,6 +7,7 @@
 #ifndef PIXMAPGENERATOR_H
 #define PIXMAPGENERATOR_H
 
+#include <QHash>
 #include <QIcon>
 #include <QLoggingCategory>
 #include <QMap>
@@ -125,6 +126,45 @@ public:
     }
 };
 
+class ManaSymbolPixmapGenerator
+{
+private:
+    static QHash<QString, QPixmap> masterCache;
+    static QHash<QString, QPixmap> scaledCache;
+
+    /**
+     * @brief Renders \a symbol once at a fixed moderate size, so repeated scalings never
+     * re-rasterize the source file (SVG sources can be very expensive to rasterize).
+     */
+    static const QPixmap &masterIcon(const QString &symbol);
+
+public:
+    /**
+     * @brief Returns a smooth-scaled rendering of the given mana symbol icon.
+     *
+     * Results are shared between all callers via a process-wide cache keyed by symbol
+     * and size, so scaling work is done once per distinct combination instead of once
+     * per widget creation or resize.
+     */
+    static QPixmap generatePixmap(const QString &symbol, const QSize &size);
+    static void clear()
+    {
+        masterCache.clear();
+        scaledCache.clear();
+    }
+};
+
 QPixmap loadColorAdjustedPixmap(const QString &name);
+
+// Loads a "theme:" asset (with no file extension in prefix), preferring the
+// scheme-qualified variant (prefix-dark / prefix-light, resolved via
+// ThemeManager::assetPath) and falling back to the plain asset. Callers load
+// the returned path directly. Use for scheme-sensitive pixmaps like
+// backgrounds, the card back, and the app logo.
+QPixmap themePixmap(QStringView prefix);
+
+// Clears every PixmapGenerator's static cache so scheme variants are
+// re-resolved when the active theme or color scheme changes.
+void clearPixmapGeneratorCaches();
 
 #endif

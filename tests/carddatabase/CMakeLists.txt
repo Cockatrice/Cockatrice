@@ -22,6 +22,24 @@ target_link_libraries(
 add_test(NAME carddatabase_test COMMAND carddatabase_test)
 
 # ------------------------
+# Load Benchmark (manual, not run in CI)
+# ------------------------
+add_executable(load_benchmark ${MOCKS_SOURCES} ${VERSION_STRING_CPP} load_benchmark.cpp mocks.cpp)
+
+target_link_libraries(
+  load_benchmark
+  PRIVATE libcockatrice_card
+  PRIVATE libcockatrice_models
+  PRIVATE Threads::Threads
+  PRIVATE ${GTEST_BOTH_LIBRARIES}
+  PRIVATE ${TEST_QT_MODULES}
+)
+
+if(NOT GTEST_FOUND)
+  add_dependencies(load_benchmark gtest)
+endif()
+
+# ------------------------
 # Filter String Test
 # (guard must match the condition for libcockatrice_filters in the root CMakeLists.txt)
 # ------------------------

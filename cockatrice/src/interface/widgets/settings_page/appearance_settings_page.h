@@ -24,6 +24,7 @@ private slots:
 
     void cardViewInitialRowsMaxChanged(int value);
     void cardViewExpandedRowsMaxChanged(int value);
+    void openPlaymatCollectionDialog();
 
 private:
     QLabel themeLabel;
@@ -31,43 +32,68 @@ private:
     QPushButton openThemeButton;
     QLabel schemeComboLabel;
     QComboBox schemeCombo;
+    QLabel styleComboLabel;
+    QComboBox styleCombo;
     QPushButton editPaletteButton;
+
     QLabel homeTabBackgroundSourceLabel;
     QComboBox homeTabBackgroundSourceBox;
     QLabel homeTabBackgroundShuffleFrequencyLabel;
     QSpinBox homeTabBackgroundShuffleFrequencySpinBox;
     QCheckBox homeTabDisplayCardNameCheckBox;
-    QLabel minPlayersForMultiColumnLayoutLabel;
-    QLabel maxFontSizeForCardsLabel;
+    QCheckBox homeTabBackgroundDimCheckBox;
+    QLabel homeTabButtonColorSourceLabel;
+    QComboBox homeTabButtonColorSourceBox;
+
+    QLabel playmatVisibilityLabel;
+    QComboBox playmatVisibilityCombo;
+    QLabel playmatModeLabel;
+    QComboBox playmatModeCombo;
+    QLabel playmatDefaultLabel;
+    QPushButton playmatDefaultEditButton;
+
+    QCheckBox styleUserListCheckBox;
+
     QCheckBox showShortcutsCheckBox;
     QCheckBox showGameSelectorFilterToolbarCheckBox;
+
     QCheckBox overrideAllCardArtWithPersonalPreferenceCheckBox;
     QCheckBox bumpSetsWithCardsInDeckToTopCheckBox;
+
     QCheckBox displayCardNamesCheckBox;
     QCheckBox autoRotateSidewaysLayoutCardsCheckBox;
     QCheckBox cardScalingCheckBox;
     QCheckBox roundCardCornersCheckBox;
+    QLabel maxFontSizeForCardsLabel;
+    QSpinBox maxFontSizeForCardsEdit;
+
     QLabel verticalCardOverlapPercentLabel;
     QSpinBox verticalCardOverlapPercentBox;
     QLabel cardViewInitialRowsMaxLabel;
     QSpinBox cardViewInitialRowsMaxBox;
     QLabel cardViewExpandedRowsMaxLabel;
     QSpinBox cardViewExpandedRowsMaxBox;
+
+    QList<QLabel *> cardCounterNames;
+
     QCheckBox horizontalHandCheckBox;
     QCheckBox leftJustifiedHandCheckBox;
+
     QCheckBox invertVerticalCoordinateCheckBox;
+    QLabel minPlayersForMultiColumnLayoutLabel;
+    QSpinBox minPlayersForMultiColumnLayoutEdit;
+
     QGroupBox *themeGroupBox;
     QGroupBox *homeTabGroupBox;
+    QGroupBox *playmatGroupBox;
+    QGroupBox *stylingGroupBox;
     QGroupBox *menuGroupBox;
     QGroupBox *printingsGroupBox;
     QGroupBox *cardsGroupBox;
     QGroupBox *cardLayoutGroupBox;
+    QGroupBox *cardCountersGroupBox;
     QGroupBox *handGroupBox;
     QGroupBox *tableGroupBox;
-    QGroupBox *cardCountersGroupBox;
-    QList<QLabel *> cardCounterNames;
-    QSpinBox minPlayersForMultiColumnLayoutEdit;
-    QSpinBox maxFontSizeForCardsEdit;
 
 public:
     AppearanceSettingsPage();

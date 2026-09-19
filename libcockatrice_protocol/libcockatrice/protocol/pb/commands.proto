@@ -4,6 +4,7 @@ import "game_commands.proto";
 import "room_commands.proto";
 import "moderator_commands.proto";
 import "admin_commands.proto";
+import "developer_commands.proto";
 
 message CommandContainer {
     optional uint64 cmd_id = 1;
@@ -16,4 +17,5 @@ message CommandContainer {
     repeated RoomCommand room_command = 102;
     repeated ModeratorCommand moderator_command = 103;
     repeated AdminCommand admin_command = 104;
+    repeated DeveloperCommand developer_command = 105;
 }
