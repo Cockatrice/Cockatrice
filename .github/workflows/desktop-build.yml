@@ -368,13 +368,26 @@ jobs:
           key: ccache-${{ matrix.runner }}_${{ matrix.override_target }}-Xcode${{ matrix.xcode }}
           path: ${{ env.CCACHE_DIR }}
 
-      # - name: "[macOS] Restore thin Qt ${{ matrix.qt_version }} libraries"
-      #   if: matrix.os == 'macOS'
-      #   id: restore_qt
-      #   uses: actions/cache/restore@v6
-      #   with:
-      #     key: thin-qt-macos-${{ matrix.soc }}-${{ matrix.qt_version }}
-      #     path: ${{ github.workspace }}/Qt
+      - name: "[macOS] Install aqtinstall"
+        if: matrix.os == 'macOS'
+        run: pipx install aqtinstall
+
+      # Resolve given wildcard versions (e.g. Qt 6.6.*) to latest version via aqtinstall to avoid stale caches on new releases
+      - name: "[macOS] Resolve latest Qt from ${{ matrix.qt_version }} input"
+        if: matrix.os == 'macOS'
+        env:
+          QT_VERSION: ${{ matrix.qt_version }}
+        id: resolve_qt_version
+        shell: bash
+        run: .ci/resolve_latest_aqt_qt_version.sh "$QT_VERSION"
+
+      - name: "[macOS] Restore thin Qt ${{ steps.resolve_qt_version.outputs.version }}"
+        if: matrix.os == 'macOS'
+        id: restore_qt
+        uses: actions/cache/restore@v6
+        with:
+          key: Qt-${{ steps.resolve_qt_version.outputs.version }}-macOS-${{ matrix.soc }}-${{ matrix.qt_modules }}-thin
+          path: ${{ github.workspace }}/Qt
 
       # Using jurplel/install-qt-action to install Qt without using brew
       # Qt build using vcpkg either just fails or takes too long to build
@@ -382,21 +395,21 @@ jobs:
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         uses: jurplel/install-qt-action@v4
         with:
-          cache: true
-          dir: ${{ github.workspace }}
+          cache: false
+          # cache-key-prefix: Qt
           modules: ${{ matrix.qt_modules }}
           version: ${{ matrix.qt_version }}
 
-      # - name: "[macOS] Create thin Qt libraries"
-      #   if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
-      #   run: .ci/thin_macos_qtlib.sh
+      - name: "[macOS] Create thin Qt libraries"
+        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+        run: .ci/thin_macos_qtlib.sh
 
-      # - name: "[macOS] Cache thin Qt libraries"
-      #   if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
-      #   uses: actions/cache/save@v6
-      #   with:
-      #     key: ${{ steps.restore_qt.outputs.cache-primary-key }}
-      #     path: ${{ github.workspace }}/Qt
+      - name: "[macOS] Cache thin Qt libraries"
+        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          key: ${{ steps.restore_qt.outputs.cache-primary-key }}
+          path: ${{ github.workspace }}/Qt
 
       - name: "[Windows] Install Qt ${{ matrix.qt_version }}"
         if: matrix.os == 'Windows'
