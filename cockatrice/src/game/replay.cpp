@@ -2,7 +2,7 @@
 
 #include "../interface/widgets/tabs/tab_game.h"
 
-Replay::Replay(QObject *_parent, GameReplay *_replay, bool isLocalGame) : AbstractGame(_parent)
+Replay::Replay(QObject *_parent, const GameReplay *_replay, bool isLocalGame) : AbstractGame(_parent)
 {
     gameState = new GameState(this, 0, -1, isLocalGame, {}, false, false, -1, false);
     connect(gameMetaInfo, &GameMetaInfo::startedChanged, gameState, &GameState::onStartedChanged);

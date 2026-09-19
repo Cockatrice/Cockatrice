@@ -16,7 +16,7 @@ QString ThemeConfig::toIni() const
     out += "[Appearance]\n";
     out += QString("ColorScheme = %1\n").arg(colorScheme.isEmpty() ? "System" : colorScheme);
     out += "\n[Style]\n";
-    out += QString("Name = %1\n").arg(styleName.isEmpty() ? "Default" : styleName);
+    out += QString("Name = %1\n").arg(styleName.isEmpty() ? "System" : styleName);
     return out;
 }
 
@@ -96,7 +96,7 @@ bool ThemeConfig::save(const QString &themeDirPath) const
 
 bool PaletteConfig::hasPalette() const
 {
-    return !colors.isEmpty();
+    return !colors.isEmpty() || !appColors.isEmpty();
 }
 
 QString PaletteConfig::toToml() const
@@ -133,6 +133,24 @@ QString PaletteConfig::toToml() const
         out += "\n";
     }
 
+    if (!appColors.isEmpty()) {
+        QMetaEnum appEnum = QMetaEnum::fromType<AppColor::Role>();
+
+        out += "[AppColors]\n";
+
+        for (auto it = appColors.cbegin(); it != appColors.cend(); ++it) {
+            const char *roleName = appEnum.valueToKey(it.key());
+
+            if (!roleName) {
+                continue;
+            }
+
+            out += QString("%1 = %2\n").arg(QString(roleName), -20).arg(it.value().name(QColor::HexArgb));
+        }
+
+        out += "\n";
+    }
+
     return out;
 }
 
@@ -152,6 +170,7 @@ PaletteConfig PaletteConfig::fromFile(const QString &filePath)
     }
 
     QMetaEnum roleEnum = QMetaEnum::fromType<QPalette::ColorRole>();
+    QMetaEnum appEnum = QMetaEnum::fromType<AppColor::Role>();
 
     QString currentSection;
     QPalette::ColorGroup currentGroup = QPalette::Active;
@@ -202,6 +221,26 @@ PaletteConfig PaletteConfig::fromFile(const QString &filePath)
             }
         }
 
+        QColor color(value);
+
+        if (!color.isValid()) {
+            continue;
+        }
+
+        if (currentSection.compare("AppColors", Qt::CaseInsensitive) == 0) {
+            if (key.startsWith("AppColor::")) {
+                key = key.mid(10);
+            }
+
+            int appRoleInt = appEnum.keyToValue(key.toUtf8().constData());
+
+            if (appRoleInt >= 0) {
+                cfg.appColors[static_cast<AppColor::Role>(appRoleInt)] = color;
+            }
+
+            continue;
+        }
+
         if (!currentSection.startsWith("Palette", Qt::CaseInsensitive)) {
             continue;
         }
@@ -216,11 +255,7 @@ PaletteConfig PaletteConfig::fromFile(const QString &filePath)
             continue;
         }
 
-        QColor color(value);
-
-        if (color.isValid()) {
-            cfg.colors[currentGroup][static_cast<QPalette::ColorRole>(roleInt)] = color;
-        }
+        cfg.colors[currentGroup][static_cast<QPalette::ColorRole>(roleInt)] = color;
     }
 
     return cfg;
@@ -245,14 +280,11 @@ PaletteConfig PaletteConfig::fromDefault(const QString &themeDirPath, const QStr
 
     bool wantDark = colorScheme.compare("Dark", Qt::CaseInsensitive) == 0;
 
-    PaletteConfig cfg =
-        fromFile(dir.absoluteFilePath(wantDark ? "palette-default-dark.toml" : "palette-default-light.toml"));
-
-    if (!cfg.hasPalette()) {
-        cfg = fromFile(dir.absoluteFilePath(wantDark ? "palette-default-light.toml" : "palette-default-dark.toml"));
-    }
-
-    return cfg;
+    // Only the default file matching the requested scheme is used. Falling back
+    // to the opposite scheme's default would silently apply dark colours to a
+    // "Light" scheme (or vice versa). Callers already fall back to the OS /
+    // application palette when no default palette is available.
+    return fromFile(dir.absoluteFilePath(wantDark ? "palette-default-dark.toml" : "palette-default-light.toml"));
 }
 
 QPalette PaletteConfig::apply(QPalette base) const

@@ -15,6 +15,11 @@ class CardSearchModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
+    enum CardSearchRoles
+    {
+        CardInfoRole = Qt::UserRole + 1,
+    };
+
     explicit CardSearchModel(CardDatabaseDisplayModel *sourceModel, QObject *parent = nullptr);
 
     [[nodiscard]] int rowCount(const QModelIndex &parent = QModelIndex()) const override;

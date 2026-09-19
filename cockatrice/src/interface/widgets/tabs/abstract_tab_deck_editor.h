@@ -8,6 +8,7 @@
 #ifndef TAB_GENERIC_DECK_EDITOR_H
 #define TAB_GENERIC_DECK_EDITOR_H
 
+#include "../../deck_loader/deck_loader.h"
 #include "../interface/widgets/deck_editor/deck_editor_card_database_dock_widget.h"
 #include "../interface/widgets/deck_editor/deck_editor_card_info_dock_widget.h"
 #include "../interface/widgets/deck_editor/deck_editor_database_display_widget.h"
@@ -263,12 +264,12 @@ protected slots:
     /** @brief Handles dock close events. */
     void closeEvent(QCloseEvent *event) override;
 
-private:
     /** @brief Sets the deck for this tab.
      *  @param _deck The deck object.
      */
     virtual void setDeck(const LoadedDeck &_deck);
 
+private:
     /** @brief Helper for editing decks from the clipboard. */
     void editDeckInClipboard(bool annotated);
 

@@ -5,23 +5,23 @@
 # This file sets all the variables shared between the projects
 # like the installation path, compilation flags etc..
 
-# cmake 3.16 is required if using qt6
-cmake_minimum_required(VERSION 3.10)
+# 3.16 required for Qt6 and target_precompile_headers()
+cmake_minimum_required(VERSION 3.16)
 
-# Early detect ccache
+# Use compiler cache (ccache)
 option(USE_CCACHE "Cache the build results with ccache" ON)
 # Treat warnings as errors (Debug builds only)
 option(WARNING_AS_ERROR "Treat warnings as errors in debug builds" ON)
 # Check for translation updates
 option(UPDATE_TRANSLATIONS "Update translations on compile" OFF)
-# Compile servatrice
-option(WITH_SERVER "build servatrice" OFF)
-# Compile cockatrice
-option(WITH_CLIENT "build cockatrice" ON)
-# Compile oracle
-option(WITH_ORACLE "build oracle" ON)
+# Compile Cockatrice
+option(WITH_CLIENT "Build Cockatrice client" ON)
+# Compile Oracle
+option(WITH_ORACLE "Build Cockatrice card database tool (Oracle)" ON)
+# Compile Servatrice
+option(WITH_SERVER "Build Cockatrice server (Servatrice)" OFF)
 # Compile tests
-option(TEST "build tests" OFF)
+option(TEST "Build tests" OFF)
 # Use vcpkg regardless of OS
 option(USE_VCPKG "Use vcpkg regardless of OS" OFF)
 
@@ -39,13 +39,24 @@ else()
   )
 endif()
 
-if(USE_CCACHE)
+# ccache does not support MSVC and must not auto-engage on Windows
+# (it is installed unintentionally on the Windows CI runner).
+# NOTE: this keys off the target OS, so a mingw/Ninja configuration on Windows
+# also opts out of ccache even though the GNUCXX branch below supports it.
+if(USE_CCACHE AND NOT WIN32)
   find_program(CCACHE_PROGRAM ccache)
   if(CCACHE_PROGRAM)
     # Support Unix Makefiles and Ninja
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+    # PCH-aware caching, matching .ci/compile.sh: without this ccache refuses
+    # to cache any TU that consumes a precompiled header, so every PCH-backed
+    # target recompiles from scratch on each build.
+    execute_process(COMMAND ${CCACHE_PROGRAM} --set-config sloppiness=pch_defines,time_macros)
     message(STATUS "Found CCache ${CCACHE_PROGRAM}")
   endif()
+elseif(USE_CCACHE AND WIN32)
+  # An explicit opt-in must not disappear silently on Windows.
+  message(STATUS "ccache disabled: not supported for the MSVC toolchain on Windows")
 endif()
 
 if(WIN32 OR USE_VCPKG)
@@ -64,10 +75,11 @@ if(WIN32 OR USE_VCPKG)
   else()
     set(QTDIR
         ""
-        CACHE PATH "Path to Qt (e.g. C:/Qt/5.7/msvc2015_64)"
+        CACHE PATH "Path to Qt (e.g. C:/Qt/6.4.2/msvc2019_64)"
     )
     message(
-      WARNING "QTDIR variable is missing.  Please set this variable to specify path to Qt (e.g. C:/Qt/5.7/msvc2015_64)"
+      WARNING
+        "QTDIR variable is missing.  Please set this variable to specify path to Qt (e.g. C:/Qt/6.4.2/msvc2019_64)"
     )
   endif()
 endif()
@@ -174,7 +186,7 @@ elseif(CMAKE_COMPILER_IS_GNUCXX)
       -Wno-error=delete-non-virtual-dtor
       -Wno-error=sign-compare
       -Wno-error=missing-declarations
-      -Wno-error=sfinae-incomplete  # GCC 16+: Qt MOC + protobuf forward decls trigger this
+      -Wno-error=sfinae-incomplete # GCC 16+: Qt MOC + protobuf forward decls trigger this
   )
 
   foreach(FLAG ${ADDITIONAL_DEBUG_FLAGS})
@@ -183,6 +195,9 @@ elseif(CMAKE_COMPILER_IS_GNUCXX)
       set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${FLAG}")
     endif()
   endforeach()
+
+  # Reduce compiler I/O by using pipes between stages instead of temp files
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe")
 else()
   # other: osx/llvm, bsd/llvm
   set(CMAKE_CXX_FLAGS_RELEASE "-O2")
@@ -191,6 +206,9 @@ else()
   else()
     set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra")
   endif()
+
+  # Reduce compiler I/O by using pipes between stages instead of temp files
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe")
 endif()
 
 # GNU systems need to define the Mersenne exponent for the RNG to compile w/o warning
@@ -238,11 +256,6 @@ if(WIN32)
   find_package(OpenSSL REQUIRED)
   if(OPENSSL_FOUND)
     include_directories(${OPENSSL_INCLUDE_DIRS})
-  else()
-    message(
-      WARNING
-        "Could not find OpenSSL runtime libraries. They are not required for compiling, but needs to be available at runtime."
-    )
   endif()
 endif()
 
@@ -280,11 +293,7 @@ if(UNIX)
     if(CPACK_GENERATOR STREQUAL "RPM")
       set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
       set(CPACK_RPM_MAIN_COMPONENT "cockatrice")
-      if(Qt6_FOUND)
-        set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt6-qttools, qt6-qtsvg, qt6-qtmultimedia, qt6-qtimageformats")
-      elseif(Qt5_FOUND)
-        set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt5-qttools, qt5-qtsvg, qt5-qtmultimedia")
-      endif()
+      set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt6-qttools, qt6-qtsvg, qt6-qtmultimedia, qt6-qtimageformats")
       set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
       set(CPACK_RPM_PACKAGE_URL "http://github.com/Cockatrice/Cockatrice")
       # stop directories from making package conflicts
@@ -302,12 +311,8 @@ if(UNIX)
       set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
       set(CPACK_DEBIAN_PACKAGE_SECTION "games")
       set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/Cockatrice/Cockatrice")
-      if(Qt6_FOUND)
-        set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6, libqt6svg6, qt6-qpa-plugins, qt6-image-formats-plugins")
-        set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "libqt6sql6-mysql") # for connecting servatrice to a mysql db
-      elseif(Qt5_FOUND)
-        set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5multimedia5-plugins, libqt5svg5")
-      endif()
+      set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6, libqt6svg6, qt6-qpa-plugins, qt6-image-formats-plugins")
+      set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "libqt6sql6-mysql") # for connecting servatrice to a mysql db
     endif()
   endif()
 elseif(WIN32)

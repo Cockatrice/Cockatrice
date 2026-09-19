@@ -19,6 +19,9 @@ class SettingsButtonWidget : public QWidget
 
 public:
     explicit SettingsButtonWidget(QWidget *parent = nullptr);
+
+    ~SettingsButtonWidget() override;
+
     void addSettingsWidget(QWidget *toAdd) const;
     void removeSettingsWidget(QWidget *toRemove) const;
     void setButtonIcon(QPixmap iconMap);

@@ -3,6 +3,7 @@
 #include "../../../client/settings/cache_settings.h"
 
 #include <QDate>
+#include <libcockatrice/settings/updates_settings.h>
 
 DlgStartupCardCheck::DlgStartupCardCheck(QWidget *parent) : QDialog(parent)
 {
@@ -10,7 +11,7 @@ DlgStartupCardCheck::DlgStartupCardCheck(QWidget *parent) : QDialog(parent)
 
     layout = new QVBoxLayout(this);
 
-    QDate lastCheckDate = SettingsCache::instance().getLastCardUpdateCheck();
+    QDate lastCheckDate = SettingsCache::instance().updates().getLastCardUpdateCheck();
     int daysAgo = lastCheckDate.daysTo(QDate::currentDate());
 
     instructionLabel = new QLabel(

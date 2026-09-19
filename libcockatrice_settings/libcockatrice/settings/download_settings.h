@@ -15,6 +15,7 @@ class DownloadSettings : public SettingsManager
     friend class SettingsCache;
 
     static const QStringList DEFAULT_DOWNLOAD_URLS;
+    static const QString SCRYFALL_NAMED_LOCALIZED_URL;
 
 public:
     explicit DownloadSettings(const QString &, QObject *);
@@ -22,6 +23,15 @@ public:
     QStringList getAllURLs() const;
     void setDownloadUrls(const QStringList &downloadURLs);
     void resetToDefaultURLs();
+    [[nodiscard]] bool addLocalizedScryfallUrl();
+    [[nodiscard]] bool getPicDownload() const;
+    void setPicDownload(bool _picDownload);
+    [[nodiscard]] bool getDownloadSpoilersStatus() const;
+    void setDownloadSpoilerStatus(bool _spoilerStatus);
+
+signals:
+    void picDownloadChanged();
+    void downloadSpoilerStatusChanged();
 };
 
 #endif // COCKATRICE_DOWNLOADSETTINGS_H

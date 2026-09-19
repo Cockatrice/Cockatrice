@@ -10,6 +10,7 @@
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 
 CardInfoFrameWidget::CardInfoFrameWidget(QWidget *parent)
     : QTabWidget(parent), viewTransformationButton(nullptr), cardTextOnly(false)
@@ -60,7 +61,7 @@ CardInfoFrameWidget::CardInfoFrameWidget(QWidget *parent)
     tab3Layout->addWidget(splitter);
     tab3->setLayout(tab3Layout);
 
-    setViewMode(SettingsCache::instance().getCardInfoViewMode());
+    setViewMode(SettingsCache::instance().cardsDisplay().getCardInfoViewMode());
 }
 
 void CardInfoFrameWidget::retranslateUi()
@@ -127,7 +128,7 @@ void CardInfoFrameWidget::setViewMode(int mode)
 
     refreshLayout();
 
-    SettingsCache::instance().setCardInfoViewMode(mode);
+    SettingsCache::instance().cardsDisplay().setCardInfoViewMode(mode);
 }
 
 static bool hasTransformation(const CardInfo &info)

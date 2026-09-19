@@ -7,9 +7,12 @@
 #ifndef GAMEVIEW_H
 #define GAMEVIEW_H
 
+#include "tally/tally.h"
+
 #include <QGraphicsView>
 
 class GameScene;
+class QGridLayout;
 class QLabel;
 class QRubberBand;
 
@@ -21,7 +24,14 @@ private:
     QRubberBand *rubberBand;
     QLabel *dragCountLabel;
     QLabel *totalCountLabel;
+    QWidget *tallyContainer;
+    QGridLayout *tallyLayout;
     QPointF selectionOrigin;
+    QRect previousBandRect;          ///< Last rubber-band rect for targeted repaint
+    QList<TallyRow> cachedTallyRows; ///< Cached entries to avoid redundant rebuilds
+
+    QSize rebuildTallyLabels(const QList<TallyRow> &entries);
+    void clearTallyLabels();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

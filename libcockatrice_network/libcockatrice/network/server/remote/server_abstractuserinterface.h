@@ -42,6 +42,7 @@ public:
     void playerRemovedFromGame(Server_Game *game);
     void playerAddedToGame(int gameId, int roomId, int playerId);
     void joinPersistentGames(ResponseContainer &rc);
+    virtual void onLogin(ResponseContainer &rc);
 
     QMap<int, QPair<int, int>> getGames() const
     {

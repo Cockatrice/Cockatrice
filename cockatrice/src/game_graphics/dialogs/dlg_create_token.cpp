@@ -20,7 +20,10 @@
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/models/database/card_database_model.h>
 #include <libcockatrice/models/database/token/token_display_model.h>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/settings/card_override_settings.h>
+#include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/settings/layouts_settings.h>
+#include <libcockatrice/utility/string_limits.h>
 
 DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent)
     : QDialog(parent), predefinedTokens(_predefinedTokens)
@@ -186,7 +189,7 @@ void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QMo
         const QChar cardColor = cardInfo->getColorChar();
         colorEdit->setCurrentIndex(colorEdit->findData(cardColor, Qt::UserRole, Qt::MatchFixedString));
         ptEdit->setText(cardInfo->getPowTough());
-        if (SettingsCache::instance().getAnnotateTokens()) {
+        if (SettingsCache::instance().userInterface().getAnnotateTokens()) {
             annotationEdit->setText(cardInfo->getText());
         }
     } else {

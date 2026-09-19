@@ -32,6 +32,7 @@ BannerWidget::BannerWidget(QWidget *parent, const QString &text, Qt::Orientation
 
     // Set minimum height for the widget
     setMinimumHeight(50);
+    setMaximumHeight(100);
     connect(this, &BannerWidget::buddyVisibilityChanged, this, &BannerWidget::toggleBuddyVisibility);
 
     updateDropdownIconState();

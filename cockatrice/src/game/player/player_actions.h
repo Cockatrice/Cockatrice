@@ -240,7 +240,8 @@ private:
     void createCard(const CardItem *sourceCard,
                     const QString &dbCardName,
                     CardRelationType attach = CardRelationType::DoesNotAttach,
-                    bool persistent = false);
+                    bool persistent = false,
+                    bool faceDown = false);
 
     void playSelectedCards(QList<CardItem *> selectedCards, bool faceDown = false);
 

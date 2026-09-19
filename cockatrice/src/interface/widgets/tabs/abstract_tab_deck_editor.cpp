@@ -10,6 +10,7 @@
 #include "abstract_tab_deck_editor.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../client/network/interfaces/deck_stats_interface.h"
 #include "../client/network/interfaces/tapped_out_interface.h"
 #include "../deck_editor/deck_state_manager.h"
@@ -43,7 +44,10 @@
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/settings/deck_editor_settings.h>
+#include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/settings/recents_settings.h>
+#include <libcockatrice/utility/string_limits.h>
 
 /**
  * @brief Constructs the AbstractTabDeckEditor.
@@ -199,7 +203,7 @@ void AbstractTabDeckEditor::cleanDeckAndResetModified()
  */
 AbstractTabDeckEditor::DeckOpenLocation AbstractTabDeckEditor::confirmOpen(const bool openInSameTabIfBlank)
 {
-    if (SettingsCache::instance().getOpenDeckInNewTab()) {
+    if (SettingsCache::instance().deckEditor().getOpenDeckInNewTab()) {
         if (openInSameTabIfBlank && deckStateManager->isBlankNewDeck()) {
             return SAME_TAB;
         } else {
@@ -350,7 +354,7 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
     DeckList deckList = deckStateManager->getDeckList();
 
     QFileDialog dialog(this, tr("Save deck"));
-    dialog.setDirectory(SettingsCache::instance().getDeckPath());
+    dialog.setDirectory(SettingsCache::instance().paths().getDeckPath());
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setDefaultSuffix("cod");
     dialog.setNameFilters(DeckLoader::FILE_NAME_FILTERS);

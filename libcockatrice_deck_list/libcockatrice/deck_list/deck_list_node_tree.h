@@ -10,6 +10,7 @@
 class DecklistNodeTree
 {
     InnerDecklistNode *root; ///< Root of the deck tree (zones + cards).
+    int totalCards = 0;
 
 public:
     /** @brief Constructs an empty DecklistNodeTree. */
@@ -78,15 +79,82 @@ public:
     bool deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNode = nullptr);
 
     /**
-     * @brief Apply a function to every card in the deck tree. This can modify the cards.
+     * @brief Creates a new custom zone nested under a board zone.
      *
-     * @param func Function taking (zone node, card node).
+     * Custom zone names must be unique across the whole deck so that cards can be
+     * added to a custom zone without specifying its board zone.
+     *
+     * @param boardZoneName Name of the board zone (e.g. DECK_ZONE_MAIN).
+     * @param zoneName Name of the custom zone.
+     * @return The created zone node, or nullptr if the name is already in use.
+     */
+    InnerDecklistNode *addCustomZone(const QString &boardZoneName, const QString &zoneName);
+
+    /**
+     * @brief Renames a custom zone.
+     * @return true on success, false if the zone was not found or the new name is taken.
+     */
+    bool renameCustomZone(const QString &oldZoneName, const QString &newZoneName);
+
+    /**
+     * @brief Moves a custom zone (and all its cards) to another board zone.
+     * @return true on success, false if the zone or the new board zone was not found.
+     */
+    bool moveCustomZone(const QString &zoneName, const QString &newBoardZoneName);
+
+    /**
+     * @brief Removes a custom zone and all its cards.
+     * @return true if the zone was found and removed.
+     */
+    bool removeCustomZone(const QString &zoneName);
+
+    /**
+     * @brief Gets all custom zones nested under a board zone.
+     * @param boardZoneName Name of the board zone.
+     * @return The custom zones, in insertion order.
+     */
+    QList<const InnerDecklistNode *> getCustomZones(const QString &boardZoneName) const;
+
+    /**
+     * @brief Checks whether a zone name is taken anywhere in the deck.
+     *
+     * Covers the standard board names and any top-level or nested custom zone.
+     * @param zoneName The checked name.
+     * @return true if the name is reserved or already in use.
+     */
+    bool hasZoneName(const QString &zoneName) const;
+
+    /**
+     * @brief Finds a custom zone anywhere in the deck by name.
+     *
+     * Walks the children of every top-level zone, so a zone nested under any
+     * board (and not just the standard ones) is found.
+     * @param zoneName The zone name to find.
+     * @return The matching zone node, or nullptr if none exists.
+     */
+    InnerDecklistNode *findCustomZoneByName(const QString &zoneName) const;
+
+    /**
+     * @brief Applies a function to every card in the deck tree. This can modify the cards.
+     *
+     * @param func Function taking (top-level board zone node, card node). Cards nested
+     *        in custom zones are reported with their board zone.
      */
     void forEachCard(const std::function<void(InnerDecklistNode *, DecklistCardNode *)> &func) const;
 
 private:
     // Helpers for traversing the tree
-    InnerDecklistNode *getZoneObjFromName(const QString &zoneName) const;
+    InnerDecklistNode *getZoneObjFromName(const QString &zoneName);
+    InnerDecklistNode *findBoardZone(const QString &boardZoneName) const;
+    InnerDecklistNode *findOrCreateBoardZone(const QString &boardZoneName);
+
+    /**
+     * @brief Recursively removes @p container when it is an empty board zone.
+     *
+     * Empty custom zones are kept while empty board zones get pruned, so a
+     * board zone disappears once its last card or custom zone goes away.
+     */
+    void pruneEmptyBoardZone(InnerDecklistNode *container);
 };
 
 #endif // COCKATRICE_DECKLIST_NODE_TREE_H

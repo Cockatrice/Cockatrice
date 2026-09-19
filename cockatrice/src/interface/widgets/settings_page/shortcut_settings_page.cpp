@@ -2,11 +2,14 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcut_treeview.h"
+#include "../../../client/settings/shortcuts_settings.h"
+#include "../../pixel_map_generator.h"
 #include "../interface/widgets/utility/custom_line_edit.h"
 #include "../interface/widgets/utility/sequence_edit.h"
 
 #include <QAbstractItemView>
 #include <QMessageBox>
+#include <libcockatrice/settings/personal_settings.h>
 
 ShortcutSettingsPage::ShortcutSettingsPage()
 {
@@ -45,8 +48,8 @@ ShortcutSettingsPage::ShortcutSettingsPage()
     btnResetAll = new QPushButton(this);
     btnClearAll = new QPushButton(this);
 
-    btnResetAll->setIcon(QPixmap("theme:icons/update"));
-    btnClearAll->setIcon(QPixmap("theme:icons/clearsearch"));
+    btnResetAll->setIcon(themePixmap(QStringLiteral("icons/update")));
+    btnClearAll->setIcon(themePixmap(QStringLiteral("icons/clearsearch")));
 
     // layout
     auto *_editLayout = new QGridLayout;
@@ -78,7 +81,8 @@ ShortcutSettingsPage::ShortcutSettingsPage()
 
     connect(shortcutsTable, &ShortcutTreeView::currentItemChanged, this, &ShortcutSettingsPage::currentItemChanged);
 
-    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &ShortcutSettingsPage::retranslateUi);
+    connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this,
+            &ShortcutSettingsPage::retranslateUi);
     retranslateUi();
 }
 
@@ -120,6 +124,7 @@ void ShortcutSettingsPage::retranslateUi()
     currentActionGroupLabel->setText(tr("Section:"));
     currentActionLabel->setText(tr("Action:"));
     currentShortcutLabel->setText(tr("Shortcut:"));
+    editShortcutGroupBox->setTitle(tr("Shortcut editor"));
     editTextBox->retranslateUi();
     faqLabel->setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_SHORTCUTS).arg(tr("How to set custom shortcuts")));
     btnResetAll->setText(tr("Restore all default shortcuts"));

@@ -3,11 +3,13 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../logger.h"
 
+#include <QApplication>
 #include <QClipboard>
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QVBoxLayout>
+#include <libcockatrice/settings/servers_settings.h>
 
 DlgViewLog::DlgViewLog(QWidget *parent) : QDialog(parent)
 {

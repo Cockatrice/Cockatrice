@@ -138,21 +138,55 @@ QVariant SettingsManager::getValue(const QString &name, const QString &group, co
 {
     auto settings = getSettings();
 
-    if (!group.isEmpty()) {
-        settings.beginGroup(group);
+    QString effectiveGroup = group.isEmpty() ? defaultGroup : group;
+    QString effectiveSubGroup = subGroup.isEmpty() ? defaultSubGroup : subGroup;
+
+    if (!effectiveGroup.isEmpty()) {
+        settings.beginGroup(effectiveGroup);
     }
 
-    if (!subGroup.isEmpty()) {
-        settings.beginGroup(subGroup);
+    if (!effectiveSubGroup.isEmpty()) {
+        settings.beginGroup(effectiveSubGroup);
     }
 
     QVariant value = settings.value(name);
 
-    if (!subGroup.isEmpty()) {
+    if (!effectiveSubGroup.isEmpty()) {
         settings.endGroup();
     }
 
-    if (!group.isEmpty()) {
+    if (!effectiveGroup.isEmpty()) {
+        settings.endGroup();
+    }
+
+    return value;
+}
+
+QVariant SettingsManager::getValue(const QString &name,
+                                   const QString &group,
+                                   const QString &subGroup,
+                                   const QVariant &defaultValue) const
+{
+    auto settings = getSettings();
+
+    QString effectiveGroup = group.isEmpty() ? defaultGroup : group;
+    QString effectiveSubGroup = subGroup.isEmpty() ? defaultSubGroup : subGroup;
+
+    if (!effectiveGroup.isEmpty()) {
+        settings.beginGroup(effectiveGroup);
+    }
+
+    if (!effectiveSubGroup.isEmpty()) {
+        settings.beginGroup(effectiveSubGroup);
+    }
+
+    QVariant value = settings.value(name, defaultValue);
+
+    if (!effectiveSubGroup.isEmpty()) {
+        settings.endGroup();
+    }
+
+    if (!effectiveGroup.isEmpty()) {
         settings.endGroup();
     }
 

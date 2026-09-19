@@ -4,6 +4,8 @@
 #include "card_picture_loader_status_bar.h"
 #include "card_picture_loader_worker.h"
 
+#include <QDateTime>
+#include <QHash>
 #include <QLoggingCategory>
 
 inline Q_LOGGING_CATEGORY(CardPictureLoaderLog, "card_picture_loader");
@@ -56,6 +58,7 @@ private:
 
     CardPictureLoaderWorker *worker;       ///< Worker thread for async image loading
     CardPictureLoaderStatusBar *statusBar; ///< Status bar widget showing load progress
+    QHash<QString, QDateTime> failedAt;    ///< Timestamp of the last failed load attempt per pixmap cache key
 
 public:
     /**
@@ -94,10 +97,17 @@ public:
     static void cacheCardPixmaps(const QList<ExactCard> &cards);
 
     /**
-     * @brief Check if the user has custom card art in the picsPath directory.
-     * @return True if any custom art exists.
+     * @brief Check if a local override image already exists for the card.
+     * @param card The card to check.
+     * @return True if the card has at least one locally stored override image.
      */
-    static bool hasCustomArt();
+    static bool hasLocalOverrides(const ExactCard &card);
+
+    /**
+     * @brief Removes all locally stored override images for the card.
+     * @param card The card to remove the override images of.
+     */
+    static void deleteAllLocalOverrides(const ExactCard &card);
 
     /**
      * @brief Clears the in-memory QPixmap cache for all cards.
@@ -117,7 +127,9 @@ public slots:
      * @param image Loaded QImage.
      */
     void imageLoaded(const ExactCard &card, const QImage &image);
-    void saveCardImageToLocalStorage(const ExactCard &card, const QPixmap &pixmap);
+    void saveCardImageToLocalStorage(const ExactCard &card, const QPixmap &pixmap, bool allowOverwrite = false);
+    void installPrintingOverride(const ExactCard &originalCard, const ExactCard &overrideCard);
+    void installPrintingOverrideOnLoad(const ExactCard &originalCard, const ExactCard &overrideCard);
 
 private slots:
     /**
@@ -131,6 +143,12 @@ private slots:
      * Clears the QPixmap cache to reload images.
      */
     void picsPathChanged();
+
+    /**
+     * @brief Triggered when the card language setting changes.
+     * Clears the in-memory picture caches so images reload in the new language.
+     */
+    void cardLangChanged();
 };
 
 #endif

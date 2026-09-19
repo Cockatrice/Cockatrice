@@ -1,5 +1,6 @@
 #ifndef COCKATRICE_QT_UTILS_H
 #define COCKATRICE_QT_UTILS_H
+#include <QLayout>
 #include <QObject>
 
 namespace QtUtils

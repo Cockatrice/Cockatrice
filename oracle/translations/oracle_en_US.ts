@@ -276,7 +276,7 @@
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="src/oracleimporter.cpp" line="540"/>
+        <location filename="src/oracleimporter.cpp" line="542"/>
         <source>Dummy set containing tokens</source>
         <translation>Dummy set containing tokens</translation>
     </message>
@@ -284,7 +284,7 @@
 <context>
     <name>OracleWizard</name>
     <message>
-        <location filename="src/oraclewizard.cpp" line="97"/>
+        <location filename="src/oraclewizard.cpp" line="101"/>
         <source>Oracle Importer</source>
         <translation>Oracle Importer</translation>
     </message>

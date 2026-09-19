@@ -1,5 +1,6 @@
 #include "player_menu.h"
 
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../../../game_graphics/zones/hand_zone.h"
 #include "../../../game_graphics/zones/pile_zone.h"
 #include "../../../game_graphics/zones/table_zone.h"
@@ -43,6 +44,8 @@ PlayerMenu::PlayerMenu(PlayerGraphicsItem *_player) : QObject(_player), player(_
         countersMenu = nullptr;
         utilityMenu = nullptr;
     }
+
+    tallyMenu = addManagedMenu<TallyMenu>();
 
     if (player->getLogic()->getPlayerInfo()->getLocal()) {
         sayMenu = addManagedMenu<SayMenu>(player);

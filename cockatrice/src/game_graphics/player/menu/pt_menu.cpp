@@ -1,5 +1,6 @@
 #include "pt_menu.h"
 
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
 #include "../player_graphics_item.h"

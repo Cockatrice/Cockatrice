@@ -1,14 +1,26 @@
 #include "general_settings_page.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../main.h"
+#include "../server/user/user_info_connection.h"
 #include "update/client/release_channel.h"
 
 #include <QCoreApplication>
+#include <QFile>
 #include <QFileDialog>
 #include <QGridLayout>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <QTranslator>
+#include <libcockatrice/card/card_localization.h>
+#include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/download_settings.h>
+#include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/settings/tabs_settings.h>
+#include <libcockatrice/settings/updates_settings.h>
+#include <libcockatrice/utility/macros.h>
 
 enum startupCardUpdateCheckBehaviorIndex
 {
@@ -40,27 +52,45 @@ GeneralSettingsPage::GeneralSettingsPage()
     connect(&languageBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
             &GeneralSettingsPage::languageBoxChanged);
 
+    // card text & images language, independent of the UI language
+    cardLanguageBox.addItem(tr("English"), "en");
+    for (const QString &code : CardLocalization::supportedLanguages()) {
+        cardLanguageBox.addItem(CardLocalization::languageDisplayName(code), code);
+    }
+    const int cardLangIndex = cardLanguageBox.findData(SettingsCache::instance().cardsDisplay().getCardLang());
+    cardLanguageBox.setCurrentIndex(cardLangIndex < 0 ? 0 : cardLangIndex);
+
+    connect(&cardLanguageBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+            &GeneralSettingsPage::cardLanguageBoxChanged);
+
     auto *languageGrid = new QGridLayout;
     languageGrid->addWidget(&languageLabel, 0, 0);
     languageGrid->addWidget(&languageBox, 0, 1);
-    languageGrid->addWidget(&advertiseTranslationPageLabel, 1, 1, Qt::AlignRight);
+    languageGrid->addWidget(&cardLanguageLabel, 1, 0);
+    languageGrid->addWidget(&cardLanguageBox, 1, 1);
+    languageGrid->addWidget(&cardLanguageNoteLabel, 2, 1);
+    languageGrid->addWidget(&advertiseTranslationPageLabel, 3, 1, Qt::AlignRight);
+
+    cardLanguageNoteLabel.setWordWrap(true);
+    cardLanguageNoteLabel.setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
     languageGroupBox = new QGroupBox;
     languageGroupBox->setLayout(languageGrid);
 
     // version settings
     SettingsCache &settings = SettingsCache::instance();
-    startupUpdateCheckCheckBox.setChecked(settings.getCheckUpdatesOnStartup());
+    startupUpdateCheckCheckBox.setChecked(settings.updates().getCheckUpdatesOnStartup());
 
-    connect(&startupUpdateCheckCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
-            &SettingsCache::setCheckUpdatesOnStartup);
+    connect(&startupUpdateCheckCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.updates(),
+            &UpdatesSettings::setCheckUpdatesOnStartup);
 
     updateNotificationCheckBox.setChecked(settings.getNotifyAboutUpdates());
 
-    connect(&updateNotificationCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setNotifyAboutUpdate);
+    connect(&updateNotificationCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.updates(),
+            &UpdatesSettings::setNotifyAboutUpdates);
 
-    connect(&newVersionOracleCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
-            &SettingsCache::setNotifyAboutNewVersion);
+    connect(&newVersionOracleCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.updates(),
+            &UpdatesSettings::setNotifyAboutNewVersion);
 
     auto *versionGrid = new QGridLayout;
     versionGrid->addWidget(&updateReleaseChannelLabel, 0, 0);
@@ -76,9 +106,9 @@ GeneralSettingsPage::GeneralSettingsPage()
     startupCardUpdateCheckBehaviorSelector.addItem(""); // these will be set in retranslateUI
     startupCardUpdateCheckBehaviorSelector.addItem("");
     startupCardUpdateCheckBehaviorSelector.addItem("");
-    if (SettingsCache::instance().getStartupCardUpdateCheckPromptForUpdate()) {
+    if (SettingsCache::instance().updates().getStartupCardUpdateCheckPromptForUpdate()) {
         startupCardUpdateCheckBehaviorSelector.setCurrentIndex(startupCardUpdateCheckBehaviorIndexPrompt);
-    } else if (SettingsCache::instance().getStartupCardUpdateCheckAlwaysUpdate()) {
+    } else if (SettingsCache::instance().updates().getStartupCardUpdateCheckAlwaysUpdate()) {
         startupCardUpdateCheckBehaviorSelector.setCurrentIndex(startupCardUpdateCheckBehaviorIndexAlways);
     } else {
         startupCardUpdateCheckBehaviorSelector.setCurrentIndex(startupCardUpdateCheckBehaviorIndexNone);
@@ -86,20 +116,20 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     connect(&startupCardUpdateCheckBehaviorSelector, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             [](int index) {
-                SettingsCache::instance().setStartupCardUpdateCheckPromptForUpdate(
+                SettingsCache::instance().updates().setStartupCardUpdateCheckPromptForUpdate(
                     index == startupCardUpdateCheckBehaviorIndexPrompt);
-                SettingsCache::instance().setStartupCardUpdateCheckAlwaysUpdate(
+                SettingsCache::instance().updates().setStartupCardUpdateCheckAlwaysUpdate(
                     index == startupCardUpdateCheckBehaviorIndexAlways);
             });
 
     cardUpdateCheckIntervalSpinBox.setMinimum(1);
     cardUpdateCheckIntervalSpinBox.setMaximum(30);
-    cardUpdateCheckIntervalSpinBox.setValue(settings.getCardUpdateCheckInterval());
+    cardUpdateCheckIntervalSpinBox.setValue(settings.updates().getCardUpdateCheckInterval());
 
-    connect(&cardUpdateCheckIntervalSpinBox, qOverload<int>(&QSpinBox::valueChanged), &settings,
-            &SettingsCache::setCardUpdateCheckInterval);
+    connect(&cardUpdateCheckIntervalSpinBox, qOverload<int>(&QSpinBox::valueChanged), &settings.updates(),
+            &UpdatesSettings::setCardUpdateCheckInterval);
 
-    newVersionOracleCheckBox.setChecked(settings.getNotifyAboutNewVersion());
+    newVersionOracleCheckBox.setChecked(settings.updates().getNotifyAboutNewVersion());
 
     auto *cardDatabaseGrid = new QGridLayout;
     cardDatabaseGrid->addWidget(&startupCardUpdateCheckBehaviorLabel, 0, 0);
@@ -112,33 +142,86 @@ GeneralSettingsPage::GeneralSettingsPage()
     cardDatabaseGroupBox->setLayout(cardDatabaseGrid);
 
     // startup settings
-    showTipsOnStartup.setChecked(settings.getShowTipsOnStartup());
+    showTipsOnStartup.setChecked(settings.personal().getShowTipsOnStartup());
 
-    connect(&showTipsOnStartup, &QCheckBox::clicked, &settings, &SettingsCache::setShowTipsOnStartup);
+    connect(&showTipsOnStartup, &QCheckBox::clicked, &settings.personal(), &PersonalSettings::setShowTipsOnStartup);
+
+    // startup destination
+    for (int i = 0; i < 8; ++i) {
+        startupTabSelector.addItem(""); // texts set in retranslateUi
+    }
+    startupTabSelector.setCurrentIndex(settings.tabs().getStartupTabIndex());
+
+    connect(&startupTabSelector, qOverload<int>(&QComboBox::currentIndexChanged), &settings.tabs(),
+            &TabsSettings::setStartupTabIndex);
+    connect(&startupTabSelector, qOverload<int>(&QComboBox::currentIndexChanged), this,
+            &GeneralSettingsPage::updateStartupServerControlsVisibility);
+
+    const QString savedHost = settings.tabs().getStartupServerHost();
+    const QString savedPort = settings.tabs().getStartupServerPort();
+    int startupServerIndex = -1;
+    UserConnection_Information uci;
+    for (const auto &savedServer : uci.getServerInfo()) {
+        const UserConnection_Information &info = savedServer.second;
+        const QString saveName = info.getSaveName();
+        if (saveName.isEmpty()) {
+            continue;
+        }
+        startupServerSelector.addItem(saveName, QVariantList{info.getServer(), info.getPort()});
+        if (startupServerIndex == -1 && info.getServer() == savedHost && info.getPort() == savedPort) {
+            startupServerIndex = startupServerSelector.count() - 1;
+        }
+    }
+    startupServerSelector.setCurrentIndex(startupServerIndex);
+
+    connect(&startupServerSelector, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int index) {
+        const QVariantList serverInfo = startupServerSelector.itemData(index).toList();
+        if (serverInfo.size() != 2) {
+            return;
+        }
+        TabsSettings &tabs = SettingsCache::instance().tabs();
+        tabs.setStartupServerHost(serverInfo[0].toString());
+        tabs.setStartupServerPort(serverInfo[1].toString());
+    });
+
+    startupRoomNameEdit = new QLineEdit(settings.tabs().getStartupRoomName());
+    // Default (Expanding) would stretch the whole controls column when this row becomes visible,
+    // so size it like the combo boxes instead: fills the column, never widens it.
+    startupRoomNameEdit->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    connect(startupRoomNameEdit, &QLineEdit::editingFinished, this,
+            [this] { SettingsCache::instance().tabs().setStartupRoomName(startupRoomNameEdit->text().trimmed()); });
 
     auto *startupGrid = new QGridLayout;
     startupGrid->addWidget(&showTipsOnStartup, 0, 0, 1, 2);
+    startupGrid->addWidget(&startupTabLabel, 1, 0);
+    startupGrid->addWidget(&startupTabSelector, 1, 1);
+    startupGrid->addWidget(&startupServerLabel, 2, 0);
+    startupGrid->addWidget(&startupServerSelector, 2, 1);
+    startupGrid->addWidget(&startupRoomLabel, 3, 0);
+    startupGrid->addWidget(startupRoomNameEdit, 3, 1);
+
+    updateStartupServerControlsVisibility();
 
     startupGroupBox = new QGroupBox;
     startupGroupBox->setLayout(startupGrid);
 
     // paths settings
-    deckPathEdit = new QLineEdit(settings.getDeckPath());
+    deckPathEdit = new QLineEdit(settings.paths().getDeckPath());
     deckPathEdit->setReadOnly(true);
     auto *deckPathButton = new QPushButton("...");
     connect(deckPathButton, &QPushButton::clicked, this, &GeneralSettingsPage::deckPathButtonClicked);
 
-    filtersPathEdit = new QLineEdit(settings.getFiltersPath());
+    filtersPathEdit = new QLineEdit(settings.paths().getFiltersPath());
     filtersPathEdit->setReadOnly(true);
     auto *filtersPathButton = new QPushButton("...");
     connect(filtersPathButton, &QPushButton::clicked, this, &GeneralSettingsPage::filtersPathButtonClicked);
 
-    replaysPathEdit = new QLineEdit(settings.getReplaysPath());
+    replaysPathEdit = new QLineEdit(settings.paths().getReplaysPath());
     replaysPathEdit->setReadOnly(true);
     auto *replaysPathButton = new QPushButton("...");
     connect(replaysPathButton, &QPushButton::clicked, this, &GeneralSettingsPage::replaysPathButtonClicked);
 
-    picsPathEdit = new QLineEdit(settings.getPicsPath());
+    picsPathEdit = new QLineEdit(settings.paths().getPicsPath());
     picsPathEdit->setReadOnly(true);
     auto *picsPathButton = new QPushButton("...");
     connect(picsPathButton, &QPushButton::clicked, this, &GeneralSettingsPage::picsPathButtonClicked);
@@ -224,13 +307,14 @@ GeneralSettingsPage::GeneralSettingsPage()
     GeneralSettingsPage::retranslateUi();
 
     // connect the ReleaseChannel combo box only after the entries are inserted in retranslateUi
-    connect(&updateReleaseChannelBox, qOverload<int>(&QComboBox::currentIndexChanged), &settings,
-            &SettingsCache::setUpdateReleaseChannelIndex);
+    connect(&updateReleaseChannelBox, qOverload<int>(&QComboBox::currentIndexChanged), &settings.updates(),
+            &UpdatesSettings::setUpdateReleaseChannelIndex);
     updateReleaseChannelBox.setCurrentIndex(settings.getUpdateReleaseChannelIndex());
 
     setLayout(mainLayout);
 
-    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &GeneralSettingsPage::retranslateUi);
+    connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this,
+            &GeneralSettingsPage::retranslateUi);
     retranslateUi();
 }
 
@@ -264,7 +348,7 @@ void GeneralSettingsPage::deckPathButtonClicked()
     }
 
     deckPathEdit->setText(path);
-    SettingsCache::instance().setDeckPath(path);
+    SettingsCache::instance().paths().setDeckPath(path);
 }
 
 void GeneralSettingsPage::filtersPathButtonClicked()
@@ -275,7 +359,7 @@ void GeneralSettingsPage::filtersPathButtonClicked()
     }
 
     filtersPathEdit->setText(path);
-    SettingsCache::instance().setFiltersPath(path);
+    SettingsCache::instance().paths().setFiltersPath(path);
 }
 
 void GeneralSettingsPage::replaysPathButtonClicked()
@@ -286,7 +370,7 @@ void GeneralSettingsPage::replaysPathButtonClicked()
     }
 
     replaysPathEdit->setText(path);
-    SettingsCache::instance().setReplaysPath(path);
+    SettingsCache::instance().paths().setReplaysPath(path);
 }
 
 void GeneralSettingsPage::picsPathButtonClicked()
@@ -297,7 +381,7 @@ void GeneralSettingsPage::picsPathButtonClicked()
     }
 
     picsPathEdit->setText(path);
-    SettingsCache::instance().setPicsPath(path);
+    SettingsCache::instance().paths().setPicsPath(path);
 }
 
 void GeneralSettingsPage::cardDatabasePathButtonClicked()
@@ -308,7 +392,7 @@ void GeneralSettingsPage::cardDatabasePathButtonClicked()
     }
 
     cardDatabasePathEdit->setText(path);
-    SettingsCache::instance().setCardDatabasePath(path);
+    SettingsCache::instance().paths().setCardDatabasePath(path);
 }
 
 void GeneralSettingsPage::customCardDatabaseButtonClicked()
@@ -319,7 +403,7 @@ void GeneralSettingsPage::customCardDatabaseButtonClicked()
     }
 
     customCardDatabasePathEdit->setText(path);
-    SettingsCache::instance().setCustomCardDatabasePath(path);
+    SettingsCache::instance().paths().setCustomCardDatabasePath(path);
 }
 
 void GeneralSettingsPage::tokenDatabasePathButtonClicked()
@@ -330,16 +414,16 @@ void GeneralSettingsPage::tokenDatabasePathButtonClicked()
     }
 
     tokenDatabasePathEdit->setText(path);
-    SettingsCache::instance().setTokenDatabasePath(path);
+    SettingsCache::instance().paths().setTokenDatabasePath(path);
 }
 
 void GeneralSettingsPage::resetAllPathsClicked()
 {
     SettingsCache &settings = SettingsCache::instance();
     settings.resetPaths();
-    deckPathEdit->setText(settings.getDeckPath());
-    replaysPathEdit->setText(settings.getReplaysPath());
-    picsPathEdit->setText(settings.getPicsPath());
+    deckPathEdit->setText(settings.paths().getDeckPath());
+    replaysPathEdit->setText(settings.paths().getReplaysPath());
+    picsPathEdit->setText(settings.paths().getPicsPath());
     cardDatabasePathEdit->setText(settings.getCardDatabasePath());
     customCardDatabasePathEdit->setText(settings.getCustomCardDatabasePath());
     tokenDatabasePathEdit->setText(settings.getTokenDatabasePath());
@@ -348,54 +432,84 @@ void GeneralSettingsPage::resetAllPathsClicked()
 
 void GeneralSettingsPage::languageBoxChanged(int index)
 {
-    SettingsCache::instance().setLang(languageBox.itemData(index).toString());
+    SettingsCache::instance().personal().setLang(languageBox.itemData(index).toString());
+}
+
+void GeneralSettingsPage::cardLanguageBoxChanged(int index)
+{
+    const QString lang = cardLanguageBox.itemData(index).toString();
+    SettingsCache::instance().cardsDisplay().setCardLang(lang);
+
+    // Switching to a non-default language only takes effect after the card
+    // database is re-imported with that language selected; English data is always
+    // present, so switching back to English needs no prompt.
+    if (lang == "en") {
+        return;
+    }
+
+    // The binary cache does not track the language its entries were imported in,
+    // and the downloaded pictures were fetched with English art names, so both are
+    // stale until Oracle re-imports the database in the new language: drop them.
+    QFile::remove(SettingsCache::instance().getCardDatabasePath() + ".cache");
+    CardPictureLoader::clearNetworkCache();
+    CardPictureLoader::clearPixmapCache();
+
+    // Art is resolved by the translated card name for non-English languages, so the
+    // matching Scryfall URL is added to the top of the download list. It stays
+    // visible in the deck editor settings, where it can be removed or reordered.
+    const bool localizedUrlAdded = SettingsCache::instance().downloads().addLocalizedScryfallUrl();
+
+    QString message = tr("<p>The card database only contains English card data. To see cards in <b>%1</b>, "
+                         "<b>Oracle</b> must run once with this language selected and re-import the card "
+                         "database.</p>"
+                         "<p>The cached database and the downloaded card pictures have been cleared, so a "
+                         "re-import is picked up without stale entries.</p>")
+                          .arg(cardLanguageBox.itemText(index));
+    if (localizedUrlAdded) {
+        message += tr("<p>The Scryfall URL that resolves card art by translated name was added to the top of your "
+                      "download list. You can remove or reorder it any time.</p>");
+    }
+    message += tr("<p>Run Oracle now?</p>");
+
+    const QMessageBox::StandardButton answer = QMessageBox::question(
+        this, tr("Card text & images language changed"), message, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+
+    // The answer only controls whether Oracle starts right away; the caches stay
+    // cleared so the next import or launch rebuilds them in the new language.
+    if (answer == QMessageBox::Yes) {
+        emit cardDatabaseUpdateRequested();
+    }
+}
+
+void GeneralSettingsPage::updateStartupServerControlsVisibility()
+{
+    const int index = startupTabSelector.currentIndex();
+    const bool serverNeeded = index == StartupTab::StartupTabServer || index == StartupTab::StartupTabServerRoom;
+    const bool roomNeeded = index == StartupTab::StartupTabServerRoom;
+    startupServerLabel.setVisible(serverNeeded);
+    startupServerSelector.setVisible(serverNeeded);
+    startupRoomLabel.setVisible(roomNeeded);
+    startupRoomNameEdit->setVisible(roomNeeded);
 }
 
 void GeneralSettingsPage::retranslateUi()
 {
-    languageGroupBox->setTitle(tr("Language settings"));
-    languageLabel.setText(tr("Language:"));
-
-    versionGroupBox->setTitle(tr("Version settings"));
-    cardDatabaseGroupBox->setTitle(tr("Card database"));
-    startupGroupBox->setTitle(tr("Startup settings"));
-
-    if (SettingsCache::instance().getIsPortableBuild()) {
-        pathsGroupBox->setTitle(tr("Paths (editing disabled in portable mode)"));
-    } else {
-        pathsGroupBox->setTitle(tr("Paths"));
-    }
-    advertiseTranslationPageLabel.setText(
-        QString("<a href='%1'>%2</a>").arg(WIKI_TRANSLATION_FAQ).arg(tr("How to help with translations")));
-    deckPathLabel.setText(tr("Decks directory:"));
-    filtersPathLabel.setText(tr("Filters directory:"));
-    replaysPathLabel.setText(tr("Replays directory:"));
-    picsPathLabel.setText(tr("Pictures directory:"));
-    cardDatabasePathLabel.setText(tr("Card database:"));
-    customCardDatabasePathLabel.setText(tr("Custom database directory:"));
-    tokenDatabasePathLabel.setText(tr("Token database:"));
-    updateReleaseChannelLabel.setText(tr("Update channel"));
-    startupUpdateCheckCheckBox.setText(tr("Check for client updates on startup"));
-    startupCardUpdateCheckBehaviorLabel.setText(tr("Check for card database updates on startup"));
-    startupCardUpdateCheckBehaviorSelector.setItemText(startupCardUpdateCheckBehaviorIndexNone, tr("Don't check"));
-    startupCardUpdateCheckBehaviorSelector.setItemText(startupCardUpdateCheckBehaviorIndexPrompt,
-                                                       tr("Prompt for update"));
-    startupCardUpdateCheckBehaviorSelector.setItemText(startupCardUpdateCheckBehaviorIndexAlways,
-                                                       tr("Always update in the background"));
-    cardUpdateCheckIntervalLabel.setText(tr("Check for card database updates every"));
-    cardUpdateCheckIntervalSpinBox.setSuffix(tr(" days"));
-    updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));
-    newVersionOracleCheckBox.setText(tr("Automatically run Oracle when running a new version of Cockatrice"));
-    showTipsOnStartup.setText(tr("Show tips on startup"));
-    resetAllPathsButton->setText(tr("Reset all paths"));
-
     const auto &settings = SettingsCache::instance();
 
-    QDate lastCheckDate = settings.getLastCardUpdateCheck();
-    int daysAgo = lastCheckDate.daysTo(QDate::currentDate());
+    languageGroupBox->setTitle(tr("Language settings"));
+    languageLabel.setText(tr("Language:"));
+    cardLanguageBox.setItemText(0, tr("English"));
+    cardLanguageLabel.setText(tr("Card text & images language:"));
+    cardLanguageNoteLabel.setText(
+        tr("Foreign card names, text and art apply after you update the card database (Oracle)."));
+    advertiseTranslationPageLabel.setText(
+        QString("<a href='%1'>%2</a>").arg(WIKI_TRANSLATION_FAQ).arg(tr("How to help with translations")));
 
-    lastCardUpdateCheckDateLabel.setText(
-        tr("Last update check on %1 (%2 days ago)").arg(lastCheckDate.toString()).arg(daysAgo));
+    versionGroupBox->setTitle(tr("Version settings"));
+    updateReleaseChannelLabel.setText(tr("Update channel"));
+    startupUpdateCheckCheckBox.setText(tr("Check for client updates on startup"));
+    updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));
+    newVersionOracleCheckBox.setText(tr("Automatically run Oracle when running a new version of Cockatrice"));
 
     // We can't change the strings after they're put into the QComboBox, so this is our workaround
     int oldIndex = updateReleaseChannelBox.currentIndex();
@@ -404,4 +518,50 @@ void GeneralSettingsPage::retranslateUi()
         updateReleaseChannelBox.addItem(tr(chan->getName().toUtf8()));
     }
     updateReleaseChannelBox.setCurrentIndex(oldIndex);
+
+    cardDatabaseGroupBox->setTitle(tr("Card database"));
+    startupCardUpdateCheckBehaviorLabel.setText(tr("Check for card database updates on startup"));
+    startupCardUpdateCheckBehaviorSelector.setItemText(startupCardUpdateCheckBehaviorIndexNone, tr("Don't check"));
+    startupCardUpdateCheckBehaviorSelector.setItemText(startupCardUpdateCheckBehaviorIndexPrompt,
+                                                       tr("Prompt for update"));
+    startupCardUpdateCheckBehaviorSelector.setItemText(startupCardUpdateCheckBehaviorIndexAlways,
+                                                       tr("Always update in the background"));
+    cardUpdateCheckIntervalLabel.setText(tr("Check for card database updates every"));
+    cardUpdateCheckIntervalSpinBox.setSuffix(tr(" days"));
+
+    QDate lastCheckDate = settings.updates().getLastCardUpdateCheck();
+    int daysAgo = lastCheckDate.daysTo(QDate::currentDate());
+    lastCardUpdateCheckDateLabel.setText(
+        tr("Last update check on %1 (%2 days ago)").arg(lastCheckDate.toString()).arg(daysAgo));
+
+    startupGroupBox->setTitle(tr("Startup settings"));
+    showTipsOnStartup.setText(tr("Show tips on startup"));
+    startupTabLabel.setText(tr("Startup tab:"));
+    startupTabSelector.setItemText(StartupTab::StartupTabHome, tr("Home"));
+    startupTabSelector.setItemText(StartupTab::StartupTabVisualDeckStorage, tr("Visual Deck Storage"));
+    startupTabSelector.setItemText(StartupTab::StartupTabDeckStorage, tr("Deck Storage"));
+    startupTabSelector.setItemText(StartupTab::StartupTabReplays, tr("Game Replays"));
+    startupTabSelector.setItemText(StartupTab::StartupTabDeckEditor, tr("Deck Editor"));
+    startupTabSelector.setItemText(StartupTab::StartupTabVisualDeckEditor, tr("Visual Deck Editor"));
+    startupTabSelector.setItemText(StartupTab::StartupTabServer, tr("Server"));
+    startupTabSelector.setItemText(StartupTab::StartupTabServerRoom, tr("Server Room"));
+    startupTabSelector.setToolTip(
+        tr("The tab shown when Cockatrice starts. If the chosen tab is not open yet, it is opened."));
+    startupServerLabel.setText(tr("Server:"));
+    startupRoomLabel.setText(tr("Room:"));
+    startupRoomNameEdit->setPlaceholderText(tr("Room name"));
+
+    if (settings.getIsPortableBuild()) {
+        pathsGroupBox->setTitle(tr("Paths (editing disabled in portable mode)"));
+    } else {
+        pathsGroupBox->setTitle(tr("Paths"));
+    }
+    deckPathLabel.setText(tr("Decks directory:"));
+    filtersPathLabel.setText(tr("Filters directory:"));
+    replaysPathLabel.setText(tr("Replays directory:"));
+    picsPathLabel.setText(tr("Pictures directory:"));
+    cardDatabasePathLabel.setText(tr("Card database:"));
+    customCardDatabasePathLabel.setText(tr("Custom database directory:"));
+    tokenDatabasePathLabel.setText(tr("Token database:"));
+    resetAllPathsButton->setText(tr("Reset all paths"));
 }

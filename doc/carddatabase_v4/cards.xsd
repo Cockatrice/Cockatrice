@@ -6,6 +6,7 @@
                 <xs:attribute type="xs:string" name="exclude" use="optional" />
                 <xs:attribute type="xs:string" name="attach" use="optional" />
                 <xs:attribute type="xs:string" name="persistent" use="optional" />
+                <xs:attribute type="xs:string" name="facedown" use="optional"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
@@ -34,6 +35,13 @@
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
+    <xs:complexType name="localizationType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="name" minOccurs="0" maxOccurs="1" />
+            <xs:element type="xs:string" name="text" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="lang" use="required" />
+    </xs:complexType>
     <xs:group name="cardPropertyGroup">
         <xs:sequence>
             <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded" />
@@ -46,6 +54,13 @@
             <xs:element name="prop" minOccurs="0" maxOccurs="1">
                 <xs:complexType>
                     <xs:group ref="cardPropertyGroup"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="localizations" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element type="localizationType" name="localization" minOccurs="0" maxOccurs="unbounded" />
+                    </xs:sequence>
                 </xs:complexType>
             </xs:element>
             <xs:element type="cardInSetType" name="set" minOccurs="1" maxOccurs="unbounded" />

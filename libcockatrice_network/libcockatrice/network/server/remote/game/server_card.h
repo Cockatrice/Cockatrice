@@ -156,7 +156,7 @@ public:
     /**
      * @brief Sets a card counter to an exact value with clamping.
      * @param _id The counter ID.
-     * @param value The desired value (clamped to [0, MAX_COUNTERS_ON_CARD]; 0 removes the counter).
+     * @param value The desired value (clamped to [0, MAX_COUNTER_VALUE]; 0 removes the counter).
      * @param event Optional event to populate with counter state.
      * @return true if the value changed, false otherwise.
      */
@@ -168,7 +168,7 @@ public:
      * @param event Optional event to populate with counter state.
      * @return true if the value changed, false otherwise.
      * @note If counter does not exist, starts from 0. Counter is removed if result is 0.
-     * @note Clamps result to [0, MAX_COUNTERS_ON_CARD].
+     * @note Clamps result to [0, MAX_COUNTER_VALUE].
      */
     [[nodiscard]] bool incrementCounter(int counterId, int delta, Event_SetCardCounter *event = nullptr);
     void setTapped(bool _tapped)

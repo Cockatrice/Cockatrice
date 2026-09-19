@@ -4,12 +4,15 @@
 #include "card_picture_loader_worker.h"
 #include "card_picture_to_load.h"
 
+#include <QDateTime>
 #include <QLoggingCategory>
 #include <QMutex>
 #include <QNetworkAccessManager>
 #include <QObject>
+#include <QRandomGenerator>
 #include <QThread>
 #include <libcockatrice/card/database/card_database.h>
+#include <libcockatrice/utility/server_rate_limiter.h>
 
 inline Q_LOGGING_CATEGORY(CardPictureLoaderWorkerWorkLog, "card_picture_loader.worker");
 
@@ -50,6 +53,8 @@ public slots:
 private:
     bool picDownload; ///< Whether network downloading is enabled
 
+    static ServerRateLimiter s_rateLimiter; ///< Shared per-server 429 backoff state
+
     /** @brief Starts downloading the next URL for this card. */
     void startNextPicDownload();
 
@@ -77,6 +82,16 @@ private:
      */
     void concludeImageLoad(const QImage &image);
 
+    /**
+     * @brief Schedules a deferred retry after the relevant server backoff expires.
+     *
+     * Waits on the current URL's server when it is the reason we are blocked,
+     * otherwise on the earliest active backoff. If no servers are in backoff,
+     * concludes with failure. Otherwise resets the CardPictureToLoad indices and
+     * retries after the backoff period.
+     */
+    void scheduleDeferredRetry();
+
 private slots:
     /** @brief Updates the picDownload setting when it changes. */
     void picDownloadChanged();
@@ -99,6 +114,9 @@ signals:
 
     /** @brief Emitted when a URL has been redirected. */
     void urlRedirected(const QUrl &originalUrl, const QUrl &redirectUrl);
+
+    /** @brief Emitted when a server returned HTTP 429. */
+    void rateLimited(const QString &host);
 
     /** @brief Emitted when a cached URL is invalid and must be removed. */
     void cachedUrlInvalidated(const QUrl &url);

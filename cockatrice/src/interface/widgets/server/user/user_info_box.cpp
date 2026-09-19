@@ -122,6 +122,8 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
     QString userLevelText;
     if (userLevel.testFlag(ServerInfo_User::IsAdmin)) {
         userLevelText = tr("Administrator");
+    } else if (userLevel.testFlag(ServerInfo_User::IsDeveloper)) {
+        userLevelText = tr("Developer");
     } else if (userLevel.testFlag(ServerInfo_User::IsModerator)) {
         userLevelText = tr("Moderator");
     } else if (userLevel.testFlag(ServerInfo_User::IsRegistered)) {
@@ -319,6 +321,7 @@ void UserInfoBox::actBannerCard()
     if (hasUserInfo && currentUserInfo.has_card_art_params()) {
         const auto &cap = currentUserInfo.card_art_params();
         initial.cardName = QString::fromStdString(cap.card_name());
+        initial.cardProviderId = QString::fromStdString(cap.card_provider_id());
         initial.marginPctL = cap.margin_pct_l();
         initial.marginPctR = cap.margin_pct_r();
         initial.verticalOffset = cap.vertical_offset();
@@ -335,6 +338,7 @@ void UserInfoBox::actBannerCard()
     Command_SetCardArtParams cmd;
     cmd.set_card_name(p.cardName.toStdString());
     if (!p.cardName.isEmpty()) {
+        cmd.set_card_provider_id(p.cardProviderId.toStdString());
         cmd.set_margin_pct_l(p.marginPctL);
         cmd.set_margin_pct_r(p.marginPctR);
         cmd.set_vertical_offset(p.verticalOffset);

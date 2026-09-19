@@ -57,6 +57,7 @@ private slots:
     void cardRemoved(CardInfoPtr card);
     void cardInfoChanged(const CardInfoPtr &card);
     void cardDatabaseEnabledSetsChanged();
+    void resetCardList();
 };
 
 #endif

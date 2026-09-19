@@ -1,5 +1,6 @@
 #include "archidekt_api_response_deck_display_widget.h"
 
+#include "../../../../../../client/settings/cache_settings.h"
 #include "../../../../../deck_loader/card_node_function.h"
 #include "../../../../../deck_loader/deck_loader.h"
 #include "../../../../cards/card_size_widget.h"
@@ -10,6 +11,7 @@
 
 #include <QSortFilterProxyModel>
 #include <libcockatrice/card/import/card_name_normalizer.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 
 ArchidektApiResponseDeckDisplayWidget::ArchidektApiResponseDeckDisplayWidget(QWidget *parent,
                                                                              ArchidektApiResponseDeck _response,
@@ -120,6 +122,9 @@ ArchidektApiResponseDeckDisplayWidget::ArchidektApiResponseDeckDisplayWidget(QWi
     }
 
     model = new DeckListModel(this);
+    model->setDisplayLanguage(SettingsCache::instance().cardsDisplay().getCardLang());
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::cardLangChanged, model,
+            [this](const QString &lang) { model->setDisplayLanguage(lang); });
     connect(model, &DeckListModel::modelReset, this, &ArchidektApiResponseDeckDisplayWidget::decklistModelReset);
 
     auto decklist = QSharedPointer<DeckList>(new DeckList);

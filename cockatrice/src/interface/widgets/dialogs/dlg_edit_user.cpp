@@ -6,7 +6,7 @@
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/utility/string_limits.h>
 
 DlgEditUser::DlgEditUser(QWidget *parent, QString email, QString country, QString realName) : QDialog(parent)
 {

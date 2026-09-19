@@ -6,6 +6,7 @@ mysql.cnf
 .DS_Store
 .idea/
 *.aps
+*.cache
 cmake-build*
 preferences
 compile_commands.json

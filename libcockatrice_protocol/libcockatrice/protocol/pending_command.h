@@ -7,6 +7,7 @@
 #ifndef PENDING_COMMAND_H
 #define PENDING_COMMAND_H
 
+#include <QElapsedTimer>
 #include <QVariant>
 #include <libcockatrice/protocol/pb/commands.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
@@ -21,6 +22,7 @@ private:
     CommandContainer commandContainer;
     QVariant extraData;
     int ticks;
+    QElapsedTimer startTime;
 
 public:
     explicit PendingCommand(const CommandContainer &_commandContainer, QVariant _extraData = QVariant());
@@ -29,6 +31,18 @@ public:
     QVariant getExtraData() const;
     void processResponse(const Response &response);
     int tick();
+
+    /**
+     * @brief Starts the round-trip timer. Called by the client thread right
+     * before the command container is handed to the transport layer.
+     */
+    void startTiming();
+
+    /**
+     * @return Milliseconds elapsed since startTiming(), or -1 if the timer was
+     * never started.
+     */
+    qint64 elapsedMs() const;
 };
 
 #endif
