@@ -14,7 +14,7 @@ class MoveMenu : public QMenu
     Q_OBJECT
 
 public:
-    explicit MoveMenu(PlayerGraphicsItem *player);
+    explicit MoveMenu(PlayerGraphicsItem *player, QWidget *parent);
     void setShortcutsActive();
     void retranslateUi();
 

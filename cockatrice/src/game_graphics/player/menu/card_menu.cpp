@@ -203,7 +203,7 @@ void CardMenu::createTableMenu(bool canModifyCard)
     }
     addSeparator();
     addAction(aClone);
-    addMenu(new MoveMenu(player));
+    addMenu(new MoveMenu(player, this));
     addSeparator();
     addAction(aAttach);
     if (card->getAttachedTo()) {
@@ -253,7 +253,7 @@ void CardMenu::createStackMenu(bool canModifyCard)
     addAction(aPlayFacedown);
     addSeparator();
     addAction(aClone);
-    addMenu(new MoveMenu(player));
+    addMenu(new MoveMenu(player, this));
     addSeparator();
     addAction(aAttach);
     addAction(aDrawArrow);
@@ -282,7 +282,7 @@ void CardMenu::createGraveyardOrExileMenu(bool canModifyCard)
     addAction(aPlayFacedown);
     addSeparator();
     addAction(aClone);
-    addMenu(new MoveMenu(player));
+    addMenu(new MoveMenu(player, this));
     addSeparator();
     addAction(aAttach);
     addAction(aDrawArrow);
@@ -320,7 +320,7 @@ void CardMenu::createHandOrCustomZoneMenu(bool canModifyCard)
 
     addSeparator();
     addAction(aClone);
-    addMenu(new MoveMenu(player));
+    addMenu(new MoveMenu(player, this));
 
     // actions that are really wonky when done from deck or sideboard
     if (card->getZone()->getName() == ZoneNames::HAND) {
@@ -344,7 +344,7 @@ void CardMenu::createHandOrCustomZoneMenu(bool canModifyCard)
 void CardMenu::createZonelessMenu(bool canModifyCard)
 {
     if (canModifyCard) {
-        addMenu(new MoveMenu(player));
+        addMenu(new MoveMenu(player, this));
     }
 }
 
