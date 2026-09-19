@@ -2,6 +2,32 @@
 
 #include <QXmlStreamReader>
 
+namespace
+{
+
+void readMoveCardToZone(QXmlStreamReader *xml, QList<MoveCard_ToZone> &moveList)
+{
+    MoveCard_ToZone move;
+    while (!xml->atEnd()) {
+        xml->readNext();
+        const QString childName = xml->name().toString();
+        if (xml->isStartElement()) {
+            if (childName == "card_name") {
+                move.set_card_name(xml->readElementText().toStdString());
+            } else if (childName == "start_zone") {
+                move.set_start_zone(xml->readElementText().toStdString());
+            } else if (childName == "target_zone") {
+                move.set_target_zone(xml->readElementText().toStdString());
+            }
+        } else if (xml->isEndElement() && (childName == "move_card_to_zone")) {
+            moveList.append(move);
+            return;
+        }
+    }
+}
+
+} // namespace
+
 SideboardPlan::SideboardPlan(const QString &_name, const QList<MoveCard_ToZone> &_moveList)
     : name(_name), moveList(_moveList)
 {
@@ -21,23 +47,7 @@ bool SideboardPlan::readElement(QXmlStreamReader *xml)
             if (childName == "name") {
                 name = xml->readElementText();
             } else if (childName == "move_card_to_zone") {
-                MoveCard_ToZone m;
-                while (!xml->atEnd()) {
-                    xml->readNext();
-                    const QString childName2 = xml->name().toString();
-                    if (xml->isStartElement()) {
-                        if (childName2 == "card_name") {
-                            m.set_card_name(xml->readElementText().toStdString());
-                        } else if (childName2 == "start_zone") {
-                            m.set_start_zone(xml->readElementText().toStdString());
-                        } else if (childName2 == "target_zone") {
-                            m.set_target_zone(xml->readElementText().toStdString());
-                        }
-                    } else if (xml->isEndElement() && (childName2 == "move_card_to_zone")) {
-                        moveList.append(m);
-                        break;
-                    }
-                }
+                readMoveCardToZone(xml, moveList);
             }
         } else if (xml->isEndElement() && (childName == "sideboard_plan")) {
             return true;
