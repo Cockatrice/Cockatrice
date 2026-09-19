@@ -145,10 +145,6 @@ private:
 
 public:
     explicit RemoteDeckList_TreeWidget(AbstractClient *_client, QWidget *parent = nullptr);
-    [[nodiscard]] RemoteDeckList_TreeModel *getModel() const
-    {
-        return treeModel;
-    }
     [[nodiscard]] RemoteDeckList_TreeModel::Node *getNode(const QModelIndex &ind) const;
     [[nodiscard]] RemoteDeckList_TreeModel::Node *getCurrentItem() const;
     [[nodiscard]] QList<RemoteDeckList_TreeModel::Node *> getCurrentSelection() const;
