@@ -110,6 +110,11 @@ QString CardsDisplaySettings::getCardLang() const
     return getValue("cardLang", QString(), QString(), "en").toString();
 }
 
+int CardsDisplaySettings::getCardSearchLanguage() const
+{
+    return getValue("cardSearchLanguage", QString(), QString(), static_cast<int>(CardSearchLanguage::English)).toInt();
+}
+
 void CardsDisplaySettings::setDisplayCardNames(bool _displayCardNames)
 {
     setValue(_displayCardNames, "displayCardNames");
@@ -241,4 +246,13 @@ void CardsDisplaySettings::setCardLang(const QString &_cardLang)
     // observe a stale (pre-change) value.
     sync();
     emit cardLangChanged(_cardLang);
+}
+
+void CardsDisplaySettings::setCardSearchLanguage(int _cardSearchLanguage)
+{
+    if (_cardSearchLanguage == getCardSearchLanguage()) {
+        return;
+    }
+    setValue(_cardSearchLanguage, "cardSearchLanguage");
+    emit cardSearchLanguageChanged(_cardSearchLanguage);
 }

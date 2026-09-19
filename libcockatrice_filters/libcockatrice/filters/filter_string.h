@@ -14,6 +14,7 @@
 #include <QString>
 #include <functional>
 #include <libcockatrice/card/card_info.h>
+#include <libcockatrice/card/card_localization.h>
 #include <utility>
 
 inline Q_LOGGING_CATEGORY(FilterStringLog, "filter_string");
@@ -35,7 +36,9 @@ class FilterString
 {
 public:
     FilterString();
-    explicit FilterString(const QString &exp);
+    explicit FilterString(const QString &exp,
+                          const QString &searchLanguage = QString(),
+                          CardSearchLanguage searchLanguageMode = CardSearchLanguage::English);
     [[nodiscard]] bool check(const CardData &card) const
     {
         if (card.isNull()) {

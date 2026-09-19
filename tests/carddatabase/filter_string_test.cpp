@@ -73,6 +73,57 @@ QUERY(Color4, cat, "c!gw", false)
 
 QUERY(BracketNextToUnquotedString, cat, "(o:woof OR o:meow)", true)
 
+CardInfoPtr localizedCat()
+{
+    CardInfoPtr localized = CardInfo::newInstance("Cat", "Meow!", false, {}, {}, {}, {}, {});
+    localized->setLocalizedName("de", "Kater");
+    localized->setLocalizedText("de", "miaut");
+    return localized;
+}
+
+TEST_F(CardQuery, SearchLanguageEnglishMatchesOnlyEnglish)
+{
+    const CardData localized = localizedCat();
+    ASSERT_TRUE(FilterString("Cat", "de", CardSearchLanguage::English).check(localized));
+    ASSERT_FALSE(FilterString("Kater", "de", CardSearchLanguage::English).check(localized));
+}
+
+TEST_F(CardQuery, SearchLanguageSelectedMatchesLocalizedNameAndText)
+{
+    const CardData localized = localizedCat();
+    ASSERT_TRUE(FilterString("Kater", "de", CardSearchLanguage::Selected).check(localized));
+    ASSERT_TRUE(FilterString("o:miaut", "de", CardSearchLanguage::Selected).check(localized));
+    ASSERT_FALSE(FilterString("Cat", "de", CardSearchLanguage::Selected).check(localized));
+}
+
+TEST_F(CardQuery, SearchLanguageSelectedFallsBackToEnglishForUntranslatedCards)
+{
+    const CardData localized = localizedCat();
+    ASSERT_TRUE(FilterString("Cat", "fr", CardSearchLanguage::Selected).check(localized));
+    ASSERT_FALSE(FilterString("Kater", "fr", CardSearchLanguage::Selected).check(localized));
+}
+
+TEST_F(CardQuery, SearchLanguageBothMatchesEitherLanguage)
+{
+    const CardData localized = localizedCat();
+    ASSERT_TRUE(FilterString("Cat", "de", CardSearchLanguage::Both).check(localized));
+    ASSERT_TRUE(FilterString("Kater", "de", CardSearchLanguage::Both).check(localized));
+}
+
+TEST_F(CardQuery, SearchLanguageIsBoundPerInstance)
+{
+    const CardData localized = localizedCat();
+
+    FilterString germanQuery("Kater", "de", CardSearchLanguage::Selected);
+    ASSERT_TRUE(germanQuery.check(localized));
+
+    // Constructing an English-bound instance afterwards must not change the
+    // language the earlier instance searches in.
+    FilterString englishQuery("Kater", "", CardSearchLanguage::English);
+    ASSERT_FALSE(englishQuery.check(localized));
+    ASSERT_TRUE(germanQuery.check(localized));
+}
+
 } // namespace
 
 int main(int argc, char **argv)
