@@ -76,6 +76,23 @@ public:
          * @brief Checks if all values (except for lastLoadedTimestamp) in the metadata is empty.
          */
         bool isEmpty() const;
+
+        /**
+         * @brief Reads a single deck metadata element from a Cockatrice deck XML stream.
+         *
+         * @param xml Reader positioned at the element.
+         * @param childName Name of the current element.
+         * @return true if a metadata element was consumed, false if @p childName is
+         *         not a metadata element.
+         */
+        bool readElement(QXmlStreamReader *xml, const QString &childName);
+
+        /**
+         * @brief Writes the deck metadata section of a Cockatrice deck XML file.
+         *
+         * @param xml Writer to append the metadata elements to.
+         */
+        void write(QXmlStreamWriter *xml) const;
     };
 
 private:
@@ -88,6 +105,22 @@ private:
      * An empty string indicates the cache is invalid.
      */
     mutable QString cachedDeckHash;
+
+    /** @name XML load helpers */
+    ///@{
+    /**
+     * @brief Advances to the next element in the XML stream.
+     * @param xml Reader to advance past non-element tokens.
+     * @return true when a start element was reached, false at end of stream.
+     */
+    bool seekToNextElement(QXmlStreamReader *xml);
+
+    /**
+     * @brief Reads the contents of a `cockatrice_deck` element into this deck.
+     * @param xml Reader positioned at the deck element, stopped at its end.
+     */
+    void readDeckBody(QXmlStreamReader *xml);
+    ///@}
 
 public:
     /** @name Metadata setters */

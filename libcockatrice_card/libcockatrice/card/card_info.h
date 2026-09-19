@@ -77,6 +77,9 @@ private:
     QString text;          ///< Text description or rules text of the card.
     bool isToken;          ///< Whether this card is a token or not.
 
+    QMap<QString, QString> localizedNames; ///< Localized card names, keyed by language code.
+    QMap<QString, QString> localizedTexts; ///< Localized rules text, keyed by language code.
+
     LazyPropertiesHash properties; ///< Key-value store of dynamic card properties.
 
     QList<CardRelation *> relatedCards;            ///< Forward references to related cards.
@@ -100,6 +103,8 @@ public:
      * @param _reverseRelatedCards Backward references to related cards.
      * @param _sets Map of set names to printing information.
      * @param _uiAttributes Attributes that affect display and game logic
+     * @param _localizedNames Localized card names, keyed by language code.
+     * @param _localizedTexts Localized rules text, keyed by language code.
      */
     explicit CardInfo(const QString &_name,
                       const QString &_text,
@@ -108,7 +113,9 @@ public:
                       const QList<CardRelation *> &_relatedCards,
                       const QList<CardRelation *> &_reverseRelatedCards,
                       SetToPrintingsMap _sets,
-                      UiAttributes _uiAttributes);
+                      UiAttributes _uiAttributes,
+                      QMap<QString, QString> _localizedNames = {},
+                      QMap<QString, QString> _localizedTexts = {});
 
     /**
      * @brief Constructs a CardInfo from a cache snapshot with precomputed derived
@@ -130,6 +137,8 @@ public:
      * @param _uiAttributes Attributes that affect display and game logic.
      * @param _simpleName Precomputed simplified name.
      * @param _altNames Precomputed alternate names.
+     * @param _localizedNames Localized card names, keyed by language code.
+     * @param _localizedTexts Localized rules text, keyed by language code.
      */
     explicit CardInfo(const QString &_name,
                       const QString &_text,
@@ -140,7 +149,9 @@ public:
                       SetToPrintingsMap _sets,
                       UiAttributes _uiAttributes,
                       QString _simpleName,
-                      QSet<QString> _altNames);
+                      QSet<QString> _altNames,
+                      QMap<QString, QString> _localizedNames = {},
+                      QMap<QString, QString> _localizedTexts = {});
 
     /**
      * @brief Copy constructor for CardInfo.
@@ -151,7 +162,8 @@ public:
      */
     CardInfo(const CardInfo &other)
         : QObject(other.parent()), name(other.name), simpleName(other.simpleName), text(other.text),
-          isToken(other.isToken), properties(other.properties), relatedCards(other.relatedCards),
+          isToken(other.isToken), localizedNames(other.localizedNames), localizedTexts(other.localizedTexts),
+          properties(other.properties), relatedCards(other.relatedCards),
           reverseRelatedCards(other.reverseRelatedCards), reverseRelatedCardsToMe(other.reverseRelatedCardsToMe),
           setsToPrintings(other.setsToPrintings), uiAttributes(other.uiAttributes), setsNames(other.setsNames),
           altNames(other.altNames)
@@ -179,6 +191,8 @@ public:
      * @param _reverseRelatedCards Reverse relationships.
      * @param _sets Printing information per set.
      * @param _uiAttributes Attributes that affect display and game logic
+     * @param _localizedNames Localized card names, keyed by language code.
+     * @param _localizedTexts Localized rules text, keyed by language code.
      * @return Shared pointer to the new CardInfo instance.
      */
     static CardInfoPtr newInstance(const QString &_name,
@@ -188,7 +202,9 @@ public:
                                    const QList<CardRelation *> &_relatedCards,
                                    const QList<CardRelation *> &_reverseRelatedCards,
                                    SetToPrintingsMap _sets,
-                                   UiAttributes _uiAttributes);
+                                   UiAttributes _uiAttributes,
+                                   QMap<QString, QString> _localizedNames = {},
+                                   QMap<QString, QString> _localizedTexts = {});
 
     /**
      * @brief Creates a new instance from a cache snapshot with precomputed
@@ -208,6 +224,8 @@ public:
      *        its CardSets. Pass false when building cards in parallel so the
      *        (non-thread-safe) set membership is populated in a later
      *        single-threaded pass.
+     * @param _localizedNames Localized card names, keyed by language code.
+     * @param _localizedTexts Localized rules text, keyed by language code.
      * @return Shared pointer to the new CardInfo instance.
      */
     static CardInfoPtr newInstance(const QString &_name,
@@ -220,7 +238,9 @@ public:
                                    UiAttributes _uiAttributes,
                                    QString _simpleName,
                                    QSet<QString> _altNames,
-                                   bool _appendToSets = true);
+                                   bool _appendToSets = true,
+                                   QMap<QString, QString> _localizedNames = {},
+                                   QMap<QString, QString> _localizedTexts = {});
 
     /**
      * @brief Clones the current CardInfo instance.
@@ -269,6 +289,96 @@ public:
     {
         text = _text;
         emit cardInfoChanged(smartThis);
+    }
+
+    /**
+     * @brief Returns the card name in the given language, falling back to the
+     *        English name when no localization is available.
+     *
+     * @param lang Language code (e.g. "de", "ja", "zhs").
+     * @return The localized name, or the English name as fallback.
+     */
+    [[nodiscard]] const QString &getLocalizedName(const QString &lang) const
+    {
+        const auto it = localizedNames.constFind(lang);
+        return it != localizedNames.constEnd() ? it.value() : name;
+    }
+
+    /**
+     * @brief Returns the rules text in the given language, falling back to the
+     *        English text when no localization is available.
+     *
+     * @param lang Language code (e.g. "de", "ja", "zhs").
+     * @return The localized text, or the English text as fallback.
+     */
+    [[nodiscard]] const QString &getLocalizedText(const QString &lang) const
+    {
+        const auto it = localizedTexts.constFind(lang);
+        return it != localizedTexts.constEnd() ? it.value() : text;
+    }
+
+    /**
+     * @brief Returns the localized card names keyed by language code.
+     *
+     * Only languages that have an entry are present; there is no English
+     * fallback in this map.
+     */
+    [[nodiscard]] const QMap<QString, QString> &getLocalizedNames() const
+    {
+        return localizedNames;
+    }
+
+    /**
+     * @brief Returns the localized rules text keyed by language code.
+     *
+     * Only languages that have an entry are present; there is no English
+     * fallback in this map.
+     */
+    [[nodiscard]] const QMap<QString, QString> &getLocalizedTexts() const
+    {
+        return localizedTexts;
+    }
+
+    /**
+     * @brief Sets the card name for the given language.
+     *
+     * @param lang Language code.
+     * @param _localizedName The localized card name.
+     */
+    void setLocalizedName(const QString &lang, const QString &_localizedName)
+    {
+        if (localizedNames.value(lang) == _localizedName) {
+            return;
+        }
+        localizedNames.insert(lang, _localizedName);
+        emit cardInfoChanged(smartThis);
+    }
+
+    /**
+     * @brief Sets the rules text for the given language.
+     *
+     * @param lang Language code.
+     * @param _localizedText The localized rules text.
+     */
+    void setLocalizedText(const QString &lang, const QString &_localizedText)
+    {
+        if (localizedTexts.value(lang) == _localizedText) {
+            return;
+        }
+        localizedTexts.insert(lang, _localizedText);
+        emit cardInfoChanged(smartThis);
+    }
+
+    /**
+     * @brief Returns the language codes for which this card has a localized
+     *        name or rules text.
+     */
+    [[nodiscard]] QStringList localizationLanguages() const
+    {
+        QStringList languages = localizedNames.keys();
+        languages.append(localizedTexts.keys());
+        languages.removeDuplicates();
+        return languages;
     }
     [[nodiscard]] bool getIsToken() const
     {

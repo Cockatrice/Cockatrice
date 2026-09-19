@@ -171,6 +171,7 @@ public:
     [[nodiscard]] QList<GameInviteOption> getGameInviteLinksForRoom(int roomId) const;
     void sendInviteToUser(const QString &userName, const QString &inviteText);
     [[nodiscard]] bool getAdminLocked() const;
+    [[nodiscard]] bool canOverrideGameRestrictions() const;
     void closeEvent(QCloseEvent *event) override;
     bool switchToGameTabIfAlreadyExists(const int gameId);
     static void actShowPopup(const QString &message);

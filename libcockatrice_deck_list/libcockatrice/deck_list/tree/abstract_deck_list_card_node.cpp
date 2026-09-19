@@ -34,17 +34,6 @@ bool AbstractDecklistCardNode::compareName(AbstractDecklistNode *other) const
     }
 }
 
-int AbstractDecklistCardNode::readElement(QXmlStreamReader *xml, int /* limit */)
-{
-    while (!xml->atEnd()) {
-        xml->readNext();
-        if (xml->isEndElement() && xml->name().toString() == "card") {
-            return 0;
-        }
-    }
-    return 0;
-}
-
 void AbstractDecklistCardNode::writeElement(QXmlStreamWriter *xml)
 {
     xml->writeEmptyElement("card");

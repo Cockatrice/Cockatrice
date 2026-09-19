@@ -23,6 +23,10 @@ public:
     static QStringList findQmFiles();
     static QString languageName(const QString &lang);
 
+signals:
+    /// Request to re-import the card database with the newly selected card language
+    void cardDatabaseUpdateRequested();
+
 private slots:
     void deckPathButtonClicked();
     void filtersPathButtonClicked();
@@ -33,6 +37,7 @@ private slots:
     void tokenDatabasePathButtonClicked();
     void resetAllPathsClicked();
     void languageBoxChanged(int index);
+    void cardLanguageBoxChanged(int index);
     void updateStartupServerControlsVisibility();
 
 private:
@@ -45,6 +50,10 @@ private:
     QLabel languageLabel;
     QComboBox languageBox;
     QLabel advertiseTranslationPageLabel;
+
+    QLabel cardLanguageLabel;
+    QComboBox cardLanguageBox;
+    QLabel cardLanguageNoteLabel;
 
     QLabel updateReleaseChannelLabel;
     QComboBox updateReleaseChannelBox;

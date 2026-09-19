@@ -23,7 +23,7 @@ private:
     QLabel *propsLabel;
     QScrollArea *propsScroll;
     QTextEdit *textLabel;
-    CardInfoPtr info;
+    ExactCard currentCard; ///< Last card set, re-rendered when the card language changes.
     void setTexts(const QString &propsText, const QString &textText);
 
 public:

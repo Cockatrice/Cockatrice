@@ -50,8 +50,8 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     QCoreApplication::setOrganizationName("Cockatrice");
-    QCoreApplication::setOrganizationDomain("cockatrice");
-    // this can't be changed, as it influences the default save path for cards.xml
+    QCoreApplication::setOrganizationDomain("Cockatrice");
+    // This can't be changed, as it influences the default save path for cards.xml
     QCoreApplication::setApplicationName("Cockatrice");
 
     // If the program is opened with the -s flag, it will only do spoilers. Otherwise it will do MTGJSON/Tokens
@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
     QIcon icon("theme:appicon.svg");
     wizard.setWindowIcon(icon);
     // set name of the app desktop file; used by wayland to load the window icon
-    QGuiApplication::setDesktopFileName("oracle");
+    QGuiApplication::setDesktopFileName("Oracle");
 
     wizard.show();
 

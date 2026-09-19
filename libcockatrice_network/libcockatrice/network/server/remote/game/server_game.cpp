@@ -465,7 +465,7 @@ Response::ResponseCode Server_Game::checkJoin(ServerInfo_User *user,
     if (asJudge && !(user->user_level() & ServerInfo_User::IsJudge)) {
         return Response::RespUserLevelTooLow;
     }
-    if (!(overrideRestrictions && (user->user_level() & ServerInfo_User::IsModerator))) {
+    if (!(overrideRestrictions && (user->user_level() & (ServerInfo_User::IsModerator | ServerInfo_User::IsJudge)))) {
         if ((_password != password) && !(spectator && !spectatorsNeedPassword)) {
             return Response::RespWrongPassword;
         }

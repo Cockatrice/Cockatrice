@@ -1451,6 +1451,11 @@ bool TabSupervisor::getAdminLocked() const
     return tabAdmin->getLocked();
 }
 
+bool TabSupervisor::canOverrideGameRestrictions() const
+{
+    return !getAdminLocked() || (userInfo->user_level() & ServerInfo_User::IsJudge);
+}
+
 void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
 {
 

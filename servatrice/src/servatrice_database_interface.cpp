@@ -12,6 +12,7 @@
 #include <QLoggingCategory>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QStringList>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
@@ -86,9 +87,10 @@ bool Servatrice_DatabaseInterface::openDatabase()
                                              << dbversion << "to version" << expectedversion;
             return false;
         } else if (dbversion > expectedversion) {
-            qCCritical(DatabaseInterfaceLog) << poolStr << "Error opening database: the database schema version"
-                                             << dbversion << "is too new, you need to update servatrice"
-                                             << "(this servatrice actually uses version" << expectedversion << ")";
+            qCCritical(DatabaseInterfaceLog)
+                << poolStr << "Error opening database: the database schema version" << dbversion
+                << "is too new, you need to update Servatrice" << "(Currently running Servatrice actually uses version"
+                << expectedversion << ")";
             return false;
         }
     } else {
@@ -98,10 +100,57 @@ bool Servatrice_DatabaseInterface::openDatabase()
         return false;
     }
 
+    if (sqlDatabase.driverName() != "QMYSQL") {
+        qCCritical(DatabaseInterfaceLog)
+            << poolStr
+            << "Error opening database: connection is not a MySQL/MariaDB database, Servatrice only "
+               "supports the QMYSQL driver (actual driver:"
+            << sqlDatabase.driverName() << ").";
+        return false;
+    }
+
+    bool strictModeCheckOk = false;
+    const bool strictModeEnabled = isStrictModeEnabled(strictModeCheckOk);
+    if (!strictModeCheckOk) {
+        qCCritical(DatabaseInterfaceLog) << poolStr
+                                         << "Error opening database: unable to determine whether MySQL/MariaDB strict "
+                                            "mode is enabled";
+        return false;
+    }
+    if (strictModeEnabled) {
+        qCCritical(DatabaseInterfaceLog) << poolStr
+                                         << "Error opening database: MySQL/MariaDB strict mode is enabled, which "
+                                            "breaks most Servatrice database operations. Please disable strict mode "
+                                            "by removing STRICT_TRANS_TABLES and STRICT_ALL_TABLES from sql_mode, "
+                                            "for example by adding 'sql_mode=NO_ENGINE_SUBSTITUTION' under [mysqld] "
+                                            "in your my.cnf (or my.ini on Windows) and restarting the database "
+                                            "server.";
+        return false;
+    }
+
     // reset all prepared statements
     qDeleteAll(preparedStatements);
     preparedStatements.clear();
     return true;
+}
+
+bool Servatrice_DatabaseInterface::isStrictModeEnabled(bool &ok) const
+{
+    ok = true;
+
+    QSqlQuery query(sqlDatabase);
+    if (!query.exec("SELECT @@GLOBAL.sql_mode")) {
+        ok = false;
+        return false;
+    }
+
+    const QStringList modes = query.next() ? query.value(0).toString().split(',') : QStringList();
+    for (const QString &mode : modes) {
+        if (mode.trimmed() == "STRICT_TRANS_TABLES" || mode.trimmed() == "STRICT_ALL_TABLES") {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool Servatrice_DatabaseInterface::checkSql()

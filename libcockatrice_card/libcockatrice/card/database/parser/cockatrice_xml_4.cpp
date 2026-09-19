@@ -273,6 +273,8 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
             QString name = QString("");
             QString text = QString("");
             QHash<QString, QString> properties;
+            QMap<QString, QString> localizedNames;
+            QMap<QString, QString> localizedTexts;
             QList<CardRelation *> relatedCards, reverseRelatedCards;
             auto _sets = SetToPrintingsMap();
             int tableRow = 0;
@@ -298,6 +300,44 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     // generic properties
                 } else if (xmlName == "prop") {
                     properties = loadCardPropertiesFromXml(xml);
+                    // localized card data
+                } else if (xmlName == "localizations") {
+                    while (!xml.atEnd()) {
+                        if (xml.readNextStartElement()) {
+                            const QString elementName = xml.name().toString();
+                            if (elementName == "localization") {
+                                const QString lang = xml.attributes().value("lang").toString();
+                                QString localizedName;
+                                QString localizedText;
+                                while (!xml.atEnd()) {
+                                    if (xml.readNext() == QXmlStreamReader::EndElement) {
+                                        break;
+                                    }
+                                    if (xml.isStartElement()) {
+                                        const QString childName = xml.name().toString();
+                                        QString value = xml.readElementText(QXmlStreamReader::IncludeChildElements);
+                                        if (childName == "name") {
+                                            localizedName = value;
+                                        } else if (childName == "text") {
+                                            localizedText = value;
+                                        }
+                                    }
+                                }
+                                if (!lang.isEmpty()) {
+                                    if (!localizedName.isEmpty()) {
+                                        localizedNames.insert(lang, localizedName);
+                                    }
+                                    if (!localizedText.isEmpty()) {
+                                        localizedTexts.insert(lang, localizedText);
+                                    }
+                                }
+                            } else {
+                                xml.skipCurrentElement();
+                            }
+                        } else {
+                            break;
+                        }
+                    }
                     // positioning info
                 } else if (xmlName == "tablerow") {
                     tableRow = xml.readElementText(QXmlStreamReader::IncludeChildElements).toInt();
@@ -399,8 +439,9 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                                                  .landscapeOrientation = landscapeOrientation,
                                                  .tableRow = tableRow,
                                                  .upsideDownArt = upsideDown};
-            CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards,
-                                                        reverseRelatedCards, _sets, attributes);
+            CardInfoPtr newCard =
+                CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards, _sets,
+                                      attributes, std::move(localizedNames), std::move(localizedTexts));
             if (targetData) {
                 // Mirror CardDatabase::addCard: if a card with this name already
                 // exists, merge the new printings into it instead of replacing.
@@ -516,6 +557,26 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
         xml.writeTextElement(propName, info->getProperty(propName));
     }
     xml.writeEndElement();
+
+    // localized card data
+    const QStringList localizedLanguages = info->localizationLanguages();
+    if (!localizedLanguages.isEmpty()) {
+        xml.writeStartElement("localizations");
+        const QMap<QString, QString> &localizedNames = info->getLocalizedNames();
+        const QMap<QString, QString> &localizedTexts = info->getLocalizedTexts();
+        for (const QString &lang : localizedLanguages) {
+            xml.writeStartElement("localization");
+            xml.writeAttribute("lang", lang);
+            if (localizedNames.contains(lang)) {
+                xml.writeTextElement("name", localizedNames.value(lang));
+            }
+            if (localizedTexts.contains(lang)) {
+                xml.writeTextElement("text", localizedTexts.value(lang));
+            }
+            xml.writeEndElement();
+        }
+        xml.writeEndElement();
+    }
 
     // sets
     for (const auto &printings : info->getSets()) {

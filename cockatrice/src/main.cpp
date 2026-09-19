@@ -231,7 +231,7 @@ int main(int argc, char *argv[])
     // These values are only used by the settings loader/saver
     // Wrong or outdated values are kept to not break things
     QCoreApplication::setOrganizationName("Cockatrice");
-    QCoreApplication::setOrganizationDomain("cockatrice.de");
+    QCoreApplication::setOrganizationDomain("cockatrice.github.io");
     QCoreApplication::setApplicationName("Cockatrice");
     QCoreApplication::setApplicationVersion(VERSION_STRING);
 
@@ -250,7 +250,7 @@ int main(int argc, char *argv[])
 
     // Command-line parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Cockatrice");
+    parser.setApplicationDescription("Cockatrice Client");
     parser.addHelpOption();
     parser.addVersionOption();
 
@@ -350,8 +350,8 @@ int main(int argc, char *argv[])
     qCInfo(MainLog) << "MainWindow constructor finished";
 
     ui.setWindowIcon(themePixmap(QStringLiteral("cockatrice")));
-    // set name of the app desktop file; used by wayland to load the window icon
-    QGuiApplication::setDesktopFileName("cockatrice");
+    // Set name of the app desktop file; used by wayland to load the window icon
+    QGuiApplication::setDesktopFileName("Cockatrice");
 
     SettingsCache::instance().network().setClientID(generateClientID());
 

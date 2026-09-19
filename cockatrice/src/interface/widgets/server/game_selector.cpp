@@ -369,7 +369,7 @@ void GameSelector::joinGame(const ServerInfo_Game &game, const bool asSpectator,
         return;
     }
 
-    bool overrideRestrictions = !tabSupervisor->getAdminLocked();
+    bool overrideRestrictions = tabSupervisor->canOverrideGameRestrictions();
 
     // Joining a full game without override privileges silently becomes a
     // spectator join, so ask first instead of surprising the player.
@@ -462,7 +462,7 @@ void GameSelector::enableButtonsForIndex(const QModelIndex &current)
     }
 
     const ServerInfo_Game &game = gameListModel->getGame(current.data(Qt::UserRole).toInt());
-    bool overrideRestrictions = !tabSupervisor->getAdminLocked();
+    bool overrideRestrictions = tabSupervisor->canOverrideGameRestrictions();
 
     spectateButton->setEnabled(game.spectators_allowed() || overrideRestrictions);
     joinButton->setEnabled(game.player_count() < game.max_players() || overrideRestrictions);

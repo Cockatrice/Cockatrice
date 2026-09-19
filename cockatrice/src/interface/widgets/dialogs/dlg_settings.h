@@ -54,6 +54,7 @@ public:
 
     explicit DlgSettings(QWidget *parent = nullptr);
     void setTab(int index);
+    AbstractSettingsPage *page(SettingsPage which) const;
 
 private slots:
     void onTabClicked(int index);

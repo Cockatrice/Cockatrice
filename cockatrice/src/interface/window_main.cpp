@@ -33,6 +33,7 @@
 #include "../interface/widgets/dialogs/dlg_update.h"
 #include "../interface/widgets/dialogs/dlg_view_log.h"
 #include "../interface/widgets/onboarding/first_run_wizard.h"
+#include "../interface/widgets/settings_page/general_settings_page.h"
 #include "../interface/widgets/tabs/tab_game.h"
 #include "../interface/widgets/tabs/tab_server.h"
 #include "../interface/widgets/tabs/tab_supervisor.h"
@@ -92,8 +93,8 @@
 #include <libcockatrice/settings/updates_settings.h>
 
 #define GITHUB_PAGES_URL "https://cockatrice.github.io"
-#define GITHUB_CONTRIBUTORS_URL "https://github.com/Cockatrice/Cockatrice/graphs/contributors?type=c"
-#define GITHUB_CONTRIBUTE_URL "https://github.com/Cockatrice/Cockatrice#cockatrice"
+#define GITHUB_CONTRIBUTORS_URL "https://github.com/Cockatrice/Cockatrice/graphs/contributors"
+#define GITHUB_CONTRIBUTE_URL "https://github.com/Cockatrice/Cockatrice#"
 #define GITHUB_TRANSIFEX_TRANSLATORS_URL "https://github.com/Cockatrice/Cockatrice/wiki/Translator-Hall-of-Fame"
 #define GITHUB_TRANSLATOR_FAQ_URL "https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ"
 #define GITHUB_ISSUES_URL "https://github.com/Cockatrice/Cockatrice/issues"
@@ -246,6 +247,8 @@ void MainWindow::actFullScreen(bool checked)
 void MainWindow::actSettings()
 {
     DlgSettings dlg(this);
+    auto *generalPage = qobject_cast<GeneralSettingsPage *>(dlg.page(DlgSettings::GeneralPage));
+    connect(generalPage, &GeneralSettingsPage::cardDatabaseUpdateRequested, this, &MainWindow::actCheckCardUpdates);
     dlg.exec();
 }
 
@@ -1050,7 +1053,7 @@ void MainWindow::createCardUpdateProcess(bool background)
 
     if (dir.exists(binaryName)) {
         updaterCmd = dir.absoluteFilePath(binaryName);
-    } else { // try and find the directory oracle is stored in the build directory
+    } else { // try and find the directory Oracle is stored in the build directory
         QDir findLocalDir(dir);
         findLocalDir.cdUp();
         findLocalDir.cd(getCardUpdaterBinaryName());

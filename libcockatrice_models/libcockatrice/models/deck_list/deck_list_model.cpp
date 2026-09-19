@@ -28,6 +28,16 @@ DeckListModel::~DeckListModel()
     delete root;
 }
 
+void DeckListModel::setDisplayLanguage(const QString &lang)
+{
+    if (displayLang == lang) {
+        return;
+    }
+    displayLang = lang;
+    emit layoutAboutToBeChanged();
+    emit layoutChanged();
+}
+
 /**
  * @brief Extract the value from the card that is used for the group criteria.
  * @param info Pointer to card information.
@@ -181,8 +191,15 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
             switch (index.column()) {
                 case DeckListModelColumns::CARD_AMOUNT:
                     return card->getNumber();
-                case DeckListModelColumns::CARD_NAME:
+                case DeckListModelColumns::CARD_NAME: {
+                    if (role == Qt::DisplayRole) {
+                        CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(card->getName());
+                        if (info) {
+                            return info->getLocalizedName(displayLang);
+                        }
+                    }
                     return card->getName();
+                }
                 case DeckListModelColumns::CARD_SET:
                     return card->getCardSetShortName();
                 case DeckListModelColumns::CARD_COLLECTOR_NUMBER:

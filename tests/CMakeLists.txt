@@ -24,6 +24,19 @@ target_include_directories(lag_monitor_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatri
 add_test(NAME latency_tracker_test COMMAND latency_tracker_test)
 add_executable(latency_tracker_test latency_tracker_test.cpp)
 
+add_test(NAME loader_local_matching_test COMMAND loader_local_matching_test)
+add_executable(
+  ${VERSION_STRING_CPP}
+  loader_local_matching_test
+  loader_local_matching_test.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network/update/client/release_channel.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/cache_settings.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/card_counter_settings.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/shortcuts_settings.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/card_picture_loader/card_picture_loader_local.cpp
+)
+target_include_directories(loader_local_matching_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src)
+
 add_test(NAME metrics_registry_test COMMAND metrics_registry_test)
 add_executable(metrics_registry_test ../servatrice/src/metrics_registry.cpp metrics_registry_test.cpp)
 
@@ -41,6 +54,9 @@ add_executable(server_counter_test server_counter_test.cpp)
 
 add_test(NAME server_developer_role_test COMMAND server_developer_role_test)
 add_executable(server_developer_role_test server_developer_role_test.cpp)
+
+add_test(NAME server_game_join_test COMMAND server_game_join_test)
+add_executable(server_game_join_test server_game_join_test.cpp)
 
 add_test(NAME server_rate_limiter_test COMMAND server_rate_limiter_test)
 add_executable(server_rate_limiter_test server_rate_limiter_test.cpp)
@@ -78,20 +94,22 @@ if(NOT GTEST_FOUND)
   set(GTEST_INCLUDE_DIRS "${CMAKE_BINARY_DIR}/gtest-src/include")
   set(GTEST_BOTH_LIBRARIES gtest)
   add_dependencies(dummy_test gtest)
-  add_dependencies(expression_test gtest)
   add_dependencies(clamped_arithmetic_test gtest)
-  add_dependencies(test_age_formatting gtest)
-  add_dependencies(password_hash_test gtest)
-  add_dependencies(playmat_resolver_test gtest)
   add_dependencies(deck_hash_performance_test gtest)
-  add_dependencies(server_card_counter_test gtest)
-  add_dependencies(server_counter_test gtest)
-  add_dependencies(server_rate_limiter_test gtest)
-  add_dependencies(server_developer_role_test gtest)
-  add_dependencies(warning_categories_test gtest)
+  add_dependencies(expression_test gtest)
   add_dependencies(lag_monitor_test gtest)
   add_dependencies(latency_tracker_test gtest)
+  add_dependencies(loader_local_matching_test gtest)
   add_dependencies(metrics_registry_test gtest)
+  add_dependencies(password_hash_test gtest)
+  add_dependencies(playmat_resolver_test gtest)
+  add_dependencies(server_card_counter_test gtest)
+  add_dependencies(server_counter_test gtest)
+  add_dependencies(server_developer_role_test gtest)
+  add_dependencies(server_game_join_test gtest)
+  add_dependencies(server_rate_limiter_test gtest)
+  add_dependencies(test_age_formatting gtest)
+  add_dependencies(warning_categories_test gtest)
 endif()
 
 include_directories(${GTEST_INCLUDE_DIRS})
@@ -128,6 +146,10 @@ target_link_libraries(
   ${TEST_QT_MODULES}
 )
 target_link_libraries(
+  server_game_join_test libcockatrice_network_server_remote libcockatrice_rng Threads::Threads ${GTEST_BOTH_LIBRARIES}
+  ${TEST_QT_MODULES}
+)
+target_link_libraries(
   warning_categories_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
 )
 target_link_libraries(lag_monitor_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
@@ -136,9 +158,12 @@ target_link_libraries(
 )
 target_include_directories(metrics_registry_test PRIVATE ${CMAKE_SOURCE_DIR}/servatrice/src)
 target_link_libraries(metrics_registry_test ${TEST_QT_MODULES} Threads::Threads ${GTEST_BOTH_LIBRARIES})
+target_link_libraries(
+  loader_local_matching_test libcockatrice_settings Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
+)
 
-add_subdirectory(card_zone_algorithms)
 add_subdirectory(carddatabase)
+add_subdirectory(card_zone_algorithms)
 add_subdirectory(deck_list_model)
 add_subdirectory(deck_list_zones)
 add_subdirectory(loading_from_clipboard)

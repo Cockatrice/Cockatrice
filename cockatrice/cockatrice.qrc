@@ -63,6 +63,8 @@
         <file>resources/icons/mana/W.svg</file>
 
         <file>resources/backgrounds/home.png</file>
+        <file>resources/backgrounds/home-dark.png</file>
+        <file>resources/backgrounds/home-light.png</file>
         <file>resources/backgrounds/card_triplet.svg</file>
         <file>resources/backgrounds/placeholder_printing_selector.svg</file>
 
@@ -363,6 +365,8 @@
 
         <file>resources/usericons/pawn_single.svg</file>
         <file>resources/usericons/pawn_double.svg</file>
+        <file>resources/usericons/pawn_dev_single.svg</file>
+        <file>resources/usericons/pawn_dev_double.svg</file>
         <file>resources/usericons/pawn_donator_single.svg</file>
         <file>resources/usericons/pawn_donator_double.svg</file>
         <file>resources/usericons/pawn_judge_single.svg</file>

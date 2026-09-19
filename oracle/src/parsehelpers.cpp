@@ -20,7 +20,7 @@
  * Note that "...enters tapped unless..." returns false.
  *
  * @param name The name of the card
- * @param text The oracle text of the card
+ * @param text The Oracle text of the card
  */
 bool parseCipt(const QString &name, const QString &text)
 {

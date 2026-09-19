@@ -13,6 +13,9 @@
 
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 
+class QAction;
+class QMenu;
+
 class PrintingSelectorCardOverlayWidget : public QWidget
 {
     Q_OBJECT
@@ -43,11 +46,19 @@ private slots:
 
 private:
     void initializePinBadge();
+    void loadCustomImage();
+    void showPreviewForAction(QAction *action);
+    void refreshPreview();
+    void hidePreview();
     CardInfoPictureWidget *cardInfoPicture;
     AllZonesCardAmountWidget *allZonesCardAmountWidget;
     QLabel *pinBadge = nullptr;
     AbstractTabDeckEditor *deckEditor;
     ExactCard rootCard;
+    QLabel *cardOverridePreviewLabel = nullptr;
+    ExactCard hoveredOverrideCard;
+    QMenu *previewSourceMenu = nullptr;
+    QAction *hoveredOverrideAction = nullptr;
 };
 
 #endif // PRINTING_SELECTOR_CARD_OVERLAY_WIDGET_H

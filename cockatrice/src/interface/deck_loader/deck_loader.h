@@ -131,7 +131,7 @@ public:
     static void printDeckList(QPrinter *printer, const DeckList &deckList);
 
     /**
-     * Converts the given deck's file to the cockatrice file format.
+     * Converts the given deck's file to the Cockatrice file format.
      * Uses the lastLoadInfo in the LoadedDeck to determine the current name of the file and where to save to.
      * @param deck The deck to convert. Should have valid lastLoadInfo. Will update the lastLoadInfo.
      * @return Whether the conversion succeeded.
