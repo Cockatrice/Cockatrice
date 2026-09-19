@@ -226,13 +226,13 @@ void TabServer::joinRoomFinished(const Response &r,
 {
     const bool setCurrent = pendingRoomJoins.value(roomId, extraData.toBool());
     pendingRoomJoins.remove(roomId);
+    const bool healedJoin = healedRoomJoins.contains(roomId);
+    healedRoomJoins.remove(roomId);
 
     switch (r.response_code()) {
         case Response::RespOk:
-            healedRoomJoins.remove(roomId);
             break;
         case Response::RespNameNotFound:
-            healedRoomJoins.remove(roomId);
             if (setCurrent) {
                 QMessageBox::critical(this, tr("Error"),
                                       tr("Failed to join the server room: it doesn't exist on the server."));
@@ -240,11 +240,10 @@ void TabServer::joinRoomFinished(const Response &r,
             emit roomJoinFailed(roomId);
             return;
         case Response::RespContextError:
-            if (healedRoomJoins.contains(roomId)) {
+            if (healedJoin) {
                 // The rejoin below was already answered and the server still rejects the join, so
-                // the stale-membership heal cannot help: surface the error. The guard is released
-                // again so a later user-initiated join may try a fresh heal.
-                healedRoomJoins.remove(roomId);
+                // the stale-membership heal cannot help: surface the error. The guard was already
+                // released above so a later user-initiated join may try a fresh heal.
                 if (setCurrent) {
                     QMessageBox::critical(
                         this, tr("Error"),
@@ -264,7 +263,6 @@ void TabServer::joinRoomFinished(const Response &r,
             leaveAndRejoinRoom(roomId, setCurrent);
             return;
         case Response::RespUserLevelTooLow:
-            healedRoomJoins.remove(roomId);
             if (setCurrent) {
                 QMessageBox::critical(this, tr("Error"),
                                       tr("You do not have the required permission to join this server room."));
@@ -272,7 +270,6 @@ void TabServer::joinRoomFinished(const Response &r,
             emit roomJoinFailed(roomId);
             return;
         default:
-            healedRoomJoins.remove(roomId);
             if (setCurrent) {
                 QMessageBox::critical(
                     this, tr("Error"),
