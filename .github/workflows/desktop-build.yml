@@ -277,11 +277,10 @@ jobs:
             soc: Intel
             type: Release
             use_ccache: 1
-            xcode: "26.3"
 
           - os: macOS
             target: 14    # EOL 2026-09-14
-            runner: macos-26    # https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md
+            runner: xcode-27    # https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
@@ -293,11 +292,10 @@ jobs:
             soc: Apple
             type: Release
             use_ccache: 1
-            xcode: "26.6"
 
           - os: macOS
             target: 15    # 2027-??
-            runner: macos-26    # https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md
+            runner: xcode-27    # https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
@@ -309,11 +307,10 @@ jobs:
             soc: Apple
             type: Release
             use_ccache: 1
-            xcode: "26.6"
 
           - os: macOS
-            target: 26
-            runner: macos-26    # https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md
+            target: 27
+            runner: xcode-27    # https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
@@ -322,7 +319,6 @@ jobs:
             soc: Apple
             type: Debug
             use_ccache: 1
-            xcode: "26.6"
 
           - os: Windows
             target: 10
@@ -365,7 +361,7 @@ jobs:
         id: restore_ccache
         uses: actions/cache/restore@v6
         with:
-          key: ccache-${{ matrix.runner }}_${{ matrix.override_target }}-Xcode${{ matrix.xcode }}
+          key: ccache-${{ matrix.os }}${{ matrix.override_target }}-${{ matrix.runner }}
           path: ${{ env.CCACHE_DIR }}
 
       - name: "Install aqtinstall"
@@ -440,7 +436,6 @@ jobs:
           CCACHE_EVICTION_AGE: ${{ matrix.ccache_eviction_age }}
           CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
           CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform }}
-          DEVELOPER_DIR: '/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer'
           GITHUB_TOKEN: ${{ github.token }}    # needed for vcpkg dependency graph updates, see VCPKG_FEATURE_FLAGS
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
