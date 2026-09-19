@@ -6,7 +6,8 @@
 
 #include <QDialog>
 
-IntentGetLoginCredentials::IntentGetLoginCredentials(ContextConnectToServer *_context, bool _promptForMissingCredentials)
+IntentGetLoginCredentials::IntentGetLoginCredentials(ContextConnectToServer *_context,
+                                                     bool _promptForMissingCredentials)
     : Intent(), context(_context), promptForMissingCredentials(_promptForMissingCredentials)
 {
 }
