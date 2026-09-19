@@ -102,4 +102,14 @@ private:
     QList<bool> colorMatches;  ///< Per-row color identity match.
 };
 
+/**
+ * @brief Whether an identity string matches the active color-identity filter.
+ *
+ * The single source of truth for the color identity matching rule, shared by
+ * the Visual Deck Storage proxy and the remote public decks model.
+ */
+[[nodiscard]] bool colorIdentityMatches(VisualDeckStorageSortFilterProxyModel::FilterMode mode,
+                                        const QSet<QChar> &colors,
+                                        const QString &identity);
+
 #endif // VISUAL_DECK_STORAGE_SORT_FILTER_PROXY_MODEL_H

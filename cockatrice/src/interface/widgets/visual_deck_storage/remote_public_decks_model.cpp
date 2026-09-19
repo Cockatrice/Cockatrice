@@ -99,30 +99,7 @@ void RemotePublicDecksModel::rebuildVisibleIndices()
 
         if (!activeColors.isEmpty()) {
             const QString &identity = entry.colorIdentity;
-            bool colorMatch = true;
-            switch (colorFilterMode) {
-                case VisualDeckStorageSortFilterProxyModel::ExactMatch: {
-                    QSet<QChar> activeSet;
-                    for (const QChar &color : activeColors) {
-                        activeSet.insert(color.toUpper());
-                    }
-                    QSet<QChar> identitySet;
-                    for (const QChar &color : identity) {
-                        identitySet.insert(color.toUpper());
-                    }
-                    colorMatch = activeSet == identitySet;
-                    break;
-                }
-                case VisualDeckStorageSortFilterProxyModel::Includes:
-                    colorMatch = std::all_of(activeColors.begin(), activeColors.end(),
-                                             [&identity](const QChar &color) { return identity.contains(color); });
-                    break;
-                case VisualDeckStorageSortFilterProxyModel::Excludes:
-                    colorMatch = std::none_of(activeColors.begin(), activeColors.end(),
-                                              [&identity](const QChar &color) { return identity.contains(color); });
-                    break;
-            }
-            if (!colorMatch) {
+            if (!colorIdentityMatches(colorFilterMode, activeColors, identity)) {
                 continue;
             }
         }
