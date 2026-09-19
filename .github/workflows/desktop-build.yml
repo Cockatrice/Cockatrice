@@ -280,7 +280,7 @@ jobs:
             xcode: "26.3"
 
           - os: macOS
-            target: 14    # EOL 2026-??
+            target: 14    # EOL 2026-09-14
             runner: macos-26    # https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md
 
             ccache_eviction_age: 7d
@@ -296,7 +296,7 @@ jobs:
             xcode: "26.6"
 
           - os: macOS
-            target: 15
+            target: 15    # 2027-??
             runner: macos-26    # https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md
 
             ccache_eviction_age: 7d
