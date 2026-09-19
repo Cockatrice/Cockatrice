@@ -86,8 +86,11 @@ public slots:
      */
     QNetworkReply *makeRequest(const QUrl &url, CardPictureLoaderWorkerWork *workThread);
 
-    /** @brief Processes all queued requests respecting the request quota. */
+    /** @brief Starts the pacing timers if there is queued work, stops them when the queue is empty. */
     void processQueuedRequests();
+
+    /** @brief Chooses a request from the queue and starts it, respecting the quota and pacing. */
+    void dispatchQueuedRequest();
 
     /**
      * @brief Processes a single queued request.
@@ -118,8 +121,8 @@ private:
     bool picDownload;                                  ///< Whether downloading images from network is enabled
     QQueue<QPair<QUrl, CardPictureLoaderWorkerWork *>> requestLoadQueue; ///< Queue of pending network requests
 
-    int requestQuota;                       ///< Remaining requests allowed per second
     QTimer requestTimer;                    ///< Timer to reset the request quota
+    QTimer dispatchTimer;                   ///< Timer pacing individual network requests
     QHash<QString, int> hostRequestQuota;   ///< Sustained per-host request allowance
     QHash<QString, int> hostQuotaRemaining; ///< Per-host allowance left in the current second
     QHash<QString, QDateTime> hostLast429;  ///< When each host was last rate limited
