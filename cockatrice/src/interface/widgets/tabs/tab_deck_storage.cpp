@@ -44,6 +44,12 @@
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/utility/string_limits.h>
 
+namespace {
+// How long to wait after the last visibility change before reading back the
+// Public/Private column, in milliseconds.
+constexpr int VISIBILITY_REFRESH_DELAY = 500;
+} // namespace
+
 TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
                                AbstractClient *_client,
                                const ServerInfo_User *currentUserInfo)
@@ -119,6 +125,15 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
         static_cast<int>((static_cast<qint64>(SettingsCache::instance().network().getTimeOut()) + 1) *
                          SettingsCache::instance().network().getKeepAlive() * 1000));
     connect(shareTimeoutTimer, &QTimer::timeout, this, &TabDeckStorage::onShareFromTreeTimeout);
+
+    // Restartable single-shot refresh for the Public/Private column. A dropped
+    // visibility reply must not leave the widget permanently stale, so the tree
+    // is re-read whenever publishes quiet down instead of waiting on a count
+    // that can get stuck above zero.
+    visibilityRefreshTimer = new QTimer(this);
+    visibilityRefreshTimer->setSingleShot(true);
+    visibilityRefreshTimer->setInterval(VISIBILITY_REFRESH_DELAY);
+    connect(visibilityRefreshTimer, &QTimer::timeout, this, &TabDeckStorage::onVisibilityRefreshTimeout);
 
     QVBoxLayout *rightVbox = new QVBoxLayout;
     rightVbox->addWidget(shareBar);
@@ -255,6 +270,8 @@ void TabDeckStorage::handleConnected(const ServerInfo_User &userInfo)
 void TabDeckStorage::handleConnectionChanged(ClientStatus status)
 {
     if (status == StatusDisconnected) {
+        visibilityRefreshTimer->stop();
+        visibilityRefreshStarted = false;
         setRemoteEnabled(false);
     }
 }
@@ -864,7 +881,8 @@ void TabDeckStorage::actPublishDeck()
 
         PendingCommand *pend = client->prepareSessionCommand(cmd);
         connect(pend, &PendingCommand::finished, this, &TabDeckStorage::setVisibilityFinished);
-        ++pendingVisibilityChanges;
+        visibilityRefreshStarted = true;
+        visibilityRefreshTimer->start();
         client->sendCommand(pend);
     }
 }
@@ -876,9 +894,10 @@ void TabDeckStorage::setVisibilityFinished(const Response &r, const CommandConta
                               tr("Failed to change deck visibility on server (response code %1).")
                                   .arg(QString::number(static_cast<int>(r.response_code()))));
     }
-    // Refresh once the last in-flight change has been acknowledged so the
-    // Public/Private column reflects every selected node.
-    if (--pendingVisibilityChanges == 0) {
-        serverDirView->refreshTree();
-    }
+}
+
+void TabDeckStorage::onVisibilityRefreshTimeout()
+{
+    visibilityRefreshStarted = false;
+    serverDirView->refreshTree();
 }
