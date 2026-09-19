@@ -6,7 +6,8 @@
 
 #include <QDialog>
 
-IntentGetLoginCredentials::IntentGetLoginCredentials(ContextConnectToServer *_context) : Intent(), context(_context)
+IntentGetLoginCredentials::IntentGetLoginCredentials(ContextConnectToServer *_context, bool _promptForMissingCredentials)
+    : Intent(), context(_context), promptForMissingCredentials(_promptForMissingCredentials)
 {
 }
 
@@ -32,6 +33,14 @@ void IntentGetLoginCredentials::onPreconditionSatisfied()
 
 void IntentGetLoginCredentials::onPreconditionNotSatisfied()
 {
+    // MainWindow::applyStartupDestination runs this intent on every launch for
+    // users whose startup tab is Server / Server Room; keep that path quiet, as
+    // it was before the link-driven sign-in dialog existed.
+    if (!promptForMissingCredentials) {
+        emitFailed(tr("No saved credentials for this server"));
+        return;
+    }
+
     // No credentials saved for the target server: ask the user for them. They
     // opt into saving them so later links to the same server connect directly.
     const QString serverText = context->hostname + ":" + context->port;

@@ -121,7 +121,7 @@ Intent *IntentUrlParser::createJoinGameIntent(const QUrlQuery &query, QList<Inte
 
     Intent *firstIntent = joinGameIntent;
     if (!isConnectedTo(serverContext->hostname, serverContext->port)) {
-        auto getLoginCredentialsIntent = new IntentGetLoginCredentials(serverContext);
+        auto getLoginCredentialsIntent = new IntentGetLoginCredentials(serverContext, /*promptForMissingCredentials=*/true);
         getLoginCredentialsIntent->setParent(joinGameIntent);
         chain.insert(0, getLoginCredentialsIntent);
 
@@ -238,7 +238,7 @@ Intent *IntentUrlParser::createOpenDeckIntent(const QUrlQuery &query, QList<Inte
 
     Intent *firstIntent = openDeckIntent;
     if (!isConnectedTo(serverContext->hostname, serverContext->port)) {
-        auto getLoginCredentialsIntent = new IntentGetLoginCredentials(serverContext);
+        auto getLoginCredentialsIntent = new IntentGetLoginCredentials(serverContext, /*promptForMissingCredentials=*/true);
         getLoginCredentialsIntent->setParent(openDeckIntent);
         chain.insert(0, getLoginCredentialsIntent);
 
