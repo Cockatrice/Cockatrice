@@ -135,7 +135,12 @@ QVariant RemoteDeckList_TreeModel::data(const QModelIndex &index, int role) cons
                     case 0:
                         return node->getName();
                     case 3:
-                        return isEffectivelyPublic(node) ? tr("Public") : tr("Private");
+                        // Report the node's own bit, not the inherited effective
+                        // state, so it stays in step with what publishing toggles.
+                        if (node->isPublic()) {
+                            return tr("Public");
+                        }
+                        return isEffectivelyPublic(node) ? tr("Public (inherited)") : tr("Private");
                     default:
                         return QVariant();
                 }
@@ -144,8 +149,12 @@ QVariant RemoteDeckList_TreeModel::data(const QModelIndex &index, int role) cons
                 return index.column() == 0 ? dirIcon : QVariant();
             case Qt::ToolTipRole:
                 if (index.column() == 3) {
-                    return isEffectivelyPublic(node) ? tr("This folder is visible to other users")
-                                                     : tr("This folder is only visible to you");
+                    if (node->isPublic()) {
+                        return tr("This folder is visible to other users");
+                    }
+                    return isEffectivelyPublic(node)
+                               ? tr("This folder is private, but a parent folder is public (inherited).")
+                               : tr("This folder is only visible to you");
                 }
                 return QVariant();
             default:
@@ -162,7 +171,12 @@ QVariant RemoteDeckList_TreeModel::data(const QModelIndex &index, int role) cons
                     case 2:
                         return file->getUploadTime();
                     case 3:
-                        return isEffectivelyPublic(file) ? tr("Public") : tr("Private");
+                        // Report the node's own bit, not the inherited effective
+                        // state, so it stays in step with what publishing toggles.
+                        if (file->isPublic()) {
+                            return tr("Public");
+                        }
+                        return isEffectivelyPublic(file) ? tr("Public (inherited)") : tr("Private");
                     default:
                         return QVariant();
                 }
@@ -173,8 +187,12 @@ QVariant RemoteDeckList_TreeModel::data(const QModelIndex &index, int role) cons
                 return index.column() == 1 ? Qt::AlignRight : Qt::AlignLeft;
             case Qt::ToolTipRole:
                 if (index.column() == 3) {
-                    return isEffectivelyPublic(file) ? tr("This deck is visible to other users")
-                                                     : tr("This deck is only visible to you");
+                    if (file->isPublic()) {
+                        return tr("This deck is visible to other users");
+                    }
+                    return isEffectivelyPublic(file)
+                               ? tr("This deck is private, but a parent folder is public (inherited).")
+                               : tr("This deck is only visible to you");
                 }
                 return QVariant();
             default:
