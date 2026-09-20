@@ -631,6 +631,10 @@ void TabSupervisor::stop()
         tabsToDelete << i.value();
     }
 
+    for (auto i = publicDecksTabs.cbegin(), end = publicDecksTabs.cend(); i != end; ++i) {
+        tabsToDelete << i.value();
+    }
+
     for (const auto tab : tabsToDelete) {
         tab->close();
     }
