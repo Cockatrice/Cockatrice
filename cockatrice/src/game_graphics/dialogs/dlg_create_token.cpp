@@ -90,14 +90,16 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     cardDatabaseDisplayModel = new TokenDisplayModel(this);
     cardDatabaseDisplayModel->setSourceModel(cardDatabaseModel);
 
-    CardsDisplaySettings *cardsDisplay = &SettingsCache::instance().cardsDisplay();
-    const auto applyCardSearchLanguage = [this, cardsDisplay]() {
+    const auto applyCardSearchLanguage = [this]() {
+        const CardsDisplaySettings &cardsDisplay = SettingsCache::instance().cardsDisplay();
         cardDatabaseDisplayModel->setSearchLanguage(CardSearchLanguage{
-            cardsDisplay->getCardLang(), static_cast<SearchLanguageMode>(cardsDisplay->getCardSearchLanguage())});
+            cardsDisplay.getCardLang(), static_cast<SearchLanguageMode>(cardsDisplay.getCardSearchLanguage())});
     };
     applyCardSearchLanguage();
-    connect(cardsDisplay, &CardsDisplaySettings::cardLangChanged, this, applyCardSearchLanguage);
-    connect(cardsDisplay, &CardsDisplaySettings::cardSearchLanguageChanged, this, applyCardSearchLanguage);
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::cardLangChanged, this,
+            applyCardSearchLanguage);
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::cardSearchLanguageChanged, this,
+            applyCardSearchLanguage);
 
     chooseTokenFromAllRadioButton = new QRadioButton(tr("Show &all tokens"));
     connect(chooseTokenFromAllRadioButton, &QRadioButton::toggled, this, &DlgCreateToken::actChooseTokenFromAll);
