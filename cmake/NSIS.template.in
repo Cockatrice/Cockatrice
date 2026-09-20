@@ -16,7 +16,6 @@ Var ReinstallMode
 !include LogicLib.nsh
 !include FileFunc.nsh
 !include MUI2.nsh
-!include nsExec.nsh
 !include x64.nsh
 
 !define MUI_ABORTWARNING
@@ -217,10 +216,16 @@ FunctionEnd
 ; old and new Qt DLLs next to the new executable, failing with
 ; "The procedure entry point X could not be located in the dynamic link
 ; library ...Qt6Network.dll" on the next start.
+;
+; Processes are matched by image name AND by their executable path living
+; under $INSTDIR, so unrelated processes that merely share an image name
+; (e.g. the Oracle DB instance "oracle.exe") are never touched.
 
+; usage: set $R2 to the base image name (without extension, e.g. "cockatrice",
+;        as accepted by Get-Process -Name), call this, result in $R0
+;        (1 = running from $INSTDIR, 0 = not running)
 Function IsAppRunning
-    ; usage: set $R1 to the image name, call this, result in $R0 (1 = running, 0 = not running)
-    nsExec::Exec 'cmd /c tasklist /FI "IMAGENAME eq $R1" /FO CSV /NH | findstr /I "$R1" >nul'
+    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { $$_.Path -like $\'$INSTDIR\*$\' } | Select-Object -First 1"'
     Pop $R0
     ${If} $R0 = 0
         StrCpy $R0 1
@@ -229,8 +234,20 @@ Function IsAppRunning
     ${EndIf}
 FunctionEnd
 
+Function CloseMatchingApps
+    ; gracefully ask every matching instance to close (sends WM_CLOSE)
+    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { $$_.Path -like $\'$INSTDIR\*$\' } | ForEach-Object { $$null = $$_.CloseMainWindow() }"'
+    Pop $R3
+FunctionEnd
+
+Function ForceCloseMatchingApps
+    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { $$_.Path -like $\'$INSTDIR\*$\' } | Stop-Process -Force -ErrorAction SilentlyContinue"'
+    Pop $R3
+FunctionEnd
+
 Function WaitForAppToClose
-    ; usage: set $R1 to the image name
+    ; usage: set $R1 to the display name (e.g. "cockatrice.exe") and $R2 to the
+    ; base image name (e.g. "cockatrice")
     Call IsAppRunning
     ${If} $R0 = 0
         Return
@@ -239,8 +256,7 @@ Function WaitForAppToClose
     ${If} ${Silent}
         ; ask the application to close gracefully (WM_CLOSE), then wait for it to exit
         DetailPrint "Closing $R1 ..."
-        nsExec::Exec 'cmd /c taskkill /IM $R1'
-        Pop $R2
+        Call CloseMatchingApps
         StrCpy $R8 0
         ck_wait_loop:
         Sleep 500
@@ -255,8 +271,7 @@ Function WaitForAppToClose
         ${EndIf}
         ; give up waiting, force close
         DetailPrint "Force closing $R1 ..."
-        nsExec::Exec 'cmd /c taskkill /F /IM $R1'
-        Pop $R2
+        Call ForceCloseMatchingApps
         Sleep 500
     ${Else}
         ck_wait_prompt:
@@ -275,23 +290,36 @@ FunctionEnd
 
 Function EnsureAppsNotRunning
     StrCpy $R1 "cockatrice.exe"
+    StrCpy $R2 "cockatrice"
     Call WaitForAppToClose
     StrCpy $R1 "oracle.exe"
+    StrCpy $R2 "oracle"
     Call WaitForAppToClose
     StrCpy $R1 "servatrice.exe"
+    StrCpy $R2 "servatrice"
     Call WaitForAppToClose
 FunctionEnd
 
 ; Uninstaller copies of the same routines (the uninstaller gets its own
 ; function set compiled in, it cannot call the installer functions).
 Function un.IsAppRunning
-    nsExec::Exec 'cmd /c tasklist /FI "IMAGENAME eq $R1" /FO CSV /NH | findstr /I "$R1" >nul'
+    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { $$_.Path -like $\'$INSTDIR\*$\' } | Select-Object -First 1"'
     Pop $R0
     ${If} $R0 = 0
         StrCpy $R0 1
     ${Else}
         StrCpy $R0 0
     ${EndIf}
+FunctionEnd
+
+Function un.CloseMatchingApps
+    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { $$_.Path -like $\'$INSTDIR\*$\' } | ForEach-Object { $$null = $$_.CloseMainWindow() }"'
+    Pop $R3
+FunctionEnd
+
+Function un.ForceCloseMatchingApps
+    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { $$_.Path -like $\'$INSTDIR\*$\' } | Stop-Process -Force -ErrorAction SilentlyContinue"'
+    Pop $R3
 FunctionEnd
 
 Function un.WaitForAppToClose
@@ -302,8 +330,7 @@ Function un.WaitForAppToClose
 
     ${If} ${Silent}
         DetailPrint "Closing $R1 ..."
-        nsExec::Exec 'cmd /c taskkill /IM $R1'
-        Pop $R2
+        Call un.CloseMatchingApps
         StrCpy $R8 0
         un_ck_wait_loop:
         Sleep 500
@@ -317,8 +344,7 @@ Function un.WaitForAppToClose
             Goto un_ck_wait_loop
         ${EndIf}
         DetailPrint "Force closing $R1 ..."
-        nsExec::Exec 'cmd /c taskkill /F /IM $R1'
-        Pop $R2
+        Call un.ForceCloseMatchingApps
         Sleep 500
     ${Else}
         un_ck_wait_prompt:
@@ -337,10 +363,13 @@ FunctionEnd
 
 Function un.EnsureAppsNotRunning
     StrCpy $R1 "cockatrice.exe"
+    StrCpy $R2 "cockatrice"
     Call un.WaitForAppToClose
     StrCpy $R1 "oracle.exe"
+    StrCpy $R2 "oracle"
     Call un.WaitForAppToClose
     StrCpy $R1 "servatrice.exe"
+    StrCpy $R2 "servatrice"
     Call un.WaitForAppToClose
 FunctionEnd
 
@@ -471,6 +500,7 @@ ${EndIf}
 Call EnsureAppsNotRunning
 
 ${If} $PortableMode = 0
+${AndIf} ${FileExists} "$INSTDIR\cockatrice.exe"
 	RMDir /r "$INSTDIR\Plugins"
 	Delete "$INSTDIR\Qt*.dll"
 	Delete "$INSTDIR\libcrypto*.dll"
