@@ -189,7 +189,12 @@ void DeckEditorSettingsPage::storeSettings()
     QHash<QString, int> limits = SettingsCache::instance().downloads().getHostRequestLimits();
     bool limitsChanged = false;
     for (auto it = limits.begin(); it != limits.end();) {
-        if (!usedHosts.contains(it.key())) {
+        // Prune only limits for hosts that are neither referenced by a configured URL nor carry a
+        // developer cap. Capped hosts are often redirect targets (e.g. api.scryfall.com redirects
+        // to cards.scryfall.io) that never appear in the URL list, yet they are exactly the hosts
+        // the throttle applies to, so dropping them when a URL is removed would silently re-enable
+        // free-running traffic to a rate-sensitive server.
+        if (!usedHosts.contains(it.key()) && !DownloadSettings::getDeveloperHostCaps().contains(it.key())) {
             it = limits.erase(it);
             limitsChanged = true;
         } else {
@@ -269,7 +274,7 @@ void DeckEditorSettingsPage::actAdjustRateLimit()
     QString prompt;
     if (unlocked) {
         minimum = 0; // 0 means "unlimited"
-        maximum = DownloadSettings::DEFAULT_HOST_REQUEST_LIMIT;
+        maximum = DownloadSettings::UNLOCKED_HOST_LIMIT_MAX;
         defaultValue = currentLimits.value(host, 0);
         prompt = tr("Requests per second (0 = unlimited, fastest; up to %1):").arg(maximum);
     } else {

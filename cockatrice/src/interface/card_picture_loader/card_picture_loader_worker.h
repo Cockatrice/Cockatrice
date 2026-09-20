@@ -132,6 +132,9 @@ private:
     /** @brief Maximum concurrent in-flight network replies per host. */
     static constexpr int MAX_IN_FLIGHT_PER_HOST = 6;
 
+    /** @brief Bound on how many cached-redirect hops dispatch resolution will follow. */
+    static constexpr int MAX_REDIRECT_CHAIN_DEPTH = 10;
+
     CardPictureLoaderLocal *localLoader; ///< Loader for local images
     QSet<QString> currentlyLoading;      ///< Deduplication: contains pixmapCacheKey currently being loaded
 
@@ -154,9 +157,19 @@ private:
     /** @brief Returns cached redirect URL for the given original URL, if available. */
     [[nodiscard]] QUrl getCachedRedirect(const QUrl &originalUrl) const;
 
-    /** @brief Whether a request for this URL would actually touch the network, rather than being served from the disk
+/** @brief Whether a request for this URL would actually touch the network, rather than being served from the disk
      * cache. */
     [[nodiscard]] bool requestTouchesNetwork(const QUrl &url) const;
+
+    /**
+     * @brief Follows the cached-redirect chain to the URL that will actually be requested.
+     * @param url The URL to resolve
+     * @return The final URL after chasing cached redirects, or @p url itself if none lead elsewhere
+     *
+     * Dispatch decisions (unlocked-host fast path, 429 backoff, in-flight cap) must key on the host
+     * a request really goes to, not the URL that merely redirects to it.
+     */
+    [[nodiscard]] QUrl resolveCachedRedirect(const QUrl &url) const;
 
     /** @brief Loads redirect cache from disk. */
     void loadRedirectCache();

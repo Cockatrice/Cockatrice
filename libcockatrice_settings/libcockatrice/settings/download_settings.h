@@ -25,6 +25,15 @@ public:
     static constexpr int DEFAULT_HOST_REQUEST_LIMIT = 10;
     /** @brief Floor for any per-host request allowance. */
     static constexpr int MIN_HOST_REQUEST_LIMIT = 1;
+    /**
+     * @brief Upper bound offered to the user when lowering an unlocked host's allowance.
+     *
+     * Unlocked hosts have no developer cap, so `clampHostRequestLimit` puts no upper bound on
+     * them; this only bounds what the settings dialog offers, and matches the widest paced
+     * allowance a user is documented to be able to hand-edit in `downloads.ini`. Choosing 0
+     * below this restores the "unlimited" fast path.
+     */
+    static constexpr int UNLOCKED_HOST_LIMIT_MAX = 50;
     /** @brief Developer cap marking a host as never throttled per host or by the dispatch pacing. */
     static constexpr int UNLIMITED_HOST_QUOTA = -1;
 

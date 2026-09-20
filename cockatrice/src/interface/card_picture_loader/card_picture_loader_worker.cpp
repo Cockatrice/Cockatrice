@@ -144,11 +144,16 @@ QNetworkReply *CardPictureLoaderWorker::makeRequest(const QUrl &url, CardPicture
     const QString host = url.host();
     hostInFlight.insert(host, hostInFlight.value(host) + 1);
 
-    // Connect reply handling
-    connect(reply, &QNetworkReply::finished, worker, [this, reply, worker, host] {
-        hostInFlight.insert(host, qMax(0, hostInFlight.value(host) - 1));
-        worker->handleNetworkReply(reply);
-    });
+    // Release the in-flight slot when the reply is destroyed, not when it emits `finished`, and use
+    // the worker (not the work object) as the context object: a reply can go away without ever
+    // finishing (aborted, or a work object deleted while a reply is still pending), and a connection
+    // bound to that work object's lifetime would then never run, permanently shrinking the fast
+    // path's concurrency until it wedges. This way the slot is released exactly once.
+    connect(reply, &QObject::destroyed, this,
+            [this, host] { hostInFlight.insert(host, qMax(0, hostInFlight.value(host) - 1)); });
+
+    // Connect reply handling; the work object is the context so its handler dies with it.
+    connect(reply, &QNetworkReply::finished, worker, [worker, reply] { worker->handleNetworkReply(reply); });
 
     return reply;
 }
@@ -215,14 +220,18 @@ void CardPictureLoaderWorker::dispatchQueuedRequest()
     // connection for them.
     for (int i = 0; i < requestLoadQueue.size();) {
         const auto &request = requestLoadQueue.at(i);
-        const QString host = request.first.host();
+        // Dispatch decisions must key on the host the request will actually go to, not the URL that
+        // merely redirects to it: a redirect learned after this URL was queued would otherwise
+        // bypass the in-flight cap and drain the whole queue onto the target host unchecked.
+        const QUrl resolvedUrl = resolveCachedRedirect(request.first);
+        const QString host = resolvedUrl.host();
         if (isUnlockedHost(host)) {
             if (CardPictureLoaderWorkerWork::rateLimiter().isRateLimited(host, now)) {
                 ++i;
                 continue;
             }
             if (hostInFlight.value(host) < MAX_IN_FLIGHT_PER_HOST) {
-                makeRequest(request.first, request.second);
+                makeRequest(resolvedUrl, request.second);
                 requestLoadQueue.removeAt(i);
                 dispatched = true;
                 continue;
@@ -287,8 +296,12 @@ bool CardPictureLoaderWorker::processSingleRequest()
 {
     QDateTime now = QDateTime::currentDateTime();
     for (int i = 0; i < requestLoadQueue.size(); ++i) {
-        const auto &request = requestLoadQueue.at(i);
-        const QString host = request.first.host();
+        // Copy the entry: takeAt(i) below erases within the list this reference points into.
+        const auto request = requestLoadQueue.at(i);
+        // Resolve cached redirects so the rate-limit and allowance arithmetic keys on the host the
+        // request will actually hit (see resolveCachedRedirect).
+        const QUrl resolvedUrl = resolveCachedRedirect(request.first);
+        const QString host = resolvedUrl.host();
         // Don't dispatch requests to a host that is currently in its 429 backoff; hand the entry
         // back to its worker so it can wait the backoff out or fall through to another source,
         // instead of leaving it parked in the queue with no reply pending. Only applies to
@@ -299,11 +312,16 @@ bool CardPictureLoaderWorker::processSingleRequest()
             // The queued URL is usually a cached-redirect target whose host differs from
             // cardToDownload.getCurrentUrl(), so scheduleDeferredRetry() (which waits out the
             // blocked host's deadline) is used instead of startNextPicDownload() looping on the
-            // original host. Keep scanning so one backed-off entry doesn't monopolize the tick.
+            // original host.
             auto entry = requestLoadQueue.takeAt(i);
-            --i;
-            entry.second->scheduleDeferredRetry(host);
-            continue;
+            if (host != entry.first.host()) {
+                // A cached redirect target is what is blocked, which the work object would not
+                // discover from its own URL; wait out that specific host (with jitter) instead.
+                entry.second->scheduleDeferredRetry(host);
+            } else {
+                entry.second->startNextPicDownload();
+            }
+            return true;
         }
         // Unlocked hosts are handled by dispatchQueuedRequest's fast path, bounded by the in-flight
         // cap; they must not fall through to the per-host allowance arithmetic below.
@@ -324,12 +342,9 @@ bool CardPictureLoaderWorker::processSingleRequest()
         }
         int allowance = hostQuotaRemaining.value(host);
         if (allowance > 0) {
+            hostQuotaRemaining.insert(host, allowance - 1);
             auto entry = requestLoadQueue.takeAt(i);
-            // The allowance is only spent when a request is actually issued: makeRequest() returns
-            // nullptr when the cached redirect target is in backoff and it hands the entry back.
-            if (makeRequest(entry.first, entry.second)) {
-                hostQuotaRemaining.insert(host, allowance - 1);
-            }
+            makeRequest(resolvedUrl, entry.second);
             return true;
         }
     }
@@ -424,6 +439,22 @@ QUrl CardPictureLoaderWorker::getCachedRedirect(const QUrl &originalUrl) const
         return redirectCache[originalUrl].first;
     }
     return {};
+}
+
+QUrl CardPictureLoaderWorker::resolveCachedRedirect(const QUrl &url) const
+{
+    // Follow the whole cached-redirect chain so dispatch keys on the host that is really hit. The
+    // depth bound keeps a corrupt or self-referencing cache entry from spinning us forever.
+    QUrl resolved = url;
+    int depth = 0;
+    while (depth++ < MAX_REDIRECT_CHAIN_DEPTH) {
+        QUrl target = getCachedRedirect(resolved);
+        if (target.isEmpty() || target == resolved) {
+            break;
+        }
+        resolved = target;
+    }
+    return resolved;
 }
 
 void CardPictureLoaderWorker::loadRedirectCache()
