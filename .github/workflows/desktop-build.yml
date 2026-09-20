@@ -405,7 +405,7 @@ jobs:
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         run: .ci/thin_macos_qtlib.sh
 
-      - name: "[macOS] Cache thin Qt libraries"
+      - name: "[macOS] Save thin Qt libraries"
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true' && github.ref == 'refs/heads/master'
         uses: actions/cache/save@v6
         with:
