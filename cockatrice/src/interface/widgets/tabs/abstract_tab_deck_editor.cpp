@@ -388,7 +388,8 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
  */
 void AbstractTabDeckEditor::actShareDeck()
 {
-    if (tabSupervisor->getClient()->getStatus() != StatusLoggedIn) {
+    AbstractClient *client = tabSupervisor->getServerClient();
+    if (client->getStatus() != StatusLoggedIn) {
         QMessageBox::information(this, tr("Share deck"), tr("You must be connected to the server to share a deck."));
         return;
     }
@@ -399,7 +400,7 @@ void AbstractTabDeckEditor::actShareDeck()
         return;
     }
 
-    DlgShareDeck shareDialog(tabSupervisor->getClient(), deck, this);
+    DlgShareDeck shareDialog(client, deck, this);
     shareDialog.exec();
 }
 
