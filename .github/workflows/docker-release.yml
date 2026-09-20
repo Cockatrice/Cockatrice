@@ -19,7 +19,7 @@ on:
       - 'docker-compose.yml.windows'
   release:
     types:
-      - released    # publishing of stable releases
+      - released    # publishing of stable releases test
 
 # Cancel earlier, unfinished runs of this workflow on the same branch (unless on release)
 concurrency:
