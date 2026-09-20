@@ -397,6 +397,7 @@ jobs:
         with:
           cache: false
           # cache-key-prefix: Qt
+          dir: ${{ github.workspace }}    # thinning script depends on this location
           modules: ${{ matrix.qt_modules }}
           version: ${{ matrix.qt_version }}
 
