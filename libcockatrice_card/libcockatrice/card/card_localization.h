@@ -18,7 +18,7 @@
 /**
  * @brief The card languages card search should run against.
  */
-enum class CardSearchLanguage
+enum class SearchLanguageMode
 {
     English,  ///< Only search the English card names and texts.
     Selected, ///< Search the selected card language (untranslated cards still match in English).

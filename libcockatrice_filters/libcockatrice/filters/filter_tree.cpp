@@ -103,7 +103,7 @@ FilterTreeNode *FilterItemList::termNode(const QString &term)
 bool FilterItemList::testTypeAnd(const CardInfoPtr info,
                                  CardFilter::Attr attr,
                                  const QString &searchLanguage,
-                                 CardSearchLanguage searchLanguageMode) const
+                                 SearchLanguageMode searchLanguageMode) const
 {
     for (auto i = childNodes.constBegin(); i != childNodes.constEnd(); i++) {
         if (!(*i)->isEnabled()) {
@@ -121,7 +121,7 @@ bool FilterItemList::testTypeAnd(const CardInfoPtr info,
 bool FilterItemList::testTypeAndNot(const CardInfoPtr info,
                                     CardFilter::Attr attr,
                                     const QString &searchLanguage,
-                                    CardSearchLanguage searchLanguageMode) const
+                                    SearchLanguageMode searchLanguageMode) const
 {
     // if any one in the list is true, return false
     return !testTypeOr(info, attr, searchLanguage, searchLanguageMode);
@@ -130,7 +130,7 @@ bool FilterItemList::testTypeAndNot(const CardInfoPtr info,
 bool FilterItemList::testTypeOr(const CardInfoPtr info,
                                 CardFilter::Attr attr,
                                 const QString &searchLanguage,
-                                CardSearchLanguage searchLanguageMode) const
+                                SearchLanguageMode searchLanguageMode) const
 {
     bool noChildEnabledChild = true;
 
@@ -154,7 +154,7 @@ bool FilterItemList::testTypeOr(const CardInfoPtr info,
 bool FilterItemList::testTypeOrNot(const CardInfoPtr info,
                                    CardFilter::Attr attr,
                                    const QString &searchLanguage,
-                                   CardSearchLanguage searchLanguageMode) const
+                                   SearchLanguageMode searchLanguageMode) const
 {
     // if any one in the list is false, return true
     return !testTypeAnd(info, attr, searchLanguage, searchLanguageMode);
@@ -162,13 +162,13 @@ bool FilterItemList::testTypeOrNot(const CardInfoPtr info,
 
 bool FilterItem::acceptName(const CardInfoPtr info,
                             const QString &searchLanguage,
-                            CardSearchLanguage searchLanguageMode) const
+                            SearchLanguageMode searchLanguageMode) const
 {
-    if (searchLanguageMode == CardSearchLanguage::English) {
+    if (searchLanguageMode == SearchLanguageMode::English) {
         return info->getName().contains(term, Qt::CaseInsensitive);
     }
 
-    if (searchLanguageMode == CardSearchLanguage::Both && info->getName().contains(term, Qt::CaseInsensitive)) {
+    if (searchLanguageMode == SearchLanguageMode::Both && info->getName().contains(term, Qt::CaseInsensitive)) {
         return true;
     }
 
@@ -181,13 +181,13 @@ bool FilterItem::acceptName(const CardInfoPtr info,
 
 bool FilterItem::acceptNameExact(const CardInfoPtr info,
                                  const QString &searchLanguage,
-                                 CardSearchLanguage searchLanguageMode) const
+                                 SearchLanguageMode searchLanguageMode) const
 {
-    if (searchLanguageMode == CardSearchLanguage::English) {
+    if (searchLanguageMode == SearchLanguageMode::English) {
         return info->getName() == term;
     }
 
-    if (searchLanguageMode == CardSearchLanguage::Both && info->getName() == term) {
+    if (searchLanguageMode == SearchLanguageMode::Both && info->getName() == term) {
         return true;
     }
 
@@ -255,13 +255,13 @@ bool FilterItem::acceptColor(const CardInfoPtr info) const
 
 bool FilterItem::acceptText(const CardInfoPtr info,
                             const QString &searchLanguage,
-                            CardSearchLanguage searchLanguageMode) const
+                            SearchLanguageMode searchLanguageMode) const
 {
-    if (searchLanguageMode == CardSearchLanguage::English) {
+    if (searchLanguageMode == SearchLanguageMode::English) {
         return info->getText().contains(term, Qt::CaseInsensitive);
     }
 
-    if (searchLanguageMode == CardSearchLanguage::Both && info->getText().contains(term, Qt::CaseInsensitive)) {
+    if (searchLanguageMode == SearchLanguageMode::Both && info->getText().contains(term, Qt::CaseInsensitive)) {
         return true;
     }
 
@@ -459,7 +459,7 @@ bool FilterItem::relationCheck(int cardInfo) const
 bool FilterItem::acceptCardAttr(const CardInfoPtr info,
                                 CardFilter::Attr attr,
                                 const QString &searchLanguage,
-                                CardSearchLanguage searchLanguageMode) const
+                                SearchLanguageMode searchLanguageMode) const
 {
     switch (attr) {
         case CardFilter::AttrName:
@@ -544,7 +544,7 @@ FilterTreeNode *FilterTree::termNode(const CardFilter *f)
 bool FilterTree::testAttr(const CardInfoPtr info,
                           const LogicMap *lm,
                           const QString &searchLanguage,
-                          CardSearchLanguage searchLanguageMode) const
+                          SearchLanguageMode searchLanguageMode) const
 {
     const FilterItemList *fil;
     bool status = true;
@@ -579,7 +579,7 @@ bool FilterTree::testAttr(const CardInfoPtr info,
 
 bool FilterTree::acceptsCard(const CardInfoPtr info,
                              const QString &searchLanguage,
-                             CardSearchLanguage searchLanguageMode) const
+                             SearchLanguageMode searchLanguageMode) const
 {
     for (auto i = childNodes.constBegin(); i != childNodes.constEnd(); i++) {
         if ((*i)->isEnabled() && !testAttr(info, *i, searchLanguage, searchLanguageMode)) {

@@ -191,7 +191,7 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
 bool CardDatabaseDisplayModel::rowMatchesCardName(CardInfoPtr info) const
 {
     if (!cardName.isEmpty() && !info->getName().contains(cardName, Qt::CaseInsensitive) &&
-        searchLanguageMode != CardSearchLanguage::English && !searchLanguage.isEmpty() && searchLanguage != "en" &&
+        searchLanguageMode != SearchLanguageMode::English && !searchLanguage.isEmpty() && searchLanguage != "en" &&
         !info->getLocalizedName(searchLanguage).contains(cardName, Qt::CaseInsensitive)) {
         return false;
     }
@@ -245,7 +245,7 @@ void CardDatabaseDisplayModel::setStringFilter(const QString &_src)
     dirty();
 }
 
-void CardDatabaseDisplayModel::setSearchLanguage(const QString &searchLang, CardSearchLanguage mode)
+void CardDatabaseDisplayModel::setSearchLanguage(const QString &searchLang, SearchLanguageMode mode)
 {
     if (searchLanguage == searchLang && searchLanguageMode == mode) {
         return;

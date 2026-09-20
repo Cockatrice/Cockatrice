@@ -38,7 +38,7 @@ public:
     FilterString();
     explicit FilterString(const QString &exp,
                           const QString &searchLanguage = QString(),
-                          CardSearchLanguage searchLanguageMode = CardSearchLanguage::English);
+                          SearchLanguageMode searchLanguageMode = SearchLanguageMode::English);
     [[nodiscard]] bool check(const CardData &card) const
     {
         if (card.isNull()) {

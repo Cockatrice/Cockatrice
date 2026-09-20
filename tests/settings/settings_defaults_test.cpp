@@ -565,14 +565,14 @@ TEST_F(SettingsDefaultsTest, CardsDisplay_CardLang_SetAndGet)
 TEST_F(SettingsDefaultsTest, CardsDisplay_CardSearchLanguage_Default)
 {
     CardsDisplaySettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getCardSearchLanguage(), static_cast<int>(CardSearchLanguage::English));
+    ASSERT_EQ(s.getCardSearchLanguage(), static_cast<int>(SearchLanguageMode::English));
 }
 
 TEST_F(SettingsDefaultsTest, CardsDisplay_CardSearchLanguage_SetAndGet)
 {
     CardsDisplaySettings s(settingsPath, nullptr);
-    s.setCardSearchLanguage(static_cast<int>(CardSearchLanguage::Selected));
-    ASSERT_EQ(s.getCardSearchLanguage(), static_cast<int>(CardSearchLanguage::Selected));
+    s.setCardSearchLanguage(static_cast<int>(SearchLanguageMode::Selected));
+    ASSERT_EQ(s.getCardSearchLanguage(), static_cast<int>(SearchLanguageMode::Selected));
 }
 
 // --- VisualDeckStorageSettings ---

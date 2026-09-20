@@ -20,7 +20,7 @@ void applyCardSearchLanguage(CardSearchModel *searchModel)
 {
     const auto &cardsDisplay = SettingsCache::instance().cardsDisplay();
     searchModel->setSearchLanguage(cardsDisplay.getCardLang(),
-                                   static_cast<CardSearchLanguage>(cardsDisplay.getCardSearchLanguage()));
+                                   static_cast<SearchLanguageMode>(cardsDisplay.getCardSearchLanguage()));
 }
 } // namespace
 

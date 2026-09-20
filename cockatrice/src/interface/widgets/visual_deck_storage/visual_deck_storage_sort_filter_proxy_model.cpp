@@ -192,7 +192,7 @@ void VisualDeckStorageSortFilterProxyModel::updateSearchMatches()
 
     const auto &cardsDisplay = SettingsCache::instance().cardsDisplay();
     DeckFilterString filterString(searchText, cardsDisplay.getCardLang(),
-                                  static_cast<CardSearchLanguage>(cardsDisplay.getCardSearchLanguage()));
+                                  static_cast<SearchLanguageMode>(cardsDisplay.getCardSearchLanguage()));
     for (int row = 0; row < count; ++row) {
         const DeckPreviewData &data = source->dataForRow(row);
 

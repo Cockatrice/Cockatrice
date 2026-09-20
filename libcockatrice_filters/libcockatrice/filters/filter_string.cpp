@@ -83,7 +83,7 @@ static std::once_flag init;
 struct SearchLanguageContext
 {
     QString searchLanguage;
-    CardSearchLanguage searchLanguageMode = CardSearchLanguage::English;
+    SearchLanguageMode searchLanguageMode = SearchLanguageMode::English;
 };
 thread_local SearchLanguageContext searchLanguageContext;
 
@@ -92,14 +92,14 @@ namespace
 bool matchesInSearchLanguage(const QString &english,
                              const QString &localized,
                              const QString &searchLanguage,
-                             CardSearchLanguage searchLanguageMode,
+                             SearchLanguageMode searchLanguageMode,
                              const StringMatcher &matcher)
 {
-    if (searchLanguageMode == CardSearchLanguage::English) {
+    if (searchLanguageMode == SearchLanguageMode::English) {
         return matcher(english);
     }
 
-    if (searchLanguageMode == CardSearchLanguage::Both && matcher(english)) {
+    if (searchLanguageMode == SearchLanguageMode::Both && matcher(english)) {
         return true;
     }
 
@@ -371,7 +371,7 @@ static void setupParserRules()
     search["OracleQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         const auto matcher = std::any_cast<StringMatcher>(sv[0]);
         const QString searchLanguage = searchLanguageContext.searchLanguage;
-        const CardSearchLanguage searchLanguageMode = searchLanguageContext.searchLanguageMode;
+        const SearchLanguageMode searchLanguageMode = searchLanguageContext.searchLanguageMode;
         return [=](const CardData &x) {
             return matchesInSearchLanguage(x->getText(), x->getLocalizedText(searchLanguage), searchLanguage,
                                            searchLanguageMode, matcher);
@@ -453,7 +453,7 @@ static void setupParserRules()
     search["GenericQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         const auto matcher = std::any_cast<StringMatcher>(sv[0]);
         const QString searchLanguage = searchLanguageContext.searchLanguage;
-        const CardSearchLanguage searchLanguageMode = searchLanguageContext.searchLanguageMode;
+        const SearchLanguageMode searchLanguageMode = searchLanguageContext.searchLanguageMode;
         return [=](const CardData &x) {
             return matchesInSearchLanguage(x->getName(), x->getLocalizedName(searchLanguage), searchLanguage,
                                            searchLanguageMode, matcher);
@@ -472,7 +472,7 @@ FilterString::FilterString()
     _error = "Not initialized";
 }
 
-FilterString::FilterString(const QString &expr, const QString &searchLanguage, CardSearchLanguage searchLanguageMode)
+FilterString::FilterString(const QString &expr, const QString &searchLanguage, SearchLanguageMode searchLanguageMode)
 {
     QByteArray ba = expr.simplified().toUtf8();
 

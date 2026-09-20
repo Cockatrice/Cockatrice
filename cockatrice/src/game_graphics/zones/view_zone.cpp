@@ -258,7 +258,7 @@ void ZoneViewZone::setFilterString(const QString &_filterString)
 {
     const CardsDisplaySettings &cardsDisplay = SettingsCache::instance().cardsDisplay();
     filterString = FilterString(_filterString, cardsDisplay.getCardLang(),
-                                static_cast<CardSearchLanguage>(cardsDisplay.getCardSearchLanguage()));
+                                static_cast<SearchLanguageMode>(cardsDisplay.getCardSearchLanguage()));
     reorganizeCards();
 }
 

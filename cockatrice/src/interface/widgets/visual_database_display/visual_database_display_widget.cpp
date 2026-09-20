@@ -44,7 +44,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     CardsDisplaySettings *cardsDisplay = &SettingsCache::instance().cardsDisplay();
     const auto applyCardSearchLanguage = [this, cardsDisplay]() {
         databaseDisplayModel->setSearchLanguage(cardsDisplay->getCardLang(),
-                                                static_cast<CardSearchLanguage>(cardsDisplay->getCardSearchLanguage()));
+                                                static_cast<SearchLanguageMode>(cardsDisplay->getCardSearchLanguage()));
     };
     applyCardSearchLanguage();
     connect(cardsDisplay, &CardsDisplaySettings::cardLangChanged, this, applyCardSearchLanguage);

@@ -171,19 +171,19 @@ public:
     [[nodiscard]] bool testTypeAnd(CardInfoPtr info,
                                    CardFilter::Attr attr,
                                    const QString &searchLanguage,
-                                   CardSearchLanguage searchLanguageMode) const;
+                                   SearchLanguageMode searchLanguageMode) const;
     [[nodiscard]] bool testTypeAndNot(CardInfoPtr info,
                                       CardFilter::Attr attr,
                                       const QString &searchLanguage,
-                                      CardSearchLanguage searchLanguageMode) const;
+                                      SearchLanguageMode searchLanguageMode) const;
     [[nodiscard]] bool testTypeOr(CardInfoPtr info,
                                   CardFilter::Attr attr,
                                   const QString &searchLanguage,
-                                  CardSearchLanguage searchLanguageMode) const;
+                                  SearchLanguageMode searchLanguageMode) const;
     [[nodiscard]] bool testTypeOrNot(CardInfoPtr info,
                                      CardFilter::Attr attr,
                                      const QString &searchLanguage,
-                                     CardSearchLanguage searchLanguageMode) const;
+                                     SearchLanguageMode searchLanguageMode) const;
 };
 
 class FilterItem : public FilterTreeNode
@@ -221,15 +221,15 @@ public:
     }
 
     [[nodiscard]] bool
-    acceptName(CardInfoPtr info, const QString &searchLanguage, CardSearchLanguage searchLanguageMode) const;
+    acceptName(CardInfoPtr info, const QString &searchLanguage, SearchLanguageMode searchLanguageMode) const;
     [[nodiscard]] bool
-    acceptNameExact(CardInfoPtr info, const QString &searchLanguage, CardSearchLanguage searchLanguageMode) const;
+    acceptNameExact(CardInfoPtr info, const QString &searchLanguage, SearchLanguageMode searchLanguageMode) const;
     [[nodiscard]] bool acceptType(CardInfoPtr info) const;
     [[nodiscard]] bool acceptMainType(CardInfoPtr info) const;
     [[nodiscard]] bool acceptSubType(CardInfoPtr info) const;
     [[nodiscard]] bool acceptColor(CardInfoPtr info) const;
     [[nodiscard]] bool
-    acceptText(CardInfoPtr info, const QString &searchLanguage, CardSearchLanguage searchLanguageMode) const;
+    acceptText(CardInfoPtr info, const QString &searchLanguage, SearchLanguageMode searchLanguageMode) const;
     [[nodiscard]] bool acceptSet(CardInfoPtr info) const;
     [[nodiscard]] bool acceptManaCost(CardInfoPtr info) const;
     [[nodiscard]] bool acceptCmc(CardInfoPtr info) const;
@@ -239,7 +239,7 @@ public:
     [[nodiscard]] bool acceptCardAttr(CardInfoPtr info,
                                       CardFilter::Attr attr,
                                       const QString &searchLanguage,
-                                      CardSearchLanguage searchLanguageMode) const;
+                                      SearchLanguageMode searchLanguageMode) const;
     [[nodiscard]] bool acceptFormat(CardInfoPtr info) const;
     [[nodiscard]] bool relationCheck(int cardInfo) const;
 };
@@ -262,7 +262,7 @@ private:
     bool testAttr(CardInfoPtr info,
                   const LogicMap *lm,
                   const QString &searchLanguage,
-                  CardSearchLanguage searchLanguageMode) const;
+                  SearchLanguageMode searchLanguageMode) const;
 
     void nodeChanged() const override
     {
@@ -302,7 +302,7 @@ public:
     }
 
     [[nodiscard]] bool
-    acceptsCard(CardInfoPtr info, const QString &searchLanguage, CardSearchLanguage searchLanguageMode) const;
+    acceptsCard(CardInfoPtr info, const QString &searchLanguage, SearchLanguageMode searchLanguageMode) const;
     void removeFiltersByAttr(CardFilter::Attr filterType);
     void removeFilter(const CardFilter *toRemove);
     void clear();

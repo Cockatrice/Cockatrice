@@ -50,7 +50,7 @@ static std::once_flag init;
 struct DeckSearchLanguageContext
 {
     QString searchLanguage;
-    CardSearchLanguage searchLanguageMode = CardSearchLanguage::English;
+    SearchLanguageMode searchLanguageMode = SearchLanguageMode::English;
 };
 thread_local DeckSearchLanguageContext deckSearchLanguageContext;
 
@@ -128,7 +128,7 @@ static void setupParserRules()
     // actual functionality
     search["DeckContentQuery"] = [](const peg::SemanticValues &sv) -> DeckFilter {
         const QString searchLanguage = deckSearchLanguageContext.searchLanguage;
-        const CardSearchLanguage searchLanguageMode = deckSearchLanguageContext.searchLanguageMode;
+        const SearchLanguageMode searchLanguageMode = deckSearchLanguageContext.searchLanguageMode;
         auto cardFilter = FilterString(std::any_cast<QString>(sv[0]), searchLanguage, searchLanguageMode);
         auto numberMatcher = sv.size() > 1 ? std::any_cast<NumberMatcher>(sv[1]) : [](int count) { return count > 0; };
 
@@ -201,7 +201,7 @@ DeckFilterString::DeckFilterString()
 
 DeckFilterString::DeckFilterString(const QString &expr,
                                    const QString &searchLanguage,
-                                   CardSearchLanguage searchLanguageMode)
+                                   SearchLanguageMode searchLanguageMode)
 {
     QByteArray ba = expr.simplified().toUtf8();
 
