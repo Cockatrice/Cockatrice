@@ -20,10 +20,21 @@ enum class TallyType
 {
     None,
     Subtypes,
+    TotalPower,
+    TotalToughness,
+    MaxValue = TotalToughness // sentinel value
 };
 
 namespace Tally
 {
+
+/**
+ * Safely converts an int into the corresponding TallyType.
+ *
+ * @param value The int value
+ * @return The TallyType. Returns TallyType::None if the value is not within range
+ */
+TallyType intToType(int value);
 
 /**
  * @brief Analyzes the selected cards according to the tally type and builds the resulting tally rows.

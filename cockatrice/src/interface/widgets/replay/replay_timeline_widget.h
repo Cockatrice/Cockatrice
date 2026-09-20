@@ -18,58 +18,25 @@ class QTimer;
 class ReplayTimelineWidget : public QWidget
 {
     Q_OBJECT
+
 signals:
-    void processNextEvent(EventProcessingOptions options);
-    void replayFinished();
-    void rewound();
+    void timeClicked(int newTime);
 
 private:
-    enum PlaybackMode
-    {
-        NORMAL_PLAYBACK,
-        FORWARD_SKIP,
-        BACKWARD_SKIP
-    };
-
-    static constexpr int TIMER_INTERVAL_MS = 200;
-    static constexpr int BIN_LENGTH = 5000;
-
-    QTimer *replayTimer;
-    QTimer *rewindBufferingTimer;
-    QList<int> replayTimeline;
     QList<int> histogram;
-    int maxBinValue, maxTime;
-    qreal timeScaleFactor;
-    int currentVisualTime;    // time currently displayed by the timeline
-    int currentProcessedTime; // time that events are currently processed up to. Could differ from visual time due to
-                              // rewind buffering
-    int currentEvent;
+    int maxBinValue = 1;
+    int maxTime = 1;
 
-    void skipToTime(int newTime, bool doRewindBuffering);
-    void handleBackwardsSkip(bool doRewindBuffering);
-    void processRewind();
-    void processNewEvents(PlaybackMode playbackMode);
-private slots:
-    void replayTimerTimeout();
+    int currentTime = 0;
 
 public:
-    static constexpr int SMALL_SKIP_MS = 1000;
-    static constexpr int BIG_SKIP_MS = 10000;
-    static constexpr qreal FAST_FORWARD_SCALE_FACTOR = 10.0;
-
     explicit ReplayTimelineWidget(QWidget *parent = nullptr);
-    void setTimeline(const QList<int> &_replayTimeline);
+    void setTimeline(const QList<int> &replayTimeline);
     [[nodiscard]] QSize sizeHint() const override;
     [[nodiscard]] QSize minimumSizeHint() const override;
-    void setTimeScaleFactor(qreal _timeScaleFactor);
-    [[nodiscard]] int getCurrentEvent() const
-    {
-        return currentEvent;
-    }
+
 public slots:
-    void startReplay();
-    void stopReplay();
-    void skipByAmount(int amount); // use a negative amount to skip backwards
+    void setCurrentTime(int time);
 
 protected:
     void paintEvent(QPaintEvent *event) override;

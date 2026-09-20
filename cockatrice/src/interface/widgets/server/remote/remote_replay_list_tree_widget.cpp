@@ -1,5 +1,7 @@
 #include "remote_replay_list_tree_widget.h"
 
+#include "../../../pixel_map_generator.h"
+
 #include <QFileIconProvider>
 #include <QHeaderView>
 #include <QSortFilterProxyModel>
@@ -37,7 +39,7 @@ RemoteReplayList_TreeModel::RemoteReplayList_TreeModel(AbstractClient *_client, 
     QFileIconProvider fip;
     dirIcon = fip.icon(QFileIconProvider::Folder);
     fileIcon = fip.icon(QFileIconProvider::File);
-    lockIcon = QPixmap("theme:icons/lock");
+    lockIcon = themePixmap(QStringLiteral("icons/lock"));
 }
 
 RemoteReplayList_TreeModel::~RemoteReplayList_TreeModel()

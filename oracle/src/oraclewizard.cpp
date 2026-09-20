@@ -15,6 +15,8 @@
 #include <QScrollBar>
 #include <QtConcurrent>
 #include <QtGui>
+#include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/personal_settings.h>
 
 OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
 {
@@ -33,9 +35,12 @@ OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
         migrateOracleSettings();
     }
 
-    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &OracleWizard::updateLanguage);
+    connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this, &OracleWizard::updateLanguage);
 
     importer = new OracleImporter(this);
+    // Import card text in the language the client displays, if supported:
+    // foreignData for any other language is never imported.
+    importer->setCardLang(SettingsCache::instance().cardsDisplay().getCardLang());
 
     nam = new QNetworkAccessManager(this);
 
@@ -107,6 +112,24 @@ void OracleWizard::retranslateUi()
 void OracleWizard::accept()
 {
     QDialog::accept();
+}
+
+void OracleWizard::reject()
+{
+    // The wizard is being closed while a page may still run a worker on the
+    // importer. Ask it to stop before the wizard (and the importer child) is
+    // destroyed, so the worker thread never touches freed memory.
+    if (auto *active = dynamic_cast<OracleWizardPage *>(currentPage())) {
+        active->cancelWork();
+    }
+    QWizard::reject();
+}
+
+void OracleWizard::runInBackground()
+{
+    backgroundMode = true;
+    hide();
+    currentPage()->initializePage();
 }
 
 void OracleWizard::enableButtons()

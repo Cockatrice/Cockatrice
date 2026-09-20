@@ -7,6 +7,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
+#include <libcockatrice/settings/servers_settings.h>
 #include <libcockatrice/utility/string_limits.h>
 
 DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent) : QDialog(parent)

@@ -5,7 +5,6 @@
 
 #include <QWidget>
 
-class QPushButton;
 class QHBoxLayout;
 class QLabel;
 class QSlider;
@@ -16,12 +15,11 @@ class QSlider;
  *
  * The panel contains:
  * - an accent color picker,
- * - an intensity slider,
- * - and a generate button.
+ * - an intensity slider.
  *
- * When the user clicks the generate button, the panel emits
- * generateRequested() with the currently selected accent color
- * and intensity value.
+ * Whenever either value changes the panel emits valueChanged() with
+ * the current accent colour and intensity, which the parent dialog
+ * uses to auto-apply the generated palette.
  *
  * Typically used together with PaletteGenerator::fromAccent()
  * to quickly generate color schemes from a chosen accent color.
@@ -71,12 +69,12 @@ public:
 
 signals:
     /**
-     * @brief Emitted when the user requests palette generation.
+     * @brief Emitted whenever the accent colour or intensity changes.
      *
-     * @param accent The selected accent color.
-     * @param intensity The selected intensity value.
+     * The parent dialog consumes this to auto-apply the generated palette
+     * without requiring an explicit Generate click.
      */
-    void generateRequested(QColor accent, int intensity);
+    void valueChanged(QColor accent, int intensity);
 
 private:
     QHBoxLayout *layout;
@@ -88,7 +86,6 @@ private:
     QLabel *labelHigh;
     QSlider *intensitySlider;
     QLabel *intensityPercentageLabel;
-    QPushButton *generateButton;
 };
 
 #endif // COCKATRICE_QUICK_SETUP_PANEL_H

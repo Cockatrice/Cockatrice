@@ -104,8 +104,12 @@ protected:
     /**
      * @brief Computes the card index at a given y-coordinate within the zone's vertical layout.
      * Returns 0 if the zone has no cards or the offset is zero.
+     *
+     * @param dropY The y-coordinate that the card was dropped at
+     * @param allowCountExpand If false, clamps the index at the number of cards minus 1
+     * @param minOffset Minimum offset to preserve
      */
-    int calcDropIndexFromY(qreal dropY, qreal minOffset = 0.0) const;
+    int calcDropIndexFromY(qreal dropY, bool allowCountExpand, qreal minOffset = 0.0) const;
 
     /**
      * @brief Positions cards vertically with alternating left/right x-offsets.

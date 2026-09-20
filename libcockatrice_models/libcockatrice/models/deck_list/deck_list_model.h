@@ -1,6 +1,8 @@
 #ifndef DECKLISTMODEL_H
 #define DECKLISTMODEL_H
 
+#include "deck_list_model_custom_zones.h"
+
 #include <../../../../libcockatrice_deck_list/libcockatrice/deck_list/tree/abstract_deck_list_card_node.h>
 #include <../../../../libcockatrice_deck_list/libcockatrice/deck_list/tree/deck_list_card_node.h>
 #include <QAbstractItemModel>
@@ -30,7 +32,8 @@ enum
 {
     IsCardRole = Qt::UserRole + 1, /**< Indicates whether the item represents a card. */
     DepthRole,                     /**< Depth level within the deck's grouping hierarchy. */
-    IsLegalRole                    /**< Whether the card is legal in the current deck format. */
+    IsLegalRole,                   /**< Whether the card is legal in the current deck format. */
+    IsCustomZoneRole               /**< Whether the item represents a custom zone nested under a board zone. */
 };
 } // namespace DeckRoles
 
@@ -285,6 +288,16 @@ public:
     ~DeckListModel() override;
 
     /**
+     * @brief Selects the language code for localized card names in the display role.
+     *
+     * The model never reads global settings itself; callers wire this to the card
+     * language setting (including reacting to its changes) rather than the model
+     * querying it.
+     * @param lang Language code; "en" shows the canonical English names.
+     */
+    void setDisplayLanguage(const QString &lang);
+
+    /**
      * @brief Returns the root index of the model.
      * @return QModelIndex representing the root node.
      */
@@ -391,12 +404,21 @@ public:
      */
     [[nodiscard]] QList<QString> getZones() const;
 
+    /**
+     * @brief Gets the names of the custom zones nested under the given board zone.
+     *
+     * @param boardZoneName The board zone to query (main/side/maybeboard)
+     * @return The custom zone names, in deck order
+     */
+    [[nodiscard]] QStringList getCustomZoneNames(const QString &boardZoneName) const;
+
 private:
     QSharedPointer<DeckList> deckList; /**< Pointer to the decklist providing the underlying data. */
     InnerDecklistNode *root;           /**< Root node of the model tree. */
     DeckListModelGroupCriteria::Type activeGroupCriteria = DeckListModelGroupCriteria::MAIN_TYPE;
     int lastKnownColumn;          /**< Last column used for sorting. */
     Qt::SortOrder lastKnownOrder; /**< Last known sort order. */
+    QString displayLang = "en";   /**< Language code for localized card names in the display role. */
 
     InnerDecklistNode *createNodeIfNeeded(const QString &name, InnerDecklistNode *parent);
     QModelIndex nodeToIndex(AbstractDecklistNode *node) const;
@@ -427,6 +449,7 @@ private:
     void emitRecursiveUpdates(const QModelIndex &index);
 
     void sortHelper(InnerDecklistNode *node, Qt::SortOrder order);
+    void sortShadowTree(InnerDecklistNode *node, Qt::SortOrder order);
 
     template <typename T> T getNode(const QModelIndex &index) const
     {

@@ -131,7 +131,7 @@ public:
     static void printDeckList(QPrinter *printer, const DeckList &deckList);
 
     /**
-     * Converts the given deck's file to the cockatrice file format.
+     * Converts the given deck's file to the Cockatrice file format.
      * Uses the lastLoadInfo in the LoadedDeck to determine the current name of the file and where to save to.
      * @param deck The deck to convert. Should have valid lastLoadInfo. Will update the lastLoadInfo.
      * @return Whether the conversion succeeded.
@@ -159,12 +159,13 @@ private:
     static void saveToStream_DeckZone(QTextStream &out,
                                       const InnerDecklistNode *zoneNode,
                                       bool addComments = true,
-                                      bool addSetNameAndNumber = true);
+                                      bool addSetNameAndNumber = true,
+                                      const QString &boardZoneName = QString());
     static void saveToStream_DeckZoneCards(QTextStream &out,
-                                           const InnerDecklistNode *zoneNode,
                                            QList<DecklistCardNode *> cards,
                                            bool addComments = true,
-                                           bool addSetNameAndNumber = true);
+                                           bool addSetNameAndNumber = true,
+                                           const QString &boardZoneName = QString());
 };
 
 #endif

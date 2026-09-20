@@ -1,0 +1,9 @@
+syntax = "proto2";
+import "session_commands.proto";
+
+message Command_ReportDetails {
+    extend SessionCommand {
+        optional Command_ReportDetails ext = 1206;
+    }
+    required int32 report_id = 1;
+}

@@ -1,10 +1,13 @@
 #include "theme_manager.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "pixel_map_generator.h"
 
 #include <QApplication>
 #include <QColor>
 #include <QDebug>
+#include <QFile>
+#include <QFileInfo>
 #include <QLibraryInfo>
 #include <QMap>
 #include <QMetaEnum>
@@ -17,8 +20,9 @@
 #include <QStyleHints>
 #include <QWidget>
 #include <Qt>
+#include <libcockatrice/settings/paths_settings.h>
 
-#define NONE_THEME_NAME "Default"
+#define SYSTEM_THEME_NAME "System"
 #define FUSION_THEME_NAME "Fusion"
 #define STYLE_CSS_NAME "style.css"
 #define HANDZONE_BG_NAME "handzone"
@@ -89,16 +93,25 @@ struct PaletteColorInfo
     }
 }
 
+static QString usableDefaultStyle(const QString &style)
+{
+    // The Windows 11 native style is broken: when the OS default
+    // ("System" theme selection) would use it, fall back to the Vista style.
+    // Explicitly choosing "windows11" in a theme is still honored.
+    return style.compare("windows11", Qt::CaseInsensitive) == 0 ? QStringLiteral("windowsvista") : style;
+}
+
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 {
-    defaultStyleName = qApp->style()->objectName();
-    //! \todo Workaround for windows11 style being broken.
-    if (defaultStyleName == "windows11") {
-        defaultStyleName = "windowsvista";
-    }
+    defaultStyleName = usableDefaultStyle(qApp->style()->objectName());
+    // Capture the untouched application palette before any theme is applied.
+    defaultPalette = qApp->palette();
     ensureThemeDirectoryExists();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
-    connect(QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged, this, &ThemeManager::themeChangedSlot);
+    connect(QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged, this, [this] {
+        defaultPalette = qApp->palette();
+        themeChangedSlot();
+    });
 #endif
     connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this, &ThemeManager::themeChangedSlot);
     themeChangedSlot();
@@ -106,14 +119,20 @@ ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 
 void ThemeManager::ensureThemeDirectoryExists()
 {
-    if (SettingsCache::instance().getThemeName().isEmpty() ||
-        !getAvailableThemes().contains(SettingsCache::instance().getThemeName())) {
+    auto &settings = SettingsCache::instance();
+
+    // Migrate the old "Default" theme name to "System"
+    if (settings.getThemeName() == "Default") {
+        settings.setThemeName(SYSTEM_THEME_NAME);
+    }
+
+    if (settings.getThemeName().isEmpty() || !getAvailableThemes().contains(settings.getThemeName())) {
         qCInfo(ThemeManagerLog) << "Theme name not set, setting default value";
-        SettingsCache::instance().setThemeName(NONE_THEME_NAME);
+        settings.setThemeName(FUSION_THEME_NAME);
     }
 }
 
-bool ThemeManager::isDarkMode(const QString &themeDirPath)
+bool ThemeManager::isDarkMode(const QString &themeDirPath) const
 {
     ThemeConfig themeConfig = ThemeConfig::fromThemeDir(themeDirPath);
     if (themeConfig.colorScheme.compare("Dark", Qt::CaseInsensitive) == 0) {
@@ -130,11 +149,88 @@ bool ThemeManager::isDarkMode(const QString &themeDirPath)
     }
 }
 
-bool ThemeManager::isBuiltInTheme()
+QString ThemeManager::schemeVariantPath(QStringView prefix) const
 {
-    const auto themeName = SettingsCache::instance().getThemeName();
+    static const QStringList formats = {QStringLiteral(".png"), QStringLiteral(".jpg"), QStringLiteral(".jpeg"),
+                                        QStringLiteral(".svg")};
+    const QString scheme = isDarkMode(currentThemePath) ? QStringLiteral("dark") : QStringLiteral("light");
+    const QString variantStem = prefix.toString() + QLatin1Char('-') + scheme;
 
-    return themeName == NONE_THEME_NAME || themeName == FUSION_THEME_NAME;
+    for (const QString &format : formats) {
+        if (QFileInfo::exists(QStringLiteral("theme:") + variantStem + format)) {
+            return variantStem + format;
+        }
+    }
+    return QString();
+}
+
+QString ThemeManager::assetPath(QStringView prefix) const
+{
+    // Probe order mirrors tryLoadImage: a theme may override the default SVG
+    // with a raster of the same stem, so raster wins over SVG within a stem.
+    static const QStringList formats = {QStringLiteral(".png"), QStringLiteral(".jpg"), QStringLiteral(".jpeg"),
+                                        QStringLiteral(".svg")};
+
+    auto findExisting = [](const QString &stem) {
+        for (const QString &format : formats) {
+            if (QFileInfo::exists(QStringLiteral("theme:") + stem + format)) {
+                return stem + format;
+            }
+        }
+        return QString();
+    };
+
+    // Prefer the scheme-qualified variant when it exists, else the plain
+    // asset as the super fallback. Both return the resolved path including
+    // its file extension so callers can load it directly.
+    const QString variant = schemeVariantPath(prefix);
+    if (!variant.isEmpty()) {
+        return variant;
+    }
+    const QString resolvedPlain = findExisting(prefix.toString());
+    return resolvedPlain.isEmpty() ? prefix.toString() : resolvedPlain;
+}
+
+// Probe whether a directory is truly writable by trying to create and remove a
+// temporary file. QFileInfo::isWritable() on a directory is unreliable (notably
+// on Windows where UAC VirtualStore can make a system dir appear writable).
+bool ThemeManager::isDirReallyWritable(const QString &dirPath)
+{
+    const QString probe = QDir(dirPath).absoluteFilePath(".cockatrice_write_test");
+    QFile f(probe);
+    if (!f.open(QIODevice::WriteOnly)) {
+        return false;
+    }
+    f.close();
+    f.remove();
+    return true;
+}
+
+QString ThemeManager::writableThemeDir(const QString &themeName)
+{
+    // All theme writes go to the user themes directory regardless of whether
+    // the resolved (system) theme directory happens to be writable. Even when a
+    // write would succeed in-place, routing it to the user directory keeps the
+    // install intact and guarantees changes survive upgrades.
+    const QString dirPath = QDir(SettingsCache::instance().paths().getThemesPath()).absoluteFilePath(themeName);
+    if (!QDir().mkpath(dirPath)) {
+        qWarning() << "Failed to create theme save directory:" << dirPath;
+    }
+    return dirPath;
+}
+
+// System (read-only) themes location, relative to the application binary.
+static QString systemThemesBasePath()
+{
+    QString base = qApp->applicationDirPath();
+#ifdef Q_OS_MAC
+    base += "/../Resources/themes";
+#elif defined(Q_OS_WIN)
+    base += "/themes";
+#else // linux
+    base += "/../share/cockatrice/themes";
+#endif
+    return base;
 }
 
 QStringMap &ThemeManager::getAvailableThemes()
@@ -143,11 +239,9 @@ QStringMap &ThemeManager::getAvailableThemes()
     availableThemes.clear();
 
     // load themes from user profile dir
-    dir.setPath(SettingsCache::instance().getThemesPath());
+    dir.setPath(SettingsCache::instance().paths().getThemesPath());
 
-    // add default value
-    availableThemes.insert(NONE_THEME_NAME, dir.absoluteFilePath("Default"));
-
+    availableThemes.insert(SYSTEM_THEME_NAME, dir.absoluteFilePath("System"));
     availableThemes.insert(FUSION_THEME_NAME, dir.absoluteFilePath("Fusion"));
 
     for (QString themeName : dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
@@ -156,16 +250,8 @@ QStringMap &ThemeManager::getAvailableThemes()
         }
     }
 
-    // load themes from cockatrice system dir
-    dir.setPath(qApp->applicationDirPath() +
-#ifdef Q_OS_MAC
-                "/../Resources/themes"
-#elif defined(Q_OS_WIN)
-                "/themes"
-#else // linux
-                "/../share/cockatrice/themes"
-#endif
-    );
+    // Load themes from Cockatrice system dir
+    dir.setPath(systemThemesBasePath());
 
     for (QString themeName : dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
         if (!availableThemes.contains(themeName)) {
@@ -179,7 +265,7 @@ QStringMap &ThemeManager::getAvailableThemes()
 QBrush ThemeManager::loadBrush(QString fileName, QColor fallbackColor)
 {
     QBrush brush;
-    QPixmap tmp = QPixmap("theme:zones/" + fileName);
+    QPixmap tmp = QPixmap("theme:" + assetPath(QStringLiteral("zones/") + fileName));
     if (tmp.isNull()) {
         brush.setColor(fallbackColor);
         brush.setStyle(Qt::SolidPattern);
@@ -193,7 +279,7 @@ QBrush ThemeManager::loadBrush(QString fileName, QColor fallbackColor)
 QBrush ThemeManager::loadExtraBrush(QString fileName, QBrush &fallbackBrush)
 {
     QBrush brush;
-    QPixmap tmp = QPixmap("theme:zones/" + fileName);
+    QPixmap tmp = QPixmap("theme:" + assetPath(QStringLiteral("zones/") + fileName));
 
     if (tmp.isNull()) {
         brush = fallbackBrush;
@@ -242,12 +328,50 @@ bool ThemeManager::savePaletteConfig(const QString &themeDirPath, const QString 
     return true;
 }
 
+PaletteConfig ThemeManager::loadDefaultPaletteConfig(const QString &themeDirPath,
+                                                     const QString &themeName,
+                                                     const QString &colorScheme)
+{
+    PaletteConfig cfg = PaletteConfig::fromDefault(themeDirPath, colorScheme);
+    if (!cfg.hasPalette()) {
+        // The shipped default may live in the system theme directory rather
+        // than the resolved (user) theme directory, so built-in themes still
+        // get their curated defaults.
+        cfg = PaletteConfig::fromDefault(QDir(systemThemesBasePath()).absoluteFilePath(themeName), colorScheme);
+    }
+    return cfg;
+}
+
+bool ThemeManager::commitPalette(const QString &themeDirPath, const QString &colorScheme, const PaletteConfig &cfg)
+{
+    if (!savePaletteConfig(themeDirPath, colorScheme, cfg)) {
+        return false;
+    }
+
+    ThemeConfig globalCfg = ThemeConfig::fromThemeDir(themeDirPath);
+    globalCfg.colorScheme = colorScheme;
+    globalCfg.save(themeDirPath);
+
+    return true;
+}
+
 void ThemeManager::setColorScheme(const QString &scheme)
 {
-    const QString dirPath = getAvailableThemes().value(SettingsCache::instance().getThemeName());
+    const QString dirPath = writableThemeDir(SettingsCache::instance().getThemeName());
     ThemeConfig cfg = ThemeConfig::fromThemeDir(dirPath);
 
     cfg.colorScheme = scheme;
+
+    cfg.save(dirPath);
+    reloadCurrentTheme();
+}
+
+void ThemeManager::setStyleName(const QString &styleName)
+{
+    const QString dirPath = writableThemeDir(SettingsCache::instance().getThemeName());
+    ThemeConfig cfg = ThemeConfig::fromThemeDir(dirPath);
+
+    cfg.styleName = styleName;
 
     cfg.save(dirPath);
     reloadCurrentTheme();
@@ -275,17 +399,17 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
     Q_UNUSED(activeScheme)
 #endif
     QString styleName = themeCfg.styleName;
-    if (styleName.isEmpty() || styleName.compare("Default", Qt::CaseInsensitive) == 0) {
+    if (styleName.isEmpty() || styleName.compare("System", Qt::CaseInsensitive) == 0) {
         if (themeName == FUSION_THEME_NAME) {
             styleName = "Fusion";
         } else {
-            styleName = defaultStyleName;
+            styleName = usableDefaultStyle(defaultStyleName);
         }
     }
 
     QStyle *style = QStyleFactory::create(styleName);
     if (!style) {
-        style = QStyleFactory::create(defaultStyleName);
+        style = QStyleFactory::create(usableDefaultStyle(defaultStyleName));
     }
 
     // Base palette
@@ -298,7 +422,11 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
         }
 #endif
     } else {
-        base = qApp->palette();
+        // Use the pristine startup palette rather than qApp->palette(): the
+        // latter may already carry a previously-applied custom (e.g. dark)
+        // palette, which would otherwise persist when switching to a scheme
+        // that supplies no palette of its own.
+        base = defaultPalette;
     }
 
     // Overlay custom palette colours
@@ -314,6 +442,8 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
     qApp->setPalette(base);
     qApp->setStyle(style);
 
+    currentAppColors = palCfg.appColors;
+
     // Force every widget to re-polish and repaint immediately rather than
     // waiting for natural expose events, which produces a patchwork of old
     // and new colours during a live preview.
@@ -326,6 +456,35 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
         style->polish(widget);
         widget->update();
     }
+
+    emit paletteChanged();
+}
+
+QColor ThemeManager::appColor(AppColor::Role role) const
+{
+    const auto it = currentAppColors.constFind(role);
+    if (it != currentAppColors.constEnd()) {
+        return it.value();
+    }
+
+    // QPalette::Accent was introduced in Qt 6.6 and several shipped palettes
+    // set it to a value barely distinguishable from Window, so it is not a
+    // reliable accent source. The selection highlight is the stable accent
+    // (Accent defaults to Highlight when unset), and deriving from it
+    // unconditionally keeps every Qt version rendering identically.
+    const QColor accent = qApp->palette().color(QPalette::Active, QPalette::Highlight);
+
+    if (role == AppColor::AccentSoft) {
+        constexpr int SOFT_SATURATION_PERCENT = 70;
+        constexpr int SOFT_LIGHTNESS_OFFSET = 60;
+
+        // Light end of the gradient: same hue, softened and lightened
+        return QColor::fromHsl(qMax(0, accent.hslHue()),
+                               qBound(0, qRound(accent.hslSaturation() * SOFT_SATURATION_PERCENT / 100.0), 255),
+                               qBound(0, accent.lightness() + SOFT_LIGHTNESS_OFFSET, 255));
+    }
+
+    return accent;
 }
 
 void ThemeManager::themeChangedSlot()
@@ -335,9 +494,19 @@ void ThemeManager::themeChangedSlot()
     currentThemePath = dirPath;
     QDir dir(dirPath);
 
-    // CSS
-    if (!dirPath.isEmpty() && dir.exists(STYLE_CSS_NAME)) {
-        qApp->setStyleSheet("file:///" + dir.absoluteFilePath(STYLE_CSS_NAME));
+    // CSS — prefer the scheme-qualified stylesheet (style-dark.css /
+    // style-light.css) when present, else the plain style.css as fallback.
+    if (!dirPath.isEmpty()) {
+        const QString scheme = isDarkMode(dirPath) ? QStringLiteral("dark") : QStringLiteral("light");
+        const QString schemeCss = QFileInfo(QStringLiteral(STYLE_CSS_NAME)).completeBaseName() + QLatin1Char('-') +
+                                  scheme + QStringLiteral(".css");
+        if (dir.exists(schemeCss)) {
+            qApp->setStyleSheet("file:///" + dir.absoluteFilePath(schemeCss));
+        } else if (dir.exists(STYLE_CSS_NAME)) {
+            qApp->setStyleSheet("file:///" + dir.absoluteFilePath(STYLE_CSS_NAME));
+        } else {
+            qApp->setStyleSheet("");
+        }
     } else {
         qApp->setStyleSheet("");
     }
@@ -352,8 +521,19 @@ void ThemeManager::themeChangedSlot()
 
     // ── Load palette: custom first, then theme default ────────────────────
     PaletteConfig palette = PaletteConfig::fromScheme(dirPath, activeScheme);
-    if (!palette.hasPalette()) {
-        palette = PaletteConfig::fromDefault(dirPath, activeScheme);
+    const PaletteConfig themeDefault = ThemeManager::loadDefaultPaletteConfig(dirPath, themeName, activeScheme);
+    if (palette.hasPalette()) {
+        // A custom palette written before [AppColors] existed carries no app
+        // colors; merge the theme's shipped defaults so the identity colors
+        // survive (hasPalette() counts an app-colors-only file as a palette,
+        // so those are kept wholesale and never reach here empty).
+        for (auto it = themeDefault.appColors.cbegin(); it != themeDefault.appColors.cend(); ++it) {
+            if (!palette.appColors.contains(it.key())) {
+                palette.appColors.insert(it.key(), it.value());
+            }
+        }
+    } else {
+        palette = themeDefault;
     }
 
     applyStyleAndPalette(themeName, themeCfg, palette, activeScheme);
@@ -362,6 +542,16 @@ void ThemeManager::themeChangedSlot()
     if (!dirPath.isEmpty()) {
         resources << dir.absolutePath();
     }
+
+    // When the resolved dir is a user copy (e.g. user/<theme>), also
+    // include the system theme dir as a fallback so shipped assets like
+    // zones/*.png and style.css still resolve for themes that ship only
+    // those files (e.g. Leather, Plasma, Fabric, VelvetMarble).
+    const QString sysPath = QDir(systemThemesBasePath()).absoluteFilePath(themeName);
+    if (sysPath != dirPath && QDir(sysPath).exists()) {
+        resources << sysPath;
+    }
+
     resources << DEFAULT_RESOURCE_PATHS;
 
     QDir::setSearchPaths("theme", resources);
@@ -378,6 +568,7 @@ void ThemeManager::themeChangedSlot()
     }
 
     QPixmapCache::clear();
+    clearPixmapGeneratorCaches();
 
     emit themeChanged();
 }

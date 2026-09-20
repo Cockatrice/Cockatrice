@@ -12,6 +12,17 @@ CardDatabaseQuerier::CardDatabaseQuerier(QObject *_parent,
                                          const ICardPreferenceProvider *prefs)
     : QObject(_parent), db(_db), prefs(prefs)
 {
+    // Invalidate the cached count maps whenever the database contents change.
+    connect(db, &CardDatabase::cardAdded, this, &CardDatabaseQuerier::invalidateCaches);
+    connect(db, &CardDatabase::cardRemoved, this, &CardDatabaseQuerier::invalidateCaches);
+    connect(db, &CardDatabase::cardDatabaseReset, this, &CardDatabaseQuerier::invalidateCaches);
+}
+
+void CardDatabaseQuerier::invalidateCaches()
+{
+    mainCardTypeCountsCache.clear();
+    subCardTypeCountsCache.clear();
+    formatsCountCache.clear();
 }
 
 /**
@@ -304,44 +315,43 @@ QString CardDatabaseQuerier::getPreferredPrintingProviderId(const QString &cardN
 
 QStringList CardDatabaseQuerier::getAllMainCardTypes() const
 {
-    QSet<QString> types;
-    for (const auto &card : db->cards.values()) {
-        types.insert(card->getMainCardType());
-    }
-    return types.values();
+    return getAllMainCardTypesWithCount().keys();
 }
 
 QMap<QString, int> CardDatabaseQuerier::getAllMainCardTypesWithCount() const
 {
-    QMap<QString, int> typeCounts;
-
-    for (const auto &card : db->cards.values()) {
-        QString type = card->getMainCardType();
-        typeCounts[type]++;
+    // An empty cache is always recomputed correctly: a database with no cards
+    // produces an empty map, so the cache is only ever empty when it needs a
+    // (trivially cheap) rebuild.
+    if (mainCardTypeCountsCache.isEmpty()) {
+        for (const auto &card : db->cards.values()) {
+            QString type = card->getMainCardType();
+            mainCardTypeCountsCache[type]++;
+        }
     }
 
-    return typeCounts;
+    return mainCardTypeCountsCache;
 }
 
 QMap<QString, int> CardDatabaseQuerier::getAllSubCardTypesWithCount() const
 {
-    QMap<QString, int> typeCounts;
+    if (subCardTypeCountsCache.isEmpty()) {
+        for (const auto &card : db->cards.values()) {
+            QString type = card->getCardType();
 
-    for (const auto &card : db->cards.values()) {
-        QString type = card->getCardType();
+            QStringList parts = type.split(" — ");
 
-        QStringList parts = type.split(" — ");
+            if (parts.size() > 1) { // Ensure there are subtypes
+                QStringList subtypes = parts[1].split(" ", Qt::SkipEmptyParts);
 
-        if (parts.size() > 1) { // Ensure there are subtypes
-            QStringList subtypes = parts[1].split(" ", Qt::SkipEmptyParts);
-
-            for (const QString &subtype : subtypes) {
-                typeCounts[subtype]++;
+                for (const QString &subtype : subtypes) {
+                    subCardTypeCountsCache[subtype]++;
+                }
             }
         }
     }
 
-    return typeCounts;
+    return subCardTypeCountsCache;
 }
 
 FormatRulesPtr CardDatabaseQuerier::getFormat(const QString &formatName) const
@@ -351,18 +361,18 @@ FormatRulesPtr CardDatabaseQuerier::getFormat(const QString &formatName) const
 
 QMap<QString, int> CardDatabaseQuerier::getAllFormatsWithCount() const
 {
-    QMap<QString, int> formatCounts;
+    if (formatsCountCache.isEmpty()) {
+        for (const auto &card : db->cards.values()) {
+            QStringList allProps = card->getProperties();
 
-    for (const auto &card : db->cards.values()) {
-        QStringList allProps = card->getProperties();
-
-        for (const QString &prop : allProps) {
-            if (prop.startsWith("format-")) {
-                QString formatName = prop.mid(QStringLiteral("format-").size());
-                formatCounts[formatName]++;
+            for (const QString &prop : allProps) {
+                if (prop.startsWith("format-")) {
+                    QString formatName = prop.mid(QStringLiteral("format-").size());
+                    formatsCountCache[formatName]++;
+                }
             }
         }
     }
 
-    return formatCounts;
+    return formatsCountCache;
 }

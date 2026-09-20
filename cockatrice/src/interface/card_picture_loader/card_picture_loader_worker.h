@@ -5,6 +5,8 @@
 #include "card_picture_loader_worker_work.h"
 #include "card_picture_to_load.h"
 
+#include <QDateTime>
+#include <QHash>
 #include <QLoggingCategory>
 #include <QMutex>
 #include <QNetworkAccessManager>
@@ -66,6 +68,12 @@ public:
      */
     void queueRequest(const QUrl &url, CardPictureLoaderWorkerWork *worker);
 
+    /**
+     * @brief Handles a server returning HTTP 429 by reducing that host's request quota.
+     * @param host The host that returned 429
+     */
+    void onHostRateLimited(const QString &host);
+
     /** @brief Clears the network cache and redirect cache. */
     void clearNetworkCache();
 
@@ -110,8 +118,11 @@ private:
     bool picDownload;                                  ///< Whether downloading images from network is enabled
     QQueue<QPair<QUrl, CardPictureLoaderWorkerWork *>> requestLoadQueue; ///< Queue of pending network requests
 
-    int requestQuota;    ///< Remaining requests allowed per second
-    QTimer requestTimer; ///< Timer to reset the request quota
+    int requestQuota;                       ///< Remaining requests allowed per second
+    QTimer requestTimer;                    ///< Timer to reset the request quota
+    QHash<QString, int> hostRequestQuota;   ///< Sustained per-host request allowance
+    QHash<QString, int> hostQuotaRemaining; ///< Per-host allowance left in the current second
+    QHash<QString, QDateTime> hostLast429;  ///< When each host was last rate limited
 
     CardPictureLoaderLocal *localLoader; ///< Loader for local images
     QSet<QString> currentlyLoading;      ///< Deduplication: contains pixmapCacheKey currently being loaded

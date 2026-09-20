@@ -1,14 +1,15 @@
 #include "user_context_menu.h"
 
+#include "../../dialogs/dlg_report_user.h"
 #include "../../interface/widgets/tabs/tab_account.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../../interface/widgets/tabs/tab_supervisor.h"
 #include "../chat_view/chat_view.h"
 #include "../game_selector.h"
 #include "user_info_box.h"
+#include "user_list_dialog.h"
 #include "user_list_manager.h"
 #include "user_list_proxy.h"
-#include "user_list_widget.h"
 
 #include <QAction>
 #include <QMenu>
@@ -41,6 +42,7 @@ UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *parent,
     aAddToIgnoreList = new QAction(QString(), this);
     aRemoveFromIgnoreList = new QAction(QString(), this);
     aKick = new QAction(QString(), this);
+    aReport = new QAction(QString(), this);
     aWarnUser = new QAction(QString(), this);
     aWarnHistory = new QAction(QString(), this);
     aBan = new QAction(QString(), this);
@@ -49,7 +51,10 @@ UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *parent,
     aDemoteFromMod = new QAction(QString(), this);
     aPromoteToJudge = new QAction(QString(), this);
     aDemoteFromJudge = new QAction(QString(), this);
+    aPromoteToDeveloper = new QAction(QString(), this);
+    aDemoteFromDeveloper = new QAction(QString(), this);
     aGetAdminNotes = new QAction(QString(), this);
+    aInvestigateUser = new QAction(QString(), this);
 
     retranslateUi();
 }
@@ -64,6 +69,7 @@ void UserContextMenu::retranslateUi()
     aAddToIgnoreList->setText(tr("Add to &ignore list"));
     aRemoveFromIgnoreList->setText(tr("Remove from &ignore list"));
     aKick->setText(tr("Kick from &game"));
+    aReport->setText(tr("Report user"));
     aWarnUser->setText(tr("Warn user"));
     aWarnHistory->setText(tr("View user's war&n history"));
     aBan->setText(tr("Ban from &server"));
@@ -72,7 +78,10 @@ void UserContextMenu::retranslateUi()
     aDemoteFromMod->setText(tr("Dem&ote user from moderator"));
     aPromoteToJudge->setText(tr("Promote user to &judge"));
     aDemoteFromJudge->setText(tr("Demote user from judge"));
+    aPromoteToDeveloper->setText(tr("Promote user to &developer"));
+    aDemoteFromDeveloper->setText(tr("Demote user from de&veloper"));
     aGetAdminNotes->setText(tr("View admin notes"));
+    aInvestigateUser->setText(tr("Investigate user"));
 }
 
 void UserContextMenu::gamesOfUserReceived(const Response &resp, const CommandContainer &commandContainer)
@@ -144,7 +153,8 @@ void UserContextMenu::warnUser_processGetWarningsListResponse(const Response &r)
 
     if (response.warning_size() > 0) {
         for (int i = 0; i < response.warning_size(); ++i) {
-            dlg->addWarningOption(QString::fromStdString(response.warning(i)).simplified());
+            int startingIl = i < response.warning_il_size() ? response.warning_il(i) : 1;
+            dlg->addWarningOption(QString::fromStdString(response.warning(i)).simplified(), startingIl);
         }
     }
     dlg->show();
@@ -262,7 +272,7 @@ void UserContextMenu::adjustMod_processUserResponse(const Response &resp, const 
     const Command_AdjustMod &cmd = commandContainer.admin_command(0).GetExtension(Command_AdjustMod::ext);
 
     if (resp.response_code() == Response::RespOk) {
-        if (cmd.should_be_mod() || cmd.should_be_judge()) {
+        if (cmd.should_be_mod() || cmd.should_be_judge() || cmd.should_be_developer()) {
             QMessageBox::information(static_cast<QWidget *>(parent()), tr("Success"),
                                      tr("Successfully promoted user."));
         } else {
@@ -270,7 +280,7 @@ void UserContextMenu::adjustMod_processUserResponse(const Response &resp, const 
         }
 
     } else {
-        if (cmd.should_be_mod() || cmd.should_be_judge()) {
+        if (cmd.should_be_mod() || cmd.should_be_judge() || cmd.should_be_developer()) {
             QMessageBox::information(static_cast<QWidget *>(parent()), tr("Failed"), tr("Failed to promote user."));
         } else {
             QMessageBox::information(static_cast<QWidget *>(parent()), tr("Failed"), tr("Failed to demote user."));
@@ -355,6 +365,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
 {
     QAction *aCopyToClipBoard = nullptr, *aRemoveMessages = nullptr;
     aUserName->setText(userName);
+    const bool anotherUser = userName != userListProxy->getOwnUsername();
 
     auto *menu = new QMenu(static_cast<QWidget *>(parent()));
     menu->addAction(aUserName);
@@ -366,6 +377,17 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
     menu->addAction(aDetails);
     menu->addAction(aShowGames);
     menu->addAction(aChat);
+    const QList<GameInviteOption> inviteOptions = inviteOptionsForUser(userName);
+    if (!inviteOptions.isEmpty()) {
+        auto *inviteMenu = new QMenu(tr("&Invite to Game"), menu);
+        for (const GameInviteOption &option : inviteOptions) {
+            QAction *inviteAction = inviteMenu->addAction(option.label);
+            inviteAction->setEnabled(anotherUser && online);
+            connect(inviteAction, &QAction::triggered, this,
+                    [this, userName, option] { execInvite(userName, option); });
+        }
+        menu->addMenu(inviteMenu);
+    }
     if (userLevel.testFlag(ServerInfo_User::IsRegistered) && userListProxy->isOwnUserRegistered()) {
         menu->addSeparator();
         if (userListProxy->isUserBuddy(userName)) {
@@ -383,6 +405,9 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         aRemoveMessages = new QAction(tr("Remove this user's messages"), this);
         menu->addAction(aRemoveMessages);
     }
+    if (userListProxy->isOwnUserRegistered()) {
+        menu->addAction(aReport);
+    }
     if (game && (game->isHost() || !tabSupervisor->getAdminLocked())) {
         menu->addSeparator();
         menu->addAction(aKick);
@@ -396,6 +421,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         menu->addAction(aBanHistory);
         menu->addSeparator();
         menu->addAction(aGetAdminNotes);
+        menu->addAction(aInvestigateUser);
 
         menu->addSeparator();
         if (userLevel.testFlag(ServerInfo_User::IsModerator) &&
@@ -415,11 +441,20 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
                    (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsAdmin)) {
             menu->addAction(aPromoteToJudge);
         }
+
+        if (userLevel.testFlag(ServerInfo_User::IsDeveloper) &&
+            (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsAdmin)) {
+            menu->addAction(aDemoteFromDeveloper);
+
+        } else if (userLevel.testFlag(ServerInfo_User::IsRegistered) &&
+                   (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsAdmin)) {
+            menu->addAction(aPromoteToDeveloper);
+        }
     }
-    bool anotherUser = userName != userListProxy->getOwnUsername();
     aDetails->setEnabled(true);
-    aChat->setEnabled(anotherUser && online);
+    aChat->setEnabled(anotherUser && online && !userListProxy->isUserIgnored(userName));
     aShowGames->setEnabled(online);
+    aReport->setEnabled(anotherUser);
     aAddToBuddyList->setEnabled(anotherUser);
     aRemoveFromBuddyList->setEnabled(anotherUser);
     aAddToIgnoreList->setEnabled(anotherUser);
@@ -430,8 +465,13 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
     aBan->setEnabled(anotherUser);
     aBanHistory->setEnabled(anotherUser);
     aGetAdminNotes->setEnabled(anotherUser);
+    aInvestigateUser->setEnabled(anotherUser);
     aPromoteToMod->setEnabled(anotherUser);
     aDemoteFromMod->setEnabled(anotherUser);
+    aPromoteToJudge->setEnabled(anotherUser);
+    aDemoteFromJudge->setEnabled(anotherUser);
+    aPromoteToDeveloper->setEnabled(anotherUser);
+    aDemoteFromDeveloper->setEnabled(anotherUser);
 
     QAction *actionClicked = menu->exec(pos);
     if (actionClicked == nullptr) {
@@ -451,12 +491,23 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         execRemoveFromIgnore(userName);
     } else if (actionClicked == aKick) {
         execKick(playerId);
+    } else if (actionClicked == aReport) {
+        int gameId = game ? game->getGameMetaInfo()->gameId() : -1;
+        QString autoChatLog;
+        if (chatView) {
+            autoChatLog = chatView->getRecentChatLog(50);
+        }
+        auto dlgReport = new DlgReportUser(client, userName, gameId, autoChatLog, static_cast<QWidget *>(parent()));
+        dlgReport->setAttribute(Qt::WA_DeleteOnClose);
+        dlgReport->exec();
     } else if (actionClicked == aBan) {
         execBan(userName);
     } else if (actionClicked == aPromoteToMod || actionClicked == aDemoteFromMod) {
         execAdjustMod(userName, actionClicked == aPromoteToMod);
     } else if (actionClicked == aPromoteToJudge || actionClicked == aDemoteFromJudge) {
         execAdjustJudge(userName, actionClicked == aPromoteToJudge);
+    } else if (actionClicked == aPromoteToDeveloper || actionClicked == aDemoteFromDeveloper) {
+        execAdjustDeveloper(userName, actionClicked == aPromoteToDeveloper);
     } else if (actionClicked == aBanHistory) {
         execBanHistory(userName);
     } else if (actionClicked == aWarnUser) {
@@ -465,6 +516,8 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         execWarnHistory(userName);
     } else if (actionClicked == aGetAdminNotes) {
         execAdminNotes(userName);
+    } else if (actionClicked == aInvestigateUser) {
+        execInvestigateUser(userName);
     } else if (actionClicked == aCopyToClipBoard) {
         QClipboard *clipboard = QGuiApplication::clipboard();
         clipboard->setText(deckHash);
@@ -478,6 +531,60 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
 void UserContextMenu::execChat(const QString &userName)
 {
     emit openMessageDialog(userName, true);
+}
+
+QList<GameInviteOption> UserContextMenu::inviteOptionsForUser(const QString &userName) const
+{
+    if (!gameInviteLinkProvider) {
+        return {};
+    }
+    const QList<GameInviteOption> options = gameInviteLinkProvider();
+    QList<GameInviteOption> result;
+    for (const GameInviteOption &option : options) {
+        // Buddy-only games accept invites only from their creator, and only to
+        // users on the creator's buddy list.
+        if (option.onlyBuddies &&
+            (option.creatorName != userListProxy->getOwnUsername() || !userListProxy->isUserBuddy(userName))) {
+            continue;
+        }
+        result.append(option);
+    }
+    return result;
+}
+
+void UserContextMenu::execInvite(const QString &userName)
+{
+    const QList<GameInviteOption> options = inviteOptionsForUser(userName);
+    if (options.isEmpty()) {
+        return;
+    }
+
+    if (options.size() == 1) {
+        execInvite(userName, options.first());
+        return;
+    }
+
+    // More than one game in the room — let the user pick which one to invite to.
+    auto *menu = new QMenu(static_cast<QWidget *>(parent()));
+    for (const GameInviteOption &option : options) {
+        QAction *action = menu->addAction(option.label);
+        connect(action, &QAction::triggered, this, [this, userName, option] { execInvite(userName, option); });
+    }
+    menu->setAttribute(Qt::WA_DeleteOnClose);
+    menu->popup(QCursor::pos());
+}
+
+void UserContextMenu::execInvite(const QString &userName, const GameInviteOption &option)
+{
+    // Name the game by description first, then its id — "Join my game 'Magic'
+    // (#123)" — so a description-less fallback still identifies the game.
+    // The multi-arg .arg() overloads replace in a single pass, so a description
+    // containing "%…" cannot corrupt later placeholders.
+    const QString prefix =
+        option.description.isEmpty()
+            ? tr("Join my game (#%1):").arg(option.gameId)
+            : tr("Join my game \"%1\" (#%2):").arg(option.description, QString::number(option.gameId));
+    tabSupervisor->sendInviteToUser(userName, prefix + " " + option.url);
 }
 
 void UserContextMenu::execDetails(const QString &userName)
@@ -518,7 +625,15 @@ void UserContextMenu::execAddToIgnore(const QString &userName)
     Command_AddToList cmd;
     cmd.set_list("ignore");
     cmd.set_user_name(userName.toStdString());
-    client->sendCommand(client->prepareSessionCommand(cmd));
+    PendingCommand *pend = client->prepareSessionCommand(cmd);
+    connect(pend, &PendingCommand::finished, this,
+            [this, userName](const Response &response, const CommandContainer &, const QVariant &) {
+                if (response.response_code() == Response::RespOk) {
+                    QMessageBox::information(static_cast<QWidget *>(parent()), tr("Ignore list"),
+                                             tr("%1 has been added to your ignore list.").arg(userName));
+                }
+            });
+    client->sendCommand(pend);
 }
 
 void UserContextMenu::execRemoveFromIgnore(const QString &userName)
@@ -587,6 +702,11 @@ void UserContextMenu::execAdminNotes(const QString &userName)
     client->sendCommand(pend);
 }
 
+void UserContextMenu::execInvestigateUser(const QString &userName)
+{
+    tabSupervisor->openTabModeration(userName);
+}
+
 void UserContextMenu::execAdjustMod(const QString &userName, bool shouldBeMod)
 {
     Command_AdjustMod cmd;
@@ -602,6 +722,16 @@ void UserContextMenu::execAdjustJudge(const QString &userName, bool shouldBeJudg
     Command_AdjustMod cmd;
     cmd.set_user_name(userName.toStdString());
     cmd.set_should_be_judge(shouldBeJudge);
+    PendingCommand *pend = client->prepareAdminCommand(cmd);
+    connect(pend, &PendingCommand::finished, this, &UserContextMenu::adjustMod_processUserResponse);
+    client->sendCommand(pend);
+}
+
+void UserContextMenu::execAdjustDeveloper(const QString &userName, bool shouldBeDeveloper)
+{
+    Command_AdjustMod cmd;
+    cmd.set_user_name(userName.toStdString());
+    cmd.set_should_be_developer(shouldBeDeveloper);
     PendingCommand *pend = client->prepareAdminCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &UserContextMenu::adjustMod_processUserResponse);
     client->sendCommand(pend);

@@ -27,6 +27,7 @@ private:
     QWidget *tallyContainer;
     QGridLayout *tallyLayout;
     QPointF selectionOrigin;
+    QRect previousBandRect;          ///< Last rubber-band rect for targeted repaint
     QList<TallyRow> cachedTallyRows; ///< Cached entries to avoid redundant rebuilds
 
     QSize rebuildTallyLabels(const QList<TallyRow> &entries);

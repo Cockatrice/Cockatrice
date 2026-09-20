@@ -1,5 +1,6 @@
 #include "utility_menu.h"
 
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../../../interface/deck_loader/deck_loader.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"

@@ -6,11 +6,14 @@
 #include <QObject>
 #include <QSqlDatabase>
 #include <libcockatrice/protocol/pb/serverinfo_chat_message.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_moderator_login.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_user_alt.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_user_session.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_warning.pb.h>
 #include <server.h>
 #include <server_database_interface.h>
 
-#define DATABASE_SCHEMA_VERSION 35
+#define DATABASE_SCHEMA_VERSION 36
 
 class Servatrice;
 
@@ -29,6 +32,7 @@ private:
     bool checkUserIsIpBanned(const QString &ipAddress, QString &banReason, int &banSecondsRemaining);
     /** Must be called after checkSql and server is known to be in auth mode. */
     bool checkUserIsNameBanned(QString const &userName, QString &banReason, int &banSecondsRemaining);
+    bool isStrictModeEnabled(bool &ok) const;
 
 protected:
     AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler,
@@ -119,6 +123,7 @@ public:
                             bool oldPasswordNeedsHash,
                             const QString &newPassword,
                             bool newPasswordNeedsHash) override;
+    void setForcePasswordChange(const QString &user, bool force) override;
     QList<ServerInfo_Ban> getUserBanHistory(const QString userName);
     bool
     addWarning(const QString userName, const QString adminName, const QString warningReason, const QString clientID);
@@ -133,6 +138,25 @@ public:
                                                        bool &room,
                                                        int &range,
                                                        int &maxresults);
+    QList<ServerInfo_UserSession> getUserSessions(const QString &userName, int limit);
+    QList<ServerInfo_UserAlt> getUserAlts(const QString &userName);
+    QList<ServerInfo_ModeratorLogin> getModeratorLastLogins();
+
+    // Uptime snapshot as recorded by Servatrice::statusUpdate() into the
+    // {prefix}_uptime table. valid is false when no snapshot exists yet.
+    struct UptimeSnapshot
+    {
+        bool valid = false;
+        quint64 usersCount = 0;
+        quint64 modsCount = 0;
+        quint64 gamesCount = 0;
+        quint64 txBytes = 0;
+        quint64 rxBytes = 0;
+        quint64 uptimeSecs = 0;
+        quint64 timest = 0;
+    };
+    UptimeSnapshot getLatestUptimeSnapshot(int serverId);
+    bool removeUserAvatar(const QString &userName);
     bool addForgotPassword(const QString &user);
     bool removeForgotPassword(const QString &user) override;
     bool doesForgotPasswordExist(const QString &user);

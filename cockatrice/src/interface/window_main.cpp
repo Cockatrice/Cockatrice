@@ -19,9 +19,11 @@
  ***************************************************************************/
 #include "window_main.h"
 
+#include "../client/latency_status_widget.h"
 #include "../client/network/update/client/client_update_checker.h"
 #include "../client/network/update/client/release_channel.h"
 #include "../client/settings/cache_settings.h"
+#include "../client/settings/shortcuts_settings.h"
 #include "../interface/widgets/dialogs/dlg_edit_tokens.h"
 #include "../interface/widgets/dialogs/dlg_local_game_options.h"
 #include "../interface/widgets/dialogs/dlg_manage_sets.h"
@@ -30,13 +32,24 @@
 #include "../interface/widgets/dialogs/dlg_tip_of_the_day.h"
 #include "../interface/widgets/dialogs/dlg_update.h"
 #include "../interface/widgets/dialogs/dlg_view_log.h"
+#include "../interface/widgets/onboarding/first_run_wizard.h"
+#include "../interface/widgets/settings_page/general_settings_page.h"
 #include "../interface/widgets/tabs/tab_game.h"
+#include "../interface/widgets/tabs/tab_server.h"
 #include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../main.h"
+#include "intents/contexts/context_connect_to_server.h"
+#include "intents/contexts/context_join_room.h"
+#include "intents/intent_connect_to_server.h"
+#include "intents/intent_login.h"
+#include "intents/intent_open_server_room_by_name.h"
+#include "intents/url_parser.h"
 #include "logger.h"
+#include "pixel_map_generator.h"
 #include "version_string.h"
 #include "widgets/dialogs/dlg_connect.h"
 #include "widgets/server/handle_public_servers.h"
+#include "widgets/tabs/api/commander_spellbook/handle_commander_brackets.h"
 #include "widgets/utility/get_text_with_max.h"
 
 #include <QAction>
@@ -47,6 +60,7 @@
 #include <QDesktopServices>
 #include <QFile>
 #include <QFileDialog>
+#include <QLabel>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -66,10 +80,21 @@
 #include <libcockatrice/network/server/local/local_server_interface.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 #include <libcockatrice/protocol/pb/room_commands.pb.h>
+#include <libcockatrice/settings/cache_storage_settings.h>
+#include <libcockatrice/settings/debug_settings.h>
+#include <libcockatrice/settings/download_settings.h>
+#include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/settings/layouts_settings.h>
+#include <libcockatrice/settings/network_settings.h>
+#include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/settings/servers_settings.h>
+#include <libcockatrice/settings/tabs_settings.h>
+#include <libcockatrice/settings/updates_settings.h>
 
 #define GITHUB_PAGES_URL "https://cockatrice.github.io"
-#define GITHUB_CONTRIBUTORS_URL "https://github.com/Cockatrice/Cockatrice/graphs/contributors?type=c"
-#define GITHUB_CONTRIBUTE_URL "https://github.com/Cockatrice/Cockatrice#cockatrice"
+#define GITHUB_CONTRIBUTORS_URL "https://github.com/Cockatrice/Cockatrice/graphs/contributors"
+#define GITHUB_CONTRIBUTE_URL "https://github.com/Cockatrice/Cockatrice#"
 #define GITHUB_TRANSIFEX_TRANSLATORS_URL "https://github.com/Cockatrice/Cockatrice/wiki/Translator-Hall-of-Fame"
 #define GITHUB_TRANSLATOR_FAQ_URL "https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ"
 #define GITHUB_ISSUES_URL "https://github.com/Cockatrice/Cockatrice/issues"
@@ -177,7 +202,7 @@ void MainWindow::startLocalGame(const LocalGameOptions &options)
 void MainWindow::actWatchReplay()
 {
     QFileDialog dlg(this, tr("Load replay"));
-    dlg.setDirectory(SettingsCache::instance().getReplaysPath());
+    dlg.setDirectory(SettingsCache::instance().paths().getReplaysPath());
     dlg.setNameFilters(QStringList() << QObject::tr("Cockatrice replays (*.cor)"));
     if (!dlg.exec()) {
         return;
@@ -222,6 +247,8 @@ void MainWindow::actFullScreen(bool checked)
 void MainWindow::actSettings()
 {
     DlgSettings dlg(this);
+    auto *generalPage = qobject_cast<GeneralSettingsPage *>(dlg.page(DlgSettings::GeneralPage));
+    connect(generalPage, &GeneralSettingsPage::cardDatabaseUpdateRequested, this, &MainWindow::actCheckCardUpdates);
     dlg.exec();
 }
 
@@ -248,7 +275,8 @@ void MainWindow::actAbout()
                 GITHUB_TROUBLESHOOTING_URL + "'>" + tr("Troubleshooting") + "</a><br>" + "<a href='" + GITHUB_FAQ_URL +
                 "'>" + tr("F.A.Q.") + "</a><br>"),
         QMessageBox::Ok, this);
-    mb.setIconPixmap(QPixmap("theme:cockatrice").scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    mb.setIconPixmap(
+        themePixmap(QStringLiteral("cockatrice")).scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     mb.setTextInteractionFlags(Qt::TextBrowserInteraction);
     mb.exec();
 }
@@ -300,7 +328,7 @@ void MainWindow::retranslateUi()
     aRegister->setText(tr("&Register to server..."));
     aForgotPassword->setText(tr("&Restore password..."));
     aSettings->setText(tr("&Settings..."));
-    aSettings->setIcon(QPixmap("theme:icons/settings"));
+    aSettings->setIcon(themePixmap(QStringLiteral("icons/settings")));
     aExit->setText(tr("&Exit"));
 
 #if defined(__APPLE__) /* For OSX */
@@ -328,6 +356,7 @@ void MainWindow::retranslateUi()
     aStatusBar->setText(tr("Show Status Bar"));
     aViewLog->setText(tr("View &Debug Log"));
     aOpenSettingsFolder->setText(tr("Open Settings Folder"));
+    aFirstRunWizard->setText(tr("Re-run Onboarding Wizard..."));
 
     aShow->setText(tr("Show/Hide"));
 
@@ -382,12 +411,15 @@ void MainWindow::createActions()
     connect(aCheckCardUpdatesBackground, &QAction::triggered, this, &MainWindow::actCheckCardUpdatesBackground);
     aStatusBar = new QAction(this);
     aStatusBar->setCheckable(true);
-    aStatusBar->setChecked(SettingsCache::instance().getShowStatusBar());
-    connect(aStatusBar, &QAction::triggered, &SettingsCache::instance(), &SettingsCache::setShowStatusBar);
+    aStatusBar->setChecked(SettingsCache::instance().userInterface().getShowStatusBar());
+    connect(aStatusBar, &QAction::triggered, &SettingsCache::instance().userInterface(),
+            &InterfaceSettings::setShowStatusBar);
     aViewLog = new QAction(this);
     connect(aViewLog, &QAction::triggered, this, &MainWindow::actViewLog);
     aOpenSettingsFolder = new QAction(this);
     connect(aOpenSettingsFolder, &QAction::triggered, this, &MainWindow::actOpenSettingsFolder);
+    aFirstRunWizard = new QAction(this);
+    connect(aFirstRunWizard, &QAction::triggered, this, [this] { runFirstRunWizard(); });
 
     aShow = new QAction(this);
     connect(aShow, &QAction::triggered, this, &MainWindow::actShow);
@@ -466,17 +498,20 @@ void MainWindow::createMenus()
     helpMenu->addAction(aStatusBar);
     helpMenu->addAction(aViewLog);
     helpMenu->addAction(aOpenSettingsFolder);
+    helpMenu->addSeparator();
+    helpMenu->addAction(aFirstRunWizard);
 }
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), localServer(nullptr), bHasActivated(false), askedForDbUpdater(false),
       cardUpdateProcess(nullptr), logviewDialog(nullptr)
 {
-    connect(&SettingsCache::instance(), &SettingsCache::pixmapCacheSizeChanged, this,
+    connect(&SettingsCache::instance().cacheStorage(), &CacheStorageSettings::pixmapCacheSizeChanged, this,
             &MainWindow::pixmapCacheSizeChanged);
-    pixmapCacheSizeChanged(SettingsCache::instance().getPixmapCacheSize());
+    pixmapCacheSizeChanged(SettingsCache::instance().cacheStorage().getPixmapCacheSize());
 
     connectionController = new ConnectionController(this, this);
+    urlParser = new IntentUrlParser(this, this);
 
     createActions();
     createMenus();
@@ -488,6 +523,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(tabSupervisor, &TabSupervisor::setMenu, this, &MainWindow::updateTabMenu);
     connect(tabSupervisor, &TabSupervisor::localGameEnded, this, &MainWindow::localGameEnded);
     connect(tabSupervisor, &TabSupervisor::showWindowIfHidden, this, &MainWindow::showWindowIfHidden);
+    connect(tabSupervisor, &TabSupervisor::cockatriceLinkActivated, this, &MainWindow::handleCockatriceLink);
     connect(connectionController, &ConnectionController::tabSupervisorStartRequested, tabSupervisor,
             &TabSupervisor::start);
     connect(connectionController, &ConnectionController::tabSupervisorStopRequested, tabSupervisor,
@@ -508,9 +544,15 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     // status bar
-    connect(&SettingsCache::instance(), &SettingsCache::showStatusBarChanged, this,
+    connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::showStatusBarChanged, this,
             [this](bool show) { statusBar()->setVisible(show); });
-    statusBar()->setVisible(SettingsCache::instance().getShowStatusBar());
+    statusBar()->setVisible(SettingsCache::instance().userInterface().getShowStatusBar());
+
+    latencyStatus = new LatencyStatusWidget(this);
+    statusBar()->addPermanentWidget(latencyStatus);
+
+    connect(connectionController, &ConnectionController::pingStatsUpdated, latencyStatus,
+            &LatencyStatusWidget::updateData);
 
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &MainWindow::refreshShortcuts);
@@ -527,45 +569,59 @@ MainWindow::MainWindow(QWidget *parent)
 
     // run startup check async
     QTimer::singleShot(0, this, &MainWindow::startupConfigCheck);
+    QTimer::singleShot(0, this, &MainWindow::applyStartupDestination);
 }
 
 void MainWindow::startupConfigCheck()
 {
+    // checkUnknownSets() is intentionally deferred from the card database load
+    // (which runs in main() before MainWindow exists) so that
+    // cardDatabaseNewSetsFound / cardDatabaseAllNewSetsEnabled have live
+    // receivers when emitted.
+    CardDatabaseManager::getInstance()->checkUnknownSets();
+
     if (SettingsCache::instance().debug().getLocalGameOnStartup()) {
         LocalGameOptions options;
         options.numberPlayers = SettingsCache::instance().debug().getLocalGamePlayerCount();
         startLocalGame(options);
     }
 
-    if (SettingsCache::instance().getCheckUpdatesOnStartup()) {
+    if (SettingsCache::instance().updates().getCheckUpdatesOnStartup()) {
         actCheckClientUpdates();
     }
 
-    if (SettingsCache::instance().getClientVersion() == CLIENT_INFO_NOT_SET) {
+    actCheckCommanderBracketDefinitionUpdates();
+
+    if (SettingsCache::instance().network().getClientVersion() == CLIENT_INFO_NOT_SET) {
         // no config found, 99% new clean install
         qCInfo(WindowMainStartupVersionLog)
             << "Startup: old client version empty, assuming first start after clean install";
-        alertForcedOracleRun(VERSION_STRING, false);
         SettingsCache::instance().downloads().resetToDefaultURLs(); // populate the download urls
-        SettingsCache::instance().setClientVersion(VERSION_STRING);
-    } else if (SettingsCache::instance().getClientVersion() != VERSION_STRING) {
+        SettingsCache::instance().network().setClientVersion(VERSION_STRING);
+        actCheckServerUpdates();
+        runFirstRunWizard();
+
+        if (QString(VERSION_STRING).contains("custom", Qt::CaseInsensitive)) {
+            SettingsCache::instance().updates().setCheckUpdatesOnStartup(false);
+        } else if (QString(VERSION_STRING).contains("beta", Qt::CaseInsensitive)) {
+            SettingsCache::instance().updates().setUpdateReleaseChannelIndex(1);
+        }
+    } else if (SettingsCache::instance().network().getClientVersion() != VERSION_STRING) {
         // config found, from another (presumably older) version
         qCInfo(WindowMainStartupVersionLog)
-            << "Startup: old client version" << SettingsCache::instance().getClientVersion()
+            << "Startup: old client version" << SettingsCache::instance().network().getClientVersion()
             << "differs, assuming first start after update";
-        if (SettingsCache::instance().getNotifyAboutNewVersion()) {
+        if (SettingsCache::instance().updates().getNotifyAboutNewVersion()) {
             alertForcedOracleRun(VERSION_STRING, true);
-        } else {
-            const auto reloadOk0 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
         }
 
         qCInfo(WindowMainStartupShortcutsLog) << "Migrating shortcuts after update detected.";
         SettingsCache::instance().shortcuts().migrateShortcuts();
 
-        if (SettingsCache::instance().getCheckUpdatesOnStartup()) {
+        if (SettingsCache::instance().updates().getCheckUpdatesOnStartup()) {
             if (QString(VERSION_STRING).contains("custom", Qt::CaseInsensitive)) {
                 qCInfo(WindowMainStartupShortcutsLog) << "Update has changed to custom version, disabling auto update";
-                SettingsCache::instance().setCheckUpdatesOnStartup(Qt::Unchecked);
+                SettingsCache::instance().updates().setCheckUpdatesOnStartup(false);
             } else {
                 int channel = 0;
                 if (QString(VERSION_STRING).contains("beta", Qt::CaseInsensitive)) {
@@ -573,18 +629,18 @@ void MainWindow::startupConfigCheck()
                 }
                 if (SettingsCache::instance().getUpdateReleaseChannelIndex() != channel) {
                     qCInfo(WindowMainStartupShortcutsLog) << "Update has changed beta state, updating release channel.";
-                    SettingsCache::instance().setUpdateReleaseChannelIndex(channel);
+                    SettingsCache::instance().updates().setUpdateReleaseChannelIndex(channel);
                 }
             }
         }
 
-        SettingsCache::instance().setClientVersion(VERSION_STRING);
+        SettingsCache::instance().network().setClientVersion(VERSION_STRING);
     } else {
         // previous config from this version found
         qCInfo(WindowMainStartupVersionLog) << "Startup: found config with current version";
 
-        if (SettingsCache::instance().getCardUpdateCheckRequired()) {
-            if (SettingsCache::instance().getStartupCardUpdateCheckPromptForUpdate()) {
+        if (SettingsCache::instance().updates().getCardUpdateCheckRequired()) {
+            if (SettingsCache::instance().updates().getStartupCardUpdateCheckPromptForUpdate()) {
                 auto startupCardCheckDialog = new DlgStartupCardCheck(this);
 
                 if (startupCardCheckDialog->exec() == QDialog::Accepted) {
@@ -596,32 +652,123 @@ void MainWindow::startupConfigCheck()
                             actCheckCardUpdatesBackground();
                             break;
                         case 2: // background + always
-                            SettingsCache::instance().setStartupCardUpdateCheckPromptForUpdate(false);
-                            SettingsCache::instance().setStartupCardUpdateCheckAlwaysUpdate(true);
+                            SettingsCache::instance().updates().setStartupCardUpdateCheckPromptForUpdate(false);
+                            SettingsCache::instance().updates().setStartupCardUpdateCheckAlwaysUpdate(true);
                             actCheckCardUpdatesBackground();
                             break;
                         case 3: // don't prompt again + don't run
-                            SettingsCache::instance().setStartupCardUpdateCheckPromptForUpdate(false);
-                            SettingsCache::instance().setStartupCardUpdateCheckAlwaysUpdate(false);
+                            SettingsCache::instance().updates().setStartupCardUpdateCheckPromptForUpdate(false);
+                            SettingsCache::instance().updates().setStartupCardUpdateCheckAlwaysUpdate(false);
                             break;
                         default:
                             break;
                     }
                 }
-            } else if (SettingsCache::instance().getStartupCardUpdateCheckAlwaysUpdate()) {
+            } else if (SettingsCache::instance().updates().getStartupCardUpdateCheckAlwaysUpdate()) {
                 actCheckCardUpdatesBackground();
             }
         }
 
-        const auto reloadOk1 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
-
         // Run the tips dialog only on subsequent startups.
         // On the first run after an install/update the startup is already crowded enough
-        if (tip->successfulInit && SettingsCache::instance().getShowTipsOnStartup() && tip->newTipsAvailable) {
+        if (tip->successfulInit && SettingsCache::instance().personal().getShowTipsOnStartup() &&
+            tip->newTipsAvailable) {
             tip->raise();
             tip->show();
         }
     }
+}
+
+void MainWindow::runFirstRunWizard()
+{
+    auto *wizard = new FirstRunWizard(this);
+    wizard->setAttribute(Qt::WA_DeleteOnClose);
+
+    connect(wizard, &FirstRunWizard::cardDatabaseUpdateRequested, this, &MainWindow::actCheckCardUpdatesBackground);
+    connect(wizard, &FirstRunWizard::manualCardDatabaseSetupRequested, this, &MainWindow::actCheckCardUpdates);
+    connect(this, &MainWindow::cardDatabaseUpdateFinished, wizard, &FirstRunWizard::onCardDatabaseUpdateFinished);
+    connect(this, &MainWindow::cardDatabaseUpdateProgress, wizard, &FirstRunWizard::onCardDatabaseUpdateProgress);
+    connect(wizard, &FirstRunWizard::registerRequested, connectionController, &ConnectionController::registerToServer);
+    connect(wizard, &FirstRunWizard::connectRequested, connectionController, &ConnectionController::connectToServer);
+
+    wizard->setModal(true);
+    wizard->show();
+}
+
+/**
+ * Drives the server-based startup destinations (Server lobby, Server Room) through the intent
+ * system: fetch saved credentials, connect to the configured server, then land on the Lobby or
+ * join the configured room by name.
+ */
+void MainWindow::applyStartupDestination()
+{
+    // An explicit command-line connect takes precedence over the startup destination.
+    if (!connectTo.isEmpty()) {
+        return;
+    }
+
+    const int destination = SettingsCache::instance().tabs().getStartupTabIndex();
+    if (destination != StartupTab::StartupTabServer && destination != StartupTab::StartupTabServerRoom) {
+        return;
+    }
+
+    const QString host = SettingsCache::instance().tabs().getStartupServerHost();
+    const QString port = SettingsCache::instance().tabs().getStartupServerPort();
+    if (host.isEmpty() || port.isEmpty()) {
+        qCWarning(WindowMainStartupLog) << "Startup destination needs a configured server";
+        return;
+    }
+
+    auto serverContext = std::make_shared<ContextConnectToServer>();
+    serverContext->hostname = host;
+    serverContext->port = port;
+
+    auto *credentials = new IntentGetLoginCredentials(serverContext.get());
+    auto *connector = new IntentConnectToServer(getRemoteClient(), serverContext.get());
+
+    connect(credentials, &Intent::finished, connector, &Intent::execute);
+    connect(credentials, &Intent::failed, this, &MainWindow::startupDestinationFailed);
+    connect(connector, &Intent::finished, this,
+            [this, destination, serverContext]() { onStartupDestinationConnected(destination, *serverContext); });
+    connect(connector, &Intent::failed, this, &MainWindow::startupDestinationFailed);
+
+    credentials->execute();
+}
+
+void MainWindow::onStartupDestinationConnected(int destination, const ContextConnectToServer &serverContext)
+{
+    // The server tab must exist: it is what requests the room list.
+    if (!tabSupervisor->getTabServer()) {
+        tabSupervisor->openTabServer();
+    }
+
+    if (destination == StartupTab::StartupTabServerRoom) {
+        auto roomContext = std::make_unique<ContextJoinRoom>();
+        roomContext->serverContext = serverContext;
+        auto *roomIntent = new IntentOpenServerRoomByName(tabSupervisor, getRemoteClient(), std::move(roomContext),
+                                                          SettingsCache::instance().tabs().getStartupRoomName());
+        roomIntent->setParent(this);
+        connect(roomIntent, &Intent::failed, this, &MainWindow::startupDestinationFailed);
+        roomIntent->execute();
+        return;
+    }
+
+    if (tabSupervisor->getTabServer()) {
+        tabSupervisor->setCurrentWidget(tabSupervisor->getTabServer());
+    } else {
+        qCWarning(WindowMainStartupLog) << "Startup destination: server tab could not be opened";
+    }
+}
+
+void MainWindow::startupDestinationFailed(const QString &reason)
+{
+    qCWarning(WindowMainStartupLog) << "Startup destination failed:" << reason;
+}
+
+bool MainWindow::startupDestinationConnectsToServer() const
+{
+    const int destination = SettingsCache::instance().tabs().getStartupTabIndex();
+    return destination == StartupTab::StartupTabServer || destination == StartupTab::StartupTabServerRoom;
 }
 
 void MainWindow::alertForcedOracleRun(const QString &version, bool isUpdate)
@@ -640,6 +787,7 @@ void MainWindow::alertForcedOracleRun(const QString &version, bool isUpdate)
 
     actCheckCardUpdates();
     actCheckServerUpdates();
+    actCheckCommanderBracketDefinitionUpdates();
 }
 
 MainWindow::~MainWindow()
@@ -674,7 +822,7 @@ void MainWindow::createTrayIcon()
 
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setContextMenu(trayIconMenu);
-    trayIcon->setIcon(QPixmap("theme:cockatrice"));
+    trayIcon->setIcon(themePixmap(QStringLiteral("cockatrice")));
     trayIcon->show();
 }
 
@@ -701,6 +849,17 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
     bClosingDown = true;
 
+    if (cardUpdateProcess && cardUpdateProcess->state() != QProcess::NotRunning) {
+        if (QMessageBox::question(this, tr("Are you sure?"),
+                                  tr("A card database update is still running. Quitting now will cancel it.\n"
+                                     "Are you sure you want to quit?"),
+                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No) {
+            event->ignore();
+            bClosingDown = false;
+            return;
+        }
+    }
+
     if (!tabSupervisor->close()) {
         event->ignore();
         bClosingDown = false;
@@ -725,7 +884,8 @@ void MainWindow::changeEvent(QEvent *event)
                 connectionController->connectToServerDirect(connectTo.host(), connectTo.port(), connectTo.userName(),
                                                             connectTo.password());
             } else if (SettingsCache::instance().servers().getAutoConnect() &&
-                       !SettingsCache::instance().debug().getLocalGameOnStartup()) {
+                       !SettingsCache::instance().debug().getLocalGameOnStartup() &&
+                       !startupDestinationConnectsToServer()) {
                 qCInfo(WindowMainStartupAutoconnectLog) << "Attempting auto-connect...";
                 DlgConnect dlg(this);
                 connectionController->connectToServerDirect(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()),
@@ -749,6 +909,11 @@ void MainWindow::showWindowIfHidden()
     // keep the previous window state
     setWindowState(windowState() & ~Qt::WindowMinimized);
     show();
+}
+
+void MainWindow::handleCockatriceLink(const QString &url)
+{
+    urlParser->handle(url);
 }
 
 void MainWindow::cardDatabaseLoadingFailed()
@@ -780,7 +945,7 @@ void MainWindow::cardDatabaseLoadingFailed()
 
 void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknownSetsNames)
 {
-    if (SettingsCache::instance().getAlwaysEnableNewSets()) {
+    if (SettingsCache::instance().updates().getAlwaysEnableNewSets()) {
         CardDatabaseManager::getInstance()->enableAllUnknownSets();
         const auto reloadOk1 =
             QtConcurrent::run([] { CardDatabaseManager::getInstance()->reloadCardDatabasesAndNotify(); });
@@ -812,7 +977,7 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
         CardDatabaseManager::getInstance()->enableAllUnknownSets();
         const auto reloadOk1 =
             QtConcurrent::run([] { CardDatabaseManager::getInstance()->reloadCardDatabasesAndNotify(); });
-        SettingsCache::instance().setAlwaysEnableNewSets(true);
+        SettingsCache::instance().updates().setAlwaysEnableNewSets(true);
     } else if (msgBox.clickedButton() == noButton) {
         CardDatabaseManager::getInstance()->markAllSetsAsKnown();
     } else if (msgBox.clickedButton() == settingsButton) {
@@ -888,7 +1053,7 @@ void MainWindow::createCardUpdateProcess(bool background)
 
     if (dir.exists(binaryName)) {
         updaterCmd = dir.absoluteFilePath(binaryName);
-    } else { // try and find the directory oracle is stored in the build directory
+    } else { // try and find the directory Oracle is stored in the build directory
         QDir findLocalDir(dir);
         findLocalDir.cdUp();
         findLocalDir.cd(getCardUpdaterBinaryName());
@@ -902,19 +1067,57 @@ void MainWindow::createCardUpdateProcess(bool background)
         QMessageBox::warning(this, tr("Error"),
                              tr("Unable to run the card database updater: ") + dir.absoluteFilePath(binaryName));
         exitCardDatabaseUpdate();
+        emit cardDatabaseUpdateFinished(false);
         return;
     }
 
     if (!background) {
         cardUpdateProcess->start(updaterCmd, QStringList());
     } else {
+        cardUpdateOutputBuffer.clear();
+        connect(cardUpdateProcess, &QProcess::readyReadStandardOutput, this, &MainWindow::cardUpdateProgressOutput);
         cardUpdateProcess->start(updaterCmd, QStringList("-b"));
         statusBar()->showMessage(tr("Card database update running."));
     }
 }
 
+void MainWindow::cardUpdateProgressOutput()
+{
+    if (!cardUpdateProcess) {
+        return;
+    }
+    cardUpdateOutputBuffer.append(cardUpdateProcess->readAllStandardOutput());
+    while (true) {
+        const int newline = cardUpdateOutputBuffer.indexOf('\n');
+        if (newline < 0) {
+            break;
+        }
+        const QByteArray line = cardUpdateOutputBuffer.left(newline).trimmed();
+        cardUpdateOutputBuffer.remove(0, newline + 1);
+        // Protocol emitted by `oracle -b`: "PROGRESS <stage> <done> <total>"
+        if (!line.startsWith("PROGRESS ")) {
+            continue;
+        }
+        const QList<QByteArray> parts = line.split(' ');
+        if (parts.size() != 4) {
+            continue;
+        }
+        bool doneOk = false;
+        bool totalOk = false;
+        const qint64 done = parts.at(2).toLongLong(&doneOk);
+        const qint64 total = parts.at(3).toLongLong(&totalOk);
+        if (!doneOk || !totalOk || done < 0 || total < 0) {
+            continue;
+        }
+        emit cardDatabaseUpdateProgress(QString::fromLatin1(parts.at(1)), done, total);
+    }
+}
+
 void MainWindow::exitCardDatabaseUpdate()
 {
+    if (!cardUpdateProcess) {
+        return;
+    }
     cardUpdateProcess->deleteLater();
     cardUpdateProcess = nullptr;
     statusBar()->clearMessage();
@@ -952,14 +1155,19 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
 
     exitCardDatabaseUpdate();
     QMessageBox::warning(this, tr("Error"), tr("The card database updater exited with an error:\n%1").arg(error));
+    emit cardDatabaseUpdateFinished(false);
 }
 
-void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus exitStatus)
+void MainWindow::cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
+    cardUpdateProgressOutput(); // drain any progress lines not yet parsed
+
+    const bool success = (exitStatus == QProcess::NormalExit) && (exitCode == 0);
     if (exitStatus == QProcess::NormalExit) {
-        SettingsCache::instance().setLastCardUpdateCheck(QDateTime::currentDateTime().date());
+        SettingsCache::instance().updates().setLastCardUpdateCheck(QDateTime::currentDateTime().date());
     }
     exitCardDatabaseUpdate();
+    emit cardDatabaseUpdateFinished(success);
 }
 
 void MainWindow::actCheckServerUpdates()
@@ -984,6 +1192,16 @@ void MainWindow::checkClientUpdatesFinished(bool needToUpdate, bool /* isCompati
     }
 }
 
+void MainWindow::actCheckCommanderBracketDefinitionUpdates()
+{
+    auto *handler = new HandleCommanderBrackets(this);
+
+    connect(handler, &HandleCommanderBrackets::sigBracketDefinitionsDownloaded, this,
+            []() { qDebug() << "Bracket definitions loaded"; });
+
+    handler->downloadBracketDefinitions();
+}
+
 void MainWindow::refreshShortcuts()
 {
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
@@ -1004,7 +1222,7 @@ void MainWindow::refreshShortcuts()
 
 void MainWindow::actOpenCustomFolder()
 {
-    QString dir = SettingsCache::instance().getCustomPicsPath();
+    QString dir = SettingsCache::instance().paths().getCustomPicsPath();
     QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
 }
 

@@ -37,6 +37,7 @@
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_set_counter.pb.h>
+#include <libcockatrice/protocol/pb/command_set_playmat.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_lock.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_plan.pb.h>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
@@ -140,6 +141,13 @@ Response::ResponseCode Server_AbstractParticipant::cmdSetSideboardPlan(const Com
 Response::ResponseCode Server_AbstractParticipant::cmdSetSideboardLock(const Command_SetSideboardLock & /*cmd*/,
                                                                        ResponseContainer & /*rc*/,
                                                                        GameEventStorage & /*ges*/)
+{
+    return Response::RespFunctionNotAllowed;
+}
+
+Response::ResponseCode Server_AbstractParticipant::cmdSetPlaymat(const Command_SetPlaymat & /*cmd*/,
+                                                                 ResponseContainer & /*rc*/,
+                                                                 GameEventStorage & /*ges*/)
 {
     return Response::RespFunctionNotAllowed;
 }
@@ -524,6 +532,9 @@ Server_AbstractParticipant::processGameCommand(const GameCommand &command, Respo
             break;
         case GameCommand::REVERSE_TURN:
             return cmdReverseTurn(command.GetExtension(Command_ReverseTurn::ext), rc, ges);
+            break;
+        case GameCommand::SET_PLAYMAT:
+            return cmdSetPlaymat(command.GetExtension(Command_SetPlaymat::ext), rc, ges);
             break;
         default:
             return Response::RespInvalidCommand;

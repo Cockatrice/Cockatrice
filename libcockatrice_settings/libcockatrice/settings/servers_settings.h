@@ -61,6 +61,10 @@ public:
                               QString password,
                               bool savePassword,
                               QString site = QString());
+    int findServerIndex(const QString &host, const QString &port) const;
+    bool hasUsername(const QString &host, const QString &port) const;
+    bool hasCredentials(const QString &host, const QString &port) const;
+    bool hasLoginData(const QString &host, const QString &port) const;
 
     bool updateExistingServerWithoutLoss(QString saveName,
                                          QString serv = QString(),

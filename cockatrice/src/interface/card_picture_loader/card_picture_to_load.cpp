@@ -9,14 +9,17 @@
 #include <algorithm>
 #include <libcockatrice/card/set/card_set_comparator.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
+#include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/download_settings.h>
 
 CardPictureToLoad::CardPictureToLoad(const ExactCard &_card)
     : card(_card), urlTemplates(SettingsCache::instance().downloads().getAllURLs())
 {
     if (card) {
         sortedSets = extractSetsSorted(card);
-        // The first time called, nextSet will also populate the Urls for the first set.
-        nextSet();
+        currentSetIndex = 0;
+        currentSet = sortedSets.first();
+        populateSetUrls();
     }
 }
 
@@ -34,7 +37,7 @@ QList<CardSetPtr> CardPictureToLoad::extractSetsSorted(const ExactCard &card)
     std::sort(sortedSets.begin(), sortedSets.end(), SetPriorityComparator());
 
     // If the user hasn't disabled arts other than their personal preference...
-    if (!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
+    if (!SettingsCache::instance().cardsDisplay().getOverrideAllCardArtWithPersonalPreference()) {
         // If the pixmapCacheKey corresponds to a specific set, we have to try to load it first.
         qsizetype setIndex = sortedSets.indexOf(card.getPrinting().getSet());
         if (setIndex > 0) { // we don't need to move the set if it's already first
@@ -91,7 +94,8 @@ void CardPictureToLoad::populateSetUrls()
         }
     }
 
-    for (const QString &urlTemplate : urlTemplates) {
+    const QStringList orderedTemplates = urlTemplates;
+    for (const QString &urlTemplate : orderedTemplates) {
         QString transformedUrl = transformUrl(urlTemplate);
 
         if (!transformedUrl.isEmpty()) {
@@ -99,15 +103,19 @@ void CardPictureToLoad::populateSetUrls()
         }
     }
 
-    /* Call nextUrl to make sure currentUrl is up-to-date
-       but we don't need the result here. */
-    (void)nextUrl();
+    currentUrlIndex = 0;
+    if (!currentSetUrls.isEmpty()) {
+        currentUrl = currentSetUrls.first();
+    } else {
+        currentUrl = QString();
+    }
 }
 
 bool CardPictureToLoad::nextSet()
 {
-    if (!sortedSets.isEmpty()) {
-        currentSet = sortedSets.takeFirst();
+    currentSetIndex++;
+    if (currentSetIndex < sortedSets.size()) {
+        currentSet = sortedSets.at(currentSetIndex);
         populateSetUrls();
         return true;
     }
@@ -117,8 +125,9 @@ bool CardPictureToLoad::nextSet()
 
 bool CardPictureToLoad::nextUrl()
 {
-    if (!currentSetUrls.isEmpty()) {
-        currentUrl = currentSetUrls.takeFirst();
+    currentUrlIndex++;
+    if (currentUrlIndex < currentSetUrls.size()) {
+        currentUrl = currentSetUrls.at(currentUrlIndex);
         return true;
     }
     currentUrl = QString();
@@ -131,6 +140,28 @@ QString CardPictureToLoad::getSetName() const
         return currentSet->getCorrectedShortName();
     } else {
         return QString();
+    }
+}
+
+QString CardPictureToLoad::peekNextUrl() const
+{
+    int nextIndex = currentUrlIndex + 1;
+    if (nextIndex < currentSetUrls.size()) {
+        return currentSetUrls.at(nextIndex);
+    }
+    return QString();
+}
+
+void CardPictureToLoad::resetIndices()
+{
+    currentSetIndex = 0;
+    if (!sortedSets.isEmpty()) {
+        currentSet = sortedSets.first();
+        populateSetUrls();
+    } else {
+        currentSet = {};
+        currentSetUrls.clear();
+        currentUrl = QString();
     }
 }
 
@@ -252,8 +283,15 @@ QString CardPictureToLoad::transformUrl(const QString &urlTemplate) const
     }
 
     // language setting
-    transformMap["!sflang!"] = QString(QCoreApplication::translate(
-        "PictureLoader", "en", "code for scryfall's language property, not available for all languages"));
+    const QString cardLang = SettingsCache::instance().cardsDisplay().getCardLang();
+    transformMap["!sflang!"] = cardLang;
+
+    // The localized printing's own id is unknown, so Scryfall must resolve it by
+    // its translated name (see populateSetUrls); expose that name for the
+    // `/cards/named` template.
+    if (cardLang != "en") {
+        transformMap["!localizedName!"] = card.getInfo().getLocalizedName(cardLang);
+    }
 
     QString transformedUrl = urlTemplate;
     for (const QString &prop : transformMap.keys()) {

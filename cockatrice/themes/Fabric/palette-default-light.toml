@@ -1,0 +1,74 @@
+# Fabric — light identity palette (navy-cloth chrome)
+[Palette]
+WindowText           = #1c2330
+Button               = #c8d6ea
+Light                = #ffffff
+Midlight             = #b9c6dc
+Dark                 = #8fa0bd
+Mid                  = #a3b3cd
+Text                 = #1c2330
+BrightText           = #1d4fa0
+ButtonText           = #141c29
+Base                 = #f6f8fc
+Window               = #dbe3ef
+Shadow               = #5a6a85
+Highlight            = #2f6fd6
+HighlightedText      = #ffffff
+Link                 = #2555b0
+LinkVisited          = #6a4bb8
+AlternateBase        = #e9eef7
+ToolTipBase          = #e9eff8
+ToolTipText          = #141c29
+PlaceholderText      = #7a1c2330
+Accent               = #2f6fd6
+
+[Palette.Disabled]
+WindowText           = #787878
+Button               = #dbe3ef
+Light                = #ffffff
+Midlight             = #b9c6dc
+Dark                 = #8fa0bd
+Mid                  = #a3b3cd
+Text                 = #787878
+BrightText           = #1d4fa0
+ButtonText           = #969696
+Base                 = #dbe3ef
+Window               = #dbe3ef
+Shadow               = #5a6a85
+Highlight            = #cdd8e9
+HighlightedText      = #787878
+Link                 = #0000ff
+LinkVisited          = #ff00ff
+AlternateBase        = #e9eef7
+ToolTipBase          = #e9eff8
+ToolTipText          = #141c29
+PlaceholderText      = #7a1c2330
+Accent               = #787878
+
+[Palette.Inactive]
+WindowText           = #1c2330
+Button               = #c8d6ea
+Light                = #ffffff
+Midlight             = #b9c6dc
+Dark                 = #8fa0bd
+Mid                  = #a3b3cd
+Text                 = #1c2330
+BrightText           = #1d4fa0
+ButtonText           = #141c29
+Base                 = #f6f8fc
+Window               = #dbe3ef
+Shadow               = #5a6a85
+Highlight            = #cdd8e9
+HighlightedText      = #000000
+Link                 = #2555b0
+LinkVisited          = #6a4bb8
+AlternateBase        = #e9eef7
+ToolTipBase          = #e9eff8
+ToolTipText          = #141c29
+PlaceholderText      = #7a1c2330
+Accent               = #2f6fd6
+
+[AppColors]
+AccentStrong         = #3a6fd6
+AccentSoft           = #8fb8f2
+

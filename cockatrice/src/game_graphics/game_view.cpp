@@ -1,6 +1,7 @@
 #include "game_view.h"
 
 #include "../client/settings/cache_settings.h"
+#include "../client/settings/shortcuts_settings.h"
 #include "game_scene.h"
 
 #include <QAction>
@@ -9,6 +10,7 @@
 #include <QLayout>
 #include <QResizeEvent>
 #include <QRubberBand>
+#include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
 
 // QRubberBand calls raise() in showEvent() and changeEvent() to stay on top of siblings.
@@ -45,9 +47,12 @@ GameView::GameView(GameScene *scene, QWidget *parent) : QGraphicsView(scene, par
     connect(scene, &GameScene::sigResizeRubberBand, this, &GameView::resizeRubberBand);
     connect(scene, &GameScene::sigStopRubberBand, this, &GameView::stopRubberBand);
     connect(scene, &QGraphicsScene::selectionChanged, this, [this]() { updateTotalSelectionCount(); });
+    connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::tallyTypeChanged, this,
+            [this] { updateTotalSelectionCount(); });
 
-    setFocusDisabled(SettingsCache::instance().getKeepGameChatFocus());
-    connect(&SettingsCache::instance(), &SettingsCache::keepGameChatFocusChanged, this, &GameView::setFocusDisabled);
+    setFocusDisabled(SettingsCache::instance().userInterface().getKeepGameChatFocus());
+    connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::keepGameChatFocusChanged, this,
+            &GameView::setFocusDisabled);
 
     aCloseMostRecentZoneView = new QAction(this);
 
@@ -109,6 +114,7 @@ void GameView::startRubberBand(const QPointF &_selectionOrigin)
     }
 
     selectionOrigin = _selectionOrigin;
+    previousBandRect = QRect();
     rubberBand->setGeometry(QRect(mapFromScene(selectionOrigin), QSize(0, 0)));
     rubberBand->show();
 }
@@ -123,9 +129,19 @@ void GameView::resizeRubberBand(const QPointF &cursorPoint, int selectedCount)
 
     QPoint cursor = cursorPoint.toPoint();
     QRect rect = QRect(mapFromScene(selectionOrigin), cursor).normalized();
-    rubberBand->setGeometry(rect);
 
-    if (!SettingsCache::instance().getShowDragSelectionCount()) {
+    rubberBand->setGeometry(rect);
+    if (viewport()) {
+        // Repaint the union of the previous and current band rects: the vacated
+        // strip of a child widget is not reliably invalidated on all platforms
+        // (notably macOS), leaving stale pixels under the selection.
+        QRect dirty = previousBandRect.isNull() ? rect : previousBandRect.united(rect);
+        dirty.adjust(-1, -1, 1, 1);
+        viewport()->update(dirty);
+        previousBandRect = rect;
+    }
+
+    if (!SettingsCache::instance().userInterface().getShowDragSelectionCount()) {
         dragCountLabel->hide();
         return;
     }
@@ -166,7 +182,13 @@ void GameView::stopRubberBand()
         return;
     }
 
+    // Same rationale as resizeRubberBand: repaint the last known band area
+    // since hiding a child widget doesn't reliably invalidate its region.
     rubberBand->hide();
+    if (viewport() && !previousBandRect.isNull()) {
+        viewport()->update(previousBandRect.adjusted(-1, -1, 1, 1));
+        previousBandRect = QRect();
+    }
     dragCountLabel->hide();
 }
 
@@ -234,7 +256,7 @@ void GameView::updateTotalSelectionCount(const QSize &viewSize)
 
     int count = scene()->selectedItems().count();
 
-    if (!SettingsCache::instance().getShowTotalSelectionCount() || count <= 1) {
+    if (!SettingsCache::instance().userInterface().getShowTotalSelectionCount() || count <= 1) {
         totalCountLabel->hide();
     } else {
         totalCountLabel->setText(QString::number(count));
@@ -246,13 +268,12 @@ void GameView::updateTotalSelectionCount(const QSize &viewSize)
         totalCountLabel->show();
     }
 
-    TallyType tallyType =
-        SettingsCache::instance().getShowSubtypeSelectionTally() ? TallyType::Subtypes : TallyType::None;
+    TallyType tallyType = Tally::intToType(SettingsCache::instance().userInterface().getTallyType());
 
     GameScene *gameScene = static_cast<GameScene *>(scene());
     QList<TallyRow> entries = Tally::compute(gameScene->selectedCards(), tallyType);
 
-    if (entries.isEmpty() || count <= 1) {
+    if (entries.isEmpty()) {
         tallyContainer->hide();
         cachedTallyRows.clear();
         return;

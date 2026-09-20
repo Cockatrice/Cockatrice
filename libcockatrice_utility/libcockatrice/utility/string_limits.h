@@ -22,6 +22,19 @@ inline QString textFromStdString(const std::string &_string)
 {
     return QString::fromUtf8(_string.data(), std::min(int(_string.size()), MAX_TEXT_LENGTH));
 }
+/** @brief Returns a QString from a std::string, truncated to at most MAX_TEXT_LENGTH bytes, keeping the tail. */
+inline QString textTailFromStdString(const std::string &_string)
+{
+    if (int(_string.size()) <= MAX_TEXT_LENGTH) {
+        return QString::fromUtf8(_string.data(), int(_string.size()));
+    }
+
+    int start = int(_string.size()) - MAX_TEXT_LENGTH;
+    while (start < int(_string.size()) && (static_cast<unsigned char>(_string[start]) & 0xC0) == 0x80) {
+        ++start;
+    }
+    return QString::fromUtf8(_string.data() + start, int(_string.size()) - start);
+}
 /** @brief Returns a QString from a std::string, truncated to at most MAX_FILE_LENGTH bytes. */
 inline QString fileFromStdString(const std::string &_string)
 {

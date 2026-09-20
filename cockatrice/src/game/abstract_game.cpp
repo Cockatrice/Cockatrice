@@ -31,7 +31,7 @@ AbstractClient *AbstractGame::getClientForPlayer(int playerId) const
     }
 }
 
-void AbstractGame::loadReplay(GameReplay *replay)
+void AbstractGame::loadReplay(const GameReplay *replay)
 {
     gameMetaInfo->setFromProto(replay->game_info());
     gameMetaInfo->setSpectatorsOmniscient(true);

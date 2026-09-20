@@ -15,12 +15,18 @@
 #include "deck_list_history_manager_widget.h"
 #include "deck_list_style_proxy.h"
 
+#include <QCheckBox>
+#include <QComboBox>
 #include <QDockWidget>
 #include <QLabel>
+#include <QMenu>
+#include <QPushButton>
 #include <QTextEdit>
 #include <QTreeView>
 #include <libcockatrice/card/card_info.h>
+#include <libcockatrice/deck_list/deck_list.h>
 
+class CommanderBracketWidget;
 class DeckListModel;
 class AbstractTabDeckEditor;
 class DeckEditorDeckDockWidget : public QDockWidget
@@ -32,6 +38,8 @@ public:
     DeckListStyleProxy *proxy;
     QTreeView *deckView;
     QComboBox *bannerCardComboBox;
+    QLabel *playmatLabel;
+    QPushButton *playmatSettingsButton;
     void createDeckDock();
     ExactCard getCurrentCard();
     void retranslateUi();
@@ -89,9 +97,16 @@ private:
 
     QAction *aRemoveCard, *aIncrement, *aDecrement, *aSwapCard;
 
+    CommanderBracketWidget *commanderBracketWidget;
+
     DeckListModel *getModel() const;
     [[nodiscard]] QModelIndexList getSelectedCardNodeSourceIndices() const;
     void offsetCountAtIndex(const QModelIndex &idx, bool isIncrement);
+
+    void addMoveToZoneMenu(QMenu *menu, const QModelIndex &sourceCardIndex, const QString &currentBoardName);
+    void addChangeBoardMenu(QMenu *menu, const QString &zoneName);
+    QString createNewCustomZone(const QString &initialBoardName = {});
+    void addNewZoneAction(QMenu *menu, const QString &initialBoardName = {});
 
 private slots:
     void decklistCustomMenu(QPoint point);
@@ -99,6 +114,8 @@ private slots:
     void writeName();
     void writeComments();
     void writeBannerCard(int);
+    void openPlaymatSettings();
+    void updatePlaymatLabel();
     void applyActiveGroupCriteria();
     void setSelectedIndex(const QModelIndex &newCardIndex, bool preserveWidgetFocus);
     void updateHash();

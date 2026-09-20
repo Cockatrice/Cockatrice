@@ -52,6 +52,7 @@ In this list of examples below, each entry has an explanation and can be clicked
 <dt><u>E</u>dition:</dt>
 <dd>[set:lea](#set:lea) <small>(Cards that appear in Alpha, which has the set code LEA)</small></dd>
 <dd>[e:lea OR e:leb](#e:lea OR e:leb) <small>(Cards that appear in Alpha or Beta)</small></dd>
+<dd>[e&lt;8ED](#e<8ED) <small>(Cards that appear before 8th edition)</small></dd>
 
 <dt>Negate:</dt>
 <dd>[c:wu -c:m](#c:wu -c:m) <small>(Any card that is white or blue, but not multicolored)</small></dd>

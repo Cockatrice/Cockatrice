@@ -164,6 +164,21 @@ public slots:
      * @return true if successful, false otherwise.
      */
     bool actSaveDeckAs() override;
+
+    /**
+     * @brief Prompts for and creates a new custom deck zone.
+     * @return The name of the created zone, or an empty string if creation was cancelled.
+     */
+    QString createNewZone();
+
+private:
+    /**
+     * @brief Sets the deck for this tab and selects the sub-tab to open on
+     * startup, per the "Visual deck editor startup tab" setting (Context /
+     * Deck display / Database display).
+     * @param _deck The deck object.
+     */
+    void setDeck(const LoadedDeck &_deck) override;
 };
 
 #endif

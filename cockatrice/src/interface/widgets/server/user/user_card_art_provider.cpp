@@ -1,6 +1,7 @@
 #include "user_card_art_provider.h"
 
 #include "../../../card_picture_loader/card_picture_loader.h"
+#include "../../cards/card_art_utils.h"
 
 #include <QPointer>
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -39,7 +40,10 @@ void UserCardArtProvider::requestCardArt(const QString &userName, const QString 
 
     const QString key = makeKey(userName, cardName, providerId);
 
-    if (cardArtCache.contains(key) || pending.contains(key)) {
+    if (pending.contains(key)) {
+        return;
+    }
+    if (cardArtCache.contains(key) && !cardArtCache.value(key).isNull()) {
         return;
     }
 
@@ -49,20 +53,33 @@ void UserCardArtProvider::requestCardArt(const QString &userName, const QString 
     processQueue();
 }
 
-QPixmap UserCardArtProvider::cropCardArt(const QPixmap &fullRes)
+QPixmap UserCardArtProvider::cropCardArt(const QPixmap &fullRes, const ExactCard &card)
 {
-    const QSize sz = fullRes.size();
+    QPixmap source = fullRes;
+
+    // Sideways-layout cards (plane, siege/battle, split) store their landscape
+    // artwork rotated 90° inside a portrait frame. Rotate it upright first so
+    // the crop below lands on the horizontal art, mirroring the way
+    // CardInfoPictureWidget displays these cards.
+    const bool landscape = card.getInfo().getUiAttributes().landscapeOrientation;
+    source = CardArtUtils::rotateSidewaysLayoutArt(source, card);
+
+    const QSize sz = source.size();
     const int marginX = sz.width() * 0.07;
-    const int topMargin = sz.height() * 0.11;
-    const int bottomMargin = sz.height() * 0.45;
+    const int topMargin = landscape ? sz.height() * 0.05 : sz.height() * 0.11;
+    const int bottomMargin = landscape ? sz.height() * 0.42 : sz.height() * 0.45;
 
-    const QRect foilRect(marginX, topMargin, sz.width() - 2 * marginX, sz.height() - topMargin - bottomMargin);
+    const QRect artRect(marginX, topMargin, sz.width() - 2 * marginX, sz.height() - topMargin - bottomMargin);
 
-    return fullRes.copy(foilRect.intersected(fullRes.rect()));
+    return source.copy(artRect.intersected(source.rect()));
 }
 
 void UserCardArtProvider::insertIntoCache(const QString &key, const QPixmap &pixmap)
 {
+    if (pixmap.isNull()) {
+        return;
+    }
+
     if (!cardArtCache.contains(key)) {
         cacheInsertionOrder.append(key);
         while (cacheInsertionOrder.size() > MaxCacheEntries) {
@@ -104,7 +121,7 @@ void UserCardArtProvider::processQueue()
 
         // Synchronous hit (already loaded/on disk)
         if (!fullRes.isNull()) {
-            insertIntoCache(key, cropCardArt(fullRes));
+            insertIntoCache(key, cropCardArt(fullRes, card));
             pending.remove(key);
 
             emit cardArtUpdated(userName);
@@ -128,9 +145,7 @@ void UserCardArtProvider::processQueue()
                             CardPictureLoader::getPixmap(fullRes, card, QSize(745, 1040));
 
                             if (!fullRes.isNull()) {
-                                self->insertIntoCache(key, self->cropCardArt(fullRes));
-                            } else {
-                                self->insertIntoCache(key, QPixmap());
+                                self->insertIntoCache(key, self->cropCardArt(fullRes, card));
                             }
 
                             self->pending.remove(key);

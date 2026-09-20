@@ -15,8 +15,12 @@ class StackZone : public SelectZone
     Q_OBJECT
 private:
     qreal zoneHeight;
+    bool playmatActive = false;
 private slots:
     void updateBg();
+
+public slots:
+    void onPlaymatChanged(bool active);
 
 public:
     StackZone(StackZoneLogic *_logic, int _zoneHeight, QGraphicsItem *parent);

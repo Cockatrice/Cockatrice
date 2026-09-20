@@ -15,6 +15,9 @@
 #include <QWidget>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 
+class QGridLayout;
+class QLabel;
+
 class HomeWidget : public QWidget
 {
 
@@ -23,7 +26,7 @@ class HomeWidget : public QWidget
 public:
     HomeWidget(QWidget *parent, TabSupervisor *tabSupervisor);
     void updateRandomCard();
-    QPair<QColor, QColor> extractDominantColors(const QPixmap &pixmap);
+    static QPair<QColor, QColor> extractDominantColors(const QPixmap &pixmap);
 
 public slots:
     void paintEvent(QPaintEvent *event) override;
@@ -41,12 +44,14 @@ private:
     QPixmap background;
     CardInfoPictureArtCropWidget *backgroundSourceCard = nullptr;
     DeckList backgroundSourceDeck;
-    QPixmap overlay;
+    QLabel *logoLabel = nullptr;
     QPair<QColor, QColor> gradientColors;
     HomeStyledButton *connectButton;
 
     void setRandomCard(ExactCard &newCard);
     void loadBackgroundSourceDeck();
+    QPair<QColor, QColor> determineButtonColor() const;
+    void updateLogoOverlay();
 };
 
 #endif // HOME_WIDGET_H

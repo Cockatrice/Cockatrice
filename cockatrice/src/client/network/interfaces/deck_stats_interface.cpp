@@ -72,7 +72,7 @@ void DeckStatsInterface::copyDeckWithoutTokens(const DeckList &source, DeckList 
 {
     auto copyIfNotAToken = [&destination](const auto node, const auto card) {
         CardInfoPtr dbCard = CardDatabaseManager::query()->getCardInfo(card->getName());
-        if (dbCard && !dbCard->getIsToken()) {
+        if (dbCard && !dbCard->getIsToken() && node->getName() != DECK_ZONE_MAYBEBOARD) {
             DecklistCardNode *addedCard = destination.addCard(card->getName(), node->getName(), -1);
             addedCard->setNumber(card->getNumber());
         }

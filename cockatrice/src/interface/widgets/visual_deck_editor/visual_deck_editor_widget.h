@@ -38,7 +38,10 @@ class VisualDeckEditorWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit VisualDeckEditorWidget(QWidget *parent, DeckListModel *deckListModel, QItemSelectionModel *selectionModel);
+    explicit VisualDeckEditorWidget(QWidget *parent,
+                                    DeckListModel *deckListModel,
+                                    QItemSelectionModel *selectionModel,
+                                    CardDatabaseModel *_cardDatabaseModel = nullptr);
     void retranslateUi();
     void updateCompactMode();
     void clearAllDisplayWidgets();

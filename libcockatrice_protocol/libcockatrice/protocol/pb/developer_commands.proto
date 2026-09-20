@@ -1,0 +1,8 @@
+syntax = "proto2";
+message DeveloperCommand {
+    enum DeveloperCommandType {
+        GET_SERVER_STATS = 1000;
+        VIEWLOG_HISTORY = 1001;
+    }
+    extensions 100 to max;
+}

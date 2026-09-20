@@ -47,6 +47,13 @@ public:
     }
 
 private:
+    /**
+     * @brief Moves one state from @p source to @p target, applying it to @p deck.
+     *
+     * Used by both undo (undoStack -> redoStack) and redo (redoStack -> undoStack).
+     */
+    void restoreAndSwap(QStack<DeckListMemento> &source, QStack<DeckListMemento> &target, DeckList *deck);
+
     QStack<DeckListMemento> undoStack;
     QStack<DeckListMemento> redoStack;
 };

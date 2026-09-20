@@ -349,7 +349,7 @@ OPTIMIZE_OUTPUT_SLICE  = NO
 #
 # Note see also the list of default file extension mappings.
 
-EXTENSION_MAPPING      =
+EXTENSION_MAPPING      = proto=C++
 
 # If the MARKDOWN_SUPPORT tag is enabled then Doxygen pre-processes all comments
 # according to the Markdown format, which allows for more readable
@@ -1086,7 +1086,8 @@ FILE_PATTERNS          = *.cc \
                          *.h++ \
                          *.markdown \
                          *.md \
-                         *.dox
+                         *.dox \
+                         *.proto
 
 # The RECURSIVE tag can be used to specify whether or not subdirectories should
 # be searched for input files as well.
@@ -1103,6 +1104,7 @@ RECURSIVE              = YES
 
 EXCLUDE                = build/ \
                          cmake/ \
+                         cmake-build-debug/ \
                          doc/doxygen/theme/docs/ \
                          doc/doxygen/theme/include/ \
                          vcpkg/
@@ -1195,7 +1197,7 @@ INPUT_FILTER           =
 # need to set EXTENSION_MAPPING for the extension otherwise the files are not
 # properly processed by Doxygen.
 
-FILTER_PATTERNS        =
+FILTER_PATTERNS        = "*.proto=python doc/doxygen/filters/proto2cpp.py"
 
 # If the FILTER_SOURCE_FILES tag is set to YES, the input filter (if set using
 # INPUT_FILTER) will also be used to filter the input files that are used for

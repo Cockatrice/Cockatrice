@@ -2,27 +2,34 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../interface/widgets/tabs/tab_supervisor.h"
+#include "../../pixel_map_generator.h"
 #include "../../theme_manager.h"
 #include "../../window_main.h"
+#include "../cards/art_crop_attribution.h"
 #include "background_sources.h"
 #include "home_styled_button.h"
+#include "home_tab_button_color.h"
 
 #include <QGroupBox>
+#include <QLabel>
+#include <QLinearGradient>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/remote/remote_client.h>
+#include <libcockatrice/settings/appearance_settings.h>
+#include <libcockatrice/settings/paths_settings.h>
 
 HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
-    : QWidget(parent), tabSupervisor(_tabSupervisor), background("theme:backgrounds/home"), overlay("theme:cockatrice")
+    : QWidget(parent), tabSupervisor(_tabSupervisor), background(themePixmap(QStringLiteral("backgrounds/home")))
 {
     layout = new QGridLayout(this);
 
     backgroundSourceCard = new CardInfoPictureArtCropWidget(this);
 
-    gradientColors = extractDominantColors(background);
+    gradientColors = determineButtonColor();
 
     layout->addWidget(createButtons(), 1, 1, Qt::AlignVCenter | Qt::AlignHCenter);
 
@@ -41,32 +48,47 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     updateConnectButton(tabSupervisor->getClient()->getStatus());
 
     connect(tabSupervisor->getClient(), &RemoteClient::statusChanged, this, &HomeWidget::updateConnectButton);
-    connect(&SettingsCache::instance(), &SettingsCache::homeTabBackgroundSourceChanged, this,
+    connect(&SettingsCache::instance().appearance(), &AppearanceSettings::homeTabBackgroundSourceChanged, this,
             &HomeWidget::initializeBackgroundFromSource);
-    connect(&SettingsCache::instance(), &SettingsCache::homeTabBackgroundShuffleFrequencyChanged, this,
-            &HomeWidget::onBackgroundShuffleFrequencyChanged);
+    connect(&SettingsCache::instance().appearance(), &AppearanceSettings::homeTabBackgroundShuffleFrequencyChanged,
+            this, &HomeWidget::onBackgroundShuffleFrequencyChanged);
     // Lambda is cleaner to read than overloading this
-    connect(&SettingsCache::instance(), &SettingsCache::homeTabDisplayCardNameChanged, this, [this] { repaint(); });
+    connect(&SettingsCache::instance().appearance(), &AppearanceSettings::homeTabDisplayCardNameChanged, this,
+            [this] { repaint(); });
+    connect(&SettingsCache::instance().appearance(), &AppearanceSettings::homeTabBackgroundDimChanged, this,
+            [this] { repaint(); });
     connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this,
             &HomeWidget::initializeBackgroundFromSource);
     connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this,
+            &HomeWidget::updateButtonsToBackgroundColor);
+    // Scheme flips (light/dark/system with an OS switch) fire on themeManager,
+    // not on SettingsCache::themeChanged, so re-resolve the variant background.
+    connect(themeManager, &ThemeManager::themeChanged, this, &HomeWidget::initializeBackgroundFromSource);
+    connect(themeManager, &ThemeManager::paletteChanged, this, &HomeWidget::updateButtonsToBackgroundColor);
+    connect(themeManager, &ThemeManager::paletteChanged, this, &HomeWidget::updateLogoOverlay);
+    connect(&SettingsCache::instance().appearance(), &AppearanceSettings::homeTabButtonColorChanged, this,
             &HomeWidget::updateButtonsToBackgroundColor);
 }
 
 void HomeWidget::initializeBackgroundFromSource()
 {
+    // The featured logo is theme/scheme-derived too; reload it alongside the
+    // background so a theme or appearance switch doesn't leave it stale.
+    updateLogoOverlay();
+
     if (CardDatabaseManager::getInstance()->getLoadStatus() != LoadStatus::Ok) {
         connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
                 &HomeWidget::initializeBackgroundFromSource);
         return;
     }
 
-    auto backgroundSourceType = BackgroundSources::fromId(SettingsCache::instance().getHomeTabBackgroundSource());
+    auto backgroundSourceType =
+        BackgroundSources::fromId(SettingsCache::instance().appearance().getHomeTabBackgroundSource());
 
     switch (backgroundSourceType) {
         case BackgroundSources::Theme:
             cardChangeTimer->stop();
-            background = QPixmap("theme:backgrounds/home");
+            background = themePixmap(QStringLiteral("backgrounds/home"));
             backgroundSourceDeck = DeckList();
             backgroundSourceCard->setCard(ExactCard());
             updateButtonsToBackgroundColor();
@@ -88,8 +110,28 @@ void HomeWidget::initializeBackgroundFromSource()
 void HomeWidget::loadBackgroundSourceDeck()
 {
     std::optional<LoadedDeck> deckOpt = DeckLoader::loadFromFile(
-        SettingsCache::instance().getDeckPath() + "background.cod", DeckFileFormat::Cockatrice, false);
+        SettingsCache::instance().paths().getDeckPath() + "background.cod", DeckFileFormat::Cockatrice, false);
     backgroundSourceDeck = deckOpt.has_value() ? deckOpt.value().deckList : DeckList();
+}
+
+static QPair<QColor, QColor> paletteDerivedButtonColors()
+{
+    return {themeManager->appColor(AppColor::AccentStrong), themeManager->appColor(AppColor::AccentSoft)};
+}
+
+QPair<QColor, QColor> HomeWidget::determineButtonColor() const
+{
+    auto colorSource =
+        HomeTabButtonColor::intToSource(SettingsCache::instance().appearance().getHomeTabButtonColorSourceIndex());
+
+    switch (colorSource) {
+        case HomeTabButtonColor::FromThemeColors:
+            return paletteDerivedButtonColors();
+        case HomeTabButtonColor::FromBackground:
+            return extractDominantColors(background);
+    }
+
+    return paletteDerivedButtonColors();
 }
 
 void HomeWidget::setRandomCard(ExactCard &newCard)
@@ -108,7 +150,8 @@ void HomeWidget::setRandomCard(ExactCard &newCard)
 
 void HomeWidget::updateRandomCard()
 {
-    auto backgroundSourceType = BackgroundSources::fromId(SettingsCache::instance().getHomeTabBackgroundSource());
+    auto backgroundSourceType =
+        BackgroundSources::fromId(SettingsCache::instance().appearance().getHomeTabBackgroundSource());
 
     ExactCard newCard;
 
@@ -151,8 +194,8 @@ void HomeWidget::updateRandomCard()
 void HomeWidget::onBackgroundShuffleFrequencyChanged()
 {
     cardChangeTimer->stop();
-    if (SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() > 0) {
-        cardChangeTimer->start(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() * 1000);
+    if (SettingsCache::instance().appearance().getHomeTabBackgroundShuffleFrequency() > 0) {
+        cardChangeTimer->start(SettingsCache::instance().appearance().getHomeTabBackgroundShuffleFrequency() * 1000);
     }
 }
 
@@ -165,7 +208,7 @@ void HomeWidget::updateBackgroundProperties()
 
 void HomeWidget::updateButtonsToBackgroundColor()
 {
-    gradientColors = extractDominantColors(background);
+    gradientColors = determineButtonColor();
     for (HomeStyledButton *button : findChildren<HomeStyledButton *>()) {
         button->updateStylesheet(gradientColors);
         button->update();
@@ -192,10 +235,10 @@ QGroupBox *HomeWidget::createButtons()
     QVBoxLayout *boxLayout = new QVBoxLayout;
     boxLayout->setAlignment(Qt::AlignHCenter);
 
-    QLabel *logoLabel = new QLabel;
-    logoLabel->setPixmap(overlay.scaledToWidth(200, Qt::SmoothTransformation));
+    logoLabel = new QLabel;
     logoLabel->setAlignment(Qt::AlignCenter);
     boxLayout->addWidget(logoLabel);
+    updateLogoOverlay();
     boxLayout->addSpacing(25);
 
     connectButton = new HomeStyledButton("Connect/Play", gradientColors);
@@ -260,11 +303,6 @@ void HomeWidget::updateConnectButton(const ClientStatus status)
 
 QPair<QColor, QColor> HomeWidget::extractDominantColors(const QPixmap &pixmap)
 {
-    if (themeManager->isBuiltInTheme() &&
-        SettingsCache::instance().getHomeTabBackgroundSource() == BackgroundSources::toId(BackgroundSources::Theme)) {
-        return QPair<QColor, QColor>(QColor::fromRgb(20, 140, 60), QColor::fromRgb(120, 200, 80));
-    }
-
     // Step 1: Downscale image for performance
     QImage image = pixmap.toImage()
                        .scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation)
@@ -328,16 +366,19 @@ void HomeWidget::paintEvent(QPaintEvent *event)
         painter.drawPixmap(topLeft, toDraw);
     }
 
-    // Draw translucent black overlay with rounded corners
-    QRectF overlayRect(5, 5, width() - 10, height() - 10);
-    QPainterPath roundedRectPath;
-    roundedRectPath.addRoundedRect(overlayRect, 20, 20);
+    if (SettingsCache::instance().appearance().getHomeTabBackgroundDim()) {
+        // Draw translucent black overlay with rounded corners
+        QRectF overlayRect(5, 5, width() - 10, height() - 10);
+        QPainterPath roundedRectPath;
+        roundedRectPath.addRoundedRect(overlayRect, 20, 20);
 
-    QColor semiTransparentBlack(0, 0, 0, static_cast<int>(255 * 0.33));
-    painter.fillPath(roundedRectPath, semiTransparentBlack);
+        QColor semiTransparentBlack(0, 0, 0, static_cast<int>(255 * 0.33));
+        painter.fillPath(roundedRectPath, semiTransparentBlack);
+    }
 
-    // Card name overlay (bottom-right)
+    // Card name overlay (above the attribution, bottom-right)
     QString cardName;
+    QString attribution;
     ExactCard card = backgroundSourceCard->getCard();
     if (card) {
         cardName = card.getCardPtr()->getName();
@@ -345,9 +386,28 @@ void HomeWidget::paintEvent(QPaintEvent *event)
             cardName += " (" + card.getPrinting().getSet()->getCorrectedShortName() + ") " +
                         card.getPrinting().getProperty("num");
         }
+        attribution = buildArtAttribution(card);
     }
 
-    if (!cardName.isEmpty() && SettingsCache::instance().getHomeTabDisplayCardName()) {
+    // Scryfall requires artist attribution wherever card art is shown cropped.
+    // Pin it to the bottom-right corner, using the same font as the card name pill,
+    // and align its right edge with the card name pill's right edge.
+    constexpr int margin = 15;
+    constexpr qreal attributionMargin = 4.0;
+
+    QFont attributionFont = painter.font();
+    attributionFont.setPointSize(14);
+    attributionFont.setBold(true);
+    painter.setFont(attributionFont);
+
+    // paintArtAttribution insets the pill 4px from the given rect's right edge,
+    // so nudge the rect's right edge to land exactly on the pill's right edge.
+    QRectF attributionArea = rect();
+    attributionArea.setRight(width() - margin + attributionMargin);
+    const QRectF attributionRect = paintArtAttribution(painter, attributionArea, attribution);
+
+    // Card name bubble above the attribution (when enabled).
+    if (!cardName.isEmpty() && SettingsCache::instance().appearance().getHomeTabDisplayCardName()) {
         QFont font = painter.font();
         font.setPointSize(14);
         font.setBold(true);
@@ -355,24 +415,80 @@ void HomeWidget::paintEvent(QPaintEvent *event)
 
         QFontMetrics fm(font);
         constexpr int padding = 10;
-        constexpr int margin = 15;
 
         QRect textRect = fm.boundingRect(cardName);
 
-        QRect bgRect(width() - textRect.width() - padding * 2 - margin,
-                     height() - textRect.height() - padding * 2 - margin, textRect.width() + padding * 2,
-                     textRect.height() + padding * 2);
+        int bubbleBottom = height() - margin;
+        if (!attributionRect.isEmpty()) {
+            bubbleBottom = attributionRect.top() - 6;
+        }
+        const QRect nameBubbleRect(width() - textRect.width() - padding * 2 - margin,
+                                   bubbleBottom - textRect.height() - padding * 2, textRect.width() + padding * 2,
+                                   textRect.height() + padding * 2);
 
         // Background bubble
         painter.setPen(Qt::NoPen);
         painter.setBrush(QColor(0, 0, 0, 160));
-        painter.drawRoundedRect(bgRect, 8, 8);
+        painter.drawRoundedRect(nameBubbleRect, 8, 8);
 
         // Text
         painter.setPen(Qt::white);
-        painter.drawText(bgRect.adjusted(padding, padding, -padding, -padding), Qt::AlignRight | Qt::AlignVCenter,
-                         cardName);
+        painter.drawText(nameBubbleRect.adjusted(padding, padding, -padding, -padding),
+                         Qt::AlignRight | Qt::AlignVCenter, cardName);
     }
 
     QWidget::paintEvent(event);
+}
+
+void HomeWidget::updateLogoOverlay()
+{
+    // Emulate cockatrice.svg in Qt rather than rendering the baked-in SVG.
+    // The SVG has no separate plate: the gradient fills the bird's silhouette
+    // paths (light #c9fd62/AccentSoft at the top-left, dark #139740/AccentStrong
+    // toward the bottom-right — the SVG's linearGradient4265-7-8 stops along
+    // its userSpaceOnUse axis), and the white highlight path
+    // (cockatrice-logo-white) sits on top. So we paint that gradient clipped to
+    // the full logo silhouette (the full-color logo's alpha), then overlay the
+    // white mark. Colours stay fully theme-driven and independent of the static
+    // greens baked into the SVG.
+    const QColor strong = themeManager->appColor(AppColor::AccentStrong);
+    const QColor soft = themeManager->appColor(AppColor::AccentSoft);
+
+    const QPixmap silhouette = themePixmap(QStringLiteral("cockatrice")).scaledToWidth(200, Qt::SmoothTransformation);
+    const QPixmap whiteMark =
+        themePixmap(QStringLiteral("cockatrice-logo-white")).scaledToWidth(200, Qt::SmoothTransformation);
+    if (silhouette.isNull() || whiteMark.isNull()) {
+        return;
+    }
+
+    QPixmap composite(silhouette.size());
+    composite.fill(Qt::transparent);
+
+    {
+        QPainter painter(&composite);
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform);
+
+        // Recreate cockatrice.svg's own gradient geometry (linearGradient
+        // 4265-7-8, userSpaceOnUse): light AccentSoft at S=(-8.097,-97.746),
+        // dark AccentStrong at E=(162.455,295.208), on the SVG's 300x300
+        // canvas. Scale those coordinates to this composite's size.
+        const qreal scale = composite.width() / 300.0;
+        QLinearGradient gradient(QPointF(-8.097, -97.746) * scale, QPointF(162.455, 295.208) * scale);
+        gradient.setColorAt(0.0, soft);
+        gradient.setColorAt(1.0, strong);
+        painter.fillRect(composite.rect(), gradient);
+
+        // Clip the gradient to the full logo silhouette exactly as the SVG's
+        // gradient paths are confined to the bird.
+        painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+        painter.drawPixmap(0, 0, silhouette);
+
+        painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+        painter.drawPixmap(0, 0, whiteMark);
+    }
+
+    if (logoLabel) {
+        logoLabel->setPixmap(composite);
+    }
 }

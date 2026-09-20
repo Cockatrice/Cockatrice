@@ -9,16 +9,16 @@ RecentsSettings::RecentsSettings(const QString &settingPath, QObject *parent)
 
 QStringList RecentsSettings::getRecentlyOpenedDeckPaths() const
 {
-    return getValue("deckpaths").toStringList();
+    return getValue("deckPaths").toStringList();
 }
 void RecentsSettings::clearRecentlyOpenedDeckPaths()
 {
-    deleteValue("deckpaths");
+    deleteValue("deckPaths");
     emit recentlyOpenedDeckPathsChanged();
 }
 void RecentsSettings::updateRecentlyOpenedDeckPaths(const QString &deckPath)
 {
-    auto deckPaths = getValue("deckpaths").toStringList();
+    auto deckPaths = getValue("deckPaths").toStringList();
     deckPaths.removeAll(deckPath);
 
     deckPaths.prepend(deckPath);
@@ -27,7 +27,7 @@ void RecentsSettings::updateRecentlyOpenedDeckPaths(const QString &deckPath)
         deckPaths.removeLast();
     }
 
-    setValue(deckPaths, "deckpaths");
+    setValue(deckPaths, "deckPaths");
     emit recentlyOpenedDeckPathsChanged();
 }
 

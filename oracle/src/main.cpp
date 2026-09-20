@@ -10,6 +10,7 @@
 #include <QLibraryInfo>
 #include <QTimer>
 #include <QTranslator>
+#include <libcockatrice/settings/personal_settings.h>
 
 QTranslator *translator, *qtTranslator;
 ThemeManager *themeManager;
@@ -21,14 +22,10 @@ bool isBackgrounded;
 
 void installNewTranslator()
 {
-    QString lang = SettingsCache::instance().getLang();
+    QString lang = SettingsCache::instance().personal().getLang();
 
     QString qtNameHint = "qt_" + lang;
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     QString qtTranslationPath = QLibraryInfo::path(QLibraryInfo::TranslationsPath);
-#else
-    QString qtTranslationPath = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
-#endif
 
     bool qtTranslationLoaded = qtTranslator->load(qtNameHint, qtTranslationPath);
     if (!qtTranslationLoaded) {
@@ -53,8 +50,8 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     QCoreApplication::setOrganizationName("Cockatrice");
-    QCoreApplication::setOrganizationDomain("cockatrice");
-    // this can't be changed, as it influences the default save path for cards.xml
+    QCoreApplication::setOrganizationDomain("Cockatrice");
+    // This can't be changed, as it influences the default save path for cards.xml
     QCoreApplication::setApplicationName("Cockatrice");
 
     // If the program is opened with the -s flag, it will only do spoilers. Otherwise it will do MTGJSON/Tokens
@@ -86,7 +83,7 @@ int main(int argc, char *argv[])
     QIcon icon("theme:appicon.svg");
     wizard.setWindowIcon(icon);
     // set name of the app desktop file; used by wayland to load the window icon
-    QGuiApplication::setDesktopFileName("oracle");
+    QGuiApplication::setDesktopFileName("Oracle");
 
     wizard.show();
 

@@ -13,12 +13,12 @@ CounterState *CounterState::fromProto(const ServerInfo_Counter &counter, QObject
                             convertColorToQColor(counter.counter_color()), counter.radius(), counter.count(), parent);
 }
 
-void CounterState::setValue(int newValue)
+void CounterState::setValue(int newValue, bool skipDamageAnimation)
 {
     if (newValue == value) {
         return;
     }
     int old = value;
     value = newValue;
-    emit valueChanged(old, newValue);
+    emit valueChanged(old, newValue, skipDamageAnimation);
 }

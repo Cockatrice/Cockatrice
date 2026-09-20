@@ -82,6 +82,13 @@ void CockatriceXml4Parser::parseFile(QIODevice &device)
     }
 }
 
+void CockatriceXml4Parser::parseFileInto(QIODevice &device, CardDatabaseData &data)
+{
+    targetData = &data;
+    parseFile(device);
+    targetData = nullptr;
+}
+
 static QSharedPointer<FormatRules> parseFormat(QXmlStreamReader &xml)
 {
     auto rulesPtr = FormatRulesPtr(new FormatRules());
@@ -187,7 +194,11 @@ void CockatriceXml4Parser::loadFormats(QXmlStreamReader &xml)
 
         if (xml.name().toString() == "format") {
             auto rulesPtr = parseFormat(xml);
-            emit addFormat(rulesPtr);
+            if (targetData) {
+                targetData->formats.insert(rulesPtr->formatName.toLower(), rulesPtr);
+            } else {
+                emit addFormat(rulesPtr);
+            }
         }
     }
 }
@@ -232,9 +243,9 @@ void CockatriceXml4Parser::loadSetsFromXml(QXmlStreamReader &xml)
     }
 }
 
-QVariantHash CockatriceXml4Parser::loadCardPropertiesFromXml(QXmlStreamReader &xml)
+QHash<QString, QString> CockatriceXml4Parser::loadCardPropertiesFromXml(QXmlStreamReader &xml)
 {
-    QVariantHash properties = QVariantHash();
+    QHash<QString, QString> properties;
     while (!xml.atEnd()) {
         if (xml.readNext() == QXmlStreamReader::EndElement) {
             break;
@@ -261,7 +272,9 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
         if (xmlName == "card") {
             QString name = QString("");
             QString text = QString("");
-            QVariantHash properties = QVariantHash();
+            QHash<QString, QString> properties;
+            QMap<QString, QString> localizedNames;
+            QMap<QString, QString> localizedTexts;
             QList<CardRelation *> relatedCards, reverseRelatedCards;
             auto _sets = SetToPrintingsMap();
             int tableRow = 0;
@@ -287,6 +300,44 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     // generic properties
                 } else if (xmlName == "prop") {
                     properties = loadCardPropertiesFromXml(xml);
+                    // localized card data
+                } else if (xmlName == "localizations") {
+                    while (!xml.atEnd()) {
+                        if (xml.readNextStartElement()) {
+                            const QString elementName = xml.name().toString();
+                            if (elementName == "localization") {
+                                const QString lang = xml.attributes().value("lang").toString();
+                                QString localizedName;
+                                QString localizedText;
+                                while (!xml.atEnd()) {
+                                    if (xml.readNext() == QXmlStreamReader::EndElement) {
+                                        break;
+                                    }
+                                    if (xml.isStartElement()) {
+                                        const QString childName = xml.name().toString();
+                                        QString value = xml.readElementText(QXmlStreamReader::IncludeChildElements);
+                                        if (childName == "name") {
+                                            localizedName = value;
+                                        } else if (childName == "text") {
+                                            localizedText = value;
+                                        }
+                                    }
+                                }
+                                if (!lang.isEmpty()) {
+                                    if (!localizedName.isEmpty()) {
+                                        localizedNames.insert(lang, localizedName);
+                                    }
+                                    if (!localizedText.isEmpty()) {
+                                        localizedTexts.insert(lang, localizedText);
+                                    }
+                                }
+                            } else {
+                                xml.skipCurrentElement();
+                            }
+                        } else {
+                            break;
+                        }
+                    }
                     // positioning info
                 } else if (xmlName == "tablerow") {
                     tableRow = xml.readElementText(QXmlStreamReader::IncludeChildElements).toInt();
@@ -303,14 +354,15 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     QString setName = xml.readElementText(QXmlStreamReader::IncludeChildElements);
                     auto set = internalAddSet(setName);
                     if (set->getEnabled()) {
-                        PrintingInfo printingInfo(set);
+                        QHash<QString, QString> printingProps;
                         for (QXmlStreamAttribute attr : attrs) {
                             QString attrName = attr.name().toString();
                             if (attrName == "picURL") {
                                 attrName = "picurl";
                             }
-                            printingInfo.setProperty(attrName, attr.value().toString());
+                            printingProps.insert(attrName, attr.value().toString());
                         }
+                        PrintingInfo printingInfo(set, LazyPropertiesHash(printingProps));
 
                         // This is very much a hack and not the right place to
                         // put this check, as it requires a reload of Cockatrice
@@ -387,9 +439,25 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                                                  .landscapeOrientation = landscapeOrientation,
                                                  .tableRow = tableRow,
                                                  .upsideDownArt = upsideDown};
-            CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards,
-                                                        reverseRelatedCards, _sets, attributes);
-            emit addCard(newCard);
+            CardInfoPtr newCard =
+                CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards, _sets,
+                                      attributes, std::move(localizedNames), std::move(localizedTexts));
+            if (targetData) {
+                // Mirror CardDatabase::addCard: if a card with this name already
+                // exists, merge the new printings into it instead of replacing.
+                if (auto existing = targetData->cards.value(name)) {
+                    for (const auto &printings : newCard->getSets()) {
+                        for (const auto &printing : printings) {
+                            existing->addToSet(printing.getSet(), printing);
+                        }
+                    }
+                } else {
+                    targetData->cards.insert(name, newCard);
+                    targetData->simpleNameCards.insert(newCard->getSimpleName(), newCard);
+                }
+            } else {
+                emit addCard(newCard);
+            }
         }
     }
 }
@@ -489,6 +557,26 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
         xml.writeTextElement(propName, info->getProperty(propName));
     }
     xml.writeEndElement();
+
+    // localized card data
+    const QStringList localizedLanguages = info->localizationLanguages();
+    if (!localizedLanguages.isEmpty()) {
+        xml.writeStartElement("localizations");
+        const QMap<QString, QString> &localizedNames = info->getLocalizedNames();
+        const QMap<QString, QString> &localizedTexts = info->getLocalizedTexts();
+        for (const QString &lang : localizedLanguages) {
+            xml.writeStartElement("localization");
+            xml.writeAttribute("lang", lang);
+            if (localizedNames.contains(lang)) {
+                xml.writeTextElement("name", localizedNames.value(lang));
+            }
+            if (localizedTexts.contains(lang)) {
+                xml.writeTextElement("text", localizedTexts.value(lang));
+            }
+            xml.writeEndElement();
+        }
+        xml.writeEndElement();
+    }
 
     // sets
     for (const auto &printings : info->getSets()) {

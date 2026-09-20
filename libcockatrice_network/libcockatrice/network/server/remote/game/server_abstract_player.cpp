@@ -66,6 +66,15 @@ Server_AbstractPlayer::Server_AbstractPlayer(Server_Game *_game,
 
 Server_AbstractPlayer::~Server_AbstractPlayer() = default;
 
+int Server_AbstractPlayer::getCardCount() const
+{
+    int result = 0;
+    for (auto *zone : zones) {
+        result += zone->getCards().size();
+    }
+    return result;
+}
+
 void Server_AbstractPlayer::prepareDestroy()
 {
     delete deck;
@@ -1630,10 +1639,11 @@ void Server_AbstractPlayer::getInfo(ServerInfo_Player *info,
                                     bool withUserInfo)
 {
     getProperties(*info->mutable_properties(), withUserInfo);
-    if (recipient == this) {
-        if (deck) {
-            info->set_deck_list(deck->writeToString_Native().toStdString());
-        }
+
+    // Deck lists are only shared with other players when the game is in Open Decklists mode,
+    // so a player joining an open lobby can see every deck that was loaded before they joined.
+    if (deck && (recipient == this || game->getShareDecklistsOnLoad())) {
+        info->set_deck_list(deck->writeToString_Native().toStdString());
     }
 
     for (Server_Arrow *arrow : arrows) {
@@ -1652,5 +1662,13 @@ void Server_AbstractPlayer::getPlayerProperties(ServerInfo_PlayerProperties &res
     result.set_ready_start(readyStart);
     if (deck) {
         result.set_deck_hash(deck->getDeckHash().toStdString());
+        const auto &playmat = deck->getPlaymat();
+        auto *playmatParams = result.mutable_playmat_params();
+        playmatParams->set_card_name(playmat.card.name.toStdString());
+        playmatParams->set_card_provider_id(playmat.card.providerId.toStdString());
+        playmatParams->set_margin_pct_l(playmat.params.marginPctL);
+        playmatParams->set_margin_pct_r(playmat.params.marginPctR);
+        playmatParams->set_vertical_offset(playmat.params.verticalOffset);
+        playmatParams->set_zoom(playmat.params.zoom);
     }
 }
