@@ -39,6 +39,8 @@ private:
     QGroupBox *leftGroupBox, *rightGroupBox;
     ShareBarWidget *shareBar;
     QTimer *shareTimeoutTimer;
+    int shareRequestSeq = 0;
+    int shareInFlightSeq = 0;
 
     QAction *aOpenLocalDeck, *aRenameLocal, *aUpload, *aNewLocalFolder, *aDeleteLocalDeck;
     QAction *aOpenDecksFolder;

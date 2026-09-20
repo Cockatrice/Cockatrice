@@ -683,6 +683,10 @@ void TabDeckStorage::setShareModeEnabled(bool enabled)
         onServerSelectionChanged();
         shareBar->focusName();
     } else {
+        // Abandon any in-flight request: otherwise the timer keeps running and a late
+        // response reports the share as created after the user already backed out.
+        shareTimeoutTimer->stop();
+        shareInFlightSeq = 0;
         serverDirView->clearSelection();
     }
 }
@@ -775,8 +779,17 @@ void TabDeckStorage::actShareSelection()
     }
 
     shareBar->setCreateEnabled(false);
+    const int seq = ++shareRequestSeq;
+    shareInFlightSeq = seq;
     PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, &PendingCommand::finished, this, &TabDeckStorage::shareFromTreeFinished);
+    connect(pend, &PendingCommand::finished, this,
+            [this, seq](const Response &response, const CommandContainer &commandContainer) {
+                if (shareInFlightSeq != seq) {
+                    return; // the user cancelled or a newer request superseded this one
+                }
+                shareInFlightSeq = 0;
+                shareFromTreeFinished(response, commandContainer);
+            });
     client->sendCommand(pend);
     shareTimeoutTimer->start();
 }
@@ -808,6 +821,10 @@ void TabDeckStorage::showShareNotice(const QString &message, bool warning)
 
 void TabDeckStorage::onShareFromTreeTimeout()
 {
+    if (shareInFlightSeq == 0) {
+        return; // share mode was left while the request was still outstanding
+    }
+    shareInFlightSeq = 0;
     shareBar->setCreateEnabled(true);
     showShareNotice(tr("The server did not respond in time. Try again."), true);
 }
