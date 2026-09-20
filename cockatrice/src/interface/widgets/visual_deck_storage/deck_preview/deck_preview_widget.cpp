@@ -295,6 +295,10 @@ void DeckPreviewWidget::updateTagsVisibility(bool visible)
     }
 }
 
+/**
+ * Refreshes the banner card text.
+ * This also calls `refreshBannerCardToolTip`, since those two often need to be updated together.
+ */
 void DeckPreviewWidget::refreshBannerCardText()
 {
     bannerCardDisplayWidget->setOverlayText(getDisplayName());
