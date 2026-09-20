@@ -46,7 +46,7 @@ signals:
      * Emitted when a chip's selection or exclusion state changes.
      *
      * The chip only emits when its state actually changed, so this fires once per
-     * effective toggle rather than on every click."
+     * effective toggle rather than on every click.
      */
     void filterChanged();
 

@@ -54,15 +54,12 @@ void VisualDeckStorageTagFilterWidget::refreshTags()
     }
 
     // Add chips for tags that are not shown yet.
+    QSet<QString> existingTags;
+    for (DeckPreviewTagDisplayWidget *tagWidget : chips) {
+        existingTags.insert(tagWidget->getTagName());
+    }
     for (const QString &tag : allTags) {
-        bool tagExists = false;
-        for (DeckPreviewTagDisplayWidget *tagWidget : chips) {
-            if (tagWidget->getTagName() == tag) {
-                tagExists = true;
-                break;
-            }
-        }
-        if (!tagExists) {
+        if (!existingTags.contains(tag)) {
             auto *newTagWidget = new DeckPreviewTagDisplayWidget(this, tag);
             connect(newTagWidget, &DeckPreviewTagDisplayWidget::tagClicked, this,
                     &VisualDeckStorageTagFilterWidget::filterChanged);
@@ -75,7 +72,10 @@ void VisualDeckStorageTagFilterWidget::refreshTags()
     // FlowWidget inherits QLayout::removeWidget's linear scan, so rebuilding an unchanged
     // order would be quadratic plus a full relayout on every chip click and load batch.
     std::sort(chips.begin(), chips.end(), [](DeckPreviewTagDisplayWidget *a, DeckPreviewTagDisplayWidget *b) {
-        return a->getTagName().toLower() < b->getTagName().toLower();
+        const QString aName = a->getTagName();
+        const QString bName = b->getTagName();
+        const int compared = aName.compare(bName, Qt::CaseInsensitive);
+        return compared != 0 ? compared < 0 : aName < bName;
     });
     if (chips == currentChipOrder) {
         return;
