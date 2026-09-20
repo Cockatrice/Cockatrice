@@ -512,6 +512,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connectionController = new ConnectionController(this, this);
     urlParser = new IntentUrlParser(this, this);
+    connect(urlParser, &IntentUrlParser::urlChainFinished, this, &MainWindow::onUrlChainFinished);
 
     createActions();
     createMenus();
@@ -707,6 +708,12 @@ void MainWindow::applyStartupDestination()
         return;
     }
 
+    // A cockatrice:// link owns the startup connection while its chain runs;
+    // connecting here would race (and tear down) the link's own connection.
+    if (skipStartupAutoConnect) {
+        return;
+    }
+
     const int destination = SettingsCache::instance().tabs().getStartupTabIndex();
     if (destination != StartupTab::StartupTabServer && destination != StartupTab::StartupTabServerRoom) {
         return;
@@ -728,6 +735,7 @@ void MainWindow::applyStartupDestination()
 
     connect(credentials, &Intent::finished, connector, &Intent::execute);
     connect(credentials, &Intent::failed, this, &MainWindow::startupDestinationFailed);
+    connect(credentials, &Intent::cancelled, this, [this]() { startupDestinationFailed(tr("Sign-in cancelled")); });
     connect(connector, &Intent::finished, this,
             [this, destination, serverContext]() { onStartupDestinationConnected(destination, *serverContext); });
     connect(connector, &Intent::failed, this, &MainWindow::startupDestinationFailed);
@@ -879,18 +887,7 @@ void MainWindow::changeEvent(QEvent *event)
     } else if (event->type() == QEvent::ActivationChange) {
         if (isActiveWindow() && !bHasActivated) {
             bHasActivated = true;
-            if (!connectTo.isEmpty()) {
-                qCInfo(WindowMainStartupAutoconnectLog) << "Command line connect to " << connectTo;
-                connectionController->connectToServerDirect(connectTo.host(), connectTo.port(), connectTo.userName(),
-                                                            connectTo.password());
-            } else if (SettingsCache::instance().servers().getAutoConnect() &&
-                       !SettingsCache::instance().debug().getLocalGameOnStartup() &&
-                       !startupDestinationConnectsToServer()) {
-                qCInfo(WindowMainStartupAutoconnectLog) << "Attempting auto-connect...";
-                DlgConnect dlg(this);
-                connectionController->connectToServerDirect(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()),
-                                                            dlg.getPlayerName(), dlg.getPassword());
-            }
+            attemptStartupAutoConnect();
         }
     }
 
@@ -914,6 +911,59 @@ void MainWindow::showWindowIfHidden()
 void MainWindow::handleCockatriceLink(const QString &url)
 {
     urlParser->handle(url);
+}
+
+void MainWindow::attemptStartupAutoConnect()
+{
+    if (startupAutoConnectAttempted || skipStartupAutoConnect) {
+        return;
+    }
+    startupAutoConnectAttempted = true;
+
+    if (!connectTo.isEmpty()) {
+        qCInfo(WindowMainStartupAutoconnectLog) << "Command line connect to " << connectTo;
+        connectionController->connectToServerDirect(connectTo.host(), connectTo.port(), connectTo.userName(),
+                                                    connectTo.password());
+    } else if (SettingsCache::instance().servers().getAutoConnect() &&
+               !SettingsCache::instance().debug().getLocalGameOnStartup() && !startupDestinationConnectsToServer()) {
+        qCInfo(WindowMainStartupAutoconnectLog) << "Attempting auto-connect...";
+        DlgConnect dlg(this);
+        connectionController->connectToServerDirect(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()),
+                                                    dlg.getPlayerName(), dlg.getPassword());
+    }
+}
+
+void MainWindow::onUrlChainFinished(bool connected)
+{
+    // A cockatrice:// link owns the startup connection while it runs. When its
+    // chain ended without connecting (declined, invalid, offline), fall back to
+    // the startup connection so the activation launch still behaves like a
+    // normal launch.
+    if (connected) {
+        // The launch link connected, so the startup fallback has served its
+        // purpose: drop the skip so a later mid-session link that ends declined
+        // or offline cannot silently fire auto-connect or applyStartupDestination
+        // again.
+        skipStartupAutoConnect = false;
+        return;
+    }
+
+    if (!skipStartupAutoConnect || getRemoteClient()->getStatus() != StatusDisconnected) {
+        return;
+    }
+
+    if (startupDestinationConnectsToServer()) {
+        // Users whose startup tab is a Server / Server Room connect through the
+        // startup destination, not through auto-connect; retry that instead.
+        qCInfo(WindowMainStartupAutoconnectLog) << "URL chain ended without a connection; retrying startup destination";
+        skipStartupAutoConnect = false;
+        applyStartupDestination();
+        return;
+    }
+
+    qCInfo(WindowMainStartupAutoconnectLog) << "URL chain ended without a connection; retrying startup connect";
+    skipStartupAutoConnect = false;
+    attemptStartupAutoConnect();
 }
 
 void MainWindow::cardDatabaseLoadingFailed()
