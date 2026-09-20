@@ -25,7 +25,10 @@ DlgSharedDecksPreview::DlgSharedDecksPreview(QWidget *parent,
 
     auto *mainLayout = new QVBoxLayout(this);
 
-    auto *titleLabel = new QLabel(tr("Share: %1").arg(shareName.isEmpty() ? tr("Untitled") : shareName), this);
+    // shareName and serverText come from the share server, so escape them: the
+    // QLabels render AutoText and markup would otherwise be shown as rich text.
+    auto *titleLabel =
+        new QLabel(tr("Share: %1").arg((shareName.isEmpty() ? tr("Untitled") : shareName).toHtmlEscaped()), this);
     QFont titleFont = titleLabel->font();
     titleFont.setBold(true);
     titleFont.setPointSize(titleFont.pointSize() + 2);
@@ -33,7 +36,7 @@ DlgSharedDecksPreview::DlgSharedDecksPreview(QWidget *parent,
     mainLayout->addWidget(titleLabel);
 
     if (!serverText.isEmpty()) {
-        mainLayout->addWidget(new QLabel(tr("From %1").arg(serverText), this));
+        mainLayout->addWidget(new QLabel(tr("From %1").arg(serverText.toHtmlEscaped()), this));
     }
 
     if (expiresAt > 0) {
@@ -57,7 +60,7 @@ DlgSharedDecksPreview::DlgSharedDecksPreview(QWidget *parent,
         auto *tile = new SharedDeckPreviewWidget(
             this, querier, QString::fromStdString(item.name()), QString::fromStdString(item.banner_card()),
             QString::fromStdString(item.color_identity()), QString::fromStdString(item.game_format()), tags.join(", "));
-        flowWidget->addWidget(tile);
+        flowWidget->addNavigableWidget(tile);
         tiles.append(tile);
         itemIds.append(item.id());
     }

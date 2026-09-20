@@ -208,9 +208,13 @@ Intent *IntentUrlParser::createOpenDeckIntent(const QUrlQuery &query, PendingInt
     // taking the session anywhere it isn't already, naming the host we would
     // connect to. Remember the link's target when it moves us away from a live
     // session so a failed or cancelled chain can restore the session it left.
+    // The hostname is link-supplied and percent-decoded, so escape it: QMessageBox
+    // renders AutoText, and markup in a hostname would otherwise flip the whole
+    // prompt to rich text and let a link pad the message the user is shown.
     const bool alreadyConnected = isConnectedTo(ctx->serverContext.hostname, ctx->serverContext.port);
     if (!alreadyConnected) {
-        const QString target = QStringLiteral("%1:%2").arg(ctx->serverContext.hostname, ctx->serverContext.port);
+        const QString target =
+            QStringLiteral("%1:%2").arg(ctx->serverContext.hostname.toHtmlEscaped(), ctx->serverContext.port);
 
         if (client->getStatus() == StatusLoggedIn) {
             const QString current =
@@ -273,12 +277,14 @@ Intent *IntentUrlParser::createOpenDeckIntent(const QUrlQuery &query, PendingInt
 
 bool IntentUrlParser::isConnectedTo(const QString &hostname, const QString &port) const
 {
-    Q_UNUSED(port);
-    // Deliberately hostname-only (no port): the intents' preconditions apply the
-    // same rule, so a link to the same host on another port still connects
-    // rather than silently reusing an existing session on a different server.
+    // serverName() reflects the server the client was configured to connect to,
+    // which may differ from the actual TCP peer (e.g. when connecting through a
+    // proxy), so compare the configured host and port — exactly what a link
+    // names. A link to the same host on another port is a different server and
+    // must not silently reuse an existing session there.
     RemoteClient *client = mainWindow->getRemoteClient();
-    return client->getStatus() == StatusLoggedIn && client->serverName().compare(hostname, Qt::CaseInsensitive) == 0;
+    return client->getStatus() == StatusLoggedIn && client->serverName().compare(hostname, Qt::CaseInsensitive) == 0 &&
+           QString::number(client->serverPort()) == port;
 }
 
 void IntentUrlParser::startNextChain()

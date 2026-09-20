@@ -92,6 +92,14 @@ SingleInstanceManager::ForwardResult SingleInstanceManager::forwardToPrimary(con
     socket.flush();
     socket.waitForBytesWritten(1000);
 
+    // A plain launch has nothing for the primary to act on, so there is nothing
+    // to acknowledge. Waiting here would block the new instance for seconds if
+    // the primary is busy in a modal dialog, so only the activation path (which
+    // needs the ACK to avoid stealing a live primary's socket) waits below.
+    if (filesToSend.isEmpty()) {
+        return ForwardResult::Delivered;
+    }
+
     // Only report a successful hand-off once the primary has acknowledged that
     // it actually read the payload. A socket that connects but is still working
     // on an earlier payload is alive but busy, not dead: give it more room

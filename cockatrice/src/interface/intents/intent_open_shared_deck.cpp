@@ -34,10 +34,15 @@ bool IntentOpenSharedDeck::checkPrecondition() const
     if (remoteClient->getStatus() != ClientStatus::StatusLoggedIn) {
         return false;
     }
-    // serverName() reflects the server the client was configured to connect to,
-    // which may differ from the actual TCP peer (e.g. when connecting through a
-    // proxy), so only the hostname is compared here.
-    return remoteClient->serverName().compare(context->serverContext.hostname, Qt::CaseInsensitive) == 0;
+    // serverName()/serverPort() reflect the server the client was configured
+    // to connect to, which may differ from the actual TCP peer (e.g. when
+    // connecting through a proxy), so compare those configured values. The
+    // share token must be resolved against the host the link named — a link to
+    // the same host on another port is a different server.
+    if (remoteClient->serverName().compare(context->serverContext.hostname, Qt::CaseInsensitive) != 0) {
+        return false;
+    }
+    return QString::number(remoteClient->serverPort()) == context->serverContext.port;
 }
 
 void IntentOpenSharedDeck::onPreconditionSatisfied()

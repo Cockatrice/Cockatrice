@@ -30,6 +30,7 @@ public:
                Qt::ScrollBarPolicy verticalPolicy);
 
     void addWidget(QWidget *widget_to_add);
+    void addNavigableWidget(QWidget *widget_to_add);
     void insertWidgetAtIndex(QWidget *toInsert, int index);
     void removeWidget(QWidget *widgetToRemove) const;
     void clearLayout();

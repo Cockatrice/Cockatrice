@@ -81,13 +81,30 @@ FlowWidget::FlowWidget(QWidget *parent,
 /**
  * @brief Adds a widget to the flow layout within the FlowWidget.
  *
- * The widget is filtered for arrow-key events so keyboard navigation between
- * the flow items keeps working even when the flow sits inside a QScrollArea,
- * which swallows arrow keys before they can reach FlowWidget::keyPressEvent.
+ * Plain widgets are not filtered for arrow keys: intercepting them would steal
+ * Up/Down/Left/Right from controls that use them (combo boxes, spin boxes
+ * etc.). Widgets that want keyboard navigation between flow items must be
+ * added via addNavigableWidget instead.
  *
  * @param widget_to_add The widget to add to the flow layout.
  */
 void FlowWidget::addWidget(QWidget *widget_to_add)
+{
+    flowLayout->addWidget(widget_to_add);
+}
+
+/**
+ * @brief Adds a widget and routes its arrow keys to FlowWidget focus navigation.
+ *
+ * The widget is filtered for arrow-key events so keyboard navigation between
+ * the flow items keeps working even when the flow sits inside a QScrollArea,
+ * which swallows arrow keys before they can reach FlowWidget::keyPressEvent.
+ * Only widgets added through this method are affected; anything that needs its
+ * own arrow keys should use plain addWidget.
+ *
+ * @param widget_to_add The widget to add to the flow layout.
+ */
+void FlowWidget::addNavigableWidget(QWidget *widget_to_add)
 {
     widget_to_add->installEventFilter(this);
     flowLayout->addWidget(widget_to_add);

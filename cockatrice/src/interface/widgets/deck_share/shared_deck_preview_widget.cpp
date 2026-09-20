@@ -33,7 +33,8 @@ SharedDeckPreviewWidget::SharedDeckPreviewWidget(QWidget *parent,
     colorIdentityWidget = new ColorIdentityWidget(this, colorIdentity);
     colorIdentityWidget->setVisible(!colorIdentity.isEmpty());
 
-    gameFormatLabel = new QLabel(gameFormat, this);
+    // gameFormat is server-supplied and the QLabel renders AutoText, so escape it.
+    gameFormatLabel = new QLabel(gameFormat.toHtmlEscaped(), this);
     gameFormatLabel->setAlignment(Qt::AlignCenter);
     gameFormatLabel->setVisible(!gameFormat.isEmpty());
 

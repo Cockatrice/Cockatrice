@@ -60,8 +60,19 @@ void IntentGetLoginCredentials::onPreconditionNotSatisfied()
 
     if (dialog.savePassword() && !context->username.isEmpty()) {
         ServersSettings &servers = SettingsCache::instance().servers();
-        servers.addNewServer(context->hostname, context->hostname, context->port, context->username, context->password,
-                             true);
+        // The host may already be saved under a friendly name (e.g. a public-server
+        // list entry) with no credentials; reuse that name instead of overwriting
+        // it with the raw hostname when addNewServer updates the entry in place.
+        QString saveName = context->hostname;
+        const int existingIndex = servers.findServerIndex(context->hostname, context->port);
+        if (existingIndex >= 0) {
+            saveName =
+                servers.getValue(QString("saveName%1").arg(existingIndex), "server", "server_details").toString();
+            if (saveName.isEmpty()) {
+                saveName = context->hostname;
+            }
+        }
+        servers.addNewServer(saveName, context->hostname, context->port, context->username, context->password, true);
     }
 
     emitFinished();

@@ -939,7 +939,16 @@ void MainWindow::onUrlChainFinished(bool connected)
     // chain ended without connecting (declined, invalid, offline), fall back to
     // the startup connection so the activation launch still behaves like a
     // normal launch.
-    if (connected || !skipStartupAutoConnect || getRemoteClient()->getStatus() != StatusDisconnected) {
+    if (connected) {
+        // The launch link connected, so the startup fallback has served its
+        // purpose: drop the skip so a later mid-session link that ends declined
+        // or offline cannot silently fire auto-connect or applyStartupDestination
+        // again.
+        skipStartupAutoConnect = false;
+        return;
+    }
+
+    if (!skipStartupAutoConnect || getRemoteClient()->getStatus() != StatusDisconnected) {
         return;
     }
 
