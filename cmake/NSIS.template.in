@@ -387,19 +387,14 @@ SectionEnd
 
 Section "un.Application" UnSecApplication
 	SetShellVarContext all
-	RMDir /r "$INSTDIR\plugins"
-	RMDir /r "$INSTDIR\sounds"
-	RMDir /r "$INSTDIR\themes"
-	RMDir /r "$INSTDIR\translations"
-	Delete "$INSTDIR\*.exe"
-	Delete "$INSTDIR\*.dll"
-	Delete "$INSTDIR\qt.conf"
-	Delete "$INSTDIR\qdebug.txt"
-	Delete "$INSTDIR\servatrice.sql"
-	Delete "$INSTDIR\servatrice.ini.example"
-	RMDir "$INSTDIR"
 
-	RMDir "$SMPROGRAMS\Cockatrice"
+	; Remove the entire application directory so any file that is not part of
+	; the installed payload (e.g. build-tree artifacts such as *.dir folders,
+	; *_autogen and *.tlog files from a build) cannot survive between an
+	; uninstall and a fresh reinstall.
+	RMDir /r "$INSTDIR"
+
+	RMDir /r "$SMPROGRAMS\Cockatrice"
 
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice"
 SectionEnd

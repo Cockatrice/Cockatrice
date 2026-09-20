@@ -11,6 +11,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../cards/additional_info/deck_color_identity.h"
 #include "../client/network/interfaces/deck_stats_interface.h"
 #include "../client/network/interfaces/tapped_out_interface.h"
 #include "../deck_editor/deck_state_manager.h"
@@ -19,6 +20,7 @@
 #include "../interface/widgets/dialogs/dlg_load_deck.h"
 #include "../interface/widgets/dialogs/dlg_load_deck_from_clipboard.h"
 #include "../interface/widgets/dialogs/dlg_load_deck_from_website.h"
+#include "../interface/widgets/dialogs/dlg_share_deck.h"
 #include "../utility/visibility_change_listener.h"
 #include "tab_supervisor.h"
 
@@ -323,6 +325,7 @@ bool AbstractTabDeckEditor::actSaveDeck()
         Command_DeckUpload cmd;
         cmd.set_deck_id(static_cast<google::protobuf::uint32>(loadedDeck.lastLoadInfo.remoteDeckId));
         cmd.set_deck_list(deckString.toStdString());
+        cmd.set_color_identity(getDeckColorIdentity(loadedDeck.deckList, CardDatabaseManager::query()).toStdString());
 
         PendingCommand *pend = AbstractClient::prepareSessionCommand(cmd);
         connect(pend, &PendingCommand::finished, this, &AbstractTabDeckEditor::saveDeckRemoteFinished);
@@ -380,6 +383,27 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
     deckStateManager->setModified(false);
     SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
     return true;
+}
+
+/**
+ * @brief Opens the deck share dialog with the current deck preselected.
+ */
+void AbstractTabDeckEditor::actShareDeck()
+{
+    AbstractClient *client = tabSupervisor->getServerClient();
+    if (client->getStatus() != StatusLoggedIn) {
+        QMessageBox::information(this, tr("Share deck"), tr("You must be connected to the server to share a deck."));
+        return;
+    }
+
+    const QSharedPointer<DeckList> deck = deckStateManager->getDeckListShared();
+    if (deck->isBlankDeck()) {
+        QMessageBox::information(this, tr("Share deck"), tr("The deck is empty. Add cards before sharing it."));
+        return;
+    }
+
+    DlgShareDeck shareDialog(client, deck, this);
+    shareDialog.exec();
 }
 
 /**

@@ -3,34 +3,53 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../deck_loader/deck_loader.h"
 #include "../../pixel_map_generator.h"
+#include "../cards/additional_info/deck_color_identity.h"
+#include "../deck_share/deck_share_utils.h"
+#include "../deck_share/share_bar_widget.h"
 #include "../interface/widgets/server/remote/remote_decklist_tree_widget.h"
 #include "../interface/widgets/utility/get_text_with_max.h"
 
 #include <QAction>
 #include <QApplication>
+#include <QDateTime>
 #include <QDebug>
 #include <QDesktopServices>
 #include <QFileSystemModel>
 #include <QGroupBox>
+#include <QHBoxLayout>
 #include <QHeaderView>
 #include <QInputDialog>
+#include <QLineEdit>
 #include <QMessageBox>
+#include <QTimer>
 #include <QToolBar>
 #include <QTreeView>
 #include <QUrl>
 #include <QVBoxLayout>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/protocol/pb/command_deck_del.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_del_dir.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_download.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_new_dir.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_set_visibility.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_share_create.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_download.pb.h>
+#include <libcockatrice/protocol/pb/response_deck_share_create.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_upload.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/settings/network_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/utility/string_limits.h>
+
+namespace
+{
+// How long to wait after the last visibility change before reading back the
+// Public/Private column, in milliseconds.
+constexpr int VISIBILITY_REFRESH_DELAY = 500;
+} // namespace
 
 TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
                                AbstractClient *_client,
@@ -92,8 +111,34 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     serverDirView = new RemoteDeckList_TreeWidget(client);
 
     connect(serverDirView, &QTreeView::doubleClicked, this, &TabDeckStorage::actRemoteDoubleClick);
+    connect(serverDirView->selectionModel(), &QItemSelectionModel::selectionChanged, this,
+            [this] { onServerSelectionChanged(); });
+
+    // Share bar for creating a share link from the selected server decks/folders.
+    shareBar = new ShareBarWidget(this);
+    connect(shareBar, &ShareBarWidget::createRequested, this, &TabDeckStorage::actShareSelection);
+    connect(shareBar, &ShareBarWidget::cancelRequested, this, &TabDeckStorage::cancelShareDecks);
+    shareBar->setVisible(false);
+
+    shareTimeoutTimer = new QTimer(this);
+    shareTimeoutTimer->setSingleShot(true);
+    shareTimeoutTimer->setInterval(
+        static_cast<int>((static_cast<qint64>(SettingsCache::instance().network().getTimeOut()) + 1) *
+                         SettingsCache::instance().network().getKeepAlive() * 1000));
+    connect(shareTimeoutTimer, &QTimer::timeout, this, &TabDeckStorage::onShareFromTreeTimeout);
+
+    // Restartable single-shot refresh for the Public/Private column. It is
+    // armed with the full network timeout when a publish is sent (so a dropped
+    // reply still drains once) and re-armed with the short delay every time a
+    // reply lands, so the drain cannot fire while a slow round trip is still in
+    // flight. Either way the tree is re-read once things quiet down.
+    visibilityRefreshTimer = new QTimer(this);
+    visibilityRefreshTimer->setSingleShot(true);
+    visibilityRefreshTimer->setInterval(VISIBILITY_REFRESH_DELAY);
+    connect(visibilityRefreshTimer, &QTimer::timeout, this, &TabDeckStorage::onVisibilityRefreshTimeout);
 
     QVBoxLayout *rightVbox = new QVBoxLayout;
+    rightVbox->addWidget(shareBar);
     rightVbox->addWidget(serverDirView);
     rightVbox->addLayout(rightToolBarLayout);
     rightGroupBox = new QGroupBox;
@@ -139,6 +184,14 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     aDeleteRemoteDeck->setIcon(themePixmap(QStringLiteral("icons/remove_row")));
     connect(aDeleteRemoteDeck, &QAction::triggered, this, &TabDeckStorage::actDeleteRemoteDeck);
 
+    aShareDecks = new QAction(this);
+    aShareDecks->setIcon(themePixmap(QStringLiteral("icons/share")));
+    connect(aShareDecks, &QAction::triggered, this, &TabDeckStorage::actShareDecks);
+
+    aPublishDeck = new QAction(this);
+    aPublishDeck->setIcon(QPixmap("theme:icons/lock"));
+    connect(aPublishDeck, &QAction::triggered, this, &TabDeckStorage::actPublishDeck);
+
     // Add actions to toolbars
     leftToolBar->addAction(aOpenLocalDeck);
     leftToolBar->addAction(aRenameLocal);
@@ -150,6 +203,8 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
 
     rightToolBar->addAction(aOpenRemoteDeck);
     rightToolBar->addAction(aDownload);
+    rightToolBar->addAction(aShareDecks);
+    rightToolBar->addAction(aPublishDeck);
     rightToolBar->addAction(aNewFolder);
     rightToolBar->addAction(aDeleteRemoteDeck);
 
@@ -178,7 +233,13 @@ void TabDeckStorage::retranslateUi()
     aNewFolder->setText(tr("New folder"));
     aDeleteLocalDeck->setText(tr("Delete"));
     aDeleteRemoteDeck->setText(tr("Delete"));
+    aShareDecks->setText(tr("Share decks"));
+    aPublishDeck->setText(tr("Publish/unpublish deck"));
     aOpenDecksFolder->setText(tr("Open decks folder"));
+    shareBar->retranslateUi();
+    if (shareBar->isVisible()) {
+        onServerSelectionChanged();
+    }
 }
 
 QString TabDeckStorage::getTargetPath() const
@@ -211,6 +272,8 @@ void TabDeckStorage::handleConnected(const ServerInfo_User &userInfo)
 void TabDeckStorage::handleConnectionChanged(ClientStatus status)
 {
     if (status == StatusDisconnected) {
+        visibilityRefreshTimer->stop();
+        visibilityRefreshStarted = false;
         setRemoteEnabled(false);
     }
 }
@@ -220,12 +283,15 @@ void TabDeckStorage::setRemoteEnabled(bool enabled)
     aUpload->setEnabled(enabled);
     aOpenRemoteDeck->setEnabled(enabled);
     aDownload->setEnabled(enabled);
+    aShareDecks->setEnabled(enabled);
+    aPublishDeck->setEnabled(enabled);
     aNewFolder->setEnabled(enabled);
     aDeleteRemoteDeck->setEnabled(enabled);
 
     if (enabled) {
         serverDirView->refreshTree();
     } else {
+        setShareModeEnabled(false);
         serverDirView->clearTree();
     }
 }
@@ -346,6 +412,8 @@ void TabDeckStorage::uploadDeck(const QString &filePath, const QString &targetPa
     Command_DeckUpload cmd;
     cmd.set_path(targetPath.toStdString());
     cmd.set_deck_list(deckString.toStdString());
+
+    cmd.set_color_identity(getDeckColorIdentity(deck, CardDatabaseManager::query()).toStdString());
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &TabDeckStorage::uploadFinished);
@@ -625,4 +693,242 @@ void TabDeckStorage::deleteFolderFinished(const Response &response, const Comman
     if (toDelete) {
         serverDirView->removeNode(toDelete);
     }
+}
+
+void TabDeckStorage::actShareDecks()
+{
+    setShareModeEnabled(true);
+}
+
+void TabDeckStorage::cancelShareDecks()
+{
+    setShareModeEnabled(false);
+}
+
+void TabDeckStorage::setShareModeEnabled(bool enabled)
+{
+    shareBar->setVisible(enabled);
+    if (enabled) {
+        shareBar->setCreateEnabled(true);
+        shareBar->setName(tr("Shared decks"));
+        onServerSelectionChanged();
+        shareBar->focusName();
+    } else {
+        // Abandon any in-flight request: otherwise the timer keeps running and a late
+        // response reports the share as created after the user already backed out.
+        shareTimeoutTimer->stop();
+        shareInFlightSeq = 0;
+        serverDirView->clearSelection();
+    }
+}
+
+void TabDeckStorage::onServerSelectionChanged()
+{
+    if (!shareBar->isVisible()) {
+        return;
+    }
+    const auto selection = serverDirView->getCurrentSelection();
+    int folders = 0;
+    int files = 0;
+    for (const auto *node : selection) {
+        if (dynamic_cast<const RemoteDeckList_TreeModel::DirectoryNode *>(node)) {
+            ++folders;
+        } else {
+            ++files;
+        }
+    }
+
+    QString hint;
+    if (folders > 1) {
+        hint = tr("Only one folder can be shared at a time.");
+    } else if (folders > 0 && files > 0) {
+        hint = tr("Share either a folder or decks, not both.");
+    } else if (folders == 0 && files == 0) {
+        hint = tr("Select folders or decks in the tree to share.");
+    }
+    shareBar->setHintText(hint, !hint.isEmpty());
+
+    QStringList parts;
+    if (folders > 0) {
+        parts << tr("%n folder(s)", "", folders);
+    }
+    if (files > 0) {
+        parts << tr("%n deck(s)", "", files);
+    }
+    shareBar->setCountText(parts.isEmpty() ? tr("No decks selected")
+                                           : tr("Selected: %1").arg(parts.join(QStringLiteral(", "))));
+}
+
+void TabDeckStorage::actShareSelection()
+{
+    const auto selection = serverDirView->getCurrentSelection();
+    QString sharedFolder;
+    bool hasFile = false;
+    bool hasFolder = false;
+    for (const auto *node : selection) {
+        if (const auto *dirNode = dynamic_cast<const RemoteDeckList_TreeModel::DirectoryNode *>(node)) {
+            hasFolder = true;
+            if (!sharedFolder.isEmpty()) {
+                showShareNotice(tr("Only one folder can be shared at a time."), true);
+                return;
+            }
+            sharedFolder = dirNode->getPath();
+        } else {
+            hasFile = true;
+        }
+    }
+
+    if (hasFile && hasFolder) {
+        showShareNotice(tr("Share either a folder or decks, not both."), true);
+        return;
+    }
+    if (hasFolder && sharedFolder.isEmpty()) {
+        showShareNotice(tr("The root folder cannot be shared."), true);
+        return;
+    }
+
+    Command_DeckShareCreate cmd;
+    cmd.set_name(shareBar->name().toStdString());
+    if (cmd.name().empty()) {
+        cmd.set_name(tr("Shared decks").toStdString());
+    }
+
+    if (!sharedFolder.isEmpty()) {
+        cmd.set_folder_path(sharedFolder.toStdString());
+    } else {
+        for (const auto *node : selection) {
+            if (const auto *fileNode = dynamic_cast<const RemoteDeckList_TreeModel::FileNode *>(node)) {
+                DeckShareItem *item = cmd.add_items();
+                item->set_deck_id(fileNode->getId());
+            }
+        }
+    }
+
+    if (cmd.items_size() == 0 && cmd.folder_path().empty()) {
+        showShareNotice(tr("Select decks to share."), true);
+        return;
+    }
+
+    shareBar->setCreateEnabled(false);
+    const int seq = ++shareRequestSeq;
+    shareInFlightSeq = seq;
+    PendingCommand *pend = client->prepareSessionCommand(cmd);
+    connect(pend, &PendingCommand::finished, this,
+            [this, seq](const Response &response, const CommandContainer &commandContainer) {
+                if (shareInFlightSeq != seq) {
+                    return; // the user cancelled or a newer request superseded this one
+                }
+                shareInFlightSeq = 0;
+                shareFromTreeFinished(response, commandContainer);
+            });
+    client->sendCommand(pend);
+    shareTimeoutTimer->start();
+}
+
+void TabDeckStorage::shareFromTreeFinished(const Response &response, const CommandContainer & /*commandContainer*/)
+{
+    shareTimeoutTimer->stop();
+    shareBar->setCreateEnabled(true);
+    if (response.response_code() != Response::RespOk) {
+        qWarning() << "failed to create deck share:" << response.response_code();
+        showShareNotice(tr("Failed to create the share link (server response code %1).")
+                            .arg(QString::number(static_cast<int>(response.response_code()))),
+                        true);
+        return;
+    }
+    const DeckShareUtils::ShareResponse share = DeckShareUtils::handleShareResponse(client, response);
+
+    showShareNotice(
+        tr("Share link copied to the clipboard.\nExpires on %1.").arg(DeckShareUtils::formatShareExpiry(share.expiry)));
+    setShareModeEnabled(false);
+}
+
+void TabDeckStorage::showShareNotice(const QString &message, bool warning)
+{
+    QMessageBox box(warning ? QMessageBox::Warning : QMessageBox::Information, tr("Share link"), message,
+                    QMessageBox::Ok, this);
+    box.exec();
+}
+
+void TabDeckStorage::onShareFromTreeTimeout()
+{
+    if (shareInFlightSeq == 0) {
+        return; // share mode was left while the request was still outstanding
+    }
+    shareInFlightSeq = 0;
+    shareBar->setCreateEnabled(true);
+    showShareNotice(tr("The server did not respond in time. Try again."), true);
+}
+
+void TabDeckStorage::actPublishDeck()
+{
+    visibilityFailures.clear();
+    // Arm the drain with the full network timeout so a lost reply still costs
+    // one refresh instead of a dead column; each reply shrinks it to the short
+    // delay below, so a slow round trip is never drained before it lands.
+    const int visibilityFailSafeDelay =
+        static_cast<int>((static_cast<qint64>(SettingsCache::instance().network().getTimeOut()) + 1) *
+                         SettingsCache::instance().network().getKeepAlive() * 1000);
+
+    const auto selection = serverDirView->getCurrentSelection();
+    for (const auto *node : selection) {
+        Command_DeckSetVisibility cmd;
+        if (const auto *fileNode = dynamic_cast<const RemoteDeckList_TreeModel::FileNode *>(node)) {
+            cmd.set_deck_id(fileNode->getId());
+        } else if (const auto *dirNode = dynamic_cast<const RemoteDeckList_TreeModel::DirectoryNode *>(node)) {
+            const QString path = dirNode->getPath();
+            if (path.isEmpty()) {
+                continue; // the root folder cannot be published
+            }
+            cmd.set_folder_path(path.toStdString());
+        } else {
+            continue;
+        }
+        // Toggle the node's own visibility bit (what the server persists); the
+        // effective visibility shown by the column may additionally be inherited
+        // from a parent folder.
+        cmd.set_is_public(!node->isPublic());
+
+        PendingCommand *pend = client->prepareSessionCommand(cmd);
+        connect(pend, &PendingCommand::finished, this, &TabDeckStorage::setVisibilityFinished);
+        visibilityRefreshStarted = true;
+        visibilityRefreshTimer->setInterval(visibilityFailSafeDelay);
+        visibilityRefreshTimer->start();
+        client->sendCommand(pend);
+    }
+}
+
+void TabDeckStorage::setVisibilityFinished(const Response &r, const CommandContainer & /*commandContainer*/)
+{
+    if (r.response_code() == Response::RespOk) {
+        if (visibilityRefreshStarted) {
+            visibilityRefreshTimer->setInterval(VISIBILITY_REFRESH_DELAY);
+            visibilityRefreshTimer->start();
+        }
+        return;
+    }
+
+    // Collect batch failures and surface them once, when publishing quiets
+    // down, instead of stacking one modal dialog per rejected node.
+    const QString message = tr("Failed to change deck visibility on server (response code %1).")
+                                .arg(QString::number(static_cast<int>(r.response_code())));
+    if (visibilityRefreshStarted) {
+        visibilityFailures.append(message);
+        visibilityRefreshTimer->setInterval(VISIBILITY_REFRESH_DELAY);
+        visibilityRefreshTimer->start();
+    } else {
+        QMessageBox::critical(this, tr("Error"), message);
+    }
+}
+
+void TabDeckStorage::onVisibilityRefreshTimeout()
+{
+    visibilityRefreshStarted = false;
+    if (!visibilityFailures.isEmpty()) {
+        QMessageBox::critical(
+            this, tr("Error"),
+            tr("Failed to change the visibility of %n selected deck(s).", "", visibilityFailures.size()));
+        visibilityFailures.clear();
+    }
+    serverDirView->refreshTree();
 }

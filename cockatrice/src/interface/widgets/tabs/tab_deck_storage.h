@@ -11,6 +11,7 @@
 #include "../interface/widgets/server/remote/remote_decklist_tree_widget.h"
 #include "tab.h"
 
+#include <QStringList>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 
 struct LoadedDeck;
@@ -22,8 +23,10 @@ class QToolBar;
 class QTreeWidget;
 class QTreeWidgetItem;
 class QGroupBox;
+class QTimer;
 class CommandContainer;
 class Response;
+class ShareBarWidget;
 
 class TabDeckStorage : public Tab
 {
@@ -35,13 +38,24 @@ private:
     QToolBar *leftToolBar, *rightToolBar;
     RemoteDeckList_TreeWidget *serverDirView;
     QGroupBox *leftGroupBox, *rightGroupBox;
+    ShareBarWidget *shareBar;
+    QTimer *shareTimeoutTimer;
+    int shareRequestSeq = 0;
+    int shareInFlightSeq = 0;
 
     QAction *aOpenLocalDeck, *aRenameLocal, *aUpload, *aNewLocalFolder, *aDeleteLocalDeck;
     QAction *aOpenDecksFolder;
-    QAction *aOpenRemoteDeck, *aDownload, *aNewFolder, *aDeleteRemoteDeck;
+    QAction *aOpenRemoteDeck, *aDownload, *aShareDecks, *aPublishDeck, *aNewFolder, *aDeleteRemoteDeck;
+    bool visibilityRefreshStarted = false;
+    QTimer *visibilityRefreshTimer;
+    QStringList visibilityFailures;
     QString getTargetPath() const;
 
     void setRemoteEnabled(bool enabled);
+
+    void showShareNotice(const QString &message, bool warning = false);
+
+    void setShareModeEnabled(bool enabled);
 
     void uploadDeck(const QString &filePath, const QString &targetPath);
     void deleteRemoteDeck(const RemoteDeckList_TreeModel::Node *node);
@@ -74,6 +88,17 @@ private slots:
 
     void actNewFolder();
     void newFolderFinished(const Response &response, const CommandContainer &commandContainer);
+
+    void actShareDecks();
+    void actShareSelection();
+    void cancelShareDecks();
+    void onServerSelectionChanged();
+    void shareFromTreeFinished(const Response &r, const CommandContainer &commandContainer);
+    void onShareFromTreeTimeout();
+
+    void actPublishDeck();
+    void setVisibilityFinished(const Response &r, const CommandContainer &commandContainer);
+    void onVisibilityRefreshTimeout();
 
     void actDeleteRemoteDeck();
     void deleteFolderFinished(const Response &response, const CommandContainer &commandContainer);
