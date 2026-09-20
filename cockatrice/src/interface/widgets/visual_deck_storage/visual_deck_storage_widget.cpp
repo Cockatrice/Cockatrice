@@ -194,7 +194,9 @@ QStringList VisualDeckStorageWidget::selectedFilePaths() const
     if (folderWidget != nullptr) {
         const auto previews = folderWidget->findChildren<DeckPreviewWidget *>();
         for (DeckPreviewWidget *preview : previews) {
-            if (preview->isShareSelected()) {
+            // Filtered-out previews stay alive hidden in their sorted place, so only decks the
+            // user can actually see are part of the share.
+            if (preview->isVisible() && preview->isShareSelected()) {
                 selectedPaths.append(preview->filePath);
             }
         }

@@ -126,6 +126,11 @@ void VisualDeckStorageFolderDisplayWidget::continueDeckPass()
 
         const bool matches = index.data(VisualDeckStorageRoles::FilterMatchRole).toBool();
         deckPreviewWidget->setVisible(matches);
+        if (!matches) {
+            // A deck that no longer matches the filters is dropped from the selection so its
+            // highlight cannot linger on an invisible preview or be counted in the share.
+            deckPreviewWidget->setShareSelected(false);
+        }
         if (matches) {
             ++visibleDeckCount;
         }
