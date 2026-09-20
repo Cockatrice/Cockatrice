@@ -77,6 +77,8 @@ private:
     ShareBarWidget *shareBar;
     AbstractClient *client;
     QTimer *shareTimeoutTimer;
+    int shareRequestSeq = 0;
+    int shareInFlightSeq = 0;
     bool shareDeckAvailable = false;
 };
 
