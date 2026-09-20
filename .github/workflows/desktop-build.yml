@@ -204,7 +204,7 @@ jobs:
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "Delete remote compiler cache (ccache)"
-        if: github.ref == 'refs/heads/master' && steps.restore_ccache.outputs.cache-hit
+        if: github.ref == 'refs/heads/master' && steps.restore_ccache.outputs.cache-hit != 'true'
         continue-on-error: true
         env:
           CACHE_PRIMARY_KEY: ${{ steps.restore_ccache.outputs.cache-primary-key }}
@@ -460,7 +460,7 @@ jobs:
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "[macOS] Delete remote compiler cache (ccache)"
-        if: matrix.os == 'macOS' && matrix.use_ccache == 1 && github.ref == 'refs/heads/master' && steps.restore_ccache.outputs.cache-hit
+        if: matrix.os == 'macOS' && matrix.use_ccache == 1 && github.ref == 'refs/heads/master' && steps.restore_ccache.outputs.cache-hit != 'true'
         continue-on-error: true
         env:
           CACHE_PRIMARY_KEY: ${{ steps.restore_ccache.outputs.cache-primary-key }}
