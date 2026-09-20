@@ -675,6 +675,7 @@ if(WIN32)
     DIRECTORY "${CMAKE_BINARY_DIR}/cockatrice/"
     DESTINATION ./
     FILES_MATCHING
+    PATTERN "*.ini"
     PATTERN "CMakeFiles*" EXCLUDE
     PATTERN "*.dir*" EXCLUDE
     PATTERN "*_autogen*" EXCLUDE
@@ -684,7 +685,6 @@ if(WIN32)
     PATTERN ".qt*" EXCLUDE
     PATTERN ".qsb*" EXCLUDE
     PATTERN ".lupdate*" EXCLUDE
-    PATTERN "*.ini"
   )
 
   # Qt plugins: audio, iconengines, imageformats, multimedia, platforms, printsupport, styles, tls

@@ -344,6 +344,8 @@ if [[ $MAKE_PACKAGE ]]; then
       echo "::warning file=$0::7-Zip not found, skipping installer content check"
     else
       echo "Inspecting $package"
+      # Fail the build if the installer contains any path left behind by the MSBuild or
+      # Qt AUTOMOC tooling (build-tree artifacts must live in the build dir, not the install)
       if "$seven_zip" l "$package" |
         grep -E "_autogen|\.dir[\\/]|\.tlog|(^|[\\/])x64[\\/]|(^|[\\/])\.qt[\\/]|(^|[\\/])\.qsb[\\/]|(^|[\\/])\.lupdate[\\/]|CMakeFiles"; then
         echo "::error file=$0::Installer contains build-tree artifacts"
