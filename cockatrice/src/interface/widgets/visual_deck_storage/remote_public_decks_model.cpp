@@ -131,12 +131,23 @@ void RemotePublicDecksModel::refresh(const QString &userName)
     if (loading) {
         return;
     }
+    // Every refresh captures its own request id so a reply that lands after its
+    // loading timeout (the reverse of the ping sweep dropping the command) is
+    // recognised as stale: it must not stop the newer request's timer or paint
+    // the grid with out-of-date data.
+    const int seq = ++requestSequence;
     setLoading(true);
     loadingTimeoutTimer->start();
     Command_DeckListOtherUser cmd;
     cmd.set_user_name(userName.toStdString());
     PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, &PendingCommand::finished, this, &RemotePublicDecksModel::decksReceived);
+    connect(pend, &PendingCommand::finished, this,
+            [this, seq](const Response &response, const CommandContainer &commandContainer) {
+                if (seq != requestSequence) {
+                    return; // a newer refresh superseded this one
+                }
+                decksReceived(response, commandContainer);
+            });
     client->sendCommand(pend);
 }
 
