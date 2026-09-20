@@ -395,6 +395,7 @@ void AbstractTabDeckEditor::actShareDeck()
 
     const QSharedPointer<DeckList> deck = deckStateManager->getDeckListShared();
     if (deck->isBlankDeck()) {
+        QMessageBox::information(this, tr("Share deck"), tr("The deck is empty. Add cards before sharing it."));
         return;
     }
 
