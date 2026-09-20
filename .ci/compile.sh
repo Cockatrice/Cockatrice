@@ -327,4 +327,32 @@ if [[ $MAKE_PACKAGE ]]; then
     BUILD_DIR="$BUILD_DIR" .ci/name_build.sh "$PACKAGE_SUFFIX"
     echo "::endgroup::"
   fi
+
+  if [[ $RUNNER_OS == Windows ]]; then
+    echo "::group::Check installer for build-tree artifacts"
+    cd "$BUILD_DIR"
+    package="$(find . -maxdepth 1 -type f -name 'Cockatrice-*.exe' -print -quit)"
+    if [[ ! $package ]]; then
+      echo "::error file=$0::Could not find installer to inspect"
+      exit 1
+    fi
+    seven_zip="$(command -v 7z || true)"
+    if [[ ! $seven_zip ]]; then
+      seven_zip="/c/Program Files/7-Zip/7z.exe"
+    fi
+    if [[ ! -f $seven_zip ]]; then
+      echo "::warning file=$0::7-Zip not found, skipping installer content check"
+    else
+      echo "Inspecting $package"
+      # Fail the build if the installer contains any path left behind by the MSBuild or
+      # Qt AUTOMOC tooling (build-tree artifacts must live in the build dir, not the install)
+      if "$seven_zip" l "$package" |
+        grep -E "_autogen|\.dir[\\/]|\.tlog|(^|[\\/])x64[\\/]|(^|[\\/])\.qt[\\/]|(^|[\\/])\.qsb[\\/]|(^|[\\/])\.lupdate[\\/]|CMakeFiles"; then
+        echo "::error file=$0::Installer contains build-tree artifacts"
+        exit 1
+      fi
+      echo "Installer content is clean"
+    fi
+    echo "::endgroup::"
+  fi
 fi

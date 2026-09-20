@@ -656,18 +656,35 @@ if(WIN32)
   set(qtconf_dest_dir .)
 
   install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/"
+    DIRECTORY "$<TARGET_FILE_DIR:cockatrice>/"
     DESTINATION ./
     FILES_MATCHING
     PATTERN "*.dll"
+    PATTERN "*.pdb" EXCLUDE
+    PATTERN "*.dir*" EXCLUDE
+    PATTERN "*_autogen*" EXCLUDE
+    PATTERN "*.tlog*" EXCLUDE
+    PATTERN "CMakeFiles*" EXCLUDE
+    PATTERN "x64*" EXCLUDE
+    PATTERN ".qt*" EXCLUDE
+    PATTERN ".qsb*" EXCLUDE
+    PATTERN ".lupdate*" EXCLUDE
   )
 
   install(
     DIRECTORY "${CMAKE_BINARY_DIR}/cockatrice/"
     DESTINATION ./
     FILES_MATCHING
-    PATTERN "CMakeFiles" EXCLUDE
     PATTERN "*.ini"
+    PATTERN "CMakeFiles*" EXCLUDE
+    PATTERN "*.dir*" EXCLUDE
+    PATTERN "*_autogen*" EXCLUDE
+    PATTERN "*.tlog*" EXCLUDE
+    PATTERN "*.pdb" EXCLUDE
+    PATTERN "x64*" EXCLUDE
+    PATTERN ".qt*" EXCLUDE
+    PATTERN ".qsb*" EXCLUDE
+    PATTERN ".lupdate*" EXCLUDE
   )
 
   # Qt plugins: audio, iconengines, imageformats, multimedia, platforms, printsupport, styles, tls
@@ -720,10 +737,6 @@ Data = Resources\")
         "
     COMPONENT Runtime
   )
-
-  if(OPENSSL_FOUND)
-    install(FILES ${OPENSSL_INCLUDE_DIRS} DESTINATION ./)
-  endif()
 endif()
 
 if(Qt6LinguistTools_FOUND)

@@ -213,10 +213,19 @@ if(WIN32)
   list(APPEND libSearchDirs ${QT_LIBRARY_DIR})
 
   install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/"
+    DIRECTORY "$<TARGET_FILE_DIR:oracle>/"
     DESTINATION ./
     FILES_MATCHING
     PATTERN "*.dll"
+    PATTERN "*.pdb" EXCLUDE
+    PATTERN "*.dir*" EXCLUDE
+    PATTERN "*_autogen*" EXCLUDE
+    PATTERN "*.tlog*" EXCLUDE
+    PATTERN "CMakeFiles*" EXCLUDE
+    PATTERN "x64*" EXCLUDE
+    PATTERN ".qt*" EXCLUDE
+    PATTERN ".qsb*" EXCLUDE
+    PATTERN ".lupdate*" EXCLUDE
   )
 
   # Qt plugins: iconengines, platforms, styles, tls (Qt6)
