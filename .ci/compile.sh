@@ -333,7 +333,7 @@ if [[ $MAKE_PACKAGE ]]; then
     cd "$BUILD_DIR"
     package="$(find . -maxdepth 1 -type f -name 'Cockatrice-*.exe' -print -quit)"
     if [[ ! $package ]]; then
-      echo "::error file=$0::could not find installer to inspect"
+      echo "::error file=$0::Could not find installer to inspect"
       exit 1
     fi
     seven_zip="$(command -v 7z || true)"
@@ -346,10 +346,10 @@ if [[ $MAKE_PACKAGE ]]; then
       echo "Inspecting $package"
       if "$seven_zip" l "$package" |
         grep -E "_autogen|\.dir[\\/]|\.tlog|(^|[\\/])x64[\\/]|(^|[\\/])\.qt[\\/]|(^|[\\/])\.qsb[\\/]|(^|[\\/])\.lupdate[\\/]|CMakeFiles"; then
-        echo "::error file=$0::installer contains build-tree artifacts"
+        echo "::error file=$0::Installer contains build-tree artifacts"
         exit 1
       fi
-      echo "Installer content is clean."
+      echo "Installer content is clean"
     fi
     echo "::endgroup::"
   fi
