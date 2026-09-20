@@ -621,9 +621,6 @@ bool AbstractServerSocketInterface::deckListHelper(int folderId,
         const QString name = folderInfo.first;
         const bool ownPublic = folderInfo.second;
         const bool effectivePublic = inheritedPublic || ownPublic;
-        if (publicOnly && !effectivePublic) {
-            continue;
-        }
 
         ServerInfo_DeckStorage_TreeItem *newItem = folder->add_items();
         newItem->set_id(folderIdValue);
@@ -632,6 +629,10 @@ bool AbstractServerSocketInterface::deckListHelper(int folderId,
 
         if (!deckListHelper(newItem->id(), newItem->mutable_folder(), userId, effectivePublic, publicOnly)) {
             return false;
+        }
+
+        if (publicOnly && !effectivePublic && newItem->mutable_folder()->items_size() == 0) {
+            folder->mutable_items()->RemoveLast();
         }
     }
 
@@ -1033,11 +1034,15 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
         fileInfo->mutable_file()->set_is_public(cmd.has_is_public() && cmd.is_public());
         rc.setResponseExtension(re);
     } else if (cmd.has_deck_id()) {
-        QSqlQuery *query =
-            sqlInterface->prepareQuery("update {prefix}_decklist_files set name=:name, upload_time=NOW(), "
-                                       "content=:content, banner_card_name=:banner_card_name, "
-                                       "banner_card_provider=:banner_card_provider, color_identity=:color_identity, "
-                                       "tags=:tags where id = :id_deck and id_user = :id_user");
+        QString updateQuery = "update {prefix}_decklist_files set name=:name, upload_time=NOW(), content=:content, "
+                              "banner_card_name=:banner_card_name, banner_card_provider=:banner_card_provider, "
+                              "color_identity=:color_identity, tags=:tags";
+        if (cmd.has_is_public()) {
+            updateQuery += ", is_public=:is_public";
+        }
+        updateQuery += " where id = :id_deck and id_user = :id_user";
+
+        QSqlQuery *query = sqlInterface->prepareQuery(updateQuery);
         query->bindValue(":id_deck", cmd.deck_id());
         query->bindValue(":id_user", userInfo->id());
         query->bindValue(":name", deckName);
@@ -1046,6 +1051,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
         query->bindValue(":banner_card_provider", bannerCardProvider);
         query->bindValue(":color_identity", colorIdentity);
         query->bindValue(":tags", tagsJson);
+        if (cmd.has_is_public()) {
+            query->bindValue(":is_public", cmd.is_public() ? 1 : 0);
+        }
         if (!sqlInterface->execSqlQuery(query)) {
             return Response::RespContextError;
         }
@@ -1149,8 +1157,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareCreate(const C
                                                            "created_by = :created_by and created_at >= "
                                                            "DATE_SUB(NOW(), INTERVAL 1 DAY)");
         countQuery->bindValue(":created_by", userInfo->id());
-        if (sqlInterface->execSqlQuery(countQuery) && countQuery->next() &&
-            countQuery->value(0).toInt() >= maxSharesPerDay) {
+        if (!sqlInterface->execSqlQuery(countQuery) || !countQuery->next()) {
+            return Response::RespContextError;
+        }
+        if (countQuery->value(0).toInt() >= maxSharesPerDay) {
             return Response::RespTooManyRequests;
         }
     }
@@ -1185,25 +1195,26 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareCreate(const C
 
         // Drain the deck list before resolving each deck: getDeckFromDatabase
         // issues its own query on the same cached statement set.
-        QSqlQuery *query = sqlInterface->prepareQuery("select id from {prefix}_decklist_files where id_folder = "
-                                                      ":id_folder and id_user = :id_user");
+        QSqlQuery *query =
+            sqlInterface->prepareQuery("select id, color_identity from {prefix}_decklist_files where id_folder = "
+                                       ":id_folder and id_user = :id_user");
         query->bindValue(":id_folder", folderId);
         query->bindValue(":id_user", userInfo->id());
         if (!sqlInterface->execSqlQuery(query)) {
             return Response::RespContextError;
         }
-        QList<int> deckIds;
+        QList<std::pair<int, QString>> deckRows;
         while (query->next()) {
-            deckIds.append(query->value(0).toInt());
+            deckRows.append({query->value(0).toInt(), query->value(1).toString()});
         }
-        for (const int deckId : deckIds) {
+        for (const auto &[deckId, colorIdentity] : deckRows) {
             DeckList *deck;
             try {
                 deck = sqlInterface->getDeckFromDatabase(deckId, userInfo->id());
             } catch (Response::ResponseCode &r) {
                 return r;
             }
-            items.append(makeShareItemFromDeck(*deck, QString()));
+            items.append(makeShareItemFromDeck(*deck, colorIdentity));
             delete deck;
         }
     } else {

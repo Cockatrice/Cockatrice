@@ -1224,7 +1224,8 @@ bool Servatrice_DatabaseInterface::getDeckSharesForUser(int userId, QList<DeckSh
 
     QSqlQuery *query = prepareQuery("select s.id, s.name, UNIX_TIMESTAMP(s.created_at), "
                                     "UNIX_TIMESTAMP(s.expires_at), count(i.id) from {prefix}_deck_share s left join "
-                                    "{prefix}_deck_share_item i on i.share_id = s.id where s.created_by = :created_by "
+                                    "{prefix}_deck_share_item i on i.share_id = s.id "
+                                    "where s.created_by = :created_by and s.expires_at > now() "
                                     "group by s.id, s.name, s.created_at, s.expires_at order by s.created_at desc");
     query->bindValue(":created_by", userId);
     if (!execSqlQuery(query)) {

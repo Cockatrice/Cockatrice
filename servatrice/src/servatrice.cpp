@@ -1082,7 +1082,7 @@ int Servatrice::getServerStatusUpdateTime() const
 
 int Servatrice::getDeckShareExpiryDays() const
 {
-    return settingsCache->value("deck_share/expiry_days", 7).toInt();
+    return qMax(1, settingsCache->value("deck_share/expiry_days", 7).toInt());
 }
 
 int Servatrice::getDeckShareCleanupInterval() const
@@ -1098,8 +1098,7 @@ int Servatrice::getDeckShareMaxDecksPerShare() const
 
 int Servatrice::getDeckShareMaxSharesPerDay() const
 {
-    // default: no limit
-    return settingsCache->value("deck_share/max_shares_per_day", 0).toInt();
+    return settingsCache->value("deck_share/max_shares_per_day", 50).toInt();
 }
 
 int Servatrice::getNumberOfTCPPools() const
