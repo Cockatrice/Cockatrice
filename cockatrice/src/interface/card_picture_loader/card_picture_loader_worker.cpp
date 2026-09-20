@@ -107,6 +107,14 @@ QNetworkReply *CardPictureLoaderWorker::makeRequest(const QUrl &url, CardPicture
     // Check for cached redirects
     QUrl cachedRedirect = getCachedRedirect(url);
     if (!cachedRedirect.isEmpty()) {
+        // The redirect target is a different host, which may itself be in 429 backoff; hand the
+        // entry back to its worker so it waits the backoff out instead of dispatching straight
+        // onto the backed-off host.
+        if (CardPictureLoaderWorkerWork::rateLimiter().isRateLimited(cachedRedirect.host(),
+                                                                     QDateTime::currentDateTime())) {
+            worker->scheduleDeferredRetry(cachedRedirect.host());
+            return nullptr;
+        }
         emit imageRequestSucceeded(url);
         return makeRequest(cachedRedirect, worker);
     }
@@ -143,10 +151,10 @@ void CardPictureLoaderWorker::resetRequestQuota()
         }
     }
 
-    for (const auto &request : requestLoadQueue) {
-        const QString host = request.first.host();
-        hostQuotaRemaining.insert(host, hostRequestQuota.value(host, MAX_REQUESTS_PER_SEC));
-    }
+    // Forget the per-second allowances; each host's allowance is re-seeded lazily from its
+    // reduced sustained quota the first time it is dispatched in the new second, so a host that
+    // enters the queue mid-second no longer falls through to a fresh full quota.
+    hostQuotaRemaining.clear();
 
     updateTimerState();
 }
@@ -212,14 +220,28 @@ void CardPictureLoaderWorker::updateTimerState()
 
 bool CardPictureLoaderWorker::processSingleRequest()
 {
+    QDateTime now = QDateTime::currentDateTime();
     for (int i = 0; i < requestLoadQueue.size(); ++i) {
         const auto &request = requestLoadQueue.at(i);
-        QString host = request.first.host();
-        int allowance = hostQuotaRemaining.value(host, MAX_REQUESTS_PER_SEC);
+        const QString host = request.first.host();
+        // Don't dispatch requests to a host that is currently in its 429 backoff; hand the entry
+        // back to its worker so it can wait the backoff out or fall through to another source,
+        // instead of leaving it parked in the queue with no reply pending.
+        if (CardPictureLoaderWorkerWork::rateLimiter().isRateLimited(host, now)) {
+            auto entry = requestLoadQueue.takeAt(i);
+            entry.second->startNextPicDownload();
+            return true;
+        }
+        // Seed the allowance now so a host that was rate limited gets its reduced
+        // allowance instead of a fresh full quota mid-second.
+        if (!hostQuotaRemaining.contains(host)) {
+            hostQuotaRemaining.insert(host, hostRequestQuota.value(host, MAX_REQUESTS_PER_SEC));
+        }
+        int allowance = hostQuotaRemaining.value(host);
         if (allowance > 0) {
             hostQuotaRemaining.insert(host, allowance - 1);
-            makeRequest(request.first, request.second);
-            requestLoadQueue.removeAt(i);
+            auto entry = requestLoadQueue.takeAt(i);
+            makeRequest(entry.first, entry.second);
             return true;
         }
     }
