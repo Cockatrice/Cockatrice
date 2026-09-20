@@ -18,9 +18,9 @@ namespace
 {
 void applyCardSearchLanguage(CardSearchModel *searchModel)
 {
-    const auto &cardsDisplay = SettingsCache::instance().cardsDisplay();
-    searchModel->setSearchLanguage(cardsDisplay.getCardLang(),
-                                   static_cast<SearchLanguageMode>(cardsDisplay.getCardSearchLanguage()));
+    const CardsDisplaySettings &cardsDisplay = SettingsCache::instance().cardsDisplay();
+    searchModel->setSearchLanguage(CardSearchLanguage{
+        cardsDisplay.getCardLang(), static_cast<SearchLanguageMode>(cardsDisplay.getCardSearchLanguage())});
 }
 } // namespace
 

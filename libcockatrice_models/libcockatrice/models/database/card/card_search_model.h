@@ -27,13 +27,12 @@ public:
 
     void updateSearchResults(const QString &query); // Update results based on input
 
-    void setSearchLanguage(const QString &searchLang, SearchLanguageMode mode)
+    void setSearchLanguage(const CardSearchLanguage &searchLang)
     {
-        if (searchLanguage == searchLang && searchLanguageMode == mode) {
+        if (searchLanguage == searchLang) {
             return;
         }
         searchLanguage = searchLang;
-        searchLanguageMode = mode;
     }
 
 private:
@@ -45,8 +44,7 @@ private:
 
     CardDatabaseDisplayModel *sourceModel;
     QList<SearchResult> searchResults;
-    QString searchLanguage;
-    SearchLanguageMode searchLanguageMode = SearchLanguageMode::English;
+    CardSearchLanguage searchLanguage;
 };
 
 #endif // CARD_SEARCH_MODEL_H

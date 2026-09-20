@@ -33,8 +33,7 @@ private:
     FilterString *filterString;
     int loadedRowCount;
     QTimer dirtyTimer;
-    QString searchLanguage;
-    SearchLanguageMode searchLanguageMode = SearchLanguageMode::English;
+    CardSearchLanguage searchLanguage;
     QString searchText;
 
     /** The translation table that will be used for sanitizeCardName. */
@@ -65,7 +64,7 @@ public:
         cardNameSet = _cardNameSet;
         dirty();
     }
-    void setSearchLanguage(const QString &searchLang, SearchLanguageMode mode);
+    void setSearchLanguage(const CardSearchLanguage &searchLang);
 
     void dirty()
     {

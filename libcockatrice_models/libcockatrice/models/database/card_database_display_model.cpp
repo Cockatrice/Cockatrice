@@ -179,7 +179,7 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
     }
 
     if (filterString != nullptr) {
-        if (filterTree != nullptr && !filterTree->acceptsCard(info, searchLanguage, searchLanguageMode)) {
+        if (filterTree != nullptr && !filterTree->acceptsCard(info, searchLanguage)) {
             return false;
         }
         return filterString->check(info);
@@ -190,10 +190,14 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
 
 bool CardDatabaseDisplayModel::rowMatchesCardName(CardInfoPtr info) const
 {
-    if (!cardName.isEmpty() && !info->getName().contains(cardName, Qt::CaseInsensitive) &&
-        searchLanguageMode != SearchLanguageMode::English && !searchLanguage.isEmpty() && searchLanguage != "en" &&
-        !info->getLocalizedName(searchLanguage).contains(cardName, Qt::CaseInsensitive)) {
-        return false;
+    if (!cardName.isEmpty()) {
+        const bool matchesEnglish = info->getName().contains(cardName, Qt::CaseInsensitive);
+        const bool matchesLocalized =
+            !searchLanguage.isEnglishOnly() &&
+            info->getLocalizedName(searchLanguage.language).contains(cardName, Qt::CaseInsensitive);
+        if (!matchesEnglish && !matchesLocalized) {
+            return false;
+        }
     }
 
     if (!cardNameSet.isEmpty() && !cardNameSet.contains(info->getName())) {
@@ -201,7 +205,7 @@ bool CardDatabaseDisplayModel::rowMatchesCardName(CardInfoPtr info) const
     }
 
     if (filterTree != nullptr) {
-        return filterTree->acceptsCard(info, searchLanguage, searchLanguageMode);
+        return filterTree->acceptsCard(info, searchLanguage);
     }
 
     return true;
@@ -241,18 +245,17 @@ void CardDatabaseDisplayModel::setStringFilter(const QString &_src)
 {
     searchText = _src;
     delete filterString;
-    filterString = new FilterString(_src, searchLanguage, searchLanguageMode);
+    filterString = new FilterString(_src, searchLanguage);
     dirty();
 }
 
-void CardDatabaseDisplayModel::setSearchLanguage(const QString &searchLang, SearchLanguageMode mode)
+void CardDatabaseDisplayModel::setSearchLanguage(const CardSearchLanguage &searchLang)
 {
-    if (searchLanguage == searchLang && searchLanguageMode == mode) {
+    if (searchLanguage == searchLang) {
         return;
     }
 
     searchLanguage = searchLang;
-    searchLanguageMode = mode;
 
     if (filterString != nullptr) {
         setStringFilter(searchText);

@@ -68,8 +68,8 @@ void CardSearchModel::updateSearchResults(const QString &query)
         // The completer suggestions match against the same languages the card
         // search uses, so typing a localized name finds the card.
         QString matchName = card->getName();
-        if (searchLanguageMode != SearchLanguageMode::English && !searchLanguage.isEmpty() && searchLanguage != "en") {
-            matchName = card->getLocalizedName(searchLanguage);
+        if (searchLanguage.mode != SearchLanguageMode::English && !searchLanguage.isEnglishOnly()) {
+            matchName = card->getLocalizedName(searchLanguage.language);
         }
         const QString lowerName = matchName.toLower();
         if (!lowerName.contains(lowerQuery)) {
@@ -88,9 +88,9 @@ void CardSearchModel::updateSearchResults(const QString &query)
     auto sortByDistanceThenLength = [this](const SearchResult &a, const SearchResult &b) {
         QString nameA = a.card->getName();
         QString nameB = b.card->getName();
-        if (searchLanguageMode != SearchLanguageMode::English && !searchLanguage.isEmpty() && searchLanguage != "en") {
-            nameA = a.card->getLocalizedName(searchLanguage);
-            nameB = b.card->getLocalizedName(searchLanguage);
+        if (searchLanguage.mode != SearchLanguageMode::English && !searchLanguage.isEnglishOnly()) {
+            nameA = a.card->getLocalizedName(searchLanguage.language);
+            nameB = b.card->getLocalizedName(searchLanguage.language);
         }
         if (a.distance != b.distance) {
             return a.distance < b.distance;

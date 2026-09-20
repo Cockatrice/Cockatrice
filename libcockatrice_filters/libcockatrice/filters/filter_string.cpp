@@ -80,34 +80,27 @@ static std::once_flag init;
 // and OracleQuery rule actions through this thread-local context, which is live only
 // while a FilterString is being parsed. The rule actions copy it into the filter
 // closures they produce, so card evaluation never reads process-global state.
-struct SearchLanguageContext
-{
-    QString searchLanguage;
-    SearchLanguageMode searchLanguageMode = SearchLanguageMode::English;
-};
-thread_local SearchLanguageContext searchLanguageContext;
+thread_local CardSearchLanguage searchLanguageContext;
 
 namespace
 {
 bool matchesInSearchLanguage(const QString &english,
                              const QString &localized,
-                             const QString &searchLanguage,
-                             SearchLanguageMode searchLanguageMode,
+                             const CardSearchLanguage &searchLanguage,
                              const StringMatcher &matcher)
 {
-    if (searchLanguageMode == SearchLanguageMode::English) {
+    if (searchLanguage.mode == SearchLanguageMode::English) {
         return matcher(english);
     }
 
-    if (searchLanguageMode == SearchLanguageMode::Both && matcher(english)) {
-        return true;
-    }
-
-    if (searchLanguage.isEmpty() || searchLanguage == "en") {
+    if (searchLanguage.mode == SearchLanguageMode::Both) {
+        if (!searchLanguage.isEnglishOnly() && matcher(localized)) {
+            return true;
+        }
         return matcher(english);
     }
 
-    return matcher(localized);
+    return searchLanguage.isEnglishOnly() ? matcher(english) : matcher(localized);
 }
 } // namespace
 
@@ -370,11 +363,10 @@ static void setupParserRules()
 
     search["OracleQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         const auto matcher = std::any_cast<StringMatcher>(sv[0]);
-        const QString searchLanguage = searchLanguageContext.searchLanguage;
-        const SearchLanguageMode searchLanguageMode = searchLanguageContext.searchLanguageMode;
+        const CardSearchLanguage searchLanguage = searchLanguageContext;
         return [=](const CardData &x) {
-            return matchesInSearchLanguage(x->getText(), x->getLocalizedText(searchLanguage), searchLanguage,
-                                           searchLanguageMode, matcher);
+            return matchesInSearchLanguage(x->getText(), x->getLocalizedText(searchLanguage.language), searchLanguage,
+                                           matcher);
         };
     };
 
@@ -452,11 +444,10 @@ static void setupParserRules()
     };
     search["GenericQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         const auto matcher = std::any_cast<StringMatcher>(sv[0]);
-        const QString searchLanguage = searchLanguageContext.searchLanguage;
-        const SearchLanguageMode searchLanguageMode = searchLanguageContext.searchLanguageMode;
+        const CardSearchLanguage searchLanguage = searchLanguageContext;
         return [=](const CardData &x) {
-            return matchesInSearchLanguage(x->getName(), x->getLocalizedName(searchLanguage), searchLanguage,
-                                           searchLanguageMode, matcher);
+            return matchesInSearchLanguage(x->getName(), x->getLocalizedName(searchLanguage.language), searchLanguage,
+                                           matcher);
         };
     };
 
@@ -472,7 +463,7 @@ FilterString::FilterString()
     _error = "Not initialized";
 }
 
-FilterString::FilterString(const QString &expr, const QString &searchLanguage, SearchLanguageMode searchLanguageMode)
+FilterString::FilterString(const QString &expr, const CardSearchLanguage &searchLanguage)
 {
     QByteArray ba = expr.simplified().toUtf8();
 
@@ -485,7 +476,7 @@ FilterString::FilterString(const QString &expr, const QString &searchLanguage, S
         return;
     }
 
-    searchLanguageContext = SearchLanguageContext{searchLanguage, searchLanguageMode};
+    searchLanguageContext = searchLanguage;
 
     search.set_logger([&](size_t /*ln*/, size_t col, const std::string &msg) {
         _error = QString("Error at position %1: %2").arg(col).arg(QString::fromStdString(msg));

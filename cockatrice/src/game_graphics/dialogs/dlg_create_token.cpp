@@ -92,8 +92,8 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
 
     CardsDisplaySettings *cardsDisplay = &SettingsCache::instance().cardsDisplay();
     const auto applyCardSearchLanguage = [this, cardsDisplay]() {
-        cardDatabaseDisplayModel->setSearchLanguage(
-            cardsDisplay->getCardLang(), static_cast<SearchLanguageMode>(cardsDisplay->getCardSearchLanguage()));
+        cardDatabaseDisplayModel->setSearchLanguage(CardSearchLanguage{
+            cardsDisplay->getCardLang(), static_cast<SearchLanguageMode>(cardsDisplay->getCardSearchLanguage())});
     };
     applyCardSearchLanguage();
     connect(cardsDisplay, &CardsDisplaySettings::cardLangChanged, this, applyCardSearchLanguage);

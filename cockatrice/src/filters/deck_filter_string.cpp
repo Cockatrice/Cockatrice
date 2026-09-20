@@ -47,12 +47,7 @@ static std::once_flag init;
 // per-instance state. The card language that the nested [[card name]] search matches
 // against is passed through this thread-local context, which is live only while a
 // DeckFilterString is being parsed, and copied into the nested FilterString closures.
-struct DeckSearchLanguageContext
-{
-    QString searchLanguage;
-    SearchLanguageMode searchLanguageMode = SearchLanguageMode::English;
-};
-thread_local DeckSearchLanguageContext deckSearchLanguageContext;
+thread_local CardSearchLanguage deckSearchLanguageContext;
 
 static void setupParserRules()
 {
@@ -127,9 +122,7 @@ static void setupParserRules()
 
     // actual functionality
     search["DeckContentQuery"] = [](const peg::SemanticValues &sv) -> DeckFilter {
-        const QString searchLanguage = deckSearchLanguageContext.searchLanguage;
-        const SearchLanguageMode searchLanguageMode = deckSearchLanguageContext.searchLanguageMode;
-        auto cardFilter = FilterString(std::any_cast<QString>(sv[0]), searchLanguage, searchLanguageMode);
+        auto cardFilter = FilterString(std::any_cast<QString>(sv[0]), deckSearchLanguageContext);
         auto numberMatcher = sv.size() > 1 ? std::any_cast<NumberMatcher>(sv[1]) : [](int count) { return count > 0; };
 
         return [=](const DeckSearchData &data) -> bool {
@@ -199,9 +192,7 @@ DeckFilterString::DeckFilterString()
     _error = "Not initialized";
 }
 
-DeckFilterString::DeckFilterString(const QString &expr,
-                                   const QString &searchLanguage,
-                                   SearchLanguageMode searchLanguageMode)
+DeckFilterString::DeckFilterString(const QString &expr, const CardSearchLanguage &searchLanguage)
 {
     QByteArray ba = expr.simplified().toUtf8();
 
@@ -214,7 +205,7 @@ DeckFilterString::DeckFilterString(const QString &expr,
         return;
     }
 
-    deckSearchLanguageContext = DeckSearchLanguageContext{searchLanguage, searchLanguageMode};
+    deckSearchLanguageContext = searchLanguage;
 
     search.set_logger([&](size_t /*ln*/, size_t col, const std::string &msg) {
         _error = QString("Error at position %1: %2").arg(col).arg(QString::fromStdString(msg));

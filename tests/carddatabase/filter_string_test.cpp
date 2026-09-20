@@ -84,42 +84,42 @@ CardInfoPtr localizedCat()
 TEST_F(CardQuery, SearchLanguageEnglishMatchesOnlyEnglish)
 {
     const CardData localized = localizedCat();
-    ASSERT_TRUE(FilterString("Cat", "de", SearchLanguageMode::English).check(localized));
-    ASSERT_FALSE(FilterString("Kater", "de", SearchLanguageMode::English).check(localized));
+    ASSERT_TRUE(FilterString("Cat", CardSearchLanguage{"de", SearchLanguageMode::English}).check(localized));
+    ASSERT_FALSE(FilterString("Kater", CardSearchLanguage{"de", SearchLanguageMode::English}).check(localized));
 }
 
 TEST_F(CardQuery, SearchLanguageSelectedMatchesLocalizedNameAndText)
 {
     const CardData localized = localizedCat();
-    ASSERT_TRUE(FilterString("Kater", "de", SearchLanguageMode::Selected).check(localized));
-    ASSERT_TRUE(FilterString("o:miaut", "de", SearchLanguageMode::Selected).check(localized));
-    ASSERT_FALSE(FilterString("Cat", "de", SearchLanguageMode::Selected).check(localized));
+    ASSERT_TRUE(FilterString("Kater", CardSearchLanguage{"de", SearchLanguageMode::Selected}).check(localized));
+    ASSERT_TRUE(FilterString("o:miaut", CardSearchLanguage{"de", SearchLanguageMode::Selected}).check(localized));
+    ASSERT_FALSE(FilterString("Cat", CardSearchLanguage{"de", SearchLanguageMode::Selected}).check(localized));
 }
 
 TEST_F(CardQuery, SearchLanguageSelectedFallsBackToEnglishForUntranslatedCards)
 {
     const CardData localized = localizedCat();
-    ASSERT_TRUE(FilterString("Cat", "fr", SearchLanguageMode::Selected).check(localized));
-    ASSERT_FALSE(FilterString("Kater", "fr", SearchLanguageMode::Selected).check(localized));
+    ASSERT_TRUE(FilterString("Cat", CardSearchLanguage{"fr", SearchLanguageMode::Selected}).check(localized));
+    ASSERT_FALSE(FilterString("Kater", CardSearchLanguage{"fr", SearchLanguageMode::Selected}).check(localized));
 }
 
 TEST_F(CardQuery, SearchLanguageBothMatchesEitherLanguage)
 {
     const CardData localized = localizedCat();
-    ASSERT_TRUE(FilterString("Cat", "de", SearchLanguageMode::Both).check(localized));
-    ASSERT_TRUE(FilterString("Kater", "de", SearchLanguageMode::Both).check(localized));
+    ASSERT_TRUE(FilterString("Cat", CardSearchLanguage{"de", SearchLanguageMode::Both}).check(localized));
+    ASSERT_TRUE(FilterString("Kater", CardSearchLanguage{"de", SearchLanguageMode::Both}).check(localized));
 }
 
 TEST_F(CardQuery, SearchLanguageIsBoundPerInstance)
 {
     const CardData localized = localizedCat();
 
-    FilterString germanQuery("Kater", "de", SearchLanguageMode::Selected);
+    FilterString germanQuery("Kater", CardSearchLanguage{"de", SearchLanguageMode::Selected});
     ASSERT_TRUE(germanQuery.check(localized));
 
     // Constructing an English-bound instance afterwards must not change the
     // language the earlier instance searches in.
-    FilterString englishQuery("Kater", "", SearchLanguageMode::English);
+    FilterString englishQuery("Kater", CardSearchLanguage{"", SearchLanguageMode::English});
     ASSERT_FALSE(englishQuery.check(localized));
     ASSERT_TRUE(germanQuery.check(localized));
 }

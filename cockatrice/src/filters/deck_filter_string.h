@@ -36,9 +36,7 @@ class DeckFilterString
 {
 public:
     DeckFilterString();
-    explicit DeckFilterString(const QString &expr,
-                              const QString &searchLanguage = QString(),
-                              SearchLanguageMode searchLanguageMode = SearchLanguageMode::English);
+    explicit DeckFilterString(const QString &expr, const CardSearchLanguage &searchLanguage = {});
     bool check(const DeckSearchData &data) const
     {
         return filter(data);

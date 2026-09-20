@@ -257,8 +257,9 @@ ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, Ca
 void ZoneViewZone::setFilterString(const QString &_filterString)
 {
     const CardsDisplaySettings &cardsDisplay = SettingsCache::instance().cardsDisplay();
-    filterString = FilterString(_filterString, cardsDisplay.getCardLang(),
-                                static_cast<SearchLanguageMode>(cardsDisplay.getCardSearchLanguage()));
+    filterString = FilterString(
+        _filterString, CardSearchLanguage{cardsDisplay.getCardLang(),
+                                          static_cast<SearchLanguageMode>(cardsDisplay.getCardSearchLanguage())});
     reorganizeCards();
 }
 
