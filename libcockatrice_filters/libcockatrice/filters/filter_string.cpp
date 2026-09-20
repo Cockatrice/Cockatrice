@@ -20,7 +20,7 @@ SomewhatComplexQueryPart <- [(] QueryPartList [)] / QueryPart
 QueryPart <- NotQuery / SetQuery / RarityQuery / CMCQuery / FormatQuery / PowerQuery / ToughnessQuery / ColorQuery / TypeQuery / OracleQuery / FieldQuery / GenericQuery
 
 NotQuery <- ('NOT' ws/'-') SomewhatComplexQueryPart
-SetQuery <- ('e'/'set') SetExpression / ([:] FlexStringValue)
+SetQuery <- ('e'/'set') ([=:] FlexStringValue) / ('e'/'set') (<[!][=]?> FlexStringValue) / ('e'/'set') SetExpression
 OracleQuery <- 'o' [:] MatcherString
 
 
@@ -104,13 +104,22 @@ static void setupParserRules()
         return [=](const CardData &x) -> bool { return matcher(x->getCardType()); };
     };
     search["SetQuery"] = [](const peg::SemanticValues &sv) -> Filter {
-        if (sv.choice() == 1) {
+        if (sv.choice() == 0) {
             auto matcher = std::any_cast<StringMatcher>(sv[0]);
             return [=](const CardData &x) -> bool {
                 QList<QString> sets = x->getSets().keys();
 
                 auto matchesSet = [&matcher](const QString &set) { return matcher(set); };
                 return std::any_of(sets.begin(), sets.end(), matchesSet);
+            };
+        }
+        if (sv.choice() == 1) {
+            auto matcher = std::any_cast<StringMatcher>(sv[0]);
+            return [=](const CardData &x) -> bool {
+                QList<QString> sets = x->getSets().keys();
+
+                auto matchesSet = [&matcher](const QString &set) { return matcher(set); };
+                return std::none_of(sets.begin(), sets.end(), matchesSet);
             };
         }
 
