@@ -127,10 +127,11 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
                          SettingsCache::instance().network().getKeepAlive() * 1000));
     connect(shareTimeoutTimer, &QTimer::timeout, this, &TabDeckStorage::onShareFromTreeTimeout);
 
-    // Restartable single-shot refresh for the Public/Private column. A dropped
-    // visibility reply must not leave the widget permanently stale, so the tree
-    // is re-read whenever publishes quiet down instead of waiting on a count
-    // that can get stuck above zero.
+    // Restartable single-shot refresh for the Public/Private column. It is
+    // armed with the full network timeout when a publish is sent (so a dropped
+    // reply still drains once) and re-armed with the short delay every time a
+    // reply lands, so the drain cannot fire while a slow round trip is still in
+    // flight. Either way the tree is re-read once things quiet down.
     visibilityRefreshTimer = new QTimer(this);
     visibilityRefreshTimer->setSingleShot(true);
     visibilityRefreshTimer->setInterval(VISIBILITY_REFRESH_DELAY);
@@ -862,6 +863,13 @@ void TabDeckStorage::onShareFromTreeTimeout()
 void TabDeckStorage::actPublishDeck()
 {
     visibilityFailures.clear();
+    // Arm the drain with the full network timeout so a lost reply still costs
+    // one refresh instead of a dead column; each reply shrinks it to the short
+    // delay below, so a slow round trip is never drained before it lands.
+    const int visibilityFailSafeDelay =
+        static_cast<int>((static_cast<qint64>(SettingsCache::instance().network().getTimeOut()) + 1) *
+                         SettingsCache::instance().network().getKeepAlive() * 1000);
+
     const auto selection = serverDirView->getCurrentSelection();
     for (const auto *node : selection) {
         Command_DeckSetVisibility cmd;
@@ -884,6 +892,7 @@ void TabDeckStorage::actPublishDeck()
         PendingCommand *pend = client->prepareSessionCommand(cmd);
         connect(pend, &PendingCommand::finished, this, &TabDeckStorage::setVisibilityFinished);
         visibilityRefreshStarted = true;
+        visibilityRefreshTimer->setInterval(visibilityFailSafeDelay);
         visibilityRefreshTimer->start();
         client->sendCommand(pend);
     }
@@ -893,6 +902,7 @@ void TabDeckStorage::setVisibilityFinished(const Response &r, const CommandConta
 {
     if (r.response_code() == Response::RespOk) {
         if (visibilityRefreshStarted) {
+            visibilityRefreshTimer->setInterval(VISIBILITY_REFRESH_DELAY);
             visibilityRefreshTimer->start();
         }
         return;
@@ -904,6 +914,7 @@ void TabDeckStorage::setVisibilityFinished(const Response &r, const CommandConta
                                 .arg(QString::number(static_cast<int>(r.response_code())));
     if (visibilityRefreshStarted) {
         visibilityFailures.append(message);
+        visibilityRefreshTimer->setInterval(VISIBILITY_REFRESH_DELAY);
         visibilityRefreshTimer->start();
     } else {
         QMessageBox::critical(this, tr("Error"), message);
