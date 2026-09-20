@@ -470,7 +470,7 @@ jobs:
             echo "Cache deleted successfully"
           fi
 
-      - name: "[macOS] Cache updated compiler cache (ccache)"
+      - name: "[macOS] Save updated compiler cache (ccache)"
         if: matrix.os == 'macOS' && matrix.use_ccache == 1 && github.ref == 'refs/heads/master'
         uses: actions/cache/save@v6
         with:
