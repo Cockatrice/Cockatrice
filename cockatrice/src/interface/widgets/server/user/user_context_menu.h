@@ -37,6 +37,7 @@ private:
     QAction *aUserName;
     QAction *aDetails;
     QAction *aShowGames;
+    QAction *aViewPublicDecks;
     QAction *aChat;
     QAction *aAddToBuddyList, *aRemoveFromBuddyList;
     QAction *aAddToIgnoreList, *aRemoveFromIgnoreList;
@@ -111,6 +112,7 @@ public:
     void execInvite(const QString &userName);
     void execDetails(const QString &userName);
     void execShowGames(const QString &userName);
+    void execViewPublicDecks(const QString &userName);
     void execAddToBuddy(const QString &userName);
     void execRemoveFromBuddy(const QString &userName);
     void execAddToIgnore(const QString &userName);
