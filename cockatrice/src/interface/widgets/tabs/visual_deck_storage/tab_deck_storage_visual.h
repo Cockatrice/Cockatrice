@@ -74,7 +74,7 @@ private:
 
     VisualDeckStorageWidget *visualDeckStorageWidget;
 
-    ShareBarWidget *shareBar;
+    ShareBarWidget *shareBar = nullptr;
     AbstractClient *client;
     QTimer *shareTimeoutTimer;
     int shareRequestSeq = 0;

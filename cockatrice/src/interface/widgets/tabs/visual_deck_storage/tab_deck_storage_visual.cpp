@@ -38,10 +38,6 @@ TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor, Abstra
         }
     });
 
-    connect(client, &AbstractClient::statusChanged, this, &TabDeckStorageVisual::handleConnectionChanged);
-    shareDeckAvailable = (client->getStatus() == StatusLoggedIn);
-    visualDeckStorageWidget->setShareAvailable(shareDeckAvailable);
-
     auto *widget = new QWidget(this);
     auto *layout = new QVBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -56,6 +52,10 @@ TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor, Abstra
 
     layout->insertWidget(0, shareBar);
     shareBar->setVisible(false);
+
+    connect(client, &AbstractClient::statusChanged, this, &TabDeckStorageVisual::handleConnectionChanged);
+    shareDeckAvailable = (client->getStatus() == StatusLoggedIn);
+    visualDeckStorageWidget->setShareAvailable(shareDeckAvailable);
 
     shareTimeoutTimer->setSingleShot(true);
     shareTimeoutTimer->setInterval(
