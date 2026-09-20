@@ -86,7 +86,7 @@ public slots:
      */
     QNetworkReply *makeRequest(const QUrl &url, CardPictureLoaderWorkerWork *workThread);
 
-    /** @brief Starts the pacing timers if there is queued work, stops them when the queue is empty. */
+    /** @brief Ensures the pacing and quota-reset timers reflect the current queue and recovery state. */
     void processQueuedRequests();
 
     /** @brief Chooses a request from the queue and starts it, respecting the quota and pacing. */
@@ -141,6 +141,9 @@ private:
 
     /** @brief Removes stale redirect entries older than TTL. */
     void cleanStaleEntries();
+
+    /** @brief Starts or stops the pacing and quota-reset timers to match the queue and recovery state. */
+    void updateTimerState();
 
 private slots:
     /** @brief Resets the request quota for rate-limiting. */
