@@ -346,7 +346,8 @@ void ChatView::appendMessage(QString message,
                 // against the user list to turn their history entries into full user
                 // tags (correct level, name casing and moderation context menu).
                 QString displayName = sentBy;
-                QString levelMarker = "_"; // placeholder for offline / unknown user level
+                // Offline users have no known level; render them as zero-level tags.
+                QString levelMarker = "0";
                 if (const ServerInfo_User *onlineUser = userListProxy->getOnlineUser(sentBy)) {
                     displayName = QString::fromStdString(onlineUser->name());
                     levelMarker = QString::number(onlineUser->user_level());
