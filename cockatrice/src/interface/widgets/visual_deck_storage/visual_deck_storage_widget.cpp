@@ -49,7 +49,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     connect(refreshButton, &QPushButton::clicked, this, &VisualDeckStorageWidget::refreshIfPossible);
 
     shareButton = new QToolButton(this);
-    shareButton->setIcon(QPixmap("theme:icons/share"));
+    shareButton->setIcon(themePixmap(QStringLiteral("icons/share")));
     shareButton->setFixedSize(32, 32);
     shareButton->setVisible(false);
     connect(shareButton, &QPushButton::clicked, this, &VisualDeckStorageWidget::shareRequested);

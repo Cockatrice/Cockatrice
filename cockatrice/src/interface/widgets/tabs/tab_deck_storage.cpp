@@ -165,7 +165,7 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     connect(aDeleteRemoteDeck, &QAction::triggered, this, &TabDeckStorage::actDeleteRemoteDeck);
 
     aShareDecks = new QAction(this);
-    aShareDecks->setIcon(QPixmap("theme:icons/share"));
+    aShareDecks->setIcon(themePixmap(QStringLiteral("icons/share")));
     connect(aShareDecks, &QAction::triggered, this, &TabDeckStorage::actShareDecks);
 
     // Add actions to toolbars
