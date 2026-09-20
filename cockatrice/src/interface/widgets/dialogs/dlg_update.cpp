@@ -243,13 +243,22 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
     // Try to open the installer. If it opens, quit Cockatrice
     if (process.startDetached()) {
         qCInfo(DlgUpdateLog) << "Opened downloaded update file successfully - closing Cockatrice";
-        // Close the main window synchronously so settings are saved and file locks are released
-        // before the NSIS installer (already launched) starts replacing files, then quit the
-        // application for real in case the close was suppressed (e.g. by a pending prompt).
+        // Close the main window synchronously so file locks are released before the NSIS installer
+        // (already launched) starts replacing files. This also flushes settings and shuts down the
+        // tabs, but only when the close is actually accepted: MainWindow may veto it for a running
+        // card DB update, an open game, or an unsaved deck. In that case keep running so the user
+        // can resolve the blocker, and tell them the installer is already waiting.
         if (auto *window = qobject_cast<MainWindow *>(parent())) {
-            window->close();
+            if (window->close()) {
+                QTimer::singleShot(0, qApp, &QCoreApplication::quit);
+            } else {
+                QMessageBox::warning(this, tr("Update"),
+                                     tr("The update installer is already running and will finish the update once "
+                                        "Cockatrice closes. Cockatrice is still busy, so it stays open for now."));
+            }
+        } else {
+            QTimer::singleShot(0, qApp, &QCoreApplication::quit);
         }
-        QTimer::singleShot(0, qApp, &QCoreApplication::quit);
         close();
     } else {
         setLabel(tr("Error"));
