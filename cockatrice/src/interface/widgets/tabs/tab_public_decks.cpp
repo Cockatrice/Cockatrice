@@ -90,6 +90,7 @@ TabPublicDecks::TabPublicDecks(TabSupervisor *_tabSupervisor, AbstractClient *_c
     connect(model, &QAbstractItemModel::modelReset, this, &TabPublicDecks::rebuildGrid);
     connect(model, &RemotePublicDecksModel::loadingChanged, this, &TabPublicDecks::updateLoadingState);
     connect(model, &RemotePublicDecksModel::loadFailed, this, [this](const QString &message) {
+        lastFailureMessage = message;
         statusLabel->setText(message);
         statusLabel->setVisible(true);
         flowWidget->setVisible(false);
@@ -127,9 +128,18 @@ void TabPublicDecks::retranslateUi()
     refreshButton->setToolTip(tr("Refresh"));
     refreshButton->setAccessibleName(tr("Refresh"));
     quickSettingsWidget->setToolTip(tr("Public Decks Settings"));
-    // Re-show the status so a visible loading message picks up the new language
-    // instead of staying stale; if nothing is shown it just stays hidden.
-    updateLoadingState(model->isLoading());
+    // Re-show whatever the status label is showing so a language change picks up
+    // the new language or, for a failure message, at least does not hide it.
+    if (model->isLoading()) {
+        updateLoadingState(true);
+    } else if (!lastFailureMessage.isEmpty()) {
+        statusLabel->setText(lastFailureMessage);
+        statusLabel->setVisible(true);
+        flowWidget->setVisible(false);
+        emptyLabel->setVisible(false);
+    } else {
+        updateLoadingState(false);
+    }
     emit tabTextChanged(this, getTabText());
 }
 
@@ -182,6 +192,9 @@ void TabPublicDecks::updateTagsVisibility(bool visible)
 void TabPublicDecks::updateLoadingState(bool loading)
 {
     if (loading) {
+        // A new attempt is under way, so the previously shown failure, if any,
+        // no longer describes the current state.
+        lastFailureMessage.clear();
         statusLabel->setText(tr("Loading public decks…"));
         statusLabel->setVisible(true);
         flowWidget->setVisible(false);

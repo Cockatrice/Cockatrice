@@ -73,6 +73,7 @@ private:
     QLabel *titleLabel;
     QLabel *statusLabel;
     QLabel *emptyLabel;
+    QString lastFailureMessage; ///< Last load-failure text, re-shown on retranslate.
     int cardSize = 100;
 };
 
