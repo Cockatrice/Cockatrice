@@ -109,7 +109,10 @@ ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
     ensureThemeDirectoryExists();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
     connect(QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged, this, [this] {
-        defaultPalette = qApp->palette();
+        // Reload so scheme-qualified assets and palettes follow the OS, but do
+        // NOT recapture defaultPalette: qApp->palette() already carries the
+        // currently-applied theme palette at this point, so recapturing it
+        // would contaminate the base for every later theme switch.
         themeChangedSlot();
     });
 #endif
