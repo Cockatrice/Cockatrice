@@ -327,6 +327,27 @@ Function EnsureAppsNotRunning
     Call WaitForAppToClose
 FunctionEnd
 
+; Sets $R0 to 1 if $INSTDIR looks like an existing Cockatrice install (any of
+; the three executables or a previous uninstaller is present). Used to guard
+; the stale-runtime-DLL purge so a first-time install into a pre-existing
+; directory with an unrelated "Plugins" folder is never touched, while an
+; install that only ever held e.g. servatrice.exe is still purged.
+Function IsExistingCockatriceInstall
+    StrCpy $R0 0
+    ${If} ${FileExists} "$INSTDIR\cockatrice.exe"
+        StrCpy $R0 1
+    ${EndIf}
+    ${If} ${FileExists} "$INSTDIR\oracle.exe"
+        StrCpy $R0 1
+    ${EndIf}
+    ${If} ${FileExists} "$INSTDIR\servatrice.exe"
+        StrCpy $R0 1
+    ${EndIf}
+    ${If} ${FileExists} "$INSTDIR\uninstall.exe"
+        StrCpy $R0 1
+    ${EndIf}
+FunctionEnd
+
 ; Uninstaller copies of the same routines (the uninstaller gets its own
 ; function set compiled in, it cannot call the installer functions).
 Function un.IsAppRunning
@@ -522,6 +543,8 @@ ${AndIf} ${FileExists} "$INSTDIR\portable.dat"
 	Delete "$INSTDIR\Qt*.dll"
 	Delete "$INSTDIR\libmysql.dll"
 	Delete "$INSTDIR\icu*.dll"
+	Delete "$INSTDIR\libcrypto*.dll"
+	Delete "$INSTDIR\libssl*.dll"
 	Delete "$INSTDIR\libeay32.dll"
 	Delete "$INSTDIR\ssleay32.dll"
 	Delete "$INSTDIR\qt.conf"
@@ -539,8 +562,9 @@ ${EndIf}
 ; located in the dynamic link library ...Qt6Network.dll" after an update.
 Call EnsureAppsNotRunning
 
+Call IsExistingCockatriceInstall
 ${If} $PortableMode = 0
-${AndIf} ${FileExists} "$INSTDIR\cockatrice.exe"
+${AndIf} $R0 = 1
 	RMDir /r "$INSTDIR\Plugins"
 	Delete "$INSTDIR\Qt*.dll"
 	Delete "$INSTDIR\libcrypto*.dll"
