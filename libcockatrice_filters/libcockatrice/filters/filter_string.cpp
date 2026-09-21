@@ -20,7 +20,8 @@ SomewhatComplexQueryPart <- [(] QueryPartList [)] / QueryPart
 QueryPart <- NotQuery / SetQuery / RarityQuery / CMCQuery / FormatQuery / PowerQuery / ToughnessQuery / ColorQuery / TypeQuery / OracleQuery / FieldQuery / GenericQuery
 
 NotQuery <- ('NOT' ws/'-') SomewhatComplexQueryPart
-SetQuery <- ('e'/'set') ([=:] FlexStringValue) / ('e'/'set') (<[!][=]?> FlexStringValue) / ('e'/'set') SetExpression
+SetQuery <- ('e'/'set') SetQueryValue
+SetQueryValue <- ([=:] FlexStringValue) / (<[!][=]?> FlexStringValue) / SetExpression
 OracleQuery <- 'o' [:] MatcherString
 
 
@@ -103,7 +104,7 @@ static void setupParserRules()
         const auto matcher = std::any_cast<StringMatcher>(sv[0]);
         return [=](const CardData &x) -> bool { return matcher(x->getCardType()); };
     };
-    search["SetQuery"] = [](const peg::SemanticValues &sv) -> Filter {
+    search["SetQueryValue"] = [](const peg::SemanticValues &sv) -> Filter {
         if (sv.choice() == 0) {
             auto matcher = std::any_cast<StringMatcher>(sv[0]);
             return [=](const CardData &x) -> bool {

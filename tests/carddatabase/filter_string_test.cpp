@@ -3,6 +3,7 @@
 
 #include "gtest/gtest.h"
 #include <libcockatrice/card/card_info.h>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/printing/printing_info.h>
 #include <libcockatrice/filters/filter_string.h>
 #include <libcockatrice/interfaces/noop_card_preference_provider.h>
@@ -95,9 +96,18 @@ protected:
                                        CardSet::PriorityPrimary);
         commanderSet = CardSet::newInstance(&controller, "EOC", "Edge of Eternities Commander", "commander",
                                             sharedReleaseDate, CardSet::PrioritySecondary);
+        oldSet = CardSet::newInstance(&controller, "OLD", "Older Set", "expansion", QDate(2020, 1, 1),
+                                      CardSet::PriorityPrimary);
 
         inBothSets = newCardWithPrintings({{"EOE", mainSet}, {"EOC", commanderSet}});
         onlyInCommanderSet = newCardWithPrintings({{"EOC", commanderSet}});
+        onlyInOldSet = newCardWithPrintings({{"OLD", oldSet}});
+
+        // SetExpression resolves set codes to release dates through the global set list.
+        auto *database = CardDatabaseManager::getInstance();
+        database->addSet(mainSet);
+        database->addSet(commanderSet);
+        database->addSet(oldSet);
     }
 
     CardInfoPtr newCardWithPrintings(const QList<QPair<QString, CardSetPtr>> &printings)
@@ -112,8 +122,10 @@ protected:
     NoopCardSetPriorityController controller;
     CardSetPtr mainSet;
     CardSetPtr commanderSet;
+    CardSetPtr oldSet;
     CardInfoPtr inBothSets;
     CardInfoPtr onlyInCommanderSet;
+    CardInfoPtr onlyInOldSet;
 };
 
 TEST_F(SetQuery, ExactMatchSeparatesSameDaySets)
@@ -136,6 +148,15 @@ TEST_F(SetQuery, NotEqualsMatchesPrintingsOutsideTheSet)
 {
     EXPECT_FALSE(FilterString("set!EOE").check(inBothSets));
     EXPECT_TRUE(FilterString("set!EOE").check(onlyInCommanderSet));
+}
+
+TEST_F(SetQuery, ComparisonMatchesByReleaseDate)
+{
+    // OLD (2020) predates EOE/EOC (2026-03-13), so comparison operators still use release dates.
+    EXPECT_TRUE(FilterString("set<EOE").check(onlyInOldSet));
+    EXPECT_FALSE(FilterString("set>EOE").check(onlyInOldSet));
+    EXPECT_TRUE(FilterString("set>=EOE").check(inBothSets));
+    EXPECT_FALSE(FilterString("set<EOE").check(inBothSets));
 }
 
 int main(int argc, char **argv)
