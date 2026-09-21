@@ -249,14 +249,17 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
         // card DB update, an open game, or an unsaved deck, and closeForUpdate() also reports a
         // close already in progress (reached from a nested event loop while a shutdown prompt is
         // up). Only quit when the shutdown really ran - otherwise keep running so the user can
-        // resolve the blocker, and tell them the installer is already waiting.
+        // resolve the blocker, and warn them that the installer only waits about a minute
+        // before it terminates the application to finish the update.
         if (auto *window = qobject_cast<MainWindow *>(parent())) {
             if (window->closeForUpdate()) {
                 QTimer::singleShot(0, qApp, [] { QCoreApplication::exit(0); });
             } else {
                 QMessageBox::warning(this, tr("Update"),
-                                     tr("The update installer is already running and will finish the update once "
-                                        "Cockatrice closes. Cockatrice is still busy, so it stays open for now."));
+                                     tr("The update installer is already running and will terminate "
+                                        "Cockatrice within the next minute to finish the update. "
+                                        "Cockatrice is still busy, so save your work and close it "
+                                        "yourself before then."));
             }
         } else {
             QTimer::singleShot(0, qApp, [] { QCoreApplication::exit(0); });
