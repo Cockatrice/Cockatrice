@@ -132,11 +132,17 @@ ${EndIf}
 Call SetModeDestinationFromInstdir
 
 ; Make sure no application instance is still running (and holding file locks)
-; before the previous version is uninstalled or new files are installed.
-; On a silent update (/R /S) running processes are asked to close gracefully
-; and waited for, then force-closed only on timeout. On interactive installs
-; the user is prompted to close them instead.
-Call EnsureAppsNotRunning
+; before the previous version is uninstalled. On a silent update (/R /S) the
+; running processes are asked to close gracefully and waited for; if they
+; refuse to close the update is aborted rather than force-killing them (data
+; loss, e.g. an unsaved deck). On interactive installs the user is prompted
+; to close them instead.
+; Only needed this early for /R, where AutoUninstallIfNeeded runs below; for
+; interactive installs the section re-checks after the directory page, when
+; $INSTDIR is the directory the user actually picked.
+${If} $ReinstallMode = 1
+    Call EnsureAppsNotRunning
+${EndIf}
 
 ${If} $ReinstallMode = 1
 ${AndIf} $PortableMode = 0
