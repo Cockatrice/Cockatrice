@@ -69,6 +69,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
                                         SettingsCache::instance().cardsDisplay().getVisualDatabaseDisplayCardSize());
     connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance().cardsDisplay(),
             &CardsDisplaySettings::setVisualDatabaseDisplayCardSize);
+    cardSizeWidget->enableCtrlScrollResize(flowWidget);
 
     searchContainer = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
 

@@ -54,6 +54,7 @@ EdhrecApiResponseCardDetailsDisplayWidget::EdhrecApiResponseCardDetailsDisplayWi
                 &CardInfoPictureWidget::setScaleFactor);
         connect(this, &EdhrecApiResponseCardDetailsDisplayWidget::requestUrl, parentTab,
                 &TabEdhRecMain::actNavigatePage);
+        parentTab->getCardSizeSlider()->enableCtrlScrollResize(this);
     }
 }
 
