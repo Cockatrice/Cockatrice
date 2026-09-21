@@ -95,9 +95,11 @@ struct PaletteColorInfo
 
 static QString usableDefaultStyle(const QString &style)
 {
-    // The Windows 11 native style is broken: when the OS default
-    // ("System" theme selection) would use it, fall back to the Vista style.
-    // Explicitly choosing "windows11" in a theme is still honored.
+    // The Windows 11 native style is broken: dragging cards across zones can
+    // shrink the board to a tiny grey window that is unfixable without
+    // rejoining. It is never usable, so guard against it no matter how it was
+    // requested (OS default or an explicit "windows11" theme choice) and fall
+    // back to the Vista style.
     return style.compare("windows11", Qt::CaseInsensitive) == 0 ? QStringLiteral("windowsvista") : style;
 }
 
@@ -409,6 +411,10 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
             styleName = usableDefaultStyle(defaultStyleName);
         }
     }
+
+    // The Windows 11 style is broken even when selected explicitly in a theme,
+    // so sanitize the resolved name here rather than trusting the theme config.
+    styleName = usableDefaultStyle(styleName);
 
     QStyle *style = QStyleFactory::create(styleName);
     if (!style) {
