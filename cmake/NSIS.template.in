@@ -279,16 +279,19 @@ Function WaitForAppToClose
         ; ask the application to close gracefully (WM_CLOSE), then wait for it to exit
         DetailPrint "Closing $R1 ..."
         Call CloseMatchingApps
-        StrCpy $R8 0
+        ; wall-clock deadline: each poll has to spawn a fresh powershell.exe, so
+        ; a bare loop counter would not bound the real wait time to 60 s.
+        ${GetTickCount} $R8
         ck_wait_loop:
         Sleep 500
-        IntOp $R8 $R8 + 1
         Call IsAppRunning
         ${If} $R0 = 0
             DetailPrint "$R1 closed."
             Return
         ${EndIf}
-        ${If} $R8 < 60
+        ${GetTickCount} $R9
+        IntOp $R9 $R9 - $R8
+        ${If} $R9 < 60000
             Goto ck_wait_loop
         ${EndIf}
         ; give up waiting, force close
@@ -366,16 +369,19 @@ Function un.WaitForAppToClose
     ${If} ${Silent}
         DetailPrint "Closing $R1 ..."
         Call un.CloseMatchingApps
-        StrCpy $R8 0
+        ; wall-clock deadline: each poll has to spawn a fresh powershell.exe, so
+        ; a bare loop counter would not bound the real wait time to 60 s.
+        ${GetTickCount} $R8
         un_ck_wait_loop:
         Sleep 500
-        IntOp $R8 $R8 + 1
         Call un.IsAppRunning
         ${If} $R0 = 0
             DetailPrint "$R1 closed."
             Return
         ${EndIf}
-        ${If} $R8 < 60
+        ${GetTickCount} $R9
+        IntOp $R9 $R9 - $R8
+        ${If} $R9 < 60000
             Goto un_ck_wait_loop
         ${EndIf}
         DetailPrint "Force closing $R1 ..."
