@@ -87,6 +87,8 @@ const QString CardFilter::attrName(Attr a)
             return tr("Loyalty");
         case AttrFormat:
             return tr("Format");
+        case AttrTag:
+            return tr("Tag");
         case AttrMainType:
             return tr("Main Type");
         case AttrSubType:
