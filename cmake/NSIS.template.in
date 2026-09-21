@@ -298,6 +298,15 @@ Function WaitForAppToClose
         DetailPrint "Force closing $R1 ..."
         Call ForceCloseMatchingApps
         Sleep 500
+        ; verify the force close actually worked; a process that cannot be
+        ; terminated (e.g. one owned by another user session) would otherwise
+        ; leave locked files that silently reproduce the very mixed-Qt-DLL bug
+        ; this guard exists to prevent.
+        Call IsAppRunning
+        ${If} $R0 = 1
+            DetailPrint "WARNING: $R1 is still running; aborting before any files are replaced."
+            Abort
+        ${EndIf}
     ${Else}
         ck_wait_prompt:
         MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
@@ -387,6 +396,15 @@ Function un.WaitForAppToClose
         DetailPrint "Force closing $R1 ..."
         Call un.ForceCloseMatchingApps
         Sleep 500
+        ; verify the force close actually worked; a process that cannot be
+        ; terminated (e.g. one owned by another user session) would otherwise
+        ; leave locked files that silently reproduce the very mixed-Qt-DLL bug
+        ; this guard exists to prevent.
+        Call un.IsAppRunning
+        ${If} $R0 = 1
+            DetailPrint "WARNING: $R1 is still running; aborting before any files are replaced."
+            Abort
+        ${EndIf}
     ${Else}
         un_ck_wait_prompt:
         MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
