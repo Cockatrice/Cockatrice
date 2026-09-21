@@ -252,14 +252,14 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
         // resolve the blocker, and tell them the installer is already waiting.
         if (auto *window = qobject_cast<MainWindow *>(parent())) {
             if (window->closeForUpdate()) {
-                QTimer::singleShot(0, qApp, &QCoreApplication::quit);
+                QTimer::singleShot(0, qApp, [] { QCoreApplication::exit(0); });
             } else {
                 QMessageBox::warning(this, tr("Update"),
                                      tr("The update installer is already running and will finish the update once "
                                         "Cockatrice closes. Cockatrice is still busy, so it stays open for now."));
             }
         } else {
-            QTimer::singleShot(0, qApp, &QCoreApplication::quit);
+            QTimer::singleShot(0, qApp, [] { QCoreApplication::exit(0); });
         }
         close();
     } else {
