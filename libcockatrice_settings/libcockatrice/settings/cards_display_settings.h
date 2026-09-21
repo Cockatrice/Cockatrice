@@ -29,6 +29,7 @@ public:
     [[nodiscard]] int getVisualDeckStorageCardSize() const override;
     [[nodiscard]] int getVisualDatabaseDisplayCardSize() const override;
     [[nodiscard]] int getVisualDeckEditorCardSize() const override;
+    [[nodiscard]] bool getVisualDeckEditorShowCardCounts() const override;
     [[nodiscard]] int getEDHRecCardSize() const override;
     [[nodiscard]] int getArchidektPreviewSize() const override;
     [[nodiscard]] int getSampleHandSize() const override;
@@ -52,6 +53,7 @@ public:
     void setVisualDeckStorageCardSize(int _cardSize);
     void setVisualDatabaseDisplayCardSize(int _cardSize);
     void setVisualDeckEditorCardSize(int _cardSize);
+    void setVisualDeckEditorShowCardCounts(bool _showCardCounts);
     void setEDHRecCardSize(int _edhrecCardSize);
     void setArchidektPreviewCardSize(int _archidektPreviewCardSize);
     void setSampleHandSize(int _sampleHandSize);
@@ -70,6 +72,7 @@ signals:
     void visualDeckStorageCardSizeChanged();
     void visualDatabaseDisplayCardSizeChanged();
     void visualDeckEditorCardSizeChanged();
+    void visualDeckEditorShowCardCountsChanged(bool showCardCounts);
     void edhRecCardSizeChanged();
     void archidektPreviewSizeChanged();
     void sampleHandSizeChanged(int amount);

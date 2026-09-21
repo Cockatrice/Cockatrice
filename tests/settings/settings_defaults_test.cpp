@@ -538,6 +538,21 @@ TEST_F(SettingsDefaultsTest, CardsDisplay_VisualDeckEditorCardSize_Default)
     ASSERT_EQ(s.getVisualDeckEditorCardSize(), 100);
 }
 
+TEST_F(SettingsDefaultsTest, CardsDisplay_VisualDeckEditorShowCardCounts_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getVisualDeckEditorShowCardCounts(), true);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_VisualDeckEditorShowCardCounts_SetAndGet)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    s.setVisualDeckEditorShowCardCounts(false);
+    ASSERT_EQ(s.getVisualDeckEditorShowCardCounts(), false);
+    s.setVisualDeckEditorShowCardCounts(true);
+    ASSERT_EQ(s.getVisualDeckEditorShowCardCounts(), true);
+}
+
 TEST_F(SettingsDefaultsTest, CardsDisplay_EDHRecCardSize_Default)
 {
     CardsDisplaySettings s(settingsPath, nullptr);

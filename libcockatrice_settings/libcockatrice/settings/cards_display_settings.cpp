@@ -90,6 +90,11 @@ int CardsDisplaySettings::getVisualDeckEditorCardSize() const
     return getValue("visualDeckEditor", "cards", "cardSize", 100).toInt();
 }
 
+bool CardsDisplaySettings::getVisualDeckEditorShowCardCounts() const
+{
+    return getValue("visualDeckEditorShowCardCounts", QString(), QString(), true).toBool();
+}
+
 int CardsDisplaySettings::getEDHRecCardSize() const
 {
     return getValue("edhrec", "cards", "cardSize", 100).toInt();
@@ -215,6 +220,15 @@ void CardsDisplaySettings::setVisualDeckEditorCardSize(int _cardSize)
 {
     setValue(_cardSize, "visualDeckEditor", "cards", "cardSize");
     emit visualDeckEditorCardSizeChanged();
+}
+
+void CardsDisplaySettings::setVisualDeckEditorShowCardCounts(bool _showCardCounts)
+{
+    if (_showCardCounts == getVisualDeckEditorShowCardCounts()) {
+        return;
+    }
+    setValue(_showCardCounts, "visualDeckEditorShowCardCounts");
+    emit visualDeckEditorShowCardCountsChanged(_showCardCounts);
 }
 
 void CardsDisplaySettings::setEDHRecCardSize(int _edhrecCardSize)
