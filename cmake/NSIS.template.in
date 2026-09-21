@@ -225,12 +225,17 @@ FunctionEnd
 ;        as accepted by Get-Process -Name), call this, result in $R0
 ;        (1 = running from $INSTDIR, 0 = not running)
 Function IsAppRunning
-    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { $$_.Path -like $\'$INSTDIR\*$\' } | Select-Object -First 1"'
+    ; Exit the process explicitly so nsExec's pop reflects whether a matching
+    ; process was found: powershell.exe exits 0 whether or not the pipeline
+    ; produced objects. Any other result (exit 1, or nsExec's "error" string
+    ; when powershell itself cannot be started) is treated as "running" so the
+    ; lock guard fails closed.
+    nsExec::ExecToLog 'powershell -NoProfile -Command "if (Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { $$_.Path -like $\'$INSTDIR\*$\' } | Select-Object -First 1) { exit 1 } else { exit 0 }"'
     Pop $R0
-    ${If} $R0 = 0
-        StrCpy $R0 1
-    ${Else}
+    ${If} $R0 == "0"
         StrCpy $R0 0
+    ${Else}
+        StrCpy $R0 1
     ${EndIf}
 FunctionEnd
 
