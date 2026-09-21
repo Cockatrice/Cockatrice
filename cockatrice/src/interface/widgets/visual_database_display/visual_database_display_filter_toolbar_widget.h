@@ -17,6 +17,7 @@ class VisualDatabaseDisplayMainTypeFilterWidget;
 class VisualDatabaseDisplayNameFilterWidget;
 class VisualDatabaseDisplaySetFilterWidget;
 class VisualDatabaseDisplaySubTypeFilterWidget;
+class VisualDatabaseDisplayTagFilterWidget;
 
 class VisualDatabaseDisplayFilterToolbarWidget : public FlowWidget
 {
@@ -54,6 +55,8 @@ private:
     VisualDatabaseDisplaySetFilterWidget *setFilterWidget;
     SettingsButtonWidget *quickFilterFormatLegalityWidget;
     VisualDatabaseDisplayFormatLegalityFilterWidget *formatLegalityWidget;
+    SettingsButtonWidget *quickFilterTagWidget;
+    VisualDatabaseDisplayTagFilterWidget *tagFilterWidget;
 
     int fullWidthHint = 0;
     void updateCompactMode(int availableWidth);
