@@ -92,10 +92,7 @@ jobs:
             args=()
             [[ $prerelease == yes ]] && args+=(--prerelease)
 
-            gh release create "$tag_name" \
-              --verify-tag \
-              --draft \
-              "${args[@]}" \
+            gh release create "$tag_name" --verify-tag --draft "${args[@]}" \
               --target "$target" \
               --title "$release_name" \
               --notes-file "$body_path"
