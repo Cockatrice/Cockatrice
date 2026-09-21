@@ -78,6 +78,9 @@ VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidg
     quickFilterFormatLegalityWidget = new SettingsButtonWidget(this);
     quickFilterFormatLegalityWidget->setButtonIcon(themePixmap(QStringLiteral("icons/scale_balanced")));
 
+    quickFilterTagWidget = new SettingsButtonWidget(this);
+    quickFilterTagWidget->setButtonIcon(themePixmap(QStringLiteral("icons/tags")));
+
     retranslateUi();
 }
 
@@ -102,6 +105,7 @@ void VisualDatabaseDisplayFilterToolbarWidget::initialize()
     formatLegalityWidget = new VisualDatabaseDisplayFormatLegalityFilterWidget(this, filterModel);
     subTypeFilterWidget = new VisualDatabaseDisplaySubTypeFilterWidget(this, filterModel);
     setFilterWidget = new VisualDatabaseDisplaySetFilterWidget(this, filterModel);
+    tagFilterWidget = new VisualDatabaseDisplayTagFilterWidget(this, filterModel);
 
     quickFilterSaveLoadWidget->addSettingsWidget(saveLoadWidget);
     quickFilterNameWidget->addSettingsWidget(nameFilterWidget);
@@ -109,6 +113,7 @@ void VisualDatabaseDisplayFilterToolbarWidget::initialize()
     quickFilterSubTypeWidget->addSettingsWidget(subTypeFilterWidget);
     quickFilterSetWidget->addSettingsWidget(setFilterWidget);
     quickFilterFormatLegalityWidget->addSettingsWidget(formatLegalityWidget);
+    quickFilterTagWidget->addSettingsWidget(tagFilterWidget);
 
     // fill groupbox layouts
     sortLayout->addWidget(sortByLabel);
@@ -121,6 +126,7 @@ void VisualDatabaseDisplayFilterToolbarWidget::initialize()
     filterLayout->addWidget(quickFilterSubTypeWidget);
     filterLayout->addWidget(quickFilterSetWidget);
     filterLayout->addWidget(quickFilterFormatLegalityWidget);
+    filterLayout->addWidget(quickFilterTagWidget);
 
     // put everything into main layout
     addWidget(sortGroupBox);
@@ -148,6 +154,7 @@ void VisualDatabaseDisplayFilterToolbarWidget::retranslateUi()
     quickFilterSubTypeWidget->setToolTip(tr("Filter by card sub-type"));
     quickFilterSetWidget->setToolTip(tr("Filter by set"));
     quickFilterFormatLegalityWidget->setToolTip(tr("Filter by format legality"));
+    quickFilterTagWidget->setToolTip(tr("Filter by Scryfall Tagger tag"));
 
     quickFilterSaveLoadWidget->setButtonText(tr("Save/Load"));
     quickFilterNameWidget->setButtonText(tr("Name"));
@@ -155,6 +162,7 @@ void VisualDatabaseDisplayFilterToolbarWidget::retranslateUi()
     quickFilterSubTypeWidget->setButtonText(tr("Sub Type"));
     quickFilterSetWidget->setButtonText(tr("Sets"));
     quickFilterFormatLegalityWidget->setButtonText(tr("Formats"));
+    quickFilterTagWidget->setButtonText(tr("Tags"));
 }
 
 void VisualDatabaseDisplayFilterToolbarWidget::resizeEvent(QResizeEvent *event)
@@ -168,8 +176,8 @@ void VisualDatabaseDisplayFilterToolbarWidget::updateCompactMode(int availableWi
     const bool compact = availableWidth < fullWidthHint;
 
     const QList<SettingsButtonWidget *> filterButtons = {
-        quickFilterSaveLoadWidget, quickFilterNameWidget, quickFilterMainTypeWidget,
-        quickFilterSubTypeWidget,  quickFilterSetWidget,  quickFilterFormatLegalityWidget,
+        quickFilterSaveLoadWidget, quickFilterNameWidget,           quickFilterMainTypeWidget, quickFilterSubTypeWidget,
+        quickFilterSetWidget,      quickFilterFormatLegalityWidget, quickFilterTagWidget,
     };
 
     for (auto *btn : filterButtons) {
