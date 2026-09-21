@@ -87,7 +87,7 @@ jobs:
           prerelease: ${{ steps.prepare.outputs.is_beta }}
         run: |
           if gh release view "$tag_name" >/dev/null 2>&1; then
-            echo "Release $tag_name already exists; leaving it unchanged."
+            echo "::warning::Release $tag_name already exists"
           else
             args=()
             [[ $prerelease == yes ]] && args+=(--prerelease)
@@ -598,12 +598,12 @@ jobs:
           is_prerelease=$(jq -r '.isPrerelease' <<< "$release")
 
           if [[ "$is_draft" != true ]]; then
-            echo "::error::Release $tag_name is not a draft; refusing to publish it."
+            echo "::error::Release $tag_name is not a draft"
             exit 1
           fi
 
           if [[ "$is_prerelease" != true ]]; then
-            echo "::error::Release $tag_name is not a prerelease; refusing to publish it."
+            echo "::error::Release $tag_name is not a pre-release"
             exit 1
           fi
 
