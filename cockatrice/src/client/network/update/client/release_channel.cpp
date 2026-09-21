@@ -68,6 +68,12 @@ void ReleaseChannel::checkForUpdates()
 // Find assets compatible with host platform (Linux is not supported by in-client updater)
 std::optional<int> ReleaseChannel::getTargetVersionForCurrentOS(const QString &fileName)
 {
+#if defined(Q_OS_WIN) && Q_PROCESSOR_WORDSIZE == 4
+    // The published Windows assets are 64-bit only
+    Q_UNUSED(fileName);
+    return std::nullopt;
+#endif
+
     const QRegularExpression *regex = nullptr;
 
     static const std::optional<int> systemVersion = getProductVersionMajor();
