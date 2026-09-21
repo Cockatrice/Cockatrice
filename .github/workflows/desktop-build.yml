@@ -577,7 +577,7 @@ jobs:
         run: gh attestation verify "$BUILD_PATH" --repo Cockatrice/Cockatrice
 
   publish:
-    name: Publish pre-release automatically
+    name: Publish pre-release
     runs-on: ubuntu-slim    # https://github.com/actions/runner-images/blob/main/images/ubuntu-slim/ubuntu-slim-Readme.md
     needs:
       - configure
@@ -586,7 +586,7 @@ jobs:
     if: ${{ github.ref_type == 'tag' && needs.configure.outputs.is_beta == 'yes' }}
 
     steps:
-      - name: "Publish pre-release"
+      - name: "Update pre-release status"
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
