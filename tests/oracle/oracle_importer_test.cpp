@@ -524,6 +524,64 @@ TEST_F(OracleImporterTest, LegacyConvertedManaCostCoercedToCmc)
 }
 
 // ============================================================================
+// Scryfall Tagger tag tests
+// ============================================================================
+
+TEST_F(OracleImporterTest, ImportsScryfallTags)
+{
+    QJsonObject card = makeCard("Ramp Card");
+    card["tags"] = QJsonArray{"ramp", "removal"};
+    QJsonArray cards{card};
+
+    importer->importCardsFromSet(set, cards);
+    auto result = importer->getCardList().value("Ramp Card");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_EQ(result->getProperty("tags"), "ramp removal");
+}
+
+TEST_F(OracleImporterTest, TagsAreNormalizedDedupedAndSorted)
+{
+    QJsonObject card = makeCard("Messy Tags");
+    card["tags"] = QJsonArray{"Ramp", " removal ", "ramp", ""};
+    QJsonArray cards{card};
+
+    importer->importCardsFromSet(set, cards);
+    auto result = importer->getCardList().value("Messy Tags");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_EQ(result->getProperty("tags"), "ramp removal");
+}
+
+TEST_F(OracleImporterTest, CardsWithoutTagsHaveNoTagsProperty)
+{
+    QJsonArray cards{makeCard("Untagged Card")};
+    importer->importCardsFromSet(set, cards);
+
+    auto result = importer->getCardList().value("Untagged Card");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_FALSE(result->hasProperty("tags"));
+}
+
+TEST_F(OracleImporterTest, SplitCardTagsAreUnioned)
+{
+    QJsonObject face1 = makeCard("Fire // Ice");
+    face1["layout"] = "split";
+    face1["side"] = "a";
+    face1["faceName"] = "Fire";
+    face1["tags"] = QJsonArray{"removal"};
+    QJsonObject face2 = makeCard("Fire // Ice");
+    face2["layout"] = "split";
+    face2["side"] = "b";
+    face2["faceName"] = "Ice";
+    face2["tags"] = QJsonArray{"card-advantage", "removal"};
+    QJsonArray cards{face1, face2};
+
+    importer->importCardsFromSet(set, cards);
+    auto result = importer->getCardList().value("Fire // Ice");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_EQ(result->getProperty("tags"), "card-advantage removal");
+}
+
+// ============================================================================
 // Card deduplication tests
 // ============================================================================
 
