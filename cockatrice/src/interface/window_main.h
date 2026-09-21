@@ -167,6 +167,7 @@ private:
     LagMonitor lagMonitor;                        ///< watches the main thread for event loop stalls
     LatencyStatusWidget *latencyStatus = nullptr; ///< status bar widget with live round-trip stats and history graph
     bool bHasActivated, askedForDbUpdater;
+    bool bClosingDown = false; ///< guards closeEvent() against re-entrancy
     bool skipStartupAutoConnect = false;
     bool startupAutoConnectAttempted = false;
     QProcess *cardUpdateProcess;
@@ -203,6 +204,13 @@ public:
     {
         return tabSupervisor;
     }
+
+    /**
+     * @brief Closes the window so an update installer can replace the running binaries.
+     *        Returns true only if the shutdown actually ran (settings flushed, tabs shut down);
+     *        false if the close was vetoed by the user or is already in progress.
+     */
+    bool closeForUpdate();
 
 protected:
     void closeEvent(QCloseEvent *event) override;

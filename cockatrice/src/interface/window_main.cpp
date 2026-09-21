@@ -851,7 +851,6 @@ void MainWindow::actShow()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     // workaround Qt bug where closeEvent gets called twice
-    static bool bClosingDown = false;
     if (bClosingDown) {
         return;
     }
@@ -878,6 +877,18 @@ void MainWindow::closeEvent(QCloseEvent *event)
     event->accept();
     SettingsCache::instance().layouts().setMainWindowGeometry(saveGeometry());
     tabSupervisor->deleteLater();
+}
+
+bool MainWindow::closeForUpdate()
+{
+    // A shutdown is already being handled (e.g. this is reached from a nested event loop while
+    // closeEvent() is blocked on a user prompt). close() would hit the re-entrancy guard and return
+    // true without any shutdown having happened, so report faithfully instead: the caller must keep
+    // the process alive until the user resolves whatever is blocking the close.
+    if (bClosingDown) {
+        return false;
+    }
+    return close();
 }
 
 void MainWindow::changeEvent(QEvent *event)

@@ -246,10 +246,12 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
         // Close the main window synchronously so file locks are released before the NSIS installer
         // (already launched) starts replacing files. This also flushes settings and shuts down the
         // tabs, but only when the close is actually accepted: MainWindow may veto it for a running
-        // card DB update, an open game, or an unsaved deck. In that case keep running so the user
-        // can resolve the blocker, and tell them the installer is already waiting.
+        // card DB update, an open game, or an unsaved deck, and closeForUpdate() also reports a
+        // close already in progress (reached from a nested event loop while a shutdown prompt is
+        // up). Only quit when the shutdown really ran - otherwise keep running so the user can
+        // resolve the blocker, and tell them the installer is already waiting.
         if (auto *window = qobject_cast<MainWindow *>(parent())) {
-            if (window->close()) {
+            if (window->closeForUpdate()) {
                 QTimer::singleShot(0, qApp, &QCoreApplication::quit);
             } else {
                 QMessageBox::warning(this, tr("Update"),
