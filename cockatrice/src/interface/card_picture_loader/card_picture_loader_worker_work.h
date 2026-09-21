@@ -51,9 +51,7 @@ public:
      * @brief Starts downloading the next URL for this card.
      *
      * Skips URLs whose server is currently in 429 backoff, either waiting the
-     * backoff out or falling through to the other configured sources. Also used by
-     * the dispatch machinery to hand an entry back after it was removed from the
-     * request queue when its host turned out to be backed off.
+     * backoff out or falling through to the other configured sources.
      */
     void startNextPicDownload();
 

@@ -107,6 +107,9 @@ QNetworkReply *CardPictureLoaderWorker::makeRequest(const QUrl &url, CardPicture
     // Check for cached redirects
     QUrl cachedRedirect = getCachedRedirect(url);
     if (!cachedRedirect.isEmpty()) {
+        // The status bar still needs to reclaim this URL's widget even when we hand the request back
+        // for a deferred retry instead of dispatching it onto the network.
+        emit imageRequestSucceeded(url);
         // The redirect target is a different host, which may itself be in 429 backoff; hand the
         // entry back to its worker so it waits the backoff out instead of dispatching straight
         // onto the backed-off host.
@@ -115,7 +118,6 @@ QNetworkReply *CardPictureLoaderWorker::makeRequest(const QUrl &url, CardPicture
             worker->scheduleDeferredRetry(cachedRedirect.host());
             return nullptr;
         }
-        emit imageRequestSucceeded(url);
         return makeRequest(cachedRedirect, worker);
     }
 
@@ -126,10 +128,7 @@ QNetworkReply *CardPictureLoaderWorker::makeRequest(const QUrl &url, CardPicture
     // Cached entries are served straight from the disk cache even when picture downloads are
     // enabled: re-fetching an already-cached image would burn the rate limit for nothing. Only a
     // genuine cache miss goes to the network, and only when downloads are enabled.
-    bool useNetworkCache = static_cast<CardPictureLoaderCacheMethod::CacheMethod>(
-                               SettingsCache::instance().cacheStorage().getCardPictureLoaderCacheMethod()) ==
-                               CardPictureLoaderCacheMethod::CacheMethod::NETWORK_CACHE &&
-                           (cache->metaData(url).isValid() || !picDownload);
+    bool useNetworkCache = !requestTouchesNetwork(url);
 
     req.setAttribute(QNetworkRequest::CacheLoadControlAttribute,
                      useNetworkCache ? QNetworkRequest::AlwaysCache : QNetworkRequest::AlwaysNetwork);
@@ -226,11 +225,19 @@ bool CardPictureLoaderWorker::processSingleRequest()
         const QString host = request.first.host();
         // Don't dispatch requests to a host that is currently in its 429 backoff; hand the entry
         // back to its worker so it can wait the backoff out or fall through to another source,
-        // instead of leaving it parked in the queue with no reply pending.
-        if (CardPictureLoaderWorkerWork::rateLimiter().isRateLimited(host, now)) {
+        // instead of leaving it parked in the queue with no reply pending. Only applies to
+        // requests that will actually touch the network: one that will be served from the disk
+        // cache costs nothing and shouldn't wait out the 429.
+        if (requestTouchesNetwork(request.first) &&
+            CardPictureLoaderWorkerWork::rateLimiter().isRateLimited(host, now)) {
+            // The queued URL is usually a cached-redirect target whose host differs from
+            // cardToDownload.getCurrentUrl(), so scheduleDeferredRetry() (which waits out the
+            // blocked host's deadline) is used instead of startNextPicDownload() looping on the
+            // original host. Keep scanning so one backed-off entry doesn't monopolize the tick.
             auto entry = requestLoadQueue.takeAt(i);
-            entry.second->startNextPicDownload();
-            return true;
+            --i;
+            entry.second->scheduleDeferredRetry(host);
+            continue;
         }
         // Seed the allowance now so a host that was rate limited gets its reduced
         // allowance instead of a fresh full quota mid-second.
@@ -239,13 +246,25 @@ bool CardPictureLoaderWorker::processSingleRequest()
         }
         int allowance = hostQuotaRemaining.value(host);
         if (allowance > 0) {
-            hostQuotaRemaining.insert(host, allowance - 1);
             auto entry = requestLoadQueue.takeAt(i);
-            makeRequest(entry.first, entry.second);
+            // The allowance is only spent when a request is actually issued: makeRequest() returns
+            // nullptr when the cached redirect target is in backoff and it hands the entry back.
+            if (makeRequest(entry.first, entry.second)) {
+                hostQuotaRemaining.insert(host, allowance - 1);
+            }
             return true;
         }
     }
     return false;
+}
+
+bool CardPictureLoaderWorker::requestTouchesNetwork(const QUrl &url) const
+{
+    bool useNetworkCache = static_cast<CardPictureLoaderCacheMethod::CacheMethod>(
+                               SettingsCache::instance().cacheStorage().getCardPictureLoaderCacheMethod()) ==
+                               CardPictureLoaderCacheMethod::CacheMethod::NETWORK_CACHE &&
+                           (cache->metaData(url).isValid() || !picDownload);
+    return !useNetworkCache;
 }
 
 void CardPictureLoaderWorker::onHostRateLimited(const QString &host)
