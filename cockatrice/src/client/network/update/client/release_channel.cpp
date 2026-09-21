@@ -30,6 +30,7 @@
 namespace
 {
 
+#if defined(Q_OS_MACOS) || defined(Q_OS_WIN)
 // QSysInfo::productVersion() is not guaranteed to start with a number, e.g. it returns
 // "Server 2022" on Windows Server. Use the first numeric token as the major host version.
 std::optional<int> getProductVersionMajor()
@@ -45,6 +46,7 @@ std::optional<int> getProductVersionMajor()
     }
     return version;
 }
+#endif
 
 } // namespace
 
@@ -76,7 +78,13 @@ std::optional<int> ReleaseChannel::getTargetVersionForCurrentOS(const QString &f
 
     const QRegularExpression *regex = nullptr;
 
-    static const std::optional<int> systemVersion = getProductVersionMajor();
+    // Only platforms shipping updater assets (macOS, Windows) need the host version
+    static const std::optional<int> systemVersion =
+#if defined(Q_OS_MACOS) || defined(Q_OS_WIN)
+        getProductVersionMajor();
+#else
+        std::nullopt;
+#endif
 
     if (!systemVersion) {
         return std::nullopt;
