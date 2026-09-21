@@ -1,9 +1,12 @@
 #include "visual_deck_storage_sort_filter_proxy_model.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../../filters/deck_filter_string.h"
 
 #include <QFileInfo>
 #include <algorithm>
+#include <libcockatrice/card/card_localization.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 
 VisualDeckStorageSortFilterProxyModel::VisualDeckStorageSortFilterProxyModel(QObject *parent)
     : QSortFilterProxyModel(parent)
@@ -215,7 +218,10 @@ void VisualDeckStorageSortFilterProxyModel::updateSearchMatches()
         return;
     }
 
-    DeckFilterString filterString(searchText);
+    const auto &cardsDisplay = SettingsCache::instance().cardsDisplay();
+    DeckFilterString filterString(
+        searchText, CardSearchLanguage{cardsDisplay.getCardLang(),
+                                       static_cast<SearchLanguageMode>(cardsDisplay.getCardSearchLanguage())});
     for (int row = 0; row < count; ++row) {
         const DeckPreviewData &data = source->dataForRow(row);
 

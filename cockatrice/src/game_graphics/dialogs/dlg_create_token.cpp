@@ -16,11 +16,13 @@
 #include <QLineEdit>
 #include <QRadioButton>
 #include <QTreeView>
+#include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/models/database/card_database_model.h>
 #include <libcockatrice/models/database/token/token_display_model.h>
 #include <libcockatrice/settings/card_override_settings.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/layouts_settings.h>
 #include <libcockatrice/utility/string_limits.h>
@@ -87,6 +89,17 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     cardDatabaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, this);
     cardDatabaseDisplayModel = new TokenDisplayModel(this);
     cardDatabaseDisplayModel->setSourceModel(cardDatabaseModel);
+
+    const auto applyCardSearchLanguage = [this]() {
+        const CardsDisplaySettings &cardsDisplay = SettingsCache::instance().cardsDisplay();
+        cardDatabaseDisplayModel->setSearchLanguage(CardSearchLanguage{
+            cardsDisplay.getCardLang(), static_cast<SearchLanguageMode>(cardsDisplay.getCardSearchLanguage())});
+    };
+    applyCardSearchLanguage();
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::cardLangChanged, this,
+            applyCardSearchLanguage);
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::cardSearchLanguageChanged, this,
+            applyCardSearchLanguage);
 
     chooseTokenFromAllRadioButton = new QRadioButton(tr("Show &all tokens"));
     connect(chooseTokenFromAllRadioButton, &QRadioButton::toggled, this, &DlgCreateToken::actChooseTokenFromAll);

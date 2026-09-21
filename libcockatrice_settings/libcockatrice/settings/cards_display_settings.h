@@ -3,6 +3,7 @@
 
 #include "settings_manager.h"
 
+#include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/interfaces/interface_cards_display_settings_provider.h>
 
 class CardsDisplaySettings : public SettingsManager, public ICardsDisplaySettingsProvider
@@ -32,6 +33,7 @@ public:
     [[nodiscard]] int getArchidektPreviewSize() const override;
     [[nodiscard]] int getSampleHandSize() const override;
     [[nodiscard]] QString getCardLang() const override;
+    [[nodiscard]] int getCardSearchLanguage() const override;
 
     void setDisplayCardNames(bool _displayCardNames);
     void setRoundCardCorners(bool _roundCardCorners);
@@ -54,6 +56,7 @@ public:
     void setArchidektPreviewCardSize(int _archidektPreviewCardSize);
     void setSampleHandSize(int _sampleHandSize);
     void setCardLang(const QString &_cardLang);
+    void setCardSearchLanguage(int _cardSearchLanguage);
 
 signals:
     void displayCardNamesChanged();
@@ -71,6 +74,7 @@ signals:
     void archidektPreviewSizeChanged();
     void sampleHandSizeChanged(int amount);
     void cardLangChanged(const QString &lang);
+    void cardSearchLanguageChanged(int cardSearchLanguage);
 
 public:
     explicit CardsDisplaySettings(const QString &settingPath, QObject *parent = nullptr);

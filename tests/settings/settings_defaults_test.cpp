@@ -575,6 +575,19 @@ TEST_F(SettingsDefaultsTest, CardsDisplay_CardLang_SetAndGet)
     ASSERT_EQ(s.getCardLang(), QString("de"));
 }
 
+TEST_F(SettingsDefaultsTest, CardsDisplay_CardSearchLanguage_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getCardSearchLanguage(), static_cast<int>(SearchLanguageMode::English));
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_CardSearchLanguage_SetAndGet)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    s.setCardSearchLanguage(static_cast<int>(SearchLanguageMode::Selected));
+    ASSERT_EQ(s.getCardSearchLanguage(), static_cast<int>(SearchLanguageMode::Selected));
+}
+
 // --- VisualDeckStorageSettings ---
 
 TEST_F(SettingsDefaultsTest, VisualDeckStorage_SortingOrder_Default)

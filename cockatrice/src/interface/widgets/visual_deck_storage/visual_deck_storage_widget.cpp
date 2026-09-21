@@ -15,6 +15,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
 
@@ -117,6 +118,13 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
             &VisualDeckStorageWidget::updateColorFilter);
     connect(searchWidget, &VisualDeckStorageSearchWidget::searchTextChanged, this,
             &VisualDeckStorageWidget::updateSearchFilter);
+
+    // The deck content search matches card names in the configured card language;
+    // re-run it whenever that setting changes so active searches follow immediately.
+    CardsDisplaySettings *cardsDisplay = &SettingsCache::instance().cardsDisplay();
+    const auto reapplySearchForLanguage = [this] { storageProxyModel->reapplyFilters(); };
+    connect(cardsDisplay, &CardsDisplaySettings::cardLangChanged, this, reapplySearchForLanguage);
+    connect(cardsDisplay, &CardsDisplaySettings::cardSearchLanguageChanged, this, reapplySearchForLanguage);
 
     connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
             &VisualDeckStorageWidget::createRootFolderWidget);
