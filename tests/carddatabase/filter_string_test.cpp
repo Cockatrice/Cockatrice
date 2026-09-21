@@ -124,6 +124,47 @@ TEST_F(CardQuery, SearchLanguageIsBoundPerInstance)
     ASSERT_TRUE(germanQuery.check(localized));
 }
 
+CardInfoPtr taggedCard()
+{
+    return CardInfo::newInstance("Tagged Card", "text", false, {{"tags", "ramp removal"}}, {}, {}, {}, {});
+}
+
+TEST_F(CardQuery, TagsMatchWholeSlugs)
+{
+    const CardData tagged = taggedCard();
+    ASSERT_TRUE(FilterString("tags:ramp").check(tagged));
+    ASSERT_TRUE(FilterString("tags:removal").check(tagged));
+    ASSERT_TRUE(FilterString("tags:RAMP").check(tagged));
+    ASSERT_TRUE(FilterString("tag:ramp").check(tagged));
+    ASSERT_FALSE(FilterString("tags:squirrel").check(tagged));
+}
+
+TEST_F(CardQuery, TagQueryDoesNotMatchPartialSlugs)
+{
+    const CardData tagged = taggedCard();
+    ASSERT_FALSE(FilterString("tags:ram").check(tagged));
+    ASSERT_FALSE(FilterString("tags:mov").check(tagged));
+}
+
+TEST_F(CardQuery, TagQueryCombinesWithAnd)
+{
+    const CardData tagged = taggedCard();
+    ASSERT_TRUE(FilterString("tags:ramp tags:removal").check(tagged));
+    ASSERT_FALSE(FilterString("tags:ramp tags:squirrel").check(tagged));
+}
+
+TEST_F(CardQuery, TagQueryTreatsCommasAsPartOfTheSlug)
+{
+    // Tag lists are not a thing: `tags:draw` and `tags:ramp` are separate terms.
+    const CardData tagged = taggedCard();
+    ASSERT_FALSE(FilterString("tags:ramp,removal").check(tagged));
+}
+
+TEST_F(CardQuery, TagQueryFalseWhenCardHasNoTags)
+{
+    ASSERT_FALSE(FilterString("tags:ramp").check(cat));
+}
+
 } // namespace
 
 int main(int argc, char **argv)
