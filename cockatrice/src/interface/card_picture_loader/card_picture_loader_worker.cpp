@@ -16,14 +16,15 @@
 #include <utility>
 #include <version_string.h>
 
-static constexpr int MAX_REQUESTS_PER_SEC = 10;
-static constexpr int MIN_HOST_QUOTA = 1;                ///< Floor for the per-host request allowance
+static constexpr int MAX_REQUESTS_PER_SEC = DownloadSettings::DEFAULT_HOST_REQUEST_LIMIT;
+static constexpr int MIN_HOST_QUOTA = DownloadSettings::MIN_HOST_REQUEST_LIMIT;
 static constexpr qint64 QUOTA_RECOVER_MS = 60000;       ///< Idle time before a reduced quota starts recovering
 static constexpr int DISPATCH_INTERVAL_MS = 100;        ///< Pacing between individual network requests
 static constexpr qint64 QUOTA_RESET_INTERVAL_MS = 1000; ///< Interval at which the request quota resets
 
 CardPictureLoaderWorker::CardPictureLoaderWorker()
-    : QObject(nullptr), picDownload(SettingsCache::instance().downloads().getPicDownload())
+    : QObject(nullptr), picDownload(SettingsCache::instance().downloads().getPicDownload()),
+      hostRequestLimits(SettingsCache::instance().downloads().getHostRequestLimits())
 {
     networkManager = new QNetworkAccessManager(this);
     // We need a timeout to ensure requests don't hang indefinitely in case of
@@ -73,6 +74,9 @@ CardPictureLoaderWorker::CardPictureLoaderWorker()
 
     connect(&dispatchTimer, &QTimer::timeout, this, &CardPictureLoaderWorker::dispatchQueuedRequest);
     dispatchTimer.setInterval(DISPATCH_INTERVAL_MS);
+
+    connect(&SettingsCache::instance().downloads(), &DownloadSettings::hostRequestLimitsChanged, this,
+            [this] { hostRequestLimits = SettingsCache::instance().downloads().getHostRequestLimits(); });
 }
 
 CardPictureLoaderWorker::~CardPictureLoaderWorker()
@@ -135,8 +139,21 @@ QNetworkReply *CardPictureLoaderWorker::makeRequest(const QUrl &url, CardPicture
 
     QNetworkReply *reply = networkManager->get(req);
 
-    // Connect reply handling
-    connect(reply, &QNetworkReply::finished, worker, [reply, worker] { worker->handleNetworkReply(reply); });
+    // Track in-flight replies per host so the unlocked fast path can bound how many requests it
+    // issues at once, instead of creating replies that time out before Qt opens a connection.
+    const QString host = url.host();
+    hostInFlight.insert(host, hostInFlight.value(host) + 1);
+
+    // Release the in-flight slot when the reply is destroyed, not when it emits `finished`, and use
+    // the worker (not the work object) as the context object: a reply can go away without ever
+    // finishing (aborted, or a work object deleted while a reply is still pending), and a connection
+    // bound to that work object's lifetime would then never run, permanently shrinking the fast
+    // path's concurrency until it wedges. This way the slot is released exactly once.
+    connect(reply, &QObject::destroyed, this,
+            [this, host] { hostInFlight.insert(host, qMax(0, hostInFlight.value(host) - 1)); });
+
+    // Connect reply handling; the work object is the context so its handler dies with it.
+    connect(reply, &QNetworkReply::finished, worker, [worker, reply] { worker->handleNetworkReply(reply); });
 
     return reply;
 }
@@ -144,10 +161,23 @@ QNetworkReply *CardPictureLoaderWorker::makeRequest(const QUrl &url, CardPicture
 void CardPictureLoaderWorker::resetRequestQuota()
 {
     QDateTime now = QDateTime::currentDateTime();
-    for (auto it = hostRequestQuota.begin(); it != hostRequestQuota.end(); ++it) {
+    for (auto it = hostRequestQuota.begin(); it != hostRequestQuota.end();) {
         if (!hostLast429.contains(it.key()) || now.msecsTo(hostLast429.value(it.key())) < -QUOTA_RECOVER_MS) {
-            it.value() = qMin(MAX_REQUESTS_PER_SEC, it.value() + 1);
+            if (hostAllowanceCeiling(it.key()) == DownloadSettings::UNLIMITED_HOST_QUOTA) {
+                // A developer-unlocked host that fell back after a 429 recovers towards the default
+                // allowance; once it gets there it becomes unlocked (fast-path) again.
+                if (it.value() + 1 >= DownloadSettings::DEFAULT_HOST_REQUEST_LIMIT) {
+                    it = hostRequestQuota.erase(it);
+                    continue;
+                }
+                it.value() += 1;
+            } else {
+                // Recover towards the host's effective allowance ceiling, which may be
+                // lowered by the user's per-host request limits.
+                it.value() = qMin(hostAllowanceCeiling(it.key()), it.value() + 1);
+            }
         }
+        ++it;
     }
 
     // Forget the per-second allowances; each host's allowance is re-seeded lazily from its
@@ -177,8 +207,53 @@ void CardPictureLoaderWorker::dispatchQueuedRequest()
         return;
     }
 
-    if (!processSingleRequest()) {
-        // No queued host currently has allowance left in this second; wait for the quota reset.
+    QDateTime now = QDateTime::currentDateTime();
+    bool dispatched = false;
+    // Set while an unlocked host still has queued work blocked only by the in-flight cap; the
+    // timer must keep running so it gets another try as soon as a slot frees. A host blocked by
+    // its 429 backoff instead waits for the next quota-reset tick to restart the dispatcher.
+    bool unlockedCapped = false;
+
+    // Unlocked hosts (developer cap UNLIMITED_HOST_QUOTA) skip the pacing and the per-host
+    // allowance: dispatch their queued requests back-to-back, bounded by their 429 backoff and the
+    // per-host in-flight cap so a large burst can't queue replies that time out before Qt opens a
+    // connection for them.
+    for (int i = 0; i < requestLoadQueue.size();) {
+        const auto &request = requestLoadQueue.at(i);
+        // Dispatch decisions must key on the host the request will actually go to, not the URL that
+        // merely redirects to it: a redirect learned after this URL was queued would otherwise
+        // bypass the in-flight cap and drain the whole queue onto the target host unchecked.
+        const QUrl resolvedUrl = resolveCachedRedirect(request.first);
+        const QString host = resolvedUrl.host();
+        if (isUnlockedHost(host)) {
+            if (CardPictureLoaderWorkerWork::rateLimiter().isRateLimited(host, now)) {
+                ++i;
+                continue;
+            }
+            if (hostInFlight.value(host) < MAX_IN_FLIGHT_PER_HOST) {
+                makeRequest(resolvedUrl, request.second);
+                requestLoadQueue.removeAt(i);
+                dispatched = true;
+                continue;
+            }
+            unlockedCapped = true;
+        }
+        ++i;
+    }
+
+    if (requestLoadQueue.isEmpty()) {
+        dispatchTimer.stop();
+        requestTimer.stop();
+        return;
+    }
+
+    if (processSingleRequest()) {
+        dispatched = true;
+    }
+
+    // Keep the timer running while there is progress to make or unlocked work waiting on a free
+    // in-flight slot; otherwise no host has allowance left this second, so wait for the quota reset.
+    if (!dispatched && !unlockedCapped) {
         dispatchTimer.stop();
     }
 }
@@ -221,8 +296,12 @@ bool CardPictureLoaderWorker::processSingleRequest()
 {
     QDateTime now = QDateTime::currentDateTime();
     for (int i = 0; i < requestLoadQueue.size(); ++i) {
-        const auto &request = requestLoadQueue.at(i);
-        const QString host = request.first.host();
+        // Copy the entry: takeAt(i) below erases within the list this reference points into.
+        const auto request = requestLoadQueue.at(i);
+        // Resolve cached redirects so the rate-limit and allowance arithmetic keys on the host the
+        // request will actually hit (see resolveCachedRedirect).
+        const QUrl resolvedUrl = resolveCachedRedirect(request.first);
+        const QString host = resolvedUrl.host();
         // Don't dispatch requests to a host that is currently in its 429 backoff; hand the entry
         // back to its worker so it can wait the backoff out or fall through to another source,
         // instead of leaving it parked in the queue with no reply pending. Only applies to
@@ -233,25 +312,39 @@ bool CardPictureLoaderWorker::processSingleRequest()
             // The queued URL is usually a cached-redirect target whose host differs from
             // cardToDownload.getCurrentUrl(), so scheduleDeferredRetry() (which waits out the
             // blocked host's deadline) is used instead of startNextPicDownload() looping on the
-            // original host. Keep scanning so one backed-off entry doesn't monopolize the tick.
+            // original host.
             auto entry = requestLoadQueue.takeAt(i);
-            --i;
-            entry.second->scheduleDeferredRetry(host);
+            if (host != entry.first.host()) {
+                // A cached redirect target is what is blocked, which the work object would not
+                // discover from its own URL; wait out that specific host (with jitter) instead.
+                entry.second->scheduleDeferredRetry(host);
+            } else {
+                entry.second->startNextPicDownload();
+            }
+            return true;
+        }
+        // Unlocked hosts are handled by dispatchQueuedRequest's fast path, bounded by the in-flight
+        // cap; they must not fall through to the per-host allowance arithmetic below.
+        if (isUnlockedHost(host)) {
             continue;
         }
-        // Seed the allowance now so a host that was rate limited gets its reduced
-        // allowance instead of a fresh full quota mid-second.
+        int ceiling = hostAllowanceCeiling(host);
+        if (ceiling == DownloadSettings::UNLIMITED_HOST_QUOTA) {
+            // A 429 dropped this unlocked host out of the fast path and installed a concrete
+            // allowance; pace it against that allowance until the recovery loop unlocks it again.
+            ceiling = hostRequestQuota.value(host, DownloadSettings::DEFAULT_HOST_REQUEST_LIMIT);
+        }
+        // Seed the allowance lazily so a host that enters the queue mid-second gets its reduced
+        // per-host allowance, clamped against the ceiling so a lowered user cap applies from this
+        // second onward.
         if (!hostQuotaRemaining.contains(host)) {
-            hostQuotaRemaining.insert(host, hostRequestQuota.value(host, MAX_REQUESTS_PER_SEC));
+            hostQuotaRemaining.insert(host, qMin(ceiling, hostRequestQuota.value(host, ceiling)));
         }
         int allowance = hostQuotaRemaining.value(host);
         if (allowance > 0) {
+            hostQuotaRemaining.insert(host, allowance - 1);
             auto entry = requestLoadQueue.takeAt(i);
-            // The allowance is only spent when a request is actually issued: makeRequest() returns
-            // nullptr when the cached redirect target is in backoff and it hands the entry back.
-            if (makeRequest(entry.first, entry.second)) {
-                hostQuotaRemaining.insert(host, allowance - 1);
-            }
+            makeRequest(resolvedUrl, entry.second);
             return true;
         }
     }
@@ -267,9 +360,30 @@ bool CardPictureLoaderWorker::requestTouchesNetwork(const QUrl &url) const
     return !useNetworkCache;
 }
 
+int CardPictureLoaderWorker::hostAllowanceCeiling(const QString &host) const
+{
+    const int devCap = DownloadSettings::getDeveloperHostCaps().value(host, MAX_REQUESTS_PER_SEC);
+    if (devCap == DownloadSettings::UNLIMITED_HOST_QUOTA && !hostRequestLimits.contains(host)) {
+        return DownloadSettings::UNLIMITED_HOST_QUOTA;
+    }
+    const int requested = hostRequestLimits.value(host, devCap);
+    return SettingsCache::instance().downloads().clampHostRequestLimit(host, requested);
+}
+
+bool CardPictureLoaderWorker::isUnlockedHost(const QString &host) const
+{
+    return hostAllowanceCeiling(host) == DownloadSettings::UNLIMITED_HOST_QUOTA && !hostRequestQuota.contains(host);
+}
+
 void CardPictureLoaderWorker::onHostRateLimited(const QString &host)
 {
-    hostRequestQuota.insert(host, qMax(MIN_HOST_QUOTA, hostRequestQuota.value(host, MAX_REQUESTS_PER_SEC) / 2));
+    const int ceiling = hostAllowanceCeiling(host);
+    // An unlocked host has no per-host allowance to halve. Install one instead so it drops out of
+    // the unlocked fast path and is paced like a throttled host; the recovery loop in
+    // resetRequestQuota() then walks it back up and unlocks it again.
+    const int base =
+        ceiling == DownloadSettings::UNLIMITED_HOST_QUOTA ? DownloadSettings::DEFAULT_HOST_REQUEST_LIMIT : ceiling;
+    hostRequestQuota.insert(host, qMax(MIN_HOST_QUOTA, hostRequestQuota.value(host, base) / 2));
     hostLast429.insert(host, QDateTime::currentDateTime());
 }
 
@@ -325,6 +439,22 @@ QUrl CardPictureLoaderWorker::getCachedRedirect(const QUrl &originalUrl) const
         return redirectCache[originalUrl].first;
     }
     return {};
+}
+
+QUrl CardPictureLoaderWorker::resolveCachedRedirect(const QUrl &url) const
+{
+    // Follow the whole cached-redirect chain so dispatch keys on the host that is really hit. The
+    // depth bound keeps a corrupt or self-referencing cache entry from spinning us forever.
+    QUrl resolved = url;
+    int depth = 0;
+    while (depth++ < MAX_REDIRECT_CHAIN_DEPTH) {
+        QUrl target = getCachedRedirect(resolved);
+        if (target.isEmpty() || target == resolved) {
+            break;
+        }
+        resolved = target;
+    }
+    return resolved;
 }
 
 void CardPictureLoaderWorker::loadRedirectCache()
