@@ -21,6 +21,7 @@ static constexpr int MIN_HOST_QUOTA = DownloadSettings::MIN_HOST_REQUEST_LIMIT;
 static constexpr qint64 QUOTA_RECOVER_MS = 60000;       ///< Idle time before a reduced quota starts recovering
 static constexpr int DISPATCH_INTERVAL_MS = 100;        ///< Pacing between individual network requests
 static constexpr qint64 QUOTA_RESET_INTERVAL_MS = 1000; ///< Interval at which the request quota resets
+static constexpr int THREAD_SHUTDOWN_WAIT_MS = 5000;    ///< Bounded wait for the worker thread to stop at exit
 
 CardPictureLoaderWorker::CardPictureLoaderWorker()
     : QObject(nullptr), picDownload(SettingsCache::instance().downloads().getPicDownload()),
@@ -59,6 +60,9 @@ CardPictureLoaderWorker::CardPictureLoaderWorker()
     localLoader = new CardPictureLoaderLocal(this);
 
     pictureLoaderThread = new QThread;
+    // The worker object frees itself once its thread finishes, so no event loop is left
+    // running and the QThread is never destroyed while still executing.
+    connect(pictureLoaderThread, &QThread::finished, this, &QObject::deleteLater);
     pictureLoaderThread->start(QThread::LowPriority);
     moveToThread(pictureLoaderThread);
 
@@ -82,7 +86,33 @@ CardPictureLoaderWorker::CardPictureLoaderWorker()
 CardPictureLoaderWorker::~CardPictureLoaderWorker()
 {
     saveRedirectCache();
-    pictureLoaderThread->deleteLater();
+}
+
+bool CardPictureLoaderWorker::shutdownThread()
+{
+    // The finished() -> deleteLater chain (wired in the constructor) frees this worker as soon as
+    // its event loop exits, so nothing - not even a member read - may run once wait() returns.
+    // QThread::quit() and QThread::wait() are thread-safe and may be called from the owning thread.
+    QThread *thread = pictureLoaderThread;
+    if (!thread) {
+        return true;
+    }
+    thread->quit();
+    // Only an unbounded wait() would guarantee the thread stops, but this runs from a function-local
+    // static destructor after main() has returned, with no UI left to interrupt a worker stuck in a
+    // slow slot or on a stalled filesystem. Bound the wait and leave such a thread to the OS rather
+    // than hanging the process forever.
+    if (!thread->wait(THREAD_SHUTDOWN_WAIT_MS)) {
+        qCWarning(CardPictureLoaderWorkerLog) << "Picture loader worker thread did not stop within"
+                                              << THREAD_SHUTDOWN_WAIT_MS << "ms; leaving it to be torn down by the OS";
+        return false;
+    }
+    return true;
+}
+
+QThread *CardPictureLoaderWorker::workerThread() const
+{
+    return pictureLoaderThread;
 }
 
 void CardPictureLoaderWorker::queueRequest(const QUrl &url, CardPictureLoaderWorkerWork *worker)
@@ -509,4 +539,5 @@ void CardPictureLoaderWorker::clearNetworkCache()
 {
     networkManager->cache()->clear();
     redirectCache.clear();
+    emit networkCacheCleared();
 }

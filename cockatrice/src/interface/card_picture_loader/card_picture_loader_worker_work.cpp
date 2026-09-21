@@ -27,8 +27,8 @@ const ServerRateLimiter &CardPictureLoaderWorkerWork::rateLimiter()
     return s_rateLimiter;
 }
 
-CardPictureLoaderWorkerWork::CardPictureLoaderWorkerWork(const CardPictureLoaderWorker *worker, const ExactCard &toLoad)
-    : QObject(nullptr), cardToDownload(CardPictureToLoad(toLoad)),
+CardPictureLoaderWorkerWork::CardPictureLoaderWorkerWork(CardPictureLoaderWorker *worker, const ExactCard &toLoad)
+    : QObject(worker), cardToDownload(CardPictureToLoad(toLoad)),
       picDownload(SettingsCache::instance().downloads().getPicDownload())
 {
     // Hook up signals to the orchestrator
