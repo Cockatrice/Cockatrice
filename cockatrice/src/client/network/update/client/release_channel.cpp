@@ -27,6 +27,27 @@
 
 #define GIT_SHORT_HASH_LEN 7
 
+namespace
+{
+
+// QSysInfo::productVersion() is not guaranteed to start with a number, e.g. it returns
+// "Server 2022" on Windows Server. Use the first numeric token as the major host version.
+std::optional<int> getProductVersionMajor()
+{
+    const QString versionString = QSysInfo::productVersion();
+    bool ok = false;
+    static const QRegularExpression firstNumber(R"((\d+))");
+    const auto match = firstNumber.match(versionString);
+    const int version = match.hasMatch() ? match.captured(1).toInt(&ok) : 0;
+    if (!ok) {
+        qCWarning(ReleaseChannelLog) << "Unable to determine OS version from" << versionString;
+        return std::nullopt;
+    }
+    return version;
+}
+
+} // namespace
+
 ReleaseChannel::ReleaseChannel() : netMan(new QNetworkAccessManager(this)), response(nullptr), lastRelease(nullptr)
 {
 }
@@ -49,16 +70,7 @@ std::optional<int> ReleaseChannel::getTargetVersionForCurrentOS(const QString &f
 {
     const QRegularExpression *regex = nullptr;
 
-    static const std::optional<int> systemVersion = [] {
-        bool ok = false;
-        const QString versionString = QSysInfo::productVersion();
-        const int version = versionString.split('.').first().toInt(&ok);
-        if (!ok) {
-            qCWarning(ReleaseChannelLog) << "Unable to determine OS version from" << versionString;
-            return std::optional<int>();
-        }
-        return std::optional<int>{version};
-    }();
+    static const std::optional<int> systemVersion = getProductVersionMajor();
 
     if (!systemVersion) {
         return std::nullopt;
