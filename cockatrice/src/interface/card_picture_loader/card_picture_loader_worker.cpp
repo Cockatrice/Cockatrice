@@ -17,12 +17,13 @@
 #include <version_string.h>
 
 static constexpr int MAX_REQUESTS_PER_SEC = 10;
-static constexpr int MIN_HOST_QUOTA = 1;          ///< Floor for the per-host request allowance
-static constexpr qint64 QUOTA_RECOVER_MS = 60000; ///< Idle time before a reduced quota starts recovering
+static constexpr int MIN_HOST_QUOTA = 1;                ///< Floor for the per-host request allowance
+static constexpr qint64 QUOTA_RECOVER_MS = 60000;       ///< Idle time before a reduced quota starts recovering
+static constexpr int DISPATCH_INTERVAL_MS = 100;        ///< Pacing between individual network requests
+static constexpr qint64 QUOTA_RESET_INTERVAL_MS = 1000; ///< Interval at which the request quota resets
 
 CardPictureLoaderWorker::CardPictureLoaderWorker()
-    : QObject(nullptr), picDownload(SettingsCache::instance().downloads().getPicDownload()),
-      requestQuota(MAX_REQUESTS_PER_SEC)
+    : QObject(nullptr), picDownload(SettingsCache::instance().downloads().getPicDownload())
 {
     networkManager = new QNetworkAccessManager(this);
     // We need a timeout to ensure requests don't hang indefinitely in case of
@@ -60,11 +61,18 @@ CardPictureLoaderWorker::CardPictureLoaderWorker()
     pictureLoaderThread->start(QThread::LowPriority);
     moveToThread(pictureLoaderThread);
 
+    // QTimer value members are not QObject children, so moveToThread on the worker doesn't move
+    // them. They must live in the worker's thread to be started from the slot code that runs there.
+    requestTimer.moveToThread(pictureLoaderThread);
+    dispatchTimer.moveToThread(pictureLoaderThread);
+
     connect(this, &CardPictureLoaderWorker::imageLoadEnqueued, this, &CardPictureLoaderWorker::handleImageLoadEnqueued);
 
     connect(&requestTimer, &QTimer::timeout, this, &CardPictureLoaderWorker::resetRequestQuota);
-    requestTimer.setInterval(1000);
-    requestTimer.start();
+    requestTimer.setInterval(static_cast<int>(QUOTA_RESET_INTERVAL_MS));
+
+    connect(&dispatchTimer, &QTimer::timeout, this, &CardPictureLoaderWorker::dispatchQueuedRequest);
+    dispatchTimer.setInterval(DISPATCH_INTERVAL_MS);
 }
 
 CardPictureLoaderWorker::~CardPictureLoaderWorker()
@@ -128,8 +136,6 @@ QNetworkReply *CardPictureLoaderWorker::makeRequest(const QUrl &url, CardPicture
 
 void CardPictureLoaderWorker::resetRequestQuota()
 {
-    requestQuota = MAX_REQUESTS_PER_SEC;
-
     QDateTime now = QDateTime::currentDateTime();
     for (auto it = hostRequestQuota.begin(); it != hostRequestQuota.end(); ++it) {
         if (!hostLast429.contains(it.key()) || now.msecsTo(hostLast429.value(it.key())) < -QUOTA_RECOVER_MS) {
@@ -142,13 +148,65 @@ void CardPictureLoaderWorker::resetRequestQuota()
         hostQuotaRemaining.insert(host, hostRequestQuota.value(host, MAX_REQUESTS_PER_SEC));
     }
 
-    processQueuedRequests();
+    updateTimerState();
 }
 
 void CardPictureLoaderWorker::processQueuedRequests()
 {
-    while (requestQuota > 0 && processSingleRequest()) {
-        --requestQuota;
+    // QTimer must be started from the thread it lives in; if this public slot is ever reached from
+    // another thread, replay it on the worker's event loop instead of letting start() fail silently.
+    if (thread() != QThread::currentThread()) {
+        QMetaObject::invokeMethod(this, &CardPictureLoaderWorker::processQueuedRequests, Qt::QueuedConnection);
+        return;
+    }
+    updateTimerState();
+}
+
+void CardPictureLoaderWorker::dispatchQueuedRequest()
+{
+    if (requestLoadQueue.isEmpty()) {
+        // All queued requests have been dispatched; stop the pacing timers.
+        updateTimerState();
+        return;
+    }
+
+    if (!processSingleRequest()) {
+        // No queued host currently has allowance left in this second; wait for the quota reset.
+        dispatchTimer.stop();
+    }
+}
+
+void CardPictureLoaderWorker::updateTimerState()
+{
+    // Never restart an active timer: that would reset the pacing countdown and a burst of enqueues
+    // could keep starving the dispatcher, so only (re)start a timer that has actually stopped.
+    if (requestLoadQueue.isEmpty()) {
+        dispatchTimer.stop();
+        // Forget per-second allowances once nothing is pending: a stale zero would otherwise delay
+        // the next single request by a full quota-reset interval.
+        hostQuotaRemaining.clear();
+    } else if (!dispatchTimer.isActive()) {
+        dispatchTimer.start();
+    }
+
+    // The quota timer resets allowances every second and is also the only thing that heals a host
+    // after a 429 (see resetRequestQuota). It must keep ticking while work is queued or a host is
+    // still recovering below the ceiling, and only winds down once no host needs recovery anymore.
+    // Keeping it alive during such idle periods lets reduced quotas recover as intended.
+    bool hostRecovering = false;
+    for (auto it = hostRequestQuota.cbegin(); it != hostRequestQuota.cend(); ++it) {
+        if (it.value() < MAX_REQUESTS_PER_SEC) {
+            hostRecovering = true;
+            break;
+        }
+    }
+
+    if (!requestLoadQueue.isEmpty() || hostRecovering) {
+        if (!requestTimer.isActive()) {
+            requestTimer.start();
+        }
+    } else if (requestTimer.isActive()) {
+        requestTimer.stop();
     }
 }
 

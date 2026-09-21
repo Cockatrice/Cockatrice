@@ -86,8 +86,11 @@ public slots:
      */
     QNetworkReply *makeRequest(const QUrl &url, CardPictureLoaderWorkerWork *workThread);
 
-    /** @brief Processes all queued requests respecting the request quota. */
+    /** @brief Ensures the pacing and quota-reset timers reflect the current queue and recovery state. */
     void processQueuedRequests();
+
+    /** @brief Chooses a request from the queue and starts it, respecting the quota and pacing. */
+    void dispatchQueuedRequest();
 
     /**
      * @brief Processes a single queued request.
@@ -118,8 +121,8 @@ private:
     bool picDownload;                                  ///< Whether downloading images from network is enabled
     QQueue<QPair<QUrl, CardPictureLoaderWorkerWork *>> requestLoadQueue; ///< Queue of pending network requests
 
-    int requestQuota;                       ///< Remaining requests allowed per second
     QTimer requestTimer;                    ///< Timer to reset the request quota
+    QTimer dispatchTimer;                   ///< Timer pacing individual network requests
     QHash<QString, int> hostRequestQuota;   ///< Sustained per-host request allowance
     QHash<QString, int> hostQuotaRemaining; ///< Per-host allowance left in the current second
     QHash<QString, QDateTime> hostLast429;  ///< When each host was last rate limited
@@ -138,6 +141,9 @@ private:
 
     /** @brief Removes stale redirect entries older than TTL. */
     void cleanStaleEntries();
+
+    /** @brief Starts or stops the pacing and quota-reset timers to match the queue and recovery state. */
+    void updateTimerState();
 
 private slots:
     /** @brief Resets the request quota for rate-limiting. */
