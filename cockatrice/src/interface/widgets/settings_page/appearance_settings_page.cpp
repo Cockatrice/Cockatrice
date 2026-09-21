@@ -505,7 +505,7 @@ void AppearanceSettingsPage::retranslateUi()
     openThemeButton.setText(tr("Open themes folder"));
     schemeComboLabel.setText(tr("Active theme palette:"));
     styleComboLabel.setText(tr("Active theme style:"));
-    styleCombo.setToolTip(tr("Qt widget style saved to this theme (\"Default\" lets the application decide)"));
+    styleCombo.setToolTip(tr("Qt widget style saved to this theme (\"System\" lets the application decide)"));
     editPaletteButton.setText(tr("Edit theme palette"));
 
     homeTabGroupBox->setTitle(tr("Home tab settings"));
