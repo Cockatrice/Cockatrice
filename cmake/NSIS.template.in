@@ -225,12 +225,17 @@ FunctionEnd
 ;        as accepted by Get-Process -Name), call this, result in $R0
 ;        (1 = running from $INSTDIR, 0 = not running)
 Function IsAppRunning
+    ; Pass the install dir to PowerShell via an environment variable so it
+    ; never has to be embedded into the -Command string: apostrophes in a path
+    ; would terminate the command early, and `$INSTDIR` in a -like pattern
+    ; would treat [ and ] as wildcard characters.
+    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_INSTDIR", "$INSTDIR")'
     ; Exit the process explicitly so nsExec's pop reflects whether a matching
     ; process was found: powershell.exe exits 0 whether or not the pipeline
     ; produced objects. Any other result (exit 1, or nsExec's "error" string
     ; when powershell itself cannot be started) is treated as "running" so the
     ; lock guard fails closed.
-    nsExec::ExecToLog 'powershell -NoProfile -Command "if (Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { $$_.Path -like $\'$INSTDIR\*$\' } | Select-Object -First 1) { exit 1 } else { exit 0 }"'
+    nsExec::ExecToLog 'powershell -NoProfile -Command "if (Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { $$_.Path.StartsWith($$env:COCKATRICE_INSTDIR, [StringComparison]::OrdinalIgnoreCase) } | Select-Object -First 1) { exit 1 } else { exit 0 }"'
     Pop $R0
     ${If} $R0 == "0"
         StrCpy $R0 0
@@ -241,12 +246,14 @@ FunctionEnd
 
 Function CloseMatchingApps
     ; gracefully ask every matching instance to close (sends WM_CLOSE)
-    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { $$_.Path -like $\'$INSTDIR\*$\' } | ForEach-Object { $$null = $$_.CloseMainWindow() }"'
+    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_INSTDIR", "$INSTDIR")'
+    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { $$_.Path.StartsWith($$env:COCKATRICE_INSTDIR, [StringComparison]::OrdinalIgnoreCase) } | ForEach-Object { $$null = $$_.CloseMainWindow() }"'
     Pop $R3
 FunctionEnd
 
 Function ForceCloseMatchingApps
-    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { $$_.Path -like $\'$INSTDIR\*$\' } | Stop-Process -Force -ErrorAction SilentlyContinue"'
+    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_INSTDIR", "$INSTDIR")'
+    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { $$_.Path.StartsWith($$env:COCKATRICE_INSTDIR, [StringComparison]::OrdinalIgnoreCase) } | Stop-Process -Force"'
     Pop $R3
 FunctionEnd
 
@@ -308,12 +315,17 @@ FunctionEnd
 ; Uninstaller copies of the same routines (the uninstaller gets its own
 ; function set compiled in, it cannot call the installer functions).
 Function un.IsAppRunning
+    ; Pass the install dir to PowerShell via an environment variable so it
+    ; never has to be embedded into the -Command string: apostrophes in a path
+    ; would terminate the command early, and `$INSTDIR` in a -like pattern
+    ; would treat [ and ] as wildcard characters.
+    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_INSTDIR", "$INSTDIR")'
     ; Exit the process explicitly so nsExec's pop reflects whether a matching
     ; process was found: powershell.exe exits 0 whether or not the pipeline
     ; produced objects. Any other result (exit 1, or nsExec's "error" string
     ; when powershell itself cannot be started) is treated as "running" so the
     ; lock guard fails closed.
-    nsExec::ExecToLog 'powershell -NoProfile -Command "if (Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { $$_.Path -like $\'$INSTDIR\*$\' } | Select-Object -First 1) { exit 1 } else { exit 0 }"'
+    nsExec::ExecToLog 'powershell -NoProfile -Command "if (Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { $$_.Path.StartsWith($$env:COCKATRICE_INSTDIR, [StringComparison]::OrdinalIgnoreCase) } | Select-Object -First 1) { exit 1 } else { exit 0 }"'
     Pop $R0
     ${If} $R0 == "0"
         StrCpy $R0 0
@@ -323,12 +335,15 @@ Function un.IsAppRunning
 FunctionEnd
 
 Function un.CloseMatchingApps
-    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { $$_.Path -like $\'$INSTDIR\*$\' } | ForEach-Object { $$null = $$_.CloseMainWindow() }"'
+    ; gracefully ask every matching instance to close (sends WM_CLOSE)
+    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_INSTDIR", "$INSTDIR")'
+    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { $$_.Path.StartsWith($$env:COCKATRICE_INSTDIR, [StringComparison]::OrdinalIgnoreCase) } | ForEach-Object { $$null = $$_.CloseMainWindow() }"'
     Pop $R3
 FunctionEnd
 
 Function un.ForceCloseMatchingApps
-    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { $$_.Path -like $\'$INSTDIR\*$\' } | Stop-Process -Force -ErrorAction SilentlyContinue"'
+    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_INSTDIR", "$INSTDIR")'
+    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { $$_.Path.StartsWith($$env:COCKATRICE_INSTDIR, [StringComparison]::OrdinalIgnoreCase) } | Stop-Process -Force"'
     Pop $R3
 FunctionEnd
 
