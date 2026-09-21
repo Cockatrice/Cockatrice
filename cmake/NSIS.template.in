@@ -223,6 +223,12 @@ FunctionEnd
 ; "The procedure entry point X could not be located in the dynamic link
 ; library ...Qt6Network.dll" on the next start.
 ;
+; On a silent update (/R /S) matching processes are asked to close gracefully
+; (WM_CLOSE) and waited for up to 60 s; if they refuse, the install is aborted
+; so their data is preserved - a force-kill could destroy an unsaved deck from
+; Help -> Check for Client Updates. On interactive installs and uninstalls the
+; user is prompted to close them instead.
+;
 ; Processes are matched by image name AND by their executable path living
 ; under $INSTDIR, so unrelated processes that merely share an image name
 ; (e.g. the Oracle DB instance "oracle.exe") are never touched.
@@ -261,12 +267,6 @@ Function CloseMatchingApps
     Pop $R3
 FunctionEnd
 
-Function ForceCloseMatchingApps
-    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_INSTDIR", "$INSTDIR")'
-    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_INSTDIR, [StringComparison]::OrdinalIgnoreCase) } else { $$true } } catch { $$true } } | Stop-Process -Force"'
-    Pop $R3
-FunctionEnd
-
 Function WaitForAppToClose
     ; usage: set $R1 to the display name (e.g. "cockatrice.exe") and $R2 to the
     ; base image name (e.g. "cockatrice")
@@ -294,19 +294,12 @@ Function WaitForAppToClose
         ${If} $R9 < 60000
             Goto ck_wait_loop
         ${EndIf}
-        ; give up waiting, force close
-        DetailPrint "Force closing $R1 ..."
-        Call ForceCloseMatchingApps
-        Sleep 500
-        ; verify the force close actually worked; a process that cannot be
-        ; terminated (e.g. one owned by another user session) would otherwise
-        ; leave locked files that silently reproduce the very mixed-Qt-DLL bug
-        ; this guard exists to prevent.
-        Call IsAppRunning
-        ${If} $R0 = 1
-            DetailPrint "WARNING: $R1 is still running; aborting before any files are replaced."
-            Abort
-        ${EndIf}
+        ; give up waiting. The application refused to close (e.g. it is showing
+        ; a "really leave this game?" confirmation or holds an unsaved deck).
+        ; Do not force-kill it: nothing has been replaced yet, so aborting just
+        ; defers the update and preserves the user's data.
+        DetailPrint "$R1 is still running after 60 s; aborting the update so that no data is lost."
+        Abort
     ${Else}
         ck_wait_prompt:
         MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
@@ -363,12 +356,6 @@ Function un.CloseMatchingApps
     Pop $R3
 FunctionEnd
 
-Function un.ForceCloseMatchingApps
-    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_INSTDIR", "$INSTDIR")'
-    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_INSTDIR, [StringComparison]::OrdinalIgnoreCase) } else { $$true } } catch { $$true } } | Stop-Process -Force"'
-    Pop $R3
-FunctionEnd
-
 Function un.WaitForAppToClose
     Call un.IsAppRunning
     ${If} $R0 = 0
@@ -393,18 +380,12 @@ Function un.WaitForAppToClose
         ${If} $R9 < 60000
             Goto un_ck_wait_loop
         ${EndIf}
-        DetailPrint "Force closing $R1 ..."
-        Call un.ForceCloseMatchingApps
-        Sleep 500
-        ; verify the force close actually worked; a process that cannot be
-        ; terminated (e.g. one owned by another user session) would otherwise
-        ; leave locked files that silently reproduce the very mixed-Qt-DLL bug
-        ; this guard exists to prevent.
-        Call un.IsAppRunning
-        ${If} $R0 = 1
-            DetailPrint "WARNING: $R1 is still running; aborting before any files are replaced."
-            Abort
-        ${EndIf}
+        ; give up waiting. The application refused to close (e.g. it is showing
+        ; a "really leave this game?" confirmation or holds an unsaved deck).
+        ; Do not force-kill it: nothing has been replaced yet, so aborting just
+        ; defers the uninstall and preserves the user's data.
+        DetailPrint "$R1 is still running after 60 s; aborting so that no data is lost."
+        Abort
     ${Else}
         un_ck_wait_prompt:
         MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
