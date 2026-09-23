@@ -51,6 +51,7 @@ private:
     QComboBox visualDeckStoragePromptForConversionSelector;
     QCheckBox visualDeckStorageInGameCheckBox;
     QCheckBox visualDeckStorageSelectionAnimationCheckBox;
+    QCheckBox visualDeckEditorShowCardCountsCheckBox;
     QLabel defaultDeckEditorTypeLabel;
     QComboBox defaultDeckEditorTypeSelector;
     QLabel vdeStartupTabLabel;
