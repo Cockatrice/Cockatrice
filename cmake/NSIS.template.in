@@ -281,7 +281,8 @@ Function WaitForAppToClose
         Call CloseMatchingApps
         ; wall-clock deadline: each poll has to spawn a fresh powershell.exe, so
         ; a bare loop counter would not bound the real wait time to 60 s.
-        ${GetTickCount} $R8
+        System::Call 'kernel32::GetTickCount()i.s'
+        Pop $R8
         ck_wait_loop:
         Sleep 500
         Call IsAppRunning
@@ -289,7 +290,8 @@ Function WaitForAppToClose
             DetailPrint "$R1 closed."
             Return
         ${EndIf}
-        ${GetTickCount} $R9
+        System::Call 'kernel32::GetTickCount()i.s'
+        Pop $R9
         IntOp $R9 $R9 - $R8
         ${If} $R9 < 60000
             Goto ck_wait_loop
@@ -388,7 +390,8 @@ Function un.WaitForAppToClose
         Call un.CloseMatchingApps
         ; wall-clock deadline: each poll has to spawn a fresh powershell.exe, so
         ; a bare loop counter would not bound the real wait time to 60 s.
-        ${GetTickCount} $R8
+        System::Call 'kernel32::GetTickCount()i.s'
+        Pop $R8
         un_ck_wait_loop:
         Sleep 500
         Call un.IsAppRunning
@@ -396,7 +399,8 @@ Function un.WaitForAppToClose
             DetailPrint "$R1 closed."
             Return
         ${EndIf}
-        ${GetTickCount} $R9
+        System::Call 'kernel32::GetTickCount()i.s'
+        Pop $R9
         IntOp $R9 $R9 - $R8
         ${If} $R9 < 60000
             Goto un_ck_wait_loop
