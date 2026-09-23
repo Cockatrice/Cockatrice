@@ -14,11 +14,11 @@
  */
 namespace ReportCategories
 {
-    /** @brief The complete list of valid category keys, in canonical order. */
-    const QStringList &keys();
+/** @brief The complete list of valid category keys, in canonical order. */
+const QStringList &keys();
 
-    /** @brief Whether @a key is a valid report category (case-insensitive). */
-    bool isValid(const QString &key);
+/** @brief Whether @a key is a valid report category (case-insensitive). */
+bool isValid(const QString &key);
 } // namespace ReportCategories
 
 #endif // REPORT_CATEGORIES_H

@@ -15,8 +15,8 @@ TEST(ReportCategoriesTest, CanonicalListIsNonEmptyAndStable)
 
 TEST(ReportCategoriesTest, CanonicalListContainsMergedClientAndServerCategories)
 {
-    const QStringList expected = {"cheating", "bug_abuse", "harassment", "verbal_abuse",
-                                  "hate_speech", "spam", "other"};
+    const QStringList expected = {"cheating",    "bug_abuse", "harassment", "verbal_abuse",
+                                  "hate_speech", "spam",      "other"};
     EXPECT_EQ(expected, ReportCategories::keys());
     EXPECT_EQ(7, ReportCategories::keys().size());
 }

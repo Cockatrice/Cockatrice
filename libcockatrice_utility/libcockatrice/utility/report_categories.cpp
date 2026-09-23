@@ -4,13 +4,8 @@ namespace ReportCategories
 {
 const QStringList &keys()
 {
-    static const QStringList categories = {"cheating",
-                                           "bug_abuse",
-                                           "harassment",
-                                           "verbal_abuse",
-                                           "hate_speech",
-                                           "spam",
-                                           "other"};
+    static const QStringList categories = {"cheating",    "bug_abuse", "harassment", "verbal_abuse",
+                                           "hate_speech", "spam",      "other"};
     return categories;
 }
 
