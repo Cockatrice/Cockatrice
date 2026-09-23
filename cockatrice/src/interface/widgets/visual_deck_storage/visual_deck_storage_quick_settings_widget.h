@@ -70,6 +70,15 @@ public:
     [[nodiscard]] TooltipType getDeckPreviewTooltip() const;
     [[nodiscard]] int getCardSize() const;
 
+    /**
+     * @return The card size widget, so card display hosts can resize the cards on
+     * Ctrl + scroll even though the slider itself lives inside this menu.
+     */
+    [[nodiscard]] CardSizeWidget *getCardSizeWidget() const
+    {
+        return cardSizeWidget;
+    }
+
 signals:
     void showFoldersChanged(bool enabled);
     void drawUnusedColorIdentitiesChanged(bool enabled);

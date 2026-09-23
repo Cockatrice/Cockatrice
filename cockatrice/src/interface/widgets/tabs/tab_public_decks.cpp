@@ -2,6 +2,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../deck_loader/deck_loader.h"
+#include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../visual_deck_storage/deck_preview/deck_preview_color_identity_filter_widget.h"
 #include "../visual_deck_storage/deck_preview/public_deck_preview_widget.h"
@@ -107,6 +108,7 @@ TabPublicDecks::TabPublicDecks(TabSupervisor *_tabSupervisor, AbstractClient *_c
             &TabPublicDecks::updateCardSize);
     connect(quickSettingsWidget, &VisualDeckStorageQuickSettingsWidget::showTagFilterChanged, this,
             &TabPublicDecks::updateTagsVisibility);
+    quickSettingsWidget->getCardSizeWidget()->enableCtrlScrollResize(flowWidget);
 
     retranslateUi();
     model->refresh(userName);

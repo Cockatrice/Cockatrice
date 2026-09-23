@@ -38,6 +38,7 @@ EdhrecCommanderResponseCommanderDetailsDisplayWidget::EdhrecCommanderResponseCom
         connect(parentTab->getCardSizeSlider()->getSlider(), &QSlider::valueChanged, commanderPicture,
                 &CardInfoPictureWidget::setScaleFactor);
         commanderPicture->setScaleFactor(parentTab->getCardSizeSlider()->getSlider()->value());
+        parentTab->getCardSizeSlider()->enableCtrlScrollResize(this);
     }
 
     commanderDetails.debugPrint();

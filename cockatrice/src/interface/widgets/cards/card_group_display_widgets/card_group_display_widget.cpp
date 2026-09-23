@@ -46,6 +46,8 @@ CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
     connect(deckListModel, &QAbstractItemModel::dataChanged, this, &CardGroupDisplayWidget::updateCardCount);
     connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::visualDeckEditorShowCardCountsChanged,
             this, &CardGroupDisplayWidget::updateCardCount);
+
+    cardSizeWidget->enableCtrlScrollResize(this);
 }
 
 // Just here so it can get overwritten in subclasses.
