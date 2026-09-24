@@ -91,8 +91,30 @@ MessageLogWidget::getFromStr(CardZoneLogic *zone, QString cardName, int position
     return {cardName, fromStr};
 }
 
+void MessageLogWidget::logTransformIntoCard(const QString &playerName,
+                                            QString oldCardName,
+                                            QString newCardName,
+                                            QString pt,
+                                            bool faceDown)
+{
+    if (faceDown) {
+        appendHtmlServerMessage(
+            tr("%1 transforms %2 into a face down card.").arg(playerName).arg(cardLink(std::move(oldCardName))));
+    } else {
+        appendHtmlServerMessage(tr("%1 transforms %2 into %3%4.")
+                                    .arg(playerName)
+                                    .arg(cardLink(std::move(oldCardName)))
+                                    .arg(cardLink(std::move(newCardName)))
+                                    .arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
+    }
+}
+
 void MessageLogWidget::containerProcessingDone()
 {
+    for (const auto &[playerName, cardName] : deferredDestroyCardNames) {
+        appendHtmlServerMessage(tr("%1 destroys %2.").arg(playerName).arg(cardLink(cardName)));
+    }
+    deferredDestroyCardNames.clear();
     currentContext = MessageContext_None;
     transformOldCardName.clear();
     messageSuffix = messagePrefix = QString();
@@ -235,18 +257,18 @@ void MessageLogWidget::logCreateToken(PlayerLogic *player, QString cardName, QSt
                                         .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                         .arg(cardLink(std::move(cardName)))
                                         .arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
-        } else if (faceDown) {
-            appendHtmlServerMessage(tr("%1 transforms %2 into a face down card.")
-                                        .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
-                                        .arg(cardLink(std::move(transformOldCardName))));
         } else {
-            appendHtmlServerMessage(tr("%1 transforms %2 into %3%4.")
-                                        .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
-                                        .arg(cardLink(std::move(transformOldCardName)))
-                                        .arg(cardLink(std::move(cardName)))
-                                        .arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
+            logTransformIntoCard(sanitizeHtml(player->getPlayerInfo()->getName()), std::move(transformOldCardName),
+                                 std::move(cardName), pt, faceDown);
         }
         transformOldCardName.clear();
+        return;
+    }
+
+    if (currentContext == MessageContext_MoveCard && !deferredDestroyCardNames.isEmpty()) {
+        const auto deferredDestroy = deferredDestroyCardNames.takeLast();
+        logTransformIntoCard(deferredDestroy.first, std::move(deferredDestroy.second), std::move(cardName), pt,
+                             faceDown);
         return;
     }
 
@@ -281,6 +303,11 @@ void MessageLogWidget::logDestroyCard(PlayerLogic *player, QString cardName)
         return;
     }
 
+    if (currentContext == MessageContext_MoveCard) {
+        deferredDestroyCardNames.append({sanitizeHtml(player->getPlayerInfo()->getName()), std::move(cardName)});
+        return;
+    }
+
     appendHtmlServerMessage(
         tr("%1 destroys %2.").arg(sanitizeHtml(player->getPlayerInfo()->getName())).arg(cardLink(std::move(cardName))));
 }
@@ -292,6 +319,14 @@ void MessageLogWidget::logMoveCard(PlayerLogic *player,
                                    CardZoneLogic *targetZone,
                                    int newX)
 {
+    // A destroyed card that was not replaced by a re-created card has no
+    // following move event, so flush any pending destroy logs before logging
+    // the next move within this batch.
+    for (const auto &[playerName, cardName] : deferredDestroyCardNames) {
+        appendHtmlServerMessage(tr("%1 destroys %2.").arg(playerName).arg(cardLink(cardName)));
+    }
+    deferredDestroyCardNames.clear();
+
     if (currentContext == MessageContext_Mulligan) {
         return;
     }

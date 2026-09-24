@@ -17,9 +17,12 @@
 #include <QCoreApplication>
 #include <gtest/gtest.h>
 #include <libcockatrice/protocol/pb/command_create_token.pb.h>
+#include <libcockatrice/protocol/pb/command_move_card.pb.h>
+#include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/protocol/pb/context_transform_card.pb.h>
 #include <libcockatrice/protocol/pb/event_create_token.pb.h>
 #include <libcockatrice/protocol/pb/event_destroy_card.pb.h>
+#include <libcockatrice/protocol/pb/event_move_card.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/rng/rng_abstract.h>
 #include <libcockatrice/utility/zone_names.h>
@@ -157,6 +160,82 @@ TEST_F(TransformContextTest, PlainTokenCreateHasNoTransformContext)
 
     EXPECT_EQ(player->cmdCreateToken(cmd, rc, ges), Response::RespOk);
     EXPECT_EQ(ges.getGameEventContext(), nullptr);
+}
+
+TEST_F(TransformContextTest, MovingTransformedTokenRevertsToOriginalCard)
+{
+    GameEventStorage transformGes;
+    ResponseContainer rc(0);
+    ASSERT_EQ(player->cmdCreateToken(makeTransformCommand(targetCard->getId()), rc, transformGes), Response::RespOk);
+
+    uint32_t transformedCardId = 0;
+    for (const auto *item : transformGes.getGameEventList()) {
+        const GameEvent &event = item->getGameEvent();
+        if (event.HasExtension(Event_CreateToken::ext)) {
+            transformedCardId = event.GetExtension(Event_CreateToken::ext).card_id();
+        }
+    }
+    ASSERT_NE(transformedCardId, 0u);
+    ASSERT_NE(tableZoneOf(*player)->getCard(transformedCardId), nullptr);
+
+    auto *graveZone = new Server_CardZone(player.get(), ZoneNames::GRAVE, false, ServerInfo_Zone::HiddenZone);
+    player->addZone(graveZone);
+
+    CardToMove cardToMove;
+    cardToMove.set_card_id(transformedCardId);
+    QList<const CardToMove *> cardsToMove = {&cardToMove};
+
+    GameEventStorage moveGes;
+    ASSERT_EQ(player->moveCard(moveGes, tableZoneOf(*player), cardsToMove, graveZone, 0, 0, false, false, false),
+              Response::RespOk);
+
+    // The batch context is MoveCard so the client associates this sequence with
+    // the revert of a transformed token.
+    ASSERT_NE(moveGes.getGameEventContext(), nullptr);
+    EXPECT_TRUE(static_cast<GameEventContext *>(moveGes.getGameEventContext())->HasExtension(Context_MoveCard::ext));
+
+    int destroyIndex = -1;
+    int createIndex = -1;
+    int moveIndex = -1;
+    Event_CreateToken resurrectEvent;
+    QList<const GameEvent *> events;
+    for (const auto *item : moveGes.getGameEventList()) {
+        events.append(&item->getGameEvent());
+    }
+    for (int i = 0; i < events.size(); ++i) {
+        const GameEvent &event = *events.at(i);
+        if (event.HasExtension(Event_DestroyCard::ext)) {
+            const auto &destroyEvent = event.GetExtension(Event_DestroyCard::ext);
+            EXPECT_EQ(destroyEvent.card_id(), transformedCardId);
+            EXPECT_EQ(QString::fromStdString(destroyEvent.zone_name()), ZoneNames::TABLE);
+            destroyIndex = i;
+        } else if (event.HasExtension(Event_CreateToken::ext)) {
+            resurrectEvent = event.GetExtension(Event_CreateToken::ext);
+            createIndex = i;
+        } else if (event.HasExtension(Event_MoveCard::ext)) {
+            moveIndex = i;
+        }
+    }
+
+    // The transformed token is destroyed, the stashed original is re-created in
+    // the start zone, and the original card continues into the target zone.
+    EXPECT_NE(destroyIndex, -1);
+    ASSERT_NE(createIndex, -1);
+    EXPECT_NE(moveIndex, -1);
+    EXPECT_LT(destroyIndex, createIndex);
+    EXPECT_LT(createIndex, moveIndex);
+
+    EXPECT_EQ(resurrectEvent.card_name(), "Old Card");
+    EXPECT_EQ(QString::fromStdString(resurrectEvent.zone_name()), ZoneNames::TABLE);
+    ASSERT_TRUE(resurrectEvent.has_card_id());
+
+    // The transformed card is gone from the table and the original card moved
+    // into the graveyard.
+    EXPECT_EQ(tableZoneOf(*player)->getCard(transformedCardId), nullptr);
+    const auto &graveCards = graveZone->getCards();
+    ASSERT_EQ(graveCards.size(), 1);
+    EXPECT_EQ(graveCards.first()->getId(), resurrectEvent.card_id());
+    EXPECT_EQ(graveCards.first()->getName(), "Old Card");
 }
 
 } // namespace
