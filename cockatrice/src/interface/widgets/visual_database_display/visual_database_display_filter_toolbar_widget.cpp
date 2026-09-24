@@ -154,7 +154,7 @@ void VisualDatabaseDisplayFilterToolbarWidget::retranslateUi()
     quickFilterSubTypeWidget->setToolTip(tr("Filter by card sub-type"));
     quickFilterSetWidget->setToolTip(tr("Filter by set"));
     quickFilterFormatLegalityWidget->setToolTip(tr("Filter by format legality"));
-    quickFilterTagWidget->setToolTip(tr("Filter by Scryfall Tagger tag"));
+    quickFilterTagWidget->setToolTip(tr("Filter by card tag"));
 
     quickFilterSaveLoadWidget->setButtonText(tr("Save/Load"));
     quickFilterNameWidget->setButtonText(tr("Name"));
