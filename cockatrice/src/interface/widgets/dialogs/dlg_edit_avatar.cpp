@@ -19,6 +19,9 @@ DlgEditAvatar::DlgEditAvatar(QWidget *parent) : QDialog(parent), image()
 
     textLabel = new QLabel(tr("To change your avatar, choose a new image.\nTo remove your current avatar, confirm "
                               "without choosing a new image."));
+    hintLabel = new QLabel(
+        tr("Images are automatically downscaled to at most %1x%1 pixels.").arg(QString::number(MAX_AVATAR_DIMENSION)));
+    hintLabel->setStyleSheet("color: palette(placeholderText);");
     browseButton = new QPushButton(tr("Browse..."));
     connect(browseButton, &QPushButton::clicked, this, &DlgEditAvatar::actBrowse);
 
@@ -26,6 +29,7 @@ DlgEditAvatar::DlgEditAvatar(QWidget *parent) : QDialog(parent), image()
     grid->addWidget(imageLabel, 0, 0, 1, 2);
     grid->addWidget(textLabel, 1, 0);
     grid->addWidget(browseButton, 1, 1);
+    grid->addWidget(hintLabel, 2, 0, 1, 2);
 
     auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgEditAvatar::actOk);
@@ -70,6 +74,10 @@ QByteArray DlgEditAvatar::getImage()
 {
     if (image.isNull()) {
         return QByteArray();
+    }
+
+    if (image.width() > MAX_AVATAR_DIMENSION || image.height() > MAX_AVATAR_DIMENSION) {
+        image = image.scaled(MAX_AVATAR_DIMENSION, MAX_AVATAR_DIMENSION, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     }
 
     for (;;) {
