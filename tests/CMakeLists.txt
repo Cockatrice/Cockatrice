@@ -330,6 +330,17 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  server_transform_context_test
+  SOURCES
+  server_transform_context_test.cpp
+  LIBS
+  libcockatrice_network_server_remote
+  libcockatrice_rng
+  LABELS
+  server
+)
+cockatrice_add_test(
+  NAME
   server_forced_password_change_test
   SOURCES
   server_forced_password_change_test.cpp

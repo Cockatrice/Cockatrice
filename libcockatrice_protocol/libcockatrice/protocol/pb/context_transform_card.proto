@@ -1,0 +1,8 @@
+syntax = "proto2";
+import "game_event_context.proto";
+
+message Context_TransformCard {
+    extend GameEventContext {
+        optional Context_TransformCard ext = 1010;
+    }
+}

@@ -34,10 +34,12 @@ private:
     {
         MessageContext_None,
         MessageContext_MoveCard,
-        MessageContext_Mulligan
+        MessageContext_Mulligan,
+        MessageContext_TransformCard
     };
 
     MessageContext currentContext;
+    QString transformOldCardName;
     QString messagePrefix, messageSuffix;
 
     static QPair<QString, QString> getFromStr(CardZoneLogic *zone, QString cardName, int position, bool ownerChange);
