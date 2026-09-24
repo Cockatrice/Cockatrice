@@ -139,7 +139,7 @@ private:
     void createTrayIcon();
     int getNextCustomSetPrefix(QDir dataDir);
 
-    void runFirstRunWizard();
+    void runFirstRunWizard(bool firstRun = false);
 
     inline QString getCardUpdaterBinaryName()
     {
@@ -169,6 +169,7 @@ private:
     bool bHasActivated, askedForDbUpdater;
     bool skipStartupAutoConnect = false;
     bool startupAutoConnectAttempted = false;
+    bool firstRunWizardActive = false;
     QProcess *cardUpdateProcess;
     QByteArray cardUpdateOutputBuffer;
     DlgViewLog *logviewDialog;
