@@ -10,9 +10,9 @@
 #include "game/server_card.h"
 #include "game/server_cardzone.h"
 #include "game/server_game.h"
+#include "movecard_tests/server_test_helpers.h"
 #include "server_response_containers.h"
 #include "server_room.h"
-#include "movecard_tests/server_test_helpers.h"
 
 #include <QCoreApplication>
 #include <gtest/gtest.h>
