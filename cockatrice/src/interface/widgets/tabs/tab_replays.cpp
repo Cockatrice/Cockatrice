@@ -9,6 +9,7 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QDesktopServices>
+#include <QDir>
 #include <QFileSystemModel>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -33,6 +34,12 @@
 #include <libcockatrice/settings/paths_settings.h>
 
 inline Q_LOGGING_CATEGORY(TabReplaysLog, "replays_tab");
+
+namespace
+{
+// File name filters for the local replay files Cockatrice can load.
+const QStringList REPLAY_FILE_NAME_FILTERS = {"*.cor"};
+} // namespace
 
 TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User *currentUserInfo)
     : Tab(_tabSupervisor), client(_client)
@@ -62,6 +69,8 @@ QGroupBox *TabReplays::createLeftLayout()
 {
     localDirModel = new QFileSystemModel(this);
     localDirModel->setRootPath(SettingsCache::instance().paths().getReplaysPath());
+    localDirModel->setNameFilters(REPLAY_FILE_NAME_FILTERS);
+    localDirModel->setNameFilterDisables(false);
     localDirModel->sort(0, Qt::AscendingOrder);
 
     localDirView = new QTreeView;
@@ -262,6 +271,10 @@ void TabReplays::actOpenLocalReplay()
             continue;
         }
         QString filePath = localDirModel->filePath(curLeft);
+
+        if (!QDir::match(REPLAY_FILE_NAME_FILTERS, QFileInfo(filePath).fileName())) {
+            continue;
+        }
 
         QFile f(filePath);
         if (!f.open(QIODevice::ReadOnly)) {

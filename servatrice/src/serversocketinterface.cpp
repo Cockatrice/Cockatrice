@@ -982,6 +982,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
         return Response::RespInvalidData;
     }
 
+    if (cmd.deck_list().size() > static_cast<std::string::size_type>(MAX_FILE_LENGTH)) {
+        return Response::RespInvalidData;
+    }
+
     sqlInterface->checkSql();
 
     QString deckStr = fileFromStdString(cmd.deck_list());
