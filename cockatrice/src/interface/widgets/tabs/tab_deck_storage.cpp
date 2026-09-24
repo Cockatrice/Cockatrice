@@ -14,6 +14,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QDesktopServices>
+#include <QDir>
 #include <QFileSystemModel>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -49,6 +50,12 @@ namespace
 // How long to wait after the last visibility change before reading back the
 // Public/Private column, in milliseconds.
 constexpr int VISIBILITY_REFRESH_DELAY = 500;
+
+// Whether the file's name matches one of the deck formats Cockatrice can load.
+bool isSupportedDeckFile(const QString &filePath)
+{
+    return QDir::match(DeckLoader::ACCEPTED_FILE_EXTENSIONS, QFileInfo(filePath).fileName());
+}
 } // namespace
 
 TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
@@ -58,6 +65,8 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
 {
     localDirModel = new QFileSystemModel(this);
     localDirModel->setRootPath(SettingsCache::instance().paths().getDeckPath());
+    localDirModel->setNameFilters(DeckLoader::ACCEPTED_FILE_EXTENSIONS);
+    localDirModel->setNameFilterDisables(false);
     localDirModel->sort(0, Qt::AscendingOrder);
 
     localDirView = new QTreeView;
@@ -312,6 +321,10 @@ void TabDeckStorage::actOpenLocalDeck()
         }
         QString filePath = localDirModel->filePath(curLeft);
 
+        if (!isSupportedDeckFile(filePath)) {
+            continue;
+        }
+
         std::optional<LoadedDeck> deckOpt = DeckLoader::loadFromFile(filePath, DeckFileFormat::Cockatrice, true);
         if (!deckOpt) {
             continue;
@@ -376,6 +389,11 @@ void TabDeckStorage::actUpload()
 
 void TabDeckStorage::uploadDeck(const QString &filePath, const QString &targetPath)
 {
+    if (!isSupportedDeckFile(filePath)) {
+        QMessageBox::critical(this, tr("Error"), tr("Invalid deck file"));
+        return;
+    }
+
     QFile deckFile(filePath);
     QFileInfo deckFileInfo(deckFile);
 
