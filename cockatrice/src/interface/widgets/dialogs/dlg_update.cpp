@@ -5,11 +5,13 @@
 #include "../client/network/update/client/release_channel.h"
 #include "../interface/window_main.h"
 
+#include <QCoreApplication>
 #include <QDesktopServices>
 #include <QLabel>
 #include <QMessageBox>
 #include <QProgressBar>
 #include <QPushButton>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <QtNetwork>
 #include <version_string.h>
@@ -240,8 +242,28 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
 
     // Try to open the installer. If it opens, quit Cockatrice
     if (process.startDetached()) {
-        QMetaObject::invokeMethod(static_cast<MainWindow *>(parent()), "close", Qt::QueuedConnection);
         qCInfo(DlgUpdateLog) << "Opened downloaded update file successfully - closing Cockatrice";
+        // Close the main window synchronously so file locks are released before the NSIS installer
+        // (already launched) starts replacing files. This also flushes settings and shuts down the
+        // tabs, but only when the close is actually accepted: MainWindow may veto it for a running
+        // card DB update, an open game, or an unsaved deck, and closeForUpdate() also reports a
+        // close already in progress (reached from a nested event loop while a shutdown prompt is
+        // up). Only quit when the shutdown really ran - otherwise keep running so the user can
+        // resolve the blocker, and warn them that the installer only waits about a minute
+        // before it terminates the application to finish the update.
+        if (auto *window = qobject_cast<MainWindow *>(parent())) {
+            if (window->closeForUpdate()) {
+                QTimer::singleShot(0, qApp, [] { QCoreApplication::exit(0); });
+            } else {
+                QMessageBox::warning(this, tr("Update"),
+                                     tr("The update installer is already running and will terminate "
+                                        "Cockatrice within the next minute to finish the update. "
+                                        "Cockatrice is still busy, so save your work and close it "
+                                        "yourself before then."));
+            }
+        } else {
+            QTimer::singleShot(0, qApp, [] { QCoreApplication::exit(0); });
+        }
         close();
     } else {
         setLabel(tr("Error"));
