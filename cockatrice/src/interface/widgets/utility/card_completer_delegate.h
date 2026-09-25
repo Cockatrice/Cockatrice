@@ -30,6 +30,9 @@ public:
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
+    // Content width of one popup row; the completer popup is sized to fit it.
+    static constexpr int PopupRowWidth = 480;
+
 private:
     // Set short codes, resolved once per card name and cached
     mutable QCache<QString, QString> setCodeCache;
@@ -42,7 +45,8 @@ private:
 
     // Draw all mana pips for a cost string like "2RG" or "{2}{R}{G}"; split and
     // adventure costs ("1W // W") are drawn as separate groups. Returns the left-most x used
-    int drawManaCost(QPainter *p, const QRect &row, const QString &manaCost, int radius) const;
+    int
+    drawManaCost(QPainter *p, const QRect &row, const QString &manaCost, int radius, int spacing, int rightPad) const;
 
     // Resolve the preferred printing's set short code for a card
     QString setCodeForCard(const QSharedPointer<CardInfo> &card) const;

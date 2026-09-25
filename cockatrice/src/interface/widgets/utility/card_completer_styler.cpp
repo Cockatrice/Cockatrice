@@ -10,8 +10,11 @@
 #include <QEvent>
 #include <QKeyEvent>
 #include <QMouseEvent>
+#include <QPoint>
 #include <QPropertyAnimation>
+#include <QRect>
 #include <QScreen>
+#include <QScrollBar>
 #include <QSize>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -86,6 +89,7 @@ bool CardCompleterStyler::eventFilter(QObject *obj, QEvent *ev)
             case QEvent::Show:
             case QEvent::Move:
             case QEvent::Resize:
+                applyPopupWidth();
                 updateOrientation();
                 reposition();
                 break;
@@ -136,6 +140,43 @@ bool CardCompleterStyler::handlePopupKeyPress(QKeyEvent *event)
     }
 
     return true;
+}
+
+// ---------------------------------------------------------------------------
+
+void CardCompleterStyler::applyPopupWidth()
+{
+    auto *popup = completer->popup();
+
+    // QCompleter sizes its popup to the line edit, so a narrow search field
+    // would crush the rows. Ask for the width the rows are designed for (plus
+    // the frame and scrollbar) and let QWidget's geometry clamping keep the
+    // popup that wide, clamped to the screen it is shown on.
+    int contentWidth = CardCompleterDelegate::PopupRowWidth + popup->frameWidth() * 2;
+    if (auto *vbar = popup->verticalScrollBar(); vbar != nullptr) {
+        contentWidth += vbar->sizeHint().width();
+    }
+
+    const QScreen *screen = popup->screen();
+    const QRect available = screen ? screen->availableGeometry() : QRect();
+
+    const int minWidth = available.isEmpty() ? contentWidth : qMin(contentWidth, available.width());
+    popup->setMinimumWidth(minWidth);
+
+    // Widen the popup right away on the first show; QCompleter has already
+    // positioned it for the narrow size, so keep it on screen afterwards.
+    if (popup->width() < minWidth) {
+        popup->resize(minWidth, popup->height());
+
+        if (!available.isEmpty()) {
+            // Clamp in screen coordinates, then map back to parent coordinates.
+            QPoint globalPos = popup->mapToGlobal(QPoint(0, 0));
+            int clampedGlobalX =
+                qBound(available.left(), globalPos.x(), qMax(available.left(), available.right() - popup->width() + 1));
+            QPoint parentPos = popup->mapFromGlobal(QPoint(clampedGlobalX, globalPos.y()));
+            popup->move(parentPos);
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------
