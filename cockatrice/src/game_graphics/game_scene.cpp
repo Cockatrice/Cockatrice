@@ -735,6 +735,16 @@ void GameScene::clearViews()
     }
 }
 
+void GameScene::emptyActiveViews()
+{
+    for (auto zoneView : zoneViews) {
+        auto logic = qobject_cast<ZoneViewZoneLogic *>(zoneView->getZone()->getLogic());
+        if (!logic->getRevealZone()) {
+            logic->clearCards();
+        }
+    }
+}
+
 /**
  * @brief Closes the most recently added zone view.
  */

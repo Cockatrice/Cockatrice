@@ -267,6 +267,9 @@ void TabGame::resetChatAndPhase()
     // reset phase markers
     game->getGameState()->setCurrentPhase(-1);
 
+    // reset view zones
+    static_cast<GameScene *>(gameView->scene())->emptyActiveViews();
+
     // reset spectator state so the replay can rebuild it from the start
     game->getPlayerManager()->clearSpectators();
     playerListWidget->clearSpectators();

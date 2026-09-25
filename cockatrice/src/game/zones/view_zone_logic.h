@@ -41,6 +41,10 @@ public:
     bool prepareAddCard(int x);
     void removeCard(int position, bool toNewZone);
     void updateCardIds(CardAction action);
+
+    /** @brief Removes all cards from the view, without touching anything else. Used in replay rewind */
+    void clearCards();
+
     int getNumberCards() const
     {
         return numberCards;
