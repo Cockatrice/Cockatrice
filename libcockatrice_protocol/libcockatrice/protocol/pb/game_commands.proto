@@ -180,6 +180,15 @@ message GameCommand {
         /// Server: Server_Player::cmdSetPlaymat
         /// Client: reflected via player properties changed event
         SET_PLAYMAT = 1035;
+
+        /// Report the result of a tournament match sub-game.
+        REPORT_MATCH_RESULT = 1037;
+
+        /// Advance the tournament to the next round.
+        ADVANCE_TOURNAMENT = 1038;
+
+        /// Select tournament settings.
+        TOURNAMENT_SETTINGS_SELECT = 1039;
     }
 
     extensions 100 to max;
