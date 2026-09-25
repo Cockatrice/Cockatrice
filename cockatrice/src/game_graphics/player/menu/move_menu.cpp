@@ -6,7 +6,7 @@
 #include "../card_menu_action_type.h"
 #include "../player_graphics_item.h"
 
-MoveMenu::MoveMenu(PlayerGraphicsItem *player) : QMenu(tr("Move to"))
+MoveMenu::MoveMenu(PlayerGraphicsItem *player, QWidget *parent) : QMenu(tr("Move to"), parent)
 {
     aMoveToTopLibrary = new QAction(this);
     aMoveToTopLibrary->setData(cmMoveToTopLibrary);
