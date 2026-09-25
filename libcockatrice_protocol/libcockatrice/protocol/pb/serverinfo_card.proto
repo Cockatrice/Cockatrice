@@ -53,4 +53,7 @@ message ServerInfo_Card {
 
     // unique id of this kind of card, extends the name to specify a specific printing of a card
     optional string provider_id = 17;
+
+    // whether the card should not be untapped during its controller's next turn
+    optional bool doesnt_untap_once = 18;
 }
