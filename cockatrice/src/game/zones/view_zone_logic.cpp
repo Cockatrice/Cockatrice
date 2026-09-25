@@ -154,6 +154,14 @@ void ZoneViewZoneLogic::removeCard(int position, bool toNewZone)
     reorganizeCards();
 }
 
+void ZoneViewZoneLogic::clearCards()
+{
+    for (auto card : cards) {
+        card->deleteLater();
+    }
+    cards.clear();
+}
+
 void ZoneViewZoneLogic::setWriteableRevealZone(bool _writeableRevealZone)
 {
 
