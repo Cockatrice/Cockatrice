@@ -575,11 +575,18 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::startupConfigCheck()
 {
+    const bool isCleanInstall = SettingsCache::instance().network().getClientVersion() == CLIENT_INFO_NOT_SET;
+
     // checkUnknownSets() is intentionally deferred from the card database load
     // (which runs in main() before MainWindow exists) so that
     // cardDatabaseNewSetsFound / cardDatabaseAllNewSetsEnabled have live
     // receivers when emitted.
-    CardDatabaseManager::getInstance()->checkUnknownSets();
+    // On a clean install the onboarding wizard owns the first-run experience;
+    // wait until it closes so the legacy "all sets enabled" welcome and the
+    // Manage Sets dialog don't appear first.
+    if (!isCleanInstall) {
+        CardDatabaseManager::getInstance()->checkUnknownSets();
+    }
 
     if (SettingsCache::instance().debug().getLocalGameOnStartup()) {
         LocalGameOptions options;
@@ -593,14 +600,14 @@ void MainWindow::startupConfigCheck()
 
     actCheckCommanderBracketDefinitionUpdates();
 
-    if (SettingsCache::instance().network().getClientVersion() == CLIENT_INFO_NOT_SET) {
+    if (isCleanInstall) {
         // no config found, 99% new clean install
         qCInfo(WindowMainStartupVersionLog)
             << "Startup: old client version empty, assuming first start after clean install";
         SettingsCache::instance().downloads().resetToDefaultURLs(); // populate the download urls
         SettingsCache::instance().network().setClientVersion(VERSION_STRING);
         actCheckServerUpdates();
-        runFirstRunWizard();
+        runFirstRunWizard(true);
 
         if (QString(VERSION_STRING).contains("custom", Qt::CaseInsensitive)) {
             SettingsCache::instance().updates().setCheckUpdatesOnStartup(false);
@@ -680,7 +687,7 @@ void MainWindow::startupConfigCheck()
     }
 }
 
-void MainWindow::runFirstRunWizard()
+void MainWindow::runFirstRunWizard(bool firstRun)
 {
     auto *wizard = new FirstRunWizard(this);
     wizard->setAttribute(Qt::WA_DeleteOnClose);
@@ -691,6 +698,19 @@ void MainWindow::runFirstRunWizard()
     connect(this, &MainWindow::cardDatabaseUpdateProgress, wizard, &FirstRunWizard::onCardDatabaseUpdateProgress);
     connect(wizard, &FirstRunWizard::registerRequested, connectionController, &ConnectionController::registerToServer);
     connect(wizard, &FirstRunWizard::connectRequested, connectionController, &ConnectionController::connectToServer);
+
+    if (firstRun) {
+        // The onboarding wizard owns set handling for a clean install. Suppress
+        // the legacy set dialogs while it's open and run checkUnknownSets() once
+        // it closes so the sets end up enabled in the right order.
+        firstRunWizardActive = true;
+        connect(wizard, &QDialog::finished, this, [this] {
+            QTimer::singleShot(0, this, [this] {
+                CardDatabaseManager::getInstance()->checkUnknownSets();
+                firstRunWizardActive = false;
+            });
+        });
+    }
 
     wizard->setModal(true);
     wizard->show();
@@ -995,7 +1015,7 @@ void MainWindow::cardDatabaseLoadingFailed()
 
 void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknownSetsNames)
 {
-    if (SettingsCache::instance().updates().getAlwaysEnableNewSets()) {
+    if (firstRunWizardActive || SettingsCache::instance().updates().getAlwaysEnableNewSets()) {
         CardDatabaseManager::getInstance()->enableAllUnknownSets();
         const auto reloadOk1 =
             QtConcurrent::run([] { CardDatabaseManager::getInstance()->reloadCardDatabasesAndNotify(); });
@@ -1038,6 +1058,12 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
 
 void MainWindow::cardDatabaseAllNewSetsEnabled()
 {
+    if (firstRunWizardActive || CardDatabaseManager::getInstance()->getCardList().isEmpty()) {
+        // The onboarding wizard owns the first-run messaging on a clean install,
+        // and with no card data there are no sets to have enabled.
+        return;
+    }
+
     QMessageBox::information(
         this, tr("Welcome"),
         tr("Hi! It seems like you're running this version of Cockatrice for the first time.\nAll the sets in the card "
