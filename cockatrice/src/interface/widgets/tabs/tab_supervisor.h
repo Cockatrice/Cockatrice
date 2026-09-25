@@ -94,6 +94,8 @@ public:
     };
 
 private:
+    void startSpectatorJoin(int gameId, int roomId, const QString &unavailableMessage);
+
     ServerInfo_User *userInfo;
     AbstractClient *client;
     UserListManager *userListManager;
@@ -198,6 +200,7 @@ public slots:
     TabEdhRec *addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCommander = false);
     void openReplay(GameReplay *replay);
     void joinReportGame(int gameId, int roomId);
+    void spectatorJoinGame(int gameId, int roomId);
     void openTabModeration(const QString &userName = {});
     void switchToFirstAvailableNetworkTab();
     void maximizeMainWindow();
