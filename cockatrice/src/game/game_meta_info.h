@@ -84,6 +84,21 @@ public:
         return roomGameTypes.find(gameInfo_.game_types(index)).value();
     }
 
+    bool isTournament() const
+    {
+        return gameInfo_.is_tournament();
+    }
+
+    int parentGameId() const
+    {
+        return parentGameId_;
+    }
+
+    void setParentGameId(int id)
+    {
+        parentGameId_ = id;
+    }
+
 public slots:
     void setStarted(bool s)
     {
@@ -108,6 +123,7 @@ signals:
 
 private:
     ServerInfo_Game gameInfo_;
+    int parentGameId_ = -1;
 };
 
 #endif // GAME_META_INFO_H
