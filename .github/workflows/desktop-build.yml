@@ -46,6 +46,7 @@ jobs:
     outputs:
       tag: ${{ steps.configure.outputs.tag }}
       sha: ${{ steps.configure.outputs.sha }}
+      is_beta: ${{ steps.prepare.outputs.is_beta }}
 
     steps:
       - name: "Configure"
@@ -85,13 +86,17 @@ jobs:
           body_path: ${{ steps.prepare.outputs.body_path }}
           prerelease: ${{ steps.prepare.outputs.is_beta }}
         run: |
-          args=()
-          [[ $prerelease == yes ]] && args+=(--prerelease)
+          if gh release view "$tag_name" >/dev/null 2>&1; then
+            echo "::warning::Release $tag_name already exists"
+          else
+            args=()
+            [[ $prerelease == yes ]] && args+=(--prerelease)
 
-          gh release create "$tag_name" --verify-tag --draft "${args[@]}" \
-            --target "$target" \
-            --title "$release_name" \
-            --notes-file "$body_path"
+            gh release create "$tag_name" --verify-tag --draft "${args[@]}" \
+              --target "$target" \
+              --title "$release_name" \
+              --notes-file "$body_path"
+          fi
 
   build-linux:
     strategy:
@@ -570,3 +575,36 @@ jobs:
           BUILD_PATH: ${{ steps.build.outputs.path }}
           GH_TOKEN: ${{ github.token }}
         run: gh attestation verify "$BUILD_PATH" --repo Cockatrice/Cockatrice
+
+  publish:
+    name: Publish pre-release
+    runs-on: ubuntu-slim    # https://github.com/actions/runner-images/blob/main/images/ubuntu-slim/ubuntu-slim-Readme.md
+    needs:
+      - configure
+      - build-linux
+      - build-vcpkg
+    if: ${{ github.ref_type == 'tag' && needs.configure.outputs.is_beta == 'yes' }}
+
+    steps:
+      - name: "Update pre-release status"
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          tag_name: ${{ needs.configure.outputs.tag }}
+        run: |
+          release=$(gh release view "$tag_name" --json isDraft,isPrerelease)
+
+          is_draft=$(jq -r '.isDraft' <<< "$release")
+          is_prerelease=$(jq -r '.isPrerelease' <<< "$release")
+
+          if [[ "$is_draft" != true ]]; then
+            echo "::error::Release $tag_name is not a draft"
+            exit 1
+          fi
+
+          if [[ "$is_prerelease" != true ]]; then
+            echo "::error::Release $tag_name is not a pre-release"
+            exit 1
+          fi
+
+          gh release edit "$tag_name" --draft=false
