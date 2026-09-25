@@ -29,8 +29,9 @@ private slots:
     void actBrowse();
 
 private:
+    static constexpr int MAX_AVATAR_DIMENSION = 1024;
     QImage image;
-    QLabel *textLabel, *imageLabel;
+    QLabel *textLabel, *imageLabel, *hintLabel;
     QPushButton *browseButton;
 };
 
