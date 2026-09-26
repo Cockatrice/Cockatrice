@@ -218,9 +218,10 @@ void UserListTWI::setOnline(bool online)
  * 2) Admins, judge/vip/donator status ignored
  * 3) Moderators, judge/vip/donator status ignored
  * 4) Judges
- * 5) VIPs
- * 6) Donators
- * 7) Everyone else
+ * 5) Developers
+ * 6) VIPs
+ * 7) Donators
+ * 8) Everyone else
  * @param other RHS to compare to
  * @return Left is less than the Right
  */
@@ -234,11 +235,10 @@ bool UserListTWI::operator<(const QTreeWidgetItem &other) const
     const auto &lhsUserLevelFlags = UserLevelFlags(data(0, Qt::UserRole).toInt());
     const auto &rhsUserLevelFlags = UserLevelFlags(other.data(0, Qt::UserRole).toInt());
 
-    // Admins, Developers & Mods need no additional comparison checks, just to see if they're an admin, a developer
+    // Admins & Moderators need no additional comparison checks, just to see if they're an admin
     // or a moderator
     static const QList<ServerInfo_User_UserLevelFlag> userLevelWithNoOtherPrefOrder = {
-        ServerInfo_User_UserLevelFlag_IsAdmin, ServerInfo_User_UserLevelFlag_IsDeveloper,
-        ServerInfo_User_UserLevelFlag_IsModerator};
+        ServerInfo_User_UserLevelFlag_IsAdmin, ServerInfo_User_UserLevelFlag_IsModerator};
     for (const auto &userLevelEntry : userLevelWithNoOtherPrefOrder) {
         if (lhsUserLevelFlags.testFlag(userLevelEntry) &&
             lhsUserLevelFlags.testFlag(userLevelEntry) == rhsUserLevelFlags.testFlag(userLevelEntry)) {
@@ -249,10 +249,10 @@ bool UserListTWI::operator<(const QTreeWidgetItem &other) const
         }
     }
 
-    // Judges can be sorted by their additional ranks
-    static const QList<ServerInfo_User_UserLevelFlag> userLevelOrder = {ServerInfo_User_UserLevelFlag_IsJudge,
-                                                                        ServerInfo_User_UserLevelFlag_IsRegistered,
-                                                                        ServerInfo_User_UserLevelFlag_IsUser};
+    // Judges and developers can be sorted by their additional ranks
+    static const QList<ServerInfo_User_UserLevelFlag> userLevelOrder = {
+        ServerInfo_User_UserLevelFlag_IsJudge, ServerInfo_User_UserLevelFlag_IsDeveloper,
+        ServerInfo_User_UserLevelFlag_IsRegistered, ServerInfo_User_UserLevelFlag_IsUser};
     for (const auto &userLevelEntry : userLevelOrder) {
         if (lhsUserLevelFlags.testFlag(userLevelEntry) != rhsUserLevelFlags.testFlag(userLevelEntry)) {
             return lhsUserLevelFlags.testFlag(userLevelEntry) > rhsUserLevelFlags.testFlag(userLevelEntry);

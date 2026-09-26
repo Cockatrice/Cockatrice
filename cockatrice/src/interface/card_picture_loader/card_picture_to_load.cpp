@@ -94,8 +94,7 @@ void CardPictureToLoad::populateSetUrls()
         }
     }
 
-    const QStringList orderedTemplates = urlTemplates;
-    for (const QString &urlTemplate : orderedTemplates) {
+    for (const QString &urlTemplate : urlTemplates) {
         QString transformedUrl = transformUrl(urlTemplate);
 
         if (!transformedUrl.isEmpty()) {

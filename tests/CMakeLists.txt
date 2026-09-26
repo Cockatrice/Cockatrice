@@ -14,6 +14,7 @@ add_test(NAME server_rate_limiter_test COMMAND server_rate_limiter_test)
 add_test(NAME server_developer_role_test COMMAND server_developer_role_test)
 add_test(NAME server_game_join_test COMMAND server_game_join_test)
 add_test(NAME warning_categories_test COMMAND warning_categories_test)
+add_test(NAME report_categories_test COMMAND report_categories_test)
 add_test(NAME lag_monitor_test COMMAND lag_monitor_test)
 add_test(NAME latency_tracker_test COMMAND latency_tracker_test)
 add_test(NAME metrics_registry_test COMMAND metrics_registry_test)
@@ -37,6 +38,7 @@ add_executable(server_rate_limiter_test server_rate_limiter_test.cpp)
 add_executable(server_developer_role_test server_developer_role_test.cpp)
 add_executable(server_game_join_test server_game_join_test.cpp)
 add_executable(warning_categories_test warning_categories_test.cpp)
+add_executable(report_categories_test report_categories_test.cpp)
 add_executable(lag_monitor_test ${CMAKE_SOURCE_DIR}/cockatrice/src/client/lag_monitor.cpp lag_monitor_test.cpp)
 target_include_directories(lag_monitor_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src)
 add_executable(latency_tracker_test latency_tracker_test.cpp)
@@ -91,6 +93,7 @@ if(NOT GTEST_FOUND)
   add_dependencies(server_developer_role_test gtest)
   add_dependencies(server_game_join_test gtest)
   add_dependencies(warning_categories_test gtest)
+  add_dependencies(report_categories_test gtest)
   add_dependencies(lag_monitor_test gtest)
   add_dependencies(latency_tracker_test gtest)
   add_dependencies(metrics_registry_test gtest)
@@ -137,6 +140,9 @@ target_link_libraries(
 target_link_libraries(
   warning_categories_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
 )
+target_link_libraries(
+  report_categories_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
+)
 target_link_libraries(lag_monitor_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
 target_link_libraries(
   latency_tracker_test libcockatrice_network Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
@@ -155,3 +161,9 @@ add_subdirectory(loading_from_clipboard)
 add_subdirectory(movecard_tests)
 add_subdirectory(oracle)
 add_subdirectory(settings)
+
+# picture_loader_benchmark links libcockatrice_settings, which only exists when
+# a client/UI-capable target is being built.
+if(WITH_ORACLE OR WITH_CLIENT)
+  add_subdirectory(picture_loader_benchmark)
+endif()

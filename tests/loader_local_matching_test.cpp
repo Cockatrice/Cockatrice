@@ -69,6 +69,18 @@ protected:
     }
 
     /**
+     * @brief Destroys and rebuilds the loader so the CUSTOM index is re-scanned.
+     *
+     * The CUSTOM-folder index is snapshotted at construction; rebuild it after
+     * writing files so freshly placed images are discoverable.
+     */
+    void rebuildLoader()
+    {
+        delete loader;
+        loader = new CardPictureLoaderLocal(nullptr);
+    }
+
+    /**
      * @brief Writes a valid 1x1 PNG under the sandboxed pics path.
      */
     void writePngUnderPics(const QString &relativePath, const QColor &color = Qt::red)
@@ -160,6 +172,28 @@ TEST_F(LocalMatcherTest, SetFolderCandidateTakesPrecedenceOverRootFallback)
 
     ASSERT_FALSE(image.isNull());
     EXPECT_EQ(image.pixelColor(0, 0), QColor(Qt::red)) << "The set-folder candidate must be preferred";
+}
+
+TEST_F(LocalMatcherTest, CustomSubfolderResolvesExactFile)
+{
+    // Images in the CUSTOM folder are indexed by their full file path (extension included),
+    // unlike the extension-less candidate paths built from the naming schemes.
+    writePngUnderPics("CUSTOM/poker/TestCard.png");
+    rebuildLoader();
+
+    const QImage image = loader->tryLoad(cardFor("TestCard", "", ""));
+
+    EXPECT_FALSE(image.isNull()) << "A CUSTOM-folder image in a subdirectory must resolve";
+}
+
+TEST_F(LocalMatcherTest, CustomSubfolderIgnoresSuffixedFiles)
+{
+    writePngUnderPics("CUSTOM/poker/TestCard (1).png");
+    rebuildLoader();
+
+    const QImage image = loader->tryLoad(cardFor("TestCard", "", ""));
+
+    EXPECT_TRUE(image.isNull()) << "A suffixed CUSTOM-folder file must not satisfy an exact name lookup";
 }
 
 } // namespace

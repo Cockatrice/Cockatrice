@@ -9,6 +9,8 @@
 
 #include "settings_manager.h"
 
+#include <QHash>
+
 class DownloadSettings : public SettingsManager
 {
     Q_OBJECT
@@ -16,8 +18,35 @@ class DownloadSettings : public SettingsManager
 
     static const QStringList DEFAULT_DOWNLOAD_URLS;
     static const QString SCRYFALL_NAMED_LOCALIZED_URL;
+    static const QHash<QString, int> DEVELOPER_HOST_CAPS;
 
 public:
+    /** @brief Per-host request allowance (requests/second) when no developer cap applies. */
+    static constexpr int DEFAULT_HOST_REQUEST_LIMIT = 10;
+    /** @brief Floor for any per-host request allowance. */
+    static constexpr int MIN_HOST_REQUEST_LIMIT = 1;
+    /**
+     * @brief Upper bound offered to the user when lowering an unlocked host's allowance.
+     *
+     * Unlocked hosts have no developer cap, so `clampHostRequestLimit` puts no upper bound on
+     * them; this only bounds what the settings dialog offers, and matches the widest paced
+     * allowance a user is documented to be able to hand-edit in `downloads.ini`. Choosing 0
+     * below this restores the "unlimited" fast path.
+     */
+    static constexpr int UNLOCKED_HOST_LIMIT_MAX = 50;
+    /** @brief Developer cap marking a host as never throttled per host or by the dispatch pacing. */
+    static constexpr int UNLIMITED_HOST_QUOTA = -1;
+
+    /**
+     * @brief Developer-set per-host allowance ceilings (requests/second), keyed by host.
+     *
+     * Hosts not present default to DEFAULT_HOST_REQUEST_LIMIT. An entry of
+     * UNLIMITED_HOST_QUOTA marks a host that users may still lower, but that is never
+     * throttled per host by default. Users can never raise a host's allowance above its
+     * developer cap.
+     */
+    static const QHash<QString, int> &getDeveloperHostCaps();
+
     explicit DownloadSettings(const QString &, QObject *);
 
     QStringList getAllURLs() const;
@@ -29,9 +58,23 @@ public:
     [[nodiscard]] bool getDownloadSpoilersStatus() const;
     void setDownloadSpoilerStatus(bool _spoilerStatus);
 
+    /** @brief User-set per-host request allowances (requests/second). Missing hosts use the developer default. */
+    QHash<QString, int> getHostRequestLimits() const;
+    void setHostRequestLimits(const QHash<QString, int> &hostRequestLimits);
+
+    /**
+     * @brief Clamps the user's requested allowance for a host against its developer cap.
+     * @param host The host to clamp for
+     * @param requested The user-requested allowance in requests/second
+     * @return The effective allowance. Users may lower a host's allowance but never raise it
+     *         above the developer cap; hosts with UNLIMITED_HOST_QUOTA have no upper bound.
+     */
+    [[nodiscard]] int clampHostRequestLimit(const QString &host, int requested) const;
+
 signals:
     void picDownloadChanged();
     void downloadSpoilerStatusChanged();
+    void hostRequestLimitsChanged();
 };
 
 #endif // COCKATRICE_DOWNLOADSETTINGS_H

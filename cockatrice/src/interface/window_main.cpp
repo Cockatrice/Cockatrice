@@ -512,6 +512,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connectionController = new ConnectionController(this, this);
     urlParser = new IntentUrlParser(this, this);
+    connect(urlParser, &IntentUrlParser::urlChainFinished, this, &MainWindow::onUrlChainFinished);
 
     createActions();
     createMenus();
@@ -574,11 +575,18 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::startupConfigCheck()
 {
+    const bool isCleanInstall = SettingsCache::instance().network().getClientVersion() == CLIENT_INFO_NOT_SET;
+
     // checkUnknownSets() is intentionally deferred from the card database load
     // (which runs in main() before MainWindow exists) so that
     // cardDatabaseNewSetsFound / cardDatabaseAllNewSetsEnabled have live
     // receivers when emitted.
-    CardDatabaseManager::getInstance()->checkUnknownSets();
+    // On a clean install the onboarding wizard owns the first-run experience;
+    // wait until it closes so the legacy "all sets enabled" welcome and the
+    // Manage Sets dialog don't appear first.
+    if (!isCleanInstall) {
+        CardDatabaseManager::getInstance()->checkUnknownSets();
+    }
 
     if (SettingsCache::instance().debug().getLocalGameOnStartup()) {
         LocalGameOptions options;
@@ -592,14 +600,14 @@ void MainWindow::startupConfigCheck()
 
     actCheckCommanderBracketDefinitionUpdates();
 
-    if (SettingsCache::instance().network().getClientVersion() == CLIENT_INFO_NOT_SET) {
+    if (isCleanInstall) {
         // no config found, 99% new clean install
         qCInfo(WindowMainStartupVersionLog)
             << "Startup: old client version empty, assuming first start after clean install";
         SettingsCache::instance().downloads().resetToDefaultURLs(); // populate the download urls
         SettingsCache::instance().network().setClientVersion(VERSION_STRING);
         actCheckServerUpdates();
-        runFirstRunWizard();
+        runFirstRunWizard(true);
 
         if (QString(VERSION_STRING).contains("custom", Qt::CaseInsensitive)) {
             SettingsCache::instance().updates().setCheckUpdatesOnStartup(false);
@@ -679,7 +687,7 @@ void MainWindow::startupConfigCheck()
     }
 }
 
-void MainWindow::runFirstRunWizard()
+void MainWindow::runFirstRunWizard(bool firstRun)
 {
     auto *wizard = new FirstRunWizard(this);
     wizard->setAttribute(Qt::WA_DeleteOnClose);
@@ -690,6 +698,19 @@ void MainWindow::runFirstRunWizard()
     connect(this, &MainWindow::cardDatabaseUpdateProgress, wizard, &FirstRunWizard::onCardDatabaseUpdateProgress);
     connect(wizard, &FirstRunWizard::registerRequested, connectionController, &ConnectionController::registerToServer);
     connect(wizard, &FirstRunWizard::connectRequested, connectionController, &ConnectionController::connectToServer);
+
+    if (firstRun) {
+        // The onboarding wizard owns set handling for a clean install. Suppress
+        // the legacy set dialogs while it's open and run checkUnknownSets() once
+        // it closes so the sets end up enabled in the right order.
+        firstRunWizardActive = true;
+        connect(wizard, &QDialog::finished, this, [this] {
+            QTimer::singleShot(0, this, [this] {
+                CardDatabaseManager::getInstance()->checkUnknownSets();
+                firstRunWizardActive = false;
+            });
+        });
+    }
 
     wizard->setModal(true);
     wizard->show();
@@ -704,6 +725,12 @@ void MainWindow::applyStartupDestination()
 {
     // An explicit command-line connect takes precedence over the startup destination.
     if (!connectTo.isEmpty()) {
+        return;
+    }
+
+    // A cockatrice:// link owns the startup connection while its chain runs;
+    // connecting here would race (and tear down) the link's own connection.
+    if (skipStartupAutoConnect) {
         return;
     }
 
@@ -728,6 +755,7 @@ void MainWindow::applyStartupDestination()
 
     connect(credentials, &Intent::finished, connector, &Intent::execute);
     connect(credentials, &Intent::failed, this, &MainWindow::startupDestinationFailed);
+    connect(credentials, &Intent::cancelled, this, [this]() { startupDestinationFailed(tr("Sign-in cancelled")); });
     connect(connector, &Intent::finished, this,
             [this, destination, serverContext]() { onStartupDestinationConnected(destination, *serverContext); });
     connect(connector, &Intent::failed, this, &MainWindow::startupDestinationFailed);
@@ -879,18 +907,7 @@ void MainWindow::changeEvent(QEvent *event)
     } else if (event->type() == QEvent::ActivationChange) {
         if (isActiveWindow() && !bHasActivated) {
             bHasActivated = true;
-            if (!connectTo.isEmpty()) {
-                qCInfo(WindowMainStartupAutoconnectLog) << "Command line connect to " << connectTo;
-                connectionController->connectToServerDirect(connectTo.host(), connectTo.port(), connectTo.userName(),
-                                                            connectTo.password());
-            } else if (SettingsCache::instance().servers().getAutoConnect() &&
-                       !SettingsCache::instance().debug().getLocalGameOnStartup() &&
-                       !startupDestinationConnectsToServer()) {
-                qCInfo(WindowMainStartupAutoconnectLog) << "Attempting auto-connect...";
-                DlgConnect dlg(this);
-                connectionController->connectToServerDirect(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()),
-                                                            dlg.getPlayerName(), dlg.getPassword());
-            }
+            attemptStartupAutoConnect();
         }
     }
 
@@ -914,6 +931,59 @@ void MainWindow::showWindowIfHidden()
 void MainWindow::handleCockatriceLink(const QString &url)
 {
     urlParser->handle(url);
+}
+
+void MainWindow::attemptStartupAutoConnect()
+{
+    if (startupAutoConnectAttempted || skipStartupAutoConnect) {
+        return;
+    }
+    startupAutoConnectAttempted = true;
+
+    if (!connectTo.isEmpty()) {
+        qCInfo(WindowMainStartupAutoconnectLog) << "Command line connect to " << connectTo;
+        connectionController->connectToServerDirect(connectTo.host(), connectTo.port(), connectTo.userName(),
+                                                    connectTo.password());
+    } else if (SettingsCache::instance().servers().getAutoConnect() &&
+               !SettingsCache::instance().debug().getLocalGameOnStartup() && !startupDestinationConnectsToServer()) {
+        qCInfo(WindowMainStartupAutoconnectLog) << "Attempting auto-connect...";
+        DlgConnect dlg(this);
+        connectionController->connectToServerDirect(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()),
+                                                    dlg.getPlayerName(), dlg.getPassword());
+    }
+}
+
+void MainWindow::onUrlChainFinished(bool connected)
+{
+    // A cockatrice:// link owns the startup connection while it runs. When its
+    // chain ended without connecting (declined, invalid, offline), fall back to
+    // the startup connection so the activation launch still behaves like a
+    // normal launch.
+    if (connected) {
+        // The launch link connected, so the startup fallback has served its
+        // purpose: drop the skip so a later mid-session link that ends declined
+        // or offline cannot silently fire auto-connect or applyStartupDestination
+        // again.
+        skipStartupAutoConnect = false;
+        return;
+    }
+
+    if (!skipStartupAutoConnect || getRemoteClient()->getStatus() != StatusDisconnected) {
+        return;
+    }
+
+    if (startupDestinationConnectsToServer()) {
+        // Users whose startup tab is a Server / Server Room connect through the
+        // startup destination, not through auto-connect; retry that instead.
+        qCInfo(WindowMainStartupAutoconnectLog) << "URL chain ended without a connection; retrying startup destination";
+        skipStartupAutoConnect = false;
+        applyStartupDestination();
+        return;
+    }
+
+    qCInfo(WindowMainStartupAutoconnectLog) << "URL chain ended without a connection; retrying startup connect";
+    skipStartupAutoConnect = false;
+    attemptStartupAutoConnect();
 }
 
 void MainWindow::cardDatabaseLoadingFailed()
@@ -945,7 +1015,7 @@ void MainWindow::cardDatabaseLoadingFailed()
 
 void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknownSetsNames)
 {
-    if (SettingsCache::instance().updates().getAlwaysEnableNewSets()) {
+    if (firstRunWizardActive || SettingsCache::instance().updates().getAlwaysEnableNewSets()) {
         CardDatabaseManager::getInstance()->enableAllUnknownSets();
         const auto reloadOk1 =
             QtConcurrent::run([] { CardDatabaseManager::getInstance()->reloadCardDatabasesAndNotify(); });
@@ -988,6 +1058,12 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
 
 void MainWindow::cardDatabaseAllNewSetsEnabled()
 {
+    if (firstRunWizardActive || CardDatabaseManager::getInstance()->getCardList().isEmpty()) {
+        // The onboarding wizard owns the first-run messaging on a clean install,
+        // and with no card data there are no sets to have enabled.
+        return;
+    }
+
     QMessageBox::information(
         this, tr("Welcome"),
         tr("Hi! It seems like you're running this version of Cockatrice for the first time.\nAll the sets in the card "

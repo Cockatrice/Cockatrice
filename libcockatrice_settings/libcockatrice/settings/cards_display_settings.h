@@ -3,6 +3,7 @@
 
 #include "settings_manager.h"
 
+#include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/interfaces/interface_cards_display_settings_provider.h>
 
 class CardsDisplaySettings : public SettingsManager, public ICardsDisplaySettingsProvider
@@ -28,10 +29,12 @@ public:
     [[nodiscard]] int getVisualDeckStorageCardSize() const override;
     [[nodiscard]] int getVisualDatabaseDisplayCardSize() const override;
     [[nodiscard]] int getVisualDeckEditorCardSize() const override;
+    [[nodiscard]] bool getVisualDeckEditorShowCardCounts() const override;
     [[nodiscard]] int getEDHRecCardSize() const override;
     [[nodiscard]] int getArchidektPreviewSize() const override;
     [[nodiscard]] int getSampleHandSize() const override;
     [[nodiscard]] QString getCardLang() const override;
+    [[nodiscard]] int getCardSearchLanguage() const override;
 
     void setDisplayCardNames(bool _displayCardNames);
     void setRoundCardCorners(bool _roundCardCorners);
@@ -50,10 +53,12 @@ public:
     void setVisualDeckStorageCardSize(int _cardSize);
     void setVisualDatabaseDisplayCardSize(int _cardSize);
     void setVisualDeckEditorCardSize(int _cardSize);
+    void setVisualDeckEditorShowCardCounts(bool _showCardCounts);
     void setEDHRecCardSize(int _edhrecCardSize);
     void setArchidektPreviewCardSize(int _archidektPreviewCardSize);
     void setSampleHandSize(int _sampleHandSize);
     void setCardLang(const QString &_cardLang);
+    void setCardSearchLanguage(int _cardSearchLanguage);
 
 signals:
     void displayCardNamesChanged();
@@ -67,10 +72,12 @@ signals:
     void visualDeckStorageCardSizeChanged();
     void visualDatabaseDisplayCardSizeChanged();
     void visualDeckEditorCardSizeChanged();
+    void visualDeckEditorShowCardCountsChanged(bool showCardCounts);
     void edhRecCardSizeChanged();
     void archidektPreviewSizeChanged();
     void sampleHandSizeChanged(int amount);
     void cardLangChanged(const QString &lang);
+    void cardSearchLanguageChanged(int cardSearchLanguage);
 
 public:
     explicit CardsDisplaySettings(const QString &settingPath, QObject *parent = nullptr);

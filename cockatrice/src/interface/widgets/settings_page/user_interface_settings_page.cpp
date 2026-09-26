@@ -149,6 +149,11 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&openDeckInNewTabCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().deckEditor(),
             &DeckEditorSettings::setOpenDeckInNewTab);
 
+    visualDeckEditorShowCardCountsCheckBox.setChecked(
+        SettingsCache::instance().cardsDisplay().getVisualDeckEditorShowCardCounts());
+    connect(&visualDeckEditorShowCardCountsCheckBox, &QCheckBox::QT_STATE_CHANGED,
+            &SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::setVisualDeckEditorShowCardCounts);
+
     visualDeckStorageInGameCheckBox.setChecked(
         SettingsCache::instance().visualDeckStorage().getVisualDeckStorageInGame());
     connect(&visualDeckStorageInGameCheckBox, &QCheckBox::QT_STATE_CHANGED,
@@ -244,18 +249,19 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 
     auto *deckEditorGrid = new QGridLayout;
     deckEditorGrid->addWidget(&openDeckInNewTabCheckBox, 0, 0);
-    deckEditorGrid->addWidget(&visualDeckStorageInGameCheckBox, 1, 0);
-    deckEditorGrid->addWidget(&visualDeckStorageSelectionAnimationCheckBox, 2, 0);
-    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionLabel, 3, 0);
-    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionSelector, 3, 1);
-    deckEditorGrid->addWidget(&defaultDeckEditorTypeLabel, 4, 0);
-    deckEditorGrid->addWidget(&defaultDeckEditorTypeSelector, 4, 1);
-    deckEditorGrid->addWidget(&vdeStartupTabLabel, 5, 0);
-    deckEditorGrid->addWidget(&vdeStartupTabSelector, 5, 1);
-    deckEditorGrid->addWidget(&commanderSpellbookIntegrationEnabledLabel, 6, 0);
-    deckEditorGrid->addWidget(&commanderSpellbookIntegrationEnabledSelector, 6, 1);
-    deckEditorGrid->addWidget(labelWidget, 7, 0);
-    deckEditorGrid->addWidget(&commanderSpellbookIntegrationBracketNamingSelector, 7, 1);
+    deckEditorGrid->addWidget(&visualDeckEditorShowCardCountsCheckBox, 1, 0);
+    deckEditorGrid->addWidget(&visualDeckStorageInGameCheckBox, 2, 0);
+    deckEditorGrid->addWidget(&visualDeckStorageSelectionAnimationCheckBox, 3, 0);
+    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionLabel, 4, 0);
+    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionSelector, 4, 1);
+    deckEditorGrid->addWidget(&defaultDeckEditorTypeLabel, 5, 0);
+    deckEditorGrid->addWidget(&defaultDeckEditorTypeSelector, 5, 1);
+    deckEditorGrid->addWidget(&vdeStartupTabLabel, 6, 0);
+    deckEditorGrid->addWidget(&vdeStartupTabSelector, 6, 1);
+    deckEditorGrid->addWidget(&commanderSpellbookIntegrationEnabledLabel, 7, 0);
+    deckEditorGrid->addWidget(&commanderSpellbookIntegrationEnabledSelector, 7, 1);
+    deckEditorGrid->addWidget(labelWidget, 8, 0);
+    deckEditorGrid->addWidget(&commanderSpellbookIntegrationBracketNamingSelector, 8, 1);
 
     deckEditorGroupBox = new QGroupBox;
     deckEditorGroupBox->setLayout(deckEditorGrid);
@@ -367,6 +373,7 @@ void UserInterfaceSettingsPage::retranslateUi()
 
     deckEditorGroupBox->setTitle(tr("Deck editor/storage settings"));
     openDeckInNewTabCheckBox.setText(tr("Open deck in new tab by default"));
+    visualDeckEditorShowCardCountsCheckBox.setText(tr("Show card counts in Visual Deck Editor"));
     visualDeckStorageInGameCheckBox.setText(tr("Use visual deck storage in game lobby"));
     visualDeckStorageSelectionAnimationCheckBox.setText(tr("Use selection animation for Visual Deck Storage"));
     visualDeckStoragePromptForConversionLabel.setText(

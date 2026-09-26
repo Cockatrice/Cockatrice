@@ -15,6 +15,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
 
@@ -48,6 +49,12 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     refreshButton->setFixedSize(32, 32);
     connect(refreshButton, &QPushButton::clicked, this, &VisualDeckStorageWidget::refreshIfPossible);
 
+    shareButton = new QToolButton(this);
+    shareButton->setIcon(themePixmap(QStringLiteral("icons/share")));
+    shareButton->setFixedSize(32, 32);
+    shareButton->setVisible(false);
+    connect(shareButton, &QPushButton::clicked, this, &VisualDeckStorageWidget::shareRequested);
+
     quickSettingsWidget = new VisualDeckStorageQuickSettingsWidget(this);
     connect(quickSettingsWidget, &VisualDeckStorageQuickSettingsWidget::showFoldersChanged, this,
             &VisualDeckStorageWidget::updateShowFolders);
@@ -58,10 +65,14 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     searchAndSortLayout->addWidget(sortWidget);
     searchAndSortLayout->addWidget(searchWidget);
     searchAndSortLayout->addWidget(refreshButton);
+    searchAndSortLayout->addWidget(shareButton);
     searchAndSortLayout->addWidget(quickSettingsWidget);
 
     // tag filter box
     tagFilterWidget = new VisualDeckStorageTagFilterWidget(this);
+    tagFilterWidget->setAllTagsProvider([this] { return gatherVisibleTags(); });
+    connect(tagFilterWidget, &VisualDeckStorageTagFilterWidget::filterChanged, this,
+            &VisualDeckStorageWidget::updateTagFilter);
     updateTagsVisibility(SettingsCache::instance().visualDeckStorage().getVisualDeckStorageShowTagFilter());
 
     deckPreviewSelectionAnimationEnabled =
@@ -107,6 +118,13 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
             &VisualDeckStorageWidget::updateColorFilter);
     connect(searchWidget, &VisualDeckStorageSearchWidget::searchTextChanged, this,
             &VisualDeckStorageWidget::updateSearchFilter);
+
+    // The deck content search matches card names in the configured card language;
+    // re-run it whenever that setting changes so active searches follow immediately.
+    CardsDisplaySettings *cardsDisplay = &SettingsCache::instance().cardsDisplay();
+    const auto reapplySearchForLanguage = [this] { storageProxyModel->reapplyFilters(); };
+    connect(cardsDisplay, &CardsDisplaySettings::cardLangChanged, this, reapplySearchForLanguage);
+    connect(cardsDisplay, &CardsDisplaySettings::cardSearchLanguageChanged, this, reapplySearchForLanguage);
 
     connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
             &VisualDeckStorageWidget::createRootFolderWidget);
@@ -155,9 +173,69 @@ void VisualDeckStorageWidget::retranslateUi()
     databaseLoadIndicator->setText(tr("Loading database ..."));
 
     refreshButton->setToolTip(tr("Refresh loaded files"));
+    shareButton->setToolTip(tr("Select decks to share"));
     quickSettingsWidget->setToolTip(tr("Visual Deck Storage Settings"));
 
     sortWidget->retranslateUi();
+}
+
+void VisualDeckStorageWidget::setShareSelectable(bool selectable)
+{
+    if (shareSelectable == selectable) {
+        return;
+    }
+    shareSelectable = selectable;
+    if (folderWidget != nullptr) {
+        folderWidget->setShareSelectable(selectable);
+    }
+    emit shareSelectionChanged();
+}
+
+bool VisualDeckStorageWidget::isShareSelectable() const
+{
+    return shareSelectable;
+}
+
+QStringList VisualDeckStorageWidget::selectedFilePaths() const
+{
+    QStringList selectedPaths;
+    if (folderWidget != nullptr) {
+        const auto previews = folderWidget->findChildren<DeckPreviewWidget *>();
+        for (DeckPreviewWidget *preview : previews) {
+            // Filtered-out previews stay alive hidden in their sorted place, so only decks the
+            // user can actually see are part of the share.
+            if (preview->isVisible() && preview->isShareSelected()) {
+                selectedPaths.append(preview->filePath);
+            }
+        }
+    }
+    return selectedPaths;
+}
+
+void VisualDeckStorageWidget::clearShareSelection()
+{
+    if (folderWidget != nullptr) {
+        const auto previews = folderWidget->findChildren<DeckPreviewWidget *>();
+        for (DeckPreviewWidget *preview : previews) {
+            preview->setShareSelected(false);
+        }
+    }
+}
+
+void VisualDeckStorageWidget::setShareAvailable(bool available)
+{
+    shareButton->setVisible(available);
+    shareButton->setEnabled(available);
+}
+
+void VisualDeckStorageWidget::setShareSelectedFiles(const QStringList &paths)
+{
+    if (folderWidget != nullptr) {
+        const auto previews = folderWidget->findChildren<DeckPreviewWidget *>();
+        for (DeckPreviewWidget *preview : previews) {
+            preview->setShareSelected(paths.contains(preview->filePath));
+        }
+    }
 }
 
 /**
@@ -215,6 +293,25 @@ void VisualDeckStorageWidget::updateTagFilter()
                                     QSet<QString>(excluded.cbegin(), excluded.cend()));
     // The visible deck set changed, so the chips are re-gathered from it.
     tagFilterWidget->refreshTags();
+}
+
+/**
+ * @brief The tags of all decks currently accepted by the proxy model.
+ */
+QSet<QString> VisualDeckStorageWidget::gatherVisibleTags() const
+{
+    QSet<QString> allTags;
+    for (int proxyRow = 0; proxyRow < storageProxyModel->rowCount(); ++proxyRow) {
+        const QModelIndex index = storageProxyModel->index(proxyRow, 0);
+        if (!index.data(VisualDeckStorageRoles::FilterMatchRole).toBool()) {
+            continue;
+        }
+        const QStringList deckTags = index.data(VisualDeckStorageRoles::TagsRole).toStringList();
+        for (const QString &tag : deckTags) {
+            allTags.insert(tag);
+        }
+    }
+    return allTags;
 }
 
 /**

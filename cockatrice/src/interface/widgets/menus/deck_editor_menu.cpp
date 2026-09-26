@@ -28,6 +28,9 @@ DeckEditorMenu::DeckEditorMenu(AbstractTabDeckEditor *parent) : QMenu(parent), d
     aSaveDeckAs = new QAction(QString(), this);
     connect(aSaveDeckAs, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actSaveDeckAs);
 
+    aShareDeck = new QAction(QString(), this);
+    connect(aShareDeck, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actShareDeck);
+
     aLoadDeckFromClipboard = new QAction(QString(), this);
     connect(aLoadDeckFromClipboard, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actLoadDeckFromClipboard);
 
@@ -96,6 +99,7 @@ DeckEditorMenu::DeckEditorMenu(AbstractTabDeckEditor *parent) : QMenu(parent), d
     addMenu(loadRecentDeckMenu);
     addAction(aSaveDeck);
     addAction(aSaveDeckAs);
+    addAction(aShareDeck);
     addSeparator();
     addAction(aLoadDeckFromClipboard);
     addMenu(editDeckInClipboardMenu);
@@ -120,6 +124,7 @@ void DeckEditorMenu::setSaveStatus(bool newStatus)
 {
     aSaveDeck->setEnabled(newStatus);
     aSaveDeckAs->setEnabled(newStatus);
+    aShareDeck->setEnabled(newStatus);
     aSaveDeckToClipboard->setEnabled(newStatus);
     aSaveDeckToClipboardNoSetInfo->setEnabled(newStatus);
     aSaveDeckToClipboardRaw->setEnabled(newStatus);
@@ -157,6 +162,7 @@ void DeckEditorMenu::retranslateUi()
     aClearRecents->setText(tr("Clear"));
     aSaveDeck->setText(tr("&Save deck"));
     aSaveDeckAs->setText(tr("Save deck &as..."));
+    aShareDeck->setText(tr("Share deck..."));
 
     aLoadDeckFromClipboard->setText(tr("Load deck from cl&ipboard..."));
 

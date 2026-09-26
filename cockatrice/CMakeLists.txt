@@ -45,11 +45,14 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp
     src/interface/widgets/dialogs/dlg_load_remote_deck.cpp
     src/interface/widgets/dialogs/dlg_local_game_options.cpp
+    src/interface/widgets/dialogs/dlg_login_prompt.cpp
     src/interface/widgets/dialogs/dlg_manage_sets.cpp
     src/interface/widgets/dialogs/dlg_my_reports.cpp
     src/interface/widgets/dialogs/dlg_register.cpp
     src/interface/widgets/dialogs/dlg_report_user.cpp
     src/interface/widgets/dialogs/dlg_select_set_for_cards.cpp
+    src/interface/widgets/dialogs/dlg_share_deck.cpp
+    src/interface/widgets/dialogs/dlg_shared_decks_preview.cpp
     src/interface/widgets/dialogs/dlg_settings.cpp
     src/interface/widgets/dialogs/dlg_startup_card_check.cpp
     src/interface/widgets/dialogs/dlg_tip_of_the_day.cpp
@@ -57,6 +60,9 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/dlg_view_log.cpp
     src/interface/widgets/dialogs/override_printing_warning.cpp
     src/interface/widgets/dialogs/tip_of_the_day.cpp
+    src/interface/widgets/deck_share/deck_share_utils.cpp
+    src/interface/widgets/deck_share/shared_deck_preview_widget.cpp
+    src/interface/widgets/deck_share/share_bar_widget.cpp
     src/filters/deck_filter_string.cpp
     src/filters/filter_builder.cpp
     src/filters/filter_tree_model.cpp
@@ -163,6 +169,7 @@ set(cockatrice_SOURCES
     src/interface/palette_editor/palette_grid_widget.cpp
     src/interface/palette_editor/palette_editor_dialog.cpp
     src/interface/widgets/cards/additional_info/color_identity_widget.cpp
+    src/interface/widgets/cards/additional_info/deck_color_identity.cpp
     src/interface/widgets/cards/additional_info/mana_cost_widget.cpp
     src/interface/widgets/cards/additional_info/mana_symbol_widget.cpp
     src/interface/widgets/cards/art_crop_attribution.cpp
@@ -317,6 +324,8 @@ set(cockatrice_SOURCES
     src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_tag_display_widget.cpp
     src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_tag_item_widget.cpp
     src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp
+    src/interface/widgets/visual_deck_storage/deck_preview/public_deck_preview_widget.cpp
+    src/interface/widgets/visual_deck_storage/remote_public_decks_model.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_folder_display_widget.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_model.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_quick_settings_widget.cpp
@@ -388,6 +397,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/tab_logs.cpp
     src/interface/widgets/tabs/tab_message.cpp
     src/interface/widgets/tabs/tab_moderation.cpp
+    src/interface/widgets/tabs/tab_public_decks.cpp
     src/interface/widgets/tabs/tab_report.cpp
     src/interface/widgets/tabs/tab_replays.cpp
     src/interface/widgets/tabs/tab_room.cpp
@@ -444,6 +454,8 @@ set(cockatrice_SOURCES
     src/interface/intents/intent_login.h
     src/interface/intents/intent_open_server_room_by_name.cpp
     src/interface/intents/intent_open_server_room_by_name.h
+    src/interface/intents/intent_open_shared_deck.cpp
+    src/interface/intents/intent_open_shared_deck.h
     src/interface/intents/url_parser.cpp
     src/interface/intents/url_parser.h
     src/interface/widgets/server/user/user_info_popup.cpp
@@ -656,18 +668,35 @@ if(WIN32)
   set(qtconf_dest_dir .)
 
   install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/"
+    DIRECTORY "$<TARGET_FILE_DIR:cockatrice>/"
     DESTINATION ./
     FILES_MATCHING
     PATTERN "*.dll"
+    PATTERN "*.pdb" EXCLUDE
+    PATTERN "*.dir*" EXCLUDE
+    PATTERN "*_autogen*" EXCLUDE
+    PATTERN "*.tlog*" EXCLUDE
+    PATTERN "CMakeFiles*" EXCLUDE
+    PATTERN "x64*" EXCLUDE
+    PATTERN ".qt*" EXCLUDE
+    PATTERN ".qsb*" EXCLUDE
+    PATTERN ".lupdate*" EXCLUDE
   )
 
   install(
     DIRECTORY "${CMAKE_BINARY_DIR}/cockatrice/"
     DESTINATION ./
     FILES_MATCHING
-    PATTERN "CMakeFiles" EXCLUDE
     PATTERN "*.ini"
+    PATTERN "CMakeFiles*" EXCLUDE
+    PATTERN "*.dir*" EXCLUDE
+    PATTERN "*_autogen*" EXCLUDE
+    PATTERN "*.tlog*" EXCLUDE
+    PATTERN "*.pdb" EXCLUDE
+    PATTERN "x64*" EXCLUDE
+    PATTERN ".qt*" EXCLUDE
+    PATTERN ".qsb*" EXCLUDE
+    PATTERN ".lupdate*" EXCLUDE
   )
 
   # Qt plugins: audio, iconengines, imageformats, multimedia, platforms, printsupport, styles, tls
@@ -720,10 +749,6 @@ Data = Resources\")
         "
     COMPONENT Runtime
   )
-
-  if(OPENSSL_FOUND)
-    install(FILES ${OPENSSL_INCLUDE_DIRS} DESTINATION ./)
-  endif()
 endif()
 
 if(Qt6LinguistTools_FOUND)

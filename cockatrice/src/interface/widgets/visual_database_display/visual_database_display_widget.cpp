@@ -41,6 +41,17 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     databaseDisplayModel->setSourceModel(database_model);
     databaseDisplayModel->setFilterKeyColumn(0);
 
+    const auto applyCardSearchLanguage = [this]() {
+        const CardsDisplaySettings &cardsDisplay = SettingsCache::instance().cardsDisplay();
+        databaseDisplayModel->setSearchLanguage(CardSearchLanguage{
+            cardsDisplay.getCardLang(), static_cast<SearchLanguageMode>(cardsDisplay.getCardSearchLanguage())});
+    };
+    applyCardSearchLanguage();
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::cardLangChanged, this,
+            applyCardSearchLanguage);
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::cardSearchLanguageChanged, this,
+            applyCardSearchLanguage);
+
     cards = new QList<ExactCard>;
     connect(databaseDisplayModel, &CardDatabaseDisplayModel::modelDirty, this,
             &VisualDatabaseDisplayWidget::modelDirty);
@@ -58,6 +69,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
                                         SettingsCache::instance().cardsDisplay().getVisualDatabaseDisplayCardSize());
     connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance().cardsDisplay(),
             &CardsDisplaySettings::setVisualDatabaseDisplayCardSize);
+    cardSizeWidget->enableCtrlScrollResize(flowWidget);
 
     searchContainer = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
 

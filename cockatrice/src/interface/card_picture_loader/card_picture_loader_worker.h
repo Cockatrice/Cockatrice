@@ -74,10 +74,37 @@ public:
      */
     void onHostRateLimited(const QString &host);
 
-    /** @brief Clears the network cache and redirect cache. */
-    void clearNetworkCache();
+    /**
+     * @brief Stops the worker thread and reports whether it stopped.
+     *
+     * Called from the owning thread (CardPictureLoader) on its way out. QThread::quit() posts an
+     * exit request to the worker's event loop and QThread::wait() blocks (bounded) until the loop
+     * has returned and the thread finished. Only QThread members are touched here, so this method
+     * is safe to call from the owning thread. The worker object itself is freed by the finished()
+     * -> deleteLater chain (see the constructor); the QThread object is deleted afterwards by the
+     * owner (CardPictureLoader::~CardPictureLoader), not by this method.
+     *
+     * @return true if the thread stopped within the timeout, false if it is still running (in
+     *         which case the owner must not delete the QThread).
+     */
+    [[nodiscard]] bool shutdownThread();
+
+    /**
+     * @brief Returns the worker's QThread.
+     * @return The worker thread
+     *
+     * Only meaningful while the worker object is alive; capture it before calling shutdownThread().
+     */
+    QThread *workerThread() const;
 
 public slots:
+    /**
+     * @brief Clears the network cache and redirect cache.
+     *
+     * Runs on the worker thread; invoke it via a queued call when coming from another thread,
+     * since both caches are owned by the worker thread.
+     */
+    void clearNetworkCache();
     /**
      * @brief Makes a network request for the given URL using the specified worker.
      * @param url URL to load
@@ -86,8 +113,11 @@ public slots:
      */
     QNetworkReply *makeRequest(const QUrl &url, CardPictureLoaderWorkerWork *workThread);
 
-    /** @brief Processes all queued requests respecting the request quota. */
+    /** @brief Ensures the pacing and quota-reset timers reflect the current queue and recovery state. */
     void processQueuedRequests();
+
+    /** @brief Chooses a request from the queue and starts it, respecting the quota and pacing. */
+    void dispatchQueuedRequest();
 
     /**
      * @brief Processes a single queued request.
@@ -118,17 +148,55 @@ private:
     bool picDownload;                                  ///< Whether downloading images from network is enabled
     QQueue<QPair<QUrl, CardPictureLoaderWorkerWork *>> requestLoadQueue; ///< Queue of pending network requests
 
-    int requestQuota;                       ///< Remaining requests allowed per second
     QTimer requestTimer;                    ///< Timer to reset the request quota
+    QTimer dispatchTimer;                   ///< Timer pacing individual network requests
     QHash<QString, int> hostRequestQuota;   ///< Sustained per-host request allowance
+    QHash<QString, int> hostRequestLimits;  ///< User-set per-host request allowances
     QHash<QString, int> hostQuotaRemaining; ///< Per-host allowance left in the current second
     QHash<QString, QDateTime> hostLast429;  ///< When each host was last rate limited
+    QHash<QString, int> hostInFlight;       ///< Network replies currently in flight, per host
+
+    /** @brief Maximum concurrent in-flight network replies per host. */
+    static constexpr int MAX_IN_FLIGHT_PER_HOST = 6;
+
+    /** @brief Bound on how many cached-redirect hops dispatch resolution will follow. */
+    static constexpr int MAX_REDIRECT_CHAIN_DEPTH = 10;
 
     CardPictureLoaderLocal *localLoader; ///< Loader for local images
     QSet<QString> currentlyLoading;      ///< Deduplication: contains pixmapCacheKey currently being loaded
 
+    /**
+     * @brief Effective per-host allowance ceiling for a host.
+     * @param host The host to look up
+     * @return The allowance ceiling in requests/second, or DownloadSettings::UNLIMITED_HOST_QUOTA
+     *         when the developer unlocked the host and no user limit is set for it.
+     */
+    [[nodiscard]] int hostAllowanceCeiling(const QString &host) const;
+
+    /**
+     * @brief Whether a host may skip dispatch pacing and per-host allowance entirely.
+     *
+     * A host is unlocked while it has no user limit and no reduced allowance installed by a 429.
+     * A 429 drops it out of the fast path until resetRequestQuota() walks the allowance back up.
+     */
+    [[nodiscard]] bool isUnlockedHost(const QString &host) const;
+
     /** @brief Returns cached redirect URL for the given original URL, if available. */
     [[nodiscard]] QUrl getCachedRedirect(const QUrl &originalUrl) const;
+
+    /** @brief Whether a request for this URL would actually touch the network, rather than being served from the disk
+     * cache. */
+    [[nodiscard]] bool requestTouchesNetwork(const QUrl &url) const;
+
+    /**
+     * @brief Follows the cached-redirect chain to the URL that will actually be requested.
+     * @param url The URL to resolve
+     * @return The final URL after chasing cached redirects, or @p url itself if none lead elsewhere
+     *
+     * Dispatch decisions (unlocked-host fast path, 429 backoff, in-flight cap) must key on the host
+     * a request really goes to, not the URL that merely redirects to it.
+     */
+    [[nodiscard]] QUrl resolveCachedRedirect(const QUrl &url) const;
 
     /** @brief Loads redirect cache from disk. */
     void loadRedirectCache();
@@ -138,6 +206,9 @@ private:
 
     /** @brief Removes stale redirect entries older than TTL. */
     void cleanStaleEntries();
+
+    /** @brief Starts or stops the pacing and quota-reset timers to match the queue and recovery state. */
+    void updateTimerState();
 
 private slots:
     /** @brief Resets the request quota for rate-limiting. */
@@ -158,6 +229,9 @@ signals:
 
     /** @brief Emitted when a network request successfully completes. */
     void imageRequestSucceeded(const QUrl &url);
+
+    /** @brief Emitted after clearNetworkCache() has finished clearing both caches. */
+    void networkCacheCleared();
 };
 
 #endif // PICTURE_LOADER_WORKER_H

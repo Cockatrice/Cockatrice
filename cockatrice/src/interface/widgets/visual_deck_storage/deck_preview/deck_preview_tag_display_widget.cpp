@@ -48,6 +48,7 @@ QSize DeckPreviewTagDisplayWidget::sizeHint() const
 
 void DeckPreviewTagDisplayWidget::mousePressEvent(QMouseEvent *event)
 {
+    const TagState previousState = state;
     switch (event->button()) {
         case Qt::LeftButton:
             setState(state != TagState::Selected ? TagState::Selected : TagState::NotSelected);
@@ -62,7 +63,12 @@ void DeckPreviewTagDisplayWidget::mousePressEvent(QMouseEvent *event)
             break;
     }
 
-    emit tagClicked();
+    // Only announce a change when the state was actually toggled, so a click that falls
+    // through the switch (e.g. a button the widget does not react to) does not drive a
+    // full tag-filter update and layout pass for nothing.
+    if (state != previousState) {
+        emit tagClicked();
+    }
     QWidget::mousePressEvent(event);
 }
 

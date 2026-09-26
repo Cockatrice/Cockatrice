@@ -38,6 +38,7 @@ private slots:
     void resetAllPathsClicked();
     void languageBoxChanged(int index);
     void cardLanguageBoxChanged(int index);
+    void cardSearchLanguageBoxChanged(int index);
     void updateStartupServerControlsVisibility();
 
 private:
@@ -54,6 +55,9 @@ private:
     QLabel cardLanguageLabel;
     QComboBox cardLanguageBox;
     QLabel cardLanguageNoteLabel;
+
+    QLabel cardSearchLanguageLabel;
+    QComboBox cardSearchLanguageBox;
 
     QLabel updateReleaseChannelLabel;
     QComboBox updateReleaseChannelBox;

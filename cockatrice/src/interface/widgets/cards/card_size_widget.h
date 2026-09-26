@@ -17,6 +17,8 @@
 #include <QTimer>
 #include <QWidget>
 
+class QWheelEvent;
+
 class CardSizeWidget : public QWidget
 {
     Q_OBJECT
@@ -24,6 +26,18 @@ class CardSizeWidget : public QWidget
 public:
     explicit CardSizeWidget(QWidget *parent, FlowWidget *flowWidget = nullptr, int defaultValue = 100);
     [[nodiscard]] QSlider *getSlider() const;
+
+    /**
+     * @brief Resizes the cards when the user Ctrl + scrolls over @p host or any of its descendants.
+     *
+     * Installs this widget as an event filter on the given host widget. If the host contains a
+     * scroll area the filter is also installed on the scroll area's content widget, so the resize
+     * intercepts the wheel event before the scroll area would scroll the view.
+     */
+    void enableCtrlScrollResize(QWidget *host);
+
+protected:
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 private slots:
     void updateCardSizeSetting(int newValue);
@@ -44,6 +58,10 @@ private:
     QSlider *cardSizeSlider;
     QTimer debounceTimer; // Debounce timer
     int pendingValue;     // Stores the latest slider value
+
+    bool adjustSliderForWheel(QWheelEvent *event);
+
+    static constexpr int CARD_SIZE_WHEEL_STEP = 10; ///< Slider step applied per Ctrl + scroll notch.
 };
 
 #endif // CARD_SIZE_WIDGET_H

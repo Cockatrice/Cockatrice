@@ -20,7 +20,8 @@ SomewhatComplexQueryPart <- [(] QueryPartList [)] / QueryPart
 QueryPart <- NotQuery / SetQuery / RarityQuery / CMCQuery / FormatQuery / PowerQuery / ToughnessQuery / ColorQuery / TypeQuery / OracleQuery / FieldQuery / GenericQuery
 
 NotQuery <- ('NOT' ws/'-') SomewhatComplexQueryPart
-SetQuery <- ('e'/'set') SetExpression / ([:] FlexStringValue)
+SetQuery <- ('e'/'set') SetQueryValue
+SetQueryValue <- ([=:] FlexStringValue) / (<[!][=]?> FlexStringValue) / SetExpression
 OracleQuery <- 'o' [:] MatcherString
 
 
@@ -74,6 +75,36 @@ NumericValue <- [0-9]+
 
 static std::once_flag init;
 
+// The peglib parser rules (and therefore their rule actions) are set up once per
+// process, so a rule action cannot capture per-instance state. The card language
+// plain-text name and text queries search in is therefore handed to the GenericQuery
+// and OracleQuery rule actions through this thread-local context, which is live only
+// while a FilterString is being parsed. The rule actions copy it into the filter
+// closures they produce, so card evaluation never reads process-global state.
+thread_local CardSearchLanguage searchLanguageContext;
+
+namespace
+{
+bool matchesInSearchLanguage(const QString &english,
+                             const QString &localized,
+                             const CardSearchLanguage &searchLanguage,
+                             const StringMatcher &matcher)
+{
+    if (searchLanguage.mode == SearchLanguageMode::English) {
+        return matcher(english);
+    }
+
+    if (searchLanguage.mode == SearchLanguageMode::Both) {
+        if (!searchLanguage.isEnglishOnly() && matcher(localized)) {
+            return true;
+        }
+        return matcher(english);
+    }
+
+    return searchLanguage.isEnglishOnly() ? matcher(english) : matcher(localized);
+}
+} // namespace
+
 static void setupParserRules()
 {
     auto passthru = [](const peg::SemanticValues &sv) -> Filter {
@@ -103,14 +134,23 @@ static void setupParserRules()
         const auto matcher = std::any_cast<StringMatcher>(sv[0]);
         return [=](const CardData &x) -> bool { return matcher(x->getCardType()); };
     };
-    search["SetQuery"] = [](const peg::SemanticValues &sv) -> Filter {
-        if (sv.choice() == 1) {
+    search["SetQueryValue"] = [](const peg::SemanticValues &sv) -> Filter {
+        if (sv.choice() == 0) {
             auto matcher = std::any_cast<StringMatcher>(sv[0]);
             return [=](const CardData &x) -> bool {
                 QList<QString> sets = x->getSets().keys();
 
                 auto matchesSet = [&matcher](const QString &set) { return matcher(set); };
                 return std::any_of(sets.begin(), sets.end(), matchesSet);
+            };
+        }
+        if (sv.choice() == 1) {
+            auto matcher = std::any_cast<StringMatcher>(sv[0]);
+            return [=](const CardData &x) -> bool {
+                QList<QString> sets = x->getSets().keys();
+
+                auto matchesSet = [&matcher](const QString &set) { return matcher(set); };
+                return std::none_of(sets.begin(), sets.end(), matchesSet);
             };
         }
 
@@ -333,7 +373,11 @@ static void setupParserRules()
 
     search["OracleQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         const auto matcher = std::any_cast<StringMatcher>(sv[0]);
-        return [=](const CardData &x) { return matcher(x->getText()); };
+        const CardSearchLanguage searchLanguage = searchLanguageContext;
+        return [=](const CardData &x) {
+            return matchesInSearchLanguage(x->getText(), x->getLocalizedText(searchLanguage.language), searchLanguage,
+                                           matcher);
+        };
     };
 
     search["ColorQuery"] = [](const peg::SemanticValues &sv) -> Filter {
@@ -410,7 +454,11 @@ static void setupParserRules()
     };
     search["GenericQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         const auto matcher = std::any_cast<StringMatcher>(sv[0]);
-        return [=](const CardData &x) { return matcher(x->getName()); };
+        const CardSearchLanguage searchLanguage = searchLanguageContext;
+        return [=](const CardData &x) {
+            return matchesInSearchLanguage(x->getName(), x->getLocalizedName(searchLanguage.language), searchLanguage,
+                                           matcher);
+        };
     };
 
     search["Color"] = [](const peg::SemanticValues &sv) -> char { return "WUBRGU"[sv.choice()]; };
@@ -425,7 +473,7 @@ FilterString::FilterString()
     _error = "Not initialized";
 }
 
-FilterString::FilterString(const QString &expr)
+FilterString::FilterString(const QString &expr, const CardSearchLanguage &searchLanguage)
 {
     QByteArray ba = expr.simplified().toUtf8();
 
@@ -437,6 +485,8 @@ FilterString::FilterString(const QString &expr)
         result = [](const CardData &) -> bool { return true; };
         return;
     }
+
+    searchLanguageContext = searchLanguage;
 
     search.set_logger([&](size_t /*ln*/, size_t col, const std::string &msg) {
         _error = QString("Error at position %1: %2").arg(col).arg(QString::fromStdString(msg));
