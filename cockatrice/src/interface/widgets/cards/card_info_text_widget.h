@@ -23,7 +23,8 @@ private:
     QLabel *propsLabel;
     QScrollArea *propsScroll;
     QTextEdit *textLabel;
-    ExactCard currentCard; ///< Last card set, re-rendered when the card language changes.
+    ExactCard currentCard;    ///< Last card set, re-rendered when the card language changes.
+    bool showAllTags = false; ///< Whether the potentially long tag list is fully expanded.
     void setTexts(const QString &propsText, const QString &textText);
 
 public:

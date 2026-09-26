@@ -28,6 +28,7 @@ QString const PowTough("pt");
 QString const Side("side");
 QString const Layout("layout");
 QString const ColorIdentity("coloridentity");
+QString const Tags("tags");
 
 inline static const QString getNicePropertyName(QString key)
 {
@@ -60,6 +61,9 @@ inline static const QString getNicePropertyName(QString key)
     }
     if (key == ColorIdentity) {
         return QCoreApplication::translate("Mtg", "Color Identity");
+    }
+    if (key == Tags) {
+        return QCoreApplication::translate("Mtg", "Tags");
     }
     return key;
 }

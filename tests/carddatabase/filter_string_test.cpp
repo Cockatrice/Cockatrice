@@ -6,6 +6,7 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/printing/printing_info.h>
 #include <libcockatrice/filters/filter_string.h>
+#include <libcockatrice/filters/filter_tree.h>
 #include <libcockatrice/interfaces/noop_card_preference_provider.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 
@@ -132,6 +133,64 @@ TEST_F(CardQuery, SearchLanguageIsBoundPerInstance)
     FilterString englishQuery("Kater", CardSearchLanguage{"", SearchLanguageMode::English});
     ASSERT_FALSE(englishQuery.check(localized));
     ASSERT_TRUE(germanQuery.check(localized));
+}
+
+CardInfoPtr taggedCard()
+{
+    return CardInfo::newInstance("Tagged Card", "text", false, {{"tags", "ramp removal"}}, {}, {}, {}, {});
+}
+
+TEST_F(CardQuery, TagsMatchWholeSlugs)
+{
+    const CardData tagged = taggedCard();
+    ASSERT_TRUE(FilterString("tags:ramp").check(tagged));
+    ASSERT_TRUE(FilterString("tags:removal").check(tagged));
+    ASSERT_TRUE(FilterString("tags:RAMP").check(tagged));
+    ASSERT_TRUE(FilterString("tag:ramp").check(tagged));
+    ASSERT_FALSE(FilterString("tags:squirrel").check(tagged));
+}
+
+TEST_F(CardQuery, TagQueryDoesNotMatchPartialSlugs)
+{
+    const CardData tagged = taggedCard();
+    ASSERT_FALSE(FilterString("tags:ram").check(tagged));
+    ASSERT_FALSE(FilterString("tags:mov").check(tagged));
+}
+
+TEST_F(CardQuery, TagQueryCombinesWithAnd)
+{
+    const CardData tagged = taggedCard();
+    ASSERT_TRUE(FilterString("tags:ramp tags:removal").check(tagged));
+    ASSERT_FALSE(FilterString("tags:ramp tags:squirrel").check(tagged));
+}
+
+TEST_F(CardQuery, TagQueryTreatsCommasAsPartOfTheSlug)
+{
+    // Tag lists are not a thing: `tags:draw` and `tags:ramp` are separate terms.
+    const CardData tagged = taggedCard();
+    ASSERT_FALSE(FilterString("tags:ramp,removal").check(tagged));
+}
+
+TEST_F(CardQuery, FilterTreeTagAttribute)
+{
+    const CardData tagged = taggedCard();
+
+    FilterTree matching;
+    matching.termNode(CardFilter::AttrTag, CardFilter::TypeAnd, "ramp");
+    ASSERT_TRUE(matching.acceptsCard(tagged, CardSearchLanguage{}));
+
+    FilterTree partial;
+    partial.termNode(CardFilter::AttrTag, CardFilter::TypeAnd, "ram");
+    ASSERT_FALSE(partial.acceptsCard(tagged, CardSearchLanguage{}));
+
+    FilterTree missing;
+    missing.termNode(CardFilter::AttrTag, CardFilter::TypeAnd, "squirrel");
+    ASSERT_FALSE(missing.acceptsCard(tagged, CardSearchLanguage{}));
+}
+
+TEST_F(CardQuery, TagQueryFalseWhenCardHasNoTags)
+{
+    ASSERT_FALSE(FilterString("tags:ramp").check(cat));
 }
 
 } // namespace
