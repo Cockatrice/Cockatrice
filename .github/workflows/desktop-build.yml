@@ -372,14 +372,14 @@ jobs:
         if: matrix.os == 'macOS'
         run: pipx install aqtinstall
 
-      # Resolve given wildcard versions (e.g. Qt 6.6.*) to latest version via aqtinstall to avoid stale caches on new releases
+      # Resolve given wildcard versions (e.g. Qt 6.6.*) to latest version (and latest-1) via aqtinstall to avoid stale caches on new releases
       - name: "[macOS] Resolve latest Qt from ${{ matrix.qt_version }} input"
         if: matrix.os == 'macOS'
         env:
           QT_VERSION: ${{ matrix.qt_version }}
         id: resolve_qt_version
         shell: bash
-        run: .ci/resolve_latest_aqt_qt_version.sh "$QT_VERSION"
+        run: .ci/resolve_qt_version.sh "$QT_VERSION"
 
       - name: "[macOS] Restore thin Qt ${{ steps.resolve_qt_version.outputs.version }}"
         if: matrix.os == 'macOS'
