@@ -356,7 +356,7 @@ jobs:
         with:
           msbuild-architecture: x64
 
-      - name: "[macOS] Setup ccache"
+      - name: "[macOS] Install ccache"
         if: matrix.os == 'macOS' && matrix.use_ccache == 1
         run: brew install ccache
 
@@ -368,13 +368,11 @@ jobs:
           key: ccache-${{ matrix.runner }}_${{ matrix.override_target }}-Xcode${{ matrix.xcode }}
           path: ${{ env.CCACHE_DIR }}
 
-      - name: "[macOS] Install aqtinstall"
-        if: matrix.os == 'macOS'
+      - name: "Install aqtinstall"
         run: pipx install aqtinstall
 
-      # Resolve given wildcard versions (e.g. Qt 6.6.*) to latest version (and latest-1) via aqtinstall to avoid stale caches on new releases
-      - name: "[macOS] Resolve latest Qt from ${{ matrix.qt_version }} input"
-        if: matrix.os == 'macOS'
+      # Resolve given wildcard versions (e.g. Qt 6.6.*) to latest version (and previous patch) via aqtinstall to avoid stale caches on new releases
+      - name: "Resolve latest Qt from ${{ matrix.qt_version }} input"
         env:
           QT_VERSION: ${{ matrix.qt_version }}
         id: resolve_qt_version
@@ -382,7 +380,7 @@ jobs:
         run: .ci/resolve_qt_version.sh "$QT_VERSION"
 
       - name: "[macOS] Restore thin Qt ${{ steps.resolve_qt_version.outputs.version }}"
-        if: matrix.os == 'macOS'
+        if: matrix.os == 'macOS' && steps.resolve_qt_version == success()
         id: restore_qt
         uses: actions/cache/restore@v6
         with:
@@ -393,6 +391,7 @@ jobs:
       # Qt build using vcpkg either just fails or takes too long to build
       - name: "[macOS] Install fat Qt ${{ matrix.qt_version }}"
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+        id: install_qt_mac
         uses: jurplel/install-qt-action@v4
         with:
           cache: false
@@ -401,12 +400,34 @@ jobs:
           modules: ${{ matrix.qt_modules }}
           version: ${{ matrix.qt_version }}
 
+      # Fallback to restore previous Qt patch version from cache
+      - name: "[macOS] Restore thin Qt ${{ steps.resolve_qt_version.outputs.version_previous_patch }} (Fallback)"
+        if: failure() && matrix.os == 'macOS' && steps.install_qt_mac.outcome == 'failure'
+        id: restore_qt_fallback
+        uses: actions/cache/restore@v6
+        with:
+          key: Qt-${{ steps.resolve_qt_version.outputs.version_previous_patch }}-macOS-${{ matrix.soc }}-${{ matrix.qt_modules }}-thin
+          path: ${{ github.workspace }}/Qt
+
+      # Fallback to installing previous Qt patch version
+      - name: "[macOS] Install fat Qt ${{ steps.resolve_qt_version.outputs.version_previous_patch }} (Fallback)"
+        if: failure() && matrix.os == 'macOS' && steps.restore_qt_fallback.outputs.cache-hit != 'true'
+        id: install_qt_mac_fallback
+        uses: jurplel/install-qt-action@v4
+        with:
+          cache: false
+          # cache-key-prefix: Qt
+          dir: ${{ github.workspace }}    # thinning script depends on this location
+          modules: ${{ matrix.qt_modules }}
+          version: ${{ steps.resolve_qt_version.outputs.version_previous_patch }}
+
       - name: "[macOS] Create thin Qt libraries"
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         run: .ci/thin_macos_qtlib.sh
 
       - name: "[macOS] Cache thin Qt libraries"
-        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true' && github.ref == 'refs/heads/master'
+        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true' && github.ref == 'refs/heads/master' &&
+            !(steps.restore_qt_fallback.outputs.cache-hit == 'true' || steps.install_qt_mac_fallback.outcome == 'success')
         uses: actions/cache/save@v6
         with:
           key: ${{ steps.restore_qt.outputs.cache-primary-key }}
@@ -414,6 +435,7 @@ jobs:
 
       - name: "[Windows] Install Qt ${{ matrix.qt_version }}"
         if: matrix.os == 'Windows'
+        id: install_qt_win
         uses: jurplel/install-qt-action@v4
         with:
           # Qt 6.11.0 only works with aqtinstall directly from git until aqtinstall 3.4 is released
@@ -422,6 +444,18 @@ jobs:
           cache-key-prefix: Qt
           modules: ${{ matrix.qt_modules }}
           version: ${{ matrix.qt_version }}
+
+      # Fallback to installing previous Qt patch version
+      - name: "[Windows] Install Qt ${{ steps.resolve_qt_version.outputs.version_previous_patch }} (Fallback)"
+        if: failure() && matrix.os == 'Windows' && steps.install_qt_win.outcome == 'failure'
+        uses: jurplel/install-qt-action@v4
+        with:
+          # Qt 6.11.0 only works with aqtinstall directly from git until aqtinstall 3.4 is released
+          aqtsource: git+https://github.com/miurahr/aqtinstall.git
+          cache: ${{ github.ref == 'refs/heads/master' }}
+          cache-key-prefix: Qt
+          modules: ${{ matrix.qt_modules }}
+          version: ${{ steps.resolve_qt_version.outputs.version_previous_patch }}
 
       - name: "[Windows] Install NSIS"
         if: matrix.os == 'Windows'
