@@ -25,7 +25,7 @@ env:
 jobs:
   docs:
     name: Doxygen
-    runs-on: macos-latest    # https://github.com/actions/runner-images#available-images
+    runs-on: macos-15-intel    # https://github.com/actions/runner-images#available-images
 
     steps:
       - name: "Checkout code"
