@@ -62,6 +62,12 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     // Qt widget style; "System" lets the application decide
     styleCombo.addItem(tr("System"), QStringLiteral("System"));
     for (const QString &key : QStyleFactory::keys()) {
+        // The Windows 11 native style is broken (board rendering glitches when
+        // moving cards), so never offer it; it is already sanitized at apply
+        // time in ThemeManager.
+        if (key.compare("windows11", Qt::CaseInsensitive) == 0) {
+            continue;
+        }
         styleCombo.addItem(key, key);
     }
 
@@ -505,7 +511,7 @@ void AppearanceSettingsPage::retranslateUi()
     openThemeButton.setText(tr("Open themes folder"));
     schemeComboLabel.setText(tr("Active theme palette:"));
     styleComboLabel.setText(tr("Active theme style:"));
-    styleCombo.setToolTip(tr("Qt widget style saved to this theme (\"Default\" lets the application decide)"));
+    styleCombo.setToolTip(tr("Qt widget style saved to this theme (\"System\" lets the application decide)"));
     editPaletteButton.setText(tr("Edit theme palette"));
 
     homeTabGroupBox->setTitle(tr("Home tab settings"));

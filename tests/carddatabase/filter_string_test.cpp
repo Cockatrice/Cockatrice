@@ -2,6 +2,9 @@
 #include "test_card_database_path_provider.h"
 
 #include "gtest/gtest.h"
+#include <libcockatrice/card/card_info.h>
+#include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/card/printing/printing_info.h>
 #include <libcockatrice/filters/filter_string.h>
 #include <libcockatrice/filters/filter_tree.h>
 #include <libcockatrice/interfaces/noop_card_preference_provider.h>
@@ -71,6 +74,13 @@ QUERY(Color1, cat, "c:g", true)
 QUERY(Color2, cat, "c:gw", true)
 QUERY(Color3, cat, "c!g", true)
 QUERY(Color4, cat, "c!gw", false)
+
+QUERY(SetCodeCaseInsensitive1, cat, "set:cat", true)
+QUERY(SetCodeCaseInsensitive2, cat, "set:CAT", true)
+QUERY(SetCodeCaseInsensitive3, cat, "set:CAt", true)
+QUERY(SetCodeShortForm, cat, "e:cat", true)
+QUERY(SetCodeWrongSet, cat, "set:who", false)
+QUERY(SetCodeWrongSet2, doctor, "set:cat", false)
 
 QUERY(BracketNextToUnquotedString, cat, "(o:woof OR o:meow)", true)
 
@@ -184,6 +194,80 @@ TEST_F(CardQuery, TagQueryFalseWhenCardHasNoTags)
 }
 
 } // namespace
+
+class SetQuery : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        // EOE and EOC share a release date, like a set and its Commander counterpart.
+        const QDate sharedReleaseDate(2026, 3, 13);
+        mainSet = CardSet::newInstance(&controller, "EOE", "Edge of Eternities", "expansion", sharedReleaseDate,
+                                       CardSet::PriorityPrimary);
+        commanderSet = CardSet::newInstance(&controller, "EOC", "Edge of Eternities Commander", "commander",
+                                            sharedReleaseDate, CardSet::PrioritySecondary);
+        oldSet = CardSet::newInstance(&controller, "OLD", "Older Set", "expansion", QDate(2020, 1, 1),
+                                      CardSet::PriorityPrimary);
+
+        inBothSets = newCardWithPrintings({{"EOE", mainSet}, {"EOC", commanderSet}});
+        onlyInCommanderSet = newCardWithPrintings({{"EOC", commanderSet}});
+        onlyInOldSet = newCardWithPrintings({{"OLD", oldSet}});
+
+        // SetExpression resolves set codes to release dates through the global set list.
+        auto *database = CardDatabaseManager::getInstance();
+        database->addSet(mainSet);
+        database->addSet(commanderSet);
+        database->addSet(oldSet);
+    }
+
+    CardInfoPtr newCardWithPrintings(const QList<QPair<QString, CardSetPtr>> &printings)
+    {
+        SetToPrintingsMap setsInfo;
+        for (const auto &printing : printings) {
+            setsInfo[printing.first].append(PrintingInfo(printing.second));
+        }
+        return CardInfo::newInstance("Test Card", "", false, {}, {}, {}, setsInfo, CardInfo::UiAttributes());
+    }
+
+    NoopCardSetPriorityController controller;
+    CardSetPtr mainSet;
+    CardSetPtr commanderSet;
+    CardSetPtr oldSet;
+    CardInfoPtr inBothSets;
+    CardInfoPtr onlyInCommanderSet;
+    CardInfoPtr onlyInOldSet;
+};
+
+TEST_F(SetQuery, ExactMatchSeparatesSameDaySets)
+{
+    EXPECT_TRUE(FilterString("set:EOE").check(inBothSets));
+    EXPECT_TRUE(FilterString("e:EOE").check(inBothSets));
+    EXPECT_TRUE(FilterString("set:EOC").check(inBothSets));
+    EXPECT_FALSE(FilterString("set:EOE").check(onlyInCommanderSet));
+    EXPECT_TRUE(FilterString("set:EOC").check(onlyInCommanderSet));
+}
+
+TEST_F(SetQuery, ExactMatchIsCaseInsensitive)
+{
+    EXPECT_TRUE(FilterString("set:eoe").check(inBothSets));
+    EXPECT_TRUE(FilterString("set:EoE").check(inBothSets));
+    EXPECT_FALSE(FilterString("set:eoe").check(onlyInCommanderSet));
+}
+
+TEST_F(SetQuery, NotEqualsMatchesPrintingsOutsideTheSet)
+{
+    EXPECT_FALSE(FilterString("set!EOE").check(inBothSets));
+    EXPECT_TRUE(FilterString("set!EOE").check(onlyInCommanderSet));
+}
+
+TEST_F(SetQuery, ComparisonMatchesByReleaseDate)
+{
+    // OLD (2020) predates EOE/EOC (2026-03-13), so comparison operators still use release dates.
+    EXPECT_TRUE(FilterString("set<EOE").check(onlyInOldSet));
+    EXPECT_FALSE(FilterString("set>EOE").check(onlyInOldSet));
+    EXPECT_TRUE(FilterString("set>=EOE").check(inBothSets));
+    EXPECT_FALSE(FilterString("set<EOE").check(inBothSets));
+}
 
 int main(int argc, char **argv)
 {

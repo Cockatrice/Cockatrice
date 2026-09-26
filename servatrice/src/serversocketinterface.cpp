@@ -128,6 +128,7 @@
 #include <libcockatrice/protocol/pb/serverinfo_user_alt.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user_session.pb.h>
 #include <libcockatrice/utility/passwordhasher.h>
+#include <libcockatrice/utility/report_categories.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <libcockatrice/utility/warning_categories.h>
 #include <server_response_containers.h>
@@ -3775,8 +3776,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReport(const Command_Re
         return Response::RespInvalidData;
     }
 
-    static const QStringList validCategories = {"cheating", "bug_abuse", "verbal_abuse", "other"};
-    if (!validCategories.contains(category.toLower())) {
+    if (!ReportCategories::isValid(category)) {
         return Response::RespInvalidData;
     }
 

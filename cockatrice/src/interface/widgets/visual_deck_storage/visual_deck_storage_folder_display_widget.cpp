@@ -1,6 +1,7 @@
 #include "visual_deck_storage_folder_display_widget.h"
 
 #include "../cards/card_info_picture_widget.h"
+#include "../cards/card_size_widget.h"
 #include "../general/display/banner_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "deck_preview/deck_preview_widget.h"
@@ -44,6 +45,8 @@ VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
     containerLayout->addWidget(flowWidget);
+
+    visualDeckStorageWidget->settings()->getCardSizeWidget()->enableCtrlScrollResize(this);
 
     auto *proxy = visualDeckStorageWidget->proxyModel();
     // A burst of proxy changes (one dataChanged per finished deck load, plus the filter

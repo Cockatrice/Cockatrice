@@ -31,8 +31,6 @@ set(oracle_SOURCES
     ../cockatrice/src/interface/pixel_map_generator.cpp
     ../cockatrice/src/interface/theme_config.cpp
     ../cockatrice/src/interface/theme_manager.cpp
-    ../cockatrice/src/interface/widgets/quick_settings/settings_button_widget.cpp
-    ../cockatrice/src/interface/widgets/quick_settings/settings_popup_widget.cpp
     ${VERSION_STRING_CPP}
 )
 
@@ -123,9 +121,13 @@ target_link_libraries(
   oracle
   PUBLIC libcockatrice_card
   PUBLIC libcockatrice_settings
-  PUBLIC libcockatrice_network
+  PUBLIC libcockatrice_protocol
   PUBLIC ${ORACLE_QT_MODULES}
 )
+
+# Only user_level.h is needed from the network headers (pulled in transitively
+# by pixel_map_generator.h); nothing from the network libraries is linked.
+target_include_directories(oracle PRIVATE ${CMAKE_SOURCE_DIR}/libcockatrice_network)
 
 if(ZLIB_FOUND)
   target_link_libraries(oracle PUBLIC ${ZLIB_LIBRARIES})

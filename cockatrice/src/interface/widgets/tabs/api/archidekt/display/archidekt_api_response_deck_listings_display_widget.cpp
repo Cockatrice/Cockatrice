@@ -15,6 +15,8 @@ ArchidektApiResponseDeckListingsDisplayWidget::ArchidektApiResponseDeckListingsD
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
 
+    cardSizeSlider->enableCtrlScrollResize(flowWidget);
+
     imageNetworkManager = new QNetworkAccessManager(this);
     imageNetworkManager->setTransferTimeout(); // Use Qt's default timeout
     imageNetworkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);

@@ -345,6 +345,16 @@ ${If} $PortableMode = 0
 	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "VersionMajor" "@CPACK_PACKAGE_VERSION_MAJOR@"
 	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "VersionMinor" "@CPACK_PACKAGE_VERSION_MINOR@"
 
+	; --- Register .cod file type ---
+	WriteRegStr HKCR ".cod" "" "Cockatrice"
+	WriteRegStr HKCR "Cockatrice" "" "Cockatrice Deck File"
+	WriteRegStr HKCR "Cockatrice\shell\open\command" "" '"$INSTDIR\cockatrice.exe" "%1"'
+
+	; --- Register custom URI protocol ---
+	WriteRegStr HKCR "cockatrice" "" "URL: Cockatrice Protocol"
+	WriteRegStr HKCR "cockatrice" "URL Protocol" ""
+	WriteRegStr HKCR "cockatrice\shell\open\command" "" '"$INSTDIR\cockatrice.exe" "%1"'
+
 	IfFileExists "$INSTDIR\vc_redist.x86.exe" VcRedist86Exists PastVcRedist86Check
 	VcRedist86Exists:
 		ExecWait '"$INSTDIR\vc_redist.x86.exe" /passive /norestart'
@@ -387,6 +397,12 @@ SectionEnd
 
 Section "un.Application" UnSecApplication
 	SetShellVarContext all
+	StrCpy $R1 0
+
+	; Record whether this was a portable install before the directory (and the
+	; portable.dat marker inside it) is removed below.
+	IfFileExists "$INSTDIR\portable.dat" 0 +2
+		StrCpy $R1 1
 
 	; Remove the entire application directory so any file that is not part of
 	; the installed payload (e.g. build-tree artifacts such as *.dir folders,
@@ -397,6 +413,18 @@ Section "un.Application" UnSecApplication
 	RMDir /r "$SMPROGRAMS\Cockatrice"
 
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice"
+
+	; Only remove the file/protocol associations if we registered them (i.e. the
+	; install was not portable) and .cod is still owned by Cockatrice, so we don't
+	; clobber a .cod association installed by another application.
+	${If} $R1 == 0
+		ReadRegStr $0 HKCR ".cod" ""
+		${If} $0 == "Cockatrice"
+			DeleteRegKey HKCR ".cod"
+			DeleteRegKey HKCR "Cockatrice"
+			DeleteRegKey HKCR "cockatrice"
+		${EndIf}
+	${EndIf}
 SectionEnd
 
 ; unselected because it is /o
