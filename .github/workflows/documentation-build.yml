@@ -25,7 +25,7 @@ env:
 jobs:
   docs:
     name: Doxygen
-    runs-on: ubuntu-24.04-arm
+    runs-on: windows-latest
 
     steps:
       - name: "Checkout code"
@@ -35,7 +35,7 @@ jobs:
 
       - name: "Install Graphviz"
         run: |
-          sudo apt-get install -y graphviz
+          choco install graphviz
           dot -V
 
       - name: "Install Doxygen"
@@ -44,6 +44,7 @@ jobs:
           version: "1.16.1"
 
       - name: "Update Doxygen Configuration"
+        shell: bash
         run: |
           git diff Doxyfile
           doxygen -u Doxyfile
