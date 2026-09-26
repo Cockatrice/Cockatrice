@@ -1,5 +1,6 @@
 #include "dlg_move_top_cards_until.h"
 
+#include <QCompleter>
 #include <QDialogButtonBox>
 #include <QLabel>
 #include <QLineEdit>
@@ -19,6 +20,7 @@ DlgMoveTopCardsUntil::DlgMoveTopCardsUntil(QWidget *parent, const MoveTopCardsUn
     exprComboBox = new QComboBox(this);
     exprComboBox->setFocus();
     exprComboBox->setEditable(true);
+    exprComboBox->completer()->setCaseSensitivity(Qt::CaseSensitive);
     exprComboBox->setInsertPolicy(QComboBox::InsertAtTop);
     exprComboBox->insertItems(0, options.exprs);
     exprLabel->setBuddy(exprComboBox);
