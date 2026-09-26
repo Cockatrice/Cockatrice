@@ -356,7 +356,7 @@ jobs:
         with:
           msbuild-architecture: x64
 
-      - name: "[macOS] Install ccache"
+      - name: "[macOS] Setup ccache"
         if: matrix.os == 'macOS' && matrix.use_ccache == 1
         run: brew install ccache
 
@@ -380,7 +380,7 @@ jobs:
         run: .ci/resolve_qt_version.sh "$QT_VERSION"
 
       - name: "[macOS] Restore thin Qt ${{ steps.resolve_qt_version.outputs.version }}"
-        if: matrix.os == 'macOS' && steps.resolve_qt_version == success()
+        if: matrix.os == 'macOS' && steps.resolve_qt_version.outcome == 'success'
         id: restore_qt
         uses: actions/cache/restore@v6
         with:
@@ -402,7 +402,7 @@ jobs:
 
       # Fallback to restore previous Qt patch version from cache
       - name: "[macOS] Restore thin Qt ${{ steps.resolve_qt_version.outputs.version_previous_patch }} (Fallback)"
-        if: failure() && matrix.os == 'macOS' && steps.install_qt_mac.outcome == 'failure'
+        if: failure() && matrix.os == 'macOS' && steps.install_qt_mac.outcome == 'failure' && steps.resolve_qt_version.outcome == 'success'
         id: restore_qt_fallback
         uses: actions/cache/restore@v6
         with:
@@ -411,7 +411,7 @@ jobs:
 
       # Fallback to installing previous Qt patch version
       - name: "[macOS] Install fat Qt ${{ steps.resolve_qt_version.outputs.version_previous_patch }} (Fallback)"
-        if: failure() && matrix.os == 'macOS' && steps.restore_qt_fallback.outputs.cache-hit != 'true'
+        if: failure() && matrix.os == 'macOS' && (steps.restore_qt_fallback.outcome == 'success' && steps.restore_qt_fallback.outputs.cache-hit != 'true') && steps.resolve_qt_version.outcome == 'success'
         id: install_qt_mac_fallback
         uses: jurplel/install-qt-action@v4
         with:
