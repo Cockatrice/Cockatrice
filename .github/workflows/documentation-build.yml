@@ -25,7 +25,7 @@ env:
 jobs:
   docs:
     name: Doxygen
-    runs-on: windows-latest
+    runs-on: macos-latest    # https://github.com/actions/runner-images#available-images
 
     steps:
       - name: "Checkout code"
@@ -35,7 +35,7 @@ jobs:
 
       - name: "Install Graphviz"
         run: |
-          choco install graphviz
+          brew install graphviz
           dot -V
 
       - name: "Install Doxygen"
