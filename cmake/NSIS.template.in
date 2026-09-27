@@ -12,6 +12,7 @@ Var NormalDestDir
 Var PortableDestDir
 Var PortableMode
 Var ReinstallMode
+Var AllowForceClose
 
 !include LogicLib.nsh
 !include FileFunc.nsh
@@ -133,10 +134,11 @@ Call SetModeDestinationFromInstdir
 
 ; Make sure no application instance is still running (and holding file locks)
 ; before the previous version is uninstalled. On a silent update (/R /S) the
-; running processes are asked to close gracefully and waited for; if they
-; refuse to close the update is aborted rather than force-killing them (data
-; loss, e.g. an unsaved deck). On interactive installs the user is prompted
-; to close them instead.
+; running processes are asked to close gracefully and waited for; Cockatrice
+; itself is never force-killed (data loss, e.g. an unsaved deck) so the update
+; is aborted instead, while the console applications Oracle and Servatrice are
+; force-stopped by PID once the grace period is over. On interactive installs
+; the user is prompted to close them instead.
 ; Only needed this early for /R, where AutoUninstallIfNeeded runs below; for
 ; interactive installs the section re-checks after the directory page, when
 ; $INSTDIR is the directory the user actually picked.
@@ -224,10 +226,14 @@ FunctionEnd
 ; library ...Qt6Network.dll" on the next start.
 ;
 ; On a silent update (/R /S) matching processes are asked to close gracefully
-; (WM_CLOSE) and waited for up to 60 s; if they refuse, the install is aborted
-; so their data is preserved - a force-kill could destroy an unsaved deck from
-; Help -> Check for Client Updates. On interactive installs and uninstalls the
-; user is prompted to close them instead.
+; (WM_CLOSE) and waited for up to 60 s. Cockatrice is never force-stopped: it
+; may be holding an unsaved deck or showing a "really leave this game?"
+; confirmation, so if it refuses to close the install is aborted - nothing has
+; been replaced yet, so the update is simply deferred. Oracle and Servatrice
+; are console applications without a main window, so CloseMainWindow() does
+; nothing for them and waiting cannot help; they hold no unsaved user data and
+; are force-stopped by PID once the grace period is over. On interactive
+; installs and uninstalls the user is prompted to close them instead.
 ;
 ; Processes are matched by image name AND by their executable path living
 ; under $INSTDIR, so unrelated processes that merely share an image name
@@ -300,6 +306,15 @@ Function CloseMatchingApps
     Pop $R3
 FunctionEnd
 
+Function ForceCloseApps
+    ; stop the matching instances by PID once the grace period is over. Only
+    ; used for the console applications ($AllowForceClose), which have no window
+    ; to close and hold no unsaved user data. Same strict filter as above.
+    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_INSTDIR", "$INSTDIR")'
+    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_INSTDIR, [StringComparison]::OrdinalIgnoreCase) } else { $$false } } catch { $$false } } | ForEach-Object { Stop-Process -Id $$_.Id -Force -ErrorAction SilentlyContinue }"'
+    Pop $R3
+FunctionEnd
+
 Function WaitForAppToClose
     ; usage: set $R1 to the display name (e.g. "cockatrice.exe") and $R2 to the
     ; base image name (e.g. "cockatrice")
@@ -335,11 +350,29 @@ Function WaitForAppToClose
         ${If} $R9 < 60000
             Goto ck_wait_loop
         ${EndIf}
-        ; give up waiting. The application refused to close (e.g. it is showing
-        ; a "really leave this game?" confirmation or holds an unsaved deck).
-        ; Do not force-kill it: nothing has been replaced yet, so aborting just
-        ; defers the update and preserves the user's data.
-        DetailPrint "$R1 is still running after 60 s; aborting the update so that no data is lost."
+        ; The grace period is over. Cockatrice is never force-stopped: it may be
+        ; showing a "really leave this game?" confirmation or holding an unsaved
+        ; deck, and nothing has been replaced yet, so aborting just defers the
+        ; update and preserves the user's data.
+        ${If} $AllowForceClose = 0
+            DetailPrint "$R1 is still running after 60 s; aborting the update so that no data is lost."
+            Abort
+        ${EndIf}
+        ; Oracle and Servatrice are console applications: CloseMainWindow()
+        ; returned false for them and waiting longer cannot help. They hold no
+        ; unsaved user data, so stop them by PID.
+        DetailPrint "Force-stopping $R1 ..."
+        Call ForceCloseApps
+        Sleep 2000
+        Call IsAppRunning
+        ${If} $R0 = 0
+            DetailPrint "$R1 closed."
+            Return
+        ${EndIf}
+        ${If} $R0 != 1
+            Return
+        ${EndIf}
+        DetailPrint "$R1 is still running after 60 s; aborting the update."
         Abort
     ${Else}
         ck_wait_prompt:
@@ -374,12 +407,16 @@ Function EnsureAppsNotRunning
     ${EndIf}
     StrCpy $R1 "cockatrice.exe"
     StrCpy $R2 "cockatrice"
+    ; a GUI application with unsaved user data: graceful close only
+    StrCpy $AllowForceClose 0
     Call WaitForAppToClose
     StrCpy $R1 "oracle.exe"
     StrCpy $R2 "oracle"
+    StrCpy $AllowForceClose 1
     Call WaitForAppToClose
     StrCpy $R1 "servatrice.exe"
     StrCpy $R2 "servatrice"
+    StrCpy $AllowForceClose 1
     Call WaitForAppToClose
 FunctionEnd
 
@@ -453,6 +490,14 @@ Function un.CloseMatchingApps
     Pop $R3
 FunctionEnd
 
+Function un.ForceCloseApps
+    ; stop the matching instances by PID once the grace period is over, see
+    ; ForceCloseApps in the installer.
+    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_INSTDIR", "$INSTDIR")'
+    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_INSTDIR, [StringComparison]::OrdinalIgnoreCase) } else { $$false } } catch { $$false } } | ForEach-Object { Stop-Process -Id $$_.Id -Force -ErrorAction SilentlyContinue }"'
+    Pop $R3
+FunctionEnd
+
 Function un.WaitForAppToClose
     Call un.IsAppRunning
     ; Only a definite "running" is worth waiting for, see WaitForAppToClose.
@@ -483,11 +528,24 @@ Function un.WaitForAppToClose
         ${If} $R9 < 60000
             Goto un_ck_wait_loop
         ${EndIf}
-        ; give up waiting. The application refused to close (e.g. it is showing
-        ; a "really leave this game?" confirmation or holds an unsaved deck).
-        ; Do not force-kill it: nothing has been replaced yet, so aborting just
-        ; defers the uninstall and preserves the user's data.
-        DetailPrint "$R1 is still running after 60 s; aborting so that no data is lost."
+        ; The grace period is over. Cockatrice is never force-stopped, see
+        ; WaitForAppToClose in the installer.
+        ${If} $AllowForceClose = 0
+            DetailPrint "$R1 is still running after 60 s; aborting so that no data is lost."
+            Abort
+        ${EndIf}
+        DetailPrint "Force-stopping $R1 ..."
+        Call un.ForceCloseApps
+        Sleep 2000
+        Call un.IsAppRunning
+        ${If} $R0 = 0
+            DetailPrint "$R1 closed."
+            Return
+        ${EndIf}
+        ${If} $R0 != 1
+            Return
+        ${EndIf}
+        DetailPrint "$R1 is still running after 60 s; aborting."
         Abort
     ${Else}
         un_ck_wait_prompt:
@@ -520,12 +578,16 @@ Function un.EnsureAppsNotRunning
     ${EndIf}
     StrCpy $R1 "cockatrice.exe"
     StrCpy $R2 "cockatrice"
+    ; a GUI application with unsaved user data: graceful close only
+    StrCpy $AllowForceClose 0
     Call un.WaitForAppToClose
     StrCpy $R1 "oracle.exe"
     StrCpy $R2 "oracle"
+    StrCpy $AllowForceClose 1
     Call un.WaitForAppToClose
     StrCpy $R1 "servatrice.exe"
     StrCpy $R2 "servatrice"
+    StrCpy $AllowForceClose 1
     Call un.WaitForAppToClose
 FunctionEnd
 
