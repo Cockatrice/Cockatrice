@@ -21,7 +21,7 @@ DlgEditAvatar::DlgEditAvatar(QWidget *parent) : QDialog(parent), image()
                               "without choosing a new image."));
     hintLabel = new QLabel(
         tr("Images are automatically downscaled to at most %1x%1 pixels.").arg(QString::number(MAX_AVATAR_DIMENSION)));
-    hintLabel->setStyleSheet("color: palette(placeholderText);");
+
     browseButton = new QPushButton(tr("Browse..."));
     connect(browseButton, &QPushButton::clicked, this, &DlgEditAvatar::actBrowse);
 
