@@ -360,7 +360,7 @@ jobs:
         with:
           msbuild-architecture: x64
 
-      - name: "[macOS] Install ccache"
+      - name: "[macOS] Setup ccache"
         if: matrix.os == 'macOS' && matrix.use_ccache == 1
         run: brew install ccache
 
