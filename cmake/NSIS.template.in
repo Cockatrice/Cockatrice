@@ -246,6 +246,13 @@ FunctionEnd
 ;        as accepted by Get-Process -Name), call this, result in $R0
 ;        (1 = running from $GuardDir, 0 = not running, 2 = could not determine)
 Function IsAppRunning
+    ; Every caller has to set $GuardDir; an empty one would make the path check
+    ; below match every process that merely shares the image name, which is the
+    ; opposite of what this guard is for.
+    ${If} $GuardDir == ""
+        StrCpy $R0 2
+        Return
+    ${EndIf}
     ; Pass the directory to guard to PowerShell via an environment variable so
     ; it never has to be embedded into the -Command string: apostrophes in a
     ; path would terminate the command early, and the path in a -like pattern
@@ -514,6 +521,12 @@ FunctionEnd
 ; Uninstaller copies of the same routines (the uninstaller gets its own
 ; function set compiled in, it cannot call the installer functions).
 Function un.IsAppRunning
+    ; An unset $GuardDir would match every process that merely shares the image
+    ; name, see IsAppRunning in the installer.
+    ${If} $GuardDir == ""
+        StrCpy $R0 2
+        Return
+    ${EndIf}
     ; Pass the directory to guard to PowerShell via an environment variable so
     ; it never has to be embedded into the -Command string: apostrophes in a
     ; path would terminate the command early, and the path in a -like pattern
