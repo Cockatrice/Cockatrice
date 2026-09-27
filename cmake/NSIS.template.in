@@ -487,6 +487,21 @@ Function IsExistingCockatriceInstall
     ${EndIf}
 FunctionEnd
 
+; Sets $R0 to 1 if a runtime file of a previous version is still present after
+; the purge. NSIS silently skips whatever it cannot delete, so one surviving DLL
+; is enough to prove that something still holds a lock on the install
+; directory. The purge works on wildcards, which the file existence checks do
+; not, so this looks for files that are certainly part of the payload.
+Function HasStaleRuntimeFiles
+    StrCpy $R0 0
+    ${If} ${FileExists} "$INSTDIR\Qt6Core.dll"
+        StrCpy $R0 1
+    ${EndIf}
+    ${If} ${FileExists} "$INSTDIR\Qt6Network.dll"
+        StrCpy $R0 1
+    ${EndIf}
+FunctionEnd
+
 ; Uninstaller copies of the same routines (the uninstaller gets its own
 ; function set compiled in, it cannot call the installer functions).
 Function un.IsAppRunning
@@ -499,7 +514,7 @@ Function un.IsAppRunning
     ; process was found: powershell.exe exits 0 whether or not the pipeline
     ; produced objects. 0 = not running, 1 = running, anything else = could not
     ; be determined (see un.IsProcessLookupAvailable).
-    ; Strict match: a readable path under $INSTDIR, same as in the installer.
+    ; Strict match: a readable path under $GuardDir, same as in the installer.
     nsExec::ExecToLog 'powershell -NoProfile -Command "if (Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_GUARD_DIR, [StringComparison]::OrdinalIgnoreCase) } else { $$false } } catch { $$false } } | Select-Object -First 1) { exit 1 } else { exit 0 }"'
     Pop $R0
     ${If} $R0 == "0"
@@ -760,9 +775,17 @@ SetOutPath "$INSTDIR"
 ; library ...Qt6Network.dll"). So the check has to come before the first
 ; Delete/RMDir and not after it - an interactive install into an existing
 ; portable directory with cockatrice.exe still running would otherwise delete
-; the old files under its feet. On the /R path the old uninstaller has already
-; run in .onInit, so this is a re-check right before the files are touched.
-Call EnsureAppsNotRunning
+; the old files under its feet.
+;
+; It is skipped on the /R path: .onInit already ran it before
+; AutoUninstallIfNeeded removed the previous installation, so by the time this
+; section starts the old files are gone and a second Abort here would leave the
+; user with the old version uninstalled and the new one not installed at all,
+; which is worse than the locked files being prevented. The leftover runtime
+; files are reported at the end of the purge instead.
+${If} $ReinstallMode = 0
+    Call EnsureAppsNotRunning
+${EndIf}
 
 ${If} $PortableMode = 1
 ${AndIf} ${FileExists} "$INSTDIR\portable.dat"
@@ -804,6 +827,19 @@ ${AndIf} $R0 = 1
 	Delete "$INSTDIR\icu*.dll"
 	Delete "$INSTDIR\libeay32.dll"
 	Delete "$INSTDIR\ssleay32.dll"
+${EndIf}
+
+; Whatever was locked during the purge - by an instance that started while the
+; installer was running, or because the running instance check could not be
+; performed at all - is still on disk, and the new executables are about to be
+; written next to it. That mix is exactly what makes the next start fail with
+; "The procedure entry point X could not be located in the dynamic link library
+; ...Qt6Network.dll", so say so instead of leaving it to the user to find out.
+Call HasStaleRuntimeFiles
+${If} $R0 = 1
+    DetailPrint "Files of a previous version are still present; the installation may be incomplete."
+    MessageBox MB_OK|MB_ICONEXCLAMATION \
+        "The installation could not remove all files of a previous version of Cockatrice, most likely because it is still running or was started as administrator.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice and run the installer again."
 ${EndIf}
 
 @CPACK_NSIS_EXTRA_PREINSTALL_COMMANDS@
