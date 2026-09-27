@@ -13,6 +13,8 @@ Var PortableDestDir
 Var PortableMode
 Var ReinstallMode
 Var AllowForceClose
+Var GuardDir
+Var OldUninstallString
 
 !include LogicLib.nsh
 !include FileFunc.nsh
@@ -236,24 +238,25 @@ FunctionEnd
 ; installs and uninstalls the user is prompted to close them instead.
 ;
 ; Processes are matched by image name AND by their executable path living
-; under $INSTDIR, so unrelated processes that merely share an image name
-; (e.g. the Oracle DB instance "oracle.exe") are never touched.
+; under the guarded directory ($GuardDir, normally $INSTDIR), so unrelated
+; processes that merely share an image name (e.g. the Oracle DB instance
+; "oracle.exe") are never touched.
 
 ; usage: set $R2 to the base image name (without extension, e.g. "cockatrice",
 ;        as accepted by Get-Process -Name), call this, result in $R0
-;        (1 = running from $INSTDIR, 0 = not running, 2 = could not determine)
+;        (1 = running from $GuardDir, 0 = not running, 2 = could not determine)
 Function IsAppRunning
-    ; Pass the install dir to PowerShell via an environment variable so it
-    ; never has to be embedded into the -Command string: apostrophes in a path
-    ; would terminate the command early, and `$INSTDIR` in a -like pattern
+    ; Pass the directory to guard to PowerShell via an environment variable so
+    ; it never has to be embedded into the -Command string: apostrophes in a
+    ; path would terminate the command early, and the path in a -like pattern
     ; would treat [ and ] as wildcard characters.
-    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_INSTDIR", "$INSTDIR")'
+    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$GuardDir")'
     ; Exit the process explicitly so nsExec's pop reflects whether a matching
     ; process was found: powershell.exe exits 0 whether or not the pipeline
     ; produced objects. 0 = not running, 1 = running, anything else = could not
     ; be determined (see IsProcessLookupAvailable).
     ; A process is only a match when its path is readable and lives under
-    ; $INSTDIR. A process we cannot inspect is not one of ours: the updater is
+    ; $GuardDir. A process we cannot inspect is not one of ours: the updater is
     ; always started by the application it updates, so it runs in the same user
     ; session, and an interactive install is elevated and can read the paths of
     ; the user's own processes. Assuming a match instead would be a hard stop
@@ -261,7 +264,7 @@ Function IsAppRunning
     ; SYSTEM has a process named "oracle" whose path raises Access denied, and
     ; that would make every silent update abort and every interactive install
     ; loop on the Retry prompt with no way out but Cancel.
-    nsExec::ExecToLog 'powershell -NoProfile -Command "if (Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_INSTDIR, [StringComparison]::OrdinalIgnoreCase) } else { $$false } } catch { $$false } } | Select-Object -First 1) { exit 1 } else { exit 0 }"'
+    nsExec::ExecToLog 'powershell -NoProfile -Command "if (Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_GUARD_DIR, [StringComparison]::OrdinalIgnoreCase) } else { $$false } } catch { $$false } } | Select-Object -First 1) { exit 1 } else { exit 0 }"'
     Pop $R0
     ${If} $R0 == "0"
         StrCpy $R0 0
@@ -296,13 +299,13 @@ Function CloseMatchingApps
     ; gracefully ask every matching instance to close (sends WM_CLOSE)
     ;
     ; The filter here is deliberately the strict one: a process is only asked to
-    ; close when its path is readable and lives under $INSTDIR. Treating a
+    ; close when its path is readable and lives under $GuardDir. Treating a
     ; process whose path cannot be read (an unrelated oracle.exe / servatrice.exe,
     ; or one owned by another account running as SYSTEM) as a match would make
     ; the installer close a third party application, and it runs elevated, so
     ; CloseMainWindow() would succeed on it.
-    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_INSTDIR", "$INSTDIR")'
-    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_INSTDIR, [StringComparison]::OrdinalIgnoreCase) } else { $$false } } catch { $$false } } | ForEach-Object { $$null = $$_.CloseMainWindow() }"'
+    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$GuardDir")'
+    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_GUARD_DIR, [StringComparison]::OrdinalIgnoreCase) } else { $$false } } catch { $$false } } | ForEach-Object { $$null = $$_.CloseMainWindow() }"'
     Pop $R3
 FunctionEnd
 
@@ -310,8 +313,8 @@ Function ForceCloseApps
     ; stop the matching instances by PID once the grace period is over. Only
     ; used for the console applications ($AllowForceClose), which have no window
     ; to close and hold no unsaved user data. Same strict filter as above.
-    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_INSTDIR", "$INSTDIR")'
-    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_INSTDIR, [StringComparison]::OrdinalIgnoreCase) } else { $$false } } catch { $$false } } | ForEach-Object { Stop-Process -Id $$_.Id -Force -ErrorAction SilentlyContinue }"'
+    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$GuardDir")'
+    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_GUARD_DIR, [StringComparison]::OrdinalIgnoreCase) } else { $$false } } catch { $$false } } | ForEach-Object { Stop-Process -Id $$_.Id -Force -ErrorAction SilentlyContinue }"'
     Pop $R3
 FunctionEnd
 
@@ -400,6 +403,31 @@ Function WaitForAppToClose
 FunctionEnd
 
 Function EnsureAppsNotRunning
+    ; guards the install directory
+    StrCpy $GuardDir $INSTDIR
+    Call GuardAppsNotRunning
+FunctionEnd
+
+Function EnsureOldInstallNotRunning
+    ; Guards the directory of a *previous* installation, as recorded in the
+    ; registry. Needed by componentsPagePre, which runs the old uninstaller
+    ; before the directory page, so $INSTDIR is still the default there and not
+    ; the directory the old install lives in. Every uninstaller shipped before
+    ; this change had no running instance guard of its own, so the old one would
+    ; delete files while an instance of the application is still holding them.
+    ReadRegStr $R3 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "InstallLocation"
+    ${If} $R3 == ""
+        ; no usable record of where the old install is; $INSTDIR is the default
+        ; install directory at this point, which is where it usually is anyway
+        DetailPrint "Could not read the previous installation directory from the registry; checking $INSTDIR instead."
+        StrCpy $R3 $INSTDIR
+    ${EndIf}
+    StrCpy $GuardDir $R3
+    Call GuardAppsNotRunning
+FunctionEnd
+
+Function GuardAppsNotRunning
+    ; usage: set $GuardDir to the directory to guard, then call this
     Call IsProcessLookupAvailable
     ${If} $R0 = 0
         ; Without PowerShell we cannot tell whether a running instance is
@@ -462,17 +490,17 @@ FunctionEnd
 ; Uninstaller copies of the same routines (the uninstaller gets its own
 ; function set compiled in, it cannot call the installer functions).
 Function un.IsAppRunning
-    ; Pass the install dir to PowerShell via an environment variable so it
-    ; never has to be embedded into the -Command string: apostrophes in a path
-    ; would terminate the command early, and `$INSTDIR` in a -like pattern
+    ; Pass the directory to guard to PowerShell via an environment variable so
+    ; it never has to be embedded into the -Command string: apostrophes in a
+    ; path would terminate the command early, and the path in a -like pattern
     ; would treat [ and ] as wildcard characters.
-    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_INSTDIR", "$INSTDIR")'
+    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$GuardDir")'
     ; Exit the process explicitly so nsExec's pop reflects whether a matching
     ; process was found: powershell.exe exits 0 whether or not the pipeline
     ; produced objects. 0 = not running, 1 = running, anything else = could not
     ; be determined (see un.IsProcessLookupAvailable).
     ; Strict match: a readable path under $INSTDIR, same as in the installer.
-    nsExec::ExecToLog 'powershell -NoProfile -Command "if (Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_INSTDIR, [StringComparison]::OrdinalIgnoreCase) } else { $$false } } catch { $$false } } | Select-Object -First 1) { exit 1 } else { exit 0 }"'
+    nsExec::ExecToLog 'powershell -NoProfile -Command "if (Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_GUARD_DIR, [StringComparison]::OrdinalIgnoreCase) } else { $$false } } catch { $$false } } | Select-Object -First 1) { exit 1 } else { exit 0 }"'
     Pop $R0
     ${If} $R0 == "0"
         StrCpy $R0 0
@@ -503,16 +531,16 @@ Function un.CloseMatchingApps
     ;
     ; Strict filter, same as in the installer: never close a process whose path
     ; cannot be read, it is not necessarily one of ours.
-    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_INSTDIR", "$INSTDIR")'
-    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_INSTDIR, [StringComparison]::OrdinalIgnoreCase) } else { $$false } } catch { $$false } } | ForEach-Object { $$null = $$_.CloseMainWindow() }"'
+    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$GuardDir")'
+    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_GUARD_DIR, [StringComparison]::OrdinalIgnoreCase) } else { $$false } } catch { $$false } } | ForEach-Object { $$null = $$_.CloseMainWindow() }"'
     Pop $R3
 FunctionEnd
 
 Function un.ForceCloseApps
     ; stop the matching instances by PID once the grace period is over, see
     ; ForceCloseApps in the installer.
-    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_INSTDIR", "$INSTDIR")'
-    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_INSTDIR, [StringComparison]::OrdinalIgnoreCase) } else { $$false } } catch { $$false } } | ForEach-Object { Stop-Process -Id $$_.Id -Force -ErrorAction SilentlyContinue }"'
+    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$GuardDir")'
+    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_GUARD_DIR, [StringComparison]::OrdinalIgnoreCase) } else { $$false } } catch { $$false } } | ForEach-Object { Stop-Process -Id $$_.Id -Force -ErrorAction SilentlyContinue }"'
     Pop $R3
 FunctionEnd
 
@@ -589,6 +617,12 @@ Function un.WaitForAppToClose
 FunctionEnd
 
 Function un.EnsureAppsNotRunning
+    ; guards the install directory; the uninstaller only ever has to check this one
+    StrCpy $GuardDir $INSTDIR
+    Call un.GuardAppsNotRunning
+FunctionEnd
+
+Function un.GuardAppsNotRunning
     Call un.IsProcessLookupAvailable
     ${If} $R0 = 0
         ; Same reasoning as in the installer: without PowerShell we cannot tell
@@ -673,8 +707,15 @@ ${If} $PortableMode = 0
     ${EndIf}
 
     uninst32:
+    ; the old uninstaller is run here, before the directory page, and every
+    ; uninstaller predating this change has no guard of its own: make sure no
+    ; instance of the application is still running out of the *old* install
+    ; directory before letting it delete anything. The uninstall string is
+    ; stashed away first, the check works on $R0.
+    StrCpy $OldUninstallString $R0
+    Call EnsureOldInstallNotRunning
     ClearErrors
-    ExecWait "$R0"
+    ExecWait "$OldUninstallString"
 
 	done32:
 
@@ -693,8 +734,10 @@ ${If} $PortableMode = 0
         ${EndIf}
 
 	    uninst64:
+	    StrCpy $OldUninstallString $R0
+	    Call EnsureOldInstallNotRunning
 	    ClearErrors
-	    ExecWait "$R0"
+	    ExecWait "$OldUninstallString"
 
 		done64:
 	${EndIf}
