@@ -205,6 +205,24 @@ void DlgUpdate::setLabel(const QString &newText)
     statusLabel->setText(newText);
 }
 
+void DlgUpdate::warnInstallerIsWaiting()
+{
+    // Modeless on purpose: the installer asks the application to close exactly once (see
+    // CloseMatchingApps in NSIS.template.in) and only polls afterwards, while Qt drops spontaneous
+    // close events - a WM_CLOSE from the installer - for windows that are blocked by a modal
+    // widget (QGuiApplicationPrivate::processCloseEvent). An application modal message box here
+    // would therefore swallow the installer's one and only request for the rest of its wait.
+    auto *notification = new QMessageBox(QMessageBox::Warning, tr("Update"),
+                                         tr("The update installer is already running and waits about a "
+                                            "minute for Cockatrice to close. Cockatrice is still busy, so "
+                                            "save your work and close it before then. Otherwise the "
+                                            "installer gives up and the update is cancelled."),
+                                         QMessageBox::Ok, parentWidget());
+    notification->setWindowModality(Qt::NonModal);
+    notification->setAttribute(Qt::WA_DeleteOnClose);
+    notification->show();
+}
+
 void DlgUpdate::updateCheckError(const QString &errorString)
 {
     setLabel(tr("Error"));
@@ -255,11 +273,7 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
             if (window->closeForUpdate()) {
                 QTimer::singleShot(0, qApp, [] { QCoreApplication::exit(0); });
             } else {
-                QMessageBox::warning(this, tr("Update"),
-                                     tr("The update installer is already running and waits about a "
-                                        "minute for Cockatrice to close. Cockatrice is still busy, so "
-                                        "save your work and close it before then. Otherwise the "
-                                        "installer gives up and the update is cancelled."));
+                warnInstallerIsWaiting();
             }
         } else {
             QTimer::singleShot(0, qApp, [] { QCoreApplication::exit(0); });
