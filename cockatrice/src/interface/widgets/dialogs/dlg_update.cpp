@@ -7,6 +7,8 @@
 
 #include <QCoreApplication>
 #include <QDesktopServices>
+#include <QDir>
+#include <QFileInfo>
 #include <QLabel>
 #include <QMessageBox>
 #include <QProgressBar>
@@ -15,6 +17,12 @@
 #include <QVBoxLayout>
 #include <QtNetwork>
 #include <version_string.h>
+
+// Executable that, when it sits next to the downloaded update installer, is installed instead of
+// it. A packager shipping a custom build - or someone testing one - can drop the file there and
+// have Cockatrice run it rather than the official installer, without the release channel having to
+// host an installer for that build. It is a drop-in and is run with the same arguments.
+static const QString UPDATE_INSTALLER_OVERRIDE = "Cockatrice-Update-Override.exe";
 
 DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent)
 {
@@ -244,6 +252,12 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
 
     QString installerPath = filepath.toLocalFile();
 
+    const QString overridePath = QDir(QFileInfo(installerPath).absolutePath()).filePath(UPDATE_INSTALLER_OVERRIDE);
+    if (QFileInfo::exists(overridePath)) {
+        qCInfo(DlgUpdateLog) << "Installing the update installer override instead of the download:" << overridePath;
+        installerPath = overridePath;
+    }
+
     QString appDir = QDir::toNativeSeparators(QCoreApplication::applicationDirPath());
     QProcess process;
     process.setProgram(installerPath);
@@ -260,7 +274,7 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
 
     // Try to open the installer. If it opens, quit Cockatrice
     if (process.startDetached()) {
-        qCInfo(DlgUpdateLog) << "Opened downloaded update file successfully - closing Cockatrice";
+        qCInfo(DlgUpdateLog) << "Opened update installer successfully - closing Cockatrice";
         // Close the main window synchronously so file locks are released before the NSIS installer
         // (already launched) starts replacing files. This also flushes settings and shuts down the
         // tabs, but only when the close is actually accepted: MainWindow may veto it for a running
