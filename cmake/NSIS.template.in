@@ -356,14 +356,20 @@ Function WaitForAppToClose
         ; The grace period is over. Cockatrice is never force-stopped: it may be
         ; showing a "really leave this game?" confirmation or holding an unsaved
         ; deck, and nothing has been replaced yet, so aborting just defers the
-        ; update and preserves the user's data. A silent /R update has no output
-        ; the user can see, so the abort is reported in a message box - Help ->
-        ; Check for Client Updates started this installer and the client is
-        ; already closing, without it the update would just silently not happen.
+        ; update and preserves the user's data.
         ${If} $AllowForceClose = 0
             DetailPrint "$R1 is still running after 60 s; aborting the update so that no data is lost."
-            MessageBox MB_OK|MB_ICONEXCLAMATION \
-                "$R1 did not close within 60 seconds, so the installation was aborted to avoid losing unsaved data.$\r$\n$\r$\nPlease close $R1 and run the installer again."
+            ; The in-app updater runs this installer silent and detached and
+            ; never looks at its exit code, so a plain Abort would leave the user
+            ; with no update and no explanation. A /S install without /R on the
+            ; other hand is unattended - by a package manager, for instance -
+            ; and a message box there would block forever, so that case only
+            ; reports through the log and the exit code.
+            ${If} $ReinstallMode = 1
+                MessageBox MB_OK|MB_ICONEXCLAMATION \
+                    "$R1 did not close within 60 seconds, so the installation was aborted to avoid losing unsaved data.$\r$\n$\r$\nPlease close $R1 and run the installer again."
+            ${EndIf}
+            SetErrorLevel 1
             Abort
         ${EndIf}
         ; Oracle and Servatrice are console applications: CloseMainWindow()
@@ -381,8 +387,11 @@ Function WaitForAppToClose
             Return
         ${EndIf}
         DetailPrint "$R1 is still running after 60 s; aborting the update."
-        MessageBox MB_OK|MB_ICONEXCLAMATION \
-            "$R1 could not be stopped, so the installation was aborted.$\r$\n$\r$\nPlease close $R1 and run the installer again."
+        ${If} $ReinstallMode = 1
+            MessageBox MB_OK|MB_ICONEXCLAMATION \
+                "$R1 could not be stopped, so the installation was aborted.$\r$\n$\r$\nPlease close $R1 and run the installer again."
+        ${EndIf}
+        SetErrorLevel 1
         Abort
     ${Else}
         ck_wait_prompt:
@@ -590,12 +599,14 @@ Function un.WaitForAppToClose
             Goto un_ck_wait_loop
         ${EndIf}
         ; The grace period is over. Cockatrice is never force-stopped, see
-        ; WaitForAppToClose in the installer. A silent uninstall has no output
-        ; the user can see either, so the abort is reported in a message box.
+        ; WaitForAppToClose in the installer. A silent uninstall only reports
+        ; through the log and its exit code: it is also run unattended (the /R
+        ; updater uses it via QuietUninstallString, package managers use it
+        ; directly), and a message box would block there. The installer that ran
+        ; us reports the incomplete result to the user itself.
         ${If} $AllowForceClose = 0
             DetailPrint "$R1 is still running after 60 s; aborting so that no data is lost."
-            MessageBox MB_OK|MB_ICONEXCLAMATION \
-                "$R1 did not close within 60 seconds, so the uninstall was aborted to avoid losing unsaved data.$\r$\n$\r$\nPlease close $R1 and run the uninstaller again."
+            SetErrorLevel 1
             Abort
         ${EndIf}
         DetailPrint "Force-stopping $R1 ..."
@@ -610,8 +621,7 @@ Function un.WaitForAppToClose
             Return
         ${EndIf}
         DetailPrint "$R1 is still running after 60 s; aborting."
-        MessageBox MB_OK|MB_ICONEXCLAMATION \
-            "$R1 could not be stopped, so the uninstall was aborted.$\r$\n$\r$\nPlease close $R1 and run the uninstaller again."
+        SetErrorLevel 1
         Abort
     ${Else}
         un_ck_wait_prompt:
