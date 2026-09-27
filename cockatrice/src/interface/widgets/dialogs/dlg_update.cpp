@@ -276,6 +276,13 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
                 warnInstallerIsWaiting();
             }
         } else {
+            // Not a MainWindow, so no faithful close can be requested - but the parent still gets
+            // its close() call, which is what the code before this change did and lets it flush
+            // settings and shut down its tabs. Leaving is then unconditional: the installer is
+            // already running against a process that still holds locks on the files it replaces.
+            if (auto *widget = parentWidget()) {
+                widget->close();
+            }
             QTimer::singleShot(0, qApp, [] { QCoreApplication::exit(0); });
         }
         close();
