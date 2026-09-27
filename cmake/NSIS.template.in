@@ -709,6 +709,18 @@ Section "Application" SecApplication
 SetShellVarContext all
 SetOutPath "$INSTDIR"
 
+; No application instance may be running while any file below is deleted or
+; replaced: both upgrade blocks start by removing the old executables and
+; runtime DLLs, and NSIS silently skips whatever is locked, which is how an
+; install ends up with a mix of old and new Qt DLLs next to the new executable
+; ("The procedure entry point X could not be located in the dynamic link
+; library ...Qt6Network.dll"). So the check has to come before the first
+; Delete/RMDir and not after it - an interactive install into an existing
+; portable directory with cockatrice.exe still running would otherwise delete
+; the old files under its feet. On the /R path the old uninstaller has already
+; run in .onInit, so this is a re-check right before the files are touched.
+Call EnsureAppsNotRunning
+
 ${If} $PortableMode = 1
 ${AndIf} ${FileExists} "$INSTDIR\portable.dat"
 	; upgrade portable mode
@@ -735,13 +747,8 @@ ${AndIf} ${FileExists} "$INSTDIR\portable.dat"
 	RMDir "$INSTDIR"
 ${EndIf}
 
-; Belt and braces: the old uninstaller may have already run in the /R path, so
-; ensure no application instance is still holding file locks, then remove any
-; runtime DLLs left over from older versions. A mismatched Qt/OpenSSL set next
-; to the new executable is what causes "The procedure entry point X could not be
-; located in the dynamic link library ...Qt6Network.dll" after an update.
-Call EnsureAppsNotRunning
-
+; Remove any runtime DLLs left over from older versions, so a mismatched
+; Qt/OpenSSL set cannot survive next to the new executables.
 Call IsExistingCockatriceInstall
 ${If} $PortableMode = 0
 ${AndIf} $R0 = 1
