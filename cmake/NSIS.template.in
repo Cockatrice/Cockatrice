@@ -235,7 +235,7 @@ FunctionEnd
 
 ; usage: set $R2 to the base image name (without extension, e.g. "cockatrice",
 ;        as accepted by Get-Process -Name), call this, result in $R0
-;        (1 = running from $INSTDIR, 0 = not running)
+;        (1 = running from $INSTDIR, 0 = not running, 2 = could not determine)
 Function IsAppRunning
     ; Pass the install dir to PowerShell via an environment variable so it
     ; never has to be embedded into the -Command string: apostrophes in a path
@@ -259,8 +259,30 @@ Function IsAppRunning
     Pop $R0
     ${If} $R0 == "0"
         StrCpy $R0 0
-    ${Else}
+    ${ElseIf} $R0 == "1"
         StrCpy $R0 1
+    ${Else}
+        ; powershell.exe could not be run at all (nsExec pushes the string
+        ; "error"), or died with an unexpected code. That is "could not
+        ; determine", which has to stay distinguishable from "definitely
+        ; running": a state that can never clear would block the installer
+        ; forever. IsProcessLookupAvailable warns about that case once.
+        StrCpy $R0 2
+    ${EndIf}
+FunctionEnd
+
+; Sets $R0 to 1 if PowerShell can be started at all, 0 if it cannot. The
+; running instance check is built on top of it, so a machine where
+; powershell.exe is missing, blocked by policy or refused by antivirus is
+; reported once instead of being reported as "Cockatrice is running" on every
+; single check.
+Function IsProcessLookupAvailable
+    nsExec::ExecToLog 'powershell -NoProfile -Command "exit 0"'
+    Pop $R0
+    ${If} $R0 == "0"
+        StrCpy $R0 1
+    ${Else}
+        StrCpy $R0 0
     ${EndIf}
 FunctionEnd
 
@@ -282,7 +304,10 @@ Function WaitForAppToClose
     ; usage: set $R1 to the display name (e.g. "cockatrice.exe") and $R2 to the
     ; base image name (e.g. "cockatrice")
     Call IsAppRunning
-    ${If} $R0 = 0
+    ; Only a definite "running" is worth waiting for. "Not running" is done, and
+    ; "could not determine" must not keep the installer waiting on an answer it
+    ; will never get - EnsureAppsNotRunning has warned about that case already.
+    ${If} $R0 != 1
         Return
     ${EndIf}
 
@@ -299,6 +324,9 @@ Function WaitForAppToClose
         Call IsAppRunning
         ${If} $R0 = 0
             DetailPrint "$R1 closed."
+            Return
+        ${EndIf}
+        ${If} $R0 != 1
             Return
         ${EndIf}
         System::Call 'kernel32::GetTickCount()i.s'
@@ -322,6 +350,9 @@ Function WaitForAppToClose
         ${If} $R0 = 0
             Return
         ${EndIf}
+        ${If} $R0 != 1
+            Return
+        ${EndIf}
         Goto ck_wait_prompt
         ck_abort_install:
         Abort
@@ -329,6 +360,18 @@ Function WaitForAppToClose
 FunctionEnd
 
 Function EnsureAppsNotRunning
+    Call IsProcessLookupAvailable
+    ${If} $R0 = 0
+        ; Without PowerShell we cannot tell whether a running instance is
+        ; holding locks on the files we are about to replace. Warn once and
+        ; continue: refusing to install would leave the user with an installer
+        ; that can never complete, which is worse than the locked-file failure
+        ; this check exists to prevent. MessageBox is shown even in a silent
+        ; install - the user has to be told to close the applications by hand.
+        DetailPrint "Could not start powershell.exe; skipping the running instance check. Close Cockatrice, Oracle and Servatrice manually if the installation reports a problem."
+        MessageBox MB_OK|MB_ICONEXCLAMATION "This installer could not check whether Cockatrice is still running, because powershell.exe could not be started.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice manually before continuing."
+        Return
+    ${EndIf}
     StrCpy $R1 "cockatrice.exe"
     StrCpy $R2 "cockatrice"
     Call WaitForAppToClose
@@ -378,8 +421,25 @@ Function un.IsAppRunning
     Pop $R0
     ${If} $R0 == "0"
         StrCpy $R0 0
-    ${Else}
+    ${ElseIf} $R0 == "1"
         StrCpy $R0 1
+    ${Else}
+        ; powershell.exe could not be run at all (nsExec pushes the string
+        ; "error"), or died with an unexpected code. That is "could not
+        ; determine", which has to stay distinguishable from "definitely
+        ; running": a state that can never clear would block the uninstaller
+        ; forever. un.IsProcessLookupAvailable warns about that case once.
+        StrCpy $R0 2
+    ${EndIf}
+FunctionEnd
+
+Function un.IsProcessLookupAvailable
+    nsExec::ExecToLog 'powershell -NoProfile -Command "exit 0"'
+    Pop $R0
+    ${If} $R0 == "0"
+        StrCpy $R0 1
+    ${Else}
+        StrCpy $R0 0
     ${EndIf}
 FunctionEnd
 
@@ -395,7 +455,8 @@ FunctionEnd
 
 Function un.WaitForAppToClose
     Call un.IsAppRunning
-    ${If} $R0 = 0
+    ; Only a definite "running" is worth waiting for, see WaitForAppToClose.
+    ${If} $R0 != 1
         Return
     ${EndIf}
 
@@ -411,6 +472,9 @@ Function un.WaitForAppToClose
         Call un.IsAppRunning
         ${If} $R0 = 0
             DetailPrint "$R1 closed."
+            Return
+        ${EndIf}
+        ${If} $R0 != 1
             Return
         ${EndIf}
         System::Call 'kernel32::GetTickCount()i.s'
@@ -434,6 +498,9 @@ Function un.WaitForAppToClose
         ${If} $R0 = 0
             Return
         ${EndIf}
+        ${If} $R0 != 1
+            Return
+        ${EndIf}
         Goto un_ck_wait_prompt
         un_ck_abort_install:
         Abort
@@ -441,6 +508,16 @@ Function un.WaitForAppToClose
 FunctionEnd
 
 Function un.EnsureAppsNotRunning
+    Call un.IsProcessLookupAvailable
+    ${If} $R0 = 0
+        ; Same reasoning as in the installer: without PowerShell we cannot tell
+        ; whether a running instance still holds file locks, and refusing to
+        ; uninstall would leave the user with an uninstaller that never
+        ; completes. Warn once and continue.
+        DetailPrint "Could not start powershell.exe; skipping the running instance check. Close Cockatrice, Oracle and Servatrice manually if the uninstall reports a problem."
+        MessageBox MB_OK|MB_ICONEXCLAMATION "This uninstaller could not check whether Cockatrice is still running, because powershell.exe could not be started.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice manually before continuing."
+        Return
+    ${EndIf}
     StrCpy $R1 "cockatrice.exe"
     StrCpy $R2 "cockatrice"
     Call un.WaitForAppToClose
