@@ -25,7 +25,7 @@ env:
 jobs:
   docs:
     name: Doxygen
-    runs-on: macos-15-intel    # https://github.com/actions/runner-images#available-images
+    runs-on: ubuntu-24.04-arm    # https://github.com/actions/runner-images#available-images
 
     steps:
       - name: "Checkout code"
@@ -35,7 +35,7 @@ jobs:
 
       - name: "Install Graphviz"
         run: |
-          brew install graphviz
+          sudo apt-get install -y graphviz
           dot -V
 
       - name: "Install Doxygen"
