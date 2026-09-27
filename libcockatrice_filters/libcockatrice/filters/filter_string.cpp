@@ -150,8 +150,8 @@ static void setupParserRules()
             return stored.split(" ", Qt::SkipEmptyParts).contains(tag, Qt::CaseInsensitive);
         };
     };
-    search["SetQuery"] = [](const peg::SemanticValues &sv) -> Filter {
-        if (sv.choice() == 1) {
+    search["SetQueryValue"] = [](const peg::SemanticValues &sv) -> Filter {
+        if (sv.choice() == 0) {
             auto matcher = std::any_cast<StringMatcher>(sv[0]);
             return [=](const CardData &x) -> bool {
                 QList<QString> sets = x->getSets().keys();
