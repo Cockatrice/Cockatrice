@@ -427,9 +427,8 @@ Function EnsureAppsNotRunning
     Call WaitForAppToClose
 FunctionEnd
 
-; Sets $R0 to 1 if $INSTDIR looks like an existing Cockatrice install (any of
-; the three executables or a previous uninstaller is present). Used to guard
-; the stale-runtime-DLL purge so a first-time install into a pre-existing
+; Sets $R0 to 1 if $INSTDIR looks like an existing Cockatrice install. Used to
+; guard the stale-runtime-DLL purge so a first-time install into a pre-existing
 ; directory with an unrelated "Plugins" folder is never touched, while an
 ; install that only ever held e.g. servatrice.exe is still purged.
 Function IsExistingCockatriceInstall
@@ -444,6 +443,18 @@ Function IsExistingCockatriceInstall
         StrCpy $R0 1
     ${EndIf}
     ${If} ${FileExists} "$INSTDIR\uninstall.exe"
+        StrCpy $R0 1
+    ${EndIf}
+    ; A leftover runtime DLL counts as an install as well. A previously failed
+    ; update can leave a directory in which the old uninstaller removed the
+    ; executables and uninstall.exe but silently skipped the DLLs its running
+    ; instance had locked - which is exactly the broken install the purge is
+    ; meant to heal, and without these markers none of the files above would be
+    ; there to prove that it is one.
+    ${If} ${FileExists} "$INSTDIR\Qt6Core.dll"
+        StrCpy $R0 1
+    ${EndIf}
+    ${If} ${FileExists} "$INSTDIR\qt.conf"
         StrCpy $R0 1
     ${EndIf}
 FunctionEnd
