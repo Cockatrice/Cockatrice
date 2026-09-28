@@ -13,6 +13,7 @@ add_test(NAME server_counter_test COMMAND server_counter_test)
 add_test(NAME server_rate_limiter_test COMMAND server_rate_limiter_test)
 add_test(NAME server_developer_role_test COMMAND server_developer_role_test)
 add_test(NAME server_game_join_test COMMAND server_game_join_test)
+add_test(NAME server_transform_context_test COMMAND server_transform_context_test)
 add_test(NAME warning_categories_test COMMAND warning_categories_test)
 add_test(NAME report_categories_test COMMAND report_categories_test)
 add_test(NAME lag_monitor_test COMMAND lag_monitor_test)
@@ -37,6 +38,7 @@ add_executable(server_counter_test server_counter_test.cpp)
 add_executable(server_rate_limiter_test server_rate_limiter_test.cpp)
 add_executable(server_developer_role_test server_developer_role_test.cpp)
 add_executable(server_game_join_test server_game_join_test.cpp)
+add_executable(server_transform_context_test server_transform_context_test.cpp)
 add_executable(warning_categories_test warning_categories_test.cpp)
 add_executable(report_categories_test report_categories_test.cpp)
 add_executable(lag_monitor_test ${CMAKE_SOURCE_DIR}/cockatrice/src/client/lag_monitor.cpp lag_monitor_test.cpp)
@@ -92,6 +94,7 @@ if(NOT GTEST_FOUND)
   add_dependencies(server_rate_limiter_test gtest)
   add_dependencies(server_developer_role_test gtest)
   add_dependencies(server_game_join_test gtest)
+  add_dependencies(server_transform_context_test gtest)
   add_dependencies(warning_categories_test gtest)
   add_dependencies(report_categories_test gtest)
   add_dependencies(lag_monitor_test gtest)
@@ -136,6 +139,10 @@ target_link_libraries(
 target_link_libraries(
   server_game_join_test libcockatrice_network_server_remote libcockatrice_rng Threads::Threads ${GTEST_BOTH_LIBRARIES}
   ${TEST_QT_MODULES}
+)
+target_link_libraries(
+  server_transform_context_test libcockatrice_network_server_remote libcockatrice_rng Threads::Threads
+  ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
 )
 target_link_libraries(
   warning_categories_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}

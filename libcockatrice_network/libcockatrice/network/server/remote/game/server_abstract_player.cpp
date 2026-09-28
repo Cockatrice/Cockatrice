@@ -27,6 +27,7 @@
 #include <libcockatrice/protocol/pb/context_concede.pb.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/protocol/pb/context_ready_start.pb.h>
+#include <libcockatrice/protocol/pb/context_transform_card.pb.h>
 #include <libcockatrice/protocol/pb/context_undo_draw.pb.h>
 #include <libcockatrice/protocol/pb/event_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/event_change_zone_properties.pb.h>
@@ -990,6 +991,7 @@ Server_AbstractPlayer::cmdCreateToken(const Command_CreateToken &cmd, ResponseCo
         if (targetZone) {
             targetCard = targetZone->getCard(cmd.target_card_id());
             if (targetCard && cmd.target_mode() == Command_CreateToken::TRANSFORM_INTO) {
+                ges.setGameEventContext(Context_TransformCard());
                 if (targetCard->getParentCard()) {
                     ges.enqueueGameEvent(makeAttachCardEvent(targetCard), playerId);
                 }

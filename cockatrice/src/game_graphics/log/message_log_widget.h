@@ -10,6 +10,9 @@
 #include "../../game/zones/card_zone_logic.h"
 #include "../../interface/widgets/server/chat_view/chat_view.h"
 
+#include <QList>
+#include <QPair>
+
 class AbstractGame;
 class CardItem;
 class GameEventContext;
@@ -24,13 +27,25 @@ private:
     {
         MessageContext_None,
         MessageContext_MoveCard,
-        MessageContext_Mulligan
+        MessageContext_Mulligan,
+        MessageContext_TransformCard
     };
 
     MessageContext currentContext;
+    QString transformOldCardName;
+    // During a move, a destroyed token may be replaced by a re-created stashed
+    // card in the start zone. The destroy event name is buffered here so the
+    // matching create-token event can render "transforms X into Y" instead of
+    // a destroy + create token pair. Entries are {playerName, cardName}.
+    QList<QPair<QString, QString>> deferredDestroyCardNames;
     QString messagePrefix, messageSuffix;
 
     static QPair<QString, QString> getFromStr(CardZoneLogic *zone, QString cardName, int position, bool ownerChange);
+    void logTransformIntoCard(const QString &playerName,
+                              QString oldCardName,
+                              QString newCardName,
+                              QString pt,
+                              bool faceDown);
 
 public:
     void connectToPlayerEventHandler(PlayerEventHandler *player);
