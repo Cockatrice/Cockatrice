@@ -41,6 +41,7 @@
 #include <libcockatrice/protocol/pb/command_set_sideboard_lock.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_plan.pb.h>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
+#include <libcockatrice/protocol/pb/command_tournament.pb.h>
 #include <libcockatrice/protocol/pb/command_undo_draw.pb.h>
 #include <libcockatrice/protocol/pb/context_connection_state_changed.pb.h>
 #include <libcockatrice/protocol/pb/event_game_say.pb.h>
@@ -536,6 +537,15 @@ Server_AbstractParticipant::processGameCommand(const GameCommand &command, Respo
         case GameCommand::SET_PLAYMAT:
             return cmdSetPlaymat(command.GetExtension(Command_SetPlaymat::ext), rc, ges);
             break;
+        case GameCommand::REPORT_MATCH_RESULT:
+            return cmdReportMatchResult(command.GetExtension(Command_ReportMatchResult::ext), rc, ges);
+            break;
+        case GameCommand::ADVANCE_TOURNAMENT:
+            return cmdAdvanceTournament(command.GetExtension(Command_AdvanceTournament::ext), rc, ges);
+            break;
+        case GameCommand::TOURNAMENT_SETTINGS_SELECT:
+            return cmdTournamentSettingsSelect(command.GetExtension(Command_TournamentSettingsSelect::ext), rc, ges);
+            break;
         default:
             return Response::RespInvalidCommand;
     }
@@ -583,4 +593,26 @@ void Server_AbstractParticipant::getInfo(ServerInfo_Player *info,
                                          bool withUserInfo)
 {
     getProperties(*info->mutable_properties(), withUserInfo);
+}
+
+Response::ResponseCode Server_AbstractParticipant::cmdReportMatchResult(const Command_ReportMatchResult & /*cmd*/,
+                                                                        ResponseContainer & /*rc*/,
+                                                                        GameEventStorage & /*ges*/)
+{
+    return Response::RespContextError;
+}
+
+Response::ResponseCode Server_AbstractParticipant::cmdAdvanceTournament(const Command_AdvanceTournament & /*cmd*/,
+                                                                        ResponseContainer & /*rc*/,
+                                                                        GameEventStorage & /*ges*/)
+{
+    return Response::RespContextError;
+}
+
+Response::ResponseCode
+Server_AbstractParticipant::cmdTournamentSettingsSelect(const Command_TournamentSettingsSelect & /*cmd*/,
+                                                        ResponseContainer & /*rc*/,
+                                                        GameEventStorage & /*ges*/)
+{
+    return Response::RespContextError;
 }
