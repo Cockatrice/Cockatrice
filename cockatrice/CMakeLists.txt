@@ -729,11 +729,15 @@ if(WIN32)
     PATTERN "tls/qschannelbackend.dll"
   )
 
+  # The Windows install has no Resources directory: the .qm files go to
+  # ${COCKATRICE_WIN32_QM_INSTALL_DIR} and main.cpp looks for them at
+  # applicationDirPath() + "/translations". The macOS bundle above keeps
+  # Resources/translations, which is correct for it.
   install(
     CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
 Plugins = Plugins
-Translations = Resources/translations
+Translations = translations
 Data = Resources\")
     "
     COMPONENT Runtime
