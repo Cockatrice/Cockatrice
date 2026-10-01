@@ -155,16 +155,25 @@ void SingleInstanceManager::handleNewConnection()
             socket->write(ACK_MESSAGE);
             socket->flush();
 
-            // Drop the payload from the buffer before handling it: the handlers
-            // run synchronously and can spin a nested event loop (e.g. a modal
-            // dialog) that re-reads this socket, which would re-parse and re-emit
-            // the same files.
+            // Drop the payload from the buffer before handing it off, so a
+            // re-entrant event loop cannot re-parse and re-emit the same files.
             buffer->clear();
             *expectedSize = 0;
 
-            emit filesReceived(files);
-
+            // Close the connection after the acknowledgment has been flushed, so
+            // the sender has everything it needs before the socket goes away.
+            // The socket itself is only destroyed by the deleteLater() below,
+            // which runs once the event loop regains control.
             socket->disconnectFromServer();
+
+            // Hand the payload to the handlers only after this readyRead emission
+            // has returned. The handlers can spin a nested event loop (the
+            // "Join game?" confirmation is a modal QMessageBox), and the sending
+            // instance exits as soon as it has the ACK above, so this socket gets
+            // disconnected -> deleteLater while that loop runs. Deleting the
+            // socket in the middle of its own readyRead would leave both this
+            // lambda and Qt's signal dispatch holding freed memory.
+            QMetaObject::invokeMethod(this, [this, files] { emit filesReceived(files); }, Qt::QueuedConnection);
             return;
         }
     });
