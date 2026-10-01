@@ -15,6 +15,9 @@ Var ReinstallMode
 Var AllowForceClose
 Var GuardDir
 Var OldUninstallString
+Var StaleFindHandle
+Var StaleFindName
+Var IsUpgrade
 
 !include LogicLib.nsh
 !include FileFunc.nsh
@@ -494,27 +497,65 @@ Function IsExistingCockatriceInstall
     ; executables and uninstall.exe but silently skipped the DLLs its running
     ; instance had locked - which is exactly the broken install the purge is
     ; meant to heal, and without these markers none of the files above would be
-    ; there to prove that it is one.
-    ${If} ${FileExists} "$INSTDIR\Qt6Core.dll"
-        StrCpy $R0 1
-    ${EndIf}
+    ; there to prove that it is one. Every Qt module Cockatrice links is part of
+    ; the payload, so match them all: probing only Qt6Core.dll would miss a
+    ; directory where that one file happened to be deletable and the others
+    ; were not.
+    StrCpy $R3 "Qt6*.dll"
+    Call CheckStaleRuntimeMask
     ${If} ${FileExists} "$INSTDIR\qt.conf"
         StrCpy $R0 1
     ${EndIf}
 FunctionEnd
 
 ; Sets $R0 to 1 if a runtime file of a previous version is still present after
-; the purge. NSIS silently skips whatever it cannot delete, so one surviving DLL
-; is enough to prove that something still holds a lock on the install
-; directory. The purge works on wildcards, which the file existence checks do
-; not, so this looks for files that are certainly part of the payload.
+; the purge. NSIS silently skips whatever it cannot delete, so one surviving file
+; is enough to prove that something still holds a lock on the install directory.
+;
+; The masks below have to cover the purge above one for one. A check that only
+; probed named files could not see a locked Qt6Multimedia.dll or a Plugins
+; directory the purge was unable to remove, so the exact files that broke the
+; install were also the ones this check was blind to.
 Function HasStaleRuntimeFiles
     StrCpy $R0 0
-    ${If} ${FileExists} "$INSTDIR\Qt6Core.dll"
+    StrCpy $R3 "Qt*.dll"
+    Call CheckStaleRuntimeMask
+    StrCpy $R3 "libcrypto*.dll"
+    Call CheckStaleRuntimeMask
+    StrCpy $R3 "libssl*.dll"
+    Call CheckStaleRuntimeMask
+    StrCpy $R3 "zlib*.dll"
+    Call CheckStaleRuntimeMask
+    StrCpy $R3 "icu*.dll"
+    Call CheckStaleRuntimeMask
+    StrCpy $R3 "libeay32.dll"
+    Call CheckStaleRuntimeMask
+    StrCpy $R3 "ssleay32.dll"
+    Call CheckStaleRuntimeMask
+    ${If} $R0 = 1
+        Return
+    ${EndIf}
+    ${If} ${FileExists} "$INSTDIR\libmysql.dll"
+        StrCpy $R0 1
+        Return
+    ${EndIf}
+    ; IfFileExists takes wildcards, so a Plugins directory the purge could not
+    ; remove counts as a leftover too.
+    ${If} ${FileExists} "$INSTDIR\Plugins\*.*"
         StrCpy $R0 1
     ${EndIf}
-    ${If} ${FileExists} "$INSTDIR\Qt6Network.dll"
+FunctionEnd
+
+; usage: set $R3 to a file mask, call this. Sets $R0 to 1 when $INSTDIR holds a
+; matching file. Returns early once something was found, so $R0 stays 1.
+Function CheckStaleRuntimeMask
+    ${If} $R0 = 1
+        Return
+    ${EndIf}
+    FindFirst $StaleFindHandle $StaleFindName "$INSTDIR\$R3"
+    ${If} $StaleFindHandle != ""
         StrCpy $R0 1
+        FindClose $StaleFindHandle
     ${EndIf}
 FunctionEnd
 
@@ -839,6 +880,12 @@ ${EndIf}
 ; Remove any runtime DLLs left over from older versions, so a mismatched
 ; Qt/OpenSSL set cannot survive next to the new executables.
 Call IsExistingCockatriceInstall
+; Remembered because the stale-runtime check below must only ever fire for a
+; directory this installer recognised as a Cockatrice install. Scanning for
+; leftovers in an unrelated directory (a first-time install into a folder that
+; happens to hold some Qt5 DLLs, say) would otherwise turn those files into an
+; abort reason even though the payload is about to overwrite nothing of theirs.
+StrCpy $IsUpgrade $R0
 ${If} $PortableMode = 0
 ${AndIf} $R0 = 1
 	RMDir /r "$INSTDIR\Plugins"
@@ -857,12 +904,29 @@ ${EndIf}
 ; performed at all - is still on disk, and the new executables are about to be
 ; written next to it. That mix is exactly what makes the next start fail with
 ; "The procedure entry point X could not be located in the dynamic link library
-; ...Qt6Network.dll", so say so instead of leaving it to the user to find out.
-Call HasStaleRuntimeFiles
+; ...Qt6QuickWidgets.dll" or "The code execution cannot proceed because
+; Qt6Multimedia.dll was not found", so stop here instead of compounding it.
+; Nothing of the new payload has been written at this point, so the next run -
+; with the applications closed - gets a clean install.
+${If} $IsUpgrade = 1
+    Call HasStaleRuntimeFiles
+${Else}
+    StrCpy $R0 0
+${EndIf}
 ${If} $R0 = 1
-    DetailPrint "Files of a previous version are still present; the installation may be incomplete."
-    MessageBox MB_OK|MB_ICONEXCLAMATION \
-        "The installation could not remove all files of a previous version of Cockatrice, most likely because it is still running or was started as administrator.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice and run the installer again."
+    DetailPrint "Files of a previous version could not be removed; aborting the installation."
+    ; The in-app updater runs this installer silent and detached and never looks
+    ; at its exit code, so the user has to be told what happened. A /S install
+    ; without /R is unattended - a package manager, for instance - and a message
+    ; box there would block forever, so that case only reports through the log
+    ; and the exit code.
+    ${If} $ReinstallMode = 1
+    ${OrIfNot} ${Silent}
+        MessageBox MB_OK|MB_ICONEXCLAMATION \
+            "The installation could not remove all files of a previous version of Cockatrice, most likely because it is still running or was started as administrator, and was cancelled rather than leave a mismatched install behind.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice and run the installer again."
+    ${EndIf}
+    SetErrorLevel 1
+    Abort
 ${EndIf}
 
 @CPACK_NSIS_EXTRA_PREINSTALL_COMMANDS@
