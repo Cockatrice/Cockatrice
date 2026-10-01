@@ -19,6 +19,8 @@ Var StaleFindHandle
 Var StaleFindName
 Var IsUpgrade
 Var AbortReason
+Var WaitPid
+Var LauncherExited
 
 !include LogicLib.nsh
 !include FileFunc.nsh
@@ -92,7 +94,8 @@ ${IfNot} ${Errors}
       /PORTABLE : Install in portable mode$\n\
       /S : Silent install$\n\
       /R : Silent upgrade$\n\
-      /D=%directory% : Specify destination directory$\n"
+      /PID=%pid% : Process to wait for before replacing files (used by the in-app updater)$\n\
+      /D=%directory% : Specify destination directory$\n\"
     Quit
 ${EndIf}
 
@@ -119,6 +122,23 @@ ${Else}
     StrCpy $ReinstallMode 0
 ${EndIf}
 
+; /PID= carries the process id of the application that started this installer.
+; The in-app updater launches the installer and only then quits itself, so
+; without it the installer has to guess whether the launching process is still
+; alive by polling powershell.exe for an image name - a guess that can come back
+; "not running" or "could not determine" while the process is very much alive and
+; still has its Qt DLLs mapped. An older client does not pass /PID= and an older
+; installer ignores it, so both sides of the pair have to keep working.
+; Note that /D= must stay the last parameter on the command line, which is why
+; the client puts it last and this one anywhere.
+StrCpy $WaitPid ""
+StrCpy $LauncherExited 0
+ClearErrors
+${GetOptions} $9 "/PID=" $8
+${IfNot} ${Errors}
+    StrCpy $WaitPid $8
+${EndIf}
+
 ${If} $InstDir == ""
     ; User did not use /D to specify a directory,
     ; we need to set a default based on the install mode
@@ -138,17 +158,24 @@ ${EndIf}
 ; Now that $PortableMode reflects reality, commit InstDir into the correct slot
 Call SetModeDestinationFromInstdir
 
-; Make sure no application instance is still running (and holding file locks)
-; before the previous version is uninstalled. On a silent update (/R /S) the
-; running processes are asked to close gracefully and waited for; Cockatrice
-; itself is never force-killed (data loss, e.g. an unsaved deck) so the update
-; is aborted instead, while the console applications Oracle and Servatrice are
-; force-stopped by PID once the grace period is over. On interactive installs
+; Wait for the process that launched this installer to exit before anything is
+; replaced or deleted. It goes first because it is the one check here that needs
+; no powershell.exe: on a machine where the process lookup cannot run at all, the
+; launcher is still proven gone here instead of the whole upgrade being cancelled
+; by a check that was only ever a proxy for this one.
+;
+; Then make sure no *other* application instance is still running (and holding
+; file locks) before the previous version is uninstalled. On a silent update
+; (/R /S) the running processes are asked to close gracefully and waited for;
+; Cockatrice itself is never force-killed (data loss, e.g. an unsaved deck) so the
+; update is aborted instead, while the console applications Oracle and Servatrice
+; are force-stopped by PID once the grace period is over. On interactive installs
 ; the user is prompted to close them instead.
 ; Only needed this early for /R, where AutoUninstallIfNeeded runs below; for
 ; interactive installs the section re-checks after the directory page, when
 ; $INSTDIR is the directory the user actually picked.
 ${If} $ReinstallMode = 1
+    Call WaitForLauncherToExit
     Call EnsureAppsNotRunning
 ${EndIf}
 
@@ -467,6 +494,54 @@ Function AbortInstall
     Abort
 FunctionEnd
 
+; Waits for the application that launched this installer to exit, using the /PID=
+; it passed. Sets $LauncherExited to 1 when that process is provably gone.
+;
+; This is the authority for the one question the rest of the installer can only
+; approximate: is the process that started us still holding its Qt DLLs mapped?
+; A mapped module cannot be deleted, so an answer of "not running" obtained by
+; enumerating process names is what allows the update to write a new payload on
+; top of files it could not remove. Waiting on a real handle has no such gap,
+; needs no powershell.exe, and is unaffected by a process whose path cannot be
+; read - the case the name based check has to treat as "not ours" so it never
+; closes a third party application.
+;
+; Sets $LauncherExited to 0 when no usable /PID= was given, which is the older
+; client that does not pass one; the caller then has no authority available and
+; falls back to the name based guard.
+Function WaitForLauncherToExit
+    StrCpy $LauncherExited 0
+    ${If} $WaitPid == ""
+        Return
+    ${EndIf}
+    ; PROCESS_SYNCHRONIZE is the only access this needs - enough to wait on the
+    ; handle, and the least likely to be refused for a reason that has nothing to
+    ; do with the upgrade.
+    ClearErrors
+    System::Call 'kernel32::OpenProcess(i 0x00100000, i 0, i $WaitPid) p.r0'
+    ${If} $Errors
+        ; The launcher is gone - OpenProcess cannot open a dead process - which is
+        ; exactly the state the wait was for.
+        DetailPrint "The application that started this installer has already exited."
+        StrCpy $LauncherExited 1
+        Return
+    ${EndIf}
+    DetailPrint "Waiting for the application that started this installer to exit ..."
+    ; Same 60 s grace period the name based check uses, so a client that is slow
+    ; to flush its card database does not get less room than it used to.
+    ; WAIT_OBJECT_0 is 0; WAIT_TIMEOUT is 258 and a failed wait reports 0xFFFFFFFF.
+    System::Call 'kernel32::WaitForSingleObject(p r0, i 60000) i.r1'
+    System::Call 'kernel32::CloseHandle(p r0)'
+    ${If} $R1 != 0
+        DetailPrint "The application that started this installer did not exit within 60 s."
+        StrCpy $AbortReason \
+            "The application that started this update has not exited yet, so the installation was cancelled rather than replace files it is still using.$\r$\n$\r$\nPlease close Cockatrice and run the installer again."
+        Call AbortInstall
+    ${EndIf}
+    DetailPrint "The application that started this installer has exited."
+    StrCpy $LauncherExited 1
+FunctionEnd
+
 Function EnsureOldInstallNotRunning
     ; Guards the directory of a *previous* installation, as recorded in the
     ; registry. Needed by componentsPagePre, which runs the old uninstaller
@@ -499,7 +574,14 @@ Function GuardAppsNotRunning
         ; instead. An interactive install can still continue: the user is at the
         ; keyboard, and refusing outright would leave them with an installer that
         ; can never complete.
-        ${If} $ReinstallMode = 1
+        ;
+        ; Unless the launcher has already been waited on directly: WaitForLauncherToExit
+        ; needs no powershell.exe, so when it has run, Cockatrice is known to be
+        ; gone and the lookup failing to run costs nothing but the Oracle and
+        ; Servatrice checks. An older client that passes no /PID= leaves no such
+        ; authority, and there the upgrade is cancelled as before.
+        ${If} $LauncherExited != 1
+        ${AndIf} $ReinstallMode = 1
             StrCpy $AbortReason \
                 "The installation was cancelled because it could not check whether Cockatrice is still running, because powershell.exe could not be started.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice and run the installer again."
             Call AbortInstall
