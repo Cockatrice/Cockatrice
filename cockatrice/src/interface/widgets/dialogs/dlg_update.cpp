@@ -265,8 +265,16 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
     // NSIS needs the /D= argument to be an UNQUOTED string, even if it contains spaces. Qt likes to quote arguments if
     // they contain spaces, so we use the windows exclusive QProcess::setNativeArguments in the only case where this is
     // relevant, which preserves the argument unquoted.
+    //
+    // /PID= tells the installer which process to wait for before it replaces anything. We launch the installer first
+    // and only quit afterwards, so it starts while this process is still alive and still has every Qt runtime DLL
+    // mapped, and a mapped DLL cannot be deleted. Without the handle the installer can only poll for an image name and
+    // guess, and a wrong guess is what leaves the update writing new executables next to runtime files of the previous
+    // version, which fails on the next start with "The procedure entry point ... could not be located in the dynamic
+    // link library
+    // ...Qt6QuickWidgets.dll". /D= has to stay the last parameter, which is why it is last here too.
 #ifdef Q_OS_WIN
-    process.setNativeArguments(QString("/R /D=%1").arg(appDir));
+    process.setNativeArguments(QString("/R /PID=%1 /D=%2").arg(QCoreApplication::applicationPid()).arg(appDir));
 #else
     // Linux/macOS: normal argument passing (not relevant since they update differently.)
     process.setArguments({"/R", QString("/D=%1").arg(appDir)});
