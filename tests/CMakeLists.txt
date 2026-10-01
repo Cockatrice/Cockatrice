@@ -57,9 +57,9 @@ target_include_directories(loader_local_matching_test PRIVATE ${CMAKE_SOURCE_DIR
 
 # Guard must match the condition for src/single_instance_manager.cpp in cockatrice/CMakeLists.txt.
 if(WITH_CLIENT)
-  add_executable(single_instance_manager_test
-    ${CMAKE_SOURCE_DIR}/cockatrice/src/single_instance_manager.cpp
-    single_instance_manager_test.cpp
+  add_executable(
+    single_instance_manager_test ${CMAKE_SOURCE_DIR}/cockatrice/src/single_instance_manager.cpp
+                                 single_instance_manager_test.cpp
   )
   target_include_directories(single_instance_manager_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src)
 
@@ -166,9 +166,7 @@ target_link_libraries(
 )
 
 if(WITH_CLIENT)
-  target_link_libraries(
-    single_instance_manager_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
-  )
+  target_link_libraries(single_instance_manager_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
 endif()
 
 add_subdirectory(card_zone_algorithms)
