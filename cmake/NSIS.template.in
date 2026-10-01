@@ -18,6 +18,7 @@ Var OldUninstallString
 Var StaleFindHandle
 Var StaleFindName
 Var IsUpgrade
+Var AbortReason
 
 !include LogicLib.nsh
 !include FileFunc.nsh
@@ -334,8 +335,13 @@ Function WaitForAppToClose
     Call IsAppRunning
     ; Only a definite "running" is worth waiting for. "Not running" is done, and
     ; "could not determine" must not keep the installer waiting on an answer it
-    ; will never get - EnsureAppsNotRunning has warned about that case already.
-    ${If} $R0 != 1
+    ; will never get - but it cannot simply be waved through either, see
+    ; HandleUnknownAppState.
+    ${If} $R0 = 0
+        Return
+    ${EndIf}
+    ${If} $R0 = 2
+        Call HandleUnknownAppState
         Return
     ${EndIf}
 
@@ -354,7 +360,8 @@ Function WaitForAppToClose
             DetailPrint "$R1 closed."
             Return
         ${EndIf}
-        ${If} $R0 != 1
+        ${If} $R0 = 2
+            Call HandleUnknownAppState
             Return
         ${EndIf}
         System::Call 'kernel32::GetTickCount()i.s'
@@ -369,18 +376,9 @@ Function WaitForAppToClose
         ; update and preserves the user's data.
         ${If} $AllowForceClose = 0
             DetailPrint "$R1 is still running after 60 s; aborting the update so that no data is lost."
-            ; The in-app updater runs this installer silent and detached and
-            ; never looks at its exit code, so a plain Abort would leave the user
-            ; with no update and no explanation. A /S install without /R on the
-            ; other hand is unattended - by a package manager, for instance -
-            ; and a message box there would block forever, so that case only
-            ; reports through the log and the exit code.
-            ${If} $ReinstallMode = 1
-                MessageBox MB_OK|MB_ICONEXCLAMATION \
-                    "$R1 did not close within 60 seconds, so the installation was aborted to avoid losing unsaved data.$\r$\n$\r$\nPlease close $R1 and run the installer again."
-            ${EndIf}
-            SetErrorLevel 1
-            Abort
+            StrCpy $AbortReason \
+                "$R1 did not close within 60 seconds, so the installation was aborted to avoid losing unsaved data.$\r$\n$\r$\nPlease close $R1 and run the installer again."
+            Call AbortInstall
         ${EndIf}
         ; Oracle and Servatrice are console applications: CloseMainWindow()
         ; returned false for them and waiting longer cannot help. They hold no
@@ -393,16 +391,14 @@ Function WaitForAppToClose
             DetailPrint "$R1 closed."
             Return
         ${EndIf}
-        ${If} $R0 != 1
+        ${If} $R0 = 2
+            Call HandleUnknownAppState
             Return
         ${EndIf}
         DetailPrint "$R1 is still running after 60 s; aborting the update."
-        ${If} $ReinstallMode = 1
-            MessageBox MB_OK|MB_ICONEXCLAMATION \
-                "$R1 could not be stopped, so the installation was aborted.$\r$\n$\r$\nPlease close $R1 and run the installer again."
-        ${EndIf}
-        SetErrorLevel 1
-        Abort
+        StrCpy $AbortReason \
+            "$R1 could not be stopped, so the installation was aborted.$\r$\n$\r$\nPlease close $R1 and run the installer again."
+        Call AbortInstall
     ${Else}
         ck_wait_prompt:
         MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
@@ -412,7 +408,8 @@ Function WaitForAppToClose
         ${If} $R0 = 0
             Return
         ${EndIf}
-        ${If} $R0 != 1
+        ${If} $R0 = 2
+            Call HandleUnknownAppState
             Return
         ${EndIf}
         Goto ck_wait_prompt
@@ -421,10 +418,53 @@ Function WaitForAppToClose
     ${EndIf}
 FunctionEnd
 
+; A process lookup came back "could not determine": powershell.exe ran but the
+; answer was not usable, e.g. the process could not be inspected at all. That
+; state is fine to carry on from when the user is at the keyboard - they can
+; close the applications by hand and the stale-runtime check still stands
+; between a failed guard and a mismatched install.
+;
+; It is not fine on a silent upgrade. There the whole point of this guard is to
+; know that nothing holds locks on the files about to be replaced, and this is
+; exactly the state where that is unknown, with no one to click a dialog: the
+; old code returned and let the install carry on into the mixed Qt DLL set that
+; made the next start fail. Cancel the update instead; the next attempt runs
+; with the applications closed and succeeds.
+Function HandleUnknownAppState
+    ${If} $ReinstallMode = 1
+        StrCpy $AbortReason \
+            "The installation was cancelled because it could not determine whether Cockatrice is still running.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice and run the installer again."
+        Call AbortInstall
+    ${EndIf}
+    DetailPrint "Could not determine whether $R1 is running; close Cockatrice, Oracle and Servatrice manually if the installation reports a problem."
+    ${IfNot} ${Silent}
+        MessageBox MB_OK|MB_ICONEXCLAMATION \
+            "This installer could not determine whether $R1 is still running.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice manually before continuing."
+    ${EndIf}
+FunctionEnd
+
 Function EnsureAppsNotRunning
     ; guards the install directory
     StrCpy $GuardDir $INSTDIR
     Call GuardAppsNotRunning
+FunctionEnd
+
+; Aborts the installation, showing $AbortReason to the user.
+;
+; Every abort goes through here so the unattended case is handled the same way
+; everywhere: the in-app updater runs this installer silent and detached and
+; never looks at its exit code, so a plain Abort would leave the user with no
+; update and no explanation, while a /S install without /R is unattended - by a
+; package manager, for instance - and a message box there would block forever.
+; Only the first of those two gets a dialog; the second reports through the log
+; and the exit code.
+Function AbortInstall
+    ${If} $ReinstallMode = 1
+    ${OrIfNot} ${Silent}
+        MessageBox MB_OK|MB_ICONEXCLAMATION "$AbortReason"
+    ${EndIf}
+    SetErrorLevel 1
+    Abort
 FunctionEnd
 
 Function EnsureOldInstallNotRunning
@@ -450,13 +490,25 @@ Function GuardAppsNotRunning
     Call IsProcessLookupAvailable
     ${If} $R0 = 0
         ; Without PowerShell we cannot tell whether a running instance is
-        ; holding locks on the files we are about to replace. Warn once and
-        ; continue: refusing to install would leave the user with an installer
-        ; that can never complete, which is worse than the locked-file failure
-        ; this check exists to prevent. MessageBox is shown even in a silent
-        ; install - the user has to be told to close the applications by hand.
+        ; holding locks on the files we are about to replace.
         DetailPrint "Could not start powershell.exe; skipping the running instance check. Close Cockatrice, Oracle and Servatrice manually if the installation reports a problem."
-        MessageBox MB_OK|MB_ICONEXCLAMATION "This installer could not check whether Cockatrice is still running, because powershell.exe could not be started.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice manually before continuing."
+        ; On a silent upgrade that used to be a warning and nothing more, which
+        ; left the very process that launched the installer free to go on
+        ; replacing files it still had mapped - the one outcome this guard exists
+        ; to prevent - and then writing the new payload on top of them. Cancel
+        ; instead. An interactive install can still continue: the user is at the
+        ; keyboard, and refusing outright would leave them with an installer that
+        ; can never complete.
+        ${If} $ReinstallMode = 1
+            StrCpy $AbortReason \
+                "The installation was cancelled because it could not check whether Cockatrice is still running, because powershell.exe could not be started.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice and run the installer again."
+            Call AbortInstall
+        ${EndIf}
+        ; The user has to be told to close the applications by hand, but a /S
+        ; install without /R is unattended and would block on this forever.
+        ${IfNot} ${Silent}
+            MessageBox MB_OK|MB_ICONEXCLAMATION "This installer could not check whether Cockatrice is still running, because powershell.exe could not be started.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice manually before continuing."
+        ${EndIf}
         Return
     ${EndIf}
     StrCpy $R1 "cockatrice.exe"
