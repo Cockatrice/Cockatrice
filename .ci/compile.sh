@@ -345,13 +345,45 @@ if [[ $MAKE_PACKAGE ]]; then
     else
       echo "Inspecting $package"
       # Fail the build if the installer contains any path left behind by the MSBuild or
-      # Qt AUTOMOC tooling (build-tree artifacts must live in the build dir, not the install)
+      # Qt AUTOMOC tooling (build-tree artifacts must live in the build dir, not in the install)
       if "$seven_zip" l "$package" |
         grep -E "_autogen|\.dir[\\/]|\.tlog|(^|[\\/])x64[\\/]|(^|[\\/])\.qt[\\/]|(^|[\\/])\.qsb[\\/]|(^|[\\/])\.lupdate[\\/]|CMakeFiles"; then
         echo "::error file=$0::Installer contains build-tree artifacts"
         exit 1
       fi
       echo "Installer content is clean"
+
+      # Fail the build if the installer is missing a Qt runtime the applications
+      # link against. The DLLs reach the package by globbing every *.dll out of
+      # the build output directories, so a module the client links statically
+      # (Qt6Multimedia.dll, Qt6QuickWidgets.dll) can be left out without anything
+      # else noticing, and the only symptom is a client that refuses to start
+      # after an update. required-qt-runtime.txt is written by the top level
+      # CMakeLists.txt from the same module list the targets are built against.
+      if [[ ! -f required-qt-runtime.txt ]]; then
+        echo "::error file=$0::required-qt-runtime.txt not found in the build dir, cannot verify the Qt runtime"
+        exit 1
+      fi
+      # Normalize the archive's own separators to / so the entries below can be
+      # compared as exact relative paths, and use -xF so a '.' in a DLL name is
+      # never a wildcard.
+      installer_paths="$("$seven_zip" l -slt "$package" | sed -n 's/^Path = //p' | sed 's|\\|/|g')"
+      missing=""
+      checked=0
+      while IFS= read -r entry; do
+        if [[ -z $entry || $entry == \#* ]]; then
+          continue
+        fi
+        checked=$((checked + 1))
+        if ! grep -qxF "$entry" <<<"$installer_paths"; then
+          missing+=" $entry"
+        fi
+      done <required-qt-runtime.txt
+      if [[ -n $missing ]]; then
+        echo "::error file=$0::Installer is missing required Qt runtime files:$missing"
+        exit 1
+      fi
+      echo "Installer contains the full Qt runtime ($checked files)"
     fi
     echo "::endgroup::"
   fi
