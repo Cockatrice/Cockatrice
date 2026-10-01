@@ -95,7 +95,7 @@ ${IfNot} ${Errors}
       /S : Silent install$\n\
       /R : Silent upgrade$\n\
       /PID=%pid% : Process to wait for before replacing files (used by the in-app updater)$\n\
-      /D=%directory% : Specify destination directory$\n\"
+      /D=%directory% : Specify destination directory$\n"
     Quit
 ${EndIf}
 
