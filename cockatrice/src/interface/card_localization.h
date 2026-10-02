@@ -5,6 +5,7 @@
 
 #include <QString>
 #include <libcockatrice/card/card_info.h>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 
 namespace CardLocalization
@@ -53,6 +54,25 @@ inline QString displayName(const CardInfo &card)
 inline QString displayText(const CardInfo &card)
 {
     return card.getLocalizedText(displayLang());
+}
+
+/**
+ * @brief Looks a card up by its canonical name and returns its name in the configured display language.
+ *
+ * Use this where only the canonical name is known, such as the game log or [card] chat tags. Callers that
+ * already hold a resolved card and need to keep the canonical name around (as a link target, say) should
+ * use displayName() directly instead.
+ *
+ * @param cardName The canonical card name.
+ * @return The localized name, or cardName unchanged when the card is unknown to the database.
+ */
+inline QString displayNameFor(const QString &cardName)
+{
+    if (cardName.isEmpty()) {
+        return cardName;
+    }
+    const QString localizedName = displayName(CardDatabaseManager::query()->getCardInfo(cardName));
+    return localizedName.isEmpty() ? cardName : localizedName;
 }
 } // namespace CardLocalization
 
