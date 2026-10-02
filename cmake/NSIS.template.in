@@ -518,9 +518,9 @@ Function WaitForLauncherToExit
     ; do with the upgrade.
     ClearErrors
     System::Call 'kernel32::OpenProcess(i 0x00100000, i 0, i $WaitPid) p.r0'
-    ${If} $Errors
-        ; The launcher is gone - OpenProcess cannot open a dead process - which is
-        ; exactly the state the wait was for.
+    ${If} ${Errors}
+    ; The launcher is gone - OpenProcess cannot open a dead process - which is
+    ; exactly the state the wait was for.
         DetailPrint "The application that started this installer has already exited."
         StrCpy $LauncherExited 1
         Return
