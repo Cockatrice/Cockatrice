@@ -21,9 +21,8 @@ add_test(NAME metrics_registry_test COMMAND metrics_registry_test)
 add_test(NAME loader_local_matching_test COMMAND loader_local_matching_test)
 
 add_test(NAME deck_hash_performance_test COMMAND deck_hash_performance_test)
+set_tests_properties(dummy_test PROPERTIES TIMEOUT 5)
 set_tests_properties(deck_hash_performance_test PROPERTIES TIMEOUT 15)
-
-# Find GTest
 
 add_executable(dummy_test dummy_test.cpp)
 add_executable(expression_test expression_test.cpp)
@@ -55,6 +54,7 @@ add_executable(
 )
 target_include_directories(loader_local_matching_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src)
 
+# Find GTest
 find_package(GTest)
 
 if(NOT GTEST_FOUND)

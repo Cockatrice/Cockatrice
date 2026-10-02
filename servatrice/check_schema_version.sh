@@ -10,7 +10,7 @@ declare -i schema_ver="${version_line%%)*}"
 latest_migration="$(ls -1 servatrice/migrations/ | tail -n1)"
 xtoysql="${latest_migration#servatrice_}"
 xtoy="${xtoysql%.sql}"
-declare -i old_ver="10#${xtoy%_to_*}" #declare as integer with base 10, numbers with a leading 0 are normally interpreted as base 16
+declare -i old_ver="10#${xtoy%_to_*}" # declare as integer with base 10, numbers with a leading 0 are normally interpreted as base 16
 declare -i new_ver="10#${xtoy#*_to_}"
 
 if ((old_ver >= new_ver)); then
