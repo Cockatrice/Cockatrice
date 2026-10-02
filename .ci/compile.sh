@@ -370,9 +370,17 @@ if [[ $MAKE_PACKAGE ]]; then
       # compared as exact relative paths. -xF keeps a '.' in a DLL name from
       # being a wildcard; -i because that is how the installed tree behaves -
       # the uninstaller clears both $INSTDIR\plugins and $INSTDIR\Plugins.
+      # The archive side and the manifest side have to agree on line endings.
+      # CMake writes required-qt-runtime.txt with the platform's line ending and
+      # 7-Zip writes CRLF on Windows, so a trailing \r survives on $entry and
+      # defeats the whole-line match - every entry then reads as missing even
+      # though the listing holds it verbatim.
+      # [$] rather than \$ so the literal dollar is a bracket expression and
+      # shellcheck does not read these as unexpanded shell variables (SC2016).
       installer_paths="$("$seven_zip" l -slt "$package" | tr -d '\r' |
         sed -n 's/^Path = //p' |
-        sed -e 's|\\|/|g' -e 's|^\$INSTDIR/||' -e 's|^\$OUTDIR/||' -e 's|^\$PLUGINSDIR/||' -e 's|^\./||' -e 's|^/||')"
+        sed -e 's|\\|/|g' -e 's|^[$]INSTDIR/||' -e 's|^[$]OUTDIR/||' -e 's|^[$]PLUGINSDIR/||' -e 's|^\./||' -e 's|^/||')"
+      manifest="$(tr -d '\r' <required-qt-runtime.txt)"
       missing=""
       checked=0
       while IFS= read -r entry; do
@@ -383,7 +391,7 @@ if [[ $MAKE_PACKAGE ]]; then
         if ! grep -qxiF "$entry" <<<"$installer_paths"; then
           missing+=" $entry"
         fi
-      done <required-qt-runtime.txt
+      done <<<"$manifest"
       if [[ -n $missing ]]; then
         echo "::error file=$0::Installer is missing required Qt runtime files:$missing"
         # Print both sides of the comparison. A mismatch here has twice been
@@ -391,7 +399,7 @@ if [[ $MAKE_PACKAGE ]]; then
         # and a bare "missing" line cannot tell those apart.
         echo "required-qt-runtime.txt asked for $checked path(s); 7-Zip listed $(grep -c '' <<<"$installer_paths") path(s)"
         echo "--- required ---"
-        sed 's/^/  /' required-qt-runtime.txt
+        sed 's/^/  /' <<<"$manifest"
         echo "--- first 40 paths 7-Zip lists in the installer ---"
         head -40 <<<"$installer_paths" | sed 's/^/  /'
         exit 1
