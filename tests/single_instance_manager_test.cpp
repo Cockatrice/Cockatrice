@@ -2,7 +2,6 @@
 
 #include <QCoreApplication>
 #include <QDataStream>
-#include <QElapsedTimer>
 #include <QEventLoop>
 #include <QLocalServer>
 #include <QLocalSocket>
@@ -37,10 +36,12 @@ QByteArray encodePayload(const QStringList &files)
 // socket's readyRead emission, which is what lets the "Join game?" confirmation
 // appear at all. A handler can spin a nested event loop (a modal QMessageBox),
 // and the sending instance exits as soon as it has the acknowledgment, so the
-// socket gets disconnected and deleteLater'd *while that loop runs*. Control then
-// returns to the readyRead frame with the socket already destroyed: touching it
-// again from that frame is the use-after-free. The teardown is therefore queued
-// and guarded, never done inline.
+// peer closes *while that loop runs*. deleteLater() called from inside such a
+// nested loop does not wait for the outer loop: Qt frees the object as soon as
+// the nested loop unwinds, still inside the readyRead emission, so Qt's own
+// signal dispatch and the handler lambda both end up holding a freed socket.
+// Nothing may therefore delete the socket from the disconnected signal, and the
+// teardown is queued until that frame has unwound.
 TEST(SingleInstanceManagerTest, HandlersRunSynchronouslyAndSocketIsNotTouchedAfterTheyReturn)
 {
     // Scope the hand-off socket to this test process so a Cockatrice the
@@ -58,6 +59,11 @@ TEST(SingleInstanceManagerTest, HandlersRunSynchronouslyAndSocketIsNotTouchedAft
     QByteArray acknowledgment;
     int handlerCalls = 0;
     bool socketConnectedWhenHandled = false;
+    bool socketReleased = false;
+
+    // Waited on after the handlers return: the deferred teardown deletes the
+    // forwarding socket once the readyRead frame has unwound.
+    QEventLoop teardownLoop;
 
     QEventLoop loop;
     QObject::connect(&primary, &SingleInstanceManager::filesReceived, &primary, [&](const QStringList &files) {
@@ -68,6 +74,17 @@ TEST(SingleInstanceManagerTest, HandlersRunSynchronouslyAndSocketIsNotTouchedAft
         // game?" confirmation this hand-off exists to show.
         auto *connection = server->findChild<QLocalSocket *>();
         socketConnectedWhenHandled = connection != nullptr && connection->state() == QLocalSocket::ConnectedState;
+
+        // Observe the socket's destruction rather than polling for it. `destroyed`
+        // is emitted just before the object goes away, so this stays correct
+        // however the teardown ends up deleting it, and `&primary` keeps the
+        // observer alive even once the socket itself is gone.
+        if (connection != nullptr) {
+            QObject::connect(connection, &QObject::destroyed, &primary, [&] {
+                socketReleased = true;
+                teardownLoop.quit();
+            });
+        }
 
         // The primary acknowledges the payload before handling it, so that a
         // sender waiting on the acknowledgment never mistakes a busy primary
@@ -101,22 +118,12 @@ TEST(SingleInstanceManagerTest, HandlersRunSynchronouslyAndSocketIsNotTouchedAft
     EXPECT_TRUE(socketConnectedWhenHandled) << "the payload was not handled from inside the readyRead emission";
     EXPECT_FALSE(acknowledgment.isEmpty()) << "the primary never acknowledged the payload";
 
-    // The deferred teardown must not have been skipped: once control has left the
-    // readyRead frame, the primary closes (and releases) the forwarding socket
-    // instead of leaking a connection per forwarded payload.
-    QElapsedTimer teardownTimer;
-    teardownTimer.start();
-    while (teardownTimer.elapsed() < HANDSHAKE_TIMEOUT_MS) {
-        auto *leftover = server->findChild<QLocalSocket *>();
-        if (leftover == nullptr || leftover->state() != QLocalSocket::ConnectedState) {
-            break;
-        }
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
-    }
-
-    auto *leftover = server->findChild<QLocalSocket *>();
-    EXPECT_TRUE(leftover == nullptr || leftover->state() != QLocalSocket::ConnectedState)
-        << "the forwarding socket was left connected after the deferred teardown";
+    // The deferred teardown must not be skipped, and must not delete the socket
+    // from inside the nested loop above: either would show up here as a crash or
+    // as a socket that outlives the hand-off and leaks a connection per payload.
+    QTimer::singleShot(HANDSHAKE_TIMEOUT_MS, &teardownLoop, &QEventLoop::quit);
+    teardownLoop.exec();
+    EXPECT_TRUE(socketReleased) << "the forwarding socket was never released after the hand-off";
 }
 
 int main(int argc, char **argv)
