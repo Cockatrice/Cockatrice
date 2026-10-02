@@ -5,14 +5,24 @@
 #include "../client/network/update/client/release_channel.h"
 #include "../interface/window_main.h"
 
+#include <QCoreApplication>
 #include <QDesktopServices>
+#include <QDir>
+#include <QFileInfo>
 #include <QLabel>
 #include <QMessageBox>
 #include <QProgressBar>
 #include <QPushButton>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <QtNetwork>
 #include <version_string.h>
+
+// Executable that, when it sits next to the downloaded update installer, is installed instead of
+// it. A packager shipping a custom build - or someone testing one - can drop the file there and
+// have Cockatrice run it rather than the official installer, without the release channel having to
+// host an installer for that build. It is a drop-in and is run with the same arguments.
+static const QString UPDATE_INSTALLER_OVERRIDE = "Cockatrice-Update-Override.exe";
 
 DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent)
 {
@@ -203,6 +213,24 @@ void DlgUpdate::setLabel(const QString &newText)
     statusLabel->setText(newText);
 }
 
+void DlgUpdate::warnInstallerIsWaiting()
+{
+    // Modeless on purpose: the installer asks the application to close exactly once (see
+    // CloseMatchingApps in NSIS.template.in) and only polls afterwards, while Qt drops spontaneous
+    // close events - a WM_CLOSE from the installer - for windows that are blocked by a modal
+    // widget (QGuiApplicationPrivate::processCloseEvent). An application modal message box here
+    // would therefore swallow the installer's one and only request for the rest of its wait.
+    auto *notification = new QMessageBox(QMessageBox::Warning, tr("Update"),
+                                         tr("The update installer is already running and waits about a "
+                                            "minute for Cockatrice to close. Cockatrice is still busy, so "
+                                            "save your work and close it before then. Otherwise the "
+                                            "installer gives up and the update is cancelled."),
+                                         QMessageBox::Ok, parentWidget());
+    notification->setWindowModality(Qt::NonModal);
+    notification->setAttribute(Qt::WA_DeleteOnClose);
+    notification->show();
+}
+
 void DlgUpdate::updateCheckError(const QString &errorString)
 {
     setLabel(tr("Error"));
@@ -224,6 +252,12 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
 
     QString installerPath = filepath.toLocalFile();
 
+    const QString overridePath = QDir(QFileInfo(installerPath).absolutePath()).filePath(UPDATE_INSTALLER_OVERRIDE);
+    if (QFileInfo::exists(overridePath)) {
+        qCInfo(DlgUpdateLog) << "Installing the update installer override instead of the download:" << overridePath;
+        installerPath = overridePath;
+    }
+
     QString appDir = QDir::toNativeSeparators(QCoreApplication::applicationDirPath());
     QProcess process;
     process.setProgram(installerPath);
@@ -240,8 +274,31 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
 
     // Try to open the installer. If it opens, quit Cockatrice
     if (process.startDetached()) {
-        QMetaObject::invokeMethod(static_cast<MainWindow *>(parent()), "close", Qt::QueuedConnection);
-        qCInfo(DlgUpdateLog) << "Opened downloaded update file successfully - closing Cockatrice";
+        qCInfo(DlgUpdateLog) << "Opened update installer successfully - closing Cockatrice";
+        // Close the main window synchronously so file locks are released before the NSIS installer
+        // (already launched) starts replacing files. This also flushes settings and shuts down the
+        // tabs, but only when the close is actually accepted: MainWindow may veto it for a running
+        // card DB update, an open game, or an unsaved deck, and closeForUpdate() also reports a
+        // close already in progress (reached from a nested event loop while a shutdown prompt is
+        // up). Only quit when the shutdown really ran - otherwise keep running so the user can
+        // resolve the blocker, and warn them that the installer only waits about a minute
+        // before it gives up and cancels the update.
+        if (auto *window = qobject_cast<MainWindow *>(parent())) {
+            if (window->closeForUpdate()) {
+                QTimer::singleShot(0, qApp, [] { QCoreApplication::exit(0); });
+            } else {
+                warnInstallerIsWaiting();
+            }
+        } else {
+            // Not a MainWindow, so no faithful close can be requested - but the parent still gets
+            // its close() call, which is what the code before this change did and lets it flush
+            // settings and shut down its tabs. Leaving is then unconditional: the installer is
+            // already running against a process that still holds locks on the files it replaces.
+            if (auto *widget = parentWidget()) {
+                widget->close();
+            }
+            QTimer::singleShot(0, qApp, [] { QCoreApplication::exit(0); });
+        }
         close();
     } else {
         setLabel(tr("Error"));
