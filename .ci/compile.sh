@@ -375,8 +375,8 @@ if [[ $MAKE_PACKAGE ]]; then
       # 7-Zip writes CRLF on Windows, so a trailing \r survives on $entry and
       # defeats the whole-line match - every entry then reads as missing even
       # though the listing holds it verbatim.
-      # [$] rather than \$ so the literal dollar is a bracket expression and
-      # shellcheck does not read these as unexpanded shell variables (SC2016).
+      # [$] rather than \$ so the literal dollar is a bracket expression and the
+      # linter does not read these as unexpanded shell variables (SC2016).
       installer_paths="$("$seven_zip" l -slt "$package" | tr -d '\r' |
         sed -n 's/^Path = //p' |
         sed -e 's|\\|/|g' -e 's|^[$]INSTDIR/||' -e 's|^[$]OUTDIR/||' -e 's|^[$]PLUGINSDIR/||' -e 's|^\./||' -e 's|^/||')"
