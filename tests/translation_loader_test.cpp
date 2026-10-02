@@ -254,3 +254,9 @@ TEST(TranslationLoaderTest, UnsetLanguageLoadsNothing)
     EXPECT_TRUE(translator.isEmpty());
     EXPECT_TRUE(translator.filePath().isEmpty());
 }
+
+int main(int argc, char **argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}
