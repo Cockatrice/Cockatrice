@@ -458,6 +458,14 @@ jobs:
           VCPKG_FEATURE_FLAGS: dependencygraph
         run: .ci/compile.sh --server --test --vcpkg
 
+      # CPack reports a failed makensis run as "Problem running NSIS command"
+      # plus a path to NSISOutput.log, and that log lives only on the runner, so
+      # the actual compile error is otherwise nowhere in the workflow output.
+      # Dump it, or a broken installer script is undiagnosable from CI alone.
+      - name: "Dump NSIS compile log"
+        if: failure() && matrix.os == 'Windows'
+        run: find . -name NSISOutput.log -exec cat {} \;
+
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "[macOS] Delete remote compiler cache (ccache)"
         if: matrix.os == 'macOS' && matrix.use_ccache == 1 && github.ref == 'refs/heads/master' && steps.restore_ccache.outputs.cache-hit
