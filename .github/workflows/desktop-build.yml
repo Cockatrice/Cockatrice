@@ -462,9 +462,12 @@ jobs:
       # plus a path to NSISOutput.log, and that log lives only on the runner, so
       # the actual compile error is otherwise nowhere in the workflow output.
       # Dump it, or a broken installer script is undiagnosable from CI alone.
+      # shell: bash matters here - the default pwsh resolves `find` to Windows'
+      # text-search find.exe, which errors instead of searching.
       - name: "Dump NSIS compile log"
         if: failure() && matrix.os == 'Windows'
-        run: find . -name NSISOutput.log -exec cat {} \;
+        shell: bash
+        run: find . -name NSISOutput.log -exec cat {} +
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "[macOS] Delete remote compiler cache (ccache)"
