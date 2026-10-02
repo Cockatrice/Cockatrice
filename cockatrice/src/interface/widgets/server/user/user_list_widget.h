@@ -172,7 +172,6 @@ signals:
     void removeBuddy(const QString &userName);
     void addIgnore(const QString &userName);
     void removeIgnore(const QString &userName);
-    void joinGameRequested(int gameId, int roomId, bool asSpectator);
     void sectionExpanded(Section section, bool expanded);
     /** Dialog mode: the user activated (Enter/double-click) the given row. */
     void userActivated(const QString &userName);

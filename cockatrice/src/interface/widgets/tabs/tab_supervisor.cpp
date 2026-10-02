@@ -1101,9 +1101,26 @@ void TabSupervisor::replayLeft(TabGame *tab)
 
 void TabSupervisor::joinReportGame(const int gameId, const int roomId)
 {
+    joinGameByIntent(gameId, roomId, true);
+}
+
+void TabSupervisor::joinGameFromUserCard(const int gameId, const int roomId, const bool asSpectator)
+{
+    joinGameByIntent(gameId, roomId, asSpectator);
+}
+
+/**
+ * Runs the join/spectate intent for @p gameId in @p roomId.
+ *
+ * The intent owns the whole flow: if the room tab is not open yet it joins the
+ * room first, then retries the game, so callers do not have to care whether the
+ * room happens to be on screen.
+ */
+void TabSupervisor::joinGameByIntent(const int gameId, const int roomId, const bool asSpectator)
+{
     auto *remoteClient = qobject_cast<RemoteClient *>(client);
     if (!remoteClient) {
-        actShowPopup(tr("Report joins are only available on a remote server."));
+        actShowPopup(tr("Game joins are only available on a remote server."));
         return;
     }
 
@@ -1112,7 +1129,7 @@ void TabSupervisor::joinReportGame(const int gameId, const int roomId)
     ctx->roomContext.serverContext.port = QString::number(remoteClient->peerPort());
     ctx->roomContext.roomId = roomId;
     ctx->gameId = gameId;
-    ctx->asSpectator = true;
+    ctx->asSpectator = asSpectator;
 
     auto *joinGameIntent = new IntentJoinServerGame(this, remoteClient, std::move(ctx));
     joinGameIntent->setParent(this);
