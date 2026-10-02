@@ -110,6 +110,16 @@ SettingsCache::SettingsCache()
 
     settings = new QSettings(settingsPath + "global.ini", QSettings::IniFormat, this);
 
+    // Both migrations below overwrite per-domain files in place, so snapshot the whole settings
+    // folder first: global.ini is preserved as global.ini.old, but pre-existing per-domain files
+    // (and a re-migration after a downgrade) would otherwise have no way back.
+    if (SettingsMigration::isMigrationPending(settingsPath)) {
+        const QString backupPath = SettingsMigration::backupSettingsDirectory(settingsPath);
+        if (!backupPath.isEmpty()) {
+            qCInfo(SettingsCacheLog) << "[SettingsCache] Settings backed up before migration:" << backupPath;
+        }
+    }
+
     // Migrate from legacy NativeFormat settings to per-class INI files (runs at most once)
     if (!isPortableBuild) {
         SettingsMigration::migrateLegacySettings(settingsPath);
