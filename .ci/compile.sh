@@ -127,6 +127,12 @@ done
 
 set -e
 
+# cmake reads the generator platform from the environment, so a leftover platform
+# follows the generator around; Ninja has no platform to select.
+if [[ $CMAKE_GENERATOR != "Visual Studio"* ]]; then
+  unset CMAKE_GENERATOR_PLATFORM
+fi
+
 # Setup
 ./servatrice/check_schema_version.sh
 if [[ ! $BUILDTYPE ]]; then
@@ -277,26 +283,32 @@ if [[ $RUNNER_OS == macOS ]]; then
   fi
 
 elif [[ $RUNNER_OS == Windows ]]; then
-  # cmake only hands MSBuild a job count when one is asked for, and without it
-  # MSBuild builds a single node: one project at a time, whatever MTT does inside
-  # it. Ask for a node per core.
-  if [[ ! $BUILD_PARALLEL_LEVEL ]]; then
-    BUILD_PARALLEL_LEVEL="${NUMBER_OF_PROCESSORS:-1}"
-  fi
-  buildflags+=(--parallel "$BUILD_PARALLEL_LEVEL")
+  if [[ $CMAKE_GENERATOR == "Visual Studio"* ]]; then
+    # cmake only hands MSBuild a job count when it is asked for, and without it
+    # MSBuild builds a single node: one project at a time, whatever MTT does inside
+    # it. Ask for a node per core.
+    if [[ ! $BUILD_PARALLEL_LEVEL ]]; then
+      BUILD_PARALLEL_LEVEL="${NUMBER_OF_PROCESSORS:-1}"
+    fi
+    buildflags+=(--parallel "$BUILD_PARALLEL_LEVEL")
 
-  # Enable MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
-  # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
-  # EnforceProcessCountAcrossBuilds makes the CL_MPCount ceiling apply across all
-  # the projects the nodes are building, instead of each node running its own
-  # cl.exe processes and /m and MTT multiplying into an oversubscribed machine.
-  buildflags+=(-- -p:UseMultiToolTask=true -p:EnableClServerMode=true -p:EnforceProcessCountAcrossBuilds=true -p:CL_MPCount="$BUILD_PARALLEL_LEVEL")
-  if [[ $BUILD_PROFILE ]]; then
-    # A performance summary says which projects and tasks cost what, the binary log
-    # keeps the full timeline; both are far too noisy to always produce. The files
-    # land next to the solution, i.e. in the build dir the workflow uploads. These
-    # join the MTT options above, which already carried the "--" separator.
-    buildflags+=("-flp:PerformanceSummary;v=q;LogFile=msbuild-perf.log" -bl:msbuild.binlog)
+    # Enable MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
+    # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
+    # EnforceProcessCountAcrossBuilds makes the CL_MPCount ceiling apply across all
+    # the projects the nodes are building, instead of each node running its own
+    # cl.exe processes and /m and MTT multiplying into an oversubscribed machine.
+    buildflags+=(-- -p:UseMultiToolTask=true -p:EnableClServerMode=true -p:EnforceProcessCountAcrossBuilds=true -p:CL_MPCount="$BUILD_PARALLEL_LEVEL")
+    if [[ $BUILD_PROFILE ]]; then
+      # A performance summary says which projects and tasks cost what, the binary log
+      # keeps the full timeline; both are far too noisy to always produce. The files
+      # land next to the solution, i.e. in the build dir the workflow uploads. These
+      # join the MTT options above, which already carried the "--" separator.
+      buildflags+=("-flp:PerformanceSummary;v=q;LogFile=msbuild-perf.log" -bl:msbuild.binlog)
+    fi
+  else
+    # Ninja runs the compiler itself, so it neither needs the MSVC switches nor
+    # wants a job count: it sizes its own pool for the cores it finds.
+    echo "ninja $(ninja --version)"
   fi
 fi
 
