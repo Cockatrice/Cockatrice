@@ -179,11 +179,14 @@ void SingleInstanceManager::handleNewConnection()
             // the use-after-free this guards against. `socket` itself must not be
             // referenced again from here on; the guard is null once the socket has
             // been destroyed, in which case there is nothing left to close.
-            QMetaObject::invokeMethod(this, [guardedSocket]() {
-                if (guardedSocket) {
-                    guardedSocket->disconnectFromServer();
-                }
-            }, Qt::QueuedConnection);
+            QMetaObject::invokeMethod(
+                this,
+                [guardedSocket]() {
+                    if (guardedSocket) {
+                        guardedSocket->disconnectFromServer();
+                    }
+                },
+                Qt::QueuedConnection);
             return;
         }
     });
