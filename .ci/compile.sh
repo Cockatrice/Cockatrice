@@ -365,13 +365,14 @@ if [[ $MAKE_PACKAGE ]]; then
         exit 1
       fi
       # 7-Zip writes CRLF on Windows, so the \r has to come off before any
-      # whole-line comparison below or every entry carries a trailing \r and
-      # nothing matches at all. Normalize its separators to / as well so the
-      # entries can be compared as exact relative paths, and use -xF so a '.'
-      # in a DLL name is never a wildcard. The match is case-insensitive
-      # because that is how the installed tree behaves: the uninstaller clears
-      # both $INSTDIR\plugins and $INSTDIR\Plugins.
-      installer_paths="$("$seven_zip" l -slt "$package" | tr -d '\r' | sed -n 's/^Path = //p' | sed 's|\\|/|g')"
+      # whole-line comparison below. Normalize separators to /, and strip the
+      # install-root prefixes an NSIS listing may carry, so the entries can be
+      # compared as exact relative paths. -xF keeps a '.' in a DLL name from
+      # being a wildcard; -i because that is how the installed tree behaves -
+      # the uninstaller clears both $INSTDIR\plugins and $INSTDIR\Plugins.
+      installer_paths="$("$seven_zip" l -slt "$package" | tr -d '\r' |
+        sed -n 's/^Path = //p' |
+        sed -e 's|\\|/|g' -e 's|^\$INSTDIR/||' -e 's|^\$OUTDIR/||' -e 's|^\$PLUGINSDIR/||' -e 's|^\./||' -e 's|^/||')"
       missing=""
       checked=0
       while IFS= read -r entry; do
@@ -385,6 +386,14 @@ if [[ $MAKE_PACKAGE ]]; then
       done <required-qt-runtime.txt
       if [[ -n $missing ]]; then
         echo "::error file=$0::Installer is missing required Qt runtime files:$missing"
+        # Print both sides of the comparison. A mismatch here has twice been
+        # caused by the shape of 7-Zip's output rather than by a missing file,
+        # and a bare "missing" line cannot tell those apart.
+        echo "required-qt-runtime.txt asked for $checked path(s); 7-Zip listed $(grep -c '' <<<"$installer_paths") path(s)"
+        echo "--- required ---"
+        sed 's/^/  /' required-qt-runtime.txt
+        echo "--- first 40 paths 7-Zip lists in the installer ---"
+        head -40 <<<"$installer_paths" | sed 's/^/  /'
         exit 1
       fi
       echo "Installer contains the full Qt runtime ($checked files)"
