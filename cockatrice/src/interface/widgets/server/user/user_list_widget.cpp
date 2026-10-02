@@ -430,9 +430,6 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
             hidePopup(true);
             requestVisibleItemResources();
         });
-
-        // Forward join requests from popup upward
-        connect(userInfoPopup, &UserInfoPopup::joinGameRequested, this, &UserListWidget::joinGameRequested);
     } else {
         // Dialog mode: keyboard selection drives the Invite button.
         connect(userTree, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem *current, QTreeWidgetItem *) {
@@ -692,6 +689,17 @@ void UserListWidget::connectPopupSignals()
             [this](const QString &n) { userContextMenu->execAdjustJudge(n, true); });
     connect(userInfoPopup, &UserInfoPopup::demoteFromJudgeRequested, this,
             [this](const QString &n) { userContextMenu->execAdjustJudge(n, false); });
+
+    // Joining is a tab-level action, not a per-user one: the popup's games list
+    // spans every room the user is in, so the target room may not be open yet.
+    // Hand it to the supervisor, which owns the intent that joins the room if
+    // needed. The popup closes here because that intent switches tabs, which
+    // would otherwise strand it on a list that is no longer on screen.
+    connect(userInfoPopup, &UserInfoPopup::joinGameRequested, this,
+            [this](const int gameId, const int roomId, const bool asSpectator) {
+                hidePopup(true);
+                tabSupervisor->joinGameFromUserCard(gameId, roomId, asSpectator);
+            });
 }
 
 bool UserListWidget::eventFilter(QObject *obj, QEvent *event)

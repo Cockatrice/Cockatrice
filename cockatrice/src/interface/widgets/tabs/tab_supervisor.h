@@ -128,6 +128,8 @@ private:
     static QString sanitizeTabName(QString dirty);
     static QString sanitizeHtml(QString dirty);
     void resetTabsMenu();
+    /** Shared join/spectate driver behind the report tab and the profile hover card. */
+    void joinGameByIntent(int gameId, int roomId, bool asSpectator);
 
 public:
     explicit TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent = nullptr);
@@ -198,6 +200,8 @@ public slots:
     TabEdhRec *addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCommander = false);
     void openReplay(GameReplay *replay);
     void joinReportGame(int gameId, int roomId);
+    /** Joins or spectates a game listed on a user's profile hover card. */
+    void joinGameFromUserCard(int gameId, int roomId, bool asSpectator);
     void openTabModeration(const QString &userName = {});
     void switchToFirstAvailableNetworkTab();
     void maximizeMainWindow();
