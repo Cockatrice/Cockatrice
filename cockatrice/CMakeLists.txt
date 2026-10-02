@@ -683,6 +683,24 @@ if(WIN32)
     PATTERN ".lupdate*" EXCLUDE
   )
 
+  # fixup_bundle further down copies only the DLLs it can find in Cockatrice.exe's
+  # import table, and the glob above only sees DLLs that were already copied next
+  # to the executable. Qt6::Concurrent is linked but never imported - QtConcurrent::run
+  # and QFutureWatcher are header-only in Qt 6 - so neither step ships
+  # Qt6Concurrent.dll, even though required-qt-runtime.txt lists it and the
+  # Windows package check then fails on a package that is fine to run.
+  # Qt6::ShaderTools is skipped for the same reason.
+  #
+  # Install the runtime of every linked module explicitly. An unused DLL costs a
+  # few hundred kilobytes; a missing one is what stops the client starting after
+  # an update, and it stays invisible until then.
+  foreach(_qt_module IN LISTS COCKATRICE_QT_MODULES)
+    get_target_property(_qt_module_type ${_qt_module} TYPE)
+    if(_qt_module_type STREQUAL "SHARED_LIBRARY")
+      install(FILES "$<TARGET_FILE:${_qt_module}>" DESTINATION ./)
+    endif()
+  endforeach()
+
   install(
     DIRECTORY "${CMAKE_BINARY_DIR}/cockatrice/"
     DESTINATION ./
