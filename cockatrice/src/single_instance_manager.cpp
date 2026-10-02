@@ -1,6 +1,7 @@
 #include "single_instance_manager.h"
 
 #include <QDir>
+#include <QPointer>
 
 namespace
 {
@@ -155,19 +156,44 @@ void SingleInstanceManager::handleNewConnection()
             socket->write(ACK_MESSAGE);
             socket->flush();
 
-            // Drop the payload from the buffer before handling it: the handlers
-            // run synchronously and can spin a nested event loop (e.g. a modal
-            // dialog) that re-reads this socket, which would re-parse and re-emit
-            // the same files.
+            // Drop the payload from the buffer before handing it off, so a
+            // re-entrant event loop cannot re-parse and re-emit the same files.
             buffer->clear();
             *expectedSize = 0;
 
+            // Take the guard while the socket is still alive: QPointer has to be
+            // built from a live pointer, and by the time the handlers below return
+            // the socket may already be gone.
+            QPointer<QLocalSocket> guardedSocket(socket);
+
+            // Hand the payload over synchronously, exactly as before, so the
+            // "Join game?" confirmation still appears. A handler can spin a nested
+            // event loop (that modal box is one), and the sending instance exits as
+            // soon as it has the ACK above, so while that loop runs the peer closes
+            // and this socket is disconnected.
             emit filesReceived(files);
 
-            socket->disconnectFromServer();
+            // The handlers run synchronously, so returning from the emit means the
+            // readyRead frame has unwound and it is safe to touch the socket again.
+            // This teardown must therefore NOT be queued: a queued call would be
+            // picked up by the nested loop above while the frame is still on the
+            // stack, which is precisely the use-after-free this guards against.
+            // The guard covers the one remaining way the socket can die under us --
+            // the primary being torn down (e.g. quit) while the dialog was open --
+            // since QLocalServer owns and destroys its pending connections.
+            if (guardedSocket) {
+                guardedSocket->disconnectFromServer();
+                guardedSocket->deleteLater();
+            }
             return;
         }
     });
 
-    connect(socket, &QLocalSocket::disconnected, socket, &QLocalSocket::deleteLater);
+    // Deliberately no `disconnected -> deleteLater()` here. The handlers above run
+    // synchronously and may spin a nested event loop, during which the sender exits
+    // and this socket is disconnected. A deleteLater() triggered from there is not
+    // deferred to the outer loop: Qt frees the object as soon as that nested loop
+    // unwinds, which is still inside this readyRead emission, so Qt's own signal
+    // dispatch is left holding a freed socket. The socket is instead closed and
+    // deleted once the handlers have returned, on the code path above.
 }
