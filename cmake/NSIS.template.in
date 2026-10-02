@@ -15,6 +15,7 @@ Var ReinstallMode
 Var AllowForceClose
 Var GuardDir
 Var OldUninstallString
+Var StaleFindHandle
 Var StaleFindName
 Var IsUpgrade
 Var AbortReason
@@ -485,8 +486,7 @@ FunctionEnd
 ; Only the first of those two gets a dialog; the second reports through the log
 ; and the exit code.
 Function AbortInstall
-    ${If} $ReinstallMode = 1
-    ${OrIfNot} ${Silent}
+    ${IfNot} ${Silent}
         MessageBox MB_OK|MB_ICONEXCLAMATION "$AbortReason"
     ${EndIf}
     SetErrorLevel 1
@@ -685,16 +685,10 @@ Function CheckStaleRuntimeMask
     ${If} $R0 = 1
         Return
     ${EndIf}
-    ; FindFirst takes the pattern and the name variable only, and leaves the
-    ; search handle in $0 - there is no handle argument and no handle variable
-    ; to keep, which is why FindNext does not take one either. $R3 and $R0 are
-    ; untouched by it, so only $0 is consumed here.
-    ; One match is enough: $R0 is a yes/no flag, not a list, so there is no
-    ; FindNext and nothing to iterate.
-    FindFirst "$INSTDIR\$R3" $StaleFindName
-    ${If} $0 != ""
+    FindFirst $StaleFindHandle $StaleFindName "$INSTDIR\$R3"
+    ${If} $StaleFindHandle != ""
         StrCpy $R0 1
-        FindClose $0
+        FindClose $StaleFindHandle
     ${EndIf}
 FunctionEnd
 
@@ -1059,8 +1053,7 @@ ${If} $R0 = 1
     ; without /R is unattended - a package manager, for instance - and a message
     ; box there would block forever, so that case only reports through the log
     ; and the exit code.
-    ${If} $ReinstallMode = 1
-    ${OrIfNot} ${Silent}
+    ${IfNot} ${Silent}
         MessageBox MB_OK|MB_ICONEXCLAMATION \
             "The installation could not remove all files of a previous version of Cockatrice, most likely because it is still running or was started as administrator, and was cancelled rather than leave a mismatched install behind.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice and run the installer again."
     ${EndIf}
