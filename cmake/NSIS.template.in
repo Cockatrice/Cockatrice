@@ -15,7 +15,6 @@ Var ReinstallMode
 Var AllowForceClose
 Var GuardDir
 Var OldUninstallString
-Var StaleFindHandle
 Var StaleFindName
 Var IsUpgrade
 Var AbortReason
@@ -686,10 +685,16 @@ Function CheckStaleRuntimeMask
     ${If} $R0 = 1
         Return
     ${EndIf}
-    FindFirst $StaleFindHandle $StaleFindName "$INSTDIR\$R3"
-    ${If} $StaleFindHandle != ""
+    ; FindFirst takes the pattern and the name variable only, and leaves the
+    ; search handle in $0 - there is no handle argument and no handle variable
+    ; to keep, which is why FindNext does not take one either. $R3 and $R0 are
+    ; untouched by it, so only $0 is consumed here.
+    ; One match is enough: $R0 is a yes/no flag, not a list, so there is no
+    ; FindNext and nothing to iterate.
+    FindFirst "$INSTDIR\$R3" $StaleFindName
+    ${If} $0 != ""
         StrCpy $R0 1
-        FindClose $StaleFindHandle
+        FindClose $0
     ${EndIf}
 FunctionEnd
 
