@@ -345,7 +345,7 @@ if [[ $MAKE_PACKAGE ]]; then
     else
       echo "Inspecting $package"
       # Fail the build if the installer contains any path left behind by the MSBuild or
-      # Qt AUTOMOC tooling (build-tree artifacts must live in the build dir, not in the install)
+      # Qt AUTOMOC tooling (build-tree artifacts must live in the build dir, not the install)
       if "$seven_zip" l "$package" |
         grep -E "_autogen|\.dir[\\/]|\.tlog|(^|[\\/])x64[\\/]|(^|[\\/])\.qt[\\/]|(^|[\\/])\.qsb[\\/]|(^|[\\/])\.lupdate[\\/]|CMakeFiles"; then
         echo "::error file=$0::Installer contains build-tree artifacts"
@@ -398,10 +398,13 @@ if [[ $MAKE_PACKAGE ]]; then
         # caused by the shape of 7-Zip's output rather than by a missing file,
         # and a bare "missing" line cannot tell those apart.
         echo "required-qt-runtime.txt asked for $checked path(s); 7-Zip listed $(grep -c '' <<<"$installer_paths") path(s)"
+        # Indent with parameter expansion rather than sed 's/^/  /', which the
+        # linter reports as SC2001.
         echo "--- required ---"
-        sed 's/^/  /' <<<"$manifest"
+        echo "${manifest//$'\n'/$'\n  '}"
         echo "--- first 40 paths 7-Zip lists in the installer ---"
-        head -40 <<<"$installer_paths" | sed 's/^/  /'
+        listed_head="$(head -40 <<<"$installer_paths")"
+        echo "${listed_head//$'\n'/$'\n  '}"
         exit 1
       fi
       echo "Installer contains the full Qt runtime ($checked files)"
