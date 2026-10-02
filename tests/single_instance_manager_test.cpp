@@ -2,6 +2,7 @@
 
 #include <QCoreApplication>
 #include <QDataStream>
+#include <QElapsedTimer>
 #include <QEventLoop>
 #include <QLocalServer>
 #include <QLocalSocket>
@@ -32,14 +33,15 @@ QByteArray encodePayload(const QStringList &files)
 
 // Regression test for the use-after-free in SingleInstanceManager::handleNewConnection().
 //
-// The forwarded payload used to be handed to the handlers straight from inside
-// the forwarding socket's readyRead emission. A handler can spin a nested event
-// loop (the "Join game?" confirmation is a modal QMessageBox), and the sending
-// instance exits as soon as it has the acknowledgment, so the socket was
-// disconnected and deleteLater'd while that loop ran: the socket died in the
-// middle of its own readyRead signal, which both this lambda and Qt's signal
-// dispatch then kept using.
-TEST(SingleInstanceManagerTest, PayloadIsHandledAfterTheForwardingSocketIsClosed)
+// The forwarded payload is handed to the handlers from inside the forwarding
+// socket's readyRead emission, which is what lets the "Join game?" confirmation
+// appear at all. A handler can spin a nested event loop (a modal QMessageBox),
+// and the sending instance exits as soon as it has the acknowledgment, so the
+// socket gets disconnected and deleteLater'd *while that loop runs*. Control then
+// returns to the readyRead frame with the socket already destroyed: touching it
+// again from that frame is the use-after-free. The teardown is therefore queued
+// and guarded, never done inline.
+TEST(SingleInstanceManagerTest, HandlersRunSynchronouslyAndSocketIsNotTouchedAfterTheyReturn)
 {
     // Scope the hand-off socket to this test process so a Cockatrice the
     // developer happens to be running cannot claim it.
@@ -55,18 +57,17 @@ TEST(SingleInstanceManagerTest, PayloadIsHandledAfterTheForwardingSocketIsClosed
     QStringList handled;
     QByteArray acknowledgment;
     int handlerCalls = 0;
-    bool socketClosedWhenHandled = false;
+    bool socketConnectedWhenHandled = false;
 
     QEventLoop loop;
     QObject::connect(&primary, &SingleInstanceManager::filesReceived, &primary, [&](const QStringList &files) {
         ++handlerCalls;
 
-        // The forwarding socket must already be closing by the time a handler
-        // runs: a modal handler spins a nested event loop during which the
-        // sending instance closes its end, and the socket would then be deleted
-        // in the middle of its own readyRead emission.
+        // The payload must reach the handlers while the forwarding socket is
+        // still connected: deferring the emit would suppress the modal "Join
+        // game?" confirmation this hand-off exists to show.
         auto *connection = server->findChild<QLocalSocket *>();
-        socketClosedWhenHandled = connection == nullptr || connection->state() != QLocalSocket::ConnectedState;
+        socketConnectedWhenHandled = connection != nullptr && connection->state() == QLocalSocket::ConnectedState;
 
         // The primary acknowledges the payload before handling it, so that a
         // sender waiting on the acknowledgment never mistakes a busy primary
@@ -75,7 +76,8 @@ TEST(SingleInstanceManagerTest, PayloadIsHandledAfterTheForwardingSocketIsClosed
         acknowledgment = sender.readAll();
 
         // Stand in for the modal "Join game?" confirmation: the sending instance
-        // goes away while this nested loop is running.
+        // goes away while this nested loop is running, which is what used to
+        // destroy the socket underneath this readyRead frame.
         sender.abort();
 
         QEventLoop modalDialog;
@@ -96,8 +98,25 @@ TEST(SingleInstanceManagerTest, PayloadIsHandledAfterTheForwardingSocketIsClosed
 
     EXPECT_EQ(1, handlerCalls) << "the payload must be handed to the handlers exactly once";
     EXPECT_EQ(PAYLOAD, handled);
-    EXPECT_TRUE(socketClosedWhenHandled) << "the payload was handled while the forwarding socket was still connected";
+    EXPECT_TRUE(socketConnectedWhenHandled) << "the payload was not handled from inside the readyRead emission";
     EXPECT_FALSE(acknowledgment.isEmpty()) << "the primary never acknowledged the payload";
+
+    // The deferred teardown must not have been skipped: once control has left the
+    // readyRead frame, the primary closes (and releases) the forwarding socket
+    // instead of leaking a connection per forwarded payload.
+    QElapsedTimer teardownTimer;
+    teardownTimer.start();
+    while (teardownTimer.elapsed() < HANDSHAKE_TIMEOUT_MS) {
+        auto *leftover = server->findChild<QLocalSocket *>();
+        if (leftover == nullptr || leftover->state() != QLocalSocket::ConnectedState) {
+            break;
+        }
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+    }
+
+    auto *leftover = server->findChild<QLocalSocket *>();
+    EXPECT_TRUE(leftover == nullptr || leftover->state() != QLocalSocket::ConnectedState)
+        << "the forwarding socket was left connected after the deferred teardown";
 }
 
 int main(int argc, char **argv)

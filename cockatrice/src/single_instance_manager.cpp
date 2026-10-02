@@ -1,6 +1,7 @@
 #include "single_instance_manager.h"
 
 #include <QDir>
+#include <QPointer>
 
 namespace
 {
@@ -160,20 +161,29 @@ void SingleInstanceManager::handleNewConnection()
             buffer->clear();
             *expectedSize = 0;
 
-            // Close the connection after the acknowledgment has been flushed, so
-            // the sender has everything it needs before the socket goes away.
-            // The socket itself is only destroyed by the deleteLater() below,
-            // which runs once the event loop regains control.
-            socket->disconnectFromServer();
+            // Take the guard while the socket is still alive: QPointer has to be
+            // built from a live pointer, and by the time the handlers below return
+            // the socket may already be gone.
+            QPointer<QLocalSocket> guardedSocket(socket);
 
-            // Hand the payload to the handlers only after this readyRead emission
-            // has returned. The handlers can spin a nested event loop (the
-            // "Join game?" confirmation is a modal QMessageBox), and the sending
-            // instance exits as soon as it has the ACK above, so this socket gets
-            // disconnected -> deleteLater while that loop runs. Deleting the
-            // socket in the middle of its own readyRead would leave both this
-            // lambda and Qt's signal dispatch holding freed memory.
-            QMetaObject::invokeMethod(this, [this, files] { emit filesReceived(files); }, Qt::QueuedConnection);
+            // Hand the payload over synchronously, exactly as before. The
+            // handlers can spin a nested event loop (the "Join game?" confirmation
+            // is a modal QMessageBox), and the sending instance exits as soon as
+            // it has the ACK above, so while that loop runs this socket gets
+            // disconnected and deleteLater() schedules it from the nested loop
+            // level. Control returns here with the socket already destroyed.
+            emit filesReceived(files);
+
+            // So tear the connection down only after this readyRead frame is off
+            // the stack: touching `socket` inline after the handlers return is
+            // the use-after-free this guards against. `socket` itself must not be
+            // referenced again from here on; the guard is null once the socket has
+            // been destroyed, in which case there is nothing left to close.
+            QMetaObject::invokeMethod(this, [guardedSocket]() {
+                if (guardedSocket) {
+                    guardedSocket->disconnectFromServer();
+                }
+            }, Qt::QueuedConnection);
             return;
         }
     });
