@@ -227,6 +227,9 @@ public slots:
     /** @brief Closes all zone views. */
     void clearViews();
 
+    /** @brief Empties the contents of all non-reveal zone views. Used for replay rewinding */
+    void emptyActiveViews();
+
     /** @brief Closes the most recently added zone view. */
     void closeMostRecentZoneView();
     QTransform getViewTransform() const;
