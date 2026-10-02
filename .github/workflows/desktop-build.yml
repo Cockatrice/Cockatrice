@@ -453,7 +453,12 @@ jobs:
           PACKAGE_SUFFIX: '${{ matrix.package_suffix }}'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
           USE_CCACHE: ${{ matrix.use_ccache }}
-          VCPKG_BINARY_SOURCES: "clear;files,${{ steps.vcpkg-cache.outputs.path }},${{ case(github.ref == 'refs/heads/master', 'readwrite', 'read') }}"
+          # Only master may write, so a runner image update (a new VS build changes
+          # every port's ABI hash) could never heal the cache: every PR paid a full
+          # source build of protobuf, openssl and abseil until a master run happened.
+          # A branch in this repo runs with a token that can write, so let those
+          # refresh the cache too; a fork PR keeps read-only access to it.
+          VCPKG_BINARY_SOURCES: "clear;files,${{ steps.vcpkg-cache.outputs.path }},${{ case(github.event.pull_request.head.repo.fork, 'read', 'readwrite') }}"
           VCPKG_DISABLE_METRICS: 1
           VCPKG_FEATURE_FLAGS: dependencygraph
         run: .ci/compile.sh --server --test --vcpkg
