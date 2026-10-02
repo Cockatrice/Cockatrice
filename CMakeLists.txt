@@ -326,6 +326,39 @@ elseif(WIN32)
   # Configure file with custom definitions for NSIS.
   configure_file("${COCKATRICE_CMAKE_PATH}/NSIS.definitions.nsh.in" "${PROJECT_BINARY_DIR}/NSIS.definitions.nsh")
 
+  # Every Qt module the client links against, as the DLL names a Windows install
+  # has to contain, plus the platform plugin without which the client cannot
+  # start. .ci/compile.sh reads this and fails the build when the packaged
+  # installer is missing one of them.
+  #
+  # Only the client is packaged on Windows, so this is the client's module list
+  # rather than the union across server, client and Oracle: demanding Oracle's or
+  # Servatrice's modules of the client installer checks nothing about the client.
+  #
+  # A statically linked Qt module ships no runtime DLL, so requiring one would
+  # fail the package check on a static build for no reason. cockatrice/CMakeLists.txt
+  # installs the runtime of every module listed here, and skips static ones the
+  # same way, so the two can never disagree.
+  #
+  # A DLL missing from the package only surfaces on a user's machine, after an
+  # update has already replaced their install, as "The code execution cannot
+  # proceed because Qt6Multimedia.dll was not found" or as a missing procedure
+  # entry point in a Qt6QuickWidgets.dll left over from the previous version.
+  # Assert it while the installer is still being built instead.
+  set(_required_qt_runtime "")
+  foreach(_qt_module IN LISTS COCKATRICE_QT_MODULES)
+    get_target_property(_qt_module_type ${_qt_module} TYPE)
+    if(_qt_module_type STREQUAL "SHARED_LIBRARY")
+      string(REGEX REPLACE "^Qt6::" "" _qt_component "${_qt_module}")
+      list(APPEND _required_qt_runtime "Qt6${_qt_component}.dll")
+    endif()
+  endforeach()
+  list(APPEND _required_qt_runtime "Plugins/platforms/qwindows.dll")
+  list(REMOVE_DUPLICATES _required_qt_runtime)
+  list(SORT _required_qt_runtime)
+  string(REPLACE ";" "\n" _required_qt_runtime "${_required_qt_runtime}")
+  file(WRITE "${PROJECT_BINARY_DIR}/required-qt-runtime.txt" "${_required_qt_runtime}\n")
+
   # include vcredist into the package; NSIS will take care of running it
   if(VCREDISTRUNTIME_FOUND)
     install(FILES "${VCREDISTRUNTIME_FILE}" DESTINATION ./)

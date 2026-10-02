@@ -352,6 +352,62 @@ if [[ $MAKE_PACKAGE ]]; then
         exit 1
       fi
       echo "Installer content is clean"
+
+      # Fail the build if the installer is missing a Qt runtime the applications
+      # link against. The DLLs reach the package by globbing every *.dll out of
+      # the build output directories, so a module the client links statically
+      # (Qt6Multimedia.dll, Qt6QuickWidgets.dll) can be left out without anything
+      # else noticing, and the only symptom is a client that refuses to start
+      # after an update. required-qt-runtime.txt is written by the top level
+      # CMakeLists.txt from the same module list the targets are built against.
+      if [[ ! -f required-qt-runtime.txt ]]; then
+        echo "::error file=$0::required-qt-runtime.txt not found in the build dir, cannot verify the Qt runtime"
+        exit 1
+      fi
+      # 7-Zip writes CRLF on Windows, so the \r has to come off before any
+      # whole-line comparison below. Normalize separators to /, and strip the
+      # install-root prefixes an NSIS listing may carry, so the entries can be
+      # compared as exact relative paths. -xF keeps a '.' in a DLL name from
+      # being a wildcard; -i because that is how the installed tree behaves -
+      # the uninstaller clears both $INSTDIR\plugins and $INSTDIR\Plugins.
+      # The archive side and the manifest side have to agree on line endings.
+      # CMake writes required-qt-runtime.txt with the platform's line ending and
+      # 7-Zip writes CRLF on Windows, so a trailing \r survives on $entry and
+      # defeats the whole-line match - every entry then reads as missing even
+      # though the listing holds it verbatim.
+      # [$] rather than \$ so the literal dollar is a bracket expression and the
+      # linter does not read these as unexpanded shell variables (SC2016).
+      installer_paths="$("$seven_zip" l -slt "$package" | tr -d '\r' |
+        sed -n 's/^Path = //p' |
+        sed -e 's|\\|/|g' -e 's|^[$]INSTDIR/||' -e 's|^[$]OUTDIR/||' -e 's|^[$]PLUGINSDIR/||' -e 's|^\./||' -e 's|^/||')"
+      manifest="$(tr -d '\r' <required-qt-runtime.txt)"
+      missing=""
+      checked=0
+      while IFS= read -r entry; do
+        if [[ -z $entry || $entry == \#* ]]; then
+          continue
+        fi
+        checked=$((checked + 1))
+        if ! grep -qxiF "$entry" <<<"$installer_paths"; then
+          missing+=" $entry"
+        fi
+      done <<<"$manifest"
+      if [[ -n $missing ]]; then
+        echo "::error file=$0::Installer is missing required Qt runtime files:$missing"
+        # Print both sides of the comparison. A mismatch here has twice been
+        # caused by the shape of 7-Zip's output rather than by a missing file,
+        # and a bare "missing" line cannot tell those apart.
+        echo "required-qt-runtime.txt asked for $checked path(s); 7-Zip listed $(grep -c '' <<<"$installer_paths") path(s)"
+        # Indent with parameter expansion rather than sed 's/^/  /', which the
+        # linter reports as SC2001.
+        echo "--- required ---"
+        echo "${manifest//$'\n'/$'\n  '}"
+        echo "--- first 40 paths 7-Zip lists in the installer ---"
+        listed_head="$(head -40 <<<"$installer_paths")"
+        echo "${listed_head//$'\n'/$'\n  '}"
+        exit 1
+      fi
+      echo "Installer contains the full Qt runtime ($checked files)"
     fi
     echo "::endgroup::"
   fi
