@@ -364,10 +364,14 @@ if [[ $MAKE_PACKAGE ]]; then
         echo "::error file=$0::required-qt-runtime.txt not found in the build dir, cannot verify the Qt runtime"
         exit 1
       fi
-      # Normalize the archive's own separators to / so the entries below can be
-      # compared as exact relative paths, and use -xF so a '.' in a DLL name is
-      # never a wildcard.
-      installer_paths="$("$seven_zip" l -slt "$package" | sed -n 's/^Path = //p' | sed 's|\\|/|g')"
+      # 7-Zip writes CRLF on Windows, so the \r has to come off before any
+      # whole-line comparison below or every entry carries a trailing \r and
+      # nothing matches at all. Normalize its separators to / as well so the
+      # entries can be compared as exact relative paths, and use -xF so a '.'
+      # in a DLL name is never a wildcard. The match is case-insensitive
+      # because that is how the installed tree behaves: the uninstaller clears
+      # both $INSTDIR\plugins and $INSTDIR\Plugins.
+      installer_paths="$("$seven_zip" l -slt "$package" | tr -d '\r' | sed -n 's/^Path = //p' | sed 's|\\|/|g')"
       missing=""
       checked=0
       while IFS= read -r entry; do
@@ -375,7 +379,7 @@ if [[ $MAKE_PACKAGE ]]; then
           continue
         fi
         checked=$((checked + 1))
-        if ! grep -qxF "$entry" <<<"$installer_paths"; then
+        if ! grep -qxiF "$entry" <<<"$installer_paths"; then
           missing+=" $entry"
         fi
       done <required-qt-runtime.txt
