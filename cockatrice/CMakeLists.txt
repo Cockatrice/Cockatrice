@@ -798,6 +798,12 @@ if(Qt6LinguistTools_FOUND)
   elseif(WIN32)
     install(FILES ${cockatrice_QM} DESTINATION ${COCKATRICE_WIN32_QM_INSTALL_DIR})
   endif()
+
+  # Qt attaches the .qm files to the default build target only, so building the executable on its own
+  # (CLion, --target cockatrice) leaves it without any translations: nothing is translated and the
+  # language selector stays empty.
+  add_custom_target(cockatrice_translations DEPENDS ${cockatrice_QM})
+  add_dependencies(cockatrice cockatrice_translations)
 endif()
 
 qt6_finalize_target(cockatrice)

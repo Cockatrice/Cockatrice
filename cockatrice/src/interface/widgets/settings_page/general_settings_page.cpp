@@ -21,6 +21,7 @@
 #include <libcockatrice/settings/tabs_settings.h>
 #include <libcockatrice/settings/updates_settings.h>
 #include <libcockatrice/utility/macros.h>
+#include <libcockatrice/utility/translation_loader.h>
 
 enum startupCardUpdateCheckBehaviorIndex
 {
@@ -333,22 +334,18 @@ GeneralSettingsPage::GeneralSettingsPage()
 
 QStringList GeneralSettingsPage::findQmFiles()
 {
-    QDir dir(translationPath);
-    QStringList fileNames = dir.entryList(QStringList(translationPrefix + "_*.qm"), QDir::Files, QDir::Name);
-    fileNames.replaceInStrings(QRegularExpression(translationPrefix + "_(.*)\\.qm"), "\\1");
-    return fileNames;
+    return TranslationLoader::availableLanguages(translationPrefix,
+                                                 TranslationLoader::applicationTranslationPaths(translationPath));
 }
 
 QString GeneralSettingsPage::languageName(const QString &lang)
 {
     QTranslator qTranslator;
 
-    QString appNameHint = translationPrefix + "_" + lang;
-    bool appTranslationLoaded = qTranslator.load(appNameHint, translationPath);
-    if (!appTranslationLoaded) {
-        qCWarning(GeneralSettingsPageLog)
-            << "Unable to load" << translationPrefix << "translation" << appNameHint << "at" << translationPath;
-    }
+    // Only the language name is needed here, so the file is loaded without logging a line per
+    // language: findQmFiles() asked for languages whose files exist in the first place.
+    TranslationLoader::loadFrom(qTranslator, translationPrefix + "_" + lang,
+                                TranslationLoader::applicationTranslationPaths(translationPath));
 
     return qTranslator.translate("i18n", DEFAULT_LANG_NAME);
 }

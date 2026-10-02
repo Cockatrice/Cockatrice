@@ -299,6 +299,12 @@ if(Qt6LinguistTools_FOUND)
   elseif(WIN32)
     install(FILES ${oracle_QM} DESTINATION ${ORACLE_WIN32_QM_INSTALL_DIR})
   endif()
+
+  # Qt attaches the .qm files to the default build target only, so building the executable on its own
+  # (CLion, --target oracle) leaves it without any translations: nothing is translated and the
+  # language selector in the wizard stays empty.
+  add_custom_target(oracle_translations DEPENDS ${oracle_QM})
+  add_dependencies(oracle oracle_translations)
 endif()
 
 qt6_finalize_target(oracle)
