@@ -70,6 +70,11 @@ bool ChatSettings::getIgnoreAllPrivateMessages() const
     return getValue("ignoreAllPrivateMessages", QString(), QString(), false).toBool();
 }
 
+bool ChatSettings::getUseGameTime() const
+{
+    return getValue("useGameTime", QString(), QString(), false).toBool();
+}
+
 QString ChatSettings::getHighlightWords() const
 {
     return getValue("highlightWords").toString();
@@ -139,6 +144,11 @@ void ChatSettings::setRoomHistory(bool _roomHistory)
 void ChatSettings::setIgnoreAllPrivateMessages(bool _ignoreAllPrivateMessages)
 {
     setValue(_ignoreAllPrivateMessages, "ignoreAllPrivateMessages");
+}
+
+void ChatSettings::setUseGameTime(bool _useGameTime)
+{
+    setValue(_useGameTime, "useGameTime");
 }
 
 void ChatSettings::setHighlightWords(const QString &_highlightWords)

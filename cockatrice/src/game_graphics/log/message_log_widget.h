@@ -104,6 +104,9 @@ public slots:
     void appendHtmlServerMessage(const QString &html,
                                  bool optionalIsBold = false,
                                  QString optionalFontColor = QString()) override;
+
+private:
+    [[nodiscard]] QString getCurrentTime() const override;
 };
 
 #endif
