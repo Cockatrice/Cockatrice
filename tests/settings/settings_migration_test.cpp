@@ -542,6 +542,34 @@ TEST_F(SettingsMigrationTest, PartialMigrationOnlyMigratesPresentKeys)
     ASSERT_FALSE(fileExists("chat.ini"));
 }
 
+TEST_F(SettingsMigrationTest, ThemeNameDefaultIsRewrittenToSystem)
+{
+    {
+        QSettings g(settingsPath + "global.ini", QSettings::IniFormat);
+        g.setValue("theme/name", "Default");
+        g.sync();
+    }
+
+    ASSERT_TRUE(SettingsMigration::migrateSettingsFromGlobalIni(settingsPath));
+
+    ASSERT_TRUE(fileExists("appearance.ini"));
+    ASSERT_EQ(readFromIni("appearance.ini", "appearance/themeName"), QVariant("System"));
+}
+
+TEST_F(SettingsMigrationTest, OtherThemeNamesAreLeftAlone)
+{
+    {
+        QSettings g(settingsPath + "global.ini", QSettings::IniFormat);
+        g.setValue("theme/name", "VelvetMarble");
+        g.sync();
+    }
+
+    ASSERT_TRUE(SettingsMigration::migrateSettingsFromGlobalIni(settingsPath));
+
+    ASSERT_TRUE(fileExists("appearance.ini"));
+    ASSERT_EQ(readFromIni("appearance.ini", "appearance/themeName"), QVariant("VelvetMarble"));
+}
+
 TEST_F(SettingsMigrationTest, KeyMapTranslationIsCorrect)
 {
     {
