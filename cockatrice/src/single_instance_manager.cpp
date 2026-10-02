@@ -169,32 +169,31 @@ void SingleInstanceManager::handleNewConnection()
             // Hand the payload over synchronously, exactly as before, so the
             // "Join game?" confirmation still appears. A handler can spin a nested
             // event loop (that modal box is one), and the sending instance exits as
-            // soon as it has the ACK above, so while that loop runs the peer can
-            // close and this socket can be torn down underneath us.
+            // soon as it has the ACK above, so while that loop runs the peer closes
+            // and this socket is disconnected.
             emit filesReceived(files);
 
-            // Close and release the socket only once this readyRead frame is off the
-            // stack, because `socket` may already have been destroyed by the time
-            // the handlers return. QPointer because it may also be gone by the time
-            // this queued call runs, in which case there is nothing left to close.
-            QMetaObject::invokeMethod(
-                this,
-                [guardedSocket]() {
-                    if (guardedSocket) {
-                        guardedSocket->disconnectFromServer();
-                        guardedSocket->deleteLater();
-                    }
-                },
-                Qt::QueuedConnection);
+            // The handlers run synchronously, so returning from the emit means the
+            // readyRead frame has unwound and it is safe to touch the socket again.
+            // This teardown must therefore NOT be queued: a queued call would be
+            // picked up by the nested loop above while the frame is still on the
+            // stack, which is precisely the use-after-free this guards against.
+            // The guard covers the one remaining way the socket can die under us --
+            // the primary being torn down (e.g. quit) while the dialog was open --
+            // since QLocalServer owns and destroys its pending connections.
+            if (guardedSocket) {
+                guardedSocket->disconnectFromServer();
+                guardedSocket->deleteLater();
+            }
             return;
         }
     });
 
     // Deliberately no `disconnected -> deleteLater()` here. The handlers above run
-    // synchronously and may spin a nested event loop, during which the sender
-    // exits and this socket is disconnected. deleteLater() called from inside such
-    // a nested loop is not deferred to the outer loop -- Qt deletes the object as
-    // soon as that nested loop unwinds, which is still inside this readyRead
-    // emission, leaving Qt's own signal dispatch and the lambda above holding a
-    // freed socket. Deletion therefore happens only in the queued teardown.
+    // synchronously and may spin a nested event loop, during which the sender exits
+    // and this socket is disconnected. A deleteLater() triggered from there is not
+    // deferred to the outer loop: Qt frees the object as soon as that nested loop
+    // unwinds, which is still inside this readyRead emission, so Qt's own signal
+    // dispatch is left holding a freed socket. The socket is instead closed and
+    // deleted once the handlers have returned, on the code path above.
 }
