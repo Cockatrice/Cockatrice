@@ -1,0 +1,112 @@
+name: Import vcpkg cache
+
+# A pull request run can only write caches into its own refs/pull/<n>/merge scope, which
+# nothing else is allowed to restore. So after a runner image update changes every port's
+# ABI hash, the first pull request rebuilds protobuf, openssl and abseil from source and
+# the next one does the same, until somebody merges and a master run finally repopulates
+# the shared cache. This workflow takes the archives such a run produced and saves them
+# in the default branch scope instead, where every later run can restore them.
+#
+# repository_dispatch is not used on purpose: it would also resolve to the default branch,
+# but it counts as a low-trust trigger and may only write there when it declares a
+# write-capable cache-mode, which puts it in the same position as workflow_run.
+
+permissions:
+  actions: write    # needed to save entries into the default branch's cache scope
+  contents: read
+
+on:
+  workflow_run:
+    workflows: ["Build Desktop"]
+    types: [completed]
+
+# Every import writes the same scopes, so let them queue instead of racing each other
+concurrency:
+  group: vcpkg-cache-import
+  cancel-in-progress: false
+
+jobs:
+  list:
+    name: List new vcpkg entries
+    # Only a successful same-repository pull request has archives worth importing. Forks
+    # build untrusted code and must never reach a cache that master runs restore and link.
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-slim    # https://github.com/actions/runner-images/blob/main/images/ubuntu-slim/ubuntu-slim-Readme.md
+    # workflow_run is a low-trust trigger, so cache access is read-only by default even
+    # though this run resolves to the default branch. Assert below that this took effect,
+    # because a save under read-only access only warns and would import nothing silently.
+    cache-mode: write
+    outputs:
+      entries: ${{ steps.scan.outputs.entries }}
+
+    steps:
+      - name: "Download new vcpkg entries"
+        uses: actions/download-artifact@v8
+        with:
+          pattern: vcpkg-new-*
+          path: incoming
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Assert write access"
+        shell: bash
+        run: |
+          if [[ $ACTIONS_CACHE_MODE != *write* ]]; then
+            echo "::error::expected a write-capable cache, got '$ACTIONS_CACHE_MODE'"
+            exit 1
+          fi
+
+      - name: "List cache entries"
+        id: scan
+        shell: bash
+        working-directory: incoming
+        run: |
+          entries="$(find . -name keys.txt -type f -exec sh -c '
+            for manifest; do
+              artifact="$(basename "$(dirname "$manifest")")"
+              while read -r key path; do
+                printf "{\"artifact\": \"%s\", \"key\": \"%s\", \"path\": \"%s\"}\n" \
+                  "$artifact" "$key" "$path"
+              done <"$manifest"
+            done
+          ' _ {} +)"
+          [[ -n $entries ]] || exit 0
+          # Compact, because a multi line value cannot be written to GITHUB_OUTPUT
+          entries="$(jq -cs '.' <<<"$entries")"
+          echo "entries=$entries" >>"$GITHUB_OUTPUT"
+          echo "::notice::importing $(jq length <<<"$entries") vcpkg entries"
+
+  save:
+    name: "Save ${{ matrix.entry.key }}"
+    needs: list
+    if: needs.list.outputs.entries
+    runs-on: ubuntu-slim
+    cache-mode: write
+    strategy:
+      # One job per archive, they run in parallel and each only uploads a single file
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        entry: ${{ fromJSON(needs.list.outputs.entries) }}
+
+    steps:
+      - name: "Download new vcpkg entries"
+        uses: actions/download-artifact@v8
+        with:
+          pattern: ${{ matrix.entry.artifact }}
+          path: incoming
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Save vcpkg entry"
+        uses: actions/cache/save@v6
+        with:
+          # The payload is a Windows or macOS archive while the upload runs on Linux, and
+          # without this the entry would be stamped as a Linux cache that neither of them
+          # is allowed to restore.
+          enableCrossOsArchive: true
+          key: ${{ matrix.entry.key }}
+          path: incoming/${{ matrix.entry.path }}
