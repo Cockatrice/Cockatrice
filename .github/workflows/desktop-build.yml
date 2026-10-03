@@ -498,7 +498,6 @@ jobs:
           PACKAGE_SUFFIX: '${{ matrix.package_suffix }}'
           TARGET_MACOS_VERSION: '${{ matrix.override_target }}'
           USE_CCACHE: ${{ matrix.use_ccache }}
-          USE_CCACHE: ${{ matrix.use_ccache }}
           USE_SCCACHE: ${{ matrix.use_sccache }}
           # Only master may write, so a runner image update (a new VS build changes
           # every port's ABI hash) could never heal the cache: every PR paid a full
