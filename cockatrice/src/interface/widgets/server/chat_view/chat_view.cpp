@@ -2,6 +2,7 @@
 
 #include "../../../../client/settings/cache_settings.h"
 #include "../../client/sound_engine.h"
+#include "../../interface/card_localization.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../../interface/widgets/tabs/tab_account.h"
 #include "../user/user_context_menu.h"
@@ -190,7 +191,8 @@ void ChatView::appendCardTag(QTextCursor &cursor, const QString &cardName)
     QTextCharFormat cardFormat = oldFormat;
     cardFormat.setFontItalic(true);
 
-    if (!CardDatabaseManager::query()->lookupCardByName(cardName)) {
+    const CardInfoPtr card = CardDatabaseManager::query()->lookupCardByName(cardName);
+    if (card.isNull()) {
         cardFormat.setForeground(unresolvedCardTagColor);
         cursor.setCharFormat(cardFormat);
         cursor.insertText(cardName);
@@ -200,10 +202,12 @@ void ChatView::appendCardTag(QTextCursor &cursor, const QString &cardName)
 
     cardFormat.setForeground(linkColor);
     cardFormat.setAnchor(true);
+    // The href keeps the canonical name so the card popup can resolve it, while the text shows the name
+    // in the configured card language.
     cardFormat.setAnchorHref("card://" + cardName);
 
     cursor.setCharFormat(cardFormat);
-    cursor.insertText(cardName);
+    cursor.insertText(CardLocalization::displayName(card));
     cursor.setCharFormat(oldFormat);
 }
 

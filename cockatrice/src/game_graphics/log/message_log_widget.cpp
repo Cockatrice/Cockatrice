@@ -6,6 +6,7 @@
 #include "../../game/game_state.h"
 #include "../../game/phase.h"
 #include "../../game/player/player_logic.h"
+#include "../../interface/card_localization.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../board/card_item.h"
 #include "../board/translate_counter_name.h"
@@ -23,7 +24,11 @@ static QString sanitizeHtml(QString dirty)
 
 static QString cardLink(const QString &cardName)
 {
-    return QString("<i><a href=\"card://%1\">%2</a></i>").arg(cardName).arg(cardName);
+    // The href keeps the canonical name so the card popup can resolve it, while the label shows the name
+    // in the configured card language.
+    return QString("<i><a href=\"card://%1\">%2</a></i>")
+        .arg(sanitizeHtml(cardName))
+        .arg(sanitizeHtml(CardLocalization::displayNameFor(cardName)));
 }
 
 QPair<QString, QString>
@@ -803,10 +808,9 @@ void MessageLogWidget::logUndoDraw(PlayerLogic *player, QString cardName)
     if (cardName.isEmpty()) {
         appendHtmlServerMessage(tr("%1 undoes their last draw.").arg(sanitizeHtml(player->getPlayerInfo()->getName())));
     } else {
-        appendHtmlServerMessage(
-            tr("%1 undoes their last draw (%2).")
-                .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
-                .arg(QString("<a href=\"card://%1\">%2</a>").arg(sanitizeHtml(cardName)).arg(sanitizeHtml(cardName))));
+        appendHtmlServerMessage(tr("%1 undoes their last draw (%2).")
+                                    .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
+                                    .arg(cardLink(std::move(cardName))));
     }
 }
 
