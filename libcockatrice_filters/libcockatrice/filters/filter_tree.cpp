@@ -3,6 +3,7 @@
 #include "filter_card.h"
 
 #include <QList>
+#include <libcockatrice/card/game_specific_terms.h>
 
 template <class T> FilterTreeNode *FilterTreeBranch<T>::nodeAt(int i) const
 {
@@ -341,6 +342,16 @@ bool FilterItem::acceptFormat(const CardInfoPtr info) const
     return info->getLegalityProp(term.toLower()) == "legal";
 }
 
+bool FilterItem::acceptTag(const CardInfoPtr info) const
+{
+    const QString stored = info->getProperty(Mtg::Tags);
+    if (stored.isEmpty()) {
+        return false;
+    }
+    // Tags are stored space-separated; match whole slugs, not substrings.
+    return stored.split(" ", Qt::SkipEmptyParts).contains(term.trimmed(), Qt::CaseInsensitive);
+}
+
 bool FilterItem::acceptLoyalty(const CardInfoPtr info) const
 {
     if (info->getLoyalty().isEmpty()) {
@@ -495,6 +506,8 @@ bool FilterItem::acceptCardAttr(const CardInfoPtr info,
             return acceptLoyalty(info);
         case CardFilter::AttrFormat:
             return acceptFormat(info);
+        case CardFilter::AttrTag:
+            return acceptTag(info);
         case CardFilter::AttrMainType:
             return acceptMainType(info);
         case CardFilter::AttrSubType:
