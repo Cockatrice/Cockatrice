@@ -160,7 +160,7 @@ The following flags (with their non-default values) can be passed to `cmake`:
 | `-DTEST=1`                 | Enable regression tests<br> **Note:** `make test` to run tests, *googletest* will be downloaded if not available                              |
 
 > [!TIP]
-> Build our code documentation ([Doxygen](https://www.doxygen.nl)):
+> Build code documentation ([Doxygen](https://www.doxygen.nl)) according to our [configuration](https://github.com/Cockatrice/Cockatrice/blob/master/Doxyfile) into `/docs`:
 > ```bash
 > doxygen Doxyfile
 > ```
