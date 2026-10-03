@@ -7,10 +7,10 @@
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QIcon>
-#include <QLibraryInfo>
 #include <QTimer>
 #include <QTranslator>
 #include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/utility/translation_loader.h>
 
 QTranslator *translator, *qtTranslator;
 ThemeManager *themeManager;
@@ -24,24 +24,13 @@ void installNewTranslator()
 {
     QString lang = SettingsCache::instance().personal().getLang();
 
-    QString qtNameHint = "qt_" + lang;
-    QString qtTranslationPath = QLibraryInfo::path(QLibraryInfo::TranslationsPath);
-
-    bool qtTranslationLoaded = qtTranslator->load(qtNameHint, qtTranslationPath);
-    if (!qtTranslationLoaded) {
-        qDebug() << "Unable to load qt translation" << qtNameHint << "at" << qtTranslationPath;
-    } else {
-        qDebug() << "Loaded qt translation" << qtNameHint << "at" << qtTranslationPath;
-    }
+    // Qt's own strings and ours need a translator each: QTranslator discards its previous contents
+    // on every load, so loading both files into one translator silently drops the first of them.
+    TranslationLoader::loadQt(*qtTranslator, lang);
     qApp->installTranslator(qtTranslator);
 
-    QString appNameHint = translationPrefix + "_" + lang;
-    bool appTranslationLoaded = qtTranslator->load(appNameHint, translationPath);
-    if (!appTranslationLoaded) {
-        qDebug() << "Unable to load" << translationPrefix << "translation" << appNameHint << "at" << translationPath;
-    } else {
-        qDebug() << "Loaded" << translationPrefix << "translation" << appNameHint << "at" << translationPath;
-    }
+    TranslationLoader::loadApplication(*translator, translationPrefix, lang,
+                                       TranslationLoader::applicationTranslationPaths(translationPath));
     qApp->installTranslator(translator);
 }
 

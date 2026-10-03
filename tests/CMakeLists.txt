@@ -14,6 +14,10 @@ add_test(NAME server_rate_limiter_test COMMAND server_rate_limiter_test)
 add_test(NAME server_developer_role_test COMMAND server_developer_role_test)
 add_test(NAME server_game_join_test COMMAND server_game_join_test)
 add_test(NAME warning_categories_test COMMAND warning_categories_test)
+# The translation loader test compiles a .qm fixture, which needs lrelease from Qt Linguist.
+if(TARGET Qt6::lrelease)
+  add_test(NAME translation_loader_test COMMAND translation_loader_test)
+endif()
 add_test(NAME report_categories_test COMMAND report_categories_test)
 add_test(NAME lag_monitor_test COMMAND lag_monitor_test)
 add_test(NAME latency_tracker_test COMMAND latency_tracker_test)
@@ -38,6 +42,34 @@ add_executable(server_rate_limiter_test server_rate_limiter_test.cpp)
 add_executable(server_developer_role_test server_developer_role_test.cpp)
 add_executable(server_game_join_test server_game_join_test.cpp)
 add_executable(warning_categories_test warning_categories_test.cpp)
+if(TARGET Qt6::lrelease)
+  add_executable(translation_loader_test translation_loader_test.cpp)
+
+  # QTranslator only accepts real .qm files, so the translation loader test gets one compiled from its
+  # own .ts fixture rather than a stub.
+  set(TRANSLATION_LOADER_TEST_QM "${CMAKE_CURRENT_BINARY_DIR}/translation_loader_test_de.qm")
+  add_custom_command(
+    OUTPUT "${TRANSLATION_LOADER_TEST_QM}"
+    COMMAND Qt6::lrelease "${CMAKE_CURRENT_SOURCE_DIR}/translation_loader_test.ts" -qm "${TRANSLATION_LOADER_TEST_QM}"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/translation_loader_test.ts"
+    COMMENT "Compiling translation_loader_test.ts"
+  )
+  add_custom_target(translation_loader_test_qm DEPENDS "${TRANSLATION_LOADER_TEST_QM}")
+  add_dependencies(translation_loader_test translation_loader_test_qm)
+  target_compile_definitions(translation_loader_test PRIVATE TRANSLATION_LOADER_TEST_DIR="${CMAKE_CURRENT_BINARY_DIR}")
+
+  # A multi-config generator (MSBuild, Xcode) puts the executable in a per-config subdirectory while
+  # the .qm stays in the current binary directory, so copy the fixture next to the binary: that is the
+  # layout ABuildTreeFindsTheTranslationsNextToTheExecutable is about, and the only one it finds on
+  # those generators.
+  add_custom_command(
+    TARGET translation_loader_test
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${TRANSLATION_LOADER_TEST_QM}"
+            "$<TARGET_FILE_DIR:translation_loader_test>/"
+    VERBATIM
+  )
+endif()
 add_executable(report_categories_test report_categories_test.cpp)
 add_executable(lag_monitor_test ${CMAKE_SOURCE_DIR}/cockatrice/src/client/lag_monitor.cpp lag_monitor_test.cpp)
 target_include_directories(lag_monitor_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src)
@@ -104,6 +136,9 @@ if(NOT GTEST_FOUND)
   add_dependencies(server_developer_role_test gtest)
   add_dependencies(server_game_join_test gtest)
   add_dependencies(warning_categories_test gtest)
+  if(TARGET translation_loader_test)
+    add_dependencies(translation_loader_test gtest)
+  endif()
   add_dependencies(report_categories_test gtest)
   add_dependencies(lag_monitor_test gtest)
   add_dependencies(latency_tracker_test gtest)
@@ -152,6 +187,11 @@ target_link_libraries(
 target_link_libraries(
   warning_categories_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
 )
+if(TARGET translation_loader_test)
+  target_link_libraries(
+    translation_loader_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
+  )
+endif()
 target_link_libraries(
   report_categories_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
 )

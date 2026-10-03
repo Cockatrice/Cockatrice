@@ -798,6 +798,18 @@ if(Qt6LinguistTools_FOUND)
   elseif(WIN32)
     install(FILES ${cockatrice_QM} DESTINATION ${COCKATRICE_WIN32_QM_INSTALL_DIR})
   endif()
+
+  # Qt attaches the .qm files to the default build target only, so building the executable on its own
+  # (CLion, --target cockatrice) leaves it without any translations: nothing is translated and the
+  # language selector stays empty.
+  # Depend on Qt's own lrelease target instead of attaching the .qm custom commands to a second
+  # target: two independent targets owning the same outputs race on MSBuild/Makefiles and are an
+  # error on Xcode. Older Qt versions already add this dependency themselves.
+  foreach(_lrelease_target Cockatrice_lrelease cockatrice_lrelease)
+    if(TARGET ${_lrelease_target})
+      add_dependencies(cockatrice ${_lrelease_target})
+    endif()
+  endforeach()
 endif()
 
 qt6_finalize_target(cockatrice)
