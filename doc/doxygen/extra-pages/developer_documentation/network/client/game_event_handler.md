@@ -90,13 +90,13 @@ This keeps the handler independent of concrete UI implementations.
 
 `GameEventHandler` and `PlayerEventHandler` work together but have distinct roles:
 
-| GameEventHandler | PlayerEventHandler |
-|------------------|--------------------|
-| Global game state | Per-player state |
-| Turn / phase flow | Zones and cards |
-| Player join/leave | Player actions |
-| Spectator events | Player-specific events |
-| Chat dispatch | Card and zone updates |
+| GameEventHandler  | PlayerEventHandler     |
+| ----------------- | ---------------------- |
+| Global game state | Per-player state       |
+| Turn / phase flow | Zones and cards        |
+| Player join/leave | Player actions         |
+| Spectator events  | Player-specific events |
+| Chat dispatch     | Card and zone updates  |
 
 When a server event is associated with a specific player, `GameEventHandler`
 routes it to the corresponding `PlayerEventHandler`. Events without a player
