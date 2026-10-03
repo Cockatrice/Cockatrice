@@ -11,12 +11,14 @@
 # --debug or --release sets the build type ie CMAKE_BUILD_TYPE
 # --ccache [<size>] uses ccache and shows stats, optionally provide size
 # --evict-ccache <age> runs ccache eviction based on given age after build
+# --sccache uses sccache instead, needs a generator that runs the compiler itself
 # --dir <dir> sets the name of the build dir, default is "build"
 # --cmake-generator <generator> sets CMAKE_GENERATOR as used by cmake
 # --target-macos-version <version> sets the min os version - only used for macOS builds
 # --profile writes an MSBuild performance summary and binary log, Windows only
-# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_NO_CLIENT MAKE_TEST USE_CCACHE CCACHE_SIZE CCACHE_EVICTION_AGE BUILD_DIR CMAKE_GENERATOR TARGET_MACOS_VERSION BUILD_PARALLEL_LEVEL BUILD_PROFILE
-# (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir> --profile)
+# --sccache uses sccache instead, needs a generator that runs the compiler itself
+# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_NO_CLIENT MAKE_TEST USE_CCACHE CCACHE_SIZE CCACHE_EVICTION_AGE BUILD_DIR CMAKE_GENERATOR TARGET_MACOS_VERSION BUILD_PARALLEL_LEVEL BUILD_PROFILE USE_SCCACHE
+# (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir> --profile --sccache)
 # exitcode: 1 for failure, 3 for invalid arguments
 
 # Read arguments
@@ -81,6 +83,10 @@ while [[ $# != 0 ]]; do
         exit 3
       fi
       CCACHE_EVICTION_AGE=$1
+      shift
+      ;;
+    '--sccache')
+      USE_SCCACHE=1
       shift
       ;;
     '--vcpkg')
@@ -149,6 +155,16 @@ export CMAKE_POLICY_VERSION_MINIMUM=3.10
 
 # Add cmake flags
 flags=("-DCMAKE_BUILD_TYPE=$BUILDTYPE")
+if [[ $USE_CCACHE && $USE_SCCACHE ]]; then
+  echo "::error file=$0::ccache and sccache at the same time is not a supported combination"
+  exit 1
+fi
+if [[ $USE_SCCACHE && $CMAKE_GENERATOR != "Ninja"* ]]; then
+  # A compiler cache wraps the compiler, and only generators that run the compiler
+  # themselves are given a launcher to wrap: cmake does not pass one to MSBuild.
+  echo "::error file=$0::sccache needs a Ninja generator, not '$CMAKE_GENERATOR', which would ignore it"
+  exit 1
+fi
 if [[ $MAKE_SERVER ]]; then
   flags+=("-DWITH_SERVER=1")
 fi
@@ -167,6 +183,10 @@ if [[ $USE_CCACHE ]]; then
     # note, this setting persists after running the script
     ccache --max-size "$CCACHE_SIZE"
   fi
+fi
+if [[ $USE_SCCACHE ]]; then
+  flags+=("-DUSE_SCCACHE=1")
+  flags+=("-DCMAKE_C_COMPILER_LAUNCHER=sccache" "-DCMAKE_CXX_COMPILER_LAUNCHER=sccache")
 fi
 if [[ $PACKAGE_TYPE ]]; then
   flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
@@ -346,6 +366,10 @@ if [[ $USE_CCACHE ]]; then
   fi
   echo "::group::Show ccache stats again"
   ccachestatsverbose
+  echo "::endgroup::"
+elif [[ $USE_SCCACHE ]]; then
+  echo "::group::Show sccache stats"
+  sccache --show-stats
   echo "::endgroup::"
 elif [[ $CCACHE_EVICTION_AGE ]]; then
   echo "::error file=$0::ccache eviction is enabled while ccache is disabled!"

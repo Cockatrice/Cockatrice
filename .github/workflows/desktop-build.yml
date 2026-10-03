@@ -354,6 +354,7 @@ jobs:
             qt_version: 6.11.*
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             type: Release
+            use_sccache: 1
             variant: ' (Ninja)'
 
     name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}${{ matrix.variant }}
@@ -453,6 +454,20 @@ jobs:
         with:
           arch: x64
 
+      # sccache is only useful for the Ninja job: a compiler cache has to wrap the
+      # compiler, and MSBuild is driven by cmake instead of running it, so a
+      # launcher handed to MSBuild is ignored without a word.
+      - name: "[Windows/Ninja] Set up sccache"
+        if: matrix.os == 'Windows' && matrix.cmake_generator == 'Ninja'
+        uses: mozilla-actions/sccache-action@v0.0.11
+        env:
+          SCCACHE_GHA_ENABLED: "true"
+          # A fork pull request can read the cache, but the token it runs with
+          # cannot write to the base branch's scope.
+          SCCACHE_GHA_RW_MODE: ${{ github.event.pull_request.head.repo.fork && 'READ_ONLY' || 'READ_WRITE' }}
+          # A cache that cannot be reached must not fail the build.
+          SCCACHE_IGNORE_SERVER_IO_ERROR: "1"
+
       - name: "[Windows] Install NSIS"
         if: matrix.os == 'Windows'
         shell: bash
@@ -481,8 +496,9 @@ jobs:
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
           MAKE_PACKAGE: '${{ matrix.make_package }}'
           PACKAGE_SUFFIX: '${{ matrix.package_suffix }}'
-          TARGET_MACOS_VERSION: ${{ matrix.override_target }}
+          TARGET_MACOS_VERSION: '${{ matrix.override_target }}'
           USE_CCACHE: ${{ matrix.use_ccache }}
+          USE_SCCACHE: ${{ matrix.use_sccache }}
           # Only master may write, so a runner image update (a new VS build changes
           # every port's ABI hash) could never heal the cache: every PR paid a full
           # source build of protobuf, openssl and abseil until a master run happened.
