@@ -177,7 +177,11 @@ add_subdirectory(loading_from_clipboard)
 add_subdirectory(movecard_tests)
 add_subdirectory(oracle)
 add_subdirectory(settings)
-add_subdirectory(theme_migration)
+
+# theme_migration_test compiles client sources, whose headers are only reachable from a client build.
+if(WITH_CLIENT)
+  add_subdirectory(theme_migration)
+endif()
 
 # picture_loader_benchmark links libcockatrice_settings, which only exists when
 # a client/UI-capable target is being built.

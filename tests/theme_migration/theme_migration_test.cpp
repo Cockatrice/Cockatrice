@@ -144,3 +144,11 @@ TEST_F(ThemeMigrationTest, IsIdempotent)
 
     EXPECT_EQ(readThemeFile(themesPath, CURRENT, "style.css").toStdString(), std::string("css"));
 }
+
+// Every test brings its own main(): GTest is not guaranteed to be found on the build machines, and
+// the fallback then links the bare gtest library without gtest_main.
+int main(int argc, char **argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}
