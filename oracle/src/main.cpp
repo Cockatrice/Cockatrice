@@ -82,8 +82,9 @@ int main(int argc, char *argv[])
 
     QIcon icon("theme:appicon.svg");
     wizard.setWindowIcon(icon);
-    // set name of the app desktop file; used by wayland to load the window icon
-    QGuiApplication::setDesktopFileName("Oracle");
+    // Base name of the installed oracle.desktop; wayland reads the window icon from it and
+    // xdg-desktop-portal registers it as the app ID, so the case has to match the file name.
+    QGuiApplication::setDesktopFileName("oracle");
 
     wizard.show();
 

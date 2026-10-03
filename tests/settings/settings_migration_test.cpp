@@ -20,7 +20,11 @@ protected:
 
     void SetUp() override
     {
-        settingsPath = tempDir.path() + "/";
+        // Mirror the production layout: the settings folder lives inside the data folder, so
+        // migration backups (siblings of settings/) stay isolated inside tempDir instead of
+        // landing in the shared system temp directory.
+        settingsPath = tempDir.path() + "/settings/";
+        QDir().mkpath(settingsPath);
 
         // Isolate the settings used by the legacy migration tests inside the temporary
         // directory so the tests never read or write the real user config (registry on
@@ -63,6 +67,25 @@ protected:
             }
         }
         return false;
+    }
+
+    // The migration backups are timestamped, so tests address them by index rather than by name.
+    QStringList backupFolderNames() const
+    {
+        return QDir(tempDir.path())
+            .entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name)
+            .filter(QStringLiteral("settings-backup-"));
+    }
+
+    QVariant readFromBackup(const QString &folderName, const QString &fileName, const QString &key) const
+    {
+        QSettings ini(QDir::cleanPath(tempDir.path() + '/' + folderName + '/' + fileName), QSettings::IniFormat);
+        return ini.value(key);
+    }
+
+    bool backupFileExists(const QString &folderName, const QString &fileName) const
+    {
+        return QFile::exists(QDir::cleanPath(tempDir.path() + '/' + folderName + '/' + fileName));
     }
 };
 
@@ -723,6 +746,168 @@ TEST_F(SettingsMigrationTest, RenameFailureWithExistingBackup)
 
     // Second call should be a no-op
     ASSERT_FALSE(SettingsMigration::migrateSettingsFromGlobalIni(settingsPath));
+}
+
+// --- pre-migration backup of the settings folder ---
+
+TEST_F(SettingsMigrationTest, BackupHoldsPreMigrationStateOfPerDomainFiles)
+{
+    // A user already migrated once, changed a setting, then ran an older build that wrote to
+    // global.ini again. Re-migrating clobbers the per-domain file, so the backup has to hold the
+    // pre-migration value.
+    {
+        QSettings tabs(settingsPath + "tabs.ini", QSettings::IniFormat);
+        tabs.setValue("tabs/visualDeckStorage", false);
+        tabs.sync();
+    }
+    {
+        QSettings g(settingsPath + "global.ini", QSettings::IniFormat);
+        g.setValue("tabs/visualDeckStorage", true);
+        g.sync();
+    }
+
+    const QString backupPath = SettingsMigration::backupSettingsDirectory(settingsPath);
+    ASSERT_FALSE(backupPath.isEmpty());
+    ASSERT_TRUE(SettingsMigration::migrateSettingsFromGlobalIni(settingsPath));
+
+    // The migration overwrote the user's change ...
+    ASSERT_EQ(readFromIni("tabs.ini", "tabs/visualDeckStorage"), QVariant(true));
+
+    // ... but the backup still holds it, so it can be restored by hand.
+    const QStringList backups = backupFolderNames();
+    ASSERT_EQ(backups.size(), 1);
+    ASSERT_EQ(readFromBackup(backups.at(0), "tabs.ini", "tabs/visualDeckStorage"), QVariant(false));
+    ASSERT_EQ(readFromBackup(backups.at(0), "global.ini", "tabs/visualDeckStorage"), QVariant(true));
+}
+
+TEST_F(SettingsMigrationTest, BackupIsASiblingOfTheSettingsFolder)
+{
+    {
+        QSettings g(settingsPath + "global.ini", QSettings::IniFormat);
+        g.setValue("sound/enabled", true);
+        g.sync();
+    }
+
+    const QString backupPath = SettingsMigration::backupSettingsDirectory(settingsPath);
+    ASSERT_FALSE(backupPath.isEmpty());
+
+    const QDir backupDir(backupPath);
+    ASSERT_TRUE(backupDir.dirName().startsWith("settings-backup-"));
+    // Same parent as the settings folder, and not inside it, so a backup is never copied into
+    // another backup and "Open settings folder" shows only live files.
+    ASSERT_EQ(QDir::cleanPath(backupDir.absolutePath() + "/.."), QDir::cleanPath(tempDir.path()));
+    ASSERT_FALSE(backupDir.absolutePath().startsWith(QDir::cleanPath(settingsPath) + '/'));
+    ASSERT_TRUE(backupFileExists(backupDir.dirName(), "global.ini"));
+}
+
+TEST_F(SettingsMigrationTest, BackupCopiesNestedFolders)
+{
+    ASSERT_TRUE(QDir().mkpath(settingsPath + "nested"));
+    {
+        QFile f(settingsPath + "nested/deep.ini");
+        ASSERT_TRUE(f.open(QIODevice::WriteOnly));
+        f.write("[visualDeckStorage]\nfirstDeck=1234\n");
+    }
+    {
+        QSettings g(settingsPath + "global.ini", QSettings::IniFormat);
+        g.setValue("sound/enabled", true);
+        g.sync();
+    }
+
+    const QString backupPath = SettingsMigration::backupSettingsDirectory(settingsPath);
+    ASSERT_FALSE(backupPath.isEmpty());
+
+    const QStringList backups = backupFolderNames();
+    ASSERT_EQ(backups.size(), 1);
+    ASSERT_TRUE(backupFileExists(backups.at(0), "nested/deep.ini"));
+    ASSERT_EQ(readFromBackup(backups.at(0), "nested/deep.ini", "visualDeckStorage/firstDeck"), QVariant("1234"));
+}
+
+TEST_F(SettingsMigrationTest, NoBackupWhenSettingsFolderIsEmpty)
+{
+    ASSERT_TRUE(SettingsMigration::backupSettingsDirectory(settingsPath).isEmpty());
+    ASSERT_TRUE(backupFolderNames().isEmpty());
+}
+
+TEST_F(SettingsMigrationTest, NoBackupWhenEverySettingsFileIsEmpty)
+{
+    // A fresh profile: QSettings has created global.ini, but it holds nothing worth preserving.
+    {
+        QFile f(settingsPath + "global.ini");
+        ASSERT_TRUE(f.open(QIODevice::WriteOnly));
+        f.close();
+    }
+
+    ASSERT_TRUE(SettingsMigration::backupSettingsDirectory(settingsPath).isEmpty());
+    ASSERT_TRUE(backupFolderNames().isEmpty());
+}
+
+TEST_F(SettingsMigrationTest, BackupFailsGracefullyOnMissingSettingsFolder)
+{
+    ASSERT_TRUE(SettingsMigration::backupSettingsDirectory(tempDir.path() + "/does-not-exist/").isEmpty());
+}
+
+TEST_F(SettingsMigrationTest, BackupKeepsEveryPreviousSnapshot)
+{
+    {
+        QSettings g(settingsPath + "global.ini", QSettings::IniFormat);
+        g.setValue("sound/enabled", true);
+        g.sync();
+    }
+
+    ASSERT_FALSE(SettingsMigration::backupSettingsDirectory(settingsPath).isEmpty());
+    ASSERT_FALSE(SettingsMigration::backupSettingsDirectory(settingsPath).isEmpty());
+
+    // A second snapshot in the same second must not merge into the first one.
+    const QStringList backups = backupFolderNames();
+    ASSERT_EQ(backups.size(), 2);
+    ASSERT_NE(backups.at(0), backups.at(1));
+}
+
+TEST_F(SettingsMigrationTest, IsMigrationPendingWhenGlobalIniHasKeys)
+{
+    {
+        QSettings g(settingsPath + "global.ini", QSettings::IniFormat);
+        g.setValue("sound/enabled", true);
+        g.sync();
+    }
+
+    ASSERT_TRUE(SettingsMigration::isMigrationPending(settingsPath));
+}
+
+TEST_F(SettingsMigrationTest, IsNotMigrationPendingAfterSentinelIsSet)
+{
+    {
+        QSettings g(settingsPath + "global.ini", QSettings::IniFormat);
+        g.setValue("sound/enabled", true);
+        g.sync();
+    }
+    ASSERT_TRUE(SettingsMigration::migrateSettingsFromGlobalIni(settingsPath));
+
+    // The sentinel-only global.ini and the legacy sentinel leave nothing to migrate.
+    {
+        QSettings personal(settingsPath + "personal.ini", QSettings::IniFormat);
+        personal.setValue("migration/legacy_complete", true);
+        personal.sync();
+    }
+    ASSERT_FALSE(SettingsMigration::isMigrationPending(settingsPath));
+}
+
+TEST_F(SettingsMigrationTest, IsMigrationPendingWhenOnlyLegacySettingsRemain)
+{
+    QSettings().setValue("server/host", "example.com");
+    QSettings().sync();
+
+    ASSERT_TRUE(SettingsMigration::isMigrationPending(settingsPath));
+}
+
+TEST_F(SettingsMigrationTest, IsNotMigrationPendingWithoutLegacyData)
+{
+    // Nothing to migrate: a fresh profile must not leave a backup folder behind on every start.
+    QSettings().clear();
+    QSettings().sync();
+
+    ASSERT_FALSE(SettingsMigration::isMigrationPending(settingsPath));
 }
 
 } // namespace
