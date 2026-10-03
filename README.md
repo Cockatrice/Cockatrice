@@ -159,6 +159,12 @@ The following flags (with their non-default values) can be passed to `cmake`:
 | `-DUPDATE_TRANSLATIONS=1`  |  Configure `make` to update the translation .ts files for new strings in the source code<br> **Note:** `make clean` will remove the .ts files |
 | `-DTEST=1`                 | Enable regression tests<br> **Note:** `make test` to run tests, *googletest* will be downloaded if not available                              |
 
+> [!TIP]
+> Build code documentation ([Doxygen](https://www.doxygen.nl)) according to our [configuration](https://github.com/Cockatrice/Cockatrice/blob/master/Doxyfile) into `/docs`:
+> ```bash
+> doxygen Doxyfile
+> ```
+
 
 # Run
 
