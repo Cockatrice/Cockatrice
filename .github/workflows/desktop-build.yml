@@ -416,8 +416,6 @@ jobs:
         if: matrix.os == 'Windows'
         uses: jurplel/install-qt-action@v4
         with:
-          # Qt 6.11.0 only works with aqtinstall directly from git until aqtinstall 3.4 is released
-          aqtsource: git+https://github.com/miurahr/aqtinstall.git
           cache: ${{ github.ref == 'refs/heads/master' }}
           cache-key-prefix: Qt
           modules: ${{ matrix.qt_modules }}
