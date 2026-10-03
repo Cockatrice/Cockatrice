@@ -328,6 +328,10 @@ jobs:
             target: 10
             runner: windows-2025    # https://github.com/actions/runner-images/blob/main/images/windows/Windows2025-VS2026-Readme.md
 
+            # Set build_profile: 1 to have the build write an MSBuild performance
+            # summary and a binary log; empty on every entry that runs by default.
+            build_profile: ''
+
             cmake_generator: "Visual Studio 18 2026"
             cmake_generator_platform: x64
             make_package: 1
@@ -341,6 +345,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 100
     env:
+      BUILD_PROFILE: '${{ matrix.build_profile }}'
       CCACHE_DIR: ${{ github.workspace }}/.cache/
       CCACHE_SIZE: 600M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
 
@@ -559,6 +564,17 @@ jobs:
             build/cockatrice/Release/*.pdb
             build/oracle/Release/*.pdb
             build/servatrice/Release/*.pdb
+
+      # Written only when the matrix entry sets build_profile, so the artifact
+      # exists exactly on the runs that were asked to produce one.
+      - name: "[Windows] Upload MSBuild binary log"
+        if: always() && matrix.os == 'Windows' && env.BUILD_PROFILE == '1'
+        uses: actions/upload-artifact@v7
+        with:
+          if-no-files-found: error
+          name: ${{ steps.build.outputs.name }}-msbuild
+          path: build/msbuild.binlog
+          retention-days: 7
 
       - name: "Upload to release"
         if: needs.configure.outputs.tag != null && matrix.make_package == '1'
