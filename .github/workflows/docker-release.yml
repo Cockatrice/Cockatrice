@@ -147,8 +147,9 @@ jobs:
           images: ${{ env.GHCR_IMAGE }}
           flavor: |
             latest=auto
+          # if semver, also: type=semver,pattern={{version}} / {{major}}.{{minor}}
           tags: |
-            type=ref,event=tag    # if semver, also: type=semver,pattern={{version}} / {{major}}.{{minor}}
+            type=ref,event=tag
 
       # Add OCI annotations to image index and publish tags
       - name: "Create image index"
