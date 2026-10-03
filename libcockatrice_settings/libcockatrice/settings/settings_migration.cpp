@@ -9,6 +9,7 @@
 #include <QMap>
 #include <QSettings>
 #include <QStringList>
+#include <algorithm>
 
 inline Q_LOGGING_CATEGORY(SettingsMigrationLog, "settings_migration");
 
@@ -31,10 +32,11 @@ static bool hasPendingGlobalIniSettings(const QString &settingsPath)
         return true;
     }
 
-    globalIni.sync();
-    auto allKeys = globalIni.allKeys();
-    allKeys.removeAll(MIGRATION_SENTINEL_KEY);
-    return !allKeys.isEmpty();
+    // The sentinel is set, so any key besides it was written after the migration, i.e. by an
+    // older build sharing this file. Those are exactly the keys to re-migrate.
+    QStringList otherKeys = globalIni.allKeys();
+    otherKeys.removeAll(MIGRATION_SENTINEL_KEY);
+    return !otherKeys.isEmpty();
 }
 
 static void migrateTabsSettings(const QString &settingsPath, QSettings &globalIni)
@@ -750,13 +752,8 @@ QString SettingsMigration::backupSettingsDirectory(const QString &settingsPath)
     // A profile holding nothing but empty files has nothing to lose, and backing it up would only
     // leave clutter next to the settings folder.
     const QFileInfoList files = settingsDir.entryInfoList(fileFilters);
-    bool hasContent = false;
-    for (const auto &file : files) {
-        if (file.size() > 0) {
-            hasContent = true;
-            break;
-        }
-    }
+    const bool hasContent =
+        std::any_of(files.cbegin(), files.cend(), [](const QFileInfo &file) { return file.size() > 0; });
     if (!hasContent) {
         return QString();
     }

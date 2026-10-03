@@ -390,8 +390,11 @@ int main(int argc, char *argv[])
     qCInfo(MainLog) << "MainWindow constructor finished";
 
     ui.setWindowIcon(themePixmap(QStringLiteral("cockatrice")));
-    // Set name of the app desktop file; used by wayland to load the window icon
-    QGuiApplication::setDesktopFileName("Cockatrice");
+    // Base name of the desktop file installed next to the binary, without the ".desktop"
+    // extension. Wayland reads the window icon from it, and xdg-desktop-portal looks up
+    // org.freedesktop.host.portal.Registry by this app ID, so it has to match the file name
+    // exactly, down to the case.
+    QGuiApplication::setDesktopFileName("cockatrice");
 
     SettingsCache::instance().network().setClientID(generateClientID());
 
