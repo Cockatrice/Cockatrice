@@ -53,6 +53,18 @@ add_custom_command(
 add_custom_target(translation_loader_test_qm DEPENDS "${TRANSLATION_LOADER_TEST_QM}")
 add_dependencies(translation_loader_test translation_loader_test_qm)
 target_compile_definitions(translation_loader_test PRIVATE TRANSLATION_LOADER_TEST_DIR="${CMAKE_CURRENT_BINARY_DIR}")
+
+# A multi-config generator (MSBuild, Xcode) puts the executable in a per-config subdirectory while
+# the .qm stays in the current binary directory, so copy the fixture next to the binary: that is the
+# layout ABuildTreeFindsTheTranslationsNextToTheExecutable is about, and the only one it finds on
+# those generators.
+add_custom_command(
+  TARGET translation_loader_test
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different "${TRANSLATION_LOADER_TEST_QM}"
+          "$<TARGET_FILE_DIR:translation_loader_test>/"
+  VERBATIM
+)
 add_executable(report_categories_test report_categories_test.cpp)
 add_executable(lag_monitor_test ${CMAKE_SOURCE_DIR}/cockatrice/src/client/lag_monitor.cpp lag_monitor_test.cpp)
 target_include_directories(lag_monitor_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src)
