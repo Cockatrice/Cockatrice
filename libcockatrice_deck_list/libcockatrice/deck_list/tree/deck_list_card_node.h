@@ -14,7 +14,11 @@
 
 #include "abstract_deck_list_card_node.h"
 
+#include <QString>
 #include <libcockatrice/utility/card_ref.h>
+#include <utility>
+
+class InnerDecklistNode;
 
 /**
  * @class DecklistCardNode

@@ -2,6 +2,7 @@
 #define COCKATRICE_SIDEBOARD_PLAN_H
 
 #include <QList>
+#include <QString>
 #include <libcockatrice/protocol/pb/move_card_to_zone.pb.h>
 
 class QXmlStreamWriter;

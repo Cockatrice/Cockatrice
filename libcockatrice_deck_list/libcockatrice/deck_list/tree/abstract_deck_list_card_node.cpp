@@ -1,5 +1,10 @@
 #include "abstract_deck_list_card_node.h"
 
+#include "libcockatrice/deck_list/tree/abstract_deck_list_node.h"
+
+#include <QXmlStreamWriter>
+#include <compare>
+
 bool AbstractDecklistCardNode::compare(AbstractDecklistNode *other) const
 {
     switch (sortMethod) {

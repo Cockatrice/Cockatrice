@@ -19,7 +19,13 @@
 #include "abstract_deck_list_node.h"
 
 #include <QList>
+#include <QPair>
 #include <QString>
+#include <QVector>
+#include <qnamespace.h>
+#include <utility>
+
+class QXmlStreamReader;
 
 /** @brief Constant for the "main" deck zone name. */
 #define DECK_ZONE_MAIN "main"

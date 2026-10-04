@@ -2,16 +2,25 @@
 
 #include "deck_list_memento.h"
 #include "deck_list_plain_text_parser.h"
-#include "tree/abstract_deck_list_node.h"
+#include "libcockatrice/deck_list/deck_list_node_tree.h"
+#include "libcockatrice/deck_list/sideboard_plan.h"
+#include "libcockatrice/utility/playmat_params.h"
 #include "tree/deck_list_card_node.h"
 #include "tree/inner_deck_list_node.h"
 
-#include <QCryptographicHash>
+#include <QAnyStringView>
 #include <QDebug>
-#include <QFile>
 #include <QSet>
+#include <QSharedPointer>
+#include <QStringView>
 #include <QTextStream>
+#include <QXmlStreamAttributes>
+#include <QXmlStreamReader>
+#include <QXmlStreamWriter>
 #include <algorithm>
+#include <iterator>
+#include <qlogging.h>
+#include <qminmax.h>
 
 static const QString CURRENT_SIDEBOARD_PLAN_KEY = "";
 
