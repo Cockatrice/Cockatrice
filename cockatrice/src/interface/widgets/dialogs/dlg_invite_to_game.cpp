@@ -6,13 +6,18 @@
 
 #include <QGuiApplication>
 #include <QHBoxLayout>
-#include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QRect>
 #include <QScreen>
+#include <QSize>
 #include <QUrl>
 #include <QUrlQuery>
 #include <QVBoxLayout>
+#include <functional>
+#include <qminmax.h>
+
+class QWidget;
 
 DlgInviteToGame::DlgInviteToGame(TabSupervisor *_tabSupervisor,
                                  const QString &_inviteUrl,

@@ -3,11 +3,13 @@
 
 #include "abstract_settings_page.h"
 
-#include <QComboBox>
-#include <QGroupBox>
 #include <QLabel>
 #include <QPushButton>
 #include <QSpinBox>
+#include <qtmetamacros.h>
+
+class QComboBox;
+class QGroupBox;
 
 class StorageSettingsPage : public AbstractSettingsPage
 {

@@ -1,12 +1,35 @@
 #include "filter_string.h"
 
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/card_localization.h"
+#include "libcockatrice/card/database/card_database.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/card/set/card_set_list.h"
+
 #include <QByteArray>
+#include <QChar>
+#include <QDate>
 #include <QDebug>
+#include <QList>
+#include <QMessageLogger>
 #include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QSharedPointer>
 #include <QString>
+#include <QStringList>
+#include <algorithm>
+#include <any>
+#include <ctype.h>
 #include <functional>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/utility/peglib.h>
+#include <mutex>
+#include <qnamespace.h>
+#include <stddef.h>
+#include <string>
+#include <string_view>
+#include <vector>
 
 static peg::parser search(R"(
 Start <- QueryPartList

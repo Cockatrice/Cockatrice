@@ -1,5 +1,7 @@
 #include "player_info.h"
 
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+
 PlayerInfo::PlayerInfo(const ServerInfo_User &info, int _id, bool _local, bool _judge)
     : id(_id), local(_local), judge(_judge)
 {

@@ -8,7 +8,14 @@
 #define COCKATRICE_PLAYER_AREA_H
 
 #include "../board/graphics_item_type.h"
-#include "QGraphicsItem"
+
+#include <QGraphicsItem>
+#include <QObject>
+#include <QRectF>
+#include <qtmetamacros.h>
+#include <qtypes.h>
+
+class QGraphicsItem;
 
 /**
  * The entire graphical area belonging to a single player.

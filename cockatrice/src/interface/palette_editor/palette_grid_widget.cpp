@@ -1,14 +1,25 @@
 #include "palette_grid_widget.h"
 
+#include "../theme_config.h"
 #include "../theme_manager.h"
+#include "color_button.h"
 
 #include <QApplication>
+#include <QColor>
+#include <QEvent>
+#include <QFont>
+#include <QFrame>
 #include <QGridLayout>
 #include <QLabel>
 #include <QMetaEnum>
 #include <QScrollArea>
+#include <QString>
+#include <QStringList>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <QtTranslation>
+#include <qnamespace.h>
+#include <utility>
 
 static QList<QPalette::ColorRole> allRoles()
 {

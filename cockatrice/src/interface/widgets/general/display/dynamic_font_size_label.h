@@ -9,6 +9,12 @@
 
 #include <QColor>
 #include <QLabel>
+#include <QString>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
+#include <stddef.h>
+
+class QWidget;
 
 class DynamicFontSizeLabel : public QLabel
 {

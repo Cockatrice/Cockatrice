@@ -5,7 +5,10 @@
 #include "sfmt/SFMT.h"
 
 #include <QMutex>
-#include <climits>
+#include <qtmetamacros.h>
+#include <stdint.h>
+
+class QObject;
 
 /**
  * This class encapsulates a state of the art PRNG and can be used

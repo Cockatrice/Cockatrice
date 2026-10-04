@@ -3,7 +3,24 @@
 #include "cache_settings.h"
 #include "shortcuts_settings.h"
 
+#include <QAbstractItemModel>
+#include <QAbstractItemView>
+#include <QFont>
+#include <QHash>
 #include <QHeaderView>
+#include <QList>
+#include <QModelIndex>
+#include <QRegularExpression>
+#include <QSharedPointer>
+#include <QStandardItem>
+#include <QStandardItemModel>
+#include <QStringList>
+#include <QVariant>
+#include <algorithm>
+#include <qnamespace.h>
+
+class QObject;
+class QWidget;
 
 ShortcutFilterProxyModel::ShortcutFilterProxyModel(QObject *parent) : QSortFilterProxyModel(parent)
 {

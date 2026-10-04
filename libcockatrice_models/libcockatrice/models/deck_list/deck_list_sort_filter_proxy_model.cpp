@@ -1,6 +1,16 @@
 #include "deck_list_sort_filter_proxy_model.h"
 
 #include "deck_list_model.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_manager.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+
+#include <QAbstractItemModel>
+#include <QModelIndex>
+#include <QSharedPointer>
+#include <QVariant>
+#include <qnamespace.h>
 
 bool DeckListSortFilterProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
 {

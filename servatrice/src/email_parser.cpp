@@ -1,6 +1,8 @@
 #include "email_parser.h"
 
 #include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QSharedPointer>
 #include <QString>
 
 QPair<QString, QString> EmailParser::parseEmailAddress(const QString &dirtyEmailAddress)

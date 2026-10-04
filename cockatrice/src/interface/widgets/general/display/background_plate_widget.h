@@ -2,6 +2,7 @@
 #define COCKATRICE_BACKGROUND_PLATE_WIDGET_H
 
 #include <QWidget>
+#include <qtmetamacros.h>
 
 class BackgroundPlateWidget : public QWidget
 {

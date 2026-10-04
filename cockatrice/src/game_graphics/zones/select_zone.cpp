@@ -1,13 +1,25 @@
 #include "select_zone.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "../../game/board/card_list.h"
+#include "../../game/zones/card_zone_logic.h"
 #include "../board/card_item.h"
 #include "../game_scene.h"
 
+#include <QBrush>
+#include <QGraphicsItem>
 #include <QGraphicsRectItem>
+#include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
+#include <QPen>
+#include <QPoint>
+#include <QRectF>
+#include <QTransform>
 #include <QtMath>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <qminmax.h>
+#include <qnamespace.h>
+#include <qnumeric.h>
 
 static qreal stackingOffset(qreal cardHeight)
 {

@@ -1,7 +1,7 @@
 #include "dlg_convert_deck_to_cod_format.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../deck_loader/deck_loader.h"
+#include "../../deck_loader/deck_file_format.h"
 
 #include <QCheckBox>
 #include <QDialogButtonBox>
@@ -10,6 +10,7 @@
 #include <QFileInfo>
 #include <QLabel>
 #include <QMessageBox>
+#include <QObject>
 #include <QVBoxLayout>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
 

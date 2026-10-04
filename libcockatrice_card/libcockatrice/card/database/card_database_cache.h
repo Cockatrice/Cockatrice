@@ -1,10 +1,11 @@
 #ifndef CARDDATABASE_CACHE_H
 #define CARDDATABASE_CACHE_H
 
-#include "card_database_data.h"
+#include <QString>
 
-#include <QByteArray>
-#include <libcockatrice/interfaces/interface_card_set_priority_controller.h>
+class ICardSetPriorityController;
+class QByteArray;
+struct CardDatabaseData;
 
 namespace CardDatabaseCache
 {

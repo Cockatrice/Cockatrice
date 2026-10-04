@@ -5,6 +5,8 @@
 #include <QEvent>
 #include <QLoggingCategory>
 #include <gtest/gtest.h>
+#include <qnumeric.h>
+#include <string>
 
 namespace
 {

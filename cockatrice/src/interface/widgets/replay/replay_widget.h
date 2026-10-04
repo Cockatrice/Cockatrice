@@ -8,15 +8,18 @@
 #ifndef REPLAY_WIDGET_H
 #define REPLAY_WIDGET_H
 
-#include "replay_timeline_widget.h"
+#include "../../../game/player/event_processing_options.h"
 
-#include <QToolButton>
 #include <QWidget>
-#include <libcockatrice/protocol/pb/game_replay.pb.h>
+#include <qtmetamacros.h>
 
 class ReplayManager;
 class ReplayQuickSettingsWidget;
-class TabGame;
+class GameEventContainer;
+class GameReplay;
+class QAction;
+class QToolButton;
+class ReplayTimelineWidget;
 
 /**
  * @brief The top-level widget that is put in the replay dock widget.

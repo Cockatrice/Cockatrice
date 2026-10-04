@@ -3,8 +3,17 @@
 #include "../../../../client/settings/cache_settings.h"
 #include "../../../pixel_map_generator.h"
 
+#include <QGraphicsOpacityEffect>
+#include <QPixmap>
 #include <QResizeEvent>
+#include <QSharedPointer>
+#include <QSize>
+#include <QtPreprocessorSupport>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <qtypes.h>
+#include <utility>
+
+class QWidget;
 
 ManaSymbolWidget::ManaSymbolWidget(QWidget *parent, QString _symbol, bool _isActive, bool _mayBeToggled)
     : QLabel(parent), symbol(std::move(_symbol)), isActive(_isActive), mayBeToggled(_mayBeToggled)

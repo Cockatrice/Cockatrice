@@ -8,25 +8,32 @@
 #ifndef TAB_SUPERVISOR_H
 #define TAB_SUPERVISOR_H
 
-#include "../../deck_loader/deck_loader.h"
 #include "../interface/widgets/server/game_link.h"
-#include "../interface/widgets/server/user/user_list_proxy.h"
-#include "abstract_tab_deck_editor.h"
-#include "api/archidekt/tab_archidekt.h"
-#include "api/edhrec/tab_edhrec.h"
-#include "api/edhrec/tab_edhrec_main.h"
-#include "tab_visual_database_display.h"
-#include "visual_deck_editor/tab_deck_editor_visual.h"
-#include "visual_deck_storage/tab_deck_storage_visual.h"
+#include "libcockatrice/card/card_info.h"
 
 #include <QAbstractButton>
+#include <QList>
 #include <QLoggingCategory>
 #include <QMap>
 #include <QProxyStyle>
+#include <QSize>
+#include <QString>
 #include <QTabWidget>
 #include <libcockatrice/network/client/abstract/latency_tracker.h>
+#include <qtmetamacros.h>
 
 class TabCardArtRules;
+class AbstractTabDeckEditor;
+class QAction;
+class QWidget;
+class TabArchidekt;
+class TabDeckEditorVisual;
+class TabDeckStorageVisual;
+class TabEdhRec;
+class TabEdhRecMain;
+class TabVisualDatabaseDisplay;
+struct LoadedDeck;
+
 inline Q_LOGGING_CATEGORY(TabSupervisorLog, "tab_supervisor");
 
 class UserListManager;
@@ -56,7 +63,6 @@ class Event_NotifyUser;
 class ServerInfo_Room;
 class ServerInfo_User;
 class GameReplay;
-class DeckList;
 
 class MacOSTabFixStyle : public QProxyStyle
 {

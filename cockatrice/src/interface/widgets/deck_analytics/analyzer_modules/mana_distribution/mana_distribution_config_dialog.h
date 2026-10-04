@@ -4,14 +4,15 @@
 #include "mana_distribution_config.h"
 
 #include <QDialog>
-#include <QDialogButtonBox>
-#include <QLabel>
-#include <QStringList>
+#include <qtmetamacros.h>
 
 class QComboBox;
 class QListWidget;
 class QCheckBox;
 class DeckListStatisticsAnalyzer;
+class QDialogButtonBox;
+class QLabel;
+class QWidget;
 
 class ManaDistributionConfigDialog : public QDialog
 {

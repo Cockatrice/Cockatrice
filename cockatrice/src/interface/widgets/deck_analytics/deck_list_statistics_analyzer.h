@@ -1,10 +1,12 @@
 #ifndef COCKATRICE_DECK_LIST_STATISTICS_ANALYZER_H
 #define COCKATRICE_DECK_LIST_STATISTICS_ANALYZER_H
 
-#include "deck_list_model.h"
-
 #include <QHash>
+#include <QList>
 #include <QObject>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
 #include <unordered_map>
 
 class DeckListModel;

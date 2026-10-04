@@ -1,26 +1,53 @@
 #include "player_graphics_item.h"
 
+#include "../../client/settings/cache_settings.h"
+#include "../../game/board/counter_state.h"
 #include "../../game/player/player_actions.h"
+#include "../../game/player/player_info.h"
+#include "../../game/player/player_logic.h"
+#include "../../game/zones/card_zone_logic.h"
+#include "../../game/zones/hand_zone_logic.h"
+#include "../../game/zones/pile_zone_logic.h"
+#include "../../game/zones/stack_zone_logic.h"
+#include "../../game/zones/table_zone_logic.h"
 #include "../../interface/card_picture_loader/card_picture_loader.h"
 #include "../../interface/widgets/cards/art_crop_attribution.h"
 #include "../../interface/widgets/cards/card_art_utils.h"
 #include "../../interface/widgets/playmat/playmat_utils.h"
-#include "../../interface/widgets/tabs/tab_game.h"
-#include "../board/abstract_card_item.h"
+#include "../board/abstract_counter.h"
 #include "../board/counter_general.h"
+#include "../card_dimensions.h"
 #include "../hand_counter.h"
 #include "../zones/hand_zone.h"
 #include "../zones/pile_zone.h"
 #include "../zones/stack_zone.h"
 #include "../zones/table_zone.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/interfaces/interface_interface_settings_provider.h"
+#include "libcockatrice/utility/card_ref.h"
 #include "menu/player_menu.h"
+#include "player_area.h"
 #include "player_dialogs.h"
+#include "player_target.h"
 
-#include <QGraphicsView>
+#include <QList>
+#include <QMapIterator>
+#include <QMenu>
+#include <QPainter>
+#include <QPoint>
+#include <QPointF>
+#include <QRect>
+#include <QSharedPointer>
+#include <QTransform>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/playmat_resolver.h>
 #include <libcockatrice/settings/interface_settings.h>
+#include <qminmax.h>
+#include <qnamespace.h>
+#include <qnumeric.h>
 
 PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
 {

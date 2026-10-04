@@ -2,10 +2,11 @@
 #define REPORT_UTILS_H
 
 #include <QString>
-#include <libcockatrice/protocol/pb/serverinfo_report.pb.h>
+#include <qtypes.h>
 
 class QTableWidget;
 class QTextEdit;
+class ServerInfo_Report;
 
 namespace report_utils
 {

@@ -2,10 +2,16 @@
 #define COCKATRICE_XML4_H
 
 #include "card_database_parser.h"
+#include "libcockatrice/card/card_info.h"
 
+#include <QHash>
 #include <QLoggingCategory>
-#include <QXmlStreamReader>
-#include <libcockatrice/interfaces/interface_card_preference_provider.h>
+#include <QString>
+#include <qtmetamacros.h>
+
+class ICardPreferenceProvider;
+class ICardSetPriorityController;
+class QXmlStreamReader;
 
 inline Q_LOGGING_CATEGORY(CockatriceXml4Log, "cockatrice_xml.xml_4_parser");
 

@@ -1,8 +1,14 @@
 #include "intent_connect_to_server.h"
 
+#include "contexts/context_connect_to_server.h"
 #include "intent_disconnect_from_server.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "remote_client.h"
 
 #include <QTimer>
+#include <qtypes.h>
+
+template <typename T> class QList;
 
 IntentConnectToServer::IntentConnectToServer(RemoteClient *_remoteClient, ContextConnectToServer *_context)
     : Intent(), remoteClient(_remoteClient), context(_context)

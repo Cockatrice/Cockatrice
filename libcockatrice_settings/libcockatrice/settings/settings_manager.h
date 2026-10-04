@@ -7,9 +7,12 @@
 #ifndef SETTINGSMANAGER_H
 #define SETTINGSMANAGER_H
 
+#include <QObject>
 #include <QSettings>
-#include <QStringList>
+#include <QString>
 #include <QVariant>
+#include <functional>
+#include <qtmetamacros.h>
 
 class SettingsManager : public QObject
 {

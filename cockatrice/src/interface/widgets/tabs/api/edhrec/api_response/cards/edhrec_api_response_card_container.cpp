@@ -3,6 +3,9 @@
 #include <QDebug>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QJsonValue>
+#include <QJsonValueRef>
+#include <qlogging.h>
 
 void EdhrecApiResponseCardContainer::fromJson(const QJsonObject &json)
 {

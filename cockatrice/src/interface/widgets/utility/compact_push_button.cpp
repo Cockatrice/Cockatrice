@@ -1,5 +1,9 @@
 #include "compact_push_button.h"
 
+#include <QFontMetrics>
+#include <QSizePolicy>
+#include <QWidget>
+
 CompactPushButton::CompactPushButton(QWidget *parent) : QPushButton(parent)
 {
     setCheckable(true);

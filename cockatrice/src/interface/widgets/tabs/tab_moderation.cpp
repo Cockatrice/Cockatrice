@@ -1,8 +1,13 @@
 #include "tab_moderation.h"
 
 #include "abstract_client.h"
-#include "tab_supervisor.h"
+#include "libcockatrice/protocol/pb/admin_commands.pb.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_moderator_login.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user_alt.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user_session.pb.h"
 
+#include <QAbstractItemView>
 #include <QDateTime>
 #include <QGridLayout>
 #include <QGroupBox>
@@ -10,12 +15,17 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <QLineEdit>
+#include <QList>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSharedPointer>
 #include <QSplitter>
+#include <QStringList>
 #include <QTableWidget>
+#include <QTableWidgetItem>
 #include <QTextEdit>
 #include <QVBoxLayout>
+#include <QWidget>
 #include <libcockatrice/protocol/pb/command_report_user_info.pb.h>
 #include <libcockatrice/protocol/pb/moderator_commands.pb.h>
 #include <libcockatrice/protocol/pb/response_moderator_last_logins.pb.h>
@@ -26,6 +36,10 @@
 #include <libcockatrice/protocol/pb/response_user_sessions.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <qnamespace.h>
+#include <string>
+
+class TabSupervisor;
 
 namespace
 {

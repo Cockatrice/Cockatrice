@@ -1,11 +1,15 @@
 #ifndef COCKATRICE_MANA_CURVE_TOTAL_WIDGET_H
 #define COCKATRICE_MANA_CURVE_TOTAL_WIDGET_H
-#include "../../../general/display/charts/bars/bar_chart_widget.h"
-#include "mana_curve_config.h"
-
-#include <QHBoxLayout>
-#include <QLabel>
+#include <QString>
+#include <QStringList>
 #include <QWidget>
+#include <qtmetamacros.h>
+
+class BarChartWidget;
+class QHBoxLayout;
+class QLabel;
+struct ManaCurveConfig;
+template <class Key, class T> class QMap;
 
 class ManaCurveTotalWidget : public QWidget
 {

@@ -1,8 +1,19 @@
 #include "visual_database_display_color_filter_widget.h"
 
 #include "../cards/additional_info/mana_symbol_widget.h"
+#include "filter_tree_model.h"
+#include "libcockatrice/filters/filter_card.h"
 
+#include <QAbstractItemModel>
+#include <QComboBox>
+#include <QDebug>
+#include <QHBoxLayout>
+#include <QOverload>
+#include <QPersistentModelIndex>
+#include <QSharedPointer>
+#include <QString>
 #include <QTimer>
+#include <QVariant>
 #include <libcockatrice/filters/filter_tree.h>
 
 /**

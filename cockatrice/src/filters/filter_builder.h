@@ -8,8 +8,8 @@
 #define FILTERBUILDER_H
 
 #include <QWidget>
+#include <qtmetamacros.h>
 
-class QCheckBox;
 class QComboBox;
 class LineEditUnfocusable;
 class CardFilter;

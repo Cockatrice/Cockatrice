@@ -7,9 +7,12 @@
 #ifndef DYNAMICFONTSIZEPUSHBUTTON_H
 #define DYNAMICFONTSIZEPUSHBUTTON_H
 
-#include <QObject>
+#include <QColor>
 #include <QPushButton>
-#include <QWidget>
+#include <QString>
+#include <stddef.h>
+
+class QWidget;
 
 class DynamicFontSizePushButton : public QPushButton
 {

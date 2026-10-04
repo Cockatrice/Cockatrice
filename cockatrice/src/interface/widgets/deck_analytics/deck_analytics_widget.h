@@ -7,19 +7,22 @@
 #ifndef DECK_ANALYTICS_WIDGET_H
 #define DECK_ANALYTICS_WIDGET_H
 
-#include "../general/layout_containers/flow_widget.h"
-#include "abstract_analytics_panel_widget.h"
-#include "deck_list_statistics_analyzer.h"
-#include "resizable_panel.h"
-
-#include <QCheckBox>
 #include <QJsonObject>
-#include <QScrollArea>
-#include <QVBoxLayout>
+#include <QList>
+#include <QString>
 #include <QVector>
 #include <QWidget>
+#include <qtmetamacros.h>
 
 class LayoutInspector;
+class AbstractAnalyticsPanelWidget;
+class DeckListStatisticsAnalyzer;
+class FlowWidget;
+class QCheckBox;
+class QPushButton;
+class QScrollArea;
+class QVBoxLayout;
+class ResizablePanel;
 
 class DeckAnalyticsWidget : public QWidget
 {

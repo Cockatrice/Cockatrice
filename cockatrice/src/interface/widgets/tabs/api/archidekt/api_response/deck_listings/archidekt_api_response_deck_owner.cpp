@@ -1,5 +1,9 @@
 #include "archidekt_api_response_deck_owner.h"
 
+#include <QDebug>
+#include <QJsonValue>
+#include <qlogging.h>
+
 void ArchidektApiResponseDeckOwner::fromJson(const QJsonObject &json)
 {
     id = json.value("id").toInt();

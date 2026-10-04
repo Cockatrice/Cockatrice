@@ -10,19 +10,23 @@
 
 #include "tab.h"
 
+#include <QString>
+#include <QVariant>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
+#include <qtmetamacros.h>
 
 class ServerInfo_User;
 class Response;
-class AbstractClient;
 class QTreeView;
 class QFileSystemModel;
-class QToolBar;
 class QGroupBox;
 class RemoteReplayList_TreeWidget;
 class GameReplay;
 class Event_ReplayAdded;
 class CommandContainer;
+class QAction;
+class QModelIndex;
+class TabSupervisor;
 
 class TabReplays : public Tab
 {

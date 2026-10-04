@@ -3,12 +3,19 @@
 
 #include "../../key_signals.h"
 
+#include <QPair>
+#include <QString>
+#include <QStringList>
 #include <QTreeView>
 #include <functional>
 #include <libcockatrice/card/card_info.h>
+#include <qtmetamacros.h>
 
-class CardDatabaseModel;
 class CardDatabaseDisplayModel;
+class QModelIndex;
+class QPoint;
+class QWidget;
+template <typename T> class QList;
 
 /**
  * @brief The card database table.

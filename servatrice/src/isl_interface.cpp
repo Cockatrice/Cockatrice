@@ -1,11 +1,34 @@
 #include "isl_interface.h"
 
+#include "libcockatrice/protocol/pb/commands.pb.h"
+#include "libcockatrice/protocol/pb/room_commands.pb.h"
+#include "libcockatrice/protocol/pb/room_event.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_room.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+#include "libcockatrice/protocol/pb/session_event.pb.h"
 #include "main.h"
+#include "servatrice.h"
+#include "server_abstractuserinterface.h"
 #include "server_logger.h"
+#include "serverinfo_user_container.h"
 
+#include <QDebug>
+#include <QHostAddress>
+#include <QList>
 #include <QLoggingCategory>
+#include <QMap>
+#include <QMapIterator>
+#include <QMessageLogger>
+#include <QMutexLocker>
+#include <QReadLocker>
+#include <QReadWriteLock>
+#include <QSharedPointer>
+#include <QSslError>
 #include <QSslSocket>
 #include <google/protobuf/descriptor.h>
+#include <google/protobuf/message.h>
+#include <google/protobuf/stubs/common.h>
 #include <libcockatrice/protocol/debug_pb_message.h>
 #include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/event_game_joined.pb.h>
@@ -17,8 +40,9 @@
 #include <libcockatrice/protocol/pb/event_server_complete_list.pb.h>
 #include <libcockatrice/protocol/pb/event_user_joined.pb.h>
 #include <libcockatrice/protocol/pb/event_user_left.pb.h>
-#include <libcockatrice/protocol/pb/event_user_message.pb.h>
 #include <libcockatrice/protocol/pb/isl_message.pb.h>
+#include <qnamespace.h>
+#include <qobjectdefs.h>
 #include <server_protocolhandler.h>
 #include <server_room.h>
 

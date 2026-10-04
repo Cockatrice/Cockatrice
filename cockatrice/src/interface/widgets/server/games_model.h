@@ -4,13 +4,18 @@
 #include "game_filter_configs.h"
 #include "game_type_map.h"
 
+#include <QAbstractTableModel>
 #include <QList>
-#include <QSet>
+#include <QMap>
+#include <QModelIndex>
 #include <QSortFilterProxyModel>
-#include <QTime>
+#include <QString>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
 
 class UserListProxy;
+class QObject;
 
 /**
  * @class GamesModel

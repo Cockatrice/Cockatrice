@@ -1,16 +1,18 @@
 #ifndef COCKATRICE_MANA_CURVE_ADD_DIALOG_H
 #define COCKATRICE_MANA_CURVE_ADD_DIALOG_H
 
-#include "../../deck_list_statistics_analyzer.h"
 #include "mana_curve_config.h"
 
 #include <QDialog>
-#include <QDialogButtonBox>
-#include <QLabel>
+#include <qtmetamacros.h>
 
 class QListWidget;
 class QCheckBox;
 class QComboBox;
+class DeckListStatisticsAnalyzer;
+class QDialogButtonBox;
+class QLabel;
+class QWidget;
 
 class ManaCurveConfigDialog : public QDialog
 {

@@ -6,10 +6,17 @@
 
 #include "flow_widget.h"
 
+#include "../../../layouts/flow_layout.h"
+
+#include <QEvent>
 #include <QHBoxLayout>
 #include <QKeyEvent>
+#include <QLayoutItem>
+#include <QList>
+#include <QMessageLogger>
 #include <QResizeEvent>
 #include <QScrollArea>
+#include <QSize>
 #include <QSizePolicy>
 #include <QWidget>
 

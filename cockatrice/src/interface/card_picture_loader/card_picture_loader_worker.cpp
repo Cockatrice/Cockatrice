@@ -4,15 +4,35 @@
 #include "card_picture_loader_cache_method.h"
 #include "card_picture_loader_local.h"
 #include "card_picture_loader_worker_work.h"
+#include "card_picture_to_load.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/utility/server_rate_limiter.h"
 
-#include <QDirIterator>
-#include <QMovie>
+#include <QAbstractNetworkCache>
+#include <QByteArray>
+#include <QCoreApplication>
+#include <QDateTime>
+#include <QDebug>
+#include <QImage>
+#include <QMessageLogger>
+#include <QMetaObject>
+#include <QMetaType>
+#include <QNetworkAccessManager>
+#include <QNetworkCacheMetaData>
 #include <QNetworkDiskCache>
 #include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QSettings>
+#include <QSharedPointer>
 #include <QThread>
+#include <QVariant>
+#include <compare>
 #include <libcockatrice/settings/cache_storage_settings.h>
 #include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
+#include <qminmax.h>
+#include <qnamespace.h>
+#include <qtypes.h>
 #include <utility>
 #include <version_string.h>
 

@@ -1,12 +1,19 @@
 #include "single_instance_manager.h"
 
+#include <QByteArray>
 #include <QCoreApplication>
 #include <QDataStream>
 #include <QEventLoop>
+#include <QIODevice>
+#include <QList>
 #include <QLocalServer>
 #include <QLocalSocket>
+#include <QStringLiteral>
 #include <QTimer>
+#include <QtEnvironmentVariables>
 #include <gtest/gtest.h>
+#include <qtypes.h>
+#include <string>
 
 namespace
 {

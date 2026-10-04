@@ -2,6 +2,9 @@
 #define COCKATRICE_VISIBILITY_LISTENER_H
 
 #include <QObject>
+#include <qtmetamacros.h>
+
+class QWidget;
 
 /**
  * @brief This filter listens to the visibility changes of a target widget, emitting signals whenever the visibility of

@@ -6,12 +6,20 @@
 
 #ifndef COCKATRICE_PLAYER_GRAPHICS_ITEM_H
 #define COCKATRICE_PLAYER_GRAPHICS_ITEM_H
-#include "../../game/player/player_logic.h"
-#include "../board/abstract_counter.h"
+#include "../board/graphics_item_type.h"
 #include "../game_scene.h"
+#include "libcockatrice/utility/playmat_params.h"
 
 #include <QGraphicsObject>
-#include <libcockatrice/deck_list/deck_list.h>
+#include <QMap>
+#include <QMetaObject>
+#include <QPixmap>
+#include <QRectF>
+#include <QSize>
+#include <QSizeF>
+#include <QString>
+#include <qtmetamacros.h>
+#include <qtypes.h>
 
 class HandZone;
 class PileZone;
@@ -20,7 +28,12 @@ class PlayerMenu;
 class PlayerTarget;
 class StackZone;
 class TableZone;
-class ZoneViewZone;
+class AbstractCounter;
+class CardZone;
+class CounterState;
+class PlayerArea;
+class PlayerLogic;
+struct CardRef;
 
 class PlayerGraphicsItem : public QGraphicsObject
 {

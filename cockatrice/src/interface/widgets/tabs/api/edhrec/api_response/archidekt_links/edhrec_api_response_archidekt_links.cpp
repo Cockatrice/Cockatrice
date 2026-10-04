@@ -3,6 +3,9 @@
 #include <QDebug>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QJsonValue>
+#include <QJsonValueConstRef>
+#include <qlogging.h>
 
 void EdhrecApiResponseArchidektLink::fromJson(const QJsonObject &json)
 {

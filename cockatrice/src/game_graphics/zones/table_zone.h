@@ -7,12 +7,26 @@
 #ifndef TABLEZONE_H
 #define TABLEZONE_H
 
-#include "../../game/zones/table_zone_logic.h"
 #include "../animated_item.h"
-#include "../board/abstract_card_item.h"
+#include "../card_dimensions.h"
 #include "select_zone.h"
 
 #include <QElapsedTimer>
+#include <QMap>
+#include <QPixmap>
+#include <QPoint>
+#include <QPointF>
+#include <qtmetamacros.h>
+#include <qtypes.h>
+
+class CardDragItem;
+class CardItem;
+class CardZoneLogic;
+class QColor;
+class QGraphicsItem;
+class QPainter;
+class TableZoneLogic;
+template <typename T> class QList;
 
 /**
  * @brief TableZone is the grid based rect where CardItems may be placed.

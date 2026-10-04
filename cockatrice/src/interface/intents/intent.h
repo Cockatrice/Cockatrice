@@ -2,6 +2,8 @@
 #define COCKATRICE_INTENT_H
 
 #include <QObject>
+#include <QString>
+#include <qtmetamacros.h>
 
 class Intent : public QObject
 {

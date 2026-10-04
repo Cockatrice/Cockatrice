@@ -19,13 +19,21 @@
  ***************************************************************************/
 #include "server_cardzone.h"
 
+#include "libcockatrice/protocol/pb/serverinfo_zone.pb.h"
 #include "server_abstract_player.h"
 #include "server_card.h"
 
 #include <QDebug>
+#include <QListIterator>
+#include <QMultiMap>
+#include <QPair>
 #include <QSet>
+#include <QSetIterator>
+#include <QSharedPointer>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/rng/rng_abstract.h>
+#include <qlogging.h>
+#include <string>
 
 Server_CardZone::Server_CardZone(Server_AbstractPlayer *_player,
                                  const QString &_name,

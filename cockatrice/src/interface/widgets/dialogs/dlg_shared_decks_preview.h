@@ -3,14 +3,17 @@
 
 #include <QDialog>
 #include <QList>
+#include <QString>
+#include <qtmetamacros.h>
+#include <qtypes.h>
 
 class FlowWidget;
-class QCloseEvent;
 class QLabel;
 class QPushButton;
 class ServerInfo_DeckShareItem;
 class SharedDeckPreviewWidget;
 class CardDatabaseQuerier;
+class QWidget;
 
 /**
  * @brief Non-modal preview of the decks contained in a shared-deck link.

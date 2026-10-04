@@ -6,10 +6,17 @@
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../interface/widgets/server/user/user_list_widget.h"
 #include "../interface/widgets/utility/custom_line_edit.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 #include "tab_supervisor.h"
 
+#include <QHBoxLayout>
+#include <QList>
+#include <QMap>
 #include <QPushButton>
+#include <QSharedPointer>
 #include <QVBoxLayout>
+#include <QWidget>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/event_add_to_list.pb.h>
 #include <libcockatrice/protocol/pb/event_remove_from_list.pb.h>
@@ -19,6 +26,7 @@
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <qnamespace.h>
 
 TabAccount::TabAccount(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &userInfo)
     : Tab(_tabSupervisor), client(_client)

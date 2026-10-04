@@ -2,16 +2,39 @@
 
 #include "../../../../../../client/settings/cache_settings.h"
 #include "../../../../../deck_loader/card_node_function.h"
-#include "../../../../../deck_loader/deck_loader.h"
-#include "../../../../cards/card_size_widget.h"
+#include "../../../../../deck_loader/loaded_deck.h"
 #include "../../../../cards/deck_card_zone_display_widget.h"
 #include "../../../../visual_deck_editor/visual_deck_display_options_widget.h"
+#include "../../../../visual_deck_editor/visual_deck_editor_widget.h"
 #include "../api_response/archidekt_formats.h"
+#include "../api_response/card/archidekt_api_response_card.h"
+#include "../api_response/card/archidekt_api_response_card_entry.h"
+#include "../api_response/card/archidekt_api_response_edition.h"
 #include "../api_response/deck/archidekt_api_response_deck.h"
+#include "deck_list_model.h"
+#include "libcockatrice/deck_list/deck_list.h"
 
+#include <QAbstractListModel>
+#include <QDebug>
+#include <QHBoxLayout>
+#include <QJsonObject>
+#include <QJsonValue>
+#include <QList>
+#include <QModelIndex>
+#include <QPushButton>
+#include <QScrollArea>
+#include <QSharedPointer>
 #include <QSortFilterProxyModel>
+#include <QTextStream>
+#include <QVBoxLayout>
+#include <QVariant>
+#include <functional>
 #include <libcockatrice/card/import/card_name_normalizer.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <qlogging.h>
+#include <qnamespace.h>
+
+class CardSizeWidget;
 
 ArchidektApiResponseDeckDisplayWidget::ArchidektApiResponseDeckDisplayWidget(QWidget *parent,
                                                                              ArchidektApiResponseDeck _response,

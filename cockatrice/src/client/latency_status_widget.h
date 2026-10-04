@@ -7,8 +7,10 @@
 #define LATENCY_STATUS_WIDGET_H
 
 #include <QList>
+#include <QString>
 #include <QWidget>
 #include <libcockatrice/network/client/abstract/latency_tracker.h>
+#include <qtmetamacros.h>
 
 class QLabel;
 class LatencyGraphWidget;

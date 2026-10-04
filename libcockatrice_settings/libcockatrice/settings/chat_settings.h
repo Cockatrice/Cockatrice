@@ -3,7 +3,11 @@
 
 #include "settings_manager.h"
 
+#include <QString>
 #include <libcockatrice/interfaces/interface_chat_settings_provider.h>
+#include <qtmetamacros.h>
+
+class QObject;
 
 class ChatSettings : public SettingsManager, public IChatSettingsProvider
 {

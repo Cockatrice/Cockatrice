@@ -2,11 +2,16 @@
 
 #include "../utility/report_utils.h"
 #include "abstract_client.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
 #include "tab_supervisor.h"
 
+#include <QAbstractItemView>
+#include <QChar>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDateTime>
+#include <QDebug>
+#include <QFont>
 #include <QFontDatabase>
 #include <QGridLayout>
 #include <QGroupBox>
@@ -15,16 +20,19 @@
 #include <QInputDialog>
 #include <QLabel>
 #include <QLineEdit>
-#include <QMessageBox>
 #include <QPushButton>
+#include <QSharedPointer>
 #include <QSignalBlocker>
 #include <QSplitter>
 #include <QTableWidget>
+#include <QTableWidgetItem>
 #include <QTextCursor>
 #include <QTextEdit>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <QVariant>
 #include <QWidget>
+#include <QtVersionChecks>
 #include <libcockatrice/protocol/pb/command_replay_download_by_game_id.pb.h>
 #include <libcockatrice/protocol/pb/command_report_add_comment.pb.h>
 #include <libcockatrice/protocol/pb/command_report_assign.pb.h>
@@ -41,6 +49,9 @@
 #include <libcockatrice/protocol/pb/response_report_user_info.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_report.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <qnamespace.h>
+#include <qtypes.h>
+#include <string>
 
 namespace
 {

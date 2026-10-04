@@ -1,11 +1,14 @@
 #include "dlg_roll_dice.h"
 
 #include <QDialogButtonBox>
+#include <QGridLayout>
 #include <QLabel>
 #include <QSpinBox>
+#include <QString>
 #include <QVBoxLayout>
-#include <QWidget>
 #include <libcockatrice/utility/dice_limits.h>
+
+class QWidget;
 
 DlgRollDice::DlgRollDice(QWidget *parent) : QDialog(parent)
 {

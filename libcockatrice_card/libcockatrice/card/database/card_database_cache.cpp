@@ -4,15 +4,32 @@
 #include "../format/format_legality_rules.h"
 #include "../printing/printing_info.h"
 #include "../relation/card_relation.h"
-#include "../relation/card_relation_type.h"
 #include "../set/card_set.h"
 #include "card_database_loader.h"
+#include "libcockatrice/card/database/card_database_data.h"
+#include "libcockatrice/card/lazy_properties_hash.h"
 
 #include <QBuffer>
+#include <QByteArray>
 #include <QDataStream>
+#include <QDate>
+#include <QDebug>
 #include <QElapsedTimer>
 #include <QFile>
+#include <QIODevice>
+#include <QList>
+#include <QLoggingCategory>
+#include <QMap>
+#include <QMessageLogger>
 #include <QSaveFile>
+#include <QSet>
+#include <QSharedPointer>
+#include <qnamespace.h>
+#include <qtypes.h>
+
+class ICardSetPriorityController;
+enum class CardRelationType;
+template <typename Key, typename T> class QHash;
 
 namespace
 {

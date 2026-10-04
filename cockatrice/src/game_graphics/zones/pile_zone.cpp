@@ -1,18 +1,34 @@
 #include "pile_zone.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "../../game/board/card_list.h"
 #include "../../game/player/player_actions.h"
+#include "../../game/player/player_info.h"
 #include "../../game/player/player_logic.h"
+#include "../../game/zones/card_zone_logic.h"
 #include "../../game/zones/pile_zone_logic.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
-#include "view_zone.h"
+#include "../card_dimensions.h"
 
 #include <QApplication>
+#include <QCursor>
+#include <QGraphicsItem>
 #include <QGraphicsSceneMouseEvent>
+#include <QList>
 #include <QPainter>
+#include <QPainterPath>
+#include <QPoint>
+#include <QPointF>
+#include <QRectF>
+#include <QString>
+#include <QTransform>
+#include <QtPreprocessorSupport>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <qnamespace.h>
+#include <qtypes.h>
+#include <string>
 
 PileZone::PileZone(PileZoneLogic *_logic, QGraphicsItem *parent) : CardZone(_logic, parent)
 {

@@ -23,21 +23,44 @@
 #include "../server_database_interface.h"
 #include "../server_protocolhandler.h"
 #include "../server_room.h"
+#include "game/game_config.h"
+#include "game/server_abstract_participant.h"
+#include "game/server_arrowtarget.h"
+#include "game/server_deck_validation_strategy.h"
+#include "game/server_game_lifecycle_strategy.h"
+#include "game/server_match_result_strategy.h"
 #include "libcockatrice/protocol/pb/command_move_card.pb.h"
+#include "libcockatrice/protocol/pb/game_event.pb.h"
+#include "libcockatrice/protocol/pb/game_event_container.pb.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/server_message.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_gametype.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_replay.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_replay_match.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+#include "libcockatrice/protocol/pb/session_event.pb.h"
 #include "server_abstract_player.h"
+#include "server_abstractuserinterface.h"
 #include "server_arrow.h"
 #include "server_card.h"
 #include "server_cardzone.h"
 #include "server_player.h"
+#include "server_response_containers.h"
 #include "server_spectator.h"
 
 #include <QDebug>
 #include <QElapsedTimer>
+#include <QMutexLocker>
+#include <QReadWriteLock>
 #include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QSharedPointer>
+#include <QStringList>
 #include <QTimer>
 #include <google/protobuf/descriptor.h>
-#include <libcockatrice/deck_list/deck_list.h>
-#include <libcockatrice/protocol/pb/context_connection_state_changed.pb.h>
+#include <google/protobuf/message.h>
 #include <libcockatrice/protocol/pb/context_ping_changed.pb.h>
 #include <libcockatrice/protocol/pb/event_delete_arrow.pb.h>
 #include <libcockatrice/protocol/pb/event_game_closed.pb.h>
@@ -53,6 +76,9 @@
 #include <libcockatrice/protocol/pb/event_set_active_player.pb.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 #include <libcockatrice/utility/zone_names.h>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <string>
 
 Server_Game::Server_Game(const GameConfig &config, Server_Room *_room)
     : QObject(), room(_room), nextPlayerId(0), hostId(0), creatorInfo(new ServerInfo_User(config.creatorInfo)),

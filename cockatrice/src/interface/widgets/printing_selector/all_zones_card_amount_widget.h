@@ -7,11 +7,15 @@
 
 #ifndef ALL_ZONES_CARD_AMOUNT_WIDGET_H
 #define ALL_ZONES_CARD_AMOUNT_WIDGET_H
-#include "../../deck_loader/deck_loader.h"
-#include "card_amount_widget.h"
-
 #include <QWidget>
-#include <libcockatrice/models/deck_list/deck_list_model.h>
+#include <qtmetamacros.h>
+
+class CardAmountWidget;
+class DeckStateManager;
+class ExactCard;
+class QLabel;
+class QSlider;
+class QVBoxLayout;
 
 class AllZonesCardAmountWidget : public QWidget
 {

@@ -7,9 +7,12 @@
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QLabel>
+#include <QSize>
 #include <QSpinBox>
 #include <QVBoxLayout>
 #include <libcockatrice/settings/game_settings.h>
+
+class QWidget;
 
 DlgLocalGameOptions::DlgLocalGameOptions(QWidget *parent) : QDialog(parent)
 {

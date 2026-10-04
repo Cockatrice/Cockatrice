@@ -1,5 +1,6 @@
 #include "deck_analytics_widget.h"
 
+#include "../general/layout_containers/flow_widget.h"
 #include "abstract_analytics_panel_widget.h"
 #include "add_analytics_panel_dialog.h"
 #include "analytics_panel_widget_factory.h"
@@ -9,13 +10,19 @@
 #include "deck_list_statistics_analyzer.h"
 #include "resizable_panel.h"
 
+#include <QCheckBox>
+#include <QDialog>
 #include <QEvent>
+#include <QFrame>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QJsonValueRef>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QSettings>
 #include <QVBoxLayout>
+#include <QVariant>
+#include <qnamespace.h>
 
 DeckAnalyticsWidget::DeckAnalyticsWidget(QWidget *parent, DeckListStatisticsAnalyzer *_statsAnalyzer)
     : QWidget(parent), statsAnalyzer(_statsAnalyzer)

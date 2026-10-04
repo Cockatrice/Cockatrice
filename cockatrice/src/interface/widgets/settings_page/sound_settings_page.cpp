@@ -3,10 +3,21 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../client/sound_engine.h"
 
+#include <QDebug>
 #include <QGridLayout>
+#include <QGroupBox>
+#include <QList>
+#include <QOverload>
+#include <QSharedPointer>
+#include <QSlider>
+#include <QSpinBox>
+#include <QString>
+#include <QStringList>
+#include <QVBoxLayout>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/sound_settings.h>
 #include <libcockatrice/utility/macros.h>
+#include <qnamespace.h>
 
 SoundSettingsPage::SoundSettingsPage()
 {

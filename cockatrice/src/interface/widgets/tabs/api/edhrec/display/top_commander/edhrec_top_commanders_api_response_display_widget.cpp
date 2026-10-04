@@ -1,7 +1,19 @@
 #include "edhrec_top_commanders_api_response_display_widget.h"
 
+#include "../../api_response/cards/edhrec_api_response_card_container.h"
+#include "../../api_response/cards/edhrec_api_response_card_list.h"
 #include "../../api_response/top_commanders/edhrec_top_commanders_api_response.h"
 #include "../cards/edhrec_api_response_card_list_display_widget.h"
+
+#include <QDebug>
+#include <QHBoxLayout>
+#include <QList>
+#include <QResizeEvent>
+#include <QScrollArea>
+#include <QSize>
+#include <QVBoxLayout>
+#include <qlogging.h>
+#include <qnamespace.h>
 
 EdhrecTopCommandersApiResponseDisplayWidget::EdhrecTopCommandersApiResponseDisplayWidget(
     QWidget *parent,

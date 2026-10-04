@@ -1,16 +1,43 @@
 #include "player_target.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "../../game/player/player_info.h"
 #include "../../game/player/player_logic.h"
 #include "../../interface/pixel_map_generator.h"
+#include "../board/abstract_counter.h"
+#include "../board/abstract_graphics_item.h"
+#include "../board/arrow_target.h"
 #include "../game_scene.h"
+#include "libcockatrice/settings/interface_settings.h"
+#include "user_level.h"
 
-#include <QApplication>
-#include <QDebug>
+#include <QBrush>
+#include <QColor>
+#include <QFlag>
+#include <QFlags>
+#include <QFont>
+#include <QObject>
 #include <QPainter>
+#include <QPainterPath>
+#include <QPen>
 #include <QPixmapCache>
+#include <QPointF>
+#include <QRadialGradient>
+#include <QRectF>
+#include <QSize>
+#include <QSizeF>
+#include <QString>
+#include <QTransform>
 #include <QtMath>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <qminmax.h>
+#include <qnamespace.h>
+#include <qnumeric.h>
+#include <string>
+#include <sys/types.h>
+
+class CounterState;
+class QGraphicsItem;
 
 PlayerCounter::PlayerCounter(CounterState *state, PlayerLogic *player, QGraphicsItem *parent)
     : AbstractCounter(state, player, false, false, parent)

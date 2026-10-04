@@ -8,17 +8,24 @@
 #ifndef COCKATRICE_PLAYER_ACTIONS_H
 #define COCKATRICE_PLAYER_ACTIONS_H
 
-#include "../../game_graphics/board/card_item.h"
 #include "../../game_graphics/dialogs/dlg_create_token.h"
 #include "../../game_graphics/dialogs/dlg_move_top_cards_until.h"
 #include "../../game_graphics/player/card_menu_action_type.h"
-#include "event_processing_options.h"
-#include "player_logic.h"
+#include "../board/card_list.h"
+#include "libcockatrice/card/card_info.h"
 
-#include <QMenu>
 #include <QObject>
+#include <QString>
+#include <QStringList>
 #include <libcockatrice/card/relation/card_relation_type.h>
 #include <libcockatrice/filters/filter_string.h>
+#include <qtmetamacros.h>
+
+class CardItem;
+class CardRelation;
+class QAction;
+class QTimer;
+template <typename T> class QList;
 
 namespace google
 {
@@ -29,9 +36,9 @@ class Message;
 } // namespace google
 
 class Command_MoveCard;
-class GameEventContext;
 class PendingCommand;
 class PlayerLogic;
+
 class PlayerActions : public QObject
 {
     Q_OBJECT

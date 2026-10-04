@@ -1,15 +1,38 @@
 #include "pixel_map_generator.h"
 
+#include "libcockatrice/network/server/remote/user_level.h"
 #include "theme_manager.h"
 
 #include <QApplication>
+#include <QBrush>
+#include <QByteArray>
+#include <QChar>
+#include <QColor>
+#include <QDebug>
 #include <QDomDocument>
+#include <QDomElement>
+#include <QDomNode>
+#include <QDomNodeList>
 #include <QFile>
+#include <QIODevice>
+#include <QImage>
 #include <QImageReader>
+#include <QLatin1Char>
+#include <QLatin1String>
+#include <QMessageLogger>
 #include <QPainter>
 #include <QPalette>
+#include <QPointF>
+#include <QRadialGradient>
+#include <QSharedPointer>
+#include <QSize>
+#include <QStringLiteral>
 #include <QSvgRenderer>
+#include <initializer_list>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <qminmax.h>
+#include <qnamespace.h>
+#include <qtypes.h>
 
 #define DEFAULT_COLOR_UNREGISTERED "#32c8ec";
 #define DEFAULT_COLOR_REGISTERED "#5ed900";

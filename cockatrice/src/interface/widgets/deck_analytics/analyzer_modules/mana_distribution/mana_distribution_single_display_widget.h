@@ -1,10 +1,12 @@
 #ifndef COCKATRICE_MANA_DISTRIBUTION_SINGLE_DISPLAY_WIDGET_H
 #define COCKATRICE_MANA_DISTRIBUTION_SINGLE_DISPLAY_WIDGET_H
 
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QProgressBar>
+#include <QString>
 #include <QWidget>
+#include <qtmetamacros.h>
+
+class QLabel;
+class QProgressBar;
 
 class ManaDistributionSingleDisplayWidget : public QWidget
 {

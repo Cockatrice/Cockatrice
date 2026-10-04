@@ -2,19 +2,34 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../pixel_map_generator.h"
+#include "../server/handle_public_servers.h"
+#include "../server/user/user_info_connection.h"
+#include "libcockatrice/utility/macros.h"
 
 #include <QCheckBox>
 #include <QComboBox>
+#include <QDebug>
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QGroupBox>
-#include <QKeyEvent>
+#include <QHBoxLayout>
+#include <QIntValidator>
 #include <QLabel>
+#include <QList>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QRadioButton>
+#include <QSharedPointer>
+#include <QSize>
+#include <QStringList>
+#include <QStringLiteral>
+#include <QVBoxLayout>
+#include <QtPreprocessorSupport>
 #include <libcockatrice/settings/servers_settings.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <qnamespace.h>
+
+class QWidget;
 
 DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 {

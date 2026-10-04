@@ -1,16 +1,26 @@
 #include "card_picture_to_load.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
 
-#include <QCoreApplication>
 #include <QDate>
+#include <QDebug>
+#include <QMap>
+#include <QMessageLogger>
 #include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QRegularExpressionMatchIterator>
+#include <QSharedPointer>
 #include <QUrl>
 #include <algorithm>
+#include <functional>
 #include <libcockatrice/card/set/card_set_comparator.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/download_settings.h>
+#include <qtypes.h>
 
 CardPictureToLoad::CardPictureToLoad(const ExactCard &_card)
     : card(_card), urlTemplates(SettingsCache::instance().downloads().getAllURLs())

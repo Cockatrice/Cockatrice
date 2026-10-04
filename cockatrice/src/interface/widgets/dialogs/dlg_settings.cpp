@@ -8,6 +8,7 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../pixel_map_generator.h"
 #include "../main.h"
+#include "../settings_page/abstract_settings_page.h"
 #include "../settings_page/appearance_settings_page.h"
 #include "../settings_page/deck_editor_settings_page.h"
 #include "../settings_page/general_settings_page.h"
@@ -18,33 +19,61 @@
 #include "../settings_page/sound_settings_page.h"
 #include "../settings_page/storage_settings_page.h"
 #include "../settings_page/user_interface_settings_page.h"
+#include "libcockatrice/card/database/card_database.h"
 #include "libcockatrice/card/database/card_database_loader.h"
 #include "libcockatrice/card/database/card_database_manager.h"
 
+#include <QAbstractAnimation>
 #include <QAbstractItemView>
+#include <QApplication>
+#include <QBrush>
+#include <QByteArray>
 #include <QCloseEvent>
+#include <QColor>
+#include <QDebug>
 #include <QDir>
+#include <QEasingCurve>
+#include <QEvent>
+#include <QFlags>
 #include <QFrame>
 #include <QGraphicsOpacityEffect>
 #include <QGuiApplication>
 #include <QHBoxLayout>
+#include <QIcon>
 #include <QKeyEvent>
+#include <QKeySequence>
 #include <QLineEdit>
 #include <QListView>
 #include <QMessageBox>
+#include <QMessageLogger>
+#include <QModelIndex>
+#include <QObject>
+#include <QOverload>
+#include <QPalette>
+#include <QPixmap>
 #include <QPropertyAnimation>
 #include <QPushButton>
+#include <QRect>
 #include <QScreen>
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QSequentialAnimationGroup>
 #include <QShortcut>
+#include <QSize>
+#include <QSizePolicy>
 #include <QStackedLayout>
 #include <QStackedWidget>
+#include <QStringLiteral>
 #include <QToolButton>
 #include <QVBoxLayout>
+#include <QWidget>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
+#include <qassert.h>
+#include <qminmax.h>
+#include <qnamespace.h>
+
+class QModelIndex;
 
 /**
  * @brief Wraps a widget in a scroll area for long settings pages

@@ -1,23 +1,32 @@
 #include "card_database_setup_page.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "../first_run_wizard_page.h"
+#include "libcockatrice/card/database/card_database.h"
 
 #include <QComboBox>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLatin1String>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QOverload>
 #include <QProgressBar>
 #include <QPushButton>
 #include <QSettings>
+#include <QSharedPointer>
 #include <QSpinBox>
 #include <QTimer>
 #include <QUrl>
 #include <QVBoxLayout>
+#include <QVariant>
+#include <QWidget>
 #include <climits>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/updates_settings.h>
+#include <qminmax.h>
+#include <qnamespace.h>
 
 CardDatabaseSetupPage::CardDatabaseSetupPage(QWidget *parent) : FirstRunWizardPage(parent)
 {

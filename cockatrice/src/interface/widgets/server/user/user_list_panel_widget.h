@@ -8,7 +8,9 @@
 
 #include "user_list_widget.h"
 
+#include <QString>
 #include <QWidget>
+#include <qtmetamacros.h>
 
 class AbstractClient;
 class QLineEdit;

@@ -1,13 +1,33 @@
 #include "card_group_display_widget.h"
 
 #include "../../../../client/settings/cache_settings.h"
+#include "../../general/display/banner_widget.h"
+#include "../card_info_picture_widget.h"
 #include "../card_info_picture_with_text_overlay_widget.h"
+#include "../card_size_widget.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
 
-#include <QResizeEvent>
+#include <QAbstractItemModel>
+#include <QAbstractProxyModel>
+#include <QDebug>
+#include <QItemSelection>
+#include <QItemSelectionModel>
+#include <QItemSelectionRange>
+#include <QModelIndex>
+#include <QObject>
+#include <QSharedPointer>
+#include <QSize>
+#include <QSlider>
+#include <QStringLiteral>
+#include <QVariant>
+#include <QtPreprocessorSupport>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <libcockatrice/models/deck_list/deck_list_sort_filter_proxy_model.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <qnamespace.h>
+#include <utility>
 
 CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
                                                DeckListModel *_deckListModel,

@@ -1,5 +1,9 @@
 #include "archidekt_api_response_edition.h"
 
+#include <QDebug>
+#include <QJsonValue>
+#include <qlogging.h>
+
 void ArchidektApiResponseEdition::fromJson(const QJsonObject &json)
 {
     editionCode = json.value("editioncode").toString();

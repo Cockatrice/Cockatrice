@@ -3,14 +3,27 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../pixel_map_generator.h"
 #include "../interface/widgets/utility/get_text_with_max.h"
+#include "libcockatrice/utility/macros.h"
 
+#include <QAction>
+#include <QColor>
+#include <QDebug>
 #include <QGridLayout>
+#include <QGroupBox>
+#include <QHBoxLayout>
 #include <QLineEdit>
+#include <QListWidget>
+#include <QListWidgetItem>
+#include <QSizePolicy>
+#include <QStringLiteral>
 #include <QToolBar>
+#include <QVBoxLayout>
+#include <QtVersionChecks>
 #include <libcockatrice/settings/chat_settings.h>
 #include <libcockatrice/settings/message_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <qnamespace.h>
 
 MessagesSettingsPage::MessagesSettingsPage()
 {

@@ -7,14 +7,17 @@
 #ifndef DECK_VIEW_CONTAINER_H
 #define DECK_VIEW_CONTAINER_H
 
-#include "../../interface/deck_loader/deck_loader.h"
+#include "libcockatrice/deck_list/deck_list.h"
+#include "libcockatrice/utility/playmat_params.h"
 
 #include <QPushButton>
+#include <QString>
+#include <QWidget>
+#include <qtmetamacros.h>
 
 class QVBoxLayout;
 class AbstractCardItem;
 class VisualDeckStorageWidget;
-class DeckPreviewWidget;
 class Response;
 class TabGame;
 class DeckView;

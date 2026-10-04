@@ -1,5 +1,9 @@
 #include "mana_devotion_config.h"
 
+#include <QJsonArray>
+#include <QJsonValue>
+#include <QJsonValueRef>
+
 QJsonObject ManaDevotionConfig::toJson() const
 {
     QJsonObject jsonObject;

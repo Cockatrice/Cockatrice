@@ -7,18 +7,23 @@
 #ifndef PLAYERLISTWIDGET_H
 #define PLAYERLISTWIDGET_H
 
-#include "../../game/player/player_logic.h"
-
 #include <QIcon>
 #include <QMap>
+#include <QString>
 #include <QStyledItemDelegate>
 #include <QTreeWidget>
+#include <QTreeWidgetItem>
+#include <qtmetamacros.h>
 
 class ServerInfo_PlayerProperties;
 class TabSupervisor;
 class AbstractClient;
 class AbstractGame;
 class UserContextMenu;
+class QModelIndex;
+class QObject;
+class QPoint;
+class QWidget;
 
 class PlayerListItemDelegate : public QStyledItemDelegate
 {

@@ -5,16 +5,19 @@
 
 #include <QColor>
 #include <QList>
-#include <QMap>
 #include <QPalette>
-#include <QPixmap>
 #include <QRect>
+#include <QRectF>
 #include <QSize>
+#include <QString>
+#include <qtypes.h>
 
 class QPainter;
 class QModelIndex;
 class QStyleOptionViewItem;
 class ServerInfo_User;
+class QPixmap;
+template <class Key, class T> class QMap;
 
 struct CardArtParams
 {

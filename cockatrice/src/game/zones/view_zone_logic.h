@@ -8,6 +8,11 @@
 #define COCKATRICE_VIEW_ZONE_LOGIC_H
 #include "card_zone_logic.h"
 
+#include <qtmetamacros.h>
+
+class PlayerLogic;
+class QObject;
+
 class ZoneViewZoneLogic : public CardZoneLogic
 {
     Q_OBJECT

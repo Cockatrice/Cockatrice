@@ -1,10 +1,12 @@
 #include "theme_setup_page.h"
 
+#include "../../../theme_config.h"
 #include "../../client/settings/cache_settings.h"
 #include "../../interface/palette_editor/palette_generator.h"
 #include "../../interface/palette_editor/quick_setup_panel.h"
 #include "../../interface/theme_manager.h"
 #include "../../interface/widgets/general/background_sources.h"
+#include "../first_run_wizard_page.h"
 #include "libcockatrice/settings/appearance_settings.h"
 
 #include <QComboBox>
@@ -12,12 +14,22 @@
 #include <QFile>
 #include <QFormLayout>
 #include <QGroupBox>
-#include <QLabel>
+#include <QIODevice>
+#include <QList>
+#include <QMap>
 #include <QMessageBox>
+#include <QObject>
+#include <QOverload>
 #include <QPalette>
+#include <QSharedPointer>
+#include <QStringLiteral>
 #include <QVBoxLayout>
+#include <QVariant>
+#include <QtVersionChecks>
+#include <initializer_list>
 #include <libcockatrice/settings/paths_settings.h>
-#include <libcockatrice/settings/personal_settings.h>
+
+class QWidget;
 
 namespace
 {

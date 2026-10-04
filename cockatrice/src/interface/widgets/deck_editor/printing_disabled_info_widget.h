@@ -1,6 +1,7 @@
 #ifndef COCKATRICE_PRINTING_DISABLED_INFO_WIDGET_H
 #define COCKATRICE_PRINTING_DISABLED_INFO_WIDGET_H
 #include <QWidget>
+#include <qtmetamacros.h>
 
 class QPushButton;
 class QLabel;

@@ -4,7 +4,12 @@
 
 #include <QCoreApplication>
 #include <QList>
+#include <QSharedPointer>
+#include <QString>
+#include <QVariant>
+#include <QVariantList>
 #include <algorithm>
+#include <qminmax.h>
 
 static int sumPowers(const QList<CardItem *> &cards)
 {

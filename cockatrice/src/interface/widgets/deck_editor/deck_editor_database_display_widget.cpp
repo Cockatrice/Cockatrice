@@ -2,19 +2,30 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../filters/syntax_help.h"
-#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
-#include "../../../interface/widgets/tabs/tab_supervisor.h"
+#include "../../key_signals.h"
 #include "../../pixel_map_generator.h"
+#include "../utility/custom_line_edit.h"
+#include "card_database_display_model.h"
+#include "card_database_model.h"
 #include "card_database_view.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
 
-#include <QClipboard>
-#include <QHeaderView>
+#include <QAction>
+#include <QHBoxLayout>
+#include <QIcon>
+#include <QLineEdit>
+#include <QStringLiteral>
 #include <QToolButton>
-#include <QTreeView>
+#include <QVBoxLayout>
 #include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/utility/card_ref.h>
+#include <qnamespace.h>
+
+class FilterTree;
 
 DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent, CardDatabaseModel *databaseModel)
     : QWidget(parent)

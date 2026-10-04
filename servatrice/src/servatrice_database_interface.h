@@ -1,17 +1,25 @@
 #ifndef SERVATRICE_DATABASE_INTERFACE_H
 #define SERVATRICE_DATABASE_INTERFACE_H
 
-#include <QChar>
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+
 #include <QHash>
-#include <QObject>
+#include <QList>
 #include <QSqlDatabase>
+#include <QString>
+#include <QStringList>
+#include <libcockatrice/protocol/pb/serverinfo_ban.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_chat_message.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_moderator_login.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user_alt.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user_session.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_warning.pb.h>
+#include <qtmetamacros.h>
+#include <qtypes.h>
 #include <server.h>
 #include <server_database_interface.h>
+
+class QSqlQuery;
 
 #define DATABASE_SCHEMA_VERSION 37
 

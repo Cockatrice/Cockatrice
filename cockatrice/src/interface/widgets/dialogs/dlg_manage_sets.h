@@ -7,12 +7,11 @@
 #ifndef DLG_MANAGE_SETS_H
 #define DLG_MANAGE_SETS_H
 
-#include <QDialogButtonBox>
-#include <QGridLayout>
-#include <QLabel>
 #include <QMainWindow>
+#include <QString>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
 
-class CardDatabase;
 class LineEditUnfocusable;
 class QGroupBox;
 class QItemSelection;
@@ -20,7 +19,14 @@ class QPushButton;
 class QTreeView;
 class SetsDisplayModel;
 class SetsModel;
-class SetsProxyModel;
+class QAction;
+class QDialogButtonBox;
+class QGridLayout;
+class QHBoxLayout;
+class QLabel;
+class QToolBar;
+class QWidget;
+template <class T> class QSet;
 
 class WndSets : public QMainWindow
 {

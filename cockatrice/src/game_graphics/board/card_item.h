@@ -8,18 +8,24 @@
 #define CARDITEM_H
 
 #include "../../game/board/card_state.h"
-#include "../../game/zones/card_zone_logic.h"
 #include "abstract_card_item.h"
+#include "graphics_item_type.h"
 
-#include <libcockatrice/network/server/remote/game/server_card.h>
+#include <QList>
+#include <QPoint>
+#include <QPointF>
+#include <QString>
+#include <QVariantList>
+#include <qtmetamacros.h>
 
-class CardDatabase;
 class CardDragItem;
-class CardZone;
 class ServerInfo_Card;
 class PlayerLogic;
-class QAction;
 class QColor;
+class CardZoneLogic;
+class QGraphicsItem;
+struct CardRef;
+template <class Key, class T> class QMap;
 
 const int ROTATION_DEGREES_PER_FRAME = 10;
 

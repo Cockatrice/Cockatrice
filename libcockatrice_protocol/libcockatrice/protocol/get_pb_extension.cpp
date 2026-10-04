@@ -2,6 +2,7 @@
 
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
+#include <vector>
 
 int getPbExtension(const ::google::protobuf::Message &message)
 {

@@ -17,15 +17,21 @@
 #include "client/settings/cache_settings.h"
 #include "interface/card_picture_loader/card_picture_loader_cache_method.h"
 
+#include <QDebug>
 #include <QDir>
 #include <QFile>
+#include <QLoggingCategory>
+#include <QMessageLogger>
 #include <QSettings>
+#include <QSharedPointer>
 #include <QStandardPaths>
+#include <QString>
+#include <QVariant>
 #include <libcockatrice/settings/cache_storage_settings.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
-#include <utility>
+#include <qtmetamacros.h>
 
 QString SettingsCache::getDataPath()
 {

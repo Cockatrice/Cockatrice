@@ -8,11 +8,23 @@
 #define REMOTECLIENT_H
 
 #include "../abstract/abstract_client.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/session_commands.pb.h"
 
+#include <QAbstractSocket>
+#include <QByteArray>
 #include <QLoggingCategory>
+#include <QString>
+#include <QTcpSocket>
 #include <QWebSocket>
-#include <libcockatrice/interfaces/interface_network_settings_provider.h>
-#include <libcockatrice/protocol/pb/commands.pb.h>
+#include <qtmetamacros.h>
+#include <qtypes.h>
+
+class Event_ConnectionClosed;
+class Event_ServerIdentification;
+class INetworkSettingsProvider;
+class QObject;
+template <typename T> class QList;
 
 inline Q_LOGGING_CATEGORY(RemoteClientLog, "remote_client");
 

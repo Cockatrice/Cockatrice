@@ -5,9 +5,17 @@
 #include <QApplication>
 #include <QDateTime>
 #include <QDebug>
+#include <QFlags>
+#include <QIODevice>
 #include <QLocale>
+#include <QMetaMethodArgument>
+#include <QMetaObject>
+#include <QMetaType>
+#include <QMutexLocker>
 #include <QSysInfo>
 #include <iostream>
+#include <qconfig.h>
+#include <qnamespace.h>
 
 #define LOGGER_MAX_ENTRIES 128
 #define LOGGER_FILENAME "qdebug.txt"

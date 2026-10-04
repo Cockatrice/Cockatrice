@@ -8,14 +8,17 @@
 #ifndef DIALOG_CONVERT_DECK_TO_COD_FORMAT_H
 #define DIALOG_CONVERT_DECK_TO_COD_FORMAT_H
 
-#include <QCheckBox>
 #include <QDialog>
-#include <QDialogButtonBox>
-#include <QLabel>
-#include <QVBoxLayout>
+#include <QString>
+#include <QtClassHelperMacros>
 #include <functional>
+#include <qtmetamacros.h>
 
 class QWidget;
+class QCheckBox;
+class QDialogButtonBox;
+class QLabel;
+class QVBoxLayout;
 
 class DialogConvertDeckToCodFormat : public QDialog
 {

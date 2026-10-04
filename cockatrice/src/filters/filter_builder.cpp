@@ -5,8 +5,15 @@
 
 #include <QComboBox>
 #include <QGridLayout>
+#include <QIcon>
+#include <QOverload>
 #include <QPushButton>
+#include <QSizePolicy>
+#include <QString>
+#include <QStringLiteral>
+#include <QVariant>
 #include <libcockatrice/filters/filter_card.h>
+#include <stddef.h>
 
 FilterBuilder::FilterBuilder(QWidget *parent) : QWidget(parent)
 {

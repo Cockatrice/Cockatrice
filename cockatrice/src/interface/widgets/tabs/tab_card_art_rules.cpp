@@ -1,16 +1,39 @@
 #include "tab_card_art_rules.h"
 
 #include "../utility/completer_utils.h"
+#include "card_database_display_model.h"
+#include "card_database_model.h"
+#include "libcockatrice/card/card_info.h"
 #include "libcockatrice/card/database/card_database_manager.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
 
+#include <QAbstractItemView>
+#include <QComboBox>
 #include <QCompleter>
 #include <QFormLayout>
 #include <QHBoxLayout>
+#include <QLineEdit>
+#include <QList>
+#include <QPushButton>
+#include <QSharedPointer>
+#include <QTableView>
 #include <QVBoxLayout>
+#include <QVariant>
+#include <QWidget>
+#include <QtPreprocessorSupport>
+#include <google/protobuf/repeated_ptr_field.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/moderator_commands.pb.h>
 #include <libcockatrice/protocol/pb/response_card_art_rule_entry.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <string>
+
+class QObject;
+class TabSupervisor;
 
 CardArtRulesModel::CardArtRulesModel(AbstractClient *client, QObject *parent)
     : QAbstractTableModel(parent), client(client)

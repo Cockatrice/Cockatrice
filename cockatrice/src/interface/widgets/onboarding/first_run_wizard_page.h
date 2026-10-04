@@ -1,7 +1,9 @@
 #ifndef FIRST_RUN_WIZARD_PAGE_H
 #define FIRST_RUN_WIZARD_PAGE_H
 
+#include <QString>
 #include <QWidget>
+#include <qtmetamacros.h>
 
 /** @brief Base class for a single step of FirstRunWizard.
  *

@@ -1,5 +1,11 @@
 #include "message_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QVariant>
+
+class QObject;
+
 MessageSettings::MessageSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "messages.ini", "messages", QString(), parent)
 {

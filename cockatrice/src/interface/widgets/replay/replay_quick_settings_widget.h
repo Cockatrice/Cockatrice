@@ -5,7 +5,12 @@
 
 #include <QCheckBox>
 #include <QDoubleSpinBox>
+#include <QLabel>
 #include <libcockatrice/utility/macros.h>
+#include <qtmetamacros.h>
+#include <qtypes.h>
+
+class QWidget;
 
 class ReplayQuickSettingsWidget : public SettingsButtonWidget
 {

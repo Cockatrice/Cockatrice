@@ -1,5 +1,9 @@
 #include "mana_curve_config.h"
 
+#include <QJsonArray>
+#include <QJsonValue>
+#include <QJsonValueRef>
+
 QJsonObject ManaCurveConfig::toJson() const
 {
     QJsonObject jsonObject;

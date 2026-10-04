@@ -3,8 +3,11 @@
 
 #include "settings_manager.h"
 
-#include <libcockatrice/card/card_localization.h>
+#include <QString>
 #include <libcockatrice/interfaces/interface_cards_display_settings_provider.h>
+#include <qtmetamacros.h>
+
+class QObject;
 
 class CardsDisplaySettings : public SettingsManager, public ICardsDisplaySettingsProvider
 {

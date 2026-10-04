@@ -2,19 +2,36 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "card_picture_loader_worker.h"
+#include "card_picture_to_load.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/utility/server_rate_limiter.h"
 
 #include <QBuffer>
-#include <QDirIterator>
+#include <QByteArray>
+#include <QCryptographicHash>
+#include <QDateTime>
+#include <QDebug>
+#include <QImageReader>
+#include <QList>
 #include <QLoggingCategory>
+#include <QMessageLogger>
 #include <QMovie>
 #include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QRandomGenerator>
-#include <QThread>
-#include <QThreadPool>
+#include <QSharedPointer>
+#include <QStringList>
 #include <QTimer>
+#include <QUrl>
+#include <QVariant>
 
 ServerRateLimiter CardPictureLoaderWorkerWork::s_rateLimiter;
 #include <libcockatrice/settings/download_settings.h>
+#include <qminmax.h>
+#include <qnamespace.h>
+#include <qobjectdefs.h>
+#include <qtypes.h>
 
 // Card back returned by gatherer when card is not found
 static const QStringList MD5_BLACKLIST = {

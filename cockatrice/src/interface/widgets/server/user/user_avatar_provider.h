@@ -5,6 +5,8 @@
 #include <QObject>
 #include <QPixmap>
 #include <QSet>
+#include <QString>
+#include <qtmetamacros.h>
 
 class AbstractClient;
 

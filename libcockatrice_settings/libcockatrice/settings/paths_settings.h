@@ -3,7 +3,11 @@
 
 #include "settings_manager.h"
 
+#include <QString>
 #include <libcockatrice/interfaces/interface_paths_settings_provider.h>
+#include <qtmetamacros.h>
+
+class QObject;
 
 class PathsSettings : public SettingsManager, public IPathsSettingsProvider
 {

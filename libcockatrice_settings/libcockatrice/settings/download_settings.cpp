@@ -2,6 +2,14 @@
 
 #include "settings_manager.h"
 
+#include <QList>
+#include <QSettings>
+#include <QVariant>
+#include <qminmax.h>
+#include <utility>
+
+class QObject;
+
 const QStringList DownloadSettings::DEFAULT_DOWNLOAD_URLS = {
     "https://cards.scryfall.io/large/!prop:side!/!set:uuid_substr_0_1!/!set:uuid_substr_1_1!/!set:uuid!.jpg",
     "https://api.scryfall.com/cards/!set:uuid!?format=image&face=!prop:side!&lang=!sflang!",

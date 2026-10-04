@@ -3,8 +3,15 @@
 #include "../widgets/tabs/tab_room.h"
 #include "../widgets/tabs/tab_server.h"
 #include "../widgets/tabs/tab_supervisor.h"
+#include "abstract_client.h"
+#include "contexts/context_connect_to_server.h"
+#include "contexts/context_join_room.h"
 #include "intent_connect_to_server.h"
+#include "remote_client.h"
 
+#include <QMap>
+#include <QSharedPointer>
+#include <QString>
 #include <QTimer>
 #include <libcockatrice/protocol/pb/serverinfo_room.pb.h>
 

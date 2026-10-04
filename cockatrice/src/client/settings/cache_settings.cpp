@@ -2,15 +2,19 @@
 
 #include "../network/update/client/release_channel.h"
 #include "card_counter_settings.h"
+#include "libcockatrice/interfaces/interface_card_database_path_provider.h"
 #include "shortcuts_settings.h"
-#include "version_string.h"
 
+#include <QApplication>
 #include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QGlobalStatic>
+#include <QMessageLogger>
 #include <QSettings>
+#include <QSharedPointer>
 #include <QStandardPaths>
+#include <QVariant>
 #include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/cache_storage_settings.h>
 #include <libcockatrice/settings/card_database_settings.h>
@@ -36,6 +40,7 @@
 #include <libcockatrice/settings/tabs_settings.h>
 #include <libcockatrice/settings/updates_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <qminmax.h>
 #include <utility>
 
 Q_GLOBAL_STATIC(SettingsCache, settingsCache)

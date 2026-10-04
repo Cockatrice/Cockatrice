@@ -1,8 +1,21 @@
 #include "syntax_help.h"
 
+#include <QDebug>
 #include <QFile>
+#include <QFlags>
+#include <QIODevice>
+#include <QLineEdit>
+#include <QMessageLogger>
+#include <QObject>
 #include <QRegularExpression>
+#include <QSharedPointer>
+#include <QSize>
+#include <QString>
+#include <QTextBrowser>
+#include <QTextDocument>
 #include <QTextStream>
+#include <QUrl>
+#include <qnamespace.h>
 
 /**
  * Creates the card search syntax help window

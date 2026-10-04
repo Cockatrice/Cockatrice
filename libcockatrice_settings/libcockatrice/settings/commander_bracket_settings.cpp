@@ -1,6 +1,16 @@
 #include "commander_bracket_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QList>
+#include <QMap>
 #include <QSettings>
+#include <QStringList>
+#include <QVariant>
+#include <QVariantMap>
+#include <utility>
+
+class QObject;
 
 QVariantList CommanderBracketSettings::defaultDefinitions()
 {

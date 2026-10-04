@@ -1,10 +1,15 @@
 #ifndef COCKATRICE_COMMANDER_BRACKET_SERVICE_H
 #define COCKATRICE_COMMANDER_BRACKET_SERVICE_H
 
+#include "api_response/commander_spellbook_estimate_bracket_result.h"
 #include "commander_spellbook_api_accessor.h"
-#include "libcockatrice/deck_list/deck_list.h"
 
 #include <QObject>
+#include <QString>
+#include <qtmetamacros.h>
+#include <qtypes.h>
+
+class DeckList;
 
 struct CommanderBracketEstimate
 {

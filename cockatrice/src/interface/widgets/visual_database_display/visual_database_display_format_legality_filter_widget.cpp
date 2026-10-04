@@ -1,14 +1,30 @@
 #include "visual_database_display_format_legality_filter_widget.h"
 
 #include "../../../filters/filter_tree_model.h"
+#include "../general/layout_containers/flow_widget.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/filters/filter_card.h"
 #include "visual_database_display_filter_button.h"
 
+#include <QAbstractItemModel>
+#include <QDebug>
+#include <QHBoxLayout>
 #include <QLabel>
+#include <QList>
+#include <QOverload>
+#include <QPersistentModelIndex>
 #include <QPushButton>
+#include <QSet>
+#include <QSharedPointer>
 #include <QSpinBox>
 #include <QTimer>
+#include <QVBoxLayout>
+#include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/filters/filter_tree.h>
+#include <limits>
+#include <qminmax.h>
+#include <qnamespace.h>
 
 VisualDatabaseDisplayFormatLegalityFilterWidget::VisualDatabaseDisplayFormatLegalityFilterWidget(
     QWidget *parent,

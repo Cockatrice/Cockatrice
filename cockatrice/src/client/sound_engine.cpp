@@ -4,9 +4,16 @@
 
 #include <QApplication>
 #include <QAudioOutput>
+#include <QDebug>
 #include <QDir>
+#include <QFile>
+#include <QList>
 #include <QMediaPlayer>
+#include <QMessageLogger>
+#include <QStringList>
+#include <QUrl>
 #include <libcockatrice/settings/sound_settings.h>
+#include <qtypes.h>
 
 #define DEFAULT_THEME_NAME "Default"
 #define TEST_SOUND_FILENAME "player_join"

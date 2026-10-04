@@ -1,16 +1,27 @@
 #include "card_info_frame_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../../game_graphics/board/card_item.h"
-#include "card_info_display_widget.h"
+#include "../../../game_graphics/board/abstract_card_item.h"
 #include "card_info_picture_widget.h"
 #include "card_info_text_widget.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
 
+#include <QList>
+#include <QObject>
+#include <QOverload>
+#include <QPushButton>
 #include <QSplitter>
 #include <QVBoxLayout>
+#include <QWidget>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/utility/card_ref.h>
+#include <qnamespace.h>
+
+struct CardRef;
 
 CardInfoFrameWidget::CardInfoFrameWidget(QWidget *parent)
     : QTabWidget(parent), viewTransformationButton(nullptr), cardTextOnly(false)

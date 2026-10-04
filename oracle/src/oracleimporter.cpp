@@ -1,20 +1,36 @@
 #include "oracleimporter.h"
 
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/format/format_legality_rules.h"
+#include "libcockatrice/card/lazy_properties_hash.h"
+#include "libcockatrice/card/relation/card_relation_type.h"
 #include "libcockatrice/interfaces/noop_card_preference_provider.h"
 #include "libcockatrice/interfaces/noop_card_set_priority_controller.h"
 #include "parsehelpers.h"
 
+#include <QChar>
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonParseError>
+#include <QJsonValue>
+#include <QJsonValueConstRef>
+#include <QJsonValueRef>
+#include <QPair>
 #include <QRegularExpression>
+#include <QRegularExpressionMatch>
 #include <QSet>
+#include <QSharedPointer>
+#include <QVariant>
 #include <algorithm>
 #include <climits>
 #include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/card/database/parser/cockatrice_xml_4.h>
 #include <libcockatrice/card/relation/card_relation.h>
+#include <qlogging.h>
+#include <qtypes.h>
+
+class ICardSetPriorityController;
 
 static const QList<AllowedCount> kConstructedCounts = {{4, "legal"}, {0, "banned"}};
 

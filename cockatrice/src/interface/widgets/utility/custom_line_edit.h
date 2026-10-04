@@ -8,6 +8,7 @@
 #define CUSTOMLINEEDIT_H
 
 #include <QLineEdit>
+#include <qtmetamacros.h>
 
 class QTreeView;
 class QKeyEvent;

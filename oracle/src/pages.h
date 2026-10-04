@@ -7,22 +7,20 @@
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QString>
-#include <QTimer>
-#include <QWizard>
-#include <utility>
+#include <QStringList>
+#include <qtmetamacros.h>
+#include <qtypes.h>
 
 class QCheckBox;
-class QGroupBox;
 class QComboBox;
 class QLabel;
 class QLineEdit;
 class QRadioButton;
 class QProgressBar;
-class QNetworkAccessManager;
 class QTextEdit;
-class QVBoxLayout;
-class OracleImporter;
-class QSettings;
+class QPushButton;
+class QUrl;
+class QWidget;
 
 class IntroPage : public OracleWizardPage
 {

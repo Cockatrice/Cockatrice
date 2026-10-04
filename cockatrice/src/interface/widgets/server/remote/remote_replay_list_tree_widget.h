@@ -9,21 +9,30 @@
 #ifndef REMOTEREPLAYLIST_TREEWIDGET_H
 #define REMOTEREPLAYLIST_TREEWIDGET_H
 
-#include <QDateTime>
+#include <QAbstractItemModel>
+#include <QIcon>
+#include <QList>
+#include <QModelIndex>
+#include <QSet>
+#include <QString>
 #include <QTreeView>
 #include <libcockatrice/protocol/pb/serverinfo_replay.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_replay_match.pb.h>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
 
 class Response;
 class AbstractClient;
 class QSortFilterProxyModel;
+class QObject;
+class QWidget;
 
 class RemoteReplayList_TreeModel : public QAbstractItemModel
 {
     Q_OBJECT
 private:
-    class MatchNode;
     class ReplayNode;
+
     class Node
     {
     protected:

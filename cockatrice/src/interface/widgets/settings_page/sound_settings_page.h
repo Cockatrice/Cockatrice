@@ -5,10 +5,13 @@
 
 #include <QCheckBox>
 #include <QComboBox>
-#include <QGroupBox>
 #include <QLabel>
 #include <QPushButton>
-#include <QSpinBox>
+#include <qtmetamacros.h>
+
+class QGroupBox;
+class QSlider;
+class QSpinBox;
 
 class SoundSettingsPage : public AbstractSettingsPage
 {

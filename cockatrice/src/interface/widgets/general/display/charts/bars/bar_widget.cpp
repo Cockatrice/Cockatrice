@@ -2,6 +2,10 @@
 
 #include <QFontMetrics>
 #include <QPainter>
+#include <QRect>
+#include <QSize>
+#include <QSizePolicy>
+#include <utility>
 
 BarWidget::BarWidget(QString label, int value, int total, QColor barColor, QWidget *parent)
     : QWidget(parent), label(std::move(label)), value(value), total(total), barColor(barColor)

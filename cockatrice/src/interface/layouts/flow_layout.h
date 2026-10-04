@@ -12,8 +12,14 @@
 #include <QLayout>
 #include <QList>
 #include <QLoggingCategory>
+#include <QSize>
 #include <QStyle>
-#include <QWidget>
+#include <QVector>
+#include <qlogging.h>
+#include <qnamespace.h>
+
+class QLayoutItem;
+class QWidget;
 
 inline Q_LOGGING_CATEGORY(FlowLayoutLog, "flow_layout", QtInfoMsg);
 

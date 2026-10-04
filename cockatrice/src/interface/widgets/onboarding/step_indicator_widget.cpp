@@ -1,7 +1,13 @@
 #include "step_indicator_widget.h"
 
+#include <QBrush>
+#include <QColor>
 #include <QPainter>
 #include <QPainterPath>
+#include <QPalette>
+#include <QRectF>
+#include <QSize>
+#include <qminmax.h>
 
 StepIndicatorWidget::StepIndicatorWidget(QWidget *parent) : QWidget(parent)
 {

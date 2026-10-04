@@ -3,11 +3,17 @@
 #include "../deck_loader/deck_loader.h"
 #include "../widgets/dialogs/dlg_shared_decks_preview.h"
 #include "../widgets/tabs/tab_supervisor.h"
+#include "abstract_client.h"
+#include "contexts/context_connect_to_server.h"
 #include "intent_connect_to_server.h"
+#include "remote_client.h"
 
+#include <QDebug>
 #include <QMessageBox>
+#include <QSharedPointer>
 #include <QTimer>
-#include <libcockatrice/card/database/card_database_querier.h>
+#include <QWidget>
+#include <google/protobuf/repeated_ptr_field.h>
 #include <libcockatrice/protocol/pb/command_deck_share_download.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_share_list.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
@@ -15,6 +21,11 @@
 #include <libcockatrice/protocol/pb/response_deck_share_list.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_deck_share_item.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <optional>
+#include <qnamespace.h>
+#include <string>
+
+class CommandContainer;
 
 IntentOpenSharedDeck::IntentOpenSharedDeck(TabSupervisor *_tabSupervisor,
                                            RemoteClient *_remoteClient,

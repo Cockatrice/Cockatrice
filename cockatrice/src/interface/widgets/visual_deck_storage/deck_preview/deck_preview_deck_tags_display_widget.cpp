@@ -1,15 +1,23 @@
 #include "deck_preview_deck_tags_display_widget.h"
 
 #include "../../../../client/settings/cache_settings.h"
+#include "../../../deck_loader/deck_file_format.h"
 #include "../../../deck_loader/deck_loader.h"
+#include "../../../deck_loader/loaded_deck.h"
 #include "../../general/layout_containers/flow_widget.h"
 #include "deck_preview_tag_addition_widget.h"
 #include "deck_preview_tag_dialog.h"
 #include "deck_preview_tag_display_widget.h"
+#include "libcockatrice/deck_list/deck_list.h"
 
+#include <QDialog>
+#include <QDir>
 #include <QDirIterator>
 #include <QHBoxLayout>
+#include <QSizePolicy>
 #include <libcockatrice/settings/paths_settings.h>
+#include <optional>
+#include <qnamespace.h>
 
 DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_parent, const QStringList &_tags)
     : QWidget(_parent), currentTags(_tags)

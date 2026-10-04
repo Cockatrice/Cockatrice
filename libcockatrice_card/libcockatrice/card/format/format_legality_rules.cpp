@@ -1,6 +1,9 @@
 #include "format_legality_rules.h"
 
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
 #include <libcockatrice/card/card_info.h>
+#include <qnamespace.h>
 
 bool cardMatchesCondition(const CardInfo &card, const CardCondition &cond)
 {

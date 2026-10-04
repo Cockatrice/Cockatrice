@@ -4,9 +4,17 @@
 
 #include <QDialogButtonBox>
 #include <QGridLayout>
-#include <QHBoxLayout>
 #include <QLabel>
+#include <QList>
+#include <QPixmap>
+#include <QSharedPointer>
+#include <QSize>
+#include <QStringList>
+#include <QVBoxLayout>
 #include <libcockatrice/utility/string_limits.h>
+
+class QVBoxLayout;
+class QWidget;
 
 DlgEditUser::DlgEditUser(QWidget *parent, QString email, QString country, QString realName) : QDialog(parent)
 {

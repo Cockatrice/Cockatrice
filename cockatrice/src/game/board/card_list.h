@@ -9,6 +9,8 @@
 
 #include <QList>
 #include <QLoggingCategory>
+#include <QString>
+#include <functional>
 
 inline Q_LOGGING_CATEGORY(CardListLog, "card_list");
 

@@ -4,12 +4,17 @@
 #include "../../logger.h"
 
 #include <QApplication>
+#include <QCheckBox>
 #include <QClipboard>
+#include <QHBoxLayout>
+#include <QList>
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QVBoxLayout>
 #include <libcockatrice/settings/servers_settings.h>
+
+class QWidget;
 
 DlgViewLog::DlgViewLog(QWidget *parent) : QDialog(parent)
 {

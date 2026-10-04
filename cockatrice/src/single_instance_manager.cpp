@@ -1,7 +1,17 @@
 #include "single_instance_manager.h"
 
+#include <QByteArray>
+#include <QDataStream>
 #include <QDir>
+#include <QIODevice>
+#include <QList>
+#include <QLocalServer>
+#include <QLocalSocket>
 #include <QPointer>
+#include <QSharedPointer>
+#include <QStringLiteral>
+#include <QtEnvironmentVariables>
+#include <qtypes.h>
 
 namespace
 {

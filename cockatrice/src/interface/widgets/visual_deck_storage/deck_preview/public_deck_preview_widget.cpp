@@ -4,15 +4,19 @@
 #include "../../cards/additional_info/color_identity_widget.h"
 #include "../../cards/deck_preview_card_picture_widget.h"
 #include "../../general/layout_containers/flow_widget.h"
+#include "../remote_public_decks_model.h"
 #include "deck_preview_tag_display_widget.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/utility/card_ref.h"
 
+#include <QDateTime>
 #include <QKeyEvent>
 #include <QLabel>
-#include <QMouseEvent>
-#include <QResizeEvent>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <qnamespace.h>
 
 PublicDeckPreviewWidget::PublicDeckPreviewWidget(QWidget *parent, const RemotePublicDecksModel::DeckEntry &entry)
     : QWidget(parent)

@@ -2,12 +2,21 @@
 
 #include "../widgets/tabs/tab_room.h"
 #include "../widgets/tabs/tab_supervisor.h"
+#include "contexts/context_connect_to_server.h"
 #include "intent_connect_to_server.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_room.pb.h"
+#include "remote_client.h"
 
+#include <QMap>
+#include <QSharedPointer>
 #include <libcockatrice/protocol/pb/event_list_rooms.pb.h>
 #include <libcockatrice/protocol/pb/response_join_room.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+
+class CommandContainer;
+class QVariant;
 
 IntentOpenServerRoomByName::IntentOpenServerRoomByName(TabSupervisor *_tabSupervisor,
                                                        RemoteClient *_remoteClient,

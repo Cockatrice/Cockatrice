@@ -8,8 +8,8 @@
 #define REVERSED_COMPLETER_MODEL_H
 
 #include <QAbstractProxyModel>
-
-class QAbstractItemModel;
+#include <QModelIndex>
+#include <qnamespace.h>
 
 /**
  * @brief A completer model that can present its rows bottom-to-top.

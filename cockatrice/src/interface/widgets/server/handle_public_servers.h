@@ -9,8 +9,17 @@
 
 #include "user/user_info_connection.h"
 
+#include <QList>
+#include <QMap>
+#include <QObject>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
+#include <utility>
+
 class QNetworkReply;
 class QNetworkAccessManager;
+class QVariant;
 
 /**
  * This class is used to update the servers.ini file and ensure

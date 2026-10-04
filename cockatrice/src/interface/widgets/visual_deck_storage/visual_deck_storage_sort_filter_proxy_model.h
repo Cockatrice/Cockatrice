@@ -15,11 +15,15 @@
 #ifndef VISUAL_DECK_STORAGE_SORT_FILTER_PROXY_MODEL_H
 #define VISUAL_DECK_STORAGE_SORT_FILTER_PROXY_MODEL_H
 
-#include "visual_deck_storage_model.h"
-
+#include <QChar>
+#include <QList>
 #include <QSet>
 #include <QSortFilterProxyModel>
 #include <QString>
+#include <qtmetamacros.h>
+
+class QObject;
+class VisualDeckStorageModel;
 
 class VisualDeckStorageSortFilterProxyModel : public QSortFilterProxyModel
 {

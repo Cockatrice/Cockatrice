@@ -1,5 +1,13 @@
 #include "cards_display_settings.h"
 
+#include "libcockatrice/card/card_localization.h"
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QSharedPointer>
+#include <QVariant>
+
+class QObject;
+
 CardsDisplaySettings::CardsDisplaySettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "cards_display.ini", "cards", QString(), parent)
 {

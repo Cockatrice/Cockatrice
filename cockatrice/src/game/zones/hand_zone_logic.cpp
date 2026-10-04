@@ -3,6 +3,9 @@
 #include "../../game_graphics/board/card_item.h"
 #include "card_zone_algorithms.h"
 
+class PlayerLogic;
+class QObject;
+
 HandZoneLogic::HandZoneLogic(PlayerLogic *_player,
                              const QString &_name,
                              bool _hasCardAttr,

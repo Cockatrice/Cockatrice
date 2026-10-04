@@ -1,5 +1,8 @@
 #include "translate_counter_name.h"
 
+#include <QtTranslation>
+#include <utility>
+
 const QMap<QString, QString> TranslateCounterName::translated = {
     {"life", QT_TRANSLATE_NOOP("TranslateCounterName", "Life")},
     {"w", QT_TRANSLATE_NOOP("TranslateCounterName", "White")},

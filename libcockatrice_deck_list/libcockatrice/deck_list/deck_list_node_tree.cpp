@@ -16,9 +16,6 @@
 #include <qminmax.h>
 #include <qtypes.h>
 
-class QXmlStreamReader;
-class QXmlStreamWriter;
-
 static constexpr int MAX_DECK_SIZE = 1e5;
 
 namespace

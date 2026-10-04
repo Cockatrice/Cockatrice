@@ -1,6 +1,11 @@
 #include "debug_settings.h"
 
-#include <QtCore/QFile>
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QFile>
+#include <QVariant>
+
+class QObject;
 
 DebugSettings::DebugSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "debug.ini", "debug", QString(), parent)

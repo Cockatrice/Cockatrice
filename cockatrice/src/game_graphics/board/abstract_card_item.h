@@ -8,14 +8,22 @@
 #define ABSTRACTCARDITEM_H
 
 #include "../animated_item.h"
-#include "../card_dimensions.h"
 #include "arrow_target.h"
 #include "graphics_item_type.h"
 
+#include <QColor>
+#include <QGraphicsItem>
+#include <QSizeF>
+#include <QString>
 #include <libcockatrice/card/printing/exact_card.h>
 #include <libcockatrice/utility/card_ref.h>
+#include <qtmetamacros.h>
+#include <qtypes.h>
 
 class PlayerLogic;
+class CardInfo;
+class QPainter;
+class QPoint;
 
 class AbstractCardItem : public ArrowTarget, public IAnimatedItem
 {

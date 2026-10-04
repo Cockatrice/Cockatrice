@@ -4,6 +4,7 @@
 #include "intent.h"
 
 #include <QString>
+#include <qtmetamacros.h>
 
 class TabSupervisor;
 

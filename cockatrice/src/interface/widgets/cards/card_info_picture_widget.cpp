@@ -1,21 +1,48 @@
 #include "card_info_picture_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../../game_graphics/board/card_item.h"
 #include "../../../interface/card_picture_loader/card_picture_loader.h"
 #include "../../../interface/widgets/tabs/tab_supervisor.h"
 #include "../../window_main.h"
+#include "../tabs/abstract_tab_deck_editor.h"
 #include "card_art_utils.h"
+#include "card_info_picture_enlarged_widget.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
 
+#include <QAbstractAnimation>
+#include <QAction>
+#include <QApplication>
+#include <QByteArray>
+#include <QCursor>
+#include <QDebug>
+#include <QEasingCurve>
+#include <QGuiApplication>
+#include <QList>
 #include <QMenu>
 #include <QMouseEvent>
+#include <QObject>
+#include <QPainterPath>
+#include <QPropertyAnimation>
+#include <QRect>
 #include <QScreen>
+#include <QSharedPointer>
+#include <QSize>
+#include <QString>
 #include <QStylePainter>
+#include <QTimer>
 #include <QWidget>
+#include <QtPreprocessorSupport>
+#include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/settings/cards_display_settings.h>
-#include <utility>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <qtypes.h>
 
 static constexpr qreal MTG_CARD_ASPECT_RATIO = 1.396;
 // static constexpr qreal YUGIOH_CARD_ASPECT_RATIO = 1.457;

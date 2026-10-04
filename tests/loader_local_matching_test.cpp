@@ -1,7 +1,11 @@
 #include "client/settings/cache_settings.h"
 #include "interface/card_picture_loader/card_picture_loader_local.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/printing/printing_info.h"
 
 #include "gtest/gtest.h"
+#include <QByteArray>
+#include <QByteArrayView>
 #include <QColor>
 #include <QCoreApplication>
 #include <QDir>
@@ -9,13 +13,18 @@
 #include <QImage>
 #include <QImageWriter>
 #include <QLoggingCategory>
+#include <QSharedPointer>
 #include <QStandardPaths>
+#include <QString>
 #include <QTemporaryDir>
+#include <QtEnvironmentVariables>
 #include <libcockatrice/card/lazy_properties_hash.h>
 #include <libcockatrice/card/printing/exact_card.h>
 #include <libcockatrice/card/set/card_set.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 #include <libcockatrice/settings/paths_settings.h>
+#include <qnamespace.h>
+#include <string>
 
 namespace
 {

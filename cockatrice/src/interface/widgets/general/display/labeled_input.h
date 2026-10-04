@@ -7,11 +7,15 @@
 #ifndef LABELED_INPUT_H
 #define LABELED_INPUT_H
 
-#include <QComboBox>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QSpinBox>
+#include <QString>
+#include <QStringList>
 #include <QWidget>
+#include <qtmetamacros.h>
+
+class QComboBox;
+class QHBoxLayout;
+class QLabel;
+class QSpinBox;
 
 class LabeledInput final : public QWidget
 {

@@ -1,17 +1,26 @@
 #include "phases_toolbar.h"
 
 #include "../interface/pixel_map_generator.h"
+#include "board/abstract_graphics_item.h"
+#include "libcockatrice/protocol/pb/card_attributes.pb.h"
 
 #include <QAction>
-#include <QDebug>
+#include <QColor>
 #include <QPainter>
-#include <QPen>
+#include <QPixmap>
+#include <QRect>
+#include <QRectF>
 #include <QTimer>
+#include <QTransform>
+#include <google/protobuf/stubs/port.h>
 #include <libcockatrice/protocol/pb/command_draw_cards.pb.h>
 #include <libcockatrice/protocol/pb/command_next_turn.pb.h>
 #include <libcockatrice/protocol/pb/command_set_active_phase.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
 #include <libcockatrice/utility/zone_names.h>
+#include <qnamespace.h>
+#include <qnumeric.h>
+#include <qtypes.h>
 
 PhaseButton::PhaseButton(const QString &_name, QGraphicsItem *parent, QAction *_doubleClickAction, bool _highlightable)
     : QObject(), QGraphicsItem(parent), name(_name), active(false), highlightable(_highlightable),

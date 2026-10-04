@@ -1,28 +1,53 @@
 #include "view_zone_widget.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "../../client/translation.h"
 #include "../../filters/syntax_help.h"
+#include "../../game/board/card_list.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
+#include "../../game/zones/card_zone_logic.h"
+#include "../../game/zones/view_zone_logic.h"
 #include "../../interface/pixel_map_generator.h"
-#include "../board/card_item.h"
-#include "../game_scene.h"
+#include "../card_dimensions.h"
 #include "../z_values.h"
+#include "libcockatrice/utility/macros.h"
 #include "view_zone.h"
 
+#include <QAction>
 #include <QCheckBox>
+#include <QCloseEvent>
+#include <QDebug>
+#include <QEvent>
+#include <QFlags>
+#include <QFrame>
+#include <QGraphicsItem>
+#include <QGraphicsLayout>
 #include <QGraphicsLinearLayout>
 #include <QGraphicsProxyWidget>
+#include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsSceneResizeEvent>
 #include <QGraphicsView>
-#include <QLabel>
-#include <QPainter>
+#include <QIcon>
+#include <QObject>
+#include <QRect>
 #include <QScrollBar>
+#include <QSizeF>
+#include <QSizePolicy>
+#include <QString>
+#include <QStringLiteral>
 #include <QStyle>
 #include <QStyleOption>
+#include <QStyleOptionTitleBar>
+#include <QTimer>
+#include <QVariant>
+#include <QWidget>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
+#include <qminmax.h>
+#include <qnamespace.h>
 
 namespace
 {

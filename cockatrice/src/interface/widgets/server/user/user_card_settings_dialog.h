@@ -3,24 +3,26 @@
 
 #include "user_list_painter.h"
 
-#include <QComboBox>
 #include <QDialog>
+#include <QMetaObject>
 #include <QPixmap>
+#include <QPoint>
+#include <QString>
+#include <QWidget>
+#include <qtmetamacros.h>
+#include <qtypes.h>
 
 class QCompleter;
-class QFocusEvent;
 class QGroupBox;
-class QKeyEvent;
-class QMouseEvent;
 class QLineEdit;
 class QDoubleSpinBox;
 class QLabel;
 class QPushButton;
-class QWheelEvent;
 class CardDatabaseModel;
 class CardDatabaseDisplayModel;
 class CardSearchModel;
 class CardCompleterProxyModel;
+class QComboBox;
 
 /**
  * @brief Interactive preview of the user list banner art.

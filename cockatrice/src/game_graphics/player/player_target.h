@@ -14,8 +14,12 @@
 
 #include <QElapsedTimer>
 #include <QPixmap>
+#include <qtmetamacros.h>
+#include <qtypes.h>
 
 class PlayerLogic;
+class CounterState;
+class QGraphicsItem;
 
 class PlayerCounter : public AbstractCounter, public IAnimatedItem
 {

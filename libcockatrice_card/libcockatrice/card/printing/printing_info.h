@@ -4,9 +4,12 @@
 #include "../set/card_set.h"
 #include "libcockatrice/card/lazy_properties_hash.h"
 
+#include <QHash>
 #include <QList>
 #include <QMap>
 #include <QSharedPointer>
+#include <QString>
+#include <QStringList>
 
 class PrintingInfo;
 

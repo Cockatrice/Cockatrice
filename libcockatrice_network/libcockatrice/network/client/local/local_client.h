@@ -10,6 +10,11 @@
 #include "../abstract/abstract_client.h"
 
 #include <QLoggingCategory>
+#include <QString>
+#include <qtmetamacros.h>
+
+class QObject;
+class ServerMessage;
 
 inline Q_LOGGING_CATEGORY(LocalClientLog, "local_client");
 

@@ -10,6 +10,13 @@
 #include "tab.h"
 
 #include <QLoggingCategory>
+#include <QString>
+#include <QVariant>
+#include <qtmetamacros.h>
+
+class QAction;
+class QMenu;
+class TabSupervisor;
 
 inline Q_LOGGING_CATEGORY(TabMessageLog, "tab_message");
 

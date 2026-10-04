@@ -5,11 +5,14 @@
 
 #include <QCheckBox>
 #include <QComboBox>
-#include <QGroupBox>
 #include <QLabel>
+#include <QList>
 #include <QPushButton>
 #include <QSpinBox>
 #include <libcockatrice/utility/macros.h>
+#include <qtmetamacros.h>
+
+class QGroupBox;
 
 class AppearanceSettingsPage : public AbstractSettingsPage
 {

@@ -1,26 +1,51 @@
 #include "deck_loader.h"
 
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/deck_list/tree/abstract_deck_list_card_node.h"
+#include "libcockatrice/deck_list/tree/abstract_deck_list_node.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
+
 #include <QApplication>
 #include <QClipboard>
+#include <QDateTime>
 #include <QDebug>
 #include <QDir>
 #include <QFile>
+#include <QFileDevice>
 #include <QFileInfo>
-#include <QFutureWatcher>
+#include <QFont>
+#include <QFuture>
+#include <QIODevice>
+#include <QList>
+#include <QMap>
+#include <QMessageLogger>
+#include <QMultiMap>
 #include <QPrinter>
 #include <QRegularExpression>
 #include <QSaveFile>
+#include <QSet>
+#include <QSharedPointer>
 #include <QStringList>
+#include <QTextBlockFormat>
+#include <QTextCharFormat>
 #include <QTextCursor>
 #include <QTextDocument>
+#include <QTextLength>
 #include <QTextStream>
 #include <QTextTable>
+#include <QTextTableCell>
+#include <QTextTableFormat>
+#include <QVector>
 #include <QtConcurrentRun>
-#include <libcockatrice/card/database/card_database.h>
+#include <functional>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/import/card_name_normalizer.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/tree/deck_list_card_node.h>
+#include <qnamespace.h>
+
+class QTextLength;
 
 const QStringList DeckLoader::ACCEPTED_FILE_EXTENSIONS = {"*.cod", "*.dec", "*.dek", "*.txt", "*.mwDeck"};
 

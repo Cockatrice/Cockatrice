@@ -2,6 +2,7 @@
 
 #include "../../interface/theme_manager.h"
 
+#include <QBrush>
 #include <QPainter>
 
 PlayerArea::PlayerArea(QGraphicsItem *parentItem) : QObject(), QGraphicsItem(parentItem)

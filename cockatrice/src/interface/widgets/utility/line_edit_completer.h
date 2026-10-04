@@ -10,12 +10,12 @@
 
 #include "custom_line_edit.h"
 
-#include <QCompleter>
-#include <QFocusEvent>
-#include <QKeyEvent>
 #include <QList>
 #include <QString>
-#include <QVector>
+#include <qtmetamacros.h>
+
+class QCompleter;
+class QWidget;
 
 enum class CompleterTrigger
 {

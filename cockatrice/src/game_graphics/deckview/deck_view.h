@@ -8,17 +8,30 @@
 #define DECKVIEW_H
 
 #include "../board/abstract_card_drag_item.h"
+#include "../board/abstract_card_item.h"
+#include "../board/graphics_item_type.h"
 
+#include <QGraphicsItem>
+#include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QList>
 #include <QMap>
+#include <QMultiMap>
+#include <QPair>
+#include <QPointF>
+#include <QRectF>
+#include <QSizeF>
+#include <QString>
 #include <libcockatrice/protocol/pb/move_card_to_zone.pb.h>
+#include <qtmetamacros.h>
+#include <qtypes.h>
 
 class DeckList;
-class InnerDecklistNode;
-class CardInfo;
 class DeckViewCardContainer;
 class DeckViewCardDragItem;
-class MoveCardToZone;
+class QObject;
+class QWidget;
+struct CardRef;
 
 class DeckViewCard : public AbstractCardItem
 {

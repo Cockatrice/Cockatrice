@@ -1,12 +1,16 @@
 #include "mana_cost_widget.h"
 
+#include "libcockatrice/card/card_info.h"
 #include "mana_symbol_widget.h"
 
 #include <QHBoxLayout>
-#include <QLabel>
+#include <QList>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QRegularExpressionMatchIterator>
 #include <QResizeEvent>
 #include <QSize>
-#include <qregularexpression.h>
+#include <qminmax.h>
 
 ManaCostWidget::ManaCostWidget(QWidget *parent, CardInfoPtr _card) : QWidget(parent), card(_card)
 {

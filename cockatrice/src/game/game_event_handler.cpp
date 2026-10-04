@@ -1,9 +1,30 @@
 #include "game_event_handler.h"
 
-#include "../game_graphics/log/message_log_widget.h"
-#include "../interface/widgets/tabs/tab_game.h"
 #include "abstract_game.h"
+#include "game_meta_info.h"
+#include "game_state.h"
+#include "libcockatrice/protocol/pb/commands.pb.h"
+#include "libcockatrice/protocol/pb/game_commands.pb.h"
+#include "libcockatrice/protocol/pb/game_event.pb.h"
+#include "libcockatrice/protocol/pb/game_event_context.pb.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_player.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+#include "player/player_event_handler.h"
+#include "player/player_info.h"
+#include "player/player_logic.h"
+#include "player/player_manager.h"
 
+#include <QList>
+#include <QMap>
+#include <QMapIterator>
+#include <QMessageLogger>
+#include <QSharedPointer>
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/message.h>
+#include <google/protobuf/stubs/port.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/command_concede.pb.h>
@@ -13,7 +34,6 @@
 #include <libcockatrice/protocol/pb/command_next_turn.pb.h>
 #include <libcockatrice/protocol/pb/command_reverse_turn.pb.h>
 #include <libcockatrice/protocol/pb/command_set_active_phase.pb.h>
-#include <libcockatrice/protocol/pb/context_connection_state_changed.pb.h>
 #include <libcockatrice/protocol/pb/context_deck_select.pb.h>
 #include <libcockatrice/protocol/pb/event_game_closed.pb.h>
 #include <libcockatrice/protocol/pb/event_game_host_changed.pb.h>
@@ -28,6 +48,8 @@
 #include <libcockatrice/protocol/pb/event_set_active_player.pb.h>
 #include <libcockatrice/protocol/pb/game_event_container.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <string>
+#include <utility>
 
 GameEventHandler::GameEventHandler(AbstractGame *_game) : QObject(_game), game(_game)
 {

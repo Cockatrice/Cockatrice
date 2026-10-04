@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "libcockatrice/rng/rng_abstract.h"
 #include "servatrice.h"
 #include "server_logger.h"
 #include "settingscache.h"
@@ -25,16 +26,30 @@
 #include "smtpclient.h"
 #include "version_string.h"
 
+#include <QCommandLineOption>
 #include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QDateTime>
+#include <QDebug>
 #include <QFile>
+#include <QList>
+#include <QMetaMethodArgument>
+#include <QMetaObject>
 #include <QMetaType>
-#include <QtGlobal>
+#include <QObject>
+#include <QSharedPointer>
+#include <QString>
+#include <QThread>
+#include <QVariant>
+#include <QVector>
+#include <google/protobuf/stubs/common.h>
 #include <iostream>
 #include <libcockatrice/rng/rng_sfmt.h>
 #include <libcockatrice/utility/cryptoutil.h>
 #include <libcockatrice/utility/passwordhasher.h>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <string>
 
 RNG_Abstract *rng;
 ServerLogger *logger;

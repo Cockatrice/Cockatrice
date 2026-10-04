@@ -1,5 +1,12 @@
 #include "card_node_function.h"
 
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
+
+#include <QSharedPointer>
+#include <QString>
+#include <QtPreprocessorSupport>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/tree/deck_list_card_node.h>

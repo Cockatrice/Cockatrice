@@ -15,13 +15,18 @@
 
 #include "flow_layout.h"
 
-#include "../widgets/general/layout_containers/flow_widget.h"
-
 #include <QDebug>
 #include <QLayoutItem>
-#include <QScrollArea>
+#include <QMessageLogger>
+#include <QMetaObject>
+#include <QObject>
+#include <QPoint>
+#include <QRect>
+#include <QSizePolicy>
 #include <QStyle>
+#include <QWidget>
 #include <QWidgetItem>
+#include <qminmax.h>
 
 FlowLayout::FlowLayout(QWidget *parent,
                        const Qt::Orientation flowDirection,

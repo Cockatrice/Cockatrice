@@ -2,7 +2,8 @@
 #define COCKATRICE_DLG_REPORT_USER_H
 
 #include <QDialog>
-#include <libcockatrice/protocol/pb/response.pb.h>
+#include <QString>
+#include <qtmetamacros.h>
 
 class AbstractClient;
 class QComboBox;
@@ -10,6 +11,8 @@ class QDialogButtonBox;
 class QLineEdit;
 class QTextEdit;
 class QLabel;
+class QWidget;
+class Response;
 
 class DlgReportUser : public QDialog
 {

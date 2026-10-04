@@ -1,7 +1,15 @@
 #include "card_database_model.h"
 
-#include <QMap>
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
+
+#include <QChar>
+#include <QSharedPointer>
+#include <QString>
+#include <QVariant>
 #include <libcockatrice/card/database/card_database.h>
+
+class QObject;
 
 #define CARDDBMODEL_COLUMNS 6
 

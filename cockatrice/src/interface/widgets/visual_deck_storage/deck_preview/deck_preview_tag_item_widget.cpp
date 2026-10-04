@@ -1,5 +1,8 @@
 #include "deck_preview_tag_item_widget.h"
 
+#include <QCheckBox>
+#include <QHBoxLayout>
+
 DeckPreviewTagItemWidget::DeckPreviewTagItemWidget(const QString &tagName, bool isChecked, QWidget *parent)
     : QWidget(parent), checkBox_(new QCheckBox(this))
 {

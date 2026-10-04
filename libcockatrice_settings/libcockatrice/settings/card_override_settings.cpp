@@ -1,5 +1,12 @@
 #include "card_override_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+#include "libcockatrice/utility/card_ref.h"
+
+#include <QVariant>
+
+class QObject;
+
 CardOverrideSettings::CardOverrideSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "cardPreferenceOverrides.ini", "cards", QString(), parent)
 {

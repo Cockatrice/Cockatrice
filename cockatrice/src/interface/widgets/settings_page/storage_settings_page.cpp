@@ -5,12 +5,21 @@
 #include "../../card_picture_loader/card_picture_loader_local_schemes.h"
 #include "../interface/card_picture_loader/card_picture_loader.h"
 
+#include <QComboBox>
 #include <QDir>
 #include <QGridLayout>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QList>
 #include <QMessageBox>
+#include <QOverload>
+#include <QString>
+#include <QVBoxLayout>
+#include <QVariant>
 #include <libcockatrice/settings/cache_storage_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
+#include <qnamespace.h>
 
 StorageSettingsPage::StorageSettingsPage()
 {

@@ -2,15 +2,27 @@
 
 #include "version_string.h"
 
+#include <QByteArray>
+#include <QDebug>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QMessageBox>
+#include <QJsonParseError>
+#include <QJsonValue>
+#include <QMap>
+#include <QMessageLogger>
+#include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QRegularExpression>
-#include <QSysInfo>
-#include <QtGlobal>
+#include <QRegularExpressionMatch>
+#include <QUrl>
+#include <QVariant>
+#include <QVariantMap>
+#include <QtPreprocessorSupport>
 #include <optional>
+#include <qnamespace.h>
+#include <qprocessordetection.h>
 
 #if defined(Q_OS_MACOS)
 #include <sys/sysctl.h>

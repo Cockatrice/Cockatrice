@@ -1,8 +1,15 @@
 #ifndef PICTURE_LOADER_LOCAL_H
 #define PICTURE_LOADER_LOCAL_H
 
-#include <QTimer>
-#include <libcockatrice/card/printing/exact_card.h>
+#include <QImage>
+#include <QLoggingCategory>
+#include <QMultiHash>
+#include <QObject>
+#include <QString>
+#include <qtmetamacros.h>
+
+class ExactCard;
+class QTimer;
 
 inline Q_LOGGING_CATEGORY(CardPictureLoaderLocalLog, "card_picture_loader.local");
 

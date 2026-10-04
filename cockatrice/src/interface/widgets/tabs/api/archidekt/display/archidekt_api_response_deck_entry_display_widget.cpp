@@ -1,17 +1,30 @@
 #include "archidekt_api_response_deck_entry_display_widget.h"
 
 #include "../../../../../card_picture_loader/card_picture_loader.h"
-#include "../../../../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../../../../general/display/background_plate_widget.h"
 #include "../../../../general/display/charts/bars/color_bar.h"
+#include "../../../../general/display/shadow_background_label.h"
+#include "../api_response/deck_listings/archidekt_api_response_deck_listing_container.h"
+#include "../api_response/deck_listings/archidekt_api_response_deck_owner.h"
 #include "archidekt_deck_preview_image_display_widget.h"
 
-#include <QHBoxLayout>
+#include <QByteArray>
+#include <QDateTime>
+#include <QFontMetrics>
 #include <QLabel>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QPixmap>
+#include <QRect>
+#include <QSharedPointer>
+#include <QSize>
+#include <QSizePolicy>
+#include <QVBoxLayout>
+#include <QVariant>
 #include <QWidget>
+#include <qnamespace.h>
+#include <qtypes.h>
 #include <version_string.h>
 
 #define ARCHIDEKT_DEFAULT_IMAGE "https://storage.googleapis.com/topdekt-user/images/archidekt_deck_card_shadow.jpg"

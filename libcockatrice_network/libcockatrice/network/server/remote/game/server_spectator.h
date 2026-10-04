@@ -3,6 +3,12 @@
 
 #include "server_abstract_participant.h"
 
+#include <qtmetamacros.h>
+
+class ServerInfo_User;
+class Server_AbstractUserInterface;
+class Server_Game;
+
 class Server_Spectator : public Server_AbstractParticipant
 {
     Q_OBJECT

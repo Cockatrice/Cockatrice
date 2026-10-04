@@ -3,13 +3,22 @@
 #include "../cards/art_crop_attribution.h"
 #include "playmat_utils.h"
 
+#include <QBrush>
+#include <QColor>
+#include <QFlags>
 #include <QKeyEvent>
 #include <QLinearGradient>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QPainterPath>
+#include <QPalette>
+#include <QPen>
+#include <QPointF>
+#include <QRect>
+#include <QSizePolicy>
 #include <QWheelEvent>
 #include <cmath>
+#include <qminmax.h>
+#include <qnamespace.h>
 
 namespace
 {

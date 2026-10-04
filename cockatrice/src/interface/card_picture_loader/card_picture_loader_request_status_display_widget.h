@@ -1,11 +1,16 @@
 #ifndef PICTURE_LOADER_REQUEST_STATUS_DISPLAY_WIDGET_H
 #define PICTURE_LOADER_REQUEST_STATUS_DISPLAY_WIDGET_H
 
-#include <QHBoxLayout>
+#include <QDateTime>
 #include <QLabel>
-#include <QUrl>
+#include <QSharedPointer>
+#include <QString>
 #include <QWidget>
-#include <libcockatrice/card/printing/exact_card.h>
+#include <qtmetamacros.h>
+
+class ExactCard;
+class QHBoxLayout;
+class QUrl;
 
 /**
  * @class CardPictureLoaderRequestStatusDisplayWidget

@@ -1,19 +1,38 @@
 #include "printing_selector.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../../interface/card_picture_loader/card_picture_loader.h"
-#include "../../../interface/widgets/dialogs/dlg_select_set_for_cards.h"
+#include "../cards/card_size_widget.h"
 #include "../deck_editor/deck_state_manager.h"
+#include "../general/layout_containers/flow_widget.h"
+#include "../quick_settings/settings_button_widget.h"
+#include "../tabs/abstract_tab_deck_editor.h"
+#include "deck_list_model.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/deck_list/tree/deck_list_card_node.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
 #include "printing_selector_card_display_widget.h"
 #include "printing_selector_card_search_widget.h"
 #include "printing_selector_card_selection_widget.h"
 #include "printing_selector_card_sorting_widget.h"
 #include "printing_selector_placeholder_widget.h"
 
-#include <QBoxLayout>
+#include <QCheckBox>
+#include <QDebug>
+#include <QHBoxLayout>
+#include <QList>
+#include <QMap>
+#include <QScrollArea>
 #include <QScrollBar>
+#include <QSharedPointer>
+#include <QSizePolicy>
+#include <QString>
+#include <QTimer>
+#include <QVBoxLayout>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/utility/macros.h>
+#include <qnamespace.h>
 
 /**
  * @brief Constructs a PrintingSelector widget to display and manage card printings.

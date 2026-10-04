@@ -19,6 +19,7 @@
 #include <QXmlStreamWriter>
 #include <algorithm>
 #include <iterator>
+#include <libcockatrice/utility/card_ref.h>
 #include <qlogging.h>
 #include <qminmax.h>
 

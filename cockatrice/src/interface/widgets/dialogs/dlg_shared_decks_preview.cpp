@@ -3,14 +3,19 @@
 #include "../deck_share/shared_deck_preview_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 
-#include <QCloseEvent>
+#include <QAbstractButton>
 #include <QDateTime>
 #include <QDialogButtonBox>
+#include <QFont>
 #include <QLabel>
 #include <QPushButton>
+#include <QStringList>
 #include <QVBoxLayout>
-#include <libcockatrice/card/database/card_database_querier.h>
+#include <google/protobuf/repeated_ptr_field.h>
 #include <libcockatrice/protocol/pb/serverinfo_deck_share_item.pb.h>
+#include <qnamespace.h>
+
+class QWidget;
 
 DlgSharedDecksPreview::DlgSharedDecksPreview(QWidget *parent,
                                              const CardDatabaseQuerier *querier,

@@ -2,10 +2,21 @@
 
 #include "libcockatrice/utility/color.h"
 
+#include <QBrush>
 #include <QLinearGradient>
+#include <QMap>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPen>
+#include <QPoint>
+#include <QPointF>
+#include <QRect>
+#include <QRectF>
+#include <QSize>
 #include <QToolTip>
+#include <QtPreprocessorSupport>
+#include <qnamespace.h>
+#include <utility>
 
 ColorBar::ColorBar(const QMap<QString, int> &_colors, QWidget *parent)
     : QWidget(parent), colors(GameSpecificColors::MTG::sortManaMapWUBRGCFirst(_colors))

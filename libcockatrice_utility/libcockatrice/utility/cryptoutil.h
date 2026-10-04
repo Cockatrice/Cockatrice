@@ -2,7 +2,7 @@
 #define CRYPTOUTIL_H
 
 #include <QByteArray>
-#include <QtGlobal>
+#include <qtypes.h>
 
 namespace CryptoUtil
 {

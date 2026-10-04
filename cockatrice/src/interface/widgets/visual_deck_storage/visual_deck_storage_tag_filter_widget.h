@@ -6,13 +6,16 @@
 #ifndef VISUAL_DECK_STORAGE_TAG_FILTER_WIDGET_H
 #define VISUAL_DECK_STORAGE_TAG_FILTER_WIDGET_H
 
-#include <QSet>
+#include <QList>
 #include <QStringList>
 #include <QWidget>
 #include <functional>
+#include <qtmetamacros.h>
 
 class DeckPreviewTagDisplayWidget;
 class FlowWidget;
+class QString;
+template <class T> class QSet;
 
 class VisualDeckStorageTagFilterWidget : public QWidget
 {

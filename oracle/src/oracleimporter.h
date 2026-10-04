@@ -1,17 +1,28 @@
 #ifndef ORACLEIMPORTER_H
 #define ORACLEIMPORTER_H
 
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
 #include "raw_json_scanner.h"
 
 #include <QAtomicInt>
 #include <QByteArray>
+#include <QDate>
+#include <QHash>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QList>
 #include <QMap>
-#include <QRegularExpression>
-#include <QVariant>
+#include <QObject>
+#include <QString>
+#include <QStringList>
 #include <libcockatrice/card/card_info.h>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
 #include <utility>
+
+class CardRelation;
+class QRegularExpression;
 
 // many users prefer not to see these sets with non english arts
 // they will given priority PriorityLowest

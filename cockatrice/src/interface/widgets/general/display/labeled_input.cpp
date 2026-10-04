@@ -1,5 +1,12 @@
 #include "labeled_input.h"
 
+#include <QComboBox>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QList>
+#include <QSpinBox>
+#include <qobjectdefs.h>
+
 LabeledInput::LabeledInput(QWidget *parent, const QString &labelText) : QWidget(parent)
 {
     label = new QLabel(labelText, this);

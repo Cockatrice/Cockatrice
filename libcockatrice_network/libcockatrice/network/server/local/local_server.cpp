@@ -1,8 +1,17 @@
 #include "local_server.h"
 
+#include "../remote/server.h"
+#include "../remote/server_database_interface.h"
+#include "../remote/server_protocolhandler.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 #include "local_server_interface.h"
 
 #include <../remote/server_room.h>
+#include <QList>
+#include <QStringList>
+#include <string>
+
+class QObject;
 
 LocalServer::LocalServer(QObject *parent) : Server(parent)
 {

@@ -1,8 +1,10 @@
 #include "local_server_interface.h"
 
+#include "../remote/server_protocolhandler.h"
 #include "local_server.h"
 
-#include <QDebug>
+class CommandContainer;
+class Server_DatabaseInterface;
 
 LocalServerInterface::LocalServerInterface(LocalServer *_server, Server_DatabaseInterface *_databaseInterface)
     : Server_ProtocolHandler(_server, _databaseInterface, _server)

@@ -1,9 +1,13 @@
 #include "replay_quick_settings_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../quick_settings/settings_button_widget.h"
+#include "libcockatrice/utility/macros.h"
 
+#include <QDebug>
 #include <QGridLayout>
 #include <QLabel>
+#include <QOverload>
 #include <QWidget>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/personal_settings.h>

@@ -2,7 +2,10 @@
 
 #include "../../../cards/additional_info/mana_symbol_widget.h"
 
+#include <QLabel>
+#include <QProgressBar>
 #include <QVBoxLayout>
+#include <qnamespace.h>
 
 ManaDistributionSingleDisplayWidget::ManaDistributionSingleDisplayWidget(const QString &colorSymbol, QWidget *parent)
     : QWidget(parent)

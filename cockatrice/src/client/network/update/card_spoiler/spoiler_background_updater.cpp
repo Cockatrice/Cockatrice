@@ -1,21 +1,35 @@
 #include "spoiler_background_updater.h"
 
-#include "../../../../interface/window_main.h"
 #include "../../../../main.h"
 #include "../../../settings/cache_settings.h"
 
+#include <QChar>
 #include <QCryptographicHash>
 #include <QDateTime>
 #include <QDebug>
+#include <QDir>
 #include <QFile>
+#include <QFileInfo>
+#include <QIODevice>
+#include <QList>
 #include <QLocale>
+#include <QMessageLogger>
+#include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QSharedPointer>
+#include <QSystemTrayIcon>
+#include <QTimeZone>
 #include <QUrl>
-#include <QtConcurrent>
+#include <QtConcurrentRun>
+#include <QtVersionChecks>
+#include <functional>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
+#include <tuple>
+#include <utility>
 #include <version_string.h>
 
 #define SPOILERS_STATUS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Spoiler/files/SpoilerSeasonEnabled"

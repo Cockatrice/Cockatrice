@@ -1,6 +1,7 @@
 #include "cryptoutil.h"
 
 #include <openssl/rand.h>
+#include <qlogging.h>
 
 namespace CryptoUtil
 {

@@ -1,8 +1,19 @@
 #ifndef WINDOW_DECKEDITORVISUAL_H
 #define WINDOW_DECKEDITORVISUAL_H
 
-#include "../tab.h"
-#include "tab_deck_editor_visual_tab_widget.h"
+#include "../abstract_tab_deck_editor.h"
+
+#include <QString>
+#include <qtmetamacros.h>
+
+class ExactCard;
+class QDockWidget;
+class QHBoxLayout;
+class QMouseEvent;
+class QVBoxLayout;
+class QWidget;
+class TabDeckEditorVisualTabWidget;
+class TabSupervisor;
 
 /**
  * @class TabDeckEditorVisual

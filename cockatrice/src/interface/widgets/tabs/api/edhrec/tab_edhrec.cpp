@@ -1,16 +1,26 @@
 #include "tab_edhrec.h"
 
+#include "../../tab.h"
 #include "api_response/commander/edhrec_commander_api_response.h"
 #include "display/commander/edhrec_commander_api_response_display_widget.h"
+#include "libcockatrice/card/card_info.h"
 
+#include <QByteArray>
+#include <QChar>
 #include <QDebug>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonValueRef>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QRegularExpression>
-#include <QResizeEvent>
+#include <QSharedPointer>
+#include <QUrl>
+#include <qlogging.h>
+
+class TabSupervisor;
 
 TabEdhRec::TabEdhRec(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 {

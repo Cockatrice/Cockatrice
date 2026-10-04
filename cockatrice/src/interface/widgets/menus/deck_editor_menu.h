@@ -8,8 +8,11 @@
 #define DECK_EDITOR_MENU_H
 
 #include <QMenu>
+#include <qtmetamacros.h>
 
 class AbstractTabDeckEditor;
+class QAction;
+
 class DeckEditorMenu : public QMenu
 {
     Q_OBJECT

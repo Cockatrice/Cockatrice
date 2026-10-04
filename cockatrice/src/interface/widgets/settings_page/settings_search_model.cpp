@@ -6,7 +6,14 @@
 #include "settings_search_model.h"
 
 #include <QPair>
+#include <QSharedPointer>
+#include <QStringLiteral>
+#include <QVariant>
+#include <QWidget>
 #include <algorithm>
+#include <utility>
+
+class QObject;
 
 SettingsSearchModel::SettingsSearchModel(QObject *parent) : QAbstractListModel(parent)
 {

@@ -7,17 +7,24 @@
 #ifndef ZONEVIEWERZONE_H
 #define ZONEVIEWERZONE_H
 
-#include "../../game/zones/view_zone_logic.h"
+#include "../../game/board/card_list.h"
 #include "select_zone.h"
 
 #include <QGraphicsLayoutItem>
+#include <QList>
 #include <QLoggingCategory>
+#include <QRectF>
+#include <QSizeF>
+#include <QString>
 #include <libcockatrice/filters/filter_string.h>
-#include <libcockatrice/protocol/pb/commands.pb.h>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
+
+class QGraphicsItem;
+class ZoneViewZoneLogic;
 
 inline Q_LOGGING_CATEGORY(ViewZoneLog, "view_zone");
 
-class ZoneViewWidget;
 class Response;
 class ServerInfo_Card;
 class QGraphicsSceneWheelEvent;

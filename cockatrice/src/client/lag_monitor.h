@@ -6,15 +6,15 @@
 #ifndef LAG_MONITOR_H
 #define LAG_MONITOR_H
 
-#include <QDateTime>
 #include <QElapsedTimer>
 #include <QList>
 #include <QLoggingCategory>
 #include <QObject>
+#include <qtmetamacros.h>
+#include <qtypes.h>
 
 inline Q_LOGGING_CATEGORY(LagMonitorLog, "lag_monitor");
 
-class QEvent;
 class QTimer;
 
 /**

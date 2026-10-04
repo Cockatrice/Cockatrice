@@ -1,5 +1,14 @@
 #include "card_completer_proxy_model.h"
 
+#include <QAbstractItemModel>
+#include <QModelIndex>
+#include <QRegularExpression>
+#include <QString>
+#include <QVariant>
+#include <qnamespace.h>
+
+class QObject;
+
 CardCompleterProxyModel::CardCompleterProxyModel(QObject *parent) : QSortFilterProxyModel(parent)
 {
 }

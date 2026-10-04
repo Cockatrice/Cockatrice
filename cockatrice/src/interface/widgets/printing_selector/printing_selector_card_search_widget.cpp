@@ -1,5 +1,11 @@
 #include "printing_selector_card_search_widget.h"
 
+#include "printing_selector.h"
+
+#include <QHBoxLayout>
+#include <QLineEdit>
+#include <QTimer>
+
 /**
  * @brief Constructs a PrintingSelectorCardSearchWidget for searching cards by set name or set code.
  *

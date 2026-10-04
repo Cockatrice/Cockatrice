@@ -7,8 +7,13 @@
 #ifndef STACKZONE_H
 #define STACKZONE_H
 
-#include "../../game/zones/stack_zone_logic.h"
 #include "select_zone.h"
+
+#include <qtmetamacros.h>
+#include <qtypes.h>
+
+class QGraphicsItem;
+class StackZoneLogic;
 
 class StackZone : public SelectZone
 {

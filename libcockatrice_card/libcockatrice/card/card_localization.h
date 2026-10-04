@@ -1,6 +1,8 @@
 #ifndef CARD_LOCALIZATION_H
 #define CARD_LOCALIZATION_H
 
+#include <QLatin1String>
+#include <QSharedPointer>
 #include <QString>
 #include <QStringList>
 

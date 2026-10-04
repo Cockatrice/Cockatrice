@@ -6,11 +6,15 @@
 #include "latency_status_widget.h"
 
 #include "latency_graph_widget.h"
+#include "latency_tracker.h"
 
 #include <QEvent>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QObject>
+#include <QPoint>
 #include <QVBoxLayout>
+#include <qnamespace.h>
 
 LatencyStatusWidget::LatencyStatusWidget(QWidget *parent) : QWidget(parent)
 {

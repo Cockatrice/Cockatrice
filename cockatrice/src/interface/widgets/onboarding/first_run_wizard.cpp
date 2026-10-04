@@ -10,7 +10,6 @@
 #include "shader_banner_widget.h"
 #include "step_indicator_widget.h"
 
-#include <QCloseEvent>
 #include <QEvent>
 #include <QFont>
 #include <QHBoxLayout>
@@ -18,6 +17,10 @@
 #include <QPushButton>
 #include <QStackedWidget>
 #include <QVBoxLayout>
+#include <qnamespace.h>
+#include <utility>
+
+class QWidget;
 
 FirstRunWizard::FirstRunWizard(QWidget *parent) : QDialog(parent)
 {

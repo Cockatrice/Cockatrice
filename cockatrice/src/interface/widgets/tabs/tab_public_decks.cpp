@@ -2,6 +2,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../deck_loader/deck_loader.h"
+#include "../../deck_loader/loaded_deck.h"
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../visual_deck_storage/deck_preview/deck_preview_color_identity_filter_widget.h"
@@ -12,14 +13,21 @@
 #include "../visual_deck_storage/visual_deck_storage_tag_filter_widget.h"
 #include "tab_supervisor.h"
 
-#include <QDateTime>
+#include <QAbstractItemModel>
+#include <QChar>
+#include <QDebug>
+#include <QFont>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QList>
 #include <QMessageBox>
 #include <QPixmap>
+#include <QSet>
 #include <QStringList>
 #include <QToolButton>
 #include <QVBoxLayout>
+#include <QWidget>
+#include <functional>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_deck_download_public.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
@@ -27,6 +35,7 @@
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <optional>
+#include <qnamespace.h>
 
 TabPublicDecks::TabPublicDecks(TabSupervisor *_tabSupervisor, AbstractClient *_client, const QString &_userName)
     : Tab(_tabSupervisor), client(_client), userName(_userName)

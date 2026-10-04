@@ -1,5 +1,13 @@
 #include "edhrec_api_response_card_synergy_display_widget.h"
 
+#include "../../../../../general/display/charts/bars/percent_bar_widget.h"
+#include "../../api_response/cards/edhrec_api_response_card_details.h"
+
+#include <QLabel>
+#include <QString>
+#include <QVBoxLayout>
+#include <qnamespace.h>
+
 EdhrecApiResponseCardSynergyDisplayWidget::EdhrecApiResponseCardSynergyDisplayWidget(
     QWidget *parent,
     const EdhrecApiResponseCardDetails &_toDisplay)

@@ -2,12 +2,22 @@
 #define COCKATRICE_CARD_DATABASE_LOADER_H
 
 #include <QBasicMutex>
+#include <QByteArray>
 #include <QList>
 #include <QLoggingCategory>
-#include <libcockatrice/card/database/card_database_data.h>
-#include <libcockatrice/interfaces/interface_card_database_path_provider.h>
-#include <libcockatrice/interfaces/interface_card_preference_provider.h>
-#include <libcockatrice/interfaces/interface_card_set_priority_controller.h>
+#include <QObject>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
+
+class ICardDatabasePathProvider;
+class ICardPreferenceProvider;
+class ICardSetPriorityController;
+
+// IWYU pragma: keep
+// CardDatabaseData is passed by value to the databaseDataReady() signal, so the
+// moc-generated code needs the complete type.
+#include "card_database_data.h"
 
 inline Q_LOGGING_CATEGORY(CardDatabaseLoadingLog, "card_database.loading");
 inline Q_LOGGING_CATEGORY(CardDatabaseLoadingSuccessOrFailureLog, "card_database.loading.success_or_failure");

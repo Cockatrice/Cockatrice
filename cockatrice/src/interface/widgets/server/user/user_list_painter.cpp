@@ -1,14 +1,35 @@
 #include "user_list_painter.h"
 
 #include "../../interface/pixel_map_generator.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 
 #include <QAbstractScrollArea>
 #include <QApplication>
+#include <QBrush>
+#include <QChar>
+#include <QFlag>
+#include <QFlags>
+#include <QFont>
+#include <QFontMetrics>
+#include <QImage>
+#include <QLinearGradient>
+#include <QMap>
+#include <QModelIndex>
+#include <QObject>
 #include <QPainter>
 #include <QPainterPath>
+#include <QPen>
+#include <QPixmap>
+#include <QPoint>
 #include <QScrollBar>
+#include <QSharedPointer>
 #include <QStyle>
 #include <QStyleOptionViewItem>
+#include <QVariant>
+#include <QWidget>
+#include <qminmax.h>
+#include <qnamespace.h>
+#include <qnumeric.h>
 
 static constexpr int RowHeight = 72;
 static constexpr int AvatarSize = 36;

@@ -1,6 +1,14 @@
 #include "abstract_graphics_item.h"
 
+#include <QBrush>
+#include <QFont>
+#include <QFontMetrics>
 #include <QPainter>
+#include <QRectF>
+#include <QString>
+#include <QTransform>
+#include <qnamespace.h>
+#include <qtypes.h>
 
 void AbstractGraphicsItem::paintNumberEllipse(int number,
                                               int fontSize,

@@ -10,13 +10,22 @@
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
+#include <QIntValidator>
 #include <QLabel>
+#include <QList>
 #include <QMessageBox>
+#include <QPixmap>
 #include <QPushButton>
 #include <QRadioButton>
+#include <QSharedPointer>
+#include <QStringList>
+#include <QStringLiteral>
 #include <QVBoxLayout>
+#include <QtPreprocessorSupport>
 #include <libcockatrice/settings/servers_settings.h>
 #include <libcockatrice/utility/string_limits.h>
+
+class QWidget;
 
 DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
 {

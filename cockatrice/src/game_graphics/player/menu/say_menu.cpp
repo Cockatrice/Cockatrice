@@ -5,7 +5,12 @@
 #include "../../game/player/player_logic.h"
 #include "../player_graphics_item.h"
 
+#include <QAction>
+#include <QKeySequence>
+#include <QList>
+#include <QString>
 #include <libcockatrice/settings/message_settings.h>
+
 SayMenu::SayMenu(PlayerGraphicsItem *_player) : player(_player)
 {
     connect(&SettingsCache::instance().messages(), &MessageSettings::messageMacrosChanged, this, &SayMenu::initSayMenu);

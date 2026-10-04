@@ -1,12 +1,20 @@
 #include "report_utils.h"
 
+#include "libcockatrice/protocol/pb/serverinfo_report.pb.h"
+
 #include <QApplication>
 #include <QBrush>
+#include <QChar>
+#include <QColor>
 #include <QDateTime>
 #include <QPalette>
+#include <QSharedPointer>
 #include <QTableWidget>
+#include <QTableWidgetItem>
 #include <QTextCursor>
 #include <QTextEdit>
+#include <qnamespace.h>
+#include <string>
 
 namespace report_utils
 {

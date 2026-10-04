@@ -1,9 +1,14 @@
 #ifndef COCKATRICE_INTENT_CONNECT_TO_SERVER_H
 #define COCKATRICE_INTENT_CONNECT_TO_SERVER_H
 
-#include "contexts/context_connect_to_server.h"
+#include "abstract_client.h"
 #include "intent.h"
-#include "remote_client.h"
+
+#include <QString>
+#include <qtmetamacros.h>
+
+class RemoteClient;
+struct ContextConnectToServer;
 
 class IntentConnectToServer : public Intent
 {

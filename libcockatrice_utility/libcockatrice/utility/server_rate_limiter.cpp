@@ -1,5 +1,9 @@
 #include "server_rate_limiter.h"
 
+#include <QSharedPointer>
+#include <compare>
+#include <qminmax.h>
+
 bool ServerRateLimiter::isRateLimited(const QString &host, const QDateTime &now) const
 {
     auto it = backoffUntil.constFind(host);

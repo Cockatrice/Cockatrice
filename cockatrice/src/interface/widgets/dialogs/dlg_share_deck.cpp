@@ -9,6 +9,7 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QString>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -16,9 +17,13 @@
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_deck_share_create.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
-#include <libcockatrice/protocol/pb/response_deck_share_create.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/network_settings.h>
+#include <qtypes.h>
+#include <string>
+
+class QWidget;
+template <class T> class QSharedPointer;
 
 DlgShareDeck::DlgShareDeck(AbstractClient *_client, const QSharedPointer<DeckList> &_deck, QWidget *_parent)
     : QDialog(_parent), client(_client), deck(_deck), shareTimeoutTimer(new QTimer(this))

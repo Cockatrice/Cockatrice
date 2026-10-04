@@ -1,10 +1,15 @@
 #ifndef COCKATRICE_PLAYMAT_PREVIEW_WIDGET_H
 #define COCKATRICE_PLAYMAT_PREVIEW_WIDGET_H
 
-#include <QFocusEvent>
+#include "libcockatrice/utility/playmat_params.h"
+
 #include <QPixmap>
+#include <QPoint>
+#include <QRectF>
+#include <QString>
 #include <QWidget>
-#include <libcockatrice/deck_list/deck_list.h>
+#include <qtmetamacros.h>
+#include <qtypes.h>
 
 /**
  * @brief Interactive crop surface showing how a playmat card art will appear

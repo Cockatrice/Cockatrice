@@ -10,20 +10,20 @@
 #include "theme_config.h"
 
 #include <QBrush>
-#include <QDir>
+#include <QColor>
 #include <QLoggingCategory>
 #include <QMap>
 #include <QObject>
-#include <QPixmap>
+#include <QPalette>
 #include <QString>
+#include <QStringView>
 #include <array>
+#include <qtmetamacros.h>
 
 inline Q_LOGGING_CATEGORY(ThemeManagerLog, "theme_manager");
 
 typedef QMap<QString, QString> QStringMap;
 typedef QMap<int, QBrush> QBrushMap;
-
-class QApplication;
 
 class ThemeManager : public QObject
 {

@@ -1,7 +1,13 @@
 #include "server_abstractuserinterface.h"
 
+#include "game/server_abstract_participant.h"
 #include "game/server_game.h"
-#include "game/server_player.h"
+#include "libcockatrice/protocol/pb/game_event_container.pb.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/room_event.pb.h"
+#include "libcockatrice/protocol/pb/server_message.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+#include "libcockatrice/protocol/pb/session_event.pb.h"
 #include "server.h"
 #include "server_player_reference.h"
 #include "server_response_containers.h"
@@ -9,8 +15,13 @@
 
 #include <QDebug>
 #include <QList>
+#include <QReadLocker>
+#include <QReadWriteLock>
+#include <QString>
 #include <google/protobuf/descriptor.h>
-#include <libcockatrice/protocol/pb/event_game_joined.pb.h>
+#include <google/protobuf/message.h>
+#include <qlogging.h>
+#include <utility>
 
 void Server_AbstractUserInterface::sendProtocolItemByType(ServerMessage::MessageType type,
                                                           const ::google::protobuf::Message &item)

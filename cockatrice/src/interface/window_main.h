@@ -27,15 +27,24 @@
 
 #include "../client/lag_monitor.h"
 #include "connection_controller/remote_connection_controller.h"
-#include "widgets/dialogs/dlg_local_game_options.h"
 
+#include <QByteArray>
+#include <QDir>
 #include <QList>
+#include <QLoggingCategory>
 #include <QMainWindow>
-#include <QMessageBox>
-#include <QSystemTrayIcon>
-#include <QtNetwork>
+#include <QProcess>
+#include <QString>
+#include <QStringList>
+#include <QUrl>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
-#include <libcockatrice/protocol/pb/response.pb.h>
+#include <qtmetamacros.h>
+#include <qtypes.h>
+
+class QAction;
+class QMenu;
+class QWidget;
+struct LocalGameOptions;
 
 inline Q_LOGGING_CATEGORY(WindowMainLog, "window_main");
 inline Q_LOGGING_CATEGORY(WindowMainStartupLog, "window_main.startup");
@@ -44,17 +53,11 @@ inline Q_LOGGING_CATEGORY(WindowMainStartupShortcutsLog, "window_main.startup.sh
 inline Q_LOGGING_CATEGORY(WindowMainStartupAutoconnectLog, "window_main.startup.autoconnect");
 
 class Release;
-class DlgConnect;
 class DlgViewLog;
 class GameReplay;
-class HandlePublicServers;
-class LocalClient;
 class LocalServer;
-class QLabel;
 class LatencyStatusWidget;
-class QThread;
 class RemoteClient;
-class ServerInfo_User;
 class TabSupervisor;
 class WndSets;
 class DlgTipOfTheDay;

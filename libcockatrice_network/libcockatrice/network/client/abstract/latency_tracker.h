@@ -6,9 +6,11 @@
 #ifndef LATENCY_TRACKER_H
 #define LATENCY_TRACKER_H
 
+#include <QByteArray>
 #include <QList>
 #include <QMetaType>
 #include <array>
+#include <qtypes.h>
 
 /**
  * @brief Fixed-capacity rolling window of network round-trip time samples.

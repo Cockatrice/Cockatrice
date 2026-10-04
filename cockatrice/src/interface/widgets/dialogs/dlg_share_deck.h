@@ -9,6 +9,7 @@
 
 #include <QDialog>
 #include <QSharedPointer>
+#include <qtmetamacros.h>
 
 class AbstractClient;
 class CommandContainer;
@@ -17,6 +18,8 @@ class QDialogButtonBox;
 class QLineEdit;
 class QTimer;
 class Response;
+class QWidget;
+template <class T> class QSharedPointer;
 
 /**
  * @brief Slim dialog to create a temporary share for the deck open in the editor.

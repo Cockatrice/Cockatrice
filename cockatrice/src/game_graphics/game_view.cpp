@@ -5,13 +5,24 @@
 #include "game_scene.h"
 
 #include <QAction>
+#include <QBrush>
+#include <QColor>
+#include <QEvent>
+#include <QGraphicsScene>
 #include <QGridLayout>
 #include <QLabel>
-#include <QLayout>
+#include <QMargins>
+#include <QPainter>
+#include <QPoint>
 #include <QResizeEvent>
 #include <QRubberBand>
+#include <QString>
+#include <QStringLiteral>
+#include <QWidget>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
+#include <qminmax.h>
+#include <qnamespace.h>
 
 // QRubberBand calls raise() in showEvent() and changeEvent() to stay on top of siblings.
 // This subclass disables that behavior so dragCountLabel can appear above it.

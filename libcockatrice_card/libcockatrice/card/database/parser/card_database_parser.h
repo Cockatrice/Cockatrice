@@ -2,10 +2,17 @@
 #define CARDDATABASE_PARSER_H
 
 #include "../../card_info.h"
-#include "../card_database_data.h"
+#include "libcockatrice/card/database/parser/card_database_parser.h"
+#include "libcockatrice/card/set/card_set.h"
 
-#include <QIODevice>
+#include <QDate>
+#include <QObject>
 #include <QString>
+#include <qtmetamacros.h>
+
+class ICardSetPriorityController;
+class QIODevice;
+struct CardDatabaseData;
 
 #define COCKATRICE_XML_XSI_NAMESPACE "http://www.w3.org/2001/XMLSchema-instance"
 

@@ -23,38 +23,56 @@
 #include "client/network/update/card_spoiler/spoiler_background_updater.h"
 #include "client/settings/cache_settings.h"
 #include "client/sound_engine.h"
-#include "client/url_scheme_event_filter.h"
 #include "database/interface/settings_card_preference_provider.h"
+#include "interface/intents/intent.h"
 #include "interface/intents/intent_open_local_deck.h"
 #include "interface/logger.h"
 #include "interface/pixel_map_generator.h"
 #include "interface/theme_manager.h"
-#include "interface/widgets/dialogs/dlg_settings.h"
-#include "interface/widgets/tabs/tab_supervisor.h"
 #include "interface/window_main.h"
+#include "libcockatrice/card/database/card_database.h"
+#include "libcockatrice/rng/rng_abstract.h"
 #include "single_instance_manager.h"
 #include "version_string.h"
 
 #include <QApplication>
+#include <QByteArray>
+#include <QByteArrayView>
+#include <QCommandLineOption>
+#include <QCommandLineParser>
+#include <QCoreApplication>
 #include <QCryptographicHash>
-#include <QDateTime>
 #include <QDebug>
+#include <QFileInfo>
+#include <QGuiApplication>
+#include <QIcon>
+#include <QList>
 #include <QLocale>
 #include <QMessageBox>
-#include <QSystemTrayIcon>
+#include <QMessageLogger>
+#include <QNetworkInterface>
+#include <QObject>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QSharedPointer>
+#include <QString>
+#include <QStringList>
+#include <QStringLiteral>
 #include <QTranslator>
 #include <QUrl>
+#include <QtEnvironmentVariables>
 #include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/rng/rng_sfmt.h>
-#include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/card_database_settings.h>
-#include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/network_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/utility/cryptoutil.h>
 #include <libcockatrice/utility/translation_loader.h>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <qsystemdetection.h>
 
 QTranslator *translator, *qtTranslator;
 RNG_Abstract *rng;
@@ -91,6 +109,7 @@ static void CockatriceLogger(QtMsgType type, const QMessageLogContext &ctx, cons
 #include <ShlObj.h>
 #include <ctime>
 #include <filesystem>
+
 #pragma comment(lib, "DbgHelp.lib") // Link the DbgHelp library
 // clang-format on
 

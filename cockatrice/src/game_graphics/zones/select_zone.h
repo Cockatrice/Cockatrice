@@ -9,10 +9,16 @@
 
 #include "card_zone.h"
 
+#include <QPointF>
 #include <QSet>
 #include <optional>
+#include <qtmetamacros.h>
+#include <qtypes.h>
 
 class QGraphicsRectItem;
+class CardItem;
+class CardZoneLogic;
+class QGraphicsItem;
 
 /**
  * A CardZone where the cards are laid out, with each card directly interactable by clicking.

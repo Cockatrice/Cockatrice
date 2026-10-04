@@ -1,6 +1,7 @@
 #include "../../oracle/src/parsehelpers.h"
 
 #include "gtest/gtest.h"
+#include <string>
 
 TEST(ParseCiptTest, parsesThisEntersTapped)
 {

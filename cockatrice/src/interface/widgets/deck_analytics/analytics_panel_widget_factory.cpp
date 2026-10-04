@@ -2,6 +2,8 @@
 
 #include "abstract_analytics_panel_widget.h"
 
+#include <QSharedPointer>
+
 AnalyticsPanelWidgetFactory &AnalyticsPanelWidgetFactory::instance()
 {
     static AnalyticsPanelWidgetFactory f;

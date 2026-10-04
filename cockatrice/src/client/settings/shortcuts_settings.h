@@ -8,9 +8,18 @@
 #define SHORTCUTSSETTINGS_H
 
 #include <QApplication>
+#include <QByteArray>
+#include <QChar>
+#include <QHash>
 #include <QKeySequence>
+#include <QList>
 #include <QLoggingCategory>
-#include <QSettings>
+#include <QObject>
+#include <QString>
+#include <QStringList>
+#include <QtTranslation>
+#include <qtmetamacros.h>
+#include <utility>
 
 inline Q_LOGGING_CATEGORY(ShortcutsSettingsLog, "shortcuts_settings");
 

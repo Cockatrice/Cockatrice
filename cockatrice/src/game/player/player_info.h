@@ -7,10 +7,10 @@
 #ifndef COCKATRICE_PLAYER_INFO_H
 #define COCKATRICE_PLAYER_INFO_H
 
-#include "../../game_graphics/player/player_target.h"
-
 #include <QObject>
+#include <QString>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <qtmetamacros.h>
 
 class PlayerInfo : public QObject
 {

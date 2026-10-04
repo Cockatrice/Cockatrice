@@ -8,6 +8,12 @@
 #define COCKATRICE_HAND_ZONE_LOGIC_H
 #include "card_zone_logic.h"
 
+#include <QString>
+#include <qtmetamacros.h>
+
+class PlayerLogic;
+class QObject;
+
 class HandZoneLogic : public CardZoneLogic
 {
     Q_OBJECT

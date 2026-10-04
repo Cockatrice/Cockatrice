@@ -6,7 +6,10 @@
 
 #ifndef CLIENT_UPDATE_CHECKER_H
 #define CLIENT_UPDATE_CHECKER_H
+#include <QMetaObject>
 #include <QObject>
+#include <QString>
+#include <qtmetamacros.h>
 
 class Release;
 

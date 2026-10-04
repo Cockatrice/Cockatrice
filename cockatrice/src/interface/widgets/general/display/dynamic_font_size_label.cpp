@@ -1,7 +1,16 @@
 #include "dynamic_font_size_label.h"
-#define FONT_PRECISION (0.5)
 
-#include <QElapsedTimer>
+#include <QFont>
+#include <QFontMetricsF>
+#include <QObject>
+#include <QRect>
+#include <QRectF>
+#include <QSharedPointer>
+#include <QSize>
+#include <QWidget>
+#include <QtPreprocessorSupport>
+
+#define FONT_PRECISION (0.5)
 
 DynamicFontSizeLabel::DynamicFontSizeLabel(QWidget *parent, Qt::WindowFlags f) : QLabel(parent, f)
 {

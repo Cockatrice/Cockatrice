@@ -11,11 +11,11 @@
 #include "abstract_player_component.h"
 
 #include <QAction>
-#include <QMenu>
+#include <qtmetamacros.h>
 
 class PlayerGraphicsItem;
-class PlayerLogic;
-class PlayerActions;
+class QMenu;
+class QWidget;
 
 class LibraryMenu : public TearOffMenu, public AbstractPlayerComponent
 {

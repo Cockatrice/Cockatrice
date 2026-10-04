@@ -4,6 +4,8 @@
 #include "card_set.h"
 
 #include <QList>
+#include <QSharedPointer>
+#include <QStringList>
 
 /**
  * @class CardSetList

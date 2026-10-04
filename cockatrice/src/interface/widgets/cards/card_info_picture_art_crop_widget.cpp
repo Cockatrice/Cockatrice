@@ -1,6 +1,12 @@
 #include "card_info_picture_art_crop_widget.h"
 
 #include "../../../interface/card_picture_loader/card_picture_loader.h"
+#include "libcockatrice/card/printing/exact_card.h"
+
+#include <QRect>
+#include <QSize>
+
+class QWidget;
 
 CardInfoPictureArtCropWidget::CardInfoPictureArtCropWidget(QWidget *parent)
     : CardInfoPictureWidget(parent, false, false)

@@ -8,12 +8,16 @@
 #define DLG_INVITE_TO_GAME_H
 
 #include <QDialog>
+#include <QList>
+#include <QString>
 #include <QStringList>
+#include <qtmetamacros.h>
 
 class QLineEdit;
 class QPushButton;
 class TabSupervisor;
 class UserListWidget;
+class QWidget;
 
 class DlgInviteToGame : public QDialog
 {

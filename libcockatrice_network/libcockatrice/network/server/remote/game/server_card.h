@@ -22,15 +22,18 @@
 
 #include "server_arrowtarget.h"
 
+#include <QList>
 #include <QMap>
 #include <QString>
-#include <libcockatrice/protocol/pb/card_attributes.pb.h>
-#include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
 #include <libcockatrice/utility/card_ref.h>
+#include <qassert.h>
+#include <qtmetamacros.h>
 
 class Server_CardZone;
 class Event_SetCardCounter;
 class Event_SetCardAttr;
+class ServerInfo_Card;
+enum CardAttribute : int;
 
 class Server_Card : public Server_ArrowTarget
 {

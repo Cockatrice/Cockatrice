@@ -3,6 +3,10 @@
  *  @ingroup Tests
  */
 
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/server_message.pb.h"
+
+#include <QString>
 #include <gtest/gtest.h>
 #include <libcockatrice/network/server/remote/server.h>
 #include <libcockatrice/network/server/remote/server_protocolhandler.h>
@@ -11,6 +15,8 @@
 #include <libcockatrice/protocol/pb/developer_commands.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/rng/rng_abstract.h>
+#include <stdint.h>
+#include <string>
 
 // The server_remote library references the global RNG, which is normally
 // defined by the servatrice/client executable main(). Provide a stub so the

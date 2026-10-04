@@ -8,9 +8,13 @@
 #define PENDING_COMMAND_H
 
 #include <QElapsedTimer>
+#include <QObject>
 #include <QVariant>
 #include <libcockatrice/protocol/pb/commands.pb.h>
-#include <libcockatrice/protocol/pb/response.pb.h>
+#include <qtmetamacros.h>
+#include <qtypes.h>
+
+class Response;
 
 class PendingCommand : public QObject
 {

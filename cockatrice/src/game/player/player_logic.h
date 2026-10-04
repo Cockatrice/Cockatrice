@@ -7,57 +7,43 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "../../game_graphics/player/player_area.h"
-#include "../../interface/widgets/menus/tearoff_menu.h"
-#include "../board/arrow_data.h"
-#include "../interface/deck_loader/loaded_deck.h"
+#include "../zones/card_zone_logic.h"
 #include "../zones/hand_zone_logic.h"
 #include "../zones/pile_zone_logic.h"
 #include "../zones/stack_zone_logic.h"
 #include "../zones/table_zone_logic.h"
-#include "player_event_handler.h"
-#include "player_info.h"
-#include "player_manager.h"
+#include "libcockatrice/deck_list/deck_list.h"
+#include "libcockatrice/utility/card_ref.h"
+#include "libcockatrice/utility/playmat_params.h"
 
+#include <QColor>
 #include <QInputDialog>
+#include <QList>
 #include <QLoggingCategory>
 #include <QMap>
-#include <QTimer>
-#include <libcockatrice/filters/filter_string.h>
-#include <libcockatrice/protocol/pb/card_attributes.pb.h>
-#include <libcockatrice/protocol/pb/game_event.pb.h>
+#include <QObject>
+#include <QString>
 #include <libcockatrice/utility/zone_names.h>
+#include <qtmetamacros.h>
+
+class CardItem;
+class CounterState;
+class QWidget;
+class ServerInfo_PlayerProperties;
+struct ArrowData;
+struct LoadedDeck;
+template <class T> class QSharedPointer;
 
 inline Q_LOGGING_CATEGORY(PlayerLog, "player");
-
-namespace google
-{
-namespace protobuf
-{
-class Message;
-}
-} // namespace google
 class AbstractCardItem;
 class AbstractGame;
-class ArrowItem;
-class ArrowTarget;
-class CardDatabase;
-class CardZone;
-class CommandContainer;
-class GameCommand;
-class GameEvent;
 class PlayerInfo;
 class PlayerEventHandler;
 class PlayerActions;
-class PlayerMenu;
-class QAction;
-class QMenu;
-class ServerInfo_Arrow;
 class ServerInfo_Card;
 class ServerInfo_Counter;
 class ServerInfo_Player;
 class ServerInfo_User;
-class TabGame;
 
 const int MAX_TOKENS_PER_DIALOG = 99;
 

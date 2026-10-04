@@ -1,6 +1,14 @@
 #include "update_downloader.h"
 
+#include <QByteArray>
+#include <QChar>
+#include <QDir>
+#include <QFile>
+#include <QIODevice>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
 #include <QUrl>
+#include <QVariant>
 
 UpdateDownloader::UpdateDownloader(QObject *parent) : QObject(parent), response(nullptr)
 {

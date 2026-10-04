@@ -1,10 +1,12 @@
 #ifndef RAW_JSON_SCANNER_H
 #define RAW_JSON_SCANNER_H
 
-#include <QByteArray>
 #include <QList>
 #include <QString>
 #include <functional>
+#include <qtypes.h>
+
+class QByteArray;
 
 namespace RawJson
 {

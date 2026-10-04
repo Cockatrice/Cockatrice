@@ -7,15 +7,17 @@
 #ifndef CARDINFOWIDGET_H
 #define CARDINFOWIDGET_H
 
-#include <QComboBox>
 #include <QFrame>
-#include <QStringList>
 #include <libcockatrice/card/printing/exact_card.h>
-#include <libcockatrice/utility/card_ref.h>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
+#include <qtypes.h>
 
 class CardInfoPictureWidget;
 class CardInfoTextWidget;
 class AbstractCardItem;
+class QWidget;
+struct CardRef;
 
 class CardInfoDisplayWidget : public QFrame
 {

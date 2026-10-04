@@ -3,30 +3,50 @@
 #include "../../../card_picture_loader/card_picture_loader.h"
 #include "../../cards/art_crop_attribution.h"
 #include "../../utility/completer_utils.h"
-#include "card/card_search_model.h"
 #include "card_database_display_model.h"
 #include "card_database_model.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
 #include "user_card_art_provider.h"
 #include "user_list_painter.h"
 
+#include <QBrush>
+#include <QColor>
+#include <QComboBox>
 #include <QCompleter>
 #include <QDialogButtonBox>
 #include <QDoubleSpinBox>
+#include <QFlags>
 #include <QFormLayout>
 #include <QGroupBox>
-#include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLineEdit>
+#include <QLinearGradient>
+#include <QList>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
+#include <QPalette>
+#include <QPen>
 #include <QPushButton>
-#include <QRegularExpression>
+#include <QRect>
+#include <QRectF>
+#include <QSharedPointer>
+#include <QSize>
+#include <QSizePolicy>
 #include <QVBoxLayout>
+#include <QVariant>
 #include <QWheelEvent>
 #include <cmath>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/utility/card_ref.h>
+#include <qminmax.h>
+#include <qnamespace.h>
+#include <qnumeric.h>
 
 namespace
 {

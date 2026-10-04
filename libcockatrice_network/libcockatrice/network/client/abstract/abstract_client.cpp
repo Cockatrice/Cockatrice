@@ -1,6 +1,24 @@
 #include "abstract_client.h"
 
+#include "libcockatrice/protocol/pb/admin_commands.pb.h"
+#include "libcockatrice/protocol/pb/developer_commands.pb.h"
+#include "libcockatrice/protocol/pb/game_event_container.pb.h"
+#include "libcockatrice/protocol/pb/moderator_commands.pb.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/room_commands.pb.h"
+#include "libcockatrice/protocol/pb/room_event.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+#include "libcockatrice/protocol/pb/session_commands.pb.h"
+#include "libcockatrice/protocol/pb/session_event.pb.h"
+
+#include <QDebug>
+#include <QList>
+#include <QMessageLogger>
+#include <QMetaType>
+#include <QSharedPointer>
+#include <QVariant>
 #include <google/protobuf/descriptor.h>
+#include <google/protobuf/message.h>
 #include <libcockatrice/protocol/debug_pb_message.h>
 #include <libcockatrice/protocol/featureset.h>
 #include <libcockatrice/protocol/get_pb_extension.h>
@@ -20,6 +38,7 @@
 #include <libcockatrice/protocol/pb/event_user_message.pb.h>
 #include <libcockatrice/protocol/pb/server_message.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <qassert.h>
 
 AbstractClient::AbstractClient(QObject *parent)
     : QObject(parent), nextCmdId(0), status(StatusDisconnected), serverSupportsPasswordHash(false)

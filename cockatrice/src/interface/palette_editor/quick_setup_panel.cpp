@@ -1,9 +1,15 @@
 #include "quick_setup_panel.h"
 
+#include "color_button.h"
+
 #include <QApplication>
+#include <QFont>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QPalette>
 #include <QSlider>
+#include <QString>
+#include <qnamespace.h>
 
 QuickSetupPanel::QuickSetupPanel(QWidget *parent) : QWidget(parent)
 {

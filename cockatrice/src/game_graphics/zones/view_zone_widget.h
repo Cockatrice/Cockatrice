@@ -6,30 +6,29 @@
 #ifndef ZONEVIEWWIDGET_H
 #define ZONEVIEWWIDGET_H
 
-#include "../../game/zones/card_zone_logic.h"
-
 #include <QCheckBox>
 #include <QComboBox>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsWidget>
 #include <QLineEdit>
+#include <QList>
+#include <QPoint>
+#include <QPointF>
 #include <QPointer>
+#include <QRectF>
 #include <libcockatrice/utility/macros.h>
+#include <qtmetamacros.h>
+#include <qtypes.h>
 
-class QLabel;
-class QPushButton;
-class CardZone;
 class ZoneViewZone;
 class PlayerLogic;
-class CardDatabase;
 class QScrollBar;
-class GameScene;
 class ServerInfo_Card;
 class QGraphicsSceneMouseEvent;
 class QGraphicsSceneWheelEvent;
-class QStyleOption;
 class QGraphicsView;
 class QWidget;
+class CardZoneLogic;
 
 class ScrollableGraphicsProxyWidget : public QGraphicsProxyWidget
 {

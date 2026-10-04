@@ -1,5 +1,9 @@
 #include "raw_json_scanner.h"
 
+#include <QByteArray>
+#include <QChar>
+#include <QSharedPointer>
+#include <QStringLiteral>
 #include <algorithm>
 #include <cstring>
 

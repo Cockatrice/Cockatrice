@@ -3,6 +3,7 @@
 
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QString>
 
 struct CommanderSpellbookVariantResult
 {

@@ -4,26 +4,61 @@
 #include "../../interface/pixel_map_generator.h"
 #include "../../interface/theme_manager.h"
 #include "../../interface/widgets/tabs/tab_supervisor.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+#include "libcockatrice/protocol/pb/session_commands.pb.h"
+#include "user_level.h"
 #include "user_list_painter.h"
 
 #include <QApplication>
+#include <QBrush>
+#include <QChar>
+#include <QFlag>
+#include <QFlags>
+#include <QFont>
+#include <QFontMetrics>
 #include <QGridLayout>
 #include <QHBoxLayout>
+#include <QImage>
 #include <QLabel>
+#include <QLayout>
+#include <QLinearGradient>
+#include <QList>
+#include <QListView>
+#include <QMap>
+#include <QMenu>
+#include <QModelIndex>
 #include <QPainter>
 #include <QPainterPath>
-#include <QPropertyAnimation>
+#include <QPen>
+#include <QPoint>
 #include <QPushButton>
-#include <QScreen>
-#include <QScrollBar>
+#include <QRect>
+#include <QRectF>
+#include <QSharedPointer>
+#include <QSize>
+#include <QSizePolicy>
 #include <QStandardItem>
+#include <QStandardItemModel>
+#include <QStringLiteral>
+#include <QStyle>
+#include <QStyleOptionViewItem>
 #include <QStyledItemDelegate>
 #include <QVBoxLayout>
+#include <QVariant>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
-#include <libcockatrice/protocol/pb/commands.pb.h>
 #include <libcockatrice/protocol/pb/response_get_games_of_user.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/utility/card_ref.h>
+#include <qminmax.h>
+#include <qnumeric.h>
+#include <string>
+
+class QAction;
 
 /// Qt stylesheets accept #aarrggbb, which is QColor::name(QColor::HexArgb).
 static QString colorStr(const QColor &color)

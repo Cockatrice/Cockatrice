@@ -7,18 +7,21 @@
 #ifndef COUNTER_H
 #define COUNTER_H
 
-#include "../../game/board/counter_state.h"
 #include "../../interface/widgets/menus/tearoff_menu.h"
 #include "../player/menu/abstract_player_component.h"
 
+#include <QColor>
 #include <QGraphicsItem>
 #include <QInputDialog>
+#include <QObject>
+#include <QString>
+#include <qtmetamacros.h>
 
 class PlayerLogic;
 class QAction;
-class QKeyEvent;
 class QMenu;
-class QString;
+class CounterState;
+class QWidget;
 
 class AbstractCounter : public QObject, public QGraphicsItem, public AbstractPlayerComponent
 {

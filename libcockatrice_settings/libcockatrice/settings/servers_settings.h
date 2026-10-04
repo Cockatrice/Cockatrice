@@ -10,7 +10,12 @@
 #include "settings_manager.h"
 
 #include <QLoggingCategory>
-#include <QObject>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
+
+class QObject;
+
 #define SERVERSETTINGS_DEFAULT_HOST "server.cockatrice.us"
 #define SERVERSETTINGS_DEFAULT_PORT "4748"
 

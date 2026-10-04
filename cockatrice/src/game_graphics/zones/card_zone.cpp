@@ -1,10 +1,18 @@
 #include "card_zone.h"
 
+#include "../../game/board/card_list.h"
+#include "../../game/zones/card_zone_logic.h"
+#include "../board/abstract_graphics_item.h"
 #include "../board/card_item.h"
-#include "view_zone.h"
 
+#include <QAction>
 #include <QGraphicsSceneMouseEvent>
 #include <QMenu>
+#include <qnamespace.h>
+
+class QGraphicsItem;
+class QPoint;
+class QPointF;
 
 CardZone::CardZone(CardZoneLogic *_logic, QGraphicsItem *parent)
     : AbstractGraphicsItem(parent), menu(nullptr), doubleClickAction(0), logic(_logic)

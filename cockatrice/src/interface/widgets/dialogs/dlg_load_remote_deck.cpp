@@ -3,8 +3,12 @@
 #include "../interface/widgets/server/remote/remote_decklist_tree_widget.h"
 
 #include <QDialogButtonBox>
+#include <QItemSelectionModel>
 #include <QPushButton>
+#include <QSize>
 #include <QVBoxLayout>
+
+class QWidget;
 
 DlgLoadRemoteDeck::DlgLoadRemoteDeck(AbstractClient *_client, QWidget *parent) : QDialog(parent), client(_client)
 {

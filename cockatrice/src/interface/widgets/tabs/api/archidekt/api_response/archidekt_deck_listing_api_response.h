@@ -4,8 +4,9 @@
 #include "deck_listings/archidekt_api_response_deck_listing_container.h"
 
 #include <QJsonObject>
-#include <QString>
+#include <QList>
 #include <QUrl>
+#include <QVector>
 
 class ArchidektDeckListingApiResponse
 {

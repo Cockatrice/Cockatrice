@@ -1,9 +1,14 @@
 #include "card_list.h"
 
 #include "../../game_graphics/board/card_item.h"
+#include "libcockatrice/card/printing/exact_card.h"
 
+#include <QChar>
 #include <QDebug>
+#include <QMessageLogger>
+#include <QSharedPointer>
 #include <algorithm>
+#include <compare>
 #include <libcockatrice/card/card_info.h>
 
 CardList::CardList(bool _contentsKnown) : QList<CardItem *>(), contentsKnown(_contentsKnown)

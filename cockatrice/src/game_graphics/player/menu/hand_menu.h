@@ -10,11 +10,12 @@
 #include "../../../interface/widgets/menus/tearoff_menu.h"
 #include "abstract_player_component.h"
 
-#include <QAction>
-#include <QMenu>
+#include <qtmetamacros.h>
 
 class PlayerGraphicsItem;
-class PlayerActions;
+class QAction;
+class QMenu;
+class QWidget;
 
 class HandMenu : public TearOffMenu, public AbstractPlayerComponent
 {

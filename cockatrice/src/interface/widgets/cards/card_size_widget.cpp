@@ -1,10 +1,19 @@
 #include "card_size_widget.h"
 
-#include "../printing_selector/printing_selector.h"
-#include "../visual_deck_storage/visual_deck_storage_widget.h"
+#include "../general/layout_containers/flow_widget.h"
 
+#include <QEvent>
+#include <QFlags>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QList>
+#include <QPoint>
 #include <QScrollArea>
+#include <QSizePolicy>
+#include <QSlider>
 #include <QWheelEvent>
+#include <qminmax.h>
+#include <qnamespace.h>
 
 /**
  * @class CardSizeWidget

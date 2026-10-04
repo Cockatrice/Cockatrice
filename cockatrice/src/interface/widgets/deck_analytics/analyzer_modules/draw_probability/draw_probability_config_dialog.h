@@ -3,11 +3,13 @@
 #include "draw_probability_config.h"
 
 #include <QDialog>
-#include <QFormLayout>
+#include <qtmetamacros.h>
 
 class QComboBox;
 class QSpinBox;
 class QLabel;
+class QFormLayout;
+class QWidget;
 
 class DrawProbabilityConfigDialog : public QDialog
 {

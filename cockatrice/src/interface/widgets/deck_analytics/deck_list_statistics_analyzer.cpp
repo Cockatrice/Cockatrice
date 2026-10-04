@@ -1,11 +1,19 @@
 #include "deck_list_statistics_analyzer.h"
 
 #include "deck_list_model.h"
-#include "deck_list_statistics_analyzer.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/deck_list/tree/deck_list_card_node.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
 
+#include <QChar>
 #include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QSharedPointer>
+#include <QStringLiteral>
+#include <initializer_list>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/deck_list/deck_list.h>
+#include <utility>
 
 DeckListStatisticsAnalyzer::DeckListStatisticsAnalyzer(QObject *parent,
                                                        DeckListModel *_model,

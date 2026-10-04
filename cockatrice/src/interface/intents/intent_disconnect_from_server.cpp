@@ -1,5 +1,7 @@
 #include "intent_disconnect_from_server.h"
 
+#include "remote_client.h"
+
 IntentDisconnectFromServer::IntentDisconnectFromServer(RemoteClient *_remoteClient)
     : Intent(), remoteClient(_remoteClient)
 {

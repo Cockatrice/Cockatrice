@@ -1,5 +1,11 @@
 #include "layouts_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QVariant>
+
+class QObject;
+
 const static QString STATE_PROP = "state";
 const static QString GEOMETRY_PROP = "geometry";
 const static QString SIZE_PROP = "widgetSize";

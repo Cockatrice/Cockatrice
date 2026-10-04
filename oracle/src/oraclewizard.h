@@ -1,21 +1,16 @@
 #ifndef ORACLEWIZARD_H
 #define ORACLEWIZARD_H
 
+#include <QByteArray>
+#include <QString>
 #include <QWizard>
+#include <qtmetamacros.h>
 #include <utility>
 
-class QCheckBox;
-class QGroupBox;
-class QComboBox;
-class QLabel;
-class QLineEdit;
-class QRadioButton;
-class QProgressBar;
 class QNetworkAccessManager;
-class QTextEdit;
-class QVBoxLayout;
 class OracleImporter;
 class QSettings;
+class QWidget;
 
 class OracleWizard : public QWizard
 {

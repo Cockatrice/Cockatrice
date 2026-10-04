@@ -1,6 +1,14 @@
 #include "palette_generator.h"
 
+#include "../theme_config.h"
+
 #include <QColor>
+#include <QMap>
+#include <QPalette>
+#include <QtVersionChecks>
+#include <qminmax.h>
+#include <qnamespace.h>
+#include <qnumeric.h>
 
 // ════════════════════════════════════════════════════════════════════════════
 //  PaletteGenerator::fromAccent

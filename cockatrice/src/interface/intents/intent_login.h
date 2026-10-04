@@ -1,8 +1,11 @@
 #ifndef COCKATRICE_INTENT_LOGIN_H
 #define COCKATRICE_INTENT_LOGIN_H
 
-#include "contexts/context_connect_to_server.h"
 #include "intent.h"
+
+#include <qtmetamacros.h>
+
+struct ContextConnectToServer;
 
 class IntentGetLoginCredentials : public Intent
 {

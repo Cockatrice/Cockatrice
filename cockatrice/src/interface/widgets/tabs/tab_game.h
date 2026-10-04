@@ -9,47 +9,55 @@
 #ifndef TAB_GAME_H
 #define TAB_GAME_H
 
-#include "../game/abstract_game.h"
-#include "../game/player/player_logic.h"
-#include "../game_graphics/log/message_log_widget.h"
-#include "../interface/widgets/menus/tearoff_menu.h"
-#include "../interface/widgets/replay/replay_widget.h"
 #include "tab.h"
 
-#include <QCompleter>
+#include <QList>
 #include <QLoggingCategory>
 #include <QMap>
-#include <QStringListModel>
+#include <QPair>
+#include <QSize>
+#include <QString>
+#include <QStringList>
+#include <QVector>
+#include <qtmetamacros.h>
+// IWYU pragma: keep
+// ServerInfo_User appears by value and inside QList in slot signatures, so the
+// moc-generated code needs the complete type.
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
 class CardMenu;
-class ServerInfo_PlayerProperties;
 class TabbedDeckViewContainer;
+class AbstractGame;
+class Event_GameJoined;
+class GameEventContext;
+class MessageLogWidget;
+class PlayerLogic;
+class QAction;
+class QCompleter;
+class QStringListModel;
+class QWidget;
+class ServerInfo_Player;
+class ServerInfo_User;
+class TabSupervisor;
+class TearOffMenu;
+struct CardRef;
+struct LoadedDeck;
+
 inline Q_LOGGING_CATEGORY(TabGameLog, "tab_game");
 
 class UserListProxy;
-class DeckViewContainer;
 class AbstractClient;
-class CardDatabase;
 class GameView;
 class GameScene;
 class ReplayWidget;
 class CardInfoFrameWidget;
-class QTimer;
-class QSplitter;
 class QLabel;
 class QPushButton;
-class QToolButton;
 class QMenu;
-class ZoneViewLayout;
-class ZoneViewWidget;
 class PhasesToolbar;
 class PlayerListWidget;
-class ReplayTimelineWidget;
-class CardZone;
 class AbstractCardItem;
-class CardItem;
 class QVBoxLayout;
-class QHBoxLayout;
 class GameReplay;
 class LineEditCompleter;
 class QDockWidget;

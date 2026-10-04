@@ -2,23 +2,35 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../interface/widgets/tabs/tab_room.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/room_commands.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+#include "libcockatrice/utility/macros.h"
 
-#include <QApplication>
 #include <QCheckBox>
+#include <QDebug>
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMapIterator>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QSet>
+#include <QSharedPointer>
+#include <QSize>
 #include <QSpinBox>
+#include <QVBoxLayout>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/game_settings.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <qnamespace.h>
+#include <string>
+
+class QWidget;
 
 void DlgCreateGame::sharedCtor()
 {

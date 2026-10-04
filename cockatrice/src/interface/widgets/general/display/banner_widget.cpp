@@ -2,10 +2,16 @@
 
 #include "../../../pixel_map_generator.h"
 
+#include <QBrush>
+#include <QColor>
+#include <QHBoxLayout>
 #include <QLinearGradient>
-#include <QMouseEvent>
 #include <QPainter>
-#include <QVBoxLayout>
+#include <QPixmap>
+#include <QPointF>
+#include <QRect>
+#include <QtPreprocessorSupport>
+#include <qminmax.h>
 
 BannerWidget::BannerWidget(QWidget *parent, const QString &text, Qt::Orientation orientation, int transparency_)
     : QWidget(parent), gradientOrientation(orientation), transparency(qBound(0, transparency_, 100))

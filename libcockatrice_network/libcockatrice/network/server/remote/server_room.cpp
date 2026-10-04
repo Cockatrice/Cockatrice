@@ -1,11 +1,26 @@
 #include "server_room.h"
 
 #include "game/server_game.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/room_event.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_gametype.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+#include "server.h"
+#include "server_abstractuserinterface.h"
 #include "server_protocolhandler.h"
+#include "server_response_containers.h"
+#include "serverinfo_user_container.h"
 
 #include <QDateTime>
-#include <QDebug>
+#include <QMapIterator>
+#include <QMutexLocker>
+#include <QReadLocker>
+#include <QRecursiveMutex>
+#include <QSharedPointer>
 #include <google/protobuf/descriptor.h>
+#include <google/protobuf/message.h>
+#include <iterator>
 #include <libcockatrice/protocol/pb/commands.pb.h>
 #include <libcockatrice/protocol/pb/event_join_room.pb.h>
 #include <libcockatrice/protocol/pb/event_leave_room.pb.h>
@@ -16,6 +31,10 @@
 #include <libcockatrice/protocol/pb/serverinfo_chat_message.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_room.pb.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <string>
+#include <utility>
 
 Server_Room::Server_Room(int _id,
                          int _chatHistorySize,

@@ -8,19 +8,22 @@
 #define DLG_CREATETOKEN_H
 
 #include <QDialog>
+#include <QList>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
 
 class QLabel;
 class QLineEdit;
 class QComboBox;
 class QCheckBox;
-class QPushButton;
 class QRadioButton;
-class QCloseEvent;
 class QTreeView;
-class DeckList;
 class CardDatabaseModel;
 class TokenDisplayModel;
 class CardInfoPictureWidget;
+class QModelIndex;
+class QWidget;
 
 struct TokenInfo
 {

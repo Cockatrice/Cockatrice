@@ -2,18 +2,44 @@
 
 #include "../../pixel_map_generator.h"
 #include "../cards/additional_info/mana_cost_widget.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/set/card_set.h"
 
+#include <QBrush>
+#include <QChar>
+#include <QFlags>
+#include <QFont>
 #include <QFontMetrics>
 #include <QLinearGradient>
+#include <QList>
+#include <QModelIndex>
 #include <QPainter>
 #include <QPainterPath>
+#include <QPalette>
+#include <QPen>
+#include <QPixmap>
+#include <QPoint>
+#include <QRect>
+#include <QRectF>
 #include <QRegularExpression>
 #include <QSet>
+#include <QSharedPointer>
+#include <QSize>
+#include <QStringList>
+#include <QStyle>
 #include <QStyleOptionViewItem>
+#include <QVariant>
+#include <QtPreprocessorSupport>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/printing/printing_info.h>
 #include <libcockatrice/models/database/card/card_search_model.h>
+#include <qminmax.h>
+#include <qnamespace.h>
+#include <qtypes.h>
+
+class QObject;
+template <class T> class QSharedPointer;
 
 // ---------------------------------------------------------------------------
 // Internal colour helpers

@@ -2,6 +2,9 @@
 
 #include <QDebug>
 #include <QJsonArray>
+#include <QJsonValue>
+#include <QJsonValueRef>
+#include <qlogging.h>
 
 void ArchidektDeckListingApiResponse::fromJson(const QJsonObject &json)
 {

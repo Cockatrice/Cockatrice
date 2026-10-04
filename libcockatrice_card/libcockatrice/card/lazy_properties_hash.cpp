@@ -1,6 +1,8 @@
 #include "lazy_properties_hash.h"
 
-#include <QIODevice>
+#include <QDataStream>
+#include <QMutexLocker>
+#include <QSharedPointer>
 
 LazyPropertiesHash::LazyPropertiesHash() : isMaterialized(true)
 {

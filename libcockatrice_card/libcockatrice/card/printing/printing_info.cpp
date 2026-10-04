@@ -2,9 +2,6 @@
 
 #include "../set/card_set.h"
 
-#include <QDataStream>
-#include <QIODevice>
-
 PrintingInfo::PrintingInfo(const CardSetPtr &_set, const LazyPropertiesHash &_properties)
     : set(_set), properties(_properties)
 {

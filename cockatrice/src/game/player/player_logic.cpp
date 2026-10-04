@@ -1,33 +1,37 @@
 #include "player_logic.h"
 
-#include "../../game_graphics/board/arrow_item.h"
 #include "../../game_graphics/board/card_item.h"
-#include "../../game_graphics/board/counter_general.h"
-#include "../../game_graphics/game_scene.h"
-#include "../../game_graphics/player/player_target.h"
-#include "../../game_graphics/zones/hand_zone.h"
-#include "../../game_graphics/zones/pile_zone.h"
-#include "../../game_graphics/zones/stack_zone.h"
-#include "../../game_graphics/zones/table_zone.h"
-#include "../../interface/theme_manager.h"
-#include "../../interface/widgets/tabs/tab_game.h"
-#include "../board/card_list.h"
+#include "../abstract_game.h"
+#include "../board/arrow_data.h"
+#include "../board/counter_state.h"
+#include "../game_meta_info.h"
+#include "../zones/hand_zone_logic.h"
+#include "../zones/pile_zone_logic.h"
+#include "../zones/stack_zone_logic.h"
+#include "../zones/table_zone_logic.h"
+#include "libcockatrice/protocol/pb/serverinfo_card.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_counter.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h"
+#include "libcockatrice/utility/zone_names.h"
 #include "player_actions.h"
+#include "player_event_handler.h"
+#include "player_info.h"
+#include "player_manager.h"
 
 #include <QDebug>
-#include <QMenu>
-#include <QMetaType>
-#include <QPainter>
-#include <QtConcurrent>
-#include <libcockatrice/protocol/pb/command_attach_card.pb.h>
-#include <libcockatrice/protocol/pb/command_set_card_counter.pb.h>
-#include <libcockatrice/protocol/pb/event_create_arrow.pb.h>
-#include <libcockatrice/protocol/pb/event_create_counter.pb.h>
-#include <libcockatrice/protocol/pb/event_draw_cards.pb.h>
+#include <QMapIterator>
+#include <QMessageLogger>
+#include <QMutableMapIterator>
+#include <QSet>
+#include <QSharedPointer>
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_zone.pb.h>
+#include <libcockatrice/utility/card_ref.h>
 #include <libcockatrice/utility/color.h>
+#include <qalgorithms.h>
+#include <qminmax.h>
+#include <string>
 
 PlayerLogic::PlayerLogic(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent)
     : QObject(_parent), game(_parent), playerInfo(new PlayerInfo(info, _id, _local, _judge)),

@@ -1,6 +1,8 @@
 #include "gtest/gtest.h"
+#include <QList>
 #include <QString>
 #include <libcockatrice/utility/warning_categories.h>
+#include <string>
 
 TEST(WarningCategoriesTest, EmptyValueYieldsNoCategories)
 {

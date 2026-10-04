@@ -14,14 +14,20 @@
 #define VISUAL_DECK_STORAGE_MODEL_H
 
 #include "../../deck_loader/loaded_deck.h"
+#include "libcockatrice/utility/card_ref.h"
 
 #include <QAbstractListModel>
 #include <QDateTime>
 #include <QHash>
 #include <QList>
+#include <QModelIndex>
+#include <QString>
 #include <QStringList>
-#include <libcockatrice/deck_list/deck_list.h>
-#include <optional>
+#include <QVector>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
+
+class QObject;
 
 namespace VisualDeckStorageRoles
 {

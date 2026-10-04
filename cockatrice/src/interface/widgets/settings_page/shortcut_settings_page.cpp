@@ -8,8 +8,17 @@
 #include "../interface/widgets/utility/sequence_edit.h"
 
 #include <QAbstractItemView>
+#include <QGridLayout>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QLabel>
 #include <QMessageBox>
+#include <QPushButton>
+#include <QSizePolicy>
+#include <QStringLiteral>
+#include <QVBoxLayout>
 #include <libcockatrice/settings/personal_settings.h>
+#include <qnamespace.h>
 
 ShortcutSettingsPage::ShortcutSettingsPage()
 {

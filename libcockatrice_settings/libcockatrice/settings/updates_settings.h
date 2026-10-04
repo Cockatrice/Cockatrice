@@ -3,8 +3,12 @@
 
 #include "settings_manager.h"
 
-#include <QDate>
+#include <QString>
 #include <libcockatrice/interfaces/interface_updates_settings_provider.h>
+#include <qtmetamacros.h>
+
+class QDate;
+class QObject;
 
 class UpdatesSettings : public SettingsManager, public IUpdatesSettingsProvider
 {

@@ -9,10 +9,19 @@
  * full model and card database machinery.
  */
 
+#include "deck_list_model_custom_zones.h"
+#include "libcockatrice/deck_list/tree/abstract_deck_list_node.h"
+
+#include <QList>
+#include <QString>
+#include <QStringList>
 #include <gtest/gtest.h>
 #include <libcockatrice/deck_list/tree/deck_list_card_node.h>
 #include <libcockatrice/deck_list/tree/inner_deck_list_node.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
+#include <qnamespace.h>
+#include <string>
+#include <utility>
 
 namespace
 {

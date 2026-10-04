@@ -1,8 +1,16 @@
 #include "line_edit_completer.h"
 
 #include <QAbstractItemView>
+#include <QChar>
+#include <QCompleter>
 #include <QFocusEvent>
 #include <QKeyEvent>
+#include <QModelIndex>
+#include <QOverload>
+#include <QVariant>
+#include <qnamespace.h>
+
+class QWidget;
 
 LineEditCompleter::LineEditCompleter(QWidget *parent) : LineEditUnfocusable(parent)
 {

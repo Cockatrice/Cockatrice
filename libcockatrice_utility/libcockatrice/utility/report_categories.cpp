@@ -1,5 +1,8 @@
 #include "report_categories.h"
 
+#include <QList>
+#include <qnamespace.h>
+
 namespace ReportCategories
 {
 const QStringList &keys()

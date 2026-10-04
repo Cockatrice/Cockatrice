@@ -3,11 +3,14 @@
 
 #include "../../../game/player/event_processing_options.h"
 
+#include <QList>
 #include <QObject>
-#include <libcockatrice/protocol/pb/game_replay.pb.h>
+#include <qtmetamacros.h>
+#include <qtypes.h>
 
 class GameReplay;
 class QTimer;
+class GameEventContainer;
 
 /**
  * @brief This class handles all logic to do with playing back replays

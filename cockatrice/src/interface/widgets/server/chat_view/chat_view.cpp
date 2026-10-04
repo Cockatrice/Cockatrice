@@ -4,22 +4,48 @@
 #include "../../client/sound_engine.h"
 #include "../../interface/card_localization.h"
 #include "../../interface/pixel_map_generator.h"
-#include "../../interface/widgets/tabs/tab_account.h"
+#include "../../tabs/tab_supervisor.h"
 #include "../user/user_context_menu.h"
 #include "../user/user_list_manager.h"
 #include "../user/user_list_proxy.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/protocol/pb/event_room_say.pb.h"
+#include "room_message_type.h"
 
 #include <QApplication>
+#include <QBrush>
+#include <QChar>
 #include <QDateTime>
 #include <QDesktopServices>
+#include <QFlag>
+#include <QFlags>
+#include <QFont>
+#include <QFontInfo>
 #include <QMouseEvent>
+#include <QPalette>
+#include <QPixmap>
+#include <QPointF>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
 #include <QScrollBar>
+#include <QSharedPointer>
+#include <QTextBlockFormat>
+#include <QTextDocument>
 #include <QTimer>
 #include <QUrl>
 #include <QUrlQuery>
+#include <QWidget>
+#include <QtVersionChecks>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/server/remote/user_level.h>
 #include <libcockatrice/settings/chat_settings.h>
+#include <libcockatrice/utility/card_ref.h>
+#include <qminmax.h>
+#include <qnamespace.h>
+#include <qobjectdefs.h>
+
+class QPoint;
 
 const QColor DEFAULT_MENTION_COLOR = QColor(194, 31, 47);
 

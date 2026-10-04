@@ -1,13 +1,24 @@
 #include "gtest/gtest.h"
+#include <QByteArray>
+#include <QByteArrayView>
+#include <QChar>
 #include <QColor>
 #include <QCoreApplication>
 #include <QDate>
 #include <QDir>
 #include <QFile>
+#include <QIODevice>
+#include <QList>
 #include <QSettings>
+#include <QString>
 #include <QStringList>
+#include <QStringLiteral>
 #include <QTemporaryDir>
+#include <QVariant>
+#include <QtEnvironmentVariables>
 #include <libcockatrice/settings/settings_migration.h>
+#include <qnamespace.h>
+#include <string>
 
 namespace
 {

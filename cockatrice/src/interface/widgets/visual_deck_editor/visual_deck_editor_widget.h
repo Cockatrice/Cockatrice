@@ -7,26 +7,35 @@
 #ifndef VISUAL_DECK_EDITOR_H
 #define VISUAL_DECK_EDITOR_H
 
-#include "../cards/card_info_picture_with_text_overlay_widget.h"
-#include "../cards/card_size_widget.h"
-#include "../general/layout_containers/overlap_control_widget.h"
-#include "../quick_settings/settings_button_widget.h"
-#include "../utility/compact_push_button.h"
-#include "visual_deck_editor_placeholder_widget.h"
-
-#include <QCheckBox>
-#include <QListWidget>
-#include <QPushButton>
+#include <QHash>
+#include <QPersistentModelIndex>
+#include <QString>
+#include <QStringList>
 #include <QWidget>
-#include <libcockatrice/card/database/card_database.h>
-#include <libcockatrice/models/database/card/card_completer_proxy_model.h>
-#include <libcockatrice/models/database/card_database_display_model.h>
-#include <libcockatrice/models/database/card_database_model.h>
-#include <libcockatrice/models/deck_list/deck_list_model.h>
-#include <qscrollarea.h>
+#include <qtmetamacros.h>
 
 class VisualDeckDisplayOptionsWidget;
 class DeckCardZoneDisplayWidget;
+class CardCompleterProxyModel;
+class CardDatabaseDisplayModel;
+class CardDatabaseModel;
+class CardSizeWidget;
+class CompactPushButton;
+class DeckList;
+class DeckListModel;
+class ExactCard;
+class FlowWidget;
+class QCompleter;
+class QHBoxLayout;
+class QItemSelection;
+class QItemSelectionModel;
+class QLineEdit;
+class QModelIndex;
+class QMouseEvent;
+class QScrollArea;
+class QVBoxLayout;
+class VisualDeckEditorPlaceholderWidget;
+
 enum class DisplayType
 {
     Flat,

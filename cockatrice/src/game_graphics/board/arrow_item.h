@@ -6,15 +6,23 @@
 #include "arrow_target.h"
 #include "graphics_item_type.h"
 
+#include <QColor>
 #include <QElapsedTimer>
 #include <QGraphicsItem>
+#include <QList>
+#include <QMetaObject>
+#include <QObject>
 #include <QPainterPath>
+#include <QPointF>
 #include <QPointer>
+#include <QRectF>
 #include <QSharedPointer>
+#include <qtmetamacros.h>
+#include <qtypes.h>
 
 class CardItem;
-class QGraphicsSceneMouseEvent;
 class PlayerLogic;
+template <class T> class QSharedPointer;
 
 class ArrowItem : public QObject, public QGraphicsItem, public IAnimatedItem
 {

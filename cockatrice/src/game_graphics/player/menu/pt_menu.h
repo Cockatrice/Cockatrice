@@ -7,8 +7,11 @@
 #ifndef COCKATRICE_PT_MENU_H
 #define COCKATRICE_PT_MENU_H
 #include <QMenu>
+#include <qtmetamacros.h>
 
 class PlayerGraphicsItem;
+class QAction;
+
 class PtMenu : public QMenu
 {
 

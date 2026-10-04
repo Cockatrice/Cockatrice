@@ -1,7 +1,28 @@
 #include "deck_list_history_manager_widget.h"
 
 #include "../../pixel_map_generator.h"
+#include "../quick_settings/settings_button_widget.h"
 #include "deck_state_manager.h"
+#include "libcockatrice/deck_list/deck_list_history_manager.h"
+#include "libcockatrice/deck_list/deck_list_memento.h"
+
+#include <QAction>
+#include <QBrush>
+#include <QFlags>
+#include <QHBoxLayout>
+#include <QKeySequence>
+#include <QLabel>
+#include <QListWidget>
+#include <QListWidgetItem>
+#include <QSharedPointer>
+#include <QStack>
+#include <QString>
+#include <QStringLiteral>
+#include <QToolButton>
+#include <QVariant>
+#include <qnamespace.h>
+
+class DeckListStyleProxy;
 
 DeckListHistoryManagerWidget::DeckListHistoryManagerWidget(DeckStateManager *_deckStateManager,
                                                            DeckListStyleProxy *_styleProxy,
