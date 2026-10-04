@@ -15,6 +15,7 @@
 #include <QList>
 #include <QLoggingCategory>
 #include <QMap>
+#include <QMenu>
 #include <QProxyStyle>
 #include <QSize>
 #include <QString>
@@ -37,7 +38,6 @@ struct LoadedDeck;
 inline Q_LOGGING_CATEGORY(TabSupervisorLog, "tab_supervisor");
 
 class UserListManager;
-class QMenu;
 class AbstractClient;
 class Tab;
 class TabServer;

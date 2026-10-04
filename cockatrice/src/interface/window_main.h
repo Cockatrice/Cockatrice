@@ -26,6 +26,7 @@
 #define WINDOW_H
 
 #include "../client/lag_monitor.h"
+#include "../client/network/update/client/release_channel.h"
 #include "connection_controller/remote_connection_controller.h"
 
 #include <QByteArray>
@@ -33,6 +34,7 @@
 #include <QList>
 #include <QLoggingCategory>
 #include <QMainWindow>
+#include <QMenu>
 #include <QProcess>
 #include <QString>
 #include <QStringList>
@@ -42,7 +44,6 @@
 #include <qtmetamacros.h>
 
 class QAction;
-class QMenu;
 class QWidget;
 struct LocalGameOptions;
 
@@ -52,7 +53,6 @@ inline Q_LOGGING_CATEGORY(WindowMainStartupVersionLog, "window_main.startup.vers
 inline Q_LOGGING_CATEGORY(WindowMainStartupShortcutsLog, "window_main.startup.shortcuts");
 inline Q_LOGGING_CATEGORY(WindowMainStartupAutoconnectLog, "window_main.startup.autoconnect");
 
-class Release;
 class DlgViewLog;
 class GameReplay;
 class LocalServer;

@@ -7,6 +7,8 @@
 #ifndef DLG_UPDATE_H
 #define DLG_UPDATE_H
 
+#include "../../../client/network/update/client/release_channel.h"
+
 #include <QDialog>
 #include <QLoggingCategory>
 #include <QString>
@@ -22,8 +24,6 @@ class QWidget;
 class UpdateDownloader;
 
 inline Q_LOGGING_CATEGORY(DlgUpdateLog, "dlg_update");
-
-class Release;
 
 class DlgUpdate : public QDialog
 {
