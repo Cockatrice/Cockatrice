@@ -26,6 +26,11 @@
 #include <libcockatrice/utility/zone_names.h>
 #include <qtmetamacros.h>
 
+// IWYU pragma: keep
+// ServerInfo_Card appears inside QList<...> in signal and slot
+// signatures, which the moc-generated code needs to be complete.
+#include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
+
 class CardItem;
 class CounterState;
 class QWidget;
