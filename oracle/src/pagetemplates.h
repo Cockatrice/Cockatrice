@@ -4,8 +4,8 @@
 #include <QByteArray>
 #include <QString>
 #include <QWizardPage>
+#include <QtTypes>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class QRadioButton;
 class OracleWizard;

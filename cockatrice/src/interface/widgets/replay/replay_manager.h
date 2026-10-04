@@ -5,8 +5,8 @@
 
 #include <QList>
 #include <QObject>
+#include <QtTypes>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class GameReplay;
 class QTimer;

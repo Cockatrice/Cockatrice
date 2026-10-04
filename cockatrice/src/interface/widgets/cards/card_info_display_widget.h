@@ -8,10 +8,10 @@
 #define CARDINFOWIDGET_H
 
 #include <QFrame>
+#include <QtTypes>
 #include <libcockatrice/card/printing/exact_card.h>
 #include <qnamespace.h>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class CardInfoPictureWidget;
 class CardInfoTextWidget;

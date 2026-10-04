@@ -24,13 +24,13 @@
 #include <QUrl>
 #include <QUrlQuery>
 #include <QVariant>
+#include <QtTypes>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/settings/servers_settings.h>
 #include <memory>
 #include <qlogging.h>
 #include <qnamespace.h>
-#include <qtypes.h>
 #include <utility>
 
 inline Q_LOGGING_CATEGORY(UrlParserLog, "url_parser");

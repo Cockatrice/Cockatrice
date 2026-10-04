@@ -11,10 +11,10 @@
 // IWYU pragma: keep
 // ServerInfo_User and ServerInfo_Game are passed by value to signals, so the
 // moc-generated code needs the complete types.
+#include <QtTypes>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class Servatrice;
 class QSslSocket;

@@ -11,9 +11,9 @@
 
 #include <QPointF>
 #include <QSet>
+#include <QtTypes>
 #include <optional>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class QGraphicsRectItem;
 class CardItem;

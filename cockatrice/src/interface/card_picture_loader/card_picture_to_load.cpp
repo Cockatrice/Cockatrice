@@ -14,13 +14,13 @@
 #include <QRegularExpressionMatchIterator>
 #include <QSharedPointer>
 #include <QUrl>
+#include <QtTypes>
 #include <algorithm>
 #include <functional>
 #include <libcockatrice/card/set/card_set_comparator.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/download_settings.h>
-#include <qtypes.h>
 
 CardPictureToLoad::CardPictureToLoad(const ExactCard &_card)
     : card(_card), urlTemplates(SettingsCache::instance().downloads().getAllURLs())

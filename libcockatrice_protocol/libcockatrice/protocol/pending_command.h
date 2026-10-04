@@ -10,9 +10,9 @@
 #include <QElapsedTimer>
 #include <QObject>
 #include <QVariant>
+#include <QtTypes>
 #include <libcockatrice/protocol/pb/commands.pb.h>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class Response;
 

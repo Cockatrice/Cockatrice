@@ -24,8 +24,8 @@
 #include <QSaveFile>
 #include <QSet>
 #include <QSharedPointer>
+#include <QtTypes>
 #include <qnamespace.h>
-#include <qtypes.h>
 
 class ICardSetPriorityController;
 enum class CardRelationType;

@@ -17,8 +17,8 @@
 #include <QPointer>
 #include <QRectF>
 #include <QSharedPointer>
+#include <QtTypes>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class CardItem;
 class PlayerLogic;

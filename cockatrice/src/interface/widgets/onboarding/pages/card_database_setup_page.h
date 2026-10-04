@@ -5,8 +5,8 @@
 
 #include <QSize>
 #include <QString>
+#include <QtTypes>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class QComboBox;
 class QLabel;

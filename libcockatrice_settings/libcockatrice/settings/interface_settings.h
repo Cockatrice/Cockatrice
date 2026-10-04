@@ -5,9 +5,9 @@
 
 #include <QString>
 #include <QStringList>
+#include <QtTypes>
 #include <libcockatrice/interfaces/interface_interface_settings_provider.h>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class QObject;
 struct PlaymatInfo;

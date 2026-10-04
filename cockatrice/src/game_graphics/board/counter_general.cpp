@@ -11,9 +11,9 @@
 #include <QSizeF>
 #include <QString>
 #include <QTransform>
+#include <QtTypes>
 #include <qminmax.h>
 #include <qnamespace.h>
-#include <qtypes.h>
 
 class CounterState;
 class PlayerLogic;

@@ -48,6 +48,7 @@
 #include <QUrl>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QtTypes>
 #include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
@@ -68,7 +69,6 @@
 #include <optional>
 #include <qlogging.h>
 #include <qnamespace.h>
-#include <qtypes.h>
 #include <string>
 
 class TabSupervisor;

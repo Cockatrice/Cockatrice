@@ -11,8 +11,8 @@
 #include <QLoggingCategory>
 #include <QString>
 #include <QUrl>
+#include <QtTypes>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class QDialogButtonBox;
 class QLabel;

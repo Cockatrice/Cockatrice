@@ -23,8 +23,8 @@
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QWidget>
+#include <QtTypes>
 #include <qnamespace.h>
-#include <qtypes.h>
 #include <version_string.h>
 
 #define ARCHIDEKT_DEFAULT_IMAGE "https://storage.googleapis.com/topdekt-user/images/archidekt_deck_card_shadow.jpg"

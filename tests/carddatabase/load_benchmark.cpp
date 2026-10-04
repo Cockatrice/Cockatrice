@@ -28,6 +28,7 @@
 #include <QSharedPointer>
 #include <QString>
 #include <QStringList>
+#include <QtTypes>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_loader.h>
 #include <libcockatrice/interfaces/interface_card_database_path_provider.h>
@@ -35,7 +36,6 @@
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 #include <libcockatrice/models/database/card_database_model.h>
 #include <qlogging.h>
-#include <qtypes.h>
 
 static QString defaultXdgPath(const QString &file)
 {

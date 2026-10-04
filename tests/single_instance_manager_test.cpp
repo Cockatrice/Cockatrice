@@ -11,8 +11,8 @@
 #include <QStringLiteral>
 #include <QTimer>
 #include <QtEnvironmentVariables>
+#include <QtTypes>
 #include <gtest/gtest.h>
-#include <qtypes.h>
 #include <string>
 
 namespace

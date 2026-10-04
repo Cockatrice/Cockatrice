@@ -22,13 +22,13 @@
 #include <QSet>
 #include <QSharedPointer>
 #include <QVariant>
+#include <QtTypes>
 #include <algorithm>
 #include <climits>
 #include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/card/database/parser/cockatrice_xml_4.h>
 #include <libcockatrice/card/relation/card_relation.h>
 #include <qlogging.h>
-#include <qtypes.h>
 
 class ICardSetPriorityController;
 

@@ -1,8 +1,8 @@
 #ifndef COCKATRICE_ART_CROP_ATTRIBUTION_H
 #define COCKATRICE_ART_CROP_ATTRIBUTION_H
 
+#include <QtTypes>
 #include <qnamespace.h>
-#include <qtypes.h>
 
 class ExactCard;
 class QPainter;

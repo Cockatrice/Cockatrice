@@ -7,10 +7,10 @@
 #include <QPainterPath>
 #include <QPointF>
 #include <QSize>
+#include <QtTypes>
 #include <qminmax.h>
 #include <qnamespace.h>
 #include <qnumeric.h>
-#include <qtypes.h>
 
 static constexpr int BIN_LENGTH = 5000;
 static constexpr int MIN_RESOLUTION_MS = 1000;

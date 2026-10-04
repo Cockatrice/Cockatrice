@@ -15,8 +15,8 @@
 #include <QSizeF>
 #include <QString>
 #include <QTransform>
+#include <QtTypes>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class CardZoneLogic;
 class IAnimatedItem;

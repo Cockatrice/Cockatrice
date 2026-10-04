@@ -40,11 +40,11 @@
 #include <QSqlDatabase>
 #include <QTcpServer>
 #include <QWebSocketServer>
+#include <QtTypes>
 #include <atomic>
 #include <libcockatrice/protocol/pb/response_report_stats.pb.h>
 #include <memory>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 #include <server.h>
 #include <utility>
 

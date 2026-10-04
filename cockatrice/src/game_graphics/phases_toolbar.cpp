@@ -12,6 +12,7 @@
 #include <QRectF>
 #include <QTimer>
 #include <QTransform>
+#include <QtTypes>
 #include <google/protobuf/stubs/port.h>
 #include <libcockatrice/protocol/pb/command_draw_cards.pb.h>
 #include <libcockatrice/protocol/pb/command_next_turn.pb.h>
@@ -20,7 +21,6 @@
 #include <libcockatrice/utility/zone_names.h>
 #include <qnamespace.h>
 #include <qnumeric.h>
-#include <qtypes.h>
 
 PhaseButton::PhaseButton(const QString &_name, QGraphicsItem *parent, QAction *_doubleClickAction, bool _highlightable)
     : QObject(), QGraphicsItem(parent), name(_name), active(false), highlightable(_highlightable),

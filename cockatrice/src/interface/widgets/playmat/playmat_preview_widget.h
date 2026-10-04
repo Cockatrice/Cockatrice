@@ -8,8 +8,8 @@
 #include <QRectF>
 #include <QString>
 #include <QWidget>
+#include <QtTypes>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 /**
  * @brief Interactive crop surface showing how a playmat card art will appear

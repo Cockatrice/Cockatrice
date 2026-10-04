@@ -12,8 +12,8 @@
 #include <QMessageLogger>
 #include <QStringList>
 #include <QUrl>
+#include <QtTypes>
 #include <libcockatrice/settings/sound_settings.h>
-#include <qtypes.h>
 
 #define DEFAULT_THEME_NAME "Default"
 #define TEST_SOUND_FILENAME "player_join"

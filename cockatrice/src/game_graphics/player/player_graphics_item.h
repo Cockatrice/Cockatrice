@@ -18,8 +18,8 @@
 #include <QSize>
 #include <QSizeF>
 #include <QString>
+#include <QtTypes>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class HandZone;
 class PileZone;

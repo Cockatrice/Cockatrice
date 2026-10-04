@@ -11,7 +11,7 @@
 #include <QSharedPointer>
 #include <QStringLiteral>
 #include <QtEnvironmentVariables>
-#include <qtypes.h>
+#include <QtTypes>
 
 namespace
 {

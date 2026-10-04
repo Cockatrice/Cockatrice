@@ -27,11 +27,11 @@
 #include <QVariant>
 
 ServerRateLimiter CardPictureLoaderWorkerWork::s_rateLimiter;
+#include <QtTypes>
 #include <libcockatrice/settings/download_settings.h>
 #include <qminmax.h>
 #include <qnamespace.h>
 #include <qobjectdefs.h>
-#include <qtypes.h>
 
 // Card back returned by gatherer when card is not found
 static const QStringList MD5_BLACKLIST = {

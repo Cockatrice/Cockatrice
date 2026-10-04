@@ -12,8 +12,8 @@
 #include <QGraphicsItem>
 #include <QObject>
 #include <QRectF>
+#include <QtTypes>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class QGraphicsItem;
 

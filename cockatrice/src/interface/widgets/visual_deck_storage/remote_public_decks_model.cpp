@@ -4,6 +4,7 @@
 
 #include <QTimer>
 #include <QVariant>
+#include <QtTypes>
 #include <algorithm>
 #include <google/protobuf/repeated_ptr_field.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
@@ -13,7 +14,6 @@
 #include <libcockatrice/protocol/pb/serverinfo_deckstorage.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/network_settings.h>
-#include <qtypes.h>
 #include <string>
 
 class QObject;

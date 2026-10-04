@@ -7,9 +7,9 @@
 #define METRICS_REGISTRY_H
 
 #include <QList>
+#include <QtTypes>
 #include <array>
 #include <atomic>
-#include <qtypes.h>
 
 /**
  * @brief Lock-free accumulation of command processing statistics.

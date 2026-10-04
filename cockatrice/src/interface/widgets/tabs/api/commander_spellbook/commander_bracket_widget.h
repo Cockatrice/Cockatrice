@@ -6,8 +6,8 @@
 #include <QSharedPointer>
 #include <QString>
 #include <QWidget>
+#include <QtTypes>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class QLabel;
 class QToolButton;

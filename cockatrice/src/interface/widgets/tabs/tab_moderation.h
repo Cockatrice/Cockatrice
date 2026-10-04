@@ -4,8 +4,8 @@
 #include "tab.h"
 
 #include <QString>
+#include <QtTypes>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class AbstractClient;
 class QGroupBox;

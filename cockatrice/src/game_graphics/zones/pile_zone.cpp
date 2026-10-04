@@ -24,10 +24,10 @@
 #include <QString>
 #include <QTransform>
 #include <QtPreprocessorSupport>
+#include <QtTypes>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <qnamespace.h>
-#include <qtypes.h>
 #include <string>
 
 PileZone::PileZone(PileZoneLogic *_logic, QGraphicsItem *parent) : CardZone(_logic, parent)

@@ -3,8 +3,8 @@
 
 #include <QList>
 #include <QString>
+#include <QtTypes>
 #include <functional>
-#include <qtypes.h>
 
 class QByteArray;
 

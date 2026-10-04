@@ -14,8 +14,8 @@
 
 #include <QElapsedTimer>
 #include <QPixmap>
+#include <QtTypes>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class PlayerLogic;
 class CounterState;

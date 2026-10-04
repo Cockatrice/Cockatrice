@@ -11,10 +11,10 @@
 #include <QTextStream>
 #include <QThread>
 #include <QVariant>
+#include <QtTypes>
 #include <iostream>
 #include <qnamespace.h>
 #include <qobjectdefs.h>
-#include <qtypes.h>
 #include <string>
 
 ServerLogger::ServerLogger(bool _logToConsole, QObject *parent)

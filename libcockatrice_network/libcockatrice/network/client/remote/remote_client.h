@@ -17,8 +17,8 @@
 #include <QString>
 #include <QTcpSocket>
 #include <QWebSocket>
+#include <QtTypes>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class Event_ConnectionClosed;
 class Event_ServerIdentification;

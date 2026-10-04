@@ -12,10 +12,10 @@
 #include <QPainterPath>
 #include <QTransform>
 #include <QtPreprocessorSupport>
+#include <QtTypes>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <qminmax.h>
 #include <qnamespace.h>
-#include <qtypes.h>
 
 class QPointF;
 

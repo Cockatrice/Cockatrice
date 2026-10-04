@@ -4,7 +4,7 @@
 #include <QDateTime>
 #include <QMap>
 #include <QString>
-#include <qtypes.h>
+#include <QtTypes>
 
 /**
  * @class ServerRateLimiter

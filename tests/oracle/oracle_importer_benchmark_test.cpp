@@ -28,10 +28,10 @@
 #include <QUrl>
 #include <QtEnvironmentVariables>
 #include <QtPreprocessorSupport>
+#include <QtTypes>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 #include <qlogging.h>
 #include <qsystemdetection.h>
-#include <qtypes.h>
 #include <string>
 #include <utility>
 

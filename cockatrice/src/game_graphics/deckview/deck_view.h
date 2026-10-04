@@ -22,9 +22,9 @@
 #include <QRectF>
 #include <QSizeF>
 #include <QString>
+#include <QtTypes>
 #include <libcockatrice/protocol/pb/move_card_to_zone.pb.h>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class DeckList;
 class DeckViewCardContainer;

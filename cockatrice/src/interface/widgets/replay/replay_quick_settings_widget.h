@@ -6,9 +6,9 @@
 #include <QCheckBox>
 #include <QDoubleSpinBox>
 #include <QLabel>
+#include <QtTypes>
 #include <libcockatrice/utility/macros.h>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class QWidget;
 

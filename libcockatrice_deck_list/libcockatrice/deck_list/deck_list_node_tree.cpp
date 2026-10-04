@@ -13,8 +13,8 @@
 #include <QStringView>
 #include <QXmlStreamAttributes>
 #include <QXmlStreamReader>
+#include <QtTypes>
 #include <qminmax.h>
-#include <qtypes.h>
 
 static constexpr int MAX_DECK_SIZE = 1e5;
 

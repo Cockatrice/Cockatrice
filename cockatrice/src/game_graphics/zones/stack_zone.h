@@ -9,8 +9,8 @@
 
 #include "select_zone.h"
 
+#include <QtTypes>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class QGraphicsItem;
 class StackZoneLogic;

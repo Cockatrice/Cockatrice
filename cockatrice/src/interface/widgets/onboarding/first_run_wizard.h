@@ -4,8 +4,8 @@
 #include <QDialog>
 #include <QList>
 #include <QString>
+#include <QtTypes>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class BannerHost;
 class FirstRunWizardPage;

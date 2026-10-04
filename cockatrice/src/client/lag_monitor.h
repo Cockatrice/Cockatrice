@@ -10,8 +10,8 @@
 #include <QList>
 #include <QLoggingCategory>
 #include <QObject>
+#include <QtTypes>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 inline Q_LOGGING_CATEGORY(LagMonitorLog, "lag_monitor");
 

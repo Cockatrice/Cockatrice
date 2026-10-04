@@ -8,8 +8,8 @@
 #include <QFutureWatcher>
 #include <QString>
 #include <QStringList>
+#include <QtTypes>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class QCheckBox;
 class QComboBox;

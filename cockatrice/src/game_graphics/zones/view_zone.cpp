@@ -23,6 +23,7 @@
 #include <QPainter>
 #include <QSharedPointer>
 #include <QtMath>
+#include <QtTypes>
 #include <functional>
 #include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/protocol/pb/command_dump_zone.pb.h>
@@ -32,7 +33,6 @@
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <qminmax.h>
-#include <qtypes.h>
 #include <string>
 
 class QGraphicsItem;

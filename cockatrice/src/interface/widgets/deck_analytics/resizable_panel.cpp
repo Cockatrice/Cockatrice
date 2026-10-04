@@ -28,9 +28,9 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QtPreprocessorSupport>
+#include <QtTypes>
 #include <qminmax.h>
 #include <qnamespace.h>
-#include <qtypes.h>
 
 ResizablePanel::ResizablePanel(const QString &_typeId, AbstractAnalyticsPanelWidget *analyticsPanel, QWidget *parent)
     : QWidget(parent), panel(analyticsPanel), typeId(_typeId)

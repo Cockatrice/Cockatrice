@@ -16,9 +16,9 @@
 #include <QPointF>
 #include <QPointer>
 #include <QRectF>
+#include <QtTypes>
 #include <libcockatrice/utility/macros.h>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class ZoneViewZone;
 class PlayerLogic;

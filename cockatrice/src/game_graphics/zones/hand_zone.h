@@ -10,8 +10,8 @@
 #include "../../game/board/card_list.h"
 #include "select_zone.h"
 
+#include <QtTypes>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class HandZoneLogic;
 class QGraphicsItem;

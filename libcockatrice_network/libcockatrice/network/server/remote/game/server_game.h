@@ -34,12 +34,12 @@
 #include <QScopedPointer>
 #include <QSet>
 #include <QString>
+#include <QtTypes>
 #include <atomic>
 #include <libcockatrice/protocol/pb/event_leave.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class QTimer;
 class GameEventContainer;

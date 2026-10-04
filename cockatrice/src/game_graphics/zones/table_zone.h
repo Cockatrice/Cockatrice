@@ -16,8 +16,8 @@
 #include <QPixmap>
 #include <QPoint>
 #include <QPointF>
+#include <QtTypes>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class CardDragItem;
 class CardItem;

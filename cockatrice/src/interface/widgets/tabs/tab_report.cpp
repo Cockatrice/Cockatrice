@@ -32,6 +32,7 @@
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QWidget>
+#include <QtTypes>
 #include <QtVersionChecks>
 #include <libcockatrice/protocol/pb/command_replay_download_by_game_id.pb.h>
 #include <libcockatrice/protocol/pb/command_report_add_comment.pb.h>
@@ -50,7 +51,6 @@
 #include <libcockatrice/protocol/pb/serverinfo_report.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <qnamespace.h>
-#include <qtypes.h>
 #include <string>
 
 namespace

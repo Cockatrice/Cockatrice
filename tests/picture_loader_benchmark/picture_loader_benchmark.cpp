@@ -53,6 +53,7 @@
 #include <QUrl>
 #include <QtEnvironmentVariables>
 #include <QtMessageHandler>
+#include <QtTypes>
 #include <atomic>
 #include <cstdio>
 #include <libcockatrice/card/database/card_database.h>
@@ -65,7 +66,6 @@
 #include <optional>
 #include <qminmax.h>
 #include <qsystemdetection.h>
-#include <qtypes.h>
 #include <utility>
 
 class BenchmarkCardDatabasePathProvider : public ICardDatabasePathProvider

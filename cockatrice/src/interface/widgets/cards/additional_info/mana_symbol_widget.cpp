@@ -9,8 +9,8 @@
 #include <QSharedPointer>
 #include <QSize>
 #include <QtPreprocessorSupport>
+#include <QtTypes>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
-#include <qtypes.h>
 #include <utility>
 
 class QWidget;

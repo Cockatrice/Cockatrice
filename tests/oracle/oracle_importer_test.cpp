@@ -23,10 +23,10 @@
 #include <QUuid>
 #include <QVariant>
 #include <QVariantMap>
+#include <QtTypes>
 #include <libcockatrice/card/format/format_legality_rules.h>
 #include <libcockatrice/card/set/card_set.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
-#include <qtypes.h>
 #include <string>
 #include <utility>
 

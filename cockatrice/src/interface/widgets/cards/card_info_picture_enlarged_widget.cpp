@@ -11,9 +11,9 @@
 #include <QSize>
 #include <QStylePainter>
 #include <QtPreprocessorSupport>
+#include <QtTypes>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <qnamespace.h>
-#include <qtypes.h>
 
 /**
  * @brief Constructs a CardPictureEnlargedWidget.

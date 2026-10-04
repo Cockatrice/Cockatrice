@@ -32,8 +32,8 @@
 #include <QStringList>
 #include <QTcpSocket>
 #include <QWebSocket>
+#include <QtTypes>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 #include <server_protocolhandler.h>
 
 class Servatrice;

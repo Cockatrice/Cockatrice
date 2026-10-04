@@ -36,13 +36,13 @@
 #include <QTimer>
 #include <QWidget>
 #include <QtPreprocessorSupport>
+#include <QtTypes>
 #include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <qlogging.h>
 #include <qnamespace.h>
-#include <qtypes.h>
 
 static constexpr qreal MTG_CARD_ASPECT_RATIO = 1.396;
 // static constexpr qreal YUGIOH_CARD_ASPECT_RATIO = 1.457;

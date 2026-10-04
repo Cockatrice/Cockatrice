@@ -2,9 +2,9 @@
 #include <QDateTime>
 #include <QString>
 #include <QTimeZone>
+#include <QtTypes>
 #include <compare>
 #include <libcockatrice/utility/server_rate_limiter.h>
-#include <qtypes.h>
 #include <string>
 
 namespace

@@ -19,13 +19,13 @@
 #include <QTime>
 #include <QTimeZone>
 #include <QVariant>
+#include <QtTypes>
 #include <QtVersionChecks>
 #include <compare>
 #include <initializer_list>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 #include <libcockatrice/settings/game_filters_settings.h>
 #include <qassert.h>
-#include <qtypes.h>
 
 enum GameListColumn
 {

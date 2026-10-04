@@ -15,7 +15,7 @@
 #include <QString>
 #include <QStringLiteral>
 #include <QToolButton>
-#include <qtypes.h>
+#include <QtTypes>
 
 class GameReplay;
 

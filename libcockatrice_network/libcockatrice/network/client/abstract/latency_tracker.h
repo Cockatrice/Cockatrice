@@ -9,8 +9,8 @@
 #include <QByteArray>
 #include <QList>
 #include <QMetaType>
+#include <QtTypes>
 #include <array>
-#include <qtypes.h>
 
 /**
  * @brief Fixed-capacity rolling window of network round-trip time samples.

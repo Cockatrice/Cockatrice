@@ -15,6 +15,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QtTypes>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
@@ -23,7 +24,6 @@
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/network_settings.h>
 #include <optional>
-#include <qtypes.h>
 #include <string>
 
 TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor, AbstractClient *_client)

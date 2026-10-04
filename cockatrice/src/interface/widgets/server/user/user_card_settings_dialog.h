@@ -9,8 +9,8 @@
 #include <QPoint>
 #include <QString>
 #include <QWidget>
+#include <QtTypes>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class QCompleter;
 class QGroupBox;

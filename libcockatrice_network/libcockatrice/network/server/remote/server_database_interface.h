@@ -8,8 +8,8 @@
 #include <QObject>
 #include <QString>
 #include <QStringList>
+#include <QtTypes>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class DeckList;
 class GameReplay;

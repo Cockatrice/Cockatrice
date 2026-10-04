@@ -36,6 +36,7 @@
 #include <QStringLiteral>
 #include <QThread>
 #include <QWidget>
+#include <QtTypes>
 #include <QtVersionChecks>
 #include <compare>
 #include <libcockatrice/settings/cache_storage_settings.h>
@@ -44,7 +45,6 @@
 #include <libcockatrice/settings/paths_settings.h>
 #include <qminmax.h>
 #include <qnamespace.h>
-#include <qtypes.h>
 
 // never cache more than 300 cards at once for a single deck
 #define CACHED_CARD_PER_DECK_MAX 300

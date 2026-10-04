@@ -5,8 +5,8 @@
 #include <QObject>
 #include <QString>
 #include <QtClassHelperMacros>
+#include <QtTypes>
 #include <qtmetamacros.h>
-#include <qtypes.h>
 
 class DeckList;
 class QNetworkReply;
