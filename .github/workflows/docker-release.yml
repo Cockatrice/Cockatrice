@@ -20,11 +20,22 @@ on:
   release:
     types:
       - released    # publishing of stable releases
+  workflow_dispatch:    # (re)publish the image for an existing stable release
+    inputs:
+      tag:
+        description: 'Existing release tag to build and publish (e.g. 2026-10-03-Release-3.1.0)'
+        required: true
+        type: string
+      latest:
+        description: 'Also update the "latest" tag'
+        required: true
+        type: boolean
+        default: true
 
-# Cancel earlier, unfinished runs of this workflow on the same branch (unless on release)
+# Cancel earlier, unfinished runs of this workflow on the same branch (unless publishing)
 concurrency:
-  group: "${{ github.workflow }} @ ${{ github.ref_name }}"
-  cancel-in-progress: ${{ github.event_name != 'release' }}
+  group: "${{ github.workflow }} @ ${{ inputs.tag || github.ref_name }}"
+  cancel-in-progress: ${{ github.event_name != 'release' && github.event_name != 'workflow_dispatch' }}
 
 env:
   GHCR_IMAGE: ghcr.io/cockatrice/servatrice
@@ -57,12 +68,14 @@ jobs:
     steps:
       - name: "Checkout"
         uses: actions/checkout@v7
+        with:
+          ref: ${{ case(github.event_name == 'workflow_dispatch', format('refs/tags/{0}', inputs.tag), '') }}
 
       - name: "Set up Docker buildx"
         uses: docker/setup-buildx-action@v4
 
       - name: "Login to GitHub Container Registry (GHCR)"
-        if: github.event_name == 'release' && github.event.release.prerelease == false
+        if: (github.event_name == 'release' && github.event.release.prerelease == false) || github.event_name == 'workflow_dispatch'
         id: login
         uses: docker/login-action@v4
         with:
@@ -70,7 +83,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
-      # Don't push for non-release triggers
+      # Don't push for non-publishing triggers
       - name: "Build image"
         if: steps.login.outcome != 'success'
         uses: docker/build-push-action@v7
@@ -120,7 +133,7 @@ jobs:
   # Create an OCI image index from the platform-specific image manifests
   index:
     name: "Publish multi-platform Servatrice image"
-    if: github.repository_owner == 'Cockatrice' && github.event_name == 'release' && github.event.release.prerelease == false
+    if: github.repository_owner == 'Cockatrice' && ((github.event_name == 'release' && github.event.release.prerelease == false) || github.event_name == 'workflow_dispatch')
     needs: build
     runs-on: ubuntu-slim    # https://github.com/actions/runner-images/blob/main/images/ubuntu-slim/ubuntu-slim-Readme.md
 
@@ -149,6 +162,8 @@ jobs:
           # if semver, also: type=semver,pattern={{version}} / {{major}}.{{minor}}
           tags: |
             type=ref,event=tag
+            type=raw,value=${{ inputs.tag }},enable=${{ github.event_name == 'workflow_dispatch' }}
+            type=raw,value=latest,enable=${{ github.event_name == 'workflow_dispatch' && inputs.latest }}
 
       # Add OCI annotations to image index and publish tags
       - name: "Create image index"
@@ -176,7 +191,7 @@ jobs:
 
       - name: "Inspect images"
         env:
-          GITHUB_TAG: ${{ github.ref_name }}
+          GITHUB_TAG: ${{ inputs.tag || github.ref_name }}
         run: |
           docker buildx imagetools inspect "$GHCR_IMAGE:latest"
           docker buildx imagetools inspect "$GHCR_IMAGE:$GITHUB_TAG"
