@@ -39,7 +39,6 @@
 #include <QFile>
 #include <QIODevice>
 #include <QMapIterator>
-#include <QMetaMethodArgument>
 #include <QMetaObject>
 #include <QMutableListIterator>
 #include <QObject>

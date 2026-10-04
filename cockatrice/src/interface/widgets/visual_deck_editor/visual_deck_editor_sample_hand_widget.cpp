@@ -13,7 +13,6 @@
 
 #include <QDebug>
 #include <QHBoxLayout>
-#include <QOverload>
 #include <QPushButton>
 #include <QSharedPointer>
 #include <QSlider>

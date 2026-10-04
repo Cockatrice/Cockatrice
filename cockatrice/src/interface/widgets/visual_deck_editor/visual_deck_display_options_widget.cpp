@@ -15,11 +15,11 @@
 #include <QLabel>
 #include <QListWidget>
 #include <QListWidgetItem>
-#include <QOverload>
 #include <QPushButton>
 #include <QSize>
 #include <QSizePolicy>
 #include <QStringLiteral>
+#include <QtGlobal>
 #include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 

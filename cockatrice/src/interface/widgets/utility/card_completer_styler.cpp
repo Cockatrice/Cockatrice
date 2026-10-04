@@ -16,7 +16,6 @@
 #include <QKeyEvent>
 #include <QList>
 #include <QMouseEvent>
-#include <QOverload>
 #include <QPoint>
 #include <QPropertyAnimation>
 #include <QRect>

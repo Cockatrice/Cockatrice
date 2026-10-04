@@ -48,7 +48,6 @@
 #include <QMessageLogger>
 #include <QModelIndex>
 #include <QObject>
-#include <QOverload>
 #include <QPalette>
 #include <QPixmap>
 #include <QPropertyAnimation>

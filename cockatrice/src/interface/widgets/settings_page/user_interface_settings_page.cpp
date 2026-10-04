@@ -9,10 +9,10 @@
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
-#include <QOverload>
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/interface_settings.h>

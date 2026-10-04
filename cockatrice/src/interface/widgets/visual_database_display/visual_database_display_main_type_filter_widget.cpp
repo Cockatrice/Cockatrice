@@ -11,7 +11,6 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QList>
-#include <QOverload>
 #include <QPersistentModelIndex>
 #include <QPushButton>
 #include <QSet>

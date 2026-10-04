@@ -6,8 +6,8 @@
 #include <QFocusEvent>
 #include <QKeyEvent>
 #include <QModelIndex>
-#include <QOverload>
 #include <QVariant>
+#include <QtGlobal>
 #include <qnamespace.h>
 
 class QWidget;

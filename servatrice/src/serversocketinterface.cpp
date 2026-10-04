@@ -57,7 +57,6 @@
 #include <QLoggingCategory>
 #include <QMap>
 #include <QMessageLogger>
-#include <QMetaMethodArgument>
 #include <QMetaObject>
 #include <QMetaType>
 #include <QMutexLocker>

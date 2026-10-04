@@ -44,7 +44,6 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QModelIndex>
-#include <QOverload>
 #include <QPair>
 #include <QPoint>
 #include <QPushButton>
@@ -61,6 +60,7 @@
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QWidget>
+#include <QtGlobal>
 #include <algorithm>
 #include <compare>
 #include <functional>

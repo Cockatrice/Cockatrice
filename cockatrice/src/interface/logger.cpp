@@ -8,7 +8,6 @@
 #include <QFlags>
 #include <QIODevice>
 #include <QLocale>
-#include <QMetaMethodArgument>
 #include <QMetaObject>
 #include <QMetaType>
 #include <QMutexLocker>

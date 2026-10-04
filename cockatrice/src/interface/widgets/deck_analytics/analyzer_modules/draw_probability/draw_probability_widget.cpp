@@ -19,7 +19,6 @@
 #include <QList>
 #include <QMap>
 #include <QObject>
-#include <QOverload>
 #include <QSharedPointer>
 #include <QSizePolicy>
 #include <QSpinBox>
@@ -29,6 +28,7 @@
 #include <QTableWidgetItem>
 #include <QVBoxLayout>
 #include <QVariant>
+#include <QtGlobal>
 #include <QtMath>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/card/database/card_database_manager.h>

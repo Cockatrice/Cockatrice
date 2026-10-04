@@ -10,11 +10,11 @@
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QOverload>
 #include <QSlider>
 #include <QSpinBox>
 #include <QVariant>
 #include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>

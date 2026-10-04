@@ -30,7 +30,6 @@
 #include <QMessageBox>
 #include <QModelIndex>
 #include <QMouseEvent>
-#include <QOverload>
 #include <QPair>
 #include <QRect>
 #include <QSet>

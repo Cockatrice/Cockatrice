@@ -8,12 +8,12 @@
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <QMapIterator>
-#include <QOverload>
 #include <QSet>
 #include <QSharedPointer>
 #include <QSignalBlocker>
 #include <QString>
 #include <QVariant>
+#include <QtGlobal>
 
 class TabSupervisor;
 template <class Key, class T> class QMap;

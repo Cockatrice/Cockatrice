@@ -6,12 +6,12 @@
 #include <QComboBox>
 #include <QGridLayout>
 #include <QIcon>
-#include <QOverload>
 #include <QPushButton>
 #include <QSizePolicy>
 #include <QString>
 #include <QStringLiteral>
 #include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/filters/filter_card.h>
 #include <stddef.h>
 

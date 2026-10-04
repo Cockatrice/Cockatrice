@@ -22,13 +22,13 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QModelIndex>
-#include <QOverload>
 #include <QSharedPointer>
 #include <QStringLiteral>
 #include <QToolBar>
 #include <QTreeView>
 #include <QVBoxLayout>
 #include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card_database_model.h>

@@ -7,8 +7,8 @@
 #include <QDebug>
 #include <QGridLayout>
 #include <QLabel>
-#include <QOverload>
 #include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 

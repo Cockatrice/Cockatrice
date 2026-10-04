@@ -25,7 +25,6 @@
 #include <QList>
 #include <QModelIndex>
 #include <QModelIndexList>
-#include <QOverload>
 #include <QPushButton>
 #include <QSet>
 #include <QSharedPointer>
@@ -37,6 +36,7 @@
 #include <QTreeView>
 #include <QWidget>
 #include <QtConcurrentRun>
+#include <QtGlobal>
 #include <algorithm>
 #include <compare>
 #include <functional>

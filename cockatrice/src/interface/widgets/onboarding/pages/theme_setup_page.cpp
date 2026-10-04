@@ -19,7 +19,6 @@
 #include <QMap>
 #include <QMessageBox>
 #include <QObject>
-#include <QOverload>
 #include <QPalette>
 #include <QSharedPointer>
 #include <QStringLiteral>

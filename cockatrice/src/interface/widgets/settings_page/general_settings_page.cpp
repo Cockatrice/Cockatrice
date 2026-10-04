@@ -18,7 +18,6 @@
 #include <QList>
 #include <QMap>
 #include <QMessageBox>
-#include <QOverload>
 #include <QPushButton>
 #include <QSharedPointer>
 #include <QSizePolicy>
@@ -26,6 +25,7 @@
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QVariantList>
+#include <QtGlobal>
 #include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/download_settings.h>

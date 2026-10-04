@@ -17,7 +17,6 @@
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <QList>
-#include <QOverload>
 #include <QPersistentModelIndex>
 #include <QPushButton>
 #include <QSet>
@@ -25,6 +24,7 @@
 #include <QSpinBox>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <QtGlobal>
 #include <algorithm>
 #include <compare>
 #include <libcockatrice/card/database/card_database_manager.h>

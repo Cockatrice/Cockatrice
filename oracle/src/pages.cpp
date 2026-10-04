@@ -29,7 +29,6 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QObject>
-#include <QOverload>
 #include <QPointer>
 #include <QProgressBar>
 #include <QPushButton>
@@ -45,6 +44,7 @@
 #include <QVariant>
 #include <QWizard>
 #include <QtConcurrentRun>
+#include <QtGlobal>
 #include <cstdio>
 #include <functional>
 #include <libcockatrice/settings/personal_settings.h>

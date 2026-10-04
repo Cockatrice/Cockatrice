@@ -20,7 +20,6 @@
 #include <QLabel>
 #include <QLayout>
 #include <QList>
-#include <QOverload>
 #include <QPixmap>
 #include <QResizeEvent>
 #include <QSize>
@@ -29,6 +28,7 @@
 #include <QStringLiteral>
 #include <QVariant>
 #include <QWidget>
+#include <QtGlobal>
 #include <qnamespace.h>
 
 class DeckListModel;

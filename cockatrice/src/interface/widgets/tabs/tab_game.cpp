@@ -59,7 +59,6 @@
 #include <QMapIterator>
 #include <QMenu>
 #include <QMessageBox>
-#include <QOverload>
 #include <QPoint>
 #include <QPushButton>
 #include <QRegularExpression>

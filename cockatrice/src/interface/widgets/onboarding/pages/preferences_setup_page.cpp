@@ -14,12 +14,12 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QList>
-#include <QOverload>
 #include <QScrollArea>
 #include <QString>
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QWidget>
+#include <QtGlobal>
 
 namespace
 {

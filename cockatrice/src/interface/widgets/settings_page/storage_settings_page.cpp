@@ -12,10 +12,10 @@
 #include <QHBoxLayout>
 #include <QList>
 #include <QMessageBox>
-#include <QOverload>
 #include <QString>
 #include <QVBoxLayout>
 #include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/settings/cache_storage_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>

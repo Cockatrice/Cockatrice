@@ -32,7 +32,6 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QOverload>
 #include <QPoint>
 #include <QPushButton>
 #include <QScrollArea>
@@ -47,6 +46,7 @@
 #include <QVBoxLayout>
 #include <QWheelEvent>
 #include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <qlogging.h>

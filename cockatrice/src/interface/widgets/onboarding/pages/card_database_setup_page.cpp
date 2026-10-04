@@ -11,7 +11,6 @@
 #include <QLatin1String>
 #include <QLineEdit>
 #include <QMessageBox>
-#include <QOverload>
 #include <QProgressBar>
 #include <QPushButton>
 #include <QSettings>

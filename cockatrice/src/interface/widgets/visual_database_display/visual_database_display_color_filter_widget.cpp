@@ -8,12 +8,12 @@
 #include <QComboBox>
 #include <QDebug>
 #include <QHBoxLayout>
-#include <QOverload>
 #include <QPersistentModelIndex>
 #include <QSharedPointer>
 #include <QString>
 #include <QTimer>
 #include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/filters/filter_tree.h>
 
 /**

@@ -13,10 +13,10 @@
 #include <QLabel>
 #include <QList>
 #include <QLocale>
-#include <QOverload>
 #include <QString>
 #include <QVBoxLayout>
 #include <QVariant>
+#include <QtGlobal>
 #include <qnamespace.h>
 
 class QWidget;

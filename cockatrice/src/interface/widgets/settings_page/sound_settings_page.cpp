@@ -7,13 +7,13 @@
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QList>
-#include <QOverload>
 #include <QSharedPointer>
 #include <QSlider>
 #include <QSpinBox>
 #include <QString>
 #include <QStringList>
 #include <QVBoxLayout>
+#include <QtGlobal>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/sound_settings.h>
 #include <libcockatrice/utility/macros.h>

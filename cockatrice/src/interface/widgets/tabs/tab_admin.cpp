@@ -9,11 +9,11 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
-#include <QOverload>
 #include <QPushButton>
 #include <QSpinBox>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/admin_commands.pb.h>
 #include <libcockatrice/protocol/pb/event_replay_added.pb.h>

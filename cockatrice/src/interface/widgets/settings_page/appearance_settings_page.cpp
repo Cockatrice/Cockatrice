@@ -23,7 +23,6 @@
 #include <QGroupBox>
 #include <QMessageBox>
 #include <QObject>
-#include <QOverload>
 #include <QSharedPointer>
 #include <QString>
 #include <QStringList>

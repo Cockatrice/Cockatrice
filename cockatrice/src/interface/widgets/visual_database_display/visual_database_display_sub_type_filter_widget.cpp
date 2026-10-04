@@ -12,7 +12,6 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QList>
-#include <QOverload>
 #include <QPersistentModelIndex>
 #include <QPushButton>
 #include <QSet>

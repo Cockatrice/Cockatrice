@@ -16,7 +16,6 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <QList>
-#include <QOverload>
 #include <QPushButton>
 #include <QSharedPointer>
 #include <QSizePolicy>
@@ -26,6 +25,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QtGlobal>
 #include <algorithm>
 #include <google/protobuf/repeated_ptr_field.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>

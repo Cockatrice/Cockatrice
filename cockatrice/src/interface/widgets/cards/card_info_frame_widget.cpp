@@ -10,11 +10,11 @@
 
 #include <QList>
 #include <QObject>
-#include <QOverload>
 #include <QPushButton>
 #include <QSplitter>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/settings/cards_display_settings.h>

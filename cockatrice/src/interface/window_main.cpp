@@ -72,7 +72,6 @@
 #include <QMessageBox>
 #include <QMessageLogger>
 #include <QObject>
-#include <QOverload>
 #include <QPixmap>
 #include <QPixmapCache>
 #include <QPushButton>
