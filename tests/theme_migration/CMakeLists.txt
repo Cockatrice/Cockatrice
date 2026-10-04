@@ -20,7 +20,7 @@ target_link_libraries(
   libcockatrice_protocol
   Threads::Threads
   ${GTEST_BOTH_LIBRARIES}
-  ${TEST_QT_MODULES}
+  ${QT_MODULES_TEST}
 )
 
 add_test(NAME theme_migration_test COMMAND theme_migration_test)

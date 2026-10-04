@@ -692,7 +692,7 @@ if(WIN32) # Windows (including 64bit)
   # Install the runtime of every linked module explicitly. An unused DLL costs a
   # few hundred kilobytes; a missing one is what stops the client starting after
   # an update, and it stays invisible until then.
-  foreach(_qt_module IN LISTS COCKATRICE_QT_MODULES)
+  foreach(_qt_module IN LISTS QT_MODULES_COCKATRICE)
     get_target_property(_qt_module_type ${_qt_module} TYPE)
     if(_qt_module_type STREQUAL "SHARED_LIBRARY")
       install(FILES "$<TARGET_FILE:${_qt_module}>" DESTINATION ./)

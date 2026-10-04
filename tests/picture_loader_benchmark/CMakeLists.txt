@@ -22,5 +22,5 @@ target_link_libraries(
   libcockatrice_interfaces
   libcockatrice_utility
   Threads::Threads
-  ${TEST_QT_MODULES}
+  ${QT_MODULES_TEST}
 )

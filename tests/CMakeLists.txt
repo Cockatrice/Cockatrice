@@ -205,7 +205,7 @@ target_link_libraries(
 )
 
 if(WITH_CLIENT)
-  target_link_libraries(single_instance_manager_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
+  target_link_libraries(single_instance_manager_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${QT_MODULES_TEST})
 endif()
 
 add_subdirectory(card_zone_algorithms)
