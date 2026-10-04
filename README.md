@@ -102,6 +102,7 @@ There are various places where useful information for different needs are mainta
 - [Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki) `Community supported`
 - [Official Webpage](https://cockatrice.github.io/)
 - [Official README](https://github.com/Cockatrice/Cockatrice/blob/master/README.md) `This file`
+- [Official CONTRIBUTING](https://github.com/Cockatrice/Cockatrice/blob/master/.github/CONTRIBUTING.md)
 
 Cockatrice tries to use the [Google Developer Documentation Style Guide](https://developers.google.com/style/) to ensure consistent documentation. We encourage you to improve the documentation by suggesting edits based on this guide.
 
