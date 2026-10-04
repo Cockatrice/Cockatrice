@@ -48,7 +48,7 @@
 #include <QUrl>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <QtTypes>
+#include <QtGlobal>
 #include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>

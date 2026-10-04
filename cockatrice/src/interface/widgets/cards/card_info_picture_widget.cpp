@@ -35,8 +35,7 @@
 #include <QStylePainter>
 #include <QTimer>
 #include <QWidget>
-#include <QtPreprocessorSupport>
-#include <QtTypes>
+#include <QtGlobal>
 #include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>

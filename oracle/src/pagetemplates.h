@@ -4,7 +4,7 @@
 #include <QByteArray>
 #include <QString>
 #include <QWizardPage>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 
 class QRadioButton;

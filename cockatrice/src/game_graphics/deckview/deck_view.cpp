@@ -27,15 +27,14 @@
 #include <QSharedPointer>
 #include <QSize>
 #include <QStringList>
+#include <QtGlobal>
 #include <QtMath>
-#include <QtPreprocessorSupport>
 #include <algorithm>
 #include <compare>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/utility/card_ref.h>
-#include <qminmax.h>
 #include <qnamespace.h>
 #include <string>
 #include <utility>

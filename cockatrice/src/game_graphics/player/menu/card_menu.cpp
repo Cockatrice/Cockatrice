@@ -32,7 +32,7 @@
 #include <QSharedPointer>
 #include <QStringList>
 #include <QVariant>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/utility/zone_names.h>

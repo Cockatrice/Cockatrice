@@ -23,7 +23,7 @@
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QWidget>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qnamespace.h>
 #include <version_string.h>
 

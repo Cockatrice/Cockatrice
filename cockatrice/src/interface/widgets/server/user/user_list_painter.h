@@ -10,7 +10,7 @@
 #include <QRectF>
 #include <QSize>
 #include <QString>
-#include <QtTypes>
+#include <QtGlobal>
 
 class QPainter;
 class QModelIndex;

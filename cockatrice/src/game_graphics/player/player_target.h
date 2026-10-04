@@ -14,7 +14,7 @@
 
 #include <QElapsedTimer>
 #include <QPixmap>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 
 class PlayerLogic;

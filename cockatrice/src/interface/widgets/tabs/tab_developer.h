@@ -10,7 +10,7 @@
 #include "tab.h"
 
 #include <QString>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 
 class AbstractClient;

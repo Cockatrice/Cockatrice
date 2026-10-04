@@ -25,7 +25,7 @@
 #include <QList>
 #include <QMap>
 #include <QSharedPointer>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <algorithm>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/protocol/pb/context_undo_draw.pb.h>

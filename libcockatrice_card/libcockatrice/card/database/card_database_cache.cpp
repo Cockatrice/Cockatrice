@@ -24,7 +24,7 @@
 #include <QSaveFile>
 #include <QSet>
 #include <QSharedPointer>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qnamespace.h>
 
 class ICardSetPriorityController;

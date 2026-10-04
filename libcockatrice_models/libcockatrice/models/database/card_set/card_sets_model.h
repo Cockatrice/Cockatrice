@@ -19,7 +19,7 @@
 #include <QSortFilterProxyModel>
 #include <QString>
 #include <QStringList>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <qnamespace.h>
 #include <qtmetamacros.h>
 

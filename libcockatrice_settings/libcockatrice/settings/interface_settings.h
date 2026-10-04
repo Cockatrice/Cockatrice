@@ -5,7 +5,7 @@
 
 #include <QString>
 #include <QStringList>
-#include <QtTypes>
+#include <QtGlobal>
 #include <libcockatrice/interfaces/interface_interface_settings_provider.h>
 #include <qtmetamacros.h>
 

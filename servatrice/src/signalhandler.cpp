@@ -6,7 +6,7 @@
 
 #include <QSocketNotifier>
 #include <QThread>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <qobjectdefs.h>
 #include <qsystemdetection.h>
 

@@ -11,8 +11,8 @@
 #include <QRectF>
 #include <QSizeF>
 #include <QString>
+#include <QtGlobal>
 #include <libcockatrice/card/printing/exact_card.h>
-#include <qminmax.h>
 
 QString buildArtAttribution(const ExactCard &card)
 {

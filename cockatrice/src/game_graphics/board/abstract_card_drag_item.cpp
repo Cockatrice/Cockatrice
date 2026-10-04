@@ -11,10 +11,8 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QTransform>
-#include <QtPreprocessorSupport>
-#include <QtTypes>
+#include <QtGlobal>
 #include <libcockatrice/settings/cards_display_settings.h>
-#include <qminmax.h>
 #include <qnamespace.h>
 
 class QPointF;

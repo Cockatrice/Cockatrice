@@ -21,7 +21,7 @@
 #include <QSlider>
 #include <QStringLiteral>
 #include <QVariant>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <libcockatrice/models/deck_list/deck_list_sort_filter_proxy_model.h>

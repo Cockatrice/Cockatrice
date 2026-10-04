@@ -9,7 +9,7 @@
 #define PERCENT_BAR_WIDGET_H
 
 #include <QWidget>
-#include <qminmax.h>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 
 class PercentBarWidget : public QWidget

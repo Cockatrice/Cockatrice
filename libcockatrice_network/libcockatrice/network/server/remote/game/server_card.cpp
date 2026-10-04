@@ -28,12 +28,12 @@
 #include <QMapIterator>
 #include <QSharedPointer>
 #include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/protocol/pb/event_set_card_attr.pb.h>
 #include <libcockatrice/protocol/pb/event_set_card_counter.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
 #include <libcockatrice/utility/clamped_arithmetic.h>
 #include <libcockatrice/utility/counter_limits.h>
-#include <qminmax.h>
 #include <string>
 
 Server_Card::Server_Card(const CardRef &cardRef, int _id, int _coord_x, int _coord_y, Server_CardZone *_zone)

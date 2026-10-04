@@ -23,8 +23,7 @@
 #include <QRectF>
 #include <QString>
 #include <QTransform>
-#include <QtPreprocessorSupport>
-#include <QtTypes>
+#include <QtGlobal>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <qnamespace.h>

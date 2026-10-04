@@ -83,8 +83,7 @@
 #include <QTimer>
 #include <QWidget>
 #include <QtConcurrentRun>
-#include <QtPreprocessorSupport>
-#include <QtTranslation>
+#include <QtGlobal>
 #include <functional>
 #include <google/protobuf/stubs/port.h>
 #include <libcockatrice/card/database/card_database.h>

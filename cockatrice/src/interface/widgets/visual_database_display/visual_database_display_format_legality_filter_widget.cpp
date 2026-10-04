@@ -19,11 +19,11 @@
 #include <QSpinBox>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <QtGlobal>
 #include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/filters/filter_tree.h>
 #include <limits>
-#include <qminmax.h>
 #include <qnamespace.h>
 
 VisualDatabaseDisplayFormatLegalityFilterWidget::VisualDatabaseDisplayFormatLegalityFilterWidget(

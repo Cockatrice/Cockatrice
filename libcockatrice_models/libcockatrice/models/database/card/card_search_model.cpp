@@ -6,7 +6,7 @@
 #include <QAbstractItemModel>
 #include <QObject>
 #include <QVariant>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <algorithm>
 #include <libcockatrice/utility/levenshtein.h>
 

@@ -5,8 +5,7 @@
 #include <QColor>
 #include <QMap>
 #include <QPalette>
-#include <QtVersionChecks>
-#include <qminmax.h>
+#include <QtGlobal>
 #include <qnamespace.h>
 #include <qnumeric.h>
 

@@ -26,9 +26,7 @@
 #include <QString>
 #include <QTimer>
 #include <QUrl>
-#include <QtEnvironmentVariables>
-#include <QtPreprocessorSupport>
-#include <QtTypes>
+#include <QtGlobal>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 #include <qlogging.h>
 #include <qsystemdetection.h>

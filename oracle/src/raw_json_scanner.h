@@ -3,7 +3,7 @@
 
 #include <QList>
 #include <QString>
-#include <QtTypes>
+#include <QtGlobal>
 #include <functional>
 
 class QByteArray;

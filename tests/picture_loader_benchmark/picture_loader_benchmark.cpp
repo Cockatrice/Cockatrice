@@ -51,9 +51,8 @@
 #include <QThread>
 #include <QTimer>
 #include <QUrl>
-#include <QtEnvironmentVariables>
+#include <QtGlobal>
 #include <QtMessageHandler>
-#include <QtTypes>
 #include <atomic>
 #include <cstdio>
 #include <libcockatrice/card/database/card_database.h>
@@ -64,7 +63,6 @@
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 #include <libcockatrice/settings/download_settings.h>
 #include <optional>
-#include <qminmax.h>
 #include <qsystemdetection.h>
 #include <utility>
 

@@ -41,11 +41,11 @@
 #include <QRect>
 #include <QSharedPointer>
 #include <QTransform>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/playmat_resolver.h>
 #include <libcockatrice/settings/interface_settings.h>
-#include <qminmax.h>
 #include <qnamespace.h>
 #include <qnumeric.h>
 

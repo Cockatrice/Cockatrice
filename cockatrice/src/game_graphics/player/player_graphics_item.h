@@ -18,7 +18,7 @@
 #include <QSize>
 #include <QSizeF>
 #include <QString>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 
 class HandZone;

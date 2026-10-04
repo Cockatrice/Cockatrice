@@ -61,7 +61,7 @@
 #include <QStringLiteral>
 #include <QTranslator>
 #include <QUrl>
-#include <QtEnvironmentVariables>
+#include <QtGlobal>
 #include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/rng/rng_sfmt.h>

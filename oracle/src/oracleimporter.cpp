@@ -22,7 +22,7 @@
 #include <QSet>
 #include <QSharedPointer>
 #include <QVariant>
-#include <QtTypes>
+#include <QtGlobal>
 #include <algorithm>
 #include <climits>
 #include <libcockatrice/card/card_localization.h>

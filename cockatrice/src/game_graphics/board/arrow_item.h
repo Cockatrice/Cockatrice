@@ -17,7 +17,7 @@
 #include <QPointer>
 #include <QRectF>
 #include <QSharedPointer>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 
 class CardItem;

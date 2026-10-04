@@ -7,8 +7,7 @@
 #include <QPainterPath>
 #include <QPointF>
 #include <QSize>
-#include <QtTypes>
-#include <qminmax.h>
+#include <QtGlobal>
 #include <qnamespace.h>
 #include <qnumeric.h>
 

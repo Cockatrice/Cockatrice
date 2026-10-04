@@ -12,7 +12,7 @@
 #include <QSizePolicy>
 #include <QSlider>
 #include <QWheelEvent>
-#include <qminmax.h>
+#include <QtGlobal>
 #include <qnamespace.h>
 
 /**

@@ -28,6 +28,7 @@
 #include <QRectF>
 #include <QSharedPointer>
 #include <QString>
+#include <QtGlobal>
 #include <algorithm>
 #include <iterator>
 #include <libcockatrice/card/card_info.h>
@@ -35,7 +36,6 @@
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/zone_names.h>
-#include <qminmax.h>
 #include <string>
 
 namespace google

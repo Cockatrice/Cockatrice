@@ -27,7 +27,7 @@
 #include <QStyleOptionViewItem>
 #include <QVariant>
 #include <QWidget>
-#include <qminmax.h>
+#include <QtGlobal>
 #include <qnamespace.h>
 #include <qnumeric.h>
 

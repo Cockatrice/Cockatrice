@@ -8,8 +8,7 @@
 #include "servatrice.h"
 
 #include <QTimer>
-#include <QtTypes>
-#include <qminmax.h>
+#include <QtGlobal>
 #include <utility>
 
 EventLoopWatchdog::EventLoopWatchdog(Servatrice *_servatrice, QString _threadName)

@@ -72,7 +72,7 @@
 #include <QStringLiteral>
 #include <QTextStream>
 #include <QVariant>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <algorithm>
 #include <exception>
 #include <google/protobuf/descriptor.h>
@@ -167,7 +167,6 @@
 #include <libcockatrice/utility/warning_categories.h>
 #include <memory>
 #include <qlogging.h>
-#include <qminmax.h>
 #include <qnamespace.h>
 #include <server_response_containers.h>
 #include <server_room.h>

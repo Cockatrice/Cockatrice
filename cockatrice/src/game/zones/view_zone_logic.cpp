@@ -4,8 +4,8 @@
 #include "../../game_graphics/board/card_item.h"
 #include "../board/card_list.h"
 
+#include <QtGlobal>
 #include <libcockatrice/settings/interface_settings.h>
-#include <qminmax.h>
 
 class PlayerLogic;
 class QObject;

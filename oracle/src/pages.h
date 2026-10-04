@@ -8,7 +8,7 @@
 #include <QFutureWatcher>
 #include <QString>
 #include <QStringList>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 
 class QCheckBox;

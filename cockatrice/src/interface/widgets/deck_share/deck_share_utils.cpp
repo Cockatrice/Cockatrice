@@ -7,7 +7,7 @@
 #include <QTimeZone>
 #include <QUrl>
 #include <QUrlQuery>
-#include <QtVersionChecks>
+#include <QtGlobal>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_share_create.pb.h>

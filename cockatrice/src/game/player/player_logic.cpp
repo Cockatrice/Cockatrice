@@ -24,13 +24,13 @@
 #include <QMutableMapIterator>
 #include <QSet>
 #include <QSharedPointer>
+#include <QtGlobal>
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_zone.pb.h>
 #include <libcockatrice/utility/card_ref.h>
 #include <libcockatrice/utility/color.h>
 #include <qalgorithms.h>
-#include <qminmax.h>
 #include <string>
 
 PlayerLogic::PlayerLogic(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent)

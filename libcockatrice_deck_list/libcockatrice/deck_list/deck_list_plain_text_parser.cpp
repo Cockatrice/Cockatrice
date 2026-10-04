@@ -10,7 +10,7 @@
 #include <QRegularExpressionMatch>
 #include <QString>
 #include <QTextStream>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <qnamespace.h>
 
 namespace DeckListPlainText

@@ -23,7 +23,7 @@
 #include <QXmlStreamAttributes>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <qnamespace.h>
 #include <version_string.h>
 

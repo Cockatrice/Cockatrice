@@ -41,7 +41,7 @@
 #include <QStringLiteral>
 #include <QVBoxLayout>
 #include <QVariant>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <algorithm>
 #include <compare>
 #include <functional>

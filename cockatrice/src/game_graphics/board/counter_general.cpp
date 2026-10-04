@@ -11,8 +11,7 @@
 #include <QSizeF>
 #include <QString>
 #include <QTransform>
-#include <QtTypes>
-#include <qminmax.h>
+#include <QtGlobal>
 #include <qnamespace.h>
 
 class CounterState;

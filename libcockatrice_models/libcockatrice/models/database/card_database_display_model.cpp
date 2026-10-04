@@ -12,8 +12,7 @@
 #include <QSharedPointer>
 #include <QStringList>
 #include <QVariant>
-#include <QtVersionChecks>
-#include <qminmax.h>
+#include <QtGlobal>
 #include <qnamespace.h>
 #include <string>
 #include <utility>

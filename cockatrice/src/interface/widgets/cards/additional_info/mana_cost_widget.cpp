@@ -10,7 +10,7 @@
 #include <QRegularExpressionMatchIterator>
 #include <QResizeEvent>
 #include <QSize>
-#include <qminmax.h>
+#include <QtGlobal>
 
 ManaCostWidget::ManaCostWidget(QWidget *parent, CardInfoPtr _card) : QWidget(parent), card(_card)
 {

@@ -10,7 +10,7 @@
 #include <QSizePolicy>
 #include <QStyle>
 #include <QStyleOptionButton>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <qnamespace.h>
 
 class QWidget;

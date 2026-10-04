@@ -17,7 +17,7 @@
 #include <QString>
 #include <QTcpSocket>
 #include <QWebSocket>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 
 class Event_ConnectionClosed;

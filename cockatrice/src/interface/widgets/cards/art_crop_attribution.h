@@ -1,7 +1,7 @@
 #ifndef COCKATRICE_ART_CROP_ATTRIBUTION_H
 #define COCKATRICE_ART_CROP_ATTRIBUTION_H
 
-#include <QtTypes>
+#include <QtGlobal>
 #include <qnamespace.h>
 
 class ExactCard;

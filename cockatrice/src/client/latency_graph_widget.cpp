@@ -8,7 +8,7 @@
 #include <QColor>
 #include <QPainter>
 #include <QRectF>
-#include <qminmax.h>
+#include <QtGlobal>
 #include <qnumeric.h>
 
 LatencyGraphWidget::LatencyGraphWidget(QWidget *parent) : QWidget(parent)

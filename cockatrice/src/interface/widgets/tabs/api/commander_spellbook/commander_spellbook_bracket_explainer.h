@@ -4,7 +4,7 @@
 #include <QList>
 #include <QString>
 #include <QStringList>
-#include <QtTranslation>
+#include <QtGlobal>
 
 struct EstimateBracketResult;
 

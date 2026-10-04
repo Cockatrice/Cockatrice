@@ -41,10 +41,10 @@
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QWheelEvent>
+#include <QtGlobal>
 #include <cmath>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/utility/card_ref.h>
-#include <qminmax.h>
 #include <qnamespace.h>
 #include <qnumeric.h>
 

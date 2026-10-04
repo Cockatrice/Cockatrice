@@ -15,7 +15,7 @@
 #include <QSizeF>
 #include <QString>
 #include <QTransform>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 
 class CardZoneLogic;

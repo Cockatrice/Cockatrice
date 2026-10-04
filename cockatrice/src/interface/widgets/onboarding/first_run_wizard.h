@@ -4,7 +4,7 @@
 #include <QDialog>
 #include <QList>
 #include <QString>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 
 class BannerHost;

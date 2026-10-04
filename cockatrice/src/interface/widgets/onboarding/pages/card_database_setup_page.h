@@ -5,7 +5,7 @@
 
 #include <QSize>
 #include <QString>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 
 class QComboBox;

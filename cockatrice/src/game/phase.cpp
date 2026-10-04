@@ -3,7 +3,7 @@
 #include <QByteArray>
 #include <QList>
 #include <QSharedPointer>
-#include <QtTranslation>
+#include <QtGlobal>
 
 Phase::Phase(const QString &_name, const QString &_color, const QString &_soundFileName)
     : name(_name), color(_color), soundFileName(_soundFileName)

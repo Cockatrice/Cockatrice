@@ -22,7 +22,7 @@
 #include <QSharedPointer>
 #include <QString>
 #include <QVariant>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <libcockatrice/protocol/pb/command_inc_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_set_counter.pb.h>
 #include <libcockatrice/utility/expression.h>

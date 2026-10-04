@@ -9,7 +9,7 @@
 #include <QByteArray>
 #include <QList>
 #include <QMetaType>
-#include <QtTypes>
+#include <QtGlobal>
 #include <array>
 
 /**

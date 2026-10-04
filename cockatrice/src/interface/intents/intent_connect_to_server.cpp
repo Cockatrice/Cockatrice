@@ -6,7 +6,7 @@
 #include "remote_client.h"
 
 #include <QTimer>
-#include <QtTypes>
+#include <QtGlobal>
 
 template <typename T> class QList;
 

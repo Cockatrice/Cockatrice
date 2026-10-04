@@ -19,9 +19,9 @@
 #include <QString>
 #include <QStringLiteral>
 #include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
-#include <qminmax.h>
 #include <qnamespace.h>
 
 // QRubberBand calls raise() in showEvent() and changeEvent() to stay on top of siblings.

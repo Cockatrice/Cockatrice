@@ -1,6 +1,6 @@
 #include "translate_counter_name.h"
 
-#include <QtTranslation>
+#include <QtGlobal>
 #include <utility>
 
 const QMap<QString, QString> TranslateCounterName::translated = {

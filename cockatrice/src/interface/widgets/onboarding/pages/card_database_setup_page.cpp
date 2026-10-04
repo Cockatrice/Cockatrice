@@ -22,10 +22,10 @@
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QWidget>
+#include <QtGlobal>
 #include <climits>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/updates_settings.h>
-#include <qminmax.h>
 #include <qnamespace.h>
 
 CardDatabaseSetupPage::CardDatabaseSetupPage(QWidget *parent) : FirstRunWizardPage(parent)

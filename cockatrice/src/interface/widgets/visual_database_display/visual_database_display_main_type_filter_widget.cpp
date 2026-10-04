@@ -19,9 +19,9 @@
 #include <QSpinBox>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/filters/filter_tree.h>
-#include <qminmax.h>
 #include <qnamespace.h>
 
 VisualDatabaseDisplayMainTypeFilterWidget::VisualDatabaseDisplayMainTypeFilterWidget(QWidget *parent,

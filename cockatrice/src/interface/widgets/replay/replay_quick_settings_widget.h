@@ -6,7 +6,7 @@
 #include <QCheckBox>
 #include <QDoubleSpinBox>
 #include <QLabel>
-#include <QtTypes>
+#include <QtGlobal>
 #include <libcockatrice/utility/macros.h>
 #include <qtmetamacros.h>
 

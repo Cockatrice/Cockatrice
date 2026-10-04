@@ -20,7 +20,7 @@
 #include <QUrl>
 #include <QWebSocket>
 #include <QWebSocketProtocol>
-#include <QtVersionChecks>
+#include <QtGlobal>
 #include <google/protobuf/stubs/common.h>
 #include <libcockatrice/interfaces/interface_network_settings_provider.h>
 #include <libcockatrice/protocol/debug_pb_message.h>

@@ -37,7 +37,7 @@
 #include <QString>
 #include <QStringList>
 #include <QUrl>
-#include <QtTypes>
+#include <QtGlobal>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <qtmetamacros.h>
 

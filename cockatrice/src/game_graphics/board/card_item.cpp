@@ -39,7 +39,7 @@
 #include <QSizeF>
 #include <QTransform>
 #include <QVariant>
-#include <QtTypes>
+#include <QtGlobal>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
 #include <libcockatrice/settings/interface_settings.h>

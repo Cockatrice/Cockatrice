@@ -15,9 +15,9 @@
 #include <QPoint>
 #include <QRectF>
 #include <QTransform>
+#include <QtGlobal>
 #include <QtMath>
 #include <libcockatrice/settings/cards_display_settings.h>
-#include <qminmax.h>
 #include <qnamespace.h>
 #include <qnumeric.h>
 

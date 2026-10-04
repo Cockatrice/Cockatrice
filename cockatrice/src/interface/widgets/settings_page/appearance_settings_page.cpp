@@ -33,7 +33,7 @@
 #include <QUrl>
 #include <QVBoxLayout>
 #include <QVariant>
-#include <QtVersionChecks>
+#include <QtGlobal>
 #include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/interface_settings.h>

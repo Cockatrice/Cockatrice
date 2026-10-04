@@ -8,7 +8,7 @@
 #include <QRectF>
 #include <QString>
 #include <QWidget>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 
 /**

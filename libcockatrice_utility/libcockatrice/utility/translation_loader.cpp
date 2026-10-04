@@ -15,7 +15,7 @@
 #include <QStringList>
 #include <QStringLiteral>
 #include <QTranslator>
-#include <QtVersionChecks>
+#include <QtGlobal>
 #include <algorithm>
 #include <initializer_list>
 

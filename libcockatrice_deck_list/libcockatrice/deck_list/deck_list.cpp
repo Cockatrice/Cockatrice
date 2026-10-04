@@ -17,11 +17,11 @@
 #include <QXmlStreamAttributes>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
+#include <QtGlobal>
 #include <algorithm>
 #include <iterator>
 #include <libcockatrice/utility/card_ref.h>
 #include <qlogging.h>
-#include <qminmax.h>
 
 static const QString CURRENT_SIDEBOARD_PLAN_KEY = "";
 

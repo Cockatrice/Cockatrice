@@ -8,7 +8,7 @@
 
 #include <QList>
 #include <QWidget>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 
 /**

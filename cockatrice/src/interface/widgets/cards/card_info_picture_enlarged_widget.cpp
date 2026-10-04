@@ -10,8 +10,7 @@
 #include <QRect>
 #include <QSize>
 #include <QStylePainter>
-#include <QtPreprocessorSupport>
-#include <QtTypes>
+#include <QtGlobal>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <qnamespace.h>
 

@@ -12,7 +12,7 @@
 #include <QMessageLogger>
 #include <QStringList>
 #include <QUrl>
-#include <QtTypes>
+#include <QtGlobal>
 #include <libcockatrice/settings/sound_settings.h>
 
 #define DEFAULT_THEME_NAME "Default"

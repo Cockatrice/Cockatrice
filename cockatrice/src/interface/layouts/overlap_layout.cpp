@@ -7,9 +7,9 @@
 #include <QRect>
 #include <QWidget>
 #include <QWidgetItem>
+#include <QtGlobal>
 #include <QtMath>
 #include <limits.h>
-#include <qminmax.h>
 
 /**
  * @class OverlapLayout

@@ -16,8 +16,8 @@
 #include <QRect>
 #include <QSizePolicy>
 #include <QWheelEvent>
+#include <QtGlobal>
 #include <cmath>
-#include <qminmax.h>
 #include <qnamespace.h>
 
 namespace

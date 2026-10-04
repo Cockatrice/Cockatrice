@@ -26,12 +26,11 @@
 #include <QSharedPointer>
 #include <QThread>
 #include <QVariant>
-#include <QtTypes>
+#include <QtGlobal>
 #include <compare>
 #include <libcockatrice/settings/cache_storage_settings.h>
 #include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
-#include <qminmax.h>
 #include <qnamespace.h>
 #include <utility>
 #include <version_string.h>

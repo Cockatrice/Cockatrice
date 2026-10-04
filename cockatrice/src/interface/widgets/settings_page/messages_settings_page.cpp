@@ -18,7 +18,7 @@
 #include <QStringLiteral>
 #include <QToolBar>
 #include <QVBoxLayout>
-#include <QtVersionChecks>
+#include <QtGlobal>
 #include <libcockatrice/settings/chat_settings.h>
 #include <libcockatrice/settings/message_settings.h>
 #include <libcockatrice/settings/personal_settings.h>

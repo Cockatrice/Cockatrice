@@ -54,7 +54,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QVector>
-#include <QtTypes>
+#include <QtGlobal>
 #include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/remote/remote_client.h>

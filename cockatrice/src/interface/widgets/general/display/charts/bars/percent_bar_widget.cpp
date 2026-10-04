@@ -4,7 +4,7 @@
 #include <QPainter>
 #include <QPen>
 #include <QRect>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <qnamespace.h>
 #include <qnumeric.h>
 

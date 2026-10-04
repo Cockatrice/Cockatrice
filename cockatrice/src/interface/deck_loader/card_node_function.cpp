@@ -6,7 +6,7 @@
 
 #include <QSharedPointer>
 #include <QString>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/tree/deck_list_card_node.h>

@@ -27,7 +27,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QVariant>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <qnamespace.h>
 

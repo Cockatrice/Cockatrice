@@ -30,7 +30,7 @@
 #include <QRectF>
 #include <QTransform>
 #include <QVariant>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/appearance_settings.h>

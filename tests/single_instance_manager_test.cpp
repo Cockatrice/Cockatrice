@@ -10,8 +10,7 @@
 #include <QLocalSocket>
 #include <QStringLiteral>
 #include <QTimer>
-#include <QtEnvironmentVariables>
-#include <QtTypes>
+#include <QtGlobal>
 #include <gtest/gtest.h>
 #include <string>
 

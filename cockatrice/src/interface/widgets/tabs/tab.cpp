@@ -10,7 +10,7 @@
 #include <QRect>
 #include <QScreen>
 #include <QSharedPointer>
-#include <qminmax.h>
+#include <QtGlobal>
 #include <qnamespace.h>
 
 Tab::Tab(TabSupervisor *_tabSupervisor)

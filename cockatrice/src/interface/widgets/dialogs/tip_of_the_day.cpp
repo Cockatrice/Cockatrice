@@ -9,7 +9,7 @@
 #include <QTextStream>
 #include <QVariant>
 #include <QXmlStreamReader>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <qnamespace.h>
 #include <stdio.h>
 #include <utility>

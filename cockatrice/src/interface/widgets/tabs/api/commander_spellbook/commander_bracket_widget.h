@@ -6,7 +6,7 @@
 #include <QSharedPointer>
 #include <QString>
 #include <QWidget>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 
 class QLabel;

@@ -32,8 +32,7 @@
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QWidget>
-#include <QtTypes>
-#include <QtVersionChecks>
+#include <QtGlobal>
 #include <libcockatrice/protocol/pb/command_replay_download_by_game_id.pb.h>
 #include <libcockatrice/protocol/pb/command_report_add_comment.pb.h>
 #include <libcockatrice/protocol/pb/command_report_assign.pb.h>

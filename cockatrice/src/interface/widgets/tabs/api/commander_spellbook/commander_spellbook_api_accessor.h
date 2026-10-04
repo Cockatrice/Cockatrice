@@ -4,8 +4,7 @@
 #include <QNetworkAccessManager>
 #include <QObject>
 #include <QString>
-#include <QtClassHelperMacros>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 
 class DeckList;

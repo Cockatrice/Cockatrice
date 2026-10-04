@@ -28,7 +28,7 @@
 #include <QSharedPointer>
 #include <QString>
 #include <QStringList>
-#include <QtTypes>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_loader.h>
 #include <libcockatrice/interfaces/interface_card_database_path_provider.h>

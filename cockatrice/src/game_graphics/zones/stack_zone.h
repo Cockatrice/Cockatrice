@@ -9,7 +9,7 @@
 
 #include "select_zone.h"
 
-#include <QtTypes>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 
 class QGraphicsItem;

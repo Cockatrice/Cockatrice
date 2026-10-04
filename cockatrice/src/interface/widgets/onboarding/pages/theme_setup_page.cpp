@@ -25,7 +25,7 @@
 #include <QStringLiteral>
 #include <QVBoxLayout>
 #include <QVariant>
-#include <QtVersionChecks>
+#include <QtGlobal>
 #include <initializer_list>
 #include <libcockatrice/settings/paths_settings.h>
 

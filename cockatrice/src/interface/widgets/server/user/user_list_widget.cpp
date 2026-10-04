@@ -56,9 +56,8 @@
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QWidget>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <libcockatrice/settings/appearance_settings.h>
-#include <qminmax.h>
 #include <qnamespace.h>
 
 class QPixmap;

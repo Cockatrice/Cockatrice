@@ -28,10 +28,9 @@
 #include <QSize>
 #include <QStringLiteral>
 #include <QSvgRenderer>
-#include <QtTypes>
+#include <QtGlobal>
 #include <initializer_list>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
-#include <qminmax.h>
 #include <qnamespace.h>
 
 #define DEFAULT_COLOR_UNREGISTERED "#32c8ec";

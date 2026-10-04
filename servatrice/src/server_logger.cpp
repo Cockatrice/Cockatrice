@@ -11,7 +11,7 @@
 #include <QTextStream>
 #include <QThread>
 #include <QVariant>
-#include <QtTypes>
+#include <QtGlobal>
 #include <iostream>
 #include <qnamespace.h>
 #include <qobjectdefs.h>

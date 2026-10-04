@@ -29,13 +29,11 @@
 #include <QStyle>
 #include <QStyleOptionViewItem>
 #include <QVariant>
-#include <QtPreprocessorSupport>
-#include <QtTypes>
+#include <QtGlobal>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/printing/printing_info.h>
 #include <libcockatrice/models/database/card/card_search_model.h>
-#include <qminmax.h>
 #include <qnamespace.h>
 
 class QObject;

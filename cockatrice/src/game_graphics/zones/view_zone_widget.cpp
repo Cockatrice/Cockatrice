@@ -43,10 +43,10 @@
 #include <QTimer>
 #include <QVariant>
 #include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
-#include <qminmax.h>
 #include <qnamespace.h>
 
 namespace

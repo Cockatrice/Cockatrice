@@ -22,7 +22,7 @@
 #include <QTimeZone>
 #include <QUrl>
 #include <QtConcurrentRun>
-#include <QtVersionChecks>
+#include <QtGlobal>
 #include <functional>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>

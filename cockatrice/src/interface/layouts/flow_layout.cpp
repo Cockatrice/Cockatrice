@@ -26,7 +26,7 @@
 #include <QStyle>
 #include <QWidget>
 #include <QWidgetItem>
-#include <qminmax.h>
+#include <QtGlobal>
 
 FlowLayout::FlowLayout(QWidget *parent,
                        const Qt::Orientation flowDirection,

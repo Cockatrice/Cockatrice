@@ -12,7 +12,7 @@
 #include <QString>
 #include <QTimer>
 #include <QVBoxLayout>
-#include <QtTypes>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>

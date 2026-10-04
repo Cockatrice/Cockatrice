@@ -25,7 +25,7 @@
 #include <QSet>
 #include <QSharedPointer>
 #include <QString>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <google/protobuf/stubs/port.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/protocol/pb/command_change_zone_properties.pb.h>
@@ -60,7 +60,6 @@
 #include <libcockatrice/utility/string_limits.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <qalgorithms.h>
-#include <qminmax.h>
 #include <string>
 
 class Server_AbstractUserInterface;

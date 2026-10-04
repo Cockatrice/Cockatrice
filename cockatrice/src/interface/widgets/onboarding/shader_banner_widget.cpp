@@ -18,8 +18,8 @@
 #include <QStackedLayout>
 #include <QString>
 #include <QUrl>
+#include <QtGlobal>
 #include <qmath.h>
-#include <qminmax.h>
 #include <qnamespace.h>
 #include <qnumeric.h>
 

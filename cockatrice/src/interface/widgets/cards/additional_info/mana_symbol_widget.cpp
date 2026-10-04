@@ -8,8 +8,7 @@
 #include <QResizeEvent>
 #include <QSharedPointer>
 #include <QSize>
-#include <QtPreprocessorSupport>
-#include <QtTypes>
+#include <QtGlobal>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
 #include <utility>
 

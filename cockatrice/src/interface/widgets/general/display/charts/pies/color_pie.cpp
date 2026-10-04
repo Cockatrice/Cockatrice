@@ -13,10 +13,9 @@
 #include <QRectF>
 #include <QSize>
 #include <QToolTip>
+#include <QtGlobal>
 #include <QtMath>
-#include <QtPreprocessorSupport>
 #include <cmath>
-#include <qminmax.h>
 #include <qnamespace.h>
 #include <utility>
 

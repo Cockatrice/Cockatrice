@@ -17,7 +17,7 @@
 #include <QStandardPaths>
 #include <QString>
 #include <QTemporaryDir>
-#include <QtEnvironmentVariables>
+#include <QtGlobal>
 #include <libcockatrice/card/lazy_properties_hash.h>
 #include <libcockatrice/card/printing/exact_card.h>
 #include <libcockatrice/card/set/card_set.h>

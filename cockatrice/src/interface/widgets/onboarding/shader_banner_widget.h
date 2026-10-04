@@ -5,7 +5,7 @@
 #include <QElapsedTimer>
 #include <QTimer>
 #include <QWidget>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 
 class BannerShaderConfig;

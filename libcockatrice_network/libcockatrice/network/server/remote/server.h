@@ -11,7 +11,7 @@
 #include <QObject>
 #include <QReadWriteLock>
 #include <QString>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 
 class Server_DatabaseInterface;

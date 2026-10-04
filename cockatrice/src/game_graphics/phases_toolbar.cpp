@@ -12,7 +12,7 @@
 #include <QRectF>
 #include <QTimer>
 #include <QTransform>
-#include <QtTypes>
+#include <QtGlobal>
 #include <google/protobuf/stubs/port.h>
 #include <libcockatrice/protocol/pb/command_draw_cards.pb.h>
 #include <libcockatrice/protocol/pb/command_next_turn.pb.h>

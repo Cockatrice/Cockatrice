@@ -10,8 +10,7 @@
 #include <QPointer>
 #include <QSharedPointer>
 #include <QStringLiteral>
-#include <QtEnvironmentVariables>
-#include <QtTypes>
+#include <QtGlobal>
 
 namespace
 {

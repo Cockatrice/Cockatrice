@@ -17,6 +17,7 @@
 #include <QMetaType>
 #include <QSharedPointer>
 #include <QVariant>
+#include <QtGlobal>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
 #include <libcockatrice/protocol/debug_pb_message.h>
@@ -38,7 +39,6 @@
 #include <libcockatrice/protocol/pb/event_user_message.pb.h>
 #include <libcockatrice/protocol/pb/server_message.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <qassert.h>
 
 AbstractClient::AbstractClient(QObject *parent)
     : QObject(parent), nextCmdId(0), status(StatusDisconnected), serverSupportsPasswordHash(false)

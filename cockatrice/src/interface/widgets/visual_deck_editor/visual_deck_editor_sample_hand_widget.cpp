@@ -21,12 +21,12 @@
 #include <QSplitter>
 #include <QString>
 #include <QVBoxLayout>
+#include <QtGlobal>
 #include <algorithm>
 #include <compare>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <qlogging.h>
-#include <qminmax.h>
 #include <qnamespace.h>
 #include <qobjectdefs.h>
 #include <random>

@@ -8,7 +8,7 @@
 #include <QSharedPointer>
 #include <QSize>
 #include <QWidget>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 
 #define FONT_PRECISION (0.5)
 

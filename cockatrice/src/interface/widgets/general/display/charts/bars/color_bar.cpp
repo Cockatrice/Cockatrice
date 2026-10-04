@@ -14,7 +14,7 @@
 #include <QRectF>
 #include <QSize>
 #include <QToolTip>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <qnamespace.h>
 #include <utility>
 

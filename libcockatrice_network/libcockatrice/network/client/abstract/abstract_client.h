@@ -20,7 +20,7 @@
 // IWYU pragma: keep
 // ServerInfo_User appears in signal signatures, including inside QList, so the
 // moc-generated code needs the complete type.
-#include <QtTypes>
+#include <QtGlobal>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <qtmetamacros.h>
 

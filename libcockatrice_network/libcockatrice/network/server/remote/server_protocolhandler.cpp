@@ -31,6 +31,7 @@
 #include <QReadWriteLock>
 #include <QRecursiveMutex>
 #include <QSharedPointer>
+#include <QtGlobal>
 #include <QtMath>
 #include <google/protobuf/repeated_ptr_field.h>
 #include <libcockatrice/protocol/debug_pb_message.h>
@@ -51,7 +52,6 @@
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <qlogging.h>
-#include <qminmax.h>
 #include <string>
 #include <utility>
 

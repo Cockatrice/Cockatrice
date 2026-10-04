@@ -11,7 +11,7 @@
 #include <QObject>
 #include <QSharedPointer>
 #include <QString>
-#include <QtTranslation>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 
 class BackgroundSources

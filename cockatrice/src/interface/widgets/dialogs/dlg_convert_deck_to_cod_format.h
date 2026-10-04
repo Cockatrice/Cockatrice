@@ -10,7 +10,7 @@
 
 #include <QDialog>
 #include <QString>
-#include <QtClassHelperMacros>
+#include <QtGlobal>
 #include <functional>
 #include <qtmetamacros.h>
 

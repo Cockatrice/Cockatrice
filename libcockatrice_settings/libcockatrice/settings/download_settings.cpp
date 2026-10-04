@@ -5,7 +5,7 @@
 #include <QList>
 #include <QSettings>
 #include <QVariant>
-#include <qminmax.h>
+#include <QtGlobal>
 #include <utility>
 
 class QObject;

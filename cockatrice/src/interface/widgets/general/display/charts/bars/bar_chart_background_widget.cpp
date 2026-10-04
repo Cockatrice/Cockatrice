@@ -9,7 +9,7 @@
 #include <QSize>
 #include <QSizePolicy>
 #include <QString>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <qnamespace.h>
 
 BarChartBackgroundWidget::BarChartBackgroundWidget(QWidget *parent) : QWidget(parent)

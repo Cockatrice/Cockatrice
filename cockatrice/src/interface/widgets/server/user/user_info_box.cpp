@@ -26,14 +26,13 @@
 #include <QSharedPointer>
 #include <QSize>
 #include <QSizePolicy>
-#include <QtTypes>
+#include <QtGlobal>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/response_get_user_info.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/passwordhasher.h>
-#include <qminmax.h>
 #include <string>
 #include <sys/types.h>
 

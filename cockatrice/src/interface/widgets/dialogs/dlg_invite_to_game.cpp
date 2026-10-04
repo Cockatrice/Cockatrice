@@ -14,8 +14,8 @@
 #include <QUrl>
 #include <QUrlQuery>
 #include <QVBoxLayout>
+#include <QtGlobal>
 #include <functional>
-#include <qminmax.h>
 
 class QWidget;
 

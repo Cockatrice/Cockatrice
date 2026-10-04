@@ -32,7 +32,7 @@
 #include <QStringList>
 #include <QTcpSocket>
 #include <QWebSocket>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 #include <server_protocolhandler.h>
 

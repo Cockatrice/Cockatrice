@@ -24,7 +24,7 @@
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QWidget>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <google/protobuf/repeated_ptr_field.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/moderator_commands.pb.h>

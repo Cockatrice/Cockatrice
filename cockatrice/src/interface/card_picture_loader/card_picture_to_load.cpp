@@ -14,7 +14,7 @@
 #include <QRegularExpressionMatchIterator>
 #include <QSharedPointer>
 #include <QUrl>
-#include <QtTypes>
+#include <QtGlobal>
 #include <algorithm>
 #include <functional>
 #include <libcockatrice/card/set/card_set_comparator.h>

@@ -22,7 +22,7 @@
 #include <QRectF>
 #include <QSizeF>
 #include <QString>
-#include <QtTypes>
+#include <QtGlobal>
 #include <libcockatrice/protocol/pb/move_card_to_zone.pb.h>
 #include <qtmetamacros.h>
 

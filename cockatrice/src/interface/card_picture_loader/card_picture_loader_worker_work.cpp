@@ -27,9 +27,8 @@
 #include <QVariant>
 
 ServerRateLimiter CardPictureLoaderWorkerWork::s_rateLimiter;
-#include <QtTypes>
+#include <QtGlobal>
 #include <libcockatrice/settings/download_settings.h>
-#include <qminmax.h>
 #include <qnamespace.h>
 #include <qobjectdefs.h>
 

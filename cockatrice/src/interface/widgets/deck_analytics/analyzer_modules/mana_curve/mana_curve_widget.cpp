@@ -15,7 +15,7 @@
 #include <QSizePolicy>
 #include <QStringList>
 #include <QVBoxLayout>
-#include <qminmax.h>
+#include <QtGlobal>
 
 class QWidget;
 

@@ -8,7 +8,7 @@
 #include <QSqlDatabase>
 #include <QString>
 #include <QStringList>
-#include <QtTypes>
+#include <QtGlobal>
 #include <libcockatrice/protocol/pb/serverinfo_ban.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_chat_message.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_moderator_login.pb.h>

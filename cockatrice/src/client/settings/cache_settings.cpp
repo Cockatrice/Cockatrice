@@ -15,6 +15,7 @@
 #include <QSharedPointer>
 #include <QStandardPaths>
 #include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/cache_storage_settings.h>
 #include <libcockatrice/settings/card_database_settings.h>
@@ -40,7 +41,6 @@
 #include <libcockatrice/settings/tabs_settings.h>
 #include <libcockatrice/settings/updates_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
-#include <qminmax.h>
 #include <utility>
 
 Q_GLOBAL_STATIC(SettingsCache, settingsCache)

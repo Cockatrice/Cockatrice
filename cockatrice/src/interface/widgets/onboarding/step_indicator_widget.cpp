@@ -7,7 +7,7 @@
 #include <QPalette>
 #include <QRectF>
 #include <QSize>
-#include <qminmax.h>
+#include <QtGlobal>
 
 StepIndicatorWidget::StepIndicatorWidget(QWidget *parent) : QWidget(parent)
 {

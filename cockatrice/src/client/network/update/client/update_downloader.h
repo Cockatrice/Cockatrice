@@ -11,7 +11,7 @@
 #include <QObject>
 #include <QString>
 #include <QUrl>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 
 class QNetworkAccessManager;

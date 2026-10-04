@@ -12,7 +12,7 @@
 #include <QGraphicsItem>
 #include <QObject>
 #include <QRectF>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 
 class QGraphicsItem;

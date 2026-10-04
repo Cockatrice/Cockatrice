@@ -7,7 +7,7 @@
 #include <QMessageBox>
 #include <QObject>
 #include <QString>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 
 class RemoteClient;

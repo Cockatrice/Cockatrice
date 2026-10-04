@@ -32,11 +32,9 @@
 #include <QTextStream>
 #include <QWidget>
 #include <Qt>
-#include <QtVersionChecks>
+#include <QtGlobal>
 #include <libcockatrice/settings/paths_settings.h>
-#include <qassert.h>
 #include <qlogging.h>
-#include <qminmax.h>
 #include <qnumeric.h>
 
 #define SYSTEM_THEME_NAME "System"

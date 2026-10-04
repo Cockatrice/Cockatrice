@@ -16,7 +16,7 @@
 #include <QPointF>
 #include <QPointer>
 #include <QRectF>
-#include <QtTypes>
+#include <QtGlobal>
 #include <libcockatrice/utility/macros.h>
 #include <qtmetamacros.h>
 

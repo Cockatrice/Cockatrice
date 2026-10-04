@@ -36,12 +36,11 @@
 #include <QUrl>
 #include <QUrlQuery>
 #include <QWidget>
-#include <QtVersionChecks>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/server/remote/user_level.h>
 #include <libcockatrice/settings/chat_settings.h>
 #include <libcockatrice/utility/card_ref.h>
-#include <qminmax.h>
 #include <qnamespace.h>
 #include <qobjectdefs.h>
 

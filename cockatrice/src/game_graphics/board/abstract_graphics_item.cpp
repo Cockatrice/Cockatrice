@@ -7,7 +7,7 @@
 #include <QRectF>
 #include <QString>
 #include <QTransform>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qnamespace.h>
 
 void AbstractGraphicsItem::paintNumberEllipse(int number,

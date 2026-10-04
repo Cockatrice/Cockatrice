@@ -56,6 +56,7 @@
 #include <QTypeInfo>
 #include <QUrl>
 #include <QVariant>
+#include <QtGlobal>
 #include <compare>
 #include <game/server_game.h>
 #include <google/protobuf/stubs/port.h>
@@ -65,7 +66,6 @@
 #include <libcockatrice/protocol/pb/event_server_shutdown.pb.h>
 #include <new>
 #include <qlogging.h>
-#include <qminmax.h>
 #include <qnamespace.h>
 #include <server_room.h>
 #include <string>

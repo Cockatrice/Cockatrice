@@ -15,7 +15,7 @@
 #include <QGraphicsItem>
 #include <QSizeF>
 #include <QString>
-#include <QtTypes>
+#include <QtGlobal>
 #include <libcockatrice/card/printing/exact_card.h>
 #include <libcockatrice/utility/card_ref.h>
 #include <qtmetamacros.h>

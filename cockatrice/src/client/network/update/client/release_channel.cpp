@@ -19,7 +19,7 @@
 #include <QUrl>
 #include <QVariant>
 #include <QVariantMap>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <optional>
 #include <qnamespace.h>
 #include <qprocessordetection.h>

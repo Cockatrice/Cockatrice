@@ -67,10 +67,9 @@
 #include <QToolButton>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
-#include <qassert.h>
-#include <qminmax.h>
 #include <qnamespace.h>
 
 class QModelIndex;

@@ -21,7 +21,7 @@
 #include <QStringList>
 #include <QStringLiteral>
 #include <QVBoxLayout>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <libcockatrice/settings/servers_settings.h>
 #include <libcockatrice/utility/string_limits.h>
 

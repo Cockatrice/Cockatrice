@@ -13,7 +13,7 @@
 #include <QRect>
 #include <QSize>
 #include <QToolTip>
-#include <qminmax.h>
+#include <QtGlobal>
 #include <qnamespace.h>
 
 BarChartWidget::BarChartWidget(QWidget *parent) : QWidget(parent)

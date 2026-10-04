@@ -5,7 +5,7 @@
 
 #include <QList>
 #include <QObject>
-#include <QtTypes>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 
 class GameReplay;

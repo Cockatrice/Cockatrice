@@ -10,7 +10,7 @@
 #include <QElapsedTimer>
 #include <QObject>
 #include <QVariant>
-#include <QtTypes>
+#include <QtGlobal>
 #include <libcockatrice/protocol/pb/commands.pb.h>
 #include <qtmetamacros.h>
 

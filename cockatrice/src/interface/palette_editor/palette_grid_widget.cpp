@@ -17,7 +17,7 @@
 #include <QStringList>
 #include <QTimer>
 #include <QVBoxLayout>
-#include <QtTranslation>
+#include <QtGlobal>
 #include <qnamespace.h>
 #include <utility>
 

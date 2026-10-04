@@ -7,7 +7,7 @@
 #include <QChar>
 #include <QList>
 #include <QVariant>
-#include <qminmax.h>
+#include <QtGlobal>
 
 class QObject;
 

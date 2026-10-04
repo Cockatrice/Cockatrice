@@ -2,7 +2,7 @@
 #define REPORT_UTILS_H
 
 #include <QString>
-#include <QtTypes>
+#include <QtGlobal>
 
 class QTableWidget;
 class QTextEdit;

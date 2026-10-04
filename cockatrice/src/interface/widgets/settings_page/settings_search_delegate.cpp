@@ -21,7 +21,7 @@
 #include <QStyle>
 #include <QStyleOptionViewItem>
 #include <QVariant>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <qnamespace.h>
 
 class QObject;

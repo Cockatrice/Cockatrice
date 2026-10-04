@@ -25,8 +25,8 @@
 #include <QList>
 #include <QMap>
 #include <QString>
+#include <QtGlobal>
 #include <libcockatrice/utility/card_ref.h>
-#include <qassert.h>
 #include <qtmetamacros.h>
 
 class Server_CardZone;

@@ -10,9 +10,9 @@
 #include <QXmlStreamAttributes>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
+#include <QtGlobal>
 #include <algorithm>
 #include <compare>
-#include <qminmax.h>
 
 InnerDecklistNode::InnerDecklistNode(InnerDecklistNode *other, InnerDecklistNode *_parent)
     : AbstractDecklistNode(_parent), name(other->getName())

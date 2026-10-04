@@ -34,7 +34,7 @@
 #include <QTreeView>
 #include <QVBoxLayout>
 #include <QVariant>
-#include <QtTypes>
+#include <QtGlobal>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/room_commands.pb.h>

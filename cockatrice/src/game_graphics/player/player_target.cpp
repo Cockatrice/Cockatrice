@@ -28,9 +28,9 @@
 #include <QSizeF>
 #include <QString>
 #include <QTransform>
+#include <QtGlobal>
 #include <QtMath>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
-#include <qminmax.h>
 #include <qnamespace.h>
 #include <qnumeric.h>
 #include <string>

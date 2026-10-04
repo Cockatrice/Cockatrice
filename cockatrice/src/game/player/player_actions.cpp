@@ -43,6 +43,7 @@
 #include <QTimer>
 #include <QVariant>
 #include <QVariantList>
+#include <QtGlobal>
 #include <algorithm>
 #include <functional>
 #include <google/protobuf/descriptor.h>
@@ -72,7 +73,6 @@
 #include <libcockatrice/utility/expression.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <memory>
-#include <qminmax.h>
 #include <qnamespace.h>
 #include <qnumeric.h>
 #include <string>

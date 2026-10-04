@@ -18,7 +18,7 @@
 #include <QSettings>
 #include <QVariant>
 #include <QWizardPage>
-#include <QtTranslation>
+#include <QtGlobal>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <qlogging.h>

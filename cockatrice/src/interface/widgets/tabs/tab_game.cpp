@@ -70,7 +70,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <QtPreprocessorSupport>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>

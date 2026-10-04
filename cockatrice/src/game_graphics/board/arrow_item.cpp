@@ -25,6 +25,7 @@
 #include <QPoint>
 #include <QString>
 #include <QTransform>
+#include <QtGlobal>
 #include <QtMath>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
@@ -34,7 +35,6 @@
 #include <libcockatrice/utility/color.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <math.h>
-#include <qminmax.h>
 #include <qnamespace.h>
 #include <string>
 #include <utility>

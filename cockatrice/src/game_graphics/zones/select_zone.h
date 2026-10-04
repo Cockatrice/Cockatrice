@@ -11,7 +11,7 @@
 
 #include <QPointF>
 #include <QSet>
-#include <QtTypes>
+#include <QtGlobal>
 #include <optional>
 #include <qtmetamacros.h>
 

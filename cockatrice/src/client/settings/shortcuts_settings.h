@@ -17,7 +17,7 @@
 #include <QObject>
 #include <QString>
 #include <QStringList>
-#include <QtTranslation>
+#include <QtGlobal>
 #include <qtmetamacros.h>
 #include <utility>
 

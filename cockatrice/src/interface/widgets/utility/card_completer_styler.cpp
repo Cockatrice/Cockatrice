@@ -26,11 +26,11 @@
 #include <QString>
 #include <QVariant>
 #include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card/card_search_model.h>
 #include <libcockatrice/utility/card_ref.h>
-#include <qminmax.h>
 #include <qnamespace.h>
 
 template <class T> class QSharedPointer;

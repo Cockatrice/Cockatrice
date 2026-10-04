@@ -1,9 +1,9 @@
 #include "latency_tracker.h"
 
 #include <QSharedPointer>
+#include <QtGlobal>
 #include <QtMath>
 #include <algorithm>
-#include <qminmax.h>
 #include <stddef.h>
 
 void LatencyTracker::addSample(qint64 ms)

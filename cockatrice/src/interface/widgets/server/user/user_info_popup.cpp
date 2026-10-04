@@ -49,12 +49,12 @@
 #include <QStyledItemDelegate>
 #include <QVBoxLayout>
 #include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/response_get_games_of_user.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/card_ref.h>
-#include <qminmax.h>
 #include <qnumeric.h>
 #include <string>
 

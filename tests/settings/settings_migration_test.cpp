@@ -15,7 +15,7 @@
 #include <QStringLiteral>
 #include <QTemporaryDir>
 #include <QVariant>
-#include <QtEnvironmentVariables>
+#include <QtGlobal>
 #include <libcockatrice/settings/settings_migration.h>
 #include <qnamespace.h>
 #include <string>

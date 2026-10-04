@@ -10,8 +10,7 @@
 #include <QPixmap>
 #include <QPointF>
 #include <QRect>
-#include <QtPreprocessorSupport>
-#include <qminmax.h>
+#include <QtGlobal>
 
 BannerWidget::BannerWidget(QWidget *parent, const QString &text, Qt::Orientation orientation, int transparency_)
     : QWidget(parent), gradientOrientation(orientation), transparency(qBound(0, transparency_, 100))

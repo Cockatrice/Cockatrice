@@ -8,8 +8,8 @@
 #include <QString>
 #include <QVariant>
 #include <QVariantList>
+#include <QtGlobal>
 #include <algorithm>
-#include <qminmax.h>
 
 static int sumPowers(const QList<CardItem *> &cards)
 {
