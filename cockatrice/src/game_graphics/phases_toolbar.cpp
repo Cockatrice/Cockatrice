@@ -14,7 +14,7 @@
 #include <libcockatrice/utility/zone_names.h>
 
 PhaseButton::PhaseButton(const QString &_name, QGraphicsItem *parent, QAction *_doubleClickAction, bool _highlightable)
-    : QObject(), QGraphicsItem(parent), name(_name), active(false), highlightable(_highlightable),
+    : QGraphicsObject(parent), name(_name), active(false), highlightable(_highlightable),
       activeAnimationCounter(0), doubleClickAction(_doubleClickAction), width(50)
 {
     if (highlightable) {
@@ -108,7 +108,7 @@ void PhaseButton::triggerDoubleClickAction()
 }
 
 PhasesToolbar::PhasesToolbar(QGraphicsItem *parent)
-    : QGraphicsItem(parent), width(100), height(100), ySpacing(1), symbolSize(8)
+    : QGraphicsObject(parent), width(100), height(100), ySpacing(1), symbolSize(8)
 {
     auto *aUntapAll = new QAction(this);
     connect(aUntapAll, &QAction::triggered, this, &PhasesToolbar::actUntapAll);

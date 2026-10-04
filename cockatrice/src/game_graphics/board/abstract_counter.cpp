@@ -23,7 +23,7 @@ AbstractCounter::AbstractCounter(CounterState *state,
                                  bool _shownInCounterArea,
                                  bool _useNameForShortcut,
                                  QGraphicsItem *parent)
-    : QGraphicsItem(parent), player(_player), id(state->getId()), name(state->getName()), value(state->getValue()),
+    : QGraphicsObject(parent), player(_player), id(state->getId()), name(state->getName()), value(state->getValue()),
       color(state->getColor()), radius(state->getRadius()), useNameForShortcut(_useNameForShortcut),
       shownInCounterArea(_shownInCounterArea)
 {

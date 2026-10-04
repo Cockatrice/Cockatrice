@@ -13,7 +13,7 @@
 /**
  * The entire graphical area belonging to a single player.
  */
-class PlayerArea : public QObject, public QGraphicsItem
+class PlayerArea : public QGraphicsObject
 {
     Q_OBJECT
 private:

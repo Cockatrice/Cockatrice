@@ -16,7 +16,7 @@ class CardItem;
 class QGraphicsSceneMouseEvent;
 class PlayerLogic;
 
-class ArrowItem : public QObject, public QGraphicsItem, public IAnimatedItem
+class ArrowItem : public QGraphicsObject, public IAnimatedItem
 {
     Q_OBJECT
 signals:

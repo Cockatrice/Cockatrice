@@ -42,7 +42,7 @@ qreal easeOutCubic(qreal t)
 } // namespace
 
 ArrowItem::ArrowItem(QSharedPointer<const ArrowData> _data, ArrowTarget *_startItem, ArrowTarget *_targetItem)
-    : data(std::move(_data)), startItem(_startItem), targetItem(_targetItem)
+    : QGraphicsObject(), data(std::move(_data)), startItem(_startItem), targetItem(_targetItem)
 {
     setZValue(ZValues::ARROWS);
 

@@ -20,7 +20,7 @@ class QKeyEvent;
 class QMenu;
 class QString;
 
-class AbstractCounter : public QObject, public QGraphicsItem, public AbstractPlayerComponent
+class AbstractCounter : public QGraphicsObject, public AbstractPlayerComponent
 {
     Q_OBJECT
 

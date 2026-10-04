@@ -24,7 +24,7 @@ class Message;
 class PlayerLogic;
 class GameCommand;
 
-class PhaseButton : public QObject, public QGraphicsItem
+class PhaseButton : public QGraphicsObject
 {
     Q_OBJECT
 private:
@@ -61,7 +61,7 @@ protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 };
 
-class PhasesToolbar : public QObject, public QGraphicsItem
+class PhasesToolbar : public QGraphicsObject
 {
     Q_OBJECT
 private:

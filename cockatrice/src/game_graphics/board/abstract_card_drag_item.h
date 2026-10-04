@@ -13,7 +13,7 @@ class QGraphicsScene;
 class CardZone;
 class CardInfo;
 
-class AbstractCardDragItem : public QObject, public QGraphicsItem
+class AbstractCardDragItem : public QGraphicsObject
 {
     Q_OBJECT
 protected:
