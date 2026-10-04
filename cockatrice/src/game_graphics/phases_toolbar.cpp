@@ -14,8 +14,8 @@
 #include <libcockatrice/utility/zone_names.h>
 
 PhaseButton::PhaseButton(const QString &_name, QGraphicsItem *parent, QAction *_doubleClickAction, bool _highlightable)
-    : QGraphicsObject(parent), name(_name), active(false), highlightable(_highlightable),
-      activeAnimationCounter(0), doubleClickAction(_doubleClickAction), width(50)
+    : QGraphicsObject(parent), name(_name), active(false), highlightable(_highlightable), activeAnimationCounter(0),
+      doubleClickAction(_doubleClickAction), width(50)
 {
     if (highlightable) {
         activeAnimationTimer = new QTimer(this);
