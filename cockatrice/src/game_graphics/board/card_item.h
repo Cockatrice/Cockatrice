@@ -104,6 +104,11 @@ public:
         return state->getDoesntUntap();
     }
     void setDoesntUntap(bool _doesntUntap);
+    [[nodiscard]] bool getDoesntUntapOnce() const
+    {
+        return state->getDoesntUntapOnce();
+    }
+    void setDoesntUntapOnce(bool _doesntUntapOnce);
     [[nodiscard]] QString getPT() const
     {
         return state->getPT();
