@@ -90,7 +90,7 @@ project("Cockatrice" VERSION 3.1.0)
 
 # Set release name if not provided via env/cmake var
 if(NOT DEFINED GIT_TAG_RELEASENAME)
-  set(GIT_TAG_RELEASENAME "Graduation Day")
+  set(GIT_TAG_RELEASENAME "Reality Check")
 endif()
 
 # Use c++20 for all targets
