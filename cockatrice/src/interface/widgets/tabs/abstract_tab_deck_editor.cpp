@@ -49,6 +49,7 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QPrintPreviewDialog>
+#include <QPrinter>
 #include <QPushButton>
 #include <QSharedPointer>
 #include <QUrl>
@@ -65,8 +66,6 @@
 #include <libcockatrice/utility/string_limits.h>
 #include <optional>
 #include <string>
-
-class QPrinter;
 
 /**
  * @brief Constructs the AbstractTabDeckEditor.

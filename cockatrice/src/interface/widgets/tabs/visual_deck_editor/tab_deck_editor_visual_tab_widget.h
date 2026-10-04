@@ -3,6 +3,7 @@
 
 #include "libcockatrice/card/card_info.h"
 
+#include <QMouseEvent>
 #include <QString>
 #include <QTabWidget>
 #include <qtmetamacros.h>
@@ -14,7 +15,6 @@ class DeckListModel;
 class DeckListStatisticsAnalyzer;
 class ExactCard;
 class PrintingSelector;
-class QMouseEvent;
 class QVBoxLayout;
 class QWidget;
 class VisualDatabaseDisplayWidget;

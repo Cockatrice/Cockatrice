@@ -3,13 +3,13 @@
 
 #include "../abstract_tab_deck_editor.h"
 
+#include <QMouseEvent>
 #include <QString>
 #include <qtmetamacros.h>
 
 class ExactCard;
 class QDockWidget;
 class QHBoxLayout;
-class QMouseEvent;
 class QVBoxLayout;
 class QWidget;
 class TabDeckEditorVisualTabWidget;

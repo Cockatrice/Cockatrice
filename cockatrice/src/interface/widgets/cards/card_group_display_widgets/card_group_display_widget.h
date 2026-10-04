@@ -9,6 +9,7 @@
 
 #include <QList>
 #include <QMap>
+#include <QMouseEvent>
 #include <QPersistentModelIndex>
 #include <QString>
 #include <QStringList>
@@ -24,7 +25,6 @@ class ExactCard;
 class QItemSelection;
 class QItemSelectionModel;
 class QModelIndex;
-class QMouseEvent;
 
 class CardGroupDisplayWidget : public QWidget
 {

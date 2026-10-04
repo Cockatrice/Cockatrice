@@ -8,6 +8,7 @@
 #define CARD_INFO_PICTURE_H
 
 #include <QLoggingCategory>
+#include <QMouseEvent>
 #include <QPixmap>
 #include <QPoint>
 #include <QWidget>
@@ -15,7 +16,6 @@
 #include <qtmetamacros.h>
 
 class CardInfoPictureEnlargedWidget;
-class QMouseEvent;
 class QPropertyAnimation;
 class QTimer;
 

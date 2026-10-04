@@ -9,6 +9,7 @@
 #include "../remote_public_decks_model.h"
 
 #include <QList>
+#include <QMouseEvent>
 #include <QString>
 #include <QWidget>
 #include <qtmetamacros.h>
@@ -17,7 +18,6 @@ class ColorIdentityWidget;
 class DeckPreviewCardPictureWidget;
 class FlowWidget;
 class QLabel;
-class QMouseEvent;
 
 /**
  * @brief A preview tile for a public deck published by another user.

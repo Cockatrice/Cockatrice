@@ -11,6 +11,7 @@
 
 #include <QHash>
 #include <QList>
+#include <QMouseEvent>
 #include <QPersistentModelIndex>
 #include <QString>
 #include <QStringList>
@@ -26,7 +27,6 @@ class OverlapWidget;
 class QItemSelection;
 class QItemSelectionModel;
 class QModelIndex;
-class QMouseEvent;
 class QVBoxLayout;
 
 class DeckCardZoneDisplayWidget : public QWidget

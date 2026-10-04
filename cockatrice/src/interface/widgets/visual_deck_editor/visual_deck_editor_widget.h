@@ -8,6 +8,7 @@
 #define VISUAL_DECK_EDITOR_H
 
 #include <QHash>
+#include <QMouseEvent>
 #include <QPersistentModelIndex>
 #include <QString>
 #include <QStringList>
@@ -31,7 +32,6 @@ class QItemSelection;
 class QItemSelectionModel;
 class QLineEdit;
 class QModelIndex;
-class QMouseEvent;
 class QScrollArea;
 class QVBoxLayout;
 class VisualDeckEditorPlaceholderWidget;

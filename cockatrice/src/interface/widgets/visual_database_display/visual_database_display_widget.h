@@ -10,6 +10,7 @@
 #include "libcockatrice/card/card_info.h"
 
 #include <QLoggingCategory>
+#include <QMouseEvent>
 #include <QString>
 #include <QStringList>
 #include <QWidget>
@@ -29,7 +30,6 @@ class FlowWidget;
 class OverlapControlWidget;
 class QLabel;
 class QModelIndex;
-class QMouseEvent;
 class QPushButton;
 class QScrollArea;
 class QTimer;
