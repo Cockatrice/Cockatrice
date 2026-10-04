@@ -80,6 +80,7 @@ public slots:
     void actCheckClientUpdates();
     void actConnect();
     void actExit();
+    void handleCockatriceLink(const QString &url);
 private slots:
     void updateTabMenu(const QList<QMenu *> &newMenuList);
     void statusChanged(ClientStatus _status);
@@ -97,7 +98,7 @@ private slots:
     void actOpenSettingsFolder();
     void actShow();
     void showWindowIfHidden();
-    void handleCockatriceLink(const QString &url);
+    void onUrlChainFinished(bool connected);
 
     void cardUpdateError(QProcess::ProcessError err);
     void cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus);
@@ -126,6 +127,8 @@ private slots:
     void startupDestinationFailed(const QString &reason);
     [[nodiscard]] bool startupDestinationConnectsToServer() const;
 
+    void attemptStartupAutoConnect();
+
 private:
     static const QString appName;
     static const QStringList fileNameFilters;
@@ -136,7 +139,7 @@ private:
     void createTrayIcon();
     int getNextCustomSetPrefix(QDir dataDir);
 
-    void runFirstRunWizard();
+    void runFirstRunWizard(bool firstRun = false);
 
     inline QString getCardUpdaterBinaryName()
     {
@@ -164,6 +167,10 @@ private:
     LagMonitor lagMonitor;                        ///< watches the main thread for event loop stalls
     LatencyStatusWidget *latencyStatus = nullptr; ///< status bar widget with live round-trip stats and history graph
     bool bHasActivated, askedForDbUpdater;
+    bool bClosingDown = false; ///< guards closeEvent() against re-entrancy
+    bool skipStartupAutoConnect = false;
+    bool startupAutoConnectAttempted = false;
+    bool firstRunWizardActive = false;
     QProcess *cardUpdateProcess;
     QByteArray cardUpdateOutputBuffer;
     DlgViewLog *logviewDialog;
@@ -177,6 +184,16 @@ public:
     {
         connectTo = QUrl(QString("cockatrice://%1").arg(url));
     }
+    // When set, the window's own startup connection (--connect or auto-connect
+    // on first activation) is skipped. Used for activation launches: the intent
+    // chain triggered by a cockatrice:// URL owns the connection, and letting
+    // auto-connect race against it caused two connectToServer calls to tear
+    // each other down. onUrlChainFinished() clears this and retries the startup
+    // connection when the link's chain ended without connecting.
+    void setSkipStartupAutoConnect(bool skip)
+    {
+        skipStartupAutoConnect = skip;
+    }
     ~MainWindow() override;
 
     RemoteClient *getRemoteClient() const
@@ -188,6 +205,13 @@ public:
     {
         return tabSupervisor;
     }
+
+    /**
+     * @brief Closes the window so an update installer can replace the running binaries.
+     *        Returns true only if the shutdown actually ran (settings flushed, tabs shut down);
+     *        false if the close was vetoed by the user or is already in progress.
+     */
+    bool closeForUpdate();
 
 protected:
     void closeEvent(QCloseEvent *event) override;

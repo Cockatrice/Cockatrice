@@ -25,10 +25,12 @@ public:
     [[nodiscard]] virtual int getVisualDeckStorageCardSize() const = 0;
     [[nodiscard]] virtual int getVisualDatabaseDisplayCardSize() const = 0;
     [[nodiscard]] virtual int getVisualDeckEditorCardSize() const = 0;
+    [[nodiscard]] virtual bool getVisualDeckEditorShowCardCounts() const = 0;
     [[nodiscard]] virtual int getEDHRecCardSize() const = 0;
     [[nodiscard]] virtual int getArchidektPreviewSize() const = 0;
     [[nodiscard]] virtual int getSampleHandSize() const = 0;
     [[nodiscard]] virtual QString getCardLang() const = 0;
+    [[nodiscard]] virtual int getCardSearchLanguage() const = 0;
 };
 
 #endif // COCKATRICE_INTERFACE_CARDS_DISPLAY_SETTINGS_PROVIDER_H

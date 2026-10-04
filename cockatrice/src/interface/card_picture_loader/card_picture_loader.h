@@ -117,6 +117,9 @@ public:
 public slots:
     /**
      * @brief Clears the network disk cache of the worker.
+     *
+     * The clear runs on the worker thread, so this returns before it has completed; connect to
+     * networkCacheCleared() to act once it is done.
      */
     static void clearNetworkCache();
 
@@ -130,6 +133,10 @@ public slots:
     void saveCardImageToLocalStorage(const ExactCard &card, const QPixmap &pixmap, bool allowOverwrite = false);
     void installPrintingOverride(const ExactCard &originalCard, const ExactCard &overrideCard);
     void installPrintingOverrideOnLoad(const ExactCard &originalCard, const ExactCard &overrideCard);
+
+signals:
+    /** @brief Emitted after the worker has finished clearing the network and redirect caches. */
+    void networkCacheCleared();
 
 private slots:
     /**

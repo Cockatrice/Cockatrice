@@ -259,13 +259,16 @@ void TabGame::linkCardToChat(const QString &cardName)
     sayEdit->setFocus();
 }
 
-void TabGame::resetChatAndPhase()
+void TabGame::resetForRewind()
 {
     // reset chat log
     messageLog->clearChat();
 
     // reset phase markers
     game->getGameState()->setCurrentPhase(-1);
+
+    // reset view zones
+    static_cast<GameScene *>(gameView->scene())->emptyActiveViews();
 
     // reset spectator state so the replay can rebuild it from the start
     game->getPlayerManager()->clearSpectators();
@@ -1270,7 +1273,7 @@ void TabGame::createReplayDock(GameReplay *replay)
     replayDock->setWidget(replayWidget);
     replayDock->setFloating(false);
 
-    connect(replayWidget, &ReplayWidget::rewound, this, &TabGame::resetChatAndPhase);
+    connect(replayWidget, &ReplayWidget::rewound, this, &TabGame::resetForRewind);
     connect(replayWidget, &ReplayWidget::eventReplayed, game->getGameEventHandler(),
             [this](const auto &event, auto options) {
                 game->getGameEventHandler()->processGameEventContainer(event, nullptr, options);

@@ -1,0 +1,9 @@
+syntax = "proto2";
+import "response.proto";
+
+message Response_DeckShareDownload {
+    extend Response {
+        optional Response_DeckShareDownload ext = 1105;
+    }
+    optional string deck = 1;
+}

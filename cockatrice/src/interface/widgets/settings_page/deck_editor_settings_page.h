@@ -27,6 +27,7 @@ private slots:
     void actAddURL();
     void actRemoveURL();
     void actEditURL();
+    void actAdjustRateLimit();
     void resetDownloadedURLsButtonClicked();
 
 private:
@@ -34,7 +35,7 @@ private:
     QLabel urlLinkLabel;
     QCheckBox picDownloadCheckBox;
     QListWidget *urlList;
-    QAction *aAdd, *aEdit, *aRemove;
+    QAction *aAdd, *aEdit, *aRemove, *aRateLimit;
     QCheckBox mcDownloadSpoilersCheckBox;
     QLabel msDownloadSpoilersLabel;
     QGroupBox *mpGeneralGroupBox;
@@ -46,6 +47,18 @@ private:
     QLabel infoOnSpoilersLabel;
     QPushButton *mpSpoilerPathButton;
     QPushButton *updateNowButton;
+
+    /** @brief Adds a list item for the given URL, storing the raw URL alongside its displayed label. */
+    QListWidgetItem *addUrlItem(const QString &url);
+
+    /** @brief Returns the raw URL stored on a list item. */
+    [[nodiscard]] QString urlForItem(const QListWidgetItem *item) const;
+
+    /** @brief Returns the display label for a URL, including its current effective rate limit. */
+    [[nodiscard]] QString urlLabel(const QString &url) const;
+
+    /** @brief Refreshes the displayed label of every URL item after limits or settings change. */
+    void refreshUrlItems();
 };
 
 #endif // COCKATRICE_DECK_EDITOR_SETTINGS_PAGE_H

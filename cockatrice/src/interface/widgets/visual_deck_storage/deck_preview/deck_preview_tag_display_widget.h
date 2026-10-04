@@ -48,7 +48,10 @@ public:
 
 signals:
     /**
-     * @brief Emitted when the tag is clicked.
+     * @brief Emitted when a click toggles the chip's selection/exclusion state.
+     *
+     * Not emitted for clicks that leave the state unchanged. Connected handlers use
+     * this as the trigger to update filters built from selectedTags()/excludedTags().
      */
     void tagClicked();
 

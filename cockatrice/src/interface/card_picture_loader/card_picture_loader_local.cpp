@@ -101,7 +101,7 @@ QImage CardPictureLoaderLocal::tryLoadCardImageFromDisk(const QString &setName,
         for (const QString &path : candidatePaths) {
             QFileInfo fileInfo(path);
             QDir dir = fileInfo.dir();
-            QString baseName = fileInfo.fileName();
+            QString baseName = fileInfo.completeBaseName();
 
             if (!dir.exists()) {
                 continue;

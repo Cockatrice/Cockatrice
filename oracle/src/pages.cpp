@@ -33,6 +33,7 @@
 #include <QtGui>
 #include <cstdio>
 #include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/utility/translation_loader.h>
 
 #ifdef HAS_LZMA
 #include "lzma/decompress.h"
@@ -212,21 +213,18 @@ void IntroPage::initializePage()
 
 QStringList IntroPage::findQmFiles()
 {
-    QDir dir(translationPath);
-    QStringList fileNames = dir.entryList(QStringList(translationPrefix + "_*.qm"), QDir::Files, QDir::Name);
-    fileNames.replaceInStrings(QRegularExpression(translationPrefix + "_(.*)\\.qm"), "\\1");
-    return fileNames;
+    return TranslationLoader::availableLanguages(translationPrefix,
+                                                 TranslationLoader::applicationTranslationPaths(translationPath));
 }
 
 QString IntroPage::languageName(const QString &lang)
 {
     QTranslator qTranslator;
 
-    QString appNameHint = translationPrefix + "_" + lang;
-    bool appTranslationLoaded = qTranslator.load(appNameHint, translationPath);
-    if (!appTranslationLoaded) {
-        qDebug() << "Unable to load" << translationPrefix << "translation" << appNameHint << "at" << translationPath;
-    }
+    // Only the language name is needed here, so the file is loaded without logging a line per
+    // language: findQmFiles() asked for languages whose files exist in the first place.
+    TranslationLoader::loadFrom(qTranslator, translationPrefix + "_" + lang,
+                                TranslationLoader::applicationTranslationPaths(translationPath));
 
     return qTranslator.translate("i18n", DEFAULT_LANG_NAME);
 }

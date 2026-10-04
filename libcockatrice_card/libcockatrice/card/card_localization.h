@@ -5,6 +5,42 @@
 #include <QStringList>
 
 /**
+ * @brief The card languages card search should run against.
+ */
+enum class SearchLanguageMode
+{
+    English,  ///< Only search the English card names and texts.
+    Selected, ///< Search the selected card language (untranslated cards still match in English).
+    Both      ///< Search both the English and the selected card language names and texts.
+};
+
+/**
+ * @brief The card language and matching mode searches run against.
+ *
+ * Bundles the card language code configured in the settings with the
+ * SearchLanguageMode, so entry points take one value instead of two related
+ * parameters.
+ */
+struct CardSearchLanguage
+{
+    QString language; ///< Card language code (e.g. "de"); empty means the English fallback.
+    SearchLanguageMode mode = SearchLanguageMode::English; ///< How the language participates in the search.
+
+    /**
+     * @brief Whether only the English card data is searched.
+     *
+     * @return True when no card language is selected or English itself is selected.
+     */
+    [[nodiscard]] bool isEnglishOnly() const
+    {
+        return language.isEmpty() || language == QLatin1String("en");
+    }
+
+    bool operator==(const CardSearchLanguage &) const = default;
+    bool operator!=(const CardSearchLanguage &) const = default;
+};
+
+/**
  * @namespace CardLocalization
  * @ingroup Cards
  *

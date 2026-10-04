@@ -52,6 +52,7 @@ public slots:
     QList<QString> getGroupCriteriaValueList();
     void onCategoryAddition(const QModelIndex &parent, int first, int last);
     void onCategoryRemoval(const QModelIndex &parent, int first, int last);
+    void updateZoneCardCount();
 
 signals:
     void cardClicked(QMouseEvent *event, const ExactCard &card, const QString &zoneName);

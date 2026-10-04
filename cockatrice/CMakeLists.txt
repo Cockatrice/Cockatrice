@@ -45,11 +45,14 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp
     src/interface/widgets/dialogs/dlg_load_remote_deck.cpp
     src/interface/widgets/dialogs/dlg_local_game_options.cpp
+    src/interface/widgets/dialogs/dlg_login_prompt.cpp
     src/interface/widgets/dialogs/dlg_manage_sets.cpp
     src/interface/widgets/dialogs/dlg_my_reports.cpp
     src/interface/widgets/dialogs/dlg_register.cpp
     src/interface/widgets/dialogs/dlg_report_user.cpp
     src/interface/widgets/dialogs/dlg_select_set_for_cards.cpp
+    src/interface/widgets/dialogs/dlg_share_deck.cpp
+    src/interface/widgets/dialogs/dlg_shared_decks_preview.cpp
     src/interface/widgets/dialogs/dlg_settings.cpp
     src/interface/widgets/dialogs/dlg_startup_card_check.cpp
     src/interface/widgets/dialogs/dlg_tip_of_the_day.cpp
@@ -57,6 +60,9 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/dlg_view_log.cpp
     src/interface/widgets/dialogs/override_printing_warning.cpp
     src/interface/widgets/dialogs/tip_of_the_day.cpp
+    src/interface/widgets/deck_share/deck_share_utils.cpp
+    src/interface/widgets/deck_share/shared_deck_preview_widget.cpp
+    src/interface/widgets/deck_share/share_bar_widget.cpp
     src/filters/deck_filter_string.cpp
     src/filters/filter_builder.cpp
     src/filters/filter_tree_model.cpp
@@ -163,6 +169,7 @@ set(cockatrice_SOURCES
     src/interface/palette_editor/palette_grid_widget.cpp
     src/interface/palette_editor/palette_editor_dialog.cpp
     src/interface/widgets/cards/additional_info/color_identity_widget.cpp
+    src/interface/widgets/cards/additional_info/deck_color_identity.cpp
     src/interface/widgets/cards/additional_info/mana_cost_widget.cpp
     src/interface/widgets/cards/additional_info/mana_symbol_widget.cpp
     src/interface/widgets/cards/art_crop_attribution.cpp
@@ -317,6 +324,8 @@ set(cockatrice_SOURCES
     src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_tag_display_widget.cpp
     src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_tag_item_widget.cpp
     src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp
+    src/interface/widgets/visual_deck_storage/deck_preview/public_deck_preview_widget.cpp
+    src/interface/widgets/visual_deck_storage/remote_public_decks_model.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_folder_display_widget.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_model.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_quick_settings_widget.cpp
@@ -388,6 +397,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/tab_logs.cpp
     src/interface/widgets/tabs/tab_message.cpp
     src/interface/widgets/tabs/tab_moderation.cpp
+    src/interface/widgets/tabs/tab_public_decks.cpp
     src/interface/widgets/tabs/tab_report.cpp
     src/interface/widgets/tabs/tab_replays.cpp
     src/interface/widgets/tabs/tab_room.cpp
@@ -444,6 +454,8 @@ set(cockatrice_SOURCES
     src/interface/intents/intent_login.h
     src/interface/intents/intent_open_server_room_by_name.cpp
     src/interface/intents/intent_open_server_room_by_name.h
+    src/interface/intents/intent_open_shared_deck.cpp
+    src/interface/intents/intent_open_shared_deck.h
     src/interface/intents/url_parser.cpp
     src/interface/intents/url_parser.h
     src/interface/widgets/server/user/user_info_popup.cpp
@@ -654,18 +666,53 @@ if(WIN32) # Windows (including 64bit)
   set(qtconf_dest_dir .)
 
   install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/"
+    DIRECTORY "$<TARGET_FILE_DIR:cockatrice>/"
     DESTINATION ./
     FILES_MATCHING
     PATTERN "*.dll"
+    PATTERN "*.pdb" EXCLUDE
+    PATTERN "*.dir*" EXCLUDE
+    PATTERN "*_autogen*" EXCLUDE
+    PATTERN "*.tlog*" EXCLUDE
+    PATTERN "CMakeFiles*" EXCLUDE
+    PATTERN "x64*" EXCLUDE
+    PATTERN ".qt*" EXCLUDE
+    PATTERN ".qsb*" EXCLUDE
+    PATTERN ".lupdate*" EXCLUDE
   )
+
+  # fixup_bundle further down copies only the DLLs it can find in Cockatrice.exe's
+  # import table, and the glob above only sees DLLs that were already copied next
+  # to the executable. Qt6::Concurrent is linked but never imported - QtConcurrent::run
+  # and QFutureWatcher are header-only in Qt 6 - so neither step ships
+  # Qt6Concurrent.dll, even though required-qt-runtime.txt lists it and the
+  # Windows package check then fails on a package that is fine to run.
+  # Qt6::ShaderTools is skipped for the same reason.
+  #
+  # Install the runtime of every linked module explicitly. An unused DLL costs a
+  # few hundred kilobytes; a missing one is what stops the client starting after
+  # an update, and it stays invisible until then.
+  foreach(_qt_module IN LISTS COCKATRICE_QT_MODULES)
+    get_target_property(_qt_module_type ${_qt_module} TYPE)
+    if(_qt_module_type STREQUAL "SHARED_LIBRARY")
+      install(FILES "$<TARGET_FILE:${_qt_module}>" DESTINATION ./)
+    endif()
+  endforeach()
 
   install(
     DIRECTORY "${CMAKE_BINARY_DIR}/cockatrice/"
     DESTINATION ./
     FILES_MATCHING
-    PATTERN "CMakeFiles" EXCLUDE
     PATTERN "*.ini"
+    PATTERN "CMakeFiles*" EXCLUDE
+    PATTERN "*.dir*" EXCLUDE
+    PATTERN "*_autogen*" EXCLUDE
+    PATTERN "*.tlog*" EXCLUDE
+    PATTERN "*.pdb" EXCLUDE
+    PATTERN "x64*" EXCLUDE
+    PATTERN ".qt*" EXCLUDE
+    PATTERN ".qsb*" EXCLUDE
+    PATTERN ".lupdate*" EXCLUDE
   )
 
   # Qt plugins: iconengines, imageformats, multimedia, platforms, styles, tls
@@ -695,11 +742,15 @@ if(WIN32) # Windows (including 64bit)
     PATTERN "tls/qschannelbackend.dll"
   )
 
+  # The Windows install has no Resources directory: the .qm files go to
+  # ${COCKATRICE_WIN32_QM_INSTALL_DIR} and main.cpp looks for them at
+  # applicationDirPath() + "/translations". The macOS bundle above keeps
+  # Resources/translations, which is correct for it.
   install(
     CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
 Plugins = Plugins
-Translations = Resources/translations
+Translations = translations
 Data = Resources\")
     "
     COMPONENT Runtime
@@ -715,10 +766,6 @@ Data = Resources\")
         "
     COMPONENT Runtime
   )
-
-  if(OPENSSL_FOUND)
-    install(FILES ${OPENSSL_INCLUDE_DIRS} DESTINATION ./)
-  endif()
 endif()
 
 if(Qt6LinguistTools_FOUND)
@@ -746,6 +793,18 @@ if(Qt6LinguistTools_FOUND)
   elseif(WIN32)
     install(FILES ${cockatrice_QM} DESTINATION ${COCKATRICE_WIN32_QM_INSTALL_DIR})
   endif()
+
+  # Qt attaches the .qm files to the default build target only, so building the executable on its own
+  # (CLion, --target cockatrice) leaves it without any translations: nothing is translated and the
+  # language selector stays empty.
+  # Depend on Qt's own lrelease target instead of attaching the .qm custom commands to a second
+  # target: two independent targets owning the same outputs race on MSBuild/Makefiles and are an
+  # error on Xcode. Older Qt versions already add this dependency themselves.
+  foreach(_lrelease_target Cockatrice_lrelease cockatrice_lrelease)
+    if(TARGET ${_lrelease_target})
+      add_dependencies(cockatrice ${_lrelease_target})
+    endif()
+  endforeach()
 endif()
 
 qt6_finalize_target(cockatrice)

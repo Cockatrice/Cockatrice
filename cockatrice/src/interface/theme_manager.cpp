@@ -23,6 +23,7 @@
 #include <libcockatrice/settings/paths_settings.h>
 
 #define SYSTEM_THEME_NAME "System"
+#define LEGACY_SYSTEM_THEME_NAME "Default"
 #define FUSION_THEME_NAME "Fusion"
 #define STYLE_CSS_NAME "style.css"
 #define HANDZONE_BG_NAME "handzone"
@@ -95,9 +96,11 @@ struct PaletteColorInfo
 
 static QString usableDefaultStyle(const QString &style)
 {
-    // The Windows 11 native style is broken: when the OS default
-    // ("System" theme selection) would use it, fall back to the Vista style.
-    // Explicitly choosing "windows11" in a theme is still honored.
+    // The Windows 11 native style is broken: dragging cards across zones can
+    // shrink the board to a tiny grey window that is unfixable without
+    // rejoining. It is never usable, so guard against it no matter how it was
+    // requested (OS default or an explicit "windows11" theme choice) and fall
+    // back to the Vista style.
     return style.compare("windows11", Qt::CaseInsensitive) == 0 ? QStringLiteral("windowsvista") : style;
 }
 
@@ -109,7 +112,10 @@ ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
     ensureThemeDirectoryExists();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
     connect(QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged, this, [this] {
-        defaultPalette = qApp->palette();
+        // Reload so scheme-qualified assets and palettes follow the OS, but do
+        // NOT recapture defaultPalette: qApp->palette() already carries the
+        // currently-applied theme palette at this point, so recapturing it
+        // would contaminate the base for every later theme switch.
         themeChangedSlot();
     });
 #endif
@@ -117,12 +123,84 @@ ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
     themeChangedSlot();
 }
 
+// Copy every file of sourceDir into targetDir without ever overwriting an
+// existing file, recursing into subdirectories (zones/, backgrounds/, ...).
+// Returns false as soon as an entry could not be copied, leaving the source
+// untouched so the caller can retry later.
+static bool mergeDirWithoutOverwrite(const QString &sourceDir, const QString &targetDir)
+{
+    const QDir target(targetDir);
+    bool merged = true;
+
+    const QDir::Filters filters = QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden;
+    for (const QFileInfo &entry : QDir(sourceDir).entryInfoList(filters)) {
+        const QString targetEntry = target.absoluteFilePath(entry.fileName());
+        if (entry.isDir()) {
+            if (!QDir().mkpath(targetEntry) || !mergeDirWithoutOverwrite(entry.absoluteFilePath(), targetEntry)) {
+                merged = false;
+            }
+        } else if (!target.exists(entry.fileName()) && !QFile::copy(entry.absoluteFilePath(), targetEntry)) {
+            qCWarning(ThemeManagerLog) << "Could not migrate theme file:" << entry.absoluteFilePath();
+            merged = false;
+        }
+    }
+
+    return merged;
+}
+
+void ThemeManager::migrateLegacyThemeDir(const QString &themesPath, const QString &currentThemeName)
+{
+    const QString legacyPath = QDir(themesPath).absoluteFilePath(LEGACY_SYSTEM_THEME_NAME);
+    if (!QDir(legacyPath).exists()) {
+        return;
+    }
+
+    // Only the renamed theme's own directory is migrated. A user sitting on a
+    // different theme may well have hand-made a "Default" folder of their own,
+    // and silently folding it into "System" would be rude. The check accepts
+    // both the pre-rename name and the post-rename one, since a user who
+    // already ran the rename keeps their settings on "System" while their
+    // customised directory is still called "Default".
+    if (currentThemeName != LEGACY_SYSTEM_THEME_NAME && currentThemeName != SYSTEM_THEME_NAME) {
+        return;
+    }
+
+    const QString targetPath = QDir(themesPath).absoluteFilePath(SYSTEM_THEME_NAME);
+    if (!QDir(targetPath).exists() && QDir().rename(legacyPath, targetPath)) {
+        qCInfo(ThemeManagerLog) << "Migrated customised theme directory" << LEGACY_SYSTEM_THEME_NAME << "to"
+                                << SYSTEM_THEME_NAME;
+        return;
+    }
+
+    // The rename is only possible when the target does not exist yet. When it
+    // does (a partial earlier upgrade, or a user who re-customised the theme
+    // after the rename), fall back to merging so nothing is lost: existing
+    // "System" files win, legacy files only fill gaps. Because every legacy
+    // file either already exists at the target or is copied there, removing
+    // the legacy directory afterwards cannot drop user data.
+    if (!mergeDirWithoutOverwrite(legacyPath, targetPath)) {
+        qCWarning(ThemeManagerLog) << "Could not fully migrate theme directory" << legacyPath << "; keeping it for a"
+                                   << "later retry";
+        return;
+    }
+    if (!QDir(legacyPath).removeRecursively()) {
+        qCWarning(ThemeManagerLog) << "Migrated theme directory but could not remove the legacy one:" << legacyPath;
+        return;
+    }
+    qCInfo(ThemeManagerLog) << "Merged customised theme directory" << LEGACY_SYSTEM_THEME_NAME << "into"
+                            << SYSTEM_THEME_NAME;
+}
+
 void ThemeManager::ensureThemeDirectoryExists()
 {
     auto &settings = SettingsCache::instance();
 
+    // Carry the user's theme customisations (zone graphics, stylesheets,
+    // palettes, theme.cfg) across before the stored name is rewritten.
+    migrateLegacyThemeDir(settings.paths().getThemesPath(), settings.getThemeName());
+
     // Migrate the old "Default" theme name to "System"
-    if (settings.getThemeName() == "Default") {
+    if (settings.getThemeName() == LEGACY_SYSTEM_THEME_NAME) {
         settings.setThemeName(SYSTEM_THEME_NAME);
     }
 
@@ -406,6 +484,10 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
             styleName = usableDefaultStyle(defaultStyleName);
         }
     }
+
+    // The Windows 11 style is broken even when selected explicitly in a theme,
+    // so sanitize the resolved name here rather than trusting the theme config.
+    styleName = usableDefaultStyle(styleName);
 
     QStyle *style = QStyleFactory::create(styleName);
     if (!style) {

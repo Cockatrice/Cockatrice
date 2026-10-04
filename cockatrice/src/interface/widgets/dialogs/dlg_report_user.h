@@ -26,6 +26,9 @@ private slots:
     void reportResponse(const Response &response);
 
 private:
+    static QString categoryLabel(const QString &key);
+    static QString categoryToolTip(const QString &key);
+
     AbstractClient *client;
     QString reportedUser;
     int gameId;

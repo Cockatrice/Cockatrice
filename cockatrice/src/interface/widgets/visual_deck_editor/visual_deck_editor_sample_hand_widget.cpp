@@ -48,6 +48,7 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
     upperLayout->addWidget(flowWidget);
 
     cardSizeWidget = new CardSizeWidget(this, flowWidget);
+    cardSizeWidget->enableCtrlScrollResize(flowWidget);
     upperLayout->addWidget(cardSizeWidget);
 
     auto upperLayoutWidget = new QWidget(this);

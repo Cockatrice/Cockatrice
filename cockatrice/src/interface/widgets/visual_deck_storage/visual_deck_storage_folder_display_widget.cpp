@@ -1,6 +1,7 @@
 #include "visual_deck_storage_folder_display_widget.h"
 
 #include "../cards/card_info_picture_widget.h"
+#include "../cards/card_size_widget.h"
 #include "../general/display/banner_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "deck_preview/deck_preview_widget.h"
@@ -44,6 +45,8 @@ VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
     containerLayout->addWidget(flowWidget);
+
+    visualDeckStorageWidget->settings()->getCardSizeWidget()->enableCtrlScrollResize(this);
 
     auto *proxy = visualDeckStorageWidget->proxyModel();
     // A burst of proxy changes (one dataChanged per finished deck load, plus the filter
@@ -126,6 +129,11 @@ void VisualDeckStorageFolderDisplayWidget::continueDeckPass()
 
         const bool matches = index.data(VisualDeckStorageRoles::FilterMatchRole).toBool();
         deckPreviewWidget->setVisible(matches);
+        if (!matches) {
+            // A deck that no longer matches the filters is dropped from the selection so its
+            // highlight cannot linger on an invisible preview or be counted in the share.
+            deckPreviewWidget->setShareSelected(false);
+        }
         if (matches) {
             ++visibleDeckCount;
         }
@@ -209,11 +217,28 @@ DeckPreviewWidget *VisualDeckStorageFolderDisplayWidget::createDeckPreviewWidget
             &VisualDeckStorageWidget::deckLoadRequested);
     connect(deckPreviewWidget, &DeckPreviewWidget::openDeckEditor, visualDeckStorageWidget,
             &VisualDeckStorageWidget::openDeckEditor);
+    connect(deckPreviewWidget, &DeckPreviewWidget::shareDeckRequested, visualDeckStorageWidget,
+            &VisualDeckStorageWidget::shareDeckRequested);
+    connect(deckPreviewWidget, &DeckPreviewWidget::shareSelectionToggled, visualDeckStorageWidget,
+            &VisualDeckStorageWidget::shareSelectionChanged);
+    deckPreviewWidget->setShareSelectable(visualDeckStorageWidget->isShareSelectable());
     connect(visualDeckStorageWidget->settings(), &VisualDeckStorageQuickSettingsWidget::cardSizeChanged,
             deckPreviewWidget->bannerCardDisplayWidget, &CardInfoPictureWidget::setScaleFactor);
     deckPreviewWidget->bannerCardDisplayWidget->setScaleFactor(visualDeckStorageWidget->settings()->getCardSize());
     deckWidgets.insert(filePath, deckPreviewWidget);
     return deckPreviewWidget;
+}
+
+void VisualDeckStorageFolderDisplayWidget::setShareSelectable(bool selectable)
+{
+    const auto previews = flowWidget->findChildren<DeckPreviewWidget *>();
+    for (DeckPreviewWidget *preview : previews) {
+        preview->setShareSelectable(selectable);
+    }
+    const auto subFolders = findChildren<VisualDeckStorageFolderDisplayWidget *>();
+    for (VisualDeckStorageFolderDisplayWidget *subFolder : subFolders) {
+        subFolder->setShareSelectable(selectable);
+    }
 }
 
 /**

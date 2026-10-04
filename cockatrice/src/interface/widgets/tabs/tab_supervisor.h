@@ -47,6 +47,7 @@ class TabAccount;
 class TabDeckEditor;
 class TabDeveloper;
 class TabLog;
+class TabPublicDecks;
 class RoomEvent;
 class GameEventContainer;
 class Event_GameJoined;
@@ -114,6 +115,7 @@ private:
     QMap<int, TabGame *> gameTabs;
     QList<TabGame *> replayTabs;
     QMap<QString, TabMessage *> messageTabs;
+    QMap<QString, TabPublicDecks *> publicDecksTabs;
     QList<AbstractTabDeckEditor *> deckEditorTabs;
     bool isLocalGame;
 
@@ -126,6 +128,8 @@ private:
     static QString sanitizeTabName(QString dirty);
     static QString sanitizeHtml(QString dirty);
     void resetTabsMenu();
+    /** Shared join/spectate driver behind the report tab and the profile hover card. */
+    void joinGameByIntent(int gameId, int roomId, bool asSpectator);
 
 public:
     explicit TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent = nullptr);
@@ -152,6 +156,10 @@ public:
         return userInfo;
     }
     [[nodiscard]] AbstractClient *getClient() const;
+    [[nodiscard]] AbstractClient *getServerClient() const
+    {
+        return client;
+    }
     [[nodiscard]] UserListManager *getUserListManager() const
     {
         return userListManager;
@@ -192,6 +200,8 @@ public slots:
     TabEdhRec *addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCommander = false);
     void openReplay(GameReplay *replay);
     void joinReportGame(int gameId, int roomId);
+    /** Joins or spectates a game listed on a user's profile hover card. */
+    void joinGameFromUserCard(int gameId, int roomId, bool asSpectator);
     void openTabModeration(const QString &userName = {});
     void switchToFirstAvailableNetworkTab();
     void maximizeMainWindow();
@@ -199,6 +209,7 @@ public slots:
     void actTabReplays(bool checked);
     void openTabServer();
     void addRoomTab(const ServerInfo_Room &info, bool setCurrent);
+    void openTabPublicDecks(const QString &userName);
 private slots:
     void refreshShortcuts();
 
@@ -231,6 +242,7 @@ private slots:
     void localGameJoined(const Event_GameJoined &event);
     void gameLeft(TabGame *tab);
     void roomLeft(TabRoom *tab);
+    void publicDecksClosed(TabPublicDecks *tab);
     TabMessage *addMessageTab(const QString &userName, bool focus);
     void replayLeft(TabGame *tab);
     void processUserLeft(const QString &userName);

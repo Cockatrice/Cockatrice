@@ -61,7 +61,14 @@ public:
                               QString password,
                               bool savePassword,
                               QString site = QString());
+    void updateServerFields(int index,
+                            const QString &saveName,
+                            const QString &username,
+                            const QString &password,
+                            bool savePassword,
+                            const QString &site);
     int findServerIndex(const QString &host, const QString &port) const;
+    int findHostIndex(const QString &host) const;
     bool hasUsername(const QString &host, const QString &port) const;
     bool hasCredentials(const QString &host, const QString &port) const;
     bool hasLoginData(const QString &host, const QString &port) const;

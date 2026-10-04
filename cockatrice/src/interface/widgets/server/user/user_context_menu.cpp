@@ -37,6 +37,7 @@ UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *parent,
     aDetails = new QAction(QString(), this);
     aChat = new QAction(QString(), this);
     aShowGames = new QAction(QString(), this);
+    aViewPublicDecks = new QAction(QString(), this);
     aAddToBuddyList = new QAction(QString(), this);
     aRemoveFromBuddyList = new QAction(QString(), this);
     aAddToIgnoreList = new QAction(QString(), this);
@@ -64,6 +65,7 @@ void UserContextMenu::retranslateUi()
     aDetails->setText(tr("User &details"));
     aChat->setText(tr("Private &chat"));
     aShowGames->setText(tr("Show this user's &games"));
+    aViewPublicDecks->setText(tr("View this user's &public decks"));
     aAddToBuddyList->setText(tr("Add to &buddy list"));
     aRemoveFromBuddyList->setText(tr("Remove from &buddy list"));
     aAddToIgnoreList->setText(tr("Add to &ignore list"));
@@ -376,6 +378,9 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
     }
     menu->addAction(aDetails);
     menu->addAction(aShowGames);
+    if (userLevel.testFlag(ServerInfo_User::IsRegistered)) {
+        menu->addAction(aViewPublicDecks);
+    }
     menu->addAction(aChat);
     const QList<GameInviteOption> inviteOptions = inviteOptionsForUser(userName);
     if (!inviteOptions.isEmpty()) {
@@ -455,6 +460,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
     aChat->setEnabled(anotherUser && online && !userListProxy->isUserIgnored(userName));
     aShowGames->setEnabled(online);
     aReport->setEnabled(anotherUser);
+    aViewPublicDecks->setEnabled(anotherUser);
     aAddToBuddyList->setEnabled(anotherUser);
     aRemoveFromBuddyList->setEnabled(anotherUser);
     aAddToIgnoreList->setEnabled(anotherUser);
@@ -481,6 +487,8 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         execChat(userName);
     } else if (actionClicked == aShowGames) {
         execShowGames(userName);
+    } else if (actionClicked == aViewPublicDecks) {
+        execViewPublicDecks(userName);
     } else if (actionClicked == aAddToBuddyList) {
         execAddToBuddy(userName);
     } else if (actionClicked == aRemoveFromBuddyList) {
@@ -602,6 +610,11 @@ void UserContextMenu::execShowGames(const QString &userName)
     PendingCommand *pend = client->prepareSessionCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &UserContextMenu::gamesOfUserReceived);
     client->sendCommand(pend);
+}
+
+void UserContextMenu::execViewPublicDecks(const QString &userName)
+{
+    tabSupervisor->openTabPublicDecks(userName);
 }
 
 void UserContextMenu::execAddToBuddy(const QString &userName)

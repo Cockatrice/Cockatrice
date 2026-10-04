@@ -1,11 +1,10 @@
 #include "deck_preview_color_identity_filter_widget.h"
 
 #include "../../cards/additional_info/mana_symbol_widget.h"
-#include "../visual_deck_storage_widget.h"
 
 #include <QSet>
 
-DeckPreviewColorIdentityFilterWidget::DeckPreviewColorIdentityFilterWidget(VisualDeckStorageWidget *parent)
+DeckPreviewColorIdentityFilterWidget::DeckPreviewColorIdentityFilterWidget(QWidget *parent)
     : QWidget(parent), layout(new QHBoxLayout(this))
 {
     setLayout(layout);

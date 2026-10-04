@@ -78,6 +78,7 @@ signals:
 
 protected:
     void initializeSearchBarAndCompleter();
+    void addCardFromSearch();
     void initializeDisplayOptionsWidget();
     void initializeDisplayOptionsAndSearchWidget();
     void initializeScrollAreaAndZoneContainer();

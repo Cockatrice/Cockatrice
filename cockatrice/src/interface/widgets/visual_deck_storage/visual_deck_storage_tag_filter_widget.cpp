@@ -2,14 +2,10 @@
 
 #include "../general/layout_containers/flow_widget.h"
 #include "deck_preview/deck_preview_tag_display_widget.h"
-#include "visual_deck_storage_model.h"
-#include "visual_deck_storage_sort_filter_proxy_model.h"
-#include "visual_deck_storage_widget.h"
 
 #include <QHBoxLayout>
 
-VisualDeckStorageTagFilterWidget::VisualDeckStorageTagFilterWidget(VisualDeckStorageWidget *_parent)
-    : QWidget(_parent), parent(_parent)
+VisualDeckStorageTagFilterWidget::VisualDeckStorageTagFilterWidget(QWidget *parent) : QWidget(parent)
 {
 
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -25,99 +21,72 @@ VisualDeckStorageTagFilterWidget::VisualDeckStorageTagFilterWidget(VisualDeckSto
     layout->addWidget(flowWidget);
 }
 
+void VisualDeckStorageTagFilterWidget::setAllTagsProvider(const std::function<QSet<QString>()> &provider)
+{
+    allTagsProvider = provider;
+}
+
 void VisualDeckStorageTagFilterWidget::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
     refreshTags();
 }
 
-/**
- * @brief The tags of all decks currently accepted by the proxy model.
- */
-QSet<QString> VisualDeckStorageTagFilterWidget::gatherAllTags() const
-{
-    QSet<QString> allTags;
-    auto *proxy = parent->proxyModel();
-
-    for (int proxyRow = 0; proxyRow < proxy->rowCount(); ++proxyRow) {
-        const QModelIndex index = proxy->index(proxyRow, 0);
-        if (!index.data(VisualDeckStorageRoles::FilterMatchRole).toBool()) {
-            continue;
-        }
-        const QStringList deckTags = index.data(VisualDeckStorageRoles::TagsRole).toStringList();
-        for (const QString &tag : deckTags) {
-            allTags.insert(tag);
-        }
-    }
-
-    return allTags;
-}
-
 void VisualDeckStorageTagFilterWidget::refreshTags()
 {
-    QSet<QString> allTags = gatherAllTags();
-    removeTagsNotInList(allTags);
-    addTagsIfNotPresent(allTags);
-    sortTags();
-}
+    const QSet<QString> allTags = allTagsProvider ? allTagsProvider() : QSet<QString>();
 
-void VisualDeckStorageTagFilterWidget::removeTagsNotInList(const QSet<QString> &tags)
-{
+    // Existing chips survive if their tag is still part of the deck set, or if the chip
+    // is currently selected/excluded. Everything else is dropped. Dropped chips must NOT
+    // be re-added to the layout afterwards: they are reparented to nullptr and scheduled
+    // for a deferred delete (QWidget::setParent(nullptr) also hides them), and the flow
+    // layout would keep a dangling reference to them once the deletion runs on the next
+    // event-loop cycle.
+    QList<DeckPreviewTagDisplayWidget *> chips;
     for (DeckPreviewTagDisplayWidget *tagWidget : findChildren<DeckPreviewTagDisplayWidget *>()) {
-        const QString &tagName = tagWidget->getTagName();
-
-        // Keep the tag widget if it is either selected or excluded
-        if (!tags.contains(tagName) && tagWidget->getState() == TagState::NotSelected) {
+        if (tagWidget->getState() != TagState::NotSelected || allTags.contains(tagWidget->getTagName())) {
+            chips.append(tagWidget);
+        } else {
             flowWidget->removeWidget(tagWidget);
+            tagWidget->setParent(nullptr);
             tagWidget->deleteLater();
         }
     }
-}
 
-void VisualDeckStorageTagFilterWidget::addTagsIfNotPresent(const QSet<QString> &tags)
-{
-    for (const QString &tag : tags) {
-        addTagIfNotPresent(tag);
+    // Add chips for tags that are not shown yet.
+    QSet<QString> existingTags;
+    for (DeckPreviewTagDisplayWidget *tagWidget : chips) {
+        existingTags.insert(tagWidget->getTagName());
     }
-}
-
-void VisualDeckStorageTagFilterWidget::addTagIfNotPresent(const QString &tag)
-{
-    // Check if the tag already exists in the flow widget
-    bool tagExists = false;
-    for (DeckPreviewTagDisplayWidget *tagWidget : findChildren<DeckPreviewTagDisplayWidget *>()) {
-        if (tagWidget->getTagName() == tag) {
-            tagExists = true;
-            break;
+    for (const QString &tag : allTags) {
+        if (!existingTags.contains(tag)) {
+            auto *newTagWidget = new DeckPreviewTagDisplayWidget(this, tag);
+            connect(newTagWidget, &DeckPreviewTagDisplayWidget::tagClicked, this,
+                    &VisualDeckStorageTagFilterWidget::filterChanged);
+            flowWidget->addWidget(newTagWidget);
+            chips.append(newTagWidget);
         }
     }
 
-    // If the tag doesn't exist, add a new DeckPreviewTagDisplayWidget
-    if (!tagExists) {
-        auto *newTagWidget = new DeckPreviewTagDisplayWidget(this, tag);
-        connect(newTagWidget, &DeckPreviewTagDisplayWidget::tagClicked, parent,
-                &VisualDeckStorageWidget::updateTagFilter);
-        flowWidget->addWidget(newTagWidget);
-    }
-}
-
-void VisualDeckStorageTagFilterWidget::sortTags()
-{
-    // Get all tag widgets
-    QList<DeckPreviewTagDisplayWidget *> tagWidgets = findChildren<DeckPreviewTagDisplayWidget *>();
-
-    // Sort widgets by tag name
-    std::sort(tagWidgets.begin(), tagWidgets.end(), [](DeckPreviewTagDisplayWidget *a, DeckPreviewTagDisplayWidget *b) {
-        return a->getTagName().toLower() < b->getTagName().toLower();
+    // Sort, but skip the full remove/re-add when the order already matches the layout.
+    // FlowWidget inherits QLayout::removeWidget's linear scan, so rebuilding an unchanged
+    // order would be quadratic plus a full relayout on every chip click and load batch.
+    std::sort(chips.begin(), chips.end(), [](DeckPreviewTagDisplayWidget *a, DeckPreviewTagDisplayWidget *b) {
+        const QString aName = a->getTagName();
+        const QString bName = b->getTagName();
+        const int compared = aName.compare(bName, Qt::CaseInsensitive);
+        return compared != 0 ? compared < 0 : aName < bName;
     });
-
-    // Clear and re-add widgets in sorted order
-    for (DeckPreviewTagDisplayWidget *tagWidget : tagWidgets) {
+    if (chips == currentChipOrder) {
+        return;
+    }
+    for (DeckPreviewTagDisplayWidget *tagWidget : chips) {
         flowWidget->removeWidget(tagWidget);
     }
-    for (DeckPreviewTagDisplayWidget *tagWidget : tagWidgets) {
+    for (DeckPreviewTagDisplayWidget *tagWidget : chips) {
         flowWidget->addWidget(tagWidget);
     }
+    currentChipOrder = chips;
 }
 
 QStringList VisualDeckStorageTagFilterWidget::selectedTags() const

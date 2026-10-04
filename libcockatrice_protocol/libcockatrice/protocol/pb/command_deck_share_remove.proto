@@ -1,0 +1,11 @@
+syntax = "proto2";
+import "session_commands.proto";
+
+// Revokes one of the calling user's own share bundles. The referenced items
+// are removed by cascade.
+message Command_DeckShareRemove {
+    extend SessionCommand {
+        optional Command_DeckShareRemove ext = 1033;
+    }
+    optional uint32 share_id = 1;
+}

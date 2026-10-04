@@ -2,6 +2,7 @@
 
 #include "../../../../client/settings/cache_settings.h"
 #include "../../client/sound_engine.h"
+#include "../../interface/card_localization.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../../interface/widgets/tabs/tab_account.h"
 #include "../user/user_context_menu.h"
@@ -167,7 +168,7 @@ void ChatView::appendHtmlServerMessage(const QString &html, bool optionalIsBold,
 
     QString htmlText =
         "<font color=" + ((optionalFontColor.size() > 0) ? optionalFontColor : serverMessageColor.name()) + ">" +
-        QDateTime::currentDateTime().toString("[hh:mm:ss] ") + html + "</font>";
+        getCurrentTime() + html + "</font>";
 
     if (optionalIsBold) {
         htmlText = "<b>" + htmlText + "</b>";
@@ -179,13 +180,19 @@ void ChatView::appendHtmlServerMessage(const QString &html, bool optionalIsBold,
     }
 }
 
+QString ChatView::getCurrentTime() const
+{
+    return QDateTime::currentDateTime().toString("[hh:mm:ss] ");
+}
+
 void ChatView::appendCardTag(QTextCursor &cursor, const QString &cardName)
 {
     QTextCharFormat oldFormat = cursor.charFormat();
     QTextCharFormat cardFormat = oldFormat;
     cardFormat.setFontItalic(true);
 
-    if (!CardDatabaseManager::query()->lookupCardByName(cardName)) {
+    const CardInfoPtr card = CardDatabaseManager::query()->lookupCardByName(cardName);
+    if (card.isNull()) {
         cardFormat.setForeground(unresolvedCardTagColor);
         cursor.setCharFormat(cardFormat);
         cursor.insertText(cardName);
@@ -195,10 +202,12 @@ void ChatView::appendCardTag(QTextCursor &cursor, const QString &cardName)
 
     cardFormat.setForeground(linkColor);
     cardFormat.setAnchor(true);
+    // The href keeps the canonical name so the card popup can resolve it, while the text shows the name
+    // in the configured card language.
     cardFormat.setAnchorHref("card://" + cardName);
 
     cursor.setCharFormat(cardFormat);
-    cursor.insertText(cardName);
+    cursor.insertText(CardLocalization::displayName(card));
     cursor.setCharFormat(oldFormat);
 }
 
@@ -290,7 +299,7 @@ void ChatView::appendMessage(QString message,
         timeFormat.setForeground(serverMessageColor);
         timeFormat.setFontWeight(QFont::Bold);
         cursor.setCharFormat(timeFormat);
-        cursor.insertText(QDateTime::currentDateTime().toString("[hh:mm:ss] "));
+        cursor.insertText(getCurrentTime());
     }
 
     // nickname
@@ -340,16 +349,27 @@ void ChatView::appendMessage(QString message,
                 pos.relativePosition = match.captured(0).length(); // set message start
                 auto before = match.captured(1);
                 auto sentBy = match.captured(2);
+
+                // The user level is not carried in the room chat history, so history
+                // entries used to render as fixed-level user tags. Resolve online users
+                // against the user list to turn their history entries into full user
+                // tags (correct level, name casing and moderation context menu).
+                QString displayName = sentBy;
+                // Offline users have no known level; render them as zero-level tags.
+                QString levelMarker = "0";
+                if (const ServerInfo_User *onlineUser = userListProxy->getOnlineUser(sentBy)) {
+                    displayName = QString::fromStdString(onlineUser->name());
+                    levelMarker = QString::number(onlineUser->user_level());
+                }
+
                 cursor.insertText(before); // add message timestamp
                 QTextCharFormat senderFormat(defaultFormat);
                 senderFormat.setAnchor(true);
-                // this underscore is important, it is used to add the user level, but in this case the level is
-                // unknown, if the name contains an underscore it would split up the name
-                senderFormat.setAnchorHref("user://_" + sentBy);
+                senderFormat.setAnchorHref("user://" + levelMarker + "_" + displayName);
                 cursor.setCharFormat(senderFormat);
-                cursor.insertText(sentBy);                   // add username with href so it shows the menu
-                userMessagePositions[sentBy].append(pos);    // save message position
-                message.remove(0, pos.relativePosition - 2); // do not remove semicolon
+                cursor.insertText(displayName);                // add username with href so it shows the menu
+                userMessagePositions[displayName].append(pos); // save message position
+                message.remove(0, pos.relativePosition - 2);   // do not remove semicolon
             }
         } else {
             //! \todo Remove hardcoded color.

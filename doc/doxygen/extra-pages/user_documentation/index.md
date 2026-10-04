@@ -11,6 +11,14 @@
 
 - @subpage beta_release
 
+## Settings
+
+- @subpage settings_folder
+
+## Card Pictures
+
+- @subpage custom_card_pictures
+
 ## Troubleshooting
 
 - @subpage fixing_card_pictures

@@ -1,0 +1,10 @@
+syntax = "proto2";
+import "session_commands.proto";
+
+message Command_DeckShareDownload {
+    extend SessionCommand {
+        optional Command_DeckShareDownload ext = 1028;
+    }
+    optional string token = 1;
+    optional uint32 item_id = 2;
+}

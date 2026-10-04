@@ -65,25 +65,31 @@ void CardSearchModel::updateSearchResults(const QString &query)
             continue;
         }
 
-        const QString lowerName = card->getName().toLower();
-        if (!lowerName.contains(lowerQuery)) {
-            continue;
-        }
+        // The completer suggestions match against the same languages the card
+        // search uses, so typing a localized name finds the card. In Both mode
+        // either language can match.
+        for (const QString &matchName : searchableNames(card)) {
+            const QString lowerName = matchName.toLower();
+            if (!lowerName.contains(lowerQuery)) {
+                continue;
+            }
 
-        const int distance = levenshteinDistance(lowerQuery, lowerName);
+            const int distance = levenshteinDistance(lowerQuery, lowerName);
 
-        if (lowerName.startsWith(lowerQuery)) {
-            prefixMatches.append({card, distance});
-        } else {
-            containsMatches.append({card, distance});
+            if (lowerName.startsWith(lowerQuery)) {
+                prefixMatches.append({card, distance});
+            } else {
+                containsMatches.append({card, distance});
+            }
+            break;
         }
     }
 
-    auto sortByDistanceThenLength = [](const SearchResult &a, const SearchResult &b) {
+    auto sortByDistanceThenLength = [this](const SearchResult &a, const SearchResult &b) {
         if (a.distance != b.distance) {
             return a.distance < b.distance;
         }
-        return a.card->getName().size() < b.card->getName().size();
+        return sortableName(a.card).size() < sortableName(b.card).size();
     };
 
     std::sort(prefixMatches.begin(), prefixMatches.end(), sortByDistanceThenLength);
@@ -100,4 +106,26 @@ void CardSearchModel::updateSearchResults(const QString &query)
     }
 
     endResetModel();
+}
+
+QStringList CardSearchModel::searchableNames(const CardInfoPtr &card) const
+{
+    if (searchLanguage.isEnglishOnly()) {
+        return {card->getName()};
+    }
+
+    const QString localizedName = card->getLocalizedName(searchLanguage.language);
+    if (searchLanguage.mode == SearchLanguageMode::Selected) {
+        return {localizedName};
+    }
+
+    return {card->getName(), localizedName};
+}
+
+QString CardSearchModel::sortableName(const CardInfoPtr &card) const
+{
+    if (searchLanguage.isEnglishOnly()) {
+        return card->getName();
+    }
+    return card->getLocalizedName(searchLanguage.language);
 }

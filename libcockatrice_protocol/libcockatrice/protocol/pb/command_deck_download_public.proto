@@ -1,0 +1,9 @@
+syntax = "proto2";
+import "session_commands.proto";
+
+message Command_DeckDownloadPublic {
+    extend SessionCommand {
+        optional Command_DeckDownloadPublic ext = 1031;
+    }
+    optional uint32 deck_id = 1;
+}

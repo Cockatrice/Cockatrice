@@ -15,9 +15,17 @@ set(PROTO_FILES
     command_deck_del.proto
     command_deck_del_dir.proto
     command_deck_download.proto
+    command_deck_download_public.proto
     command_deck_list.proto
+    command_deck_list_other_user.proto
     command_deck_new_dir.proto
     command_deck_select.proto
+    command_deck_set_visibility.proto
+    command_deck_share_create.proto
+    command_deck_share_download.proto
+    command_deck_share_list.proto
+    command_deck_share_list_mine.proto
+    command_deck_share_remove.proto
     command_deck_upload.proto
     command_del_counter.proto
     command_delete_arrow.proto
@@ -137,6 +145,10 @@ set(PROTO_FILES
     response_card_art_rule_entry.proto
     response_deck_download.proto
     response_deck_list.proto
+    response_deck_share_create.proto
+    response_deck_share_download.proto
+    response_deck_share_list.proto
+    response_deck_share_list_mine.proto
     response_deck_upload.proto
     response_dump_zone.proto
     response_forgotpasswordrequest.proto
@@ -175,6 +187,8 @@ set(PROTO_FILES
     serverinfo_cardcounter.proto
     serverinfo_chat_message.proto
     serverinfo_counter.proto
+    serverinfo_deck_share_item.proto
+    serverinfo_deck_share_summary.proto
     serverinfo_deckstorage.proto
     serverinfo_game.proto
     serverinfo_gametype.proto

@@ -1,11 +1,43 @@
 #include "settings_migration.h"
 
+#include <QDateTime>
+#include <QDir>
+#include <QDirIterator>
 #include <QFile>
+#include <QFileInfo>
+#include <QLoggingCategory>
 #include <QMap>
 #include <QSettings>
 #include <QStringList>
+#include <algorithm>
+
+inline Q_LOGGING_CATEGORY(SettingsMigrationLog, "settings_migration");
 
 static const QString MIGRATION_SENTINEL_KEY = QStringLiteral("migration/perfile_complete");
+
+/**
+ * True when global.ini holds keys that migrateSettingsFromGlobalIni() would still move, i.e. the
+ * exact condition that function uses to decide whether it has work to do. If a user runs an older
+ * Cockatrice build that writes to global.ini (non-sentinel keys) and then upgrades back, those new
+ * keys would otherwise be silently ignored, so they are re-migrated instead.
+ */
+static bool hasPendingGlobalIniSettings(const QString &settingsPath)
+{
+    if (!QFile::exists(settingsPath + "global.ini")) {
+        return false;
+    }
+
+    QSettings globalIni(settingsPath + "global.ini", QSettings::IniFormat);
+    if (!globalIni.value(MIGRATION_SENTINEL_KEY, false).toBool()) {
+        return true;
+    }
+
+    // The sentinel is set, so any key besides it was written after the migration, i.e. by an
+    // older build sharing this file. Those are exactly the keys to re-migrate.
+    QStringList otherKeys = globalIni.allKeys();
+    otherKeys.removeAll(MIGRATION_SENTINEL_KEY);
+    return !otherKeys.isEmpty();
+}
 
 static void migrateTabsSettings(const QString &settingsPath, QSettings &globalIni)
 {
@@ -658,21 +690,11 @@ bool SettingsMigration::migrateLegacySettings(const QString &settingsPath)
 
 bool SettingsMigration::migrateSettingsFromGlobalIni(const QString &settingsPath)
 {
-    if (!QFile::exists(settingsPath + "global.ini")) {
+    if (!hasPendingGlobalIniSettings(settingsPath)) {
         return false;
     }
 
     QSettings globalIni(settingsPath + "global.ini", QSettings::IniFormat);
-    if (globalIni.value(MIGRATION_SENTINEL_KEY, false).toBool()) {
-        // If a user runs an older Cockatrice build that writes to global.ini (non-sentinel keys)
-        // and then upgrades back, those new keys will be silently ignored. Re-migrate them.
-        globalIni.sync();
-        auto allKeys = globalIni.allKeys();
-        allKeys.removeAll(MIGRATION_SENTINEL_KEY);
-        if (allKeys.isEmpty()) {
-            return false;
-        }
-    }
 
     migrateTabsSettings(settingsPath, globalIni);
     migrateSoundSettings(settingsPath, globalIni);
@@ -699,4 +721,79 @@ bool SettingsMigration::migrateSettingsFromGlobalIni(const QString &settingsPath
     newGlobalIni.sync();
 
     return true;
+}
+
+bool SettingsMigration::isMigrationPending(const QString &settingsPath)
+{
+    if (hasPendingGlobalIniSettings(settingsPath)) {
+        return true;
+    }
+
+    QSettings personalIni(settingsPath + "personal.ini", QSettings::IniFormat);
+    if (personalIni.value("migration/legacy_complete", false).toBool()) {
+        return false;
+    }
+
+    // migrateLegacySettings() also runs on an empty profile, where it only writes its sentinel.
+    // Reporting that as pending would leave a backup folder behind on every fresh install, so
+    // only count it when there really are legacy keys left to move.
+    return !QSettings().allKeys().isEmpty();
+}
+
+QString SettingsMigration::backupSettingsDirectory(const QString &settingsPath)
+{
+    QDir settingsDir(QDir::cleanPath(settingsPath));
+    if (!settingsDir.exists()) {
+        return QString();
+    }
+
+    const QDir::Filters fileFilters = QDir::Files | QDir::Hidden | QDir::System | QDir::NoDotAndDotDot;
+
+    // A profile holding nothing but empty files has nothing to lose, and backing it up would only
+    // leave clutter next to the settings folder.
+    const QFileInfoList files = settingsDir.entryInfoList(fileFilters);
+    const bool hasContent =
+        std::any_of(files.cbegin(), files.cend(), [](const QFileInfo &file) { return file.size() > 0; });
+    if (!hasContent) {
+        return QString();
+    }
+
+    // Keep the backup a sibling of the settings folder rather than a child: a folder that is never
+    // copied into its own backup, and one the "Open settings folder" action does not have to skip.
+    QDir backupParentDir(settingsDir.absolutePath());
+    if (!backupParentDir.cdUp()) {
+        qCWarning(SettingsMigrationLog) << "[SettingsMigration] Could not resolve the parent of the settings folder:"
+                                        << settingsDir.absolutePath();
+        return QString();
+    }
+
+    const QString backupName =
+        QStringLiteral("settings-backup-") + QDateTime::currentDateTime().toString("yyyyMMdd-HHmmss");
+    QString backupPath = backupParentDir.absoluteFilePath(backupName);
+    // Two migrations inside the same second must not merge into a single folder.
+    for (int suffix = 1; QFileInfo::exists(backupPath); ++suffix) {
+        backupPath = backupParentDir.absoluteFilePath(backupName + '-' + QString::number(suffix));
+    }
+
+    if (!QDir().mkpath(backupPath)) {
+        qCWarning(SettingsMigrationLog) << "[SettingsMigration] Could not create the settings backup folder:"
+                                        << backupPath;
+        return QString();
+    }
+
+    QDir backupDir(backupPath);
+    QDirIterator it(settingsDir.absolutePath(), fileFilters, QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        it.next();
+
+        const QString target = backupDir.absoluteFilePath(settingsDir.relativeFilePath(it.filePath()));
+        QDir().mkpath(QFileInfo(target).absolutePath());
+        if (!QFile::copy(it.filePath(), target)) {
+            // A partially copied backup still beats none: report it and let the migration run.
+            qCWarning(SettingsMigrationLog) << "[SettingsMigration] Could not back up settings file:" << it.filePath();
+        }
+    }
+
+    qCInfo(SettingsMigrationLog) << "[SettingsMigration] Settings backed up to" << backupPath;
+    return backupPath;
 }

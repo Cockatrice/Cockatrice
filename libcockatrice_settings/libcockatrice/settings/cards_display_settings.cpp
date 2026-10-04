@@ -90,6 +90,11 @@ int CardsDisplaySettings::getVisualDeckEditorCardSize() const
     return getValue("visualDeckEditor", "cards", "cardSize", 100).toInt();
 }
 
+bool CardsDisplaySettings::getVisualDeckEditorShowCardCounts() const
+{
+    return getValue("visualDeckEditorShowCardCounts", QString(), QString(), true).toBool();
+}
+
 int CardsDisplaySettings::getEDHRecCardSize() const
 {
     return getValue("edhrec", "cards", "cardSize", 100).toInt();
@@ -108,6 +113,11 @@ int CardsDisplaySettings::getSampleHandSize() const
 QString CardsDisplaySettings::getCardLang() const
 {
     return getValue("cardLang", QString(), QString(), "en").toString();
+}
+
+int CardsDisplaySettings::getCardSearchLanguage() const
+{
+    return getValue("cardSearchLanguage", QString(), QString(), static_cast<int>(SearchLanguageMode::English)).toInt();
 }
 
 void CardsDisplaySettings::setDisplayCardNames(bool _displayCardNames)
@@ -212,6 +222,15 @@ void CardsDisplaySettings::setVisualDeckEditorCardSize(int _cardSize)
     emit visualDeckEditorCardSizeChanged();
 }
 
+void CardsDisplaySettings::setVisualDeckEditorShowCardCounts(bool _showCardCounts)
+{
+    if (_showCardCounts == getVisualDeckEditorShowCardCounts()) {
+        return;
+    }
+    setValue(_showCardCounts, "visualDeckEditorShowCardCounts");
+    emit visualDeckEditorShowCardCountsChanged(_showCardCounts);
+}
+
 void CardsDisplaySettings::setEDHRecCardSize(int _edhrecCardSize)
 {
     setValue(_edhrecCardSize, "edhrec", "cards", "cardSize");
@@ -241,4 +260,13 @@ void CardsDisplaySettings::setCardLang(const QString &_cardLang)
     // observe a stale (pre-change) value.
     sync();
     emit cardLangChanged(_cardLang);
+}
+
+void CardsDisplaySettings::setCardSearchLanguage(int _cardSearchLanguage)
+{
+    if (_cardSearchLanguage == getCardSearchLanguage()) {
+        return;
+    }
+    setValue(_cardSearchLanguage, "cardSearchLanguage");
+    emit cardSearchLanguageChanged(_cardSearchLanguage);
 }

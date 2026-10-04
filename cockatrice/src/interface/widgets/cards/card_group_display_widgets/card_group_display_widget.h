@@ -55,6 +55,7 @@ public slots:
     virtual void onCardRemoval(const QModelIndex &parent, int first, int last);
     void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
     void onActiveSortCriteriaChanged(QStringList activeSortCriteria);
+    void updateCardCount();
     void resizeEvent(QResizeEvent *event) override;
 
 signals:

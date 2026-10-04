@@ -10,6 +10,7 @@
 #include <QNetworkAccessManager>
 #include <QObject>
 #include <QRandomGenerator>
+#include <QString>
 #include <QThread>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/utility/server_rate_limiter.h>
@@ -36,12 +37,35 @@ class CardPictureLoaderWorkerWork : public QObject
 public:
     /**
      * @brief Constructs a worker for downloading a specific card image.
-     * @param worker The orchestrating CardPictureLoaderWorker
+     * @param worker The orchestrating CardPictureLoaderWorker; the work object becomes its child so
+     *               it is destroyed with the worker even if it never reaches concludeImageLoad().
      * @param toLoad The ExactCard to download
      */
-    explicit CardPictureLoaderWorkerWork(const CardPictureLoaderWorker *worker, const ExactCard &toLoad);
+    explicit CardPictureLoaderWorkerWork(CardPictureLoaderWorker *worker, const ExactCard &toLoad);
 
     CardPictureToLoad cardToDownload; ///< The card and associated URLs to try downloading
+
+    /** @brief Shared per-server 429 backoff state. */
+    static const ServerRateLimiter &rateLimiter();
+
+    /**
+     * @brief Starts downloading the next URL for this card.
+     *
+     * Skips URLs whose server is currently in 429 backoff, either waiting the
+     * backoff out or falling through to the other configured sources.
+     */
+    void startNextPicDownload();
+
+    /**
+     * @brief Schedules a deferred retry after the relevant server backoff expires.
+     * @param preferredHost The server that is actually blocking the request, or an empty
+     *                      string to use the current URL's server
+     *
+     * Waits on the blocking server's backoff deadline, otherwise on the earliest active
+     * backoff. If no servers are in backoff, concludes with failure. Otherwise resets the
+     * CardPictureToLoad indices and retries after the backoff period.
+     */
+    void scheduleDeferredRetry(const QString &preferredHost = {});
 
 public slots:
     /**
@@ -54,9 +78,6 @@ private:
     bool picDownload; ///< Whether network downloading is enabled
 
     static ServerRateLimiter s_rateLimiter; ///< Shared per-server 429 backoff state
-
-    /** @brief Starts downloading the next URL for this card. */
-    void startNextPicDownload();
 
     /** @brief Called when all URLs have been exhausted or download failed. */
     void picDownloadFailed();
@@ -81,16 +102,6 @@ private:
      * Emits imageLoaded() and deletes this object.
      */
     void concludeImageLoad(const QImage &image);
-
-    /**
-     * @brief Schedules a deferred retry after the relevant server backoff expires.
-     *
-     * Waits on the current URL's server when it is the reason we are blocked,
-     * otherwise on the earliest active backoff. If no servers are in backoff,
-     * concludes with failure. Otherwise resets the CardPictureToLoad indices and
-     * retries after the backoff period.
-     */
-    void scheduleDeferredRetry();
 
 private slots:
     /** @brief Updates the picDownload setting when it changes. */

@@ -214,6 +214,9 @@ protected slots:
     /** @brief Saves the current deck under a new name. */
     virtual bool actSaveDeckAs();
 
+    /** @brief Opens the deck share dialog for the current deck. */
+    void actShareDeck();
+
     /** @brief Loads a deck from the clipboard. */
     virtual void actLoadDeckFromClipboard();
 

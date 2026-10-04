@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+message ServerInfo_DeckShareItem {
+    optional uint32 id = 1;
+    optional string name = 2;
+    repeated string tags = 3;
+    optional string banner_card = 4;
+    optional string game_format = 5;
+    optional string color_identity = 6;
+}

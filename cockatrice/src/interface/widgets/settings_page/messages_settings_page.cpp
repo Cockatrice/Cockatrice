@@ -64,6 +64,10 @@ MessagesSettingsPage::MessagesSettingsPage()
     connect(&ignoreAllPrivateMessagesCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().chat(),
             &ChatSettings::setIgnoreAllPrivateMessages);
 
+    useGameTimeCheckBox.setChecked(SettingsCache::instance().chat().getUseGameTime());
+    connect(&useGameTimeCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().chat(),
+            &ChatSettings::setUseGameTime);
+
     customAlertString = new QLineEdit();
     customAlertString->setText(SettingsCache::instance().chat().getHighlightWords());
     connect(customAlertString, &QLineEdit::textChanged, &SettingsCache::instance().chat(),
@@ -82,6 +86,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     chatGrid->addWidget(&mentionPopups, 6, 0);
     chatGrid->addWidget(&roomHistory, 7, 0);
     chatGrid->addWidget(&ignoreAllPrivateMessagesCheckBox, 8, 0);
+    chatGrid->addWidget(&useGameTimeCheckBox, 9, 0);
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatGrid);
 
@@ -253,6 +258,7 @@ void MessagesSettingsPage::retranslateUi()
     mentionPopups.setText(tr("Enable desktop notification for mentions"));
     roomHistory.setText(tr("Enable room message history on join"));
     ignoreAllPrivateMessagesCheckBox.setText(tr("Ignore all private messages"));
+    useGameTimeCheckBox.setText(tr("Use game time instead of local time in game logs"));
     hexLabel.setText(tr("(Color is hexadecimal)"));
     hexHighlightLabel.setText(tr("(Color is hexadecimal)"));
     customAlertStringLabel.setText(tr("Separate words with a space, alphanumeric characters only"));

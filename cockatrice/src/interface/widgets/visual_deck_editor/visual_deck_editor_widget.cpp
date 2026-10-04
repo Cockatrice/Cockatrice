@@ -20,6 +20,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QResizeEvent>
+#include <QTimer>
 #include <libcockatrice/card/card_info_comparator.h>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -82,13 +83,8 @@ void VisualDeckEditorWidget::initializeSearchBarAndCompleter()
     searchBar = new QLineEdit(searchContainer);
     searchContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     connect(searchBar, &QLineEdit::returnPressed, this, [=, this]() {
-        if (!searchBar->hasFocus()) {
-            return;
-        }
-
-        ExactCard card = CardDatabaseManager::query()->getCard({searchBar->text()});
-        if (card) {
-            emit cardAdditionRequested(card);
+        if (searchBar->hasFocus()) {
+            addCardFromSearch();
         }
     });
 
@@ -133,14 +129,22 @@ void VisualDeckEditorWidget::initializeSearchBarAndCompleter()
     // Search button functionality
     searchPushButton = new CompactPushButton(searchContainer);
     searchPushButton->setButtonIcon(themePixmap(QStringLiteral("icons/search")));
-    connect(searchPushButton, &QPushButton::clicked, this, [=, this]() {
-        ExactCard card = CardDatabaseManager::query()->getCard({searchBar->text()});
-        if (card) {
-            emit cardAdditionRequested(card);
-        }
-    });
+    connect(searchPushButton, &QPushButton::clicked, this, [this] { addCardFromSearch(); });
 
     searchLayout->addWidget(searchPushButton);
+}
+
+void VisualDeckEditorWidget::addCardFromSearch()
+{
+    ExactCard card = CardDatabaseManager::query()->getCard({searchBar->text()});
+    if (!card) {
+        return;
+    }
+
+    emit cardAdditionRequested(card);
+
+    searchBar->setFocus();
+    QTimer::singleShot(0, searchBar, [this] { searchBar->setSelection(0, searchBar->text().length()); });
 }
 
 void VisualDeckEditorWidget::initializeDisplayOptionsWidget()

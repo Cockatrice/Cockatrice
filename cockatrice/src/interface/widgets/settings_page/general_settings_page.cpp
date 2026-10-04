@@ -21,6 +21,7 @@
 #include <libcockatrice/settings/tabs_settings.h>
 #include <libcockatrice/settings/updates_settings.h>
 #include <libcockatrice/utility/macros.h>
+#include <libcockatrice/utility/translation_loader.h>
 
 enum startupCardUpdateCheckBehaviorIndex
 {
@@ -63,13 +64,26 @@ GeneralSettingsPage::GeneralSettingsPage()
     connect(&cardLanguageBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
             &GeneralSettingsPage::cardLanguageBoxChanged);
 
+    // card search language, independent of the card display language
+    cardSearchLanguageBox.addItem(""); // texts set in retranslateUi
+    cardSearchLanguageBox.addItem("");
+    cardSearchLanguageBox.addItem("");
+    const int cardSearchLanguageIndex = SettingsCache::instance().cardsDisplay().getCardSearchLanguage();
+    cardSearchLanguageBox.setCurrentIndex(cardSearchLanguageIndex < 0 ? static_cast<int>(SearchLanguageMode::English)
+                                                                      : cardSearchLanguageIndex);
+
+    connect(&cardSearchLanguageBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+            &GeneralSettingsPage::cardSearchLanguageBoxChanged);
+
     auto *languageGrid = new QGridLayout;
     languageGrid->addWidget(&languageLabel, 0, 0);
     languageGrid->addWidget(&languageBox, 0, 1);
     languageGrid->addWidget(&cardLanguageLabel, 1, 0);
     languageGrid->addWidget(&cardLanguageBox, 1, 1);
     languageGrid->addWidget(&cardLanguageNoteLabel, 2, 1);
-    languageGrid->addWidget(&advertiseTranslationPageLabel, 3, 1, Qt::AlignRight);
+    languageGrid->addWidget(&cardSearchLanguageLabel, 3, 0);
+    languageGrid->addWidget(&cardSearchLanguageBox, 3, 1);
+    languageGrid->addWidget(&advertiseTranslationPageLabel, 4, 1, Qt::AlignRight);
 
     cardLanguageNoteLabel.setWordWrap(true);
     cardLanguageNoteLabel.setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
@@ -320,22 +334,18 @@ GeneralSettingsPage::GeneralSettingsPage()
 
 QStringList GeneralSettingsPage::findQmFiles()
 {
-    QDir dir(translationPath);
-    QStringList fileNames = dir.entryList(QStringList(translationPrefix + "_*.qm"), QDir::Files, QDir::Name);
-    fileNames.replaceInStrings(QRegularExpression(translationPrefix + "_(.*)\\.qm"), "\\1");
-    return fileNames;
+    return TranslationLoader::availableLanguages(translationPrefix,
+                                                 TranslationLoader::applicationTranslationPaths(translationPath));
 }
 
 QString GeneralSettingsPage::languageName(const QString &lang)
 {
     QTranslator qTranslator;
 
-    QString appNameHint = translationPrefix + "_" + lang;
-    bool appTranslationLoaded = qTranslator.load(appNameHint, translationPath);
-    if (!appTranslationLoaded) {
-        qCWarning(GeneralSettingsPageLog)
-            << "Unable to load" << translationPrefix << "translation" << appNameHint << "at" << translationPath;
-    }
+    // Only the language name is needed here, so the file is loaded without logging a line per
+    // language: findQmFiles() asked for languages whose files exist in the first place.
+    TranslationLoader::loadFrom(qTranslator, translationPrefix + "_" + lang,
+                                TranslationLoader::applicationTranslationPaths(translationPath));
 
     return qTranslator.translate("i18n", DEFAULT_LANG_NAME);
 }
@@ -481,6 +491,11 @@ void GeneralSettingsPage::cardLanguageBoxChanged(int index)
     }
 }
 
+void GeneralSettingsPage::cardSearchLanguageBoxChanged(int index)
+{
+    SettingsCache::instance().cardsDisplay().setCardSearchLanguage(index);
+}
+
 void GeneralSettingsPage::updateStartupServerControlsVisibility()
 {
     const int index = startupTabSelector.currentIndex();
@@ -502,6 +517,12 @@ void GeneralSettingsPage::retranslateUi()
     cardLanguageLabel.setText(tr("Card text & images language:"));
     cardLanguageNoteLabel.setText(
         tr("Foreign card names, text and art apply after you update the card database (Oracle)."));
+    cardSearchLanguageLabel.setText(tr("Language used in card search:"));
+    cardSearchLanguageBox.setItemText(static_cast<int>(SearchLanguageMode::English), tr("English"));
+    cardSearchLanguageBox.setItemText(static_cast<int>(SearchLanguageMode::Selected),
+                                      tr("Selected card language (untranslated cards still match in English)"));
+    cardSearchLanguageBox.setItemText(static_cast<int>(SearchLanguageMode::Both),
+                                      tr("English and selected card language"));
     advertiseTranslationPageLabel.setText(
         QString("<a href='%1'>%2</a>").arg(WIKI_TRANSLATION_FAQ).arg(tr("How to help with translations")));
 

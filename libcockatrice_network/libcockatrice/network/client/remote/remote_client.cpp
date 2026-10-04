@@ -559,6 +559,15 @@ void RemoteClient::ping()
         PendingCommand *pend = i.next().value();
         if (pend->tick() > maxTimeout) {
             i.remove();
+            // Answer the command instead of dropping it silently: the connection may still
+            // be alive (other traffic keeps lastDataReceived fresh) while this single
+            // command stalled, and awaiters such as TabServer's room-join dedup can only
+            // release their in-flight markers when `finished` fires. A silent drop wedges
+            // them permanently - e.g. a room whose join timing never surfaces again.
+            Response response;
+            response.set_response_code(Response::RespNotConnected);
+            response.set_cmd_id(pend->getCommandContainer().cmd_id());
+            pend->processResponse(response);
             pend->deleteLater();
         }
     }

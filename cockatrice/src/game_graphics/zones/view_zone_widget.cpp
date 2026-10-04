@@ -21,6 +21,7 @@
 #include <QStyle>
 #include <QStyleOption>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 
 namespace
@@ -168,6 +169,12 @@ ZoneViewWidget::ZoneViewWidget(PlayerLogic *_player,
         }
 
         connect(&searchEdit, &QLineEdit::textChanged, zone, &ZoneViewZone::setFilterString);
+
+        const auto applyCardSearchLanguage = [this] { zone->setFilterString(searchEdit.text()); };
+        connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::cardLangChanged, this,
+                applyCardSearchLanguage);
+        connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::cardSearchLanguageChanged, this,
+                applyCardSearchLanguage);
     }
 
     setLayout(vbox);

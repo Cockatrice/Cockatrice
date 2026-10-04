@@ -171,7 +171,12 @@ void ServersSettings::addNewServer(const QString &saveName,
                                    bool savePassword,
                                    const QString &site)
 {
-    if (updateExistingServer(saveName, serv, port, username, password, savePassword, site)) {
+    // Match the exact host-plus-port server the caller is adding, so a link or
+    // public-server list entry cannot clobber the port (and credentials) of an
+    // unrelated entry that happens to share the same hostname.
+    const int existingIndex = findServerIndex(serv, port);
+    if (existingIndex >= 0) {
+        updateServerFields(existingIndex, saveName, username, password, savePassword, site);
         return;
     }
 
@@ -271,27 +276,37 @@ bool ServersSettings::updateExistingServer(QString saveName,
     for (int i = 0; i <= size; ++i) {
         if (serv == getValue(QString("server%1").arg(i), "server", "server_details").toString()) {
             setValue(port, QString("port%1").arg(i), "server", "server_details");
-            if (!username.isEmpty()) {
-                setValue(username, QString("username%1").arg(i), "server", "server_details");
-            }
-
-            if (savePassword && !password.isEmpty()) {
-                setValue(password, QString("password%1").arg(i), "server", "server_details");
-            } else {
-                setValue(QString(), QString("password%1").arg(i), "server", "server_details");
-            }
-
-            if (!site.isEmpty()) {
-                setValue(site, QString("site%1").arg(i), "server", "server_details");
-            }
-
-            setValue(savePassword, QString("savePassword%1").arg(i), "server", "server_details");
-            setValue(saveName, QString("saveName%1").arg(i), "server", "server_details");
+            updateServerFields(i, saveName, username, password, savePassword, site);
 
             return true;
         }
     }
     return false;
+}
+
+void ServersSettings::updateServerFields(int index,
+                                         const QString &saveName,
+                                         const QString &username,
+                                         const QString &password,
+                                         bool savePassword,
+                                         const QString &site)
+{
+    if (!username.isEmpty()) {
+        setValue(username, QString("username%1").arg(index), "server", "server_details");
+    }
+
+    if (savePassword && !password.isEmpty()) {
+        setValue(password, QString("password%1").arg(index), "server", "server_details");
+    } else {
+        setValue(QString(), QString("password%1").arg(index), "server", "server_details");
+    }
+
+    if (!site.isEmpty()) {
+        setValue(site, QString("site%1").arg(index), "server", "server_details");
+    }
+
+    setValue(savePassword, QString("savePassword%1").arg(index), "server", "server_details");
+    setValue(saveName, QString("saveName%1").arg(index), "server", "server_details");
 }
 
 int ServersSettings::findServerIndex(const QString &host, const QString &port) const
@@ -303,6 +318,21 @@ int ServersSettings::findServerIndex(const QString &host, const QString &port) c
         QString storedPort = getValue(QString("port%1").arg(i), "server", "server_details").toString();
 
         if (storedHost == host && storedPort == port) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+int ServersSettings::findHostIndex(const QString &host) const
+{
+    int size = getValue("totalServers", "server", "server_details").toInt();
+
+    for (int i = 0; i <= size; ++i) {
+        QString storedHost = getValue(QString("server%1").arg(i), "server", "server_details").toString();
+
+        if (storedHost.compare(host, Qt::CaseInsensitive) == 0) {
             return i;
         }
     }

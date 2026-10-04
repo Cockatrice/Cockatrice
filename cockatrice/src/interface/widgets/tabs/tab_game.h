@@ -204,7 +204,7 @@ public:
 
 public slots:
     void viewCardInfo(const CardRef &cardRef = {}) const;
-    void resetChatAndPhase();
+    void resetForRewind();
     void updateTimeElapsedLabel(QString newTime);
     void addPlayerToAutoCompleteList(QString playerName);
     void removePlayerFromAutoCompleteList(QString playerName);

@@ -1,15 +1,19 @@
 #include "message_log_widget.h"
 
+#include "../../client/settings/cache_settings.h"
 #include "../../client/settings/card_counter_settings.h"
 #include "../../client/sound_engine.h"
+#include "../../game/game_state.h"
 #include "../../game/phase.h"
 #include "../../game/player/player_logic.h"
+#include "../../interface/card_localization.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../board/card_item.h"
 #include "../board/translate_counter_name.h"
 
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/protocol/pb/context_mulligan.pb.h>
+#include <libcockatrice/settings/chat_settings.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <utility>
 
@@ -20,7 +24,11 @@ static QString sanitizeHtml(QString dirty)
 
 static QString cardLink(const QString &cardName)
 {
-    return QString("<i><a href=\"card://%1\">%2</a></i>").arg(cardName).arg(cardName);
+    // The href keeps the canonical name so the card popup can resolve it, while the label shows the name
+    // in the configured card language.
+    return QString("<i><a href=\"card://%1\">%2</a></i>")
+        .arg(sanitizeHtml(cardName))
+        .arg(sanitizeHtml(CardLocalization::displayNameFor(cardName)));
 }
 
 QPair<QString, QString>
@@ -626,13 +634,12 @@ void MessageLogWidget::logSetActivePhase(int phaseNumber)
 
     soundEngine->playSound(phase.soundFileName);
 
-    appendHtml("<font color=\"" + phase.color + "\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") +
-               phase.getName() + "</b></font>");
+    appendHtml("<font color=\"" + phase.color + "\"><b>" + getCurrentTime() + phase.getName() + "</b></font>");
 }
 
 void MessageLogWidget::logSetActivePlayer(PlayerLogic *player)
 {
-    appendHtml("<br><font color=\"green\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") +
+    appendHtml("<br><font color=\"green\"><b>" + getCurrentTime() +
                QString(tr("%1's turn.")).arg(player->getPlayerInfo()->getName()) + "</b></font><br>");
 }
 
@@ -801,10 +808,9 @@ void MessageLogWidget::logUndoDraw(PlayerLogic *player, QString cardName)
     if (cardName.isEmpty()) {
         appendHtmlServerMessage(tr("%1 undoes their last draw.").arg(sanitizeHtml(player->getPlayerInfo()->getName())));
     } else {
-        appendHtmlServerMessage(
-            tr("%1 undoes their last draw (%2).")
-                .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
-                .arg(QString("<a href=\"card://%1\">%2</a>").arg(sanitizeHtml(cardName)).arg(sanitizeHtml(cardName))));
+        appendHtmlServerMessage(tr("%1 undoes their last draw (%2).")
+                                    .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
+                                    .arg(cardLink(std::move(cardName))));
     }
 }
 
@@ -824,6 +830,14 @@ void MessageLogWidget::appendHtmlServerMessage(const QString &html, bool optiona
 {
 
     ChatView::appendHtmlServerMessage(messagePrefix + html + messageSuffix, optionalIsBold, optionalFontColor);
+}
+
+QString MessageLogWidget::getCurrentTime() const
+{
+    if (SettingsCache::instance().chat().getUseGameTime()) {
+        return "[" + GameState::formatElapsedTime(game->getGameState()->getSecondsElapsed()) + "] ";
+    }
+    return ChatView::getCurrentTime();
 }
 
 void MessageLogWidget::connectToPlayerEventHandler(PlayerEventHandler *playerEventHandler)

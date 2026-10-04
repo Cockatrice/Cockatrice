@@ -634,9 +634,10 @@ void UserInfoPopup::onGamesContextMenu(const QPoint &pos)
                        "QMenu::item:selected{background:%4;}")
             .arg(colorStr(theme.bg), colorStr(theme.text), colorStr(theme.border), colorStr(theme.buttonHover)));
 
-    const bool canJoin = !game.started() && game.player_count() < game.max_players();
+    // Never grey the join action out: GameSelector::joinGame() asks whether to
+    // fall back to spectating when the game is full or already running, so a
+    // disabled entry would just read as a dead button.
     QAction *join = menu.addAction(tr("Join game"));
-    join->setEnabled(canJoin);
 
     QAction *spec = nullptr;
     if (game.spectators_allowed()) {

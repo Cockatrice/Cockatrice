@@ -259,7 +259,7 @@ if(UNIX)
     if(CPACK_GENERATOR STREQUAL "RPM")
       set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
       set(CPACK_RPM_MAIN_COMPONENT "cockatrice")
-      set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt6-qttools, qt6-qtsvg, qt6-qtmultimedia, qt6-qtimageformats")
+      set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt6-qtimageformats, qt6-qtmultimedia, qt6-qtsvg, qt6-qttools")
       set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
       set(CPACK_RPM_PACKAGE_URL "http://github.com/Cockatrice/Cockatrice")
       # stop directories from making package conflicts
@@ -277,7 +277,7 @@ if(UNIX)
       set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
       set(CPACK_DEBIAN_PACKAGE_SECTION "games")
       set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/Cockatrice/Cockatrice")
-      set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6, libqt6svg6, qt6-qpa-plugins, qt6-image-formats-plugins")
+      set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6, libqt6svg6, qt6-image-formats-plugins, qt6-qpa-plugins")
       set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "libqt6sql6-mysql") # for connecting servatrice to a mysql db
     endif()
   endif()
@@ -291,6 +291,39 @@ elseif(WIN32) # Windows (including 64bit)
 
   # Configure file with custom definitions for NSIS.
   configure_file("${COCKATRICE_CMAKE_PATH}/NSIS.definitions.nsh.in" "${PROJECT_BINARY_DIR}/NSIS.definitions.nsh")
+
+  # Every Qt module the client links against, as the DLL names a Windows install
+  # has to contain, plus the platform plugin without which the client cannot
+  # start. .ci/compile.sh reads this and fails the build when the packaged
+  # installer is missing one of them.
+  #
+  # Only the client is packaged on Windows, so this is the client's module list
+  # rather than the union across server, client and Oracle: demanding Oracle's or
+  # Servatrice's modules of the client installer checks nothing about the client.
+  #
+  # A statically linked Qt module ships no runtime DLL, so requiring one would
+  # fail the package check on a static build for no reason. cockatrice/CMakeLists.txt
+  # installs the runtime of every module listed here, and skips static ones the
+  # same way, so the two can never disagree.
+  #
+  # A DLL missing from the package only surfaces on a user's machine, after an
+  # update has already replaced their install, as "The code execution cannot
+  # proceed because Qt6Multimedia.dll was not found" or as a missing procedure
+  # entry point in a Qt6QuickWidgets.dll left over from the previous version.
+  # Assert it while the installer is still being built instead.
+  set(_required_qt_runtime "")
+  foreach(_qt_module IN LISTS COCKATRICE_QT_MODULES)
+    get_target_property(_qt_module_type ${_qt_module} TYPE)
+    if(_qt_module_type STREQUAL "SHARED_LIBRARY")
+      string(REGEX REPLACE "^Qt6::" "" _qt_component "${_qt_module}")
+      list(APPEND _required_qt_runtime "Qt6${_qt_component}.dll")
+    endif()
+  endforeach()
+  list(APPEND _required_qt_runtime "Plugins/platforms/qwindows.dll")
+  list(REMOVE_DUPLICATES _required_qt_runtime)
+  list(SORT _required_qt_runtime)
+  string(REPLACE ";" "\n" _required_qt_runtime "${_required_qt_runtime}")
+  file(WRITE "${PROJECT_BINARY_DIR}/required-qt-runtime.txt" "${_required_qt_runtime}\n")
 
   # include vcredist into the package; NSIS will take care of running it
   if(VCREDISTRUNTIME_FOUND)

@@ -23,7 +23,14 @@ private slots:
     void handleNewConnection();
 
 private:
-    bool forwardToPrimary(const QStringList &filesToSend);
+    enum class ForwardResult
+    {
+        Delivered,  // a live primary acknowledged the payload
+        NoPrimary,  // no connectable primary socket exists
+        PrimaryBusy // a primary exists but did not acknowledge in time
+    };
+
+    ForwardResult forwardToPrimary(const QStringList &filesToSend);
 
     QString serverName;
     QLocalServer *server = nullptr;
