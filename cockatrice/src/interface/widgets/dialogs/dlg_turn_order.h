@@ -36,6 +36,8 @@ private slots:
 public:
     explicit DlgTurnOrder(const QStringList &_playerNames, QWidget *parent = nullptr);
 
+    void retranslateUi();
+
     [[nodiscard]] bool randomize() const
     {
         return randomizeRequested;
