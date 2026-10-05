@@ -11,6 +11,9 @@ add_library(
                            libcockatrice/rng/sfmt/SFMT.c
 )
 
+# SFMT is vendored and its own headers trip UBSan's alignment and vptr checks.
+cockatrice_disable_sanitizers_for(libcockatrice/rng/sfmt/SFMT.c)
+
 target_include_directories(libcockatrice_rng PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(libcockatrice_rng PUBLIC ${QT_CORE_MODULE})
