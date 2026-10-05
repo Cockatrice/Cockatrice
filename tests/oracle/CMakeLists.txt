@@ -18,8 +18,9 @@ cockatrice_add_test(
 # Oracle importer benchmark tests (manual, not run in CI, incl. RAM benchmark)
 # Optional compression libs, mirrored from oracle/CMakeLists.txt, so the benchmark
 # can download and decompress whatever AllPrintings format the default URL selects.
-# Declared after the unit tests above on purpose: add_definitions() only reaches
-# targets created after it, so HAS_ZLIB/HAS_LZMA stay confined to the benchmark.
+# add_definitions() is directory-scoped and order-independent, so HAS_ZLIB/HAS_LZMA also
+# reach the two unit tests above. That is harmless: those macros gate code only in
+# oracle/src/pages.cpp and oracle/src/pagetemplates.cpp, which no test target compiles.
 find_package(ZLIB)
 if(ZLIB_FOUND)
   add_definitions("-DHAS_ZLIB")
