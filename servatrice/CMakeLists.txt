@@ -27,6 +27,11 @@ set(servatrice_SOURCES
 
 set(servatrice_RESOURCES servatrice.qrc)
 
+# Qxt SMTP is vendored.
+cockatrice_disable_sanitizers_for(
+  src/smtp/qxthmac.cpp src/smtp/qxtmailattachment.cpp src/smtp/qxtmailmessage.cpp src/smtp/qxtsmtp.cpp
+)
+
 if(WIN32)
   set(servatrice_SOURCES ${servatrice_SOURCES} servatrice.rc)
 endif(WIN32)

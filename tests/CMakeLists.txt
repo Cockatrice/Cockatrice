@@ -60,7 +60,7 @@ include_directories(${GTEST_INCLUDE_DIRS})
 #
 # A second label is a configure-time FATAL_ERROR rather than a line CTest quietly reads as one.
 # Anything orthogonal to a test's kind belongs in a helper flag beside the label, so it
-# composes with the group instead of competing for the single slot.
+# composes with the group instead of competing for the single slot. NO_SANITIZE is such a flag.
 #
 # TIMEOUT is bounded per test because CTest's implicit default is 1500s: one hung socket wait
 # would otherwise stall CI for 25 minutes.
@@ -69,7 +69,9 @@ include_directories(${GTEST_INCLUDE_DIRS})
 # lzma) keeps it last, which is where the linker needs it.
 
 function(cockatrice_add_test)
-  cmake_parse_arguments(PARSE_ARGV 0 ARG "MANUAL" "NAME" "SOURCES;LIBS;LABELS;DEFINITIONS;INCLUDE_DIRS;EXTRA_LIBS")
+  cmake_parse_arguments(
+    PARSE_ARGV 0 ARG "MANUAL;NO_SANITIZE" "NAME" "SOURCES;LIBS;LABELS;DEFINITIONS;INCLUDE_DIRS;EXTRA_LIBS"
+  )
 
   if(NOT ARG_NAME OR NOT ARG_SOURCES)
     message(FATAL_ERROR "cockatrice_add_test requires at least NAME and SOURCES")
@@ -102,6 +104,13 @@ function(cockatrice_add_test)
     return()
   endif()
 
+  # NO_SANITIZE marks a target the sanitizer leg cannot run. Excluded by not handing its cases
+  # to CTest at all, rather than by a label, so the exclusion cannot rot into a line CTest
+  # quietly reads as something else. The target still builds, and still runs on the other legs.
+  if(ARG_NO_SANITIZE AND COCKATRICE_SANITIZERS)
+    return()
+  endif()
+
   # One label only, per the note above. Rejecting a second loudly beats emitting a
   # CTestTestfile line that CTest will quietly read as one label.
   list(LENGTH ARG_LABELS _label_count)
@@ -112,12 +121,19 @@ function(cockatrice_add_test)
     set(ARG_LABELS ci)
   endif()
 
-  # GoogleTestAddTests defaults DISCOVERY_TIMEOUT to 5s. A plain debug binary answers
-  # --gtest_list_tests in 0.04s, but that budget is thin once several binaries discover
-  # concurrently behind a -j build, and being over it fails at the *link* step with a bare
-  # "Process terminated due to timeout" that points nowhere near the cause.
+  # GoogleTestAddTests defaults DISCOVERY_TIMEOUT to 5s, which is ample for a plain debug
+  # binary (--gtest_list_tests costs 0.04s) but not for an instrumented one (~2.8s cold, and
+  # discovery runs several binaries concurrently behind a -j build). Left at the default, a
+  # sanitizer build fails at the *link* step with a bare "Process terminated due to timeout"
+  # and no hint that discovery, not the test, is what is slow.
+  if(COCKATRICE_SANITIZERS)
+    set(_discovery_timeout 300)
+  else()
+    set(_discovery_timeout 60)
+  endif()
+
   gtest_discover_tests(
-    ${ARG_NAME} DISCOVERY_MODE POST_BUILD DISCOVERY_TIMEOUT 60
+    ${ARG_NAME} DISCOVERY_MODE POST_BUILD DISCOVERY_TIMEOUT ${_discovery_timeout}
     PROPERTIES LABELS "${ARG_LABELS}"
     TIMEOUT 60
   )
@@ -199,6 +215,7 @@ cockatrice_add_test(
 cockatrice_add_test(
   NAME
   server_developer_role_test
+  NO_SANITIZE
   SOURCES
   server_developer_role_test.cpp
   LIBS
