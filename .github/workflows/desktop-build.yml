@@ -546,12 +546,15 @@ jobs:
           echo "count=$count" >>"$GITHUB_OUTPUT"
           echo "slug=$(sed -e 's|^vcpkg/||' -e 's|/$||' -e 's|/|-|g' <<<"$VCPKG_SCOPE")" >>"$GITHUB_OUTPUT"
 
+      # archive: false accepts a single file and nothing else, and a scope hands over one
+      # archive per ABI hash vcpkg had to rebuild, which is 23 files on a cold runner.
+      # Zipping the directory keeps the fanout at the artifact root, which is where
+      # vcpkg-cache-import.yml looks for keys.txt once download-artifact unpacks it.
       - name: "Upload new vcpkg entries"
         # An empty count means the step above did not run at all, on master and on forks
         if: steps.vcpkg_new.outputs.count != '' && steps.vcpkg_new.outputs.count != '0'
         uses: actions/upload-artifact@v7
         with:
-          archive: false
           if-no-files-found: error    # a count above zero with nothing staged is a bug
           name: vcpkg-new-${{ steps.vcpkg_new.outputs.slug }}
           path: ${{ runner.temp }}/vcpkg-new
