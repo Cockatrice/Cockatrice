@@ -451,6 +451,17 @@ jobs:
           prefix: ${{ matrix.vcpkg_scope }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      # The action only creates its directory when the prefix matched at least one
+      # entry, and it reads that directory unguarded when it saves at the end of the
+      # job. A scope nobody has written to yet therefore leaves the directory missing
+      # and fails the job, which is exactly the state every scope starts in. Make the
+      # directory up front so an empty scope is a cache miss instead of an error.
+      - name: "Create vcpkg cache directory"
+        shell: bash
+        env:
+          CACHE_DIR: '${{ steps.vcpkg-cache.outputs.path }}'
+        run: mkdir -p "$CACHE_DIR"
+
       # Uses environment variables, see compile.sh for more details
       - name: "Build Cockatrice"
         id: build
