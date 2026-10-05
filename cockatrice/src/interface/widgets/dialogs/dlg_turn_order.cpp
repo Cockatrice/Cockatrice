@@ -16,11 +16,11 @@ DlgTurnOrder::DlgTurnOrder(const QStringList &_playerNames, QWidget *parent)
     listWidget->setCurrentRow(0);
     connect(listWidget, &QListWidget::currentRowChanged, this, &DlgTurnOrder::selectionChanged);
 
-    moveUpButton = new QPushButton(tr("Move up"), this);
+    moveUpButton = new QPushButton(this);
     connect(moveUpButton, &QPushButton::clicked, this, &DlgTurnOrder::actMoveUp);
-    moveDownButton = new QPushButton(tr("Move down"), this);
+    moveDownButton = new QPushButton(this);
     connect(moveDownButton, &QPushButton::clicked, this, &DlgTurnOrder::actMoveDown);
-    randomizeButton = new QPushButton(tr("Randomize"), this);
+    randomizeButton = new QPushButton(this);
     connect(randomizeButton, &QPushButton::clicked, this, &DlgTurnOrder::actRandomize);
 
     auto *buttonColumn = new QVBoxLayout;
@@ -43,8 +43,17 @@ DlgTurnOrder::DlgTurnOrder(const QStringList &_playerNames, QWidget *parent)
     setLayout(mainLayout);
 
     updateButtons();
-    setWindowTitle(tr("Set turn order"));
+
+    retranslateUi();
     setMinimumWidth(300);
+}
+
+void DlgTurnOrder::retranslateUi()
+{
+    setWindowTitle(tr("Set turn order"));
+    moveUpButton->setText(tr("Move up"));
+    moveDownButton->setText(tr("Move down"));
+    randomizeButton->setText(tr("Randomize"));
 }
 
 QStringList DlgTurnOrder::order() const
