@@ -258,6 +258,20 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  deck_filter_string_test
+  SOURCES
+  ${VERSION_STRING_CPP}
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/filters/deck_filter_string.cpp
+  deck_filter_string_test.cpp
+  LIBS
+  libcockatrice_deck_list
+  libcockatrice_filters
+  libcockatrice_card
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src
+)
+cockatrice_add_test(
+  NAME
   lag_monitor_test
   SOURCES
   ${CMAKE_SOURCE_DIR}/cockatrice/src/client/lag_monitor.cpp
