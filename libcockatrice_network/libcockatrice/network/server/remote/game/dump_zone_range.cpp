@@ -13,5 +13,5 @@ std::pair<qsizetype, qsizetype> dumpZoneCardRange(qsizetype cardCount, int numbe
     count = std::max<qsizetype>(count, 0);
 
     const qsizetype begin = isReversed ? cardCount - count : 0;
-    return { begin, begin + count };
+    return {begin, begin + count};
 }
