@@ -48,10 +48,19 @@ include_directories(${GTEST_INCLUDE_DIRS})
 # hides which case failed and makes `ctest -R Suite.Case` impossible; discovery exposes each
 # TEST() as its own CTest entry instead.
 #
-# Labels: `ci` is applied to every registered test and marks the default CI run, so
-# `ctest -LE bench` is the fast hermetic set. Add `gui` for a test that constructs a
-# QApplication (none do today — CI has no display), `server` for servatrice-facing tests
-# so `ctest -L server` works, `bench` for the slow suites.
+# Labels: exactly one per test, because gtest_discover_tests() cannot carry more than one.
+# GoogleTestAddTests.cmake accumulates the generated script with `foreach(arg ${ARGN})`, so a
+# label list serialises as bare `LABELS ci server` in the CTestTestfile, and CTest reads only
+# the first value of a property and silently discards the rest. A label therefore classifies a
+# test into exactly one group, and the three groups cover every selection worth making:
+#
+#   ci      the default hermetic set, so `ctest -LE bench` runs everything but benchmarks
+#   server  servatrice-facing tests, so `ctest -L server` works
+#   bench   the slow suites, kept out of the default run
+#
+# A second label is a configure-time FATAL_ERROR rather than a line CTest quietly reads as one.
+# Anything orthogonal to a test's kind belongs in a helper flag beside the label, so it
+# composes with the group instead of competing for the single slot.
 #
 # TIMEOUT is bounded per test because CTest's implicit default is 1500s: one hung socket wait
 # would otherwise stall CI for 25 minutes.
@@ -93,14 +102,22 @@ function(cockatrice_add_test)
     return()
   endif()
 
+  # One label only, per the note above. Rejecting a second loudly beats emitting a
+  # CTestTestfile line that CTest will quietly read as one label.
+  list(LENGTH ARG_LABELS _label_count)
+  if(_label_count GREATER 1)
+    message(FATAL_ERROR "${ARG_NAME}: pass at most one label, got '${ARG_LABELS}'")
+  endif()
   if(NOT ARG_LABELS)
     set(ARG_LABELS ci)
-  else()
-    list(APPEND ARG_LABELS ci)
   endif()
 
+  # GoogleTestAddTests defaults DISCOVERY_TIMEOUT to 5s. A plain debug binary answers
+  # --gtest_list_tests in 0.04s, but that budget is thin once several binaries discover
+  # concurrently behind a -j build, and being over it fails at the *link* step with a bare
+  # "Process terminated due to timeout" that points nowhere near the cause.
   gtest_discover_tests(
-    ${ARG_NAME} DISCOVERY_MODE POST_BUILD
+    ${ARG_NAME} DISCOVERY_MODE POST_BUILD DISCOVERY_TIMEOUT 60
     PROPERTIES LABELS "${ARG_LABELS}"
     TIMEOUT 60
   )
