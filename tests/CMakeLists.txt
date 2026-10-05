@@ -204,6 +204,17 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  server_dump_zone_test
+  SOURCES
+  server_dump_zone_test.cpp
+  LIBS
+  libcockatrice_rng
+  libcockatrice_network
+  LABELS
+  server
+)
+cockatrice_add_test(
+  NAME
   server_counter_test
   SOURCES
   server_counter_test.cpp
