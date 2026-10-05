@@ -8,6 +8,7 @@
 # --suffix <suffix> renames package with this suffix, requires arg
 # --server compiles servatrice
 # --test runs tests
+# --sanitize builds with AddressSanitizer and UndefinedBehaviorSanitizer, gcc/clang only
 # --debug or --release sets the build type ie CMAKE_BUILD_TYPE
 # --ccache [<size>] uses ccache and shows stats, optionally provide size
 # --evict-ccache <age> runs ccache eviction based on given age after build
@@ -55,6 +56,10 @@ while [[ $# != 0 ]]; do
       ;;
     '--test')
       MAKE_TEST=1
+      shift
+      ;;
+    '--sanitize')
+      MAKE_SANITIZE=1
       shift
       ;;
     '--debug')
@@ -146,6 +151,9 @@ if [[ $MAKE_NO_CLIENT ]]; then
 fi
 if [[ $MAKE_TEST ]]; then
   flags+=("-DTEST=1")
+fi
+if [[ $MAKE_SANITIZE ]]; then
+  flags+=("-DENABLE_SANITIZERS=ON")
 fi
 if [[ $USE_CCACHE ]]; then
   flags+=("-DUSE_CCACHE=1")
@@ -306,6 +314,18 @@ fi
 
 if [[ $MAKE_TEST ]]; then
   echo "::group::Run tests"
+  if [[ $MAKE_SANITIZE ]]; then
+    # detect_leaks=0: Qt and the sanitizers' own runtimes both leak at exit by design, and
+    # LeakSanitizer's default is aggressive enough to bury our real findings under hundreds
+    # of process-teardown reports. Malloc/free misuse and use-after-free are what ASan is for
+    # and they stay fully on.
+    # abort_on_error=1: a bad access leaves the process in an unusable state, so continuing
+    # only produces a second, more confusing report from the wreckage.
+    # UBSAN halt_on_error=0: report and keep going, so one run collects many findings instead
+    # of stopping at the first one.
+    export ASAN_OPTIONS="detect_leaks=0:abort_on_error=1:print_stacktrace=1:symbolize=1"
+    export UBSAN_OPTIONS="print_stacktrace=1:halt_on_error=0:symbolize=1"
+  fi
   # Every TEST() is its own CTest entry, so the suite is process-spawn bound rather than CPU
   # bound and -j recovers nearly all of the per-process overhead. The test binaries are safe to
   # run concurrently: the only one that claims a fixed resource is single_instance_manager_test,
