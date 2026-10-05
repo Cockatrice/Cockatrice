@@ -306,7 +306,11 @@ fi
 
 if [[ $MAKE_TEST ]]; then
   echo "::group::Run tests"
-  ctest -C "$BUILDTYPE" --output-on-failure
+  # Every TEST() is its own CTest entry, so the suite is process-spawn bound rather than CPU
+  # bound and -j recovers nearly all of the per-process overhead. The test binaries are safe to
+  # run concurrently: the only one that claims a fixed resource is single_instance_manager_test,
+  # which already scopes its local socket name to its own pid so parallel copies cannot collide.
+  ctest -C "$BUILDTYPE" --output-on-failure -j "${CTEST_JOBS:-4}"
   echo "::endgroup::"
 fi
 

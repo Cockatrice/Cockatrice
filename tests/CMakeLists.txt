@@ -2,108 +2,9 @@
 # If a new test needs additional Qt modules, add them there — not in individual test CMakeLists.txt files.
 enable_testing()
 
-add_test(NAME dummy_test COMMAND dummy_test)
-add_test(NAME expression_test COMMAND expression_test)
-add_test(NAME clamped_arithmetic_test COMMAND clamped_arithmetic_test)
-add_test(NAME test_age_formatting COMMAND test_age_formatting)
-add_test(NAME password_hash_test COMMAND password_hash_test)
-add_test(NAME playmat_resolver_test COMMAND playmat_resolver_test)
-add_test(NAME server_card_counter_test COMMAND server_card_counter_test)
-add_test(NAME server_counter_test COMMAND server_counter_test)
-add_test(NAME server_rate_limiter_test COMMAND server_rate_limiter_test)
-add_test(NAME server_developer_role_test COMMAND server_developer_role_test)
-add_test(NAME server_game_join_test COMMAND server_game_join_test)
-add_test(NAME warning_categories_test COMMAND warning_categories_test)
-# The translation loader test compiles a .qm fixture, which needs lrelease from Qt Linguist.
-if(TARGET Qt6::lrelease)
-  add_test(NAME translation_loader_test COMMAND translation_loader_test)
-endif()
-add_test(NAME report_categories_test COMMAND report_categories_test)
-add_test(NAME lag_monitor_test COMMAND lag_monitor_test)
-add_test(NAME latency_tracker_test COMMAND latency_tracker_test)
-add_test(NAME metrics_registry_test COMMAND metrics_registry_test)
-add_test(NAME card_update_progress_test COMMAND card_update_progress_test)
-add_test(NAME loader_local_matching_test COMMAND loader_local_matching_test)
-
-add_test(NAME deck_hash_performance_test COMMAND deck_hash_performance_test)
-set_tests_properties(deck_hash_performance_test PROPERTIES TIMEOUT 15)
+include(GoogleTest)
 
 # Find GTest
-
-add_executable(dummy_test dummy_test.cpp)
-add_executable(expression_test expression_test.cpp)
-add_executable(clamped_arithmetic_test clamped_arithmetic_test.cpp)
-add_executable(test_age_formatting test_age_formatting.cpp)
-add_executable(password_hash_test password_hash_test.cpp)
-add_executable(playmat_resolver_test playmat_resolver_test.cpp)
-add_executable(deck_hash_performance_test deck_hash_performance_test.cpp)
-add_executable(server_card_counter_test server_card_counter_test.cpp)
-add_executable(server_counter_test server_counter_test.cpp)
-add_executable(server_rate_limiter_test server_rate_limiter_test.cpp)
-add_executable(server_developer_role_test server_developer_role_test.cpp)
-add_executable(server_game_join_test server_game_join_test.cpp)
-add_executable(warning_categories_test warning_categories_test.cpp)
-if(TARGET Qt6::lrelease)
-  add_executable(translation_loader_test translation_loader_test.cpp)
-
-  # QTranslator only accepts real .qm files, so the translation loader test gets one compiled from its
-  # own .ts fixture rather than a stub.
-  set(TRANSLATION_LOADER_TEST_QM "${CMAKE_CURRENT_BINARY_DIR}/translation_loader_test_de.qm")
-  add_custom_command(
-    OUTPUT "${TRANSLATION_LOADER_TEST_QM}"
-    COMMAND Qt6::lrelease "${CMAKE_CURRENT_SOURCE_DIR}/translation_loader_test.ts" -qm "${TRANSLATION_LOADER_TEST_QM}"
-    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/translation_loader_test.ts"
-    COMMENT "Compiling translation_loader_test.ts"
-  )
-  add_custom_target(translation_loader_test_qm DEPENDS "${TRANSLATION_LOADER_TEST_QM}")
-  add_dependencies(translation_loader_test translation_loader_test_qm)
-  target_compile_definitions(translation_loader_test PRIVATE TRANSLATION_LOADER_TEST_DIR="${CMAKE_CURRENT_BINARY_DIR}")
-
-  # A multi-config generator (MSBuild, Xcode) puts the executable in a per-config subdirectory while
-  # the .qm stays in the current binary directory, so copy the fixture next to the binary: that is the
-  # layout ABuildTreeFindsTheTranslationsNextToTheExecutable is about, and the only one it finds on
-  # those generators.
-  add_custom_command(
-    TARGET translation_loader_test
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${TRANSLATION_LOADER_TEST_QM}"
-            "$<TARGET_FILE_DIR:translation_loader_test>/"
-    VERBATIM
-  )
-endif()
-add_executable(report_categories_test report_categories_test.cpp)
-add_executable(lag_monitor_test ${CMAKE_SOURCE_DIR}/cockatrice/src/client/lag_monitor.cpp lag_monitor_test.cpp)
-target_include_directories(lag_monitor_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src)
-add_executable(latency_tracker_test latency_tracker_test.cpp)
-add_executable(metrics_registry_test ../servatrice/src/metrics_registry.cpp metrics_registry_test.cpp)
-add_executable(
-  card_update_progress_test ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/card_database_update/card_update_progress.cpp
-                            card_update_progress_test.cpp
-)
-target_include_directories(card_update_progress_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src)
-add_executable(
-  loader_local_matching_test
-  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/card_picture_loader/card_picture_loader_local.cpp
-  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/cache_settings.cpp
-  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/card_counter_settings.cpp
-  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/shortcuts_settings.cpp
-  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network/update/client/release_channel.cpp
-  ${VERSION_STRING_CPP}
-  loader_local_matching_test.cpp
-)
-target_include_directories(loader_local_matching_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src)
-
-# Guard must match the condition for src/single_instance_manager.cpp in cockatrice/CMakeLists.txt.
-if(WITH_CLIENT)
-  add_executable(
-    single_instance_manager_test ${CMAKE_SOURCE_DIR}/cockatrice/src/single_instance_manager.cpp
-                                 single_instance_manager_test.cpp
-  )
-  target_include_directories(single_instance_manager_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src)
-  target_include_directories(single_instance_manager_test PRIVATE ${CMAKE_SOURCE_DIR}/libcockatrice_utility)
-
-  add_test(NAME single_instance_manager_test COMMAND single_instance_manager_test)
-endif()
 
 find_package(GTest)
 
@@ -130,92 +31,291 @@ if(NOT GTEST_FOUND)
 
   set(GTEST_INCLUDE_DIRS "${CMAKE_BINARY_DIR}/gtest-src/include")
   set(GTEST_BOTH_LIBRARIES gtest)
-  add_dependencies(dummy_test gtest)
-  add_dependencies(expression_test gtest)
-  add_dependencies(clamped_arithmetic_test gtest)
-  add_dependencies(test_age_formatting gtest)
-  add_dependencies(password_hash_test gtest)
-  add_dependencies(playmat_resolver_test gtest)
-  add_dependencies(deck_hash_performance_test gtest)
-  add_dependencies(server_card_counter_test gtest)
-  add_dependencies(server_counter_test gtest)
-  add_dependencies(server_rate_limiter_test gtest)
-  add_dependencies(server_developer_role_test gtest)
-  add_dependencies(server_game_join_test gtest)
-  add_dependencies(warning_categories_test gtest)
-  if(TARGET translation_loader_test)
-    add_dependencies(translation_loader_test gtest)
-  endif()
-  add_dependencies(report_categories_test gtest)
-  add_dependencies(lag_monitor_test gtest)
-  add_dependencies(latency_tracker_test gtest)
-  add_dependencies(metrics_registry_test gtest)
-  add_dependencies(card_update_progress_test gtest)
-  add_dependencies(loader_local_matching_test gtest)
-  add_dependencies(single_instance_manager_test gtest)
 endif()
 
+# Directory-scoped on purpose: the test subdirectories below add targets that include the
+# fetched gtest headers and do not repeat this path themselves.
 include_directories(${GTEST_INCLUDE_DIRS})
-target_link_libraries(dummy_test Threads::Threads ${GTEST_BOTH_LIBRARIES})
-target_link_libraries(expression_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
-target_link_libraries(
-  clamped_arithmetic_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
-)
-target_link_libraries(
-  test_age_formatting libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
-)
-target_link_libraries(
-  password_hash_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
-)
-target_link_libraries(
-  playmat_resolver_test libcockatrice_deck_list libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES}
-  ${TEST_QT_MODULES}
-)
-target_link_libraries(
-  deck_hash_performance_test libcockatrice_deck_list libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES}
-  ${TEST_QT_MODULES}
-)
-target_link_libraries(
-  server_card_counter_test libcockatrice_network Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
-)
-target_link_libraries(
-  server_counter_test libcockatrice_network Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
-)
-target_link_libraries(
-  server_rate_limiter_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
-)
-target_link_libraries(
-  server_developer_role_test libcockatrice_network libcockatrice_rng Threads::Threads ${GTEST_BOTH_LIBRARIES}
-  ${TEST_QT_MODULES}
-)
-target_link_libraries(
-  server_game_join_test libcockatrice_network_server_remote libcockatrice_rng Threads::Threads ${GTEST_BOTH_LIBRARIES}
-  ${TEST_QT_MODULES}
-)
-target_link_libraries(
-  warning_categories_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
-)
-if(TARGET translation_loader_test)
+
+# --- Test registration ----------------------------------------------------------
+#
+# Every test target needs the same four steps: build the executable, depend on gtest when it
+# was fetched from source, link the shared test libraries, and hand the cases to CTest. The
+# `if(NOT GTEST_FOUND)` branch is the easy one to forget — omit it and the link fails with
+# undefined gtest symbols — so it lives here once instead of being repeated per test.
+#
+# This also replaces `add_test(NAME x COMMAND x)`. Naming the binary as a single CTest entry
+# hides which case failed and makes `ctest -R Suite.Case` impossible; discovery exposes each
+# TEST() as its own CTest entry instead.
+#
+# Labels: `ci` is applied to every registered test and marks the default CI run, so
+# `ctest -LE bench` is the fast hermetic set. Add `gui` for a test that constructs a
+# QApplication (none do today — CI has no display), `server` for servatrice-facing tests
+# so `ctest -L server` works, `bench` for the slow suites.
+#
+# TIMEOUT is bounded per test because CTest's implicit default is 1500s: one hung socket wait
+# would otherwise stall CI for 25 minutes.
+#
+# EXTRA_LIBS is appended after the shared libraries so a caller adding a static archive (zlib,
+# lzma) keeps it last, which is where the linker needs it.
+
+function(cockatrice_add_test)
+  cmake_parse_arguments(PARSE_ARGV 0 ARG "MANUAL" "NAME" "SOURCES;LIBS;LABELS;DEFINITIONS;INCLUDE_DIRS;EXTRA_LIBS")
+
+  if(NOT ARG_NAME OR NOT ARG_SOURCES)
+    message(FATAL_ERROR "cockatrice_add_test requires at least NAME and SOURCES")
+  endif()
+
+  add_executable(${ARG_NAME} ${ARG_SOURCES})
+
+  if(ARG_INCLUDE_DIRS)
+    target_include_directories(${ARG_NAME} PRIVATE ${ARG_INCLUDE_DIRS})
+  endif()
+
+  if(ARG_DEFINITIONS)
+    target_compile_definitions(${ARG_NAME} PRIVATE ${ARG_DEFINITIONS})
+  endif()
+
   target_link_libraries(
-    translation_loader_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
+    ${ARG_NAME} ${ARG_LIBS} Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES} ${ARG_EXTRA_LIBS}
+  )
+
+  # Only needed when gtest was downloaded and add_subdirectory'd above. An imported gtest
+  # target already carries its own dependency, so this must stay conditional.
+  if(NOT GTEST_FOUND)
+    add_dependencies(${ARG_NAME} gtest)
+  endif()
+
+  # MANUAL targets are built but deliberately kept out of ctest: benchmarks that need a card
+  # database, hit the network, or measure RAM. Leaving them unregistered keeps CI hermetic
+  # and fast. They still link gtest so they can use TEST() without a second code path.
+  if(ARG_MANUAL)
+    return()
+  endif()
+
+  if(NOT ARG_LABELS)
+    set(ARG_LABELS ci)
+  else()
+    list(APPEND ARG_LABELS ci)
+  endif()
+
+  gtest_discover_tests(
+    ${ARG_NAME} DISCOVERY_MODE POST_BUILD
+    PROPERTIES LABELS "${ARG_LABELS}"
+    TIMEOUT 60
+  )
+endfunction()
+
+# Same wiring for targets that are built but deliberately kept out of ctest: benchmarks that
+# need a card database, hit the network, or measure RAM. A separate name rather than a MANUAL
+# flag spelled out at each call site, so "this is not in the CI suite" is visible in the CMake
+# file. Note the unquoted expansions: an unset multi-value keyword expands to zero arguments,
+# which is what lets this forward a caller's keywords verbatim without tripping the FATAL_ERROR
+# guard above on an empty list.
+function(cockatrice_add_manual_test)
+  cmake_parse_arguments(PARSE_ARGV 0 ARG "" "NAME" "SOURCES;LIBS;DEFINITIONS;INCLUDE_DIRS;EXTRA_LIBS")
+
+  cockatrice_add_test(
+    NAME
+    ${ARG_NAME}
+    SOURCES
+    ${ARG_SOURCES}
+    LIBS
+    ${ARG_LIBS}
+    DEFINITIONS
+    ${ARG_DEFINITIONS}
+    INCLUDE_DIRS
+    ${ARG_INCLUDE_DIRS}
+    EXTRA_LIBS
+    ${ARG_EXTRA_LIBS}
+    MANUAL
+  )
+endfunction()
+
+# --- Unit tests ------------------------------------------------------------------
+
+cockatrice_add_test(NAME expression_test SOURCES expression_test.cpp LIBS libcockatrice_utility)
+cockatrice_add_test(NAME clamped_arithmetic_test SOURCES clamped_arithmetic_test.cpp LIBS libcockatrice_utility)
+cockatrice_add_test(NAME test_age_formatting SOURCES test_age_formatting.cpp LIBS libcockatrice_utility)
+cockatrice_add_test(NAME password_hash_test SOURCES password_hash_test.cpp LIBS libcockatrice_utility)
+cockatrice_add_test(NAME report_categories_test SOURCES report_categories_test.cpp LIBS libcockatrice_utility)
+cockatrice_add_test(NAME warning_categories_test SOURCES warning_categories_test.cpp LIBS libcockatrice_utility)
+cockatrice_add_test(
+  NAME
+  playmat_resolver_test
+  SOURCES
+  playmat_resolver_test.cpp
+  LIBS
+  libcockatrice_deck_list
+  libcockatrice_utility
+)
+cockatrice_add_test(
+  NAME
+  server_rate_limiter_test
+  SOURCES
+  server_rate_limiter_test.cpp
+  LIBS
+  libcockatrice_utility
+  LABELS
+  server
+)
+cockatrice_add_test(
+  NAME
+  server_card_counter_test
+  SOURCES
+  server_card_counter_test.cpp
+  LIBS
+  libcockatrice_network
+  LABELS
+  server
+)
+cockatrice_add_test(
+  NAME
+  server_counter_test
+  SOURCES
+  server_counter_test.cpp
+  LIBS
+  libcockatrice_network
+  LABELS
+  server
+)
+cockatrice_add_test(
+  NAME
+  server_developer_role_test
+  SOURCES
+  server_developer_role_test.cpp
+  LIBS
+  libcockatrice_network
+  libcockatrice_rng
+  LABELS
+  server
+)
+cockatrice_add_test(
+  NAME
+  server_game_join_test
+  SOURCES
+  server_game_join_test.cpp
+  LIBS
+  libcockatrice_network_server_remote
+  libcockatrice_rng
+  LABELS
+  server
+)
+cockatrice_add_test(
+  NAME
+  latency_tracker_test
+  SOURCES
+  latency_tracker_test.cpp
+  LIBS
+  libcockatrice_network
+  LABELS
+  server
+)
+cockatrice_add_test(
+  NAME
+  lag_monitor_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/lag_monitor.cpp
+  lag_monitor_test.cpp
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src
+)
+cockatrice_add_test(
+  NAME
+  metrics_registry_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/servatrice/src/metrics_registry.cpp
+  metrics_registry_test.cpp
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/servatrice/src
+  LABELS
+  server
+)
+cockatrice_add_test(
+  NAME
+  card_update_progress_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/card_database_update/card_update_progress.cpp
+  card_update_progress_test.cpp
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src
+)
+cockatrice_add_test(
+  NAME
+  loader_local_matching_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/card_picture_loader/card_picture_loader_local.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/cache_settings.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/card_counter_settings.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/shortcuts_settings.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network/update/client/release_channel.cpp
+  ${VERSION_STRING_CPP}
+  loader_local_matching_test.cpp
+  LIBS
+  libcockatrice_settings
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src
+)
+cockatrice_add_test(
+  NAME
+  deck_hash_performance_test
+  SOURCES
+  deck_hash_performance_test.cpp
+  LIBS
+  libcockatrice_deck_list
+  libcockatrice_utility
+  LABELS
+  bench
+)
+
+# The translation loader test compiles a .qm fixture, which needs lrelease from Qt Linguist.
+if(TARGET Qt6::lrelease)
+  set(TRANSLATION_LOADER_TEST_QM "${CMAKE_CURRENT_BINARY_DIR}/translation_loader_test_de.qm")
+  add_custom_command(
+    OUTPUT "${TRANSLATION_LOADER_TEST_QM}"
+    COMMAND Qt6::lrelease "${CMAKE_CURRENT_SOURCE_DIR}/translation_loader_test.ts" -qm "${TRANSLATION_LOADER_TEST_QM}"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/translation_loader_test.ts"
+    COMMENT "Compiling translation_loader_test.ts"
+  )
+  add_custom_target(translation_loader_test_qm DEPENDS "${TRANSLATION_LOADER_TEST_QM}")
+
+  cockatrice_add_test(
+    NAME
+    translation_loader_test
+    SOURCES
+    translation_loader_test.cpp
+    LIBS
+    libcockatrice_utility
+    DEFINITIONS
+    TRANSLATION_LOADER_TEST_DIR="${CMAKE_CURRENT_BINARY_DIR}"
+  )
+  add_dependencies(translation_loader_test translation_loader_test_qm)
+
+  # A multi-config generator (MSBuild, Xcode) puts the executable in a per-config subdirectory while
+  # the .qm stays in the current binary directory, so copy the fixture next to the binary: that is the
+  # layout ABuildTreeFindsTheTranslationsNextToTheExecutable is about, and the only one it finds on
+  # those generators.
+  add_custom_command(
+    TARGET translation_loader_test
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${TRANSLATION_LOADER_TEST_QM}"
+            "$<TARGET_FILE_DIR:translation_loader_test>/"
+    VERBATIM
   )
 endif()
-target_link_libraries(
-  report_categories_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
-)
-target_link_libraries(lag_monitor_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
-target_link_libraries(
-  latency_tracker_test libcockatrice_network Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
-)
-target_include_directories(metrics_registry_test PRIVATE ${CMAKE_SOURCE_DIR}/servatrice/src)
-target_link_libraries(metrics_registry_test ${TEST_QT_MODULES} Threads::Threads ${GTEST_BOTH_LIBRARIES})
-target_link_libraries(card_update_progress_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
-target_link_libraries(
-  loader_local_matching_test libcockatrice_settings Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
-)
 
+# Guard must match the condition for src/single_instance_manager.cpp in cockatrice/CMakeLists.txt.
 if(WITH_CLIENT)
-  target_link_libraries(single_instance_manager_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
+  cockatrice_add_test(
+    NAME
+    single_instance_manager_test
+    SOURCES
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/single_instance_manager.cpp
+    single_instance_manager_test.cpp
+    INCLUDE_DIRS
+    ${CMAKE_SOURCE_DIR}/cockatrice/src
+    ${CMAKE_SOURCE_DIR}/libcockatrice_utility
+  )
 endif()
 
 add_subdirectory(card_zone_algorithms)
