@@ -201,6 +201,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config.cpp
     src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp
     src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/hypergeometric_probability.cpp
     src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config.cpp
     src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp
     src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_widget.cpp
