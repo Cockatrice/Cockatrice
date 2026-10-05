@@ -481,12 +481,15 @@ jobs:
           PACKAGE_SUFFIX: '${{ matrix.package_suffix }}'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
           USE_CCACHE: ${{ matrix.use_ccache }}
-          # Only master may write the cache itself. A pull request run has its own
-          # merge ref scope, which nothing else can read, so anything it saved there
-          # would be unreachable for every later run. Handing the new archives over
-          # to vcpkg-cache-import.yml is what lets a pull request heal the shared
-          # cache after a runner image update changes every ABI hash.
-          VCPKG_BINARY_SOURCES: "clear;files,${{ steps.vcpkg-cache.outputs.path }},${{ case(github.ref == 'refs/heads/master', 'readwrite', 'read') }}"
+          # vcpkg has to be allowed to write into the cache directory even on a pull
+          # request, because that is where "Collect new vcpkg entries" looks for the
+          # archives this run had to compile itself. With the source left at read those
+          # archives are never written, the collect step finds nothing, and vcpkg-cache-import.yml
+          # gets no artifact to heal the shared cache with. The importer is what publishes
+          # to master's scope; a pull request's own merge ref stays unreadable by every
+          # later run, so the action's own save there costs quota but nothing else.
+          # Forks keep the read-only mode, they are the case that must not be trusted.
+          VCPKG_BINARY_SOURCES: "clear;files,${{ steps.vcpkg-cache.outputs.path }},${{ case(github.ref == 'refs/heads/master' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository), 'readwrite', 'read') }}"
           VCPKG_DISABLE_METRICS: 1
           VCPKG_FEATURE_FLAGS: dependencygraph
           VCPKG_TARGET_MACOS_VERSION: ${{ matrix.vcpkg_deployment_target }}
