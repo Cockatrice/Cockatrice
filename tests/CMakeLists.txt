@@ -30,7 +30,11 @@ if(NOT GTEST_FOUND)
   target_include_directories(gtest INTERFACE "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/gtest-src/include>")
 
   set(GTEST_INCLUDE_DIRS "${CMAKE_BINARY_DIR}/gtest-src/include")
-  set(GTEST_BOTH_LIBRARIES gtest)
+  # gtest_main is not optional here. FindGTest sets GTEST_BOTH_LIBRARIES to both halves, so this
+  # has to match it or the two paths disagree about what provides main(). A test source that
+  # defines its own main() gets away with the omission; one that does not fails at link with
+  # `undefined reference to main` pointing at crt1.o, which names neither gtest nor this line.
+  set(GTEST_BOTH_LIBRARIES gtest gtest_main)
 endif()
 
 # Directory-scoped on purpose: the test subdirectories below add targets that include the
@@ -94,7 +98,7 @@ function(cockatrice_add_test)
   # Only needed when gtest was downloaded and add_subdirectory'd above. An imported gtest
   # target already carries its own dependency, so this must stay conditional.
   if(NOT GTEST_FOUND)
-    add_dependencies(${ARG_NAME} gtest)
+    add_dependencies(${ARG_NAME} gtest gtest_main)
   endif()
 
   # MANUAL targets are built but deliberately kept out of ctest: benchmarks that need a card
