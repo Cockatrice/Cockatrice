@@ -142,11 +142,16 @@ if [[ ! $BUILD_DIR ]]; then
   BUILD_DIR="build"
 fi
 mkdir -p "$BUILD_DIR"
-cd "$BUILD_DIR"
 
-# Captured before the cd because $0 is relative to the directory the script was invoked from,
-# and after the cd it no longer resolves to anything. The coverage report needs the source root.
-SRC_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+if [[ $MAKE_COVERAGE ]]; then
+  # Resolved while the working directory is still the source root. $0 is relative to the
+  # directory the script was invoked from, so after the cd below it no longer resolves, and
+  # under `set -e` the failed subshell would abort the build rather than just yielding an empty
+  # variable. Only the coverage report needs this, so only coverage pays for it.
+  SRC_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+fi
+
+cd "$BUILD_DIR"
 
 # Set minimum CMake Version
 export CMAKE_POLICY_VERSION_MINIMUM=3.10
