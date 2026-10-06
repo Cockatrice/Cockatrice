@@ -43,6 +43,7 @@ public:
         AttrMainType,
         AttrSubType,
         AttrFormat,
+        AttrTag,
         AttrEnd,
     };
 

@@ -7,6 +7,7 @@
 #include "visual_database_display_name_filter_widget.h"
 #include "visual_database_display_set_filter_widget.h"
 #include "visual_database_display_sub_type_filter_widget.h"
+#include "visual_database_display_tag_filter_widget.h"
 
 class VisualDatabaseDisplayWidget;
 
@@ -46,6 +47,8 @@ private:
     VisualDatabaseDisplaySetFilterWidget *setFilterWidget;
     SettingsButtonWidget *quickFilterFormatLegalityWidget;
     VisualDatabaseDisplayFormatLegalityFilterWidget *formatLegalityWidget;
+    SettingsButtonWidget *quickFilterTagWidget;
+    VisualDatabaseDisplayTagFilterWidget *tagFilterWidget;
 
     int fullWidthHint = 0;
     void updateCompactMode(int availableWidth);

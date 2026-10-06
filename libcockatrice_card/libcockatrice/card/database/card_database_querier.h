@@ -214,6 +214,16 @@ public:
      * @return Map of subtype string to count.
      */
     [[nodiscard]] QMap<QString, int> getAllSubCardTypesWithCount() const;
+
+    /**
+     * @brief Returns a mapping of Scryfall Tagger tag slugs to their occurrence counts.
+     *
+     * Tags are stored space-separated in the `tags` card property, so a card
+     * tagged "ramp" and "removal" contributes one to each slug's count.
+     *
+     * @return Map of tag slug to count.
+     */
+    [[nodiscard]] QMap<QString, int> getAllTagsWithCount() const;
     FormatRulesPtr getFormat(const QString &formatName) const;
     QMap<QString, int> getAllFormatsWithCount() const;
 
@@ -227,6 +237,7 @@ private:
     mutable QMap<QString, int> mainCardTypeCountsCache;
     mutable QMap<QString, int> subCardTypeCountsCache;
     mutable QMap<QString, int> formatsCountCache;
+    mutable QMap<QString, int> tagCountsCache;
 
 private slots:
     void invalidateCaches();
