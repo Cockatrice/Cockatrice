@@ -23,6 +23,21 @@ public:
                    bool _contentsKnown,
                    QObject *parent = nullptr);
 
+    /** @brief Number of rows in the table zone grid (0=creatures, 1=noncreatures, 2=lands). */
+    static const int ROW_COUNT = 3;
+
+    /**
+     * Clamps a grid row index into [0, ROW_COUNT - 1].
+     */
+    static int clampValidTableRow(const int row);
+
+    /**
+     * Converts a card's logical table row (0=creatures, 1=noncreatures, 2=lands)
+     * to the corresponding grid Y coordinate. Cards with tableRow > 2 (e.g.,
+     * instants/sorceries) default to the noncreatures row.
+     */
+    static int tableRowToGridY(int tableRow);
+
 protected:
     void addCardImpl(CardItem *card, int x, int y) override;
 
