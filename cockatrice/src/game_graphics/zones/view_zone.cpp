@@ -40,21 +40,23 @@ class QGraphicsItem;
 ZoneViewZone::ZoneViewZone(ZoneViewZoneLogic *_logic, QGraphicsItem *parent)
     : SelectZone(_logic, parent), bRect(QRectF()), minRows(0), groupBy(CardList::NoSort), sortBy(CardList::NoSort)
 {
-    if (!(qobject_cast<ZoneViewZoneLogic *>(getLogic())->getRevealZone() &&
-          !qobject_cast<ZoneViewZoneLogic *>(getLogic())->getWriteableRevealZone())) {
-        qobject_cast<ZoneViewZoneLogic *>(getLogic())->getOriginalZone()->getViews().append(this);
+    auto *viewLogic = qobject_cast<ZoneViewZoneLogic *>(getLogic());
+    if (!(viewLogic->getRevealZone() && !viewLogic->getWriteableRevealZone())) {
+        viewLogic->getOriginalZone()->getViews().append(viewLogic);
     }
     connect(_logic, &ZoneViewZoneLogic::closeView, this, &ZoneViewZone::close);
 }
 
 void ZoneViewZone::addToViews()
 {
-    qobject_cast<ZoneViewZoneLogic *>(getLogic())->getOriginalZone()->getViews().append(this);
+    auto *viewLogic = qobject_cast<ZoneViewZoneLogic *>(getLogic());
+    viewLogic->getOriginalZone()->getViews().append(viewLogic);
 }
 
 void ZoneViewZone::removeFromViews()
 {
-    qobject_cast<ZoneViewZoneLogic *>(getLogic())->getOriginalZone()->getViews().removeOne(this);
+    auto *viewLogic = qobject_cast<ZoneViewZoneLogic *>(getLogic());
+    viewLogic->getOriginalZone()->getViews().removeOne(viewLogic);
 }
 
 /**
@@ -64,9 +66,9 @@ void ZoneViewZone::removeFromViews()
 void ZoneViewZone::close()
 {
     emit closed();
-    if (!(qobject_cast<ZoneViewZoneLogic *>(getLogic())->getRevealZone() &&
-          !qobject_cast<ZoneViewZoneLogic *>(getLogic())->getWriteableRevealZone())) {
-        qobject_cast<ZoneViewZoneLogic *>(getLogic())->getOriginalZone()->getViews().removeOne(this);
+    auto *viewLogic = qobject_cast<ZoneViewZoneLogic *>(getLogic());
+    if (!(viewLogic->getRevealZone() && !viewLogic->getWriteableRevealZone())) {
+        viewLogic->getOriginalZone()->getViews().removeOne(viewLogic);
     }
     deleteLater();
 }
