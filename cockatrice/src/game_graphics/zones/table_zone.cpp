@@ -14,7 +14,6 @@
 #include <QGraphicsScene>
 #include <QPainter>
 #include <libcockatrice/card/card_info.h>
-#include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/zone_names.h>
 
@@ -239,35 +238,18 @@ void TableZone::reorganizeCards()
 
 void TableZone::toggleTapped()
 {
-    QList<QGraphicsItem *> selectedItemsRaw = scene()->selectedItems();
-    QList<QGraphicsItem *> selectedItems;
-
-    auto isCardOnTable = [](const QGraphicsItem *item) {
-        if (auto card = qgraphicsitem_cast<const CardItem *>(item)) {
-            return card->getZone()->getName() == ZoneNames::TABLE;
-        }
-        return false;
-    };
-
-    std::copy_if(selectedItemsRaw.begin(), selectedItemsRaw.end(), std::back_inserter(selectedItems), isCardOnTable);
-
-    bool tapAll = std::any_of(selectedItems.begin(), selectedItems.end(), [](const QGraphicsItem *item) {
-        return !qgraphicsitem_cast<const CardItem *>(item)->getTapped();
-    });
-    QList<const ::google::protobuf::Message *> cmdList;
-    for (const auto &selectedItem : selectedItems) {
-        CardItem *temp = qgraphicsitem_cast<CardItem *>(selectedItem);
-        if (temp->getTapped() != tapAll) {
-            Command_SetCardAttr *cmd = new Command_SetCardAttr;
-            cmd->set_zone(getLogic()->getName().toStdString());
-            cmd->set_card_id(temp->getId());
-            cmd->set_attribute(AttrTapped);
-            cmd->set_attr_value(tapAll ? "1" : "0");
-            cmdList.append(cmd);
+    QList<CardItem *> selectedCards;
+    for (auto *item : scene()->selectedItems()) {
+        auto *card = qgraphicsitem_cast<CardItem *>(item);
+        if (card && card->getZone()->getName() == ZoneNames::TABLE) {
+            selectedCards.append(card);
         }
     }
-    getLogic()->getPlayer()->getPlayerActions()->sendGameCommand(
-        getLogic()->getPlayer()->getPlayerActions()->prepareGameCommand(cmdList));
+
+    const bool tapAll = std::any_of(selectedCards.begin(), selectedCards.end(),
+                                    [](const CardItem *card) { return !card->getTapped(); });
+
+    getLogic()->getPlayer()->getPlayerActions()->actToggleTapped(getLogic()->getName(), selectedCards, tapAll);
 }
 
 void TableZone::resizeToContents()
