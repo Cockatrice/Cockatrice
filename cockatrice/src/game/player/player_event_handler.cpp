@@ -356,7 +356,7 @@ void PlayerEventHandler::eventMoveCard(const Event_MoveCard &event, const GameEv
     }
 
     if (card->getAttachedTo() && (startZone != targetZone)) {
-        CardItem *parentCard = card->getAttachedTo();
+        CardState *parentCard = card->getAttachedTo();
         card->setAttachedTo(nullptr);
         parentCard->getZone()->reorganizeCards();
     }
@@ -440,7 +440,7 @@ void PlayerEventHandler::eventDestroyCard(const Event_DestroyCard &event)
 
     emit logDestroyCard(player, card->getName());
     zone->takeCard(-1, event.card_id(), true);
-    card->deleteLater();
+    card->getState()->deleteView();
 }
 
 void PlayerEventHandler::eventAttachCard(const Event_AttachCard &event)
@@ -469,7 +469,7 @@ void PlayerEventHandler::eventAttachCard(const Event_AttachCard &event)
         return;
     }
 
-    CardItem *oldParent = startCard->getAttachedTo();
+    CardState *oldParent = startCard->getAttachedTo();
 
     startCard->setAttachedTo(targetCard);
 

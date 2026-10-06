@@ -65,12 +65,13 @@ CardItem::CardItem(PlayerLogic *_owner,
     });
 
     connect(state, &CardState::stateReset, this, [this] {
-        attachedCards.clear();
         if (scene()) {
             static_cast<GameScene *>(scene())->unregisterAnimationItem(this);
         }
         update();
     });
+
+    connect(state, &CardState::viewDeleteRequested, this, &CardItem::deleteLater);
 }
 
 void CardItem::prepareDelete()
@@ -84,6 +85,7 @@ void CardItem::prepareDelete()
         owner = nullptr;
     }
 
+    const QList<CardItem *> &attachedCards = state->getAttachedCards();
     while (!attachedCards.isEmpty()) {
         attachedCards.first()->setZone(nullptr); // so that it won't try to call reorganizeCards()
         attachedCards.first()->setAttachedTo(nullptr);
@@ -224,7 +226,7 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
     }
 
     state->setGridPoint(QPoint(-1, state->getGridPoint().y()));
-    state->setAttachedTo(_attachedTo);
+    state->setAttachedTo(_attachedTo == nullptr ? nullptr : _attachedTo->getState());
     if (state->getAttachedTo() != nullptr) {
         // If the zone is being torn down, it might already be null by the time a card tries to un-attach all its
         // attached cards
