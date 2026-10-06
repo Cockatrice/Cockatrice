@@ -31,8 +31,6 @@
 #include <QChar>
 #include <QColor>
 #include <QFlags>
-#include <QInputDialog>
-#include <QKeyEvent>
 #include <QList>
 #include <QMap>
 #include <QMapIterator>
@@ -1493,16 +1491,6 @@ void PlayerActions::actReduceLifeByPower(QList<CardItem *> selectedCards)
     cmd.set_counter_id(lifeCounter->getId());
     cmd.set_delta(-total);
     sendGameCommand(prepareGameCommand(cmd));
-}
-
-void AnnotationDialog::keyPressEvent(QKeyEvent *event)
-{
-    if (event->key() == Qt::Key_Return && event->modifiers() & Qt::ControlModifier) {
-        event->accept();
-        accept();
-        return;
-    }
-    QInputDialog::keyPressEvent(event);
 }
 
 void PlayerActions::actRequestSetAnnotationDialog(QList<CardItem *> selectedCards)
