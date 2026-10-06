@@ -18,7 +18,6 @@
 #include "player_info.h"
 #include "player_manager.h"
 
-#include <QInputDialog>
 #include <QLoggingCategory>
 #include <QMap>
 #include <QTimer>
@@ -264,17 +263,6 @@ private:
     CardRef remotePlaymatCard;
     PlaymatParams remotePlaymatParams;
     bool hasRemotePlaymat = false;
-};
-
-class AnnotationDialog : public QInputDialog
-{
-    Q_OBJECT
-    void keyPressEvent(QKeyEvent *e) override;
-
-public:
-    explicit AnnotationDialog(QWidget *parent = nullptr) : QInputDialog(parent)
-    {
-    }
 };
 
 #endif
