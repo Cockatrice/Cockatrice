@@ -134,6 +134,8 @@ void TabEdhRecMain::setCard(CardInfoPtr _cardToQuery, bool isCommander)
         return;
     }
 
+    emit tabTextChanged(this, getTabText());
+
     QString cardName = cardToQuery->getName();
     QString formattedName = cardName.toLower().replace(" ", "-").remove(QRegularExpression("[^a-z0-9\\-]"));
 
