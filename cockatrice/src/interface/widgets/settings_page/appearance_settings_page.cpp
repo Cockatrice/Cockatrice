@@ -129,6 +129,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     });
 
     homeTabBackgroundShuffleFrequencySpinBox.setRange(0, 3600);
+    //: Unit following a number of seconds. Keep the leading space unless your language writes number and unit flush.
     homeTabBackgroundShuffleFrequencySpinBox.setSuffix(tr(" seconds"));
     homeTabBackgroundShuffleFrequencySpinBox.setValue(settings.appearance().getHomeTabBackgroundShuffleFrequency());
     connect(&homeTabBackgroundShuffleFrequencySpinBox, qOverload<int>(&QSpinBox::valueChanged), &settings.appearance(),
