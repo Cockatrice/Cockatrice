@@ -2,7 +2,6 @@
 
 #include "../client/settings/cache_settings.h"
 #include "../game/abstract_game.h"
-#include "../game/arrow_registry.h"
 #include "../game/board/arrow_data.h"
 #include "../game/player/player_actions.h"
 #include "../game/player/player_event_handler.h"
@@ -13,6 +12,7 @@
 #include "animated_item.h"
 #include "board/abstract_card_item.h"
 #include "board/arrow_item.h"
+#include "board/arrow_registry.h"
 #include "board/card_item.h"
 #include "phases_toolbar.h"
 #include "player/menu/player_menu.h"
