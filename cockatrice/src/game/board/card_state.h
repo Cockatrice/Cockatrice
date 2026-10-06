@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QPoint>
 #include <QString>
+#include <QVariant>
 #include <libcockatrice/card/printing/exact_card.h>
 #include <libcockatrice/utility/card_ref.h>
 #include <qtmetamacros.h>
@@ -150,6 +151,26 @@ public:
     }
 
     void setPT(const QString &_pt);
+
+    /**
+     * @brief Parses a string representing a p/t in order to extract the values from it.
+     *
+     * If the string contains '/', the string will be split at the '/' and each side will be parsed separately,
+     * which means the result list will have two elements.
+     *
+     * If '/' is not found, then the entire string is parsed together, which means the result list will
+     * have a single element.
+     *
+     * If either side of the split is empty, there will also only be a single element in the result list.
+     *
+     * This function will attempt to parse each substring as an int first, handling plus and minus prefixes.
+     * If successful, it will put the parsed value into the QVariant as an int.
+     * If failed, it will just put the substring into the QVariant as a QString.
+     *
+     * @param pt The p/t string
+     * @return A QVariantList that can contain one or two elements, where each QVariant can be either int or QString
+     */
+    static QVariantList parsePT(const QString &pt);
 
     bool getDoesntUntap() const
     {
