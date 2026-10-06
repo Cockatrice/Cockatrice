@@ -6,14 +6,19 @@
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/command_concede.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_select.pb.h>
 #include <libcockatrice/protocol/pb/command_delete_arrow.pb.h>
 #include <libcockatrice/protocol/pb/command_draw_cards.pb.h>
 #include <libcockatrice/protocol/pb/command_game_say.pb.h>
 #include <libcockatrice/protocol/pb/command_leave_game.pb.h>
 #include <libcockatrice/protocol/pb/command_next_turn.pb.h>
+#include <libcockatrice/protocol/pb/command_ready_start.pb.h>
 #include <libcockatrice/protocol/pb/command_reverse_turn.pb.h>
 #include <libcockatrice/protocol/pb/command_set_active_phase.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
+#include <libcockatrice/protocol/pb/command_set_playmat.pb.h>
+#include <libcockatrice/protocol/pb/command_set_sideboard_lock.pb.h>
+#include <libcockatrice/protocol/pb/command_set_sideboard_plan.pb.h>
 #include <libcockatrice/protocol/pb/context_connection_state_changed.pb.h>
 #include <libcockatrice/protocol/pb/context_deck_select.pb.h>
 #include <libcockatrice/protocol/pb/event_game_closed.pb.h>
@@ -219,6 +224,71 @@ void GameEventHandler::handleDrawCard()
     cmd.set_number(1);
 
     sendGameCommand(cmd);
+}
+
+PendingCommand *GameEventHandler::prepareDeckSelect(const QString &deckList)
+{
+    Command_DeckSelect cmd;
+    cmd.set_deck(deckList.toStdString());
+
+    return prepareGameCommand(cmd);
+}
+
+PendingCommand *GameEventHandler::prepareDeckSelectId(int deckId)
+{
+    Command_DeckSelect cmd;
+    cmd.set_deck_id(deckId);
+
+    return prepareGameCommand(cmd);
+}
+
+void GameEventHandler::sendSetPlaymat(const PlaymatInfo &playmat, int playerId)
+{
+    Command_SetPlaymat cmd;
+    auto *pp = cmd.mutable_playmat_params();
+    pp->set_card_name(playmat.card.name.toStdString());
+    pp->set_card_provider_id(playmat.card.providerId.toStdString());
+    pp->set_margin_pct_l(playmat.params.marginPctL);
+    pp->set_margin_pct_r(playmat.params.marginPctR);
+    pp->set_vertical_offset(playmat.params.verticalOffset);
+    pp->set_zoom(playmat.params.zoom);
+
+    sendGameCommand(prepareGameCommand(cmd), playerId);
+}
+
+void GameEventHandler::sendReadyStart(bool ready, int playerId)
+{
+    Command_ReadyStart cmd;
+    cmd.set_ready(ready);
+
+    sendGameCommand(cmd, playerId);
+}
+
+void GameEventHandler::sendForceStart(int playerId)
+{
+    Command_ReadyStart cmd;
+    cmd.set_force_start(true);
+    cmd.set_ready(true);
+
+    sendGameCommand(cmd, playerId);
+}
+
+void GameEventHandler::sendSetSideboardLock(bool locked, int playerId)
+{
+    Command_SetSideboardLock cmd;
+    cmd.set_locked(locked);
+
+    sendGameCommand(cmd, playerId);
+}
+
+void GameEventHandler::sendSetSideboardPlan(const QList<MoveCard_ToZone> &plan, int playerId)
+{
+    Command_SetSideboardPlan cmd;
+    for (const auto &zone : plan) {
+        cmd.add_move_list()->CopyFrom(zone);
+    }
+
+    sendGameCommand(cmd, playerId);
 }
 
 void GameEventHandler::handleGameLeft()
