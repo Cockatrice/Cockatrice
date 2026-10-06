@@ -10,8 +10,10 @@
 
 #include "libcockatrice/deck_list/deck_list.h"
 
+#include <QCheckBox>
 #include <QDialog>
 #include <QString>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <qtmetamacros.h>
 
 class QPlainTextEdit;

@@ -2,7 +2,6 @@
 
 #include "../../../../client/settings/cache_settings.h"
 #include "../../../../client/settings/shortcuts_settings.h"
-#include "../../../deck_loader/loaded_deck.h"
 #include "../../deck_editor/deck_editor_card_database_dock_widget.h"
 #include "../../deck_editor/deck_editor_card_info_dock_widget.h"
 #include "../../deck_editor/deck_editor_deck_dock_widget.h"
@@ -44,6 +43,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <functional>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/layouts_settings.h>

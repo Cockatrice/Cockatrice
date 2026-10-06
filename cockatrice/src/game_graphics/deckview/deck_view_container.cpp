@@ -6,9 +6,7 @@
 #include "../../game/game_event_handler.h"
 #include "../../game/game_state.h"
 #include "../../interface/card_picture_loader/card_picture_loader.h"
-#include "../../interface/deck_loader/deck_file_format.h"
 #include "../../interface/deck_loader/deck_loader.h"
-#include "../../interface/deck_loader/loaded_deck.h"
 #include "../../interface/widgets/dialogs/dlg_load_deck.h"
 #include "../../interface/widgets/dialogs/dlg_load_deck_from_clipboard.h"
 #include "../../interface/widgets/dialogs/dlg_load_deck_from_website.h"
@@ -33,6 +31,8 @@
 #include <QRect>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/deck_list/deck_file_format.h>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/deck_list/playmat_resolver.h>
 #include <libcockatrice/protocol/pb/response_deck_download.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
