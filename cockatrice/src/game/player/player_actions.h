@@ -189,9 +189,7 @@ public slots:
     void actRequestSetCardCounterDialog(QList<CardItem *> selectedCards, int counterId);
     void actSetCardCounter(QList<CardItem *> selectedCards, int counterId, const QString &counterValue);
     void actIncrementAllCardCounters(QList<CardItem *> cardsToUpdate);
-    void actAttach();
     void actUnattach(QList<CardItem *> selectedCards);
-    void actDrawArrow();
     void actIncPT(QList<CardItem *> selectedCards, int deltaP, int deltaT);
     void actResetPT(QList<CardItem *> selectedCards);
     void actRequestSetPTDialog(QList<CardItem *> selectedCards);

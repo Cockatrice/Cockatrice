@@ -21,7 +21,7 @@ signals:
     void cardInfoRequested(const CardRef &cardRef);
 
 public:
-    explicit CardMenu(PlayerGraphicsItem *player, const CardItem *card, bool shortcutsActive);
+    explicit CardMenu(PlayerGraphicsItem *player, CardItem *card, bool shortcutsActive);
     void removePlayer(PlayerLogic *playerToRemove);
     void createTableMenu(bool canModifyCard);
     void createStackMenu(bool canModifyCard);
@@ -47,11 +47,13 @@ public:
 
 private:
     PlayerGraphicsItem *player;
-    const CardItem *card;
+    CardItem *card;
     QList<QPair<QString, int>> playersInfo;
     bool shortcutsActive;
 
     void addRelatedCardActions();
+    void attachCard();
+    void drawArrow();
     void retranslateUi();
     void initContextualPlayersMenu(QMenu *menu, QAction *allPlayersAction);
     void setShortcutsActive();

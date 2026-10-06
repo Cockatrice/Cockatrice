@@ -1375,14 +1375,6 @@ void PlayerActions::actSetPT(QList<CardItem *> selectedCards, const QString &pt)
     player->getGame()->getGameEventHandler()->sendGameCommand(prepareGameCommand(commandList), playerid);
 }
 
-void PlayerActions::actDrawArrow()
-{
-    auto *card = player->getGame()->getActiveCard();
-    if (card) {
-        card->drawArrow(Qt::red);
-    }
-}
-
 void PlayerActions::actIncP(QList<CardItem *> selectedCards)
 {
     actIncPT(selectedCards, 1, 0);
@@ -1472,16 +1464,6 @@ void PlayerActions::actSetAnnotation(QList<CardItem *> selectedCards, const QStr
         commandList.append(cmd);
     }
     sendGameCommand(prepareGameCommand(commandList));
-}
-
-void PlayerActions::actAttach()
-{
-    auto *card = player->getGame()->getActiveCard();
-    if (!card) {
-        return;
-    }
-
-    card->drawAttachArrow();
 }
 
 void PlayerActions::actUnattach(QList<CardItem *> selectedCards)
