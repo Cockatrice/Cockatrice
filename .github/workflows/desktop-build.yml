@@ -209,7 +209,7 @@ jobs:
           RUN --server --release --package "$package" "${args[@]}"
 
       # Delete used cache to emulate a cache update. See https://github.com/actions/cache/issues/342
-      - name: "Delete used cache to emulate a cache update. See https://github.com/actions/cache/issues/342"
+      - name: "[Linux] Delete used cache to emulate a cache update"
         if: github.ref == 'refs/heads/master' && steps.restore_image_cache.outputs.cache-hit
         continue-on-error: true
         env:
@@ -368,7 +368,7 @@ jobs:
 
       - name: "[macOS] Restore compiler cache (ccache)"
         if: matrix.os == 'macOS' && matrix.use_ccache == 1
-        id: restore_image_cache
+        id: restore_ccache
         uses: actions/cache/restore@v6
         with:
           key: ccache-${{ matrix.runner }}_${{ matrix.override_target }}-Xcode${{ matrix.xcode }}
@@ -477,10 +477,10 @@ jobs:
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "[macOS] Delete remote compiler cache (ccache)"
-        if: matrix.os == 'macOS' && matrix.use_ccache == 1 && github.ref == 'refs/heads/master' && steps.restore_image_cache.outputs.cache-hit
+        if: matrix.os == 'macOS' && matrix.use_ccache == 1 && github.ref == 'refs/heads/master' && steps.restore_ccache.outputs.cache-hit
         continue-on-error: true
         env:
-          CACHE_PRIMARY_KEY: ${{ steps.restore_image_cache.outputs.cache-primary-key }}
+          CACHE_PRIMARY_KEY: ${{ steps.restore_ccache.outputs.cache-primary-key }}
           GH_TOKEN: ${{ github.token }}
         run: |
           if gh cache delete --repo "$GITHUB_REPOSITORY" "$CACHE_PRIMARY_KEY"; then
@@ -491,7 +491,7 @@ jobs:
         if: matrix.os == 'macOS' && matrix.use_ccache == 1 && github.ref == 'refs/heads/master'
         uses: actions/cache/save@v6
         with:
-          key: ${{ steps.restore_image_cache.outputs.cache-primary-key }}
+          key: ${{ steps.restore_ccache.outputs.cache-primary-key }}
           path: ${{ env.CCACHE_DIR }}
 
       - name: "[macOS] Sign app bundle"
