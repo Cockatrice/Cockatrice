@@ -86,20 +86,18 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, CardItem *_card, bool _shortcuts
     aHide = makeAction(this, [actions, sel]() { actions->actHide(sel()); });
     aReduceLifeByPower = makeAction(this, [actions, sel]() { actions->actReduceLifeByPower(sel()); });
 
-    // Actions bound to the card this menu was opened for
+    // Actions bound to the card this menu was opened for, not to the current selection
     aAttach = new QAction(this);
     aDrawArrow = new QAction(this);
-
-    // Actions that use activeCard, not selection — direct connection
     aSelectAll = new QAction(this);
     aSelectRow = new QAction(this);
     aSelectColumn = new QAction(this);
 
     connect(aAttach, &QAction::triggered, this, &CardMenu::attachCard);
     connect(aDrawArrow, &QAction::triggered, this, &CardMenu::drawArrow);
-    connect(aSelectAll, &QAction::triggered, actions, &PlayerActions::actSelectAll);
-    connect(aSelectRow, &QAction::triggered, actions, &PlayerActions::actSelectRow);
-    connect(aSelectColumn, &QAction::triggered, actions, &PlayerActions::actSelectColumn);
+    connect(aSelectAll, &QAction::triggered, this, [this, actions]() { actions->actSelectAll(card); });
+    connect(aSelectRow, &QAction::triggered, this, [this, actions]() { actions->actSelectRow(card); });
+    connect(aSelectColumn, &QAction::triggered, this, [this, actions]() { actions->actSelectColumn(card); });
 
     aRevealToAll = new QAction(this);
 
@@ -421,6 +419,7 @@ void CardMenu::addRelatedCardActions()
     if (relatedCards.isEmpty()) {
         return;
     }
+    auto *playerActions = player->getLogic()->getPlayerActions();
 
     addSeparator();
     int index = 0;
@@ -464,9 +463,9 @@ void CardMenu::addRelatedCardActions()
         }
 
         auto *createRelated = new QAction(text, this);
-        createRelated->setData(QVariant(index++));
-        connect(createRelated, &QAction::triggered, player->getLogic()->getPlayerActions(),
-                &PlayerActions::actCreateRelatedCard);
+        const int relatedIndex = index++;
+        connect(createRelated, &QAction::triggered, this,
+                [this, playerActions, relatedIndex] { playerActions->actCreateRelatedCard(card, relatedIndex); });
         addAction(createRelated);
     }
 
@@ -475,8 +474,8 @@ void CardMenu::addRelatedCardActions()
             createRelatedCards->setShortcuts(
                 SettingsCache::instance().shortcuts().getShortcut("Player/aCreateRelatedTokens"));
         }
-        connect(createRelatedCards, &QAction::triggered, player->getLogic()->getPlayerActions(),
-                &PlayerActions::actCreateAllRelatedCards);
+        connect(createRelatedCards, &QAction::triggered, this,
+                [this, playerActions] { playerActions->actCreateAllRelatedCards(card); });
         addAction(createRelatedCards);
     }
 }
