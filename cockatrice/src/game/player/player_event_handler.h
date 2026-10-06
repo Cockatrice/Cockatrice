@@ -267,7 +267,7 @@ signals:
     /** @} */
 
     void cardZoneChanged(CardItem *card, bool sameZone);
-    void requestCardMenuUpdate(const CardItem *card);
+    void requestCardMenuUpdate(CardItem *card);
 
 private:
     /** Owning player instance. */
