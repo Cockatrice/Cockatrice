@@ -68,12 +68,12 @@ set(cockatrice_SOURCES
     src/filters/filter_tree_model.cpp
     src/filters/syntax_help.cpp
     src/game/abstract_game.cpp
-    src/game/arrow_registry.cpp
     src/game_graphics/board/abstract_card_drag_item.cpp
     src/game_graphics/board/abstract_card_item.cpp
     src/game_graphics/board/abstract_counter.cpp
     src/game/board/arrow_data.cpp
     src/game_graphics/board/arrow_item.cpp
+    src/game_graphics/board/arrow_registry.cpp
     src/game_graphics/board/arrow_target.cpp
     src/game_graphics/board/card_drag_item.cpp
     src/game_graphics/board/card_item.cpp

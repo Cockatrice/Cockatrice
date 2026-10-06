@@ -1,7 +1,7 @@
 #ifndef COCKATRICE_ARROW_REGISTRY_H
 #define COCKATRICE_ARROW_REGISTRY_H
 
-#include "board/arrow_data.h"
+#include "../../game/board/arrow_data.h"
 
 #include <QMap>
 #include <QSet>

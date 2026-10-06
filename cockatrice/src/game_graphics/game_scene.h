@@ -1,11 +1,11 @@
 #ifndef GAMESCENE_H
 #define GAMESCENE_H
 
-#include "../game/arrow_registry.h"
 #include "../game/board/arrow_data.h"
 #include "../game/zones/card_zone_logic.h"
 #include "animated_item.h"
 #include "board/arrow_item.h"
+#include "board/arrow_registry.h"
 
 #include <QGraphicsScene>
 #include <QHash>
