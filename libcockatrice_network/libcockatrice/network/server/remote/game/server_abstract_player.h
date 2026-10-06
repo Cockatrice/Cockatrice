@@ -49,6 +49,10 @@ public:
     {
         return deck;
     }
+    bool getSideboardLocked() const
+    {
+        return sideboardLocked;
+    }
     bool getReadyStart() const
     {
         return readyStart;
