@@ -41,7 +41,7 @@ class CardZoneLogic;
 class Command_MoveCard;
 class PendingCommand;
 class PlayerLogic;
-
+struct ArrowData;
 class PlayerActions : public QObject
 {
     Q_OBJECT
@@ -85,6 +85,25 @@ public:
      * @param tapped Desired tapped state.
      */
     void actToggleTapped(const QString &zoneName, const QList<CardItem *> &cards, bool tapped);
+
+    /**
+     * @brief Attaches one card to another on the table on behalf of a view.
+     * @param startCard Card being attached.
+     * @param targetCard Card being attached to.
+     */
+    void attachCards(CardItem *startCard, const CardItem *targetCard);
+
+    /**
+     * @brief Draws an arrow from a card to another card or a player on behalf of a view.
+     *
+     * The view resolves the endpoints before playing the card out of hand, so the
+     * arrow still records the zone the card started in.
+     *
+     * @param startCard Card the arrow starts from.
+     * @param arrow Arrow endpoints and color, as resolved by the view.
+     * @param deleteInPhase Phase the arrow expires in, 0 to keep it until removed.
+     */
+    void createArrow(CardItem *startCard, const ArrowData &arrow, int deleteInPhase);
 
     void moveOneCardUntil(CardItem *card);
     void stopMoveTopCardsUntil();
