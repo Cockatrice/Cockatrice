@@ -29,7 +29,8 @@ public:
     [[nodiscard]] QString getTabText() const override
     {
         auto cardName = cardToQuery.isNull() ? QString() : cardToQuery->getName();
-        return tr("EDHRec: ") + cardName;
+        //: EDHRec is a website name, keep it as written. %1 is the card being looked up.
+        return tr("EDHRec: %1").arg(cardName);
     }
 
     CardSizeWidget *getCardSizeSlider() const

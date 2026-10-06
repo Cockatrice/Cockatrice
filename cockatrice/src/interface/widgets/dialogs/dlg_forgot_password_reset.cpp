@@ -50,6 +50,7 @@ DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent) : QDialog(parent
     playernameEdit->setMaxLength(MAX_NAME_LENGTH);
     playernameLabel->setBuddy(playernameEdit);
 
+    //: Code mailed to the player so they can reset their password. Not a game token.
     tokenLabel = new QLabel(tr("Token:"));
     tokenEdit = new QLineEdit();
     tokenEdit->setMaxLength(MAX_NAME_LENGTH);

@@ -440,16 +440,16 @@ void CardMenu::addRelatedCardActions()
             relatedCardName = relatedCard.getName(); // "name"
         }
 
-        QString text = tr("Token: ");
+        QString text;
         if (cardRelation->getDoesAttach()) {
-            text +=
-                tr(cardRelation->getDoesTransform() ? "Transform into " : "Attach to ") + "\"" + relatedCardName + "\"";
+            text = cardRelation->getDoesTransform() ? tr("Token: Transform into \"%1\"").arg(relatedCardName)
+                                                    : tr("Token: Attach to \"%1\"").arg(relatedCardName);
         } else if (cardRelation->getIsVariable()) {
-            text += "X " + relatedCardName;
+            text = tr("Token: X %1").arg(relatedCardName);
         } else if (cardRelation->getDefaultCount() != 1) {
-            text += QString::number(cardRelation->getDefaultCount()) + "x " + relatedCardName;
+            text = tr("Token: %1x %2").arg(cardRelation->getDefaultCount()).arg(relatedCardName);
         } else {
-            text += relatedCardName;
+            text = tr("Token: %1").arg(relatedCardName);
         }
 
         if (createRelatedCards == nullptr) {
