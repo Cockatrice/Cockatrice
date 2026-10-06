@@ -368,6 +368,13 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             type: Release
             variant: ' (Ninja)'
+            # The same scope as the Visual Studio leg, so both halves of the A/B
+            # start from the same vcpkg cache and the comparison is about the
+            # generator alone. Without it this leg's prefix is empty, which makes
+            # the cache action restore the whole vcpkg/ namespace and write entries
+            # that no scope claims. vcpkg_upload is deliberately left unset, so only
+            # the Visual Studio leg hands its archives over.
+            vcpkg_scope: 'vcpkg/windows10-x64-vs2026/'
 
     name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}${{ matrix.variant }}
     needs: configure
