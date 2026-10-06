@@ -1,6 +1,6 @@
 /**
  * @file card_menu_action_type.h
- * @ingroup GameMenusPlayers
+ * @ingroup GameLogicPlayers
  */
 //! \todo Document this file.
 

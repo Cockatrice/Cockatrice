@@ -9,11 +9,11 @@
 #define COCKATRICE_PLAYER_ACTIONS_H
 
 #include "../../game_graphics/board/card_item.h"
-#include "../../game_graphics/dialogs/dlg_create_token.h"
-#include "../../game_graphics/dialogs/dlg_move_top_cards_until.h"
-#include "../../game_graphics/player/card_menu_action_type.h"
+#include "card_menu_action_type.h"
 #include "event_processing_options.h"
+#include "move_top_cards_until_options.h"
 #include "player_logic.h"
+#include "token_info.h"
 
 #include <QMenu>
 #include <QObject>
