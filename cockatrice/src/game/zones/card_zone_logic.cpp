@@ -1,7 +1,6 @@
 #include "card_zone_logic.h"
 
 #include "../../game_graphics/board/card_item.h"
-#include "../../game_graphics/zones/view_zone.h"
 #include "../player/player_actions.h"
 #include "../player/player_logic.h"
 #include "view_zone_logic.h"
@@ -38,16 +37,16 @@ CardZoneLogic::CardZoneLogic(PlayerLogic *_player,
 void CardZoneLogic::addCard(CardItem *card, const bool reorganize, const int x, const int y)
 {
     if (!card) {
-        qCWarning(CardZoneLog) << "CardZoneLogic::addCard() card is null; this shouldn't normally happen";
+        qCWarning(CardZoneLogicLog) << "CardZoneLogic::addCard() card is null; this shouldn't normally happen";
         return;
     }
 
-    for (auto *view : views) {
-        if (qobject_cast<ZoneViewZoneLogic *>(view->getLogic())->prepareAddCard(x)) {
+    for (auto *viewLogic : views) {
+        if (viewLogic->prepareAddCard(x)) {
             auto copy = new CardItem(player, nullptr, card->getCardRef(), card->getId());
             copy->setFaceDown(card->getFaceDown());
 
-            view->getLogic()->addCard(copy, reorganize, x, y);
+            viewLogic->addCard(copy, reorganize, x, y);
         }
     }
 
@@ -81,8 +80,8 @@ CardItem *CardZoneLogic::takeCard(int position, int cardId, bool toNewZone)
         return nullptr;
     }
 
-    for (auto *view : views) {
-        qobject_cast<ZoneViewZoneLogic *>(view->getLogic())->removeCard(position, toNewZone);
+    for (auto *viewLogic : views) {
+        viewLogic->removeCard(position, toNewZone);
     }
 
     CardItem *c = cards.takeAt(position);
@@ -98,7 +97,7 @@ CardItem *CardZoneLogic::getCard(int cardId)
 {
     CardItem *c = cards.findCard(cardId);
     if (!c) {
-        qCWarning(CardZoneLog) << "CardZoneLogic::getCard: card id=" << cardId << "not found";
+        qCWarning(CardZoneLogicLog) << "CardZoneLogic::getCard: card id=" << cardId << "not found";
         return nullptr;
     }
     // If the card's id is -1, this zone is invisible,
@@ -113,7 +112,7 @@ CardItem *CardZoneLogic::getCard(int cardId)
 void CardZoneLogic::removeCard(CardItem *card)
 {
     if (!card) {
-        qCWarning(CardZoneLog) << "CardZoneLogic::removeCard: card is null, this shouldn't normally happen";
+        qCWarning(CardZoneLogicLog) << "CardZoneLogic::removeCard: card is null, this shouldn't normally happen";
         return;
     }
 

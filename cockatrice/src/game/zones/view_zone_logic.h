@@ -42,6 +42,13 @@ public:
     void removeCard(int position, bool toNewZone);
     void updateCardIds(CardAction action);
 
+    /**
+     * @brief Asks the graphics view showing this zone to close itself.
+     *
+     * Logic code has no handle on the view, so it goes through the logic object the view was built from.
+     */
+    void requestClose();
+
     /** @brief Removes all cards from the view, without touching anything else. Used in replay rewind */
     void clearCards();
 
