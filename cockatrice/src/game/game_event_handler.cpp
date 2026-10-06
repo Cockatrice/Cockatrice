@@ -255,8 +255,6 @@ void GameEventHandler::eventSpectatorLeave(const Event_Leave &event,
     emit spectatorLeft(eventPlayerId);
 
     game->getPlayerManager()->removeSpectator(eventPlayerId);
-
-    emitUserEvent();
 }
 
 void GameEventHandler::eventGameStateChanged(const Event_GameStateChanged &event,
@@ -443,9 +441,9 @@ void GameEventHandler::eventJoin(const Event_Join &event, int /*eventPlayerId*/,
         PlayerLogic *newPlayer = game->getPlayerManager()->addPlayer(playerId, playerInfo.user_info());
         emit logJoinPlayer(newPlayer);
         emit playerJoined(playerInfo);
-    }
 
-    emitUserEvent();
+        emitUserEvent();
+    }
 }
 
 QString GameEventHandler::getLeaveReason(Event_Leave::LeaveReason reason)
