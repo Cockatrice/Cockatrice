@@ -7,6 +7,8 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "../board/arrow_data.h"
+#include "../board/counter_state.h"
 #include "../zones/card_zone_logic.h"
 #include "../zones/hand_zone_logic.h"
 #include "../zones/pile_zone_logic.h"
@@ -22,6 +24,11 @@
 #include <QMap>
 #include <QObject>
 #include <QString>
+#include <QTimer>
+#include <libcockatrice/deck_list/loaded_deck.h>
+#include <libcockatrice/filters/filter_string.h>
+#include <libcockatrice/protocol/pb/card_attributes.pb.h>
+#include <libcockatrice/protocol/pb/game_event.pb.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <qtmetamacros.h>
 
