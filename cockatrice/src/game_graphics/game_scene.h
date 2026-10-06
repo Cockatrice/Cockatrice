@@ -92,6 +92,15 @@ public:
     /** @brief Gets all selected CardItems. */
     QList<CardItem *> selectedCards() const;
 
+    /** @brief Selects every card sharing the zone of @p card. */
+    void selectAllInZone(const CardItem *card);
+
+    /** @brief Selects the cards laid out in the same visual row as @p card. */
+    void selectSameRow(const CardItem *card);
+
+    /** @brief Selects the cards laid out in the same visual column as @p card. */
+    void selectSameColumn(const CardItem *card);
+
     /** @brief Card the currently open context menu targets, or null. */
     CardItem *getActiveCard() const;
 

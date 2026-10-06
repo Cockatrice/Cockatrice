@@ -11,7 +11,7 @@ static int sumPowers(const QList<CardItem *> &cards)
     // calculate total power;
     int total = 0;
     for (auto card : cards) {
-        QVariantList parsed = CardItem::parsePT(card->getPT());
+        QVariantList parsed = CardState::parsePT(card->getPT());
         if (!parsed.isEmpty()) {
             int power = parsed.first().toInt(); // toInt will default to 0 if it's not an int
             total += qMax(power, 0);
@@ -39,7 +39,7 @@ static int sumToughness(const QList<CardItem *> &cards)
 {
     int total = 0;
     for (auto card : cards) {
-        QVariantList parsed = CardItem::parsePT(card->getPT());
+        QVariantList parsed = CardState::parsePT(card->getPT());
         if (parsed.size() == 2) {
             int toughness = parsed.at(1).toInt(); // toInt will default to 0 if it's not an int
             total += qMax(toughness, 0);

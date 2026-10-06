@@ -95,9 +95,9 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, CardItem *_card, bool _shortcuts
 
     connect(aAttach, &QAction::triggered, this, &CardMenu::attachCard);
     connect(aDrawArrow, &QAction::triggered, this, &CardMenu::drawArrow);
-    connect(aSelectAll, &QAction::triggered, this, [this, actions]() { actions->actSelectAll(card); });
-    connect(aSelectRow, &QAction::triggered, this, [this, actions]() { actions->actSelectRow(card); });
-    connect(aSelectColumn, &QAction::triggered, this, [this, actions]() { actions->actSelectColumn(card); });
+    connect(aSelectAll, &QAction::triggered, this, [this, gameScene]() { gameScene->selectAllInZone(card); });
+    connect(aSelectRow, &QAction::triggered, this, [this, gameScene]() { gameScene->selectSameRow(card); });
+    connect(aSelectColumn, &QAction::triggered, this, [this, gameScene]() { gameScene->selectSameColumn(card); });
 
     aRevealToAll = new QAction(this);
 
