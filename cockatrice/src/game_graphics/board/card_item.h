@@ -33,9 +33,6 @@ class CardItem : public AbstractCardItem
 {
     Q_OBJECT
 private:
-    CardState *state;
-
-    QPoint gridPoint;
     CardDragItem *dragItem;
     QList<CardItem *> attachedCards;
 
@@ -60,10 +57,6 @@ public:
                       CardZoneLogic *_zone = nullptr);
 
     void retranslateUi();
-    [[nodiscard]] CardState *getState() const
-    {
-        return state;
-    }
     [[nodiscard]] CardZoneLogic *getZone() const
     {
         return state->getZone();
@@ -72,15 +65,15 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     [[nodiscard]] QPoint getGridPoint() const
     {
-        return gridPoint;
+        return state->getGridPoint();
     }
     void setGridPoint(const QPoint &_gridPoint)
     {
-        gridPoint = _gridPoint;
+        state->setGridPoint(_gridPoint);
     }
     [[nodiscard]] QPoint getGridPos() const
     {
-        return gridPoint;
+        return state->getGridPoint();
     }
     [[nodiscard]] PlayerLogic *getOwner() const
     {
