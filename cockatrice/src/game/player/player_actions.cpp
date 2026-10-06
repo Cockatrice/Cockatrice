@@ -2,6 +2,7 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../abstract_game.h"
+#include "../board/arrow_data.h"
 #include "../zones/table_zone_logic.h"
 #include "../zones/view_zone_logic.h"
 
@@ -9,6 +10,7 @@
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/command_change_zone_properties.pb.h>
+#include <libcockatrice/protocol/pb/command_create_arrow.pb.h>
 #include <libcockatrice/protocol/pb/command_create_token.pb.h>
 #include <libcockatrice/protocol/pb/command_draw_cards.pb.h>
 #include <libcockatrice/protocol/pb/command_dump_zone.pb.h>
@@ -28,6 +30,7 @@
 #include <libcockatrice/settings/card_override_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/clamped_arithmetic.h>
+#include <libcockatrice/utility/color.h>
 #include <libcockatrice/utility/counter_limits.h>
 #include <libcockatrice/utility/expression.h>
 #include <libcockatrice/utility/zone_names.h>
@@ -129,6 +132,60 @@ void PlayerActions::playCardToTable(const CardItem *card, bool faceDown)
     cmd.set_target_zone(ZoneNames::TABLE);
     cmd.set_x(gridPoint.x());
     cmd.set_y(gridPoint.y());
+    sendGameCommand(cmd);
+}
+
+void PlayerActions::attachCards(CardItem *startCard, const CardItem *targetCard)
+{
+    if (targetCard->getAttachedTo() || targetCard->getZone()->getName() != ZoneNames::TABLE) {
+        return;
+    }
+
+    // move card onto table first if attaching from some other zone
+    if (startCard->getZone()->getName() != ZoneNames::TABLE) {
+        playCardToTable(startCard, false);
+    }
+
+    Command_AttachCard cmd;
+    cmd.set_start_zone(ZoneNames::TABLE);
+    cmd.set_card_id(startCard->getId());
+    cmd.set_target_player_id(targetCard->getZone()->getPlayer()->getPlayerInfo()->getId());
+    cmd.set_target_zone(targetCard->getZone()->getName().toStdString());
+    cmd.set_target_card_id(targetCard->getId());
+    sendGameCommand(cmd);
+}
+
+void PlayerActions::createArrow(CardItem *startCard, const ArrowData &arrow, int deleteInPhase)
+{
+    Command_CreateArrow cmd;
+    cmd.mutable_arrow_color()->CopyFrom(convertQColorToColor(arrow.color));
+    cmd.set_start_player_id(arrow.startPlayerId);
+    cmd.set_start_zone(arrow.startZone.toStdString());
+    cmd.set_start_card_id(arrow.startCardId);
+    cmd.set_target_player_id(arrow.targetPlayerId);
+
+    if (!arrow.isPlayerTargeted()) {
+        cmd.set_target_zone(arrow.targetZone.toStdString());
+        cmd.set_target_card_id(arrow.targetCardId);
+    }
+
+    // if the card is in hand then it has just been moved to the stack or table as part of drawing the arrow
+    if (arrow.startZone == ZoneNames::HAND) {
+        CardInfoPtr ci = startCard->getCard().getCardPtr();
+        bool playToStack = SettingsCache::instance().userInterface().getPlayToStack();
+        if (ci && ((!playToStack && ci->getUiAttributes().tableRow == 3) ||
+                   (playToStack && ci->getUiAttributes().tableRow != 0 &&
+                    startCard->getZone()->getName() != ZoneNames::STACK))) {
+            cmd.set_start_zone(ZoneNames::STACK);
+        } else {
+            cmd.set_start_zone(playToStack ? ZoneNames::STACK : ZoneNames::TABLE);
+        }
+    }
+
+    if (deleteInPhase != 0) {
+        cmd.set_delete_in_phase(deleteInPhase);
+    }
+
     sendGameCommand(cmd);
 }
 

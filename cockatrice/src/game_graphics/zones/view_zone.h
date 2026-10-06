@@ -13,7 +13,6 @@
 #include <QGraphicsLayoutItem>
 #include <QLoggingCategory>
 #include <libcockatrice/filters/filter_string.h>
-#include <libcockatrice/protocol/pb/commands.pb.h>
 
 inline Q_LOGGING_CATEGORY(ViewZoneLog, "view_zone");
 

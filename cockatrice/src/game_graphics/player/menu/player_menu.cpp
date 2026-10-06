@@ -10,8 +10,6 @@
 #include "card_menu.h"
 #include "hand_menu.h"
 
-#include <libcockatrice/protocol/pb/command_reveal_cards.pb.h>
-
 PlayerMenu::PlayerMenu(PlayerGraphicsItem *_player) : QObject(_player), player(_player)
 {
     connect(player->getLogic(), &PlayerLogic::requestCardMenuUpdate, this, &PlayerMenu::updateCardMenu);

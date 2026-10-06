@@ -123,7 +123,6 @@ private:
     PlayerLogic *player;
     QList<ArrowAttachItem *> childArrows;
     QMetaObject::Connection positionConnection;
-    void attachCards(CardItem *startCard, const CardItem *targetCard);
 
 public:
     explicit ArrowAttachItem(ArrowTarget *_startItem);
