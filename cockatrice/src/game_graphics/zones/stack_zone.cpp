@@ -9,7 +9,6 @@
 #include "../card_dimensions.h"
 
 #include <QPainter>
-#include <libcockatrice/protocol/pb/command_move_card.pb.h>
 
 StackZone::StackZone(StackZoneLogic *_logic, int _zoneHeight, QGraphicsItem *parent)
     : SelectZone(_logic, parent), zoneHeight(_zoneHeight)
@@ -67,25 +66,15 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
         }
     }
 
-    Command_MoveCard cmd;
-    cmd.set_start_player_id(startZone->getPlayer()->getPlayerInfo()->getId());
-    cmd.set_start_zone(startZone->getName().toStdString());
-    cmd.set_target_player_id(getLogic()->getPlayer()->getPlayerInfo()->getId());
-    cmd.set_target_zone(getLogic()->getName().toStdString());
-    cmd.set_x(index);
-    cmd.set_y(0);
-
+    QList<CardMoveRequest> cards;
+    cards.reserve(dragItems.size());
     for (const CardDragItem *item : dragItems) {
         if (item) {
-            auto *cardToMove = cmd.mutable_cards_to_move()->add_card();
-            cardToMove->set_card_id(item->getId());
-            if (item->isForceFaceDown()) {
-                cardToMove->set_face_down(true);
-            }
+            cards.append(CardMoveRequest{item->getId(), item->isForceFaceDown()});
         }
     }
 
-    getLogic()->getPlayer()->getPlayerActions()->sendGameCommand(cmd);
+    getLogic()->getPlayer()->getPlayerActions()->moveCards(startZone, getLogic(), index, 0, cards);
 }
 
 void StackZone::setHeight(qreal newHeight)
