@@ -27,7 +27,6 @@ public:
     GameState *gameState;
     GameEventHandler *gameEventHandler;
     PlayerManager *playerManager;
-    CardItem *activeCard;
 
     GameMetaInfo *getGameMetaInfo()
     {
@@ -56,12 +55,6 @@ public:
     void loadReplay(const GameReplay *replay);
 
     CardItem *getCard(int playerId, const QString &zoneName, int cardId) const;
-
-    void setActiveCard(CardItem *card);
-    CardItem *getActiveCard() const
-    {
-        return activeCard;
-    }
 };
 
 #endif // COCKATRICE_ABSTRACT_GAME_H

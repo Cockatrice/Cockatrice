@@ -6,8 +6,6 @@ AbstractGame::AbstractGame(QObject *_parent) : QObject(_parent)
 {
     gameMetaInfo = new GameMetaInfo(this);
     gameEventHandler = new GameEventHandler(this);
-
-    activeCard = nullptr;
 }
 
 bool AbstractGame::isHost() const
@@ -34,11 +32,6 @@ void AbstractGame::loadReplay(const GameReplay *replay)
 {
     gameMetaInfo->setFromProto(replay->game_info());
     gameMetaInfo->setSpectatorsOmniscient(true);
-}
-
-void AbstractGame::setActiveCard(CardItem *card)
-{
-    activeCard = card;
 }
 
 CardItem *AbstractGame::getCard(int playerId, const QString &zoneName, int cardId) const

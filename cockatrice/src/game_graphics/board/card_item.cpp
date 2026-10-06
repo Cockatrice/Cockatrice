@@ -41,9 +41,10 @@ CardItem::CardItem(PlayerLogic *_owner,
 void CardItem::prepareDelete()
 {
     if (owner != nullptr) {
-        if (owner->getGame()->getActiveCard() == this) {
+        auto *gameScene = qobject_cast<GameScene *>(scene());
+        if (gameScene && gameScene->getActiveCard() == this) {
             emit owner->requestCardMenuUpdate(nullptr);
-            owner->getGame()->setActiveCard(nullptr);
+            gameScene->setActiveCard(nullptr);
         }
         owner = nullptr;
     }
@@ -533,7 +534,9 @@ QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
         bool selected = value.toBool();
 
         if (selected) {
-            owner->getGame()->setActiveCard(this);
+            if (auto *gameScene = qobject_cast<GameScene *>(scene())) {
+                gameScene->setActiveCard(this);
+            }
         }
 
         emit selectionChanged(this, selected);
