@@ -8,10 +8,9 @@
 #ifndef DLG_LOAD_DECK_FROM_CLIPBOARD_H
 #define DLG_LOAD_DECK_FROM_CLIPBOARD_H
 
-#include "../../deck_loader/loaded_deck.h"
-
 #include <QCheckBox>
 #include <QDialog>
+#include <libcockatrice/deck_list/loaded_deck.h>
 
 class QPlainTextEdit;
 class QPushButton;
