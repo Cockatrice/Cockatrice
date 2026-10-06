@@ -21,6 +21,7 @@
 #include <libcockatrice/protocol/pb/command_roll_die.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_counter.pb.h>
+#include <libcockatrice/protocol/pb/command_set_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
 #include <libcockatrice/protocol/pb/command_undo_draw.pb.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
@@ -1406,6 +1407,24 @@ void PlayerActions::actFlowP(QList<CardItem *> selectedCards)
 void PlayerActions::actFlowT(QList<CardItem *> selectedCards)
 {
     actIncPT(selectedCards, -1, 1);
+}
+
+void PlayerActions::actIncrementCounter(int counterId, int delta)
+{
+    Command_IncCounter cmd;
+    cmd.set_counter_id(counterId);
+    cmd.set_delta(delta);
+
+    sendGameCommand(cmd);
+}
+
+void PlayerActions::actSetCounter(int counterId, int value)
+{
+    Command_SetCounter cmd;
+    cmd.set_counter_id(counterId);
+    cmd.set_value(value);
+
+    sendGameCommand(cmd);
 }
 
 void PlayerActions::actReduceLifeByPower(QList<CardItem *> selectedCards)

@@ -231,6 +231,12 @@ public slots:
     void actFlowP(QList<CardItem *> selectedCards);
     void actFlowT(QList<CardItem *> selectedCards);
 
+    /** @brief Adjusts a player counter by a signed delta. */
+    void actIncrementCounter(int counterId, int delta);
+
+    /** @brief Sets a player counter to an absolute value. */
+    void actSetCounter(int counterId, int value);
+
     void actReduceLifeByPower(QList<CardItem *> selectedCards);
 
     void actRequestSetAnnotationDialog(QList<CardItem *> selectedCards);
