@@ -28,7 +28,6 @@ class CardItem : public AbstractCardItem
     Q_OBJECT
 private:
     CardDragItem *dragItem;
-    QList<CardItem *> attachedCards;
 
     void prepareDelete();
     void handleClickedToPlay(bool shiftHeld);
@@ -110,22 +109,22 @@ public:
     {
         state->setDestroyOnZoneChange(_destroy);
     }
-    [[nodiscard]] CardItem *getAttachedTo() const
+    [[nodiscard]] CardState *getAttachedTo() const
     {
         return state->getAttachedTo();
     }
     void setAttachedTo(CardItem *_attachedTo);
     void addAttachedCard(CardItem *card)
     {
-        attachedCards.append(card);
+        state->addAttachedCard(card);
     }
     void removeAttachedCard(CardItem *card)
     {
-        attachedCards.removeOne(card);
+        state->removeAttachedCard(card);
     }
     [[nodiscard]] const QList<CardItem *> &getAttachedCards() const
     {
-        return attachedCards;
+        return state->getAttachedCards();
     }
     void resetState(bool keepAnnotations = false);
     void processCardInfo(const ServerInfo_Card &_info);
