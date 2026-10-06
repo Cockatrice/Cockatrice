@@ -633,7 +633,11 @@ Function IsExistingCockatriceInstall
     ; there to prove that it is one. Every Qt module Cockatrice links is part of
     ; the payload, so match them all: probing only Qt6Core.dll would miss a
     ; directory where that one file happened to be deletable and the others
-    ; were not.
+    ; were not. Qt6*.dll rather than *.dll on purpose - this function decides
+    ; whether a directory is ours, and a folder that merely holds some DLLs of
+    ; its own must not be purged. Qt6*.dll is enough even when only the protobuf
+    ; runtime survived, because the whole Qt set is mapped by the same process
+    ; that maps abseil_dll.dll and so is locked or free with it.
     StrCpy $R3 "Qt6*.dll"
     Call CheckStaleRuntimeMask
     ${If} ${FileExists} "$INSTDIR\qt.conf"
@@ -645,33 +649,19 @@ FunctionEnd
 ; the purge. NSIS silently skips whatever it cannot delete, so one surviving file
 ; is enough to prove that something still holds a lock on the install directory.
 ;
-; The masks below have to cover the purge above one for one. A check that only
-; probed named files could not see a locked Qt6Multimedia.dll or a Plugins
-; directory the purge was unable to remove, so the exact files that broke the
-; install were also the ones this check was blind to.
+; Any DLL at all counts, not a list of expected ones. The purge removes every
+; top-level DLL, so after it has run the only DLL that can still be there is one
+; it failed to delete, whatever its name. A mask per library family - Qt, then
+; OpenSSL, then zlib - is what let abseil_dll.dll through: it is in neither the
+; purge nor this check, so it survived a 3.0.2 to 3.1 update untouched, the new
+; executables were written next to it, and the client then failed to start with
+; "abseil_dll.dll is either not designed to run on Windows or it contains an
+; error". Probing *.dll has no list to fall out of date when the next
+; transitive dependency appears.
 Function HasStaleRuntimeFiles
     StrCpy $R0 0
-    StrCpy $R3 "Qt*.dll"
+    StrCpy $R3 "*.dll"
     Call CheckStaleRuntimeMask
-    StrCpy $R3 "libcrypto*.dll"
-    Call CheckStaleRuntimeMask
-    StrCpy $R3 "libssl*.dll"
-    Call CheckStaleRuntimeMask
-    StrCpy $R3 "zlib*.dll"
-    Call CheckStaleRuntimeMask
-    StrCpy $R3 "icu*.dll"
-    Call CheckStaleRuntimeMask
-    StrCpy $R3 "libeay32.dll"
-    Call CheckStaleRuntimeMask
-    StrCpy $R3 "ssleay32.dll"
-    Call CheckStaleRuntimeMask
-    ${If} $R0 = 1
-        Return
-    ${EndIf}
-    ${If} ${FileExists} "$INSTDIR\libmysql.dll"
-        StrCpy $R0 1
-        Return
-    ${EndIf}
     ; IfFileExists takes wildcards, so a Plugins directory the purge could not
     ; remove counts as a leftover too.
     ${If} ${FileExists} "$INSTDIR\Plugins\*.*"
@@ -967,12 +957,13 @@ SetOutPath "$INSTDIR"
 ; No application instance may be running while any file below is deleted or
 ; replaced: both upgrade blocks start by removing the old executables and
 ; runtime DLLs, and NSIS silently skips whatever is locked, which is how an
-; install ends up with a mix of old and new Qt DLLs next to the new executable
-; ("The procedure entry point X could not be located in the dynamic link
-; library ...Qt6Network.dll"). So the check has to come before the first
-; Delete/RMDir and not after it - an interactive install into an existing
-; portable directory with cockatrice.exe still running would otherwise delete
-; the old files under its feet.
+; install ends up with a mix of old and new runtimes next to the new executable
+; - "The procedure entry point X could not be located in the dynamic link
+; library ...Qt6Network.dll" for the Qt ones, "abseil_dll.dll is either not
+; designed to run on Windows or it contains an error" for the protobuf ones.
+; So the check has to come before the first Delete/RMDir and not after it - an
+; interactive install into an existing portable directory with cockatrice.exe
+; still running would otherwise delete the old files under its feet.
 ;
 ; It is skipped on the /R path: .onInit already ran it before
 ; AutoUninstallIfNeeded removed the previous installation, so by the time this
@@ -995,23 +986,21 @@ ${AndIf} ${FileExists} "$INSTDIR\portable.dat"
 	Delete "$INSTDIR\cockatrice.exe"
 	Delete "$INSTDIR\oracle.exe"
 	Delete "$INSTDIR\servatrice.exe"
-	Delete "$INSTDIR\Qt*.dll"
-	Delete "$INSTDIR\libmysql.dll"
-	Delete "$INSTDIR\icu*.dll"
-	Delete "$INSTDIR\libcrypto*.dll"
-	Delete "$INSTDIR\libssl*.dll"
-	Delete "$INSTDIR\libeay32.dll"
-	Delete "$INSTDIR\ssleay32.dll"
+	; Every top-level DLL, not a list of expected ones. The payload is written
+	; after this block, so a DLL the new build still needs is put straight back;
+	; what this has to guarantee is that nothing from the previous build is left
+	; to be loaded next to the new executables. Naming the families by hand is
+	; what let abseil_dll.dll through - see HasStaleRuntimeFiles.
+	Delete "$INSTDIR\*.dll"
 	Delete "$INSTDIR\qt.conf"
 	Delete "$INSTDIR\qdebug.txt"
 	Delete "$INSTDIR\servatrice.sql"
 	Delete "$INSTDIR\servatrice.ini.example"
-	Delete "$INSTDIR\zlib*.dll"
 	RMDir "$INSTDIR"
 ${EndIf}
 
 ; Remove any runtime DLLs left over from older versions, so a mismatched
-; Qt/OpenSSL set cannot survive next to the new executables.
+; Qt/OpenSSL/protobuf set cannot survive next to the new executables.
 Call IsExistingCockatriceInstall
 ; Remembered because the stale-runtime check below must only ever fire for a
 ; directory this installer recognised as a Cockatrice install. Scanning for
@@ -1022,14 +1011,7 @@ StrCpy $IsUpgrade $R0
 ${If} $PortableMode = 0
 ${AndIf} $R0 = 1
 	RMDir /r "$INSTDIR\Plugins"
-	Delete "$INSTDIR\Qt*.dll"
-	Delete "$INSTDIR\libcrypto*.dll"
-	Delete "$INSTDIR\libssl*.dll"
-	Delete "$INSTDIR\zlib*.dll"
-	Delete "$INSTDIR\libmysql.dll"
-	Delete "$INSTDIR\icu*.dll"
-	Delete "$INSTDIR\libeay32.dll"
-	Delete "$INSTDIR\ssleay32.dll"
+	Delete "$INSTDIR\*.dll"
 ${EndIf}
 
 ; Whatever was locked during the purge - by an instance that started while the
@@ -1037,10 +1019,11 @@ ${EndIf}
 ; performed at all - is still on disk, and the new executables are about to be
 ; written next to it. That mix is exactly what makes the next start fail with
 ; "The procedure entry point X could not be located in the dynamic link library
-; ...Qt6QuickWidgets.dll" or "The code execution cannot proceed because
-; Qt6Multimedia.dll was not found", so stop here instead of compounding it.
-; Nothing of the new payload has been written at this point, so the next run -
-; with the applications closed - gets a clean install.
+; ...Qt6QuickWidgets.dll", "The code execution cannot proceed because
+; Qt6Multimedia.dll was not found", or "abseil_dll.dll is either not designed to
+; run on Windows or it contains an error", so stop here instead of compounding
+; it. Nothing of the new payload has been written at this point, so the next run
+; - with the applications closed - gets a clean install.
 ${If} $IsUpgrade = 1
     Call HasStaleRuntimeFiles
 ${Else}
