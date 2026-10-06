@@ -278,6 +278,7 @@ jobs:
             type: Release
             use_ccache: 1
             vcpkg_scope: 'vcpkg/macos13-x64-xcode26.3/'
+            vcpkg_upload: 1    # only one leg per vcpkg_scope hands its archives over
             xcode: "26.3"
 
           - os: macOS
@@ -296,6 +297,7 @@ jobs:
             use_ccache: 1
             vcpkg_deployment_target: 14
             vcpkg_scope: 'vcpkg/macos14-arm64-xcode26.6/'
+            vcpkg_upload: 1    # only one leg per vcpkg_scope hands its archives over
             xcode: "26.6"
 
           - os: macOS
@@ -343,6 +345,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             type: Release
             vcpkg_scope: 'vcpkg/windows10-x64-vs2026/'
+            vcpkg_upload: 1    # only one leg per vcpkg_scope hands its archives over
 
     name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
@@ -512,9 +515,13 @@ jobs:
       # archives this leg had to build itself and let vcpkg-cache-import.yml, which runs
       # in the default branch scope, save them where later runs can restore them.
       # Forks are skipped, they are the one case where the archives must not be trusted.
+      # vcpkg_upload keeps this to one leg per scope: macOS 14, 15 and 26 share a scope
+      # by design, and all three rebuild the same archives, so uploading from each of them
+      # would publish three identical 269 MB artifacts under one artifact name and make
+      # the importer spawn a save job per copy.
       - name: "Collect new vcpkg entries"
         id: vcpkg_new
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && matrix.vcpkg_upload == 1
         shell: bash
         env:
           CACHE_DIR: '${{ steps.vcpkg-cache.outputs.path }}'
