@@ -341,16 +341,25 @@ elseif(WIN32)
   # installs the runtime of every module listed here, and skips static ones the
   # same way, so the two can never disagree.
   #
-  # The Qt runtimes are only half the payload. protobuf, Abseil, liblzma, zlib and
-  # OpenSSL come from vcpkg as DLLs app-located next to the binaries, and nothing
-  # about the build declares them - they ride in on the "*.dll" glob in
-  # cockatrice/CMakeLists.txt. A manifest of Qt modules alone could not see one go
-  # missing, and a client whose protobuf runtime is absent, stale or of the wrong
-  # architecture fails to start with "abseil_dll.dll is either not designed to run
-  # on Windows or it contains an error". Take the names from the same vcpkg bin
-  # directory the app-local copies come from, so the list cannot fall behind a
-  # dependency bump or a versioned name such as libcrypto-3-x64.dll becoming
-  # libcrypto-4-x64.dll.
+  # Only the Qt modules, and that is deliberate. protobuf, Abseil, liblzma, zlib
+  # and OpenSSL also ride in on the "*.dll" glob, and a client whose runtime is
+  # absent, stale or of the wrong architecture fails to start with "abseil_dll.dll
+  # is either not designed to run on Windows or it contains an error", so they
+  # are exactly the files worth asserting.
+  #
+  # Their names cannot be derived from the vcpkg bin directory, which is what a
+  # first attempt did and what a Windows build immediately refuted: bin holds
+  # everything vcpkg installed, not everything the applications import. It also
+  # contains gmock.dll, libprotobuf-lite.dll, libprotoc.dll, legacy.dll and three
+  # pthreadVC*.dll FindThreads probes, none of which any shipped executable
+  # links, so requiring them failed a build over a package that was correct.
+  #
+  # Deriving them from the executables' own import tables is the real answer,
+  # and fixup_bundle already walks it to decide what to copy. Until that result
+  # is available to CMake, requiring the vcpkg half would mean guessing names
+  # again, which is what produced this bug report in the first place. So assert
+  # what is derived from the build's own link lists and leave the rest to the
+  # purge in cmake/NSIS.template.in, which removes every DLL regardless of name.
   set(_required_runtime "")
   foreach(_qt_module IN LISTS COCKATRICE_QT_MODULES SERVATRICE_QT_MODULES ORACLE_QT_MODULES)
     get_target_property(_qt_module_type ${_qt_module} TYPE)
@@ -361,38 +370,8 @@ elseif(WIN32)
   endforeach()
   list(APPEND _required_runtime "Plugins/platforms/qwindows.dll")
 
-  # Only populated on a vcpkg build. Without one the manifest stays Qt-only and
-  # says nothing about the third party runtimes, which is weaker than knowing
-  # them but never wrong; the package check that reads it runs on the vcpkg build
-  # anyway, and treats an absent vcpkg list as "do not enforce the unknown
-  # runtime half".
-  set(_required_runtime_vcpkg_known FALSE)
-  if(VCPKG_INSTALLED_DIR AND VCPKG_TARGET_TRIPLET)
-    set(_required_runtime_vcpkg_known TRUE)
-    file(GLOB _vcpkg_bin_dlls "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin/*.dll")
-    foreach(_vcpkg_bin_dll IN LISTS _vcpkg_bin_dlls)
-      get_filename_component(_vcpkg_bin_dll_name "${_vcpkg_bin_dll}" NAME)
-      # gtest is linked by the test targets only. Nothing that ships links it, and
-      # it must not end up in the package - see the unexpected runtime check in
-      # .ci/compile.sh.
-      if(_vcpkg_bin_dll_name MATCHES "^gtest")
-        continue()
-      endif()
-      list(APPEND _required_runtime "${_vcpkg_bin_dll_name}")
-    endforeach()
-    if(NOT _vcpkg_bin_dlls)
-      # A vcpkg build with no runtime DLLs at all is a static one. Do not claim
-      # to know the runtime set, so the unknown runtime check stays off rather
-      # than rejecting every DLL in a perfectly good package.
-      set(_required_runtime_vcpkg_known FALSE)
-    endif()
-  endif()
-
   list(REMOVE_DUPLICATES _required_runtime)
   list(SORT _required_runtime)
-  # Marker rather than a comment, so the reader can key off it without having to
-  # infer emptiness from the list itself.
-  list(INSERT _required_runtime 0 "vcpkg-runtime-known=${_required_runtime_vcpkg_known}")
   string(REPLACE ";" "\n" _required_runtime "${_required_runtime}")
   file(WRITE "${PROJECT_BINARY_DIR}/required-runtime.txt" "${_required_runtime}\n")
 

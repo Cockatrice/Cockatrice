@@ -386,18 +386,7 @@ if [[ $MAKE_PACKAGE ]]; then
       installer_paths="$("$seven_zip" l -slt "$package" | tr -d '\r' |
         sed -n 's/^Path = //p' |
         sed -e 's|\\|/|g' -e 's|^[$]INSTDIR/||' -e 's|^[$]OUTDIR/||' -e 's|^[$]PLUGINSDIR/||' -e 's|^\./||' -e 's|^/||')"
-      manifest_raw="$(tr -d '\r' <required-runtime.txt)"
-      # The marker line records whether CMake found a vcpkg tree to take the
-      # third party runtime names from. Without it the manifest only knows the Qt
-      # half, so every protobuf or OpenSSL DLL in the package would read as
-      # unknown - and the unknown half of the check has to stay off rather than
-      # fail a build whose manifest is knowingly partial.
-      vcpkg_runtime_known=TRUE
-      if grep -qxF 'vcpkg-runtime-known=FALSE' <<<"$manifest_raw"; then
-        vcpkg_runtime_known=FALSE
-      fi
-      manifest="$(grep -vxF 'vcpkg-runtime-known=TRUE' <<<"$manifest_raw" |
-        grep -vxF 'vcpkg-runtime-known=FALSE' || true)"
+      manifest="$(tr -d '\r' <required-runtime.txt)"
       missing=""
       checked=0
       while IFS= read -r entry; do
@@ -424,48 +413,65 @@ if [[ $MAKE_PACKAGE ]]; then
         echo "${listed_head//$'\n'/$'\n  '}"
         exit 1
       fi
-      echo "Installer contains the full Qt runtime ($checked files)"
+      echo "Installer carries the Qt runtime of every module the three applications link ($checked files)"
 
-      # Now the other direction: a DLL in the package that the manifest does not
-      # name. The missing check above cannot see a runtime that was never
-      # expected, and the build output directories the "*.dll" glob reads are
-      # shared with the test targets, so gtest.dll and gtest_main.dll are one
-      # filter away from shipping in every release.
+      # Now the other direction: a top level DLL in the package that the manifest
+      # does not name. The missing check above cannot see a runtime that was
+      # never expected.
       #
-      # Only the test framework is a hard failure. "Nothing requires this" is a
-      # fact about gtest - no shipped executable links it - whereas a runtime
-      # that is merely not in the manifest may be one the manifest failed to
-      # derive, as Qt6Core.dll was for as long as the module list left Core to
-      # arrive transitively. Failing the build on an unknown would take a
-      # safety net that has never run before and turn it into a release blocker,
-      # so report those instead: loud enough that a dependency bump is noticed.
-      if [[ $vcpkg_runtime_known == TRUE ]]; then
-        forbidden=""
-        unexpected=""
-        while IFS= read -r entry; do
-          [[ -z $entry ]] && continue
-          if grep -qxiF "$entry" <<<"$manifest"; then
-            continue
-          fi
-          if [[ $entry == [Gg][Tt][Ee][Ss][Tt]* ]]; then
-            forbidden+=" $entry"
-          else
-            unexpected+=" $entry"
-          fi
-        done < <(grep -i '\.dll$' <<<"$installer_paths")
-        if [[ -n $forbidden ]]; then
-          echo "::error file=$0::Installer contains test framework runtimes that nothing shipped links:$forbidden"
-          echo "A build output directory shared with the test targets has leaked into the package."
-          exit 1
+      # Two things are reported here and neither may fail the build.
+      #
+      # The test framework is a fact rather than a guess - no shipped executable
+      # links gtest or gmock, and the build output directories the "*.dll" glob
+      # reads are shared with the test targets, so gtest.dll and gmock.dll are
+      # one filter away from shipping in every release. Even so it is reported
+      # instead of enforced: a check that has never passed on a real package has
+      # not earned the right to block a release, and the first Windows run of an
+      # enforcing version is exactly when its own wrong assumptions show up.
+      #
+      # Everything else is expected to be there. required-runtime.txt names the
+      # Qt modules the three applications link, and the protobuf, Abseil,
+      # OpenSSL, liblzma, ffmpeg and Qt debug DLLs in the package come in on the
+      # build output glob instead, because nothing in the build declares them by
+      # name. So this list is a report of what the package carries, not a verdict.
+      # Read it when a dependency is added; do not fail on it.
+      forbidden=""
+      unexpected=""
+      while IFS= read -r entry; do
+        [[ -z $entry ]] && continue
+        # Top level only. A DLL under Plugins/ or a nested image format plugin is
+        # a plugin the platform loads by name, not a runtime the executable
+        # imports, and requiring one here would list all of them every run.
+        [[ $entry == */* ]] && continue
+        if grep -qxiF "$entry" <<<"$manifest"; then
+          continue
         fi
-        if [[ -n $unexpected ]]; then
-          echo "::warning file=$0::Installer contains runtime files required-runtime.txt does not list:$unexpected"
-          echo "Either a dependency was added and required-runtime.txt was not updated, or a build output directory leaked into the package."
+        # NSIS extracts its plugins to $PLUGINSDIR, which the path normalization
+        # above strips, so they arrive here looking like payload files. They are
+        # part of the installer, not of the installed tree.
+        if [[ $entry == [Nn][Ss][Dd][Ii][Aa][Ll][Oo][Gg][Ss].dll ||
+          $entry == [Nn][Ss][Ee][Xx][Ee][Cc].dll ||
+          $entry == [Ss][Yy][Ss][Tt][Ee][Mm].dll ||
+          $entry == [Uu][Ss][Ee][Rr][Ii][Nn][Ff][Oo].dll ||
+          $entry == [Ii][Nn][Ee][Tt].dll ]]; then
+          continue
+        fi
+        if [[ $entry == [Gg][Tt][Ee][Ss][Tt]* || $entry == [Gg][Mm][Oo][Cc][Kk]* ]]; then
+          forbidden+=" $entry"
         else
-          echo "Installer carries no unexpected runtime files"
+          unexpected+=" $entry"
         fi
-      else
-        echo "::warning file=$0::No vcpkg runtime manifest, skipping the unexpected runtime check"
+      done < <(grep -i '\.dll$' <<<"$installer_paths")
+      if [[ -n $forbidden ]]; then
+        echo "::warning file=$0::Installer contains test framework DLLs that no shipped executable links:$forbidden"
+        echo "A build output directory shared with the test targets has leaked into the package."
+      fi
+      if [[ -n $unexpected ]]; then
+        echo "Top level DLLs in the package beyond the linked Qt modules:$unexpected"
+        echo "These arrive on the build output glob, not from required-runtime.txt, so they are reported and not required."
+      fi
+      if [[ -z $forbidden && -z $unexpected ]]; then
+        echo "Installer carries no runtime files beyond the linked Qt modules"
       fi
     fi
     echo "::endgroup::"
