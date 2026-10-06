@@ -27,8 +27,9 @@ CardItem::CardItem(PlayerLogic *_owner,
                    const CardRef &cardRef,
                    int _cardid,
                    CardZoneLogic *_zone)
-    : AbstractCardItem(parent, cardRef, _owner, _cardid), state(new CardState(this, _zone)), dragItem(nullptr)
+    : AbstractCardItem(parent, cardRef, _owner, _cardid), dragItem(nullptr)
 {
+    state->setZone(_zone);
     owner->addCard(this);
 
     connect(&SettingsCache::instance().cardCounters(), &CardCounterSettings::colorChanged, this, [this](int counterId) {
@@ -102,7 +103,7 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         painter->save();
         transformPainter(painter, translatedSize, tapAngle);
 
-        if (!getFaceDown() && state->getPT() == exactCard.getInfo().getPowTough()) {
+        if (!getFaceDown() && state->getPT() == state->getCardInfo().getPowTough()) {
             painter->setPen(Qt::white);
         } else {
             painter->setPen(QColor(255, 150, 0)); // dark orange
@@ -188,7 +189,7 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
         state->getAttachedTo()->removeAttachedCard(this);
     }
 
-    gridPoint.setX(-1);
+    state->setGridPoint(QPoint(-1, state->getGridPoint().y()));
     state->setAttachedTo(_attachedTo);
     if (state->getAttachedTo() != nullptr) {
         // If the zone is being torn down, it might already be null by the time a card tries to un-attach all its
@@ -365,7 +366,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
         // Use the buttonDownPos to align the hot spot with the position when
         // the user originally clicked
-        createDragItem(id, event->buttonDownPos(Qt::LeftButton), event->scenePos(), forceFaceDown);
+        createDragItem(state->getId(), event->buttonDownPos(Qt::LeftButton), event->scenePos(), forceFaceDown);
         dragItem->grabMouse();
 
         int childIndex = 0;
@@ -504,16 +505,16 @@ bool CardItem::animationEvent()
 {
     int rotation = ROTATION_DEGREES_PER_FRAME;
     bool animationIncomplete = true;
-    if (!tapped) {
+    if (!state->getTapped()) {
         rotation *= -1;
     }
 
     tapAngle += rotation;
-    if (tapped && (tapAngle > 90)) {
+    if (state->getTapped() && (tapAngle > 90)) {
         tapAngle = 90;
         animationIncomplete = false;
     }
-    if (!tapped && (tapAngle < 0)) {
+    if (!state->getTapped() && (tapAngle < 0)) {
         tapAngle = 0;
         animationIncomplete = false;
     }

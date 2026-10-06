@@ -1,5 +1,8 @@
 #include "card_state.h"
 
+#include <libcockatrice/card/card_info.h>
+#include <libcockatrice/card/database/card_database_manager.h>
+
 void CardState::resetState(bool keepAnnotations)
 {
     attacking = false;
@@ -9,6 +12,56 @@ void CardState::resetState(bool keepAnnotations)
         annotation.clear();
     }
     attachedTo = nullptr;
+}
+
+void CardState::setCardRef(const CardRef &_cardRef)
+{
+    if (cardRef == _cardRef) {
+        return;
+    }
+
+    const CardRef oldCardRef = cardRef;
+    if (exactCard) {
+        disconnect(exactCard.getCardPtr().data(), nullptr, this, nullptr);
+    }
+    cardRef = _cardRef;
+
+    emit cardRefChanged(oldCardRef, cardRef);
+    refreshCardInfo();
+}
+
+void CardState::refreshCardInfo()
+{
+    exactCard = CardDatabaseManager::query()->getCard(cardRef);
+
+    if (!exactCard && !cardRef.name.isEmpty()) {
+        CardInfo::UiAttributes attributes = {.tableRow = -1};
+        auto info = CardInfo::newInstance(cardRef.name, "", true, {}, {}, {}, {}, attributes);
+        exactCard = ExactCard(info);
+    }
+    if (exactCard) {
+        connect(exactCard.getCardPtr().data(), &CardInfo::pixmapUpdated, this, &CardState::cardPixmapUpdated);
+    }
+
+    emit cardInfoChanged();
+}
+
+void CardState::setTapped(bool _tapped, bool canAnimate)
+{
+    if (tapped == _tapped) {
+        return;
+    }
+
+    tapped = _tapped;
+    emit tappedChanged(tapped, canAnimate);
+    emit stateChanged();
+}
+
+void CardState::setFaceDown(bool _facedown)
+{
+    facedown = _facedown;
+    emit facedownChanged(facedown);
+    emit stateChanged();
 }
 
 void CardState::setZone(CardZoneLogic *_zone)

@@ -7,13 +7,11 @@
 #ifndef ABSTRACTCARDITEM_H
 #define ABSTRACTCARDITEM_H
 
+#include "../../game/board/card_state.h"
 #include "../animated_item.h"
 #include "../card_dimensions.h"
 #include "arrow_target.h"
 #include "graphics_item_type.h"
-
-#include <libcockatrice/card/printing/exact_card.h>
-#include <libcockatrice/utility/card_ref.h>
 
 class PlayerLogic;
 
@@ -21,11 +19,7 @@ class AbstractCardItem : public ArrowTarget, public IAnimatedItem
 {
     Q_OBJECT
 protected:
-    ExactCard exactCard;
-    int id;
-    CardRef cardRef;
-    bool tapped;
-    bool facedown;
+    CardState *state;
     int tapAngle;
     QString color;
     QColor bgColor;
@@ -35,6 +29,9 @@ private:
     qreal realZValue;
 private slots:
     void pixmapUpdated();
+    void onCardInfoChanged();
+    void onCardRefChanged(const CardRef &oldCardRef, const CardRef &newCardRef);
+    void onTappedChanged(bool newTapped, bool canAnimate);
 
 public slots:
     void refreshCardInfo();
@@ -70,31 +67,38 @@ public:
     QSizeF getTranslatedSize(QPainter *painter) const;
     void paintPicture(QPainter *painter, const QSizeF &translatedSize, int angle);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    [[nodiscard]] CardState *getState() const
+    {
+        return state;
+    }
     ExactCard getCard() const
     {
-        return exactCard;
+        return state->getCard();
     }
     const CardInfo &getCardInfo() const;
     int getId() const
     {
-        return id;
+        return state->getId();
     }
     void setId(int _id)
     {
-        id = _id;
+        state->setId(_id);
     }
     QString getName() const
     {
-        return cardRef.name;
+        return state->getCardRef().name;
     }
     QString getProviderId() const
     {
-        return cardRef.providerId;
+        return state->getCardRef().providerId;
     }
-    void setCardRef(const CardRef &_cardRef);
+    void setCardRef(const CardRef &_cardRef)
+    {
+        state->setCardRef(_cardRef);
+    }
     CardRef getCardRef() const
     {
-        return cardRef;
+        return state->getCardRef();
     }
     qreal getRealZValue() const
     {
@@ -113,18 +117,24 @@ public:
     void setColor(const QString &_color);
     bool getTapped() const
     {
-        return tapped;
+        return state->getTapped();
     }
-    void setTapped(bool _tapped, bool canAnimate = false);
+    void setTapped(bool _tapped, bool canAnimate = false)
+    {
+        state->setTapped(_tapped, canAnimate);
+    }
     bool getFaceDown() const
     {
-        return facedown;
+        return state->getFaceDown();
     }
-    void setFaceDown(bool _facedown);
+    void setFaceDown(bool _facedown)
+    {
+        state->setFaceDown(_facedown);
+    }
     void processHoverEvent();
     void deleteCardInfoPopup()
     {
-        emit deleteCardInfoPopup(cardRef.name);
+        emit deleteCardInfoPopup(state->getCardRef().name);
     }
 
     /** @brief Default: no per-tick animation. Subclasses override to animate. */
