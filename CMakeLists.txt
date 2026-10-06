@@ -326,38 +326,75 @@ elseif(WIN32)
   # Configure file with custom definitions for NSIS.
   configure_file("${COCKATRICE_CMAKE_PATH}/NSIS.definitions.nsh.in" "${PROJECT_BINARY_DIR}/NSIS.definitions.nsh")
 
-  # Every Qt module the client links against, as the DLL names a Windows install
-  # has to contain, plus the platform plugin without which the client cannot
-  # start. .ci/compile.sh reads this and fails the build when the packaged
-  # installer is missing one of them.
+  # Every runtime DLL a Windows install has to contain, as paths relative to the
+  # install root. .ci/compile.sh reads this and fails the build when the packaged
+  # installer is missing one of them, or carries a runtime it does not know about.
   #
-  # Only the client is packaged on Windows, so this is the client's module list
-  # rather than the union across server, client and Oracle: demanding Oracle's or
-  # Servatrice's modules of the client installer checks nothing about the client.
+  # All three applications are packaged into the same directory on Windows, so
+  # this is the union of their Qt module lists, not just the client's: Servatrice
+  # contributes Qt6Sql.dll and Oracle contributes nothing the client lacks, and a
+  # client-only manifest leaves Qt6Sql.dll unasserted even though servatrice.exe
+  # is installed next to cockatrice.exe and cannot start without it.
   #
   # A statically linked Qt module ships no runtime DLL, so requiring one would
   # fail the package check on a static build for no reason. cockatrice/CMakeLists.txt
   # installs the runtime of every module listed here, and skips static ones the
   # same way, so the two can never disagree.
   #
-  # A DLL missing from the package only surfaces on a user's machine, after an
-  # update has already replaced their install, as "The code execution cannot
-  # proceed because Qt6Multimedia.dll was not found" or as a missing procedure
-  # entry point in a Qt6QuickWidgets.dll left over from the previous version.
-  # Assert it while the installer is still being built instead.
-  set(_required_qt_runtime "")
-  foreach(_qt_module IN LISTS COCKATRICE_QT_MODULES)
+  # The Qt runtimes are only half the payload. protobuf, Abseil, liblzma, zlib and
+  # OpenSSL come from vcpkg as DLLs app-located next to the binaries, and nothing
+  # about the build declares them - they ride in on the "*.dll" glob in
+  # cockatrice/CMakeLists.txt. A manifest of Qt modules alone could not see one go
+  # missing, and a client whose protobuf runtime is absent, stale or of the wrong
+  # architecture fails to start with "abseil_dll.dll is either not designed to run
+  # on Windows or it contains an error". Take the names from the same vcpkg bin
+  # directory the app-local copies come from, so the list cannot fall behind a
+  # dependency bump or a versioned name such as libcrypto-3-x64.dll becoming
+  # libcrypto-4-x64.dll.
+  set(_required_runtime "")
+  foreach(_qt_module IN LISTS COCKATRICE_QT_MODULES SERVATRICE_QT_MODULES ORACLE_QT_MODULES)
     get_target_property(_qt_module_type ${_qt_module} TYPE)
     if(_qt_module_type STREQUAL "SHARED_LIBRARY")
       string(REGEX REPLACE "^Qt6::" "" _qt_component "${_qt_module}")
-      list(APPEND _required_qt_runtime "Qt6${_qt_component}.dll")
+      list(APPEND _required_runtime "Qt6${_qt_component}.dll")
     endif()
   endforeach()
-  list(APPEND _required_qt_runtime "Plugins/platforms/qwindows.dll")
-  list(REMOVE_DUPLICATES _required_qt_runtime)
-  list(SORT _required_qt_runtime)
-  string(REPLACE ";" "\n" _required_qt_runtime "${_required_qt_runtime}")
-  file(WRITE "${PROJECT_BINARY_DIR}/required-qt-runtime.txt" "${_required_qt_runtime}\n")
+  list(APPEND _required_runtime "Plugins/platforms/qwindows.dll")
+
+  # Only populated on a vcpkg build. Without one the manifest stays Qt-only and
+  # says nothing about the third party runtimes, which is weaker than knowing
+  # them but never wrong; the package check that reads it runs on the vcpkg build
+  # anyway, and treats an absent vcpkg list as "do not enforce the unknown
+  # runtime half".
+  set(_required_runtime_vcpkg_known FALSE)
+  if(VCPKG_INSTALLED_DIR AND VCPKG_TARGET_TRIPLET)
+    set(_required_runtime_vcpkg_known TRUE)
+    file(GLOB _vcpkg_bin_dlls "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin/*.dll")
+    foreach(_vcpkg_bin_dll IN LISTS _vcpkg_bin_dlls)
+      get_filename_component(_vcpkg_bin_dll_name "${_vcpkg_bin_dll}" NAME)
+      # gtest is linked by the test targets only. Nothing that ships links it, and
+      # it must not end up in the package - see the unexpected runtime check in
+      # .ci/compile.sh.
+      if(_vcpkg_bin_dll_name MATCHES "^gtest")
+        continue()
+      endif()
+      list(APPEND _required_runtime "${_vcpkg_bin_dll_name}")
+    endforeach()
+    if(NOT _vcpkg_bin_dlls)
+      # A vcpkg build with no runtime DLLs at all is a static one. Do not claim
+      # to know the runtime set, so the unknown runtime check stays off rather
+      # than rejecting every DLL in a perfectly good package.
+      set(_required_runtime_vcpkg_known FALSE)
+    endif()
+  endif()
+
+  list(REMOVE_DUPLICATES _required_runtime)
+  list(SORT _required_runtime)
+  # Marker rather than a comment, so the reader can key off it without having to
+  # infer emptiness from the list itself.
+  list(INSERT _required_runtime 0 "vcpkg-runtime-known=${_required_runtime_vcpkg_known}")
+  string(REPLACE ";" "\n" _required_runtime "${_required_runtime}")
+  file(WRITE "${PROJECT_BINARY_DIR}/required-runtime.txt" "${_required_runtime}\n")
 
   # include vcredist into the package; NSIS will take care of running it
   if(VCREDISTRUNTIME_FOUND)

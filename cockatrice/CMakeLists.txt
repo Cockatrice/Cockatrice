@@ -687,7 +687,7 @@ if(WIN32)
   # import table, and the glob above only sees DLLs that were already copied next
   # to the executable. Qt6::Concurrent is linked but never imported - QtConcurrent::run
   # and QFutureWatcher are header-only in Qt 6 - so neither step ships
-  # Qt6Concurrent.dll, even though required-qt-runtime.txt lists it and the
+  # Qt6Concurrent.dll, even though required-runtime.txt lists it and the
   # Windows package check then fails on a package that is fine to run.
   # Qt6::ShaderTools is skipped for the same reason.
   #
