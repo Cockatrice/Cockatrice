@@ -1,6 +1,5 @@
 #include "abstract_game.h"
 
-#include "../interface/widgets/tabs/tab_game.h"
 #include "player/player_logic.h"
 
 AbstractGame::AbstractGame(QObject *_parent) : QObject(_parent)

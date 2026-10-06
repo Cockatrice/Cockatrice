@@ -5,6 +5,7 @@
 #include "../game/player/player_actions.h"
 #include "../game/player/player_logic.h"
 #include "../game_graphics/player/player_graphics_item.h"
+#include "../game_graphics/player/player_target.h"
 #include "board/card_item.h"
 #include "phases_toolbar.h"
 #include "player/menu/player_menu.h"
