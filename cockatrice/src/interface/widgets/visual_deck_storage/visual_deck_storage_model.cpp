@@ -2,7 +2,6 @@
 
 #include "../../deck_loader/deck_file_format.h"
 #include "../../deck_loader/deck_loader.h"
-#include "../../deck_loader/loaded_deck.h"
 #include "../cards/additional_info/deck_color_identity.h"
 #include "libcockatrice/deck_list/deck_list.h"
 
@@ -21,6 +20,7 @@
 #include <QtConcurrentRun>
 #include <compare>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/utility/card_ref.h>
 #include <optional>
 #include <utility>
