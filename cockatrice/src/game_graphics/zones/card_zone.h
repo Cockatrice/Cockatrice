@@ -67,6 +67,15 @@ public:
         return logic;
     }
 
+    /**
+     * @brief The CardItems backing getLogic()->getCards(), in zone order.
+     *
+     * Game logic talks about cards as states; this is the graphics side's view of the same list.
+     * It is rebuilt on demand after any content change, so views never reach into the logic's
+     * container themselves and never observe a stale one.
+     */
+    [[nodiscard]] const QList<CardItem *> &cardItems() const;
+
     void setMenu(QMenu *_menu, QAction *_doubleClickAction = 0)
     {
         menu = _menu;
@@ -74,7 +83,12 @@ public:
     }
 
 private:
+    /** @brief Marks the cached card items stale. Connected to every content-changing signal. */
+    void invalidateItems();
+
     CardZoneLogic *logic;
+    mutable QList<CardItem *> items;
+    mutable bool itemsDirty = true;
 };
 
 #endif

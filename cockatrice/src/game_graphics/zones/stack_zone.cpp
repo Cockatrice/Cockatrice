@@ -60,7 +60,7 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
     int index = calcDropIndexFromY(dropPoint.y(), !sameZone, MIN_CARD_VISIBLE);
     if (sameZone) {
         // Same-zone no-op: don't move a card onto itself
-        const auto &cards = getLogic()->getCards();
+        const auto &cards = cardItems();
         if (!cards.isEmpty() && cards.at(index)->getId() == dragItems.at(0)->getId()) {
             return;
         }
@@ -90,7 +90,7 @@ void StackZone::setHeight(qreal newHeight)
 
 void StackZone::reorganizeCards()
 {
-    if (!getLogic()->getCards().isEmpty()) {
+    if (!cardItems().isEmpty()) {
         const auto params = buildStackParams(MIN_CARD_VISIBLE);
         layoutCardsVertically(params);
     }

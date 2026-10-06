@@ -12,6 +12,9 @@ void CardState::resetState(bool keepAnnotations)
         annotation.clear();
     }
     attachedTo = nullptr;
+    setTapped(false, false);
+    setDoesntUntap(false);
+    emit stateReset();
 }
 
 void CardState::setCardRef(const CardRef &_cardRef)

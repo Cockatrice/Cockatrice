@@ -5,9 +5,9 @@ namespace CardZoneAlgorithms
 {
 
 /**
- * Shared insertion logic for zones where cards become visible on add and follow
- * the standard pattern: clamp index, insert, clear identity if contents unknown,
- * reset state, show card.
+ * Shared insertion logic for zones where cards follow the standard pattern:
+ * clamp index, insert, clear identity if contents unknown, reset state.
+ * Visibility and parenting are handled by the graphics zone's onCardAdded().
  *
  * Zones with different post-add behavior (signal connections, positional resets,
  * hidden cards, or coordinate-based placement) should NOT use this — implement
@@ -18,8 +18,7 @@ namespace CardZoneAlgorithms
  *
  * @tparam CardList Must provide: size() -> int, insert(int, CardType*),
  *                  getContentsKnown() -> bool
- * @tparam CardType Must provide: setId(int), setCardRef(CardRefType),
- *                  resetState(bool), setVisible(bool)
+ * @tparam CardType Must provide: setId(int), setCardRef(CardRefType), resetState(bool)
  * @param keepAnnotations Forwarded to card->resetState(). Stack-like zones preserve
  *                        annotations across zone transitions; hand-like zones clear them.
  */
@@ -37,7 +36,6 @@ void addCardToList(CardList &cards, CardType *card, int x, bool keepAnnotations)
     }
 
     card->resetState(keepAnnotations);
-    card->setVisible(true);
 }
 
 } // namespace CardZoneAlgorithms

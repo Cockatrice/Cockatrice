@@ -51,15 +51,14 @@ void PileZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
 {
     painter->drawPath(shape());
 
-    if (!getLogic()->getCards().isEmpty()) {
-        getLogic()->getCards().at(0)->paintPicture(painter, getLogic()->getCards().at(0)->getTranslatedSize(painter),
-                                                   90);
+    if (!cardItems().isEmpty()) {
+        cardItems().at(0)->paintPicture(painter, cardItems().at(0)->getTranslatedSize(painter), 90);
     }
 
     painter->translate(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F);
     painter->rotate(-90);
     painter->translate(-CardDimensions::WIDTH_HALF_F, -CardDimensions::HEIGHT_HALF_F);
-    paintNumberEllipse(getLogic()->getCards().size(), 28, Qt::white, -1, -1, painter);
+    paintNumberEllipse(cardItems().size(), 28, Qt::white, -1, -1, painter);
 }
 
 void PileZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZoneLogic *startZone, const QPoint &)
@@ -71,6 +70,15 @@ void PileZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZoneL
     }
 
     getLogic()->getPlayer()->getPlayerActions()->moveCards(startZone, getLogic(), 0, 0, cards);
+}
+
+void PileZone::onCardAdded(CardItem *addedCard)
+{
+    CardZone::onCardAdded(addedCard);
+    if (addedCard) {
+        addedCard->setPos(0, 0);
+        addedCard->setVisible(false);
+    }
 }
 
 void PileZone::reorganizeCards()
@@ -100,15 +108,14 @@ void PileZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         return;
     }
 
-    if (getLogic()->getCards().isEmpty()) {
+    if (cardItems().isEmpty()) {
         return;
     }
 
     bool forceFaceDown = event->modifiers().testFlag(Qt::ShiftModifier);
     bool bottomCard = event->modifiers().testFlag(Qt::ControlModifier);
-    CardItem *card = bottomCard ? getLogic()->getCards().last() : getLogic()->getCards().first();
-    const int cardid =
-        getLogic()->contentsKnown() ? card->getId() : (bottomCard ? getLogic()->getCards().size() - 1 : 0);
+    CardItem *card = bottomCard ? cardItems().last() : cardItems().first();
+    const int cardid = getLogic()->contentsKnown() ? card->getId() : (bottomCard ? cardItems().size() - 1 : 0);
     CardDragItem *drag = card->createDragItem(cardid, event->pos(), event->scenePos(), forceFaceDown);
     drag->grabMouse();
     setCursor(Qt::OpenHandCursor);
@@ -121,8 +128,8 @@ void PileZone::mouseReleaseEvent(QGraphicsSceneMouseEvent * /*event*/)
 
 void PileZone::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
-    if (!getLogic()->getCards().isEmpty()) {
-        getLogic()->getCards()[0]->processHoverEvent();
+    if (!cardItems().isEmpty()) {
+        cardItems()[0]->processHoverEvent();
     }
     QGraphicsItem::hoverEnterEvent(event);
 }

@@ -123,8 +123,8 @@ void ZoneViewZone::zoneDumpReceived(const Response &r)
 void ZoneViewZone::reorganizeCards()
 {
     // filter cards
-    CardList cardsToDisplay = CardList(getLogic()->getCards().getContentsKnown());
-    for (auto card : getLogic()->getCards()) {
+    CardList cardsToDisplay = CardList(getLogic()->contentsKnown());
+    for (auto card : cardItems()) {
         if (filterString.check(card->getCard().getCardPtr())) {
             card->show();
             cardsToDisplay.append(card);

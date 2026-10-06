@@ -15,7 +15,6 @@ struct MockCard
     bool cardRefWasCalled = false;
     bool resetStateCalled = false;
     bool resetStateKeepAnnotations = false;
-    bool visibleSet = false;
 
     void setId(int id)
     {
@@ -33,11 +32,6 @@ struct MockCard
     {
         resetStateCalled = true;
         resetStateKeepAnnotations = keepAnnotations;
-    }
-
-    void setVisible(bool visible)
-    {
-        visibleSet = visible;
     }
 };
 
@@ -108,7 +102,6 @@ TEST_F(AddCardAlgorithmTest, ContentsKnownPreservesIdentity)
 
     EXPECT_FALSE(card.idWasCalled);
     EXPECT_FALSE(card.cardRefWasCalled);
-    EXPECT_TRUE(card.visibleSet);
 }
 
 TEST_F(AddCardAlgorithmTest, ContentsUnknownClearsIdentity)
