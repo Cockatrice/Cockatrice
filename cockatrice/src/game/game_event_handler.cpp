@@ -7,11 +7,13 @@
 #include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/command_concede.pb.h>
 #include <libcockatrice/protocol/pb/command_delete_arrow.pb.h>
+#include <libcockatrice/protocol/pb/command_draw_cards.pb.h>
 #include <libcockatrice/protocol/pb/command_game_say.pb.h>
 #include <libcockatrice/protocol/pb/command_leave_game.pb.h>
 #include <libcockatrice/protocol/pb/command_next_turn.pb.h>
 #include <libcockatrice/protocol/pb/command_reverse_turn.pb.h>
 #include <libcockatrice/protocol/pb/command_set_active_phase.pb.h>
+#include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
 #include <libcockatrice/protocol/pb/context_connection_state_changed.pb.h>
 #include <libcockatrice/protocol/pb/context_deck_select.pb.h>
 #include <libcockatrice/protocol/pb/event_game_closed.pb.h>
@@ -27,6 +29,7 @@
 #include <libcockatrice/protocol/pb/event_set_active_player.pb.h>
 #include <libcockatrice/protocol/pb/game_event_container.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/utility/zone_names.h>
 
 GameEventHandler::GameEventHandler(AbstractGame *_game) : QObject(_game), game(_game)
 {
@@ -197,6 +200,24 @@ void GameEventHandler::handleActivePhaseChanged(int phase)
 {
     Command_SetActivePhase cmd;
     cmd.set_phase(static_cast<google::protobuf::uint32>(phase));
+    sendGameCommand(cmd);
+}
+
+void GameEventHandler::handleUntapAll()
+{
+    Command_SetCardAttr cmd;
+    cmd.set_zone(ZoneNames::TABLE);
+    cmd.set_attribute(AttrTapped);
+    cmd.set_attr_value("0");
+
+    sendGameCommand(cmd);
+}
+
+void GameEventHandler::handleDrawCard()
+{
+    Command_DrawCards cmd;
+    cmd.set_number(1);
+
     sendGameCommand(cmd);
 }
 

@@ -112,6 +112,12 @@ public:
      */
     void handleActivePhaseChanged(int phase);
 
+    /** @brief Request untapping every permanent on the table. */
+    void handleUntapAll();
+
+    /** @brief Request drawing a single card. */
+    void handleDrawCard();
+
     /** @brief Leave the current game session. */
     void handleGameLeft();
 
