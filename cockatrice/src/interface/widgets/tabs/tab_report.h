@@ -53,6 +53,8 @@ private slots:
     void reportDetailsResponse(const Response &response);
     void requestStats();
     void statsResponse(const Response &response);
+    void reopenReport();
+    void reopenResponse(const Response &response);
 
 private:
     int selectedReportId() const;
@@ -84,6 +86,7 @@ private:
     QPushButton *resolveButton;
     QPushButton *resolveWithNoteButton;
     QPushButton *dismissButton;
+    QPushButton *reopenButton;
     QPushButton *viewReplayButton;
     QPushButton *joinGameButton;
     QLabel *statusLabel;
@@ -105,6 +108,7 @@ private:
     QLabel *userContextNotesLabel;
     QLabel *userContextRecentReportsLabel;
     QString lastRequestedUser;
+    QString pendingStatusMessage;
     QGroupBox *statsGroup;
     QLabel *statsTotalLabel;
     QLabel *statsTrendLabel;

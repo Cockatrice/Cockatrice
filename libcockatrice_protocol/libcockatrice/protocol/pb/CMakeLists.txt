@@ -55,6 +55,7 @@ set(PROTO_FILES
     command_report_details.proto
     command_report_list.proto
     command_report_my_list.proto
+    command_report_reopen.proto
     command_report_resolve.proto
     command_report_stats.proto
     command_report_user_info.proto
