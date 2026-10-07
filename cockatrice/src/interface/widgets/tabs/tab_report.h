@@ -43,7 +43,7 @@ private slots:
     void reportListResponse(const Response &response);
     void assignReport();
     void assignResponse(const Response &response);
-    void resolveReport(bool dismissed, bool promptNote);
+    void resolveReport(bool dismissed);
     void resolveResponse(const Response &response);
     void onSelectionChanged();
     void showTableContextMenu(const QPoint &pos);
@@ -88,7 +88,6 @@ private:
     QPushButton *commentButton;
     QPushButton *assignButton;
     QPushButton *resolveButton;
-    QPushButton *resolveWithNoteButton;
     QPushButton *dismissButton;
     QPushButton *reopenButton;
     QPushButton *viewReplayButton;
