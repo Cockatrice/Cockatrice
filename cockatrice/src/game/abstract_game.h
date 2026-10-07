@@ -19,7 +19,7 @@ class GameMetaInfo;
 class GameReplay;
 class GameState;
 class PlayerManager;
-
+class CardState;
 class AbstractGame : public QObject
 {
     Q_OBJECT
