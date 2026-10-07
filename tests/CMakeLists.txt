@@ -11,6 +11,7 @@ add_test(NAME playmat_resolver_test COMMAND playmat_resolver_test)
 add_test(NAME server_card_counter_test COMMAND server_card_counter_test)
 add_test(NAME server_counter_test COMMAND server_counter_test)
 add_test(NAME server_rate_limiter_test COMMAND server_rate_limiter_test)
+add_test(NAME server_moderator_role_test COMMAND server_moderator_role_test)
 add_test(NAME server_developer_role_test COMMAND server_developer_role_test)
 add_test(NAME server_game_join_test COMMAND server_game_join_test)
 add_test(NAME warning_categories_test COMMAND warning_categories_test)
@@ -39,6 +40,7 @@ add_executable(deck_hash_performance_test deck_hash_performance_test.cpp)
 add_executable(server_card_counter_test server_card_counter_test.cpp)
 add_executable(server_counter_test server_counter_test.cpp)
 add_executable(server_rate_limiter_test server_rate_limiter_test.cpp)
+add_executable(server_moderator_role_test server_moderator_role_test.cpp)
 add_executable(server_developer_role_test server_developer_role_test.cpp)
 add_executable(server_game_join_test server_game_join_test.cpp)
 add_executable(warning_categories_test warning_categories_test.cpp)
@@ -133,6 +135,7 @@ if(NOT GTEST_FOUND)
   add_dependencies(server_card_counter_test gtest)
   add_dependencies(server_counter_test gtest)
   add_dependencies(server_rate_limiter_test gtest)
+  add_dependencies(server_moderator_role_test gtest)
   add_dependencies(server_developer_role_test gtest)
   add_dependencies(server_game_join_test gtest)
   add_dependencies(warning_categories_test gtest)
@@ -175,6 +178,10 @@ target_link_libraries(
 )
 target_link_libraries(
   server_rate_limiter_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
+)
+target_link_libraries(
+  server_moderator_role_test libcockatrice_network libcockatrice_rng Threads::Threads ${GTEST_BOTH_LIBRARIES}
+  ${TEST_QT_MODULES}
 )
 target_link_libraries(
   server_developer_role_test libcockatrice_network libcockatrice_rng Threads::Threads ${GTEST_BOTH_LIBRARIES}

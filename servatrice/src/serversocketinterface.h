@@ -32,6 +32,7 @@
 #include <libcockatrice/protocol/pb/command_report_details.pb.h>
 #include <libcockatrice/protocol/pb/command_report_list.pb.h>
 #include <libcockatrice/protocol/pb/command_report_my_list.pb.h>
+#include <libcockatrice/protocol/pb/command_report_reopen.pb.h>
 #include <libcockatrice/protocol/pb/command_report_resolve.pb.h>
 #include <libcockatrice/protocol/pb/command_report_stats.pb.h>
 #include <libcockatrice/protocol/pb/command_report_user_info.pb.h>
@@ -148,6 +149,7 @@ private:
     Response::ResponseCode cmdUpdateServerMessage(const Command_UpdateServerMessage &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReportAssign(const Command_ReportAssign &cmd, ResponseContainer &);
     Response::ResponseCode cmdReportResolve(const Command_ReportResolve &cmd, ResponseContainer &);
+    Response::ResponseCode cmdReportReopen(const Command_ReportReopen &cmd, ResponseContainer &);
     Response::ResponseCode cmdReportUserInfo(const Command_ReportUserInfo &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReportStats(const Command_ReportStats &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdRegisterAccount(const Command_Register &cmd, ResponseContainer &rc);

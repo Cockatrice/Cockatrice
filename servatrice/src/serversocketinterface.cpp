@@ -75,6 +75,7 @@
 #include <libcockatrice/protocol/pb/command_report_details.pb.h>
 #include <libcockatrice/protocol/pb/command_report_list.pb.h>
 #include <libcockatrice/protocol/pb/command_report_my_list.pb.h>
+#include <libcockatrice/protocol/pb/command_report_reopen.pb.h>
 #include <libcockatrice/protocol/pb/command_report_resolve.pb.h>
 #include <libcockatrice/protocol/pb/command_report_stats.pb.h>
 #include <libcockatrice/protocol/pb/command_report_user_info.pb.h>
@@ -391,6 +392,8 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedModeratorCo
             return cmdReportAssign(cmd.GetExtension(Command_ReportAssign::ext), rc);
         case ModeratorCommand::REPORT_RESOLVE:
             return cmdReportResolve(cmd.GetExtension(Command_ReportResolve::ext), rc);
+        case ModeratorCommand::REPORT_REOPEN:
+            return cmdReportReopen(cmd.GetExtension(Command_ReportReopen::ext), rc);
         case ModeratorCommand::VIEWLOG_HISTORY:
             return cmdGetLogHistory(cmd.GetExtension(Command_ViewLogHistory::ext), rc, true);
         case ModeratorCommand::GRANT_REPLAY_ACCESS:
@@ -2745,6 +2748,42 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportMyList(const Comm
     }
 
     rc.setResponseExtension(re);
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdReportReopen(const Command_ReportReopen &cmd,
+                                                                      ResponseContainer & /*rc*/)
+{
+    if (!sqlInterface->checkSql()) {
+        return Response::RespInternalError;
+    }
+
+    int reportId = cmd.report_id();
+    QString note = textFromStdString(cmd.reopen_note());
+
+    QSqlQuery *query = sqlInterface->prepareQuery("UPDATE {prefix}_reports "
+                                                  "SET status = 'open', resolution_note = NULL, "
+                                                  "resolution_time = NULL, resolved_by = NULL, assigned_to = NULL, "
+                                                  "notified = 0 "
+                                                  "WHERE id = :id AND status IN ('resolved', 'dismissed')");
+
+    query->bindValue(":id", reportId);
+
+    if (!sqlInterface->execSqlQuery(query)) {
+        return Response::RespInternalError;
+    }
+
+    if (query->numRowsAffected() == 0) {
+        return Response::RespInvalidData;
+    }
+
+    QString auditDetails = QString("Report #%1 reopened").arg(reportId);
+    if (!note.isEmpty()) {
+        auditDetails += QString(". Reason: %1").arg(note.left(200));
+    }
+    sqlInterface->addAuditRecord(QString::number(reportId), this->getAddress(),
+                                 QString::fromStdString(userInfo->clientid()), "REPORT_REOPENED", auditDetails, true);
+
     return Response::RespOk;
 }
 
