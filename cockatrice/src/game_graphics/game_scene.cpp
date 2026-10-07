@@ -137,7 +137,8 @@ static void selectCardsInZone(
         return;
     }
 
-    for (auto &cardItem : zone->getCards()) {
+    for (auto *cardState : zone->getCards()) {
+        auto *cardItem = cardState == nullptr ? nullptr : qobject_cast<CardItem *>(cardState->parent());
         if (cardItem && filter(cardItem)) {
             cardItem->setSelected(true);
         }
@@ -596,7 +597,11 @@ void GameScene::addArrow(QSharedPointer<ArrowData> data)
         return;
     }
 
-    CardItem *startCard = startZone->getCard(data->startCardId);
+    CardState *startCardState = startZone->getCard(data->startCardId);
+    if (!startCardState) {
+        return;
+    }
+    CardItem *startCard = qobject_cast<CardItem *>(startCardState->parent());
     if (!startCard) {
         return;
     }
@@ -607,7 +612,8 @@ void GameScene::addArrow(QSharedPointer<ArrowData> data)
     } else {
         auto *zone = targetView->getLogic()->getZones().value(data->targetZone);
         if (zone) {
-            targetItem = zone->getCard(data->targetCardId);
+            CardState *targetCardState = zone->getCard(data->targetCardId);
+            targetItem = targetCardState == nullptr ? nullptr : qobject_cast<CardItem *>(targetCardState->parent());
         }
     }
     if (!targetItem) {

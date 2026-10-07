@@ -26,7 +26,7 @@ public:
                    QObject *parent = nullptr);
 
 protected:
-    void addCardImpl(CardItem *card, int x, int y) override;
+    void addCardImpl(CardState *card, int x, int y) override;
 };
 
 #endif // COCKATRICE_STACK_ZONE_LOGIC_H
