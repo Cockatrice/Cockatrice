@@ -4,6 +4,7 @@
 #include "tab.h"
 
 #include <QList>
+#include <QPoint>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_report.pb.h>
 
@@ -19,6 +20,7 @@ class QTableWidget;
 class QTextEdit;
 class QTimer;
 class GameReplay;
+class UserContextMenu;
 
 class TabReport : public Tab
 {
@@ -34,6 +36,7 @@ public:
 signals:
     void openReplay(GameReplay *replay);
     void requestJoinGame(int gameId, int roomId);
+    void openMessageDialog(const QString &userName, bool focus);
 
 private slots:
     void refreshList();
@@ -43,6 +46,7 @@ private slots:
     void resolveReport(bool dismissed, bool promptNote);
     void resolveResponse(const Response &response);
     void onSelectionChanged();
+    void showTableContextMenu(const QPoint &pos);
     void viewReplay();
     void viewReplayResponse(const Response &response);
     void joinGame();
@@ -91,6 +95,7 @@ private:
     QPushButton *joinGameButton;
     QLabel *statusLabel;
     QTimer *refreshTimer;
+    UserContextMenu *userContextMenu;
 
     QGroupBox *userContextGroup;
     QLabel *userContextName;
