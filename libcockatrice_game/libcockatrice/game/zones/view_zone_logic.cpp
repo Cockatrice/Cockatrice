@@ -1,9 +1,9 @@
 #include "view_zone_logic.h"
 
-#include "../../client/settings/cache_settings.h"
 #include "../board/card_state.h"
 #include "../player/player_actions.h"
 #include "../player/player_logic.h"
+#include "client/settings/cache_settings.h"
 
 #include <QtGlobal>
 #include <libcockatrice/settings/interface_settings.h>

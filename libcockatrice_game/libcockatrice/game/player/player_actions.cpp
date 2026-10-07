@@ -1,8 +1,5 @@
 #include "player_actions.h"
 
-#include "../../client/settings/cache_settings.h"
-#include "../../game_graphics/dialogs/dlg_create_token.h"
-#include "../abstract_game.h"
 #include "../board/arrow_data.h"
 #include "../board/card_state.h"
 #include "../board/counter_state.h"
@@ -12,6 +9,7 @@
 #include "../zones/pile_zone_logic.h"
 #include "../zones/table_zone_logic.h"
 #include "../zones/view_zone_logic.h"
+#include "client/settings/cache_settings.h"
 #include "libcockatrice/card/database/card_database_querier.h"
 #include "libcockatrice/card/printing/exact_card.h"
 #include "libcockatrice/card/printing/printing_info.h"

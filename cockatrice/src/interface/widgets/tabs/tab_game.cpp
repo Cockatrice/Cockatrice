@@ -2,16 +2,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
-#include "../../../game/abstract_game.h"
-#include "../../../game/game_event_handler.h"
-#include "../../../game/game_meta_info.h"
-#include "../../../game/game_state.h"
-#include "../../../game/player/player_info.h"
-#include "../../../game/player/player_manager.h"
 #include "../../../game_graphics/board/abstract_card_item.h"
-#include "../game/game.h"
-#include "../game/player/player_logic.h"
-#include "../game/replay.h"
 #include "../game_graphics/deckview/deck_view_container.h"
 #include "../game_graphics/deckview/tabbed_deck_view_container.h"
 #include "../game_graphics/game_scene.h"
@@ -71,6 +62,15 @@
 #include <QWidget>
 #include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/game.h>
+#include <libcockatrice/game/game_event_handler.h>
+#include <libcockatrice/game/game_meta_info.h>
+#include <libcockatrice/game/game_state.h>
+#include <libcockatrice/game/player/player_info.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/player/player_manager.h>
+#include <libcockatrice/game/replay.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
