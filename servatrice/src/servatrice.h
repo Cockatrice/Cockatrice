@@ -163,6 +163,7 @@ public:
     };
 private slots:
     void statusUpdate();
+    void sweepLegacyBackups();
     void shutdownTimeout();
     void cleanupExpiredDeckShares();
 
@@ -179,6 +180,7 @@ private:
     DatabaseType databaseType;
     QTimer *pingClock, *statusUpdateClock;
     QTimer *deckShareCleanupClock;
+    QTimer *legacyBackupSweepClock;
     Servatrice_GameServer *gameServer;
     Servatrice_WebsocketGameServer *websocketGameServer;
     Servatrice_IslServer *islServer;
@@ -261,6 +263,10 @@ public:
     {
         return getAuthenticationStrictness() == AuthenticationStrict;
     }
+    /** @brief Key sealing legacy password backups, or empty when they are disabled. */
+    QByteArray getLegacyBackupKey() const;
+    /** @brief Days a legacy password backup may go unused before it is purged. */
+    int getLegacyBackupTtlDays() const;
     QString getServerName() const;
     QString getLoginMessage() const override
     {

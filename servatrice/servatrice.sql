@@ -32,6 +32,8 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `name` varchar(35) NOT NULL,
   `realname` varchar(255) NOT NULL,
   `password_sha512` varchar(255) NOT NULL,
+  `password_legacy_backup` varchar(255) NOT NULL DEFAULT '',
+  `password_legacy_backup_used_at` datetime DEFAULT NULL,
   `email` varchar(255) NOT NULL,
   `country` char(2) NOT NULL,
   `avatar_bmp` mediumblob NOT NULL,
