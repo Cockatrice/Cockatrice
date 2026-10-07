@@ -3,11 +3,6 @@
 #include "../../client/settings/cache_settings.h"
 #include "../../client/translation.h"
 #include "../../filters/syntax_help.h"
-#include "../../game/board/card_list.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_logic.h"
-#include "../../game/zones/card_zone_logic.h"
-#include "../../game/zones/view_zone_logic.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../card_dimensions.h"
 #include "../z_values.h"
@@ -44,6 +39,11 @@
 #include <QVariant>
 #include <QWidget>
 #include <QtGlobal>
+#include <libcockatrice/game/board/card_list.h>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
+#include <libcockatrice/game/zones/view_zone_logic.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <qnamespace.h>

@@ -1,15 +1,6 @@
 #include "player_graphics_item.h"
 
 #include "../../client/settings/cache_settings.h"
-#include "../../game/board/counter_state.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_info.h"
-#include "../../game/player/player_logic.h"
-#include "../../game/zones/card_zone_logic.h"
-#include "../../game/zones/hand_zone_logic.h"
-#include "../../game/zones/pile_zone_logic.h"
-#include "../../game/zones/stack_zone_logic.h"
-#include "../../game/zones/table_zone_logic.h"
 #include "../../interface/card_picture_loader/card_picture_loader.h"
 #include "../../interface/widgets/cards/art_crop_attribution.h"
 #include "../../interface/widgets/cards/card_art_utils.h"
@@ -45,6 +36,15 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/playmat_resolver.h>
+#include <libcockatrice/game/board/counter_state.h>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_info.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
+#include <libcockatrice/game/zones/hand_zone_logic.h>
+#include <libcockatrice/game/zones/pile_zone_logic.h>
+#include <libcockatrice/game/zones/stack_zone_logic.h>
+#include <libcockatrice/game/zones/table_zone_logic.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <qnamespace.h>
 #include <qnumeric.h>

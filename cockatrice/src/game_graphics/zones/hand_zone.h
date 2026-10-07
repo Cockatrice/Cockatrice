@@ -7,10 +7,10 @@
 #ifndef HANDZONE_H
 #define HANDZONE_H
 
-#include "../../game/board/card_list.h"
 #include "select_zone.h"
 
 #include <QtGlobal>
+#include <libcockatrice/game/board/card_list.h>
 #include <qtmetamacros.h>
 
 class HandZoneLogic;
