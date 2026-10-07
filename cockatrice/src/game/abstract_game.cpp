@@ -34,7 +34,7 @@ void AbstractGame::loadReplay(const GameReplay *replay)
     gameMetaInfo->setSpectatorsOmniscient(true);
 }
 
-CardItem *AbstractGame::getCard(int playerId, const QString &zoneName, int cardId) const
+CardState *AbstractGame::getCard(int playerId, const QString &zoneName, int cardId) const
 {
     PlayerLogic *player = playerManager->getPlayer(playerId);
     if (!player) {

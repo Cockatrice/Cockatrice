@@ -34,7 +34,7 @@ CardZoneLogic::CardZoneLogic(PlayerLogic *_player,
             &CardZoneLogic::refreshCardInfos);
 }
 
-void CardZoneLogic::addCard(CardItem *card, const bool reorganize, const int x, const int y)
+void CardZoneLogic::addCard(CardState *card, const bool reorganize, const int x, const int y)
 {
     if (!card) {
         qCWarning(CardZoneLogicLog) << "CardZoneLogic::addCard() card is null; this shouldn't normally happen";
@@ -46,7 +46,7 @@ void CardZoneLogic::addCard(CardItem *card, const bool reorganize, const int x, 
             auto copy = new CardItem(player, nullptr, card->getCardRef(), card->getId());
             copy->setFaceDown(card->getFaceDown());
 
-            viewLogic->addCard(copy, reorganize, x, y);
+            viewLogic->addCard(copy->getState(), reorganize, x, y);
         }
     }
 
@@ -61,7 +61,7 @@ void CardZoneLogic::addCard(CardItem *card, const bool reorganize, const int x, 
     emit cardCountChanged();
 }
 
-CardItem *CardZoneLogic::takeCard(int position, int cardId, bool toNewZone)
+CardState *CardZoneLogic::takeCard(int position, int cardId, bool toNewZone)
 {
     if (position == -1) {
         // position == -1 means either that the zone is indexed by card id
@@ -84,7 +84,7 @@ CardItem *CardZoneLogic::takeCard(int position, int cardId, bool toNewZone)
         viewLogic->removeCard(position, toNewZone);
     }
 
-    CardItem *c = cards.takeAt(position);
+    CardState *c = cards.takeAt(position);
 
     c->setId(cardId);
 
@@ -93,9 +93,9 @@ CardItem *CardZoneLogic::takeCard(int position, int cardId, bool toNewZone)
     return c;
 }
 
-CardItem *CardZoneLogic::getCard(int cardId)
+CardState *CardZoneLogic::getCard(int cardId)
 {
-    CardItem *c = cards.findCard(cardId);
+    CardState *c = cards.findCard(cardId);
     if (!c) {
         qCWarning(CardZoneLogicLog) << "CardZoneLogic::getCard: card id=" << cardId << "not found";
         return nullptr;
@@ -109,7 +109,7 @@ CardItem *CardZoneLogic::getCard(int cardId)
     return c;
 }
 
-void CardZoneLogic::removeCard(CardItem *card)
+void CardZoneLogic::removeCard(CardState *card)
 {
     if (!card) {
         qCWarning(CardZoneLogicLog) << "CardZoneLogic::removeCard: card is null, this shouldn't normally happen";
@@ -125,8 +125,8 @@ void CardZoneLogic::removeCard(CardItem *card)
 
 void CardZoneLogic::refreshCardInfos()
 {
-    for (const auto &cardItem : cards) {
-        cardItem->refreshCardInfo();
+    for (const auto &cardState : cards) {
+        cardState->refreshCardInfo();
     }
 }
 
@@ -158,17 +158,17 @@ void CardZoneLogic::clearContents()
     const CardList toClear = cards;
 
     // Detach and notify attached cards and zones *before* deleting anything.
-    for (CardItem *card : toClear) {
+    for (CardState *card : toClear) {
         // If an incorrectly implemented server doesn't return attached cards to whom they belong before dropping a
         // player, we have to return them to avoid a crash.
         const QList<CardItem *> &attachedCards = card->getAttachedCards();
         for (CardItem *attachedCard : attachedCards) {
-            emit attachedCard->getZone()->cardAdded(attachedCard);
+            emit attachedCard->getZone()->cardAdded(attachedCard->getState());
         }
     }
 
     // Now request deletions after all manipulations are done.
-    for (CardItem *card : toClear) {
+    for (CardState *card : toClear) {
         player->deleteCard(card);
     }
 

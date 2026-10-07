@@ -1572,7 +1572,9 @@ void PlayerActions::actIncrementAllCardCounters(QList<CardItem *> cardsToUpdate)
 {
     if (cardsToUpdate.isEmpty()) {
         // If no cards selected, update all cards on table
-        cardsToUpdate = static_cast<QList<CardItem *>>(player->getTableZone()->getCards());
+        for (auto *state : player->getTableZone()->getCards()) {
+            cardsToUpdate.append(qobject_cast<CardItem *>(state->parent()));
+        }
     }
 
     QList<const ::google::protobuf::Message *> commandList;
@@ -1645,7 +1647,7 @@ void PlayerActions::actHide(QList<CardItem *> selectedCards)
     for (const auto &item : selectedCards) {
         auto *card = static_cast<CardItem *>(item);
         if (card && isUnwritableRevealZone(card->getZone())) {
-            card->getZone()->removeCard(card);
+            card->getZone()->removeCard(card->getState());
         }
     }
 }

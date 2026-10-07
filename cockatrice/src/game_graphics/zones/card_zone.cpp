@@ -29,17 +29,26 @@ void CardZone::invalidateItems()
 const QList<CardItem *> &CardZone::cardItems() const
 {
     if (itemsDirty) {
-        items = getLogic()->getCards();
+        items.clear();
+        for (auto *cardState : getLogic()->getCards()) {
+            if (auto *cardItem = qobject_cast<CardItem *>(cardState->parent())) {
+                items.append(cardItem);
+            }
+        }
         itemsDirty = false;
     }
     return items;
 }
 
-void CardZone::onCardAdded(CardItem *addedCard)
+void CardZone::onCardAdded(CardState *addedCard)
 {
-    addedCard->setParentItem(this);
-    addedCard->setVisible(true);
-    addedCard->update();
+    auto *addedItem = addedCard == nullptr ? nullptr : qobject_cast<CardItem *>(addedCard->parent());
+    if (addedItem == nullptr) {
+        return;
+    }
+    addedItem->setParentItem(this);
+    addedItem->setVisible(true);
+    addedItem->update();
 }
 
 void CardZone::retranslateUi()

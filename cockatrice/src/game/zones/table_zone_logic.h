@@ -39,7 +39,7 @@ public:
     static int tableRowToGridY(int tableRow);
 
 protected:
-    void addCardImpl(CardItem *card, int x, int y) override;
+    void addCardImpl(CardState *card, int x, int y) override;
 
     /**
      *  @brief Removes a card from view.
@@ -47,9 +47,9 @@ protected:
      *  @param position card position
      *  @param cardId id of card to take
      *  @param toNewZone Whether the destination of the card is not the same as the starting zone. Defaults to true
-     *  @return CardItem that has been removed
+     *  @return CardState that has been removed
      */
-    CardItem *takeCard(int position, int cardId, bool toNewZone = true) override;
+    CardState *takeCard(int position, int cardId, bool toNewZone = true) override;
 };
 
 #endif // COCKATRICE_TABLE_ZONE_LOGIC_H
