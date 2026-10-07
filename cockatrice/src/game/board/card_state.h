@@ -29,6 +29,7 @@ private:
     QString pt;
     bool doesntUntap = false;
     bool destroyOnZoneChange = false;
+    QString color;
 
     CardState *attachedTo = nullptr;
     QList<CardItem *> attachedCards;
@@ -43,6 +44,7 @@ signals:
     void tappedChanged(bool newTapped, bool canAnimate);
     void facedownChanged(bool newFaceDown);
     void stateReset();
+    void colorChanged();
 
     void attackingChanged(bool newValue);
     void countersChanged(const QMap<int, int> &newCounters);
@@ -88,6 +90,16 @@ public:
     }
 
     void setCardRef(const CardRef &_cardRef);
+
+    QString getName() const
+    {
+        return cardRef.name;
+    }
+
+    QString getProviderId() const
+    {
+        return cardRef.providerId;
+    }
 
     ExactCard getCard() const
     {
@@ -182,6 +194,13 @@ public:
      * @return A QVariantList that can contain one or two elements, where each QVariant can be either int or QString
      */
     static QVariantList parsePT(const QString &pt);
+
+    [[nodiscard]] QString getColor() const
+    {
+        return color;
+    }
+
+    void setColor(const QString &_color);
 
     bool getDoesntUntap() const
     {

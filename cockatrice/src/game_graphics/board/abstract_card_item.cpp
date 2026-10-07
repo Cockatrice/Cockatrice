@@ -28,6 +28,10 @@ AbstractCardItem::AbstractCardItem(QGraphicsItem *parent, const CardRef &cardRef
     connect(state, &CardState::cardRefChanged, this, &AbstractCardItem::onCardRefChanged);
     connect(state, &CardState::tappedChanged, this, &AbstractCardItem::onTappedChanged);
     connect(state, &CardState::facedownChanged, this, [this] { update(); });
+    connect(state, &CardState::colorChanged, this, [this] {
+        cacheBgColor();
+        update();
+    });
 
     connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::displayCardNamesChanged, this,
             [this] { update(); });
@@ -239,18 +243,17 @@ void AbstractCardItem::setHovered(bool _hovered)
 
 void AbstractCardItem::setColor(const QString &_color)
 {
-    color = _color;
-    cacheBgColor();
-    update();
+    state->setColor(_color);
 }
 
 void AbstractCardItem::cacheBgColor()
 {
     QChar colorChar;
-    if (color.isEmpty()) {
+    const QString cardColor = state->getColor();
+    if (cardColor.isEmpty()) {
         colorChar = state->getCardInfo().getColorChar();
     } else {
-        colorChar = color.at(0);
+        colorChar = cardColor.at(0);
     }
 
     switch (colorChar.toLower().toLatin1()) {
