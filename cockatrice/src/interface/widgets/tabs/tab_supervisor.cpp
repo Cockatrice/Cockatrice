@@ -884,6 +884,7 @@ void TabSupervisor::openTabReport()
     myAddTab(tabReport, aTabReport);
     connect(tabReport, &TabReport::openReplay, this, &TabSupervisor::openReplay);
     connect(tabReport, &TabReport::requestJoinGame, this, &TabSupervisor::joinReportGame);
+    connect(tabReport, &TabReport::openMessageDialog, this, &TabSupervisor::addMessageTab);
     connect(tabReport, &QObject::destroyed, this, [this] {
         tabReport = nullptr;
         aTabReport->setChecked(false);

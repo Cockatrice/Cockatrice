@@ -1,5 +1,6 @@
 #include "tab_report.h"
 
+#include "../server/user/user_context_menu.h"
 #include "../utility/report_utils.h"
 #include "abstract_client.h"
 #include "tab_supervisor.h"
@@ -25,6 +26,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <libcockatrice/network/server/remote/user_level.h>
 #include <libcockatrice/protocol/pb/command_replay_download_by_game_id.pb.h>
 #include <libcockatrice/protocol/pb/command_report_add_comment.pb.h>
 #include <libcockatrice/protocol/pb/command_report_assign.pb.h>
@@ -111,6 +113,10 @@ TabReport::TabReport(TabSupervisor *_tabSupervisor, AbstractClient *_client) : T
     table->horizontalHeader()->setSectionResizeMode(COL_REPORTED, QHeaderView::Stretch);
     table->horizontalHeader()->setSectionResizeMode(COL_REPORTER, QHeaderView::ResizeToContents);
     connect(table, &QTableWidget::itemSelectionChanged, this, &TabReport::onSelectionChanged);
+    table->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(table, &QTableWidget::customContextMenuRequested, this, &TabReport::showTableContextMenu);
+    userContextMenu = new UserContextMenu(tabSupervisor, this);
+    connect(userContextMenu, &UserContextMenu::openMessageDialog, this, &TabReport::openMessageDialog);
 
     descGroup = new QGroupBox;
     descriptionEdit = new QTextEdit;
@@ -266,6 +272,7 @@ TabReport::TabReport(TabSupervisor *_tabSupervisor, AbstractClient *_client) : T
 
 void TabReport::retranslateUi()
 {
+    userContextMenu->retranslateUi();
     searchEdit->setPlaceholderText(tr("Search by username, category..."));
     statusFilter->clear();
     statusFilter->addItem(tr("All Statuses"), "");
@@ -494,6 +501,36 @@ void TabReport::onSelectionChanged()
     const int reportId = table->item(row, COL_ID)->data(Qt::UserRole).toInt();
     loadReportDetails(reportId);
     updateActionStates();
+}
+
+void TabReport::showTableContextMenu(const QPoint &pos)
+{
+    QTableWidgetItem *clickedItem = table->itemAt(pos);
+    if (!clickedItem || clickedItem->row() < 0) {
+        return;
+    }
+
+    const int row = clickedItem->row();
+    const QTableWidgetItem *reportedItem = table->item(row, COL_REPORTED);
+    const QTableWidgetItem *idItem = table->item(row, COL_ID);
+    if (!reportedItem || !idItem || reportedItem->text().isEmpty()) {
+        return;
+    }
+
+    int userLevel = ServerInfo_User::IsUser;
+    const int reportId = idItem->data(Qt::UserRole).toInt();
+    for (const ServerInfo_Report &r : filteredReports) {
+        if (r.report_id() == reportId) {
+            if (r.reported_user_level() != 0) {
+                userLevel = r.reported_user_level();
+            }
+            break;
+        }
+    }
+
+    table->selectRow(row);
+    userContextMenu->showContextMenu(table->viewport()->mapToGlobal(pos), reportedItem->text(),
+                                     UserLevelFlags(userLevel));
 }
 
 void TabReport::loadReportDetails(int reportId)

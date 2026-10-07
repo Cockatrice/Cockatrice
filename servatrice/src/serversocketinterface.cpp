@@ -1943,6 +1943,29 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
     return Response::RespOk;
 }
 
+namespace
+{
+int reportUserLevel(bool userExists, int adminFlags)
+{
+    int userLevel = ServerInfo_User::IsUser;
+    if (userExists) {
+        userLevel |= ServerInfo_User::IsRegistered;
+        if (adminFlags & 1) {
+            userLevel |= ServerInfo_User::IsAdmin | ServerInfo_User::IsModerator;
+        } else if (adminFlags & 2) {
+            userLevel |= ServerInfo_User::IsModerator;
+        }
+        if (adminFlags & 4) {
+            userLevel |= ServerInfo_User::IsJudge;
+        }
+        if (adminFlags & 8) {
+            userLevel |= ServerInfo_User::IsDeveloper;
+        }
+    }
+    return userLevel;
+}
+} // namespace
+
 Response::ResponseCode AbstractServerSocketInterface::cmdReportList(const Command_ReportList &cmd,
                                                                     ResponseContainer &rc)
 {
@@ -1957,7 +1980,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportList(const Comman
     // Columns: 0=id, 1=reporter_name, 2=reported_user_name, 3=game_id,
     //          4=category, 5=description, 6=created_at, 7=status,
     //          8=resolution_note, 9=assigned_mod_name,
-    //          10=room_id, 11=replay_id
+    //          10=room_id, 11=replay_id,
+    //          12=reported_user_id, 13=reported_user_admin
     QString whereClause;
     if (unresolvedOnly) {
         whereClause = "WHERE r.status = 'open' OR r.status = 'assigned' ";
@@ -1974,10 +1998,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportList(const Comman
                        "r.category, r.description, r.created_at, r.status, "
                        "r.resolution_note, u.name AS assigned_mod_name, ru.name AS resolved_by_name, r.room_id, "
                        "(SELECT id FROM {prefix}_replays WHERE id_game = r.game_id ORDER BY id DESC LIMIT 1) "
-                       "AS replay_id "
+                       "AS replay_id, u2.id AS reported_user_id, u2.admin AS reported_user_admin "
                        "FROM {prefix}_reports r "
                        "LEFT JOIN {prefix}_users u ON r.assigned_to = u.id "
-                       "LEFT JOIN {prefix}_users ru ON r.resolved_by = ru.id ";
+                       "LEFT JOIN {prefix}_users ru ON r.resolved_by = ru.id "
+                       "LEFT JOIN {prefix}_users u2 ON u2.name = r.reported_user_name ";
 
     if (unresolvedOnly) {
         queryStr += "WHERE r.status = 'open' OR r.status = 'assigned' ";
@@ -2029,6 +2054,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportList(const Comman
         if (!query->value(12).isNull()) {
             info->set_replay_id(query->value(12).toInt());
         }
+
+        info->set_reported_user_level(reportUserLevel(!query->value(12).isNull(), query->value(13).toInt()));
     }
 
     rc.setResponseExtension(re);
@@ -2703,10 +2730,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportMyList(const Comm
                        "r.category, r.description, r.created_at, r.status, "
                        "r.resolution_note, u.name AS assigned_mod_name, ru.name AS resolved_by_name, r.room_id, "
                        "(SELECT id FROM {prefix}_replays WHERE id_game = r.game_id ORDER BY id DESC LIMIT 1) "
-                       "AS replay_id "
+                       "AS replay_id, u2.id AS reported_user_id, u2.admin AS reported_user_admin "
                        "FROM {prefix}_reports r "
                        "LEFT JOIN {prefix}_users u ON r.assigned_to = u.id "
                        "LEFT JOIN {prefix}_users ru ON r.resolved_by = ru.id "
+                       "LEFT JOIN {prefix}_users u2 ON u2.name = r.reported_user_name "
                        "WHERE r.reporter_id = :reporter_id "
                        "ORDER BY r.created_at DESC LIMIT 200";
 
@@ -2753,6 +2781,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportMyList(const Comm
         if (!query->value(12).isNull()) {
             info->set_replay_id(query->value(12).toInt());
         }
+
+        info->set_reported_user_level(reportUserLevel(!query->value(12).isNull(), query->value(13).toInt()));
     }
 
     rc.setResponseExtension(re);
