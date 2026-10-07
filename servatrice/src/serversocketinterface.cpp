@@ -1972,11 +1972,12 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportList(const Comman
 
     QString queryStr = "SELECT r.id, r.reporter_name, r.reported_user_name, r.game_id, "
                        "r.category, r.description, r.created_at, r.status, "
-                       "r.resolution_note, u.name AS assigned_mod_name, r.room_id, "
+                       "r.resolution_note, u.name AS assigned_mod_name, ru.name AS resolved_by_name, r.room_id, "
                        "(SELECT id FROM {prefix}_replays WHERE id_game = r.game_id ORDER BY id DESC LIMIT 1) "
                        "AS replay_id "
                        "FROM {prefix}_reports r "
-                       "LEFT JOIN {prefix}_users u ON r.assigned_to = u.id ";
+                       "LEFT JOIN {prefix}_users u ON r.assigned_to = u.id "
+                       "LEFT JOIN {prefix}_users ru ON r.resolved_by = ru.id ";
 
     if (unresolvedOnly) {
         queryStr += "WHERE r.status = 'open' OR r.status = 'assigned' ";
@@ -2017,13 +2018,16 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportList(const Comman
         if (!query->value(9).isNull()) {
             info->set_assigned_mod_name(query->value(9).toString().toStdString());
         }
-
         if (!query->value(10).isNull()) {
-            info->set_room_id(query->value(10).toInt());
+            info->set_resolved_by_name(query->value(10).toString().toStdString());
         }
 
         if (!query->value(11).isNull()) {
-            info->set_replay_id(query->value(11).toInt());
+            info->set_room_id(query->value(11).toInt());
+        }
+
+        if (!query->value(12).isNull()) {
+            info->set_replay_id(query->value(12).toInt());
         }
     }
 
@@ -2697,11 +2701,12 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportMyList(const Comm
 
     QString queryStr = "SELECT r.id, r.reporter_name, r.reported_user_name, r.game_id, "
                        "r.category, r.description, r.created_at, r.status, "
-                       "r.resolution_note, u.name AS assigned_mod_name, r.room_id, "
+                       "r.resolution_note, u.name AS assigned_mod_name, ru.name AS resolved_by_name, r.room_id, "
                        "(SELECT id FROM {prefix}_replays WHERE id_game = r.game_id ORDER BY id DESC LIMIT 1) "
                        "AS replay_id "
                        "FROM {prefix}_reports r "
                        "LEFT JOIN {prefix}_users u ON r.assigned_to = u.id "
+                       "LEFT JOIN {prefix}_users ru ON r.resolved_by = ru.id "
                        "WHERE r.reporter_id = :reporter_id "
                        "ORDER BY r.created_at DESC LIMIT 200";
 
@@ -2737,13 +2742,16 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportMyList(const Comm
         if (!query->value(9).isNull()) {
             info->set_assigned_mod_name(query->value(9).toString().toStdString());
         }
-
         if (!query->value(10).isNull()) {
-            info->set_room_id(query->value(10).toInt());
+            info->set_resolved_by_name(query->value(10).toString().toStdString());
         }
 
         if (!query->value(11).isNull()) {
-            info->set_replay_id(query->value(11).toInt());
+            info->set_room_id(query->value(11).toInt());
+        }
+
+        if (!query->value(12).isNull()) {
+            info->set_replay_id(query->value(12).toInt());
         }
     }
 
@@ -2802,17 +2810,19 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportDetails(const Com
 
     // Columns: 0=id, 1=reporter_id, 2=reporter_name, 3=reported_user_name, 4=game_id,
     //          5=category, 6=description, 7=created_at, 8=status,
-    //          9=resolution_note, 10=assigned_mod_name, 11=chat_log,
-    //          12=room_id, 13=resolution_time, 14=replay_id
-    QString queryStr = "SELECT r.id, r.reporter_id, r.reporter_name, r.reported_user_name, r.game_id, "
-                       "r.category, r.description, r.created_at, r.status, "
-                       "r.resolution_note, u.name AS assigned_mod_name, r.chat_log, r.room_id, "
-                       "r.resolution_time, "
-                       "(SELECT id FROM {prefix}_replays WHERE id_game = r.game_id ORDER BY id DESC LIMIT 1) "
-                       "AS replay_id "
-                       "FROM {prefix}_reports r "
-                       "LEFT JOIN {prefix}_users u ON r.assigned_to = u.id "
-                       "WHERE r.id = :id";
+    //          9=resolution_note, 10=assigned_mod_name, 11=resolved_by_name,
+    //          12=chat_log, 13=room_id, 14=resolution_time, 15=replay_id
+    QString queryStr =
+        "SELECT r.id, r.reporter_id, r.reporter_name, r.reported_user_name, r.game_id, "
+        "r.category, r.description, r.created_at, r.status, "
+        "r.resolution_note, u.name AS assigned_mod_name, ru.name AS resolved_by_name, r.chat_log, r.room_id, "
+        "r.resolution_time, "
+        "(SELECT id FROM {prefix}_replays WHERE id_game = r.game_id ORDER BY id DESC LIMIT 1) "
+        "AS replay_id "
+        "FROM {prefix}_reports r "
+        "LEFT JOIN {prefix}_users u ON r.assigned_to = u.id "
+        "LEFT JOIN {prefix}_users ru ON r.resolved_by = ru.id "
+        "WHERE r.id = :id";
     QSqlQuery *query = sqlInterface->prepareQuery(queryStr);
     query->bindValue(":id", reportId);
 
@@ -2851,21 +2861,24 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportDetails(const Com
     if (!query->value(10).isNull()) {
         info->set_assigned_mod_name(query->value(10).toString().toStdString());
     }
-
     if (!query->value(11).isNull()) {
-        info->set_chat_log(query->value(11).toString().toStdString());
+        info->set_resolved_by_name(query->value(11).toString().toStdString());
     }
 
     if (!query->value(12).isNull()) {
-        info->set_room_id(query->value(12).toInt());
+        info->set_chat_log(query->value(12).toString().toStdString());
     }
 
     if (!query->value(13).isNull()) {
-        info->set_resolution_time(query->value(13).toDateTime().toSecsSinceEpoch());
+        info->set_room_id(query->value(13).toInt());
     }
 
     if (!query->value(14).isNull()) {
-        info->set_replay_id(query->value(14).toInt());
+        info->set_resolution_time(query->value(14).toDateTime().toSecsSinceEpoch());
+    }
+
+    if (!query->value(15).isNull()) {
+        info->set_replay_id(query->value(15).toInt());
     }
 
     QSqlQuery *commentQuery =
