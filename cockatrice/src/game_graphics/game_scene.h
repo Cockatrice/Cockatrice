@@ -92,6 +92,7 @@ public:
 
     /** @brief Gets all selected CardItems. */
     QList<CardItem *> selectedCards() const;
+    QList<CardState *> selectedCardStates() const;
 
     /** @brief Selects every card sharing the zone of @p card. */
     void selectAllInZone(const CardItem *card);

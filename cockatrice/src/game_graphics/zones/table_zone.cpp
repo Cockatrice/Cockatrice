@@ -238,16 +238,16 @@ void TableZone::reorganizeCards()
 
 void TableZone::toggleTapped()
 {
-    QList<CardItem *> selectedCards;
+    QList<CardState *> selectedCards;
     for (auto *item : scene()->selectedItems()) {
         auto *card = qgraphicsitem_cast<CardItem *>(item);
         if (card && card->getZone()->getName() == ZoneNames::TABLE) {
-            selectedCards.append(card);
+            selectedCards.append(card->getState());
         }
     }
 
     const bool tapAll = std::any_of(selectedCards.begin(), selectedCards.end(),
-                                    [](const CardItem *card) { return !card->getTapped(); });
+                                    [](const CardState *card) { return !card->getTapped(); });
 
     getLogic()->getPlayer()->getPlayerActions()->actToggleTapped(getLogic()->getName(), selectedCards, tapAll);
 }

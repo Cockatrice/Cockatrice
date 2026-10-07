@@ -26,7 +26,7 @@ MoveMenu::MoveMenu(PlayerGraphicsItem *player) : QMenu(tr("Move to"))
 
     auto invoke = [player](CardMenuActionType type) {
         return [type, player]() {
-            player->getLogic()->getPlayerActions()->cardMenuAction(player->getGameScene()->selectedCards(), type);
+            player->getLogic()->getPlayerActions()->cardMenuAction(player->getGameScene()->selectedCardStates(), type);
         };
     };
 
