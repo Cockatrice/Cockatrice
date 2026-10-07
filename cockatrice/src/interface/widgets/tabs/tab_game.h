@@ -9,8 +9,6 @@
 #ifndef TAB_GAME_H
 #define TAB_GAME_H
 
-#include "../game/abstract_game.h"
-#include "../game/player/player_logic.h"
 #include "../game_graphics/log/message_log_widget.h"
 #include "../interface/widgets/menus/tearoff_menu.h"
 #include "../interface/widgets/replay/replay_widget.h"
@@ -20,6 +18,8 @@
 #include <QLoggingCategory>
 #include <QMap>
 #include <QStringListModel>
+#include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/player/player_logic.h>
 
 class CardMenu;
 class ServerInfo_PlayerProperties;

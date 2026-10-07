@@ -2,8 +2,6 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../../filters/syntax_help.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_logic.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../board/card_item.h"
 #include "../game_scene.h"
@@ -20,6 +18,8 @@
 #include <QScrollBar>
 #include <QStyle>
 #include <QStyleOption>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_logic.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 

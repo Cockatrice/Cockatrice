@@ -1,10 +1,10 @@
 #include "say_menu.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_logic.h"
 #include "../player_graphics_item.h"
 
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_logic.h>
 #include <libcockatrice/settings/message_settings.h>
 SayMenu::SayMenu(PlayerGraphicsItem *_player) : player(_player)
 {

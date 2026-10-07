@@ -7,10 +7,10 @@
 #ifndef CARDITEM_H
 #define CARDITEM_H
 
-#include "../../game/board/card_state.h"
-#include "../../game/zones/card_zone_logic.h"
 #include "abstract_card_item.h"
 
+#include <libcockatrice/game/board/card_state.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
 #include <libcockatrice/network/server/remote/game/server_card.h>
 
 class CardDatabase;

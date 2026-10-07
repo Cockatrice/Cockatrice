@@ -3,14 +3,14 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../../../interface/widgets/tabs/tab_game.h"
-#include "../../game/abstract_game.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_logic.h"
 #include "../player_graphics_item.h"
 
 #include <QAction>
 #include <QGraphicsView>
 #include <QMenu>
+#include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_logic.h>
 
 LibraryMenu::LibraryMenu(PlayerGraphicsItem *_player, QWidget *parent) : TearOffMenu(parent), player(_player)
 {

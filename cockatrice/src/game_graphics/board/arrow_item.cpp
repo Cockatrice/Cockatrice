@@ -2,8 +2,6 @@
 #include "arrow_item.h"
 
 #include "../../client/settings/cache_settings.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_logic.h"
 #include "../game_scene.h"
 #include "../player/player_target.h"
 #include "../z_values.h"
@@ -16,6 +14,8 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <QtMath>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_logic.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/utility/zone_names.h>
 

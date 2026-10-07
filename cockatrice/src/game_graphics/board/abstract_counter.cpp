@@ -2,8 +2,6 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../../client/settings/shortcuts_settings.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_logic.h"
 #include "../../game_graphics/board/translate_counter_name.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 
@@ -14,6 +12,8 @@
 #include <QKeyEvent>
 #include <QMenu>
 #include <QString>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_logic.h>
 #include <libcockatrice/utility/expression.h>
 
 AbstractCounter::AbstractCounter(CounterState *state,

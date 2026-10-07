@@ -1,10 +1,10 @@
 #ifndef COCKATRICE_PLAYER_DIALOGS_H
 #define COCKATRICE_PLAYER_DIALOGS_H
-#include "../../game/player/player_actions.h"
 #include "player_graphics_item.h"
 
 #include <QGraphicsView>
 #include <QObject>
+#include <libcockatrice/game/player/player_actions.h>
 
 class PlayerGraphicsItem;
 class PlayerDialogs : public QObject

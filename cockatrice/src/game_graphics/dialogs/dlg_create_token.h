@@ -7,9 +7,8 @@
 #ifndef DLG_CREATETOKEN_H
 #define DLG_CREATETOKEN_H
 
-#include "../../game/player/token_info.h"
-
 #include <QDialog>
+#include <libcockatrice/game/player/token_info.h>
 
 class QLabel;
 class QLineEdit;

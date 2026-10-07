@@ -2,12 +2,8 @@
 
 #include "../../../client/settings/card_counter_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
-#include "../../../game/player/card_menu_action_type.h"
 #include "../../../interface/widgets/tabs/tab_game.h"
 #include "../../board/card_item.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_logic.h"
-#include "../../game/zones/view_zone_logic.h"
 #include "../player_graphics_item.h"
 #include "move_menu.h"
 #include "pt_menu.h"
@@ -15,6 +11,10 @@
 #include <QPainter>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/game/player/card_menu_action_type.h>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/zones/view_zone_logic.h>
 #include <libcockatrice/utility/zone_names.h>
 
 /**

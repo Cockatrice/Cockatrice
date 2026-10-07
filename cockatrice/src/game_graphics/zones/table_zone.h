@@ -7,12 +7,12 @@
 #ifndef TABLEZONE_H
 #define TABLEZONE_H
 
-#include "../../game/zones/table_zone_logic.h"
 #include "../animated_item.h"
 #include "../board/abstract_card_item.h"
 #include "select_zone.h"
 
 #include <QElapsedTimer>
+#include <libcockatrice/game/zones/table_zone_logic.h>
 
 /**
  * @brief TableZone is the grid based rect where CardItems may be placed.

@@ -218,6 +218,11 @@ add_subdirectory(movecard_tests)
 add_subdirectory(oracle)
 add_subdirectory(settings)
 
+# libcockatrice_game only exists when the client is built.
+if(WITH_CLIENT)
+  add_subdirectory(game)
+endif()
+
 # theme_migration_test compiles client sources, whose headers are only reachable from a client build.
 if(WITH_CLIENT)
   add_subdirectory(theme_migration)

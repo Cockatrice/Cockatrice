@@ -1,9 +1,8 @@
 #ifndef COCKATRICE_REPLAY_MANAGER_H
 #define COCKATRICE_REPLAY_MANAGER_H
 
-#include "../../../game/player/event_processing_options.h"
-
 #include <QObject>
+#include <libcockatrice/game/player/event_processing_options.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 
 class GameReplay;

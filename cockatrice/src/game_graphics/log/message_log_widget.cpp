@@ -3,14 +3,14 @@
 #include "../../client/settings/cache_settings.h"
 #include "../../client/settings/card_counter_settings.h"
 #include "../../client/sound_engine.h"
-#include "../../game/game_state.h"
-#include "../../game/phase.h"
-#include "../../game/player/player_logic.h"
 #include "../../interface/card_localization.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../board/card_item.h"
 #include "../board/translate_counter_name.h"
 
+#include <libcockatrice/game/game_state.h>
+#include <libcockatrice/game/phase.h>
+#include <libcockatrice/game/player/player_logic.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/protocol/pb/context_mulligan.pb.h>
 #include <libcockatrice/settings/chat_settings.h>

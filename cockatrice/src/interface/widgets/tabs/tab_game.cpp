@@ -2,9 +2,6 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
-#include "../game/game.h"
-#include "../game/player/player_logic.h"
-#include "../game/replay.h"
 #include "../game_graphics/board/arrow_item.h"
 #include "../game_graphics/board/card_item.h"
 #include "../game_graphics/deckview/deck_view_container.h"
@@ -53,6 +50,9 @@
 #include <QWidget>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/game/game.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/replay.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/event_game_joined.pb.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>

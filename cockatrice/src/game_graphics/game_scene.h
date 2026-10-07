@@ -1,8 +1,6 @@
 #ifndef GAMESCENE_H
 #define GAMESCENE_H
 
-#include "../game/board/arrow_data.h"
-#include "../game/zones/card_zone_logic.h"
 #include "animated_item.h"
 #include "board/arrow_item.h"
 #include "board/arrow_registry.h"
@@ -12,6 +10,8 @@
 #include <QList>
 #include <QLoggingCategory>
 #include <QPointer>
+#include <libcockatrice/game/board/arrow_data.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
 
 inline Q_LOGGING_CATEGORY(GameSceneLog, "game_scene");
 inline Q_LOGGING_CATEGORY(GameScenePlayerAdditionRemovalLog, "game_scene.player_addition_removal");

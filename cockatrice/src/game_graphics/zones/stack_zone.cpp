@@ -1,14 +1,14 @@
 #include "stack_zone.h"
 
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_logic.h"
-#include "../../game/zones/stack_zone_logic.h"
 #include "../../interface/theme_manager.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
 #include "../card_dimensions.h"
 
 #include <QPainter>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/zones/stack_zone_logic.h>
 
 StackZone::StackZone(StackZoneLogic *_logic, int _zoneHeight, QGraphicsItem *parent)
     : SelectZone(_logic, parent), zoneHeight(_zoneHeight)

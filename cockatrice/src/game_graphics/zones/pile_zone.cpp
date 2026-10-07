@@ -1,9 +1,6 @@
 #include "pile_zone.h"
 
 #include "../../client/settings/cache_settings.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_logic.h"
-#include "../../game/zones/pile_zone_logic.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
 #include "view_zone.h"
@@ -11,6 +8,9 @@
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/zones/pile_zone_logic.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 
 PileZone::PileZone(PileZoneLogic *_logic, QGraphicsItem *parent) : CardZone(_logic, parent)

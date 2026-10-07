@@ -1,6 +1,8 @@
 add_executable(card_zone_algorithms_test card_zone_algorithms_test.cpp)
 
-target_include_directories(card_zone_algorithms_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src/game/zones)
+target_include_directories(
+  card_zone_algorithms_test PRIVATE ${CMAKE_SOURCE_DIR}/libcockatrice_game/libcockatrice/game/zones
+)
 
 target_link_libraries(
   card_zone_algorithms_test
