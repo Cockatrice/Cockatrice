@@ -33,4 +33,5 @@ message ServerInfo_Report {
     optional string chat_log = 14;
 
     optional string resolution_note = 15;
+    optional string resolved_by_name = 16;
 }
