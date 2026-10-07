@@ -146,6 +146,19 @@ void ServersSettings::setFPPlayerName(QString playerName)
     setValue(playerName, "fpPlayerName");
 }
 
+void ServersSettings::setServerPassword(const QString &saveName, const QString &password)
+{
+    const int index = getPrevioushostindex(saveName);
+    if (index >= 0) {
+        setValue(password, QString("password%1").arg(index), "server", "server_details");
+    } else {
+        // A credential write that silently no-ops is hard to diagnose from a
+        // bug report; surface a mismatched profile name instead.
+        qCWarning(ServersSettingsLog) << "setServerPassword() could not find profile:" << saveName
+                                      << "- password not saved";
+    }
+}
+
 QString ServersSettings::getFPPlayerName(QString defaultName) const
 {
     QVariant name = getValue("fpPlayerName");
