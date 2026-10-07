@@ -172,7 +172,7 @@ void PlayerLogic::processPlayerInfo(const ServerInfo_Player &info)
         const int cardListSize = zoneInfo.card_list_size();
         if (!cardListSize) {
             for (int j = 0; j < zoneInfo.card_count(); ++j) {
-                zone->addCard(new CardItem(this), false, -1);
+                zone->addCard((new CardItem(this))->getState(), false, -1);
             }
         } else {
             for (int j = 0; j < cardListSize; ++j) {
@@ -184,9 +184,9 @@ void PlayerLogic::processPlayerInfo(const ServerInfo_Player &info)
                 // The x coordinate of such cards is always 0, so inserting at it
                 // would reverse the list on reconnect. Append instead.
                 if (zoneInfo.with_coords()) {
-                    zone->addCard(card, false, cardInfo.x(), cardInfo.y());
+                    zone->addCard(card->getState(), false, cardInfo.x(), cardInfo.y());
                 } else {
-                    zone->addCard(card, false, -1);
+                    zone->addCard(card->getState(), false, -1);
                 }
             }
         }
@@ -219,8 +219,8 @@ void PlayerLogic::processCardAttachment(const ServerInfo_Player &info)
         for (int j = 0; j < cardListSize; ++j) {
             const ServerInfo_Card &cardInfo = zoneInfo.card_list(j);
             if (cardInfo.has_attach_player_id()) {
-                CardItem *startCard = zone->getCard(cardInfo.id());
-                CardItem *targetCard =
+                CardState *startCard = zone->getCard(cardInfo.id());
+                CardState *targetCard =
                     game->getCard(cardInfo.attach_player_id(), QString::fromStdString(cardInfo.attach_zone()),
                                   cardInfo.attach_card_id());
                 if (!targetCard) {
@@ -244,14 +244,14 @@ void PlayerLogic::addCard(CardItem *card)
     emit newCardAdded(card);
 }
 
-void PlayerLogic::deleteCard(CardItem *card)
+void PlayerLogic::deleteCard(CardState *card)
 {
     if (card == nullptr) {
         return;
     } else if (dialogSemaphore) {
         cardsToDelete.append(card);
     } else {
-        card->getState()->deleteView();
+        card->deleteView();
     }
 }
 
@@ -332,7 +332,7 @@ bool PlayerLogic::clearCardsToDelete()
 
     for (auto &i : cardsToDelete) {
         if (i != nullptr) {
-            i->getState()->deleteView();
+            i->deleteView();
         }
     }
     cardsToDelete.clear();
