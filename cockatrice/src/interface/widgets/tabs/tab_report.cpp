@@ -228,15 +228,13 @@ TabReport::TabReport(TabSupervisor *_tabSupervisor, AbstractClient *_client) : T
 
     assignButton = new QPushButton;
     resolveButton = new QPushButton;
-    resolveWithNoteButton = new QPushButton;
     dismissButton = new QPushButton;
     reopenButton = new QPushButton;
     viewReplayButton = new QPushButton;
     joinGameButton = new QPushButton;
     connect(assignButton, &QPushButton::clicked, this, &TabReport::assignReport);
-    connect(resolveButton, &QPushButton::clicked, this, [this]() { resolveReport(false, false); });
-    connect(resolveWithNoteButton, &QPushButton::clicked, this, [this]() { resolveReport(false, true); });
-    connect(dismissButton, &QPushButton::clicked, this, [this]() { resolveReport(true, true); });
+    connect(resolveButton, &QPushButton::clicked, this, [this]() { resolveReport(false); });
+    connect(dismissButton, &QPushButton::clicked, this, [this]() { resolveReport(true); });
     connect(reopenButton, &QPushButton::clicked, this, &TabReport::reopenReport);
     connect(viewReplayButton, &QPushButton::clicked, this, &TabReport::viewReplay);
     connect(joinGameButton, &QPushButton::clicked, this, &TabReport::joinGame);
@@ -246,7 +244,6 @@ TabReport::TabReport(TabSupervisor *_tabSupervisor, AbstractClient *_client) : T
     auto *actionBar = new QHBoxLayout;
     actionBar->addWidget(assignButton);
     actionBar->addWidget(resolveButton);
-    actionBar->addWidget(resolveWithNoteButton);
     actionBar->addWidget(dismissButton);
     actionBar->addWidget(reopenButton);
     actionBar->addSpacing(20);
@@ -313,8 +310,7 @@ void TabReport::retranslateUi()
     statsGroup->setTitle(tr("Report Statistics"));
 
     assignButton->setText(tr("Assign to Me"));
-    resolveButton->setText(tr("Resolve"));
-    resolveWithNoteButton->setText(tr("Resolve with note..."));
+    resolveButton->setText(tr("Resolve..."));
     dismissButton->setText(tr("Dismiss..."));
     reopenButton->setText(tr("Reopen..."));
     reopenButton->setToolTip(tr("Available for resolved or dismissed reports."));
@@ -616,7 +612,6 @@ void TabReport::updateActionStates()
     const QString status = QString::fromStdString(report.status());
     assignButton->setEnabled(status == "open");
     resolveButton->setEnabled(status == "open" || status == "assigned");
-    resolveWithNoteButton->setEnabled(status == "open" || status == "assigned");
     dismissButton->setEnabled(status == "open" || status == "assigned");
     reopenButton->setEnabled(status == "resolved" || status == "dismissed");
 
@@ -630,7 +625,6 @@ void TabReport::setActionsEnabled(bool enabled)
 {
     assignButton->setEnabled(enabled);
     resolveButton->setEnabled(enabled);
-    resolveWithNoteButton->setEnabled(enabled);
     dismissButton->setEnabled(enabled);
     reopenButton->setEnabled(enabled);
     viewReplayButton->setEnabled(false);
@@ -694,22 +688,19 @@ void TabReport::assignResponse(const Response &response)
     }
 }
 
-void TabReport::resolveReport(bool dismissed, bool promptNote)
+void TabReport::resolveReport(bool dismissed)
 {
     const int reportId = selectedReportId();
     if (reportId < 0) {
         return;
     }
 
-    QString note;
-    if (promptNote) {
-        bool ok;
-        note = QInputDialog::getText(this, dismissed ? tr("Dismiss Report") : tr("Resolve Report"),
-                                     dismissed ? tr("Optional note:") : tr("Resolution note (optional):"),
-                                     QLineEdit::Normal, QString(), &ok);
-        if (!ok) {
-            return;
-        }
+    bool ok;
+    QString note = QInputDialog::getText(this, dismissed ? tr("Dismiss Report") : tr("Resolve Report"),
+                                         dismissed ? tr("Optional note:") : tr("Resolution note (optional):"),
+                                         QLineEdit::Normal, QString(), &ok);
+    if (!ok) {
+        return;
     }
 
     setActionsEnabled(false);
