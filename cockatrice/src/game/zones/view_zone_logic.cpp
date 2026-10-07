@@ -30,7 +30,7 @@ ZoneViewZoneLogic::ZoneViewZoneLogic(PlayerLogic *_player,
  * Note that this method can end up modifying the cardIds despite returning false.
  * (for example, if the card is inserted into a hidden portion of the deck while the view is reversed)
  *
- * Make sure to call this method once before calling addCard(), so that you skip creating a new CardItem and calling
+ * Make sure to call this method once before calling addCard(), so that you skip creating the card and calling
  * addCard() if it's not required.
  *
  * @param x The position to insert the card at.

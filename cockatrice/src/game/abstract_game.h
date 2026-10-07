@@ -15,7 +15,6 @@
 #include <QObject>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 
-class CardItem;
 class CardState;
 class AbstractGame : public QObject
 {

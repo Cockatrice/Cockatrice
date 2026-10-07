@@ -74,7 +74,7 @@ signals:
     /** @brief Emitted when the remote playmat (card/params) is updated from player properties. */
     void playmatChanged();
     void newCardAdded(AbstractCardItem *card);
-    void requestCardMenuUpdate(CardItem *card);
+    void requestCardMenuUpdate(CardState *card);
     void counterAdded(CounterState *state);
     void counterRemoved(int counterId);
     void rearrangeCounters();
@@ -104,7 +104,7 @@ public:
     void processPlayerInfo(const ServerInfo_Player &info);
     void processCardAttachment(const ServerInfo_Player &info);
 
-    void addCard(CardItem *c);
+    void addCard(AbstractCardItem *c);
     void deleteCard(CardState *c);
 
     bool clearCardsToDelete();
