@@ -1,5 +1,7 @@
 #include "gtest/gtest.h"
+#include <QStringList>
 #include <cstring>
+#include <libcockatrice/utility/cryptoutil.h>
 #include <libcockatrice/utility/passwordhasher.h>
 
 namespace
@@ -165,6 +167,73 @@ TEST(PasswordHashTest, VerifyPasswordScryptRow)
     ASSERT_TRUE(PasswordHasher::verifyPassword("correct horse", scryptStored));
     ASSERT_FALSE(PasswordHasher::verifyPassword("battery staple", scryptStored));
     ASSERT_FALSE(PasswordHasher::verifyPassword("correct horse", "garbage"));
+}
+
+TEST(CryptoUtilTest, SecretRoundTrip)
+{
+    const QByteArray key = CryptoUtil::randomBytes(32);
+    const QByteArray plaintext = PasswordHasher::computeHash("correct horse", "saltsaltsaltsalt").toUtf8();
+    const QByteArray aad = "alice";
+
+    const QString sealed = CryptoUtil::encryptSecret(plaintext, key, aad);
+    ASSERT_FALSE(sealed.isEmpty());
+    ASSERT_TRUE(sealed.startsWith("enc1:"));
+    ASSERT_EQ(CryptoUtil::decryptSecret(sealed, key, aad), plaintext);
+}
+
+TEST(CryptoUtilTest, SealIsNonDeterministic)
+{
+    const QByteArray key = CryptoUtil::randomBytes(32);
+    const QByteArray plaintext = "same secret";
+    // Fresh random nonce per seal: identical inputs must not produce identical blobs.
+    ASSERT_NE(CryptoUtil::encryptSecret(plaintext, key), CryptoUtil::encryptSecret(plaintext, key));
+}
+
+TEST(CryptoUtilTest, RejectsWrongKey)
+{
+    const QByteArray key = CryptoUtil::randomBytes(32);
+    const QByteArray otherKey = CryptoUtil::randomBytes(32);
+    const QString sealed = CryptoUtil::encryptSecret("secret", key, "alice");
+    ASSERT_FALSE(sealed.isEmpty());
+    ASSERT_TRUE(CryptoUtil::decryptSecret(sealed, otherKey, "alice").isEmpty());
+}
+
+TEST(CryptoUtilTest, RejectsWrongAad)
+{
+    const QByteArray key = CryptoUtil::randomBytes(32);
+    const QString sealed = CryptoUtil::encryptSecret("secret", key, "alice");
+    ASSERT_FALSE(sealed.isEmpty());
+    ASSERT_TRUE(CryptoUtil::decryptSecret(sealed, key, "bob").isEmpty());
+    ASSERT_TRUE(CryptoUtil::decryptSecret(sealed, key).isEmpty());
+}
+
+TEST(CryptoUtilTest, RejectsTampering)
+{
+    const QByteArray key = CryptoUtil::randomBytes(32);
+    const QString sealed = CryptoUtil::encryptSecret("secret", key);
+    ASSERT_FALSE(sealed.isEmpty());
+
+    // Flip a character inside the ciphertext segment (keep it valid base64).
+    QStringList parts = sealed.split(':');
+    ASSERT_EQ(parts.size(), 3);
+    QByteArray ciphertext = QByteArray::fromBase64(parts.at(2).toUtf8());
+    ciphertext[0] = static_cast<char>(ciphertext.at(0) ^ 0x01);
+    parts[2] = QString(ciphertext.toBase64());
+    ASSERT_TRUE(CryptoUtil::decryptSecret(parts.join(':'), key).isEmpty());
+}
+
+TEST(CryptoUtilTest, RejectsMalformedInput)
+{
+    const QByteArray key = CryptoUtil::randomBytes(32);
+    ASSERT_TRUE(CryptoUtil::decryptSecret("garbage", key).isEmpty());
+    ASSERT_TRUE(CryptoUtil::decryptSecret("enc1:notbase64!!:also-not!", key).isEmpty());
+    ASSERT_TRUE(CryptoUtil::decryptSecret("enc1:AAAAAAAAAAAAAAAA:AAAA", key).isEmpty());
+    ASSERT_TRUE(CryptoUtil::decryptSecret("", key).isEmpty());
+    // A short or oversized key must never reach the cipher.
+    ASSERT_TRUE(
+        CryptoUtil::decryptSecret("enc1:AAAAAAAAAAAAAAAA:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", CryptoUtil::randomBytes(16))
+            .isEmpty());
+    ASSERT_TRUE(CryptoUtil::encryptSecret("secret", CryptoUtil::randomBytes(16)).isEmpty());
 }
 
 } // namespace

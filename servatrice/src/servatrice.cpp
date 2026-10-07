@@ -34,6 +34,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QProcessEnvironment>
+#include <QRegularExpression>
 #include <QSqlQuery>
 #include <QString>
 #include <QStringList>
@@ -47,6 +48,10 @@
 #include <libcockatrice/protocol/pb/event_server_message.pb.h>
 #include <libcockatrice/protocol/pb/event_server_shutdown.pb.h>
 #include <server_room.h>
+
+// Expired legacy password backups are also purged on first use, but idle accounts
+// need this sweep so credentials that are never touched still age out of the database.
+static constexpr qint64 kLegacyBackupSweepIntervalMs = 6 * 60 * 60 * 1000;
 
 Servatrice_GameServer::Servatrice_GameServer(Servatrice *_server,
                                              int _numberPools,
@@ -445,6 +450,10 @@ bool Servatrice::initServer()
         deckShareCleanupClock->start(deckShareCleanupInterval);
     }
 
+    legacyBackupSweepClock = new QTimer(this);
+    connect(legacyBackupSweepClock, &QTimer::timeout, this, &Servatrice::sweepLegacyBackups);
+    legacyBackupSweepClock->start(kLegacyBackupSweepIntervalMs);
+
     // SOCKET SERVER
     if (getNumberOfTCPPools() > 0) {
         gameServer =
@@ -776,6 +785,14 @@ SessionEvent *Servatrice::getLoginSessionEvent() const
     return nullptr;
 }
 
+void Servatrice::sweepLegacyBackups()
+{
+    if (!servatriceDatabaseInterface->checkSql()) {
+        return;
+    }
+    servatriceDatabaseInterface->purgeExpiredLegacyBackups();
+}
+
 void Servatrice::scheduleShutdown(const QString &reason, int minutes)
 {
     shutdownStateMutex.lock();
@@ -978,6 +995,31 @@ Servatrice::AuthenticationStrictness Servatrice::getAuthenticationStrictness() c
         return AuthenticationLegacy;
     }
     return AuthenticationMixed;
+}
+
+QByteArray Servatrice::getLegacyBackupKey() const
+{
+    const QString keyHex = settingsCache->value("security/legacy_backup_key").toString().trimmed();
+    if (keyHex.isEmpty()) {
+        return {};
+    }
+    static const QRegularExpression validHexKey(QStringLiteral("^[0-9a-fA-F]{64}$"));
+    if (!validHexKey.match(keyHex).hasMatch()) {
+        qDebug() << "security/legacy_backup_key is not 64 hex characters;"
+                 << "legacy password backups are disabled";
+        return {};
+    }
+    return QByteArray::fromHex(keyHex.toUtf8());
+}
+
+int Servatrice::getLegacyBackupTtlDays() const
+{
+    bool ok = false;
+    const int days = settingsCache->value("security/legacy_backup_ttl_days", 90).toInt(&ok);
+    if (!ok || days < 1 || days > 3650) {
+        return 90;
+    }
+    return days;
 }
 
 QString Servatrice::getDBTypeString() const

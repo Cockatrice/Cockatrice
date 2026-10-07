@@ -3817,11 +3817,21 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRequestPasswordSalt(con
             delete re;
             return Response::RespContextError;
         }
-        re->set_password_salt(QString(verifier.salt.toBase64()).toStdString());
+        const QString scryptSalt = QString(verifier.salt.toBase64());
+        re->set_password_salt(scryptSalt.toStdString());
+        re->set_scrypt_salt(scryptSalt.toStdString());
         re->set_n(verifier.n);
         re->set_r(verifier.r);
         re->set_p(verifier.p);
         re->set_needs_migration(false);
+        // Pre-challenge clients derive the legacy hash from password_salt. While a fresh
+        // encrypted legacy backup exists, serve its salt there so they can still log in;
+        // challenge-response clients must use scrypt_salt, which always carries the
+        // verifier salt.
+        const QString legacyBackup = sqlInterface->getUsableLegacyBackup(userName);
+        if (!legacyBackup.isEmpty()) {
+            re->set_password_salt(legacyBackup.left(16).toStdString());
+        }
         // scrypt rows are served challenge-response in every mode so migrated accounts never lock out.
         const QByteArray nonce = CryptoUtil::randomBytes(32);
         setAuthNonce(nonce, userName);

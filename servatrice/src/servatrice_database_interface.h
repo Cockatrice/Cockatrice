@@ -90,6 +90,16 @@ public:
     QString getUserSalt(const QString &user) override;
     QString getUserPasswordData(const QString &user) override;
     bool submitPasswordVerifier(const QString &user, const QString &passwordVerifier) override;
+    /** @brief Decrypt the account's legacy password backup when it exists, is decryptable
+     *  with the configured key and has not aged out; purges it when it has. Returns the
+     *  legacy credential in the stored "salt + hash" format, or an empty string. */
+    QString getUsableLegacyBackup(const QString &user);
+    /** @brief Refresh the age window of the account's legacy password backup. */
+    void touchLegacyBackup(const QString &user);
+    /** @brief Drop the account's legacy password backup. */
+    void clearLegacyBackup(const QString &user);
+    /** @brief Drop every legacy password backup that has not been used within the TTL. */
+    void purgeExpiredLegacyBackups();
     int getUserIdInDB(const QString &name);
     QMap<QString, ServerInfo_User> getBuddyList(const QString &name) override;
     QMap<QString, ServerInfo_User> getIgnoreList(const QString &name) override;

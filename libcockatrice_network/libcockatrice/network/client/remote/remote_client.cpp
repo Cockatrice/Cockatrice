@@ -343,18 +343,18 @@ void RemoteClient::passwordSaltResponse(const Response &response)
                                     QStringLiteral("The server requested unreasonable scrypt cost parameters."), 0, {});
                     return;
                 }
-                key = PasswordHasher::deriveKey(password, QByteArray::fromBase64(passwordSalt.toUtf8()), n, r, p);
+                // password_salt may carry a legacy backup salt for pre-challenge clients;
+                // the verifier itself is always derived from scrypt_salt when present.
+                const QString scryptSalt =
+                    resp.has_scrypt_salt() ? QString::fromStdString(resp.scrypt_salt()) : passwordSalt;
+                key = PasswordHasher::deriveKey(password, QByteArray::fromBase64(scryptSalt.toUtf8()), n, r, p);
                 if (key.isEmpty()) {
                     emit loginError(Response::RespClientUpdateRequired, QStringLiteral("Unable to derive verifier."), 0,
                                     {});
                     return;
                 }
-                derivedVerifier = QString("$scrypt$%1$%2$%3$%4$%5")
-                                      .arg(n)
-                                      .arg(r)
-                                      .arg(p)
-                                      .arg(passwordSalt)
-                                      .arg(QString(key.toBase64()));
+                derivedVerifier =
+                    QString("$scrypt$%1$%2$%3$%4$%5").arg(n).arg(r).arg(p).arg(scryptSalt).arg(QString(key.toBase64()));
             } else if (!storedVerifier.isEmpty()) {
                 const PasswordVerifier verifier = PasswordHasher::parsePasswordVerifier(storedVerifier);
                 if (!verifier.isValid) {
