@@ -14,7 +14,7 @@
 #include <qtmetamacros.h>
 #include <utility>
 
-class CardItem;
+class CardState;
 class CardMenu;
 class PlayerGraphicsItem;
 class AbstractPlayerComponent;
@@ -43,7 +43,7 @@ signals:
 
 public slots:
     void setMenusForGraphicItems();
-    QMenu *updateCardMenu(CardItem *card);
+    QMenu *updateCardMenu(CardState *card);
 
 private slots:
     void refreshShortcuts();
