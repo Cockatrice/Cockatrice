@@ -11,7 +11,6 @@
 #include <qtmetamacros.h>
 
 class ICardDatabasePathProvider;
-class ICardPreferenceProvider;
 class ICardSetPriorityController;
 
 // IWYU pragma: keep
@@ -59,12 +58,10 @@ public:
      * @param parent QObject parent.
      * @param db Pointer to the CardDatabase to populate (non-owning).
      * @param pathProvider Provider for card database file paths.
-     * @param preferenceProvider Optional card preference provider for pinned printings.
      */
     explicit CardDatabaseLoader(QObject *parent,
                                 CardDatabase *db,
                                 ICardDatabasePathProvider *pathProvider,
-                                ICardPreferenceProvider *preferenceProvider,
                                 ICardSetPriorityController *_priorityController);
 
     /** @brief Destructor cleans up allocated parsers. */

@@ -4,7 +4,6 @@
 #include "libcockatrice/card/format/format_legality_rules.h"
 #include "libcockatrice/card/lazy_properties_hash.h"
 #include "libcockatrice/card/relation/card_relation_type.h"
-#include "libcockatrice/interfaces/noop_card_preference_provider.h"
 #include "libcockatrice/interfaces/noop_card_set_priority_controller.h"
 #include "parsehelpers.h"
 
@@ -852,7 +851,7 @@ int OracleImporter::startImport()
 
 bool OracleImporter::saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion)
 {
-    CockatriceXml4Parser parser(new NoopCardPreferenceProvider(), new NoopCardSetPriorityController());
+    CockatriceXml4Parser parser(new NoopCardSetPriorityController());
 
     return parser.saveToFile(createDefaultMagicFormats(), sets, cards, fileName, sourceUrl, sourceVersion);
 }

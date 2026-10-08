@@ -37,9 +37,8 @@ class ICardSetPriorityController;
 #define COCKATRICE_XML4_SCHEMALOCATION                                                                                 \
     "https://raw.githubusercontent.com/Cockatrice/Cockatrice/master/doc/carddatabase_v4/cards.xsd"
 
-CockatriceXml4Parser::CockatriceXml4Parser(ICardPreferenceProvider *_cardPreferenceProvider,
-                                           ICardSetPriorityController *_cardSetPriorityController)
-    : ICardDatabaseParser(_cardSetPriorityController), cardPreferenceProvider(_cardPreferenceProvider)
+CockatriceXml4Parser::CockatriceXml4Parser(ICardSetPriorityController *_cardSetPriorityController)
+    : ICardDatabaseParser(_cardSetPriorityController)
 {
 }
 
@@ -284,7 +283,6 @@ QHash<QString, QString> CockatriceXml4Parser::loadCardPropertiesFromXml(QXmlStre
 
 void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
 {
-    bool includeRebalancedCards = cardPreferenceProvider->getIncludeRebalancedCards();
     while (!xml.atEnd()) {
         if (xml.readNext() == QXmlStreamReader::EndElement) {
             break;
@@ -386,17 +384,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                             printingProps.insert(attrName, attr.value().toString());
                         }
                         PrintingInfo printingInfo(set, LazyPropertiesHash(printingProps));
-
-                        // This is very much a hack and not the right place to
-                        // put this check, as it requires a reload of Cockatrice
-                        // to be apply.
-                        //
-                        // However, this is also true of the `set->getEnabled()`
-                        // check above (which is currently bugged as well), so
-                        // we'll fix both at the same time.
-                        if (includeRebalancedCards || printingInfo.getProperty("isRebalanced") != "true") {
-                            _sets[setName].append(printingInfo);
-                        }
+                        _sets[setName].append(printingInfo);
                     }
                     // related cards
                 } else if (xmlName == "related" || xmlName == "reverse-related") {
