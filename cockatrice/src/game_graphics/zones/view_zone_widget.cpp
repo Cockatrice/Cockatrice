@@ -26,7 +26,13 @@
 
 namespace
 {
-constexpr qreal kTitleBarHeight = 24.0;
+static qreal titleBarHeight(QWidget *styleWidget)
+{
+    if (styleWidget) {
+        return static_cast<qreal>(styleWidget->style()->pixelMetric(QStyle::PM_TitleBarHeight, nullptr, styleWidget));
+    }
+    return 24.0;
+}
 constexpr qreal kMinVisibleWidth = 100.0;
 } // namespace
 
@@ -290,7 +296,8 @@ QRectF ZoneViewWidget::closeButtonRect(QWidget *styleWidget) const
 
     // query the style for the close button position (handles macOS top-left placement)
     // Title bar rect MUST be local (0,0-based) for QStyle
-    const QRect titleBarRect(0, 0, static_cast<int>(frameRectF.width()), static_cast<int>(kTitleBarHeight));
+    const qreal tbh = titleBarHeight(styleWidget ? styleWidget : nullptr);
+    const QRect titleBarRect(0, 0, static_cast<int>(frameRectF.width()), static_cast<int>(tbh));
 
     if (styleWidget) {
         QStyleOptionTitleBar opt;
@@ -319,7 +326,8 @@ QRectF ZoneViewWidget::closeButtonRect(QWidget *styleWidget) const
     }
 
     // Fallback: frame-relative top-right
-    return QRectF(frameRectF.right() - kTitleBarHeight, frameRectF.top(), kTitleBarHeight, kTitleBarHeight);
+    const qreal tbh = titleBarHeight(styleWidget ? styleWidget : nullptr);
+    return QRectF(frameRectF.right() - tbh, frameRectF.top(), tbh, tbh);
 }
 
 QGraphicsView *ZoneViewWidget::findDragView(QWidget *eventWidget) const
