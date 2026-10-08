@@ -132,8 +132,8 @@ bool CardCompleterStyler::handlePopupKeyPress(QKeyEvent *event)
     const int newRow = qBound(0, currentRow + step, rowCount - 1);
 
     if (newRow != currentRow) {
-        popup->selectionModel()->setCurrentIndex(
-            completer->completionModel()->index(newRow, completer->completionColumn()), QItemSelectionModel::NoUpdate);
+        const QModelIndex newIndex = completer->completionModel()->index(newRow, completer->completionColumn());
+        popup->selectionModel()->setCurrentIndex(newIndex, QItemSelectionModel::NoUpdate);
     }
 
     return true;
