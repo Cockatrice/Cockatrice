@@ -7,11 +7,13 @@ set(HEADERS
     libcockatrice/deck_list/tree/abstract_deck_list_node.h
     libcockatrice/deck_list/tree/deck_list_card_node.h
     libcockatrice/deck_list/tree/inner_deck_list_node.h
+    libcockatrice/deck_list/deck_file_format.h
     libcockatrice/deck_list/deck_list.h
     libcockatrice/deck_list/deck_list_history_manager.h
     libcockatrice/deck_list/deck_list_node_tree.h
     libcockatrice/deck_list/deck_list_memento.h
     libcockatrice/deck_list/deck_list_plain_text_parser.h
+    libcockatrice/deck_list/loaded_deck.h
     libcockatrice/deck_list/playmat_resolver.h
     libcockatrice/deck_list/sideboard_plan.h
 )
@@ -25,10 +27,12 @@ add_library(
   libcockatrice/deck_list/tree/abstract_deck_list_node.cpp
   libcockatrice/deck_list/tree/deck_list_card_node.cpp
   libcockatrice/deck_list/tree/inner_deck_list_node.cpp
+  libcockatrice/deck_list/deck_file_format.cpp
   libcockatrice/deck_list/deck_list.cpp
   libcockatrice/deck_list/deck_list_history_manager.cpp
   libcockatrice/deck_list/deck_list_node_tree.cpp
   libcockatrice/deck_list/deck_list_plain_text_parser.cpp
+  libcockatrice/deck_list/loaded_deck.cpp
   libcockatrice/deck_list/playmat_resolver.cpp
   libcockatrice/deck_list/sideboard_plan.cpp
 )

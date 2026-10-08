@@ -9,7 +9,6 @@
 
 #include "../board/arrow_data.h"
 #include "../board/counter_state.h"
-#include "../interface/deck_loader/loaded_deck.h"
 #include "../zones/hand_zone_logic.h"
 #include "../zones/pile_zone_logic.h"
 #include "../zones/stack_zone_logic.h"
@@ -21,6 +20,7 @@
 #include <QLoggingCategory>
 #include <QMap>
 #include <QTimer>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/filters/filter_string.h>
 #include <libcockatrice/protocol/pb/card_attributes.pb.h>
 #include <libcockatrice/protocol/pb/game_event.pb.h>

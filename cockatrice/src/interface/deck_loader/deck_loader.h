@@ -7,12 +7,11 @@
 #ifndef DECK_LOADER_H
 #define DECK_LOADER_H
 
-#include "loaded_deck.h"
-
 #include <QLoggingCategory>
 #include <QPrinter>
 #include <QTextCursor>
 #include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <optional>
 
 inline Q_LOGGING_CATEGORY(DeckLoaderLog, "deck_loader");

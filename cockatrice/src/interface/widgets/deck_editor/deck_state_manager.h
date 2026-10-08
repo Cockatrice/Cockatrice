@@ -1,12 +1,12 @@
 #ifndef COCKATRICE_DECK_STATE_MANAGER_H
 #define COCKATRICE_DECK_STATE_MANAGER_H
 
-#include "../../deck_loader/loaded_deck.h"
 #include "deck_list_model.h"
 
 #include <QSharedPointer>
 #include <functional>
 #include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/deck_list/loaded_deck.h>
 
 class DeckListHistoryManager;
 
