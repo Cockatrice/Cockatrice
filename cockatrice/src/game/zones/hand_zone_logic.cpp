@@ -1,6 +1,6 @@
 #include "hand_zone_logic.h"
 
-#include "../../game_graphics/board/card_item.h"
+#include "../board/card_state.h"
 #include "card_zone_algorithms.h"
 
 HandZoneLogic::HandZoneLogic(PlayerLogic *_player,
@@ -13,7 +13,7 @@ HandZoneLogic::HandZoneLogic(PlayerLogic *_player,
 {
 }
 
-void HandZoneLogic::addCardImpl(CardItem *card, int x, int /*y*/)
+void HandZoneLogic::addCardImpl(CardState *card, int x, int /*y*/)
 {
     CardZoneAlgorithms::addCardToList(cards, card, x, false);
 }

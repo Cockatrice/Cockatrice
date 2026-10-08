@@ -1,31 +1,31 @@
 #include "card_list.h"
 
-#include "../../game_graphics/board/card_item.h"
+#include "card_state.h"
 
 #include <QDebug>
 #include <algorithm>
 #include <libcockatrice/card/card_info.h>
 
-CardList::CardList(bool _contentsKnown) : QList<CardItem *>(), contentsKnown(_contentsKnown)
+CardList::CardList(bool _contentsKnown) : QList<CardState *>(), contentsKnown(_contentsKnown)
 {
 }
 
 /**
- * @brief Finds the CardItem with the given id in the list.
+ * @brief Finds the CardState with the given id in the list.
  * If contentsKnown is false, then this just returns the first element of the list.
  *
  * @param cardId The id of the card to find.
  *
- * @returns A pointer to the CardItem, or a nullptr if not found.
+ * @returns A pointer to the CardState, or a nullptr if not found.
  */
-CardItem *CardList::findCard(const int cardId) const
+CardState *CardList::findCard(const int cardId) const
 {
     if (!contentsKnown && !empty()) {
         return at(0);
     } else {
-        for (auto *cardItem : *this) {
-            if (cardItem->getId() == cardId) {
-                return cardItem;
+        for (auto *cardState : *this) {
+            if (cardState->getId() == cardId) {
+                return cardState;
             }
         }
     }
@@ -33,7 +33,7 @@ CardItem *CardList::findCard(const int cardId) const
 }
 
 /**
- * @brief sorts the list by using string comparison on properties extracted from the CardItem
+ * @brief sorts the list by using string comparison on properties extracted from the CardState
  * The cards are compared using each property in order.
  * If two cards have the same value for a property, then the next property in the list is used.
  *
@@ -46,7 +46,7 @@ void CardList::sortBy(const QList<SortOption> &option)
         return;
     }
 
-    auto comparator = [&option](CardItem *a, CardItem *b) {
+    auto comparator = [&option](CardState *a, CardState *b) {
         for (auto prop : option) {
             auto extractor = getExtractorFor(prop);
             QString t1 = extractor(a);
@@ -111,26 +111,26 @@ static QString getColorSortString(const CardInfo &c, bool appendAtEnd)
 }
 
 /**
- * @brief returns the function that extracts the given property from the CardItem.
+ * @brief returns the function that extracts the given property from the CardState.
  */
-std::function<QString(CardItem *)> CardList::getExtractorFor(SortOption option)
+std::function<QString(CardState *)> CardList::getExtractorFor(SortOption option)
 {
     switch (option) {
         case NoSort:
-            return [](CardItem *) { return ""; };
+            return [](CardState *) { return ""; };
         case SortByMainType:
-            return [](CardItem *c) { return c->getCardInfo().getMainCardType(); };
+            return [](CardState *c) { return c->getCardInfo().getMainCardType(); };
         case SortByManaValue:
             // getCmc returns the int as a string. We pad with 0's so that string comp also works on it
-            return [](CardItem *c) { return c->getCard() ? c->getCardInfo().getCmc().rightJustified(4, '0') : ""; };
+            return [](CardState *c) { return c->getCard() ? c->getCardInfo().getCmc().rightJustified(4, '0') : ""; };
         case SortByColorGrouping:
-            return [](CardItem *c) { return c->getCard() ? getColorSortString(c->getCardInfo(), false) : ""; };
+            return [](CardState *c) { return c->getCard() ? getColorSortString(c->getCardInfo(), false) : ""; };
         case SortByName:
-            return [](CardItem *c) { return c->getName(); };
+            return [](CardState *c) { return c->getName(); };
         case SortByType:
-            return [](CardItem *c) { return c->getCardInfo().getCardType(); };
+            return [](CardState *c) { return c->getCardInfo().getCardType(); };
         case SortByManaCost:
-            return [](CardItem *c) {
+            return [](CardState *c) {
                 if (!c->getCard()) {
                     return QString();
                 }
@@ -142,18 +142,18 @@ std::function<QString(CardItem *)> CardList::getExtractorFor(SortOption option)
                 return QString("%1%2").arg(info.getCmc(), 4, QChar('0')).arg(info.getManaCost());
             };
         case SortByColors:
-            return [](CardItem *c) { return c->getCard() ? getColorSortString(c->getCardInfo(), true) : ""; };
+            return [](CardState *c) { return c->getCard() ? getColorSortString(c->getCardInfo(), true) : ""; };
         case SortByPt:
             // do the same padding trick as above
             return
-                [](CardItem *c) { return c->getCard() ? c->getCardInfo().getPowTough().rightJustified(10, '0') : ""; };
+                [](CardState *c) { return c->getCard() ? c->getCardInfo().getPowTough().rightJustified(10, '0') : ""; };
         case SortBySet:
-            return [](CardItem *c) { return c->getCardInfo().getSetsNames(); };
+            return [](CardState *c) { return c->getCardInfo().getSetsNames(); };
         case SortByPrinting:
-            return [](CardItem *c) { return c->getProviderId(); };
+            return [](CardState *c) { return c->getProviderId(); };
     }
 
     // this line should never be reached
     qCWarning(CardListLog) << "cardlist.cpp: Could not find extractor for SortOption" << option;
-    return [](CardItem *) { return ""; };
+    return [](CardState *) { return ""; };
 }

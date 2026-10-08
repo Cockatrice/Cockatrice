@@ -160,12 +160,13 @@ SelectZone::~SelectZone()
     }
 }
 
-void SelectZone::onCardAdded(CardItem *addedCard)
+void SelectZone::onCardAdded(CardState *addedCard)
 {
-    if (cardClipContainer && addedCard) {
-        addedCard->setParentItem(cardClipContainer);
-        addedCard->setVisible(true);
-        addedCard->update();
+    auto *addedItem = addedCard == nullptr ? nullptr : qobject_cast<CardItem *>(addedCard->parent());
+    if (cardClipContainer && addedItem) {
+        addedItem->setParentItem(cardClipContainer);
+        addedItem->setVisible(true);
+        addedItem->update();
     } else {
         CardZone::onCardAdded(addedCard);
     }

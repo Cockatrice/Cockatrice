@@ -12,9 +12,9 @@
 
 inline Q_LOGGING_CATEGORY(CardListLog, "card_list");
 
-class CardItem;
+class CardState;
 
-class CardList : public QList<CardItem *>
+class CardList : public QList<CardState *>
 {
 protected:
     bool contentsKnown;
@@ -41,7 +41,7 @@ public:
         SortByPrinting
     };
     explicit CardList(bool _contentsKnown);
-    CardItem *findCard(const int cardId) const;
+    CardState *findCard(const int cardId) const;
     bool getContentsKnown() const
     {
         return contentsKnown;
@@ -49,7 +49,7 @@ public:
 
     void sortBy(const QList<SortOption> &options);
 
-    static std::function<QString(CardItem *)> getExtractorFor(SortOption option);
+    static std::function<QString(CardState *)> getExtractorFor(SortOption option);
 };
 
 #endif

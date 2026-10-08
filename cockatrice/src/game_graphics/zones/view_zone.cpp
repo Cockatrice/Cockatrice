@@ -79,7 +79,7 @@ void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardLis
             auto copy = new CardItem(getLogic()->getPlayer(), this, cardRef, card->id());
             copy->setFaceDown(card->face_down());
 
-            getLogic()->addCard(copy, false, i);
+            getLogic()->addCard(copy->getState(), false, i);
         }
         reorganizeCards();
     } else if (!qobject_cast<ZoneViewZoneLogic *>(getLogic())->getOriginalZone()->contentsKnown()) {
@@ -91,11 +91,11 @@ void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardLis
         const CardList &c = qobject_cast<ZoneViewZoneLogic *>(getLogic())->getOriginalZone()->getCards();
         int number = numberCards == -1 ? c.size() : (numberCards < c.size() ? numberCards : c.size());
         for (int i = 0; i < number; i++) {
-            CardItem *card = c.at(i);
+            CardState *card = c.at(i);
             auto copy = new CardItem(getLogic()->getPlayer(), this, card->getCardRef(), card->getId());
             copy->setFaceDown(card->getFaceDown());
 
-            getLogic()->addCard(copy, false, i);
+            getLogic()->addCard(copy->getState(), false, i);
         }
         reorganizeCards();
     }
@@ -111,7 +111,7 @@ void ZoneViewZone::zoneDumpReceived(const Response &r)
         auto cardProviderId = QString::fromStdString(cardInfo.provider_id());
         auto card = new CardItem(getLogic()->getPlayer(), this, {cardName, cardProviderId}, cardInfo.id(), getLogic());
         card->setFaceDown(cardInfo.face_down());
-        getLogic()->rawInsertCard(card, i);
+        getLogic()->rawInsertCard(card->getState(), i);
     }
 
     qobject_cast<ZoneViewZoneLogic *>(getLogic())->updateCardIds(ZoneViewZoneLogic::INITIALIZE);
@@ -129,7 +129,7 @@ void ZoneViewZone::reorganizeCards()
     for (auto card : cardItems()) {
         if (filterString.check(card->getCard().getCardPtr())) {
             card->show();
-            cardsToDisplay.append(card);
+            cardsToDisplay.append(card->getState());
         } else {
             card->hide();
         }
@@ -197,7 +197,8 @@ ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, Ca
         const auto extractor = CardList::getExtractorFor(pileOption);
 
         for (int i = 0; i < cardCount; i++) {
-            CardItem *c = cards.at(i);
+            CardState *c = cards.at(i);
+            CardItem *cItem = qobject_cast<CardItem *>(c->parent());
             QString columnProp = extractor(c);
 
             if (i) { // if not the first card
@@ -212,8 +213,8 @@ ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, Ca
             lastColumnProp = columnProp;
             qreal x = col * CardDimensions::WIDTH_F;
             qreal y = row * CardDimensions::HEIGHT_F / 3;
-            c->setPos(HORIZONTAL_PADDING + x, VERTICAL_PADDING + y);
-            c->setRealZValue(i);
+            cItem->setPos(HORIZONTAL_PADDING + x, VERTICAL_PADDING + y);
+            cItem->setRealZValue(i);
             longestRow = qMax(row, longestRow);
         }
 
@@ -238,11 +239,11 @@ ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, Ca
         qCDebug(ViewZoneLog) << "reorganizeCards: rows=" << rows << "cols=" << cols;
 
         for (int i = 0; i < cardCount; i++) {
-            CardItem *c = cards.at(i);
+            auto *cItem = qobject_cast<CardItem *>(cards.at(i)->parent());
             qreal x = (i / rows) * CardDimensions::WIDTH_F;
             qreal y = (i % rows) * CardDimensions::HEIGHT_F / 3;
-            c->setPos(HORIZONTAL_PADDING + x, VERTICAL_PADDING + y);
-            c->setRealZValue(i);
+            cItem->setPos(HORIZONTAL_PADDING + x, VERTICAL_PADDING + y);
+            cItem->setRealZValue(i);
         }
 
         return GridSize{rows, qMax(cols, 1)};

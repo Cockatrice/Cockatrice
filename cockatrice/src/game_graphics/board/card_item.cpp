@@ -207,7 +207,7 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
         if (state->getAttachedTo()->getZone() == nullptr) {
             deleteLater();
         } else {
-            emit state->getAttachedTo()->getZone()->cardAdded(this);
+            emit state->getAttachedTo()->getZone()->cardAdded(state);
             state->getAttachedTo()->addAttachedCard(this);
             if (state->getZone() != state->getAttachedTo()->getZone()) {
                 state->getAttachedTo()->getZone()->reorganizeCards();
@@ -219,7 +219,7 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
         if (state->getZone() == nullptr) {
             deleteLater();
         } else {
-            emit state->getZone()->cardAdded(this);
+            emit state->getZone()->cardAdded(state);
         }
     }
 
@@ -441,7 +441,7 @@ void CardItem::handleClickedToPlay(bool shiftHeld)
         if (SettingsCache::instance().userInterface().getClickPlaysAllSelected()) {
             emit hideSelected(this);
         } else {
-            state->getZone()->removeCard(this);
+            state->getZone()->removeCard(state);
         }
     } else {
         playCard(shiftHeld);

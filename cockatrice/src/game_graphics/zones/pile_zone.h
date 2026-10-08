@@ -29,7 +29,7 @@ public:
     [[nodiscard]] QPainterPath shape() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     void reorganizeCards() override;
-    void onCardAdded(CardItem *addedCard) override;
+    void onCardAdded(CardState *addedCard) override;
     void
     handleDropEvent(const QList<CardDragItem *> &dragItems, CardZoneLogic *startZone, const QPoint &dropPoint) override;
 

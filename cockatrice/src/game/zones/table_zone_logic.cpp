@@ -1,6 +1,6 @@
 #include "table_zone_logic.h"
 
-#include "../../game_graphics/board/card_item.h"
+#include "../board/card_state.h"
 
 TableZoneLogic::TableZoneLogic(PlayerLogic *_player,
                                const QString &_name,
@@ -12,7 +12,7 @@ TableZoneLogic::TableZoneLogic(PlayerLogic *_player,
 {
 }
 
-void TableZoneLogic::addCardImpl(CardItem *card, int _x, int _y)
+void TableZoneLogic::addCardImpl(CardState *card, int _x, int _y)
 {
     cards.append(card);
     if (!card->getFaceDown() && card->getPT().isEmpty()) {
@@ -24,9 +24,9 @@ void TableZoneLogic::addCardImpl(CardItem *card, int _x, int _y)
     card->setGridPoint(QPoint(_x, _y));
 }
 
-CardItem *TableZoneLogic::takeCard(int position, int cardId, bool toNewZone)
+CardState *TableZoneLogic::takeCard(int position, int cardId, bool toNewZone)
 {
-    CardItem *result = CardZoneLogic::takeCard(position, cardId);
+    CardState *result = CardZoneLogic::takeCard(position, cardId);
 
     if (toNewZone) {
         emit contentSizeChanged();

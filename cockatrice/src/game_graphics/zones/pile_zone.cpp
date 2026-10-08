@@ -72,12 +72,13 @@ void PileZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZoneL
     getLogic()->getPlayer()->getPlayerActions()->moveCards(startZone, getLogic(), 0, 0, cards);
 }
 
-void PileZone::onCardAdded(CardItem *addedCard)
+void PileZone::onCardAdded(CardState *addedCard)
 {
     CardZone::onCardAdded(addedCard);
-    if (addedCard) {
-        addedCard->setPos(0, 0);
-        addedCard->setVisible(false);
+    auto *addedItem = addedCard == nullptr ? nullptr : qobject_cast<CardItem *>(addedCard->parent());
+    if (addedItem) {
+        addedItem->setPos(0, 0);
+        addedItem->setVisible(false);
     }
 }
 
