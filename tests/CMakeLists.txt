@@ -22,6 +22,7 @@ add_test(NAME report_categories_test COMMAND report_categories_test)
 add_test(NAME lag_monitor_test COMMAND lag_monitor_test)
 add_test(NAME latency_tracker_test COMMAND latency_tracker_test)
 add_test(NAME metrics_registry_test COMMAND metrics_registry_test)
+add_test(NAME card_update_progress_test COMMAND card_update_progress_test)
 add_test(NAME loader_local_matching_test COMMAND loader_local_matching_test)
 
 add_test(NAME deck_hash_performance_test COMMAND deck_hash_performance_test)
@@ -76,6 +77,12 @@ target_include_directories(lag_monitor_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatri
 add_executable(latency_tracker_test latency_tracker_test.cpp)
 add_executable(metrics_registry_test ../servatrice/src/metrics_registry.cpp metrics_registry_test.cpp)
 add_executable(
+  card_update_progress_test
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/card_database_update/card_update_progress_parser.cpp
+  card_update_progress_test.cpp
+)
+target_include_directories(card_update_progress_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src)
+add_executable(
   loader_local_matching_test
   ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/card_picture_loader/card_picture_loader_local.cpp
   ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/cache_settings.cpp
@@ -94,6 +101,7 @@ if(WITH_CLIENT)
                                  single_instance_manager_test.cpp
   )
   target_include_directories(single_instance_manager_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src)
+  target_include_directories(single_instance_manager_test PRIVATE ${CMAKE_SOURCE_DIR}/libcockatrice_utility)
 
   add_test(NAME single_instance_manager_test COMMAND single_instance_manager_test)
 endif()
@@ -143,6 +151,7 @@ if(NOT GTEST_FOUND)
   add_dependencies(lag_monitor_test gtest)
   add_dependencies(latency_tracker_test gtest)
   add_dependencies(metrics_registry_test gtest)
+  add_dependencies(card_update_progress_test gtest)
   add_dependencies(loader_local_matching_test gtest)
   add_dependencies(single_instance_manager_test gtest)
 endif()
@@ -201,6 +210,7 @@ target_link_libraries(
 )
 target_include_directories(metrics_registry_test PRIVATE ${CMAKE_SOURCE_DIR}/servatrice/src)
 target_link_libraries(metrics_registry_test ${TEST_QT_MODULES} Threads::Threads ${GTEST_BOTH_LIBRARIES})
+target_link_libraries(card_update_progress_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
 target_link_libraries(
   loader_local_matching_test libcockatrice_settings Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
 )

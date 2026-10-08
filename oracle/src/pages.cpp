@@ -82,13 +82,12 @@ class QWidget;
 #endif
 
 /**
- * @brief Emits one machine-readable background-run progress line to stdout.
+ * @brief Emits one machine-readable progress line to stdout.
  *
- * Used only in background mode, so the hosting Cockatrice client can parse these
- * lines to drive a determinate progress bar. stderr stays reserved for
- * human-readable log output.
+ * The hosting Cockatrice client parses these lines to drive a determinate
+ * progress bar. stderr stays reserved for human-readable log output.
  */
-static void emitBackgroundProgress(const char *stage, qint64 done, qint64 total)
+static void emitProgress(const char *stage, qint64 done, qint64 total)
 {
     QTextStream out(stdout);
     out << "PROGRESS " << stage << ' ' << done << ' ' << total << '\n';
@@ -473,9 +472,7 @@ void LoadSetsPage::downloadSetsFile(const QUrl &url)
 
 void LoadSetsPage::actDownloadProgressSetsFile(qint64 received, qint64 total)
 {
-    if (wizard()->backgroundMode) {
-        emitBackgroundProgress("download", received, total);
-    }
+    emitProgress("download", received, total);
     if (total > 0) {
         progressBar->setMaximum(static_cast<int>(total));
         progressBar->setValue(static_cast<int>(received));
@@ -534,7 +531,7 @@ void LoadSetsPage::updateParsingProgress(int bytesRead, int totalBytes)
 
 void LoadSetsPage::scanProgressToStdout(int bytesRead, int totalBytes)
 {
-    emitBackgroundProgress("scan", bytesRead, totalBytes);
+    emitProgress("scan", bytesRead, totalBytes);
 }
 
 void LoadSetsPage::beginLoadSets(bool compressedFile)
@@ -841,18 +838,18 @@ void SaveSetsPage::updateTotalProgress(int cardsImported, int setIndex, const QS
         const int cardCount = wizard()->importer->getCardList().size();
         if (wizard()->backgroundMode) {
             qInfo() << tr("Import finished: %1 cards.").arg(cardCount);
-            emitBackgroundProgress("import", totalSets, totalSets);
         } else {
             messageLog->append("<b>" + tr("Import finished: %1 cards.").arg(cardCount) + "</b>");
         }
+        emitProgress("import", totalSets, totalSets);
     } else {
         progressBar->setValue(setIndex);
         if (wizard()->backgroundMode) {
             qInfo() << tr("%1: %2 cards imported").arg(setName).arg(cardsImported);
-            emitBackgroundProgress("import", setIndex, totalSets);
         } else {
             messageLog->append(tr("%1: %2 cards imported").arg(setName).arg(cardsImported));
         }
+        emitProgress("import", setIndex, totalSets);
     }
 
     messageLog->verticalScrollBar()->setValue(messageLog->verticalScrollBar()->maximum());
