@@ -132,7 +132,8 @@ bool CardCompleterStyler::handlePopupKeyPress(QKeyEvent *event)
     const int newRow = qBound(0, currentRow + step, rowCount - 1);
 
     if (newRow != currentRow) {
-        popup->setCurrentIndex(completer->completionModel()->index(newRow, completer->completionColumn()));
+        popup->selectionModel()->setCurrentIndex(
+            completer->completionModel()->index(newRow, completer->completionColumn()), QItemSelectionModel::NoUpdate);
     }
 
     return true;
@@ -161,7 +162,8 @@ void CardCompleterStyler::ensureClosestSelected()
     const int closestRow = rowCount - 1;
 
     if (currentRow != closestRow) {
-        popup->setCurrentIndex(completionModel->index(closestRow, completer->completionColumn()));
+        popup->selectionModel()->setCurrentIndex(completionModel->index(closestRow, completer->completionColumn()),
+                                                 QItemSelectionModel::NoUpdate);
     }
 }
 
