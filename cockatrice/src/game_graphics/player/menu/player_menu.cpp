@@ -72,7 +72,7 @@ void PlayerMenu::setMenusForGraphicItems()
     }
 }
 
-QMenu *PlayerMenu::updateCardMenu(const CardItem *card)
+QMenu *PlayerMenu::updateCardMenu(CardItem *card)
 {
     if (!card) {
         emit cardMenuUpdated(nullptr);

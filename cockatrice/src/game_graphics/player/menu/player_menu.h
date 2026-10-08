@@ -39,7 +39,7 @@ signals:
 
 public slots:
     void setMenusForGraphicItems();
-    QMenu *updateCardMenu(const CardItem *card);
+    QMenu *updateCardMenu(CardItem *card);
 
 private slots:
     void refreshShortcuts();

@@ -45,7 +45,7 @@ static QAction *makeAction(QObject *parent, Slot &&slot, bool checkable = false,
     return a;
 }
 
-CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _shortcutsActive)
+CardMenu::CardMenu(PlayerGraphicsItem *_player, CardItem *_card, bool _shortcutsActive)
     : player(_player), card(_card), shortcutsActive(_shortcutsActive)
 {
     const QList<PlayerLogic *> &players = player->getLogic()->getGame()->getPlayerManager()->getPlayers().values();
@@ -86,15 +86,17 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
     aHide = makeAction(this, [actions, sel]() { actions->actHide(sel()); });
     aReduceLifeByPower = makeAction(this, [actions, sel]() { actions->actReduceLifeByPower(sel()); });
 
-    // Actions that use activeCard, not selection — direct connection
+    // Actions bound to the card this menu was opened for
     aAttach = new QAction(this);
     aDrawArrow = new QAction(this);
+
+    // Actions that use activeCard, not selection — direct connection
     aSelectAll = new QAction(this);
     aSelectRow = new QAction(this);
     aSelectColumn = new QAction(this);
 
-    connect(aAttach, &QAction::triggered, actions, &PlayerActions::actAttach);
-    connect(aDrawArrow, &QAction::triggered, actions, &PlayerActions::actDrawArrow);
+    connect(aAttach, &QAction::triggered, this, &CardMenu::attachCard);
+    connect(aDrawArrow, &QAction::triggered, this, &CardMenu::drawArrow);
     connect(aSelectAll, &QAction::triggered, actions, &PlayerActions::actSelectAll);
     connect(aSelectRow, &QAction::triggered, actions, &PlayerActions::actSelectRow);
     connect(aSelectColumn, &QAction::triggered, actions, &PlayerActions::actSelectColumn);
@@ -476,6 +478,20 @@ void CardMenu::addRelatedCardActions()
         connect(createRelatedCards, &QAction::triggered, player->getLogic()->getPlayerActions(),
                 &PlayerActions::actCreateAllRelatedCards);
         addAction(createRelatedCards);
+    }
+}
+
+void CardMenu::attachCard()
+{
+    if (card) {
+        card->drawAttachArrow();
+    }
+}
+
+void CardMenu::drawArrow()
+{
+    if (card) {
+        card->drawArrow(Qt::red);
     }
 }
 
