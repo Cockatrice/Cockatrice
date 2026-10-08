@@ -9,7 +9,6 @@
 
 #include <QHeaderView>
 #include <QMouseEvent>
-#include <libcockatrice/protocol/pb/command_kick_from_game.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 
