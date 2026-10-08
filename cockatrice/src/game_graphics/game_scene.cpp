@@ -19,6 +19,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
 #include <QtMath>
+#include <functional>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <numeric>
@@ -98,6 +99,56 @@ QList<CardItem *> GameScene::selectedCards() const
     }
 
     return selectedCards;
+}
+
+/**
+ * @brief Selects every card of @p zone for which @p filter holds.
+ * @param filter A predicate to filter which cards are selected.
+ */
+static void selectCardsInZone(
+    const CardZoneLogic *zone,
+    std::function<bool(const CardItem *)> filter = [](const CardItem *) { return true; })
+{
+    if (!zone) {
+        return;
+    }
+
+    for (auto &cardItem : zone->getCards()) {
+        if (cardItem && filter(cardItem)) {
+            cardItem->setSelected(true);
+        }
+    }
+}
+
+void GameScene::selectAllInZone(const CardItem *card)
+{
+    if (!card) {
+        return;
+    }
+
+    selectCardsInZone(card->getZone());
+}
+
+void GameScene::selectSameRow(const CardItem *card)
+{
+    if (!card) {
+        return;
+    }
+
+    auto isSameRow = [card](const CardItem *cardItem) {
+        return qAbs(card->scenePos().y() - cardItem->scenePos().y()) < 50;
+    };
+    selectCardsInZone(card->getZone(), isSameRow);
+}
+
+void GameScene::selectSameColumn(const CardItem *card)
+{
+    if (!card) {
+        return;
+    }
+
+    auto isSameColumn = [card](const CardItem *cardItem) { return cardItem->x() == card->x(); };
+    selectCardsInZone(card->getZone(), isSameColumn);
 }
 
 CardItem *GameScene::getActiveCard() const

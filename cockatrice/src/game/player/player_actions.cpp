@@ -753,58 +753,6 @@ void PlayerActions::actMoveBottomCardToTop()
     sendGameCommand(cmd);
 }
 
-/**
- * Selects all cards in the given zone.
- *
- * @param zone The zone to select from
- * @param filter A predicate to filter which cards are selected. Defaults to always returning true.
- */
-static void selectCardsInZone(
-    const CardZoneLogic *zone,
-    std::function<bool(const CardItem *)> filter = [](const CardItem *) { return true; })
-{
-    if (!zone) {
-        return;
-    }
-
-    for (auto &cardItem : zone->getCards()) {
-        if (cardItem && filter(cardItem)) {
-            cardItem->setSelected(true);
-        }
-    }
-}
-
-void PlayerActions::actSelectAll(const CardItem *card)
-{
-    if (!card) {
-        return;
-    }
-
-    selectCardsInZone(card->getZone());
-}
-
-void PlayerActions::actSelectRow(const CardItem *card)
-{
-    if (!card) {
-        return;
-    }
-
-    auto isSameRow = [card](const CardItem *cardItem) {
-        return qAbs(card->scenePos().y() - cardItem->scenePos().y()) < 50;
-    };
-    selectCardsInZone(card->getZone(), isSameRow);
-}
-
-void PlayerActions::actSelectColumn(const CardItem *card)
-{
-    if (!card) {
-        return;
-    }
-
-    auto isSameColumn = [card](const CardItem *cardItem) { return cardItem->x() == card->x(); };
-    selectCardsInZone(card->getZone(), isSameColumn);
-}
-
 void PlayerActions::actDrawBottomCard()
 {
     if (player->getDeckZone()->getCards().empty()) {
@@ -1314,7 +1262,7 @@ void PlayerActions::actIncPT(QList<CardItem *> selectedCards, int deltaP, int de
     QList<const ::google::protobuf::Message *> commandList;
     for (auto card : selectedCards) {
         QString pt = card->getPT();
-        const auto ptList = CardItem::parsePT(pt);
+        const auto ptList = CardState::parsePT(pt);
         QString newpt;
         if (ptList.isEmpty()) {
             newpt = QString::number(deltaP) + (deltaT ? "/" + QString::number(deltaT) : "");
@@ -1390,7 +1338,7 @@ void PlayerActions::actSetPT(QList<CardItem *> selectedCards, const QString &pt)
 {
     int playerid = player->getPlayerInfo()->getId();
 
-    const auto ptList = CardItem::parsePT(pt);
+    const auto ptList = CardState::parsePT(pt);
     bool empty = ptList.isEmpty();
 
     QList<const ::google::protobuf::Message *> commandList;
@@ -1398,7 +1346,7 @@ void PlayerActions::actSetPT(QList<CardItem *> selectedCards, const QString &pt)
         auto *cmd = new Command_SetCardAttr;
         QString newpt = QString();
         if (!empty) {
-            const auto oldpt = CardItem::parsePT(card->getPT());
+            const auto oldpt = CardState::parsePT(card->getPT());
             int ptIter = 0;
             for (const auto &_item : ptList) {
                 if (_item.typeId() == QMetaType::Type::Int) {
@@ -1495,7 +1443,7 @@ void PlayerActions::actReduceLifeByPower(QList<CardItem *> selectedCards)
     // calculate total power;
     int total = 0;
     for (auto card : selectedCards) {
-        QVariantList parsed = CardItem::parsePT(card->getPT());
+        QVariantList parsed = CardState::parsePT(card->getPT());
         if (!parsed.isEmpty()) {
             int power = parsed.first().toInt(); // toInt will default to 0 if it's not an int
             total += qMax(power, 0);
