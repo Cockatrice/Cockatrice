@@ -259,7 +259,6 @@ static void migrateCardsDisplaySettings(const QString &settingsPath, QSettings &
         {"cards/roundcardcorners", "cards/roundCardCorners"},
         {"cards/overrideallcardartwithpersonalpreference", "cards/overrideAllCardArtWithPersonalPreference"},
         {"cards/bumpsetswithcardsindecktotop", "cards/bumpSetsWithCardsInDeckToTop"},
-        {"cards/includerebalancedcards", "cards/includerebalancedcards"},
         {"cards/tapanimation", "cards/tapAnimation"},
         {"cards/autorotatesidewayslayoutcards", "cards/autoRotateSidewaysLayoutCards"},
         {"cards/scaleCards", "cards/scaleCards"},

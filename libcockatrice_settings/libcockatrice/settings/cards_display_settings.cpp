@@ -43,11 +43,6 @@ int CardsDisplaySettings::getPrintingSelectorCardSize() const
     return getValue("printingSelector", "cards", "cardSize", 100).toInt();
 }
 
-bool CardsDisplaySettings::getIncludeRebalancedCards() const
-{
-    return getValue("includerebalancedcards", QString(), QString(), true).toBool();
-}
-
 bool CardsDisplaySettings::getPrintingSelectorNavigationButtonsVisible() const
 {
     return getValue("navigationButtonsVisible", "cards", "printingSelector", true).toBool();
@@ -165,15 +160,6 @@ void CardsDisplaySettings::setPrintingSelectorCardSize(int _printingSelectorCard
 {
     setValue(_printingSelectorCardSize, "printingSelector", "cards", "cardSize");
     emit printingSelectorCardSizeChanged();
-}
-
-void CardsDisplaySettings::setIncludeRebalancedCards(bool _includeRebalancedCards)
-{
-    if (_includeRebalancedCards == getIncludeRebalancedCards()) {
-        return;
-    }
-    setValue(_includeRebalancedCards, "includerebalancedcards");
-    emit includeRebalancedCardsChanged(_includeRebalancedCards);
 }
 
 void CardsDisplaySettings::setPrintingSelectorNavigationButtonsVisible(bool _navigationButtonsVisible)

@@ -67,7 +67,6 @@ static QByteArray buildSyntheticData(int numSets, int cardsPerSet)
             card["convertedManaCost"] = 1.0;
             card["manaValue"] = 1.0;
             card["isOnlineOnly"] = false;
-            card["isRebalanced"] = false;
 
             QJsonObject legalities;
             legalities["standard"] = "legal";

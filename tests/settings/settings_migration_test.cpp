@@ -236,7 +236,6 @@ TEST_F(SettingsMigrationTest, MigratesAllSettingsGroups)
         g.setValue("cards/roundcardcorners", false);
         g.setValue("cards/overrideallcardartwithpersonalpreference", true);
         g.setValue("cards/bumpsetswithcardsindecktotop", false);
-        g.setValue("cards/includerebalancedcards", false);
         g.setValue("cards/autorotatesidewayslayoutcards", false);
         g.setValue("cards/tapanimation", true);
         g.setValue("cards/scaleCards", false);
@@ -395,7 +394,6 @@ TEST_F(SettingsMigrationTest, MigratesAllSettingsGroups)
     ASSERT_EQ(readFromIni("cards_display.ini", "cards/roundCardCorners"), QVariant(false));
     ASSERT_EQ(readFromIni("cards_display.ini", "cards/overrideAllCardArtWithPersonalPreference"), QVariant(true));
     ASSERT_EQ(readFromIni("cards_display.ini", "cards/bumpSetsWithCardsInDeckToTop"), QVariant(false));
-    ASSERT_EQ(readFromIni("cards_display.ini", "cards/includerebalancedcards"), QVariant(false));
     ASSERT_EQ(readFromIni("cards_display.ini", "cards/autoRotateSidewaysLayoutCards"), QVariant(false));
     ASSERT_EQ(readFromIni("cards_display.ini", "cards/tapAnimation"), QVariant(true));
     ASSERT_EQ(readFromIni("cards_display.ini", "cards/scaleCards"), QVariant(false));
