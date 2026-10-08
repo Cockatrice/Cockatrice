@@ -41,6 +41,7 @@ protected:
 private:
     bool isHovered;
     qreal realZValue;
+    bool pendingSelectionCollapse;
 private slots:
     void pixmapUpdated();
 

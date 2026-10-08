@@ -12,6 +12,7 @@
 #include "libcockatrice/card/printing/exact_card.h"
 #include "libcockatrice/utility/card_ref.h"
 
+#include <QApplication>
 #include <QBrush>
 #include <QChar>
 #include <QCursor>
@@ -42,7 +43,7 @@ class QSizeF;
 
 AbstractCardItem::AbstractCardItem(QGraphicsItem *parent, const CardRef &cardRef, PlayerLogic *_owner, int _id)
     : ArrowTarget(_owner, parent), id(_id), cardRef(cardRef), tapped(false), facedown(false), tapAngle(0),
-      bgColor(Qt::transparent), isHovered(false), realZValue(0)
+      bgColor(Qt::transparent), isHovered(false), realZValue(0), pendingSelectionCollapse(false)
 {
     setCursor(Qt::OpenHandCursor);
     setFlag(ItemIsSelectable);
@@ -344,6 +345,7 @@ void AbstractCardItem::setFaceDown(bool _facedown)
 
 void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    pendingSelectionCollapse = false;
     if ((event->modifiers() & Qt::AltModifier) && event->button() == Qt::LeftButton) {
         emit cardShiftClicked(cardRef.name);
     } else if ((event->modifiers() & Qt::ControlModifier)) {
@@ -351,13 +353,10 @@ void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     } else if (!isSelected()) {
         scene()->clearSelection();
         setSelected(true);
-    } else {
-        // Already selected and no modifier held; collapse multi-selection to this card
-        if (scene()->selectedItems().count() > 1) {
-            scene()->clearSelection();
-            setSelected(true);
-        }
-        // If it's the only selected item, do nothing
+    } else if (event->button() == Qt::LeftButton && scene()->selectedItems().count() > 1) {
+        // Part of a multi-selection; collapse only if this turns out to be a click rather than a drag,
+        // so that dragging the whole selection keeps it intact.
+        pendingSelectionCollapse = true;
     }
     if (event->button() == Qt::LeftButton) {
         setCursor(Qt::ClosedHandCursor);
@@ -369,6 +368,16 @@ void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void AbstractCardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+    if (pendingSelectionCollapse) {
+        pendingSelectionCollapse = false;
+        bool dragged = (event->screenPos() - event->buttonDownScreenPos(event->button())).manhattanLength() >=
+                       2 * QApplication::startDragDistance();
+        if (!dragged) {
+            scene()->clearSelection();
+            setSelected(true);
+        }
+    }
+
     if (event->button() == Qt::MiddleButton) {
         emit deleteCardInfoPopup(cardRef.name);
     }
