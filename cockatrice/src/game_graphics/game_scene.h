@@ -52,6 +52,7 @@ private:
     QList<ZoneViewWidget *> zoneViews;                  ///< Active zone view widgets
     QSize viewSize;                                     ///< Current view size
     QPointer<CardItem> hoveredCard;                     ///< Currently hovered card
+    QPointer<CardItem> activeCard;                      ///< Card the currently open context menu targets
     QBasicTimer *animationTimer;                        ///< Timer for scene animations
     QHash<QObject *, IAnimatedItem *> animatedItems;    ///< Items currently animating
     QHash<QObject *, QMetaObject::Connection>
@@ -90,6 +91,12 @@ public:
 
     /** @brief Gets all selected CardItems. */
     QList<CardItem *> selectedCards() const;
+
+    /** @brief Card the currently open context menu targets, or null. */
+    CardItem *getActiveCard() const;
+
+    /** @brief Sets the card the currently open context menu targets. */
+    void setActiveCard(CardItem *card);
 
     /**
      * @brief Adds a player to the scene and stores their graphics item.

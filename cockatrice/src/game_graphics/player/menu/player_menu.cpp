@@ -83,7 +83,7 @@ QMenu *PlayerMenu::updateCardMenu(CardItem *card)
     // only update the menu if the card is actually selected
     if ((player->getLogic()->getGame()->getPlayerManager()->isSpectator() &&
          !player->getLogic()->getGame()->getPlayerManager()->isJudge()) ||
-        player->getLogic()->getGame()->getActiveCard() != card) {
+        player->getGameScene()->getActiveCard() != card) {
         return nullptr;
     }
 
