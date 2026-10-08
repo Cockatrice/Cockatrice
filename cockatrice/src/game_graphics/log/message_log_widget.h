@@ -7,8 +7,9 @@
 #ifndef MESSAGELOGWIDGET_H
 #define MESSAGELOGWIDGET_H
 
-#include "../../game/zones/card_zone_logic.h"
 #include "../../interface/widgets/server/chat_view/chat_view.h"
+
+#include <libcockatrice/game/zones/card_zone_logic.h>
 
 class CardState;
 class AbstractGame;

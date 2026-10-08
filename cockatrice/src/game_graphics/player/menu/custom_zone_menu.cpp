@@ -1,7 +1,8 @@
 #include "custom_zone_menu.h"
 
-#include "../../game/player/player_logic.h"
 #include "../player_graphics_item.h"
+
+#include <libcockatrice/game/player/player_logic.h>
 
 CustomZoneMenu::CustomZoneMenu(PlayerGraphicsItem *_player) : player(_player)
 {

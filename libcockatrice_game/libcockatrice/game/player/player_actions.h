@@ -8,6 +8,7 @@
 #ifndef COCKATRICE_PLAYER_ACTIONS_H
 #define COCKATRICE_PLAYER_ACTIONS_H
 
+#include "../board/card_state.h"
 #include "card_menu_action_type.h"
 #include "card_move_request.h"
 #include "event_processing_options.h"

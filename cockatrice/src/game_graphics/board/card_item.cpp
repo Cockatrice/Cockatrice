@@ -2,10 +2,6 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../../client/settings/card_counter_settings.h"
-#include "../../game/phase.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_logic.h"
-#include "../../game/zones/view_zone_logic.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../game_scene.h"
 #include "../zones/table_zone.h"
@@ -19,6 +15,10 @@
 #include <QMenu>
 #include <QPainter>
 #include <libcockatrice/card/card_info.h>
+#include <libcockatrice/game/phase.h>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/zones/view_zone_logic.h>
 #include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
 #include <libcockatrice/settings/interface_settings.h>
 

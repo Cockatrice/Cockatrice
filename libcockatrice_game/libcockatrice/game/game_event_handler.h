@@ -20,6 +20,7 @@
 #include <QLoggingCategory>
 #include <QObject>
 #include <libcockatrice/protocol/pb/event_leave.pb.h>
+#include <libcockatrice/protocol/pb/game_event_context.pb.h>
 #include <libcockatrice/protocol/pb/move_card_to_zone.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
 #include <libcockatrice/utility/playmat_params.h>
@@ -29,7 +30,6 @@ class AbstractGame;
 class CommandContainer;
 class GameCommand;
 class GameEventContainer;
-class GameEventContext;
 class PendingCommand;
 class PlayerLogic;
 class Response;

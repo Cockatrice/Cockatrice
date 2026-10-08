@@ -7,8 +7,9 @@
 #ifndef STACKZONE_H
 #define STACKZONE_H
 
-#include "../../game/zones/stack_zone_logic.h"
 #include "select_zone.h"
+
+#include <libcockatrice/game/zones/stack_zone_logic.h>
 
 class StackZone : public SelectZone
 {

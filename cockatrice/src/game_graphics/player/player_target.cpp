@@ -1,7 +1,6 @@
 #include "player_target.h"
 
 #include "../../client/settings/cache_settings.h"
-#include "../../game/player/player_logic.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../game_scene.h"
 
@@ -10,6 +9,7 @@
 #include <QPainter>
 #include <QPixmapCache>
 #include <QtMath>
+#include <libcockatrice/game/player/player_logic.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
 PlayerCounter::PlayerCounter(CounterState *state, PlayerLogic *player, QGraphicsItem *parent)

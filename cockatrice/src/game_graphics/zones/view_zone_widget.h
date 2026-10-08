@@ -6,14 +6,13 @@
 #ifndef ZONEVIEWWIDGET_H
 #define ZONEVIEWWIDGET_H
 
-#include "../../game/zones/card_zone_logic.h"
-
 #include <QCheckBox>
 #include <QComboBox>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsWidget>
 #include <QLineEdit>
 #include <QPointer>
+#include <libcockatrice/game/zones/card_zone_logic.h>
 #include <libcockatrice/utility/macros.h>
 
 class QLabel;

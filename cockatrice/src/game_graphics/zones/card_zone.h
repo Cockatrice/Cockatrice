@@ -7,12 +7,12 @@
 #ifndef CARDZONE_H
 #define CARDZONE_H
 
-#include "../../game/zones/card_zone_logic.h"
 #include "../board/abstract_graphics_item.h"
 #include "../board/graphics_item_type.h"
 
 #include <QLoggingCategory>
 #include <QString>
+#include <libcockatrice/game/zones/card_zone_logic.h>
 
 class CardItem;
 

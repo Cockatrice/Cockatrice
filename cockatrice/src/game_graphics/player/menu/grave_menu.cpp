@@ -1,13 +1,13 @@
 #include "grave_menu.h"
 
 #include "../../../client/settings/shortcuts_settings.h"
-#include "../../game/abstract_game.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_logic.h"
 #include "../player_graphics_item.h"
 
 #include <QAction>
 #include <QMenu>
+#include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_logic.h>
 #include <libcockatrice/utility/zone_names.h>
 
 GraveyardMenu::GraveyardMenu(PlayerGraphicsItem *_player, QWidget *parent) : TearOffMenu(parent), player(_player)

@@ -1,9 +1,6 @@
 #include "game_scene.h"
 
 #include "../client/settings/cache_settings.h"
-#include "../game/abstract_game.h"
-#include "../game/player/player_actions.h"
-#include "../game/player/player_logic.h"
 #include "../game_graphics/player/player_graphics_item.h"
 #include "../game_graphics/player/player_target.h"
 #include "board/card_item.h"
@@ -20,6 +17,9 @@
 #include <QGraphicsView>
 #include <QtMath>
 #include <functional>
+#include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_logic.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <numeric>

@@ -7,12 +7,12 @@
 #ifndef COUNTER_H
 #define COUNTER_H
 
-#include "../../game/board/counter_state.h"
 #include "../../interface/widgets/menus/tearoff_menu.h"
 #include "../player/menu/abstract_player_component.h"
 
 #include <QGraphicsItem>
 #include <QInputDialog>
+#include <libcockatrice/game/board/counter_state.h>
 
 class PlayerLogic;
 class QAction;

@@ -7,12 +7,11 @@
 #ifndef PLAYERLISTWIDGET_H
 #define PLAYERLISTWIDGET_H
 
-#include "../../game/player/player_logic.h"
-
 #include <QIcon>
 #include <QMap>
 #include <QStyledItemDelegate>
 #include <QTreeWidget>
+#include <libcockatrice/game/player/player_logic.h>
 
 class ServerInfo_PlayerProperties;
 class TabSupervisor;

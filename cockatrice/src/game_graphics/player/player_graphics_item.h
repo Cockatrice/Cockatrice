@@ -6,7 +6,6 @@
 
 #ifndef COCKATRICE_PLAYER_GRAPHICS_ITEM_H
 #define COCKATRICE_PLAYER_GRAPHICS_ITEM_H
-#include "../../game/player/player_logic.h"
 #include "../board/abstract_counter.h"
 #include "../game_scene.h"
 #include "player_area.h"
@@ -14,6 +13,7 @@
 
 #include <QGraphicsObject>
 #include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/game/player/player_logic.h>
 
 class HandZone;
 class PileZone;

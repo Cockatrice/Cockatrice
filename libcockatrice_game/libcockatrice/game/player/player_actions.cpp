@@ -1,11 +1,11 @@
 #include "player_actions.h"
 
-#include "../../client/settings/cache_settings.h"
 #include "../abstract_game.h"
 #include "../board/arrow_data.h"
 #include "../board/card_state.h"
 #include "../zones/table_zone_logic.h"
 #include "../zones/view_zone_logic.h"
+#include "client/settings/cache_settings.h"
 
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>

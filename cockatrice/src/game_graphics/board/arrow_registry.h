@@ -1,11 +1,10 @@
 #ifndef COCKATRICE_ARROW_REGISTRY_H
 #define COCKATRICE_ARROW_REGISTRY_H
 
-#include "../../game/board/arrow_data.h"
-
 #include <QMap>
 #include <QSet>
 #include <QSharedPointer>
+#include <libcockatrice/game/board/arrow_data.h>
 
 class ArrowItem;
 
