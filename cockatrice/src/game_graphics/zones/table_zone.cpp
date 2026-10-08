@@ -396,7 +396,7 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
     const int gridPointHeight = CardDimensions::HEIGHT + PADDING_Y;
     int gridPointY = (y + PADDING_Y / 2) / gridPointHeight;
 
-    gridPointY = clampValidTableRow(gridPointY);
+    gridPointY = TableZoneLogic::clampValidTableRow(gridPointY);
 
     if (isInverted()) {
         gridPointY = TABLEROWS - 1 - gridPointY;
@@ -443,23 +443,4 @@ QPointF TableZone::closestGridPoint(const QPointF &point)
         gridPoint.setX(gridPoint.x() + 1);
     }
     return mapFromGrid(gridPoint);
-}
-
-int TableZone::clampValidTableRow(const int row)
-{
-    if (row < 0) {
-        return 0;
-    }
-    if (row >= TABLEROWS) {
-        return TABLEROWS - 1;
-    }
-    return row;
-}
-
-int TableZone::tableRowToGridY(int tableRow)
-{
-    if (tableRow > 2) {
-        tableRow = 1;
-    }
-    return clampValidTableRow(2 - tableRow);
 }

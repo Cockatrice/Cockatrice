@@ -1,8 +1,8 @@
 #include "player_actions.h"
 
 #include "../../client/settings/cache_settings.h"
-#include "../../game_graphics/zones/table_zone.h"
 #include "../abstract_game.h"
+#include "../zones/table_zone_logic.h"
 #include "../zones/view_zone_logic.h"
 
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -78,7 +78,7 @@ void PlayerActions::playCard(CardItem *card, bool faceDown)
         cmd.set_y(0);
     } else {
         tableRow = faceDown ? 2 : info.getUiAttributes().tableRow;
-        QPoint gridPoint = QPoint(-1, TableZone::tableRowToGridY(tableRow));
+        QPoint gridPoint = QPoint(-1, TableZoneLogic::tableRowToGridY(tableRow));
         cardToMove->set_face_down(faceDown);
         if (!faceDown) {
             cardToMove->set_pt(info.getPowTough().toStdString());
@@ -118,7 +118,7 @@ void PlayerActions::playCardToTable(const CardItem *card, bool faceDown)
     const CardInfo &info = exactCard.getInfo();
 
     int tableRow = faceDown ? 2 : info.getUiAttributes().tableRow;
-    QPoint gridPoint = QPoint(-1, TableZone::tableRowToGridY(tableRow));
+    QPoint gridPoint = QPoint(-1, TableZoneLogic::tableRowToGridY(tableRow));
     cardToMove->set_face_down(faceDown);
     if (!faceDown) {
         cardToMove->set_pt(info.getPowTough().toStdString());
@@ -882,7 +882,7 @@ void PlayerActions::actCreateToken(TokenInfo tokenToCreate)
     if (correctedCard) {
         lastTokenInfo.name = correctedCard.getName();
         int tableRow = lastTokenInfo.faceDown ? 2 : correctedCard.getInfo().getUiAttributes().tableRow;
-        lastTokenTableRow = TableZone::tableRowToGridY(tableRow);
+        lastTokenTableRow = TableZoneLogic::tableRowToGridY(tableRow);
         if (lastTokenInfo.pt.isEmpty()) {
             lastTokenInfo.pt = correctedCard.getInfo().getPowTough();
         }
@@ -936,7 +936,7 @@ void PlayerActions::setLastTokenInfo(CardInfoPtr cardInfo)
         .destroy = true,
         .providerId = SettingsCache::instance().cardOverrides().getCardPreferenceOverride(cardInfo->getName())};
 
-    lastTokenTableRow = TableZone::tableRowToGridY(cardInfo->getUiAttributes().tableRow);
+    lastTokenTableRow = TableZoneLogic::tableRowToGridY(cardInfo->getUiAttributes().tableRow);
 
     emit requestEnableAndSetCreateAnotherTokenAction(lastTokenInfo.name);
 }
@@ -1148,7 +1148,7 @@ void PlayerActions::createCard(const CardItem *sourceCard,
         return;
     }
 
-    QPoint gridPoint = QPoint(-1, TableZone::tableRowToGridY(cardInfo->getUiAttributes().tableRow));
+    QPoint gridPoint = QPoint(-1, TableZoneLogic::tableRowToGridY(cardInfo->getUiAttributes().tableRow));
 
     // create the token for the related card
     Command_CreateToken cmd;
@@ -1934,7 +1934,7 @@ void PlayerActions::cardMenuAction(QList<CardItem *> selectedCards, CardMenuActi
                         ctm->set_tapped(info.getUiAttributes().cipt);
                     }
 
-                    cmd->set_y(TableZone::tableRowToGridY(tableRow));
+                    cmd->set_y(TableZoneLogic::tableRowToGridY(tableRow));
                     commandList.append(cmd);
                 }
                 break;

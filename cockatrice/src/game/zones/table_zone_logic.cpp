@@ -34,3 +34,22 @@ CardItem *TableZoneLogic::takeCard(int position, int cardId, bool toNewZone)
     }
     return result;
 }
+
+int TableZoneLogic::clampValidTableRow(const int row)
+{
+    if (row < 0) {
+        return 0;
+    }
+    if (row >= ROW_COUNT) {
+        return ROW_COUNT - 1;
+    }
+    return row;
+}
+
+int TableZoneLogic::tableRowToGridY(int tableRow)
+{
+    if (tableRow > 2) {
+        tableRow = 1;
+    }
+    return clampValidTableRow(2 - tableRow);
+}
