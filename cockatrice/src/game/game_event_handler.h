@@ -20,7 +20,9 @@
 #include <QLoggingCategory>
 #include <QObject>
 #include <libcockatrice/protocol/pb/event_leave.pb.h>
+#include <libcockatrice/protocol/pb/move_card_to_zone.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
+#include <libcockatrice/utility/playmat_params.h>
 
 class AbstractClient;
 class AbstractGame;
@@ -135,6 +137,67 @@ public:
      */
     void handleArrowDeletion(int creatorId, int arrowId);
     void handleArrowDeletionFinished(const Response &response, int creatorId, int arrowId);
+
+    /**
+     * @brief Prepare a deck selection from its native deck list text.
+     *
+     * The returned command is not sent yet, so the caller can connect to
+     * PendingCommand::finished before handing it to sendGameCommand().
+     *
+     * @param deckList Serialized deck list.
+     * @return The pending command awaiting the deck download response.
+     */
+    PendingCommand *prepareDeckSelect(const QString &deckList);
+
+    /**
+     * @brief Prepare a deck selection for a deck stored on the server.
+     *
+     * The returned command is not sent yet, so the caller can connect to
+     * PendingCommand::finished before handing it to sendGameCommand().
+     *
+     * @param deckId Server-side deck identifier.
+     * @return The pending command awaiting the deck download response.
+     */
+    PendingCommand *prepareDeckSelectId(int deckId);
+
+    /**
+     * @brief Send a resolved playmat for a player.
+     *
+     * @param playmat Resolved playmat card and positioning parameters.
+     * @param playerId Player the playmat belongs to.
+     */
+    void sendSetPlaymat(const PlaymatInfo &playmat, int playerId);
+
+    /**
+     * @brief Set a player's ready state.
+     *
+     * @param ready Whether the player is ready.
+     * @param playerId Player the state applies to.
+     */
+    void sendReadyStart(bool ready, int playerId);
+
+    /**
+     * @brief Force-start the game, kicking every player who is not ready.
+     *
+     * @param playerId Player issuing the force start.
+     */
+    void sendForceStart(int playerId);
+
+    /**
+     * @brief Lock or unlock a player's sideboard.
+     *
+     * @param locked Whether the sideboard is locked.
+     * @param playerId Player the lock applies to.
+     */
+    void sendSetSideboardLock(bool locked, int playerId);
+
+    /**
+     * @brief Send a player's sideboard plan.
+     *
+     * @param plan Cards to move between zones when leaving sideboarding.
+     * @param playerId Player the plan belongs to.
+     */
+    void sendSetSideboardPlan(const QList<MoveCard_ToZone> &plan, int playerId);
 
     /** @} */
 
