@@ -429,7 +429,7 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
             startCard->playCard(false);
         }
 
-        player->getPlayerActions()->createArrow(startCard, arrow, deleteInPhase);
+        player->getPlayerActions()->createArrow(startCard->getState(), arrow, deleteInPhase);
     }
 
     delArrow();
@@ -521,7 +521,7 @@ void ArrowAttachItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         auto *startCard = qgraphicsitem_cast<CardItem *>(startItem);
         auto *targetCard = qgraphicsitem_cast<CardItem *>(targetItem);
         if (startCard && targetCard) {
-            player->getPlayerActions()->attachCards(startCard, targetCard);
+            player->getPlayerActions()->attachCards(startCard->getState(), targetCard->getState());
         }
     }
 

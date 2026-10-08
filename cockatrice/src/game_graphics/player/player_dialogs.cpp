@@ -190,7 +190,7 @@ void PlayerDialogs::onRollDieDialogRequested()
     playerActions->actRollDie(dlg.getDieSideCount(), dlg.getDiceToRollCount());
 }
 
-void PlayerDialogs::onCreateRelatedFromRelationDialogRequested(const CardItem *sourceCard,
+void PlayerDialogs::onCreateRelatedFromRelationDialogRequested(const CardState *sourceCard,
                                                                const CardRelation *cardRelation)
 {
     if (sourceCard == nullptr || cardRelation == nullptr) {
@@ -245,14 +245,14 @@ void PlayerDialogs::onMoveCardXCardsFromTopDialogRequested(int defaultNumberTopC
     number -= 1; // indexes start at 0
 
     if (ok) {
-        playerActions->actMoveCardXCardsFromTop(player->getGameScene()->selectedCards(), number);
+        playerActions->actMoveCardXCardsFromTop(player->getGameScene()->selectedCardStates(), number);
     }
 }
 
 void PlayerDialogs::onSetPTDialogRequested(const QString &oldPT)
 {
     bool ok;
-    auto cards = player->getGameScene()->selectedCards();
+    auto cards = player->getGameScene()->selectedCardStates();
     emit requestDialogSemaphore(true);
     QString pt = getTextWithMax(dialogParent(), tr("Change power/toughness"), tr("Change stats to:"), QLineEdit::Normal,
                                 oldPT, &ok);
@@ -267,7 +267,7 @@ void PlayerDialogs::onSetPTDialogRequested(const QString &oldPT)
 
 void PlayerDialogs::onSetAnnotationDialogRequested(const QString &oldAnnotation)
 {
-    auto cards = player->getGameScene()->selectedCards();
+    auto cards = player->getGameScene()->selectedCardStates();
     emit requestDialogSemaphore(true);
     AnnotationDialog *dialog = new AnnotationDialog(dialogParent());
     dialog->setOptions(QInputDialog::UsePlainTextEditForTextInput);
@@ -285,7 +285,7 @@ void PlayerDialogs::onSetAnnotationDialogRequested(const QString &oldAnnotation)
 
 void PlayerDialogs::onSetCardCounterDialogRequested(int counterId, const QString &oldValueForDlg)
 {
-    auto cards = player->getGameScene()->selectedCards();
+    auto cards = player->getGameScene()->selectedCardStates();
     emit requestDialogSemaphore(true);
 
     auto &cardCounterSettings = SettingsCache::instance().cardCounters();

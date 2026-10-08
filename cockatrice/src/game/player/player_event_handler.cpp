@@ -371,7 +371,7 @@ void PlayerEventHandler::eventMoveCard(const Event_MoveCard &event, const GameEv
 
     if (player->getPlayerActions()->isMovingCardsUntil() && startZoneString == ZoneNames::DECK &&
         targetZone->getName() == ZoneNames::STACK) {
-        player->getPlayerActions()->moveOneCardUntil(toCardItem(card));
+        player->getPlayerActions()->moveOneCardUntil(card);
     }
 }
 

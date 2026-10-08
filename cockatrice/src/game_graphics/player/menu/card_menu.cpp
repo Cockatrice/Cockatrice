@@ -64,7 +64,7 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, CardItem *_card, bool _shortcuts
     auto *gameScene = player->getGameScene();
 
     // Single selection resolver used by all lambdas — called at trigger time
-    auto sel = [gameScene]() { return gameScene->selectedCards(); };
+    auto sel = [gameScene]() { return gameScene->selectedCardStates(); };
 
     // Unified dispatcher for card menu actions
     auto invoke = [actions, sel](CardMenuActionType type) {
@@ -315,7 +315,7 @@ void CardMenu::createHandOrCustomZoneMenu(bool canModifyCard)
     initContextualPlayersMenu(revealMenu, aRevealToAll);
 
     connect(revealMenu, &QMenu::triggered, this, [this](QAction *action) {
-        player->getLogic()->getPlayerActions()->actReveal(player->getGameScene()->selectedCards(), action);
+        player->getLogic()->getPlayerActions()->actReveal(player->getGameScene()->selectedCardStates(), action);
     });
 
     addSeparator();
@@ -464,8 +464,9 @@ void CardMenu::addRelatedCardActions()
 
         auto *createRelated = new QAction(text, this);
         const int relatedIndex = index++;
-        connect(createRelated, &QAction::triggered, this,
-                [this, playerActions, relatedIndex] { playerActions->actCreateRelatedCard(card, relatedIndex); });
+        connect(createRelated, &QAction::triggered, this, [this, playerActions, relatedIndex] {
+            playerActions->actCreateRelatedCard(card->getState(), relatedIndex);
+        });
         addAction(createRelated);
     }
 
@@ -475,7 +476,7 @@ void CardMenu::addRelatedCardActions()
                 SettingsCache::instance().shortcuts().getShortcut("Player/aCreateRelatedTokens"));
         }
         connect(createRelatedCards, &QAction::triggered, this,
-                [this, playerActions] { playerActions->actCreateAllRelatedCards(card); });
+                [this, playerActions] { playerActions->actCreateAllRelatedCards(card->getState()); });
         addAction(createRelatedCards);
     }
 }
