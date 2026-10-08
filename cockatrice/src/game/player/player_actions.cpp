@@ -7,7 +7,6 @@
 #include "../abstract_game.h"
 #include "../zones/view_zone_logic.h"
 
-#include <QKeyEvent>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
@@ -1449,16 +1448,6 @@ void PlayerActions::actReduceLifeByPower(QList<CardItem *> selectedCards)
     cmd.set_counter_id(lifeCounter->getId());
     cmd.set_delta(-total);
     sendGameCommand(prepareGameCommand(cmd));
-}
-
-void AnnotationDialog::keyPressEvent(QKeyEvent *event)
-{
-    if (event->key() == Qt::Key_Return && event->modifiers() & Qt::ControlModifier) {
-        event->accept();
-        accept();
-        return;
-    }
-    QInputDialog::keyPressEvent(event);
 }
 
 void PlayerActions::actRequestSetAnnotationDialog(QList<CardItem *> selectedCards)
