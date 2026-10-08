@@ -26,7 +26,7 @@
 
 namespace
 {
-static qreal titleBarHeight(QWidget *styleWidget)
+qreal titleBarHeight(QWidget *styleWidget)
 {
     if (styleWidget) {
         return static_cast<qreal>(styleWidget->style()->pixelMetric(QStyle::PM_TitleBarHeight, nullptr, styleWidget));
@@ -296,7 +296,7 @@ QRectF ZoneViewWidget::closeButtonRect(QWidget *styleWidget) const
 
     // query the style for the close button position (handles macOS top-left placement)
     // Title bar rect MUST be local (0,0-based) for QStyle
-    const qreal tbh = titleBarHeight(styleWidget ? styleWidget : nullptr);
+    const qreal tbh = titleBarHeight(styleWidget);
     const QRect titleBarRect(0, 0, static_cast<int>(frameRectF.width()), static_cast<int>(tbh));
 
     if (styleWidget) {
@@ -326,7 +326,6 @@ QRectF ZoneViewWidget::closeButtonRect(QWidget *styleWidget) const
     }
 
     // Fallback: frame-relative top-right
-    const qreal tbh = titleBarHeight(styleWidget ? styleWidget : nullptr);
     return QRectF(frameRectF.right() - tbh, frameRectF.top(), tbh, tbh);
 }
 
@@ -451,8 +450,9 @@ QVariant ZoneViewWidget::itemChange(GraphicsItemChange change, const QVariant &v
 
         const qreal minX = sceneRect.left();
         const qreal maxX = qMax(minX, sceneRect.right() - kMinVisibleWidth);
-        const qreal minY = sceneRect.top() + kTitleBarHeight;
-        const qreal maxY = qMax(minY, sceneRect.bottom() - kTitleBarHeight);
+        const qreal tbh = titleBarHeight(nullptr);
+        const qreal minY = sceneRect.top() + tbh;
+        const qreal maxY = qMax(minY, sceneRect.bottom() - tbh);
 
         desiredPos.setX(qBound(minX, desiredPos.x(), maxX));
         desiredPos.setY(qBound(minY, desiredPos.y(), maxY));
