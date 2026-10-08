@@ -14,7 +14,6 @@
 #include <QtMath>
 #include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/protocol/pb/command_dump_zone.pb.h>
-#include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/protocol/pb/response_dump_zone.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
@@ -285,24 +284,13 @@ void ZoneViewZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
                                    CardZoneLogic *startZone,
                                    const QPoint & /*dropPoint*/)
 {
-    Command_MoveCard cmd;
-    cmd.set_start_player_id(startZone->getPlayer()->getPlayerInfo()->getId());
-    cmd.set_start_zone(startZone->getName().toStdString());
-    cmd.set_target_player_id(getLogic()->getPlayer()->getPlayerInfo()->getId());
-    cmd.set_target_zone(getLogic()->getName().toStdString());
-    cmd.set_x(0);
-    cmd.set_y(0);
-    cmd.set_is_reversed(qobject_cast<ZoneViewZoneLogic *>(getLogic())->getIsReversed());
-
+    QList<CardMoveRequest> cards;
+    cards.reserve(dragItems.size());
     for (int i = 0; i < dragItems.size(); ++i) {
-        auto cardToMove = cmd.mutable_cards_to_move()->add_card();
-        cardToMove->set_card_id(dragItems[i]->getId());
-        if (dragItems[i]->isForceFaceDown()) {
-            cardToMove->set_face_down(true);
-        }
+        cards.append(CardMoveRequest{dragItems[i]->getId(), dragItems[i]->isForceFaceDown()});
     }
 
-    getLogic()->getPlayer()->getPlayerActions()->sendGameCommand(cmd);
+    getLogic()->getPlayer()->getPlayerActions()->moveCards(startZone, getLogic(), 0, 0, cards);
 }
 
 void ZoneViewZone::setGeometry(const QRectF &rect)

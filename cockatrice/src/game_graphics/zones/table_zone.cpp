@@ -14,7 +14,6 @@
 #include <QGraphicsScene>
 #include <QPainter>
 #include <libcockatrice/card/card_info.h>
-#include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/zone_names.h>
@@ -181,29 +180,20 @@ void TableZone::handleDropEventByGrid(const QList<CardDragItem *> &dragItems,
                                       CardZoneLogic *startZone,
                                       const QPoint &gridPoint)
 {
-    Command_MoveCard cmd;
-    cmd.set_start_player_id(startZone->getPlayer()->getPlayerInfo()->getId());
-    cmd.set_start_zone(startZone->getName().toStdString());
-    cmd.set_target_player_id(getLogic()->getPlayer()->getPlayerInfo()->getId());
-    cmd.set_target_zone(getLogic()->getName().toStdString());
-    cmd.set_x(gridPoint.x());
-    cmd.set_y(gridPoint.y());
-
-    for (const auto &item : dragItems) {
-        CardToMove *ctm = cmd.mutable_cards_to_move()->add_card();
-        ctm->set_card_id(item->getId());
-        if (item->isForceFaceDown()) {
-            ctm->set_face_down(true);
-        }
+    QList<CardMoveRequest> cards;
+    cards.reserve(dragItems.size());
+    for (const CardDragItem *item : dragItems) {
+        CardMoveRequest card{item->getId(), item->isForceFaceDown()};
         if (startZone->getName() != getLogic()->getName() && !item->isForceFaceDown()) {
-            const auto &card = item->getItem()->getCard();
-            if (card) {
-                ctm->set_pt(card.getInfo().getPowTough().toStdString());
+            const auto &cardInfo = item->getItem()->getCard();
+            if (cardInfo) {
+                card.pt = cardInfo.getInfo().getPowTough();
             }
         }
+        cards.append(card);
     }
 
-    startZone->getPlayer()->getPlayerActions()->sendGameCommand(cmd);
+    startZone->getPlayer()->getPlayerActions()->moveCards(startZone, getLogic(), gridPoint.x(), gridPoint.y(), cards);
 }
 
 void TableZone::reorganizeCards()

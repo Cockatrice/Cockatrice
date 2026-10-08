@@ -10,6 +10,7 @@
 
 #include "../../game_graphics/board/card_item.h"
 #include "card_menu_action_type.h"
+#include "card_move_request.h"
 #include "event_processing_options.h"
 #include "move_top_cards_until_options.h"
 #include "player_logic.h"
@@ -28,6 +29,7 @@ class Message;
 }
 } // namespace google
 
+class CardZoneLogic;
 class Command_MoveCard;
 class GameEventContext;
 class PendingCommand;
@@ -49,6 +51,17 @@ public:
 
     PendingCommand *prepareGameCommand(const ::google::protobuf::Message &cmd);
     PendingCommand *prepareGameCommand(const QList<const ::google::protobuf::Message *> &cmdList);
+
+    /**
+     * @brief Moves the requested cards between zones on behalf of a view.
+     * @param startZone Zone the cards are dragged out of.
+     * @param targetZone Zone the cards are dropped onto.
+     * @param x Horizontal target index within the zone.
+     * @param y Vertical target index within the zone.
+     * @param cards The cards to move, as chosen by the view.
+     */
+    void
+    moveCards(CardZoneLogic *startZone, CardZoneLogic *targetZone, int x, int y, const QList<CardMoveRequest> &cards);
 
     void moveOneCardUntil(CardItem *card);
     void stopMoveTopCardsUntil();

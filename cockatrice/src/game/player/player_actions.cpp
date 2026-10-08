@@ -1957,6 +1957,42 @@ PendingCommand *PlayerActions::prepareGameCommand(const QList<const ::google::pr
     }
 }
 
+void PlayerActions::moveCards(CardZoneLogic *startZone,
+                              CardZoneLogic *targetZone,
+                              int x,
+                              int y,
+                              const QList<CardMoveRequest> &cards)
+{
+    if (!startZone || !targetZone) {
+        return;
+    }
+
+    Command_MoveCard cmd;
+    cmd.set_start_player_id(startZone->getPlayer()->getPlayerInfo()->getId());
+    cmd.set_start_zone(startZone->getName().toStdString());
+    cmd.set_target_player_id(targetZone->getPlayer()->getPlayerInfo()->getId());
+    cmd.set_target_zone(targetZone->getName().toStdString());
+    cmd.set_x(x);
+    cmd.set_y(y);
+
+    if (auto *viewLogic = qobject_cast<ZoneViewZoneLogic *>(targetZone)) {
+        cmd.set_is_reversed(viewLogic->getIsReversed());
+    }
+
+    for (const CardMoveRequest &card : cards) {
+        auto *cardToMove = cmd.mutable_cards_to_move()->add_card();
+        cardToMove->set_card_id(card.cardId);
+        if (card.faceDown) {
+            cardToMove->set_face_down(true);
+        }
+        if (!card.pt.isEmpty()) {
+            cardToMove->set_pt(card.pt.toStdString());
+        }
+    }
+
+    sendGameCommand(cmd);
+}
+
 void PlayerActions::sendGameCommand(const google::protobuf::Message &command)
 {
     if (player->getPlayerInfo()->getJudge() && !player->getPlayerInfo()->getLocal()) {
