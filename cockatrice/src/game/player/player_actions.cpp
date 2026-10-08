@@ -11,6 +11,7 @@
 #include <libcockatrice/protocol/pb/command_change_zone_properties.pb.h>
 #include <libcockatrice/protocol/pb/command_create_token.pb.h>
 #include <libcockatrice/protocol/pb/command_draw_cards.pb.h>
+#include <libcockatrice/protocol/pb/command_dump_zone.pb.h>
 #include <libcockatrice/protocol/pb/command_flip_card.pb.h>
 #include <libcockatrice/protocol/pb/command_game_say.pb.h>
 #include <libcockatrice/protocol/pb/command_inc_counter.pb.h>
@@ -1991,6 +1992,40 @@ void PlayerActions::moveCards(CardZoneLogic *startZone,
     }
 
     sendGameCommand(cmd);
+}
+
+PendingCommand *PlayerActions::prepareZoneDump(CardZoneLogic *zone, int numberCards)
+{
+    if (!zone) {
+        return nullptr;
+    }
+
+    Command_DumpZone cmd;
+    cmd.set_player_id(zone->getPlayer()->getPlayerInfo()->getId());
+    cmd.set_zone_name(zone->getName().toStdString());
+    cmd.set_number_cards(numberCards);
+    if (auto *viewLogic = qobject_cast<ZoneViewZoneLogic *>(zone)) {
+        cmd.set_is_reversed(viewLogic->getIsReversed());
+    }
+
+    return prepareGameCommand(cmd);
+}
+
+void PlayerActions::actToggleTapped(const QString &zoneName, const QList<CardItem *> &cards, bool tapped)
+{
+    QList<const ::google::protobuf::Message *> cmdList;
+    for (CardItem *card : cards) {
+        if (card->getTapped() != tapped) {
+            auto *cmd = new Command_SetCardAttr;
+            cmd->set_zone(zoneName.toStdString());
+            cmd->set_card_id(card->getId());
+            cmd->set_attribute(AttrTapped);
+            cmd->set_attr_value(tapped ? "1" : "0");
+            cmdList.append(cmd);
+        }
+    }
+
+    sendGameCommand(prepareGameCommand(cmdList));
 }
 
 void PlayerActions::sendGameCommand(const google::protobuf::Message &command)

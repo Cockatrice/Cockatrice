@@ -63,6 +63,21 @@ public:
     void
     moveCards(CardZoneLogic *startZone, CardZoneLogic *targetZone, int x, int y, const QList<CardMoveRequest> &cards);
 
+    /**
+     * @brief Prepares a dump of the given zone, for the caller to connect to and send.
+     * @param zone Zone to dump.
+     * @param numberCards How many cards to dump, -1 for all.
+     */
+    PendingCommand *prepareZoneDump(CardZoneLogic *zone, int numberCards);
+
+    /**
+     * @brief Sets the tapped state of the cards that do not already have it.
+     * @param zoneName Zone the cards belong to.
+     * @param cards Cards the view wants toggled.
+     * @param tapped Desired tapped state.
+     */
+    void actToggleTapped(const QString &zoneName, const QList<CardItem *> &cards, bool tapped);
+
     void moveOneCardUntil(CardItem *card);
     void stopMoveTopCardsUntil();
 

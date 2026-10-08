@@ -20,7 +20,6 @@
 #include <QScrollBar>
 #include <QStyle>
 #include <QStyleOption>
-#include <libcockatrice/protocol/pb/command_shuffle.pb.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 
@@ -540,7 +539,7 @@ void ZoneViewWidget::closeEvent(QCloseEvent *event)
     // manually call zone->close in order to remove it from the origZones views
     zone->close();
     if (shuffleCheckBox.isChecked()) {
-        player->getPlayerActions()->sendGameCommand(Command_Shuffle());
+        player->getPlayerActions()->actShuffle();
     }
     zoneDeleted();
     event->accept();
