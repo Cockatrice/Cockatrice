@@ -62,11 +62,10 @@ static QByteArray buildSyntheticData(int numSets, int cardsPerSet)
             card["colors"] = QJsonArray{"W"};
             card["colorIdentity"] = QJsonArray{"W"};
             card["types"] = QJsonArray{"Creature"};
-            // Real MTGJSON types: floats and booleans, not strings. This
+            // Real MTGJSON types: floats, not strings. This
             // exercises the QVariant coercion in the property reader.
             card["convertedManaCost"] = 1.0;
             card["manaValue"] = 1.0;
-            card["isOnlineOnly"] = false;
 
             QJsonObject legalities;
             legalities["standard"] = "legal";

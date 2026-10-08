@@ -301,9 +301,9 @@ CardInfoPtr OracleImporter::addCard(QString name,
 
 static QString getJsonString(const QJsonObject &obj, const QString &key)
 {
-    // QVariant coerces numbers and booleans to text, while QJsonValue::toString()
-    // returns a null string for them — some MTGJSON fields (manaValue,
-    // convertedManaCost, isOnlineOnly) carry those types.
+    // QVariant coerces numbers to text, while QJsonValue::toString() returns a
+    // null string for them — MTGJSON fields like manaValue and convertedManaCost
+    // carry those types.
     return obj.value(key).toVariant().toString();
 }
 
@@ -413,7 +413,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
 
     // mtgjson name => xml name
     static const QMap<QString, QString> setInfoProperties{
-        {"number", "num"}, {"rarity", "rarity"}, {"isOnlineOnly", "isOnlineOnly"}, {"artist", "artist"}};
+        {"number", "num"}, {"rarity", "rarity"}, {"artist", "artist"}};
 
     // mtgjson name => xml name
     static const QMap<QString, QString> identifierProperties{{"multiverseId", "muid"}, {"scryfallId", "uuid"}};
