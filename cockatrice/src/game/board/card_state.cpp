@@ -18,6 +18,12 @@ void CardState::resetState(bool keepAnnotations)
     emit stateReset();
 }
 
+void CardState::setColor(const QString &_color)
+{
+    color = _color;
+    emit colorChanged();
+}
+
 void CardState::deleteView()
 {
     emit viewDeleteRequested();
