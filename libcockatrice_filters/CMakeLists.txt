@@ -18,3 +18,5 @@ add_dependencies(libcockatrice_filters libcockatrice_card)
 target_include_directories(libcockatrice_filters PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(libcockatrice_filters PUBLIC libcockatrice_card ${QT_CORE_MODULE})
+
+target_precompile_headers(libcockatrice_filters PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtcore_pch.h")

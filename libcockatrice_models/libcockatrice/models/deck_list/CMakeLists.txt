@@ -16,3 +16,5 @@ target_include_directories(libcockatrice_models_deck_list PUBLIC ${CMAKE_CURRENT
 target_link_libraries(
   libcockatrice_models_deck_list PUBLIC libcockatrice_card libcockatrice_deck_list ${QT_CORE_MODULE}
 )
+
+target_precompile_headers(libcockatrice_models_deck_list PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtcore_pch.h")

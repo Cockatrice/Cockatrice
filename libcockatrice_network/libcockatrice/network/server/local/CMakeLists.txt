@@ -15,3 +15,5 @@ add_dependencies(libcockatrice_network_server_local libcockatrice_protocol)
 target_include_directories(libcockatrice_network_server_local PUBLIC .)
 
 target_link_libraries(libcockatrice_network_server_local PUBLIC ${COCKATRICE_QT_MODULES} libcockatrice_protocol)
+
+target_precompile_headers(libcockatrice_network_server_local PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtcore_pch.h")

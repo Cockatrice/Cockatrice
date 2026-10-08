@@ -48,3 +48,5 @@ target_link_libraries(libcockatrice_utility PUBLIC libcockatrice_rng OpenSSL::Cr
 set(ORACLE_LIBS)
 
 include_directories(${${COCKATRICE_QT_VERSION_NAME}Core_INCLUDE_DIRS})
+
+target_precompile_headers(libcockatrice_utility PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtcore_pch.h")
