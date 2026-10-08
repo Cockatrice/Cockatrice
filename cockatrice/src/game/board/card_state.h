@@ -3,6 +3,9 @@
 
 #include <QMap>
 #include <QObject>
+#include <QPoint>
+#include <libcockatrice/card/printing/exact_card.h>
+#include <libcockatrice/utility/card_ref.h>
 
 class CardZoneLogic;
 class CardItem;
@@ -11,6 +14,13 @@ class CardState : public QObject
     Q_OBJECT
 
 private:
+    int id = -1;
+    CardRef cardRef;
+    ExactCard exactCard;
+    bool tapped = false;
+    bool facedown = false;
+    QPoint gridPoint;
+
     bool attacking = false;
     QMap<int, int> counters;
     QString annotation;
@@ -24,6 +34,12 @@ private:
 signals:
     void stateChanged();
 
+    void cardRefChanged(const CardRef &oldCardRef, const CardRef &newCardRef);
+    void cardInfoChanged();
+    void cardPixmapUpdated();
+    void tappedChanged(bool newTapped, bool canAnimate);
+    void facedownChanged(bool newFaceDown);
+
     void attackingChanged(bool newValue);
     void countersChanged(const QMap<int, int> &newCounters);
     void annotationChanged(const QString &newAnnotation);
@@ -34,11 +50,65 @@ signals:
     void zoneChanged(CardState *changedCard, CardZoneLogic *newZone);
 
 public:
-    explicit CardState(QObject *parent, CardZoneLogic *_zone) : QObject(parent), zone(_zone)
+    explicit CardState(QObject *parent, CardZoneLogic *_zone = nullptr, const CardRef &_cardRef = {}, int _id = -1)
+        : QObject(parent), id(_id), cardRef(_cardRef), zone(_zone)
     {
     }
 
     void resetState(bool keepAnnotations);
+
+    int getId() const
+    {
+        return id;
+    }
+
+    void setId(int _id)
+    {
+        id = _id;
+    }
+
+    const CardRef &getCardRef() const
+    {
+        return cardRef;
+    }
+
+    void setCardRef(const CardRef &_cardRef);
+
+    ExactCard getCard() const
+    {
+        return exactCard;
+    }
+
+    const CardInfo &getCardInfo() const
+    {
+        return exactCard.getInfo();
+    }
+
+    void refreshCardInfo();
+
+    bool getTapped() const
+    {
+        return tapped;
+    }
+
+    void setTapped(bool _tapped, bool canAnimate = false);
+
+    bool getFaceDown() const
+    {
+        return facedown;
+    }
+
+    void setFaceDown(bool _facedown);
+
+    const QPoint &getGridPoint() const
+    {
+        return gridPoint;
+    }
+
+    void setGridPoint(const QPoint &_gridPoint)
+    {
+        gridPoint = _gridPoint;
+    }
 
     CardZoneLogic *getZone() const
     {
