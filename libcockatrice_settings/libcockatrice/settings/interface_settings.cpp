@@ -37,7 +37,7 @@ InterfaceSettings::InterfaceSettings(const QString &settingPath, QObject *parent
 
 bool InterfaceSettings::getUseTearOffMenus() const
 {
-    return getValue("useTearOffMenus", QString(), QString(), true).toBool();
+    return getValue("useTearOffMenus", QString(), QString(), false).toBool();
 }
 
 int InterfaceSettings::getCardViewInitialRowsMax() const
