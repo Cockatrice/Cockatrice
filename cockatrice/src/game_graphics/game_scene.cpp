@@ -267,6 +267,8 @@ void GameScene::addPlayer(PlayerLogic *player)
             [this, id = player->getPlayerInfo()->getId()]() { clearArrowsForPlayerLocally(id); });
 
     connect(player->getPlayerEventHandler(), &PlayerEventHandler::cardZoneChanged, this, &GameScene::onCardZoneChanged);
+    connect(player->getPlayerEventHandler(), &PlayerEventHandler::cardViewRefreshRequested, this,
+            &GameScene::onCardViewRefreshRequested);
 
     rearrange();
 }
@@ -623,6 +625,25 @@ void GameScene::onCardZoneChanged(CardItem *card, bool sameZone)
     }
     for (auto *arrow : toDelete) {
         deleteArrow(arrow->getCreatorId(), arrow->getId());
+    }
+}
+
+void GameScene::onCardViewRefreshRequested(CardState *card, bool zoneChanged, PlayerLogic *newOwner)
+{
+    auto *item = qobject_cast<CardItem *>(card->parent());
+    if (!item) {
+        return;
+    }
+    if (zoneChanged) {
+        item->deleteCardInfoPopup();
+    }
+    item->deleteDragItem();
+    if (zoneChanged) {
+        item->setBeingPointedAt(false);
+        item->setHovered(false);
+    }
+    if (newOwner) {
+        item->setOwner(newOwner);
     }
 }
 

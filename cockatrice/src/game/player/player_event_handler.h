@@ -27,6 +27,7 @@
 #include <libcockatrice/protocol/pb/game_event_context.pb.h>
 
 class CardItem;
+class CardState;
 class CardZoneLogic;
 class PlayerLogic;
 
@@ -265,6 +266,14 @@ signals:
 
     void cardZoneChanged(CardItem *card, bool sameZone);
     void requestCardMenuUpdate(CardItem *card);
+    /**
+     * @brief A card was just moved by the server and its view needs refreshing.
+     *
+     * @param card The card that moved.
+     * @param zoneChanged Whether the card crossed a zone boundary.
+     * @param newOwner The player the card now belongs to, or nullptr to leave the owner alone.
+     */
+    void cardViewRefreshRequested(CardState *card, bool zoneChanged, PlayerLogic *newOwner);
 
 private:
     /** Owning player instance. */

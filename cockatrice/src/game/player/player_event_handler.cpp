@@ -1,10 +1,10 @@
 #include "player_event_handler.h"
 
 #include "../../game_graphics/board/card_item.h"
-#include "../../game_graphics/zones/view_zone.h"
 #include "../abstract_game.h"
 #include "../board/arrow_data.h"
 #include "../board/card_list.h"
+#include "../zones/view_zone_logic.h"
 #include "player_actions.h"
 #include "player_logic.h"
 
@@ -57,12 +57,12 @@ void PlayerEventHandler::eventShuffle(const Event_Shuffle &event)
     }
 
     // close all views that contain shuffled cards
-    for (ZoneViewZone *view : zone->getViews()) {
-        if (view != nullptr) {
-            int length = view->getLogic()->getCards().length();
+    for (auto *viewLogic : zone->getViews()) {
+        if (viewLogic != nullptr) {
+            int length = viewLogic->getCards().length();
             // we want to close empty views as well
             if (length == 0 || length > absStart) { // note this assumes views always start at the top of the library
-                view->close();
+                viewLogic->requestClose();
             }
         } else {
             qWarning() << zone->getName() << "of" << player->getPlayerInfo()->getName() << "holds empty zoneview!";
@@ -326,9 +326,9 @@ void PlayerEventHandler::eventMoveCard(const Event_MoveCard &event, const GameEv
     if (card == nullptr) {
         return;
     }
-    if (startZone != targetZone) {
-        card->deleteCardInfoPopup();
-    }
+    const bool zoneChanged = startZone != targetZone;
+    const bool ownerChanged = zoneChanged && startZone->getPlayer() != targetZone->getPlayer();
+    emit cardViewRefreshRequested(card->getState(), zoneChanged, ownerChanged ? targetZone->getPlayer() : nullptr);
     if (event.has_card_name()) {
         QString name = QString::fromStdString(event.card_name());
         QString providerId =
@@ -342,21 +342,12 @@ void PlayerEventHandler::eventMoveCard(const Event_MoveCard &event, const GameEv
         parentCard->getZone()->reorganizeCards();
     }
 
-    card->deleteDragItem();
-
     card->setId(event.new_card_id());
     card->setFaceDown(event.face_down());
     if (startZone != targetZone) {
-        card->setBeingPointedAt(false);
-        card->setHovered(false);
-
         const QList<CardItem *> &attachedCards = card->getAttachedCards();
         for (auto attachedCard : attachedCards) {
             emit targetZone->cardAdded(attachedCard);
-        }
-
-        if (startZone->getPlayer() != targetZone->getPlayer()) {
-            card->setOwner(targetZone->getPlayer());
         }
     }
 

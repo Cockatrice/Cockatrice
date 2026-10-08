@@ -22,6 +22,7 @@ class ZoneViewWidget;
 class CardZone;
 class AbstractCardItem;
 class CardItem;
+class CardState;
 class ServerInfo_Card;
 class PhasesToolbar;
 class QBasicTimer;
@@ -261,6 +262,14 @@ public slots:
     void requestArrowDeletion(int playerId, int arrowId);
 
     void onCardZoneChanged(CardItem *card, bool sameZone);
+    /**
+     * @brief Refreshes the view of a card that the server just moved.
+     *
+     * @param card The card that moved.
+     * @param zoneChanged Whether the card crossed a zone boundary.
+     * @param newOwner The player the card now belongs to, or nullptr to leave the owner alone.
+     */
+    void onCardViewRefreshRequested(CardState *card, bool zoneChanged, PlayerLogic *newOwner);
 
 protected:
     /** @brief Handles hover updates. */
