@@ -1,7 +1,5 @@
 #include "game.h"
 
-#include "../interface/widgets/tabs/tab_game.h"
-
 #include <libcockatrice/protocol/pb/event_game_joined.pb.h>
 
 Game::Game(QObject *_parent,

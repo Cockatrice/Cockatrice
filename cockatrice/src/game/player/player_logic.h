@@ -7,9 +7,8 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "../../game_graphics/player/player_area.h"
-#include "../../interface/widgets/menus/tearoff_menu.h"
 #include "../board/arrow_data.h"
+#include "../board/counter_state.h"
 #include "../interface/deck_loader/loaded_deck.h"
 #include "../zones/hand_zone_logic.h"
 #include "../zones/pile_zone_logic.h"

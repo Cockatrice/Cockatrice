@@ -9,6 +9,8 @@
 #include "../../game/player/player_logic.h"
 #include "../board/abstract_counter.h"
 #include "../game_scene.h"
+#include "player_area.h"
+#include "player_target.h"
 
 #include <QGraphicsObject>
 #include <libcockatrice/deck_list/deck_list.h>
