@@ -715,9 +715,8 @@ static void selectCardsInZone(
     }
 }
 
-void PlayerActions::actSelectAll()
+void PlayerActions::actSelectAll(const CardItem *card)
 {
-    const CardItem *card = player->getGame()->getActiveCard();
     if (!card) {
         return;
     }
@@ -725,9 +724,8 @@ void PlayerActions::actSelectAll()
     selectCardsInZone(card->getZone());
 }
 
-void PlayerActions::actSelectRow()
+void PlayerActions::actSelectRow(const CardItem *card)
 {
-    const CardItem *card = player->getGame()->getActiveCard();
     if (!card) {
         return;
     }
@@ -738,9 +736,8 @@ void PlayerActions::actSelectRow()
     selectCardsInZone(card->getZone(), isSameRow);
 }
 
-void PlayerActions::actSelectColumn()
+void PlayerActions::actSelectColumn(const CardItem *card)
 {
-    const CardItem *card = player->getGame()->getActiveCard();
     if (!card) {
         return;
     }
@@ -954,25 +951,20 @@ void PlayerActions::actCreatePredefinedToken()
     actCreateAnotherToken();
 }
 
-void PlayerActions::actCreateRelatedCard()
+void PlayerActions::actCreateRelatedCard(const CardItem *sourceCard, int index)
 {
-    const CardItem *sourceCard = player->getGame()->getActiveCard();
-
     if (!sourceCard) {
         return;
     }
 
-    auto *action = static_cast<QAction *>(sender());
-    // If there is a better way of passing a CardRelation through a QAction, please add it here.
     auto relatedCards = sourceCard->getCardInfo().getAllRelatedCards();
 
-    CardRelation *cardRelation = relatedCards.at(action->data().toInt());
+    CardRelation *cardRelation = relatedCards.at(index);
     actRequestCreateRelatedFromRelationDialog(sourceCard, cardRelation);
 }
 
-void PlayerActions::actCreateAllRelatedCards()
+void PlayerActions::actCreateAllRelatedCards(const CardItem *sourceCard)
 {
-    const CardItem *sourceCard = player->getGame()->getActiveCard();
     if (!sourceCard) {
         return;
     }

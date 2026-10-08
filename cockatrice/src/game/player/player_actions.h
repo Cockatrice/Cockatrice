@@ -156,9 +156,9 @@ public slots:
     void actRequestMoveBottomCardsToDialog(const QString &targetZone, const QString &zoneDisplayName, bool faceDown);
     void moveBottomCardsTo(int number, const QString &targetZone, bool faceDown);
 
-    void actSelectAll();
-    void actSelectRow();
-    void actSelectColumn();
+    void actSelectAll(const CardItem *card);
+    void actSelectRow(const CardItem *card);
+    void actSelectColumn(const CardItem *card);
 
     void actViewLibrary();
     void actViewHand();
@@ -179,8 +179,8 @@ public slots:
 
     void actOpenDeckInDeckEditor();
     void actCreatePredefinedToken();
-    void actCreateRelatedCard();
-    void actCreateAllRelatedCards();
+    void actCreateRelatedCard(const CardItem *sourceCard, int index);
+    void actCreateAllRelatedCards(const CardItem *sourceCard);
 
     void actRequestMoveCardXCardsFromTopDialog();
     void actMoveCardXCardsFromTop(QList<CardItem *> selectedCards, int number);
