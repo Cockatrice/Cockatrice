@@ -4,6 +4,8 @@
 #include "../../interface/widgets/utility/get_text_with_max.h"
 #include "../board/card_item.h"
 #include "../dialogs/dlg_annotation.h"
+#include "../dialogs/dlg_create_token.h"
+#include "../dialogs/dlg_move_top_cards_until.h"
 #include "../dialogs/dlg_roll_dice.h"
 #include "../player/player_graphics_item.h"
 

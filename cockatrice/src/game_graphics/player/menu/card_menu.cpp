@@ -2,12 +2,12 @@
 
 #include "../../../client/settings/card_counter_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../../../game/player/card_menu_action_type.h"
 #include "../../../interface/widgets/tabs/tab_game.h"
 #include "../../board/card_item.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
 #include "../../game/zones/view_zone_logic.h"
-#include "../card_menu_action_type.h"
 #include "../player_graphics_item.h"
 #include "move_menu.h"
 #include "pt_menu.h"

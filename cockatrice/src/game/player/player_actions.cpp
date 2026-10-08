@@ -1,8 +1,6 @@
 #include "player_actions.h"
 
 #include "../../client/settings/cache_settings.h"
-#include "../../game_graphics/dialogs/dlg_move_top_cards_until.h"
-#include "../../game_graphics/player/card_menu_action_type.h"
 #include "../../game_graphics/zones/table_zone.h"
 #include "../abstract_game.h"
 #include "../zones/view_zone_logic.h"
