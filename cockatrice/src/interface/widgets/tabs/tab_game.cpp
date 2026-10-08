@@ -21,6 +21,7 @@
 #include "../interface/widgets/cards/card_info_frame_widget.h"
 #include "../interface/widgets/dialogs/dlg_create_game.h"
 #include "../interface/widgets/dialogs/dlg_invite_to_game.h"
+#include "../interface/widgets/dialogs/dlg_turn_order.h"
 #include "../interface/widgets/server/game_link.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../interface/widgets/utility/completer_utils.h"
@@ -225,6 +226,8 @@ void TabGame::connectMessageLogToGameEventHandler()
 
     connect(game->getGameEventHandler(), &GameEventHandler::logTurnReversed, messageLog,
             &MessageLogWidget::logReverseTurn);
+    connect(game->getGameEventHandler(), &GameEventHandler::logTurnOrderChanged, messageLog,
+            &MessageLogWidget::logTurnOrderChanged);
 
     connect(game->getGameEventHandler(), &GameEventHandler::logConcede, messageLog, &MessageLogWidget::logConcede);
     connect(game->getGameEventHandler(), &GameEventHandler::logUnconcede, messageLog, &MessageLogWidget::logUnconcede);
@@ -334,6 +337,9 @@ void TabGame::retranslateUi()
     }
     if (aReverseTurn) {
         aReverseTurn->setText(tr("Reverse turn order"));
+    }
+    if (aTurnOrder) {
+        aTurnOrder->setText(tr("&Set turn order..."));
     }
     if (aRemoveLocalArrows) {
         aRemoveLocalArrows->setText(tr("&Remove all local arrows"));
@@ -592,6 +598,25 @@ void TabGame::actConcede()
     }
 }
 
+void TabGame::actTurnOrder()
+{
+    if (!game->isHost() || game->getGameMetaInfo()->started()) {
+        return;
+    }
+
+    QStringList playerNames;
+    for (PlayerLogic *player : game->getPlayerManager()->getPlayers()) {
+        playerNames.append(player->getPlayerInfo()->getName());
+    }
+
+    DlgTurnOrder dlg(playerNames, this);
+    if (dlg.exec() != QDialog::Accepted) {
+        return;
+    }
+
+    game->getGameEventHandler()->handleSetPlayerOrder(dlg.order(), dlg.randomize());
+}
+
 /**
  * Confirms the leave game and sends the leave game command, if applicable.
  *
@@ -801,6 +826,15 @@ void TabGame::processPlayerLeave(PlayerLogic *leavingPlayer)
                 break;
             }
         }
+    }
+
+    // A shuffled local player has their seat changed, so the deck view container
+    // keyed by their previous id must be cleaned up alongside the leaving player.
+    int leavingPlayerId = leavingPlayer->getPlayerInfo()->getId();
+    if (deckViewContainers.contains(leavingPlayerId)) {
+        TabbedDeckViewContainer *deckView = deckViewContainers.take(leavingPlayerId);
+        deckViewContainerLayout->removeWidget(deckView);
+        deckView->deleteLater();
     }
 
     scene->removePlayer(leavingPlayer);
@@ -1051,6 +1085,11 @@ void TabGame::createMenuItems()
     connect(aNextTurn, &QAction::triggered, game->getGameEventHandler(), &GameEventHandler::handleNextTurn);
     aReverseTurn = new QAction(this);
     connect(aReverseTurn, &QAction::triggered, game->getGameEventHandler(), &GameEventHandler::handleReverseTurn);
+    aTurnOrder = new QAction(this);
+    connect(aTurnOrder, &QAction::triggered, this, &TabGame::actTurnOrder);
+    if (!game->isHost() || game->getGameMetaInfo()->started()) {
+        aTurnOrder->setVisible(false);
+    }
     aRemoveLocalArrows = new QAction(this);
     connect(aRemoveLocalArrows, &QAction::triggered, this, &TabGame::actRemoveLocalArrows);
     aRotateViewCW = new QAction(this);
@@ -1096,6 +1135,7 @@ void TabGame::createMenuItems()
     gameMenu->addMenu(phasesMenu);
     gameMenu->addAction(aNextTurn);
     gameMenu->addAction(aReverseTurn);
+    gameMenu->addAction(aTurnOrder);
     gameMenu->addSeparator();
     gameMenu->addAction(aRemoveLocalArrows);
     gameMenu->addAction(aRotateViewCW);
@@ -1124,6 +1164,7 @@ void TabGame::createReplayMenuItems()
     aNextPhaseAction = nullptr;
     aNextTurn = nullptr;
     aReverseTurn = nullptr;
+    aTurnOrder = nullptr;
     aRemoveLocalArrows = nullptr;
     aRotateViewCW = nullptr;
     aRotateViewCCW = nullptr;

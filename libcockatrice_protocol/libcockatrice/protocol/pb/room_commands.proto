@@ -69,6 +69,9 @@ message Command_CreateGame {
 
     // share decklists with all players when selected
     optional bool share_decklists_on_load = 14;
+
+    // shuffle the player order (seats) before each game starts
+    optional bool shuffle_players = 15;
 }
 
 message Command_JoinGame {

@@ -946,6 +946,7 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
     int startingLifeTotal = cmd.has_starting_life_total() ? cmd.starting_life_total() : 20;
 
     bool shareDecklistsOnLoad = cmd.has_share_decklists_on_load() ? cmd.share_decklists_on_load() : false;
+    bool shufflePlayers = cmd.has_shuffle_players() ? cmd.shuffle_players() : false;
 
     const int gameId = databaseInterface->getNextGameId();
     if (gameId == -1) {
@@ -967,7 +968,8 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
                       .spectatorsCanTalk = cmd.spectators_can_talk(),
                       .spectatorsSeeEverything = cmd.spectators_see_everything(),
                       .startingLifeTotal = startingLifeTotal,
-                      .shareDecklistsOnLoad = shareDecklistsOnLoad};
+                      .shareDecklistsOnLoad = shareDecklistsOnLoad,
+                      .shufflePlayers = shufflePlayers};
 
     auto *game = new Server_Game(config, room);
 

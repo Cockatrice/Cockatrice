@@ -180,6 +180,11 @@ message GameCommand {
         /// Server: Server_Player::cmdSetPlaymat
         /// Client: reflected via player properties changed event
         SET_PLAYMAT = 1035;
+
+        /// Set the seating (turn) order of the players.
+        /// Server: Server_AbstractParticipant::cmdSetPlayerOrder
+        /// Client: reflected via Event_PlayerOrderChanged
+        SET_PLAYER_ORDER = 1206;
     }
 
     extensions 100 to max;

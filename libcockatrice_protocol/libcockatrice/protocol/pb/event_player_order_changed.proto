@@ -1,0 +1,13 @@
+syntax = "proto2";
+import "game_event.proto";
+message Event_PlayerOrderChanged {
+    extend GameEvent {
+        optional Event_PlayerOrderChanged ext = 2023;
+    }
+
+    // The new seating order, expressed as player names.
+    repeated string player_names = 1;
+
+    // Whether the order was obtained by randomizing rather than set explicitly.
+    optional bool randomized = 2;
+}

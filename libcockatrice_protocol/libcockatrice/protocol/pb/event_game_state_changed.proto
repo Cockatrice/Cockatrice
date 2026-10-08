@@ -24,4 +24,9 @@ message Event_GameStateChanged {
 
     // the amount of seconds since the game started
     optional uint32 seconds_elapsed = 5;
+
+    // the id of the player this event is addressed to. Used to re-identify the
+    // local player after seats have been shuffled. Only set for events sent to
+    // a specific participant, never for omniscient/replay events.
+    optional sint32 local_player_id = 6;
 }

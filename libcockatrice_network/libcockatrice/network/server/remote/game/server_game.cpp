@@ -47,11 +47,13 @@
 #include <libcockatrice/protocol/pb/event_join.pb.h>
 #include <libcockatrice/protocol/pb/event_kicked.pb.h>
 #include <libcockatrice/protocol/pb/event_leave.pb.h>
+#include <libcockatrice/protocol/pb/event_player_order_changed.pb.h>
 #include <libcockatrice/protocol/pb/event_player_properties_changed.pb.h>
 #include <libcockatrice/protocol/pb/event_replay_added.pb.h>
 #include <libcockatrice/protocol/pb/event_set_active_phase.pb.h>
 #include <libcockatrice/protocol/pb/event_set_active_player.pb.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
+#include <libcockatrice/rng/rng_abstract.h>
 #include <libcockatrice/utility/zone_names.h>
 
 Server_Game::Server_Game(const GameConfig &config, Server_Room *_room)
@@ -62,8 +64,8 @@ Server_Game::Server_Game(const GameConfig &config, Server_Room *_room)
       spectatorsAllowed(config.spectatorsAllowed), spectatorsNeedPassword(config.spectatorsNeedPassword),
       spectatorsCanTalk(config.spectatorsCanTalk), spectatorsSeeEverything(config.spectatorsSeeEverything),
       startingLifeTotal(config.startingLifeTotal), shareDecklistsOnLoad(config.shareDecklistsOnLoad),
-      inactivityCounter(0), startTimeOfThisGame(0), secondsElapsed(0), firstGameStarted(false),
-      turnOrderReversed(false), startTime(QDateTime::currentDateTime()), pingClock(nullptr),
+      shufflePlayers(config.shufflePlayers), inactivityCounter(0), startTimeOfThisGame(0), secondsElapsed(0),
+      firstGameStarted(false), turnOrderReversed(false), startTime(QDateTime::currentDateTime()), pingClock(nullptr),
       deckValidationStrategy(new Server_DefaultDeckValidationStrategy),
       lifecycleStrategy(new Server_DefaultLifecycleStrategy), matchResultStrategy(new Server_NullMatchResultStrategy),
       gameMutex()
@@ -280,13 +282,17 @@ void Server_Game::createGameStateChangedEvent(Event_GameStateChanged *event,
     for (Server_AbstractParticipant *participant : participants.values()) {
         participant->getInfo(event->add_player_list(), recipient, omniscient, withUserInfo);
     }
+
+    if (recipient != nullptr) {
+        event->set_local_player_id(recipient->getPlayerId());
+    }
 }
 
 void Server_Game::sendGameStateToPlayers()
 {
     // game state information for replay and omniscient spectators
     Event_GameStateChanged omniscientEvent;
-    createGameStateChangedEvent(&omniscientEvent, nullptr, true, false);
+    createGameStateChangedEvent(&omniscientEvent, nullptr, true, true);
 
     GameEventContainer *replayCont = prepareGameEvent(omniscientEvent, -1);
     replayCont->set_seconds_elapsed(secondsElapsed - startTimeOfThisGame);
@@ -298,7 +304,7 @@ void Server_Game::sendGameStateToPlayers()
     // the data we used for the replay. All spectators are equal, so we don't need to make a createGameStateChangedEvent
     // call for each one.
     Event_GameStateChanged spectatorNormalEvent;
-    createGameStateChangedEvent(&spectatorNormalEvent, nullptr, false, false);
+    createGameStateChangedEvent(&spectatorNormalEvent, nullptr, false, true);
 
     // send game state info to clients according to their role in the game
     for (auto *participant : participants.values()) {
@@ -311,7 +317,7 @@ void Server_Game::sendGameStateToPlayers()
             }
         } else {
             Event_GameStateChanged event;
-            createGameStateChangedEvent(&event, participant, participant->isJudge(), false);
+            createGameStateChangedEvent(&event, participant, participant->isJudge(), true);
 
             gec = prepareGameEvent(event, -1);
         }
@@ -349,6 +355,11 @@ void Server_Game::doStartGameIfReady(bool forceStartGame)
     if (lifecycleStrategy->onGameStarting(this) == Server_GameLifecycleStrategy::StartAction::Handled) {
         locker.unlock();
         return;
+    }
+
+    if (shufflePlayers && players.size() > 1) {
+        shufflePlayerSeats();
+        players = getPlayers();
     }
 
     for (Server_AbstractPlayer *player : players.values()) {
@@ -402,6 +413,115 @@ void Server_Game::doStartGameIfReady(bool forceStartGame)
 void Server_Game::startGameIfReady(bool forceStartGame)
 {
     emit sigStartGameIfReady(forceStartGame);
+}
+
+void Server_Game::shufflePlayerSeats()
+{
+    QMutexLocker locker(&gameMutex);
+
+    // Split participants into players and spectators. Spectators keep their seats.
+    QList<Server_AbstractParticipant *> players;
+    QList<Server_AbstractParticipant *> spectators;
+    for (auto *participant : participants.values()) {
+        if (participant->isSpectator()) {
+            spectators.append(participant);
+        } else {
+            players.append(participant);
+        }
+    }
+
+    // Fisher-Yates shuffle of the players.
+    QList<Server_AbstractParticipant *> shuffledPlayers;
+    while (!players.isEmpty()) {
+        const int index = rng->rand(0, players.size() - 1);
+        shuffledPlayers.append(players.takeAt(index));
+    }
+
+    reseatPlayers(shuffledPlayers + spectators, true);
+}
+
+void Server_Game::reorderPlayerSeats(const QList<QString> &orderedNames)
+{
+    QMutexLocker locker(&gameMutex);
+
+    // Split participants into players and spectators. Spectators keep their seats.
+    QList<Server_AbstractParticipant *> players;
+    QList<Server_AbstractParticipant *> spectators;
+    for (auto *participant : participants.values()) {
+        if (participant->isSpectator()) {
+            spectators.append(participant);
+        } else {
+            players.append(participant);
+        }
+    }
+
+    // Order the players according to the given names, appending any player that
+    // was not listed (should not happen) in their current seat order.
+    QList<Server_AbstractParticipant *> orderedPlayers;
+    QSet<Server_AbstractParticipant *> placed;
+    for (const QString &name : orderedNames) {
+        for (auto *participant : players) {
+            if (!placed.contains(participant) && (QString::fromStdString(participant->getUserInfo()->name()) == name)) {
+                orderedPlayers.append(participant);
+                placed.insert(participant);
+                break;
+            }
+        }
+    }
+    for (auto *participant : players) {
+        if (!placed.contains(participant)) {
+            orderedPlayers.append(participant);
+        }
+    }
+
+    reseatPlayers(orderedPlayers + spectators, false);
+}
+
+void Server_Game::reseatPlayers(const QList<Server_AbstractParticipant *> &orderedParticipants, bool randomized)
+{
+    QMutexLocker locker(&gameMutex);
+
+    // Reassign fresh, unique player ids following the given order.
+    QMap<int, Server_AbstractParticipant *> newParticipants;
+    int newHostId = -1;
+    for (auto *participant : orderedParticipants) {
+        const int newPlayerId = nextPlayerId++;
+        const int oldPlayerId = participant->getPlayerId();
+        participant->setPlayerId(newPlayerId);
+        newParticipants.insert(newPlayerId, participant);
+
+        // Keep the user interface's per-user game/seat mapping in sync so that
+        // incoming game commands are routed to the participant under its new id.
+        if (participant->getUserInterface()) {
+            participant->getUserInterface()->playerAddedToGame(gameId, room->getId(), newPlayerId);
+        }
+
+        if (!participant->isSpectator() && (participant->getUserInfo()->user_level() & ServerInfo_User::IsRegistered)) {
+            const QString playerName = QString::fromStdString(participant->getUserInfo()->name());
+            room->getServer()->removePersistentPlayer(playerName, room->getId(), gameId, oldPlayerId);
+            room->getServer()->addPersistentPlayer(playerName, room->getId(), gameId, newPlayerId);
+        }
+
+        if (participant->getUserInfo()->name() == creatorInfo->name()) {
+            newHostId = newPlayerId;
+        }
+    }
+    participants = newParticipants;
+
+    if (newHostId != -1) {
+        hostId = newHostId;
+        sendGameEventContainer(prepareGameEvent(Event_GameHostChanged(), hostId));
+    }
+
+    // Broadcast the new seating order so that every client can display it.
+    Event_PlayerOrderChanged event;
+    for (auto *participant : orderedParticipants) {
+        if (!participant->isSpectator()) {
+            event.add_player_names(QString::fromStdString(participant->getUserInfo()->name()).toStdString());
+        }
+    }
+    event.set_randomized(randomized);
+    sendGameEventContainer(prepareGameEvent(event, -1));
 }
 
 void Server_Game::stopGameIfFinished()
@@ -875,6 +995,7 @@ void Server_Game::getInfo(ServerInfo_Game &result) const
         result.set_spectators_can_chat(spectatorsCanTalk);
         result.set_spectators_omniscient(spectatorsSeeEverything);
         result.set_share_decklists_on_load(shareDecklistsOnLoad);
+        result.set_shuffle_players(shufflePlayers);
         result.set_spectators_count(getSpectatorCount());
         result.set_start_time(startTime.toSecsSinceEpoch());
     }

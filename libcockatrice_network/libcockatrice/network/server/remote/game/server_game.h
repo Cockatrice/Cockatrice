@@ -74,6 +74,7 @@ private:
     bool spectatorsSeeEverything;
     int startingLifeTotal;
     bool shareDecklistsOnLoad;
+    bool shufflePlayers;
     int inactivityCounter;
     int startTimeOfThisGame, secondsElapsed;
     bool firstGameStarted;
@@ -93,6 +94,7 @@ private:
                                      Server_AbstractParticipant *recipient,
                                      bool omniscient,
                                      bool withUserInfo);
+    void reseatPlayers(const QList<Server_AbstractParticipant *> &orderedParticipants, bool randomized);
     void storeGameInformation();
 signals:
     void sigStartGameIfReady(bool override);
@@ -172,6 +174,10 @@ public:
     {
         return shareDecklistsOnLoad;
     }
+    bool getShufflePlayers() const
+    {
+        return shufflePlayers;
+    }
     Response::ResponseCode
     checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions, bool asJudge);
     bool containsUser(const QString &userName) const;
@@ -186,6 +192,8 @@ public:
     bool kickParticipant(int playerId);
     void startGameIfReady(bool forceStartGame);
     void stopGameIfFinished();
+    void shufflePlayerSeats();
+    void reorderPlayerSeats(const QList<QString> &orderedNames);
     int getActivePlayer() const
     {
         return activePlayer;

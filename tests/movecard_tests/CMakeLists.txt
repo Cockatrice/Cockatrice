@@ -1,7 +1,9 @@
 add_executable(reverse_card_move_test reverse_card_move_test.cpp)
+add_executable(player_order_test player_order_test.cpp)
 
 if(NOT GTEST_FOUND)
   add_dependencies(reverse_card_move_test gtest)
+  add_dependencies(player_order_test gtest)
 endif()
 
 target_link_libraries(
@@ -13,4 +15,14 @@ target_link_libraries(
   PRIVATE ${TEST_QT_MODULES}
 )
 
+target_link_libraries(
+  player_order_test
+  PRIVATE libcockatrice_network_server_remote
+  PRIVATE libcockatrice_rng
+  PRIVATE Threads::Threads
+  PRIVATE ${GTEST_BOTH_LIBRARIES}
+  PRIVATE ${TEST_QT_MODULES}
+)
+
 add_test(NAME reverse_card_move_test COMMAND reverse_card_move_test)
+add_test(NAME player_order_test COMMAND player_order_test)

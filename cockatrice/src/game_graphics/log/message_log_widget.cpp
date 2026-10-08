@@ -586,6 +586,20 @@ void MessageLogWidget::logReverseTurn(PlayerLogic *player, bool reversed)
                                 .arg(reversed ? tr("reversed") : tr("normal")));
 }
 
+void MessageLogWidget::logTurnOrderChanged(QStringList playerNames, bool randomized)
+{
+    QStringList sanitizedNames;
+    for (const QString &name : playerNames) {
+        sanitizedNames.append(sanitizeHtml(name));
+    }
+    const QString order = sanitizedNames.join(" -> ");
+    if (randomized) {
+        appendHtmlServerMessage(tr("Randomized turn order: %1.").arg(order));
+    } else {
+        appendHtmlServerMessage(tr("New turn order set: %1.").arg(order));
+    }
+}
+
 void MessageLogWidget::logRollDie(PlayerLogic *player, int sides, const QList<uint> &rolls)
 {
     if (rolls.length() == 1) {
