@@ -12,9 +12,15 @@ void CardState::resetState(bool keepAnnotations)
         annotation.clear();
     }
     attachedTo = nullptr;
+    attachedCards.clear();
     setTapped(false, false);
     setDoesntUntap(false);
     emit stateReset();
+}
+
+void CardState::deleteView()
+{
+    emit viewDeleteRequested();
 }
 
 void CardState::setCardRef(const CardRef &_cardRef)
@@ -187,7 +193,7 @@ void CardState::setDestroyOnZoneChange(bool _destroyOnZoneChange)
     emit stateChanged();
 }
 
-void CardState::setAttachedTo(CardItem *_attachedTo)
+void CardState::setAttachedTo(CardState *_attachedTo)
 {
     if (attachedTo == _attachedTo) {
         return;

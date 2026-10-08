@@ -1,6 +1,7 @@
 #ifndef COCKATRICE_CARD_STATE_H
 #define COCKATRICE_CARD_STATE_H
 
+#include <QList>
 #include <QMap>
 #include <QObject>
 #include <QPoint>
@@ -29,7 +30,8 @@ private:
     bool doesntUntap = false;
     bool destroyOnZoneChange = false;
 
-    CardItem *attachedTo = nullptr;
+    CardState *attachedTo = nullptr;
+    QList<CardItem *> attachedCards;
     CardZoneLogic *zone = nullptr;
 
 signals:
@@ -48,8 +50,10 @@ signals:
     void ptChanged(const QString &newPt);
     void doesntUntapChanged(bool newValue);
     void destroyOnZoneChangeChanged(bool newValue);
-    void attachedToChanged(CardItem *newAttachedTo);
+    void attachedToChanged(CardState *newAttachedTo);
     void zoneChanged(CardState *changedCard, CardZoneLogic *newZone);
+
+    void viewDeleteRequested();
 
 public:
     explicit CardState(QObject *parent, CardZoneLogic *_zone = nullptr, const CardRef &_cardRef = {}, int _id = -1)
@@ -58,6 +62,15 @@ public:
     }
 
     void resetState(bool keepAnnotations);
+
+    /**
+     * @brief Asks the card view owning this state to tear itself down.
+     *
+     * The state never holds a card item directly, so it cannot delete one. It asks instead and lets the view run
+     * its own teardown, which detaches attachments, drops it from the active card slot and unregisters its
+     * animations before the graphics object goes away.
+     */
+    void deleteView();
 
     int getId() const
     {
@@ -184,12 +197,27 @@ public:
 
     void setDestroyOnZoneChange(bool _destroyOnZoneChange);
 
-    CardItem *getAttachedTo() const
+    CardState *getAttachedTo() const
     {
         return attachedTo;
     }
 
-    void setAttachedTo(CardItem *_attachedTo);
+    void setAttachedTo(CardState *_attachedTo);
+
+    void addAttachedCard(CardItem *card)
+    {
+        attachedCards.append(card);
+    }
+
+    void removeAttachedCard(CardItem *card)
+    {
+        attachedCards.removeOne(card);
+    }
+
+    const QList<CardItem *> &getAttachedCards() const
+    {
+        return attachedCards;
+    }
 };
 
 #endif // COCKATRICE_CARD_STATE_H
