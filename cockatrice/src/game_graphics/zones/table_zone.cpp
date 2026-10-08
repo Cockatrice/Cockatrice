@@ -220,11 +220,14 @@ void TableZone::reorganizeCards()
         cardItems()[i]->setPos(actualX, actualY);
         cardItems()[i]->setRealZValue(ZValues::tableCardZValue(actualX, actualY));
 
-        QListIterator<CardItem *> attachedCardIterator(cardItems()[i]->getAttachedCards());
+        QListIterator<CardState *> attachedCardIterator(cardItems()[i]->getAttachedCards());
         int j = 0;
         while (attachedCardIterator.hasNext()) {
             ++j;
-            CardItem *attachedCard = attachedCardIterator.next();
+            CardItem *attachedCard = qobject_cast<CardItem *>(attachedCardIterator.next()->parent());
+            if (attachedCard == nullptr) {
+                continue;
+            }
             qreal childX = actualX - j * STACKED_CARD_OFFSET_X;
             qreal childY = y + 5;
             attachedCard->setPos(childX, childY);

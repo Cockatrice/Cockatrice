@@ -23,7 +23,7 @@
 #include <QObject>
 #include <libcockatrice/utility/card_ref.h>
 
-class CardItem;
+class CardState;
 class CardMenu;
 class PlayerGraphicsItem;
 class PlayerMenu : public QObject
@@ -39,7 +39,7 @@ signals:
 
 public slots:
     void setMenusForGraphicItems();
-    QMenu *updateCardMenu(CardItem *card);
+    QMenu *updateCardMenu(CardState *card);
 
 private slots:
     void refreshShortcuts();

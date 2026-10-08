@@ -181,7 +181,7 @@ void GameScene::onCardSelectionChanged(AbstractCardItem *abstractCard, bool sele
     auto *owner = card->getOwner();
 
     if (selected) {
-        owner->requestCardMenuUpdate(card);
+        owner->requestCardMenuUpdate(card->getState());
         return;
     }
 
@@ -207,7 +207,7 @@ void GameScene::onCardRightClicked(AbstractCardItem *abstractCard, QPoint screen
 
     setActiveCard(card);
 
-    if (auto *menu = view->getPlayerMenu()->updateCardMenu(card)) {
+    if (auto *menu = view->getPlayerMenu()->updateCardMenu(card->getState())) {
         menu->popup(screenPos);
     }
 }
@@ -626,11 +626,15 @@ void GameScene::requestArrowDeletion(int playerId, int arrowId)
     }
 }
 
-void GameScene::onCardZoneChanged(CardItem *card, bool sameZone)
+void GameScene::onCardZoneChanged(CardState *card, bool sameZone)
 {
+    auto *item = qobject_cast<CardItem *>(card->parent());
+    if (!item) {
+        return;
+    }
     QList<ArrowItem *> toDelete;
     for (auto *arrow : arrowRegistry.all()) {
-        if (arrow->getStartItem() == card || arrow->getTargetItem() == card) {
+        if (arrow->getStartItem() == item || arrow->getTargetItem() == item) {
             if (sameZone) {
                 arrow->updatePath();
             } else {

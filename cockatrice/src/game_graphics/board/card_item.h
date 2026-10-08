@@ -114,15 +114,15 @@ public:
         return state->getAttachedTo();
     }
     void setAttachedTo(CardItem *_attachedTo);
-    void addAttachedCard(CardItem *card)
+    void addAttachedCard(CardState *card)
     {
         state->addAttachedCard(card);
     }
-    void removeAttachedCard(CardItem *card)
+    void removeAttachedCard(CardState *card)
     {
         state->removeAttachedCard(card);
     }
-    [[nodiscard]] const QList<CardItem *> &getAttachedCards() const
+    [[nodiscard]] const QList<CardState *> &getAttachedCards() const
     {
         return state->getAttachedCards();
     }

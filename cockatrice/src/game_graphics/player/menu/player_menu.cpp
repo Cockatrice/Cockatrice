@@ -70,22 +70,24 @@ void PlayerMenu::setMenusForGraphicItems()
     }
 }
 
-QMenu *PlayerMenu::updateCardMenu(CardItem *card)
+QMenu *PlayerMenu::updateCardMenu(CardState *card)
 {
     if (!card) {
         emit cardMenuUpdated(nullptr);
         return nullptr;
     }
 
+    auto *cardItem = qobject_cast<CardItem *>(card->parent());
+
     // If is spectator (as spectators don't need card menus), return
     // only update the menu if the card is actually selected
     if ((player->getLogic()->getGame()->getPlayerManager()->isSpectator() &&
          !player->getLogic()->getGame()->getPlayerManager()->isJudge()) ||
-        player->getGameScene()->getActiveCard() != card) {
+        cardItem == nullptr || player->getGameScene()->getActiveCard() != cardItem) {
         return nullptr;
     }
 
-    CardMenu *menu = new CardMenu(player, card, shortcutsActive);
+    CardMenu *menu = new CardMenu(player, cardItem, shortcutsActive);
     connect(menu, &CardMenu::cardInfoRequested, this, &PlayerMenu::cardInfoRequested);
     emit cardMenuUpdated(menu);
 

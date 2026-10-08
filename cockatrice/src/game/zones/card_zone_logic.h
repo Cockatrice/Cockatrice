@@ -12,6 +12,7 @@
 
 #include <QLoggingCategory>
 #include <QObject>
+#include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
 
 inline Q_LOGGING_CATEGORY(CardZoneLogicLog, "card_zone_logic");
 
@@ -28,6 +29,8 @@ class CardZoneLogic : public QObject
 
 signals:
     void cardAdded(CardState *addedCard);
+    /** @brief Asks the graphics side to build the card item for @p cardInfo and add it to this zone. */
+    void requestCreateCard(const ServerInfo_Card &cardInfo, bool reorganize);
     void cardCountChanged();
     void reorganizeCards();
     void updateGraphics();

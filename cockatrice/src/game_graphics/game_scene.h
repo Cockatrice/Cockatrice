@@ -262,7 +262,7 @@ public slots:
     /// Queues up arrow deletion but doesn't directly modify the scene
     void requestArrowDeletion(int playerId, int arrowId);
 
-    void onCardZoneChanged(CardItem *card, bool sameZone);
+    void onCardZoneChanged(CardState *card, bool sameZone);
     /**
      * @brief Refreshes the view of a card that the server just moved.
      *

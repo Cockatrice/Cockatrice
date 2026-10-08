@@ -16,6 +16,7 @@ CardZone::CardZone(CardZoneLogic *_logic, QGraphicsItem *parent)
     connect(logic, &CardZoneLogic::cardCountChanged, this, &CardZone::invalidateItems);
     connect(logic, &CardZoneLogic::reorganizeCards, this, &CardZone::invalidateItems);
     connect(logic, &CardZoneLogic::cardAdded, this, &CardZone::onCardAdded);
+    connect(logic, &CardZoneLogic::requestCreateCard, this, &CardZone::onCreateCardRequested);
     connect(logic, &CardZoneLogic::setGraphicsVisibility, this, [this](bool v) { this->setVisible(v); });
     connect(logic, &CardZoneLogic::updateGraphics, this, [this]() { update(); });
     connect(logic, &CardZoneLogic::reorganizeCards, this, &CardZone::reorganizeCards);
@@ -49,6 +50,14 @@ void CardZone::onCardAdded(CardState *addedCard)
     addedItem->setParentItem(this);
     addedItem->setVisible(true);
     addedItem->update();
+}
+
+void CardZone::onCreateCardRequested(const ServerInfo_Card &cardInfo, bool reorganize)
+{
+    CardRef cardRef = {QString::fromStdString(cardInfo.name()), QString::fromStdString(cardInfo.provider_id())};
+    auto *card = new CardItem(getLogic()->getPlayer(), nullptr, cardRef, cardInfo.id());
+    card->processCardInfo(cardInfo);
+    getLogic()->addCard(card->getState(), reorganize, cardInfo.x(), cardInfo.y());
 }
 
 void CardZone::retranslateUi()
