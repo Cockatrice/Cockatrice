@@ -22,7 +22,6 @@ void TableZoneLogic::addCardImpl(CardItem *card, int _x, int _y)
         card->setDoesntUntap(true);
     }
     card->setGridPoint(QPoint(_x, _y));
-    card->setVisible(true);
 }
 
 CardItem *TableZoneLogic::takeCard(int position, int cardId, bool toNewZone)

@@ -73,7 +73,7 @@ SelectZone *SelectZone::findOwningSelectZone(const QGraphicsItem *card)
 
 SelectZone::StackLayoutParams SelectZone::buildStackParams(qreal minOffset) const
 {
-    const auto &cards = getLogic()->getCards();
+    const auto &cards = cardItems();
     if (cards.isEmpty()) {
         return {0, boundingRect().height(), 0.0, 0.0, minOffset};
     }
@@ -85,7 +85,7 @@ SelectZone::StackLayoutParams SelectZone::buildStackParams(qreal minOffset) cons
 
 int SelectZone::calcDropIndexFromY(qreal dropY, bool allowCountExpand, qreal minOffset) const
 {
-    const auto &cards = getLogic()->getCards();
+    const auto &cards = cardItems();
     if (cards.isEmpty()) {
         return 0;
     }
@@ -103,7 +103,7 @@ void SelectZone::restoreStaleEscapedCards()
     if (!cardClipContainer) {
         return;
     }
-    for (auto *card : getLogic()->getCards()) {
+    for (auto *card : cardItems()) {
         // A card parented to the zone (instead of the clip container) should
         // only occur while it is actively hovered. If hover cleanup was
         // missed, reparent it back so clipping resumes.
@@ -115,7 +115,7 @@ void SelectZone::restoreStaleEscapedCards()
 
 void SelectZone::layoutCardsVertically(const StackLayoutParams &params)
 {
-    const auto &cards = getLogic()->getCards();
+    const auto &cards = cardItems();
     if (cards.isEmpty() || params.cardCount <= 0) {
         return;
     }
@@ -150,9 +150,9 @@ SelectZone::~SelectZone()
     if (cardClipContainer) {
         // Reparent any hover-escaped cards back to the clip container so Qt's
         // parent-child tree is consistent for destruction. setParentItem() does
-        // not invalidate getLogic()->getCards() (it modifies the graphics tree,
-        // not the zone's logical card list).
-        for (auto *card : getLogic()->getCards()) {
+        // not invalidate cardItems() — it only moves the item in the graphics
+        // tree, it never changes the zone's contents.
+        for (auto *card : cardItems()) {
             if (card && card->parentItem() == this) {
                 card->setParentItem(cardClipContainer);
             }
@@ -235,7 +235,7 @@ void SelectZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         }
 
         QRectF selectionRect = QRectF(selectionOrigin, pos).normalized();
-        for (auto card : getLogic()->getCards()) {
+        for (auto card : cardItems()) {
             if (card->getAttachedTo() && card->getAttachedTo()->getZone() != getLogic()) {
                 continue;
             }
