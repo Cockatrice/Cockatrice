@@ -76,9 +76,13 @@ public slots:
      *
      * Runs synchronously on the calling thread.  The caller should ensure
      * that any signal receivers are already connected before invoking this.
+     * @param ignoreCache Skip the binary cache lookup and re-parse the source
+     *        files from disk, refreshing the cache afterwards. Used for
+     *        explicit reloads so that edits the source hash cannot see are
+     *        still picked up.
      * @return Status of the main database load.
      */
-    LoadStatus loadCardDatabases();
+    LoadStatus loadCardDatabases(bool ignoreCache = false);
 
     /**
      * @brief Loads a single card database file into the given snapshot.
@@ -131,9 +135,10 @@ private:
 
     /**
      * @brief Performs the actual load work synchronously on the calling thread.
+     * @param ignoreCache Skip the binary cache lookup and re-parse from disk.
      * @return Status of the main database load.
      */
-    LoadStatus doLoadCardDatabases();
+    LoadStatus doLoadCardDatabases(bool ignoreCache);
 
     /**
      * @brief Collects custom card database paths recursively.

@@ -571,9 +571,15 @@ static void migrateLegacySets(const QString &settingsPath)
     QSettings cardDbIni(settingsPath + "cardDatabase.ini", QSettings::IniFormat);
     for (const auto &shortName : groups) {
         legacySetting.beginGroup(shortName);
-        cardDbIni.setValue("sets/" + shortName + "/sortKey", legacySetting.value("sortkey"));
-        cardDbIni.setValue("sets/" + shortName + "/enabled", legacySetting.value("enabled"));
-        cardDbIni.setValue("sets/" + shortName + "/isKnown", legacySetting.value("isknown"));
+        if (legacySetting.contains("sortkey")) {
+            cardDbIni.setValue("sets/" + shortName + "/sortKey", legacySetting.value("sortkey"));
+        }
+        if (legacySetting.contains("enabled")) {
+            cardDbIni.setValue("sets/" + shortName + "/enabled", legacySetting.value("enabled"));
+        }
+        if (legacySetting.contains("isknown")) {
+            cardDbIni.setValue("sets/" + shortName + "/isKnown", legacySetting.value("isknown"));
+        }
         legacySetting.endGroup();
     }
     legacySetting.endGroup();

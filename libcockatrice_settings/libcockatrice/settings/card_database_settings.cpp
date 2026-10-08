@@ -88,6 +88,20 @@ ICardSetPriorityController::SetOptions CardDatabaseSettings::getSetOptions(QStri
     return setOptionsCache.value(shortName);
 }
 
+QStringList CardDatabaseSettings::getEnabledSetNames() const
+{
+    QMutexLocker lock(&setOptionsMutex);
+    ensureSetOptionsLoaded();
+    QStringList names;
+    for (auto it = setOptionsCache.constBegin(); it != setOptionsCache.constEnd(); ++it) {
+        if (it.value().enabled) {
+            names << it.key();
+        }
+    }
+    names.sort();
+    return names;
+}
+
 void CardDatabaseSettings::saveSets(const QVector<ICardSetPriorityController::SetSaveData> &data)
 {
     batchWrite([&](QSettings &s) {

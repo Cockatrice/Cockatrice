@@ -78,7 +78,9 @@ void CardDatabase::loadCardDatabases()
 
 void CardDatabase::reloadCardDatabasesAndNotify()
 {
-    loadCardDatabases();
+    // An explicit reload bypasses the binary cache so the files on disk are
+    // always re-read, even when their size/mtime hash still matches the cache.
+    loadStatus = loader->loadCardDatabases(/* ignoreCache */ true);
 
     if (loadStatus == Ok) {
         checkUnknownSets();

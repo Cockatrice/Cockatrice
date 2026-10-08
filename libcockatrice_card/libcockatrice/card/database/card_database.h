@@ -177,8 +177,12 @@ public slots:
 
     void addFormat(const FormatRulesPtr &format);
 
-    /** @brief Loads card databases from configured paths. */
+    /** @brief Loads card databases from configured paths, using the binary cache when valid. */
     void loadCardDatabases();
+    /**
+     * @brief Reloads card databases from disk, bypassing the binary cache,
+     *        and notifies observers of the fresh state.
+     */
     void reloadCardDatabasesAndNotify();
 
     /** @brief Saves custom tokens to file.
