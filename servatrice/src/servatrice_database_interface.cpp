@@ -1,24 +1,46 @@
 #include "servatrice_database_interface.h"
 
 #include "deck_tag_serialization.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_chat_message.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_moderator_login.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user_alt.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user_session.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_warning.pb.h"
 #include "servatrice.h"
-#include "serversocketinterface.h"
+#include "server.h"
+#include "server_protocolhandler.h"
 #include "settingscache.h"
 
+#include <QByteArray>
 #include <QChar>
 #include <QDateTime>
 #include <QDebug>
-#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonValue>
 #include <QLoggingCategory>
+#include <QMap>
+#include <QMessageLogger>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QSet>
+#include <QSetIterator>
+#include <QSharedPointer>
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QStringList>
+#include <QVariant>
+#include <QVariantList>
+#include <google/protobuf/stubs/common.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/utility/passwordhasher.h>
+#include <qalgorithms.h>
+#include <qnamespace.h>
+#include <string>
 
 inline Q_LOGGING_CATEGORY(DatabaseInterfaceLog, "database_interface");
 

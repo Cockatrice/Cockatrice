@@ -1,6 +1,23 @@
 #include "card_database_display_model.h"
 
 #include "card_database_model.h"
+#include "libcockatrice/card/card_localization.h"
+#include "libcockatrice/filters/filter_string.h"
+#include "libcockatrice/filters/filter_tree.h"
+
+#include <QAbstractItemModel>
+#include <QChar>
+#include <QList>
+#include <QMap>
+#include <QSharedPointer>
+#include <QStringList>
+#include <QVariant>
+#include <QtGlobal>
+#include <qnamespace.h>
+#include <string>
+#include <utility>
+
+class QObject;
 
 CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)
     : QSortFilterProxyModel(parent), isToken(ShowAll), filterString(nullptr)

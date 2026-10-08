@@ -8,7 +8,11 @@
 #ifndef BAR_WIDGET_H
 #define BAR_WIDGET_H
 
+#include <QColor>
+#include <QString>
 #include <QWidget>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
 
 class BarWidget : public QWidget
 {

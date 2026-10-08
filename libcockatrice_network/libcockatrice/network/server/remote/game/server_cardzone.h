@@ -20,15 +20,16 @@
 #ifndef SERVER_CARDZONE_H
 #define SERVER_CARDZONE_H
 
+#include <QList>
 #include <QMap>
 #include <QSet>
 #include <QString>
+#include <QtGlobal>
 #include <libcockatrice/protocol/pb/serverinfo_zone.pb.h>
 
 class Server_Card;
 class Server_AbstractPlayer;
 class Server_AbstractParticipant;
-class Server_Game;
 class GameEventStorage;
 
 class Server_CardZone

@@ -1,5 +1,10 @@
+#include "libcockatrice/card/card_localization.h"
+
 #include "gtest/gtest.h"
-#include <QSettings>
+#include <QHash>
+#include <QList>
+#include <QString>
+#include <QStringList>
 #include <QTemporaryDir>
 #include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/cache_storage_settings.h>
@@ -15,6 +20,8 @@
 #include <libcockatrice/settings/tabs_settings.h>
 #include <libcockatrice/settings/updates_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <string>
+#include <utility>
 
 namespace
 {

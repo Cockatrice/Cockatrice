@@ -2,9 +2,14 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../deck_editor/deck_editor_filter_dock_widget.h"
 #include "../tabs/abstract_tab_deck_editor.h"
 
+#include <QAction>
+#include <QList>
+#include <QString>
 #include <libcockatrice/settings/recents_settings.h>
+
 DeckEditorMenu::DeckEditorMenu(AbstractTabDeckEditor *parent) : QMenu(parent), deckEditor(parent)
 {
     aNewDeck = new QAction(QString(), this);

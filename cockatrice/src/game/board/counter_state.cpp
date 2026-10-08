@@ -1,5 +1,7 @@
 #include "counter_state.h"
 
+#include "libcockatrice/protocol/pb/serverinfo_counter.pb.h"
+
 #include <libcockatrice/utility/color.h>
 
 CounterState::CounterState(int id, const QString &name, const QColor &color, int radius, int value, QObject *parent)

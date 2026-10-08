@@ -1,29 +1,44 @@
 #include "appearance_settings_page.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../../client/settings/card_counter_settings.h"
 #include "../../client/settings/card_counter_settings.h"
 #include "../../palette_editor/palette_editor_dialog.h"
+#include "../../theme_config.h"
 #include "../dialogs/override_printing_warning.h"
 #include "../general/home_tab_button_color.h"
 #include "../interface/theme_manager.h"
 #include "../interface/widgets/general/background_sources.h"
 #include "../playmat/playmat_collection_dialog.h"
-#include "../playmat/playmat_settings_dialog.h"
+#include "libcockatrice/interfaces/interface_interface_settings_provider.h"
+#include "libcockatrice/utility/macros.h"
 
+#include <QAbstractButton>
 #include <QApplication>
+#include <QColor>
 #include <QColorDialog>
+#include <QDebug>
 #include <QDesktopServices>
+#include <QDir>
 #include <QGridLayout>
-#include <QHBoxLayout>
+#include <QGroupBox>
 #include <QMessageBox>
+#include <QObject>
+#include <QSharedPointer>
+#include <QString>
+#include <QStringList>
+#include <QStringLiteral>
 #include <QStyleFactory>
 #include <QTimer>
+#include <QUrl>
+#include <QVBoxLayout>
+#include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
+#include <qnamespace.h>
 
 AppearanceSettingsPage::AppearanceSettingsPage()
 {

@@ -2,22 +2,38 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../pixel_map_generator.h"
-#include "../quick_settings/settings_button_widget.h"
 #include "deck_preview/deck_preview_color_identity_filter_widget.h"
 #include "deck_preview/deck_preview_widget.h"
+#include "libcockatrice/card/database/card_database.h"
+#include "libcockatrice/card/database/card_database_loader.h"
 #include "visual_deck_storage_folder_display_widget.h"
+#include "visual_deck_storage_model.h"
 #include "visual_deck_storage_quick_settings_widget.h"
 #include "visual_deck_storage_search_widget.h"
+#include "visual_deck_storage_sort_filter_proxy_model.h"
 #include "visual_deck_storage_sort_widget.h"
 #include "visual_deck_storage_tag_filter_widget.h"
 
+#include <QAbstractItemModel>
+#include <QChar>
+#include <QDebug>
+#include <QHBoxLayout>
 #include <QLabel>
+#include <QList>
+#include <QModelIndex>
+#include <QPushButton>
+#include <QScrollArea>
+#include <QStringLiteral>
 #include <QTimer>
+#include <QToolButton>
 #include <QVBoxLayout>
+#include <QVariant>
+#include <functional>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <qnamespace.h>
 
 VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(parent)
 {

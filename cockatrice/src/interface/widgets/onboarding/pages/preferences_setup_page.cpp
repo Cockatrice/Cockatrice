@@ -2,6 +2,7 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../../client/sound_engine.h"
+#include "../first_run_wizard_page.h"
 #include "libcockatrice/settings/interface_settings.h"
 #include "libcockatrice/settings/sound_settings.h"
 #include "libcockatrice/settings/tabs_settings.h"
@@ -9,10 +10,16 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QFormLayout>
+#include <QFrame>
 #include <QGroupBox>
 #include <QLabel>
+#include <QList>
 #include <QScrollArea>
+#include <QString>
 #include <QVBoxLayout>
+#include <QVariant>
+#include <QWidget>
+#include <QtGlobal>
 
 namespace
 {

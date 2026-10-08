@@ -1,7 +1,18 @@
-#include "mocks.h"
+#include "libcockatrice/card/database/card_database.h"
+#include "libcockatrice/card/database/card_database_loader.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/card/set/card_set_list.h"
 #include "test_card_database_path_provider.h"
 
 #include "gtest/gtest.h"
+#include <QDate>
+#include <QFile>
+#include <QHash>
+#include <QIODevice>
+#include <QList>
+#include <QSharedPointer>
+#include <QString>
 #include <QTemporaryDir>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/card/database/card_database_data.h>
@@ -10,6 +21,8 @@
 #include <libcockatrice/card/printing/printing_info.h>
 #include <libcockatrice/interfaces/noop_card_preference_provider.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
+#include <string>
+
 namespace
 {
 

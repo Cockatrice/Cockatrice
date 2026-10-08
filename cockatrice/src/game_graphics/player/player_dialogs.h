@@ -1,12 +1,26 @@
 #ifndef COCKATRICE_PLAYER_DIALOGS_H
 #define COCKATRICE_PLAYER_DIALOGS_H
-#include "../../game/player/player_actions.h"
 #include "player_graphics_item.h"
 
-#include <QGraphicsView>
-#include <QObject>
+// IWYU pragma: keep
+// MoveTopCardsUntilOptions is passed by value to a slot, so the moc-generated
+// code needs the complete type.
+#include "../dialogs/dlg_move_top_cards_until.h"
 
-class PlayerGraphicsItem;
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QList>
+#include <QObject>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
+
+class CardItem;
+class CardRelation;
+class PlayerActions;
+class QWidget;
+struct MoveTopCardsUntilOptions;
+
 class PlayerDialogs : public QObject
 {
 

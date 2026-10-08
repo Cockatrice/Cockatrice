@@ -2,6 +2,7 @@
 #define SIGNALHANDLER_H
 
 #include <QObject>
+#include <qtmetamacros.h>
 
 class QSocketNotifier;
 

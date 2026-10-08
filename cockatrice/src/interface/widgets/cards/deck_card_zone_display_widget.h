@@ -7,16 +7,27 @@
 #ifndef DECK_CARD_ZONE_DISPLAY_WIDGET_H
 #define DECK_CARD_ZONE_DISPLAY_WIDGET_H
 
-#include "../general/display/banner_widget.h"
-#include "../general/layout_containers/overlap_widget.h"
 #include "../visual_deck_editor/visual_deck_editor_widget.h"
-#include "card_group_display_widgets/card_group_display_widget.h"
-#include "card_info_picture_with_text_overlay_widget.h"
-#include "card_size_widget.h"
 
-#include <QVBoxLayout>
+#include <QHash>
+#include <QList>
+#include <QMouseEvent>
+#include <QPersistentModelIndex>
+#include <QString>
+#include <QStringList>
 #include <QWidget>
-#include <libcockatrice/models/deck_list/deck_list_model.h>
+#include <qtmetamacros.h>
+
+class BannerWidget;
+class CardGroupDisplayWidget;
+class CardSizeWidget;
+class DeckListModel;
+class ExactCard;
+class OverlapWidget;
+class QItemSelection;
+class QItemSelectionModel;
+class QModelIndex;
+class QVBoxLayout;
 
 class DeckCardZoneDisplayWidget : public QWidget
 {

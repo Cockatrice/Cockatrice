@@ -10,10 +10,11 @@
 #include <QComboBox>
 #include <QDialog>
 #include <QLineEdit>
+#include <QString>
+#include <qtmetamacros.h>
 
 class QLabel;
-class QPushButton;
-class QCheckBox;
+class QWidget;
 
 class DlgEditUser : public QDialog
 {

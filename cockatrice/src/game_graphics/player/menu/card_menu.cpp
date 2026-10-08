@@ -1,21 +1,43 @@
 #include "card_menu.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/card_counter_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
-#include "../../../interface/widgets/tabs/tab_game.h"
+#include "../../../game/abstract_game.h"
+#include "../../../game/player/player_info.h"
+#include "../../../game/player/player_manager.h"
+#include "../../../game/zones/card_zone_logic.h"
 #include "../../board/card_item.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
 #include "../../game/zones/view_zone_logic.h"
+#include "../../game_scene.h"
 #include "../card_menu_action_type.h"
 #include "../player_graphics_item.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/utility/card_ref.h"
 #include "move_menu.h"
 #include "pt_menu.h"
 
+#include <QAction>
+#include <QColor>
+#include <QIcon>
+#include <QMap>
+#include <QObject>
 #include <QPainter>
+#include <QPixmap>
+#include <QSharedPointer>
+#include <QStringList>
+#include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/utility/zone_names.h>
+#include <qnamespace.h>
+#include <utility>
 
 /**
  * @brief Creates a circular icon filled with the specified color.

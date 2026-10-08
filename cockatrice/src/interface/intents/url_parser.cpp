@@ -4,22 +4,34 @@
 #include "../widgets/tabs/tab_room.h"
 #include "../widgets/tabs/tab_supervisor.h"
 #include "../window_main.h"
+#include "contexts/context_connect_to_server.h"
 #include "contexts/context_join_game.h"
+#include "contexts/context_join_room.h"
 #include "contexts/context_open_deck.h"
 #include "intent.h"
 #include "intent_join_server_game.h"
 #include "intent_login.h"
 #include "intent_open_shared_deck.h"
+#include "remote_client.h"
 
 #include <QDebug>
 #include <QLoggingCategory>
+#include <QMap>
 #include <QMessageBox>
+#include <QMessageLogger>
+#include <QSharedPointer>
+#include <QStringLiteral>
 #include <QUrl>
 #include <QUrlQuery>
+#include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/settings/servers_settings.h>
 #include <memory>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <utility>
 
 inline Q_LOGGING_CATEGORY(UrlParserLog, "url_parser");
 

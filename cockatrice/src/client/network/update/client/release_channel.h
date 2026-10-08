@@ -11,8 +11,9 @@
 #include <QLoggingCategory>
 #include <QObject>
 #include <QString>
-#include <QVariantMap>
+#include <QVariantList>
 #include <optional>
+#include <qtmetamacros.h>
 #include <utility>
 
 inline Q_LOGGING_CATEGORY(ReleaseChannelLog, "release_channel");

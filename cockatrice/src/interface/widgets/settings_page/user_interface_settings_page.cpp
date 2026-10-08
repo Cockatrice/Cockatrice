@@ -3,13 +3,22 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../tabs/api/commander_spellbook/commander_spellbook_bracket_explainer.h"
+#include "libcockatrice/utility/macros.h"
 
+#include <QDebug>
 #include <QGridLayout>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QVariant>
+#include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <qnamespace.h>
 
 enum visualDeckStoragePromptForConversionIndex
 {

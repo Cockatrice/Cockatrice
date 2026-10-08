@@ -7,13 +7,24 @@
 #ifndef SETSMODEL_H
 #define SETSMODEL_H
 
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/set/card_set_list.h"
+
 #include <QAbstractTableModel>
+#include <QList>
 #include <QMimeData>
+#include <QModelIndex>
+#include <QModelIndexList>
 #include <QSet>
 #include <QSortFilterProxyModel>
-#include <libcockatrice/card/database/card_database.h>
+#include <QString>
+#include <QStringList>
+#include <QtGlobal>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
 
-class SetsProxyModel;
+class CardDatabase;
+class QObject;
 
 class SetsMimeData : public QMimeData
 {

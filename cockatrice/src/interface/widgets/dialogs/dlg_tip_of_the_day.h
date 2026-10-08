@@ -7,12 +7,15 @@
 #ifndef DLG_TIPOFDAY_H
 #define DLG_TIPOFDAY_H
 
-#include <QComboBox>
 #include <QDialog>
-#include <QDialogButtonBox>
-#include <QLineEdit>
 #include <QLoggingCategory>
-#include <QVBoxLayout>
+#include <qtmetamacros.h>
+
+class QDialogButtonBox;
+class QHBoxLayout;
+class QPixmap;
+class QVBoxLayout;
+class QWidget;
 
 inline Q_LOGGING_CATEGORY(DlgTipOfTheDayLog, "dlg_tip_of_the_day");
 

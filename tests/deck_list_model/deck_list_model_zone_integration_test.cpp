@@ -1,3 +1,12 @@
+#include "libcockatrice/card/database/card_database.h"
+#include "libcockatrice/deck_list/tree/abstract_deck_list_node.h"
+
+#include <QList>
+#include <QModelIndex>
+#include <QSharedPointer>
+#include <QString>
+#include <QStringList>
+#include <QVariant>
 #include <gtest/gtest.h>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -8,6 +17,10 @@
 #include <libcockatrice/deck_list/tree/deck_list_card_node.h>
 #include <libcockatrice/deck_list/tree/inner_deck_list_node.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
+#include <qnamespace.h>
+#include <string>
+
+class QModelIndex;
 
 namespace
 {

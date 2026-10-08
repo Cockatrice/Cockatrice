@@ -1,9 +1,12 @@
 #ifndef COCKATRICE_PLAYMAT_RESOLVER_H
 #define COCKATRICE_PLAYMAT_RESOLVER_H
 
-#include "deck_list.h"
+#include "libcockatrice/utility/playmat_params.h"
 
 #include <libcockatrice/interfaces/interface_interface_settings_provider.h>
+
+class DeckList;
+template <typename T> class QList;
 
 /**
  * @brief Resolves the effective playmat for a deck per the resolution chain:

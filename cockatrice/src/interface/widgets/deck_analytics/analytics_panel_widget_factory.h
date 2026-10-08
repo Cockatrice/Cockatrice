@@ -1,9 +1,9 @@
 #ifndef COCKATRICE_DECK_ANALYTICS_WIDGET_FACTORY_H
 #define COCKATRICE_DECK_ANALYTICS_WIDGET_FACTORY_H
 
+#include <QList>
 #include <QMap>
 #include <QString>
-#include <QStringList>
 #include <QWidget>
 #include <functional>
 

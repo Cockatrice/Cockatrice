@@ -1,14 +1,38 @@
 #include "deck_card_zone_display_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../general/display/banner_widget.h"
+#include "../visual_deck_editor/visual_deck_editor_widget.h"
+#include "card_group_display_widgets/card_group_display_widget.h"
 #include "card_group_display_widgets/flat_card_group_display_widget.h"
 #include "card_group_display_widgets/overlapped_card_group_display_widget.h"
+#include "libcockatrice/card/card_info.h"
 #include "libcockatrice/card/database/card_database_manager.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/deck_list/tree/deck_list_card_node.h"
 #include "libcockatrice/settings/cards_display_settings.h"
 
-#include <QResizeEvent>
-#include <algorithm>
+#include <QAbstractItemModel>
+#include <QDebug>
+#include <QItemSelection>
+#include <QItemSelectionModel>
+#include <QItemSelectionRange>
+#include <QLayout>
+#include <QLayoutItem>
+#include <QModelIndex>
+#include <QSharedPointer>
+#include <QSizePolicy>
+#include <QStringLiteral>
+#include <QTimer>
+#include <QVBoxLayout>
+#include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
+#include <qnamespace.h>
+
+class CardSizeWidget;
+class QMouseEvent;
 
 DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
                                                      DeckListModel *_deckListModel,

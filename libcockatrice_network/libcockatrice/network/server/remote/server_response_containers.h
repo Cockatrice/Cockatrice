@@ -1,9 +1,13 @@
 #ifndef SERVER_RESPONSE_CONTAINERS_H
 #define SERVER_RESPONSE_CONTAINERS_H
 
+#include <QFlags>
 #include <QList>
 #include <QPair>
+#include <algorithm>
 #include <libcockatrice/protocol/pb/server_message.pb.h>
+
+class GameEvent;
 
 namespace google
 {

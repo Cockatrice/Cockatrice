@@ -1,6 +1,19 @@
 #include "mana_base_config_dialog.h"
 
+#include "../../deck_list_statistics_analyzer.h"
+
+#include <QAbstractItemView>
+#include <QComboBox>
+#include <QDialogButtonBox>
+#include <QHash>
+#include <QLabel>
+#include <QListWidget>
+#include <QListWidgetItem>
 #include <QPushButton>
+#include <QStringList>
+#include <QVBoxLayout>
+
+class QWidget;
 
 ManaBaseConfigDialog::ManaBaseConfigDialog(DeckListStatisticsAnalyzer *analyzer,
                                            ManaBaseConfig initial,

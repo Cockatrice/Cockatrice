@@ -5,8 +5,12 @@
 
 #include <../../cockatrice/src/client/settings/cache_settings.h>
 #include <QApplication>
+#include <QCommandLineOption>
 #include <QCommandLineParser>
+#include <QCoreApplication>
+#include <QGuiApplication>
 #include <QIcon>
+#include <QString>
 #include <QTimer>
 #include <QTranslator>
 #include <libcockatrice/settings/personal_settings.h>

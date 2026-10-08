@@ -1,8 +1,10 @@
 #ifndef COCKATRICE_LAZY_PROPERTIES_HASH_H
 #define COCKATRICE_LAZY_PROPERTIES_HASH_H
 
+#include <QByteArray>
 #include <QHash>
 #include <QMutex>
+#include <QString>
 
 /**
  * @brief A property map that can lazily deserialize blobs to avoid loading overhead.

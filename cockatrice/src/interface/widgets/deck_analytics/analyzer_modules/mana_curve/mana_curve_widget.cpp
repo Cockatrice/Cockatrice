@@ -1,19 +1,23 @@
 #include "mana_curve_widget.h"
 
-#include "../../../general/display/charts/bars/bar_chart_background_widget.h"
-#include "../../../general/display/charts/bars/bar_chart_widget.h"
-#include "../../../general/display/charts/bars/segmented_bar_widget.h"
+#include "../../abstract_analytics_panel_widget.h"
 #include "../../analytics_panel_widget_registrar.h"
 #include "../../deck_list_statistics_analyzer.h"
-#include "libcockatrice/utility/color.h"
-#include "libcockatrice/utility/qt_utils.h"
+#include "mana_curve_category_widget.h"
 #include "mana_curve_config_dialog.h"
+#include "mana_curve_total_widget.h"
 
-#include <QInputDialog>
-#include <QJsonArray>
-#include <QLabel>
-#include <QPushButton>
-#include <QSettings>
+#include <QDialog>
+#include <QHash>
+#include <QMap>
+#include <QObject>
+#include <QSharedPointer>
+#include <QSizePolicy>
+#include <QStringList>
+#include <QVBoxLayout>
+#include <QtGlobal>
+
+class QWidget;
 
 namespace
 {

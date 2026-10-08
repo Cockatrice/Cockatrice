@@ -2,10 +2,13 @@
 #define COCKATRICE_TALLY_MENU_H
 
 #include "../../../interface/widgets/menus/tearoff_menu.h"
-#include "../../tally/tally.h"
 #include "abstract_player_component.h"
 
-#include <QMenu>
+#include <qtmetamacros.h>
+
+class QAction;
+class QActionGroup;
+enum class TallyType;
 
 class TallyMenu : public TearOffMenu, public AbstractPlayerComponent
 {

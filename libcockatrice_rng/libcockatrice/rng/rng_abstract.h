@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QVector>
+#include <qtmetamacros.h>
 
 class RNG_Abstract : public QObject
 {

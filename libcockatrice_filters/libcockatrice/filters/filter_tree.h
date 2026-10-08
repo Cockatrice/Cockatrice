@@ -8,12 +8,15 @@
 #define FILTERTREE_H
 
 #include "filter_card.h"
+#include "libcockatrice/card/card_info.h"
 
 #include <QList>
 #include <QObject>
-#include <libcockatrice/card/card_localization.h>
-#include <libcockatrice/card/database/card_database.h>
+#include <QString>
+#include <qtmetamacros.h>
 #include <utility>
+
+struct CardSearchLanguage;
 
 class FilterTreeNode
 {
@@ -120,6 +123,7 @@ public:
 
 class FilterItemList;
 class FilterTree;
+
 class LogicMap : public FilterTreeBranch<FilterItemList *>
 {
 
@@ -142,6 +146,7 @@ public:
 };
 
 class FilterItem;
+
 class FilterItemList : public FilterTreeBranch<FilterItem *>
 {
 private:

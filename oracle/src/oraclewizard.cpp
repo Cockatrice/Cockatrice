@@ -6,17 +6,24 @@
 #include "pages.h"
 #include "pagetemplates.h"
 
-#include <QCheckBox>
-#include <QFileDialog>
-#include <QGridLayout>
-#include <QLineEdit>
-#include <QNetworkReply>
-#include <QPushButton>
-#include <QScrollBar>
-#include <QtConcurrent>
-#include <QtGui>
+#include <QAbstractButton>
+#include <QApplication>
+#include <QDebug>
+#include <QDialog>
+#include <QEvent>
+#include <QFile>
+#include <QIODevice>
+#include <QList>
+#include <QNetworkAccessManager>
+#include <QSettings>
+#include <QVariant>
+#include <QWizardPage>
+#include <QtGlobal>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
+#include <qlogging.h>
+
+class QWidget;
 
 OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
 {

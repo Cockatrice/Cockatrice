@@ -1,7 +1,8 @@
 #include "arrow_target.h"
 
-#include "../../game/player/player_logic.h"
-#include "arrow_item.h"
+#include <QVariant>
+
+class QGraphicsItem;
 
 ArrowTarget::ArrowTarget(PlayerLogic *_owner, QGraphicsItem *parent) : AbstractGraphicsItem(parent), owner(_owner)
 {

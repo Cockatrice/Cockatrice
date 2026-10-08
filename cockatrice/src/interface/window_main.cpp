@@ -21,7 +21,6 @@
 
 #include "../client/latency_status_widget.h"
 #include "../client/network/update/client/client_update_checker.h"
-#include "../client/network/update/client/release_channel.h"
 #include "../client/settings/cache_settings.h"
 #include "../client/settings/shortcuts_settings.h"
 #include "../interface/widgets/dialogs/dlg_edit_tokens.h"
@@ -34,50 +33,63 @@
 #include "../interface/widgets/dialogs/dlg_view_log.h"
 #include "../interface/widgets/onboarding/first_run_wizard.h"
 #include "../interface/widgets/settings_page/general_settings_page.h"
-#include "../interface/widgets/tabs/tab_game.h"
 #include "../interface/widgets/tabs/tab_server.h"
 #include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../main.h"
+#include "abstract_client.h"
 #include "intents/contexts/context_connect_to_server.h"
 #include "intents/contexts/context_join_room.h"
+#include "intents/intent.h"
 #include "intents/intent_connect_to_server.h"
 #include "intents/intent_login.h"
 #include "intents/intent_open_server_room_by_name.h"
 #include "intents/url_parser.h"
+#include "latency_tracker.h"
 #include "logger.h"
 #include "pixel_map_generator.h"
 #include "version_string.h"
 #include "widgets/dialogs/dlg_connect.h"
 #include "widgets/server/handle_public_servers.h"
+#include "widgets/settings_page/abstract_settings_page.h"
 #include "widgets/tabs/api/commander_spellbook/handle_commander_brackets.h"
-#include "widgets/utility/get_text_with_max.h"
 
 #include <QAction>
 #include <QApplication>
 #include <QButtonGroup>
 #include <QCloseEvent>
 #include <QDateTime>
+#include <QDebug>
 #include <QDesktopServices>
+#include <QDialog>
+#include <QEvent>
 #include <QFile>
 #include <QFileDialog>
-#include <QLabel>
+#include <QFileInfo>
+#include <QFlags>
+#include <QIODevice>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QMessageLogger>
+#include <QObject>
+#include <QPixmap>
 #include <QPixmapCache>
+#include <QPushButton>
+#include <QSharedPointer>
 #include <QStatusBar>
+#include <QStringLiteral>
 #include <QSystemTrayIcon>
-#include <QThread>
 #include <QTimer>
-#include <QWindow>
-#include <QtConcurrent>
-#include <QtNetwork>
+#include <QWidget>
+#include <QtConcurrentRun>
+#include <QtGlobal>
+#include <functional>
+#include <google/protobuf/stubs/port.h>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/local/local_client.h>
 #include <libcockatrice/network/client/remote/remote_client.h>
 #include <libcockatrice/network/server/local/local_server.h>
-#include <libcockatrice/network/server/local/local_server_interface.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 #include <libcockatrice/protocol/pb/room_commands.pb.h>
 #include <libcockatrice/settings/cache_storage_settings.h>
@@ -91,6 +103,13 @@
 #include <libcockatrice/settings/servers_settings.h>
 #include <libcockatrice/settings/tabs_settings.h>
 #include <libcockatrice/settings/updates_settings.h>
+#include <memory>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <tuple>
+#include <utility>
+
+class LocalServerInterface;
 
 #define GITHUB_PAGES_URL "https://cockatrice.github.io"
 #define GITHUB_CONTRIBUTORS_URL "https://github.com/Cockatrice/Cockatrice/graphs/contributors"

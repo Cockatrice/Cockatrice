@@ -4,6 +4,10 @@
 #include "../../pixel_map_generator.h"
 
 #include <QAction>
+#include <QHBoxLayout>
+#include <QIcon>
+#include <QLineEdit>
+#include <QStringLiteral>
 #include <QTimer>
 
 /**

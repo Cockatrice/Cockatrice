@@ -3,14 +3,19 @@
  *  @ingroup Tests
  */
 
+#include "game/game_config.h"
 #include "game/server_game.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
 #include "server.h"
 #include "server_database_interface.h"
 #include "server_room.h"
 
+#include <QList>
+#include <QString>
 #include <gtest/gtest.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/rng/rng_abstract.h>
+#include <string>
 
 RNG_Abstract *rng = nullptr; // referenced by the server_remote library
 

@@ -4,7 +4,6 @@
 #include "tally.h"
 
 #include <QList>
-#include <QString>
 
 class CardItem;
 

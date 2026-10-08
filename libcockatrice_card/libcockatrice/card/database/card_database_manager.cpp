@@ -1,8 +1,15 @@
 #include "card_database_manager.h"
 
+#include "libcockatrice/card/database/card_database.h"
+
 #include <libcockatrice/interfaces/noop_card_database_path_provider.h>
 #include <libcockatrice/interfaces/noop_card_preference_provider.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
+
+class CardDatabaseQuerier;
+class ICardDatabasePathProvider;
+class ICardPreferenceProvider;
+class ICardSetPriorityController;
 
 ICardPreferenceProvider *CardDatabaseManager::cardPreferenceProvider = new NoopCardPreferenceProvider();
 ICardDatabasePathProvider *CardDatabaseManager::pathProvider = new NoopCardDatabasePathProvider();

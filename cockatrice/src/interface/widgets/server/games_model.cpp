@@ -2,13 +2,26 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../interface/pixel_map_generator.h"
-#include "../interface/widgets/tabs/tab_account.h"
-#include "user/user_list_manager.h"
-#include "user/user_list_widget.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+#include "user/user_list_proxy.h"
+#include "user_level.h"
 
+#include <QAbstractItemModel>
+#include <QDate>
 #include <QDateTime>
+#include <QFlag>
 #include <QIcon>
+#include <QMapIterator>
+#include <QObject>
+#include <QSet>
+#include <QSharedPointer>
+#include <QStringList>
+#include <QTime>
 #include <QTimeZone>
+#include <QVariant>
+#include <QtGlobal>
+#include <compare>
+#include <initializer_list>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 #include <libcockatrice/settings/game_filters_settings.h>
 

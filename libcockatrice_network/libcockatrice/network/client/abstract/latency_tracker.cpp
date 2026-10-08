@@ -1,7 +1,10 @@
 #include "latency_tracker.h"
 
+#include <QSharedPointer>
+#include <QtGlobal>
 #include <QtMath>
 #include <algorithm>
+#include <stddef.h>
 
 void LatencyTracker::addSample(qint64 ms)
 {

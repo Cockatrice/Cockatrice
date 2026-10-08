@@ -9,10 +9,16 @@
 
 #include <QCache>
 #include <QColor>
-#include <QPixmap>
+#include <QString>
 #include <QStyledItemDelegate>
+#include <qtmetamacros.h>
 
 class CardInfo;
+class QObject;
+class QPainter;
+class QPoint;
+class QRect;
+template <class T> class QSharedPointer;
 
 /**
  * @brief Paints styled card completer popup rows.

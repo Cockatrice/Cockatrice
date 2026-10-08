@@ -1,16 +1,16 @@
 #ifndef SERVER_ROOM_H
 #define SERVER_ROOM_H
 
-#include "serverinfo_user_container.h"
-
+#include <QList>
 #include <QMap>
-#include <QMutex>
 #include <QObject>
 #include <QReadWriteLock>
+#include <QString>
+#include <QStringList>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_chat_message.pb.h>
+#include <qtmetamacros.h>
 
-class Server_DatabaseInterface;
 class Server_ProtocolHandler;
 class RoomEvent;
 class ServerInfo_User;
@@ -18,10 +18,17 @@ class ServerInfo_Room;
 class ServerInfo_Game;
 class Server_Game;
 class Server;
-
 class Command_JoinGame;
 class ResponseContainer;
 class Server_AbstractUserInterface;
+class ServerInfo_User_Container;
+namespace google
+{
+namespace protobuf
+{
+class Message;
+} // namespace protobuf
+} // namespace google
 
 class Server_Room : public QObject
 {

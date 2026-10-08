@@ -4,7 +4,9 @@
 #include <QColor>
 #include <QObject>
 #include <QString>
-#include <libcockatrice/protocol/pb/serverinfo_counter.pb.h>
+#include <qtmetamacros.h>
+
+class ServerInfo_Counter;
 
 class CounterState : public QObject
 {

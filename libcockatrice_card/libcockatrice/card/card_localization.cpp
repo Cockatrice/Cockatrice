@@ -1,8 +1,10 @@
 #include "card_localization.h"
 
 #include <QHash>
+#include <QList>
 #include <QLocale>
 #include <QStringList>
+#include <utility>
 
 namespace CardLocalization
 {

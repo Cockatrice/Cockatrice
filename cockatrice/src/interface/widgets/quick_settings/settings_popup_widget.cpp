@@ -1,10 +1,14 @@
 #include "settings_popup_widget.h"
 
 #include <QApplication>
-#include <QFocusEvent>
+#include <QFrame>
 #include <QPainter>
+#include <QRect>
 #include <QScreen>
 #include <QScrollArea>
+#include <QSize>
+#include <QVBoxLayout>
+#include <qnamespace.h>
 
 SettingsPopupWidget::SettingsPopupWidget(QWidget *parent) : QWidget(parent, Qt::Popup | Qt::FramelessWindowHint)
 {

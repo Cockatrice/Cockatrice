@@ -3,12 +3,21 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../../pixel_map_generator.h"
-#include "../interface/widgets/tabs/tab_game.h"
+#include "libcockatrice/settings/interface_settings.h"
 #include "replay_manager.h"
 #include "replay_quick_settings_widget.h"
+#include "replay_timeline_widget.h"
 
+#include <QAction>
 #include <QHBoxLayout>
+#include <QIcon>
+#include <QSize>
+#include <QString>
+#include <QStringLiteral>
 #include <QToolButton>
+#include <QtGlobal>
+
+class GameReplay;
 
 ReplayWidget::ReplayWidget(QWidget *parent, GameReplay *replay)
     : QWidget(parent), replayPlayButton(nullptr), replayFastForwardButton(nullptr), aReplaySkipForward(nullptr),

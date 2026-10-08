@@ -3,8 +3,13 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../deck_loader/deck_loader.h"
 
+#include <QDir>
+#include <QString>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/recents_settings.h>
+
+class QWidget;
+
 DlgLoadDeck::DlgLoadDeck(QWidget *parent) : QFileDialog(parent, tr("Load Deck"))
 {
     QString startingDir = SettingsCache::instance().recents().getLatestDeckDirPath();

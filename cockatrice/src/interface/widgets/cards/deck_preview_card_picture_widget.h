@@ -11,9 +11,12 @@
 #include "card_info_picture_with_text_overlay_widget.h"
 
 #include <QColor>
-#include <QSize>
-#include <QTextOption>
-#include <QTimer>
+#include <QMouseEvent>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
+
+class QTimer;
+class QWidget;
 
 class DeckPreviewCardPictureWidget final : public CardInfoPictureWithTextOverlayWidget
 {

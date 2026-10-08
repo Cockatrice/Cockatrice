@@ -1,18 +1,26 @@
 #ifndef DECKLISTMODEL_H
 #define DECKLISTMODEL_H
 
-#include "deck_list_model_custom_zones.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
+#include "libcockatrice/utility/card_ref.h"
 
 #include <../../../../libcockatrice_deck_list/libcockatrice/deck_list/tree/abstract_deck_list_card_node.h>
 #include <../../../../libcockatrice_deck_list/libcockatrice/deck_list/tree/deck_list_card_node.h>
 #include <QAbstractItemModel>
 #include <QList>
-#include <libcockatrice/card/printing/exact_card.h>
-#include <libcockatrice/deck_list/deck_list.h>
+#include <QModelIndex>
+#include <QSharedPointer>
+#include <QString>
+#include <QStringList>
+#include <functional>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
 
-class CardDatabase;
-class QPrinter;
-class QTextCursor;
+class AbstractDecklistNode;
+class DeckList;
+class ExactCard;
+class QObject;
 
 /**
  * @namespace DeckRoles

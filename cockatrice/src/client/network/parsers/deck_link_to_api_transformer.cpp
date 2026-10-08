@@ -1,6 +1,7 @@
 #include "deck_link_to_api_transformer.h"
 
 #include <QRegularExpression>
+#include <QRegularExpressionMatch>
 
 namespace DeckLinkToApiTransformer
 {

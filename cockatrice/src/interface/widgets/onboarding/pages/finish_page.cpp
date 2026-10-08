@@ -1,7 +1,13 @@
 #include "finish_page.h"
 
+#include "../first_run_wizard_page.h"
+
 #include <QLabel>
+#include <QString>
 #include <QVBoxLayout>
+#include <qnamespace.h>
+
+class QWidget;
 
 FinishPage::FinishPage(QWidget *parent) : FirstRunWizardPage(parent)
 {

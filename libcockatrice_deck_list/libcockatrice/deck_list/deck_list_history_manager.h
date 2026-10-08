@@ -1,11 +1,13 @@
 #ifndef COCKATRICE_DECK_LIST_HISTORY_MANAGER_H
 #define COCKATRICE_DECK_LIST_HISTORY_MANAGER_H
 
-#include "deck_list.h"
 #include "deck_list_memento.h"
 
 #include <QObject>
 #include <QStack>
+#include <qtmetamacros.h>
+
+class DeckList;
 
 class DeckListHistoryManager : public QObject
 {

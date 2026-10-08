@@ -1,8 +1,17 @@
 #include "art_crop_attribution.h"
 
+#include "libcockatrice/card/printing/printing_info.h"
+
+#include <QColor>
+#include <QFont>
 #include <QFontMetrics>
 #include <QObject>
 #include <QPainter>
+#include <QPointF>
+#include <QRectF>
+#include <QSizeF>
+#include <QString>
+#include <QtGlobal>
 #include <libcockatrice/card/printing/exact_card.h>
 
 QString buildArtAttribution(const ExactCard &card)

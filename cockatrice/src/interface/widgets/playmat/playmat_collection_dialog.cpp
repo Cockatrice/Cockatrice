@@ -1,6 +1,9 @@
 #include "playmat_collection_dialog.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "libcockatrice/interfaces/interface_interface_settings_provider.h"
+#include "libcockatrice/utility/card_ref.h"
+#include "libcockatrice/utility/playmat_params.h"
 #include "playmat_settings_dialog.h"
 
 #include <QComboBox>
@@ -8,9 +11,14 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QListWidget>
+#include <QListWidgetItem>
 #include <QPushButton>
+#include <QString>
 #include <QVBoxLayout>
+#include <QVariant>
 #include <libcockatrice/settings/interface_settings.h>
+
+class QWidget;
 
 PlaymatCollectionDialog::PlaymatCollectionDialog(QWidget *parent) : QDialog(parent)
 {

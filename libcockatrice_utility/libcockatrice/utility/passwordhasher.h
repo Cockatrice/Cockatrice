@@ -1,7 +1,7 @@
 #ifndef PASSWORDHASHER_H
 #define PASSWORDHASHER_H
 
-#include <QObject>
+#include <QString>
 
 class PasswordHasher
 {

@@ -1,7 +1,16 @@
 #include "edhrec_top_tags_api_response_display_widget.h"
 
+#include "../../api_response/cards/edhrec_api_response_card_container.h"
+#include "../../api_response/cards/edhrec_api_response_card_list.h"
 #include "../../api_response/top_tags/edhrec_top_tags_api_response.h"
 #include "../cards/edhrec_api_response_card_list_display_widget.h"
+
+#include <QHBoxLayout>
+#include <QList>
+#include <QResizeEvent>
+#include <QScrollArea>
+#include <QVBoxLayout>
+#include <qnamespace.h>
 
 EdhrecTopTagsApiResponseDisplayWidget::EdhrecTopTagsApiResponseDisplayWidget(QWidget *parent,
                                                                              EdhrecTopTagsApiResponse response)

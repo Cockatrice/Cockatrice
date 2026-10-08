@@ -7,16 +7,23 @@
 #ifndef DLG_UPDATE_H
 #define DLG_UPDATE_H
 
-#include "../client/network/update/client/update_downloader.h"
+#include "../../../client/network/update/client/release_channel.h"
 
-#include <QDialogButtonBox>
+#include <QDialog>
 #include <QLoggingCategory>
-#include <QProgressDialog>
-#include <QtNetwork>
+#include <QString>
+#include <QUrl>
+#include <QtGlobal>
+#include <qtmetamacros.h>
+
+class QDialogButtonBox;
+class QLabel;
+class QProgressBar;
+class QPushButton;
+class QWidget;
+class UpdateDownloader;
 
 inline Q_LOGGING_CATEGORY(DlgUpdateLog, "dlg_update");
-
-class Release;
 
 class DlgUpdate : public QDialog
 {

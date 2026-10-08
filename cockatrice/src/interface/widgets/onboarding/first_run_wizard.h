@@ -3,6 +3,9 @@
 
 #include <QDialog>
 #include <QList>
+#include <QString>
+#include <QtGlobal>
+#include <qtmetamacros.h>
 
 class BannerHost;
 class FirstRunWizardPage;
@@ -11,6 +14,7 @@ class CardDatabaseSetupPage;
 class QLabel;
 class QPushButton;
 class QStackedWidget;
+class QWidget;
 
 /** @brief Polished first-run onboarding flow: card database setup, theme
  *         selection, server account setup, and a handful of key preferences.

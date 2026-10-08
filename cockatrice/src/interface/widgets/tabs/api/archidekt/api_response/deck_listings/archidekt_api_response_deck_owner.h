@@ -1,11 +1,11 @@
 #ifndef COCKATRICE_ARCHIDEKT_API_RESPONSE_DECK_OWNER_H
 #define COCKATRICE_ARCHIDEKT_API_RESPONSE_DECK_OWNER_H
 
-#include <QDebug>
-#include <QJsonArray>
 #include <QJsonObject>
+#include <QList>
 #include <QString>
-#include <QVector>
+#include <QStringList>
+#include <QUrl>
 
 class ArchidektApiResponseDeckOwner
 {

@@ -1,6 +1,13 @@
 #include "replay.h"
 
-#include "../interface/widgets/tabs/tab_game.h"
+#include "game_meta_info.h"
+#include "game_state.h"
+#include "player/player_manager.h"
+
+#include <QList>
+
+class GameReplay;
+class QObject;
 
 Replay::Replay(QObject *_parent, const GameReplay *_replay, bool isLocalGame) : AbstractGame(_parent)
 {

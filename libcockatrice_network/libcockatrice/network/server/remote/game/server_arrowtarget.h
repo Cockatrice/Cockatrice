@@ -2,6 +2,7 @@
 #define SERVER_ARROWTARGET_H
 
 #include <QObject>
+#include <qtmetamacros.h>
 
 class Server_ArrowTarget : public QObject
 {

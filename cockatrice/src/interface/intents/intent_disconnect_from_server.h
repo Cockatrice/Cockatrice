@@ -1,8 +1,12 @@
 #ifndef COCKATRICE_INTENT_DISCONNECT_FROM_SERVER_H
 #define COCKATRICE_INTENT_DISCONNECT_FROM_SERVER_H
 
+#include "abstract_client.h"
 #include "intent.h"
-#include "remote_client.h"
+
+#include <qtmetamacros.h>
+
+class RemoteClient;
 
 class IntentDisconnectFromServer : public Intent
 {

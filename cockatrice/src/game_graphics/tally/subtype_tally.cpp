@@ -1,9 +1,18 @@
 #include "subtype_tally.h"
 
 #include "../board/card_item.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/printing/exact_card.h"
 
 #include <QMap>
+#include <QSharedPointer>
+#include <QString>
+#include <QStringList>
+#include <QStringLiteral>
 #include <algorithm>
+#include <compare>
+#include <iterator>
+#include <qnamespace.h>
 
 namespace
 {

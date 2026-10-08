@@ -9,6 +9,9 @@
 #define DLG_LOAD_DECK_H
 
 #include <QFileDialog>
+#include <qtmetamacros.h>
+
+class QWidget;
 
 /**
  * The file dialog for "Load Deck" operations.

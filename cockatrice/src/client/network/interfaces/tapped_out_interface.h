@@ -9,6 +9,7 @@
 
 #include <QLoggingCategory>
 #include <QObject>
+#include <qtmetamacros.h>
 
 inline Q_LOGGING_CATEGORY(TappedOutInterfaceLog, "tapped_out_interface");
 

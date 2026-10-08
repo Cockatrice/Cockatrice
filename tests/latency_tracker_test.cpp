@@ -1,5 +1,9 @@
+#include <QList>
+#include <QtGlobal>
 #include <gtest/gtest.h>
+#include <initializer_list>
 #include <libcockatrice/network/client/abstract/latency_tracker.h>
+#include <string>
 
 TEST(LatencyTrackerTest, EmptyTrackerYieldsZeroedStats)
 {

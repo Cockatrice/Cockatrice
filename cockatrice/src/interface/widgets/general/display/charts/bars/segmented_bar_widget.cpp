@@ -1,9 +1,19 @@
 #include "segmented_bar_widget.h"
 
+#include <QBrush>
+#include <QFont>
+#include <QLinearGradient>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
+#include <QPoint>
+#include <QPointF>
+#include <QRect>
+#include <QSize>
+#include <QSizePolicy>
 #include <QToolTip>
+#include <qnamespace.h>
+#include <utility>
 
 SegmentedBarWidget::SegmentedBarWidget(QString label, QVector<Segment> segments, int total, QWidget *parent)
     : QWidget(parent), label(std::move(label)), segments(std::move(segments)), total(total)

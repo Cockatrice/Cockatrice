@@ -1,5 +1,9 @@
 #include "visual_deck_editor_placeholder_widget.h"
 
+#include <QLabel>
+#include <QVBoxLayout>
+#include <qnamespace.h>
+
 VisualDeckEditorPlaceholderWidget::VisualDeckEditorPlaceholderWidget(QWidget *parent) : QWidget(parent)
 {
     mainLayout = new QVBoxLayout(this);

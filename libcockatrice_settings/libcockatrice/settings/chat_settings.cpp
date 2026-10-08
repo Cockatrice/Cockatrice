@@ -1,5 +1,11 @@
 #include "chat_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QVariant>
+
+class QObject;
+
 ChatSettings::ChatSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "chat.ini", "chat", QString(), parent)
 {

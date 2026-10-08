@@ -1,14 +1,22 @@
 #ifndef COCKATRICE_VISUAL_DATABASE_DISPLAY_FILTER_TOOLBAR_WIDGET_H
 #define COCKATRICE_VISUAL_DATABASE_DISPLAY_FILTER_TOOLBAR_WIDGET_H
 
-#include "visual_database_display_filter_save_load_widget.h"
-#include "visual_database_display_format_legality_filter_widget.h"
-#include "visual_database_display_main_type_filter_widget.h"
-#include "visual_database_display_name_filter_widget.h"
-#include "visual_database_display_set_filter_widget.h"
-#include "visual_database_display_sub_type_filter_widget.h"
+#include "../general/layout_containers/flow_widget.h"
+
+#include <qtmetamacros.h>
 
 class VisualDatabaseDisplayWidget;
+class DeckListModel;
+class QComboBox;
+class QGroupBox;
+class QLabel;
+class SettingsButtonWidget;
+class VisualDatabaseDisplayFilterSaveLoadWidget;
+class VisualDatabaseDisplayFormatLegalityFilterWidget;
+class VisualDatabaseDisplayMainTypeFilterWidget;
+class VisualDatabaseDisplayNameFilterWidget;
+class VisualDatabaseDisplaySetFilterWidget;
+class VisualDatabaseDisplaySubTypeFilterWidget;
 
 class VisualDatabaseDisplayFilterToolbarWidget : public FlowWidget
 {

@@ -3,7 +3,10 @@
 #include <QBrush>
 #include <QColor>
 #include <QFont>
+#include <QModelIndex>
+#include <QVariant>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
+#include <qnamespace.h>
 
 QVariant DeckListStyleProxy::data(const QModelIndex &index, int role) const
 {

@@ -11,6 +11,9 @@
 #define DLG_LOCAL_GAME_OPTIONS_H
 
 #include <QDialog>
+#include <qtmetamacros.h>
+
+class QWidget;
 
 struct LocalGameOptions
 {

@@ -26,16 +26,26 @@
 #define WINDOW_H
 
 #include "../client/lag_monitor.h"
+#include "../client/network/update/client/release_channel.h"
 #include "connection_controller/remote_connection_controller.h"
-#include "widgets/dialogs/dlg_local_game_options.h"
 
+#include <QByteArray>
+#include <QDir>
 #include <QList>
+#include <QLoggingCategory>
 #include <QMainWindow>
-#include <QMessageBox>
-#include <QSystemTrayIcon>
-#include <QtNetwork>
+#include <QMenu>
+#include <QProcess>
+#include <QString>
+#include <QStringList>
+#include <QUrl>
+#include <QtGlobal>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
-#include <libcockatrice/protocol/pb/response.pb.h>
+#include <qtmetamacros.h>
+
+class QAction;
+class QWidget;
+struct LocalGameOptions;
 
 inline Q_LOGGING_CATEGORY(WindowMainLog, "window_main");
 inline Q_LOGGING_CATEGORY(WindowMainStartupLog, "window_main.startup");
@@ -43,18 +53,11 @@ inline Q_LOGGING_CATEGORY(WindowMainStartupVersionLog, "window_main.startup.vers
 inline Q_LOGGING_CATEGORY(WindowMainStartupShortcutsLog, "window_main.startup.shortcuts");
 inline Q_LOGGING_CATEGORY(WindowMainStartupAutoconnectLog, "window_main.startup.autoconnect");
 
-class Release;
-class DlgConnect;
 class DlgViewLog;
 class GameReplay;
-class HandlePublicServers;
-class LocalClient;
 class LocalServer;
-class QLabel;
 class LatencyStatusWidget;
-class QThread;
 class RemoteClient;
-class ServerInfo_User;
 class TabSupervisor;
 class WndSets;
 class DlgTipOfTheDay;

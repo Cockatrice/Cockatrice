@@ -6,8 +6,10 @@
 #ifndef LATENCY_TRACKER_H
 #define LATENCY_TRACKER_H
 
+#include <QByteArray>
 #include <QList>
 #include <QMetaType>
+#include <QtGlobal>
 #include <array>
 
 /**

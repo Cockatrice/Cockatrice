@@ -9,11 +9,16 @@
 
 #include "tab.h"
 
+#include <QString>
+#include <qtmetamacros.h>
+#include <string>
+// IWYU pragma: keep
+// ServerInfo_User appears by value and inside QList in slot signatures, so the
+// moc-generated code needs the complete type.
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
 class AbstractClient;
 class Event_AddToList;
-class Event_ListRooms;
 class Event_RemoveFromList;
 class Event_UserJoined;
 class Event_UserLeft;
@@ -23,6 +28,8 @@ class Response;
 class ServerInfo_User;
 class UserInfoBox;
 class UserListWidget;
+class TabSupervisor;
+template <typename T> class QList;
 
 class TabAccount : public Tab
 {

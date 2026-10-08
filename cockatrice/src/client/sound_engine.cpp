@@ -4,8 +4,15 @@
 
 #include <QApplication>
 #include <QAudioOutput>
+#include <QDebug>
 #include <QDir>
+#include <QFile>
+#include <QList>
 #include <QMediaPlayer>
+#include <QMessageLogger>
+#include <QStringList>
+#include <QUrl>
+#include <QtGlobal>
 #include <libcockatrice/settings/sound_settings.h>
 
 #define DEFAULT_THEME_NAME "Default"

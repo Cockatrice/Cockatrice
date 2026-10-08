@@ -7,8 +7,15 @@
 #ifndef HANDZONE_H
 #define HANDZONE_H
 
-#include "../../game/zones/hand_zone_logic.h"
+#include "../../game/board/card_list.h"
 #include "select_zone.h"
+
+#include <QtGlobal>
+#include <qtmetamacros.h>
+
+class HandZoneLogic;
+class QGraphicsItem;
+template <typename T> class QList;
 
 class HandZone : public SelectZone
 {

@@ -8,13 +8,17 @@
 #ifndef FLOW_WIDGET_H
 #define FLOW_WIDGET_H
 
-#include "../../../layouts/flow_layout.h"
-
-#include <QHBoxLayout>
-#include <QKeyEvent>
 #include <QLoggingCategory>
-#include <QScrollArea>
 #include <QWidget>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
+
+class FlowLayout;
+class QHBoxLayout;
+class QKeyEvent;
+class QLayoutItem;
+class QScrollArea;
 
 inline Q_LOGGING_CATEGORY(FlowWidgetLog, "flow_widget", QtInfoMsg);
 inline Q_LOGGING_CATEGORY(FlowWidgetSizeLog, "flow_widget.size", QtInfoMsg);

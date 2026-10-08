@@ -9,6 +9,7 @@
 
 #include <QModelIndex>
 #include <QObject>
+#include <qtmetamacros.h>
 
 class CardInfoPictureEnlargedWidget;
 class QCompleter;

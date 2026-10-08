@@ -2,18 +2,26 @@
 #define CARDDATABASE_H
 
 #include "../set/card_set_list.h"
-#include "card_database_data.h"
 #include "card_database_loader.h"
-#include "card_database_querier.h"
+
+// IWYU pragma: keep
+// CardDatabaseData is passed by value to the swapInDatabaseData() slot, and
+// CardInfoPtr is passed by value to the cardAdded()/cardRemoved() signals, so
+// the moc-generated code needs the complete types.
+#include "card_database_data.h"
+#include "libcockatrice/card/card_info.h"
 
 #include <QBasicMutex>
-#include <QDate>
-#include <QHash>
-#include <QList>
 #include <QLoggingCategory>
-#include <QVector>
-#include <libcockatrice/interfaces/interface_card_database_path_provider.h>
-#include <utility>
+#include <QObject>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
+
+class CardDatabaseQuerier;
+class ICardDatabasePathProvider;
+class ICardPreferenceProvider;
+class ICardSetPriorityController;
 
 inline Q_LOGGING_CATEGORY(CardDatabaseLog, "card_database");
 

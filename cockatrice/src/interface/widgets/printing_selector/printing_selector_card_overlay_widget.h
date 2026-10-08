@@ -7,14 +7,20 @@
 #ifndef PRINTING_SELECTOR_CARD_OVERLAY_WIDGET_H
 #define PRINTING_SELECTOR_CARD_OVERLAY_WIDGET_H
 
-#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
-#include "all_zones_card_amount_widget.h"
-#include "set_name_and_collectors_number_display_widget.h"
+#include "libcockatrice/card/printing/exact_card.h"
 
-#include <libcockatrice/models/deck_list/deck_list_model.h>
+#include <QWidget>
+#include <qtmetamacros.h>
 
 class QAction;
 class QMenu;
+class AbstractTabDeckEditor;
+class AllZonesCardAmountWidget;
+class CardInfoPictureWidget;
+class DeckStateManager;
+class QLabel;
+class QPoint;
+class QSlider;
 
 class PrintingSelectorCardOverlayWidget : public QWidget
 {

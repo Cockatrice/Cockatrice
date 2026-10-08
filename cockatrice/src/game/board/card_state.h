@@ -3,9 +3,12 @@
 
 #include <QMap>
 #include <QObject>
+#include <QString>
+#include <qtmetamacros.h>
 
 class CardZoneLogic;
 class CardItem;
+
 class CardState : public QObject
 {
     Q_OBJECT

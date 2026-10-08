@@ -7,19 +7,23 @@
 #ifndef DLG_SELECT_SET_FOR_CARDS_H
 #define DLG_SELECT_SET_FOR_CARDS_H
 
-#include "../interface/widgets/general/layout_containers/flow_widget.h"
-
-#include <QCheckBox>
 #include <QDialog>
-#include <QLabel>
-#include <QListWidget>
+#include <QList>
 #include <QMap>
-#include <QScrollArea>
-#include <QVBoxLayout>
-#include <libcockatrice/models/deck_list/deck_list_model.h>
+#include <QString>
+#include <QStringList>
+#include <QWidget>
+#include <qtmetamacros.h>
 
 class DeckStateManager;
 class SetEntryWidget; // Forward declaration
+class FlowWidget;
+class QCheckBox;
+class QLabel;
+class QListWidget;
+class QPushButton;
+class QScrollArea;
+class QVBoxLayout;
 
 class DlgSelectSetForCards : public QDialog
 {

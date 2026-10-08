@@ -2,12 +2,32 @@
 
 #include "../../relation/card_relation.h"
 #include "../../relation/card_relation_type.h"
+#include "libcockatrice/card/database/card_database_data.h"
+#include "libcockatrice/card/database/parser/card_database_parser.h"
+#include "libcockatrice/card/lazy_properties_hash.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
 
+#include <QChar>
 #include <QCoreApplication>
+#include <QDate>
+#include <QDateTime>
 #include <QDebug>
 #include <QFile>
+#include <QHash>
+#include <QIODevice>
+#include <QList>
+#include <QMessageLogger>
+#include <QSharedPointer>
+#include <QStringView>
+#include <QXmlStreamAttributes>
 #include <QXmlStreamReader>
+#include <QXmlStreamWriter>
+#include <QtGlobal>
+#include <qnamespace.h>
 #include <version_string.h>
+
+class ICardSetPriorityController;
 
 #define COCKATRICE_XML3_TAGNAME "cockatrice_carddatabase"
 #define COCKATRICE_XML3_TAGVER 3

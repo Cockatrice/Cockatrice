@@ -1,21 +1,26 @@
 #ifndef ISL_INTERFACE_H
 #define ISL_INTERFACE_H
 
-#include "servatrice.h"
-
+#include <QAbstractSocket>
+#include <QByteArray>
+#include <QMutex>
+#include <QObject>
 #include <QSslCertificate>
-#include <QWaitCondition>
+#include <QString>
+
+// IWYU pragma: keep
+// ServerInfo_User and ServerInfo_Game are passed by value to signals, so the
+// moc-generated code needs the complete types.
+#include <QtGlobal>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
-#include <libcockatrice/protocol/pb/serverinfo_room.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <qtmetamacros.h>
 
 class Servatrice;
 class QSslSocket;
 class QSslKey;
 class IslMessage;
-
 class Event_ServerCompleteList;
-class Event_UserMessage;
 class Event_UserJoined;
 class Event_UserLeft;
 class Event_JoinRoom;
@@ -24,6 +29,11 @@ class Event_RoomSay;
 class Event_ListGames;
 class Event_RemoveMessages;
 class Command_JoinGame;
+class CommandContainer;
+class GameEventContainer;
+class Response;
+class RoomEvent;
+class SessionEvent;
 
 class IslInterface : public QObject
 {

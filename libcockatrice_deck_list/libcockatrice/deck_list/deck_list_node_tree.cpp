@@ -1,9 +1,19 @@
 #include "deck_list_node_tree.h"
 
+#include "libcockatrice/deck_list/tree/abstract_deck_list_node.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
 #include "tree/deck_list_card_node.h"
 
+#include <QByteArray>
+#include <QChar>
 #include <QCryptographicHash>
 #include <QSet>
+#include <QSharedPointer>
+#include <QStringList>
+#include <QStringView>
+#include <QXmlStreamAttributes>
+#include <QXmlStreamReader>
+#include <QtGlobal>
 
 static constexpr int MAX_DECK_SIZE = 1e5;
 

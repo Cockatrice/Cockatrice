@@ -1,6 +1,12 @@
 #ifndef PICTURE_TO_LOAD_H
 #define PICTURE_TO_LOAD_H
 
+#include "libcockatrice/card/card_info.h"
+
+#include <QList>
+#include <QLoggingCategory>
+#include <QSharedPointer>
+#include <QString>
 #include <libcockatrice/card/printing/exact_card.h>
 
 inline Q_LOGGING_CATEGORY(CardPictureToLoadLog, "card_picture_loader.picture_to_load");

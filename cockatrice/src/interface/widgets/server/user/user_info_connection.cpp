@@ -2,7 +2,10 @@
 
 #include "../../../../client/settings/cache_settings.h"
 
-#include <QDebug>
+#include <QList>
+#include <QMessageLogger>
+#include <QSharedPointer>
+#include <QVariant>
 #include <libcockatrice/settings/servers_settings.h>
 #include <utility>
 

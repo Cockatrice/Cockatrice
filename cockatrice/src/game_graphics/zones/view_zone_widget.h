@@ -6,30 +6,34 @@
 #ifndef ZONEVIEWWIDGET_H
 #define ZONEVIEWWIDGET_H
 
-#include "../../game/zones/card_zone_logic.h"
-
 #include <QCheckBox>
 #include <QComboBox>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsWidget>
 #include <QLineEdit>
+#include <QList>
+#include <QPoint>
+#include <QPointF>
 #include <QPointer>
+#include <QRectF>
+#include <QtGlobal>
 #include <libcockatrice/utility/macros.h>
+#include <qtmetamacros.h>
 
-class QLabel;
-class QPushButton;
-class CardZone;
+// IWYU pragma: keep
+// ServerInfo_Card appears inside QList<...> in signal and slot
+// signatures, which the moc-generated code needs to be complete.
+#include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
+
 class ZoneViewZone;
 class PlayerLogic;
-class CardDatabase;
 class QScrollBar;
-class GameScene;
 class ServerInfo_Card;
 class QGraphicsSceneMouseEvent;
 class QGraphicsSceneWheelEvent;
-class QStyleOption;
 class QGraphicsView;
 class QWidget;
+class CardZoneLogic;
 
 class ScrollableGraphicsProxyWidget : public QGraphicsProxyWidget
 {

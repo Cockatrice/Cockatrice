@@ -10,10 +10,13 @@
 #include "libcockatrice/card/printing/exact_card.h"
 
 #include <QFrame>
-#include <libcockatrice/card/card_info.h>
+#include <QString>
+#include <qtmetamacros.h>
+
 class QLabel;
 class QScrollArea;
 class QTextEdit;
+class QWidget;
 
 class CardInfoTextWidget : public QFrame
 {

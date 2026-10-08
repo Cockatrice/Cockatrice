@@ -1,5 +1,17 @@
 #include "bar_chart_background_widget.h"
 
+#include <QBrush>
+#include <QColor>
+#include <QFlags>
+#include <QPainter>
+#include <QPen>
+#include <QRect>
+#include <QSize>
+#include <QSizePolicy>
+#include <QString>
+#include <QtGlobal>
+#include <qnamespace.h>
+
 BarChartBackgroundWidget::BarChartBackgroundWidget(QWidget *parent) : QWidget(parent)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

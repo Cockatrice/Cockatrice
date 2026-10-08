@@ -7,11 +7,14 @@
 #ifndef EDHREC_COMMANDER_API_RESPONSE_DISPLAY_WIDGET_H
 #define EDHREC_COMMANDER_API_RESPONSE_DISPLAY_WIDGET_H
 
-#include "../../api_response/commander/edhrec_commander_api_response.h"
-
-#include <QScrollArea>
-#include <QVBoxLayout>
+#include <QString>
 #include <QWidget>
+#include <qtmetamacros.h>
+
+class EdhrecCommanderApiResponse;
+class QHBoxLayout;
+class QScrollArea;
+class QVBoxLayout;
 
 class EdhrecCommanderApiResponseDisplayWidget : public QWidget
 {

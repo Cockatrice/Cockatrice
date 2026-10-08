@@ -3,9 +3,12 @@
 
 #include "settings_manager.h"
 
-#include <QDate>
-#include <QList>
+#include <QString>
 #include <libcockatrice/interfaces/interface_personal_settings_provider.h>
+#include <qtmetamacros.h>
+
+class QObject;
+template <typename T> class QList;
 
 class PersonalSettings : public SettingsManager, public IPersonalSettingsProvider
 {

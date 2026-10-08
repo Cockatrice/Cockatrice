@@ -1,10 +1,21 @@
 #include "edhrec_api_response_card_details_display_widget.h"
 
+#include "../../../../../cards/card_info_picture_widget.h"
+#include "../../../../../cards/card_size_widget.h"
 #include "../../../../../general/display/background_plate_widget.h"
+#include "../../api_response/cards/edhrec_api_response_card_details.h"
 #include "../../tab_edhrec_main.h"
+#include "edhrec_api_response_card_inclusion_display_widget.h"
+#include "edhrec_api_response_card_synergy_display_widget.h"
+#include "libcockatrice/card/database/card_database_querier.h"
 
+#include <QLabel>
 #include <QMouseEvent>
+#include <QObject>
+#include <QSlider>
+#include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <qnamespace.h>
 
 EdhrecApiResponseCardDetailsDisplayWidget::EdhrecApiResponseCardDetailsDisplayWidget(
     QWidget *parent,

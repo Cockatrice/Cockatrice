@@ -2,28 +2,42 @@
 #include "arrow_item.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "../../game/board/arrow_data.h"
 #include "../../game/player/player_actions.h"
+#include "../../game/player/player_info.h"
 #include "../../game/player/player_logic.h"
+#include "../../game/zones/card_zone_logic.h"
 #include "../game_scene.h"
 #include "../player/player_target.h"
 #include "../z_values.h"
-#include "../zones/card_zone.h"
 #include "card_item.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/protocol/pb/color.pb.h"
 
-#include <QDebug>
+#include <QBrush>
 #include <QElapsedTimer>
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
+#include <QLineF>
+#include <QLinearGradient>
 #include <QPainter>
+#include <QPen>
+#include <QPoint>
+#include <QString>
+#include <QTransform>
+#include <QtGlobal>
 #include <QtMath>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/command_create_arrow.pb.h>
-#include <libcockatrice/protocol/pb/command_delete_arrow.pb.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/color.h>
 #include <libcockatrice/utility/zone_names.h>
+#include <math.h>
+#include <qnamespace.h>
+#include <string>
+#include <utility>
 
 namespace
 {

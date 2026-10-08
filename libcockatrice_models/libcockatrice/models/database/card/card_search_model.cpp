@@ -3,6 +3,10 @@
 #include "../card_database_display_model.h"
 #include "../card_database_model.h"
 
+#include <QAbstractItemModel>
+#include <QObject>
+#include <QVariant>
+#include <QtGlobal>
 #include <algorithm>
 #include <libcockatrice/utility/levenshtein.h>
 

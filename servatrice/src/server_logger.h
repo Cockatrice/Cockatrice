@@ -1,14 +1,14 @@
 #ifndef SERVER_LOGGER_H
 #define SERVER_LOGGER_H
 
+#include <QList>
 #include <QMutex>
 #include <QObject>
+#include <QString>
 #include <QStringList>
-#include <QThread>
-#include <QWaitCondition>
+#include <qtmetamacros.h>
 
 class QFile;
-class Server_ProtocolHandler;
 
 class ServerLogger : public QObject
 {

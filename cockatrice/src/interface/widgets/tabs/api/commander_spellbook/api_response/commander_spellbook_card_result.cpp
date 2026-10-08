@@ -1,5 +1,7 @@
 #include "commander_spellbook_card_result.h"
 
+#include <QJsonValue>
+
 CommanderSpellbookCardResult CommanderSpellbookCardResult::fromJson(const QJsonObject &json)
 {
     CommanderSpellbookCardResult result;

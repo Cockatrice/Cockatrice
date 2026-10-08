@@ -2,10 +2,19 @@
 
 #include <QDate>
 #include <QFile>
-#include <QMessageBox>
+#include <QIODevice>
+#include <QList>
+#include <QSharedPointer>
+#include <QStringView>
 #include <QTextStream>
+#include <QVariant>
 #include <QXmlStreamReader>
+#include <QtGlobal>
+#include <qnamespace.h>
+#include <stdio.h>
 #include <utility>
+
+class QObject;
 
 #define TIPDDBMODEL_COLUMNS 3
 

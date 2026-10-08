@@ -1,9 +1,27 @@
 #include "visual_deck_display_options_widget.h"
 
 #include "../../pixel_map_generator.h"
+#include "../deck_editor/deck_editor_deck_dock_widget.h"
+#include "../quick_settings/settings_button_widget.h"
 #include "../tabs/visual_deck_editor/tab_deck_editor_visual.h"
+#include "../utility/compact_push_button.h"
+#include "deck_list_model.h"
 
+#include <QAbstractItemModel>
+#include <QAbstractItemView>
+#include <QComboBox>
+#include <QFlags>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QListWidget>
+#include <QListWidgetItem>
+#include <QPushButton>
+#include <QSize>
+#include <QSizePolicy>
+#include <QStringLiteral>
+#include <QtGlobal>
 #include <libcockatrice/utility/qt_utils.h>
+#include <qnamespace.h>
 
 VisualDeckDisplayOptionsWidget::VisualDeckDisplayOptionsWidget(QWidget *parent) : QWidget(parent)
 {

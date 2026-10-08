@@ -4,6 +4,9 @@
 #include "../first_run_wizard_page.h"
 
 #include <QSize>
+#include <QString>
+#include <QtGlobal>
+#include <qtmetamacros.h>
 
 class QComboBox;
 class QLabel;

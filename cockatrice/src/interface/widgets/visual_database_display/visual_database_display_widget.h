@@ -7,25 +7,38 @@
 #ifndef VISUAL_DATABASE_DISPLAY_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_WIDGET_H
 
-#include "../../../filters/filter_tree_model.h"
-#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
-#include "../../key_signals.h"
-#include "../cards/card_info_picture_with_text_overlay_widget.h"
-#include "../cards/card_size_widget.h"
-#include "../general/layout_containers/flow_widget.h"
-#include "../general/layout_containers/overlap_control_widget.h"
-#include "../utility/custom_line_edit.h"
-#include "visual_database_display_color_filter_widget.h"
-#include "visual_database_display_filter_toolbar_widget.h"
+#include "libcockatrice/card/card_info.h"
 
 #include <QLoggingCategory>
-#include <QVBoxLayout>
-#include <QWheelEvent>
+#include <QMouseEvent>
+#include <QString>
+#include <QStringList>
 #include <QWidget>
 #include <functional>
-#include <libcockatrice/models/database/card_database_model.h>
-#include <libcockatrice/models/deck_list/deck_list_model.h>
-#include <qscrollarea.h>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
+
+class CardDatabaseDisplayModel;
+class CardDatabaseModel;
+class CardDatabaseView;
+class CardSizeWidget;
+class DeckList;
+class DeckListModel;
+class ExactCard;
+class FilterTreeModel;
+class FlowWidget;
+class OverlapControlWidget;
+class QLabel;
+class QModelIndex;
+class QPushButton;
+class QScrollArea;
+class QTimer;
+class QToolButton;
+class QVBoxLayout;
+class SearchLineEdit;
+class VisualDatabaseDisplayColorFilterWidget;
+class VisualDatabaseDisplayFilterToolbarWidget;
+template <typename T> class QList;
 
 inline Q_LOGGING_CATEGORY(VisualDatabaseDisplayLog, "visual_database_display");
 

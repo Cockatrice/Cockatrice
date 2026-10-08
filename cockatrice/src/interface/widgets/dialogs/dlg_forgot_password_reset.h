@@ -7,13 +7,13 @@
 #ifndef DLG_FORGOTPASSWORDRESET_H
 #define DLG_FORGOTPASSWORDRESET_H
 
-#include <QComboBox>
 #include <QDialog>
 #include <QLineEdit>
+#include <QString>
+#include <qtmetamacros.h>
 
 class QLabel;
-class QPushButton;
-class QCheckBox;
+class QWidget;
 
 class DlgForgotPasswordReset : public QDialog
 {

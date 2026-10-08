@@ -1,18 +1,31 @@
 #include "visual_deck_storage_model.h"
 
+#include "../../deck_loader/deck_file_format.h"
 #include "../../deck_loader/deck_loader.h"
+#include "../../deck_loader/loaded_deck.h"
 #include "../cards/additional_info/deck_color_identity.h"
+#include "libcockatrice/deck_list/deck_list.h"
 
+#include <QChar>
 #include <QDir>
 #include <QDirIterator>
 #include <QElapsedTimer>
 #include <QFile>
 #include <QFileInfo>
 #include <QFutureWatcher>
+#include <QMetaObject>
+#include <QMetaType>
 #include <QSet>
+#include <QSharedPointer>
+#include <QVariant>
 #include <QtConcurrentRun>
+#include <compare>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/utility/card_ref.h>
+#include <optional>
 #include <utility>
+
+class QObject;
 
 namespace
 {

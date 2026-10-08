@@ -8,6 +8,9 @@
 #define CARD_COMPLETER_PROXY_MODEL_H
 
 #include <QSortFilterProxyModel>
+#include <qtmetamacros.h>
+
+class QObject;
 
 class CardCompleterProxyModel : public QSortFilterProxyModel
 {

@@ -2,9 +2,20 @@
 
 #include "../../../client/settings/cache_settings.h"
 
+#include <QAbstractItemView>
+#include <QHBoxLayout>
+#include <QLineEdit>
+#include <QList>
+#include <QListWidget>
+#include <QListWidgetItem>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSharedPointer>
+#include <QSizePolicy>
+#include <QString>
+#include <QStringList>
 #include <QVBoxLayout>
+#include <QWidget>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
 
 DlgDefaultTagsEditor::DlgDefaultTagsEditor(QWidget *parent) : QDialog(parent)

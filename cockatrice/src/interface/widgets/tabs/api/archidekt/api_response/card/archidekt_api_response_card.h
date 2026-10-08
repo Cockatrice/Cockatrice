@@ -3,11 +3,10 @@
 
 #include "archidekt_api_response_edition.h"
 
-#include <QDebug>
-#include <QJsonArray>
 #include <QJsonObject>
+#include <QList>
 #include <QString>
-#include <QVector>
+#include <QStringList>
 
 class ArchidektApiResponseCard
 {

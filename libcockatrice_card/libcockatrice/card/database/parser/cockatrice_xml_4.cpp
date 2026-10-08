@@ -1,13 +1,36 @@
 #include "cockatrice_xml_4.h"
 
 #include "../../relation/card_relation.h"
+#include "libcockatrice/card/database/card_database_data.h"
+#include "libcockatrice/card/database/parser/card_database_parser.h"
+#include "libcockatrice/card/lazy_properties_hash.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/relation/card_relation_type.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/interfaces/interface_card_preference_provider.h"
 
 #include <QCoreApplication>
+#include <QDate>
+#include <QDateTime>
 #include <QDebug>
 #include <QFile>
+#include <QIODevice>
+#include <QList>
+#include <QMap>
+#include <QMessageLogger>
+#include <QSharedPointer>
+#include <QStringList>
+#include <QStringView>
+#include <QXmlStreamAttribute>
+#include <QXmlStreamAttributes>
 #include <QXmlStreamReader>
+#include <QXmlStreamWriter>
 #include <libcockatrice/card/format/format_legality_rules.h>
+#include <qnamespace.h>
+#include <utility>
 #include <version_string.h>
+
+class ICardSetPriorityController;
 
 #define COCKATRICE_XML4_TAGNAME "cockatrice_carddatabase"
 #define COCKATRICE_XML4_TAGVER 4

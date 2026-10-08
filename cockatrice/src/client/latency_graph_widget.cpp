@@ -5,7 +5,11 @@
 
 #include "latency_graph_widget.h"
 
+#include <QColor>
 #include <QPainter>
+#include <QRectF>
+#include <QtGlobal>
+#include <qnumeric.h>
 
 LatencyGraphWidget::LatencyGraphWidget(QWidget *parent) : QWidget(parent)
 {

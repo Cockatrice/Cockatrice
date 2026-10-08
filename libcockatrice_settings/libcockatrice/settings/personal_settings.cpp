@@ -1,5 +1,12 @@
 #include "personal_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QList>
+#include <QVariant>
+
+class QObject;
+
 PersonalSettings::PersonalSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "personal.ini", "personal", QString(), parent)
 {

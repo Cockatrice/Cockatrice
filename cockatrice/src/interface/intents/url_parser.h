@@ -2,8 +2,11 @@
 #define COCKATRICE_URL_PARSER_H
 
 #include <QList>
+#include <QMetaObject>
 #include <QObject>
+#include <QString>
 #include <QUrlQuery>
+#include <qtmetamacros.h>
 
 class Intent;
 class MainWindow;

@@ -6,13 +6,26 @@
 #include "../server/user/user_info_connection.h"
 #include "update/client/release_channel.h"
 
+#include <QByteArray>
 #include <QCoreApplication>
+#include <QDate>
+#include <QDebug>
 #include <QFile>
 #include <QFileDialog>
 #include <QGridLayout>
+#include <QGroupBox>
 #include <QLineEdit>
+#include <QList>
+#include <QMap>
 #include <QMessageBox>
+#include <QPushButton>
+#include <QSharedPointer>
+#include <QSizePolicy>
 #include <QTranslator>
+#include <QVBoxLayout>
+#include <QVariant>
+#include <QVariantList>
+#include <QtGlobal>
 #include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/download_settings.h>
@@ -22,6 +35,9 @@
 #include <libcockatrice/settings/updates_settings.h>
 #include <libcockatrice/utility/macros.h>
 #include <libcockatrice/utility/translation_loader.h>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <utility>
 
 enum startupCardUpdateCheckBehaviorIndex
 {

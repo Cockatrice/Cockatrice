@@ -20,28 +20,26 @@
 #ifndef SERVERSOCKETINTERFACE_H
 #define SERVERSOCKETINTERFACE_H
 
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/server_message.pb.h"
+
+#include <QAbstractSocket>
+#include <QByteArray>
 #include <QHostAddress>
+#include <QList>
 #include <QMutex>
+#include <QString>
+#include <QStringList>
 #include <QTcpSocket>
 #include <QWebSocket>
-#include <libcockatrice/protocol/pb/command_get_server_stats.pb.h>
-#include <libcockatrice/protocol/pb/command_replay_download_by_game_id.pb.h>
-#include <libcockatrice/protocol/pb/command_report.pb.h>
-#include <libcockatrice/protocol/pb/command_report_add_comment.pb.h>
-#include <libcockatrice/protocol/pb/command_report_assign.pb.h>
-#include <libcockatrice/protocol/pb/command_report_details.pb.h>
-#include <libcockatrice/protocol/pb/command_report_list.pb.h>
-#include <libcockatrice/protocol/pb/command_report_my_list.pb.h>
-#include <libcockatrice/protocol/pb/command_report_resolve.pb.h>
-#include <libcockatrice/protocol/pb/command_report_stats.pb.h>
-#include <libcockatrice/protocol/pb/command_report_user_info.pb.h>
+#include <QtGlobal>
+#include <qtmetamacros.h>
 #include <server_protocolhandler.h>
 
 class Servatrice;
 class Servatrice_DatabaseInterface;
 class DeckList;
 class ServerInfo_DeckStorage_Folder;
-
 class Command_AddToList;
 class Command_RemoveFromList;
 class Command_DeckList;
@@ -64,16 +62,51 @@ class Command_ReplayModifyMatch;
 class Command_ReplayDeleteMatch;
 class Command_ReplayGetCode;
 class Command_ReplaySubmitCode;
-
 class Command_BanFromServer;
 class Command_UpdateServerMessage;
 class Command_ShutdownServer;
 class Command_ReloadConfig;
 class Command_ReplayDownloadByGameId;
-
 class Command_AccountEdit;
 class Command_AccountImage;
 class Command_AccountPassword;
+class Command_Activate;
+class Command_AddCardArtRule;
+class Command_AdjustMod;
+class Command_ForceActivateUser;
+class Command_ForgotPasswordChallenge;
+class Command_ForgotPasswordRequest;
+class Command_ForgotPasswordReset;
+class Command_GetAdminNotes;
+class Command_GetBanHistory;
+class Command_GetModeratorLastLogins;
+class Command_GetServerStats;
+class Command_GetUserAlts;
+class Command_GetUserSessions;
+class Command_GetWarnHistory;
+class Command_GetWarnList;
+class Command_GrantReplayAccess;
+class Command_ListCardArtRules;
+class Command_Register;
+class Command_RemoveCardArtRule;
+class Command_RemoveUserAvatar;
+class Command_Report;
+class Command_ReportAddComment;
+class Command_ReportAssign;
+class Command_ReportDetails;
+class Command_ReportList;
+class Command_ReportMyList;
+class Command_ReportResolve;
+class Command_ReportStats;
+class Command_ReportUserInfo;
+class Command_RequestPasswordSalt;
+class Command_ResetUserPassword;
+class Command_SetCardArtParams;
+class Command_UpdateAdminNotes;
+class Command_ViewLogHistory;
+class Command_WarnUser;
+class QObject;
+class ResponseContainer;
 
 class AbstractServerSocketInterface : public Server_ProtocolHandler
 {

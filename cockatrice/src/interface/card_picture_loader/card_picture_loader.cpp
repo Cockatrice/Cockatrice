@@ -4,27 +4,45 @@
 #include "../pixel_map_generator.h"
 #include "card_picture_loader_cache_method.h"
 #include "card_picture_loader_local_schemes.h"
+#include "card_picture_loader_status_bar.h"
+#include "card_picture_loader_worker.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
 
 #include <QApplication>
-#include <QBuffer>
+#include <QChar>
+#include <QColor>
+#include <QDateTime>
 #include <QDebug>
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
+#include <QImage>
+#include <QLatin1Char>
+#include <QList>
 #include <QMainWindow>
+#include <QMessageLogger>
 #include <QMetaObject>
-#include <QMovie>
-#include <QNetworkRequest>
-#include <QPainter>
+#include <QMetaType>
+#include <QPixmap>
 #include <QPixmapCache>
 #include <QScreen>
+#include <QSharedPointer>
+#include <QSize>
 #include <QStatusBar>
+#include <QString>
+#include <QStringLiteral>
 #include <QThread>
-#include <algorithm>
+#include <QWidget>
+#include <QtGlobal>
+#include <compare>
 #include <libcockatrice/settings/cache_storage_settings.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
-#include <utility>
+#include <qnamespace.h>
 
 // never cache more than 300 cards at once for a single deck
 #define CACHED_CARD_PER_DECK_MAX 300

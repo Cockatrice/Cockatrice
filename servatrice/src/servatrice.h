@@ -22,34 +22,44 @@
 
 #include "metrics_registry.h"
 
+#include <QByteArray>
 #include <QDateTime>
 #include <QHostAddress>
+#include <QList>
+#include <QMap>
 #include <QMetaType>
 #include <QMutex>
+#include <QMutexLocker>
 #include <QReadWriteLock>
-#include <QSqlDatabase>
 #include <QSslCertificate>
 #include <QSslKey>
+#include <QString>
+
+// IWYU pragma: keep
+// Q_DECLARE_METATYPE below needs the complete type.
+#include <QSqlDatabase>
 #include <QTcpServer>
 #include <QWebSocketServer>
+#include <QtGlobal>
 #include <atomic>
 #include <libcockatrice/protocol/pb/response_report_stats.pb.h>
 #include <memory>
+#include <qtmetamacros.h>
 #include <server.h>
 #include <utility>
 
+class QObject;
+class QThread;
+class SessionEvent;
+
 Q_DECLARE_METATYPE(QSqlDatabase)
 
-class QSqlQuery;
 class QTimer;
-
-class GameReplay;
 class Servatrice;
 class Servatrice_ConnectionPool;
 class Servatrice_DatabaseInterface;
 class AbstractServerSocketInterface;
 class IslInterface;
-class FeatureSet;
 
 class Servatrice_GameServer : public QTcpServer
 {

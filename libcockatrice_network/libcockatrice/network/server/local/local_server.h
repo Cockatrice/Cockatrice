@@ -9,8 +9,11 @@
 
 #include <../remote/server.h>
 #include <../remote/server_database_interface.h>
+#include <QString>
+#include <qtmetamacros.h>
 
 class LocalServerInterface;
+class QObject;
 
 class LocalServer : public Server
 {

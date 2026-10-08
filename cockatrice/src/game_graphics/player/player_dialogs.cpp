@@ -1,12 +1,21 @@
 #include "player_dialogs.h"
 
+#include "../../client/settings/cache_settings.h"
 #include "../../client/settings/card_counter_settings.h"
+#include "../../game/player/player_actions.h"
+#include "../../game/player/player_logic.h"
 #include "../../interface/widgets/utility/get_text_with_max.h"
+#include "../board/abstract_counter.h"
 #include "../board/card_item.h"
+#include "../dialogs/dlg_create_token.h"
+#include "../dialogs/dlg_move_top_cards_until.h"
 #include "../dialogs/dlg_roll_dice.h"
+#include "../game_scene.h"
 #include "../player/player_graphics_item.h"
 
+#include <QChar>
 #include <QInputDialog>
+#include <QLineEdit>
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/utility/string_limits.h>
 

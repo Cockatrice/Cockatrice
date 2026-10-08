@@ -1,11 +1,12 @@
 #ifndef COCKATRICE_FORMAT_LEGALITY_RULES_H
 #define COCKATRICE_FORMAT_LEGALITY_RULES_H
 
-#include <QRegularExpression>
+#include <QList>
 #include <QSharedPointer>
 #include <QString>
 
 class CardInfo;
+
 using CardInfoPtr = QSharedPointer<CardInfo>;
 
 struct CardCondition

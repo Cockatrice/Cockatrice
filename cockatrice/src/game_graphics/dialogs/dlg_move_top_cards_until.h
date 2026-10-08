@@ -7,14 +7,19 @@
 #ifndef DLG_MOVE_TOP_CARDS_UNTIL_H
 #define DLG_MOVE_TOP_CARDS_UNTIL_H
 
-#include <QCheckBox>
-#include <QComboBox>
 #include <QDialog>
-#include <QDialogButtonBox>
-#include <QLabel>
-#include <QSpinBox>
+#include <QList>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
 
 class FilterString;
+class QCheckBox;
+class QComboBox;
+class QDialogButtonBox;
+class QLabel;
+class QSpinBox;
+class QWidget;
 
 struct MoveTopCardsUntilOptions
 {

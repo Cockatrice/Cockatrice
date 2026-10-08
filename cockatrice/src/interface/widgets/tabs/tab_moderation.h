@@ -3,7 +3,9 @@
 
 #include "tab.h"
 
-#include <libcockatrice/protocol/pb/response.pb.h>
+#include <QString>
+#include <QtGlobal>
+#include <qtmetamacros.h>
 
 class AbstractClient;
 class QGroupBox;
@@ -12,6 +14,8 @@ class QLineEdit;
 class QPushButton;
 class QTableWidget;
 class QTextEdit;
+class Response;
+class TabSupervisor;
 
 /**
  * Staff investigation tool. Lets moderators look up a user's account data,

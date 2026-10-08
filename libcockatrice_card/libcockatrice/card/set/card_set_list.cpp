@@ -1,5 +1,12 @@
 #include "card_set_list.h"
 
+#include "libcockatrice/card/set/card_set.h"
+
+#include <QDate>
+#include <QString>
+#include <algorithm>
+#include <compare>
+
 class CardSetList::KeyCompareFunctor
 {
 public:

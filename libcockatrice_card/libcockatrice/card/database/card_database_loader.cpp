@@ -2,6 +2,10 @@
 
 #include "card_database.h"
 #include "card_database_cache.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_data.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/interfaces/interface_card_database_path_provider.h"
 #include "parser/card_database_parser.h"
 #include "parser/cockatrice_xml_3.h"
 #include "parser/cockatrice_xml_4.h"
@@ -9,11 +13,22 @@
 #include <QByteArray>
 #include <QCoreApplication>
 #include <QCryptographicHash>
+#include <QDateTime>
 #include <QDebug>
+#include <QDir>
 #include <QDirIterator>
 #include <QFile>
 #include <QFileInfo>
+#include <QIODevice>
+#include <QMessageLogger>
+#include <QMutexLocker>
+#include <QSharedPointer>
 #include <QTime>
+#include <qalgorithms.h>
+#include <utility>
+
+class ICardPreferenceProvider;
+class ICardSetPriorityController;
 
 CardDatabaseLoader::CardDatabaseLoader(QObject *parent,
                                        CardDatabase *db,

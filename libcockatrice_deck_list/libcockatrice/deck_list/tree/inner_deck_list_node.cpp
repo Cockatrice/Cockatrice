@@ -1,6 +1,18 @@
 #include "inner_deck_list_node.h"
 
 #include "deck_list_card_node.h"
+#include "libcockatrice/deck_list/tree/abstract_deck_list_card_node.h"
+#include "libcockatrice/deck_list/tree/abstract_deck_list_node.h"
+
+#include <QObject>
+#include <QSharedPointer>
+#include <QStringView>
+#include <QXmlStreamAttributes>
+#include <QXmlStreamReader>
+#include <QXmlStreamWriter>
+#include <QtGlobal>
+#include <algorithm>
+#include <compare>
 
 InnerDecklistNode::InnerDecklistNode(InnerDecklistNode *other, InnerDecklistNode *_parent)
     : AbstractDecklistNode(_parent), name(other->getName())

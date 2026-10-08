@@ -1,9 +1,12 @@
 #ifndef COCKATRICE_HANDLE_COMMANDER_BRACKETS_H
 #define COCKATRICE_HANDLE_COMMANDER_BRACKETS_H
 
-#include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QObject>
+#include <QVariantMap>
+#include <qtmetamacros.h>
+
+class QNetworkAccessManager;
 
 class HandleCommanderBrackets : public QObject
 {

@@ -1,6 +1,16 @@
 #include "card_database_settings.h"
 
+#include "libcockatrice/interfaces/interface_card_set_priority_controller.h"
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QList>
 #include <QMutexLocker>
+#include <QSettings>
+#include <QStringList>
+#include <QVariant>
+#include <functional>
+
+class QObject;
 
 CardDatabaseSettings::CardDatabaseSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "cardDatabase.ini", QString(), QString(), parent)

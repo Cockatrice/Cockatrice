@@ -2,8 +2,12 @@
 #define COCKATRICE_SEGMENTED_BAR_WIDGET_H
 
 #include <QColor>
+#include <QList>
+#include <QString>
+#include <QStringList>
 #include <QVector>
 #include <QWidget>
+#include <qtmetamacros.h>
 
 class SegmentedBarWidget : public QWidget
 {

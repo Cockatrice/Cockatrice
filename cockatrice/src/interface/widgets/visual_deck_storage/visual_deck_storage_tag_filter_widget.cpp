@@ -4,6 +4,13 @@
 #include "deck_preview/deck_preview_tag_display_widget.h"
 
 #include <QHBoxLayout>
+#include <QSet>
+#include <QSharedPointer>
+#include <QSizePolicy>
+#include <QString>
+#include <algorithm>
+#include <compare>
+#include <qnamespace.h>
 
 VisualDeckStorageTagFilterWidget::VisualDeckStorageTagFilterWidget(QWidget *parent) : QWidget(parent)
 {

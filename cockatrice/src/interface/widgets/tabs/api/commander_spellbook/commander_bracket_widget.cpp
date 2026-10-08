@@ -3,7 +3,9 @@
 #include "../../../../../client/settings/cache_settings.h"
 #include "../../../../pixel_map_generator.h"
 #include "commander_bracket_service.h"
+#include "libcockatrice/deck_list/deck_list.h"
 
+#include <QAbstractButton>
 #include <QComboBox>
 #include <QDialog>
 #include <QDialogButtonBox>
@@ -11,11 +13,17 @@
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QList>
+#include <QObject>
 #include <QPushButton>
+#include <QStringLiteral>
 #include <QTimer>
 #include <QToolButton>
 #include <QVBoxLayout>
 #include <libcockatrice/settings/deck_editor_settings.h>
+#include <qnamespace.h>
+
+template <class T> class QSharedPointer;
 
 CommanderBracketWidget::CommanderBracketWidget(QWidget *parent) : QWidget(parent)
 {

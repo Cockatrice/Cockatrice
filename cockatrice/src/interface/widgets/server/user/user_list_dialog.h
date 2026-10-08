@@ -2,7 +2,8 @@
 #define COCKATRICE_USER_LIST_DIALOG_H
 
 #include <QDialog>
-#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <QString>
+#include <qtmetamacros.h>
 
 class QComboBox;
 class QLabel;
@@ -11,6 +12,8 @@ class QRadioButton;
 class QSpinBox;
 class QLineEdit;
 class QCheckBox;
+class QWidget;
+class ServerInfo_User;
 
 class BanDialog : public QDialog
 {

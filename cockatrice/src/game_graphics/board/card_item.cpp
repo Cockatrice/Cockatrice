@@ -1,26 +1,52 @@
 #include "card_item.h"
 
 #include "../../client/settings/cache_settings.h"
-#include "../../client/settings/card_counter_settings.h"
+#include "../../game/abstract_game.h"
+#include "../../game/board/card_state.h"
+#include "../../game/game_state.h"
 #include "../../game/phase.h"
 #include "../../game/player/player_actions.h"
+#include "../../game/player/player_info.h"
 #include "../../game/player/player_logic.h"
+#include "../../game/player/player_manager.h"
+#include "../../game/zones/card_zone_logic.h"
+#include "../../game/zones/table_zone_logic.h"
 #include "../../game/zones/view_zone_logic.h"
-#include "../../interface/widgets/tabs/tab_game.h"
+#include "../card_dimensions.h"
 #include "../game_scene.h"
-#include "../zones/table_zone.h"
-#include "../zones/view_zone.h"
 #include "arrow_item.h"
 #include "card_drag_item.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/protocol/pb/serverinfo_cardcounter.pb.h"
 
 #include <../../client/settings/card_counter_settings.h>
 #include <QApplication>
+#include <QBrush>
+#include <QChar>
+#include <QColor>
+#include <QCursor>
+#include <QFlags>
+#include <QGraphicsItem>
+#include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
-#include <QMenu>
+#include <QMap>
+#include <QMapIterator>
+#include <QObject>
 #include <QPainter>
+#include <QPen>
+#include <QRectF>
+#include <QSharedPointer>
+#include <QSizeF>
+#include <QTransform>
+#include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
 #include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/utility/card_ref.h>
+#include <qnamespace.h>
+
+struct CardRef;
 
 CardItem::CardItem(PlayerLogic *_owner,
                    QGraphicsItem *parent,

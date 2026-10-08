@@ -1,13 +1,13 @@
 #ifndef COCKATRICE_ARROW_REGISTRY_H
 #define COCKATRICE_ARROW_REGISTRY_H
 
-#include "board/arrow_data.h"
-
+#include <QList>
 #include <QMap>
 #include <QSet>
-#include <QSharedPointer>
 
 class ArrowItem;
+struct ArrowData;
+template <class T> class QSharedPointer;
 
 struct ArrowKey
 {

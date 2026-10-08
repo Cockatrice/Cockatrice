@@ -7,11 +7,17 @@
 #ifndef ABSTRACTCARDDRAGITEM_H
 #define ABSTRACTCARDDRAGITEM_H
 
-#include "abstract_card_item.h"
+#include "../card_dimensions.h"
+#include "graphics_item_type.h"
 
-class QGraphicsScene;
-class CardZone;
-class CardInfo;
+#include <QGraphicsItem>
+#include <QList>
+#include <QObject>
+#include <QPointF>
+#include <QRectF>
+#include <qtmetamacros.h>
+
+class AbstractCardItem;
 
 class AbstractCardDragItem : public QObject, public QGraphicsItem
 {

@@ -3,6 +3,9 @@
 #include "../../../client/settings/cache_settings.h"
 #include "visual_deck_storage_widget.h"
 
+#include <QComboBox>
+#include <QHBoxLayout>
+#include <QtGlobal>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
 
 VisualDeckStorageSortWidget::VisualDeckStorageSortWidget(VisualDeckStorageWidget *parent) : QWidget(parent)

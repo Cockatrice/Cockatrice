@@ -1,12 +1,21 @@
 #include "mana_distribution_widget.h"
 
+#include "../../../general/display/charts/bars/color_bar.h"
+#include "../../../general/display/charts/pies/color_pie.h"
+#include "../../abstract_analytics_panel_widget.h"
 #include "../../analytics_panel_widget_registrar.h"
+#include "../../deck_list_statistics_analyzer.h"
 #include "mana_distribution_config_dialog.h"
+#include "mana_distribution_single_display_widget.h"
 
-#include <QComboBox>
-#include <QDialogButtonBox>
-#include <QLabel>
+#include <QDialog>
+#include <QHBoxLayout>
+#include <QHash>
+#include <QList>
+#include <QSharedPointer>
+#include <QStringList>
 #include <QVBoxLayout>
+#include <QWidget>
 
 namespace
 {

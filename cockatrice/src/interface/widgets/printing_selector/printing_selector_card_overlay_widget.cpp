@@ -3,23 +3,46 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../card_picture_loader/card_picture_loader.h"
 #include "../cards/card_info_picture_widget.h"
-#include "printing_selector_card_display_widget.h"
+#include "../tabs/abstract_tab_deck_editor.h"
+#include "all_zones_card_amount_widget.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
 
+#include <QAction>
 #include <QApplication>
+#include <QDebug>
 #include <QFileDialog>
+#include <QGuiApplication>
+#include <QImage>
 #include <QImageReader>
 #include <QLabel>
+#include <QList>
 #include <QMenu>
 #include <QMessageBox>
 #include <QMouseEvent>
+#include <QPixmap>
 #include <QPixmapCache>
+#include <QPoint>
+#include <QRect>
 #include <QScreen>
+#include <QSharedPointer>
+#include <QSize>
+#include <QSizeF>
+#include <QSlider>
+#include <QString>
+#include <QStringLiteral>
 #include <QVBoxLayout>
+#include <QVariant>
+#include <QtGlobal>
 #include <QtMath>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/settings/card_override_settings.h>
-#include <utility>
+#include <qnamespace.h>
+
+class DeckStateManager;
 
 namespace
 {

@@ -8,11 +8,15 @@
 #define FILTERTREEMODEL_H
 
 #include <QAbstractItemModel>
+#include <QList>
+#include <QModelIndex>
 #include <libcockatrice/filters/filter_card.h>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
 
 class FilterTree;
-class CardFilter;
 class FilterTreeNode;
+class QObject;
 
 class FilterTreeModel : public QAbstractItemModel
 {

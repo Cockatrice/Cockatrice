@@ -7,8 +7,10 @@
 #ifndef TRANSLATECOUNTERNAME_H
 #define TRANSLATECOUNTERNAME_H
 
+#include <QByteArray>
+#include <QCoreApplication>
+#include <QMap>
 #include <QString>
-#include <QtCore>
 
 class TranslateCounterName
 {

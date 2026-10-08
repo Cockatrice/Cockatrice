@@ -9,8 +9,11 @@
 
 #include "settings_manager.h"
 
-#include <QObject>
-#include <libcockatrice/utility/card_ref.h>
+#include <QString>
+#include <qtmetamacros.h>
+
+class QObject;
+struct CardRef;
 
 class CardOverrideSettings : public SettingsManager
 {

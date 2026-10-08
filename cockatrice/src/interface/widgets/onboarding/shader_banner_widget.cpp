@@ -1,16 +1,27 @@
 #include "shader_banner_widget.h"
 
+#include "../../theme_config.h"
 #include "../../theme_manager.h"
 #include "banner_shader_config.h"
 #include "brand_colors.h"
 
 #include <QApplication>
+#include <QBrush>
+#include <QDebug>
+#include <QLinearGradient>
 #include <QPainter>
+#include <QPalette>
 #include <QQmlContext>
 #include <QQmlEngine>
 #include <QQuickWidget>
-#include <QResizeEvent>
+#include <QRgb>
 #include <QStackedLayout>
+#include <QString>
+#include <QUrl>
+#include <QtGlobal>
+#include <qmath.h>
+#include <qnamespace.h>
+#include <qnumeric.h>
 
 namespace
 {

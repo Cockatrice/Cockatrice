@@ -2,9 +2,22 @@
 
 #include "../../../card_picture_loader/card_picture_loader.h"
 #include "../../cards/card_art_utils.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database.h"
+#include "libcockatrice/card/database/card_database_loader.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
 
+#include <QChar>
+#include <QMetaObject>
 #include <QPointer>
+#include <QRect>
+#include <QSize>
+#include <QStringList>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/utility/card_ref.h>
+#include <memory>
 
 static QString makeKey(const QString &user, const QString &card, const QString &providerId)
 {

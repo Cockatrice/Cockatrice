@@ -4,8 +4,16 @@
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../../pixel_map_generator.h"
 
+#include <QChar>
+#include <QEvent>
+#include <QFlags>
 #include <QHBoxLayout>
 #include <QKeyEvent>
+#include <QLineEdit>
+#include <QList>
+#include <QPoint>
+#include <QPushButton>
+#include <QStringLiteral>
 #include <QToolTip>
 
 SequenceEdit::SequenceEdit(const QString &_shortcutName, QWidget *parent) : QWidget(parent)

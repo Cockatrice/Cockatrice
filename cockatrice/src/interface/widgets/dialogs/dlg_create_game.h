@@ -9,7 +9,9 @@
 
 #include <QDialog>
 #include <QMap>
+#include <QString>
 #include <libcockatrice/utility/macros.h>
+#include <qtmetamacros.h>
 
 class QCheckBox;
 class QDialogButtonBox;
@@ -22,6 +24,7 @@ class QSpinBox;
 class Response;
 class ServerInfo_Game;
 class TabRoom;
+class QWidget;
 
 class DlgCreateGame : public QDialog
 {

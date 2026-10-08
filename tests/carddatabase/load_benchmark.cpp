@@ -12,25 +12,30 @@
  * (~/.local/share/Cockatrice/Cockatrice/...).
  */
 
-#include "mocks.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/set/card_set_list.h"
 
-#include "gtest/gtest.h"
 #include <QAbstractItemModel>
 #include <QCoreApplication>
-#include <QDateTime>
+#include <QDebug>
 #include <QDir>
 #include <QElapsedTimer>
-#include <QEventLoop>
 #include <QFile>
+#include <QHash>
+#include <QList>
 #include <QLoggingCategory>
+#include <QObject>
+#include <QSharedPointer>
+#include <QString>
 #include <QStringList>
-#include <QTimer>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_loader.h>
 #include <libcockatrice/interfaces/interface_card_database_path_provider.h>
 #include <libcockatrice/interfaces/noop_card_preference_provider.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 #include <libcockatrice/models/database/card_database_model.h>
+#include <qlogging.h>
 
 static QString defaultXdgPath(const QString &file)
 {

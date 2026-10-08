@@ -3,7 +3,15 @@
 
 #include "settings_manager.h"
 
+#include <QString>
+#include <QStringList>
+#include <QtGlobal>
 #include <libcockatrice/interfaces/interface_interface_settings_provider.h>
+#include <qtmetamacros.h>
+
+class QObject;
+struct PlaymatInfo;
+template <typename T> class QList;
 
 class InterfaceSettings : public SettingsManager, public IInterfaceSettingsProvider
 {

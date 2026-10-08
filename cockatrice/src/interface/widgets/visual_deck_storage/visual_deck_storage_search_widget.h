@@ -6,11 +6,13 @@
 #ifndef VISUAL_DECK_STORAGE_SEARCH_WIDGET_H
 #define VISUAL_DECK_STORAGE_SEARCH_WIDGET_H
 
-#include <QHBoxLayout>
-#include <QLineEdit>
+#include <QString>
 #include <QWidget>
+#include <qtmetamacros.h>
 
 class QTimer;
+class QHBoxLayout;
+class QLineEdit;
 
 class VisualDeckStorageSearchWidget : public QWidget
 {

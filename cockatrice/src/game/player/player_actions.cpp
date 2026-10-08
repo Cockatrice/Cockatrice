@@ -1,14 +1,54 @@
 #include "player_actions.h"
 
+#include "../../client/settings/cache_settings.h"
+#include "../../game_graphics/board/card_item.h"
+#include "../../game_graphics/dialogs/dlg_create_token.h"
 #include "../../game_graphics/dialogs/dlg_move_top_cards_until.h"
-#include "../../game_graphics/dialogs/dlg_roll_dice.h"
 #include "../../game_graphics/player/card_menu_action_type.h"
-#include "../../game_graphics/zones/hand_zone.h"
 #include "../../game_graphics/zones/table_zone.h"
-#include "../../interface/widgets/tabs/tab_game.h"
-#include "../../interface/widgets/utility/get_text_with_max.h"
+#include "../../interface/deck_loader/loaded_deck.h"
+#include "../abstract_game.h"
+#include "../board/counter_state.h"
+#include "../game_event_handler.h"
+#include "../zones/card_zone_logic.h"
+#include "../zones/hand_zone_logic.h"
+#include "../zones/pile_zone_logic.h"
+#include "../zones/table_zone_logic.h"
 #include "../zones/view_zone_logic.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/relation/card_relation_type.h"
+#include "libcockatrice/deck_list/deck_list.h"
+#include "libcockatrice/filters/filter_string.h"
+#include "libcockatrice/protocol/pb/card_attributes.pb.h"
+#include "libcockatrice/protocol/pb/game_commands.pb.h"
+#include "libcockatrice/settings/cards_display_settings.h"
+#include "player_info.h"
+#include "player_logic.h"
 
+#include <QAction>
+#include <QChar>
+#include <QColor>
+#include <QFlags>
+#include <QInputDialog>
+#include <QKeyEvent>
+#include <QList>
+#include <QMap>
+#include <QMapIterator>
+#include <QMetaType>
+#include <QPoint>
+#include <QPointF>
+#include <QSharedPointer>
+#include <QTimer>
+#include <QVariant>
+#include <QVariantList>
+#include <QtGlobal>
+#include <algorithm>
+#include <functional>
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/message.h>
+#include <google/protobuf/stubs/port.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
@@ -26,13 +66,16 @@
 #include <libcockatrice/protocol/pb/command_set_card_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
 #include <libcockatrice/protocol/pb/command_undo_draw.pb.h>
-#include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/settings/card_override_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/clamped_arithmetic.h>
 #include <libcockatrice/utility/counter_limits.h>
 #include <libcockatrice/utility/expression.h>
 #include <libcockatrice/utility/zone_names.h>
+#include <memory>
+#include <qnamespace.h>
+#include <qnumeric.h>
+#include <string>
 
 // milliseconds in between triggers of the move top cards until action
 static constexpr int MOVE_TOP_CARD_UNTIL_INTERVAL = 100;

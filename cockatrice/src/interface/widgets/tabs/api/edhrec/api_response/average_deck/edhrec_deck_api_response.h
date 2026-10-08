@@ -7,7 +7,9 @@
 #ifndef EDHREC_DECK_API_RESPONSE_H
 #define EDHREC_DECK_API_RESPONSE_H
 
-#include "../../../../../../deck_loader/deck_loader.h"
+#include "libcockatrice/deck_list/deck_list.h"
+
+#include <QJsonArray>
 
 class EdhrecDeckApiResponse
 {

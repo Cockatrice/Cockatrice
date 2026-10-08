@@ -2,23 +2,30 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../../interface/widgets/cards/card_info_picture_widget.h"
-#include "../../main.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_querier.h"
 
+#include <QByteArray>
+#include <QChar>
 #include <QCheckBox>
 #include <QCloseEvent>
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QGroupBox>
-#include <QHBoxLayout>
 #include <QHeaderView>
+#include <QItemSelectionModel>
 #include <QLabel>
 #include <QLineEdit>
+#include <QModelIndex>
 #include <QRadioButton>
+#include <QSet>
+#include <QTimer>
 #include <QTreeView>
+#include <QVBoxLayout>
+#include <QVariant>
 #include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/models/database/card_database_model.h>
 #include <libcockatrice/models/database/token/token_display_model.h>
 #include <libcockatrice/settings/card_override_settings.h>
@@ -26,6 +33,10 @@
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/layouts_settings.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <qnamespace.h>
+
+class QModelIndex;
+class QWidget;
 
 DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent)
     : QDialog(parent), predefinedTokens(_predefinedTokens)

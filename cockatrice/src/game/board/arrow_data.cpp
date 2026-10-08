@@ -1,5 +1,8 @@
 #include "arrow_data.h"
 
+#include "libcockatrice/protocol/pb/serverinfo_arrow.pb.h"
+#include "libcockatrice/utility/color.h"
+
 ArrowData ArrowData::fromProto(const ServerInfo_Arrow &arrow, int creatorId, bool isLocalCreator)
 {
     ArrowData data;

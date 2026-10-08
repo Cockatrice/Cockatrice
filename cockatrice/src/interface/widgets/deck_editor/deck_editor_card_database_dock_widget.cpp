@@ -2,10 +2,23 @@
 
 #include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "card_database_view.h"
+#include "deck_editor_database_display_widget.h"
+#include "deck_list_model.h"
 #include "deck_state_manager.h"
 #include "deck_zone_dialog.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
 
-#include <libcockatrice/deck_list/deck_list_node_tree.h>
+#include <QFlags>
+#include <QList>
+#include <QPair>
+#include <QString>
+#include <QStringList>
+#include <QVBoxLayout>
+#include <QWidget>
+#include <functional>
+#include <qnamespace.h>
+#include <utility>
 
 DeckEditorCardDatabaseDockWidget::DeckEditorCardDatabaseDockWidget(AbstractTabDeckEditor *parent) : QDockWidget(parent)
 {

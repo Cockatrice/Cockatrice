@@ -3,12 +3,22 @@
 #include <QBuffer>
 #include <QDebug>
 #include <QDialogButtonBox>
+#include <QDir>
 #include <QFileDialog>
+#include <QGridLayout>
+#include <QIODevice>
 #include <QImageReader>
 #include <QLabel>
+#include <QMessageLogger>
+#include <QPixmap>
 #include <QPushButton>
+#include <QSize>
+#include <QString>
 #include <QVBoxLayout>
 #include <libcockatrice/utility/string_limits.h>
+#include <qnamespace.h>
+
+class QWidget;
 
 DlgEditAvatar::DlgEditAvatar(QWidget *parent) : QDialog(parent), image()
 {

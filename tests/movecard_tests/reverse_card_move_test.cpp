@@ -3,15 +3,20 @@
 #include "game/server_card.h"
 #include "game/server_cardzone.h"
 #include "game/server_game.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_zone.pb.h"
 #include "server_response_containers.h"
 #include "server_room.h"
 #include "server_test_helpers.h"
 
+#include <QList>
+#include <QString>
 #include <gtest/gtest.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/rng/rng_abstract.h>
 #include <libcockatrice/utility/zone_names.h>
+#include <string>
 
 RNG_Abstract *rng = nullptr; // this needs to be defined due to other functions in server
 

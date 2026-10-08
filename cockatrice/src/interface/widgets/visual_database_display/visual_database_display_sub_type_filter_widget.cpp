@@ -1,15 +1,28 @@
 #include "visual_database_display_sub_type_filter_widget.h"
 
 #include "../../../filters/filter_tree_model.h"
+#include "../general/layout_containers/flow_widget.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/filters/filter_card.h"
 #include "visual_database_display_filter_button.h"
 
+#include <QAbstractItemModel>
+#include <QDebug>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QList>
+#include <QPersistentModelIndex>
 #include <QPushButton>
+#include <QSet>
+#include <QSharedPointer>
 #include <QSpinBox>
 #include <QTimer>
+#include <QVBoxLayout>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/filters/filter_tree.h>
+#include <qnamespace.h>
 
 VisualDatabaseDisplaySubTypeFilterWidget::VisualDatabaseDisplaySubTypeFilterWidget(QWidget *parent,
                                                                                    FilterTreeModel *_filterModel)

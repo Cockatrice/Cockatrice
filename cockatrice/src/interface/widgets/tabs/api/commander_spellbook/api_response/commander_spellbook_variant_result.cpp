@@ -1,5 +1,7 @@
 #include "commander_spellbook_variant_result.h"
 
+#include <QJsonValue>
+
 CommanderSpellbookVariantResult CommanderSpellbookVariantResult::fromJson(const QJsonObject &json)
 {
     CommanderSpellbookVariantResult result;

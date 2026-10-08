@@ -2,28 +2,28 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../deck_editor/deck_editor_card_database_dock_widget.h"
+#include "../deck_editor/deck_editor_card_info_dock_widget.h"
+#include "../deck_editor/deck_editor_deck_dock_widget.h"
+#include "../deck_editor/deck_editor_printing_selector_dock_widget.h"
 #include "../deck_editor/deck_state_manager.h"
-#include "../filters/filter_builder.h"
-#include "../interface/pixel_map_generator.h"
-#include "../interface/widgets/cards/card_info_frame_widget.h"
 #include "../interface/widgets/deck_editor/deck_editor_filter_dock_widget.h"
 #include "../interface/widgets/menus/deck_editor_menu.h"
-#include "tab_supervisor.h"
 
 #include <QAction>
-#include <QCloseEvent>
-#include <QDebug>
-#include <QDir>
+#include <QByteArray>
 #include <QDockWidget>
-#include <QHeaderView>
-#include <QMenuBar>
-#include <QProcessEnvironment>
-#include <QTimer>
-#include <libcockatrice/models/database/card_database_model.h>
-#include <libcockatrice/network/client/abstract/abstract_client.h>
-#include <libcockatrice/protocol/pending_command.h>
+#include <QEvent>
+#include <QList>
+#include <QMap>
+#include <QMenu>
+#include <QSize>
+#include <QString>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/layouts_settings.h>
+#include <qnamespace.h>
+
+class TabSupervisor;
 
 /**
  * @brief Constructs a new TabDeckEditor object.

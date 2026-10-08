@@ -9,6 +9,7 @@
 
 #include "../cards/edhrec_api_response_card_container.h"
 
+#include <QJsonObject>
 #include <QString>
 
 class EdhrecTopTagsApiResponse

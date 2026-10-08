@@ -1,5 +1,16 @@
 #include "interface_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+#include "libcockatrice/utility/card_ref.h"
+#include "libcockatrice/utility/playmat_params.h"
+
+#include <QChar>
+#include <QList>
+#include <QVariant>
+#include <QtGlobal>
+
+class QObject;
+
 namespace
 {
 const QChar PLAYMAT_FIELD_SEP = QChar(0x1F); ///< Separator between PlaymatInfo fields.

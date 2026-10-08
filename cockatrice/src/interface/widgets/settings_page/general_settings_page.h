@@ -5,11 +5,16 @@
 
 #include <QCheckBox>
 #include <QComboBox>
-#include <QGroupBox>
 #include <QLabel>
 #include <QLoggingCategory>
-#include <QPushButton>
 #include <QSpinBox>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
+
+class QGroupBox;
+class QLineEdit;
+class QPushButton;
 
 inline Q_LOGGING_CATEGORY(GeneralSettingsPageLog, "general_settings_page");
 

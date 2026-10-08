@@ -3,9 +3,11 @@
 #include <QClipboard>
 #include <QGuiApplication>
 #include <QLocale>
+#include <QStringLiteral>
 #include <QTimeZone>
 #include <QUrl>
 #include <QUrlQuery>
+#include <QtGlobal>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_share_create.pb.h>

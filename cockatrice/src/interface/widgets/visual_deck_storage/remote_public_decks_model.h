@@ -9,10 +9,15 @@
 #include "visual_deck_storage_sort_filter_proxy_model.h"
 
 #include <QAbstractListModel>
+#include <QChar>
 #include <QDateTime>
 #include <QList>
+#include <QModelIndex>
 #include <QSet>
+#include <QString>
 #include <QStringList>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
 
 class AbstractClient;
 class CommandContainer;
@@ -20,6 +25,7 @@ class QTimer;
 class Response;
 class ServerInfo_DeckStorage_Folder;
 class ServerInfo_DeckStorage_TreeItem;
+class QObject;
 
 /**
  * @brief Flat, read-only list of the public decks published by another user.

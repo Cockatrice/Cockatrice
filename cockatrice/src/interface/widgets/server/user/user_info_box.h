@@ -7,13 +7,15 @@
 #ifndef USERINFOBOX_H
 #define USERINFOBOX_H
 
-#include <QDateTime>
 #include <QLabel>
+#include <QPixmap>
 #include <QPushButton>
+#include <QString>
 #include <QWidget>
 #include <libcockatrice/network/server/remote/user_level.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
-#include <libcockatrice/utility/days_years_between.h>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
 
 class AbstractClient;
 class Response;

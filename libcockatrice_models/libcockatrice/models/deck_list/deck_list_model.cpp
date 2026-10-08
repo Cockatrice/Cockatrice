@@ -1,6 +1,27 @@
 #include "deck_list_model.h"
 
+#include "deck_list_model_custom_zones.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/format/format_legality_rules.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/deck_list/deck_list.h"
+#include "libcockatrice/deck_list/deck_list_node_tree.h"
+#include "libcockatrice/deck_list/tree/abstract_deck_list_node.h"
+#include "libcockatrice/deck_list/tree/deck_list_card_node.h"
+
+#include <QModelIndexList>
+#include <QSet>
+#include <QVariant>
+#include <algorithm>
+#include <compare>
+#include <iterator>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/utility/card_ref.h>
+#include <utility>
+
+class QObject;
 
 DeckListModel::DeckListModel(QObject *parent)
     : QAbstractItemModel(parent), lastKnownColumn(1), lastKnownOrder(Qt::AscendingOrder)

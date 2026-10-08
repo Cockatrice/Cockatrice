@@ -1,6 +1,13 @@
 #include "updates_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QDate>
 #include <QDateTime>
+#include <QSharedPointer>
+#include <QVariant>
+
+class QObject;
 
 UpdatesSettings::UpdatesSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "updates.ini", "updates", QString(), parent)

@@ -1,15 +1,25 @@
 #include "settings_migration.h"
 
+#include <QChar>
 #include <QDateTime>
+#include <QDebug>
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
 #include <QFileInfo>
+#include <QFileInfoList>
+#include <QFlags>
+#include <QList>
 #include <QLoggingCategory>
 #include <QMap>
+#include <QMessageLogger>
 #include <QSettings>
+#include <QSharedPointer>
 #include <QStringList>
+#include <QStringLiteral>
+#include <QVariant>
 #include <algorithm>
+#include <utility>
 
 inline Q_LOGGING_CATEGORY(SettingsMigrationLog, "settings_migration");
 

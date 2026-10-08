@@ -1,11 +1,8 @@
 #ifndef COCKATRICE_ARCHIDEKT_API_RESPONSE_EDITION_H
 #define COCKATRICE_ARCHIDEKT_API_RESPONSE_EDITION_H
 
-#include <QDebug>
-#include <QJsonArray>
 #include <QJsonObject>
 #include <QString>
-#include <QVector>
 
 class ArchidektApiResponseEdition
 {

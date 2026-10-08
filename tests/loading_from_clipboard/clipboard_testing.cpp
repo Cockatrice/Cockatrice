@@ -1,6 +1,12 @@
 #include "clipboard_testing.h"
 
+#include "libcockatrice/deck_list/deck_list.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
+
+#include <QSharedPointer>
 #include <QTextStream>
+#include <functional>
+#include <gtest/gtest.h>
 #include <libcockatrice/card/import/card_name_normalizer.h>
 #include <libcockatrice/deck_list/tree/deck_list_card_node.h>
 

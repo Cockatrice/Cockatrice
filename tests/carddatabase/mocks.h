@@ -7,7 +7,7 @@
 
 #define PICTURELOADER_H
 
-#include <libcockatrice/card/database/card_database.h>
+#include "libcockatrice/card/card_info.h"
 
 class CardPictureLoader
 {

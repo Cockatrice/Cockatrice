@@ -1,12 +1,14 @@
 #ifndef COCKATRICE_MANA_CURVE_CATEGORY_WIDGET_H
 #define COCKATRICE_MANA_CURVE_CATEGORY_WIDGET_H
 
-#include "../../../general/display/charts/bars/bar_chart_widget.h"
-#include "mana_curve_config.h"
-
-#include <QHBoxLayout>
-#include <QLabel>
+#include <QStringList>
 #include <QWidget>
+#include <qtmetamacros.h>
+
+class QString;
+class QVBoxLayout;
+struct ManaCurveConfig;
+template <typename Key, typename T> class QHash;
 
 class ManaCurveCategoryWidget : public QWidget
 {

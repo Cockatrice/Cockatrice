@@ -2,9 +2,13 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../widgets/dialogs/dlg_login_prompt.h"
+#include "contexts/context_connect_to_server.h"
 #include "libcockatrice/settings/servers_settings.h"
 
 #include <QDialog>
+#include <QString>
+#include <QVariant>
+#include <qnamespace.h>
 
 IntentGetLoginCredentials::IntentGetLoginCredentials(ContextConnectToServer *_context,
                                                      bool _promptForMissingCredentials)

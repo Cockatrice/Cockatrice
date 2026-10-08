@@ -1,15 +1,25 @@
 #include "dlg_filter_games.h"
 
+#include "../server/games_model.h"
+
 #include <QCheckBox>
 #include <QComboBox>
-#include <QCryptographicHash>
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QGroupBox>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
-#include <QPushButton>
+#include <QList>
+#include <QMapIterator>
+#include <QSharedPointer>
+#include <QSize>
 #include <QSpinBox>
+#include <QVBoxLayout>
+#include <qnamespace.h>
+#include <utility>
+
+class QWidget;
 
 DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
                                const GamesProxyModel *_gamesProxyModel,

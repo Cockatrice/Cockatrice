@@ -9,6 +9,12 @@
 
 #include "abstract_counter.h"
 
+#include <qtmetamacros.h>
+
+class CounterState;
+class PlayerLogic;
+class QGraphicsItem;
+
 class GeneralCounter : public AbstractCounter
 {
     Q_OBJECT

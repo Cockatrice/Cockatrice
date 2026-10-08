@@ -1,11 +1,21 @@
 #include "settings_button_widget.h"
 
 #include "../../pixel_map_generator.h"
+#include "settings_popup_widget.h"
 
 #include <QApplication>
 #include <QHBoxLayout>
 #include <QMouseEvent>
+#include <QPixmap>
+#include <QPoint>
+#include <QPointF>
+#include <QRect>
 #include <QScreen>
+#include <QSize>
+#include <QSizePolicy>
+#include <QStringLiteral>
+#include <QToolButton>
+#include <qnamespace.h>
 
 SettingsButtonWidget::SettingsButtonWidget(QWidget *parent)
     : QWidget(parent), button(new QToolButton(this)), popup(new SettingsPopupWidget(nullptr))

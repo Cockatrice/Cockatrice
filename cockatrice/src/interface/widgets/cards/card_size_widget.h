@@ -9,15 +9,15 @@
 #ifndef CARD_SIZE_WIDGET_H
 #define CARD_SIZE_WIDGET_H
 
-#include "../general/layout_containers/flow_widget.h"
-
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QSlider>
 #include <QTimer>
 #include <QWidget>
+#include <qtmetamacros.h>
 
 class QWheelEvent;
+class FlowWidget;
+class QHBoxLayout;
+class QLabel;
+class QSlider;
 
 class CardSizeWidget : public QWidget
 {

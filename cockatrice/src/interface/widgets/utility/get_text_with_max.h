@@ -8,8 +8,11 @@
 #define GETTEXTWITHMAX_H
 
 #include <QLineEdit>
-#include <QWidget>
+#include <QString>
 #include <libcockatrice/utility/string_limits.h>
+#include <qnamespace.h>
+
+class QWidget;
 
 QString getTextWithMax(QWidget *parent,
                        const QString &title,

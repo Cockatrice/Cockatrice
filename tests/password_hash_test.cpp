@@ -1,6 +1,9 @@
 #include "gtest/gtest.h"
+#include <QChar>
+#include <QString>
 #include <cstring>
 #include <libcockatrice/utility/passwordhasher.h>
+#include <string>
 
 namespace
 {

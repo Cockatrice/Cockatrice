@@ -2,25 +2,41 @@
 
 #include "../../pixel_map_generator.h"
 #include "../interface/widgets/utility/get_text_with_max.h"
+#include "card_database_display_model.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
 
 #include <QAction>
+#include <QChar>
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
+#include <QHash>
 #include <QHeaderView>
-#include <QInputDialog>
+#include <QItemSelectionModel>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QModelIndex>
+#include <QSharedPointer>
+#include <QStringLiteral>
 #include <QToolBar>
 #include <QTreeView>
+#include <QVBoxLayout>
+#include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card_database_model.h>
 #include <libcockatrice/models/database/token/token_edit_model.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <qnamespace.h>
+
+class QWidget;
 
 DlgEditTokens::DlgEditTokens(QWidget *parent) : QDialog(parent), currentCard(nullptr)
 {

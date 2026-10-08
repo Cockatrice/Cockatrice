@@ -1,11 +1,28 @@
 #include "deck_state_manager.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../deck_loader/loaded_deck.h"
+#include "deck_list_model.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/deck_list/deck_list.h"
+#include "libcockatrice/deck_list/deck_list_memento.h"
+#include "libcockatrice/deck_list/deck_list_node_tree.h"
+#include "libcockatrice/utility/card_ref.h"
+#include "libcockatrice/utility/playmat_params.h"
 
+#include <QList>
+#include <QVariant>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list_history_manager.h>
 #include <libcockatrice/deck_list/tree/inner_deck_list_node.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <qnamespace.h>
+
+class QModelIndex;
 
 DeckStateManager::DeckStateManager(QObject *parent)
     : QObject(parent), deckList(QSharedPointer<DeckList>(new DeckList)),

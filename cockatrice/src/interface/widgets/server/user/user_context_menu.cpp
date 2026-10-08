@@ -1,20 +1,42 @@
 #include "user_context_menu.h"
 
+#include "../../../../game/abstract_game.h"
+#include "../../../../game/game_event_handler.h"
+#include "../../../../game/game_meta_info.h"
 #include "../../dialogs/dlg_report_user.h"
-#include "../../interface/widgets/tabs/tab_account.h"
-#include "../../interface/widgets/tabs/tab_game.h"
 #include "../../interface/widgets/tabs/tab_supervisor.h"
 #include "../chat_view/chat_view.h"
+#include "../game_link.h"
 #include "../game_selector.h"
+#include "../game_type_map.h"
+#include "libcockatrice/protocol/pb/admin_commands.pb.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_ban.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_gametype.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_room.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_warning.pb.h"
 #include "user_info_box.h"
+#include "user_level.h"
 #include "user_list_dialog.h"
 #include "user_list_manager.h"
 #include "user_list_proxy.h"
 
 #include <QAction>
+#include <QClipboard>
+#include <QCursor>
+#include <QDialog>
+#include <QFlags>
+#include <QGuiApplication>
+#include <QHeaderView>
+#include <QMap>
 #include <QMenu>
-#include <QtGui>
-#include <QtWidgets>
+#include <QMessageBox>
+#include <QSharedPointer>
+#include <QSizePolicy>
+#include <QTableWidget>
+#include <QTableWidgetItem>
+#include <QWidget>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_kick_from_game.pb.h>
 #include <libcockatrice/protocol/pb/commands.pb.h>
@@ -27,6 +49,10 @@
 #include <libcockatrice/protocol/pb/response_warn_list.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <qnamespace.h>
+#include <string>
+
+class QVariant;
 
 UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *parent, AbstractGame *_game)
     : QObject(parent), client(_tabSupervisor->getClient()), tabSupervisor(_tabSupervisor),

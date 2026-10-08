@@ -3,10 +3,13 @@
 #include "../dialogs/override_printing_warning.h"
 
 #include <QHBoxLayout>
+#include <QIcon>
 #include <QLabel>
 #include <QPushButton>
+#include <QSize>
 #include <QStyle>
-#include <qguiapplication.h>
+#include <QVBoxLayout>
+#include <qnamespace.h>
 
 PrintingDisabledInfoWidget::PrintingDisabledInfoWidget(QWidget *parent) : QWidget(parent)
 {

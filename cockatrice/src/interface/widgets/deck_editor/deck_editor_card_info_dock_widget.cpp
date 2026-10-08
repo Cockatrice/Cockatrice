@@ -1,8 +1,14 @@
 #include "deck_editor_card_info_dock_widget.h"
 
 #include "../cards/card_info_frame_widget.h"
+#include "../tabs/abstract_tab_deck_editor.h"
 
+#include <QFlags>
 #include <QVBoxLayout>
+#include <QWidget>
+#include <qnamespace.h>
+
+class ExactCard;
 
 DeckEditorCardInfoDockWidget::DeckEditorCardInfoDockWidget(AbstractTabDeckEditor *parent)
     : QDockWidget(parent), deckEditor(parent)

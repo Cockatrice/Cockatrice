@@ -2,14 +2,22 @@
 
 #include "settings_search_model.h"
 
+#include <QChar>
 #include <QCheckBox>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QLabel>
+#include <QLatin1Char>
 #include <QLayout>
+#include <QLayoutItem>
 #include <QLineEdit>
+#include <QObject>
 #include <QPair>
 #include <QSpinBox>
+#include <QString>
+#include <QStringList>
+#include <QTextDocument>
+#include <utility>
 
 /**
  * @brief Recursively collects all widgets within a layout

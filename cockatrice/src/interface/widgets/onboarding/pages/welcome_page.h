@@ -3,8 +3,11 @@
 
 #include "../first_run_wizard_page.h"
 
+#include <qtmetamacros.h>
+
 class QComboBox;
 class QLabel;
+class QWidget;
 
 class WelcomePage : public FirstRunWizardPage
 {

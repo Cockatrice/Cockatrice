@@ -3,13 +3,14 @@
 
 #include "contexts/context_join_game.h"
 #include "intent.h"
-#include "remote_client.h"
 
 #include <QScopedPointer>
 #include <memory>
+#include <qtmetamacros.h>
 
 class TabRoom;
 class TabSupervisor;
+class RemoteClient;
 
 class IntentJoinServerGame : public Intent
 {

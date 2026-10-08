@@ -3,7 +3,10 @@
 #include "../../../client/settings/cache_settings.h"
 
 #include <QTimer>
+#include <QVariant>
+#include <QtGlobal>
 #include <algorithm>
+#include <google/protobuf/repeated_ptr_field.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_deck_list_other_user.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
@@ -11,6 +14,9 @@
 #include <libcockatrice/protocol/pb/serverinfo_deckstorage.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/network_settings.h>
+#include <string>
+
+class QObject;
 
 RemotePublicDecksModel::RemotePublicDecksModel(AbstractClient *_client, QObject *parent)
     : QAbstractListModel(parent), client(_client)

@@ -2,25 +2,40 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "pixel_map_generator.h"
+#include "theme_config.h"
 
 #include <QApplication>
+#include <QChar>
 #include <QColor>
 #include <QDebug>
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include <QLibraryInfo>
+#include <QFlags>
+#include <QGuiApplication>
+#include <QIODevice>
+#include <QLatin1Char>
+#include <QList>
 #include <QMap>
+#include <QMessageLogger>
 #include <QMetaEnum>
 #include <QPalette>
+#include <QPixmap>
 #include <QPixmapCache>
-#include <QStandardPaths>
+#include <QSharedPointer>
 #include <QString>
+#include <QStringList>
+#include <QStringLiteral>
 #include <QStyle>
 #include <QStyleFactory>
 #include <QStyleHints>
+#include <QTextStream>
 #include <QWidget>
 #include <Qt>
+#include <QtGlobal>
 #include <libcockatrice/settings/paths_settings.h>
+#include <qlogging.h>
+#include <qnumeric.h>
 
 #define SYSTEM_THEME_NAME "System"
 #define LEGACY_SYSTEM_THEME_NAME "Default"

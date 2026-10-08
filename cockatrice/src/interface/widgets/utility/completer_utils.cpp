@@ -7,12 +7,13 @@
 #include <QLineEdit>
 #include <QObject>
 #include <QRegularExpression>
+#include <QString>
 #include <QStringListModel>
 #include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/models/database/card/card_completer_proxy_model.h>
 #include <libcockatrice/models/database/card/card_search_model.h>
-#include <libcockatrice/models/database/card_database_display_model.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <qnamespace.h>
 
 namespace
 {

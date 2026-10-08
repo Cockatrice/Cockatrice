@@ -1,9 +1,11 @@
 #ifndef COCKATRICE_VISUAL_DECK_EDITOR_PLACEHOLDER_WIDGET_H
 #define COCKATRICE_VISUAL_DECK_EDITOR_PLACEHOLDER_WIDGET_H
 
-#include <QLabel>
-#include <QVBoxLayout>
 #include <QWidget>
+#include <qtmetamacros.h>
+
+class QLabel;
+class QVBoxLayout;
 
 class VisualDeckEditorPlaceholderWidget : public QWidget
 {

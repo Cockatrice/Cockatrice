@@ -2,13 +2,18 @@
 
 #include "../../../client/settings/cache_settings.h"
 
+#include <QChar>
 #include <QDir>
 #include <QFile>
 #include <QFontMetrics>
 #include <QHBoxLayout>
 #include <QMessageBox>
+#include <QMouseEvent>
 #include <QPushButton>
+#include <QSize>
+#include <QSizePolicy>
 #include <libcockatrice/settings/paths_settings.h>
+#include <qnamespace.h>
 
 FilterDisplayWidget::FilterDisplayWidget(QWidget *parent, const QString &filename, FilterTreeModel *_filterModel)
     : QWidget(parent), filterFilename(filename), filterModel(_filterModel)

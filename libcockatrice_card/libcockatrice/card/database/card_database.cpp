@@ -1,16 +1,26 @@
 #include "card_database.h"
 
 #include "../relation/card_relation.h"
-#include "card_database_manager.h"
-#include "parser/cockatrice_xml_4.h"
+#include "libcockatrice/card/database/card_database_data.h"
+#include "libcockatrice/card/database/card_database_loader.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/database/parser/card_database_parser.h"
+#include "libcockatrice/card/format/format_legality_rules.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/card/set/card_set_list.h"
 
-#include <QCryptographicHash>
 #include <QDebug>
-#include <QDirIterator>
-#include <QFile>
-#include <QRegularExpression>
-#include <algorithm>
+#include <QList>
+#include <QMessageLogger>
+#include <QMetaType>
+#include <QMutexLocker>
+#include <QSharedPointer>
 #include <utility>
+
+class ICardDatabasePathProvider;
+class ICardPreferenceProvider;
+class ICardSetPriorityController;
 
 CardDatabase::CardDatabase(QObject *parent,
                            ICardPreferenceProvider *prefs,

@@ -2,6 +2,11 @@
 
 #include "abstract_game.h"
 
+#include <QChar>
+#include <QTimer>
+
+class AbstractClient;
+
 GameState::GameState(AbstractGame *parent,
                      int _secondsElapsed,
                      int _hostId,

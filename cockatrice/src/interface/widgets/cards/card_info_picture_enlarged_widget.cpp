@@ -2,10 +2,17 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../interface/card_picture_loader/card_picture_loader.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/printing/exact_card.h"
 
 #include <QPainterPath>
+#include <QPoint>
+#include <QRect>
+#include <QSize>
 #include <QStylePainter>
+#include <QtGlobal>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <qnamespace.h>
 
 /**
  * @brief Constructs a CardPictureEnlargedWidget.

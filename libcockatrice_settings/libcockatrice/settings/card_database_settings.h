@@ -12,7 +12,12 @@
 
 #include <QHash>
 #include <QMutex>
+#include <QString>
+#include <QVector>
 #include <libcockatrice/interfaces/interface_card_set_priority_controller.h>
+#include <qtmetamacros.h>
+
+class QObject;
 
 class CardDatabaseSettings : public SettingsManager, public ICardSetPriorityController
 {

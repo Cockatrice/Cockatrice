@@ -4,7 +4,10 @@
 #include <../../../../libcockatrice_deck_list/libcockatrice/deck_list/tree/inner_deck_list_node.h>
 #include <QList>
 #include <QPair>
-#include <QtGlobal>
+#include <QString>
+#include <qnamespace.h>
+
+class AbstractDecklistNode;
 
 /**
  * @class DecklistModelSubZoneNode

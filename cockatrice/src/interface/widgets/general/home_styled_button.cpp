@@ -1,9 +1,19 @@
 #include "home_styled_button.h"
 
+#include <QBrush>
+#include <QFontMetrics>
 #include <QPainter>
 #include <QPainterPath>
-#include <qgraphicseffect.h>
-#include <qstyleoption.h>
+#include <QPen>
+#include <QPointF>
+#include <QSize>
+#include <QSizePolicy>
+#include <QStyle>
+#include <QStyleOptionButton>
+#include <QtGlobal>
+#include <qnamespace.h>
+
+class QWidget;
 
 HomeStyledButton::HomeStyledButton(const QString &text, QPair<QColor, QColor> _gradientColors, QWidget *parent)
     : QPushButton(text, parent), gradientColors(_gradientColors)

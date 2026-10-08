@@ -1,15 +1,21 @@
 #ifndef PAGETEMPLATES_H
 #define PAGETEMPLATES_H
 
+#include <QByteArray>
+#include <QString>
 #include <QWizardPage>
+#include <QtGlobal>
+#include <qtmetamacros.h>
 
-class QFile;
 class QRadioButton;
 class OracleWizard;
 class QCheckBox;
 class QLabel;
 class QLineEdit;
 class QProgressBar;
+class QPushButton;
+class QUrl;
+class QWidget;
 
 class OracleWizardPage : public QWizardPage
 {
