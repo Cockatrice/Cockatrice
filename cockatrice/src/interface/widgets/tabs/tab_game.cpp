@@ -1032,6 +1032,12 @@ void TabGame::setCardMenu(CardMenu *menu)
         return;
     }
 
+    if (aCardMenu->menu() && aCardMenu->menu()->isVisible()) {
+        aCardMenu->menu()->hide();
+        if (gameView && gameView->viewport()) {
+            gameView->viewport()->update(gameView->sceneRect());
+        }
+    }
     if (menu) {
         aCardMenu->setMenu(menu);
     } else {
