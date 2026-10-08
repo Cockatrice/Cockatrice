@@ -116,6 +116,7 @@ void GameView::startRubberBand(const QPointF &_selectionOrigin)
     selectionOrigin = _selectionOrigin;
     previousBandRect = QRect();
     rubberBand->setGeometry(QRect(mapFromScene(selectionOrigin), QSize(0, 0)));
+    rubberBand->raise();
     rubberBand->show();
 }
 

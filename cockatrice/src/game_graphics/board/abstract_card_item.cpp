@@ -328,6 +328,13 @@ void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     } else if (!isSelected()) {
         scene()->clearSelection();
         setSelected(true);
+    } else {
+        // Already selected and no modifier held; collapse multi-selection to this card
+        if (scene()->selectedItems().count() > 1) {
+            scene()->clearSelection();
+            setSelected(true);
+        }
+        // If it's the only selected item, do nothing
     }
     if (event->button() == Qt::LeftButton) {
         setCursor(Qt::ClosedHandCursor);
