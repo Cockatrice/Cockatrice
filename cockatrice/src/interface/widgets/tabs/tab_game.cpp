@@ -1242,8 +1242,14 @@ void TabGame::createPlayAreaWidget(bool bReplay)
 {
     phasesToolbar = new PhasesToolbar;
     if (!bReplay) {
-        connect(phasesToolbar, &PhasesToolbar::sendGameCommand, game->getGameEventHandler(),
-                qOverload<const ::google::protobuf::Message &, int>(&GameEventHandler::sendGameCommand));
+        connect(phasesToolbar, &PhasesToolbar::setActivePhaseRequested, game->getGameEventHandler(),
+                &GameEventHandler::handleActivePhaseChanged);
+        connect(phasesToolbar, &PhasesToolbar::nextTurnRequested, game->getGameEventHandler(),
+                &GameEventHandler::handleNextTurn);
+        connect(phasesToolbar, &PhasesToolbar::untapAllRequested, game->getGameEventHandler(),
+                &GameEventHandler::handleUntapAll);
+        connect(phasesToolbar, &PhasesToolbar::drawCardRequested, game->getGameEventHandler(),
+                &GameEventHandler::handleDrawCard);
     }
     scene = new GameScene(phasesToolbar, this);
     connect(game->getPlayerManager(), &PlayerManager::playerConceded, scene, &GameScene::rearrange);
