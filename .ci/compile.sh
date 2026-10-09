@@ -14,7 +14,7 @@
 # --dir <dir> sets the name of the build dir, default is "build"
 # --cmake-generator <generator> sets CMAKE_GENERATOR as used by cmake
 # --target-macos-version <version> sets the min os version - only used for macOS builds
-# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_NO_CLIENT MAKE_TEST USE_CCACHE CCACHE_SIZE CCACHE_EVICTION_AGE BUILD_DIR CMAKE_GENERATOR TARGET_MACOS_VERSION
+# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_NO_CLIENT MAKE_TEST USE_CCACHE CCACHE_SIZE CCACHE_EVICTION_AGE BUILD_DIR CMAKE_GENERATOR TARGET_MACOS_VERSION VCPKG_TARGET_MACOS_VERSION
 # (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir>)
 # exitcode: 1 for failure, 3 for invalid arguments
 
@@ -212,8 +212,14 @@ if [[ $RUNNER_OS == macOS ]]; then
       triplet_source="../vcpkg/triplets/community/$arch-osx.cmake"
     fi
     cp "$triplet_source" "$triplet_file"
-    echo "set(VCPKG_CMAKE_SYSTEM_VERSION $TARGET_MACOS_VERSION)" >>"$triplet_file"
-    echo "set(VCPKG_OSX_DEPLOYMENT_TARGET $TARGET_MACOS_VERSION)" >>"$triplet_file"
+    # The triplet is what vcpkg hashes into the ABI hash of every port, so two legs that
+    # agree here reuse each other's binary cache. Targets 14, 15 and 26 on the same Xcode
+    # produce identical binaries when they share the lowest deployment target, so they all
+    # build against 14 to keep one vcpkg cache scope instead of three.
+    # Keep in sync with "vcpkg_scope" and "vcpkg_deployment_target" in desktop-build.yml.
+    vcpkg_target="${VCPKG_TARGET_MACOS_VERSION:-$TARGET_MACOS_VERSION}"
+    echo "set(VCPKG_CMAKE_SYSTEM_VERSION $vcpkg_target)" >>"$triplet_file"
+    echo "set(VCPKG_OSX_DEPLOYMENT_TARGET $vcpkg_target)" >>"$triplet_file"
     flags+=("-DVCPKG_OVERLAY_TRIPLETS=$triplets_dir")
     flags+=("-DVCPKG_HOST_TRIPLET=$triplet_version")
     flags+=("-DVCPKG_TARGET_TRIPLET=$triplet_version")

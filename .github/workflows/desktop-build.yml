@@ -150,7 +150,7 @@ jobs:
     continue-on-error: ${{ matrix.allow-failure == 'yes' }}
     timeout-minutes: 70
     env:
-      CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}    # directory for caching docker image and ccache
+      CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}    # directory for caching the compiler cache
       CCACHE_EVICTION_AGE: 7d
       CCACHE_SIZE: 600M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CMAKE_GENERATOR: 'Ninja'
@@ -165,7 +165,7 @@ jobs:
         uses: actions/cache/restore@v6
         with:
           key: ccache-${{ matrix.distro }}${{ matrix.version }}
-          path: ${{ env.CACHE }}
+          path: ${{ env.CACHE }}/.ccache
 
       - name: "Build ${{ matrix.distro }} ${{ matrix.version }} Docker image"
         shell: bash
@@ -219,7 +219,7 @@ jobs:
         uses: actions/cache/save@v6
         with:
           key: ${{ steps.restore_ccache.outputs.cache-primary-key }}
-          path: ${{ env.CACHE }}
+          path: ${{ env.CACHE }}/.ccache
 
       - name: "Upload artifact"
         id: upload_artifact
@@ -277,6 +277,8 @@ jobs:
             soc: Intel
             type: Release
             use_ccache: 1
+            vcpkg_scope: 'vcpkg/macos13-x64-xcode26.3/'
+            vcpkg_upload: 1    # only one leg per vcpkg_scope hands its archives over
             xcode: "26.3"
 
           - os: macOS
@@ -293,6 +295,9 @@ jobs:
             soc: Apple
             type: Release
             use_ccache: 1
+            vcpkg_deployment_target: 14
+            vcpkg_scope: 'vcpkg/macos14-arm64-xcode26.6/'
+            vcpkg_upload: 1    # only one leg per vcpkg_scope hands its archives over
             xcode: "26.6"
 
           - os: macOS
@@ -309,6 +314,8 @@ jobs:
             soc: Apple
             type: Release
             use_ccache: 1
+            vcpkg_deployment_target: 14
+            vcpkg_scope: 'vcpkg/macos14-arm64-xcode26.6/'
             xcode: "26.6"
 
           - os: macOS
@@ -322,6 +329,8 @@ jobs:
             soc: Apple
             type: Debug
             use_ccache: 1
+            vcpkg_deployment_target: 14
+            vcpkg_scope: 'vcpkg/macos14-arm64-xcode26.6/'
             xcode: "26.6"
 
           - os: Windows
@@ -335,6 +344,8 @@ jobs:
             qt_version: 6.11.*
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             type: Release
+            vcpkg_scope: 'vcpkg/windows10-x64-vs2026/'
+            vcpkg_upload: 1    # only one leg per vcpkg_scope hands its archives over
 
     name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
@@ -432,7 +443,27 @@ jobs:
         id: vcpkg-cache
         uses: TAServers/vcpkg-cache@v3
         with:
+          # Every entry is keyed by vcpkg ABI hash, and one hash set exists per platform,
+          # target and toolchain. The action restores every entry it finds under the
+          # prefix, not just the hashes vcpkg asks for, so with one shared vcpkg/
+          # namespace every leg downloads all 66 archives of all 5 legs on every run.
+          # Each of those restores also refreshes the entry's last access date, which
+          # is why a dead ABI generation is never evicted by age. Naming the scope is
+          # what makes those generations identifiable, and prune-caches below able to
+          # delete them.
+          prefix: ${{ matrix.vcpkg_scope }}
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      # The action only creates its directory when the prefix matched at least one
+      # entry, and it reads that directory unguarded when it saves at the end of the
+      # job. A scope nobody has written to yet therefore leaves the directory missing
+      # and fails the job, which is exactly the state every scope starts in. Make the
+      # directory up front so an empty scope is a cache miss instead of an error.
+      - name: "Create vcpkg cache directory"
+        shell: bash
+        env:
+          CACHE_DIR: '${{ steps.vcpkg-cache.outputs.path }}'
+        run: mkdir -p "$CACHE_DIR"
 
       # Uses environment variables, see compile.sh for more details
       - name: "Build Cockatrice"
@@ -453,9 +484,18 @@ jobs:
           PACKAGE_SUFFIX: '${{ matrix.package_suffix }}'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
           USE_CCACHE: ${{ matrix.use_ccache }}
-          VCPKG_BINARY_SOURCES: "clear;files,${{ steps.vcpkg-cache.outputs.path }},${{ case(github.ref == 'refs/heads/master', 'readwrite', 'read') }}"
+          # vcpkg has to be allowed to write into the cache directory even on a pull
+          # request, because that is where "Collect new vcpkg entries" looks for the
+          # archives this run had to compile itself. With the source left at read those
+          # archives are never written, the collect step finds nothing, and vcpkg-cache-import.yml
+          # gets no artifact to heal the shared cache with. The importer is what publishes
+          # to master's scope; a pull request's own merge ref stays unreadable by every
+          # later run, so the action's own save there costs quota but nothing else.
+          # Forks keep the read-only mode, they are the case that must not be trusted.
+          VCPKG_BINARY_SOURCES: "clear;files,${{ steps.vcpkg-cache.outputs.path }},${{ case(github.ref == 'refs/heads/master' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository), 'readwrite', 'read') }}"
           VCPKG_DISABLE_METRICS: 1
           VCPKG_FEATURE_FLAGS: dependencygraph
+          VCPKG_TARGET_MACOS_VERSION: ${{ matrix.vcpkg_deployment_target }}
         run: .ci/compile.sh --server --test --vcpkg
 
       # CPack reports a failed makensis run as "Problem running NSIS command"
@@ -468,6 +508,64 @@ jobs:
         if: failure() && matrix.os == 'Windows'
         shell: bash
         run: find . -name NSISOutput.log -exec cat {} +
+
+      # A pull request cannot write the shared cache itself: its cache entries are scoped
+      # to refs/pull/<n>/merge and stay unreadable for every other run, so writing them
+      # from a pull request only burns the repository's quota. So hand over only the
+      # archives this leg had to build itself and let vcpkg-cache-import.yml, which runs
+      # in the default branch scope, save them where later runs can restore them.
+      # Forks are skipped, they are the one case where the archives must not be trusted.
+      # vcpkg_upload keeps this to one leg per scope: macOS 14, 15 and 26 share a scope
+      # by design, and all three rebuild the same archives, so uploading from each of them
+      # would publish three identical 269 MB artifacts under one artifact name and make
+      # the importer spawn a save job per copy.
+      - name: "Collect new vcpkg entries"
+        id: vcpkg_new
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && matrix.vcpkg_upload == 1
+        shell: bash
+        env:
+          CACHE_DIR: '${{ steps.vcpkg-cache.outputs.path }}'
+          GH_TOKEN: ${{ github.token }}
+          VCPKG_SCOPE: '${{ matrix.vcpkg_scope }}'
+        run: |
+          # The archive name is the ABI hash, so a missing key is exactly what vcpkg had
+          # to compile from source in this job.
+          gh api --paginate \
+            "repos/$GITHUB_REPOSITORY/actions/caches?ref=refs/heads/master&key=$VCPKG_SCOPE&per_page=100" \
+            --jq '.actions_caches[].key' | sort -u >"$RUNNER_TEMP/master-keys.txt"
+          find "$CACHE_DIR" -type f -name '*.zip' -exec basename {} .zip \; |
+            sed "s|^|$VCPKG_SCOPE|" | sort -u >"$RUNNER_TEMP/local-keys.txt"
+          comm -23 "$RUNNER_TEMP/local-keys.txt" "$RUNNER_TEMP/master-keys.txt" >"$RUNNER_TEMP/new-keys.txt"
+
+          mkdir -p "$RUNNER_TEMP/vcpkg-new"
+          : >"$RUNNER_TEMP/vcpkg-new/keys.txt"
+          while read -r key; do
+            hash="${key##*/}"
+            archive="$(find "$CACHE_DIR" -type f -name "$hash.zip" -print -quit)"
+            dir="$RUNNER_TEMP/vcpkg-new/${hash:0:2}"    # vcpkg's own two character fanout
+            mkdir -p "$dir"
+            cp "$archive" "$dir/"
+            echo "$key ${hash:0:2}/$hash.zip" >>"$RUNNER_TEMP/vcpkg-new/keys.txt"
+          done <"$RUNNER_TEMP/new-keys.txt"
+
+          count="$(wc -l <"$RUNNER_TEMP/new-keys.txt")"
+          echo "vcpkg scope $VCPKG_SCOPE: $count entries to import"
+          echo "count=$count" >>"$GITHUB_OUTPUT"
+          echo "slug=$(sed -e 's|^vcpkg/||' -e 's|/$||' -e 's|/|-|g' <<<"$VCPKG_SCOPE")" >>"$GITHUB_OUTPUT"
+
+      # archive: false accepts a single file and nothing else, and a scope hands over one
+      # archive per ABI hash vcpkg had to rebuild, which is 23 files on a cold runner.
+      # Zipping the directory keeps the fanout at the artifact root, which is where
+      # vcpkg-cache-import.yml looks for keys.txt once download-artifact unpacks it.
+      - name: "Upload new vcpkg entries"
+        # An empty count means the step above did not run at all, on master and on forks
+        if: steps.vcpkg_new.outputs.count != '' && steps.vcpkg_new.outputs.count != '0'
+        uses: actions/upload-artifact@v7
+        with:
+          if-no-files-found: error    # a count above zero with nothing staged is a bug
+          name: vcpkg-new-${{ steps.vcpkg_new.outputs.slug }}
+          path: ${{ runner.temp }}/vcpkg-new
+          retention-days: 1
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "[macOS] Delete remote compiler cache (ccache)"
@@ -581,3 +679,67 @@ jobs:
           BUILD_PATH: ${{ steps.build.outputs.path }}
           GH_TOKEN: ${{ github.token }}
         run: gh attestation verify "$BUILD_PATH" --repo Cockatrice/Cockatrice
+
+  prune-caches:
+    name: Prune caches
+    # Only master writes caches at all, so only master may clean them up too
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-slim    # https://github.com/actions/runner-images/blob/main/images/ubuntu-slim/ubuntu-slim-Readme.md
+    continue-on-error: true    # freeing space must never fail a build
+
+    steps:
+      # The repository holds 10Gi of cache against entries that want more, and GitHub
+      # evicts the least recently used entry whenever that is exceeded. The vcpkg
+      # entries are the reason that never happens: the restore above touches every
+      # entry under the prefix on every run, so a dead ABI generation keeps its access
+      # date fresh forever and age based eviction can never reach it. Deleting by age
+      # alone cannot fix that, only knowing which scope an entry belongs to can.
+      - name: "Delete unusable cache entries"
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # Must list every vcpkg_scope of the build-vcpkg matrix above, or the entries of
+          # a scope that is still in use get deleted on the next run.
+          LIVE_VCPKG_SCOPES: 'vcpkg/macos13-x64-xcode26.3/ vcpkg/macos14-arm64-xcode26.6/ vcpkg/windows10-x64-vs2026/'
+        run: |
+          gh api --paginate "repos/$GITHUB_REPOSITORY/actions/caches?per_page=100" \
+            --jq '.actions_caches[] | [.id, .ref, .key, .last_accessed_at] | @tsv' >"$RUNNER_TEMP/caches.tsv"
+
+          cutoff="$(( $(date -u +%s) - 7 * 24 * 3600 ))"
+          live=" ${LIVE_VCPKG_SCOPES} "
+          deleted=0
+          while IFS=$'\t' read -r id ref key accessed; do
+            [[ -n $id ]] || continue
+            # Only ever touch the key shapes this workflow creates, so that an entry of
+            # some other workflow can never be deleted by accident
+            case "$key" in
+              vcpkg/* | ccache-* | Qt*) ;;
+              *) continue ;;
+            esac
+
+            reason=""
+            if [[ $ref != refs/heads/master ]]; then
+              reason="scoped to $ref"
+            elif [[ $key == vcpkg/* ]]; then
+              # "<scope>/<abi hash>", cut the hash off the end to get the scope
+              scope="vcpkg/${key#vcpkg/}"
+              scope="${scope%/*}/"
+              if [[ $live != *" $scope "* ]]; then
+                reason="no matrix leg uses $scope"
+              fi
+            fi
+            if [[ -z $reason ]]; then
+              stamp="$(date -u -d "$accessed" +%s 2>/dev/null || echo 0)"
+              if [[ $stamp -ne 0 && $stamp -lt $cutoff ]]; then
+                reason="unused since $accessed"
+              fi
+            fi
+
+            if [[ -n $reason ]]; then
+              echo "::notice::deleting $key, $reason"
+              gh api -X DELETE "repos/$GITHUB_REPOSITORY/actions/caches/$id"
+              deleted=$((deleted + 1))
+            fi
+          done <"$RUNNER_TEMP/caches.tsv"
+
+          echo "::notice::deleted $deleted of $(wc -l <"$RUNNER_TEMP/caches.tsv") cache entries"
