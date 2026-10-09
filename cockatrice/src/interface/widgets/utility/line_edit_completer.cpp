@@ -88,8 +88,7 @@ void LineEditCompleter::keyPressEvent(QKeyEvent *event)
         return;
     }
 
-    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter || event->key() == Qt::Key_Space ||
-        event->key() == Qt::Key_Tab) {
+    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter || event->key() == Qt::Key_Space) {
         for (auto &info : completers) {
             if (info.completer->popup()->isVisible()) {
                 event->ignore();
@@ -104,6 +103,27 @@ void LineEditCompleter::keyPressEvent(QKeyEvent *event)
                     insertCompletion(info.completer, completionText);
                 }
                 hideCompleterPopups();
+                return;
+            }
+        }
+    }
+
+    if (event->key() == Qt::Key_Tab) {
+        for (auto &info : completers) {
+            if (info.completer->popup()->isVisible()) {
+                event->ignore();
+                const QModelIndex currentIndex = info.completer->popup()->currentIndex();
+                QString completionText;
+                if (currentIndex.isValid()) {
+                    completionText = currentIndex.data().toString();
+                } else {
+                    completionText = info.completer->currentCompletion();
+                }
+                if (!completionText.isEmpty()) {
+                    insertCompletion(info.completer, completionText);
+                }
+                hideCompleterPopups();
+                setFocus();
                 return;
             }
         }
