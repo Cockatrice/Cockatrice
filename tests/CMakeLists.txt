@@ -77,9 +77,8 @@ target_include_directories(lag_monitor_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatri
 add_executable(latency_tracker_test latency_tracker_test.cpp)
 add_executable(metrics_registry_test ../servatrice/src/metrics_registry.cpp metrics_registry_test.cpp)
 add_executable(
-  card_update_progress_test
-  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/card_database_update/card_update_progress.cpp
-  card_update_progress_test.cpp
+  card_update_progress_test ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/card_database_update/card_update_progress.cpp
+                            card_update_progress_test.cpp
 )
 target_include_directories(card_update_progress_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src)
 add_executable(
