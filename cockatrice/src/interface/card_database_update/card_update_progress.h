@@ -1,5 +1,5 @@
-#ifndef CARD_UPDATE_PROGRESS_PARSER_H
-#define CARD_UPDATE_PROGRESS_PARSER_H
+#ifndef CARD_UPDATE_PROGRESS_H
+#define CARD_UPDATE_PROGRESS_H
 
 #include <QByteArray>
 #include <QString>
@@ -39,4 +39,4 @@ struct CardUpdateProgress
     qint64 total = 0;
 };
 
-#endif // CARD_UPDATE_PROGRESS_PARSER_H
+#endif // CARD_UPDATE_PROGRESS_H

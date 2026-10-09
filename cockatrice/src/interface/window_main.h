@@ -27,7 +27,7 @@
 
 #include "../client/lag_monitor.h"
 #include "../client/network/update/client/release_channel.h"
-#include "card_database_update/card_update_progress_parser.h"
+#include "card_database_update/card_update_progress.h"
 #include "connection_controller/remote_connection_controller.h"
 
 #include <QByteArray>

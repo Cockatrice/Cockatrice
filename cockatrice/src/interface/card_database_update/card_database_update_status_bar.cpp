@@ -52,20 +52,18 @@ QString CardDatabaseUpdateStatusBar::statusText() const
     if (!active) {
         return {};
     }
-    const QString name = stageName(stage, tr("Updating the card database"));
-    if (total <= 0) {
+    const QString name = stageName(progress.stage, tr("Updating the card database"));
+    if (progress.total <= 0) {
         return name;
     }
-    const int percent = static_cast<int>((100.0 * done) / total);
+    const int percent = static_cast<int>((100.0 * progress.done) / progress.total);
     return tr("%1 (%2%)").arg(name).arg(percent);
 }
 
 void CardDatabaseUpdateStatusBar::updateStarted()
 {
     active = true;
-    stage = CardUpdateStage::Unknown;
-    done = 0;
-    total = 0;
+    progress = {};
     refresh();
     show();
 }
@@ -73,18 +71,14 @@ void CardDatabaseUpdateStatusBar::updateStarted()
 void CardDatabaseUpdateStatusBar::updateProgress(const CardUpdateProgress &progress)
 {
     active = true;
-    stage = progress.stage;
-    done = progress.done;
-    total = progress.total;
+    this->progress = progress;
     refresh();
 }
 
 void CardDatabaseUpdateStatusBar::updateFinished()
 {
     active = false;
-    stage = CardUpdateStage::Unknown;
-    done = 0;
-    total = 0;
+    progress = {};
     refresh();
     hide();
 }
@@ -99,11 +93,11 @@ void CardDatabaseUpdateStatusBar::changeEvent(QEvent *event)
 
 void CardDatabaseUpdateStatusBar::refresh()
 {
-    const QString name = stageName(stage, tr("Updating the card database"));
+    const QString name = stageName(progress.stage, tr("Updating the card database"));
     stageLabel->setText(name);
 
-    const qint64 cappedTotal = qMin<qint64>(total, INT_MAX);
-    const qint64 cappedDone = qMin<qint64>(done, INT_MAX);
+    const qint64 cappedTotal = qMin<qint64>(progress.total, INT_MAX);
+    const qint64 cappedDone = qMin<qint64>(progress.done, INT_MAX);
     const int minimum = 0;
     const int maximum = static_cast<int>(cappedTotal);
     if (progressBar->minimum() != minimum || progressBar->maximum() != maximum) {
@@ -112,8 +106,8 @@ void CardDatabaseUpdateStatusBar::refresh()
     }
     progressBar->setValue(static_cast<int>(cappedDone));
 
-    if (active && total > 0) {
-        const int percent = static_cast<int>((100.0 * done) / total);
+    if (active && progress.total > 0) {
+        const int percent = static_cast<int>((100.0 * progress.done) / progress.total);
         setToolTip(tr("Card database update in progress: %1 (%2%)").arg(name).arg(percent));
     } else if (active) {
         setToolTip(tr("Card database update in progress."));

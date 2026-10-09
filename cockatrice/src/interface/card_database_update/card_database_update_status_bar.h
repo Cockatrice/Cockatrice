@@ -1,7 +1,7 @@
 #ifndef CARD_DATABASE_UPDATE_STATUS_BAR_H
 #define CARD_DATABASE_UPDATE_STATUS_BAR_H
 
-#include "card_update_progress_parser.h"
+#include "card_update_progress.h"
 
 #include <QString>
 #include <QWidget>
@@ -58,13 +58,11 @@ protected:
 private:
     void refresh();
 
-    QHBoxLayout *layout;       ///< Horizontal layout holding the stage label and the progress bar
-    QLabel *stageLabel;        ///< Name of the stage currently running
-    QProgressBar *progressBar; ///< Progress within the current stage
-    CardUpdateStage stage = CardUpdateStage::Unknown; ///< Last reported stage
-    qint64 done = 0;                                  ///< Last reported progress numerator
-    qint64 total = 0;                                 ///< Last reported progress denominator, 0 when unknown
-    bool active = false;                              ///< Whether an update is currently running
+    QHBoxLayout *layout;         ///< Horizontal layout holding the stage label and the progress bar
+    QLabel *stageLabel;          ///< Name of the stage currently running
+    QProgressBar *progressBar;   ///< Progress within the current stage
+    CardUpdateProgress progress; ///< Last reported progress
+    bool active = false;         ///< Whether an update is currently running
 };
 
 #endif // CARD_DATABASE_UPDATE_STATUS_BAR_H

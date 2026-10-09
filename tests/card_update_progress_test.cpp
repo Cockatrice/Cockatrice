@@ -1,4 +1,4 @@
-#include "interface/card_database_update/card_update_progress_parser.h"
+#include "interface/card_database_update/card_update_progress.h"
 
 #include <QByteArray>
 #include <QString>

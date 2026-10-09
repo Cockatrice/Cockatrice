@@ -1,4 +1,4 @@
-#include "card_update_progress_parser.h"
+#include "card_update_progress.h"
 
 #include <QList>
 

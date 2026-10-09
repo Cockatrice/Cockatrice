@@ -38,7 +38,7 @@
 #include "../main.h"
 #include "abstract_client.h"
 #include "card_database_update/card_database_update_status_bar.h"
-#include "card_database_update/card_update_progress_parser.h"
+#include "card_database_update/card_update_progress.h"
 #include "intents/contexts/context_connect_to_server.h"
 #include "intents/contexts/context_join_room.h"
 #include "intents/intent.h"

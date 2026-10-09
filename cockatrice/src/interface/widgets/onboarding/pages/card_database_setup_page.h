@@ -1,7 +1,7 @@
 #ifndef CARD_DATABASE_SETUP_PAGE_H
 #define CARD_DATABASE_SETUP_PAGE_H
 
-#include "../../../card_database_update/card_update_progress_parser.h"
+#include "../../../card_database_update/card_update_progress.h"
 #include "../first_run_wizard_page.h"
 
 #include <QSize>
