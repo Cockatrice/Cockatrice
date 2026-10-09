@@ -79,6 +79,12 @@ CardCompleterStyler::CardCompleterStyler(QCompleter *completer, QObject *parent)
     connect(completer, qOverload<const QString &>(&QCompleter::activated), this, &CardCompleterStyler::hidePreview);
     connect(completer->completionModel(), &QAbstractItemModel::modelReset, this,
             &CardCompleterStyler::onCompletionReset);
+    connect(completer->completionModel(), &QAbstractItemModel::rowsInserted, this,
+            &CardCompleterStyler::onCompletionReset);
+    connect(completer->completionModel(), &QAbstractItemModel::rowsRemoved, this,
+            &CardCompleterStyler::onCompletionReset);
+    connect(completer->completionModel(), &QAbstractItemModel::layoutChanged, this,
+            &CardCompleterStyler::onCompletionReset);
 }
 
 CardCompleterStyler::~CardCompleterStyler()
