@@ -48,7 +48,7 @@ void CardZone::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * /*event*/)
 bool CardZone::showContextMenu(const QPoint &screenPos)
 {
     if (menu) {
-        menu->exec(screenPos);
+        menu->popup(screenPos);
         return true;
     }
     return false;
