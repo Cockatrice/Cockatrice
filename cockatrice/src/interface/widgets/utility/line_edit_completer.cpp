@@ -1,9 +1,11 @@
 #include "line_edit_completer.h"
 
+#include <QAbstractItemModel>
 #include <QAbstractItemView>
 #include <QChar>
 #include <QCompleter>
 #include <QFocusEvent>
+#include <QItemSelectionModel>
 #include <QKeyEvent>
 #include <QModelIndex>
 #include <QVariant>
@@ -175,6 +177,17 @@ void LineEditCompleter::keyPressEvent(QKeyEvent *event)
     }
 
     active->completer->complete();
+
+    // The popup opens without a current row, so nothing is highlighted and there
+    // is no visual indication of what Enter will insert. Select the row that
+    // currentCompletion() would use so the current mention stays visible.
+    auto *completionModel = active->completer->completionModel();
+    const int currentRow = active->completer->currentRow();
+    if (currentRow >= 0 && currentRow < completionModel->rowCount()) {
+        active->completer->popup()->selectionModel()->setCurrentIndex(
+            completionModel->index(currentRow, active->completer->completionColumn()),
+            QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+    }
 }
 
 void LineEditCompleter::insertCompletion(const QString &completion)
