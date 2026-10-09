@@ -114,24 +114,11 @@ void LineEditCompleter::keyPressEvent(QKeyEvent *event)
     }
 
     if (event->key() == Qt::Key_Tab) {
-        for (auto &info : completers) {
-            if (info.completer->popup()->isVisible()) {
-                event->ignore();
-                const QModelIndex currentIndex = info.completer->popup()->currentIndex();
-                QString completionText;
-                if (currentIndex.isValid()) {
-                    completionText = currentIndex.data().toString();
-                } else {
-                    completionText = info.completer->currentCompletion();
-                }
-                if (!completionText.isEmpty()) {
-                    insertCompletion(info.completer, completionText);
-                }
-                hideCompleterPopups();
-                return;
-            }
+        bool popupVisible = hasVisibleCompleterPopup();
+        if (popupVisible) {
+            event->ignore();
+            return;
         }
-        // If no popup is visible, prevent Tab from moving focus
         event->ignore();
         return;
     }
