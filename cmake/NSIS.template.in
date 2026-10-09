@@ -88,6 +88,10 @@ Function CockLogWrite
     ${If} $LogHandle == ""
         Return
     ${EndIf}
+    ; FileOpen places the pointer at the start of the file in every mode, so
+    ; 'a' alone would overwrite the log from the beginning on each line. Seek
+    ; past the existing content first to actually append.
+    FileSeek $LogHandle 0 END
     FileWrite $LogHandle "$LogMessage$\r$\n"
     FileClose $LogHandle
 FunctionEnd
@@ -121,6 +125,10 @@ FunctionEnd
 Function .onInit
 
 StrCpy $InstallLogPath "$TEMP\Cockatrice-installer.log"
+; Start each run from a clean file so the log that gets sent back is the last
+; run, not every past run glued together.
+FileOpen $LogHandle "$InstallLogPath" w
+FileClose $LogHandle
 !insertmacro CockLog "=================================================================="
 !insertmacro CockLog "installer start: @CPACK_PACKAGE_NAME@ @CPACK_PACKAGE_VERSION@"
 
