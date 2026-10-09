@@ -111,12 +111,17 @@ struct PaletteColorInfo
 
 static QString usableDefaultStyle(const QString &style)
 {
-    // The Windows 11 native style is broken: dragging cards across zones can
+    // Only the OS/default ("System") style is sanitized: the Windows 11 and
+    // Windows Vista native styles are broken (dragging cards across zones can
     // shrink the board to a tiny grey window that is unfixable without
-    // rejoining. It is never usable, so guard against it no matter how it was
-    // requested (OS default or an explicit "windows11" theme choice) and fall
-    // back to the Vista style.
-    return style.compare("windows11", Qt::CaseInsensitive) == 0 ? QStringLiteral("windowsvista") : style;
+    // rejoining), so a "System" choice falls through to the built-in "windows"
+    // style (QWindowsStyle) instead. They remain selectable by hand, where the
+    // settings page warns about them.
+    if (style.compare("windows11", Qt::CaseInsensitive) == 0 ||
+        style.compare("windowsvista", Qt::CaseInsensitive) == 0) {
+        return QStringLiteral("windows");
+    }
+    return style;
 }
 
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
@@ -496,13 +501,12 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
         if (themeName == FUSION_THEME_NAME) {
             styleName = "Fusion";
         } else {
+            // "System" resolves through the guard, which steers the broken
+            // Windows native styles to "windows". An explicitly chosen style
+            // name is honored as-is.
             styleName = usableDefaultStyle(defaultStyleName);
         }
     }
-
-    // The Windows 11 style is broken even when selected explicitly in a theme,
-    // so sanitize the resolved name here rather than trusting the theme config.
-    styleName = usableDefaultStyle(styleName);
 
     QStyle *style = QStyleFactory::create(styleName);
     if (!style) {
