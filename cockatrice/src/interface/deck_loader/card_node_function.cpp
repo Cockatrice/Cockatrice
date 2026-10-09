@@ -15,13 +15,14 @@ void CardNodeFunction::SetProviderIdToPreferred::operator()(const InnerDecklistN
 {
     Q_UNUSED(node);
     PrintingInfo preferredPrinting = CardDatabaseManager::query()->getPreferredPrinting(card->getName());
-    QString providerId = preferredPrinting.getUuid();
-    QString setShortName = preferredPrinting.getSet()->getShortName();
-    QString collectorNumber = preferredPrinting.getProperty("num");
+    CardSetPtr preferredSet = preferredPrinting.getSet();
+    if (!preferredSet) {
+        return;
+    }
 
-    card->setCardProviderId(providerId);
-    card->setCardCollectorNumber(collectorNumber);
-    card->setCardSetShortName(setShortName);
+    card->setCardProviderId(preferredPrinting.getUuid());
+    card->setCardCollectorNumber(preferredPrinting.getProperty("num"));
+    card->setCardSetShortName(preferredSet->getShortName());
 }
 
 void CardNodeFunction::ClearPrintingData::operator()(const InnerDecklistNode *node, DecklistCardNode *card) const
