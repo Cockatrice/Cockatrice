@@ -48,32 +48,37 @@ void LineEditCompleter::focusOutEvent(QFocusEvent *e)
 {
     LineEditUnfocusable::focusOutEvent(e);
 
-    // Only commit the highlighted completion when focus moves away via Tab.
+    // Commit completion when focus moves away via Tab if popup is visible.
     // Other focus losses (e.g. the unfocus shortcut / Escape) must simply close
     // the popup without inserting anything.
-    if (e->reason() != Qt::TabFocusReason) {
-        hideCompleterPopups();
+    bool popupWasVisible = false;
+    for (auto &info : completers) {
+        if (info.completer->popup()->isVisible()) {
+            popupWasVisible = true;
+            const QModelIndex currentIndex = info.completer->popup()->currentIndex();
+            QString completionText;
+            if (currentIndex.isValid()) {
+                completionText = currentIndex.data().toString();
+            } else {
+                completionText = info.completer->currentCompletion();
+            }
+            if (!completionText.isEmpty()) {
+                insertCompletion(info.completer, completionText);
+            }
+        }
+    }
+    hideCompleterPopups();
+
+    if (popupWasVisible && e->reason() == Qt::TabFocusReason) {
+        // Refocus the edit so Tab doesn't move focus away
+        setFocus();
+        e->accept();
         return;
     }
 
-    for (auto &info : completers) {
-        if (!info.completer->popup()->isVisible()) {
-            continue;
-        }
-
-        const QModelIndex currentIndex = info.completer->popup()->currentIndex();
-        QString completionText;
-        if (currentIndex.isValid()) {
-            completionText = currentIndex.data().toString();
-        } else {
-            completionText = info.completer->currentCompletion();
-        }
-        if (!completionText.isEmpty()) {
-            insertCompletion(info.completer, completionText);
-        }
+    if (popupWasVisible) {
+        return;
     }
-
-    hideCompleterPopups();
 }
 
 void LineEditCompleter::keyPressEvent(QKeyEvent *event)
