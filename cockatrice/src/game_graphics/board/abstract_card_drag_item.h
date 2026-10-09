@@ -19,10 +19,9 @@
 
 class AbstractCardItem;
 
-class AbstractCardDragItem : public QObject, public QGraphicsItem
+class AbstractCardDragItem : public QGraphicsObject
 {
     Q_OBJECT
-    Q_INTERFACES(QGraphicsItem)
 protected:
     AbstractCardItem *item;
     QPointF hotSpot;

@@ -22,7 +22,7 @@ const QColor GHOST_MASK = QColor(255, 255, 255, 50);
 AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item,
                                            const QPointF &_hotSpot,
                                            AbstractCardDragItem *parentDrag)
-    : QGraphicsItem(), item(_item), hotSpot(_hotSpot)
+    : QGraphicsObject(), item(_item), hotSpot(_hotSpot)
 {
     if (parentDrag) {
         parentDrag->addChildDrag(this);

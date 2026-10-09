@@ -1,6 +1,6 @@
 # CMakeLists for servatrice directory
 #
-# provides the servatrice binary
+# Provides the servatrice binary
 
 project(Servatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
@@ -27,7 +27,7 @@ set(servatrice_SOURCES
 
 set(servatrice_RESOURCES servatrice.qrc)
 
-if(WIN32)
+if(WIN32) # Windows (including 64bit)
   set(servatrice_SOURCES ${servatrice_SOURCES} servatrice.rc)
 endif(WIN32)
 
@@ -49,14 +49,14 @@ qt6_add_resources(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
 
 set(QT_DONT_USE_QTGUI TRUE)
 
-# Mysql connector
+# MySQL connector
 if(UNIX)
   if(APPLE)
     set(MYSQLCLIENT_DEFAULT_PATHS "/usr/local/lib" "/opt/local/lib/mysql55/mysql/" "/opt/local/lib/mysql56/mysql/")
   else()
     set(MYSQLCLIENT_DEFAULT_PATHS "/usr/lib64" "/usr/local/lib64" "/usr/lib" "/usr/local/lib")
   endif()
-elseif(WIN32)
+elseif(WIN32) # Windows (including 64bit)
   set(MYSQLCLIENT_DEFAULT_PATHS "C:\\Program Files\\MySQL\\MySQL Server 5.7\\lib"
                                 "C:\\Program Files (x86)\\MySQL\\MySQL Server 5.7\\lib"
   )
@@ -101,16 +101,16 @@ target_precompile_headers(servatrice PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtco
 
 if(CMAKE_HOST_SYSTEM MATCHES "FreeBSD")
   target_link_libraries(
-    servatrice libcockatrice_deck_list libcockatrice_network_server_remote Threads::Threads ${SERVATRICE_QT_MODULES}
+    servatrice libcockatrice_deck_list libcockatrice_network_server_remote Threads::Threads ${QT_MODULES_SERVATRICE}
     ${LIBEXECINFO_LIBRARY}
   )
 else()
   target_link_libraries(
-    servatrice libcockatrice_deck_list libcockatrice_network_server_remote Threads::Threads ${SERVATRICE_QT_MODULES}
+    servatrice libcockatrice_deck_list libcockatrice_network_server_remote Threads::Threads ${QT_MODULES_SERVATRICE}
   )
 endif()
 
-# install rules
+# Install rules
 if(UNIX)
   if(APPLE)
     set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME}")
@@ -124,7 +124,7 @@ if(UNIX)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.ini.example DESTINATION ./servatrice.app/Contents/Resources/)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.sql DESTINATION ./servatrice.app/Contents/Resources/)
   else()
-    # Assume linux
+    # Assume Linux
     install(TARGETS servatrice RUNTIME DESTINATION bin/)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.ini.example DESTINATION share/servatrice/)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.sql DESTINATION share/servatrice/)
@@ -133,14 +133,14 @@ if(UNIX)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/servatrice.svg DESTINATION ${ICONDIR}/hicolor/scalable/apps)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.desktop DESTINATION ${DESKTOPDIR})
   endif()
-elseif(WIN32)
+elseif(WIN32) # Windows (including 64bit)
   install(TARGETS servatrice RUNTIME DESTINATION ./)
   install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.ini.example DESTINATION ./)
   install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.sql DESTINATION ./)
 endif()
 
 if(APPLE)
-  # these needs to be relative to CMAKE_INSTALL_PREFIX
+  # These needs to be relative to CMAKE_INSTALL_PREFIX
   set(plugin_dest_dir servatrice.app/Contents/Plugins)
   set(qtconf_dest_dir servatrice.app/Contents/Resources)
 
@@ -178,8 +178,8 @@ Translations = Resources/translations\")
   )
 endif()
 
-if(WIN32)
-  # these needs to be relative to CMAKE_INSTALL_PREFIX
+if(WIN32) # Windows (including 64bit)
+  # These needs to be relative to CMAKE_INSTALL_PREFIX
   set(plugin_dest_dir Plugins)
   set(qtconf_dest_dir .)
 

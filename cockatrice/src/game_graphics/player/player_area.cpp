@@ -5,7 +5,7 @@
 #include <QBrush>
 #include <QPainter>
 
-PlayerArea::PlayerArea(QGraphicsItem *parentItem) : QObject(), QGraphicsItem(parentItem)
+PlayerArea::PlayerArea(QGraphicsItem *parentItem) : QGraphicsObject(parentItem)
 {
     setCacheMode(DeviceCoordinateCache);
     connect(themeManager, &ThemeManager::themeChanged, this, &PlayerArea::updateBg);

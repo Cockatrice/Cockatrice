@@ -60,5 +60,5 @@ target_include_directories(libcockatrice_network_server_remote PUBLIC .)
 # Make cockatrice_server depend on cockatrice_protocol
 target_link_libraries(
   libcockatrice_network_server_remote PUBLIC libcockatrice_protocol libcockatrice_utility libcockatrice_rng
-                                             libcockatrice_deck_list ${COCKATRICE_QT_MODULES}
+                                             libcockatrice_deck_list ${QT_MODULES_COCKATRICE}
 )

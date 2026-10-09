@@ -5,6 +5,6 @@ if(NOT GTEST_FOUND)
 endif()
 
 target_link_libraries(
-  deck_list_zones_test libcockatrice_deck_list Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
+  deck_list_zones_test libcockatrice_deck_list Threads::Threads ${GTEST_BOTH_LIBRARIES} ${QT_MODULES_TEST}
 )
 add_test(NAME deck_list_zones_test COMMAND deck_list_zones_test)

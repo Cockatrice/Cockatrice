@@ -7,6 +7,6 @@ endif()
 
 target_link_libraries(
   loading_from_clipboard_test libcockatrice_deck_list libcockatrice_card Threads::Threads ${GTEST_BOTH_LIBRARIES}
-  ${TEST_QT_MODULES}
+  ${QT_MODULES_TEST}
 )
 add_test(NAME loading_from_clipboard_test COMMAND loading_from_clipboard_test)

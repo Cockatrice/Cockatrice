@@ -25,10 +25,9 @@ class Message;
 }
 } // namespace google
 
-class PhaseButton : public QObject, public QGraphicsItem
+class PhaseButton : public QGraphicsObject
 {
     Q_OBJECT
-    Q_INTERFACES(QGraphicsItem)
 private:
     QString name;
     bool active, highlightable;
@@ -63,10 +62,9 @@ protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 };
 
-class PhasesToolbar : public QObject, public QGraphicsItem
+class PhasesToolbar : public QGraphicsObject
 {
     Q_OBJECT
-    Q_INTERFACES(QGraphicsItem)
 private:
     QList<PhaseButton *> buttonList;
     PhaseButton *nextTurnButton;
