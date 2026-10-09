@@ -150,7 +150,7 @@ jobs:
     continue-on-error: ${{ matrix.allow-failure == 'yes' }}
     timeout-minutes: 70
     env:
-      CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}    # directory for caching docker image and ccache
+      CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}    # directory holding the build image and ccache, only the image subdir is cached below
       CCACHE_EVICTION_AGE: 7d
       CCACHE_SIZE: 600M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CMAKE_GENERATOR: 'Ninja'
@@ -160,12 +160,18 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@v7
 
-      - name: "Restore compiler cache (ccache)"
-        id: restore_ccache
+      # Only the image half of this cache is worth keeping. A compile on these legs runs
+      # inside a container, so ccache measures a 0.00 to 1.85 percent hit rate here against
+      # 49 to 50 percent on the macOS legs, and the roughly 420 MiB of ccache each entry
+      # carried was buying nothing. Caching $CACHE/image alone drops that.
+      # The key changes name because the cached content does: the old ccache-<distro>
+      # entries hold an image plus a ccache directory, and expire on their own untouched.
+      - name: "Restore build image cache"
+        id: restore_image_cache
         uses: actions/cache/restore@v6
         with:
-          key: ccache-${{ matrix.distro }}${{ matrix.version }}
-          path: ${{ env.CACHE }}
+          key: image-${{ matrix.distro }}${{ matrix.version }}
+          path: ${{ env.CACHE }}/image
 
       - name: "Build ${{ matrix.distro }} ${{ matrix.version }} Docker image"
         shell: bash
@@ -202,24 +208,24 @@ jobs:
 
           RUN --server --release --package "$package" "${args[@]}"
 
-      # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
-      - name: "Delete remote compiler cache (ccache)"
-        if: github.ref == 'refs/heads/master' && steps.restore_ccache.outputs.cache-hit
+      # Delete used cache to emulate a cache update. See https://github.com/actions/cache/issues/342
+      - name: "[Linux] Delete used cache to emulate a cache update"
+        if: github.ref == 'refs/heads/master' && steps.restore_image_cache.outputs.cache-hit
         continue-on-error: true
         env:
-          CACHE_PRIMARY_KEY: ${{ steps.restore_ccache.outputs.cache-primary-key }}
+          CACHE_PRIMARY_KEY: ${{ steps.restore_image_cache.outputs.cache-primary-key }}
           GH_TOKEN: ${{ github.token }}
         run: |
           if gh cache delete --repo "$GITHUB_REPOSITORY" "$CACHE_PRIMARY_KEY"; then
             echo "Cache deleted successfully"
           fi
 
-      - name: "Save updated compiler cache (ccache)"
+      - name: "Save updated build image cache"
         if: github.ref == 'refs/heads/master'
         uses: actions/cache/save@v6
         with:
-          key: ${{ steps.restore_ccache.outputs.cache-primary-key }}
-          path: ${{ env.CACHE }}
+          key: ${{ steps.restore_image_cache.outputs.cache-primary-key }}
+          path: ${{ env.CACHE }}/image
 
       - name: "Upload artifact"
         id: upload_artifact
