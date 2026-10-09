@@ -111,12 +111,17 @@ struct PaletteColorInfo
 
 static QString usableDefaultStyle(const QString &style)
 {
-    // The Windows 11 native style is broken: dragging cards across zones can
-    // shrink the board to a tiny grey window that is unfixable without
-    // rejoining. It is never usable, so guard against it no matter how it was
-    // requested (OS default or an explicit "windows11" theme choice) and fall
-    // back to the Vista style.
-    return style.compare("windows11", Qt::CaseInsensitive) == 0 ? QStringLiteral("windowsvista") : style;
+    // The Windows 11 and Windows Vista native styles are broken: dragging cards
+    // across zones can shrink the board to a tiny grey window that is unfixable
+    // without rejoining. Neither is usable, so guard against both no matter how
+    // they were requested (OS default or an explicit theme choice) and fall back
+    // to the built-in "windows" style (QWindowsStyle), the classic non-native
+    // style that was the client default before the Fusion theme was added.
+    if (style.compare("windows11", Qt::CaseInsensitive) == 0 ||
+        style.compare("windowsvista", Qt::CaseInsensitive) == 0) {
+        return QStringLiteral("windows");
+    }
+    return style;
 }
 
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)

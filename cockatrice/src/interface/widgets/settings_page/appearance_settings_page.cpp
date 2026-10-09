@@ -77,10 +77,11 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     // Qt widget style; "System" lets the application decide
     styleCombo.addItem(tr("System"), QStringLiteral("System"));
     for (const QString &key : QStyleFactory::keys()) {
-        // The Windows 11 native style is broken (board rendering glitches when
-        // moving cards), so never offer it; it is already sanitized at apply
-        // time in ThemeManager.
-        if (key.compare("windows11", Qt::CaseInsensitive) == 0) {
+        // The Windows 11 and Windows Vista native styles are broken (board
+        // rendering glitches when moving cards), so never offer them; they are
+        // already sanitized at apply time in ThemeManager.
+        if (key.compare("windows11", Qt::CaseInsensitive) == 0 ||
+            key.compare("windowsvista", Qt::CaseInsensitive) == 0) {
             continue;
         }
         styleCombo.addItem(key, key);
