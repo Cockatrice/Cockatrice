@@ -52,7 +52,6 @@ private:
     int sortIndex;
     Qt::SortOrder sortOrder;
     bool setOrderIsSorted;
-    bool includeRebalancedCards;
     enum
     {
         NO_SETS_SELECTED,
@@ -87,7 +86,6 @@ private slots:
     void actDisableResetButton(const QString &filterText);
     void actSort(int index);
     void actIgnoreWarning();
-    void includeRebalancedCardsChanged(bool _includeRebalancedCardsChanged);
 };
 
 #endif

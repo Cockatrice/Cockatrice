@@ -33,12 +33,11 @@ class ICardSetPriorityController;
 CardDatabaseLoader::CardDatabaseLoader(QObject *parent,
                                        CardDatabase *db,
                                        ICardDatabasePathProvider *_pathProvider,
-                                       ICardPreferenceProvider *_preferenceProvider,
                                        ICardSetPriorityController *_priorityController)
     : QObject(parent), database(db), pathProvider(_pathProvider), priorityController(_priorityController)
 {
     // instantiate available parsers here
-    availableParsers << new CockatriceXml4Parser(_preferenceProvider, _priorityController);
+    availableParsers << new CockatriceXml4Parser(_priorityController);
     availableParsers << new CockatriceXml3Parser(_priorityController);
 
     // The load path parses into a snapshot and never emits per-card signals;

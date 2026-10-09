@@ -4,7 +4,6 @@
 #include "libcockatrice/card/format/format_legality_rules.h"
 #include "libcockatrice/card/lazy_properties_hash.h"
 #include "libcockatrice/card/relation/card_relation_type.h"
-#include "libcockatrice/interfaces/noop_card_preference_provider.h"
 #include "libcockatrice/interfaces/noop_card_set_priority_controller.h"
 #include "parsehelpers.h"
 
@@ -302,9 +301,9 @@ CardInfoPtr OracleImporter::addCard(QString name,
 
 static QString getJsonString(const QJsonObject &obj, const QString &key)
 {
-    // QVariant coerces numbers and booleans to text, while QJsonValue::toString()
-    // returns a null string for them — some MTGJSON fields (manaValue,
-    // convertedManaCost, isOnlineOnly, isRebalanced) carry those types.
+    // QVariant coerces numbers to text, while QJsonValue::toString() returns a
+    // null string for them — MTGJSON fields like manaValue and convertedManaCost
+    // carry those types.
     return obj.value(key).toVariant().toString();
 }
 
@@ -413,11 +412,8 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
     };
 
     // mtgjson name => xml name
-    static const QMap<QString, QString> setInfoProperties{{"number", "num"},
-                                                          {"rarity", "rarity"},
-                                                          {"isOnlineOnly", "isOnlineOnly"},
-                                                          {"isRebalanced", "isRebalanced"},
-                                                          {"artist", "artist"}};
+    static const QMap<QString, QString> setInfoProperties{
+        {"number", "num"}, {"rarity", "rarity"}, {"artist", "artist"}};
 
     // mtgjson name => xml name
     static const QMap<QString, QString> identifierProperties{{"multiverseId", "muid"}, {"scryfallId", "uuid"}};
@@ -852,7 +848,7 @@ int OracleImporter::startImport()
 
 bool OracleImporter::saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion)
 {
-    CockatriceXml4Parser parser(new NoopCardPreferenceProvider(), new NoopCardSetPriorityController());
+    CockatriceXml4Parser parser(new NoopCardSetPriorityController());
 
     return parser.saveToFile(createDefaultMagicFormats(), sets, cards, fileName, sourceUrl, sourceVersion);
 }

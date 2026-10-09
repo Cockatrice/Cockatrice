@@ -21,7 +21,6 @@ public:
     [[nodiscard]] bool getBumpSetsWithCardsInDeckToTop() const override;
     [[nodiscard]] int getPrintingSelectorSortOrder() const override;
     [[nodiscard]] int getPrintingSelectorCardSize() const override;
-    [[nodiscard]] bool getIncludeRebalancedCards() const override;
     [[nodiscard]] bool getPrintingSelectorNavigationButtonsVisible() const override;
     [[nodiscard]] bool getTapAnimation() const override;
     [[nodiscard]] bool getArrowDrawAnimation() const override;
@@ -45,7 +44,6 @@ public:
     void setBumpSetsWithCardsInDeckToTop(bool _bumpSetsWithCardsInDeckToTop);
     void setPrintingSelectorSortOrder(int _printingSelectorSortOrder);
     void setPrintingSelectorCardSize(int _printingSelectorCardSize);
-    void setIncludeRebalancedCards(bool _includeRebalancedCards);
     void setPrintingSelectorNavigationButtonsVisible(bool _navigationButtonsVisible);
     void setTapAnimation(bool _tapAnimation);
     void setArrowDrawAnimation(bool _arrowDrawAnimation);
@@ -70,7 +68,6 @@ signals:
     void bumpSetsWithCardsInDeckToTopChanged();
     void printingSelectorSortOrderChanged();
     void printingSelectorCardSizeChanged();
-    void includeRebalancedCardsChanged(bool _includeRebalancedCards);
     void printingSelectorNavigationButtonsVisibleChanged();
     void visualDeckStorageCardSizeChanged();
     void visualDatabaseDisplayCardSizeChanged();

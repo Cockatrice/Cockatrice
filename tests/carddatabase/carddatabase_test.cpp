@@ -77,12 +77,11 @@ TEST(CardDatabaseTest, Xml4LocalizedDataRoundTrip)
 
     QTemporaryDir tempDir;
     const QString fileName = tempDir.filePath("cards.xml");
-    NoopCardPreferenceProvider prefProvider;
-    CockatriceXml4Parser writer(&prefProvider, &controller);
+    CockatriceXml4Parser writer(&controller);
     ASSERT_TRUE(writer.saveToFile({}, sets, cards, fileName));
 
     CardDatabaseData data;
-    CockatriceXml4Parser parser(&prefProvider, &controller);
+    CockatriceXml4Parser parser(&controller);
     QFile file(fileName);
     ASSERT_TRUE(file.open(QIODevice::ReadOnly));
     parser.parseFileInto(file, data);
