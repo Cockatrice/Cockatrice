@@ -8,8 +8,19 @@
 # 3.16 required for Qt6 and target_precompile_headers()
 cmake_minimum_required(VERSION 3.16)
 
+# Let CMake pick the MSVC debug information format through
+# CMAKE_MSVC_DEBUG_INFORMATION_FORMAT instead of writing it into the
+# CMAKE_<LANG>_FLAGS_<CONFIG> defaults. The policy has to be settled before the
+# first project() enables a language, and it does not exist before CMake 3.25,
+# where the old defaults are the only thing available.
+if(POLICY CMP0141)
+  cmake_policy(SET CMP0141 NEW)
+endif()
+
 # Use compiler cache (ccache)
 option(USE_CCACHE "Cache the build results with ccache" ON)
+# Use compiler cache (sccache), for generators that invoke the compiler themselves
+option(USE_SCCACHE "Cache the build results with sccache" OFF)
 # Treat warnings as errors (Debug builds only)
 option(WARNING_AS_ERROR "Treat warnings as errors in debug builds" ON)
 # Check for translation updates
@@ -152,8 +163,17 @@ endif()
 
 # Define proper compilation flags
 if(MSVC)
-  # Disable Warning C4251, C++20 compatibility, Multi-threaded Builds, Warn Detection, Unwind Semantics, Debug Symbols
-  set(CMAKE_CXX_FLAGS "/wd4251 /Zc:__cplusplus /std:c++20 /permissive- /W4 /MP /EHsc /Zi")
+  # Debug information: a cache can only store and restore objects that carry it
+  # inside, so a cached build asks for /Z7 (Embedded); otherwise /Zi (ProgramDatabase).
+  # Either way the linker is told to write the PDB, in every configuration.
+  if(USE_SCCACHE)
+    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT Embedded)
+  else()
+    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT ProgramDatabase)
+  endif()
+
+  # Disable Warning C4251, C++20 compatibility, Multi-threaded Builds, Warn Detection, Unwind Semantics
+  set(CMAKE_CXX_FLAGS "/wd4251 /Zc:__cplusplus /std:c++20 /permissive- /W4 /MP /EHsc")
   # Visual Studio: Maximum Optimization, Multi-threaded DLL
   set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD")
   # Visual Studio: No Optimization, Multi-threaded Debug DLL
