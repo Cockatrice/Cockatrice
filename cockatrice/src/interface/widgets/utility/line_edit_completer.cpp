@@ -88,8 +88,14 @@ void LineEditCompleter::keyPressEvent(QKeyEvent *event)
             if (info.completer->popup()->isVisible()) {
                 event->ignore();
                 const QModelIndex currentIndex = info.completer->popup()->currentIndex();
+                QString completionText;
                 if (currentIndex.isValid()) {
-                    insertCompletion(info.completer, currentIndex.data().toString());
+                    completionText = currentIndex.data().toString();
+                } else {
+                    completionText = info.completer->currentCompletion();
+                }
+                if (!completionText.isEmpty()) {
+                    insertCompletion(info.completer, completionText);
                 }
                 hideCompleterPopups();
                 return;
