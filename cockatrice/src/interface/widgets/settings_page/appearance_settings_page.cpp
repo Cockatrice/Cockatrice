@@ -74,16 +74,10 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&schemeCombo, &QComboBox::currentIndexChanged, this,
             [this] { themeManager->setColorScheme(schemeCombo.currentData().toString()); });
 
-    // Qt widget style; "System" lets the application decide
+    // Qt widget style; "System" lets the application decide. The broken Windows
+    // native styles are still offered, but selecting one raises a warning.
     styleCombo.addItem(tr("System"), QStringLiteral("System"));
     for (const QString &key : QStyleFactory::keys()) {
-        // The Windows 11 and Windows Vista native styles are broken (board
-        // rendering glitches when moving cards), so never offer them; they are
-        // already sanitized at apply time in ThemeManager.
-        if (key.compare("windows11", Qt::CaseInsensitive) == 0 ||
-            key.compare("windowsvista", Qt::CaseInsensitive) == 0) {
-            continue;
-        }
         styleCombo.addItem(key, key);
     }
 
@@ -93,6 +87,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
     connect(&styleCombo, &QComboBox::currentIndexChanged, this,
             [this] { themeManager->setStyleName(styleCombo.currentData().toString()); });
+    connect(&styleCombo, &QComboBox::currentIndexChanged, this, &AppearanceSettingsPage::updateStyleWarning);
 
     connect(themeManager, &ThemeManager::themeChanged, this, [this, dirPath] {
         const QString newDir = themeManager->getAvailableThemes().value(SettingsCache::instance().getThemeName());
@@ -109,6 +104,8 @@ AppearanceSettingsPage::AppearanceSettingsPage()
         const int styleIdx = currentStyle.isEmpty() ? 0 : styleCombo.findData(currentStyle);
         styleCombo.setCurrentIndex(styleIdx >= 0 ? styleIdx : 0);
         styleCombo.blockSignals(false);
+
+        updateStyleWarning();
     });
 
     connect(&editPaletteButton, &QPushButton::clicked, this, &AppearanceSettingsPage::editPalette);
@@ -121,7 +118,11 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     themeGrid->addWidget(&schemeCombo, 2, 1);
     themeGrid->addWidget(&styleComboLabel, 3, 0);
     themeGrid->addWidget(&styleCombo, 3, 1);
-    themeGrid->addWidget(&editPaletteButton, 4, 1);
+    themeGrid->addWidget(&styleWarningLabel, 4, 0, 1, 2);
+    themeGrid->addWidget(&editPaletteButton, 5, 1);
+
+    styleWarningLabel.setWordWrap(true);
+    styleWarningLabel.setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
     themeGroupBox = new QGroupBox;
     themeGroupBox->setLayout(themeGrid);
@@ -466,6 +467,14 @@ void AppearanceSettingsPage::updateHomeTabSettingsVisibility()
     homeTabDisplayCardNameCheckBox.setVisible(visible);
 }
 
+void AppearanceSettingsPage::updateStyleWarning()
+{
+    const QString style = styleCombo.currentData().toString();
+    const bool broken =
+        style.compare("windows11", Qt::CaseInsensitive) == 0 || style.compare("windowsvista", Qt::CaseInsensitive) == 0;
+    styleWarningLabel.setVisible(broken);
+}
+
 void AppearanceSettingsPage::showShortcutsChanged(QT_STATE_CHANGED_T value)
 {
     SettingsCache::instance().userInterface().setShowShortcuts(value);
@@ -528,6 +537,11 @@ void AppearanceSettingsPage::retranslateUi()
     schemeComboLabel.setText(tr("Active theme palette:"));
     styleComboLabel.setText(tr("Active theme style:"));
     styleCombo.setToolTip(tr("Qt widget style saved to this theme (\"System\" lets the application decide)"));
+    styleWarningLabel.setText(
+        tr("Warning: the Windows 11 and Windows Vista styles are buggy and can render controls such as combo boxes "
+           "unreadable, especially in dark mode. Fusion is the recommended style on every platform: it is Qt's "
+           "cross-platform style and the one Cockatrice is developed against."));
+    updateStyleWarning();
     editPaletteButton.setText(tr("Edit theme palette"));
 
     homeTabGroupBox->setTitle(tr("Home tab settings"));
