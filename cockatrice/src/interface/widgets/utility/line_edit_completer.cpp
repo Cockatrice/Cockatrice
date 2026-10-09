@@ -123,10 +123,12 @@ void LineEditCompleter::keyPressEvent(QKeyEvent *event)
                     insertCompletion(info.completer, completionText);
                 }
                 hideCompleterPopups();
-                setFocus();
                 return;
             }
         }
+        // If no popup is visible, prevent Tab from moving focus
+        event->ignore();
+        return;
     }
 
     LineEditUnfocusable::keyPressEvent(event);
