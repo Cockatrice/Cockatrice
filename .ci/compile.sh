@@ -353,15 +353,21 @@ if [[ $MAKE_PACKAGE ]]; then
       fi
       echo "Installer content is clean"
 
-      # Fail the build if the installer is missing a Qt runtime the applications
-      # link against. The DLLs reach the package by globbing every *.dll out of
-      # the build output directories, so a module the client links statically
-      # (Qt6Multimedia.dll, Qt6QuickWidgets.dll) can be left out without anything
-      # else noticing, and the only symptom is a client that refuses to start
-      # after an update. required-qt-runtime.txt is written by the top level
-      # CMakeLists.txt from the same module list the targets are built against.
-      if [[ ! -f required-qt-runtime.txt ]]; then
-        echo "::error file=$0::required-qt-runtime.txt not found in the build dir, cannot verify the Qt runtime"
+      # Fail the build if the installer does not carry the runtime the
+      # applications link against - a file that must be there, or a DLL that must
+      # not be. The runtime DLLs reach the package by globbing every *.dll out of
+      # the build output directories, so anything that build produced can ride
+      # along and nothing else in the build objects to it: a Qt module the client
+      # links statically (Qt6Multimedia.dll, Qt6QuickWidgets.dll) can be left out,
+      # and the test framework's gtest.dll can be shipped. Either only surfaces on
+      # a user's machine after an update has already replaced their install, as
+      # "The code execution cannot proceed because Qt6Multimedia.dll was not
+      # found" or "abseil_dll.dll is either not designed to run on Windows or it
+      # contains an error". required-runtime.txt is written by the top level
+      # CMakeLists.txt from the same module lists the targets are built against
+      # plus the vcpkg bin directory the app-local copies come from.
+      if [[ ! -f required-runtime.txt ]]; then
+        echo "::error file=$0::required-runtime.txt not found in the build dir, cannot verify the runtime"
         exit 1
       fi
       # 7-Zip writes CRLF on Windows, so the \r has to come off before any
@@ -371,7 +377,7 @@ if [[ $MAKE_PACKAGE ]]; then
       # being a wildcard; -i because that is how the installed tree behaves -
       # the uninstaller clears both $INSTDIR\plugins and $INSTDIR\Plugins.
       # The archive side and the manifest side have to agree on line endings.
-      # CMake writes required-qt-runtime.txt with the platform's line ending and
+      # CMake writes required-runtime.txt with the platform's line ending and
       # 7-Zip writes CRLF on Windows, so a trailing \r survives on $entry and
       # defeats the whole-line match - every entry then reads as missing even
       # though the listing holds it verbatim.
@@ -380,7 +386,7 @@ if [[ $MAKE_PACKAGE ]]; then
       installer_paths="$("$seven_zip" l -slt "$package" | tr -d '\r' |
         sed -n 's/^Path = //p' |
         sed -e 's|\\|/|g' -e 's|^[$]INSTDIR/||' -e 's|^[$]OUTDIR/||' -e 's|^[$]PLUGINSDIR/||' -e 's|^\./||' -e 's|^/||')"
-      manifest="$(tr -d '\r' <required-qt-runtime.txt)"
+      manifest="$(tr -d '\r' <required-runtime.txt)"
       missing=""
       checked=0
       while IFS= read -r entry; do
@@ -393,11 +399,11 @@ if [[ $MAKE_PACKAGE ]]; then
         fi
       done <<<"$manifest"
       if [[ -n $missing ]]; then
-        echo "::error file=$0::Installer is missing required Qt runtime files:$missing"
+        echo "::error file=$0::Installer is missing required runtime files:$missing"
         # Print both sides of the comparison. A mismatch here has twice been
         # caused by the shape of 7-Zip's output rather than by a missing file,
         # and a bare "missing" line cannot tell those apart.
-        echo "required-qt-runtime.txt asked for $checked path(s); 7-Zip listed $(grep -c '' <<<"$installer_paths") path(s)"
+        echo "required-runtime.txt asked for $checked path(s); 7-Zip listed $(grep -c '' <<<"$installer_paths") path(s)"
         # Indent with parameter expansion rather than sed 's/^/  /', which the
         # linter reports as SC2001.
         echo "--- required ---"
@@ -407,7 +413,66 @@ if [[ $MAKE_PACKAGE ]]; then
         echo "${listed_head//$'\n'/$'\n  '}"
         exit 1
       fi
-      echo "Installer contains the full Qt runtime ($checked files)"
+      echo "Installer carries the Qt runtime of every module the three applications link ($checked files)"
+
+      # Now the other direction: a top level DLL in the package that the manifest
+      # does not name. The missing check above cannot see a runtime that was
+      # never expected.
+      #
+      # Two things are reported here and neither may fail the build.
+      #
+      # The test framework is a fact rather than a guess - no shipped executable
+      # links gtest or gmock, and the build output directories the "*.dll" glob
+      # reads are shared with the test targets, so gtest.dll and gmock.dll are
+      # one filter away from shipping in every release. Even so it is reported
+      # instead of enforced: a check that has never passed on a real package has
+      # not earned the right to block a release, and the first Windows run of an
+      # enforcing version is exactly when its own wrong assumptions show up.
+      #
+      # Everything else is expected to be there. required-runtime.txt names the
+      # Qt modules the three applications link, and the protobuf, Abseil,
+      # OpenSSL, liblzma, ffmpeg and Qt debug DLLs in the package come in on the
+      # build output glob instead, because nothing in the build declares them by
+      # name. So this list is a report of what the package carries, not a verdict.
+      # Read it when a dependency is added; do not fail on it.
+      forbidden=""
+      unexpected=""
+      while IFS= read -r entry; do
+        [[ -z $entry ]] && continue
+        # Top level only. A DLL under Plugins/ or a nested image format plugin is
+        # a plugin the platform loads by name, not a runtime the executable
+        # imports, and requiring one here would list all of them every run.
+        [[ $entry == */* ]] && continue
+        if grep -qxiF "$entry" <<<"$manifest"; then
+          continue
+        fi
+        # NSIS extracts its plugins to $PLUGINSDIR, which the path normalization
+        # above strips, so they arrive here looking like payload files. They are
+        # part of the installer, not of the installed tree.
+        if [[ $entry == [Nn][Ss][Dd][Ii][Aa][Ll][Oo][Gg][Ss].dll ||
+          $entry == [Nn][Ss][Ee][Xx][Ee][Cc].dll ||
+          $entry == [Ss][Yy][Ss][Tt][Ee][Mm].dll ||
+          $entry == [Uu][Ss][Ee][Rr][Ii][Nn][Ff][Oo].dll ||
+          $entry == [Ii][Nn][Ee][Tt].dll ]]; then
+          continue
+        fi
+        if [[ $entry == [Gg][Tt][Ee][Ss][Tt]* || $entry == [Gg][Mm][Oo][Cc][Kk]* ]]; then
+          forbidden+=" $entry"
+        else
+          unexpected+=" $entry"
+        fi
+      done < <(grep -i '\.dll$' <<<"$installer_paths")
+      if [[ -n $forbidden ]]; then
+        echo "::warning file=$0::Installer contains test framework DLLs that no shipped executable links:$forbidden"
+        echo "A build output directory shared with the test targets has leaked into the package."
+      fi
+      if [[ -n $unexpected ]]; then
+        echo "Top level DLLs in the package beyond the linked Qt modules:$unexpected"
+        echo "These arrive on the build output glob, not from required-runtime.txt, so they are reported and not required."
+      fi
+      if [[ -z $forbidden && -z $unexpected ]]; then
+        echo "Installer carries no runtime files beyond the linked Qt modules"
+      fi
     fi
     echo "::endgroup::"
   fi

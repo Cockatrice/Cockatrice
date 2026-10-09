@@ -326,38 +326,54 @@ elseif(WIN32)
   # Configure file with custom definitions for NSIS.
   configure_file("${COCKATRICE_CMAKE_PATH}/NSIS.definitions.nsh.in" "${PROJECT_BINARY_DIR}/NSIS.definitions.nsh")
 
-  # Every Qt module the client links against, as the DLL names a Windows install
-  # has to contain, plus the platform plugin without which the client cannot
-  # start. .ci/compile.sh reads this and fails the build when the packaged
-  # installer is missing one of them.
+  # Every runtime DLL a Windows install has to contain, as paths relative to the
+  # install root. .ci/compile.sh reads this and fails the build when the packaged
+  # installer is missing one of them, or carries a runtime it does not know about.
   #
-  # Only the client is packaged on Windows, so this is the client's module list
-  # rather than the union across server, client and Oracle: demanding Oracle's or
-  # Servatrice's modules of the client installer checks nothing about the client.
+  # All three applications are packaged into the same directory on Windows, so
+  # this is the union of their Qt module lists, not just the client's: Servatrice
+  # contributes Qt6Sql.dll and Oracle contributes nothing the client lacks, and a
+  # client-only manifest leaves Qt6Sql.dll unasserted even though servatrice.exe
+  # is installed next to cockatrice.exe and cannot start without it.
   #
   # A statically linked Qt module ships no runtime DLL, so requiring one would
   # fail the package check on a static build for no reason. cockatrice/CMakeLists.txt
   # installs the runtime of every module listed here, and skips static ones the
   # same way, so the two can never disagree.
   #
-  # A DLL missing from the package only surfaces on a user's machine, after an
-  # update has already replaced their install, as "The code execution cannot
-  # proceed because Qt6Multimedia.dll was not found" or as a missing procedure
-  # entry point in a Qt6QuickWidgets.dll left over from the previous version.
-  # Assert it while the installer is still being built instead.
-  set(_required_qt_runtime "")
-  foreach(_qt_module IN LISTS COCKATRICE_QT_MODULES)
+  # Only the Qt modules, and that is deliberate. protobuf, Abseil, liblzma, zlib
+  # and OpenSSL also ride in on the "*.dll" glob, and a client whose runtime is
+  # absent, stale or of the wrong architecture fails to start with "abseil_dll.dll
+  # is either not designed to run on Windows or it contains an error", so they
+  # are exactly the files worth asserting.
+  #
+  # Their names cannot be derived from the vcpkg bin directory, which is what a
+  # first attempt did and what a Windows build immediately refuted: bin holds
+  # everything vcpkg installed, not everything the applications import. It also
+  # contains gmock.dll, libprotobuf-lite.dll, libprotoc.dll, legacy.dll and three
+  # pthreadVC*.dll FindThreads probes, none of which any shipped executable
+  # links, so requiring them failed a build over a package that was correct.
+  #
+  # Deriving them from the executables' own import tables is the real answer,
+  # and fixup_bundle already walks it to decide what to copy. Until that result
+  # is available to CMake, requiring the vcpkg half would mean guessing names
+  # again, which is what produced this bug report in the first place. So assert
+  # what is derived from the build's own link lists and leave the rest to the
+  # purge in cmake/NSIS.template.in, which removes every DLL regardless of name.
+  set(_required_runtime "")
+  foreach(_qt_module IN LISTS COCKATRICE_QT_MODULES SERVATRICE_QT_MODULES ORACLE_QT_MODULES)
     get_target_property(_qt_module_type ${_qt_module} TYPE)
     if(_qt_module_type STREQUAL "SHARED_LIBRARY")
       string(REGEX REPLACE "^Qt6::" "" _qt_component "${_qt_module}")
-      list(APPEND _required_qt_runtime "Qt6${_qt_component}.dll")
+      list(APPEND _required_runtime "Qt6${_qt_component}.dll")
     endif()
   endforeach()
-  list(APPEND _required_qt_runtime "Plugins/platforms/qwindows.dll")
-  list(REMOVE_DUPLICATES _required_qt_runtime)
-  list(SORT _required_qt_runtime)
-  string(REPLACE ";" "\n" _required_qt_runtime "${_required_qt_runtime}")
-  file(WRITE "${PROJECT_BINARY_DIR}/required-qt-runtime.txt" "${_required_qt_runtime}\n")
+  list(APPEND _required_runtime "Plugins/platforms/qwindows.dll")
+
+  list(REMOVE_DUPLICATES _required_runtime)
+  list(SORT _required_runtime)
+  string(REPLACE ";" "\n" _required_runtime "${_required_runtime}")
+  file(WRITE "${PROJECT_BINARY_DIR}/required-runtime.txt" "${_required_runtime}\n")
 
   # include vcredist into the package; NSIS will take care of running it
   if(VCREDISTRUNTIME_FOUND)
