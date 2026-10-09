@@ -301,14 +301,23 @@ Function AutoUninstallIfNeeded
 
 SetShellVarContext all
 
+; _?=$INSTDIR is load-bearing. An NSIS uninstaller copies itself to %TEMP% and
+; runs from there so that it can delete its own directory, and the process we
+; started exits immediately. A plain ExecWait therefore returns *before* the
+; uninstall has run, and the temp copy's "RMDir /r $INSTDIR" then runs
+; concurrently with the section below, deleting files the payload just wrote.
+; _?= disables the copy and makes ExecWait block until the uninstall finishes;
+; it must be the last argument and must not be quoted, even when the path
+; contains spaces.
+;
 ; --- 32-bit uninstall ---
 SetRegView 32
 ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "QuietUninstallString"
 
-!insertmacro CockLog "uninstall (32-bit): '$R0'"
+!insertmacro CockLog "uninstall (32-bit): '$R0 _?=$INSTDIR'"
 StrCmp $R0 "" done32
 DetailPrint "Removing previous version (32-bit)..."
-ExecWait '$R0'
+ExecWait '$R0 _?=$INSTDIR'
 
 done32:
 
@@ -317,10 +326,10 @@ ${If} ${RunningX64}
     SetRegView 64
     ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "QuietUninstallString"
 
-    !insertmacro CockLog "uninstall (64-bit): '$R0'"
+    !insertmacro CockLog "uninstall (64-bit): '$R0 _?=$INSTDIR'"
     StrCmp $R0 "" done64
     DetailPrint "Removing previous version (64-bit)..."
-    ExecWait '$R0'
+    ExecWait '$R0 _?=$INSTDIR'
 
     done64:
 ${EndIf}
@@ -1029,10 +1038,10 @@ ${If} $PortableMode = 0
     ; directory before letting it delete anything. The uninstall string is
     ; stashed away first, the check works on $R0.
     StrCpy $OldUninstallString $R0
-    !insertmacro CockLog "componentsPagePre: old 32-bit uninstall '$OldUninstallString'"
+    !insertmacro CockLog "componentsPagePre: old 32-bit uninstall '$OldUninstallString _?=$INSTDIR'"
     Call EnsureOldInstallNotRunning
     ClearErrors
-    ExecWait "$OldUninstallString"
+    ExecWait "$OldUninstallString _?=$INSTDIR"
 
 	done32:
 
@@ -1052,10 +1061,10 @@ ${If} $PortableMode = 0
 
 	    uninst64:
 	    StrCpy $OldUninstallString $R0
-	    !insertmacro CockLog "componentsPagePre: old 64-bit uninstall '$OldUninstallString'"
+	    !insertmacro CockLog "componentsPagePre: old 64-bit uninstall '$OldUninstallString _?=$INSTDIR'"
 	    Call EnsureOldInstallNotRunning
 	    ClearErrors
-	    ExecWait "$OldUninstallString"
+	    ExecWait "$OldUninstallString _?=$INSTDIR"
 
 		done64:
 	${EndIf}
