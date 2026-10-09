@@ -14,8 +14,9 @@
 # --dir <dir> sets the name of the build dir, default is "build"
 # --cmake-generator <generator> sets CMAKE_GENERATOR as used by cmake
 # --target-macos-version <version> sets the min os version - only used for macOS builds
-# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_NO_CLIENT MAKE_TEST USE_CCACHE CCACHE_SIZE CCACHE_EVICTION_AGE BUILD_DIR CMAKE_GENERATOR TARGET_MACOS_VERSION VCPKG_TARGET_MACOS_VERSION
-# (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir>)
+# --profile writes an MSBuild performance summary and binary log, Windows only
+# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_NO_CLIENT MAKE_TEST USE_CCACHE CCACHE_SIZE CCACHE_EVICTION_AGE BUILD_DIR CMAKE_GENERATOR TARGET_MACOS_VERSION VCPKG_TARGET_MACOS_VERSION BUILD_PROFILE
+# (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir> --profile)
 # exitcode: 1 for failure, 3 for invalid arguments
 
 # Read arguments
@@ -104,6 +105,10 @@ while [[ $# != 0 ]]; do
       export CMAKE_GENERATOR=$1
       shift
       ;;
+    '--profile')
+      BUILD_PROFILE=1
+      shift
+      ;;
     '--target-macos-version')
       shift
       if [[ $# == 0 ]]; then
@@ -176,6 +181,22 @@ function ccachestatsverbose() {
   else
     ccache --show-stats
   fi
+}
+
+function cpuinfo() {
+  # The number of cores decides how much build parallelism is useful; the hosted
+  # runners are not all sized alike, so read it off the machine instead of assuming.
+  case "$RUNNER_OS" in
+  Windows)
+    echo "cores: ${NUMBER_OF_PROCESSORS:-unknown}"
+    ;;
+  macOS)
+    echo "cores: $(sysctl -n hw.ncpu)"
+    ;;
+  *)
+    echo "cores: $(nproc 2>/dev/null || echo unknown)"
+    ;;
+  esac
 }
 
 # Compile
@@ -265,6 +286,13 @@ elif [[ $RUNNER_OS == Windows ]]; then
   # Enable MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
   # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
   buildflags+=(-- -p:UseMultiToolTask=true -p:EnableClServerMode=true)
+  if [[ $BUILD_PROFILE ]]; then
+    # A performance summary says which projects and tasks cost what, the binary log
+    # keeps the full timeline; both are far too noisy to always produce. The files
+    # land next to the solution, i.e. in the build dir the workflow uploads. These
+    # join the MTT options above, which already carried the "--" separator.
+    buildflags+=("-flp:PerformanceSummary;v=q;LogFile=msbuild-perf.log" -bl:msbuild.binlog)
+  fi
 fi
 
 if [[ $USE_CCACHE ]]; then
@@ -280,9 +308,18 @@ cmake .. "${flags[@]}"
 echo "::endgroup::"
 
 echo "::group::Build project"
+cpuinfo
 echo "Running cmake --build with flags: ${buildflags[*]}"
 cmake --build . "${buildflags[@]}"
 echo "::endgroup::"
+
+if [[ $BUILD_PROFILE && $RUNNER_OS == Windows && -f msbuild-perf.log ]]; then
+  # Repeat the summary in the job log so the numbers are readable without
+  # downloading the binary log, which is hundreds of megabytes.
+  echo "::group::MSBuild performance summary"
+  cat msbuild-perf.log
+  echo "::endgroup::"
+fi
 
 if [[ $USE_CCACHE ]]; then
   if [[ $CCACHE_EVICTION_AGE ]]; then
