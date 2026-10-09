@@ -71,8 +71,7 @@ void LineEditCompleter::focusOutEvent(QFocusEvent *e)
 
     if (popupWasVisible && e->reason() == Qt::TabFocusReason) {
         // Refocus the edit so Tab doesn't move focus away
-        // Use a queued connection to ensure focus is restored after the focus change completes
-        QMetaObject::invokeMethod(this, "setFocus", Qt::QueuedConnection);
+        setFocus();
         e->accept();
         return;
     }

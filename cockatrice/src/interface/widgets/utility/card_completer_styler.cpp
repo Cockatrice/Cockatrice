@@ -176,11 +176,11 @@ void CardCompleterStyler::ensureClosestSelected()
     }
 
     const int currentRow = popup->currentIndex().row();
-    const int closestRow = rowCount - 1;
+    const int closestRow = 0;
 
     if (currentRow != closestRow) {
         popup->selectionModel()->setCurrentIndex(completionModel->index(closestRow, completer->completionColumn()),
-                                                 QItemSelectionModel::NoUpdate);
+                                                 QItemSelectionModel::SelectCurrent);
     }
 }
 
