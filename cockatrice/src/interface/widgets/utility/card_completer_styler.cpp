@@ -188,9 +188,7 @@ void CardCompleterStyler::ensureClosestSelected()
 
 void CardCompleterStyler::onCompletionReset()
 {
-    if (above) {
-        ensureClosestSelected();
-    }
+    ensureClosestSelected();
 }
 
 // ---------------------------------------------------------------------------
