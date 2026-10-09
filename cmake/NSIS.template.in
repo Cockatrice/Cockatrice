@@ -486,7 +486,13 @@ FunctionEnd
 ; Only the first of those two gets a dialog; the second reports through the log
 ; and the exit code.
 Function AbortInstall
-    ${IfNot} ${Silent}
+    ; A dialog is wanted whenever someone is at the keyboard to see it: an
+    ; interactive install, or the in-app updater's /R upgrade - silent, but the
+    ; client that launched the installer has already quit, so the user is still
+    ; there. Only a /S install without /R is attended by a package manager and
+    ; must go straight to the exit code.
+    ${If} $ReinstallMode = 1
+    ${OrIfNot} ${Silent}
         MessageBox MB_OK|MB_ICONEXCLAMATION "$AbortReason"
     ${EndIf}
     SetErrorLevel 1
@@ -516,9 +522,22 @@ Function WaitForLauncherToExit
     ; PROCESS_SYNCHRONIZE is the only access this needs - enough to wait on the
     ; handle, and the least likely to be refused for a reason that has nothing to
     ; do with the upgrade.
+    ;
+    ; System.dll maps its output registers so that .rN writes $N and .RN writes
+    ; $RN. The caller reads $R0/$R1, so the uppercase .RN form is required; the
+    ; original .r0/.r1 wrote $0/$1 and left $R1 empty, which made the "did not
+    ; exit" test below compare "" against "0" and abort on every /PID= upgrade.
     ClearErrors
-    System::Call 'kernel32::OpenProcess(i 0x00100000, i 0, i $WaitPid) p.r0'
+    System::Call 'kernel32::OpenProcess(i 0x00100000, i 0, i $WaitPid) p.R0'
+    ; OpenProcess returns a null handle for a process that is already gone. The
+    ; System plugin does not raise the NSIS error flag from a called function's
+    ; return value, so ${Errors} alone never saw that case and the null handle was
+    ; passed straight to WaitForSingleObject. Fold a plugin failure into the same
+    ; null-handle case instead of reading a handle that was never written.
     ${If} ${Errors}
+        StrCpy $R0 0
+    ${EndIf}
+    ${If} $R0 == 0
     ; The launcher is gone - OpenProcess cannot open a dead process - which is
     ; exactly the state the wait was for.
         DetailPrint "The application that started this installer has already exited."
@@ -529,8 +548,8 @@ Function WaitForLauncherToExit
     ; Same 60 s grace period the name based check uses, so a client that is slow
     ; to flush its card database does not get less room than it used to.
     ; WAIT_OBJECT_0 is 0; WAIT_TIMEOUT is 258 and a failed wait reports 0xFFFFFFFF.
-    System::Call 'kernel32::WaitForSingleObject(p r0, i 60000) i.r1'
-    System::Call 'kernel32::CloseHandle(p r0)'
+    System::Call 'kernel32::WaitForSingleObject(p R0, i 60000) i.R1'
+    System::Call 'kernel32::CloseHandle(p R0)'
     ${If} $R1 != 0
         DetailPrint "The application that started this installer did not exit within 60 s."
         StrCpy $AbortReason \
@@ -587,7 +606,8 @@ Function GuardAppsNotRunning
         ${EndIf}
         ; The user has to be told to close the applications by hand, but a /S
         ; install without /R is unattended and would block on this forever.
-        ${IfNot} ${Silent}
+        ${If} $ReinstallMode = 1
+        ${OrIfNot} ${Silent}
             MessageBox MB_OK|MB_ICONEXCLAMATION "This installer could not check whether Cockatrice is still running, because powershell.exe could not be started.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice manually before continuing."
         ${EndIf}
         Return
@@ -1035,13 +1055,10 @@ ${If} $R0 = 1
     ; at its exit code, so the user has to be told what happened. A /S install
     ; without /R is unattended - a package manager, for instance - and a message
     ; box there would block forever, so that case only reports through the log
-    ; and the exit code.
-    ${IfNot} ${Silent}
-        MessageBox MB_OK|MB_ICONEXCLAMATION \
-            "The installation could not remove all files of a previous version of Cockatrice, most likely because it is still running or was started as administrator, and was cancelled rather than leave a mismatched install behind.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice and run the installer again."
-    ${EndIf}
-    SetErrorLevel 1
-    Abort
+    ; and the exit code. AbortInstall owns that decision.
+    StrCpy $AbortReason \
+        "The installation could not remove all files of a previous version of Cockatrice, most likely because it is still running or was started as administrator, and was cancelled rather than leave a mismatched install behind.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice and run the installer again."
+    Call AbortInstall
 ${EndIf}
 
 @CPACK_NSIS_EXTRA_PREINSTALL_COMMANDS@
