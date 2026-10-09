@@ -1,6 +1,8 @@
 #ifndef FIRST_RUN_WIZARD_H
 #define FIRST_RUN_WIZARD_H
 
+#include "../../card_database_update/card_update_progress.h"
+
 #include <QDialog>
 #include <QList>
 #include <QString>
@@ -42,7 +44,7 @@ public slots:
     void onCardDatabaseUpdateFinished(bool success);
 
     /** @brief Forwarded from MainWindow while the background card database update process runs. */
-    void onCardDatabaseUpdateProgress(const QString &stage, qint64 done, qint64 total);
+    void onCardDatabaseUpdateProgress(const CardUpdateProgress &progress);
 
 protected:
     void closeEvent(QCloseEvent *event) override;

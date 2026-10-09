@@ -110,6 +110,7 @@ suffix, e.g. `card_picture_loader.*`, to include all sub categories).
 | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | Card picture loading (URLs, local file hits/misses, downloads, redirects) | `card_picture_loader.*`                                                                                            |
 | Card database loading and parsing                                         | `card_database`, `card_database.loading`, `card_database.loading.success_or_failure`, `cockatrice_xml.*`           |
+| Card database update (running Oracle, progress, exit status, errors)      | `card_database.update`                                                                                             |
 | Card, set, and deck information                                           | `card_info`, `card_list`, `deck_loader`                                                                            |
 | Startup sequence and update checks                                        | `window_main.startup.*`, `release_channel`, `spoiler_background_updater`                                           |
 | User interface and themes                                                 | `theme_manager`, `sound_engine`, `flow_layout`, `flow_widget.*`, `pixel_map_generator`, `card_info_picture_widget` |
@@ -128,6 +129,7 @@ For example, to investigate why a card database update seems to fail, enable the
 card_database = true
 card_database.loading = true
 card_database.loading.success_or_failure = true
+card_database.update = true
 cockatrice_xml.* = true
 ```
 

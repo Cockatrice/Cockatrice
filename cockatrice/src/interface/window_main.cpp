@@ -37,6 +37,8 @@
 #include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../main.h"
 #include "abstract_client.h"
+#include "card_database_update/card_database_update_status_bar.h"
+#include "card_database_update/card_update_progress.h"
 #include "intents/contexts/context_connect_to_server.h"
 #include "intents/contexts/context_join_room.h"
 #include "intents/intent.h"
@@ -67,6 +69,7 @@
 #include <QFileInfo>
 #include <QFlags>
 #include <QIODevice>
+#include <QLocalSocket>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -103,6 +106,7 @@
 #include <libcockatrice/settings/servers_settings.h>
 #include <libcockatrice/settings/tabs_settings.h>
 #include <libcockatrice/settings/updates_settings.h>
+#include <libcockatrice/utility/local_server_name.h>
 #include <memory>
 #include <qlogging.h>
 #include <qnamespace.h>
@@ -574,6 +578,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(connectionController, &ConnectionController::pingStatsUpdated, latencyStatus,
             &LatencyStatusWidget::updateData);
 
+    cardUpdateStatusBar = new CardDatabaseUpdateStatusBar(this);
+    statusBar()->addPermanentWidget(cardUpdateStatusBar);
+    connect(this, &MainWindow::cardDatabaseUpdateProgress, cardUpdateStatusBar,
+            &CardDatabaseUpdateStatusBar::updateProgress);
+    connect(this, &MainWindow::cardDatabaseUpdateFinished, cardUpdateStatusBar,
+            &CardDatabaseUpdateStatusBar::updateFinished);
+
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &MainWindow::refreshShortcuts);
     refreshShortcuts();
@@ -896,10 +907,15 @@ void MainWindow::closeEvent(QCloseEvent *event)
     bClosingDown = true;
 
     if (cardUpdateProcess && cardUpdateProcess->state() != QProcess::NotRunning) {
-        if (QMessageBox::question(this, tr("Are you sure?"),
-                                  tr("A card database update is still running. Quitting now will cancel it.\n"
-                                     "Are you sure you want to quit?"),
-                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No) {
+        const QString runningFor = cardUpdateStatusBar ? cardUpdateStatusBar->statusText() : QString();
+        const QString message = runningFor.isEmpty()
+                                    ? tr("A card database update is still running. Quitting now will cancel it.\n"
+                                         "Are you sure you want to quit?")
+                                    : tr("A card database update is still running: %1.\nQuitting now will cancel it.\n"
+                                         "Are you sure you want to quit?")
+                                          .arg(runningFor);
+        if (QMessageBox::question(this, tr("Are you sure?"), message, QMessageBox::Yes | QMessageBox::No,
+                                  QMessageBox::No) == QMessageBox::No) {
             event->ignore();
             bClosingDown = false;
             return;
@@ -1116,16 +1132,28 @@ void MainWindow::actCheckCardUpdatesBackground()
 void MainWindow::createCardUpdateProcess(bool background)
 {
     if (cardUpdateProcess) {
-        QMessageBox::information(this, tr("Information"), tr("A card database update is already running."));
+        qCDebug(CardDatabaseUpdateLog) << "A card database update is already running; asking it to come to the front";
+        if (requestCardUpdateRaise()) {
+            return;
+        }
+        if (background) {
+            // A hidden run has nothing to raise: keep the user informed without blocking.
+            announceCardUpdateRunning();
+            return;
+        }
+        QMessageBox::information(this, tr("Information"),
+                                 tr("The card database updater is already open.\n"
+                                    "Look for the Oracle window - it may be behind this one."));
         return;
     }
 
     cardUpdateProcess = new QProcess(this);
 
     connect(cardUpdateProcess, &QProcess::errorOccurred, this, &MainWindow::cardUpdateError);
-
     connect(cardUpdateProcess, qOverload<int, QProcess::ExitStatus>(&QProcess::finished), this,
             &MainWindow::cardUpdateFinished);
+    connect(cardUpdateProcess, &QProcess::readyReadStandardOutput, this, &MainWindow::cardUpdateProgressOutput);
+    connect(cardUpdateProcess, &QProcess::readyReadStandardError, this, &MainWindow::cardUpdateStandardError);
 
     // full "run the update" command; leave empty if not present
     QString updaterCmd;
@@ -1170,6 +1198,8 @@ void MainWindow::createCardUpdateProcess(bool background)
     }
 
     if (updaterCmd.isEmpty()) {
+        qCWarning(CardDatabaseUpdateLog) << "Unable to locate the card database updater; looked for"
+                                         << dir.absoluteFilePath(binaryName);
         QMessageBox::warning(this, tr("Error"),
                              tr("Unable to run the card database updater: ") + dir.absoluteFilePath(binaryName));
         exitCardDatabaseUpdate();
@@ -1177,13 +1207,24 @@ void MainWindow::createCardUpdateProcess(bool background)
         return;
     }
 
+    cardUpdateOutputBuffer.clear();
+    cardUpdateErrorOutput.clear();
+    cardUpdateErrorPartial.clear();
+    cardUpdateLoggedStage = CardUpdateStage::Unknown;
+    cardUpdateProgressLogTimer.start();
+
+    qCInfo(CardDatabaseUpdateLog) << "Starting the card database updater" << updaterCmd << "background:" << background;
+    cardUpdateStatusBar->updateStarted();
+
     if (!background) {
         cardUpdateProcess->start(updaterCmd, QStringList());
     } else {
-        cardUpdateOutputBuffer.clear();
-        connect(cardUpdateProcess, &QProcess::readyReadStandardOutput, this, &MainWindow::cardUpdateProgressOutput);
         cardUpdateProcess->start(updaterCmd, QStringList("-b"));
         statusBar()->showMessage(tr("Card database update running."));
+        if (trayIcon && SettingsCache::instance().updates().getCardDatabaseUpdateTrayNotification()) {
+            trayIcon->showMessage(tr("Card database update started"),
+                                  tr("Cockatrice is updating the card database in the background."));
+        }
     }
 }
 
@@ -1198,24 +1239,43 @@ void MainWindow::cardUpdateProgressOutput()
         if (newline < 0) {
             break;
         }
-        const QByteArray line = cardUpdateOutputBuffer.left(newline).trimmed();
+        const QByteArray line = cardUpdateOutputBuffer.left(newline);
         cardUpdateOutputBuffer.remove(0, newline + 1);
-        // Protocol emitted by `oracle -b`: "PROGRESS <stage> <done> <total>"
-        if (!line.startsWith("PROGRESS ")) {
+        // Protocol emitted by `oracle`: "PROGRESS <stage> <done> <total>"
+        const std::optional<CardUpdateProgress> progress = CardUpdateProgress::fromProtocolLine(line);
+        if (!progress.has_value()) {
             continue;
         }
-        const QList<QByteArray> parts = line.split(' ');
-        if (parts.size() != 4) {
-            continue;
+        // Log stage changes and, while a stage runs, one line per second at most, so the
+        // debug log shows liveness without flooding it.
+        if (progress->stage != cardUpdateLoggedStage || cardUpdateProgressLogTimer.elapsed() >= 1000) {
+            qCDebug(CardDatabaseUpdateLog)
+                << "Card database update" << progress->stageToken() << progress->done << "/" << progress->total;
+            cardUpdateLoggedStage = progress->stage;
+            cardUpdateProgressLogTimer.restart();
         }
-        bool doneOk = false;
-        bool totalOk = false;
-        const qint64 done = parts.at(2).toLongLong(&doneOk);
-        const qint64 total = parts.at(3).toLongLong(&totalOk);
-        if (!doneOk || !totalOk || done < 0 || total < 0) {
-            continue;
+        emit cardDatabaseUpdateProgress(progress.value());
+    }
+}
+
+void MainWindow::cardUpdateStandardError()
+{
+    if (!cardUpdateProcess) {
+        return;
+    }
+    const QByteArray chunk = cardUpdateProcess->readAllStandardError();
+    if (chunk.isEmpty()) {
+        return;
+    }
+    cardUpdateErrorOutput.append(chunk);
+    cardUpdateErrorPartial.append(chunk);
+    int newline;
+    while ((newline = cardUpdateErrorPartial.indexOf('\n')) >= 0) {
+        const QByteArray line = cardUpdateErrorPartial.left(newline).trimmed();
+        cardUpdateErrorPartial.remove(0, newline + 1);
+        if (!line.isEmpty()) {
+            qCWarning(CardDatabaseUpdateLog) << "Card database updater:" << line;
         }
-        emit cardDatabaseUpdateProgress(QString::fromLatin1(parts.at(1)), done, total);
     }
 }
 
@@ -1240,7 +1300,6 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
             break;
         case QProcess::Crashed:
             error = tr("The process crashed some time after starting successfully.");
-            error += "\n\nError output:\n" + cardUpdateProcess->readAllStandardError();
             break;
         case QProcess::Timedout:
             error = tr("Timed out. The process took too long to respond. The last waitFor...() function timed out.");
@@ -1259,6 +1318,12 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
             break;
     }
 
+    if (!cardUpdateErrorOutput.isEmpty()) {
+        error += "\n\n" + tr("Error output:") + "\n" + QString::fromUtf8(cardUpdateErrorOutput);
+        cardUpdateErrorOutput.clear();
+    }
+
+    qCWarning(CardDatabaseUpdateLog) << "The card database updater exited with an error:" << error;
     exitCardDatabaseUpdate();
     QMessageBox::warning(this, tr("Error"), tr("The card database updater exited with an error:\n%1").arg(error));
     emit cardDatabaseUpdateFinished(false);
@@ -1266,14 +1331,54 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
 
 void MainWindow::cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
+    if (!cardUpdateProcess) {
+        return;
+    }
     cardUpdateProgressOutput(); // drain any progress lines not yet parsed
 
     const bool success = (exitStatus == QProcess::NormalExit) && (exitCode == 0);
     if (exitStatus == QProcess::NormalExit) {
         SettingsCache::instance().updates().setLastCardUpdateCheck(QDateTime::currentDateTime().date());
     }
+    qCInfo(CardDatabaseUpdateLog) << "The card database updater finished with exit code" << exitCode << "exit status"
+                                  << static_cast<int>(exitStatus) << "success:" << success;
     exitCardDatabaseUpdate();
+    notifyCardUpdateFinishedFromTray(success);
     emit cardDatabaseUpdateFinished(success);
+}
+
+bool MainWindow::requestCardUpdateRaise()
+{
+    const QString serverName = scopedLocalServerName(QStringLiteral("CockatriceOracleRaise"));
+    QLocalSocket socket;
+    socket.connectToServer(serverName);
+    if (!socket.waitForConnected(250)) {
+        return false;
+    }
+    socket.write("RAISE\n");
+    const bool acked = socket.waitForBytesWritten(250);
+    socket.disconnectFromServer();
+    return acked;
+}
+
+void MainWindow::announceCardUpdateRunning()
+{
+    if (SettingsCache::instance().userInterface().getShowStatusBar()) {
+        statusBar()->showMessage(tr("Card database update running."));
+    } else if (trayIcon && SettingsCache::instance().updates().getCardDatabaseUpdateTrayNotification()) {
+        trayIcon->showMessage(tr("Card database update running"),
+                              tr("Cockatrice is updating the card database in the background."));
+    }
+}
+
+void MainWindow::notifyCardUpdateFinishedFromTray(bool success)
+{
+    if (SettingsCache::instance().userInterface().getShowStatusBar() || !trayIcon ||
+        !SettingsCache::instance().updates().getCardDatabaseUpdateTrayNotification()) {
+        return;
+    }
+    trayIcon->showMessage(tr("Card database update finished"),
+                          success ? tr("The card database is up to date.") : tr("The card database update failed."));
 }
 
 void MainWindow::actCheckServerUpdates()

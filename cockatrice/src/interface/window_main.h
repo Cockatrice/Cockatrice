@@ -27,10 +27,12 @@
 
 #include "../client/lag_monitor.h"
 #include "../client/network/update/client/release_channel.h"
+#include "card_database_update/card_update_progress.h"
 #include "connection_controller/remote_connection_controller.h"
 
 #include <QByteArray>
 #include <QDir>
+#include <QElapsedTimer>
 #include <QList>
 #include <QLoggingCategory>
 #include <QMainWindow>
@@ -52,11 +54,13 @@ inline Q_LOGGING_CATEGORY(WindowMainStartupLog, "window_main.startup");
 inline Q_LOGGING_CATEGORY(WindowMainStartupVersionLog, "window_main.startup.version");
 inline Q_LOGGING_CATEGORY(WindowMainStartupShortcutsLog, "window_main.startup.shortcuts");
 inline Q_LOGGING_CATEGORY(WindowMainStartupAutoconnectLog, "window_main.startup.autoconnect");
+inline Q_LOGGING_CATEGORY(CardDatabaseUpdateLog, "card_database.update");
 
 class DlgViewLog;
 class GameReplay;
 class LocalServer;
 class LatencyStatusWidget;
+class CardDatabaseUpdateStatusBar;
 class RemoteClient;
 class TabSupervisor;
 class WndSets;
@@ -68,13 +72,13 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 signals:
-    /** @brief Emitted after the background card-database update subprocess exits. */
+    /** @brief Emitted after the card-database update subprocess exits. */
     void cardDatabaseUpdateFinished(bool success);
 
-    /** @brief Emitted while the background card-database update subprocess runs.
-     *         @p stage is one of "download", "scan" or "import"; @p done/@p total
-     *         are byte counts for the first two stages and set indices for "import". */
-    void cardDatabaseUpdateProgress(const QString &stage, qint64 done, qint64 total);
+    /** @brief Emitted while the card-database update subprocess runs.
+     *         @p progress.done/@p progress.total are byte counts for the first two stages
+     *         and set indices for "import". */
+    void cardDatabaseUpdateProgress(const CardUpdateProgress &progress);
 
 public slots:
     void actCheckCardUpdates();
@@ -106,6 +110,7 @@ private slots:
     void cardUpdateError(QProcess::ProcessError err);
     void cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void cardUpdateProgressOutput();
+    void cardUpdateStandardError();
     void refreshShortcuts();
     void cardDatabaseLoadingFailed();
     void cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknownSetsNames);
@@ -150,6 +155,15 @@ private:
     }
     void createCardUpdateProcess(bool background = false);
     void exitCardDatabaseUpdate();
+    /**
+     * @brief Tries to bring the open card database updater window to the front.
+     * @return true when the updater acknowledged the request
+     */
+    bool requestCardUpdateRaise();
+    /** @brief Tells the user an update is running without blocking, honoring a hidden status bar. */
+    void announceCardUpdateRunning();
+    /** @brief Posts a tray notification when the status bar cannot show progress. */
+    void notifyCardUpdateFinishedFromTray(bool success);
 
     void startLocalGame(const LocalGameOptions &options);
 
@@ -176,6 +190,11 @@ private:
     bool firstRunWizardActive = false;
     QProcess *cardUpdateProcess;
     QByteArray cardUpdateOutputBuffer;
+    QByteArray cardUpdateErrorOutput;  ///< diagnostic output collected from the updater's stderr
+    QByteArray cardUpdateErrorPartial; ///< incomplete trailing stderr line, kept for line-based logging
+    CardUpdateStage cardUpdateLoggedStage = CardUpdateStage::Unknown; ///< stage of the last logged progress update
+    QElapsedTimer cardUpdateProgressLogTimer;                   ///< throttles progress logging to the running stage
+    CardDatabaseUpdateStatusBar *cardUpdateStatusBar = nullptr; ///< status bar widget tracking the card database update
     DlgViewLog *logviewDialog;
     GameReplay *replay;
     DlgTipOfTheDay *tip;

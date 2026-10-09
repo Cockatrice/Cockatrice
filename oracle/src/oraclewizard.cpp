@@ -14,13 +14,17 @@
 #include <QFile>
 #include <QIODevice>
 #include <QList>
+#include <QLocalServer>
+#include <QLocalSocket>
 #include <QNetworkAccessManager>
 #include <QSettings>
 #include <QVariant>
+#include <QWindow>
 #include <QWizardPage>
 #include <QtGlobal>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/utility/local_server_name.h>
 #include <qlogging.h>
 
 class QWidget;
@@ -71,6 +75,7 @@ OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
     }
 
     retranslateUi();
+    startRaiseServer();
 }
 
 /**
@@ -137,6 +142,54 @@ void OracleWizard::runInBackground()
     backgroundMode = true;
     hide();
     currentPage()->initializePage();
+}
+
+void OracleWizard::startRaiseServer()
+{
+    // Scope the socket name to the current user, mirroring the hosting client.
+    raiseServer = new QLocalServer(this);
+    connect(raiseServer, &QLocalServer::newConnection, this, &OracleWizard::handleRaiseRequest);
+    const QString serverName = scopedLocalServerName(QStringLiteral("CockatriceOracleRaise"));
+    if (raiseServer->listen(serverName)) {
+        return;
+    }
+    // A stale socket left behind by a crashed run holds the name: take it back.
+    QLocalServer::removeServer(serverName);
+    if (!raiseServer->listen(serverName)) {
+        qWarning() << "Oracle: could not listen for raise requests on" << serverName;
+        delete raiseServer;
+        raiseServer = nullptr;
+    }
+}
+
+void OracleWizard::handleRaiseRequest()
+{
+    while (raiseServer && raiseServer->hasPendingConnections()) {
+        QLocalSocket *socket = raiseServer->nextPendingConnection();
+        connect(socket, &QLocalSocket::readyRead, this, [this, socket]() {
+            socket->readAll();
+            socket->deleteLater();
+            raiseWizard();
+        });
+        connect(socket, &QLocalSocket::disconnected, socket, &QLocalSocket::deleteLater);
+    }
+    raiseWizard();
+}
+
+void OracleWizard::raiseWizard()
+{
+    // An ongoing background run is hidden; the user asked to see it, so promote it to a window.
+    if (backgroundMode && !isVisible()) {
+        show();
+    }
+    if (isMinimized()) {
+        showNormal();
+    }
+    raise();
+    activateWindow();
+    if (windowHandle()) {
+        windowHandle()->requestActivate();
+    }
 }
 
 void OracleWizard::enableButtons()

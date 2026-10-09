@@ -188,21 +188,29 @@ void CardDatabaseSetupPage::onUpdateFinished(bool success)
     }
 }
 
-void CardDatabaseSetupPage::onUpdateProgress(const QString &stage, qint64 done, qint64 total)
+void CardDatabaseSetupPage::onUpdateProgress(const CardUpdateProgress &progress)
 {
     if (state != State::Running) {
         return;
     }
+    const qint64 total = progress.total;
+    const qint64 done = progress.done;
     progressBar->setRange(0, total > 0 ? static_cast<int>(qMin<qint64>(total, INT_MAX)) : 0);
     progressBar->setValue(static_cast<int>(qMin<qint64>(done, INT_MAX)));
     if (total > 0) {
         const int percent = static_cast<int>((100.0 * done) / total);
-        if (stage == QLatin1String("download")) {
-            statusLabel->setText(tr("Downloading the card database (%1%)…").arg(percent));
-        } else if (stage == QLatin1String("scan")) {
-            statusLabel->setText(tr("Parsing the card database (%1%)…").arg(percent));
-        } else if (stage == QLatin1String("import")) {
-            statusLabel->setText(tr("Importing cards (%1%)…").arg(percent));
+        switch (progress.stage) {
+            case CardUpdateStage::Download:
+                statusLabel->setText(tr("Downloading the card database (%1%)…").arg(percent));
+                break;
+            case CardUpdateStage::Scan:
+                statusLabel->setText(tr("Parsing the card database (%1%)…").arg(percent));
+                break;
+            case CardUpdateStage::Import:
+                statusLabel->setText(tr("Importing cards (%1%)…").arg(percent));
+                break;
+            case CardUpdateStage::Unknown:
+                break;
         }
     }
 }

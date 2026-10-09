@@ -25,6 +25,7 @@ public:
     [[nodiscard]] bool getAlwaysEnableNewSets() const override;
     [[nodiscard]] bool getNotifyAboutUpdates() const override;
     [[nodiscard]] bool getNotifyAboutNewVersion() const override;
+    [[nodiscard]] bool getCardDatabaseUpdateTrayNotification() const;
     [[nodiscard]] int getUpdateReleaseChannelIndex() const override;
 
     void setCheckUpdatesOnStartup(bool value);
@@ -35,6 +36,7 @@ public:
     void setAlwaysEnableNewSets(bool value);
     void setNotifyAboutUpdates(bool _notifyaboutupdate);
     void setNotifyAboutNewVersion(bool _notifyaboutnewversion);
+    void setCardDatabaseUpdateTrayNotification(bool value);
     void setUpdateReleaseChannelIndex(int value);
 
 public:

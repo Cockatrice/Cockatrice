@@ -2,15 +2,14 @@
 
 #include <QByteArray>
 #include <QDataStream>
-#include <QDir>
 #include <QIODevice>
 #include <QList>
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <QPointer>
 #include <QSharedPointer>
-#include <QStringLiteral>
 #include <QtGlobal>
+#include <libcockatrice/utility/local_server_name.h>
 
 namespace
 {
@@ -26,17 +25,9 @@ SingleInstanceManager::SingleInstanceManager(QObject *parent) : QObject(parent)
 
 bool SingleInstanceManager::tryRun(const QStringList &filesToSend)
 {
-    // Scope the socket name to the current user. On Linux the default abstract
-    // namespace is system-wide, so a plain name would let one user's instance
+    // Scope the socket name to the current user so one user's instance cannot
     // hijack another user's session.
-    QString userName = qEnvironmentVariable("USER");
-    if (userName.isEmpty()) {
-        userName = qEnvironmentVariable("USERNAME");
-    }
-    if (userName.isEmpty()) {
-        userName = QDir::home().dirName();
-    }
-    serverName = QStringLiteral("CockatriceSingleInstance-%1").arg(userName);
+    serverName = scopedLocalServerName(QStringLiteral("CockatriceSingleInstance"));
 
     // Hand off to an already-running primary instance if one exists. Never steal
     // the socket of a busy primary: it is alive and will act on the payload.

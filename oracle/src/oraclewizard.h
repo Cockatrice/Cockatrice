@@ -9,6 +9,7 @@
 
 class QNetworkAccessManager;
 class OracleImporter;
+class QLocalServer;
 class QSettings;
 class QWidget;
 
@@ -60,6 +61,7 @@ public:
 
 private slots:
     void updateLanguage();
+    void handleRaiseRequest();
 
 private:
     QByteArray tokensData;
@@ -67,6 +69,13 @@ private:
     QString cardSourceVersion;
 
     void migrateOracleSettings();
+    /**
+     * @brief Starts the local socket the hosting Cockatrice client uses to bring this wizard forward.
+     */
+    void startRaiseServer();
+    /** @brief Shows, raises and activates the wizard window. */
+    void raiseWizard();
+    QLocalServer *raiseServer = nullptr; ///< listens for raise requests from the hosting client
 
 protected:
     void changeEvent(QEvent *event) override;

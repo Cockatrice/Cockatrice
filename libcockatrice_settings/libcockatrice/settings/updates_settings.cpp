@@ -60,6 +60,11 @@ bool UpdatesSettings::getNotifyAboutNewVersion() const
     return getValue("newVersionNotification", QString(), QString(), true).toBool();
 }
 
+bool UpdatesSettings::getCardDatabaseUpdateTrayNotification() const
+{
+    return getValue("cardDatabaseUpdateTrayNotification", QString(), QString(), true).toBool();
+}
+
 int UpdatesSettings::getUpdateReleaseChannelIndex() const
 {
     return getValue("updateReleaseChannel", QString(), QString(), 0).toInt();
@@ -103,6 +108,11 @@ void UpdatesSettings::setNotifyAboutUpdates(bool _notifyaboutupdate)
 void UpdatesSettings::setNotifyAboutNewVersion(bool _notifyaboutnewversion)
 {
     setValue(_notifyaboutnewversion, "newVersionNotification");
+}
+
+void UpdatesSettings::setCardDatabaseUpdateTrayNotification(bool value)
+{
+    setValue(value, "cardDatabaseUpdateTrayNotification");
 }
 
 void UpdatesSettings::setUpdateReleaseChannelIndex(int value)

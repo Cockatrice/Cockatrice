@@ -22,6 +22,7 @@ set(UTILITY_HEADERS
     libcockatrice/utility/cryptoutil.h
     libcockatrice/utility/expression.h
     libcockatrice/utility/levenshtein.h
+    libcockatrice/utility/local_server_name.h
     libcockatrice/utility/macros.h
     libcockatrice/utility/passwordhasher.h
     libcockatrice/utility/playmat_params.h
