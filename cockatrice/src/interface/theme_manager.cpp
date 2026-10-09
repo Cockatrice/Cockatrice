@@ -5,6 +5,7 @@
 #include "theme_config.h"
 
 #include <QApplication>
+#include <QByteArray>
 #include <QChar>
 #include <QColor>
 #include <QDebug>
@@ -84,8 +85,10 @@ struct PaletteColorInfo
     return colors;
 }
 
-// Pretty print version
-[[maybe_unused]] static inline void printPaletteColors(const QPalette &palette = qApp->palette())
+// Pretty print version. Called unconditionally from applyStyleAndPalette() so a
+// build with no config changes (no qtlogging.ini edits, no -d) still emits the
+// active palette to stderr and the in-app Debug Log for troubleshooting.
+static inline void printPaletteColors(const QPalette &palette = qApp->palette())
 {
     QMetaEnum groupEnum = QMetaEnum::fromType<QPalette::ColorGroup>();
     QMetaEnum roleEnum = QMetaEnum::fromType<QPalette::ColorRole>();
@@ -109,6 +112,17 @@ struct PaletteColorInfo
     }
 }
 
+bool ThemeManager::allowBrokenStyles()
+{
+    // Static: the environment is read once so the diagnostic override cannot
+    // flip halfway through a session. Empty/0/false all mean "suppressed".
+    static const bool allow = [] {
+        const QByteArray value = qgetenv("COCKATRICE_ALLOW_WINDOWS11_STYLE");
+        return !value.isEmpty() && value != "0" && value.compare("false", Qt::CaseInsensitive) != 0;
+    }();
+    return allow;
+}
+
 static QString usableDefaultStyle(const QString &style)
 {
     // The Windows 11 native style is broken: dragging cards across zones can
@@ -116,12 +130,26 @@ static QString usableDefaultStyle(const QString &style)
     // rejoining. It is never usable, so guard against it no matter how it was
     // requested (OS default or an explicit "windows11" theme choice) and fall
     // back to the Vista style.
-    return style.compare("windows11", Qt::CaseInsensitive) == 0 ? QStringLiteral("windowsvista") : style;
+    if (!ThemeManager::allowBrokenStyles() && style.compare("windows11", Qt::CaseInsensitive) == 0) {
+        return QStringLiteral("windowsvista");
+    }
+    return style;
+}
+
+static QString styleObjectName(QStyle *style)
+{
+    return style ? style->objectName() : QStringLiteral("<none>");
 }
 
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 {
     defaultStyleName = usableDefaultStyle(qApp->style()->objectName());
+    qInfo().noquote() << QStringLiteral("[theme-manager] startup style objectName=%1 -> defaultStyleName=%2 "
+                                        "(COCKATRICE_ALLOW_WINDOWS11_STYLE=%3)")
+                             .arg(qApp->style()->objectName(), defaultStyleName,
+                                  allowBrokenStyles() ? QStringLiteral("true") : QStringLiteral("false"));
+    qInfo().noquote() << QStringLiteral("[theme-manager] QStyleFactory::keys()=%1")
+                             .arg(QStyleFactory::keys().join(QStringLiteral(", ")));
     // Capture the untouched application palette before any theme is applied.
     defaultPalette = qApp->palette();
     ensureThemeDirectoryExists();
@@ -488,9 +516,9 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
                                         const PaletteConfig &palCfg,
                                         const QString &activeScheme)
 {
-#if (QT_VERSION < QT_VERSION_CHECK(6, 5, 0))
-    Q_UNUSED(activeScheme)
-#endif
+    qInfo().noquote() << QStringLiteral("[theme-manager] applyStyleAndPalette theme=%1 theme.cfg[Style]Name=%2 "
+                                        "theme.cfg[Appearance]ColorScheme=%3 activeScheme=%4")
+                             .arg(themeName, themeCfg.styleName, themeCfg.colorScheme, activeScheme);
     QString styleName = themeCfg.styleName;
     if (styleName.isEmpty() || styleName.compare("System", Qt::CaseInsensitive) == 0) {
         if (themeName == FUSION_THEME_NAME) {
@@ -498,20 +526,38 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
         } else {
             styleName = usableDefaultStyle(defaultStyleName);
         }
+        qInfo().noquote()
+            << QStringLiteral("[theme-manager] style requested 'System'/empty -> resolved to %1").arg(styleName);
     }
 
     // The Windows 11 style is broken even when selected explicitly in a theme,
     // so sanitize the resolved name here rather than trusting the theme config.
+    const QString requestedStyle = styleName;
     styleName = usableDefaultStyle(styleName);
+    if (requestedStyle.compare(styleName, Qt::CaseInsensitive) != 0) {
+        qWarning().noquote() << QStringLiteral("[theme-manager] suppressed broken style %1 -> %2 "
+                                               "(set COCKATRICE_ALLOW_WINDOWS11_STYLE=1 to force it)")
+                                    .arg(requestedStyle, styleName);
+    } else {
+        qInfo().noquote() << QStringLiteral("[theme-manager] style resolved to %1").arg(styleName);
+    }
 
     QStyle *style = QStyleFactory::create(styleName);
     if (!style) {
-        style = QStyleFactory::create(usableDefaultStyle(defaultStyleName));
+        const QString fallback = usableDefaultStyle(defaultStyleName);
+        qWarning().noquote() << QStringLiteral("[theme-manager] QStyleFactory::create(%1) failed; falling back to %2")
+                                    .arg(styleName, fallback);
+        style = QStyleFactory::create(fallback);
     }
+    qInfo().noquote() << QStringLiteral("[theme-manager] applied QStyle objectName=%1 class=%2")
+                             .arg(styleObjectName(style), style ? QString::fromLatin1(style->metaObject()->className())
+                                                                : QStringLiteral("<none>"));
 
     // Base palette
     QPalette base;
+    QString paletteSource;
     if (styleName.compare("Fusion", Qt::CaseInsensitive) == 0) {
+        paletteSource = QStringLiteral("Fusion standardPalette()");
         base = style->standardPalette();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
         if (activeScheme == "Dark") {
@@ -523,6 +569,7 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
         // latter may already carry a previously-applied custom (e.g. dark)
         // palette, which would otherwise persist when switching to a scheme
         // that supplies no palette of its own.
+        paletteSource = QStringLiteral("pristine startup palette (<style>.standardPalette not used)");
         base = defaultPalette;
     }
 
@@ -530,6 +577,14 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
     if (palCfg.hasPalette()) {
         base = palCfg.apply(base);
     }
+
+    qInfo().noquote() << QStringLiteral("[theme-manager] palette source=%1 | theme palette overrides=%2 | "
+                                        "colorRoles set=%3 | appColors set=%4")
+                             .arg(paletteSource, palCfg.hasPalette() ? QStringLiteral("true") : QStringLiteral("false"))
+                             .arg(palCfg.colors.size())
+                             .arg(palCfg.appColors.size());
+    qInfo().noquote() << QStringLiteral("[theme-manager] final palette for scheme %1:").arg(activeScheme);
+    printPaletteColors(base);
 
     // Palette BEFORE style — setStyle() triggers a synchronous repolish of all
     // widgets immediately. If the palette isn't set yet at that point, every
@@ -591,20 +646,29 @@ void ThemeManager::themeChangedSlot()
     currentThemePath = dirPath;
     QDir dir(dirPath);
 
+    const bool darkMode = isDarkMode(dirPath);
+    qInfo().noquote() << QStringLiteral("[theme-manager] themeChanged theme=%1 dir=%2 isDarkMode=%3")
+                             .arg(themeName, dirPath, darkMode ? QStringLiteral("true") : QStringLiteral("false"));
+
     // CSS — prefer the scheme-qualified stylesheet (style-dark.css /
     // style-light.css) when present, else the plain style.css as fallback.
     if (!dirPath.isEmpty()) {
-        const QString scheme = isDarkMode(dirPath) ? QStringLiteral("dark") : QStringLiteral("light");
+        const QString scheme = darkMode ? QStringLiteral("dark") : QStringLiteral("light");
         const QString schemeCss = QFileInfo(QStringLiteral(STYLE_CSS_NAME)).completeBaseName() + QLatin1Char('-') +
                                   scheme + QStringLiteral(".css");
         if (dir.exists(schemeCss)) {
+            qInfo().noquote() << QStringLiteral("[theme-manager] stylesheet: scheme-qualified %1").arg(schemeCss);
             qApp->setStyleSheet("file:///" + dir.absoluteFilePath(schemeCss));
         } else if (dir.exists(STYLE_CSS_NAME)) {
+            qInfo().noquote() << QStringLiteral("[theme-manager] stylesheet: plain %1").arg(STYLE_CSS_NAME);
             qApp->setStyleSheet("file:///" + dir.absoluteFilePath(STYLE_CSS_NAME));
         } else {
+            qInfo().noquote()
+                << QStringLiteral("[theme-manager] stylesheet: none (no style.css / style-%1.css)").arg(scheme);
             qApp->setStyleSheet("");
         }
     } else {
+        qInfo().noquote() << QStringLiteral("[theme-manager] stylesheet: none (no theme directory)");
         qApp->setStyleSheet("");
     }
 
@@ -614,7 +678,7 @@ void ThemeManager::themeChangedSlot()
     // Resolve active scheme:
     // theme.cfg says Dark/Light → use that
     // theme.cfg says System or is absent → follow the OS
-    QString activeScheme = isDarkMode(dirPath) ? "Dark" : "Light";
+    QString activeScheme = darkMode ? "Dark" : "Light";
 
     // ── Load palette: custom first, then theme default ────────────────────
     PaletteConfig palette = PaletteConfig::fromScheme(dirPath, activeScheme);

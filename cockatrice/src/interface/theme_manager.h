@@ -66,6 +66,12 @@ protected:
                               const QString &activeScheme);
 
 public:
+    // Diagnostic escape hatch: native styles that are known to be broken (the
+    // Windows 11 style) are suppressed everywhere. Setting the
+    // COCKATRICE_ALLOW_WINDOWS11_STYLE environment variable to anything other
+    // than "0"/"false" re-enables them, so the rendering bug can be reproduced
+    // in an otherwise unmodified build. Never ship with it set.
+    static bool allowBrokenStyles();
     // Resolves the directory to write theme changes to for the given theme
     // name. The resolved theme dir (user or system) is used when writable;
     // read-only system themes fall back to the user themes directory, creating
