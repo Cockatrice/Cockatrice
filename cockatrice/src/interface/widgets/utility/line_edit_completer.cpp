@@ -72,12 +72,32 @@ void LineEditCompleter::focusOutEvent(QFocusEvent *e)
 
 void LineEditCompleter::keyPressEvent(QKeyEvent *event)
 {
-    LineEditUnfocusable::keyPressEvent(event);
-
     if (event->key() == Qt::Key_Escape) {
-        hideCompleterPopups();
+        if (hasVisibleCompleterPopup()) {
+            event->ignore();
+            hideCompleterPopups();
+            return;
+        }
+        LineEditUnfocusable::keyPressEvent(event);
         return;
     }
+
+    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter || event->key() == Qt::Key_Space ||
+        event->key() == Qt::Key_Tab) {
+        for (auto &info : completers) {
+            if (info.completer->popup()->isVisible()) {
+                event->ignore();
+                const QModelIndex currentIndex = info.completer->popup()->currentIndex();
+                if (currentIndex.isValid()) {
+                    insertCompletion(info.completer, currentIndex.data().toString());
+                }
+                hideCompleterPopups();
+                return;
+            }
+        }
+    }
+
+    LineEditUnfocusable::keyPressEvent(event);
 
     QString textValue = text();
     int cursorPos = cursorPosition();
