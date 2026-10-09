@@ -185,10 +185,10 @@ void FirstRunWizard::onCardDatabaseUpdateFinished(bool success)
     }
 }
 
-void FirstRunWizard::onCardDatabaseUpdateProgress(const QString &stage, qint64 done, qint64 total)
+void FirstRunWizard::onCardDatabaseUpdateProgress(const CardUpdateProgress &progress)
 {
     if (cardDatabasePage) {
-        cardDatabasePage->onUpdateProgress(stage, done, total);
+        cardDatabasePage->onUpdateProgress(progress);
     }
 }
 

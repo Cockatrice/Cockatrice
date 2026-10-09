@@ -1210,7 +1210,7 @@ void MainWindow::createCardUpdateProcess(bool background)
     cardUpdateOutputBuffer.clear();
     cardUpdateErrorOutput.clear();
     cardUpdateErrorPartial.clear();
-    cardUpdateLoggedStage.clear();
+    cardUpdateLoggedStage = CardUpdateStage::Unknown;
     cardUpdateProgressLogTimer.start();
 
     qCInfo(CardDatabaseUpdateLog) << "Starting the card database updater" << updaterCmd << "background:" << background;
@@ -1242,19 +1242,19 @@ void MainWindow::cardUpdateProgressOutput()
         const QByteArray line = cardUpdateOutputBuffer.left(newline);
         cardUpdateOutputBuffer.remove(0, newline + 1);
         // Protocol emitted by `oracle`: "PROGRESS <stage> <done> <total>"
-        CardUpdateProgress progress;
-        if (!parseCardUpdateProgressLine(line, progress)) {
+        const std::optional<CardUpdateProgress> progress = CardUpdateProgress::fromProtocolLine(line);
+        if (!progress.has_value()) {
             continue;
         }
         // Log stage changes and, while a stage runs, one line per second at most, so the
         // debug log shows liveness without flooding it.
-        if (progress.stage != cardUpdateLoggedStage || cardUpdateProgressLogTimer.elapsed() >= 1000) {
+        if (progress->stage != cardUpdateLoggedStage || cardUpdateProgressLogTimer.elapsed() >= 1000) {
             qCDebug(CardDatabaseUpdateLog)
-                << "Card database update" << progress.stage << progress.done << "/" << progress.total;
-            cardUpdateLoggedStage = progress.stage;
+                << "Card database update" << progress->stageToken() << progress->done << "/" << progress->total;
+            cardUpdateLoggedStage = progress->stage;
             cardUpdateProgressLogTimer.restart();
         }
-        emit cardDatabaseUpdateProgress(progress.stage, progress.done, progress.total);
+        emit cardDatabaseUpdateProgress(progress.value());
     }
 }
 

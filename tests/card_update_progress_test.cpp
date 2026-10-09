@@ -6,96 +6,84 @@
 
 namespace
 {
-bool parseLine(const QByteArray &line, QString &stage, qint64 &done, qint64 &total)
+std::optional<CardUpdateProgress> parseLine(const QByteArray &line)
 {
-    CardUpdateProgress progress;
-    if (!parseCardUpdateProgressLine(line, progress)) {
-        return false;
-    }
-    stage = progress.stage;
-    done = progress.done;
-    total = progress.total;
-    return true;
+    return CardUpdateProgress::fromProtocolLine(line);
 }
 } // namespace
 
 TEST(CardUpdateProgressTest, ParsesAValidDownloadLine)
 {
-    QString stage;
-    qint64 done = -1;
-    qint64 total = -1;
-    EXPECT_TRUE(parseLine("PROGRESS download 42 100", stage, done, total));
-    EXPECT_EQ("download", stage);
-    EXPECT_EQ(42, done);
-    EXPECT_EQ(100, total);
+    const std::optional<CardUpdateProgress> progress = parseLine("PROGRESS download 42 100");
+    ASSERT_TRUE(progress.has_value());
+    EXPECT_EQ(CardUpdateStage::Download, progress->stage);
+    EXPECT_EQ(42, progress->done);
+    EXPECT_EQ(100, progress->total);
 }
 
 TEST(CardUpdateProgressTest, ParsesTrailingNewline)
 {
-    QString stage;
-    qint64 done = -1;
-    qint64 total = -1;
-    EXPECT_TRUE(parseLine("PROGRESS scan 7 99\n", stage, done, total));
-    EXPECT_EQ("scan", stage);
-    EXPECT_EQ(7, done);
-    EXPECT_EQ(99, total);
+    const std::optional<CardUpdateProgress> progress = parseLine("PROGRESS scan 7 99\n");
+    ASSERT_TRUE(progress.has_value());
+    EXPECT_EQ(CardUpdateStage::Scan, progress->stage);
+    EXPECT_EQ(7, progress->done);
+    EXPECT_EQ(99, progress->total);
 }
 
 TEST(CardUpdateProgressTest, ParsesWithSurroundingWhitespace)
 {
-    QString stage;
-    qint64 done = -1;
-    qint64 total = -1;
-    EXPECT_TRUE(parseLine(QByteArray("  PROGRESS import 3 10  "), stage, done, total));
-    EXPECT_EQ("import", stage);
-    EXPECT_EQ(3, done);
-    EXPECT_EQ(10, total);
+    const std::optional<CardUpdateProgress> progress = parseLine(QByteArray("  PROGRESS import 3 10  "));
+    ASSERT_TRUE(progress.has_value());
+    EXPECT_EQ(CardUpdateStage::Import, progress->stage);
+    EXPECT_EQ(3, progress->done);
+    EXPECT_EQ(10, progress->total);
 }
 
 TEST(CardUpdateProgressTest, AcceptsZeroProgress)
 {
-    QString stage;
-    qint64 done = -1;
-    qint64 total = -1;
-    EXPECT_TRUE(parseLine("PROGRESS download 0 0", stage, done, total));
-    EXPECT_EQ(0, done);
-    EXPECT_EQ(0, total);
+    const std::optional<CardUpdateProgress> progress = parseLine("PROGRESS download 0 0");
+    ASSERT_TRUE(progress.has_value());
+    EXPECT_EQ(0, progress->done);
+    EXPECT_EQ(0, progress->total);
 }
 
 TEST(CardUpdateProgressTest, RejectsLinesWithoutProgressPrefix)
 {
-    CardUpdateProgress progress;
-    EXPECT_FALSE(parseCardUpdateProgressLine("download 42 100", progress));
-    EXPECT_FALSE(parseCardUpdateProgressLine("PROGRESSdownload 42 100", progress));
-    EXPECT_FALSE(parseCardUpdateProgressLine("", progress));
+    EXPECT_FALSE(parseLine("download 42 100").has_value());
+    EXPECT_FALSE(parseLine("PROGRESSdownload 42 100").has_value());
+    EXPECT_FALSE(parseLine("").has_value());
 }
 
 TEST(CardUpdateProgressTest, RejectsMalformedLines)
 {
-    CardUpdateProgress progress;
-    EXPECT_FALSE(parseCardUpdateProgressLine("PROGRESS", progress));
-    EXPECT_FALSE(parseCardUpdateProgressLine("PROGRESS download", progress));
-    EXPECT_FALSE(parseCardUpdateProgressLine("PROGRESS download 42 100 extra", progress));
-    EXPECT_FALSE(parseCardUpdateProgressLine("PROGRESS download 42", progress));
-    EXPECT_FALSE(parseCardUpdateProgressLine("PROGRESS download notANumber 100", progress));
+    EXPECT_FALSE(parseLine("PROGRESS").has_value());
+    EXPECT_FALSE(parseLine("PROGRESS download").has_value());
+    EXPECT_FALSE(parseLine("PROGRESS download 42 100 extra").has_value());
+    EXPECT_FALSE(parseLine("PROGRESS download 42").has_value());
+    EXPECT_FALSE(parseLine("PROGRESS download notANumber 100").has_value());
 }
 
 TEST(CardUpdateProgressTest, RejectsNegativeValues)
 {
-    CardUpdateProgress progress;
-    EXPECT_FALSE(parseCardUpdateProgressLine("PROGRESS download -1 100", progress));
-    EXPECT_FALSE(parseCardUpdateProgressLine("PROGRESS download 42 -100", progress));
+    EXPECT_FALSE(parseLine("PROGRESS download -1 100").has_value());
+    EXPECT_FALSE(parseLine("PROGRESS download 42 -100").has_value());
 }
 
 TEST(CardUpdateProgressTest, AcceptsUnknownStagesSchemalessly)
 {
-    QString stage;
-    qint64 done = -1;
-    qint64 total = -1;
-    EXPECT_TRUE(parseLine("PROGRESS spoilers 1 2", stage, done, total));
-    EXPECT_EQ("spoilers", stage);
-    EXPECT_EQ(1, done);
-    EXPECT_EQ(2, total);
+    const std::optional<CardUpdateProgress> progress = parseLine("PROGRESS spoilers 1 2");
+    ASSERT_TRUE(progress.has_value());
+    EXPECT_EQ(CardUpdateStage::Unknown, progress->stage);
+    EXPECT_EQ(1, progress->done);
+    EXPECT_EQ(2, progress->total);
+}
+
+TEST(CardUpdateProgressTest, StageTokensRoundTrip)
+{
+    EXPECT_EQ("download", CardUpdateProgress{CardUpdateStage::Download}.stageToken());
+    EXPECT_EQ("scan", CardUpdateProgress{CardUpdateStage::Scan}.stageToken());
+    EXPECT_EQ("import", CardUpdateProgress{CardUpdateStage::Import}.stageToken());
+    EXPECT_EQ("unknown", CardUpdateProgress{CardUpdateStage::Unknown}.stageToken());
 }
 
 int main(int argc, char **argv)

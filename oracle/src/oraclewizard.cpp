@@ -156,7 +156,7 @@ void OracleWizard::startRaiseServer()
     // A stale socket left behind by a crashed run holds the name: take it back.
     QLocalServer::removeServer(serverName);
     if (!raiseServer->listen(serverName)) {
-        qDebug() << "Oracle: could not listen for raise requests on" << serverName;
+        qWarning() << "Oracle: could not listen for raise requests on" << serverName;
         delete raiseServer;
         raiseServer = nullptr;
     }

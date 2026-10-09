@@ -1,6 +1,8 @@
 #ifndef CARD_DATABASE_UPDATE_STATUS_BAR_H
 #define CARD_DATABASE_UPDATE_STATUS_BAR_H
 
+#include "card_update_progress_parser.h"
+
 #include <QString>
 #include <QWidget>
 #include <qtmetamacros.h>
@@ -42,11 +44,8 @@ public slots:
 
     /**
      * @brief Shows the progress of one update stage.
-     * @param stage one of "download", "scan" or "import"
-     * @param done units completed so far
-     * @param total units to complete, 0 when unknown
      */
-    void updateProgress(const QString &stage, qint64 done, qint64 total);
+    void updateProgress(const CardUpdateProgress &progress);
 
     /**
      * @brief Hides the widget and clears the reported progress.
@@ -62,10 +61,10 @@ private:
     QHBoxLayout *layout;       ///< Horizontal layout holding the stage label and the progress bar
     QLabel *stageLabel;        ///< Name of the stage currently running
     QProgressBar *progressBar; ///< Progress within the current stage
-    QString stage;             ///< Last reported stage, empty before the first report
-    qint64 done = 0;           ///< Last reported progress numerator
-    qint64 total = 0;          ///< Last reported progress denominator, 0 when unknown
-    bool active = false;       ///< Whether an update is currently running
+    CardUpdateStage stage = CardUpdateStage::Unknown; ///< Last reported stage
+    qint64 done = 0;                                  ///< Last reported progress numerator
+    qint64 total = 0;                                 ///< Last reported progress denominator, 0 when unknown
+    bool active = false;                              ///< Whether an update is currently running
 };
 
 #endif // CARD_DATABASE_UPDATE_STATUS_BAR_H

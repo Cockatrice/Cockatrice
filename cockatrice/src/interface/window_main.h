@@ -27,6 +27,7 @@
 
 #include "../client/lag_monitor.h"
 #include "../client/network/update/client/release_channel.h"
+#include "card_database_update/card_update_progress_parser.h"
 #include "connection_controller/remote_connection_controller.h"
 
 #include <QByteArray>
@@ -75,9 +76,9 @@ signals:
     void cardDatabaseUpdateFinished(bool success);
 
     /** @brief Emitted while the card-database update subprocess runs.
-     *         @p stage is one of "download", "scan" or "import"; @p done/@p total
-     *         are byte counts for the first two stages and set indices for "import". */
-    void cardDatabaseUpdateProgress(const QString &stage, qint64 done, qint64 total);
+     *         @p progress.done/@p progress.total are byte counts for the first two stages
+     *         and set indices for "import". */
+    void cardDatabaseUpdateProgress(const CardUpdateProgress &progress);
 
 public slots:
     void actCheckCardUpdates();
@@ -189,10 +190,10 @@ private:
     bool firstRunWizardActive = false;
     QProcess *cardUpdateProcess;
     QByteArray cardUpdateOutputBuffer;
-    QByteArray cardUpdateErrorOutput;         ///< diagnostic output collected from the updater's stderr
-    QByteArray cardUpdateErrorPartial;        ///< incomplete trailing stderr line, kept for line-based logging
-    QString cardUpdateLoggedStage;            ///< stage of the last logged progress update
-    QElapsedTimer cardUpdateProgressLogTimer; ///< throttles progress logging to the running stage
+    QByteArray cardUpdateErrorOutput;  ///< diagnostic output collected from the updater's stderr
+    QByteArray cardUpdateErrorPartial; ///< incomplete trailing stderr line, kept for line-based logging
+    CardUpdateStage cardUpdateLoggedStage = CardUpdateStage::Unknown; ///< stage of the last logged progress update
+    QElapsedTimer cardUpdateProgressLogTimer;                   ///< throttles progress logging to the running stage
     CardDatabaseUpdateStatusBar *cardUpdateStatusBar = nullptr; ///< status bar widget tracking the card database update
     DlgViewLog *logviewDialog;
     GameReplay *replay;

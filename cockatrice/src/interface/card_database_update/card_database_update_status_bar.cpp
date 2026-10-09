@@ -12,19 +12,19 @@ namespace
 {
 /**
  * @brief Translated name of one updater stage.
- * @param stage one of "download", "scan" or "import"
  * @param fallback shown when the stage is unknown or not reported yet
  */
-QString stageName(const QString &stage, const QString &fallback)
+QString stageName(CardUpdateStage stage, const QString &fallback)
 {
-    if (stage == QLatin1String("download")) {
-        return QCoreApplication::translate("CardDatabaseUpdateStatusBar", "Downloading");
-    }
-    if (stage == QLatin1String("scan")) {
-        return QCoreApplication::translate("CardDatabaseUpdateStatusBar", "Parsing");
-    }
-    if (stage == QLatin1String("import")) {
-        return QCoreApplication::translate("CardDatabaseUpdateStatusBar", "Importing");
+    switch (stage) {
+        case CardUpdateStage::Download:
+            return QCoreApplication::translate("CardDatabaseUpdateStatusBar", "Downloading");
+        case CardUpdateStage::Scan:
+            return QCoreApplication::translate("CardDatabaseUpdateStatusBar", "Parsing");
+        case CardUpdateStage::Import:
+            return QCoreApplication::translate("CardDatabaseUpdateStatusBar", "Importing");
+        case CardUpdateStage::Unknown:
+            return fallback;
     }
     return fallback;
 }
@@ -63,26 +63,26 @@ QString CardDatabaseUpdateStatusBar::statusText() const
 void CardDatabaseUpdateStatusBar::updateStarted()
 {
     active = true;
-    stage.clear();
+    stage = CardUpdateStage::Unknown;
     done = 0;
     total = 0;
     refresh();
     show();
 }
 
-void CardDatabaseUpdateStatusBar::updateProgress(const QString &_stage, qint64 _done, qint64 _total)
+void CardDatabaseUpdateStatusBar::updateProgress(const CardUpdateProgress &progress)
 {
     active = true;
-    stage = _stage;
-    done = _done;
-    total = _total;
+    stage = progress.stage;
+    done = progress.done;
+    total = progress.total;
     refresh();
 }
 
 void CardDatabaseUpdateStatusBar::updateFinished()
 {
     active = false;
-    stage.clear();
+    stage = CardUpdateStage::Unknown;
     done = 0;
     total = 0;
     refresh();
