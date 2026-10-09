@@ -353,9 +353,33 @@ jobs:
             vcpkg_scope: 'vcpkg/windows10-x64-vs2026/'
             vcpkg_upload: 1    # only one leg per vcpkg_scope hands its archives over
 
-    name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
+          # A/B run: is Ninja faster than the Visual Studio generator on this runner?
+          # It is allowed to fail and is never published, see the steps that build
+          # a release below. Delete this entry once the answer is known.
+          - os: Windows
+            target: 10
+            runner: windows-2025
+
+            cmake_generator: Ninja
+            experiment: yes
+            make_package: 1
+            package_suffix: "-Win10-ninja"
+            qt_version: 6.11.*
+            qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
+            type: Release
+            variant: ' (Ninja)'
+            # The same scope as the Visual Studio leg, so both halves of the A/B
+            # start from the same vcpkg cache and the comparison is about the
+            # generator alone. Without it this leg's prefix is empty, which makes
+            # the cache action restore the whole vcpkg/ namespace and write entries
+            # that no scope claims. vcpkg_upload is deliberately left unset, so only
+            # the Visual Studio leg hands its archives over.
+            vcpkg_scope: 'vcpkg/windows10-x64-vs2026/'
+
+    name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}${{ matrix.variant }}
     needs: configure
     runs-on: ${{ matrix.runner }}
+    continue-on-error: ${{ matrix.experiment == 'yes' }}
     timeout-minutes: 100
     env:
       BUILD_PROFILE: '${{ matrix.build_profile }}'
@@ -440,6 +464,14 @@ jobs:
           cache-key-prefix: Qt
           modules: ${{ matrix.qt_modules }}
           version: ${{ matrix.qt_version }}
+
+      # Ninja invokes cl.exe directly and needs the MSVC environment on PATH; the
+      # Visual Studio generator locates the compiler on its own and skips this.
+      - name: "[Windows/Ninja] Set up MSVC environment"
+        if: matrix.os == 'Windows' && matrix.cmake_generator == 'Ninja'
+        uses: TheMrMilchmann/setup-msvc-dev@v4.1.0
+        with:
+          arch: x64
 
       - name: "[Windows] Install NSIS"
         if: matrix.os == 'Windows'
@@ -649,8 +681,11 @@ jobs:
           if-no-files-found: error
           path: ${{ steps.build.outputs.path }}
 
+      # Ninja writes its PDBs next to the binaries instead of into a Release
+      # subdirectory, and the experimental job is not a source of release debug
+      # symbols, so it keeps out of both.
       - name: "[Windows] Upload PDBs (Program Databases)"
-        if: matrix.os == 'Windows' && github.ref_type != 'tag'
+        if: matrix.os == 'Windows' && matrix.experiment != 'yes' && github.ref_type != 'tag'
         uses: actions/upload-artifact@v7
         with:
           if-no-files-found: error
@@ -672,7 +707,7 @@ jobs:
           retention-days: 7
 
       - name: "Upload to release"
-        if: needs.configure.outputs.tag != null && matrix.make_package == '1'
+        if: needs.configure.outputs.tag != null && matrix.make_package == '1' && matrix.experiment != 'yes'
         id: upload_release
         shell: bash
         env:
