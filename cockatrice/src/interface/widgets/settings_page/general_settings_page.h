@@ -75,6 +75,7 @@ private:
     QLabel cardUpdateCheckIntervalLabel;
     QSpinBox cardUpdateCheckIntervalSpinBox;
     QLabel lastCardUpdateCheckDateLabel;
+    QCheckBox cardDatabaseUpdateTrayNotificationCheckBox;
 
     QCheckBox showTipsOnStartup;
     QLabel startupTabLabel;

@@ -161,12 +161,18 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     newVersionOracleCheckBox.setChecked(settings.updates().getNotifyAboutNewVersion());
 
+    cardDatabaseUpdateTrayNotificationCheckBox.setChecked(settings.updates().getCardDatabaseUpdateTrayNotification());
+
+    connect(&cardDatabaseUpdateTrayNotificationCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.updates(),
+            &UpdatesSettings::setCardDatabaseUpdateTrayNotification);
+
     auto *cardDatabaseGrid = new QGridLayout;
     cardDatabaseGrid->addWidget(&startupCardUpdateCheckBehaviorLabel, 0, 0);
     cardDatabaseGrid->addWidget(&startupCardUpdateCheckBehaviorSelector, 0, 1);
     cardDatabaseGrid->addWidget(&cardUpdateCheckIntervalLabel, 1, 0);
     cardDatabaseGrid->addWidget(&cardUpdateCheckIntervalSpinBox, 1, 1);
     cardDatabaseGrid->addWidget(&lastCardUpdateCheckDateLabel, 2, 1);
+    cardDatabaseGrid->addWidget(&cardDatabaseUpdateTrayNotificationCheckBox, 3, 0, 1, 2);
 
     cardDatabaseGroupBox = new QGroupBox;
     cardDatabaseGroupBox->setLayout(cardDatabaseGrid);
@@ -565,6 +571,7 @@ void GeneralSettingsPage::retranslateUi()
                                                        tr("Always update in the background"));
     cardUpdateCheckIntervalLabel.setText(tr("Check for card database updates every"));
     cardUpdateCheckIntervalSpinBox.setSuffix(tr(" days"));
+    cardDatabaseUpdateTrayNotificationCheckBox.setText(tr("Notify in the system tray while the card database updates"));
 
     QDate lastCheckDate = settings.updates().getLastCardUpdateCheck();
     int daysAgo = lastCheckDate.daysTo(QDate::currentDate());

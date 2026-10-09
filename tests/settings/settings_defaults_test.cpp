@@ -166,6 +166,12 @@ TEST_F(SettingsDefaultsTest, Updates_NotifyAboutNewVersion_Default)
     ASSERT_EQ(s.getNotifyAboutNewVersion(), true);
 }
 
+TEST_F(SettingsDefaultsTest, Updates_CardDatabaseUpdateTrayNotification_Default)
+{
+    UpdatesSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getCardDatabaseUpdateTrayNotification(), true);
+}
+
 TEST_F(SettingsDefaultsTest, Updates_UpdateReleaseChannelIndex_Default)
 {
     UpdatesSettings s(settingsPath, nullptr);

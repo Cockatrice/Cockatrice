@@ -1221,7 +1221,7 @@ void MainWindow::createCardUpdateProcess(bool background)
     } else {
         cardUpdateProcess->start(updaterCmd, QStringList("-b"));
         statusBar()->showMessage(tr("Card database update running."));
-        if (trayIcon) {
+        if (trayIcon && SettingsCache::instance().updates().getCardDatabaseUpdateTrayNotification()) {
             trayIcon->showMessage(tr("Card database update started"),
                                   tr("Cockatrice is updating the card database in the background."));
         }
@@ -1365,7 +1365,7 @@ void MainWindow::announceCardUpdateRunning()
 {
     if (SettingsCache::instance().userInterface().getShowStatusBar()) {
         statusBar()->showMessage(tr("Card database update running."));
-    } else if (trayIcon) {
+    } else if (trayIcon && SettingsCache::instance().updates().getCardDatabaseUpdateTrayNotification()) {
         trayIcon->showMessage(tr("Card database update running"),
                               tr("Cockatrice is updating the card database in the background."));
     }
@@ -1373,7 +1373,8 @@ void MainWindow::announceCardUpdateRunning()
 
 void MainWindow::notifyCardUpdateFinishedFromTray(bool success)
 {
-    if (SettingsCache::instance().userInterface().getShowStatusBar() || !trayIcon) {
+    if (SettingsCache::instance().userInterface().getShowStatusBar() || !trayIcon ||
+        !SettingsCache::instance().updates().getCardDatabaseUpdateTrayNotification()) {
         return;
     }
     trayIcon->showMessage(tr("Card database update finished"),
