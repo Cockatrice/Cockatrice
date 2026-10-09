@@ -339,7 +339,9 @@ jobs:
 
             # Set build_profile: 1 to have the build write an MSBuild performance
             # summary and a binary log; empty on every entry that runs by default.
-            build_profile: ''
+            # Enabled here on purpose: this pull request measures MSBuild
+            # parallelism, so its run is the one worth profiling.
+            build_profile: 1
 
             cmake_generator: "Visual Studio 18 2026"
             cmake_generator_platform: x64
