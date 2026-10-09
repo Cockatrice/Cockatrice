@@ -35,6 +35,8 @@ public:
 
     SetOptions getSetOptions(QString shortName) const override;
 
+    QStringList getEnabledSetNames() const override;
+
     void saveSets(const QVector<SetSaveData> &data) override;
 
 private:

@@ -6,6 +6,7 @@
 #include "libcockatrice/card/database/card_database_data.h"
 #include "libcockatrice/card/set/card_set.h"
 #include "libcockatrice/interfaces/interface_card_database_path_provider.h"
+#include "libcockatrice/interfaces/interface_card_set_priority_controller.h"
 #include "parser/card_database_parser.h"
 #include "parser/cockatrice_xml_3.h"
 #include "parser/cockatrice_xml_4.h"
@@ -28,7 +29,6 @@
 #include <utility>
 
 class ICardPreferenceProvider;
-class ICardSetPriorityController;
 
 CardDatabaseLoader::CardDatabaseLoader(QObject *parent,
                                        CardDatabase *db,
@@ -44,8 +44,7 @@ CardDatabaseLoader::CardDatabaseLoader(QObject *parent,
     // the finished snapshot is swapped into the live database on the GUI thread.
 
     // when SettingsCache's path changes, trigger reloads
-    connect(pathProvider, &ICardDatabasePathProvider::cardDatabasePathChanged, this,
-            &CardDatabaseLoader::loadCardDatabases);
+    connect(pathProvider, &ICardDatabasePathProvider::cardDatabasePathChanged, this, [this] { loadCardDatabases(); });
 }
 
 CardDatabaseLoader::~CardDatabaseLoader()
@@ -90,12 +89,12 @@ LoadStatus CardDatabaseLoader::loadCardDatabase(const QString &path, CardDatabas
     return tempLoadStatus;
 }
 
-LoadStatus CardDatabaseLoader::loadCardDatabases()
+LoadStatus CardDatabaseLoader::loadCardDatabases(bool ignoreCache)
 {
-    return doLoadCardDatabases();
+    return doLoadCardDatabases(ignoreCache);
 }
 
-LoadStatus CardDatabaseLoader::doLoadCardDatabases()
+LoadStatus CardDatabaseLoader::doLoadCardDatabases(bool ignoreCache)
 {
     QMutexLocker locker(reloadDatabaseMutex);
 
@@ -113,9 +112,14 @@ LoadStatus CardDatabaseLoader::doLoadCardDatabases()
     LoadStatus loadStatus = NotLoaded;
 
     // Try the binary cache first: a cache hit avoids re-parsing the (large) XML.
+    // An explicit reload skips the lookup so the files on disk are always
+    // re-read, even when their size/mtime hash still matches the cache.
     const QStringList customPaths = collectCustomDatabasePaths();
     const QByteArray sourceHash = computeSourceHash(customPaths);
-    if (loadFromCache(data, sourceHash)) {
+    if (ignoreCache) {
+        qCInfo(CardDatabaseLoadingLog) << "Ignoring binary cache, re-parsing source files";
+    }
+    if (!ignoreCache && loadFromCache(data, sourceHash)) {
         qCInfo(CardDatabaseLoadingLog) << "Loaded card database from binary cache";
         loadStatus = Ok;
     } else {
@@ -180,6 +184,12 @@ QByteArray CardDatabaseLoader::computeSourceHash(const QStringList &customPaths)
     hash.addData(QCoreApplication::applicationVersion().toUtf8());
     hash.addData(QByteArray(1, '\0'));
 
+    // Include parser schema version to invalidate caches when parser behavior changes.
+    // Increment this if the parser logic changes in a way that affects cached data.
+    static const char SCHEMA_VERSION[] = "carddb-parse-schema-v1";
+    hash.addData(QByteArray(SCHEMA_VERSION, sizeof(SCHEMA_VERSION) - 1));
+    hash.addData(QByteArray(1, '\0'));
+
     const QStringList inputs = QStringList()
                                << pathProvider->getCardDatabasePath() << pathProvider->getTokenDatabasePath()
                                << pathProvider->getSpoilerCardDatabasePath() << customPaths;
@@ -191,6 +201,17 @@ QByteArray CardDatabaseLoader::computeSourceHash(const QStringList &customPaths)
             hash.addData(QByteArray::number(info.size()));
             hash.addData(QByteArray(1, '\0'));
             hash.addData(QByteArray::number(info.lastModified().toSecsSinceEpoch()));
+            hash.addData(QByteArray(1, '\0'));
+        }
+    }
+
+    // The parsers drop printings of disabled sets at parse time, so the cached
+    // snapshot depends on enablement: fold the enabled set names in so that
+    // toggling a set invalidates the cache and forces a re-parse.
+    if (priorityController) {
+        const QStringList enabledSets = priorityController->getEnabledSetNames();
+        for (const QString &setName : enabledSets) {
+            hash.addData(setName.toUtf8());
             hash.addData(QByteArray(1, '\0'));
         }
     }
