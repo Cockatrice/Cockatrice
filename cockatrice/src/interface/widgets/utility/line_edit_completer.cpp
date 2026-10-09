@@ -114,12 +114,8 @@ void LineEditCompleter::keyPressEvent(QKeyEvent *event)
     }
 
     if (event->key() == Qt::Key_Tab) {
-        bool popupVisible = hasVisibleCompleterPopup();
-        if (popupVisible) {
-            event->ignore();
-            return;
-        }
-        event->ignore();
+        // Let Tab proceed normally; focusOutEvent will handle completion if popup is visible
+        LineEditUnfocusable::keyPressEvent(event);
         return;
     }
 
