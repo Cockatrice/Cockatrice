@@ -1003,6 +1003,10 @@ Response::ResponseCode Server_ProtocolHandler::cmdRoomChannelSay(const Command_R
 
     room->say(QString::fromStdString(userInfo->name()), msg, channelId);
 
+    databaseInterface->logMessage(
+        userInfo->id(), QString::fromStdString(userInfo->name()), QString::fromStdString(userInfo->address()), msg,
+        Server_DatabaseInterface::MessageTargetRoomChannel, room->getId(), room->getName(), channelId);
+
     return Response::RespOk;
 }
 

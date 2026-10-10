@@ -18,4 +18,12 @@ CREATE TABLE IF NOT EXISTS `cockatrice_rooms_channels` (
   FOREIGN KEY(`id_room`) REFERENCES `cockatrice_rooms`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
+-- 2. Audit log: room_channel target type plus a channel column so moderators
+-- can tell which stream a logged message belongs to.
+ALTER TABLE `cockatrice_log`
+  MODIFY `target_type` ENUM('room', 'game', 'chat', 'room_channel') NOT NULL;
+
+ALTER TABLE `cockatrice_log`
+  ADD COLUMN `channel` varchar(50) NULL AFTER `target_name`;
+
 UPDATE cockatrice_schema_version SET version=38 WHERE version=37;
