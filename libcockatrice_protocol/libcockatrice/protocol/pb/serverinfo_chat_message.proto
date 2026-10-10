@@ -13,4 +13,5 @@ message ServerInfo_ChatMessage {
     optional string target_type = 6; // target type (room,game,chat)
     optional string target_id = 7;   // id of target
     optional string target_name = 8; // name of target
+    optional string channel = 9;     // channel id, for room_channel targets
 }

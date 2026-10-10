@@ -117,6 +117,7 @@ set(PROTO_FILES
     event_reveal_cards.proto
     event_reverse_turn.proto
     event_roll_die.proto
+    event_room_channel_say.proto
     event_room_say.proto
     event_server_complete_list.proto
     event_server_identification.proto
@@ -201,6 +202,7 @@ set(PROTO_FILES
     serverinfo_replay_match.proto
     serverinfo_report.proto
     serverinfo_room.proto
+    serverinfo_room_channel.proto
     serverinfo_user.proto
     serverinfo_user_alt.proto
     serverinfo_user_session.proto

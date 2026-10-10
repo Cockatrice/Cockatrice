@@ -2,6 +2,7 @@ syntax = "proto2";
 import "serverinfo_game.proto";
 import "serverinfo_user.proto";
 import "serverinfo_gametype.proto";
+import "serverinfo_room_channel.proto";
 
 message ServerInfo_Room {
     optional sint32 room_id = 1;
@@ -15,4 +16,5 @@ message ServerInfo_Room {
     repeated ServerInfo_GameType gametype_list = 9;
     optional string permissionlevel = 10;
     optional string privilegelevel = 11;
+    repeated ServerInfo_RoomChannel channel_list = 12;
 }

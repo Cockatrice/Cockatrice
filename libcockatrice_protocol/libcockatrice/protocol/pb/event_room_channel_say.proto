@@ -1,0 +1,12 @@
+syntax = "proto2";
+import "room_event.proto";
+
+message Event_RoomChannelSay {
+    extend RoomEvent {
+        optional Event_RoomChannelSay ext = 1005; // next free RoomEvent extension
+    }
+    optional string channel_id = 1;
+    optional string name = 2;
+    optional string message = 3;
+    optional uint64 time_of = 4;
+}

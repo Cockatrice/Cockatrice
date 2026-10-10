@@ -1,0 +1,16 @@
+syntax = "proto2";
+
+message ServerInfo_RoomChannel {
+    enum AccessLevel {
+        // Minimum privilege level required to read and write the channel.
+        Public = 0;
+        Registered = 1;
+        Judge = 2;
+        Moderator = 3;
+        Admin = 4;
+        Developer = 5;
+    }
+    optional string id = 1;           // stable ASCII id, e.g. "deck-discussion"
+    optional string display_name = 2; // server-provided, localizable only server-side
+    optional AccessLevel access_level = 3 [default = Public];
+}
