@@ -208,6 +208,17 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  server_dump_zone_test
+  SOURCES
+  server_dump_zone_test.cpp
+  LIBS
+  libcockatrice_rng
+  libcockatrice_network
+  LABELS
+  server
+)
+cockatrice_add_test(
+  NAME
   server_counter_test
   SOURCES
   server_counter_test.cpp
@@ -248,6 +259,20 @@ cockatrice_add_test(
   libcockatrice_network
   LABELS
   server
+)
+cockatrice_add_test(
+  NAME
+  deck_filter_string_test
+  SOURCES
+  ${VERSION_STRING_CPP}
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/filters/deck_filter_string.cpp
+  deck_filter_string_test.cpp
+  LIBS
+  libcockatrice_deck_list
+  libcockatrice_filters
+  libcockatrice_card
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src
 )
 cockatrice_add_test(
   NAME
