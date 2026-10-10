@@ -119,6 +119,14 @@ public:
     const ServerInfo_RoomChannel *findChannel(const QString &channelId) const;
     /** @brief True when @p channelId refers to the implicit Main channel. */
     static bool isMainChannel(const QString &channelId);
+    /**
+     * @brief The highest privilege level held by @p userInfo, for channel access gating.
+     *
+     * Level ordering: Public < Registered < Judge < Moderator < Admin < Developer.
+     */
+    static ServerInfo_RoomChannel::AccessLevel userPrivilegeLevel(const ServerInfo_User &userInfo);
+    /** @brief True when @p userInfo may read and write @p channel. */
+    bool mayUseChannel(const ServerInfo_User &userInfo, const ServerInfo_RoomChannel &channel) const;
     const QMap<int, Server_Game *> &getGames() const
     {
         return games;
@@ -155,7 +163,9 @@ public:
     void addGame(Server_Game *game);
     void removeGame(Server_Game *game);
 
-    void sendRoomEvent(RoomEvent *event, bool sendToIsl = true);
+    void sendRoomEvent(RoomEvent *event,
+                       bool sendToIsl = true,
+                       ServerInfo_RoomChannel::AccessLevel accessLevel = ServerInfo_RoomChannel::Public);
     RoomEvent *prepareRoomEvent(const ::google::protobuf::Message &roomEvent);
 };
 
