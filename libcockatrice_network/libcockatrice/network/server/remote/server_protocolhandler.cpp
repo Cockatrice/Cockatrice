@@ -598,7 +598,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
         int remaining = server->loginRateLimitRemainingSeconds(getAddress());
         if (remaining > 0) {
             auto *re = new Response_Login;
-            re->set_denied_reason_str("Too many login attempts");
             re->set_denied_end_time(QDateTime::currentDateTime().addSecs(remaining).toSecsSinceEpoch());
             rc.setResponseExtension(re);
         }
@@ -621,7 +620,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
                 int remaining = server->loginRateLimitRemainingSeconds(getAddress());
                 if (remaining > 0) {
                     auto *re = new Response_Login;
-                    re->set_denied_reason_str("Too many login attempts");
                     re->set_denied_end_time(QDateTime::currentDateTime().addSecs(remaining).toSecsSinceEpoch());
                     rc.setResponseExtension(re);
                 }

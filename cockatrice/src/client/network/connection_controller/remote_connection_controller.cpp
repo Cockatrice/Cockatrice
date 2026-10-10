@@ -376,9 +376,14 @@ void ConnectionController::onRegisterError(int r, QString reasonStr, quint32 end
             break;
         }
         case Response::RespTooManyRequests: {
-            QString deniedStr = endTime ? tr("Too many registration attempts. Try again after %1.")
-                                              .arg(QDateTime::fromSecsSinceEpoch(endTime).toString())
-                                        : tr("Too many registration attempts. Please try again later.");
+            QString deniedStr =
+                endTime ? tr("Too many registration attempts. Try again after %1.")
+                              .arg(QDateTime::fromSecsSinceEpoch(endTime).toString())
+                        : tr("It appears you are attempting to register a new account on this server yet you "
+                             "already have an account registered with the email provided. This server "
+                             "restricts the number of accounts a user can register per address. Please "
+                             "contact the server operator for further assistance or to obtain your "
+                             "credential information.");
             QMessageBox::critical(dialogParent, tr("Registration denied"), deniedStr);
             break;
         }
