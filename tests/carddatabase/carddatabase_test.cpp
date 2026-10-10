@@ -375,6 +375,45 @@ TEST_F(CardDatabaseCacheInvalidationTest, ExplicitReloadBypassesCache)
     EXPECT_FALSE(db.getCardList().value("Cat")->getSets().contains("CAT"));
     EXPECT_TRUE(db.getCardList().value("Cat")->getSets().contains("DOG"));
 }
+
+TEST_F(CardDatabaseCacheInvalidationTest, FirstRunWithNoSetsEnabledSkipsCacheWrite)
+{
+    // A blank config: the parser discovers every set, but none of them has an
+    // ini entry, so all of them default to disabled (first run).
+    SeededSetPriorityController blankController;
+    NoopCardPreferenceProvider prefs;
+    SandboxPathProvider pathProvider(root);
+    CardDatabase db(nullptr, &prefs, &pathProvider, &blankController);
+
+    db.loadCardDatabases();
+    ASSERT_FALSE(db.getCardList().value("Cat").isNull()) << "cards are parsed even while their sets are disabled";
+    EXPECT_TRUE(db.getCardList().value("Cat")->getSets().isEmpty())
+        << "no printings survive an all-sets-disabled parse";
+    EXPECT_TRUE(cacheContents().isEmpty()) << "a stripped first-run snapshot must not be cached";
+}
+
+TEST_F(CardDatabaseCacheInvalidationTest, EnablingAllSetsAfterFirstRunRestoresPrintings)
+{
+    SeededSetPriorityController blankController;
+    NoopCardPreferenceProvider prefs;
+    SandboxPathProvider pathProvider(root);
+    CardDatabase db(nullptr, &prefs, &pathProvider, &blankController);
+
+    db.loadCardDatabases();
+    ASSERT_TRUE(cacheContents().isEmpty());
+
+    // This mirrors what checkUnknownSets() does on a first run: enable every
+    // set, then reload so the parser keeps the printings and the complete
+    // snapshot gets cached under the enabled-set hash.
+    for (const CardSetPtr &set : db.getSetList()) {
+        blankController.setEnabled(set->getShortName(), true);
+    }
+    db.reloadCardDatabasesAndNotify();
+
+    ASSERT_FALSE(db.getCardList().value("Cat").isNull());
+    EXPECT_TRUE(db.getCardList().value("Cat")->getSets().contains("CAT"));
+    EXPECT_FALSE(cacheContents().isEmpty()) << "the enabled-set snapshot must be cached";
+}
 } // namespace
 
 int main(int argc, char **argv)

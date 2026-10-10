@@ -44,7 +44,13 @@ CardDatabaseLoader::CardDatabaseLoader(QObject *parent,
     // the finished snapshot is swapped into the live database on the GUI thread.
 
     // when SettingsCache's path changes, trigger reloads
-    connect(pathProvider, &ICardDatabasePathProvider::cardDatabasePathChanged, this, [this] { loadCardDatabases(); });
+    connect(pathProvider, &ICardDatabasePathProvider::cardDatabasePathChanged, this, [this] {
+        loadCardDatabases();
+        // This reload runs synchronously on the emitting (GUI) thread, so the
+        // finished snapshot is already swapped in when it returns: enable any
+        // sets the newly pointed-at database introduced.
+        database->checkUnknownSets();
+    });
 }
 
 CardDatabaseLoader::~CardDatabaseLoader()
@@ -136,7 +142,23 @@ LoadStatus CardDatabaseLoader::doLoadCardDatabases(bool ignoreCache)
                 loadCardDatabase(p, data);
             }
 
-            if (!saveToCache(data, sourceHash)) {
+            // A snapshot parsed while no set is enabled has had every printing
+            // stripped by the parsers, and the cache reader re-derives enablement
+            // from the priority controller, so such an entry can never be reused
+            // meaningfully. Skip writing it so a first-run (blank config) load
+            // cannot poison the cache with an empty snapshot. The check mirrors
+            // what the parsers saw: any set still reporting enabled means the
+            // snapshot is complete for the current enablement.
+            bool anySetEnabled = false;
+            for (const CardSetPtr &set : data.sets) {
+                if (set && set->getEnabled()) {
+                    anySetEnabled = true;
+                    break;
+                }
+            }
+            if (!data.sets.isEmpty() && !anySetEnabled) {
+                qCInfo(CardDatabaseLoadingLog) << "Skipping binary cache: no set is enabled yet, snapshot was stripped";
+            } else if (!saveToCache(data, sourceHash)) {
                 qCWarning(CardDatabaseLoadingLog) << "Failed to write binary cache to" << cachePath();
             }
         }
@@ -148,18 +170,15 @@ LoadStatus CardDatabaseLoader::doLoadCardDatabases(bool ignoreCache)
         database->refreshCachedReverseRelatedCards(data.cards);
 
         qCInfo(CardDatabaseLoadingSuccessOrFailureLog) << "Card Database Loading Success";
+        // NOTE: checkUnknownSets() is intentionally NOT called here. During the
+        // front-loaded parse in main() MainWindow does not exist yet, so
+        // cardDatabaseNewSetsFound / cardDatabaseAllNewSetsEnabled would be
+        // emitted with no receivers, and enabling the sets up-front would
+        // suppress the first-run experience MainWindow::startupConfigCheck()
+        // and the onboarding wizard are designed around. Callers that load
+        // after startup own the check (and any reload it triggers).
         emit databaseDataReady(std::move(data));
         emit loadingFinished();
-        // During the front-loaded parse in main() this runs before MainWindow
-        // exists, so cardDatabaseNewSetsFound / cardDatabaseAllNewSetsEnabled
-        // would be emitted with no receivers.  Skip the check on the first load;
-        // MainWindow::startupConfigCheck() calls checkUnknownSets() once its
-        // signal connections are live.  On subsequent reloads (e.g. path change)
-        // MainWindow exists and signals have live receivers.
-        if (initialLoadComplete) {
-            database->checkUnknownSets();
-        }
-        initialLoadComplete = true;
     } else {
         qCInfo(CardDatabaseLoadingSuccessOrFailureLog) << "Card Database Loading Failed";
         emit loadingFailed(); // bring up the settings dialog
