@@ -18,8 +18,10 @@
 
 class UserListProxy;
 class QAction;
+class QComboBox;
 class QGroupBox;
 class QMenu;
+class QStackedWidget;
 class QStringListModel;
 class TabSupervisor;
 
@@ -42,6 +44,7 @@ class Event_ListGames;
 class Event_JoinRoom;
 class Event_LeaveRoom;
 class Event_RoomSay;
+class Event_RoomChannelSay;
 class Event_RemoveMessages;
 class GameSelector;
 class Response;
@@ -64,6 +67,11 @@ private:
     UserListWidget *userList;
     const UserListProxy *userListProxy;
     ChatView *chatView;
+    QStackedWidget *chatViewStack;
+    QComboBox *channelSelector;
+    QMap<QString, ChatView *> channelViews;
+    QStringList channelIds;
+    QString activeChannelId;
     QLabel *sayLabel;
     LineEditCompleter *sayEdit;
     QStringListModel *mentionModel;
@@ -86,6 +94,7 @@ signals:
 private slots:
     void sendMessage();
     void sayFinished(const Response &response);
+    void onChannelChanged(int index);
     void actClearChat();
     void actOpenChatSettings();
     void addMentionTag(QString mentionTag);
@@ -98,8 +107,11 @@ private slots:
     void processJoinRoomEvent(const Event_JoinRoom &event);
     void processLeaveRoomEvent(const Event_LeaveRoom &event);
     void processRoomSayEvent(const Event_RoomSay &event);
+    void processRoomChannelSayEvent(const Event_RoomChannelSay &event);
     void processRemoveMessagesEvent(const Event_RemoveMessages &event);
     void refreshShortcuts();
+
+    ChatView *makeChatView();
 
 protected slots:
     void closeEvent(QCloseEvent *event) override;
