@@ -136,7 +136,14 @@ LoadStatus CardDatabaseLoader::doLoadCardDatabases(bool ignoreCache)
                 loadCardDatabase(p, data);
             }
 
-            if (!saveToCache(data, sourceHash)) {
+            // A snapshot parsed while no set is enabled has had every printing
+            // stripped by the parsers, and the cache reader re-derives enablement
+            // from the priority controller, so such an entry can never be reused
+            // meaningfully. Skip writing it so a first-run (blank config) load
+            // cannot poison the cache with an empty snapshot.
+            if (priorityController && priorityController->getEnabledSetNames().isEmpty()) {
+                qCInfo(CardDatabaseLoadingLog) << "Skipping binary cache: no set is enabled yet, snapshot was stripped";
+            } else if (!saveToCache(data, sourceHash)) {
                 qCWarning(CardDatabaseLoadingLog) << "Failed to write binary cache to" << cachePath();
             }
         }

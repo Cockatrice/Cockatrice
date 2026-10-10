@@ -1104,9 +1104,20 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
 
 void MainWindow::cardDatabaseAllNewSetsEnabled()
 {
-    if (firstRunWizardActive || CardDatabaseManager::getInstance()->getCardList().isEmpty()) {
-        // The onboarding wizard owns the first-run messaging on a clean install,
-        // and with no card data there are no sets to have enabled.
+    // With no card data there is nothing to have enabled and nothing to reparse.
+    if (CardDatabaseManager::getInstance()->getCardList().isEmpty()) {
+        return;
+    }
+
+    // checkUnknownSets() enabled every set after the database had already been
+    // parsed under the (empty) first-run enablement, so the parser dropped every
+    // printing of every set. Reparse now that the sets are enabled, otherwise the
+    // deck editor's card database display stays empty until the next launch.
+    const auto reloadOk1 =
+        QtConcurrent::run([] { CardDatabaseManager::getInstance()->reloadCardDatabasesAndNotify(); });
+
+    if (firstRunWizardActive) {
+        // The onboarding wizard owns the first-run messaging on a clean install.
         return;
     }
 
