@@ -26,15 +26,19 @@
 #include <libcockatrice/protocol/pb/event_leave_room.pb.h>
 #include <libcockatrice/protocol/pb/event_list_games.pb.h>
 #include <libcockatrice/protocol/pb/event_remove_messages.pb.h>
+#include <libcockatrice/protocol/pb/event_room_channel_say.pb.h>
 #include <libcockatrice/protocol/pb/event_room_say.pb.h>
 #include <libcockatrice/protocol/pb/room_commands.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_chat_message.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_room.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_room_channel.pb.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <qlogging.h>
 #include <qnamespace.h>
 #include <string>
 #include <utility>
+
+const QString Server_Room::MAIN_CHANNEL_KEY = QStringLiteral("__main__");
 
 Server_Room::Server_Room(int _id,
                          int _chatHistorySize,
@@ -45,11 +49,16 @@ Server_Room::Server_Room(int _id,
                          bool _autoJoin,
                          const QString &_joinMessage,
                          const QStringList &_gameTypes,
-                         Server *parent)
+                         Server *parent,
+                         const QList<ServerInfo_RoomChannel> &_channels)
     : QObject(parent), id(_id), chatHistorySize(_chatHistorySize), name(_name), description(_description),
       permissionLevel(_permissionLevel), privilegeLevel(_privilegeLevel), autoJoin(_autoJoin),
-      joinMessage(_joinMessage), gameTypes(_gameTypes), gamesLock(QReadWriteLock::Recursive)
+      joinMessage(_joinMessage), gameTypes(_gameTypes), channels(_channels), gamesLock(QReadWriteLock::Recursive)
 {
+    for (const ServerInfo_RoomChannel &channel : channels) {
+        channelIndex.insert(QString::fromStdString(channel.id()), channel);
+    }
+
     connect(
         this, &Server_Room::gameListChanged, this, [this](auto gameInfo) { broadcastGameListUpdate(gameInfo); },
         Qt::QueuedConnection);
@@ -152,7 +161,27 @@ Server_Room::getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes,
         }
     }
 
+    for (const ServerInfo_RoomChannel &channel : channels) {
+        result.add_channel_list()->CopyFrom(channel);
+    }
+
     return result;
+}
+
+bool Server_Room::isMainChannel(const QString &channelId)
+{
+    return channelId.isEmpty() || channelId == MAIN_CHANNEL_KEY;
+}
+
+const ServerInfo_RoomChannel *Server_Room::findChannel(const QString &channelId) const
+{
+    auto it = channelIndex.constFind(channelId);
+    return it == channelIndex.constEnd() ? nullptr : &it.value();
+}
+
+QList<ServerInfo_ChatMessage> Server_Room::getChatHistory(const QString &channelId) const
+{
+    return channelChatHistory.value(isMainChannel(channelId) ? MAIN_CHANNEL_KEY : channelId);
 }
 
 RoomEvent *Server_Room::prepareRoomEvent(const ::google::protobuf::Message &roomEvent)
@@ -310,12 +339,22 @@ Response::ResponseCode Server_Room::processJoinGameCommand(const Command_JoinGam
     return result;
 }
 
-void Server_Room::say(const QString &userName, const QString &userMessage, bool sendToIsl)
+void Server_Room::say(const QString &userName, const QString &userMessage, const QString &channelId, bool sendToIsl)
 {
-    Event_RoomSay event;
-    event.set_name(userName.toStdString());
-    event.set_message(userMessage.toStdString());
-    sendRoomEvent(prepareRoomEvent(event), sendToIsl);
+    const bool isMain = isMainChannel(channelId);
+
+    if (isMain) {
+        Event_RoomSay event;
+        event.set_name(userName.toStdString());
+        event.set_message(userMessage.toStdString());
+        sendRoomEvent(prepareRoomEvent(event), sendToIsl);
+    } else {
+        Event_RoomChannelSay event;
+        event.set_channel_id(channelId.toStdString());
+        event.set_name(userName.toStdString());
+        event.set_message(userMessage.toStdString());
+        sendRoomEvent(prepareRoomEvent(event), sendToIsl);
+    }
 
     if (chatHistorySize != 0) {
         ServerInfo_ChatMessage chatMessage;
@@ -324,18 +363,23 @@ void Server_Room::say(const QString &userName, const QString &userMessage, bool 
         chatMessage.set_time(dateTimeString.toStdString());
         chatMessage.set_sender_name(userName.toStdString());
         chatMessage.set_message(userMessage.simplified().toStdString());
-
-        historyLock.lockForWrite();
-        if (chatHistory.size() >= chatHistorySize) {
-            chatHistory.removeAt(0);
+        if (!isMain) {
+            chatMessage.set_channel(channelId.toStdString());
         }
 
-        chatHistory.push_back(std::move(chatMessage));
+        const QString storageKey = isMain ? MAIN_CHANNEL_KEY : channelId;
+        historyLock.lockForWrite();
+        QList<ServerInfo_ChatMessage> &history = channelChatHistory[storageKey];
+        if (history.size() >= chatHistorySize) {
+            history.removeAt(0);
+        }
+
+        history.push_back(std::move(chatMessage));
         historyLock.unlock();
     }
 }
 
-void Server_Room::removeSaidMessages(const QString &userName, int amount, bool sendToIsl)
+void Server_Room::removeSaidMessages(const QString &userName, int amount, bool sendToIsl, const QString &channelId)
 {
     Event_RemoveMessages event;
     auto stdStringUserName = userName.toStdString();
@@ -345,9 +389,11 @@ void Server_Room::removeSaidMessages(const QString &userName, int amount, bool s
 
     if (chatHistorySize != 0) {
         int removed = 0;
+        const QString storageKey = isMainChannel(channelId) ? MAIN_CHANNEL_KEY : channelId;
         historyLock.lockForWrite();
+        QList<ServerInfo_ChatMessage> &history = channelChatHistory[storageKey];
         // redact [amount] of the most recent messages from this user from history
-        for (auto message = chatHistory.rbegin(); message != chatHistory.rend() && removed != amount; ++message) {
+        for (auto message = history.rbegin(); message != history.rend() && removed != amount; ++message) {
             if (message->sender_name() == stdStringUserName) {
                 message->clear_message();
                 ++removed;

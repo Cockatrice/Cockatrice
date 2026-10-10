@@ -9,6 +9,7 @@
 #include <QStringList>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_chat_message.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_room_channel.pb.h>
 #include <qtmetamacros.h>
 
 class Server_ProtocolHandler;
@@ -47,15 +48,19 @@ private:
     bool autoJoin;
     QString joinMessage;
     QStringList gameTypes;
+    QList<ServerInfo_RoomChannel> channels;
+    QMap<QString, ServerInfo_RoomChannel> channelIndex;
     QMap<int, Server_Game *> games;
     QMap<int, ServerInfo_Game> externalGames;
     QMap<QString, Server_ProtocolHandler *> users;
     QMap<QString, ServerInfo_User_Container> externalUsers;
-    QList<ServerInfo_ChatMessage> chatHistory;
+    QMap<QString, QList<ServerInfo_ChatMessage>> channelChatHistory;
 private slots:
     void broadcastGameListUpdate(const ServerInfo_Game &gameInfo, bool sendToIsl = true);
 
 public:
+    static const QString MAIN_CHANNEL_KEY;
+
     mutable QReadWriteLock usersLock;
     mutable QReadWriteLock gamesLock;
     mutable QReadWriteLock historyLock;
@@ -68,7 +73,8 @@ public:
                 bool _autoJoin,
                 const QString &_joinMessage,
                 const QStringList &_gameTypes,
-                Server *parent);
+                Server *parent,
+                const QList<ServerInfo_RoomChannel> &_channels = {});
     ~Server_Room() override;
     int getId() const
     {
@@ -103,6 +109,17 @@ public:
     {
         return gameTypes;
     }
+    const QList<ServerInfo_RoomChannel> &getChannels() const
+    {
+        return channels;
+    }
+    /**
+     * @brief Looks up a catalog channel by its stable id.
+     * @return The matching channel, or nullptr when the id is not in the catalog.
+     */
+    const ServerInfo_RoomChannel *findChannel(const QString &channelId) const;
+    /** @brief True when @p channelId refers to the implicit Main channel. */
+    static bool isMainChannel(const QString &channelId);
     const QMap<int, Server_Game *> &getGames() const
     {
         return games;
@@ -116,10 +133,7 @@ public:
     getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes = false, bool includeExternalData = true) const;
     int getGamesCreatedByUser(const QString &name) const;
     QList<ServerInfo_Game> getGamesOfUser(const QString &name) const;
-    QList<ServerInfo_ChatMessage> &getChatHistory()
-    {
-        return chatHistory;
-    }
+    QList<ServerInfo_ChatMessage> getChatHistory(const QString &channelId) const;
 
     void addClient(Server_ProtocolHandler *client);
     void removeClient(Server_ProtocolHandler *client);
@@ -136,8 +150,11 @@ public:
                                                   ResponseContainer &rc,
                                                   Server_AbstractUserInterface *userInterface);
 
-    void say(const QString &userName, const QString &s, bool sendToIsl = true);
-    void removeSaidMessages(const QString &userName, int amount, bool sendToIsl = true);
+    void say(const QString &userName, const QString &s, const QString &channelId = QString(), bool sendToIsl = true);
+    void removeSaidMessages(const QString &userName,
+                            int amount,
+                            bool sendToIsl = true,
+                            const QString &channelId = QString());
 
     void addGame(Server_Game *game);
     void removeGame(Server_Game *game);

@@ -13,6 +13,7 @@
 #include "libcockatrice/protocol/pb/server_message.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_chat_message.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_room_channel.pb.h"
 #include "libcockatrice/protocol/pb/session_commands.pb.h"
 #include "libcockatrice/protocol/pb/session_event.pb.h"
 #include "server_database_interface.h"
@@ -40,6 +41,7 @@
 #include <libcockatrice/protocol/pb/commands.pb.h>
 #include <libcockatrice/protocol/pb/event_list_rooms.pb.h>
 #include <libcockatrice/protocol/pb/event_notify_user.pb.h>
+#include <libcockatrice/protocol/pb/event_room_channel_say.pb.h>
 #include <libcockatrice/protocol/pb/event_room_say.pb.h>
 #include <libcockatrice/protocol/pb/event_server_message.pb.h>
 #include <libcockatrice/protocol/pb/event_user_message.pb.h>
@@ -251,6 +253,9 @@ Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const
                 break;
             case RoomCommand::ROOM_SAY:
                 resp = cmdRoomSay(sc.GetExtension(Command_RoomSay::ext), room, rc);
+                break;
+            case RoomCommand::ROOM_CHANNEL_SAY:
+                resp = cmdRoomChannelSay(sc.GetExtension(Command_RoomChannelSay::ext), room, rc);
                 break;
             case RoomCommand::CREATE_GAME:
                 resp = cmdCreateGame(sc.GetExtension(Command_CreateGame::ext), room, rc);
@@ -856,16 +861,27 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
     rooms.insert(room->getId(), room);
 
     QReadLocker chatHistoryLocker(&room->historyLock);
-    QList<ServerInfo_ChatMessage> chatHistory = room->getChatHistory();
-    ServerInfo_ChatMessage chatMessage;
-    for (int i = 0; i < chatHistory.size(); ++i) {
-        chatMessage = chatHistory.at(i);
+    const QList<ServerInfo_ChatMessage> mainChatHistory = room->getChatHistory(Server_Room::MAIN_CHANNEL_KEY);
+    for (const ServerInfo_ChatMessage &chatMessage : mainChatHistory) {
         Event_RoomSay roomChatHistory;
         roomChatHistory.set_message(chatMessage.sender_name() + ": " + chatMessage.message());
         roomChatHistory.set_message_type(Event_RoomSay::ChatHistory);
         roomChatHistory.set_time_of(
             QDateTime::fromString(QString::fromStdString(chatMessage.time())).toMSecsSinceEpoch());
         rc.enqueuePostResponseItem(ServerMessage::ROOM_EVENT, room->prepareRoomEvent(roomChatHistory));
+    }
+
+    // Replay the history of every catalog channel public to the joining user.
+    for (const ServerInfo_RoomChannel &channel : room->getChannels()) {
+        const QList<ServerInfo_ChatMessage> channelHistory = room->getChatHistory(QString::fromStdString(channel.id()));
+        for (const ServerInfo_ChatMessage &chatMessage : channelHistory) {
+            Event_RoomChannelSay channelChatHistory;
+            channelChatHistory.set_channel_id(channel.id());
+            channelChatHistory.set_message(chatMessage.sender_name() + ": " + chatMessage.message());
+            channelChatHistory.set_time_of(
+                QDateTime::fromString(QString::fromStdString(chatMessage.time())).toMSecsSinceEpoch());
+            rc.enqueuePostResponseItem(ServerMessage::ROOM_EVENT, room->prepareRoomEvent(channelChatHistory));
+        }
     }
 
     Event_RoomSay joinMessageEvent;
@@ -955,6 +971,29 @@ Server_ProtocolHandler::cmdRoomSay(const Command_RoomSay &cmd, Server_Room *room
     databaseInterface->logMessage(userInfo->id(), QString::fromStdString(userInfo->name()),
                                   QString::fromStdString(userInfo->address()), msg,
                                   Server_DatabaseInterface::MessageTargetRoom, room->getId(), room->getName());
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode Server_ProtocolHandler::cmdRoomChannelSay(const Command_RoomChannelSay &cmd,
+                                                                 Server_Room *room,
+                                                                 ResponseContainer & /*rc*/)
+{
+    const QString channelId = QString::fromStdString(cmd.channel_id());
+    const ServerInfo_RoomChannel *channel = room->findChannel(channelId);
+    if (channel == nullptr) {
+        // The client only ever offers catalog ids; a crafted or stale id is rejected.
+        return Response::RespInvalidCommand;
+    }
+
+    if (!addSaidMessageSize(static_cast<int>(cmd.message().size()))) {
+        return Response::RespChatFlood;
+    }
+    QString msg = QString::fromStdString(cmd.message());
+
+    msg.replace(QChar('\n'), QChar(' '));
+
+    room->say(QString::fromStdString(userInfo->name()), msg, channelId);
 
     return Response::RespOk;
 }

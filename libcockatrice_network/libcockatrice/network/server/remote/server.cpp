@@ -451,7 +451,7 @@ void Server::externalRoomSay(int roomId, const QString &userName, const QString 
         qDebug() << "externalRoomSay: room id=" << roomId << "not found";
         return;
     }
-    room->say(userName, message, false);
+    room->say(userName, message, QString(), false);
 
     getDatabaseInterface()->logMessage(0, userName, "ISL", message, Server_DatabaseInterface::MessageTargetIslRoom,
                                        room->getId(), room->getName());
