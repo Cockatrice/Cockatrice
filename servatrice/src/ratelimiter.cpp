@@ -66,6 +66,43 @@ void RateLimiter::clearAttempts(const QString &key)
     attempts.remove(key);
 }
 
+int RateLimiter::retryAfterSeconds(const QString &key, int maxAttempts, int windowSeconds) const
+{
+    return retryAfterSecondsAt(key, maxAttempts, windowSeconds, QDateTime::currentSecsSinceEpoch());
+}
+
+int RateLimiter::retryAfterSecondsAt(const QString &key, int maxAttempts, int windowSeconds, qint64 now) const
+{
+    if (maxAttempts <= 0 || windowSeconds <= 0) {
+        return 0;
+    }
+
+    QMutexLocker locker(&mutex);
+
+    const auto it = attempts.constFind(key);
+    if (it == attempts.constEnd()) {
+        return 0;
+    }
+
+    QList<qint64> timestamps = it.value().timestamps;
+    while (!timestamps.isEmpty() && timestamps.first() <= now - windowSeconds) {
+        timestamps.removeFirst();
+    }
+    if (timestamps.size() < maxAttempts) {
+        return 0;
+    }
+    if (timestamps.isEmpty()) {
+        return 0;
+    }
+
+    qint64 oldest = timestamps.first();
+    qint64 retryAt = oldest + windowSeconds;
+    if (retryAt <= now) {
+        return 0;
+    }
+    return static_cast<int>(retryAt - now);
+}
+
 void RateLimiter::pruneLocked(qint64 now)
 {
     if (lastPruneSecs + PruneIntervalSeconds > now) {

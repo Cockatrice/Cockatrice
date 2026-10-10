@@ -1230,6 +1230,12 @@ bool Servatrice::isLoginRateLimited(const QString &ipAddress)
     return rateLimiter.isBlocked("login:" + ipAddress, getMaxLoginAttemptsPerIp(), getLoginAttemptWindowSeconds());
 }
 
+int Servatrice::loginRateLimitRemainingSeconds(const QString &ipAddress)
+{
+    return rateLimiter.retryAfterSeconds("login:" + ipAddress, getMaxLoginAttemptsPerIp(),
+                                         getLoginAttemptWindowSeconds());
+}
+
 void Servatrice::clearFailedLogins(const QString &ipAddress)
 {
     rateLimiter.clearAttempts("login:" + ipAddress);

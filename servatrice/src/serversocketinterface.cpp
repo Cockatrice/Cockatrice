@@ -3178,6 +3178,15 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
                                          false);
         }
 
+        Response_Register *re = new Response_Register;
+        re->set_denied_reason_str("Too many registration attempts");
+        int remaining = servatrice->getRateLimiter()->retryAfterSeconds("register:" + this->getAddress(),
+                                                                        servatrice->getMaxRegistrationsPerIp(),
+                                                                        servatrice->getRegistrationWindowSeconds());
+        if (remaining > 0) {
+            re->set_denied_end_time(QDateTime::currentDateTime().addSecs(remaining).toSecsSinceEpoch());
+        }
+        rc.setResponseExtension(re);
         return Response::RespTooManyRequests;
     }
 

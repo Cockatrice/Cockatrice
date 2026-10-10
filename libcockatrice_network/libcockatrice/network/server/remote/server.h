@@ -202,6 +202,14 @@ public:
     {
         return false;
     }
+    /**
+     * @brief Seconds remaining before the login rate limit for @p ipAddress lifts.
+     * Returns 0 if not limited.
+     */
+    virtual int loginRateLimitRemainingSeconds(const QString & /*ipAddress*/)
+    {
+        return 0;
+    }
     /** @brief Clear any failed-login lockout for the given address, e.g. after a successful login. */
     virtual void clearFailedLogins(const QString & /*ipAddress*/)
     {
