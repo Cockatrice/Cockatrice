@@ -1078,8 +1078,8 @@ void Servatrice::addIslInterface(int _serverId, IslInterface *interface)
     connect(interface, SIGNAL(externalRoomUserJoined(int, ServerInfo_User)), this,
             SLOT(externalRoomUserJoined(int, ServerInfo_User)));
     connect(interface, SIGNAL(externalRoomUserLeft(int, QString)), this, SLOT(externalRoomUserLeft(int, QString)));
-    connect(interface, SIGNAL(externalRoomSay(int, QString, QString)), this,
-            SLOT(externalRoomSay(int, QString, QString)));
+    connect(interface, SIGNAL(externalRoomSay(int, QString, QString, QString)), this,
+            SLOT(externalRoomSay(int, QString, QString, QString)));
     connect(interface, SIGNAL(externalRoomRemoveMessages(int, QString, int)), this,
             SLOT(externalRoomRemoveMessages(int, QString, int)));
     connect(interface, SIGNAL(externalRoomGameListChanged(int, ServerInfo_Game)), this,

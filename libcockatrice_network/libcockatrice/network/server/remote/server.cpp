@@ -441,7 +441,7 @@ void Server::externalRoomUserLeft(int roomId, const QString &userName)
     room->removeExternalUser(userName);
 }
 
-void Server::externalRoomSay(int roomId, const QString &userName, const QString &message)
+void Server::externalRoomSay(int roomId, const QString &userName, const QString &message, const QString &channelId)
 {
     // This function is always called from the main thread via signal/slot.
     QReadLocker locker(&roomsLock);
@@ -451,10 +451,16 @@ void Server::externalRoomSay(int roomId, const QString &userName, const QString 
         qDebug() << "externalRoomSay: room id=" << roomId << "not found";
         return;
     }
-    room->say(userName, message, QString(), false);
+    room->say(userName, message, channelId, false);
 
-    getDatabaseInterface()->logMessage(0, userName, "ISL", message, Server_DatabaseInterface::MessageTargetIslRoom,
-                                       room->getId(), room->getName());
+    if (channelId.isEmpty()) {
+        getDatabaseInterface()->logMessage(0, userName, "ISL", message, Server_DatabaseInterface::MessageTargetIslRoom,
+                                           room->getId(), room->getName());
+    } else {
+        getDatabaseInterface()->logMessage(0, userName, "ISL", message,
+                                           Server_DatabaseInterface::MessageTargetRoomChannel, room->getId(),
+                                           room->getName(), channelId);
+    }
 }
 
 void Server::externalRoomRemoveMessages(int roomId, const QString &userName, int amount)

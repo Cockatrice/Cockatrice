@@ -265,7 +265,7 @@ protected slots:
     void externalUserLeft(const QString &userName);
     void externalRoomUserJoined(int roomId, const ServerInfo_User &userInfo);
     void externalRoomUserLeft(int roomId, const QString &userName);
-    void externalRoomSay(int roomId, const QString &userName, const QString &message);
+    void externalRoomSay(int roomId, const QString &userName, const QString &message, const QString &channelId);
     void externalRoomRemoveMessages(int roomId, const QString &userName, int amount);
     void externalRoomGameListChanged(int roomId, const ServerInfo_Game &gameInfo);
     void

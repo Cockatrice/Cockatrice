@@ -36,6 +36,7 @@
 #include <libcockatrice/protocol/pb/event_leave_room.pb.h>
 #include <libcockatrice/protocol/pb/event_list_games.pb.h>
 #include <libcockatrice/protocol/pb/event_remove_messages.pb.h>
+#include <libcockatrice/protocol/pb/event_room_channel_say.pb.h>
 #include <libcockatrice/protocol/pb/event_room_say.pb.h>
 #include <libcockatrice/protocol/pb/event_server_complete_list.pb.h>
 #include <libcockatrice/protocol/pb/event_user_joined.pb.h>
@@ -383,7 +384,14 @@ void IslInterface::roomEvent_UserLeft(int roomId, const Event_LeaveRoom &event)
 
 void IslInterface::roomEvent_Say(int roomId, const Event_RoomSay &event)
 {
-    emit externalRoomSay(roomId, QString::fromStdString(event.name()), QString::fromStdString(event.message()));
+    emit externalRoomSay(roomId, QString::fromStdString(event.name()), QString::fromStdString(event.message()),
+                         QString());
+}
+
+void IslInterface::roomEvent_ChannelSay(int roomId, const Event_RoomChannelSay &event)
+{
+    emit externalRoomSay(roomId, QString::fromStdString(event.name()), QString::fromStdString(event.message()),
+                         QString::fromStdString(event.channel_id()));
 }
 
 void IslInterface::roomEvent_ListGames(int roomId, const Event_ListGames &event)
@@ -458,6 +466,9 @@ void IslInterface::processRoomEvent(const RoomEvent &event)
             break;
         case RoomEvent::ROOM_SAY:
             roomEvent_Say(event.room_id(), event.GetExtension(Event_RoomSay::ext));
+            break;
+        case RoomEvent::ROOM_CHANNEL_SAY:
+            roomEvent_ChannelSay(event.room_id(), event.GetExtension(Event_RoomChannelSay::ext));
             break;
         case RoomEvent::LIST_GAMES:
             roomEvent_ListGames(event.room_id(), event.GetExtension(Event_ListGames::ext));
