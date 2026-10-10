@@ -1,9 +1,11 @@
 #include "line_edit_completer.h"
 
+#include <QAbstractItemModel>
 #include <QAbstractItemView>
 #include <QChar>
 #include <QCompleter>
 #include <QFocusEvent>
+#include <QItemSelectionModel>
 #include <QKeyEvent>
 #include <QModelIndex>
 #include <QVariant>
@@ -48,36 +50,79 @@ void LineEditCompleter::focusOutEvent(QFocusEvent *e)
 {
     LineEditUnfocusable::focusOutEvent(e);
 
-    // Only commit the highlighted completion when focus moves away via Tab.
+    // Commit completion when focus moves away via Tab if popup is visible.
     // Other focus losses (e.g. the unfocus shortcut / Escape) must simply close
     // the popup without inserting anything.
-    if (e->reason() != Qt::TabFocusReason) {
-        hideCompleterPopups();
+    bool popupWasVisible = false;
+    for (auto &info : completers) {
+        if (info.completer->popup()->isVisible()) {
+            popupWasVisible = true;
+            const QModelIndex currentIndex = info.completer->popup()->currentIndex();
+            QString completionText;
+            if (currentIndex.isValid()) {
+                completionText = currentIndex.data().toString();
+            } else {
+                completionText = info.completer->currentCompletion();
+            }
+            if (!completionText.isEmpty()) {
+                insertCompletion(info.completer, completionText);
+            }
+        }
+    }
+    hideCompleterPopups();
+
+    if (popupWasVisible && e->reason() == Qt::TabFocusReason) {
+        // Refocus the edit so Tab doesn't move focus away
+        // Use a queued connection to ensure focus is restored after the focus change completes
+        QMetaObject::invokeMethod(this, "setFocus", Qt::QueuedConnection);
+        e->accept();
         return;
     }
 
-    for (auto &info : completers) {
-        if (!info.completer->popup()->isVisible()) {
-            continue;
-        }
-
-        const QModelIndex currentIndex = info.completer->popup()->currentIndex();
-        if (currentIndex.isValid()) {
-            insertCompletion(info.completer, currentIndex.data().toString());
-        }
+    if (popupWasVisible) {
+        return;
     }
-
-    hideCompleterPopups();
 }
 
 void LineEditCompleter::keyPressEvent(QKeyEvent *event)
 {
-    LineEditUnfocusable::keyPressEvent(event);
-
     if (event->key() == Qt::Key_Escape) {
-        hideCompleterPopups();
+        if (hasVisibleCompleterPopup()) {
+            event->ignore();
+            hideCompleterPopups();
+            return;
+        }
+        LineEditUnfocusable::keyPressEvent(event);
         return;
     }
+
+    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter || event->key() == Qt::Key_Space) {
+        for (auto &info : completers) {
+            if (info.completer->popup()->isVisible()) {
+                event->ignore();
+                const QModelIndex currentIndex = info.completer->popup()->currentIndex();
+                QString completionText;
+                if (currentIndex.isValid()) {
+                    completionText = currentIndex.data().toString();
+                } else {
+                    completionText = info.completer->currentCompletion();
+                }
+                if (!completionText.isEmpty()) {
+                    insertCompletion(info.completer, completionText);
+                }
+                hideCompleterPopups();
+                return;
+            }
+        }
+    }
+
+    if (event->key() == Qt::Key_Tab) {
+        // Let Tab proceed normally; focusOutEvent will handle completion if popup is visible
+        LineEditUnfocusable::keyPressEvent(event);
+        return;
+    }
+
+    LineEditUnfocusable::keyPressEvent(event);
 
     QString textValue = text();
     int cursorPos = cursorPosition();
@@ -132,6 +177,17 @@ void LineEditCompleter::keyPressEvent(QKeyEvent *event)
     }
 
     active->completer->complete();
+
+    // The popup opens without a current row, so nothing is highlighted and there
+    // is no visual indication of what Enter will insert. Select the row that
+    // currentCompletion() would use so the current mention stays visible.
+    auto *completionModel = active->completer->completionModel();
+    const int currentRow = active->completer->currentRow();
+    if (currentRow >= 0 && currentRow < completionModel->rowCount()) {
+        active->completer->popup()->selectionModel()->setCurrentIndex(
+            completionModel->index(currentRow, active->completer->completionColumn()),
+            QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+    }
 }
 
 void LineEditCompleter::insertCompletion(const QString &completion)
