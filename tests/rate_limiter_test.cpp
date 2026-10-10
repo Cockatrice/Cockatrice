@@ -97,6 +97,24 @@ TEST(RateLimiterTest, BlockedKeyIsUnlockedAfterSuccessfulClear)
     ASSERT_FALSE(limiter.recordAttemptAt("ip", 2, 60, t + 3));
 }
 
+TEST(RateLimiterTest, RetryAfterSecondsReportsTimeUntilUnlock)
+{
+    RateLimiter limiter;
+    const qint64 t = 1000;
+    const int window = 60;
+
+    ASSERT_EQ(0, limiter.retryAfterSecondsAt("ip", 2, window, t));
+    ASSERT_FALSE(limiter.recordAttemptAt("ip", 2, window, t));
+    ASSERT_EQ(0, limiter.retryAfterSecondsAt("ip", 2, window, t));
+    ASSERT_FALSE(limiter.recordAttemptAt("ip", 2, window, t + 1));
+    ASSERT_TRUE(limiter.isBlockedAt("ip", 2, window, t + 2));
+    // Oldest attempt was at t, window 60, so retry at t+60; now is t+2 => 58.
+    ASSERT_EQ(58, limiter.retryAfterSecondsAt("ip", 2, window, t + 2));
+    // At t+60 the window just elapsed; retry should return 0.
+    ASSERT_EQ(0, limiter.retryAfterSecondsAt("ip", 2, window, t + 60));
+    ASSERT_EQ(0, limiter.retryAfterSecondsAt("ip", 2, window, t + 61));
+}
+
 } // namespace
 
 int main(int argc, char **argv)

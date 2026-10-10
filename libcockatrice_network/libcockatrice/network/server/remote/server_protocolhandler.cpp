@@ -595,6 +595,13 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     // Throttle before doing any work: a locked-out address must not get a full
     // database round trip and password verification on every attempt.
     if (server->isLoginRateLimited(getAddress())) {
+        int remaining = server->loginRateLimitRemainingSeconds(getAddress());
+        if (remaining > 0) {
+            auto *re = new Response_Login;
+            re->set_denied_reason_str("Too many login attempts");
+            re->set_denied_end_time(QDateTime::currentDateTime().addSecs(remaining).toSecsSinceEpoch());
+            rc.setResponseExtension(re);
+        }
         return Response::RespTooManyRequests;
     }
     AuthenticationResult res = server->loginUser(this, userName, password, needsHash, reasonStr, banSecondsLeft,
@@ -611,6 +618,13 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
         }
         case NotLoggedIn:
             if (server->recordFailedLogin(getAddress())) {
+                int remaining = server->loginRateLimitRemainingSeconds(getAddress());
+                if (remaining > 0) {
+                    auto *re = new Response_Login;
+                    re->set_denied_reason_str("Too many login attempts");
+                    re->set_denied_end_time(QDateTime::currentDateTime().addSecs(remaining).toSecsSinceEpoch());
+                    rc.setResponseExtension(re);
+                }
                 return Response::RespTooManyRequests;
             }
             return Response::RespWrongPassword;

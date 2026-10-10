@@ -50,6 +50,25 @@ public:
     /** @brief Drop all recorded attempts for the key, e.g. after a successful login. */
     void clearAttempts(const QString &key);
 
+    /**
+     * @brief Get the retry-after window in seconds for @p key.
+     *
+     * Returns the number of seconds from @p now until the oldest attempt
+     * exits @p windowSeconds and the key is no longer blocked. If the key is
+     * not blocked, returns 0. Returns 0 if @p maxAttempts <= 0 or
+     * @p windowSeconds <= 0.
+     *
+     * Delegates to retryAfterSecondsAt().
+     */
+    int retryAfterSeconds(const QString &key, int maxAttempts, int windowSeconds) const;
+
+    /**
+     * @brief Get the retry-after window in seconds for @p key as measured at @p now.
+     *
+     * Exposed for deterministic tests.
+     */
+    int retryAfterSecondsAt(const QString &key, int maxAttempts, int windowSeconds, qint64 now) const;
+
 private:
     struct AttemptHistory
     {
