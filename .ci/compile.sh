@@ -9,14 +9,16 @@
 # --server compiles servatrice
 # --test runs tests
 # --sanitize builds with AddressSanitizer and UndefinedBehaviorSanitizer, gcc/clang only
+# --coverage instruments the test run for line coverage and prints a gcovr summary, gcc only
+
 # --debug or --release sets the build type ie CMAKE_BUILD_TYPE
 # --ccache [<size>] uses ccache and shows stats, optionally provide size
 # --evict-ccache <age> runs ccache eviction based on given age after build
 # --dir <dir> sets the name of the build dir, default is "build"
 # --cmake-generator <generator> sets CMAKE_GENERATOR as used by cmake
 # --target-macos-version <version> sets the min os version - only used for macOS builds
-# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_NO_CLIENT MAKE_TEST USE_CCACHE CCACHE_SIZE CCACHE_EVICTION_AGE BUILD_DIR CMAKE_GENERATOR TARGET_MACOS_VERSION
-# (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir>)
+# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_NO_CLIENT MAKE_TEST USE_CCACHE CCACHE_SIZE CCACHE_EVICTION_AGE BUILD_DIR CMAKE_GENERATOR TARGET_MACOS_VERSION MAKE_SANITIZE MAKE_COVERAGE
+# (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --sanitize --coverage --ccache <ccache_size> --dir <dir>)
 # exitcode: 1 for failure, 3 for invalid arguments
 
 # Read arguments
@@ -60,6 +62,10 @@ while [[ $# != 0 ]]; do
       ;;
     '--sanitize')
       MAKE_SANITIZE=1
+      shift
+      ;;
+    '--coverage')
+      MAKE_COVERAGE=1
       shift
       ;;
     '--debug')
@@ -136,6 +142,15 @@ if [[ ! $BUILD_DIR ]]; then
   BUILD_DIR="build"
 fi
 mkdir -p "$BUILD_DIR"
+
+if [[ $MAKE_COVERAGE ]]; then
+  # Resolved while the working directory is still the source root. $0 is relative to the
+  # directory the script was invoked from, so after the cd below it no longer resolves, and
+  # under `set -e` the failed subshell would abort the build rather than just yielding an empty
+  # variable. Only the coverage report needs this, so only coverage pays for it.
+  SRC_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+fi
+
 cd "$BUILD_DIR"
 
 # Set minimum CMake Version
@@ -154,6 +169,9 @@ if [[ $MAKE_TEST ]]; then
 fi
 if [[ $MAKE_SANITIZE ]]; then
   flags+=("-DENABLE_SANITIZERS=ON")
+fi
+if [[ $MAKE_COVERAGE ]]; then
+  flags+=("-DENABLE_COVERAGE=ON")
 fi
 if [[ $USE_CCACHE ]]; then
   flags+=("-DUSE_CCACHE=1")
@@ -331,6 +349,31 @@ if [[ $MAKE_TEST ]]; then
   # run concurrently: the only one that claims a fixed resource is single_instance_manager_test,
   # which already scopes its local socket name to its own pid so parallel copies cannot collide.
   ctest -C "$BUILDTYPE" --output-on-failure -j "${CTEST_JOBS:-4}"
+  echo "::endgroup::"
+fi
+
+if [[ $MAKE_COVERAGE ]]; then
+  # gcovr is not a build dependency and is not available everywhere, so a missing one is reported
+  # and skipped rather than failing an otherwise green build.
+  echo "::group::Coverage report"
+  GCOVR="$(command -v gcovr || true)"
+  if [[ -z $GCOVR ]]; then
+    echo "gcovr not found; install it to produce a coverage report"
+  else
+    "$GCOVR" --version
+    # This script configures with `cmake ..`, so the build dir it was started from is the object
+    # directory and the source root is one level up. Both are passed explicitly: gcovr otherwise
+    # walks the current directory and trips over in-tree build directories left by other tooling,
+    # whose stale .gcno files cannot be resolved. --config is named too, so the filters apply no
+    # matter what directory gcovr happens to start from.
+    GCOVR_ARGS=("." --root "$SRC_ROOT" --object-directory "." --config "$SRC_ROOT/gcovr.cfg")
+    "$GCOVR" "${GCOVR_ARGS[@]}" --txt --decisions
+    "$GCOVR" "${GCOVR_ARGS[@]}" --html-details coverage-details.html --html-title "Cockatrice line coverage"
+    "$GCOVR" "${GCOVR_ARGS[@]}" --lcov -o coverage.lcov
+    "$GCOVR" "${GCOVR_ARGS[@]}" --cobertura-pretty -o coverage.xml
+    "$GCOVR" "${GCOVR_ARGS[@]}" --json-summary-pretty -o coverage-summary.json
+    echo "Coverage artifacts written to coverage-details.html, coverage.lcov, coverage.xml and coverage-summary.json"
+  fi
   echo "::endgroup::"
 fi
 

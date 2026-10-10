@@ -13,10 +13,16 @@
 # --set-cache <location> sets the location to cache the image or for ccache
 #
 # requires: docker
-# uses env: NAME CACHE BUILD GET SAVE INTERACTIVE
+# uses env: NAME IMAGE_SUFFIX CACHE BUILD GET SAVE INTERACTIVE
 # (correspond to args: <name> --set-cache <cache> --build --get --save --interactive)
 # sets env: RUN CCACHE_DIR IMAGE_NAME RUN_ARGS RUN_OPTS BUILD_SCRIPT
 # exitcode: 1 for failure, 2 for missing dockerfile, 3 for invalid arguments
+#
+# IMAGE_SUFFIX is optional and only appended to the image name, never to NAME, so that a matrix
+# leg can have its own image and image cache without needing its own directory under .ci. Two legs
+# building and tagging the same image concurrently would race on `docker build --tag`.
+# It is deliberately not called SUFFIX: compile.sh already uses SUFFIX for output file names, and
+# a job-level SUFFIX would be silently overridden by those per-step env blocks.
 #
 # exported RUN function will run the BUILD_SCRIPT inside of the docker container.
 # note that the docker container will not inherit any environment variables!
@@ -81,7 +87,7 @@ if ! [[ $NAME ]]; then
   return 3
 fi
 
-export IMAGE_NAME="${project_name,,}_${NAME,,}" # lower case
+export IMAGE_NAME="${project_name,,}_${NAME,,}${IMAGE_SUFFIX:+_${IMAGE_SUFFIX,,}}" # lower case
 
 docker_dir=".ci/$NAME"
 if ! [[ -r $docker_dir/Dockerfile ]]; then

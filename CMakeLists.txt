@@ -24,6 +24,8 @@ option(WITH_SERVER "Build Cockatrice server (Servatrice)" OFF)
 option(TEST "Build tests" OFF)
 # Build with AddressSanitizer and UndefinedBehaviorSanitizer
 option(ENABLE_SANITIZERS "Build with AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
+# Build instrumented for GCC line coverage, reported with gcovr
+option(ENABLE_COVERAGE "Build instrumented for GCC line coverage" OFF)
 # Use vcpkg regardless of OS
 option(USE_VCPKG "Use vcpkg regardless of OS" OFF)
 
@@ -213,9 +215,11 @@ else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe")
 endif()
 
-# Always included, because it defines cockatrice_disable_sanitizers_for() for the vendored
-# trees. It only touches the global flags when ENABLE_SANITIZERS is on.
+# Always included, because they define cockatrice_disable_sanitizers_for() and
+# cockatrice_disable_coverage_for() for the vendored trees. They only touch the global flags
+# when ENABLE_SANITIZERS or ENABLE_COVERAGE is on.
 include(Sanitizers)
+include(Coverage)
 
 # GNU systems need to define the Mersenne exponent for the RNG to compile w/o warning
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
