@@ -1,13 +1,16 @@
 ## Building Doxygen Documentation
 
 We use [Doxygen](https://www.doxygen.nl) for our code documentation.  
-After installing the tool, you can build a HTML webpage into `/docs` folder according to our [configuration](https://github.com/Cockatrice/Cockatrice/blob/master/Doxyfile):
+After installing the tool, you can build a HTML webpage into the `/docs` folder according to our [configuration](https://github.com/Cockatrice/Cockatrice/blob/master/Doxyfile):
 ```bash
 doxygen Doxyfile
 ```
-Open the `index.html` file in the `/docs/html/` folder to view and use it.  
+Open the `index.html` file in the `/docs/html/` folder to browse the result locally.  
 There is also an online version we host at the Cockatrice webpage: [cockatrice.github.io/docs](https://cockatrice.github.io/docs)
 
+Doxygen's own documenation can be found at [www.doxygen.nl/manual](https://www.doxygen.nl/manual).
+
+<br>
 
 ## Doxygen Documentation Theme
 
