@@ -1066,25 +1066,11 @@ INPUT_FILE_ENCODING    =
 # provided as Doxygen C comment), *.py, *.pyw, *.f90, *.f95, *.f03, *.f08,
 # *.f18, *.f, *.for, *.vhd, *.vhdl, *.ucf, *.qsf and *.ice.
 
-FILE_PATTERNS          = *.cc \
-                         *.cxx \
-                         *.cxxm \
-                         *.cpp \
+FILE_PATTERNS          = *.cpp \
                          *.cppm \
-                         *.ccm \
-                         *.c++ \
-                         *.c++m \
-                         *.ii \
-                         *.ixx \
                          *.ipp \
-                         *.i++ \
                          *.inl \
                          *.h \
-                         *.hh \
-                         *.hxx \
-                         *.hpp \
-                         *.h++ \
-                         *.markdown \
                          *.md \
                          *.dox \
                          *.proto
