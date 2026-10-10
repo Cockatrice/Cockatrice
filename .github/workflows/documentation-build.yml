@@ -28,12 +28,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: "Checkout code"
+      - name: "Checkout"
         uses: actions/checkout@v7
         with:
           submodules: recursive
 
       - name: "Install Graphviz"
+        shell: bash
         run: |
           sudo apt-get install -y graphviz
           dot -V
@@ -44,6 +45,7 @@ jobs:
           version: "1.18.0"
 
       - name: "Update Doxygen Configuration"
+        shell: bash
         run: |
           git diff Doxyfile
           doxygen -u Doxyfile
@@ -58,9 +60,10 @@ jobs:
 
       - name: "Generate Documentation"
         if: always()
+        shell: bash
         run: doxygen Doxyfile
 
-      - name: "Deploy to cockatrice.github.io"
+      - name: "Deploy to cockatrice.github.io/docs"
         if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
         uses: peaceiris/actions-gh-pages@v4
         with:
@@ -69,3 +72,8 @@ jobs:
           external_repository: Cockatrice/cockatrice.github.io
           publish_branch: master
           publish_dir: ./docs/html
+
+      - name: Link to Documentation Page
+        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: echo "::notice title=New documentation published::Shortly available at https://cockatrice.github.io/docs/"
