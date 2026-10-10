@@ -276,6 +276,15 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  hypergeometric_probability_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/hypergeometric_probability.cpp
+  hypergeometric_probability_test.cpp
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/deck_analytics/analyzer_modules/draw_probability
+)
+cockatrice_add_test(
+  NAME
   lag_monitor_test
   SOURCES
   ${CMAKE_SOURCE_DIR}/cockatrice/src/client/lag_monitor.cpp

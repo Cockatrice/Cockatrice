@@ -3,6 +3,7 @@
 
 #include "../../abstract_analytics_panel_widget.h"
 #include "draw_probability_config.h"
+#include "hypergeometric_probability.h"
 
 #include <qtmetamacros.h>
 
@@ -51,7 +52,6 @@ private:
 
     QTableWidget *resultTable;
 
-    double hypergeometricProbability(int N, int K, int n, int k);
     double calculateProbability(int totalCards, int copies, int drawn, bool atLeast);
 };
 

@@ -6,6 +6,7 @@
 #include "../../deck_list_statistics_analyzer.h"
 #include "deck_list_model.h"
 #include "draw_probability_config_dialog.h"
+#include "hypergeometric_probability.h"
 #include "libcockatrice/card/database/card_database_querier.h"
 #include "libcockatrice/deck_list/tree/deck_list_card_node.h"
 
@@ -232,24 +233,4 @@ void DrawProbabilityWidget::updateFilterOptions()
         resultTable->setItem(row, 1, new QTableWidgetItem(QString::number(copies)));
         resultTable->setItem(row, 2, new QTableWidgetItem(QString::number(probability * 100.0, 'f', 2)));
     }
-}
-
-double DrawProbabilityWidget::hypergeometricProbability(int N, int K, int n, int k)
-{
-    if (k < 0 || k > n || K > N || n > N) {
-        return 0.0;
-    }
-
-    double logP = 0.0;
-    for (int i = 1; i <= k; ++i) {
-        logP += qLn(double(K - k + i) / i);
-    }
-    for (int i = 1; i <= n - k; ++i) {
-        logP += qLn(double(N - K - (n - k) + i) / i);
-    }
-    for (int i = 1; i <= n; ++i) {
-        logP -= qLn(double(N - n + i) / i);
-    }
-
-    return qExp(logP);
 }
