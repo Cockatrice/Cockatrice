@@ -19,3 +19,5 @@ target_link_libraries(
   PUBLIC ${COCKATRICE_QT_VERSION_NAME}::Network ${COCKATRICE_QT_VERSION_NAME}::WebSockets libcockatrice_protocol
          libcockatrice_network_server_remote
 )
+
+target_precompile_headers(libcockatrice_network_client_abstract PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtcore_pch.h")
