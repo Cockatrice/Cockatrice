@@ -4,6 +4,7 @@
 #include "settings_manager.h"
 
 #include <QString>
+#include <QStringList>
 #include <libcockatrice/interfaces/interface_paths_settings_provider.h>
 #include <qtmetamacros.h>
 
@@ -27,6 +28,24 @@ public:
     [[nodiscard]] QString getSpoilerCardDatabasePath() const override;
     [[nodiscard]] QString getRedirectCachePath() const override;
 
+    /**
+     * @brief Returns the configured paths that resolve inside baseDir.
+     *
+     * Comparison is lexical (QDir::cleanPath); symlinks are not resolved, so a
+     * path that only reaches baseDir through a symlink is not reported.
+     */
+    [[nodiscard]] QStringList pathsInsideDir(const QString &baseDir) const;
+
+    /**
+     * @brief Whether path resolves inside baseDir, as a single-path check.
+     *
+     * A path counts as inside when it equals baseDir or is nested below it;
+     * a sibling sharing the name prefix (baseDir + "2") does not.
+     */
+    [[nodiscard]] static bool isInsideDir(const QString &path, const QString &baseDir);
+
+    [[nodiscard]] bool getAppDirWarningAcknowledged() const;
+
     void setDeckPath(const QString &_deckPath);
     void setFiltersPath(const QString &_filtersPath);
     void setReplaysPath(const QString &_replaysPath);
@@ -37,14 +56,17 @@ public:
     void setCustomCardDatabasePath(const QString &_customCardDatabasePath);
     void setTokenDatabasePath(const QString &_tokenDatabasePath);
     void setSpoilerDatabasePath(const QString &_spoilerDatabasePath);
+    void setAppDirWarningAcknowledged(bool _appDirWarningAcknowledged);
 
 signals:
     void cardDatabasePathChanged();
     void picsPathChanged();
     void themeChanged();
 
-private:
+public:
     explicit PathsSettings(const QString &settingPath, QObject *parent = nullptr);
+
+private:
     PathsSettings(const PathsSettings & /*other*/);
 };
 
