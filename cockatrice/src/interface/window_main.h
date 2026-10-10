@@ -156,6 +156,14 @@ private:
     void createCardUpdateProcess(bool background = false);
     void exitCardDatabaseUpdate();
     /**
+     * @brief Reloads the card database on a worker thread and runs checkUnknownSets() once the finished
+     *        snapshot has been swapped in.
+     *
+     * The loader never runs checkUnknownSets() itself (see main.cpp); post-update loads that can introduce
+     * new sets must own the check, and it has to run after the queued snapshot swap, not on the worker.
+     */
+    void reloadCardDatabaseAndCheckSets();
+    /**
      * @brief Tries to bring the open card database updater window to the front.
      * @return true when the updater acknowledged the request
      */

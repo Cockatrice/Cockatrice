@@ -10,6 +10,7 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QFutureWatcher>
 #include <QIODevice>
 #include <QList>
 #include <QLocale>
@@ -177,7 +178,15 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
 
     // Data written, so reload the card database
     qCInfo(SpoilerBackgroundUpdaterLog) << "Spoiler Service Data Written";
-    const auto reloadOk = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
+    // Spoilers can introduce sets the config has never seen; the loader never
+    // runs checkUnknownSets() itself, so run it once the finished snapshot has
+    // been swapped in.
+    auto *watcher = new QFutureWatcher<void>(this);
+    connect(watcher, &QFutureWatcher<void>::finished, this, [watcher] {
+        watcher->deleteLater();
+        CardDatabaseManager::getInstance()->checkUnknownSets();
+    });
+    watcher->setFuture(QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); }));
 
     // If the user has notifications enabled, let them know
     // when the database was last updated
