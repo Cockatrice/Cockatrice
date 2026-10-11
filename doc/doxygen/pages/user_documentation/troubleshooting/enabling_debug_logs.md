@@ -116,7 +116,7 @@ suffix, e.g. `card_picture_loader.*`, to include all sub categories).
 | User interface and themes                                                 | `theme_manager`, `sound_engine`, `flow_layout`, `flow_widget.*`, `pixel_map_generator`, `card_info_picture_widget` |
 | Networking and servers                                                    | `local_client`, `remote_client`, `tapped_out_interface`, `servers_settings`                                        |
 | In-game logic                                                             | `player`, `game_scene.*`, `card_zone.*`, `view_zone`, `game_event_handler`                                         |
-| Dialogs and tabs                                                          | `dlg_settings`, `dlg_update`, `dlg_tip_of_the_day`, `tab_game`, `tab_message`, `tab_supervisor`                    |
+| Dialogs and tabs                                                          | `tab_settings`, `dlg_update`, `dlg_tip_of_the_day`, `tab_game`, `tab_message`, `tab_supervisor`                    |
 | Settings and shortcuts                                                    | `settings_cache`, `shortcuts_settings`                                                                             |
 | Deck and card filtering                                                   | `filter_string`, `deck_filter_string`, `syntax_help`                                                               |
 
