@@ -1,11 +1,15 @@
 name: Import vcpkg cache
 
-# A pull request run can only write caches into its own refs/pull/<n>/merge scope, which
-# nothing else is allowed to restore. So after a runner image update changes every port's
-# ABI hash, the first pull request rebuilds protobuf, openssl and abseil from source and
-# the next one does the same, until somebody merges and a master run finally repopulates
-# the shared cache. This workflow takes the archives such a run produced and saves them
-# in the default branch scope instead, where every later run can restore them.
+# After a runner image update changes every port's ABI hash, the first master run
+# rebuilds protobuf, openssl and abseil from source and saves them into the shared
+# cache, where every later run can restore them.
+#
+# Only master pushes are imported here: the collect step, keys.txt and the zip
+# contents all come from the workflow run being imported, so importing from an
+# unmerged pull request would let anyone who can push a branch — or a bot actor
+# such as Dependabot, whose PRs are same-repo — promote arbitrary binaries into
+# the scope that master and tag builds restore and link into signed releases.
+# Forks build untrusted code and must never reach that scope either.
 #
 # repository_dispatch is not used on purpose: it would also resolve to the default branch,
 # but it counts as a low-trust trigger and may only write there when it declares a
@@ -28,12 +32,17 @@ concurrency:
 jobs:
   list:
     name: List new vcpkg entries
-    # Only a successful same-repository pull request has archives worth importing. Forks
-    # build untrusted code and must never reach a cache that master runs restore and link.
+    # Only a successful push to the default branch has archives worth importing.
+    # Only code that landed on master may populate the scope master runs restore.
+    # Bot actors are excluded on top: their runs must never promote binaries into
+    # the shared scope even if they somehow target the default branch.
     if: >-
       github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'pull_request' &&
-      github.event.workflow_run.head_repository.full_name == github.repository
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'master' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      !endsWith(github.event.workflow_run.actor.login, '[bot]') &&
+      !endsWith(github.event.workflow_run.triggering_actor.login, '[bot]')
     runs-on: ubuntu-slim    # https://github.com/actions/runner-images/blob/main/images/ubuntu-slim/ubuntu-slim-Readme.md
     # workflow_run is a low-trust trigger, so cache access is read-only by default even
     # though this run resolves to the default branch. Assert below that this took effect,

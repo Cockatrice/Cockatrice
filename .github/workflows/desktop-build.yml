@@ -532,15 +532,16 @@ jobs:
           PACKAGE_SUFFIX: '${{ matrix.package_suffix }}'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
           USE_CCACHE: ${{ matrix.use_ccache }}
-          # vcpkg has to be allowed to write into the cache directory even on a pull
-          # request, because that is where "Collect new vcpkg entries" looks for the
-          # archives this run had to compile itself. With the source left at read those
-          # archives are never written, the collect step finds nothing, and vcpkg-cache-import.yml
-          # gets no artifact to heal the shared cache with. The importer is what publishes
-          # to master's scope; a pull request's own merge ref stays unreadable by every
-          # later run, so the action's own save there costs quota but nothing else.
-          # Forks keep the read-only mode, they are the case that must not be trusted.
-          VCPKG_BINARY_SOURCES: "clear;files,${{ steps.vcpkg-cache.outputs.path }},${{ case(github.ref == 'refs/heads/master' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository), 'readwrite', 'read') }}"
+          # Only pushes to the default branch may write the shared binary cache: the
+          # archives a run compiles are only as trustworthy as the code they were
+          # built from, and only merged code may populate the scope that master and
+          # release builds restore and link. Pull requests (same-repository ones
+          # included) restore the shared cache but never write it; with the source
+          # left at read the collect step below finds nothing on PRs, so no
+          # pull-request-scoped entry is ever saved that no later run could restore.
+          # Forks pushing to their own default branch resolve github.ref against
+          # their own repository, so they keep a working cache of their own there.
+          VCPKG_BINARY_SOURCES: "clear;files,${{ steps.vcpkg-cache.outputs.path }},${{ case(github.ref == 'refs/heads/master', 'readwrite', 'read') }}"
           VCPKG_DISABLE_METRICS: 1
           VCPKG_FEATURE_FLAGS: dependencygraph
           VCPKG_TARGET_MACOS_VERSION: ${{ matrix.vcpkg_deployment_target }}
@@ -557,19 +558,18 @@ jobs:
         shell: bash
         run: find . -name NSISOutput.log -exec cat {} +
 
-      # A pull request cannot write the shared cache itself: its cache entries are scoped
-      # to refs/pull/<n>/merge and stay unreadable for every other run, so writing them
-      # from a pull request only burns the repository's quota. So hand over only the
-      # archives this leg had to build itself and let vcpkg-cache-import.yml, which runs
-      # in the default branch scope, save them where later runs can restore them.
-      # Forks are skipped, they are the one case where the archives must not be trusted.
+      # A master run hands over the archives it had to build itself so that
+      # vcpkg-cache-import.yml, which runs in the default branch scope, can save them
+      # where later runs can restore them. Pull requests hand over nothing: their cache
+      # entries would be scoped to refs/pull/<n>/merge and stay unreadable for every
+      # other run, so writing them only burns the repository's quota.
       # vcpkg_upload keeps this to one leg per scope: macOS 14, 15 and 26 share a scope
       # by design, and all three rebuild the same archives, so uploading from each of them
       # would publish three identical 269 MB artifacts under one artifact name and make
       # the importer spawn a save job per copy.
       - name: "Collect new vcpkg entries"
         id: vcpkg_new
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && matrix.vcpkg_upload == 1
+        if: github.ref == 'refs/heads/master' && matrix.vcpkg_upload == 1
         shell: bash
         env:
           CACHE_DIR: '${{ steps.vcpkg-cache.outputs.path }}'
