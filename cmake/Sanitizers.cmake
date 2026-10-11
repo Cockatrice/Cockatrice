@@ -48,6 +48,12 @@ if(ENABLE_SANITIZERS)
   set(SANITIZER_FLAGS
       -fsanitize=address,undefined
       -fno-omit-frame-pointer
+      # UBSan defaults to recover mode: it prints "runtime error: ..." but the
+      # process exits 0, so gtest/ctest report a pass and CI stays green.
+      # -fno-sanitize-recover makes the first finding abort instead. This is
+      # probed like the other cosmetic flags, but CI also sets
+      # UBSAN_OPTIONS=halt_on_error=1 as the runtime-side guarantee.
+      -fno-sanitize-recover=undefined
       # Qt builds QObject subclasses into raw storage and writes the vptr afterwards, which
       # the vptr check reports on essentially every QObject instantiation. The check has no
       # value for us because nothing outside moc-generated code inherits QObject, so it is
@@ -90,5 +96,14 @@ if(ENABLE_SANITIZERS)
   set(COCKATRICE_SANITIZERS
       ON
       CACHE INTERNAL "AddressSanitizer and UBSan are enabled"
+  )
+else()
+  # ENABLE_SANITIZERS is OFF, but COCKATRICE_SANITIZERS is CACHE INTERNAL, so a
+  # reused build dir (e.g. CI's release-package step reconfiguring the same dir
+  # after the sanitized debug step) would otherwise keep skipping NO_SANITIZE
+  # tests and keep the 300s discovery timeout. Reset it explicitly.
+  set(COCKATRICE_SANITIZERS
+      OFF
+      CACHE INTERNAL "AddressSanitizer and UBSan are enabled" FORCE
   )
 endif()
