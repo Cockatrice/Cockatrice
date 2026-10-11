@@ -1,8 +1,29 @@
 <!-- this template comes from .ci/release_template.md -->
 
-<!-- Don't forget to delete the previous betas after publishing this!
-git push -d origin --REPLACE-WITH-BETA-LIST--
- -->
+
+>[!CAUTION]
+> **Release Check List**
+>
+>**While DRAFTING** a new stable release:
+> - [ ] Pull in newest translations data from transifex: [Trigger workflow manually](https://github.com/Cockatrice/Cockatrice/actions/workflows/translations-pull.yml) & merge PR's
+> - [ ] [Create a Draft Release in GitHub UI](https://github.com/Cockatrice/Cockatrice/releases/new)
+>   - [ ] Add `title` in the form `Cockatrice X.Y.Z: <RELEASE_NAME>`
+>   - [ ] Create a new `tag` targeting master branch in the form `YYYY-MM-DD-Release-X.Y.Z` (Also see [CONTRIBUTING](https://github.com/Cockatrice/Cockatrice/blob/master/.github/CONTRIBUTING.md#release-management) file)
+> - [ ] Review & update automatically generated Release Notes
+>   - [ ] Review [current build pipeline](https://github.com/Cockatrice/Cockatrice/blob/master/.github/workflows/desktop-build.yml) and update list of release binaries
+>   - [ ] Add note for relevant deprecations of supported operating systems or achitectures
+>   - [ ] Note Highlights / New Features / Important Fixes
+> <br>
+>
+>**After PUBLISHING** the release:
+> - [ ] Delete previous betas (double check this command carefully before executing the remote deletion)
+>    ```
+>    gh release delete --no-delete-tag --REPLACE-WITH-BETA-LIST--
+>    ```
+> - [ ] Bump version in main [CMakeLists](https://github.com/Cockatrice/Cockatrice/blob/master/CMakeLists.txt) to next patch release, e.g. `project("Cockatrice" VERSION 3.0.1)`
+> - [ ] Remove this reminder check list
+<br>
+
 
 <!-- This list of binaries should be updated every time the CI is changed to include all targets -->
 <pre>
