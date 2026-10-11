@@ -30,7 +30,7 @@ public:
     void removePlayer(int playerId);
     // Marks an already-starting/started tournament player as dropped: they stop
     // being paired and their outstanding unstarted match is awarded as a loss.
-    void dropPlayer(int playerId);
+    void dropPlayer(int playerId, GameEventStorage &ges);
     void startTournament();
     void advanceRound(GameEventStorage &ges);
     void recordMatchResult(int playerId1, int playerId2, int winnerId, GameEventStorage &ges);
