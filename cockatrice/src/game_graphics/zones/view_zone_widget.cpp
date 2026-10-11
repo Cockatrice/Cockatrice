@@ -1,7 +1,6 @@
 #include "view_zone_widget.h"
 
 #include "../../client/settings/cache_settings.h"
-#include "../../client/translation.h"
 #include "../../filters/syntax_help.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../card_dimensions.h"
@@ -42,6 +41,7 @@
 #include <libcockatrice/game/board/card_list.h>
 #include <libcockatrice/game/player/player_actions.h>
 #include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/translation.h>
 #include <libcockatrice/game/zones/card_zone_logic.h>
 #include <libcockatrice/game/zones/view_zone_logic.h>
 #include <libcockatrice/settings/cards_display_settings.h>
@@ -176,9 +176,10 @@ ZoneViewWidget::ZoneViewWidget(PlayerLogic *_player,
 
     vbox->addItem(zoneHBox);
 
-    zone = new ZoneViewZone(new ZoneViewZoneLogic(player, _origZone, numberCards, _revealZone, _writeableRevealZone,
-                                                  _isReversed, zoneContainer),
-                            zoneContainer);
+    zone =
+        new ZoneViewZone(new ZoneViewZoneLogic(player, _origZone, numberCards, _revealZone, _writeableRevealZone,
+                                               _isReversed, &SettingsCache::instance().userInterface(), zoneContainer),
+                         zoneContainer);
     connect(zone, &ZoneViewZone::wheelEventReceived, scrollBarProxy, &ScrollableGraphicsProxyWidget::recieveWheelEvent);
 
     retranslateUi();

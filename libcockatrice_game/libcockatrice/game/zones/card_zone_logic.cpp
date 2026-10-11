@@ -1,12 +1,11 @@
 #include "card_zone_logic.h"
 
-#include "../../client/translation.h"
-#include "../../game_graphics/zones/card_zone.h"
 #include "../board/card_list.h"
 #include "../board/card_state.h"
 #include "../player/player_actions.h"
 #include "../player/player_info.h"
 #include "../player/player_logic.h"
+#include "../translation.h"
 #include "libcockatrice/card/database/card_database.h"
 #include "view_zone_logic.h"
 

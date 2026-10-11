@@ -3,7 +3,6 @@
 #include "../../client/settings/cache_settings.h"
 #include "../../client/settings/card_counter_settings.h"
 #include "../../client/sound_engine.h"
-#include "../../client/translation.h"
 #include "../../interface/card_localization.h"
 #include "../../interface/widgets/server/chat_view/chat_view.h"
 #include "../board/card_item.h"
@@ -23,6 +22,7 @@
 #include <libcockatrice/game/player/player_info.h>
 #include <libcockatrice/game/player/player_logic.h>
 #include <libcockatrice/game/player/player_manager.h>
+#include <libcockatrice/game/translation.h>
 #include <libcockatrice/game/zones/card_zone_logic.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/protocol/pb/context_mulligan.pb.h>

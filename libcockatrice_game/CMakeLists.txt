@@ -63,19 +63,14 @@ add_library(
   libcockatrice/game/zones/view_zone_logic.cpp
 )
 
-target_include_directories(
-  libcockatrice_game
-  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-  # SettingsCache, the client-side settings facade the game logic still reads, lives in the
-  # application sources rather than in libcockatrice_settings.
-  PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src
-)
+target_include_directories(libcockatrice_game PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(
   libcockatrice_game
   PUBLIC libcockatrice_card
          libcockatrice_deck_list
          libcockatrice_filters
+         libcockatrice_interfaces
          libcockatrice_network
          libcockatrice_protocol
          libcockatrice_settings
@@ -83,5 +78,4 @@ target_link_libraries(
          ${QT_CORE_MODULE}
          ${COCKATRICE_QT_VERSION_NAME}::Concurrent
          ${COCKATRICE_QT_VERSION_NAME}::Gui
-         ${COCKATRICE_QT_VERSION_NAME}::Widgets
 )

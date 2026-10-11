@@ -14,13 +14,19 @@
 
 class GameReplay;
 class QObject;
+class ICardPreferenceProvider;
+class IInterfaceSettingsProvider;
 
 class Replay : public AbstractGame
 {
     Q_OBJECT
 
 public:
-    explicit Replay(QObject *_parent, const GameReplay *_replay, bool isLocalGame);
+    explicit Replay(QObject *_parent,
+                    const GameReplay *_replay,
+                    bool isLocalGame,
+                    IInterfaceSettingsProvider *interfaceSettings = nullptr,
+                    ICardPreferenceProvider *cardPreferences = nullptr);
 };
 
 #endif // COCKATRICE_REPLAY_H

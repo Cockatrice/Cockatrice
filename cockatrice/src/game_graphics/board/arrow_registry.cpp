@@ -1,9 +1,9 @@
 #include "arrow_registry.h"
 
-#include "../../game/board/arrow_data.h"
 #include "arrow_item.h"
 
 #include <QSharedPointer>
+#include <libcockatrice/game/board/arrow_data.h>
 
 void ArrowRegistry::insert(QSharedPointer<ArrowData> data, ArrowItem *arrow)
 {
