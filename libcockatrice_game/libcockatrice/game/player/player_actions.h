@@ -39,8 +39,12 @@ class Message;
 class CardState;
 class CardZoneLogic;
 class Command_MoveCard;
+class GameEventContext;
+class ICardPreferenceProvider;
+class IInterfaceSettingsProvider;
 class PendingCommand;
 class PlayerLogic;
+class QAction;
 struct ArrowData;
 class PlayerActions : public QObject
 {
@@ -52,7 +56,9 @@ public:
         RANDOM_CARD_FROM_ZONE = -2
     };
 
-    explicit PlayerActions(PlayerLogic *player);
+    explicit PlayerActions(PlayerLogic *player,
+                           IInterfaceSettingsProvider *interfaceSettings = nullptr,
+                           ICardPreferenceProvider *cardPreferences = nullptr);
 
     void sendGameCommand(PendingCommand *pend);
     void sendGameCommand(const google::protobuf::Message &command);
@@ -143,6 +149,12 @@ signals:
     void requestSortHand(const QList<CardList::SortOption> &options);
     void requestEnableAndSetCreateAnotherTokenAction(const QString &lastTokenName);
     void requestSetLastToken(CardInfoPtr lastToken);
+    /**
+     * @brief The player chose a mulligan size to remember as the starting hand size.
+     *
+     * Game logic must not write client settings itself, so persistence is left to the application.
+     */
+    void startingHandSizeChosen(int number);
 
 public slots:
     void setLastToken(CardInfoPtr cardInfo);
@@ -275,6 +287,10 @@ public slots:
 
 private:
     PlayerLogic *player;
+    // Borrowed settings providers (owned by the application). Null outside the client, in which case the compiled-in
+    // defaults below apply.
+    IInterfaceSettingsProvider *interfaceSettings;
+    ICardPreferenceProvider *cardPreferences;
 
     int defaultNumberTopCards = 1;
     int defaultNumberTopCardsToPlaceBelow = 1;
@@ -291,6 +307,11 @@ private:
     MoveTopCardsUntilOptions movingCardsUntilOptions;
 
     bool lastRelatedCreationSucceeded = false;
+
+    [[nodiscard]] bool getPlayToStack() const;
+    [[nodiscard]] int getStartingHandSize() const;
+    [[nodiscard]] bool getAnnotateTokens() const;
+    [[nodiscard]] QString getCardPreferenceOverride(const QString &cardName) const;
 
     void createCard(const CardState *sourceCard,
                     const QString &dbCardName,

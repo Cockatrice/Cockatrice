@@ -34,10 +34,17 @@
 #include <qalgorithms.h>
 #include <string>
 
-PlayerLogic::PlayerLogic(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent)
+PlayerLogic::PlayerLogic(const ServerInfo_User &info,
+                         int _id,
+                         bool _local,
+                         bool _judge,
+                         AbstractGame *_parent,
+                         IInterfaceSettingsProvider *interfaceSettings,
+                         ICardPreferenceProvider *cardPreferences)
     : QObject(_parent), game(_parent), playerInfo(new PlayerInfo(info, _id, _local, _judge)),
-      playerEventHandler(new PlayerEventHandler(this)), playerActions(new PlayerActions(this)), active(false),
-      conceded(false), zoneId(0), dialogSemaphore(false)
+      playerEventHandler(new PlayerEventHandler(this)),
+      playerActions(new PlayerActions(this, interfaceSettings, cardPreferences)), active(false), conceded(false),
+      zoneId(0), dialogSemaphore(false)
 {
     initializeZones();
 }

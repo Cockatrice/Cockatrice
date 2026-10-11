@@ -2,9 +2,6 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../../client/settings/shortcuts_settings.h"
-#include "../../game/abstract_game.h"
-#include "../../game/game_event_handler.h"
-#include "../../game/game_state.h"
 #include "../../interface/card_picture_loader/card_picture_loader.h"
 #include "../../interface/deck_loader/deck_loader.h"
 #include "../../interface/widgets/dialogs/dlg_load_deck.h"
@@ -34,6 +31,9 @@
 #include <libcockatrice/deck_list/deck_file_format.h>
 #include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/deck_list/playmat_resolver.h>
+#include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/game_event_handler.h>
+#include <libcockatrice/game/game_state.h>
 #include <libcockatrice/protocol/pb/response_deck_download.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/interface_settings.h>

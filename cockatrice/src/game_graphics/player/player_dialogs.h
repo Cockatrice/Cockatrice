@@ -17,6 +17,7 @@
 
 class CardItem;
 class CardRelation;
+class CardState;
 class PlayerActions;
 class QWidget;
 struct MoveTopCardsUntilOptions;
@@ -58,6 +59,7 @@ public slots:
     void onSetPTDialogRequested(const QString &oldPT);
     void onSetAnnotationDialogRequested(const QString &oldAnnotation);
     void onSetCardCounterDialogRequested(int counterId, const QString &oldValueForDlg);
+    void onStartingHandSizeChosen(int number);
 
 private:
     PlayerGraphicsItem *player;
