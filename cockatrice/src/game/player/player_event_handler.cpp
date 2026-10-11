@@ -362,7 +362,13 @@ void PlayerEventHandler::eventMoveCard(const Event_MoveCard &event, const GameEv
 
     if (card->getAttachedTo() && (startZone != targetZone)) {
         CardState *parentCard = card->getAttachedTo();
-        card->setAttachedTo(nullptr);
+        // Route through CardItem so the old parent's attachedCards list is cleaned up: CardState::setAttachedTo
+        // only repoints the pointer, leaving a dangling entry that reorganizeCards/prepareDelete would dereference.
+        if (CardItem *item = toCardItem(card)) {
+            item->setAttachedTo(nullptr);
+        } else {
+            card->setAttachedTo(nullptr);
+        }
         parentCard->getZone()->reorganizeCards();
     }
 
@@ -467,7 +473,14 @@ void PlayerEventHandler::eventAttachCard(const Event_AttachCard &event)
 
     CardState *oldParent = startCard->getAttachedTo();
 
-    startCard->setAttachedTo(targetCard);
+    // Route through CardItem::setAttachedTo to keep the attachedCards graph, grid-x reset and zone emits intact:
+    // CardState::setAttachedTo alone only repoints the pointer, so the target would never list the card and the old
+    // parent would keep a dangling pointer.
+    if (CardItem *startItem = toCardItem(startCard)) {
+        startItem->setAttachedTo(toCardItem(targetCard));
+    } else {
+        startCard->setAttachedTo(targetCard);
+    }
 
     startZone->reorganizeCards();
     if ((startZone != targetZone) && targetZone) {
