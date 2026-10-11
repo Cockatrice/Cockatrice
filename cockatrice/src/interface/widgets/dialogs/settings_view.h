@@ -89,6 +89,8 @@ private:
     void navigateToSearchResult(const QModelIndex &index);
     void navigateToSection(int pageIndex, QWidget *sectionWidget);
     void setActiveTab(int index);
+    void applySectionFilter(int pageIndex, QWidget *sectionWidget);
+    QTreeWidgetItem *findSectionItem(int pageIndex, QWidget *sectionWidget) const;
     static void flashWidget(QWidget *widget);
     static void scrollToAndFlash(QWidget *target);
     static QStringList translatedPageNames();

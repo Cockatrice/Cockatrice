@@ -49,6 +49,7 @@
 #include <QScrollBar>
 #include <QSequentialAnimationGroup>
 #include <QShortcut>
+#include <QSignalBlocker>
 #include <QSize>
 #include <QSizePolicy>
 #include <QStackedLayout>
@@ -349,6 +350,9 @@ void SettingsView::setActiveTab(int index)
     currentTabIndex = index;
     pagesWidget->setCurrentIndex(index);
 
+    // A page row always shows the full page; sections filter down from here
+    applySectionFilter(index, nullptr);
+
     // Selecting the item also expands a collapsed group; selecting the already
     // current item emits nothing, so the currentItemChanged handler cannot loop.
     if (QTreeWidgetItem *parent = pageItems[index]->parent()) {
@@ -452,8 +456,17 @@ void SettingsView::navigateToSearchResult(const QModelIndex &index)
     switchToTabMode();
     setActiveTab(entry.pageIndex);
 
-    // Scroll to the widget, focus it, and flash to highlight it
+    // Isolate the control's section, then scroll to the widget, focus it, and flash it
     if (entry.widget) {
+        QWidget *section = nullptr;
+        for (const SettingsPageSection &candidate : pages[entry.pageIndex]->getSections()) {
+            if (candidate.sectionWidget == entry.widget ||
+                (candidate.sectionWidget && candidate.sectionWidget->isAncestorOf(entry.widget))) {
+                section = candidate.sectionWidget;
+                break;
+            }
+        }
+        applySectionFilter(entry.pageIndex, section);
         scrollToAndFlash(entry.widget);
         entry.widget->setFocus();
     }
@@ -471,9 +484,75 @@ void SettingsView::navigateToSection(int pageIndex, QWidget *sectionWidget)
         }
         setActiveTab(pageIndex);
     }
+    applySectionFilter(pageIndex, sectionWidget);
 
-    // Focus stays in the navigation tree; only scroll and highlight the section
-    scrollToAndFlash(sectionWidget);
+    // setActiveTab selects the page row, so restore the clicked section row
+    // without re-triggering navigation; unknown widgets show the full page
+    if (QTreeWidgetItem *sectionItem = findSectionItem(pageIndex, sectionWidget)) {
+        const QSignalBlocker blocker(navTree);
+        navTree->setCurrentItem(sectionItem);
+        flashWidget(sectionWidget);
+    }
+}
+
+/**
+ * @brief Finds the nav row for a section widget
+ * @param pageIndex SettingsPage owning the section
+ * @param sectionWidget Section's group box
+ * @return The section's tree item, or nullptr when it has no row
+ */
+QTreeWidgetItem *SettingsView::findSectionItem(int pageIndex, QWidget *sectionWidget) const
+{
+    if (pageIndex < 0 || pageIndex >= pageItems.size() || !pageItems[pageIndex]) {
+        return nullptr;
+    }
+    for (int c = 0; c < pageItems[pageIndex]->childCount(); ++c) {
+        QTreeWidgetItem *child = pageItems[pageIndex]->child(c);
+        if (fromWidgetId(child->data(0, SectionWidgetRole).value<WidgetId>()) == sectionWidget) {
+            return child;
+        }
+    }
+    return nullptr;
+}
+
+/**
+ * @brief Shows only the given section of a page, hiding its siblings
+ *
+ * A null sectionWidget restores the full page. Unknown widgets fall back to
+ * the full page so a stale reference can never leave a blank page.
+ *
+ * @param pageIndex SettingsPage to filter
+ * @param sectionWidget Section's group box, or nullptr to show all sections
+ */
+void SettingsView::applySectionFilter(int pageIndex, QWidget *sectionWidget)
+{
+    if (pageIndex < 0 || pageIndex >= pages.size()) {
+        return;
+    }
+
+    const QList<SettingsPageSection> sections = pages[pageIndex]->getSections();
+
+    bool known = sectionWidget == nullptr;
+    for (const SettingsPageSection &section : sections) {
+        if (section.sectionWidget == sectionWidget) {
+            known = true;
+        }
+    }
+    if (!known) {
+        sectionWidget = nullptr;
+    }
+
+    for (const SettingsPageSection &section : sections) {
+        if (section.sectionWidget) {
+            section.sectionWidget->setVisible(sectionWidget == nullptr || section.sectionWidget == sectionWidget);
+        }
+    }
+
+    if (auto *scrollArea = qobject_cast<QScrollArea *>(pagesWidget->widget(pageIndex))) {
+        if (QScrollBar *scrollBar = scrollArea->verticalScrollBar()) {
+            scrollBar->setValue(0);
+        }
+    }
 }
 
 void SettingsView::scrollToAndFlash(QWidget *target)
