@@ -157,6 +157,7 @@ private slots:
     void statusUpdate();
     void shutdownTimeout();
     void cleanupExpiredDeckShares();
+    void purgeDeckTombstones();
 
 protected:
     void doSendIslMessage(const IslMessage &msg, int _serverId) override;
@@ -293,6 +294,7 @@ public:
     int getDeckShareMaxDecksPerShare() const;
     int getDeckShareMaxSharesPerDay() const;
     int getDeckSyncMaxVersions() const;
+    int getDeckSyncTombstoneDays() const;
     int getMaxUsersPerAddress() const;
     int getMessageCountingInterval() const override;
     int getMaxMessageCountPerInterval() const override;
