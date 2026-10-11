@@ -1,5 +1,8 @@
 #include "interface_settings.h"
 
+#include <QDir>
+#include <QFileInfo>
+
 InterfaceSettings::InterfaceSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "interface.ini", "interface", QString(), parent)
 {
@@ -157,6 +160,14 @@ bool InterfaceSettings::getShowGameSelectorFilterToolbar() const
 
 bool InterfaceSettings::getTutorialCompleted() const
 {
+    // Upgrading users have settings files but no tutorial key yet: treat the tutorial as seen so they are
+    // not overlaid on upgrade. Genuinely new installs have no settings files at all, so they still get it.
+    if (!getSettings().contains("interface/tutorialCompleted")) {
+        QDir settingsDir = QFileInfo(settingPath).dir();
+        if (!settingsDir.entryList({"*.ini"}, QDir::Files).isEmpty()) {
+            return true;
+        }
+    }
     return getValue("tutorialCompleted", QString(), QString(), false).toBool();
 }
 

@@ -507,8 +507,14 @@ TutorialSequence VisualDeckEditorWidget::addTutorialSteps()
     organizationStep.text = "Let's look at how cards are organized and displayed now.\n\nWe'll add some random cards "
                             "from the database to your deck, so you can see it in action properly.";
     organizationStep.onExit = [this]() {
-        while (deckListModel->getDeckList()->getCardList().size() < 60) {
+        // getCardList() counts distinct card nodes, not copies, so once every random pick only bumps an
+        // existing node's count the size never grows. With fewer than ~60 distinct cards in the database
+        // this would loop forever, so bound the attempts to always terminate.
+        static constexpr int MaxFillAttempts = 600;
+        int attempts = 0;
+        while (deckListModel->getDeckList()->getCardList().size() < 60 && attempts < MaxFillAttempts) {
             deckListModel->addCard(CardDatabaseManager::query()->getRandomCard(), DECK_ZONE_MAIN);
+            ++attempts;
         }
     };
 

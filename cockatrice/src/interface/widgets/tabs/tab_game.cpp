@@ -172,6 +172,11 @@ void TabGame::finishTutorialInitialization()
         tutorialInitialized = true;
     }
 
+    // No sequence building (and no widget access) once the tutorial is done.
+    if (SettingsCache::instance().userInterface().getTutorialCompleted()) {
+        return;
+    }
+
     auto deckViewSequence = deckViewContainers.first()->generateTutorialSequence();
 
     tutorialController->addSequence(deckViewSequence);
@@ -328,7 +333,7 @@ void TabGame::finishTutorialInitialization()
 
     tutorialController->addSequence(gamePlaySequence);
 
-    if (tutorialStarted || SettingsCache::instance().userInterface().getTutorialCompleted()) {
+    if (tutorialStarted) {
         return;
     }
     // The tab may have been shown before the local player joined; start now that

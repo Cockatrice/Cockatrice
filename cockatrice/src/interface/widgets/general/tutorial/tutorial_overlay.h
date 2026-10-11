@@ -1,6 +1,7 @@
 #ifndef TUTORIAL_OVERLAY_H
 #define TUTORIAL_OVERLAY_H
 
+#include <QPointer>
 #include <QWidget>
 
 class QFrame;
@@ -49,7 +50,9 @@ private:
     void recomputeLayout();
     QRect computeBubbleRect(const QRect &hole, const QSize &bubbleSize) const;
 
-    QWidget *targetWidget = nullptr;
+    // QPointer: the target can be deleted while the overlay lives on (e.g. toggling
+    // the in-game VDS setting deleteLater()s it), so never hold a raw pointer across steps.
+    QPointer<QWidget> targetWidget;
     QFrame *controlBar = nullptr;
     QLabel *titleLabel = nullptr;
     QPushButton *nextButton = nullptr;
