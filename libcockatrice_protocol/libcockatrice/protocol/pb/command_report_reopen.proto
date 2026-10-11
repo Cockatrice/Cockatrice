@@ -1,0 +1,10 @@
+syntax = "proto2";
+import "moderator_commands.proto";
+
+message Command_ReportReopen {
+    extend ModeratorCommand {
+        optional Command_ReportReopen ext = 1206;
+    }
+    required int32 report_id = 1;
+    optional string reopen_note = 2;
+}

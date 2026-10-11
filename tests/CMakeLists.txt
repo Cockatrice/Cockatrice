@@ -230,6 +230,18 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  server_moderator_role_test
+  NO_SANITIZE
+  SOURCES
+  server_moderator_role_test.cpp
+  LIBS
+  libcockatrice_network
+  libcockatrice_rng
+  LABELS
+  server
+)
+cockatrice_add_test(
+  NAME
   server_game_join_test
   SOURCES
   server_game_join_test.cpp

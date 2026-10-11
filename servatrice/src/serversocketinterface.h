@@ -96,6 +96,7 @@ class Command_ReportAssign;
 class Command_ReportDetails;
 class Command_ReportList;
 class Command_ReportMyList;
+class Command_ReportReopen;
 class Command_ReportResolve;
 class Command_ReportStats;
 class Command_ReportUserInfo;
@@ -181,6 +182,7 @@ private:
     Response::ResponseCode cmdUpdateServerMessage(const Command_UpdateServerMessage &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReportAssign(const Command_ReportAssign &cmd, ResponseContainer &);
     Response::ResponseCode cmdReportResolve(const Command_ReportResolve &cmd, ResponseContainer &);
+    Response::ResponseCode cmdReportReopen(const Command_ReportReopen &cmd, ResponseContainer &);
     Response::ResponseCode cmdReportUserInfo(const Command_ReportUserInfo &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReportStats(const Command_ReportStats &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdRegisterAccount(const Command_Register &cmd, ResponseContainer &rc);

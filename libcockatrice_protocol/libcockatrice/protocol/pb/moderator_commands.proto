@@ -26,6 +26,7 @@ message ModeratorCommand {
         REPLAY_DOWNLOAD_BY_GAME_ID = 1203;
         REPORT_USER_INFO = 1204;
         REPORT_STATS = 1205;
+        REPORT_REOPEN = 1206;
     }
     extensions 100 to max;
 }
