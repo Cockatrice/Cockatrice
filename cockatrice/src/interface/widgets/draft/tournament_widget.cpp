@@ -185,7 +185,7 @@ void TournamentWidget::rebuildTables(const Event_TournamentState &state)
         QString statusStr;
         if (pairing.player2_id() == -1) {
             statusStr = tr("BYE");
-        } else if (pairing.winner_id() != -1) {
+        } else if (pairing.has_winner_id() || pairing.is_draw()) {
             statusStr = tr("Finished");
         } else {
             statusStr = tr("vs");
@@ -211,7 +211,7 @@ void TournamentWidget::resolveCurrentGameId(const Event_TournamentState &state)
 
     for (int i = 0; i < state.pairings_size(); ++i) {
         const auto &pairing = state.pairings(i);
-        if (pairing.game_id() == -1) {
+        if (pairing.game_id() == -1 || pairing.has_winner_id() || pairing.is_draw()) {
             continue;
         }
         if (!hasOwnLivePairing && localPlayerId != -1 &&
