@@ -12,6 +12,7 @@
 #include <libcockatrice/deck_list/deck_file_format.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
+#include <libcockatrice/protocol/pb/command_deck_del.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_download.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_list.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_new_dir.pb.h>
@@ -116,6 +117,7 @@ void DeckSyncManager::syncNow()
     skippedCount = 0;
     pendingUploads.clear();
     pendingDownloads.clear();
+    pendingDeletes.clear();
     plannedLocalPaths.clear();
     ensuredDirs.clear();
     ensuredDirs.insert(QString());
@@ -275,8 +277,21 @@ void DeckSyncManager::onListFinished(const Response &response, const CommandCont
                 }
             }
         }
-
         if (serverId == -1) {
+            if (sidecarRecord.remoteId != -1) {
+                // The server no longer lists this deck: it was deleted elsewhere.
+                // Apply the delete locally, keeping a backup of the file.
+                const QString absolutePath = deckPath + "/" + it.key();
+                const QString backupPath =
+                    absolutePath + BACKUP_SUFFIX + QString::number(QDateTime::currentDateTime().toSecsSinceEpoch());
+                if (!QFile::copy(absolutePath, backupPath) || !QFile::remove(absolutePath)) {
+                    ++skippedCount;
+                    continue;
+                }
+                sidecar.remove(it.key());
+                ++downloadedCount;
+                continue;
+            }
             const QString serverPath = serverPathFor(it.key());
             pendingUploads.append(UploadOp{.relativePath = it.key(),
                                            .serverPath = serverPath,
@@ -298,6 +313,7 @@ void DeckSyncManager::onListFinished(const Response &response, const CommandCont
             record.lastSyncSecs = nowSecs;
             record.deleted = false;
             sidecar.set(it.key(), record);
+            snapshotLocalFile(it.key(), record.guid);
             ++unchangedCount;
             continue;
         }
@@ -337,6 +353,18 @@ void DeckSyncManager::onListFinished(const Response &response, const CommandCont
                                            .lastModifiedSecs = it.value().lastModifiedSecs});
     }
 
+    const QMap<QString, DeckSyncRecord> knownRecords = sidecar.records();
+    for (auto it = knownRecords.begin(); it != knownRecords.end(); ++it) {
+        if (localFiles.contains(it.key())) {
+            continue;
+        }
+        if (it.value().remoteId == -1) {
+            sidecar.remove(it.key());
+            continue;
+        }
+        pendingDeletes.append(it.key());
+    }
+
     sidecar.save();
     processNext();
 }
@@ -352,7 +380,12 @@ void DeckSyncManager::processNext()
     if (!syncing) {
         return;
     }
-    if (!pendingUploads.isEmpty()) {
+    if (!pendingDeletes.isEmpty()) {
+        const QString relativePath = pendingDeletes.first();
+        DeckSyncSidecar sidecar(sidecarPath);
+        sidecar.load();
+        sendDelete(relativePath, sidecar.get(relativePath).remoteId);
+    } else if (!pendingUploads.isEmpty()) {
         processNextUpload();
     } else if (!pendingDownloads.isEmpty()) {
         sendDownload(pendingDownloads.first());
@@ -453,7 +486,12 @@ void DeckSyncManager::sendUpload(const UploadOp &op)
         cmd.set_color_identity(colorIdentityProvider(loaded->deckList).toStdString());
     }
     PendingCommand *pend = AbstractClient::prepareSessionCommand(cmd);
-    pend->setExtraData(op.relativePath);
+    QVariantMap context;
+    context.insert("path", op.relativePath);
+    context.insert("serverPath", op.serverPath);
+    context.insert("deckId", op.deckId);
+    context.insert("guid", op.guid);
+    pend->setExtraData(context);
     connect(pend, &PendingCommand::finished, this, &DeckSyncManager::onUploadFinished);
     client->sendCommand(pend);
 }
@@ -469,8 +507,22 @@ void DeckSyncManager::onUploadFinished(const Response &response,
         failSync(tr("Server connection lost."));
         return;
     }
-    const QString relativePath = extraData.toString();
+    const QVariantMap context = extraData.toMap();
+    const QString relativePath = context.value("path").toString();
+    const int deckId = context.value("deckId", -1).toInt();
     if (response.response_code() != Response::RespOk) {
+        if (response.response_code() == Response::RespNameNotFound && deckId != -1) {
+            // The server row is gone (purged tombstone or removed elsewhere):
+            // upload the deck as new instead of updating a dead id.
+            UploadOp retry;
+            retry.relativePath = relativePath;
+            retry.serverPath = context.value("serverPath").toString();
+            retry.deckId = -1;
+            retry.guid = context.value("guid").toString();
+            pendingUploads.prepend(retry);
+            processNext();
+            return;
+        }
         ++skippedCount;
         processNext();
         return;
@@ -501,6 +553,7 @@ void DeckSyncManager::onUploadFinished(const Response &response,
     record.deleted = false;
     sidecar.set(relativePath, record);
     sidecar.save();
+    snapshotLocalFile(relativePath, record.guid);
     ++uploadedCount;
     processNext();
 }
@@ -615,8 +668,64 @@ void DeckSyncManager::onDownloadFinished(const Response &response,
     record.deleted = false;
     sidecar.set(relativePath, record);
     sidecar.save();
+    snapshotLocalFile(relativePath, record.guid);
     ++downloadedCount;
     processNext();
+}
+
+void DeckSyncManager::sendDelete(const QString &relativePath, int deckId)
+{
+    emit statusMessage(tr("Deleting %1 from server...").arg(relativePath));
+    Command_DeckDel cmd;
+    cmd.set_deck_id(deckId);
+    PendingCommand *pend = AbstractClient::prepareSessionCommand(cmd);
+    pend->setExtraData(relativePath);
+    connect(pend, &PendingCommand::finished, this, &DeckSyncManager::onDeleteFinished);
+    client->sendCommand(pend);
+}
+
+void DeckSyncManager::onDeleteFinished(const Response &response,
+                                       const CommandContainer & /*commandContainer*/,
+                                       const QVariant &extraData)
+{
+    if (!syncing) {
+        return;
+    }
+    const QString relativePath = extraData.toString();
+    for (int i = 0; i < pendingDeletes.size(); ++i) {
+        if (pendingDeletes.at(i) == relativePath) {
+            pendingDeletes.removeAt(i);
+            break;
+        }
+    }
+    // Both outcomes converge the record: pushed deletes and server-side
+    // deletes (already tombstoned, answering NameNotFound) are done.
+    if (response.response_code() == Response::RespOk || response.response_code() == Response::RespNameNotFound) {
+        DeckSyncSidecar sidecar(sidecarPath);
+        sidecar.load();
+        sidecar.remove(relativePath);
+        sidecar.save();
+    } else {
+        ++skippedCount;
+    }
+    processNext();
+}
+
+void DeckSyncManager::snapshotLocalFile(const QString &relativePath, const QString &guid)
+{
+    if (guid.isEmpty()) {
+        return;
+    }
+    QFile source(deckPath + "/" + relativePath);
+    if (!source.open(QIODevice::ReadOnly)) {
+        return;
+    }
+    QDir().mkpath(deckPath + "/" + SYNC_META_DIR + "/bases");
+    QFile snapshot(deckPath + "/" + SYNC_META_DIR + "/bases/" + guid + ".cod");
+    if (!snapshot.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        return;
+    }
+    snapshot.write(source.readAll());
 }
 
 void DeckSyncManager::failSync(const QString &error)
