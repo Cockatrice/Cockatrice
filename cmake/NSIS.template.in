@@ -304,10 +304,11 @@ SetShellVarContext all
 ; _?=$INSTDIR keeps the old uninstaller running in place. An NSIS uninstaller
 ; normally copies itself to %TEMP% and runs from there so that it can delete its
 ; own directory, and the process we started exits at once. ExecWait then returns
-; before the uninstall has run, and the temp copy's "RMDir /r $INSTDIR" executes
-; while the section below is still writing the new payload. _?= disables the copy
-; and makes ExecWait block until the uninstall finishes. It must be the last
-; argument and must not be quoted, even when the path contains spaces.
+; before the uninstall has run, and the temp copy keeps deleting files - from
+; 3.1.0 and 3.1.1 on disk a blanket "RMDir /r $INSTDIR" - while the section
+; below is still writing the new payload. _?= disables the copy and makes
+; ExecWait block until the uninstall finishes. It must be the last argument
+; and must not be quoted, even when the path contains spaces.
 ;
 ; --- 32-bit uninstall ---
 SetRegView 32
@@ -1107,9 +1108,14 @@ ${AndIf} ${FileExists} "$INSTDIR\portable.dat"
 	; upgrade portable mode
 	!insertmacro CockLog "section: portable upgrade purge"
 	!insertmacro CockLogListing "before-portable-purge" "*.dll"
+	; plugins and translations are payload and are rewritten by the payload
+	; below, so removing them here is safe. sounds and themes are payload
+	; too - the default packs are rewritten below as well - but a portable
+	; user's custom sounds and themes live in exactly those folders, so a
+	; recursive purge here would delete user content along with the defaults.
+	; Stale default files from an older release are overwritten or replaced
+	; by the payload, never by a purge.
 	RMDir /r "$INSTDIR\plugins"
-	RMDir /r "$INSTDIR\sounds"
-	RMDir /r "$INSTDIR\themes"
 	RMDir /r "$INSTDIR\translations"
 	Delete "$INSTDIR\uninstall.exe"
 	Delete "$INSTDIR\cockatrice.exe"
@@ -1263,16 +1269,32 @@ Section "un.Application" UnSecApplication
 	SetShellVarContext all
 	StrCpy $R1 0
 
-	; Record whether this was a portable install before the directory (and the
-	; portable.dat marker inside it) is removed below.
+	; Record whether this was a portable install before portable.dat is
+	; removed below.
 	IfFileExists "$INSTDIR\portable.dat" 0 +2
 		StrCpy $R1 1
 
-	; Remove the entire application directory so any file that is not part of
-	; the installed payload (e.g. build-tree artifacts such as *.dir folders,
-	; *_autogen and *.tlog files from a build) cannot survive between an
-	; uninstall and a fresh reinstall.
-	RMDir /r "$INSTDIR"
+	; Remove only what the installer wrote. The two lists below are generated
+	; by CPack from the staged install tree: one Delete per installed file and
+	; one non-recursive RMDir per installed directory, children first.
+	; Anything the user put in $INSTDIR - decks, pictures, portable data
+	; folders - is not on those lists and survives, and $INSTDIR itself is
+	; only removed when nothing else is left in it. An earlier version of this
+	; section ran a blanket "RMDir /r $INSTDIR" to keep build-tree artifacts
+	; out of a fresh reinstall; that also deleted user decks whenever a user
+	; had pointed their data folders into the install directory, so payload
+	; purity may never be bought at that price again.
+@CPACK_NSIS_DELETE_FILES@
+@CPACK_NSIS_DELETE_DIRECTORIES@
+
+	; Written by the installer itself, so absent from the staged payload
+	; above; qdebug.txt is app-generated log output next to the executables.
+	Delete "$INSTDIR\uninstall.exe"
+	Delete "$INSTDIR\portable.dat"
+	Delete "$INSTDIR\qdebug.txt"
+
+	; Succeeds only when no foreign files remain.
+	RMDir "$INSTDIR"
 
 	RMDir /r "$SMPROGRAMS\Cockatrice"
 
