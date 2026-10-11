@@ -177,6 +177,22 @@ void PlayerGraphicsItem::initializeZones()
 
 void PlayerGraphicsItem::onCustomZoneAdded(QString customZoneName)
 {
+    // Custom zones have no board view, but their cards still need a graphics owner.
+    // Without one, PileZone::onCardAdded never runs and cards moved from the table
+    // or hand into a custom zone stay drawn at their old spot. Give them a hidden
+    // pile zone so added cards are reparented to (0, 0) and hidden.
+    CardZoneLogic *logic = player->getZone(customZoneName);
+    if (auto *pileLogic = qobject_cast<PileZoneLogic *>(logic)) {
+        auto *hiddenZone = new PileZone(pileLogic, this);
+        hiddenZone->setVisible(false);
+        hiddenZone->setPos(0, 0);
+        zoneGraphicsItems.insert(customZoneName, hiddenZone);
+        // Hide any cards that arrived before the graphics item existed.
+        for (CardState *state : pileLogic->getCards()) {
+            hiddenZone->onCardAdded(state);
+        }
+        return;
+    }
     zoneGraphicsItems.insert(customZoneName, nullptr); // Custom zone view goes here, if we ever implement it.
 }
 
