@@ -594,8 +594,8 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     QString connectionType = getConnectionType();
     // Throttle before doing any work: a locked-out address must not get a full
     // database round trip and password verification on every attempt.
-    if (server->isLoginRateLimited(getAddress())) {
-        int remaining = server->loginRateLimitRemainingSeconds(getAddress());
+    if (server->isLoginRateLimited(getAddress(), userName)) {
+        int remaining = server->loginRateLimitRemainingSeconds(getAddress(), userName);
         if (remaining > 0) {
             auto *re = new Response_Login;
             re->set_denied_end_time(QDateTime::currentDateTime().addSecs(remaining).toSecsSinceEpoch());
@@ -616,8 +616,8 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
             return Response::RespUserIsBanned;
         }
         case NotLoggedIn:
-            if (server->recordFailedLogin(getAddress())) {
-                int remaining = server->loginRateLimitRemainingSeconds(getAddress());
+            if (server->recordFailedLogin(getAddress(), userName)) {
+                int remaining = server->loginRateLimitRemainingSeconds(getAddress(), userName);
                 if (remaining > 0) {
                     auto *re = new Response_Login;
                     re->set_denied_end_time(QDateTime::currentDateTime().addSecs(remaining).toSecsSinceEpoch());
@@ -629,7 +629,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
         case WouldOverwriteOldSession:
             return Response::RespWouldOverwriteOldSession;
         case UsernameInvalid: {
-            server->recordFailedLogin(getAddress());
+            server->recordFailedLogin(getAddress(), userName);
             auto *re = new Response_Login;
             re->set_denied_reason_str(reasonStr.toStdString());
             rc.setResponseExtension(re);
@@ -640,12 +640,12 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
         case ClientIdRequired:
             return Response::RespClientIdRequired;
         case UserIsInactive:
-            server->recordFailedLogin(getAddress());
+            server->recordFailedLogin(getAddress(), userName);
             return Response::RespAccountNotActivated;
         case PasswordChangeRequired:
             return Response::RespPasswordChangeRequired;
         default:
-            server->clearFailedLogins(getAddress());
+            server->clearFailedLogins(getAddress(), userName);
             authState = res;
             usingRealPassword = needsHash;
     }

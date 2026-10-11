@@ -369,10 +369,10 @@ public:
     {
         return &rateLimiter;
     }
-    bool recordFailedLogin(const QString &ipAddress) override;
-    bool isLoginRateLimited(const QString &ipAddress) override;
-    int loginRateLimitRemainingSeconds(const QString &ipAddress) override;
-    void clearFailedLogins(const QString &ipAddress) override;
+    bool recordFailedLogin(const QString &ipAddress, const QString &userName) override;
+    bool isLoginRateLimited(const QString &ipAddress, const QString &userName) override;
+    int loginRateLimitRemainingSeconds(const QString &ipAddress, const QString &userName) override;
+    void clearFailedLogins(const QString &ipAddress, const QString &userName) override;
     bool recordRegistrationAttempt(const QString &ipAddress);
     bool recordForgotPasswordAttempt(const QString &ipAddress);
     /// True when the address is in security/trusted_sources and therefore exempt from per-address limits.

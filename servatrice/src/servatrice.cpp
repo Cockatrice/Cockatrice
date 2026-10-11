@@ -51,6 +51,7 @@
 #include <QSsl>
 #include <QString>
 #include <QStringList>
+#include <QStringLiteral>
 #include <QThread>
 #include <QTimer>
 #include <QTypeInfo>
@@ -1286,25 +1287,40 @@ int Servatrice::getForgotPasswordTokenLife() const
     return settingsCache->value("forgotpassword/tokenlife", 60).toInt();
 }
 
-bool Servatrice::recordFailedLogin(const QString &ipAddress)
+/**
+ * @brief Rate limiter key for one login target.
+ *
+ * Keyed by (address, username) so a success only clears that pair's history:
+ * a guest login or a login as the attacker's own account from the same
+ * address must not wipe out another user's failure count. Lowercased so
+ * case variations of the same name share one bucket.
+ */
+static QString loginLimitKey(const QString &ipAddress, const QString &userName)
+{
+    return QStringLiteral("login:") + ipAddress + QStringLiteral(":") + userName.toLower();
+}
+
+bool Servatrice::recordFailedLogin(const QString &ipAddress, const QString &userName)
 {
     if (isRateLimitExempt(ipAddress)) {
         return false;
     }
-    return rateLimiter.recordAttempt("login:" + ipAddress, getMaxLoginAttemptsPerIp(), getLoginAttemptWindowSeconds());
+    return rateLimiter.recordAttempt(loginLimitKey(ipAddress, userName), getMaxLoginAttemptsPerIp(),
+                                     getLoginAttemptWindowSeconds());
 }
 
-bool Servatrice::isLoginRateLimited(const QString &ipAddress)
+bool Servatrice::isLoginRateLimited(const QString &ipAddress, const QString &userName)
 {
     if (isRateLimitExempt(ipAddress)) {
         return false;
     }
-    return rateLimiter.isBlocked("login:" + ipAddress, getMaxLoginAttemptsPerIp(), getLoginAttemptWindowSeconds());
+    return rateLimiter.isBlocked(loginLimitKey(ipAddress, userName), getMaxLoginAttemptsPerIp(),
+                                 getLoginAttemptWindowSeconds());
 }
 
-int Servatrice::loginRateLimitRemainingSeconds(const QString &ipAddress)
+int Servatrice::loginRateLimitRemainingSeconds(const QString &ipAddress, const QString &userName)
 {
-    return rateLimiter.retryAfterSeconds("login:" + ipAddress, getMaxLoginAttemptsPerIp(),
+    return rateLimiter.retryAfterSeconds(loginLimitKey(ipAddress, userName), getMaxLoginAttemptsPerIp(),
                                          getLoginAttemptWindowSeconds());
 }
 
@@ -1335,9 +1351,9 @@ bool Servatrice::isRateLimitExempt(const QString &ipAddress) const
     return trustedSources.contains(ipAddress, Qt::CaseInsensitive);
 }
 
-void Servatrice::clearFailedLogins(const QString &ipAddress)
+void Servatrice::clearFailedLogins(const QString &ipAddress, const QString &userName)
 {
-    rateLimiter.clearAttempts("login:" + ipAddress);
+    rateLimiter.clearAttempts(loginLimitKey(ipAddress, userName));
 }
 
 int Servatrice::getMaxLoginAttemptsPerIp() const
