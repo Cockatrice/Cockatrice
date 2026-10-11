@@ -1,0 +1,22 @@
+syntax = "proto2";
+import "game_event.proto";
+import "serverinfo_tournament.proto";
+
+message Event_TournamentState {
+    extend GameEvent {
+        optional Event_TournamentState ext = 2027;
+    }
+
+    enum TournamentPhase {
+        PHASE_DECK_BUILDING = 0;
+        PHASE_PLAYING = 1;
+        PHASE_FINISHED = 2;
+    }
+
+    optional TournamentPhase phase = 1;
+    optional uint32 current_round = 2;
+    optional uint32 total_rounds = 3;
+    repeated TournamentPlayer players = 4;
+    repeated TournamentPairing pairings = 5;
+    optional TournamentSettings settings = 6;
+}
