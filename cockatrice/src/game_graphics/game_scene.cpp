@@ -35,6 +35,7 @@
 #include <functional>
 #include <libcockatrice/game/abstract_game.h>
 #include <libcockatrice/game/board/arrow_data.h>
+#include <libcockatrice/game/game_state.h>
 #include <libcockatrice/game/player/player_actions.h>
 #include <libcockatrice/game/player/player_event_handler.h>
 #include <libcockatrice/game/player/player_info.h>
@@ -429,6 +430,37 @@ QList<PlayerLogic *> GameScene::collectActivePlayers(int &firstPlayerIndex) cons
             if (!firstPlayerFound && p->getPlayerInfo()->getLocal()) {
                 firstPlayerIndex = activePlayers.size() - 1;
                 firstPlayerFound = true;
+            }
+        }
+    }
+
+    // Lay out the table in seat order rather than id order. Players missing
+    // from the tracked order keep id order at the end.
+    QList<int> seatOrder;
+    for (auto *pgItem : playerViews.values()) {
+        if (PlayerLogic *p = pgItem->getLogic()) {
+            seatOrder = p->getGame()->getGameState()->getSeatOrder();
+            break;
+        }
+    }
+    if (!seatOrder.isEmpty()) {
+        std::sort(activePlayers.begin(), activePlayers.end(), [&](PlayerLogic *a, PlayerLogic *b) {
+            int indexA = seatOrder.indexOf(a->getPlayerInfo()->getId());
+            int indexB = seatOrder.indexOf(b->getPlayerInfo()->getId());
+            if (indexA == -1) {
+                indexA = seatOrder.size() + a->getPlayerInfo()->getId();
+            }
+            if (indexB == -1) {
+                indexB = seatOrder.size() + b->getPlayerInfo()->getId();
+            }
+            return indexA < indexB;
+        });
+        // Recompute the local-player index after sorting.
+        firstPlayerIndex = 0;
+        for (int i = 0; i < activePlayers.size(); ++i) {
+            if (activePlayers[i]->getPlayerInfo()->getLocal()) {
+                firstPlayerIndex = i;
+                break;
             }
         }
     }
