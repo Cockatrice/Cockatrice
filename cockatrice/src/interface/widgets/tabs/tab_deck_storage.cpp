@@ -2,11 +2,15 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../deck_loader/deck_loader.h"
+#include "../../deck_sync/deck_sync_conflict.h"
 #include "../../deck_sync/deck_sync_manager.h"
+#include "../../deck_sync/deck_sync_profile.h"
 #include "../../pixel_map_generator.h"
 #include "../cards/additional_info/deck_color_identity.h"
 #include "../deck_share/deck_share_utils.h"
 #include "../deck_share/share_bar_widget.h"
+#include "../dialogs/dlg_sync_conflict.h"
+#include "../dialogs/dlg_sync_onboarding.h"
 #include "../interface/widgets/server/remote/remote_decklist_tree_widget.h"
 #include "../interface/widgets/utility/get_text_with_max.h"
 #include "abstract_client.h"
@@ -63,6 +67,7 @@
 #include <libcockatrice/protocol/pb/response_deck_download.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_upload.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/settings/deck_sync_settings.h>
 #include <libcockatrice/settings/network_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
@@ -256,8 +261,13 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
 
     syncManager = new DeckSyncManager(
         client, [](const DeckList &deck) { return getDeckColorIdentity(deck, CardDatabaseManager::query()); }, this);
+    syncManager->setConflictDefault(SettingsCache::instance().deckSync().getConflictDefault());
+    connect(&SettingsCache::instance().deckSync(), &DeckSyncSettings::conflictDefaultChanged, syncManager,
+            &DeckSyncManager::setConflictDefault);
     connect(syncManager, &DeckSyncManager::statusMessage, this, &TabDeckStorage::onSyncStatusMessage);
     connect(syncManager, &DeckSyncManager::syncFinished, this, &TabDeckStorage::onSyncFinished);
+    connect(syncManager, &DeckSyncManager::firstSyncDetected, this, &TabDeckStorage::onFirstSyncDetected);
+    connect(syncManager, &DeckSyncManager::conflictRequest, this, &TabDeckStorage::onConflictRequest);
     if (currentUserInfo != nullptr) {
         syncUsername = QString::fromStdString(currentUserInfo->name());
     }
@@ -556,6 +566,34 @@ void TabDeckStorage::actSyncNow()
     syncManager->setDeckPath(SettingsCache::instance().paths().getDeckPath());
     aSyncNow->setEnabled(false);
     syncManager->syncNow();
+}
+
+void TabDeckStorage::onFirstSyncDetected(int localCount, int serverCount)
+{
+    DlgSyncOnboarding dialog(localCount, serverCount, this);
+    if (dialog.exec() == QDialog::Accepted) {
+        syncManager->continueFirstSync(dialog.selectedMode());
+    } else {
+        syncManager->cancelFirstSync();
+    }
+}
+
+void TabDeckStorage::onConflictRequest(const DeckSyncConflict &conflict)
+{
+    DlgSyncConflict dialog(conflict, this);
+    if (dialog.exec() != QDialog::Accepted) {
+        DeckSyncResolution skip;
+        skip.action = DeckSyncSkipConflict;
+        syncManager->resolveConflict(skip);
+        return;
+    }
+    const DeckSyncResolution resolution = dialog.resolution();
+    if (resolution.rememberAlways &&
+        (resolution.action == DeckSyncKeepMine || resolution.action == DeckSyncKeepServer)) {
+        SettingsCache::instance().deckSync().setConflictDefault(
+            resolution.action == DeckSyncKeepMine ? DeckSyncConflictKeepMine : DeckSyncConflictKeepServer);
+    }
+    syncManager->resolveConflict(resolution);
 }
 
 void TabDeckStorage::onSyncStatusMessage(const QString &message)
