@@ -27,10 +27,26 @@ static const int MAX_BACKOFF_SHIFT = 10;
 
 inline Q_LOGGING_CATEGORY(SmtpClientLog, "smtp_client")
 
-static QString pendingKey(const QString &userName, EmailType type)
+static QString pendingKey(const QString &userName, EmailType type, const QString &token)
 {
     const char *typeName = (type == EmailType::Activation) ? "activation" : "forgotpassword";
-    return userName + '/' + typeName;
+    // The token is part of the key: a regenerated token (forgot-password issues a
+    // fresh one per request) must not be suppressed by a stale pending entry.
+    return userName + '/' + typeName + '/' + token;
+}
+
+// True only for permanent 5xx replies. Anything else (4xx greylisting/rate
+// limiting, or an unparsable reply) must be retried, never treated as final:
+// destroying the durable queue row on a transient failure loses the mail.
+static bool isPermanentSmtpReply(const QByteArray &msg)
+{
+    for (char c : msg) {
+        if (c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '-') {
+            continue;
+        }
+        return c == '5';
+    }
+    return false;
 }
 
 SmtpClient::SmtpClient(QObject *parent) : QObject(parent)
@@ -69,7 +85,9 @@ SmtpClient::~SmtpClient()
 
 int SmtpClient::maxRetries() const
 {
-    return settingsCache->value("smtp/maxretries", DEFAULT_MAX_RETRIES).toInt();
+    // Bounded like retryDelaySeconds(): an unset/blank value must not turn the
+    // first transient failure into a permanent one (attempts >= 0 is immediate).
+    return qBound(1, settingsCache->value("smtp/maxretries", DEFAULT_MAX_RETRIES).toInt(), 100);
 }
 
 int SmtpClient::retryDelaySeconds() const
@@ -92,13 +110,16 @@ SmtpClient::PendingEmail SmtpClient::buildEmail(const QString &nickname,
                                                 const QString &body,
                                                 const QString &recipient,
                                                 const QString &token,
-                                                const QString &email)
+                                                const QString &email,
+                                                qint64 rowId)
 {
     QString name = settingsCache->value("smtp/name", "").toString();
 
     PendingEmail pending;
     pending.userName = nickname;
     pending.type = type;
+    pending.token = token;
+    pending.rowId = rowId;
     pending.maxAttempts = maxRetries();
     pending.retryDelay = retryDelaySeconds();
     pending.nextAttempt = QDateTime::currentDateTime();
@@ -116,10 +137,30 @@ SmtpClient::PendingEmail SmtpClient::buildEmail(const QString &nickname,
 
 bool SmtpClient::enqueue(const PendingEmail &email)
 {
-    const QString key = pendingKey(email.userName, email.type);
+    const QString key = pendingKey(email.userName, email.type, email.token);
     if (pendingEmails.contains(key)) {
         qCDebug(SmtpClientLog) << "Email already pending for" << email.userName << "- not duplicating";
         return false;
+    }
+
+    // A fresher database row for the same user/type supersedes a stale pending
+    // entry: drop the stale one so only the current token is ever delivered.
+    // (Any in-flight mapping for the dropped key is removed as well; the
+    // mailSent/recordFailed lookups tolerate missing entries.)
+    for (auto it = pendingEmails.begin(); it != pendingEmails.end();) {
+        if (it.value().userName == email.userName && it.value().type == email.type) {
+            for (auto mapIt = mailIdToUser.begin(); mapIt != mailIdToUser.end();) {
+                if (mapIt.value() == it.key()) {
+                    mapIt = mailIdToUser.erase(mapIt);
+                } else {
+                    ++mapIt;
+                }
+            }
+            qCDebug(SmtpClientLog) << "Replacing stale pending email for" << email.userName;
+            it = pendingEmails.erase(it);
+        } else {
+            ++it;
+        }
     }
 
     pendingEmails.insert(key, email);
@@ -130,7 +171,7 @@ bool SmtpClient::enqueue(const PendingEmail &email)
 
 bool SmtpClient::enqueueActivationTokenMail(const QString &nickname, const QString &recipient, const QString &token)
 {
-    if (pendingEmails.contains(pendingKey(nickname, EmailType::Activation))) {
+    if (pendingEmails.contains(pendingKey(nickname, EmailType::Activation, token))) {
         qCDebug(SmtpClientLog) << "Activation email already pending for" << nickname << "- skipping";
         return false;
     }
@@ -146,9 +187,12 @@ bool SmtpClient::enqueueActivationTokenMail(const QString &nickname, const QStri
     return enqueue(buildEmail(nickname, EmailType::Activation, subject, body, recipient, token, email));
 }
 
-bool SmtpClient::enqueueForgotPasswordTokenMail(const QString &nickname, const QString &recipient, const QString &token)
+bool SmtpClient::enqueueForgotPasswordTokenMail(const QString &nickname,
+                                                const QString &recipient,
+                                                const QString &token,
+                                                qint64 rowId)
 {
-    if (pendingEmails.contains(pendingKey(nickname, EmailType::ForgotPassword))) {
+    if (pendingEmails.contains(pendingKey(nickname, EmailType::ForgotPassword, token))) {
         qCDebug(SmtpClientLog) << "Password reset email already pending for" << nickname << "- skipping";
         return false;
     }
@@ -161,7 +205,7 @@ bool SmtpClient::enqueueForgotPasswordTokenMail(const QString &nickname, const Q
         return false;
     }
 
-    return enqueue(buildEmail(nickname, EmailType::ForgotPassword, subject, body, recipient, token, email));
+    return enqueue(buildEmail(nickname, EmailType::ForgotPassword, subject, body, recipient, token, email, rowId));
 }
 
 void SmtpClient::sendAllEmails()
@@ -230,7 +274,7 @@ void SmtpClient::relayoutForSending()
             continue; // not yet due; honours the backoff schedule
         }
         int id = smtp->send(pending.message);
-        mailIdToUser.insert(id, pendingKey(pending.userName, pending.type));
+        mailIdToUser.insert(id, pendingKey(pending.userName, pending.type, pending.token));
     }
 }
 
@@ -243,6 +287,9 @@ void SmtpClient::finished()
 void SmtpClient::authenticated()
 {
     qCDebug(SmtpClientLog) << "authenticated";
+    // The session has actually succeeded (TCP connect alone proves nothing:
+    // TLS/auth may still fail), so the connection-level backoff resets here.
+    connectionAttempts = 0;
     // Start the idle timer here, once the connection is fully ready to send,
     // rather than on TCP connect: SSL/STARTTLS handshake and auth may take a
     // while and must not be cut short by the idle timeout.
@@ -261,7 +308,11 @@ void SmtpClient::authenticationFailed(const QByteArray &msg)
 void SmtpClient::connected()
 {
     qCDebug(SmtpClientLog) << "connected";
-    connectionAttempts = 0;
+    // NOTE: connectionAttempts is deliberately not reset here. This fires on
+    // TCP connect, before the TLS handshake and AUTH; resetting here would pin
+    // the connection-level backoff at its base delay for exactly the failures
+    // (bad password/cert/STARTTLS) it is meant to cover. It resets in
+    // authenticated() and on the first successful mailSent instead.
 }
 
 void SmtpClient::connectionFailed(const QByteArray &msg)
@@ -277,6 +328,15 @@ void SmtpClient::disconnected()
 {
     qCDebug(SmtpClientLog) << "disconnected - emails still pending:" << pendingEmails.count();
     idleTimer->stop();
+    // A mid-session drop (peer close/RST past the connect phase, or the idle
+    // timeout firing mid-batch) emits no mailFailed/connectionFailed signal, so
+    // route every in-flight mail through recordFailed(): otherwise attempts and
+    // backoff are bypassed and the mails requeue with stale state forever.
+    const QList<int> inFlight = mailIdToUser.keys();
+    for (int mailID : inFlight) {
+        recordFailed(mailID);
+    }
+    mailIdToUser.clear();
 }
 
 void SmtpClient::encrypted()
@@ -320,10 +380,12 @@ void SmtpClient::recordFailed(int mailID)
     if (pending.attempts >= pending.maxAttempts) {
         const QString userName = pending.userName;
         const EmailType type = pending.type;
+        const QString token = pending.token;
+        const qint64 rowId = pending.rowId;
         qCWarning(SmtpClientLog) << "Email to" << userName << "permanently failed after" << pending.attempts
                                  << "attempts - dropping from pending set";
         pendingEmails.erase(pendingIt);
-        emit mailPermanentlyFailed(userName, type, FailureReason::RetryExhausted);
+        emit mailPermanentlyFailed(userName, type, FailureReason::RetryExhausted, token, rowId);
         return;
     }
 
@@ -349,7 +411,8 @@ void SmtpClient::recordConnectionFailure()
             qCWarning(SmtpClientLog) << "Email to" << pending.userName << "permanently failed after" << pending.attempts
                                      << "connection failures - dropping from pending set";
             keysToRemove.append(it.key());
-            emit mailPermanentlyFailed(pending.userName, pending.type, FailureReason::RetryExhausted);
+            emit mailPermanentlyFailed(pending.userName, pending.type, FailureReason::RetryExhausted, pending.token,
+                                       pending.rowId);
         }
     }
     for (const QString &key : keysToRemove) {
@@ -391,12 +454,19 @@ void SmtpClient::mailFailed(int mailID, int errorCode, const QByteArray &msg)
 {
     qCWarning(SmtpClientLog) << "mailFailed id=" << mailID << " errorCode=" << errorCode
                              << "msg=" << QString::fromUtf8(msg);
+    // Progress was made (the server answered), so the idle timer measures from
+    // here rather than acting as a cap on the whole session.
+    idleTimer->start(IDLE_TIMEOUT_MS);
     recordFailed(mailID);
 }
 
 void SmtpClient::mailSent(int mailID)
 {
     qCDebug(SmtpClientLog) << "mailSent" << mailID;
+    // A delivered mail proves the session works: reset the connection-level
+    // backoff and restart the idle timer from this point of progress.
+    connectionAttempts = 0;
+    idleTimer->start(IDLE_TIMEOUT_MS);
 
     auto it = mailIdToUser.find(mailID);
     if (it == mailIdToUser.end()) {
@@ -412,15 +482,23 @@ void SmtpClient::mailSent(int mailID)
 
     const QString userName = pendingIt.value().userName;
     const EmailType type = pendingIt.value().type;
+    const QString token = pendingIt.value().token;
+    const qint64 rowId = pendingIt.value().rowId;
     pendingEmails.erase(pendingIt);
     qCDebug(SmtpClientLog) << "Delivered email to" << userName;
-    emit mailDelivered(userName, type);
+    emit mailDelivered(userName, type, token, rowId);
 }
 
 void SmtpClient::recipientRejected(int mailID, const QString &address, const QByteArray &msg)
 {
     qCWarning(SmtpClientLog) << "recipientRejected id=" << mailID << " address=" << address
                              << "msg=" << QString::fromUtf8(msg);
+    if (!isPermanentSmtpReply(msg)) {
+        // Transient 4xx (e.g. greylisting): consume one attempt and reschedule
+        // with backoff instead of destroying the durable queue row.
+        recordFailed(mailID);
+        return;
+    }
     // A rejected recipient is a permanent condition; consider the mail undeliverable.
     auto it = mailIdToUser.find(mailID);
     if (it != mailIdToUser.end()) {
@@ -428,9 +506,11 @@ void SmtpClient::recipientRejected(int mailID, const QString &address, const QBy
         if (auto pendingIt = pendingEmails.find(key); pendingIt != pendingEmails.end()) {
             const QString userName = pendingIt.value().userName;
             const EmailType type = pendingIt.value().type;
+            const QString token = pendingIt.value().token;
+            const qint64 rowId = pendingIt.value().rowId;
             pendingEmails.erase(pendingIt);
             qCWarning(SmtpClientLog) << "Email to" << userName << "rejected - dropping from pending set";
-            emit mailPermanentlyFailed(userName, type, FailureReason::RecipientRejected);
+            emit mailPermanentlyFailed(userName, type, FailureReason::RecipientRejected, token, rowId);
         }
         mailIdToUser.erase(it);
     }
@@ -440,6 +520,11 @@ void SmtpClient::senderRejected(int mailID, const QString &address, const QByteA
 {
     qCWarning(SmtpClientLog) << "senderRejected id=" << mailID << " sender=" << address
                              << "msg=" << QString::fromUtf8(msg);
+    if (!isPermanentSmtpReply(msg)) {
+        // Transient 4xx on MAIL FROM (e.g. rate limiting): retry with backoff.
+        recordFailed(mailID);
+        return;
+    }
     // A rejected sender is a permanent condition; consider the mail undeliverable.
     auto it = mailIdToUser.find(mailID);
     if (it != mailIdToUser.end()) {
@@ -447,9 +532,11 @@ void SmtpClient::senderRejected(int mailID, const QString &address, const QByteA
         if (auto pendingIt = pendingEmails.find(key); pendingIt != pendingEmails.end()) {
             const QString userName = pendingIt.value().userName;
             const EmailType type = pendingIt.value().type;
+            const QString token = pendingIt.value().token;
+            const qint64 rowId = pendingIt.value().rowId;
             pendingEmails.erase(pendingIt);
             qCWarning(SmtpClientLog) << "Email to" << userName << "sender rejected - dropping from pending set";
-            emit mailPermanentlyFailed(userName, type, FailureReason::SenderRejected);
+            emit mailPermanentlyFailed(userName, type, FailureReason::SenderRejected, token, rowId);
         }
         mailIdToUser.erase(it);
     }

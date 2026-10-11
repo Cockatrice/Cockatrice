@@ -45,12 +45,19 @@ public:
 
 public slots:
     bool enqueueActivationTokenMail(const QString &nickname, const QString &recipient, const QString &token);
-    bool enqueueForgotPasswordTokenMail(const QString &nickname, const QString &recipient, const QString &token);
+    bool enqueueForgotPasswordTokenMail(const QString &nickname,
+                                        const QString &recipient,
+                                        const QString &token,
+                                        qint64 rowId = -1);
     void sendAllEmails();
 
 signals:
-    void mailDelivered(const QString &userName, EmailType type);
-    void mailPermanentlyFailed(const QString &userName, EmailType type, FailureReason reason);
+    void mailDelivered(const QString &userName, EmailType type, const QString &token, qint64 rowId);
+    void mailPermanentlyFailed(const QString &userName,
+                               EmailType type,
+                               FailureReason reason,
+                               const QString &token,
+                               qint64 rowId);
 
 protected:
     QxtSmtp *smtp;
@@ -75,6 +82,10 @@ private:
     {
         QString userName;
         EmailType type;
+        QString token;
+        // Database row id for tables that allow multiple rows per user
+        // ({prefix}_forgot_password); -1 when the name alone identifies the row.
+        qint64 rowId = -1;
         QxtMailMessage message;
         int attempts = 0;
         int maxAttempts = 0;
@@ -88,7 +99,8 @@ private:
                             const QString &body,
                             const QString &recipient,
                             const QString &token,
-                            const QString &email);
+                            const QString &email,
+                            qint64 rowId = -1);
     bool enqueue(const PendingEmail &email);
     void relayoutForSending();
     QDateTime nextRetryTime(int attempts, int retryDelay) const;

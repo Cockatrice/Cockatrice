@@ -760,8 +760,8 @@ void Servatrice::statusUpdate()
 
         if (getEnableForgotPassword()) {
             auto *forgotPwQuery = servatriceDatabaseInterface->prepareQuery(
-                "select a.name, b.email, b.token from {prefix}_forgot_password a left join {prefix}_users b on a.name "
-                "= b.name where a.emailed = 0");
+                "select a.id, a.name, b.email, b.token from {prefix}_forgot_password a left join {prefix}_users b on "
+                "a.name = b.name where a.emailed = 0");
             if (!servatriceDatabaseInterface->execSqlQuery(forgotPwQuery)) {
                 return;
             }
@@ -769,11 +769,12 @@ void Servatrice::statusUpdate()
             // Rows are intentionally left with emailed = 0 here; they are marked emailed only once
             // delivery is confirmed by the SMTP client (see onEmailDelivered).
             while (forgotPwQuery->next()) {
-                const QString userName = forgotPwQuery->value(0).toString();
-                const auto emailAddress = EmailParser::getParsedEmailAddress(forgotPwQuery->value(1).toString());
-                const QString token = forgotPwQuery->value(2).toString();
+                const qint64 rowId = forgotPwQuery->value(0).toLongLong();
+                const QString userName = forgotPwQuery->value(1).toString();
+                const auto emailAddress = EmailParser::getParsedEmailAddress(forgotPwQuery->value(2).toString());
+                const QString token = forgotPwQuery->value(3).toString();
 
-                smtpClient->enqueueForgotPasswordTokenMail(userName, emailAddress, token);
+                smtpClient->enqueueForgotPasswordTokenMail(userName, emailAddress, token, rowId);
             }
         }
 
@@ -781,14 +782,21 @@ void Servatrice::statusUpdate()
     }
 }
 
-void Servatrice::onEmailDelivered(const QString &userName, EmailType type)
+void Servatrice::onEmailDelivered(const QString &userName, EmailType type, const QString &token, qint64 rowId)
 {
-    if (cleanupDatabaseForEmail(userName, type)) {
+    if (cleanupDatabaseForEmail(userName, type, token, rowId)) {
         qCDebug(ServatriceLog) << "E-mail delivered to" << userName;
+    } else {
+        qCWarning(ServatriceLog) << "Failed to clean up database row for delivered e-mail to" << userName
+                                 << "- row may be re-enqueued on next status update";
     }
 }
 
-void Servatrice::onEmailPermanentlyFailed(const QString &userName, EmailType type, FailureReason reason)
+void Servatrice::onEmailPermanentlyFailed(const QString &userName,
+                                          EmailType type,
+                                          FailureReason reason,
+                                          const QString &token,
+                                          qint64 rowId)
 {
     switch (reason) {
         case FailureReason::RetryExhausted:
@@ -802,14 +810,15 @@ void Servatrice::onEmailPermanentlyFailed(const QString &userName, EmailType typ
             break;
     }
 
-    if (!cleanupDatabaseForEmail(userName, type)) {
+    if (!cleanupDatabaseForEmail(userName, type, token, rowId)) {
         qCWarning(ServatriceLog) << "Failed to clean up database row for permanently failed e-mail to" << userName
                                  << "- row may be re-enqueued on next status update";
     }
 }
 
-bool Servatrice::cleanupDatabaseForEmail(const QString &userName, EmailType type)
+bool Servatrice::cleanupDatabaseForEmail(const QString &userName, EmailType type, const QString &token, qint64 rowId)
 {
+    Q_UNUSED(token);
     switch (type) {
         case EmailType::Activation: {
             QSqlQuery *query =
@@ -818,6 +827,15 @@ bool Servatrice::cleanupDatabaseForEmail(const QString &userName, EmailType type
             return servatriceDatabaseInterface->execSqlQuery(query);
         }
         case EmailType::ForgotPassword: {
+            // Scope the update to the row that was actually sent: the table
+            // holds one row per request, and marking by name would also mark
+            // rows for newer tokens that were never delivered.
+            if (rowId >= 0) {
+                QSqlQuery *query = servatriceDatabaseInterface->prepareQuery(
+                    "update {prefix}_forgot_password set emailed = 1 where id = :id");
+                query->bindValue(":id", rowId);
+                return servatriceDatabaseInterface->execSqlQuery(query);
+            }
             QSqlQuery *query = servatriceDatabaseInterface->prepareQuery(
                 "update {prefix}_forgot_password set emailed = 1 where name = :name");
             query->bindValue(":name", userName);
