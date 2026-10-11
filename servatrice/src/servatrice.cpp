@@ -1122,6 +1122,11 @@ int Servatrice::getDeckShareMaxSharesPerDay() const
     return settingsCache->value("deck_share/max_shares_per_day", 50).toInt();
 }
 
+int Servatrice::getDeckSyncMaxVersions() const
+{
+    return qMax(1, settingsCache->value("deck_sync/max_versions", 20).toInt());
+}
+
 int Servatrice::getNumberOfTCPPools() const
 {
     return settingsCache->value("server/number_pools", 1).toInt();
