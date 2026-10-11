@@ -92,9 +92,9 @@ static QStringList pageIconResources()
 
 SettingsView::SettingsView(QWidget *parent) : QWidget(parent), currentTabIndex(0), searchActive(false)
 {
-    // Swap the QTranslator before retranslating (was DlgSettings::updateLanguage): without this, picking a new
-    // language only stores the setting and every retranslateUi re-runs against the old translator until restart.
-    // Connected before setupUi() so the swap runs before the pages' own langChanged handlers below.
+    // Swap the QTranslator before retranslating (was DlgSettings::updateLanguage, removed with the dialog):
+    // without this, picking a new language only stores the setting and every retranslateUi re-runs against the
+    // old translator until restart. Connected before setupUi() so the swap runs before the pages' own handlers.
     connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this, &SettingsView::updateLanguage);
     setupUi();
 
