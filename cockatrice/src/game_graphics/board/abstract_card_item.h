@@ -116,6 +116,14 @@ public:
     {
         return isHovered;
     }
+    void cancelPendingSelectionCollapse()
+    {
+        pendingSelectionCollapse = false;
+    }
+    virtual bool doubleClickActsOnSelection() const
+    {
+        return false;
+    }
     QString getColor() const
     {
         return color;
