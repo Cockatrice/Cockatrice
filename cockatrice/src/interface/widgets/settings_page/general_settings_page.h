@@ -111,6 +111,8 @@ private:
     QCheckBox autoSyncCheckBox;
     QLabel syncIntervalLabel;
     QSpinBox syncIntervalEdit;
+    QLabel historyLimitLabel;
+    QSpinBox historyLimitEdit;
 };
 
 #endif // COCKATRICE_GENERAL_SETTINGS_PAGE_H

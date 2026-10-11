@@ -89,6 +89,7 @@
 #include <libcockatrice/protocol/pb/command_deck_del_dir.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_download.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_download_public.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_history_list.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_list.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_list_other_user.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_new_dir.pb.h>
@@ -130,6 +131,7 @@
 #include <libcockatrice/protocol/pb/response_card_art_rule_entry.pb.h>
 #include <libcockatrice/protocol/pb/response_clear_blacklisted_banners.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_download.pb.h>
+#include <libcockatrice/protocol/pb/response_deck_history_list.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_list.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_share_create.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_share_download.pb.h>
@@ -375,6 +377,8 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionComm
             return cmdDeckDownload(cmd.GetExtension(Command_DeckDownload::ext), rc);
         case SessionCommand::DECK_SYNC_CHECK:
             return cmdDeckSyncCheck(cmd.GetExtension(Command_DeckSyncCheck::ext), rc);
+        case SessionCommand::DECK_HISTORY_LIST:
+            return cmdDeckHistoryList(cmd.GetExtension(Command_DeckHistoryList::ext), rc);
         case SessionCommand::REPLAY_LIST:
             return cmdReplayList(cmd.GetExtension(Command_ReplayList::ext), rc);
         case SessionCommand::REPLAY_DOWNLOAD:
@@ -949,6 +953,50 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckSyncCheck(const Com
         return Response::RespContextError;
     }
     re->set_server_time(clockQuery->value(0).toULongLong());
+    rc.setResponseExtension(re);
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdDeckHistoryList(const Command_DeckHistoryList &cmd,
+                                                                         ResponseContainer &rc)
+{
+    if (authState != PasswordRight) {
+        return Response::RespFunctionNotAllowed;
+    }
+
+    sqlInterface->checkSql();
+
+    QSqlQuery *ownerQuery =
+        sqlInterface->prepareQuery("select 1 from {prefix}_decklist_files where id = :id and id_user = :id_user");
+    ownerQuery->bindValue(":id", cmd.deck_id());
+    ownerQuery->bindValue(":id_user", userInfo->id());
+    if (!sqlInterface->execSqlQuery(ownerQuery)) {
+        return Response::RespContextError;
+    }
+    if (!ownerQuery->next()) {
+        return Response::RespNameNotFound;
+    }
+
+    const int limit = qMin(cmd.has_limit() ? static_cast<int>(cmd.limit()) : 20, servatrice->getDeckSyncMaxVersions());
+    QSqlQuery *query =
+        sqlInterface->prepareQuery("select version_no, unix_timestamp(created_at), created_by_clientid, hash, "
+                                   "content from {prefix}_deck_versions where deck_id = :deck_id order by version_no "
+                                   "desc limit :limit");
+    query->bindValue(":deck_id", cmd.deck_id());
+    query->bindValue(":limit", qMax(1, limit));
+    if (!sqlInterface->execSqlQuery(query)) {
+        return Response::RespContextError;
+    }
+
+    Response_DeckHistoryList *re = new Response_DeckHistoryList;
+    while (query->next()) {
+        DeckVersionInfo *version = re->add_versions();
+        version->set_version_no(query->value(0).toUInt());
+        version->set_created_at(query->value(1).toULongLong());
+        version->set_created_by_clientid(query->value(2).toString().toStdString());
+        version->set_hash(query->value(3).toString().toStdString());
+        version->set_content(query->value(4).toString().toStdString());
+    }
     rc.setResponseExtension(re);
     return Response::RespOk;
 }
