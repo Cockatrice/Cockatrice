@@ -789,38 +789,42 @@ void Server_Game::createGameJoinedEvent(Server_AbstractParticipant *joiningParti
     // (they are only broadcast when a deck is selected), so replay a deck-select
     // context for every player that already has a deck loaded. It is delivered
     // privately to the joining participant, whose client renders it as a log
-    // entry in the same way as a fresh deck selection.
-    for (auto *participant : participants.values()) {
-        if (participant == joiningParticipant) {
-            continue;
-        }
-        auto *deckOwner = qobject_cast<Server_Player *>(participant);
-        if (deckOwner == nullptr) {
-            continue;
-        }
-        const DeckList *deckList = deckOwner->getDeckList();
-        if (deckList == nullptr) {
-            continue;
-        }
+    // entry in the same way as a fresh deck selection. Skipped on reconnect
+    // (resuming) — the player already saw these — and once the game has started,
+    // when the message is no longer useful and would only spam the log.
+    if (!resuming && !gameStarted) {
+        for (auto *participant : participants.values()) {
+            if (participant == joiningParticipant) {
+                continue;
+            }
+            auto *deckOwner = qobject_cast<Server_Player *>(participant);
+            if (deckOwner == nullptr) {
+                continue;
+            }
+            const DeckList *deckList = deckOwner->getDeckList();
+            if (deckList == nullptr) {
+                continue;
+            }
 
-        Event_PlayerPropertiesChanged event;
-        event.mutable_player_properties()->set_sideboard_locked(deckOwner->getSideboardLocked());
-        event.mutable_player_properties()->set_deck_hash(deckList->getDeckHash().toStdString());
+            Event_PlayerPropertiesChanged event;
+            event.mutable_player_properties()->set_sideboard_locked(deckOwner->getSideboardLocked());
+            event.mutable_player_properties()->set_deck_hash(deckList->getDeckHash().toStdString());
 
-        Context_DeckSelect deckSelect;
-        deckSelect.set_deck_hash(deckList->getDeckHash().toStdString());
-        deckSelect.set_sideboard_size(deckList->getSideboardSize());
-        if (getShareDecklistsOnLoad()) {
-            deckSelect.set_deck_list(deckList->writeToString_Native().toStdString());
+            Context_DeckSelect deckSelect;
+            deckSelect.set_deck_hash(deckList->getDeckHash().toStdString());
+            deckSelect.set_sideboard_size(deckList->getSideboardSize());
+            if (getShareDecklistsOnLoad()) {
+                deckSelect.set_deck_list(deckList->writeToString_Native().toStdString());
+            }
+
+            GameEventContext context;
+            context.GetReflection()
+                ->MutableMessage(&context, deckSelect.GetDescriptor()->FindExtensionByName("ext"))
+                ->CopyFrom(deckSelect);
+
+            rc.enqueuePostResponseItem(ServerMessage::GAME_EVENT_CONTAINER,
+                                       prepareGameEvent(event, deckOwner->getPlayerId(), &context));
         }
-
-        GameEventContext context;
-        context.GetReflection()
-            ->MutableMessage(&context, deckSelect.GetDescriptor()->FindExtensionByName("ext"))
-            ->CopyFrom(deckSelect);
-
-        rc.enqueuePostResponseItem(ServerMessage::GAME_EVENT_CONTAINER,
-                                   prepareGameEvent(event, deckOwner->getPlayerId(), &context));
     }
 }
 
