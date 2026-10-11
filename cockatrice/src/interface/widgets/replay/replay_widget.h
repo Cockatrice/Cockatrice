@@ -8,9 +8,8 @@
 #ifndef REPLAY_WIDGET_H
 #define REPLAY_WIDGET_H
 
-#include "../../../game/player/event_processing_options.h"
-
 #include <QWidget>
+#include <libcockatrice/game/player/event_processing_options.h>
 #include <qtmetamacros.h>
 
 class ReplayManager;

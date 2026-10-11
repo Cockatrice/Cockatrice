@@ -2,9 +2,6 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
-#include "../../../game/abstract_game.h"
-#include "../../../game/game_event_handler.h"
-#include "../../../game/game_meta_info.h"
 #include "../../intents/contexts/context_connect_to_server.h"
 #include "../../intents/contexts/context_join_game.h"
 #include "../../intents/contexts/context_join_room.h"
@@ -65,6 +62,9 @@
 #include <QSystemTrayIcon>
 #include <QTabBar>
 #include <libcockatrice/deck_list/loaded_deck.h>
+#include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/game_event_handler.h>
+#include <libcockatrice/game/game_meta_info.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/network/client/remote/remote_client.h>
 #include <libcockatrice/protocol/pb/event_game_joined.pb.h>

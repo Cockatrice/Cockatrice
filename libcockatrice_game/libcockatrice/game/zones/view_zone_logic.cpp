@@ -2,9 +2,9 @@
 
 "
 #include "../board/card_state.h"
-#include "client/settings/cache_settings.h"
 
 #include <QtGlobal>
+#include <libcockatrice/interfaces/interface_interface_settings_provider.h>
 #include <libcockatrice/settings/interface_settings.h>
 
 class PlayerLogic;
@@ -22,11 +22,17 @@ ZoneViewZoneLogic::ZoneViewZoneLogic(PlayerLogic *_player,
                                      bool _revealZone,
                                      bool _writeableRevealZone,
                                      bool _isReversed,
+                                     IInterfaceSettingsProvider *_interfaceSettings,
                                      QObject *parent)
     : CardZoneLogic(_player, _origZone->getName(), false, false, true, parent), origZone(_origZone),
       numberCards(_numberCards), revealZone(_revealZone), writeableRevealZone(_writeableRevealZone),
-      isReversed(_isReversed)
+      isReversed(_isReversed), interfaceSettings(_interfaceSettings)
 {
+}
+
+bool ZoneViewZoneLogic::getCloseEmptyCardView() const
+{
+    return interfaceSettings ? interfaceSettings->getCloseEmptyCardView() : true;
 }
 
 /**
@@ -64,7 +70,7 @@ bool ZoneViewZoneLogic::prepareAddCard(int x)
 
     // autoclose check is done both here and in removeCard
 
-    if (cards.isEmpty() && !doInsert && SettingsCache::instance().userInterface().getCloseEmptyCardView()) {
+    if (cards.isEmpty() && !doInsert && getCloseEmptyCardView()) {
         emit closeView();
     }
 
@@ -151,7 +157,7 @@ void ZoneViewZoneLogic::removeCard(int position, bool toNewZone)
     // card gets dragged within the view.
     // Another autoclose check is done in prepareAddCard so that the view autocloses if the last card was moved to an
     // unrevealed portion of the same zone.
-    if (cards.isEmpty() && SettingsCache::instance().userInterface().getCloseEmptyCardView() && toNewZone) {
+    if (cards.isEmpty() && getCloseEmptyCardView() && toNewZone) {
         emit closeView();
         return;
     }

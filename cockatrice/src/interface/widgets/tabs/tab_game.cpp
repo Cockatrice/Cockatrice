@@ -2,7 +2,10 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../../../database/interface/settings_card_preference_provider.h"
 #include "../../../game_graphics/board/abstract_card_item.h"
+#include "../game_graphics/board/arrow_item.h"
+#include "../game_graphics/board/card_item.h"
 #include "../game_graphics/deckview/deck_view_container.h"
 #include "../game_graphics/deckview/tabbed_deck_view_container.h"
 #include "../game_graphics/game_scene.h"
@@ -96,7 +99,8 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     : Tab(_tabSupervisor), sayLabel(nullptr), sayEdit(nullptr)
 {
     // THIS CTOR IS USED ON REPLAY
-    game = new Replay(this, _replay, tabSupervisor->getIsLocalGame());
+    game = new Replay(this, _replay, tabSupervisor->getIsLocalGame(), &SettingsCache::instance().userInterface(),
+                      new SettingsCardPreferenceProvider(this));
 
     createCardInfoDock(true);
     createPlayerListDock(true);
@@ -140,7 +144,8 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     : Tab(_tabSupervisor), userListProxy(_tabSupervisor->getUserListManager())
 {
     // THIS CTOR IS USED ON GAMES
-    game = new Game(this, tabSupervisor->getIsLocalGame(), _clients, event, _roomGameTypes);
+    game = new Game(this, tabSupervisor->getIsLocalGame(), _clients, event, _roomGameTypes,
+                    &SettingsCache::instance().userInterface(), new SettingsCardPreferenceProvider(this));
 
     createCardInfoDock();
     createPlayerListDock();
