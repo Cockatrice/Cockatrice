@@ -3,7 +3,7 @@
 
 #include <QString>
 
-class GameConfig;
+struct GameConfig;
 class Server_Game;
 class Server_AbstractUserInterface;
 
