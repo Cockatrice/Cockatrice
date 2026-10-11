@@ -327,21 +327,30 @@ void LoadSetsPage::initializePage()
     urlLineEdit->setText(wizard()->settings->value("allsetsurl", ALLSETS_URL).toString());
 
     // Memory check because Oracle parsing fails on systems with less than 4GiB for MTGJsons allPrintings.json
+    // The fallback URL is xz-compressed, so only offer it in builds that can read it.
+    // During background (automatic) updates there is no user to answer, so switch silently.
+#ifdef HAS_LZMA
     if (!SystemMemoryQuerier::hasAtLeastGiB(4) && urlLineEdit->text() == ALLSETS_URL) {
-        // Ask user whether to switch URL
-        QMessageBox msgBox(
-            QMessageBox::Question, tr("Low Memory Detected"),
-            tr("Your system has less than 4 GiB of memory.\n"
-               "Using the default AllPrintings URL may cause high memory usage and is known to fail as a result.\n\n"
-               "Would you like to switch to the direct-download pre-parsed URL instead? (Updated daily)"),
-            QMessageBox::Yes | QMessageBox::No, this);
-
-        msgBox.setDefaultButton(QMessageBox::Yes);
-
-        if (msgBox.exec() == QMessageBox::Yes) {
+        if (wizard()->backgroundMode) {
             urlLineEdit->setText(MTGXML_URL);
+        } else {
+            // Ask user whether to switch URL
+            QMessageBox msgBox(
+                QMessageBox::Question, tr("Low Memory Detected"),
+                tr("Your system has less than 4 GiB of memory.\n"
+                   "Using the default AllPrintings URL may cause high memory usage and is known to fail as a "
+                   "result.\n\n"
+                   "Would you like to switch to the direct-download pre-parsed URL instead? (Updated daily)"),
+                QMessageBox::Yes | QMessageBox::No, this);
+
+            msgBox.setDefaultButton(QMessageBox::Yes);
+
+            if (msgBox.exec() == QMessageBox::Yes) {
+                urlLineEdit->setText(MTGXML_URL);
+            }
         }
     }
+#endif
 
     progressLabel->hide();
     progressBar->hide();
