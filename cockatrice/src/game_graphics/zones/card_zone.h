@@ -16,6 +16,7 @@
 
 class CardDragItem;
 class CardItem;
+class CardState;
 class CardZoneLogic;
 class QAction;
 class QGraphicsItem;

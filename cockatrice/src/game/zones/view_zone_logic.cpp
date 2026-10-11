@@ -3,6 +3,8 @@
 #include "../../client/settings/cache_settings.h"
 #include "../board/card_list.h"
 #include "../board/card_state.h"
+#include "../player/player_actions.h"
+#include "../player/player_logic.h"
 
 #include <QtGlobal>
 #include <libcockatrice/settings/interface_settings.h>
