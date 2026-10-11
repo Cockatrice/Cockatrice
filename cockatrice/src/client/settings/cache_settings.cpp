@@ -25,6 +25,7 @@
 #include <libcockatrice/settings/commander_bracket_settings.h>
 #include <libcockatrice/settings/debug_settings.h>
 #include <libcockatrice/settings/deck_editor_settings.h>
+#include <libcockatrice/settings/deck_sync_settings.h>
 #include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/game_filters_settings.h>
 #include <libcockatrice/settings/game_settings.h>
@@ -155,6 +156,7 @@ SettingsCache::SettingsCache()
     cardsDisplaySettings = new CardsDisplaySettings(settingsPath, this);
     interfaceSettings = new InterfaceSettings(settingsPath, this);
     deckEditorSettings = new DeckEditorSettings(settingsPath, this);
+    deckSyncSettings = new DeckSyncSettings(settingsPath, this);
     pathsSettings = new PathsSettings(settingsPath, this);
     visualDeckStorageSettings = new VisualDeckStorageSettings(settingsPath, this);
     appearanceSettings = new AppearanceSettings(settingsPath, this);
@@ -454,6 +456,11 @@ PathsSettings &SettingsCache::paths() const
 DeckEditorSettings &SettingsCache::deckEditor() const
 {
     return *deckEditorSettings;
+}
+
+DeckSyncSettings &SettingsCache::deckSync() const
+{
+    return *deckSyncSettings;
 }
 
 VisualDeckStorageSettings &SettingsCache::visualDeckStorage() const
