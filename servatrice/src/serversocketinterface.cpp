@@ -72,6 +72,7 @@
 #include <QString>
 #include <QStringLiteral>
 #include <QTextStream>
+#include <QUuid>
 #include <QVariant>
 #include <QtGlobal>
 #include <algorithm>
@@ -707,8 +708,8 @@ bool AbstractServerSocketInterface::deckListHelper(int folderId,
     }
 
     query = sqlInterface->prepareQuery("select id, name, upload_time, is_public, banner_card_name, "
-                                       "banner_card_provider, color_identity, tags from {prefix}_decklist_files where "
-                                       "id_folder = :id_folder and id_user = :id_user");
+                                       "banner_card_provider, color_identity, tags, guid, hash, last_modified from "
+                                       "{prefix}_decklist_files where id_folder = :id_folder and id_user = :id_user");
     query->bindValue(":id_folder", folderId);
     query->bindValue(":id_user", userId);
     if (!sqlInterface->execSqlQuery(query)) {
@@ -733,6 +734,12 @@ bool AbstractServerSocketInterface::deckListHelper(int folderId,
         newFile->set_color_identity(query->value(6).toString().toStdString());
         for (const QString &tag : deserializeDeckTags(query->value(7).toString())) {
             newFile->add_tags(tag.toStdString());
+        }
+        newFile->set_guid(query->value(8).toString().toStdString());
+        newFile->set_hash(query->value(9).toString().toStdString());
+        const QDateTime lastModified = query->value(10).toDateTime();
+        if (lastModified.isValid()) {
+            newFile->set_last_modified(lastModified.toSecsSinceEpoch());
         }
     }
 
@@ -1040,6 +1047,38 @@ QString sanitizeColorIdentity(const QString &colorIdentity)
 }
 } // namespace
 
+bool AbstractServerSocketInterface::storeDeckVersion(int deckId, const QString &content, const QString &hash)
+{
+    QSqlQuery *maxQuery =
+        sqlInterface->prepareQuery("select coalesce(max(version_no), 0) from {prefix}_deck_versions where deck_id = "
+                                   ":deck_id");
+    maxQuery->bindValue(":deck_id", deckId);
+    if (!sqlInterface->execSqlQuery(maxQuery) || !maxQuery->next()) {
+        return false;
+    }
+    const int nextVersion = maxQuery->value(0).toInt() + 1;
+
+    QSqlQuery *insertQuery =
+        sqlInterface->prepareQuery("insert into {prefix}_deck_versions (deck_id, version_no, content, hash, "
+                                   "created_at, created_by_clientid) values(:deck_id, :version_no, :content, :hash, "
+                                   "NOW(), :created_by_clientid)");
+    insertQuery->bindValue(":deck_id", deckId);
+    insertQuery->bindValue(":version_no", nextVersion);
+    insertQuery->bindValue(":content", content);
+    insertQuery->bindValue(":hash", hash);
+    insertQuery->bindValue(":created_by_clientid", QString::fromStdString(userInfo->clientid()));
+    if (!sqlInterface->execSqlQuery(insertQuery)) {
+        return false;
+    }
+
+    QSqlQuery *pruneQuery = sqlInterface->prepareQuery("delete from {prefix}_deck_versions where deck_id = :deck_id "
+                                                       "and version_no <= :min_kept_version");
+    pruneQuery->bindValue(":deck_id", deckId);
+    pruneQuery->bindValue(":min_kept_version", nextVersion - servatrice->getDeckSyncMaxVersions());
+    sqlInterface->execSqlQuery(pruneQuery);
+    return true;
+}
+
 Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Command_DeckUpload &cmd,
                                                                     ResponseContainer &rc)
 {
@@ -1075,6 +1114,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
     const QString bannerCardProvider = deck.getBannerCard().providerId.left(32);
     const QString tagsJson = serializeDeckTags(deck.getTags());
     const QString colorIdentity = sanitizeColorIdentity(nameFromStdString(cmd.color_identity()));
+    const QString deckHash = deck.getDeckHash();
+    QString guid = cmd.has_guid() ? nameFromStdString(cmd.guid()).left(36) : QString();
+    if (QUuid::fromString(guid).isNull()) {
+        guid = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    }
 
     if (cmd.has_path()) {
         int folderId = getDeckPathId(nameFromStdString(cmd.path()));
@@ -1085,8 +1129,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
         QSqlQuery *query =
             sqlInterface->prepareQuery("insert into {prefix}_decklist_files (id_folder, id_user, name, upload_time, "
                                        "content, is_public, banner_card_name, banner_card_provider, color_identity, "
-                                       "tags) values(:id_folder, :id_user, :name, NOW(), :content, :is_public, "
-                                       ":banner_card_name, :banner_card_provider, :color_identity, :tags)");
+                                       "tags, guid, hash, last_modified) values(:id_folder, :id_user, :name, NOW(), "
+                                       ":content, :is_public, :banner_card_name, :banner_card_provider, "
+                                       ":color_identity, :tags, :guid, :hash, NOW())");
         query->bindValue(":id_folder", folderId);
         query->bindValue(":id_user", userInfo->id());
         query->bindValue(":name", deckName);
@@ -1096,21 +1141,63 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
         query->bindValue(":banner_card_provider", bannerCardProvider);
         query->bindValue(":color_identity", colorIdentity);
         query->bindValue(":tags", tagsJson);
+        query->bindValue(":guid", guid);
+        query->bindValue(":hash", deckHash);
         if (!sqlInterface->execSqlQuery(query)) {
+            return Response::RespContextError;
+        }
+        const int deckId = query->lastInsertId().toInt();
+        if (!storeDeckVersion(deckId, deckStr, deckHash)) {
+            QSqlQuery *cleanupQuery = sqlInterface->prepareQuery("delete from {prefix}_decklist_files where id = :id");
+            cleanupQuery->bindValue(":id", deckId);
+            sqlInterface->execSqlQuery(cleanupQuery);
+            return Response::RespContextError;
+        }
+
+        QSqlQuery *stampQuery =
+            sqlInterface->prepareQuery("select unix_timestamp(upload_time), unix_timestamp(last_modified) from "
+                                       "{prefix}_decklist_files where id = :id and id_user = :id_user");
+        stampQuery->bindValue(":id", deckId);
+        stampQuery->bindValue(":id_user", userInfo->id());
+        if (!sqlInterface->execSqlQuery(stampQuery) || !stampQuery->next()) {
+            QSqlQuery *cleanupQuery = sqlInterface->prepareQuery("delete from {prefix}_decklist_files where id = :id");
+            cleanupQuery->bindValue(":id", deckId);
+            sqlInterface->execSqlQuery(cleanupQuery);
             return Response::RespContextError;
         }
 
         Response_DeckUpload *re = new Response_DeckUpload;
         ServerInfo_DeckStorage_TreeItem *fileInfo = re->mutable_new_file();
-        fileInfo->set_id(query->lastInsertId().toInt());
+        fileInfo->set_id(deckId);
         fileInfo->set_name(deckName.toStdString());
-        fileInfo->mutable_file()->set_creation_time(QDateTime::currentDateTime().toSecsSinceEpoch());
+        fileInfo->mutable_file()->set_creation_time(stampQuery->value(0).toUInt());
         fileInfo->mutable_file()->set_is_public(cmd.has_is_public() && cmd.is_public());
+        fileInfo->mutable_file()->set_guid(guid.toStdString());
+        fileInfo->mutable_file()->set_hash(deckHash.toStdString());
+        fileInfo->mutable_file()->set_last_modified(stampQuery->value(1).toULongLong());
         rc.setResponseExtension(re);
     } else if (cmd.has_deck_id()) {
+        QSqlQuery *currentQuery =
+            sqlInterface->prepareQuery("select guid, hash from {prefix}_decklist_files where id = :id and id_user = "
+                                       ":id_user");
+        currentQuery->bindValue(":id", cmd.deck_id());
+        currentQuery->bindValue(":id_user", userInfo->id());
+        if (!sqlInterface->execSqlQuery(currentQuery)) {
+            return Response::RespContextError;
+        }
+        if (!currentQuery->next()) {
+            return Response::RespNameNotFound;
+        }
+        if (!QUuid::fromString(currentQuery->value(0).toString()).isNull()) {
+            guid = currentQuery->value(0).toString();
+        } else if (cmd.has_guid() && !QUuid::fromString(nameFromStdString(cmd.guid()).left(36)).isNull()) {
+            guid = nameFromStdString(cmd.guid()).left(36);
+        }
+        const QString oldHash = currentQuery->value(1).toString();
+
         QString updateQuery = "update {prefix}_decklist_files set name=:name, upload_time=NOW(), content=:content, "
                               "banner_card_name=:banner_card_name, banner_card_provider=:banner_card_provider, "
-                              "color_identity=:color_identity, tags=:tags";
+                              "color_identity=:color_identity, tags=:tags, guid=:guid, hash=:hash, last_modified=NOW()";
         if (cmd.has_is_public()) {
             updateQuery += ", is_public=:is_public";
         }
@@ -1125,33 +1212,56 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
         query->bindValue(":banner_card_provider", bannerCardProvider);
         query->bindValue(":color_identity", colorIdentity);
         query->bindValue(":tags", tagsJson);
+        query->bindValue(":guid", guid);
+        query->bindValue(":hash", deckHash);
         if (cmd.has_is_public()) {
             query->bindValue(":is_public", cmd.is_public() ? 1 : 0);
         }
         if (!sqlInterface->execSqlQuery(query)) {
             return Response::RespContextError;
         }
-
         if (query->numRowsAffected() == 0) {
             return Response::RespNameNotFound;
         }
 
+        if (oldHash != deckHash) {
+            if (!storeDeckVersion(cmd.deck_id(), deckStr, deckHash)) {
+                return Response::RespContextError;
+            }
+        } else {
+            // Self-heal a version gap left by an earlier failed version write:
+            // a same-content re-upload must still leave a version behind.
+            QSqlQuery *versionQuery =
+                sqlInterface->prepareQuery("select count(*) from {prefix}_deck_versions where deck_id = :deck_id and "
+                                           "hash = :hash");
+            versionQuery->bindValue(":deck_id", cmd.deck_id());
+            versionQuery->bindValue(":hash", deckHash);
+            if (!sqlInterface->execSqlQuery(versionQuery) || !versionQuery->next()) {
+                return Response::RespContextError;
+            }
+            if (versionQuery->value(0).toInt() == 0 && !storeDeckVersion(cmd.deck_id(), deckStr, deckHash)) {
+                return Response::RespContextError;
+            }
+        }
+
         QSqlQuery *visibilityQuery =
-            sqlInterface->prepareQuery("select is_public from {prefix}_decklist_files where id = :id and "
-                                       "id_user = :id_user");
+            sqlInterface->prepareQuery("select is_public, unix_timestamp(upload_time), unix_timestamp(last_modified) "
+                                       "from {prefix}_decklist_files where id = :id and id_user = :id_user");
         visibilityQuery->bindValue(":id", cmd.deck_id());
         visibilityQuery->bindValue(":id_user", userInfo->id());
-        if (!sqlInterface->execSqlQuery(visibilityQuery)) {
+        if (!sqlInterface->execSqlQuery(visibilityQuery) || !visibilityQuery->next()) {
             return Response::RespContextError;
         }
-        const bool isPublic = visibilityQuery->next() && visibilityQuery->value(0).toBool();
 
         Response_DeckUpload *re = new Response_DeckUpload;
         ServerInfo_DeckStorage_TreeItem *fileInfo = re->mutable_new_file();
         fileInfo->set_id(cmd.deck_id());
         fileInfo->set_name(deckName.toStdString());
-        fileInfo->mutable_file()->set_creation_time(QDateTime::currentDateTime().toSecsSinceEpoch());
-        fileInfo->mutable_file()->set_is_public(isPublic);
+        fileInfo->mutable_file()->set_creation_time(visibilityQuery->value(1).toUInt());
+        fileInfo->mutable_file()->set_is_public(visibilityQuery->value(0).toBool());
+        fileInfo->mutable_file()->set_guid(guid.toStdString());
+        fileInfo->mutable_file()->set_hash(deckHash.toStdString());
+        fileInfo->mutable_file()->set_last_modified(visibilityQuery->value(2).toULongLong());
         rc.setResponseExtension(re);
     } else {
         return Response::RespInvalidData;
@@ -1173,11 +1283,29 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckDownload(const Comm
     } catch (Response::ResponseCode &r) {
         return r;
     }
+    const QString deckNative = deck->writeToString_Native();
+    delete deck;
+
+    QSqlQuery *syncQuery =
+        sqlInterface->prepareQuery("select guid, hash, last_modified from {prefix}_decklist_files where id = :id and "
+                                   "id_user = :id_user");
+    syncQuery->bindValue(":id", cmd.deck_id());
+    syncQuery->bindValue(":id_user", userInfo->id());
+    if (!sqlInterface->execSqlQuery(syncQuery)) {
+        return Response::RespContextError;
+    }
 
     Response_DeckDownload *re = new Response_DeckDownload;
-    re->set_deck(deck->writeToString_Native().toStdString());
+    re->set_deck(deckNative.toStdString());
+    if (syncQuery->next()) {
+        re->set_guid(syncQuery->value(0).toString().toStdString());
+        re->set_hash(syncQuery->value(1).toString().toStdString());
+        const QDateTime lastModified = syncQuery->value(2).toDateTime();
+        if (lastModified.isValid()) {
+            re->set_last_modified(lastModified.toSecsSinceEpoch());
+        }
+    }
     rc.setResponseExtension(re);
-    delete deck;
 
     return Response::RespOk;
 }
