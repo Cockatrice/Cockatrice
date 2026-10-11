@@ -27,6 +27,7 @@
 #include <QtGlobal>
 #include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/deck_sync_settings.h>
 #include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
@@ -359,6 +360,25 @@ GeneralSettingsPage::GeneralSettingsPage()
     pathsGroupBox = new QGroupBox;
     pathsGroupBox->setLayout(pathsGrid);
 
+    // deck sync settings
+    conflictDefaultSelector.addItem("", DeckSyncConflictAsk);
+    conflictDefaultSelector.addItem("", DeckSyncConflictKeepMine);
+    conflictDefaultSelector.addItem("", DeckSyncConflictKeepServer);
+    conflictDefaultSelector.addItem("", DeckSyncConflictKeepNewer);
+    int conflictIndex = conflictDefaultSelector.findData(settings.deckSync().getConflictDefault());
+    if (conflictIndex >= 0) {
+        conflictDefaultSelector.setCurrentIndex(conflictIndex);
+    }
+    connect(&conflictDefaultSelector, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int index) {
+        SettingsCache::instance().deckSync().setConflictDefault(conflictDefaultSelector.itemData(index).toInt());
+    });
+
+    auto *deckSyncGrid = new QGridLayout;
+    deckSyncGrid->addWidget(&conflictDefaultLabel, 0, 0);
+    deckSyncGrid->addWidget(&conflictDefaultSelector, 0, 1);
+    deckSyncGroupBox = new QGroupBox;
+    deckSyncGroupBox->setLayout(deckSyncGrid);
+
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(languageGroupBox);
     mainLayout->addWidget(versionGroupBox);
@@ -366,6 +386,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     mainLayout->addWidget(cardDatabaseGroupBox);
     mainLayout->addWidget(startupGroupBox);
     mainLayout->addWidget(pathsGroupBox);
+    mainLayout->addWidget(deckSyncGroupBox);
     mainLayout->addStretch();
 
     GeneralSettingsPage::retranslateUi();
@@ -647,5 +668,13 @@ void GeneralSettingsPage::retranslateUi()
     cardDatabasePathLabel.setText(tr("Card database:"));
     customCardDatabasePathLabel.setText(tr("Custom database directory:"));
     tokenDatabasePathLabel.setText(tr("Token database:"));
+    deckSyncGroupBox->setTitle(tr("Deck sync"));
+    conflictDefaultLabel.setText(tr("When a deck changed on both sides:"));
+    conflictDefaultSelector.setItemText(conflictDefaultSelector.findData(DeckSyncConflictAsk), tr("Ask me every time"));
+    conflictDefaultSelector.setItemText(conflictDefaultSelector.findData(DeckSyncConflictKeepMine), tr("Keep my deck"));
+    conflictDefaultSelector.setItemText(conflictDefaultSelector.findData(DeckSyncConflictKeepServer),
+                                        tr("Keep the server deck"));
+    conflictDefaultSelector.setItemText(conflictDefaultSelector.findData(DeckSyncConflictKeepNewer),
+                                        tr("Keep the newer deck"));
     resetAllPathsButton->setText(tr("Reset all paths"));
 }

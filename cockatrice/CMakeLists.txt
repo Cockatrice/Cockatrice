@@ -58,6 +58,8 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/dlg_shared_decks_preview.cpp
     src/interface/widgets/dialogs/dlg_settings.cpp
     src/interface/widgets/dialogs/dlg_startup_card_check.cpp
+    src/interface/widgets/dialogs/dlg_sync_conflict.cpp
+    src/interface/widgets/dialogs/dlg_sync_onboarding.cpp
     src/interface/widgets/dialogs/dlg_tip_of_the_day.cpp
     src/interface/widgets/dialogs/dlg_update.cpp
     src/interface/widgets/dialogs/dlg_view_log.cpp
