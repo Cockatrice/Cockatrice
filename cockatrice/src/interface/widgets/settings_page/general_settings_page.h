@@ -108,6 +108,9 @@ private:
 
     QLabel conflictDefaultLabel;
     QComboBox conflictDefaultSelector;
+    QCheckBox autoSyncCheckBox;
+    QLabel syncIntervalLabel;
+    QSpinBox syncIntervalEdit;
 };
 
 #endif // COCKATRICE_GENERAL_SETTINGS_PAGE_H

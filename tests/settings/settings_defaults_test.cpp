@@ -606,6 +606,33 @@ TEST_F(SettingsDefaultsTest, DeckSync_ConflictDefault_SetAndGet)
     ASSERT_EQ(s.getConflictDefault(), DeckSyncConflictAsk);
 }
 
+TEST_F(SettingsDefaultsTest, DeckSync_AutoSync_Default)
+{
+    DeckSyncSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getAutoSync(), true);
+}
+
+TEST_F(SettingsDefaultsTest, DeckSync_AutoSync_SetAndGet)
+{
+    DeckSyncSettings s(settingsPath, nullptr);
+    s.setAutoSync(false);
+    ASSERT_EQ(s.getAutoSync(), false);
+    s.setAutoSync(true);
+    ASSERT_EQ(s.getAutoSync(), true);
+}
+
+TEST_F(SettingsDefaultsTest, DeckSync_SyncIntervalMinutes_DefaultAndBounds)
+{
+    DeckSyncSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getSyncIntervalMinutes(), 5);
+    s.setSyncIntervalMinutes(15);
+    ASSERT_EQ(s.getSyncIntervalMinutes(), 15);
+    s.setSyncIntervalMinutes(0);
+    ASSERT_EQ(s.getSyncIntervalMinutes(), 1);
+    s.setSyncIntervalMinutes(600);
+    ASSERT_EQ(s.getSyncIntervalMinutes(), 60);
+}
+
 // --- NetworkSettings ---
 
 TEST_F(SettingsDefaultsTest, Network_ClientID_Default)
