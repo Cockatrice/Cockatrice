@@ -605,8 +605,25 @@ void TabGame::actTurnOrder()
     }
 
     QStringList playerNames;
-    for (PlayerLogic *player : game->getPlayerManager()->getPlayers()) {
-        playerNames.append(player->getPlayerInfo()->getName());
+    const QList<int> seatOrder = game->getGameState()->getSeatOrder();
+    const auto &players = game->getPlayerManager()->getPlayers();
+    if (!seatOrder.isEmpty()) {
+        for (int playerId : seatOrder) {
+            if (PlayerLogic *player = players.value(playerId, nullptr)) {
+                playerNames.append(player->getPlayerInfo()->getName());
+            }
+        }
+        // Include any players missing from the tracked order rather than dropping them.
+        for (auto it = players.constBegin(); it != players.constEnd(); ++it) {
+            const QString name = it.value()->getPlayerInfo()->getName();
+            if (!playerNames.contains(name)) {
+                playerNames.append(name);
+            }
+        }
+    } else {
+        for (PlayerLogic *player : players) {
+            playerNames.append(player->getPlayerInfo()->getName());
+        }
     }
 
     DlgTurnOrder dlg(playerNames, this);
@@ -1289,6 +1306,7 @@ void TabGame::createPlayAreaWidget(bool bReplay)
     scene = new GameScene(phasesToolbar, this);
     connect(game->getPlayerManager(), &PlayerManager::playerConceded, scene, &GameScene::rearrange);
     connect(game->getPlayerManager(), &PlayerManager::playerCountChanged, scene, &GameScene::rearrange);
+    connect(game->getGameState(), &GameState::seatOrderChanged, scene, &GameScene::rearrange);
     connect(scene, &GameScene::arrowDeletionRequested, game->getGameEventHandler(),
             &GameEventHandler::handleArrowDeletion);
     connect(game->getGameEventHandler(), &GameEventHandler::arrowDeleted, scene, &GameScene::deleteArrow);

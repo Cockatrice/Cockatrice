@@ -7,6 +7,7 @@
 #ifndef COCKATRICE_GAME_STATE_H
 #define COCKATRICE_GAME_STATE_H
 
+#include <QList>
 #include <QTimer>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 
@@ -110,6 +111,19 @@ public:
         return hostId;
     }
 
+    void setSeatOrder(const QList<int> &order)
+    {
+        if (seatOrder != order) {
+            seatOrder = order;
+            emit seatOrderChanged(seatOrder);
+        }
+    }
+
+    QList<int> getSeatOrder() const
+    {
+        return seatOrder;
+    }
+
     int getSecondsElapsed() const
     {
         return secondsElapsed;
@@ -121,6 +135,7 @@ signals:
     void gameStopped();
     void activePhaseChanged(int activePhase);
     void activePlayerChanged(int playerId);
+    void seatOrderChanged(const QList<int> &seatOrder);
 
 public slots:
     void incrementGameTime();
@@ -140,6 +155,7 @@ private:
     int currentPhase;
     int activePlayer;
     bool gameClosed;
+    QList<int> seatOrder;
 };
 
 #endif // COCKATRICE_GAME_STATE_H

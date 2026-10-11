@@ -346,6 +346,19 @@ void GameEventHandler::eventGameStateChanged(const Event_GameStateChanged &event
 
     emit remotePlayersDecksSelected(opponentDecksToDisplay);
 
+    // The server emits player_list in seat order, so record it to lay out the
+    // table by seating rather than by player id.
+    QList<int> seatOrder;
+    for (int i = 0; i < playerListSize; ++i) {
+        const ServerInfo_PlayerProperties &prop = event.player_list(i).properties();
+        if (!prop.spectator()) {
+            seatOrder.append(prop.player_id());
+        }
+    }
+    if (!seatOrder.isEmpty()) {
+        game->getGameState()->setSeatOrder(seatOrder);
+    }
+
     game->getGameState()->setGameTime(event.seconds_elapsed());
 
     if (event.game_started() && !game->getGameMetaInfo()->started()) {
@@ -557,6 +570,22 @@ void GameEventHandler::eventPlayerOrderChanged(const Event_PlayerOrderChanged &e
     QStringList playerNames;
     for (const auto &name : event.player_names()) {
         playerNames.append(QString::fromStdString(name));
+    }
+
+    // Track the seating by stable player id so the table layout and the turn
+    // order dialog follow the shuffled order instead of id order.
+    QList<int> seatOrder;
+    const auto &players = game->getPlayerManager()->getPlayers();
+    for (const QString &name : playerNames) {
+        for (auto it = players.constBegin(); it != players.constEnd(); ++it) {
+            if (it.value() && it.value()->getPlayerInfo()->getName() == name) {
+                seatOrder.append(it.key());
+                break;
+            }
+        }
+    }
+    if (!seatOrder.isEmpty()) {
+        game->getGameState()->setSeatOrder(seatOrder);
     }
     emit logTurnOrderChanged(playerNames, event.randomized());
 }
