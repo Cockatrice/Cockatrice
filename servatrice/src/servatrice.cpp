@@ -1288,12 +1288,45 @@ int Servatrice::getForgotPasswordTokenLife() const
 
 bool Servatrice::recordFailedLogin(const QString &ipAddress)
 {
+    if (isRateLimitExempt(ipAddress)) {
+        return false;
+    }
     return rateLimiter.recordAttempt("login:" + ipAddress, getMaxLoginAttemptsPerIp(), getLoginAttemptWindowSeconds());
 }
 
 bool Servatrice::isLoginRateLimited(const QString &ipAddress)
 {
+    if (isRateLimitExempt(ipAddress)) {
+        return false;
+    }
     return rateLimiter.isBlocked("login:" + ipAddress, getMaxLoginAttemptsPerIp(), getLoginAttemptWindowSeconds());
+}
+
+bool Servatrice::recordRegistrationAttempt(const QString &ipAddress)
+{
+    if (isRateLimitExempt(ipAddress)) {
+        return false;
+    }
+    return rateLimiter.recordAttempt("register:" + ipAddress, getMaxRegistrationsPerIp(),
+                                     getRegistrationWindowSeconds());
+}
+
+bool Servatrice::recordForgotPasswordAttempt(const QString &ipAddress)
+{
+    if (isRateLimitExempt(ipAddress)) {
+        return false;
+    }
+    return rateLimiter.recordAttempt("forgot:" + ipAddress, getMaxForgotPasswordRequestsPerIp(),
+                                     getForgotPasswordWindowSeconds());
+}
+
+bool Servatrice::isRateLimitExempt(const QString &ipAddress) const
+{
+    // Mirrors the max_users_per_address bypass in initSession: trusted sources
+    // (e.g. 127.0.0.1 for Webatrice behind local nginx, where every websocket
+    // client shares one address) are not subject to per-address limits.
+    const QString trustedSources = settingsCache->value("security/trusted_sources", "127.0.0.1,::1").toString();
+    return trustedSources.contains(ipAddress, Qt::CaseInsensitive);
 }
 
 void Servatrice::clearFailedLogins(const QString &ipAddress)

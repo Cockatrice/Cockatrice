@@ -372,6 +372,10 @@ public:
     bool recordFailedLogin(const QString &ipAddress) override;
     bool isLoginRateLimited(const QString &ipAddress) override;
     void clearFailedLogins(const QString &ipAddress) override;
+    bool recordRegistrationAttempt(const QString &ipAddress);
+    bool recordForgotPasswordAttempt(const QString &ipAddress);
+    /// True when the address is in security/trusted_sources and therefore exempt from per-address limits.
+    bool isRateLimitExempt(const QString &ipAddress) const;
     int getMaxLoginAttemptsPerIp() const;
     int getLoginAttemptWindowSeconds() const;
     int getMaxRegistrationsPerIp() const;
