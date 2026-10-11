@@ -25,9 +25,11 @@ class QFileSystemModel;
 class QToolBar;
 class QGroupBox;
 class QTimer;
+class QLabel;
 class CommandContainer;
 class Response;
 class ShareBarWidget;
+class DeckSyncManager;
 class QAction;
 class QModelIndex;
 class TabSupervisor;
@@ -50,6 +52,29 @@ private:
     QAction *aOpenLocalDeck, *aRenameLocal, *aUpload, *aNewLocalFolder, *aDeleteLocalDeck;
     QAction *aOpenDecksFolder;
     QAction *aOpenRemoteDeck, *aDownload, *aShareDecks, *aPublishDeck, *aNewFolder, *aDeleteRemoteDeck;
+    QAction *aSyncNow;
+    QLabel *syncStatusLabel;
+    DeckSyncManager *syncManager;
+    QString syncUsername;
+    bool remoteEnabled = false;
+    enum class SyncStatusType
+    {
+        Idle,
+        Working,
+        Finished,
+        Failed
+    };
+    struct SyncSummary
+    {
+        int uploaded = 0;
+        int downloaded = 0;
+        int unchanged = 0;
+        int skipped = 0;
+    };
+    SyncStatusType syncStatusType = SyncStatusType::Idle;
+    QString syncStatusDetail;
+    SyncSummary lastSyncSummary;
+    void renderSyncStatus();
     bool visibilityRefreshStarted = false;
     QTimer *visibilityRefreshTimer;
     QStringList visibilityFailures;
@@ -107,6 +132,10 @@ private slots:
     void actDeleteRemoteDeck();
     void deleteFolderFinished(const Response &response, const CommandContainer &commandContainer);
     void deleteDeckFinished(const Response &response, const CommandContainer &commandContainer);
+
+    void actSyncNow();
+    void onSyncStatusMessage(const QString &message);
+    void onSyncFinished(int uploaded, int downloaded, int unchanged, int skipped, const QString &error);
 
 public:
     TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User *currentUserInfo);
