@@ -5,7 +5,12 @@
 #include <QByteArray>
 #include <QString>
 #include <QtMath>
+#include <cmath>
 #include <functional>
+#include <memory>
+#include <qnumeric.h>
+#include <string>
+#include <vector>
 
 peg::parser math(R"(
     EXPRESSION   <-  P0

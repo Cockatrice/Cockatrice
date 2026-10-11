@@ -10,18 +10,22 @@
 #include "user_list_proxy.h"
 
 #include <QMap>
-#include <QWidget>
+#include <QObject>
+#include <QString>
+#include <qtmetamacros.h>
+// IWYU pragma: keep
+// ServerInfo_User appears by value and inside QList in slot signatures, so the
+// moc-generated code needs the complete type.
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
 class AbstractClient;
 class Event_AddToList;
-class Event_ListRooms;
 class Event_RemoveFromList;
 class Event_UserJoined;
 class Event_UserLeft;
 class Response;
 class ServerInfo_User;
-class TabSupervisor;
+template <typename T> class QList;
 
 class UserListManager : public QObject, public UserListProxy
 {

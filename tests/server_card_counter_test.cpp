@@ -3,12 +3,14 @@
  *  @ingroup Tests
  */
 
+#include <QMap>
+#include <QString>
 #include <gtest/gtest.h>
 #include <libcockatrice/network/server/remote/game/server_card.h>
 #include <libcockatrice/protocol/pb/event_set_card_counter.pb.h>
 #include <libcockatrice/utility/card_ref.h>
 #include <libcockatrice/utility/counter_limits.h>
-#include <limits>
+#include <string>
 
 TEST(ServerCardCounter, IncrementNewCounter)
 {

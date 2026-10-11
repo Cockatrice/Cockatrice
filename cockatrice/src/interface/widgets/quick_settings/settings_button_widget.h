@@ -8,10 +8,14 @@
 #ifndef SETTINGS_BUTTON_WIDGET_H
 #define SETTINGS_BUTTON_WIDGET_H
 
-#include "settings_popup_widget.h"
-
-#include <QToolButton>
+#include <QString>
 #include <QWidget>
+#include <qtmetamacros.h>
+
+class QHBoxLayout;
+class QPixmap;
+class QToolButton;
+class SettingsPopupWidget;
 
 class SettingsButtonWidget : public QWidget
 {

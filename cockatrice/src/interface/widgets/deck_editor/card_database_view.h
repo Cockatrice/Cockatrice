@@ -3,11 +3,19 @@
 
 #include "../../key_signals.h"
 
+#include <QPair>
+#include <QString>
+#include <QStringList>
 #include <QTreeView>
+#include <functional>
 #include <libcockatrice/card/card_info.h>
+#include <qtmetamacros.h>
 
-class CardDatabaseModel;
 class CardDatabaseDisplayModel;
+class QModelIndex;
+class QPoint;
+class QWidget;
+template <typename T> class QList;
 
 /**
  * @brief The card database table.
@@ -18,6 +26,13 @@ class CardDatabaseView : public QTreeView
 
     KeySignals searchKeySignals;
     CardDatabaseDisplayModel *databaseDisplayModel;
+
+    /// Provides the custom zones available in the current deck, grouped by board zone.
+    /// The list contains (board zone name, custom zone names) pairs for every board.
+    std::function<QList<QPair<QString, QStringList>>()> zoneMenuProvider;
+    /// Handler invoked when the user picks "New zone..." from the add-to-zone menu.
+    /// Returns the name of the created zone, or an empty string if creation was cancelled.
+    std::function<QString()> newZoneHandler;
 
 public:
     explicit CardDatabaseView(QWidget *parent, CardDatabaseDisplayModel *model);
@@ -32,6 +47,17 @@ public:
     {
         return &searchKeySignals;
     }
+
+    /**
+     * @brief Sets the provider used to populate the "Add to zone" submenu of the context menu.
+     * If no provider is set, the submenu is not shown.
+     *
+     * @param provider Returns the custom zones of the current deck, grouped by board zone
+     * @param newZoneHandler Creates a new custom zone and returns its name, or an empty string
+     *                       if creation was cancelled. The menu entry is hidden when not provided.
+     */
+    void setZoneMenuProvider(const std::function<QList<QPair<QString, QStringList>>()> &provider,
+                             const std::function<QString()> &newZoneHandler);
 
 signals:
     void cardChanged(const QString &cardName);

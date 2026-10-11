@@ -2,17 +2,22 @@
 #define COCKATRICE_REMOTE_CONNECTION_CONTROLLER_H
 
 #include "abstract_client.h"
+#include "latency_tracker.h"
 
 #include <QMessageBox>
 #include <QObject>
 #include <QString>
-#include <QThread>
-#include <libcockatrice/protocol/pb/event_connection_closed.pb.h>
-#include <libcockatrice/protocol/pb/event_server_shutdown.pb.h>
+#include <QtGlobal>
+#include <qtmetamacros.h>
 
 class RemoteClient;
 class ServerInfo_User;
 class DlgConnect;
+class Event_ConnectionClosed;
+class Event_ServerShutdown;
+class QThread;
+class QWidget;
+template <typename T> class QList;
 
 /**
  * Owns the RemoteClient and its worker thread.
@@ -53,6 +58,10 @@ signals:
     // Passes the raw ClientStatus through so MainWindow can drive its own
     // action enable/disable logic
     void statusChanged(ClientStatus status);
+
+    // Forwarded from AbstractClient::pingStatsUpdated. See that signal for the
+    // meaning of the parameters.
+    void pingStatsUpdated(const LatencyTracker::Stats &stats, const QList<int> &samplesMs);
 
 private slots:
     // Slots wired directly to RemoteClient signals

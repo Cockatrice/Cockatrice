@@ -20,40 +20,93 @@
 #ifndef SERVERSOCKETINTERFACE_H
 #define SERVERSOCKETINTERFACE_H
 
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/server_message.pb.h"
+
+#include <QAbstractSocket>
+#include <QByteArray>
 #include <QHostAddress>
+#include <QList>
 #include <QMutex>
+#include <QString>
+#include <QStringList>
 #include <QTcpSocket>
 #include <QWebSocket>
+#include <QtGlobal>
+#include <qtmetamacros.h>
 #include <server_protocolhandler.h>
 
 class Servatrice;
 class Servatrice_DatabaseInterface;
 class DeckList;
 class ServerInfo_DeckStorage_Folder;
-
 class Command_AddToList;
 class Command_RemoveFromList;
 class Command_DeckList;
+class Command_DeckListOtherUser;
 class Command_DeckNewDir;
 class Command_DeckDelDir;
 class Command_DeckDel;
 class Command_DeckDownload;
+class Command_DeckDownloadPublic;
 class Command_DeckUpload;
+class Command_DeckSetVisibility;
+class Command_DeckShareCreate;
+class Command_DeckShareList;
+class Command_DeckShareListMine;
+class Command_DeckShareRemove;
+class Command_DeckShareDownload;
 class Command_ReplayList;
 class Command_ReplayDownload;
 class Command_ReplayModifyMatch;
 class Command_ReplayDeleteMatch;
 class Command_ReplayGetCode;
 class Command_ReplaySubmitCode;
-
 class Command_BanFromServer;
 class Command_UpdateServerMessage;
 class Command_ShutdownServer;
 class Command_ReloadConfig;
-
+class Command_ReplayDownloadByGameId;
 class Command_AccountEdit;
 class Command_AccountImage;
 class Command_AccountPassword;
+class Command_Activate;
+class Command_AddCardArtRule;
+class Command_AdjustMod;
+class Command_ForceActivateUser;
+class Command_ForgotPasswordChallenge;
+class Command_ForgotPasswordRequest;
+class Command_ForgotPasswordReset;
+class Command_GetAdminNotes;
+class Command_GetBanHistory;
+class Command_GetModeratorLastLogins;
+class Command_GetServerStats;
+class Command_GetUserAlts;
+class Command_GetUserSessions;
+class Command_GetWarnHistory;
+class Command_GetWarnList;
+class Command_GrantReplayAccess;
+class Command_ListCardArtRules;
+class Command_Register;
+class Command_RemoveCardArtRule;
+class Command_RemoveUserAvatar;
+class Command_Report;
+class Command_ReportAddComment;
+class Command_ReportAssign;
+class Command_ReportDetails;
+class Command_ReportList;
+class Command_ReportMyList;
+class Command_ReportResolve;
+class Command_ReportStats;
+class Command_ReportUserInfo;
+class Command_RequestPasswordSalt;
+class Command_ResetUserPassword;
+class Command_SetCardArtParams;
+class Command_UpdateAdminNotes;
+class Command_ViewLogHistory;
+class Command_WarnUser;
+class QObject;
+class ResponseContainer;
 
 class AbstractServerSocketInterface : public Server_ProtocolHandler
 {
@@ -67,8 +120,9 @@ signals:
     void incTxBytes(qint64 amount);
 
 protected:
-    void logDebugMessage(const QString &message);
+    void logDebugMessage(const QString &message) override;
     bool tooManyRegistrationAttempts(const QString &ipAddress);
+    void processCommandContainer(const CommandContainer &cont) override;
 
     virtual void writeToSocket(QByteArray &data) = 0;
     virtual void flushSocket() = 0;
@@ -84,8 +138,16 @@ private:
     Response::ResponseCode cmdRemoveFromList(const Command_RemoveFromList &cmd, ResponseContainer &rc);
     int getDeckPathId(int basePathId, QStringList path);
     int getDeckPathId(const QString &path);
-    bool deckListHelper(int folderId, ServerInfo_DeckStorage_Folder *folder);
+    bool deckListHelper(int folderId,
+                        ServerInfo_DeckStorage_Folder *folder,
+                        int userId,
+                        bool inheritedPublic,
+                        bool publicOnly);
+    int getDeckOwnerId(int deckId);
+    bool isDeckEffectivelyPublic(int deckId);
     Response::ResponseCode cmdDeckList(const Command_DeckList &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckListOtherUser(const Command_DeckListOtherUser &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckSetVisibility(const Command_DeckSetVisibility &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckNewDir(const Command_DeckNewDir &cmd, ResponseContainer &rc);
     void deckDelDirHelper(int basePathId);
     void sendServerMessage(const QString userName, const QString message);
@@ -94,6 +156,12 @@ private:
     Response::ResponseCode cmdDeckUpload(const Command_DeckUpload &cmd, ResponseContainer &rc);
     DeckList *getDeckFromDatabase(int deckId);
     Response::ResponseCode cmdDeckDownload(const Command_DeckDownload &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckDownloadPublic(const Command_DeckDownloadPublic &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckShareCreate(const Command_DeckShareCreate &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckShareList(const Command_DeckShareList &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckShareListMine(const Command_DeckShareListMine &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckShareRemove(const Command_DeckShareRemove &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckShareDownload(const Command_DeckShareDownload &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReplayList(const Command_ReplayList &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReplayDownload(const Command_ReplayDownload &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReplayModifyMatch(const Command_ReplayModifyMatch &cmd, ResponseContainer &rc);
@@ -102,13 +170,19 @@ private:
     Response::ResponseCode cmdReplayGetCode(const Command_ReplayGetCode &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReplaySubmitCode(const Command_ReplaySubmitCode &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdBanFromServer(const Command_BanFromServer &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdReportList(const Command_ReportList &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdWarnUser(const Command_WarnUser &cmd, ResponseContainer &rc);
-    Response::ResponseCode cmdGetLogHistory(const Command_ViewLogHistory &cmd, ResponseContainer &rc);
+    Response::ResponseCode
+    cmdGetLogHistory(const Command_ViewLogHistory &cmd, ResponseContainer &rc, bool allowPrivateChat);
     Response::ResponseCode cmdGetBanHistory(const Command_GetBanHistory &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdGetWarnList(const Command_GetWarnList &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdGetWarnHistory(const Command_GetWarnHistory &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdShutdownServer(const Command_ShutdownServer &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdUpdateServerMessage(const Command_UpdateServerMessage &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdReportAssign(const Command_ReportAssign &cmd, ResponseContainer &);
+    Response::ResponseCode cmdReportResolve(const Command_ReportResolve &cmd, ResponseContainer &);
+    Response::ResponseCode cmdReportUserInfo(const Command_ReportUserInfo &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdReportStats(const Command_ReportStats &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdRegisterAccount(const Command_Register &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdActivateAccount(const Command_Activate &cmd, ResponseContainer & /* rc */);
     Response::ResponseCode cmdReloadConfig(const Command_ReloadConfig & /* cmd */, ResponseContainer & /*rc*/);
@@ -122,10 +196,21 @@ private:
     Response::ResponseCode cmdForgotPasswordChallenge(const Command_ForgotPasswordChallenge &cmd,
                                                       ResponseContainer &rc);
     Response::ResponseCode cmdRequestPasswordSalt(const Command_RequestPasswordSalt &cmd, ResponseContainer &rc);
-    Response::ResponseCode processExtendedSessionCommand(int cmdType, const SessionCommand &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdReport(const Command_Report &cmd, ResponseContainer &);
+    Response::ResponseCode cmdReportMyList(const Command_ReportMyList &cmd, ResponseContainer &rc);
+    void sendPendingReportNotifications(ResponseContainer &rc);
+    void onLogin(ResponseContainer &rc) override;
+    Response::ResponseCode cmdReportDetails(const Command_ReportDetails &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdReportAddComment(const Command_ReportAddComment &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdReplayDownloadByGameId(const Command_ReplayDownloadByGameId &cmd, ResponseContainer &rc);
     Response::ResponseCode
-    processExtendedModeratorCommand(int cmdType, const ModeratorCommand &cmd, ResponseContainer &rc);
-    Response::ResponseCode processExtendedAdminCommand(int cmdType, const AdminCommand &cmd, ResponseContainer &rc);
+    processExtendedSessionCommand(int cmdType, const SessionCommand &cmd, ResponseContainer &rc) override;
+    Response::ResponseCode
+    processExtendedModeratorCommand(int cmdType, const ModeratorCommand &cmd, ResponseContainer &rc) override;
+    Response::ResponseCode
+    processExtendedAdminCommand(int cmdType, const AdminCommand &cmd, ResponseContainer &rc) override;
+    Response::ResponseCode
+    processExtendedDeveloperCommand(int cmdType, const DeveloperCommand &cmd, ResponseContainer &rc) override;
 
     Response::ResponseCode cmdAccountEdit(const Command_AccountEdit &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdAccountImage(const Command_AccountImage &cmd, ResponseContainer &rc);
@@ -140,6 +225,14 @@ private:
 
     Response::ResponseCode cmdGetAdminNotes(const Command_GetAdminNotes &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdUpdateAdminNotes(const Command_UpdateAdminNotes &cmd, ResponseContainer &rc);
+
+    Response::ResponseCode cmdGetUserSessions(const Command_GetUserSessions &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdGetUserAlts(const Command_GetUserAlts &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdGetModeratorLastLogins(const Command_GetModeratorLastLogins &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdResetUserPassword(const Command_ResetUserPassword &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdRemoveUserAvatar(const Command_RemoveUserAvatar &cmd, ResponseContainer &rc);
+
+    Response::ResponseCode cmdGetServerStats(const Command_GetServerStats &cmd, ResponseContainer &rc);
 
     bool addAdminFlagToUser(const QString &user, int flag);
     bool removeAdminFlagFromUser(const QString &user, int flag);
@@ -157,9 +250,9 @@ public:
     bool initSession();
 
     virtual QHostAddress getPeerAddress() const = 0;
-    virtual QString getAddress() const = 0;
+    QString getAddress() const override = 0;
 
-    void transmitProtocolItem(const ServerMessage &item);
+    void transmitProtocolItem(const ServerMessage &item) override;
 };
 
 class TcpServerSocketInterface : public AbstractServerSocketInterface

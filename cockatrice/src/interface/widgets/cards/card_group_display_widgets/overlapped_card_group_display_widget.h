@@ -10,6 +10,16 @@
 #include "../../general/layout_containers/overlap_widget.h"
 #include "card_group_display_widget.h"
 
+#include <QPersistentModelIndex>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
+
+class CardSizeWidget;
+class DeckListModel;
+class QItemSelectionModel;
+class QWidget;
+
 class OverlappedCardGroupDisplayWidget : public CardGroupDisplayWidget
 {
     Q_OBJECT

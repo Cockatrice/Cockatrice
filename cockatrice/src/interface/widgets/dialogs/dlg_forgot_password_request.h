@@ -7,13 +7,13 @@
 #ifndef DLG_FORGOTPASSWORDREQUEST_H
 #define DLG_FORGOTPASSWORDREQUEST_H
 
-#include <QComboBox>
 #include <QDialog>
 #include <QLineEdit>
+#include <QString>
+#include <qtmetamacros.h>
 
 class QLabel;
-class QPushButton;
-class QCheckBox;
+class QWidget;
 
 class DlgForgotPasswordRequest : public QDialog
 {

@@ -1,8 +1,11 @@
 #ifndef CLIPBOARD_TESTING_H
 #define CLIPBOARD_TESTING_H
 
-#include "gtest/gtest.h"
-#include <libcockatrice/deck_list/deck_list.h>
+#include <QList>
+#include <QString>
+#include <QVector>
+#include <string>
+#include <utility>
 
 // using std types because qt types aren't understood by gtest (without this you'll get less nice errors)
 using CardRows = QVector<std::pair<std::string, int>>;

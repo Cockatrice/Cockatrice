@@ -1,22 +1,44 @@
 #include "cockatrice_xml_4.h"
 
 #include "../../relation/card_relation.h"
+#include "libcockatrice/card/database/card_database_data.h"
+#include "libcockatrice/card/database/parser/card_database_parser.h"
+#include "libcockatrice/card/lazy_properties_hash.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/relation/card_relation_type.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/interfaces/interface_card_preference_provider.h"
 
 #include <QCoreApplication>
+#include <QDate>
+#include <QDateTime>
 #include <QDebug>
 #include <QFile>
+#include <QIODevice>
+#include <QList>
+#include <QMap>
+#include <QMessageLogger>
+#include <QSharedPointer>
+#include <QStringList>
+#include <QStringView>
+#include <QXmlStreamAttribute>
+#include <QXmlStreamAttributes>
 #include <QXmlStreamReader>
+#include <QXmlStreamWriter>
 #include <libcockatrice/card/format/format_legality_rules.h>
+#include <qnamespace.h>
+#include <utility>
 #include <version_string.h>
+
+class ICardSetPriorityController;
 
 #define COCKATRICE_XML4_TAGNAME "cockatrice_carddatabase"
 #define COCKATRICE_XML4_TAGVER 4
 #define COCKATRICE_XML4_SCHEMALOCATION                                                                                 \
     "https://raw.githubusercontent.com/Cockatrice/Cockatrice/master/doc/carddatabase_v4/cards.xsd"
 
-CockatriceXml4Parser::CockatriceXml4Parser(ICardPreferenceProvider *_cardPreferenceProvider,
-                                           ICardSetPriorityController *_cardSetPriorityController)
-    : ICardDatabaseParser(_cardSetPriorityController), cardPreferenceProvider(_cardPreferenceProvider)
+CockatriceXml4Parser::CockatriceXml4Parser(ICardSetPriorityController *_cardSetPriorityController)
+    : ICardDatabaseParser(_cardSetPriorityController)
 {
 }
 
@@ -261,7 +283,6 @@ QHash<QString, QString> CockatriceXml4Parser::loadCardPropertiesFromXml(QXmlStre
 
 void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
 {
-    bool includeRebalancedCards = cardPreferenceProvider->getIncludeRebalancedCards();
     while (!xml.atEnd()) {
         if (xml.readNext() == QXmlStreamReader::EndElement) {
             break;
@@ -273,6 +294,8 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
             QString name = QString("");
             QString text = QString("");
             QHash<QString, QString> properties;
+            QMap<QString, QString> localizedNames;
+            QMap<QString, QString> localizedTexts;
             QList<CardRelation *> relatedCards, reverseRelatedCards;
             auto _sets = SetToPrintingsMap();
             int tableRow = 0;
@@ -298,6 +321,44 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     // generic properties
                 } else if (xmlName == "prop") {
                     properties = loadCardPropertiesFromXml(xml);
+                    // localized card data
+                } else if (xmlName == "localizations") {
+                    while (!xml.atEnd()) {
+                        if (xml.readNextStartElement()) {
+                            const QString elementName = xml.name().toString();
+                            if (elementName == "localization") {
+                                const QString lang = xml.attributes().value("lang").toString();
+                                QString localizedName;
+                                QString localizedText;
+                                while (!xml.atEnd()) {
+                                    if (xml.readNext() == QXmlStreamReader::EndElement) {
+                                        break;
+                                    }
+                                    if (xml.isStartElement()) {
+                                        const QString childName = xml.name().toString();
+                                        QString value = xml.readElementText(QXmlStreamReader::IncludeChildElements);
+                                        if (childName == "name") {
+                                            localizedName = value;
+                                        } else if (childName == "text") {
+                                            localizedText = value;
+                                        }
+                                    }
+                                }
+                                if (!lang.isEmpty()) {
+                                    if (!localizedName.isEmpty()) {
+                                        localizedNames.insert(lang, localizedName);
+                                    }
+                                    if (!localizedText.isEmpty()) {
+                                        localizedTexts.insert(lang, localizedText);
+                                    }
+                                }
+                            } else {
+                                xml.skipCurrentElement();
+                            }
+                        } else {
+                            break;
+                        }
+                    }
                     // positioning info
                 } else if (xmlName == "tablerow") {
                     tableRow = xml.readElementText(QXmlStreamReader::IncludeChildElements).toInt();
@@ -322,18 +383,8 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                             }
                             printingProps.insert(attrName, attr.value().toString());
                         }
-                        PrintingInfo printingInfo(set, printingProps);
-
-                        // This is very much a hack and not the right place to
-                        // put this check, as it requires a reload of Cockatrice
-                        // to be apply.
-                        //
-                        // However, this is also true of the `set->getEnabled()`
-                        // check above (which is currently bugged as well), so
-                        // we'll fix both at the same time.
-                        if (includeRebalancedCards || printingInfo.getProperty("isRebalanced") != "true") {
-                            _sets[setName].append(printingInfo);
-                        }
+                        PrintingInfo printingInfo(set, LazyPropertiesHash(printingProps));
+                        _sets[setName].append(printingInfo);
                     }
                     // related cards
                 } else if (xmlName == "related" || xmlName == "reverse-related") {
@@ -399,8 +450,9 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                                                  .landscapeOrientation = landscapeOrientation,
                                                  .tableRow = tableRow,
                                                  .upsideDownArt = upsideDown};
-            CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards,
-                                                        reverseRelatedCards, _sets, attributes);
+            CardInfoPtr newCard =
+                CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards, _sets,
+                                      attributes, std::move(localizedNames), std::move(localizedTexts));
             if (targetData) {
                 // Mirror CardDatabase::addCard: if a card with this name already
                 // exists, merge the new printings into it instead of replacing.
@@ -516,6 +568,26 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
         xml.writeTextElement(propName, info->getProperty(propName));
     }
     xml.writeEndElement();
+
+    // localized card data
+    const QStringList localizedLanguages = info->localizationLanguages();
+    if (!localizedLanguages.isEmpty()) {
+        xml.writeStartElement("localizations");
+        const QMap<QString, QString> &localizedNames = info->getLocalizedNames();
+        const QMap<QString, QString> &localizedTexts = info->getLocalizedTexts();
+        for (const QString &lang : localizedLanguages) {
+            xml.writeStartElement("localization");
+            xml.writeAttribute("lang", lang);
+            if (localizedNames.contains(lang)) {
+                xml.writeTextElement("name", localizedNames.value(lang));
+            }
+            if (localizedTexts.contains(lang)) {
+                xml.writeTextElement("text", localizedTexts.value(lang));
+            }
+            xml.writeEndElement();
+        }
+        xml.writeEndElement();
+    }
 
     // sets
     for (const auto &printings : info->getSets()) {

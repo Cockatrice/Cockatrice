@@ -10,17 +10,18 @@
 #include "../../client/translation.h"
 #include "../board/card_list.h"
 
+#include <QList>
 #include <QLoggingCategory>
 #include <QObject>
+#include <QString>
+#include <qtmetamacros.h>
+
+class CardItem;
 
 inline Q_LOGGING_CATEGORY(CardZoneLogicLog, "card_zone_logic");
 
 class PlayerLogic;
 class ZoneViewZone;
-class QMenu;
-class QAction;
-class QPainter;
-class CardDragItem;
 
 class CardZoneLogic : public QObject
 {

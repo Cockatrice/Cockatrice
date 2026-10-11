@@ -7,12 +7,15 @@
 #ifndef DLG_STARTUP_CARD_CHECK_H
 #define DLG_STARTUP_CARD_CHECK_H
 
-#include <QButtonGroup>
 #include <QDialog>
-#include <QDialogButtonBox>
-#include <QLabel>
-#include <QRadioButton>
-#include <QVBoxLayout>
+#include <qtmetamacros.h>
+
+class QButtonGroup;
+class QDialogButtonBox;
+class QLabel;
+class QRadioButton;
+class QVBoxLayout;
+class QWidget;
 
 class DlgStartupCardCheck : public QDialog
 {

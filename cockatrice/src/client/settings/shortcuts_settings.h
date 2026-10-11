@@ -8,9 +8,18 @@
 #define SHORTCUTSSETTINGS_H
 
 #include <QApplication>
+#include <QByteArray>
+#include <QChar>
+#include <QHash>
 #include <QKeySequence>
+#include <QList>
 #include <QLoggingCategory>
-#include <QSettings>
+#include <QObject>
+#include <QString>
+#include <QStringList>
+#include <QtGlobal>
+#include <qtmetamacros.h>
+#include <utility>
 
 inline Q_LOGGING_CATEGORY(ShortcutsSettingsLog, "shortcuts_settings");
 
@@ -786,6 +795,10 @@ private:
                                        ShortcutGroup::Tabs)},
         {"Tabs/aTabLogs",
          ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Logs"), parseSequenceString(""), ShortcutGroup::Tabs)},
+        {"Tabs/aTabReport",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Report Queue"), parseSequenceString(""), ShortcutGroup::Tabs)},
+        {"Tabs/aTabModeration",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Moderation"), parseSequenceString(""), ShortcutGroup::Tabs)},
     };
 };
 

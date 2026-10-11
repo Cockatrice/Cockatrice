@@ -53,6 +53,7 @@ message Response {
         RespClientUpdateRequired = 35; // Client is missing features that the server is requiring
         RespServerFull = 36;           // Server user limit reached
         RespEmailBlackListed = 37;     // Server has blocked the email address provided for registration for some reason
+        RespPasswordChangeRequired = 38; // Server requires the user to change their password before proceeding
     }
 
     // Type of response, used to route handling on the client
@@ -76,9 +77,14 @@ message Response {
         FORGOT_PASSWORD_REQUEST = 1016; // Response to password reset request
         PASSWORD_SALT = 1017;           // Response containing password salt
         GET_ADMIN_NOTES = 1018;         // Response with admin notes
+        GET_SERVER_STATS = 1019;        // Response with server status statistics
         REPLAY_LIST = 1100;             // Response listing replays
         REPLAY_DOWNLOAD = 1101;         // Response for replay download
         REPLAY_GET_CODE = 1102;         // Response containing replay code
+        DECK_SHARE_CREATE = 1103;       // Response to deck share creation
+        DECK_SHARE_LIST = 1104;         // Response listing shared decks
+        DECK_SHARE_DOWNLOAD = 1105;     // Response for shared deck download
+        DECK_SHARE_LIST_MINE = 1106;    // Response listing the caller's own shares
         CARD_ART_RULE_LIST = 1200;      // Response containing a list of card art rules
     }
 

@@ -2,26 +2,50 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../../pixel_map_generator.h"
 #include "../interface/widgets/dialogs/dlg_settings.h"
 #include "../interface/widgets/server/chat_view/chat_view.h"
+#include "../interface/widgets/server/game_link.h"
 #include "../interface/widgets/server/game_selector.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
+#include "../interface/widgets/server/user/user_list_panel_widget.h"
 #include "../interface/widgets/server/user/user_list_widget.h"
 #include "../main.h"
-#include "tab_account.h"
+#include "../server/game_type_map.h"
+#include "../server/user/user_list_proxy.h"
+#include "../utility/completer_utils.h"
+#include "../utility/line_edit_completer.h"
+#include "card/card_completer_proxy_model.h"
+#include "card/card_search_model.h"
+#include "card_database_display_model.h"
+#include "card_database_model.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/room_event.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_gametype.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 #include "tab_supervisor.h"
+#include "user_level.h"
 
+#include <QAction>
 #include <QApplication>
+#include <QCloseEvent>
 #include <QCompleter>
+#include <QDateTime>
+#include <QFlag>
+#include <QGroupBox>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QMenu>
-#include <QMessageBox>
-#include <QPushButton>
+#include <QRegularExpression>
 #include <QSplitter>
+#include <QStringListModel>
+#include <QStringLiteral>
 #include <QSystemTrayIcon>
 #include <QToolButton>
 #include <QVBoxLayout>
-#include <QtCore/qdatetime.h>
+#include <QWidget>
+#include <functional>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/event_join_room.pb.h>
@@ -34,6 +58,8 @@
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/chat_settings.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <qnamespace.h>
+#include <string>
 
 TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
                  AbstractClient *_client,
@@ -52,28 +78,19 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     tempMap.insert(info.room_id(), gameTypes);
     gameSelector = new GameSelector(client, tabSupervisor, this, QMap<int, QString>(), tempMap, true, true);
 
-    auto *tabs = new QTabWidget(this);
+    userListPanel = new UserListPanelWidget(tabSupervisor, client, this);
+    userListPanel->bind(tabSupervisor->getUserListManager());
+    userList = userListPanel->getUserList();
+    connect(userListPanel, &UserListPanelWidget::openMessageDialog, this, &TabRoom::openMessageDialog);
 
-    friendsList = new UserListWidget(tabSupervisor, client, UserListWidget::BuddyList);
-    friendsList->bind(tabSupervisor->getUserListManager());
-    userList = new UserListWidget(tabSupervisor, client, UserListWidget::RoomList);
-    userList->bind(tabSupervisor->getUserListManager());
-    ignoreList = new UserListWidget(tabSupervisor, client, UserListWidget::IgnoreList);
-    ignoreList->bind(tabSupervisor->getUserListManager());
-
-    connect(friendsList, SIGNAL(openMessageDialog(const QString &, bool)), this,
-            SIGNAL(openMessageDialog(const QString &, bool)));
-    connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this,
-            SIGNAL(openMessageDialog(const QString &, bool)));
-
-    tabs->addTab(friendsList, tr("Friends"));
-    tabs->addTab(userList, tr("Online"));
-    tabs->addTab(ignoreList, tr("Ignored"));
+    const auto gameInviteLinkProvider = [this]() { return tabSupervisor->getGameInviteLinksForRoom(roomId); };
+    userList->setGameInviteLinkProvider(gameInviteLinkProvider);
 
     chatView = new ChatView(tabSupervisor, nullptr, true, this);
     connect(chatView, &ChatView::showMentionPopup, this, &TabRoom::actShowMentionPopup);
     connect(chatView, &ChatView::messageClickedSignal, this, &TabRoom::focusTab);
     connect(chatView, &ChatView::openMessageDialog, this, &TabRoom::openMessageDialog);
+    connect(chatView, &ChatView::cockatriceLinkActivated, this, &TabRoom::cockatriceLinkActivated);
     connect(chatView, &ChatView::showCardInfoPopup, this, &TabRoom::showCardInfoPopup);
     connect(chatView, &ChatView::deleteCardInfoPopup, this, &TabRoom::deleteCardInfoPopup);
     connect(chatView, &ChatView::addMentionTag, this, &TabRoom::addMentionTag);
@@ -96,7 +113,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     connect(aOpenChatSettings, &QAction::triggered, this, &TabRoom::actOpenChatSettings);
 
     auto *chatSettingsButton = new QToolButton;
-    chatSettingsButton->setIcon(QPixmap("theme:icons/settings"));
+    chatSettingsButton->setIcon(themePixmap(QStringLiteral("icons/settings")));
     chatSettingsButton->setMenu(chatSettingsMenu);
     chatSettingsButton->setPopupMode(QToolButton::InstantPopup);
 
@@ -118,7 +135,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
 
     auto *hbox = new QHBoxLayout;
     hbox->addWidget(splitter, 3);
-    hbox->addWidget(tabs, 1);
+    hbox->addWidget(userListPanel, 1);
 
     aLeaveRoom = new QAction(this);
     connect(aLeaveRoom, &QAction::triggered, this, &TabRoom::closeRequest);
@@ -137,13 +154,27 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
         gameSelector->processGameInfo(info.game_list(i));
     }
 
-    completer = new QCompleter(autocompleteUserList, sayEdit);
-    completer->setCaseSensitivity(Qt::CaseInsensitive);
-    completer->setMaxVisibleItems(5);
-    completer->setFilterMode(Qt::MatchStartsWith);
+    mentionModel = new QStringListModel(autocompleteUserList, sayEdit);
+    mentionCompleter = createMentionCompleter(mentionModel, sayEdit);
+    sayEdit->addCompleter(mentionCompleter, CompleterTrigger::Mention);
 
-    sayEdit->setCompleter(completer);
+    auto *cardDatabaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, sayEdit);
+    auto *displayModel = new CardDatabaseDisplayModel(sayEdit);
+    displayModel->setSourceModel(cardDatabaseModel);
+    const CardCompleterSetup cardSetup = createCardCompleter(displayModel, sayEdit);
+    sayEdit->addCompleter(cardSetup.completer, CompleterTrigger::Card);
+
+    connect(sayEdit, &LineEditCompleter::cardPartialChanged, this, [this, cardSetup](const QString &text) {
+        cardSetup.searchModel->updateSearchResults(text);
+        cardSetup.proxyModel->setFilterRegularExpression(
+            QRegularExpression(QRegularExpression::escape(text), QRegularExpression::CaseInsensitiveOption));
+        if (sayEdit->hasFocus()) {
+            cardSetup.completer->complete();
+        }
+    });
+
     actCompleterChanged();
+
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &TabRoom::refreshShortcuts);
     refreshShortcuts();
@@ -159,7 +190,7 @@ void TabRoom::retranslateUi()
 {
     gameSelector->retranslateUi();
     chatView->retranslateUi();
-    userList->retranslateUi();
+    userListPanel->retranslateUi();
     sayLabel->setText(tr("&Say:"));
     chatGroupBox->setTitle(tr("Chat"));
     roomMenu->setTitle(tr("&Room"));
@@ -213,8 +244,8 @@ void TabRoom::sendMessage()
 {
     if (sayEdit->text().isEmpty()) {
         return;
-    } else if (completer->popup()->isVisible()) {
-        completer->popup()->hide();
+    } else if (sayEdit->hasVisibleCompleterPopup()) {
+        sayEdit->hideCompleterPopups();
         return;
     } else {
         Command_RoomSay cmd;
@@ -248,8 +279,8 @@ void TabRoom::actOpenChatSettings()
 
 void TabRoom::actCompleterChanged()
 {
-    SettingsCache::instance().chat().getChatMentionCompleter() ? completer->setCompletionRole(2)
-                                                               : completer->setCompletionRole(1);
+    SettingsCache::instance().chat().getChatMentionCompleter() ? mentionCompleter->setCompletionRole(2)
+                                                               : mentionCompleter->setCompletionRole(1);
 }
 
 void TabRoom::processRoomEvent(const RoomEvent &event)
@@ -285,16 +316,18 @@ void TabRoom::processListGamesEvent(const Event_ListGames &event)
 
 void TabRoom::processJoinRoomEvent(const Event_JoinRoom &event)
 {
-    if (!autocompleteUserList.contains("@" + QString::fromStdString(event.user_info().name()))) {
-        autocompleteUserList << "@" + QString::fromStdString(event.user_info().name());
-        sayEdit->setCompletionList(autocompleteUserList);
+    QString mention = "@" + QString::fromStdString(event.user_info().name());
+    if (!autocompleteUserList.contains(mention)) {
+        autocompleteUserList << mention;
+        mentionModel->setStringList(autocompleteUserList);
     }
 }
 
 void TabRoom::processLeaveRoomEvent(const Event_LeaveRoom &event)
 {
-    autocompleteUserList.removeOne("@" + QString::fromStdString(event.name()));
-    sayEdit->setCompletionList(autocompleteUserList);
+    QString mention = "@" + QString::fromStdString(event.name());
+    autocompleteUserList.removeOne(mention);
+    mentionModel->setStringList(autocompleteUserList);
 }
 
 void TabRoom::processRoomSayEvent(const Event_RoomSay &event)

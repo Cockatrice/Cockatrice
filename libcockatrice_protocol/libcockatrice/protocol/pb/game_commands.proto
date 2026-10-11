@@ -175,6 +175,11 @@ message GameCommand {
         /// Server: Server_Player::cmdReverseTurn
         /// Client: reflected via subsequent turn events
         REVERSE_TURN = 1034;
+
+        /// Set the player's playmat independently of the deck.
+        /// Server: Server_Player::cmdSetPlaymat
+        /// Client: reflected via player properties changed event
+        SET_PLAYMAT = 1035;
     }
 
     extensions 100 to max;

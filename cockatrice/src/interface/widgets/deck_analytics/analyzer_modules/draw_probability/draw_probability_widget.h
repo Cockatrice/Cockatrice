@@ -1,16 +1,19 @@
 #ifndef COCKATRICE_DRAW_PROBABILITY_WIDGET_H
 #define COCKATRICE_DRAW_PROBABILITY_WIDGET_H
 
-#include "../../../../layouts/flow_layout.h"
-#include "../../../general/layout_containers/flow_widget.h"
 #include "../../abstract_analytics_panel_widget.h"
-#include "../../deck_list_statistics_analyzer.h"
 #include "draw_probability_config.h"
 
-#include <QComboBox>
-#include <QLineEdit>
-#include <QSpinBox>
-#include <QTableWidget>
+#include <qtmetamacros.h>
+
+class DeckListStatisticsAnalyzer;
+class FlowWidget;
+class QComboBox;
+class QLabel;
+class QLineEdit;
+class QSpinBox;
+class QTableWidget;
+class QWidget;
 
 class DrawProbabilityWidget : public AbstractAnalyticsPanelWidget
 {

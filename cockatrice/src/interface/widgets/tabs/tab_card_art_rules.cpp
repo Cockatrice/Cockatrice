@@ -1,15 +1,39 @@
 #include "tab_card_art_rules.h"
 
+#include "../utility/completer_utils.h"
+#include "card_database_display_model.h"
+#include "card_database_model.h"
+#include "libcockatrice/card/card_info.h"
 #include "libcockatrice/card/database/card_database_manager.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
 
+#include <QAbstractItemView>
+#include <QComboBox>
 #include <QCompleter>
 #include <QFormLayout>
 #include <QHBoxLayout>
+#include <QLineEdit>
+#include <QList>
+#include <QPushButton>
+#include <QSharedPointer>
+#include <QTableView>
 #include <QVBoxLayout>
+#include <QVariant>
+#include <QWidget>
+#include <QtGlobal>
+#include <google/protobuf/repeated_ptr_field.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/moderator_commands.pb.h>
 #include <libcockatrice/protocol/pb/response_card_art_rule_entry.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <string>
+
+class QObject;
+class TabSupervisor;
 
 CardArtRulesModel::CardArtRulesModel(AbstractClient *client, QObject *parent)
     : QAbstractTableModel(parent), client(client)
@@ -194,29 +218,14 @@ void TabCardArtRules::initSearchBar()
     cardDbModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, this);
     cardDbDisplayModel = new CardDatabaseDisplayModel(this);
     cardDbDisplayModel->setSourceModel(cardDbModel);
-    cardSearchModel = new CardSearchModel(cardDbDisplayModel, this);
 
-    cardProxyModel = new CardCompleterProxyModel(this);
-    cardProxyModel->setSourceModel(cardSearchModel);
-    cardProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-
-    searchCompleter = new QCompleter(cardProxyModel, this);
-    searchCompleter->setCompletionRole(Qt::DisplayRole);
-    searchCompleter->setCompletionMode(QCompleter::PopupCompletion);
-    searchCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-    searchCompleter->setFilterMode(Qt::MatchContains);
-    searchCompleter->setMaxVisibleItems(15);
+    const CardCompleterSetup cardSetup = createCardCompleter(cardDbDisplayModel, this, 15);
+    cardSearchModel = cardSetup.searchModel;
+    cardProxyModel = cardSetup.proxyModel;
+    searchCompleter = cardSetup.completer;
     searchEdit->setCompleter(searchCompleter);
 
-    connect(searchEdit, &QLineEdit::textEdited, cardSearchModel, &CardSearchModel::updateSearchResults);
-    connect(searchEdit, &QLineEdit::textEdited, this, [this](const QString &text) {
-        const QString pattern = ".*" + QRegularExpression::escape(text) + ".*";
-        cardProxyModel->setFilterRegularExpression(
-            QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption));
-        if (!text.isEmpty()) {
-            searchCompleter->complete();
-        }
-    });
+    connectCardCompleterSearch(searchEdit, cardSetup);
     connect(searchCompleter, static_cast<void (QCompleter::*)(const QString &)>(&QCompleter::activated), this,
             [this](const QString &name) { searchEdit->setText(name); });
     connect(searchEdit, &QLineEdit::editingFinished, this,

@@ -16,16 +16,40 @@
 #include "../general/layout_containers/overlap_control_widget.h"
 #include "../general/tutorial/tutorial_controller.h"
 #include "../utility/custom_line_edit.h"
+#include "libcockatrice/card/card_info.h"
 #include "visual_database_display_color_filter_widget.h"
 #include "visual_database_display_filter_toolbar_widget.h"
 
 #include <QLoggingCategory>
-#include <QVBoxLayout>
-#include <QWheelEvent>
+#include <QMouseEvent>
+#include <QString>
+#include <QStringList>
 #include <QWidget>
-#include <libcockatrice/models/database/card_database_model.h>
-#include <libcockatrice/models/deck_list/deck_list_model.h>
-#include <qscrollarea.h>
+#include <functional>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
+
+class CardDatabaseDisplayModel;
+class CardDatabaseModel;
+class CardDatabaseView;
+class CardSizeWidget;
+class DeckList;
+class DeckListModel;
+class ExactCard;
+class FilterTreeModel;
+class FlowWidget;
+class OverlapControlWidget;
+class QLabel;
+class QModelIndex;
+class QPushButton;
+class QScrollArea;
+class QTimer;
+class QToolButton;
+class QVBoxLayout;
+class SearchLineEdit;
+class VisualDatabaseDisplayColorFilterWidget;
+class VisualDatabaseDisplayFilterToolbarWidget;
+template <typename T> class QList;
 
 class TutorialController;
 inline Q_LOGGING_CATEGORY(VisualDatabaseDisplayLog, "visual_database_display");
@@ -47,6 +71,12 @@ public:
     void loadCurrentPage();
     void sortCardList(const QStringList &properties, Qt::SortOrder order) const;
     void setDeckList(const DeckList &new_deck_list_model);
+
+    /**
+     * @brief Sets the callback used to create a custom zone from the add-to-zone menu.
+     * The callback returns the name of the created zone, or an empty string if creation was cancelled.
+     */
+    void setNewZoneCreator(const std::function<QString()> &creator);
 
     CardDatabaseDisplayModel *getDatabaseDisplayModel()
     {
@@ -109,6 +139,7 @@ private:
     VisualDatabaseDisplayFilterToolbarWidget *filterContainer;
     CardDatabaseDisplayModel *databaseDisplayModel;
     CardDatabaseView *databaseView;
+    std::function<QString()> newZoneCreator;
     QList<ExactCard> *cards;
     QVBoxLayout *mainLayout;
     QScrollArea *scrollArea;
@@ -118,17 +149,20 @@ private:
     OverlapControlWidget *overlapControlWidget;
     CardSizeWidget *cardSizeWidget;
     QTimer *debounceTimer;
-    QTimer *loadCardsTimer;
 
     int debounceTime = 300; // in Ms
     int currentPage = 0;    // Current page index
     int cardsPerPage = 100; // Number of cards per page
+    bool filtersInitialized = false;
+    bool initialLoadScheduled = false;
 
+    void initializeFilters();
     void highlightAllSearchEdit();
     bool nearEndOfPage() const;
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
+    void showEvent(QShowEvent *event) override;
 };
 
 #endif // VISUAL_DATABASE_DISPLAY_WIDGET_H

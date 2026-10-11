@@ -1,33 +1,37 @@
 #include "player_logic.h"
 
-#include "../../game_graphics/board/arrow_item.h"
 #include "../../game_graphics/board/card_item.h"
-#include "../../game_graphics/board/counter_general.h"
-#include "../../game_graphics/game_scene.h"
-#include "../../game_graphics/player/player_target.h"
-#include "../../game_graphics/zones/hand_zone.h"
-#include "../../game_graphics/zones/pile_zone.h"
-#include "../../game_graphics/zones/stack_zone.h"
-#include "../../game_graphics/zones/table_zone.h"
-#include "../../interface/theme_manager.h"
-#include "../../interface/widgets/tabs/tab_game.h"
-#include "../board/card_list.h"
+#include "../abstract_game.h"
+#include "../board/arrow_data.h"
+#include "../board/counter_state.h"
+#include "../game_meta_info.h"
+#include "../zones/hand_zone_logic.h"
+#include "../zones/pile_zone_logic.h"
+#include "../zones/stack_zone_logic.h"
+#include "../zones/table_zone_logic.h"
+#include "libcockatrice/protocol/pb/serverinfo_card.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_counter.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h"
+#include "libcockatrice/utility/zone_names.h"
 #include "player_actions.h"
+#include "player_event_handler.h"
+#include "player_info.h"
+#include "player_manager.h"
 
 #include <QDebug>
-#include <QMenu>
-#include <QMetaType>
-#include <QPainter>
-#include <QtConcurrent>
-#include <libcockatrice/protocol/pb/command_attach_card.pb.h>
-#include <libcockatrice/protocol/pb/command_set_card_counter.pb.h>
-#include <libcockatrice/protocol/pb/event_create_arrow.pb.h>
-#include <libcockatrice/protocol/pb/event_create_counter.pb.h>
-#include <libcockatrice/protocol/pb/event_draw_cards.pb.h>
+#include <QMapIterator>
+#include <QMessageLogger>
+#include <QMutableMapIterator>
+#include <QSet>
+#include <QSharedPointer>
+#include <QtGlobal>
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_zone.pb.h>
+#include <libcockatrice/utility/card_ref.h>
 #include <libcockatrice/utility/color.h>
+#include <qalgorithms.h>
+#include <string>
 
 PlayerLogic::PlayerLogic(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent)
     : QObject(_parent), game(_parent), playerInfo(new PlayerInfo(info, _id, _local, _judge)),
@@ -175,7 +179,15 @@ void PlayerLogic::processPlayerInfo(const ServerInfo_Player &info)
                 const ServerInfo_Card &cardInfo = zoneInfo.card_list(j);
                 auto *card = new CardItem(this);
                 card->processCardInfo(cardInfo);
-                zone->addCard(card, false, cardInfo.x(), cardInfo.y());
+                // Zones without coordinates (hand, piles, stack) preserve the order
+                // they arrive in on the server in the positions of their cards list.
+                // The x coordinate of such cards is always 0, so inserting at it
+                // would reverse the list on reconnect. Append instead.
+                if (zoneInfo.with_coords()) {
+                    zone->addCard(card, false, cardInfo.x(), cardInfo.y());
+                } else {
+                    zone->addCard(card, false, -1);
+                }
             }
         }
         if (zoneInfo.has_always_reveal_top_card()) {
@@ -248,6 +260,22 @@ void PlayerLogic::setDeck(const DeckList &_deck)
     deck = _deck;
 
     emit deckChanged();
+}
+
+void PlayerLogic::setPlaymatFromProperties(const ServerInfo_PlayerProperties &props)
+{
+    if (props.has_playmat_params() && !props.playmat_params().card_name().empty()) {
+        const auto &pp = props.playmat_params();
+        remotePlaymatCard = {QString::fromStdString(pp.card_name()), QString::fromStdString(pp.card_provider_id())};
+        remotePlaymatParams = {qBound(0.0, pp.margin_pct_l(), 0.95), qBound(0.0, pp.margin_pct_r(), 0.95),
+                               qBound(0.0, pp.vertical_offset(), 1.0), qBound(0.1, pp.zoom(), 4.0)};
+        hasRemotePlaymat = true;
+    } else {
+        remotePlaymatCard = CardRef{};
+        remotePlaymatParams = PlaymatParams{};
+        hasRemotePlaymat = false;
+    }
+    emit playmatChanged();
 }
 
 CounterState *PlayerLogic::addCounter(const ServerInfo_Counter &counter)

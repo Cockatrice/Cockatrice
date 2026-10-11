@@ -21,16 +21,25 @@
 #define SERVERGAME_H
 
 #include "../server_response_containers.h"
+#include "libcockatrice/protocol/pb/game_event_context.pb.h"
 
+// IWYU pragma: keep
+// ServerInfo_Game is passed by value to the gameInfoChanged() signal, so the
+// moc-generated code needs the complete type.
 #include <QDateTime>
+#include <QList>
 #include <QMap>
-#include <QMutex>
 #include <QObject>
+#include <QRecursiveMutex>
+#include <QScopedPointer>
 #include <QSet>
-#include <QStringList>
+#include <QString>
+#include <QtGlobal>
+#include <atomic>
 #include <libcockatrice/protocol/pb/event_leave.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
+#include <qtmetamacros.h>
 
 class QTimer;
 class GameEventContainer;
@@ -42,6 +51,17 @@ class ServerInfo_User;
 class ServerInfo_Game;
 class Server_AbstractUserInterface;
 class Event_GameStateChanged;
+class Server_DeckValidationStrategy;
+class Server_GameLifecycleStrategy;
+class Server_MatchResultStrategy;
+namespace google
+{
+namespace protobuf
+{
+class Message;
+} // namespace protobuf
+} // namespace google
+struct GameConfig;
 
 class Server_Game : public QObject
 {
@@ -78,6 +98,12 @@ private:
     QList<GameReplay *> replayList;
     GameReplay *currentReplay;
 
+    QScopedPointer<Server_DeckValidationStrategy> deckValidationStrategy;
+
+    QScopedPointer<Server_GameLifecycleStrategy> lifecycleStrategy;
+
+    QScopedPointer<Server_MatchResultStrategy> matchResultStrategy;
+
     void createGameStateChangedEvent(Event_GameStateChanged *event,
                                      Server_AbstractParticipant *recipient,
                                      bool omniscient,
@@ -92,21 +118,7 @@ private slots:
 
 public:
     mutable QRecursiveMutex gameMutex;
-    Server_Game(const ServerInfo_User &_creatorInfo,
-                int _gameId,
-                const QString &_description,
-                const QString &_password,
-                int _maxPlayers,
-                const QList<int> &_gameTypes,
-                bool _onlyBuddies,
-                bool _onlyRegistered,
-                bool _spectatorsAllowed,
-                bool _spectatorsNeedPassword,
-                bool _spectatorsCanTalk,
-                bool _spectatorsSeeEverything,
-                int _startingLifeTotal,
-                bool _shareDecklistsOnLoad,
-                Server_Room *parent);
+    Server_Game(const GameConfig &config, Server_Room *parent);
     ~Server_Game() override;
     Server_Room *getRoom() const
     {
@@ -126,6 +138,8 @@ public:
         return gameStarted;
     }
     int getPlayerCount() const;
+    /// Total cards across all players' zones. Takes gameMutex itself.
+    int getCardsInGame() const;
     int getSpectatorCount() const;
     QMap<int, Server_AbstractPlayer *> getPlayers() const;
     Server_AbstractPlayer *getPlayer(int id) const;
@@ -221,6 +235,20 @@ public:
                                                                                    GameEventStorageItem::SendToOthers,
                                 int privatePlayerId = -1);
     void returnCardsFromPlayer(GameEventStorage &ges, Server_AbstractPlayer *player);
+
+    /** @brief Get the current deck validation strategy (non-owning). */
+    Server_DeckValidationStrategy *getDeckValidationStrategy() const
+    {
+        return deckValidationStrategy.data();
+    }
+    /** @brief Replace the deck validation strategy; takes ownership of @p strategy. */
+    void setDeckValidationStrategy(Server_DeckValidationStrategy *strategy);
+
+    /** @brief Get the current game lifecycle strategy (non-owning). */
+    Server_GameLifecycleStrategy *getLifecycleStrategy() const
+    {
+        return lifecycleStrategy.data();
+    }
 };
 
 #endif

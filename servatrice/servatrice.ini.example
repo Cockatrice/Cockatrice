@@ -41,6 +41,12 @@ websocket_host=any
 ; The TCP port number servatrice will listen on for websockets clients; default is 4748
 websocket_port=4748
 
+; If websockets are served through a reverse proxy (e.g. nginx), the real client address can be
+; read from an HTTP header such as X-Forwarded-For. The header is ONLY trusted when the websocket
+; connection itself originates from an address listed in security/trusted_sources (default 127.0.0.1,::1),
+; so that clients cannot spoof their address to bypass bans or rate limits.
+web_socket_ip_header=
+
 ; When database is enabled, servatrice writes the server status in the "update" database table; this
 ; setting defines every how many milliseconds servatrice will update its status; default is 15000 (15 secs)
 statusupdate=15000
@@ -79,8 +85,10 @@ requiredfeatures=""
 
 ; You can define custom warnings that users are sent when the moderation staff uses the right client warn user
 ; menu option.  This list is comma seperated that each item will appear in the drop down list for staff members
-; to choose from.  Example: "Flaming,Foul Language"
-officialwarnings="Flaming,Spamming,Causing Drama,Abusive Language"
+; to choose from.  Each entry may optionally carry a recommended starting intervention level (see the moderator
+; guide) by appending "|" and the level number.  Entries without an explicit level default to intervention
+; level 1.  Example: "Flaming,Foul Language"
+officialwarnings="Abusive Language|1,Calling Out User|1,Causing Drama|1,Cheating|2,Disrespecting Staff|1,Disrupting a Draft|1,Inappropriate Avatar|3,Inappropriate Game Name|1,Kicking Without Valid Reason|1,Spamming|1,Targeted Harassment|2"
 
 ; Maximum time in seconds a player can stay connected but idle.  Default is 3600 (0 = disabled)
 ; Clients will be notified at the 90% time period of pending disconnection if they do not take action.
@@ -373,6 +381,26 @@ command_counting_interval=10
 ; Maximum number of game commands in an interval before new commands gets dropped; default is 20
 max_command_count_per_interval=20
 
+[reporting]
+; Maximum number of user reports a single user can file per day; default is 10; set to 0 to disable the limit
+max_reports_per_day=10
+
+; Maximum number of report comments a single user can post per hour; default is 30; set to 0 to disable the limit
+max_comments_per_hour=30
+
+[metrics]
+; Command containers that take longer than this many milliseconds are logged
+; as slow commands. Set to 0 to disable the log line. A latency spike produces
+; one warning per slow container with no rate limiting of its own -- a bad
+; patch can briefly flood the log, which is how you notice it.
+slow_command_ms=500
+
+; Each socket pool thread runs a watchdog heartbeat. If a heartbeat arrives
+; this many milliseconds late, the stall is logged and exposed as
+; servatrice_eventloop_* metrics in the Developer tab. Set to 0 to disable
+; the watchdogs.
+stall_warn_ms=2000
+
 [logging]
 ; Admin/Moderators can query the stored logs for information when looking up reports by various players. This
 ; option can allow or disallow them from doing so.
@@ -430,3 +458,24 @@ ssl_cert=ssl_cert.pem
 
 ; Filename of the private key for the server-to-server certificate
 ssl_key=ssl_key.pem
+
+
+[deck_share]
+
+; How many days a created deck share link remains valid before it expires.
+; Default: 7
+expiry_days=7
+
+; How often (in minutes) the server checks for and removes expired deck shares.
+; A value of 0 disables the automatic cleanup.
+; Default: 60
+cleanup_interval=60
+
+; Maximum number of decks a single share link can contain.
+; Default: 50
+max_decks_per_share=50
+
+; Maximum number of share links a single user may create per day.
+; A value of 0 disables the limit.
+; Default: 50
+max_shares_per_day=50

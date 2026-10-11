@@ -1,7 +1,11 @@
 #include "parsehelpers.h"
 
 #include <QChar>
+#include <QList>
 #include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QSharedPointer>
+#include <QStringList>
 
 /**
  * Parses the card text to determine if the card should have the cipt tag
@@ -20,7 +24,7 @@
  * Note that "...enters tapped unless..." returns false.
  *
  * @param name The name of the card
- * @param text The oracle text of the card
+ * @param text The Oracle text of the card
  */
 bool parseCipt(const QString &name, const QString &text)
 {

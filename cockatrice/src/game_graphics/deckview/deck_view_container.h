@@ -9,13 +9,17 @@
 
 #include "../../interface/deck_loader/deck_loader.h"
 #include "../../interface/widgets/general/tutorial/tutorial_controller.h"
+#include "libcockatrice/deck_list/deck_list.h"
+#include "libcockatrice/utility/playmat_params.h"
 
 #include <QPushButton>
+#include <QString>
+#include <QWidget>
+#include <qtmetamacros.h>
 
 class QVBoxLayout;
 class AbstractCardItem;
 class VisualDeckStorageWidget;
-class DeckPreviewWidget;
 class Response;
 class TabGame;
 class DeckView;
@@ -58,6 +62,9 @@ private:
     VisualDeckStorageWidget *visualDeckStorageWidget;
     TabGame *parentGame;
     int playerId;
+    int playmatRotationIndex = 0;    ///< Per-match cursor for round-robin playmat mode.
+    DeckList currentDeck;            ///< Cached deck for live settings re-resolution.
+    PlaymatInfo lastResolvedPlaymat; ///< Tracks last sent playmat to avoid repeats in random mode.
 
     void tryCreateVisualDeckStorageWidget();
     void sendReadyStartCommand(bool ready);
@@ -76,6 +83,7 @@ private slots:
     void sideboardLockButtonClicked();
     void updateSideboardLockButtonText();
     void refreshShortcuts();
+    void onPlaymatSettingsChanged();
 signals:
     void newCardAdded(AbstractCardItem *card);
     void notIdle();
@@ -89,6 +97,8 @@ public:
     void setSideboardLocked(bool locked);
     void setDeck(const DeckList &deck);
     void setVisualDeckStorageExists(bool exists);
+    void advancePlaymatRotation();
+    void resolveAndSendPlaymat();
 
 public slots:
     void loadDeckFromFile(const QString &filePath);

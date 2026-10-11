@@ -10,11 +10,19 @@
 #include "tally/tally.h"
 
 #include <QGraphicsView>
+#include <QList>
+#include <QPointF>
+#include <QRect>
+#include <QRectF>
+#include <QSize>
+#include <qtmetamacros.h>
 
 class GameScene;
 class QGridLayout;
 class QLabel;
 class QRubberBand;
+class QAction;
+class QWidget;
 
 class GameView : public QGraphicsView
 {
@@ -27,6 +35,7 @@ private:
     QWidget *tallyContainer;
     QGridLayout *tallyLayout;
     QPointF selectionOrigin;
+    QRect previousBandRect;          ///< Last rubber-band rect for targeted repaint
     QList<TallyRow> cachedTallyRows; ///< Cached entries to avoid redundant rebuilds
 
     QSize rebuildTallyLabels(const QList<TallyRow> &entries);

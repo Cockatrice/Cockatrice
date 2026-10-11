@@ -3,7 +3,15 @@
 
 #include "settings_manager.h"
 
+#include <QString>
+#include <QStringList>
+#include <QtGlobal>
 #include <libcockatrice/interfaces/interface_interface_settings_provider.h>
+#include <qtmetamacros.h>
+
+class QObject;
+struct PlaymatInfo;
+template <typename T> class QList;
 
 class InterfaceSettings : public SettingsManager, public IInterfaceSettingsProvider
 {
@@ -34,6 +42,7 @@ public:
     [[nodiscard]] int getMinPlayersForMultiColumnLayout() const override;
     [[nodiscard]] int getRewindBufferingMs() const override;
     [[nodiscard]] qreal getFastForwardSpeed() const override;
+    [[nodiscard]] bool getSkipEmptySections() const override;
     [[nodiscard]] bool getLeftJustified() const override;
     [[nodiscard]] int getZoneViewGroupByIndex() const override;
     [[nodiscard]] int getZoneViewSortByIndex() const override;
@@ -42,6 +51,13 @@ public:
     [[nodiscard]] bool getShowShortcuts() const override;
     [[nodiscard]] bool getShowGameSelectorFilterToolbar() const override;
     [[nodiscard]] bool getTutorialCompleted() const;
+    [[nodiscard]] int getPlaymatVisibility() const override;
+    [[nodiscard]] QList<PlaymatInfo> getPlaymatFallbackList() const override;
+    [[nodiscard]] int getPlaymatMode() const override;
+    [[nodiscard]] int getPlaymatFallbackBehavior() const override;
+    [[nodiscard]] bool getLifeCounterAnimationsEnabled() const override;
+    [[nodiscard]] bool getBattlefieldFlashEnabled() const override;
+    [[nodiscard]] QStringList getUserListExpandedSections() const override;
 
     void setUseTearOffMenus(bool _useTearOffMenus);
     void setCardViewInitialRowsMax(int _cardViewInitialRowsMax);
@@ -66,6 +82,7 @@ public:
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);
     void setRewindBufferingMs(int _rewindBufferingMs);
     void setFastForwardSpeed(qreal _value);
+    void setSkipEmptySections(bool _value);
     void setLeftJustified(bool _leftJustified);
     void setZoneViewGroupByIndex(int _zoneViewGroupByIndex);
     void setZoneViewSortByIndex(int _zoneViewSortByIndex);
@@ -74,6 +91,13 @@ public:
     void setShowShortcuts(bool _showShortcuts);
     void setShowGameSelectorFilterToolbar(bool _showGameSelectorFilterToolbar);
     void setTutorialCompleted(bool value);
+    void setPlaymatVisibility(int _visibility);
+    void setPlaymatFallbackList(const QList<PlaymatInfo> &_fallbackList);
+    void setPlaymatMode(int _mode);
+    void setPlaymatFallbackBehavior(int _behavior);
+    void setLifeCounterAnimationsEnabled(bool _lifeCounterAnimationsEnabled);
+    void setBattlefieldFlashEnabled(bool _battlefieldFlashEnabled);
+    void setUserListExpandedSections(const QStringList &sections);
 
 signals:
     void useTearOffMenusChanged(bool state);
@@ -85,6 +109,10 @@ signals:
     void tallyTypeChanged(int type);
     void showStatusBarChanged(bool state);
     void showGameSelectorFilterToolbarChanged(bool state);
+    void playmatVisibilityChanged(int visibility);
+    void playmatSettingsChanged();
+    void lifeCounterAnimationsEnabledChanged(bool state);
+    void battlefieldFlashEnabledChanged(bool state);
 
 public:
     explicit InterfaceSettings(const QString &settingPath, QObject *parent = nullptr);

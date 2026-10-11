@@ -2,9 +2,9 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-set(HEADERS abstract_client.h)
+set(HEADERS abstract_client.h latency_tracker.h)
 
-set(SOURCES abstract_client.cpp)
+set(SOURCES abstract_client.cpp latency_tracker.cpp)
 
 qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
 
@@ -19,3 +19,5 @@ target_link_libraries(
   PUBLIC ${COCKATRICE_QT_VERSION_NAME}::Network ${COCKATRICE_QT_VERSION_NAME}::WebSockets libcockatrice_protocol
          libcockatrice_network_server_remote
 )
+
+target_precompile_headers(libcockatrice_network_client_abstract PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtcore_pch.h")

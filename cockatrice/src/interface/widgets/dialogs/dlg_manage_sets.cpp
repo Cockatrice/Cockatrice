@@ -1,23 +1,45 @@
 #include "dlg_manage_sets.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../pixel_map_generator.h"
 #include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../interface/widgets/utility/custom_line_edit.h"
+#include "libcockatrice/card/database/card_database.h"
 
+#include <QAbstractButton>
+#include <QAbstractItemView>
+#include <QAbstractTableModel>
 #include <QAction>
+#include <QByteArray>
 #include <QCheckBox>
+#include <QDebug>
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QIcon>
 #include <QItemSelection>
+#include <QItemSelectionModel>
 #include <QLabel>
+#include <QList>
+#include <QModelIndex>
+#include <QModelIndexList>
 #include <QPushButton>
+#include <QSet>
+#include <QSharedPointer>
+#include <QSize>
+#include <QSizePolicy>
+#include <QSortFilterProxyModel>
+#include <QStringLiteral>
 #include <QToolBar>
 #include <QTreeView>
+#include <QWidget>
 #include <QtConcurrentRun>
+#include <QtGlobal>
 #include <algorithm>
+#include <compare>
+#include <functional>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card_set/card_sets_model.h>
 #include <libcockatrice/settings/cards_display_settings.h>
@@ -35,28 +57,28 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     setsEditToolBar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
     aTop = new QAction(QString(), this);
-    aTop->setIcon(QPixmap("theme:icons/arrow_top_green"));
+    aTop->setIcon(themePixmap(QStringLiteral("icons/arrow_top_green")));
     aTop->setToolTip(tr("Move selected set to the top"));
     aTop->setEnabled(false);
     connect(aTop, &QAction::triggered, this, &WndSets::actTop);
     setsEditToolBar->addAction(aTop);
 
     aUp = new QAction(QString(), this);
-    aUp->setIcon(QPixmap("theme:icons/arrow_up_green"));
+    aUp->setIcon(themePixmap(QStringLiteral("icons/arrow_up_green")));
     aUp->setToolTip(tr("Move selected set up"));
     aUp->setEnabled(false);
     connect(aUp, &QAction::triggered, this, &WndSets::actUp);
     setsEditToolBar->addAction(aUp);
 
     aDown = new QAction(QString(), this);
-    aDown->setIcon(QPixmap("theme:icons/arrow_down_green"));
+    aDown->setIcon(themePixmap(QStringLiteral("icons/arrow_down_green")));
     aDown->setToolTip(tr("Move selected set down"));
     aDown->setEnabled(false);
     connect(aDown, &QAction::triggered, this, &WndSets::actDown);
     setsEditToolBar->addAction(aDown);
 
     aBottom = new QAction(QString(), this);
-    aBottom->setIcon(QPixmap("theme:icons/arrow_bottom_green"));
+    aBottom->setIcon(themePixmap(QStringLiteral("icons/arrow_bottom_green")));
     aBottom->setToolTip(tr("Move selected set to the bottom"));
     aBottom->setEnabled(false);
     connect(aBottom, &QAction::triggered, this, &WndSets::actBottom);
@@ -66,7 +88,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     searchField = new LineEditUnfocusable;
     searchField->setObjectName("searchEdit");
     searchField->setPlaceholderText(tr("Search by set name, code, type, or release date"));
-    searchField->addAction(QPixmap("theme:icons/search"), LineEditUnfocusable::LeadingPosition);
+    searchField->addAction(themePixmap(QStringLiteral("icons/search")), LineEditUnfocusable::LeadingPosition);
     searchField->setClearButtonEnabled(true);
     setFocusProxy(searchField);
 
@@ -156,12 +178,6 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     sortWarning->setLayout(sortWarningLayout);
     sortWarning->setVisible(false);
 
-    includeRebalancedCards = SettingsCache::instance().cardsDisplay().getIncludeRebalancedCards();
-    QCheckBox *includeRebalancedCardsCheckBox =
-        new QCheckBox(tr("Include cards rebalanced for Alchemy [requires restart]"));
-    includeRebalancedCardsCheckBox->setChecked(includeRebalancedCards);
-    connect(includeRebalancedCardsCheckBox, &QAbstractButton::toggled, this, &WndSets::includeRebalancedCardsChanged);
-
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &WndSets::actSave);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &WndSets::actRestore);
@@ -175,9 +191,8 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     mainLayout->addWidget(enableSomeButton, 2, 1);
     mainLayout->addWidget(disableSomeButton, 2, 2);
     mainLayout->addWidget(sortWarning, 3, 1, 1, 2);
-    mainLayout->addWidget(includeRebalancedCardsCheckBox, 4, 1, 1, 2);
-    mainLayout->addWidget(hintsGroupBox, 5, 1, 1, 2);
-    mainLayout->addWidget(buttonBox, 6, 1, 1, 2);
+    mainLayout->addWidget(hintsGroupBox, 4, 1, 1, 2);
+    mainLayout->addWidget(buttonBox, 5, 1, 1, 2);
     mainLayout->setColumnStretch(1, 1);
     mainLayout->setColumnStretch(2, 1);
 
@@ -248,15 +263,9 @@ void WndSets::resetSort()
     sortWarning->setVisible(false);
 }
 
-void WndSets::includeRebalancedCardsChanged(bool _includeRebalancedCards)
-{
-    includeRebalancedCards = _includeRebalancedCards;
-}
-
 void WndSets::actSave()
 {
     model->save(CardDatabaseManager::getInstance());
-    SettingsCache::instance().cardsDisplay().setIncludeRebalancedCards(includeRebalancedCards);
     CardPictureLoader::clearPixmapCache();
     const auto reloadOk1 = QtConcurrent::run([] {
         CardDatabaseManager::getInstance()->reloadCardDatabasesAndNotify();

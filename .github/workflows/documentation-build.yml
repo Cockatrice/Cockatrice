@@ -1,5 +1,8 @@
 name: Generate Docs
 
+permissions:
+  contents: read    # write permission to the destination repo come from 'deploy_key'
+
 on:
   pull_request:
     paths:
@@ -11,6 +14,11 @@ on:
       - published    # publishing of stable releases and pre-releases
   workflow_dispatch:
 
+# Cancel earlier, unfinished runs of this workflow on the same branch (unless on release)
+concurrency:
+  group: "${{ github.workflow }} @ ${{ github.ref_name }}"
+  cancel-in-progress: ${{ github.event_name != 'release' }}
+
 env:
   COCKATRICE_REF: ${{ github.ref_name }}    # tag name if the commit is tagged, otherwise branch name
 
@@ -20,12 +28,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: "Checkout code"
+      - name: "Checkout"
         uses: actions/checkout@v7
         with:
           submodules: recursive
 
       - name: "Install Graphviz"
+        shell: bash
         run: |
           sudo apt-get install -y graphviz
           dot -V
@@ -33,9 +42,10 @@ jobs:
       - name: "Install Doxygen"
         uses: ssciwr/doxygen-install@v2
         with:
-          version: "1.16.1"
+          version: "1.18.0"
 
       - name: "Update Doxygen Configuration"
+        shell: bash
         run: |
           git diff Doxyfile
           doxygen -u Doxyfile
@@ -50,9 +60,10 @@ jobs:
 
       - name: "Generate Documentation"
         if: always()
+        shell: bash
         run: doxygen Doxyfile
 
-      - name: "Deploy to cockatrice.github.io"
+      - name: "Deploy to cockatrice.github.io/docs"
         if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
         uses: peaceiris/actions-gh-pages@v4
         with:
@@ -61,3 +72,8 @@ jobs:
           external_repository: Cockatrice/cockatrice.github.io
           publish_branch: master
           publish_dir: ./docs/html
+
+      - name: Link to Documentation Page
+        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: echo "::notice title=New documentation published::Shortly available at https://cockatrice.github.io/docs/"

@@ -9,9 +9,11 @@
 
 #include "../../api_response/card_prices/edhrec_api_response_card_prices.h"
 
-#include <QGridLayout>
-#include <QLabel>
 #include <QWidget>
+#include <qtmetamacros.h>
+
+class QGridLayout;
+class QLabel;
 
 class EdhrecApiResponseCardPricesDisplayWidget : public QWidget
 {

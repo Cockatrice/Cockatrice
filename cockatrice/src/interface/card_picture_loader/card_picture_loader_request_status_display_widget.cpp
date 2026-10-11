@@ -1,5 +1,11 @@
 #include "card_picture_loader_request_status_display_widget.h"
 
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+
+#include <QHBoxLayout>
+#include <QUrl>
+
 CardPictureLoaderRequestStatusDisplayWidget::CardPictureLoaderRequestStatusDisplayWidget(QWidget *parent,
                                                                                          const QUrl &_url,
                                                                                          const ExactCard &card,

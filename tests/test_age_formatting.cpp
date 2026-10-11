@@ -1,5 +1,8 @@
 #include "gtest/gtest.h"
+#include <QDate>
+#include <QPair>
 #include <libcockatrice/utility/days_years_between.h>
+#include <string>
 
 namespace
 {

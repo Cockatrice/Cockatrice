@@ -4,12 +4,17 @@
 #include "commander_spellbook_bracket_explainer.h"
 
 #include <QSharedPointer>
+#include <QString>
 #include <QWidget>
-#include <libcockatrice/deck_list/deck_list.h>
+#include <QtGlobal>
+#include <qtmetamacros.h>
 
 class QLabel;
 class QToolButton;
 struct CommanderBracketEstimate;
+class DeckList;
+class QObject;
+template <class T> class QSharedPointer;
 
 class CommanderBracketWidget : public QWidget
 {

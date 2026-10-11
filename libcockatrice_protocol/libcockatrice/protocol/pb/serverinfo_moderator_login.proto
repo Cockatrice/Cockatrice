@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+/**
+ * The last login date of a staff member (moderator/judge/admin).
+ * Used by the moderation "Moderator Last Logins" tool.
+ */
+message ServerInfo_ModeratorLogin {
+    optional string user_name = 1;  // staff account name
+    optional uint64 last_login = 2; // last known login, epoch seconds; 0 = unknown
+    optional uint32 user_level = 3; // ServerInfo_User::UserLevelFlag mask (moderator/judge/admin)
+}

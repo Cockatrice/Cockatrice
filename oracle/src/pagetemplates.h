@@ -1,15 +1,21 @@
 #ifndef PAGETEMPLATES_H
 #define PAGETEMPLATES_H
 
+#include <QByteArray>
+#include <QString>
 #include <QWizardPage>
+#include <QtGlobal>
+#include <qtmetamacros.h>
 
-class QFile;
 class QRadioButton;
 class OracleWizard;
 class QCheckBox;
 class QLabel;
 class QLineEdit;
 class QProgressBar;
+class QPushButton;
+class QUrl;
+class QWidget;
 
 class OracleWizardPage : public QWizardPage
 {
@@ -19,6 +25,14 @@ public:
     {
     }
     virtual void retranslateUi() = 0;
+
+    /**
+     * @brief Asks an active page to stop any background worker before the wizard
+     *        (and its importer) can be torn down underneath it. Default is a no-op.
+     */
+    virtual void cancelWork()
+    {
+    }
 
 signals:
     void readyToContinue();

@@ -1,6 +1,8 @@
 #include "rng_abstract.h"
 
 #include <QDebug>
+#include <QList>
+#include <qlogging.h>
 
 QVector<int> RNG_Abstract::makeNumbersVector(int n, int min, int max)
 {

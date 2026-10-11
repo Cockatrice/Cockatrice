@@ -3,6 +3,8 @@
 
 #include "analytics_panel_widget_factory.h"
 
+#include <QString>
+
 class AnalyticsPanelWidgetRegistrar
 {
 public:

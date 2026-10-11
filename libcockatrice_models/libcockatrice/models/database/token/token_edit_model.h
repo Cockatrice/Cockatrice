@@ -9,6 +9,11 @@
 
 #include "../card_database_display_model.h"
 
+#include <QModelIndex>
+#include <qtmetamacros.h>
+
+class QObject;
+
 class TokenEditModel : public CardDatabaseDisplayModel
 {
     Q_OBJECT

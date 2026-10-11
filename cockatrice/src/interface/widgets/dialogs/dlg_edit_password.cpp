@@ -4,11 +4,16 @@
 
 #include <QDialogButtonBox>
 #include <QGridLayout>
-#include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
+#include <QSharedPointer>
+#include <QSize>
+#include <QVBoxLayout>
 #include <libcockatrice/settings/servers_settings.h>
 #include <libcockatrice/utility/string_limits.h>
+
+class QVBoxLayout;
+class QWidget;
 
 DlgEditPassword::DlgEditPassword(QWidget *parent) : QDialog(parent)
 {

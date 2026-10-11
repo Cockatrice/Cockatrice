@@ -2,16 +2,47 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../../interface/theme_manager.h"
+#include "../board/abstract_card_drag_item.h"
+#include "../card_dimensions.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/deck_list/tree/deck_list_card_node.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
+#include "libcockatrice/protocol/pb/move_card_to_zone.pb.h"
 
 #include <QApplication>
+#include <QBrush>
+#include <QColor>
+#include <QCursor>
+#include <QFlags>
+#include <QFont>
+#include <QFontMetrics>
+#include <QGraphicsSceneHoverEvent>
 #include <QGraphicsSceneMouseEvent>
+#include <QMapIterator>
 #include <QMouseEvent>
+#include <QPainter>
+#include <QPen>
+#include <QPoint>
+#include <QSet>
+#include <QSharedPointer>
+#include <QSize>
+#include <QStringList>
+#include <QtGlobal>
 #include <QtMath>
 #include <algorithm>
+#include <compare>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/deck_list/deck_list.h>
-#include <libcockatrice/deck_list/tree/deck_list_card_node.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/utility/card_ref.h>
+#include <qnamespace.h>
+#include <string>
+#include <utility>
+
+class QObject;
+class QRectF;
+class QWidget;
+struct CardRef;
 
 DeckViewCardDragItem::DeckViewCardDragItem(DeckViewCard *_item,
                                            const QPointF &_hotSpot,
@@ -381,12 +412,10 @@ void DeckViewScene::rebuildTree()
             addItem(container);
         }
 
-        for (int j = 0; j < currentZone->size(); j++) {
-            auto *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
-            if (!currentCard) {
-                continue;
-            }
-
+        // Cards in custom zones nested under a board are regular board cards in-game.
+        // They are collected recursively (like every other consumer) and reported with
+        // the top-level board zone as their origin, so that sideboard plans keep working.
+        for (auto *currentCard : deck->getCardNodes({currentZone->getName()})) {
             for (int k = 0; k < currentCard->getNumber(); ++k) {
                 auto *newCard = new DeckViewCard(container, currentCard->toCardRef(), currentZone->getName());
                 container->addCard(newCard);

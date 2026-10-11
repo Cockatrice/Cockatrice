@@ -2,6 +2,11 @@
 #define EXACT_CARD_H
 
 #include "../card_info.h"
+#include "libcockatrice/card/printing/printing_info.h"
+
+#include <QByteArray>
+#include <QMetaType>
+#include <QString>
 
 /**
  * @class ExactCard

@@ -1,22 +1,50 @@
 #include "table_zone.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "../../game/board/card_list.h"
 #include "../../game/player/player_actions.h"
+#include "../../game/player/player_info.h"
 #include "../../game/player/player_logic.h"
+#include "../../game/zones/card_zone_logic.h"
 #include "../../game/zones/table_zone_logic.h"
 #include "../../interface/theme_manager.h"
-#include "../board/arrow_item.h"
+#include "../board/abstract_card_item.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
+#include "../game_scene.h"
 #include "../z_values.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/protocol/pb/card_attributes.pb.h"
 
+#include <QBrush>
+#include <QColor>
+#include <QGradient>
+#include <QGraphicsItem>
 #include <QGraphicsScene>
+#include <QLinearGradient>
+#include <QList>
+#include <QListIterator>
 #include <QPainter>
+#include <QRectF>
+#include <QSharedPointer>
+#include <QString>
+#include <QtGlobal>
+#include <algorithm>
+#include <iterator>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/zone_names.h>
+#include <string>
+
+namespace google
+{
+namespace protobuf
+{
+class Message;
+} // namespace protobuf
+} // namespace google
 
 const QColor TableZone::BACKGROUND_COLOR = QColor(100, 100, 100);
 const QColor TableZone::FADE_MASK = QColor(0, 0, 0, 80);
@@ -47,6 +75,31 @@ void TableZone::updateBg()
     update();
 }
 
+void TableZone::triggerDamageShimmer()
+{
+    if (!SettingsCache::instance().userInterface().getBattlefieldFlashEnabled()) {
+        damageShimmerAlpha = 0.0;
+        return;
+    }
+
+    damageShimmerAlpha = 1.0;
+    shimmerClock.start();
+    if (scene()) {
+        static_cast<GameScene *>(scene())->registerAnimationItem(this);
+    }
+}
+
+bool TableZone::animationEvent()
+{
+    damageShimmerAlpha = 1.0 - shimmerClock.elapsed() / shimmerDurationMs;
+    if (damageShimmerAlpha <= 0.0) {
+        damageShimmerAlpha = 0.0;
+        return false;
+    }
+    update();
+    return true;
+}
+
 QRectF TableZone::boundingRect() const
 {
     return QRectF(0, 0, width, height);
@@ -66,18 +119,41 @@ bool TableZone::isInverted() const
 
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Table, getLogic()->getPlayer()->getZoneId());
-    painter->fillRect(boundingRect(), brush);
+    if (playmatActive) {
+        // Subtle overlay to distinguish table zone from stack zone
+        painter->fillRect(boundingRect(), QColor(0, 0, 0, 60));
+    } else {
+        QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Table, getLogic()->getPlayer()->getZoneId());
+        painter->fillRect(boundingRect(), brush);
+    }
 
     if (active) {
         paintZoneOutline(painter);
     } else {
         // inactive player gets a darker table zone with a semi transparent black mask
-        // this means if the user provides a custom background it will fade
+        // this means if the user provides a custom background or playmat it will fade
         painter->fillRect(boundingRect(), FADE_MASK);
     }
 
+    // Decaying crimson wash from taking damage.
+    if (damageShimmerAlpha > 0.0) {
+        QColor shimmerColor(239, 68, 68);
+        shimmerColor.setAlphaF(0.22 * damageShimmerAlpha);
+        painter->fillRect(boundingRect(), shimmerColor);
+    }
+
     paintLandDivider(painter);
+}
+
+void TableZone::onPlaymatChanged(bool active)
+{
+    playmatActive = active;
+    // While a playmat is shown the zone paints a translucent overlay over the
+    // dynamic playmat behind it. Keep it out of the device cache so the cached
+    // pixels are never stale relative to the playmat (and to avoid compositing
+    // artifacts of cached translucent content on some platforms).
+    setCacheMode(active ? QGraphicsItem::NoCache : QGraphicsItem::DeviceCoordinateCache);
+    update();
 }
 
 /**

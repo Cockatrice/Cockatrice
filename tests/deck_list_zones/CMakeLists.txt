@@ -1,0 +1,1 @@
+cockatrice_add_test(NAME deck_list_zones_test SOURCES deck_list_zones_test.cpp LIBS libcockatrice_deck_list)

@@ -1,6 +1,19 @@
 #include "card_sets_model.h"
 
+#include "libcockatrice/card/database/card_database.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/interfaces/interface_card_set_priority_controller.h"
+
+#include <QAbstractItemModel>
+#include <QChar>
+#include <QDate>
+#include <QFlags>
+#include <QMultiMap>
+#include <QObject>
+#include <QSharedPointer>
 #include <QSortFilterProxyModel>
+#include <QVariant>
+#include <QVector>
 
 SetsModel::SetsModel(CardDatabase *_db, QObject *parent) : QAbstractTableModel(parent), sets(_db->getSetList())
 {

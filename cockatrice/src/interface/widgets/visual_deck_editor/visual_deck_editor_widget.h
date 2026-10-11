@@ -16,18 +16,37 @@
 #include "visual_deck_editor_placeholder_widget.h"
 
 #include <QCheckBox>
+#include <QHash>
 #include <QListWidget>
+#include <QMouseEvent>
+#include <QPersistentModelIndex>
 #include <QPushButton>
+#include <QString>
+#include <QStringList>
 #include <QWidget>
-#include <libcockatrice/card/database/card_database.h>
-#include <libcockatrice/models/database/card/card_completer_proxy_model.h>
-#include <libcockatrice/models/database/card_database_display_model.h>
-#include <libcockatrice/models/database/card_database_model.h>
-#include <libcockatrice/models/deck_list/deck_list_model.h>
-#include <qscrollarea.h>
+#include <qtmetamacros.h>
 
 class VisualDeckDisplayOptionsWidget;
 class DeckCardZoneDisplayWidget;
+class CardCompleterProxyModel;
+class CardDatabaseDisplayModel;
+class CardDatabaseModel;
+class CardSizeWidget;
+class CompactPushButton;
+class DeckList;
+class DeckListModel;
+class ExactCard;
+class FlowWidget;
+class QCompleter;
+class QHBoxLayout;
+class QItemSelection;
+class QItemSelectionModel;
+class QLineEdit;
+class QModelIndex;
+class QScrollArea;
+class QVBoxLayout;
+class VisualDeckEditorPlaceholderWidget;
+
 enum class DisplayType
 {
     Flat,
@@ -39,7 +58,10 @@ class VisualDeckEditorWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit VisualDeckEditorWidget(QWidget *parent, DeckListModel *deckListModel, QItemSelectionModel *selectionModel);
+    explicit VisualDeckEditorWidget(QWidget *parent,
+                                    DeckListModel *deckListModel,
+                                    QItemSelectionModel *selectionModel,
+                                    CardDatabaseModel *_cardDatabaseModel = nullptr);
     void retranslateUi();
     void updateCompactMode();
     void clearAllDisplayWidgets();
@@ -77,6 +99,7 @@ signals:
 
 protected:
     void initializeSearchBarAndCompleter();
+    void addCardFromSearch();
     void initializeDisplayOptionsWidget();
     void initializeDisplayOptionsAndSearchWidget();
     void initializeScrollAreaAndZoneContainer();

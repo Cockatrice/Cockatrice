@@ -7,9 +7,13 @@
 #ifndef MANA_COST_WIDGET_H
 #define MANA_COST_WIDGET_H
 
-#include <QHBoxLayout>
+#include <QString>
+#include <QStringList>
 #include <QWidget>
 #include <libcockatrice/card/card_info.h>
+#include <qtmetamacros.h>
+
+class QHBoxLayout;
 
 class ManaCostWidget : public QWidget
 {
@@ -17,7 +21,7 @@ class ManaCostWidget : public QWidget
 public:
     explicit ManaCostWidget(QWidget *parent, CardInfoPtr card);
 
-    QStringList parseManaCost(const QString &manaString);
+    static QStringList parseManaCost(const QString &manaString);
 public slots:
     void resizeEvent(QResizeEvent *event) override;
 

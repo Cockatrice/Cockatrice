@@ -1,8 +1,35 @@
 #include "tabs_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QSharedPointer>
+#include <QVariant>
+
+class QObject;
+
 TabsSettings::TabsSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "tabs.ini", "tabs", QString(), parent)
 {
+}
+
+int TabsSettings::getStartupTabIndex() const
+{
+    return getValue("startupTab", QString(), QString(), StartupTab::StartupTabHome).toInt();
+}
+
+QString TabsSettings::getStartupServerHost() const
+{
+    return getValue("startupServerHost", QString(), QString(), QString()).toString();
+}
+
+QString TabsSettings::getStartupServerPort() const
+{
+    return getValue("startupServerPort", QString(), QString(), QString()).toString();
+}
+
+QString TabsSettings::getStartupRoomName() const
+{
+    return getValue("startupRoomName", QString(), QString(), QString()).toString();
 }
 
 bool TabsSettings::getTabVisualDeckStorageOpen() const
@@ -40,6 +67,57 @@ bool TabsSettings::getTabLogOpen() const
     return getValue("log", QString(), QString(), true).toBool();
 }
 
+void TabsSettings::setStartupTabIndex(int value)
+{
+    if (getStartupTabIndex() == value) {
+        return;
+    }
+    setValue(value, "startupTab");
+    emit startupTabIndexChanged(value);
+}
+
+void TabsSettings::setStartupServerHost(const QString &host)
+{
+    if (getStartupServerHost() == host) {
+        return;
+    }
+    setValue(host, "startupServerHost");
+    emit startupServerHostChanged(host);
+}
+
+void TabsSettings::setStartupServerPort(const QString &port)
+{
+    if (getStartupServerPort() == port) {
+        return;
+    }
+    setValue(port, "startupServerPort");
+    emit startupServerPortChanged(port);
+}
+
+void TabsSettings::setStartupRoomName(const QString &roomName)
+{
+    if (getStartupRoomName() == roomName) {
+        return;
+    }
+    setValue(roomName, "startupRoomName");
+    emit startupRoomNameChanged(roomName);
+}
+
+bool TabsSettings::getTabReportOpen() const
+{
+    return getValue("report", QString(), QString(), false).toBool();
+}
+
+bool TabsSettings::getTabModerationOpen() const
+{
+    return getValue("moderation", QString(), QString(), false).toBool();
+}
+
+bool TabsSettings::getTabCardArtRulesOpen() const
+{
+    return getValue("cardArtRules", QString(), QString(), false).toBool();
+}
+
 void TabsSettings::setTabVisualDeckStorageOpen(bool value)
 {
     setValue(value, "visualDeckStorage");
@@ -73,4 +151,19 @@ void TabsSettings::setTabAdminOpen(bool value)
 void TabsSettings::setTabLogOpen(bool value)
 {
     setValue(value, "log");
+}
+
+void TabsSettings::setTabReportOpen(bool value)
+{
+    setValue(value, "report");
+}
+
+void TabsSettings::setTabModerationOpen(bool value)
+{
+    setValue(value, "moderation");
+}
+
+void TabsSettings::setTabCardArtRulesOpen(bool value)
+{
+    setValue(value, "cardArtRules");
 }

@@ -15,12 +15,21 @@
 
 #include <QCheckBox>
 #include <QJsonObject>
-#include <QScrollArea>
-#include <QVBoxLayout>
+#include <QList>
+#include <QString>
 #include <QVector>
 #include <QWidget>
+#include <qtmetamacros.h>
 
 class LayoutInspector;
+class AbstractAnalyticsPanelWidget;
+class DeckListStatisticsAnalyzer;
+class FlowWidget;
+class QCheckBox;
+class QPushButton;
+class QScrollArea;
+class QVBoxLayout;
+class ResizablePanel;
 
 class DeckAnalyticsWidget : public QWidget
 {

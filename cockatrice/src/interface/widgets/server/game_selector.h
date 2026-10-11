@@ -1,25 +1,34 @@
 #ifndef GAMESELECTOR_H
 #define GAMESELECTOR_H
 
-#include "game_selector_quick_filter_toolbar.h"
 #include "game_type_map.h"
 
 #include <QGroupBox>
-#include <libcockatrice/protocol/pb/commands.pb.h>
-#include <libcockatrice/protocol/pb/event_add_to_list.pb.h>
-#include <libcockatrice/protocol/pb/event_remove_from_list.pb.h>
+#include <qtmetamacros.h>
+// IWYU pragma: keep
+// ServerInfo_User appears by value and inside QList in slot signatures, so the
+// moc-generated code needs the complete type.
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
 class QTreeView;
 class GamesModel;
 class GamesProxyModel;
 class QPushButton;
-class QCheckBox;
-class QLabel;
 class AbstractClient;
 class TabSupervisor;
 class TabRoom;
 class ServerInfo_Game;
 class Response;
+class Event_AddToList;
+class Event_RemoveFromList;
+class GameSelectorQuickFilterToolBar;
+class QModelIndex;
+class QPoint;
+class QString;
+class QWidget;
+class ServerInfo_User;
+template <class Key, class T> class QMap;
+template <typename T> class QList;
 
 /**
  * @class GameSelector
@@ -171,6 +180,17 @@ private:
      */
     void joinGame(bool asSpectator = false, bool asJudge = false);
 
+    /**
+     * @brief Performs the join or spectate action for a specific game.
+     * @param game The game to join.
+     * @param asSpectator True to join as a spectator, false to join as a player.
+     * @param asJudge True to join as a judge, false to join as a player.
+     *
+     * Unlike the selection-based overload, this does not depend on the game being
+     * visible in the filtered game list.
+     */
+    void joinGame(const ServerInfo_Game &game, bool asSpectator = false, bool asJudge = false);
+
 public:
     /**
      * @brief Constructs a GameSelector widget.
@@ -202,7 +222,16 @@ public:
      * @param info The ServerInfo_Game object containing information about the game to update.
      */
     void processGameInfo(const ServerInfo_Game &info);
-    bool joinGameById(int gameId);
+    /**
+     * @brief Finds a game by ID and joins or spectates it.
+     * @param gameId The ID of the game to join.
+     * @param asSpectator True to join as a spectator, false to join as a player.
+     * @return True if the game was found and joined, false otherwise.
+     *
+     * Unlike the selection-based overload, this does not depend on the game
+     * being visible in the filtered game list.
+     */
+    bool joinGameById(int gameId, bool asSpectator = false);
 };
 
 #endif

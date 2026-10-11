@@ -9,6 +9,12 @@
 
 #include <QAbstractListModel>
 #include <QDate>
+#include <QModelIndex>
+#include <QString>
+#include <qtmetamacros.h>
+
+class QObject;
+template <typename T> class QList;
 
 class TipOfTheDay
 {

@@ -1,14 +1,33 @@
 #include "server_abstract_player.h"
 
+#include "game/server_abstract_participant.h"
+#include "game/server_arrowtarget.h"
+#include "libcockatrice/protocol/pb/card_attributes.pb.h"
+#include "libcockatrice/protocol/pb/color.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_arrow.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_card.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_cardcounter.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_zone.pb.h"
+#include "libcockatrice/utility/card_ref.h"
+#include "libcockatrice/utility/playmat_params.h"
 #include "server_arrow.h"
 #include "server_card.h"
 #include "server_cardzone.h"
 #include "server_game.h"
 #include "server_move_card_struct.h"
+#include "server_response_containers.h"
 
-#include <QDebug>
-#include <QRegularExpression>
+#include <QList>
+#include <QListIterator>
+#include <QMapIterator>
+#include <QObject>
+#include <QSet>
+#include <QSharedPointer>
+#include <QVariant>
 #include <algorithm>
+#include <google/protobuf/stubs/port.h>
+#include <iterator>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/command_change_zone_properties.pb.h>
@@ -50,8 +69,11 @@
 #include <libcockatrice/utility/dice_limits.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <libcockatrice/utility/zone_names.h>
-#include <limits>
 #include <ranges>
+#include <set>
+#include <string>
+
+class Server_AbstractUserInterface;
 
 Server_AbstractPlayer::Server_AbstractPlayer(Server_Game *_game,
                                              int _playerId,
@@ -65,6 +87,15 @@ Server_AbstractPlayer::Server_AbstractPlayer(Server_Game *_game,
 }
 
 Server_AbstractPlayer::~Server_AbstractPlayer() = default;
+
+int Server_AbstractPlayer::getCardCount() const
+{
+    int result = 0;
+    for (auto *zone : zones) {
+        result += zone->getCards().size();
+    }
+    return result;
+}
 
 void Server_AbstractPlayer::prepareDestroy()
 {
@@ -1631,7 +1662,9 @@ void Server_AbstractPlayer::getInfo(ServerInfo_Player *info,
 {
     getProperties(*info->mutable_properties(), withUserInfo);
 
-    if (deck) {
+    // Deck lists are only shared with other players when the game is in Open Decklists mode,
+    // so a player joining an open lobby can see every deck that was loaded before they joined.
+    if (deck && (recipient == this || game->getShareDecklistsOnLoad())) {
         info->set_deck_list(deck->writeToString_Native().toStdString());
     }
 
@@ -1651,5 +1684,13 @@ void Server_AbstractPlayer::getPlayerProperties(ServerInfo_PlayerProperties &res
     result.set_ready_start(readyStart);
     if (deck) {
         result.set_deck_hash(deck->getDeckHash().toStdString());
+        const auto &playmat = deck->getPlaymat();
+        auto *playmatParams = result.mutable_playmat_params();
+        playmatParams->set_card_name(playmat.card.name.toStdString());
+        playmatParams->set_card_provider_id(playmat.card.providerId.toStdString());
+        playmatParams->set_margin_pct_l(playmat.params.marginPctL);
+        playmatParams->set_margin_pct_r(playmat.params.marginPctR);
+        playmatParams->set_vertical_offset(playmat.params.verticalOffset);
+        playmatParams->set_zoom(playmat.params.zoom);
     }
 }

@@ -8,6 +8,10 @@
 #define STYLEDLABEL_H
 
 #include <QLabel>
+#include <QString>
+#include <qtmetamacros.h>
+
+class QWidget;
 
 class ShadowBackgroundLabel : public QLabel
 {

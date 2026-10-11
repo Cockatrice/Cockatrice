@@ -1,6 +1,14 @@
 #include "commander_spellbook_deck_request.h"
 
+#include "libcockatrice/deck_list/deck_list.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
+#include "libcockatrice/utility/card_ref.h"
+
 #include <QJsonArray>
+#include <QJsonValue>
+#include <QJsonValueConstRef>
+#include <QSet>
+#include <QString>
 #include <libcockatrice/deck_list/tree/deck_list_card_node.h>
 
 CommanderSpellbookDeckRequest CommanderSpellbookDeckRequest::fromJson(const QJsonObject &json)

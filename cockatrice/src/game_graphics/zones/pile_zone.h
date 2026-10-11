@@ -7,8 +7,12 @@
 #ifndef PILEZONE_H
 #define PILEZONE_H
 
-#include "../../game/zones/pile_zone_logic.h"
 #include "card_zone.h"
+
+#include <qtmetamacros.h>
+
+class PileZoneLogic;
+class QGraphicsItem;
 
 /**
  * A CardZone where the cards are in a single pile instead of being laid out.

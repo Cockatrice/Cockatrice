@@ -1,5 +1,13 @@
 #include "cards_display_settings.h"
 
+#include "libcockatrice/card/card_localization.h"
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QSharedPointer>
+#include <QVariant>
+
+class QObject;
+
 CardsDisplaySettings::CardsDisplaySettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "cards_display.ini", "cards", QString(), parent)
 {
@@ -35,11 +43,6 @@ int CardsDisplaySettings::getPrintingSelectorCardSize() const
     return getValue("printingSelector", "cards", "cardSize", 100).toInt();
 }
 
-bool CardsDisplaySettings::getIncludeRebalancedCards() const
-{
-    return getValue("includerebalancedcards", QString(), QString(), true).toBool();
-}
-
 bool CardsDisplaySettings::getPrintingSelectorNavigationButtonsVisible() const
 {
     return getValue("navigationButtonsVisible", "cards", "printingSelector", true).toBool();
@@ -48,6 +51,11 @@ bool CardsDisplaySettings::getPrintingSelectorNavigationButtonsVisible() const
 bool CardsDisplaySettings::getTapAnimation() const
 {
     return getValue("tapAnimation", QString(), QString(), true).toBool();
+}
+
+bool CardsDisplaySettings::getArrowDrawAnimation() const
+{
+    return getValue("arrowDrawAnimation", QString(), QString(), true).toBool();
 }
 
 bool CardsDisplaySettings::getAutoRotateSidewaysLayoutCards() const
@@ -85,6 +93,11 @@ int CardsDisplaySettings::getVisualDeckEditorCardSize() const
     return getValue("visualDeckEditor", "cards", "cardSize", 100).toInt();
 }
 
+bool CardsDisplaySettings::getVisualDeckEditorShowCardCounts() const
+{
+    return getValue("visualDeckEditorShowCardCounts", QString(), QString(), true).toBool();
+}
+
 int CardsDisplaySettings::getEDHRecCardSize() const
 {
     return getValue("edhrec", "cards", "cardSize", 100).toInt();
@@ -98,6 +111,16 @@ int CardsDisplaySettings::getArchidektPreviewSize() const
 int CardsDisplaySettings::getSampleHandSize() const
 {
     return getValue("sampleHandSize", "cards", "cardSize", 7).toInt();
+}
+
+QString CardsDisplaySettings::getCardLang() const
+{
+    return getValue("cardLang", QString(), QString(), "en").toString();
+}
+
+int CardsDisplaySettings::getCardSearchLanguage() const
+{
+    return getValue("cardSearchLanguage", QString(), QString(), static_cast<int>(SearchLanguageMode::English)).toInt();
 }
 
 void CardsDisplaySettings::setDisplayCardNames(bool _displayCardNames)
@@ -139,15 +162,6 @@ void CardsDisplaySettings::setPrintingSelectorCardSize(int _printingSelectorCard
     emit printingSelectorCardSizeChanged();
 }
 
-void CardsDisplaySettings::setIncludeRebalancedCards(bool _includeRebalancedCards)
-{
-    if (_includeRebalancedCards == getIncludeRebalancedCards()) {
-        return;
-    }
-    setValue(_includeRebalancedCards, "includerebalancedcards");
-    emit includeRebalancedCardsChanged(_includeRebalancedCards);
-}
-
 void CardsDisplaySettings::setPrintingSelectorNavigationButtonsVisible(bool _navigationButtonsVisible)
 {
     setValue(_navigationButtonsVisible, "navigationButtonsVisible", "cards", "printingSelector");
@@ -157,6 +171,11 @@ void CardsDisplaySettings::setPrintingSelectorNavigationButtonsVisible(bool _nav
 void CardsDisplaySettings::setTapAnimation(bool _tapAnimation)
 {
     setValue(_tapAnimation, "tapAnimation");
+}
+
+void CardsDisplaySettings::setArrowDrawAnimation(bool _arrowDrawAnimation)
+{
+    setValue(_arrowDrawAnimation, "arrowDrawAnimation");
 }
 
 void CardsDisplaySettings::setAutoRotateSidewaysLayoutCards(bool _autoRotateSidewaysLayoutCards)
@@ -197,6 +216,15 @@ void CardsDisplaySettings::setVisualDeckEditorCardSize(int _cardSize)
     emit visualDeckEditorCardSizeChanged();
 }
 
+void CardsDisplaySettings::setVisualDeckEditorShowCardCounts(bool _showCardCounts)
+{
+    if (_showCardCounts == getVisualDeckEditorShowCardCounts()) {
+        return;
+    }
+    setValue(_showCardCounts, "visualDeckEditorShowCardCounts");
+    emit visualDeckEditorShowCardCountsChanged(_showCardCounts);
+}
+
 void CardsDisplaySettings::setEDHRecCardSize(int _edhrecCardSize)
 {
     setValue(_edhrecCardSize, "edhrec", "cards", "cardSize");
@@ -213,4 +241,26 @@ void CardsDisplaySettings::setSampleHandSize(int _sampleHandSize)
 {
     setValue(_sampleHandSize, "sampleHandSize", "cards", "cardSize");
     emit sampleHandSizeChanged(_sampleHandSize);
+}
+
+void CardsDisplaySettings::setCardLang(const QString &_cardLang)
+{
+    if (_cardLang == getCardLang()) {
+        return;
+    }
+    setValue(_cardLang, "cardLang");
+    // Flush to disk immediately: the Oracle tool is a separate process that
+    // reads this value to decide which foreignData to import, so it must not
+    // observe a stale (pre-change) value.
+    sync();
+    emit cardLangChanged(_cardLang);
+}
+
+void CardsDisplaySettings::setCardSearchLanguage(int _cardSearchLanguage)
+{
+    if (_cardSearchLanguage == getCardSearchLanguage()) {
+        return;
+    }
+    setValue(_cardSearchLanguage, "cardSearchLanguage");
+    emit cardSearchLanguageChanged(_cardSearchLanguage);
 }

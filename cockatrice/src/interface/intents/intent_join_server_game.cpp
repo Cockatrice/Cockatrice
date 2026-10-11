@@ -3,9 +3,17 @@
 #include "../widgets/server/game_selector.h"
 #include "../widgets/tabs/tab_room.h"
 #include "../widgets/tabs/tab_supervisor.h"
+#include "abstract_client.h"
+#include "contexts/context_connect_to_server.h"
+#include "contexts/context_join_room.h"
 #include "intent_join_server_room.h"
+#include "remote_client.h"
 
+#include <QMap>
+#include <QSharedPointer>
+#include <QString>
 #include <QTimer>
+#include <qnamespace.h>
 
 IntentJoinServerGame::IntentJoinServerGame(TabSupervisor *_tabSupervisor,
                                            RemoteClient *_remoteClient,
@@ -19,13 +27,15 @@ bool IntentJoinServerGame::checkPrecondition() const
     if (remoteClient->getStatus() != ClientStatus::StatusLoggedIn) {
         return false;
     }
-    // peerPort() reflects the actual TCP peer, which may differ from the
-    // configured server port (e.g. when connecting through a proxy), so only
-    // the hostname is compared here.
-    if (remoteClient->peerName() != context->roomContext.serverContext.hostname) {
+    // serverName()/serverPort() reflect the server the client was configured
+    // to connect to, which may differ from the actual TCP peer (e.g. when
+    // connecting through a proxy), so compare those configured values. A link
+    // naming the same host on another port is a different server and must not
+    // reuse the session there.
+    if (remoteClient->serverName().compare(context->roomContext.serverContext.hostname, Qt::CaseInsensitive) != 0) {
         return false;
     }
-    if (QString::number(remoteClient->peerPort()) != context->roomContext.serverContext.port) {
+    if (QString::number(remoteClient->serverPort()) != context->roomContext.serverContext.port) {
         return false;
     }
 
@@ -55,7 +65,7 @@ bool IntentJoinServerGame::tryJoinGame(TabRoom *room)
         return false;
     }
 
-    if (room->getGameSelector()->joinGameById(context->gameId)) {
+    if (room->getGameSelector()->joinGameById(context->gameId, context->asSpectator)) {
         emitFinished();
         return true;
     }

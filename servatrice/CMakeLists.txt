@@ -6,7 +6,9 @@ project(Servatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${
 
 set(servatrice_SOURCES
     src/email_parser.cpp
+    src/event_loop_watchdog.cpp
     src/main.cpp
+    src/metrics_registry.cpp
     src/servatrice.cpp
     src/servatrice_connection_pool.cpp
     src/servatrice_database_interface.cpp
@@ -24,6 +26,14 @@ set(servatrice_SOURCES
 )
 
 set(servatrice_RESOURCES servatrice.qrc)
+
+# Qxt SMTP is vendored.
+cockatrice_disable_sanitizers_for(
+  src/smtp/qxthmac.cpp src/smtp/qxtmailattachment.cpp src/smtp/qxtmailmessage.cpp src/smtp/qxtsmtp.cpp
+)
+cockatrice_disable_coverage_for(
+  src/smtp/qxthmac.cpp src/smtp/qxtmailattachment.cpp src/smtp/qxtmailmessage.cpp src/smtp/qxtsmtp.cpp
+)
 
 if(WIN32)
   set(servatrice_SOURCES ${servatrice_SOURCES} servatrice.rc)
@@ -94,6 +104,8 @@ set(DESKTOPDIR
 
 # Build servatrice binary and link it
 add_executable(servatrice MACOSX_BUNDLE ${servatrice_MOC_SRCS} ${servatrice_RESOURCES_RCC} ${servatrice_SOURCES})
+
+target_precompile_headers(servatrice PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtcore_pch.h")
 
 if(CMAKE_HOST_SYSTEM MATCHES "FreeBSD")
   target_link_libraries(
@@ -180,10 +192,19 @@ if(WIN32)
   set(qtconf_dest_dir .)
 
   install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/"
+    DIRECTORY "$<TARGET_FILE_DIR:servatrice>/"
     DESTINATION ./
     FILES_MATCHING
     PATTERN "*.dll"
+    PATTERN "*.pdb" EXCLUDE
+    PATTERN "*.dir*" EXCLUDE
+    PATTERN "*_autogen*" EXCLUDE
+    PATTERN "*.tlog*" EXCLUDE
+    PATTERN "CMakeFiles*" EXCLUDE
+    PATTERN "x64*" EXCLUDE
+    PATTERN ".qt*" EXCLUDE
+    PATTERN ".qsb*" EXCLUDE
+    PATTERN ".lupdate*" EXCLUDE
   )
 
   # Qt plugins: platforms, sqldrivers, tls (Qt6)

@@ -1,6 +1,8 @@
 #ifndef COCKATRICE_INTERFACE_CARDS_DISPLAY_SETTINGS_PROVIDER_H
 #define COCKATRICE_INTERFACE_CARDS_DISPLAY_SETTINGS_PROVIDER_H
 
+#include <QString>
+
 class ICardsDisplaySettingsProvider
 {
 public:
@@ -12,9 +14,9 @@ public:
     [[nodiscard]] virtual bool getBumpSetsWithCardsInDeckToTop() const = 0;
     [[nodiscard]] virtual int getPrintingSelectorSortOrder() const = 0;
     [[nodiscard]] virtual int getPrintingSelectorCardSize() const = 0;
-    [[nodiscard]] virtual bool getIncludeRebalancedCards() const = 0;
     [[nodiscard]] virtual bool getPrintingSelectorNavigationButtonsVisible() const = 0;
     [[nodiscard]] virtual bool getTapAnimation() const = 0;
+    [[nodiscard]] virtual bool getArrowDrawAnimation() const = 0;
     [[nodiscard]] virtual bool getAutoRotateSidewaysLayoutCards() const = 0;
     [[nodiscard]] virtual bool getScaleCards() const = 0;
     [[nodiscard]] virtual int getStackCardOverlapPercent() const = 0;
@@ -22,9 +24,12 @@ public:
     [[nodiscard]] virtual int getVisualDeckStorageCardSize() const = 0;
     [[nodiscard]] virtual int getVisualDatabaseDisplayCardSize() const = 0;
     [[nodiscard]] virtual int getVisualDeckEditorCardSize() const = 0;
+    [[nodiscard]] virtual bool getVisualDeckEditorShowCardCounts() const = 0;
     [[nodiscard]] virtual int getEDHRecCardSize() const = 0;
     [[nodiscard]] virtual int getArchidektPreviewSize() const = 0;
     [[nodiscard]] virtual int getSampleHandSize() const = 0;
+    [[nodiscard]] virtual QString getCardLang() const = 0;
+    [[nodiscard]] virtual int getCardSearchLanguage() const = 0;
 };
 
 #endif // COCKATRICE_INTERFACE_CARDS_DISPLAY_SETTINGS_PROVIDER_H

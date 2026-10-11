@@ -7,20 +7,23 @@
 #ifndef DLG_FILTER_GAMES_H
 #define DLG_FILTER_GAMES_H
 
-#include "../interface/widgets/server/games_model.h"
+#include "../server/game_filter_configs.h"
 
-#include <QCheckBox>
-#include <QComboBox>
 #include <QDialog>
 #include <QMap>
 #include <QSet>
+#include <QString>
+#include <QStringList>
 #include <QTime>
+#include <qtmetamacros.h>
 
 class QCheckBox;
 class QComboBox;
 class QGroupBox;
 class QLineEdit;
 class QSpinBox;
+class GamesProxyModel;
+class QWidget;
 
 class DlgFilterGames : public QDialog
 {
@@ -35,7 +38,7 @@ private:
     QCheckBox *hideNotBuddyCreatedGames;
     QCheckBox *hideOpenDecklistGames;
     QLineEdit *gameNameFilterEdit;
-    QLineEdit *creatorNameFilterEdit;
+    QLineEdit *hostNameFilterEdit;
     QMap<int, QCheckBox *> gameTypeFilterCheckBoxes;
     QSpinBox *maxPlayersFilterMinSpinBox;
     QSpinBox *maxPlayersFilterMaxSpinBox;
@@ -50,7 +53,7 @@ private:
     const GamesProxyModel *gamesProxyModel;
     const QMap<QTime, QString> gameAgeMap;
 
-    [[nodiscard]] QStringList getCreatorNameFilters() const;
+    [[nodiscard]] QStringList getHostNameFilters() const;
     [[nodiscard]] QSet<int> getGameTypeFilter() const;
     [[nodiscard]] QTime getMaxGameAge() const;
     [[nodiscard]] bool getShowSpectatorPasswordProtected() const;

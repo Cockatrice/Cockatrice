@@ -1,6 +1,12 @@
 #ifndef COCKATRICE_COMMANDER_SPELLBOOK_BRACKET_EXPLAINER_H
 #define COCKATRICE_COMMANDER_SPELLBOOK_BRACKET_EXPLAINER_H
-#include "api_response/commander_spellbook_estimate_bracket_result.h"
+
+#include <QList>
+#include <QString>
+#include <QStringList>
+#include <QtGlobal>
+
+struct EstimateBracketResult;
 
 namespace CommanderBracketNames
 {

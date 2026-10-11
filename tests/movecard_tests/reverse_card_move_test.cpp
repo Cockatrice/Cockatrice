@@ -1,16 +1,22 @@
+#include "game/game_config.h"
 #include "game/server_abstract_player.h"
 #include "game/server_card.h"
 #include "game/server_cardzone.h"
 #include "game/server_game.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_zone.pb.h"
 #include "server_response_containers.h"
 #include "server_room.h"
 #include "server_test_helpers.h"
 
+#include <QList>
+#include <QString>
 #include <gtest/gtest.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/rng/rng_abstract.h>
 #include <libcockatrice/utility/zone_names.h>
+#include <string>
 
 RNG_Abstract *rng = nullptr; // this needs to be defined due to other functions in server
 
@@ -22,7 +28,21 @@ TEST(ReverseCardMoveTest, MoveCardFromBottomTest)
     // instantiate a fake server instance
     FakeServer server;
     Server_Room room(0, 0, "", "", "", "", false, "", {}, &server);
-    Server_Game game(user, 1, "", "", 2, QList<int>(), false, false, false, false, false, false, 20, false, &room);
+    GameConfig config{.creatorInfo = user,
+                      .gameId = 1,
+                      .description = QString(),
+                      .password = QString(),
+                      .maxPlayers = 2,
+                      .gameTypes = QList<int>(),
+                      .onlyBuddies = false,
+                      .onlyRegistered = false,
+                      .spectatorsAllowed = false,
+                      .spectatorsNeedPassword = false,
+                      .spectatorsCanTalk = false,
+                      .spectatorsSeeEverything = false,
+                      .startingLifeTotal = 20,
+                      .shareDecklistsOnLoad = false};
+    Server_Game game(config, &room);
     Server_AbstractPlayer player(&game, 1, user, false, nullptr);
     Server_CardZone deckZone(&player, ZoneNames::DECK, true, ServerInfo_Zone::PublicZone);
     Server_CardZone exileZone(&player, ZoneNames::EXILE, true, ServerInfo_Zone::PublicZone);

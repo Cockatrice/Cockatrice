@@ -6,8 +6,16 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QForeach>
+#include <QIODevice>
 #include <QTextStream>
+#include <QThread>
+#include <QVariant>
+#include <QtGlobal>
 #include <iostream>
+#include <qnamespace.h>
+#include <qobjectdefs.h>
+#include <string>
 
 ServerLogger::ServerLogger(bool _logToConsole, QObject *parent)
     : QObject(parent), logToConsole(_logToConsole), flushRunning(false)

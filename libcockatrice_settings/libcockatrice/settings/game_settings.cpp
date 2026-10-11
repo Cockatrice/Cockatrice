@@ -1,5 +1,11 @@
 #include "game_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QVariant>
+
+class QObject;
+
 GameSettings::GameSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "game.ini", QString(), QString(), parent)
 {

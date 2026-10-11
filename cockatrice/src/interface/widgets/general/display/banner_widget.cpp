@@ -2,10 +2,15 @@
 
 #include "../../../pixel_map_generator.h"
 
+#include <QBrush>
+#include <QColor>
+#include <QHBoxLayout>
 #include <QLinearGradient>
-#include <QMouseEvent>
 #include <QPainter>
-#include <QVBoxLayout>
+#include <QPixmap>
+#include <QPointF>
+#include <QRect>
+#include <QtGlobal>
 
 BannerWidget::BannerWidget(QWidget *parent, const QString &text, Qt::Orientation orientation, int transparency_)
     : QWidget(parent), gradientOrientation(orientation), transparency(qBound(0, transparency_, 100))
@@ -32,6 +37,7 @@ BannerWidget::BannerWidget(QWidget *parent, const QString &text, Qt::Orientation
 
     // Set minimum height for the widget
     setMinimumHeight(50);
+    setMaximumHeight(100);
     connect(this, &BannerWidget::buddyVisibilityChanged, this, &BannerWidget::toggleBuddyVisibility);
 
     updateDropdownIconState();

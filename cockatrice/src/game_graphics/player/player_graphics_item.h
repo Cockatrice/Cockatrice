@@ -6,11 +6,20 @@
 
 #ifndef COCKATRICE_PLAYER_GRAPHICS_ITEM_H
 #define COCKATRICE_PLAYER_GRAPHICS_ITEM_H
-#include "../../game/player/player_logic.h"
-#include "../board/abstract_counter.h"
+#include "../board/graphics_item_type.h"
 #include "../game_scene.h"
+#include "libcockatrice/utility/playmat_params.h"
 
 #include <QGraphicsObject>
+#include <QMap>
+#include <QMetaObject>
+#include <QPixmap>
+#include <QRectF>
+#include <QSize>
+#include <QSizeF>
+#include <QString>
+#include <QtGlobal>
+#include <qtmetamacros.h>
 
 class HandZone;
 class PileZone;
@@ -19,7 +28,12 @@ class PlayerMenu;
 class PlayerTarget;
 class StackZone;
 class TableZone;
-class ZoneViewZone;
+class AbstractCounter;
+class CardZone;
+class CounterState;
+class PlayerArea;
+class PlayerLogic;
+struct CardRef;
 
 class PlayerGraphicsItem : public QGraphicsObject
 {
@@ -126,6 +140,7 @@ signals:
     void playerCountChanged();
     void mirroredChanged(bool isMirrored);
     void cardInfoRequested(const CardRef &cardRef);
+    void playmatChanged(bool hasPlaymat);
 
 private:
     PlayerLogic *player;
@@ -146,9 +161,23 @@ private:
     bool mirrored;
     bool handVisible = false;
 
+    QPixmap playmatPixmap;
+    QPixmap scaledPlaymatPixmap; // down-scaled copy of playmatPixmap for the current render size
+    QSize scaledPlaymatKey;      // size bucket scaledPlaymatPixmap was rendered for
+    PlaymatParams playmatParams;
+    QString playmatAttribution;
+    bool hasPlaymat = false;
+    QMetaObject::Connection playmatPixmapConnection;
+
 private slots:
     void updateBoundingRect();
     void rearrangeZones();
+    void clearPlaymat();
+    void updatePlaymat();
+    void onPlaymatPixmapReady();
+
+private:
+    QPixmap scaledPlaymatFor(const QRectF &srcRect, const QSizeF &deviceDstSize);
 };
 
 #endif // COCKATRICE_PLAYER_GRAPHICS_ITEM_H

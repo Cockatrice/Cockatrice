@@ -8,8 +8,8 @@
 #ifndef KEYSIGNALS_H
 #define KEYSIGNALS_H
 
-#include <QEvent>
 #include <QObject>
+#include <qtmetamacros.h>
 
 class KeySignals : public QObject
 {

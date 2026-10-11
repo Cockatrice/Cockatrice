@@ -8,23 +8,41 @@
 #ifndef DECK_EDITOR_DECK_DOCK_WIDGET_H
 #define DECK_EDITOR_DECK_DOCK_WIDGET_H
 
-#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "../../key_signals.h"
 #include "../general/tutorial/tutorial_controller.h"
 #include "../utility/custom_line_edit.h"
 #include "../visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
 #include "deck_list_history_manager_widget.h"
 #include "deck_list_style_proxy.h"
+#include "libcockatrice/card/printing/exact_card.h"
 
 #include <QDockWidget>
-#include <QLabel>
-#include <QTextEdit>
+#include <QModelIndexList>
+#include <QString>
 #include <QTreeView>
-#include <libcockatrice/card/card_info.h>
+#include <qtmetamacros.h>
 
 class CommanderBracketWidget;
 class DeckListModel;
 class AbstractTabDeckEditor;
+class DeckListHistoryManagerWidget;
+class DeckListStyleProxy;
+class DeckPreviewDeckTagsDisplayWidget;
+class DeckStateManager;
+class LineEditUnfocusable;
+class QAction;
+class QCheckBox;
+class QComboBox;
+class QItemSelectionModel;
+class QLabel;
+class QMenu;
+class QModelIndex;
+class QPoint;
+class QPushButton;
+class QTextEdit;
+class QTimer;
+class SettingsButtonWidget;
+
 class DeckEditorDeckDockWidget : public QDockWidget
 {
     Q_OBJECT
@@ -34,6 +52,8 @@ public:
     DeckListStyleProxy *proxy;
     QTreeView *deckView;
     QComboBox *bannerCardComboBox;
+    QLabel *playmatLabel;
+    QPushButton *playmatSettingsButton;
     void createDeckDock();
     ExactCard getCurrentCard();
     void retranslateUi();
@@ -99,12 +119,19 @@ private:
     [[nodiscard]] QModelIndexList getSelectedCardNodeSourceIndices() const;
     void offsetCountAtIndex(const QModelIndex &idx, bool isIncrement);
 
+    void addMoveToZoneMenu(QMenu *menu, const QModelIndex &sourceCardIndex, const QString &currentBoardName);
+    void addChangeBoardMenu(QMenu *menu, const QString &zoneName);
+    QString createNewCustomZone(const QString &initialBoardName = {});
+    void addNewZoneAction(QMenu *menu, const QString &initialBoardName = {});
+
 private slots:
     void decklistCustomMenu(QPoint point);
     void updateCard(QModelIndex, const QModelIndex &current);
     void writeName();
     void writeComments();
     void writeBannerCard(int);
+    void openPlaymatSettings();
+    void updatePlaymatLabel();
     void applyActiveGroupCriteria();
     void setSelectedIndex(const QModelIndex &newCardIndex, bool preserveWidgetFocus);
     void updateHash();

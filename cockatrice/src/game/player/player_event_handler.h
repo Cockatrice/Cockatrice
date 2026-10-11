@@ -22,14 +22,14 @@
 #include "event_processing_options.h"
 
 #include <QObject>
-#include <libcockatrice/protocol/pb/card_attributes.pb.h>
+#include <QString>
 #include <libcockatrice/protocol/pb/game_event.pb.h>
-#include <libcockatrice/protocol/pb/game_event_context.pb.h>
+#include <qtmetamacros.h>
+#include <sys/types.h>
 
 class CardItem;
 class CardZoneLogic;
 class PlayerLogic;
-
 class Event_AttachCard;
 class Event_ChangeZoneProperties;
 class Event_CreateArrow;
@@ -50,6 +50,9 @@ class Event_SetCardCounter;
 class Event_SetCounter;
 class Event_Shuffle;
 class Event_GameLogNotice;
+class GameEventContext;
+enum CardAttribute : int;
+template <typename T> class QList;
 
 /**
  * @class PlayerEventHandler
@@ -153,7 +156,7 @@ public:
     void eventCreateCounter(const Event_CreateCounter &event);
 
     /// Set a player-level counter value.
-    void eventSetCounter(const Event_SetCounter &event);
+    void eventSetCounter(const Event_SetCounter &event, EventProcessingOptions options);
 
     /// Delete a player-level counter.
     void eventDelCounter(const Event_DelCounter &event);

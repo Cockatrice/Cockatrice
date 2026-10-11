@@ -1,11 +1,18 @@
 #include "mana_distribution_config_dialog.h"
 
+#include <QAbstractItemView>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <QLabel>
+#include <QList>
 #include <QListWidget>
+#include <QListWidgetItem>
+#include <QString>
+#include <QStringList>
 #include <QVBoxLayout>
+
+class QWidget;
 
 static const QStringList kColors = {"W", "U", "B", "R", "G", "C"};
 

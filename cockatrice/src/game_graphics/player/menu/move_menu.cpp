@@ -1,10 +1,14 @@
 #include "move_menu.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
+#include "../../game_scene.h"
 #include "../card_menu_action_type.h"
 #include "../player_graphics_item.h"
+
+#include <QAction>
 
 MoveMenu::MoveMenu(PlayerGraphicsItem *player) : QMenu(tr("Move to"))
 {

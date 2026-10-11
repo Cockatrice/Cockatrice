@@ -1,5 +1,11 @@
 #include "chat_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QVariant>
+
+class QObject;
+
 ChatSettings::ChatSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "chat.ini", "chat", QString(), parent)
 {
@@ -63,6 +69,16 @@ bool ChatSettings::getShowMentionPopup() const
 bool ChatSettings::getRoomHistory() const
 {
     return getValue("roomHistory", QString(), QString(), true).toBool();
+}
+
+bool ChatSettings::getIgnoreAllPrivateMessages() const
+{
+    return getValue("ignoreAllPrivateMessages", QString(), QString(), false).toBool();
+}
+
+bool ChatSettings::getUseGameTime() const
+{
+    return getValue("useGameTime", QString(), QString(), false).toBool();
 }
 
 QString ChatSettings::getHighlightWords() const
@@ -129,6 +145,16 @@ void ChatSettings::setShowMentionPopups(bool _showMentionPopups)
 void ChatSettings::setRoomHistory(bool _roomHistory)
 {
     setValue(_roomHistory, "roomHistory");
+}
+
+void ChatSettings::setIgnoreAllPrivateMessages(bool _ignoreAllPrivateMessages)
+{
+    setValue(_ignoreAllPrivateMessages, "ignoreAllPrivateMessages");
+}
+
+void ChatSettings::setUseGameTime(bool _useGameTime)
+{
+    setValue(_useGameTime, "useGameTime");
 }
 
 void ChatSettings::setHighlightWords(const QString &_highlightWords)

@@ -1,6 +1,10 @@
 #include "tab_edhrec_main.h"
 
 #include "../../../../../client/settings/cache_settings.h"
+#include "../../../../deck_loader/loaded_deck.h"
+#include "../../../cards/card_size_widget.h"
+#include "../../../quick_settings/settings_button_widget.h"
+#include "../../../utility/completer_utils.h"
 #include "../../tab_supervisor.h"
 #include "api_response/average_deck/edhrec_average_deck_api_response.h"
 #include "api_response/commander/edhrec_commander_api_response.h"
@@ -12,19 +16,22 @@
 #include "display/top_commander/edhrec_top_commanders_api_response_display_widget.h"
 #include "display/top_tags/edhrec_top_tags_api_response_display_widget.h"
 
-#include <QCompleter>
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QLineEdit>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QPushButton>
 #include <QRegularExpression>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/card/database/card_database_querier.h>
 #include <libcockatrice/models/database/card/card_completer_proxy_model.h>
 #include <libcockatrice/models/database/card/card_search_model.h>
+#include <libcockatrice/models/database/card_database_display_model.h>
+#include <libcockatrice/models/database/card_database_model.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <version_string.h>
 
@@ -63,32 +70,12 @@ TabEdhRecMain::TabEdhRecMain(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor
     auto cardDatabaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, this);
     auto displayModel = new CardDatabaseDisplayModel(this);
     displayModel->setSourceModel(cardDatabaseModel);
-    auto *searchModel = new CardSearchModel(displayModel, this);
 
-    auto *proxyModel = new CardCompleterProxyModel(this);
-    proxyModel->setSourceModel(searchModel);
-    proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    proxyModel->setFilterRole(Qt::DisplayRole);
-
-    auto *completer = new QCompleter(proxyModel, this);
-    completer->setCompletionRole(Qt::DisplayRole);
-    completer->setCompletionMode(QCompleter::PopupCompletion);
-    completer->setCaseSensitivity(Qt::CaseInsensitive);
-    completer->setFilterMode(Qt::MatchContains);
-    completer->setMaxVisibleItems(10);
-    searchBar->setCompleter(completer);
+    const CardCompleterSetup cardSetup = createCardCompleter(displayModel, this);
+    searchBar->setCompleter(cardSetup.completer);
 
     // Update suggestions dynamically
-    connect(searchBar, &QLineEdit::textChanged, searchModel, &CardSearchModel::updateSearchResults);
-    connect(searchBar, &QLineEdit::textChanged, this, [=](const QString &text) {
-        // Ensure substring matching
-        QString pattern = ".*" + QRegularExpression::escape(text) + ".*";
-        proxyModel->setFilterRegularExpression(QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption));
-
-        if (!text.isEmpty()) {
-            completer->complete(); // Force the dropdown to appear
-        }
-    });
+    connectCardCompleterSearch(searchBar, cardSetup);
 
     searchPushButton = new QPushButton(navigationContainer);
     connect(searchPushButton, &QPushButton::clicked, this, [=, this]() { doSearch(); });
@@ -153,6 +140,8 @@ void TabEdhRecMain::setCard(CardInfoPtr _cardToQuery, bool isCommander)
         qDebug() << "Invalid card information provided.";
         return;
     }
+
+    emit tabTextChanged(this, getTabText());
 
     QString cardName = cardToQuery->getName();
     QString formattedName = cardName.toLower().replace(" ", "-").remove(QRegularExpression("[^a-z0-9\\-]"));

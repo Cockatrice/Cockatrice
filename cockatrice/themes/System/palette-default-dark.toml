@@ -1,0 +1,7 @@
+# The System theme derives all of its colors from the platform palette
+# (e.g. qt6ct's custom color scheme on Linux), so it must NOT ship palette
+# overrides. Only the identity app colors are provided here, so buttons keep
+# their classic greens while the actual palette stays native to the OS.
+[AppColors]
+AccentStrong        = #ff148c3c
+AccentSoft          = #ff78c850

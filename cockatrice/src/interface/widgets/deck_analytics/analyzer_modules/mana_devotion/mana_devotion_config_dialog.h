@@ -2,16 +2,20 @@
 #ifndef COCKATRICE_MANA_DEVOTION_ADD_DIALOG_H
 #define COCKATRICE_MANA_DEVOTION_ADD_DIALOG_H
 
-#include "../../deck_list_statistics_analyzer.h"
 #include "mana_devotion_config.h"
 
-#include <QCheckBox>
-#include <QComboBox>
 #include <QDialog>
-#include <QDialogButtonBox>
-#include <QLabel>
-#include <QListWidget>
-#include <QVBoxLayout>
+#include <QList>
+#include <QString>
+#include <qtmetamacros.h>
+
+class DeckListStatisticsAnalyzer;
+class QComboBox;
+class QDialogButtonBox;
+class QLabel;
+class QListWidget;
+class QVBoxLayout;
+class QWidget;
 
 class ManaDevotionConfigDialog : public QDialog
 {

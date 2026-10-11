@@ -20,11 +20,16 @@
 #include "servatrice.h"
 
 #include "email_parser.h"
+#include "event_loop_watchdog.h"
 #include "isl_interface.h"
+#include "libcockatrice/protocol/pb/response_report_stats.pb.h"
+#include "libcockatrice/protocol/pb/session_event.pb.h"
 #include "main.h"
 #include "servatrice_connection_pool.h"
 #include "servatrice_database_interface.h"
+#include "server.h"
 #include "server_logger.h"
+#include "server_protocolhandler.h"
 #include "serversocketinterface.h"
 #include "settingscache.h"
 #include "smtpclient.h"
@@ -32,19 +37,37 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QFile>
+#include <QIODevice>
+#include <QMapIterator>
+#include <QMetaObject>
+#include <QMutableListIterator>
+#include <QObject>
 #include <QProcessEnvironment>
+#include <QReadLocker>
+#include <QSharedPointer>
+#include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QSsl>
 #include <QString>
 #include <QStringList>
+#include <QThread>
 #include <QTimer>
+#include <QTypeInfo>
 #include <QUrl>
-#include <iostream>
-#include <libcockatrice/deck_list/deck_list.h>
+#include <QVariant>
+#include <QtGlobal>
+#include <compare>
+#include <game/server_game.h>
+#include <google/protobuf/stubs/port.h>
 #include <libcockatrice/protocol/featureset.h>
 #include <libcockatrice/protocol/pb/event_connection_closed.pb.h>
 #include <libcockatrice/protocol/pb/event_server_message.pb.h>
 #include <libcockatrice/protocol/pb/event_server_shutdown.pb.h>
+#include <new>
+#include <qlogging.h>
+#include <qnamespace.h>
 #include <server_room.h>
+#include <string>
 
 Servatrice_GameServer::Servatrice_GameServer(Servatrice *_server,
                                              int _numberPools,
@@ -63,6 +86,7 @@ Servatrice_GameServer::Servatrice_GameServer(Servatrice *_server,
         server->addDatabaseInterface(newThread, newDatabaseInterface);
 
         newThread->start();
+        server->watchWorkerThread(newThread);
         QMetaObject::invokeMethod(newDatabaseInterface, "initDatabase", Qt::BlockingQueuedConnection,
                                   Q_ARG(QSqlDatabase, _sqlDatabase));
 
@@ -86,7 +110,6 @@ void Servatrice_GameServer::incomingConnection(qintptr socketDescriptor)
     Servatrice_ConnectionPool *pool = findLeastUsedConnectionPool();
 
     auto ssi = new TcpServerSocketInterface(server, pool->getDatabaseInterface());
-    connect(ssi, SIGNAL(incTxBytes(qint64)), this, SLOT(incTxBytes(qint64)));
     ssi->moveToThread(pool->thread());
     pool->addClient();
     connect(ssi, SIGNAL(destroyed()), pool, SLOT(removeClient()));
@@ -131,6 +154,7 @@ Servatrice_WebsocketGameServer::Servatrice_WebsocketGameServer(Servatrice *_serv
         server->addDatabaseInterface(newThread, newDatabaseInterface);
 
         newThread->start();
+        server->watchWorkerThread(newThread);
         QMetaObject::invokeMethod(newDatabaseInterface, "initDatabase", Qt::BlockingQueuedConnection,
                                   Q_ARG(QSqlDatabase, _sqlDatabase));
 
@@ -156,7 +180,6 @@ void Servatrice_WebsocketGameServer::onNewConnection()
     Servatrice_ConnectionPool *pool = findLeastUsedConnectionPool();
 
     auto ssi = new WebsocketServerSocketInterface(server, pool->getDatabaseInterface());
-    connect(ssi, SIGNAL(incTxBytes(quint64)), this, SLOT(incTxBytes(quint64)));
     /*
      * Due to a Qt limitation, websockets can't be moved to another thread.
      * This will hopefully change in Qt6 if QtWebSocket will be integrated in QtNetwork
@@ -226,6 +249,13 @@ bool Servatrice::initServer()
 {
 
     serverId = getServerID();
+
+    // METRICS (always active. Slow-command logging and stall watchdogs are
+    // controlled by their respective thresholds below). Read up front so the
+    // values are available before any pool thread is started and watchdogged.
+    metricsSlowCommandMs = settingsCache->value("metrics/slow_command_ms", 500).toInt();
+    metricsStallWarnMs = qMax(0, settingsCache->value("metrics/stall_warn_ms", 2000).toInt());
+
     if (getAuthenticationMethodString() == "sql") {
         qDebug() << "Authenticating method: sql";
         authenticationMethod = AuthenticationSql;
@@ -428,6 +458,14 @@ bool Servatrice::initServer()
         statusUpdateClock->start(getServerStatusUpdateTime());
     }
 
+    deckShareCleanupClock = new QTimer(this);
+    connect(deckShareCleanupClock, SIGNAL(timeout()), this, SLOT(cleanupExpiredDeckShares()));
+    const int deckShareCleanupInterval = getDeckShareCleanupInterval();
+    if (deckShareCleanupInterval > 0) {
+        qDebug() << "Starting deck share cleanup clock, interval" << deckShareCleanupInterval << "ms";
+        deckShareCleanupClock->start(deckShareCleanupInterval);
+    }
+
     // SOCKET SERVER
     if (getNumberOfTCPPools() > 0) {
         gameServer =
@@ -470,7 +508,53 @@ bool Servatrice::initServer()
     }
 
     setRequiredFeatures(getRequiredFeatures());
+
     return true;
+}
+
+void Servatrice::observeGameStartDurationMs(qint64 elapsedMs)
+{
+    metricsRegistry.observeGameStartDurationMs(elapsedMs);
+}
+
+void Servatrice::observeEventLoopStall(const QString &threadName, qint64 overshootMs)
+{
+    eventLoopStallsTotal.fetch_add(1, std::memory_order_relaxed);
+    eventLoopLastStallMs.store(overshootMs, std::memory_order_relaxed);
+    qint64 prevMax = eventLoopMaxStallMs.load(std::memory_order_relaxed);
+    while (overshootMs > prevMax &&
+           !eventLoopMaxStallMs.compare_exchange_weak(prevMax, overshootMs, std::memory_order_relaxed)) {
+        // retry until the max is at least as high as the new sample
+    }
+
+    qWarning() << "Event loop stall in" << threadName << "- heartbeat overshot by" << overshootMs << "ms";
+}
+
+void Servatrice::watchWorkerThread(QThread *thread)
+{
+    if (metricsStallWarnMs <= 0) {
+        return; // watchdogs disabled via metrics/stall_warn_ms = 0
+    }
+
+    auto *watchdog = new EventLoopWatchdog(this, thread->objectName());
+    connect(thread, &QThread::finished, watchdog, &QObject::deleteLater);
+    watchdog->moveToThread(thread);
+    QMetaObject::invokeMethod(watchdog, &EventLoopWatchdog::start, Qt::QueuedConnection);
+}
+
+qint64 Servatrice::getCardsInGamesTotal() const
+{
+    qint64 total = 0;
+    QReadLocker roomsLocker(&roomsLock); // locking order: roomsLock before gamesLock/gameMutex
+    QMapIterator<int, Server_Room *> roomIterator(rooms);
+    while (roomIterator.hasNext()) {
+        Server_Room *room = roomIterator.next().value();
+        QReadLocker gamesLocker(&room->gamesLock);
+        for (auto *game : room->getGames()) {
+            total += game->getCardsInGame();
+        }
+    }
+    return total;
 }
 
 void Servatrice::addDatabaseInterface(QThread *thread, Servatrice_DatabaseInterface *databaseInterface)
@@ -512,6 +596,23 @@ QList<ServerProperties> Servatrice::getServerList() const
     serverListMutex.unlock();
 
     return result;
+}
+
+std::shared_ptr<const Response_ReportStats> Servatrice::getCachedReportStats() const
+{
+    QMutexLocker locker(&reportStatsMutex);
+    if (!reportStatsTimestamp.isValid() ||
+        reportStatsTimestamp.secsTo(QDateTime::currentDateTime()) >= reportStatsCacheTtlSeconds) {
+        return nullptr;
+    }
+    return reportStatsCache;
+}
+
+void Servatrice::cacheReportStats(const Response_ReportStats &stats)
+{
+    QMutexLocker locker(&reportStatsMutex);
+    reportStatsCache = std::make_shared<const Response_ReportStats>(stats);
+    reportStatsTimestamp = QDateTime::currentDateTime();
 }
 
 int Servatrice::getUsersWithAddress(const QHostAddress &address) const
@@ -581,6 +682,11 @@ void Servatrice::setRequiredFeatures(const QString &featureList)
     }
 
     qDebug() << "Set required client features to:" << serverRequiredFeatureList;
+}
+
+void Servatrice::cleanupExpiredDeckShares()
+{
+    servatriceDatabaseInterface->cleanupExpiredDeckShares();
 }
 
 void Servatrice::statusUpdate()
@@ -673,8 +779,27 @@ void Servatrice::statusUpdate()
     }
 }
 
+SessionEvent *Servatrice::makeShutdownEvent() const
+{
+    Event_ServerShutdown event;
+    event.set_reason(shutdownReason.toStdString());
+    event.set_minutes(static_cast<google::protobuf::uint32>(shutdownMinutes));
+    return Server_ProtocolHandler::prepareSessionEvent(event);
+}
+
+SessionEvent *Servatrice::getLoginSessionEvent() const
+{
+    // Notify newly logged-in users of a pending server shutdown
+    QMutexLocker locker(&shutdownStateMutex);
+    if (shutdownTimer && shutdownMinutes > 0) {
+        return makeShutdownEvent();
+    }
+    return nullptr;
+}
+
 void Servatrice::scheduleShutdown(const QString &reason, int minutes)
 {
+    shutdownStateMutex.lock();
     shutdownReason = reason;
     shutdownMinutes = minutes;
     nextShutdownMessageMinutes = shutdownMinutes;
@@ -683,6 +808,7 @@ void Servatrice::scheduleShutdown(const QString &reason, int minutes)
         connect(shutdownTimer, SIGNAL(timeout()), this, SLOT(shutdownTimeout()));
         shutdownTimer->start(60000);
     }
+    shutdownStateMutex.unlock();
     shutdownTimeout();
 }
 
@@ -702,6 +828,7 @@ void Servatrice::incRxBytes(quint64 num)
 
 void Servatrice::shutdownTimeout()
 {
+    QMutexLocker locker(&shutdownStateMutex);
     // Show every time counter cut in half & every minute for last 5 minutes
     if (shutdownMinutes <= 5 || shutdownMinutes == nextShutdownMessageMinutes) {
         if (shutdownMinutes == nextShutdownMessageMinutes) {
@@ -710,10 +837,7 @@ void Servatrice::shutdownTimeout()
 
         SessionEvent *se;
         if (shutdownMinutes) {
-            Event_ServerShutdown event;
-            event.set_reason(shutdownReason.toStdString());
-            event.set_minutes(static_cast<google::protobuf::uint32>(shutdownMinutes));
-            se = Server_ProtocolHandler::prepareSessionEvent(event);
+            se = makeShutdownEvent();
         } else {
             Event_ConnectionClosed event;
             event.set_reason(Event_ConnectionClosed::SERVER_SHUTDOWN);
@@ -975,6 +1099,27 @@ int Servatrice::getMaxCommandCountPerInterval() const
 int Servatrice::getServerStatusUpdateTime() const
 {
     return settingsCache->value("server/statusupdate", 15000).toInt();
+}
+
+int Servatrice::getDeckShareExpiryDays() const
+{
+    return qMax(1, settingsCache->value("deck_share/expiry_days", 7).toInt());
+}
+
+int Servatrice::getDeckShareCleanupInterval() const
+{
+    // default: every 60 minutes
+    return settingsCache->value("deck_share/cleanup_interval", 60).toInt() * 60000;
+}
+
+int Servatrice::getDeckShareMaxDecksPerShare() const
+{
+    return settingsCache->value("deck_share/max_decks_per_share", 50).toInt();
+}
+
+int Servatrice::getDeckShareMaxSharesPerDay() const
+{
+    return settingsCache->value("deck_share/max_shares_per_day", 50).toInt();
 }
 
 int Servatrice::getNumberOfTCPPools() const

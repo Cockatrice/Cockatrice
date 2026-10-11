@@ -1,5 +1,9 @@
 name: Update Translations
 
+permissions:
+  contents: write
+  pull-requests: write
+
 on:
   pull_request:
     paths:

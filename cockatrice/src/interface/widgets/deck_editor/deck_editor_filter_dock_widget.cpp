@@ -4,10 +4,31 @@
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../../../filters/filter_builder.h"
 #include "../../../filters/filter_tree_model.h"
+#include "../../key_signals.h"
+#include "../../pixel_map_generator.h"
+#include "../tabs/abstract_tab_deck_editor.h"
+#include "libcockatrice/filters/filter_card.h"
 
+#include <QAbstractItemModel>
+#include <QAction>
+#include <QDebug>
+#include <QFlags>
 #include <QGridLayout>
+#include <QItemSelectionModel>
+#include <QList>
 #include <QMenu>
+#include <QModelIndex>
+#include <QModelIndexList>
+#include <QPersistentModelIndex>
+#include <QPoint>
+#include <QString>
+#include <QStringLiteral>
 #include <QToolButton>
+#include <QTreeView>
+#include <QVBoxLayout>
+#include <QVariant>
+#include <QWidget>
+#include <qnamespace.h>
 
 DeckEditorFilterDockWidget::DeckEditorFilterDockWidget(AbstractTabDeckEditor *parent)
     : QDockWidget(parent), deckEditor(parent)
@@ -42,11 +63,11 @@ void DeckEditorFilterDockWidget::createFiltersDock()
     connect(filterBuilder, &FilterBuilder::add, filterModel, &FilterTreeModel::addFilter);
 
     aClearFilterOne = new QAction(QString(), this);
-    aClearFilterOne->setIcon(QPixmap("theme:icons/decrement"));
+    aClearFilterOne->setIcon(themePixmap(QStringLiteral("icons/decrement")));
     connect(aClearFilterOne, &QAction::triggered, this, &DeckEditorFilterDockWidget::actClearFilterOne);
 
     aClearFilterAll = new QAction(QString(), this);
-    aClearFilterAll->setIcon(QPixmap("theme:icons/clearsearch"));
+    aClearFilterAll->setIcon(themePixmap(QStringLiteral("icons/clearsearch")));
     connect(aClearFilterAll, &QAction::triggered, this, &DeckEditorFilterDockWidget::actClearFilterAll);
 
     auto *filterDelOne = new QToolButton();

@@ -25,40 +25,61 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include "../client/lag_monitor.h"
+#include "../client/network/update/client/release_channel.h"
+#include "card_database_update/card_update_progress.h"
 #include "connection_controller/remote_connection_controller.h"
-#include "widgets/dialogs/dlg_local_game_options.h"
 
+#include <QByteArray>
+#include <QDir>
+#include <QElapsedTimer>
 #include <QList>
+#include <QLoggingCategory>
 #include <QMainWindow>
-#include <QMessageBox>
-#include <QSystemTrayIcon>
-#include <QtNetwork>
+#include <QMenu>
+#include <QProcess>
+#include <QString>
+#include <QStringList>
+#include <QUrl>
+#include <QtGlobal>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
-#include <libcockatrice/protocol/pb/response.pb.h>
+#include <qtmetamacros.h>
+
+class QAction;
+class QWidget;
+struct LocalGameOptions;
 
 inline Q_LOGGING_CATEGORY(WindowMainLog, "window_main");
 inline Q_LOGGING_CATEGORY(WindowMainStartupLog, "window_main.startup");
 inline Q_LOGGING_CATEGORY(WindowMainStartupVersionLog, "window_main.startup.version");
 inline Q_LOGGING_CATEGORY(WindowMainStartupShortcutsLog, "window_main.startup.shortcuts");
 inline Q_LOGGING_CATEGORY(WindowMainStartupAutoconnectLog, "window_main.startup.autoconnect");
+inline Q_LOGGING_CATEGORY(CardDatabaseUpdateLog, "card_database.update");
 
-class Release;
-class DlgConnect;
 class DlgViewLog;
 class GameReplay;
-class HandlePublicServers;
-class LocalClient;
 class LocalServer;
-class QThread;
+class LatencyStatusWidget;
+class CardDatabaseUpdateStatusBar;
 class RemoteClient;
-class ServerInfo_User;
 class TabSupervisor;
 class WndSets;
 class DlgTipOfTheDay;
+struct ContextConnectToServer;
+class IntentUrlParser;
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+signals:
+    /** @brief Emitted after the card-database update subprocess exits. */
+    void cardDatabaseUpdateFinished(bool success);
+
+    /** @brief Emitted while the card-database update subprocess runs.
+     *         @p progress.done/@p progress.total are byte counts for the first two stages
+     *         and set indices for "import". */
+    void cardDatabaseUpdateProgress(const CardUpdateProgress &progress);
+
 public slots:
     void actCheckCardUpdates();
     void actCheckCardUpdatesBackground();
@@ -66,6 +87,7 @@ public slots:
     void actCheckClientUpdates();
     void actConnect();
     void actExit();
+    void handleCockatriceLink(const QString &url);
 private slots:
     void updateTabMenu(const QList<QMenu *> &newMenuList);
     void statusChanged(ClientStatus _status);
@@ -83,9 +105,12 @@ private slots:
     void actOpenSettingsFolder();
     void actShow();
     void showWindowIfHidden();
+    void onUrlChainFinished(bool connected);
 
     void cardUpdateError(QProcess::ProcessError err);
     void cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void cardUpdateProgressOutput();
+    void cardUpdateStandardError();
     void refreshShortcuts();
     void cardDatabaseLoadingFailed();
     void cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknownSetsNames);
@@ -105,6 +130,13 @@ private slots:
     void startupConfigCheck();
     void alertForcedOracleRun(const QString &version, bool isUpdate);
 
+    void applyStartupDestination();
+    void onStartupDestinationConnected(int destination, const ContextConnectToServer &serverContext);
+    void startupDestinationFailed(const QString &reason);
+    [[nodiscard]] bool startupDestinationConnectsToServer() const;
+
+    void attemptStartupAutoConnect();
+
 private:
     static const QString appName;
     static const QStringList fileNameFilters;
@@ -114,12 +146,24 @@ private:
 
     void createTrayIcon();
     int getNextCustomSetPrefix(QDir dataDir);
+
+    void runFirstRunWizard(bool firstRun = false);
+
     inline QString getCardUpdaterBinaryName()
     {
         return "oracle";
     }
     void createCardUpdateProcess(bool background = false);
     void exitCardDatabaseUpdate();
+    /**
+     * @brief Tries to bring the open card database updater window to the front.
+     * @return true when the updater acknowledged the request
+     */
+    bool requestCardUpdateRaise();
+    /** @brief Tells the user an update is running without blocking, honoring a hidden status bar. */
+    void announceCardUpdateRunning();
+    /** @brief Posts a tray notification when the status bar cannot show progress. */
+    void notifyCardUpdateFinishedFromTray(bool success);
 
     void startLocalGame(const LocalGameOptions &options);
 
@@ -129,15 +173,28 @@ private:
     QAction *aConnect, *aDisconnect, *aRegister, *aForgotPassword, *aSinglePlayer, *aWatchReplay, *aFullScreen;
     QAction *aManageSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet,
         *aReloadCardDatabase;
-    QAction *aTips, *aUpdate, *aCheckCardUpdates, *aCheckCardUpdatesBackground, *aStatusBar, *aViewLog,
-        *aOpenSettingsFolder;
+    QAction *aTips, *aUpdate, *aCheckCardUpdates, *aCheckCardUpdatesBackground, *aFirstRunWizard, *aStatusBar,
+        *aViewLog, *aOpenSettingsFolder;
 
     TabSupervisor *tabSupervisor;
+    IntentUrlParser *urlParser;
     WndSets *wndSets;
     ConnectionController *connectionController;
     LocalServer *localServer;
+    LagMonitor lagMonitor;                        ///< watches the main thread for event loop stalls
+    LatencyStatusWidget *latencyStatus = nullptr; ///< status bar widget with live round-trip stats and history graph
     bool bHasActivated, askedForDbUpdater;
+    bool bClosingDown = false; ///< guards closeEvent() against re-entrancy
+    bool skipStartupAutoConnect = false;
+    bool startupAutoConnectAttempted = false;
+    bool firstRunWizardActive = false;
     QProcess *cardUpdateProcess;
+    QByteArray cardUpdateOutputBuffer;
+    QByteArray cardUpdateErrorOutput;  ///< diagnostic output collected from the updater's stderr
+    QByteArray cardUpdateErrorPartial; ///< incomplete trailing stderr line, kept for line-based logging
+    CardUpdateStage cardUpdateLoggedStage = CardUpdateStage::Unknown; ///< stage of the last logged progress update
+    QElapsedTimer cardUpdateProgressLogTimer;                   ///< throttles progress logging to the running stage
+    CardDatabaseUpdateStatusBar *cardUpdateStatusBar = nullptr; ///< status bar widget tracking the card database update
     DlgViewLog *logviewDialog;
     GameReplay *replay;
     DlgTipOfTheDay *tip;
@@ -148,6 +205,16 @@ public:
     void setConnectTo(QString url)
     {
         connectTo = QUrl(QString("cockatrice://%1").arg(url));
+    }
+    // When set, the window's own startup connection (--connect or auto-connect
+    // on first activation) is skipped. Used for activation launches: the intent
+    // chain triggered by a cockatrice:// URL owns the connection, and letting
+    // auto-connect race against it caused two connectToServer calls to tear
+    // each other down. onUrlChainFinished() clears this and retries the startup
+    // connection when the link's chain ended without connecting.
+    void setSkipStartupAutoConnect(bool skip)
+    {
+        skipStartupAutoConnect = skip;
     }
     ~MainWindow() override;
 
@@ -160,6 +227,13 @@ public:
     {
         return tabSupervisor;
     }
+
+    /**
+     * @brief Closes the window so an update installer can replace the running binaries.
+     *        Returns true only if the shutdown actually ran (settings flushed, tabs shut down);
+     *        false if the close was vetoed by the user or is already in progress.
+     */
+    bool closeForUpdate();
 
 protected:
     void closeEvent(QCloseEvent *event) override;

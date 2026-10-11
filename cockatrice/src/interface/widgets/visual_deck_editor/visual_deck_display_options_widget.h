@@ -4,12 +4,18 @@
 #include "../general/tutorial/tutorial_controller.h"
 #include "visual_deck_editor_widget.h"
 
-#include <QComboBox>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QListWidget>
-#include <QPushButton>
+#include <QList>
+#include <QString>
+#include <QStringList>
 #include <QWidget>
+#include <qtmetamacros.h>
+
+class CompactPushButton;
+class QComboBox;
+class QHBoxLayout;
+class QLabel;
+class QListWidget;
+class SettingsButtonWidget;
 
 /**
  * @class VisualDeckDisplayOptionsWidget

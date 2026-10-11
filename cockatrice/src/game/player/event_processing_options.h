@@ -13,7 +13,8 @@
 enum EventProcessingOption
 {
     SKIP_REVEAL_WINDOW = 0x0001,
-    SKIP_TAP_ANIMATION = 0x0002
+    SKIP_TAP_ANIMATION = 0x0002,
+    SKIP_DAMAGE_ANIMATION = 0x0004
 };
 
 // Wrap it in a QFlags typedef

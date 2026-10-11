@@ -1,11 +1,13 @@
 #include "debug_pb_message.h"
 
-#include <QList>
 #include <QString>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
+#include <google/protobuf/stubs/common.h>
 #include <google/protobuf/text_format.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <string>
+#include <vector>
 
 // FastFieldValuePrinter is added in protobuf 3.4, going out of our way to add the old FieldValuePrinter is not worth it
 #if GOOGLE_PROTOBUF_VERSION > 3004000

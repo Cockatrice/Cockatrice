@@ -1,5 +1,11 @@
 #include "network_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QVariant>
+
+class QObject;
+
 NetworkSettings::NetworkSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "network.ini", "network", QString(), parent)
 {

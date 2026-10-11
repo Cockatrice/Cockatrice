@@ -3,7 +3,11 @@
 
 #include "settings_manager.h"
 
+#include <QString>
 #include <libcockatrice/interfaces/interface_deck_editor_settings_provider.h>
+#include <qtmetamacros.h>
+
+class QObject;
 
 enum commanderSpellbookIntegrationEnabledIndex
 {
@@ -11,6 +15,13 @@ enum commanderSpellbookIntegrationEnabledIndex
     commanderSpellbookIntegrationEnabledIndexEnabled,
     commanderSpellbookIntegrationEnabledIndexAutomatic,
     commanderSpellbookIntegrationEnabledIndexUnprompted,
+};
+
+enum VdeStartupTab
+{
+    VdeStartupTabContext, ///< Match the opened deck: new decks show the database display, existing decks the deck view
+    VdeStartupTabDeckDisplay,     ///< Always open the Visual Deck View
+    VdeStartupTabDatabaseDisplay, ///< Always open the Visual Database Display
 };
 
 class DeckEditorSettings : public SettingsManager, public IDeckEditorSettingsProvider
@@ -23,6 +34,7 @@ public:
     [[nodiscard]] bool getBannerCardComboBoxVisible() const override;
     [[nodiscard]] bool getTagsWidgetVisible() const override;
     [[nodiscard]] int getDefaultDeckEditorType() const override;
+    [[nodiscard]] int getVdeStartupTab() const;
     [[nodiscard]] int getCommanderSpellbookIntegrationEnabled() const;
     [[nodiscard]] bool getCommanderSpellbookIntegrationUseOfficialBracketNames() const;
 
@@ -30,6 +42,7 @@ public:
     void setBannerCardComboBoxVisible(bool _bannerCardComboBoxVisible);
     void setTagsWidgetVisible(bool _tagsWidgetVisible);
     void setDefaultDeckEditorType(int _defaultDeckEditorType);
+    void setVdeStartupTab(int _vdeStartupTab);
     void setCommanderSpellbookIntegrationEnabled(int _commanderSpellbookIntegrationEnabled);
     void setCommanderSpellbookIntegrationUseOfficialBracketNames(bool _useOfficialBracketNames);
 
@@ -38,6 +51,7 @@ signals:
     void tagsWidgetVisibleChanged(bool visible);
     void commanderSpellbookIntegrationEnabledChanged(int enabled);
     void commanderSpellbookIntegrationUseOfficialBracketNamesChanged(bool useOfficialBracketNames);
+    void vdeStartupTabChanged(int vdeStartupTab);
 
 public:
     explicit DeckEditorSettings(const QString &settingPath, QObject *parent = nullptr);

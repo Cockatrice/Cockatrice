@@ -7,7 +7,8 @@
 #ifndef DECKSTATS_INTERFACE_H
 #define DECKSTATS_INTERFACE_H
 
-#include <libcockatrice/deck_list/deck_list.h>
+#include <QObject>
+#include <qtmetamacros.h>
 
 class QByteArray;
 class QNetworkAccessManager;

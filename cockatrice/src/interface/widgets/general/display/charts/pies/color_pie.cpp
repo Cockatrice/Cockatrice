@@ -2,10 +2,22 @@
 
 #include "libcockatrice/utility/color.h"
 
+#include <QBrush>
+#include <QFontMetrics>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPen>
+#include <QPoint>
+#include <QPointF>
+#include <QRadialGradient>
+#include <QRectF>
+#include <QSize>
 #include <QToolTip>
+#include <QtGlobal>
 #include <QtMath>
+#include <cmath>
+#include <qnamespace.h>
+#include <utility>
 
 ColorPie::ColorPie(const QMap<QString, int> &_colors, QWidget *parent)
     : QWidget(parent), colors(GameSpecificColors::MTG::sortManaMapWUBRGCFirst(_colors))

@@ -2,7 +2,6 @@
  * @file visual_deck_storage_widget.h
  * @ingroup VisualDeckStorageWidgets
  */
-//! \todo Document this file.
 
 #ifndef VISUAL_DECK_STORAGE_WIDGET_H
 #define VISUAL_DECK_STORAGE_WIDGET_H
@@ -18,14 +17,28 @@
 #include "visual_deck_storage_sort_widget.h"
 #include "visual_deck_storage_tag_filter_widget.h"
 
-#include <libcockatrice/models/deck_list/deck_list_model.h>
+#include <QSet>
+#include <QString>
+#include <QStringList>
+#include <QWidget>
+#include <qtmetamacros.h>
 
-class QSpinBox;
+class QLabel;
+class QTimer;
+class DeckPreviewColorIdentityFilterWidget;
+class VisualDeckStorageFolderDisplayWidget;
+class VisualDeckStorageQuickSettingsWidget;
 class VisualDeckStorageSearchWidget;
 class VisualDeckStorageSortWidget;
 class VisualDeckStorageTagFilterWidget;
-class VisualDeckStorageFolderDisplayWidget;
-class DeckPreviewColorIdentityFilterWidget;
+class QHBoxLayout;
+class QScrollArea;
+class QToolButton;
+class QVBoxLayout;
+class VisualDeckStorageModel;
+class VisualDeckStorageSortFilterProxyModel;
+struct LoadedDeck;
+
 class VisualDeckStorageWidget final : public QWidget
 {
     Q_OBJECT
@@ -34,44 +47,71 @@ public:
     void refreshIfPossible();
     void retranslateUi();
     void generateTutorialSequence(TutorialSequence &vdsSequence);
+    void setShareSelectable(bool selectable);
+    [[nodiscard]] bool isShareSelectable() const;
+    [[nodiscard]] QStringList selectedFilePaths() const;
+    void setShareSelectedFiles(const QStringList &paths);
+    void clearShareSelection();
+    void setShareAvailable(bool available);
 
     VisualDeckStorageTagFilterWidget *tagFilterWidget;
     bool deckPreviewSelectionAnimationEnabled;
 
     [[nodiscard]] const VisualDeckStorageQuickSettingsWidget *settings() const;
+    [[nodiscard]] VisualDeckStorageModel *model() const
+    {
+        return storageModel;
+    }
+    [[nodiscard]] VisualDeckStorageSortFilterProxyModel *proxyModel() const
+    {
+        return storageProxyModel;
+    }
 
 public slots:
-    void createRootFolderWidget(); // Refresh the display of cards based on the current sorting option
+    /**
+     * @brief Starts scanning the deck folder and rebuilds the folder tree and previews.
+     */
+    void createRootFolderWidget();
     void updateShowFolders(bool enabled);
-    void updateTagFilter();
-    void updateColorFilter();
-    void updateSearchFilter();
     void updateTagsVisibility(bool visible);
     void updateSelectionAnimationEnabled(bool enabled);
     void updateSortOrder();
+    void updateTagFilter();
+    void updateColorFilter();
+    void updateSearchFilter(const QString &text);
+
+signals:
+    void deckLoadRequested(const QString &filePath);
+    void openDeckEditor(const LoadedDeck &deck);
+    void shareDeckRequested(const QString &filePath);
+    void shareSelectionChanged();
+    void shareRequested();
+
+protected:
     void resizeEvent(QResizeEvent *event) override;
     void showEvent(QShowEvent *event) override;
 
-signals:
-    void bannerCardsRefreshed();
-    void deckLoadRequested(const QString &filePath);
-    void openDeckEditor(const LoadedDeck &deck);
+private:
+    void reapplySortAndFilters();
+    [[nodiscard]] QSet<QString> gatherVisibleTags() const;
 
 private:
     QVBoxLayout *layout;
     QWidget *searchAndSortContainer;
     QHBoxLayout *searchAndSortLayout;
-    DeckListModel *deckListModel;
     QLabel *databaseLoadIndicator;
     VisualDeckStorageSortWidget *sortWidget;
     VisualDeckStorageSearchWidget *searchWidget;
     DeckPreviewColorIdentityFilterWidget *deckPreviewColorIdentityFilterWidget;
     QToolButton *refreshButton;
+    QToolButton *shareButton;
     VisualDeckStorageQuickSettingsWidget *quickSettingsWidget;
     QScrollArea *scrollArea;
-    VisualDeckStorageFolderDisplayWidget *folderWidget;
-
-    void reapplySortAndFilters();
+    VisualDeckStorageFolderDisplayWidget *folderWidget = nullptr;
+    VisualDeckStorageModel *storageModel = nullptr;
+    VisualDeckStorageSortFilterProxyModel *storageProxyModel = nullptr;
+    QTimer *refreshTimer = nullptr; ///< Coalesces the re-apply/refresh burst following a batch of deck loads.
+    bool shareSelectable = false;
 };
 
 #endif // VISUAL_DECK_STORAGE_WIDGET_H

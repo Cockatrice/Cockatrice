@@ -7,12 +7,21 @@
 #ifndef CARDZONE_H
 #define CARDZONE_H
 
-#include "../../game/zones/card_zone_logic.h"
 #include "../board/abstract_graphics_item.h"
 #include "../board/graphics_item_type.h"
 
 #include <QLoggingCategory>
-#include <QString>
+#include <QPointF>
+#include <qtmetamacros.h>
+
+class CardDragItem;
+class CardItem;
+class CardZoneLogic;
+class QAction;
+class QGraphicsItem;
+class QMenu;
+class QPoint;
+template <typename T> class QList;
 
 inline Q_LOGGING_CATEGORY(CardZoneLog, "card_zone");
 

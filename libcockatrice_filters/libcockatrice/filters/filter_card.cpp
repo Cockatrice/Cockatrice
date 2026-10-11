@@ -1,6 +1,9 @@
 #include "filter_card.h"
 
 #include <QJsonObject>
+#include <QJsonValue>
+#include <QJsonValueRef>
+#include <QSharedPointer>
 
 QJsonObject CardFilter::toJson() const
 {

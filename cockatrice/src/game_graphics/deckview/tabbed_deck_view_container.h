@@ -9,7 +9,15 @@
 #include "../../interface/widgets/general/tutorial/tutorial_controller.h"
 #include "deck_view_container.h"
 
+#include <QMap>
+#include <QString>
 #include <QTabWidget>
+#include <qtmetamacros.h>
+
+class DeckList;
+class DeckView;
+class DeckViewContainer;
+class TabGame;
 
 class TabbedDeckViewContainer : public QTabWidget
 {
