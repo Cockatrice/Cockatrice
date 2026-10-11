@@ -180,18 +180,17 @@ void CardCompleterStyler::applyPopupWidth()
     const int minWidth = available.isEmpty() ? contentWidth : qMin(contentWidth, available.width());
     popup->setMinimumWidth(minWidth);
 
-    // Widen the popup right away on the first show; QCompleter has already
-    // positioned it for the narrow size, so keep it on screen afterwards.
-    if (popup->width() < minWidth) {
-        popup->resize(minWidth, popup->height());
-
-        if (!available.isEmpty()) {
-            // Clamp in screen coordinates, then map back to parent coordinates.
-            QPoint globalPos = popup->mapToGlobal(QPoint(0, 0));
-            int clampedGlobalX =
-                qBound(available.left(), globalPos.x(), qMax(available.left(), available.right() - popup->width() + 1));
-            QPoint parentPos = popup->mapFromGlobal(QPoint(clampedGlobalX, globalPos.y()));
-            popup->move(parentPos);
+    // setMinimumWidth() already widened the popup if it was narrower, but
+    // QCompleter positioned it for the line-edit width, so the widened popup
+    // can now extend past the right screen edge. The popup is a top-level
+    // Qt::Popup window, so geometry()/move() are already in screen
+    // coordinates: clamp the x from geometry() and move directly.
+    if (!available.isEmpty()) {
+        const QRect geom = popup->geometry();
+        const int clampedX =
+            qBound(available.left(), geom.x(), qMax(available.left(), available.right() - geom.width() + 1));
+        if (clampedX != geom.x()) {
+            popup->move(QPoint(clampedX, popup->y()));
         }
     }
 }
