@@ -41,6 +41,7 @@ class UserListManager;
 class AbstractClient;
 class Tab;
 class TabServer;
+class TabSettings;
 class TabRoom;
 class TabHome;
 class TabGame;
@@ -108,6 +109,7 @@ private:
     TabHome *tabHome;
     TabDeckStorageVisual *tabVisualDeckStorage;
     TabServer *tabServer;
+    TabSettings *tabSettings;
     TabAccount *tabAccount;
     TabDeckStorage *tabDeckStorage;
     TabReplays *tabReplays;
@@ -214,6 +216,7 @@ public slots:
     void actTabVisualDeckStorage(bool checked);
     void actTabReplays(bool checked);
     void openTabServer();
+    TabSettings *openTabSettings(int pageIndex = -1);
     void addRoomTab(const ServerInfo_Room &info, bool setCurrent);
     void openTabPublicDecks(const QString &userName);
 private slots:

@@ -3,7 +3,7 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../../pixel_map_generator.h"
-#include "../interface/widgets/dialogs/dlg_settings.h"
+#include "../interface/widgets/dialogs/settings_view.h"
 #include "../interface/widgets/server/chat_view/chat_view.h"
 #include "../interface/widgets/server/game_link.h"
 #include "../interface/widgets/server/game_selector.h"
@@ -272,9 +272,7 @@ void TabRoom::actClearChat()
 
 void TabRoom::actOpenChatSettings()
 {
-    DlgSettings settings(this);
-    settings.setTab(DlgSettings::MessagesPage);
-    settings.exec();
+    tabSupervisor->openTabSettings(SettingsView::MessagesPage);
 }
 
 void TabRoom::actCompleterChanged()

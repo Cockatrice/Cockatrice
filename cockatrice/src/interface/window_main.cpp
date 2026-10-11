@@ -26,14 +26,15 @@
 #include "../interface/widgets/dialogs/dlg_edit_tokens.h"
 #include "../interface/widgets/dialogs/dlg_local_game_options.h"
 #include "../interface/widgets/dialogs/dlg_manage_sets.h"
-#include "../interface/widgets/dialogs/dlg_settings.h"
 #include "../interface/widgets/dialogs/dlg_startup_card_check.h"
 #include "../interface/widgets/dialogs/dlg_tip_of_the_day.h"
 #include "../interface/widgets/dialogs/dlg_update.h"
 #include "../interface/widgets/dialogs/dlg_view_log.h"
+#include "../interface/widgets/dialogs/settings_view.h"
 #include "../interface/widgets/onboarding/first_run_wizard.h"
 #include "../interface/widgets/settings_page/general_settings_page.h"
 #include "../interface/widgets/tabs/tab_server.h"
+#include "../interface/widgets/tabs/tab_settings.h"
 #include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../main.h"
 #include "abstract_client.h"
@@ -271,10 +272,13 @@ void MainWindow::actFullScreen(bool checked)
 
 void MainWindow::actSettings()
 {
-    DlgSettings dlg(this);
-    auto *generalPage = qobject_cast<GeneralSettingsPage *>(dlg.page(DlgSettings::GeneralPage));
-    connect(generalPage, &GeneralSettingsPage::cardDatabaseUpdateRequested, this, &MainWindow::actCheckCardUpdates);
-    dlg.exec();
+    TabSettings *settingsTab = tabSupervisor->openTabSettings();
+    auto *generalPage =
+        qobject_cast<GeneralSettingsPage *>(settingsTab->getSettingsView()->page(SettingsView::GeneralPage));
+    if (generalPage) {
+        connect(generalPage, &GeneralSettingsPage::cardDatabaseUpdateRequested, this, &MainWindow::actCheckCardUpdates,
+                Qt::UniqueConnection);
+    }
 }
 
 void MainWindow::actExit()
