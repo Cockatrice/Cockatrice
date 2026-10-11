@@ -2,7 +2,6 @@
 
 #include <QDialogButtonBox>
 #include <QFormLayout>
-#include <QLabel>
 #include <QPushButton>
 #include <QSpinBox>
 
@@ -15,12 +14,8 @@ DlgTournamentSettings::DlgTournamentSettings(QWidget *parent) : QDialog(parent)
     gamesPerMatchSpin = new QSpinBox(this);
     gamesPerMatchSpin->setRange(1, 5);
     gamesPerMatchSpin->setValue(1);
-    gamesPerMatchSpin->setToolTip(tr("Number of games per match (e.g., 3 for Best of 3)"));
+    gamesPerMatchSpin->setToolTip(tr("Number of games per match (e.g., 3 for Best of 3, 5 for Best of 5)"));
     mainLayout->addRow(tr("Games per match:"), gamesPerMatchSpin);
-
-    QLabel *hintLabel = new QLabel(tr("Set to 3 for Best of 3, 5 for Best of 5, etc."), this);
-    hintLabel->setStyleSheet("color: palette(placeholderText);");
-    mainLayout->addRow(QString(), hintLabel);
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgTournamentSettings::actOK);
