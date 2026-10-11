@@ -325,6 +325,13 @@ void ConnectionController::onLoginError(int r,
             break;
         }
 
+        case Response::RespTooManyRequests: {
+            QMessageBox::critical(dialogParent, tr("Error"),
+                                  tr("Too many failed login attempts were made from this address. "
+                                     "Please wait a while and try again later."));
+            break;
+        }
+
         default: {
             QMessageBox::critical(dialogParent, tr("Error"),
                                   tr("Unknown login error: %1").arg(r) +
