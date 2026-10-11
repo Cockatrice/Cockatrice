@@ -16,9 +16,15 @@ DeckSyncSidecar::DeckSyncSidecar(const QString &_filePath) : filePath(_filePath)
 {
 }
 
+QString DeckSyncSidecar::pathForDeckPath(const QString &deckPath, const QString &profileKey)
+{
+    return QDir(deckPath).filePath(".sync/" + profileKey + ".json");
+}
+
 bool DeckSyncSidecar::load()
 {
     recordMap.clear();
+    mode = MODE_LINKED;
 
     QFile file(filePath);
     if (!file.exists()) {
@@ -31,6 +37,8 @@ bool DeckSyncSidecar::load()
     if (!document.isObject() || !document.object().value("records").isObject()) {
         return false;
     }
+    const QJsonValue modeValue = document.object().value("mode");
+    mode = modeValue.isString() ? modeValue.toString() : MODE_LINKED;
     const QJsonObject records = document.object().value("records").toObject();
     for (auto it = records.begin(); it != records.end(); ++it) {
         if (!it.value().isObject()) {
@@ -62,6 +70,7 @@ bool DeckSyncSidecar::save() const
     }
     QJsonObject root;
     root.insert("version", SIDECAR_FORMAT_VERSION);
+    root.insert("mode", mode);
     root.insert("records", records);
 
     QDir().mkpath(QFileInfo(filePath).absolutePath());

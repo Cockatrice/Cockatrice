@@ -19,6 +19,8 @@
 #include <qtmetamacros.h>
 
 struct LoadedDeck;
+struct DeckSyncConflict;
+struct DeckSyncResolution;
 class ServerInfo_User;
 class QTreeView;
 class QFileSystemModel;
@@ -134,6 +136,8 @@ private slots:
     void deleteDeckFinished(const Response &response, const CommandContainer &commandContainer);
 
     void actSyncNow();
+    void onFirstSyncDetected(int localCount, int serverCount);
+    void onConflictRequest(const DeckSyncConflict &conflict);
     void onSyncStatusMessage(const QString &message);
     void onSyncFinished(int uploaded, int downloaded, int unchanged, int skipped, const QString &error);
 
