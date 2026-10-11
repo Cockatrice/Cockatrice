@@ -460,6 +460,7 @@ bool Servatrice::initServer()
 
     deckShareCleanupClock = new QTimer(this);
     connect(deckShareCleanupClock, SIGNAL(timeout()), this, SLOT(cleanupExpiredDeckShares()));
+    connect(deckShareCleanupClock, SIGNAL(timeout()), this, SLOT(purgeDeckTombstones()));
     const int deckShareCleanupInterval = getDeckShareCleanupInterval();
     if (deckShareCleanupInterval > 0) {
         qDebug() << "Starting deck share cleanup clock, interval" << deckShareCleanupInterval << "ms";
@@ -687,6 +688,11 @@ void Servatrice::setRequiredFeatures(const QString &featureList)
 void Servatrice::cleanupExpiredDeckShares()
 {
     servatriceDatabaseInterface->cleanupExpiredDeckShares();
+}
+
+void Servatrice::purgeDeckTombstones()
+{
+    servatriceDatabaseInterface->purgeDeckTombstones(getDeckSyncTombstoneDays());
 }
 
 void Servatrice::statusUpdate()
@@ -1125,6 +1131,11 @@ int Servatrice::getDeckShareMaxSharesPerDay() const
 int Servatrice::getDeckSyncMaxVersions() const
 {
     return qMax(1, settingsCache->value("deck_sync/max_versions", 20).toInt());
+}
+
+int Servatrice::getDeckSyncTombstoneDays() const
+{
+    return qMax(0, settingsCache->value("deck_sync/tombstone_days", 30).toInt());
 }
 
 int Servatrice::getNumberOfTCPPools() const

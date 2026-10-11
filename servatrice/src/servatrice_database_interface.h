@@ -140,6 +140,11 @@ public:
     bool getDeckShareItem(const QString &token, int itemId, QString &content);
     /** @brief Deletes all expired share bundles (cascades to their items). */
     void cleanupExpiredDeckShares();
+    /**
+     * @brief Hard-deletes tombstoned decks older than the grace period (cascades to versions).
+     * @param olderThanDays Tombstones older than this many days are purged; 0 purges all tombstones.
+     */
+    void purgeDeckTombstones(int olderThanDays);
 
     int getNextGameId() override;
     int getNextReplayId() override;

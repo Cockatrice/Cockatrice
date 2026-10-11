@@ -488,3 +488,10 @@ max_shares_per_day=50
 ; Minimum enforced: 1.
 ; Default: 20
 max_versions=20
+
+; How many days a deleted deck stays restorable as a tombstone before the
+; cleanup clock purges it (with its versions) for good. Re-uploading the
+; same deck within this window resurrects it instead of creating a copy.
+; A value of 0 purges tombstones on the next cleanup run.
+; Default: 30
+tombstone_days=30
