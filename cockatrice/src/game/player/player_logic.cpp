@@ -33,6 +33,11 @@
 #include <qalgorithms.h>
 #include <string>
 
+static CardItem *toCardItem(CardState *card)
+{
+    return card == nullptr ? nullptr : qobject_cast<CardItem *>(card->parent());
+}
+
 PlayerLogic::PlayerLogic(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent)
     : QObject(_parent), game(_parent), playerInfo(new PlayerInfo(info, _id, _local, _judge)),
       playerEventHandler(new PlayerEventHandler(this)), playerActions(new PlayerActions(this)), active(false),
@@ -227,7 +232,13 @@ void PlayerLogic::processCardAttachment(const ServerInfo_Player &info)
                     continue;
                 }
 
-                startCard->setAttachedTo(targetCard);
+                // Route through CardItem::setAttachedTo to maintain the attachedCards graph and reparenting;
+                // CardState::setAttachedTo alone only repoints the pointer.
+                if (CardItem *startItem = toCardItem(startCard)) {
+                    startItem->setAttachedTo(toCardItem(targetCard));
+                } else {
+                    startCard->setAttachedTo(targetCard);
+                }
             }
         }
     }
