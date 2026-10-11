@@ -79,14 +79,14 @@ bool TabSettings::closeRequest()
                                "Would you like to change your database location setting?");
             break;
         case FileError:
-            loadErrorMessage = QCoreApplication::translate(
-                "DlgSettings", "File Error loading your card database.\n\n"
-                               "Would you like to change your database location setting?");
+            loadErrorMessage =
+                QCoreApplication::translate("DlgSettings", "File Error loading your card database.\n\n"
+                                                           "Would you like to change your database location setting?");
             break;
         case NoCards:
-            loadErrorMessage = QCoreApplication::translate(
-                "DlgSettings", "Your card database was loaded but contains no cards.\n\n"
-                               "Would you like to change your database location setting?");
+            loadErrorMessage =
+                QCoreApplication::translate("DlgSettings", "Your card database was loaded but contains no cards.\n\n"
+                                                           "Would you like to change your database location setting?");
             break;
         default:
             loadErrorMessage = QCoreApplication::translate(
@@ -117,11 +117,11 @@ bool TabSettings::closeRequest()
 
     if (!QDir(SettingsCache::instance().paths().getPicsPath()).exists() ||
         SettingsCache::instance().paths().getPicsPath().isEmpty()) {
-        if (QMessageBox::critical(
-                this, QCoreApplication::translate("DlgSettings", "Error"),
-                QCoreApplication::translate("DlgSettings", "The path to your card pictures directory is invalid. "
-                                                           "Would you like to go back and set the correct path?"),
-                QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+        if (QMessageBox::critical(this, QCoreApplication::translate("DlgSettings", "Error"),
+                                  QCoreApplication::translate("DlgSettings",
+                                                              "The path to your card pictures directory is invalid. "
+                                                              "Would you like to go back and set the correct path?"),
+                                  QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
             return false;
         }
     }
