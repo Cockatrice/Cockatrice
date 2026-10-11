@@ -84,7 +84,11 @@ qulonglong SystemMemoryQuerier::availableMemoryBytes()
     while (!in.atEnd()) {
         QString line = in.readLine();
         if (line.startsWith("MemAvailable:")) {
-            QStringList parts = line.split(QRegExp("\\s+"), Qt::SkipEmptyParts);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            QStringList parts = line.split(QRegExp("\\s+"), QString::SkipEmptyParts);
+#else
+            QStringList parts = line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+#endif
             if (parts.size() >= 2)
                 return parts[1].toULongLong() * 1024;
         }
