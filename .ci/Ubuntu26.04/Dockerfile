@@ -9,6 +9,7 @@ RUN apt-get update && \
         cmake \
         file \
         g++ \
+        gcovr \
         git \
         libgl-dev \
         liblzma-dev \
