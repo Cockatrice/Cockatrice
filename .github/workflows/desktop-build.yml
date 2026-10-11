@@ -194,7 +194,14 @@ jobs:
 
       - name: "Build ${{ matrix.distro }} ${{ matrix.version }} Docker image"
         shell: bash
-        run: source .ci/docker.sh --build
+        run: |
+          # --get/--save wire the $CACHE/image dir restored/saved above into the
+          # build: without them the image is rebuilt from scratch every run and
+          # the image cache saves nothing. Only persist on master; PR runs just
+          # reuse whatever the restore step found.
+          args=(--get --build)
+          [[ $GITHUB_REF == "refs/heads/master" ]] && args+=(--save)
+          source .ci/docker.sh "${args[@]}"
 
       - name: "Build debug and test"
         if: matrix.test != 'skip'
