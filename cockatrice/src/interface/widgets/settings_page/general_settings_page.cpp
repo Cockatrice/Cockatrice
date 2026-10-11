@@ -1,6 +1,7 @@
 #include "general_settings_page.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../dialogs/path_safety_warning.h"
 #include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../main.h"
 #include "../server/user/user_info_connection.h"
@@ -378,6 +379,9 @@ void GeneralSettingsPage::deckPathButtonClicked()
     if (path.isEmpty()) {
         return;
     }
+    if (!PathSafetyWarning::confirmOutsideProgramDir(this, path)) {
+        return;
+    }
 
     deckPathEdit->setText(path);
     SettingsCache::instance().paths().setDeckPath(path);
@@ -387,6 +391,9 @@ void GeneralSettingsPage::filtersPathButtonClicked()
 {
     QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), filtersPathEdit->text());
     if (path.isEmpty()) {
+        return;
+    }
+    if (!PathSafetyWarning::confirmOutsideProgramDir(this, path)) {
         return;
     }
 
@@ -400,6 +407,9 @@ void GeneralSettingsPage::replaysPathButtonClicked()
     if (path.isEmpty()) {
         return;
     }
+    if (!PathSafetyWarning::confirmOutsideProgramDir(this, path)) {
+        return;
+    }
 
     replaysPathEdit->setText(path);
     SettingsCache::instance().paths().setReplaysPath(path);
@@ -409,6 +419,9 @@ void GeneralSettingsPage::picsPathButtonClicked()
 {
     QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), picsPathEdit->text());
     if (path.isEmpty()) {
+        return;
+    }
+    if (!PathSafetyWarning::confirmOutsideProgramDir(this, path)) {
         return;
     }
 
@@ -422,6 +435,9 @@ void GeneralSettingsPage::cardDatabasePathButtonClicked()
     if (path.isEmpty()) {
         return;
     }
+    if (!PathSafetyWarning::confirmOutsideProgramDir(this, path)) {
+        return;
+    }
 
     cardDatabasePathEdit->setText(path);
     SettingsCache::instance().paths().setCardDatabasePath(path);
@@ -433,6 +449,9 @@ void GeneralSettingsPage::customCardDatabaseButtonClicked()
     if (path.isEmpty()) {
         return;
     }
+    if (!PathSafetyWarning::confirmOutsideProgramDir(this, path)) {
+        return;
+    }
 
     customCardDatabasePathEdit->setText(path);
     SettingsCache::instance().paths().setCustomCardDatabasePath(path);
@@ -442,6 +461,9 @@ void GeneralSettingsPage::tokenDatabasePathButtonClicked()
 {
     QString path = QFileDialog::getOpenFileName(this, tr("Choose path"), tokenDatabasePathEdit->text());
     if (path.isEmpty()) {
+        return;
+    }
+    if (!PathSafetyWarning::confirmOutsideProgramDir(this, path)) {
         return;
     }
 

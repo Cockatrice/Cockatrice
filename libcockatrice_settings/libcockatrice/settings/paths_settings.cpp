@@ -2,6 +2,8 @@
 
 #include "libcockatrice/settings/settings_manager.h"
 
+#include <QDir>
+#include <QStringList>
 #include <QVariant>
 
 class QObject;
@@ -120,4 +122,53 @@ void PathsSettings::setSpoilerDatabasePath(const QString &_spoilerDatabasePath)
 {
     setValue(_spoilerDatabasePath, "spoilerDatabase");
     emit cardDatabasePathChanged();
+}
+
+QStringList PathsSettings::pathsInsideDir(const QString &baseDir) const
+{
+    QStringList offenders;
+    const auto check = [&offenders, &baseDir](const QString &path) {
+        if (!path.isEmpty() && isInsideDir(path, baseDir)) {
+            offenders.append(QDir::cleanPath(path));
+        }
+    };
+
+    check(getDeckPath());
+    check(getFiltersPath());
+    check(getReplaysPath());
+    check(getPicsPath());
+    check(getCustomPicsPath());
+    check(getThemesPath());
+    check(getCardDatabasePath());
+    check(getCustomCardDatabasePath());
+    check(getTokenDatabasePath());
+    check(getSpoilerCardDatabasePath());
+    check(getRedirectCachePath());
+
+    offenders.removeDuplicates();
+    return offenders;
+}
+
+bool PathsSettings::isInsideDir(const QString &path, const QString &baseDir)
+{
+#if defined(Q_OS_WIN) || defined(Q_OS_MACOS)
+    // Windows and default macOS volumes are case-insensitive filesystems.
+    constexpr Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive;
+#else
+    constexpr Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive;
+#endif
+    const QString base = QDir::cleanPath(baseDir);
+    const QString cleaned = QDir::cleanPath(path);
+    const QString prefix = base.endsWith(QLatin1Char('/')) ? base : base + QLatin1Char('/');
+    return cleaned == base || cleaned.startsWith(prefix, caseSensitivity);
+}
+
+bool PathsSettings::getAppDirWarningAcknowledged() const
+{
+    return getValue("appDirWarningAcknowledged").toBool();
+}
+
+void PathsSettings::setAppDirWarningAcknowledged(bool _appDirWarningAcknowledged)
+{
+    setValue(_appDirWarningAcknowledged, "appDirWarningAcknowledged");
 }

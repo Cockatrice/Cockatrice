@@ -2,6 +2,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../pixel_map_generator.h"
+#include "../dialogs/path_safety_warning.h"
 #include "update/card_spoiler/spoiler_background_updater.h"
 
 #include <QAbstractItemModel>
@@ -361,6 +362,9 @@ void DeckEditorSettingsPage::spoilerPathButtonClicked()
 {
     QString lsPath = QFileDialog::getExistingDirectory(this, tr("Choose path"), mpSpoilerSavePathLineEdit->text());
     if (lsPath.isEmpty()) {
+        return;
+    }
+    if (!PathSafetyWarning::confirmOutsideProgramDir(this, lsPath + "/spoiler.xml")) {
         return;
     }
 
