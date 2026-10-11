@@ -182,12 +182,18 @@ message GameCommand {
         SET_PLAYMAT = 1035;
 
         /// Report the result of a tournament match sub-game.
+        /// Server: Server_AbstractParticipant::cmdReportMatchResult
+        /// Client: reflected via tournament state events
         REPORT_MATCH_RESULT = 1037;
 
         /// Advance the tournament to the next round.
+        /// Server: Server_AbstractParticipant::cmdAdvanceTournament
+        /// Client: reflected via tournament state events
         ADVANCE_TOURNAMENT = 1038;
 
         /// Select tournament settings.
+        /// Server: Server_AbstractParticipant::cmdTournamentSettingsSelect
+        /// Client: reflected via tournament state events
         TOURNAMENT_SETTINGS_SELECT = 1039;
     }
 
