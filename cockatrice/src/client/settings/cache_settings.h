@@ -33,6 +33,7 @@ class ChatSettings;
 class CommanderBracketSettings;
 class DebugSettings;
 class DeckEditorSettings;
+class DeckSyncSettings;
 class DownloadSettings;
 class GameFiltersSettings;
 class GameSettings;
@@ -82,6 +83,7 @@ private:
     CardsDisplaySettings *cardsDisplaySettings = nullptr;
     InterfaceSettings *interfaceSettings = nullptr;
     DeckEditorSettings *deckEditorSettings = nullptr;
+    DeckSyncSettings *deckSyncSettings = nullptr;
     PathsSettings *pathsSettings = nullptr;
     VisualDeckStorageSettings *visualDeckStorageSettings = nullptr;
     AppearanceSettings *appearanceSettings = nullptr;
@@ -150,6 +152,7 @@ public:
     [[nodiscard]] CardsDisplaySettings &cardsDisplay() const;
     [[nodiscard]] InterfaceSettings &userInterface() const;
     [[nodiscard]] DeckEditorSettings &deckEditor() const;
+    [[nodiscard]] DeckSyncSettings &deckSync() const;
     [[nodiscard]] PathsSettings &paths() const;
     [[nodiscard]] VisualDeckStorageSettings &visualDeckStorage() const;
     [[nodiscard]] AppearanceSettings &appearance() const;
