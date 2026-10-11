@@ -40,7 +40,9 @@ endif()
 if(TEST)
   # Union of Qt modules required across all test targets (independent of application targets).
   # When adding a new test that needs additional Qt modules, add them here rather than in the test's CMakeLists.txt.
-  set(_TEST_NEEDED Concurrent Network Svg Widgets)
+  # Test is QtTest: it brings QAbstractItemModelTester and QSignalSpy, which are how the Qt model
+  # and signal contracts get verified without standing up a GUI.
+  set(_TEST_NEEDED Concurrent Network Svg Widgets Test)
 endif()
 
 set(REQUIRED_QT_COMPONENTS ${REQUIRED_QT_COMPONENTS} ${_SERVATRICE_NEEDED} ${_COCKATRICE_NEEDED} ${_ORACLE_NEEDED}
