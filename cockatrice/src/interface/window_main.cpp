@@ -1320,6 +1320,11 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
             break;
     }
 
+    if (!cardUpdateErrorOutput.isEmpty()) {
+        error += "\n\n" + tr("Error output:") + "\n" + QString::fromUtf8(cardUpdateErrorOutput);
+        cardUpdateErrorOutput.clear();
+    }
+
     qCWarning(CardDatabaseUpdateLog) << "The card database updater exited with an error:" << error;
     exitCardDatabaseUpdate(false);
     QMessageBox::warning(this, tr("Error"), tr("The card database updater exited with an error:\n%1").arg(error));
