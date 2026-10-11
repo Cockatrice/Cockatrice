@@ -1,7 +1,19 @@
 #include "card_size_widget.h"
 
-#include "../printing_selector/printing_selector.h"
-#include "../visual_deck_storage/visual_deck_storage_widget.h"
+#include "../general/layout_containers/flow_widget.h"
+
+#include <QEvent>
+#include <QFlags>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QList>
+#include <QPoint>
+#include <QScrollArea>
+#include <QSizePolicy>
+#include <QSlider>
+#include <QWheelEvent>
+#include <QtGlobal>
+#include <qnamespace.h>
 
 /**
  * @class CardSizeWidget
@@ -57,4 +69,40 @@ void CardSizeWidget::updateCardSizeSetting(int newValue)
 QSlider *CardSizeWidget::getSlider() const
 {
     return cardSizeSlider;
+}
+
+void CardSizeWidget::enableCtrlScrollResize(QWidget *host)
+{
+    host->installEventFilter(this);
+
+    const auto scrollAreas = host->findChildren<QScrollArea *>();
+    for (QScrollArea *scrollArea : scrollAreas) {
+        if (QWidget *content = scrollArea->widget()) {
+            content->installEventFilter(this);
+        }
+    }
+}
+
+bool CardSizeWidget::eventFilter(QObject *watched, QEvent *event)
+{
+    if (event->type() == QEvent::Wheel && adjustSliderForWheel(static_cast<QWheelEvent *>(event))) {
+        return true;
+    }
+    return QWidget::eventFilter(watched, event);
+}
+
+bool CardSizeWidget::adjustSliderForWheel(QWheelEvent *event)
+{
+    if (!(event->modifiers() & Qt::ControlModifier)) {
+        return false;
+    }
+
+    const int angleDelta = event->angleDelta().y();
+    if (angleDelta == 0) {
+        return false;
+    }
+
+    const int wheelSteps = angleDelta > 0 ? qMax(1, angleDelta / 120) : qMin(-1, angleDelta / 120);
+    cardSizeSlider->setValue(cardSizeSlider->value() + wheelSteps * CARD_SIZE_WHEEL_STEP);
+    return true;
 }

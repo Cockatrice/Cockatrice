@@ -5,11 +5,16 @@
 
 #include <QCheckBox>
 #include <QComboBox>
-#include <QGroupBox>
 #include <QLabel>
 #include <QLoggingCategory>
-#include <QPushButton>
 #include <QSpinBox>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
+
+class QGroupBox;
+class QLineEdit;
+class QPushButton;
 
 inline Q_LOGGING_CATEGORY(GeneralSettingsPageLog, "general_settings_page");
 
@@ -23,6 +28,10 @@ public:
     static QStringList findQmFiles();
     static QString languageName(const QString &lang);
 
+signals:
+    /// Request to re-import the card database with the newly selected card language
+    void cardDatabaseUpdateRequested();
+
 private slots:
     void deckPathButtonClicked();
     void filtersPathButtonClicked();
@@ -33,6 +42,8 @@ private slots:
     void tokenDatabasePathButtonClicked();
     void resetAllPathsClicked();
     void languageBoxChanged(int index);
+    void cardLanguageBoxChanged(int index);
+    void cardSearchLanguageBoxChanged(int index);
     void updateStartupServerControlsVisibility();
 
 private:
@@ -46,6 +57,13 @@ private:
     QComboBox languageBox;
     QLabel advertiseTranslationPageLabel;
 
+    QLabel cardLanguageLabel;
+    QComboBox cardLanguageBox;
+    QLabel cardLanguageNoteLabel;
+
+    QLabel cardSearchLanguageLabel;
+    QComboBox cardSearchLanguageBox;
+
     QLabel updateReleaseChannelLabel;
     QComboBox updateReleaseChannelBox;
     QCheckBox startupUpdateCheckCheckBox;
@@ -57,6 +75,7 @@ private:
     QLabel cardUpdateCheckIntervalLabel;
     QSpinBox cardUpdateCheckIntervalSpinBox;
     QLabel lastCardUpdateCheckDateLabel;
+    QCheckBox cardDatabaseUpdateTrayNotificationCheckBox;
 
     QCheckBox showTipsOnStartup;
     QLabel startupTabLabel;

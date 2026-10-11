@@ -1,8 +1,13 @@
 #ifndef FIRST_RUN_WIZARD_H
 #define FIRST_RUN_WIZARD_H
 
+#include "../../card_database_update/card_update_progress.h"
+
 #include <QDialog>
 #include <QList>
+#include <QString>
+#include <QtGlobal>
+#include <qtmetamacros.h>
 
 class BannerHost;
 class FirstRunWizardPage;
@@ -11,6 +16,7 @@ class CardDatabaseSetupPage;
 class QLabel;
 class QPushButton;
 class QStackedWidget;
+class QWidget;
 
 /** @brief Polished first-run onboarding flow: card database setup, theme
  *         selection, server account setup, and a handful of key preferences.
@@ -36,6 +42,9 @@ signals:
 public slots:
     /** @brief Forwarded from MainWindow once the background card database update process exits. */
     void onCardDatabaseUpdateFinished(bool success);
+
+    /** @brief Forwarded from MainWindow while the background card database update process runs. */
+    void onCardDatabaseUpdateProgress(const CardUpdateProgress &progress);
 
 protected:
     void closeEvent(QCloseEvent *event) override;

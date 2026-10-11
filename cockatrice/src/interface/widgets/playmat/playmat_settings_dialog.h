@@ -1,9 +1,14 @@
 #ifndef COCKATRICE_PLAYMAT_SETTINGS_DIALOG_H
 #define COCKATRICE_PLAYMAT_SETTINGS_DIALOG_H
 
+#include "libcockatrice/utility/card_ref.h"
+#include "libcockatrice/utility/playmat_params.h"
+
 #include <QDialog>
+#include <QMetaObject>
 #include <QPixmap>
-#include <libcockatrice/deck_list/deck_list.h>
+#include <QString>
+#include <qtmetamacros.h>
 
 class QCheckBox;
 class QComboBox;

@@ -8,13 +8,18 @@
 #ifndef DECK_EDITOR_FILTER_DOCK_WIDGET_H
 #define DECK_EDITOR_FILTER_DOCK_WIDGET_H
 
-#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "../../key_signals.h"
 
 #include <QDockWidget>
+#include <qtmetamacros.h>
 
 class FilterTreeModel;
 class AbstractTabDeckEditor;
+class QAction;
+class QPoint;
+class QTreeView;
+class QWidget;
+
 class DeckEditorFilterDockWidget : public QDockWidget
 {
     Q_OBJECT

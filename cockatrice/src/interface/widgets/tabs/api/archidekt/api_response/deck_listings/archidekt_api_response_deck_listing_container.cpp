@@ -3,8 +3,10 @@
 #include "archidekt_api_response_deck_owner.h"
 
 #include <QDebug>
-#include <QJsonArray>
 #include <QJsonObject>
+#include <QJsonValue>
+#include <QJsonValueRef>
+#include <qlogging.h>
 
 void ArchidektApiResponseDeckListingContainer::fromJson(const QJsonObject &json)
 {

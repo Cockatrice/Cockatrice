@@ -1,8 +1,14 @@
 #include "account_setup_page.h"
 
+#include "../first_run_wizard_page.h"
+
 #include <QLabel>
 #include <QPushButton>
+#include <QString>
 #include <QVBoxLayout>
+#include <qnamespace.h>
+
+class QWidget;
 
 AccountSetupPage::AccountSetupPage(QWidget *parent) : FirstRunWizardPage(parent)
 {

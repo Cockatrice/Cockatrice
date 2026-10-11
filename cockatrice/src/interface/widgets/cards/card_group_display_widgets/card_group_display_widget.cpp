@@ -1,11 +1,33 @@
 #include "card_group_display_widget.h"
 
+#include "../../../../client/settings/cache_settings.h"
+#include "../../general/display/banner_widget.h"
+#include "../card_info_picture_widget.h"
 #include "../card_info_picture_with_text_overlay_widget.h"
+#include "../card_size_widget.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
 
-#include <QResizeEvent>
+#include <QAbstractItemModel>
+#include <QAbstractProxyModel>
+#include <QDebug>
+#include <QItemSelection>
+#include <QItemSelectionModel>
+#include <QItemSelectionRange>
+#include <QModelIndex>
+#include <QObject>
+#include <QSharedPointer>
+#include <QSize>
+#include <QSlider>
+#include <QStringLiteral>
+#include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <libcockatrice/models/deck_list/deck_list_sort_filter_proxy_model.h>
+#include <libcockatrice/settings/cards_display_settings.h>
+#include <qnamespace.h>
+#include <utility>
 
 CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
                                                DeckListModel *_deckListModel,
@@ -30,6 +52,7 @@ CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
     layout->addWidget(banner);
 
     CardGroupDisplayWidget::updateCardDisplays();
+    updateCardCount();
 
     connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &CardGroupDisplayWidget::onCardAddition);
     if (selectionModel) {
@@ -38,6 +61,13 @@ CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
     }
     connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &CardGroupDisplayWidget::onCardRemoval);
     connect(deckListModel, &QAbstractItemModel::dataChanged, this, &CardGroupDisplayWidget::onDataChanged);
+    connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &CardGroupDisplayWidget::updateCardCount);
+    connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &CardGroupDisplayWidget::updateCardCount);
+    connect(deckListModel, &QAbstractItemModel::dataChanged, this, &CardGroupDisplayWidget::updateCardCount);
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::visualDeckEditorShowCardCountsChanged,
+            this, &CardGroupDisplayWidget::updateCardCount);
+
+    cardSizeWidget->enableCtrlScrollResize(this);
 }
 
 // Just here so it can get overwritten in subclasses.
@@ -348,4 +378,22 @@ void CardGroupDisplayWidget::onActiveSortCriteriaChanged(QStringList _activeSort
 
     clearAllDisplayWidgets();
     updateCardDisplays();
+}
+
+void CardGroupDisplayWidget::updateCardCount()
+{
+    if (!banner || !deckListModel || !trackedIndex.isValid()) {
+        return;
+    }
+
+    QString text = cardGroupCategory;
+    if (SettingsCache::instance().cardsDisplay().getVisualDeckEditorShowCardCounts()) {
+        int total = 0;
+        for (int i = 0; i < deckListModel->rowCount(trackedIndex); ++i) {
+            total +=
+                deckListModel->index(i, DeckListModelColumns::CARD_AMOUNT, trackedIndex).data(Qt::EditRole).toInt();
+        }
+        text += QStringLiteral(" (%1)").arg(total);
+    }
+    banner->setText(text);
 }

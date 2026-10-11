@@ -8,6 +8,7 @@ message ServerInfo_User {
         IsModerator = 4;
         IsAdmin = 8;
         IsJudge = 16;
+        IsDeveloper = 32;
     };
     message PawnColorsOverride {
         optional string left_side = 1;

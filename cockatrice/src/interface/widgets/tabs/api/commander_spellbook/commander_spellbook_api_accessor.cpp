@@ -1,12 +1,20 @@
 #include "commander_spellbook_api_accessor.h"
 
 #include "api_response/commander_spellbook_deck_request.h"
+#include "api_response/commander_spellbook_estimate_bracket_result.h"
 
+#include <QByteArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonParseError>
+#include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QStringLiteral>
 #include <QUrl>
+#include <QVariant>
 #include <version_string.h>
+
+class DeckList;
 
 static const QUrl ESTIMATE_BRACKET_URL(QStringLiteral("https://backend.commanderspellbook.com/estimate-bracket"));
 

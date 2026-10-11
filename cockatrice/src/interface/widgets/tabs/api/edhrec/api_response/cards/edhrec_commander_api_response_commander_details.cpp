@@ -1,6 +1,11 @@
 #include "edhrec_commander_api_response_commander_details.h"
 
+#include "../card_prices/edhrec_api_response_card_prices.h"
+
 #include <QDebug>
+#include <QJsonValue>
+#include <QJsonValueRef>
+#include <qlogging.h>
 
 void EdhrecCommanderApiResponseCommanderDetails::fromJson(const QJsonObject &json)
 {

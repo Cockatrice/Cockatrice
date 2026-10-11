@@ -1,11 +1,16 @@
 #ifndef COCKATRICE_USER_CARD_ART_PROVIDER_H
 #define COCKATRICE_USER_CARD_ART_PROVIDER_H
 
+#include <QList>
 #include <QMap>
 #include <QObject>
 #include <QPixmap>
 #include <QQueue>
 #include <QSet>
+#include <QString>
+#include <qtmetamacros.h>
+
+class ExactCard;
 
 class UserCardArtProvider : public QObject
 {
@@ -16,7 +21,7 @@ public:
 
     void requestCardArt(const QString &userName, const QString &cardName, const QString &providerId);
     const QMap<QString, QPixmap> &cache() const;
-    static QPixmap cropCardArt(const QPixmap &fullRes);
+    static QPixmap cropCardArt(const QPixmap &fullRes, const ExactCard &card);
 
 signals:
     void cardArtUpdated(const QString &userName);

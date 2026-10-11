@@ -7,9 +7,19 @@
 #include <QDate>
 #include <QDebug>
 #include <QDialogButtonBox>
+#include <QHBoxLayout>
 #include <QLabel>
+#include <QList>
+#include <QMessageLogger>
+#include <QPixmap>
 #include <QPushButton>
+#include <QSizePolicy>
+#include <QString>
+#include <QVBoxLayout>
+#include <QWidget>
+#include <algorithm>
 #include <libcockatrice/settings/personal_settings.h>
+#include <qnamespace.h>
 
 #define MIN_TIP_IMAGE_HEIGHT 200
 #define MIN_TIP_IMAGE_WIDTH 200

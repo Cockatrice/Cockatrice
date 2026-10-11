@@ -1,16 +1,24 @@
 #include "dlg_move_top_cards_until.h"
 
+#include "libcockatrice/card/card_info.h"
+
+#include <QCheckBox>
+#include <QComboBox>
+#include <QCompleter>
 #include <QDialogButtonBox>
+#include <QGridLayout>
 #include <QLabel>
-#include <QLineEdit>
 #include <QMessageBox>
 #include <QSpinBox>
 #include <QString>
 #include <QVBoxLayout>
-#include <QWidget>
+#include <algorithm>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/filters/filter_string.h>
+#include <qnamespace.h>
+
+class QWidget;
 
 DlgMoveTopCardsUntil::DlgMoveTopCardsUntil(QWidget *parent, const MoveTopCardsUntilOptions &options) : QDialog(parent)
 {
@@ -19,6 +27,7 @@ DlgMoveTopCardsUntil::DlgMoveTopCardsUntil(QWidget *parent, const MoveTopCardsUn
     exprComboBox = new QComboBox(this);
     exprComboBox->setFocus();
     exprComboBox->setEditable(true);
+    exprComboBox->completer()->setCaseSensitivity(Qt::CaseSensitive);
     exprComboBox->setInsertPolicy(QComboBox::InsertAtTop);
     exprComboBox->insertItems(0, options.exprs);
     exprLabel->setBuddy(exprComboBox);

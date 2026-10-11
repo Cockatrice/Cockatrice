@@ -1,12 +1,13 @@
 #include "user_list_panel_widget.h"
 
 #include "../../../../client/settings/cache_settings.h"
-#include "user_list_manager.h"
 #include "user_list_widget.h"
 
 #include <QLineEdit>
+#include <QList>
+#include <QStringList>
+#include <QStringLiteral>
 #include <QVBoxLayout>
-#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/settings/interface_settings.h>
 
 namespace

@@ -10,8 +10,10 @@
 #define BANNER_WIDGET_H
 
 #include <QLabel>
-#include <QVBoxLayout>
+#include <QString>
 #include <QWidget>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
 
 class BannerWidget : public QWidget
 {

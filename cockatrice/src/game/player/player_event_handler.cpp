@@ -1,15 +1,32 @@
 #include "player_event_handler.h"
 
-#include "../../game_graphics/board/arrow_item.h"
 #include "../../game_graphics/board/card_item.h"
 #include "../../game_graphics/zones/view_zone.h"
-#include "../../interface/widgets/tabs/tab_game.h"
+#include "../abstract_game.h"
 #include "../board/arrow_data.h"
 #include "../board/card_list.h"
+#include "../board/counter_state.h"
+#include "../zones/card_zone_logic.h"
+#include "../zones/hand_zone_logic.h"
+#include "../zones/pile_zone_logic.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/protocol/pb/card_attributes.pb.h"
+#include "libcockatrice/protocol/pb/game_event.pb.h"
+#include "libcockatrice/protocol/pb/game_event_context.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_card.pb.h"
+#include "libcockatrice/utility/card_ref.h"
 #include "player_actions.h"
+#include "player_info.h"
 #include "player_logic.h"
+#include "player_manager.h"
 
-#include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
+#include <QDebug>
+#include <QList>
+#include <QMap>
+#include <QSharedPointer>
+#include <QtGlobal>
+#include <algorithm>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/protocol/pb/context_undo_draw.pb.h>
 #include <libcockatrice/protocol/pb/event_attach_card.pb.h>
@@ -32,8 +49,9 @@
 #include <libcockatrice/protocol/pb/event_set_card_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_set_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_shuffle.pb.h>
-#include <libcockatrice/utility/color.h>
 #include <libcockatrice/utility/zone_names.h>
+#include <qlogging.h>
+#include <string>
 
 PlayerEventHandler::PlayerEventHandler(PlayerLogic *_player) : QObject(_player), player(_player)
 {
@@ -262,14 +280,15 @@ void PlayerEventHandler::eventCreateCounter(const Event_CreateCounter &event)
     player->addCounter(event.counter_info());
 }
 
-void PlayerEventHandler::eventSetCounter(const Event_SetCounter &event)
+void PlayerEventHandler::eventSetCounter(const Event_SetCounter &event, EventProcessingOptions options)
 {
     CounterState *ctr = player->getCounters().value(event.counter_id(), nullptr);
     if (!ctr) {
         return;
     }
     int oldValue = ctr->getValue();
-    ctr->setValue(event.value());
+    const bool skipDamageAnimation = options.testFlag(SKIP_DAMAGE_ANIMATION);
+    ctr->setValue(event.value(), skipDamageAnimation);
     emit logSetCounter(player, ctr->getName(), event.value(), oldValue);
 }
 
@@ -625,7 +644,7 @@ void PlayerEventHandler::processGameEvent(GameEvent::GameEventType type,
             eventCreateCounter(event.GetExtension(Event_CreateCounter::ext));
             break;
         case GameEvent::SET_COUNTER:
-            eventSetCounter(event.GetExtension(Event_SetCounter::ext));
+            eventSetCounter(event.GetExtension(Event_SetCounter::ext), options);
             break;
         case GameEvent::DEL_COUNTER:
             eventDelCounter(event.GetExtension(Event_DelCounter::ext));

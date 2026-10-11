@@ -1,9 +1,12 @@
 #ifndef SHADER_BANNER_WIDGET_H
 #define SHADER_BANNER_WIDGET_H
 
+#include <QColor>
 #include <QElapsedTimer>
 #include <QTimer>
 #include <QWidget>
+#include <QtGlobal>
+#include <qtmetamacros.h>
 
 class BannerShaderConfig;
 class QQuickWidget;
@@ -53,6 +56,7 @@ protected:
 private slots:
     void tick();
     void onSceneGraphFailed();
+    void applyThemeColors();
 
 private:
     struct Preset
@@ -72,6 +76,12 @@ private:
     QQuickWidget *quickWidget = nullptr;
     BannerShaderConfig *config = nullptr;
     GradientFallbackWidget *fallback = nullptr;
+
+    // Palette-derived banner colours -- the theme's window hue forced down to
+    // the banner's curated darkness, plus the theme's Highlight as accent.
+    QColor bannerColorA;
+    QColor bannerColorB;
+    QColor bannerAccent;
 
     QTimer clock;
     QElapsedTimer elapsed;

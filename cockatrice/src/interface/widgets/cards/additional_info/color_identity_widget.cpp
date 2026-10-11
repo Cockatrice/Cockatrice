@@ -1,15 +1,24 @@
 #include "color_identity_widget.h"
 
 #include "../../../../client/settings/cache_settings.h"
+#include "libcockatrice/card/card_info.h"
 #include "mana_symbol_widget.h"
 
+#include <QChar>
 #include <QHBoxLayout>
-#include <QLabel>
+#include <QLayoutItem>
+#include <QList>
+#include <QObject>
 #include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QRegularExpressionMatchIterator>
 #include <QResizeEvent>
+#include <QSharedPointer>
 #include <QSize>
+#include <QtGlobal>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
+#include <qnamespace.h>
 
 ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, const QString &_colorIdentity)
     : QWidget(parent), colorIdentity(_colorIdentity)
@@ -85,7 +94,7 @@ void ColorIdentityWidget::resizeEvent(QResizeEvent *event)
     }
     lastWidth = totalWidth;
 
-    const int totalHeight = totalWidth / 6; // Set height to 1/4 of the width
+    const int totalHeight = qMax(0, totalWidth / 6); // Set height to 1/4 of the width
     setFixedHeight(totalHeight);
 
     const int count = layout->count();
@@ -97,6 +106,10 @@ void ColorIdentityWidget::resizeEvent(QResizeEvent *event)
     const int availableWidth = totalWidth - (spacing * (count - 1));
     const int iconSize = qMin(availableWidth / count, totalHeight); // Ensure icons fit within the new height
 
+    if (iconSize <= 0) {
+        lastIconSize = iconSize;
+        return;
+    }
     if (iconSize == lastIconSize) {
         return;
     }

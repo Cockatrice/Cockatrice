@@ -9,10 +9,10 @@
 
 #include "abstract_graphics_item.h"
 
-#include <QList>
+#include <qtmetamacros.h>
 
 class PlayerLogic;
-class ArrowItem;
+class QGraphicsItem;
 
 class ArrowTarget : public AbstractGraphicsItem
 {

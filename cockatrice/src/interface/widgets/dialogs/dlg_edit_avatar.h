@@ -7,16 +7,18 @@
 #ifndef DLG_EDITAVATAR_H
 #define DLG_EDITAVATAR_H
 
-#include <QComboBox>
+#include <QByteArray>
 #include <QDialog>
-#include <QLineEdit>
+#include <QImage>
 #include <QLoggingCategory>
+#include <qtmetamacros.h>
+
+class QWidget;
 
 inline Q_LOGGING_CATEGORY(DlgEditAvatarLog, "dlg_edit_avatar");
 
 class QLabel;
 class QPushButton;
-class QCheckBox;
 
 class DlgEditAvatar : public QDialog
 {
@@ -29,8 +31,9 @@ private slots:
     void actBrowse();
 
 private:
+    static constexpr int MAX_AVATAR_DIMENSION = 1024;
     QImage image;
-    QLabel *textLabel, *imageLabel;
+    QLabel *textLabel, *imageLabel, *hintLabel;
     QPushButton *browseButton;
 };
 

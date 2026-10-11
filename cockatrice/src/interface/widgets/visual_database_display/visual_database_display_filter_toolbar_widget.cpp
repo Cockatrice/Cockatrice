@@ -1,9 +1,37 @@
 #include "visual_database_display_filter_toolbar_widget.h"
 
+#include "../../pixel_map_generator.h"
 #include "../deck_editor/card_database_view.h"
+#include "../quick_settings/settings_button_widget.h"
+#include "card_database_display_model.h"
+#include "visual_database_display_filter_save_load_widget.h"
+#include "visual_database_display_format_legality_filter_widget.h"
+#include "visual_database_display_main_type_filter_widget.h"
+#include "visual_database_display_name_filter_widget.h"
+#include "visual_database_display_set_filter_widget.h"
+#include "visual_database_display_sub_type_filter_widget.h"
 #include "visual_database_display_widget.h"
 
+#include <QAbstractItemView>
+#include <QComboBox>
 #include <QGroupBox>
+#include <QHBoxLayout>
+#include <QIcon>
+#include <QLabel>
+#include <QLayout>
+#include <QList>
+#include <QPixmap>
+#include <QResizeEvent>
+#include <QSize>
+#include <QSizePolicy>
+#include <QString>
+#include <QStringLiteral>
+#include <QVariant>
+#include <QWidget>
+#include <QtGlobal>
+#include <qnamespace.h>
+
+class DeckListModel;
 
 VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidget(VisualDatabaseDisplayWidget *_parent,
                                                                                    DeckListModel *deckListModel)
@@ -60,22 +88,22 @@ VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidg
     });
 
     quickFilterSaveLoadWidget = new SettingsButtonWidget(this);
-    quickFilterSaveLoadWidget->setButtonIcon(QPixmap("theme:icons/floppy_disk"));
+    quickFilterSaveLoadWidget->setButtonIcon(themePixmap(QStringLiteral("icons/floppy_disk")));
 
     quickFilterNameWidget = new SettingsButtonWidget(this);
-    quickFilterNameWidget->setButtonIcon(QPixmap("theme:icons/pen_to_square"));
+    quickFilterNameWidget->setButtonIcon(themePixmap(QStringLiteral("icons/pen_to_square")));
 
     quickFilterMainTypeWidget = new SettingsButtonWidget(this);
-    quickFilterMainTypeWidget->setButtonIcon(QPixmap("theme:icons/circle_half_stroke"));
+    quickFilterMainTypeWidget->setButtonIcon(themePixmap(QStringLiteral("icons/circle_half_stroke")));
 
     quickFilterSubTypeWidget = new SettingsButtonWidget(this);
-    quickFilterSubTypeWidget->setButtonIcon(QPixmap("theme:icons/dragon"));
+    quickFilterSubTypeWidget->setButtonIcon(themePixmap(QStringLiteral("icons/dragon")));
 
     quickFilterSetWidget = new SettingsButtonWidget(this);
-    quickFilterSetWidget->setButtonIcon(QPixmap("theme:icons/scroll"));
+    quickFilterSetWidget->setButtonIcon(themePixmap(QStringLiteral("icons/scroll")));
 
     quickFilterFormatLegalityWidget = new SettingsButtonWidget(this);
-    quickFilterFormatLegalityWidget->setButtonIcon(QPixmap("theme:icons/scale_balanced"));
+    quickFilterFormatLegalityWidget->setButtonIcon(themePixmap(QStringLiteral("icons/scale_balanced")));
 
     retranslateUi();
 }

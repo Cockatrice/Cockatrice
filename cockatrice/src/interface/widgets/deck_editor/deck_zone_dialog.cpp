@@ -2,10 +2,14 @@
 
 #include <QComboBox>
 #include <QDialogButtonBox>
+#include <QEvent>
+#include <QIcon>
 #include <QLabel>
 #include <QLineEdit>
+#include <QList>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QVariant>
 #include <libcockatrice/deck_list/tree/inner_deck_list_node.h>
 #include <libcockatrice/utility/string_limits.h>
 

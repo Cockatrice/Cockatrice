@@ -12,20 +12,24 @@
 
 #include "deck_list_memento.h"
 #include "deck_list_node_tree.h"
+#include "libcockatrice/protocol/pb/move_card_to_zone.pb.h"
+#include "libcockatrice/utility/card_ref.h"
 #include "sideboard_plan.h"
 #include "tree/inner_deck_list_node.h"
 
+#include <QList>
 #include <QMap>
-#include <QVector>
-#include <QtCore/QXmlStreamReader>
+#include <QSet>
+#include <QString>
+#include <QStringList>
+#include <functional>
 #include <libcockatrice/utility/playmat_params.h>
 
-class AbstractDecklistNode;
 class DecklistCardNode;
-class CardDatabase;
 class QIODevice;
 class QTextStream;
-class InnerDecklistNode;
+class QXmlStreamReader;
+class QXmlStreamWriter;
 
 /**
  * @class DeckList
@@ -76,6 +80,23 @@ public:
          * @brief Checks if all values (except for lastLoadedTimestamp) in the metadata is empty.
          */
         bool isEmpty() const;
+
+        /**
+         * @brief Reads a single deck metadata element from a Cockatrice deck XML stream.
+         *
+         * @param xml Reader positioned at the element.
+         * @param childName Name of the current element.
+         * @return true if a metadata element was consumed, false if @p childName is
+         *         not a metadata element.
+         */
+        bool readElement(QXmlStreamReader *xml, const QString &childName);
+
+        /**
+         * @brief Writes the deck metadata section of a Cockatrice deck XML file.
+         *
+         * @param xml Writer to append the metadata elements to.
+         */
+        void write(QXmlStreamWriter *xml) const;
     };
 
 private:
@@ -88,6 +109,22 @@ private:
      * An empty string indicates the cache is invalid.
      */
     mutable QString cachedDeckHash;
+
+    /** @name XML load helpers */
+    ///@{
+    /**
+     * @brief Advances to the next element in the XML stream.
+     * @param xml Reader to advance past non-element tokens.
+     * @return true when a start element was reached, false at end of stream.
+     */
+    bool seekToNextElement(QXmlStreamReader *xml);
+
+    /**
+     * @brief Reads the contents of a `cockatrice_deck` element into this deck.
+     * @param xml Reader positioned at the deck element, stopped at its end.
+     */
+    void readDeckBody(QXmlStreamReader *xml);
+    ///@}
 
 public:
     /** @name Metadata setters */

@@ -1,5 +1,6 @@
 #ifndef COCKATRICE_TALLY_H
 #define COCKATRICE_TALLY_H
+#include <QList>
 #include <QString>
 
 class CardItem;

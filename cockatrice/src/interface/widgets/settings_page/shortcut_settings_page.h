@@ -3,14 +3,18 @@
 
 #include "abstract_settings_page.h"
 
-#include <QGridLayout>
-#include <QGroupBox>
-#include <QLabel>
-#include <QPushButton>
+#include <QString>
+#include <qtmetamacros.h>
 
 class SequenceEdit;
 class ShortcutTreeView;
 class SearchLineEdit;
+class QGridLayout;
+class QGroupBox;
+class QHBoxLayout;
+class QLabel;
+class QPushButton;
+class QVBoxLayout;
 
 class ShortcutSettingsPage : public AbstractSettingsPage
 {

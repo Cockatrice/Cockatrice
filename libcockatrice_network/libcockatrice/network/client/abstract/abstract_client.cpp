@@ -1,6 +1,25 @@
 #include "abstract_client.h"
 
+#include "libcockatrice/protocol/pb/admin_commands.pb.h"
+#include "libcockatrice/protocol/pb/developer_commands.pb.h"
+#include "libcockatrice/protocol/pb/game_event_container.pb.h"
+#include "libcockatrice/protocol/pb/moderator_commands.pb.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/room_commands.pb.h"
+#include "libcockatrice/protocol/pb/room_event.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+#include "libcockatrice/protocol/pb/session_commands.pb.h"
+#include "libcockatrice/protocol/pb/session_event.pb.h"
+
+#include <QDebug>
+#include <QList>
+#include <QMessageLogger>
+#include <QMetaType>
+#include <QSharedPointer>
+#include <QVariant>
+#include <QtGlobal>
 #include <google/protobuf/descriptor.h>
+#include <google/protobuf/message.h>
 #include <libcockatrice/protocol/debug_pb_message.h>
 #include <libcockatrice/protocol/featureset.h>
 #include <libcockatrice/protocol/get_pb_extension.h>
@@ -251,5 +270,26 @@ PendingCommand *AbstractClient::prepareAdminCommand(const ::google::protobuf::Me
     CommandContainer cont;
     AdminCommand *c = cont.add_admin_command();
     c->GetReflection()->MutableMessage(c, cmd.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(cmd);
+    return new PendingCommand(cont);
+}
+
+PendingCommand *AbstractClient::prepareDeveloperCommand(const ::google::protobuf::Message &cmd)
+{
+    CommandContainer cont;
+    DeveloperCommand *c = cont.add_developer_command();
+    // A developer command message may also be usable through other command
+    // families, so select the extension scoped to DeveloperCommand rather than
+    // guessing by name.
+    const ::google::protobuf::Descriptor *cmdDescriptor = cmd.GetDescriptor();
+    const ::google::protobuf::Descriptor *developerDescriptor = DeveloperCommand::descriptor();
+    const ::google::protobuf::FieldDescriptor *developerExtension = nullptr;
+    for (int i = 0; i < cmdDescriptor->extension_count(); ++i) {
+        if (cmdDescriptor->extension(i)->containing_type() == developerDescriptor) {
+            developerExtension = cmdDescriptor->extension(i);
+            break;
+        }
+    }
+    Q_ASSERT(developerExtension != nullptr);
+    c->GetReflection()->MutableMessage(c, developerExtension)->CopyFrom(cmd);
     return new PendingCommand(cont);
 }

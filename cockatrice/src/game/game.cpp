@@ -1,8 +1,16 @@
 #include "game.h"
 
-#include "../interface/widgets/tabs/tab_game.h"
+#include "game_meta_info.h"
+#include "game_state.h"
+#include "player/player_manager.h"
 
+#include <QList>
+#include <QMap>
+#include <QString>
 #include <libcockatrice/protocol/pb/event_game_joined.pb.h>
+
+class AbstractClient;
+class QObject;
 
 Game::Game(QObject *_parent,
            bool isLocalGame,

@@ -7,13 +7,9 @@
 #ifndef REPLAY_TIMELINE_WIDGET
 #define REPLAY_TIMELINE_WIDGET
 
-#include "../../../game/player/event_processing_options.h"
-
-#include <QMouseEvent>
+#include <QList>
 #include <QWidget>
-
-class QPaintEvent;
-class QTimer;
+#include <qtmetamacros.h>
 
 class ReplayTimelineWidget : public QWidget
 {

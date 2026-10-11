@@ -1,13 +1,26 @@
 #include "remote_replay_list_tree_widget.h"
 
+#include "../../../pixel_map_generator.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_replay_match.pb.h"
+
+#include <QAbstractItemView>
+#include <QDateTime>
 #include <QFileIconProvider>
 #include <QHeaderView>
+#include <QItemSelectionModel>
 #include <QSortFilterProxyModel>
+#include <QStringList>
+#include <QStringLiteral>
+#include <QVariant>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_replay_list.pb.h>
 #include <libcockatrice/protocol/pb/response_replay_list.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_replay.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+
+class QObject;
+class QWidget;
 
 const int RemoteReplayList_TreeModel::numberOfColumns = 6;
 
@@ -37,7 +50,7 @@ RemoteReplayList_TreeModel::RemoteReplayList_TreeModel(AbstractClient *_client, 
     QFileIconProvider fip;
     dirIcon = fip.icon(QFileIconProvider::Folder);
     fileIcon = fip.icon(QFileIconProvider::File);
-    lockIcon = QPixmap("theme:icons/lock");
+    lockIcon = themePixmap(QStringLiteral("icons/lock"));
 }
 
 RemoteReplayList_TreeModel::~RemoteReplayList_TreeModel()

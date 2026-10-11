@@ -8,6 +8,11 @@
 #define COCKATRICE_VIEW_ZONE_LOGIC_H
 #include "card_zone_logic.h"
 
+#include <qtmetamacros.h>
+
+class PlayerLogic;
+class QObject;
+
 class ZoneViewZoneLogic : public CardZoneLogic
 {
     Q_OBJECT
@@ -41,6 +46,10 @@ public:
     bool prepareAddCard(int x);
     void removeCard(int position, bool toNewZone);
     void updateCardIds(CardAction action);
+
+    /** @brief Removes all cards from the view, without touching anything else. Used in replay rewind */
+    void clearCards();
+
     int getNumberCards() const
     {
         return numberCards;

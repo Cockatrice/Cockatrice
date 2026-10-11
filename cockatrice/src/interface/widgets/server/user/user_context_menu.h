@@ -11,19 +11,22 @@
 
 #include <QList>
 #include <QObject>
+#include <QString>
 #include <functional>
 #include <libcockatrice/network/server/remote/user_level.h>
+#include <qtmetamacros.h>
+#include <utility>
+
 class AbstractGame;
 class UserListProxy;
 class AbstractClient;
 class ChatView;
 class CommandContainer;
 class QAction;
-class QMenu;
 class QPoint;
 class Response;
-class ServerInfo_User;
 class TabSupervisor;
+class QWidget;
 
 class UserContextMenu : public QObject
 {
@@ -37,6 +40,7 @@ private:
     QAction *aUserName;
     QAction *aDetails;
     QAction *aShowGames;
+    QAction *aViewPublicDecks;
     QAction *aChat;
     QAction *aAddToBuddyList, *aRemoveFromBuddyList;
     QAction *aAddToIgnoreList, *aRemoveFromIgnoreList;
@@ -45,6 +49,7 @@ private:
     QAction *aBan, *aBanHistory;
     QAction *aPromoteToMod, *aDemoteFromMod;
     QAction *aPromoteToJudge, *aDemoteFromJudge;
+    QAction *aPromoteToDeveloper, *aDemoteFromDeveloper;
     QAction *aWarnUser, *aWarnHistory;
     QAction *aGetAdminNotes;
     std::function<QList<GameInviteOption>()> gameInviteLinkProvider;
@@ -110,6 +115,7 @@ public:
     void execInvite(const QString &userName);
     void execDetails(const QString &userName);
     void execShowGames(const QString &userName);
+    void execViewPublicDecks(const QString &userName);
     void execAddToBuddy(const QString &userName);
     void execRemoveFromBuddy(const QString &userName);
     void execAddToIgnore(const QString &userName);
@@ -123,6 +129,7 @@ public:
     void execInvestigateUser(const QString &userName);
     void execAdjustMod(const QString &userName, bool shouldBeMod);
     void execAdjustJudge(const QString &userName, bool shouldBeJudge);
+    void execAdjustDeveloper(const QString &userName, bool shouldBeDeveloper);
 
 private:
     void execInvite(const QString &userName, const GameInviteOption &option);

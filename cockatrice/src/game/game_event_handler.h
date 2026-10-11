@@ -19,23 +19,29 @@
 
 #include <QLoggingCategory>
 #include <QObject>
+#include <QPair>
+#include <QString>
+#include <QVector>
 #include <libcockatrice/protocol/pb/event_leave.pb.h>
+#include <qtmetamacros.h>
+
+// IWYU pragma: keep
+// GameEventContext, ServerInfo_Player and ServerInfo_User are passed by value
+// to signals and slots, so the moc-generated code needs the complete types.
+#include <libcockatrice/protocol/pb/game_event_context.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
 class AbstractClient;
 class AbstractGame;
-class CommandContainer;
-class GameCommand;
 class GameEventContainer;
 class GameEventContext;
 class PendingCommand;
 class PlayerLogic;
 class Response;
-
 class Event_GameStateChanged;
 class Event_PlayerPropertiesChanged;
 class Event_Join;
-class Event_Leave;
 class Event_GameHostChanged;
 class Event_GameClosed;
 class Event_SetActivePlayer;
@@ -44,6 +50,15 @@ class Event_GameSay;
 class Event_Kicked;
 class Event_ReverseTurn;
 class Event_Ping;
+class ServerInfo_PlayerProperties;
+namespace google
+{
+namespace protobuf
+{
+class Message;
+} // namespace protobuf
+} // namespace google
+template <typename T> class QList;
 
 inline Q_LOGGING_CATEGORY(GameEventHandlerLog, "game_event_handler");
 

@@ -3,7 +3,11 @@
 
 #include "settings_manager.h"
 
+#include <QString>
 #include <libcockatrice/interfaces/interface_cards_display_settings_provider.h>
+#include <qtmetamacros.h>
+
+class QObject;
 
 class CardsDisplaySettings : public SettingsManager, public ICardsDisplaySettingsProvider
 {
@@ -17,7 +21,6 @@ public:
     [[nodiscard]] bool getBumpSetsWithCardsInDeckToTop() const override;
     [[nodiscard]] int getPrintingSelectorSortOrder() const override;
     [[nodiscard]] int getPrintingSelectorCardSize() const override;
-    [[nodiscard]] bool getIncludeRebalancedCards() const override;
     [[nodiscard]] bool getPrintingSelectorNavigationButtonsVisible() const override;
     [[nodiscard]] bool getTapAnimation() const override;
     [[nodiscard]] bool getArrowDrawAnimation() const override;
@@ -28,9 +31,12 @@ public:
     [[nodiscard]] int getVisualDeckStorageCardSize() const override;
     [[nodiscard]] int getVisualDatabaseDisplayCardSize() const override;
     [[nodiscard]] int getVisualDeckEditorCardSize() const override;
+    [[nodiscard]] bool getVisualDeckEditorShowCardCounts() const override;
     [[nodiscard]] int getEDHRecCardSize() const override;
     [[nodiscard]] int getArchidektPreviewSize() const override;
     [[nodiscard]] int getSampleHandSize() const override;
+    [[nodiscard]] QString getCardLang() const override;
+    [[nodiscard]] int getCardSearchLanguage() const override;
 
     void setDisplayCardNames(bool _displayCardNames);
     void setRoundCardCorners(bool _roundCardCorners);
@@ -38,7 +44,6 @@ public:
     void setBumpSetsWithCardsInDeckToTop(bool _bumpSetsWithCardsInDeckToTop);
     void setPrintingSelectorSortOrder(int _printingSelectorSortOrder);
     void setPrintingSelectorCardSize(int _printingSelectorCardSize);
-    void setIncludeRebalancedCards(bool _includeRebalancedCards);
     void setPrintingSelectorNavigationButtonsVisible(bool _navigationButtonsVisible);
     void setTapAnimation(bool _tapAnimation);
     void setArrowDrawAnimation(bool _arrowDrawAnimation);
@@ -49,9 +54,12 @@ public:
     void setVisualDeckStorageCardSize(int _cardSize);
     void setVisualDatabaseDisplayCardSize(int _cardSize);
     void setVisualDeckEditorCardSize(int _cardSize);
+    void setVisualDeckEditorShowCardCounts(bool _showCardCounts);
     void setEDHRecCardSize(int _edhrecCardSize);
     void setArchidektPreviewCardSize(int _archidektPreviewCardSize);
     void setSampleHandSize(int _sampleHandSize);
+    void setCardLang(const QString &_cardLang);
+    void setCardSearchLanguage(int _cardSearchLanguage);
 
 signals:
     void displayCardNamesChanged();
@@ -60,14 +68,16 @@ signals:
     void bumpSetsWithCardsInDeckToTopChanged();
     void printingSelectorSortOrderChanged();
     void printingSelectorCardSizeChanged();
-    void includeRebalancedCardsChanged(bool _includeRebalancedCards);
     void printingSelectorNavigationButtonsVisibleChanged();
     void visualDeckStorageCardSizeChanged();
     void visualDatabaseDisplayCardSizeChanged();
     void visualDeckEditorCardSizeChanged();
+    void visualDeckEditorShowCardCountsChanged(bool showCardCounts);
     void edhRecCardSizeChanged();
     void archidektPreviewSizeChanged();
     void sampleHandSizeChanged(int amount);
+    void cardLangChanged(const QString &lang);
+    void cardSearchLanguageChanged(int cardSearchLanguage);
 
 public:
     explicit CardsDisplaySettings(const QString &settingPath, QObject *parent = nullptr);

@@ -8,11 +8,13 @@
 
 #include "visual_deck_storage_sort_filter_proxy_model.h"
 
-#include <QComboBox>
-#include <QHBoxLayout>
 #include <QWidget>
+#include <qtmetamacros.h>
 
 class VisualDeckStorageWidget;
+class QComboBox;
+class QHBoxLayout;
+
 class VisualDeckStorageSortWidget : public QWidget
 {
     Q_OBJECT

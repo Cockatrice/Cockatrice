@@ -1,7 +1,10 @@
 #include "edhrec_top_commanders_api_response.h"
 
+#include "../cards/edhrec_api_response_card_container.h"
+
 #include <QDebug>
-#include <QJsonArray>
+#include <QJsonValue>
+#include <qlogging.h>
 
 void EdhrecTopCommandersApiResponse::fromJson(const QJsonObject &json)
 {

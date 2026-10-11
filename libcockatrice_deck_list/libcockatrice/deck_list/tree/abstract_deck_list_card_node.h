@@ -13,6 +13,10 @@
 
 #include "abstract_deck_list_node.h"
 
+#include <QString>
+
+class InnerDecklistNode;
+
 /**
  * @class AbstractDecklistCardNode
  * @ingroup DeckModels
@@ -133,15 +137,6 @@ public:
      * @return true if this node’s name comes before other’s name.
      */
     bool compareName(AbstractDecklistNode *other) const;
-
-    /**
-     * @brief Deserialize this node’s properties from XML.
-     * @param xml QXmlStreamReader positioned at the element.
-     * @return true if parsing succeeded.
-     *
-     * This supports loading deck files from Cockatrice’s XML format.
-     */
-    int readElement(QXmlStreamReader *xml, int limit) override;
 
     /**
      * @brief Serialize this node’s properties to XML.

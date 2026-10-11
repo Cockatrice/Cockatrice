@@ -6,9 +6,12 @@
 #ifndef DECK_PREVIEW_DECK_TAGS_DISPLAY_WIDGET_H
 #define DECK_PREVIEW_DECK_TAGS_DISPLAY_WIDGET_H
 
+#include <QList>
+#include <QString>
 #include <QStringList>
 #include <QWidget>
 #include <functional>
+#include <qtmetamacros.h>
 
 class FlowWidget;
 

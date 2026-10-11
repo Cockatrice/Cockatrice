@@ -10,8 +10,10 @@
 #include "abstract_player_component.h"
 
 #include <QMenu>
+#include <qtmetamacros.h>
 
 class PlayerGraphicsItem;
+
 class SayMenu : public QMenu, public AbstractPlayerComponent
 {
     Q_OBJECT

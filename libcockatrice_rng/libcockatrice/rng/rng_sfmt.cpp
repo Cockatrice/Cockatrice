@@ -1,8 +1,13 @@
 #include "rng_sfmt.h"
 
-#include <algorithm>
-#include <climits>
+#include "libcockatrice/rng/rng_abstract.h"
+#include "libcockatrice/rng/sfmt/SFMT.h"
+
+#include <QString>
 #include <stdexcept>
+#include <string>
+
+class QObject;
 
 // This is from gcc sources, namely from fixincludes/inclhack.def
 // On C++11 systems, <cstdint> could be included instead.

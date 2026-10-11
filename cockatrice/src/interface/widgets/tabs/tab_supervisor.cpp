@@ -2,37 +2,69 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../../../game/abstract_game.h"
+#include "../../../game/game_event_handler.h"
+#include "../../../game/game_meta_info.h"
+#include "../../deck_loader/loaded_deck.h"
+#include "../../intents/contexts/context_connect_to_server.h"
+#include "../../intents/contexts/context_join_game.h"
+#include "../../intents/contexts/context_join_room.h"
+#include "../../intents/intent.h"
 #include "../../intents/intent_join_server_game.h"
 #include "../interface/pixel_map_generator.h"
 #include "../interface/widgets/server/game_link.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
-#include "../interface/widgets/server/user/user_list_widget.h"
 #include "../main.h"
+#include "abstract_tab_deck_editor.h"
 #include "api/archidekt/tab_archidekt.h"
+#include "api/edhrec/tab_edhrec.h"
 #include "api/edhrec/tab_edhrec_main.h"
+#include "latency_tracker.h"
+#include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_gametype.pb.h"
+#include "tab.h"
 #include "tab_account.h"
 #include "tab_admin.h"
 #include "tab_card_art_rules.h"
 #include "tab_deck_editor.h"
 #include "tab_deck_storage.h"
+#include "tab_developer.h"
 #include "tab_game.h"
 #include "tab_home.h"
 #include "tab_logs.h"
 #include "tab_message.h"
 #include "tab_moderation.h"
+#include "tab_public_decks.h"
 #include "tab_replays.h"
 #include "tab_report.h"
 #include "tab_room.h"
 #include "tab_server.h"
 #include "tab_visual_database_display.h"
+#include "user_level.h"
 #include "visual_deck_editor/tab_deck_editor_visual.h"
-#include "visual_deck_editor/tab_deck_editor_visual_tab_widget.h"
 #include "visual_deck_storage/tab_deck_storage_visual.h"
 
+#include <QAction>
 #include <QApplication>
+#include <QCloseEvent>
+#include <QCommonStyle>
+#include <QDebug>
+#include <QFlag>
+#include <QIcon>
+#include <QListIterator>
+#include <QMapIterator>
+#include <QMenu>
 #include <QMessageBox>
+#include <QMessageLogger>
+#include <QObject>
 #include <QPainter>
+#include <QRect>
+#include <QSharedPointer>
+#include <QStringLiteral>
+#include <QStyle>
+#include <QStyleOption>
 #include <QSystemTrayIcon>
+#include <QTabBar>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/network/client/remote/remote_client.h>
 #include <libcockatrice/protocol/pb/event_game_joined.pb.h>
@@ -43,11 +75,16 @@
 #include <libcockatrice/protocol/pb/room_event.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_room.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
-#include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/chat_settings.h>
 #include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/tabs_settings.h>
+#include <memory>
+#include <qnamespace.h>
+#include <string>
+#include <utility>
+
+class QWidget;
 
 QRect MacOSTabFixStyle::subElementRect(SubElement element, const QStyleOption *option, const QWidget *widget) const
 {
@@ -119,7 +156,7 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     : QTabWidget(parent), userInfo(nullptr), client(_client), tabsMenu(tabsMenu), tabHome(nullptr),
       tabVisualDeckStorage(nullptr), tabServer(nullptr), tabAccount(nullptr), tabDeckStorage(nullptr),
       tabReplays(nullptr), tabAdmin(nullptr), tabCardArtRules(nullptr), tabLog(nullptr), tabReport(nullptr),
-      tabModeration(nullptr), isLocalGame(false)
+      tabModeration(nullptr), tabDeveloper(nullptr), isLocalGame(false)
 {
     setElideMode(Qt::ElideRight);
     setMovable(true);
@@ -205,6 +242,10 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     aTabModeration->setCheckable(true);
     connect(aTabModeration, &QAction::triggered, this, &TabSupervisor::actTabModeration);
 
+    aTabDeveloper = new QAction(this);
+    aTabDeveloper->setCheckable(true);
+    connect(aTabDeveloper, &QAction::triggered, this, &TabSupervisor::actTabDeveloper);
+
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &TabSupervisor::refreshShortcuts);
     refreshShortcuts();
@@ -247,6 +288,7 @@ void TabSupervisor::retranslateUi()
     aTabReport->setText(tr("Report Queue"));
     aTabModeration->setText(tr("Moderation"));
     aTabCardArtRules->setText(tr("Card Art Rules"));
+    aTabDeveloper->setText(tr("Developer"));
 
     // tabs
     QList<Tab *> tabs;
@@ -259,6 +301,7 @@ void TabSupervisor::retranslateUi()
     tabs.append(tabReport);
     tabs.append(tabModeration);
     tabs.append(tabCardArtRules);
+    tabs.append(tabDeveloper);
     QMapIterator<int, TabRoom *> roomIterator(roomTabs);
     while (roomIterator.hasNext()) {
         tabs.append(roomIterator.next().value());
@@ -266,6 +309,10 @@ void TabSupervisor::retranslateUi()
     QMapIterator<int, TabGame *> gameIterator(gameTabs);
     while (gameIterator.hasNext()) {
         tabs.append(gameIterator.next().value());
+    }
+    QMapIterator<QString, TabPublicDecks *> publicDecksIterator(publicDecksTabs);
+    while (publicDecksIterator.hasNext()) {
+        tabs.append(publicDecksIterator.next().value());
     }
     QListIterator<TabGame *> replayIterator(replayTabs);
     while (replayIterator.hasNext()) {
@@ -528,6 +575,19 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
         }
     }
 
+    if (userInfo->user_level() & ServerInfo_User::IsDeveloper) {
+        tabsMenu->addSeparator();
+        tabsMenu->addAction(aTabDeveloper);
+        // Developers without moderation rights get log access through their
+        // own role. Moderators already have the Logs entry from above.
+        if (!(userInfo->user_level() & ServerInfo_User::IsModerator)) {
+            tabsMenu->addAction(aTabLog);
+            if (SettingsCache::instance().tabs().getTabLogOpen()) {
+                openTabLog();
+            }
+        }
+    }
+
     retranslateUi();
 }
 
@@ -540,6 +600,7 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
     tabLog = nullptr;
     tabReport = nullptr;
     tabModeration = nullptr;
+    tabDeveloper = nullptr;
     isLocalGame = true;
     userInfo = new ServerInfo_User;
     localClients = _clients;
@@ -590,6 +651,9 @@ void TabSupervisor::stop()
         if (tabCardArtRules) {
             tabCardArtRules->close();
         }
+        if (tabDeveloper) {
+            tabDeveloper->close();
+        }
     }
 
     QList<Tab *> tabsToDelete;
@@ -599,6 +663,10 @@ void TabSupervisor::stop()
     }
 
     for (auto i = gameTabs.cbegin(), end = gameTabs.cend(); i != end; ++i) {
+        tabsToDelete << i.value();
+    }
+
+    for (auto i = publicDecksTabs.cbegin(), end = publicDecksTabs.cend(); i != end; ++i) {
         tabsToDelete << i.value();
     }
 
@@ -648,7 +716,7 @@ void TabSupervisor::actTabVisualDeckStorage(bool checked)
 
 void TabSupervisor::openTabVisualDeckStorage()
 {
-    tabVisualDeckStorage = new TabDeckStorageVisual(this);
+    tabVisualDeckStorage = new TabDeckStorageVisual(this, client);
     myAddTab(tabVisualDeckStorage, aTabVisualDeckStorage);
     connect(tabVisualDeckStorage, &QObject::destroyed, this, [this] {
         tabVisualDeckStorage = nullptr;
@@ -819,7 +887,13 @@ void TabSupervisor::actTabLog(bool checked)
 
 void TabSupervisor::openTabLog()
 {
-    tabLog = new TabLog(this, client);
+    // Developers query logs through the developer command family, so tell the
+    // tab which family to use. The moderator family is strictly stronger, so a
+    // moderator who also holds the developer bit keeps the moderator path — the
+    // developer bit only selects the (narrowed) developer family on its own.
+    const bool useDeveloperCommands = (userInfo->user_level() & ServerInfo_User::IsDeveloper) &&
+                                      !(userInfo->user_level() & ServerInfo_User::IsModerator);
+    tabLog = new TabLog(this, client, useDeveloperCommands);
     myAddTab(tabLog, aTabLog);
     connect(tabLog, &QObject::destroyed, this, [this] {
         tabLog = nullptr;
@@ -879,6 +953,27 @@ void TabSupervisor::openTabModeration(const QString &userName)
         aTabModeration->setChecked(false);
     });
     aTabModeration->setChecked(true);
+}
+
+void TabSupervisor::actTabDeveloper(bool checked)
+{
+    if (checked && !tabDeveloper) {
+        openTabDeveloper();
+        setCurrentWidget(tabDeveloper);
+    } else if (!checked && tabDeveloper) {
+        tabDeveloper->closeRequest();
+    }
+}
+
+void TabSupervisor::openTabDeveloper()
+{
+    tabDeveloper = new TabDeveloper(this, client);
+    myAddTab(tabDeveloper, aTabDeveloper);
+    connect(tabDeveloper, &QObject::destroyed, this, [this] {
+        tabDeveloper = nullptr;
+        aTabDeveloper->setChecked(false);
+    });
+    aTabDeveloper->setChecked(true);
 }
 
 void TabSupervisor::updatePingTime(int value, int max)
@@ -986,6 +1081,30 @@ void TabSupervisor::roomLeft(TabRoom *tab)
     removeTab(indexOf(tab));
 }
 
+void TabSupervisor::openTabPublicDecks(const QString &userName)
+{
+    if (auto *existing = publicDecksTabs.value(userName, nullptr)) {
+        setCurrentWidget(existing);
+        return;
+    }
+
+    auto *tab = new TabPublicDecks(this, client, userName);
+    connect(tab, &TabPublicDecks::closing, this, &TabSupervisor::publicDecksClosed);
+    myAddTab(tab);
+    publicDecksTabs.insert(userName, tab);
+    setCurrentWidget(tab);
+}
+
+void TabSupervisor::publicDecksClosed(TabPublicDecks *tab)
+{
+    if (tab == currentWidget()) {
+        emit setMenu();
+    }
+
+    publicDecksTabs.remove(tab->getUserName());
+    removeTab(indexOf(tab));
+}
+
 void TabSupervisor::switchToFirstAvailableNetworkTab()
 {
     if (!roomTabs.isEmpty()) {
@@ -1017,9 +1136,26 @@ void TabSupervisor::replayLeft(TabGame *tab)
 
 void TabSupervisor::joinReportGame(const int gameId, const int roomId)
 {
+    joinGameByIntent(gameId, roomId, true);
+}
+
+void TabSupervisor::joinGameFromUserCard(const int gameId, const int roomId, const bool asSpectator)
+{
+    joinGameByIntent(gameId, roomId, asSpectator);
+}
+
+/**
+ * Runs the join/spectate intent for @p gameId in @p roomId.
+ *
+ * The intent owns the whole flow: if the room tab is not open yet it joins the
+ * room first, then retries the game, so callers do not have to care whether the
+ * room happens to be on screen.
+ */
+void TabSupervisor::joinGameByIntent(const int gameId, const int roomId, const bool asSpectator)
+{
     auto *remoteClient = qobject_cast<RemoteClient *>(client);
     if (!remoteClient) {
-        actShowPopup(tr("Report joins are only available on a remote server."));
+        actShowPopup(tr("Game joins are only available on a remote server."));
         return;
     }
 
@@ -1028,7 +1164,7 @@ void TabSupervisor::joinReportGame(const int gameId, const int roomId)
     ctx->roomContext.serverContext.port = QString::number(remoteClient->peerPort());
     ctx->roomContext.roomId = roomId;
     ctx->gameId = gameId;
-    ctx->asSpectator = true;
+    ctx->asSpectator = asSpectator;
 
     auto *joinGameIntent = new IntentJoinServerGame(this, remoteClient, std::move(ctx));
     joinGameIntent->setParent(this);
@@ -1061,6 +1197,13 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
             setCurrentWidget(tab);
         }
         return tab;
+    }
+
+    if (focus && userListManager->isUserIgnored(receiverName)) {
+        QMessageBox::information(
+            this, tr("Ignored user"),
+            tr("You have ignored %1. Remove them from your ignore list to open a private chat.").arg(receiverName));
+        return nullptr;
     }
 
     tab = new TabMessage(this, client, *userInfo, otherUser, userOnline);
@@ -1242,7 +1385,7 @@ void TabSupervisor::tabUserEvent(bool globalEvent)
     auto *tab = static_cast<Tab *>(sender());
     if (tab != currentWidget()) {
         tab->setContentsChanged(true);
-        setTabIcon(indexOf(tab), QPixmap("theme:icons/tab_changed"));
+        setTabIcon(indexOf(tab), themePixmap(QStringLiteral("icons/tab_changed")));
     }
     if (globalEvent && SettingsCache::instance().userInterface().getNotificationsEnabled()) {
         QApplication::alert(this);
@@ -1277,7 +1420,21 @@ void TabSupervisor::processGameEventContainer(const GameEventContainer &cont)
 
 void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
 {
+    // "Ignore all private messages" silences every PM, including messages to
+    // already-open tabs — unlike the unregistered/non-buddy filters below,
+    // which only apply when creating a new tab. Messages from moderators/admins
+    // are exempt to ensure warnings still reach users.
     QString senderName = QString::fromStdString(event.sender_name());
+    if (SettingsCache::instance().chat().getIgnoreAllPrivateMessages()) {
+        const ServerInfo_User *onlineUserInfo = userListManager->getOnlineUser(senderName);
+        if (!onlineUserInfo) {
+            return;
+        }
+        const UserLevelFlags userLevel(onlineUserInfo->user_level());
+        if (!userLevel.testFlag(ServerInfo_User::IsModerator) && !userLevel.testFlag(ServerInfo_User::IsAdmin)) {
+            return;
+        }
+    }
     TabMessage *tab = messageTabs.value(senderName);
     if (!tab) {
         tab = messageTabs.value(QString::fromStdString(event.receiver_name()));
@@ -1377,6 +1534,11 @@ bool TabSupervisor::getAdminLocked() const
         return true;
     }
     return tabAdmin->getLocked();
+}
+
+bool TabSupervisor::canOverrideGameRestrictions() const
+{
+    return !getAdminLocked() || (userInfo->user_level() & ServerInfo_User::IsJudge);
 }
 
 void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)

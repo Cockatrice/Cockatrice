@@ -6,7 +6,9 @@
 #include "dlg_settings.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../pixel_map_generator.h"
 #include "../main.h"
+#include "../settings_page/abstract_settings_page.h"
 #include "../settings_page/appearance_settings_page.h"
 #include "../settings_page/deck_editor_settings_page.h"
 #include "../settings_page/general_settings_page.h"
@@ -17,33 +19,59 @@
 #include "../settings_page/sound_settings_page.h"
 #include "../settings_page/storage_settings_page.h"
 #include "../settings_page/user_interface_settings_page.h"
+#include "libcockatrice/card/database/card_database.h"
 #include "libcockatrice/card/database/card_database_loader.h"
 #include "libcockatrice/card/database/card_database_manager.h"
 
+#include <QAbstractAnimation>
 #include <QAbstractItemView>
+#include <QApplication>
+#include <QBrush>
+#include <QByteArray>
 #include <QCloseEvent>
+#include <QColor>
+#include <QDebug>
 #include <QDir>
+#include <QEasingCurve>
+#include <QEvent>
+#include <QFlags>
 #include <QFrame>
 #include <QGraphicsOpacityEffect>
 #include <QGuiApplication>
 #include <QHBoxLayout>
+#include <QIcon>
 #include <QKeyEvent>
+#include <QKeySequence>
 #include <QLineEdit>
 #include <QListView>
 #include <QMessageBox>
+#include <QMessageLogger>
+#include <QModelIndex>
+#include <QObject>
+#include <QPalette>
+#include <QPixmap>
 #include <QPropertyAnimation>
 #include <QPushButton>
+#include <QRect>
 #include <QScreen>
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QSequentialAnimationGroup>
 #include <QShortcut>
+#include <QSize>
+#include <QSizePolicy>
 #include <QStackedLayout>
 #include <QStackedWidget>
+#include <QStringLiteral>
 #include <QToolButton>
 #include <QVBoxLayout>
+#include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
+#include <qnamespace.h>
+
+class QModelIndex;
 
 /**
  * @brief Wraps a widget in a scroll area for long settings pages
@@ -96,7 +124,7 @@ void DlgSettings::setupUi()
     // Search bar
     searchEdit = new QLineEdit;
     searchEdit->setClearButtonEnabled(true);
-    searchEdit->addAction(QPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
+    searchEdit->addAction(themePixmap(QStringLiteral("icons/search")), QLineEdit::LeadingPosition);
     searchEdit->installEventFilter(this);
     connect(searchEdit, &QLineEdit::textChanged, this, &DlgSettings::onSearchTextChanged);
 
@@ -132,7 +160,7 @@ void DlgSettings::setupUi()
     pagesWidget->addWidget(makeScrollable(userInterfacePage));
     pagesWidget->addWidget(makeScrollable(deckEditorPage));
     pagesWidget->addWidget(makeScrollable(storagePage));
-    pagesWidget->addWidget(messagesPage);
+    pagesWidget->addWidget(makeScrollable(messagesPage));
     pagesWidget->addWidget(soundPage);
     pagesWidget->addWidget(shortcutsPage);
 
@@ -415,6 +443,11 @@ void DlgSettings::setTab(int index)
     }
 }
 
+AbstractSettingsPage *DlgSettings::page(SettingsPage which) const
+{
+    return pages.value(static_cast<int>(which));
+}
+
 void DlgSettings::updateLanguage()
 {
     qApp->removeTranslator(translator); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
@@ -477,13 +510,13 @@ void DlgSettings::closeEvent(QCloseEvent *event)
         case Invalid:
             loadErrorMessage = tr("Your card database is invalid.\n\n"
                                   "Cockatrice may not function correctly with an invalid database\n\n"
-                                  "You may need to rerun oracle to update your card database.\n\n"
+                                  "You may need to rerun Oracle to update your card database.\n\n"
                                   "Would you like to change your database location setting?");
             break;
         case VersionTooOld:
             loadErrorMessage = tr("Your card database version is too old.\n\n"
                                   "This can cause problems loading card information or images\n\n"
-                                  "Usually this can be fixed by rerunning oracle to to update your card database.\n\n"
+                                  "Usually this can be fixed by rerunning Oracle to to update your card database.\n\n"
                                   "Would you like to change your database location setting?");
             break;
         case NotLoaded:

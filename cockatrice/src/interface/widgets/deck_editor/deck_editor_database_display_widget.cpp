@@ -2,17 +2,30 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../filters/syntax_help.h"
-#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
-#include "../../../interface/widgets/tabs/tab_supervisor.h"
+#include "../../key_signals.h"
 #include "../../pixel_map_generator.h"
+#include "../utility/custom_line_edit.h"
+#include "card_database_display_model.h"
+#include "card_database_model.h"
 #include "card_database_view.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
 
-#include <QClipboard>
-#include <QHeaderView>
+#include <QAction>
+#include <QHBoxLayout>
+#include <QIcon>
+#include <QLineEdit>
+#include <QStringLiteral>
 #include <QToolButton>
-#include <QTreeView>
+#include <QVBoxLayout>
+#include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/utility/card_ref.h>
+#include <qnamespace.h>
+
+class FilterTree;
 
 DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent, CardDatabaseModel *databaseModel)
     : QWidget(parent)
@@ -28,7 +41,7 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent
     searchEdit->setPlaceholderText(tr("Search by card name (or search expressions)"));
     searchEdit->setClearButtonEnabled(true);
     searchEdit->addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
-    auto help = searchEdit->addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
+    auto help = searchEdit->addAction(themePixmap(QStringLiteral("icons/info")), QLineEdit::TrailingPosition);
 
     setFocusProxy(searchEdit);
     setFocusPolicy(Qt::ClickFocus);
@@ -39,6 +52,17 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent
     databaseDisplayModel->setObjectName("databaseDisplayModel");
     databaseDisplayModel->setSourceModel(databaseModel);
     databaseDisplayModel->setFilterKeyColumn(0);
+
+    const auto applyCardSearchLanguage = [this]() {
+        const CardsDisplaySettings &cardsDisplay = SettingsCache::instance().cardsDisplay();
+        databaseDisplayModel->setSearchLanguage(CardSearchLanguage{
+            cardsDisplay.getCardLang(), static_cast<SearchLanguageMode>(cardsDisplay.getCardSearchLanguage())});
+    };
+    applyCardSearchLanguage();
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::cardLangChanged, this,
+            applyCardSearchLanguage);
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::cardSearchLanguageChanged, this,
+            applyCardSearchLanguage);
 
     databaseView = new CardDatabaseView(this, databaseDisplayModel);
     databaseView->setObjectName("databaseView");
@@ -59,13 +83,13 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent
             &DeckEditorDatabaseDisplayWidget::onRelatedCardClicked);
 
     aAddCard = new QAction(QString(), this);
-    aAddCard->setIcon(QPixmap("theme:icons/arrow_right_green"));
+    aAddCard->setIcon(themePixmap(QStringLiteral("icons/arrow_right_green")));
     connect(aAddCard, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
     auto *tbAddCard = new QToolButton(this);
     tbAddCard->setDefaultAction(aAddCard);
 
     aAddCardToSideboard = new QAction(QString(), this);
-    aAddCardToSideboard->setIcon(QPixmap("theme:icons/arrow_right_blue"));
+    aAddCardToSideboard->setIcon(themePixmap(QStringLiteral("icons/arrow_right_blue")));
     connect(aAddCardToSideboard, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
     auto *tbAddCardToSideboard = new QToolButton(this);
     tbAddCardToSideboard->setDefaultAction(aAddCardToSideboard);

@@ -1,13 +1,37 @@
 #include "deck_state_manager.h"
 
+#include "../../../client/settings/cache_settings.h"
+#include "../../deck_loader/loaded_deck.h"
+#include "deck_list_model.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/deck_list/deck_list.h"
+#include "libcockatrice/deck_list/deck_list_memento.h"
+#include "libcockatrice/deck_list/deck_list_node_tree.h"
+#include "libcockatrice/utility/card_ref.h"
+#include "libcockatrice/utility/playmat_params.h"
+
+#include <QList>
+#include <QVariant>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list_history_manager.h>
 #include <libcockatrice/deck_list/tree/inner_deck_list_node.h>
+#include <libcockatrice/settings/cards_display_settings.h>
+#include <qnamespace.h>
+
+class QModelIndex;
 
 DeckStateManager::DeckStateManager(QObject *parent)
     : QObject(parent), deckList(QSharedPointer<DeckList>(new DeckList)),
       deckListModel(new DeckListModel(this, deckList)), historyManager(new DeckListHistoryManager(this))
 {
+    deckListModel->setDisplayLanguage(SettingsCache::instance().cardsDisplay().getCardLang());
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::cardLangChanged, deckListModel,
+            [this](const QString &lang) { deckListModel->setDisplayLanguage(lang); });
+
     connect(historyManager, &DeckListHistoryManager::undoRedoStateChanged, this, [this] {
         setModified(true);
         emit historyChanged();
@@ -260,7 +284,10 @@ bool DeckStateManager::swapCardAtIndex(const QModelIndex &idx)
         return false;
     }
 
-    QString cardName = idx.siblingAtColumn(DeckListModelColumns::CARD_NAME).data().toString();
+    // The display role holds the localized card name; the edit role always carries the
+    // canonical English name needed to look the card up in the database.
+    QString displayCardName = idx.siblingAtColumn(DeckListModelColumns::CARD_NAME).data().toString();
+    QString cardName = idx.siblingAtColumn(DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
     QString providerId = idx.siblingAtColumn(DeckListModelColumns::CARD_PROVIDER_ID).data().toString();
     QModelIndex gparent = idx.parent().parent();
 
@@ -277,7 +304,7 @@ bool DeckStateManager::swapCardAtIndex(const QModelIndex &idx)
 
     QString reason = tr("Moved to %1 1 × \"%2\" (%3)") //
                          .arg(otherZoneName)
-                         .arg(cardName)
+                         .arg(displayCardName)
                          .arg(providerId);
 
     return modifyDeck(reason, [&idx, &cardName, &providerId, &otherZoneName](auto model) {
@@ -291,9 +318,8 @@ bool DeckStateManager::removeCardAtIndex(const QModelIndex &idx)
         return false;
     }
 
-    QString cardName = idx.siblingAtColumn(DeckListModelColumns::CARD_NAME).data().toString();
-
-    QString reason = tr("Removed \"%1\" (all copies)").arg(cardName);
+    QString reason =
+        tr("Removed \"%1\" (all copies)").arg(idx.siblingAtColumn(DeckListModelColumns::CARD_NAME).data().toString());
 
     return modifyDeck(reason, [&idx](auto model) { return model->removeRow(idx.row(), idx.parent()); });
 }

@@ -10,10 +10,13 @@
 #include "../../../interface/widgets/menus/tearoff_menu.h"
 #include "abstract_player_component.h"
 
-#include <QAction>
-#include <QMenu>
+#include <qtmetamacros.h>
 
 class PlayerGraphicsItem;
+class QAction;
+class QMenu;
+class QWidget;
+
 class GraveyardMenu : public TearOffMenu, public AbstractPlayerComponent
 {
     Q_OBJECT

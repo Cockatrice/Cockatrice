@@ -8,11 +8,14 @@
 #ifndef PHASESTOOLBAR_H
 #define PHASESTOOLBAR_H
 
-#include "board/abstract_graphics_item.h"
-
-#include <QFrame>
-#include <QGraphicsObject>
+#include <QGraphicsItem>
 #include <QList>
+#include <QObject>
+#include <QString>
+#include <qtmetamacros.h>
+
+class QAction;
+class QTimer;
 
 namespace google
 {
@@ -21,8 +24,6 @@ namespace protobuf
 class Message;
 }
 } // namespace google
-class PlayerLogic;
-class GameCommand;
 
 class PhaseButton : public QObject, public QGraphicsItem
 {

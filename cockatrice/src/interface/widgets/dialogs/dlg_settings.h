@@ -7,9 +7,15 @@
 #define DLG_SETTINGS_H
 
 #include <QDialog>
+#include <QList>
 #include <QLoggingCategory>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
 
 class QPushButton;
+class QModelIndex;
+class QWidget;
 
 inline Q_LOGGING_CATEGORY(DlgSettingsLog, "dlg_settings");
 
@@ -17,7 +23,6 @@ class QStackedWidget;
 class QToolButton;
 class QListView;
 class QLineEdit;
-
 class AbstractSettingsPage;
 class SettingsSearchModel;
 class SettingsSearchDelegate;
@@ -54,6 +59,7 @@ public:
 
     explicit DlgSettings(QWidget *parent = nullptr);
     void setTab(int index);
+    AbstractSettingsPage *page(SettingsPage which) const;
 
 private slots:
     void onTabClicked(int index);

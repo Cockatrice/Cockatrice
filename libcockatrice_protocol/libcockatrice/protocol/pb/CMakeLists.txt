@@ -15,9 +15,17 @@ set(PROTO_FILES
     command_deck_del.proto
     command_deck_del_dir.proto
     command_deck_download.proto
+    command_deck_download_public.proto
     command_deck_list.proto
+    command_deck_list_other_user.proto
     command_deck_new_dir.proto
     command_deck_select.proto
+    command_deck_set_visibility.proto
+    command_deck_share_create.proto
+    command_deck_share_download.proto
+    command_deck_share_list.proto
+    command_deck_share_list_mine.proto
+    command_deck_share_remove.proto
     command_deck_upload.proto
     command_del_counter.proto
     command_delete_arrow.proto
@@ -25,6 +33,7 @@ set(PROTO_FILES
     command_dump_zone.proto
     command_flip_card.proto
     command_game_say.proto
+    command_get_server_stats.proto
     command_inc_card_counter.proto
     command_inc_counter.proto
     command_kick_from_game.proto
@@ -71,6 +80,7 @@ set(PROTO_FILES
     context_ready_start.proto
     context_set_sideboard_lock.proto
     context_undo_draw.proto
+    developer_commands.proto
     event_add_to_list.proto
     event_attach_card.proto
     event_change_zone_properties.proto
@@ -135,11 +145,16 @@ set(PROTO_FILES
     response_card_art_rule_entry.proto
     response_deck_download.proto
     response_deck_list.proto
+    response_deck_share_create.proto
+    response_deck_share_download.proto
+    response_deck_share_list.proto
+    response_deck_share_list_mine.proto
     response_deck_upload.proto
     response_dump_zone.proto
     response_forgotpasswordrequest.proto
     response_get_admin_notes.proto
     response_get_games_of_user.proto
+    response_get_server_stats.proto
     response_get_user_info.proto
     response_join_room.proto
     response_list_users.proto
@@ -172,6 +187,8 @@ set(PROTO_FILES
     serverinfo_cardcounter.proto
     serverinfo_chat_message.proto
     serverinfo_counter.proto
+    serverinfo_deck_share_item.proto
+    serverinfo_deck_share_summary.proto
     serverinfo_deckstorage.proto
     serverinfo_game.proto
     serverinfo_gametype.proto

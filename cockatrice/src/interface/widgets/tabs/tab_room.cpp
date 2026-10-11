@@ -2,6 +2,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../../pixel_map_generator.h"
 #include "../interface/widgets/dialogs/dlg_settings.h"
 #include "../interface/widgets/server/chat_view/chat_view.h"
 #include "../interface/widgets/server/game_link.h"
@@ -10,27 +11,39 @@
 #include "../interface/widgets/server/user/user_list_panel_widget.h"
 #include "../interface/widgets/server/user/user_list_widget.h"
 #include "../main.h"
+#include "../server/game_type_map.h"
+#include "../server/user/user_list_proxy.h"
 #include "../utility/completer_utils.h"
+#include "../utility/line_edit_completer.h"
 #include "card/card_completer_proxy_model.h"
 #include "card/card_search_model.h"
 #include "card_database_display_model.h"
 #include "card_database_model.h"
-#include "tab_account.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/room_event.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_gametype.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 #include "tab_supervisor.h"
+#include "user_level.h"
 
+#include <QAction>
 #include <QApplication>
+#include <QCloseEvent>
 #include <QCompleter>
+#include <QDateTime>
+#include <QFlag>
+#include <QGroupBox>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QMenu>
-#include <QMessageBox>
-#include <QPushButton>
 #include <QRegularExpression>
 #include <QSplitter>
 #include <QStringListModel>
+#include <QStringLiteral>
 #include <QSystemTrayIcon>
 #include <QToolButton>
 #include <QVBoxLayout>
-#include <QtCore/qdatetime.h>
+#include <QWidget>
 #include <functional>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
@@ -45,6 +58,8 @@
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/chat_settings.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <qnamespace.h>
+#include <string>
 
 TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
                  AbstractClient *_client,
@@ -98,7 +113,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     connect(aOpenChatSettings, &QAction::triggered, this, &TabRoom::actOpenChatSettings);
 
     auto *chatSettingsButton = new QToolButton;
-    chatSettingsButton->setIcon(QPixmap("theme:icons/settings"));
+    chatSettingsButton->setIcon(themePixmap(QStringLiteral("icons/settings")));
     chatSettingsButton->setMenu(chatSettingsMenu);
     chatSettingsButton->setPopupMode(QToolButton::InstantPopup);
 

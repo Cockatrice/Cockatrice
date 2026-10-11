@@ -38,6 +38,10 @@ class BannerShaderConfig : public QObject
     Q_PROPERTY(QColor colorA READ colorA WRITE setColorA NOTIFY colorAChanged)
     Q_PROPERTY(QColor colorB READ colorB WRITE setColorB NOTIFY colorBChanged)
     Q_PROPERTY(QColor accent READ accent WRITE setAccent NOTIFY accentChanged)
+    Q_PROPERTY(QColor glowColor READ glowColor WRITE setGlowColor NOTIFY glowColorChanged)
+    Q_PROPERTY(QColor brandStrong READ brandStrong WRITE setBrandStrong NOTIFY brandStrongChanged)
+    Q_PROPERTY(QColor brandSoft READ brandSoft WRITE setBrandSoft NOTIFY brandSoftChanged)
+    Q_PROPERTY(qreal vignetteMin READ vignetteMin WRITE setVignetteMin NOTIFY vignetteMinChanged)
 
     Q_PROPERTY(bool logoVisible READ logoVisible WRITE setLogoVisible NOTIFY logoVisibleChanged)
     Q_PROPERTY(qreal logoGlow READ logoGlow WRITE setLogoGlow NOTIFY logoGlowChanged)
@@ -185,6 +189,54 @@ public:
         }
     }
 
+    QColor glowColor() const
+    {
+        return m_glowColor;
+    }
+    void setGlowColor(const QColor &c)
+    {
+        if (c != m_glowColor) {
+            m_glowColor = c;
+            emit glowColorChanged();
+        }
+    }
+
+    QColor brandStrong() const
+    {
+        return m_brandStrong;
+    }
+    void setBrandStrong(const QColor &c)
+    {
+        if (c != m_brandStrong) {
+            m_brandStrong = c;
+            emit brandStrongChanged();
+        }
+    }
+
+    QColor brandSoft() const
+    {
+        return m_brandSoft;
+    }
+    void setBrandSoft(const QColor &c)
+    {
+        if (c != m_brandSoft) {
+            m_brandSoft = c;
+            emit brandSoftChanged();
+        }
+    }
+
+    qreal vignetteMin() const
+    {
+        return m_vignetteMin;
+    }
+    void setVignetteMin(qreal v)
+    {
+        if (v != m_vignetteMin) {
+            m_vignetteMin = v;
+            emit vignetteMinChanged();
+        }
+    }
+
     bool logoVisible() const
     {
         return m_logoVisible;
@@ -222,6 +274,10 @@ signals:
     void colorAChanged();
     void colorBChanged();
     void accentChanged();
+    void glowColorChanged();
+    void brandStrongChanged();
+    void brandSoftChanged();
+    void vignetteMinChanged();
     void logoVisibleChanged();
     void logoGlowChanged();
 
@@ -239,9 +295,16 @@ private:
 
     bool m_frontIsA = true;
 
+    // Curated fallback seed values -- BannerHost overwrites these with
+    // palette-derived colours (see shader_banner_widget.cpp) before the first
+    // paint, so they only matter as a safe pre-first-apply default.
     QColor m_colorA{0x1A, 0x1A, 0x20};
     QColor m_colorB{0x0E, 0x0E, 0x12};
     QColor m_accent{0x8B, 0xDD, 0x6B};
+    QColor m_glowColor{Qt::white};
+    QColor m_brandStrong{0x13, 0x97, 0x40};
+    QColor m_brandSoft{0xC9, 0xFD, 0x62};
+    qreal m_vignetteMin = 0.62;
 
     bool m_logoVisible = false;
     qreal m_logoGlow = 1.0;

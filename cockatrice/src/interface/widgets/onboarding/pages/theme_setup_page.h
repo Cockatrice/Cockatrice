@@ -3,9 +3,14 @@
 
 #include "../first_run_wizard_page.h"
 
+#include <QColor>
+#include <QString>
+#include <qtmetamacros.h>
+
 class QComboBox;
 class QGroupBox;
 class QuickSetupPanel;
+class QWidget;
 
 /** @brief First-run theme step. Reuses the same building blocks as Appearance
  *         settings and the Palette Editor (ThemeManager, PaletteConfig,
@@ -53,6 +58,9 @@ private:
     QComboBox *homeTabBackgroundCombo;
 
     bool paletteDirty = false;
+
+    /// Theme whose identity accent currently seeds the picker.
+    QString lastSeededTheme;
 };
 
 #endif // THEME_SETUP_PAGE_H

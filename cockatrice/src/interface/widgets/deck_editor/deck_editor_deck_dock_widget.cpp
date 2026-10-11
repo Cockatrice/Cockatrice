@@ -2,27 +2,75 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../../key_signals.h"
+#include "../../pixel_map_generator.h"
 #include "../playmat/playmat_settings_dialog.h"
-#include "../settings_page/user_interface_settings_page.h"
+#include "../quick_settings/settings_button_widget.h"
+#include "../tabs/abstract_tab_deck_editor.h"
 #include "../tabs/api/commander_spellbook/commander_bracket_widget.h"
+#include "../utility/custom_line_edit.h"
+#include "../visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
+#include "deck_list_history_manager_widget.h"
+#include "deck_list_model.h"
 #include "deck_list_style_proxy.h"
 #include "deck_state_manager.h"
 #include "deck_zone_dialog.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database.h"
+#include "libcockatrice/card/database/card_database_loader.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/deck_list/deck_list.h"
+#include "libcockatrice/deck_list/tree/abstract_deck_list_node.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
+#include "libcockatrice/utility/card_ref.h"
+#include "libcockatrice/utility/playmat_params.h"
 
+#include <QAbstractItemModel>
+#include <QAbstractItemView>
+#include <QAction>
+#include <QCheckBox>
 #include <QComboBox>
+#include <QDebug>
+#include <QDialog>
 #include <QDockWidget>
+#include <QFlags>
+#include <QGridLayout>
 #include <QHeaderView>
+#include <QItemSelectionModel>
 #include <QLabel>
+#include <QList>
+#include <QMap>
+#include <QMenu>
 #include <QMessageBox>
+#include <QModelIndex>
+#include <QPair>
+#include <QPoint>
 #include <QPushButton>
+#include <QSet>
+#include <QSharedPointer>
+#include <QSize>
+#include <QSizePolicy>
 #include <QSplitter>
+#include <QStringList>
+#include <QStringLiteral>
 #include <QTextEdit>
+#include <QTimer>
+#include <QToolButton>
+#include <QVBoxLayout>
+#include <QVariant>
+#include <QWidget>
+#include <QtGlobal>
+#include <algorithm>
+#include <compare>
+#include <functional>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list_node_tree.h>
 #include <libcockatrice/settings/deck_editor_settings.h>
-#include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/macros.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <qnamespace.h>
+#include <utility>
 
 static int findRestoreIndex(const CardRef &wanted, const QComboBox *combo)
 {
@@ -192,25 +240,25 @@ void DeckEditorDeckDockWidget::createDeckDock()
             &DeckEditorDeckDockWidget::applyActiveGroupCriteria);
 
     aIncrement = new QAction(QString(), this);
-    aIncrement->setIcon(QPixmap("theme:icons/increment"));
+    aIncrement->setIcon(themePixmap(QStringLiteral("icons/increment")));
     connect(aIncrement, &QAction::triggered, this, &DeckEditorDeckDockWidget::actIncrementSelection);
     auto *tbIncrement = new QToolButton(this);
     tbIncrement->setDefaultAction(aIncrement);
 
     aDecrement = new QAction(QString(), this);
-    aDecrement->setIcon(QPixmap("theme:icons/decrement"));
+    aDecrement->setIcon(themePixmap(QStringLiteral("icons/decrement")));
     connect(aDecrement, &QAction::triggered, this, &DeckEditorDeckDockWidget::actDecrementSelection);
     auto *tbDecrement = new QToolButton(this);
     tbDecrement->setDefaultAction(aDecrement);
 
     aRemoveCard = new QAction(QString(), this);
-    aRemoveCard->setIcon(QPixmap("theme:icons/remove_row"));
+    aRemoveCard->setIcon(themePixmap(QStringLiteral("icons/remove_row")));
     connect(aRemoveCard, &QAction::triggered, this, &DeckEditorDeckDockWidget::actRemoveCard);
     auto *tbRemoveCard = new QToolButton(this);
     tbRemoveCard->setDefaultAction(aRemoveCard);
 
     aSwapCard = new QAction(QString(), this);
-    aSwapCard->setIcon(QPixmap("theme:icons/swap"));
+    aSwapCard->setIcon(themePixmap(QStringLiteral("icons/swap")));
     connect(aSwapCard, &QAction::triggered, this, &DeckEditorDeckDockWidget::actSwapSelection);
     auto *tbSwapCard = new QToolButton(this);
     tbSwapCard->setDefaultAction(aSwapCard);
@@ -344,7 +392,9 @@ ExactCard DeckEditorDeckDockWidget::getCurrentCard()
     if (!current.isValid()) {
         return {};
     }
-    const QString cardName = current.siblingAtColumn(DeckListModelColumns::CARD_NAME).data().toString();
+    // The display role holds the localized card name; the edit role always carries the
+    // canonical English name needed to look the card up in the database.
+    const QString cardName = current.siblingAtColumn(DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
     const QString cardProviderID = current.siblingAtColumn(DeckListModelColumns::CARD_PROVIDER_ID).data().toString();
     const QModelIndex gparent = current.parent().parent();
 
@@ -517,8 +567,11 @@ void DeckEditorDeckDockWidget::syncBannerCardComboBoxSelectionWithDeck()
 
 void DeckEditorDeckDockWidget::setSelectedIndex(const QModelIndex &newCardIndex, bool preserveWidgetFocus)
 {
+    const QModelIndex proxyIndex = proxy->mapFromSource(newCardIndex);
+
     deckView->clearSelection();
-    deckView->setCurrentIndex(newCardIndex);
+    deckView->setCurrentIndex(proxyIndex);
+    deckView->scrollTo(proxyIndex);
     recursiveExpand(newCardIndex);
 
     if (!preserveWidgetFocus) {

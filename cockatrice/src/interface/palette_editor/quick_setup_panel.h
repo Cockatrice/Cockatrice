@@ -1,13 +1,14 @@
 #ifndef COCKATRICE_QUICK_SETUP_PANEL_H
 #define COCKATRICE_QUICK_SETUP_PANEL_H
 
-#include "color_button.h"
-
+#include <QColor>
 #include <QWidget>
+#include <qtmetamacros.h>
 
 class QHBoxLayout;
 class QLabel;
 class QSlider;
+class ColorButton;
 
 /**
  * @class QuickSetupPanel

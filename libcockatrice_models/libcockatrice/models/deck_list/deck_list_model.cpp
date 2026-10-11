@@ -1,6 +1,27 @@
 #include "deck_list_model.h"
 
+#include "deck_list_model_custom_zones.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/format/format_legality_rules.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/deck_list/deck_list.h"
+#include "libcockatrice/deck_list/deck_list_node_tree.h"
+#include "libcockatrice/deck_list/tree/abstract_deck_list_node.h"
+#include "libcockatrice/deck_list/tree/deck_list_card_node.h"
+
+#include <QModelIndexList>
+#include <QSet>
+#include <QVariant>
+#include <algorithm>
+#include <compare>
+#include <iterator>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/utility/card_ref.h>
+#include <utility>
+
+class QObject;
 
 DeckListModel::DeckListModel(QObject *parent)
     : QAbstractItemModel(parent), lastKnownColumn(1), lastKnownOrder(Qt::AscendingOrder)
@@ -26,6 +47,16 @@ DeckListModel::DeckListModel(QObject *parent, const QSharedPointer<DeckList> &de
 DeckListModel::~DeckListModel()
 {
     delete root;
+}
+
+void DeckListModel::setDisplayLanguage(const QString &lang)
+{
+    if (displayLang == lang) {
+        return;
+    }
+    displayLang = lang;
+    emit layoutAboutToBeChanged();
+    emit layoutChanged();
 }
 
 /**
@@ -181,8 +212,15 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
             switch (index.column()) {
                 case DeckListModelColumns::CARD_AMOUNT:
                     return card->getNumber();
-                case DeckListModelColumns::CARD_NAME:
+                case DeckListModelColumns::CARD_NAME: {
+                    if (role == Qt::DisplayRole) {
+                        CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(card->getName());
+                        if (info) {
+                            return info->getLocalizedName(displayLang);
+                        }
+                    }
                     return card->getName();
+                }
                 case DeckListModelColumns::CARD_SET:
                     return card->getCardSetShortName();
                 case DeckListModelColumns::CARD_COLLECTOR_NUMBER:

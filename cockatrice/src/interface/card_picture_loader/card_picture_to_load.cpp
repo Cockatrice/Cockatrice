@@ -1,12 +1,22 @@
 #include "card_picture_to_load.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
 
-#include <QCoreApplication>
 #include <QDate>
+#include <QDebug>
+#include <QMap>
+#include <QMessageLogger>
 #include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QRegularExpressionMatchIterator>
+#include <QSharedPointer>
 #include <QUrl>
+#include <QtGlobal>
 #include <algorithm>
+#include <functional>
 #include <libcockatrice/card/set/card_set_comparator.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 #include <libcockatrice/settings/cards_display_settings.h>
@@ -282,8 +292,15 @@ QString CardPictureToLoad::transformUrl(const QString &urlTemplate) const
     }
 
     // language setting
-    transformMap["!sflang!"] = QString(QCoreApplication::translate(
-        "PictureLoader", "en", "code for scryfall's language property, not available for all languages"));
+    const QString cardLang = SettingsCache::instance().cardsDisplay().getCardLang();
+    transformMap["!sflang!"] = cardLang;
+
+    // The localized printing's own id is unknown, so Scryfall must resolve it by
+    // its translated name (see populateSetUrls); expose that name for the
+    // `/cards/named` template.
+    if (cardLang != "en") {
+        transformMap["!localizedName!"] = card.getInfo().getLocalizedName(cardLang);
+    }
 
     QString transformedUrl = urlTemplate;
     for (const QString &prop : transformMap.keys()) {

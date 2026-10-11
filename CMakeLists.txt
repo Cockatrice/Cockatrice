@@ -22,6 +22,8 @@ option(WITH_ORACLE "Build Cockatrice card database tool (Oracle)" ON)
 option(WITH_SERVER "Build Cockatrice server (Servatrice)" OFF)
 # Compile tests
 option(TEST "Build tests" OFF)
+# Build with AddressSanitizer and UndefinedBehaviorSanitizer
+option(ENABLE_SANITIZERS "Build with AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
 # Use vcpkg regardless of OS
 option(USE_VCPKG "Use vcpkg regardless of OS" OFF)
 
@@ -86,11 +88,11 @@ endif()
 
 # A project name is needed for CPack
 # Version can be overriden by git tags, see cmake/getversion.cmake
-project("Cockatrice" VERSION 3.1.0)
+project("Cockatrice" VERSION 3.1.1)
 
 # Set release name if not provided via env/cmake var
 if(NOT DEFINED GIT_TAG_RELEASENAME)
-  set(GIT_TAG_RELEASENAME "Graduation Day")
+  set(GIT_TAG_RELEASENAME "Reality Check")
 endif()
 
 # Use c++20 for all targets
@@ -211,6 +213,10 @@ else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe")
 endif()
 
+# Always included, because it defines cockatrice_disable_sanitizers_for() for the vendored
+# trees. It only touches the global flags when ENABLE_SANITIZERS is on.
+include(Sanitizers)
+
 # GNU systems need to define the Mersenne exponent for the RNG to compile w/o warning
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   add_definitions("-DSFMT_MEXP=19937")
@@ -293,7 +299,7 @@ if(UNIX)
     if(CPACK_GENERATOR STREQUAL "RPM")
       set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
       set(CPACK_RPM_MAIN_COMPONENT "cockatrice")
-      set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt6-qttools, qt6-qtsvg, qt6-qtmultimedia, qt6-qtimageformats")
+      set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt6-qtimageformats, qt6-qtmultimedia, qt6-qtsvg, qt6-qttools")
       set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
       set(CPACK_RPM_PACKAGE_URL "http://github.com/Cockatrice/Cockatrice")
       # stop directories from making package conflicts
@@ -311,7 +317,7 @@ if(UNIX)
       set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
       set(CPACK_DEBIAN_PACKAGE_SECTION "games")
       set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/Cockatrice/Cockatrice")
-      set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6, libqt6svg6, qt6-qpa-plugins, qt6-image-formats-plugins")
+      set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6, libqt6svg6, qt6-image-formats-plugins, qt6-qpa-plugins")
       set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "libqt6sql6-mysql") # for connecting servatrice to a mysql db
     endif()
   endif()
@@ -325,6 +331,55 @@ elseif(WIN32)
 
   # Configure file with custom definitions for NSIS.
   configure_file("${COCKATRICE_CMAKE_PATH}/NSIS.definitions.nsh.in" "${PROJECT_BINARY_DIR}/NSIS.definitions.nsh")
+
+  # Every runtime DLL a Windows install has to contain, as paths relative to the
+  # install root. .ci/compile.sh reads this and fails the build when the packaged
+  # installer is missing one of them, or carries a runtime it does not know about.
+  #
+  # All three applications are packaged into the same directory on Windows, so
+  # this is the union of their Qt module lists, not just the client's: Servatrice
+  # contributes Qt6Sql.dll and Oracle contributes nothing the client lacks, and a
+  # client-only manifest leaves Qt6Sql.dll unasserted even though servatrice.exe
+  # is installed next to cockatrice.exe and cannot start without it.
+  #
+  # A statically linked Qt module ships no runtime DLL, so requiring one would
+  # fail the package check on a static build for no reason. cockatrice/CMakeLists.txt
+  # installs the runtime of every module listed here, and skips static ones the
+  # same way, so the two can never disagree.
+  #
+  # Only the Qt modules, and that is deliberate. protobuf, Abseil, liblzma, zlib
+  # and OpenSSL also ride in on the "*.dll" glob, and a client whose runtime is
+  # absent, stale or of the wrong architecture fails to start with "abseil_dll.dll
+  # is either not designed to run on Windows or it contains an error", so they
+  # are exactly the files worth asserting.
+  #
+  # Their names cannot be derived from the vcpkg bin directory, which is what a
+  # first attempt did and what a Windows build immediately refuted: bin holds
+  # everything vcpkg installed, not everything the applications import. It also
+  # contains gmock.dll, libprotobuf-lite.dll, libprotoc.dll, legacy.dll and three
+  # pthreadVC*.dll FindThreads probes, none of which any shipped executable
+  # links, so requiring them failed a build over a package that was correct.
+  #
+  # Deriving them from the executables' own import tables is the real answer,
+  # and fixup_bundle already walks it to decide what to copy. Until that result
+  # is available to CMake, requiring the vcpkg half would mean guessing names
+  # again, which is what produced this bug report in the first place. So assert
+  # what is derived from the build's own link lists and leave the rest to the
+  # purge in cmake/NSIS.template.in, which removes every DLL regardless of name.
+  set(_required_runtime "")
+  foreach(_qt_module IN LISTS COCKATRICE_QT_MODULES SERVATRICE_QT_MODULES ORACLE_QT_MODULES)
+    get_target_property(_qt_module_type ${_qt_module} TYPE)
+    if(_qt_module_type STREQUAL "SHARED_LIBRARY")
+      string(REGEX REPLACE "^Qt6::" "" _qt_component "${_qt_module}")
+      list(APPEND _required_runtime "Qt6${_qt_component}.dll")
+    endif()
+  endforeach()
+  list(APPEND _required_runtime "Plugins/platforms/qwindows.dll")
+
+  list(REMOVE_DUPLICATES _required_runtime)
+  list(SORT _required_runtime)
+  string(REPLACE ";" "\n" _required_runtime "${_required_runtime}")
+  file(WRITE "${PROJECT_BINARY_DIR}/required-runtime.txt" "${_required_runtime}\n")
 
   # include vcredist into the package; NSIS will take care of running it
   if(VCREDISTRUNTIME_FOUND)

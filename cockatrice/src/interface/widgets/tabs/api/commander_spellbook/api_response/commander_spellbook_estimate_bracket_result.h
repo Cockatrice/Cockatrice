@@ -6,6 +6,7 @@
 
 #include <QJsonObject>
 #include <QList>
+#include <QString>
 
 struct EstimateBracketResult
 {

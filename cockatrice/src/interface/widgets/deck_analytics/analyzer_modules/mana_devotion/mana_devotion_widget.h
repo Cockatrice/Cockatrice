@@ -6,11 +6,17 @@
 
 #ifndef MANA_DEVOTION_WIDGET_H
 #define MANA_DEVOTION_WIDGET_H
-#include "../../../general/display/banner_widget.h"
 #include "../../abstract_analytics_panel_widget.h"
 #include "mana_devotion_config.h"
 
-#include <QHBoxLayout>
+#include <QJsonObject>
+#include <QList>
+#include <QString>
+#include <qtmetamacros.h>
+
+class DeckListStatisticsAnalyzer;
+class QHBoxLayout;
+class QWidget;
 
 class ManaDevotionWidget : public AbstractAnalyticsPanelWidget
 {

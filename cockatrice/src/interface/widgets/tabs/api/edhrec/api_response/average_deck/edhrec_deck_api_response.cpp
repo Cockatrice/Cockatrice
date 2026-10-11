@@ -1,10 +1,14 @@
 #include "edhrec_deck_api_response.h"
 
-#include <QApplication>
 #include <QDebug>
 #include <QJsonArray>
-#include <QJsonObject>
+#include <QJsonValue>
+#include <QJsonValueConstRef>
+#include <QString>
+#include <QTextStream>
+#include <functional>
 #include <libcockatrice/card/import/card_name_normalizer.h>
+#include <qlogging.h>
 
 void EdhrecDeckApiResponse::fromJson(const QJsonArray &json)
 {

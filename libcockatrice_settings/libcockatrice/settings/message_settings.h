@@ -9,6 +9,11 @@
 
 #include "settings_manager.h"
 
+#include <QString>
+#include <qtmetamacros.h>
+
+class QObject;
+
 class MessageSettings : public SettingsManager
 {
     Q_OBJECT

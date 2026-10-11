@@ -5,12 +5,14 @@
 #include <QList>
 #include <QSharedPointer>
 #include <QString>
-#include <libcockatrice/interfaces/interface_card_set_priority_controller.h>
 
 class CardInfo;
+class ICardSetPriorityController;
+
 using CardInfoPtr = QSharedPointer<CardInfo>;
 
 class CardSet;
+
 using CardSetPtr = QSharedPointer<CardSet>;
 
 /**

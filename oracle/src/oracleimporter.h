@@ -1,16 +1,28 @@
 #ifndef ORACLEIMPORTER_H
 #define ORACLEIMPORTER_H
 
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
 #include "raw_json_scanner.h"
 
+#include <QAtomicInt>
 #include <QByteArray>
+#include <QDate>
+#include <QHash>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QList>
 #include <QMap>
-#include <QRegularExpression>
-#include <QVariant>
+#include <QObject>
+#include <QString>
+#include <QStringList>
 #include <libcockatrice/card/card_info.h>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
 #include <utility>
+
+class CardRelation;
+class QRegularExpression;
 
 // many users prefer not to see these sets with non english arts
 // they will given priority PriorityLowest
@@ -106,7 +118,8 @@ public:
     SplitCardPart(const QString &_name,
                   const QString &_text,
                   const QHash<QString, QString> &_properties,
-                  const PrintingInfo &_printingInfo);
+                  const PrintingInfo &_printingInfo,
+                  const QString &_localizedText = QString());
     inline const QString &getName() const
     {
         return name;
@@ -114,6 +127,13 @@ public:
     inline const QString &getText() const
     {
         return text;
+    }
+    /**
+     * @brief The cardLang rules text of this face's foreignData entry, if any.
+     */
+    inline const QString &getLocalizedText() const
+    {
+        return localizedText;
     }
     inline const QHash<QString, QString> &getProperties() const
     {
@@ -127,8 +147,16 @@ public:
 private:
     QString name;
     QString text;
+    QString localizedText;
     QHash<QString, QString> properties;
     PrintingInfo printingInfo;
+};
+
+struct LocalizedCardEntry
+{
+    QString name;
+    QString text;
+    CardSet::Priority priority = CardSet::PriorityLowest;
 };
 
 class OracleImporter : public QObject
@@ -155,12 +183,69 @@ private:
      */
     QByteArray rawSetsData;
 
+    /**
+     * Whether readSetsFromByteArray() should report scan progress via
+     * dataReadProgress. The wizard streams that signal to stdout (for the
+     * hosting Cockatrice client to parse) in both interactive and background
+     * runs; the flag exists to skip the scanner instrumentation entirely when
+     * no consumer needs it.
+     */
+    bool progressReporting = true;
+
+    /**
+     * Atomic "please stop importing" flag. startImport() checks it between sets
+     * so a wizard being closed mid-import can be torn down without waiting for
+     * the whole import (or racing it).
+     */
+    QAtomicInt importCancelled;
+
+    /**
+     * The ISO-639 language code whose foreignData is imported; "en" by default.
+     */
+    QString cardLang = "en";
+
+    /**
+     * Whether cardLang is a supported language other than English, so per-card
+     * foreignData scanning can be skipped entirely when disabled.
+     */
+    bool localizationEnabled = false;
+
+    /**
+     * Localized name/text collected per imported card key while parsing sets,
+     * applied to the CardInfo objects by applyLocalizedData() once all
+     * printings have been seen so the best-priority one wins.
+     */
+    QMap<QString, LocalizedCardEntry> localizedEntries;
+
+    /**
+     * cardLang rules text collected for split-card names while parsing sets,
+     * applied by applyLocalizedData(). Kept apart from localizedEntries because
+     * MTGJSON emits each split face as its own card object with the joined name
+     * on every foreignData entry: names and the per-face text join have different
+     * completeness and must not overwrite each other under the same key.
+     */
+    QMap<QString, LocalizedCardEntry> splitLocalizedTexts;
+
     CardInfoPtr addCard(QString name,
                         const QString &text,
                         bool isToken,
                         QHash<QString, QString> properties,
                         const QList<CardRelation *> &relatedCards,
                         const PrintingInfo &printingInfo);
+
+    /**
+     * Records the first foreignData entry matching cardLang for the given card
+     * key, keeping the entry from the highest-priority set seen so far.
+     *
+     * Multi-face cards (split, adventure, aftermath, prepare) pass collectText =
+     * false: MTGJSON emits one foreignData entry per face with the same joined
+     * name but only that face's text, so the name is collected here while the
+     * per-face texts are joined during the split-card merge.
+     */
+    void collectForeignData(const QString &cardKey,
+                            const CardSetPtr &currentSet,
+                            const QJsonObject &card,
+                            bool collectText = true);
 signals:
     void setIndexChanged(int cardsImported, int setIndex, const QString &setName);
     void dataReadProgress(int bytesRead, int totalBytes);
@@ -168,11 +253,49 @@ signals:
 public:
     explicit OracleImporter(QObject *parent = nullptr);
     /**
+     * @brief Controls whether readSetsFromByteArray() instruments the raw scan.
+     *
+     * When enabled (the default) the raw scanner reports progress via
+     * dataReadProgress(), which the wizard streams to stdout (so the hosting
+     * Cockatrice client can show it) and also displays on its own progress bar.
+     * Switch it off only when nothing will consume scan progress.
+     */
+    void setProgressReporting(bool enabled)
+    {
+        progressReporting = enabled;
+    }
+    /**
+     * Selects the ISO-639 language code whose foreignData is imported.
+     * English (the default) and unsupported codes disable localization.
+     */
+    void setCardLang(const QString &lang);
+    const QString &getCardLang() const
+    {
+        return cardLang;
+    }
+    /**
      * Scans the given JSON document for set metadata. Takes the data by value so
      * the wizard can hand over its decompressed buffer without copying it.
      */
     bool readSetsFromByteArray(QByteArray data);
     int startImport();
+    /**
+     * @brief Requests an in-flight startImport() to stop at the next set boundary.
+     *
+     * Works by setting an atomic flag that startImport() polls between sets, so
+     * cancelImport() followed by a short waitForFinished() on the running future is
+     * safe the moment the wizard is about to be destroyed.
+     */
+    void cancelImport()
+    {
+        importCancelled.storeRelease(1);
+    }
+    /**
+     * Applies the collected localized names/texts to the imported cards.
+     * Called automatically at the end of startImport(); exposed separately so
+     * tests can drive it after importing sets directly.
+     */
+    void applyLocalizedData();
     bool saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion);
     int importCardsFromSet(const CardSetPtr &currentSet, const QJsonArray &cardsList);
     /**

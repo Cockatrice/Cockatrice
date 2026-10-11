@@ -5,6 +5,9 @@
 #include <QRegularExpression>
 #include <QSettings>
 #include <QString>
+#include <qtmetamacros.h>
+
+class QObject;
 
 class SettingsCache : public QSettings
 {

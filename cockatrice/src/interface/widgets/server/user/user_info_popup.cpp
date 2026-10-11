@@ -4,26 +4,61 @@
 #include "../../interface/pixel_map_generator.h"
 #include "../../interface/theme_manager.h"
 #include "../../interface/widgets/tabs/tab_supervisor.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+#include "libcockatrice/protocol/pb/session_commands.pb.h"
+#include "user_level.h"
 #include "user_list_painter.h"
 
 #include <QApplication>
+#include <QBrush>
+#include <QChar>
+#include <QFlag>
+#include <QFlags>
+#include <QFont>
+#include <QFontMetrics>
 #include <QGridLayout>
 #include <QHBoxLayout>
+#include <QImage>
 #include <QLabel>
+#include <QLayout>
+#include <QLinearGradient>
+#include <QList>
+#include <QListView>
+#include <QMap>
+#include <QMenu>
+#include <QModelIndex>
 #include <QPainter>
 #include <QPainterPath>
-#include <QPropertyAnimation>
+#include <QPen>
+#include <QPoint>
 #include <QPushButton>
-#include <QScreen>
-#include <QScrollBar>
+#include <QRect>
+#include <QRectF>
+#include <QSharedPointer>
+#include <QSize>
+#include <QSizePolicy>
 #include <QStandardItem>
+#include <QStandardItemModel>
+#include <QStringLiteral>
+#include <QStyle>
+#include <QStyleOptionViewItem>
 #include <QStyledItemDelegate>
 #include <QVBoxLayout>
+#include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
-#include <libcockatrice/protocol/pb/commands.pb.h>
 #include <libcockatrice/protocol/pb/response_get_games_of_user.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/utility/card_ref.h>
+#include <qnumeric.h>
+#include <string>
+
+class QAction;
 
 /// Qt stylesheets accept #aarrggbb, which is QColor::name(QColor::HexArgb).
 static QString colorStr(const QColor &color)
@@ -245,6 +280,9 @@ void UserInfoHeaderWidget::paintEvent(QPaintEvent *)
         if (level.testFlag(ServerInfo_User::IsAdmin)) {
             return QColor(245, 158, 11);
         }
+        if (level.testFlag(ServerInfo_User::IsDeveloper)) {
+            return QColor(185, 28, 28);
+        }
         if (level.testFlag(ServerInfo_User::IsModerator)) {
             return QColor(59, 130, 246);
         }
@@ -300,6 +338,8 @@ void UserInfoHeaderWidget::paintEvent(QPaintEvent *)
     } badge;
     if (level.testFlag(ServerInfo_User::IsAdmin)) {
         badge = {"ADMIN", QColor(245, 158, 11)};
+    } else if (level.testFlag(ServerInfo_User::IsDeveloper)) {
+        badge = {"DEV", QColor(185, 28, 28)};
     } else if (level.testFlag(ServerInfo_User::IsModerator)) {
         badge = {"MOD", QColor(59, 130, 246)};
     } else if (level.testFlag(ServerInfo_User::IsJudge)) {
@@ -629,9 +669,10 @@ void UserInfoPopup::onGamesContextMenu(const QPoint &pos)
                        "QMenu::item:selected{background:%4;}")
             .arg(colorStr(theme.bg), colorStr(theme.text), colorStr(theme.border), colorStr(theme.buttonHover)));
 
-    const bool canJoin = !game.started() && game.player_count() < game.max_players();
+    // Never grey the join action out: GameSelector::joinGame() asks whether to
+    // fall back to spectating when the game is full or already running, so a
+    // disabled entry would just read as a dead button.
     QAction *join = menu.addAction(tr("Join game"));
-    join->setEnabled(canJoin);
 
     QAction *spec = nullptr;
     if (game.spectators_allowed()) {

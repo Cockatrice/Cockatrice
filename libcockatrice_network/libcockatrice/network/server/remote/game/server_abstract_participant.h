@@ -5,8 +5,8 @@
 #include "server_arrowtarget.h"
 
 #include <QMutex>
-#include <libcockatrice/protocol/pb/card_attributes.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
+#include <qtmetamacros.h>
 
 class Server_Game;
 class Server_AbstractUserInterface;
@@ -17,7 +17,6 @@ class GameEventContainer;
 class GameEventStorage;
 class ResponseContainer;
 class GameCommand;
-
 class Command_KickFromGame;
 class Command_LeaveGame;
 class Command_GameSay;

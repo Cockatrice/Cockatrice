@@ -102,6 +102,7 @@ There are various places where useful information for different needs are mainta
 - [Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki) `Community supported`
 - [Official Webpage](https://cockatrice.github.io/)
 - [Official README](https://github.com/Cockatrice/Cockatrice/blob/master/README.md) `This file`
+- [Official CONTRIBUTING](https://github.com/Cockatrice/Cockatrice/blob/master/.github/CONTRIBUTING.md)
 
 Cockatrice tries to use the [Google Developer Documentation Style Guide](https://developers.google.com/style/) to ensure consistent documentation. We encourage you to improve the documentation by suggesting edits based on this guide.
 
@@ -158,6 +159,12 @@ The following flags (with their non-default values) can be passed to `cmake`:
 | `-DWARNING_AS_ERROR=0`     | Don't treat compilation warnings as errors in debug mode                                                                                      |
 | `-DUPDATE_TRANSLATIONS=1`  |  Configure `make` to update the translation .ts files for new strings in the source code<br> **Note:** `make clean` will remove the .ts files |
 | `-DTEST=1`                 | Enable regression tests<br> **Note:** `make test` to run tests, *googletest* will be downloaded if not available                              |
+
+> [!TIP]
+> Build code documentation ([Doxygen](https://www.doxygen.nl)) according to our [configuration](https://github.com/Cockatrice/Cockatrice/blob/master/Doxyfile) into `/docs`:
+> ```bash
+> doxygen Doxyfile
+> ```
 
 
 # Run

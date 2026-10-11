@@ -1,11 +1,17 @@
 #ifndef COCKATRICE_DECKLIST_NODE_TREE_H
 #define COCKATRICE_DECKLIST_NODE_TREE_H
 
-#include "libcockatrice/utility/card_ref.h"
 #include "tree/deck_list_card_node.h"
 #include "tree/inner_deck_list_node.h"
 
+#include <QList>
 #include <QSet>
+#include <QString>
+#include <functional>
+
+class AbstractDecklistNode;
+class QXmlStreamReader;
+class QXmlStreamWriter;
 
 class DecklistNodeTree
 {
@@ -144,9 +150,17 @@ public:
 
 private:
     // Helpers for traversing the tree
-    InnerDecklistNode *getZoneObjFromName(const QString &zoneName) const;
+    InnerDecklistNode *getZoneObjFromName(const QString &zoneName);
     InnerDecklistNode *findBoardZone(const QString &boardZoneName) const;
     InnerDecklistNode *findOrCreateBoardZone(const QString &boardZoneName);
+
+    /**
+     * @brief Recursively removes @p container when it is an empty board zone.
+     *
+     * Empty custom zones are kept while empty board zones get pruned, so a
+     * board zone disappears once its last card or custom zone goes away.
+     */
+    void pruneEmptyBoardZone(InnerDecklistNode *container);
 };
 
 #endif // COCKATRICE_DECKLIST_NODE_TREE_H

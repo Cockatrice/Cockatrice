@@ -1,25 +1,38 @@
 #include "tab_logs.h"
 
 #include "../interface/widgets/utility/custom_line_edit.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_chat_message.pb.h"
 
 #include <QCheckBox>
 #include <QDockWidget>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QLabel>
+#include <QList>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QRadioButton>
+#include <QSharedPointer>
+#include <QSizePolicy>
 #include <QSpinBox>
 #include <QTabWidget>
 #include <QTableWidget>
+#include <QTableWidgetItem>
+#include <QVBoxLayout>
+#include <QWidget>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/moderator_commands.pb.h>
 #include <libcockatrice/protocol/pb/response_viewlog_history.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <qnamespace.h>
+#include <string>
 
-TabLog::TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client) : Tab(_tabSupervisor), client(_client)
+class TabSupervisor;
+
+TabLog::TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool _canUseDeveloperCommands)
+    : Tab(_tabSupervisor), client(_client), canUseDeveloperCommands(_canUseDeveloperCommands)
 {
     roomTable = new QTableWidget();
     roomTable->setColumnCount(6);
@@ -80,7 +93,9 @@ void TabLog::getClicked()
     if (!mainRoom->isChecked() && !gameRoom->isChecked() && !privateChat->isChecked()) {
         mainRoom->setChecked(true);
         gameRoom->setChecked(true);
-        privateChat->setChecked(true);
+        if (!canUseDeveloperCommands) {
+            privateChat->setChecked(true);
+        }
     }
 
     if (maximumResults->value() == 0) {
@@ -117,7 +132,15 @@ void TabLog::getClicked()
     };
     cmd.set_date_range(dateRange);
     cmd.set_maximum_results(maximumResults->value());
-    PendingCommand *pend = client->prepareModeratorCommand(cmd);
+
+    PendingCommand *pend;
+    if (canUseDeveloperCommands) {
+        // Developers query logs through the developer command family.
+        pend = client->prepareDeveloperCommand(cmd);
+    } else {
+        pend = client->prepareModeratorCommand(cmd);
+    }
+
     connect(pend, &PendingCommand::finished, this, &TabLog::viewLogHistory_processResponse);
     client->sendCommand(pend);
 }
@@ -171,6 +194,14 @@ void TabLog::createDock()
     mainRoom = new QCheckBox(tr("Main Room"));
     gameRoom = new QCheckBox(tr("Game Room"));
     privateChat = new QCheckBox(tr("Private Chat"));
+    if (canUseDeveloperCommands) {
+        // Developers cannot query private conversations.
+        privateChat->setVisible(false);
+        // The developer family ignores the IP filter server-side, so showing
+        // the field would silently unfilter the result by it. Hide it.
+        labelFindIPAddress->setVisible(false);
+        findIPAddress->setVisible(false);
+    }
 
     pastDays = new QRadioButton(tr("Past X Days: "));
     today = new QRadioButton(tr("Today"));

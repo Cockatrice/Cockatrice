@@ -3,10 +3,13 @@
 
 #include "../first_run_wizard_page.h"
 
+#include <qtmetamacros.h>
+
 class QCheckBox;
 class QComboBox;
 class QGroupBox;
 class QLabel;
+class QWidget;
 
 /** @brief A curated subset of settings for the user to adjust.
  **/

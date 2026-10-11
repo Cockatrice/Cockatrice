@@ -1,5 +1,11 @@
 #include "card_info_comparator.h"
 
+#include "libcockatrice/card/card_info.h"
+
+#include <QMetaType>
+#include <QSharedPointer>
+#include <compare>
+
 CardInfoComparator::CardInfoComparator(const QStringList &properties, Qt::SortOrder order)
     : m_properties(properties), m_order(order)
 {

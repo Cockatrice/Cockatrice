@@ -1,6 +1,11 @@
 #ifndef COCKATRICE_GAME_FILTER_CONFIGS_H
 #define COCKATRICE_GAME_FILTER_CONFIGS_H
 
+#include <QList>
+#include <QSet>
+#include <QSharedPointer>
+#include <QString>
+#include <QStringList>
 #include <QTime>
 
 /**

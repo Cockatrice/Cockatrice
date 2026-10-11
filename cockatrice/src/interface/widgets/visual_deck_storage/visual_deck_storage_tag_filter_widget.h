@@ -6,28 +6,33 @@
 #ifndef VISUAL_DECK_STORAGE_TAG_FILTER_WIDGET_H
 #define VISUAL_DECK_STORAGE_TAG_FILTER_WIDGET_H
 
-#include <QSet>
+#include <QList>
 #include <QStringList>
 #include <QWidget>
+#include <functional>
+#include <qtmetamacros.h>
 
+class DeckPreviewTagDisplayWidget;
 class FlowWidget;
-class VisualDeckStorageWidget;
+class QString;
+template <class T> class QSet;
+
 class VisualDeckStorageTagFilterWidget : public QWidget
 {
     Q_OBJECT
 
-    VisualDeckStorageWidget *parent;
     FlowWidget *flowWidget;
-
-    [[nodiscard]] QSet<QString> gatherAllTags() const;
-    void removeTagsNotInList(const QSet<QString> &tags);
-    void addTagsIfNotPresent(const QSet<QString> &tags);
-    void addTagIfNotPresent(const QString &tag);
-    void sortTags();
+    std::function<QSet<QString>()> allTagsProvider;
+    QList<DeckPreviewTagDisplayWidget *> currentChipOrder;
 
 public:
-    explicit VisualDeckStorageTagFilterWidget(VisualDeckStorageWidget *_parent);
+    explicit VisualDeckStorageTagFilterWidget(QWidget *parent = nullptr);
     [[nodiscard]] QStringList getAllKnownTags() const;
+
+    /**
+     * @brief Sets a provider for the full set of tags to draw chips from.
+     */
+    void setAllTagsProvider(const std::function<QSet<QString>()> &provider);
 
     /**
      * @brief The tags currently in "selected" state.
@@ -39,9 +44,18 @@ public:
      */
     [[nodiscard]] QStringList excludedTags() const;
 
+signals:
+    /**
+     * Emitted when a chip's selection or exclusion state changes.
+     *
+     * The chip only emits when its state actually changed, so this fires once per
+     * effective toggle rather than on every click.
+     */
+    void filterChanged();
+
 public slots:
     /**
-     * @brief Rebuilds the tag chips from the tags of the currently visible decks.
+     * @brief Rebuilds the tag chips from the currently available tags.
      */
     void refreshTags();
     void showEvent(QShowEvent *event) override;

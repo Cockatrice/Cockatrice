@@ -1,18 +1,26 @@
 #ifndef DECKLISTMODEL_H
 #define DECKLISTMODEL_H
 
-#include "deck_list_model_custom_zones.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
+#include "libcockatrice/utility/card_ref.h"
 
 #include <../../../../libcockatrice_deck_list/libcockatrice/deck_list/tree/abstract_deck_list_card_node.h>
 #include <../../../../libcockatrice_deck_list/libcockatrice/deck_list/tree/deck_list_card_node.h>
 #include <QAbstractItemModel>
 #include <QList>
-#include <libcockatrice/card/printing/exact_card.h>
-#include <libcockatrice/deck_list/deck_list.h>
+#include <QModelIndex>
+#include <QSharedPointer>
+#include <QString>
+#include <QStringList>
+#include <functional>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
 
-class CardDatabase;
-class QPrinter;
-class QTextCursor;
+class AbstractDecklistNode;
+class DeckList;
+class ExactCard;
+class QObject;
 
 /**
  * @namespace DeckRoles
@@ -288,6 +296,16 @@ public:
     ~DeckListModel() override;
 
     /**
+     * @brief Selects the language code for localized card names in the display role.
+     *
+     * The model never reads global settings itself; callers wire this to the card
+     * language setting (including reacting to its changes) rather than the model
+     * querying it.
+     * @param lang Language code; "en" shows the canonical English names.
+     */
+    void setDisplayLanguage(const QString &lang);
+
+    /**
      * @brief Returns the root index of the model.
      * @return QModelIndex representing the root node.
      */
@@ -408,6 +426,7 @@ private:
     DeckListModelGroupCriteria::Type activeGroupCriteria = DeckListModelGroupCriteria::MAIN_TYPE;
     int lastKnownColumn;          /**< Last column used for sorting. */
     Qt::SortOrder lastKnownOrder; /**< Last known sort order. */
+    QString displayLang = "en";   /**< Language code for localized card names in the display role. */
 
     InnerDecklistNode *createNodeIfNeeded(const QString &name, InnerDecklistNode *parent);
     QModelIndex nodeToIndex(AbstractDecklistNode *node) const;

@@ -1,13 +1,34 @@
 #include "../../oracle/src/oracleimporter.h"
+#include "../../oracle/src/raw_json_scanner.h"
+#include "libcockatrice/card/card_info.h"
 
 #include "gtest/gtest.h"
+#include <QByteArray>
+#include <QChar>
+#include <QDate>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QSet>
+#include <QJsonParseError>
+#include <QJsonValue>
+#include <QJsonValueRef>
+#include <QList>
+#include <QMap>
+#include <QObject>
+#include <QPair>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QSharedPointer>
+#include <QString>
+#include <QUuid>
+#include <QVariant>
+#include <QVariantMap>
+#include <QtGlobal>
 #include <libcockatrice/card/format/format_legality_rules.h>
 #include <libcockatrice/card/set/card_set.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
+#include <string>
+#include <utility>
 
 class OracleImporterTest : public ::testing::Test
 {
@@ -68,6 +89,18 @@ protected:
         card["identifiers"] = identifiers;
 
         return card;
+    }
+
+    // Helper: build a single MTGJSON foreignData entry
+    QJsonObject makeForeignEntry(const QString &language, const QString &name, const QString &text)
+    {
+        QJsonObject entry;
+        entry["language"] = language;
+        entry["name"] = name;
+        if (!text.isEmpty()) {
+            entry["text"] = text;
+        }
+        return entry;
     }
 
     NoopCardSetPriorityController *controller;
@@ -739,6 +772,372 @@ TEST_F(OracleImporterTest, StartImportParsesSetsLazily)
     ASSERT_EQ(importedSets, 1);
     ASSERT_EQ(importer->getCardList().size(), 1);
     ASSERT_FALSE(importer->getCardList().value("Lazy Import Card").isNull());
+}
+
+// ============================================================================
+// Scan progress reporting tests
+// ============================================================================
+
+TEST(OracleScanProgress, ScanProgressReportsMonotonicBytesToTotal)
+{
+    QJsonObject setObj;
+    setObj["code"] = "tst";
+    setObj["name"] = "Test Set";
+    setObj["type"] = "expansion";
+    setObj["releaseDate"] = "2024-01-01";
+    QJsonArray cards;
+    for (int i = 0; i < 40; ++i) {
+        QJsonObject card;
+        card["name"] = QString("Card %1").arg(i);
+        card["text"] = "Some rules text used to bulk up the card payload.";
+        card["layout"] = "normal";
+        cards.append(card);
+    }
+    setObj["cards"] = cards;
+
+    QJsonObject root;
+    root["data"] = QJsonObject{{"TST", setObj}};
+
+    const QByteArray data = QJsonDocument(root).toJson(QJsonDocument::Compact);
+
+    QList<QPair<qsizetype, qsizetype>> reports;
+    RawJson::ScanError error;
+    const QList<RawJson::SetRange> ranges =
+        RawJson::scanSetRanges(data, &error, [&reports](qsizetype bytesRead, qsizetype totalBytes) {
+            reports.append({bytesRead, totalBytes});
+        });
+
+    ASSERT_FALSE(error.isError()) << error.message.toStdString();
+    ASSERT_EQ(ranges.size(), 1);
+    ASSERT_FALSE(reports.isEmpty());
+    ASSERT_GT(reports.size(), 1);
+
+    qsizetype last = 0;
+    for (const auto &[bytesRead, totalBytes] : reports) {
+        ASSERT_EQ(totalBytes, data.size());
+        ASSERT_GE(bytesRead, last) << "scan progress must be monotonic";
+        ASSERT_LE(bytesRead, totalBytes) << "scan progress must not overshoot the document size";
+        last = bytesRead;
+    }
+    ASSERT_EQ(reports.constLast().first, data.size()) << "scan must end at 100%";
+    ASSERT_LE(reports.size(), 160) << "scan reports must be throttled";
+}
+
+TEST(OracleScanProgress, ScanWithoutCallbackStillParses)
+{
+    QJsonObject setObj;
+    setObj["code"] = "tst";
+    setObj["name"] = "Test Set";
+    setObj["type"] = "expansion";
+    setObj["releaseDate"] = "2024-01-01";
+    setObj["cards"] = QJsonArray();
+
+    QJsonObject root;
+    root["data"] = QJsonObject{{"TST", setObj}};
+
+    const QByteArray data = QJsonDocument(root).toJson(QJsonDocument::Compact);
+
+    RawJson::ScanError error;
+    const QList<RawJson::SetRange> ranges = RawJson::scanSetRanges(data, &error);
+
+    ASSERT_FALSE(error.isError()) << error.message.toStdString();
+    ASSERT_EQ(ranges.size(), 1);
+    ASSERT_EQ(ranges.first().code, "tst");
+}
+
+TEST_F(OracleImporterTest, ReadSetsFromByteArrayEmitsScanProgress)
+{
+    QJsonObject setObj;
+    setObj["code"] = "tst";
+    setObj["name"] = "Test Set";
+    setObj["type"] = "expansion";
+    setObj["releaseDate"] = "2024-01-01";
+    QJsonArray cards;
+    for (int i = 0; i < 40; ++i) {
+        QJsonObject card;
+        card["name"] = QString("Card %1").arg(i);
+        cards.append(card);
+    }
+    setObj["cards"] = cards;
+
+    QJsonObject root;
+    root["data"] = QJsonObject{{"TST", setObj}};
+
+    const QByteArray data = QJsonDocument(root).toJson(QJsonDocument::Compact);
+
+    QList<QPair<qsizetype, qsizetype>> emissions;
+    QObject::connect(importer, &OracleImporter::dataReadProgress,
+                     [&emissions](int bytesRead, int totalBytes) { emissions.append({bytesRead, totalBytes}); });
+
+    ASSERT_TRUE(importer->readSetsFromByteArray(data));
+    ASSERT_FALSE(emissions.isEmpty());
+    for (const auto &[bytesRead, totalBytes] : emissions) {
+        ASSERT_EQ(totalBytes, data.size());
+        ASSERT_GE(bytesRead, 0);
+        ASSERT_LE(bytesRead, totalBytes);
+    }
+    ASSERT_EQ(emissions.constLast().first, data.size());
+}
+
+TEST_F(OracleImporterTest, DisablingProgressReportingSuppressesScanEmissions)
+{
+    QJsonObject setObj;
+    setObj["code"] = "tst";
+    setObj["name"] = "Test Set";
+    setObj["type"] = "expansion";
+    setObj["releaseDate"] = "2024-01-01";
+    setObj["cards"] = QJsonArray();
+    QJsonObject root;
+    root["data"] = QJsonObject{{"TST", setObj}};
+    const QByteArray data = QJsonDocument(root).toJson(QJsonDocument::Compact);
+
+    int emissions = 0;
+    QObject::connect(importer, &OracleImporter::dataReadProgress, [&emissions](int, int) { ++emissions; });
+
+    importer->setProgressReporting(false);
+    ASSERT_TRUE(importer->readSetsFromByteArray(data));
+    ASSERT_EQ(emissions, 0);
+
+    importer->setProgressReporting(true);
+    ASSERT_TRUE(importer->readSetsFromByteArray(data));
+    ASSERT_GT(emissions, 0);
+}
+
+// Localized card text tests
+// ============================================================================
+
+TEST_F(OracleImporterTest, ImportsLocalizedTextForRequestedLanguage)
+{
+    QJsonObject card = makeCard("Lightning Bolt");
+    card["foreignData"] =
+        QJsonArray{makeForeignEntry("German", "Blitzschlag", "Blitzschlag fügt 3 Schadenspunkte zu.")};
+    QJsonArray cards{card};
+
+    importer->setCardLang("de");
+    importer->importCardsFromSet(set, cards);
+    importer->applyLocalizedData();
+
+    auto result = importer->getCardList().value("Lightning Bolt");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_EQ(result->getLocalizedName("de"), "Blitzschlag");
+    ASSERT_EQ(result->getLocalizedText("de"), "Blitzschlag fügt 3 Schadenspunkte zu.");
+    // English identity untouched
+    ASSERT_EQ(result->getName(), "Lightning Bolt");
+    ASSERT_EQ(result->getText(), "Rules text.");
+}
+
+TEST_F(OracleImporterTest, ImportsLocalizedNameAndTextForMultiFaceCards)
+{
+    // MTGJSON reports multi-face cards (adventure/split/aftermath/prepare) as one
+    // card object per face; every face carries the joined name but only its own
+    // face's rules text in foreignData. The importer joins the per-face texts with
+    // the same separator as the English merge.
+    QJsonObject front = makeCard("Disruptive Stormbrood // Petty Revenge");
+    front["layout"] = "adventure";
+    front["faceName"] = "Disruptive Stormbrood";
+    front["side"] = "a";
+    front["foreignData"] = QJsonArray{
+        makeForeignEntry("German", "Disruptive Stormbrood // Kleinliche Rache",
+                         "Fliegend\nWenn diese Kreatur ins Spiel kommt, zerstöre bis zu ein Artefakt oder eine "
+                         "Verzauberung deiner Wahl.")};
+    QJsonObject back = makeCard("Disruptive Stormbrood // Petty Revenge");
+    back["layout"] = "adventure";
+    back["faceName"] = "Petty Revenge";
+    back["side"] = "b";
+    back["text"] = "Destroy target creature.";
+    back["foreignData"] = QJsonArray{makeForeignEntry("German", "Disruptive Stormbrood // Kleinliche Rache",
+                                                      "Zerstöre eine Kreatur deiner Wahl mit Stärke 3 oder weniger.")};
+    QJsonArray cards{front, back};
+
+    importer->setCardLang("de");
+    importer->importCardsFromSet(set, cards);
+    importer->applyLocalizedData();
+
+    auto result = importer->getCardList().value("Disruptive Stormbrood // Petty Revenge");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_EQ(result->getLocalizedName("de"), "Disruptive Stormbrood // Kleinliche Rache");
+    ASSERT_EQ(result->getLocalizedText("de"),
+              "Fliegend\nWenn diese Kreatur ins Spiel kommt, zerstöre bis zu ein Artefakt oder eine Verzauberung "
+              "deiner Wahl.\n\n---\n\nZerstöre eine Kreatur deiner Wahl mit Stärke 3 oder weniger.");
+    // English identity untouched
+    ASSERT_EQ(result->getName(), "Disruptive Stormbrood // Petty Revenge");
+    ASSERT_EQ(result->getText(), "Rules text.\n\n---\n\nDestroy target creature.");
+}
+
+TEST_F(OracleImporterTest, MultiFaceCardsWithoutCompleteForeignTextKeepEnglishText)
+{
+    // Both faces must carry a foreignData text for the joined text; otherwise the
+    // rules text stays English while the localized name (from a later complete
+    // printing) is still applied.
+    QJsonObject front = makeCard("Wear // Tear");
+    front["layout"] = "split";
+    front["faceName"] = "Wear";
+    front["side"] = "a";
+    front["foreignData"] = QJsonArray{makeForeignEntry("German", "Verschleiß // Zerrreißung", "Verschleiß-Text.")};
+    QJsonObject back = makeCard("Wear // Tear");
+    back["layout"] = "split";
+    back["faceName"] = "Tear";
+    back["side"] = "b";
+    back["text"] = "Tear rules text.";
+    back["foreignData"] = QJsonArray{makeForeignEntry("German", "Verschleiß // Zerrreißung", "")};
+    QJsonArray cards{front, back};
+
+    importer->setCardLang("de");
+    importer->importCardsFromSet(set, cards);
+    importer->applyLocalizedData();
+
+    auto result = importer->getCardList().value("Wear // Tear");
+    ASSERT_FALSE(result.isNull());
+    // The joined name is still applied.
+    ASSERT_EQ(result->getLocalizedName("de"), "Verschleiß // Zerrreißung");
+    // The incomplete text must not become the card's localized text.
+    ASSERT_TRUE(result->getLocalizedTexts().isEmpty());
+    ASSERT_EQ(result->getText(), "Rules text.\n\n---\n\nTear rules text.");
+}
+
+TEST_F(OracleImporterTest, DefaultLanguageSkipsForeignData)
+{
+    QJsonObject card = makeCard("Lightning Bolt");
+    card["foreignData"] =
+        QJsonArray{makeForeignEntry("German", "Blitzschlag", "Blitzschlag fügt 3 Schadenspunkte zu.")};
+    QJsonArray cards{card};
+
+    // cardLang defaults to "en" — foreignData must never be imported
+    importer->importCardsFromSet(set, cards);
+    importer->applyLocalizedData();
+
+    auto result = importer->getCardList().value("Lightning Bolt");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_TRUE(result->getLocalizedNames().isEmpty());
+    ASSERT_TRUE(result->getLocalizedTexts().isEmpty());
+}
+
+TEST_F(OracleImporterTest, UnsupportedLanguageSkipsForeignData)
+{
+    QJsonObject card = makeCard("Lightning Bolt");
+    card["foreignData"] = QJsonArray{makeForeignEntry("xx", "Kochanie", "Grzmot uderza.")};
+    QJsonArray cards{card};
+
+    importer->setCardLang("xx");
+    importer->importCardsFromSet(set, cards);
+    importer->applyLocalizedData();
+
+    auto result = importer->getCardList().value("Lightning Bolt");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_TRUE(result->getLocalizedNames().isEmpty());
+}
+
+TEST_F(OracleImporterTest, NonMatchingLanguageNotCollected)
+{
+    QJsonObject card = makeCard("Lightning Bolt");
+    card["foreignData"] = QJsonArray{makeForeignEntry("French", "Éclair", "L'Éclair inflige 3 blessures.")};
+    QJsonArray cards{card};
+
+    importer->setCardLang("de");
+    importer->importCardsFromSet(set, cards);
+    importer->applyLocalizedData();
+
+    auto result = importer->getCardList().value("Lightning Bolt");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_TRUE(result->getLocalizedNames().isEmpty());
+}
+
+TEST_F(OracleImporterTest, HigherPrioritySetWinsForReprint)
+{
+    // First printing in a reprint set, then another in a (more authoritative)
+    // core set: the core set's German text must win even though it was seen later.
+    QJsonObject reprintCard = makeCard("Lightning Bolt");
+    reprintCard["foreignData"] = QJsonArray{makeForeignEntry("German", "Blitzschlag", "Älterer deutscher Text.")};
+    CardSetPtr reprintSet =
+        CardSet::newInstance(controller, "TS2", "Second Set", QString(), QDate(), CardSet::PriorityReprint);
+    importer->setCardLang("de");
+    importer->importCardsFromSet(reprintSet, QJsonArray{reprintCard});
+
+    QJsonObject primaryCard = makeCard("Lightning Bolt");
+    primaryCard["foreignData"] =
+        QJsonArray{makeForeignEntry("German", "Blitzschlag", "Blitzschlag fügt 3 Schadenspunkte zu.")};
+    CardSetPtr primarySet =
+        CardSet::newInstance(controller, "TS3", "Third Set", QString(), QDate(), CardSet::PriorityPrimary);
+    importer->importCardsFromSet(primarySet, QJsonArray{primaryCard});
+    importer->applyLocalizedData();
+
+    auto result = importer->getCardList().value("Lightning Bolt");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_EQ(result->getLocalizedName("de"), "Blitzschlag");
+    ASSERT_EQ(result->getLocalizedText("de"), "Blitzschlag fügt 3 Schadenspunkte zu.");
+    ASSERT_EQ(importer->getCardList().size(), 1);
+}
+
+TEST_F(OracleImporterTest, HigherPrioritySplitSetWinsForReprint)
+{
+    // Split cards print each face as its own card object; the joined text is
+    // collected per set with the same priority policy as single-face cards, so a
+    // reprint set's German text must yield to the core set's even when reprints
+    // are imported first.
+    QJsonObject reprintFront = makeCard("Wear // Tear");
+    reprintFront["layout"] = "split";
+    reprintFront["faceName"] = "Wear";
+    reprintFront["side"] = "a";
+    reprintFront["foreignData"] =
+        QJsonArray{makeForeignEntry("German", "Verschleiß // Zerrreißung", "Wear alter Text.")};
+    QJsonObject reprintBack = makeCard("Wear // Tear");
+    reprintBack["layout"] = "split";
+    reprintBack["faceName"] = "Tear";
+    reprintBack["side"] = "b";
+    reprintBack["foreignData"] =
+        QJsonArray{makeForeignEntry("German", "Verschleiß // Zerrreißung", "Tear alter Text.")};
+    CardSetPtr reprintSet =
+        CardSet::newInstance(controller, "TS2", "Second Set", QString(), QDate(), CardSet::PriorityReprint);
+    importer->setCardLang("de");
+    importer->importCardsFromSet(reprintSet, QJsonArray{reprintFront, reprintBack});
+
+    QJsonObject primaryFront = makeCard("Wear // Tear");
+    primaryFront["layout"] = "split";
+    primaryFront["faceName"] = "Wear";
+    primaryFront["side"] = "a";
+    primaryFront["foreignData"] =
+        QJsonArray{makeForeignEntry("German", "Verschleiß // Zerrreißung", "Wear neuer Text.")};
+    QJsonObject primaryBack = makeCard("Wear // Tear");
+    primaryBack["layout"] = "split";
+    primaryBack["faceName"] = "Tear";
+    primaryBack["side"] = "b";
+    primaryBack["foreignData"] =
+        QJsonArray{makeForeignEntry("German", "Verschleiß // Zerrreißung", "Tear neuer Text.")};
+    CardSetPtr primarySet =
+        CardSet::newInstance(controller, "TS3", "Third Set", QString(), QDate(), CardSet::PriorityPrimary);
+    importer->importCardsFromSet(primarySet, QJsonArray{primaryFront, primaryBack});
+    importer->applyLocalizedData();
+
+    auto result = importer->getCardList().value("Wear // Tear");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_EQ(result->getLocalizedName("de"), "Verschleiß // Zerrreißung");
+    ASSERT_EQ(result->getLocalizedText("de"), "Wear neuer Text.\n\n---\n\nTear neuer Text.");
+    ASSERT_EQ(importer->getCardList().size(), 1);
+}
+
+TEST_F(OracleImporterTest, StartImportAppliesLocalizedData)
+{
+    QJsonObject card = makeCard("Lightning Bolt");
+    card["foreignData"] =
+        QJsonArray{makeForeignEntry("Portuguese (Brazil)", "Raio", "Raio causa 3 de dano a qualquer alvo.")};
+    QJsonObject dataSet;
+    dataSet["code"] = "tst";
+    dataSet["name"] = "Test Set";
+    dataSet["type"] = "expansion";
+    dataSet["releaseDate"] = "2024-01-01";
+    dataSet["cards"] = QJsonArray{card};
+
+    QJsonObject root;
+    root["data"] = QJsonObject{{"TST", dataSet}};
+
+    importer->setCardLang("pt");
+    ASSERT_TRUE(importer->readSetsFromByteArray(QJsonDocument(root).toJson(QJsonDocument::Compact)));
+    ASSERT_EQ(importer->startImport(), 1);
+
+    auto result = importer->getCardList().value("Lightning Bolt");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_EQ(result->getLocalizedName("pt"), "Raio");
+    ASSERT_EQ(result->getLocalizedText("pt"), "Raio causa 3 de dano a qualquer alvo.");
 }
 
 int main(int argc, char **argv)
