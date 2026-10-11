@@ -1,5 +1,12 @@
 #include "visual_deck_storage_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QList>
+#include <QVariant>
+
+class QObject;
+
 namespace
 {
 QStringList defaultTags = {

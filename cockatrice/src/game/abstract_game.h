@@ -7,15 +7,18 @@
 #ifndef COCKATRICE_ABSTRACT_GAME_H
 #define COCKATRICE_ABSTRACT_GAME_H
 
-#include "game_event_handler.h"
-#include "game_meta_info.h"
-#include "game_state.h"
-#include "player/player_manager.h"
-
 #include <QObject>
-#include <libcockatrice/protocol/pb/game_replay.pb.h>
+#include <QString>
+#include <qtmetamacros.h>
 
 class CardItem;
+class AbstractClient;
+class GameEventHandler;
+class GameMetaInfo;
+class GameReplay;
+class GameState;
+class PlayerManager;
+
 class AbstractGame : public QObject
 {
     Q_OBJECT

@@ -1,19 +1,31 @@
 #include "tab_admin.h"
 
+#include "libcockatrice/protocol/pb/response.pb.h"
+
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QGroupBox>
+#include <QIntValidator>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QSpinBox>
+#include <QVBoxLayout>
+#include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/admin_commands.pb.h>
 #include <libcockatrice/protocol/pb/event_replay_added.pb.h>
 #include <libcockatrice/protocol/pb/moderator_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <limits.h>
+#include <string>
+
+class CommandContainer;
+class QVariant;
+class TabSupervisor;
 
 ShutdownDialog::ShutdownDialog(QWidget *parent) : QDialog(parent)
 {

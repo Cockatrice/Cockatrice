@@ -7,9 +7,13 @@
 #ifndef COLOR_IDENTITY_WIDGET_H
 #define COLOR_IDENTITY_WIDGET_H
 
-#include <QHBoxLayout>
+#include <QString>
+#include <QStringList>
 #include <QWidget>
 #include <libcockatrice/card/card_info.h>
+#include <qtmetamacros.h>
+
+class QHBoxLayout;
 
 class ColorIdentityWidget : public QWidget
 {

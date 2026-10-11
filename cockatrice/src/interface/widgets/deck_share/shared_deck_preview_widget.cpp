@@ -2,14 +2,20 @@
 
 #include "../cards/additional_info/color_identity_widget.h"
 #include "../cards/deck_preview_card_picture_widget.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/utility/card_ref.h"
 
 #include <QCheckBox>
+#include <QColor>
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QLabel>
+#include <QRect>
+#include <QStringLiteral>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_querier.h>
+#include <qnamespace.h>
 
 SharedDeckPreviewWidget::SharedDeckPreviewWidget(QWidget *parent,
                                                  const CardDatabaseQuerier *querier,

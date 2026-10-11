@@ -1,17 +1,28 @@
 #ifndef ORACLEIMPORTER_H
 #define ORACLEIMPORTER_H
 
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
 #include "raw_json_scanner.h"
 
 #include <QAtomicInt>
 #include <QByteArray>
+#include <QDate>
+#include <QHash>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QList>
 #include <QMap>
-#include <QRegularExpression>
-#include <QVariant>
+#include <QObject>
+#include <QString>
+#include <QStringList>
 #include <libcockatrice/card/card_info.h>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
 #include <utility>
+
+class CardRelation;
+class QRegularExpression;
 
 // many users prefer not to see these sets with non english arts
 // they will given priority PriorityLowest
@@ -174,9 +185,10 @@ private:
 
     /**
      * Whether readSetsFromByteArray() should report scan progress via
-     * dataReadProgress. A background run routes that signal to stdout (for the
-     * hosting Cockatrice client to parse); the flag exists to skip the scanner
-     * instrumentation entirely when no consumer needs it.
+     * dataReadProgress. The wizard streams that signal to stdout (for the
+     * hosting Cockatrice client to parse) in both interactive and background
+     * runs; the flag exists to skip the scanner instrumentation entirely when
+     * no consumer needs it.
      */
     bool progressReporting = true;
 
@@ -244,9 +256,9 @@ public:
      * @brief Controls whether readSetsFromByteArray() instruments the raw scan.
      *
      * When enabled (the default) the raw scanner reports progress via
-     * dataReadProgress(), which an interactive wizard shows on its progress bar
-     * and a background run routes to stdout for the hosting client. Switch it
-     * off only when nothing will consume scan progress.
+     * dataReadProgress(), which the wizard streams to stdout (so the hosting
+     * Cockatrice client can show it) and also displays on its own progress bar.
+     * Switch it off only when nothing will consume scan progress.
      */
     void setProgressReporting(bool enabled)
     {

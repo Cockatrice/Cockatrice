@@ -2,25 +2,50 @@
 
 #include "../client/settings/cache_settings.h"
 #include "../game/abstract_game.h"
+#include "../game/arrow_registry.h"
+#include "../game/board/arrow_data.h"
 #include "../game/player/player_actions.h"
+#include "../game/player/player_event_handler.h"
+#include "../game/player/player_info.h"
 #include "../game/player/player_logic.h"
-#include "../game_graphics/player/player_graphics_item.h"
+#include "../game/zones/card_zone_logic.h"
+#include "../game/zones/view_zone_logic.h"
+#include "animated_item.h"
+#include "board/abstract_card_item.h"
+#include "board/arrow_item.h"
 #include "board/card_item.h"
 #include "phases_toolbar.h"
 #include "player/menu/player_menu.h"
 #include "player/player_graphics_item.h"
+#include "player/player_target.h"
+#include "zones/card_zone.h"
 #include "zones/select_zone.h"
 #include "zones/view_zone.h"
 #include "zones/view_zone_widget.h"
 
 #include <QBasicTimer>
 #include <QDebug>
+#include <QEvent>
+#include <QGraphicsItem>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
+#include <QListIterator>
+#include <QMenu>
+#include <QMessageLogger>
+#include <QMutableHashIterator>
+#include <QObject>
+#include <QPoint>
+#include <QRectF>
+#include <QSet>
+#include <QSharedPointer>
 #include <QtMath>
+#include <algorithm>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <numeric>
+#include <qnamespace.h>
+
+class ArrowTarget;
 
 /**
  * @brief Constructs the GameScene.

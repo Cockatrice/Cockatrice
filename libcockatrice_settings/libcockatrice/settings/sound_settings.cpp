@@ -1,5 +1,11 @@
 #include "sound_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QVariant>
+
+class QObject;
+
 SoundSettings::SoundSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "sound.ini", "sound", QString(), parent)
 {

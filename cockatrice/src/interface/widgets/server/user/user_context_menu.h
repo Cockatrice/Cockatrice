@@ -11,19 +11,22 @@
 
 #include <QList>
 #include <QObject>
+#include <QString>
 #include <functional>
 #include <libcockatrice/network/server/remote/user_level.h>
+#include <qtmetamacros.h>
+#include <utility>
+
 class AbstractGame;
 class UserListProxy;
 class AbstractClient;
 class ChatView;
 class CommandContainer;
 class QAction;
-class QMenu;
 class QPoint;
 class Response;
-class ServerInfo_User;
 class TabSupervisor;
+class QWidget;
 
 class UserContextMenu : public QObject
 {

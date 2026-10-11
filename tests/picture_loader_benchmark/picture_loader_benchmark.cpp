@@ -25,22 +25,34 @@
 #include "client/settings/cache_settings.h"
 #include "interface/card_picture_loader/card_picture_loader_worker.h"
 #include "interface/card_picture_loader/card_picture_to_load.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_loader.h"
 
+#include <QByteArrayView>
 #include <QCoreApplication>
 #include <QDir>
 #include <QElapsedTimer>
 #include <QEventLoop>
 #include <QFile>
+#include <QFlags>
 #include <QImage>
+#include <QLatin1String>
 #include <QList>
 #include <QMessageLogContext>
 #include <QMetaType>
 #include <QMutex>
+#include <QMutexLocker>
+#include <QObject>
+#include <QSharedPointer>
+#include <QString>
+#include <QStringList>
+#include <QStringLiteral>
 #include <QTemporaryDir>
 #include <QThread>
 #include <QTimer>
 #include <QUrl>
-#include <QtLogging>
+#include <QtGlobal>
+#include <QtMessageHandler>
 #include <atomic>
 #include <cstdio>
 #include <libcockatrice/card/database/card_database.h>
@@ -51,6 +63,8 @@
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 #include <libcockatrice/settings/download_settings.h>
 #include <optional>
+#include <qsystemdetection.h>
+#include <utility>
 
 class BenchmarkCardDatabasePathProvider : public ICardDatabasePathProvider
 {

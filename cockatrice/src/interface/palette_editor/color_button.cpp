@@ -1,7 +1,19 @@
 #include "color_button.h"
 
+#include <QBrush>
 #include <QColorDialog>
+#include <QFont>
+#include <QIcon>
 #include <QPainter>
+#include <QPalette>
+#include <QPen>
+#include <QPixmap>
+#include <QRectF>
+#include <QSize>
+#include <QString>
+#include <qnamespace.h>
+
+class QWidget;
 
 ColorButton::ColorButton(QWidget *parent) : QToolButton(parent)
 {

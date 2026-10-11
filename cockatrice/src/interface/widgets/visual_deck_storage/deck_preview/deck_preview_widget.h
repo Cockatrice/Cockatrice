@@ -6,17 +6,18 @@
 #ifndef DECK_PREVIEW_WIDGET_H
 #define DECK_PREVIEW_WIDGET_H
 
-#include "../../cards/deck_preview_card_picture_widget.h"
-#include "../visual_deck_storage_model.h"
-
 #include <QAbstractItemView>
+#include <QAbstractScrollArea>
 #include <QApplication>
 #include <QComboBox>
 #include <QEvent>
-#include <QVBoxLayout>
+#include <QList>
+#include <QObject>
+#include <QString>
+#include <QStringList>
 #include <QWidget>
+#include <qtmetamacros.h>
 
-class QEnterEvent;
 class QFrame;
 class QLabel;
 class QMenu;
@@ -26,6 +27,8 @@ class DeckPreviewCardPictureWidget;
 class DeckPreviewDeckTagsDisplayWidget;
 class VisualDeckStorageModel;
 class VisualDeckStorageWidget;
+class QVBoxLayout;
+struct LoadedDeck;
 
 class DeckPreviewWidget final : public QWidget
 {

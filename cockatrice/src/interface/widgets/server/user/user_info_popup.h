@@ -1,24 +1,29 @@
 #ifndef COCKATRICE_USER_INFO_POPUP_H
 #define COCKATRICE_USER_INFO_POPUP_H
 
-#include "../../interface/widgets/server/game_type_map.h"
 #include "user_list_painter.h"
 
+#include <QColor>
 #include <QFrame>
-#include <QListView>
-#include <QMap>
+#include <QPalette>
 #include <QPixmap>
-#include <QStandardItemModel>
+#include <QString>
+#include <QWidget>
 #include <functional>
-#include <libcockatrice/network/server/remote/user_level.h>
-#include <libcockatrice/protocol/pb/response.pb.h>
-#include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
+#include <utility>
 
 class AbstractClient;
 class QLabel;
 class QPushButton;
 class TabSupervisor;
+class QListView;
+class QPoint;
+class QStandardItemModel;
+class Response;
+template <class Key, class T> class QMap;
 
 // ── Roles ─────────────────────────────────────────────────────────────────────
 

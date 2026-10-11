@@ -3,19 +3,42 @@
 #include "../../client/settings/cache_settings.h"
 #include "../../interface/card_localization.h"
 #include "../../interface/card_picture_loader/card_picture_loader.h"
+#include "../card_dimensions.h"
 #include "../game_scene.h"
 #include "../z_values.h"
+#include "abstract_graphics_item.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/utility/card_ref.h"
 
+#include <QBrush>
+#include <QChar>
 #include <QCursor>
+#include <QFlags>
+#include <QFont>
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
+#include <QHash>
+#include <QLineF>
+#include <QList>
 #include <QPainter>
+#include <QPainterPath>
+#include <QPen>
+#include <QPixmap>
+#include <QPointF>
+#include <QRectF>
+#include <QTransform>
+#include <QVariant>
+#include <QtGlobal>
 #include <algorithm>
-#include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/debug_settings.h>
+#include <qnamespace.h>
+
+class QSizeF;
 
 AbstractCardItem::AbstractCardItem(QGraphicsItem *parent, const CardRef &cardRef, PlayerLogic *_owner, int _id)
     : ArrowTarget(_owner, parent), id(_id), cardRef(cardRef), tapped(false), facedown(false), tapAngle(0),

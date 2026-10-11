@@ -1,5 +1,11 @@
 #include "archidekt_api_response_card_entry.h"
 
+#include <QDebug>
+#include <QJsonArray>
+#include <QJsonValue>
+#include <QJsonValueRef>
+#include <qlogging.h>
+
 void ArchidektApiResponseCardEntry::fromJson(const QJsonObject &json)
 {
     id = json.value("id").toInt();

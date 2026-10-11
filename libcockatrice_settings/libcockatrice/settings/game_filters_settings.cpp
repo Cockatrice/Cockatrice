@@ -1,7 +1,15 @@
 #include "game_filters_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QByteArray>
 #include <QCryptographicHash>
+#include <QList>
+#include <QSharedPointer>
 #include <QTime>
+#include <QVariant>
+
+class QObject;
 
 GameFiltersSettings::GameFiltersSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "gamefilters.ini", "filter_games", QString(), parent)

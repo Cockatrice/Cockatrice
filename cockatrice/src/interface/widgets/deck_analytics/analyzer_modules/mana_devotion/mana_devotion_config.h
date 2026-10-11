@@ -1,8 +1,9 @@
 #ifndef COCKATRICE_MANA_DEVOTION_CONFIG_H
 #define COCKATRICE_MANA_DEVOTION_CONFIG_H
 
-#include <QJsonArray>
 #include <QJsonObject>
+#include <QList>
+#include <QString>
 #include <QStringList>
 
 struct ManaDevotionConfig

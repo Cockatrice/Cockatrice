@@ -1,9 +1,13 @@
 #ifndef CARD_DATABASE_SETUP_PAGE_H
 #define CARD_DATABASE_SETUP_PAGE_H
 
+#include "../../../card_database_update/card_update_progress.h"
 #include "../first_run_wizard_page.h"
 
 #include <QSize>
+#include <QString>
+#include <QtGlobal>
+#include <qtmetamacros.h>
 
 class QComboBox;
 class QLabel;
@@ -30,7 +34,7 @@ public:
     void retranslateUi() override;
 
     void onUpdateFinished(bool success);
-    void onUpdateProgress(const QString &stage, qint64 done, qint64 total);
+    void onUpdateProgress(const CardUpdateProgress &progress);
 
 signals:
     void updateRequested();

@@ -5,6 +5,10 @@
 #include <QFormLayout>
 #include <QLabel>
 #include <QSpinBox>
+#include <QString>
+#include <QVariant>
+
+class QWidget;
 
 DrawProbabilityConfigDialog::DrawProbabilityConfigDialog(QWidget *parent) : QDialog(parent)
 {

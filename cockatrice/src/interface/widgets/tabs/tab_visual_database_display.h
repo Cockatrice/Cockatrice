@@ -8,7 +8,13 @@
 #define TAB_VISUAL_DATABASE_DISPLAY_H
 
 #include "../interface/widgets/visual_database_display/visual_database_display_widget.h"
+#include "libcockatrice/card/card_info.h"
 #include "tab.h"
+
+#include <QString>
+#include <qtmetamacros.h>
+
+class TabSupervisor;
 
 class TabVisualDatabaseDisplay : public Tab
 {

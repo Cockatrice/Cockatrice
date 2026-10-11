@@ -2,6 +2,7 @@
 
 #include "../cards/card_info_picture_widget.h"
 #include "../cards/card_size_widget.h"
+#include "../cards/deck_preview_card_picture_widget.h"
 #include "../general/display/banner_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "deck_preview/deck_preview_widget.h"
@@ -10,10 +11,20 @@
 #include "visual_deck_storage_sort_filter_proxy_model.h"
 #include "visual_deck_storage_widget.h"
 
+#include <QAbstractItemModel>
+#include <QChar>
+#include <QDebug>
 #include <QElapsedTimer>
+#include <QMetaObject>
+#include <QMetaType>
+#include <QModelIndex>
+#include <QPersistentModelIndex>
 #include <QSet>
+#include <QSharedPointer>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <QVariant>
+#include <qnamespace.h>
 
 VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
     QWidget *parent,

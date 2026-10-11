@@ -1,5 +1,6 @@
 #include "palette_editor_dialog.h"
 
+#include "../theme_config.h"
 #include "../theme_manager.h"
 #include "palette_generator.h"
 #include "palette_grid_widget.h"
@@ -9,12 +10,22 @@
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <QDir>
+#include <QEvent>
 #include <QFile>
 #include <QFrame>
+#include <QHBoxLayout>
 #include <QLabel>
+#include <QList>
 #include <QMessageBox>
+#include <QPalette>
 #include <QPushButton>
+#include <QSharedPointer>
+#include <QStringList>
 #include <QTimer>
+#include <QVBoxLayout>
+#include <QWidget>
+#include <initializer_list>
+#include <qnamespace.h>
 
 PaletteEditorDialog::PaletteEditorDialog(const QString &_themeDirPath, const QString &_themeName, QWidget *parent)
     : QDialog(parent), themeDirPath(_themeDirPath), themeName(_themeName)

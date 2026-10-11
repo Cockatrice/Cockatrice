@@ -7,10 +7,17 @@
 #ifndef CARDDATABASEMODEL_H
 #define CARDDATABASEMODEL_H
 
+#include "libcockatrice/card/card_info.h"
+
 #include <QAbstractListModel>
 #include <QList>
+#include <QModelIndex>
 #include <QSet>
-#include <libcockatrice/card/database/card_database.h>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
+
+class CardDatabase;
+class QObject;
 
 class CardDatabaseModel : public QAbstractListModel
 {

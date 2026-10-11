@@ -1,12 +1,19 @@
 #include "deck_preview_tag_addition_widget.h"
 
-#include "../../../../client/settings/cache_settings.h"
-#include "../../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
-
+#include <QBrush>
+#include <QColor>
+#include <QFlags>
+#include <QFont>
 #include <QFontMetrics>
 #include <QHBoxLayout>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPen>
+#include <QRect>
+#include <QSize>
+#include <QSizePolicy>
+#include <algorithm>
+#include <qnamespace.h>
 #include <utility>
 
 DeckPreviewTagAdditionWidget::DeckPreviewTagAdditionWidget(QWidget *_parent, QString _tagName)

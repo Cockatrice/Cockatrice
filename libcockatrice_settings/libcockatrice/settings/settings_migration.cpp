@@ -1,15 +1,25 @@
 #include "settings_migration.h"
 
+#include <QChar>
 #include <QDateTime>
+#include <QDebug>
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
 #include <QFileInfo>
+#include <QFileInfoList>
+#include <QFlags>
+#include <QList>
 #include <QLoggingCategory>
 #include <QMap>
+#include <QMessageLogger>
 #include <QSettings>
+#include <QSharedPointer>
 #include <QStringList>
+#include <QStringLiteral>
+#include <QVariant>
 #include <algorithm>
+#include <utility>
 
 inline Q_LOGGING_CATEGORY(SettingsMigrationLog, "settings_migration");
 
@@ -249,7 +259,6 @@ static void migrateCardsDisplaySettings(const QString &settingsPath, QSettings &
         {"cards/roundcardcorners", "cards/roundCardCorners"},
         {"cards/overrideallcardartwithpersonalpreference", "cards/overrideAllCardArtWithPersonalPreference"},
         {"cards/bumpsetswithcardsindecktotop", "cards/bumpSetsWithCardsInDeckToTop"},
-        {"cards/includerebalancedcards", "cards/includerebalancedcards"},
         {"cards/tapanimation", "cards/tapAnimation"},
         {"cards/autorotatesidewayslayoutcards", "cards/autoRotateSidewaysLayoutCards"},
         {"cards/scaleCards", "cards/scaleCards"},
@@ -561,9 +570,15 @@ static void migrateLegacySets(const QString &settingsPath)
     QSettings cardDbIni(settingsPath + "cardDatabase.ini", QSettings::IniFormat);
     for (const auto &shortName : groups) {
         legacySetting.beginGroup(shortName);
-        cardDbIni.setValue("sets/" + shortName + "/sortKey", legacySetting.value("sortkey"));
-        cardDbIni.setValue("sets/" + shortName + "/enabled", legacySetting.value("enabled"));
-        cardDbIni.setValue("sets/" + shortName + "/isKnown", legacySetting.value("isknown"));
+        if (legacySetting.contains("sortkey")) {
+            cardDbIni.setValue("sets/" + shortName + "/sortKey", legacySetting.value("sortkey"));
+        }
+        if (legacySetting.contains("enabled")) {
+            cardDbIni.setValue("sets/" + shortName + "/enabled", legacySetting.value("enabled"));
+        }
+        if (legacySetting.contains("isknown")) {
+            cardDbIni.setValue("sets/" + shortName + "/isKnown", legacySetting.value("isknown"));
+        }
         legacySetting.endGroup();
     }
     legacySetting.endGroup();

@@ -3,17 +3,32 @@
 #include "oraclewizard.h"
 
 #include <QCheckBox>
+#include <QDebug>
 #include <QDir>
+#include <QFile>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QGridLayout>
+#include <QIODevice>
 #include <QLabel>
 #include <QLineEdit>
+#include <QList>
 #include <QMessageBox>
+#include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QObject>
 #include <QProgressBar>
 #include <QPushButton>
 #include <QRadioButton>
-#include <QtGui>
+#include <QSettings>
+#include <QSharedPointer>
+#include <QUrl>
+#include <QVariant>
+#include <qlogging.h>
+#include <qnamespace.h>
+
+class QWidget;
 
 SimpleDownloadFilePage::SimpleDownloadFilePage(QWidget *parent) : OracleWizardPage(parent)
 {

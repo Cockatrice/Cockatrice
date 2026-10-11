@@ -1,7 +1,13 @@
 #include "player_manager.h"
 
 #include "../abstract_game.h"
+#include "../game_state.h"
+#include "player_info.h"
 #include "player_logic.h"
+
+#include <QList>
+#include <QMapIterator>
+#include <QSharedPointer>
 
 PlayerManager::PlayerManager(AbstractGame *_game,
                              int _localPlayerId,

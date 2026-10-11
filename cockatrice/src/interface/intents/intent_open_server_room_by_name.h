@@ -1,19 +1,21 @@
 #ifndef COCKATRICE_INTENT_OPEN_SERVER_ROOM_BY_NAME_H
 #define COCKATRICE_INTENT_OPEN_SERVER_ROOM_BY_NAME_H
 
+#include "abstract_client.h"
 #include "contexts/context_join_room.h"
 #include "intent.h"
-#include "remote_client.h"
 
 #include <QScopedPointer>
 #include <QString>
 #include <QTimer>
 #include <memory>
+#include <qtmetamacros.h>
 
-class TabRoom;
 class TabSupervisor;
 class Event_ListRooms;
 class ServerInfo_Room;
+class RemoteClient;
+class Response;
 
 /**
  * @brief Connects to the configured server and opens a room identified by its name.

@@ -4,18 +4,33 @@
 #include "../client/network/update/client/client_update_checker.h"
 #include "../client/network/update/client/release_channel.h"
 #include "../interface/window_main.h"
+#include "update/client/update_downloader.h"
 
+#include <QApplication>
+#include <QByteArray>
 #include <QCoreApplication>
+#include <QDate>
+#include <QDebug>
 #include <QDesktopServices>
+#include <QDialogButtonBox>
 #include <QDir>
 #include <QFileInfo>
 #include <QLabel>
+#include <QList>
+#include <QLocale>
 #include <QMessageBox>
+#include <QMessageLogger>
+#include <QObject>
+#include <QProcess>
 #include <QProgressBar>
 #include <QPushButton>
+#include <QSize>
+#include <QSizePolicy>
+#include <QSslSocket>
 #include <QTimer>
 #include <QVBoxLayout>
-#include <QtNetwork>
+#include <QWidget>
+#include <qnamespace.h>
 #include <version_string.h>
 
 // Executable that, when it sits next to the downloaded update installer, is installed instead of

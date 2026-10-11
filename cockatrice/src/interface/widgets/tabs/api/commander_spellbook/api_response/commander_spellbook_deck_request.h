@@ -1,10 +1,11 @@
 #ifndef COCKATRICE_COMMANDER_SPELLBOOK_DECK_REQUEST_H
 #define COCKATRICE_COMMANDER_SPELLBOOK_DECK_REQUEST_H
 #include "card_in_deck_request.h"
-#include "libcockatrice/deck_list/deck_list.h"
 
 #include <QJsonObject>
 #include <QList>
+
+class DeckList;
 
 struct CommanderSpellbookDeckRequest
 {

@@ -8,11 +8,13 @@
 
 #include "tab.h"
 
+#include <QString>
+#include <qtmetamacros.h>
+
 class AbstractClient;
 class CommandContainer;
 class DeckPreviewColorIdentityFilterWidget;
 class FlowWidget;
-class PublicDeckPreviewWidget;
 class QLabel;
 class QToolButton;
 class RemotePublicDecksModel;
@@ -20,6 +22,7 @@ class Response;
 class VisualDeckStorageQuickSettingsWidget;
 class VisualDeckStorageSearchWidget;
 class VisualDeckStorageTagFilterWidget;
+class TabSupervisor;
 
 /**
  * @brief A visual grid of the public decks published by another user.

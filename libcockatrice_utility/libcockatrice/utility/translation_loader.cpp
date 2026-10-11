@@ -1,13 +1,23 @@
 #include "translation_loader.h"
 
+#include <QChar>
 #include <QCoreApplication>
+#include <QDebug>
 #include <QDir>
 #include <QFileInfo>
+#include <QLatin1Char>
 #include <QLibraryInfo>
+#include <QMessageLogger>
 #include <QRegularExpression>
+#include <QRegularExpressionMatch>
 #include <QSet>
+#include <QSharedPointer>
+#include <QStringList>
+#include <QStringLiteral>
 #include <QTranslator>
+#include <QtGlobal>
 #include <algorithm>
+#include <initializer_list>
 
 // Kept under the historical category name so existing QT_LOGGING_RULES filters keep working.
 Q_LOGGING_CATEGORY(TranslationLoaderLog, "qt_translator")

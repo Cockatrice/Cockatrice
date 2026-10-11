@@ -1,13 +1,29 @@
-#include "mocks.h"
+#include "libcockatrice/card/card_localization.h"
+#include "libcockatrice/card/database/card_database.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/set/card_set.h"
 #include "test_card_database_path_provider.h"
 
 #include "gtest/gtest.h"
+#include <QDate>
+#include <QHash>
+#include <QList>
+#include <QPair>
+#include <QSharedPointer>
+#include <QString>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/printing/printing_info.h>
 #include <libcockatrice/filters/filter_string.h>
 #include <libcockatrice/interfaces/noop_card_preference_provider.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
+#include <string>
+#include <utility>
+
+namespace
+{
+class CardQuery;
+}
 
 #define QUERY(name, card, query, match)                                                                                \
     TEST_F(CardQuery, name)                                                                                            \

@@ -1,7 +1,12 @@
 #ifndef COCKATRICE_COMPACT_PUSH_BUTTON_H
 #define COCKATRICE_COMPACT_PUSH_BUTTON_H
 
+#include <QIcon>
 #include <QPushButton>
+#include <QString>
+#include <qtmetamacros.h>
+
+class QWidget;
 
 class CompactPushButton : public QPushButton
 {

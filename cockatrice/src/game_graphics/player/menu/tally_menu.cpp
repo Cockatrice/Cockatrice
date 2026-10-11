@@ -1,7 +1,10 @@
 #include "tally_menu.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../tally/tally.h"
+#include "libcockatrice/settings/interface_settings.h"
 
+#include <QAction>
 #include <QActionGroup>
 
 TallyMenu::TallyMenu()

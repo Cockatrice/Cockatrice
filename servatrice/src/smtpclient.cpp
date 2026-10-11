@@ -1,10 +1,18 @@
 #include "smtpclient.h"
 
 #include "settingscache.h"
+#include "smtp/qxtmailmessage.h"
 #include "smtp/qxtsmtp.h"
 
+#include <QAbstractSocket>
+#include <QByteArray>
+#include <QDebug>
+#include <QSharedPointer>
 #include <QSslSocket>
 #include <QTcpSocket>
+#include <QVariant>
+#include <qlogging.h>
+#include <qobjectdefs.h>
 
 SmtpClient::SmtpClient(QObject *parent) : QObject(parent)
 {

@@ -11,22 +11,26 @@
 #include "../interface/widgets/server/remote/remote_decklist_tree_widget.h"
 #include "tab.h"
 
+#include <QList>
+#include <QString>
 #include <QStringList>
+#include <QVariant>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
+#include <qtmetamacros.h>
 
 struct LoadedDeck;
 class ServerInfo_User;
-class AbstractClient;
 class QTreeView;
 class QFileSystemModel;
 class QToolBar;
-class QTreeWidget;
-class QTreeWidgetItem;
 class QGroupBox;
 class QTimer;
 class CommandContainer;
 class Response;
 class ShareBarWidget;
+class QAction;
+class QModelIndex;
+class TabSupervisor;
 
 class TabDeckStorage : public Tab
 {

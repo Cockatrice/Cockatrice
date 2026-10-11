@@ -10,7 +10,6 @@
 #include "shader_banner_widget.h"
 #include "step_indicator_widget.h"
 
-#include <QCloseEvent>
 #include <QEvent>
 #include <QFont>
 #include <QHBoxLayout>
@@ -18,6 +17,10 @@
 #include <QPushButton>
 #include <QStackedWidget>
 #include <QVBoxLayout>
+#include <qnamespace.h>
+#include <utility>
+
+class QWidget;
 
 FirstRunWizard::FirstRunWizard(QWidget *parent) : QDialog(parent)
 {
@@ -182,10 +185,10 @@ void FirstRunWizard::onCardDatabaseUpdateFinished(bool success)
     }
 }
 
-void FirstRunWizard::onCardDatabaseUpdateProgress(const QString &stage, qint64 done, qint64 total)
+void FirstRunWizard::onCardDatabaseUpdateProgress(const CardUpdateProgress &progress)
 {
     if (cardDatabasePage) {
-        cardDatabasePage->onUpdateProgress(stage, done, total);
+        cardDatabasePage->onUpdateProgress(progress);
     }
 }
 

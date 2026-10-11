@@ -2,9 +2,16 @@
 
 #include "../../../../../client/settings/cache_settings.h"
 
+#include <QByteArray>
 #include <QJsonDocument>
-#include <QJsonObject>
+#include <QJsonParseError>
+#include <QMap>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QString>
+#include <QStringLiteral>
 #include <QUrl>
+#include <QVariant>
 #include <libcockatrice/settings/commander_bracket_settings.h>
 
 static const QUrl COMMANDER_BRACKET_JSON_URL(QStringLiteral("https://cockatrice.github.io/commander-brackets.json"));

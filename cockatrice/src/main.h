@@ -15,7 +15,6 @@ class CardDatabase;
 class QString;
 class QSystemTrayIcon;
 class QTranslator;
-class SoundEngine;
 
 extern CardDatabase *db;
 

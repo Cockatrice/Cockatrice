@@ -1,5 +1,12 @@
 #include "recents_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QList>
+#include <QVariant>
+
+class QObject;
+
 #define MAX_RECENT_DECK_COUNT 10
 
 RecentsSettings::RecentsSettings(const QString &settingPath, QObject *parent)

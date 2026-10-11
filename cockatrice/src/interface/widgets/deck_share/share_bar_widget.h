@@ -7,7 +7,9 @@
 #ifndef SHARE_BAR_WIDGET_H
 #define SHARE_BAR_WIDGET_H
 
+#include <QString>
 #include <QWidget>
+#include <qtmetamacros.h>
 
 class QLabel;
 class QLineEdit;

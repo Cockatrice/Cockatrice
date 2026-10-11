@@ -3,9 +3,13 @@
  *  @ingroup Tests
  */
 
+#include "libcockatrice/protocol/pb/color.pb.h"
+
+#include <QString>
 #include <gtest/gtest.h>
 #include <libcockatrice/network/server/remote/game/server_counter.h>
 #include <limits>
+#include <string>
 
 TEST(ServerCounter, IncrementDoesNotOverflow)
 {

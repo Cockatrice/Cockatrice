@@ -1,9 +1,21 @@
 #include "mana_curve_category_widget.h"
 
+#include "../../../general/display/charts/bars/bar_chart_widget.h"
 #include "libcockatrice/utility/color.h"
 #include "libcockatrice/utility/qt_utils.h"
 #include "mana_curve_config.h"
-#include "mana_curve_total_widget.h"
+
+#include <QHBoxLayout>
+#include <QHash>
+#include <QLabel>
+#include <QList>
+#include <QSharedPointer>
+#include <QSize>
+#include <QSizePolicy>
+#include <QString>
+#include <QVBoxLayout>
+#include <QVector>
+#include <algorithm>
 
 constexpr int MIN_ROW_HEIGHT = 100; // Minimum readable height per row
 

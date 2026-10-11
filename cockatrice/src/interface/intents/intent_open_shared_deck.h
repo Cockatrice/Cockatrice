@@ -1,20 +1,24 @@
 #ifndef COCKATRICE_INTENT_OPEN_SHARED_DECK_H
 #define COCKATRICE_INTENT_OPEN_SHARED_DECK_H
 
+#include "../deck_loader/loaded_deck.h"
 #include "contexts/context_open_deck.h"
 #include "intent.h"
-#include "remote_client.h"
 
 #include <QList>
 #include <QMap>
 #include <QScopedPointer>
+#include <QString>
 #include <memory>
+#include <qtmetamacros.h>
 
 class TabSupervisor;
-struct LoadedDeck;
 class CardDatabaseQuerier;
 class DlgSharedDecksPreview;
 class QTimer;
+class CommandContainer;
+class RemoteClient;
+class Response;
 
 class IntentOpenSharedDeck : public Intent
 {

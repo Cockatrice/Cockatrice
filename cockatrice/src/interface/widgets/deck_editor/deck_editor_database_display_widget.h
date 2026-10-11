@@ -8,16 +8,21 @@
 #ifndef DECK_EDITOR_DATABASE_DISPLAY_WIDGET_H
 #define DECK_EDITOR_DATABASE_DISPLAY_WIDGET_H
 
-#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
-#include "../utility/custom_line_edit.h"
+#include "libcockatrice/card/card_info.h"
 
-#include <QHBoxLayout>
+#include <QString>
 #include <QWidget>
-#include <libcockatrice/models/database/card_database_display_model.h>
-#include <libcockatrice/models/database/card_database_model.h>
+#include <qtmetamacros.h>
 
 class CardDatabaseView;
-class AbstractTabDeckEditor;
+class CardDatabaseDisplayModel;
+class CardDatabaseModel;
+class ExactCard;
+class FilterTree;
+class QAction;
+class QHBoxLayout;
+class QVBoxLayout;
+class SearchLineEdit;
 
 class DeckEditorDatabaseDisplayWidget : public QWidget
 {

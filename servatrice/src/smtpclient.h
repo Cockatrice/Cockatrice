@@ -2,9 +2,11 @@
 #define SMTPCLIENT_H
 
 #include <QObject>
+#include <QString>
+#include <qtmetamacros.h>
 
 class QxtSmtp;
-class QxtMailMessage;
+class QByteArray;
 
 class SmtpClient : public QObject
 {

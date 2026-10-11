@@ -3,10 +3,11 @@
 
 #include "deck_list.h"
 
-#include <QString>
 #include <functional>
 
 class QTextStream;
+class DecklistNodeTree;
+class QString;
 
 namespace DeckListPlainText
 {

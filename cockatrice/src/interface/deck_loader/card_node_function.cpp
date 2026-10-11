@@ -1,5 +1,12 @@
 #include "card_node_function.h"
 
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
+
+#include <QSharedPointer>
+#include <QString>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/tree/deck_list_card_node.h>
@@ -8,13 +15,14 @@ void CardNodeFunction::SetProviderIdToPreferred::operator()(const InnerDecklistN
 {
     Q_UNUSED(node);
     PrintingInfo preferredPrinting = CardDatabaseManager::query()->getPreferredPrinting(card->getName());
-    QString providerId = preferredPrinting.getUuid();
-    QString setShortName = preferredPrinting.getSet()->getShortName();
-    QString collectorNumber = preferredPrinting.getProperty("num");
+    CardSetPtr preferredSet = preferredPrinting.getSet();
+    if (!preferredSet) {
+        return;
+    }
 
-    card->setCardProviderId(providerId);
-    card->setCardCollectorNumber(collectorNumber);
-    card->setCardSetShortName(setShortName);
+    card->setCardProviderId(preferredPrinting.getUuid());
+    card->setCardCollectorNumber(preferredPrinting.getProperty("num"));
+    card->setCardSetShortName(preferredSet->getShortName());
 }
 
 void CardNodeFunction::ClearPrintingData::operator()(const InnerDecklistNode *node, DecklistCardNode *card) const

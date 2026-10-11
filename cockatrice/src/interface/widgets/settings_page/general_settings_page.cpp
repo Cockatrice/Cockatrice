@@ -6,13 +6,26 @@
 #include "../server/user/user_info_connection.h"
 #include "update/client/release_channel.h"
 
+#include <QByteArray>
 #include <QCoreApplication>
+#include <QDate>
+#include <QDebug>
 #include <QFile>
 #include <QFileDialog>
 #include <QGridLayout>
+#include <QGroupBox>
 #include <QLineEdit>
+#include <QList>
+#include <QMap>
 #include <QMessageBox>
+#include <QPushButton>
+#include <QSharedPointer>
+#include <QSizePolicy>
 #include <QTranslator>
+#include <QVBoxLayout>
+#include <QVariant>
+#include <QVariantList>
+#include <QtGlobal>
 #include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/download_settings.h>
@@ -22,6 +35,9 @@
 #include <libcockatrice/settings/updates_settings.h>
 #include <libcockatrice/utility/macros.h>
 #include <libcockatrice/utility/translation_loader.h>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <utility>
 
 enum startupCardUpdateCheckBehaviorIndex
 {
@@ -145,12 +161,18 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     newVersionOracleCheckBox.setChecked(settings.updates().getNotifyAboutNewVersion());
 
+    cardDatabaseUpdateTrayNotificationCheckBox.setChecked(settings.updates().getCardDatabaseUpdateTrayNotification());
+
+    connect(&cardDatabaseUpdateTrayNotificationCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.updates(),
+            &UpdatesSettings::setCardDatabaseUpdateTrayNotification);
+
     auto *cardDatabaseGrid = new QGridLayout;
     cardDatabaseGrid->addWidget(&startupCardUpdateCheckBehaviorLabel, 0, 0);
     cardDatabaseGrid->addWidget(&startupCardUpdateCheckBehaviorSelector, 0, 1);
     cardDatabaseGrid->addWidget(&cardUpdateCheckIntervalLabel, 1, 0);
     cardDatabaseGrid->addWidget(&cardUpdateCheckIntervalSpinBox, 1, 1);
     cardDatabaseGrid->addWidget(&lastCardUpdateCheckDateLabel, 2, 1);
+    cardDatabaseGrid->addWidget(&cardDatabaseUpdateTrayNotificationCheckBox, 3, 0, 1, 2);
 
     cardDatabaseGroupBox = new QGroupBox;
     cardDatabaseGroupBox->setLayout(cardDatabaseGrid);
@@ -549,6 +571,7 @@ void GeneralSettingsPage::retranslateUi()
                                                        tr("Always update in the background"));
     cardUpdateCheckIntervalLabel.setText(tr("Check for card database updates every"));
     cardUpdateCheckIntervalSpinBox.setSuffix(tr(" days"));
+    cardDatabaseUpdateTrayNotificationCheckBox.setText(tr("Notify in the system tray while the card database updates"));
 
     QDate lastCheckDate = settings.updates().getLastCardUpdateCheck();
     int daysAgo = lastCheckDate.daysTo(QDate::currentDate());

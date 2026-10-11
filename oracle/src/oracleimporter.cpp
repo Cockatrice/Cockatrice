@@ -1,20 +1,35 @@
 #include "oracleimporter.h"
 
-#include "libcockatrice/interfaces/noop_card_preference_provider.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/format/format_legality_rules.h"
+#include "libcockatrice/card/lazy_properties_hash.h"
+#include "libcockatrice/card/relation/card_relation_type.h"
 #include "libcockatrice/interfaces/noop_card_set_priority_controller.h"
 #include "parsehelpers.h"
 
+#include <QChar>
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonParseError>
+#include <QJsonValue>
+#include <QJsonValueConstRef>
+#include <QJsonValueRef>
+#include <QPair>
 #include <QRegularExpression>
+#include <QRegularExpressionMatch>
 #include <QSet>
+#include <QSharedPointer>
+#include <QVariant>
+#include <QtGlobal>
 #include <algorithm>
 #include <climits>
 #include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/card/database/parser/cockatrice_xml_4.h>
 #include <libcockatrice/card/relation/card_relation.h>
+#include <qlogging.h>
+
+class ICardSetPriorityController;
 
 static const QList<AllowedCount> kConstructedCounts = {{4, "legal"}, {0, "banned"}};
 
@@ -286,9 +301,9 @@ CardInfoPtr OracleImporter::addCard(QString name,
 
 static QString getJsonString(const QJsonObject &obj, const QString &key)
 {
-    // QVariant coerces numbers and booleans to text, while QJsonValue::toString()
-    // returns a null string for them — some MTGJSON fields (manaValue,
-    // convertedManaCost, isOnlineOnly, isRebalanced) carry those types.
+    // QVariant coerces numbers to text, while QJsonValue::toString() returns a
+    // null string for them — MTGJSON fields like manaValue and convertedManaCost
+    // carry those types.
     return obj.value(key).toVariant().toString();
 }
 
@@ -397,11 +412,8 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
     };
 
     // mtgjson name => xml name
-    static const QMap<QString, QString> setInfoProperties{{"number", "num"},
-                                                          {"rarity", "rarity"},
-                                                          {"isOnlineOnly", "isOnlineOnly"},
-                                                          {"isRebalanced", "isRebalanced"},
-                                                          {"artist", "artist"}};
+    static const QMap<QString, QString> setInfoProperties{
+        {"number", "num"}, {"rarity", "rarity"}, {"artist", "artist"}};
 
     // mtgjson name => xml name
     static const QMap<QString, QString> identifierProperties{{"multiverseId", "muid"}, {"scryfallId", "uuid"}};
@@ -836,7 +848,7 @@ int OracleImporter::startImport()
 
 bool OracleImporter::saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion)
 {
-    CockatriceXml4Parser parser(new NoopCardPreferenceProvider(), new NoopCardSetPriorityController());
+    CockatriceXml4Parser parser(new NoopCardSetPriorityController());
 
     return parser.saveToFile(createDefaultMagicFormats(), sets, cards, fileName, sourceUrl, sourceVersion);
 }

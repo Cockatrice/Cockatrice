@@ -8,8 +8,13 @@
 #define LOCALSERVERINTERFACE_H
 
 #include <../remote/server_protocolhandler.h>
+#include <QString>
+#include <qtmetamacros.h>
 
 class LocalServer;
+class CommandContainer;
+class ServerMessage;
+class Server_DatabaseInterface;
 
 class LocalServerInterface : public Server_ProtocolHandler
 {

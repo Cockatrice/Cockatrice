@@ -10,7 +10,11 @@
 #include <QLayout>
 #include <QList>
 #include <QLoggingCategory>
-#include <QWidget>
+#include <QSize>
+#include <qnamespace.h>
+
+class QLayoutItem;
+class QWidget;
 
 inline Q_LOGGING_CATEGORY(OverlapLayoutLog, "overlap_layout");
 

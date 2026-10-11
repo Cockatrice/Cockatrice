@@ -7,8 +7,13 @@
 #ifndef MANA_SYMBOL_WIDGET_H
 #define MANA_SYMBOL_WIDGET_H
 
-#include <QGraphicsOpacityEffect>
+#include <QChar>
 #include <QLabel>
+#include <QString>
+#include <qtmetamacros.h>
+
+class QGraphicsOpacityEffect;
+class QWidget;
 
 class ManaSymbolWidget : public QLabel
 {

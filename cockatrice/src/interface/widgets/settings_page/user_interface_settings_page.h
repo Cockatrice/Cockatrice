@@ -5,13 +5,14 @@
 
 #include <QCheckBox>
 #include <QComboBox>
-#include <QGroupBox>
 #include <QLabel>
 #include <QPushButton>
 #include <QSpinBox>
 #include <QToolButton>
-#include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/utility/macros.h>
+#include <qtmetamacros.h>
+
+class QGroupBox;
 
 class UserInterfaceSettingsPage : public AbstractSettingsPage
 {

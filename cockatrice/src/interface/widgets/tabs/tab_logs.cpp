@@ -1,23 +1,35 @@
 #include "tab_logs.h"
 
 #include "../interface/widgets/utility/custom_line_edit.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_chat_message.pb.h"
 
 #include <QCheckBox>
 #include <QDockWidget>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QLabel>
+#include <QList>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QRadioButton>
+#include <QSharedPointer>
+#include <QSizePolicy>
 #include <QSpinBox>
 #include <QTabWidget>
 #include <QTableWidget>
+#include <QTableWidgetItem>
+#include <QVBoxLayout>
+#include <QWidget>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/moderator_commands.pb.h>
 #include <libcockatrice/protocol/pb/response_viewlog_history.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <qnamespace.h>
+#include <string>
+
+class TabSupervisor;
 
 TabLog::TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool _canUseDeveloperCommands)
     : Tab(_tabSupervisor), client(_client), canUseDeveloperCommands(_canUseDeveloperCommands)

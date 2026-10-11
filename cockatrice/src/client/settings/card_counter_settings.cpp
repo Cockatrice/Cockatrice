@@ -1,8 +1,15 @@
 #include "card_counter_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QChar>
 #include <QColor>
 #include <QSettings>
+#include <QVariant>
 #include <QtMath>
+#include <iterator>
+
+class QObject;
 
 CardCounterSettings::CardCounterSettings(const QString &settingsPath, QObject *parent)
     : SettingsManager(settingsPath + "card_counters.ini", "cards", "counters", parent)

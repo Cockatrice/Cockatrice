@@ -7,9 +7,20 @@
 #ifndef CARD_SEARCH_MODEL_H
 #define CARD_SEARCH_MODEL_H
 
-#include "../card_database_display_model.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/card_localization.h"
 
 #include <QAbstractListModel>
+#include <QList>
+#include <QModelIndex>
+#include <QSharedPointer>
+#include <QString>
+#include <QStringList>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
+
+class CardDatabaseDisplayModel;
+class QObject;
 
 class CardSearchModel : public QAbstractListModel
 {

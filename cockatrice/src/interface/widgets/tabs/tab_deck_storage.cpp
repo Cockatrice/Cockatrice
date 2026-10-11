@@ -1,32 +1,55 @@
 #include "tab_deck_storage.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../deck_loader/deck_file_format.h"
 #include "../../deck_loader/deck_loader.h"
+#include "../../deck_loader/loaded_deck.h"
 #include "../../pixel_map_generator.h"
 #include "../cards/additional_info/deck_color_identity.h"
 #include "../deck_share/deck_share_utils.h"
 #include "../deck_share/share_bar_widget.h"
 #include "../interface/widgets/server/remote/remote_decklist_tree_widget.h"
 #include "../interface/widgets/utility/get_text_with_max.h"
+#include "abstract_client.h"
+#include "libcockatrice/protocol/pb/commands.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+#include "libcockatrice/protocol/pb/session_commands.pb.h"
 
+#include <QAbstractItemModel>
+#include <QAbstractItemView>
 #include <QAction>
 #include <QApplication>
-#include <QDateTime>
 #include <QDebug>
 #include <QDesktopServices>
 #include <QDir>
+#include <QFile>
+#include <QFileInfo>
 #include <QFileSystemModel>
+#include <QGridLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QInputDialog>
+#include <QItemSelection>
+#include <QItemSelectionModel>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QModelIndex>
+#include <QModelIndexList>
+#include <QPixmap>
+#include <QSharedPointer>
+#include <QSize>
+#include <QSizePolicy>
+#include <QStringLiteral>
+#include <QStyle>
 #include <QTimer>
 #include <QToolBar>
 #include <QTreeView>
 #include <QUrl>
 #include <QVBoxLayout>
+#include <QWidget>
+#include <QtGlobal>
+#include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/protocol/pb/command_deck_del.pb.h>
@@ -38,12 +61,17 @@
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_download.pb.h>
-#include <libcockatrice/protocol/pb/response_deck_share_create.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_upload.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/network_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <optional>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <string>
+
+class TabSupervisor;
 
 namespace
 {

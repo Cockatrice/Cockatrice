@@ -1,8 +1,21 @@
 #include "all_zones_card_amount_widget.h"
 
 #include "../general/display/shadow_background_label.h"
+#include "card_amount_widget.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
 
+#include <QFont>
+#include <QLabel>
+#include <QSizePolicy>
+#include <QSlider>
 #include <QTimer>
+#include <QVBoxLayout>
+#include <algorithm>
+#include <qnamespace.h>
+
+class DeckStateManager;
 
 /**
  * @brief Constructor for the AllZonesCardAmountWidget class.

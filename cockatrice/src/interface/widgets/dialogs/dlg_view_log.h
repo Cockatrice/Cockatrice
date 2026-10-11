@@ -7,11 +7,14 @@
 #ifndef DLG_VIEWLOG_H
 #define DLG_VIEWLOG_H
 
-#include <QCheckBox>
 #include <QDialog>
+#include <QString>
+#include <qtmetamacros.h>
 
 class QPlainTextEdit;
-class QCloseEvent;
+class QCheckBox;
+class QPushButton;
+class QWidget;
 
 class DlgViewLog : public QDialog
 {

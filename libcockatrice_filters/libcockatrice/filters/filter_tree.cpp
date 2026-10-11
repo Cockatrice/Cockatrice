@@ -1,8 +1,16 @@
 #include "filter_tree.h"
 
 #include "filter_card.h"
+#include "libcockatrice/card/card_localization.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
 
+#include <QChar>
 #include <QList>
+#include <QSharedPointer>
+#include <QStringList>
+#include <algorithm>
+#include <qnamespace.h>
 
 template <class T> FilterTreeNode *FilterTreeBranch<T>::nodeAt(int i) const
 {

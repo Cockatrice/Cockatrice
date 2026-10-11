@@ -22,6 +22,7 @@ set(UTILITY_HEADERS
     libcockatrice/utility/cryptoutil.h
     libcockatrice/utility/expression.h
     libcockatrice/utility/levenshtein.h
+    libcockatrice/utility/local_server_name.h
     libcockatrice/utility/macros.h
     libcockatrice/utility/passwordhasher.h
     libcockatrice/utility/playmat_params.h
@@ -48,3 +49,5 @@ target_link_libraries(libcockatrice_utility PUBLIC libcockatrice_rng OpenSSL::Cr
 set(ORACLE_LIBS)
 
 include_directories(${${COCKATRICE_QT_VERSION_NAME}Core_INCLUDE_DIRS})
+
+target_precompile_headers(libcockatrice_utility PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtcore_pch.h")

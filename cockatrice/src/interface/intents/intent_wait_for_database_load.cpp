@@ -1,5 +1,8 @@
 #include "intent_wait_for_database_load.h"
 
+#include "libcockatrice/card/database/card_database.h"
+#include "libcockatrice/card/database/card_database_loader.h"
+
 #include <libcockatrice/card/database/card_database_manager.h>
 
 bool IntentWaitForDatabaseLoad::checkPrecondition() const

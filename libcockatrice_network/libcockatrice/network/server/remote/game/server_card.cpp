@@ -19,16 +19,22 @@
  ***************************************************************************/
 #include "server_card.h"
 
+#include "game/server_abstract_player.h"
+#include "libcockatrice/protocol/pb/card_attributes.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_cardcounter.pb.h"
+#include "libcockatrice/utility/card_ref.h"
 #include "server_cardzone.h"
-#include "server_player.h"
 
+#include <QMapIterator>
+#include <QSharedPointer>
 #include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/protocol/pb/event_set_card_attr.pb.h>
 #include <libcockatrice/protocol/pb/event_set_card_counter.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
 #include <libcockatrice/utility/clamped_arithmetic.h>
 #include <libcockatrice/utility/counter_limits.h>
-#include <limits>
+#include <string>
 
 Server_Card::Server_Card(const CardRef &cardRef, int _id, int _coord_x, int _coord_y, Server_CardZone *_zone)
     : zone(_zone), id(_id), coord_x(_coord_x), coord_y(_coord_y), cardRef(cardRef), tapped(false), attacking(false),

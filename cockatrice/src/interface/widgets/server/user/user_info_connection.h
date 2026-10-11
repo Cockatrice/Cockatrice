@@ -7,12 +7,11 @@
 #ifndef USERCONNECTION_INFORMATION_H
 #define USERCONNECTION_INFORMATION_H
 
-#include <QApplication>
-#include <QDir>
-#include <QFile>
 #include <QLoggingCategory>
-#include <QSettings>
-#include <QStandardPaths>
+#include <QMap>
+#include <QString>
+#include <QStringList>
+#include <utility>
 
 inline Q_LOGGING_CATEGORY(UserInfoConnectionLog, "user_info_connection");
 

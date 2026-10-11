@@ -4,10 +4,15 @@
 #include "abstract_settings_page.h"
 
 #include <QCheckBox>
-#include <QGroupBox>
 #include <QLabel>
-#include <QListWidget>
+#include <QString>
 #include <libcockatrice/utility/macros.h>
+#include <qtmetamacros.h>
+
+class QAction;
+class QGroupBox;
+class QLineEdit;
+class QListWidget;
 
 class MessagesSettingsPage : public AbstractSettingsPage
 {

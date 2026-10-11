@@ -9,48 +9,31 @@
 #define TAB_GENERIC_DECK_EDITOR_H
 
 #include "../../deck_loader/deck_loader.h"
-#include "../interface/widgets/deck_editor/deck_editor_card_database_dock_widget.h"
-#include "../interface/widgets/deck_editor/deck_editor_card_info_dock_widget.h"
-#include "../interface/widgets/deck_editor/deck_editor_database_display_widget.h"
-#include "../interface/widgets/deck_editor/deck_editor_deck_dock_widget.h"
-#include "../interface/widgets/deck_editor/deck_editor_filter_dock_widget.h"
-#include "../interface/widgets/deck_editor/deck_editor_printing_selector_dock_widget.h"
-#include "../interface/widgets/menus/deck_editor_menu.h"
-#include "../interface/widgets/visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
+#include "libcockatrice/card/card_info.h"
 #include "tab.h"
 
-#include <libcockatrice/deck_list/deck_list_history_manager.h>
+#include <QMap>
+#include <QSize>
+#include <QString>
+#include <qtmetamacros.h>
 
 class DeckStateManager;
 class CardDatabaseModel;
-class CardDatabaseDisplayModel;
-
-class CardInfoFrameWidget;
-class DeckLoader;
 class DeckEditorMenu;
 class DeckEditorCardInfoDockWidget;
 class DeckEditorCardDatabaseDockWidget;
 class DeckEditorDeckDockWidget;
 class DeckEditorFilterDockWidget;
 class DeckEditorPrintingSelectorDockWidget;
-class DeckPreviewDeckTagsDisplayWidget;
 class Response;
 class FilterTree;
-class FilterTreeModel;
-class FilterBuilder;
-
-class QTreeView;
-class QTextEdit;
-class QLabel;
-class QComboBox;
-class QGroupBox;
 class QMessageBox;
-class QHBoxLayout;
-class QVBoxLayout;
-class QPushButton;
 class QDockWidget;
 class QMenu;
 class QAction;
+class ExactCard;
+class TabSupervisor;
+struct LoadedDeck;
 
 /**
  * @class AbstractTabDeckEditor

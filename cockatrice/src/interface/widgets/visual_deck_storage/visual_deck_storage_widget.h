@@ -6,18 +6,13 @@
 #ifndef VISUAL_DECK_STORAGE_WIDGET_H
 #define VISUAL_DECK_STORAGE_WIDGET_H
 
-#include "visual_deck_storage_model.h"
-#include "visual_deck_storage_sort_filter_proxy_model.h"
-
-#include <QHBoxLayout>
-#include <QScrollArea>
-#include <QToolButton>
-#include <QVBoxLayout>
+#include <QSet>
+#include <QString>
+#include <QStringList>
 #include <QWidget>
+#include <qtmetamacros.h>
 
 class QLabel;
-class QResizeEvent;
-class QShowEvent;
 class QTimer;
 class DeckPreviewColorIdentityFilterWidget;
 class VisualDeckStorageFolderDisplayWidget;
@@ -25,6 +20,13 @@ class VisualDeckStorageQuickSettingsWidget;
 class VisualDeckStorageSearchWidget;
 class VisualDeckStorageSortWidget;
 class VisualDeckStorageTagFilterWidget;
+class QHBoxLayout;
+class QScrollArea;
+class QToolButton;
+class QVBoxLayout;
+class VisualDeckStorageModel;
+class VisualDeckStorageSortFilterProxyModel;
+struct LoadedDeck;
 
 class VisualDeckStorageWidget final : public QWidget
 {

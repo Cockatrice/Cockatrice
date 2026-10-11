@@ -1,20 +1,43 @@
 #include "server_protocolhandler.h"
 
 #include "game/game_config.h"
+#include "game/server_abstract_participant.h"
 #include "game/server_game.h"
-#include "game/server_player.h"
+#include "libcockatrice/protocol/pb/admin_commands.pb.h"
+#include "libcockatrice/protocol/pb/developer_commands.pb.h"
+#include "libcockatrice/protocol/pb/game_commands.pb.h"
+#include "libcockatrice/protocol/pb/game_event_container.pb.h"
+#include "libcockatrice/protocol/pb/moderator_commands.pb.h"
+#include "libcockatrice/protocol/pb/room_commands.pb.h"
+#include "libcockatrice/protocol/pb/room_event.pb.h"
+#include "libcockatrice/protocol/pb/server_message.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_chat_message.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
+#include "libcockatrice/protocol/pb/session_commands.pb.h"
+#include "libcockatrice/protocol/pb/session_event.pb.h"
 #include "server_database_interface.h"
+#include "server_response_containers.h"
 #include "server_room.h"
+#include "serverinfo_user_container.h"
 
+#include <QChar>
 #include <QDateTime>
 #include <QDebug>
+#include <QListIterator>
+#include <QMapIterator>
+#include <QMutexLocker>
+#include <QPair>
+#include <QReadLocker>
+#include <QReadWriteLock>
+#include <QRecursiveMutex>
+#include <QSharedPointer>
+#include <QtGlobal>
 #include <QtMath>
-#include <google/protobuf/descriptor.h>
+#include <google/protobuf/repeated_ptr_field.h>
 #include <libcockatrice/protocol/debug_pb_message.h>
 #include <libcockatrice/protocol/featureset.h>
 #include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/commands.pb.h>
-#include <libcockatrice/protocol/pb/event_game_joined.pb.h>
 #include <libcockatrice/protocol/pb/event_list_rooms.pb.h>
 #include <libcockatrice/protocol/pb/event_notify_user.pb.h>
 #include <libcockatrice/protocol/pb/event_room_say.pb.h>
@@ -28,6 +51,9 @@
 #include <libcockatrice/protocol/pb/response_login.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <qlogging.h>
+#include <string>
+#include <utility>
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server,
                                                Server_DatabaseInterface *_databaseInterface,

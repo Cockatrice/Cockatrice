@@ -1,19 +1,18 @@
 #ifndef PICTURE_LOADER_WORKER_WORK_H
 #define PICTURE_LOADER_WORKER_WORK_H
 
-#include "card_picture_loader_worker.h"
 #include "card_picture_to_load.h"
 
-#include <QDateTime>
+#include <QImage>
 #include <QLoggingCategory>
-#include <QMutex>
-#include <QNetworkAccessManager>
 #include <QObject>
-#include <QRandomGenerator>
 #include <QString>
-#include <QThread>
-#include <libcockatrice/card/database/card_database.h>
-#include <libcockatrice/utility/server_rate_limiter.h>
+#include <qtmetamacros.h>
+
+class ExactCard;
+class QNetworkReply;
+class QUrl;
+class ServerRateLimiter;
 
 inline Q_LOGGING_CATEGORY(CardPictureLoaderWorkerWorkLog, "card_picture_loader.worker");
 

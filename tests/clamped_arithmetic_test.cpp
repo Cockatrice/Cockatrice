@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 #include <libcockatrice/utility/clamped_arithmetic.h>
 #include <limits>
+#include <string>
 
 TEST(AddClamped, AddsWithinBounds)
 {

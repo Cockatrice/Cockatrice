@@ -1,16 +1,25 @@
 #ifndef TAB_DECK_EDITOR_VISUAL_TAB_WIDGET_H
 #define TAB_DECK_EDITOR_VISUAL_TAB_WIDGET_H
 
-#include "../../interface/widgets/deck_analytics/deck_analytics_widget.h"
-#include "../../interface/widgets/printing_selector/printing_selector.h"
-#include "../../interface/widgets/visual_database_display/visual_database_display_widget.h"
-#include "../../interface/widgets/visual_deck_editor/visual_deck_editor_sample_hand_widget.h"
-#include "../../interface/widgets/visual_deck_editor/visual_deck_editor_widget.h"
-#include "../abstract_tab_deck_editor.h"
+#include "libcockatrice/card/card_info.h"
 
+#include <QMouseEvent>
+#include <QString>
 #include <QTabWidget>
-#include <QVBoxLayout>
-#include <QWidget>
+#include <qtmetamacros.h>
+
+class AbstractTabDeckEditor;
+class CardDatabaseModel;
+class DeckAnalyticsWidget;
+class DeckListModel;
+class DeckListStatisticsAnalyzer;
+class ExactCard;
+class PrintingSelector;
+class QVBoxLayout;
+class QWidget;
+class VisualDatabaseDisplayWidget;
+class VisualDeckEditorSampleHandWidget;
+class VisualDeckEditorWidget;
 
 /**
  * @class TabDeckEditorVisualTabWidget

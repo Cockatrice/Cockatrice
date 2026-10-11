@@ -2,14 +2,23 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../cards/card_size_widget.h"
-#include "visual_deck_storage_widget.h"
+#include "../quick_settings/settings_button_widget.h"
+#include "libcockatrice/utility/macros.h"
 
 #include <QCheckBox>
 #include <QComboBox>
+#include <QDebug>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QSlider>
 #include <QSpinBox>
+#include <QVariant>
+#include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <qnamespace.h>
 
 VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidget *parent)
     : SettingsButtonWidget(parent)

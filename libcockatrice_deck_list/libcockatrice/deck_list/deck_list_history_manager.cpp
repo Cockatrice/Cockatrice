@@ -1,5 +1,10 @@
 #include "deck_list_history_manager.h"
 
+#include "libcockatrice/deck_list/deck_list.h"
+#include "libcockatrice/deck_list/deck_list_memento.h"
+
+#include <QString>
+
 void DeckListHistoryManager::save(const DeckListMemento &memento)
 {
     undoStack.push(memento);

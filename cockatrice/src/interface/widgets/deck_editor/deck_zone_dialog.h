@@ -8,9 +8,9 @@
 #define DECK_ZONE_DIALOG_H
 
 #include <QDialog>
-#include <QEvent>
 #include <QString>
 #include <functional>
+#include <qtmetamacros.h>
 
 class QComboBox;
 class QDialogButtonBox;

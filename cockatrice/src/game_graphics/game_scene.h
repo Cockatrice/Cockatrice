@@ -2,16 +2,33 @@
 #define GAMESCENE_H
 
 #include "../game/arrow_registry.h"
-#include "../game/board/arrow_data.h"
-#include "../game/zones/card_zone_logic.h"
-#include "animated_item.h"
-#include "board/arrow_item.h"
 
 #include <QGraphicsScene>
 #include <QHash>
 #include <QList>
 #include <QLoggingCategory>
+#include <QMap>
+#include <QMetaObject>
+#include <QPointF>
 #include <QPointer>
+#include <QSize>
+#include <QSizeF>
+#include <QString>
+#include <QTransform>
+#include <QtGlobal>
+#include <qtmetamacros.h>
+
+// IWYU pragma: keep
+// ServerInfo_Card appears inside QList<...> in signal and slot
+// signatures, which the moc-generated code needs to be complete.
+#include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
+
+class CardZoneLogic;
+class IAnimatedItem;
+class QGraphicsItem;
+class QPoint;
+struct ArrowData;
+template <class T> class QSharedPointer;
 
 inline Q_LOGGING_CATEGORY(GameSceneLog, "game_scene");
 inline Q_LOGGING_CATEGORY(GameScenePlayerAdditionRemovalLog, "game_scene.player_addition_removal");

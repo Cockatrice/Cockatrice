@@ -19,16 +19,36 @@
  ***************************************************************************/
 #include "server.h"
 
+#include "game/server_abstract_participant.h"
 #include "game/server_game.h"
-#include "game/server_player.h"
+#include "libcockatrice/protocol/pb/commands.pb.h"
+#include "libcockatrice/protocol/pb/game_commands.pb.h"
+#include "libcockatrice/protocol/pb/game_event_container.pb.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/room_commands.pb.h"
+#include "libcockatrice/protocol/pb/room_event.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_ban.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_room.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+#include "server_abstractuserinterface.h"
 #include "server_database_interface.h"
 #include "server_protocolhandler.h"
 #include "server_remoteuserinterface.h"
+#include "server_response_containers.h"
 #include "server_room.h"
+#include "serverinfo_user_container.h"
 
-#include <QCoreApplication>
+#include <QDateTime>
 #include <QDebug>
+#include <QMapIterator>
+#include <QMetaType>
+#include <QPair>
+#include <QReadLocker>
+#include <QSharedPointer>
 #include <QThread>
+#include <QWriteLocker>
+#include <google/protobuf/stubs/port.h>
 #include <libcockatrice/protocol/debug_pb_message.h>
 #include <libcockatrice/protocol/pb/event_connection_closed.pb.h>
 #include <libcockatrice/protocol/pb/event_list_rooms.pb.h>
@@ -36,6 +56,10 @@
 #include <libcockatrice/protocol/pb/event_user_left.pb.h>
 #include <libcockatrice/protocol/pb/isl_message.pb.h>
 #include <libcockatrice/protocol/pb/session_event.pb.h>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <string>
+#include <utility>
 
 Server::Server(QObject *parent) : QObject(parent), nextLocalGameId(0), tcpUserCount(0), webSocketUserCount(0)
 {

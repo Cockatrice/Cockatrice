@@ -4,8 +4,15 @@
 #include "../printing/exact_card.h"
 #include "../set/card_set_comparator.h"
 #include "card_database.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/interfaces/interface_card_preference_provider.h"
+#include "libcockatrice/utility/card_ref.h"
 
-#include <qrandom.h>
+#include <QLatin1String>
+#include <QRandomGenerator>
+#include <QSharedPointer>
+#include <QStringLiteral>
+#include <qnamespace.h>
 
 CardDatabaseQuerier::CardDatabaseQuerier(QObject *_parent,
                                          const CardDatabase *_db,

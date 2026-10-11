@@ -1,5 +1,9 @@
 #include "commander_spellbook_estimate_bracket_result.h"
 
+#include <QJsonArray>
+#include <QJsonValue>
+#include <QJsonValueRef>
+
 EstimateBracketResult EstimateBracketResult::fromJson(const QJsonObject &json)
 {
     EstimateBracketResult result;

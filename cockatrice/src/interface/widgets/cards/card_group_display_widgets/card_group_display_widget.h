@@ -7,15 +7,24 @@
 #ifndef CARD_GROUP_DISPLAY_WIDGET_H
 #define CARD_GROUP_DISPLAY_WIDGET_H
 
-#include "../../general/display/banner_widget.h"
-#include "../card_info_picture_with_text_overlay_widget.h"
-#include "../card_size_widget.h"
-
-#include <QItemSelectionModel>
-#include <QLabel>
+#include <QList>
+#include <QMap>
+#include <QMouseEvent>
+#include <QPersistentModelIndex>
+#include <QString>
+#include <QStringList>
 #include <QVBoxLayout>
+#include <QVector>
 #include <QWidget>
-#include <libcockatrice/models/deck_list/deck_list_model.h>
+#include <qtmetamacros.h>
+
+class BannerWidget;
+class CardSizeWidget;
+class DeckListModel;
+class ExactCard;
+class QItemSelection;
+class QItemSelectionModel;
+class QModelIndex;
 
 class CardGroupDisplayWidget : public QWidget
 {

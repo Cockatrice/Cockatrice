@@ -4,19 +4,39 @@
 #include "../../pixel_map_generator.h"
 #include "update/card_spoiler/spoiler_background_updater.h"
 
+#include <QAbstractItemModel>
+#include <QAbstractItemView>
+#include <QAction>
+#include <QDateTime>
+#include <QDebug>
+#include <QDir>
+#include <QFile>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QGridLayout>
+#include <QGroupBox>
 #include <QHBoxLayout>
+#include <QHash>
 #include <QInputDialog>
 #include <QLineEdit>
+#include <QList>
+#include <QListWidget>
+#include <QListWidgetItem>
 #include <QMessageBox>
 #include <QSet>
+#include <QSizePolicy>
+#include <QStringList>
+#include <QStringLiteral>
 #include <QToolBar>
 #include <QUrl>
+#include <QVBoxLayout>
+#include <QVariant>
 #include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/utility/macros.h>
+#include <qlogging.h>
+#include <qnamespace.h>
 
 DeckEditorSettingsPage::DeckEditorSettingsPage()
 {

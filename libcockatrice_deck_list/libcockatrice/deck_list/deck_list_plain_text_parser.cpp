@@ -1,10 +1,17 @@
 #include "deck_list_plain_text_parser.h"
 
 #include "deck_list_node_tree.h"
+#include "libcockatrice/deck_list/deck_list.h"
 #include "tree/inner_deck_list_node.h"
 
+#include <QChar>
+#include <QList>
 #include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QString>
 #include <QTextStream>
+#include <QtGlobal>
+#include <qnamespace.h>
 
 namespace DeckListPlainText
 {

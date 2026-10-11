@@ -1,7 +1,16 @@
 #include "servers_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
 #include <QDebug>
+#include <QList>
+#include <QMessageLogger>
+#include <QSharedPointer>
+#include <QVariant>
+#include <qnamespace.h>
 #include <utility>
+
+class QObject;
 
 ServersSettings::ServersSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "servers.ini", "server", QString(), parent)

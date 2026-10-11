@@ -1,11 +1,34 @@
 #include "resizable_panel.h"
 
+#include "abstract_analytics_panel_widget.h"
 #include "libcockatrice/utility/qt_utils.h"
 
+#include <QApplication>
+#include <QByteArray>
 #include <QColor>
+#include <QDrag>
+#include <QDragEnterEvent>
+#include <QDragMoveEvent>
+#include <QDropEvent>
+#include <QEvent>
+#include <QFlags>
+#include <QFrame>
 #include <QHBoxLayout>
+#include <QMimeData>
+#include <QMouseEvent>
+#include <QPalette>
 #include <QPixmap>
+#include <QPointF>
+#include <QPushButton>
+#include <QRect>
+#include <QScrollArea>
+#include <QScrollBar>
+#include <QSize>
+#include <QSizePolicy>
+#include <QTimer>
+#include <QVBoxLayout>
 #include <QtGlobal>
+#include <qnamespace.h>
 
 ResizablePanel::ResizablePanel(const QString &_typeId, AbstractAnalyticsPanelWidget *analyticsPanel, QWidget *parent)
     : QWidget(parent), panel(analyticsPanel), typeId(_typeId)

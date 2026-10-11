@@ -8,12 +8,21 @@
 #ifndef COCKATRICE_CARD_DATABASE_DISPLAY_MODEL_H
 #define COCKATRICE_CARD_DATABASE_DISPLAY_MODEL_H
 
+#include "libcockatrice/card/card_info.h"
+
+#include <QModelIndex>
+#include <QSet>
 #include <QSortFilterProxyModel>
+#include <QString>
 #include <QTimer>
 #include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/filters/filter_string.h>
+#include <qtmetamacros.h>
 
 class FilterTree;
+class QObject;
+template <class Key, class T> class QMap;
+
 class CardDatabaseDisplayModel : public QSortFilterProxyModel
 {
     Q_OBJECT

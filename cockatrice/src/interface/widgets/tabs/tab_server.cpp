@@ -1,14 +1,20 @@
 #include "tab_server.h"
 
-#include "../interface/widgets/server/user/user_list_widget.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_room.pb.h"
 #include "tab_supervisor.h"
 
 #include <QHBoxLayout>
 #include <QHeaderView>
-#include <QInputDialog>
+#include <QMap>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QTextEdit>
+#include <QSharedPointer>
+#include <QTextBrowser>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
+#include <QVBoxLayout>
+#include <QWidget>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/event_list_rooms.pb.h>
 #include <libcockatrice/protocol/pb/event_server_message.pb.h>
@@ -16,6 +22,9 @@
 #include <libcockatrice/protocol/pb/room_commands.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <qnamespace.h>
+
+class TabRoom;
 
 RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent) : QGroupBox(parent), client(_client)
 {

@@ -41,6 +41,12 @@ websocket_host=any
 ; The TCP port number servatrice will listen on for websockets clients; default is 4748
 websocket_port=4748
 
+; If websockets are served through a reverse proxy (e.g. nginx), the real client address can be
+; read from an HTTP header such as X-Forwarded-For. The header is ONLY trusted when the websocket
+; connection itself originates from an address listed in security/trusted_sources (default 127.0.0.1,::1),
+; so that clients cannot spoof their address to bypass bans or rate limits.
+web_socket_ip_header=
+
 ; When database is enabled, servatrice writes the server status in the "update" database table; this
 ; setting defines every how many milliseconds servatrice will update its status; default is 15000 (15 secs)
 statusupdate=15000

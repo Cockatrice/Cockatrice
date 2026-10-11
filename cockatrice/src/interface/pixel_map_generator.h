@@ -7,13 +7,19 @@
 #ifndef PIXMAPGENERATOR_H
 #define PIXMAPGENERATOR_H
 
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+
 #include <QHash>
 #include <QIcon>
 #include <QLoggingCategory>
 #include <QMap>
 #include <QPixmap>
+#include <QString>
+#include <QStringView>
 #include <libcockatrice/network/server/remote/user_level.h>
 #include <optional>
+
+class QSize;
 
 inline Q_LOGGING_CATEGORY(PixelMapGeneratorLog, "pixel_map_generator");
 

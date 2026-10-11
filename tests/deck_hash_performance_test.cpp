@@ -1,6 +1,10 @@
 #include "gtest/gtest.h"
-#include <QDebug>
+#include <QChar>
+#include <QList>
+#include <QString>
+#include <QStringList>
 #include <libcockatrice/deck_list/deck_list.h>
+#include <string>
 
 static constexpr int amount = 1e5;
 QString repeatDeck;

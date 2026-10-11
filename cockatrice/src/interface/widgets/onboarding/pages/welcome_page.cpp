@@ -3,15 +3,23 @@
 #include "../../../../main.h"
 #include "../../client/settings/cache_settings.h"
 #include "../../settings_page/general_settings_page.h"
+#include "../first_run_wizard_page.h"
 #include "libcockatrice/settings/personal_settings.h"
 
 #include <QApplication>
+#include <QChar>
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QList>
 #include <QLocale>
-#include <QTranslator>
+#include <QString>
 #include <QVBoxLayout>
+#include <QVariant>
+#include <QtGlobal>
+#include <qnamespace.h>
+
+class QWidget;
 
 WelcomePage::WelcomePage(QWidget *parent) : FirstRunWizardPage(parent)
 {

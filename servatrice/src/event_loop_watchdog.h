@@ -9,6 +9,7 @@
 #include <QElapsedTimer>
 #include <QObject>
 #include <QString>
+#include <qtmetamacros.h>
 
 class Servatrice;
 class QTimer;

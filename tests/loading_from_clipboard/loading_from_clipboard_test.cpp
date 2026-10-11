@@ -1,5 +1,11 @@
 #include "clipboard_testing.h"
 
+#include <QList>
+#include <QString>
+#include <gtest/gtest.h>
+#include <string>
+#include <utility>
+
 // Testing is done by using the DeckList::loadFromString_Plain function in common/decklist.h
 // It does not check if cards are in the database at all, so no comparisons to the database will be made.
 

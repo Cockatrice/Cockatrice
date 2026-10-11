@@ -4,6 +4,8 @@
 
 #include <libcockatrice/settings/commander_bracket_settings.h>
 
+class DeckList;
+
 CommanderBracketService &CommanderBracketService::instance()
 {
     static CommanderBracketService service;

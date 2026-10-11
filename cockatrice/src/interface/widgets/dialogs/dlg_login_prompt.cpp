@@ -7,6 +7,8 @@
 #include <QLineEdit>
 #include <QVBoxLayout>
 
+class QWidget;
+
 DlgLoginPrompt::DlgLoginPrompt(const QString &serverText, QWidget *parent) : QDialog(parent)
 {
     setWindowTitle(tr("Sign in"));

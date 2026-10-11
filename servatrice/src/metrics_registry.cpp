@@ -1,6 +1,7 @@
 #include "metrics_registry.h"
 
 #include <QList>
+#include <stddef.h>
 
 void MetricsRegistry::observeCommand(int typeId, qint64 elapsedMs)
 {

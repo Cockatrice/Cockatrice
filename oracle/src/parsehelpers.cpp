@@ -1,7 +1,11 @@
 #include "parsehelpers.h"
 
 #include <QChar>
+#include <QList>
 #include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QSharedPointer>
+#include <QStringList>
 
 /**
  * Parses the card text to determine if the card should have the cipt tag

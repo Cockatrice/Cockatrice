@@ -2,6 +2,10 @@
 #define COCKATRICE_STATS_TALLY_H
 #include "tally.h"
 
+#include <QList>
+
+class CardItem;
+
 /**
  * @brief Extracts and tallies stats from selected cards.
  */

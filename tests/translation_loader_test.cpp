@@ -1,12 +1,17 @@
 #include "gtest/gtest.h"
+#include <QByteArray>
 #include <QCoreApplication>
 #include <QDir>
 #include <QLibraryInfo>
+#include <QList>
 #include <QSet>
 #include <QString>
+#include <QStringList>
+#include <QStringLiteral>
 #include <QTemporaryDir>
 #include <QTranslator>
 #include <libcockatrice/utility/translation_loader.h>
+#include <string>
 
 // The directory holding translation_loader_test_de.qm, compiled from translation_loader_test.ts by the
 // build. QTranslator rejects anything that is not a real .qm file, so a stub cannot stand in here.

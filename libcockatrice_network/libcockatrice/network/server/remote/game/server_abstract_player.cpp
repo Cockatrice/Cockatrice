@@ -1,14 +1,33 @@
 #include "server_abstract_player.h"
 
+#include "game/server_abstract_participant.h"
+#include "game/server_arrowtarget.h"
+#include "libcockatrice/protocol/pb/card_attributes.pb.h"
+#include "libcockatrice/protocol/pb/color.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_arrow.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_card.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_cardcounter.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_zone.pb.h"
+#include "libcockatrice/utility/card_ref.h"
+#include "libcockatrice/utility/playmat_params.h"
 #include "server_arrow.h"
 #include "server_card.h"
 #include "server_cardzone.h"
 #include "server_game.h"
 #include "server_move_card_struct.h"
+#include "server_response_containers.h"
 
-#include <QDebug>
-#include <QRegularExpression>
+#include <QList>
+#include <QListIterator>
+#include <QMapIterator>
+#include <QObject>
+#include <QSet>
+#include <QSharedPointer>
+#include <QVariant>
 #include <algorithm>
+#include <google/protobuf/stubs/port.h>
+#include <iterator>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/command_change_zone_properties.pb.h>
@@ -50,8 +69,11 @@
 #include <libcockatrice/utility/dice_limits.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <libcockatrice/utility/zone_names.h>
-#include <limits>
 #include <ranges>
+#include <set>
+#include <string>
+
+class Server_AbstractUserInterface;
 
 Server_AbstractPlayer::Server_AbstractPlayer(Server_Game *_game,
                                              int _playerId,

@@ -2,9 +2,13 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QMap>
 #include <QMessageBox>
+#include <QMessageLogger>
+#include <QSettings>
+#include <QSharedPointer>
 #include <QStringList>
-#include <utility>
+#include <QVariant>
 
 ShortcutKey::ShortcutKey(const QString &_name, QList<QKeySequence> _sequence, ShortcutGroup::Groups _group)
     : QList<QKeySequence>(_sequence), name(_name), group(_group)

@@ -3,19 +3,38 @@
 #include "../../client/settings/cache_settings.h"
 #include "../../client/settings/card_counter_settings.h"
 #include "../../client/sound_engine.h"
+#include "../../client/translation.h"
+#include "../../game/abstract_game.h"
+#include "../../game/board/card_list.h"
 #include "../../game/game_state.h"
 #include "../../game/phase.h"
+#include "../../game/player/player_event_handler.h"
+#include "../../game/player/player_info.h"
 #include "../../game/player/player_logic.h"
+#include "../../game/player/player_manager.h"
+#include "../../game/zones/card_zone_logic.h"
 #include "../../interface/card_localization.h"
-#include "../../interface/widgets/tabs/tab_game.h"
+#include "../../interface/widgets/server/chat_view/chat_view.h"
 #include "../board/card_item.h"
 #include "../board/translate_counter_name.h"
+#include "libcockatrice/protocol/pb/game_event_context.pb.h"
 
+#include <QColor>
+#include <QDebug>
+#include <QList>
+#include <QSharedPointer>
+#include <QStringList>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/protocol/pb/context_mulligan.pb.h>
 #include <libcockatrice/settings/chat_settings.h>
 #include <libcockatrice/utility/zone_names.h>
+#include <optional>
+#include <stdlib.h>
 #include <utility>
+
+class QWidget;
+class ServerInfo_User;
+class TabSupervisor;
 
 static QString sanitizeHtml(QString dirty)
 {

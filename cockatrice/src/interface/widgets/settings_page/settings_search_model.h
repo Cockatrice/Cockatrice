@@ -7,9 +7,17 @@
 #define COCKATRICE_SETTINGS_SEARCH_MODEL_H
 
 #include <QAbstractListModel>
+#include <QByteArray>
 #include <QList>
+#include <QMetaType>
+#include <QModelIndex>
 #include <QRegularExpression>
-#include <QWidget>
+#include <QString>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
+
+class QObject;
+class QWidget;
 
 /**
  * @brief Represents a single searchable setting entry

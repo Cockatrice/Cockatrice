@@ -62,3 +62,5 @@ target_link_libraries(
   libcockatrice_network_server_remote PUBLIC libcockatrice_protocol libcockatrice_utility libcockatrice_rng
                                              libcockatrice_deck_list ${COCKATRICE_QT_MODULES}
 )
+
+target_precompile_headers(libcockatrice_network_server_remote PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtcore_pch.h")

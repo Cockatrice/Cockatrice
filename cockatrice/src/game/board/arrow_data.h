@@ -3,8 +3,8 @@
 
 #include <QColor>
 #include <QString>
-#include <libcockatrice/protocol/pb/serverinfo_arrow.pb.h>
-#include <libcockatrice/utility/color.h>
+
+class ServerInfo_Arrow;
 
 struct ArrowData
 {

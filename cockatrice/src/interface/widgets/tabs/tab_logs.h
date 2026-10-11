@@ -9,7 +9,8 @@
 
 #include "tab.h"
 
-#include <QDialog>
+#include <QString>
+#include <qtmetamacros.h>
 
 class AbstractClient;
 class LineEditUnfocusable;
@@ -24,9 +25,8 @@ class QWidget;
 class QGridLayout;
 class QVBoxLayout;
 class QTableWidget;
-class CommandContainer;
 class Response;
-class AbstractClient;
+class TabSupervisor;
 
 class TabLog : public Tab
 {

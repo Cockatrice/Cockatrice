@@ -7,12 +7,20 @@
  * "main" are still mainboard cards for hashing, sideboard size, legality and export.
  */
 
+#include "libcockatrice/deck_list/tree/abstract_deck_list_node.h"
+
+#include <QList>
+#include <QSet>
+#include <QSharedPointer>
+#include <QString>
 #include <QStringList>
+#include <functional>
 #include <gtest/gtest.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/deck_list_node_tree.h>
 #include <libcockatrice/deck_list/tree/deck_list_card_node.h>
 #include <libcockatrice/deck_list/tree/inner_deck_list_node.h>
+#include <string>
 
 namespace
 {

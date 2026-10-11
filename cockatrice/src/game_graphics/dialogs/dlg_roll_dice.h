@@ -8,9 +8,13 @@
 #define DLG_ROLL_DICE_H
 
 #include <QDialog>
-#include <QDialogButtonBox>
-#include <QLabel>
-#include <QSpinBox>
+#include <qtmetamacros.h>
+#include <sys/types.h>
+
+class QDialogButtonBox;
+class QLabel;
+class QSpinBox;
+class QWidget;
 
 class DlgRollDice : public QDialog
 {

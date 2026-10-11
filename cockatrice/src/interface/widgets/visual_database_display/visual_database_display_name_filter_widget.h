@@ -7,14 +7,17 @@
 #ifndef VISUAL_DATABASE_DISPLAY_NAME_FILTER_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_NAME_FILTER_WIDGET_H
 
-#include "../../../filters/filter_tree_model.h"
-#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
-#include "../general/layout_containers/flow_widget.h"
-
-#include <QLineEdit>
 #include <QMap>
-#include <QPushButton>
+#include <QString>
 #include <QWidget>
+#include <qtmetamacros.h>
+
+class DeckListModel;
+class FilterTreeModel;
+class FlowWidget;
+class QLineEdit;
+class QPushButton;
+class QVBoxLayout;
 
 class VisualDatabaseDisplayNameFilterWidget : public QWidget
 {
