@@ -4,10 +4,16 @@
 #include "../server_abstractuserinterface.h"
 #include "../server_database_interface.h"
 #include "../server_room.h"
-#include "server_card.h"
+#include "game/server_abstract_player.h"
+#include "libcockatrice/protocol/pb/event_leave.pb.h"
+#include "libcockatrice/protocol/pb/game_commands.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h"
 #include "server_game.h"
-#include "server_player.h"
+#include "server_response_containers.h"
+#include "serverinfo_user_container.h"
 
+#include <QMutexLocker>
+#include <QString>
 #include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/command_change_zone_properties.pb.h>
@@ -37,6 +43,7 @@
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_set_counter.pb.h>
+#include <libcockatrice/protocol/pb/command_set_playmat.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_lock.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_plan.pb.h>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
@@ -49,6 +56,7 @@
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <string>
 
 Server_AbstractParticipant::Server_AbstractParticipant(Server_Game *_game,
                                                        int _playerId,
@@ -140,6 +148,13 @@ Response::ResponseCode Server_AbstractParticipant::cmdSetSideboardPlan(const Com
 Response::ResponseCode Server_AbstractParticipant::cmdSetSideboardLock(const Command_SetSideboardLock & /*cmd*/,
                                                                        ResponseContainer & /*rc*/,
                                                                        GameEventStorage & /*ges*/)
+{
+    return Response::RespFunctionNotAllowed;
+}
+
+Response::ResponseCode Server_AbstractParticipant::cmdSetPlaymat(const Command_SetPlaymat & /*cmd*/,
+                                                                 ResponseContainer & /*rc*/,
+                                                                 GameEventStorage & /*ges*/)
 {
     return Response::RespFunctionNotAllowed;
 }
@@ -524,6 +539,9 @@ Server_AbstractParticipant::processGameCommand(const GameCommand &command, Respo
             break;
         case GameCommand::REVERSE_TURN:
             return cmdReverseTurn(command.GetExtension(Command_ReverseTurn::ext), rc, ges);
+            break;
+        case GameCommand::SET_PLAYMAT:
+            return cmdSetPlaymat(command.GetExtension(Command_SetPlaymat::ext), rc, ges);
             break;
         default:
             return Response::RespInvalidCommand;

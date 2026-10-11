@@ -1,11 +1,35 @@
 #include "filter_string.h"
 
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/card_localization.h"
+#include "libcockatrice/card/database/card_database.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/card/set/card_set_list.h"
+
 #include <QByteArray>
+#include <QChar>
+#include <QDate>
 #include <QDebug>
+#include <QList>
+#include <QMessageLogger>
 #include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QSharedPointer>
 #include <QString>
+#include <QStringList>
+#include <algorithm>
+#include <any>
+#include <ctype.h>
 #include <functional>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/utility/peglib.h>
+#include <mutex>
+#include <qnamespace.h>
+#include <stddef.h>
+#include <string>
+#include <string_view>
+#include <vector>
 
 static peg::parser search(R"(
 Start <- QueryPartList
@@ -19,7 +43,8 @@ SomewhatComplexQueryPart <- [(] QueryPartList [)] / QueryPart
 QueryPart <- NotQuery / SetQuery / RarityQuery / CMCQuery / FormatQuery / PowerQuery / ToughnessQuery / ColorQuery / TypeQuery / OracleQuery / FieldQuery / GenericQuery
 
 NotQuery <- ('NOT' ws/'-') SomewhatComplexQueryPart
-SetQuery <- ('e'/'set') [:] FlexStringValue
+SetQuery <- ('e'/'set') SetQueryValue
+SetQueryValue <- ([=:] FlexStringValue) / (<[!][=]?> FlexStringValue) / SetExpression
 OracleQuery <- 'o' [:] MatcherString
 
 
@@ -64,12 +89,44 @@ RegexMatcherString <- ('\\/' / !'/' .)+
 FlexStringValue <- CompactStringSet / String / [(] StringList [)]
 CompactStringSet <- StringListString ([,+] StringListString)+
 
+SetExpression <- NumericOperator ws? String
+
 NumericExpression <- NumericOperator ws? NumericValue
 NumericOperator <- [=:] / <[><!][=]?>
 NumericValue <- [0-9]+
 )");
 
 static std::once_flag init;
+
+// The peglib parser rules (and therefore their rule actions) are set up once per
+// process, so a rule action cannot capture per-instance state. The card language
+// plain-text name and text queries search in is therefore handed to the GenericQuery
+// and OracleQuery rule actions through this thread-local context, which is live only
+// while a FilterString is being parsed. The rule actions copy it into the filter
+// closures they produce, so card evaluation never reads process-global state.
+thread_local CardSearchLanguage searchLanguageContext;
+
+namespace
+{
+bool matchesInSearchLanguage(const QString &english,
+                             const QString &localized,
+                             const CardSearchLanguage &searchLanguage,
+                             const StringMatcher &matcher)
+{
+    if (searchLanguage.mode == SearchLanguageMode::English) {
+        return matcher(english);
+    }
+
+    if (searchLanguage.mode == SearchLanguageMode::Both) {
+        if (!searchLanguage.isEnglishOnly() && matcher(localized)) {
+            return true;
+        }
+        return matcher(english);
+    }
+
+    return searchLanguage.isEnglishOnly() ? matcher(english) : matcher(localized);
+}
+} // namespace
 
 static void setupParserRules()
 {
@@ -100,13 +157,35 @@ static void setupParserRules()
         const auto matcher = std::any_cast<StringMatcher>(sv[0]);
         return [=](const CardData &x) -> bool { return matcher(x->getCardType()); };
     };
-    search["SetQuery"] = [](const peg::SemanticValues &sv) -> Filter {
-        auto matcher = std::any_cast<StringMatcher>(sv[0]);
-        return [=](const CardData &x) -> bool {
-            QList<QString> sets = x->getSets().keys();
+    search["SetQueryValue"] = [](const peg::SemanticValues &sv) -> Filter {
+        if (sv.choice() == 0) {
+            auto matcher = std::any_cast<StringMatcher>(sv[0]);
+            return [=](const CardData &x) -> bool {
+                QList<QString> sets = x->getSets().keys();
 
-            auto matchesSet = [&matcher](const QString &set) { return matcher(set); };
-            return std::any_of(sets.begin(), sets.end(), matchesSet);
+                auto matchesSet = [&matcher](const QString &set) { return matcher(set); };
+                return std::any_of(sets.begin(), sets.end(), matchesSet);
+            };
+        }
+        if (sv.choice() == 1) {
+            auto matcher = std::any_cast<StringMatcher>(sv[0]);
+            return [=](const CardData &x) -> bool {
+                QList<QString> sets = x->getSets().keys();
+
+                auto matchesSet = [&matcher](const QString &set) { return matcher(set); };
+                return std::none_of(sets.begin(), sets.end(), matchesSet);
+            };
+        }
+
+        auto matcher = std::any_cast<NumberMatcher>(sv[0]);
+        return [=](const CardData &x) -> bool {
+            const auto &sets = x->getSets().values();
+            auto matchesSet = [&](const PrintingInfo &printing) {
+                return printing.getSet()->getEnabled() && matcher(printing.getSet()->getReleaseDate().toJulianDay());
+            };
+            return std::any_of(sets.begin(), sets.end(), [&](const auto &printings) {
+                return std::any_of(printings.begin(), printings.end(), matchesSet);
+            });
         };
     };
     search["Rarity"] = [](const peg::SemanticValues &sv) -> QString {
@@ -247,40 +326,54 @@ static void setupParserRules()
         return QString::fromStdString(std::string(sv.sv()));
     };
 
-    search["NumericExpression"] = [](const peg::SemanticValues &sv) -> NumberMatcher {
-        const auto arg = std::any_cast<int>(sv[1]);
-        const auto op = std::any_cast<QString>(sv[0]);
+    search["NumericOperator"] = [](const peg::SemanticValues &sv) -> NumberComparer {
+        const auto op = QString::fromStdString(std::string(sv.sv()));
 
         if (op == ">") {
-            return [=](const int s) { return s > arg; };
+            return [=](const int s, const int arg) { return s > arg; };
         }
         if (op == ">=") {
-            return [=](const int s) { return s >= arg; };
+            return [=](const int s, const int arg) { return s >= arg; };
         }
         if (op == "<") {
-            return [=](const int s) { return s < arg; };
+            return [=](const int s, const int arg) { return s < arg; };
         }
         if (op == "<=") {
-            return [=](const int s) { return s <= arg; };
+            return [=](const int s, const int arg) { return s <= arg; };
         }
         if (op == "=") {
-            return [=](const int s) { return s == arg; };
+            return [=](const int s, const int arg) { return s == arg; };
         }
         if (op == ":") {
-            return [=](const int s) { return s == arg; };
+            return [=](const int s, const int arg) { return s == arg; };
         }
         if (op == "!=") {
-            return [=](const int s) { return s != arg; };
+            return [=](const int s, const int arg) { return s != arg; };
         }
-        return [](int) { return false; };
+        return [](int, int) { return false; };
     };
 
     search["NumericValue"] = [](const peg::SemanticValues &sv) -> int {
         return QString::fromStdString(std::string(sv.sv())).toInt();
     };
 
-    search["NumericOperator"] = [](const peg::SemanticValues &sv) -> QString {
-        return QString::fromStdString(std::string(sv.sv()));
+    search["NumericExpression"] = [](const peg::SemanticValues &sv) -> NumberMatcher {
+        const auto comparer = std::any_cast<NumberComparer>(sv[0]);
+        const auto arg = std::any_cast<int>(sv[1]);
+        return [=](int s) { return comparer(s, arg); };
+    };
+
+    search["SetExpression"] = [](const peg::SemanticValues &sv) -> NumberMatcher {
+        const auto comparer = std::any_cast<NumberComparer>(sv[0]);
+        const auto setCode = std::any_cast<QString>(sv[1]);
+        const auto allSets = CardDatabaseManager::getInstance()->getSetList();
+        for (auto &set : allSets) {
+            if (set->getShortName() == setCode) {
+                const int releaseDate = set->getReleaseDate().toJulianDay();
+                return [=](int s) { return comparer(s, releaseDate); };
+            }
+        }
+        return [](int) { return false; };
     };
 
     search["NormalMatcher"] = [](const peg::SemanticValues &sv) -> StringMatcher {
@@ -303,7 +396,11 @@ static void setupParserRules()
 
     search["OracleQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         const auto matcher = std::any_cast<StringMatcher>(sv[0]);
-        return [=](const CardData &x) { return matcher(x->getText()); };
+        const CardSearchLanguage searchLanguage = searchLanguageContext;
+        return [=](const CardData &x) {
+            return matchesInSearchLanguage(x->getText(), x->getLocalizedText(searchLanguage.language), searchLanguage,
+                                           matcher);
+        };
     };
 
     search["ColorQuery"] = [](const peg::SemanticValues &sv) -> Filter {
@@ -380,7 +477,11 @@ static void setupParserRules()
     };
     search["GenericQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         const auto matcher = std::any_cast<StringMatcher>(sv[0]);
-        return [=](const CardData &x) { return matcher(x->getName()); };
+        const CardSearchLanguage searchLanguage = searchLanguageContext;
+        return [=](const CardData &x) {
+            return matchesInSearchLanguage(x->getName(), x->getLocalizedName(searchLanguage.language), searchLanguage,
+                                           matcher);
+        };
     };
 
     search["Color"] = [](const peg::SemanticValues &sv) -> char { return "WUBRGU"[sv.choice()]; };
@@ -395,7 +496,7 @@ FilterString::FilterString()
     _error = "Not initialized";
 }
 
-FilterString::FilterString(const QString &expr)
+FilterString::FilterString(const QString &expr, const CardSearchLanguage &searchLanguage)
 {
     QByteArray ba = expr.simplified().toUtf8();
 
@@ -407,6 +508,8 @@ FilterString::FilterString(const QString &expr)
         result = [](const CardData &) -> bool { return true; };
         return;
     }
+
+    searchLanguageContext = searchLanguage;
 
     search.set_logger([&](size_t /*ln*/, size_t col, const std::string &msg) {
         _error = QString("Error at position %1: %2").arg(col).arg(QString::fromStdString(msg));

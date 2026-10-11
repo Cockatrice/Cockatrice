@@ -2,12 +2,22 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
-#include "../interface/widgets/tabs/tab_game.h"
+#include "../../pixel_map_generator.h"
+#include "libcockatrice/settings/interface_settings.h"
 #include "replay_manager.h"
 #include "replay_quick_settings_widget.h"
+#include "replay_timeline_widget.h"
 
+#include <QAction>
 #include <QHBoxLayout>
+#include <QIcon>
+#include <QSize>
+#include <QString>
+#include <QStringLiteral>
 #include <QToolButton>
+#include <QtGlobal>
+
+class GameReplay;
 
 ReplayWidget::ReplayWidget(QWidget *parent, GameReplay *replay)
     : QWidget(parent), replayPlayButton(nullptr), replayFastForwardButton(nullptr), aReplaySkipForward(nullptr),
@@ -50,15 +60,15 @@ ReplayWidget::ReplayWidget(QWidget *parent, GameReplay *replay)
     replayPlayButton = new QToolButton;
     replayPlayButton->setIconSize(QSize(32, 32));
     QIcon playButtonIcon = QIcon();
-    playButtonIcon.addPixmap(QPixmap("theme:replay/start"), QIcon::Normal, QIcon::Off);
-    playButtonIcon.addPixmap(QPixmap("theme:replay/pause"), QIcon::Normal, QIcon::On);
+    playButtonIcon.addPixmap(themePixmap(QStringLiteral("replay/start")), QIcon::Normal, QIcon::Off);
+    playButtonIcon.addPixmap(themePixmap(QStringLiteral("replay/pause")), QIcon::Normal, QIcon::On);
     replayPlayButton->setIcon(playButtonIcon);
     replayPlayButton->setCheckable(true);
     connect(replayPlayButton, &QToolButton::toggled, this, &ReplayWidget::replayPlayButtonToggled);
 
     replayFastForwardButton = new QToolButton;
     replayFastForwardButton->setIconSize(QSize(32, 32));
-    replayFastForwardButton->setIcon(QPixmap("theme:replay/fastforward"));
+    replayFastForwardButton->setIcon(themePixmap(QStringLiteral("replay/fastforward")));
     replayFastForwardButton->setCheckable(true);
     connect(replayFastForwardButton, &QToolButton::toggled, this, &ReplayWidget::updateTimeScaleFactor);
 
@@ -66,6 +76,10 @@ ReplayWidget::ReplayWidget(QWidget *parent, GameReplay *replay)
     settingsWidget->setFixedSize(QSize(32, 32));
     connect(settingsWidget, &ReplayQuickSettingsWidget::fastForwardSpeedChanged, this,
             [this] { updateTimeScaleFactor(replayFastForwardButton->isChecked()); });
+    connect(settingsWidget, &ReplayQuickSettingsWidget::skipEmptySectionsChanged, replayManager,
+            &ReplayManager::setSkipEmptySections);
+
+    replayManager->setSkipEmptySections(SettingsCache::instance().userInterface().getSkipEmptySections());
 
     // putting everything together
     auto replayControlLayout = new QHBoxLayout;
@@ -98,7 +112,7 @@ void ReplayWidget::replayPlayButtonToggled(bool checked)
 
 void ReplayWidget::updateTimeScaleFactor(bool isFastForward)
 {
-    qreal factor = isFastForward ? SettingsCache::instance().interface().getFastForwardSpeed() : 1.0;
+    qreal factor = isFastForward ? SettingsCache::instance().userInterface().getFastForwardSpeed() : 1.0;
     replayManager->setTimeScaleFactor(factor);
 }
 

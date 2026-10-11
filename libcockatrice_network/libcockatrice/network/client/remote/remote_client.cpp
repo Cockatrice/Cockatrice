@@ -1,5 +1,8 @@
 #include "remote_client.h"
 
+#include "abstract_client.h"
+#include "libcockatrice/protocol/pb/commands.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 #include "version_string.h"
 
 #include <QCryptographicHash>
@@ -7,13 +10,21 @@
 #include <QHostAddress>
 #include <QHostInfo>
 #include <QList>
+#include <QMap>
+#include <QMessageLogger>
+#include <QMutableMapIterator>
+#include <QSharedPointer>
+#include <QStringList>
 #include <QThread>
 #include <QTimer>
+#include <QUrl>
 #include <QWebSocket>
+#include <QWebSocketProtocol>
+#include <QtGlobal>
+#include <google/protobuf/stubs/common.h>
 #include <libcockatrice/interfaces/interface_network_settings_provider.h>
 #include <libcockatrice/protocol/debug_pb_message.h>
 #include <libcockatrice/protocol/pb/event_server_identification.pb.h>
-#include <libcockatrice/protocol/pb/response_activate.pb.h>
 #include <libcockatrice/protocol/pb/response_forgotpasswordrequest.pb.h>
 #include <libcockatrice/protocol/pb/response_login.pb.h>
 #include <libcockatrice/protocol/pb/response_password_salt.pb.h>
@@ -22,6 +33,10 @@
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/passwordhasher.h>
+#include <string>
+
+class Event_ConnectionClosed;
+class QObject;
 
 static const unsigned int protocolVersion = 14;
 
@@ -543,6 +558,7 @@ void RemoteClient::doDisconnectFromServer()
         delete i;
     }
     pendingCommands.clear();
+    clearLatencyStats();
 
     setStatus(StatusDisconnected);
     if (websocket->isValid()) {
@@ -558,6 +574,15 @@ void RemoteClient::ping()
         PendingCommand *pend = i.next().value();
         if (pend->tick() > maxTimeout) {
             i.remove();
+            // Answer the command instead of dropping it silently: the connection may still
+            // be alive (other traffic keeps lastDataReceived fresh) while this single
+            // command stalled, and awaiters such as TabServer's room-join dedup can only
+            // release their in-flight markers when `finished` fires. A silent drop wedges
+            // them permanently - e.g. a room whose join timing never surfaces again.
+            Response response;
+            response.set_response_code(Response::RespNotConnected);
+            response.set_cmd_id(pend->getCommandContainer().cmd_id());
+            pend->processResponse(response);
             pend->deleteLater();
         }
     }

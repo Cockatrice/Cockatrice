@@ -1,14 +1,27 @@
+#include "libcockatrice/card/card_localization.h"
+
 #include "gtest/gtest.h"
-#include <QSettings>
+#include <QHash>
+#include <QList>
+#include <QString>
+#include <QStringList>
 #include <QTemporaryDir>
+#include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/cache_storage_settings.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/chat_settings.h>
+#include <libcockatrice/settings/deck_editor_settings.h>
+#include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/game_settings.h>
+#include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/settings/network_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/sound_settings.h>
 #include <libcockatrice/settings/tabs_settings.h>
 #include <libcockatrice/settings/updates_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <string>
+#include <utility>
 
 namespace
 {
@@ -153,6 +166,12 @@ TEST_F(SettingsDefaultsTest, Updates_NotifyAboutNewVersion_Default)
     ASSERT_EQ(s.getNotifyAboutNewVersion(), true);
 }
 
+TEST_F(SettingsDefaultsTest, Updates_CardDatabaseUpdateTrayNotification_Default)
+{
+    UpdatesSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getCardDatabaseUpdateTrayNotification(), true);
+}
+
 TEST_F(SettingsDefaultsTest, Updates_UpdateReleaseChannelIndex_Default)
 {
     UpdatesSettings s(settingsPath, nullptr);
@@ -182,6 +201,38 @@ TEST_F(SettingsDefaultsTest, Sound_MasterVolume_SetAndGet)
 
 // --- TabsSettings ---
 
+TEST_F(SettingsDefaultsTest, Tabs_StartupTab_Default)
+{
+    TabsSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getStartupTabIndex(), static_cast<int>(StartupTab::StartupTabHome));
+}
+
+TEST_F(SettingsDefaultsTest, Tabs_StartupTab_SetAndGet)
+{
+    TabsSettings s(settingsPath, nullptr);
+    s.setStartupTabIndex(StartupTab::StartupTabServerRoom);
+    ASSERT_EQ(s.getStartupTabIndex(), static_cast<int>(StartupTab::StartupTabServerRoom));
+}
+
+TEST_F(SettingsDefaultsTest, Tabs_StartupServer_Default)
+{
+    TabsSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getStartupServerHost(), QString());
+    ASSERT_EQ(s.getStartupServerPort(), QString());
+    ASSERT_EQ(s.getStartupRoomName(), QString());
+}
+
+TEST_F(SettingsDefaultsTest, Tabs_StartupServer_SetAndGet)
+{
+    TabsSettings s(settingsPath, nullptr);
+    s.setStartupServerHost("server.cockatrice.us");
+    s.setStartupServerPort("4748");
+    s.setStartupRoomName("General");
+    ASSERT_EQ(s.getStartupServerHost(), QString("server.cockatrice.us"));
+    ASSERT_EQ(s.getStartupServerPort(), QString("4748"));
+    ASSERT_EQ(s.getStartupRoomName(), QString("General"));
+}
+
 TEST_F(SettingsDefaultsTest, Tabs_AllTabsOpen_Default)
 {
     TabsSettings s(settingsPath, nullptr);
@@ -192,6 +243,18 @@ TEST_F(SettingsDefaultsTest, Tabs_AllTabsOpen_Default)
     ASSERT_EQ(s.getTabReplaysOpen(), true);
     ASSERT_EQ(s.getTabAdminOpen(), true);
     ASSERT_EQ(s.getTabLogOpen(), true);
+}
+
+TEST_F(SettingsDefaultsTest, Tabs_ModerationOpen_Default)
+{
+    TabsSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getTabModerationOpen(), false);
+}
+
+TEST_F(SettingsDefaultsTest, Tabs_CardArtRulesOpen_Default)
+{
+    TabsSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getTabCardArtRulesOpen(), false);
 }
 
 // --- ChatSettings ---
@@ -250,6 +313,18 @@ TEST_F(SettingsDefaultsTest, Chat_RoomHistory_Default)
     ASSERT_EQ(s.getRoomHistory(), true);
 }
 
+TEST_F(SettingsDefaultsTest, Chat_IgnoreAllPrivateMessages_Default)
+{
+    ChatSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getIgnoreAllPrivateMessages(), false);
+}
+
+TEST_F(SettingsDefaultsTest, Chat_UseGameTime_Default)
+{
+    ChatSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getUseGameTime(), false);
+}
+
 // --- PersonalSettings ---
 
 TEST_F(SettingsDefaultsTest, Personal_Lang_Default)
@@ -258,64 +333,325 @@ TEST_F(SettingsDefaultsTest, Personal_Lang_Default)
     ASSERT_EQ(s.getLang(), QString(""));
 }
 
-TEST_F(SettingsDefaultsTest, Personal_ClientID_Default)
-{
-    PersonalSettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getClientID(), QString("notset"));
-}
-
-TEST_F(SettingsDefaultsTest, Personal_KeepAlive_Default)
-{
-    PersonalSettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getKeepAlive(), 3);
-}
-
-TEST_F(SettingsDefaultsTest, Personal_TimeOut_Default)
-{
-    PersonalSettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getTimeOut(), 5);
-}
-
-TEST_F(SettingsDefaultsTest, Personal_PicDownload_Default)
-{
-    PersonalSettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getPicDownload(), true);
-}
-
-TEST_F(SettingsDefaultsTest, Personal_ShowStatusBar_Default)
-{
-    PersonalSettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getShowStatusBar(), false);
-}
-
-TEST_F(SettingsDefaultsTest, Personal_MaxFontSize_Default)
-{
-    PersonalSettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getMaxFontSize(), 12);
-}
-
-TEST_F(SettingsDefaultsTest, Personal_HomeTabBackgroundSource_Default)
-{
-    PersonalSettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getHomeTabBackgroundSource(), QString("themed"));
-}
-
-TEST_F(SettingsDefaultsTest, Personal_HomeTabDisplayCardName_Default)
-{
-    PersonalSettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getHomeTabDisplayCardName(), true);
-}
-
 TEST_F(SettingsDefaultsTest, Personal_ShowTipsOnStartup_Default)
 {
     PersonalSettings s(settingsPath, nullptr);
     ASSERT_EQ(s.getShowTipsOnStartup(), true);
 }
 
-TEST_F(SettingsDefaultsTest, Personal_DownloadSpoilersStatus_Default)
+// --- DownloadSettings ---
+
+TEST_F(SettingsDefaultsTest, Download_PicDownload_Default)
 {
-    PersonalSettings s(settingsPath, nullptr);
+    DownloadSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getPicDownload(), true);
+}
+
+TEST_F(SettingsDefaultsTest, Download_DownloadSpoilersStatus_Default)
+{
+    DownloadSettings s(settingsPath, nullptr);
     ASSERT_EQ(s.getDownloadSpoilersStatus(), false);
+}
+
+TEST_F(SettingsDefaultsTest, Download_HostRequestLimits_Default)
+{
+    DownloadSettings s(settingsPath, nullptr);
+    ASSERT_TRUE(s.getHostRequestLimits().isEmpty());
+}
+
+TEST_F(SettingsDefaultsTest, Download_HostRequestLimits_SetAndGet)
+{
+    DownloadSettings s(settingsPath, nullptr);
+    s.setHostRequestLimits({{"api.scryfall.com", 5}});
+    const QHash<QString, int> limits = s.getHostRequestLimits();
+    ASSERT_EQ(limits.size(), 1);
+    ASSERT_EQ(limits.value("api.scryfall.com"), 5);
+}
+
+TEST_F(SettingsDefaultsTest, Download_HostRequestLimits_StackedHostCaps)
+{
+    DownloadSettings s(settingsPath, nullptr);
+    // The developer cap for the Scryfall API lowers the ceiling to 9; a user can
+    // reduce it further but can never raise it above the cap.
+    ASSERT_EQ(s.clampHostRequestLimit("api.scryfall.com", 9), 9);
+    ASSERT_EQ(s.clampHostRequestLimit("api.scryfall.com", 20), 9);
+    ASSERT_EQ(s.clampHostRequestLimit("api.scryfall.com", 5), 5);
+    ASSERT_EQ(s.clampHostRequestLimit("api.scryfall.com", 0), 1);
+    // Hosts without a developer cap fall back to the global default ceiling.
+    ASSERT_EQ(s.clampHostRequestLimit("gatherer.wizards.com", 10), 10);
+    ASSERT_EQ(s.clampHostRequestLimit("gatherer.wizards.com", 20), 10);
+    // The Scryfall CDN is unlocked: no upper bound (values are only floored).
+    ASSERT_EQ(s.clampHostRequestLimit("cards.scryfall.io", 20), 20);
+    ASSERT_EQ(s.clampHostRequestLimit("cards.scryfall.io", 0), 1);
+}
+
+// --- AppearanceSettings ---
+
+TEST_F(SettingsDefaultsTest, Appearance_ThemeName_Default)
+{
+    AppearanceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getThemeName(), QString(""));
+}
+
+TEST_F(SettingsDefaultsTest, Appearance_ThemeName_SetAndGet)
+{
+    AppearanceSettings s(settingsPath, nullptr);
+    s.setThemeName("my_theme");
+    ASSERT_EQ(s.getThemeName(), QString("my_theme"));
+}
+
+TEST_F(SettingsDefaultsTest, Appearance_StyleUserList_Default)
+{
+    AppearanceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getStyleUserList(), true);
+}
+
+TEST_F(SettingsDefaultsTest, Appearance_MaxFontSize_Default)
+{
+    AppearanceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getMaxFontSize(), 12);
+}
+
+TEST_F(SettingsDefaultsTest, Appearance_MaxFontSize_SetAndGet)
+{
+    AppearanceSettings s(settingsPath, nullptr);
+    s.setMaxFontSize(14);
+    ASSERT_EQ(s.getMaxFontSize(), 14);
+}
+
+TEST_F(SettingsDefaultsTest, Appearance_HomeTabBackgroundSource_Default)
+{
+    AppearanceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getHomeTabBackgroundSource(), QString("themed"));
+}
+
+TEST_F(SettingsDefaultsTest, Appearance_HomeTabBackgroundShuffleFrequency_Default)
+{
+    AppearanceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getHomeTabBackgroundShuffleFrequency(), 0);
+}
+
+TEST_F(SettingsDefaultsTest, Appearance_HomeTabDisplayCardName_Default)
+{
+    AppearanceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getHomeTabDisplayCardName(), true);
+}
+
+TEST_F(SettingsDefaultsTest, Appearance_HomeTabBackgroundDim_Default)
+{
+    AppearanceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getHomeTabBackgroundDim(), true);
+}
+
+TEST_F(SettingsDefaultsTest, Appearance_HomeTabBackgroundDim_SetAndGet)
+{
+    AppearanceSettings s(settingsPath, nullptr);
+    s.setHomeTabBackgroundDim(false);
+    ASSERT_EQ(s.getHomeTabBackgroundDim(), false);
+}
+
+// --- InterfaceSettings ---
+
+TEST_F(SettingsDefaultsTest, Interface_ShowStatusBar_Default)
+{
+    InterfaceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getShowStatusBar(), false);
+}
+
+TEST_F(SettingsDefaultsTest, Interface_ShowShortcuts_Default)
+{
+    InterfaceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getShowShortcuts(), true);
+}
+
+TEST_F(SettingsDefaultsTest, Interface_ShowGameSelectorFilterToolbar_Default)
+{
+    InterfaceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getShowGameSelectorFilterToolbar(), true);
+}
+
+TEST_F(SettingsDefaultsTest, Interface_NotificationsEnabled_Default)
+{
+    InterfaceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getNotificationsEnabled(), true);
+}
+
+TEST_F(SettingsDefaultsTest, Interface_SpectatorNotificationsEnabled_Default)
+{
+    InterfaceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getSpectatorNotificationsEnabled(), false);
+}
+
+TEST_F(SettingsDefaultsTest, Interface_BuddyConnectNotificationsEnabled_Default)
+{
+    InterfaceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getBuddyConnectNotificationsEnabled(), true);
+}
+
+// --- DeckEditorSettings ---
+
+TEST_F(SettingsDefaultsTest, DeckEditor_OpenDeckInNewTab_Default)
+{
+    DeckEditorSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getOpenDeckInNewTab(), false);
+}
+
+TEST_F(SettingsDefaultsTest, DeckEditor_BannerCardComboBoxVisible_Default)
+{
+    DeckEditorSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getBannerCardComboBoxVisible(), true);
+}
+
+TEST_F(SettingsDefaultsTest, DeckEditor_TagsWidgetVisible_Default)
+{
+    DeckEditorSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getTagsWidgetVisible(), true);
+}
+
+TEST_F(SettingsDefaultsTest, DeckEditor_DefaultDeckEditorType_Default)
+{
+    DeckEditorSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getDefaultDeckEditorType(), 1);
+}
+
+TEST_F(SettingsDefaultsTest, DeckEditor_VdeStartupTab_Default)
+{
+    DeckEditorSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getVdeStartupTab(), VdeStartupTabContext);
+}
+
+TEST_F(SettingsDefaultsTest, DeckEditor_VdeStartupTab_SetAndGet)
+{
+    DeckEditorSettings s(settingsPath, nullptr);
+    s.setVdeStartupTab(VdeStartupTabDeckDisplay);
+    ASSERT_EQ(s.getVdeStartupTab(), VdeStartupTabDeckDisplay);
+    s.setVdeStartupTab(VdeStartupTabDatabaseDisplay);
+    ASSERT_EQ(s.getVdeStartupTab(), VdeStartupTabDatabaseDisplay);
+    s.setVdeStartupTab(VdeStartupTabContext);
+    ASSERT_EQ(s.getVdeStartupTab(), VdeStartupTabContext);
+}
+
+// --- NetworkSettings ---
+
+TEST_F(SettingsDefaultsTest, Network_ClientID_Default)
+{
+    NetworkSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getClientID(), QString("notset"));
+}
+
+TEST_F(SettingsDefaultsTest, Network_ClientVersion_Default)
+{
+    NetworkSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getClientVersion(), QString("notset"));
+}
+
+TEST_F(SettingsDefaultsTest, Network_KeepAlive_Default)
+{
+    NetworkSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getKeepAlive(), 3);
+}
+
+TEST_F(SettingsDefaultsTest, Network_TimeOut_Default)
+{
+    NetworkSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getTimeOut(), 5);
+}
+
+TEST_F(SettingsDefaultsTest, Network_KnownMissingFeatures_Default)
+{
+    NetworkSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getKnownMissingFeatures(), QString(""));
+}
+
+// --- CardsDisplaySettings ---
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_PrintingSelectorCardSize_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getPrintingSelectorCardSize(), 100);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_VisualDeckStorageCardSize_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getVisualDeckStorageCardSize(), 100);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_VisualDatabaseDisplayCardSize_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getVisualDatabaseDisplayCardSize(), 100);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_VisualDeckEditorCardSize_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getVisualDeckEditorCardSize(), 100);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_VisualDeckEditorShowCardCounts_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getVisualDeckEditorShowCardCounts(), true);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_VisualDeckEditorShowCardCounts_SetAndGet)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    s.setVisualDeckEditorShowCardCounts(false);
+    ASSERT_EQ(s.getVisualDeckEditorShowCardCounts(), false);
+    s.setVisualDeckEditorShowCardCounts(true);
+    ASSERT_EQ(s.getVisualDeckEditorShowCardCounts(), true);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_EDHRecCardSize_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getEDHRecCardSize(), 100);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_ArchidektPreviewSize_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getArchidektPreviewSize(), 100);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_SampleHandSize_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getSampleHandSize(), 7);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_ArrowDrawAnimation_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getArrowDrawAnimation(), true);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_CardLang_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getCardLang(), QString("en"));
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_CardLang_SetAndGet)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    s.setCardLang("de");
+    ASSERT_EQ(s.getCardLang(), QString("de"));
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_CardSearchLanguage_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getCardSearchLanguage(), static_cast<int>(SearchLanguageMode::English));
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_CardSearchLanguage_SetAndGet)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    s.setCardSearchLanguage(static_cast<int>(SearchLanguageMode::Selected));
+    ASSERT_EQ(s.getCardSearchLanguage(), static_cast<int>(SearchLanguageMode::Selected));
 }
 
 // --- VisualDeckStorageSettings ---
@@ -344,6 +680,19 @@ TEST_F(SettingsDefaultsTest, VisualDeckStorage_DefaultTagsList_SetAndGet)
     QStringList custom = {"Tag1", "Tag2"};
     s.setVisualDeckStorageDefaultTagsList(custom);
     ASSERT_EQ(s.getVisualDeckStorageDefaultTagsList(), custom);
+}
+
+TEST_F(SettingsDefaultsTest, VisualDeckStorage_ShowUploadTime_Default)
+{
+    VisualDeckStorageSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getVisualDeckStorageShowUploadTime(), true);
+}
+
+TEST_F(SettingsDefaultsTest, VisualDeckStorage_ShowUploadTime_SetAndGet)
+{
+    VisualDeckStorageSettings s(settingsPath, nullptr);
+    s.setVisualDeckStorageShowUploadTime(false);
+    ASSERT_EQ(s.getVisualDeckStorageShowUploadTime(), false);
 }
 
 } // namespace

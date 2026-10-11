@@ -4,33 +4,24 @@
 #include "server.h"
 #include "server_abstractuserinterface.h"
 
+#include <QList>
+#include <QMap>
 #include <QObject>
+#include <QString>
 #include <libcockatrice/protocol/pb/response.pb.h>
-#include <libcockatrice/protocol/pb/server_message.pb.h>
+#include <qtmetamacros.h>
 
-class Features;
 class Server_DatabaseInterface;
-class Server_Player;
-class ServerInfo_User;
 class Server_Room;
-class QTimer;
-class FeatureSet;
-
 class ServerMessage;
-class Response;
-class SessionEvent;
-class GameEventContainer;
-class RoomEvent;
 class ResponseContainer;
-
 class CommandContainer;
 class SessionCommand;
 class ModeratorCommand;
 class AdminCommand;
-
+class DeveloperCommand;
 class Command_Ping;
 class Command_Login;
-class Command_Register;
 class Command_Message;
 class Command_ListUsers;
 class Command_GetGamesOfUser;
@@ -98,6 +89,12 @@ private:
     {
         return Response::RespFunctionNotAllowed;
     }
+    Response::ResponseCode processDeveloperCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
+    virtual Response::ResponseCode
+    processExtendedDeveloperCommand(int /* cmdType */, const DeveloperCommand & /* cmd */, ResponseContainer & /* rc */)
+    {
+        return Response::RespFunctionNotAllowed;
+    }
 
     void resetIdleTimer();
 private slots:
@@ -129,7 +126,7 @@ public:
         return timeRunning - lastDataReceived;
     }
     bool addSaidMessageSize(int size);
-    void processCommandContainer(const CommandContainer &cont);
+    virtual void processCommandContainer(const CommandContainer &cont);
 
     void sendProtocolItem(const Response &item);
     void sendProtocolItem(const SessionEvent &item);

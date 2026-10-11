@@ -2,11 +2,39 @@
 
 #include "settings_manager.h"
 
+#include <QList>
+#include <QSettings>
+#include <QVariant>
+#include <QtGlobal>
+#include <utility>
+
+class QObject;
+
 const QStringList DownloadSettings::DEFAULT_DOWNLOAD_URLS = {
-    "https://api.scryfall.com/cards/!set:uuid!?format=image&face=!prop:side!",
-    "https://api.scryfall.com/cards/multiverse/!set:muid!?format=image",
+    "https://cards.scryfall.io/large/!prop:side!/!set:uuid_substr_0_1!/!set:uuid_substr_1_1!/!set:uuid!.jpg",
+    "https://api.scryfall.com/cards/!set:uuid!?format=image&face=!prop:side!&lang=!sflang!",
+    "https://api.scryfall.com/cards/multiverse/!set:muid!?format=image&lang=!sflang!",
     "https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!set:muid!&type=card",
     "https://gatherer.wizards.com/Handlers/Image.ashx?name=!name!&type=card"};
+
+const QString DownloadSettings::SCRYFALL_NAMED_LOCALIZED_URL =
+    "https://api.scryfall.com/cards/named?fuzzy=!localizedName!&lang=!sflang!&format=image&face=!prop:side!";
+
+// Developer-set ceilings for the per-host request allowance. Users may lower a host's
+// allowance via the download settings, but can never raise it above these values. Hosts
+// not listed default to DEFAULT_HOST_REQUEST_LIMIT. A cap of UNLIMITED_HOST_QUOTA marks a
+// host that is never throttled per host and skips the dispatch pacing (429 backoff still applies).
+const QHash<QString, int> DownloadSettings::DEVELOPER_HOST_CAPS = {
+    // The Scryfall API enforces 10 requests/second; stay one under so a burst can't trip 429s.
+    {"api.scryfall.com", 9},
+    // The Scryfall image CDN has no documented per-client rate limit.
+    {"cards.scryfall.io", UNLIMITED_HOST_QUOTA},
+};
+
+const QHash<QString, int> &DownloadSettings::getDeveloperHostCaps()
+{
+    return DEVELOPER_HOST_CAPS;
+}
 
 DownloadSettings::DownloadSettings(const QString &settingPath, QObject *parent = nullptr)
     : SettingsManager(settingPath + "downloads.ini", "downloads", QString(), parent)
@@ -26,4 +54,92 @@ QStringList DownloadSettings::getAllURLs() const
 void DownloadSettings::resetToDefaultURLs()
 {
     setValue(QVariant::fromValue(DEFAULT_DOWNLOAD_URLS), "urls");
+}
+
+bool DownloadSettings::addLocalizedScryfallUrl()
+{
+    const QStringList urls = getAllURLs();
+    if (urls.contains(SCRYFALL_NAMED_LOCALIZED_URL)) {
+        return false;
+    }
+    QStringList updated = urls;
+    updated.prepend(SCRYFALL_NAMED_LOCALIZED_URL);
+    setDownloadUrls(updated);
+    return true;
+}
+
+bool DownloadSettings::getPicDownload() const
+{
+    return getValue("pictureDownload", QString(), QString(), true).toBool();
+}
+
+void DownloadSettings::setPicDownload(bool _picDownload)
+{
+    setValue(_picDownload, "pictureDownload");
+    emit picDownloadChanged();
+}
+
+bool DownloadSettings::getDownloadSpoilersStatus() const
+{
+    return getValue("downloadSpoilers", QString(), QString(), false).toBool();
+}
+
+void DownloadSettings::setDownloadSpoilerStatus(bool _spoilerStatus)
+{
+    setValue(_spoilerStatus, "downloadSpoilers");
+    emit downloadSpoilerStatusChanged();
+}
+
+QHash<QString, int> DownloadSettings::getHostRequestLimits() const
+{
+    auto settings = getSettings();
+    if (!defaultGroup.isEmpty()) {
+        settings.beginGroup(defaultGroup);
+    }
+    settings.beginGroup("hostRequestLimits");
+
+    QHash<QString, int> hostRequestLimits;
+    const QStringList hosts = settings.childKeys();
+    for (const QString &host : hosts) {
+        hostRequestLimits.insert(host, settings.value(host).toInt());
+    }
+
+    settings.endGroup();
+    if (!defaultGroup.isEmpty()) {
+        settings.endGroup();
+    }
+    return hostRequestLimits;
+}
+
+void DownloadSettings::setHostRequestLimits(const QHash<QString, int> &hostRequestLimits)
+{
+    auto settings = getSettings();
+    if (!defaultGroup.isEmpty()) {
+        settings.beginGroup(defaultGroup);
+    }
+
+    // Drop the legacy single-key form (an opaque @Variant blob) written by earlier builds so each
+    // host is stored as a plain, hand-editable key in its own subgroup.
+    settings.remove("hostRequestLimits");
+    settings.beginGroup("hostRequestLimits");
+    settings.remove(QString());
+    for (auto it = hostRequestLimits.cbegin(); it != hostRequestLimits.cend(); ++it) {
+        settings.setValue(it.key(), it.value());
+    }
+    settings.endGroup();
+
+    if (!defaultGroup.isEmpty()) {
+        settings.endGroup();
+    }
+    settings.sync();
+    emit hostRequestLimitsChanged();
+}
+
+int DownloadSettings::clampHostRequestLimit(const QString &host, int requested) const
+{
+    const int devCap = DEVELOPER_HOST_CAPS.value(host, DEFAULT_HOST_REQUEST_LIMIT);
+    if (devCap == UNLIMITED_HOST_QUOTA) {
+        return qMax(MIN_HOST_REQUEST_LIMIT, requested);
+    }
+    return qBound(MIN_HOST_REQUEST_LIMIT, requested, devCap);
 }

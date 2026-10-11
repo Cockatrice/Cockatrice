@@ -1,7 +1,13 @@
 #include "cache_storage_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QVariant>
+
+class QObject;
+
 CacheStorageSettings::CacheStorageSettings(const QString &settingPath, QObject *parent)
-    : SettingsManager(settingPath + "cache_storage.ini", "personal", QString(), parent)
+    : SettingsManager(settingPath + "cache_storage.ini", "cache_storage", QString(), parent)
 {
 }
 

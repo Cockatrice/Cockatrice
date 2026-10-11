@@ -16,6 +16,6 @@
   <rect id="rect10" height="2.88" width="12.8" y="4.278e-9" x="0"/>
   <rect id="rect12" height="2.88" width="12.8" y="3.36" x="0" fill="#da121a"/>
   <polygon id="polygon14" points="0 0 8.6603 5 0 10" fill="#0f47af" transform="scale(.96)"/>
-  <polygon id="polygon16" points="4.1557e5 -3.0193e5 -5.1367e5 0 4.1557e5 3.0193e5 -1.5873e5 -4.8853e5 -1.5873e5 4.8853e5" fill="#fcdd09" transform="matrix(.0000029902 0 0 .0000029902 2.7713 4.8)"/>
+  <polygon id="polygon16" points="4.01394 3.897169 1.23532 4.8 4.01394 5.702831 2.296666 3.3392 2.296666 6.2608" fill="#fcdd09"/>
  </g>
 </svg>

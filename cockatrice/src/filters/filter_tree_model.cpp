@@ -1,8 +1,15 @@
 #include "filter_tree_model.h"
 
+#include <QFlags>
 #include <QFont>
+#include <QString>
+#include <QVariant>
+#include <functional>
 #include <libcockatrice/filters/filter_card.h>
 #include <libcockatrice/filters/filter_tree.h>
+#include <stddef.h>
+
+class QObject;
 
 FilterTreeModel::FilterTreeModel(QObject *parent) : QAbstractItemModel(parent)
 {

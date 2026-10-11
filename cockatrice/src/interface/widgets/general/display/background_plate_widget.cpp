@@ -1,9 +1,9 @@
 #include "background_plate_widget.h"
 
-#include <QBrush>
 #include <QColor>
 #include <QPainter>
-#include <QPen>
+#include <QRect>
+#include <qnamespace.h>
 
 BackgroundPlateWidget::BackgroundPlateWidget(QWidget *parent) : QWidget(parent)
 {

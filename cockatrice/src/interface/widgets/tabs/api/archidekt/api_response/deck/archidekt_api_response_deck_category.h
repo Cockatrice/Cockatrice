@@ -1,15 +1,8 @@
 #ifndef COCKATRICE_ARCHIDEKT_API_RESPONSE_DECK_CATEGORY_H
 #define COCKATRICE_ARCHIDEKT_API_RESPONSE_DECK_CATEGORY_H
 
-#include "../card/archidekt_api_response_card.h"
-#include "../card/archidekt_api_response_card_entry.h"
-#include "../deck_listings/archidekt_api_response_deck_owner.h"
-
-#include <QDebug>
-#include <QJsonArray>
 #include <QJsonObject>
 #include <QString>
-#include <QVector>
 
 class ArchidektApiResponseDeckCategory
 {

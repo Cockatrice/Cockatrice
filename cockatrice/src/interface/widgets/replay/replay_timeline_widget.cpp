@@ -1,9 +1,15 @@
 #include "replay_timeline_widget.h"
 
-#include "../../../client/settings/cache_settings.h"
-
+#include <QBrush>
+#include <QColor>
+#include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
+#include <QPointF>
+#include <QSize>
+#include <QtGlobal>
+#include <qnamespace.h>
+#include <qnumeric.h>
 
 static constexpr int BIN_LENGTH = 5000;
 static constexpr int MIN_RESOLUTION_MS = 1000;
@@ -65,11 +71,7 @@ void ReplayTimelineWidget::paintEvent(QPaintEvent * /* event */)
 
 void ReplayTimelineWidget::mousePressEvent(QMouseEvent *event)
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     int newTime = static_cast<int>((qint64)maxTime * (qint64)event->position().x() / width());
-#else
-    int newTime = static_cast<int>((qint64)maxTime * (qint64)event->x() / width());
-#endif
     emit timeClicked(newTime);
 }
 

@@ -1,10 +1,21 @@
 #include "edhrec_api_response_card_details_display_widget.h"
 
+#include "../../../../../cards/card_info_picture_widget.h"
+#include "../../../../../cards/card_size_widget.h"
 #include "../../../../../general/display/background_plate_widget.h"
+#include "../../api_response/cards/edhrec_api_response_card_details.h"
 #include "../../tab_edhrec_main.h"
+#include "edhrec_api_response_card_inclusion_display_widget.h"
+#include "edhrec_api_response_card_synergy_display_widget.h"
+#include "libcockatrice/card/database/card_database_querier.h"
 
+#include <QLabel>
 #include <QMouseEvent>
+#include <QObject>
+#include <QSlider>
+#include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <qnamespace.h>
 
 EdhrecApiResponseCardDetailsDisplayWidget::EdhrecApiResponseCardDetailsDisplayWidget(
     QWidget *parent,
@@ -54,6 +65,7 @@ EdhrecApiResponseCardDetailsDisplayWidget::EdhrecApiResponseCardDetailsDisplayWi
                 &CardInfoPictureWidget::setScaleFactor);
         connect(this, &EdhrecApiResponseCardDetailsDisplayWidget::requestUrl, parentTab,
                 &TabEdhRecMain::actNavigatePage);
+        parentTab->getCardSizeSlider()->enableCtrlScrollResize(this);
     }
 }
 
@@ -65,11 +77,7 @@ void EdhrecApiResponseCardDetailsDisplayWidget::mousePressEvent(QMouseEvent *eve
     }
 }
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 void EdhrecApiResponseCardDetailsDisplayWidget::enterEvent(QEnterEvent *event)
-#else
-void EdhrecApiResponseCardDetailsDisplayWidget::enterEvent(QEvent *event)
-#endif
 {
     QWidget::enterEvent(event);
     backgroundPlateWidget->setFocused(true);

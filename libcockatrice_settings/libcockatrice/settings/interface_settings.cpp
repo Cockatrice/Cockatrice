@@ -1,5 +1,46 @@
 #include "interface_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+#include "libcockatrice/utility/card_ref.h"
+#include "libcockatrice/utility/playmat_params.h"
+
+#include <QChar>
+#include <QList>
+#include <QVariant>
+#include <QtGlobal>
+
+class QObject;
+
+namespace
+{
+const QChar PLAYMAT_FIELD_SEP = QChar(0x1F); ///< Separator between PlaymatInfo fields.
+
+QString encodePlaymatInfo(const PlaymatInfo &res)
+{
+    return res.card.name + PLAYMAT_FIELD_SEP + res.card.providerId + PLAYMAT_FIELD_SEP +
+           QString::number(res.params.marginPctL, 'f', 4) + PLAYMAT_FIELD_SEP +
+           QString::number(res.params.marginPctR, 'f', 4) + PLAYMAT_FIELD_SEP +
+           QString::number(res.params.verticalOffset, 'f', 4) + PLAYMAT_FIELD_SEP +
+           QString::number(res.params.zoom, 'f', 4);
+}
+
+PlaymatInfo decodePlaymatInfo(const QString &encoded)
+{
+    const QStringList fields = encoded.split(PLAYMAT_FIELD_SEP);
+    if (fields.size() != 6) {
+        return {};
+    }
+    PlaymatInfo res;
+    res.card.name = fields.at(0);
+    res.card.providerId = fields.at(1);
+    res.params.marginPctL = fields.at(2).toDouble();
+    res.params.marginPctR = fields.at(3).toDouble();
+    res.params.verticalOffset = fields.at(4).toDouble();
+    res.params.zoom = fields.at(5).toDouble();
+    return res;
+}
+} // namespace
+
 InterfaceSettings::InterfaceSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "interface.ini", "interface", QString(), parent)
 {
@@ -7,7 +48,7 @@ InterfaceSettings::InterfaceSettings(const QString &settingPath, QObject *parent
 
 bool InterfaceSettings::getUseTearOffMenus() const
 {
-    return getValue("usetearoffmenus", QString(), QString(), true).toBool();
+    return getValue("useTearOffMenus", QString(), QString(), false).toBool();
 }
 
 int InterfaceSettings::getCardViewInitialRowsMax() const
@@ -37,22 +78,22 @@ bool InterfaceSettings::getKeepGameChatFocus() const
 
 bool InterfaceSettings::getNotificationsEnabled() const
 {
-    return getValue("notificationsenabled", QString(), QString(), true).toBool();
+    return getValue("enabled", "interface", "notifications", true).toBool();
 }
 
 bool InterfaceSettings::getSpectatorNotificationsEnabled() const
 {
-    return getValue("specnotificationsenabled", QString(), QString(), false).toBool();
+    return getValue("spectatorsEnabled", "interface", "notifications", false).toBool();
 }
 
 bool InterfaceSettings::getBuddyConnectNotificationsEnabled() const
 {
-    return getValue("buddyconnectnotificationsenabled", QString(), QString(), true).toBool();
+    return getValue("buddyConnectEnabled", "interface", "notifications", true).toBool();
 }
 
 bool InterfaceSettings::getDoubleClickToPlay() const
 {
-    return getValue("doubleclicktoplay", QString(), QString(), true).toBool();
+    return getValue("doubleClickToPlay", QString(), QString(), true).toBool();
 }
 
 bool InterfaceSettings::getClickPlaysAllSelected() const
@@ -62,7 +103,7 @@ bool InterfaceSettings::getClickPlaysAllSelected() const
 
 bool InterfaceSettings::getPlayToStack() const
 {
-    return getValue("playtostack", QString(), QString(), true).toBool();
+    return getValue("playToStack", QString(), QString(), true).toBool();
 }
 
 bool InterfaceSettings::getDoNotDeleteArrowsInSubPhases() const
@@ -72,22 +113,22 @@ bool InterfaceSettings::getDoNotDeleteArrowsInSubPhases() const
 
 int InterfaceSettings::getStartingHandSize() const
 {
-    return getValue("startinghandsize", QString(), QString(), 7).toInt();
+    return getValue("startingHandSize", QString(), QString(), 7).toInt();
 }
 
 bool InterfaceSettings::getAnnotateTokens() const
 {
-    return getValue("annotatetokens", QString(), QString(), false).toBool();
+    return getValue("annotateTokens", QString(), QString(), false).toBool();
 }
 
 bool InterfaceSettings::getShowDragSelectionCount() const
 {
-    return getValue("showlassoselectioncount", QString(), QString(), true).toBool();
+    return getValue("showLassoSelectionCount", QString(), QString(), true).toBool();
 }
 
 bool InterfaceSettings::getShowTotalSelectionCount() const
 {
-    return getValue("showpersistentselectioncount", QString(), QString(), true).toBool();
+    return getValue("showPersistentSelectionCount", QString(), QString(), true).toBool();
 }
 
 int InterfaceSettings::getTallyType() const
@@ -102,17 +143,12 @@ bool InterfaceSettings::getHorizontalHand() const
 
 bool InterfaceSettings::getInvertVerticalCoordinate() const
 {
-    return getValue("invert_vertical", "table", QString(), false).toBool();
+    return getValue("invertVertical", "table", QString(), false).toBool();
 }
 
 int InterfaceSettings::getMinPlayersForMultiColumnLayout() const
 {
-    return getValue("min_players_multicolumn", QString(), QString(), 4).toInt();
-}
-
-bool InterfaceSettings::getOpenDeckInNewTab() const
-{
-    return getValue("openDeckInNewTab", "editor", QString(), false).toBool();
+    return getValue("minPlayersMulticolumn", QString(), QString(), 4).toInt();
 }
 
 int InterfaceSettings::getRewindBufferingMs() const
@@ -125,39 +161,94 @@ qreal InterfaceSettings::getFastForwardSpeed() const
     return getValue("fastForwardSpeed", "replay", QString(), 10).toReal();
 }
 
-bool InterfaceSettings::getStyleUserList() const
+bool InterfaceSettings::getSkipEmptySections() const
 {
-    return getValue("styleUserList", "appearance", QString(), true).toBool();
+    return getValue("skipEmptySections", "replay", QString(), false).toBool();
 }
 
 bool InterfaceSettings::getLeftJustified() const
 {
-    return getValue("leftjustified", QString(), QString(), false).toBool();
+    return getValue("leftJustified", QString(), QString(), false).toBool();
 }
 
 int InterfaceSettings::getZoneViewGroupByIndex() const
 {
-    return getValue("groupby", "zoneview", QString(), 1).toInt();
+    return getValue("groupBy", "zoneview", QString(), 1).toInt();
 }
 
 int InterfaceSettings::getZoneViewSortByIndex() const
 {
-    return getValue("sortby", "zoneview", QString(), 1).toInt();
+    return getValue("sortBy", "zoneview", QString(), 1).toInt();
 }
 
 bool InterfaceSettings::getZoneViewPileView() const
 {
-    return getValue("pileview", "zoneview", QString(), true).toBool();
+    return getValue("pileView", "zoneview", QString(), true).toBool();
 }
 
-QString InterfaceSettings::getKnownMissingFeatures()
+bool InterfaceSettings::getShowStatusBar() const
 {
-    return getValue("knownmissingfeatures", QString(), QString(), "").toString();
+    return getValue("showStatusBar", QString(), QString(), false).toBool();
+}
+
+bool InterfaceSettings::getShowShortcuts() const
+{
+    return getValue("showShortcuts", QString(), QString(), true).toBool();
+}
+
+bool InterfaceSettings::getShowGameSelectorFilterToolbar() const
+{
+    return getValue("showGameSelectorFilterToolbar", QString(), QString(), true).toBool();
+}
+
+int InterfaceSettings::getPlaymatVisibility() const
+{
+    return qBound(0, getValue("playmatvisibility", QString(), QString(), 2).toInt(), 2);
+}
+
+QList<PlaymatInfo> InterfaceSettings::getPlaymatFallbackList() const
+{
+    const QStringList entries = getValue("playmatFallbackList", QString(), QString(), QStringList()).toStringList();
+    QList<PlaymatInfo> result;
+    result.reserve(entries.size());
+    for (const QString &entry : entries) {
+        const PlaymatInfo res = decodePlaymatInfo(entry);
+        if (!res.card.isEmpty()) {
+            result.append(res);
+        }
+    }
+    return result;
+}
+
+int InterfaceSettings::getPlaymatMode() const
+{
+    return qBound(0, getValue("playmatMode", QString(), QString(), 1).toInt(), 2);
+}
+
+int InterfaceSettings::getPlaymatFallbackBehavior() const
+{
+    return qBound(0, getValue("playmatFallbackBehavior", QString(), QString(), 0).toInt(), 2);
+}
+
+bool InterfaceSettings::getLifeCounterAnimationsEnabled() const
+{
+    return getValue("lifeCounterAnimationsEnabled", QString(), QString(), true).toBool();
+}
+
+bool InterfaceSettings::getBattlefieldFlashEnabled() const
+{
+    return getValue("battlefieldFlashEnabled", QString(), QString(), true).toBool();
+}
+
+QStringList InterfaceSettings::getUserListExpandedSections() const
+{
+    return getValue("userListExpandedSections", QString(), QString(), QStringList({"buddy", "online", "ignore"}))
+        .toStringList();
 }
 
 void InterfaceSettings::setUseTearOffMenus(bool _useTearOffMenus)
 {
-    setValue(_useTearOffMenus, "usetearoffmenus");
+    setValue(_useTearOffMenus, "useTearOffMenus");
     emit useTearOffMenusChanged(_useTearOffMenus);
 }
 
@@ -189,22 +280,22 @@ void InterfaceSettings::setKeepGameChatFocus(bool value)
 
 void InterfaceSettings::setNotificationsEnabled(bool _notificationsEnabled)
 {
-    setValue(_notificationsEnabled, "notificationsenabled");
+    setValue(_notificationsEnabled, "enabled", "interface", "notifications");
 }
 
 void InterfaceSettings::setSpectatorNotificationsEnabled(bool _spectatorNotificationsEnabled)
 {
-    setValue(_spectatorNotificationsEnabled, "specnotificationsenabled");
+    setValue(_spectatorNotificationsEnabled, "spectatorsEnabled", "interface", "notifications");
 }
 
 void InterfaceSettings::setBuddyConnectNotificationsEnabled(bool _buddyConnectNotificationsEnabled)
 {
-    setValue(_buddyConnectNotificationsEnabled, "buddyconnectnotificationsenabled");
+    setValue(_buddyConnectNotificationsEnabled, "buddyConnectEnabled", "interface", "notifications");
 }
 
 void InterfaceSettings::setDoubleClickToPlay(bool _doubleClickToPlay)
 {
-    setValue(_doubleClickToPlay, "doubleclicktoplay");
+    setValue(_doubleClickToPlay, "doubleClickToPlay");
 }
 
 void InterfaceSettings::setClickPlaysAllSelected(bool _clickPlaysAllSelected)
@@ -214,7 +305,7 @@ void InterfaceSettings::setClickPlaysAllSelected(bool _clickPlaysAllSelected)
 
 void InterfaceSettings::setPlayToStack(bool _playToStack)
 {
-    setValue(_playToStack, "playtostack");
+    setValue(_playToStack, "playToStack");
 }
 
 void InterfaceSettings::setDoNotDeleteArrowsInSubPhases(bool _doNotDeleteArrowsInSubPhases)
@@ -224,22 +315,22 @@ void InterfaceSettings::setDoNotDeleteArrowsInSubPhases(bool _doNotDeleteArrowsI
 
 void InterfaceSettings::setStartingHandSize(int _startingHandSize)
 {
-    setValue(_startingHandSize, "startinghandsize");
+    setValue(_startingHandSize, "startingHandSize");
 }
 
 void InterfaceSettings::setAnnotateTokens(bool _annotateTokens)
 {
-    setValue(_annotateTokens, "annotatetokens");
+    setValue(_annotateTokens, "annotateTokens");
 }
 
 void InterfaceSettings::setShowDragSelectionCount(bool _showDragSelectionCount)
 {
-    setValue(_showDragSelectionCount, "showlassoselectioncount");
+    setValue(_showDragSelectionCount, "showLassoSelectionCount");
 }
 
 void InterfaceSettings::setShowTotalSelectionCount(bool _showTotalSelectionCount)
 {
-    setValue(_showTotalSelectionCount, "showpersistentselectioncount");
+    setValue(_showTotalSelectionCount, "showPersistentSelectionCount");
 }
 
 void InterfaceSettings::setTallyType(int value)
@@ -259,19 +350,14 @@ void InterfaceSettings::setHorizontalHand(bool _horizontalHand)
 
 void InterfaceSettings::setInvertVerticalCoordinate(bool _invertVerticalCoordinate)
 {
-    setValue(_invertVerticalCoordinate, "invert_vertical", "table");
+    setValue(_invertVerticalCoordinate, "invertVertical", "table");
     emit invertVerticalCoordinateChanged();
 }
 
 void InterfaceSettings::setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout)
 {
-    setValue(_minPlayersForMultiColumnLayout, "min_players_multicolumn");
+    setValue(_minPlayersForMultiColumnLayout, "minPlayersMulticolumn");
     emit minPlayersForMultiColumnLayoutChanged();
-}
-
-void InterfaceSettings::setOpenDeckInNewTab(bool _openDeckInNewTab)
-{
-    setValue(_openDeckInNewTab, "openDeckInNewTab", "editor");
 }
 
 void InterfaceSettings::setRewindBufferingMs(int _rewindBufferingMs)
@@ -284,34 +370,102 @@ void InterfaceSettings::setFastForwardSpeed(qreal _value)
     setValue(_value, "fastForwardSpeed", "replay");
 }
 
-void InterfaceSettings::setStyleUserList(bool _styleUserList)
+void InterfaceSettings::setSkipEmptySections(bool _value)
 {
-    setValue(_styleUserList, "styleUserList", "appearance");
-    emit styleUserListChanged();
+    setValue(_value, "skipEmptySections", "replay");
 }
 
 void InterfaceSettings::setLeftJustified(bool _leftJustified)
 {
-    setValue(_leftJustified, "leftjustified");
+    setValue(_leftJustified, "leftJustified");
     emit handJustificationChanged();
 }
 
 void InterfaceSettings::setZoneViewGroupByIndex(int _zoneViewGroupByIndex)
 {
-    setValue(_zoneViewGroupByIndex, "groupby", "zoneview");
+    setValue(_zoneViewGroupByIndex, "groupBy", "zoneview");
 }
 
 void InterfaceSettings::setZoneViewSortByIndex(int _zoneViewSortByIndex)
 {
-    setValue(_zoneViewSortByIndex, "sortby", "zoneview");
+    setValue(_zoneViewSortByIndex, "sortBy", "zoneview");
 }
 
 void InterfaceSettings::setZoneViewPileView(bool _zoneViewPileView)
 {
-    setValue(_zoneViewPileView, "pileview", "zoneview");
+    setValue(_zoneViewPileView, "pileView", "zoneview");
 }
 
-void InterfaceSettings::setKnownMissingFeatures(const QString &_knownMissingFeatures)
+void InterfaceSettings::setShowStatusBar(bool _showStatusBar)
 {
-    setValue(_knownMissingFeatures, "knownmissingfeatures");
+    setValue(_showStatusBar, "showStatusBar");
+    emit showStatusBarChanged(_showStatusBar);
+}
+
+void InterfaceSettings::setShowShortcuts(bool _showShortcuts)
+{
+    setValue(_showShortcuts, "showShortcuts");
+}
+
+void InterfaceSettings::setShowGameSelectorFilterToolbar(bool _showGameSelectorFilterToolbar)
+{
+    setValue(_showGameSelectorFilterToolbar, "showGameSelectorFilterToolbar");
+    emit showGameSelectorFilterToolbarChanged(_showGameSelectorFilterToolbar);
+}
+
+void InterfaceSettings::setPlaymatVisibility(int _visibility)
+{
+    if (getPlaymatVisibility() == _visibility) {
+        return;
+    }
+    setValue(_visibility, "playmatvisibility");
+    emit playmatVisibilityChanged(_visibility);
+}
+
+void InterfaceSettings::setPlaymatFallbackList(const QList<PlaymatInfo> &_fallbackList)
+{
+    QStringList entries;
+    entries.reserve(_fallbackList.size());
+    for (const PlaymatInfo &res : _fallbackList) {
+        entries.append(encodePlaymatInfo(res));
+    }
+    setValue(entries, "playmatFallbackList");
+    emit playmatSettingsChanged();
+}
+
+void InterfaceSettings::setPlaymatMode(int _mode)
+{
+    const int mode = qBound(0, _mode, 2);
+    if (getPlaymatMode() == mode) {
+        return;
+    }
+    setValue(mode, "playmatMode");
+    emit playmatSettingsChanged();
+}
+
+void InterfaceSettings::setPlaymatFallbackBehavior(int _behavior)
+{
+    const int behavior = qBound(0, _behavior, 2);
+    if (getPlaymatFallbackBehavior() == behavior) {
+        return;
+    }
+    setValue(behavior, "playmatFallbackBehavior");
+    emit playmatSettingsChanged();
+}
+
+void InterfaceSettings::setLifeCounterAnimationsEnabled(bool _lifeCounterAnimationsEnabled)
+{
+    setValue(_lifeCounterAnimationsEnabled, "lifeCounterAnimationsEnabled");
+    emit lifeCounterAnimationsEnabledChanged(_lifeCounterAnimationsEnabled);
+}
+
+void InterfaceSettings::setBattlefieldFlashEnabled(bool _battlefieldFlashEnabled)
+{
+    setValue(_battlefieldFlashEnabled, "battlefieldFlashEnabled");
+    emit battlefieldFlashEnabledChanged(_battlefieldFlashEnabled);
+}
+
+void InterfaceSettings::setUserListExpandedSections(const QStringList &sections)
+{
+    setValue(sections, "userListExpandedSections");
 }

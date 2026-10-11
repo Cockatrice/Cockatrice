@@ -6,12 +6,18 @@
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../interface/widgets/utility/custom_line_edit.h"
 #include "../main.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "tab_supervisor.h"
 
+#include <QAction>
 #include <QApplication>
-#include <QDebug>
+#include <QCloseEvent>
 #include <QMenu>
+#include <QMessageLogger>
+#include <QSharedPointer>
 #include <QSystemTrayIcon>
 #include <QVBoxLayout>
+#include <QWidget>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/event_user_message.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
@@ -19,18 +25,21 @@
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/chat_settings.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <string>
 
 TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
                        AbstractClient *_client,
                        const ServerInfo_User &_ownUserInfo,
-                       const ServerInfo_User &_otherUserInfo)
+                       const ServerInfo_User &_otherUserInfo,
+                       bool _userOnline)
     : Tab(_tabSupervisor), client(_client), ownUserInfo(new ServerInfo_User(_ownUserInfo)),
-      otherUserInfo(new ServerInfo_User(_otherUserInfo)), userOnline(true)
+      otherUserInfo(new ServerInfo_User(_otherUserInfo)), userOnline(_userOnline)
 {
     chatView = new ChatView(tabSupervisor, 0, true);
     connect(chatView, &ChatView::showCardInfoPopup, this, &TabMessage::showCardInfoPopup);
     connect(chatView, &ChatView::deleteCardInfoPopup, this, &TabMessage::deleteCardInfoPopup);
     connect(chatView, &ChatView::addMentionTag, this, &TabMessage::addMentionTag);
+    connect(chatView, &ChatView::cockatriceLinkActivated, this, &TabMessage::cockatriceLinkActivated);
     sayEdit = new LineEditUnfocusable;
     sayEdit->setMaxLength(MAX_TEXT_LENGTH);
     connect(sayEdit, &LineEditUnfocusable::returnPressed, this, &TabMessage::sendMessage);
@@ -94,28 +103,64 @@ void TabMessage::closeEvent(QCloseEvent *event)
     event->accept();
 }
 
-void TabMessage::sendMessage()
+void TabMessage::sendPrivateMessage(const QString &text)
 {
-    if (sayEdit->text().isEmpty() || !userOnline) {
+    if (tabSupervisor->getUserListManager()->isUserIgnored(getUserName())) {
+        chatView->appendMessage(tr("You have ignored %1; your messages are not delivered.")
+                                    .arg(QString::fromStdString(otherUserInfo->name())));
         return;
     }
 
     Command_Message cmd;
     cmd.set_user_name(otherUserInfo->name());
-    cmd.set_message(sayEdit->text().toStdString());
+    cmd.set_message(text.toStdString());
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
+    pend->setExtraData(text);
     connect(pend, &PendingCommand::finished, this, &TabMessage::messageSent);
     client->sendCommand(pend);
+}
 
+void TabMessage::sendMessage()
+{
+    if (sayEdit->text().isEmpty()) {
+        return;
+    }
+
+    if (!userOnline) {
+        notifyUserOffline();
+        return;
+    }
+
+    sendPrivateMessage(sayEdit->text());
     sayEdit->clear();
 }
 
-void TabMessage::messageSent(const Response &response)
+bool TabMessage::isUserOnline() const
+{
+    return userOnline;
+}
+
+void TabMessage::sendInviteMessage(const QString &text)
+{
+    sayEdit->setText(text);
+    sendMessage();
+}
+
+void TabMessage::messageSent(const Response &response,
+                             const CommandContainer & /*commandContainer*/,
+                             const QVariant &extraData)
 {
     if (response.response_code() == Response::RespInIgnoreList) {
         chatView->appendMessage(tr(
             "This user is ignoring you, they cannot see your messages in main chat and you cannot join their games."));
+    } else if (response.response_code() == Response::RespNameNotFound) {
+        // The recipient went offline before the command reached the server: restore the draft.
+        userOnline = false;
+        if (sayEdit->text().isEmpty()) {
+            sayEdit->setText(extraData.toString());
+        }
+        notifyUserOffline();
     }
 }
 
@@ -174,4 +219,9 @@ void TabMessage::processUserJoined(const ServerInfo_User &_userInfo)
     chatView->appendMessage(tr("%1 has joined the server.").arg(QString::fromStdString(otherUserInfo->name())));
     userOnline = true;
     *otherUserInfo = _userInfo;
+}
+
+void TabMessage::notifyUserOffline()
+{
+    chatView->appendMessage(tr("Message not sent — %1 is offline.").arg(QString::fromStdString(otherUserInfo->name())));
 }

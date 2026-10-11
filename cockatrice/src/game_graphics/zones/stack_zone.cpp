@@ -1,15 +1,27 @@
 #include "stack_zone.h"
 
+#include "../../game/board/card_list.h"
 #include "../../game/player/player_actions.h"
+#include "../../game/player/player_info.h"
 #include "../../game/player/player_logic.h"
+#include "../../game/zones/card_zone_logic.h"
 #include "../../game/zones/stack_zone_logic.h"
 #include "../../interface/theme_manager.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
 #include "../card_dimensions.h"
 
+#include <QBrush>
+#include <QColor>
+#include <QGraphicsItem>
+#include <QList>
 #include <QPainter>
+#include <QPoint>
+#include <QRectF>
+#include <QString>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
+#include <qnumeric.h>
+#include <string>
 
 StackZone::StackZone(StackZoneLogic *_logic, int _zoneHeight, QGraphicsItem *parent)
     : SelectZone(_logic, parent), zoneHeight(_zoneHeight)
@@ -31,8 +43,22 @@ QRectF StackZone::boundingRect() const
 
 void StackZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Stack, getLogic()->getPlayer()->getZoneId());
-    painter->fillRect(boundingRect(), brush);
+    if (playmatActive) {
+        // Subtle overlay to distinguish stack zone from table zone (slightly darker)
+        painter->fillRect(boundingRect(), QColor(0, 0, 0, 80));
+    } else {
+        QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Stack, getLogic()->getPlayer()->getZoneId());
+        painter->fillRect(boundingRect(), brush);
+    }
+}
+
+void StackZone::onPlaymatChanged(bool active)
+{
+    playmatActive = active;
+    // See TableZone::onPlaymatChanged for the rationale. Translucent overlay
+    // over a dynamic playmat should not be held in the device cache.
+    setCacheMode(active ? QGraphicsItem::NoCache : QGraphicsItem::DeviceCoordinateCache);
+    update();
 }
 
 void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
@@ -43,18 +69,14 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
         return;
     }
 
-    const auto &cards = getLogic()->getCards();
-    int index;
-    if (startZone == getLogic()) {
-        // Reordering within the zone: use drop position
-        index = calcDropIndexFromY(dropPoint.y(), MIN_CARD_VISIBLE);
+    bool sameZone = startZone == getLogic();
+    int index = calcDropIndexFromY(dropPoint.y(), !sameZone, MIN_CARD_VISIBLE);
+    if (sameZone) {
         // Same-zone no-op: don't move a card onto itself
+        const auto &cards = getLogic()->getCards();
         if (!cards.isEmpty() && cards.at(index)->getId() == dragItems.at(0)->getId()) {
             return;
         }
-    } else {
-        // Coming from another zone: append at end (top of stack, rendered on top)
-        index = static_cast<int>(cards.size());
     }
 
     Command_MoveCard cmd;

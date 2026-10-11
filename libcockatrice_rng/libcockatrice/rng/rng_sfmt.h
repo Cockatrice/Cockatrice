@@ -5,7 +5,10 @@
 #include "sfmt/SFMT.h"
 
 #include <QMutex>
-#include <climits>
+#include <qtmetamacros.h>
+#include <stdint.h>
+
+class QObject;
 
 /**
  * This class encapsulates a state of the art PRNG and can be used
@@ -36,7 +39,7 @@ private:
     unsigned int cdf(unsigned int min, unsigned int max);
 
 public:
-    explicit RNG_SFMT(QObject *parent = nullptr);
+    explicit RNG_SFMT(uint64_t seed, QObject *parent = nullptr);
     unsigned int rand(int min, int max) override;
 };
 

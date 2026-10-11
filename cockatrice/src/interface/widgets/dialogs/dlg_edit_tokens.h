@@ -8,7 +8,11 @@
 #define DLG_EDIT_TOKENS_H
 
 #include <QDialog>
+#include <QList>
+#include <QString>
+#include <QStringList>
 #include <libcockatrice/card/card_info.h>
+#include <qtmetamacros.h>
 
 class QModelIndex;
 class CardDatabaseModel;
@@ -17,6 +21,7 @@ class QLabel;
 class QComboBox;
 class QLineEdit;
 class QTreeView;
+class QWidget;
 
 class DlgEditTokens : public QDialog
 {

@@ -5,12 +5,21 @@
 #include "../../card_picture_loader/card_picture_loader_local_schemes.h"
 #include "../interface/card_picture_loader/card_picture_loader.h"
 
+#include <QComboBox>
 #include <QDir>
 #include <QGridLayout>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QList>
 #include <QMessageBox>
+#include <QString>
+#include <QVBoxLayout>
+#include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/settings/cache_storage_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
+#include <qnamespace.h>
 
 StorageSettingsPage::StorageSettingsPage()
 {
@@ -181,9 +190,14 @@ StorageSettingsPage::StorageSettingsPage()
 
 void StorageSettingsPage::clearDownloadedPicsButtonClicked()
 {
-    CardPictureLoader::clearNetworkCache();
+    // The network cache is cleared asynchronously on the worker thread, so wait for the completion
+    // signal before confirming; the in-memory pixmap cache is cleared synchronously right away.
+    connect(
+        &CardPictureLoader::getInstance(), &CardPictureLoader::networkCacheCleared, this,
+        [this] { QMessageBox::information(this, tr("Success"), tr("Cached card pictures have been reset.")); },
+        Qt::SingleShotConnection);
     CardPictureLoader::clearPixmapCache();
-    QMessageBox::information(this, tr("Success"), tr("Cached card pictures have been reset."));
+    CardPictureLoader::clearNetworkCache();
 }
 
 void StorageSettingsPage::clearImageBackupsButtonClicked()

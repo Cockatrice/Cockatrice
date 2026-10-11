@@ -2,6 +2,7 @@
 #define COCKATRICE_INTERFACE_CARD_SET_PRIORITY_CONTROLLER_H
 
 #include <QString>
+#include <QStringList>
 
 class ICardSetPriorityController
 {
@@ -45,6 +46,16 @@ public:
      * @return The sort key, enabled and known flags for the set.
      */
     virtual SetOptions getSetOptions(QString shortName) const = 0;
+
+    /**
+     * @brief Returns the short names of every set currently marked as enabled.
+     *
+     * Callers fold this into the card database cache source hash so that
+     * toggling set enablement invalidates the cache.
+     *
+     * @return The enabled set short names, sorted alphabetically.
+     */
+    virtual QStringList getEnabledSetNames() const = 0;
 
     virtual void saveSets(const QVector<SetSaveData> &data) = 0;
 };

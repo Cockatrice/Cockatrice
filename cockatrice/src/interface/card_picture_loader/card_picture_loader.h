@@ -1,10 +1,20 @@
 #ifndef CARD_PICTURE_LOADER_H
 #define CARD_PICTURE_LOADER_H
 
-#include "card_picture_loader_status_bar.h"
-#include "card_picture_loader_worker.h"
-
+#include <QHash>
 #include <QLoggingCategory>
+#include <QObject>
+#include <qtmetamacros.h>
+
+class CardPictureLoaderStatusBar;
+class CardPictureLoaderWorker;
+class ExactCard;
+class QDateTime;
+class QImage;
+class QPixmap;
+class QSize;
+class QString;
+template <typename T> class QList;
 
 inline Q_LOGGING_CATEGORY(CardPictureLoaderLog, "card_picture_loader");
 inline Q_LOGGING_CATEGORY(CardPictureLoaderCardBackCacheFailLog, "card_picture_loader.card_back_cache_fail");
@@ -56,6 +66,7 @@ private:
 
     CardPictureLoaderWorker *worker;       ///< Worker thread for async image loading
     CardPictureLoaderStatusBar *statusBar; ///< Status bar widget showing load progress
+    QHash<QString, QDateTime> failedAt;    ///< Timestamp of the last failed load attempt per pixmap cache key
 
 public:
     /**
@@ -94,10 +105,17 @@ public:
     static void cacheCardPixmaps(const QList<ExactCard> &cards);
 
     /**
-     * @brief Check if the user has custom card art in the picsPath directory.
-     * @return True if any custom art exists.
+     * @brief Check if a local override image already exists for the card.
+     * @param card The card to check.
+     * @return True if the card has at least one locally stored override image.
      */
-    static bool hasCustomArt();
+    static bool hasLocalOverrides(const ExactCard &card);
+
+    /**
+     * @brief Removes all locally stored override images for the card.
+     * @param card The card to remove the override images of.
+     */
+    static void deleteAllLocalOverrides(const ExactCard &card);
 
     /**
      * @brief Clears the in-memory QPixmap cache for all cards.
@@ -107,6 +125,9 @@ public:
 public slots:
     /**
      * @brief Clears the network disk cache of the worker.
+     *
+     * The clear runs on the worker thread, so this returns before it has completed; connect to
+     * networkCacheCleared() to act once it is done.
      */
     static void clearNetworkCache();
 
@@ -117,7 +138,13 @@ public slots:
      * @param image Loaded QImage.
      */
     void imageLoaded(const ExactCard &card, const QImage &image);
-    void saveCardImageToLocalStorage(const ExactCard &card, const QPixmap &pixmap);
+    void saveCardImageToLocalStorage(const ExactCard &card, const QPixmap &pixmap, bool allowOverwrite = false);
+    void installPrintingOverride(const ExactCard &originalCard, const ExactCard &overrideCard);
+    void installPrintingOverrideOnLoad(const ExactCard &originalCard, const ExactCard &overrideCard);
+
+signals:
+    /** @brief Emitted after the worker has finished clearing the network and redirect caches. */
+    void networkCacheCleared();
 
 private slots:
     /**
@@ -131,6 +158,12 @@ private slots:
      * Clears the QPixmap cache to reload images.
      */
     void picsPathChanged();
+
+    /**
+     * @brief Triggered when the card language setting changes.
+     * Clears the in-memory picture caches so images reload in the new language.
+     */
+    void cardLangChanged();
 };
 
 #endif

@@ -4,6 +4,13 @@
 #include <QDebug>
 #include <QFile>
 #include <QStandardPaths>
+#include <QStringList>
+#include <QVariant>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <qsystemdetection.h>
+
+class QObject;
 
 SettingsCache::SettingsCache(const QString &fileName, QSettings::Format format, QObject *parent)
     : QSettings(fileName, format, parent)

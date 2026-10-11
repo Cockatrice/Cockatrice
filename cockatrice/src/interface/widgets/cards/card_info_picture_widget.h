@@ -7,15 +7,20 @@
 #ifndef CARD_INFO_PICTURE_H
 #define CARD_INFO_PICTURE_H
 
-#include "card_info_picture_enlarged_widget.h"
-
-#include <QPropertyAnimation>
+#include <QLoggingCategory>
+#include <QMouseEvent>
+#include <QPixmap>
+#include <QPoint>
 #include <QWidget>
 #include <libcockatrice/card/printing/exact_card.h>
+#include <qtmetamacros.h>
+
+class CardInfoPictureEnlargedWidget;
+class QPropertyAnimation;
+class QTimer;
 
 inline Q_LOGGING_CATEGORY(CardInfoPictureWidgetLog, "card_info_picture_widget");
 
-class AbstractCardItem;
 class QMenu;
 
 class CardInfoPictureWidget : public QWidget
@@ -48,11 +53,7 @@ signals:
 protected:
     void resizeEvent(QResizeEvent *event) override;
     void paintEvent(QPaintEvent *) override;
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    void enterEvent(QEnterEvent *event) override; // Qt6 signature
-#else
-    void enterEvent(QEvent *event) override; // Qt5 signature
-#endif
+    void enterEvent(QEnterEvent *event) override;
     void leaveEvent(QEvent *event) override;
     void moveEvent(QMoveEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;

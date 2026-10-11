@@ -9,7 +9,14 @@
 
 #include "abstract_game.h"
 
-#include <QObject>
+#include <qtmetamacros.h>
+
+class AbstractClient;
+class Event_GameJoined;
+class QObject;
+class QString;
+template <class Key, class T> class QMap;
+template <typename T> class QList;
 
 class Game : public AbstractGame
 {

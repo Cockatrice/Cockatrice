@@ -1,21 +1,40 @@
 #include "view_zone.h"
 
+#include "../../client/settings/cache_settings.h"
 #include "../../game/player/player_actions.h"
+#include "../../game/player/player_info.h"
 #include "../../game/player/player_logic.h"
+#include "../../game/zones/card_zone_logic.h"
 #include "../../game/zones/view_zone_logic.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
+#include "../card_dimensions.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/filters/filter_string.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_zone.pb.h"
+#include "libcockatrice/utility/card_ref.h"
 
 #include <QBrush>
+#include <QColor>
 #include <QDebug>
-#include <QGraphicsSceneWheelEvent>
+#include <QMessageLogger>
+#include <QObject>
 #include <QPainter>
+#include <QSharedPointer>
+#include <QtGlobal>
 #include <QtMath>
+#include <functional>
+#include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/protocol/pb/command_dump_zone.pb.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/protocol/pb/response_dump_zone.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/settings/cards_display_settings.h>
+#include <string>
+
+class QGraphicsItem;
 
 /**
  * @param parent the parent QGraphicsWidget containing the reveal zone
@@ -253,7 +272,10 @@ ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, Ca
 
 void ZoneViewZone::setFilterString(const QString &_filterString)
 {
-    filterString = FilterString(_filterString);
+    const CardsDisplaySettings &cardsDisplay = SettingsCache::instance().cardsDisplay();
+    filterString = FilterString(
+        _filterString, CardSearchLanguage{cardsDisplay.getCardLang(),
+                                          static_cast<SearchLanguageMode>(cardsDisplay.getCardSearchLanguage())});
     reorganizeCards();
 }
 

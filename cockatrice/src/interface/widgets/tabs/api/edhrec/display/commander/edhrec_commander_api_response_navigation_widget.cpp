@@ -1,6 +1,12 @@
 #include "edhrec_commander_api_response_navigation_widget.h"
 
 #include "../../tab_edhrec_main.h"
+#include "edhrec_commander_api_response_bracket_navigation_widget.h"
+#include "edhrec_commander_api_response_budget_navigation_widget.h"
+
+#include <QGridLayout>
+#include <QObject>
+#include <QPushButton>
 
 EdhrecCommanderApiResponseNavigationWidget::EdhrecCommanderApiResponseNavigationWidget(
     QWidget *parent,

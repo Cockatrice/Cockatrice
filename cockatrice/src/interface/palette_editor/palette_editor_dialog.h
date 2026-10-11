@@ -3,18 +3,21 @@
 
 #include "../theme_config.h"
 
+#include <QColor>
 #include <QDialog>
-#include <QFrame>
 #include <QMap>
+#include <QString>
+#include <qtmetamacros.h>
 
 class QTimer;
-
 class QLabel;
 class QComboBox;
 class QDialogButtonBox;
 class QPushButton;
 class PaletteGridWidget;
 class QuickSetupPanel;
+class QFrame;
+class QWidget;
 
 class PaletteEditorDialog : public QDialog
 {

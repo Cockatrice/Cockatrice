@@ -1,8 +1,24 @@
 #include "card_info_picture_with_text_overlay_widget.h"
 
+#include <QBrush>
+#include <QChar>
+#include <QFont>
 #include <QFontMetrics>
+#include <QList>
+#include <QPainter>
 #include <QPainterPath>
+#include <QPalette>
+#include <QPen>
+#include <QPixmap>
+#include <QPoint>
+#include <QRect>
+#include <QSize>
+#include <QSizePolicy>
+#include <QStringList>
 #include <QStylePainter>
+#include <algorithm>
+
+class QWidget;
 
 /**
  * @brief Constructs a CardPictureWithTextOverlay widget.
@@ -133,12 +149,14 @@ void CardInfoPictureWithTextOverlayWidget::paintEvent(QPaintEvent *event)
         path.addRoundedRect(glowRect, radius, radius);
 
         // Soft outer glow
-        QColor glowColor(0, 150, 255, 80); // subtle blu
+        QColor glowColor = palette().color(QPalette::Highlight);
+        glowColor.setAlpha(80);
         painter.setPen(QPen(glowColor, 6));
         painter.drawPath(path);
 
         // Thin inner border for crispness
-        QColor borderColor(0, 150, 255, 200);
+        QColor borderColor = palette().color(QPalette::Highlight);
+        borderColor.setAlpha(200);
         painter.setPen(QPen(borderColor, 2));
         painter.drawRoundedRect(pixmapRect, radius, radius);
 

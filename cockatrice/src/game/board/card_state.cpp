@@ -1,5 +1,7 @@
 #include "card_state.h"
 
+#include <QSharedPointer>
+
 void CardState::resetState(bool keepAnnotations)
 {
     attacking = false;

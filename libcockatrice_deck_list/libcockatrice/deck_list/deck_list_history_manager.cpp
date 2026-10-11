@@ -1,5 +1,10 @@
 #include "deck_list_history_manager.h"
 
+#include "libcockatrice/deck_list/deck_list.h"
+#include "libcockatrice/deck_list/deck_list_memento.h"
+
+#include <QString>
+
 void DeckListHistoryManager::save(const DeckListMemento &memento)
 {
     undoStack.push(memento);
@@ -14,42 +19,32 @@ void DeckListHistoryManager::clear()
     emit undoRedoStateChanged();
 }
 
-void DeckListHistoryManager::undo(DeckList *deck)
+void DeckListHistoryManager::restoreAndSwap(QStack<DeckListMemento> &source,
+                                            QStack<DeckListMemento> &target,
+                                            DeckList *deck)
 {
-    if (undoStack.isEmpty()) {
+    if (source.isEmpty()) {
         return;
     }
 
-    // Peek at the memento we are going to restore
-    const DeckListMemento &mementoToRestore = undoStack.top();
+    // The reason is read before the source is popped.
+    const QString reason = source.top().getReason();
 
-    // Save current state for redo
-    DeckListMemento currentState = deck->createMemento(mementoToRestore.getReason());
-    redoStack.push(currentState);
+    // Save the current state so the opposite direction can return to it.
+    target.push(deck->createMemento(reason));
 
-    // Pop the last state from undo stack and restore it
-    DeckListMemento memento = undoStack.pop();
-    deck->restoreMemento(memento);
+    // Apply the state we are moving to.
+    deck->restoreMemento(source.pop());
 
     emit undoRedoStateChanged();
 }
 
+void DeckListHistoryManager::undo(DeckList *deck)
+{
+    restoreAndSwap(undoStack, redoStack, deck);
+}
+
 void DeckListHistoryManager::redo(DeckList *deck)
 {
-    if (redoStack.isEmpty()) {
-        return;
-    }
-
-    // Peek at the memento we are going to restore
-    const DeckListMemento &mementoToRestore = redoStack.top();
-
-    // Save current state for undo
-    DeckListMemento currentState = deck->createMemento(mementoToRestore.getReason());
-    undoStack.push(currentState);
-
-    // Pop the next state from redo stack and restore it
-    DeckListMemento memento = redoStack.pop();
-    deck->restoreMemento(memento);
-
-    emit undoRedoStateChanged();
+    restoreAndSwap(redoStack, undoStack, deck);
 }

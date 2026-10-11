@@ -1,5 +1,11 @@
 #include "sound_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QVariant>
+
+class QObject;
+
 SoundSettings::SoundSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "sound.ini", "sound", QString(), parent)
 {
@@ -17,7 +23,7 @@ QString SoundSettings::getSoundThemeName() const
 
 int SoundSettings::getMasterVolume() const
 {
-    return getValue("mastervolume", QString(), QString(), 100).toInt();
+    return getValue("masterVolume", QString(), QString(), 100).toInt();
 }
 
 void SoundSettings::setSoundEnabled(bool _soundEnabled)
@@ -34,6 +40,6 @@ void SoundSettings::setSoundThemeName(const QString &_soundThemeName)
 
 void SoundSettings::setMasterVolume(int _masterVolume)
 {
-    setValue(_masterVolume, "mastervolume");
+    setValue(_masterVolume, "masterVolume");
     emit masterVolumeChanged(_masterVolume);
 }

@@ -2,10 +2,21 @@
 
 #include "libcockatrice/utility/color.h"
 
+#include <QBrush>
 #include <QLinearGradient>
+#include <QMap>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPen>
+#include <QPoint>
+#include <QPointF>
+#include <QRect>
+#include <QRectF>
+#include <QSize>
 #include <QToolTip>
+#include <QtGlobal>
+#include <qnamespace.h>
+#include <utility>
 
 ColorBar::ColorBar(const QMap<QString, int> &_colors, QWidget *parent)
     : QWidget(parent), colors(GameSpecificColors::MTG::sortManaMapWUBRGCFirst(_colors))
@@ -83,19 +94,11 @@ void ColorBar::paintEvent(QPaintEvent *)
     }
 }
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 void ColorBar::enterEvent(QEnterEvent *event)
 {
     Q_UNUSED(event);
     isHovered = true;
 }
-#else
-void ColorBar::enterEvent(QEvent *event)
-{
-    Q_UNUSED(event);
-    isHovered = true;
-}
-#endif
 
 void ColorBar::leaveEvent(QEvent *)
 {
@@ -108,13 +111,8 @@ void ColorBar::mouseMoveEvent(QMouseEvent *event)
         return;
     }
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     int x = int(event->position().x());
     QPoint gp = event->globalPosition().toPoint();
-#else
-    int x = event->pos().x();
-    QPoint gp = event->globalPos();
-#endif
 
     QString text = tooltipForPosition(x);
     if (!text.isEmpty()) {

@@ -2,8 +2,16 @@
 
 #include "../../../client/settings/cache_settings.h"
 
+#include <QButtonGroup>
 #include <QDate>
+#include <QDialogButtonBox>
+#include <QLabel>
+#include <QRadioButton>
+#include <QString>
+#include <QVBoxLayout>
 #include <libcockatrice/settings/updates_settings.h>
+
+class QWidget;
 
 DlgStartupCardCheck::DlgStartupCardCheck(QWidget *parent) : QDialog(parent)
 {

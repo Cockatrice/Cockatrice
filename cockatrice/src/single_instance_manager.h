@@ -1,0 +1,41 @@
+#ifndef COCKATRICE_SINGLE_INSTANCE_MANAGER_H
+#define COCKATRICE_SINGLE_INSTANCE_MANAGER_H
+
+#include <QObject>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
+
+class QLocalServer;
+
+class SingleInstanceManager : public QObject
+{
+    Q_OBJECT
+public:
+    explicit SingleInstanceManager(QObject *parent = nullptr);
+
+    // Returns true if this process became the primary instance, false if
+    // another instance is already running (and received our files).
+    bool tryRun(const QStringList &initialFiles);
+
+signals:
+    void filesReceived(const QStringList &files);
+
+private slots:
+    void handleNewConnection();
+
+private:
+    enum class ForwardResult
+    {
+        Delivered,  // a live primary acknowledged the payload
+        NoPrimary,  // no connectable primary socket exists
+        PrimaryBusy // a primary exists but did not acknowledge in time
+    };
+
+    ForwardResult forwardToPrimary(const QStringList &filesToSend);
+
+    QString serverName;
+    QLocalServer *server = nullptr;
+};
+
+#endif // COCKATRICE_SINGLE_INSTANCE_MANAGER_H

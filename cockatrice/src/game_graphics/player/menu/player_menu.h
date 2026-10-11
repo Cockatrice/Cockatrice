@@ -8,24 +8,28 @@
 #define COCKATRICE_PLAYER_MENU_H
 
 #include "../../../interface/widgets/menus/tearoff_menu.h"
-#include "custom_zone_menu.h"
-#include "grave_menu.h"
-#include "hand_menu.h"
-#include "library_menu.h"
-#include "rfg_menu.h"
-#include "say_menu.h"
-#include "sideboard_menu.h"
-#include "tally_menu.h"
-#include "utility_menu.h"
 
 #include <QList>
-#include <QMenu>
 #include <QObject>
-#include <libcockatrice/utility/card_ref.h>
+#include <qtmetamacros.h>
+#include <utility>
 
 class CardItem;
 class CardMenu;
 class PlayerGraphicsItem;
+class AbstractPlayerComponent;
+class CustomZoneMenu;
+class GraveyardMenu;
+class HandMenu;
+class LibraryMenu;
+class QMenu;
+class RfgMenu;
+class SayMenu;
+class SideboardMenu;
+class TallyMenu;
+class UtilityMenu;
+struct CardRef;
+
 class PlayerMenu : public QObject
 {
     Q_OBJECT

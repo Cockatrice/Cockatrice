@@ -5,13 +5,24 @@
 #include "game_scene.h"
 
 #include <QAction>
+#include <QBrush>
+#include <QColor>
+#include <QEvent>
+#include <QGraphicsScene>
 #include <QGridLayout>
 #include <QLabel>
-#include <QLayout>
+#include <QMargins>
+#include <QPainter>
+#include <QPoint>
 #include <QResizeEvent>
 #include <QRubberBand>
+#include <QString>
+#include <QStringLiteral>
+#include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
+#include <qnamespace.h>
 
 // QRubberBand calls raise() in showEvent() and changeEvent() to stay on top of siblings.
 // This subclass disables that behavior so dragCountLabel can appear above it.
@@ -47,11 +58,11 @@ GameView::GameView(GameScene *scene, QWidget *parent) : QGraphicsView(scene, par
     connect(scene, &GameScene::sigResizeRubberBand, this, &GameView::resizeRubberBand);
     connect(scene, &GameScene::sigStopRubberBand, this, &GameView::stopRubberBand);
     connect(scene, &QGraphicsScene::selectionChanged, this, [this]() { updateTotalSelectionCount(); });
-    connect(&SettingsCache::instance().interface(), &InterfaceSettings::tallyTypeChanged, this,
+    connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::tallyTypeChanged, this,
             [this] { updateTotalSelectionCount(); });
 
-    setFocusDisabled(SettingsCache::instance().interface().getKeepGameChatFocus());
-    connect(&SettingsCache::instance().interface(), &InterfaceSettings::keepGameChatFocusChanged, this,
+    setFocusDisabled(SettingsCache::instance().userInterface().getKeepGameChatFocus());
+    connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::keepGameChatFocusChanged, this,
             &GameView::setFocusDisabled);
 
     aCloseMostRecentZoneView = new QAction(this);
@@ -114,6 +125,7 @@ void GameView::startRubberBand(const QPointF &_selectionOrigin)
     }
 
     selectionOrigin = _selectionOrigin;
+    previousBandRect = QRect();
     rubberBand->setGeometry(QRect(mapFromScene(selectionOrigin), QSize(0, 0)));
     rubberBand->show();
 }
@@ -128,9 +140,19 @@ void GameView::resizeRubberBand(const QPointF &cursorPoint, int selectedCount)
 
     QPoint cursor = cursorPoint.toPoint();
     QRect rect = QRect(mapFromScene(selectionOrigin), cursor).normalized();
-    rubberBand->setGeometry(rect);
 
-    if (!SettingsCache::instance().interface().getShowDragSelectionCount()) {
+    rubberBand->setGeometry(rect);
+    if (viewport()) {
+        // Repaint the union of the previous and current band rects: the vacated
+        // strip of a child widget is not reliably invalidated on all platforms
+        // (notably macOS), leaving stale pixels under the selection.
+        QRect dirty = previousBandRect.isNull() ? rect : previousBandRect.united(rect);
+        dirty.adjust(-1, -1, 1, 1);
+        viewport()->update(dirty);
+        previousBandRect = rect;
+    }
+
+    if (!SettingsCache::instance().userInterface().getShowDragSelectionCount()) {
         dragCountLabel->hide();
         return;
     }
@@ -171,7 +193,13 @@ void GameView::stopRubberBand()
         return;
     }
 
+    // Same rationale as resizeRubberBand: repaint the last known band area
+    // since hiding a child widget doesn't reliably invalidate its region.
     rubberBand->hide();
+    if (viewport() && !previousBandRect.isNull()) {
+        viewport()->update(previousBandRect.adjusted(-1, -1, 1, 1));
+        previousBandRect = QRect();
+    }
     dragCountLabel->hide();
 }
 
@@ -239,7 +267,7 @@ void GameView::updateTotalSelectionCount(const QSize &viewSize)
 
     int count = scene()->selectedItems().count();
 
-    if (!SettingsCache::instance().interface().getShowTotalSelectionCount() || count <= 1) {
+    if (!SettingsCache::instance().userInterface().getShowTotalSelectionCount() || count <= 1) {
         totalCountLabel->hide();
     } else {
         totalCountLabel->setText(QString::number(count));
@@ -251,7 +279,7 @@ void GameView::updateTotalSelectionCount(const QSize &viewSize)
         totalCountLabel->show();
     }
 
-    TallyType tallyType = Tally::intToType(SettingsCache::instance().interface().getTallyType());
+    TallyType tallyType = Tally::intToType(SettingsCache::instance().userInterface().getTallyType());
 
     GameScene *gameScene = static_cast<GameScene *>(scene());
     QList<TallyRow> entries = Tally::compute(gameScene->selectedCards(), tallyType);

@@ -334,7 +334,7 @@ the tr() call, also you can add an extra string as a hint for translators:
 QString message = tr("Everyone draws %n cards", "english hint for translators", amount);
 ```
 See [Qt's wiki on translations](
-https://doc.qt.io/qt-5/i18n-source-translation.html#handling-plurals)
+https://doc.qt.io/qt-6/i18n-source-translation.html#handling-plurals)
 
 If you're about to propose a change that adds or modifies any translatable
 string in the code, you don't need to take care of adding the new strings to

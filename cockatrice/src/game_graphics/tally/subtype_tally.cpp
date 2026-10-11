@@ -1,9 +1,18 @@
 #include "subtype_tally.h"
 
 #include "../board/card_item.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/printing/exact_card.h"
 
 #include <QMap>
+#include <QSharedPointer>
+#include <QString>
+#include <QStringList>
+#include <QStringLiteral>
 #include <algorithm>
+#include <compare>
+#include <iterator>
+#include <qnamespace.h>
 
 namespace
 {
@@ -67,7 +76,7 @@ QList<TallyRow> countSubtypes(const QList<CardItem *> &cards)
 
     // convert entries into TallyRows
     QList<TallyRow> rows;
-    rows.reserve(entries.size()); // for backwards compatibility with Qt5
+    rows.reserve(entries.size());
     std::transform(entries.begin(), entries.end(), std::back_inserter(rows),
                    [](const SubtypeEntry &e) { return TallyRow{e.name, QString::number(e.count)}; });
 

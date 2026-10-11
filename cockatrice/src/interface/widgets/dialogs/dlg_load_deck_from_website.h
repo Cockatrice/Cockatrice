@@ -8,15 +8,21 @@
 #ifndef DLG_LOAD_DECK_FROM_WEBSITE_H
 #define DLG_LOAD_DECK_FROM_WEBSITE_H
 
-#include "../client/network/parsers/deck_link_to_api_transformer.h"
 #include "../client/network/parsers/interface_json_deck_parser.h"
+#include "libcockatrice/deck_list/deck_list.h"
 
 #include <QDialog>
-#include <QLabel>
-#include <QLineEdit>
 #include <QLoggingCategory>
-#include <QNetworkAccessManager>
-#include <QVBoxLayout>
+#include <QSharedPointer>
+#include <qtmetamacros.h>
+
+class QLabel;
+class QLineEdit;
+class QNetworkAccessManager;
+class QVBoxLayout;
+class QWidget;
+enum class DeckProvider;
+template <class T> class QSharedPointer;
 
 inline Q_LOGGING_CATEGORY(DlgLoadDeckFromWebsiteLog, "dlg_load_deck_from_website");
 

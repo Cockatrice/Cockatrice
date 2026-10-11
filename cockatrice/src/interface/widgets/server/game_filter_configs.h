@@ -1,6 +1,11 @@
 #ifndef COCKATRICE_GAME_FILTER_CONFIGS_H
 #define COCKATRICE_GAME_FILTER_CONFIGS_H
 
+#include <QList>
+#include <QSet>
+#include <QSharedPointer>
+#include <QString>
+#include <QStringList>
 #include <QTime>
 
 /**
@@ -19,7 +24,7 @@ struct GameFilterConfigs
     bool hideNotBuddyCreatedGames = false;
     bool hideOpenDecklistGames = false;
     QString gameNameFilter = "";
-    QStringList creatorNameFilters = {};
+    QStringList hostNameFilters = {};
     QSet<int> gameTypeFilter = {};
     int maxPlayersFilterMin = DEFAULT_MAX_PLAYERS_MIN;
     int maxPlayersFilterMax = DEFAULT_MAX_PLAYERS_MAX;

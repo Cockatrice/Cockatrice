@@ -2,8 +2,12 @@
 
 #include "../card_database_display_model.h"
 #include "../card_database_model.h"
+#include "libcockatrice/card/set/card_set.h"
 
+#include <QSortFilterProxyModel>
 #include <libcockatrice/card/card_info.h>
+
+class QObject;
 
 TokenEditModel::TokenEditModel(QObject *parent) : CardDatabaseDisplayModel(parent)
 {

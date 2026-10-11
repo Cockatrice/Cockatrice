@@ -1,6 +1,7 @@
 #include "tab_visual_database_display.h"
 
-#include "tab_deck_editor.h"
+#include "../visual_database_display/visual_database_display_widget.h"
+#include "card_database_model.h"
 #include "tab_supervisor.h"
 
 #include <libcockatrice/card/database/card_database_manager.h>

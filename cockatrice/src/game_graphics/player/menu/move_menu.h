@@ -7,8 +7,11 @@
 #ifndef COCKATRICE_MOVE_MENU_H
 #define COCKATRICE_MOVE_MENU_H
 #include <QMenu>
+#include <qtmetamacros.h>
 
 class PlayerGraphicsItem;
+class QAction;
+
 class MoveMenu : public QMenu
 {
     Q_OBJECT

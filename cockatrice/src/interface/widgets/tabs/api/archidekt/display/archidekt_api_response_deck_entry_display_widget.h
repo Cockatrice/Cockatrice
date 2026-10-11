@@ -1,17 +1,20 @@
 #ifndef COCKATRICE_ARCHIDEKT_API_RESPONSE_DECK_ENTRY_DISPLAY_WIDGET_H
 #define COCKATRICE_ARCHIDEKT_API_RESPONSE_DECK_ENTRY_DISPLAY_WIDGET_H
 
-#include "../../../../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../api_response/deck_listings/archidekt_api_response_deck_listing_container.h"
-#include "archidekt_deck_preview_image_display_widget.h"
 
-#include <QLabel>
-#include <QNetworkAccessManager>
-#include <QResizeEvent>
-#include <QVBoxLayout>
+#include <QPixmap>
+#include <QString>
+#include <QUrl>
 #include <QWidget>
+#include <qtmetamacros.h>
 
 class BackgroundPlateWidget;
+class ArchidektDeckPreviewImageDisplayWidget;
+class QLabel;
+class QNetworkAccessManager;
+class QNetworkReply;
+class QVBoxLayout;
 
 /**
  * @class ArchidektApiResponseDeckEntryDisplayWidget
@@ -98,11 +101,7 @@ public slots:
 protected:
     void mousePressEvent(QMouseEvent *event) override;
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    void enterEvent(QEnterEvent *event) override; ///< Qt6 hover enter
-#else
-    void enterEvent(QEvent *event) override; ///< Qt5 hover enter
-#endif
+    void enterEvent(QEnterEvent *event) override; ///< Hover enter
     void leaveEvent(QEvent *event) override;
 
 private:

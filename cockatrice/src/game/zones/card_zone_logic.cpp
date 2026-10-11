@@ -1,16 +1,25 @@
 #include "card_zone_logic.h"
 
+#include "../../client/translation.h"
 #include "../../game_graphics/board/card_item.h"
+#include "../../game_graphics/zones/card_zone.h"
 #include "../../game_graphics/zones/view_zone.h"
+#include "../board/card_list.h"
 #include "../player/player_actions.h"
+#include "../player/player_info.h"
 #include "../player/player_logic.h"
+#include "libcockatrice/card/database/card_database.h"
 #include "view_zone_logic.h"
 
 #include <QAction>
 #include <QDebug>
+#include <QMessageLogger>
+#include <QSharedPointer>
+#include <QVariant>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/utility/zone_names.h>
+#include <string>
 
 /**
  * @param _player the player that the zone belongs to

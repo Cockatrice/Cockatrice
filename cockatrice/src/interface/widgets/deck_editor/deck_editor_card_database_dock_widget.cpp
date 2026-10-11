@@ -1,5 +1,25 @@
 #include "deck_editor_card_database_dock_widget.h"
 
+#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
+#include "card_database_view.h"
+#include "deck_editor_database_display_widget.h"
+#include "deck_list_model.h"
+#include "deck_state_manager.h"
+#include "deck_zone_dialog.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
+
+#include <QFlags>
+#include <QList>
+#include <QPair>
+#include <QString>
+#include <QStringList>
+#include <QVBoxLayout>
+#include <QWidget>
+#include <functional>
+#include <qnamespace.h>
+#include <utility>
+
 DeckEditorCardDatabaseDockWidget::DeckEditorCardDatabaseDockWidget(AbstractTabDeckEditor *parent) : QDockWidget(parent)
 {
     setObjectName("databaseDisplayDock");
@@ -14,6 +34,27 @@ DeckEditorCardDatabaseDockWidget::DeckEditorCardDatabaseDockWidget(AbstractTabDe
 void DeckEditorCardDatabaseDockWidget::createDatabaseDisplayDock(AbstractTabDeckEditor *deckEditor)
 {
     databaseDisplayWidget = new DeckEditorDatabaseDisplayWidget(this, deckEditor->databaseModel);
+
+    databaseDisplayWidget->getDatabaseView()->setZoneMenuProvider(
+        [deckEditor]() -> QList<QPair<QString, QStringList>> {
+            QList<QPair<QString, QStringList>> result;
+            auto *deckListModel = deckEditor->deckStateManager->getModel();
+            for (const QString &boardName : InnerDecklistNode::boardZoneNames()) {
+                result.append({boardName, deckListModel->getCustomZoneNames(boardName)});
+            }
+            return result;
+        },
+        [this, deckEditor]() -> QString {
+            QString boardName;
+            const QString zoneName =
+                DeckZoneDialog::promptForNewZone(this, {}, &boardName, [deckEditor](const QString &candidate) {
+                    return deckEditor->deckStateManager->validateNewZoneName(candidate);
+                });
+            if (!zoneName.isEmpty()) {
+                deckEditor->deckStateManager->createCustomZone(boardName, zoneName);
+            }
+            return zoneName;
+        });
 
     auto *frame = new QVBoxLayout;
     frame->setObjectName("databaseDisplayFrame");

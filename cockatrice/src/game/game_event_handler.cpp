@@ -1,9 +1,30 @@
 #include "game_event_handler.h"
 
-#include "../game_graphics/log/message_log_widget.h"
-#include "../interface/widgets/tabs/tab_game.h"
 #include "abstract_game.h"
+#include "game_meta_info.h"
+#include "game_state.h"
+#include "libcockatrice/protocol/pb/commands.pb.h"
+#include "libcockatrice/protocol/pb/game_commands.pb.h"
+#include "libcockatrice/protocol/pb/game_event.pb.h"
+#include "libcockatrice/protocol/pb/game_event_context.pb.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_player.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+#include "player/player_event_handler.h"
+#include "player/player_info.h"
+#include "player/player_logic.h"
+#include "player/player_manager.h"
 
+#include <QList>
+#include <QMap>
+#include <QMapIterator>
+#include <QMessageLogger>
+#include <QSharedPointer>
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/message.h>
+#include <google/protobuf/stubs/port.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/command_concede.pb.h>
@@ -13,7 +34,6 @@
 #include <libcockatrice/protocol/pb/command_next_turn.pb.h>
 #include <libcockatrice/protocol/pb/command_reverse_turn.pb.h>
 #include <libcockatrice/protocol/pb/command_set_active_phase.pb.h>
-#include <libcockatrice/protocol/pb/context_connection_state_changed.pb.h>
 #include <libcockatrice/protocol/pb/context_deck_select.pb.h>
 #include <libcockatrice/protocol/pb/event_game_closed.pb.h>
 #include <libcockatrice/protocol/pb/event_game_host_changed.pb.h>
@@ -28,6 +48,8 @@
 #include <libcockatrice/protocol/pb/event_set_active_player.pb.h>
 #include <libcockatrice/protocol/pb/game_event_container.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <string>
+#include <utility>
 
 GameEventHandler::GameEventHandler(AbstractGame *_game) : QObject(_game), game(_game)
 {
@@ -229,7 +251,11 @@ void GameEventHandler::handleArrowDeletion(int creatorId, int arrowId)
 
 void GameEventHandler::handleArrowDeletionFinished(const Response &response, int creatorId, int arrowId)
 {
-    if (response.response_code() == Response::RespNameNotFound) {
+    // The server confirms the arrow no longer exists whether it deleted it itself
+    // (RespOk, followed by an Event_DeleteArrow broadcast) or never had it
+    // (RespNameNotFound). In both cases the local copy has to go. deleteArrow is
+    // a no-op if the arrow was already removed by the event broadcast.
+    if (response.response_code() == Response::RespOk || response.response_code() == Response::RespNameNotFound) {
         emit arrowDeleted(creatorId, arrowId);
     }
 }
@@ -281,10 +307,17 @@ void GameEventHandler::eventGameStateChanged(const Event_GameStateChanged &event
                 emit playerJoined(prop);
             }
             player->processPlayerInfo(playerInfo);
+            // Extract playmat from player properties for opponent display
+            if (prop.has_playmat_params()) {
+                player->setPlaymatFromProperties(prop);
+            }
             if (player->getPlayerInfo()->getLocal()) {
                 emit localPlayerDeckSelected(player, playerId, playerInfo);
             } else {
                 if (!game->getGameMetaInfo()->proto().share_decklists_on_load()) {
+                    continue;
+                }
+                if (!playerInfo.has_deck_list()) {
                     continue;
                 }
 
@@ -343,6 +376,11 @@ void GameEventHandler::eventPlayerPropertiesChanged(const Event_PlayerProperties
     }
     const ServerInfo_PlayerProperties &prop = event.player_properties();
     emit playerPropertiesChanged(prop, eventPlayerId);
+
+    // Update playmat from player properties
+    if (prop.has_playmat_params()) {
+        player->setPlaymatFromProperties(prop);
+    }
 
     const auto contextType = static_cast<GameEventContext::ContextType>(getPbExtension(context));
     switch (contextType) {
@@ -414,12 +452,13 @@ void GameEventHandler::eventJoin(const Event_Join &event, int /*eventPlayerId*/,
     QString playerName = QString::fromStdString(playerInfo.user_info().name());
     emit addPlayerToAutoCompleteList(playerName);
 
-    if (game->getPlayerManager()->getPlayers().contains(playerId)) {
+    PlayerManager *playerManager = game->getPlayerManager();
+    if (playerManager->getPlayers().contains(playerId) || playerManager->getSpectators().contains(playerId)) {
         return;
     }
 
     if (playerInfo.spectator()) {
-        game->getPlayerManager()->addSpectator(playerId, playerInfo);
+        playerManager->addSpectator(playerId, playerInfo);
         emit logJoinSpectator(playerName);
         emit spectatorJoined(playerInfo);
     } else {

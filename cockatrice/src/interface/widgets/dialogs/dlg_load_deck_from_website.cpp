@@ -1,15 +1,36 @@
 #include "dlg_load_deck_from_website.h"
 
+#include "../../deck_loader/card_node_function.h"
+#include "parsers/deck_link_to_api_transformer.h"
+#include "parsers/interface_json_deck_parser.h"
+
 #include <QApplication>
+#include <QByteArray>
 #include <QClipboard>
+#include <QDebug>
 #include <QDialogButtonBox>
 #include <QEventLoop>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonParseError>
+#include <QLabel>
+#include <QLineEdit>
 #include <QMessageBox>
+#include <QMessageLogger>
+#include <QMetaObject>
+#include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QString>
+#include <QTextStream>
+#include <QUrl>
+#include <QVBoxLayout>
+#include <functional>
 #include <libcockatrice/card/import/card_name_normalizer.h>
+#include <qnamespace.h>
 #include <version_string.h>
+
+class QWidget;
 
 DlgLoadDeckFromWebsite::DlgLoadDeckFromWebsite(QWidget *parent) : QDialog(parent)
 {

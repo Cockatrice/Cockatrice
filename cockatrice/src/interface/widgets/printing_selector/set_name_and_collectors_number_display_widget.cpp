@@ -1,6 +1,11 @@
 #include "set_name_and_collectors_number_display_widget.h"
 
-#include <QSlider>
+#include <QFontMetrics>
+#include <QLabel>
+#include <QRect>
+#include <QSizePolicy>
+#include <QVBoxLayout>
+#include <qnamespace.h>
 
 /**
  * @class SetNameAndCollectorsNumberDisplayWidget

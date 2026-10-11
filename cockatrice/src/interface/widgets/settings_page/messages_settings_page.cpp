@@ -1,15 +1,29 @@
 #include "messages_settings_page.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../pixel_map_generator.h"
 #include "../interface/widgets/utility/get_text_with_max.h"
+#include "libcockatrice/utility/macros.h"
 
+#include <QAction>
+#include <QColor>
+#include <QDebug>
 #include <QGridLayout>
+#include <QGroupBox>
+#include <QHBoxLayout>
 #include <QLineEdit>
+#include <QListWidget>
+#include <QListWidgetItem>
+#include <QSizePolicy>
+#include <QStringLiteral>
 #include <QToolBar>
+#include <QVBoxLayout>
+#include <QtGlobal>
 #include <libcockatrice/settings/chat_settings.h>
 #include <libcockatrice/settings/message_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <qnamespace.h>
 
 MessagesSettingsPage::MessagesSettingsPage()
 {
@@ -59,6 +73,14 @@ MessagesSettingsPage::MessagesSettingsPage()
     connect(&roomHistory, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().chat(),
             &ChatSettings::setRoomHistory);
 
+    ignoreAllPrivateMessagesCheckBox.setChecked(SettingsCache::instance().chat().getIgnoreAllPrivateMessages());
+    connect(&ignoreAllPrivateMessagesCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().chat(),
+            &ChatSettings::setIgnoreAllPrivateMessages);
+
+    useGameTimeCheckBox.setChecked(SettingsCache::instance().chat().getUseGameTime());
+    connect(&useGameTimeCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().chat(),
+            &ChatSettings::setUseGameTime);
+
     customAlertString = new QLineEdit();
     customAlertString->setText(SettingsCache::instance().chat().getHighlightWords());
     connect(customAlertString, &QLineEdit::textChanged, &SettingsCache::instance().chat(),
@@ -76,6 +98,8 @@ MessagesSettingsPage::MessagesSettingsPage()
     chatGrid->addWidget(&messagePopups, 5, 0);
     chatGrid->addWidget(&mentionPopups, 6, 0);
     chatGrid->addWidget(&roomHistory, 7, 0);
+    chatGrid->addWidget(&ignoreAllPrivateMessagesCheckBox, 8, 0);
+    chatGrid->addWidget(&useGameTimeCheckBox, 9, 0);
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatGrid);
 
@@ -90,6 +114,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     highlightNotice->addWidget(&hexHighlightLabel, 1, 2);
     highlightNotice->addWidget(customAlertString, 0, 0);
     highlightNotice->addWidget(&customAlertStringLabel, 1, 0);
+    customAlertStringLabel.setBuddy(customAlertString);
     highlightGroupBox = new QGroupBox;
     highlightGroupBox->setLayout(highlightNotice);
 
@@ -101,15 +126,15 @@ MessagesSettingsPage::MessagesSettingsPage()
     }
 
     aAdd = new QAction(this);
-    aAdd->setIcon(QPixmap("theme:icons/increment"));
+    aAdd->setIcon(themePixmap(QStringLiteral("icons/increment")));
     connect(aAdd, &QAction::triggered, this, &MessagesSettingsPage::actAdd);
 
     aEdit = new QAction(this);
-    aEdit->setIcon(QPixmap("theme:icons/pencil"));
+    aEdit->setIcon(themePixmap(QStringLiteral("icons/pencil")));
     connect(aEdit, &QAction::triggered, this, &MessagesSettingsPage::actEdit);
 
     aRemove = new QAction(this);
-    aRemove->setIcon(QPixmap("theme:icons/decrement"));
+    aRemove->setIcon(themePixmap(QStringLiteral("icons/decrement")));
     connect(aRemove, &QAction::triggered, this, &MessagesSettingsPage::actRemove);
 
     auto *messageToolBar = new QToolBar;
@@ -255,6 +280,8 @@ void MessagesSettingsPage::retranslateUi()
     messagePopups.setText(tr("Enable desktop notifications for private messages"));
     mentionPopups.setText(tr("Enable desktop notification for mentions"));
     roomHistory.setText(tr("Enable room message history on join"));
+    ignoreAllPrivateMessagesCheckBox.setText(tr("Ignore all private messages"));
+    useGameTimeCheckBox.setText(tr("Use game time instead of local time in game logs"));
     hexLabel.setText(tr("(Color is hexadecimal)"));
     hexHighlightLabel.setText(tr("(Color is hexadecimal)"));
     customAlertStringLabel.setText(tr("Separate words with a space, alphanumeric characters only"));

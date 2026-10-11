@@ -7,12 +7,14 @@
 #ifndef COCKATRICE_GAME_STATE_H
 #define COCKATRICE_GAME_STATE_H
 
-#include <QTimer>
-#include <libcockatrice/network/client/abstract/abstract_client.h>
+#include <QList>
+#include <QObject>
+#include <QString>
+#include <qtmetamacros.h>
 
 class AbstractGame;
-class ServerInfo_PlayerProperties;
-class ServerInfo_User;
+class AbstractClient;
+class QTimer;
 
 class GameState : public QObject
 {
@@ -110,6 +112,11 @@ public:
         return hostId;
     }
 
+    int getSecondsElapsed() const
+    {
+        return secondsElapsed;
+    }
+
 signals:
     void updateTimeElapsedLabel(QString newTime);
     void gameStarted(bool resuming);
@@ -120,6 +127,9 @@ signals:
 public slots:
     void incrementGameTime();
     void setGameTime(int _secondsElapsed);
+
+public:
+    static QString formatElapsedTime(int _secondsElapsed);
 
 private:
     QTimer *gameTimer;

@@ -1,9 +1,19 @@
 #include "segmented_bar_widget.h"
 
+#include <QBrush>
+#include <QFont>
+#include <QLinearGradient>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
+#include <QPoint>
+#include <QPointF>
+#include <QRect>
+#include <QSize>
+#include <QSizePolicy>
 #include <QToolTip>
+#include <qnamespace.h>
+#include <utility>
 
 SegmentedBarWidget::SegmentedBarWidget(QString label, QVector<Segment> segments, int total, QWidget *parent)
     : QWidget(parent), label(std::move(label)), segments(std::move(segments)), total(total)
@@ -134,9 +144,5 @@ void SegmentedBarWidget::mouseMoveEvent(QMouseEvent *e)
     const Segment &s = segments[idx];
     QString text = QString("%1: %2 cards\n%3").arg(s.category).arg(s.value).arg(s.cards.join(", "));
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     QToolTip::showText(e->globalPosition().toPoint(), text, this);
-#else
-    QToolTip::showText(e->globalPos(), text, this);
-#endif
 }

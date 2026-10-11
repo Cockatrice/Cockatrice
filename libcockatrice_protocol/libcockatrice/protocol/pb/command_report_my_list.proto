@@ -1,0 +1,8 @@
+syntax = "proto2";
+import "session_commands.proto";
+
+message Command_ReportMyList {
+    extend SessionCommand {
+        optional Command_ReportMyList ext = 1204;
+    }
+}

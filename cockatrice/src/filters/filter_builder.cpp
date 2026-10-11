@@ -1,11 +1,19 @@
 #include "filter_builder.h"
 
+#include "../interface/pixel_map_generator.h"
 #include "../interface/widgets/utility/custom_line_edit.h"
 
 #include <QComboBox>
 #include <QGridLayout>
+#include <QIcon>
 #include <QPushButton>
+#include <QSizePolicy>
+#include <QString>
+#include <QStringLiteral>
+#include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/filters/filter_card.h>
+#include <stddef.h>
 
 FilterBuilder::FilterBuilder(QWidget *parent) : QWidget(parent)
 {
@@ -21,7 +29,7 @@ FilterBuilder::FilterBuilder(QWidget *parent) : QWidget(parent)
         typeCombo->addItem(CardFilter::typeName(static_cast<CardFilter::Type>(i)), QVariant(i));
     }
 
-    QPushButton *ok = new QPushButton(QPixmap("theme:icons/increment"), QString());
+    QPushButton *ok = new QPushButton(themePixmap(QStringLiteral("icons/increment")), QString());
     ok->setObjectName("ok");
     ok->setMaximumSize(20, 20);
 

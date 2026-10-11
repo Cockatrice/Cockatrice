@@ -9,45 +9,55 @@
 #ifndef TAB_GAME_H
 #define TAB_GAME_H
 
-#include "../game/abstract_game.h"
-#include "../game/player/player_logic.h"
-#include "../game_graphics/log/message_log_widget.h"
-#include "../interface/widgets/menus/tearoff_menu.h"
-#include "../interface/widgets/replay/replay_widget.h"
 #include "tab.h"
 
-#include <QCompleter>
+#include <QList>
 #include <QLoggingCategory>
 #include <QMap>
+#include <QPair>
+#include <QSize>
+#include <QString>
+#include <QStringList>
+#include <QVector>
+#include <qtmetamacros.h>
+// IWYU pragma: keep
+// ServerInfo_User appears by value and inside QList in slot signatures, so the
+// moc-generated code needs the complete type.
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
 class CardMenu;
-class ServerInfo_PlayerProperties;
 class TabbedDeckViewContainer;
+class AbstractGame;
+class Event_GameJoined;
+class GameEventContext;
+class MessageLogWidget;
+class PlayerLogic;
+class QAction;
+class QCompleter;
+class QStringListModel;
+class QWidget;
+class ServerInfo_Player;
+class ServerInfo_User;
+class TabSupervisor;
+class TearOffMenu;
+struct CardRef;
+struct LoadedDeck;
+
 inline Q_LOGGING_CATEGORY(TabGameLog, "tab_game");
 
 class UserListProxy;
-class DeckViewContainer;
 class AbstractClient;
-class CardDatabase;
 class GameView;
 class GameScene;
 class ReplayWidget;
 class CardInfoFrameWidget;
-class QTimer;
-class QSplitter;
 class QLabel;
-class QToolButton;
+class QPushButton;
 class QMenu;
-class ZoneViewLayout;
-class ZoneViewWidget;
 class PhasesToolbar;
 class PlayerListWidget;
-class ReplayTimelineWidget;
-class CardZone;
 class AbstractCardItem;
-class CardItem;
 class QVBoxLayout;
-class QHBoxLayout;
 class GameReplay;
 class LineEditCompleter;
 class QDockWidget;
@@ -61,12 +71,14 @@ private:
     const UserListProxy *userListProxy;
     ReplayWidget *replayWidget = nullptr;
     QStringList gameTypes;
-    QCompleter *completer;
+    QCompleter *mentionCompleter;
+    QStringListModel *mentionModel;
     QStringList autocompleteUserList;
     QStackedWidget *mainWidget;
 
     CardInfoFrameWidget *cardInfoFrameWidget;
     PlayerListWidget *playerListWidget;
+    QPushButton *inviteButton = nullptr;
     QLabel *timeElapsedLabel;
     MessageLogWidget *messageLog;
     QLabel *sayLabel;
@@ -81,9 +93,10 @@ private:
     QAction *playersSeparator;
     QMenu *gameMenu, *viewMenu;
     TearOffMenu *phasesMenu;
-    QAction *aGameInfo, *aConcede, *aLeaveGame, *aNextPhase, *aNextPhaseAction, *aNextTurn, *aReverseTurn,
-        *aRemoveLocalArrows, *aRotateViewCW, *aRotateViewCCW, *aResetLayout, *aResetReplayLayout;
+    QAction *aGameInfo, *aConcede, *aCopyGameLink, *aLeaveGame, *aNextPhase, *aNextPhaseAction, *aNextTurn,
+        *aReverseTurn, *aRemoveLocalArrows, *aRotateViewCW, *aRotateViewCCW, *aResetLayout, *aResetReplayLayout;
     QAction *aFocusChat;
+    QAction *aInviteToGame = nullptr;
     QList<QAction *> phaseActions;
     QAction *aCardMenu;
 
@@ -126,6 +139,7 @@ private:
     void createPlayAreaWidget(bool bReplay = false);
     void createDeckViewContainerWidget(bool bReplay = false);
     void createReplayDock(GameReplay *replay);
+    void updateInviteButtonState();
 signals:
     void gameClosing(TabGame *tab);
     void containerProcessingStarted(const GameEventContext &context);
@@ -145,7 +159,9 @@ private slots:
     void setCardMenu(CardMenu *menu);
 
     void actGameInfo();
+    void actInviteToGame();
     void actConcede();
+    void actCopyGameLink();
     void actRemoveLocalArrows();
     void actRotateViewCW();
     void actRotateViewCCW();
@@ -196,7 +212,7 @@ public:
 
 public slots:
     void viewCardInfo(const CardRef &cardRef = {}) const;
-    void resetChatAndPhase();
+    void resetForRewind();
     void updateTimeElapsedLabel(QString newTime);
     void addPlayerToAutoCompleteList(QString playerName);
     void removePlayerFromAutoCompleteList(QString playerName);

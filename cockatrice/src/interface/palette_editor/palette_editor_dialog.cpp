@@ -1,6 +1,6 @@
 #include "palette_editor_dialog.h"
 
-#include "../../client/settings/cache_settings.h"
+#include "../theme_config.h"
 #include "../theme_manager.h"
 #include "palette_generator.h"
 #include "palette_grid_widget.h"
@@ -10,32 +10,22 @@
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <QDir>
+#include <QEvent>
 #include <QFile>
-#include <QFileInfo>
 #include <QFrame>
-#include <QGuiApplication>
+#include <QHBoxLayout>
 #include <QLabel>
-#include <QLoggingCategory>
+#include <QList>
 #include <QMessageBox>
+#include <QPalette>
 #include <QPushButton>
-#include <QStyleHints>
+#include <QSharedPointer>
+#include <QStringList>
 #include <QTimer>
-#include <libcockatrice/settings/paths_settings.h>
-
-// Probe whether a directory is truly writable by trying to create and remove a
-// temporary file. QFileInfo::isWritable() on a directory is unreliable (notably
-// on Windows where UAC VirtualStore can make a system dir appear writable).
-static bool isDirReallyWritable(const QString &dirPath)
-{
-    const QString probe = QDir(dirPath).absoluteFilePath(".cockatrice_write_test");
-    QFile f(probe);
-    if (!f.open(QIODevice::WriteOnly)) {
-        return false;
-    }
-    f.close();
-    f.remove();
-    return true;
-}
+#include <QVBoxLayout>
+#include <QWidget>
+#include <initializer_list>
+#include <qnamespace.h>
 
 PaletteEditorDialog::PaletteEditorDialog(const QString &_themeDirPath, const QString &_themeName, QWidget *parent)
     : QDialog(parent), themeDirPath(_themeDirPath), themeName(_themeName)
@@ -46,14 +36,7 @@ PaletteEditorDialog::PaletteEditorDialog(const QString &_themeDirPath, const QSt
     // Resolve a writable directory for saving. Built-in (Default / Fusion) and
     // other read-only theme directories must be customised in the user-writable
     // themes directory; otherwise the write would fail or be lost on upgrade.
-    if (!themeDirPath.isEmpty() && isDirReallyWritable(themeDirPath)) {
-        saveDir = themeDirPath;
-    } else {
-        saveDir = QDir(SettingsCache::instance().paths().getThemesPath()).absoluteFilePath(themeName);
-        if (!QDir().mkpath(saveDir)) {
-            qWarning() << "Failed to create palette save directory:" << saveDir;
-        }
-    }
+    saveDir = ThemeManager::writableThemeDir(themeName);
 
     // Load both scheme configs upfront so switching is instant
     loadSchemes();
@@ -214,7 +197,7 @@ void PaletteEditorDialog::retranslateUi()
     resetBtn->setToolTip(tr("Discard unsaved edits and restore the last saved palette"));
     saveBtn->setToolTip(tr("Write palette-%1.toml and reload the theme").arg(loadedScheme.toLower()));
 
-    if (saveDir.isEmpty() || !isDirReallyWritable(saveDir)) {
+    if (saveDir.isEmpty() || !ThemeManager::isDirReallyWritable(saveDir)) {
         saveBtn->setEnabled(false);
         saveBtn->setToolTip(tr("Cannot save: this theme has no writable directory"));
     }
@@ -290,27 +273,41 @@ void PaletteEditorDialog::onSave()
     // Persist every scheme that changed, not just the one on screen. Each scheme
     // has its own file, so edits to the non-active scheme would otherwise be
     // silently discarded when the dialog closes.
+    //
+    // Save the loaded scheme last so commitPalette's global colour-scheme
+    // update (ThemeConfig::colorScheme) points at the active scheme.
     for (auto it = workingConfig.begin(); it != workingConfig.end(); ++it) {
-        const QString &scheme = it.key();
-        if (it.value().colors == savedConfig.value(scheme).colors) {
-            continue; // unchanged — leave the on-disk file alone
+        if (it.key() == loadedScheme) {
+            continue;
         }
-
-        if (!ThemeManager::savePaletteConfig(saveDir, scheme, it.value())) {
+        if (it.value() == savedConfig.value(it.key())) {
+            continue;
+        }
+        if (!ThemeManager::commitPalette(saveDir, it.key(), it.value())) {
             QMessageBox::warning(this, tr("Save failed"),
-                                 tr("Could not write %1 to:\n%2").arg(PaletteConfig::fileName(scheme), saveDir));
+                                 tr("Could not write %1 to:\n%2").arg(PaletteConfig::fileName(it.key()), saveDir));
             return;
         }
+    }
+
+    // Commit the active scheme last so the global colour scheme matches.
+    if (workingConfig[loadedScheme] != savedConfig.value(loadedScheme)) {
+        if (!ThemeManager::commitPalette(saveDir, loadedScheme, workingConfig[loadedScheme])) {
+            QMessageBox::warning(this, tr("Save failed"),
+                                 tr("Could not write %1 to:\n%2").arg(PaletteConfig::fileName(loadedScheme), saveDir));
+            return;
+        }
+    } else {
+        // No palette change but scheme may have switched -- still update global config.
+        ThemeConfig globalCfg = ThemeConfig::fromThemeDir(saveDir);
+        globalCfg.colorScheme = loadedScheme;
+        globalCfg.save(saveDir);
     }
 
     // Keep the saved snapshot in sync so Reset behaves correctly afterwards.
     for (auto it = workingConfig.begin(); it != workingConfig.end(); ++it) {
         savedConfig[it.key()] = it.value();
     }
-
-    ThemeConfig globalCfg = ThemeConfig::fromThemeDir(saveDir);
-    globalCfg.colorScheme = loadedScheme;
-    globalCfg.save(saveDir);
 
     themeManager->reloadCurrentTheme();
     accept();

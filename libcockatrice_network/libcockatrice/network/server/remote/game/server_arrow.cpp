@@ -1,10 +1,16 @@
 #include "server_arrow.h"
 
+#include "game/server_abstract_player.h"
+#include "game/server_arrowtarget.h"
+#include "libcockatrice/protocol/pb/color.pb.h"
 #include "server_card.h"
 #include "server_cardzone.h"
 #include "server_player.h"
 
+#include <QObject>
+#include <QString>
 #include <libcockatrice/protocol/pb/serverinfo_arrow.pb.h>
+#include <string>
 
 Server_Arrow::Server_Arrow(int _id,
                            Server_Card *_startCard,

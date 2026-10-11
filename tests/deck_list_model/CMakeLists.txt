@@ -1,0 +1,23 @@
+cockatrice_add_test(
+  NAME
+  deck_list_model_custom_zones_test
+  SOURCES
+  ${VERSION_STRING_CPP}
+  deck_list_model_custom_zones_test.cpp
+  LIBS
+  libcockatrice_models
+  libcockatrice_card
+  libcockatrice_deck_list
+)
+
+cockatrice_add_test(
+  NAME
+  deck_list_model_zone_integration_test
+  SOURCES
+  ${VERSION_STRING_CPP}
+  deck_list_model_zone_integration_test.cpp
+  LIBS
+  libcockatrice_models
+  libcockatrice_card
+  libcockatrice_deck_list
+)

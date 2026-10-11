@@ -23,15 +23,14 @@ set(oracle_SOURCES
     src/pages.cpp
     src/pagetemplates.cpp
     src/parsehelpers.cpp
-    src/qt-json/json.cpp
+    src/raw_json_scanner.cpp
     ../cockatrice/src/client/settings/cache_settings.cpp
     ../cockatrice/src/client/settings/card_counter_settings.cpp
     ../cockatrice/src/client/settings/shortcuts_settings.cpp
     ../cockatrice/src/client/network/update/client/release_channel.cpp
+    ../cockatrice/src/interface/pixel_map_generator.cpp
     ../cockatrice/src/interface/theme_config.cpp
     ../cockatrice/src/interface/theme_manager.cpp
-    ../cockatrice/src/interface/widgets/quick_settings/settings_button_widget.cpp
-    ../cockatrice/src/interface/widgets/quick_settings/settings_popup_widget.cpp
     ${VERSION_STRING_CPP}
 )
 
@@ -64,11 +63,7 @@ set(oracle_RESOURCES oracle.qrc)
 # ------------------------
 # Qt resources
 # ------------------------
-if(Qt6_FOUND)
-  qt6_add_resources(oracle_RESOURCES_RCC ${oracle_RESOURCES})
-elseif(Qt5_FOUND)
-  qt5_add_resources(oracle_RESOURCES_RCC ${oracle_RESOURCES})
-endif()
+qt6_add_resources(oracle_RESOURCES_RCC ${oracle_RESOURCES})
 
 # ------------------------
 # Include directories
@@ -84,6 +79,8 @@ if(ZLIB_FOUND)
   include_directories(${ZLIB_INCLUDE_DIRS})
   add_definitions("-DHAS_ZLIB")
   list(APPEND oracle_SOURCES src/zip/unzip.cpp src/zip/zipglobal.cpp)
+  # minizip and zlib are vendored.
+  cockatrice_disable_sanitizers_for(src/zip/unzip.cpp src/zip/zipglobal.cpp)
 else()
   message(STATUS "Oracle: zlib not found; ZIP support disabled")
 endif()
@@ -94,6 +91,8 @@ if(LIBLZMA_FOUND)
   include_directories(${LIBLZMA_INCLUDE_DIRS})
   add_definitions("-DHAS_LZMA")
   list(APPEND oracle_SOURCES src/lzma/decompress.cpp)
+  # The LZMA SDK is vendored.
+  cockatrice_disable_sanitizers_for(src/lzma/decompress.cpp)
 else()
   message(STATUS "Oracle: LibLZMA not found; xz support disabled")
 endif()
@@ -106,37 +105,18 @@ set(ORACLE_MAC_QM_INSTALL_DIR "oracle.app/Contents/Resources/translations")
 set(ORACLE_UNIX_QM_INSTALL_DIR "share/oracle/translations")
 set(ORACLE_WIN32_QM_INSTALL_DIR "translations")
 
-if(Qt6_FOUND)
-  # Qt6 Translations are linked after the executable is created in manual mode
-  qt6_add_executable(
-    oracle
-    WIN32
-    MACOSX_BUNDLE
-    ${oracle_SOURCES}
-    ${oracle_RESOURCES_RCC}
-    ${oracle_MOC_SRCS}
-    MANUAL_FINALIZATION
-  )
-elseif(Qt5_FOUND)
-  # Qt5 Translations need to be linked at executable creation time
-  if(Qt5LinguistTools_FOUND)
-    if(UPDATE_TRANSLATIONS)
-      qt5_create_translation(oracle_QM ${translate_SRCS} ${oracle_TS})
-    else()
-      qt5_add_translation(oracle_QM ${oracle_TS})
-    endif()
-  endif()
-  add_executable(oracle WIN32 MACOSX_BUNDLE ${oracle_MOC_SRCS} ${oracle_QM} ${oracle_RESOURCES_RCC} ${oracle_SOURCES})
-  if(UNIX)
-    if(APPLE)
-      install(FILES ${oracle_QM} DESTINATION ${ORACLE_MAC_QM_INSTALL_DIR})
-    else()
-      install(FILES ${oracle_QM} DESTINATION ${ORACLE_UNIX_QM_INSTALL_DIR})
-    endif()
-  elseif(WIN32)
-    install(FILES ${oracle_QM} DESTINATION ${ORACLE_WIN32_QM_INSTALL_DIR})
-  endif()
-endif()
+# Qt6 Translations are linked after the executable is created in manual mode
+qt6_add_executable(
+  oracle
+  WIN32
+  MACOSX_BUNDLE
+  ${oracle_SOURCES}
+  ${oracle_RESOURCES_RCC}
+  ${oracle_MOC_SRCS}
+  MANUAL_FINALIZATION
+)
+
+target_precompile_headers(oracle PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtwidgets_pch.h")
 
 # ------------------------
 # Link libraries
@@ -145,9 +125,13 @@ target_link_libraries(
   oracle
   PUBLIC libcockatrice_card
   PUBLIC libcockatrice_settings
-  PUBLIC libcockatrice_network
+  PUBLIC libcockatrice_protocol
   PUBLIC ${ORACLE_QT_MODULES}
 )
+
+# Only user_level.h is needed from the network headers (pulled in transitively
+# by pixel_map_generator.h); nothing from the network libraries is linked.
+target_include_directories(oracle PRIVATE ${CMAKE_SOURCE_DIR}/libcockatrice_network)
 
 if(ZLIB_FOUND)
   target_link_libraries(oracle PUBLIC ${ZLIB_LIBRARIES})
@@ -235,10 +219,19 @@ if(WIN32)
   list(APPEND libSearchDirs ${QT_LIBRARY_DIR})
 
   install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/"
+    DIRECTORY "$<TARGET_FILE_DIR:oracle>/"
     DESTINATION ./
     FILES_MATCHING
     PATTERN "*.dll"
+    PATTERN "*.pdb" EXCLUDE
+    PATTERN "*.dir*" EXCLUDE
+    PATTERN "*_autogen*" EXCLUDE
+    PATTERN "*.tlog*" EXCLUDE
+    PATTERN "CMakeFiles*" EXCLUDE
+    PATTERN "x64*" EXCLUDE
+    PATTERN ".qt*" EXCLUDE
+    PATTERN ".qsb*" EXCLUDE
+    PATTERN ".lupdate*" EXCLUDE
   )
 
   # Qt plugins: iconengines, platforms, styles, tls (Qt6)
@@ -285,7 +278,7 @@ endif()
 # ------------------------
 # Qt translations
 # ------------------------
-if(Qt6_FOUND AND Qt6LinguistTools_FOUND)
+if(Qt6LinguistTools_FOUND)
   #Qt6 Translations happen after the executable is built up
   if(UPDATE_TRANSLATIONS)
     qt6_add_translations(
@@ -310,8 +303,18 @@ if(Qt6_FOUND AND Qt6LinguistTools_FOUND)
   elseif(WIN32)
     install(FILES ${oracle_QM} DESTINATION ${ORACLE_WIN32_QM_INSTALL_DIR})
   endif()
+
+  # Qt attaches the .qm files to the default build target only, so building the executable on its own
+  # (CLion, --target oracle) leaves it without any translations: nothing is translated and the
+  # language selector in the wizard stays empty.
+  # Depend on Qt's own lrelease target instead of attaching the .qm custom commands to a second
+  # target: two independent targets owning the same outputs race on MSBuild/Makefiles and are an
+  # error on Xcode. Older Qt versions already add this dependency themselves.
+  foreach(_lrelease_target Oracle_lrelease oracle_lrelease)
+    if(TARGET ${_lrelease_target})
+      add_dependencies(oracle ${_lrelease_target})
+    endif()
+  endforeach()
 endif()
 
-if(Qt6_FOUND)
-  qt6_finalize_target(oracle)
-endif()
+qt6_finalize_target(oracle)

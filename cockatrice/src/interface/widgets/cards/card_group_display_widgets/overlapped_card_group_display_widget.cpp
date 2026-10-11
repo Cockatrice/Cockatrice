@@ -1,8 +1,20 @@
 #include "overlapped_card_group_display_widget.h"
 
+#include "../../general/display/banner_widget.h"
+#include "../../general/layout_containers/overlap_widget.h"
+#include "../card_size_widget.h"
+
+#include <QAbstractItemModel>
+#include <QList>
+#include <QMap>
 #include <QResizeEvent>
-#include <libcockatrice/card/database/card_database_manager.h>
+#include <QSlider>
+#include <QVBoxLayout>
+#include <QWidget>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
+#include <qnamespace.h>
+
+class QItemSelectionModel;
 
 OverlappedCardGroupDisplayWidget::OverlappedCardGroupDisplayWidget(QWidget *parent,
                                                                    DeckListModel *_deckListModel,

@@ -1,26 +1,52 @@
 #include "card_item.h"
 
 #include "../../client/settings/cache_settings.h"
-#include "../../client/settings/card_counter_settings.h"
+#include "../../game/abstract_game.h"
+#include "../../game/board/card_state.h"
+#include "../../game/game_state.h"
 #include "../../game/phase.h"
 #include "../../game/player/player_actions.h"
+#include "../../game/player/player_info.h"
 #include "../../game/player/player_logic.h"
+#include "../../game/player/player_manager.h"
+#include "../../game/zones/card_zone_logic.h"
+#include "../../game/zones/table_zone_logic.h"
 #include "../../game/zones/view_zone_logic.h"
-#include "../../interface/widgets/tabs/tab_game.h"
+#include "../card_dimensions.h"
 #include "../game_scene.h"
-#include "../zones/table_zone.h"
-#include "../zones/view_zone.h"
 #include "arrow_item.h"
 #include "card_drag_item.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/protocol/pb/serverinfo_cardcounter.pb.h"
 
 #include <../../client/settings/card_counter_settings.h>
 #include <QApplication>
+#include <QBrush>
+#include <QChar>
+#include <QColor>
+#include <QCursor>
+#include <QFlags>
+#include <QGraphicsItem>
+#include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
-#include <QMenu>
+#include <QMap>
+#include <QMapIterator>
+#include <QObject>
 #include <QPainter>
+#include <QPen>
+#include <QRectF>
+#include <QSharedPointer>
+#include <QSizeF>
+#include <QTransform>
+#include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
 #include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/utility/card_ref.h>
+#include <qnamespace.h>
+
+struct CardRef;
 
 CardItem::CardItem(PlayerLogic *_owner,
                    QGraphicsItem *parent,
@@ -281,7 +307,7 @@ void CardItem::drawArrow(const QColor &arrowColor)
     auto *game = owner->getGame();
     PlayerLogic *arrowOwner = game->getPlayerManager()->getActiveLocalPlayer(game->getGameState()->getActivePlayer());
     int phase = 0; // 0 means to not set the phase
-    if (SettingsCache::instance().interface().getDoNotDeleteArrowsInSubPhases()) {
+    if (SettingsCache::instance().userInterface().getDoNotDeleteArrowsInSubPhases()) {
         int currentPhase = game->getGameState()->getCurrentPhase();
         phase = Phases::getLastSubphase(currentPhase) + 1;
     }
@@ -316,7 +342,7 @@ void CardItem::drawAttachArrow()
 
     for (const auto &item : scene()->selectedItems()) {
         CardItem *card = qgraphicsitem_cast<CardItem *>(item);
-        if (card == nullptr) {
+        if (card == nullptr || card == this) {
             continue;
         }
         if (card->getZone() != state->getZone()) {
@@ -400,7 +426,7 @@ void CardItem::playCard(bool faceDown)
     if (tz) {
         emit tz->toggleTapped();
     } else {
-        if (SettingsCache::instance().interface().getClickPlaysAllSelected()) {
+        if (SettingsCache::instance().userInterface().getClickPlaysAllSelected()) {
             if (faceDown) {
                 emit playSelectedFaceDown(this);
             } else {
@@ -464,7 +490,7 @@ static bool isUnwritableRevealZone(CardZoneLogic *zone)
 void CardItem::handleClickedToPlay(bool shiftHeld)
 {
     if (isUnwritableRevealZone(state->getZone())) {
-        if (SettingsCache::instance().interface().getClickPlaysAllSelected()) {
+        if (SettingsCache::instance().userInterface().getClickPlaysAllSelected()) {
             emit hideSelected(this);
         } else {
             state->getZone()->removeCard(this);
@@ -481,7 +507,7 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         return;
     }
     if ((event->modifiers() != Qt::AltModifier) && (event->button() == Qt::LeftButton) &&
-        (!SettingsCache::instance().interface().getDoubleClickToPlay())) {
+        (!SettingsCache::instance().userInterface().getDoubleClickToPlay())) {
         handleClickedToPlay(event->modifiers().testFlag(Qt::ShiftModifier));
     }
     if (owner != nullptr) {
@@ -493,7 +519,7 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     if ((event->modifiers() != Qt::AltModifier) && (event->buttons() == Qt::LeftButton) &&
-        (SettingsCache::instance().interface().getDoubleClickToPlay())) {
+        (SettingsCache::instance().userInterface().getDoubleClickToPlay())) {
         handleClickedToPlay(event->modifiers().testFlag(Qt::ShiftModifier));
     }
     event->accept();

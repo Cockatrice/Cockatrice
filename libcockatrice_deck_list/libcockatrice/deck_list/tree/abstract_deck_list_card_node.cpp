@@ -1,5 +1,10 @@
 #include "abstract_deck_list_card_node.h"
 
+#include "libcockatrice/deck_list/tree/abstract_deck_list_node.h"
+
+#include <QXmlStreamWriter>
+#include <compare>
+
 bool AbstractDecklistCardNode::compare(AbstractDecklistNode *other) const
 {
     switch (sortMethod) {
@@ -32,17 +37,6 @@ bool AbstractDecklistCardNode::compareName(AbstractDecklistNode *other) const
     } else {
         return true;
     }
-}
-
-bool AbstractDecklistCardNode::readElement(QXmlStreamReader *xml)
-{
-    while (!xml->atEnd()) {
-        xml->readNext();
-        if (xml->isEndElement() && xml->name().toString() == "card") {
-            return false;
-        }
-    }
-    return true;
 }
 
 void AbstractDecklistCardNode::writeElement(QXmlStreamWriter *xml)

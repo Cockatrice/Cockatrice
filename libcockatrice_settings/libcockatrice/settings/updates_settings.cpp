@@ -1,6 +1,13 @@
 #include "updates_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QDate>
 #include <QDateTime>
+#include <QSharedPointer>
+#include <QVariant>
+
+class QObject;
 
 UpdatesSettings::UpdatesSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "updates.ini", "updates", QString(), parent)
@@ -45,17 +52,22 @@ bool UpdatesSettings::getAlwaysEnableNewSets() const
 
 bool UpdatesSettings::getNotifyAboutUpdates() const
 {
-    return getValue("updatenotification", QString(), QString(), true).toBool();
+    return getValue("updateNotification", QString(), QString(), true).toBool();
 }
 
 bool UpdatesSettings::getNotifyAboutNewVersion() const
 {
-    return getValue("newversionnotification", QString(), QString(), true).toBool();
+    return getValue("newVersionNotification", QString(), QString(), true).toBool();
+}
+
+bool UpdatesSettings::getCardDatabaseUpdateTrayNotification() const
+{
+    return getValue("cardDatabaseUpdateTrayNotification", QString(), QString(), true).toBool();
 }
 
 int UpdatesSettings::getUpdateReleaseChannelIndex() const
 {
-    return getValue("updatereleasechannel", QString(), QString(), 0).toInt();
+    return getValue("updateReleaseChannel", QString(), QString(), 0).toInt();
 }
 
 void UpdatesSettings::setCheckUpdatesOnStartup(bool value)
@@ -90,15 +102,20 @@ void UpdatesSettings::setAlwaysEnableNewSets(bool value)
 
 void UpdatesSettings::setNotifyAboutUpdates(bool _notifyaboutupdate)
 {
-    setValue(_notifyaboutupdate, "updatenotification");
+    setValue(_notifyaboutupdate, "updateNotification");
 }
 
 void UpdatesSettings::setNotifyAboutNewVersion(bool _notifyaboutnewversion)
 {
-    setValue(_notifyaboutnewversion, "newversionnotification");
+    setValue(_notifyaboutnewversion, "newVersionNotification");
+}
+
+void UpdatesSettings::setCardDatabaseUpdateTrayNotification(bool value)
+{
+    setValue(value, "cardDatabaseUpdateTrayNotification");
 }
 
 void UpdatesSettings::setUpdateReleaseChannelIndex(int value)
 {
-    setValue(value, "updatereleasechannel");
+    setValue(value, "updateReleaseChannel");
 }

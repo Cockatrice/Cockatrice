@@ -7,56 +7,48 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "../../game_graphics/player/player_area.h"
-#include "../../interface/widgets/menus/tearoff_menu.h"
-#include "../board/arrow_data.h"
-#include "../interface/deck_loader/loaded_deck.h"
+#include "../zones/card_zone_logic.h"
 #include "../zones/hand_zone_logic.h"
 #include "../zones/pile_zone_logic.h"
 #include "../zones/stack_zone_logic.h"
 #include "../zones/table_zone_logic.h"
-#include "player_event_handler.h"
-#include "player_info.h"
+#include "libcockatrice/deck_list/deck_list.h"
+#include "libcockatrice/utility/card_ref.h"
+#include "libcockatrice/utility/playmat_params.h"
 
+#include <QColor>
 #include <QInputDialog>
+#include <QList>
 #include <QLoggingCategory>
 #include <QMap>
-#include <QTimer>
-#include <libcockatrice/filters/filter_string.h>
-#include <libcockatrice/protocol/pb/card_attributes.pb.h>
-#include <libcockatrice/protocol/pb/game_event.pb.h>
+#include <QObject>
+#include <QString>
 #include <libcockatrice/utility/zone_names.h>
+#include <qtmetamacros.h>
+
+// IWYU pragma: keep
+// ServerInfo_Card appears inside QList<...> in signal and slot
+// signatures, which the moc-generated code needs to be complete.
+#include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
+
+class CardItem;
+class CounterState;
+class QWidget;
+class ServerInfo_PlayerProperties;
+struct ArrowData;
+struct LoadedDeck;
+template <class T> class QSharedPointer;
 
 inline Q_LOGGING_CATEGORY(PlayerLog, "player");
-
-namespace google
-{
-namespace protobuf
-{
-class Message;
-}
-} // namespace google
 class AbstractCardItem;
 class AbstractGame;
-class ArrowItem;
-class ArrowTarget;
-class CardDatabase;
-class CardZone;
-class CommandContainer;
-class GameCommand;
-class GameEvent;
 class PlayerInfo;
 class PlayerEventHandler;
 class PlayerActions;
-class PlayerMenu;
-class QAction;
-class QMenu;
-class ServerInfo_Arrow;
 class ServerInfo_Card;
 class ServerInfo_Counter;
 class ServerInfo_Player;
 class ServerInfo_User;
-class TabGame;
 
 const int MAX_TOKENS_PER_DIALOG = 99;
 
@@ -72,6 +64,8 @@ signals:
                                  const QList<const ServerInfo_Card *> &cardList,
                                  bool withWritePermission);
     void deckChanged();
+    /** @brief Emitted when the remote playmat (card/params) is updated from player properties. */
+    void playmatChanged();
     void newCardAdded(AbstractCardItem *card);
     void requestCardMenuUpdate(const CardItem *card);
     void counterAdded(CounterState *state);
@@ -226,6 +220,20 @@ public:
 
     void setZoneId(int _zoneId);
 
+    void setPlaymatFromProperties(const ServerInfo_PlayerProperties &props);
+    const CardRef &getRemotePlaymatCard() const
+    {
+        return remotePlaymatCard;
+    }
+    const PlaymatParams &getRemotePlaymatParams() const
+    {
+        return remotePlaymatParams;
+    }
+    bool getHasRemotePlaymat() const
+    {
+        return hasRemotePlaymat;
+    }
+
 private:
     AbstractGame *game;
     PlayerInfo *playerInfo;
@@ -243,6 +251,11 @@ private:
 
     bool dialogSemaphore;
     QList<CardItem *> cardsToDelete;
+
+    // Playmat from player properties (for opponent display)
+    CardRef remotePlaymatCard;
+    PlaymatParams remotePlaymatParams;
+    bool hasRemotePlaymat = false;
 };
 
 class AnnotationDialog : public QInputDialog

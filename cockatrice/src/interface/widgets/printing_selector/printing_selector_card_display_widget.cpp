@@ -1,11 +1,22 @@
 #include "printing_selector_card_display_widget.h"
 
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "printing_selector.h"
 #include "printing_selector_card_overlay_widget.h"
 #include "set_name_and_collectors_number_display_widget.h"
 
-#include <QGraphicsEffect>
+#include <QMap>
+#include <QSharedPointer>
+#include <QSizePolicy>
+#include <QString>
 #include <QVBoxLayout>
-#include <utility>
+#include <qnamespace.h>
+
+class AbstractTabDeckEditor;
+class DeckStateManager;
+class QSlider;
 
 /**
  * @brief Constructs a PrintingSelectorCardDisplayWidget to display card information.

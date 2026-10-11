@@ -2,12 +2,32 @@
 
 #include "../../relation/card_relation.h"
 #include "../../relation/card_relation_type.h"
+#include "libcockatrice/card/database/card_database_data.h"
+#include "libcockatrice/card/database/parser/card_database_parser.h"
+#include "libcockatrice/card/lazy_properties_hash.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
 
+#include <QChar>
 #include <QCoreApplication>
+#include <QDate>
+#include <QDateTime>
 #include <QDebug>
 #include <QFile>
+#include <QHash>
+#include <QIODevice>
+#include <QList>
+#include <QMessageLogger>
+#include <QSharedPointer>
+#include <QStringView>
+#include <QXmlStreamAttributes>
 #include <QXmlStreamReader>
+#include <QXmlStreamWriter>
+#include <QtGlobal>
+#include <qnamespace.h>
 #include <version_string.h>
+
+class ICardSetPriorityController;
 
 #define COCKATRICE_XML3_TAGNAME "cockatrice_carddatabase"
 #define COCKATRICE_XML3_TAGVER 3
@@ -228,7 +248,6 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     // Only load printings from sets the user has enabled, matching the v4 loader's
                     // behaviour. Without this check, disabling a set has no effect on v3 databases.
                     if (set->getEnabled()) {
-                        PrintingInfo setInfo(set);
                         QHash<QString, QString> printingProps;
                         if (attrs.hasAttribute("muId")) {
                             printingProps.insert("muid", attrs.value("muId").toString());
@@ -249,7 +268,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                         if (attrs.hasAttribute("rarity")) {
                             printingProps.insert("rarity", attrs.value("rarity").toString());
                         }
-                        setInfo.setProperties(printingProps);
+                        PrintingInfo setInfo(set, LazyPropertiesHash(printingProps));
                         _sets[setName].append(setInfo);
                     }
                     // related cards

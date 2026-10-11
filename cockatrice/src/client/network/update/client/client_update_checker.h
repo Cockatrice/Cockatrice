@@ -6,9 +6,12 @@
 
 #ifndef CLIENT_UPDATE_CHECKER_H
 #define CLIENT_UPDATE_CHECKER_H
-#include <QObject>
+#include "release_channel.h"
 
-class Release;
+#include <QMetaObject>
+#include <QObject>
+#include <QString>
+#include <qtmetamacros.h>
 
 /**
  * We use a singleton instance of UpdateChannel, which can cause interference and feedback loops when multiple objects

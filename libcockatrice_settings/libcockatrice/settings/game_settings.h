@@ -3,7 +3,11 @@
 
 #include "settings_manager.h"
 
+#include <QString>
 #include <libcockatrice/interfaces/interface_game_settings_provider.h>
+#include <qtmetamacros.h>
+
+class QObject;
 
 class GameSettings : public SettingsManager, public IGameSettingsProvider
 {

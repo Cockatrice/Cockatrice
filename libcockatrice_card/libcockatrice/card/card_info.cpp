@@ -1,92 +1,49 @@
 #include "card_info.h"
 
 #include "game_specific_terms.h"
+#include "libcockatrice/card/lazy_properties_hash.h"
 #include "printing/printing_info.h"
 #include "relation/card_relation.h"
 #include "set/card_set.h"
 
-#include <QDataStream>
-#include <QDir>
-#include <QMutex>
-#include <QMutexLocker>
+#include <QHashIterator>
 #include <QRegularExpression>
 #include <QSharedPointer>
 #include <QString>
-#include <algorithm>
 #include <utility>
-
-class CardRelation;
-class CardSet;
-class CardInfo;
 
 using CardInfoPtr = QSharedPointer<CardInfo>;
 
-namespace
-{
-QByteArray serializeProperties(const QHash<QString, QString> &props)
-{
-    QByteArray blob;
-    QDataStream out(&blob, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_6_4);
-    out << props;
-    return blob;
-}
-} // namespace
-
-void CardInfo::ensurePropertiesLoaded() const
-{
-    QMutexLocker lock(&propertiesMutex);
-    if (propertiesLoaded) {
-        return;
-    }
-    if (!propertiesBlob.isEmpty()) {
-        QDataStream in(propertiesBlob);
-        in.setVersion(QDataStream::Qt_6_4);
-        in >> propertiesCache;
-    }
-    propertiesLoaded = true;
-}
-
 const QHash<QString, QString> &CardInfo::getPropertiesHash() const
 {
-    ensurePropertiesLoaded();
-    return propertiesCache;
+    return properties.getProperties();
 }
 
 void CardInfo::setProperty(const QString &_name, const QString &_value)
 {
-    ensurePropertiesLoaded();
-    if (propertiesCache.value(_name) == _value) {
+    bool changed = properties.insert(_name, _value);
+    if (!changed) {
         return;
     }
-    propertiesCache.insert(_name, _value);
-    propertiesBlob = serializeProperties(propertiesCache);
-    emit cardInfoChanged(smartThis);
-}
 
-void CardInfo::setProperties(const QHash<QString, QString> &_props)
-{
-    ensurePropertiesLoaded();
-    propertiesCache = _props;
-    propertiesBlob = serializeProperties(propertiesCache);
     emit cardInfoChanged(smartThis);
 }
 
 CardInfo::CardInfo(const QString &_name,
                    const QString &_text,
                    bool _isToken,
-                   QHash<QString, QString> _properties,
+                   const QHash<QString, QString> &_properties,
                    const QList<CardRelation *> &_relatedCards,
                    const QList<CardRelation *> &_reverseRelatedCards,
                    SetToPrintingsMap _sets,
-                   const UiAttributes _uiAttributes)
-    : name(_name), text(_text), isToken(_isToken), relatedCards(_relatedCards),
-      reverseRelatedCards(_reverseRelatedCards), setsToPrintings(std::move(_sets)), uiAttributes(_uiAttributes)
+                   const UiAttributes _uiAttributes,
+                   QMap<QString, QString> _localizedNames,
+                   QMap<QString, QString> _localizedTexts)
+    : name(_name), text(_text), isToken(_isToken), localizedNames(std::move(_localizedNames)),
+      localizedTexts(std::move(_localizedTexts)), properties(LazyPropertiesHash(_properties)),
+      relatedCards(_relatedCards), reverseRelatedCards(_reverseRelatedCards), setsToPrintings(std::move(_sets)),
+      uiAttributes(_uiAttributes)
 {
-    propertiesCache = std::move(_properties);
-    propertiesBlob = serializeProperties(propertiesCache);
-    propertiesLoaded = true;
-
     simpleName = CardInfo::simplifyName(name);
 
     refreshCachedSets();
@@ -95,15 +52,18 @@ CardInfo::CardInfo(const QString &_name,
 CardInfo::CardInfo(const QString &_name,
                    const QString &_text,
                    bool _isToken,
-                   QByteArray _propertiesBlob,
+                   const QByteArray &_propertiesBlob,
                    const QList<CardRelation *> &_relatedCards,
                    const QList<CardRelation *> &_reverseRelatedCards,
                    SetToPrintingsMap _sets,
                    const UiAttributes _uiAttributes,
                    QString _simpleName,
-                   QSet<QString> _altNames)
+                   QSet<QString> _altNames,
+                   QMap<QString, QString> _localizedNames,
+                   QMap<QString, QString> _localizedTexts)
     : name(_name), simpleName(std::move(_simpleName)), text(_text), isToken(_isToken),
-      propertiesBlob(std::move(_propertiesBlob)), relatedCards(_relatedCards),
+      localizedNames(std::move(_localizedNames)), localizedTexts(std::move(_localizedTexts)),
+      properties(LazyPropertiesHash(_propertiesBlob)), relatedCards(_relatedCards),
       reverseRelatedCards(_reverseRelatedCards), setsToPrintings(std::move(_sets)), uiAttributes(_uiAttributes),
       altNames(std::move(_altNames))
 {
@@ -121,14 +81,16 @@ CardInfoPtr CardInfo::newInstance(const QString &_name)
 CardInfoPtr CardInfo::newInstance(const QString &_name,
                                   const QString &_text,
                                   bool _isToken,
-                                  QHash<QString, QString> _properties,
+                                  const QHash<QString, QString> &_properties,
                                   const QList<CardRelation *> &_relatedCards,
                                   const QList<CardRelation *> &_reverseRelatedCards,
                                   SetToPrintingsMap _sets,
-                                  const UiAttributes _uiAttributes)
+                                  const UiAttributes _uiAttributes,
+                                  QMap<QString, QString> _localizedNames,
+                                  QMap<QString, QString> _localizedTexts)
 {
-    CardInfoPtr ptr(new CardInfo(_name, _text, _isToken, std::move(_properties), _relatedCards, _reverseRelatedCards,
-                                 _sets, _uiAttributes));
+    CardInfoPtr ptr(new CardInfo(_name, _text, _isToken, _properties, _relatedCards, _reverseRelatedCards, _sets,
+                                 _uiAttributes, std::move(_localizedNames), std::move(_localizedTexts)));
     ptr->setSmartPointer(ptr);
 
     for (const auto &printings : _sets) {
@@ -151,11 +113,13 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
                                   const UiAttributes _uiAttributes,
                                   QString _simpleName,
                                   QSet<QString> _altNames,
-                                  bool _appendToSets)
+                                  bool _appendToSets,
+                                  QMap<QString, QString> _localizedNames,
+                                  QMap<QString, QString> _localizedTexts)
 {
     CardInfoPtr ptr(new CardInfo(_name, _text, _isToken, std::move(_propertiesBlob), _relatedCards,
                                  _reverseRelatedCards, _sets, _uiAttributes, std::move(_simpleName),
-                                 std::move(_altNames)));
+                                 std::move(_altNames), std::move(_localizedNames), std::move(_localizedTexts)));
     ptr->setSmartPointer(ptr);
 
     if (_appendToSets) {
@@ -211,15 +175,13 @@ void CardInfo::addToSet(const CardSetPtr &_set, const PrintingInfo &_info)
 
 void CardInfo::combineLegalities(const QHash<QString, QString> &props)
 {
-    ensurePropertiesLoaded();
     QHashIterator it(props);
     while (it.hasNext()) {
         it.next();
         if (it.key().startsWith("format-")) {
-            propertiesCache.insert(it.key(), it.value());
+            properties.insert(it.key(), it.value());
         }
     }
-    propertiesBlob = serializeProperties(propertiesCache);
     emit cardInfoChanged(smartThis);
 }
 

@@ -7,11 +7,13 @@
 #ifndef EDHREC_TOP_TAGS_API_RESPONSE_DISPLAY_WIDGET_H
 #define EDHREC_TOP_TAGS_API_RESPONSE_DISPLAY_WIDGET_H
 
-#include "../../api_response/top_tags/edhrec_top_tags_api_response.h"
-
-#include <QScrollArea>
-#include <QVBoxLayout>
 #include <QWidget>
+#include <qtmetamacros.h>
+
+class EdhrecTopTagsApiResponse;
+class QHBoxLayout;
+class QScrollArea;
+class QVBoxLayout;
 
 class EdhrecTopTagsApiResponseDisplayWidget : public QWidget
 {

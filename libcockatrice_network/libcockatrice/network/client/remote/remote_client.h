@@ -8,11 +8,23 @@
 #define REMOTECLIENT_H
 
 #include "../abstract/abstract_client.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/session_commands.pb.h"
 
+#include <QAbstractSocket>
+#include <QByteArray>
 #include <QLoggingCategory>
+#include <QString>
+#include <QTcpSocket>
 #include <QWebSocket>
-#include <libcockatrice/interfaces/interface_network_settings_provider.h>
-#include <libcockatrice/protocol/pb/commands.pb.h>
+#include <QtGlobal>
+#include <qtmetamacros.h>
+
+class Event_ConnectionClosed;
+class Event_ServerIdentification;
+class INetworkSettingsProvider;
+class QObject;
+template <typename T> class QList;
 
 inline Q_LOGGING_CATEGORY(RemoteClientLog, "remote_client");
 
@@ -130,6 +142,22 @@ public:
         } else {
             return socket->peerName();
         }
+    }
+    quint16 peerPort() const
+    {
+        if (usingWebSocket) {
+            return websocket->peerPort();
+        } else {
+            return socket->peerPort();
+        }
+    }
+    QString serverName() const override
+    {
+        return lastHostname;
+    }
+    quint16 serverPort() const override
+    {
+        return static_cast<quint16>(lastPort);
     }
     void
     connectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);

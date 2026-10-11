@@ -2,10 +2,18 @@
 
 #include "../../../general/display/charts/bars/bar_chart_widget.h"
 #include "libcockatrice/utility/color.h"
-#include "libcockatrice/utility/qt_utils.h"
 #include "mana_curve_config.h"
 
 #include <QHBoxLayout>
+#include <QLabel>
+#include <QList>
+#include <QMap>
+#include <QSharedPointer>
+#include <QSize>
+#include <QSizePolicy>
+#include <QVector>
+#include <algorithm>
+#include <compare>
 
 ManaCurveTotalWidget::ManaCurveTotalWidget(QWidget *parent) : QWidget(parent)
 {

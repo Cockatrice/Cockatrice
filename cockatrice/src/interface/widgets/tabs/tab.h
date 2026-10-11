@@ -7,12 +7,16 @@
 #ifndef TAB_H
 #define TAB_H
 
+#include <QList>
 #include <QMainWindow>
+#include <QString>
 #include <libcockatrice/utility/card_ref.h>
+#include <qtmetamacros.h>
 
 class QMenu;
 class TabSupervisor;
 class CardInfoDisplayWidget;
+class QPoint;
 
 class Tab : public QMainWindow
 {
@@ -20,6 +24,7 @@ class Tab : public QMainWindow
 signals:
     void userEvent(bool globalEvent = true);
     void tabTextChanged(Tab *tab, const QString &newTabText);
+    void cockatriceLinkActivated(const QString &url);
 
 protected:
     TabSupervisor *tabSupervisor;

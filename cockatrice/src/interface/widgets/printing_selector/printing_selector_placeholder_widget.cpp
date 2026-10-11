@@ -1,5 +1,10 @@
 #include "printing_selector_placeholder_widget.h"
 
+#include <QLabel>
+#include <QSizePolicy>
+#include <QVBoxLayout>
+#include <qnamespace.h>
+
 PrintingSelectorPlaceholderWidget::PrintingSelectorPlaceholderWidget(QWidget *parent) : QWidget(parent)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

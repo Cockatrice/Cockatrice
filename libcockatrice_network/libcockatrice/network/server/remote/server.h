@@ -3,30 +3,32 @@
 
 #include "server_player_reference.h"
 
+#include <QList>
+#include <QMap>
 #include <QMultiMap>
 #include <QMutex>
+#include <QMutexLocker>
 #include <QObject>
 #include <QReadWriteLock>
-#include <libcockatrice/protocol/pb/commands.pb.h>
-#include <libcockatrice/protocol/pb/serverinfo_ban.pb.h>
-#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <QString>
+#include <QtGlobal>
+#include <qtmetamacros.h>
 
 class Server_DatabaseInterface;
-class Server_Game;
 class Server_Room;
 class Server_ProtocolHandler;
 class Server_AbstractUserInterface;
-class GameReplay;
 class IslMessage;
 class SessionEvent;
 class RoomEvent;
-class DeckList;
 class ServerInfo_Game;
 class ServerInfo_Room;
 class Response;
 class GameEventContainer;
 class CommandContainer;
 class Command_JoinGame;
+class QThread;
+class ServerInfo_User;
 
 enum AuthenticationResult
 {
@@ -38,7 +40,8 @@ enum AuthenticationResult
     UsernameInvalid,
     RegistrationRequired,
     UserIsInactive,
-    ClientIdRequired
+    ClientIdRequired,
+    PasswordChangeRequired
 };
 
 class Server : public QObject
@@ -90,6 +93,10 @@ public:
     virtual QString getLoginMessage() const
     {
         return QString();
+    }
+    virtual SessionEvent *getLoginSessionEvent() const
+    {
+        return nullptr;
     }
     virtual QString getRequiredFeatures() const
     {
@@ -174,6 +181,11 @@ public:
     virtual bool permitCreateGameAsJudge() const
     {
         return false;
+    }
+    /// Called once per actual game start with how long bringing every player's
+    /// zones online took, so servers can spot deck sizes that wedge threads.
+    virtual void observeGameStartDurationMs(qint64 /* elapsedMs */)
+    {
     }
 
     Server_DatabaseInterface *getDatabaseInterface() const;

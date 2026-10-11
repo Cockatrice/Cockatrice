@@ -1,21 +1,17 @@
 #ifndef ORACLEWIZARD_H
 #define ORACLEWIZARD_H
 
+#include <QByteArray>
+#include <QString>
 #include <QWizard>
+#include <qtmetamacros.h>
 #include <utility>
 
-class QCheckBox;
-class QGroupBox;
-class QComboBox;
-class QLabel;
-class QLineEdit;
-class QRadioButton;
-class QProgressBar;
 class QNetworkAccessManager;
-class QTextEdit;
-class QVBoxLayout;
 class OracleImporter;
+class QLocalServer;
 class QSettings;
+class QWidget;
 
 class OracleWizard : public QWizard
 {
@@ -27,6 +23,15 @@ public:
     bool wasCancelled()
     {
         return cancelled;
+    }
+    /** @brief Records that the card database was written to disk, so a later cancel still counts as an update. */
+    void markDatabaseSaved()
+    {
+        databaseSaved = true;
+    }
+    bool hasSavedDatabase()
+    {
+        return databaseSaved;
     }
     void enableButtons();
     void disableButtons();
@@ -57,12 +62,7 @@ public:
     }
     bool saveTokensToFile(const QString &fileName);
 
-    void runInBackground()
-    {
-        backgroundMode = true;
-        hide();
-        currentPage()->initializePage();
-    }
+    void runInBackground();
 
 public:
     OracleImporter *importer;
@@ -74,14 +74,23 @@ public:
 
 private slots:
     void updateLanguage();
+    void handleRaiseRequest();
 
 private:
     QByteArray tokensData;
     QString cardSourceUrl;
     QString cardSourceVersion;
     bool cancelled = false;
+    bool databaseSaved = false;
 
     void migrateOracleSettings();
+    /**
+     * @brief Starts the local socket the hosting Cockatrice client uses to bring this wizard forward.
+     */
+    void startRaiseServer();
+    /** @brief Shows, raises and activates the wizard window. */
+    void raiseWizard();
+    QLocalServer *raiseServer = nullptr; ///< listens for raise requests from the hosting client
 
 protected:
     void changeEvent(QEvent *event) override;

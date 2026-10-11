@@ -1,15 +1,36 @@
 #include "visual_deck_editor_sample_hand_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../deck_loader/deck_loader.h"
 #include "../cards/card_info_picture_widget.h"
+#include "../cards/card_size_widget.h"
 #include "../deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.h"
-#include "../deck_analytics/deck_list_statistics_analyzer.h"
+#include "../general/layout_containers/flow_widget.h"
+#include "deck_list_model.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/deck_list/tree/deck_list_card_node.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
 
+#include <QDebug>
+#include <QHBoxLayout>
+#include <QPushButton>
+#include <QSharedPointer>
+#include <QSlider>
+#include <QSpinBox>
 #include <QSplitter>
+#include <QString>
+#include <QVBoxLayout>
+#include <QtGlobal>
+#include <algorithm>
+#include <compare>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <libcockatrice/settings/cards_display_settings.h>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <qobjectdefs.h>
 #include <random>
+
+class DeckListStatisticsAnalyzer;
 
 VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *parent,
                                                                    DeckListModel *_deckListModel,
@@ -34,10 +55,10 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
     resetAndHandSizeLayout->addWidget(resetButton);
 
     handSizeSpinBox = new QSpinBox(this);
-    handSizeSpinBox->setValue(SettingsCache::instance().visualDeckStorage().getVisualDeckEditorSampleHandSize());
+    handSizeSpinBox->setValue(SettingsCache::instance().cardsDisplay().getSampleHandSize());
     handSizeSpinBox->setMinimum(1);
-    connect(handSizeSpinBox, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance().visualDeckStorage(),
-            &VisualDeckStorageSettings::setVisualDeckEditorSampleHandSize);
+    connect(handSizeSpinBox, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::setSampleHandSize);
     connect(handSizeSpinBox, qOverload<int>(&QSpinBox::valueChanged), this,
             &VisualDeckEditorSampleHandWidget::updateDisplay);
     resetAndHandSizeLayout->addWidget(handSizeSpinBox);
@@ -48,6 +69,7 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
     upperLayout->addWidget(flowWidget);
 
     cardSizeWidget = new CardSizeWidget(this, flowWidget);
+    cardSizeWidget->enableCtrlScrollResize(flowWidget);
     upperLayout->addWidget(cardSizeWidget);
 
     auto upperLayoutWidget = new QWidget(this);

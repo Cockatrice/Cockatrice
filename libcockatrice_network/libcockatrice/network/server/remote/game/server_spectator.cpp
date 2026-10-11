@@ -1,5 +1,11 @@
 #include "server_spectator.h"
 
+#include "game/server_abstract_participant.h"
+
+class ServerInfo_User;
+class Server_AbstractUserInterface;
+class Server_Game;
+
 Server_Spectator::Server_Spectator(Server_Game *_game,
                                    int _playerId,
                                    const ServerInfo_User &_userInfo,

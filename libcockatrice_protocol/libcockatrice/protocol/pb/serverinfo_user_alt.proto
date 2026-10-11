@@ -1,0 +1,16 @@
+syntax = "proto2";
+
+/**
+ * An account that shares an IP address, client id or eMail address with
+ * the account being investigated. Used by the moderation "Get User Alts" tool.
+ */
+message ServerInfo_UserAlt {
+    optional string user_name = 1;         // account name
+    optional string email = 2;             // registration eMail
+    optional string clientid = 3;          // client id
+    optional uint64 registration_time = 4; // account registration, epoch seconds
+    optional uint64 last_login = 5;        // last known login, epoch seconds; 0 = unknown
+    optional uint32 warn_count = 6;        // number of warnings on record
+    optional uint32 ban_count = 7;         // number of bans on record
+    optional bool is_active = 8;           // account is not deactivated/banned
+}

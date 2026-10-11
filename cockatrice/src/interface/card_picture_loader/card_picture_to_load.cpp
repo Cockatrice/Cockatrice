@@ -1,12 +1,22 @@
 #include "card_picture_to_load.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
 
-#include <QCoreApplication>
 #include <QDate>
+#include <QDebug>
+#include <QMap>
+#include <QMessageLogger>
 #include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QRegularExpressionMatchIterator>
+#include <QSharedPointer>
 #include <QUrl>
+#include <QtGlobal>
 #include <algorithm>
+#include <functional>
 #include <libcockatrice/card/set/card_set_comparator.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 #include <libcockatrice/settings/cards_display_settings.h>
@@ -17,8 +27,9 @@ CardPictureToLoad::CardPictureToLoad(const ExactCard &_card)
 {
     if (card) {
         sortedSets = extractSetsSorted(card);
-        // The first time called, nextSet will also populate the Urls for the first set.
-        nextSet();
+        currentSetIndex = 0;
+        currentSet = sortedSets.first();
+        populateSetUrls();
     }
 }
 
@@ -101,15 +112,19 @@ void CardPictureToLoad::populateSetUrls()
         }
     }
 
-    /* Call nextUrl to make sure currentUrl is up-to-date
-       but we don't need the result here. */
-    (void)nextUrl();
+    currentUrlIndex = 0;
+    if (!currentSetUrls.isEmpty()) {
+        currentUrl = currentSetUrls.first();
+    } else {
+        currentUrl = QString();
+    }
 }
 
 bool CardPictureToLoad::nextSet()
 {
-    if (!sortedSets.isEmpty()) {
-        currentSet = sortedSets.takeFirst();
+    currentSetIndex++;
+    if (currentSetIndex < sortedSets.size()) {
+        currentSet = sortedSets.at(currentSetIndex);
         populateSetUrls();
         return true;
     }
@@ -119,8 +134,9 @@ bool CardPictureToLoad::nextSet()
 
 bool CardPictureToLoad::nextUrl()
 {
-    if (!currentSetUrls.isEmpty()) {
-        currentUrl = currentSetUrls.takeFirst();
+    currentUrlIndex++;
+    if (currentUrlIndex < currentSetUrls.size()) {
+        currentUrl = currentSetUrls.at(currentUrlIndex);
         return true;
     }
     currentUrl = QString();
@@ -133,6 +149,28 @@ QString CardPictureToLoad::getSetName() const
         return currentSet->getCorrectedShortName();
     } else {
         return QString();
+    }
+}
+
+QString CardPictureToLoad::peekNextUrl() const
+{
+    int nextIndex = currentUrlIndex + 1;
+    if (nextIndex < currentSetUrls.size()) {
+        return currentSetUrls.at(nextIndex);
+    }
+    return QString();
+}
+
+void CardPictureToLoad::resetIndices()
+{
+    currentSetIndex = 0;
+    if (!sortedSets.isEmpty()) {
+        currentSet = sortedSets.first();
+        populateSetUrls();
+    } else {
+        currentSet = {};
+        currentSetUrls.clear();
+        currentUrl = QString();
     }
 }
 
@@ -254,8 +292,15 @@ QString CardPictureToLoad::transformUrl(const QString &urlTemplate) const
     }
 
     // language setting
-    transformMap["!sflang!"] = QString(QCoreApplication::translate(
-        "PictureLoader", "en", "code for scryfall's language property, not available for all languages"));
+    const QString cardLang = SettingsCache::instance().cardsDisplay().getCardLang();
+    transformMap["!sflang!"] = cardLang;
+
+    // The localized printing's own id is unknown, so Scryfall must resolve it by
+    // its translated name (see populateSetUrls); expose that name for the
+    // `/cards/named` template.
+    if (cardLang != "en") {
+        transformMap["!localizedName!"] = card.getInfo().getLocalizedName(cardLang);
+    }
 
     QString transformedUrl = urlTemplate;
     for (const QString &prop : transformMap.keys()) {

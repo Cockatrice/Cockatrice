@@ -8,22 +8,34 @@
 #ifndef CHATVIEW_H
 #define CHATVIEW_H
 
-#include "../../interface/widgets/tabs/tab_supervisor.h"
-#include "../user/user_list_widget.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 
-#include <QAction>
 #include <QColor>
+#include <QDateTime>
+#include <QList>
+#include <QMap>
+#include <QString>
+#include <QStringList>
+#include <QTextBlock>
 #include <QTextBrowser>
+#include <QTextCharFormat>
 #include <QTextCursor>
 #include <QTextFragment>
+#include <QVector>
 #include <libcockatrice/network/server/remote/room_message_type.h>
 #include <libcockatrice/network/server/remote/user_level.h>
+#include <qtmetamacros.h>
 
 class AbstractGame;
-class QTextTable;
-class QMouseEvent;
 class UserContextMenu;
 class UserListProxy;
+class QAction;
+class QPoint;
+class QUrl;
+class QWidget;
+class TabSupervisor;
+struct CardRef;
+template <typename Enum> class QFlags;
 
 class UserMessagePosition
 {
@@ -31,6 +43,13 @@ public:
     UserMessagePosition(QTextCursor &cursor);
     int relativePosition;
     QTextBlock block;
+};
+
+struct ChatLogEntry
+{
+    QString userName;
+    QString message;
+    QDateTime timestamp;
 };
 
 class ChatView : public QTextBrowser
@@ -60,15 +79,20 @@ private:
     QStringList highlightedWords;
     bool evenNumber;
     bool showTimestamps;
+    bool stickToBottom = false;
     HoveredItemType hoveredItemType;
     QString hoveredContent;
     QAction *messageClicked;
     QMap<QString, QVector<UserMessagePosition>> userMessagePositions;
+    QList<ChatLogEntry> chatHistory;
+    static constexpr int MAX_CHAT_HISTORY = 200;
 
     [[nodiscard]] QTextFragment getFragmentUnderMouse(const QPoint &pos) const;
     QTextCursor prepareBlock(bool same = false);
+    void scrollToBottom();
     void appendCardTag(QTextCursor &cursor, const QString &cardName);
     void appendUrlTag(QTextCursor &cursor, QString url);
+    void appendGameLinkTag(QTextCursor &cursor, const QString &url);
     static QColor getCustomMentionColor();
     static QColor getCustomHighlightColor();
     void showSystemPopup(const QString &userName);
@@ -81,33 +105,33 @@ private:
     QColor otherUserColor = QColor(0, 65, 255); // dark blue
     QColor serverMessageColor = QColor(0x85, 0x15, 0x15);
     QColor linkColor;
+    QColor unresolvedCardTagColor;
 
 private slots:
     void openLink(const QUrl &link);
     void actMessageClicked();
     void adjustColorsToPalette();
     void refreshBlockColors();
+    void onScrollBarRangeChanged();
+    void onScrollBarValueChanged(int value);
 
 public:
     ChatView(TabSupervisor *_tabSupervisor, AbstractGame *_game, bool _showTimestamps, QWidget *parent = nullptr);
     void retranslateUi();
     void appendHtml(const QString &html);
-    void virtual appendHtmlServerMessage(const QString &html,
-                                         bool optionalIsBold = false,
-                                         QString optionalFontColor = QString());
+    virtual void
+    appendHtmlServerMessage(const QString &html, bool optionalIsBold = false, QString optionalFontColor = QString());
     void appendMessage(QString message,
                        RoomMessageTypeFlags messageType = {},
                        const ServerInfo_User &userInfo = {},
                        bool playerBold = false);
     void clearChat();
     void redactMessages(const QString &userName, int amount);
+    QString getRecentChatLog(int maxMessages = 50) const;
 
 protected:
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    [[nodiscard]] virtual QString getCurrentTime() const;
     void enterEvent(QEnterEvent *event) override;
-#else
-    void enterEvent(QEvent *event) override;
-#endif
     void leaveEvent(QEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
@@ -120,6 +144,7 @@ signals:
     void addMentionTag(QString mentionTag);
     void messageClickedSignal();
     void showMentionPopup(const QString &userName);
+    void cockatriceLinkActivated(const QString &url);
 };
 
 #endif

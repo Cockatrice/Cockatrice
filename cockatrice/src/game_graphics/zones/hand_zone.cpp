@@ -2,14 +2,27 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../../game/player/player_actions.h"
+#include "../../game/player/player_info.h"
 #include "../../game/player/player_logic.h"
+#include "../../game/zones/card_zone_logic.h"
+#include "../../game/zones/hand_zone_logic.h"
 #include "../../interface/theme_manager.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
+#include "../card_dimensions.h"
 
+#include <QBrush>
+#include <QList>
 #include <QPainter>
+#include <QPoint>
+#include <QPointF>
+#include <QRectF>
+#include <QString>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/settings/interface_settings.h>
+#include <string>
+
+class QGraphicsItem;
 
 HandZone::HandZone(HandZoneLogic *_logic, int _zoneHeight, QGraphicsItem *parent)
     : SelectZone(_logic, parent), zoneHeight(_zoneHeight)
@@ -34,14 +47,15 @@ void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
 
     QPoint point = dropPoint + scenePos().toPoint();
     int x = -1;
-    if (SettingsCache::instance().interface().getHorizontalHand()) {
+    if (SettingsCache::instance().userInterface().getHorizontalHand()) {
         for (x = 0; x < getLogic()->getCards().size(); x++) {
             if (point.x() < static_cast<CardItem *>(getLogic()->getCards().at(x))->scenePos().x()) {
                 break;
             }
         }
     } else {
-        x = calcDropIndexFromY(dropPoint.y());
+        bool sameZone = startZone == getLogic();
+        x = calcDropIndexFromY(dropPoint.y(), !sameZone);
     }
 
     Command_MoveCard cmd;
@@ -61,7 +75,7 @@ void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
 
 QRectF HandZone::boundingRect() const
 {
-    if (SettingsCache::instance().interface().getHorizontalHand()) {
+    if (SettingsCache::instance().userInterface().getHorizontalHand()) {
         return QRectF(0, 0, width, CardDimensions::HEIGHT_F + 10);
     } else {
         return QRectF(0, 0, CardDimensions::WIDTH_F * 1.5, zoneHeight);
@@ -78,8 +92,8 @@ void HandZone::reorganizeCards()
 {
     if (!getLogic()->getCards().isEmpty()) {
         const int cardCount = getLogic()->getCards().size();
-        if (SettingsCache::instance().interface().getHorizontalHand()) {
-            bool leftJustified = SettingsCache::instance().interface().getLeftJustified();
+        if (SettingsCache::instance().userInterface().getHorizontalHand()) {
+            bool leftJustified = SettingsCache::instance().userInterface().getLeftJustified();
             qreal cardWidth = getLogic()->getCards().at(0)->boundingRect().width();
             const int xPadding = leftJustified ? cardWidth * 1.4 : 5;
             qreal totalWidth =
@@ -127,7 +141,7 @@ void HandZone::sortHand(const QList<CardList::SortOption> &options)
 
 void HandZone::setWidth(qreal _width)
 {
-    if (SettingsCache::instance().interface().getHorizontalHand()) {
+    if (SettingsCache::instance().userInterface().getHorizontalHand()) {
         prepareGeometryChange();
         width = _width;
         reorganizeCards();

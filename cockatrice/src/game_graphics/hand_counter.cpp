@@ -1,10 +1,22 @@
 #include "hand_counter.h"
 
-#include "zones/card_zone.h"
+#include "../game/board/card_list.h"
+#include "../game/zones/card_zone_logic.h"
+#include "../interface/pixel_map_generator.h"
 
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
+#include <QPixmap>
 #include <QPixmapCache>
+#include <QRectF>
+#include <QSize>
+#include <QSizeF>
+#include <QString>
+#include <QStringLiteral>
+#include <QTransform>
+#include <qnamespace.h>
+
+class QGraphicsItem;
 
 HandCounter::HandCounter(QGraphicsItem *parent) : AbstractGraphicsItem(parent), number(0)
 {
@@ -32,7 +44,8 @@ void HandCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
     QSize translatedSize = painter->combinedTransform().mapRect(boundingRect()).size().toSize();
     QPixmap cachedPixmap;
     if (!QPixmapCache::find("handCounter" + QString::number(translatedSize.width()), &cachedPixmap)) {
-        cachedPixmap = QPixmap("theme:hand").scaled(translatedSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        cachedPixmap =
+            themePixmap(QStringLiteral("hand")).scaled(translatedSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         QPixmapCache::insert("handCounter" + QString::number(translatedSize.width()), cachedPixmap);
     }
     resetPainterTransform(painter);

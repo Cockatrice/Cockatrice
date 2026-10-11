@@ -1,14 +1,27 @@
 #include "grave_menu.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../../../game/player/player_info.h"
+#include "../../../game/player/player_manager.h"
+#include "../../../game/zones/pile_zone_logic.h"
+#include "../../../interface/widgets/menus/tearoff_menu.h"
 #include "../../game/abstract_game.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
 #include "../player_graphics_item.h"
 
 #include <QAction>
+#include <QKeySequence>
+#include <QList>
+#include <QMap>
 #include <QMenu>
+#include <QObject>
+#include <QString>
+#include <QVariant>
 #include <libcockatrice/utility/zone_names.h>
+
+class QWidget;
 
 GraveyardMenu::GraveyardMenu(PlayerGraphicsItem *_player, QWidget *parent) : TearOffMenu(parent), player(_player)
 {

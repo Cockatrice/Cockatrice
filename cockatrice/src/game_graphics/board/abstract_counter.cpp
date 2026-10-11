@@ -2,21 +2,33 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../../client/settings/shortcuts_settings.h"
+#include "../../game/board/counter_state.h"
 #include "../../game/player/player_actions.h"
+#include "../../game/player/player_info.h"
 #include "../../game/player/player_logic.h"
 #include "../../game_graphics/board/translate_counter_name.h"
-#include "../../interface/widgets/tabs/tab_game.h"
+#include "../../interface/widgets/menus/tearoff_menu.h"
 
 #include <QAction>
 #include <QApplication>
+#include <QEvent>
+#include <QFlags>
+#include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
 #include <QKeyEvent>
-#include <QMenu>
+#include <QKeySequence>
+#include <QList>
+#include <QSharedPointer>
 #include <QString>
+#include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/protocol/pb/command_inc_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_set_counter.pb.h>
 #include <libcockatrice/utility/expression.h>
+#include <qnamespace.h>
+
+class QWidget;
 
 AbstractCounter::AbstractCounter(CounterState *state,
                                  PlayerLogic *_player,
@@ -29,8 +41,9 @@ AbstractCounter::AbstractCounter(CounterState *state,
 {
     setAcceptHoverEvents(true);
 
-    connect(state, &CounterState::valueChanged, this, [this](int, int newValue) {
+    connect(state, &CounterState::valueChanged, this, [this](int oldValue, int newValue, bool skipDamageAnimation) {
         value = newValue;
+        onValueChanged(oldValue, newValue, skipDamageAnimation);
         update();
     });
 
@@ -227,4 +240,10 @@ void AbstractCounterDialog::changeValue(int diff)
     }
     curValue += diff;
     setTextValue(QString::number(curValue));
+}
+
+void AbstractCounter::onValueChanged(int /*oldValue*/, int /*newValue*/, bool /*skipDamageAnimation*/)
+{
+    // Default: no feedback. Subclasses such as PlayerCounter override this to
+    // flash the counter on meaningful changes (life gain/loss).
 }

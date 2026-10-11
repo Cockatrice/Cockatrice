@@ -8,10 +8,17 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QListWidget>
+#include <QListWidgetItem>
 #include <QMessageBox>
+#include <QObject>
 #include <QPushButton>
+#include <QSharedPointer>
 #include <QTimer>
+#include <QVBoxLayout>
+#include <QWidget>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <qnamespace.h>
 
 DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags,
                                            const QStringList &_activeTags,

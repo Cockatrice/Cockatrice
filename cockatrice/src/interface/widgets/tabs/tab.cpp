@@ -1,12 +1,17 @@
 #include "tab.h"
 
 #include "../interface/widgets/cards/card_info_display_widget.h"
+#include "libcockatrice/utility/card_ref.h"
 #include "tab_supervisor.h"
 
 #include <QApplication>
-#include <QCloseEvent>
-#include <QDebug>
+#include <QFlags>
+#include <QPoint>
+#include <QRect>
 #include <QScreen>
+#include <QSharedPointer>
+#include <QtGlobal>
+#include <qnamespace.h>
 
 Tab::Tab(TabSupervisor *_tabSupervisor)
     : QMainWindow(_tabSupervisor), tabSupervisor(_tabSupervisor), contentsChanged(false), infoPopup(0)

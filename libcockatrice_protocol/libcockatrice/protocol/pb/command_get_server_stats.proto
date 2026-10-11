@@ -1,0 +1,8 @@
+syntax = "proto2";
+import "developer_commands.proto";
+
+message Command_GetServerStats {
+    extend DeveloperCommand {
+        optional Command_GetServerStats ext = 1000;
+    }
+}

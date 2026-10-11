@@ -1,6 +1,12 @@
 #ifndef COCKATRICE_COLOR_PIE_H
 #define COCKATRICE_COLOR_PIE_H
 
+#include <QColor>
+#include <QList>
+#include <QPair>
+#include <qtmetamacros.h>
+
+class QPoint;
 #ifndef COLOR_PIE_H
 #define COLOR_PIE_H
 
@@ -22,11 +28,7 @@ public:
 protected:
     void paintEvent(QPaintEvent *) override;
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     void enterEvent(QEnterEvent *event) override;
-#else
-    void enterEvent(QEvent *event) override;
-#endif
     void leaveEvent(QEvent *) override;
     void mouseMoveEvent(QMouseEvent *event) override;
 

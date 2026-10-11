@@ -1,5 +1,8 @@
 #include "pending_command.h"
 
+class CommandContainer;
+class Response;
+
 PendingCommand::PendingCommand(const CommandContainer &_commandContainer, QVariant _extraData)
     : commandContainer(_commandContainer), extraData(_extraData), ticks(0)
 {
@@ -28,4 +31,14 @@ void PendingCommand::processResponse(const Response &response)
 int PendingCommand::tick()
 {
     return ++ticks;
+}
+
+void PendingCommand::startTiming()
+{
+    startTime.start();
+}
+
+qint64 PendingCommand::elapsedMs() const
+{
+    return startTime.isValid() ? startTime.nsecsElapsed() / 1000000 : -1;
 }

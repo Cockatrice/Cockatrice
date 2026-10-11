@@ -1,6 +1,9 @@
 #include "server_counter.h"
 
+#include "libcockatrice/protocol/pb/color.pb.h"
+
 #include <libcockatrice/protocol/pb/serverinfo_counter.pb.h>
+#include <string>
 
 Server_Counter::Server_Counter(int _id, const QString &_name, const color &_counterColor, int _radius, int _count)
     : id(_id), name(_name), counterColor(_counterColor), radius(_radius), count(_count)

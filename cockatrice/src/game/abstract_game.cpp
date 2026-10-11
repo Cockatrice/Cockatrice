@@ -1,7 +1,18 @@
 #include "abstract_game.h"
 
-#include "../interface/widgets/tabs/tab_game.h"
+#include "game_event_handler.h"
+#include "game_meta_info.h"
+#include "game_state.h"
+#include "libcockatrice/protocol/pb/game_replay.pb.h"
+#include "player/player_info.h"
 #include "player/player_logic.h"
+#include "player/player_manager.h"
+#include "zones/card_zone_logic.h"
+
+#include <QList>
+#include <QMap>
+
+class AbstractClient;
 
 AbstractGame::AbstractGame(QObject *_parent) : QObject(_parent)
 {

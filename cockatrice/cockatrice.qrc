@@ -2,6 +2,7 @@
     <qresource prefix="/">
         <file>resources/cardback.svg</file>
         <file>resources/cockatrice.svg</file>
+        <file>resources/cockatrice-logo-white.svg</file>
         <file>resources/hand.svg</file>
         <file>resources/hr.jpg</file>
 
@@ -61,7 +62,9 @@
         <file>resources/icons/mana/U.svg</file>
         <file>resources/icons/mana/W.svg</file>
 
-        <file>resources/backgrounds/home.png</file>
+        <file>resources/backgrounds/home.jpg</file>
+        <file>resources/backgrounds/home-dark.jpg</file>
+        <file>resources/backgrounds/home-light.jpg</file>
         <file>resources/backgrounds/card_triplet.svg</file>
         <file>resources/backgrounds/placeholder_printing_selector.svg</file>
 
@@ -362,6 +365,8 @@
 
         <file>resources/usericons/pawn_single.svg</file>
         <file>resources/usericons/pawn_double.svg</file>
+        <file>resources/usericons/pawn_dev_single.svg</file>
+        <file>resources/usericons/pawn_dev_double.svg</file>
         <file>resources/usericons/pawn_donator_single.svg</file>
         <file>resources/usericons/pawn_donator_double.svg</file>
         <file>resources/usericons/pawn_judge_single.svg</file>

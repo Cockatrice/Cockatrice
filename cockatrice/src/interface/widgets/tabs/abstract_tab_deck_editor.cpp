@@ -11,43 +11,61 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../../deck_loader/deck_file_format.h"
+#include "../../deck_loader/deck_loader.h"
+#include "../../deck_loader/loaded_deck.h"
+#include "../cards/additional_info/deck_color_identity.h"
+#include "../cards/card_info_frame_widget.h"
 #include "../client/network/interfaces/deck_stats_interface.h"
 #include "../client/network/interfaces/tapped_out_interface.h"
+#include "../deck_editor/deck_editor_card_database_dock_widget.h"
+#include "../deck_editor/deck_editor_card_info_dock_widget.h"
+#include "../deck_editor/deck_editor_deck_dock_widget.h"
+#include "../deck_editor/deck_editor_filter_dock_widget.h"
+#include "../deck_editor/deck_editor_printing_selector_dock_widget.h"
 #include "../deck_editor/deck_state_manager.h"
 #include "../interface/card_picture_loader/card_picture_loader.h"
-#include "../interface/pixel_map_generator.h"
 #include "../interface/widgets/dialogs/dlg_load_deck.h"
 #include "../interface/widgets/dialogs/dlg_load_deck_from_clipboard.h"
 #include "../interface/widgets/dialogs/dlg_load_deck_from_website.h"
+#include "../interface/widgets/dialogs/dlg_share_deck.h"
+#include "../menus/deck_editor_menu.h"
+#include "../printing_selector/printing_selector.h"
 #include "../utility/visibility_change_listener.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/deck_list/deck_list.h"
+#include "libcockatrice/utility/card_ref.h"
 #include "tab_supervisor.h"
 
 #include <QAction>
-#include <QApplication>
 #include <QCloseEvent>
 #include <QDesktopServices>
+#include <QDockWidget>
 #include <QFileDialog>
-#include <QHeaderView>
-#include <QLineEdit>
+#include <QFlags>
+#include <QList>
+#include <QMainWindow>
+#include <QMenu>
 #include <QMessageBox>
 #include <QPrintPreviewDialog>
 #include <QPrinter>
-#include <QProcessEnvironment>
 #include <QPushButton>
-#include <QRegularExpression>
-#include <QSplitter>
-#include <QTreeView>
+#include <QSharedPointer>
 #include <QUrl>
+#include <google/protobuf/stubs/port.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card_database_model.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/recents_settings.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <optional>
+#include <string>
 
 /**
  * @brief Constructs the AbstractTabDeckEditor.
@@ -203,7 +221,7 @@ void AbstractTabDeckEditor::cleanDeckAndResetModified()
  */
 AbstractTabDeckEditor::DeckOpenLocation AbstractTabDeckEditor::confirmOpen(const bool openInSameTabIfBlank)
 {
-    if (SettingsCache::instance().interface().getOpenDeckInNewTab()) {
+    if (SettingsCache::instance().deckEditor().getOpenDeckInNewTab()) {
         if (openInSameTabIfBlank && deckStateManager->isBlankNewDeck()) {
             return SAME_TAB;
         } else {
@@ -323,6 +341,7 @@ bool AbstractTabDeckEditor::actSaveDeck()
         Command_DeckUpload cmd;
         cmd.set_deck_id(static_cast<google::protobuf::uint32>(loadedDeck.lastLoadInfo.remoteDeckId));
         cmd.set_deck_list(deckString.toStdString());
+        cmd.set_color_identity(getDeckColorIdentity(loadedDeck.deckList, CardDatabaseManager::query()).toStdString());
 
         PendingCommand *pend = AbstractClient::prepareSessionCommand(cmd);
         connect(pend, &PendingCommand::finished, this, &AbstractTabDeckEditor::saveDeckRemoteFinished);
@@ -380,6 +399,27 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
     deckStateManager->setModified(false);
     SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
     return true;
+}
+
+/**
+ * @brief Opens the deck share dialog with the current deck preselected.
+ */
+void AbstractTabDeckEditor::actShareDeck()
+{
+    AbstractClient *client = tabSupervisor->getServerClient();
+    if (client->getStatus() != StatusLoggedIn) {
+        QMessageBox::information(this, tr("Share deck"), tr("You must be connected to the server to share a deck."));
+        return;
+    }
+
+    const QSharedPointer<DeckList> deck = deckStateManager->getDeckListShared();
+    if (deck->isBlankDeck()) {
+        QMessageBox::information(this, tr("Share deck"), tr("The deck is empty. Add cards before sharing it."));
+        return;
+    }
+
+    DlgShareDeck shareDialog(client, deck, this);
+    shareDialog.exec();
 }
 
 /**

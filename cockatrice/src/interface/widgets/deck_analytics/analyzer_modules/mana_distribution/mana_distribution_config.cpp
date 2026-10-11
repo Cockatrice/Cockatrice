@@ -1,5 +1,9 @@
 #include "mana_distribution_config.h"
 
+#include <QJsonArray>
+#include <QJsonValue>
+#include <QJsonValueRef>
+
 QJsonObject ManaDistributionConfig::toJson() const
 {
     QJsonObject o;

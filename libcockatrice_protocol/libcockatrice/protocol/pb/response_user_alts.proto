@@ -1,0 +1,10 @@
+syntax = "proto2";
+import "response.proto";
+import "serverinfo_user_alt.proto";
+
+message Response_UserAlts {
+    extend Response {
+        optional Response_UserAlts ext = 1216;
+    }
+    repeated ServerInfo_UserAlt alts = 1;
+}

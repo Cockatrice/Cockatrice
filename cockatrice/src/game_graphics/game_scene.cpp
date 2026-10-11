@@ -2,26 +2,50 @@
 
 #include "../client/settings/cache_settings.h"
 #include "../game/abstract_game.h"
+#include "../game/arrow_registry.h"
+#include "../game/board/arrow_data.h"
 #include "../game/player/player_actions.h"
+#include "../game/player/player_event_handler.h"
+#include "../game/player/player_info.h"
 #include "../game/player/player_logic.h"
-#include "../game_graphics/player/player_graphics_item.h"
+#include "../game/zones/card_zone_logic.h"
+#include "../game/zones/view_zone_logic.h"
+#include "animated_item.h"
+#include "board/abstract_card_item.h"
+#include "board/arrow_item.h"
 #include "board/card_item.h"
 #include "phases_toolbar.h"
 #include "player/menu/player_menu.h"
 #include "player/player_graphics_item.h"
+#include "player/player_target.h"
+#include "zones/card_zone.h"
 #include "zones/select_zone.h"
 #include "zones/view_zone.h"
 #include "zones/view_zone_widget.h"
 
 #include <QBasicTimer>
 #include <QDebug>
+#include <QEvent>
+#include <QGraphicsItem>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
+#include <QListIterator>
+#include <QMenu>
+#include <QMessageLogger>
+#include <QMutableHashIterator>
+#include <QObject>
+#include <QPoint>
+#include <QRectF>
 #include <QSet>
+#include <QSharedPointer>
 #include <QtMath>
+#include <algorithm>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <numeric>
+#include <qnamespace.h>
+
+class ArrowTarget;
 
 /**
  * @brief Constructs the GameScene.
@@ -37,7 +61,7 @@ GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
 {
     animationTimer = new QBasicTimer;
     addItem(phasesToolbar);
-    connect(&SettingsCache::instance().interface(), &InterfaceSettings::minPlayersForMultiColumnLayoutChanged, this,
+    connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::minPlayersForMultiColumnLayoutChanged, this,
             &GameScene::rearrange);
 
     rearrange();
@@ -45,7 +69,19 @@ GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
 
 GameScene::~GameScene()
 {
+    // Sever all destroyed->removeAnimatedItem connections before the members below
+    // are destroyed: the base QGraphicsScene destructor destroys the remaining items,
+    // and their destroyed() signals must not reach slots that reference members that
+    // no longer exist. The connection handle overload is used because the string-based
+    // disconnect(nullptr, nullptr, this, nullptr) is invalid (the sender must never be
+    // nullptr) and would otherwise fail to sever these pointer-to-member connections.
+    for (auto it = animationItemConnections.constBegin(); it != animationItemConnections.constEnd(); ++it) {
+        QObject::disconnect(*it);
+    }
+    animationItemConnections.clear();
+
     delete animationTimer;
+    animationTimer = nullptr;
 
     // Delete all ArrowItems before QGraphicsScene's base destructor runs.
     // QGraphicsScene::~QGraphicsScene() destroys items in arbitrary order.
@@ -210,7 +246,12 @@ void GameScene::removePlayer(PlayerLogic *player)
 
     clearArrowsForPlayer(player->getPlayerInfo()->getId());
 
-    for (ZoneViewWidget *zone : zoneViews) {
+    // Closing a view removes it from zoneViews synchronously, so iterate over a
+    // copy: otherwise a player with several open views (e.g. library and hand)
+    // only has the first one closed here and the remaining views are left
+    // pointing at a player that is about to be deleted.
+    const QList<ZoneViewWidget *> zoneViewCopy = zoneViews;
+    for (ZoneViewWidget *zone : zoneViewCopy) {
         if (zone->getPlayer() == player) {
             zone->close();
         }
@@ -246,17 +287,27 @@ void GameScene::adjustPlayerRotation(int rotationAdjustment)
  */
 void GameScene::rearrange()
 {
-    int firstPlayerIndex = 0;
-    auto playersPlaying = collectActivePlayers(firstPlayerIndex);
-    playersPlaying = rotatePlayers(playersPlaying, firstPlayerIndex);
+    if (rearranging) {
+        needsReArrange = true;
+        return;
+    }
+    rearranging = true;
+    do {
+        needsReArrange = false;
 
-    int columns = determineColumnCount(playersPlaying.size());
-    QSizeF sceneSize = computeSceneSizeAndPlayerLayout(playersPlaying, columns);
+        int firstPlayerIndex = 0;
+        auto playersPlaying = collectActivePlayers(firstPlayerIndex);
+        playersPlaying = rotatePlayers(playersPlaying, firstPlayerIndex);
 
-    phasesToolbar->setHeight(sceneSize.height());
-    setSceneRect(0, 0, sceneSize.width(), sceneSize.height());
+        int columns = determineColumnCount(playersPlaying.size());
+        QSizeF sceneSize = computeSceneSizeAndPlayerLayout(playersPlaying, columns);
 
-    processViewSizeChange(viewSize);
+        phasesToolbar->setHeight(sceneSize.height());
+        setSceneRect(0, 0, sceneSize.width(), sceneSize.height());
+
+        processViewSizeChange(viewSize);
+    } while (needsReArrange);
+    rearranging = false;
 }
 
 // ---------- View Size ----------
@@ -336,7 +387,7 @@ QList<PlayerLogic *> GameScene::rotatePlayers(const QList<PlayerLogic *> &active
 
 int GameScene::determineColumnCount(int playerCount)
 {
-    return playerCount < SettingsCache::instance().interface().getMinPlayersForMultiColumnLayout() ? 1 : 2;
+    return playerCount < SettingsCache::instance().userInterface().getMinPlayersForMultiColumnLayout() ? 1 : 2;
 }
 
 /**
@@ -453,8 +504,14 @@ void GameScene::resizeColumnsAndPlayers(const QList<qreal> &minWidthByColumn, qr
     qreal extraWidthPerColumn = (newWidth - minWidth) / playersByColumn.size();
     qreal newx = phasesToolbar->getWidth();
 
-    for (int col = 0; col < playersByColumn.size(); ++col) {
-        for (PlayerGraphicsItem *player : playersByColumn[col]) {
+    // Snapshot the columns: resizing a player's table can synchronously trigger
+    // GameScene::rearrange (table width -> sizeChanged -> updateBoundingRect ->
+    // sizeChanged -> rearrange), and rearrange rebuilds playersByColumn. Iterating
+    // the live container across that re-entrant call would use invalidated iterators.
+    const QList<QList<PlayerGraphicsItem *>> columns = playersByColumn;
+
+    for (int col = 0; col < columns.size(); ++col) {
+        for (PlayerGraphicsItem *player : columns[col]) {
             player->processSceneSizeChange(minWidthByColumn[col] + extraWidthPerColumn);
             player->setPos(newx, player->y());
         }
@@ -496,6 +553,7 @@ void GameScene::addArrow(QSharedPointer<ArrowData> data)
 
     auto *arrow = new ArrowItem(data, startCard, targetItem);
     addItem(arrow);
+    arrow->startDrawAnimation();
     arrowRegistry.insert(data, arrow);
     connect(arrow, &ArrowItem::requestDeletion, this, &GameScene::requestArrowDeletion);
 }
@@ -636,7 +694,10 @@ CardItem *GameScene::findTopmostCardInZone(const QList<QGraphicsItem *> &items, 
  */
 void GameScene::toggleZoneView(PlayerLogic *player, const QString &zoneName, int numberCards, bool isReversed)
 {
-    for (auto &view : zoneViews) {
+    // Closing a view removes it from zoneViews synchronously, so iterate over a
+    // copy to make sure every already-open matching view is closed.
+    const QList<ZoneViewWidget *> zoneViewCopy = zoneViews;
+    for (auto *view : zoneViewCopy) {
         ZoneViewZone *temp = view->getZone();
         if (temp->getLogic()->getName() == zoneName && temp->getLogic()->getPlayer() == player &&
             qobject_cast<ZoneViewZoneLogic *>(temp->getLogic())->getNumberCards() == numberCards) {
@@ -699,6 +760,16 @@ void GameScene::clearViews()
     }
 }
 
+void GameScene::emptyActiveViews()
+{
+    for (auto zoneView : zoneViews) {
+        auto logic = qobject_cast<ZoneViewZoneLogic *>(zoneView->getZone()->getLogic());
+        if (!logic->getRevealZone()) {
+            logic->clearCards();
+        }
+    }
+}
+
 /**
  * @brief Closes the most recently added zone view.
  */
@@ -736,30 +807,53 @@ bool GameScene::event(QEvent *event)
 
 void GameScene::timerEvent(QTimerEvent * /*event*/)
 {
-    QMutableSetIterator<CardItem *> i(cardsToAnimate);
+    QMutableHashIterator<QObject *, IAnimatedItem *> i(animatedItems);
     while (i.hasNext()) {
         i.next();
         if (!i.value()->animationEvent()) {
             i.remove();
         }
     }
-    if (cardsToAnimate.isEmpty()) {
+    if (animatedItems.isEmpty()) {
         animationTimer->stop();
     }
 }
 
-void GameScene::registerAnimationItem(AbstractCardItem *card)
+void GameScene::registerAnimationItem(IAnimatedItem *item)
 {
-    cardsToAnimate.insert(static_cast<CardItem *>(card));
-    if (!animationTimer->isActive()) {
+    auto *object = dynamic_cast<QObject *>(item);
+    if (!object) {
+        return;
+    }
+    // Guard against duplicate connections using the connection map, not
+    // animatedItems: the animation timer removes entries from animatedItems when an
+    // animation completes, but the destroyed->removeAnimatedItem connection must
+    // persist until the object is destroyed. Relying on animatedItems here would let
+    // a re-registered item (e.g. a life counter that flashes repeatedly) accumulate
+    // duplicate destroyed connections, the older ones of which would survive teardown.
+    if (!animationItemConnections.contains(object)) {
+        animationItemConnections.insert(object,
+                                        connect(object, &QObject::destroyed, this, &GameScene::removeAnimatedItem));
+    }
+    animatedItems.insert(object, item);
+    if (animationTimer && !animationTimer->isActive()) {
         animationTimer->start(10, this);
     }
 }
 
-void GameScene::unregisterAnimationItem(AbstractCardItem *card)
+void GameScene::unregisterAnimationItem(IAnimatedItem *item)
 {
-    cardsToAnimate.remove(static_cast<CardItem *>(card));
-    if (cardsToAnimate.isEmpty()) {
+    animatedItems.remove(dynamic_cast<QObject *>(item));
+    if (animationTimer && animatedItems.isEmpty()) {
+        animationTimer->stop();
+    }
+}
+
+void GameScene::removeAnimatedItem(QObject *item)
+{
+    animatedItems.remove(item);
+    animationItemConnections.remove(item);
+    if (animationTimer && animatedItems.isEmpty()) {
         animationTimer->stop();
     }
 }

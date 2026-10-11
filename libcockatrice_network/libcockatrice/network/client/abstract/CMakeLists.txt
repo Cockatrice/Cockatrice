@@ -2,15 +2,11 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-set(HEADERS abstract_client.h)
+set(HEADERS abstract_client.h latency_tracker.h)
 
-set(SOURCES abstract_client.cpp)
+set(SOURCES abstract_client.cpp latency_tracker.cpp)
 
-if(Qt6_FOUND)
-  qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-elseif(Qt5_FOUND)
-  qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
-endif()
+qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
 
 add_library(libcockatrice_network_client_abstract STATIC ${MOC_SOURCES} ${SOURCES})
 

@@ -3,11 +3,14 @@
 
 #include "../../../game/player/event_processing_options.h"
 
+#include <QList>
 #include <QObject>
-#include <libcockatrice/protocol/pb/game_replay.pb.h>
+#include <QtGlobal>
+#include <qtmetamacros.h>
 
 class GameReplay;
 class QTimer;
+class GameEventContainer;
 
 /**
  * @brief This class handles all logic to do with playing back replays
@@ -31,6 +34,7 @@ class ReplayManager : public QObject
     QTimer *rewindBufferingTimer;
 
     qreal timeScaleFactor = 1.0;
+    bool skipEmptySections = false;
 
     int currentVisualTime = 0;    ///< time currently displayed by the timeline
     int currentProcessedTime = 0; ///< time that events are currently processed up to. Could differ from visual time due
@@ -41,6 +45,7 @@ class ReplayManager : public QObject
     void handleBackwardsSkip(bool doRewindBuffering);
     void processRewind();
     void processNewEvents(PlaybackMode playbackMode);
+    void handleSkipEmptySection();
 
 private slots:
     void replayTimerTimeout();
@@ -63,6 +68,7 @@ public:
     }
 
     void setTimeScaleFactor(qreal _timeScaleFactor);
+    void setSkipEmptySections(bool value);
 
 public slots:
     void startReplay();

@@ -1,11 +1,22 @@
 #include "deck_stats_interface.h"
 
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
+
+#include <QByteArray>
 #include <QDesktopServices>
 #include <QMessageBox>
+#include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QSharedPointer>
+#include <QString>
+#include <QUrl>
 #include <QUrlQuery>
+#include <functional>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/tree/deck_list_card_node.h>
@@ -72,7 +83,7 @@ void DeckStatsInterface::copyDeckWithoutTokens(const DeckList &source, DeckList 
 {
     auto copyIfNotAToken = [&destination](const auto node, const auto card) {
         CardInfoPtr dbCard = CardDatabaseManager::query()->getCardInfo(card->getName());
-        if (dbCard && !dbCard->getIsToken()) {
+        if (dbCard && !dbCard->getIsToken() && node->getName() != DECK_ZONE_MAYBEBOARD) {
             DecklistCardNode *addedCard = destination.addCard(card->getName(), node->getName(), -1);
             addedCard->setNumber(card->getNumber());
         }

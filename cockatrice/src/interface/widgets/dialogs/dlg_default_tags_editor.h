@@ -9,9 +9,15 @@
 #define DLG_DEFAULT_TAGS_EDITOR_H
 
 #include <QDialog>
-#include <QLineEdit>
-#include <QListWidget>
-#include <QVBoxLayout>
+#include <qtmetamacros.h>
+
+class QHBoxLayout;
+class QLineEdit;
+class QListWidget;
+class QListWidgetItem;
+class QPushButton;
+class QVBoxLayout;
+class QWidget;
 
 class DlgDefaultTagsEditor : public QDialog
 {

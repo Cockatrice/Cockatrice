@@ -3,6 +3,9 @@
 
 #include <QColor>
 #include <QToolButton>
+#include <qtmetamacros.h>
+
+class QWidget;
 
 class ColorButton : public QToolButton
 {

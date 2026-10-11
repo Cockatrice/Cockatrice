@@ -1,31 +1,63 @@
 #include "view_zone_widget.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "../../client/translation.h"
 #include "../../filters/syntax_help.h"
+#include "../../game/board/card_list.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
+#include "../../game/zones/card_zone_logic.h"
+#include "../../game/zones/view_zone_logic.h"
 #include "../../interface/pixel_map_generator.h"
-#include "../board/card_item.h"
-#include "../game_scene.h"
+#include "../card_dimensions.h"
 #include "../z_values.h"
+#include "libcockatrice/utility/macros.h"
 #include "view_zone.h"
 
+#include <QAction>
 #include <QCheckBox>
+#include <QCloseEvent>
+#include <QDebug>
+#include <QEvent>
+#include <QFlags>
+#include <QFrame>
+#include <QGraphicsItem>
+#include <QGraphicsLayout>
 #include <QGraphicsLinearLayout>
 #include <QGraphicsProxyWidget>
+#include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsSceneResizeEvent>
 #include <QGraphicsView>
-#include <QLabel>
-#include <QPainter>
+#include <QIcon>
+#include <QObject>
+#include <QRect>
 #include <QScrollBar>
+#include <QSizeF>
+#include <QSizePolicy>
+#include <QString>
+#include <QStringLiteral>
 #include <QStyle>
 #include <QStyleOption>
+#include <QStyleOptionTitleBar>
+#include <QTimer>
+#include <QVariant>
+#include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
+#include <qnamespace.h>
 
 namespace
 {
-constexpr qreal kTitleBarHeight = 24.0;
+qreal titleBarHeight(QWidget *styleWidget)
+{
+    if (styleWidget) {
+        return static_cast<qreal>(styleWidget->style()->pixelMetric(QStyle::PM_TitleBarHeight, nullptr, styleWidget));
+    }
+    return 24.0;
+}
 constexpr qreal kMinVisibleWidth = 100.0;
 } // namespace
 
@@ -62,11 +94,11 @@ ZoneViewWidget::ZoneViewWidget(PlayerLogic *_player,
         searchEdit.setPlaceholderText(tr("Search by card name (or search expressions)"));
         searchEdit.setClearButtonEnabled(true);
         searchEdit.addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
-        auto help = searchEdit.addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
+        auto help = searchEdit.addAction(themePixmap(QStringLiteral("icons/info")), QLineEdit::TrailingPosition);
 
         connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(&searchEdit); });
 
-        if (SettingsCache::instance().interface().getFocusCardViewSearchBar()) {
+        if (SettingsCache::instance().userInterface().getFocusCardViewSearchBar()) {
             this->setActive(true);
             searchEdit.setFocus();
         }
@@ -77,9 +109,9 @@ ZoneViewWidget::ZoneViewWidget(PlayerLogic *_player,
         vbox->addItem(searchEditProxy);
 
         // hide search bar if chat autofocus setting is enabled, since typing into it will no longer work anyway
-        searchEditProxy->setVisible(!SettingsCache::instance().interface().getKeepGameChatFocus());
-        connect(&SettingsCache::instance().interface(), &InterfaceSettings::keepGameChatFocusChanged, searchEditProxy,
-                [searchEditProxy](bool keepFocus) { searchEditProxy->setVisible(!keepFocus); });
+        searchEditProxy->setVisible(!SettingsCache::instance().userInterface().getKeepGameChatFocus());
+        connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::keepGameChatFocusChanged,
+                searchEditProxy, [searchEditProxy](bool keepFocus) { searchEditProxy->setVisible(!keepFocus); });
 
         // top row
         QGraphicsLinearLayout *hTopRow = new QGraphicsLinearLayout(Qt::Horizontal);
@@ -159,15 +191,21 @@ ZoneViewWidget::ZoneViewWidget(PlayerLogic *_player,
         connect(&sortBySelector, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
                 &ZoneViewWidget::processSortBy);
         connect(&pileViewCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &ZoneViewWidget::processSetPileView);
-        groupBySelector.setCurrentIndex(SettingsCache::instance().interface().getZoneViewGroupByIndex());
-        sortBySelector.setCurrentIndex(SettingsCache::instance().interface().getZoneViewSortByIndex());
-        pileViewCheckBox.setChecked(SettingsCache::instance().interface().getZoneViewPileView());
+        groupBySelector.setCurrentIndex(SettingsCache::instance().userInterface().getZoneViewGroupByIndex());
+        sortBySelector.setCurrentIndex(SettingsCache::instance().userInterface().getZoneViewSortByIndex());
+        pileViewCheckBox.setChecked(SettingsCache::instance().userInterface().getZoneViewPileView());
 
         if (CardList::NoSort == static_cast<CardList::SortOption>(groupBySelector.currentData().toInt())) {
             pileViewCheckBox.setEnabled(false);
         }
 
         connect(&searchEdit, &QLineEdit::textChanged, zone, &ZoneViewZone::setFilterString);
+
+        const auto applyCardSearchLanguage = [this] { zone->setFilterString(searchEdit.text()); };
+        connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::cardLangChanged, this,
+                applyCardSearchLanguage);
+        connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::cardSearchLanguageChanged, this,
+                applyCardSearchLanguage);
     }
 
     setLayout(vbox);
@@ -191,7 +229,7 @@ ZoneViewWidget::ZoneViewWidget(PlayerLogic *_player,
 void ZoneViewWidget::processGroupBy(int index)
 {
     auto option = static_cast<CardList::SortOption>(groupBySelector.itemData(index).toInt());
-    SettingsCache::instance().interface().setZoneViewGroupByIndex(index);
+    SettingsCache::instance().userInterface().setZoneViewGroupByIndex(index);
     zone->setGroupBy(option);
 
     // disable pile view checkbox if we're not grouping by anything
@@ -215,13 +253,13 @@ void ZoneViewWidget::processSortBy(int index)
         return;
     }
 
-    SettingsCache::instance().interface().setZoneViewSortByIndex(index);
+    SettingsCache::instance().userInterface().setZoneViewSortByIndex(index);
     zone->setSortBy(option);
 }
 
 void ZoneViewWidget::processSetPileView(QT_STATE_CHANGED_T value)
 {
-    SettingsCache::instance().interface().setZoneViewPileView(value);
+    SettingsCache::instance().userInterface().setZoneViewPileView(value);
     zone->setPileView(value);
 }
 
@@ -283,7 +321,8 @@ QRectF ZoneViewWidget::closeButtonRect(QWidget *styleWidget) const
 
     // query the style for the close button position (handles macOS top-left placement)
     // Title bar rect MUST be local (0,0-based) for QStyle
-    const QRect titleBarRect(0, 0, static_cast<int>(frameRectF.width()), static_cast<int>(kTitleBarHeight));
+    const qreal tbh = titleBarHeight(styleWidget);
+    const QRect titleBarRect(0, 0, static_cast<int>(frameRectF.width()), static_cast<int>(tbh));
 
     if (styleWidget) {
         QStyleOptionTitleBar opt;
@@ -312,7 +351,7 @@ QRectF ZoneViewWidget::closeButtonRect(QWidget *styleWidget) const
     }
 
     // Fallback: frame-relative top-right
-    return QRectF(frameRectF.right() - kTitleBarHeight, frameRectF.top(), kTitleBarHeight, kTitleBarHeight);
+    return QRectF(frameRectF.right() - tbh, frameRectF.top(), tbh, tbh);
 }
 
 QGraphicsView *ZoneViewWidget::findDragView(QWidget *eventWidget) const
@@ -436,8 +475,9 @@ QVariant ZoneViewWidget::itemChange(GraphicsItemChange change, const QVariant &v
 
         const qreal minX = sceneRect.left();
         const qreal maxX = qMax(minX, sceneRect.right() - kMinVisibleWidth);
-        const qreal minY = sceneRect.top() + kTitleBarHeight;
-        const qreal maxY = qMax(minY, sceneRect.bottom() - kTitleBarHeight);
+        const qreal tbh = titleBarHeight(nullptr);
+        const qreal minY = sceneRect.top() + tbh;
+        const qreal maxY = qMax(minY, sceneRect.bottom() - tbh);
 
         desiredPos.setX(qBound(minX, desiredPos.x(), maxX));
         desiredPos.setY(qBound(minY, desiredPos.y(), maxY));
@@ -478,7 +518,7 @@ static qreal rowsToHeight(int rows)
  **/
 static qreal calcMaxInitialHeight()
 {
-    return rowsToHeight(SettingsCache::instance().interface().getCardViewInitialRowsMax());
+    return rowsToHeight(SettingsCache::instance().userInterface().getCardViewInitialRowsMax());
 }
 
 /**
@@ -549,7 +589,7 @@ void ZoneViewWidget::initStyleOption(QStyleOption *option) const
 {
     QStyleOptionTitleBar *titleBar = qstyleoption_cast<QStyleOptionTitleBar *>(option);
     if (titleBar) {
-        titleBar->icon = QPixmap("theme:cockatrice");
+        titleBar->icon = themePixmap(QStringLiteral("cockatrice"));
     }
 }
 
@@ -560,7 +600,7 @@ void ZoneViewWidget::initStyleOption(QStyleOption *option) const
 void ZoneViewWidget::expandWindow()
 {
     qreal maxInitialHeight = calcMaxInitialHeight();
-    qreal maxExpandedHeight = rowsToHeight(SettingsCache::instance().interface().getCardViewExpandedRowsMax());
+    qreal maxExpandedHeight = rowsToHeight(SettingsCache::instance().userInterface().getCardViewExpandedRowsMax());
     qreal height = rect().height() - extraHeight - 10;
     qreal maxHeight = maximumHeight() - extraHeight - 10;
 
