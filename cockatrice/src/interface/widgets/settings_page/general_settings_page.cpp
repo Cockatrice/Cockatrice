@@ -346,9 +346,22 @@ GeneralSettingsPage::GeneralSettingsPage()
         SettingsCache::instance().deckSync().setConflictDefault(conflictDefaultSelector.itemData(index).toInt());
     });
 
+    autoSyncCheckBox.setChecked(settings.deckSync().getAutoSync());
+    connect(&autoSyncCheckBox, &QCheckBox::toggled, &SettingsCache::instance().deckSync(),
+            &DeckSyncSettings::setAutoSync);
+
+    syncIntervalEdit.setMinimum(1);
+    syncIntervalEdit.setMaximum(60);
+    syncIntervalEdit.setValue(settings.deckSync().getSyncIntervalMinutes());
+    connect(&syncIntervalEdit, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance().deckSync(),
+            &DeckSyncSettings::setSyncIntervalMinutes);
+
     auto *deckSyncGrid = new QGridLayout;
     deckSyncGrid->addWidget(&conflictDefaultLabel, 0, 0);
     deckSyncGrid->addWidget(&conflictDefaultSelector, 0, 1);
+    deckSyncGrid->addWidget(&autoSyncCheckBox, 1, 0, 1, 2);
+    deckSyncGrid->addWidget(&syncIntervalLabel, 2, 0);
+    deckSyncGrid->addWidget(&syncIntervalEdit, 2, 1);
     deckSyncGroupBox = new QGroupBox;
     deckSyncGroupBox->setLayout(deckSyncGrid);
 
@@ -636,5 +649,8 @@ void GeneralSettingsPage::retranslateUi()
                                         tr("Keep the server deck"));
     conflictDefaultSelector.setItemText(conflictDefaultSelector.findData(DeckSyncConflictKeepNewer),
                                         tr("Keep the newer deck"));
+    autoSyncCheckBox.setText(tr("Sync decks automatically"));
+    syncIntervalLabel.setText(tr("Check every:"));
+    syncIntervalEdit.setSuffix(" " + tr("min"));
     resetAllPathsButton->setText(tr("Reset all paths"));
 }

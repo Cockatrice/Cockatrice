@@ -24,6 +24,7 @@ bool DeckSyncSidecar::load()
 {
     recordMap.clear();
     mode = MODE_LINKED;
+    lastSyncSecs = 0;
 
     QFile file(filePath);
     if (!file.exists()) {
@@ -38,6 +39,7 @@ bool DeckSyncSidecar::load()
     }
     const QJsonValue modeValue = document.object().value("mode");
     mode = modeValue.isString() ? modeValue.toString() : MODE_LINKED;
+    lastSyncSecs = static_cast<qint64>(document.object().value("lastSync").toDouble());
     const QJsonObject records = document.object().value("records").toObject();
     for (auto it = records.begin(); it != records.end(); ++it) {
         if (!it.value().isObject()) {
@@ -70,6 +72,7 @@ bool DeckSyncSidecar::save() const
     QJsonObject root;
     root.insert("version", SIDECAR_FORMAT_VERSION);
     root.insert("mode", mode);
+    root.insert("lastSync", static_cast<double>(lastSyncSecs));
     root.insert("records", records);
 
     QDir().mkpath(QFileInfo(filePath).absolutePath());
