@@ -28,6 +28,7 @@ set(cockatrice_SOURCES
     src/interface/deck_loader/deck_loader.cpp
     src/interface/deck_sync/deck_sync_profile.cpp
     src/interface/deck_sync/deck_sync_sidecar.cpp
+    src/interface/deck_sync/deck_sync_manager.cpp
     src/interface/widgets/dialogs/dlg_connect.cpp
     src/interface/widgets/dialogs/dlg_convert_deck_to_cod_format.cpp
     src/interface/widgets/dialogs/dlg_create_game.cpp
