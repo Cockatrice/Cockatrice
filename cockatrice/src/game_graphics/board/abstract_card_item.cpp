@@ -29,6 +29,7 @@
 #include <QPixmap>
 #include <QPointF>
 #include <QRectF>
+#include <QTimer>
 #include <QTransform>
 #include <QVariant>
 #include <QtGlobal>
@@ -345,7 +346,16 @@ void AbstractCardItem::setFaceDown(bool _facedown)
 
 void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    pendingSelectionCollapse = false;
+    cancelPendingSelectionCollapse();
+    if (scene() != nullptr) {
+        // A new press starts a new gesture: no card may collapse the selection out from under it afterwards.
+        for (QGraphicsItem *selectedItem : scene()->selectedItems()) {
+            auto *selectedCard = qgraphicsitem_cast<AbstractCardItem *>(selectedItem);
+            if (selectedCard != nullptr && selectedCard != this) {
+                selectedCard->cancelPendingSelectionCollapse();
+            }
+        }
+    }
     if ((event->modifiers() & Qt::AltModifier) && event->button() == Qt::LeftButton) {
         emit cardShiftClicked(cardRef.name);
     } else if ((event->modifiers() & Qt::ControlModifier)) {
@@ -373,8 +383,24 @@ void AbstractCardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         bool dragged = (event->screenPos() - event->buttonDownScreenPos(event->button())).manhattanLength() >=
                        2 * QApplication::startDragDistance();
         if (!dragged) {
-            scene()->clearSelection();
-            setSelected(true);
+            if (doubleClickActsOnSelection()) {
+                // A double-click may still arrive and must act on the whole multi-selection, so collapse only
+                // once the double-click window has passed without one. The generation guard (and the receiver
+                // context) drops the collapse if the item is gone, deselected, or a double-click cancelled it;
+                // the count guard drops it if the selection changed meanwhile (rubber band, ctrl-toggle).
+                const int generation = ++selectionCollapseGeneration;
+                const int armedSelectionCount = scene()->selectedItems().count();
+                QTimer::singleShot(QApplication::doubleClickInterval(), this, [this, generation, armedSelectionCount] {
+                    if (generation == selectionCollapseGeneration && scene() != nullptr && isSelected() &&
+                        scene()->selectedItems().count() == armedSelectionCount && armedSelectionCount > 1) {
+                        scene()->clearSelection();
+                        setSelected(true);
+                    }
+                });
+            } else {
+                scene()->clearSelection();
+                setSelected(true);
+            }
         }
     }
 
@@ -384,6 +410,17 @@ void AbstractCardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
     // This function ensures the parent function doesn't mess around with our selection.
     event->accept();
+}
+
+void AbstractCardItem::cancelPendingSelectionCollapse()
+{
+    pendingSelectionCollapse = false;
+    ++selectionCollapseGeneration;
+}
+
+bool AbstractCardItem::doubleClickActsOnSelection() const
+{
+    return false;
 }
 
 void AbstractCardItem::processHoverEvent()

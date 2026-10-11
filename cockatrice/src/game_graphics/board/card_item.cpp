@@ -518,11 +518,19 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
+    // The preceding release deferred its multi-selection collapse for exactly this: the double-click plays
+    // every selected card, so the collapse must not run.
+    cancelPendingSelectionCollapse();
     if ((event->modifiers() != Qt::AltModifier) && (event->buttons() == Qt::LeftButton) &&
         (SettingsCache::instance().userInterface().getDoubleClickToPlay())) {
         handleClickedToPlay(event->modifiers().testFlag(Qt::ShiftModifier));
     }
     event->accept();
+}
+
+bool CardItem::doubleClickActsOnSelection() const
+{
+    return SettingsCache::instance().userInterface().getDoubleClickToPlay();
 }
 
 bool CardItem::animationEvent()
