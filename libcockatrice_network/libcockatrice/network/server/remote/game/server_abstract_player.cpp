@@ -1694,3 +1694,9 @@ void Server_AbstractPlayer::getPlayerProperties(ServerInfo_PlayerProperties &res
         playmatParams->set_zoom(playmat.params.zoom);
     }
 }
+
+void Server_AbstractPlayer::setDeck(DeckList *_deck)
+{
+    delete deck;
+    deck = _deck;
+}
