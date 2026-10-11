@@ -12,6 +12,7 @@ set(HEADERS
     libcockatrice/settings/commander_bracket_settings.h
     libcockatrice/settings/debug_settings.h
     libcockatrice/settings/deck_editor_settings.h
+    libcockatrice/settings/deck_sync_settings.h
     libcockatrice/settings/download_settings.h
     libcockatrice/settings/game_filters_settings.h
     libcockatrice/settings/game_settings.h
@@ -43,6 +44,7 @@ add_library(
   libcockatrice/settings/chat_settings.cpp
   libcockatrice/settings/debug_settings.cpp
   libcockatrice/settings/deck_editor_settings.cpp
+  libcockatrice/settings/deck_sync_settings.cpp
   libcockatrice/settings/download_settings.cpp
   libcockatrice/settings/game_filters_settings.cpp
   libcockatrice/settings/game_settings.cpp
