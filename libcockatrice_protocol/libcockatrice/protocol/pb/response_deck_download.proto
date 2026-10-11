@@ -6,4 +6,9 @@ message Response_DeckDownload {
         optional Response_DeckDownload ext = 1007;
     }
     optional string deck = 1;
+    // Sync identity echoed so the client can update its sidecar without an
+    // extra list fetch.
+    optional string guid = 2;
+    optional string hash = 3;
+    optional uint64 last_modified = 4;
 }
