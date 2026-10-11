@@ -67,10 +67,12 @@
 #include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/board/counter_state.h>
 #include <libcockatrice/game/game.h>
 #include <libcockatrice/game/game_event_handler.h>
 #include <libcockatrice/game/game_meta_info.h>
 #include <libcockatrice/game/game_state.h>
+#include <libcockatrice/game/player/player_event_handler.h>
 #include <libcockatrice/game/player/player_info.h>
 #include <libcockatrice/game/player/player_logic.h>
 #include <libcockatrice/game/player/player_manager.h>
