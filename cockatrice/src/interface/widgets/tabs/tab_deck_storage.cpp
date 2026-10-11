@@ -4,6 +4,7 @@
 #include "../../deck_loader/deck_file_format.h"
 #include "../../deck_loader/deck_loader.h"
 #include "../../deck_loader/loaded_deck.h"
+#include "../../deck_sync/deck_sync_manager.h"
 #include "../../pixel_map_generator.h"
 #include "../cards/additional_info/deck_color_identity.h"
 #include "../deck_share/deck_share_utils.h"
@@ -32,6 +33,7 @@
 #include <QInputDialog>
 #include <QItemSelection>
 #include <QItemSelectionModel>
+#include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QModelIndex>
@@ -178,6 +180,9 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     rightVbox->addWidget(shareBar);
     rightVbox->addWidget(serverDirView);
     rightVbox->addLayout(rightToolBarLayout);
+    syncStatusLabel = new QLabel(this);
+    syncStatusLabel->setWordWrap(true);
+    rightVbox->addWidget(syncStatusLabel);
     rightGroupBox = new QGroupBox;
     rightGroupBox->setLayout(rightVbox);
 
@@ -229,6 +234,10 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     aPublishDeck->setIcon(QPixmap("theme:icons/lock"));
     connect(aPublishDeck, &QAction::triggered, this, &TabDeckStorage::actPublishDeck);
 
+    aSyncNow = new QAction(this);
+    aSyncNow->setIcon(qApp->style()->standardIcon(QStyle::SP_BrowserReload));
+    connect(aSyncNow, &QAction::triggered, this, &TabDeckStorage::actSyncNow);
+
     // Add actions to toolbars
     leftToolBar->addAction(aOpenLocalDeck);
     leftToolBar->addAction(aRenameLocal);
@@ -240,10 +249,21 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
 
     rightToolBar->addAction(aOpenRemoteDeck);
     rightToolBar->addAction(aDownload);
+    rightToolBar->addAction(aSyncNow);
     rightToolBar->addAction(aShareDecks);
     rightToolBar->addAction(aPublishDeck);
     rightToolBar->addAction(aNewFolder);
     rightToolBar->addAction(aDeleteRemoteDeck);
+
+    syncManager = new DeckSyncManager(this);
+    syncManager->setClient(client);
+    syncManager->setColorIdentityProvider(
+        [](const DeckList &deck) { return getDeckColorIdentity(deck, CardDatabaseManager::query()); });
+    connect(syncManager, &DeckSyncManager::statusMessage, this, &TabDeckStorage::onSyncStatusMessage);
+    connect(syncManager, &DeckSyncManager::syncFinished, this, &TabDeckStorage::onSyncFinished);
+    if (currentUserInfo != nullptr) {
+        syncUsername = QString::fromStdString(currentUserInfo->name());
+    }
 
     retranslateUi();
 
@@ -273,6 +293,8 @@ void TabDeckStorage::retranslateUi()
     aShareDecks->setText(tr("Share decks"));
     aPublishDeck->setText(tr("Publish/unpublish deck"));
     aOpenDecksFolder->setText(tr("Open decks folder"));
+    aSyncNow->setText(tr("Sync now"));
+    renderSyncStatus();
     shareBar->retranslateUi();
     if (shareBar->isVisible()) {
         onServerSelectionChanged();
@@ -300,6 +322,7 @@ QString TabDeckStorage::getTargetPath() const
 
 void TabDeckStorage::handleConnected(const ServerInfo_User &userInfo)
 {
+    syncUsername = QString::fromStdString(userInfo.name());
     setRemoteEnabled(userInfo.user_level() & ServerInfo_User::IsRegistered);
 }
 
@@ -317,6 +340,7 @@ void TabDeckStorage::handleConnectionChanged(ClientStatus status)
 
 void TabDeckStorage::setRemoteEnabled(bool enabled)
 {
+    remoteEnabled = enabled;
     aUpload->setEnabled(enabled);
     aOpenRemoteDeck->setEnabled(enabled);
     aDownload->setEnabled(enabled);
@@ -324,6 +348,7 @@ void TabDeckStorage::setRemoteEnabled(bool enabled)
     aPublishDeck->setEnabled(enabled);
     aNewFolder->setEnabled(enabled);
     aDeleteRemoteDeck->setEnabled(enabled);
+    aSyncNow->setEnabled(enabled && !syncManager->isSyncing());
 
     if (enabled) {
         serverDirView->refreshTree();
@@ -525,6 +550,61 @@ void TabDeckStorage::actOpenDecksFolder()
 {
     QString dir = localDirModel->rootPath();
     QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
+}
+
+void TabDeckStorage::actSyncNow()
+{
+    DeckSyncProfile profile(client->serverName(), client->serverPort(), syncUsername);
+    syncManager->setProfile(profile);
+    syncManager->setDeckPath(SettingsCache::instance().paths().getDeckPath());
+    aSyncNow->setEnabled(false);
+    syncManager->syncNow();
+}
+
+void TabDeckStorage::onSyncStatusMessage(const QString &message)
+{
+    syncStatusType = SyncStatusType::Working;
+    syncStatusDetail = message;
+    renderSyncStatus();
+}
+
+void TabDeckStorage::onSyncFinished(int uploaded, int downloaded, int unchanged, int skipped, const QString &error)
+{
+    aSyncNow->setEnabled(remoteEnabled);
+    if (!error.isEmpty()) {
+        syncStatusType = SyncStatusType::Failed;
+        syncStatusDetail = error;
+    } else {
+        syncStatusType = SyncStatusType::Finished;
+        syncStatusDetail.clear();
+        lastSyncSummary = {uploaded, downloaded, unchanged, skipped};
+    }
+    renderSyncStatus();
+    if (error.isEmpty()) {
+        serverDirView->refreshTree();
+    }
+}
+
+void TabDeckStorage::renderSyncStatus()
+{
+    switch (syncStatusType) {
+        case SyncStatusType::Working:
+            syncStatusLabel->setText(syncStatusDetail);
+            break;
+        case SyncStatusType::Failed:
+            syncStatusLabel->setText(tr("Sync failed: %1").arg(syncStatusDetail));
+            break;
+        case SyncStatusType::Finished:
+            syncStatusLabel->setText(tr("Sync complete: %1 uploaded, %2 downloaded, %3 unchanged, %4 skipped.")
+                                         .arg(lastSyncSummary.uploaded)
+                                         .arg(lastSyncSummary.downloaded)
+                                         .arg(lastSyncSummary.unchanged)
+                                         .arg(lastSyncSummary.skipped));
+            break;
+        case SyncStatusType::Idle:
+            syncStatusLabel->setText(tr("Not synced yet"));
+            break;
+    }
 }
 
 void TabDeckStorage::actRemoteDoubleClick(const QModelIndex &curRight)
