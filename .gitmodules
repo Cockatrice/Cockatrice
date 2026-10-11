@@ -2,5 +2,5 @@
 	path = vcpkg
 	url = https://github.com/microsoft/vcpkg.git
 [submodule "doxygen-awesome-css"]
-	path = doc/doxygen/theme
+	path = docs/doxygen/theme
 	url = https://github.com/jothepro/doxygen-awesome-css.git
