@@ -26,6 +26,7 @@ set(PROTO_FILES
     command_deck_share_list.proto
     command_deck_share_list_mine.proto
     command_deck_share_remove.proto
+    command_deck_sync_check.proto
     command_deck_upload.proto
     command_del_counter.proto
     command_delete_arrow.proto
@@ -149,6 +150,7 @@ set(PROTO_FILES
     response_deck_share_download.proto
     response_deck_share_list.proto
     response_deck_share_list_mine.proto
+    response_deck_sync_status.proto
     response_deck_upload.proto
     response_dump_zone.proto
     response_forgotpasswordrequest.proto
