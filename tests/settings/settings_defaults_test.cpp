@@ -578,6 +578,18 @@ TEST_F(SettingsDefaultsTest, DeckSync_SyncIntervalMinutes_DefaultAndBounds)
     ASSERT_EQ(s.getSyncIntervalMinutes(), 60);
 }
 
+TEST_F(SettingsDefaultsTest, DeckSync_HistoryLimit_DefaultAndBounds)
+{
+    DeckSyncSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getHistoryLimit(), 20);
+    s.setHistoryLimit(50);
+    ASSERT_EQ(s.getHistoryLimit(), 50);
+    s.setHistoryLimit(0);
+    ASSERT_EQ(s.getHistoryLimit(), 1);
+    s.setHistoryLimit(500);
+    ASSERT_EQ(s.getHistoryLimit(), 100);
+}
+
 // --- NetworkSettings ---
 
 TEST_F(SettingsDefaultsTest, Network_ClientID_Default)

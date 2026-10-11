@@ -1,0 +1,12 @@
+syntax = "proto2";
+import "session_commands.proto";
+
+message Command_DeckHistoryList {
+    extend SessionCommand {
+        optional Command_DeckHistoryList ext = 1035;
+    }
+    optional sint32 deck_id = 1 [default = -1];
+    // Maximum versions to return, newest first. Capped server-side by
+    // deck_sync/max_versions.
+    optional uint32 limit = 2 [default = 20];
+}

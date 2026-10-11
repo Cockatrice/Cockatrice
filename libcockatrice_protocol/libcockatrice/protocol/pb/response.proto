@@ -86,6 +86,7 @@ message Response {
         DECK_SHARE_DOWNLOAD = 1105;     // Response for shared deck download
         DECK_SHARE_LIST_MINE = 1106;    // Response listing the caller's own shares
         DECK_SYNC_STATUS = 1107;        // Response with changed decks since a timestamp
+        DECK_HISTORY_LIST = 1108;       // Response listing deck versions
         CARD_ART_RULE_LIST = 1200;      // Response containing a list of card art rules
     }
 

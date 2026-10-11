@@ -30,11 +30,14 @@ public:
     void setAutoSync(bool _autoSync);
     [[nodiscard]] int getSyncIntervalMinutes() const;
     void setSyncIntervalMinutes(int _syncIntervalMinutes);
+    [[nodiscard]] int getHistoryLimit() const;
+    void setHistoryLimit(int _historyLimit);
 
 signals:
     void conflictDefaultChanged(int conflictDefault);
     void autoSyncChanged(bool autoSync);
     void syncIntervalMinutesChanged(int syncIntervalMinutes);
+    void historyLimitChanged(int historyLimit);
 
 private:
     DeckSyncSettings(const DeckSyncSettings & /*other*/);

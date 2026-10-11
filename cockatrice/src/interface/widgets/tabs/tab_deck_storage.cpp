@@ -10,6 +10,7 @@
 #include "../cards/additional_info/deck_color_identity.h"
 #include "../deck_share/deck_share_utils.h"
 #include "../deck_share/share_bar_widget.h"
+#include "../dialogs/dlg_deck_history.h"
 #include "../dialogs/dlg_sync_conflict.h"
 #include "../dialogs/dlg_sync_onboarding.h"
 #include "../interface/widgets/server/remote/remote_decklist_tree_widget.h"
@@ -242,6 +243,10 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     aSyncNow->setIcon(qApp->style()->standardIcon(QStyle::SP_BrowserReload));
     connect(aSyncNow, &QAction::triggered, this, &TabDeckStorage::actSyncNow);
 
+    aDeckHistory = new QAction(this);
+    aDeckHistory->setIcon(qApp->style()->standardIcon(QStyle::SP_FileDialogDetailedView));
+    connect(aDeckHistory, &QAction::triggered, this, &TabDeckStorage::actDeckHistory);
+
     // Add actions to toolbars
     leftToolBar->addAction(aOpenLocalDeck);
     leftToolBar->addAction(aRenameLocal);
@@ -254,6 +259,7 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     rightToolBar->addAction(aOpenRemoteDeck);
     rightToolBar->addAction(aDownload);
     rightToolBar->addAction(aSyncNow);
+    rightToolBar->addAction(aDeckHistory);
     rightToolBar->addAction(aShareDecks);
     rightToolBar->addAction(aPublishDeck);
     rightToolBar->addAction(aNewFolder);
@@ -310,6 +316,7 @@ void TabDeckStorage::retranslateUi()
     aPublishDeck->setText(tr("Publish/unpublish deck"));
     aOpenDecksFolder->setText(tr("Open decks folder"));
     aSyncNow->setText(tr("Sync now"));
+    aDeckHistory->setText(tr("Version history"));
     renderSyncStatus();
     shareBar->retranslateUi();
     if (shareBar->isVisible()) {
@@ -365,6 +372,7 @@ void TabDeckStorage::setRemoteEnabled(bool enabled)
     aPublishDeck->setEnabled(enabled);
     aNewFolder->setEnabled(enabled);
     aDeleteRemoteDeck->setEnabled(enabled);
+    aDeckHistory->setEnabled(enabled);
     aSyncNow->setEnabled(enabled && !syncManager->isSyncing());
 
     if (enabled) {
@@ -648,6 +656,58 @@ void TabDeckStorage::renderSyncStatus()
             syncStatusLabel->setText(tr("Not synced yet"));
             break;
     }
+}
+
+void TabDeckStorage::actDeckHistory()
+{
+    QList<RemoteDeckList_TreeModel::FileNode *> files;
+    for (const auto curRight : serverDirView->getCurrentSelection()) {
+        if (auto *file = dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(curRight)) {
+            files.append(file);
+        }
+    }
+    if (files.size() != 1) {
+        QMessageBox::information(this, tr("Version history"), tr("Select a single server deck to view its history."));
+        return;
+    }
+
+    auto *dialog = new DlgDeckHistory(files.first()->getId(), files.first()->getName(),
+                                      SettingsCache::instance().deckSync().getHistoryLimit(), client, this);
+    connect(dialog, &DlgDeckHistory::restoreRequested, this, &TabDeckStorage::onHistoryRestoreRequested);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->show();
+}
+
+void TabDeckStorage::onHistoryRestoreRequested(int deckId, const QString &content)
+{
+    DeckList deck;
+    if (!deck.loadFromString_Native(content)) {
+        return;
+    }
+    const QString deckString = deck.writeToString_Native();
+    if (deckString.length() > MAX_FILE_LENGTH) {
+        QMessageBox::critical(this, tr("Error"), tr("Restored deck is too large"));
+        return;
+    }
+
+    Command_DeckUpload cmd;
+    cmd.set_deck_id(deckId);
+    cmd.set_deck_list(deckString.toStdString());
+    cmd.set_color_identity(getDeckColorIdentity(deck, CardDatabaseManager::query()).toStdString());
+
+    PendingCommand *pend = client->prepareSessionCommand(cmd);
+    connect(pend, &PendingCommand::finished, this, &TabDeckStorage::onHistoryRestoreFinished);
+    client->sendCommand(pend);
+}
+
+void TabDeckStorage::onHistoryRestoreFinished(const Response &response, const CommandContainer & /*commandContainer*/)
+{
+    if (response.response_code() != Response::RespOk) {
+        QMessageBox::critical(this, tr("Error"), tr("Failed to restore deck version"));
+        return;
+    }
+    onSyncStatusMessage(tr("Version restored."));
+    serverDirView->refreshTree();
 }
 
 void TabDeckStorage::actRemoteDoubleClick(const QModelIndex &curRight)

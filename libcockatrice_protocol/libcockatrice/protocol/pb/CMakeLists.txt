@@ -16,6 +16,7 @@ set(PROTO_FILES
     command_deck_del_dir.proto
     command_deck_download.proto
     command_deck_download_public.proto
+    command_deck_history_list.proto
     command_deck_list.proto
     command_deck_list_other_user.proto
     command_deck_new_dir.proto
@@ -145,6 +146,7 @@ set(PROTO_FILES
     response_ban_history.proto
     response_card_art_rule_entry.proto
     response_deck_download.proto
+    response_deck_history_list.proto
     response_deck_list.proto
     response_deck_share_create.proto
     response_deck_share_download.proto

@@ -55,6 +55,7 @@ private:
     QAction *aOpenDecksFolder;
     QAction *aOpenRemoteDeck, *aDownload, *aShareDecks, *aPublishDeck, *aNewFolder, *aDeleteRemoteDeck;
     QAction *aSyncNow;
+    QAction *aDeckHistory;
     QLabel *syncStatusLabel;
     DeckSyncManager *syncManager;
     QString syncUsername;
@@ -136,6 +137,9 @@ private slots:
     void deleteDeckFinished(const Response &response, const CommandContainer &commandContainer);
 
     void actSyncNow();
+    void actDeckHistory();
+    void onHistoryRestoreRequested(int deckId, const QString &content);
+    void onHistoryRestoreFinished(const Response &response, const CommandContainer &commandContainer);
     void onFirstSyncDetected(int localCount, int serverCount);
     void onConflictRequest(const DeckSyncConflict &conflict);
     void onSyncStatusMessage(const QString &message);

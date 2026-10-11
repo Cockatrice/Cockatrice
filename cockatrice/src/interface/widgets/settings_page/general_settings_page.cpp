@@ -356,12 +356,20 @@ GeneralSettingsPage::GeneralSettingsPage()
     connect(&syncIntervalEdit, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance().deckSync(),
             &DeckSyncSettings::setSyncIntervalMinutes);
 
+    historyLimitEdit.setMinimum(1);
+    historyLimitEdit.setMaximum(100);
+    historyLimitEdit.setValue(settings.deckSync().getHistoryLimit());
+    connect(&historyLimitEdit, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance().deckSync(),
+            &DeckSyncSettings::setHistoryLimit);
+
     auto *deckSyncGrid = new QGridLayout;
     deckSyncGrid->addWidget(&conflictDefaultLabel, 0, 0);
     deckSyncGrid->addWidget(&conflictDefaultSelector, 0, 1);
     deckSyncGrid->addWidget(&autoSyncCheckBox, 1, 0, 1, 2);
     deckSyncGrid->addWidget(&syncIntervalLabel, 2, 0);
     deckSyncGrid->addWidget(&syncIntervalEdit, 2, 1);
+    deckSyncGrid->addWidget(&historyLimitLabel, 3, 0);
+    deckSyncGrid->addWidget(&historyLimitEdit, 3, 1);
     deckSyncGroupBox = new QGroupBox;
     deckSyncGroupBox->setLayout(deckSyncGrid);
 
@@ -652,5 +660,6 @@ void GeneralSettingsPage::retranslateUi()
     autoSyncCheckBox.setText(tr("Sync decks automatically"));
     syncIntervalLabel.setText(tr("Check every:"));
     syncIntervalEdit.setSuffix(" " + tr("min"));
+    historyLimitLabel.setText(tr("Kept versions per deck:"));
     resetAllPathsButton->setText(tr("Reset all paths"));
 }
