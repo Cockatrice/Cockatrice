@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   PRIMARY KEY  (`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
-INSERT INTO cockatrice_schema_version VALUES(40);
+INSERT INTO cockatrice_schema_version VALUES(41);
 
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
@@ -73,9 +73,28 @@ CREATE TABLE IF NOT EXISTS `cockatrice_decklist_files` (
   `banner_card_provider` varchar(32) NULL,
   `color_identity` varchar(5) NULL,
   `tags` text NULL,
+  `guid` char(36) NULL,
+  `hash` char(40) NULL,
+  `last_modified` datetime NULL,
+  `deleted` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY  (`id`),
   KEY `FolderPlusUser` (`id_folder`,`id_user`),
   FOREIGN KEY(`id_user`) REFERENCES `cockatrice_users`(`id`)  ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
+
+-- Per-deck version history for collection sync.
+-- One row per hash-changing upload; pruned beyond retention (default 20).
+CREATE TABLE IF NOT EXISTS `cockatrice_deck_versions` (
+  `id` int(7) unsigned zerofill NOT NULL auto_increment,
+  `deck_id` int(7) unsigned zerofill NOT NULL,
+  `version_no` int(7) unsigned NOT NULL,
+  `content` text NOT NULL,
+  `hash` char(40) NULL,
+  `created_at` datetime NOT NULL,
+  `created_by_clientid` varchar(15) NULL,
+  PRIMARY KEY  (`id`),
+  KEY `deck_id` (`deck_id`),
+  FOREIGN KEY(`deck_id`) REFERENCES `cockatrice_decklist_files`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 -- Temporary deck shares: a named bundle of decks that can be fetched by
