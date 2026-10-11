@@ -6,7 +6,6 @@
 #include "../../deck_loader/loaded_deck.h"
 #include "../../deck_sync/deck_sync_conflict.h"
 #include "../../deck_sync/deck_sync_manager.h"
-#include "../../deck_sync/deck_sync_profile.h"
 #include "../../pixel_map_generator.h"
 #include "../cards/additional_info/deck_color_identity.h"
 #include "../deck_share/deck_share_utils.h"
@@ -265,8 +264,14 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     syncManager->setColorIdentityProvider(
         [](const DeckList &deck) { return getDeckColorIdentity(deck, CardDatabaseManager::query()); });
     syncManager->setConflictDefault(SettingsCache::instance().deckSync().getConflictDefault());
+    syncManager->setAutoSyncEnabled(SettingsCache::instance().deckSync().getAutoSync());
+    syncManager->setSyncIntervalMinutes(SettingsCache::instance().deckSync().getSyncIntervalMinutes());
     connect(&SettingsCache::instance().deckSync(), &DeckSyncSettings::conflictDefaultChanged, syncManager,
             &DeckSyncManager::setConflictDefault);
+    connect(&SettingsCache::instance().deckSync(), &DeckSyncSettings::autoSyncChanged, syncManager,
+            &DeckSyncManager::setAutoSyncEnabled);
+    connect(&SettingsCache::instance().deckSync(), &DeckSyncSettings::syncIntervalMinutesChanged, syncManager,
+            &DeckSyncManager::setSyncIntervalMinutes);
     connect(syncManager, &DeckSyncManager::statusMessage, this, &TabDeckStorage::onSyncStatusMessage);
     connect(syncManager, &DeckSyncManager::syncFinished, this, &TabDeckStorage::onSyncFinished);
     connect(syncManager, &DeckSyncManager::firstSyncDetected, this, &TabDeckStorage::onFirstSyncDetected);
@@ -274,6 +279,7 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     if (currentUserInfo != nullptr) {
         syncUsername = QString::fromStdString(currentUserInfo->name());
     }
+    syncManager->setServerIdentity(client->serverName(), client->serverPort(), syncUsername);
 
     retranslateUi();
 
@@ -333,6 +339,7 @@ QString TabDeckStorage::getTargetPath() const
 void TabDeckStorage::handleConnected(const ServerInfo_User &userInfo)
 {
     syncUsername = QString::fromStdString(userInfo.name());
+    syncManager->setServerIdentity(client->serverName(), client->serverPort(), syncUsername);
     setRemoteEnabled(userInfo.user_level() & ServerInfo_User::IsRegistered);
 }
 
@@ -564,8 +571,6 @@ void TabDeckStorage::actOpenDecksFolder()
 
 void TabDeckStorage::actSyncNow()
 {
-    DeckSyncProfile profile(client->serverName(), client->serverPort(), syncUsername);
-    syncManager->setProfile(profile);
     syncManager->setDeckPath(SettingsCache::instance().paths().getDeckPath());
     aSyncNow->setEnabled(false);
     syncManager->syncNow();

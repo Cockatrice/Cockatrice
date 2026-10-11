@@ -22,6 +22,8 @@
 class AbstractClient;
 class CommandContainer;
 class DeckList;
+class QFileSystemWatcher;
+class QTimer;
 class Response;
 class ServerInfo_DeckStorage_Folder;
 
@@ -56,11 +58,12 @@ public:
     explicit DeckSyncManager(QObject *parent = nullptr);
 
     void setClient(AbstractClient *_client);
-    void setProfile(const DeckSyncProfile &_profile);
+    void setServerIdentity(const QString &host, int port, const QString &username);
     void setDeckPath(const QString &path);
     void setColorIdentityProvider(ColorIdentityProvider provider);
     void setConflictDefault(int conflictDefault);
-    void setSyncMode(DeckSyncMode mode);
+    void setAutoSyncEnabled(bool enabled);
+    void setSyncIntervalMinutes(int minutes);
     [[nodiscard]] bool isSyncing() const;
 
 public slots:
@@ -83,6 +86,7 @@ signals:
 
 private slots:
     void onListFinished(const Response &response, const CommandContainer &commandContainer);
+    void onCheckFinished(const Response &response, const CommandContainer &commandContainer);
     void
     onEnsureDirFinished(const Response &response, const CommandContainer &commandContainer, const QVariant &extraData);
     void
@@ -143,6 +147,15 @@ private:
 
     void failSync(const QString &error);
     void finishSync();
+    void fetchFullList();
+    void sendSyncCheck(qint64 lastSyncSecs);
+    void autoSyncSoon();
+    [[nodiscard]] bool canAutoRun() const;
+    void onDebounceTimeout();
+    void onWatchedPathChanged(const QString &path);
+    void refreshWatcher();
+    void refreshInterval();
+    [[nodiscard]] DeckSyncProfile buildProfile() const;
     void collectServerFiles(const ServerInfo_DeckStorage_Folder &folder,
                             const QString &prefix,
                             QMap<QString, ServerFile> &files,
@@ -180,7 +193,9 @@ private:
     QString uniqueLocalPath(const QString &relativePath) const;
 
     AbstractClient *client = nullptr;
-    DeckSyncProfile profile;
+    QString serverHost;
+    int serverPort = 0;
+    QString serverUsername;
     QString deckPath;
     ColorIdentityProvider colorIdentityProvider;
     bool syncing = false;
@@ -196,6 +211,13 @@ private:
     QMap<QString, ServerFile> stashedServerFiles;
     ActiveConflict activeConflict;
     DeckSyncMode syncMode = DeckSyncMode::TwoWay;
+    QFileSystemWatcher *watcher = nullptr;
+    QTimer *debounceTimer = nullptr;
+    QTimer *intervalTimer = nullptr;
+    bool autoSyncEnabled = true;
+    int syncIntervalMinutes = 5;
+    bool offline = false;
+    qint64 pendingServerTime = -1;
     int conflictDefault = DeckSyncConflictAsk;
     int sessionDefault = -1;
     bool firstSyncRun = false;

@@ -1,0 +1,11 @@
+syntax = "proto2";
+import "session_commands.proto";
+
+message Command_DeckSyncCheck {
+    extend SessionCommand {
+        optional Command_DeckSyncCheck ext = 1034;
+    }
+    // Seconds since Unix epoch of the client's last completed sync.
+    // 0 means "never synced": the server reports every stored row.
+    optional uint64 last_sync_time = 1 [default = 0];
+}
