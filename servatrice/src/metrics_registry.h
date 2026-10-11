@@ -7,7 +7,7 @@
 #define METRICS_REGISTRY_H
 
 #include <QList>
-#include <QString>
+#include <QtGlobal>
 #include <array>
 #include <atomic>
 

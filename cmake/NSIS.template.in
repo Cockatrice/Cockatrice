@@ -21,6 +21,13 @@ Var IsUpgrade
 Var AbortReason
 Var WaitPid
 Var LauncherExited
+Var InstallLogPath
+Var LogHandle
+Var LogMessage
+Var LogFindHandle
+Var LogFindName
+Var LogMatchLabel
+Var LogMatchPattern
 
 !include LogicLib.nsh
 !include FileFunc.nsh
@@ -64,7 +71,66 @@ Page Custom PortableModePageCreate PortableModePageLeave
 
 !insertmacro MUI_LANGUAGE English
 
+; Installer log
+; Every run appends a step-by-step trace to a file so a failed upgrade on a
+; user's machine can be diagnosed after the fact. Kept in $TEMP rather than in
+; $INSTDIR because the previous version's uninstaller removes the whole install
+; directory part-way through an upgrade. Read it back with:
+;   notepad %TEMP%\Cockatrice-installer.log
+!macro CockLog text
+    Push "${text}"
+    Call CockLogWrite
+!macroend
+
+Function CockLogWrite
+    Pop $LogMessage
+    FileOpen $LogHandle "$InstallLogPath" a
+    ${If} $LogHandle == ""
+        Return
+    ${EndIf}
+    ; FileOpen places the pointer at the start of the file in every mode, so
+    ; 'a' alone would overwrite the log from the beginning on each line. Seek
+    ; past the existing content first to actually append.
+    FileSeek $LogHandle 0 END
+    FileWrite $LogHandle "$LogMessage$\r$\n"
+    FileClose $LogHandle
+FunctionEnd
+
+; Logs every file matching $INSTDIR\<mask>. Used to record the DLL inventory
+; before and after the upgrade purge, which is what shows whether Qt6Gui.dll was
+; on disk and what (if anything) survived the deletes.
+!macro CockLogListing label mask
+    Push "${label}"
+    Push "$INSTDIR\${mask}"
+    Call CockLogListing
+!macroend
+
+Function CockLogListing
+    Pop $LogMatchPattern
+    Pop $LogMatchLabel
+    !insertmacro CockLog "listing [$LogMatchLabel] pattern=$LogMatchPattern"
+    FindFirst $LogFindHandle $LogFindName "$LogMatchPattern"
+    ${If} $LogFindHandle == ""
+        !insertmacro CockLog "listing [$LogMatchLabel] (no matches)"
+        Return
+    ${EndIf}
+    log_listing_loop:
+        !insertmacro CockLog "listing [$LogMatchLabel] $LogFindName"
+        ClearErrors
+        FindNext $LogFindHandle $LogFindName
+        IfErrors 0 log_listing_loop
+    FindClose $LogFindHandle
+FunctionEnd
+
 Function .onInit
+
+StrCpy $InstallLogPath "$TEMP\Cockatrice-installer.log"
+; Start each run from a clean file so the log that gets sent back is the last
+; run, not every past run glued together.
+FileOpen $LogHandle "$InstallLogPath" w
+FileClose $LogHandle
+!insertmacro CockLog "=================================================================="
+!insertmacro CockLog "installer start: @CPACK_PACKAGE_NAME@ @CPACK_PACKAGE_VERSION@"
 
 ${If} ${NSIS_IS_64_BIT} == 1    #NSIS 64bit
     ${IfNot} ${RunningX64}
@@ -158,6 +224,13 @@ ${EndIf}
 ; Now that $PortableMode reflects reality, commit InstDir into the correct slot
 Call SetModeDestinationFromInstdir
 
+!insertmacro CockLog "options: InstDir=$InstDir PortableMode=$PortableMode ReinstallMode=$ReinstallMode WaitPid=$WaitPid"
+${If} ${Silent}
+    !insertmacro CockLog "options: running silently"
+${Else}
+    !insertmacro CockLog "options: interactive"
+${EndIf}
+
 ; Wait for the process that launched this installer to exit before anything is
 ; replaced or deleted. It goes first because it is the one check here that needs
 ; no powershell.exe: on a machine where the process lookup cannot run at all, the
@@ -175,12 +248,14 @@ Call SetModeDestinationFromInstdir
 ; interactive installs the section re-checks after the directory page, when
 ; $INSTDIR is the directory the user actually picked.
 ${If} $ReinstallMode = 1
+    !insertmacro CockLog "reinstall: waiting for launcher and other instances"
     Call WaitForLauncherToExit
     Call EnsureAppsNotRunning
 ${EndIf}
 
 ${If} $ReinstallMode = 1
 ${AndIf} $PortableMode = 0
+    !insertmacro CockLog "reinstall: auto-uninstalling previous version"
     Call AutoUninstallIfNeeded
 ${EndIf}
 
@@ -226,13 +301,22 @@ Function AutoUninstallIfNeeded
 
 SetShellVarContext all
 
+; _?=$INSTDIR keeps the old uninstaller running in place. An NSIS uninstaller
+; normally copies itself to %TEMP% and runs from there so that it can delete its
+; own directory, and the process we started exits at once. ExecWait then returns
+; before the uninstall has run, and the temp copy's "RMDir /r $INSTDIR" executes
+; while the section below is still writing the new payload. _?= disables the copy
+; and makes ExecWait block until the uninstall finishes. It must be the last
+; argument and must not be quoted, even when the path contains spaces.
+;
 ; --- 32-bit uninstall ---
 SetRegView 32
 ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "QuietUninstallString"
 
+!insertmacro CockLog "uninstall (32-bit): '$R0 _?=$INSTDIR'"
 StrCmp $R0 "" done32
 DetailPrint "Removing previous version (32-bit)..."
-ExecWait '$R0'
+ExecWait '$R0 _?=$INSTDIR'
 
 done32:
 
@@ -241,9 +325,10 @@ ${If} ${RunningX64}
     SetRegView 64
     ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "QuietUninstallString"
 
+    !insertmacro CockLog "uninstall (64-bit): '$R0 _?=$INSTDIR'"
     StrCmp $R0 "" done64
     DetailPrint "Removing previous version (64-bit)..."
-    ExecWait '$R0'
+    ExecWait '$R0 _?=$INSTDIR'
 
     done64:
 ${EndIf}
@@ -360,6 +445,7 @@ Function WaitForAppToClose
     ; usage: set $R1 to the display name (e.g. "cockatrice.exe") and $R2 to the
     ; base image name (e.g. "cockatrice")
     Call IsAppRunning
+    !insertmacro CockLog "guard $R1: state=$R0 (dir=$GuardDir)"
     ; Only a definite "running" is worth waiting for. "Not running" is done, and
     ; "could not determine" must not keep the installer waiting on an answer it
     ; will never get - but it cannot simply be waved through either, see
@@ -384,6 +470,7 @@ Function WaitForAppToClose
         Sleep 500
         Call IsAppRunning
         ${If} $R0 = 0
+            !insertmacro CockLog "guard $R1: closed gracefully"
             DetailPrint "$R1 closed."
             Return
         ${EndIf}
@@ -402,6 +489,7 @@ Function WaitForAppToClose
         ; deck, and nothing has been replaced yet, so aborting just defers the
         ; update and preserves the user's data.
         ${If} $AllowForceClose = 0
+            !insertmacro CockLog "guard $R1: still running after 60s, aborting (no force close)"
             DetailPrint "$R1 is still running after 60 s; aborting the update so that no data is lost."
             StrCpy $AbortReason \
                 "$R1 did not close within 60 seconds, so the installation was aborted to avoid losing unsaved data.$\r$\n$\r$\nPlease close $R1 and run the installer again."
@@ -410,11 +498,13 @@ Function WaitForAppToClose
         ; Oracle and Servatrice are console applications: CloseMainWindow()
         ; returned false for them and waiting longer cannot help. They hold no
         ; unsaved user data, so stop them by PID.
+        !insertmacro CockLog "guard $R1: still running after 60s, force-stopping"
         DetailPrint "Force-stopping $R1 ..."
         Call ForceCloseApps
         Sleep 2000
         Call IsAppRunning
         ${If} $R0 = 0
+            !insertmacro CockLog "guard $R1: force-stopped"
             DetailPrint "$R1 closed."
             Return
         ${EndIf}
@@ -422,6 +512,7 @@ Function WaitForAppToClose
             Call HandleUnknownAppState
             Return
         ${EndIf}
+        !insertmacro CockLog "guard $R1: could not be stopped, aborting"
         DetailPrint "$R1 is still running after 60 s; aborting the update."
         StrCpy $AbortReason \
             "$R1 could not be stopped, so the installation was aborted.$\r$\n$\r$\nPlease close $R1 and run the installer again."
@@ -486,8 +577,16 @@ FunctionEnd
 ; Only the first of those two gets a dialog; the second reports through the log
 ; and the exit code.
 Function AbortInstall
-    ${IfNot} ${Silent}
-        MessageBox MB_OK|MB_ICONEXCLAMATION "$AbortReason"
+    !insertmacro CockLog "ABORT: $AbortReason"
+    !insertmacro CockLog "full installer log: $InstallLogPath"
+    ; Show a dialog whenever someone is at the keyboard to see it: an interactive
+    ; install, or the in-app updater's /R upgrade. The /R upgrade is silent, but
+    ; the client that launched the installer has already quit, so the user is
+    ; still there. Only a /S install without /R is attended by a package manager
+    ; and must go straight to the exit code.
+    ${If} $ReinstallMode = 1
+    ${OrIfNot} ${Silent}
+        MessageBox MB_OK|MB_ICONEXCLAMATION "$AbortReason$\r$\n$\r$\nA detailed installer log was written to:$\r$\n$InstallLogPath"
     ${EndIf}
     SetErrorLevel 1
     Abort
@@ -510,17 +609,33 @@ FunctionEnd
 ; falls back to the name based guard.
 Function WaitForLauncherToExit
     StrCpy $LauncherExited 0
+    !insertmacro CockLog "wait-launcher: pid='$WaitPid'"
     ${If} $WaitPid == ""
+        !insertmacro CockLog "wait-launcher: no pid given, falling back to name check"
         Return
     ${EndIf}
     ; PROCESS_SYNCHRONIZE is the only access this needs - enough to wait on the
     ; handle, and the least likely to be refused for a reason that has nothing to
     ; do with the upgrade.
+    ;
+    ; System.dll maps its output registers so that .rN writes $N and .RN writes
+    ; $RN. The caller reads $R0/$R1, so the uppercase .RN form is required; the
+    ; original .r0/.r1 wrote $0/$1 and left $R1 empty, which made the "did not
+    ; exit" test below compare "" against "0" and abort on every /PID= upgrade.
     ClearErrors
-    System::Call 'kernel32::OpenProcess(i 0x00100000, i 0, i $WaitPid) p.r0'
+    System::Call 'kernel32::OpenProcess(i 0x00100000, i 0, i $WaitPid) p.R0'
+    ; OpenProcess returns a null handle for a process that is already gone. The
+    ; System plugin does not raise the NSIS error flag from a called function's
+    ; return value, so ${Errors} alone never saw that case and the null handle was
+    ; passed straight to WaitForSingleObject. Fold a plugin failure into the same
+    ; null-handle case instead of reading a handle that was never written.
     ${If} ${Errors}
+        StrCpy $R0 0
+    ${EndIf}
+    ${If} $R0 == 0
     ; The launcher is gone - OpenProcess cannot open a dead process - which is
     ; exactly the state the wait was for.
+        !insertmacro CockLog "wait-launcher: already exited"
         DetailPrint "The application that started this installer has already exited."
         StrCpy $LauncherExited 1
         Return
@@ -529,14 +644,16 @@ Function WaitForLauncherToExit
     ; Same 60 s grace period the name based check uses, so a client that is slow
     ; to flush its card database does not get less room than it used to.
     ; WAIT_OBJECT_0 is 0; WAIT_TIMEOUT is 258 and a failed wait reports 0xFFFFFFFF.
-    System::Call 'kernel32::WaitForSingleObject(p r0, i 60000) i.r1'
-    System::Call 'kernel32::CloseHandle(p r0)'
+    System::Call 'kernel32::WaitForSingleObject(p R0, i 60000) i.R1'
+    System::Call 'kernel32::CloseHandle(p R0)'
     ${If} $R1 != 0
+        !insertmacro CockLog "wait-launcher: did not exit within 60s (wait=$R1)"
         DetailPrint "The application that started this installer did not exit within 60 s."
         StrCpy $AbortReason \
             "The application that started this update has not exited yet, so the installation was cancelled rather than replace files it is still using.$\r$\n$\r$\nPlease close Cockatrice and run the installer again."
         Call AbortInstall
     ${EndIf}
+    !insertmacro CockLog "wait-launcher: launcher exited"
     DetailPrint "The application that started this installer has exited."
     StrCpy $LauncherExited 1
 FunctionEnd
@@ -562,9 +679,11 @@ FunctionEnd
 Function GuardAppsNotRunning
     ; usage: set $GuardDir to the directory to guard, then call this
     Call IsProcessLookupAvailable
+    !insertmacro CockLog "guard: powershell available=$R0 dir=$GuardDir launcherExited=$LauncherExited"
     ${If} $R0 = 0
         ; Without PowerShell we cannot tell whether a running instance is
         ; holding locks on the files we are about to replace.
+        !insertmacro CockLog "guard: powershell unavailable, skipping instance check"
         DetailPrint "Could not start powershell.exe; skipping the running instance check. Close Cockatrice, Oracle and Servatrice manually if the installation reports a problem."
         ; On a silent upgrade that used to be a warning and nothing more, which
         ; left the very process that launched the installer free to go on
@@ -587,7 +706,8 @@ Function GuardAppsNotRunning
         ${EndIf}
         ; The user has to be told to close the applications by hand, but a /S
         ; install without /R is unattended and would block on this forever.
-        ${IfNot} ${Silent}
+        ${If} $ReinstallMode = 1
+        ${OrIfNot} ${Silent}
             MessageBox MB_OK|MB_ICONEXCLAMATION "This installer could not check whether Cockatrice is still running, because powershell.exe could not be started.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice manually before continuing."
         ${EndIf}
         Return
@@ -633,7 +753,11 @@ Function IsExistingCockatriceInstall
     ; there to prove that it is one. Every Qt module Cockatrice links is part of
     ; the payload, so match them all: probing only Qt6Core.dll would miss a
     ; directory where that one file happened to be deletable and the others
-    ; were not.
+    ; were not. Qt6*.dll rather than *.dll on purpose: this function decides
+    ; whether a directory is ours, and a folder that merely holds some DLLs of
+    ; its own must not be purged. Qt6*.dll is enough even when only the protobuf
+    ; runtime survived, because the whole Qt set is mapped by the same process
+    ; that maps abseil_dll.dll and so is locked or free with it.
     StrCpy $R3 "Qt6*.dll"
     Call CheckStaleRuntimeMask
     ${If} ${FileExists} "$INSTDIR\qt.conf"
@@ -645,36 +769,23 @@ FunctionEnd
 ; the purge. NSIS silently skips whatever it cannot delete, so one surviving file
 ; is enough to prove that something still holds a lock on the install directory.
 ;
-; The masks below have to cover the purge above one for one. A check that only
-; probed named files could not see a locked Qt6Multimedia.dll or a Plugins
-; directory the purge was unable to remove, so the exact files that broke the
-; install were also the ones this check was blind to.
+; Any DLL at all counts, not a list of expected ones. The purge removes every
+; top-level DLL, so after it has run the only DLL that can still be there is one
+; it failed to delete, whatever its name. A mask per library family (Qt, then
+; OpenSSL, then zlib) is what let abseil_dll.dll through: it is in neither the
+; purge nor this check, so it survived a 3.0.2 to 3.1 update untouched, the new
+; executables were written next to it, and the client then failed to start with
+; "abseil_dll.dll is either not designed to run on Windows or it contains an
+; error". Probing *.dll has no list to fall out of date when the next
+; transitive dependency appears.
 Function HasStaleRuntimeFiles
     StrCpy $R0 0
-    StrCpy $R3 "Qt*.dll"
+    StrCpy $R3 "*.dll"
     Call CheckStaleRuntimeMask
-    StrCpy $R3 "libcrypto*.dll"
-    Call CheckStaleRuntimeMask
-    StrCpy $R3 "libssl*.dll"
-    Call CheckStaleRuntimeMask
-    StrCpy $R3 "zlib*.dll"
-    Call CheckStaleRuntimeMask
-    StrCpy $R3 "icu*.dll"
-    Call CheckStaleRuntimeMask
-    StrCpy $R3 "libeay32.dll"
-    Call CheckStaleRuntimeMask
-    StrCpy $R3 "ssleay32.dll"
-    Call CheckStaleRuntimeMask
-    ${If} $R0 = 1
-        Return
-    ${EndIf}
-    ${If} ${FileExists} "$INSTDIR\libmysql.dll"
-        StrCpy $R0 1
-        Return
-    ${EndIf}
     ; IfFileExists takes wildcards, so a Plugins directory the purge could not
     ; remove counts as a leftover too.
     ${If} ${FileExists} "$INSTDIR\Plugins\*.*"
+        !insertmacro CockLog "stale-runtime: Plugins directory survived the purge"
         StrCpy $R0 1
     ${EndIf}
 FunctionEnd
@@ -687,6 +798,7 @@ Function CheckStaleRuntimeMask
     ${EndIf}
     FindFirst $StaleFindHandle $StaleFindName "$INSTDIR\$R3"
     ${If} $StaleFindHandle != ""
+        !insertmacro CockLog "stale-runtime: '$StaleFindName' matched $R3 in $INSTDIR"
         StrCpy $R0 1
         FindClose $StaleFindHandle
     ${EndIf}
@@ -925,9 +1037,10 @@ ${If} $PortableMode = 0
     ; directory before letting it delete anything. The uninstall string is
     ; stashed away first, the check works on $R0.
     StrCpy $OldUninstallString $R0
+    !insertmacro CockLog "componentsPagePre: old 32-bit uninstall '$OldUninstallString _?=$INSTDIR'"
     Call EnsureOldInstallNotRunning
     ClearErrors
-    ExecWait "$OldUninstallString"
+    ExecWait "$OldUninstallString _?=$INSTDIR"
 
 	done32:
 
@@ -947,9 +1060,10 @@ ${If} $PortableMode = 0
 
 	    uninst64:
 	    StrCpy $OldUninstallString $R0
+	    !insertmacro CockLog "componentsPagePre: old 64-bit uninstall '$OldUninstallString _?=$INSTDIR'"
 	    Call EnsureOldInstallNotRunning
 	    ClearErrors
-	    ExecWait "$OldUninstallString"
+	    ExecWait "$OldUninstallString _?=$INSTDIR"
 
 		done64:
 	${EndIf}
@@ -964,15 +1078,19 @@ Section "Application" SecApplication
 SetShellVarContext all
 SetOutPath "$INSTDIR"
 
+!insertmacro CockLog "section: InstDir=$INSTDIR PortableMode=$PortableMode ReinstallMode=$ReinstallMode"
+
 ; No application instance may be running while any file below is deleted or
 ; replaced: both upgrade blocks start by removing the old executables and
 ; runtime DLLs, and NSIS silently skips whatever is locked, which is how an
-; install ends up with a mix of old and new Qt DLLs next to the new executable
-; ("The procedure entry point X could not be located in the dynamic link
-; library ...Qt6Network.dll"). So the check has to come before the first
-; Delete/RMDir and not after it - an interactive install into an existing
-; portable directory with cockatrice.exe still running would otherwise delete
-; the old files under its feet.
+; install ends up with a mix of old and new runtimes next to the new executable.
+; The next start then fails with "The procedure entry point X could not be
+; located in the dynamic link library ...Qt6Network.dll" for the Qt ones, or
+; "abseil_dll.dll is either not designed to run on Windows or it contains an
+; error" for the protobuf ones. So the check has to come before the first
+; Delete/RMDir and not after it: an interactive install into an existing portable
+; directory with cockatrice.exe still running would otherwise delete the old
+; files under its feet.
 ;
 ; It is skipped on the /R path: .onInit already ran it before
 ; AutoUninstallIfNeeded removed the previous installation, so by the time this
@@ -987,6 +1105,8 @@ ${EndIf}
 ${If} $PortableMode = 1
 ${AndIf} ${FileExists} "$INSTDIR\portable.dat"
 	; upgrade portable mode
+	!insertmacro CockLog "section: portable upgrade purge"
+	!insertmacro CockLogListing "before-portable-purge" "*.dll"
 	RMDir /r "$INSTDIR\plugins"
 	RMDir /r "$INSTDIR\sounds"
 	RMDir /r "$INSTDIR\themes"
@@ -995,24 +1115,24 @@ ${AndIf} ${FileExists} "$INSTDIR\portable.dat"
 	Delete "$INSTDIR\cockatrice.exe"
 	Delete "$INSTDIR\oracle.exe"
 	Delete "$INSTDIR\servatrice.exe"
-	Delete "$INSTDIR\Qt*.dll"
-	Delete "$INSTDIR\libmysql.dll"
-	Delete "$INSTDIR\icu*.dll"
-	Delete "$INSTDIR\libcrypto*.dll"
-	Delete "$INSTDIR\libssl*.dll"
-	Delete "$INSTDIR\libeay32.dll"
-	Delete "$INSTDIR\ssleay32.dll"
+	; Every top-level DLL, not a list of expected ones. The payload is written
+	; after this block, so a DLL the new build still needs is put straight back;
+	; what this has to guarantee is that nothing from the previous build is left
+	; to be loaded next to the new executables. Naming the families by hand is
+	; what let abseil_dll.dll through; see HasStaleRuntimeFiles.
+	Delete "$INSTDIR\*.dll"
 	Delete "$INSTDIR\qt.conf"
 	Delete "$INSTDIR\qdebug.txt"
 	Delete "$INSTDIR\servatrice.sql"
 	Delete "$INSTDIR\servatrice.ini.example"
-	Delete "$INSTDIR\zlib*.dll"
 	RMDir "$INSTDIR"
+	!insertmacro CockLogListing "after-portable-purge" "*.dll"
 ${EndIf}
 
 ; Remove any runtime DLLs left over from older versions, so a mismatched
-; Qt/OpenSSL set cannot survive next to the new executables.
+; Qt/OpenSSL/protobuf set cannot survive next to the new executables.
 Call IsExistingCockatriceInstall
+!insertmacro CockLog "section: IsExistingCockatriceInstall=$R0"
 ; Remembered because the stale-runtime check below must only ever fire for a
 ; directory this installer recognised as a Cockatrice install. Scanning for
 ; leftovers in an unrelated directory (a first-time install into a folder that
@@ -1021,48 +1141,48 @@ Call IsExistingCockatriceInstall
 StrCpy $IsUpgrade $R0
 ${If} $PortableMode = 0
 ${AndIf} $R0 = 1
+	!insertmacro CockLog "section: non-portable upgrade purge"
+	!insertmacro CockLogListing "before-purge" "*.dll"
 	RMDir /r "$INSTDIR\Plugins"
-	Delete "$INSTDIR\Qt*.dll"
-	Delete "$INSTDIR\libcrypto*.dll"
-	Delete "$INSTDIR\libssl*.dll"
-	Delete "$INSTDIR\zlib*.dll"
-	Delete "$INSTDIR\libmysql.dll"
-	Delete "$INSTDIR\icu*.dll"
-	Delete "$INSTDIR\libeay32.dll"
-	Delete "$INSTDIR\ssleay32.dll"
+	Delete "$INSTDIR\*.dll"
+	!insertmacro CockLogListing "after-purge" "*.dll"
+	!insertmacro CockLogListing "after-plugins" "Plugins\*.*"
 ${EndIf}
 
-; Whatever was locked during the purge - by an instance that started while the
+; Whatever was locked during the purge (by an instance that started while the
 ; installer was running, or because the running instance check could not be
-; performed at all - is still on disk, and the new executables are about to be
+; performed at all) is still on disk, and the new executables are about to be
 ; written next to it. That mix is exactly what makes the next start fail with
 ; "The procedure entry point X could not be located in the dynamic link library
-; ...Qt6QuickWidgets.dll" or "The code execution cannot proceed because
-; Qt6Multimedia.dll was not found", so stop here instead of compounding it.
-; Nothing of the new payload has been written at this point, so the next run -
-; with the applications closed - gets a clean install.
+; ...Qt6QuickWidgets.dll", "The code execution cannot proceed because
+; Qt6Multimedia.dll was not found", or "abseil_dll.dll is either not designed to
+; run on Windows or it contains an error", so stop here instead of compounding
+; it. Nothing of the new payload has been written at this point, so the next run,
+; with the applications closed, gets a clean install.
 ${If} $IsUpgrade = 1
     Call HasStaleRuntimeFiles
+    !insertmacro CockLog "section: HasStaleRuntimeFiles=$R0"
 ${Else}
     StrCpy $R0 0
 ${EndIf}
 ${If} $R0 = 1
+    !insertmacro CockLog "section: aborting, files of a previous version survived the purge"
     DetailPrint "Files of a previous version could not be removed; aborting the installation."
     ; The in-app updater runs this installer silent and detached and never looks
     ; at its exit code, so the user has to be told what happened. A /S install
-    ; without /R is unattended - a package manager, for instance - and a message
+    ; without /R is unattended (a package manager, for instance) and a message
     ; box there would block forever, so that case only reports through the log
-    ; and the exit code.
-    ${IfNot} ${Silent}
-        MessageBox MB_OK|MB_ICONEXCLAMATION \
-            "The installation could not remove all files of a previous version of Cockatrice, most likely because it is still running or was started as administrator, and was cancelled rather than leave a mismatched install behind.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice and run the installer again."
-    ${EndIf}
-    SetErrorLevel 1
-    Abort
+    ; and the exit code. AbortInstall owns that decision.
+    StrCpy $AbortReason \
+        "The installation could not remove all files of a previous version of Cockatrice, most likely because it is still running or was started as administrator, and was cancelled rather than leave a mismatched install behind.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice and run the installer again."
+    Call AbortInstall
 ${EndIf}
 
 @CPACK_NSIS_EXTRA_PREINSTALL_COMMANDS@
+!insertmacro CockLog "section: writing payload to $INSTDIR"
 @CPACK_NSIS_FULL_INSTALL@
+!insertmacro CockLog "section: payload written"
+!insertmacro CockLogListing "final" "Qt6*.dll"
 
 ${If} $PortableMode = 0
 	WriteUninstaller "$INSTDIR\uninstall.exe"
@@ -1126,6 +1246,7 @@ ${If} $ReinstallMode = 1
         Exec '"$INSTDIR\cockatrice.exe"'
 ${EndIf}
 
+!insertmacro CockLog "section: application install complete"
 SectionEnd
 
 Section "Start menu item" SecStartMenu

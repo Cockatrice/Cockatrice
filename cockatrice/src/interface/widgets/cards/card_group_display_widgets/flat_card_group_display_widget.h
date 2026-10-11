@@ -10,6 +10,16 @@
 #include "../../general/layout_containers/flow_widget.h"
 #include "card_group_display_widget.h"
 
+#include <QPersistentModelIndex>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
+
+class CardSizeWidget;
+class DeckListModel;
+class QItemSelectionModel;
+class QWidget;
+
 class FlatCardGroupDisplayWidget : public CardGroupDisplayWidget
 {
     Q_OBJECT

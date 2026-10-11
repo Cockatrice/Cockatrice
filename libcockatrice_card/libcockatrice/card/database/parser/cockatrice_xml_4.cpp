@@ -1,22 +1,44 @@
 #include "cockatrice_xml_4.h"
 
 #include "../../relation/card_relation.h"
+#include "libcockatrice/card/database/card_database_data.h"
+#include "libcockatrice/card/database/parser/card_database_parser.h"
+#include "libcockatrice/card/lazy_properties_hash.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/relation/card_relation_type.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/interfaces/interface_card_preference_provider.h"
 
 #include <QCoreApplication>
+#include <QDate>
+#include <QDateTime>
 #include <QDebug>
 #include <QFile>
+#include <QIODevice>
+#include <QList>
+#include <QMap>
+#include <QMessageLogger>
+#include <QSharedPointer>
+#include <QStringList>
+#include <QStringView>
+#include <QXmlStreamAttribute>
+#include <QXmlStreamAttributes>
 #include <QXmlStreamReader>
+#include <QXmlStreamWriter>
 #include <libcockatrice/card/format/format_legality_rules.h>
+#include <qnamespace.h>
+#include <utility>
 #include <version_string.h>
+
+class ICardSetPriorityController;
 
 #define COCKATRICE_XML4_TAGNAME "cockatrice_carddatabase"
 #define COCKATRICE_XML4_TAGVER 4
 #define COCKATRICE_XML4_SCHEMALOCATION                                                                                 \
     "https://raw.githubusercontent.com/Cockatrice/Cockatrice/master/doc/carddatabase_v4/cards.xsd"
 
-CockatriceXml4Parser::CockatriceXml4Parser(ICardPreferenceProvider *_cardPreferenceProvider,
-                                           ICardSetPriorityController *_cardSetPriorityController)
-    : ICardDatabaseParser(_cardSetPriorityController), cardPreferenceProvider(_cardPreferenceProvider)
+CockatriceXml4Parser::CockatriceXml4Parser(ICardSetPriorityController *_cardSetPriorityController)
+    : ICardDatabaseParser(_cardSetPriorityController)
 {
 }
 
@@ -261,7 +283,6 @@ QHash<QString, QString> CockatriceXml4Parser::loadCardPropertiesFromXml(QXmlStre
 
 void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
 {
-    bool includeRebalancedCards = cardPreferenceProvider->getIncludeRebalancedCards();
     while (!xml.atEnd()) {
         if (xml.readNext() == QXmlStreamReader::EndElement) {
             break;
@@ -363,17 +384,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                             printingProps.insert(attrName, attr.value().toString());
                         }
                         PrintingInfo printingInfo(set, LazyPropertiesHash(printingProps));
-
-                        // This is very much a hack and not the right place to
-                        // put this check, as it requires a reload of Cockatrice
-                        // to be apply.
-                        //
-                        // However, this is also true of the `set->getEnabled()`
-                        // check above (which is currently bugged as well), so
-                        // we'll fix both at the same time.
-                        if (includeRebalancedCards || printingInfo.getProperty("isRebalanced") != "true") {
-                            _sets[setName].append(printingInfo);
-                        }
+                        _sets[setName].append(printingInfo);
                     }
                     // related cards
                 } else if (xmlName == "related" || xmlName == "reverse-related") {

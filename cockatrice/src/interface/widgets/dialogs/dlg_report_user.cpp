@@ -1,21 +1,31 @@
 #include "dlg_report_user.h"
 
 #include "abstract_client.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
 
 #include <QComboBox>
 #include <QDialogButtonBox>
+#include <QFont>
 #include <QFontDatabase>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QLabel>
+#include <QLatin1String>
 #include <QLineEdit>
+#include <QList>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSharedPointer>
 #include <QTextEdit>
 #include <QVBoxLayout>
+#include <QVariant>
 #include <libcockatrice/protocol/pb/command_report.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/report_categories.h>
+#include <qnamespace.h>
+#include <string>
+
+class QWidget;
 
 DlgReportUser::DlgReportUser(AbstractClient *_client,
                              const QString &_reportedUser,

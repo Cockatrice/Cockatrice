@@ -1,9 +1,19 @@
 #include "deck_preview_tag_display_widget.h"
 
+#include <QBrush>
+#include <QColor>
+#include <QFlags>
+#include <QFont>
 #include <QFontMetrics>
 #include <QHBoxLayout>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPen>
+#include <QRect>
+#include <QSize>
+#include <QSizePolicy>
+#include <algorithm>
+#include <qnamespace.h>
 
 DeckPreviewTagDisplayWidget::DeckPreviewTagDisplayWidget(QWidget *parent, const QString &_tagName)
     : QWidget(parent), tagName(_tagName), state(TagState::NotSelected)

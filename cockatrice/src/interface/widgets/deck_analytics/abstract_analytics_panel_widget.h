@@ -3,12 +3,16 @@
 
 #include "../general/display/banner_widget.h"
 
-#include <QDialog>
 #include <QJsonObject>
-#include <QVBoxLayout>
+#include <QString>
 #include <QWidget>
+#include <qtmetamacros.h>
 
 class DeckListStatisticsAnalyzer;
+class QDialog;
+class QHBoxLayout;
+class QPushButton;
+class QVBoxLayout;
 
 class AbstractAnalyticsPanelWidget : public QWidget
 {

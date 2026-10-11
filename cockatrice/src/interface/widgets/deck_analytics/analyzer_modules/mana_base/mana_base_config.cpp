@@ -1,5 +1,9 @@
 #include "mana_base_config.h"
 
+#include <QJsonArray>
+#include <QJsonValue>
+#include <QJsonValueRef>
+
 QJsonObject ManaBaseConfig::toJson() const
 {
     QJsonObject jsonObject;

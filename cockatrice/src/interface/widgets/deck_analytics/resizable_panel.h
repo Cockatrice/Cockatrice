@@ -1,19 +1,15 @@
 #ifndef COCKATRICE_RESIZABLE_PANEL_H
 #define COCKATRICE_RESIZABLE_PANEL_H
 
-#include "abstract_analytics_panel_widget.h"
-
-#include <QApplication>
-#include <QDrag>
-#include <QFrame>
-#include <QMimeData>
-#include <QMouseEvent>
-#include <QPushButton>
-#include <QScrollArea>
-#include <QScrollBar>
-#include <QTimer>
-#include <QVBoxLayout>
+#include <QPoint>
+#include <QString>
 #include <QWidget>
+#include <qtmetamacros.h>
+
+class AbstractAnalyticsPanelWidget;
+class QFrame;
+class QPushButton;
+class QTimer;
 
 class ResizablePanel : public QWidget
 {

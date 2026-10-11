@@ -1,6 +1,12 @@
 #include "sideboard_plan.h"
 
+#include "libcockatrice/protocol/pb/move_card_to_zone.pb.h"
+
+#include <QSharedPointer>
+#include <QStringView>
 #include <QXmlStreamReader>
+#include <QXmlStreamWriter>
+#include <string>
 
 namespace
 {

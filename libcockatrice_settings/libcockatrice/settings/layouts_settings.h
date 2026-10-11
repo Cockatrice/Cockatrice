@@ -9,7 +9,11 @@
 
 #include "settings_manager.h"
 
-#include <QSize>
+#include <QByteArray>
+#include <QString>
+#include <qtmetamacros.h>
+
+class QObject;
 
 class LayoutsSettings : public SettingsManager
 {

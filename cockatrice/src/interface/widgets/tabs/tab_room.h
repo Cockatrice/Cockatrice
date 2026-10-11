@@ -8,16 +8,21 @@
 #ifndef TAB_ROOM_H
 #define TAB_ROOM_H
 
-#include "../interface/widgets/utility/line_edit_completer.h"
 #include "tab.h"
 
-#include <QFocusEvent>
-#include <QGroupBox>
+#include <QList>
 #include <QMap>
-#include <QStringListModel>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
 
 class UserListProxy;
-class UserListManager;
+class QAction;
+class QGroupBox;
+class QMenu;
+class QStringListModel;
+class TabSupervisor;
+
 namespace google
 {
 namespace protobuf
@@ -30,12 +35,9 @@ class UserListWidget;
 class UserListPanelWidget;
 class QLabel;
 class ChatView;
-class QPushButton;
-class QTextTable;
 class QCompleter;
 class RoomEvent;
 class ServerInfo_Room;
-class ServerInfo_Game;
 class Event_ListGames;
 class Event_JoinRoom;
 class Event_LeaveRoom;

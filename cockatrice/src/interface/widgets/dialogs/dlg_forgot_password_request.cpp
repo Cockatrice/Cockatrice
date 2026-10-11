@@ -4,11 +4,15 @@
 
 #include <QDialogButtonBox>
 #include <QGridLayout>
-#include <QHBoxLayout>
+#include <QIntValidator>
 #include <QLabel>
 #include <QMessageBox>
+#include <QSize>
+#include <QVBoxLayout>
 #include <libcockatrice/settings/servers_settings.h>
 #include <libcockatrice/utility/string_limits.h>
+
+class QWidget;
 
 DlgForgotPasswordRequest::DlgForgotPasswordRequest(QWidget *parent) : QDialog(parent)
 {

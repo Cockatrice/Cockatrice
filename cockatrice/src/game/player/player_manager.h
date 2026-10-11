@@ -7,12 +7,17 @@
 #ifndef COCKATRICE_PLAYER_MANAGER_H
 #define COCKATRICE_PLAYER_MANAGER_H
 
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+
 #include <QMap>
 #include <QObject>
+#include <QString>
 #include <libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h>
+#include <qtmetamacros.h>
 
 class AbstractGame;
 class PlayerLogic;
+
 class PlayerManager : public QObject
 {
     Q_OBJECT

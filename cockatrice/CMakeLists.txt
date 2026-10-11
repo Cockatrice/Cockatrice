@@ -140,6 +140,10 @@ set(cockatrice_SOURCES
     src/game_graphics/zones/view_zone.cpp
     src/game_graphics/zones/view_zone_widget.cpp
     src/game_graphics/board/abstract_graphics_item.cpp
+    src/interface/card_database_update/card_database_update_status_bar.cpp
+    src/interface/card_database_update/card_database_update_status_bar.h
+    src/interface/card_database_update/card_update_progress.cpp
+    src/interface/card_database_update/card_update_progress.h
     src/interface/card_picture_loader/card_picture_loader.cpp
     src/interface/card_picture_loader/card_picture_loader_local.cpp
     src/interface/card_picture_loader/card_picture_loader_request_status_display_widget.cpp
@@ -687,7 +691,7 @@ if(WIN32)
   # import table, and the glob above only sees DLLs that were already copied next
   # to the executable. Qt6::Concurrent is linked but never imported - QtConcurrent::run
   # and QFutureWatcher are header-only in Qt 6 - so neither step ships
-  # Qt6Concurrent.dll, even though required-qt-runtime.txt lists it and the
+  # Qt6Concurrent.dll, even though required-runtime.txt lists it and the
   # Windows package check then fails on a package that is fine to run.
   # Qt6::ShaderTools is skipped for the same reason.
   #

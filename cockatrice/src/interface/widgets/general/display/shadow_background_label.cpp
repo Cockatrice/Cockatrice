@@ -1,7 +1,13 @@
 #include "shadow_background_label.h"
 
-#include <QPaintEvent>
+#include <QColor>
+#include <QMargins>
 #include <QPainter>
+#include <QRect>
+#include <QSizePolicy>
+#include <qnamespace.h>
+
+class QWidget;
 
 /**
  * @class ShadowBackgroundLabel

@@ -1,7 +1,15 @@
 #include "overlap_layout.h"
 
 #include <QDebug>
+#include <QLayoutItem>
+#include <QMargins>
+#include <QMessageLogger>
+#include <QRect>
+#include <QWidget>
+#include <QWidgetItem>
+#include <QtGlobal>
 #include <QtMath>
+#include <limits.h>
 
 /**
  * @class OverlapLayout

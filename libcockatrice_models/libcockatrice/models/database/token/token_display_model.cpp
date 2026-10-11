@@ -1,6 +1,12 @@
 #include "token_display_model.h"
 
 #include "../card_database_model.h"
+#include "card_database_display_model.h"
+#include "libcockatrice/card/card_info.h"
+
+#include <QSortFilterProxyModel>
+
+class QObject;
 
 TokenDisplayModel::TokenDisplayModel(QObject *parent) : CardDatabaseDisplayModel(parent)
 {

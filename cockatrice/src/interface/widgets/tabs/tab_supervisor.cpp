@@ -2,14 +2,27 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../../../game/abstract_game.h"
+#include "../../../game/game_event_handler.h"
+#include "../../../game/game_meta_info.h"
+#include "../../deck_loader/loaded_deck.h"
+#include "../../intents/contexts/context_connect_to_server.h"
+#include "../../intents/contexts/context_join_game.h"
+#include "../../intents/contexts/context_join_room.h"
+#include "../../intents/intent.h"
 #include "../../intents/intent_join_server_game.h"
 #include "../interface/pixel_map_generator.h"
 #include "../interface/widgets/server/game_link.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
-#include "../interface/widgets/server/user/user_list_widget.h"
 #include "../main.h"
+#include "abstract_tab_deck_editor.h"
 #include "api/archidekt/tab_archidekt.h"
+#include "api/edhrec/tab_edhrec.h"
 #include "api/edhrec/tab_edhrec_main.h"
+#include "latency_tracker.h"
+#include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_gametype.pb.h"
+#include "tab.h"
 #include "tab_account.h"
 #include "tab_admin.h"
 #include "tab_card_art_rules.h"
@@ -27,14 +40,31 @@
 #include "tab_room.h"
 #include "tab_server.h"
 #include "tab_visual_database_display.h"
+#include "user_level.h"
 #include "visual_deck_editor/tab_deck_editor_visual.h"
-#include "visual_deck_editor/tab_deck_editor_visual_tab_widget.h"
 #include "visual_deck_storage/tab_deck_storage_visual.h"
 
+#include <QAction>
 #include <QApplication>
+#include <QCloseEvent>
+#include <QCommonStyle>
+#include <QDebug>
+#include <QFlag>
+#include <QIcon>
+#include <QListIterator>
+#include <QMapIterator>
+#include <QMenu>
 #include <QMessageBox>
+#include <QMessageLogger>
+#include <QObject>
 #include <QPainter>
+#include <QRect>
+#include <QSharedPointer>
+#include <QStringLiteral>
+#include <QStyle>
+#include <QStyleOption>
 #include <QSystemTrayIcon>
+#include <QTabBar>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/network/client/remote/remote_client.h>
 #include <libcockatrice/protocol/pb/event_game_joined.pb.h>
@@ -45,11 +75,16 @@
 #include <libcockatrice/protocol/pb/room_event.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_room.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
-#include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/chat_settings.h>
 #include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/tabs_settings.h>
+#include <memory>
+#include <qnamespace.h>
+#include <string>
+#include <utility>
+
+class QWidget;
 
 QRect MacOSTabFixStyle::subElementRect(SubElement element, const QStyleOption *option, const QWidget *widget) const
 {

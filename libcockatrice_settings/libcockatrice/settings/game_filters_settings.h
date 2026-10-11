@@ -10,6 +10,13 @@
 
 #include "settings_manager.h"
 
+#include <QString>
+#include <QStringList>
+#include <QTime>
+#include <qtmetamacros.h>
+
+class QObject;
+
 class GameFiltersSettings : public SettingsManager
 {
     Q_OBJECT

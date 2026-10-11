@@ -7,12 +7,13 @@
 #ifndef DLG_CONNECT_H
 #define DLG_CONNECT_H
 
-#include "../interface/widgets/server/handle_public_servers.h"
-#include "../interface/widgets/server/user/user_info_connection.h"
-
 #include <QDialog>
 #include <QLineEdit>
+#include <QMap>
+#include <QString>
 #include <libcockatrice/utility/macros.h>
+#include <qtmetamacros.h>
+#include <utility>
 
 class QCheckBox;
 class QComboBox;
@@ -23,6 +24,9 @@ class QLabel;
 class QPushButton;
 class QRadioButton;
 class QVBoxLayout;
+class HandlePublicServers;
+class QWidget;
+class UserConnection_Information;
 
 class DlgConnect : public QDialog
 {

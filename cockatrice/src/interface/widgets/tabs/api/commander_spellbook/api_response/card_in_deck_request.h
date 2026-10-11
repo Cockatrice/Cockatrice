@@ -1,6 +1,7 @@
 #ifndef COCKATRICE_CARD_IN_DECK_REQUEST_H
 #define COCKATRICE_CARD_IN_DECK_REQUEST_H
 #include <QJsonObject>
+#include <QString>
 
 struct CardInDeckRequest
 {

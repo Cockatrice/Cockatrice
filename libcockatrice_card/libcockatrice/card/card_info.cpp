@@ -1,20 +1,16 @@
 #include "card_info.h"
 
 #include "game_specific_terms.h"
+#include "libcockatrice/card/lazy_properties_hash.h"
 #include "printing/printing_info.h"
 #include "relation/card_relation.h"
 #include "set/card_set.h"
 
-#include <QDir>
+#include <QHashIterator>
 #include <QRegularExpression>
 #include <QSharedPointer>
 #include <QString>
-#include <algorithm>
 #include <utility>
-
-class CardRelation;
-class CardSet;
-class CardInfo;
 
 using CardInfoPtr = QSharedPointer<CardInfo>;
 

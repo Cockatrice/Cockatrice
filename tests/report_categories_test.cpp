@@ -3,6 +3,7 @@
 #include <QString>
 #include <QStringList>
 #include <libcockatrice/utility/report_categories.h>
+#include <string>
 
 TEST(ReportCategoriesTest, CanonicalListIsNonEmptyAndStable)
 {

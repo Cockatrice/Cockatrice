@@ -1,7 +1,10 @@
 #include "paths_settings.h"
 
-#include <QDir>
-#include <QFile>
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QVariant>
+
+class QObject;
 
 PathsSettings::PathsSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "paths.ini", "paths", QString(), parent)

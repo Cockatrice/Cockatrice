@@ -9,6 +9,12 @@
 
 #include "settings_manager.h"
 
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
+
+class QObject;
+
 class RecentsSettings : public SettingsManager
 {
     Q_OBJECT

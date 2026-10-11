@@ -17,9 +17,12 @@
 #define VISUAL_DECK_STORAGE_FOLDER_DISPLAY_WIDGET_H
 
 #include <QHash>
+#include <QList>
 #include <QSet>
 #include <QString>
+#include <QStringList>
 #include <QWidget>
+#include <qtmetamacros.h>
 
 class BannerWidget;
 class DeckPreviewWidget;

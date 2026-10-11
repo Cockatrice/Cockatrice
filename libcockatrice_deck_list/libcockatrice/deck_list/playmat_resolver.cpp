@@ -1,6 +1,12 @@
 #include "playmat_resolver.h"
 
+#include "libcockatrice/deck_list/deck_list.h"
+#include "libcockatrice/interfaces/interface_interface_settings_provider.h"
+#include "libcockatrice/utility/card_ref.h"
+
+#include <QList>
 #include <QRandomGenerator>
+#include <QString>
 
 PlaymatInfo resolveEffectivePlaymat(const DeckList &deck,
                                     const PlaymatInfo &force,

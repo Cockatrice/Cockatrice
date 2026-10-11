@@ -1,21 +1,37 @@
 #include "../../oracle/src/oracleimporter.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/set/card_set.h"
 
 #include "gtest/gtest.h"
 #include <QBuffer>
+#include <QByteArray>
+#include <QChar>
 #include <QCoreApplication>
 #include <QDebug>
 #include <QElapsedTimer>
 #include <QEventLoop>
 #include <QFile>
+#include <QIODevice>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonValue>
+#include <QJsonValueRef>
+#include <QList>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QObject>
+#include <QSharedPointer>
+#include <QString>
 #include <QTimer>
 #include <QUrl>
+#include <QtGlobal>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
+#include <qlogging.h>
+#include <qsystemdetection.h>
+#include <string>
+#include <utility>
 
 #if defined(HAS_LZMA)
 #include "../../oracle/src/lzma/decompress.h"
@@ -46,12 +62,10 @@ static QByteArray buildSyntheticData(int numSets, int cardsPerSet)
             card["colors"] = QJsonArray{"W"};
             card["colorIdentity"] = QJsonArray{"W"};
             card["types"] = QJsonArray{"Creature"};
-            // Real MTGJSON types: floats and booleans, not strings. This
+            // Real MTGJSON types: floats, not strings. This
             // exercises the QVariant coercion in the property reader.
             card["convertedManaCost"] = 1.0;
             card["manaValue"] = 1.0;
-            card["isOnlineOnly"] = false;
-            card["isRebalanced"] = false;
 
             QJsonObject legalities;
             legalities["standard"] = "legal";

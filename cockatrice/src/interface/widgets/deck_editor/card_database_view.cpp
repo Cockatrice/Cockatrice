@@ -1,17 +1,35 @@
 #include "card_database_view.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../key_signals.h"
 #include "card_database_display_model.h"
 #include "card_database_model.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_querier.h"
 
+#include <QAbstractItemModel>
+#include <QAction>
 #include <QApplication>
+#include <QByteArray>
 #include <QClipboard>
+#include <QFlags>
 #include <QHeaderView>
+#include <QItemSelectionModel>
+#include <QList>
 #include <QMenu>
+#include <QModelIndex>
+#include <QModelIndexList>
+#include <QPoint>
+#include <QSharedPointer>
+#include <QVariant>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/deck_list/tree/inner_deck_list_node.h>
 #include <libcockatrice/settings/layouts_settings.h>
+#include <qnamespace.h>
+#include <utility>
+
+class QWidget;
 
 static bool canBeCommander(const CardInfo &cardInfo)
 {

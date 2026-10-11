@@ -1,7 +1,11 @@
 #include "archidekt_deck_preview_image_display_widget.h"
 
-#include <QFontMetrics>
-#include <QPainter>
+#include "../../../../general/display/shadow_background_label.h"
+
+#include <QFont>
+#include <QLabel>
+#include <QString>
+#include <qnamespace.h>
 
 ArchidektDeckPreviewImageDisplayWidget::ArchidektDeckPreviewImageDisplayWidget(QWidget *parent) : QWidget(parent)
 {

@@ -6,6 +6,7 @@
 #include <QString>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/card/database/card_database_querier.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 
 namespace CardLocalization

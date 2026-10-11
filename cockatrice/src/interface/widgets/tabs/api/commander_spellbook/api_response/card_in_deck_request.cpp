@@ -1,5 +1,7 @@
 #include "card_in_deck_request.h"
 
+#include <QJsonValue>
+
 CardInDeckRequest CardInDeckRequest::fromJson(const QJsonObject &json)
 {
     CardInDeckRequest request;

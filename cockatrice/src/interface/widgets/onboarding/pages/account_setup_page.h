@@ -3,8 +3,11 @@
 
 #include "../first_run_wizard_page.h"
 
+#include <qtmetamacros.h>
+
 class QLabel;
 class QPushButton;
+class QWidget;
 
 /** @brief First-run account step. Does NOT embed DlgRegister's fields: they exist
  *         to be handed to ConnectionController's network registration flow, which

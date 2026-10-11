@@ -1,11 +1,15 @@
 #include "interface/theme_manager.h"
 
+#include <QByteArray>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QIODevice>
 #include <QString>
+#include <QStringLiteral>
 #include <QTemporaryDir>
 #include <gtest/gtest.h>
+#include <string>
 
 // Owned by main.cpp in the real application; pixel_map_generator.cpp references
 // it, so the test binary needs a definition even though it never renders.

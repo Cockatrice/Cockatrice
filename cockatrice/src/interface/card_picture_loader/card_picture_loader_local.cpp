@@ -2,11 +2,21 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "card_picture_loader_local_schemes.h"
-#include "card_picture_to_load.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
 
+#include <QDebug>
+#include <QDir>
 #include <QDirIterator>
-#include <QMovie>
-#include <libcockatrice/card/database/card_database_manager.h>
+#include <QFileInfo>
+#include <QImageReader>
+#include <QList>
+#include <QMessageLogger>
+#include <QSharedPointer>
+#include <QStringList>
+#include <QTimer>
 #include <libcockatrice/settings/paths_settings.h>
 
 static constexpr int REFRESH_INTERVAL_MS = 10 * 1000;

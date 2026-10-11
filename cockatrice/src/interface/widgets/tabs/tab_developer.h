@@ -9,6 +9,10 @@
 
 #include "tab.h"
 
+#include <QString>
+#include <QtGlobal>
+#include <qtmetamacros.h>
+
 class AbstractClient;
 class QCheckBox;
 class QLabel;
@@ -17,6 +21,7 @@ class QSpinBox;
 class QTableWidget;
 class QTimer;
 class Response;
+class TabSupervisor;
 
 class TabDeveloper : public Tab
 {

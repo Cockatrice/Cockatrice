@@ -1,6 +1,11 @@
 #include "deck_color_identity.h"
 
+#include "libcockatrice/card/card_info.h"
+
+#include <QChar>
+#include <QList>
 #include <QSet>
+#include <QStringList>
 #include <libcockatrice/card/database/card_database_querier.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/tree/inner_deck_list_node.h>

@@ -6,6 +6,11 @@
 #include "../utility/completer_utils.h"
 #include "card_database_display_model.h"
 #include "card_database_model.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
 #include "playmat_preview_widget.h"
 
 #include <QCheckBox>
@@ -15,14 +20,18 @@
 #include <QDoubleSpinBox>
 #include <QFormLayout>
 #include <QGroupBox>
-#include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
-#include <QPainter>
-#include <QPainterPath>
+#include <QList>
 #include <QPushButton>
+#include <QSharedPointer>
+#include <QSignalBlocker>
+#include <QSize>
 #include <QVBoxLayout>
+#include <QVariant>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/utility/card_ref.h>
+#include <qnamespace.h>
 
 PlaymatSettingsDialog::PlaymatSettingsDialog(const CardRef &initialCard,
                                              const PlaymatParams &initialParams,

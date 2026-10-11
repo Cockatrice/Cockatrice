@@ -2,9 +2,14 @@
 #define COCKATRICE_XML3_H
 
 #include "card_database_parser.h"
+#include "libcockatrice/card/card_info.h"
 
 #include <QLoggingCategory>
-#include <QXmlStreamReader>
+#include <QString>
+#include <qtmetamacros.h>
+
+class ICardSetPriorityController;
+class QXmlStreamReader;
 
 inline Q_LOGGING_CATEGORY(CockatriceXml3Log, "cockatrice_xml.xml_3_parser");
 

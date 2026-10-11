@@ -1,5 +1,13 @@
 #include "cards_display_settings.h"
 
+#include "libcockatrice/card/card_localization.h"
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QSharedPointer>
+#include <QVariant>
+
+class QObject;
+
 CardsDisplaySettings::CardsDisplaySettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "cards_display.ini", "cards", QString(), parent)
 {
@@ -33,11 +41,6 @@ int CardsDisplaySettings::getPrintingSelectorSortOrder() const
 int CardsDisplaySettings::getPrintingSelectorCardSize() const
 {
     return getValue("printingSelector", "cards", "cardSize", 100).toInt();
-}
-
-bool CardsDisplaySettings::getIncludeRebalancedCards() const
-{
-    return getValue("includerebalancedcards", QString(), QString(), true).toBool();
 }
 
 bool CardsDisplaySettings::getPrintingSelectorNavigationButtonsVisible() const
@@ -157,15 +160,6 @@ void CardsDisplaySettings::setPrintingSelectorCardSize(int _printingSelectorCard
 {
     setValue(_printingSelectorCardSize, "printingSelector", "cards", "cardSize");
     emit printingSelectorCardSizeChanged();
-}
-
-void CardsDisplaySettings::setIncludeRebalancedCards(bool _includeRebalancedCards)
-{
-    if (_includeRebalancedCards == getIncludeRebalancedCards()) {
-        return;
-    }
-    setValue(_includeRebalancedCards, "includerebalancedcards");
-    emit includeRebalancedCardsChanged(_includeRebalancedCards);
 }
 
 void CardsDisplaySettings::setPrintingSelectorNavigationButtonsVisible(bool _navigationButtonsVisible)

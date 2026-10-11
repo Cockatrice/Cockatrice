@@ -1,11 +1,22 @@
 #include "hand_counter.h"
 
+#include "../game/board/card_list.h"
+#include "../game/zones/card_zone_logic.h"
 #include "../interface/pixel_map_generator.h"
-#include "zones/card_zone.h"
 
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
+#include <QPixmap>
 #include <QPixmapCache>
+#include <QRectF>
+#include <QSize>
+#include <QSizeF>
+#include <QString>
+#include <QStringLiteral>
+#include <QTransform>
+#include <qnamespace.h>
+
+class QGraphicsItem;
 
 HandCounter::HandCounter(QGraphicsItem *parent) : AbstractGraphicsItem(parent), number(0)
 {

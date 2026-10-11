@@ -22,28 +22,63 @@
 
 #include "deck_tag_serialization.h"
 #include "email_parser.h"
+#include "libcockatrice/protocol/pb/admin_commands.pb.h"
+#include "libcockatrice/protocol/pb/developer_commands.pb.h"
+#include "libcockatrice/protocol/pb/moderator_commands.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_deck_share_item.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_deck_share_summary.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_replay_match.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_report.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_warning.pb.h"
+#include "libcockatrice/protocol/pb/session_commands.pb.h"
+#include "libcockatrice/protocol/pb/session_event.pb.h"
+#include "libcockatrice/utility/card_ref.h"
 #include "main.h"
+#include "metrics_registry.h"
 #include "servatrice.h"
 #include "servatrice_database_interface.h"
+#include "server.h"
+#include "server_database_interface.h"
 #include "server_logger.h"
+#include "server_protocolhandler.h"
 #include "settingscache.h"
 #include "version_string.h"
 
+#include <QChar>
+#include <QCryptographicHash>
 #include <QDateTime>
 #include <QDebug>
 #include <QElapsedTimer>
 #include <QHostAddress>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonValueRef>
+#include <QListIterator>
 #include <QLoggingCategory>
+#include <QMap>
+#include <QMessageLogger>
+#include <QMetaObject>
+#include <QMetaType>
+#include <QMutexLocker>
+#include <QNetworkRequest>
 #include <QRandomGenerator>
-#include <QRegularExpression>
+#include <QReadLocker>
+#include <QReadWriteLock>
+#include <QSharedPointer>
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QString>
+#include <QStringLiteral>
+#include <QTextStream>
+#include <QVariant>
+#include <QtGlobal>
 #include <algorithm>
-#include <game/server_player.h>
+#include <exception>
 #include <google/protobuf/descriptor.h>
+#include <google/protobuf/repeated_ptr_field.h>
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/stubs/port.h>
+#include <initializer_list>
 #include <iostream>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/protocol/get_pb_extension.h>
@@ -86,8 +121,6 @@
 #include <libcockatrice/protocol/pb/event_remove_from_list.pb.h>
 #include <libcockatrice/protocol/pb/event_replay_added.pb.h>
 #include <libcockatrice/protocol/pb/event_server_identification.pb.h>
-#include <libcockatrice/protocol/pb/event_server_message.pb.h>
-#include <libcockatrice/protocol/pb/event_user_joined.pb.h>
 #include <libcockatrice/protocol/pb/event_user_message.pb.h>
 #include <libcockatrice/protocol/pb/response_ban_history.pb.h>
 #include <libcockatrice/protocol/pb/response_card_art_rule_entry.pb.h>
@@ -132,15 +165,25 @@
 #include <libcockatrice/utility/report_categories.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <libcockatrice/utility/warning_categories.h>
+#include <memory>
+#include <qlogging.h>
+#include <qnamespace.h>
 #include <server_response_containers.h>
 #include <server_room.h>
+#include <stddef.h>
 #include <string>
+#include <utility>
+
+class QObject;
 
 inline Q_LOGGING_CATEGORY(AbstractServerSocketInterfaceLog, "abstract_server_socket_interface");
 inline Q_LOGGING_CATEGORY(TcpServerSocketInterfaceLog, "tcp_server_socket_interface");
 inline Q_LOGGING_CATEGORY(WebsocketServerSocketInterfaceLog, "websocket_server_socket_interface");
 
 static const int protocolVersion = 14;
+
+// Maximum size of a single TCP protocol message. Matches the websocket limit.
+static const int MAX_TCP_MESSAGE_SIZE = 1500000;
 
 AbstractServerSocketInterface::AbstractServerSocketInterface(Servatrice *_server,
                                                              Servatrice_DatabaseInterface *_databaseInterface,
@@ -4225,13 +4268,21 @@ void TcpServerSocketInterface::readClient()
                                 (((quint32)(unsigned char)inputBuffer[1]) << 16) +
                                 (((quint32)(unsigned char)inputBuffer[2]) << 8) +
                                 ((quint32)(unsigned char)inputBuffer[3]);
+                // Reject implausible lengths instead of buffering until they arrive.
+                // This also handles lengths that overflow into negative int values.
+                if (messageLength < 0 || messageLength > MAX_TCP_MESSAGE_SIZE) {
+                    qCWarning(TcpServerSocketInterfaceLog)
+                        << "Invalid message length" << messageLength << "from" << getAddress();
+                    prepareDestroy();
+                    return;
+                }
                 inputBuffer.remove(0, 4);
                 messageInProgress = true;
             } else {
                 return;
             }
         }
-        if (inputBuffer.size() < messageLength || messageLength < 0) {
+        if (inputBuffer.size() < messageLength) {
             return;
         }
 
@@ -4337,10 +4388,15 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
 
     QByteArray websocketIPHeader = settingsCache->value("server/web_socket_ip_header", "").toByteArray();
     if (websocketIPHeader.length() > 0 && socket->request().hasRawHeader(websocketIPHeader)) {
-        QString header(socket->request().rawHeader(websocketIPHeader));
-        QHostAddress parsed(header);
-        if (!parsed.isNull()) {
-            address = parsed;
+        // Only trust the forwarded header if the connection itself comes from a trusted proxy,
+        // otherwise a client could spoof its address to bypass bans and rate limits.
+        QString trustedSources = settingsCache->value("security/trusted_sources", "127.0.0.1,::1").toString();
+        if (trustedSources.contains(socket->peerAddress().toString(), Qt::CaseInsensitive)) {
+            QString header(socket->request().rawHeader(websocketIPHeader));
+            QHostAddress parsed(header);
+            if (!parsed.isNull()) {
+                address = parsed;
+            }
         }
     }
 

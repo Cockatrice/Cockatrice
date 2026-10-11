@@ -1,32 +1,63 @@
 #include "view_zone_widget.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "../../client/translation.h"
 #include "../../filters/syntax_help.h"
+#include "../../game/board/card_list.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
+#include "../../game/zones/card_zone_logic.h"
+#include "../../game/zones/view_zone_logic.h"
 #include "../../interface/pixel_map_generator.h"
-#include "../board/card_item.h"
-#include "../game_scene.h"
+#include "../card_dimensions.h"
 #include "../z_values.h"
+#include "libcockatrice/utility/macros.h"
 #include "view_zone.h"
 
+#include <QAction>
 #include <QCheckBox>
+#include <QCloseEvent>
+#include <QDebug>
+#include <QEvent>
+#include <QFlags>
+#include <QFrame>
+#include <QGraphicsItem>
+#include <QGraphicsLayout>
 #include <QGraphicsLinearLayout>
 #include <QGraphicsProxyWidget>
+#include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsSceneResizeEvent>
 #include <QGraphicsView>
-#include <QLabel>
-#include <QPainter>
+#include <QIcon>
+#include <QObject>
+#include <QRect>
 #include <QScrollBar>
+#include <QSizeF>
+#include <QSizePolicy>
+#include <QString>
+#include <QStringLiteral>
 #include <QStyle>
 #include <QStyleOption>
+#include <QStyleOptionTitleBar>
+#include <QTimer>
+#include <QVariant>
+#include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
+#include <qnamespace.h>
 
 namespace
 {
-constexpr qreal kTitleBarHeight = 24.0;
+qreal titleBarHeight(QWidget *styleWidget)
+{
+    if (styleWidget) {
+        return static_cast<qreal>(styleWidget->style()->pixelMetric(QStyle::PM_TitleBarHeight, nullptr, styleWidget));
+    }
+    return 24.0;
+}
 constexpr qreal kMinVisibleWidth = 100.0;
 } // namespace
 
@@ -290,7 +321,8 @@ QRectF ZoneViewWidget::closeButtonRect(QWidget *styleWidget) const
 
     // query the style for the close button position (handles macOS top-left placement)
     // Title bar rect MUST be local (0,0-based) for QStyle
-    const QRect titleBarRect(0, 0, static_cast<int>(frameRectF.width()), static_cast<int>(kTitleBarHeight));
+    const qreal tbh = titleBarHeight(styleWidget);
+    const QRect titleBarRect(0, 0, static_cast<int>(frameRectF.width()), static_cast<int>(tbh));
 
     if (styleWidget) {
         QStyleOptionTitleBar opt;
@@ -319,7 +351,7 @@ QRectF ZoneViewWidget::closeButtonRect(QWidget *styleWidget) const
     }
 
     // Fallback: frame-relative top-right
-    return QRectF(frameRectF.right() - kTitleBarHeight, frameRectF.top(), kTitleBarHeight, kTitleBarHeight);
+    return QRectF(frameRectF.right() - tbh, frameRectF.top(), tbh, tbh);
 }
 
 QGraphicsView *ZoneViewWidget::findDragView(QWidget *eventWidget) const
@@ -443,8 +475,9 @@ QVariant ZoneViewWidget::itemChange(GraphicsItemChange change, const QVariant &v
 
         const qreal minX = sceneRect.left();
         const qreal maxX = qMax(minX, sceneRect.right() - kMinVisibleWidth);
-        const qreal minY = sceneRect.top() + kTitleBarHeight;
-        const qreal maxY = qMax(minY, sceneRect.bottom() - kTitleBarHeight);
+        const qreal tbh = titleBarHeight(nullptr);
+        const qreal minY = sceneRect.top() + tbh;
+        const qreal maxY = qMax(minY, sceneRect.bottom() - tbh);
 
         desiredPos.setX(qBound(minX, desiredPos.x(), maxX));
         desiredPos.setY(qBound(minY, desiredPos.y(), maxY));

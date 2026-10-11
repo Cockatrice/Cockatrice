@@ -1,25 +1,32 @@
 #ifndef ABSTRACT_PLAYER_H
 #define ABSTRACT_PLAYER_H
 
-#include "../serverinfo_user_container.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
 #include "server_abstract_participant.h"
 
 #include <QMap>
 #include <QString>
+#include <qtmetamacros.h>
 
 class CardToMove;
 class DeckList;
 class Server_Arrow;
 class Server_Card;
 class Server_CardZone;
-class Server_Counter;
 struct MoveCardStruct;
+class GameEventStorage;
+class ServerInfo_User;
+class Server_AbstractUserInterface;
+class Server_Game;
+enum CardAttribute : int;
+template <typename T> class QList;
 
 class Server_AbstractPlayer : public Server_AbstractParticipant
 {
     Q_OBJECT
 private:
     class MoveCardCompareFunctor;
+
     QMap<int, Server_Arrow *> arrows;
 
     void sendCreateTokenEvents(Server_CardZone *zone, Server_Card *card, int xCoord, int yCoord, GameEventStorage &ges);

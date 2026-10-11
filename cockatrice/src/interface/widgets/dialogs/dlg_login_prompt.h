@@ -8,9 +8,12 @@
 #define DLG_LOGIN_PROMPT_H
 
 #include <QDialog>
+#include <QString>
+#include <qtmetamacros.h>
 
 class QCheckBox;
 class QLineEdit;
+class QWidget;
 
 /**
  * @brief Small sign-in dialog used when a cockatrice:// link needs credentials

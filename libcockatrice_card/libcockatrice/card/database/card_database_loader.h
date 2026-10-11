@@ -2,12 +2,21 @@
 #define COCKATRICE_CARD_DATABASE_LOADER_H
 
 #include <QBasicMutex>
+#include <QByteArray>
 #include <QList>
 #include <QLoggingCategory>
-#include <libcockatrice/card/database/card_database_data.h>
-#include <libcockatrice/interfaces/interface_card_database_path_provider.h>
-#include <libcockatrice/interfaces/interface_card_preference_provider.h>
-#include <libcockatrice/interfaces/interface_card_set_priority_controller.h>
+#include <QObject>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
+
+class ICardDatabasePathProvider;
+class ICardSetPriorityController;
+
+// IWYU pragma: keep
+// CardDatabaseData is passed by value to the databaseDataReady() signal, so the
+// moc-generated code needs the complete type.
+#include "card_database_data.h"
 
 inline Q_LOGGING_CATEGORY(CardDatabaseLoadingLog, "card_database.loading");
 inline Q_LOGGING_CATEGORY(CardDatabaseLoadingSuccessOrFailureLog, "card_database.loading.success_or_failure");
@@ -49,12 +58,10 @@ public:
      * @param parent QObject parent.
      * @param db Pointer to the CardDatabase to populate (non-owning).
      * @param pathProvider Provider for card database file paths.
-     * @param preferenceProvider Optional card preference provider for pinned printings.
      */
     explicit CardDatabaseLoader(QObject *parent,
                                 CardDatabase *db,
                                 ICardDatabasePathProvider *pathProvider,
-                                ICardPreferenceProvider *preferenceProvider,
                                 ICardSetPriorityController *_priorityController);
 
     /** @brief Destructor cleans up allocated parsers. */
@@ -66,9 +73,13 @@ public slots:
      *
      * Runs synchronously on the calling thread.  The caller should ensure
      * that any signal receivers are already connected before invoking this.
+     * @param ignoreCache Skip the binary cache lookup and re-parse the source
+     *        files from disk, refreshing the cache afterwards. Used for
+     *        explicit reloads so that edits the source hash cannot see are
+     *        still picked up.
      * @return Status of the main database load.
      */
-    LoadStatus loadCardDatabases();
+    LoadStatus loadCardDatabases(bool ignoreCache = false);
 
     /**
      * @brief Loads a single card database file into the given snapshot.
@@ -121,9 +132,10 @@ private:
 
     /**
      * @brief Performs the actual load work synchronously on the calling thread.
+     * @param ignoreCache Skip the binary cache lookup and re-parse from disk.
      * @return Status of the main database load.
      */
-    LoadStatus doLoadCardDatabases();
+    LoadStatus doLoadCardDatabases(bool ignoreCache);
 
     /**
      * @brief Collects custom card database paths recursively.

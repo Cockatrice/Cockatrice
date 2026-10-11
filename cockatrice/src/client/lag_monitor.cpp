@@ -1,7 +1,10 @@
 #include "lag_monitor.h"
 
+#include <QApplication>
 #include <QCoreApplication>
+#include <QDateTime>
 #include <QEvent>
+#include <QMessageLogger>
 #include <QTimer>
 
 LagMonitor::LagMonitor(QObject *parent) : QObject(parent)

@@ -21,21 +21,25 @@
 #define SERVERGAME_H
 
 #include "../server_response_containers.h"
-#include "game_config.h"
-#include "server_deck_validation_strategy.h"
-#include "server_game_lifecycle_strategy.h"
-#include "server_match_result_strategy.h"
+#include "libcockatrice/protocol/pb/game_event_context.pb.h"
 
+// IWYU pragma: keep
+// ServerInfo_Game is passed by value to the gameInfoChanged() signal, so the
+// moc-generated code needs the complete type.
 #include <QDateTime>
+#include <QList>
 #include <QMap>
-#include <QMutex>
 #include <QObject>
+#include <QRecursiveMutex>
 #include <QScopedPointer>
 #include <QSet>
-#include <QStringList>
+#include <QString>
+#include <QtGlobal>
+#include <atomic>
 #include <libcockatrice/protocol/pb/event_leave.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
+#include <qtmetamacros.h>
 
 class QTimer;
 class GameEventContainer;
@@ -47,6 +51,17 @@ class ServerInfo_User;
 class ServerInfo_Game;
 class Server_AbstractUserInterface;
 class Event_GameStateChanged;
+class Server_DeckValidationStrategy;
+class Server_GameLifecycleStrategy;
+class Server_MatchResultStrategy;
+namespace google
+{
+namespace protobuf
+{
+class Message;
+} // namespace protobuf
+} // namespace google
+struct GameConfig;
 
 class Server_Game : public QObject
 {

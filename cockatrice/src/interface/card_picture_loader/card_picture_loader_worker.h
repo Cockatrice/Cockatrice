@@ -1,21 +1,25 @@
 #ifndef PICTURE_LOADER_WORKER_H
 #define PICTURE_LOADER_WORKER_H
 
-#include "card_picture_loader_local.h"
-#include "card_picture_loader_worker_work.h"
-#include "card_picture_to_load.h"
-
-#include <QDateTime>
 #include <QHash>
 #include <QLoggingCategory>
-#include <QMutex>
-#include <QNetworkAccessManager>
-#include <QNetworkDiskCache>
 #include <QObject>
+#include <QPair>
 #include <QQueue>
+#include <QSet>
+#include <QString>
 #include <QTimer>
-#include <libcockatrice/card/card_info.h>
-#include <libcockatrice/card/database/card_database.h>
+#include <QUrl>
+#include <qtmetamacros.h>
+
+class CardPictureLoaderLocal;
+class ExactCard;
+class QDateTime;
+class QImage;
+class QNetworkAccessManager;
+class QNetworkDiskCache;
+class QNetworkReply;
+class QThread;
 
 #define REDIRECT_HEADER_NAME "redirects"
 #define REDIRECT_ORIGINAL_URL "original"

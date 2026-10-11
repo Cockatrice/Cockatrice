@@ -1,5 +1,7 @@
 #include "passwordhasher.h"
 
+#include <QByteArray>
+#include <QChar>
 #include <QCryptographicHash>
 #include <libcockatrice/utility/cryptoutil.h>
 

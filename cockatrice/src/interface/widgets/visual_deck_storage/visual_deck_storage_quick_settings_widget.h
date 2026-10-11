@@ -11,11 +11,14 @@
 
 #include "../quick_settings/settings_button_widget.h"
 
+#include <qtmetamacros.h>
+
 class CardSizeWidget;
 class QLabel;
 class QSpinBox;
 class QCheckBox;
 class QComboBox;
+class QWidget;
 
 class VisualDeckStorageQuickSettingsWidget : public SettingsButtonWidget
 {

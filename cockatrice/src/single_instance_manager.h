@@ -1,10 +1,12 @@
 #ifndef COCKATRICE_SINGLE_INSTANCE_MANAGER_H
 #define COCKATRICE_SINGLE_INSTANCE_MANAGER_H
 
-#include <QDataStream>
-#include <QDebug>
-#include <QLocalServer>
-#include <QLocalSocket>
+#include <QObject>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
+
+class QLocalServer;
 
 class SingleInstanceManager : public QObject
 {

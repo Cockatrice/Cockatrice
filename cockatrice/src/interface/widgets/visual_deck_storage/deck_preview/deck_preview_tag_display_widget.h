@@ -7,10 +7,12 @@
 #ifndef DECK_PREVIEW_TAG_DISPLAY_WIDGET_H
 #define DECK_PREVIEW_TAG_DISPLAY_WIDGET_H
 
-#include <QLabel>
-#include <QPushButton>
 #include <QString>
 #include <QWidget>
+#include <qtmetamacros.h>
+
+class QLabel;
+class QPushButton;
 
 enum class TagState
 {

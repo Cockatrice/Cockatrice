@@ -1,16 +1,26 @@
 #include "card_database.h"
 
 #include "../relation/card_relation.h"
-#include "card_database_manager.h"
-#include "parser/cockatrice_xml_4.h"
+#include "libcockatrice/card/database/card_database_data.h"
+#include "libcockatrice/card/database/card_database_loader.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/database/parser/card_database_parser.h"
+#include "libcockatrice/card/format/format_legality_rules.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/card/set/card_set_list.h"
 
-#include <QCryptographicHash>
 #include <QDebug>
-#include <QDirIterator>
-#include <QFile>
-#include <QRegularExpression>
-#include <algorithm>
+#include <QList>
+#include <QMessageLogger>
+#include <QMetaType>
+#include <QMutexLocker>
+#include <QSharedPointer>
 #include <utility>
+
+class ICardDatabasePathProvider;
+class ICardPreferenceProvider;
+class ICardSetPriorityController;
 
 CardDatabase::CardDatabase(QObject *parent,
                            ICardPreferenceProvider *prefs,
@@ -23,7 +33,7 @@ CardDatabase::CardDatabase(QObject *parent,
     qRegisterMetaType<CardDatabaseData>("CardDatabaseData");
 
     // create loader and wire it up
-    loader = new CardDatabaseLoader(this, this, pathProvider, prefs, setPriorityController);
+    loader = new CardDatabaseLoader(this, this, pathProvider, setPriorityController);
     // re-emit loader signals (so other code doesn't need to know about internals)
     connect(loader, &CardDatabaseLoader::loadingFinished, this, &CardDatabase::cardDatabaseLoadingFinished);
     connect(loader, &CardDatabaseLoader::loadingFailed, this, &CardDatabase::cardDatabaseLoadingFailed);
@@ -68,7 +78,9 @@ void CardDatabase::loadCardDatabases()
 
 void CardDatabase::reloadCardDatabasesAndNotify()
 {
-    loadCardDatabases();
+    // An explicit reload bypasses the binary cache so the files on disk are
+    // always re-read, even when their size/mtime hash still matches the cache.
+    loadStatus = loader->loadCardDatabases(/* ignoreCache */ true);
 
     if (loadStatus == Ok) {
         checkUnknownSets();

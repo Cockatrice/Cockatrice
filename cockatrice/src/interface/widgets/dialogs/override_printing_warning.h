@@ -1,6 +1,7 @@
 #ifndef COCKATRICE_OVERRIDE_PRINTING_WARN_H
 #define COCKATRICE_OVERRIDE_PRINTING_WARN_H
-#include <QMessageBox>
+
+class QWidget;
 
 namespace OverridePrintingWarning
 {

@@ -1,5 +1,7 @@
 #include "levenshtein.h"
 
+#include <QChar>
+#include <QSharedPointer>
 #include <algorithm>
 #include <vector>
 

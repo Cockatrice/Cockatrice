@@ -1,15 +1,24 @@
 #include "color_identity_widget.h"
 
 #include "../../../../client/settings/cache_settings.h"
+#include "libcockatrice/card/card_info.h"
 #include "mana_symbol_widget.h"
 
+#include <QChar>
 #include <QHBoxLayout>
-#include <QLabel>
+#include <QLayoutItem>
+#include <QList>
+#include <QObject>
 #include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QRegularExpressionMatchIterator>
 #include <QResizeEvent>
+#include <QSharedPointer>
 #include <QSize>
+#include <QtGlobal>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
+#include <qnamespace.h>
 
 ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, const QString &_colorIdentity)
     : QWidget(parent), colorIdentity(_colorIdentity)

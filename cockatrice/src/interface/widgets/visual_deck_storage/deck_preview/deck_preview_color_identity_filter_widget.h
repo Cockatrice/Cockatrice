@@ -8,11 +8,14 @@
 
 #include "../visual_deck_storage_sort_filter_proxy_model.h"
 
-#include <QHBoxLayout>
+#include <QChar>
 #include <QMap>
-#include <QPushButton>
 #include <QSet>
 #include <QWidget>
+#include <qtmetamacros.h>
+
+class QHBoxLayout;
+class QPushButton;
 
 class DeckPreviewColorIdentityFilterWidget : public QWidget
 {

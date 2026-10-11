@@ -10,6 +10,11 @@
 #include "settings_manager.h"
 
 #include <QHash>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
+
+class QObject;
 
 class DownloadSettings : public SettingsManager
 {

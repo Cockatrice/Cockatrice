@@ -1,7 +1,10 @@
 #include "card_art_utils.h"
 
+#include "libcockatrice/card/card_info.h"
+
 #include <QTransform>
 #include <libcockatrice/card/printing/exact_card.h>
+#include <qnamespace.h>
 
 namespace CardArtUtils
 {

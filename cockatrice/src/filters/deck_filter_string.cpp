@@ -1,9 +1,27 @@
 #include "deck_filter_string.h"
 
+#include "../interface/deck_loader/loaded_deck.h"
+#include "libcockatrice/card/card_localization.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/deck_list/deck_list.h"
+#include "libcockatrice/deck_list/tree/deck_list_card_node.h"
+
+#include <QByteArray>
+#include <QDebug>
 #include <QFileInfo>
+#include <QList>
+#include <QMessageLogger>
+#include <QSharedPointer>
+#include <algorithm>
+#include <any>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/filters/filter_string.h>
 #include <libcockatrice/utility/peglib.h>
+#include <mutex>
+#include <qnamespace.h>
+#include <stddef.h>
+#include <string>
+#include <vector>
 
 static peg::parser search(R"(
 Start <- QueryPartList

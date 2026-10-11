@@ -3,7 +3,11 @@
 
 #include "settings_manager.h"
 
+#include <QString>
 #include <libcockatrice/interfaces/interface_sound_settings_provider.h>
+#include <qtmetamacros.h>
+
+class QObject;
 
 class SoundSettings : public SettingsManager, public ISoundSettingsProvider
 {

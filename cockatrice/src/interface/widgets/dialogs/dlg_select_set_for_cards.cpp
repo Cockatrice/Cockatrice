@@ -1,26 +1,59 @@
 #include "dlg_select_set_for_cards.h"
 
 #include "../../deck_loader/card_node_function.h"
-#include "../../deck_loader/deck_loader.h"
 #include "../deck_editor/deck_state_manager.h"
 #include "../interface/widgets/cards/card_info_picture_widget.h"
 #include "../interface/widgets/general/layout_containers/flow_widget.h"
+#include "deck_list_model.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
 
+#include <QBrush>
+#include <QByteArray>
 #include <QCheckBox>
+#include <QColor>
 #include <QDialogButtonBox>
+#include <QDrag>
+#include <QDragEnterEvent>
+#include <QDragMoveEvent>
+#include <QDropEvent>
+#include <QHBoxLayout>
+#include <QImage>
 #include <QLabel>
-#include <QMessageBox>
+#include <QLayoutItem>
 #include <QMimeData>
+#include <QModelIndex>
+#include <QMouseEvent>
+#include <QObject>
 #include <QPainter>
+#include <QPair>
+#include <QPixmap>
+#include <QPoint>
+#include <QPointF>
 #include <QPushButton>
+#include <QRect>
+#include <QScrollArea>
 #include <QScrollBar>
+#include <QSet>
+#include <QSharedPointer>
+#include <QSizePolicy>
 #include <QSplitter>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <QVariant>
+#include <QVector>
 #include <algorithm>
+#include <functional>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <qdrag.h>
-#include <qevent.h>
+#include <qalgorithms.h>
+#include <qnamespace.h>
+#include <qobjectdefs.h>
+#include <utility>
 
 DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckStateManager *deckStateManger)
     : QDialog(parent), deckStateManager(deckStateManger)

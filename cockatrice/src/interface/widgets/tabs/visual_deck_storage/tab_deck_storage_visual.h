@@ -10,22 +10,18 @@
 #include "../../deck_share/share_bar_widget.h"
 #include "../tab.h"
 
+#include <QList>
+#include <QString>
 #include <QStringList>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
+#include <qtmetamacros.h>
 
 struct LoadedDeck;
-class AbstractClient;
 class CommandContainer;
-class DeckPreviewWidget;
-class QFileSystemModel;
-class QGroupBox;
 class QTimer;
-class QToolBar;
-class QTreeView;
-class QTreeWidget;
-class QTreeWidgetItem;
 class Response;
 class VisualDeckStorageWidget;
+class TabSupervisor;
 
 class TabDeckStorageVisual final : public Tab
 {

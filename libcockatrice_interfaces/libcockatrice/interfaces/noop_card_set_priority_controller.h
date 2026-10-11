@@ -34,6 +34,11 @@ public:
         return {0, true, true};
     }
 
+    QStringList getEnabledSetNames() const override
+    {
+        return {};
+    }
+
     void saveSets(const QVector<SetSaveData> & /* data */) override
     {
     }

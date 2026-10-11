@@ -6,21 +6,35 @@
 
 #include "tab_developer.h"
 
+#include "libcockatrice/protocol/pb/response.pb.h"
+
+#include <QAbstractItemView>
 #include <QCheckBox>
 #include <QDateTime>
+#include <QFont>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
+#include <QList>
 #include <QPushButton>
+#include <QSharedPointer>
+#include <QSizePolicy>
 #include <QSpinBox>
 #include <QTableWidget>
+#include <QTableWidgetItem>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <QWidget>
+#include <QtGlobal>
 #include <algorithm>
+#include <google/protobuf/repeated_ptr_field.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_get_server_stats.pb.h>
 #include <libcockatrice/protocol/pb/response_get_server_stats.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <qnamespace.h>
+
+class TabSupervisor;
 
 static constexpr int DEFAULT_AUTO_REFRESH_INTERVAL_SECS = 30;
 

@@ -1,11 +1,13 @@
 #ifndef COCKATRICE_INTENT_JOIN_SERVER_ROOM_H
 #define COCKATRICE_INTENT_JOIN_SERVER_ROOM_H
 
-#include "contexts/context_join_room.h"
 #include "intent.h"
-#include "remote_client.h"
+
+#include <qtmetamacros.h>
 
 class TabSupervisor;
+class RemoteClient;
+struct ContextJoinRoom;
 
 class IntentJoinServerRoom : public Intent
 {

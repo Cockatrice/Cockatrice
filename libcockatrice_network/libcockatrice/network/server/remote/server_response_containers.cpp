@@ -1,8 +1,13 @@
 #include "server_response_containers.h"
 
 #include "game/server_game.h"
+#include "libcockatrice/protocol/pb/game_event.pb.h"
+#include "libcockatrice/protocol/pb/game_event_container.pb.h"
+#include "libcockatrice/protocol/pb/game_event_context.pb.h"
 
 #include <google/protobuf/descriptor.h>
+#include <google/protobuf/message.h>
+#include <utility>
 
 GameEventStorageItem::GameEventStorageItem(const ::google::protobuf::Message &_event,
                                            int _playerId,

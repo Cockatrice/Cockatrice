@@ -1,5 +1,7 @@
-add_executable(
+cockatrice_add_test(
+  NAME
   theme_migration_test
+  SOURCES
   ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/theme_manager.cpp
   ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/theme_config.cpp
   ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/pixel_map_generator.cpp
@@ -9,22 +11,11 @@ add_executable(
   ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network/update/client/release_channel.cpp
   ${VERSION_STRING_CPP}
   theme_migration_test.cpp
-)
-target_include_directories(theme_migration_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src)
-
-target_link_libraries(
-  theme_migration_test
+  LIBS
   libcockatrice_settings
   libcockatrice_network
   libcockatrice_network_server_remote
   libcockatrice_protocol
-  Threads::Threads
-  ${GTEST_BOTH_LIBRARIES}
-  ${TEST_QT_MODULES}
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src
 )
-
-add_test(NAME theme_migration_test COMMAND theme_migration_test)
-
-if(NOT GTEST_FOUND)
-  add_dependencies(theme_migration_test gtest)
-endif()

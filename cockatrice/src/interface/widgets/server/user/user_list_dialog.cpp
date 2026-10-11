@@ -1,17 +1,26 @@
 #include "user_list_dialog.h"
 
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+
 #include <QCheckBox>
 #include <QComboBox>
+#include <QGridLayout>
 #include <QGroupBox>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QRadioButton>
+#include <QSharedPointer>
 #include <QSpinBox>
 #include <QVBoxLayout>
+#include <QVariant>
 #include <libcockatrice/utility/string_limits.h>
+#include <qnamespace.h>
+
+class QWidget;
 
 BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent) : QDialog(parent)
 {

@@ -2,14 +2,27 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../../game/player/player_actions.h"
+#include "../../game/player/player_info.h"
 #include "../../game/player/player_logic.h"
+#include "../../game/zones/card_zone_logic.h"
+#include "../../game/zones/hand_zone_logic.h"
 #include "../../interface/theme_manager.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
+#include "../card_dimensions.h"
 
+#include <QBrush>
+#include <QList>
 #include <QPainter>
+#include <QPoint>
+#include <QPointF>
+#include <QRectF>
+#include <QString>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/settings/interface_settings.h>
+#include <string>
+
+class QGraphicsItem;
 
 HandZone::HandZone(HandZoneLogic *_logic, int _zoneHeight, QGraphicsItem *parent)
     : SelectZone(_logic, parent), zoneHeight(_zoneHeight)

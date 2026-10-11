@@ -2,7 +2,12 @@
 #define CARD_DATABASE_ACCESSOR_H
 
 #pragma once
-#include "card_database.h"
+
+class CardDatabase;
+class CardDatabaseQuerier;
+class ICardDatabasePathProvider;
+class ICardPreferenceProvider;
+class ICardSetPriorityController;
 
 /**
  * @class CardDatabaseManager

@@ -8,14 +8,25 @@
 #include "../interface/widgets/dialogs/dlg_forgot_password_reset.h"
 #include "../interface/widgets/dialogs/dlg_register.h"
 #include "../interface/widgets/utility/get_text_with_max.h"
+#include "libcockatrice/protocol/pb/event_connection_closed.pb.h"
+#include "libcockatrice/protocol/pb/event_server_shutdown.pb.h"
 
+#include <QChar>
 #include <QDateTime>
+#include <QDebug>
 #include <QLineEdit>
+#include <QList>
 #include <QMessageBox>
+#include <QPixmap>
+#include <QStringList>
+#include <QStringLiteral>
 #include <QThread>
 #include <libcockatrice/network/client/remote/remote_client.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/settings/servers_settings.h>
+#include <qnamespace.h>
+
+class QWidget;
 
 ConnectionController::ConnectionController(QWidget *dialogParent, QObject *parent)
     : QObject(parent), dialogParent(dialogParent)

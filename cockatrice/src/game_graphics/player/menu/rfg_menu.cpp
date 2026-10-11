@@ -1,10 +1,20 @@
 #include "rfg_menu.h"
 
+#include "../../../game/player/player_info.h"
+#include "../../../game/zones/pile_zone_logic.h"
+#include "../../../interface/widgets/menus/tearoff_menu.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
 #include "../player_graphics_item.h"
 
+#include <QAction>
+#include <QList>
+#include <QMenu>
+#include <QString>
+#include <QVariant>
 #include <libcockatrice/utility/zone_names.h>
+
+class QWidget;
 
 RfgMenu::RfgMenu(PlayerGraphicsItem *_player, QWidget *parent) : TearOffMenu(parent), player(_player)
 {

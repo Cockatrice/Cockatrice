@@ -7,13 +7,23 @@
 #ifndef DECK_LOADER_H
 #define DECK_LOADER_H
 
+#include "deck_file_format.h"
 #include "loaded_deck.h"
 
 #include <QLoggingCategory>
-#include <QPrinter>
-#include <QTextCursor>
-#include <libcockatrice/deck_list/deck_list.h>
+#include <QObject>
+#include <QString>
+#include <QStringList>
 #include <optional>
+#include <qtmetamacros.h>
+
+class DeckList;
+class DecklistCardNode;
+class InnerDecklistNode;
+class QPrinter;
+class QTextCursor;
+class QTextStream;
+template <typename T> class QList;
 
 inline Q_LOGGING_CATEGORY(DeckLoaderLog, "deck_loader");
 

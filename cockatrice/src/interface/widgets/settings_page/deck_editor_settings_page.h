@@ -4,10 +4,17 @@
 #include "abstract_settings_page.h"
 
 #include <QCheckBox>
-#include <QGroupBox>
 #include <QLabel>
-#include <QListWidget>
 #include <QPushButton>
+#include <QString>
+#include <qtmetamacros.h>
+
+class QAction;
+class QGroupBox;
+class QLineEdit;
+class QListWidget;
+class QListWidgetItem;
+class QModelIndex;
 
 class DeckEditorSettingsPage : public AbstractSettingsPage
 {

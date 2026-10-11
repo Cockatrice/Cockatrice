@@ -5,15 +5,19 @@
 #include "lazy_properties_hash.h"
 #include "printing/printing_info.h"
 
-#include <QDate>
+#include <QByteArray>
+#include <QChar>
 #include <QHash>
 #include <QList>
 #include <QLoggingCategory>
 #include <QMap>
 #include <QMetaType>
-#include <QMutex>
+#include <QObject>
+#include <QSet>
 #include <QSharedPointer>
-#include <QVariant>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
 #include <utility>
 
 inline Q_LOGGING_CATEGORY(CardInfoLog, "card_info");
@@ -21,7 +25,6 @@ inline Q_LOGGING_CATEGORY(CardInfoLog, "card_info");
 class CardInfo;
 class CardSet;
 class CardRelation;
-class ICardDatabaseParser;
 
 typedef QSharedPointer<CardInfo> CardInfoPtr;
 typedef QSharedPointer<CardSet> CardSetPtr;

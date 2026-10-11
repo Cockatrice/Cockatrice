@@ -7,7 +7,24 @@
 
 #include "settings_search_model.h"
 
+#include <QBrush>
+#include <QColor>
+#include <QFlags>
+#include <QFont>
+#include <QModelIndex>
 #include <QPainter>
+#include <QPalette>
+#include <QPen>
+#include <QRect>
+#include <QSize>
+#include <QStringLiteral>
+#include <QStyle>
+#include <QStyleOptionViewItem>
+#include <QVariant>
+#include <QtGlobal>
+#include <qnamespace.h>
+
+class QObject;
 
 SettingsSearchDelegate::SettingsSearchDelegate(QObject *parent) : QStyledItemDelegate(parent)
 {

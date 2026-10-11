@@ -8,8 +8,9 @@
 #ifndef PERCENT_BAR_WIDGET_H
 #define PERCENT_BAR_WIDGET_H
 
-#include <QPainter>
 #include <QWidget>
+#include <QtGlobal>
+#include <qtmetamacros.h>
 
 class PercentBarWidget : public QWidget
 {

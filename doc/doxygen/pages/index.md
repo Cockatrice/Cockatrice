@@ -1,5 +1,9 @@
 @mainpage Documentation
 
+<div align="center">
+  <img src="cockatrice_logo.svg" style="width: 300px; max-width: 100%; height: auto;">
+</div>
+
 Welcome to the Cockatrice code documentation.
 
 - @subpage user_reference

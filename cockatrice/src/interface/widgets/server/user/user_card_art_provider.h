@@ -1,12 +1,16 @@
 #ifndef COCKATRICE_USER_CARD_ART_PROVIDER_H
 #define COCKATRICE_USER_CARD_ART_PROVIDER_H
 
+#include <QList>
 #include <QMap>
 #include <QObject>
 #include <QPixmap>
 #include <QQueue>
 #include <QSet>
-#include <libcockatrice/card/printing/exact_card.h>
+#include <QString>
+#include <qtmetamacros.h>
+
+class ExactCard;
 
 class UserCardArtProvider : public QObject
 {

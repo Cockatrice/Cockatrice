@@ -14,7 +14,6 @@ public:
     [[nodiscard]] virtual bool getBumpSetsWithCardsInDeckToTop() const = 0;
     [[nodiscard]] virtual int getPrintingSelectorSortOrder() const = 0;
     [[nodiscard]] virtual int getPrintingSelectorCardSize() const = 0;
-    [[nodiscard]] virtual bool getIncludeRebalancedCards() const = 0;
     [[nodiscard]] virtual bool getPrintingSelectorNavigationButtonsVisible() const = 0;
     [[nodiscard]] virtual bool getTapAnimation() const = 0;
     [[nodiscard]] virtual bool getArrowDrawAnimation() const = 0;

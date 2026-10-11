@@ -2,11 +2,16 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../../../game/abstract_game.h"
+#include "../../../game/game_event_handler.h"
+#include "../../../game/game_meta_info.h"
+#include "../../../game/game_state.h"
+#include "../../../game/player/player_info.h"
+#include "../../../game/player/player_manager.h"
+#include "../../../game_graphics/board/abstract_card_item.h"
 #include "../game/game.h"
 #include "../game/player/player_logic.h"
 #include "../game/replay.h"
-#include "../game_graphics/board/arrow_item.h"
-#include "../game_graphics/board/card_item.h"
 #include "../game_graphics/deckview/deck_view_container.h"
 #include "../game_graphics/deckview/tabbed_deck_view_container.h"
 #include "../game_graphics/game_scene.h"
@@ -25,37 +30,48 @@
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../interface/widgets/utility/completer_utils.h"
 #include "../interface/widgets/utility/line_edit_completer.h"
-#include "../interface/window_main.h"
 #include "../main.h"
+#include "../menus/tearoff_menu.h"
+#include "../replay/replay_widget.h"
 #include "../utility/visibility_change_listener.h"
 #include "card/card_completer_proxy_model.h"
 #include "card/card_search_model.h"
 #include "card_database_display_model.h"
 #include "card_database_model.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/deck_list/deck_list.h"
+#include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h"
+#include "libcockatrice/utility/card_ref.h"
 #include "tab_supervisor.h"
 
 #include <QAction>
 #include <QApplication>
 #include <QClipboard>
+#include <QCloseEvent>
 #include <QCompleter>
 #include <QDebug>
 #include <QDockWidget>
+#include <QFlags>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QMapIterator>
 #include <QMenu>
 #include <QMessageBox>
+#include <QPoint>
 #include <QPushButton>
 #include <QRegularExpression>
+#include <QSharedPointer>
 #include <QStackedWidget>
 #include <QStringListModel>
+#include <QSystemTrayIcon>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <libcockatrice/card/database/card_database.h>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
-#include <libcockatrice/protocol/pb/event_game_joined.pb.h>
-#include <libcockatrice/protocol/pb/game_replay.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/settings/chat_settings.h>
@@ -63,6 +79,18 @@
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/layouts_settings.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <qnamespace.h>
+#include <qobjectdefs.h>
+#include <utility>
+
+class Event_GameJoined;
+namespace google
+{
+namespace protobuf
+{
+class Message;
+} // namespace protobuf
+} // namespace google
 
 TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     : Tab(_tabSupervisor), sayLabel(nullptr), sayEdit(nullptr)

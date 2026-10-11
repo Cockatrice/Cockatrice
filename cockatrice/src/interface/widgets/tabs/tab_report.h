@@ -4,8 +4,9 @@
 #include "tab.h"
 
 #include <QList>
-#include <libcockatrice/protocol/pb/response.pb.h>
+#include <QString>
 #include <libcockatrice/protocol/pb/serverinfo_report.pb.h>
+#include <qtmetamacros.h>
 
 class AbstractClient;
 class QCheckBox;
@@ -19,6 +20,8 @@ class QTableWidget;
 class QTextEdit;
 class QTimer;
 class GameReplay;
+class Response;
+class TabSupervisor;
 
 class TabReport : public Tab
 {

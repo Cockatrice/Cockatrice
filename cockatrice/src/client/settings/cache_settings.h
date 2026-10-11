@@ -7,11 +7,13 @@
 #ifndef SETTINGSCACHE_H
 #define SETTINGSCACHE_H
 
+#include <QList>
 #include <QLoggingCategory>
+#include <QString>
 #include <QStringList>
 #include <libcockatrice/interfaces/interface_card_database_path_provider.h>
 #include <libcockatrice/interfaces/interface_network_settings_provider.h>
-#include <libcockatrice/utility/macros.h>
+#include <qtmetamacros.h>
 
 inline Q_LOGGING_CATEGORY(SettingsCacheLog, "settings_cache");
 

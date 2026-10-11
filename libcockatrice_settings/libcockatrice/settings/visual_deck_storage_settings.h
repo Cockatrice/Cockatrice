@@ -3,8 +3,12 @@
 
 #include "settings_manager.h"
 
+#include <QString>
 #include <QStringList>
 #include <libcockatrice/interfaces/interface_visual_deck_storage_settings_provider.h>
+#include <qtmetamacros.h>
+
+class QObject;
 
 class VisualDeckStorageSettings : public SettingsManager, public IVisualDeckStorageSettingsProvider
 {

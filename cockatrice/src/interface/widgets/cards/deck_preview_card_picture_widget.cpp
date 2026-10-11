@@ -1,14 +1,14 @@
 #include "deck_preview_card_picture_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "card_info_picture_widget.h"
 
 #include <QApplication>
-#include <QFileInfo>
-#include <QFontMetrics>
 #include <QMouseEvent>
-#include <QPainterPath>
-#include <QStylePainter>
+#include <QTimer>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
+
+class QWidget;
 
 /**
  * @brief Constructs a CardPictureWithTextOverlay widget.

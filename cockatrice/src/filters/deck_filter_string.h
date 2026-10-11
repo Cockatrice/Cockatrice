@@ -7,12 +7,13 @@
 #ifndef DECK_FILTER_STRING_H
 #define DECK_FILTER_STRING_H
 
-#include "../interface/deck_loader/loaded_deck.h"
-
 #include <QLoggingCategory>
 #include <QString>
 #include <functional>
 #include <libcockatrice/card/card_localization.h>
+
+struct CardSearchLanguage;
+struct LoadedDeck;
 
 inline Q_LOGGING_CATEGORY(DeckFilterStringLog, "deck_filter_string");
 

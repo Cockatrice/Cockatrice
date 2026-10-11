@@ -1,15 +1,26 @@
 #include "card_info_text_widget.h"
 
-#include "../../../game_graphics/board/card_item.h"
+#include "../../../client/settings/cache_settings.h"
 #include "../../card_localization.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/settings/cards_display_settings.h"
 
 #include <QGridLayout>
 #include <QLabel>
+#include <QList>
 #include <QScrollArea>
 #include <QScrollBar>
+#include <QSharedPointer>
+#include <QSize>
+#include <QStringList>
 #include <QTextEdit>
+#include <QWidget>
 #include <libcockatrice/card/game_specific_terms.h>
 #include <libcockatrice/card/relation/card_relation.h>
+#include <qnamespace.h>
+#include <qobjectdefs.h>
 
 CardInfoTextWidget::CardInfoTextWidget(QWidget *parent) : QFrame(parent)
 {

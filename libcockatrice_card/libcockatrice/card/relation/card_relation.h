@@ -5,6 +5,7 @@
 
 #include <QObject>
 #include <QString>
+#include <qtmetamacros.h>
 
 /**
  * @class CardRelation

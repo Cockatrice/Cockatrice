@@ -2,13 +2,22 @@
 #define COCKATRICE_DECK_STATE_MANAGER_H
 
 #include "../../deck_loader/loaded_deck.h"
-#include "deck_list_model.h"
 
+#include <QModelIndex>
+#include <QObject>
 #include <QSharedPointer>
+#include <QString>
+#include <QStringList>
 #include <functional>
 #include <libcockatrice/deck_list/deck_list.h>
+#include <qtmetamacros.h>
 
 class DeckListHistoryManager;
+class DeckListModel;
+class DecklistNodeTree;
+class ExactCard;
+struct CardRef;
+struct PlaymatInfo;
 
 /**
  * @brief This class centralizes the management of the state of the deck in the deck editor tab.

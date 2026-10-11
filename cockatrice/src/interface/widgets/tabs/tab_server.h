@@ -12,20 +12,21 @@
 #include <QGroupBox>
 #include <QHash>
 #include <QSet>
-#include <QTextBrowser>
-#include <QTreeWidget>
+#include <QString>
+#include <QVariant>
+#include <qtmetamacros.h>
 
 class AbstractClient;
-class QTextEdit;
-class QLabel;
-class UserListWidget;
 class QPushButton;
-
 class Event_ListRooms;
 class Event_ServerMessage;
 class Response;
 class ServerInfo_Room;
 class CommandContainer;
+class QTextBrowser;
+class QTreeWidget;
+class QWidget;
+class TabSupervisor;
 
 class RoomSelector : public QGroupBox
 {

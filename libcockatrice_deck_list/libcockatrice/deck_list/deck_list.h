@@ -12,20 +12,24 @@
 
 #include "deck_list_memento.h"
 #include "deck_list_node_tree.h"
+#include "libcockatrice/protocol/pb/move_card_to_zone.pb.h"
+#include "libcockatrice/utility/card_ref.h"
 #include "sideboard_plan.h"
 #include "tree/inner_deck_list_node.h"
 
+#include <QList>
 #include <QMap>
-#include <QVector>
-#include <QtCore/QXmlStreamReader>
+#include <QSet>
+#include <QString>
+#include <QStringList>
+#include <functional>
 #include <libcockatrice/utility/playmat_params.h>
 
-class AbstractDecklistNode;
 class DecklistCardNode;
-class CardDatabase;
 class QIODevice;
 class QTextStream;
-class InnerDecklistNode;
+class QXmlStreamReader;
+class QXmlStreamWriter;
 
 /**
  * @class DeckList

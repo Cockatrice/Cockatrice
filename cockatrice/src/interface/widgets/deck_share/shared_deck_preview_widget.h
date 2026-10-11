@@ -7,15 +7,15 @@
 #ifndef SHARED_DECK_PREVIEW_WIDGET_H
 #define SHARED_DECK_PREVIEW_WIDGET_H
 
+#include <QString>
 #include <QWidget>
+#include <qtmetamacros.h>
 
 class ColorIdentityWidget;
 class DeckPreviewCardPictureWidget;
 class QCheckBox;
 class QFrame;
-class QKeyEvent;
 class QLabel;
-class QResizeEvent;
 class CardDatabaseQuerier;
 
 /**

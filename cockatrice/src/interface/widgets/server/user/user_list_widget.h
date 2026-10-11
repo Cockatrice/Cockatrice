@@ -7,33 +7,34 @@
 #ifndef USERLIST_H
 #define USERLIST_H
 
-#include "../../cards/card_info_picture_art_crop_widget.h"
-#include "../../interface/widgets/server/game_link.h"
-#include "user_avatar_provider.h"
-#include "user_card_art_provider.h"
-#include "user_info_popup.h"
-#include "user_list_manager.h"
-#include "user_list_painter.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 
-#include <QComboBox>
 #include <QGroupBox>
+#include <QList>
+#include <QMap>
 #include <QSet>
+#include <QString>
 #include <QStyledItemDelegate>
-#include <QTextEdit>
 #include <QTreeWidgetItem>
 #include <functional>
-#include <libcockatrice/network/server/remote/user_level.h>
-#include <libcockatrice/protocol/pb/moderator_commands.pb.h>
+#include <qtmetamacros.h>
+#include <utility>
 
-class QTreeWidget;
-class ServerInfo_User;
 class AbstractClient;
 class TabSupervisor;
-class Response;
-class CommandContainer;
 class UserContextMenu;
 class UserListWidget;
-class QShowEvent;
+class QModelIndex;
+class QPixmap;
+class QPoint;
+class QTimer;
+class QWidget;
+class UserAvatarProvider;
+class UserCardArtProvider;
+class UserInfoPopup;
+class UserListManager;
+struct CardArtParams;
+struct GameInviteOption;
 
 class UserListItemDelegate : public QStyledItemDelegate
 {
