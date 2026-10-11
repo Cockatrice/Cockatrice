@@ -27,6 +27,9 @@ add_test(NAME loader_local_matching_test COMMAND loader_local_matching_test)
 
 add_test(NAME deck_hash_performance_test COMMAND deck_hash_performance_test)
 set_tests_properties(deck_hash_performance_test PROPERTIES TIMEOUT 15)
+add_test(NAME deck_diff_test COMMAND deck_diff_test)
+add_test(NAME deck_sync_profile_test COMMAND deck_sync_profile_test)
+add_test(NAME deck_sync_sidecar_test COMMAND deck_sync_sidecar_test)
 
 # Find GTest
 
@@ -37,6 +40,17 @@ add_executable(test_age_formatting test_age_formatting.cpp)
 add_executable(password_hash_test password_hash_test.cpp)
 add_executable(playmat_resolver_test playmat_resolver_test.cpp)
 add_executable(deck_hash_performance_test deck_hash_performance_test.cpp)
+add_executable(deck_diff_test deck_diff_test.cpp)
+add_executable(
+  deck_sync_profile_test ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/deck_sync/deck_sync_profile.cpp
+                         deck_sync_profile_test.cpp
+)
+target_include_directories(deck_sync_profile_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/deck_sync)
+add_executable(
+  deck_sync_sidecar_test ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/deck_sync/deck_sync_sidecar.cpp
+                         deck_sync_sidecar_test.cpp
+)
+target_include_directories(deck_sync_sidecar_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/deck_sync)
 add_executable(server_card_counter_test server_card_counter_test.cpp)
 add_executable(server_counter_test server_counter_test.cpp)
 add_executable(server_rate_limiter_test server_rate_limiter_test.cpp)
@@ -137,6 +151,9 @@ if(NOT GTEST_FOUND)
   add_dependencies(password_hash_test gtest)
   add_dependencies(playmat_resolver_test gtest)
   add_dependencies(deck_hash_performance_test gtest)
+  add_dependencies(deck_diff_test gtest)
+  add_dependencies(deck_sync_profile_test gtest)
+  add_dependencies(deck_sync_sidecar_test gtest)
   add_dependencies(server_card_counter_test gtest)
   add_dependencies(server_counter_test gtest)
   add_dependencies(server_rate_limiter_test gtest)
@@ -175,6 +192,12 @@ target_link_libraries(
   deck_hash_performance_test libcockatrice_deck_list libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES}
   ${TEST_QT_MODULES}
 )
+target_link_libraries(
+  deck_diff_test libcockatrice_deck_list libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES}
+  ${TEST_QT_MODULES}
+)
+target_link_libraries(deck_sync_profile_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
+target_link_libraries(deck_sync_sidecar_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
 target_link_libraries(
   server_card_counter_test libcockatrice_network Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
 )

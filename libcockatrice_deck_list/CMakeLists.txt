@@ -7,6 +7,7 @@ set(HEADERS
     libcockatrice/deck_list/tree/abstract_deck_list_node.h
     libcockatrice/deck_list/tree/deck_list_card_node.h
     libcockatrice/deck_list/tree/inner_deck_list_node.h
+    libcockatrice/deck_list/deck_diff.h
     libcockatrice/deck_list/deck_list.h
     libcockatrice/deck_list/deck_list_history_manager.h
     libcockatrice/deck_list/deck_list_node_tree.h
@@ -25,6 +26,7 @@ add_library(
   libcockatrice/deck_list/tree/abstract_deck_list_node.cpp
   libcockatrice/deck_list/tree/deck_list_card_node.cpp
   libcockatrice/deck_list/tree/inner_deck_list_node.cpp
+  libcockatrice/deck_list/deck_diff.cpp
   libcockatrice/deck_list/deck_list.cpp
   libcockatrice/deck_list/deck_list_history_manager.cpp
   libcockatrice/deck_list/deck_list_node_tree.cpp
