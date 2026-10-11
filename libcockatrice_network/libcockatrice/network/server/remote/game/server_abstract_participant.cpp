@@ -606,14 +606,14 @@ Response::ResponseCode Server_AbstractParticipant::cmdReportMatchResult(const Co
                                                                         ResponseContainer & /*rc*/,
                                                                         GameEventStorage & /*ges*/)
 {
-    return Response::RespContextError;
+    return Response::RespInvalidCommand;
 }
 
 Response::ResponseCode Server_AbstractParticipant::cmdAdvanceTournament(const Command_AdvanceTournament & /*cmd*/,
                                                                         ResponseContainer & /*rc*/,
                                                                         GameEventStorage & /*ges*/)
 {
-    return Response::RespContextError;
+    return Response::RespInvalidCommand;
 }
 
 Response::ResponseCode
@@ -621,5 +621,5 @@ Server_AbstractParticipant::cmdTournamentSettingsSelect(const Command_Tournament
                                                         ResponseContainer & /*rc*/,
                                                         GameEventStorage & /*ges*/)
 {
-    return Response::RespContextError;
+    return Response::RespInvalidCommand;
 }
