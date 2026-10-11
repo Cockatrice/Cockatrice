@@ -37,6 +37,7 @@ message SessionCommand {
         DECK_SHARE_LIST_MINE = 1032;
         DECK_SHARE_REMOVE = 1033;
         DECK_SYNC_CHECK = 1034;
+        DECK_HISTORY_LIST = 1035;
         REPLAY_LIST = 1100;
         REPLAY_DOWNLOAD = 1101;
         REPLAY_MODIFY_MATCH = 1102;

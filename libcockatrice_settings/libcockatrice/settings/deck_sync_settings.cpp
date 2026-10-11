@@ -42,3 +42,14 @@ void DeckSyncSettings::setSyncIntervalMinutes(int _syncIntervalMinutes)
     setValue(_syncIntervalMinutes, "syncIntervalMinutes");
     emit syncIntervalMinutesChanged(_syncIntervalMinutes);
 }
+
+int DeckSyncSettings::getHistoryLimit() const
+{
+    return qBound(1, getValue("historyLimit", QString(), QString(), 20).toInt(), 100);
+}
+
+void DeckSyncSettings::setHistoryLimit(int _historyLimit)
+{
+    setValue(_historyLimit, "historyLimit");
+    emit historyLimitChanged(_historyLimit);
+}
