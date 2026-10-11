@@ -98,7 +98,7 @@ private:
 
     QWidget *tutorializedWidget;
     TutorialOverlay *tutorialOverlay;
-    QVector<TutorialSequence> sequences;
+    QList<TutorialSequence> sequences;
 
     bool tutorialCompleted = false;
 
