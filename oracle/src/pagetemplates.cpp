@@ -246,6 +246,7 @@ bool SimpleDownloadFilePage::saveToFile()
 
     // clean saved downloadData
     downloadData = QByteArray();
+    wizard()->markDatabaseSaved();
     return true;
 }
 

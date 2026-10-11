@@ -86,5 +86,7 @@ int main(int argc, char *argv[])
     }
 
     const int execResult = app.exec();
-    return wizard.wasCancelled() ? 1 : execResult;
+    // A cancel only counts when nothing was written yet: closing the wizard
+    // after the card database was already saved on disk is still an update.
+    return (wizard.wasCancelled() && !wizard.hasSavedDatabase()) ? 1 : execResult;
 }

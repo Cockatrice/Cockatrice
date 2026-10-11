@@ -899,6 +899,7 @@ bool SaveSetsPage::validatePage()
         return false;
     }
 
+    wizard()->markDatabaseSaved();
     return true;
 }
 
