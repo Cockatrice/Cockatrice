@@ -35,6 +35,7 @@ public:
 
     QString filePath;           ///< Full path of the sidecar JSON file.
     QString mode = MODE_LINKED; ///< Linked normally; separate keeps this profile out of sync.
+    qint64 lastSyncSecs = 0;    ///< Last completed sync, seconds since epoch; 0 means never.
 
     explicit DeckSyncSidecar(const QString &_filePath);
 
