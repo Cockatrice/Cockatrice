@@ -1088,8 +1088,8 @@ DeckList *Servatrice_DatabaseInterface::getDeckFromDatabase(int deckId, int user
 {
     checkSql();
 
-    QSqlQuery *query =
-        prepareQuery("select content from {prefix}_decklist_files where id = :id and id_user = :id_user");
+    QSqlQuery *query = prepareQuery(
+        "select content from {prefix}_decklist_files where id = :id and id_user = :id_user and deleted = 0");
     query->bindValue(":id", deckId);
     query->bindValue(":id_user", userId);
     execSqlQuery(query);
@@ -1237,6 +1237,19 @@ void Servatrice_DatabaseInterface::cleanupExpiredDeckShares()
     checkSql();
 
     QSqlQuery *query = prepareQuery("delete from {prefix}_deck_share where expires_at < now()");
+    execSqlQuery(query);
+}
+
+void Servatrice_DatabaseInterface::purgeDeckTombstones(int olderThanDays)
+{
+    checkSql();
+
+    // DB-native clock: tombstones are stamped with NOW() on this same
+    // database, so the grace window is immune to app/db clock skew.
+    // The null arm only catches manually flagged rows.
+    QSqlQuery *query = prepareQuery("delete from {prefix}_decklist_files where deleted = 1 and (last_modified < "
+                                    "DATE_SUB(NOW(), INTERVAL :days DAY) or last_modified is null)");
+    query->bindValue(":days", qMax(0, olderThanDays));
     execSqlQuery(query);
 }
 
