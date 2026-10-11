@@ -279,7 +279,28 @@ void Server_Game::createGameStateChangedEvent(Event_GameStateChanged *event,
         event->set_game_started(false);
     }
 
-    for (Server_AbstractParticipant *participant : participants.values()) {
+    // Emit the player list in seat order so every client (including old ones
+    // that ignore Event_PlayerOrderChanged) sees the current seating. Player
+    // ids are stable; only this ordering changes on shuffle/reorder.
+    QList<Server_AbstractParticipant *> ordered;
+    ordered.reserve(participants.size());
+    for (int id : seatOrder) {
+        auto *participant = participants.value(id, nullptr);
+        if (participant && !participant->isSpectator() && !ordered.contains(participant)) {
+            ordered.append(participant);
+        }
+    }
+    for (auto *participant : participants.values()) {
+        if (!participant->isSpectator() && !ordered.contains(participant)) {
+            ordered.append(participant);
+        }
+    }
+    for (auto *participant : participants.values()) {
+        if (participant->isSpectator()) {
+            ordered.append(participant);
+        }
+    }
+    for (Server_AbstractParticipant *participant : ordered) {
         participant->getInfo(event->add_player_list(), recipient, omniscient, withUserInfo);
     }
 
@@ -419,14 +440,24 @@ void Server_Game::shufflePlayerSeats()
 {
     QMutexLocker locker(&gameMutex);
 
-    // Split participants into players and spectators. Spectators keep their seats.
+    // Collect players in current seat order (fall back to id order for seats
+    // predating seatOrder). Spectators keep their seats.
     QList<Server_AbstractParticipant *> players;
+    for (int id : seatOrder) {
+        auto *participant = participants.value(id, nullptr);
+        if (participant && !participant->isSpectator()) {
+            players.append(participant);
+        }
+    }
+    for (auto *participant : participants.values()) {
+        if (!participant->isSpectator() && !players.contains(participant)) {
+            players.append(participant);
+        }
+    }
     QList<Server_AbstractParticipant *> spectators;
     for (auto *participant : participants.values()) {
         if (participant->isSpectator()) {
             spectators.append(participant);
-        } else {
-            players.append(participant);
         }
     }
 
@@ -444,14 +475,24 @@ void Server_Game::reorderPlayerSeats(const QList<QString> &orderedNames)
 {
     QMutexLocker locker(&gameMutex);
 
-    // Split participants into players and spectators. Spectators keep their seats.
+    // Collect players in current seat order (fall back to id order for seats
+    // predating seatOrder). Spectators keep their seats.
     QList<Server_AbstractParticipant *> players;
+    for (int id : seatOrder) {
+        auto *participant = participants.value(id, nullptr);
+        if (participant && !participant->isSpectator()) {
+            players.append(participant);
+        }
+    }
+    for (auto *participant : participants.values()) {
+        if (!participant->isSpectator() && !players.contains(participant)) {
+            players.append(participant);
+        }
+    }
     QList<Server_AbstractParticipant *> spectators;
     for (auto *participant : participants.values()) {
         if (participant->isSpectator()) {
             spectators.append(participant);
-        } else {
-            players.append(participant);
         }
     }
 
@@ -481,36 +522,17 @@ void Server_Game::reseatPlayers(const QList<Server_AbstractParticipant *> &order
 {
     QMutexLocker locker(&gameMutex);
 
-    // Reassign fresh, unique player ids following the given order.
-    QMap<int, Server_AbstractParticipant *> newParticipants;
-    int newHostId = -1;
+    // Keep player ids stable and only reorder the seating/turn order. Changing
+    // ids would break old clients (stale localPlayerId from Event_GameJoined
+    // duplicates their own seat as an opponent), invalidate the home-server
+    // per-user game/seat mapping used for ISL command routing, and orphan the
+    // host id. All of those maps stay valid because ids never change here.
+    // The current host therefore keeps its id and needs no re-key tracking.
+    seatOrder.clear();
     for (auto *participant : orderedParticipants) {
-        const int newPlayerId = nextPlayerId++;
-        const int oldPlayerId = participant->getPlayerId();
-        participant->setPlayerId(newPlayerId);
-        newParticipants.insert(newPlayerId, participant);
-
-        // Keep the user interface's per-user game/seat mapping in sync so that
-        // incoming game commands are routed to the participant under its new id.
-        if (participant->getUserInterface()) {
-            participant->getUserInterface()->playerAddedToGame(gameId, room->getId(), newPlayerId);
+        if (!participant->isSpectator()) {
+            seatOrder.append(participant->getPlayerId());
         }
-
-        if (!participant->isSpectator() && (participant->getUserInfo()->user_level() & ServerInfo_User::IsRegistered)) {
-            const QString playerName = QString::fromStdString(participant->getUserInfo()->name());
-            room->getServer()->removePersistentPlayer(playerName, room->getId(), gameId, oldPlayerId);
-            room->getServer()->addPersistentPlayer(playerName, room->getId(), gameId, newPlayerId);
-        }
-
-        if (participant->getUserInfo()->name() == creatorInfo->name()) {
-            newHostId = newPlayerId;
-        }
-    }
-    participants = newParticipants;
-
-    if (newHostId != -1) {
-        hostId = newHostId;
-        sendGameEventContainer(prepareGameEvent(Event_GameHostChanged(), hostId));
     }
 
     // Broadcast the new seating order so that every client can display it.
@@ -656,6 +678,7 @@ void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface,
         allSpectatorsEver.insert(playerName);
     } else {
         allPlayersEver.insert(playerName);
+        seatOrder.append(newParticipant->getPlayerId());
 
         // if the original creator of the game joins, give them host status back
         //! \todo Transferring host to spectators has side effects.
@@ -685,6 +708,7 @@ void Server_Game::removeParticipant(Server_AbstractParticipant *participant, Eve
     room->getServer()->removePersistentPlayer(QString::fromStdString(participant->getUserInfo()->name()), room->getId(),
                                               gameId, participant->getPlayerId());
     participants.remove(participant->getPlayerId());
+    seatOrder.removeAll(participant->getPlayerId());
 
     bool spectator = participant->isSpectator();
     GameEventStorage ges;
@@ -704,10 +728,20 @@ void Server_Game::removeParticipant(Server_AbstractParticipant *participant, Eve
     participant->prepareDestroy();
 
     if (playerHost) {
+        // Pass host to the next player in seat order so the game always keeps
+        // a host while players remain.
         int newHostId = -1;
-        for (auto *otherPlayer : getPlayers().values()) {
-            newHostId = otherPlayer->getPlayerId();
-            break;
+        for (int id : seatOrder) {
+            if (participants.contains(id)) {
+                newHostId = id;
+                break;
+            }
+        }
+        if (newHostId == -1) {
+            for (auto *otherPlayer : getPlayers().values()) {
+                newHostId = otherPlayer->getPlayerId();
+                break;
+            }
         }
         if (newHostId != -1) {
             hostId = newHostId;
@@ -864,7 +898,20 @@ void Server_Game::nextTurn()
     }
 
     auto players = getPlayers();
-    const QList<int> keys = players.keys();
+    // Advance in seat order, not id order, so shuffles/reorders change the
+    // turn sequence while ids stay stable.
+    QList<int> keys;
+    keys.reserve(players.size());
+    for (int id : seatOrder) {
+        if (players.contains(id)) {
+            keys.append(id);
+        }
+    }
+    for (int id : players.keys()) {
+        if (!keys.contains(id)) {
+            keys.append(id);
+        }
+    }
     int listPos = -1;
     if (activePlayer != -1) {
         listPos = keys.indexOf(activePlayer);

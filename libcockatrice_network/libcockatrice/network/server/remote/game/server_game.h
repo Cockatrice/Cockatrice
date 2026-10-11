@@ -58,6 +58,11 @@ private:
     int hostId;
     ServerInfo_User *creatorInfo;
     QMap<int, Server_AbstractParticipant *> participants;
+    // Seating/turn order as an ordered list of player ids. Player ids themselves
+    // are stable for the lifetime of the participant; shuffling or reordering
+    // only permutes this list so old clients, ISL routes and persistent
+    // references (all keyed by player id) keep working.
+    QList<int> seatOrder;
     QSet<QString> allPlayersEver, allSpectatorsEver;
     bool gameStarted;
     bool gameClosed;
@@ -133,6 +138,10 @@ public:
     const QMap<int, Server_AbstractParticipant *> &getParticipants() const
     {
         return participants;
+    }
+    QList<int> getSeatOrder() const
+    {
+        return seatOrder;
     }
     int getGameId() const
     {

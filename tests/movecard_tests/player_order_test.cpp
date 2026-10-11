@@ -70,19 +70,18 @@ namespace
 QStringList participantNamesInOrder(const Server_Game &game)
 {
     QStringList names;
-    for (const auto *participant : game.getParticipants()) {
-        names.append(QString::fromStdString(participant->getUserInfo()->name()));
+    for (int id : game.getSeatOrder()) {
+        const auto *participant = game.getParticipants().value(id, nullptr);
+        if (participant) {
+            names.append(QString::fromStdString(participant->getUserInfo()->name()));
+        }
     }
     return names;
 }
 
 QList<int> participantIdsInOrder(const Server_Game &game)
 {
-    QList<int> ids;
-    for (int id : game.getParticipants().keys()) {
-        ids.append(id);
-    }
-    return ids;
+    return game.getSeatOrder();
 }
 } // namespace
 
@@ -170,21 +169,19 @@ TEST_F(PlayerOrderTest, ReorderPlayerSeats)
 
     game.reorderPlayerSeats({"C", "A", "B"});
 
-    const QList<int> ids = participantIdsInOrder(game);
+    // player ids are stable; only the seat order changes
     EXPECT_EQ(participantNamesInOrder(game), QStringList({"C", "A", "B"}));
-    EXPECT_EQ(ids.size(), 3);
-    EXPECT_GE(ids.at(0), 3); // re-seated players get fresh ids
-    EXPECT_LT(ids.at(0), ids.at(1));
-    EXPECT_LT(ids.at(1), ids.at(2));
+    EXPECT_EQ(participantIdsInOrder(game), QList<int>({2, 0, 1}));
+    EXPECT_EQ(game.getParticipants().size(), 3);
 
-    // the host seat follows the creator
-    EXPECT_EQ(game.getHostId(), ids.at(1));
+    // the host keeps its seat: creator A is still in the game, so host stays 0
+    EXPECT_EQ(game.getHostId(), 0);
 
-    // every user interface's game list is updated to the new player id
+    // no re-keying means every mapping keyed by player id stays valid
     const int gameId = game.getGameId();
-    EXPECT_EQ(uiA.getGames().value(gameId).second, ids.at(1));
-    EXPECT_EQ(uiB.getGames().value(gameId).second, ids.at(2));
-    EXPECT_EQ(uiC.getGames().value(gameId).second, ids.at(0));
+    EXPECT_EQ(uiA.getGames().value(gameId).second, 0);
+    EXPECT_EQ(uiB.getGames().value(gameId).second, 1);
+    EXPECT_EQ(uiC.getGames().value(gameId).second, 2);
 }
 
 TEST_F(PlayerOrderTest, ReorderPlayerSeatsKeepsPlayerCount)
@@ -220,8 +217,9 @@ TEST_F(PlayerOrderTest, ReorderPlayerSeatsKeepsPlayerCount)
     game.reorderPlayerSeats({"C"});
 
     EXPECT_EQ(participantNamesInOrder(game), QStringList({"C", "A", "B"}));
+    EXPECT_EQ(participantIdsInOrder(game), QList<int>({2, 0, 1}));
     EXPECT_EQ(game.getPlayerCount(), 3);
-    EXPECT_EQ(game.getHostId(), participantIdsInOrder(game).at(1));
+    EXPECT_EQ(game.getHostId(), 0);
 }
 
 TEST_F(PlayerOrderTest, ShufflePlayerSeatsIsAPermutation)
@@ -261,9 +259,9 @@ TEST_F(PlayerOrderTest, ShufflePlayerSeatsIsAPermutation)
     game.shufflePlayerSeats();
 
     EXPECT_EQ(participantNamesInOrder(game), QStringList({"B", "A", "C"}));
-    const QList<int> ids = participantIdsInOrder(game);
-    EXPECT_EQ(ids.size(), 3);
-    QSet<int> idSet(ids.cbegin(), ids.cend());
+    EXPECT_EQ(participantIdsInOrder(game), QList<int>({1, 0, 2}));
+    QSet<int> idSet(participantIdsInOrder(game).cbegin(), participantIdsInOrder(game).cend());
     EXPECT_EQ(idSet.size(), 3); // ids are unique
-    EXPECT_EQ(game.getHostId(), ids.at(1));
+    // ids are stable, so the host (creator A, id 0) is unchanged
+    EXPECT_EQ(game.getHostId(), 0);
 }
