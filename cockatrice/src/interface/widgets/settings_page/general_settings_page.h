@@ -52,6 +52,7 @@ private:
     QGroupBox *cardDatabaseGroupBox;
     QGroupBox *startupGroupBox;
     QGroupBox *pathsGroupBox;
+    QGroupBox *deckSyncGroupBox;
 
     QLabel languageLabel;
     QComboBox languageBox;
@@ -104,6 +105,9 @@ private:
     QLineEdit *tokenDatabasePathEdit;
     QPushButton *resetAllPathsButton;
     QLabel *allPathsResetLabel;
+
+    QLabel conflictDefaultLabel;
+    QComboBox conflictDefaultSelector;
 };
 
 #endif // COCKATRICE_GENERAL_SETTINGS_PAGE_H
