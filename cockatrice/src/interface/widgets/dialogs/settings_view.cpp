@@ -93,8 +93,7 @@ SettingsView::SettingsView(QWidget *parent) : QWidget(parent), currentTabIndex(0
 {
     setupUi();
 
-    connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this,
-            &SettingsView::retranslateUi);
+    connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this, &SettingsView::retranslateUi);
     retranslateUi();
 
     searchEdit->setFocus();
