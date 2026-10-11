@@ -74,7 +74,7 @@ PROJECT_ICON           = cockatrice/resources/cockatrice.png
 # entered, it will be relative to the location where Doxygen was started. If
 # left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = docs
+OUTPUT_DIRECTORY       = docs-output
 
 # If the CREATE_SUBDIRS tag is set to YES then Doxygen will create up to 4096
 # sub-directories (in 2 levels) under the output directory of each output format
@@ -874,7 +874,7 @@ FILE_VERSION_FILTER    =
 # DoxygenLayout.xml, Doxygen will parse it automatically even if the LAYOUT_FILE
 # tag is left empty.
 
-LAYOUT_FILE            = doc/doxygen/DoxygenLayout.xml
+LAYOUT_FILE            = docs/doxygen/DoxygenLayout.xml
 
 # The CITE_BIB_FILES tag can be used to specify one or more bib files containing
 # the reference definitions. This must be a list of .bib files. The .bib
@@ -1091,8 +1091,8 @@ RECURSIVE              = YES
 EXCLUDE                = build/ \
                          cmake/ \
                          cmake-build-debug/ \
-                         doc/doxygen/theme/docs/ \
-                         doc/doxygen/theme/include/ \
+                         docs/doxygen/theme/docs/ \
+                         docs/doxygen/theme/include/ \
                          vcpkg/
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
@@ -1144,7 +1144,7 @@ EXAMPLE_RECURSIVE      = NO
 # that contain images that are to be included in the documentation (see the
 # \image command).
 
-IMAGE_PATH             = doc/doxygen/images
+IMAGE_PATH             = docs/doxygen/images
 
 # The INPUT_FILTER tag can be used to specify a program that Doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program
@@ -1183,7 +1183,7 @@ INPUT_FILTER           =
 # need to set EXTENSION_MAPPING for the extension otherwise the files are not
 # properly processed by Doxygen.
 
-FILTER_PATTERNS        = "*.proto=python doc/doxygen/filters/proto2cpp.py"
+FILTER_PATTERNS        = "*.proto=python docs/doxygen/filters/proto2cpp.py"
 
 # If the FILTER_SOURCE_FILES tag is set to YES, the input filter (if set using
 # INPUT_FILTER) will also be used to filter the input files that are used for
@@ -1414,7 +1414,7 @@ HTML_FILE_EXTENSION    = .html
 # of the possible markers and block names see the documentation.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_HEADER            = doc/doxygen/html/header.html
+HTML_HEADER            = docs/doxygen/html/header.html
 
 # The HTML_FOOTER tag can be used to specify a user-defined HTML footer for each
 # generated HTML page. If the tag is left blank Doxygen will generate a standard
@@ -1424,7 +1424,7 @@ HTML_HEADER            = doc/doxygen/html/header.html
 # that Doxygen normally uses.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_FOOTER            = doc/doxygen/html/footer.html
+HTML_FOOTER            = docs/doxygen/html/footer.html
 
 # The HTML_STYLESHEET tag can be used to specify a user-defined cascading style
 # sheet that is used by each HTML page. It can be used to fine-tune the look of
@@ -1454,9 +1454,9 @@ HTML_STYLESHEET        =
 # documentation.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_EXTRA_STYLESHEET  = doc/doxygen/theme/doxygen-awesome.css \
-                         doc/doxygen/css/hide_nav_sync.css \
-                         doc/doxygen/css/cockatrice_docs_style.css
+HTML_EXTRA_STYLESHEET  = docs/doxygen/theme/doxygen-awesome.css \
+                         docs/doxygen/css/hide_nav_sync.css \
+                         docs/doxygen/css/cockatrice_docs_style.css
 
 # The HTML_EXTRA_FILES tag can be used to specify one or more extra images or
 # other source files which should be copied to the HTML output directory. Note
@@ -1466,7 +1466,7 @@ HTML_EXTRA_STYLESHEET  = doc/doxygen/theme/doxygen-awesome.css \
 # files will be copied as-is; there are no commands or markers available.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_EXTRA_FILES       = doc/doxygen/js/graph_toggle.js
+HTML_EXTRA_FILES       = docs/doxygen/js/graph_toggle.js
 
 # The HTML_COLORSTYLE tag can be used to specify if the generated HTML output
 # should be rendered with a dark or light theme.
