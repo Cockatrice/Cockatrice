@@ -2,16 +2,33 @@
 #define GAMESCENE_H
 
 #include "../game/arrow_registry.h"
-#include "../game/board/arrow_data.h"
-#include "../game/zones/card_zone_logic.h"
-#include "animated_item.h"
-#include "board/arrow_item.h"
 
 #include <QGraphicsScene>
 #include <QHash>
 #include <QList>
 #include <QLoggingCategory>
+#include <QMap>
+#include <QMetaObject>
+#include <QPointF>
 #include <QPointer>
+#include <QSize>
+#include <QSizeF>
+#include <QString>
+#include <QTransform>
+#include <QtGlobal>
+#include <qtmetamacros.h>
+
+// IWYU pragma: keep
+// ServerInfo_Card appears inside QList<...> in signal and slot
+// signatures, which the moc-generated code needs to be complete.
+#include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
+
+class CardZoneLogic;
+class IAnimatedItem;
+class QGraphicsItem;
+class QPoint;
+struct ArrowData;
+template <class T> class QSharedPointer;
 
 inline Q_LOGGING_CATEGORY(GameSceneLog, "game_scene");
 inline Q_LOGGING_CATEGORY(GameScenePlayerAdditionRemovalLog, "game_scene.player_addition_removal");
@@ -54,9 +71,11 @@ private:
     QPointer<CardItem> hoveredCard;                     ///< Currently hovered card
     QBasicTimer *animationTimer;                        ///< Timer for scene animations
     QHash<QObject *, IAnimatedItem *> animatedItems;    ///< Items currently animating
-    int playerRotation;                                 ///< Rotation offset for player layout
-    bool rearranging = false;                           ///< Guard against re-entrant rearrange
-    bool needsReArrange = false;                        ///< Pending rearrange requested during a pass
+    QHash<QObject *, QMetaObject::Connection>
+        animationItemConnections; ///< destroyed->removeAnimatedItem handles per animated item
+    int playerRotation;           ///< Rotation offset for player layout
+    bool rearranging = false;     ///< Guard against re-entrant rearrange
+    bool needsReArrange = false;  ///< Pending rearrange requested during a pass
 
     /**
      * @brief Updates which card is currently hovered based on scene coordinates.
@@ -224,6 +243,9 @@ public slots:
 
     /** @brief Closes all zone views. */
     void clearViews();
+
+    /** @brief Empties the contents of all non-reveal zone views. Used for replay rewinding */
+    void emptyActiveViews();
 
     /** @brief Closes the most recently added zone view. */
     void closeMostRecentZoneView();

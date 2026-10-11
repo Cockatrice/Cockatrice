@@ -3,7 +3,10 @@
 
 #include "../first_run_wizard_page.h"
 
+#include <qtmetamacros.h>
+
 class QLabel;
+class QWidget;
 
 class FinishPage : public FirstRunWizardPage
 {

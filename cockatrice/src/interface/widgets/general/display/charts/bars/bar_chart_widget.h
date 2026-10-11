@@ -2,9 +2,12 @@
 #define COCKATRICE_BAR_CHART_WIDGET_H
 
 #include <QColor>
+#include <QList>
 #include <QString>
+#include <QStringList>
 #include <QVector>
 #include <QWidget>
+#include <qtmetamacros.h>
 
 struct BarSegment
 {

@@ -1,7 +1,13 @@
 #include "custom_zone_menu.h"
 
+#include "../../../game/player/player_info.h"
 #include "../../game/player/player_logic.h"
+#include "../../game_scene.h"
 #include "../player_graphics_item.h"
+
+#include <QAction>
+#include <QList>
+#include <QVariant>
 
 CustomZoneMenu::CustomZoneMenu(PlayerGraphicsItem *_player) : player(_player)
 {

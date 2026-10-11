@@ -9,6 +9,11 @@
 
 #include "settings_manager.h"
 
+#include <QString>
+#include <qtmetamacros.h>
+
+class QObject;
+
 class AppearanceSettings : public SettingsManager
 {
     Q_OBJECT
@@ -27,6 +32,8 @@ public:
     void setHomeTabBackgroundShuffleFrequency(int _frequency);
     [[nodiscard]] bool getHomeTabDisplayCardName() const;
     void setHomeTabDisplayCardName(bool _displayCardName);
+    [[nodiscard]] bool getHomeTabBackgroundDim() const;
+    void setHomeTabBackgroundDim(bool _dimBackground);
     [[nodiscard]] int getHomeTabButtonColorSourceIndex() const;
     void setHomeTabButtonColorSourceIndex(int index);
 
@@ -36,6 +43,7 @@ signals:
     void homeTabBackgroundSourceChanged();
     void homeTabBackgroundShuffleFrequencyChanged();
     void homeTabDisplayCardNameChanged();
+    void homeTabBackgroundDimChanged();
     void homeTabButtonColorChanged();
 
 public:

@@ -2,11 +2,21 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "card_picture_loader_local_schemes.h"
-#include "card_picture_to_load.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
 
+#include <QDebug>
+#include <QDir>
 #include <QDirIterator>
-#include <QMovie>
-#include <libcockatrice/card/database/card_database_manager.h>
+#include <QFileInfo>
+#include <QImageReader>
+#include <QList>
+#include <QMessageLogger>
+#include <QSharedPointer>
+#include <QStringList>
+#include <QTimer>
 #include <libcockatrice/settings/paths_settings.h>
 
 static constexpr int REFRESH_INTERVAL_MS = 10 * 1000;
@@ -94,10 +104,14 @@ QImage CardPictureLoaderLocal::tryLoadCardImageFromDisk(const QString &setName,
             candidatePaths << picsPath + "/downloadedPics/" + setName + "/" + nameVariant;
         }
 
+        // Non-set-folder export schemes (e.g., Name_Set_Collector) write straight into
+        // downloadedPics/; check there as a fallback so local overrides round-trip.
+        candidatePaths << picsPath + "/downloadedPics/" + nameVariant;
+
         for (const QString &path : candidatePaths) {
             QFileInfo fileInfo(path);
             QDir dir = fileInfo.dir();
-            QString baseName = fileInfo.fileName();
+            QString baseName = fileInfo.completeBaseName();
 
             if (!dir.exists()) {
                 continue;
@@ -105,7 +119,8 @@ QImage CardPictureLoaderLocal::tryLoadCardImageFromDisk(const QString &setName,
 
             QStringList files = dir.entryList(QDir::Files);
             for (const QString &file : files) {
-                if (!file.startsWith(baseName)) {
+                QFileInfo fi(file);
+                if (fi.completeBaseName() != baseName) {
                     continue;
                 }
 

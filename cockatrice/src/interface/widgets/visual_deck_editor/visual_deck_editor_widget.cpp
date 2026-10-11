@@ -1,31 +1,48 @@
 #include "visual_deck_editor_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../../main.h"
-#include "../../deck_loader/deck_loader.h"
-#include "../../layouts/overlap_layout.h"
-#include "../cards/card_info_picture_with_text_overlay_widget.h"
+#include "../../pixel_map_generator.h"
+#include "../cards/card_size_widget.h"
 #include "../cards/deck_card_zone_display_widget.h"
 #include "../general/layout_containers/flow_widget.h"
-#include "../tabs/visual_deck_editor/tab_deck_editor_visual.h"
-#include "../tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.h"
 #include "../utility/compact_push_button.h"
 #include "../utility/completer_utils.h"
+#include "card/card_completer_proxy_model.h"
+#include "card_database_display_model.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
 #include "visual_deck_display_options_widget.h"
+#include "visual_deck_editor_placeholder_widget.h"
 
-#include <QCheckBox>
+#include <QAbstractItemModel>
+#include <QAbstractItemView>
 #include <QCompleter>
+#include <QDebug>
 #include <QHBoxLayout>
+#include <QItemSelection>
+#include <QItemSelectionModel>
+#include <QItemSelectionRange>
+#include <QLayout>
 #include <QLineEdit>
+#include <QList>
+#include <QModelIndex>
 #include <QPushButton>
-#include <QResizeEvent>
-#include <libcockatrice/card/card_info_comparator.h>
-#include <libcockatrice/card/database/card_database.h>
+#include <QRegularExpression>
+#include <QScrollArea>
+#include <QSharedPointer>
+#include <QSize>
+#include <QSizePolicy>
+#include <QSortFilterProxyModel>
+#include <QStringLiteral>
+#include <QTimer>
+#include <QVBoxLayout>
+#include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card_database_model.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <libcockatrice/settings/cards_display_settings.h>
-#include <qscrollarea.h>
+#include <qnamespace.h>
 
 VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
                                                DeckListModel *_deckListModel,
@@ -81,13 +98,8 @@ void VisualDeckEditorWidget::initializeSearchBarAndCompleter()
     searchBar = new QLineEdit(searchContainer);
     searchContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     connect(searchBar, &QLineEdit::returnPressed, this, [=, this]() {
-        if (!searchBar->hasFocus()) {
-            return;
-        }
-
-        ExactCard card = CardDatabaseManager::query()->getCard({searchBar->text()});
-        if (card) {
-            emit cardAdditionRequested(card);
+        if (searchBar->hasFocus()) {
+            addCardFromSearch();
         }
     });
 
@@ -131,15 +143,23 @@ void VisualDeckEditorWidget::initializeSearchBarAndCompleter()
 
     // Search button functionality
     searchPushButton = new CompactPushButton(searchContainer);
-    searchPushButton->setButtonIcon(QPixmap("theme:icons/search"));
-    connect(searchPushButton, &QPushButton::clicked, this, [=, this]() {
-        ExactCard card = CardDatabaseManager::query()->getCard({searchBar->text()});
-        if (card) {
-            emit cardAdditionRequested(card);
-        }
-    });
+    searchPushButton->setButtonIcon(themePixmap(QStringLiteral("icons/search")));
+    connect(searchPushButton, &QPushButton::clicked, this, [this] { addCardFromSearch(); });
 
     searchLayout->addWidget(searchPushButton);
+}
+
+void VisualDeckEditorWidget::addCardFromSearch()
+{
+    ExactCard card = CardDatabaseManager::query()->getCard({searchBar->text()});
+    if (!card) {
+        return;
+    }
+
+    emit cardAdditionRequested(card);
+
+    searchBar->setFocus();
+    QTimer::singleShot(0, searchBar, [this] { searchBar->setSelection(0, searchBar->text().length()); });
 }
 
 void VisualDeckEditorWidget::initializeDisplayOptionsWidget()

@@ -3,6 +3,10 @@
 #include "../card_info.h"
 #include "printing_info.h"
 
+#include <QLatin1String>
+#include <QSharedPointer>
+#include <qtmetamacros.h>
+
 /**
  * Default constructor.
  * This will set the CardInfoPtr to null.

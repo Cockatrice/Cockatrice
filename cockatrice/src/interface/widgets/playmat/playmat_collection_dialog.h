@@ -2,13 +2,15 @@
 #define COCKATRICE_PLAYMAT_COLLECTION_DIALOG_H
 
 #include <QDialog>
+#include <QList>
 #include <libcockatrice/utility/playmat_params.h>
+#include <qtmetamacros.h>
 
 class QComboBox;
 class QLabel;
 class QListWidget;
-class QListWidgetItem;
 class QPushButton;
+class QWidget;
 
 /**
  * @brief Dialog for editing the user-level playmat collection.

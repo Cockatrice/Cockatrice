@@ -9,10 +9,16 @@
 
 #include "abstract_player_component.h"
 
+#include <QAction>
+#include <QList>
 #include <QMenu>
+#include <QString>
+#include <QStringList>
 #include <libcockatrice/card/card_info.h>
+#include <qtmetamacros.h>
 
 class PlayerGraphicsItem;
+
 class UtilityMenu : public QMenu, public AbstractPlayerComponent
 {
     Q_OBJECT

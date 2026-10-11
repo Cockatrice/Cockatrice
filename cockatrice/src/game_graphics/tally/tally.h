@@ -1,5 +1,6 @@
 #ifndef COCKATRICE_TALLY_H
 #define COCKATRICE_TALLY_H
+#include <QList>
 #include <QString>
 
 class CardItem;
@@ -21,7 +22,8 @@ enum class TallyType
     None,
     Subtypes,
     TotalPower,
-    MaxValue = TotalPower // sentinel value
+    TotalToughness,
+    MaxValue = TotalToughness // sentinel value
 };
 
 namespace Tally

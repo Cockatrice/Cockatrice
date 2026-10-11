@@ -4,8 +4,15 @@
 
 #include <QApplication>
 #include <QAudioOutput>
+#include <QDebug>
 #include <QDir>
+#include <QFile>
+#include <QList>
 #include <QMediaPlayer>
+#include <QMessageLogger>
+#include <QStringList>
+#include <QUrl>
+#include <QtGlobal>
 #include <libcockatrice/settings/sound_settings.h>
 
 #define DEFAULT_THEME_NAME "Default"
@@ -94,7 +101,7 @@ QStringMap &SoundEngine::getAvailableThemes()
     QDir dir;
     availableThemes.clear();
 
-    // load themes from user profile dir
+    // Load themes from user profile dir
 
     dir.setPath(SettingsCache::instance().getDataPath() + "/sounds");
 
@@ -104,7 +111,7 @@ QStringMap &SoundEngine::getAvailableThemes()
         }
     }
 
-    // load themes from cockatrice system dir
+    // Load themes from Cockatrice system dir
     dir.setPath(qApp->applicationDirPath() +
 #ifdef Q_OS_MAC
                 "/../Resources/sounds"

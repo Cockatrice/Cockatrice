@@ -1,6 +1,13 @@
 #include "table_zone_logic.h"
 
 #include "../../game_graphics/board/card_item.h"
+#include "../board/card_list.h"
+#include "libcockatrice/card/card_info.h"
+
+#include <QPoint>
+
+class PlayerLogic;
+class QObject;
 
 TableZoneLogic::TableZoneLogic(PlayerLogic *_player,
                                const QString &_name,

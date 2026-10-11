@@ -4,9 +4,11 @@
 #include "settings_manager.h"
 
 #include <QHash>
-#include <QObject>
 #include <QString>
 #include <QVariantList>
+#include <qtmetamacros.h>
+
+class QObject;
 
 struct CommanderBracketDefinition
 {

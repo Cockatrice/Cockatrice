@@ -6,9 +6,15 @@
 
 #ifndef TABBED_DECK_VIEW_CONTAINER_H
 #define TABBED_DECK_VIEW_CONTAINER_H
-#include "deck_view_container.h"
-
+#include <QMap>
+#include <QString>
 #include <QTabWidget>
+#include <qtmetamacros.h>
+
+class DeckList;
+class DeckView;
+class DeckViewContainer;
+class TabGame;
 
 class TabbedDeckViewContainer : public QTabWidget
 {

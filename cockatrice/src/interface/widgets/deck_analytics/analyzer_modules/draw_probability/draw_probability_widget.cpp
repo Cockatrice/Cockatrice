@@ -1,21 +1,40 @@
 #include "draw_probability_widget.h"
 
+#include "../../../general/display/banner_widget.h"
+#include "../../../general/layout_containers/flow_widget.h"
+#include "../../abstract_analytics_panel_widget.h"
+#include "../../deck_list_statistics_analyzer.h"
+#include "deck_list_model.h"
 #include "draw_probability_config_dialog.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/deck_list/tree/deck_list_card_node.h"
 
+#include <QAbstractItemView>
+#include <QChar>
 #include <QComboBox>
 #include <QDialog>
-#include <QDialogButtonBox>
-#include <QFormLayout>
-#include <QHBoxLayout>
 #include <QHeaderView>
+#include <QJsonObject>
 #include <QLabel>
+#include <QList>
 #include <QMap>
+#include <QObject>
+#include <QSharedPointer>
+#include <QSizePolicy>
 #include <QSpinBox>
+#include <QString>
+#include <QStringList>
+#include <QTableWidget>
 #include <QTableWidgetItem>
-#include <QWidget>
+#include <QVBoxLayout>
+#include <QVariant>
+#include <QtGlobal>
 #include <QtMath>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <qnamespace.h>
+
+class QWidget;
 
 DrawProbabilityWidget::DrawProbabilityWidget(QWidget *parent, DeckListStatisticsAnalyzer *analyzer)
     : AbstractAnalyticsPanelWidget(parent, analyzer)

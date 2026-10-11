@@ -3,11 +3,17 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
 
+#include <QCoreApplication>
+#include <QEvent>
+#include <QFlags>
 #include <QKeyEvent>
+#include <QKeySequence>
 #include <QLineEdit>
-#include <QObject>
+#include <QList>
+#include <QString>
 #include <QTreeView>
-#include <QWidget>
+#include <QVector>
+#include <qnamespace.h>
 
 LineEditUnfocusable::LineEditUnfocusable(QWidget *parent) : QLineEdit(parent)
 {

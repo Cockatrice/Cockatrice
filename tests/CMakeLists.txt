@@ -11,12 +11,22 @@ add_test(NAME playmat_resolver_test COMMAND playmat_resolver_test)
 add_test(NAME server_card_counter_test COMMAND server_card_counter_test)
 add_test(NAME server_counter_test COMMAND server_counter_test)
 add_test(NAME server_rate_limiter_test COMMAND server_rate_limiter_test)
+add_test(NAME server_developer_role_test COMMAND server_developer_role_test)
+add_test(NAME server_game_join_test COMMAND server_game_join_test)
 add_test(NAME warning_categories_test COMMAND warning_categories_test)
+# The translation loader test compiles a .qm fixture, which needs lrelease from Qt Linguist.
+if(TARGET Qt6::lrelease)
+  add_test(NAME translation_loader_test COMMAND translation_loader_test)
+endif()
+add_test(NAME report_categories_test COMMAND report_categories_test)
 add_test(NAME lag_monitor_test COMMAND lag_monitor_test)
 add_test(NAME latency_tracker_test COMMAND latency_tracker_test)
+add_test(NAME metrics_registry_test COMMAND metrics_registry_test)
+add_test(NAME card_update_progress_test COMMAND card_update_progress_test)
+add_test(NAME loader_local_matching_test COMMAND loader_local_matching_test)
 
 add_test(NAME deck_hash_performance_test COMMAND deck_hash_performance_test)
-set_tests_properties(deck_hash_performance_test PROPERTIES TIMEOUT 5)
+set_tests_properties(deck_hash_performance_test PROPERTIES TIMEOUT 15)
 
 # Find GTest
 
@@ -30,10 +40,70 @@ add_executable(deck_hash_performance_test deck_hash_performance_test.cpp)
 add_executable(server_card_counter_test server_card_counter_test.cpp)
 add_executable(server_counter_test server_counter_test.cpp)
 add_executable(server_rate_limiter_test server_rate_limiter_test.cpp)
+add_executable(server_developer_role_test server_developer_role_test.cpp)
+add_executable(server_game_join_test server_game_join_test.cpp)
 add_executable(warning_categories_test warning_categories_test.cpp)
+if(TARGET Qt6::lrelease)
+  add_executable(translation_loader_test translation_loader_test.cpp)
+
+  # QTranslator only accepts real .qm files, so the translation loader test gets one compiled from its
+  # own .ts fixture rather than a stub.
+  set(TRANSLATION_LOADER_TEST_QM "${CMAKE_CURRENT_BINARY_DIR}/translation_loader_test_de.qm")
+  add_custom_command(
+    OUTPUT "${TRANSLATION_LOADER_TEST_QM}"
+    COMMAND Qt6::lrelease "${CMAKE_CURRENT_SOURCE_DIR}/translation_loader_test.ts" -qm "${TRANSLATION_LOADER_TEST_QM}"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/translation_loader_test.ts"
+    COMMENT "Compiling translation_loader_test.ts"
+  )
+  add_custom_target(translation_loader_test_qm DEPENDS "${TRANSLATION_LOADER_TEST_QM}")
+  add_dependencies(translation_loader_test translation_loader_test_qm)
+  target_compile_definitions(translation_loader_test PRIVATE TRANSLATION_LOADER_TEST_DIR="${CMAKE_CURRENT_BINARY_DIR}")
+
+  # A multi-config generator (MSBuild, Xcode) puts the executable in a per-config subdirectory while
+  # the .qm stays in the current binary directory, so copy the fixture next to the binary: that is the
+  # layout ABuildTreeFindsTheTranslationsNextToTheExecutable is about, and the only one it finds on
+  # those generators.
+  add_custom_command(
+    TARGET translation_loader_test
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${TRANSLATION_LOADER_TEST_QM}"
+            "$<TARGET_FILE_DIR:translation_loader_test>/"
+    VERBATIM
+  )
+endif()
+add_executable(report_categories_test report_categories_test.cpp)
 add_executable(lag_monitor_test ${CMAKE_SOURCE_DIR}/cockatrice/src/client/lag_monitor.cpp lag_monitor_test.cpp)
 target_include_directories(lag_monitor_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src)
 add_executable(latency_tracker_test latency_tracker_test.cpp)
+add_executable(metrics_registry_test ../servatrice/src/metrics_registry.cpp metrics_registry_test.cpp)
+add_executable(
+  card_update_progress_test ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/card_database_update/card_update_progress.cpp
+                            card_update_progress_test.cpp
+)
+target_include_directories(card_update_progress_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src)
+add_executable(
+  loader_local_matching_test
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/card_picture_loader/card_picture_loader_local.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/cache_settings.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/card_counter_settings.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/shortcuts_settings.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network/update/client/release_channel.cpp
+  ${VERSION_STRING_CPP}
+  loader_local_matching_test.cpp
+)
+target_include_directories(loader_local_matching_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src)
+
+# Guard must match the condition for src/single_instance_manager.cpp in cockatrice/CMakeLists.txt.
+if(WITH_CLIENT)
+  add_executable(
+    single_instance_manager_test ${CMAKE_SOURCE_DIR}/cockatrice/src/single_instance_manager.cpp
+                                 single_instance_manager_test.cpp
+  )
+  target_include_directories(single_instance_manager_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src)
+  target_include_directories(single_instance_manager_test PRIVATE ${CMAKE_SOURCE_DIR}/libcockatrice_utility)
+
+  add_test(NAME single_instance_manager_test COMMAND single_instance_manager_test)
+endif()
 
 find_package(GTest)
 
@@ -70,9 +140,19 @@ if(NOT GTEST_FOUND)
   add_dependencies(server_card_counter_test gtest)
   add_dependencies(server_counter_test gtest)
   add_dependencies(server_rate_limiter_test gtest)
+  add_dependencies(server_developer_role_test gtest)
+  add_dependencies(server_game_join_test gtest)
   add_dependencies(warning_categories_test gtest)
+  if(TARGET translation_loader_test)
+    add_dependencies(translation_loader_test gtest)
+  endif()
+  add_dependencies(report_categories_test gtest)
   add_dependencies(lag_monitor_test gtest)
   add_dependencies(latency_tracker_test gtest)
+  add_dependencies(metrics_registry_test gtest)
+  add_dependencies(card_update_progress_test gtest)
+  add_dependencies(loader_local_matching_test gtest)
+  add_dependencies(single_instance_manager_test gtest)
 endif()
 
 include_directories(${GTEST_INCLUDE_DIRS})
@@ -105,17 +185,55 @@ target_link_libraries(
   server_rate_limiter_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
 )
 target_link_libraries(
+  server_developer_role_test libcockatrice_network libcockatrice_rng Threads::Threads ${GTEST_BOTH_LIBRARIES}
+  ${TEST_QT_MODULES}
+)
+target_link_libraries(
+  server_game_join_test libcockatrice_network_server_remote libcockatrice_rng Threads::Threads ${GTEST_BOTH_LIBRARIES}
+  ${TEST_QT_MODULES}
+)
+target_link_libraries(
   warning_categories_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
+)
+if(TARGET translation_loader_test)
+  target_link_libraries(
+    translation_loader_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
+  )
+endif()
+target_link_libraries(
+  report_categories_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
 )
 target_link_libraries(lag_monitor_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
 target_link_libraries(
   latency_tracker_test libcockatrice_network Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
 )
+target_include_directories(metrics_registry_test PRIVATE ${CMAKE_SOURCE_DIR}/servatrice/src)
+target_link_libraries(metrics_registry_test ${TEST_QT_MODULES} Threads::Threads ${GTEST_BOTH_LIBRARIES})
+target_link_libraries(card_update_progress_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
+target_link_libraries(
+  loader_local_matching_test libcockatrice_settings Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
+)
+
+if(WITH_CLIENT)
+  target_link_libraries(single_instance_manager_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
+endif()
 
 add_subdirectory(card_zone_algorithms)
 add_subdirectory(carddatabase)
+add_subdirectory(deck_list_model)
 add_subdirectory(deck_list_zones)
 add_subdirectory(loading_from_clipboard)
 add_subdirectory(movecard_tests)
 add_subdirectory(oracle)
 add_subdirectory(settings)
+
+# theme_migration_test compiles client sources, whose headers are only reachable from a client build.
+if(WITH_CLIENT)
+  add_subdirectory(theme_migration)
+endif()
+
+# picture_loader_benchmark links libcockatrice_settings, which only exists when
+# a client/UI-capable target is being built.
+if(WITH_ORACLE OR WITH_CLIENT)
+  add_subdirectory(picture_loader_benchmark)
+endif()

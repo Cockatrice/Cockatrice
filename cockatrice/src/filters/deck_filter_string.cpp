@@ -1,9 +1,27 @@
 #include "deck_filter_string.h"
 
+#include "../interface/deck_loader/loaded_deck.h"
+#include "libcockatrice/card/card_localization.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/deck_list/deck_list.h"
+#include "libcockatrice/deck_list/tree/deck_list_card_node.h"
+
+#include <QByteArray>
+#include <QDebug>
 #include <QFileInfo>
+#include <QList>
+#include <QMessageLogger>
+#include <QSharedPointer>
+#include <algorithm>
+#include <any>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/filters/filter_string.h>
 #include <libcockatrice/utility/peglib.h>
+#include <mutex>
+#include <qnamespace.h>
+#include <stddef.h>
+#include <string>
+#include <vector>
 
 static peg::parser search(R"(
 Start <- QueryPartList
@@ -42,6 +60,12 @@ NumericValue <- [0-9]+
 )");
 
 static std::once_flag init;
+
+// The peglib parser is a single permanent object, so the rule actions below cannot see
+// per-instance state. The card language that the nested [[card name]] search matches
+// against is passed through this thread-local context, which is live only while a
+// DeckFilterString is being parsed, and copied into the nested FilterString closures.
+thread_local CardSearchLanguage deckSearchLanguageContext;
 
 static void setupParserRules()
 {
@@ -116,7 +140,7 @@ static void setupParserRules()
 
     // actual functionality
     search["DeckContentQuery"] = [](const peg::SemanticValues &sv) -> DeckFilter {
-        auto cardFilter = FilterString(std::any_cast<QString>(sv[0]));
+        auto cardFilter = FilterString(std::any_cast<QString>(sv[0]), deckSearchLanguageContext);
         auto numberMatcher = sv.size() > 1 ? std::any_cast<NumberMatcher>(sv[1]) : [](int count) { return count > 0; };
 
         return [=](const DeckSearchData &data) -> bool {
@@ -186,7 +210,7 @@ DeckFilterString::DeckFilterString()
     _error = "Not initialized";
 }
 
-DeckFilterString::DeckFilterString(const QString &expr)
+DeckFilterString::DeckFilterString(const QString &expr, const CardSearchLanguage &searchLanguage)
 {
     QByteArray ba = expr.simplified().toUtf8();
 
@@ -198,6 +222,8 @@ DeckFilterString::DeckFilterString(const QString &expr)
         filter = [](const DeckSearchData &) { return true; };
         return;
     }
+
+    deckSearchLanguageContext = searchLanguage;
 
     search.set_logger([&](size_t /*ln*/, size_t col, const std::string &msg) {
         _error = QString("Error at position %1: %2").arg(col).arg(QString::fromStdString(msg));

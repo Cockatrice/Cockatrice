@@ -10,10 +10,10 @@
 #include "board/abstract_graphics_item.h"
 #include "board/graphics_item_type.h"
 
-#include <QString>
+#include <qtmetamacros.h>
 
-class QPainter;
-class QPixmap;
+class QGraphicsItem;
+class QPoint;
 
 class HandCounter : public AbstractGraphicsItem
 {

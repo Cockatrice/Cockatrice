@@ -2,7 +2,11 @@
 
 #include "../utility/report_utils.h"
 #include "abstract_client.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_report.pb.h"
 
+#include <QAbstractItemView>
+#include <QFont>
 #include <QFontDatabase>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -10,16 +14,22 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
-#include <QSplitter>
+#include <QSharedPointer>
 #include <QTableWidget>
+#include <QTableWidgetItem>
 #include <QTextEdit>
 #include <QVBoxLayout>
+#include <QVariant>
 #include <libcockatrice/protocol/pb/command_report_add_comment.pb.h>
 #include <libcockatrice/protocol/pb/command_report_details.pb.h>
 #include <libcockatrice/protocol/pb/command_report_my_list.pb.h>
 #include <libcockatrice/protocol/pb/response_report_details.pb.h>
 #include <libcockatrice/protocol/pb/response_report_my_list.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <qnamespace.h>
+#include <string>
+
+class QWidget;
 
 namespace
 {

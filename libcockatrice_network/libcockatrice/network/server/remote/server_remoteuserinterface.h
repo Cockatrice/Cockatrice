@@ -3,6 +3,9 @@
 
 #include "server_abstractuserinterface.h"
 
+class Server;
+class ServerInfo_User_Container;
+
 class Server_RemoteUserInterface : public Server_AbstractUserInterface
 {
 public:

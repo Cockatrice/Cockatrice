@@ -1,23 +1,34 @@
 #include "server_player.h"
 
 #include "../server.h"
-#include "../server_abstractuserinterface.h"
 #include "../server_database_interface.h"
 #include "../server_room.h"
+#include "game/server_abstract_participant.h"
+#include "game/server_abstract_player.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
+#include "libcockatrice/protocol/pb/color.pb.h"
+#include "libcockatrice/protocol/pb/move_card_to_zone.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_card.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_counter.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_zone.pb.h"
+#include "libcockatrice/utility/card_ref.h"
+#include "libcockatrice/utility/playmat_params.h"
 #include "server_card.h"
 #include "server_cardzone.h"
 #include "server_counter.h"
 #include "server_game.h"
 #include "server_move_card_struct.h"
+#include "server_response_containers.h"
 
-#include <QDebug>
-#include <QRegularExpression>
-#include <algorithm>
+#include <QMapIterator>
+#include <QSet>
+#include <QSharedPointer>
+#include <QString>
+#include <QtGlobal>
+#include <google/protobuf/stubs/port.h>
 #include <libcockatrice/deck_list/deck_list.h>
-#include <libcockatrice/deck_list/tree/deck_list_card_node.h>
-#include <libcockatrice/protocol/pb/command_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/command_change_zone_properties.pb.h>
-#include <libcockatrice/protocol/pb/command_concede.pb.h>
 #include <libcockatrice/protocol/pb/command_create_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_select.pb.h>
 #include <libcockatrice/protocol/pb/command_del_counter.pb.h>
@@ -43,13 +54,15 @@
 #include <libcockatrice/protocol/pb/event_shuffle.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_download.pb.h>
-#include <libcockatrice/protocol/pb/response_dump_zone.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
-#include <libcockatrice/rng/rng_abstract.h>
 #include <libcockatrice/utility/color.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <libcockatrice/utility/zone_names.h>
+#include <qalgorithms.h>
+#include <string>
+
+class Server_AbstractUserInterface;
 
 Server_Player::Server_Player(Server_Game *_game,
                              int _playerId,

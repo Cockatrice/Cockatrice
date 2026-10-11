@@ -1,9 +1,20 @@
 #include "bar_chart_widget.h"
 
+#include <QBrush>
+#include <QFlags>
+#include <QFont>
+#include <QLinearGradient>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
+#include <QPen>
+#include <QPoint>
+#include <QPointF>
+#include <QRect>
+#include <QSize>
 #include <QToolTip>
+#include <QtGlobal>
+#include <qnamespace.h>
 
 BarChartWidget::BarChartWidget(QWidget *parent) : QWidget(parent)
 {

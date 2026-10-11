@@ -1,11 +1,13 @@
 #ifndef COCKATRICE_DECK_LIST_HISTORY_MANAGER_H
 #define COCKATRICE_DECK_LIST_HISTORY_MANAGER_H
 
-#include "deck_list.h"
 #include "deck_list_memento.h"
 
 #include <QObject>
 #include <QStack>
+#include <qtmetamacros.h>
+
+class DeckList;
 
 class DeckListHistoryManager : public QObject
 {
@@ -47,6 +49,13 @@ public:
     }
 
 private:
+    /**
+     * @brief Moves one state from @p source to @p target, applying it to @p deck.
+     *
+     * Used by both undo (undoStack -> redoStack) and redo (redoStack -> undoStack).
+     */
+    void restoreAndSwap(QStack<DeckListMemento> &source, QStack<DeckListMemento> &target, DeckList *deck);
+
     QStack<DeckListMemento> undoStack;
     QStack<DeckListMemento> redoStack;
 };

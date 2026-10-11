@@ -8,10 +8,15 @@
 #define LOGGER_H
 
 #include <QFile>
+#include <QList>
 #include <QMutex>
+#include <QObject>
 #include <QString>
 #include <QTextStream>
-#include <QVector>
+#include <qlogging.h>
+#include <qprocessordetection.h>
+#include <qtmetamacros.h>
+#include <string>
 
 #if defined(Q_PROCESSOR_X86_32)
 #define BUILD_ARCHITECTURE "32-bit"

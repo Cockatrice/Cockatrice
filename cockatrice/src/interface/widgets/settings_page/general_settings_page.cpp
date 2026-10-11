@@ -1,20 +1,43 @@
 #include "general_settings_page.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../main.h"
 #include "../server/user/user_info_connection.h"
 #include "update/client/release_channel.h"
 
+#include <QByteArray>
 #include <QCoreApplication>
+#include <QDate>
+#include <QDebug>
+#include <QFile>
 #include <QFileDialog>
 #include <QGridLayout>
+#include <QGroupBox>
 #include <QLineEdit>
+#include <QList>
+#include <QMap>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QSharedPointer>
+#include <QSizePolicy>
 #include <QTranslator>
+#include <QVBoxLayout>
+#include <QVariant>
+#include <QVariantList>
+#include <QtGlobal>
+#include <libcockatrice/card/card_localization.h>
+#include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/tabs_settings.h>
 #include <libcockatrice/settings/updates_settings.h>
 #include <libcockatrice/utility/macros.h>
+#include <libcockatrice/utility/translation_loader.h>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <utility>
 
 enum startupCardUpdateCheckBehaviorIndex
 {
@@ -46,10 +69,40 @@ GeneralSettingsPage::GeneralSettingsPage()
     connect(&languageBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
             &GeneralSettingsPage::languageBoxChanged);
 
+    // card text & images language, independent of the UI language
+    cardLanguageBox.addItem(tr("English"), "en");
+    for (const QString &code : CardLocalization::supportedLanguages()) {
+        cardLanguageBox.addItem(CardLocalization::languageDisplayName(code), code);
+    }
+    const int cardLangIndex = cardLanguageBox.findData(SettingsCache::instance().cardsDisplay().getCardLang());
+    cardLanguageBox.setCurrentIndex(cardLangIndex < 0 ? 0 : cardLangIndex);
+
+    connect(&cardLanguageBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+            &GeneralSettingsPage::cardLanguageBoxChanged);
+
+    // card search language, independent of the card display language
+    cardSearchLanguageBox.addItem(""); // texts set in retranslateUi
+    cardSearchLanguageBox.addItem("");
+    cardSearchLanguageBox.addItem("");
+    const int cardSearchLanguageIndex = SettingsCache::instance().cardsDisplay().getCardSearchLanguage();
+    cardSearchLanguageBox.setCurrentIndex(cardSearchLanguageIndex < 0 ? static_cast<int>(SearchLanguageMode::English)
+                                                                      : cardSearchLanguageIndex);
+
+    connect(&cardSearchLanguageBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+            &GeneralSettingsPage::cardSearchLanguageBoxChanged);
+
     auto *languageGrid = new QGridLayout;
     languageGrid->addWidget(&languageLabel, 0, 0);
     languageGrid->addWidget(&languageBox, 0, 1);
-    languageGrid->addWidget(&advertiseTranslationPageLabel, 1, 1, Qt::AlignRight);
+    languageGrid->addWidget(&cardLanguageLabel, 1, 0);
+    languageGrid->addWidget(&cardLanguageBox, 1, 1);
+    languageGrid->addWidget(&cardLanguageNoteLabel, 2, 1);
+    languageGrid->addWidget(&cardSearchLanguageLabel, 3, 0);
+    languageGrid->addWidget(&cardSearchLanguageBox, 3, 1);
+    languageGrid->addWidget(&advertiseTranslationPageLabel, 4, 1, Qt::AlignRight);
+
+    cardLanguageNoteLabel.setWordWrap(true);
+    cardLanguageNoteLabel.setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
     languageGroupBox = new QGroupBox;
     languageGroupBox->setLayout(languageGrid);
@@ -108,12 +161,18 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     newVersionOracleCheckBox.setChecked(settings.updates().getNotifyAboutNewVersion());
 
+    cardDatabaseUpdateTrayNotificationCheckBox.setChecked(settings.updates().getCardDatabaseUpdateTrayNotification());
+
+    connect(&cardDatabaseUpdateTrayNotificationCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.updates(),
+            &UpdatesSettings::setCardDatabaseUpdateTrayNotification);
+
     auto *cardDatabaseGrid = new QGridLayout;
     cardDatabaseGrid->addWidget(&startupCardUpdateCheckBehaviorLabel, 0, 0);
     cardDatabaseGrid->addWidget(&startupCardUpdateCheckBehaviorSelector, 0, 1);
     cardDatabaseGrid->addWidget(&cardUpdateCheckIntervalLabel, 1, 0);
     cardDatabaseGrid->addWidget(&cardUpdateCheckIntervalSpinBox, 1, 1);
     cardDatabaseGrid->addWidget(&lastCardUpdateCheckDateLabel, 2, 1);
+    cardDatabaseGrid->addWidget(&cardDatabaseUpdateTrayNotificationCheckBox, 3, 0, 1, 2);
 
     cardDatabaseGroupBox = new QGroupBox;
     cardDatabaseGroupBox->setLayout(cardDatabaseGrid);
@@ -297,22 +356,18 @@ GeneralSettingsPage::GeneralSettingsPage()
 
 QStringList GeneralSettingsPage::findQmFiles()
 {
-    QDir dir(translationPath);
-    QStringList fileNames = dir.entryList(QStringList(translationPrefix + "_*.qm"), QDir::Files, QDir::Name);
-    fileNames.replaceInStrings(QRegularExpression(translationPrefix + "_(.*)\\.qm"), "\\1");
-    return fileNames;
+    return TranslationLoader::availableLanguages(translationPrefix,
+                                                 TranslationLoader::applicationTranslationPaths(translationPath));
 }
 
 QString GeneralSettingsPage::languageName(const QString &lang)
 {
     QTranslator qTranslator;
 
-    QString appNameHint = translationPrefix + "_" + lang;
-    bool appTranslationLoaded = qTranslator.load(appNameHint, translationPath);
-    if (!appTranslationLoaded) {
-        qCWarning(GeneralSettingsPageLog)
-            << "Unable to load" << translationPrefix << "translation" << appNameHint << "at" << translationPath;
-    }
+    // Only the language name is needed here, so the file is loaded without logging a line per
+    // language: findQmFiles() asked for languages whose files exist in the first place.
+    TranslationLoader::loadFrom(qTranslator, translationPrefix + "_" + lang,
+                                TranslationLoader::applicationTranslationPaths(translationPath));
 
     return qTranslator.translate("i18n", DEFAULT_LANG_NAME);
 }
@@ -412,6 +467,57 @@ void GeneralSettingsPage::languageBoxChanged(int index)
     SettingsCache::instance().personal().setLang(languageBox.itemData(index).toString());
 }
 
+void GeneralSettingsPage::cardLanguageBoxChanged(int index)
+{
+    const QString lang = cardLanguageBox.itemData(index).toString();
+    SettingsCache::instance().cardsDisplay().setCardLang(lang);
+
+    // Switching to a non-default language only takes effect after the card
+    // database is re-imported with that language selected; English data is always
+    // present, so switching back to English needs no prompt.
+    if (lang == "en") {
+        return;
+    }
+
+    // The binary cache does not track the language its entries were imported in,
+    // and the downloaded pictures were fetched with English art names, so both are
+    // stale until Oracle re-imports the database in the new language: drop them.
+    QFile::remove(SettingsCache::instance().getCardDatabasePath() + ".cache");
+    CardPictureLoader::clearNetworkCache();
+    CardPictureLoader::clearPixmapCache();
+
+    // Art is resolved by the translated card name for non-English languages, so the
+    // matching Scryfall URL is added to the top of the download list. It stays
+    // visible in the deck editor settings, where it can be removed or reordered.
+    const bool localizedUrlAdded = SettingsCache::instance().downloads().addLocalizedScryfallUrl();
+
+    QString message = tr("<p>The card database only contains English card data. To see cards in <b>%1</b>, "
+                         "<b>Oracle</b> must run once with this language selected and re-import the card "
+                         "database.</p>"
+                         "<p>The cached database and the downloaded card pictures have been cleared, so a "
+                         "re-import is picked up without stale entries.</p>")
+                          .arg(cardLanguageBox.itemText(index));
+    if (localizedUrlAdded) {
+        message += tr("<p>The Scryfall URL that resolves card art by translated name was added to the top of your "
+                      "download list. You can remove or reorder it any time.</p>");
+    }
+    message += tr("<p>Run Oracle now?</p>");
+
+    const QMessageBox::StandardButton answer = QMessageBox::question(
+        this, tr("Card text & images language changed"), message, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+
+    // The answer only controls whether Oracle starts right away; the caches stay
+    // cleared so the next import or launch rebuilds them in the new language.
+    if (answer == QMessageBox::Yes) {
+        emit cardDatabaseUpdateRequested();
+    }
+}
+
+void GeneralSettingsPage::cardSearchLanguageBoxChanged(int index)
+{
+    SettingsCache::instance().cardsDisplay().setCardSearchLanguage(index);
+}
+
 void GeneralSettingsPage::updateStartupServerControlsVisibility()
 {
     const int index = startupTabSelector.currentIndex();
@@ -425,29 +531,38 @@ void GeneralSettingsPage::updateStartupServerControlsVisibility()
 
 void GeneralSettingsPage::retranslateUi()
 {
+    const auto &settings = SettingsCache::instance();
+
     languageGroupBox->setTitle(tr("Language settings"));
     languageLabel.setText(tr("Language:"));
-
-    versionGroupBox->setTitle(tr("Version settings"));
-    cardDatabaseGroupBox->setTitle(tr("Card database"));
-    startupGroupBox->setTitle(tr("Startup settings"));
-
-    if (SettingsCache::instance().getIsPortableBuild()) {
-        pathsGroupBox->setTitle(tr("Paths (editing disabled in portable mode)"));
-    } else {
-        pathsGroupBox->setTitle(tr("Paths"));
-    }
+    cardLanguageBox.setItemText(0, tr("English"));
+    cardLanguageLabel.setText(tr("Card text & images language:"));
+    cardLanguageNoteLabel.setText(
+        tr("Foreign card names, text and art apply after you update the card database (Oracle)."));
+    cardSearchLanguageLabel.setText(tr("Language used in card search:"));
+    cardSearchLanguageBox.setItemText(static_cast<int>(SearchLanguageMode::English), tr("English"));
+    cardSearchLanguageBox.setItemText(static_cast<int>(SearchLanguageMode::Selected),
+                                      tr("Selected card language (untranslated cards still match in English)"));
+    cardSearchLanguageBox.setItemText(static_cast<int>(SearchLanguageMode::Both),
+                                      tr("English and selected card language"));
     advertiseTranslationPageLabel.setText(
         QString("<a href='%1'>%2</a>").arg(WIKI_TRANSLATION_FAQ).arg(tr("How to help with translations")));
-    deckPathLabel.setText(tr("Decks directory:"));
-    filtersPathLabel.setText(tr("Filters directory:"));
-    replaysPathLabel.setText(tr("Replays directory:"));
-    picsPathLabel.setText(tr("Pictures directory:"));
-    cardDatabasePathLabel.setText(tr("Card database:"));
-    customCardDatabasePathLabel.setText(tr("Custom database directory:"));
-    tokenDatabasePathLabel.setText(tr("Token database:"));
+
+    versionGroupBox->setTitle(tr("Version settings"));
     updateReleaseChannelLabel.setText(tr("Update channel"));
     startupUpdateCheckCheckBox.setText(tr("Check for client updates on startup"));
+    updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));
+    newVersionOracleCheckBox.setText(tr("Automatically run Oracle when running a new version of Cockatrice"));
+
+    // We can't change the strings after they're put into the QComboBox, so this is our workaround
+    int oldIndex = updateReleaseChannelBox.currentIndex();
+    updateReleaseChannelBox.clear();
+    for (ReleaseChannel *chan : settings.getUpdateReleaseChannels()) {
+        updateReleaseChannelBox.addItem(tr(chan->getName().toUtf8()));
+    }
+    updateReleaseChannelBox.setCurrentIndex(oldIndex);
+
+    cardDatabaseGroupBox->setTitle(tr("Card database"));
     startupCardUpdateCheckBehaviorLabel.setText(tr("Check for card database updates on startup"));
     startupCardUpdateCheckBehaviorSelector.setItemText(startupCardUpdateCheckBehaviorIndexNone, tr("Don't check"));
     startupCardUpdateCheckBehaviorSelector.setItemText(startupCardUpdateCheckBehaviorIndexPrompt,
@@ -456,8 +571,14 @@ void GeneralSettingsPage::retranslateUi()
                                                        tr("Always update in the background"));
     cardUpdateCheckIntervalLabel.setText(tr("Check for card database updates every"));
     cardUpdateCheckIntervalSpinBox.setSuffix(tr(" days"));
-    updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));
-    newVersionOracleCheckBox.setText(tr("Automatically run Oracle when running a new version of Cockatrice"));
+    cardDatabaseUpdateTrayNotificationCheckBox.setText(tr("Notify in the system tray while the card database updates"));
+
+    QDate lastCheckDate = settings.updates().getLastCardUpdateCheck();
+    int daysAgo = lastCheckDate.daysTo(QDate::currentDate());
+    lastCardUpdateCheckDateLabel.setText(
+        tr("Last update check on %1 (%2 days ago)").arg(lastCheckDate.toString()).arg(daysAgo));
+
+    startupGroupBox->setTitle(tr("Startup settings"));
     showTipsOnStartup.setText(tr("Show tips on startup"));
     startupTabLabel.setText(tr("Startup tab:"));
     startupTabSelector.setItemText(StartupTab::StartupTabHome, tr("Home"));
@@ -473,21 +594,18 @@ void GeneralSettingsPage::retranslateUi()
     startupServerLabel.setText(tr("Server:"));
     startupRoomLabel.setText(tr("Room:"));
     startupRoomNameEdit->setPlaceholderText(tr("Room name"));
-    resetAllPathsButton->setText(tr("Reset all paths"));
 
-    const auto &settings = SettingsCache::instance();
-
-    QDate lastCheckDate = settings.updates().getLastCardUpdateCheck();
-    int daysAgo = lastCheckDate.daysTo(QDate::currentDate());
-
-    lastCardUpdateCheckDateLabel.setText(
-        tr("Last update check on %1 (%2 days ago)").arg(lastCheckDate.toString()).arg(daysAgo));
-
-    // We can't change the strings after they're put into the QComboBox, so this is our workaround
-    int oldIndex = updateReleaseChannelBox.currentIndex();
-    updateReleaseChannelBox.clear();
-    for (ReleaseChannel *chan : settings.getUpdateReleaseChannels()) {
-        updateReleaseChannelBox.addItem(tr(chan->getName().toUtf8()));
+    if (settings.getIsPortableBuild()) {
+        pathsGroupBox->setTitle(tr("Paths (editing disabled in portable mode)"));
+    } else {
+        pathsGroupBox->setTitle(tr("Paths"));
     }
-    updateReleaseChannelBox.setCurrentIndex(oldIndex);
+    deckPathLabel.setText(tr("Decks directory:"));
+    filtersPathLabel.setText(tr("Filters directory:"));
+    replaysPathLabel.setText(tr("Replays directory:"));
+    picsPathLabel.setText(tr("Pictures directory:"));
+    cardDatabasePathLabel.setText(tr("Card database:"));
+    customCardDatabasePathLabel.setText(tr("Custom database directory:"));
+    tokenDatabasePathLabel.setText(tr("Token database:"));
+    resetAllPathsButton->setText(tr("Reset all paths"));
 }

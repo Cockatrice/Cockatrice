@@ -1,5 +1,11 @@
 #include "appearance_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QVariant>
+
+class QObject;
+
 AppearanceSettings::AppearanceSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "appearance.ini", "appearance", QString(), parent)
 {
@@ -68,6 +74,17 @@ void AppearanceSettings::setHomeTabDisplayCardName(bool _displayCardName)
 {
     setValue(_displayCardName, "homeTabDisplayCardName");
     emit homeTabDisplayCardNameChanged();
+}
+
+bool AppearanceSettings::getHomeTabBackgroundDim() const
+{
+    return getValue("homeTabBackgroundDim", QString(), QString(), true).toBool();
+}
+
+void AppearanceSettings::setHomeTabBackgroundDim(bool _dimBackground)
+{
+    setValue(_dimBackground, "homeTabBackgroundDim");
+    emit homeTabBackgroundDimChanged();
 }
 
 int AppearanceSettings::getHomeTabButtonColorSourceIndex() const

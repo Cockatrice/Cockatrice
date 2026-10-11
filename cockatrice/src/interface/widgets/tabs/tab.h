@@ -7,12 +7,16 @@
 #ifndef TAB_H
 #define TAB_H
 
+#include <QList>
 #include <QMainWindow>
+#include <QString>
 #include <libcockatrice/utility/card_ref.h>
+#include <qtmetamacros.h>
 
 class QMenu;
 class TabSupervisor;
 class CardInfoDisplayWidget;
+class QPoint;
 
 class Tab : public QMainWindow
 {

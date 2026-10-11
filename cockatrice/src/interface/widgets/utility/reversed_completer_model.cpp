@@ -1,7 +1,10 @@
 #include "reversed_completer_model.h"
 
 #include <QAbstractItemModel>
+#include <QDebug>
+#include <QList>
 #include <QModelIndex>
+#include <QPersistentModelIndex>
 #include <QVariant>
 
 void ReversedCompleterModel::setSourceModel(QAbstractItemModel *sourceModel)

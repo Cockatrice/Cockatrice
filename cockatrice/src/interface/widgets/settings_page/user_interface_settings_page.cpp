@@ -3,13 +3,22 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../tabs/api/commander_spellbook/commander_spellbook_bracket_explainer.h"
+#include "libcockatrice/utility/macros.h"
 
+#include <QDebug>
 #include <QGridLayout>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QVariant>
+#include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <qnamespace.h>
 
 enum visualDeckStoragePromptForConversionIndex
 {
@@ -20,26 +29,7 @@ enum visualDeckStoragePromptForConversionIndex
 
 UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 {
-    // general settings and notification settings
-    notificationsEnabledCheckBox.setChecked(SettingsCache::instance().userInterface().getNotificationsEnabled());
-    connect(&notificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
-            &InterfaceSettings::setNotificationsEnabled);
-    connect(&notificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
-            &UserInterfaceSettingsPage::setNotificationEnabled);
-
-    specNotificationsEnabledCheckBox.setChecked(
-        SettingsCache::instance().userInterface().getSpectatorNotificationsEnabled());
-    specNotificationsEnabledCheckBox.setEnabled(SettingsCache::instance().userInterface().getNotificationsEnabled());
-    connect(&specNotificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
-            &InterfaceSettings::setSpectatorNotificationsEnabled);
-
-    buddyConnectNotificationsEnabledCheckBox.setChecked(
-        SettingsCache::instance().userInterface().getBuddyConnectNotificationsEnabled());
-    buddyConnectNotificationsEnabledCheckBox.setEnabled(
-        SettingsCache::instance().userInterface().getNotificationsEnabled());
-    connect(&buddyConnectNotificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED,
-            &SettingsCache::instance().userInterface(), &InterfaceSettings::setBuddyConnectNotificationsEnabled);
-
+    // general settings
     doubleClickToPlayCheckBox.setChecked(SettingsCache::instance().userInterface().getDoubleClickToPlay());
     connect(&doubleClickToPlayCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setDoubleClickToPlay);
@@ -103,6 +93,26 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
 
+    // notification settings
+    notificationsEnabledCheckBox.setChecked(SettingsCache::instance().userInterface().getNotificationsEnabled());
+    connect(&notificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
+            &InterfaceSettings::setNotificationsEnabled);
+    connect(&notificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
+            &UserInterfaceSettingsPage::setNotificationEnabled);
+
+    specNotificationsEnabledCheckBox.setChecked(
+        SettingsCache::instance().userInterface().getSpectatorNotificationsEnabled());
+    specNotificationsEnabledCheckBox.setEnabled(SettingsCache::instance().userInterface().getNotificationsEnabled());
+    connect(&specNotificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
+            &InterfaceSettings::setSpectatorNotificationsEnabled);
+
+    buddyConnectNotificationsEnabledCheckBox.setChecked(
+        SettingsCache::instance().userInterface().getBuddyConnectNotificationsEnabled());
+    buddyConnectNotificationsEnabledCheckBox.setEnabled(
+        SettingsCache::instance().userInterface().getNotificationsEnabled());
+    connect(&buddyConnectNotificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED,
+            &SettingsCache::instance().userInterface(), &InterfaceSettings::setBuddyConnectNotificationsEnabled);
+
     auto *notificationsGrid = new QGridLayout;
     notificationsGrid->addWidget(&notificationsEnabledCheckBox, 0, 0);
     notificationsGrid->addWidget(&specNotificationsEnabledCheckBox, 1, 0);
@@ -147,6 +157,11 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     openDeckInNewTabCheckBox.setChecked(SettingsCache::instance().deckEditor().getOpenDeckInNewTab());
     connect(&openDeckInNewTabCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().deckEditor(),
             &DeckEditorSettings::setOpenDeckInNewTab);
+
+    visualDeckEditorShowCardCountsCheckBox.setChecked(
+        SettingsCache::instance().cardsDisplay().getVisualDeckEditorShowCardCounts());
+    connect(&visualDeckEditorShowCardCountsCheckBox, &QCheckBox::QT_STATE_CHANGED,
+            &SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::setVisualDeckEditorShowCardCounts);
 
     visualDeckStorageInGameCheckBox.setChecked(
         SettingsCache::instance().visualDeckStorage().getVisualDeckStorageInGame());
@@ -243,18 +258,19 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 
     auto *deckEditorGrid = new QGridLayout;
     deckEditorGrid->addWidget(&openDeckInNewTabCheckBox, 0, 0);
-    deckEditorGrid->addWidget(&visualDeckStorageInGameCheckBox, 1, 0);
-    deckEditorGrid->addWidget(&visualDeckStorageSelectionAnimationCheckBox, 2, 0);
-    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionLabel, 3, 0);
-    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionSelector, 3, 1);
-    deckEditorGrid->addWidget(&defaultDeckEditorTypeLabel, 4, 0);
-    deckEditorGrid->addWidget(&defaultDeckEditorTypeSelector, 4, 1);
-    deckEditorGrid->addWidget(&vdeStartupTabLabel, 5, 0);
-    deckEditorGrid->addWidget(&vdeStartupTabSelector, 5, 1);
-    deckEditorGrid->addWidget(&commanderSpellbookIntegrationEnabledLabel, 6, 0);
-    deckEditorGrid->addWidget(&commanderSpellbookIntegrationEnabledSelector, 6, 1);
-    deckEditorGrid->addWidget(labelWidget, 7, 0);
-    deckEditorGrid->addWidget(&commanderSpellbookIntegrationBracketNamingSelector, 7, 1);
+    deckEditorGrid->addWidget(&visualDeckEditorShowCardCountsCheckBox, 1, 0);
+    deckEditorGrid->addWidget(&visualDeckStorageInGameCheckBox, 2, 0);
+    deckEditorGrid->addWidget(&visualDeckStorageSelectionAnimationCheckBox, 3, 0);
+    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionLabel, 4, 0);
+    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionSelector, 4, 1);
+    deckEditorGrid->addWidget(&defaultDeckEditorTypeLabel, 5, 0);
+    deckEditorGrid->addWidget(&defaultDeckEditorTypeSelector, 5, 1);
+    deckEditorGrid->addWidget(&vdeStartupTabLabel, 6, 0);
+    deckEditorGrid->addWidget(&vdeStartupTabSelector, 6, 1);
+    deckEditorGrid->addWidget(&commanderSpellbookIntegrationEnabledLabel, 7, 0);
+    deckEditorGrid->addWidget(&commanderSpellbookIntegrationEnabledSelector, 7, 1);
+    deckEditorGrid->addWidget(labelWidget, 8, 0);
+    deckEditorGrid->addWidget(&commanderSpellbookIntegrationBracketNamingSelector, 8, 1);
 
     deckEditorGroupBox = new QGroupBox;
     deckEditorGroupBox->setLayout(deckEditorGrid);
@@ -355,6 +371,7 @@ void UserInterfaceSettingsPage::retranslateUi()
     notificationsEnabledCheckBox.setText(tr("Enable notifications in taskbar"));
     specNotificationsEnabledCheckBox.setText(tr("Notify in the taskbar for game events while you are spectating"));
     buddyConnectNotificationsEnabledCheckBox.setText(tr("Notify in the taskbar when users in your buddy list connect"));
+
     animationGroupBox->setTitle(tr("Animation settings"));
     enableAllAnimationsButton.setText(tr("&Enable all animations"));
     disableAllAnimationsButton.setText(tr("&Disable all animations"));
@@ -362,8 +379,10 @@ void UserInterfaceSettingsPage::retranslateUi()
     arrowDrawAnimationCheckBox.setText(tr("&Arrow draw animation"));
     lifeCounterAnimationsCheckBox.setText(tr("Life counter flash"));
     battlefieldFlashCheckBox.setText(tr("Battlefield flash on damage"));
+
     deckEditorGroupBox->setTitle(tr("Deck editor/storage settings"));
     openDeckInNewTabCheckBox.setText(tr("Open deck in new tab by default"));
+    visualDeckEditorShowCardCountsCheckBox.setText(tr("Show card counts in Visual Deck Editor"));
     visualDeckStorageInGameCheckBox.setText(tr("Use visual deck storage in game lobby"));
     visualDeckStorageSelectionAnimationCheckBox.setText(tr("Use selection animation for Visual Deck Storage"));
     visualDeckStoragePromptForConversionLabel.setText(
@@ -397,8 +416,8 @@ void UserInterfaceSettingsPage::retranslateUi()
         0, CommanderBracketNames::CommanderSpellbookBracketNames);
     commanderSpellbookIntegrationBracketNamingSelector.setItemText(
         1, CommanderBracketNames::OfficialCommanderBracketNames);
-
     commanderSpellbookIntegrationUseOfficialBracketNamesExplainer.setToolTip(CommanderBracketNames::Explainer);
+
     replayGroupBox->setTitle(tr("Replay settings"));
     rewindBufferingMsLabel.setText(tr("Buffer time for backwards skip via shortcut:"));
     rewindBufferingMsBox.setSuffix(" ms");

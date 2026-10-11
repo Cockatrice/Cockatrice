@@ -1,7 +1,10 @@
 #include "tally_menu.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../tally/tally.h"
+#include "libcockatrice/settings/interface_settings.h"
 
+#include <QAction>
 #include <QActionGroup>
 
 TallyMenu::TallyMenu()
@@ -12,11 +15,13 @@ TallyMenu::TallyMenu()
     aTallyNone = createTallyAction(TallyType::None);
     aTallySubtypes = createTallyAction(TallyType::Subtypes);
     aTallyTotalPower = createTallyAction(TallyType::TotalPower);
+    aTallyTotalToughness = createTallyAction(TallyType::TotalToughness);
 
     addAction(aTallyNone);
     addSeparator();
     addAction(aTallySubtypes);
     addAction(aTallyTotalPower);
+    addAction(aTallyTotalToughness);
 
     retranslateUi();
 }
@@ -54,4 +59,5 @@ void TallyMenu::retranslateUi()
     aTallyNone->setText(tr("None"));
     aTallySubtypes->setText(tr("Subtypes"));
     aTallyTotalPower->setText(tr("Total Power"));
+    aTallyTotalToughness->setText(tr("Total Toughness"));
 }

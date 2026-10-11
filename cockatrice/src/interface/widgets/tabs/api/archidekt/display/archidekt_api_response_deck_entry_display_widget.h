@@ -1,17 +1,20 @@
 #ifndef COCKATRICE_ARCHIDEKT_API_RESPONSE_DECK_ENTRY_DISPLAY_WIDGET_H
 #define COCKATRICE_ARCHIDEKT_API_RESPONSE_DECK_ENTRY_DISPLAY_WIDGET_H
 
-#include "../../../../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../api_response/deck_listings/archidekt_api_response_deck_listing_container.h"
-#include "archidekt_deck_preview_image_display_widget.h"
 
-#include <QLabel>
-#include <QNetworkAccessManager>
-#include <QResizeEvent>
-#include <QVBoxLayout>
+#include <QPixmap>
+#include <QString>
+#include <QUrl>
 #include <QWidget>
+#include <qtmetamacros.h>
 
 class BackgroundPlateWidget;
+class ArchidektDeckPreviewImageDisplayWidget;
+class QLabel;
+class QNetworkAccessManager;
+class QNetworkReply;
+class QVBoxLayout;
 
 /**
  * @class ArchidektApiResponseDeckEntryDisplayWidget

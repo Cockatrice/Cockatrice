@@ -5,6 +5,7 @@ set(CMAKE_AUTORCC ON)
 set(HEADERS
     libcockatrice/card/card_info.h
     libcockatrice/card/card_info_comparator.h
+    libcockatrice/card/card_localization.h
     libcockatrice/card/lazy_properties_hash.h
     libcockatrice/card/database/card_database.h
     libcockatrice/card/database/card_database_loader.h
@@ -27,6 +28,7 @@ add_library(
   ${MOC_SOURCES}
   libcockatrice/card/card_info.cpp
   libcockatrice/card/card_info_comparator.cpp
+  libcockatrice/card/card_localization.cpp
   libcockatrice/card/lazy_properties_hash.cpp
   libcockatrice/card/database/card_database.cpp
   libcockatrice/card/database/card_database_cache.cpp

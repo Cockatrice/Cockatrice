@@ -14,6 +14,7 @@ RUN apt-get update \
       libmariadb-dev-compat \
       libprotobuf-dev \
       libqt6sql6-mysql \
+      libssl-dev \
       qt6-websockets-dev \
       protobuf-compiler \
       qt6-tools-dev \
@@ -42,6 +43,7 @@ RUN apt-get update \
       libprotobuf32t64 \
       libqt6sql6-mysql \
       libqt6websockets6 \
+      libssl3 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

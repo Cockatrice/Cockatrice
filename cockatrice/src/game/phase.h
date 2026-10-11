@@ -7,8 +7,9 @@
 #ifndef PHASE_H
 #define PHASE_H
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QString>
+#include <QVector>
 
 class Phase
 {

@@ -1,8 +1,19 @@
 #ifndef WINDOW_DECKEDITORVISUAL_H
 #define WINDOW_DECKEDITORVISUAL_H
 
-#include "../tab.h"
-#include "tab_deck_editor_visual_tab_widget.h"
+#include "../abstract_tab_deck_editor.h"
+
+#include <QMouseEvent>
+#include <QString>
+#include <qtmetamacros.h>
+
+class ExactCard;
+class QDockWidget;
+class QHBoxLayout;
+class QVBoxLayout;
+class QWidget;
+class TabDeckEditorVisualTabWidget;
+class TabSupervisor;
 
 /**
  * @class TabDeckEditorVisual
@@ -164,6 +175,12 @@ public slots:
      * @return true if successful, false otherwise.
      */
     bool actSaveDeckAs() override;
+
+    /**
+     * @brief Prompts for and creates a new custom deck zone.
+     * @return The name of the created zone, or an empty string if creation was cancelled.
+     */
+    QString createNewZone();
 
 private:
     /**

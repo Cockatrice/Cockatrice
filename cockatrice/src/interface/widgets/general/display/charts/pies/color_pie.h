@@ -1,6 +1,12 @@
 #ifndef COCKATRICE_COLOR_PIE_H
 #define COCKATRICE_COLOR_PIE_H
 
+#include <QColor>
+#include <QList>
+#include <QPair>
+#include <qtmetamacros.h>
+
+class QPoint;
 #ifndef COLOR_PIE_H
 #define COLOR_PIE_H
 

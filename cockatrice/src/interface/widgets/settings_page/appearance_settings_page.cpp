@@ -1,29 +1,44 @@
 #include "appearance_settings_page.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../../client/settings/card_counter_settings.h"
 #include "../../client/settings/card_counter_settings.h"
 #include "../../palette_editor/palette_editor_dialog.h"
+#include "../../theme_config.h"
 #include "../dialogs/override_printing_warning.h"
 #include "../general/home_tab_button_color.h"
 #include "../interface/theme_manager.h"
 #include "../interface/widgets/general/background_sources.h"
 #include "../playmat/playmat_collection_dialog.h"
-#include "../playmat/playmat_settings_dialog.h"
+#include "libcockatrice/interfaces/interface_interface_settings_provider.h"
+#include "libcockatrice/utility/macros.h"
 
+#include <QAbstractButton>
 #include <QApplication>
+#include <QColor>
 #include <QColorDialog>
+#include <QDebug>
 #include <QDesktopServices>
+#include <QDir>
 #include <QGridLayout>
-#include <QHBoxLayout>
+#include <QGroupBox>
 #include <QMessageBox>
+#include <QObject>
+#include <QSharedPointer>
+#include <QString>
+#include <QStringList>
+#include <QStringLiteral>
 #include <QStyleFactory>
 #include <QTimer>
+#include <QUrl>
+#include <QVBoxLayout>
+#include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
+#include <qnamespace.h>
 
 AppearanceSettingsPage::AppearanceSettingsPage()
 {
@@ -59,8 +74,9 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&schemeCombo, &QComboBox::currentIndexChanged, this,
             [this] { themeManager->setColorScheme(schemeCombo.currentData().toString()); });
 
-    // Qt widget style; "Default" lets the application decide
-    styleCombo.addItem(tr("Default"), QStringLiteral("Default"));
+    // Qt widget style; "System" lets the application decide. The broken Windows
+    // native styles are still offered, but selecting one raises a warning.
+    styleCombo.addItem(tr("System"), QStringLiteral("System"));
     for (const QString &key : QStyleFactory::keys()) {
         styleCombo.addItem(key, key);
     }
@@ -71,6 +87,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
     connect(&styleCombo, &QComboBox::currentIndexChanged, this,
             [this] { themeManager->setStyleName(styleCombo.currentData().toString()); });
+    connect(&styleCombo, &QComboBox::currentIndexChanged, this, &AppearanceSettingsPage::updateStyleWarning);
 
     connect(themeManager, &ThemeManager::themeChanged, this, [this, dirPath] {
         const QString newDir = themeManager->getAvailableThemes().value(SettingsCache::instance().getThemeName());
@@ -87,6 +104,8 @@ AppearanceSettingsPage::AppearanceSettingsPage()
         const int styleIdx = currentStyle.isEmpty() ? 0 : styleCombo.findData(currentStyle);
         styleCombo.setCurrentIndex(styleIdx >= 0 ? styleIdx : 0);
         styleCombo.blockSignals(false);
+
+        updateStyleWarning();
     });
 
     connect(&editPaletteButton, &QPushButton::clicked, this, &AppearanceSettingsPage::editPalette);
@@ -99,7 +118,11 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     themeGrid->addWidget(&schemeCombo, 2, 1);
     themeGrid->addWidget(&styleComboLabel, 3, 0);
     themeGrid->addWidget(&styleCombo, 3, 1);
-    themeGrid->addWidget(&editPaletteButton, 4, 1);
+    themeGrid->addWidget(&styleWarningLabel, 4, 0, 1, 2);
+    themeGrid->addWidget(&editPaletteButton, 5, 1);
+
+    styleWarningLabel.setWordWrap(true);
+    styleWarningLabel.setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
     themeGroupBox = new QGroupBox;
     themeGroupBox->setLayout(themeGrid);
@@ -132,6 +155,10 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&homeTabDisplayCardNameCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.appearance(),
             &AppearanceSettings::setHomeTabDisplayCardName);
 
+    homeTabBackgroundDimCheckBox.setChecked(settings.appearance().getHomeTabBackgroundDim());
+    connect(&homeTabBackgroundDimCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.appearance(),
+            &AppearanceSettings::setHomeTabBackgroundDim);
+
     for (const auto &entry : HomeTabButtonColor::all()) {
         homeTabButtonColorSourceBox.addItem(QObject::tr(entry.trKey));
     }
@@ -150,10 +177,53 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     homeTabGrid->addWidget(&homeTabDisplayCardNameCheckBox, 2, 0, 1, 2);
     homeTabGrid->addWidget(&homeTabButtonColorSourceLabel, 3, 0);
     homeTabGrid->addWidget(&homeTabButtonColorSourceBox, 3, 1);
+    homeTabGrid->addWidget(&homeTabBackgroundDimCheckBox, 4, 0, 1, 2);
 
     homeTabGroupBox = new QGroupBox;
     homeTabGroupBox->setLayout(homeTabGrid);
 
+    // Playmat settings
+    playmatVisibilityCombo.addItem(tr("Show all playmats"), PlaymatVisibilityAll);
+    playmatVisibilityCombo.addItem(tr("Show own playmat only"), PlaymatVisibilityOwnOnly);
+    playmatVisibilityCombo.addItem(tr("Don't use playmats"), PlaymatVisibilityNone);
+    int visIdx = playmatVisibilityCombo.findData(settings.userInterface().getPlaymatVisibility());
+    if (visIdx >= 0) {
+        playmatVisibilityCombo.setCurrentIndex(visIdx);
+    }
+    connect(&playmatVisibilityCombo, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int index) {
+        SettingsCache::instance().userInterface().setPlaymatVisibility(playmatVisibilityCombo.itemData(index).toInt());
+    });
+    playmatVisibilityLabel.setBuddy(&playmatVisibilityCombo);
+
+    // Playmat mode: Override / Fallback / Deck-only
+    playmatModeCombo.addItem(tr("Override deck playmat"), PlaymatModeOverrideDeck);
+    playmatModeCombo.addItem(tr("Fallback if deck has none"), PlaymatModeFallback);
+    playmatModeCombo.addItem(tr("Deck only, ignore collection"), PlaymatModeDeckOnly);
+    int modeIdx = playmatModeCombo.findData(settings.userInterface().getPlaymatMode());
+    if (modeIdx >= 0) {
+        playmatModeCombo.setCurrentIndex(modeIdx);
+    }
+    connect(&playmatModeCombo, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int index) {
+        SettingsCache::instance().userInterface().setPlaymatMode(playmatModeCombo.itemData(index).toInt());
+    });
+    playmatModeLabel.setBuddy(&playmatModeCombo);
+
+    // User-level playmat settings: fallback collection.
+    connect(&playmatDefaultEditButton, &QPushButton::clicked, this,
+            &AppearanceSettingsPage::openPlaymatCollectionDialog);
+
+    auto *playmatGrid = new QGridLayout;
+    playmatGrid->addWidget(&playmatVisibilityLabel, 0, 0, 1, 1);
+    playmatGrid->addWidget(&playmatVisibilityCombo, 0, 1, 1, 1);
+    playmatGrid->addWidget(&playmatModeLabel, 1, 0, 1, 1);
+    playmatGrid->addWidget(&playmatModeCombo, 1, 1, 1, 1);
+    playmatGrid->addWidget(&playmatDefaultLabel, 2, 0, 1, 1);
+    playmatGrid->addWidget(&playmatDefaultEditButton, 2, 1, 1, 1);
+
+    playmatGroupBox = new QGroupBox;
+    playmatGroupBox->setLayout(playmatGrid);
+
+    // Styling settings
     styleUserListCheckBox.setChecked(settings.appearance().getStyleUserList());
     connect(&styleUserListCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.appearance(),
             &AppearanceSettings::setStyleUserList);
@@ -259,7 +329,6 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     cardLayoutGroupBox->setLayout(cardLayoutGrid);
 
     // Card counter colors
-
     auto *cardCounterColorsLayout = new QGridLayout;
     cardCounterColorsLayout->setColumnStretch(1, 1);
     cardCounterColorsLayout->setColumnStretch(3, 1);
@@ -339,47 +408,6 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     tableGroupBox = new QGroupBox;
     tableGroupBox->setLayout(tableGrid);
 
-    // Playmat settings
-    playmatVisibilityCombo.addItem(tr("Show all playmats"), PlaymatVisibilityAll);
-    playmatVisibilityCombo.addItem(tr("Show own playmat only"), PlaymatVisibilityOwnOnly);
-    playmatVisibilityCombo.addItem(tr("Don't use playmats"), PlaymatVisibilityNone);
-    int visIdx = playmatVisibilityCombo.findData(settings.userInterface().getPlaymatVisibility());
-    if (visIdx >= 0) {
-        playmatVisibilityCombo.setCurrentIndex(visIdx);
-    }
-    connect(&playmatVisibilityCombo, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int index) {
-        SettingsCache::instance().userInterface().setPlaymatVisibility(playmatVisibilityCombo.itemData(index).toInt());
-    });
-    playmatVisibilityLabel.setBuddy(&playmatVisibilityCombo);
-
-    // Playmat mode: Override / Fallback / Deck-only
-    playmatModeCombo.addItem(tr("Override deck playmat"), PlaymatModeOverrideDeck);
-    playmatModeCombo.addItem(tr("Fallback if deck has none"), PlaymatModeFallback);
-    playmatModeCombo.addItem(tr("Deck only, ignore collection"), PlaymatModeDeckOnly);
-    int modeIdx = playmatModeCombo.findData(settings.userInterface().getPlaymatMode());
-    if (modeIdx >= 0) {
-        playmatModeCombo.setCurrentIndex(modeIdx);
-    }
-    connect(&playmatModeCombo, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int index) {
-        SettingsCache::instance().userInterface().setPlaymatMode(playmatModeCombo.itemData(index).toInt());
-    });
-    playmatModeLabel.setBuddy(&playmatModeCombo);
-
-    // User-level playmat settings: fallback collection.
-    connect(&playmatDefaultEditButton, &QPushButton::clicked, this,
-            &AppearanceSettingsPage::openPlaymatCollectionDialog);
-
-    auto *playmatGrid = new QGridLayout;
-    playmatGrid->addWidget(&playmatVisibilityLabel, 0, 0, 1, 1);
-    playmatGrid->addWidget(&playmatVisibilityCombo, 0, 1, 1, 1);
-    playmatGrid->addWidget(&playmatModeLabel, 1, 0, 1, 1);
-    playmatGrid->addWidget(&playmatModeCombo, 1, 1, 1, 1);
-    playmatGrid->addWidget(&playmatDefaultLabel, 2, 0, 1, 1);
-    playmatGrid->addWidget(&playmatDefaultEditButton, 2, 1, 1, 1);
-
-    playmatGroupBox = new QGroupBox;
-    playmatGroupBox->setLayout(playmatGrid);
-
     // putting it all together
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(themeGroupBox);
@@ -437,6 +465,14 @@ void AppearanceSettingsPage::updateHomeTabSettingsVisibility()
     homeTabBackgroundShuffleFrequencyLabel.setVisible(visible);
     homeTabBackgroundShuffleFrequencySpinBox.setVisible(visible);
     homeTabDisplayCardNameCheckBox.setVisible(visible);
+}
+
+void AppearanceSettingsPage::updateStyleWarning()
+{
+    const QString style = styleCombo.currentData().toString();
+    const bool broken =
+        style.compare("windows11", Qt::CaseInsensitive) == 0 || style.compare("windowsvista", Qt::CaseInsensitive) == 0;
+    styleWarningLabel.setVisible(broken);
 }
 
 void AppearanceSettingsPage::showShortcutsChanged(QT_STATE_CHANGED_T value)
@@ -500,7 +536,12 @@ void AppearanceSettingsPage::retranslateUi()
     openThemeButton.setText(tr("Open themes folder"));
     schemeComboLabel.setText(tr("Active theme palette:"));
     styleComboLabel.setText(tr("Active theme style:"));
-    styleCombo.setToolTip(tr("Qt widget style saved to this theme (\"Default\" lets the application decide)"));
+    styleCombo.setToolTip(tr("Qt widget style saved to this theme (\"System\" lets the application decide)"));
+    styleWarningLabel.setText(
+        tr("Warning: the Windows 11 and Windows Vista styles are buggy and can render controls such as combo boxes "
+           "unreadable, especially in dark mode. Fusion is the recommended style on every platform: it is Qt's "
+           "cross-platform style and the one Cockatrice is developed against."));
+    updateStyleWarning();
     editPaletteButton.setText(tr("Edit theme palette"));
 
     homeTabGroupBox->setTitle(tr("Home tab settings"));
@@ -508,9 +549,18 @@ void AppearanceSettingsPage::retranslateUi()
     homeTabBackgroundShuffleFrequencyLabel.setText(tr("Home tab background shuffle frequency:"));
     homeTabBackgroundShuffleFrequencySpinBox.setSpecialValueText(tr("Disabled"));
     homeTabDisplayCardNameCheckBox.setText(tr("Display card name of background in bottom right"));
+    homeTabBackgroundDimCheckBox.setText(tr("Dim the home tab background"));
+    homeTabBackgroundDimCheckBox.setToolTip(
+        tr("Draw a translucent overlay over the home tab background so buttons and text stand out"));
     homeTabButtonColorSourceLabel.setText(tr("Home tab button color:"));
     homeTabButtonColorSourceBox.setToolTip(
-        tr("Automatic: extract from background if present, otherwise use theme default"));
+        tr("Use the theme's identity accent colors, or extract colors from the background image"));
+
+    playmatGroupBox->setTitle(tr("Playmat settings"));
+    playmatVisibilityLabel.setText(tr("Playmat visibility:"));
+    playmatModeLabel.setText(tr("Default collection behavior:"));
+    playmatDefaultLabel.setText(tr("Default playmat collection:"));
+    playmatDefaultEditButton.setText(tr("Edit..."));
 
     stylingGroupBox->setTitle(tr("Styling settings"));
     styleUserListCheckBox.setText(tr("Style user list"));
@@ -554,9 +604,4 @@ void AppearanceSettingsPage::retranslateUi()
     tableGroupBox->setTitle(tr("Table grid layout"));
     invertVerticalCoordinateCheckBox.setText(tr("Invert vertical coordinate"));
     minPlayersForMultiColumnLayoutLabel.setText(tr("Minimum player count for multi-column layout:"));
-    playmatGroupBox->setTitle(tr("Playmat settings"));
-    playmatVisibilityLabel.setText(tr("Playmat visibility:"));
-    playmatModeLabel.setText(tr("Default collection behavior:"));
-    playmatDefaultLabel.setText(tr("Default playmat collection:"));
-    playmatDefaultEditButton.setText(tr("Edit..."));
 }

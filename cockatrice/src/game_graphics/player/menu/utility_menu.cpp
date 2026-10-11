@@ -1,12 +1,17 @@
 #include "utility_menu.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
-#include "../../../interface/deck_loader/deck_loader.h"
+#include "../../../game/player/player_info.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
+#include "../../game_scene.h"
 #include "../player_graphics_item.h"
-#include "player_menu.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/deck_list/deck_list.h"
 
+#include <QKeySequence>
+#include <QSet>
 #include <libcockatrice/deck_list/tree/deck_list_card_node.h>
 #include <libcockatrice/deck_list/tree/inner_deck_list_node.h>
 

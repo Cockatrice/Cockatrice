@@ -1,6 +1,23 @@
 #include "card_database_display_model.h"
 
 #include "card_database_model.h"
+#include "libcockatrice/card/card_localization.h"
+#include "libcockatrice/filters/filter_string.h"
+#include "libcockatrice/filters/filter_tree.h"
+
+#include <QAbstractItemModel>
+#include <QChar>
+#include <QList>
+#include <QMap>
+#include <QSharedPointer>
+#include <QStringList>
+#include <QVariant>
+#include <QtGlobal>
+#include <qnamespace.h>
+#include <string>
+#include <utility>
+
+class QObject;
 
 CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)
     : QSortFilterProxyModel(parent), isToken(ShowAll), filterString(nullptr)
@@ -179,7 +196,7 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
     }
 
     if (filterString != nullptr) {
-        if (filterTree != nullptr && !filterTree->acceptsCard(info)) {
+        if (filterTree != nullptr && !filterTree->acceptsCard(info, searchLanguage)) {
             return false;
         }
         return filterString->check(info);
@@ -190,8 +207,14 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
 
 bool CardDatabaseDisplayModel::rowMatchesCardName(CardInfoPtr info) const
 {
-    if (!cardName.isEmpty() && !info->getName().contains(cardName, Qt::CaseInsensitive)) {
-        return false;
+    if (!cardName.isEmpty()) {
+        const bool matchesEnglish = info->getName().contains(cardName, Qt::CaseInsensitive);
+        const bool matchesLocalized =
+            !searchLanguage.isEnglishOnly() &&
+            info->getLocalizedName(searchLanguage.language).contains(cardName, Qt::CaseInsensitive);
+        if (!matchesEnglish && !matchesLocalized) {
+            return false;
+        }
     }
 
     if (!cardNameSet.isEmpty() && !cardNameSet.contains(info->getName())) {
@@ -199,7 +222,7 @@ bool CardDatabaseDisplayModel::rowMatchesCardName(CardInfoPtr info) const
     }
 
     if (filterTree != nullptr) {
-        return filterTree->acceptsCard(info);
+        return filterTree->acceptsCard(info, searchLanguage);
     }
 
     return true;
@@ -233,6 +256,28 @@ void CardDatabaseDisplayModel::setFilterTree(FilterTree *_filterTree)
     this->filterTree = _filterTree;
     connect(this->filterTree, &FilterTree::changed, this, &CardDatabaseDisplayModel::filterTreeChanged);
     invalidate();
+}
+
+void CardDatabaseDisplayModel::setStringFilter(const QString &_src)
+{
+    searchText = _src;
+    delete filterString;
+    filterString = new FilterString(_src, searchLanguage);
+    dirty();
+}
+
+void CardDatabaseDisplayModel::setSearchLanguage(const CardSearchLanguage &searchLang)
+{
+    if (searchLanguage == searchLang) {
+        return;
+    }
+
+    searchLanguage = searchLang;
+
+    if (filterString != nullptr) {
+        setStringFilter(searchText);
+    }
+    dirty();
 }
 
 void CardDatabaseDisplayModel::filterTreeChanged()

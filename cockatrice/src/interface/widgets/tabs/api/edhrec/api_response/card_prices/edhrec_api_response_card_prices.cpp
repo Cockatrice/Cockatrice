@@ -1,6 +1,8 @@
 #include "edhrec_api_response_card_prices.h"
 
 #include <QDebug>
+#include <QJsonValue>
+#include <qlogging.h>
 
 void CardPrices::fromJson(const QJsonObject &json)
 {

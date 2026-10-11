@@ -23,15 +23,14 @@ set(oracle_SOURCES
     src/pages.cpp
     src/pagetemplates.cpp
     src/parsehelpers.cpp
-    src/qt-json/json.cpp
+    src/raw_json_scanner.cpp
     ../cockatrice/src/client/settings/cache_settings.cpp
     ../cockatrice/src/client/settings/card_counter_settings.cpp
     ../cockatrice/src/client/settings/shortcuts_settings.cpp
     ../cockatrice/src/client/network/update/client/release_channel.cpp
+    ../cockatrice/src/interface/pixel_map_generator.cpp
     ../cockatrice/src/interface/theme_config.cpp
     ../cockatrice/src/interface/theme_manager.cpp
-    ../cockatrice/src/interface/widgets/quick_settings/settings_button_widget.cpp
-    ../cockatrice/src/interface/widgets/quick_settings/settings_popup_widget.cpp
     ${VERSION_STRING_CPP}
 )
 
@@ -113,6 +112,8 @@ qt6_add_executable(
   MANUAL_FINALIZATION
 )
 
+target_precompile_headers(oracle PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtwidgets_pch.h")
+
 # ------------------------
 # Link libraries
 # ------------------------
@@ -120,9 +121,13 @@ target_link_libraries(
   oracle
   PUBLIC libcockatrice_card
   PUBLIC libcockatrice_settings
-  PUBLIC libcockatrice_network
+  PUBLIC libcockatrice_protocol
   PUBLIC ${ORACLE_QT_MODULES}
 )
+
+# Only user_level.h is needed from the network headers (pulled in transitively
+# by pixel_map_generator.h); nothing from the network libraries is linked.
+target_include_directories(oracle PRIVATE ${CMAKE_SOURCE_DIR}/libcockatrice_network)
 
 if(ZLIB_FOUND)
   target_link_libraries(oracle PUBLIC ${ZLIB_LIBRARIES})
@@ -210,10 +215,19 @@ if(WIN32)
   list(APPEND libSearchDirs ${QT_LIBRARY_DIR})
 
   install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/"
+    DIRECTORY "$<TARGET_FILE_DIR:oracle>/"
     DESTINATION ./
     FILES_MATCHING
     PATTERN "*.dll"
+    PATTERN "*.pdb" EXCLUDE
+    PATTERN "*.dir*" EXCLUDE
+    PATTERN "*_autogen*" EXCLUDE
+    PATTERN "*.tlog*" EXCLUDE
+    PATTERN "CMakeFiles*" EXCLUDE
+    PATTERN "x64*" EXCLUDE
+    PATTERN ".qt*" EXCLUDE
+    PATTERN ".qsb*" EXCLUDE
+    PATTERN ".lupdate*" EXCLUDE
   )
 
   # Qt plugins: iconengines, platforms, styles, tls (Qt6)
@@ -285,6 +299,18 @@ if(Qt6LinguistTools_FOUND)
   elseif(WIN32)
     install(FILES ${oracle_QM} DESTINATION ${ORACLE_WIN32_QM_INSTALL_DIR})
   endif()
+
+  # Qt attaches the .qm files to the default build target only, so building the executable on its own
+  # (CLion, --target oracle) leaves it without any translations: nothing is translated and the
+  # language selector in the wizard stays empty.
+  # Depend on Qt's own lrelease target instead of attaching the .qm custom commands to a second
+  # target: two independent targets owning the same outputs race on MSBuild/Makefiles and are an
+  # error on Xcode. Older Qt versions already add this dependency themselves.
+  foreach(_lrelease_target Oracle_lrelease oracle_lrelease)
+    if(TARGET ${_lrelease_target})
+      add_dependencies(oracle ${_lrelease_target})
+    endif()
+  endforeach()
 endif()
 
 qt6_finalize_target(oracle)

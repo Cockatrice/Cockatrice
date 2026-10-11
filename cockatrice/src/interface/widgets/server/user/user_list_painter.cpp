@@ -1,14 +1,35 @@
 #include "user_list_painter.h"
 
 #include "../../interface/pixel_map_generator.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 
 #include <QAbstractScrollArea>
 #include <QApplication>
+#include <QBrush>
+#include <QChar>
+#include <QFlag>
+#include <QFlags>
+#include <QFont>
+#include <QFontMetrics>
+#include <QImage>
+#include <QLinearGradient>
+#include <QMap>
+#include <QModelIndex>
+#include <QObject>
 #include <QPainter>
 #include <QPainterPath>
+#include <QPen>
+#include <QPixmap>
+#include <QPoint>
 #include <QScrollBar>
+#include <QSharedPointer>
 #include <QStyle>
 #include <QStyleOptionViewItem>
+#include <QVariant>
+#include <QWidget>
+#include <QtGlobal>
+#include <qnamespace.h>
+#include <qnumeric.h>
 
 static constexpr int RowHeight = 72;
 static constexpr int AvatarSize = 36;
@@ -49,6 +70,8 @@ QColor UserListPainter::getAccentColor(const UserLevelFlags &userLevel, bool onl
 
     if (userLevel.testFlag(ServerInfo_User::IsAdmin)) {
         accentColor = QColor(245, 158, 11);
+    } else if (userLevel.testFlag(ServerInfo_User::IsDeveloper)) {
+        accentColor = QColor(185, 28, 28);
     } else if (userLevel.testFlag(ServerInfo_User::IsModerator)) {
         accentColor = QColor(59, 130, 246);
     } else if (userLevel.testFlag(ServerInfo_User::IsJudge)) {
@@ -299,6 +322,8 @@ QList<UserListPainter::Badge> UserListPainter::buildBadges(const UserLevelFlags 
 
     if (userLevel.testFlag(ServerInfo_User::IsAdmin)) {
         badges << Badge{"ADMIN", QColor(245, 158, 11)};
+    } else if (userLevel.testFlag(ServerInfo_User::IsDeveloper)) {
+        badges << Badge{"DEV", QColor(185, 28, 28)};
     } else if (userLevel.testFlag(ServerInfo_User::IsModerator)) {
         badges << Badge{"MOD", QColor(59, 130, 246)};
     } else if (userLevel.testFlag(ServerInfo_User::IsJudge)) {
@@ -385,9 +410,9 @@ void UserListPainter::paint(QPainter *painter,
     const QString userName = QString::fromStdString(userInfo.name());
     const QString privLevel = QString::fromStdString(userInfo.privlevel());
     const QColor accentColor = getAccentColor(userLevel, online);
-    const bool hasRole = userLevel.testFlag(ServerInfo_User::IsAdmin) ||
-                         userLevel.testFlag(ServerInfo_User::IsModerator) ||
-                         userLevel.testFlag(ServerInfo_User::IsJudge);
+    const bool hasRole =
+        userLevel.testFlag(ServerInfo_User::IsAdmin) || userLevel.testFlag(ServerInfo_User::IsDeveloper) ||
+        userLevel.testFlag(ServerInfo_User::IsModerator) || userLevel.testFlag(ServerInfo_User::IsJudge);
     const QRectF cardRect = QRectF(rect).adjusted(3, 2, -3, -2);
     const int cardRight = getCardRight(option, rect);
 

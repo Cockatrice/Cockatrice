@@ -1,11 +1,16 @@
 #ifndef COCKATRICE_EDHREC_COMMANDER_API_RESPONSE_BRACKET_NAVIGATION_WIDGET_H
 #define COCKATRICE_EDHREC_COMMANDER_API_RESPONSE_BRACKET_NAVIGATION_WIDGET_H
 
-#include <QGridLayout>
-#include <QLabel>
+#include <QList>
 #include <QMap>
-#include <QPushButton>
+#include <QString>
+#include <QStringList>
 #include <QWidget>
+#include <qtmetamacros.h>
+
+class QGridLayout;
+class QLabel;
+class QPushButton;
 
 class EdhrecCommanderApiResponseBracketNavigationWidget : public QWidget
 {

@@ -1,5 +1,7 @@
 #include "card_set.h"
 
+#include "libcockatrice/interfaces/interface_card_set_priority_controller.h"
+
 #include <QSet>
 #include <utility>
 

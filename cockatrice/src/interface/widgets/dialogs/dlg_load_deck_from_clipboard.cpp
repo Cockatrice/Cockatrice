@@ -9,12 +9,19 @@
 #include <QCheckBox>
 #include <QClipboard>
 #include <QDialogButtonBox>
+#include <QFlags>
+#include <QHBoxLayout>
+#include <QKeyEvent>
 #include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QTextStream>
 #include <QVBoxLayout>
+#include <functional>
 #include <libcockatrice/card/import/card_name_normalizer.h>
+#include <qnamespace.h>
+
+class QWidget;
 
 /**
  * Creates the main layout and connects the signals that are common to all versions of this window

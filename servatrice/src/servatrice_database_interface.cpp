@@ -1,21 +1,46 @@
 #include "servatrice_database_interface.h"
 
+#include "deck_tag_serialization.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_chat_message.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_moderator_login.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user_alt.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user_session.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_warning.pb.h"
 #include "servatrice.h"
-#include "serversocketinterface.h"
+#include "server.h"
+#include "server_protocolhandler.h"
 #include "settingscache.h"
 
+#include <QByteArray>
 #include <QChar>
 #include <QDateTime>
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonValue>
 #include <QLoggingCategory>
+#include <QMap>
+#include <QMessageLogger>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QSet>
+#include <QSetIterator>
+#include <QSharedPointer>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QStringList>
+#include <QVariant>
+#include <QVariantList>
+#include <google/protobuf/stubs/common.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/utility/passwordhasher.h>
+#include <qalgorithms.h>
+#include <qnamespace.h>
+#include <string>
 
 inline Q_LOGGING_CATEGORY(DatabaseInterfaceLog, "database_interface");
 
@@ -86,9 +111,10 @@ bool Servatrice_DatabaseInterface::openDatabase()
                                              << dbversion << "to version" << expectedversion;
             return false;
         } else if (dbversion > expectedversion) {
-            qCCritical(DatabaseInterfaceLog) << poolStr << "Error opening database: the database schema version"
-                                             << dbversion << "is too new, you need to update servatrice"
-                                             << "(this servatrice actually uses version" << expectedversion << ")";
+            qCCritical(DatabaseInterfaceLog)
+                << poolStr << "Error opening database: the database schema version" << dbversion
+                << "is too new, you need to update Servatrice" << "(Currently running Servatrice actually uses version"
+                << expectedversion << ")";
             return false;
         }
     } else {
@@ -98,10 +124,57 @@ bool Servatrice_DatabaseInterface::openDatabase()
         return false;
     }
 
+    if (sqlDatabase.driverName() != "QMYSQL") {
+        qCCritical(DatabaseInterfaceLog)
+            << poolStr
+            << "Error opening database: connection is not a MySQL/MariaDB database, Servatrice only "
+               "supports the QMYSQL driver (actual driver:"
+            << sqlDatabase.driverName() << ").";
+        return false;
+    }
+
+    bool strictModeCheckOk = false;
+    const bool strictModeEnabled = isStrictModeEnabled(strictModeCheckOk);
+    if (!strictModeCheckOk) {
+        qCCritical(DatabaseInterfaceLog) << poolStr
+                                         << "Error opening database: unable to determine whether MySQL/MariaDB strict "
+                                            "mode is enabled";
+        return false;
+    }
+    if (strictModeEnabled) {
+        qCCritical(DatabaseInterfaceLog) << poolStr
+                                         << "Error opening database: MySQL/MariaDB strict mode is enabled, which "
+                                            "breaks most Servatrice database operations. Please disable strict mode "
+                                            "by removing STRICT_TRANS_TABLES and STRICT_ALL_TABLES from sql_mode, "
+                                            "for example by adding 'sql_mode=NO_ENGINE_SUBSTITUTION' under [mysqld] "
+                                            "in your my.cnf (or my.ini on Windows) and restarting the database "
+                                            "server.";
+        return false;
+    }
+
     // reset all prepared statements
     qDeleteAll(preparedStatements);
     preparedStatements.clear();
     return true;
+}
+
+bool Servatrice_DatabaseInterface::isStrictModeEnabled(bool &ok) const
+{
+    ok = true;
+
+    QSqlQuery query(sqlDatabase);
+    if (!query.exec("SELECT @@GLOBAL.sql_mode")) {
+        ok = false;
+        return false;
+    }
+
+    const QStringList modes = query.next() ? query.value(0).toString().split(',') : QStringList();
+    for (const QString &mode : modes) {
+        if (mode.trimmed() == "STRICT_TRANS_TABLES" || mode.trimmed() == "STRICT_ALL_TABLES") {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool Servatrice_DatabaseInterface::checkSql()
@@ -641,6 +714,10 @@ ServerInfo_User Servatrice_DatabaseInterface::evalUserQueryResult(const QSqlQuer
         userLevel |= ServerInfo_User::IsJudge;
     }
 
+    if (is_admin & 8) {
+        userLevel |= ServerInfo_User::IsDeveloper;
+    }
+
     result.set_user_level(userLevel);
 
     const QString country = query->value(3).toString();
@@ -1024,6 +1101,183 @@ DeckList *Servatrice_DatabaseInterface::getDeckFromDatabase(int deckId, int user
     deck->loadFromString_Native(query->value(0).toString());
 
     return deck;
+}
+
+bool Servatrice_DatabaseInterface::createDeckShare(const QString &token,
+                                                   const QString &name,
+                                                   int userId,
+                                                   const QList<DeckShareItemRecord> &items,
+                                                   int expiryDays,
+                                                   qint64 &expiresAt)
+{
+    checkSql();
+
+    if (items.isEmpty()) {
+        return false;
+    }
+
+    if (!sqlDatabase.transaction()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("insert into {prefix}_deck_share (token, name, created_by, created_at, expires_at) "
+                                    "values (:token, :name, :created_by, NOW(), DATE_ADD(NOW(), INTERVAL :days DAY))");
+    query->bindValue(":token", token);
+    query->bindValue(":name", name);
+    query->bindValue(":created_by", userId < 1 ? QVariant() : userId);
+    query->bindValue(":days", expiryDays);
+    if (!execSqlQuery(query)) {
+        // A failed execSqlQuery has already closed and reopened the connection,
+        // which implicitly discards the transaction; rollback below is a no-op.
+        sqlDatabase.rollback();
+        return false;
+    }
+
+    const int shareId = query->lastInsertId().toInt();
+
+    // Read the expiry back from the database so the value returned to the client
+    // matches the server clock rather than being approximated client-side.
+    QSqlQuery *expiryQuery = prepareQuery("select UNIX_TIMESTAMP(expires_at) from {prefix}_deck_share where id = :id");
+    expiryQuery->bindValue(":id", shareId);
+    if (!execSqlQuery(expiryQuery) || !expiryQuery->next()) {
+        // See the note above: after a failed execSqlQuery the transaction is
+        // already gone because the connection was torn down.
+        sqlDatabase.rollback();
+        return false;
+    }
+    expiresAt = expiryQuery->value(0).toLongLong();
+
+    for (int i = 0; i < items.size(); ++i) {
+        const DeckShareItemRecord &item = items.at(i);
+        QSqlQuery *itemQuery = prepareQuery("insert into {prefix}_deck_share_item (share_id, name, tags, banner_card, "
+                                            "game_format, color_identity, content, position) values (:share_id, :name, "
+                                            ":tags, :banner_card, :game_format, :color_identity, :content, :position)");
+        itemQuery->bindValue(":share_id", shareId);
+        itemQuery->bindValue(":name", item.name);
+        itemQuery->bindValue(":tags", serializeDeckTags(item.tags));
+        itemQuery->bindValue(":banner_card", item.bannerCard);
+        itemQuery->bindValue(":game_format", item.gameFormat);
+        itemQuery->bindValue(":color_identity", item.colorIdentity);
+        itemQuery->bindValue(":content", item.content);
+        itemQuery->bindValue(":position", i);
+        if (!execSqlQuery(itemQuery)) {
+            // See the note above: the transaction is already gone after the
+            // reconnect performed by a failed execSqlQuery.
+            sqlDatabase.rollback();
+            return false;
+        }
+    }
+
+    if (!sqlDatabase.commit()) {
+        sqlDatabase.rollback();
+        return false;
+    }
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::getDeckShareList(const QString &token,
+                                                    QString &name,
+                                                    qint64 &expiresAt,
+                                                    QList<DeckShareItemRecord> &items)
+{
+    checkSql();
+
+    QSqlQuery *query =
+        prepareQuery("select id, name, UNIX_TIMESTAMP(expires_at) from {prefix}_deck_share where token = "
+                     ":token and expires_at > now()");
+    query->bindValue(":token", token);
+    execSqlQuery(query);
+    if (!query->next()) {
+        return false;
+    }
+
+    const int shareId = query->value(0).toInt();
+    name = query->value(1).toString();
+    expiresAt = query->value(2).toLongLong();
+    items.clear();
+
+    QSqlQuery *itemQuery =
+        prepareQuery("select id, name, tags, banner_card, game_format, color_identity from {prefix}_deck_share_item "
+                     "where share_id = :share_id order by position");
+    itemQuery->bindValue(":share_id", shareId);
+    execSqlQuery(itemQuery);
+    while (itemQuery->next()) {
+        DeckShareItemRecord item;
+        item.id = itemQuery->value(0).toInt();
+        item.name = itemQuery->value(1).toString();
+        item.tags = deserializeDeckTags(itemQuery->value(2).toString());
+        item.bannerCard = itemQuery->value(3).toString();
+        item.gameFormat = itemQuery->value(4).toString();
+        item.colorIdentity = itemQuery->value(5).toString();
+        items.append(item);
+    }
+
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::getDeckShareItem(const QString &token, int itemId, QString &content)
+{
+    checkSql();
+
+    QSqlQuery *query = prepareQuery("select i.content from {prefix}_deck_share_item i join {prefix}_deck_share s on "
+                                    "s.id = i.share_id where s.token = :token and s.expires_at > now() and i.id = :id");
+    query->bindValue(":token", token);
+    query->bindValue(":id", itemId);
+    execSqlQuery(query);
+    if (!query->next()) {
+        return false;
+    }
+
+    content = query->value(0).toString();
+    return true;
+}
+
+void Servatrice_DatabaseInterface::cleanupExpiredDeckShares()
+{
+    checkSql();
+
+    QSqlQuery *query = prepareQuery("delete from {prefix}_deck_share where expires_at < now()");
+    execSqlQuery(query);
+}
+
+bool Servatrice_DatabaseInterface::getDeckSharesForUser(int userId, QList<DeckShareSummaryRecord> &shares)
+{
+    checkSql();
+
+    QSqlQuery *query = prepareQuery("select s.id, s.name, UNIX_TIMESTAMP(s.created_at), "
+                                    "UNIX_TIMESTAMP(s.expires_at), count(i.id) from {prefix}_deck_share s left join "
+                                    "{prefix}_deck_share_item i on i.share_id = s.id "
+                                    "where s.created_by = :created_by and s.expires_at > now() "
+                                    "group by s.id, s.name, s.created_at, s.expires_at order by s.created_at desc");
+    query->bindValue(":created_by", userId);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    shares.clear();
+    while (query->next()) {
+        DeckShareSummaryRecord summary;
+        summary.id = query->value(0).toInt();
+        summary.name = query->value(1).toString();
+        summary.creationTime = query->value(2).toLongLong();
+        summary.expiresAt = query->value(3).toLongLong();
+        summary.itemCount = query->value(4).toInt();
+        shares.append(summary);
+    }
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::deleteDeckShare(int shareId, int userId)
+{
+    checkSql();
+
+    QSqlQuery *query = prepareQuery("delete from {prefix}_deck_share where id = :id and created_by = :created_by");
+    query->bindValue(":id", shareId);
+    query->bindValue(":created_by", userId);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+    return query->numRowsAffected() > 0;
 }
 
 void Servatrice_DatabaseInterface::logMessage(const int senderId,
@@ -1448,7 +1702,7 @@ QList<ServerInfo_ModeratorLogin> Servatrice_DatabaseInterface::getModeratorLastL
     QSqlQuery *query = prepareQuery("SELECT u.name, u.admin, UNIX_TIMESTAMP(a.last_login) "
                                     "FROM {prefix}_users u "
                                     "LEFT JOIN {prefix}_user_analytics a ON a.id = u.id "
-                                    "WHERE (u.admin & 7) <> 0 ORDER BY u.name");
+                                    "WHERE (u.admin & 15) <> 0 ORDER BY u.name");
 
     if (!execSqlQuery(query)) {
         qCWarning(DatabaseInterfaceLog) << "Failed to collect moderator login information: SQL Error";
@@ -1469,6 +1723,9 @@ QList<ServerInfo_ModeratorLogin> Servatrice_DatabaseInterface::getModeratorLastL
         if (isAdmin & 4) {
             userLevel |= ServerInfo_User::IsJudge;
         }
+        if (isAdmin & 8) {
+            userLevel |= ServerInfo_User::IsDeveloper;
+        }
         loginDetails.set_user_level(userLevel);
 
         if (!query->value(2).isNull()) {
@@ -1478,6 +1735,38 @@ QList<ServerInfo_ModeratorLogin> Servatrice_DatabaseInterface::getModeratorLastL
     }
 
     return results;
+}
+
+Servatrice_DatabaseInterface::UptimeSnapshot Servatrice_DatabaseInterface::getLatestUptimeSnapshot(int serverId)
+{
+    UptimeSnapshot snapshot;
+
+    if (!checkSql()) {
+        return snapshot;
+    }
+
+    QSqlQuery *query = prepareQuery("SELECT users_count, mods_count, games_count, tx_bytes, rx_bytes, uptime, "
+                                    "UNIX_TIMESTAMP(timest) FROM {prefix}_uptime "
+                                    "WHERE id_server = :id_server ORDER BY timest DESC LIMIT 1");
+    query->bindValue(":id_server", serverId);
+
+    if (!execSqlQuery(query)) {
+        qCWarning(DatabaseInterfaceLog) << "Failed to collect server stats snapshot: SQL Error";
+        return snapshot;
+    }
+
+    if (query->next()) {
+        snapshot.valid = true;
+        snapshot.usersCount = query->value(0).toULongLong();
+        snapshot.modsCount = query->value(1).toULongLong();
+        snapshot.gamesCount = query->value(2).toULongLong();
+        snapshot.txBytes = query->value(3).toULongLong();
+        snapshot.rxBytes = query->value(4).toULongLong();
+        snapshot.uptimeSecs = query->value(5).toULongLong();
+        snapshot.timest = query->value(6).toULongLong();
+    }
+
+    return snapshot;
 }
 
 bool Servatrice_DatabaseInterface::removeUserAvatar(const QString &userName)

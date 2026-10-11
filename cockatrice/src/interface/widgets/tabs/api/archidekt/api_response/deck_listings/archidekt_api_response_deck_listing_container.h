@@ -3,11 +3,11 @@
 
 #include "archidekt_api_response_deck_owner.h"
 
-#include <QDebug>
-#include <QJsonArray>
 #include <QJsonObject>
+#include <QList>
+#include <QMap>
 #include <QString>
-#include <QVector>
+#include <QStringList>
 
 class ArchidektApiResponseDeckListingContainer
 {

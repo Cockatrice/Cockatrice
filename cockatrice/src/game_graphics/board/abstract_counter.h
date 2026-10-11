@@ -7,18 +7,21 @@
 #ifndef COUNTER_H
 #define COUNTER_H
 
-#include "../../game/board/counter_state.h"
 #include "../../interface/widgets/menus/tearoff_menu.h"
 #include "../player/menu/abstract_player_component.h"
 
+#include <QColor>
 #include <QGraphicsItem>
 #include <QInputDialog>
+#include <QObject>
+#include <QString>
+#include <qtmetamacros.h>
 
 class PlayerLogic;
 class QAction;
-class QKeyEvent;
 class QMenu;
-class QString;
+class CounterState;
+class QWidget;
 
 class AbstractCounter : public QObject, public QGraphicsItem, public AbstractPlayerComponent
 {
@@ -39,8 +42,9 @@ protected:
      * @brief Hook for subclasses that need per-value-change feedback (e.g. life-total flash).
      *
      * Called whenever the counter's value changes, before the item repaints.
+     * @param skipDamageAnimation True when damage-related feedback should be suppressed (replay rewinds).
      */
-    virtual void onValueChanged(int oldValue, int newValue);
+    virtual void onValueChanged(int oldValue, int newValue, bool skipDamageAnimation);
 
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;

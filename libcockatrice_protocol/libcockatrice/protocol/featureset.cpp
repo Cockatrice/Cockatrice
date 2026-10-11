@@ -1,6 +1,7 @@
 #include "featureset.h"
 
 #include <QMap>
+#include <QSharedPointer>
 
 FeatureSet::FeatureSet()
 {

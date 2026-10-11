@@ -8,6 +8,7 @@ RUN pacman --sync --refresh --sysupgrade --needed --noconfirm \
         gtest \
         mariadb-libs \
         ninja \
+        openssl \
         protobuf \
         qt6-base \
         qt6-declarative \

@@ -1,20 +1,43 @@
 #include "server_protocolhandler.h"
 
 #include "game/game_config.h"
+#include "game/server_abstract_participant.h"
 #include "game/server_game.h"
-#include "game/server_player.h"
+#include "libcockatrice/protocol/pb/admin_commands.pb.h"
+#include "libcockatrice/protocol/pb/developer_commands.pb.h"
+#include "libcockatrice/protocol/pb/game_commands.pb.h"
+#include "libcockatrice/protocol/pb/game_event_container.pb.h"
+#include "libcockatrice/protocol/pb/moderator_commands.pb.h"
+#include "libcockatrice/protocol/pb/room_commands.pb.h"
+#include "libcockatrice/protocol/pb/room_event.pb.h"
+#include "libcockatrice/protocol/pb/server_message.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_chat_message.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
+#include "libcockatrice/protocol/pb/session_commands.pb.h"
+#include "libcockatrice/protocol/pb/session_event.pb.h"
 #include "server_database_interface.h"
+#include "server_response_containers.h"
 #include "server_room.h"
+#include "serverinfo_user_container.h"
 
+#include <QChar>
 #include <QDateTime>
 #include <QDebug>
+#include <QListIterator>
+#include <QMapIterator>
+#include <QMutexLocker>
+#include <QPair>
+#include <QReadLocker>
+#include <QReadWriteLock>
+#include <QRecursiveMutex>
+#include <QSharedPointer>
+#include <QtGlobal>
 #include <QtMath>
-#include <google/protobuf/descriptor.h>
+#include <google/protobuf/repeated_ptr_field.h>
 #include <libcockatrice/protocol/debug_pb_message.h>
 #include <libcockatrice/protocol/featureset.h>
 #include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/commands.pb.h>
-#include <libcockatrice/protocol/pb/event_game_joined.pb.h>
 #include <libcockatrice/protocol/pb/event_list_rooms.pb.h>
 #include <libcockatrice/protocol/pb/event_notify_user.pb.h>
 #include <libcockatrice/protocol/pb/event_room_say.pb.h>
@@ -28,6 +51,9 @@
 #include <libcockatrice/protocol/pb/response_login.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <qlogging.h>
+#include <string>
+#include <utility>
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server,
                                                Server_DatabaseInterface *_databaseInterface,
@@ -388,6 +414,33 @@ Response::ResponseCode Server_ProtocolHandler::processAdminCommandContainer(cons
     return finalResponseCode;
 }
 
+Response::ResponseCode Server_ProtocolHandler::processDeveloperCommandContainer(const CommandContainer &cont,
+                                                                                ResponseContainer &rc)
+{
+    if (!userInfo) {
+        return Response::RespLoginNeeded;
+    }
+    if (!(userInfo->user_level() & ServerInfo_User::IsDeveloper)) {
+        return Response::RespLoginNeeded;
+    }
+
+    resetIdleTimer();
+
+    Response::ResponseCode finalResponseCode = Response::RespOk;
+    for (int i = cont.developer_command_size() - 1; i >= 0; --i) {
+        Response::ResponseCode resp = Response::RespInvalidCommand;
+        const DeveloperCommand &sc = cont.developer_command(i);
+        const int num = getPbExtension(sc);
+        logDebugMessage(getSafeDebugString(sc));
+
+        resp = processExtendedDeveloperCommand(num, sc, rc);
+        if (resp != Response::RespOk) {
+            finalResponseCode = resp;
+        }
+    }
+    return finalResponseCode;
+}
+
 void Server_ProtocolHandler::processCommandContainer(const CommandContainer &cont)
 {
     // Command processing must be disabled after prepareDestroy() has been called.
@@ -410,6 +463,8 @@ void Server_ProtocolHandler::processCommandContainer(const CommandContainer &con
         finalResponseCode = processModeratorCommandContainer(cont, responseContainer);
     } else if (cont.admin_command_size()) {
         finalResponseCode = processAdminCommandContainer(cont, responseContainer);
+    } else if (cont.developer_command_size()) {
+        finalResponseCode = processDeveloperCommandContainer(cont, responseContainer);
     } else {
         finalResponseCode = Response::RespInvalidCommand;
     }
@@ -454,11 +509,12 @@ void Server_ProtocolHandler::pingClockTimeout()
         prepareDestroy();
     }
 
-    // PrivLevel users, Moderators, and Admins are not subject to the server idle timeout policy
+    // PrivLevel users, Moderators, Admins, and Developers are not subject to the server idle timeout policy
     const bool hasPrivLevel = userInfo && QString::fromStdString(userInfo->privlevel()).toLower() != "none";
-    const bool isModOrAdmin =
-        userInfo && (userInfo->user_level() & (ServerInfo_User::IsModerator | ServerInfo_User::IsAdmin));
-    if (!hasPrivLevel && !isModOrAdmin) {
+    const bool isStaff =
+        userInfo && (userInfo->user_level() &
+                     (ServerInfo_User::IsModerator | ServerInfo_User::IsAdmin | ServerInfo_User::IsDeveloper));
+    if (!hasPrivLevel && !isStaff) {
         if ((server->getIdleClientTimeout() > 0) && (idleClientWarningSent)) {
             if (timeRunning - lastActionReceived > server->getIdleClientTimeout()) {
                 prepareDestroy();

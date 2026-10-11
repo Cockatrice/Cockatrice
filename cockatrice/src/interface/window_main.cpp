@@ -21,7 +21,6 @@
 
 #include "../client/latency_status_widget.h"
 #include "../client/network/update/client/client_update_checker.h"
-#include "../client/network/update/client/release_channel.h"
 #include "../client/settings/cache_settings.h"
 #include "../client/settings/shortcuts_settings.h"
 #include "../interface/widgets/dialogs/dlg_edit_tokens.h"
@@ -33,49 +32,67 @@
 #include "../interface/widgets/dialogs/dlg_update.h"
 #include "../interface/widgets/dialogs/dlg_view_log.h"
 #include "../interface/widgets/onboarding/first_run_wizard.h"
-#include "../interface/widgets/tabs/tab_game.h"
+#include "../interface/widgets/settings_page/general_settings_page.h"
 #include "../interface/widgets/tabs/tab_server.h"
 #include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../main.h"
+#include "abstract_client.h"
+#include "card_database_update/card_database_update_status_bar.h"
+#include "card_database_update/card_update_progress.h"
 #include "intents/contexts/context_connect_to_server.h"
 #include "intents/contexts/context_join_room.h"
+#include "intents/intent.h"
 #include "intents/intent_connect_to_server.h"
 #include "intents/intent_login.h"
 #include "intents/intent_open_server_room_by_name.h"
 #include "intents/url_parser.h"
+#include "latency_tracker.h"
 #include "logger.h"
+#include "pixel_map_generator.h"
 #include "version_string.h"
 #include "widgets/dialogs/dlg_connect.h"
 #include "widgets/server/handle_public_servers.h"
+#include "widgets/settings_page/abstract_settings_page.h"
 #include "widgets/tabs/api/commander_spellbook/handle_commander_brackets.h"
-#include "widgets/utility/get_text_with_max.h"
 
 #include <QAction>
 #include <QApplication>
 #include <QButtonGroup>
 #include <QCloseEvent>
 #include <QDateTime>
+#include <QDebug>
 #include <QDesktopServices>
+#include <QDialog>
+#include <QEvent>
 #include <QFile>
 #include <QFileDialog>
-#include <QLabel>
+#include <QFileInfo>
+#include <QFlags>
+#include <QIODevice>
+#include <QLocalSocket>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QMessageLogger>
+#include <QObject>
+#include <QPixmap>
 #include <QPixmapCache>
+#include <QPushButton>
+#include <QSharedPointer>
 #include <QStatusBar>
+#include <QStringLiteral>
 #include <QSystemTrayIcon>
-#include <QThread>
 #include <QTimer>
-#include <QWindow>
-#include <QtConcurrent>
-#include <QtNetwork>
+#include <QWidget>
+#include <QtConcurrentRun>
+#include <QtGlobal>
+#include <functional>
+#include <google/protobuf/stubs/port.h>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/local/local_client.h>
 #include <libcockatrice/network/client/remote/remote_client.h>
 #include <libcockatrice/network/server/local/local_server.h>
-#include <libcockatrice/network/server/local/local_server_interface.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 #include <libcockatrice/protocol/pb/room_commands.pb.h>
 #include <libcockatrice/settings/cache_storage_settings.h>
@@ -89,10 +106,18 @@
 #include <libcockatrice/settings/servers_settings.h>
 #include <libcockatrice/settings/tabs_settings.h>
 #include <libcockatrice/settings/updates_settings.h>
+#include <libcockatrice/utility/local_server_name.h>
+#include <memory>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <tuple>
+#include <utility>
+
+class LocalServerInterface;
 
 #define GITHUB_PAGES_URL "https://cockatrice.github.io"
-#define GITHUB_CONTRIBUTORS_URL "https://github.com/Cockatrice/Cockatrice/graphs/contributors?type=c"
-#define GITHUB_CONTRIBUTE_URL "https://github.com/Cockatrice/Cockatrice#cockatrice"
+#define GITHUB_CONTRIBUTORS_URL "https://github.com/Cockatrice/Cockatrice/graphs/contributors"
+#define GITHUB_CONTRIBUTE_URL "https://github.com/Cockatrice/Cockatrice#"
 #define GITHUB_TRANSIFEX_TRANSLATORS_URL "https://github.com/Cockatrice/Cockatrice/wiki/Translator-Hall-of-Fame"
 #define GITHUB_TRANSLATOR_FAQ_URL "https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ"
 #define GITHUB_ISSUES_URL "https://github.com/Cockatrice/Cockatrice/issues"
@@ -245,6 +270,8 @@ void MainWindow::actFullScreen(bool checked)
 void MainWindow::actSettings()
 {
     DlgSettings dlg(this);
+    auto *generalPage = qobject_cast<GeneralSettingsPage *>(dlg.page(DlgSettings::GeneralPage));
+    connect(generalPage, &GeneralSettingsPage::cardDatabaseUpdateRequested, this, &MainWindow::actCheckCardUpdates);
     dlg.exec();
 }
 
@@ -271,7 +298,8 @@ void MainWindow::actAbout()
                 GITHUB_TROUBLESHOOTING_URL + "'>" + tr("Troubleshooting") + "</a><br>" + "<a href='" + GITHUB_FAQ_URL +
                 "'>" + tr("F.A.Q.") + "</a><br>"),
         QMessageBox::Ok, this);
-    mb.setIconPixmap(QPixmap("theme:cockatrice").scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    mb.setIconPixmap(
+        themePixmap(QStringLiteral("cockatrice")).scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     mb.setTextInteractionFlags(Qt::TextBrowserInteraction);
     mb.exec();
 }
@@ -323,7 +351,7 @@ void MainWindow::retranslateUi()
     aRegister->setText(tr("&Register to server..."));
     aForgotPassword->setText(tr("&Restore password..."));
     aSettings->setText(tr("&Settings..."));
-    aSettings->setIcon(QPixmap("theme:icons/settings"));
+    aSettings->setIcon(themePixmap(QStringLiteral("icons/settings")));
     aExit->setText(tr("&Exit"));
 
 #if defined(__APPLE__) /* For OSX */
@@ -507,6 +535,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connectionController = new ConnectionController(this, this);
     urlParser = new IntentUrlParser(this, this);
+    connect(urlParser, &IntentUrlParser::urlChainFinished, this, &MainWindow::onUrlChainFinished);
 
     createActions();
     createMenus();
@@ -549,6 +578,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(connectionController, &ConnectionController::pingStatsUpdated, latencyStatus,
             &LatencyStatusWidget::updateData);
 
+    cardUpdateStatusBar = new CardDatabaseUpdateStatusBar(this);
+    statusBar()->addPermanentWidget(cardUpdateStatusBar);
+    connect(this, &MainWindow::cardDatabaseUpdateProgress, cardUpdateStatusBar,
+            &CardDatabaseUpdateStatusBar::updateProgress);
+    connect(this, &MainWindow::cardDatabaseUpdateFinished, cardUpdateStatusBar,
+            &CardDatabaseUpdateStatusBar::updateFinished);
+
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &MainWindow::refreshShortcuts);
     refreshShortcuts();
@@ -569,11 +605,18 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::startupConfigCheck()
 {
+    const bool isCleanInstall = SettingsCache::instance().network().getClientVersion() == CLIENT_INFO_NOT_SET;
+
     // checkUnknownSets() is intentionally deferred from the card database load
     // (which runs in main() before MainWindow exists) so that
     // cardDatabaseNewSetsFound / cardDatabaseAllNewSetsEnabled have live
     // receivers when emitted.
-    CardDatabaseManager::getInstance()->checkUnknownSets();
+    // On a clean install the onboarding wizard owns the first-run experience;
+    // wait until it closes so the legacy "all sets enabled" welcome and the
+    // Manage Sets dialog don't appear first.
+    if (!isCleanInstall) {
+        CardDatabaseManager::getInstance()->checkUnknownSets();
+    }
 
     if (SettingsCache::instance().debug().getLocalGameOnStartup()) {
         LocalGameOptions options;
@@ -587,14 +630,14 @@ void MainWindow::startupConfigCheck()
 
     actCheckCommanderBracketDefinitionUpdates();
 
-    if (SettingsCache::instance().network().getClientVersion() == CLIENT_INFO_NOT_SET) {
+    if (isCleanInstall) {
         // no config found, 99% new clean install
         qCInfo(WindowMainStartupVersionLog)
             << "Startup: old client version empty, assuming first start after clean install";
         SettingsCache::instance().downloads().resetToDefaultURLs(); // populate the download urls
         SettingsCache::instance().network().setClientVersion(VERSION_STRING);
         actCheckServerUpdates();
-        runFirstRunWizard();
+        runFirstRunWizard(true);
 
         if (QString(VERSION_STRING).contains("custom", Qt::CaseInsensitive)) {
             SettingsCache::instance().updates().setCheckUpdatesOnStartup(false);
@@ -674,7 +717,7 @@ void MainWindow::startupConfigCheck()
     }
 }
 
-void MainWindow::runFirstRunWizard()
+void MainWindow::runFirstRunWizard(bool firstRun)
 {
     auto *wizard = new FirstRunWizard(this);
     wizard->setAttribute(Qt::WA_DeleteOnClose);
@@ -682,8 +725,22 @@ void MainWindow::runFirstRunWizard()
     connect(wizard, &FirstRunWizard::cardDatabaseUpdateRequested, this, &MainWindow::actCheckCardUpdatesBackground);
     connect(wizard, &FirstRunWizard::manualCardDatabaseSetupRequested, this, &MainWindow::actCheckCardUpdates);
     connect(this, &MainWindow::cardDatabaseUpdateFinished, wizard, &FirstRunWizard::onCardDatabaseUpdateFinished);
+    connect(this, &MainWindow::cardDatabaseUpdateProgress, wizard, &FirstRunWizard::onCardDatabaseUpdateProgress);
     connect(wizard, &FirstRunWizard::registerRequested, connectionController, &ConnectionController::registerToServer);
     connect(wizard, &FirstRunWizard::connectRequested, connectionController, &ConnectionController::connectToServer);
+
+    if (firstRun) {
+        // The onboarding wizard owns set handling for a clean install. Suppress
+        // the legacy set dialogs while it's open and run checkUnknownSets() once
+        // it closes so the sets end up enabled in the right order.
+        firstRunWizardActive = true;
+        connect(wizard, &QDialog::finished, this, [this] {
+            QTimer::singleShot(0, this, [this] {
+                CardDatabaseManager::getInstance()->checkUnknownSets();
+                firstRunWizardActive = false;
+            });
+        });
+    }
 
     wizard->setModal(true);
     wizard->show();
@@ -698,6 +755,12 @@ void MainWindow::applyStartupDestination()
 {
     // An explicit command-line connect takes precedence over the startup destination.
     if (!connectTo.isEmpty()) {
+        return;
+    }
+
+    // A cockatrice:// link owns the startup connection while its chain runs;
+    // connecting here would race (and tear down) the link's own connection.
+    if (skipStartupAutoConnect) {
         return;
     }
 
@@ -722,6 +785,7 @@ void MainWindow::applyStartupDestination()
 
     connect(credentials, &Intent::finished, connector, &Intent::execute);
     connect(credentials, &Intent::failed, this, &MainWindow::startupDestinationFailed);
+    connect(credentials, &Intent::cancelled, this, [this]() { startupDestinationFailed(tr("Sign-in cancelled")); });
     connect(connector, &Intent::finished, this,
             [this, destination, serverContext]() { onStartupDestinationConnected(destination, *serverContext); });
     connect(connector, &Intent::failed, this, &MainWindow::startupDestinationFailed);
@@ -816,7 +880,7 @@ void MainWindow::createTrayIcon()
 
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setContextMenu(trayIconMenu);
-    trayIcon->setIcon(QPixmap("theme:cockatrice"));
+    trayIcon->setIcon(themePixmap(QStringLiteral("cockatrice")));
     trayIcon->show();
 }
 
@@ -837,11 +901,26 @@ void MainWindow::actShow()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     // workaround Qt bug where closeEvent gets called twice
-    static bool bClosingDown = false;
     if (bClosingDown) {
         return;
     }
     bClosingDown = true;
+
+    if (cardUpdateProcess && cardUpdateProcess->state() != QProcess::NotRunning) {
+        const QString runningFor = cardUpdateStatusBar ? cardUpdateStatusBar->statusText() : QString();
+        const QString message = runningFor.isEmpty()
+                                    ? tr("A card database update is still running. Quitting now will cancel it.\n"
+                                         "Are you sure you want to quit?")
+                                    : tr("A card database update is still running: %1.\nQuitting now will cancel it.\n"
+                                         "Are you sure you want to quit?")
+                                          .arg(runningFor);
+        if (QMessageBox::question(this, tr("Are you sure?"), message, QMessageBox::Yes | QMessageBox::No,
+                                  QMessageBox::No) == QMessageBox::No) {
+            event->ignore();
+            bClosingDown = false;
+            return;
+        }
+    }
 
     if (!tabSupervisor->close()) {
         event->ignore();
@@ -855,6 +934,18 @@ void MainWindow::closeEvent(QCloseEvent *event)
     tabSupervisor->deleteLater();
 }
 
+bool MainWindow::closeForUpdate()
+{
+    // A shutdown is already being handled (e.g. this is reached from a nested event loop while
+    // closeEvent() is blocked on a user prompt). close() would hit the re-entrancy guard and return
+    // true without any shutdown having happened, so report faithfully instead: the caller must keep
+    // the process alive until the user resolves whatever is blocking the close.
+    if (bClosingDown) {
+        return false;
+    }
+    return close();
+}
+
 void MainWindow::changeEvent(QEvent *event)
 {
     if (event->type() == QEvent::LanguageChange) {
@@ -862,18 +953,7 @@ void MainWindow::changeEvent(QEvent *event)
     } else if (event->type() == QEvent::ActivationChange) {
         if (isActiveWindow() && !bHasActivated) {
             bHasActivated = true;
-            if (!connectTo.isEmpty()) {
-                qCInfo(WindowMainStartupAutoconnectLog) << "Command line connect to " << connectTo;
-                connectionController->connectToServerDirect(connectTo.host(), connectTo.port(), connectTo.userName(),
-                                                            connectTo.password());
-            } else if (SettingsCache::instance().servers().getAutoConnect() &&
-                       !SettingsCache::instance().debug().getLocalGameOnStartup() &&
-                       !startupDestinationConnectsToServer()) {
-                qCInfo(WindowMainStartupAutoconnectLog) << "Attempting auto-connect...";
-                DlgConnect dlg(this);
-                connectionController->connectToServerDirect(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()),
-                                                            dlg.getPlayerName(), dlg.getPassword());
-            }
+            attemptStartupAutoConnect();
         }
     }
 
@@ -897,6 +977,59 @@ void MainWindow::showWindowIfHidden()
 void MainWindow::handleCockatriceLink(const QString &url)
 {
     urlParser->handle(url);
+}
+
+void MainWindow::attemptStartupAutoConnect()
+{
+    if (startupAutoConnectAttempted || skipStartupAutoConnect) {
+        return;
+    }
+    startupAutoConnectAttempted = true;
+
+    if (!connectTo.isEmpty()) {
+        qCInfo(WindowMainStartupAutoconnectLog) << "Command line connect to " << connectTo;
+        connectionController->connectToServerDirect(connectTo.host(), connectTo.port(), connectTo.userName(),
+                                                    connectTo.password());
+    } else if (SettingsCache::instance().servers().getAutoConnect() &&
+               !SettingsCache::instance().debug().getLocalGameOnStartup() && !startupDestinationConnectsToServer()) {
+        qCInfo(WindowMainStartupAutoconnectLog) << "Attempting auto-connect...";
+        DlgConnect dlg(this);
+        connectionController->connectToServerDirect(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()),
+                                                    dlg.getPlayerName(), dlg.getPassword());
+    }
+}
+
+void MainWindow::onUrlChainFinished(bool connected)
+{
+    // A cockatrice:// link owns the startup connection while it runs. When its
+    // chain ended without connecting (declined, invalid, offline), fall back to
+    // the startup connection so the activation launch still behaves like a
+    // normal launch.
+    if (connected) {
+        // The launch link connected, so the startup fallback has served its
+        // purpose: drop the skip so a later mid-session link that ends declined
+        // or offline cannot silently fire auto-connect or applyStartupDestination
+        // again.
+        skipStartupAutoConnect = false;
+        return;
+    }
+
+    if (!skipStartupAutoConnect || getRemoteClient()->getStatus() != StatusDisconnected) {
+        return;
+    }
+
+    if (startupDestinationConnectsToServer()) {
+        // Users whose startup tab is a Server / Server Room connect through the
+        // startup destination, not through auto-connect; retry that instead.
+        qCInfo(WindowMainStartupAutoconnectLog) << "URL chain ended without a connection; retrying startup destination";
+        skipStartupAutoConnect = false;
+        applyStartupDestination();
+        return;
+    }
+
+    qCInfo(WindowMainStartupAutoconnectLog) << "URL chain ended without a connection; retrying startup connect";
+    skipStartupAutoConnect = false;
+    attemptStartupAutoConnect();
 }
 
 void MainWindow::cardDatabaseLoadingFailed()
@@ -928,7 +1061,7 @@ void MainWindow::cardDatabaseLoadingFailed()
 
 void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknownSetsNames)
 {
-    if (SettingsCache::instance().updates().getAlwaysEnableNewSets()) {
+    if (firstRunWizardActive || SettingsCache::instance().updates().getAlwaysEnableNewSets()) {
         CardDatabaseManager::getInstance()->enableAllUnknownSets();
         const auto reloadOk1 =
             QtConcurrent::run([] { CardDatabaseManager::getInstance()->reloadCardDatabasesAndNotify(); });
@@ -971,6 +1104,12 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
 
 void MainWindow::cardDatabaseAllNewSetsEnabled()
 {
+    if (firstRunWizardActive || CardDatabaseManager::getInstance()->getCardList().isEmpty()) {
+        // The onboarding wizard owns the first-run messaging on a clean install,
+        // and with no card data there are no sets to have enabled.
+        return;
+    }
+
     QMessageBox::information(
         this, tr("Welcome"),
         tr("Hi! It seems like you're running this version of Cockatrice for the first time.\nAll the sets in the card "
@@ -993,16 +1132,28 @@ void MainWindow::actCheckCardUpdatesBackground()
 void MainWindow::createCardUpdateProcess(bool background)
 {
     if (cardUpdateProcess) {
-        QMessageBox::information(this, tr("Information"), tr("A card database update is already running."));
+        qCDebug(CardDatabaseUpdateLog) << "A card database update is already running; asking it to come to the front";
+        if (requestCardUpdateRaise()) {
+            return;
+        }
+        if (background) {
+            // A hidden run has nothing to raise: keep the user informed without blocking.
+            announceCardUpdateRunning();
+            return;
+        }
+        QMessageBox::information(this, tr("Information"),
+                                 tr("The card database updater is already open.\n"
+                                    "Look for the Oracle window - it may be behind this one."));
         return;
     }
 
     cardUpdateProcess = new QProcess(this);
 
     connect(cardUpdateProcess, &QProcess::errorOccurred, this, &MainWindow::cardUpdateError);
-
     connect(cardUpdateProcess, qOverload<int, QProcess::ExitStatus>(&QProcess::finished), this,
             &MainWindow::cardUpdateFinished);
+    connect(cardUpdateProcess, &QProcess::readyReadStandardOutput, this, &MainWindow::cardUpdateProgressOutput);
+    connect(cardUpdateProcess, &QProcess::readyReadStandardError, this, &MainWindow::cardUpdateStandardError);
 
     // full "run the update" command; leave empty if not present
     QString updaterCmd;
@@ -1036,7 +1187,7 @@ void MainWindow::createCardUpdateProcess(bool background)
 
     if (dir.exists(binaryName)) {
         updaterCmd = dir.absoluteFilePath(binaryName);
-    } else { // try and find the directory oracle is stored in the build directory
+    } else { // try and find the directory Oracle is stored in the build directory
         QDir findLocalDir(dir);
         findLocalDir.cdUp();
         findLocalDir.cd(getCardUpdaterBinaryName());
@@ -1047,6 +1198,8 @@ void MainWindow::createCardUpdateProcess(bool background)
     }
 
     if (updaterCmd.isEmpty()) {
+        qCWarning(CardDatabaseUpdateLog) << "Unable to locate the card database updater; looked for"
+                                         << dir.absoluteFilePath(binaryName);
         QMessageBox::warning(this, tr("Error"),
                              tr("Unable to run the card database updater: ") + dir.absoluteFilePath(binaryName));
         exitCardDatabaseUpdate();
@@ -1054,11 +1207,75 @@ void MainWindow::createCardUpdateProcess(bool background)
         return;
     }
 
+    cardUpdateOutputBuffer.clear();
+    cardUpdateErrorOutput.clear();
+    cardUpdateErrorPartial.clear();
+    cardUpdateLoggedStage = CardUpdateStage::Unknown;
+    cardUpdateProgressLogTimer.start();
+
+    qCInfo(CardDatabaseUpdateLog) << "Starting the card database updater" << updaterCmd << "background:" << background;
+    cardUpdateStatusBar->updateStarted();
+
     if (!background) {
         cardUpdateProcess->start(updaterCmd, QStringList());
     } else {
         cardUpdateProcess->start(updaterCmd, QStringList("-b"));
         statusBar()->showMessage(tr("Card database update running."));
+        if (trayIcon && SettingsCache::instance().updates().getCardDatabaseUpdateTrayNotification()) {
+            trayIcon->showMessage(tr("Card database update started"),
+                                  tr("Cockatrice is updating the card database in the background."));
+        }
+    }
+}
+
+void MainWindow::cardUpdateProgressOutput()
+{
+    if (!cardUpdateProcess) {
+        return;
+    }
+    cardUpdateOutputBuffer.append(cardUpdateProcess->readAllStandardOutput());
+    while (true) {
+        const int newline = cardUpdateOutputBuffer.indexOf('\n');
+        if (newline < 0) {
+            break;
+        }
+        const QByteArray line = cardUpdateOutputBuffer.left(newline);
+        cardUpdateOutputBuffer.remove(0, newline + 1);
+        // Protocol emitted by `oracle`: "PROGRESS <stage> <done> <total>"
+        const std::optional<CardUpdateProgress> progress = CardUpdateProgress::fromProtocolLine(line);
+        if (!progress.has_value()) {
+            continue;
+        }
+        // Log stage changes and, while a stage runs, one line per second at most, so the
+        // debug log shows liveness without flooding it.
+        if (progress->stage != cardUpdateLoggedStage || cardUpdateProgressLogTimer.elapsed() >= 1000) {
+            qCDebug(CardDatabaseUpdateLog)
+                << "Card database update" << progress->stageToken() << progress->done << "/" << progress->total;
+            cardUpdateLoggedStage = progress->stage;
+            cardUpdateProgressLogTimer.restart();
+        }
+        emit cardDatabaseUpdateProgress(progress.value());
+    }
+}
+
+void MainWindow::cardUpdateStandardError()
+{
+    if (!cardUpdateProcess) {
+        return;
+    }
+    const QByteArray chunk = cardUpdateProcess->readAllStandardError();
+    if (chunk.isEmpty()) {
+        return;
+    }
+    cardUpdateErrorOutput.append(chunk);
+    cardUpdateErrorPartial.append(chunk);
+    int newline;
+    while ((newline = cardUpdateErrorPartial.indexOf('\n')) >= 0) {
+        const QByteArray line = cardUpdateErrorPartial.left(newline).trimmed();
+        cardUpdateErrorPartial.remove(0, newline + 1);
+        if (!line.isEmpty()) {
+            qCWarning(CardDatabaseUpdateLog) << "Card database updater:" << line;
+        }
     }
 }
 
@@ -1083,7 +1300,6 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
             break;
         case QProcess::Crashed:
             error = tr("The process crashed some time after starting successfully.");
-            error += "\n\nError output:\n" + cardUpdateProcess->readAllStandardError();
             break;
         case QProcess::Timedout:
             error = tr("Timed out. The process took too long to respond. The last waitFor...() function timed out.");
@@ -1102,6 +1318,12 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
             break;
     }
 
+    if (!cardUpdateErrorOutput.isEmpty()) {
+        error += "\n\n" + tr("Error output:") + "\n" + QString::fromUtf8(cardUpdateErrorOutput);
+        cardUpdateErrorOutput.clear();
+    }
+
+    qCWarning(CardDatabaseUpdateLog) << "The card database updater exited with an error:" << error;
     exitCardDatabaseUpdate();
     QMessageBox::warning(this, tr("Error"), tr("The card database updater exited with an error:\n%1").arg(error));
     emit cardDatabaseUpdateFinished(false);
@@ -1109,12 +1331,54 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
 
 void MainWindow::cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
+    if (!cardUpdateProcess) {
+        return;
+    }
+    cardUpdateProgressOutput(); // drain any progress lines not yet parsed
+
     const bool success = (exitStatus == QProcess::NormalExit) && (exitCode == 0);
     if (exitStatus == QProcess::NormalExit) {
         SettingsCache::instance().updates().setLastCardUpdateCheck(QDateTime::currentDateTime().date());
     }
+    qCInfo(CardDatabaseUpdateLog) << "The card database updater finished with exit code" << exitCode << "exit status"
+                                  << static_cast<int>(exitStatus) << "success:" << success;
     exitCardDatabaseUpdate();
+    notifyCardUpdateFinishedFromTray(success);
     emit cardDatabaseUpdateFinished(success);
+}
+
+bool MainWindow::requestCardUpdateRaise()
+{
+    const QString serverName = scopedLocalServerName(QStringLiteral("CockatriceOracleRaise"));
+    QLocalSocket socket;
+    socket.connectToServer(serverName);
+    if (!socket.waitForConnected(250)) {
+        return false;
+    }
+    socket.write("RAISE\n");
+    const bool acked = socket.waitForBytesWritten(250);
+    socket.disconnectFromServer();
+    return acked;
+}
+
+void MainWindow::announceCardUpdateRunning()
+{
+    if (SettingsCache::instance().userInterface().getShowStatusBar()) {
+        statusBar()->showMessage(tr("Card database update running."));
+    } else if (trayIcon && SettingsCache::instance().updates().getCardDatabaseUpdateTrayNotification()) {
+        trayIcon->showMessage(tr("Card database update running"),
+                              tr("Cockatrice is updating the card database in the background."));
+    }
+}
+
+void MainWindow::notifyCardUpdateFinishedFromTray(bool success)
+{
+    if (SettingsCache::instance().userInterface().getShowStatusBar() || !trayIcon ||
+        !SettingsCache::instance().updates().getCardDatabaseUpdateTrayNotification()) {
+        return;
+    }
+    trayIcon->showMessage(tr("Card database update finished"),
+                          success ? tr("The card database is up to date.") : tr("The card database update failed."));
 }
 
 void MainWindow::actCheckServerUpdates()

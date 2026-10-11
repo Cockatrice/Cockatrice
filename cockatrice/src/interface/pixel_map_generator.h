@@ -7,13 +7,19 @@
 #ifndef PIXMAPGENERATOR_H
 #define PIXMAPGENERATOR_H
 
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+
 #include <QHash>
 #include <QIcon>
 #include <QLoggingCategory>
 #include <QMap>
 #include <QPixmap>
+#include <QString>
+#include <QStringView>
 #include <libcockatrice/network/server/remote/user_level.h>
 #include <optional>
+
+class QSize;
 
 inline Q_LOGGING_CATEGORY(PixelMapGeneratorLog, "pixel_map_generator");
 
@@ -155,5 +161,16 @@ public:
 };
 
 QPixmap loadColorAdjustedPixmap(const QString &name);
+
+// Loads a "theme:" asset (with no file extension in prefix), preferring the
+// scheme-qualified variant (prefix-dark / prefix-light, resolved via
+// ThemeManager::assetPath) and falling back to the plain asset. Callers load
+// the returned path directly. Use for scheme-sensitive pixmaps like
+// backgrounds, the card back, and the app logo.
+QPixmap themePixmap(QStringView prefix);
+
+// Clears every PixmapGenerator's static cache so scheme variants are
+// re-resolved when the active theme or color scheme changes.
+void clearPixmapGeneratorCaches();
 
 #endif

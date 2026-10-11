@@ -9,13 +9,16 @@
 
 #include <QMap>
 #include <QObject>
+#include <QString>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
+#include <qtmetamacros.h>
 
 // Translation layer class to expose protobuf safely and hook it up to Qt Signals.
 // This class de-couples the domain object (i.e. the GameMetaInfo) from the network object.
 // If the network object changes, only this class needs to be adjusted.
 
 class AbstractGame;
+
 class GameMetaInfo : public QObject
 {
     Q_OBJECT

@@ -1,7 +1,11 @@
 #include "gtest/gtest.h"
 #include <QSettings>
+#include <QString>
 #include <QTemporaryDir>
+#include <QVariant>
+#include <functional>
 #include <libcockatrice/settings/settings_manager.h>
+#include <string>
 
 namespace
 {

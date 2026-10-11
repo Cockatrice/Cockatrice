@@ -1,15 +1,22 @@
 #ifndef COCKATRICE_DECKLIST_NODE_TREE_H
 #define COCKATRICE_DECKLIST_NODE_TREE_H
 
-#include "libcockatrice/utility/card_ref.h"
 #include "tree/deck_list_card_node.h"
 #include "tree/inner_deck_list_node.h"
 
+#include <QList>
 #include <QSet>
+#include <QString>
+#include <functional>
+
+class AbstractDecklistNode;
+class QXmlStreamReader;
+class QXmlStreamWriter;
 
 class DecklistNodeTree
 {
     InnerDecklistNode *root; ///< Root of the deck tree (zones + cards).
+    int totalCards = 0;
 
 public:
     /** @brief Constructs an empty DecklistNodeTree. */
@@ -115,6 +122,25 @@ public:
     QList<const InnerDecklistNode *> getCustomZones(const QString &boardZoneName) const;
 
     /**
+     * @brief Checks whether a zone name is taken anywhere in the deck.
+     *
+     * Covers the standard board names and any top-level or nested custom zone.
+     * @param zoneName The checked name.
+     * @return true if the name is reserved or already in use.
+     */
+    bool hasZoneName(const QString &zoneName) const;
+
+    /**
+     * @brief Finds a custom zone anywhere in the deck by name.
+     *
+     * Walks the children of every top-level zone, so a zone nested under any
+     * board (and not just the standard ones) is found.
+     * @param zoneName The zone name to find.
+     * @return The matching zone node, or nullptr if none exists.
+     */
+    InnerDecklistNode *findCustomZoneByName(const QString &zoneName) const;
+
+    /**
      * @brief Applies a function to every card in the deck tree. This can modify the cards.
      *
      * @param func Function taking (top-level board zone node, card node). Cards nested
@@ -124,11 +150,17 @@ public:
 
 private:
     // Helpers for traversing the tree
-    InnerDecklistNode *getZoneObjFromName(const QString &zoneName) const;
+    InnerDecklistNode *getZoneObjFromName(const QString &zoneName);
     InnerDecklistNode *findBoardZone(const QString &boardZoneName) const;
     InnerDecklistNode *findOrCreateBoardZone(const QString &boardZoneName);
-    InnerDecklistNode *findCustomZoneByName(const QString &zoneName) const;
-    bool hasZoneName(const QString &zoneName) const;
+
+    /**
+     * @brief Recursively removes @p container when it is an empty board zone.
+     *
+     * Empty custom zones are kept while empty board zones get pruned, so a
+     * board zone disappears once its last card or custom zone goes away.
+     */
+    void pruneEmptyBoardZone(InnerDecklistNode *container);
 };
 
 #endif // COCKATRICE_DECKLIST_NODE_TREE_H

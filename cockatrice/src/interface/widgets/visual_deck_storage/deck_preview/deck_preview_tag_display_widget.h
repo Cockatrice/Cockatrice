@@ -7,10 +7,12 @@
 #ifndef DECK_PREVIEW_TAG_DISPLAY_WIDGET_H
 #define DECK_PREVIEW_TAG_DISPLAY_WIDGET_H
 
-#include <QLabel>
-#include <QPushButton>
 #include <QString>
 #include <QWidget>
+#include <qtmetamacros.h>
+
+class QLabel;
+class QPushButton;
 
 enum class TagState
 {
@@ -48,7 +50,10 @@ public:
 
 signals:
     /**
-     * @brief Emitted when the tag is clicked.
+     * @brief Emitted when a click toggles the chip's selection/exclusion state.
+     *
+     * Not emitted for clicks that leave the state unchanged. Connected handlers use
+     * this as the trigger to update filters built from selectedTags()/excludedTags().
      */
     void tagClicked();
 

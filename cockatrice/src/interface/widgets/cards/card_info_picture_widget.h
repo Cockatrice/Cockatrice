@@ -7,15 +7,20 @@
 #ifndef CARD_INFO_PICTURE_H
 #define CARD_INFO_PICTURE_H
 
-#include "card_info_picture_enlarged_widget.h"
-
-#include <QPropertyAnimation>
+#include <QLoggingCategory>
+#include <QMouseEvent>
+#include <QPixmap>
+#include <QPoint>
 #include <QWidget>
 #include <libcockatrice/card/printing/exact_card.h>
+#include <qtmetamacros.h>
+
+class CardInfoPictureEnlargedWidget;
+class QPropertyAnimation;
+class QTimer;
 
 inline Q_LOGGING_CATEGORY(CardInfoPictureWidgetLog, "card_info_picture_widget");
 
-class AbstractCardItem;
 class QMenu;
 
 class CardInfoPictureWidget : public QWidget

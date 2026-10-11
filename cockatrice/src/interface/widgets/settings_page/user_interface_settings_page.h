@@ -5,13 +5,14 @@
 
 #include <QCheckBox>
 #include <QComboBox>
-#include <QGroupBox>
 #include <QLabel>
 #include <QPushButton>
 #include <QSpinBox>
 #include <QToolButton>
-#include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/utility/macros.h>
+#include <qtmetamacros.h>
+
+class QGroupBox;
 
 class UserInterfaceSettingsPage : public AbstractSettingsPage
 {
@@ -23,9 +24,6 @@ private slots:
     void updateCommanderSpellbookUiState();
 
 private:
-    QCheckBox notificationsEnabledCheckBox;
-    QCheckBox specNotificationsEnabledCheckBox;
-    QCheckBox buddyConnectNotificationsEnabledCheckBox;
     QCheckBox doubleClickToPlayCheckBox;
     QCheckBox clickPlaysAllSelectedCheckBox;
     QCheckBox playToStackCheckBox;
@@ -37,17 +35,24 @@ private:
     QCheckBox showTotalSelectionCountCheckBox;
     QCheckBox useTearOffMenusCheckBox;
     QCheckBox keepGameChatFocusCheckBox;
+
+    QCheckBox notificationsEnabledCheckBox;
+    QCheckBox specNotificationsEnabledCheckBox;
+    QCheckBox buddyConnectNotificationsEnabledCheckBox;
+
     QPushButton enableAllAnimationsButton;
     QPushButton disableAllAnimationsButton;
     QCheckBox tapAnimationCheckBox;
     QCheckBox arrowDrawAnimationCheckBox;
     QCheckBox lifeCounterAnimationsCheckBox;
     QCheckBox battlefieldFlashCheckBox;
+
     QCheckBox openDeckInNewTabCheckBox;
     QLabel visualDeckStoragePromptForConversionLabel;
     QComboBox visualDeckStoragePromptForConversionSelector;
     QCheckBox visualDeckStorageInGameCheckBox;
     QCheckBox visualDeckStorageSelectionAnimationCheckBox;
+    QCheckBox visualDeckEditorShowCardCountsCheckBox;
     QLabel defaultDeckEditorTypeLabel;
     QComboBox defaultDeckEditorTypeSelector;
     QLabel vdeStartupTabLabel;
@@ -57,8 +62,10 @@ private:
     QLabel commanderSpellbookIntegrationUseOfficialBracketNamesLabel;
     QToolButton commanderSpellbookIntegrationUseOfficialBracketNamesExplainer;
     QComboBox commanderSpellbookIntegrationBracketNamingSelector;
+
     QLabel rewindBufferingMsLabel;
     QSpinBox rewindBufferingMsBox;
+
     QGroupBox *generalGroupBox;
     QGroupBox *notificationsGroupBox;
     QGroupBox *animationGroupBox;

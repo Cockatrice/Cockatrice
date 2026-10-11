@@ -2,36 +2,53 @@
 
 #include "../../../../client/settings/cache_settings.h"
 #include "../../../../client/settings/shortcuts_settings.h"
-#include "../../cards/card_info_display_widget.h"
+#include "../../../deck_loader/loaded_deck.h"
+#include "../../deck_editor/deck_editor_card_database_dock_widget.h"
+#include "../../deck_editor/deck_editor_card_info_dock_widget.h"
+#include "../../deck_editor/deck_editor_deck_dock_widget.h"
+#include "../../deck_editor/deck_editor_filter_dock_widget.h"
+#include "../../deck_editor/deck_editor_printing_selector_dock_widget.h"
 #include "../../deck_editor/deck_state_manager.h"
-#include "../../filters/filter_builder.h"
-#include "../../interface/pixel_map_generator.h"
-#include "../../interface/widgets/cards/card_info_frame_widget.h"
+#include "../../deck_editor/deck_zone_dialog.h"
 #include "../../interface/widgets/deck_analytics/deck_analytics_widget.h"
 #include "../../interface/widgets/visual_deck_editor/visual_deck_editor_widget.h"
-#include "../tab_deck_editor.h"
+#include "../../menus/deck_editor_menu.h"
+#include "../../visual_database_display/visual_database_display_widget.h"
+#include "../../visual_deck_editor/visual_deck_editor_sample_hand_widget.h"
 #include "../tab_supervisor.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
 #include "tab_deck_editor_visual_tab_widget.h"
 
 #include <QAction>
-#include <QCloseEvent>
-#include <QCompleter>
-#include <QDir>
+#include <QApplication>
+#include <QByteArray>
+#include <QDebug>
 #include <QDockWidget>
-#include <QHeaderView>
+#include <QEvent>
+#include <QFlags>
+#include <QItemSelection>
+#include <QItemSelectionModel>
 #include <QLineEdit>
+#include <QList>
+#include <QLoggingCategory>
+#include <QMainWindow>
+#include <QMap>
 #include <QMenu>
-#include <QProcessEnvironment>
-#include <QSplitter>
-#include <QTextStream>
+#include <QMessageLogger>
+#include <QModelIndex>
+#include <QMouseEvent>
+#include <QSize>
 #include <QTimer>
 #include <QTreeView>
 #include <QVBoxLayout>
+#include <QWidget>
+#include <functional>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
-#include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
-#include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/layouts_settings.h>
+#include <qnamespace.h>
+#include <qobjectdefs.h>
 
 /**
  * @brief Constructs the TabDeckEditorVisual instance.
@@ -84,6 +101,7 @@ void TabDeckEditorVisual::createCentralFrame()
     connect(tabContainer, &TabDeckEditorVisualTabWidget::printingSelectorRequested, this,
             &TabDeckEditorVisual::showPrintingSelector);
     connect(tabContainer, &TabDeckEditorVisualTabWidget::cardInfoRequested, this, &TabDeckEditorVisual::updateCardInfo);
+    tabContainer->visualDatabaseDisplay->setNewZoneCreator([this] { return createNewZone(); });
 
     centralFrame->addWidget(tabContainer);
     setCentralWidget(centralWidget);
@@ -267,6 +285,19 @@ bool TabDeckEditorVisual::actSaveDeckAs()
     auto result = AbstractTabDeckEditor::actSaveDeckAs();
     tabContainer->visualDeckView->searchBar->setEnabled(true);
     return result;
+}
+
+/** @brief Prompts for and creates a new custom deck zone. Returns the name of the created zone. */
+QString TabDeckEditorVisual::createNewZone()
+{
+    QString boardName;
+    const QString zoneName = DeckZoneDialog::promptForNewZone(this, {}, &boardName, [this](const QString &candidate) {
+        return deckStateManager->validateNewZoneName(candidate);
+    });
+    if (!zoneName.isEmpty()) {
+        deckStateManager->createCustomZone(boardName, zoneName);
+    }
+    return zoneName;
 }
 
 /** @brief Refreshes keyboard shortcuts for this tab from settings. */

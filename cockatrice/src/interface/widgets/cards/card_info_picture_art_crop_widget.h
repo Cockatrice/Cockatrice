@@ -9,6 +9,11 @@
 
 #include "card_info_picture_widget.h"
 
+#include <QPixmap>
+#include <qtmetamacros.h>
+
+class QWidget;
+
 class CardInfoPictureArtCropWidget : public CardInfoPictureWidget
 {
     Q_OBJECT

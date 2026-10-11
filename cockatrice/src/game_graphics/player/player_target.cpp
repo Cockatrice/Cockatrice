@@ -1,16 +1,43 @@
 #include "player_target.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "../../game/player/player_info.h"
 #include "../../game/player/player_logic.h"
 #include "../../interface/pixel_map_generator.h"
+#include "../board/abstract_counter.h"
+#include "../board/abstract_graphics_item.h"
+#include "../board/arrow_target.h"
 #include "../game_scene.h"
+#include "libcockatrice/settings/interface_settings.h"
+#include "user_level.h"
 
-#include <QApplication>
-#include <QDebug>
+#include <QBrush>
+#include <QColor>
+#include <QFlag>
+#include <QFlags>
+#include <QFont>
+#include <QObject>
 #include <QPainter>
+#include <QPainterPath>
+#include <QPen>
 #include <QPixmapCache>
+#include <QPointF>
+#include <QRadialGradient>
+#include <QRectF>
+#include <QSize>
+#include <QSizeF>
+#include <QString>
+#include <QTransform>
+#include <QtGlobal>
 #include <QtMath>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <qnamespace.h>
+#include <qnumeric.h>
+#include <string>
+#include <sys/types.h>
+
+class CounterState;
+class QGraphicsItem;
 
 PlayerCounter::PlayerCounter(CounterState *state, PlayerLogic *player, QGraphicsItem *parent)
     : AbstractCounter(state, player, false, false, parent)
@@ -69,7 +96,7 @@ void PlayerCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*
     }
 }
 
-void PlayerCounter::onValueChanged(int oldValue, int newValue)
+void PlayerCounter::onValueChanged(int oldValue, int newValue, bool skipDamageAnimation)
 {
     flashDelta = newValue - oldValue;
     if (flashDelta == 0) {
@@ -77,6 +104,11 @@ void PlayerCounter::onValueChanged(int oldValue, int newValue)
     }
 
     if (!SettingsCache::instance().userInterface().getLifeCounterAnimationsEnabled()) {
+        flashAlpha = 0.0;
+        return;
+    }
+
+    if (skipDamageAnimation) {
         flashAlpha = 0.0;
         return;
     }
@@ -132,8 +164,18 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
     QRectF translatedRect = painter->combinedTransform().mapRect(avatarBoundingRect);
     QSize translatedSize = translatedRect.size().toSize();
     QPixmap cachedPixmap;
+    // The key must cover everything the generated pawn depends on: the rendered
+    // size, the user level, and the pixmap being drawn. fullPixmap.cacheKey() is
+    // 0 for every null pixmap, so the default-pawn branch additionally needs the
+    // pawn's privlevel (lowercased, matching UserLevelPixmapGenerator) and colors
+    // in the key — otherwise two players without a custom avatar (and the same
+    // user level) would share one cached pawn.
     const QString cacheKey = "avatar" + QString::number(translatedSize.width()) + "_" +
-                             QString::number(info->user_level()) + "_" + QString::number(fullPixmap.cacheKey());
+                             QString::number(translatedSize.height()) + "_" + QString::number(info->user_level()) +
+                             "_" + QString::number(fullPixmap.cacheKey()) + "_" +
+                             QString::fromStdString(info->privlevel()).toLower() + "_" +
+                             QString::fromStdString(info->pawn_colors().left_side()) + "_" +
+                             QString::fromStdString(info->pawn_colors().right_side());
     if (!QPixmapCache::find(cacheKey, &cachedPixmap)) {
         cachedPixmap = QPixmap(translatedSize.width(), translatedSize.height());
 

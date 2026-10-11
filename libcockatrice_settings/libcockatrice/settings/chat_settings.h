@@ -3,7 +3,11 @@
 
 #include "settings_manager.h"
 
+#include <QString>
 #include <libcockatrice/interfaces/interface_chat_settings_provider.h>
+#include <qtmetamacros.h>
+
+class QObject;
 
 class ChatSettings : public SettingsManager, public IChatSettingsProvider
 {
@@ -23,6 +27,8 @@ public:
     [[nodiscard]] bool getShowMessagePopup() const override;
     [[nodiscard]] bool getShowMentionPopup() const override;
     [[nodiscard]] bool getRoomHistory() const override;
+    [[nodiscard]] bool getIgnoreAllPrivateMessages() const override;
+    [[nodiscard]] bool getUseGameTime() const override;
     [[nodiscard]] QString getHighlightWords() const override;
 
     void setChatMention(bool _chatMention);
@@ -37,6 +43,8 @@ public:
     void setShowMessagePopups(bool _showMessagePopups);
     void setShowMentionPopups(bool _showMentionPopups);
     void setRoomHistory(bool _roomHistory);
+    void setIgnoreAllPrivateMessages(bool _ignoreAllPrivateMessages);
+    void setUseGameTime(bool _useGameTime);
     void setHighlightWords(const QString &_highlightWords);
 
 signals:

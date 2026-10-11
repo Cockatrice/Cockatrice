@@ -2,14 +2,23 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../cards/card_size_widget.h"
-#include "visual_deck_storage_widget.h"
+#include "../quick_settings/settings_button_widget.h"
+#include "libcockatrice/utility/macros.h"
 
 #include <QCheckBox>
 #include <QComboBox>
+#include <QDebug>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QSlider>
 #include <QSpinBox>
+#include <QVariant>
+#include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <qnamespace.h>
 
 VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidget *parent)
     : SettingsButtonWidget(parent)
@@ -49,6 +58,15 @@ VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidg
     connect(showTagsOnDeckPreviewsCheckBox, &QCheckBox::QT_STATE_CHANGED,
             &SettingsCache::instance().visualDeckStorage(),
             &VisualDeckStorageSettings::setVisualDeckStorageShowTagsOnDeckPreviews);
+
+    // show upload time on DeckPreviewWidget checkbox
+    showUploadTimeCheckBox = new QCheckBox(this);
+    showUploadTimeCheckBox->setChecked(
+        SettingsCache::instance().visualDeckStorage().getVisualDeckStorageShowUploadTime());
+    connect(showUploadTimeCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
+            &VisualDeckStorageQuickSettingsWidget::showUploadTimeChanged);
+    connect(showUploadTimeCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().visualDeckStorage(),
+            &VisualDeckStorageSettings::setVisualDeckStorageShowUploadTime);
 
     // show banner card selector checkbox
     showBannerCardComboBoxCheckBox = new QCheckBox(this);
@@ -94,7 +112,7 @@ VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidg
     unusedColorIdentityOpacityLayout->addWidget(unusedColorIdentitiesOpacitySpinBox);
 
     // tooltip selector
-    auto deckPreviewTooltipWidget = new QWidget(this);
+    deckPreviewTooltipWidget = new QWidget(this);
 
     deckPreviewTooltipLabel = new QLabel(deckPreviewTooltipWidget);
     deckPreviewTooltipComboBox = new QComboBox(deckPreviewTooltipWidget);
@@ -128,6 +146,7 @@ VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidg
     this->addSettingsWidget(showTagFilterCheckBox);
     this->addSettingsWidget(showColorIdentityCheckBox);
     this->addSettingsWidget(showTagsOnDeckPreviewsCheckBox);
+    this->addSettingsWidget(showUploadTimeCheckBox);
     this->addSettingsWidget(showBannerCardComboBoxCheckBox);
     this->addSettingsWidget(drawUnusedColorIdentitiesCheckBox);
     this->addSettingsWidget(unusedColorIdentityOpacityWidget);
@@ -145,6 +164,7 @@ void VisualDeckStorageQuickSettingsWidget::retranslateUi()
     showTagFilterCheckBox->setText(tr("Show Tag Filter"));
     showColorIdentityCheckBox->setText(tr("Show Color Identity"));
     showTagsOnDeckPreviewsCheckBox->setText(tr("Show Tags On Deck Previews"));
+    showUploadTimeCheckBox->setText(tr("Show Upload Time"));
     showBannerCardComboBoxCheckBox->setText(tr("Show Banner Card Selection Option"));
     drawUnusedColorIdentitiesCheckBox->setText(tr("Draw unused Color Identities"));
     unusedColorIdentitiesOpacityLabel->setText(tr("Unused Color Identities Opacity"));
@@ -153,6 +173,14 @@ void VisualDeckStorageQuickSettingsWidget::retranslateUi()
     deckPreviewTooltipLabel->setText(tr("Deck tooltip:"));
     deckPreviewTooltipComboBox->setItemText(0, tr("None"));
     deckPreviewTooltipComboBox->setItemText(1, tr("Filepath"));
+}
+
+void VisualDeckStorageQuickSettingsWidget::setPublicDecksMode(bool enabled)
+{
+    const bool hidden = enabled;
+    showFoldersCheckBox->setVisible(!hidden);
+    showBannerCardComboBoxCheckBox->setVisible(!hidden);
+    deckPreviewTooltipWidget->setVisible(!hidden);
 }
 
 bool VisualDeckStorageQuickSettingsWidget::getShowFolders() const
@@ -183,6 +211,11 @@ bool VisualDeckStorageQuickSettingsWidget::getShowTagFilter() const
 bool VisualDeckStorageQuickSettingsWidget::getShowTagsOnDeckPreviews() const
 {
     return showTagsOnDeckPreviewsCheckBox->isChecked();
+}
+
+bool VisualDeckStorageQuickSettingsWidget::getShowUploadTime() const
+{
+    return showUploadTimeCheckBox->isChecked();
 }
 
 int VisualDeckStorageQuickSettingsWidget::getUnusedColorIdentitiesOpacity() const

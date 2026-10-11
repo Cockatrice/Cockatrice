@@ -21,6 +21,8 @@ QList<TallyRow> Tally::compute(const QList<CardItem *> &cards, const TallyType t
             return SubtypeTally::countSubtypes(cards);
         case TallyType::TotalPower:
             return StatsTally::computeTotalPower(cards);
+        case TallyType::TotalToughness:
+            return StatsTally::computeTotalToughness(cards);
     }
     return {};
 }

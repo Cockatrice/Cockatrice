@@ -1,7 +1,9 @@
 #ifndef ARCHIDEKTENTRY_H
 #define ARCHIDEKTENTRY_H
 
+#include <QJsonArray>
 #include <QJsonObject>
+#include <QList>
 #include <QString>
 #include <QVector>
 

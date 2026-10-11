@@ -7,6 +7,12 @@
 # Output: ORACLE_QT_MODULES
 # Output: TEST_QT_MODULES
 
+# Every Qt module an application links against, as the DLL names a Windows
+# install has to contain. Core is listed explicitly rather than left to arrive
+# transitively: it is the one module nothing can do without, and required-runtime.txt
+# is built from these lists, so a module missing here is a runtime the package
+# check never asserts. That is how Qt6Core.dll went unasserted while every other
+# Qt module was checked.
 set(REQUIRED_QT_COMPONENTS Core)
 if(WITH_SERVER)
   set(_SERVATRICE_NEEDED Network Sql WebSockets)
@@ -14,6 +20,7 @@ endif()
 if(WITH_CLIENT)
   set(_COCKATRICE_NEEDED
       Concurrent
+      Core
       Gui
       Multimedia
       Network
@@ -28,7 +35,7 @@ if(WITH_CLIENT)
   )
 endif()
 if(WITH_ORACLE)
-  set(_ORACLE_NEEDED Concurrent Network Svg Widgets)
+  set(_ORACLE_NEEDED Concurrent Network Svg Widgets Xml)
 endif()
 if(TEST)
   # Union of Qt modules required across all test targets (independent of application targets).

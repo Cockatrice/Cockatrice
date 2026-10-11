@@ -1,5 +1,9 @@
 #include "warning_categories.h"
 
+#include <QChar>
+#include <QStringList>
+#include <qnamespace.h>
+
 QList<WarningCategory> parseWarningCategories(const QString &value)
 {
     QList<WarningCategory> categories;

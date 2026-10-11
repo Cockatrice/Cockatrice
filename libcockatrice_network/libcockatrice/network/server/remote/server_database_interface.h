@@ -1,9 +1,22 @@
 #ifndef SERVER_DATABASE_INTERFACE_H
 #define SERVER_DATABASE_INTERFACE_H
 
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 #include "server.h"
 
+#include <QMap>
 #include <QObject>
+#include <QString>
+#include <QStringList>
+#include <QtGlobal>
+#include <qtmetamacros.h>
+
+class DeckList;
+class GameReplay;
+class ServerInfo_Game;
+class Server_ProtocolHandler;
+template <typename T> class QList;
+template <typename T> class QSet;
 
 class Server_DatabaseInterface : public QObject
 {

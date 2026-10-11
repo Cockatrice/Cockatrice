@@ -10,11 +10,19 @@
 #include "tally/tally.h"
 
 #include <QGraphicsView>
+#include <QList>
+#include <QPointF>
+#include <QRect>
+#include <QRectF>
+#include <QSize>
+#include <qtmetamacros.h>
 
 class GameScene;
 class QGridLayout;
 class QLabel;
 class QRubberBand;
+class QAction;
+class QWidget;
 
 class GameView : public QGraphicsView
 {

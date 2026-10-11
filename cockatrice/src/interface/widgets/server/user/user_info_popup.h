@@ -1,23 +1,29 @@
 #ifndef COCKATRICE_USER_INFO_POPUP_H
 #define COCKATRICE_USER_INFO_POPUP_H
 
-#include "../../interface/widgets/server/game_type_map.h"
 #include "user_list_painter.h"
 
+#include <QColor>
 #include <QFrame>
-#include <QListView>
-#include <QMap>
+#include <QPalette>
 #include <QPixmap>
-#include <QStandardItemModel>
-#include <libcockatrice/network/server/remote/user_level.h>
-#include <libcockatrice/protocol/pb/response.pb.h>
-#include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
+#include <QString>
+#include <QWidget>
+#include <functional>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
+#include <utility>
 
 class AbstractClient;
 class QLabel;
 class QPushButton;
 class TabSupervisor;
+class QListView;
+class QPoint;
+class QStandardItemModel;
+class Response;
+template <class Key, class T> class QMap;
 
 // ── Roles ─────────────────────────────────────────────────────────────────────
 
@@ -149,6 +155,17 @@ public:
     /** Re-pulls the avatar/card art for the currently shown user (e.g. after it loads). */
     void refreshHeader();
 
+    /**
+     * Sets a predicate evaluated on every action-button rebuild. It receives
+     * the name of the user the popup currently shows; when it returns true an
+     * "Invite" button is shown. The popup itself never resolves the invite
+     * link, it just forwards the request.
+     */
+    void setGameInviteAvailable(std::function<bool(const QString &userName)> available)
+    {
+        gameInviteAvailable = std::move(available);
+    }
+
 signals:
     void mouseEnteredPopup();
     void mouseLeftPopup();
@@ -159,6 +176,7 @@ signals:
 
     // ── Action signals — connect to UserContextMenu::exec*() ──────────────────
     void chatRequested(const QString &userName);
+    void inviteRequested(const QString &userName);
     void detailsRequested(const QString &userName);
     void showGamesRequested(const QString &userName);
     void addBuddyRequested(const QString &userName);
@@ -200,6 +218,7 @@ private:
     QString currentUser;
     ServerInfo_User currentUserInfo;
     bool currentOnline = false;
+    std::function<bool(const QString &userName)> gameInviteAvailable;
 
     UserInfoHeaderWidget *header;
     QWidget *actionArea; ///< rebuilt per user

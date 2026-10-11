@@ -8,6 +8,8 @@
 
 #include <QList>
 #include <QWidget>
+#include <QtGlobal>
+#include <qtmetamacros.h>
 
 /**
  * @brief Bar graph of recent network round-trip samples.

@@ -1,31 +1,54 @@
 #include "game_selector.h"
 
+#include "../../../client/settings/cache_settings.h"
+#include "../../pixel_map_generator.h"
 #include "../interface/widgets/dialogs/dlg_create_game.h"
 #include "../interface/widgets/dialogs/dlg_filter_games.h"
-#include "../interface/widgets/tabs/tab_account.h"
-#include "../interface/widgets/tabs/tab_game.h"
 #include "../interface/widgets/tabs/tab_room.h"
 #include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../interface/widgets/utility/get_text_with_max.h"
 #include "game_link.h"
+#include "game_selector_quick_filter_toolbar.h"
 #include "games_model.h"
+#include "libcockatrice/protocol/pb/event_add_to_list.pb.h"
+#include "libcockatrice/protocol/pb/event_remove_from_list.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 #include "user/user_list_manager.h"
 
+#include <QAction>
 #include <QClipboard>
 #include <QDebug>
 #include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QItemSelectionModel>
+#include <QLineEdit>
+#include <QMap>
+#include <QMenu>
 #include <QMessageBox>
+#include <QModelIndex>
 #include <QPushButton>
+#include <QSize>
+#include <QString>
+#include <QStringLiteral>
 #include <QTreeView>
+#include <QVBoxLayout>
+#include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/room_commands.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <string>
+
+class QModelIndex;
+class QPoint;
+class QWidget;
+template <typename T> class QList;
 
 GameSelector::GameSelector(AbstractClient *_client,
                            TabSupervisor *_tabSupervisor,
@@ -95,10 +118,10 @@ GameSelector::GameSelector(AbstractClient *_client,
     }
 
     filterButton = new QPushButton;
-    filterButton->setIcon(QPixmap("theme:icons/search"));
+    filterButton->setIcon(themePixmap(QStringLiteral("icons/search")));
     connect(filterButton, &QPushButton::clicked, this, &GameSelector::actSetFilter);
     clearFilterButton = new QPushButton;
-    clearFilterButton->setIcon(QPixmap("theme:icons/clearsearch"));
+    clearFilterButton->setIcon(themePixmap(QStringLiteral("icons/clearsearch")));
     bool filtersSetToDefault = showFilters && gameListProxyModel->areFilterParametersSetToDefaults();
     clearFilterButton->setEnabled(!filtersSetToDefault);
     connect(clearFilterButton, &QPushButton::clicked, this, &GameSelector::actClearFilter);
@@ -368,7 +391,7 @@ void GameSelector::joinGame(const ServerInfo_Game &game, const bool asSpectator,
         return;
     }
 
-    bool overrideRestrictions = !tabSupervisor->getAdminLocked();
+    bool overrideRestrictions = tabSupervisor->canOverrideGameRestrictions();
 
     // Joining a full game without override privileges silently becomes a
     // spectator join, so ask first instead of surprising the player.
@@ -461,7 +484,7 @@ void GameSelector::enableButtonsForIndex(const QModelIndex &current)
     }
 
     const ServerInfo_Game &game = gameListModel->getGame(current.data(Qt::UserRole).toInt());
-    bool overrideRestrictions = !tabSupervisor->getAdminLocked();
+    bool overrideRestrictions = tabSupervisor->canOverrideGameRestrictions();
 
     spectateButton->setEnabled(game.spectators_allowed() || overrideRestrictions);
     joinButton->setEnabled(game.player_count() < game.max_players() || overrideRestrictions);

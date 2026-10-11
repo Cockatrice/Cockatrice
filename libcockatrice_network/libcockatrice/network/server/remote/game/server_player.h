@@ -1,7 +1,18 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "libcockatrice/protocol/pb/response.pb.h"
 #include "server_abstract_player.h"
+
+#include <QList>
+#include <QMap>
+#include <qtmetamacros.h>
+
+class GameEventStorage;
+class ServerInfo_User;
+class Server_AbstractUserInterface;
+class Server_Counter;
+class Server_Game;
 
 class Server_Player : public Server_AbstractPlayer
 {

@@ -1,17 +1,21 @@
 #ifndef COCKATRICE_MANA_DISTRIBUTION_WIDGET_H
 #define COCKATRICE_MANA_DISTRIBUTION_WIDGET_H
 
-#include "../../../general/display/charts/bars/color_bar.h"
-#include "../../../general/display/charts/pies/color_pie.h"
 #include "../../abstract_analytics_panel_widget.h"
-#include "../../deck_list_statistics_analyzer.h"
 #include "mana_distribution_config.h"
-#include "mana_distribution_single_display_widget.h"
 
-#include <QHBoxLayout>
+#include <QJsonObject>
 #include <QMap>
-#include <QVBoxLayout>
-#include <QWidget>
+#include <QString>
+#include <qtmetamacros.h>
+
+class ColorBar;
+class ColorPie;
+class DeckListStatisticsAnalyzer;
+class ManaDistributionSingleDisplayWidget;
+class QHBoxLayout;
+class QVBoxLayout;
+class QWidget;
 
 class ManaDistributionWidget : public AbstractAnalyticsPanelWidget
 {

@@ -6,12 +6,18 @@
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../interface/widgets/utility/custom_line_edit.h"
 #include "../main.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "tab_supervisor.h"
 
+#include <QAction>
 #include <QApplication>
-#include <QDebug>
+#include <QCloseEvent>
 #include <QMenu>
+#include <QMessageLogger>
+#include <QSharedPointer>
 #include <QSystemTrayIcon>
 #include <QVBoxLayout>
+#include <QWidget>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/event_user_message.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
@@ -19,6 +25,7 @@
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/chat_settings.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <string>
 
 TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
                        AbstractClient *_client,
@@ -98,6 +105,12 @@ void TabMessage::closeEvent(QCloseEvent *event)
 
 void TabMessage::sendPrivateMessage(const QString &text)
 {
+    if (tabSupervisor->getUserListManager()->isUserIgnored(getUserName())) {
+        chatView->appendMessage(tr("You have ignored %1; your messages are not delivered.")
+                                    .arg(QString::fromStdString(otherUserInfo->name())));
+        return;
+    }
+
     Command_Message cmd;
     cmd.set_user_name(otherUserInfo->name());
     cmd.set_message(text.toStdString());

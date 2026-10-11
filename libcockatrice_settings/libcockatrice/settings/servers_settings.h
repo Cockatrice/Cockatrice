@@ -10,7 +10,12 @@
 #include "settings_manager.h"
 
 #include <QLoggingCategory>
-#include <QObject>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
+
+class QObject;
+
 #define SERVERSETTINGS_DEFAULT_HOST "server.cockatrice.us"
 #define SERVERSETTINGS_DEFAULT_PORT "4748"
 
@@ -61,7 +66,14 @@ public:
                               QString password,
                               bool savePassword,
                               QString site = QString());
+    void updateServerFields(int index,
+                            const QString &saveName,
+                            const QString &username,
+                            const QString &password,
+                            bool savePassword,
+                            const QString &site);
     int findServerIndex(const QString &host, const QString &port) const;
+    int findHostIndex(const QString &host) const;
     bool hasUsername(const QString &host, const QString &port) const;
     bool hasCredentials(const QString &host, const QString &port) const;
     bool hasLoginData(const QString &host, const QString &port) const;

@@ -1,6 +1,8 @@
 #include "edhrec_api_response_card_details.h"
 
 #include <QDebug>
+#include <QJsonValue>
+#include <qlogging.h>
 
 EdhrecApiResponseCardDetails::EdhrecApiResponseCardDetails()
     : synergy(0.0), inclusion(0), numDecks(0), potentialDecks(0)

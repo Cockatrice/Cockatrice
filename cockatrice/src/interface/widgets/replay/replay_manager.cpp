@@ -1,10 +1,16 @@
 #include "replay_manager.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../../game/player/event_processing_options.h"
+#include "libcockatrice/protocol/pb/game_event.pb.h"
+#include "libcockatrice/protocol/pb/game_event_container.pb.h"
+#include "libcockatrice/protocol/pb/game_replay.pb.h"
 
 #include <QTimer>
+#include <algorithm>
 #include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/settings/interface_settings.h>
+#include <qnumeric.h>
 
 static constexpr int TIMER_INTERVAL_MS = 200;
 static constexpr int EMPTY_SECTION_MARGIN_MS = 500;
@@ -142,8 +148,10 @@ void ReplayManager::processNewEvents(PlaybackMode playbackMode)
         }
 
         // backwards skip => always skip tap animation
+        // backwards skip => always skip damage animation (battlefield shimmer / life counter flash)
         if (playbackMode == BACKWARD_SKIP) {
             options |= SKIP_TAP_ANIMATION;
+            options |= SKIP_DAMAGE_ANIMATION;
         }
 
         emit eventReplayed(replay->event_list(currentEvent), options);

@@ -1,11 +1,26 @@
 #include "visual_database_display_name_filter_widget.h"
 
 #include "../../../interface/widgets/dialogs/dlg_load_deck_from_clipboard.h"
-#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
-#include "../deck_editor/deck_state_manager.h"
+#include "../general/layout_containers/flow_widget.h"
+#include "deck_list_model.h"
+#include "filter_tree_model.h"
+#include "libcockatrice/deck_list/deck_list.h"
+#include "libcockatrice/filters/filter_card.h"
+#include "libcockatrice/filters/filter_tree.h"
 #include "visual_database_display_filter_button.h"
 
-#include <QHBoxLayout>
+#include <QAbstractItemModel>
+#include <QDebug>
+#include <QLineEdit>
+#include <QList>
+#include <QPersistentModelIndex>
+#include <QPushButton>
+#include <QSharedPointer>
+#include <QStringList>
+#include <QTimer>
+#include <QVBoxLayout>
+#include <algorithm>
+#include <qnamespace.h>
 
 VisualDatabaseDisplayNameFilterWidget::VisualDatabaseDisplayNameFilterWidget(QWidget *parent,
                                                                              FilterTreeModel *_filterModel,

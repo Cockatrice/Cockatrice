@@ -1,7 +1,13 @@
 #include "player_manager.h"
 
 #include "../abstract_game.h"
+#include "../game_state.h"
+#include "player_info.h"
 #include "player_logic.h"
+
+#include <QList>
+#include <QMapIterator>
+#include <QSharedPointer>
 
 PlayerManager::PlayerManager(AbstractGame *_game,
                              int _localPlayerId,
@@ -73,6 +79,14 @@ PlayerLogic *PlayerManager::getPlayer(int playerId) const
         return nullptr;
     }
     return player;
+}
+
+void PlayerManager::clearSpectators()
+{
+    const QList<int> spectatorIds = spectators.keys();
+    for (int spectatorId : spectatorIds) {
+        removeSpectator(spectatorId);
+    }
 }
 
 void PlayerManager::onPlayerConceded(int playerId, bool conceded)

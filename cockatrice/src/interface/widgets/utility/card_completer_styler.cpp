@@ -2,23 +2,38 @@
 
 #include "../cards/card_info_picture_enlarged_widget.h"
 #include "card_completer_delegate.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
 #include "reversed_completer_model.h"
 
+#include <QAbstractAnimation>
 #include <QAbstractItemModel>
 #include <QAbstractItemView>
+#include <QByteArray>
 #include <QCompleter>
 #include <QEvent>
+#include <QItemSelectionModel>
 #include <QKeyEvent>
+#include <QList>
 #include <QMouseEvent>
 #include <QPoint>
 #include <QPropertyAnimation>
 #include <QRect>
 #include <QScreen>
 #include <QScrollBar>
+#include <QSharedPointer>
 #include <QSize>
+#include <QString>
+#include <QVariant>
+#include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card/card_search_model.h>
+#include <libcockatrice/utility/card_ref.h>
+#include <qnamespace.h>
+
+template <class T> class QSharedPointer;
 
 namespace
 {
@@ -136,7 +151,9 @@ bool CardCompleterStyler::handlePopupKeyPress(QKeyEvent *event)
     const int newRow = qBound(0, currentRow + step, rowCount - 1);
 
     if (newRow != currentRow) {
-        popup->setCurrentIndex(completer->completionModel()->index(newRow, completer->completionColumn()));
+        const QModelIndex newIndex = completer->completionModel()->index(newRow, completer->completionColumn());
+        popup->selectionModel()->setCurrentIndex(newIndex,
+                                                 QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
     }
 
     return true;
@@ -202,7 +219,8 @@ void CardCompleterStyler::ensureClosestSelected()
     const int closestRow = rowCount - 1;
 
     if (currentRow != closestRow) {
-        popup->setCurrentIndex(completionModel->index(closestRow, completer->completionColumn()));
+        popup->selectionModel()->setCurrentIndex(completionModel->index(closestRow, completer->completionColumn()),
+                                                 QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
     }
 }
 

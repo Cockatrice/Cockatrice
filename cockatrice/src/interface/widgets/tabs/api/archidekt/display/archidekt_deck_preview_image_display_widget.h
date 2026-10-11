@@ -1,10 +1,11 @@
 #ifndef COCKATRICE_ARCHIDEKT_DECK_PREVIEW_IMAGE_DISPLAY_WIDGET_H
 #define COCKATRICE_ARCHIDEKT_DECK_PREVIEW_IMAGE_DISPLAY_WIDGET_H
 
-#include "../../../../general/display/shadow_background_label.h"
-
-#include <QLabel>
 #include <QWidget>
+#include <qtmetamacros.h>
+
+class QLabel;
+class ShadowBackgroundLabel;
 
 /**
  * @class ArchidektDeckPreviewImageDisplayWidget

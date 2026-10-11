@@ -7,11 +7,13 @@
 #ifndef DECK_FILTER_STRING_H
 #define DECK_FILTER_STRING_H
 
-#include "../interface/deck_loader/loaded_deck.h"
-
 #include <QLoggingCategory>
 #include <QString>
 #include <functional>
+#include <libcockatrice/card/card_localization.h>
+
+struct CardSearchLanguage;
+struct LoadedDeck;
 
 inline Q_LOGGING_CATEGORY(DeckFilterStringLog, "deck_filter_string");
 
@@ -35,7 +37,7 @@ class DeckFilterString
 {
 public:
     DeckFilterString();
-    explicit DeckFilterString(const QString &expr);
+    explicit DeckFilterString(const QString &expr, const CardSearchLanguage &searchLanguage = {});
     bool check(const DeckSearchData &data) const
     {
         return filter(data);

@@ -5,23 +5,23 @@
 # This file sets all the variables shared between the projects
 # like the installation path, compilation flags etc..
 
-# cmake 3.16 is required if using qt6
-cmake_minimum_required(VERSION 3.10)
+# 3.16 required for Qt6 and target_precompile_headers()
+cmake_minimum_required(VERSION 3.16)
 
-# Early detect ccache
+# Use compiler cache (ccache)
 option(USE_CCACHE "Cache the build results with ccache" ON)
 # Treat warnings as errors (Debug builds only)
 option(WARNING_AS_ERROR "Treat warnings as errors in debug builds" ON)
 # Check for translation updates
 option(UPDATE_TRANSLATIONS "Update translations on compile" OFF)
-# Compile servatrice
-option(WITH_SERVER "build servatrice" OFF)
-# Compile cockatrice
-option(WITH_CLIENT "build cockatrice" ON)
-# Compile oracle
-option(WITH_ORACLE "build oracle" ON)
+# Compile Cockatrice
+option(WITH_CLIENT "Build Cockatrice client" ON)
+# Compile Oracle
+option(WITH_ORACLE "Build Cockatrice card database tool (Oracle)" ON)
+# Compile Servatrice
+option(WITH_SERVER "Build Cockatrice server (Servatrice)" OFF)
 # Compile tests
-option(TEST "build tests" OFF)
+option(TEST "Build tests" OFF)
 # Use vcpkg regardless of OS
 option(USE_VCPKG "Use vcpkg regardless of OS" OFF)
 
@@ -39,13 +39,24 @@ else()
   )
 endif()
 
-if(USE_CCACHE)
+# ccache does not support MSVC and must not auto-engage on Windows
+# (it is installed unintentionally on the Windows CI runner).
+# NOTE: this keys off the target OS, so a mingw/Ninja configuration on Windows
+# also opts out of ccache even though the GNUCXX branch below supports it.
+if(USE_CCACHE AND NOT WIN32)
   find_program(CCACHE_PROGRAM ccache)
   if(CCACHE_PROGRAM)
     # Support Unix Makefiles and Ninja
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+    # PCH-aware caching, matching .ci/compile.sh: without this ccache refuses
+    # to cache any TU that consumes a precompiled header, so every PCH-backed
+    # target recompiles from scratch on each build.
+    execute_process(COMMAND ${CCACHE_PROGRAM} --set-config sloppiness=pch_defines,time_macros)
     message(STATUS "Found CCache ${CCACHE_PROGRAM}")
   endif()
+elseif(USE_CCACHE AND WIN32)
+  # An explicit opt-in must not disappear silently on Windows.
+  message(STATUS "ccache disabled: not supported for the MSVC toolchain on Windows")
 endif()
 
 if(WIN32 OR USE_VCPKG)
@@ -75,11 +86,11 @@ endif()
 
 # A project name is needed for CPack
 # Version can be overriden by git tags, see cmake/getversion.cmake
-project("Cockatrice" VERSION 3.1.0)
+project("Cockatrice" VERSION 3.1.1)
 
 # Set release name if not provided via env/cmake var
 if(NOT DEFINED GIT_TAG_RELEASENAME)
-  set(GIT_TAG_RELEASENAME "Graduation Day")
+  set(GIT_TAG_RELEASENAME "Reality Check")
 endif()
 
 # Use c++20 for all targets
@@ -184,6 +195,9 @@ elseif(CMAKE_COMPILER_IS_GNUCXX)
       set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${FLAG}")
     endif()
   endforeach()
+
+  # Reduce compiler I/O by using pipes between stages instead of temp files
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe")
 else()
   # other: osx/llvm, bsd/llvm
   set(CMAKE_CXX_FLAGS_RELEASE "-O2")
@@ -192,6 +206,9 @@ else()
   else()
     set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra")
   endif()
+
+  # Reduce compiler I/O by using pipes between stages instead of temp files
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe")
 endif()
 
 # GNU systems need to define the Mersenne exponent for the RNG to compile w/o warning
@@ -239,11 +256,6 @@ if(WIN32)
   find_package(OpenSSL REQUIRED)
   if(OPENSSL_FOUND)
     include_directories(${OPENSSL_INCLUDE_DIRS})
-  else()
-    message(
-      WARNING
-        "Could not find OpenSSL runtime libraries. They are not required for compiling, but needs to be available at runtime."
-    )
   endif()
 endif()
 
@@ -281,7 +293,7 @@ if(UNIX)
     if(CPACK_GENERATOR STREQUAL "RPM")
       set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
       set(CPACK_RPM_MAIN_COMPONENT "cockatrice")
-      set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt6-qttools, qt6-qtsvg, qt6-qtmultimedia, qt6-qtimageformats")
+      set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt6-qtimageformats, qt6-qtmultimedia, qt6-qtsvg, qt6-qttools")
       set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
       set(CPACK_RPM_PACKAGE_URL "http://github.com/Cockatrice/Cockatrice")
       # stop directories from making package conflicts
@@ -299,7 +311,7 @@ if(UNIX)
       set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
       set(CPACK_DEBIAN_PACKAGE_SECTION "games")
       set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/Cockatrice/Cockatrice")
-      set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6, libqt6svg6, qt6-qpa-plugins, qt6-image-formats-plugins")
+      set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6, libqt6svg6, qt6-image-formats-plugins, qt6-qpa-plugins")
       set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "libqt6sql6-mysql") # for connecting servatrice to a mysql db
     endif()
   endif()
@@ -313,6 +325,55 @@ elseif(WIN32)
 
   # Configure file with custom definitions for NSIS.
   configure_file("${COCKATRICE_CMAKE_PATH}/NSIS.definitions.nsh.in" "${PROJECT_BINARY_DIR}/NSIS.definitions.nsh")
+
+  # Every runtime DLL a Windows install has to contain, as paths relative to the
+  # install root. .ci/compile.sh reads this and fails the build when the packaged
+  # installer is missing one of them, or carries a runtime it does not know about.
+  #
+  # All three applications are packaged into the same directory on Windows, so
+  # this is the union of their Qt module lists, not just the client's: Servatrice
+  # contributes Qt6Sql.dll and Oracle contributes nothing the client lacks, and a
+  # client-only manifest leaves Qt6Sql.dll unasserted even though servatrice.exe
+  # is installed next to cockatrice.exe and cannot start without it.
+  #
+  # A statically linked Qt module ships no runtime DLL, so requiring one would
+  # fail the package check on a static build for no reason. cockatrice/CMakeLists.txt
+  # installs the runtime of every module listed here, and skips static ones the
+  # same way, so the two can never disagree.
+  #
+  # Only the Qt modules, and that is deliberate. protobuf, Abseil, liblzma, zlib
+  # and OpenSSL also ride in on the "*.dll" glob, and a client whose runtime is
+  # absent, stale or of the wrong architecture fails to start with "abseil_dll.dll
+  # is either not designed to run on Windows or it contains an error", so they
+  # are exactly the files worth asserting.
+  #
+  # Their names cannot be derived from the vcpkg bin directory, which is what a
+  # first attempt did and what a Windows build immediately refuted: bin holds
+  # everything vcpkg installed, not everything the applications import. It also
+  # contains gmock.dll, libprotobuf-lite.dll, libprotoc.dll, legacy.dll and three
+  # pthreadVC*.dll FindThreads probes, none of which any shipped executable
+  # links, so requiring them failed a build over a package that was correct.
+  #
+  # Deriving them from the executables' own import tables is the real answer,
+  # and fixup_bundle already walks it to decide what to copy. Until that result
+  # is available to CMake, requiring the vcpkg half would mean guessing names
+  # again, which is what produced this bug report in the first place. So assert
+  # what is derived from the build's own link lists and leave the rest to the
+  # purge in cmake/NSIS.template.in, which removes every DLL regardless of name.
+  set(_required_runtime "")
+  foreach(_qt_module IN LISTS COCKATRICE_QT_MODULES SERVATRICE_QT_MODULES ORACLE_QT_MODULES)
+    get_target_property(_qt_module_type ${_qt_module} TYPE)
+    if(_qt_module_type STREQUAL "SHARED_LIBRARY")
+      string(REGEX REPLACE "^Qt6::" "" _qt_component "${_qt_module}")
+      list(APPEND _required_runtime "Qt6${_qt_component}.dll")
+    endif()
+  endforeach()
+  list(APPEND _required_runtime "Plugins/platforms/qwindows.dll")
+
+  list(REMOVE_DUPLICATES _required_runtime)
+  list(SORT _required_runtime)
+  string(REPLACE ";" "\n" _required_runtime "${_required_runtime}")
+  file(WRITE "${PROJECT_BINARY_DIR}/required-runtime.txt" "${_required_runtime}\n")
 
   # include vcredist into the package; NSIS will take care of running it
   if(VCREDISTRUNTIME_FOUND)
