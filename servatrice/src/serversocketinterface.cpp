@@ -1979,9 +1979,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportList(const Comman
 
     // Columns: 0=id, 1=reporter_name, 2=reported_user_name, 3=game_id,
     //          4=category, 5=description, 6=created_at, 7=status,
-    //          8=resolution_note, 9=assigned_mod_name,
-    //          10=room_id, 11=replay_id,
-    //          12=reported_user_id, 13=reported_user_admin
+    //          8=resolution_note, 9=assigned_mod_name, 10=resolved_by_name,
+    //          11=room_id, 12=replay_id,
+    //          13=reported_user_id, 14=reported_user_admin
     QString whereClause;
     if (unresolvedOnly) {
         whereClause = "WHERE r.status = 'open' OR r.status = 'assigned' ";
@@ -2055,7 +2055,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportList(const Comman
             info->set_replay_id(query->value(12).toInt());
         }
 
-        info->set_reported_user_level(reportUserLevel(!query->value(12).isNull(), query->value(13).toInt()));
+        info->set_reported_user_level(reportUserLevel(!query->value(13).isNull(), query->value(14).toInt()));
     }
 
     rc.setResponseExtension(re);
@@ -2782,7 +2782,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportMyList(const Comm
             info->set_replay_id(query->value(12).toInt());
         }
 
-        info->set_reported_user_level(reportUserLevel(!query->value(12).isNull(), query->value(13).toInt()));
+        info->set_reported_user_level(reportUserLevel(!query->value(13).isNull(), query->value(14).toInt()));
     }
 
     rc.setResponseExtension(re);
