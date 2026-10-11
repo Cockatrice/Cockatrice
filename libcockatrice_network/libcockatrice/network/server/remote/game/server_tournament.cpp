@@ -57,37 +57,41 @@ void Server_Tournament::removePlayer(int playerId)
     byeGivenPlayers.remove(playerId);
 }
 
-void Server_Tournament::dropPlayer(int playerId)
+void Server_Tournament::dropPlayer(int playerId, GameEventStorage &ges)
 {
-    QMutexLocker locker(&tournamentMutex);
-    if (!players.contains(playerId)) {
-        return;
-    }
-    players[playerId].dropped = true;
-    players[playerId].deckSubmitted = false;
+    {
+        QMutexLocker locker(&tournamentMutex);
+        if (!players.contains(playerId)) {
+            return;
+        }
+        players[playerId].dropped = true;
+        players[playerId].deckSubmitted = false;
 
-    // Any current pairing that involves the dropped player and is not already
-    // decided is awarded to the surviving opponent (or recorded as undecided if
-    // both dropped). The opponent keeps playing without sitting out a round.
-    for (auto &pairing : currentPairings) {
-        if (pairing.winnerId != -2) {
-            continue;
+        // Any current pairing that involves the dropped player and is not already
+        // decided is awarded to the surviving opponent (or recorded as undecided if
+        // both dropped). The opponent keeps playing without sitting out a round.
+        for (auto &pairing : currentPairings) {
+            if (pairing.winnerId != -2) {
+                continue;
+            }
+            bool involvesDropped = (pairing.player1Id == playerId || pairing.player2Id == playerId);
+            if (!involvesDropped) {
+                continue;
+            }
+            if (pairing.player1Id == playerId && pairing.player2Id == playerId) {
+                continue;
+            }
+            int opponent = (pairing.player1Id == playerId) ? pairing.player2Id : pairing.player1Id;
+            if (players.contains(opponent) && !players[opponent].dropped) {
+                pairing.winnerId = opponent;
+                players[opponent].wins += 1;
+                players[playerId].losses += 1;
+            }
+            allPreviousPairings.append(qMakePair(pairing.player1Id, pairing.player2Id));
         }
-        bool involvesDropped = (pairing.player1Id == playerId || pairing.player2Id == playerId);
-        if (!involvesDropped) {
-            continue;
-        }
-        if (pairing.player1Id == playerId && pairing.player2Id == playerId) {
-            continue;
-        }
-        int opponent = (pairing.player1Id == playerId) ? pairing.player2Id : pairing.player1Id;
-        if (players.contains(opponent) && !players[opponent].dropped) {
-            pairing.winnerId = opponent;
-            players[opponent].wins += 1;
-            players[playerId].losses += 1;
-        }
-        allPreviousPairings.append(qMakePair(pairing.player1Id, pairing.player2Id));
     }
+    // A drop can decide the last open pairing of the round; advance when complete.
+    checkAndAdvanceRound(ges);
 }
 
 void Server_Tournament::startTournament()
@@ -332,6 +336,7 @@ void Server_Tournament::createMatchGame(int player1Id, int player2Id)
     QString deck2Native;
     int round = 0;
     int gameNumber = 1;
+    bool settledWithoutGame = false;
     {
         QMutexLocker locker(&tournamentMutex);
         player1Name = players.value(player1Id).playerName;
@@ -363,11 +368,42 @@ void Server_Tournament::createMatchGame(int player1Id, int player2Id)
 
         // Bail out if either participant is no longer connected: a match game with
         // zero or one connected player can never finish and would stall the round.
-        if (!matchGameFactory->getUserInterface(player1Name) || !matchGameFactory->getUserInterface(player2Name)) {
+        // Settle the pairing like dropPlayer does so the round can still advance.
+        auto *ui1 = matchGameFactory->getUserInterface(player1Name);
+        auto *ui2 = matchGameFactory->getUserInterface(player2Name);
+        if (!ui1 || !ui2) {
             qCWarning(TournamentLog) << "Skipping match creation: a player in pairing" << player1Id << player2Id
                                      << "is no longer connected";
-            return;
+            for (auto &pairing : currentPairings) {
+                if (pairing.player1Id == player1Id && pairing.player2Id == player2Id && pairing.winnerId == -2) {
+                    if (ui1 && !ui2) {
+                        pairing.winnerId = player1Id;
+                        players[player1Id].wins += 1;
+                        players[player2Id].losses += 1;
+                    } else if (ui2 && !ui1) {
+                        pairing.winnerId = player2Id;
+                        players[player2Id].wins += 1;
+                        players[player1Id].losses += 1;
+                    } else {
+                        pairing.winnerId = -1;
+                        players[player1Id].draws += 1;
+                        players[player2Id].draws += 1;
+                    }
+                    allPreviousPairings.append(qMakePair(player1Id, player2Id));
+                    break;
+                }
+            }
+            settledWithoutGame = true;
         }
+    }
+
+    if (settledWithoutGame) {
+        GameEventStorage ges;
+        broadcastTournamentState(ges);
+        checkAndAdvanceRound(ges);
+        broadcastTournamentState(ges);
+        ges.sendToGame(parentGame);
+        return;
     }
 
     // Create a sub-game for this match via the factory, copying the real
@@ -543,65 +579,78 @@ bool Server_Tournament::recordMatchResultByGameId(int gameId, int winnerId, Game
         }
 
         // If the match is already decided, ignore further sub-game results
+        // but still check whether the round can advance (e.g. a drop decided
+        // the last pairing and this late result is the first chance to notice).
         if (pairingPtr->winnerId != -2) {
-            return true;
-        }
-
-        // Increment per-match wins
-        if (winnerId == pairingPtr->player1Id) {
-            pairingPtr->player1MatchWins += 1;
-        } else if (winnerId == pairingPtr->player2Id) {
-            pairingPtr->player2MatchWins += 1;
-        }
-        // Draw (winnerId == -1): counts nothing toward the series but does consume
-        // a slot, so a series can still end in a draw when it is exhausted.
-
-        // The winner needs a strict majority of the games in the series.
-        const int gamesPlayed = pairingPtr->matchGameIds.size();
-        const int gamesNeeded = static_cast<int>(gamesPerMatch / 2 + 1);
-        const int gamesRemaining = static_cast<int>(gamesPerMatch) - gamesPlayed;
-        matchDecided = (pairingPtr->player1MatchWins >= gamesNeeded) || (pairingPtr->player2MatchWins >= gamesNeeded);
-        if (!matchDecided) {
-            // Series exhausted without a strict-majority winner (e.g. a drawn Bo3
-            // leaves it 1-1): record the match as a draw so the round always advances.
-            matchDecided = (gamesRemaining <= 0) && (pairingPtr->player1MatchWins == pairingPtr->player2MatchWins);
-        }
-
-        if (matchDecided) {
-            // Determine match winner
-            int matchWinnerId = -1;
-            if (pairingPtr->player1MatchWins >= gamesNeeded) {
-                matchWinnerId = pairingPtr->player1Id;
-            } else if (pairingPtr->player2MatchWins >= gamesNeeded) {
-                matchWinnerId = pairingPtr->player2Id;
-            }
-            // Otherwise the series was exhausted evenly — matchWinnerId stays -1 (a draw).
-
-            // Set the match winner on the pairing
-            pairingPtr->winnerId = matchWinnerId;
-
-            // Update tournament-level player records
-            if (matchWinnerId == pairingPtr->player1Id) {
-                players[pairingPtr->player1Id].wins += 1;
-                players[pairingPtr->player2Id].losses += 1;
-            } else if (matchWinnerId == pairingPtr->player2Id) {
-                players[pairingPtr->player2Id].wins += 1;
-                players[pairingPtr->player1Id].losses += 1;
-            } else {
-                players[pairingPtr->player1Id].draws += 1;
-                players[pairingPtr->player2Id].draws += 1;
-            }
-
-            // Store for future pairing avoidance
-            allPreviousPairings.append(qMakePair(pairingPtr->player1Id, pairingPtr->player2Id));
+            broadcastTournamentState(ges);
+            // Fall through to checkAndAdvanceRound below.
+            matchDecided = true;
+            seriesContinues = false;
         } else {
-            // Match not decided — spawn the next sub-game outside all locks
-            seriesContinues = true;
-            p1 = pairingPtr->player1Id;
-            p2 = pairingPtr->player2Id;
-        }
+            // Increment per-match wins
+            if (winnerId == pairingPtr->player1Id) {
+                pairingPtr->player1MatchWins += 1;
+            } else if (winnerId == pairingPtr->player2Id) {
+                pairingPtr->player2MatchWins += 1;
+            }
+            // Draw (winnerId == -1): counts nothing toward the series but does consume
+            // a slot, so a series can still end in a draw when it is exhausted.
 
-        broadcastTournamentState(ges);
+            // The winner needs a strict majority of the games in the series.
+            const int gamesPlayed = pairingPtr->matchGameIds.size();
+            const int gamesNeeded = static_cast<int>(gamesPerMatch / 2 + 1);
+            const int gamesRemaining = static_cast<int>(gamesPerMatch) - gamesPlayed;
+            matchDecided =
+                (pairingPtr->player1MatchWins >= gamesNeeded) || (pairingPtr->player2MatchWins >= gamesNeeded);
+            if (!matchDecided && gamesRemaining <= 0) {
+                // Series exhausted: draws can leave the wins unequal without either
+                // side reaching a majority (e.g. Bo3 going win/draw/draw for 1-0).
+                // Decide by game wins, draw only on a tie, so the round advances.
+                matchDecided = true;
+            }
+
+            if (matchDecided) {
+                // Determine match winner
+                int matchWinnerId = -1;
+                if (pairingPtr->player1MatchWins >= gamesNeeded) {
+                    matchWinnerId = pairingPtr->player1Id;
+                } else if (pairingPtr->player2MatchWins >= gamesNeeded) {
+                    matchWinnerId = pairingPtr->player2Id;
+                } else if (gamesRemaining <= 0) {
+                    if (pairingPtr->player1MatchWins > pairingPtr->player2MatchWins) {
+                        matchWinnerId = pairingPtr->player1Id;
+                    } else if (pairingPtr->player2MatchWins > pairingPtr->player1MatchWins) {
+                        matchWinnerId = pairingPtr->player2Id;
+                    }
+                }
+                // Otherwise the series was exhausted evenly — matchWinnerId stays -1 (a draw).
+
+                // Set the match winner on the pairing
+                pairingPtr->winnerId = matchWinnerId;
+
+                // Update tournament-level player records
+                if (matchWinnerId == pairingPtr->player1Id) {
+                    players[pairingPtr->player1Id].wins += 1;
+                    players[pairingPtr->player2Id].losses += 1;
+                } else if (matchWinnerId == pairingPtr->player2Id) {
+                    players[pairingPtr->player2Id].wins += 1;
+                    players[pairingPtr->player1Id].losses += 1;
+                } else {
+                    players[pairingPtr->player1Id].draws += 1;
+                    players[pairingPtr->player2Id].draws += 1;
+                }
+
+                // Store for future pairing avoidance
+                allPreviousPairings.append(qMakePair(pairingPtr->player1Id, pairingPtr->player2Id));
+            } else {
+                // Match not decided — spawn the next sub-game outside all locks
+                seriesContinues = true;
+                p1 = pairingPtr->player1Id;
+                p2 = pairingPtr->player2Id;
+            }
+
+            broadcastTournamentState(ges);
+        } // else (undecided pairing)
     }
 
     if (seriesContinues) {

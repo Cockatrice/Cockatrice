@@ -329,7 +329,8 @@ void Server_Game::doStartGameIfReady(bool forceStartGame)
     // Tournament hubs must be host-started and can't lock in a partially filled
     // bracket: a mere "everyone current is ready" must not start a 1-player or
     // undersized tournament. startTournament() additionally enforces 2+ players.
-    if (isTournament && !forceStartGame) {
+    // Match sub-games carry isTournament too, so gate on the hub object only.
+    if (tournament && !forceStartGame) {
         return;
     }
 
@@ -589,7 +590,7 @@ void Server_Game::removeParticipant(Server_AbstractParticipant *participant, Eve
     if (tournament && !tournamentParentGame && !spectator) {
         const int leavingPlayerId = participant->getPlayerId();
         GameEventStorage tournGes;
-        tournament->dropPlayer(leavingPlayerId);
+        tournament->dropPlayer(leavingPlayerId, tournGes);
         tournament->broadcastTournamentState(tournGes);
         tournGes.sendToGame(this);
     }
