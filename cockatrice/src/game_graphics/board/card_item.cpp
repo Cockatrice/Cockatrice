@@ -71,6 +71,10 @@ CardItem::CardItem(PlayerLogic *_owner,
         update();
     });
 
+    // The retyped logic layer drives CardState setters directly (bypassing the CardItem wrappers that called
+    // update()), so repaint on every state change: attacking, annotation, doesntUntap, P/T and counters.
+    connect(state, &CardState::stateChanged, this, [this] { update(); });
+
     connect(state, &CardState::viewDeleteRequested, this, &CardItem::deleteLater);
 }
 
