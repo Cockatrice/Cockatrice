@@ -407,6 +407,34 @@ cockatrice_add_test(
   bench
 )
 
+cockatrice_add_test(
+  NAME
+  deck_diff_test
+  SOURCES
+  deck_diff_test.cpp
+  LIBS
+  libcockatrice_deck_list
+  libcockatrice_utility
+)
+cockatrice_add_test(
+  NAME
+  deck_sync_profile_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/deck_sync/deck_sync_profile.cpp
+  deck_sync_profile_test.cpp
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/deck_sync
+)
+cockatrice_add_test(
+  NAME
+  deck_sync_sidecar_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/deck_sync/deck_sync_sidecar.cpp
+  deck_sync_sidecar_test.cpp
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/deck_sync
+)
+
 # The translation loader test compiles a .qm fixture, which needs lrelease from Qt Linguist.
 if(TARGET Qt6::lrelease)
   set(TRANSLATION_LOADER_TEST_QM "${CMAKE_CURRENT_BINARY_DIR}/translation_loader_test_de.qm")
