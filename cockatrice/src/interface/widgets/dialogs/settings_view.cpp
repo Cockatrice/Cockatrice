@@ -7,6 +7,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../pixel_map_generator.h"
+#include "../main.h"
 #include "../settings_page/abstract_settings_page.h"
 #include "../settings_page/appearance_settings_page.h"
 #include "../settings_page/deck_editor_settings_page.h"
@@ -21,6 +22,7 @@
 
 #include <QAbstractAnimation>
 #include <QAbstractItemView>
+#include <QApplication>
 #include <QBrush>
 #include <QColor>
 #include <QCoreApplication>
@@ -91,6 +93,10 @@ static QStringList pageIconResources()
 
 SettingsView::SettingsView(QWidget *parent) : QWidget(parent), currentTabIndex(0), searchActive(false)
 {
+    // Swap the QTranslator before retranslating (was DlgSettings::updateLanguage): without this, picking a new
+    // language only stores the setting and every retranslateUi re-runs against the old translator until restart.
+    // Connected before setupUi() so the swap runs before the pages' own langChanged handlers below.
+    connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this, &SettingsView::updateLanguage);
     setupUi();
 
     connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this, &SettingsView::retranslateUi);
@@ -460,6 +466,12 @@ bool SettingsView::eventFilter(QObject *watched, QEvent *event)
         }
     }
     return QWidget::eventFilter(watched, event);
+}
+
+void SettingsView::updateLanguage()
+{
+    qApp->removeTranslator(translator); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+    installNewTranslator();
 }
 
 void SettingsView::retranslateUi()

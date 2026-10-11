@@ -61,6 +61,7 @@ private slots:
     void onTabClicked(int index);
     void onSearchTextChanged(const QString &text);
     void onSearchResultClicked(const QModelIndex &index);
+    void updateLanguage();
 
 private:
     // UI elements
