@@ -1,9 +1,11 @@
 #include "card_set_list.h"
 
 #include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/interfaces/interface_card_set_priority_controller.h"
 
 #include <QDate>
 #include <QString>
+#include <QVector>
 #include <algorithm>
 #include <compare>
 
@@ -91,6 +93,30 @@ void CardSetList::enableAll()
 
         set->setEnabled(true);
     }
+}
+
+void CardSetList::enableAllBatched(ICardSetPriorityController *controller)
+{
+    defaultSort();
+
+    QVector<ICardSetPriorityController::SetSaveData> saveData;
+    saveData.reserve(size());
+    for (int i = 0; i < size(); ++i) {
+        CardSetPtr set = at(i);
+        if (set.isNull()) {
+            continue;
+        }
+
+        const auto sortKey = static_cast<unsigned int>(i);
+        set->setSortKeyInMemory(sortKey);
+        if (!set->getIsKnownIgnored()) {
+            set->setIsKnownInMemory(true);
+        }
+        set->setEnabledInMemory(true);
+        saveData.append({set->getShortName(), sortKey, true, set->getIsKnown()});
+    }
+
+    controller->saveSets(saveData);
 }
 
 void CardSetList::markAllAsKnown()

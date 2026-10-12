@@ -64,6 +64,17 @@ public:
     void enableAll();
 
     /**
+     * @brief Enables every set with fresh sort keys, persisting in one flush.
+     *
+     * In-memory equivalent of guessSortKeys() followed by enableAll(), except the
+     * per-set options are written through the controller's batched saveSets() in a
+     * single settings flush instead of ~3 QSettings rewrite cycles per set, which
+     * froze the GUI thread for seconds on a first run with a full database.
+     * @param controller The set priority controller to persist the records with.
+     */
+    void enableAllBatched(ICardSetPriorityController *controller);
+
+    /**
      * @brief Marks all sets as known and adjusts their enabled state.
      *
      * Unknown, non-ignored sets become known and disabled.

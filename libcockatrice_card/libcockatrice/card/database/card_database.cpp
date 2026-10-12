@@ -214,11 +214,15 @@ void CardDatabase::checkUnknownSets()
         }
     } else {
         // No set enabled. Probably this is the first time running trice
-        _sets.guessSortKeys();
+        _sets.enableAllBatched(setPriorityController);
         _sets.sortByKey();
-        _sets.enableAll();
-        notifyEnabledSetsChanged();
 
+        // No cardDatabaseEnabledSetsChanged here: the reload chained off
+        // cardDatabaseAllNewSetsEnabled re-parses with the sets enabled and its
+        // swap's cardDatabaseReset rebuilds the models in one batch. Emitting
+        // both back-to-back rebuilt the 36k-card models twice on the GUI thread,
+        // stalling startup. (When the card list is empty the slot returns early
+        // without reloading, but there is nothing to display either.)
         emit cardDatabaseAllNewSetsEnabled();
     }
 }

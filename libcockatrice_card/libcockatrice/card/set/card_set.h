@@ -227,6 +227,10 @@ public:
      * @param _isknown True if known, false if unknown.
      */
     void setIsKnown(bool _isknown);
+    void setIsKnownInMemory(bool _isknown)
+    {
+        isknown = _isknown;
+    }
 
     /**
      * @brief Determines whether the set has incomplete metadata and should be ignored.

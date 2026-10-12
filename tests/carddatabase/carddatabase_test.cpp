@@ -209,6 +209,7 @@ public:
         for (const SetSaveData &entry : data) {
             setOptions[entry.shortName].sortKey = entry.sortKey;
             setOptions[entry.shortName].enabled = entry.enabled;
+            setOptions[entry.shortName].isKnown = entry.isKnown;
         }
     }
 
@@ -413,6 +414,36 @@ TEST_F(CardDatabaseCacheInvalidationTest, EnablingAllSetsAfterFirstRunRestoresPr
     ASSERT_FALSE(db.getCardList().value("Cat").isNull());
     EXPECT_TRUE(db.getCardList().value("Cat")->getSets().contains("CAT"));
     EXPECT_FALSE(cacheContents().isEmpty()) << "the enabled-set snapshot must be cached";
+}
+
+TEST_F(CardDatabaseCacheInvalidationTest, CheckUnknownSetsBatchesFirstRunEnableAll)
+{
+    // Same first-run starting point as above, but driven through the real
+    // checkUnknownSets() path, which must persist the enable-all with a single
+    // batched saveSets() instead of per-set/per-option controller writes.
+    SeededSetPriorityController blankController;
+    NoopCardPreferenceProvider prefs;
+    SandboxPathProvider pathProvider(root);
+    CardDatabase db(nullptr, &prefs, &pathProvider, &blankController);
+
+    db.loadCardDatabases();
+    ASSERT_TRUE(db.getSetList().getEnabledSetsNum() == 0);
+
+    db.checkUnknownSets();
+
+    for (const CardSetPtr &set : db.getSetList()) {
+        EXPECT_TRUE(set->getEnabled()) << set->getShortName().toStdString();
+        EXPECT_TRUE(blankController.isEnabled(set->getShortName())) << set->getShortName().toStdString();
+        if (!set->getIsKnownIgnored()) {
+            EXPECT_TRUE(set->getIsKnown()) << set->getShortName().toStdString();
+            EXPECT_TRUE(blankController.isKnown(set->getShortName())) << set->getShortName().toStdString();
+        }
+    }
+
+    // The follow-up reload re-parses with the sets enabled, restoring printings.
+    db.reloadCardDatabasesAndNotify();
+    ASSERT_FALSE(db.getCardList().value("Cat").isNull());
+    EXPECT_TRUE(db.getCardList().value("Cat")->getSets().contains("CAT"));
 }
 } // namespace
 

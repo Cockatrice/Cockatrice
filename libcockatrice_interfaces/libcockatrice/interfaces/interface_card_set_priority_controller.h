@@ -12,6 +12,7 @@ public:
         QString shortName;
         unsigned int sortKey;
         bool enabled;
+        bool isKnown = false;
     };
 
     /**
@@ -57,6 +58,14 @@ public:
      */
     virtual QStringList getEnabledSetNames() const = 0;
 
+    /**
+     * @brief Persists per-set options for every entry in a single settings flush.
+     *
+     * Each individual setSortKey/setEnabled/setIsKnown call re-opens and re-syncs
+     * the whole .ini when backed by QSettings, so persisting hundreds of sets
+     * one option at a time freezes the GUI thread for seconds. Callers that touch
+     * more than a handful of sets must bundle the records and call this once.
+     */
     virtual void saveSets(const QVector<SetSaveData> &data) = 0;
 };
 
