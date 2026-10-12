@@ -13,6 +13,7 @@
 #include <QDebug>
 #include <QList>
 #include <QMessageLogger>
+#include <QMetaObject>
 #include <QMetaType>
 #include <QMutexLocker>
 #include <QSharedPointer>
@@ -80,15 +81,17 @@ void CardDatabase::reloadCardDatabasesAndNotify()
 {
     // An explicit reload bypasses the binary cache so the files on disk are
     // always re-read, even when their size/mtime hash still matches the cache.
+    // Models refresh from the swap's cardDatabaseReset in a single batch, so
+    // no cardDatabaseEnabledSetsChanged is emitted here: that rebuilt the
+    // 36k-card models a second time on the GUI thread, which froze startup
+    // after enabling new/custom sets. The follow-up unknown-sets check is
+    // queued to the GUI thread so it sees the swapped-in data (this may run
+    // on a worker via QtConcurrent::run); it is silent unless new sets
+    // appeared mid-reload.
     loadStatus = loader->loadCardDatabases(/* ignoreCache */ true);
 
     if (loadStatus == Ok) {
-        checkUnknownSets();
-        // A reload reconstructs the exact same enabled-set state, so the cached
-        // set-name / alt-name data computed during construction is still valid.
-        // Skipping the per-card refresh avoids a full 36k-card recompute that
-        // would otherwise duplicate the work already done while building cards.
-        notifyEnabledSetsChanged(false);
+        QMetaObject::invokeMethod(this, &CardDatabase::checkUnknownSets, Qt::AutoConnection);
     }
 }
 

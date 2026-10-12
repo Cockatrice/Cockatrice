@@ -1116,25 +1116,24 @@ void MainWindow::cardDatabaseAllNewSetsEnabled()
     // parsed under the (empty) first-run enablement, so the parser dropped every
     // printing of every set. Reparse now that the sets are enabled, otherwise the
     // deck editor's card database display stays empty until the next launch.
-    QFuture<void> reload = QtConcurrent::run([cardDatabase] { cardDatabase->reloadCardDatabasesAndNotify(); });
-
-    if (firstRunWizardActive) {
-        // The onboarding wizard owns the first-run messaging on a clean install.
-        return;
-    }
-
-    QMessageBox::information(
-        this, tr("Welcome"),
-        tr("Hi! It seems like you're running this version of Cockatrice for the first time.\nAll the sets in the card "
-           "database have been enabled.\nRead more about changing the set order or disabling specific sets and "
-           "consequent effects in the \"Manage Sets\" dialog."));
-
-    // The modal box above ran a nested event loop, so the reparse has usually
-    // landed by now; wait for it if not. SetsModel snapshots the set list at
-    // construction and the reload replaces the set instances, so Manage Sets
-    // must not open against the pre-reload snapshot.
-    reload.waitForFinished();
-    actManageSets();
+    auto *watcher = new QFutureWatcher<void>(this);
+    connect(watcher, &QFutureWatcher<void>::finished, this, [this, watcher] {
+        watcher->deleteLater();
+        if (firstRunWizardActive) {
+            // The onboarding wizard owns the first-run messaging on a clean install.
+            return;
+        }
+        QMessageBox::information(
+            this, tr("Welcome"),
+            tr("Hi! It seems like you're running this version of Cockatrice for the first time.\nAll the sets in the "
+               "card "
+               "database have been enabled.\nRead more about changing the set order or disabling specific sets and "
+               "consequent effects in the \"Manage Sets\" dialog."));
+        // The reload above replaces the set instances, so Manage Sets must open
+        // only after the finished snapshot has been swapped in.
+        actManageSets();
+    });
+    watcher->setFuture(QtConcurrent::run([cardDatabase] { cardDatabase->reloadCardDatabasesAndNotify(); }));
 }
 
 /* CARD UPDATER */
