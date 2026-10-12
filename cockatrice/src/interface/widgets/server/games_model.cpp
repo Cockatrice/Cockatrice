@@ -523,6 +523,9 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
 
 void GamesProxyModel::refresh()
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
+    beginFilterChange();
+#endif
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 10, 0))
     endFilterChange(QSortFilterProxyModel::Direction::Rows);
 #else

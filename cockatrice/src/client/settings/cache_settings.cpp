@@ -133,6 +133,10 @@ SettingsCache::SettingsCache()
     // Migrate settings from global.ini to per-class INI files (runs at most once)
     SettingsMigration::migrateSettingsFromGlobalIni(settingsPath);
 
+    // Repair gamefilters.ini keys renamed to camelCase by #7084 for profiles that migrated
+    // before that rename (idempotent, safe to run on every startup, portable builds included).
+    SettingsMigration::migrateGameFiltersToCamelCase(settingsPath);
+
     shortcutsSettings = new ShortcutsSettings(settingsPath, this);
     cardDatabaseSettings = new CardDatabaseSettings(settingsPath, this);
     serversSettings = new ServersSettings(settingsPath, this);
