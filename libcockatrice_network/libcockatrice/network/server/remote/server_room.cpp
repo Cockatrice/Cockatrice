@@ -107,8 +107,11 @@ Server *Server_Room::getServer() const
     return static_cast<Server *>(parent());
 }
 
-const ServerInfo_Room &
-Server_Room::getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes, bool includeExternalData) const
+const ServerInfo_Room &Server_Room::getInfo(ServerInfo_Room &result,
+                                            bool complete,
+                                            bool showGameTypes,
+                                            bool includeExternalData,
+                                            const ServerInfo_User *forUser) const
 {
     result.set_room_id(id);
     result.set_name(name.toStdString());
@@ -158,6 +161,9 @@ Server_Room::getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes,
     }
 
     for (const ServerInfo_RoomChannel &channel : channels) {
+        if (forUser != nullptr && !mayReadChannel(*forUser, channel)) {
+            continue;
+        }
         result.add_channel_list()->CopyFrom(channel);
     }
 
@@ -200,9 +206,15 @@ ServerInfo_RoomChannel::AccessLevel Server_Room::userPrivilegeLevel(const Server
     return ServerInfo_RoomChannel::Public;
 }
 
-bool Server_Room::mayUseChannel(const ServerInfo_User &userInfo, const ServerInfo_RoomChannel &channel) const
+bool Server_Room::mayReadChannel(const ServerInfo_User &userInfo, const ServerInfo_RoomChannel &channel) const
 {
     return userPrivilegeLevel(userInfo) >= channel.access_level();
+}
+
+bool Server_Room::mayWriteChannel(const ServerInfo_User &userInfo, const ServerInfo_RoomChannel &channel) const
+{
+    const auto writeLevel = channel.has_write_access_level() ? channel.write_access_level() : channel.access_level();
+    return userPrivilegeLevel(userInfo) >= writeLevel;
 }
 
 QList<ServerInfo_ChatMessage> Server_Room::getChatHistory(const QString &channelId) const

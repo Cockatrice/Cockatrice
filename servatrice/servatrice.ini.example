@@ -336,17 +336,32 @@ roomlist\1\game_types\3\name="GameType3"
 ; channel every room has. Each channel needs a stable ASCII id, a display name
 ; (server data, like the room name) and an access level. Supported levels, from
 ; least to most restrictive, are: public, registered, judge, moderator, admin
-; and developer. A channel is readable and writable by every member whose own
+; and developer. A channel is readable by every member whose own
 ; privilege level is at least the channel's level -- so a moderator channel is
-; also reachable by admins and developers, and an admin channel by developers.
+; also readable by admins and developers, and an admin channel by developers.
 ; Public channels are visible to every room member.
-roomlist\1\channels\size=2
+;
+; Write access defaults to the read level, so by default a channel is readable
+; and writable by the same members. Set writeaccess higher for read-mostly
+; channels (e.g. a developer news feed readable by everyone but writable only
+; by developers). Members who can read but not write see the channel with a
+; disabled message input.
+;
+; banner is an optional static notice shown at the top of the channel, similar
+; to the room joinmessage on Main. Empty or unset = none.
+roomlist\1\channels\size=3
 roomlist\1\channels\1\id=looking-for-players
 roomlist\1\channels\1\displayname="Looking for players"
 roomlist\1\channels\1\access=public
+roomlist\1\channels\1\banner="Find opponents here. Be friendly!"
 roomlist\1\channels\2\id=moderators
 roomlist\1\channels\2\displayname="Moderators"
 roomlist\1\channels\2\access=moderator
+roomlist\1\channels\3\id=developer-news
+roomlist\1\channels\3\displayname="Developer news"
+roomlist\1\channels\3\access=public
+roomlist\1\channels\3\writeaccess=developer
+roomlist\1\channels\3\banner="Official announcements from the developers."
 
 
 [game]

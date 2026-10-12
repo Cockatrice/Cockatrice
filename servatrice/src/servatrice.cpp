@@ -392,7 +392,8 @@ bool Servatrice::initServer()
             }
 
             QSqlQuery *query3 = servatriceDatabaseInterface->prepareQuery(
-                "select channel_id, display_name, access_level from {prefix}_rooms_channels where id_room = :id_room "
+                "select channel_id, display_name, access_level, write_access_level, banner_message from "
+                "{prefix}_rooms_channels where id_room = :id_room "
                 "AND id_server = :id_server order by channel_id asc");
             query3->bindValue(":id_server", serverId);
             query3->bindValue(":id_room", query->value(0).toInt());
@@ -418,6 +419,10 @@ bool Servatrice::initServer()
                 channel.set_id(channelId.toStdString());
                 channel.set_display_name(query3->value(1).toString().toStdString());
                 channel.set_access_level(roomChannelAccessFromKey(query3->value(2).toString()));
+                if (!query3->isNull(3)) {
+                    channel.set_write_access_level(roomChannelAccessFromKey(query3->value(3).toString()));
+                }
+                channel.set_banner_message(query3->value(4).toString().toStdString());
                 channels.append(channel);
             }
 
@@ -460,6 +465,11 @@ bool Servatrice::initServer()
                 channel.set_id(channelId.toStdString());
                 channel.set_display_name(settingsCache->value("displayname").toString().toStdString());
                 channel.set_access_level(roomChannelAccessFromKey(settingsCache->value("access").toString()));
+                if (settingsCache->contains("writeaccess")) {
+                    channel.set_write_access_level(
+                        roomChannelAccessFromKey(settingsCache->value("writeaccess").toString()));
+                }
+                channel.set_banner_message(settingsCache->value("banner").toString().toStdString());
                 channels.append(channel);
             }
             settingsCache->endArray();

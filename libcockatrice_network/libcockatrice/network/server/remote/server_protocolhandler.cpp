@@ -769,7 +769,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(const Command_G
     while (roomIterator.hasNext()) {
         Server_Room *room = roomIterator.next().value();
         room->gamesLock.lockForRead();
-        room->getInfo(*re->add_room_list(), false, true);
+        room->getInfo(*re->add_room_list(), false, true, true, userInfo);
         QListIterator<ServerInfo_Game> gameIterator(room->getGamesOfUser(nameFromStdString(cmd.user_name())));
         while (gameIterator.hasNext()) {
             re->add_game_list()->CopyFrom(gameIterator.next());
@@ -827,7 +827,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdListRooms(const Command_ListRo
     Event_ListRooms event;
     QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
     while (roomIterator.hasNext()) {
-        roomIterator.next().value()->getInfo(*event.add_room_list(), false);
+        roomIterator.next().value()->getInfo(*event.add_room_list(), false, false, true, userInfo);
     }
     rc.enqueuePreResponseItem(ServerMessage::SESSION_EVENT, prepareSessionEvent(event));
 
@@ -875,7 +875,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
     // Public channels are replayed to everyone; restricted channels only to
     // members whose privilege level meets the channel's access level.
     for (const ServerInfo_RoomChannel &channel : room->getChannels()) {
-        if (!room->mayUseChannel(*userInfo, channel)) {
+        if (!room->mayReadChannel(*userInfo, channel)) {
             continue;
         }
         const QList<ServerInfo_ChatMessage> channelHistory = room->getChatHistory(QString::fromStdString(channel.id()));
@@ -895,7 +895,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
     rc.enqueuePostResponseItem(ServerMessage::ROOM_EVENT, room->prepareRoomEvent(joinMessageEvent));
 
     auto *re = new Response_JoinRoom;
-    room->getInfo(*re->mutable_room_info(), true);
+    room->getInfo(*re->mutable_room_info(), true, false, true, userInfo);
 
     rc.setResponseExtension(re);
     return Response::RespOk;
@@ -990,7 +990,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdRoomChannelSay(const Command_R
         // The client only ever offers catalog ids; a crafted or stale id is rejected.
         return Response::RespInvalidCommand;
     }
-    if (!room->mayUseChannel(*userInfo, *channel)) {
+    if (!room->mayWriteChannel(*userInfo, *channel)) {
         return Response::RespFunctionNotAllowed;
     }
 

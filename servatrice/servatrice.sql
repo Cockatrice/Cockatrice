@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   PRIMARY KEY  (`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
-INSERT INTO cockatrice_schema_version VALUES(38);
+INSERT INTO cockatrice_schema_version VALUES(39);
 
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
@@ -164,6 +164,8 @@ CREATE TABLE IF NOT EXISTS `cockatrice_rooms_channels` (
   `channel_id` varchar(50) NOT NULL,
   `display_name` varchar(50) NOT NULL,
   `access_level` ENUM('public','registered','judge','moderator','admin','developer') NOT NULL DEFAULT 'public',
+  `write_access_level` ENUM('public','registered','judge','moderator','admin','developer') NULL DEFAULT NULL,
+  `banner_message` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id_room`, `id_server`, `channel_id`),
   FOREIGN KEY(`id_room`) REFERENCES `cockatrice_rooms`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;

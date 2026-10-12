@@ -125,8 +125,15 @@ public:
      * Level ordering: Public < Registered < Judge < Moderator < Admin < Developer.
      */
     static ServerInfo_RoomChannel::AccessLevel userPrivilegeLevel(const ServerInfo_User &userInfo);
-    /** @brief True when @p userInfo may read and write @p channel. */
-    bool mayUseChannel(const ServerInfo_User &userInfo, const ServerInfo_RoomChannel &channel) const;
+    /** @brief True when @p userInfo may read @p channel. */
+    bool mayReadChannel(const ServerInfo_User &userInfo, const ServerInfo_RoomChannel &channel) const;
+    /**
+     * @brief True when @p userInfo may write to @p channel.
+     *
+     * Writing requires the channel's write level, or — when no explicit write
+     * level is configured — the same level as reading.
+     */
+    bool mayWriteChannel(const ServerInfo_User &userInfo, const ServerInfo_RoomChannel &channel) const;
     const QMap<int, Server_Game *> &getGames() const
     {
         return games;
@@ -136,8 +143,11 @@ public:
         return externalGames;
     }
     Server *getServer() const;
-    const ServerInfo_Room &
-    getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes = false, bool includeExternalData = true) const;
+    const ServerInfo_Room &getInfo(ServerInfo_Room &result,
+                                   bool complete,
+                                   bool showGameTypes = false,
+                                   bool includeExternalData = true,
+                                   const ServerInfo_User *forUser = nullptr) const;
     int getGamesCreatedByUser(const QString &name) const;
     QList<ServerInfo_Game> getGamesOfUser(const QString &name) const;
     QList<ServerInfo_ChatMessage> getChatHistory(const QString &channelId) const;
