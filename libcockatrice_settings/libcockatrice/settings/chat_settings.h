@@ -19,6 +19,8 @@ public:
     [[nodiscard]] bool getChatMentionCompleter() const override;
     [[nodiscard]] QString getChatMentionColor() const override;
     [[nodiscard]] QString getChatHighlightColor() const override;
+    [[nodiscard]] QString getChannelUnreadColor() const override;
+    [[nodiscard]] QString getChannelMentionColor() const override;
     [[nodiscard]] bool getChatMentionForeground() const override;
     [[nodiscard]] bool getChatHighlightForeground() const override;
     [[nodiscard]] bool getIgnoreUnregisteredUsers() const override;
@@ -35,6 +37,8 @@ public:
     void setChatMentionCompleter(bool _chatMentionCompleter);
     void setChatMentionColor(const QString &_chatMentionColor);
     void setChatHighlightColor(const QString &_chatHighlightColor);
+    void setChannelUnreadColor(const QString &_channelUnreadColor);
+    void setChannelMentionColor(const QString &_channelMentionColor);
     void setChatMentionForeground(bool _chatMentionForeground);
     void setChatHighlightForeground(bool _chatHighlightForeground);
     void setIgnoreUnregisteredUsers(bool _ignoreUnregisteredUsers);

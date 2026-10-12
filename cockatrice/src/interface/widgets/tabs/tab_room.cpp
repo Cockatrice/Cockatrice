@@ -29,7 +29,7 @@
 #include <QAction>
 #include <QApplication>
 #include <QCloseEvent>
-#include <QComboBox>
+#include <QColor>
 #include <QCompleter>
 #include <QDateTime>
 #include <QFlag>
@@ -43,6 +43,7 @@
 #include <QStringListModel>
 #include <QStringLiteral>
 #include <QSystemTrayIcon>
+#include <QTabBar>
 #include <QToolButton>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -67,14 +68,41 @@
 namespace
 {
 const QString MAIN_CHANNEL;
+
+/**
+ * @brief Privilege rank mirroring Server_Room::userPrivilegeLevel.
+ *
+ * Higher = more privileged. Used to evaluate channel write access locally so
+ * the input can reflect read-only channels; the server re-checks on send.
+ */
+int userPrivilegeRank(uint32_t userLevel)
+{
+    if (userLevel & ServerInfo_User::IsDeveloper) {
+        return static_cast<int>(ServerInfo_RoomChannel::Developer);
+    }
+    if (userLevel & ServerInfo_User::IsAdmin) {
+        return static_cast<int>(ServerInfo_RoomChannel::Admin);
+    }
+    if (userLevel & ServerInfo_User::IsModerator) {
+        return static_cast<int>(ServerInfo_RoomChannel::Moderator);
+    }
+    if (userLevel & ServerInfo_User::IsJudge) {
+        return static_cast<int>(ServerInfo_RoomChannel::Judge);
+    }
+    if (userLevel & ServerInfo_User::IsRegistered) {
+        return static_cast<int>(ServerInfo_RoomChannel::Registered);
+    }
+    return static_cast<int>(ServerInfo_RoomChannel::Public);
 }
+} // namespace
 
 TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
                  AbstractClient *_client,
                  ServerInfo_User *_ownUser,
                  const ServerInfo_Room &info)
     : Tab(_tabSupervisor), client(_client), roomId(info.room_id()), roomName(QString::fromStdString(info.name())),
-      ownUser(_ownUser), userListProxy(_tabSupervisor->getUserListManager())
+      ownUser(_ownUser), userListProxy(_tabSupervisor->getUserListManager()), activeChannelId(MAIN_CHANNEL),
+      chatCollapsed(false)
 {
     const int gameTypeListSize = info.gametype_list_size();
     for (int i = 0; i < gameTypeListSize; ++i) {
@@ -94,14 +122,23 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     const auto gameInviteLinkProvider = [this]() { return tabSupervisor->getGameInviteLinksForRoom(roomId); };
     userList->setGameInviteLinkProvider(gameInviteLinkProvider);
 
-    channelSelector = new QComboBox;
-    channelSelector->setVisible(false);
     chatViewStack = new QStackedWidget;
+    channelTabBar = new QTabBar;
+    channelTabBar->setShape(QTabBar::RoundedSouth);
+    channelTabBar->setExpanding(true);
+    channelTabBar->setUsesScrollButtons(true);
 
     channelViews.insert(MAIN_CHANNEL, makeChatView());
     channelIds << MAIN_CHANNEL;
-    channelSelector->addItem(tr("Main"), MAIN_CHANNEL);
+    channelDisplayNames.insert(MAIN_CHANNEL, tr("Main"));
+    channelUnreadCounts.insert(MAIN_CHANNEL, 0);
+    channelMentioned.insert(MAIN_CHANNEL, false);
+    channelWritable.insert(MAIN_CHANNEL, true);
+    channelTabBar->addTab(channelDisplayNames.value(MAIN_CHANNEL));
     chatViewStack->addWidget(channelViews.value(MAIN_CHANNEL));
+
+    const uint32_t ownLevel = ownUser != nullptr ? ownUser->user_level() : 0;
+    const int ownRank = userPrivilegeRank(ownLevel);
 
     const int channelCount = info.channel_list_size();
     for (int i = 0; i < channelCount; ++i) {
@@ -114,19 +151,28 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
         if (displayName.isEmpty()) {
             displayName = channelId;
         }
-        channelViews.insert(channelId, makeChatView());
+        const int writeLevel = channel.has_write_access_level() ? static_cast<int>(channel.write_access_level())
+                                                                : static_cast<int>(channel.access_level());
+        ChatView *channelView = makeChatView();
+        const QString banner = QString::fromStdString(channel.banner_message());
+        if (!banner.isEmpty()) {
+            channelView->appendMessage(banner);
+        }
+        channelViews.insert(channelId, channelView);
         channelIds << channelId;
-        channelSelector->addItem(displayName, channelId);
+        channelDisplayNames.insert(channelId, displayName);
+        channelUnreadCounts.insert(channelId, 0);
+        channelMentioned.insert(channelId, false);
+        channelWritable.insert(channelId, ownRank >= writeLevel);
+        channelTabBar->addTab(displayName);
         chatViewStack->addWidget(channelViews.value(channelId));
-    }
-
-    if (channelCount > 0) {
-        channelSelector->setVisible(true);
     }
 
     chatView = channelViews.value(MAIN_CHANNEL);
     chatViewStack->setCurrentWidget(chatView);
-    connect(channelSelector, &QComboBox::currentIndexChanged, this, &TabRoom::onChannelChanged);
+    channelTabBar->setCurrentIndex(0);
+    connect(channelTabBar, &QTabBar::currentChanged, this, &TabRoom::onChannelChanged);
+    connect(channelTabBar, &QTabBar::tabBarClicked, this, &TabRoom::onChannelTabClicked);
     connect(&SettingsCache::instance().chat(), &ChatSettings::chatMentionCompleterChanged, this,
             &TabRoom::actCompleterChanged);
     sayLabel = new QLabel;
@@ -134,6 +180,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     sayEdit->setMaxLength(MAX_TEXT_LENGTH);
     sayLabel->setBuddy(sayEdit);
     connect(sayEdit, &LineEditCompleter::returnPressed, this, &TabRoom::sendMessage);
+    updateSayEnabled();
 
     auto *chatSettingsMenu = new QMenu(this);
 
@@ -155,20 +202,23 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     sayHbox->addWidget(sayEdit);
     sayHbox->addWidget(chatSettingsButton);
 
+    sayWidget = new QWidget;
+    sayWidget->setLayout(sayHbox);
+
     auto *chatVbox = new QVBoxLayout;
-    chatVbox->addWidget(channelSelector);
     chatVbox->addWidget(chatViewStack);
-    chatVbox->addLayout(sayHbox);
+    chatVbox->addWidget(sayWidget);
+    chatVbox->addWidget(channelTabBar);
 
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatVbox);
 
-    auto *splitter = new QSplitter(Qt::Vertical);
-    splitter->addWidget(gameSelector);
-    splitter->addWidget(chatGroupBox);
+    chatSplitter = new QSplitter(Qt::Vertical);
+    chatSplitter->addWidget(gameSelector);
+    chatSplitter->addWidget(chatGroupBox);
 
     auto *hbox = new QHBoxLayout;
-    hbox->addWidget(splitter, 3);
+    hbox->addWidget(chatSplitter, 3);
     hbox->addWidget(userListPanel, 1);
 
     aLeaveRoom = new QAction(this);
@@ -233,6 +283,11 @@ void TabRoom::retranslateUi()
     aLeaveRoom->setText(tr("&Leave room"));
     aClearChat->setText(tr("&Clear chat"));
     aOpenChatSettings->setText(tr("Chat Settings..."));
+    channelDisplayNames.insert(MAIN_CHANNEL, tr("Main"));
+    for (const QString &channelId : channelIds) {
+        updateChannelTab(channelId);
+    }
+    updateSayEnabled();
 }
 
 void TabRoom::focusTab()
@@ -269,6 +324,11 @@ void TabRoom::tabActivated()
     if (!sayEdit->hasFocus()) {
         sayEdit->setFocus();
     }
+    if (!chatCollapsed) {
+        channelUnreadCounts[activeChannelId] = 0;
+        channelMentioned[activeChannelId] = false;
+        updateChannelTab(activeChannelId);
+    }
 }
 
 QString TabRoom::sanitizeHtml(QString dirty) const
@@ -276,8 +336,19 @@ QString TabRoom::sanitizeHtml(QString dirty) const
     return dirty.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
 }
 
+void TabRoom::updateSayEnabled()
+{
+    const bool writable = channelWritable.value(activeChannelId, true);
+    sayLabel->setEnabled(writable);
+    sayEdit->setEnabled(writable);
+    sayEdit->setPlaceholderText(writable ? QString() : tr("This channel is read-only."));
+}
+
 void TabRoom::sendMessage()
 {
+    if (!channelWritable.value(activeChannelId, true)) {
+        return;
+    }
     if (sayEdit->text().isEmpty()) {
         return;
     } else if (sayEdit->hasVisibleCompleterPopup()) {
@@ -315,6 +386,122 @@ void TabRoom::onChannelChanged(int index)
         chatView = view;
         chatViewStack->setCurrentWidget(view);
     }
+    // Viewing a channel clears its unread state
+    channelUnreadCounts[activeChannelId] = 0;
+    channelMentioned[activeChannelId] = false;
+    updateChannelTab(activeChannelId);
+    updateSayEnabled();
+    if (chatCollapsed) {
+        setChatCollapsed(false);
+    }
+}
+
+void TabRoom::onChannelTabClicked(int index)
+{
+    if (index < 0 || index >= channelIds.size()) {
+        return;
+    }
+    // Clicking the active tab toggles collapse; clicking another tab switches to it
+    if (channelTabBar->currentIndex() == index && channelIds.at(index) == activeChannelId) {
+        setChatCollapsed(!chatCollapsed);
+    }
+}
+
+void TabRoom::setChatCollapsed(bool collapsed)
+{
+    chatCollapsed = collapsed;
+    chatViewStack->setVisible(!collapsed);
+    sayWidget->setVisible(!collapsed);
+    if (collapsed) {
+        // Minimize the chat section of the splitter down to just the tab bar
+        savedSplitterSizes = chatSplitter->sizes();
+        chatSplitter->setSizes({1, 0});
+    } else {
+        // Expanding onto the active channel marks it read
+        channelUnreadCounts[activeChannelId] = 0;
+        channelMentioned[activeChannelId] = false;
+        updateChannelTab(activeChannelId);
+        chatViewStack->setCurrentWidget(chatView);
+        if (!savedSplitterSizes.isEmpty()) {
+            chatSplitter->setSizes(savedSplitterSizes);
+        }
+    }
+}
+
+QColor TabRoom::parseColorHex(const QString &hex, const QColor &fallback)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0))
+    QColor color = QColor::fromString("#" + hex);
+#else
+    QColor color;
+    color.setNamedColor("#" + hex);
+#endif
+    return color.isValid() ? color : fallback;
+}
+
+void TabRoom::updateChannelTab(const QString &channelId)
+{
+    int index = channelIds.indexOf(channelId);
+    if (index < 0) {
+        return;
+    }
+    QString baseName = channelDisplayNames.value(channelId, channelId.isEmpty() ? tr("Main") : channelId);
+    int unread = channelUnreadCounts.value(channelId, 0);
+    bool mentioned = channelMentioned.value(channelId, false);
+
+    QString label = baseName;
+    if (unread > 0) {
+        label += tr(" (%1)").arg(unread);
+    }
+    channelTabBar->setTabText(index, label);
+
+    if (mentioned) {
+        channelTabBar->setTabTextColor(
+            index, parseColorHex(SettingsCache::instance().chat().getChannelMentionColor(), QColor(194, 31, 47)));
+    } else if (unread > 0) {
+        channelTabBar->setTabTextColor(
+            index, parseColorHex(SettingsCache::instance().chat().getChannelUnreadColor(), QColor(26, 123, 0)));
+    } else {
+        channelTabBar->setTabTextColor(index, QColor());
+    }
+}
+
+bool TabRoom::messageContainsMention(const QString &message) const
+{
+    if (ownUser == nullptr) {
+        return false;
+    }
+    QString ownName = QString::fromStdString(ownUser->name());
+    if (ownName.isEmpty()) {
+        return false;
+    }
+    if (message.contains("@" + ownName, Qt::CaseInsensitive)) {
+        return true;
+    }
+    if (message.contains("@all", Qt::CaseInsensitive)) {
+        return true;
+    }
+    const QStringList words = SettingsCache::instance().chat().getHighlightWords().split(' ', Qt::SkipEmptyParts);
+    for (const QString &word : words) {
+        if (!word.isEmpty() && message.contains(word, Qt::CaseInsensitive)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void TabRoom::markChannelMessage(const QString &channelId, const QString &message)
+{
+    bool roomVisible = (tabSupervisor->currentWidget() == this);
+    bool viewing = (channelId == activeChannelId) && !chatCollapsed && roomVisible;
+    if (viewing) {
+        return;
+    }
+    channelUnreadCounts[channelId] = channelUnreadCounts.value(channelId, 0) + 1;
+    if (messageContainsMention(message)) {
+        channelMentioned[channelId] = true;
+    }
+    updateChannelTab(channelId);
 }
 
 ChatView *TabRoom::makeChatView()
@@ -445,6 +632,9 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
     }
 
     mainView->appendMessage(message, event.message_type(), userInfo, true);
+    if (event.message_type() != Event_RoomSay::ChatHistory) {
+        markChannelMessage(MAIN_CHANNEL, message);
+    }
     emit userEvent(false);
 }
 
@@ -484,6 +674,10 @@ void TabRoom::processRoomChannelSayEvent(const Event_RoomChannelSay &event)
     }
 
     view->appendMessage(message, {}, userInfo, true);
+    if (!senderName.isEmpty()) {
+        // Empty senders mark replayed history, which must not count as unread
+        markChannelMessage(channelId, message);
+    }
     emit userEvent(false);
 }
 
@@ -491,7 +685,9 @@ void TabRoom::processRemoveMessagesEvent(const Event_RemoveMessages &event)
 {
     QString userName = QString::fromStdString(event.name());
     int amount = event.amount();
-    chatView->redactMessages(userName, amount);
+    for (ChatView *view : channelViews) {
+        view->redactMessages(userName, amount);
+    }
 }
 
 void TabRoom::refreshShortcuts()

@@ -285,6 +285,32 @@ TEST_F(SettingsDefaultsTest, Chat_HighlightColor_Default)
     ASSERT_EQ(s.getChatHighlightColor(), QString("A6120D"));
 }
 
+TEST_F(SettingsDefaultsTest, Chat_ChannelUnreadColor_Default)
+{
+    ChatSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getChannelUnreadColor(), QString("1A7B00"));
+}
+
+TEST_F(SettingsDefaultsTest, Chat_ChannelUnreadColor_SetAndGet)
+{
+    ChatSettings s(settingsPath, nullptr);
+    s.setChannelUnreadColor(QString("0000FF"));
+    ASSERT_EQ(s.getChannelUnreadColor(), QString("0000FF"));
+}
+
+TEST_F(SettingsDefaultsTest, Chat_ChannelMentionColor_Default)
+{
+    ChatSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getChannelMentionColor(), QString("A6120D"));
+}
+
+TEST_F(SettingsDefaultsTest, Chat_ChannelMentionColor_SetAndGet)
+{
+    ChatSettings s(settingsPath, nullptr);
+    s.setChannelMentionColor(QString("FF0000"));
+    ASSERT_EQ(s.getChannelMentionColor(), QString("FF0000"));
+}
+
 TEST_F(SettingsDefaultsTest, Chat_MentionForeground_Default)
 {
     ChatSettings s(settingsPath, nullptr);
