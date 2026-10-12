@@ -64,34 +64,32 @@ QStringList CardSetList::getUnknownSetsNames()
     return sets;
 }
 
-void CardSetList::enableAllUnknown()
+void CardSetList::enableAllUnknownBatched(ICardSetPriorityController *controller)
 {
+    QVector<ICardSetPriorityController::SetSaveData> saveData;
     for (int i = 0; i < size(); ++i) {
         CardSetPtr set = at(i);
-        if (set && !set->getIsKnown() && !set->getIsKnownIgnored()) {
-            set->setIsKnown(true);
-            set->setEnabled(true);
-        } else if (set && set->getIsKnownIgnored() && !set->getEnabled()) {
-            set->setEnabled(true);
-        }
-    }
-}
-
-void CardSetList::enableAll()
-{
-    for (int i = 0; i < size(); ++i) {
-        CardSetPtr set = at(i);
-
-        if (set == nullptr) {
-            // qCWarning(CardInfoLog) << "enabledAll has null";
+        if (set.isNull()) {
             continue;
         }
 
-        if (!set->getIsKnownIgnored()) {
-            set->setIsKnown(true);
+        bool changed = false;
+        if (!set->getIsKnown() && !set->getIsKnownIgnored()) {
+            set->setIsKnownInMemory(true);
+            set->setEnabledInMemory(true);
+            changed = true;
+        } else if (set->getIsKnownIgnored() && !set->getEnabled()) {
+            set->setEnabledInMemory(true);
+            changed = true;
         }
+        if (changed) {
+            saveData.append(
+                {set->getShortName(), static_cast<unsigned int>(set->getSortKey()), true, set->getIsKnown()});
+        }
+    }
 
-        set->setEnabled(true);
+    if (!saveData.isEmpty()) {
+        controller->saveSets(saveData);
     }
 }
 
@@ -116,32 +114,37 @@ void CardSetList::enableAllBatched(ICardSetPriorityController *controller)
         saveData.append({set->getShortName(), sortKey, true, set->getIsKnown()});
     }
 
-    controller->saveSets(saveData);
-}
-
-void CardSetList::markAllAsKnown()
-{
-    for (int i = 0; i < size(); ++i) {
-        CardSetPtr set = at(i);
-        if (set && !set->getIsKnown() && !set->getIsKnownIgnored()) {
-            set->setIsKnown(true);
-            set->setEnabled(false);
-        } else if (set && set->getIsKnownIgnored() && !set->getEnabled()) {
-            set->setEnabled(true);
-        }
+    if (!saveData.isEmpty()) {
+        controller->saveSets(saveData);
     }
 }
 
-void CardSetList::guessSortKeys()
+void CardSetList::markAllAsKnownBatched(ICardSetPriorityController *controller)
 {
-    defaultSort();
+    QVector<ICardSetPriorityController::SetSaveData> saveData;
     for (int i = 0; i < size(); ++i) {
         CardSetPtr set = at(i);
         if (set.isNull()) {
-            // qCWarning(CardInfoLog) << "guessSortKeys set is null";
             continue;
         }
-        set->setSortKey(i);
+
+        bool changed = false;
+        if (!set->getIsKnown() && !set->getIsKnownIgnored()) {
+            set->setIsKnownInMemory(true);
+            set->setEnabledInMemory(false);
+            changed = true;
+        } else if (set->getIsKnownIgnored() && !set->getEnabled()) {
+            set->setEnabledInMemory(true);
+            changed = true;
+        }
+        if (changed) {
+            saveData.append({set->getShortName(), static_cast<unsigned int>(set->getSortKey()), set->getEnabled(),
+                             set->getIsKnown()});
+        }
+    }
+
+    if (!saveData.isEmpty()) {
+        controller->saveSets(saveData);
     }
 }
 

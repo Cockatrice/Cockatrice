@@ -210,7 +210,7 @@ void CardDatabase::checkUnknownSets()
         if (numUnknownSets > 0) {
             emit cardDatabaseNewSetsFound(numUnknownSets, unknownSetNames);
         } else {
-            _sets.markAllAsKnown();
+            _sets.markAllAsKnownBatched(setPriorityController);
         }
     } else {
         // No set enabled. Probably this is the first time running trice
@@ -230,13 +230,13 @@ void CardDatabase::checkUnknownSets()
 void CardDatabase::enableAllUnknownSets()
 {
     auto _sets = getSetList();
-    _sets.enableAllUnknown();
+    _sets.enableAllUnknownBatched(setPriorityController);
 }
 
 void CardDatabase::markAllSetsAsKnown()
 {
     auto _sets = getSetList();
-    _sets.markAllAsKnown();
+    _sets.markAllAsKnownBatched(setPriorityController);
 }
 
 void CardDatabase::notifyEnabledSetsChanged(bool recomputeCachedSets)
