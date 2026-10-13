@@ -2,6 +2,7 @@
 
 #include "../utility/table_activation.h"
 #include "abstract_client.h"
+#include "alt_table_delegate.h"
 #include "libcockatrice/protocol/pb/response.pb.h"
 #include "libcockatrice/protocol/pb/response_user_alts.pb.h"
 
@@ -101,6 +102,15 @@ TabAlts::TabAlts(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
     connect(backButton, &QPushButton::clicked, this, &TabAlts::goBack);
 
     statusLabel = new QLabel;
+    trailLabel = new QLabel;
+    trailLabel->setTextFormat(Qt::RichText);
+    trailLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    trailLabel->setOpenExternalLinks(false);
+    connect(trailLabel, &QLabel::linkActivated, this, [this](const QString &userName) {
+        if (!userName.isEmpty() && userName != currentUser) {
+            investigate(userName);
+        }
+    });
 
     auto *topBar = new QHBoxLayout;
     topBar->addWidget(backButton);
@@ -135,6 +145,12 @@ TabAlts::TabAlts(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
 
     altsTable = new QTableWidget(0, COL_ALTS_COUNT);
     configureAltTable(altsTable);
+    altsDelegate = new AltTableDelegate(COL_ALTS_VIA, COL_ALTS_WARNS, COL_ALTS_BANS, COL_ALTS_SHARED, altsTable);
+    altsDelegate->setVpnThreshold(vpnSpin->value());
+    connect(vpnSpin, &QSpinBox::valueChanged, altsDelegate, &AltTableDelegate::setVpnThreshold);
+    altsTable->setItemDelegateForColumn(COL_ALTS_VIA, altsDelegate);
+    altsTable->setItemDelegateForColumn(COL_ALTS_WARNS, altsDelegate);
+    altsTable->setItemDelegateForColumn(COL_ALTS_BANS, altsDelegate);
     connectTableActivation(altsTable, this, [this](const QModelIndex &index) {
         if (!index.isValid()) {
             return;
@@ -173,6 +189,10 @@ TabAlts::TabAlts(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
     detailsLayout->addLayout(detailGrid);
     detailsLayout->addWidget(warnsTable, 1);
     detailsLayout->addWidget(bansTable, 1);
+    investigateSelectedButton = new QPushButton;
+    investigateSelectedButton->setEnabled(false);
+    connect(investigateSelectedButton, &QPushButton::clicked, this, &TabAlts::investigateSelected);
+    detailsLayout->addWidget(investigateSelectedButton);
 
     auto *contentSplitter = new QSplitter(Qt::Horizontal);
     contentSplitter->addWidget(altsTable);
@@ -185,6 +205,7 @@ TabAlts::TabAlts(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
     mainLayout->addLayout(topBar);
     mainLayout->addLayout(filterBar);
     mainLayout->addWidget(statusLabel);
+    mainLayout->addWidget(trailLabel);
     mainLayout->addWidget(contentSplitter, 1);
 
     retranslateUi();
@@ -224,6 +245,8 @@ void TabAlts::retranslateUi()
     detailNameLabel->setText(tr("Name:"));
     detailCountsLabel->setText(tr("Counts:"));
     detailNotesLabel->setText(tr("Admin notes:"));
+    investigateSelectedButton->setText(tr("Investigate this user"));
+    investigateSelectedButton->setToolTip(tr("Open the selected account as a new investigation"));
 
     if (!lastAlts.isEmpty()) {
         renderTable();
@@ -264,7 +287,27 @@ void TabAlts::loadUser(const QString &userName)
 {
     currentUser = userName;
     searchEdit->setText(userName);
+    updateTrail();
     investigateUser();
+}
+
+void TabAlts::updateTrail()
+{
+    QStringList trail = backStack;
+    trail << currentUser;
+    trail.removeAll(QString());
+    QStringList links;
+    for (const QString &name : trail) {
+        const QString safeName = name.toHtmlEscaped();
+        if (name == currentUser) {
+            links << QStringLiteral("<b>") + safeName + QStringLiteral("</b>");
+        } else {
+            links << QStringLiteral("<a href=\"") + safeName + QStringLiteral("\">") + safeName +
+                         QStringLiteral("</a>");
+        }
+    }
+    trailLabel->setText(links.join(QStringLiteral(" › ")));
+    trailLabel->setVisible(!links.isEmpty());
 }
 
 void TabAlts::investigateUser()
@@ -273,7 +316,12 @@ void TabAlts::investigateUser()
     if (userName.isEmpty()) {
         return;
     }
+    if (userName != currentUser && !currentUser.isEmpty()) {
+        backStack << currentUser;
+        backButton->setEnabled(true);
+    }
     currentUser = userName;
+    updateTrail();
     lastAlts.clear();
     selectedUser.clear();
     clearDetails();
@@ -393,6 +441,9 @@ void TabAlts::renderTable()
         if (QString::fromStdString(alt.match_reason()).startsWith(QStringLiteral("ip:")) && alt.has_shared_count() &&
             alt.shared_count() > 2) {
             for (int col = 0; col < COL_ALTS_COUNT; ++col) {
+                if (col == COL_ALTS_VIA) {
+                    continue;
+                }
                 if (auto *item = altsTable->item(row, col)) {
                     item->setForeground(dimColor);
                 }
@@ -435,6 +486,13 @@ void TabAlts::onFilterChanged()
     renderTable();
 }
 
+void TabAlts::investigateSelected()
+{
+    if (!selectedUser.isEmpty() && selectedUser != currentUser) {
+        investigate(selectedUser);
+    }
+}
+
 void TabAlts::onAltSelected()
 {
     const auto selected = altsTable->selectedItems();
@@ -458,6 +516,7 @@ void TabAlts::requestDetails(const QString &userName)
     detailNotesEdit->clear();
     warnsTable->setRowCount(0);
     bansTable->setRowCount(0);
+    investigateSelectedButton->setEnabled(userName != currentUser);
 
     Command_ReportUserInfo infoCmd;
     infoCmd.set_user_name(userName.toStdString());
@@ -497,6 +556,7 @@ void TabAlts::clearDetails()
     detailNotesEdit->clear();
     warnsTable->setRowCount(0);
     bansTable->setRowCount(0);
+    investigateSelectedButton->setEnabled(false);
 }
 
 void TabAlts::userDetailsResponse(const Response &response)
