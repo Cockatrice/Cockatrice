@@ -11,6 +11,7 @@
 #include "../animated_item.h"
 #include "../card_dimensions.h"
 #include "select_zone.h"
+
 #include <QElapsedTimer>
 #include <QMap>
 #include <QPixmap>
