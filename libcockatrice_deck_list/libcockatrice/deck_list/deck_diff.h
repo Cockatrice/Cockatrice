@@ -14,10 +14,10 @@ class DeckList;
 /** @brief A single card-count change within one zone. */
 struct DeckCardChange
 {
-    QString zone;     ///< Zone name, e.g. "main".
-    QString cardName; ///< Card name.
-    int oldCount = 0; ///< Copies in the old deck.
-    int newCount = 0; ///< Copies in the new deck.
+    QString zone;             ///< Zone name, e.g. "main".
+    QString cardName;         ///< Card name.
+    int oldCount = 0;         ///< Copies in the old deck.
+    int newCount = 0;         ///< Copies in the new deck.
     QString cardSetShortName; ///< Printing set carried from the new side, empty when unchanged.
     QString cardSetNumber;    ///< Printing collector number carried from the new side.
     QString cardProviderId;   ///< Printing provider id carried from the new side.
