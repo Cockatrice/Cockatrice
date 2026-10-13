@@ -1,6 +1,5 @@
 #include "view_zone_logic.h"
 
-"
 #include "../board/card_state.h"
 
 #include <QtGlobal>
