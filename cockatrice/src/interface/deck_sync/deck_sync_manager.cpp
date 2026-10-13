@@ -336,6 +336,9 @@ void DeckSyncManager::onListFinished(const Response &response, const CommandCont
         if (localFiles.contains(it.key())) {
             continue;
         }
+        if (QFileInfo::exists(deckPath + "/" + it.key())) {
+            continue;
+        }
         if (it.value().remoteId == -1) {
             sidecar.remove(it.key());
             continue;
