@@ -223,6 +223,20 @@ int main(int argc, char **argv)
     }
 
     QCoreApplication app(argc, argv);
+
+    // Every TEST() runs as its own process and CI runs them in parallel (ctest -j4),
+    // while the picture paths round-trip through the process-global SettingsCache
+    // file. Parallel cases must therefore never share one settings directory: on
+    // platforms where QStandardPaths ignores the $HOME override above (macOS
+    // resolves the home directory via system APIs), every case would otherwise read
+    // and write the same paths.ini, and a sibling's setPicsPath can land between our
+    // own set and the loader's get — so the loader searches a foreign (or empty)
+    // directory and flakily returns a null image. Scope the settings to this process
+    // with a pid-unique application name; PIDs are never reused by live processes.
+    QCoreApplication::setOrganizationName(QStringLiteral("CockatriceTest"));
+    QCoreApplication::setApplicationName(
+        QStringLiteral("loader-local-matching-test-%1").arg(QCoreApplication::applicationPid()));
+
     QLoggingCategory::setFilterRules("card_picture_loader.*=false\nsettings_cache.*=false");
 
     ::testing::InitGoogleTest(&argc, argv);
