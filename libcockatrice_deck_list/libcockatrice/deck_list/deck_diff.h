@@ -18,6 +18,9 @@ struct DeckCardChange
     QString cardName; ///< Card name.
     int oldCount = 0; ///< Copies in the old deck.
     int newCount = 0; ///< Copies in the new deck.
+    QString cardSetShortName; ///< Printing set carried from the new side, empty when unchanged.
+    QString cardSetNumber;    ///< Printing collector number carried from the new side.
+    QString cardProviderId;   ///< Printing provider id carried from the new side.
     /** @brief Copies added (positive) or removed (negative). */
     [[nodiscard]] int delta() const
     {
@@ -40,9 +43,9 @@ struct DeckDiffResult
  * @class DeckDiff
  * @brief Pure card-count diff and three-way merge for deck sync.
  *
- * Compares card names and copy counts per zone only; printing information
- * (set, collector number, provider) is not tracked, so a merged deck keeps
- * base printings with merged counts.
+ * Compares card names and copy counts per zone only; a merged deck keeps
+ * base printings for existing cards and carries the changed side's printing
+ * for newly added cards.
  */
 class DeckDiff
 {

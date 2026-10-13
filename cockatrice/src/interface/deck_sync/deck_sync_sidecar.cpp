@@ -5,6 +5,7 @@
 #include <QFileInfo>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QSaveFile>
 
 namespace
 {
@@ -64,12 +65,12 @@ bool DeckSyncSidecar::save() const
     root.insert("records", records);
 
     QDir().mkpath(QFileInfo(filePath).absolutePath());
-    QFile file(filePath);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+    QSaveFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly)) {
         return false;
     }
     file.write(QJsonDocument(root).toJson(QJsonDocument::Compact));
-    return true;
+    return file.commit();
 }
 
 bool DeckSyncSidecar::contains(const QString &relativePath) const
