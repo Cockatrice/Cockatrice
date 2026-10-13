@@ -254,10 +254,8 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     rightToolBar->addAction(aNewFolder);
     rightToolBar->addAction(aDeleteRemoteDeck);
 
-    syncManager = new DeckSyncManager(this);
-    syncManager->setClient(client);
-    syncManager->setColorIdentityProvider(
-        [](const DeckList &deck) { return getDeckColorIdentity(deck, CardDatabaseManager::query()); });
+    syncManager = new DeckSyncManager(
+        client, [](const DeckList &deck) { return getDeckColorIdentity(deck, CardDatabaseManager::query()); }, this);
     connect(syncManager, &DeckSyncManager::statusMessage, this, &TabDeckStorage::onSyncStatusMessage);
     connect(syncManager, &DeckSyncManager::syncFinished, this, &TabDeckStorage::onSyncFinished);
     if (currentUserInfo != nullptr) {
