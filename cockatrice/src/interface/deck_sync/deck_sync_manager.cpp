@@ -318,6 +318,24 @@ void DeckSyncManager::classify(const QMap<QString, ServerFile> &serverFiles)
             ++unchangedCount;
             continue;
         }
+        const DeckSyncRecord baseRecord = sidecar.get(it.key());
+        const bool localChanged = baseRecord.baseHash.isEmpty() || baseRecord.baseHash != it.value().hash;
+        const bool serverChanged = baseRecord.baseHash.isEmpty() || baseRecord.baseHash != serverIt.value().hash;
+        if (localChanged && !serverChanged) {
+            if (syncMode == DeckSyncMode::DownloadOnly) {
+                continue;
+            }
+            applyUpload(it.key(), serverPath, serverIt.value().id, serverIt.value().guid);
+            continue;
+        }
+        if (!localChanged && serverChanged) {
+            if (syncMode == DeckSyncMode::UploadOnly) {
+                continue;
+            }
+            applyDownload(it.key(), serverIt.value().id, serverIt.value().guid, serverIt.value().hash,
+                          serverIt.value().lastModifiedSecs);
+            continue;
+        }
         const qint64 localSecs = it.value().modified.toSecsSinceEpoch();
         const int effective = sessionDefault >= 0 ? sessionDefault : conflictDefault;
         // A server row without last_modified predates sync: the local file wins.
