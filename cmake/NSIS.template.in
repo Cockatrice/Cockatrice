@@ -126,6 +126,9 @@ FunctionEnd
 Function .onInit
 
 StrCpy $InstallLogPath "$TEMP\Cockatrice-installer.log"
+; No backup has been taken yet; RestoreUserDataAfterUninstall must be a no-op
+; until BackupUserDataBeforeUninstall sets this after actually copying something.
+StrCpy $DataBackupDir ""
 ; Start each run from a clean file so the log that gets sent back is the last
 ; run, not every past run glued together.
 FileOpen $LogHandle "$InstallLogPath" w
@@ -350,28 +353,49 @@ FunctionEnd
 ; destructive one is already on disk on affected machines, so stash a copy
 ; outside $INSTDIR before invoking it and put it back afterwards. Best effort
 ; only: a failed backup must never abort the install.
+;
+; The backup is intentionally left in %TEMP% afterwards as a second safety copy.
+; Non-portable data paths beyond loose decks are covered by the client's
+; startup safety backup (warnAboutDataPathsInProgramDir).
 Function BackupUserDataBeforeUninstall
-StrCpy $DataBackupDir "$TEMP\CockatriceDataBackup"
+; Always start from a clean slate: %TEMP% survives across installer runs, and a
+; leftover backup must never be mistaken for this run's - a fresh install would
+; otherwise resurrect ancient decks via RestoreUserDataAfterUninstall.
+RMDir /r "$TEMP\CockatriceDataBackup"
+StrCpy $DataBackupDir ""
 ${If} ${FileExists} "$INSTDIR\portable.dat"
-${AndIf} ${FileExists} "$INSTDIR\data\*.*"
-    !insertmacro CockLog "pre-uninstall backup: copying $INSTDIR\data"
+${AndIf} ${FileExists} "$INSTDIR\data"
+    StrCpy $DataBackupDir "$TEMP\CockatriceDataBackup"
+    !insertmacro CockLog "pre-uninstall backup: copying $INSTDIR\data (downloaded pics excluded)"
     DetailPrint "Backing up portable user data before removing previous version..."
     CreateDirectory "$DataBackupDir\data"
     CopyFiles /SILENT "$INSTDIR\data\*.*" "$DataBackupDir\data\"
+    ; Downloaded pictures are large and re-downloadable, so drop them from the
+    ; safety backup - but keep user-made custom pics (data\pics\CUSTOM).
+    RMDir /r "$DataBackupDir\data\pics"
+    ${If} ${FileExists} "$INSTDIR\data\pics\CUSTOM"
+        CreateDirectory "$DataBackupDir\data\pics\CUSTOM"
+        CopyFiles /SILENT "$INSTDIR\data\pics\CUSTOM\*.*" "$DataBackupDir\data\pics\CUSTOM\"
+    ${EndIf}
     DetailPrint "Portable user data backup complete."
 ${EndIf}
 ${If} ${FileExists} "$INSTDIR\*.cod"
+${OrIf} ${FileExists} "$INSTDIR\*.dec"
+    ${If} $DataBackupDir == ""
+        StrCpy $DataBackupDir "$TEMP\CockatriceDataBackup"
+    ${EndIf}
     !insertmacro CockLog "pre-uninstall backup: copying loose deck files"
     DetailPrint "Backing up deck files stored in the install directory..."
     CreateDirectory "$DataBackupDir\loose_decks"
     CopyFiles /SILENT "$INSTDIR\*.cod" "$DataBackupDir\loose_decks\"
+    CopyFiles /SILENT "$INSTDIR\*.dec" "$DataBackupDir\loose_decks\"
 ${EndIf}
 FunctionEnd
 
 Function RestoreUserDataAfterUninstall
 StrCmp $DataBackupDir "" done
-${If} ${FileExists} "$DataBackupDir\data\*.*"
-    ${If} ${FileExists} "$INSTDIR\data\*.*"
+${If} ${FileExists} "$DataBackupDir\data"
+    ${If} ${FileExists} "$INSTDIR\data"
         !insertmacro CockLog "post-uninstall restore: user data survived, backup kept"
         DetailPrint "Previous user data survived the uninstall; backup kept at $DataBackupDir\data."
     ${Else}
@@ -382,9 +406,11 @@ ${If} ${FileExists} "$DataBackupDir\data\*.*"
     ${EndIf}
 ${EndIf}
 ${If} ${FileExists} "$DataBackupDir\loose_decks\*.cod"
+${OrIf} ${FileExists} "$DataBackupDir\loose_decks\*.dec"
     !insertmacro CockLog "post-uninstall restore: restoring loose deck files"
     CreateDirectory "$INSTDIR"
     CopyFiles /SILENT "$DataBackupDir\loose_decks\*.cod" "$INSTDIR\"
+    CopyFiles /SILENT "$DataBackupDir\loose_decks\*.dec" "$INSTDIR\"
     DetailPrint "Restored deck files stored in the install directory."
     ${IfNot} ${Silent}
         MessageBox MB_OK|MB_ICONINFORMATION "Your decks were stored inside the Cockatrice install folder, which the previous version's uninstaller deletes.$\n$\nThey have been restored from a backup. Please move them out of the install folder (Settings -> General -> Paths) so a future uninstall cannot delete them again."

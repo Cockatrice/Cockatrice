@@ -626,11 +626,15 @@ void MainWindow::warnAboutDataPathsInProgramDir()
     QStringList offenders;
     if (isPortable) {
         // Portable data lives inside the install directory by design, so there is
-        // nothing to reconfigure. Back up the small irreplaceable data (decks, custom
-        // sets, settings) instead. Pictures are deliberately excluded: they are large
-        // and can always be re-downloaded.
+        // nothing to reconfigure. Back up the small irreplaceable data instead.
+        // Pictures are deliberately excluded: they are large and can always be
+        // re-downloaded (the installer's pre-uninstall backup keeps custom pics
+        // but drops downloaded ones for the same reason). Replays are excluded
+        // here for size; the installer backup covers them.
         const QString dataDir = SettingsCache::instance().getDataPath();
-        for (const QString &sub : {QStringLiteral("decks"), QStringLiteral("customsets"), QStringLiteral("settings")}) {
+        for (const QString &sub :
+             QStringList{QStringLiteral("decks"), QStringLiteral("customsets"), QStringLiteral("settings"),
+                         QStringLiteral("filters"), QStringLiteral("themes")}) {
             const QString candidate = QDir(dataDir).absoluteFilePath(sub);
             if (QFileInfo::exists(candidate)) {
                 backupSources.append(candidate);
@@ -651,22 +655,26 @@ void MainWindow::warnAboutDataPathsInProgramDir()
     if (PathsSettings::isInsideDir(backupRoot, appDir)) {
         backupRoot = QDir::temp().absoluteFilePath(QStringLiteral("CockatriceBackups"));
     }
+    // One timestamped session directory for all sources, so a second boundary
+    // never splits a single startup check across two backup folders and
+    // same-named sources cannot overwrite each other.
     QStringList backupLocations;
-    for (const QString &source : backupSources) {
-        QString backupLocation;
-        if (UserDataBackup::backupAtRiskPath(source, backupRoot, &backupLocation)) {
-            qCInfo(MainWindowLog) << "Backed up at-risk user data" << source << "to" << backupLocation;
-            backupLocations.append(backupLocation);
-        } else {
-            qCWarning(MainWindowLog) << "Failed to back up at-risk user data:" << source;
-        }
+    QString sessionDir;
+    const bool backupComplete =
+        UserDataBackup::backupAtRiskPaths(backupSources, backupRoot, &backupLocations, &sessionDir);
+    for (const QString &backupLocation : backupLocations) {
+        qCInfo(MainWindowLog) << "Backed up at-risk user data to" << backupLocation;
+    }
+    if (!backupComplete) {
+        qCWarning(MainWindowLog) << "At-risk user data backup incomplete, session dir:" << sessionDir;
     }
 
     QString message;
     if (isPortable) {
         message = tr("This portable install keeps its data inside the program directory, where the "
                      "uninstallers shipped in Cockatrice 3.1.0/3.1.1 delete everything on uninstall or "
-                     "update.\n\nA safety backup of your decks, custom sets and settings has been created "
+                     "update.\n\nA safety backup of your decks, custom sets, settings, filters and themes has "
+                     "been created "
                      "at:\n%1\n\nUninstalling with the old uninstaller still deletes the program "
                      "directory, so keep your own copy of that backup until you have updated once.")
                       .arg(backupLocations.isEmpty() ? backupRoot : backupLocations.join(QLatin1Char('\n')));
@@ -679,6 +687,9 @@ void MainWindow::warnAboutDataPathsInProgramDir()
                       .arg(offenders.join(QLatin1Char('\n')));
         if (!backupLocations.isEmpty()) {
             message += tr("\n\nA safety backup has been created at:\n%1").arg(backupLocations.join(QLatin1Char('\n')));
+            if (!backupComplete) {
+                message += tr("\n\nThe backup may be incomplete; please back up these folders manually as well.");
+            }
         } else {
             message += tr("\n\nThe automatic safety backup failed; please back up these folders manually.");
         }

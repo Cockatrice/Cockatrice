@@ -10,6 +10,31 @@
 namespace UserDataBackup
 {
 
+namespace
+{
+
+QString uniqueTargetPath(const QString &sessionDir, const QString &fileName)
+{
+    QDir dir(sessionDir);
+    QString candidate = dir.absoluteFilePath(fileName);
+    if (!QFileInfo::exists(candidate)) {
+        return candidate;
+    }
+    const QFileInfo info(fileName);
+    const QString base = info.completeBaseName();
+    const QString suffix = info.suffix();
+    for (int i = 2;; ++i) {
+        QString numbered = suffix.isEmpty() ? QStringLiteral("%1 (%2)").arg(base).arg(i)
+                                            : QStringLiteral("%1 (%2).%3").arg(base).arg(i).arg(suffix);
+        candidate = dir.absoluteFilePath(numbered);
+        if (!QFileInfo::exists(candidate)) {
+            return candidate;
+        }
+    }
+}
+
+} // namespace
+
 bool copyDirectoryRecursively(const QString &sourceDir, const QString &destDir)
 {
     QDir source(sourceDir);
@@ -32,6 +57,9 @@ bool copyDirectoryRecursively(const QString &sourceDir, const QString &destDir)
                 ok = false;
             }
         } else {
+            // Ensure the parent exists even if the iterator yields a file
+            // before its directory entry.
+            QDir().mkpath(QFileInfo(target).absolutePath());
             if (QFile::exists(target) && !QFile::remove(target)) {
                 ok = false;
                 continue;
@@ -44,37 +72,84 @@ bool copyDirectoryRecursively(const QString &sourceDir, const QString &destDir)
     return ok;
 }
 
-bool backupAtRiskPath(const QString &sourcePath, const QString &backupRoot, QString *backupLocationOut)
+bool createBackupSessionDir(const QString &backupRoot, QString *sessionDirOut)
 {
-    QFileInfo source(sourcePath);
-    if (!source.exists()) {
+    if (!QDir().mkpath(backupRoot)) {
         return false;
     }
-    QString timestamp = QDateTime::currentDateTime().toString("yyyyMMdd-hhmmss");
-    QString backupDir = QDir(backupRoot).absoluteFilePath("CockatriceDataBackup-" + timestamp);
-    if (!QDir().mkpath(backupDir)) {
+    const QString timestamp = QDateTime::currentDateTime().toString(QStringLiteral("yyyyMMdd-hhmmss-zzz"));
+    const QDir root(backupRoot);
+    QString sessionDir = root.absoluteFilePath(QStringLiteral("CockatriceDataBackup-") + timestamp);
+    for (int i = 1; QFileInfo::exists(sessionDir); ++i) {
+        sessionDir = root.absoluteFilePath(QStringLiteral("CockatriceDataBackup-%1-%2").arg(timestamp).arg(i));
+    }
+    if (!QDir().mkpath(sessionDir)) {
+        return false;
+    }
+    if (sessionDirOut) {
+        *sessionDirOut = sessionDir;
+    }
+    return true;
+}
+
+bool backupAtRiskPath(const QString &sourcePath, const QString &backupRoot, QString *backupLocationOut)
+{
+    QStringList locations;
+    const bool ok = backupAtRiskPaths({sourcePath}, backupRoot, &locations, nullptr);
+    if (!locations.isEmpty() && backupLocationOut) {
+        *backupLocationOut = locations.first();
+    }
+    return ok;
+}
+
+bool backupAtRiskPaths(const QStringList &sourcePaths,
+                       const QString &backupRoot,
+                       QStringList *backupLocationsOut,
+                       QString *sessionDirOut)
+{
+    QStringList existing;
+    for (const QString &sourcePath : sourcePaths) {
+        if (QFileInfo::exists(sourcePath)) {
+            existing.append(sourcePath);
+        }
+    }
+    if (existing.isEmpty()) {
         return false;
     }
 
-    bool ok;
-    QString backupLocation;
-    if (source.isDir()) {
-        backupLocation = QDir(backupDir).absoluteFilePath(source.fileName());
-        ok = copyDirectoryRecursively(sourcePath, backupLocation);
-    } else {
-        backupLocation = QDir(backupDir).absoluteFilePath(source.fileName());
-        if (QFile::exists(backupLocation)) {
-            QFile::remove(backupLocation);
-        }
-        ok = QFile::copy(sourcePath, backupLocation);
-    }
-    if (!ok) {
+    QString sessionDir;
+    if (!createBackupSessionDir(backupRoot, &sessionDir)) {
         return false;
     }
-    if (backupLocationOut) {
-        *backupLocationOut = backupLocation;
+    if (sessionDirOut) {
+        *sessionDirOut = sessionDir;
     }
-    return true;
+
+    bool allOk = true;
+    QStringList locations;
+    for (const QString &sourcePath : existing) {
+        const QFileInfo source(sourcePath);
+        const QString backupLocation = uniqueTargetPath(sessionDir, source.fileName());
+        bool ok;
+        if (source.isDir()) {
+            ok = copyDirectoryRecursively(sourcePath, backupLocation);
+        } else {
+            ok = QFile::copy(sourcePath, backupLocation);
+        }
+        // Report the location whenever a target was created, even for partial
+        // copies, so callers can point the user at what was salvaged.
+        if (QFileInfo::exists(backupLocation)) {
+            locations.append(backupLocation);
+        } else {
+            // Total failure with no target created (e.g. QFile::copy failed).
+            ok = false;
+        }
+        allOk = allOk && ok;
+    }
+    if (backupLocationsOut) {
+        *backupLocationsOut = locations;
+    }
+    return allOk && !locations.isEmpty();
 }
 
 QString defaultBackupRoot()
