@@ -62,7 +62,8 @@ TableZone::TableZone(TableZoneLogic *_logic, bool _mirrored, QGraphicsItem *pare
 
     updateBg();
 
-    height = MARGIN_TOP + MARGIN_BOTTOM + TableZoneLogic::ROW_COUNT * CardDimensions::HEIGHT + (TableZoneLogic::ROW_COUNT - 1) * PADDING_Y;
+    height = MARGIN_TOP + MARGIN_BOTTOM + TableZoneLogic::ROW_COUNT * CardDimensions::HEIGHT +
+             (TableZoneLogic::ROW_COUNT - 1) * PADDING_Y;
     width = MIN_WIDTH;
     currentMinimumWidth = width;
 
