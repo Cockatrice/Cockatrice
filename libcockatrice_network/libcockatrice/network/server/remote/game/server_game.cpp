@@ -265,23 +265,11 @@ int Server_Game::getSpectatorCount() const
     return result;
 }
 
-void Server_Game::createGameStateChangedEvent(Event_GameStateChanged *event,
-                                              Server_AbstractParticipant *recipient,
-                                              bool omniscient,
-                                              bool withUserInfo)
+QList<Server_AbstractParticipant *> Server_Game::getParticipantsInSeatOrder() const
 {
-    event->set_seconds_elapsed(secondsElapsed);
-    if (gameStarted) {
-        event->set_game_started(true);
-        event->set_active_player_id(0);
-        event->set_active_phase(0);
-    } else {
-        event->set_game_started(false);
-    }
-
-    // Emit the player list in seat order so every client (including old ones
-    // that ignore Event_PlayerOrderChanged) sees the current seating. Player
-    // ids are stable; only this ordering changes on shuffle/reorder.
+    // Players in seat order first (fall back to id order for seats predating
+    // seatOrder), then spectators. Player ids are stable; only the ordering
+    // changes on shuffle/reorder.
     QList<Server_AbstractParticipant *> ordered;
     ordered.reserve(participants.size());
     for (int id : seatOrder) {
@@ -300,6 +288,27 @@ void Server_Game::createGameStateChangedEvent(Event_GameStateChanged *event,
             ordered.append(participant);
         }
     }
+    return ordered;
+}
+
+void Server_Game::createGameStateChangedEvent(Event_GameStateChanged *event,
+                                              Server_AbstractParticipant *recipient,
+                                              bool omniscient,
+                                              bool withUserInfo)
+{
+    event->set_seconds_elapsed(secondsElapsed);
+    if (gameStarted) {
+        event->set_game_started(true);
+        event->set_active_player_id(0);
+        event->set_active_phase(0);
+    } else {
+        event->set_game_started(false);
+    }
+
+    // Emit the player list in seat order so every client (including old ones
+    // that ignore Event_PlayerOrderChanged) sees the current seating. Player
+    // ids are stable; only this ordering changes on shuffle/reorder.
+    QList<Server_AbstractParticipant *> ordered = getParticipantsInSeatOrder();
     for (Server_AbstractParticipant *participant : ordered) {
         participant->getInfo(event->add_player_list(), recipient, omniscient, withUserInfo);
     }
@@ -961,7 +970,7 @@ void Server_Game::createGameJoinedEvent(Server_AbstractParticipant *joiningParti
     event2.set_active_phase(activePhase);
 
     bool omniscient = (joiningParticipant->isSpectator() && spectatorsSeeEverything) || joiningParticipant->isJudge();
-    for (auto *participant : participants.values()) {
+    for (auto *participant : getParticipantsInSeatOrder()) {
         participant->getInfo(event2.add_player_list(), joiningParticipant, omniscient, true);
     }
 
