@@ -6,9 +6,9 @@
 
 /**
  * Status pill for the report queue table. Paints the status text on a
- * translucent badge tinted with a palette role per status, so the colors
- * always follow the active theme. Falls back to default painting for
- * selected rows and unknown statuses.
+ * translucent badge tinted with a palette role per status (open, assigned,
+ * resolved, dismissed), so the colors always follow the active theme.
+ * Falls back to default painting for selected rows and unknown statuses.
  */
 class ReportStatusDelegate : public QStyledItemDelegate
 {
