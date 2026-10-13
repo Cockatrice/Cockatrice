@@ -200,7 +200,7 @@ public:
                                                        int &range,
                                                        int &maxresults);
     QList<ServerInfo_UserSession> getUserSessions(const QString &userName, int limit);
-    QList<ServerInfo_UserAlt> getUserAlts(const QString &userName);
+    QList<ServerInfo_UserAlt> getUserAlts(const QString &userName, int depth = 1);
     QList<ServerInfo_ModeratorLogin> getModeratorLastLogins();
 
     // Uptime snapshot as recorded by Servatrice::statusUpdate() into the
