@@ -44,7 +44,8 @@ private slots:
     void goBack();
     void investigateSelected();
     void altsResponse(const Response &response);
-    void onFilterChanged();
+    void onSearchFilterChanged();
+    void onDisplayFilterChanged();
     void onAltSelected();
     void userDetailsResponse(const Response &response);
     void warnHistoryResponse(const Response &response);
@@ -82,6 +83,8 @@ private:
     QPushButton *ipChip;
     QLabel *vpnLabel;
     QSpinBox *vpnSpin;
+    QLabel *windowLabel;
+    QSpinBox *monthsSpin;
 
     QLabel *detailNameValue;
     QLabel *detailCountsValue;
