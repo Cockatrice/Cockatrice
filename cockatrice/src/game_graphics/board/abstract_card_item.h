@@ -132,6 +132,8 @@ public:
     }
     void setFaceDown(bool _facedown);
     void processHoverEvent();
+    /** @brief Drop a pending collapse and disarm any deferred collapse timer. */
+    void cancelPendingSelectionCollapse();
     void deleteCardInfoPopup()
     {
         emit deleteCardInfoPopup(cardRef.name);
@@ -146,8 +148,6 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
     void cacheBgColor();
-    /** @brief Drop a pending collapse and disarm any deferred collapse timer. */
-    void cancelPendingSelectionCollapse();
     /**
      * @brief Whether a double-click on this item acts on the whole selection.
      *

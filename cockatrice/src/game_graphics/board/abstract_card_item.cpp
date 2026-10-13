@@ -363,8 +363,7 @@ void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     } else if (!isSelected()) {
         scene()->clearSelection();
         setSelected(true);
-    } else if (event->button() == Qt::LeftButton && scene()->selectedItems().count() > 1 &&
-               !doubleClickActsOnSelection()) {
+    } else if (event->button() == Qt::LeftButton && scene()->selectedItems().count() > 1) {
         // Part of a multi-selection; collapse only if this turns out to be a click rather than a drag,
         // so that dragging the whole selection keeps it intact.
         pendingSelectionCollapse = true;
