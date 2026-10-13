@@ -40,35 +40,33 @@ struct DeckDiffResult
 };
 
 /**
- * @class DeckDiff
+ * @namespace DeckDiff
  * @brief Pure card-count diff and three-way merge for deck sync.
  *
  * Compares card names and copy counts per zone only; a merged deck keeps
  * base printings for existing cards and carries the changed side's printing
  * for newly added cards.
  */
-class DeckDiff
+namespace DeckDiff
 {
-public:
-    /** @brief Diffs oldDeck against newDeck. */
-    static DeckDiffResult diff(const DeckList &oldDeck, const DeckList &newDeck);
-    /**
-     * @brief True when both change sets touch disjoint (zone, card) keys and a merge needs no arbitration.
-     */
-    static bool canAutoMerge(const DeckDiffResult &localChanges, const DeckDiffResult &remoteChanges);
-    /**
-     * @brief Applies both change sets onto a copy of baseDeck.
-     *
-     * @precondition localChanges and remoteChanges were both computed with
-     * diff() against baseDeck. Stale or foreign change sets silently
-     * resurrect or delete cards.
-     *
-     * Counts are clamped at zero. On overlapping keys the remote change wins;
-     * callers offer this result as "Use Merge" only when canAutoMerge is true.
-     * Metadata and sideboard plans come from baseDeck.
-     */
-    static DeckList
-    merge(const DeckList &baseDeck, const DeckDiffResult &localChanges, const DeckDiffResult &remoteChanges);
-};
+/** @brief Diffs oldDeck against newDeck. */
+DeckDiffResult diff(const DeckList &oldDeck, const DeckList &newDeck);
+/**
+ * @brief True when both change sets touch disjoint (zone, card) keys and a merge needs no arbitration.
+ */
+bool canAutoMerge(const DeckDiffResult &localChanges, const DeckDiffResult &remoteChanges);
+/**
+ * @brief Applies both change sets onto a copy of baseDeck.
+ *
+ * @precondition localChanges and remoteChanges were both computed with
+ * diff() against baseDeck. Stale or foreign change sets silently
+ * resurrect or delete cards.
+ *
+ * Counts are clamped at zero. On overlapping keys the remote change wins;
+ * callers offer this result as "Use Merge" only when canAutoMerge is true.
+ * Metadata and sideboard plans come from baseDeck.
+ */
+DeckList merge(const DeckList &baseDeck, const DeckDiffResult &localChanges, const DeckDiffResult &remoteChanges);
+} // namespace DeckDiff
 
 #endif // DECK_DIFF_H

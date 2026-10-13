@@ -55,7 +55,9 @@ bool changeLessThan(const DeckCardChange &a, const DeckCardChange &b)
 }
 } // namespace
 
-DeckDiffResult DeckDiff::diff(const DeckList &oldDeck, const DeckList &newDeck)
+namespace DeckDiff
+{
+DeckDiffResult diff(const DeckList &oldDeck, const DeckList &newDeck)
 {
     const QMap<ZoneCardKey, int> oldCounts = zoneCardCounts(oldDeck);
     const QMap<ZoneCardKey, ZoneCardInfo> newInfos = zoneCardInfos(newDeck);
@@ -83,7 +85,7 @@ DeckDiffResult DeckDiff::diff(const DeckList &oldDeck, const DeckList &newDeck)
     return result;
 }
 
-bool DeckDiff::canAutoMerge(const DeckDiffResult &localChanges, const DeckDiffResult &remoteChanges)
+bool canAutoMerge(const DeckDiffResult &localChanges, const DeckDiffResult &remoteChanges)
 {
     QSet<ZoneCardKey> localKeys;
     for (const DeckCardChange &change : localChanges.changes) {
@@ -97,8 +99,7 @@ bool DeckDiff::canAutoMerge(const DeckDiffResult &localChanges, const DeckDiffRe
     return true;
 }
 
-DeckList
-DeckDiff::merge(const DeckList &baseDeck, const DeckDiffResult &localChanges, const DeckDiffResult &remoteChanges)
+DeckList merge(const DeckList &baseDeck, const DeckDiffResult &localChanges, const DeckDiffResult &remoteChanges)
 {
     QMap<ZoneCardKey, int> counts = zoneCardCounts(baseDeck);
     QMap<ZoneCardKey, DeckCardChange> printings;
@@ -139,3 +140,4 @@ DeckDiff::merge(const DeckList &baseDeck, const DeckDiffResult &localChanges, co
     merged.refreshDeckHash();
     return merged;
 }
+} // namespace DeckDiff
