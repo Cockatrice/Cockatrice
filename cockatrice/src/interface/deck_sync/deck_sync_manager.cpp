@@ -274,11 +274,9 @@ void DeckSyncManager::syncNow()
         localFiles.insert(relativePath, file);
     }
 
-    if (!firstSyncRun && sidecar.lastSyncSecs > 0) {
-        sendSyncCheck(sidecar.lastSyncSecs);
-        return;
-    }
-    fetchFullList();
+    // Always ask the server first: its server_time becomes the sync baseline,
+    // so uploads racing the DeckList response cannot fall outside the window.
+    sendSyncCheck(sidecar.lastSyncSecs);
 }
 
 void DeckSyncManager::fetchFullList()
@@ -309,6 +307,9 @@ void DeckSyncManager::onCheckFinished(const Response &response, const CommandCon
         return;
     }
     const Response_DeckSyncStatus &status = response.GetExtension(Response_DeckSyncStatus::ext);
+    if (status.has_server_time()) {
+        pendingServerTime = static_cast<qint64>(status.server_time());
+    }
     DeckSyncSidecar sidecar(sidecarPath);
     if (!sidecar.load()) {
         fetchFullList();

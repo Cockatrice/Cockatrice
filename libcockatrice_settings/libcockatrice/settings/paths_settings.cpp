@@ -69,6 +69,7 @@ QString PathsSettings::getRedirectCachePath() const
 void PathsSettings::setDeckPath(const QString &_deckPath)
 {
     setValue(_deckPath, "decks");
+    emit deckPathChanged();
 }
 
 void PathsSettings::setFiltersPath(const QString &_filtersPath)

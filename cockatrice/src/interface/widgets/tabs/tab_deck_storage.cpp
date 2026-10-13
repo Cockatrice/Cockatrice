@@ -261,6 +261,13 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
 
     syncManager = new DeckSyncManager(this);
     syncManager->setClient(client);
+    syncManager->setDeckPath(SettingsCache::instance().paths().getDeckPath());
+    connect(&SettingsCache::instance().paths(), &PathsSettings::deckPathChanged, this, [this] {
+        const QString deckPath = SettingsCache::instance().paths().getDeckPath();
+        localDirModel->setRootPath(deckPath);
+        localDirView->setRootIndex(localDirModel->index(localDirModel->rootPath(), 0));
+        syncManager->setDeckPath(deckPath);
+    });
     syncManager->setColorIdentityProvider(
         [](const DeckList &deck) { return getDeckColorIdentity(deck, CardDatabaseManager::query()); });
     syncManager->setConflictDefault(SettingsCache::instance().deckSync().getConflictDefault());

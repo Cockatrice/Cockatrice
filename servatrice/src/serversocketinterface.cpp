@@ -872,51 +872,31 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckSetVisibility(const
     return Response::RespOk;
 }
 
-bool AbstractServerSocketInterface::syncCheckHelper(int folderId,
-                                                    const QString &prefix,
-                                                    int userId,
-                                                    qint64 sinceSecs,
-                                                    Response_DeckSyncStatus *status)
+bool AbstractServerSocketInterface::syncCheckHelper(int userId, qint64 sinceSecs, Response_DeckSyncStatus *status)
 {
-    QSqlQuery *query = sqlInterface->prepareQuery("select id, name from {prefix}_decklist_folders where id_parent = "
-                                                  ":id_parent and id_user = :id_user");
-    query->bindValue(":id_parent", folderId);
-    query->bindValue(":id_user", userId);
-    if (!sqlInterface->execSqlQuery(query)) {
-        return false;
-    }
-    QList<std::pair<int, QString>> subfolders;
-    while (query->next()) {
-        subfolders.append({query->value(0).toInt(), query->value(1).toString()});
-    }
-    for (const auto &[subfolderId, subfolderName] : subfolders) {
-        const QString path = prefix.isEmpty() ? subfolderName : prefix + "/" + subfolderName;
-        if (!syncCheckHelper(subfolderId, path, userId, sinceSecs, status)) {
-            return false;
-        }
-    }
-
-    query = sqlInterface->prepareQuery("select id, name, guid, hash, last_modified, deleted from "
-                                       "{prefix}_decklist_files where id_folder = :id_folder and id_user = :id_user "
-                                       "and (last_modified is null or last_modified > FROM_UNIXTIME(:since))");
-    query->bindValue(":id_folder", folderId);
+    // Single query over the user's files: folder rows are hard-deleted while
+    // their files linger as tombstones, so walking the live folder tree would
+    // miss deletes pointing at nonexistent folders. The client only checks
+    // changed_files_size(), so folder paths are not reconstructed here.
+    QSqlQuery *query = sqlInterface->prepareQuery("select id, guid, hash, last_modified, deleted from "
+                                                  "{prefix}_decklist_files where id_user = :id_user "
+                                                  "and (last_modified is null or last_modified >= "
+                                                  "FROM_UNIXTIME(:since))");
     query->bindValue(":id_user", userId);
     query->bindValue(":since", sinceSecs);
     if (!sqlInterface->execSqlQuery(query)) {
         return false;
     }
     while (query->next()) {
-        const QString name = query->value(1).toString();
         DeckSyncChangedFile *changed = status->add_changed_files();
-        changed->set_path((prefix.isEmpty() ? name : prefix + "/" + name).toStdString());
         changed->set_deck_id(query->value(0).toUInt());
-        changed->set_guid(query->value(2).toString().toStdString());
-        changed->set_hash(query->value(3).toString().toStdString());
-        const QDateTime lastModified = query->value(4).toDateTime();
+        changed->set_guid(query->value(1).toString().toStdString());
+        changed->set_hash(query->value(2).toString().toStdString());
+        const QDateTime lastModified = query->value(3).toDateTime();
         if (lastModified.isValid()) {
             changed->set_last_modified(lastModified.toSecsSinceEpoch());
         }
-        changed->set_deleted(query->value(5).toBool());
+        changed->set_deleted(query->value(4).toBool());
     }
     return true;
 }
@@ -931,7 +911,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckSyncCheck(const Com
     sqlInterface->checkSql();
 
     Response_DeckSyncStatus *re = new Response_DeckSyncStatus;
-    if (!syncCheckHelper(0, QString(), userInfo->id(), static_cast<qint64>(cmd.last_sync_time()), re)) {
+    if (!syncCheckHelper(userInfo->id(), static_cast<qint64>(cmd.last_sync_time()), re)) {
         delete re;
         return Response::RespContextError;
     }

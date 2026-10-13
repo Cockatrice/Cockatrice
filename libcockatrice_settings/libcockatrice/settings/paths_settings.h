@@ -39,6 +39,7 @@ public:
     void setSpoilerDatabasePath(const QString &_spoilerDatabasePath);
 
 signals:
+    void deckPathChanged();
     void cardDatabasePathChanged();
     void picsPathChanged();
     void themeChanged();
