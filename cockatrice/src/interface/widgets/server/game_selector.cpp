@@ -200,6 +200,10 @@ GameSelector::GameSelector(AbstractClient *_client,
 
 GameSelector::~GameSelector()
 {
+    // Nothing else persists quick-filter toolbar edits: the toolbar only updates the in-memory model,
+    // and the debounced timer above is the sole writer for that path (actSetFilter/actClearFilter save
+    // synchronously, but the toolbar does not). Flush a pending debounced save so edits made within
+    // the debounce interval before destruction are not lost on room switch, reconnect, or close.
     if (filterSaveDebounceTimer.isActive()) {
         filterSaveDebounceTimer.stop();
         gameListProxyModel->saveFilterParameters(gameTypeMap);

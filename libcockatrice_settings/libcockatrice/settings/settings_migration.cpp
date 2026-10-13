@@ -697,8 +697,8 @@ static void migrateLegacyGameFilters(const QString &settingsPath)
     legacySetting.endGroup();
 }
 
-static const QString legacyGameFiltersGameTypePrefix = QStringLiteral("filter_games/game_type/");
-static const QString gameFiltersGameTypePrefix = QStringLiteral("filter_games/gameType/");
+static const QString LEGACY_GAME_FILTERS_GAME_TYPE_PREFIX = QStringLiteral("filter_games/game_type/");
+static const QString GAME_FILTERS_GAME_TYPE_PREFIX = QStringLiteral("filter_games/gameType/");
 
 static bool gameFiltersCamelCaseMigrationPending(const QString &settingsPath)
 {
@@ -718,8 +718,9 @@ static bool gameFiltersCamelCaseMigrationPending(const QString &settingsPath)
         return true;
     }
     for (const auto &key : filtersIni.allKeys()) {
-        if (key.startsWith(legacyGameFiltersGameTypePrefix) &&
-            !filtersIni.contains(gameFiltersGameTypePrefix + key.mid(legacyGameFiltersGameTypePrefix.size()))) {
+        if (key.startsWith(LEGACY_GAME_FILTERS_GAME_TYPE_PREFIX) &&
+            !filtersIni.contains(GAME_FILTERS_GAME_TYPE_PREFIX +
+                                 key.mid(LEGACY_GAME_FILTERS_GAME_TYPE_PREFIX.size()))) {
             return true;
         }
     }
@@ -745,8 +746,8 @@ bool SettingsMigration::migrateGameFiltersToCamelCase(const QString &settingsPat
         filtersIni.setValue("filter_games/hostNameFilter", filtersIni.value("filter_games/creatorNameFilter"));
     }
     for (const auto &key : filtersIni.allKeys()) {
-        if (key.startsWith(legacyGameFiltersGameTypePrefix)) {
-            const QString newKey = gameFiltersGameTypePrefix + key.mid(legacyGameFiltersGameTypePrefix.size());
+        if (key.startsWith(LEGACY_GAME_FILTERS_GAME_TYPE_PREFIX)) {
+            const QString newKey = GAME_FILTERS_GAME_TYPE_PREFIX + key.mid(LEGACY_GAME_FILTERS_GAME_TYPE_PREFIX.size());
             if (!filtersIni.contains(newKey)) {
                 filtersIni.setValue(newKey, filtersIni.value(key));
             }
