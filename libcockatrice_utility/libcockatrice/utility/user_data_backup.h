@@ -22,6 +22,9 @@
 namespace UserDataBackup
 {
 
+/** @brief Above this total, the client skips the automatic startup backup and asks for a manual copy. */
+constexpr qint64 MAX_AUTO_BACKUP_BYTES = 500LL * 1024 * 1024;
+
 /**
  * @brief Recursively copies @p sourceDir into @p destDir, creating it as needed.
  * @returns true when every file was copied (or there was nothing to copy).
@@ -56,13 +59,26 @@ bool backupAtRiskPath(const QString &sourcePath, const QString &backupRoot, QStr
  * @param backupRoot directory OUTSIDE the install tree that will hold timestamped backups.
  * @param backupLocationsOut receives one entry per source that produced a backup target
  * (including partial copies).
- * @param sessionDirOut optionally receives the shared session directory.
+ * @param sessionDirOut optionally receives the shared session directory; set to empty
+ * when nothing was backed up (all sources missing, or every copy failed outright).
  * @returns true when every existing source was copied completely.
+ * A false return with a non-empty @p backupLocationsOut means a partial backup exists.
+ * When nothing at all could be salvaged the session directory is removed again, so a
+ * failed attempt never leaves an empty session behind that would block retries.
+ * Completeness is recorded with a marker file; see isBackupSessionComplete().
  */
 bool backupAtRiskPaths(const QStringList &sourcePaths,
                        const QString &backupRoot,
                        QStringList *backupLocationsOut,
                        QString *sessionDirOut = nullptr);
+
+/**
+ * @brief Estimates the total bytes that backing up @p sourcePaths would copy.
+ * @param capBytes stop counting once the total exceeds this; the returned value is then
+ * at least @p capBytes (used to skip the scan early on huge trees).
+ * Missing entries contribute 0. Best effort only.
+ */
+qint64 estimateBackupSize(const QStringList &sourcePaths, qint64 capBytes = MAX_AUTO_BACKUP_BYTES);
 
 /**
  * @brief Default backup root guaranteed to live outside the install directory.
@@ -75,21 +91,34 @@ QString defaultBackupRoot();
 QStringList listBackupSessions(const QString &backupRoot);
 
 /**
- * @brief Returns the newest session directory younger than @p maxAgeHours, or empty.
+ * @brief Returns the newest non-empty session directory younger than @p maxAgeHours, or empty.
  *
  * Used to throttle startup safety backups so dismissing the warning without
  * "Don't show again" does not create a full duplicate on every launch.
+ * Empty sessions (failed attempts) are skipped so they never block a retry,
+ * and an expired newest entry stops the search since sessions are newest-first.
  */
 QString findRecentBackupSession(const QString &backupRoot, int maxAgeHours = 24);
 
 /**
+ * @brief Reports whether @p sessionDir holds a complete backup.
+ * @returns true when the session carries the complete marker, or when it predates
+ * markers but holds backup content (legacy sessions); false for partial backups
+ * and for empty/missing sessions.
+ */
+bool isBackupSessionComplete(const QString &sessionDir);
+
+/**
  * @brief Deletes oldest sessions keeping only the newest @p keepCount ones.
+ * Empty sessions are junk from failed attempts and are always removed, so they
+ * can never evict a good session from the kept set.
  */
 void pruneOldBackupSessions(const QString &backupRoot, int keepCount = 5);
 
 /**
  * @brief Lists the backup targets inside an existing session directory.
  * @returns absolute paths of the entries, for reuse messages without a new copy.
+ * Completeness marker files are internal bookkeeping and are never listed.
  */
 QStringList listSessionBackupLocations(const QString &sessionDir);
 

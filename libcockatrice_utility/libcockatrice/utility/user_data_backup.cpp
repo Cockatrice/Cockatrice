@@ -13,6 +13,24 @@ namespace UserDataBackup
 namespace
 {
 
+const QString COMPLETE_MARKER = QStringLiteral("backup.complete");
+const QString INCOMPLETE_MARKER = QStringLiteral("backup.incomplete");
+
+bool isMarkerFile(const QString &fileName)
+{
+    return fileName == COMPLETE_MARKER || fileName == INCOMPLETE_MARKER;
+}
+
+void writeCompletionMarker(const QString &sessionDir, bool complete)
+{
+    // Best effort: a missing marker only means isBackupSessionComplete() falls
+    // back to the legacy content check below.
+    QFile marker(QDir(sessionDir).absoluteFilePath(complete ? COMPLETE_MARKER : INCOMPLETE_MARKER));
+    if (marker.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        marker.write(complete ? "complete\n" : "incomplete\n");
+    }
+}
+
 QString uniqueTargetPath(const QString &sessionDir, const QString &fileName)
 {
     QDir dir(sessionDir);
@@ -114,6 +132,12 @@ bool backupAtRiskPaths(const QStringList &sourcePaths,
         }
     }
     if (existing.isEmpty()) {
+        if (backupLocationsOut) {
+            backupLocationsOut->clear();
+        }
+        if (sessionDirOut) {
+            sessionDirOut->clear();
+        }
         return false;
     }
 
@@ -146,10 +170,52 @@ bool backupAtRiskPaths(const QStringList &sourcePaths,
         }
         allOk = allOk && ok;
     }
+    if (locations.isEmpty()) {
+        // Nothing salvaged: remove the session again so the empty directory
+        // neither blocks a retry via findRecentBackupSession() nor evicts a
+        // good session in pruneOldBackupSessions().
+        QDir(sessionDir).removeRecursively();
+        if (backupLocationsOut) {
+            backupLocationsOut->clear();
+        }
+        if (sessionDirOut) {
+            sessionDirOut->clear();
+        }
+        return false;
+    }
+    writeCompletionMarker(sessionDir, allOk);
     if (backupLocationsOut) {
         *backupLocationsOut = locations;
     }
-    return allOk && !locations.isEmpty();
+    return allOk;
+}
+
+qint64 estimateBackupSize(const QStringList &sourcePaths, qint64 capBytes)
+{
+    qint64 total = 0;
+    for (const QString &sourcePath : sourcePaths) {
+        const QFileInfo source(sourcePath);
+        if (!source.exists()) {
+            continue;
+        }
+        if (source.isDir()) {
+            QDirIterator it(sourcePath, QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot,
+                            QDirIterator::Subdirectories);
+            while (it.hasNext()) {
+                it.next();
+                total += it.fileInfo().size();
+                if (total >= capBytes) {
+                    return total;
+                }
+            }
+        } else {
+            total += source.size();
+            if (total >= capBytes) {
+                return total;
+            }
+        }
+    }
+    return total;
 }
 
 QString defaultBackupRoot()
@@ -184,31 +250,60 @@ QStringList listBackupSessions(const QString &backupRoot)
 QString findRecentBackupSession(const QString &backupRoot, int maxAgeHours)
 {
     const QStringList sessions = listBackupSessions(backupRoot);
-    if (sessions.isEmpty()) {
-        return {};
-    }
     const QDateTime now = QDateTime::currentDateTime();
     for (const QString &session : sessions) {
         const QFileInfo info(session);
-        // Newest first; the first recent entry is the reuse candidate. Entries
-        // are timestamped, so an old newest entry means no recent backup exists.
-        if (info.exists() && info.lastModified().secsTo(now) < static_cast<qint64>(maxAgeHours) * 3600) {
-            return session;
+        if (!info.exists()) {
+            continue;
         }
-        // Sessions are newest-first, so stop after the newest: older ones are older.
-        break;
+        // Sessions are newest-first, so once an entry is too old every later
+        // one is older as well and the search can stop.
+        if (info.lastModified().secsTo(now) >= static_cast<qint64>(maxAgeHours) * 3600) {
+            break;
+        }
+        // Skip empty sessions from failed attempts: they must never block a retry.
+        if (listSessionBackupLocations(session).isEmpty()) {
+            continue;
+        }
+        return session;
     }
     return {};
+}
+
+bool isBackupSessionComplete(const QString &sessionDir)
+{
+    const QDir session(sessionDir);
+    if (!session.exists()) {
+        return false;
+    }
+    if (QFileInfo::exists(session.absoluteFilePath(COMPLETE_MARKER))) {
+        return true;
+    }
+    if (QFileInfo::exists(session.absoluteFilePath(INCOMPLETE_MARKER))) {
+        return false;
+    }
+    // Legacy sessions from before markers existed: content means the copy
+    // reported success at the time, so treat them as complete.
+    return !listSessionBackupLocations(session.absolutePath()).isEmpty();
 }
 
 void pruneOldBackupSessions(const QString &backupRoot, int keepCount)
 {
     const QStringList sessions = listBackupSessions(backupRoot);
-    if (sessions.size() <= keepCount) {
-        return;
-    }
-    for (int i = keepCount; i < sessions.size(); ++i) {
-        QDir(sessions.at(i)).removeRecursively();
+    QStringList kept;
+    kept.reserve(sessions.size());
+    for (const QString &session : sessions) {
+        // Empty sessions are junk from failed attempts: drop them outright so
+        // they can never evict a good session from the kept set.
+        if (listSessionBackupLocations(session).isEmpty()) {
+            QDir(session).removeRecursively();
+            continue;
+        }
+        if (kept.size() < keepCount) {
+            kept.append(session);
+            continue;
+        }
+        QDir(session).removeRecursively();
     }
 }
 
@@ -222,6 +317,9 @@ QStringList listSessionBackupLocations(const QString &sessionDir)
     QStringList locations;
     locations.reserve(entries.size());
     for (const QString &entry : entries) {
+        if (isMarkerFile(entry)) {
+            continue;
+        }
         locations.append(session.absoluteFilePath(entry));
     }
     return locations;

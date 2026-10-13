@@ -643,13 +643,33 @@ void MainWindow::warnAboutDataPathsInProgramDir()
             }
         }
         // A portable user may also have pointed a custom path inside the install
-        // dir but outside data/ (e.g. appDir/mydecks). Those offenders would be
-        // wiped by the old uninstaller but are not in the hardcoded list above.
+        // dir. Offenders outside data/ (e.g. appDir/mydecks) would be wiped by the
+        // old uninstaller but are not in the hardcoded list above - and neither
+        // is a custom folder inside data/ itself (e.g. dataDir/mydecks), which the
+        // old uninstaller deletes all the same. Cover any offender that is not
+        // already inside a backed-up source; when an offender is a parent of
+        // already-collected sources it supersedes them.
         offenders = paths.pathsInsideDir(appDir);
         for (const QString &offender : offenders) {
-            if (!PathsSettings::isInsideDir(offender, dataDir) && !backupSources.contains(offender)) {
-                backupSources.append(offender);
+            if (!QFileInfo::exists(offender) || backupSources.contains(offender)) {
+                continue;
             }
+            bool alreadyCovered = false;
+            for (const QString &existing : backupSources) {
+                if (PathsSettings::isInsideDir(offender, existing)) {
+                    alreadyCovered = true;
+                    break;
+                }
+            }
+            if (alreadyCovered) {
+                continue;
+            }
+            for (int i = backupSources.size() - 1; i >= 0; --i) {
+                if (PathsSettings::isInsideDir(backupSources.at(i), offender)) {
+                    backupSources.removeAt(i);
+                }
+            }
+            backupSources.append(offender);
         }
         if (backupSources.isEmpty()) {
             return;
@@ -660,12 +680,38 @@ void MainWindow::warnAboutDataPathsInProgramDir()
         if (offenders.isEmpty()) {
             return;
         }
-        backupSources = offenders;
     }
 
     QString backupRoot = UserDataBackup::defaultBackupRoot();
     if (PathsSettings::isInsideDir(backupRoot, appDir)) {
         backupRoot = QDir::temp().absoluteFilePath(QStringLiteral("CockatriceBackups"));
+    }
+    // Only existing paths can be copied; a configured-but-never-created path has
+    // nothing to lose yet and must not turn the warning into a bogus "failed".
+    QStringList sourcesToBackUp;
+    if (isPortable) {
+        sourcesToBackUp = backupSources;
+    } else {
+        for (const QString &offender : offenders) {
+            if (QFileInfo::exists(offender)) {
+                sourcesToBackUp.append(offender);
+            }
+        }
+    }
+    // The copy runs synchronously on the UI thread at startup, so cap it: a
+    // pictures folder pointed into the program dir can be gigabytes, and freezing
+    // the client to duplicate it is worse than asking for a manual copy.
+    // Portable sources are small by construction (downloaded pictures and replays
+    // are excluded above); this guard bites for non-portable offenders.
+    bool backupSkippedDueToSize = false;
+    qint64 backupBytes = 0;
+    if (!sourcesToBackUp.isEmpty()) {
+        backupBytes = UserDataBackup::estimateBackupSize(sourcesToBackUp);
+        if (backupBytes >= UserDataBackup::MAX_AUTO_BACKUP_BYTES) {
+            backupSkippedDueToSize = true;
+            qCWarning(MainWindowLog) << "At-risk user data backup skipped: estimated" << backupBytes
+                                     << "bytes exceeds automatic cap";
+        }
     }
     // Throttle: dismissing the dialog without "Don't show again" must not create
     // a full duplicate on every launch. Reuse a recent session instead, and keep
@@ -676,15 +722,23 @@ void MainWindow::warnAboutDataPathsInProgramDir()
     bool backupReused = false;
     const QString recentSession = UserDataBackup::findRecentBackupSession(backupRoot, 24);
     if (!recentSession.isEmpty()) {
-        sessionDir = recentSession;
-        backupLocations = UserDataBackup::listSessionBackupLocations(sessionDir);
-        backupReused = true;
-        qCInfo(MainWindowLog) << "Reusing recent at-risk user data backup at" << sessionDir;
-    } else {
+        const QStringList reused = UserDataBackup::listSessionBackupLocations(recentSession);
+        if (!reused.isEmpty()) {
+            sessionDir = recentSession;
+            backupLocations = reused;
+            // A reused session keeps the completeness it was recorded with, so a
+            // previously partial backup is still presented with the manual-copy
+            // warning instead of as a success.
+            backupComplete = UserDataBackup::isBackupSessionComplete(recentSession);
+            backupReused = true;
+            qCInfo(MainWindowLog) << "Reusing recent at-risk user data backup at" << sessionDir;
+        }
+    }
+    if (!backupReused && !backupSkippedDueToSize && !sourcesToBackUp.isEmpty()) {
         // One timestamped session directory for all sources, so a second boundary
         // never splits a single startup check across two backup folders and
         // same-named sources cannot overwrite each other.
-        backupComplete = UserDataBackup::backupAtRiskPaths(backupSources, backupRoot, &backupLocations, &sessionDir);
+        backupComplete = UserDataBackup::backupAtRiskPaths(sourcesToBackUp, backupRoot, &backupLocations, &sessionDir);
         UserDataBackup::pruneOldBackupSessions(backupRoot, 5);
     }
     for (const QString &backupLocation : backupLocations) {
@@ -695,6 +749,9 @@ void MainWindow::warnAboutDataPathsInProgramDir()
     }
 
     const QString backupVerb = backupReused ? tr("is already available") : tr("has been created");
+    const QString sizeInfo = tr("%1 MB (automatic backups are capped at %2 MB)")
+                                 .arg(QString::number(backupBytes / 1048576.0, 'f', 1),
+                                      QString::number(UserDataBackup::MAX_AUTO_BACKUP_BYTES / 1048576));
     QString message;
     if (isPortable) {
         if (!backupLocations.isEmpty()) {
@@ -709,6 +766,14 @@ void MainWindow::warnAboutDataPathsInProgramDir()
             if (!backupComplete) {
                 message += tr("\n\nThe backup may be incomplete; please back up these folders manually as well.");
             }
+        } else if (backupSkippedDueToSize) {
+            message = tr("This portable install keeps its data inside the program directory, where the "
+                         "uninstallers shipped in Cockatrice 3.1.0/3.1.1 delete everything on uninstall or "
+                         "update.\n\nThe automatic safety backup was skipped because of its size: %1. "
+                         "Please back up your data folder manually "
+                         "before uninstalling or updating.\n\nReplays and downloaded pictures would not have been "
+                         "included in that backup either.")
+                          .arg(sizeInfo);
         } else {
             message = tr("This portable install keeps its data inside the program directory, where the "
                          "uninstallers shipped in Cockatrice 3.1.0/3.1.1 delete everything on uninstall or "
@@ -728,6 +793,13 @@ void MainWindow::warnAboutDataPathsInProgramDir()
             if (!backupComplete) {
                 message += tr("\n\nThe backup may be incomplete; please back up these folders manually as well.");
             }
+        } else if (backupSkippedDueToSize) {
+            message += tr("\n\nThe automatic safety backup was skipped because of its size: %1. "
+                          "Please back up these folders manually.")
+                           .arg(sizeInfo);
+        } else if (sourcesToBackUp.isEmpty()) {
+            message += tr("\n\nNone of these paths exist on disk yet, so there was nothing to back up. "
+                          "Files created there later are still at risk until the paths are moved.");
         } else {
             message += tr("\n\nThe automatic safety backup failed; please back up these folders manually.");
         }

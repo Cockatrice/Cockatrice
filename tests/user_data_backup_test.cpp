@@ -264,8 +264,133 @@ TEST(UserDataBackup, FindRecentReturnsEmptyWhenNone)
     EXPECT_TRUE(UserDataBackup::listBackupSessions(backupRoot.path()).isEmpty());
     EXPECT_TRUE(UserDataBackup::findRecentBackupSession(backupRoot.path(), 24).isEmpty());
     EXPECT_TRUE(UserDataBackup::listSessionBackupLocations(backupRoot.path() + "/missing").isEmpty());
+    EXPECT_FALSE(UserDataBackup::isBackupSessionComplete(backupRoot.path() + "/missing"));
     // Pruning an empty root must not fail
     UserDataBackup::pruneOldBackupSessions(backupRoot.path(), 5);
+}
+
+TEST(UserDataBackup, AllMissingSourcesCreateNoSession)
+{
+    QTemporaryDir backupRoot;
+    ASSERT_TRUE(backupRoot.isValid());
+    QStringList locations;
+    QString sessionDir;
+    EXPECT_FALSE(UserDataBackup::backupAtRiskPaths({backupRoot.path() + "/nope1", backupRoot.path() + "/nope2"},
+                                                   backupRoot.path(), &locations, &sessionDir));
+    EXPECT_TRUE(locations.isEmpty());
+    EXPECT_TRUE(sessionDir.isEmpty());
+    // No empty session left behind to block a retry or evict good sessions
+    EXPECT_TRUE(UserDataBackup::listBackupSessions(backupRoot.path()).isEmpty());
+}
+
+TEST(UserDataBackup, EmptySessionsAreSkippedAndPruned)
+{
+    QTemporaryDir backupRoot;
+    ASSERT_TRUE(backupRoot.isValid());
+    QString emptySession;
+    ASSERT_TRUE(UserDataBackup::createBackupSessionDir(backupRoot.path(), &emptySession));
+    // An empty session from a failed attempt must never block a retry
+    EXPECT_TRUE(UserDataBackup::listSessionBackupLocations(emptySession).isEmpty());
+    EXPECT_FALSE(UserDataBackup::isBackupSessionComplete(emptySession));
+    EXPECT_TRUE(UserDataBackup::findRecentBackupSession(backupRoot.path(), 24).isEmpty());
+    UserDataBackup::pruneOldBackupSessions(backupRoot.path(), 5);
+    EXPECT_FALSE(QDir(emptySession).exists());
+}
+
+TEST(UserDataBackup, SuccessfulBackupIsMarkedComplete)
+{
+    QTemporaryDir sourceDir;
+    QTemporaryDir backupRoot;
+    ASSERT_TRUE(sourceDir.isValid());
+    ASSERT_TRUE(backupRoot.isValid());
+    QFile deck(QDir(sourceDir.path()).absoluteFilePath("mydeck.cod"));
+    ASSERT_TRUE(deck.open(QIODevice::WriteOnly | QIODevice::Text));
+    deck.write("<cockatrice_deck version=\"1\"/>\n");
+    deck.close();
+
+    QStringList locations;
+    QString sessionDir;
+    EXPECT_TRUE(UserDataBackup::backupAtRiskPaths({sourceDir.path()}, backupRoot.path(), &locations, &sessionDir));
+    EXPECT_TRUE(UserDataBackup::isBackupSessionComplete(sessionDir));
+    // Marker files are bookkeeping and must not leak into the user-facing locations
+    const QStringList listed = UserDataBackup::listSessionBackupLocations(sessionDir);
+    EXPECT_FALSE(listed.isEmpty());
+    for (const QString &location : listed) {
+        EXPECT_FALSE(location.endsWith(QStringLiteral("backup.complete")));
+        EXPECT_FALSE(location.endsWith(QStringLiteral("backup.incomplete")));
+    }
+}
+
+TEST(UserDataBackup, IncompleteMarkerReportsIncompleteButRemainsReusable)
+{
+    QTemporaryDir sourceDir;
+    QTemporaryDir backupRoot;
+    ASSERT_TRUE(sourceDir.isValid());
+    ASSERT_TRUE(backupRoot.isValid());
+    QFile deck(QDir(sourceDir.path()).absoluteFilePath("mydeck.cod"));
+    ASSERT_TRUE(deck.open(QIODevice::WriteOnly | QIODevice::Text));
+    deck.write("<cockatrice_deck version=\"1\"/>\n");
+    deck.close();
+
+    QStringList locations;
+    QString sessionDir;
+    ASSERT_TRUE(UserDataBackup::backupAtRiskPaths({sourceDir.path()}, backupRoot.path(), &locations, &sessionDir));
+    ASSERT_TRUE(QFile::remove(QDir(sessionDir).absoluteFilePath("backup.complete")));
+    QFile marker(QDir(sessionDir).absoluteFilePath("backup.incomplete"));
+    ASSERT_TRUE(marker.open(QIODevice::WriteOnly | QIODevice::Text));
+    marker.write("incomplete\n");
+    marker.close();
+
+    EXPECT_FALSE(UserDataBackup::isBackupSessionComplete(sessionDir));
+    // Still non-empty, so throttling reuses it and the caller warns instead of copying again
+    EXPECT_EQ(UserDataBackup::findRecentBackupSession(backupRoot.path(), 24), sessionDir);
+}
+
+TEST(UserDataBackup, LegacySessionWithoutMarkerCountsAsComplete)
+{
+    QTemporaryDir backupRoot;
+    ASSERT_TRUE(backupRoot.isValid());
+    QString sessionDir;
+    ASSERT_TRUE(UserDataBackup::createBackupSessionDir(backupRoot.path(), &sessionDir));
+    ASSERT_TRUE(QDir(sessionDir).mkpath("decks"));
+    QFile deck(QDir(sessionDir).absoluteFilePath("decks/mydeck.cod"));
+    ASSERT_TRUE(deck.open(QIODevice::WriteOnly | QIODevice::Text));
+    deck.write("<cockatrice_deck version=\"1\"/>\n");
+    deck.close();
+    EXPECT_TRUE(UserDataBackup::isBackupSessionComplete(sessionDir));
+    EXPECT_EQ(UserDataBackup::findRecentBackupSession(backupRoot.path(), 24), sessionDir);
+}
+
+TEST(UserDataBackup, FindRecentIgnoresExpiredSessions)
+{
+    QTemporaryDir sourceDir;
+    QTemporaryDir backupRoot;
+    ASSERT_TRUE(sourceDir.isValid());
+    ASSERT_TRUE(backupRoot.isValid());
+    QFile deck(QDir(sourceDir.path()).absoluteFilePath("mydeck.cod"));
+    ASSERT_TRUE(deck.open(QIODevice::WriteOnly | QIODevice::Text));
+    deck.write("<cockatrice_deck version=\"1\"/>\n");
+    deck.close();
+
+    QStringList locations;
+    QString sessionDir;
+    ASSERT_TRUE(UserDataBackup::backupAtRiskPaths({sourceDir.path()}, backupRoot.path(), &locations, &sessionDir));
+    EXPECT_TRUE(UserDataBackup::findRecentBackupSession(backupRoot.path(), 0).isEmpty());
+}
+
+TEST(UserDataBackup, EstimateBackupSize)
+{
+    QTemporaryDir sourceDir;
+    ASSERT_TRUE(sourceDir.isValid());
+    const QString missing = QDir(sourceDir.path()).absoluteFilePath("missing");
+    EXPECT_EQ(UserDataBackup::estimateBackupSize({missing}), 0);
+    QFile deck(QDir(sourceDir.path()).absoluteFilePath("mydeck.cod"));
+    ASSERT_TRUE(deck.open(QIODevice::WriteOnly | QIODevice::Text));
+    deck.write("123456");
+    deck.close();
+    EXPECT_EQ(UserDataBackup::estimateBackupSize({sourceDir.path(), missing}), 6);
+    // Early-out: once over the cap the exact total no longer matters
+    EXPECT_GE(UserDataBackup::estimateBackupSize({sourceDir.path()}, 1), 1);
 }
 
 } // namespace
