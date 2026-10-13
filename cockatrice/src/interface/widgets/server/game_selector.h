@@ -4,6 +4,7 @@
 #include "game_type_map.h"
 
 #include <QGroupBox>
+#include <QTimer>
 #include <qtmetamacros.h>
 // IWYU pragma: keep
 // ServerInfo_User appears by value and inside QList in slot signatures, so the
@@ -148,6 +149,9 @@ private:
     const bool showFilters;  /**< Determines whether filter buttons are displayed. */
     GameTypeMap gameTypeMap; /**< Mapping of game types for the current room. */
 
+    QTimer filterSaveDebounceTimer; /**< Delays persisting quick-filter edits so typing does not rewrite the settings
+                                       file on every keystroke. */
+
     /**
      * @brief Updates the widget title to reflect the current number of displayed games.
      *
@@ -211,6 +215,7 @@ public:
                  const bool restoresettings,
                  const bool _showfilters,
                  QWidget *parent = nullptr);
+    ~GameSelector() override;
 
     /**
      * @brief Updates UI text for translation/localization.

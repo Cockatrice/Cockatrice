@@ -642,6 +642,34 @@ static void migrateLegacyMessages(const QString &settingsPath)
     legacySetting.endGroup();
 }
 
+/**
+ * gamefilters.ini keys renamed to camelCase by #7084. Profiles that migrated from the legacy
+ * native store before that rename still hold the old snake_case keys, which nothing reads
+ * anymore, so their saved filters silently stopped loading.
+ */
+static const QMap<QString, QString> &renamedGameFilterKeys()
+{
+    static const QMap<QString, QString> keyMap = {
+        {"hide_buddies_only_games", "hideBuddiesOnlyGames"},
+        {"hide_full_games", "hideFullGames"},
+        {"hide_games_that_started", "hideGamesThatStarted"},
+        {"hide_password_protected_games", "hidePasswordProtectedGames"},
+        {"hide_ignored_user_games", "hideIgnoredUserGames"},
+        {"hide_not_buddy_created_games", "hideNotBuddyCreatedGames"},
+        {"hide_open_decklist_games", "hideOpenDecklistGames"},
+        {"game_name_filter", "gameNameFilter"},
+        {"creator_name_filter", "hostNameFilter"},
+        {"min_players", "minPlayers"},
+        {"max_players", "maxPlayers"},
+        {"max_game_age_time", "maxGameAgeTime"},
+        {"show_only_if_spectators_can_watch", "showOnlyIfSpectatorsCanWatch"},
+        {"show_spectator_password_protected", "showSpectatorPasswordProtected"},
+        {"show_only_if_spectators_can_chat", "showOnlyIfSpectatorsCanChat"},
+        {"show_only_if_spectators_can_see_hands", "showOnlyIfSpectatorsCanSeeHands"},
+    };
+    return keyMap;
+}
+
 static void migrateLegacyGameFilters(const QString &settingsPath)
 {
     QSettings legacySetting;
@@ -652,24 +680,7 @@ static void migrateLegacyGameFilters(const QString &settingsPath)
         return;
     }
 
-    const QMap<QString, QString> filterKeyMap = {
-        {"hide_buddies_only_games", "hideBuddiesOnlyGames"},
-        {"hide_full_games", "hideFullGames"},
-        {"hide_games_that_started", "hideGamesThatStarted"},
-        {"hide_password_protected_games", "hidePasswordProtectedGames"},
-        {"hide_ignored_user_games", "hideIgnoredUserGames"},
-        {"hide_not_buddy_created_games", "hideNotBuddyCreatedGames"},
-        {"hide_open_decklist_games", "hideOpenDecklistGames"},
-        {"game_name_filter", "gameNameFilter"},
-        {"creator_name_filter", "creatorNameFilter"},
-        {"min_players", "minPlayers"},
-        {"max_players", "maxPlayers"},
-        {"max_game_age_time", "maxGameAgeTime"},
-        {"show_only_if_spectators_can_watch", "showOnlyIfSpectatorsCanWatch"},
-        {"show_spectator_password_protected", "showSpectatorPasswordProtected"},
-        {"show_only_if_spectators_can_chat", "showOnlyIfSpectatorsCanChat"},
-        {"show_only_if_spectators_can_see_hands", "showOnlyIfSpectatorsCanSeeHands"},
-    };
+    const QMap<QString, QString> &filterKeyMap = renamedGameFilterKeys();
 
     QSettings filtersIni(settingsPath + "gamefilters.ini", QSettings::IniFormat);
     for (auto it = filterKeyMap.constBegin(); it != filterKeyMap.constEnd(); ++it) {
@@ -684,6 +695,68 @@ static void migrateLegacyGameFilters(const QString &settingsPath)
         }
     }
     legacySetting.endGroup();
+}
+
+static const QString LEGACY_GAME_FILTERS_GAME_TYPE_PREFIX = QStringLiteral("filter_games/game_type/");
+static const QString GAME_FILTERS_GAME_TYPE_PREFIX = QStringLiteral("filter_games/gameType/");
+
+static bool gameFiltersCamelCaseMigrationPending(const QString &settingsPath)
+{
+    if (!QFile::exists(settingsPath + "gamefilters.ini")) {
+        return false;
+    }
+
+    QSettings filtersIni(settingsPath + "gamefilters.ini", QSettings::IniFormat);
+    const QMap<QString, QString> &keyMap = renamedGameFilterKeys();
+    for (auto it = keyMap.constBegin(); it != keyMap.constEnd(); ++it) {
+        if (filtersIni.contains("filter_games/" + it.key()) && !filtersIni.contains("filter_games/" + it.value())) {
+            return true;
+        }
+    }
+    // Orphaned by #7084, which migrated the legacy host-name filter to a key nothing reads.
+    if (filtersIni.contains("filter_games/creatorNameFilter") && !filtersIni.contains("filter_games/hostNameFilter")) {
+        return true;
+    }
+    for (const auto &key : filtersIni.allKeys()) {
+        if (key.startsWith(LEGACY_GAME_FILTERS_GAME_TYPE_PREFIX) &&
+            !filtersIni.contains(GAME_FILTERS_GAME_TYPE_PREFIX +
+                                 key.mid(LEGACY_GAME_FILTERS_GAME_TYPE_PREFIX.size()))) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool SettingsMigration::migrateGameFiltersToCamelCase(const QString &settingsPath)
+{
+    if (!gameFiltersCamelCaseMigrationPending(settingsPath)) {
+        return false;
+    }
+
+    QSettings filtersIni(settingsPath + "gamefilters.ini", QSettings::IniFormat);
+    const QMap<QString, QString> &keyMap = renamedGameFilterKeys();
+    for (auto it = keyMap.constBegin(); it != keyMap.constEnd(); ++it) {
+        const QString oldKey = "filter_games/" + it.key();
+        const QString newKey = "filter_games/" + it.value();
+        if (filtersIni.contains(oldKey) && !filtersIni.contains(newKey)) {
+            filtersIni.setValue(newKey, filtersIni.value(oldKey));
+        }
+    }
+    if (filtersIni.contains("filter_games/creatorNameFilter") && !filtersIni.contains("filter_games/hostNameFilter")) {
+        filtersIni.setValue("filter_games/hostNameFilter", filtersIni.value("filter_games/creatorNameFilter"));
+    }
+    for (const auto &key : filtersIni.allKeys()) {
+        if (key.startsWith(LEGACY_GAME_FILTERS_GAME_TYPE_PREFIX)) {
+            const QString newKey = GAME_FILTERS_GAME_TYPE_PREFIX + key.mid(LEGACY_GAME_FILTERS_GAME_TYPE_PREFIX.size());
+            if (!filtersIni.contains(newKey)) {
+                filtersIni.setValue(newKey, filtersIni.value(key));
+            }
+        }
+    }
+    // The old keys are deliberately kept: pre-#7084 builds still read them, so removing them
+    // would break downgrades, and nothing in the current code reads them anymore.
+    filtersIni.sync();
+    return true;
 }
 
 bool SettingsMigration::migrateLegacySettings(const QString &settingsPath)
@@ -741,6 +814,10 @@ bool SettingsMigration::migrateSettingsFromGlobalIni(const QString &settingsPath
 bool SettingsMigration::isMigrationPending(const QString &settingsPath)
 {
     if (hasPendingGlobalIniSettings(settingsPath)) {
+        return true;
+    }
+
+    if (gameFiltersCamelCaseMigrationPending(settingsPath)) {
         return true;
     }
 
