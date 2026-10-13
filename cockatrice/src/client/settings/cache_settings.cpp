@@ -115,9 +115,13 @@ SettingsCache::SettingsCache()
 
     // Decide once, before any migration writes new files, whether this is an
     // existing install. Fresh installs have no *.ini files and no legacy
-    // NativeFormat keys; upgrades have one or the other.
+    // NativeFormat keys; upgrades have one or the other. Fallbacks are disabled
+    // so that on macOS the global preferences domain (AppleLanguages etc.) is
+    // not mistaken for existing Cockatrice settings on a fresh install.
+    QSettings legacy;
+    legacy.setFallbacksEnabled(false);
     const bool hadExistingSettings =
-        !QDir(settingsPath).entryList({"*.ini"}, QDir::Files).isEmpty() || !QSettings().allKeys().isEmpty();
+        !QDir(settingsPath).entryList({"*.ini"}, QDir::Files).isEmpty() || !legacy.allKeys().isEmpty();
 
     settings = new QSettings(settingsPath + "global.ini", QSettings::IniFormat, this);
 
