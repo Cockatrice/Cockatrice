@@ -383,13 +383,15 @@ Function BackupUserDataBeforeUninstall
 ${If} $OldInstallDir == ""
     StrCpy $OldInstallDir $INSTDIR
 ${EndIf}
-; No wipe of $TEMP\CockatriceDataBackup here: %TEMP% survives across installer
-; runs, so the previous run's safety copy stays on disk until this run overwrites
-; it. Stale content can never leak into this run because restore is gated on the
-; per-run $DataBackupDone / $LooseDecksBackupDone flags below, not on what happens
-; to be on disk. CopyFiles merges/overwrites, so calling this twice in sequence
-; (32-bit then 64-bit uninstall) can only add safety, never delete the first
-; call's copy.
+; %TEMP% survives across installer runs, so a previous run's safety copy would
+; otherwise merge into this run: CopyFiles merges/overwrites, resurrecting files
+; the user deleted since (e.g. deck A from run 1 reappearing alongside deck B
+; from run 2) or restoring stale content after a failed copy. Wipe once per
+; installer run - $DataBackupDir is empty until the first backup of this run,
+; so the second call in sequence (32-bit then 64-bit uninstall) still merges.
+${If} $DataBackupDir == ""
+    RMDir /r "$TEMP\CockatriceDataBackup"
+${EndIf}
 ${If} ${FileExists} "$OldInstallDir\portable.dat"
 ${AndIf} ${FileExists} "$OldInstallDir\data"
     StrCpy $DataBackupDir "$TEMP\CockatriceDataBackup"
@@ -485,7 +487,7 @@ StrCmp $DataBackupDir "" done
 StrCmp $OldInstallDir "" done
 StrCmp $OldInstallDir $INSTDIR done
 ${If} $DataBackupDone == "1"
-${AndIf} ${FileExists} "$OldInstallDir\data\*.*"
+${AndIf} ${FileExists} "$OldInstallDir\data"
     !insertmacro CockLog "relocate: copying restored data $OldInstallDir\data -> $INSTDIR\data"
     CreateDirectory "$INSTDIR\data"
     CopyFiles /SILENT "$OldInstallDir\data\*.*" "$INSTDIR\data\"

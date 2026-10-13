@@ -674,8 +674,12 @@ void MainWindow::warnAboutDataPathsInProgramDir()
             }
             backupSources.append(offender);
         }
+        // A fresh portable install has no data on disk yet, but the user still
+        // needs to know their data will live where the 3.1.0/3.1.1 uninstaller
+        // deletes it - so fall through to the warning with an empty backup
+        // instead of returning silently.
         if (backupSources.isEmpty()) {
-            return;
+            qCInfo(MainWindowLog) << "Portable install with no existing data files, warning without backup";
         }
         offenders.clear();
     } else {
@@ -718,7 +722,11 @@ void MainWindow::warnAboutDataPathsInProgramDir()
     bool recentUsable = false;
     if (!recentSession.isEmpty()) {
         recentLocations = UserDataBackup::listSessionBackupLocations(recentSession);
-        recentUsable = !recentLocations.isEmpty() && UserDataBackup::isBackupSessionComplete(recentSession) &&
+        // An empty source set must never reuse a session: sessionCoversSources is
+        // vacuously true for it, which would claim an unrelated recent backup
+        // covers paths that were never backed up.
+        recentUsable = !sourcesToBackUp.isEmpty() && !recentLocations.isEmpty() &&
+                       UserDataBackup::isBackupSessionComplete(recentSession) &&
                        UserDataBackup::sessionCoversSources(recentSession, sourcesToBackUp);
     }
     if (recentUsable) {
@@ -747,10 +755,13 @@ void MainWindow::warnAboutDataPathsInProgramDir()
             UserDataBackup::pruneOldBackupSessions(backupRoot, 5);
             if (backupLocations.isEmpty() && !recentLocations.isEmpty()) {
                 // Fresh copy failed entirely: fall back to the recent session so the
-                // dialog still points at something, flagged incomplete below.
-                sessionDir = recentSession;
-                backupLocations = recentLocations;
-                backupComplete = false;
+                // dialog still points at something, flagged incomplete below - but
+                // only when it actually covers the current sources.
+                if (!recentSession.isEmpty() && UserDataBackup::sessionCoversSources(recentSession, sourcesToBackUp)) {
+                    sessionDir = recentSession;
+                    backupLocations = recentLocations;
+                    backupComplete = false;
+                }
             }
         }
     }
@@ -788,6 +799,11 @@ void MainWindow::warnAboutDataPathsInProgramDir()
                          "before uninstalling or updating.\n\nReplays and downloaded pictures would not have been "
                          "included in that backup either.")
                           .arg(sizeInfo);
+        } else if (sourcesToBackUp.isEmpty()) {
+            message = tr("This portable install keeps its data inside the program directory, where the "
+                         "uninstallers shipped in Cockatrice 3.1.0/3.1.1 delete everything on uninstall or "
+                         "update.\n\nNone of your data files exist on disk yet, so there was nothing to back up. "
+                         "Files created there later are still at risk until you have updated once.");
         } else {
             message = tr("This portable install keeps its data inside the program directory, where the "
                          "uninstallers shipped in Cockatrice 3.1.0/3.1.1 delete everything on uninstall or "
