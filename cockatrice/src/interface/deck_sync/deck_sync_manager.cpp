@@ -135,6 +135,9 @@ void DeckSyncManager::collectServerFiles(const ServerInfo_DeckStorage_Folder &fo
 {
     for (const auto &item : folder.items()) {
         const QString name = QString::fromStdString(item.name());
+        if (name.isEmpty() || name == "." || name == ".." || name.contains('/') || name.contains('\\')) {
+            continue;
+        }
         if (item.has_folder()) {
             const QString path = prefix.isEmpty() ? name : prefix + "/" + name;
             dirs.insert(path);
@@ -173,8 +176,37 @@ void DeckSyncManager::onListFinished(const Response &response, const CommandCont
     sidecar.load();
     const qint64 nowSecs = QDateTime::currentDateTime().toSecsSinceEpoch();
 
+    QMap<int, QString> serverPathById;
+    QMap<QString, QString> serverPathByGuid;
+    for (auto sit = serverFiles.begin(); sit != serverFiles.end(); ++sit) {
+        serverPathById.insert(sit.value().id, sit.key());
+        if (!sit.value().guid.isEmpty()) {
+            serverPathByGuid.insert(sit.value().guid, sit.key());
+        }
+    }
+    QSet<QString> matchedServerPaths;
+
     for (auto it = localFiles.begin(); it != localFiles.end(); ++it) {
-        const QString serverPath = serverPathFor(it.key());
+        const DeckSyncRecord sidecarRecord = sidecar.get(it.key());
+        QString serverPath;
+        if (sidecarRecord.remoteId != -1 && serverPathById.contains(sidecarRecord.remoteId)) {
+            serverPath = serverPathById.value(sidecarRecord.remoteId);
+        } else if (!sidecarRecord.guid.isEmpty() && serverPathByGuid.contains(sidecarRecord.guid)) {
+            serverPath = serverPathByGuid.value(sidecarRecord.guid);
+        } else {
+            serverPath = serverPathFor(it.key());
+            if (!serverFiles.contains(serverPath)) {
+                UploadOp op;
+                op.relativePath = it.key();
+                op.serverPath = serverPath;
+                op.deckId = -1;
+                op.guid = sidecar.contains(it.key()) && !sidecar.get(it.key()).guid.isEmpty()
+                              ? sidecar.get(it.key()).guid
+                              : QUuid::createUuid().toString(QUuid::WithoutBraces);
+                pendingUploads.append(op);
+                continue;
+            }
+        }
         auto serverIt = serverFiles.find(serverPath);
         if (serverIt == serverFiles.end()) {
             UploadOp op;
@@ -187,6 +219,7 @@ void DeckSyncManager::onListFinished(const Response &response, const CommandCont
             pendingUploads.append(op);
             continue;
         }
+        matchedServerPaths.insert(serverIt.key());
         if (it.value().hash == serverIt.value().hash) {
             DeckSyncRecord record = sidecar.get(it.key());
             if (record.guid.isEmpty()) {
@@ -222,6 +255,9 @@ void DeckSyncManager::onListFinished(const Response &response, const CommandCont
     }
 
     for (auto it = serverFiles.begin(); it != serverFiles.end(); ++it) {
+        if (matchedServerPaths.contains(it.key())) {
+            continue;
+        }
         const QString wantedPath = it.key().endsWith(".cod", Qt::CaseInsensitive) ? it.key() : it.key() + ".cod";
         if (localFiles.contains(wantedPath) || QFileInfo(deckPath + "/" + wantedPath).exists()) {
             continue;
@@ -455,7 +491,13 @@ void DeckSyncManager::onDownloadFinished(const Response &response,
         return;
     }
 
-    const QString absolutePath = deckPath + "/" + relativePath;
+    const QString cleanDeckPath = QDir::cleanPath(deckPath);
+    const QString absolutePath = QDir::cleanPath(deckPath + "/" + relativePath);
+    if (absolutePath != cleanDeckPath && !absolutePath.startsWith(cleanDeckPath + "/")) {
+        ++skippedCount;
+        processNext();
+        return;
+    }
     if (localFiles.contains(relativePath)) {
         const QString backupPath =
             absolutePath + BACKUP_SUFFIX + QString::number(QDateTime::currentDateTime().toSecsSinceEpoch());
