@@ -393,6 +393,70 @@ TEST(UserDataBackup, EstimateBackupSize)
     EXPECT_GE(UserDataBackup::estimateBackupSize({sourceDir.path()}, 1), 1);
 }
 
+TEST(UserDataBackup, SessionCoversSourcesRequiresManifestMatch)
+{
+    QTemporaryDir sourceA;
+    QTemporaryDir sourceB;
+    QTemporaryDir backupRoot;
+    ASSERT_TRUE(sourceA.isValid());
+    ASSERT_TRUE(sourceB.isValid());
+    ASSERT_TRUE(backupRoot.isValid());
+    QFile fa(QDir(sourceA.path()).absoluteFilePath("a.cod"));
+    ASSERT_TRUE(fa.open(QIODevice::WriteOnly | QIODevice::Text));
+    fa.write("a");
+    fa.close();
+
+    QStringList locations;
+    QString sessionDir;
+    ASSERT_TRUE(UserDataBackup::backupAtRiskPaths({sourceA.path()}, backupRoot.path(), &locations, &sessionDir));
+    EXPECT_TRUE(UserDataBackup::sessionCoversSources(sessionDir, {sourceA.path()}));
+    EXPECT_FALSE(UserDataBackup::sessionCoversSources(sessionDir, {sourceA.path(), sourceB.path()}));
+    EXPECT_FALSE(UserDataBackup::sessionCoversSources(sessionDir, {sourceB.path()}));
+}
+
+TEST(UserDataBackup, LegacySessionWithoutManifestIsNotCovering)
+{
+    QTemporaryDir backupRoot;
+    ASSERT_TRUE(backupRoot.isValid());
+    QString sessionDir;
+    ASSERT_TRUE(UserDataBackup::createBackupSessionDir(backupRoot.path(), &sessionDir));
+    ASSERT_TRUE(QDir(sessionDir).mkpath("decks"));
+    QFile deck(QDir(sessionDir).absoluteFilePath("decks/mydeck.cod"));
+    ASSERT_TRUE(deck.open(QIODevice::WriteOnly | QIODevice::Text));
+    deck.write("<cockatrice_deck version=\"1\"/>\n");
+    deck.close();
+    EXPECT_FALSE(UserDataBackup::sessionCoversSources(sessionDir, {QDir(sessionDir).absoluteFilePath("decks")}));
+}
+
+TEST(UserDataBackup, ManifestIsHiddenFromSessionLocations)
+{
+    QTemporaryDir sourceDir;
+    QTemporaryDir backupRoot;
+    ASSERT_TRUE(sourceDir.isValid());
+    ASSERT_TRUE(backupRoot.isValid());
+    QFile deck(QDir(sourceDir.path()).absoluteFilePath("mydeck.cod"));
+    ASSERT_TRUE(deck.open(QIODevice::WriteOnly | QIODevice::Text));
+    deck.write("x");
+    deck.close();
+
+    QStringList locations;
+    QString sessionDir;
+    ASSERT_TRUE(UserDataBackup::backupAtRiskPaths({sourceDir.path()}, backupRoot.path(), &locations, &sessionDir));
+    for (const QString &location : UserDataBackup::listSessionBackupLocations(sessionDir)) {
+        EXPECT_FALSE(location.endsWith(QStringLiteral("backup.sources")));
+    }
+}
+
+TEST(UserDataBackup, SingularBackupClearsOutParamOnTotalFailure)
+{
+    QTemporaryDir backupRoot;
+    ASSERT_TRUE(backupRoot.isValid());
+    QString location = QStringLiteral("stale");
+    const QString missing = QDir(backupRoot.path()).absoluteFilePath("does-not-exist.cod");
+    EXPECT_FALSE(UserDataBackup::backupAtRiskPath(missing, backupRoot.path(), &location));
+    EXPECT_TRUE(location.isEmpty());
+}
+
 } // namespace
 
 int main(int argc, char **argv)

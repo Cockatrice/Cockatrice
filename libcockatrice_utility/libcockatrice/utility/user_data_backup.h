@@ -47,6 +47,7 @@ bool createBackupSessionDir(const QString &backupRoot, QString *sessionDirOut);
  * @param backupRoot directory OUTSIDE the install tree that will hold timestamped backups.
  * @param backupLocationOut receives the created backup file or directory whenever a target
  * was created, even when the copy was only partial (i.e. also on failure with a partial copy).
+ * Cleared when nothing was salvaged.
  * @returns true when the whole source was copied, false when the source is missing or
  * any entry failed. A false return with a non-empty @p backupLocationOut means a partial
  * backup exists at that location.
@@ -118,9 +119,18 @@ void pruneOldBackupSessions(const QString &backupRoot, int keepCount = 5);
 /**
  * @brief Lists the backup targets inside an existing session directory.
  * @returns absolute paths of the entries, for reuse messages without a new copy.
- * Completeness marker files are internal bookkeeping and are never listed.
+ * Completeness marker and source manifest files are internal bookkeeping and are never listed.
  */
 QStringList listSessionBackupLocations(const QString &sessionDir);
+
+/**
+ * @brief Reports whether @p sessionDir was recorded as covering all of @p sourcePaths.
+ * @returns true when the session's source manifest lists every entry of @p sourcePaths
+ * (normalized via QDir::cleanPath, case-insensitive on Windows/macOS). Legacy sessions
+ * without a manifest return false so a changed source set always triggers a fresh copy
+ * instead of reusing a backup that may not cover it.
+ */
+bool sessionCoversSources(const QString &sessionDir, const QStringList &sourcePaths);
 
 } // namespace UserDataBackup
 

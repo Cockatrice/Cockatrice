@@ -368,6 +368,13 @@ FunctionEnd
 ; The backup is intentionally left in %TEMP% afterwards as a second safety copy.
 ; Non-portable data paths beyond loose decks are covered by the client's
 ; startup safety backup (warnAboutDataPathsInProgramDir).
+;
+; The portable-data branch below is defensive: both callers (AutoUninstallIfNeeded
+; on /R, componentsPagePre interactively) only run for non-portable installs, and
+; portable installs never write the registry uninstall keys that trigger them.
+; It fires only when $OldInstallDir nevertheless contains portable.dat - e.g. a
+; stale registry InstallLocation pointing at a portable dir, or portable.dat added
+; to a normal install dir. The loose-decks branch is the live one for normal installs.
 Function BackupUserDataBeforeUninstall
 ; $OldInstallDir is the directory being uninstalled: on the /R path it equals
 ; $INSTDIR (updater passes /D=<appDir>), on the interactive path componentsPagePre
@@ -431,8 +438,11 @@ ${AndIf} ${FileExists} "$DataBackupDir\data"
     ${If} ${FileExists} "$OldInstallDir\data"
         ; Existence-only: a partially-deleted data dir (locked files during the old
         ; uninstall) looks the same as a survived one, so the backup is always kept.
-        !insertmacro CockLog "post-uninstall restore: $OldInstallDir\data still exists, backup kept"
-        DetailPrint "Previous user data is still in place; pre-uninstall backup kept at $DataBackupDir\data."
+        ; Merge the backup back over it to repair partial deletes; CopyFiles only
+        ; adds/overwrites, so a fully-survived dir is unaffected.
+        !insertmacro CockLog "post-uninstall restore: $OldInstallDir\data still exists, merging backup and keeping it"
+        CopyFiles /SILENT "$DataBackupDir\data\*.*" "$OldInstallDir\data\"
+        DetailPrint "Previous user data is still in place; pre-uninstall backup merged back and kept at $DataBackupDir\data."
     ${Else}
         !insertmacro CockLog "post-uninstall restore: restoring $OldInstallDir\data"
         CreateDirectory "$OldInstallDir\data"
@@ -454,7 +464,7 @@ ${AndIf} ${FileExists} "$DataBackupDir\loose_decks"
     ${IfNot} ${Silent}
     ${AndIf} $LooseDeckNoticeShown != "1"
         StrCpy $LooseDeckNoticeShown "1"
-        MessageBox MB_OK|MB_ICONINFORMATION "Your decks were stored inside the Cockatrice install folder ($OldInstallDir), which the previous version's uninstaller deletes.$\n$\nThey have been restored from a backup to that folder. If you install to a different folder, they are moved there automatically. Please move them out of the install folder afterwards (Settings -> General -> Paths) so a future uninstall cannot delete them again."
+        MessageBox MB_OK|MB_ICONINFORMATION "Your decks were stored inside the Cockatrice install folder ($OldInstallDir), which the previous version's uninstaller deletes.$\n$\nThey have been restored from a backup to that folder (deck files ending in .txt are not backed up - move those manually). If you install to a different folder, they are moved there automatically. Please move them out of the install folder afterwards (Settings -> General -> Paths) so a future uninstall cannot delete them again."
     ${EndIf}
 ${EndIf}
 done:
@@ -466,30 +476,33 @@ FunctionEnd
 ; directory page, so $OldInstallDir (registry InstallLocation) is authoritative
 ; there while $INSTDIR is still the default. When the user then picks a different
 ; target directory, the restored user data would otherwise stay orphaned in the
-; old directory while the new install starts empty. Copy it across when they differ.
+; old directory while the new install starts empty. Copy it across when they differ
+; (a copy, not a move: the source is user data and is deliberately left in place).
+; StrCmp is case-sensitive while Windows paths are not; a casing-only difference
+; triggers a harmless redundant copy onto itself.
 Function RelocateRestoredDataToInstDir
 StrCmp $DataBackupDir "" done
 StrCmp $OldInstallDir "" done
 StrCmp $OldInstallDir $INSTDIR done
 ${If} $DataBackupDone == "1"
 ${AndIf} ${FileExists} "$OldInstallDir\data\*.*"
-    !insertmacro CockLog "relocate: moving restored data $OldInstallDir\data -> $INSTDIR\data"
+    !insertmacro CockLog "relocate: copying restored data $OldInstallDir\data -> $INSTDIR\data"
     CreateDirectory "$INSTDIR\data"
     CopyFiles /SILENT "$OldInstallDir\data\*.*" "$INSTDIR\data\"
-    DetailPrint "Moved restored user data to the new install folder."
+    DetailPrint "Copied restored user data to the new install folder."
 ${EndIf}
 ${If} $LooseDecksBackupDone == "1"
     ${If} ${FileExists} "$OldInstallDir\*.cod"
     ${OrIf} ${FileExists} "$OldInstallDir\*.dec"
     ${OrIf} ${FileExists} "$OldInstallDir\*.dek"
     ${OrIf} ${FileExists} "$OldInstallDir\*.mwDeck"
-        !insertmacro CockLog "relocate: moving restored decks $OldInstallDir -> $INSTDIR"
+        !insertmacro CockLog "relocate: copying restored decks $OldInstallDir -> $INSTDIR"
         CreateDirectory "$INSTDIR"
         CopyFiles /SILENT "$OldInstallDir\*.cod" "$INSTDIR\"
         CopyFiles /SILENT "$OldInstallDir\*.dec" "$INSTDIR\"
         CopyFiles /SILENT "$OldInstallDir\*.dek" "$INSTDIR\"
         CopyFiles /SILENT "$OldInstallDir\*.mwDeck" "$INSTDIR\"
-        DetailPrint "Moved restored deck files to the new install folder."
+        DetailPrint "Copied restored deck files to the new install folder."
     ${EndIf}
 ${EndIf}
 done:

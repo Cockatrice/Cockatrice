@@ -636,8 +636,9 @@ void MainWindow::warnAboutDataPathsInProgramDir()
         const QString dataDir = SettingsCache::instance().getDataPath();
         for (const QString &sub :
              QStringList{QStringLiteral("decks"), QStringLiteral("customsets"), QStringLiteral("settings"),
-                         QStringLiteral("filters"), QStringLiteral("themes"), QStringLiteral("pics/CUSTOM")}) {
-            const QString candidate = QDir(dataDir).absoluteFilePath(sub);
+                         QStringLiteral("filters"), QStringLiteral("themes"), QStringLiteral("sounds"),
+                         QStringLiteral("pics/CUSTOM")}) {
+            const QString candidate = QDir::cleanPath(QDir(dataDir).absoluteFilePath(sub));
             if (QFileInfo::exists(candidate)) {
                 backupSources.append(candidate);
             }
@@ -651,9 +652,11 @@ void MainWindow::warnAboutDataPathsInProgramDir()
         // already-collected sources it supersedes them.
         offenders = paths.pathsInsideDir(appDir);
         for (const QString &offender : offenders) {
-            if (!QFileInfo::exists(offender) || backupSources.contains(offender)) {
+            if (!QFileInfo::exists(offender)) {
                 continue;
             }
+            // isInsideDir is equality-aware and case-insensitive on Windows/macOS,
+            // so it also covers exact duplicates with different casing or separators.
             bool alreadyCovered = false;
             for (const QString &existing : backupSources) {
                 if (PathsSettings::isInsideDir(offender, existing)) {
@@ -698,48 +701,58 @@ void MainWindow::warnAboutDataPathsInProgramDir()
             }
         }
     }
-    // The copy runs synchronously on the UI thread at startup, so cap it: a
-    // pictures folder pointed into the program dir can be gigabytes, and freezing
-    // the client to duplicate it is worse than asking for a manual copy.
-    // Portable sources are small by construction (downloaded pictures and replays
-    // are excluded above); this guard bites for non-portable offenders.
+    // Throttle: dismissing the dialog without "Don't show again" must not create
+    // a full duplicate on every launch. A recent session is reused only when it is
+    // complete and its source manifest covers the current source set; otherwise a
+    // fresh copy is taken so the dialog never claims an uncovered path is backed up.
+    // The size estimate runs only when a fresh copy is actually going to happen,
+    // keeping a synchronous tree walk off the reuse fast path at startup.
+    QStringList backupLocations;
+    QString sessionDir;
+    bool backupComplete = true;
+    bool backupReused = false;
     bool backupSkippedDueToSize = false;
     qint64 backupBytes = 0;
-    if (!sourcesToBackUp.isEmpty()) {
+    const QString recentSession = UserDataBackup::findRecentBackupSession(backupRoot, 24);
+    QStringList recentLocations;
+    bool recentUsable = false;
+    if (!recentSession.isEmpty()) {
+        recentLocations = UserDataBackup::listSessionBackupLocations(recentSession);
+        recentUsable = !recentLocations.isEmpty() && UserDataBackup::isBackupSessionComplete(recentSession) &&
+                       UserDataBackup::sessionCoversSources(recentSession, sourcesToBackUp);
+    }
+    if (recentUsable) {
+        sessionDir = recentSession;
+        backupLocations = recentLocations;
+        backupComplete = true;
+        backupReused = true;
+        qCInfo(MainWindowLog) << "Reusing recent at-risk user data backup at" << sessionDir;
+    } else if (!sourcesToBackUp.isEmpty()) {
+        // The copy runs synchronously on the UI thread at startup, so cap it: a
+        // pictures folder pointed into the program dir can be gigabytes, and freezing
+        // the client to duplicate it is worse than asking for a manual copy.
+        // Portable sources are small by construction (downloaded pictures and replays
+        // are excluded above); this guard bites for non-portable offenders.
         backupBytes = UserDataBackup::estimateBackupSize(sourcesToBackUp);
         if (backupBytes >= UserDataBackup::MAX_AUTO_BACKUP_BYTES) {
             backupSkippedDueToSize = true;
             qCWarning(MainWindowLog) << "At-risk user data backup skipped: estimated" << backupBytes
                                      << "bytes exceeds automatic cap";
+        } else {
+            // One timestamped session directory for all sources, so a second boundary
+            // never splits a single startup check across two backup folders and
+            // same-named sources cannot overwrite each other.
+            backupComplete =
+                UserDataBackup::backupAtRiskPaths(sourcesToBackUp, backupRoot, &backupLocations, &sessionDir);
+            UserDataBackup::pruneOldBackupSessions(backupRoot, 5);
+            if (backupLocations.isEmpty() && !recentLocations.isEmpty()) {
+                // Fresh copy failed entirely: fall back to the recent session so the
+                // dialog still points at something, flagged incomplete below.
+                sessionDir = recentSession;
+                backupLocations = recentLocations;
+                backupComplete = false;
+            }
         }
-    }
-    // Throttle: dismissing the dialog without "Don't show again" must not create
-    // a full duplicate on every launch. Reuse a recent session instead, and keep
-    // only a handful of sessions so Documents cannot grow without bound.
-    QStringList backupLocations;
-    QString sessionDir;
-    bool backupComplete = true;
-    bool backupReused = false;
-    const QString recentSession = UserDataBackup::findRecentBackupSession(backupRoot, 24);
-    if (!recentSession.isEmpty()) {
-        const QStringList reused = UserDataBackup::listSessionBackupLocations(recentSession);
-        if (!reused.isEmpty()) {
-            sessionDir = recentSession;
-            backupLocations = reused;
-            // A reused session keeps the completeness it was recorded with, so a
-            // previously partial backup is still presented with the manual-copy
-            // warning instead of as a success.
-            backupComplete = UserDataBackup::isBackupSessionComplete(recentSession);
-            backupReused = true;
-            qCInfo(MainWindowLog) << "Reusing recent at-risk user data backup at" << sessionDir;
-        }
-    }
-    if (!backupReused && !backupSkippedDueToSize && !sourcesToBackUp.isEmpty()) {
-        // One timestamped session directory for all sources, so a second boundary
-        // never splits a single startup check across two backup folders and
-        // same-named sources cannot overwrite each other.
-        backupComplete = UserDataBackup::backupAtRiskPaths(sourcesToBackUp, backupRoot, &backupLocations, &sessionDir);
-        UserDataBackup::pruneOldBackupSessions(backupRoot, 5);
     }
     for (const QString &backupLocation : backupLocations) {
         qCInfo(MainWindowLog) << "Backed up at-risk user data to" << backupLocation;
@@ -757,7 +770,8 @@ void MainWindow::warnAboutDataPathsInProgramDir()
         if (!backupLocations.isEmpty()) {
             message = tr("This portable install keeps its data inside the program directory, where the "
                          "uninstallers shipped in Cockatrice 3.1.0/3.1.1 delete everything on uninstall or "
-                         "update.\n\nA safety backup of your decks, custom sets, settings, filters, themes and custom "
+                         "update.\n\nA safety backup of your decks, custom sets, settings, filters, themes, sounds and "
+                         "custom "
                          "pictures %1 "
                          "at:\n%2\n\nReplays and downloaded pictures are not included in this backup. Uninstalling "
                          "with the old uninstaller still deletes the program "

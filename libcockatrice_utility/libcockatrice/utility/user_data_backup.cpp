@@ -15,10 +15,20 @@ namespace
 
 const QString COMPLETE_MARKER = QStringLiteral("backup.complete");
 const QString INCOMPLETE_MARKER = QStringLiteral("backup.incomplete");
+const QString SOURCES_MANIFEST = QStringLiteral("backup.sources");
 
 bool isMarkerFile(const QString &fileName)
 {
-    return fileName == COMPLETE_MARKER || fileName == INCOMPLETE_MARKER;
+    return fileName == COMPLETE_MARKER || fileName == INCOMPLETE_MARKER || fileName == SOURCES_MANIFEST;
+}
+
+bool pathsEqual(const QString &a, const QString &b)
+{
+#if defined(Q_OS_WIN) || defined(Q_OS_MACOS)
+    return QDir::cleanPath(a).compare(QDir::cleanPath(b), Qt::CaseInsensitive) == 0;
+#else
+    return QDir::cleanPath(a) == QDir::cleanPath(b);
+#endif
 }
 
 void writeCompletionMarker(const QString &sessionDir, bool complete)
@@ -114,8 +124,12 @@ bool backupAtRiskPath(const QString &sourcePath, const QString &backupRoot, QStr
 {
     QStringList locations;
     const bool ok = backupAtRiskPaths({sourcePath}, backupRoot, &locations, nullptr);
-    if (!locations.isEmpty() && backupLocationOut) {
-        *backupLocationOut = locations.first();
+    if (backupLocationOut) {
+        if (!locations.isEmpty()) {
+            *backupLocationOut = locations.first();
+        } else {
+            backupLocationOut->clear();
+        }
     }
     return ok;
 }
@@ -143,6 +157,12 @@ bool backupAtRiskPaths(const QStringList &sourcePaths,
 
     QString sessionDir;
     if (!createBackupSessionDir(backupRoot, &sessionDir)) {
+        if (backupLocationsOut) {
+            backupLocationsOut->clear();
+        }
+        if (sessionDirOut) {
+            sessionDirOut->clear();
+        }
         return false;
     }
     if (sessionDirOut) {
@@ -184,6 +204,14 @@ bool backupAtRiskPaths(const QStringList &sourcePaths,
         return false;
     }
     writeCompletionMarker(sessionDir, allOk);
+    // Record which sources this session covers so callers can reuse it only
+    // when it actually covers the current source set (see sessionCoversSources).
+    QFile manifest(QDir(sessionDir).absoluteFilePath(SOURCES_MANIFEST));
+    if (manifest.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        for (const QString &sourcePath : existing) {
+            manifest.write(QDir::cleanPath(sourcePath).toUtf8() + "\n");
+        }
+    }
     if (backupLocationsOut) {
         *backupLocationsOut = locations;
     }
@@ -323,6 +351,36 @@ QStringList listSessionBackupLocations(const QString &sessionDir)
         locations.append(session.absoluteFilePath(entry));
     }
     return locations;
+}
+
+bool sessionCoversSources(const QString &sessionDir, const QStringList &sourcePaths)
+{
+    QFile manifest(QDir(sessionDir).absoluteFilePath(SOURCES_MANIFEST));
+    if (!manifest.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        // Legacy sessions predate the manifest: coverage cannot be verified,
+        // so report not-covered and let the caller take a fresh copy.
+        return false;
+    }
+    QStringList recorded;
+    while (!manifest.atEnd()) {
+        const QString line = QString::fromUtf8(manifest.readLine()).trimmed();
+        if (!line.isEmpty()) {
+            recorded.append(line);
+        }
+    }
+    for (const QString &source : sourcePaths) {
+        bool found = false;
+        for (const QString &entry : recorded) {
+            if (pathsEqual(source, entry)) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            return false;
+        }
+    }
+    return true;
 }
 
 } // namespace UserDataBackup
