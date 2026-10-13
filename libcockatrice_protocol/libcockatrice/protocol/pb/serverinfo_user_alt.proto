@@ -13,4 +13,8 @@ message ServerInfo_UserAlt {
     optional uint32 warn_count = 6;        // number of warnings on record
     optional uint32 ban_count = 7;         // number of bans on record
     optional bool is_active = 8;           // account is not deactivated/banned
+    optional string match_reason = 9; // why flagged, e.g. "email", "clientid:abc", "ip:1.2.3.4"; empty = seed/legacy
+    optional uint32 depth = 10;       // BFS distance from investigated account; 1 = direct, 2+ = alt-of-alt
+    optional uint32 shared_count =
+        11; // distinct users sharing the matched identifier; high values suggest VPN/shared network
 }
