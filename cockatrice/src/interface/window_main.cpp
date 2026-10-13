@@ -643,6 +643,28 @@ void MainWindow::warnAboutDataPathsInProgramDir()
                 backupSources.append(candidate);
             }
         }
+        // Card database files live in dataDir by default but are not in the list above. Seed them
+        // explicitly so they do not depend on the offender merge below to be backed up.
+        for (const QString &dbFile : QStringList{paths.getCardDatabasePath(), paths.getTokenDatabasePath(),
+                                                 paths.getSpoilerCardDatabasePath()}) {
+            if (dbFile.isEmpty()) {
+                continue;
+            }
+            const QString cleanedDbFile = QDir::cleanPath(dbFile);
+            if (!QFileInfo::exists(cleanedDbFile) || !PathsSettings::isInsideDir(cleanedDbFile, appDir)) {
+                continue;
+            }
+            bool alreadyCovered = false;
+            for (const QString &existing : backupSources) {
+                if (PathsSettings::isInsideDir(cleanedDbFile, existing)) {
+                    alreadyCovered = true;
+                    break;
+                }
+            }
+            if (!alreadyCovered) {
+                backupSources.append(cleanedDbFile);
+            }
+        }
         // A portable user may also have pointed a custom path inside the install
         // dir. Offenders outside data/ (e.g. appDir/mydecks) would be wiped by the
         // old uninstaller but are not in the hardcoded list above - and neither
@@ -650,16 +672,38 @@ void MainWindow::warnAboutDataPathsInProgramDir()
         // old uninstaller deletes all the same. Cover any offender that is not
         // already inside a backed-up source; when an offender is a parent of
         // already-collected sources it supersedes them.
+        // The merge respects the exclusion policy above: replays, downloaded pictures
+        // (everything under pics/ except the seeded CUSTOM dir) and the regenerable
+        // redirect/cache dir are never pulled back in through this path.
+        const QString replaysPath = QDir::cleanPath(paths.getReplaysPath());
+        const QString picsPath = QDir::cleanPath(paths.getPicsPath());
+        const QString customPicsPath = QDir::cleanPath(paths.getCustomPicsPath());
+        const QString redirectsPath = QDir::cleanPath(paths.getRedirectCachePath());
+        const QString cacheDir = QDir::cleanPath(SettingsCache::instance().getCachePath());
         offenders = paths.pathsInsideDir(appDir);
         for (const QString &offender : offenders) {
             if (!QFileInfo::exists(offender)) {
+                continue;
+            }
+            const QString cleanedOffender = QDir::cleanPath(offender);
+            if (!replaysPath.isEmpty() && PathsSettings::isInsideDir(cleanedOffender, replaysPath)) {
+                continue;
+            }
+            if (!picsPath.isEmpty() && PathsSettings::isInsideDir(cleanedOffender, picsPath) &&
+                (customPicsPath.isEmpty() || !PathsSettings::isInsideDir(cleanedOffender, customPicsPath))) {
+                continue;
+            }
+            if (!redirectsPath.isEmpty() && PathsSettings::isInsideDir(cleanedOffender, redirectsPath)) {
+                continue;
+            }
+            if (!cacheDir.isEmpty() && PathsSettings::isInsideDir(cleanedOffender, cacheDir)) {
                 continue;
             }
             // isInsideDir is equality-aware and case-insensitive on Windows/macOS,
             // so it also covers exact duplicates with different casing or separators.
             bool alreadyCovered = false;
             for (const QString &existing : backupSources) {
-                if (PathsSettings::isInsideDir(offender, existing)) {
+                if (PathsSettings::isInsideDir(cleanedOffender, existing)) {
                     alreadyCovered = true;
                     break;
                 }
@@ -668,11 +712,11 @@ void MainWindow::warnAboutDataPathsInProgramDir()
                 continue;
             }
             for (int i = backupSources.size() - 1; i >= 0; --i) {
-                if (PathsSettings::isInsideDir(backupSources.at(i), offender)) {
+                if (PathsSettings::isInsideDir(backupSources.at(i), cleanedOffender)) {
                     backupSources.removeAt(i);
                 }
             }
-            backupSources.append(offender);
+            backupSources.append(cleanedOffender);
         }
         // A fresh portable install has no data on disk yet, but the user still
         // needs to know their data will live where the 3.1.0/3.1.1 uninstaller
