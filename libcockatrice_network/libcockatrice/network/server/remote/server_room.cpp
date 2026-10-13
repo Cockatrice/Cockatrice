@@ -379,7 +379,7 @@ void Server_Room::say(const QString &userName, const QString &userMessage, const
     }
 }
 
-void Server_Room::removeSaidMessages(const QString &userName, int amount, bool sendToIsl, const QString &channelId)
+void Server_Room::removeSaidMessages(const QString &userName, int amount, bool sendToIsl)
 {
     Event_RemoveMessages event;
     auto stdStringUserName = userName.toStdString();
@@ -388,15 +388,17 @@ void Server_Room::removeSaidMessages(const QString &userName, int amount, bool s
     sendRoomEvent(prepareRoomEvent(event), sendToIsl);
 
     if (chatHistorySize != 0) {
-        int removed = 0;
-        const QString storageKey = isMainChannel(channelId) ? MAIN_CHANNEL_KEY : channelId;
         historyLock.lockForWrite();
-        QList<ServerInfo_ChatMessage> &history = channelChatHistory[storageKey];
-        // redact [amount] of the most recent messages from this user from history
-        for (auto message = history.rbegin(); message != history.rend() && removed != amount; ++message) {
-            if (message->sender_name() == stdStringUserName) {
-                message->clear_message();
-                ++removed;
+        // redact [amount] of the most recent messages from this user from every channel history,
+        // so removed content does not resurface for late joiners on any stream
+        for (auto historyIt = channelChatHistory.begin(); historyIt != channelChatHistory.end(); ++historyIt) {
+            QList<ServerInfo_ChatMessage> &history = historyIt.value();
+            int removed = 0;
+            for (auto message = history.rbegin(); message != history.rend() && removed != amount; ++message) {
+                if (message->sender_name() == stdStringUserName) {
+                    message->clear_message();
+                    ++removed;
+                }
             }
         }
         historyLock.unlock();
