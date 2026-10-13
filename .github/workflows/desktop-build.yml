@@ -189,7 +189,7 @@ jobs:
         id: restore_image_cache
         uses: actions/cache/restore@v6
         with:
-          key: image-${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}
+          key: image-${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}-${{ hashFiles(format('.ci/{0}{1}/**', matrix.distro, matrix.version)) }}
           path: ${{ env.CACHE }}/image
 
       - name: "Build ${{ matrix.distro }} ${{ matrix.version }} Docker image"
