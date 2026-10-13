@@ -154,12 +154,14 @@ TabAlts::TabAlts(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
 
     altsTable = new QTableWidget(0, COL_ALTS_COUNT);
     configureAltTable(altsTable);
-    altsDelegate = new AltTableDelegate(COL_ALTS_VIA, COL_ALTS_WARNS, COL_ALTS_BANS, COL_ALTS_SHARED, altsTable);
+    altsDelegate =
+        new AltTableDelegate(COL_ALTS_VIA, COL_ALTS_WARNS, COL_ALTS_BANS, COL_ALTS_SHARED, COL_ALTS_ACTIVE, altsTable);
     altsDelegate->setVpnThreshold(vpnSpin->value());
     connect(vpnSpin, &QSpinBox::valueChanged, altsDelegate, &AltTableDelegate::setVpnThreshold);
     altsTable->setItemDelegateForColumn(COL_ALTS_VIA, altsDelegate);
     altsTable->setItemDelegateForColumn(COL_ALTS_WARNS, altsDelegate);
     altsTable->setItemDelegateForColumn(COL_ALTS_BANS, altsDelegate);
+    altsTable->setItemDelegateForColumn(COL_ALTS_ACTIVE, altsDelegate);
     connect(altsTable, &QTableWidget::activated, this, [this](const QModelIndex &index) {
         if (!index.isValid()) {
             return;
@@ -456,7 +458,9 @@ void TabAlts::renderTable()
         altsTable->setItem(row, COL_ALTS_LAST_LOGIN, new QTableWidgetItem(formatEpoch(alt.last_login())));
         altsTable->setItem(row, COL_ALTS_WARNS, new QTableWidgetItem(QString::number(alt.warn_count())));
         altsTable->setItem(row, COL_ALTS_BANS, new QTableWidgetItem(QString::number(alt.ban_count())));
-        altsTable->setItem(row, COL_ALTS_ACTIVE, new QTableWidgetItem(alt.is_active() ? tr("yes") : tr("no")));
+        auto *activeItem = new QTableWidgetItem(alt.is_active() ? tr("yes") : tr("no"));
+        activeItem->setData(Qt::UserRole, alt.is_active());
+        altsTable->setItem(row, COL_ALTS_ACTIVE, activeItem);
         if (QString::fromStdString(alt.match_reason()).startsWith(QStringLiteral("ip:")) && alt.has_shared_count() &&
             alt.shared_count() > 1) {
             for (int col = 0; col < COL_ALTS_COUNT; ++col) {

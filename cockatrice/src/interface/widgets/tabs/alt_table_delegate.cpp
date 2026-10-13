@@ -15,9 +15,14 @@ constexpr int PILL_PAD_Y = 4;
 constexpr int ICON_TEXT_GAP = 4;
 } // namespace
 
-AltTableDelegate::AltTableDelegate(int viaColumn, int warnsColumn, int bansColumn, int sharedColumn, QObject *parent)
+AltTableDelegate::AltTableDelegate(int viaColumn,
+                                   int warnsColumn,
+                                   int bansColumn,
+                                   int sharedColumn,
+                                   int activeColumn,
+                                   QObject *parent)
     : QStyledItemDelegate(parent), viaColumn(viaColumn), warnsColumn(warnsColumn), bansColumn(bansColumn),
-      sharedColumn(sharedColumn)
+      sharedColumn(sharedColumn), activeColumn(activeColumn)
 {
 }
 
@@ -116,13 +121,21 @@ void AltTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
         }
     }
 
+    if (index.column() == activeColumn) {
+        const QVariant activeData = index.data(Qt::UserRole);
+        const bool active =
+            activeData.isValid() ? activeData.toBool() : text.compare(QStringLiteral("yes"), Qt::CaseInsensitive) == 0;
+        paintPill(active ? QPalette::Highlight : QPalette::PlaceholderText, emphasisRole, QIcon(), text);
+        return;
+    }
+
     QStyledItemDelegate::paint(painter, opt, index);
 }
 
 QSize AltTableDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     const QSize hint = QStyledItemDelegate::sizeHint(option, index);
-    if (index.column() == viaColumn) {
+    if (index.column() == viaColumn || index.column() == activeColumn) {
         return hint + QSize(PILL_PAD_X + 2 * ICON_TEXT_GAP, PILL_PAD_Y);
     }
     if (index.column() == warnsColumn || index.column() == bansColumn) {
