@@ -110,6 +110,7 @@ void CardDatabaseSettings::saveSets(const QVector<ICardSetPriorityController::Se
             s.beginGroup(entry.shortName);
             s.setValue("sortKey", entry.sortKey);
             s.setValue("enabled", entry.enabled);
+            s.setValue("isKnown", entry.isKnown);
             s.endGroup();
         }
         s.endGroup();
@@ -121,5 +122,6 @@ void CardDatabaseSettings::saveSets(const QVector<ICardSetPriorityController::Se
         SetOptions &o = setOptionsCache[entry.shortName];
         o.sortKey = entry.sortKey;
         o.enabled = entry.enabled;
+        o.isKnown = entry.isKnown;
     }
 }

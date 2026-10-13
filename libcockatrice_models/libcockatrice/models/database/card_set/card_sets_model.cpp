@@ -266,7 +266,7 @@ void SetsModel::save(CardDatabase *db)
         const bool enabled = enabledSets.contains(sets[i]);
         sets[i]->setSortKeyInMemory(sortKey);
         sets[i]->setEnabledInMemory(enabled);
-        saveData.append({sets[i]->getShortName(), sortKey, enabled});
+        saveData.append({sets[i]->getShortName(), sortKey, enabled, sets[i]->getIsKnown()});
     }
 
     db->getPriorityController()->saveSets(saveData);

@@ -70,6 +70,7 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QFlags>
+#include <QFutureWatcher>
 #include <QIODevice>
 #include <QLocalSocket>
 #include <QMenu>
@@ -640,10 +641,10 @@ void MainWindow::startupConfigCheck()
 
     const bool isCleanInstall = SettingsCache::instance().network().getClientVersion() == CLIENT_INFO_NOT_SET;
 
-    // checkUnknownSets() is intentionally deferred from the card database load
-    // (which runs in main() before MainWindow exists) so that
-    // cardDatabaseNewSetsFound / cardDatabaseAllNewSetsEnabled have live
-    // receivers when emitted.
+    // The loader never runs checkUnknownSets() itself (see main.cpp): the
+    // front-loaded parse runs before MainWindow exists, so
+    // cardDatabaseNewSetsFound / cardDatabaseAllNewSetsEnabled would have no
+    // receivers. MainWindow owns the check after startup.
     // On a clean install the onboarding wizard owns the first-run experience;
     // wait until it closes so the legacy "all sets enabled" welcome and the
     // Manage Sets dialog don't appear first.
@@ -1137,18 +1138,35 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
 
 void MainWindow::cardDatabaseAllNewSetsEnabled()
 {
-    if (firstRunWizardActive || CardDatabaseManager::getInstance()->getCardList().isEmpty()) {
-        // The onboarding wizard owns the first-run messaging on a clean install,
-        // and with no card data there are no sets to have enabled.
+    auto *cardDatabase = CardDatabaseManager::getInstance();
+
+    // With no card data there is nothing to have enabled and nothing to reparse.
+    if (cardDatabase->getCardList().isEmpty()) {
         return;
     }
 
-    QMessageBox::information(
-        this, tr("Welcome"),
-        tr("Hi! It seems like you're running this version of Cockatrice for the first time.\nAll the sets in the card "
-           "database have been enabled.\nRead more about changing the set order or disabling specific sets and "
-           "consequent effects in the \"Manage Sets\" dialog."));
-    actManageSets();
+    // checkUnknownSets() enabled every set after the database had already been
+    // parsed under the (empty) first-run enablement, so the parser dropped every
+    // printing of every set. Reparse now that the sets are enabled, otherwise the
+    // deck editor's card database display stays empty until the next launch.
+    auto *watcher = new QFutureWatcher<void>(this);
+    connect(watcher, &QFutureWatcher<void>::finished, this, [this, watcher] {
+        watcher->deleteLater();
+        if (firstRunWizardActive) {
+            // The onboarding wizard owns the first-run messaging on a clean install.
+            return;
+        }
+        QMessageBox::information(
+            this, tr("Welcome"),
+            tr("Hi! It seems like you're running this version of Cockatrice for the first time.\nAll the sets in the "
+               "card "
+               "database have been enabled.\nRead more about changing the set order or disabling specific sets and "
+               "consequent effects in the \"Manage Sets\" dialog."));
+        // The reload above replaces the set instances, so Manage Sets must open
+        // only after the finished snapshot has been swapped in.
+        actManageSets();
+    });
+    watcher->setFuture(QtConcurrent::run([cardDatabase] { cardDatabase->reloadCardDatabasesAndNotify(); }));
 }
 
 /* CARD UPDATER */
@@ -1321,7 +1339,19 @@ void MainWindow::exitCardDatabaseUpdate()
     cardUpdateProcess = nullptr;
     statusBar()->clearMessage();
 
-    const auto reloadOk1 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
+    // This can be the first successful load of the session (e.g. the onboarding
+    // download), so it must own the set check for that load.
+    reloadCardDatabaseAndCheckSets();
+}
+
+void MainWindow::reloadCardDatabaseAndCheckSets()
+{
+    auto *watcher = new QFutureWatcher<void>(this);
+    connect(watcher, &QFutureWatcher<void>::finished, this, [watcher] {
+        watcher->deleteLater();
+        CardDatabaseManager::getInstance()->checkUnknownSets();
+    });
+    watcher->setFuture(QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); }));
 }
 
 void MainWindow::cardUpdateError(QProcess::ProcessError err)
@@ -1523,7 +1553,8 @@ void MainWindow::actAddCustomSet()
         QMessageBox::information(
             this, tr("Load sets/cards"),
             tr("The new sets/cards have been added successfully.\nCockatrice will now reload the card database."));
-        const auto reloadOk1 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
+        // Imported files can introduce sets the config has never seen.
+        reloadCardDatabaseAndCheckSets();
     } else {
         QMessageBox::warning(this, tr("Load sets/cards"), tr("Sets/cards failed to import."));
     }

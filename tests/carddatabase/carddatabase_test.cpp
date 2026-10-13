@@ -159,16 +159,19 @@ public:
 
     void setSortKey(QString shortName, unsigned int sortKey) override
     {
+        ++individualWrites;
         setOptions[shortName].sortKey = sortKey;
     }
 
     void setEnabled(QString shortName, bool enabled) override
     {
+        ++individualWrites;
         setOptions[shortName].enabled = enabled;
     }
 
     void setIsKnown(QString shortName, bool isknown) override
     {
+        ++individualWrites;
         setOptions[shortName].isKnown = isknown;
     }
 
@@ -206,11 +209,16 @@ public:
 
     void saveSets(const QVector<SetSaveData> &data) override
     {
+        ++batchedWrites;
         for (const SetSaveData &entry : data) {
             setOptions[entry.shortName].sortKey = entry.sortKey;
             setOptions[entry.shortName].enabled = entry.enabled;
+            setOptions[entry.shortName].isKnown = entry.isKnown;
         }
     }
+
+    int individualWrites = 0; ///< Per-set/per-option controller writes (the slow path).
+    int batchedWrites = 0;    ///< Batched saveSets() flushes (the fast path).
 
 private:
     QHash<QString, SetOptions> setOptions;
@@ -374,6 +382,131 @@ TEST_F(CardDatabaseCacheInvalidationTest, ExplicitReloadBypassesCache)
     ASSERT_FALSE(db.getCardList().value("Cat").isNull());
     EXPECT_FALSE(db.getCardList().value("Cat")->getSets().contains("CAT"));
     EXPECT_TRUE(db.getCardList().value("Cat")->getSets().contains("DOG"));
+}
+
+TEST_F(CardDatabaseCacheInvalidationTest, FirstRunWithNoSetsEnabledSkipsCacheWrite)
+{
+    // A blank config: the parser discovers every set, but none of them has an
+    // ini entry, so all of them default to disabled (first run).
+    SeededSetPriorityController blankController;
+    NoopCardPreferenceProvider prefs;
+    SandboxPathProvider pathProvider(root);
+    CardDatabase db(nullptr, &prefs, &pathProvider, &blankController);
+
+    db.loadCardDatabases();
+    ASSERT_FALSE(db.getCardList().value("Cat").isNull()) << "cards are parsed even while their sets are disabled";
+    EXPECT_TRUE(db.getCardList().value("Cat")->getSets().isEmpty())
+        << "no printings survive an all-sets-disabled parse";
+    EXPECT_TRUE(cacheContents().isEmpty()) << "a stripped first-run snapshot must not be cached";
+}
+
+TEST_F(CardDatabaseCacheInvalidationTest, EnablingAllSetsAfterFirstRunRestoresPrintings)
+{
+    SeededSetPriorityController blankController;
+    NoopCardPreferenceProvider prefs;
+    SandboxPathProvider pathProvider(root);
+    CardDatabase db(nullptr, &prefs, &pathProvider, &blankController);
+
+    db.loadCardDatabases();
+    ASSERT_TRUE(cacheContents().isEmpty());
+
+    // This mirrors what checkUnknownSets() does on a first run: enable every
+    // set, then reload so the parser keeps the printings and the complete
+    // snapshot gets cached under the enabled-set hash.
+    for (const CardSetPtr &set : db.getSetList()) {
+        blankController.setEnabled(set->getShortName(), true);
+    }
+    db.reloadCardDatabasesAndNotify();
+
+    ASSERT_FALSE(db.getCardList().value("Cat").isNull());
+    EXPECT_TRUE(db.getCardList().value("Cat")->getSets().contains("CAT"));
+    EXPECT_FALSE(cacheContents().isEmpty()) << "the enabled-set snapshot must be cached";
+}
+
+TEST_F(CardDatabaseCacheInvalidationTest, CheckUnknownSetsBatchesFirstRunEnableAll)
+{
+    // Same first-run starting point as above, but driven through the real
+    // checkUnknownSets() path, which must persist the enable-all with a single
+    // batched saveSets() instead of per-set/per-option controller writes.
+    SeededSetPriorityController blankController;
+    NoopCardPreferenceProvider prefs;
+    SandboxPathProvider pathProvider(root);
+    CardDatabase db(nullptr, &prefs, &pathProvider, &blankController);
+
+    db.loadCardDatabases();
+    ASSERT_TRUE(db.getSetList().getEnabledSetsNum() == 0);
+
+    db.checkUnknownSets();
+
+    EXPECT_EQ(blankController.individualWrites, 0) << "first-run enable-all must not write per set";
+    EXPECT_EQ(blankController.batchedWrites, 1) << "first-run enable-all must persist with a single flush";
+    for (const CardSetPtr &set : db.getSetList()) {
+        EXPECT_TRUE(set->getEnabled()) << set->getShortName().toStdString();
+        EXPECT_TRUE(blankController.isEnabled(set->getShortName())) << set->getShortName().toStdString();
+        if (!set->getIsKnownIgnored()) {
+            EXPECT_TRUE(set->getIsKnown()) << set->getShortName().toStdString();
+            EXPECT_TRUE(blankController.isKnown(set->getShortName())) << set->getShortName().toStdString();
+        }
+    }
+
+    // The follow-up reload re-parses with the sets enabled, restoring printings.
+    db.reloadCardDatabasesAndNotify();
+    ASSERT_FALSE(db.getCardList().value("Cat").isNull());
+    EXPECT_TRUE(db.getCardList().value("Cat")->getSets().contains("CAT"));
+}
+
+TEST_F(CardDatabaseCacheInvalidationTest, EnableAllUnknownSetsIsBatched)
+{
+    // The "new sets found" dialog path: enabling the unknown delta must persist
+    // with a single flush no matter how many sets the database holds, so users
+    // with hundreds of custom sets don't stall the GUI thread. Built directly
+    // on CardSet objects because the fixture sets carry no metadata (and would
+    // all count as ignored).
+    SeededSetPriorityController controller;
+    CardSetList sets;
+    sets.append(
+        CardSet::newInstance(&controller, "AAA", "Alpha Set", "core", QDate(2020, 1, 1), CardSet::PriorityPrimary));
+    sets.append(
+        CardSet::newInstance(&controller, "BBB", "Beta Set", "expansion", QDate(2021, 6, 1), CardSet::PriorityPrimary));
+    sets.append(CardSet::newInstance(&controller, "XXX")); // no metadata: ignored
+
+    sets.enableAllUnknownBatched(&controller);
+
+    EXPECT_EQ(controller.individualWrites, 0) << "unknown-set enable must not write per set";
+    EXPECT_EQ(controller.batchedWrites, 1) << "unknown-set enable must persist with a single flush";
+    for (const CardSetPtr &set : sets) {
+        EXPECT_TRUE(set->getEnabled()) << set->getShortName().toStdString();
+        EXPECT_TRUE(controller.isEnabled(set->getShortName())) << set->getShortName().toStdString();
+        if (set->getIsKnownIgnored()) {
+            EXPECT_FALSE(set->getIsKnown()) << set->getShortName().toStdString();
+        } else {
+            EXPECT_TRUE(set->getIsKnown()) << set->getShortName().toStdString();
+            EXPECT_TRUE(controller.isKnown(set->getShortName())) << set->getShortName().toStdString();
+        }
+    }
+}
+
+TEST_F(CardDatabaseCacheInvalidationTest, MarkAllSetsAsKnownIsBatched)
+{
+    // The dialog's "No" path: same single-flush requirement as enabling.
+    SeededSetPriorityController controller;
+    CardSetList sets;
+    sets.append(
+        CardSet::newInstance(&controller, "AAA", "Alpha Set", "core", QDate(2020, 1, 1), CardSet::PriorityPrimary));
+    sets.append(
+        CardSet::newInstance(&controller, "BBB", "Beta Set", "expansion", QDate(2021, 6, 1), CardSet::PriorityPrimary));
+    sets.append(CardSet::newInstance(&controller, "XXX")); // no metadata: ignored
+
+    sets.markAllAsKnownBatched(&controller);
+
+    EXPECT_EQ(controller.individualWrites, 0) << "mark-known must not write per set";
+    EXPECT_EQ(controller.batchedWrites, 1) << "mark-known must persist with a single flush";
+    EXPECT_TRUE(controller.isKnown("AAA"));
+    EXPECT_TRUE(controller.isKnown("BBB"));
+    EXPECT_FALSE(controller.isEnabled("AAA"));
+    EXPECT_FALSE(controller.isEnabled("BBB"));
+    // Ignored sets keep their known state but are enabled.
+    EXPECT_TRUE(controller.isEnabled("XXX"));
 }
 } // namespace
 
