@@ -684,6 +684,29 @@ void MainWindow::warnAboutDataPathsInProgramDir()
         offenders.clear();
     } else {
         offenders = paths.pathsInsideDir(appDir);
+        // Loose decks sitting directly in the program folder are wiped by the old uninstaller
+        // just like configured paths. Mirror the installer backup set (DeckLoader extensions
+        // minus *.txt) so a manual run of the old uninstall.exe is covered too.
+        const QDir appDirHandle(appDir);
+        const QStringList topLevelFiles = appDirHandle.entryList(QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot);
+        for (const QString &fileName : topLevelFiles) {
+            const QString suffix = QFileInfo(fileName).suffix().toLower();
+            if (suffix != QStringLiteral("cod") && suffix != QStringLiteral("dec") && suffix != QStringLiteral("dek") &&
+                suffix != QStringLiteral("mwdeck")) {
+                continue;
+            }
+            const QString looseDeck = QDir::cleanPath(appDirHandle.absoluteFilePath(fileName));
+            bool alreadyCovered = false;
+            for (const QString &existing : offenders) {
+                if (PathsSettings::isInsideDir(looseDeck, existing)) {
+                    alreadyCovered = true;
+                    break;
+                }
+            }
+            if (!alreadyCovered) {
+                offenders.append(looseDeck);
+            }
+        }
         if (offenders.isEmpty()) {
             return;
         }
@@ -717,21 +740,12 @@ void MainWindow::warnAboutDataPathsInProgramDir()
     bool backupReused = false;
     bool backupSkippedDueToSize = false;
     qint64 backupBytes = 0;
-    const QString recentSession = UserDataBackup::findRecentBackupSession(backupRoot, 24);
-    QStringList recentLocations;
-    bool recentUsable = false;
-    if (!recentSession.isEmpty()) {
-        recentLocations = UserDataBackup::listSessionBackupLocations(recentSession);
-        // An empty source set must never reuse a session: sessionCoversSources is
-        // vacuously true for it, which would claim an unrelated recent backup
-        // covers paths that were never backed up.
-        recentUsable = !sourcesToBackUp.isEmpty() && !recentLocations.isEmpty() &&
-                       UserDataBackup::isBackupSessionComplete(recentSession) &&
-                       UserDataBackup::sessionCoversSources(recentSession, sourcesToBackUp);
-    }
-    if (recentUsable) {
-        sessionDir = recentSession;
-        backupLocations = recentLocations;
+    // Search all recent sessions for a complete, covering one: a partial failure must not
+    // pin the newest slot and force a full re-copy on every later launch.
+    const QString reusableSession = UserDataBackup::findRecentUsableBackupSession(backupRoot, sourcesToBackUp, 24);
+    if (!reusableSession.isEmpty()) {
+        sessionDir = reusableSession;
+        backupLocations = UserDataBackup::listSessionBackupLocations(reusableSession);
         backupComplete = true;
         backupReused = true;
         qCInfo(MainWindowLog) << "Reusing recent at-risk user data backup at" << sessionDir;
@@ -753,13 +767,14 @@ void MainWindow::warnAboutDataPathsInProgramDir()
             backupComplete =
                 UserDataBackup::backupAtRiskPaths(sourcesToBackUp, backupRoot, &backupLocations, &sessionDir);
             UserDataBackup::pruneOldBackupSessions(backupRoot, 5);
-            if (backupLocations.isEmpty() && !recentLocations.isEmpty()) {
-                // Fresh copy failed entirely: fall back to the recent session so the
-                // dialog still points at something, flagged incomplete below - but
-                // only when it actually covers the current sources.
-                if (!recentSession.isEmpty() && UserDataBackup::sessionCoversSources(recentSession, sourcesToBackUp)) {
-                    sessionDir = recentSession;
-                    backupLocations = recentLocations;
+            if (backupLocations.isEmpty()) {
+                // Fresh copy failed entirely: fall back to the newest covering session so the
+                // dialog still points at something, flagged incomplete below.
+                const QString fallbackSession =
+                    UserDataBackup::findRecentCoveringBackupSession(backupRoot, sourcesToBackUp, 24);
+                if (!fallbackSession.isEmpty()) {
+                    sessionDir = fallbackSession;
+                    backupLocations = UserDataBackup::listSessionBackupLocations(fallbackSession);
                     backupComplete = false;
                 }
             }
@@ -822,6 +837,18 @@ void MainWindow::warnAboutDataPathsInProgramDir()
             message += tr("\n\nA safety backup %1 at:\n%2").arg(backupVerb, backupLocations.join(QLatin1Char('\n')));
             if (!backupComplete) {
                 message += tr("\n\nThe backup may be incomplete; please back up these folders manually as well.");
+            }
+            bool hasLooseDecks = false;
+            for (const QString &offender : offenders) {
+                const QString suffix = QFileInfo(offender).suffix().toLower();
+                if (suffix == QStringLiteral("cod") || suffix == QStringLiteral("dec") ||
+                    suffix == QStringLiteral("dek") || suffix == QStringLiteral("mwdeck")) {
+                    hasLooseDecks = true;
+                    break;
+                }
+            }
+            if (hasLooseDecks) {
+                message += tr("\n\nDeck files ending in .txt are not backed up - move those manually.");
             }
         } else if (backupSkippedDueToSize) {
             message += tr("\n\nThe automatic safety backup was skipped because of its size: %1. "

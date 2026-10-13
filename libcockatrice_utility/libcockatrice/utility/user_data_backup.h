@@ -28,7 +28,8 @@ constexpr qint64 MAX_AUTO_BACKUP_BYTES = 500LL * 1024 * 1024;
 /**
  * @brief Recursively copies @p sourceDir into @p destDir, creating it as needed.
  * @returns true when every file was copied (or there was nothing to copy).
- * Symlinks are copied best-effort via QFile::copy; a dangling link fails that entry only.
+ * Symlinks (file or directory) are copied best-effort via QFile::copy without
+ * dereferencing them; a dangling link fails that entry only.
  */
 bool copyDirectoryRecursively(const QString &sourceDir, const QString &destDir);
 
@@ -96,10 +97,29 @@ QStringList listBackupSessions(const QString &backupRoot);
  *
  * Used to throttle startup safety backups so dismissing the warning without
  * "Don't show again" does not create a full duplicate on every launch.
- * Empty sessions (failed attempts) are skipped so they never block a retry,
- * and an expired newest entry stops the search since sessions are newest-first.
+ * Empty sessions (failed attempts) are skipped so they never block a retry.
+ * Every session is age-checked individually; no early exit assumes filename
+ * order matches mtime order (clock adjustments or externally touched dirs
+ * can break that assumption).
  */
 QString findRecentBackupSession(const QString &backupRoot, int maxAgeHours = 24);
+
+/**
+ * @brief Returns the newest session that is non-empty, complete and covering @p sourcePaths, or empty.
+ *
+ * Unlike findRecentBackupSession(), an incomplete newest session (partial failure) or one
+ * covering a different source set does not block reuse of an older good session.
+ */
+QString findRecentUsableBackupSession(const QString &backupRoot, const QStringList &sourcePaths, int maxAgeHours = 24);
+
+/**
+ * @brief Returns the newest non-empty session covering @p sourcePaths, regardless of completeness.
+ *
+ * Used as a fallback pointer when a fresh copy fails entirely, so the dialog can still
+ * point at salvaged content. Completeness is left to the caller to report.
+ */
+QString
+findRecentCoveringBackupSession(const QString &backupRoot, const QStringList &sourcePaths, int maxAgeHours = 24);
 
 /**
  * @brief Reports whether @p sessionDir holds a complete backup.

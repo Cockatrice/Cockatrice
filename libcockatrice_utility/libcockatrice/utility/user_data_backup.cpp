@@ -80,7 +80,19 @@ bool copyDirectoryRecursively(const QString &sourceDir, const QString &destDir)
         it.next();
         QString entryRel = source.relativeFilePath(it.filePath());
         QString target = QDir(destDir).absoluteFilePath(entryRel);
-        if (it.fileInfo().isDir()) {
+        if (it.fileInfo().isSymLink()) {
+            // Copy the link itself best-effort without dereferencing it. QDirIterator does not
+            // follow symlinks here, so a symlink-to-directory must not take the isDir() branch
+            // below (which would create an empty dir and silently drop the contents).
+            QDir().mkpath(QFileInfo(target).absolutePath());
+            if (QFile::exists(target) && !QFile::remove(target)) {
+                ok = false;
+                continue;
+            }
+            if (!QFile::copy(it.filePath(), target)) {
+                ok = false;
+            }
+        } else if (it.fileInfo().isDir()) {
             if (!QDir().mkpath(target)) {
                 ok = false;
             }
@@ -284,13 +296,65 @@ QString findRecentBackupSession(const QString &backupRoot, int maxAgeHours)
         if (!info.exists()) {
             continue;
         }
-        // Sessions are newest-first, so once an entry is too old every later
-        // one is older as well and the search can stop.
+        // No early break: filename order is not guaranteed to match mtime order
+        // (clock adjustments, externally touched dirs), and session counts are tiny.
         if (info.lastModified().secsTo(now) >= static_cast<qint64>(maxAgeHours) * 3600) {
-            break;
+            continue;
         }
         // Skip empty sessions from failed attempts: they must never block a retry.
         if (listSessionBackupLocations(session).isEmpty()) {
+            continue;
+        }
+        return session;
+    }
+    return {};
+}
+
+QString findRecentCoveringBackupSession(const QString &backupRoot, const QStringList &sourcePaths, int maxAgeHours)
+{
+    const QStringList sessions = listBackupSessions(backupRoot);
+    const QDateTime now = QDateTime::currentDateTime();
+    for (const QString &session : sessions) {
+        const QFileInfo info(session);
+        if (!info.exists()) {
+            continue;
+        }
+        if (info.lastModified().secsTo(now) >= static_cast<qint64>(maxAgeHours) * 3600) {
+            continue;
+        }
+        if (listSessionBackupLocations(session).isEmpty()) {
+            continue;
+        }
+        if (!sessionCoversSources(session, sourcePaths)) {
+            continue;
+        }
+        return session;
+    }
+    return {};
+}
+
+QString findRecentUsableBackupSession(const QString &backupRoot, const QStringList &sourcePaths, int maxAgeHours)
+{
+    if (sourcePaths.isEmpty()) {
+        return {};
+    }
+    const QStringList sessions = listBackupSessions(backupRoot);
+    const QDateTime now = QDateTime::currentDateTime();
+    for (const QString &session : sessions) {
+        const QFileInfo info(session);
+        if (!info.exists()) {
+            continue;
+        }
+        if (info.lastModified().secsTo(now) >= static_cast<qint64>(maxAgeHours) * 3600) {
+            continue;
+        }
+        if (listSessionBackupLocations(session).isEmpty()) {
+            continue;
+        }
+        if (!isBackupSessionComplete(session)) {
+            continue;
+        }
+        if (!sessionCoversSources(session, sourcePaths)) {
             continue;
         }
         return session;

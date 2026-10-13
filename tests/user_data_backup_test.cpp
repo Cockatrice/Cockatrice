@@ -447,6 +447,98 @@ TEST(UserDataBackup, ManifestIsHiddenFromSessionLocations)
     }
 }
 
+TEST(UserDataBackup, FindRecentUsableSkipsIncompleteNewest)
+{
+    QTemporaryDir sourceDir;
+    QTemporaryDir backupRoot;
+    ASSERT_TRUE(sourceDir.isValid());
+    ASSERT_TRUE(backupRoot.isValid());
+    QFile deck(QDir(sourceDir.path()).absoluteFilePath("mydeck.cod"));
+    ASSERT_TRUE(deck.open(QIODevice::WriteOnly | QIODevice::Text));
+    deck.write("<cockatrice_deck version=\"1\"/>\n");
+    deck.close();
+
+    QStringList locations;
+    QString oldSession;
+    QString newSession;
+    ASSERT_TRUE(UserDataBackup::backupAtRiskPaths({sourceDir.path()}, backupRoot.path(), &locations, &oldSession));
+    ASSERT_TRUE(UserDataBackup::backupAtRiskPaths({sourceDir.path()}, backupRoot.path(), &locations, &newSession));
+    ASSERT_NE(oldSession, newSession);
+
+    // Newest session becomes incomplete: usable search must fall back to the older complete one.
+    ASSERT_TRUE(QFile::remove(QDir(newSession).absoluteFilePath("backup.complete")));
+    QFile marker(QDir(newSession).absoluteFilePath("backup.incomplete"));
+    ASSERT_TRUE(marker.open(QIODevice::WriteOnly | QIODevice::Text));
+    marker.write("incomplete\n");
+    marker.close();
+
+    EXPECT_EQ(UserDataBackup::findRecentUsableBackupSession(backupRoot.path(), {sourceDir.path()}), oldSession);
+    // Covering search still finds the newest session even though it is incomplete.
+    EXPECT_EQ(UserDataBackup::findRecentCoveringBackupSession(backupRoot.path(), {sourceDir.path()}), newSession);
+}
+
+TEST(UserDataBackup, FindRecentUsableRequiresCoveringSet)
+{
+    QTemporaryDir sourceA;
+    QTemporaryDir sourceB;
+    QTemporaryDir backupRoot;
+    ASSERT_TRUE(sourceA.isValid());
+    ASSERT_TRUE(sourceB.isValid());
+    ASSERT_TRUE(backupRoot.isValid());
+    QFile fa(QDir(sourceA.path()).absoluteFilePath("a.cod"));
+    ASSERT_TRUE(fa.open(QIODevice::WriteOnly | QIODevice::Text));
+    fa.write("a");
+    fa.close();
+    QFile fb(QDir(sourceB.path()).absoluteFilePath("b.cod"));
+    ASSERT_TRUE(fb.open(QIODevice::WriteOnly | QIODevice::Text));
+    fb.write("b");
+    fb.close();
+
+    QStringList locations;
+    QString oldSession;
+    QString newSession;
+    ASSERT_TRUE(UserDataBackup::backupAtRiskPaths({sourceA.path()}, backupRoot.path(), &locations, &oldSession));
+    ASSERT_TRUE(UserDataBackup::backupAtRiskPaths({sourceB.path()}, backupRoot.path(), &locations, &newSession));
+
+    // Newest covers B only, so a query for A must reuse the older session.
+    EXPECT_EQ(UserDataBackup::findRecentUsableBackupSession(backupRoot.path(), {sourceA.path()}), oldSession);
+    EXPECT_EQ(UserDataBackup::findRecentUsableBackupSession(backupRoot.path(), {sourceB.path()}), newSession);
+    EXPECT_TRUE(
+        UserDataBackup::findRecentUsableBackupSession(backupRoot.path(), {sourceA.path(), sourceB.path()}).isEmpty());
+    EXPECT_TRUE(UserDataBackup::findRecentUsableBackupSession(backupRoot.path(), {}).isEmpty());
+}
+
+TEST(UserDataBackup, CopyDirectoryDoesNotSilentlyEmptyDirSymlink)
+{
+    QTemporaryDir sourceDir;
+    QTemporaryDir destParent;
+    ASSERT_TRUE(sourceDir.isValid());
+    ASSERT_TRUE(destParent.isValid());
+    QDir source(sourceDir.path());
+    ASSERT_TRUE(source.mkpath("real"));
+    QFile inner(source.absoluteFilePath("real/card.cod"));
+    ASSERT_TRUE(inner.open(QIODevice::WriteOnly | QIODevice::Text));
+    inner.write("x");
+    inner.close();
+    if (!QFile::link(source.absoluteFilePath("real"), source.absoluteFilePath("link"))) {
+        GTEST_SKIP() << "Symlinks not permitted in this environment";
+    }
+
+    QString dest = QDir(destParent.path()).absoluteFilePath("copy");
+    const bool ok = UserDataBackup::copyDirectoryRecursively(sourceDir.path(), dest);
+    const QFileInfo linkCopy(QDir(dest).absoluteFilePath("link"));
+    // Old behavior created an empty plain dir and reported success, silently dropping contents.
+    // New behavior copies the link best-effort; if that fails it must report failure.
+    if (ok) {
+        EXPECT_TRUE(linkCopy.exists() || linkCopy.isSymLink());
+        if (linkCopy.isDir() && !linkCopy.isSymLink()) {
+            EXPECT_FALSE(QDir(linkCopy.absoluteFilePath()).isEmpty());
+        }
+    } else {
+        EXPECT_TRUE(linkCopy.isSymLink() || !linkCopy.exists() || !QDir(linkCopy.absoluteFilePath()).isEmpty());
+    }
+}
+
 TEST(UserDataBackup, SingularBackupClearsOutParamOnTotalFailure)
 {
     QTemporaryDir backupRoot;

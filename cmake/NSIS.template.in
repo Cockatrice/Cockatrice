@@ -22,6 +22,8 @@ Var LooseDecksBackupDone
 Var LooseDeckNoticeShown
 Var StaleFindHandle
 Var StaleFindName
+Var DataBackupFindHandle
+Var DataBackupFindName
 Var IsUpgrade
 Var AbortReason
 Var WaitPid
@@ -399,10 +401,28 @@ ${AndIf} ${FileExists} "$OldInstallDir\data"
     !insertmacro CockLog "pre-uninstall backup: copying $OldInstallDir\data (downloaded pics excluded)"
     DetailPrint "Backing up portable user data before removing previous version..."
     CreateDirectory "$DataBackupDir\data"
-    CopyFiles /SILENT "$OldInstallDir\data\*.*" "$DataBackupDir\data\"
-    ; Downloaded pictures are large and re-downloadable, so drop them from the
-    ; safety backup - but keep user-made custom pics (data\pics\CUSTOM).
-    RMDir /r "$DataBackupDir\data\pics"
+    ; Copy every top-level entry except pics (downloaded pictures are large and
+    ; re-downloadable): copying everything first and deleting pics afterwards
+    ; would duplicate gigabytes into %TEMP% just to throw them away.
+    FindFirst $DataBackupFindHandle $DataBackupFindName "$OldInstallDir\data\*.*"
+    ${If} $DataBackupFindHandle != ""
+    backup_data_loop:
+        ${If} $DataBackupFindName != "."
+        ${AndIf} $DataBackupFindName != ".."
+        ${AndIf} $DataBackupFindName != "pics"
+            ${If} ${FileExists} "$OldInstallDir\data\$DataBackupFindName\*.*"
+                CreateDirectory "$DataBackupDir\data\$DataBackupFindName"
+                CopyFiles /SILENT "$OldInstallDir\data\$DataBackupFindName\*.*" "$DataBackupDir\data\$DataBackupFindName\"
+            ${Else}
+                CopyFiles /SILENT "$OldInstallDir\data\$DataBackupFindName" "$DataBackupDir\data\"
+            ${EndIf}
+        ${EndIf}
+        ClearErrors
+        FindNext $DataBackupFindHandle $DataBackupFindName
+        IfErrors 0 backup_data_loop
+        FindClose $DataBackupFindHandle
+    ${EndIf}
+    ; Keep user-made custom pics (data\pics\CUSTOM).
     ${If} ${FileExists} "$OldInstallDir\data\pics\CUSTOM"
         CreateDirectory "$DataBackupDir\data\pics\CUSTOM"
         CopyFiles /SILENT "$OldInstallDir\data\pics\CUSTOM\*.*" "$DataBackupDir\data\pics\CUSTOM\"
