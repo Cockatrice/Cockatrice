@@ -224,7 +224,7 @@ void SettingsView::setupNavTree()
         "QTreeWidget::item:selected { background: palette(highlight); color: palette(highlighted-text); }");
 
     // Groups of SettingsPage values, in navigation order
-    const QList<QList<SettingsPage>> groupedPages = {
+    static const QList<QList<SettingsPage>> groupedPages = {
         {GeneralPage, AppearancePage, UserInterfacePage},
         {DeckEditorPage, StoragePage},
         {MessagesPage, SoundPage},
