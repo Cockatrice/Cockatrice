@@ -35,18 +35,22 @@ public:
 
 private slots:
     void investigateUser();
+    void goBack();
     void altsResponse(const Response &response);
 
 private:
+    void loadUser(const QString &userName);
     void requestAlts(const QString &userName, int depth);
     [[nodiscard]] QString formatEpoch(quint64 ts) const;
 
     AbstractClient *client;
     QString currentUser;
+    QList<QString> backStack;
 
     QLineEdit *searchEdit;
     QSpinBox *depthSpin;
     QPushButton *investigateButton;
+    QPushButton *backButton;
     QLabel *statusLabel;
     QTableWidget *altsTable;
 };
