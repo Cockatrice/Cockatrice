@@ -207,11 +207,12 @@ void CardCompleterStyler::selectWithoutRewrite(const QModelIndex &index)
         selectionModel->setCurrentIndex(index, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
     }
     selectionModel->blockSignals(wasBlocked);
+    popup->viewport()->update();
 
     // currentRowChanged was suppressed above, so sync the preview manually.
     updatePreview(index);
     if (index.isValid()) {
-        popup->scrollTo(index, QAbstractItemView::PositionAtTop);
+        popup->scrollTo(index, QAbstractItemView::EnsureVisible);
     } else {
         popup->scrollToTop();
     }
