@@ -64,6 +64,23 @@ QString formatReportTime(qint64 secondsSinceEpoch)
     return dt.toString("yyyy-MM-dd hh:mm");
 }
 
+QString formatReportStatus(const QString &status)
+{
+    if (status == QStringLiteral("open")) {
+        return QObject::tr("Open");
+    }
+    if (status == QStringLiteral("assigned")) {
+        return QObject::tr("Assigned");
+    }
+    if (status == QStringLiteral("resolved")) {
+        return QObject::tr("Resolved");
+    }
+    if (status == QStringLiteral("dismissed")) {
+        return QObject::tr("Dismissed");
+    }
+    return status;
+}
+
 void fillReportTableRow(QTableWidget *table,
                         int row,
                         const ServerInfo_Report &report,
@@ -73,7 +90,8 @@ void fillReportTableRow(QTableWidget *table,
                         int categoryColumn,
                         int gameIdColumn,
                         int statusColumn,
-                        int assignedColumn)
+                        int assignedColumn,
+                        bool colorizeStatus)
 {
     auto *idItem = new QTableWidgetItem(QString::number(report.report_id()));
     idItem->setData(Qt::UserRole, report.report_id());
@@ -86,8 +104,12 @@ void fillReportTableRow(QTableWidget *table,
     table->setItem(row, gameIdColumn,
                    new QTableWidgetItem(report.game_id() > 0 ? QString::number(report.game_id()) : QString()));
 
-    auto *statusItem = new QTableWidgetItem(QString::fromStdString(report.status()));
-    setReportStatusItemColor(statusItem, QString::fromStdString(report.status()));
+    const QString rawStatus = QString::fromStdString(report.status());
+    auto *statusItem = new QTableWidgetItem(formatReportStatus(rawStatus));
+    statusItem->setData(Qt::UserRole, rawStatus);
+    if (colorizeStatus) {
+        setReportStatusItemColor(statusItem, rawStatus);
+    }
     table->setItem(row, statusColumn, statusItem);
 
     table->setItem(row, assignedColumn, new QTableWidgetItem(QString::fromStdString(report.assigned_mod_name())));
