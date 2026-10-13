@@ -54,6 +54,7 @@ public:
     };
 
     explicit DeckSyncManager(QObject *parent = nullptr);
+    DeckSyncManager(AbstractClient *client, ColorIdentityProvider provider, QObject *parent = nullptr);
 
     void setClient(AbstractClient *_client);
     void setProfile(const DeckSyncProfile &_profile);
