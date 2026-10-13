@@ -10,6 +10,7 @@
 #include <qtmetamacros.h>
 
 class AbstractClient;
+class AltTableDelegate;
 class QGroupBox;
 class QLabel;
 class QLineEdit;
@@ -41,6 +42,7 @@ public:
 private slots:
     void investigateUser();
     void goBack();
+    void investigateSelected();
     void altsResponse(const Response &response);
     void onFilterChanged();
     void onAltSelected();
@@ -50,6 +52,7 @@ private slots:
 
 private:
     void loadUser(const QString &userName);
+    void updateTrail();
     void requestAlts(const QString &userName, int depth);
     void requestDetails(const QString &userName);
     void clearDetails();
@@ -67,8 +70,11 @@ private:
     QSpinBox *depthSpin;
     QPushButton *investigateButton;
     QPushButton *backButton;
+    QPushButton *investigateSelectedButton;
+    QLabel *trailLabel;
     QLabel *statusLabel;
     QTableWidget *altsTable;
+    AltTableDelegate *altsDelegate;
 
     QPushButton *emailChip;
     QPushButton *clientIdChip;
