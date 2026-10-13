@@ -13,6 +13,7 @@
 #include <QImage>
 #include <QImageWriter>
 #include <QLoggingCategory>
+#include <QScopeGuard>
 #include <QSharedPointer>
 #include <QStandardPaths>
 #include <QString>
@@ -238,6 +239,16 @@ int main(int argc, char **argv)
         QStringLiteral("loader-local-matching-test-%1").arg(QCoreApplication::applicationPid()));
 
     QLoggingCategory::setFilterRules("card_picture_loader.*=false\nsettings_cache.*=false");
+
+    // Best-effort cleanup of this process's settings sandbox. QStandardPaths test
+    // mode is never auto-cleaned, and on macOS the $HOME override above is ignored,
+    // so without this every run litters ~/.qttest with one pid-unique directory.
+    // Safe under parallel runs: the pid-unique application name above guarantees
+    // this directory belongs to this process alone.
+    const auto cleanupSandbox = qScopeGuard([] {
+        QDir(SettingsCache::instance().getDataPath()).removeRecursively();
+        QDir(SettingsCache::instance().getCachePath()).removeRecursively();
+    });
 
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
