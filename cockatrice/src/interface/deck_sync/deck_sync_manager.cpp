@@ -42,6 +42,11 @@ DeckSyncManager::DeckSyncManager(QObject *parent) : QObject(parent)
 {
 }
 
+DeckSyncManager::DeckSyncManager(AbstractClient *_client, ColorIdentityProvider provider, QObject *parent)
+    : QObject(parent), client(_client), colorIdentityProvider(std::move(provider))
+{
+}
+
 void DeckSyncManager::setClient(AbstractClient *_client)
 {
     client = _client;
