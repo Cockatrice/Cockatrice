@@ -165,8 +165,7 @@ private:
     bool storeDeckVersion(int deckId, const QString &content, const QString &hash);
     DeckList *getDeckFromDatabase(int deckId);
     Response::ResponseCode cmdDeckDownload(const Command_DeckDownload &cmd, ResponseContainer &rc);
-    bool
-    syncCheckHelper(int folderId, const QString &prefix, int userId, qint64 sinceSecs, Response_DeckSyncStatus *status);
+    bool syncCheckHelper(int userId, qint64 sinceSecs, Response_DeckSyncStatus *status);
     Response::ResponseCode cmdDeckSyncCheck(const Command_DeckSyncCheck &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckDownloadPublic(const Command_DeckDownloadPublic &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckShareCreate(const Command_DeckShareCreate &cmd, ResponseContainer &rc);

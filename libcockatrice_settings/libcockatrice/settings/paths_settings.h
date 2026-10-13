@@ -59,6 +59,7 @@ public:
     void setAppDirWarningAcknowledged(bool _appDirWarningAcknowledged);
 
 signals:
+    void deckPathChanged();
     void cardDatabasePathChanged();
     void picsPathChanged();
     void themeChanged();
