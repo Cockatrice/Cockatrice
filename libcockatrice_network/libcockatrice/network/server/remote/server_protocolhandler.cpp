@@ -633,7 +633,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
         case PasswordChangeRequired:
             return Response::RespPasswordChangeRequired;
         default:
-            server->clearFailedLogins(getAddress());
             authState = res;
             usingRealPassword = needsHash;
     }

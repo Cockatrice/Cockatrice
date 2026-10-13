@@ -202,10 +202,6 @@ public:
     {
         return false;
     }
-    /** @brief Clear any failed-login lockout for the given address, e.g. after a successful login. */
-    virtual void clearFailedLogins(const QString & /*ipAddress*/)
-    {
-    }
 
     Server_DatabaseInterface *getDatabaseInterface() const;
     int getNextLocalGameId()

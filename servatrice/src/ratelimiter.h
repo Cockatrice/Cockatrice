@@ -47,7 +47,7 @@ public:
      */
     bool isBlockedAt(const QString &key, int maxAttempts, int windowSeconds, qint64 now) const;
 
-    /** @brief Drop all recorded attempts for the key, e.g. after a successful login. */
+    /** @brief Drop all recorded attempts for the key. */
     void clearAttempts(const QString &key);
 
 private:

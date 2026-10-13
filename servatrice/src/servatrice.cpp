@@ -1329,11 +1329,6 @@ bool Servatrice::isRateLimitExempt(const QString &ipAddress) const
     return trustedSources.contains(ipAddress, Qt::CaseInsensitive);
 }
 
-void Servatrice::clearFailedLogins(const QString &ipAddress)
-{
-    rateLimiter.clearAttempts("login:" + ipAddress);
-}
-
 int Servatrice::getMaxLoginAttemptsPerIp() const
 {
     return settingsCache->value("security/max_login_attempts_per_ip", 5).toInt();
