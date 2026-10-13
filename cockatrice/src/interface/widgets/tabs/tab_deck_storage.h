@@ -11,6 +11,7 @@
 #include "../interface/widgets/server/remote/remote_decklist_tree_widget.h"
 #include "tab.h"
 
+#include "../deck_sync/deck_sync_manager.h"
 #include <QList>
 #include <QString>
 #include <QStringList>
@@ -29,7 +30,6 @@ class QLabel;
 class CommandContainer;
 class Response;
 class ShareBarWidget;
-class DeckSyncManager;
 class QAction;
 class QModelIndex;
 class TabSupervisor;
@@ -64,13 +64,7 @@ private:
         Finished,
         Failed
     };
-    struct SyncSummary
-    {
-        int uploaded = 0;
-        int downloaded = 0;
-        int unchanged = 0;
-        int skipped = 0;
-    };
+    using SyncSummary = DeckSyncManager::SyncSummary;
     SyncStatusType syncStatusType = SyncStatusType::Idle;
     QString syncStatusDetail;
     SyncSummary lastSyncSummary;

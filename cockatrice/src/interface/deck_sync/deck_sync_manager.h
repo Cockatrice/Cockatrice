@@ -44,6 +44,15 @@ public:
     /** @brief Computes the color identity string uploaded alongside a deck. May be empty. */
     using ColorIdentityProvider = std::function<QString(const DeckList &)>;
 
+    /** @brief Outcome counts for a finished sync run; mirrors syncFinished() parameters. */
+    struct SyncSummary
+    {
+        int uploaded = 0;
+        int downloaded = 0;
+        int unchanged = 0;
+        int skipped = 0;
+    };
+
     explicit DeckSyncManager(QObject *parent = nullptr);
 
     void setClient(AbstractClient *_client);
