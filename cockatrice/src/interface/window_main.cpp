@@ -65,6 +65,7 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QDialog>
+#include <QDir>
 #include <QEvent>
 #include <QFile>
 #include <QFileDialog>
@@ -110,6 +111,7 @@
 #include <libcockatrice/settings/tabs_settings.h>
 #include <libcockatrice/settings/updates_settings.h>
 #include <libcockatrice/utility/local_server_name.h>
+#include <libcockatrice/utility/user_data_backup.h>
 #include <memory>
 #include <qlogging.h>
 #include <qnamespace.h>
@@ -609,23 +611,82 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::warnAboutDataPathsInProgramDir()
 {
     auto &paths = SettingsCache::instance().paths();
-    if (SettingsCache::instance().getIsPortableBuild() || paths.getAppDirWarningAcknowledged()) {
+    if (paths.getAppDirWarningAcknowledged()) {
         return;
     }
 
-    const QStringList offenders = paths.pathsInsideDir(QCoreApplication::applicationDirPath());
-    if (offenders.isEmpty()) {
-        return;
+    const QString appDir = QCoreApplication::applicationDirPath();
+    const bool isPortable = SettingsCache::instance().getIsPortableBuild();
+
+    // Sources to back up outside the install directory before warning. The uninstallers
+    // shipped in 3.1.0/3.1.1 delete the whole install tree, so a safety copy is kept
+    // even though the fixed uninstaller preserves foreign files - the destructive one
+    // is already on disk on affected machines.
+    QStringList backupSources;
+    QStringList offenders;
+    if (isPortable) {
+        // Portable data lives inside the install directory by design, so there is
+        // nothing to reconfigure. Back up the small irreplaceable data (decks, custom
+        // sets, settings) instead. Pictures are deliberately excluded: they are large
+        // and can always be re-downloaded.
+        const QString dataDir = SettingsCache::instance().getDataPath();
+        for (const QString &sub : {QStringLiteral("decks"), QStringLiteral("customsets"), QStringLiteral("settings")}) {
+            const QString candidate = QDir(dataDir).absoluteFilePath(sub);
+            if (QFileInfo::exists(candidate)) {
+                backupSources.append(candidate);
+            }
+        }
+        if (backupSources.isEmpty()) {
+            return;
+        }
+    } else {
+        offenders = paths.pathsInsideDir(appDir);
+        if (offenders.isEmpty()) {
+            return;
+        }
+        backupSources = offenders;
     }
 
-    QMessageBox box(QMessageBox::Warning, tr("Data paths inside the program directory"),
-                    tr("These paths are configured inside the Cockatrice program directory:\n\n%1\n\n"
-                       "Cockatrice keeps its own data outside the program directory by default. Files "
-                       "stored inside it can be deleted by an update or by uninstalling Cockatrice. "
-                       "Change them in the Settings dialog - most are on the General page - to keep "
-                       "them safe.")
-                        .arg(offenders.join(QLatin1Char('\n'))),
-                    QMessageBox::Ok, this);
+    QString backupRoot = UserDataBackup::defaultBackupRoot();
+    if (PathsSettings::isInsideDir(backupRoot, appDir)) {
+        backupRoot = QDir::temp().absoluteFilePath(QStringLiteral("CockatriceBackups"));
+    }
+    QStringList backupLocations;
+    for (const QString &source : backupSources) {
+        QString backupLocation;
+        if (UserDataBackup::backupAtRiskPath(source, backupRoot, &backupLocation)) {
+            qCInfo(MainWindowLog) << "Backed up at-risk user data" << source << "to" << backupLocation;
+            backupLocations.append(backupLocation);
+        } else {
+            qCWarning(MainWindowLog) << "Failed to back up at-risk user data:" << source;
+        }
+    }
+
+    QString message;
+    if (isPortable) {
+        message = tr("This portable install keeps its data inside the program directory, where the "
+                     "uninstallers shipped in Cockatrice 3.1.0/3.1.1 delete everything on uninstall or "
+                     "update.\n\nA safety backup of your decks, custom sets and settings has been created "
+                     "at:\n%1\n\nUninstalling with the old uninstaller still deletes the program "
+                     "directory, so keep your own copy of that backup until you have updated once.")
+                      .arg(backupLocations.isEmpty() ? backupRoot : backupLocations.join(QLatin1Char('\n')));
+    } else {
+        message = tr("These paths are configured inside the Cockatrice program directory:\n\n%1\n\n"
+                     "Cockatrice keeps its own data outside the program directory by default. Files "
+                     "stored inside it can be deleted by an update or by uninstalling Cockatrice. "
+                     "Change them in the Settings dialog - most are on the General page - to keep "
+                     "them safe.")
+                      .arg(offenders.join(QLatin1Char('\n')));
+        if (!backupLocations.isEmpty()) {
+            message += tr("\n\nA safety backup has been created at:\n%1").arg(backupLocations.join(QLatin1Char('\n')));
+        } else {
+            message += tr("\n\nThe automatic safety backup failed; please back up these folders manually.");
+        }
+    }
+    QMessageBox box(QMessageBox::Warning,
+                    isPortable ? tr("Portable data at risk on uninstall")
+                               : tr("Data paths inside the program directory"),
+                    message, QMessageBox::Ok, this);
     box.setTextFormat(Qt::PlainText);
     auto *dontShowAgain = new QCheckBox(tr("Don't show this again"));
     box.setCheckBox(dontShowAgain);

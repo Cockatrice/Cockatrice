@@ -15,6 +15,7 @@ Var ReinstallMode
 Var AllowForceClose
 Var GuardDir
 Var OldUninstallString
+Var DataBackupDir
 Var StaleFindHandle
 Var StaleFindName
 Var IsUpgrade
@@ -317,7 +318,9 @@ ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatr
 !insertmacro CockLog "uninstall (32-bit): '$R0 _?=$INSTDIR'"
 StrCmp $R0 "" done32
 DetailPrint "Removing previous version (32-bit)..."
+Call BackupUserDataBeforeUninstall
 ExecWait '$R0 _?=$INSTDIR'
+Call RestoreUserDataAfterUninstall
 
 done32:
 
@@ -329,11 +332,65 @@ ${If} ${RunningX64}
     !insertmacro CockLog "uninstall (64-bit): '$R0 _?=$INSTDIR'"
     StrCmp $R0 "" done64
     DetailPrint "Removing previous version (64-bit)..."
+    Call BackupUserDataBeforeUninstall
     ExecWait '$R0 _?=$INSTDIR'
+    Call RestoreUserDataAfterUninstall
 
     done64:
 ${EndIf}
 
+FunctionEnd
+
+; BackupUserDataBeforeUninstall / RestoreUserDataAfterUninstall
+;
+; The uninstallers shipped in 3.1.0/3.1.1 run a blanket "RMDir /r $INSTDIR".
+; For a portable install that deletes $INSTDIR\data (decks, settings, pictures)
+; along with the payload, and for a normal install it deletes anything the user
+; pointed into $INSTDIR. The fixed uninstaller preserves foreign files, but the
+; destructive one is already on disk on affected machines, so stash a copy
+; outside $INSTDIR before invoking it and put it back afterwards. Best effort
+; only: a failed backup must never abort the install.
+Function BackupUserDataBeforeUninstall
+StrCpy $DataBackupDir "$TEMP\CockatriceDataBackup"
+${If} ${FileExists} "$INSTDIR\portable.dat"
+${AndIf} ${FileExists} "$INSTDIR\data\*.*"
+    !insertmacro CockLog "pre-uninstall backup: copying $INSTDIR\data"
+    DetailPrint "Backing up portable user data before removing previous version..."
+    CreateDirectory "$DataBackupDir\data"
+    CopyFiles /SILENT "$INSTDIR\data\*.*" "$DataBackupDir\data\"
+    DetailPrint "Portable user data backup complete."
+${EndIf}
+${If} ${FileExists} "$INSTDIR\*.cod"
+    !insertmacro CockLog "pre-uninstall backup: copying loose deck files"
+    DetailPrint "Backing up deck files stored in the install directory..."
+    CreateDirectory "$DataBackupDir\loose_decks"
+    CopyFiles /SILENT "$INSTDIR\*.cod" "$DataBackupDir\loose_decks\"
+${EndIf}
+FunctionEnd
+
+Function RestoreUserDataAfterUninstall
+StrCmp $DataBackupDir "" done
+${If} ${FileExists} "$DataBackupDir\data\*.*"
+    ${If} ${FileExists} "$INSTDIR\data\*.*"
+        !insertmacro CockLog "post-uninstall restore: user data survived, backup kept"
+        DetailPrint "Previous user data survived the uninstall; backup kept at $DataBackupDir\data."
+    ${Else}
+        !insertmacro CockLog "post-uninstall restore: restoring $INSTDIR\data"
+        CreateDirectory "$INSTDIR\data"
+        CopyFiles /SILENT "$DataBackupDir\data\*.*" "$INSTDIR\data\"
+        DetailPrint "Restored portable user data from pre-uninstall backup."
+    ${EndIf}
+${EndIf}
+${If} ${FileExists} "$DataBackupDir\loose_decks\*.cod"
+    !insertmacro CockLog "post-uninstall restore: restoring loose deck files"
+    CreateDirectory "$INSTDIR"
+    CopyFiles /SILENT "$DataBackupDir\loose_decks\*.cod" "$INSTDIR\"
+    DetailPrint "Restored deck files stored in the install directory."
+    ${IfNot} ${Silent}
+        MessageBox MB_OK|MB_ICONINFORMATION "Your decks were stored inside the Cockatrice install folder, which the previous version's uninstaller deletes.$\n$\nThey have been restored from a backup. Please move them out of the install folder (Settings -> General -> Paths) so a future uninstall cannot delete them again."
+    ${EndIf}
+${EndIf}
+done:
 FunctionEnd
 
 ; --- Running instance handling ---
@@ -1041,7 +1098,9 @@ ${If} $PortableMode = 0
     !insertmacro CockLog "componentsPagePre: old 32-bit uninstall '$OldUninstallString _?=$INSTDIR'"
     Call EnsureOldInstallNotRunning
     ClearErrors
+    Call BackupUserDataBeforeUninstall
     ExecWait "$OldUninstallString _?=$INSTDIR"
+    Call RestoreUserDataAfterUninstall
 
 	done32:
 
@@ -1064,7 +1123,9 @@ ${If} $PortableMode = 0
 	    !insertmacro CockLog "componentsPagePre: old 64-bit uninstall '$OldUninstallString _?=$INSTDIR'"
 	    Call EnsureOldInstallNotRunning
 	    ClearErrors
+	    Call BackupUserDataBeforeUninstall
 	    ExecWait "$OldUninstallString _?=$INSTDIR"
+	    Call RestoreUserDataAfterUninstall
 
 		done64:
 	${EndIf}

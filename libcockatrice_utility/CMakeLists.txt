@@ -13,6 +13,7 @@ set(UTILITY_SOURCES
     libcockatrice/utility/report_categories.cpp
     libcockatrice/utility/server_rate_limiter.cpp
     libcockatrice/utility/translation_loader.cpp
+    libcockatrice/utility/user_data_backup.cpp
     libcockatrice/utility/warning_categories.cpp
 )
 
@@ -35,6 +36,7 @@ set(UTILITY_HEADERS
     libcockatrice/utility/days_years_between.h
     libcockatrice/utility/server_rate_limiter.h
     libcockatrice/utility/translation_loader.h
+    libcockatrice/utility/user_data_backup.h
     libcockatrice/utility/warning_categories.h
 )
 
