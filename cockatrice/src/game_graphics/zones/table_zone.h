@@ -7,10 +7,10 @@
 #ifndef TABLEZONE_H
 #define TABLEZONE_H
 
+#include "../../game/zones/table_zone_logic.h"
 #include "../animated_item.h"
 #include "../card_dimensions.h"
 #include "select_zone.h"
-
 #include <QElapsedTimer>
 #include <QMap>
 #include <QPixmap>
@@ -25,7 +25,6 @@ class CardZoneLogic;
 class QColor;
 class QGraphicsItem;
 class QPainter;
-class TableZoneLogic;
 template <typename T> class QList;
 
 /**
@@ -42,8 +41,6 @@ signals:
     void sizeChanged();
 
 private:
-    static const int TABLEROWS = TableZoneLogic::ROW_COUNT;
-
     /*
     Margins between table edges and cards, paddings between cards
     */
