@@ -5,17 +5,19 @@
 #include "libcockatrice/protocol/pb/response_user_alts.pb.h"
 
 #include <QAbstractItemView>
-#include <QCheckBox>
 #include <QDateTime>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QItemSelectionModel>
 #include <QLabel>
 #include <QLineEdit>
 #include <QList>
 #include <QPushButton>
+#include <QSignalBlocker>
 #include <QSpinBox>
+#include <QSplitter>
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QTextEdit>
@@ -45,6 +47,17 @@ constexpr int COL_ALTS_WARNS = 8;
 constexpr int COL_ALTS_BANS = 9;
 constexpr int COL_ALTS_ACTIVE = 10;
 constexpr int COL_ALTS_COUNT = 11;
+
+constexpr int COL_WARNS_TIME = 0;
+constexpr int COL_WARNS_MODERATOR = 1;
+constexpr int COL_WARNS_REASON = 2;
+constexpr int COL_WARNS_COUNT = 3;
+
+constexpr int COL_BANS_TIME = 0;
+constexpr int COL_BANS_MODERATOR = 1;
+constexpr int COL_BANS_LENGTH = 2;
+constexpr int COL_BANS_REASON = 3;
+constexpr int COL_BANS_COUNT = 4;
 
 constexpr int MAX_ALT_DEPTH = 3;
 // Starting default only (adjustable 1-100000): shared VPN exits routinely
@@ -94,15 +107,16 @@ TabAlts::TabAlts(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
     topBar->addWidget(depthSpin);
     topBar->addWidget(investigateButton);
 
-    emailCheck = new QCheckBox;
-    emailCheck->setChecked(true);
-    connect(emailCheck, &QCheckBox::toggled, this, &TabAlts::onFilterChanged);
-    clientIdCheck = new QCheckBox;
-    clientIdCheck->setChecked(true);
-    connect(clientIdCheck, &QCheckBox::toggled, this, &TabAlts::onFilterChanged);
-    ipCheck = new QCheckBox;
-    ipCheck->setChecked(true);
-    connect(ipCheck, &QCheckBox::toggled, this, &TabAlts::onFilterChanged);
+    auto makeChip = [this](const QString &text) {
+        auto *chip = new QPushButton(text);
+        chip->setCheckable(true);
+        chip->setChecked(true);
+        connect(chip, &QPushButton::toggled, this, &TabAlts::onFilterChanged);
+        return chip;
+    };
+    emailChip = makeChip(QString());
+    clientIdChip = makeChip(QString());
+    ipChip = makeChip(QString());
     vpnLabel = new QLabel;
     vpnSpin = new QSpinBox;
     vpnSpin->setMinimum(1);
@@ -111,17 +125,20 @@ TabAlts::TabAlts(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
     connect(vpnSpin, &QSpinBox::valueChanged, this, &TabAlts::onFilterChanged);
 
     auto *filterBar = new QHBoxLayout;
-    filterBar->addWidget(emailCheck);
-    filterBar->addWidget(clientIdCheck);
-    filterBar->addWidget(ipCheck);
+    filterBar->addWidget(emailChip);
+    filterBar->addWidget(clientIdChip);
+    filterBar->addWidget(ipChip);
     filterBar->addWidget(vpnLabel);
     filterBar->addWidget(vpnSpin);
     filterBar->addStretch();
 
     altsTable = new QTableWidget(0, COL_ALTS_COUNT);
     configureAltTable(altsTable);
-    connect(altsTable, &QTableWidget::cellDoubleClicked, this, [this](int row, int) {
-        auto *userItem = altsTable->item(row, COL_ALTS_USER);
+    connect(altsTable, &QTableWidget::activated, this, [this](const QModelIndex &index) {
+        if (!index.isValid()) {
+            return;
+        }
+        auto *userItem = altsTable->item(index.row(), COL_ALTS_USER);
         if (userItem != nullptr && !userItem->text().isEmpty() && userItem->text() != currentUser) {
             investigate(userItem->text());
         }
@@ -134,9 +151,9 @@ TabAlts::TabAlts(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
     detailNotesEdit->setReadOnly(true);
     // Compact cap so the warn/ban tables stay visible without scrolling the tab.
     detailNotesEdit->setMaximumHeight(60);
-    warnsTable = new QTableWidget(0, 3);
+    warnsTable = new QTableWidget(0, COL_WARNS_COUNT);
     configureAltTable(warnsTable);
-    bansTable = new QTableWidget(0, 4);
+    bansTable = new QTableWidget(0, COL_BANS_COUNT);
     configureAltTable(bansTable);
 
     auto *detailGrid = new QGridLayout;
@@ -150,21 +167,24 @@ TabAlts::TabAlts(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
     detailGrid->addWidget(detailNotesLabel, 1, 0);
     detailGrid->addWidget(detailNotesEdit, 1, 1, 1, 3);
 
-    auto *detailTables = new QHBoxLayout;
-    detailTables->addWidget(warnsTable);
-    detailTables->addWidget(bansTable);
-
     detailsGroup = new QGroupBox;
     auto *detailsLayout = new QVBoxLayout(detailsGroup);
     detailsLayout->addLayout(detailGrid);
-    detailsLayout->addLayout(detailTables);
+    detailsLayout->addWidget(warnsTable, 1);
+    detailsLayout->addWidget(bansTable, 1);
+
+    auto *contentSplitter = new QSplitter(Qt::Horizontal);
+    contentSplitter->addWidget(altsTable);
+    contentSplitter->addWidget(detailsGroup);
+    contentSplitter->setStretchFactor(0, 3);
+    contentSplitter->setStretchFactor(1, 2);
+    detailsGroup->setMinimumWidth(260);
 
     auto *mainLayout = new QVBoxLayout(centralWidget);
     mainLayout->addLayout(topBar);
     mainLayout->addLayout(filterBar);
     mainLayout->addWidget(statusLabel);
-    mainLayout->addWidget(altsTable, 3);
-    mainLayout->addWidget(detailsGroup, 2);
+    mainLayout->addWidget(contentSplitter, 1);
 
     retranslateUi();
     clearDetails();
@@ -183,15 +203,19 @@ void TabAlts::retranslateUi()
         statusLabel->setText(tr("Enter a user name to investigate."));
     }
 
-    emailCheck->setText(tr("Email"));
-    clientIdCheck->setText(tr("Client ID"));
-    ipCheck->setText(tr("IP"));
+    emailChip->setText(tr("Email"));
+    emailChip->setToolTip(tr("Show or hide email matches"));
+    clientIdChip->setText(tr("Client ID"));
+    clientIdChip->setToolTip(tr("Show or hide client ID matches"));
+    ipChip->setText(tr("IP"));
+    ipChip->setToolTip(tr("Show or hide IP address matches"));
     vpnLabel->setText(tr("Hide IPs shared by more than"));
     vpnSpin->setSuffix(tr(" users"));
 
     altsTable->setHorizontalHeaderLabels({tr("User"), tr("Via"), tr("Depth"), tr("Shared"), tr("eMail"),
                                           tr("Client ID"), tr("Registered"), tr("Last login"), tr("Warns"), tr("Bans"),
                                           tr("Active")});
+    altsTable->setToolTip(tr("Double-click or press Enter on a row to investigate that account"));
     warnsTable->setHorizontalHeaderLabels({tr("Warning time"), tr("Moderator"), tr("Reason")});
     bansTable->setHorizontalHeaderLabels({tr("Ban time"), tr("Moderator"), tr("Length"), tr("Reason")});
 
@@ -199,6 +223,10 @@ void TabAlts::retranslateUi()
     detailNameLabel->setText(tr("Name:"));
     detailCountsLabel->setText(tr("Counts:"));
     detailNotesLabel->setText(tr("Admin notes:"));
+
+    if (!lastAlts.isEmpty()) {
+        renderTable();
+    }
 }
 
 QString TabAlts::formatEpoch(quint64 ts) const
@@ -259,7 +287,11 @@ void TabAlts::requestAlts(const QString &userName, int depth)
     cmd.set_user_name(userName.toStdString());
     cmd.set_depth(static_cast<google::protobuf::uint32>(depth));
     PendingCommand *pend = client->prepareModeratorCommand(cmd);
-    connect(pend, &PendingCommand::finished, this, &TabAlts::altsResponse);
+    connect(pend, &PendingCommand::finished, this, [this, userName](const Response &response) {
+        if (userName == currentUser) {
+            altsResponse(response);
+        }
+    });
     client->sendCommand(pend);
 }
 
@@ -290,13 +322,13 @@ bool TabAlts::rowVisible(const ServerInfo_UserAlt &alt) const
     }
     const QString reason = QString::fromStdString(alt.match_reason());
     if (reason == QStringLiteral("email")) {
-        return emailCheck->isChecked();
+        return emailChip->isChecked();
     }
     if (reason.startsWith(QStringLiteral("clientid:"))) {
-        return clientIdCheck->isChecked();
+        return clientIdChip->isChecked();
     }
     if (reason.startsWith(QStringLiteral("ip:"))) {
-        return ipCheck->isChecked() &&
+        return ipChip->isChecked() &&
                (!alt.has_shared_count() || alt.shared_count() <= static_cast<unsigned>(vpnSpin->value()));
     }
     return true;
@@ -304,7 +336,32 @@ bool TabAlts::rowVisible(const ServerInfo_UserAlt &alt) const
 
 void TabAlts::renderTable()
 {
+    // Blocked so the programmatic refill neither wipes the details panel
+    // (via the selection-cleared path) nor refetches them on restore.
+    const QSignalBlocker blocker(altsTable);
     altsTable->setRowCount(0);
+
+    int emailCount = 0;
+    int clientIdCount = 0;
+    int ipCount = 0;
+    for (const ServerInfo_UserAlt &alt : lastAlts) {
+        const QString reason = QString::fromStdString(alt.match_reason());
+        if (reason == QStringLiteral("email")) {
+            ++emailCount;
+        } else if (reason.startsWith(QStringLiteral("clientid:"))) {
+            ++clientIdCount;
+        } else if (reason.startsWith(QStringLiteral("ip:"))) {
+            ++ipCount;
+        }
+    }
+    emailChip->setText(tr("Email (%1)").arg(emailCount));
+    clientIdChip->setText(tr("Client ID (%1)").arg(clientIdCount));
+    ipChip->setText(tr("IP (%1)").arg(ipCount));
+
+    QFont userFont = altsTable->font();
+    userFont.setBold(true);
+    const QColor dimColor = palette().color(QPalette::Disabled, QPalette::Text);
+
     int hidden = 0;
     int row = 0;
     for (const ServerInfo_UserAlt &alt : lastAlts) {
@@ -313,7 +370,9 @@ void TabAlts::renderTable()
             continue;
         }
         altsTable->insertRow(row);
-        altsTable->setItem(row, COL_ALTS_USER, new QTableWidgetItem(QString::fromStdString(alt.user_name())));
+        auto *userItem = new QTableWidgetItem(QString::fromStdString(alt.user_name()));
+        userItem->setFont(userFont);
+        altsTable->setItem(row, COL_ALTS_USER, userItem);
         altsTable->setItem(row, COL_ALTS_VIA,
                            new QTableWidgetItem(alt.has_match_reason() && !alt.match_reason().empty()
                                                     ? QString::fromStdString(alt.match_reason())
@@ -330,6 +389,14 @@ void TabAlts::renderTable()
         altsTable->setItem(row, COL_ALTS_WARNS, new QTableWidgetItem(QString::number(alt.warn_count())));
         altsTable->setItem(row, COL_ALTS_BANS, new QTableWidgetItem(QString::number(alt.ban_count())));
         altsTable->setItem(row, COL_ALTS_ACTIVE, new QTableWidgetItem(alt.is_active() ? tr("yes") : tr("no")));
+        if (QString::fromStdString(alt.match_reason()).startsWith(QStringLiteral("ip:")) && alt.has_shared_count() &&
+            alt.shared_count() > 1) {
+            for (int col = 0; col < COL_ALTS_COUNT; ++col) {
+                if (auto *item = altsTable->item(row, col)) {
+                    item->setForeground(dimColor);
+                }
+            }
+        }
         ++row;
     }
     if (hidden == 0) {
@@ -340,6 +407,22 @@ void TabAlts::renderTable()
                                  .arg(hidden)
                                  .arg(lastAlts.size())
                                  .arg(currentUser));
+    }
+
+    if (!selectedUser.isEmpty()) {
+        bool restored = false;
+        for (int restoreRow = 0; restoreRow < altsTable->rowCount(); ++restoreRow) {
+            auto *userItem = altsTable->item(restoreRow, COL_ALTS_USER);
+            if (userItem != nullptr && userItem->text() == selectedUser) {
+                altsTable->setCurrentItem(userItem, QItemSelectionModel::Select | QItemSelectionModel::Rows);
+                restored = true;
+                break;
+            }
+        }
+        if (!restored) {
+            selectedUser.clear();
+            clearDetails();
+        }
     }
 }
 
@@ -409,7 +492,7 @@ void TabAlts::requestDetails(const QString &userName)
 void TabAlts::clearDetails()
 {
     detailNameValue->clear();
-    detailCountsValue->clear();
+    detailCountsValue->setText(tr("Select a row to inspect its history."));
     detailNotesEdit->clear();
     warnsTable->setRowCount(0);
     bansTable->setRowCount(0);
@@ -446,9 +529,9 @@ void TabAlts::warnHistoryResponse(const Response &response)
     warnsTable->setRowCount(resp.warn_list_size());
     for (int i = 0; i < resp.warn_list_size(); ++i) {
         const ServerInfo_Warning &warn = resp.warn_list(i);
-        warnsTable->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(warn.time_of())));
-        warnsTable->setItem(i, 1, new QTableWidgetItem(QString::fromStdString(warn.admin_name())));
-        warnsTable->setItem(i, 2, new QTableWidgetItem(QString::fromStdString(warn.reason())));
+        warnsTable->setItem(i, COL_WARNS_TIME, new QTableWidgetItem(QString::fromStdString(warn.time_of())));
+        warnsTable->setItem(i, COL_WARNS_MODERATOR, new QTableWidgetItem(QString::fromStdString(warn.admin_name())));
+        warnsTable->setItem(i, COL_WARNS_REASON, new QTableWidgetItem(QString::fromStdString(warn.reason())));
     }
 }
 
@@ -463,9 +546,9 @@ void TabAlts::banHistoryResponse(const Response &response)
     bansTable->setRowCount(resp.ban_list_size());
     for (int i = 0; i < resp.ban_list_size(); ++i) {
         const ServerInfo_Ban &ban = resp.ban_list(i);
-        bansTable->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(ban.ban_time())));
-        bansTable->setItem(i, 1, new QTableWidgetItem(QString::fromStdString(ban.admin_name())));
-        bansTable->setItem(i, 2, new QTableWidgetItem(QString::fromStdString(ban.ban_length())));
-        bansTable->setItem(i, 3, new QTableWidgetItem(QString::fromStdString(ban.ban_reason())));
+        bansTable->setItem(i, COL_BANS_TIME, new QTableWidgetItem(QString::fromStdString(ban.ban_time())));
+        bansTable->setItem(i, COL_BANS_MODERATOR, new QTableWidgetItem(QString::fromStdString(ban.admin_name())));
+        bansTable->setItem(i, COL_BANS_LENGTH, new QTableWidgetItem(QString::fromStdString(ban.ban_length())));
+        bansTable->setItem(i, COL_BANS_REASON, new QTableWidgetItem(QString::fromStdString(ban.ban_reason())));
     }
 }

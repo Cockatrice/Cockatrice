@@ -22,6 +22,7 @@
 #include <QSharedPointer>
 #include <QSplitter>
 #include <QStringList>
+#include <QTabWidget>
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QTextEdit>
@@ -94,38 +95,67 @@ TabModeration::TabModeration(TabSupervisor *_tabSupervisor, AbstractClient *_cli
     topBar->addWidget(removeAvatarButton);
 
     userInfoGroup = new QGroupBox;
-    userInfoNameLabel = new QLabel;
     userInfoNameValue = new QLabel;
-    userInfoRegisteredLabel = new QLabel;
-    userInfoRegisteredValue = new QLabel;
-    userInfoLastLoginLabel = new QLabel;
-    userInfoLastLoginValue = new QLabel;
-    userInfoStatusLabel = new QLabel;
+    QFont displayFont = userInfoNameValue->font();
+    displayFont.setPointSize(displayFont.pointSize() + 6);
+    displayFont.setBold(true);
+    userInfoNameValue->setFont(displayFont);
     userInfoStatusValue = new QLabel;
-    userInfoCountsLabel = new QLabel;
-    userInfoCountsValue = new QLabel;
+    QFont statusFont = userInfoStatusValue->font();
+    statusFont.setBold(true);
+    userInfoStatusValue->setFont(statusFont);
+    sublineLabel = new QLabel;
+
+    auto makeCountCard = [](const QString &title, QLabel *&value) {
+        auto *card = new QGroupBox(title);
+        value = new QLabel(QStringLiteral("–"), card);
+        QFont cardFont = value->font();
+        cardFont.setPointSize(cardFont.pointSize() + 6);
+        cardFont.setBold(true);
+        value->setFont(cardFont);
+        value->setAlignment(Qt::AlignCenter);
+        auto *cardLayout = new QVBoxLayout(card);
+        cardLayout->addWidget(value);
+        return card;
+    };
+    cardReports = makeCountCard(QString(), cardReportsValue);
+    cardWarns = makeCountCard(QString(), cardWarnsValue);
+    cardBans = makeCountCard(QString(), cardBansValue);
+
+    altsCard = new QGroupBox;
+    altsCountValue = new QLabel(QStringLiteral("–"), altsCard);
+    QFont altsFont = altsCountValue->font();
+    altsFont.setPointSize(altsFont.pointSize() + 6);
+    altsFont.setBold(true);
+    altsCountValue->setFont(altsFont);
+    altsCountValue->setAlignment(Qt::AlignCenter);
+    openAltsButton = new QPushButton;
+    connect(openAltsButton, &QPushButton::clicked, this, &TabModeration::openAltsGraph);
+    auto *altsCardLayout = new QVBoxLayout(altsCard);
+    altsCardLayout->addWidget(altsCountValue);
+    altsCardLayout->addWidget(openAltsButton);
+
+    auto *cardsRow = new QHBoxLayout;
+    cardsRow->addWidget(cardReports);
+    cardsRow->addWidget(cardWarns);
+    cardsRow->addWidget(cardBans);
+    cardsRow->addWidget(altsCard);
+
     userInfoNotesLabel = new QLabel;
     userInfoNotesEdit = new QTextEdit;
     userInfoNotesEdit->setReadOnly(true);
 
-    auto *infoGrid = new QGridLayout;
-    infoGrid->addWidget(userInfoNameLabel, 0, 0);
-    infoGrid->addWidget(userInfoNameValue, 0, 1);
-    infoGrid->addWidget(userInfoRegisteredLabel, 0, 2);
-    infoGrid->addWidget(userInfoRegisteredValue, 0, 3);
-    infoGrid->addWidget(userInfoLastLoginLabel, 1, 0);
-    infoGrid->addWidget(userInfoLastLoginValue, 1, 1);
-    infoGrid->addWidget(userInfoStatusLabel, 1, 2);
-    infoGrid->addWidget(userInfoStatusValue, 1, 3);
-    infoGrid->addWidget(userInfoCountsLabel, 2, 0);
-    infoGrid->addWidget(userInfoCountsValue, 2, 1, 1, 3);
-    infoGrid->addWidget(userInfoNotesLabel, 3, 0, Qt::AlignTop);
-    infoGrid->addWidget(userInfoNotesEdit, 3, 1, 1, 3);
-    infoGrid->setColumnStretch(1, 1);
-    infoGrid->setColumnStretch(3, 1);
+    auto *identityRow = new QHBoxLayout;
+    identityRow->addWidget(userInfoNameValue);
+    identityRow->addStretch();
+    identityRow->addWidget(userInfoStatusValue);
 
     auto *infoLayout = new QVBoxLayout(userInfoGroup);
-    infoLayout->addLayout(infoGrid);
+    infoLayout->addLayout(identityRow);
+    infoLayout->addWidget(sublineLabel);
+    infoLayout->addLayout(cardsRow);
+    infoLayout->addWidget(userInfoNotesLabel);
+    infoLayout->addWidget(userInfoNotesEdit);
 
     auto configureTable = [](QTableWidget *table) {
         table->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -137,31 +167,27 @@ TabModeration::TabModeration(TabSupervisor *_tabSupervisor, AbstractClient *_cli
         table->horizontalHeader()->setStretchLastSection(true);
     };
 
-    altsGroup = new QGroupBox;
     altsTable = new QTableWidget(0, COL_ALTS_COUNT);
     configureTable(altsTable);
-    connect(altsTable, &QTableWidget::cellDoubleClicked, this, [this](int row, int) {
-        auto *userItem = altsTable->item(row, COL_ALTS_USER);
+    connect(altsTable, &QTableWidget::activated, this, [this](const QModelIndex &index) {
+        if (!index.isValid()) {
+            return;
+        }
+        auto *userItem = altsTable->item(index.row(), COL_ALTS_USER);
         if (userItem != nullptr && !userItem->text().isEmpty()) {
             getTabSupervisor()->openTabAlts(userItem->text());
         }
     });
-    openAltsButton = new QPushButton;
-    connect(openAltsButton, &QPushButton::clicked, this, &TabModeration::openAltsGraph);
-    auto *altsHeader = new QHBoxLayout;
-    altsHeader->addStretch();
-    altsHeader->addWidget(openAltsButton);
-    auto *altsLayout = new QVBoxLayout(altsGroup);
-    altsLayout->addLayout(altsHeader);
+    auto *altsPage = new QWidget;
+    auto *altsLayout = new QVBoxLayout(altsPage);
     altsLayout->addWidget(altsTable);
 
-    sessionsGroup = new QGroupBox;
     sessionsTable = new QTableWidget(0, COL_SESSIONS_COUNT);
     configureTable(sessionsTable);
-    auto *sessionsLayout = new QVBoxLayout(sessionsGroup);
+    auto *sessionsPage = new QWidget;
+    auto *sessionsLayout = new QVBoxLayout(sessionsPage);
     sessionsLayout->addWidget(sessionsTable);
 
-    staffGroup = new QGroupBox;
     staffTable = new QTableWidget(0, COL_STAFF_COUNT);
     configureTable(staffTable);
     refreshStaffButton = new QPushButton;
@@ -169,19 +195,21 @@ TabModeration::TabModeration(TabSupervisor *_tabSupervisor, AbstractClient *_cli
     auto *staffHeader = new QHBoxLayout;
     staffHeader->addStretch();
     staffHeader->addWidget(refreshStaffButton);
-    auto *staffLayout = new QVBoxLayout(staffGroup);
+    auto *staffPage = new QWidget;
+    auto *staffLayout = new QVBoxLayout(staffPage);
     staffLayout->addWidget(staffTable);
     staffLayout->addLayout(staffHeader);
 
+    sectionTabs = new QTabWidget;
+    sectionTabs->addTab(altsPage, QString());
+    sectionTabs->addTab(sessionsPage, QString());
+    sectionTabs->addTab(staffPage, QString());
+
     auto *splitter = new QSplitter(Qt::Vertical);
     splitter->addWidget(userInfoGroup);
-    splitter->addWidget(altsGroup);
-    splitter->addWidget(sessionsGroup);
-    splitter->addWidget(staffGroup);
+    splitter->addWidget(sectionTabs);
     splitter->setStretchFactor(0, 1);
     splitter->setStretchFactor(1, 2);
-    splitter->setStretchFactor(2, 2);
-    splitter->setStretchFactor(3, 1);
 
     auto *mainLayout = new QVBoxLayout(centralWidget);
     mainLayout->addLayout(topBar);
@@ -202,21 +230,28 @@ void TabModeration::retranslateUi()
     refreshStaffButton->setText(tr("Refresh"));
 
     userInfoGroup->setTitle(tr("User Info"));
-    userInfoNameLabel->setText(tr("Name:"));
-    userInfoRegisteredLabel->setText(tr("Registered:"));
-    userInfoLastLoginLabel->setText(tr("Last login:"));
-    userInfoStatusLabel->setText(tr("Status:"));
-    userInfoCountsLabel->setText(tr("Counts:"));
     userInfoNotesLabel->setText(tr("Admin notes:"));
-
-    altsGroup->setTitle(tr("Alts"));
-    openAltsButton->setText(tr("Open alt graph"));
+    cardReports->setTitle(tr("Reports"));
+    cardWarns->setTitle(tr("Warnings"));
+    cardBans->setTitle(tr("Bans"));
+    altsCard->setTitle(tr("Alts"));
+    openAltsButton->setText(tr("Open graph"));
     openAltsButton->setToolTip(tr("Open this user in the User Alts tab"));
-    sessionsGroup->setTitle(tr("Sessions"));
-    staffGroup->setTitle(tr("Staff Last Logins"));
+
+    sectionTabs->setTabText(0, tr("Alts"));
+    sectionTabs->setTabText(1, tr("Sessions"));
+    sectionTabs->setTabText(2, tr("Staff Last Logins"));
+
+    if (cachedUserInfoValid) {
+        applyUserInfo();
+    }
+    if (cachedAltsCount >= 0) {
+        applyAltsCount();
+    }
 
     altsTable->setHorizontalHeaderLabels({tr("User"), tr("eMail"), tr("Client ID"), tr("Registered"), tr("Last login"),
                                           tr("Warns"), tr("Bans"), tr("Active")});
+    altsTable->setToolTip(tr("Double-click or press Enter on a row to open it in the User Alts tab"));
     sessionsTable->setHorizontalHeaderLabels({tr("IP"), tr("Client ID"), tr("Start"), tr("End"), tr("Type")});
     staffTable->setHorizontalHeaderLabels({tr("User"), tr("Level"), tr("Last login")});
 }
@@ -232,11 +267,15 @@ QString TabModeration::formatEpoch(quint64 ts) const
 void TabModeration::clearUserData()
 {
     currentUser.clear();
+    cachedUserInfoValid = false;
+    cachedAltsCount = -1;
     userInfoNameValue->clear();
-    userInfoRegisteredValue->clear();
-    userInfoLastLoginValue->clear();
     userInfoStatusValue->clear();
-    userInfoCountsValue->clear();
+    sublineLabel->clear();
+    cardReportsValue->setText(QStringLiteral("–"));
+    cardWarnsValue->setText(QStringLiteral("–"));
+    cardBansValue->setText(QStringLiteral("–"));
+    altsCountValue->setText(QStringLiteral("–"));
     userInfoNotesEdit->clear();
     altsTable->setRowCount(0);
     sessionsTable->setRowCount(0);
@@ -261,9 +300,12 @@ void TabModeration::investigateUser()
         return;
     }
     currentUser = userName;
+    cachedUserInfoValid = false;
+    cachedAltsCount = -1;
     resetPasswordButton->setEnabled(true);
     removeAvatarButton->setEnabled(true);
     openAltsButton->setEnabled(true);
+    altsCountValue->setText(QStringLiteral("…"));
     altsTable->setRowCount(0);
     sessionsTable->setRowCount(0);
     requestUserInfo(userName);
@@ -282,10 +324,11 @@ void TabModeration::openAltsGraph()
 void TabModeration::requestUserInfo(const QString &userName)
 {
     userInfoNameValue->setText(userName);
-    userInfoRegisteredValue->setText(tr("Loading..."));
-    userInfoLastLoginValue->setText(tr("Loading..."));
+    sublineLabel->setText(tr("Loading..."));
     userInfoStatusValue->clear();
-    userInfoCountsValue->clear();
+    cardReportsValue->setText(QStringLiteral("…"));
+    cardWarnsValue->setText(QStringLiteral("…"));
+    cardBansValue->setText(QStringLiteral("…"));
     userInfoNotesEdit->clear();
 
     Command_ReportUserInfo cmd;
@@ -298,9 +341,12 @@ void TabModeration::requestUserInfo(const QString &userName)
 void TabModeration::userInfoResponse(const Response &response)
 {
     if (response.response_code() != Response::RespOk) {
-        userInfoRegisteredValue->clear();
-        userInfoLastLoginValue->clear();
+        cachedUserInfoValid = false;
+        sublineLabel->clear();
         userInfoStatusValue->setText(tr("Error loading user info."));
+        cardReportsValue->setText(QStringLiteral("–"));
+        cardWarnsValue->setText(QStringLiteral("–"));
+        cardBansValue->setText(QStringLiteral("–"));
         return;
     }
 
@@ -309,20 +355,28 @@ void TabModeration::userInfoResponse(const Response &response)
         return;
     }
 
-    userInfoRegisteredValue->setText(formatEpoch(resp.registration_time()));
-    userInfoLastLoginValue->setText(formatEpoch(resp.last_login()));
+    cachedUserInfo.CopyFrom(resp);
+    cachedUserInfoValid = true;
+    applyUserInfo();
+}
+
+void TabModeration::applyUserInfo()
+{
+    const Response_ReportUserInfo &resp = cachedUserInfo;
+    sublineLabel->setText(tr("Registered %1 · Last login %2")
+                              .arg(formatEpoch(resp.registration_time()))
+                              .arg(formatEpoch(resp.last_login())));
 
     QStringList statusParts;
     statusParts << (resp.is_active() ? tr("active") : tr("inactive"));
     if (resp.has_is_admin() && resp.is_admin()) {
         statusParts << tr("admin");
     }
-    userInfoStatusValue->setText(statusParts.join(", "));
+    userInfoStatusValue->setText(statusParts.join(QStringLiteral(", ")));
 
-    userInfoCountsValue->setText(tr("Reports: %1   Bans: %2   Warnings: %3")
-                                     .arg(resp.total_reports())
-                                     .arg(resp.total_bans())
-                                     .arg(resp.total_warns()));
+    cardReportsValue->setText(QString::number(resp.total_reports()));
+    cardWarnsValue->setText(QString::number(resp.total_warns()));
+    cardBansValue->setText(QString::number(resp.total_bans()));
 
     if (resp.has_admin_notes() && !resp.admin_notes().empty()) {
         userInfoNotesEdit->setPlainText(QString::fromStdString(resp.admin_notes()));
@@ -331,12 +385,21 @@ void TabModeration::userInfoResponse(const Response &response)
     }
 }
 
+void TabModeration::applyAltsCount()
+{
+    altsCountValue->setText(tr("%1 related").arg(cachedAltsCount));
+}
+
 void TabModeration::requestSessions(const QString &userName)
 {
     Command_GetUserSessions cmd;
     cmd.set_user_name(userName.toStdString());
     PendingCommand *pend = client->prepareModeratorCommand(cmd);
-    connect(pend, &PendingCommand::finished, this, &TabModeration::sessionsResponse);
+    connect(pend, &PendingCommand::finished, this, [this, userName](const Response &response) {
+        if (userName == currentUser) {
+            sessionsResponse(response);
+        }
+    });
     client->sendCommand(pend);
 }
 
@@ -368,7 +431,11 @@ void TabModeration::requestAlts(const QString &userName)
     Command_GetUserAlts cmd;
     cmd.set_user_name(userName.toStdString());
     PendingCommand *pend = client->prepareModeratorCommand(cmd);
-    connect(pend, &PendingCommand::finished, this, &TabModeration::altsResponse);
+    connect(pend, &PendingCommand::finished, this, [this, userName](const Response &response) {
+        if (userName == currentUser) {
+            altsResponse(response);
+        }
+    });
     client->sendCommand(pend);
 }
 
@@ -376,10 +443,14 @@ void TabModeration::altsResponse(const Response &response)
 {
     altsTable->setRowCount(0);
     if (response.response_code() != Response::RespOk) {
+        cachedAltsCount = -1;
+        altsCountValue->setText(QStringLiteral("–"));
         return;
     }
 
     const Response_UserAlts &resp = response.GetExtension(Response_UserAlts::ext);
+    cachedAltsCount = resp.alts_size();
+    applyAltsCount();
     altsTable->setRowCount(resp.alts_size());
     for (int i = 0; i < resp.alts_size(); ++i) {
         const ServerInfo_UserAlt &alt = resp.alts(i);
