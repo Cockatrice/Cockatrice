@@ -67,7 +67,8 @@
 
 namespace
 {
-const QString MAIN_CHANNEL;
+// Empty id refers to the implicit Main channel.
+const QString MAIN_CHANNEL = QString();
 
 /**
  * @brief Privilege rank mirroring Server_Room::userPrivilegeLevel.
