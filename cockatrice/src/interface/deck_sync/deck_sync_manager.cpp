@@ -150,11 +150,12 @@ void DeckSyncManager::collectServerFiles(const ServerInfo_DeckStorage_Folder &fo
         } else if (item.has_file()) {
             const QString path = prefix.isEmpty() ? name : prefix + "/" + name;
             const ServerInfo_DeckStorage_File &file = item.file();
-            ServerFile entry;
-            entry.id = item.id();
-            entry.guid = QString::fromStdString(file.guid());
-            entry.hash = QString::fromStdString(file.hash());
-            entry.lastModifiedSecs = file.has_last_modified() ? static_cast<qint64>(file.last_modified()) : 0;
+            ServerFile entry{
+                .id = item.id(),
+                .guid = QString::fromStdString(file.guid()),
+                .hash = QString::fromStdString(file.hash()),
+                .lastModifiedSecs = file.has_last_modified() ? static_cast<qint64>(file.last_modified()) : 0,
+            };
             files.insert(path, entry);
         }
     }
