@@ -5,6 +5,7 @@
 
 #include <QString>
 #include <QtGlobal>
+#include <libcockatrice/protocol/pb/response_report_user_info.pb.h>
 #include <qtmetamacros.h>
 
 class AbstractClient;
@@ -13,6 +14,7 @@ class QLabel;
 class QLineEdit;
 class QPushButton;
 class QTableWidget;
+class QTabWidget;
 class QTextEdit;
 class Response;
 class TabSupervisor;
@@ -54,10 +56,15 @@ private:
     void requestAlts(const QString &userName);
     void requestModeratorLogins();
     void clearUserData();
+    void applyUserInfo();
+    void applyAltsCount();
     [[nodiscard]] QString formatEpoch(quint64 ts) const;
 
     AbstractClient *client;
     QString currentUser;
+    Response_ReportUserInfo cachedUserInfo;
+    bool cachedUserInfoValid = false;
+    int cachedAltsCount = -1;
 
     QLineEdit *searchEdit;
     QPushButton *investigateButton;
@@ -66,26 +73,25 @@ private:
     QPushButton *removeBannerButton;
 
     QGroupBox *userInfoGroup;
-    QLabel *userInfoNameLabel;
     QLabel *userInfoNameValue;
-    QLabel *userInfoRegisteredLabel;
-    QLabel *userInfoRegisteredValue;
-    QLabel *userInfoLastLoginLabel;
-    QLabel *userInfoLastLoginValue;
-    QLabel *userInfoStatusLabel;
     QLabel *userInfoStatusValue;
-    QLabel *userInfoCountsLabel;
-    QLabel *userInfoCountsValue;
+    QLabel *sublineLabel;
+    QGroupBox *cardReports;
+    QGroupBox *cardWarns;
+    QGroupBox *cardBans;
+    QGroupBox *altsCard;
+    QLabel *cardReportsValue;
+    QLabel *cardWarnsValue;
+    QLabel *cardBansValue;
+    QLabel *altsCountValue;
     QLabel *userInfoNotesLabel;
     QTextEdit *userInfoNotesEdit;
 
-    QGroupBox *altsGroup;
+    QTabWidget *sectionTabs;
     QTableWidget *altsTable;
-    QPushButton *openAltsButton;
-    QGroupBox *sessionsGroup;
     QTableWidget *sessionsTable;
-    QGroupBox *staffGroup;
     QTableWidget *staffTable;
+    QPushButton *openAltsButton;
     QPushButton *refreshStaffButton;
 };
 
