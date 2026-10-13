@@ -1631,6 +1631,8 @@ constexpr int MAX_USER_ALTS_PER_LEVEL = 200;
 // Identifier-heavy frontiers, e.g. VPN users with hundreds of recent IPs, are
 // truncated: this tool is deliberately a first-pass sweep, not an audit.
 constexpr int MAX_USER_ALT_IDENTIFIERS = 200;
+constexpr int MIN_USER_ALT_MONTHS = 1;
+constexpr int MAX_USER_ALT_MONTHS = 24;
 
 QString altInClause(const QString &prefix, const QList<QString> &values)
 {
@@ -1673,7 +1675,12 @@ QList<QString> cappedIdentifiers(QSet<QString> values)
 }
 } // namespace
 
-QList<ServerInfo_UserAlt> Servatrice_DatabaseInterface::getUserAlts(const QString &userName, int depth)
+QList<ServerInfo_UserAlt> Servatrice_DatabaseInterface::getUserAlts(const QString &userName,
+                                                                    int depth,
+                                                                    bool useEmail,
+                                                                    bool useClientId,
+                                                                    bool useIp,
+                                                                    int sessionMonths)
 {
     QList<ServerInfo_UserAlt> results;
 
@@ -1686,6 +1693,16 @@ QList<ServerInfo_UserAlt> Servatrice_DatabaseInterface::getUserAlts(const QStrin
     } else if (depth > MAX_USER_ALT_DEPTH) {
         depth = MAX_USER_ALT_DEPTH;
     }
+    if (sessionMonths < MIN_USER_ALT_MONTHS) {
+        sessionMonths = MIN_USER_ALT_MONTHS;
+    } else if (sessionMonths > MAX_USER_ALT_MONTHS) {
+        sessionMonths = MAX_USER_ALT_MONTHS;
+    }
+
+    // Interpolated, not bound: placeholders are not allowed in INTERVAL
+    // expressions, and the clamped integer cannot inject SQL.
+    const QString sessionWindow = QStringLiteral(" AND start_time >= DATE_SUB(NOW(), INTERVAL ") +
+                                  QString::number(sessionMonths) + QStringLiteral(" MONTH)");
 
     // Seed must exist; its row anchors the result at depth 0.
     QSqlQuery *seedQuery = prepareQuery("SELECT u.name, u.email, u.clientid, UNIX_TIMESTAMP(u.registrationDate), "
@@ -1740,36 +1757,40 @@ QList<ServerInfo_UserAlt> Servatrice_DatabaseInterface::getUserAlts(const QStrin
         QSet<QString> emails;
         QSet<QString> clientIds;
         QSet<QString> ips;
-        QSqlQuery *frontierQuery =
-            prepareQuery(QStringLiteral("SELECT email, clientid FROM {prefix}_users WHERE name IN ") + frontierClause);
-        altBindValues(frontierQuery, QStringLiteral(":alt_name"), frontier);
-        if (execSqlQuery(frontierQuery)) {
-            while (frontierQuery->next()) {
-                const QString email = frontierQuery->value(0).toString();
-                const QString clientId = frontierQuery->value(1).toString();
-                if (!email.isEmpty()) {
-                    emails << email;
-                }
-                if (!clientId.isEmpty()) {
-                    clientIds << clientId;
+        if (useEmail || useClientId) {
+            QSqlQuery *frontierQuery = prepareQuery(
+                QStringLiteral("SELECT email, clientid FROM {prefix}_users WHERE name IN ") + frontierClause);
+            altBindValues(frontierQuery, QStringLiteral(":alt_name"), frontier);
+            if (execSqlQuery(frontierQuery)) {
+                while (frontierQuery->next()) {
+                    const QString email = frontierQuery->value(0).toString();
+                    const QString clientId = frontierQuery->value(1).toString();
+                    if (useEmail && !email.isEmpty()) {
+                        emails << email;
+                    }
+                    if (useClientId && !clientId.isEmpty()) {
+                        clientIds << clientId;
+                    }
                 }
             }
         }
 
         // Recent session identifiers: IPs plus historic client ids.
-        QSqlQuery *sessionQuery = prepareQuery(
-            QStringLiteral("SELECT DISTINCT ip_address, clientid FROM {prefix}_sessions WHERE user_name IN ") +
-            frontierClause + QStringLiteral(" AND start_time >= DATE_SUB(NOW(), INTERVAL 6 MONTH)"));
-        altBindValues(sessionQuery, QStringLiteral(":alt_name"), frontier);
-        if (execSqlQuery(sessionQuery)) {
-            while (sessionQuery->next()) {
-                const QString ip = sessionQuery->value(0).toString();
-                const QString clientId = sessionQuery->value(1).toString();
-                if (!ip.isEmpty()) {
-                    ips << ip;
-                }
-                if (!clientId.isEmpty()) {
-                    clientIds << clientId;
+        if (useIp || useClientId) {
+            QSqlQuery *sessionQuery = prepareQuery(
+                QStringLiteral("SELECT DISTINCT ip_address, clientid FROM {prefix}_sessions WHERE user_name IN ") +
+                frontierClause + sessionWindow);
+            altBindValues(sessionQuery, QStringLiteral(":alt_name"), frontier);
+            if (execSqlQuery(sessionQuery)) {
+                while (sessionQuery->next()) {
+                    const QString ip = sessionQuery->value(0).toString();
+                    const QString clientId = sessionQuery->value(1).toString();
+                    if (useIp && !ip.isEmpty()) {
+                        ips << ip;
+                    }
+                    if (useClientId && !clientId.isEmpty()) {
+                        clientIds << clientId;
+                    }
                 }
             }
         }
@@ -1802,14 +1823,13 @@ QList<ServerInfo_UserAlt> Servatrice_DatabaseInterface::getUserAlts(const QStrin
         if (!ipList.isEmpty()) {
             conditions << QStringLiteral("u.name IN (SELECT DISTINCT s.user_name FROM {prefix}_sessions s WHERE "
                                          "s.ip_address IN ") +
-                              altInClause(QStringLiteral(":alt_ip"), ipList) +
-                              QStringLiteral(" AND s.start_time >= DATE_SUB(NOW(), INTERVAL 6 MONTH))");
+                              altInClause(QStringLiteral(":alt_ip"), ipList) + sessionWindow + QStringLiteral(")");
         }
         if (!clientIdList.isEmpty()) {
             conditions << QStringLiteral("u.name IN (SELECT DISTINCT s.user_name FROM {prefix}_sessions s WHERE "
                                          "s.clientid IN ") +
-                              altInClause(QStringLiteral(":alt_hcid"), clientIdList) +
-                              QStringLiteral(" AND s.start_time >= DATE_SUB(NOW(), INTERVAL 6 MONTH))");
+                              altInClause(QStringLiteral(":alt_hcid"), clientIdList) + sessionWindow +
+                              QStringLiteral(")");
         }
         candidateString += conditions.join(QStringLiteral(" OR "));
         candidateString += QStringLiteral(" ORDER BY u.name LIMIT ") + QString::number(MAX_USER_ALTS_PER_LEVEL);
@@ -1869,7 +1889,7 @@ QList<ServerInfo_UserAlt> Servatrice_DatabaseInterface::getUserAlts(const QStrin
                                           altInClause(QStringLiteral(":alt_ecid"), clientIdList);
             }
             evidenceString += evidenceConditions.join(QStringLiteral(" OR "));
-            evidenceString += QStringLiteral(") AND start_time >= DATE_SUB(NOW(), INTERVAL 6 MONTH)");
+            evidenceString += QStringLiteral(")") + sessionWindow;
 
             QSqlQuery *evidenceQuery = prepareQuery(evidenceString);
             altBindValues(evidenceQuery, QStringLiteral(":alt_ev"), unexplained);
@@ -1937,11 +1957,11 @@ QList<ServerInfo_UserAlt> Servatrice_DatabaseInterface::getUserAlts(const QStrin
         }
         if (!neededIps.isEmpty()) {
             const QList<QString> neededIpList = neededIps.values();
-            QSqlQuery *countQuery = prepareQuery(
-                QStringLiteral("SELECT ip_address, COUNT(DISTINCT user_name) FROM {prefix}_sessions WHERE "
-                               "ip_address IN ") +
-                altInClause(QStringLiteral(":alt_ci"), neededIpList) +
-                QStringLiteral(" AND start_time >= DATE_SUB(NOW(), INTERVAL 6 MONTH) GROUP BY ip_address"));
+            QSqlQuery *countQuery =
+                prepareQuery(QStringLiteral("SELECT ip_address, COUNT(DISTINCT user_name) FROM {prefix}_sessions WHERE "
+                                            "ip_address IN ") +
+                             altInClause(QStringLiteral(":alt_ci"), neededIpList) + sessionWindow +
+                             QStringLiteral(" GROUP BY ip_address"));
             altBindValues(countQuery, QStringLiteral(":alt_ci"), neededIpList);
             if (execSqlQuery(countQuery)) {
                 while (countQuery->next()) {
@@ -1976,6 +1996,31 @@ QList<ServerInfo_UserAlt> Servatrice_DatabaseInterface::getUserAlts(const QStrin
             nextFrontier << candidate.name;
         }
         frontier = nextFrontier;
+    }
+
+    // Distinct recent IP counts per account: cheap group signal without
+    // shipping full address histories to the client.
+    if (!results.isEmpty()) {
+        QList<QString> resultNames;
+        resultNames.reserve(results.size());
+        for (const ServerInfo_UserAlt &alt : results) {
+            resultNames << QString::fromStdString(alt.user_name());
+        }
+        QSqlQuery *ipCountQuery = prepareQuery(
+            QStringLiteral("SELECT user_name, COUNT(DISTINCT ip_address) FROM {prefix}_sessions WHERE user_name IN ") +
+            altInClause(QStringLiteral(":alt_ic"), resultNames) + sessionWindow +
+            QStringLiteral(" GROUP BY user_name"));
+        altBindValues(ipCountQuery, QStringLiteral(":alt_ic"), resultNames);
+        QMap<QString, int> ipCountsByUser;
+        if (execSqlQuery(ipCountQuery)) {
+            while (ipCountQuery->next()) {
+                ipCountsByUser.insert(ipCountQuery->value(0).toString(), ipCountQuery->value(1).toInt());
+            }
+        }
+        for (ServerInfo_UserAlt &alt : results) {
+            alt.set_ip_count(static_cast<google::protobuf::uint32>(
+                ipCountsByUser.value(QString::fromStdString(alt.user_name()), 0)));
+        }
     }
 
     return results;

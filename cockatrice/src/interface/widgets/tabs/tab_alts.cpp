@@ -40,14 +40,15 @@ constexpr int COL_ALTS_USER = 0;
 constexpr int COL_ALTS_VIA = 1;
 constexpr int COL_ALTS_DEPTH = 2;
 constexpr int COL_ALTS_SHARED = 3;
-constexpr int COL_ALTS_EMAIL = 4;
-constexpr int COL_ALTS_CLIENTID = 5;
-constexpr int COL_ALTS_REGISTERED = 6;
-constexpr int COL_ALTS_LAST_LOGIN = 7;
-constexpr int COL_ALTS_WARNS = 8;
-constexpr int COL_ALTS_BANS = 9;
-constexpr int COL_ALTS_ACTIVE = 10;
-constexpr int COL_ALTS_COUNT = 11;
+constexpr int COL_ALTS_IPS = 4;
+constexpr int COL_ALTS_EMAIL = 5;
+constexpr int COL_ALTS_CLIENTID = 6;
+constexpr int COL_ALTS_REGISTERED = 7;
+constexpr int COL_ALTS_LAST_LOGIN = 8;
+constexpr int COL_ALTS_WARNS = 9;
+constexpr int COL_ALTS_BANS = 10;
+constexpr int COL_ALTS_ACTIVE = 11;
+constexpr int COL_ALTS_COUNT = 12;
 
 constexpr int COL_WARNS_TIME = 0;
 constexpr int COL_WARNS_MODERATOR = 1;
@@ -92,6 +93,7 @@ TabAlts::TabAlts(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
     depthSpin->setMinimum(1);
     depthSpin->setMaximum(MAX_ALT_DEPTH);
     depthSpin->setValue(1);
+    connect(depthSpin, &QSpinBox::valueChanged, this, &TabAlts::onSearchFilterChanged);
 
     investigateButton = new QPushButton;
     connect(investigateButton, &QPushButton::clicked, this, &TabAlts::investigateUser);
@@ -121,7 +123,7 @@ TabAlts::TabAlts(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
         auto *chip = new QPushButton(text);
         chip->setCheckable(true);
         chip->setChecked(true);
-        connect(chip, &QPushButton::toggled, this, &TabAlts::onFilterChanged);
+        connect(chip, &QPushButton::toggled, this, &TabAlts::onSearchFilterChanged);
         return chip;
     };
     emailChip = makeChip(QString());
@@ -132,7 +134,13 @@ TabAlts::TabAlts(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
     vpnSpin->setMinimum(1);
     vpnSpin->setMaximum(100000);
     vpnSpin->setValue(DEFAULT_VPN_THRESHOLD);
-    connect(vpnSpin, &QSpinBox::valueChanged, this, &TabAlts::onFilterChanged);
+    connect(vpnSpin, &QSpinBox::valueChanged, this, &TabAlts::onDisplayFilterChanged);
+    windowLabel = new QLabel;
+    monthsSpin = new QSpinBox;
+    monthsSpin->setMinimum(1);
+    monthsSpin->setMaximum(24);
+    monthsSpin->setValue(6);
+    connect(monthsSpin, &QSpinBox::valueChanged, this, &TabAlts::onSearchFilterChanged);
 
     auto *filterBar = new QHBoxLayout;
     filterBar->addWidget(emailChip);
@@ -140,6 +148,8 @@ TabAlts::TabAlts(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
     filterBar->addWidget(ipChip);
     filterBar->addWidget(vpnLabel);
     filterBar->addWidget(vpnSpin);
+    filterBar->addWidget(windowLabel);
+    filterBar->addWidget(monthsSpin);
     filterBar->addStretch();
 
     altsTable = new QTableWidget(0, COL_ALTS_COUNT);
@@ -232,8 +242,11 @@ void TabAlts::retranslateUi()
     ipChip->setToolTip(tr("Show or hide IP address matches"));
     vpnLabel->setText(tr("Hide IPs shared by more than"));
     vpnSpin->setSuffix(tr(" users"));
+    windowLabel->setText(tr("Session window"));
+    monthsSpin->setSuffix(tr(" months"));
+    monthsSpin->setToolTip(tr("How far back session IPs and client IDs are considered."));
 
-    altsTable->setHorizontalHeaderLabels({tr("User"), tr("Via"), tr("Depth"), tr("Shared"), tr("eMail"),
+    altsTable->setHorizontalHeaderLabels({tr("User"), tr("Via"), tr("Depth"), tr("Shared"), tr("IPs"), tr("eMail"),
                                           tr("Client ID"), tr("Registered"), tr("Last login"), tr("Warns"), tr("Bans"),
                                           tr("Active")});
     altsTable->setToolTip(tr("Double-click or press Enter on a row to investigate that account"));
@@ -334,6 +347,10 @@ void TabAlts::requestAlts(const QString &userName, int depth)
     Command_GetUserAlts cmd;
     cmd.set_user_name(userName.toStdString());
     cmd.set_depth(static_cast<google::protobuf::uint32>(depth));
+    cmd.set_include_email(emailChip->isChecked());
+    cmd.set_include_clientid(clientIdChip->isChecked());
+    cmd.set_include_ip(ipChip->isChecked());
+    cmd.set_session_months(static_cast<google::protobuf::uint32>(monthsSpin->value()));
     PendingCommand *pend = client->prepareModeratorCommand(cmd);
     connect(pend, &PendingCommand::finished, this, [this, userName](const Response &response) {
         if (userName == currentUser) {
@@ -430,6 +447,9 @@ void TabAlts::renderTable()
         altsTable->setItem(
             row, COL_ALTS_SHARED,
             new QTableWidgetItem(alt.has_shared_count() ? QString::number(alt.shared_count()) : QStringLiteral("-")));
+        altsTable->setItem(
+            row, COL_ALTS_IPS,
+            new QTableWidgetItem(alt.has_ip_count() ? QString::number(alt.ip_count()) : QStringLiteral("-")));
         altsTable->setItem(row, COL_ALTS_EMAIL, new QTableWidgetItem(QString::fromStdString(alt.email())));
         altsTable->setItem(row, COL_ALTS_CLIENTID, new QTableWidgetItem(QString::fromStdString(alt.clientid())));
         altsTable->setItem(row, COL_ALTS_REGISTERED, new QTableWidgetItem(formatEpoch(alt.registration_time())));
@@ -477,7 +497,15 @@ void TabAlts::renderTable()
     }
 }
 
-void TabAlts::onFilterChanged()
+void TabAlts::onSearchFilterChanged()
+{
+    if (currentUser.isEmpty()) {
+        return;
+    }
+    investigateUser();
+}
+
+void TabAlts::onDisplayFilterChanged()
 {
     if (lastAlts.isEmpty()) {
         return;
