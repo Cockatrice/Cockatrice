@@ -10,7 +10,7 @@
 #include <qtmetamacros.h>
 
 class AbstractClient;
-class QCheckBox;
+class QGroupBox;
 class QLabel;
 class QLineEdit;
 class QPushButton;
@@ -70,9 +70,9 @@ private:
     QLabel *statusLabel;
     QTableWidget *altsTable;
 
-    QCheckBox *emailCheck;
-    QCheckBox *clientIdCheck;
-    QCheckBox *ipCheck;
+    QPushButton *emailChip;
+    QPushButton *clientIdChip;
+    QPushButton *ipChip;
     QLabel *vpnLabel;
     QSpinBox *vpnSpin;
 
