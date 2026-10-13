@@ -60,7 +60,7 @@ void CardZoneLogic::addCard(CardState *card, const bool reorganize, const int x,
             cardInfo.set_face_down(card->getFaceDown());
             cardInfo.set_x(x);
             cardInfo.set_y(y);
-            emit viewLogic->requestCreateCard(cardInfo, reorganize);
+            emit viewLogic->createCardRequested(cardInfo, reorganize);
         }
     }
 

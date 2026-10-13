@@ -180,7 +180,7 @@ void PlayerEventHandler::eventCreateToken(const Event_CreateToken &event)
     cardInfo.set_face_down(event.face_down());
     cardInfo.set_x(event.x());
     cardInfo.set_y(event.y());
-    emit zone->requestCreateCard(cardInfo, true);
+    emit zone->createCardRequested(cardInfo, true);
 }
 
 void PlayerEventHandler::eventSetCardAttr(const Event_SetCardAttr &event,
