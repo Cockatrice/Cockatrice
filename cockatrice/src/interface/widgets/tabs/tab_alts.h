@@ -3,16 +3,20 @@
 
 #include "tab.h"
 
+#include <QList>
 #include <QString>
 #include <QtGlobal>
+#include <libcockatrice/protocol/pb/serverinfo_user_alt.pb.h>
 #include <qtmetamacros.h>
 
 class AbstractClient;
+class QCheckBox;
 class QLabel;
 class QLineEdit;
 class QPushButton;
 class QSpinBox;
 class QTableWidget;
+class QTextEdit;
 class Response;
 class TabSupervisor;
 
@@ -20,6 +24,7 @@ class TabSupervisor;
  * Staff alt-graph investigation tool. Shows accounts related to the
  * investigated user (shared email, client id, or recent IP address),
  * including transitive alts-of-alts, with per-row match evidence.
+ * Selecting a row loads that account's warnings, bans, and admin notes.
  */
 class TabAlts : public Tab
 {
@@ -37,15 +42,26 @@ private slots:
     void investigateUser();
     void goBack();
     void altsResponse(const Response &response);
+    void onFilterChanged();
+    void onAltSelected();
+    void userDetailsResponse(const Response &response);
+    void warnHistoryResponse(const Response &response);
+    void banHistoryResponse(const Response &response);
 
 private:
     void loadUser(const QString &userName);
     void requestAlts(const QString &userName, int depth);
+    void requestDetails(const QString &userName);
+    void clearDetails();
+    void renderTable();
+    [[nodiscard]] bool rowVisible(const ServerInfo_UserAlt &alt) const;
     [[nodiscard]] QString formatEpoch(quint64 ts) const;
 
     AbstractClient *client;
     QString currentUser;
+    QString selectedUser;
     QList<QString> backStack;
+    QList<ServerInfo_UserAlt> lastAlts;
 
     QLineEdit *searchEdit;
     QSpinBox *depthSpin;
@@ -53,6 +69,23 @@ private:
     QPushButton *backButton;
     QLabel *statusLabel;
     QTableWidget *altsTable;
+
+    QCheckBox *emailCheck;
+    QCheckBox *clientIdCheck;
+    QCheckBox *ipCheck;
+    QLabel *vpnLabel;
+    QSpinBox *vpnSpin;
+
+    QLabel *detailNameValue;
+    QLabel *detailCountsValue;
+    QTextEdit *detailNotesEdit;
+    QTableWidget *warnsTable;
+    QTableWidget *bansTable;
+
+    QGroupBox *detailsGroup;
+    QLabel *detailNameLabel;
+    QLabel *detailCountsLabel;
+    QLabel *detailNotesLabel;
 };
 
 #endif // TAB_ALTS_H
