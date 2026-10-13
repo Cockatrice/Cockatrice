@@ -129,14 +129,14 @@ public:
      */
     static bool hasChannelPrivilege(const ServerInfo_User &userInfo, ServerInfo_RoomChannel::AccessLevel requiredLevel);
     /** @brief True when @p userInfo may read @p channel. */
-    bool mayReadChannel(const ServerInfo_User &userInfo, const ServerInfo_RoomChannel &channel) const;
+    static bool mayReadChannel(const ServerInfo_User &userInfo, const ServerInfo_RoomChannel &channel);
     /**
      * @brief True when @p userInfo may write to @p channel.
      *
      * Writing requires the channel's write level, or — when no explicit write
      * level is configured — the same level as reading.
      */
-    bool mayWriteChannel(const ServerInfo_User &userInfo, const ServerInfo_RoomChannel &channel) const;
+    static bool mayWriteChannel(const ServerInfo_User &userInfo, const ServerInfo_RoomChannel &channel);
     const QMap<int, Server_Game *> &getGames() const
     {
         return games;

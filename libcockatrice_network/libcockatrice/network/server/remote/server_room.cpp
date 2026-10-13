@@ -211,12 +211,12 @@ bool Server_Room::hasChannelPrivilege(const ServerInfo_User &userInfo,
     }
 }
 
-bool Server_Room::mayReadChannel(const ServerInfo_User &userInfo, const ServerInfo_RoomChannel &channel) const
+bool Server_Room::mayReadChannel(const ServerInfo_User &userInfo, const ServerInfo_RoomChannel &channel)
 {
     return hasChannelPrivilege(userInfo, channel.access_level());
 }
 
-bool Server_Room::mayWriteChannel(const ServerInfo_User &userInfo, const ServerInfo_RoomChannel &channel) const
+bool Server_Room::mayWriteChannel(const ServerInfo_User &userInfo, const ServerInfo_RoomChannel &channel)
 {
     const auto writeLevel = channel.has_write_access_level() ? channel.write_access_level() : channel.access_level();
     return hasChannelPrivilege(userInfo, writeLevel);
