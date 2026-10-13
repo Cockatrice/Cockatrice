@@ -5,10 +5,13 @@
 #include "../utility/report_utils.h"
 #include "abstract_client.h"
 #include "libcockatrice/protocol/pb/response.pb.h"
+#include "moderation_header_style.h"
+#include "moderation_tab_style.h"
 #include "report_status_delegate.h"
 #include "tab_supervisor.h"
 
 #include <QAbstractItemView>
+#include <QApplication>
 #include <QChar>
 #include <QCheckBox>
 #include <QComboBox>
@@ -25,6 +28,7 @@
 #include <QPushButton>
 #include <QSharedPointer>
 #include <QSignalBlocker>
+#include <QStyleFactory>
 #include <QTabWidget>
 #include <QTableWidget>
 #include <QTableWidgetItem>
@@ -124,6 +128,9 @@ TabReport::TabReport(TabSupervisor *_tabSupervisor, AbstractClient *_client) : T
     table->horizontalHeader()->setSectionResizeMode(COL_TIME, QHeaderView::ResizeToContents);
     table->horizontalHeader()->setSectionResizeMode(COL_REPORTED, QHeaderView::Stretch);
     table->horizontalHeader()->setSectionResizeMode(COL_REPORTER, QHeaderView::ResizeToContents);
+    auto *headerStyle = new ModerationHeaderStyle(QStyleFactory::create(QApplication::style()->objectName()));
+    headerStyle->setParent(table->horizontalHeader());
+    table->horizontalHeader()->setStyle(headerStyle);
     connect(table, &QTableWidget::itemSelectionChanged, this, &TabReport::onSelectionChanged);
     table->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(table, &QTableWidget::customContextMenuRequested, this, &TabReport::showTableContextMenu);
@@ -241,6 +248,9 @@ TabReport::TabReport(TabSupervisor *_tabSupervisor, AbstractClient *_client) : T
     });
 
     detailTabs = new QTabWidget;
+    auto *tabStyle = new ModerationTabStyle(QStyleFactory::create(QApplication::style()->objectName()));
+    tabStyle->setParent(detailTabs->tabBar());
+    detailTabs->tabBar()->setStyle(tabStyle);
     detailTabs->addTab(descPage, QString());
     detailTabs->addTab(chatPage, QString());
     detailTabs->addTab(commentsPage, QString());

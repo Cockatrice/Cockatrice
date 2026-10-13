@@ -6,8 +6,10 @@
 #include "alt_table_delegate.h"
 #include "libcockatrice/protocol/pb/response.pb.h"
 #include "libcockatrice/protocol/pb/response_user_alts.pb.h"
+#include "moderation_header_style.h"
 
 #include <QAbstractItemView>
+#include <QApplication>
 #include <QDateTime>
 #include <QGridLayout>
 #include <QGroupBox>
@@ -21,6 +23,7 @@
 #include <QSignalBlocker>
 #include <QSpinBox>
 #include <QSplitter>
+#include <QStyleFactory>
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QTextEdit>
@@ -78,6 +81,9 @@ void configureAltTable(QTableWidget *table)
     table->setAlternatingRowColors(true);
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     table->horizontalHeader()->setStretchLastSection(true);
+    auto *headerStyle = new ModerationHeaderStyle(QStyleFactory::create(QApplication::style()->objectName()));
+    headerStyle->setParent(table->horizontalHeader());
+    table->horizontalHeader()->setStyle(headerStyle);
 }
 } // namespace
 
