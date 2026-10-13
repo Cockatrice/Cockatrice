@@ -70,7 +70,7 @@ TEST(CardZoneLogicTest, AddsAndTakesCardsWithoutAGraphicsSide)
 TEST(CardZoneLogicTest, AsksTheGraphicsSideToCreateCards)
 {
     HandZoneLogic zone(nullptr, QStringLiteral("library"), false, true, true);
-    QSignalSpy requestSpy(&zone, &CardZoneLogic::requestCreateCard);
+    QSignalSpy requestSpy(&zone, &CardZoneLogic::createCardRequested);
 
     ServerInfo_Card cardInfo;
     cardInfo.set_name("Lightning Bolt");
@@ -78,7 +78,7 @@ TEST(CardZoneLogicTest, AsksTheGraphicsSideToCreateCards)
     cardInfo.set_x(0);
     cardInfo.set_y(1);
 
-    zone.requestCreateCard(cardInfo, true);
+    zone.createCardRequested(cardInfo, true);
 
     ASSERT_EQ(requestSpy.count(), 1);
     const QList<QVariant> arguments = requestSpy.takeFirst();
