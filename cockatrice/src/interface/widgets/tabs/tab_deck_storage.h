@@ -8,10 +8,10 @@
 #ifndef TAB_DECK_STORAGE_H
 #define TAB_DECK_STORAGE_H
 
+#include "../deck_sync/deck_sync_manager.h"
 #include "../interface/widgets/server/remote/remote_decklist_tree_widget.h"
 #include "tab.h"
 
-#include "../deck_sync/deck_sync_manager.h"
 #include <QList>
 #include <QString>
 #include <QStringList>
