@@ -7,6 +7,7 @@
 #include "libcockatrice/protocol/pb/serverinfo_moderator_login.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_user_alt.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_user_session.pb.h"
+#include "tab_supervisor.h"
 
 #include <QAbstractItemView>
 #include <QDateTime>
@@ -146,7 +147,19 @@ TabModeration::TabModeration(TabSupervisor *_tabSupervisor, AbstractClient *_cli
     altsGroup = new QGroupBox;
     altsTable = new QTableWidget(0, COL_ALTS_COUNT);
     configureTable(altsTable);
+    connect(altsTable, &QTableWidget::cellDoubleClicked, this, [this](int row, int) {
+        auto *userItem = altsTable->item(row, COL_ALTS_USER);
+        if (userItem != nullptr && !userItem->text().isEmpty()) {
+            getTabSupervisor()->openTabAlts(userItem->text());
+        }
+    });
+    openAltsButton = new QPushButton;
+    connect(openAltsButton, &QPushButton::clicked, this, &TabModeration::openAltsGraph);
+    auto *altsHeader = new QHBoxLayout;
+    altsHeader->addStretch();
+    altsHeader->addWidget(openAltsButton);
     auto *altsLayout = new QVBoxLayout(altsGroup);
+    altsLayout->addLayout(altsHeader);
     altsLayout->addWidget(altsTable);
 
     sessionsGroup = new QGroupBox;
@@ -205,6 +218,8 @@ void TabModeration::retranslateUi()
     userInfoNotesLabel->setText(tr("Admin notes:"));
 
     altsGroup->setTitle(tr("Alts"));
+    openAltsButton->setText(tr("Open alt graph"));
+    openAltsButton->setToolTip(tr("Open this user in the User Alts tab"));
     sessionsGroup->setTitle(tr("Sessions"));
     staffGroup->setTitle(tr("Staff Last Logins"));
 
@@ -233,6 +248,7 @@ void TabModeration::clearUserData()
     resetPasswordButton->setEnabled(false);
     removeAvatarButton->setEnabled(false);
     removeBannerButton->setEnabled(false);
+    openAltsButton->setEnabled(false);
 }
 
 void TabModeration::investigate(const QString &userName)
@@ -254,11 +270,20 @@ void TabModeration::investigateUser()
     resetPasswordButton->setEnabled(true);
     removeAvatarButton->setEnabled(true);
     removeBannerButton->setEnabled(true);
+    openAltsButton->setEnabled(true);
     altsTable->setRowCount(0);
     sessionsTable->setRowCount(0);
     requestUserInfo(userName);
     requestSessions(userName);
     requestAlts(userName);
+}
+
+void TabModeration::openAltsGraph()
+{
+    if (currentUser.isEmpty()) {
+        return;
+    }
+    getTabSupervisor()->openTabAlts(currentUser);
 }
 
 void TabModeration::requestUserInfo(const QString &userName)
