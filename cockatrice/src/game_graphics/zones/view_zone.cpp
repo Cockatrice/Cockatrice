@@ -97,10 +97,10 @@ void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardLis
         }
         reorganizeCards();
     } else if (!qobject_cast<ZoneViewZoneLogic *>(getLogic())->getOriginalZone()->contentsKnown()) {
-        auto *playerActions = getLogic()->getPlayer()->getPlayerActions();
-        PendingCommand *pend = playerActions->prepareZoneDump(getLogic(), numberCards);
-        connect(pend, &PendingCommand::finished, this, &ZoneViewZone::zoneDumpReceived);
-        playerActions->sendGameCommand(pend);
+        PendingCommand *pend = qobject_cast<ZoneViewZoneLogic *>(getLogic())->requestZoneDump();
+        if (pend != nullptr) {
+            connect(pend, &PendingCommand::finished, this, &ZoneViewZone::zoneDumpReceived);
+        }
     } else {
         const CardList &c = qobject_cast<ZoneViewZoneLogic *>(getLogic())->getOriginalZone()->getCards();
         int number = numberCards == -1 ? c.size() : (numberCards < c.size() ? numberCards : c.size());
