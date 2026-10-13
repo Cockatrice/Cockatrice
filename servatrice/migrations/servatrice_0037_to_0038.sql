@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_rooms_channels` (
 -- 2. Audit log: room_channel target type plus a channel column so moderators
 -- can tell which stream a logged message belongs to.
 ALTER TABLE `cockatrice_log`
-  MODIFY `target_type` ENUM('room', 'game', 'chat', 'room_channel') NOT NULL;
+  MODIFY `target_type` ENUM('room', 'game', 'chat', 'room_channel');
 
 ALTER TABLE `cockatrice_log`
   ADD COLUMN `channel` varchar(50) NULL AFTER `target_name`;

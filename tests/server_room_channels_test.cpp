@@ -185,10 +185,11 @@ protected:
         moderator.set_name("mod");
         moderator.set_user_level(ServerInfo_User::IsUser | ServerInfo_User::IsRegistered |
                                  ServerInfo_User::IsModerator);
-        // Deliberately carries no IsModerator flag: an admin reaches moderator
-        // channels through its privilege rank, not by holding the moderator bit.
+        // Mirrors the database layer: the admin bit grants IsAdmin alongside
+        // IsModerator, so admins reach moderator channels via the moderator flag.
         admin.set_name("admin");
-        admin.set_user_level(ServerInfo_User::IsUser | ServerInfo_User::IsRegistered | ServerInfo_User::IsAdmin);
+        admin.set_user_level(ServerInfo_User::IsUser | ServerInfo_User::IsRegistered | ServerInfo_User::IsAdmin |
+                             ServerInfo_User::IsModerator);
         plainUser.set_name("user");
         plainUser.set_user_level(ServerInfo_User::IsUser | ServerInfo_User::IsRegistered);
     }
@@ -325,13 +326,13 @@ TEST_F(RoomChannelTest, ModeratorChannelReachesModeratorAndAbove)
     EXPECT_EQ(mod.lastResponseCode, Response::RespOk);
     EXPECT_EQ(channelSayEvents(mod).size(), 1);
     EXPECT_EQ(channelIdOf(channelSayEvents(mod).first()), "mods");
-    // An admin outranks a moderator and so also receives the channel message.
+    // An admin holds the moderator flag alongside the admin flag and so also receives the channel message.
     EXPECT_EQ(channelSayEvents(adminUser).size(), 1);
     EXPECT_TRUE(channelSayEvents(user).isEmpty());
     EXPECT_TRUE(roomSayEvents(user).isEmpty());
 }
 
-TEST_F(RoomChannelTest, AdminReachesModeratorChannelWithoutModeratorFlag)
+TEST_F(RoomChannelTest, AdminReachesModeratorChannel)
 {
     joinMember(mod, moderator);
     joinMember(adminUser, admin);
