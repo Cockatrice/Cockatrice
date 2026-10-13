@@ -160,9 +160,71 @@ QString defaultBackupRoot()
     }
     QString appData = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
     if (!appData.isEmpty()) {
-        return QDir(appData).absoluteFilePath("../CockatriceBackups");
+        return QDir::cleanPath(QDir(appData).absoluteFilePath("../CockatriceBackups"));
     }
     return QDir::temp().absoluteFilePath("CockatriceBackups");
+}
+
+QStringList listBackupSessions(const QString &backupRoot)
+{
+    QDir root(backupRoot);
+    if (!root.exists()) {
+        return {};
+    }
+    const QStringList names = root.entryList(QStringList() << QStringLiteral("CockatriceDataBackup-*"),
+                                             QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name | QDir::Reversed);
+    QStringList sessions;
+    sessions.reserve(names.size());
+    for (const QString &name : names) {
+        sessions.append(root.absoluteFilePath(name));
+    }
+    return sessions;
+}
+
+QString findRecentBackupSession(const QString &backupRoot, int maxAgeHours)
+{
+    const QStringList sessions = listBackupSessions(backupRoot);
+    if (sessions.isEmpty()) {
+        return {};
+    }
+    const QDateTime now = QDateTime::currentDateTime();
+    for (const QString &session : sessions) {
+        const QFileInfo info(session);
+        // Newest first; the first recent entry is the reuse candidate. Entries
+        // are timestamped, so an old newest entry means no recent backup exists.
+        if (info.exists() && info.lastModified().secsTo(now) < static_cast<qint64>(maxAgeHours) * 3600) {
+            return session;
+        }
+        // Sessions are newest-first, so stop after the newest: older ones are older.
+        break;
+    }
+    return {};
+}
+
+void pruneOldBackupSessions(const QString &backupRoot, int keepCount)
+{
+    const QStringList sessions = listBackupSessions(backupRoot);
+    if (sessions.size() <= keepCount) {
+        return;
+    }
+    for (int i = keepCount; i < sessions.size(); ++i) {
+        QDir(sessions.at(i)).removeRecursively();
+    }
+}
+
+QStringList listSessionBackupLocations(const QString &sessionDir)
+{
+    const QDir session(sessionDir);
+    if (!session.exists()) {
+        return {};
+    }
+    const QStringList entries = session.entryList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::Hidden);
+    QStringList locations;
+    locations.reserve(entries.size());
+    for (const QString &entry : entries) {
+        locations.append(session.absoluteFilePath(entry));
+    }
+    return locations;
 }
 
 } // namespace UserDataBackup

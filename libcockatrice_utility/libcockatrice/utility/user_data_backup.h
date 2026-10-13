@@ -69,6 +69,30 @@ bool backupAtRiskPaths(const QStringList &sourcePaths,
  */
 QString defaultBackupRoot();
 
+/**
+ * @brief Lists existing backup session directories under @p backupRoot, newest first.
+ */
+QStringList listBackupSessions(const QString &backupRoot);
+
+/**
+ * @brief Returns the newest session directory younger than @p maxAgeHours, or empty.
+ *
+ * Used to throttle startup safety backups so dismissing the warning without
+ * "Don't show again" does not create a full duplicate on every launch.
+ */
+QString findRecentBackupSession(const QString &backupRoot, int maxAgeHours = 24);
+
+/**
+ * @brief Deletes oldest sessions keeping only the newest @p keepCount ones.
+ */
+void pruneOldBackupSessions(const QString &backupRoot, int keepCount = 5);
+
+/**
+ * @brief Lists the backup targets inside an existing session directory.
+ * @returns absolute paths of the entries, for reuse messages without a new copy.
+ */
+QStringList listSessionBackupLocations(const QString &sessionDir);
+
 } // namespace UserDataBackup
 
 #endif // USER_DATA_BACKUP_H

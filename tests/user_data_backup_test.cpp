@@ -212,6 +212,62 @@ TEST(UserDataBackup, DefaultBackupRootIsUsable)
     EXPECT_TRUE(QDir(root).isAbsolute());
 }
 
+TEST(UserDataBackup, DefaultBackupRootHasNoDotDotSegments)
+{
+    QString root = UserDataBackup::defaultBackupRoot();
+    EXPECT_FALSE(root.contains(QStringLiteral("..")));
+    EXPECT_EQ(root, QDir::cleanPath(root));
+}
+
+TEST(UserDataBackup, ListSessionsFindsRecentAndPrunesOld)
+{
+    QTemporaryDir sourceDir;
+    QTemporaryDir backupRoot;
+    ASSERT_TRUE(sourceDir.isValid());
+    ASSERT_TRUE(backupRoot.isValid());
+    QFile deck(QDir(sourceDir.path()).absoluteFilePath("mydeck.cod"));
+    ASSERT_TRUE(deck.open(QIODevice::WriteOnly | QIODevice::Text));
+    deck.write("<cockatrice_deck version=\"1\"/>\n");
+    deck.close();
+
+    QStringList locations;
+    QString firstSession;
+    QString secondSession;
+    ASSERT_TRUE(UserDataBackup::backupAtRiskPaths({sourceDir.path()}, backupRoot.path(), &locations, &firstSession));
+    ASSERT_TRUE(UserDataBackup::backupAtRiskPaths({sourceDir.path()}, backupRoot.path(), &locations, &secondSession));
+
+    const QStringList sessions = UserDataBackup::listBackupSessions(backupRoot.path());
+    ASSERT_EQ(sessions.size(), 2);
+    // Newest first
+    EXPECT_EQ(sessions.first(), secondSession);
+
+    const QString recent = UserDataBackup::findRecentBackupSession(backupRoot.path(), 24);
+    EXPECT_EQ(recent, secondSession);
+
+    const QStringList reusedLocations = UserDataBackup::listSessionBackupLocations(recent);
+    EXPECT_FALSE(reusedLocations.isEmpty());
+    for (const QString &location : reusedLocations) {
+        EXPECT_TRUE(location.startsWith(QDir(recent).absolutePath()));
+        EXPECT_TRUE(QFile::exists(location));
+    }
+
+    UserDataBackup::pruneOldBackupSessions(backupRoot.path(), 1);
+    const QStringList pruned = UserDataBackup::listBackupSessions(backupRoot.path());
+    ASSERT_EQ(pruned.size(), 1);
+    EXPECT_EQ(pruned.first(), secondSession);
+}
+
+TEST(UserDataBackup, FindRecentReturnsEmptyWhenNone)
+{
+    QTemporaryDir backupRoot;
+    ASSERT_TRUE(backupRoot.isValid());
+    EXPECT_TRUE(UserDataBackup::listBackupSessions(backupRoot.path()).isEmpty());
+    EXPECT_TRUE(UserDataBackup::findRecentBackupSession(backupRoot.path(), 24).isEmpty());
+    EXPECT_TRUE(UserDataBackup::listSessionBackupLocations(backupRoot.path() + "/missing").isEmpty());
+    // Pruning an empty root must not fail
+    UserDataBackup::pruneOldBackupSessions(backupRoot.path(), 5);
+}
+
 } // namespace
 
 int main(int argc, char **argv)

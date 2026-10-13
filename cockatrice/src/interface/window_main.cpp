@@ -627,22 +627,34 @@ void MainWindow::warnAboutDataPathsInProgramDir()
     if (isPortable) {
         // Portable data lives inside the install directory by design, so there is
         // nothing to reconfigure. Back up the small irreplaceable data instead.
-        // Pictures are deliberately excluded: they are large and can always be
-        // re-downloaded (the installer's pre-uninstall backup keeps custom pics
-        // but drops downloaded ones for the same reason). Replays are excluded
-        // here for size; the installer backup covers them.
+        // Downloaded pictures are deliberately excluded: they are large and can
+        // always be re-downloaded (the installer's pre-uninstall backup drops
+        // them for the same reason). Replays are excluded here for size; the
+        // installer backup covers them during installer-driven upgrades, but a
+        // manual run of the old uninstall.exe is not covered - hence the note
+        // in the warning text below.
         const QString dataDir = SettingsCache::instance().getDataPath();
         for (const QString &sub :
              QStringList{QStringLiteral("decks"), QStringLiteral("customsets"), QStringLiteral("settings"),
-                         QStringLiteral("filters"), QStringLiteral("themes")}) {
+                         QStringLiteral("filters"), QStringLiteral("themes"), QStringLiteral("pics/CUSTOM")}) {
             const QString candidate = QDir(dataDir).absoluteFilePath(sub);
             if (QFileInfo::exists(candidate)) {
                 backupSources.append(candidate);
             }
         }
+        // A portable user may also have pointed a custom path inside the install
+        // dir but outside data/ (e.g. appDir/mydecks). Those offenders would be
+        // wiped by the old uninstaller but are not in the hardcoded list above.
+        offenders = paths.pathsInsideDir(appDir);
+        for (const QString &offender : offenders) {
+            if (!PathsSettings::isInsideDir(offender, dataDir) && !backupSources.contains(offender)) {
+                backupSources.append(offender);
+            }
+        }
         if (backupSources.isEmpty()) {
             return;
         }
+        offenders.clear();
     } else {
         offenders = paths.pathsInsideDir(appDir);
         if (offenders.isEmpty()) {
@@ -655,13 +667,26 @@ void MainWindow::warnAboutDataPathsInProgramDir()
     if (PathsSettings::isInsideDir(backupRoot, appDir)) {
         backupRoot = QDir::temp().absoluteFilePath(QStringLiteral("CockatriceBackups"));
     }
-    // One timestamped session directory for all sources, so a second boundary
-    // never splits a single startup check across two backup folders and
-    // same-named sources cannot overwrite each other.
+    // Throttle: dismissing the dialog without "Don't show again" must not create
+    // a full duplicate on every launch. Reuse a recent session instead, and keep
+    // only a handful of sessions so Documents cannot grow without bound.
     QStringList backupLocations;
     QString sessionDir;
-    const bool backupComplete =
-        UserDataBackup::backupAtRiskPaths(backupSources, backupRoot, &backupLocations, &sessionDir);
+    bool backupComplete = true;
+    bool backupReused = false;
+    const QString recentSession = UserDataBackup::findRecentBackupSession(backupRoot, 24);
+    if (!recentSession.isEmpty()) {
+        sessionDir = recentSession;
+        backupLocations = UserDataBackup::listSessionBackupLocations(sessionDir);
+        backupReused = true;
+        qCInfo(MainWindowLog) << "Reusing recent at-risk user data backup at" << sessionDir;
+    } else {
+        // One timestamped session directory for all sources, so a second boundary
+        // never splits a single startup check across two backup folders and
+        // same-named sources cannot overwrite each other.
+        backupComplete = UserDataBackup::backupAtRiskPaths(backupSources, backupRoot, &backupLocations, &sessionDir);
+        UserDataBackup::pruneOldBackupSessions(backupRoot, 5);
+    }
     for (const QString &backupLocation : backupLocations) {
         qCInfo(MainWindowLog) << "Backed up at-risk user data to" << backupLocation;
     }
@@ -669,15 +694,28 @@ void MainWindow::warnAboutDataPathsInProgramDir()
         qCWarning(MainWindowLog) << "At-risk user data backup incomplete, session dir:" << sessionDir;
     }
 
+    const QString backupVerb = backupReused ? tr("is already available") : tr("has been created");
     QString message;
     if (isPortable) {
-        message = tr("This portable install keeps its data inside the program directory, where the "
-                     "uninstallers shipped in Cockatrice 3.1.0/3.1.1 delete everything on uninstall or "
-                     "update.\n\nA safety backup of your decks, custom sets, settings, filters and themes has "
-                     "been created "
-                     "at:\n%1\n\nUninstalling with the old uninstaller still deletes the program "
-                     "directory, so keep your own copy of that backup until you have updated once.")
-                      .arg(backupLocations.isEmpty() ? backupRoot : backupLocations.join(QLatin1Char('\n')));
+        if (!backupLocations.isEmpty()) {
+            message = tr("This portable install keeps its data inside the program directory, where the "
+                         "uninstallers shipped in Cockatrice 3.1.0/3.1.1 delete everything on uninstall or "
+                         "update.\n\nA safety backup of your decks, custom sets, settings, filters, themes and custom "
+                         "pictures %1 "
+                         "at:\n%2\n\nReplays and downloaded pictures are not included in this backup. Uninstalling "
+                         "with the old uninstaller still deletes the program "
+                         "directory, so keep your own copy of that backup until you have updated once.")
+                          .arg(backupVerb, backupLocations.join(QLatin1Char('\n')));
+            if (!backupComplete) {
+                message += tr("\n\nThe backup may be incomplete; please back up these folders manually as well.");
+            }
+        } else {
+            message = tr("This portable install keeps its data inside the program directory, where the "
+                         "uninstallers shipped in Cockatrice 3.1.0/3.1.1 delete everything on uninstall or "
+                         "update.\n\nThe automatic safety backup failed; please back up your data folder manually "
+                         "before uninstalling or updating.\n\nReplays and downloaded pictures would not have been "
+                         "included in that backup either.");
+        }
     } else {
         message = tr("These paths are configured inside the Cockatrice program directory:\n\n%1\n\n"
                      "Cockatrice keeps its own data outside the program directory by default. Files "
@@ -686,7 +724,7 @@ void MainWindow::warnAboutDataPathsInProgramDir()
                      "them safe.")
                       .arg(offenders.join(QLatin1Char('\n')));
         if (!backupLocations.isEmpty()) {
-            message += tr("\n\nA safety backup has been created at:\n%1").arg(backupLocations.join(QLatin1Char('\n')));
+            message += tr("\n\nA safety backup %1 at:\n%2").arg(backupVerb, backupLocations.join(QLatin1Char('\n')));
             if (!backupComplete) {
                 message += tr("\n\nThe backup may be incomplete; please back up these folders manually as well.");
             }
