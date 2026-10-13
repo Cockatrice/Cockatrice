@@ -216,6 +216,10 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     chatSplitter = new QSplitter(Qt::Vertical);
     chatSplitter->addWidget(gameSelector);
     chatSplitter->addWidget(chatGroupBox);
+    // Splitter children are collapsible by default, so a zero size would hide
+    // the whole chat group box including the tab bar. Keep it clamped to its
+    // minimum size (title + tab bar) when collapsed.
+    chatSplitter->setCollapsible(1, false);
 
     auto *hbox = new QHBoxLayout;
     hbox->addWidget(chatSplitter, 3);
