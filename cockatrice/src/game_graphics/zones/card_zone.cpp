@@ -24,7 +24,7 @@ CardZone::CardZone(CardZoneLogic *_logic, QGraphicsItem *parent)
     connect(logic, &CardZoneLogic::cardCountChanged, this, &CardZone::invalidateItems);
     connect(logic, &CardZoneLogic::reorganizeCards, this, &CardZone::invalidateItems);
     connect(logic, &CardZoneLogic::cardAdded, this, &CardZone::onCardAdded);
-    connect(logic, &CardZoneLogic::requestCreateCard, this, &CardZone::onCreateCardRequested);
+    connect(logic, &CardZoneLogic::createCardRequested, this, &CardZone::onCreateCardRequested);
     connect(logic, &CardZoneLogic::setGraphicsVisibility, this, [this](bool v) { this->setVisible(v); });
     connect(logic, &CardZoneLogic::updateGraphics, this, [this]() { update(); });
     connect(logic, &CardZoneLogic::reorganizeCards, this, &CardZone::reorganizeCards);

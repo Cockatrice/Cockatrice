@@ -178,7 +178,7 @@ void PlayerLogic::processPlayerInfo(const ServerInfo_Player &info)
         const int cardListSize = zoneInfo.card_list_size();
         if (!cardListSize) {
             for (int j = 0; j < zoneInfo.card_count(); ++j) {
-                emit zone->requestCreateCard(ServerInfo_Card(), false);
+                emit zone->createCardRequested(ServerInfo_Card(), false);
             }
         } else {
             for (int j = 0; j < cardListSize; ++j) {
@@ -191,7 +191,7 @@ void PlayerLogic::processPlayerInfo(const ServerInfo_Player &info)
                     cardInfo.set_x(-1);
                     cardInfo.set_y(-1);
                 }
-                emit zone->requestCreateCard(cardInfo, false);
+                emit zone->createCardRequested(cardInfo, false);
             }
         }
         if (zoneInfo.has_always_reveal_top_card()) {
