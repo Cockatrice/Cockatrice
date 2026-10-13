@@ -2,8 +2,10 @@ syntax = "proto2";
 
 message ServerInfo_RoomChannel {
     enum AccessLevel {
-        // Minimum privilege level, evaluated against the privilege ladder
-        // Public < Registered < Judge < Moderator < Admin < Developer.
+        // Required user flag set, evaluated per level (not as a ladder):
+        // Registered needs IsRegistered; Judge needs IsJudge or IsModerator;
+        // Moderator needs IsModerator (admins hold it alongside IsAdmin);
+        // Admin needs IsAdmin; Developer needs IsDeveloper or IsAdmin.
         Public = 0;
         Registered = 1;
         Judge = 2;

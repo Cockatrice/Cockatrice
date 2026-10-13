@@ -336,9 +336,12 @@ roomlist\1\game_types\3\name="GameType3"
 ; channel every room has. Each channel needs a stable ASCII id, a display name
 ; (server data, like the room name) and an access level. Supported levels, from
 ; least to most restrictive, are: public, registered, judge, moderator, admin
-; and developer. A channel is readable by every member whose own
-; privilege level is at least the channel's level -- so a moderator channel is
-; also readable by admins and developers, and an admin channel by developers.
+; and developer. Access is evaluated against the member's user flags, not as a
+; ladder: a moderator channel admits moderators (admins hold the moderator
+; flag alongside the admin flag, so they are admitted too), an admin channel
+; admits only admins, and a developer channel admits only developers and
+; admins. In particular, developers cannot read moderator or admin channels.
+; A judge channel additionally admits moderators.
 ; Public channels are visible to every room member.
 ;
 ; Write access defaults to the read level, so by default a channel is readable

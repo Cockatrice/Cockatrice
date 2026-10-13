@@ -120,11 +120,14 @@ public:
     /** @brief True when @p channelId refers to the implicit Main channel. */
     static bool isMainChannel(const QString &channelId);
     /**
-     * @brief The highest privilege level held by @p userInfo, for channel access gating.
+     * @brief True when the flags in @p userInfo satisfy @p requiredLevel.
      *
-     * Level ordering: Public < Registered < Judge < Moderator < Admin < Developer.
+     * User flags are independent bits, not a ladder: IsDeveloper does not
+     * imply IsModerator or IsAdmin, so developer-only users cannot read or
+     * post in moderator/admin channels. Admins hold the moderator bit
+     * alongside the admin bit and moderators are admitted to judge channels.
      */
-    static ServerInfo_RoomChannel::AccessLevel userPrivilegeLevel(const ServerInfo_User &userInfo);
+    static bool hasChannelPrivilege(const ServerInfo_User &userInfo, ServerInfo_RoomChannel::AccessLevel requiredLevel);
     /** @brief True when @p userInfo may read @p channel. */
     bool mayReadChannel(const ServerInfo_User &userInfo, const ServerInfo_RoomChannel &channel) const;
     /**

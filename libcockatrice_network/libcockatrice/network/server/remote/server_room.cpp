@@ -185,36 +185,41 @@ const ServerInfo_RoomChannel *Server_Room::findChannel(const QString &channelId)
     return nullptr;
 }
 
-ServerInfo_RoomChannel::AccessLevel Server_Room::userPrivilegeLevel(const ServerInfo_User &userInfo)
+bool Server_Room::hasChannelPrivilege(const ServerInfo_User &userInfo,
+                                      ServerInfo_RoomChannel::AccessLevel requiredLevel)
 {
+    // User flags are independent bits, not a ladder: holding IsDeveloper does
+    // not imply IsModerator or IsAdmin. The database grants admins the admin
+    // and the moderator bit together, so admins still reach moderator (and
+    // judge) channels; moderators likewise reach judge channels.
     const uint32_t userLevel = userInfo.user_level();
-    if (userLevel & ServerInfo_User::IsDeveloper) {
-        return ServerInfo_RoomChannel::Developer;
+    switch (requiredLevel) {
+        case ServerInfo_RoomChannel::Public:
+            return true;
+        case ServerInfo_RoomChannel::Registered:
+            return userLevel & ServerInfo_User::IsRegistered;
+        case ServerInfo_RoomChannel::Judge:
+            return userLevel & (ServerInfo_User::IsJudge | ServerInfo_User::IsModerator);
+        case ServerInfo_RoomChannel::Moderator:
+            return userLevel & ServerInfo_User::IsModerator;
+        case ServerInfo_RoomChannel::Admin:
+            return userLevel & ServerInfo_User::IsAdmin;
+        case ServerInfo_RoomChannel::Developer:
+            return userLevel & (ServerInfo_User::IsDeveloper | ServerInfo_User::IsAdmin);
+        default:
+            return false;
     }
-    if (userLevel & ServerInfo_User::IsAdmin) {
-        return ServerInfo_RoomChannel::Admin;
-    }
-    if (userLevel & ServerInfo_User::IsModerator) {
-        return ServerInfo_RoomChannel::Moderator;
-    }
-    if (userLevel & ServerInfo_User::IsJudge) {
-        return ServerInfo_RoomChannel::Judge;
-    }
-    if (userLevel & ServerInfo_User::IsRegistered) {
-        return ServerInfo_RoomChannel::Registered;
-    }
-    return ServerInfo_RoomChannel::Public;
 }
 
 bool Server_Room::mayReadChannel(const ServerInfo_User &userInfo, const ServerInfo_RoomChannel &channel) const
 {
-    return userPrivilegeLevel(userInfo) >= channel.access_level();
+    return hasChannelPrivilege(userInfo, channel.access_level());
 }
 
 bool Server_Room::mayWriteChannel(const ServerInfo_User &userInfo, const ServerInfo_RoomChannel &channel) const
 {
     const auto writeLevel = channel.has_write_access_level() ? channel.write_access_level() : channel.access_level();
-    return userPrivilegeLevel(userInfo) >= writeLevel;
+    return hasChannelPrivilege(userInfo, writeLevel);
 }
 
 QList<ServerInfo_ChatMessage> Server_Room::getChatHistory(const QString &channelId) const
@@ -463,7 +468,7 @@ void Server_Room::sendRoomEvent(RoomEvent *event, bool sendToIsl, ServerInfo_Roo
         QMapIterator<QString, Server_ProtocolHandler *> userIterator(users);
         while (userIterator.hasNext()) {
             Server_ProtocolHandler *user = userIterator.next().value();
-            if (userPrivilegeLevel(*user->getUserInfo()) < accessLevel) {
+            if (!hasChannelPrivilege(*user->getUserInfo(), accessLevel)) {
                 continue;
             }
             user->sendProtocolItem(*event);
