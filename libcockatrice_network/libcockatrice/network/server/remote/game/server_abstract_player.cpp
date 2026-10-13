@@ -1,5 +1,6 @@
 #include "server_abstract_player.h"
 
+#include "dump_zone_range.h"
 #include "game/server_abstract_participant.h"
 #include "game/server_arrowtarget.h"
 #include "libcockatrice/protocol/pb/card_attributes.pb.h"
@@ -1435,23 +1436,23 @@ Server_AbstractPlayer::cmdDumpZone(const Command_DumpZone &cmd, ResponseContaine
 
     int numberCards = cmd.number_cards();
     const QList<Server_Card *> &cards = zone->getCards();
+    const auto cardRange = dumpZoneCardRange(cards.size(), numberCards, cmd.is_reversed());
 
     auto *re = new Response_DumpZone;
     ServerInfo_Zone *zoneInfo = re->mutable_zone_info();
     zoneInfo->set_name(zone->getName().toStdString());
     zoneInfo->set_type(zone->getType());
     zoneInfo->set_with_coords(zone->hasCoords());
-    zoneInfo->set_card_count(numberCards < cards.size() ? cards.size() : numberCards);
+    zoneInfo->set_card_count(cards.size());
 
-    for (int i = 0; (i < cards.size()) && (i < numberCards || numberCards == -1); ++i) {
-        const auto &findId = cmd.is_reversed() ? cards.size() - numberCards + i : i;
-        Server_Card *card = cards[findId];
+    for (qsizetype findId = cardRange.first; findId < cardRange.second; ++findId) {
+        Server_Card *card = cards.at(findId);
         QString displayedName = card->getFaceDown() ? QString() : card->getName();
         ServerInfo_Card *cardInfo = zoneInfo->add_card_list();
         cardInfo->set_provider_id(card->getProviderId().toStdString());
         cardInfo->set_name(displayedName.toStdString());
         if (zone->getType() == ServerInfo_Zone::HiddenZone) {
-            cardInfo->set_id(findId);
+            cardInfo->set_id(static_cast<int>(findId));
         } else {
             cardInfo->set_id(card->getId());
             cardInfo->set_x(card->getX());
