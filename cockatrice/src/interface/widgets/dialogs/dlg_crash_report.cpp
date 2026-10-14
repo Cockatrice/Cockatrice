@@ -15,12 +15,14 @@
 #include <QJsonObject>
 #include <QLabel>
 #include <QList>
+#include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <libcockatrice/settings/personal_settings.h>
 
-DlgCrashReport::DlgCrashReport(QWidget *parent) : QDialog(parent)
+DlgCrashReport::DlgCrashReport(QWidget *parent, bool _realSending, CrashReporter *_reporter)
+    : QDialog(parent), realSending(_realSending), reporter(_reporter)
 {
     infoLabel = new QLabel(this);
     infoLabel->setWordWrap(true);
@@ -70,9 +72,26 @@ void DlgCrashReport::changeEvent(QEvent *event)
 void DlgCrashReport::retranslateUi()
 {
     setWindowTitle(tr("Send crash report"));
-    infoLabel->setText(
-        tr("Cockatrice closed unexpectedly. The preview below shows what a crash report would contain (mock)."));
-    accountLabel->setText(tr("No account needed to send a crash report."));
+    if (realSending) {
+        // The preview below prefers the crashed session's persisted log tail
+        // (Logger::getPreviousSessionTail), falling back to this restart's in-memory buffer only
+        // when no previous session was saved. The native crash data (minidump + version/OS
+        // metadata cached in the Sentry DB dir by breakpad) is flushed separately on
+        // giveConsent(); the preview is attached as crash-log.txt.
+        infoLabel->setText(
+            tr("Cockatrice closed unexpectedly. Sending uploads the stored crash data from the previous "
+               "run (crash dump plus app version and operating system info) together with the redacted "
+               "log excerpt shown below (last lines from the crashed session, attached as crash-log.txt). "
+               "If no log from the crashed session was saved, this restart's early logs are shown instead."));
+    } else {
+        infoLabel->setText(
+            tr("Cockatrice closed unexpectedly (mock preview, nothing will be uploaded). A real report "
+               "would contain the stored crash data from the previous run plus the redacted log excerpt "
+               "shown below (last lines from the crashed session). If no log from the crashed session was "
+               "saved, this restart's early logs are shown instead. A mock file is saved locally instead."));
+    }
+    accountLabel->setText(tr("No account needed, and no contact info is collected. Login links "
+                             "(cockatrice://...) are scrubbed before sending."));
     rememberBox->setText(tr("Remember my choice"));
     sendButton->setText(tr("Send"));
     dontSendButton->setText(tr("Don't send"));
@@ -134,7 +153,48 @@ void DlgCrashReport::actSend()
     if (rememberBox->isChecked()) {
         SettingsCache::instance().personal().setCrashReportingMode(PersonalSettings::CrashReportingMode::AlwaysSend);
     }
-    const QString savedPath = writeMockReport(previewArea->toPlainText());
+    const QString preview = previewArea->toPlainText();
+    if (realSending && reporter != nullptr) {
+        reporter->giveConsent();
+        if (reporter->sendReport(preview)) {
+            accept();
+            return;
+        }
+        qCWarning(CrashReportLog) << "Failed to send crash report";
+        // Outcome mapping for the failure box: Save = store locally and close
+        // as accepted (the follow-up info box shows the path, so the user
+        // knows it was NOT sent); Discard = revoke consent and close as
+        // rejected (dropped); Cancel/X = back to the dialog, neither sent nor
+        // dropped. The Remember checkbox governs only the original
+        // Send/Don't-send decision, so the Discard path below revokes and
+        // closes via QDialog::reject() without touching the setting (calling
+        // our reject() override here would wrongly persist NeverSend over the
+        // AlwaysSend stored above when Remember was checked).
+        QMessageBox failureBox(QMessageBox::Warning, tr("Send crash report"),
+                               tr("Sending the crash report failed. Save the report locally instead?"),
+                               QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, this);
+        failureBox.setDefaultButton(QMessageBox::Save);
+        failureBox.setEscapeButton(QMessageBox::Cancel);
+        const QMessageBox::StandardButton choice = static_cast<QMessageBox::StandardButton>(failureBox.exec());
+        if (choice == QMessageBox::Save) {
+            const QString savedPath = writeMockReport(preview);
+            if (savedPath.isEmpty()) {
+                QMessageBox::warning(this, tr("Send crash report"), tr("Could not save the crash report locally."));
+            } else {
+                QMessageBox::information(this, tr("Send crash report"),
+                                         tr("Crash report saved locally to:\n%1").arg(savedPath));
+            }
+            accept();
+            return;
+        }
+        if (choice == QMessageBox::Discard) {
+            reporter->revokeConsent();
+            QDialog::reject();
+            return;
+        }
+        return;
+    }
+    const QString savedPath = writeMockReport(preview);
     if (savedPath.isEmpty()) {
         qCWarning(CrashReportLog) << "Could not save the mock crash report locally";
     } else {
@@ -145,8 +205,16 @@ void DlgCrashReport::actSend()
 
 void DlgCrashReport::actDontSend()
 {
+    reject();
+}
+
+void DlgCrashReport::reject()
+{
     if (rememberBox->isChecked()) {
         SettingsCache::instance().personal().setCrashReportingMode(PersonalSettings::CrashReportingMode::NeverSend);
     }
-    reject();
+    if (realSending && reporter != nullptr) {
+        reporter->revokeConsent();
+    }
+    QDialog::reject();
 }

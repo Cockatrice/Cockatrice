@@ -1,5 +1,6 @@
 #include "client/crash/crash_reporter.h"
 
+#include <QDir>
 #include <QString>
 #include <gtest/gtest.h>
 #include <libcockatrice/settings/personal_settings.h>
@@ -39,7 +40,7 @@ TEST(CrashReporterTest, RedactCockatriceUrlsLeavesOtherTextAlone)
 TEST(CrashReporterTest, InitSkippedWithoutDsn)
 {
     CrashReporter reporter;
-    reporter.init(QString(), QStringLiteral("3.1.2"), QStringLiteral("/tmp/cockatrice-crash-test"),
+    reporter.init(QString(), QStringLiteral("3.1.2"), QDir::tempPath() + QStringLiteral("/cockatrice-crash-test"),
                   PersonalSettings::CrashReportingMode::Ask);
     ASSERT_FALSE(reporter.isReady());
     reporter.shutdown();
@@ -50,7 +51,8 @@ TEST(CrashReporterTest, InitSkippedWhenNeverSend)
 {
     CrashReporter reporter;
     reporter.init(QStringLiteral("https://key@sentry.io/1"), QStringLiteral("3.1.2"),
-                  QStringLiteral("/tmp/cockatrice-crash-test"), PersonalSettings::CrashReportingMode::NeverSend);
+                  QDir::tempPath() + QStringLiteral("/cockatrice-crash-test"),
+                  PersonalSettings::CrashReportingMode::NeverSend);
     ASSERT_FALSE(reporter.isReady());
     reporter.shutdown();
 }
@@ -74,6 +76,21 @@ TEST(CrashReporterTest, ShutdownWithoutInitIsSafe)
 {
     CrashReporter reporter;
     ASSERT_FALSE(reporter.isReady());
+    reporter.shutdown();
+    ASSERT_FALSE(reporter.isReady());
+}
+
+TEST(CrashReporterTest, ConsentAndSendWithoutDsnAreSafeNoOps)
+{
+    CrashReporter reporter;
+    reporter.init(QString(), QStringLiteral("3.1.2"), QDir::tempPath() + QStringLiteral("/cockatrice-crash-test"),
+                  PersonalSettings::CrashReportingMode::Ask);
+    ASSERT_FALSE(reporter.isReady());
+    reporter.giveConsent();
+    reporter.revokeConsent();
+    ASSERT_FALSE(reporter.isReady());
+    ASSERT_FALSE(reporter.sendReport(QStringLiteral("preview")));
+    ASSERT_FALSE(reporter.sendReport(QString()));
     reporter.shutdown();
     ASSERT_FALSE(reporter.isReady());
 }

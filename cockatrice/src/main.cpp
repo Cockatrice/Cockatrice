@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
     qApp->setAttribute(Qt::AA_DontShowIconsInMenus, true);
 #endif
 
-    // Crash reporting (increment 1): init the SDK early so a crash anywhere below is captured into the
+    // Crash reporting: init the SDK early so a crash anywhere below is captured into the
     // local database. Uploads stay consent-gated (require_user_consent, armed in CrashReporter::init):
     // AlwaysSend gives consent here so cached envelopes flush at startup; any other mode starts
     // unconsented and the dialog below drives give/revoke. An empty DSN skips the SDK entirely and
@@ -274,13 +274,13 @@ int main(int argc, char *argv[])
     {
         QString crashDsn = QString::fromUtf8(qgetenv("COCKATRICE_SENTRY_DSN"));
         if (crashDsn.isEmpty()) {
-            crashDsn = QString::fromLatin1(COCKATRICE_SENTRY_DSN);
+            crashDsn = QString::fromUtf8(COCKATRICE_SENTRY_DSN);
         }
-        crashReporter.init(crashDsn, QString::fromLatin1(VERSION_STRING), crashDatabasePath,
+        crashReporter.init(crashDsn, QString::fromUtf8(VERSION_STRING), crashDatabasePath,
                            SettingsCache::instance().personal().getCrashReportingMode());
         if (crashReporter.isReady() && SettingsCache::instance().personal().getCrashReportingMode() ==
                                            PersonalSettings::CrashReportingMode::AlwaysSend) {
-            // Silent opt-in: cached crash envelopes flush automatically once consent is given.
+            // Silent opt-in: cached native crash envelopes flush automatically once consent is given.
             crashReporter.giveConsent();
         }
         // Mid-session mode changes must reach the SDK: without this, switching from AlwaysSend to
@@ -323,7 +323,8 @@ int main(int argc, char *argv[])
         {{{"c", "connect"}, QCoreApplication::translate("main", "Connect on startup"), "user:pass@host:port"},
          {{"d", "debug-output"}, QCoreApplication::translate("main", "Debug to file")},
          {"simulate-crash",
-          QCoreApplication::translate("main", "Show the mock crash-report dialog (nothing is sent)")}});
+          QCoreApplication::translate("main",
+                                      "Show the crash-report dialog (saves a mock file when no DSN is configured)")}});
 
     parser.process(app);
 
@@ -460,10 +461,11 @@ int main(int argc, char *argv[])
     ui.show();
     qCInfo(MainLog) << "ui.show() finished";
 
-    // MOCK crash-report flow (UI + settings only): no sentry-native upload, no network.
-    // Triggered by --simulate-crash or by leftover Windows crash dumps. Handled dumps are deleted
-    // after Send / Don't send (or a silent NeverSend skip) so one crash never prompts twice; on
-    // non-Windows nothing writes cockatrice.crash.*.dmp yet, so --simulate-crash is the trigger there.
+    // Crash-report flow: with a configured DSN the SDK owns capture and upload
+    // (consent-gated); with an empty DSN the dialog falls back to a local mock
+    // file and behaves exactly as before. Triggered by --simulate-crash or by
+    // leftover Windows crash dumps, which are consumed after handling so one
+    // crash never prompts twice.
     {
         QString crashDumpDir;
 #ifdef Q_OS_WIN
@@ -487,18 +489,28 @@ int main(int argc, char *argv[])
         if (parser.isSet("simulate-crash") || !crashDumps.isEmpty()) {
             const PersonalSettings::CrashReportingMode crashMode =
                 SettingsCache::instance().personal().getCrashReportingMode();
+            const bool crashReady = crashReporter.isReady();
             if (crashMode == PersonalSettings::CrashReportingMode::AlwaysSend) {
-                crashReporter.giveConsent();
-                DlgCrashReport::writeMockReport(DlgCrashReport::buildRedactedPreview());
-            } else if (crashMode == PersonalSettings::CrashReportingMode::Ask) {
-                DlgCrashReport crashDialog(&ui);
-                if (crashDialog.exec() == QDialog::Accepted) {
-                    crashReporter.giveConsent();
+                if (crashReady) {
+                    // Silent path: consent was given at startup, so native crash
+                    // envelopes flush automatically; this sends the log preview
+                    // event on top.
+                    const QString crashPreview = DlgCrashReport::buildRedactedPreview();
+                    if (!crashReporter.sendReport(crashPreview)) {
+                        const QString savedPath = DlgCrashReport::writeMockReport(crashPreview);
+                        qCWarning(MainLog) << "Failed to send crash report, saved locally to" << savedPath;
+                    }
                 } else {
-                    crashReporter.revokeConsent();
+                    DlgCrashReport::writeMockReport(DlgCrashReport::buildRedactedPreview());
                 }
+            } else if (crashMode == PersonalSettings::CrashReportingMode::Ask) {
+                // Real mode: Send gives consent + captures the event, Don't
+                // send revokes consent; the dialog owns both via the reporter.
+                DlgCrashReport crashDialog(&ui, crashReady, crashReady ? &crashReporter : nullptr);
+                crashDialog.exec();
             }
             // NeverSend: skip silently (no dialog, nothing written or sent).
+            // Handled dumps are consumed so one crash never prompts twice.
             for (const QString &dump : crashDumps) {
                 QFile::remove(crashDumpDir + QStringLiteral("/") + dump);
             }
