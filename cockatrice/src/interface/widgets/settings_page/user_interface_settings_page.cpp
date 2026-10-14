@@ -28,6 +28,14 @@ enum visualDeckStoragePromptForConversionIndex
     visualDeckStoragePromptForConversionIndexAlways
 };
 
+// A corrupt or out-of-range stored trigger would otherwise select index -1 and leave
+// the row half-hidden; clamp it back into the known trigger range.
+static int clampHoverTrigger(int trigger)
+{
+    return qBound(static_cast<int>(CardsDisplaySettings::HoverPanelTriggerHover), trigger,
+                  static_cast<int>(CardsDisplaySettings::HoverPanelTriggerShortcut));
+}
+
 UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 {
     // general settings
@@ -153,6 +161,66 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 
     animationGroupBox = new QGroupBox;
     animationGroupBox->setLayout(animationGrid);
+
+    // hover panel settings
+    hoverZoomTriggerSelector.addItem(QString());
+    hoverZoomTriggerSelector.addItem(QString());
+    hoverZoomTriggerSelector.addItem(QString());
+    hoverZoomTriggerSelector.addItem(QString());
+    hoverZoomTriggerSelector.setCurrentIndex(
+        clampHoverTrigger(SettingsCache::instance().cardsDisplay().getHoverZoomTrigger()));
+    connect(&hoverZoomTriggerSelector, &QComboBox::currentIndexChanged, &SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::setHoverZoomTrigger);
+
+    hoverPanelTriggerSelector.addItem(QString());
+    hoverPanelTriggerSelector.addItem(QString());
+    hoverPanelTriggerSelector.addItem(QString());
+    hoverPanelTriggerSelector.addItem(QString());
+    hoverPanelTriggerSelector.setCurrentIndex(
+        clampHoverTrigger(SettingsCache::instance().cardsDisplay().getHoverPanelTrigger()));
+    connect(&hoverPanelTriggerSelector, &QComboBox::currentIndexChanged, &SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::setHoverPanelTrigger);
+
+    hoverPanelDoubleConfirmCheckBox.setChecked(SettingsCache::instance().cardsDisplay().getHoverPanelDoubleConfirm());
+    connect(&hoverPanelDoubleConfirmCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::setHoverPanelDoubleConfirm);
+
+    hoverZoomDelayBox.setRange(0, 5000);
+    hoverZoomDelayBox.setSingleStep(50);
+    hoverZoomDelayBox.setSuffix(" ms");
+    hoverZoomDelayBox.setValue(SettingsCache::instance().cardsDisplay().getHoverZoomDelayMs());
+    connect(&hoverZoomDelayBox, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::setHoverZoomDelayMs);
+
+    hoverPanelDelayBox.setRange(0, 5000);
+    hoverPanelDelayBox.setSingleStep(50);
+    hoverPanelDelayBox.setSuffix(" ms");
+    hoverPanelDelayBox.setValue(SettingsCache::instance().cardsDisplay().getHoverPanelDelayMs());
+    connect(&hoverPanelDelayBox, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::setHoverPanelDelayMs);
+
+    auto *hoverPanelGrid = new QGridLayout;
+    hoverPanelGrid->addWidget(&hoverZoomTriggerLabel, 0, 0);
+    hoverPanelGrid->addWidget(&hoverZoomTriggerSelector, 0, 1);
+    hoverPanelGrid->addWidget(&hoverPanelTriggerLabel, 1, 0);
+    hoverPanelGrid->addWidget(&hoverPanelTriggerSelector, 1, 1);
+    hoverPanelGrid->addWidget(&hoverPanelDoubleConfirmCheckBox, 2, 0, 1, 2);
+    hoverPanelGrid->addWidget(&hoverZoomDelayLabel, 3, 0);
+    hoverPanelGrid->addWidget(&hoverZoomDelayBox, 3, 1);
+    hoverPanelGrid->addWidget(&hoverPanelDelayLabel, 4, 0);
+    hoverPanelGrid->addWidget(&hoverPanelDelayBox, 4, 1);
+    hoverWheelNoteLabel.setWordWrap(true);
+    hoverPanelGrid->addWidget(&hoverWheelNoteLabel, 5, 0, 1, 2);
+    connect(&hoverZoomTriggerSelector, &QComboBox::currentIndexChanged, this,
+            &UserInterfaceSettingsPage::updateHoverPanelUiState);
+    connect(&hoverPanelTriggerSelector, &QComboBox::currentIndexChanged, this,
+            &UserInterfaceSettingsPage::updateHoverPanelUiState);
+    connect(&hoverPanelDoubleConfirmCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
+            &UserInterfaceSettingsPage::updateHoverPanelUiState);
+    updateHoverPanelUiState();
+
+    hoverPanelGroupBox = new QGroupBox;
+    hoverPanelGroupBox->setLayout(hoverPanelGrid);
 
     // deck editor settings
     openDeckInNewTabCheckBox.setChecked(SettingsCache::instance().deckEditor().getOpenDeckInNewTab());
@@ -293,6 +361,7 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     mainLayout->addWidget(generalGroupBox);
     mainLayout->addWidget(notificationsGroupBox);
     mainLayout->addWidget(animationGroupBox);
+    mainLayout->addWidget(hoverPanelGroupBox);
     mainLayout->addWidget(deckEditorGroupBox);
     mainLayout->addWidget(replayGroupBox);
     mainLayout->addStretch();
@@ -351,6 +420,29 @@ void UserInterfaceSettingsPage::updateCommanderSpellbookUiState()
     }
 }
 
+void UserInterfaceSettingsPage::updateHoverPanelUiState()
+{
+    // Phase timers only apply to the hover trigger; double-confirm only applies when
+    // both phases share one trigger (repeating it).
+    const auto hoverTrigger = CardsDisplaySettings::HoverPanelTriggerHover;
+    const auto wheelTrigger = CardsDisplaySettings::HoverPanelTriggerWheel;
+    const bool zoomOnHover = hoverZoomTriggerSelector.currentIndex() == hoverTrigger;
+    const bool panelOnHover = hoverPanelTriggerSelector.currentIndex() == hoverTrigger;
+    const bool sharedTrigger = hoverZoomTriggerSelector.currentIndex() == hoverPanelTriggerSelector.currentIndex();
+    hoverZoomDelayLabel.setVisible(zoomOnHover);
+    hoverZoomDelayBox.setVisible(zoomOnHover);
+    hoverPanelDelayLabel.setVisible(panelOnHover);
+    hoverPanelDelayBox.setVisible(panelOnHover);
+    hoverPanelDoubleConfirmCheckBox.setEnabled(sharedTrigger);
+    const bool panelAuto = panelOnHover && !(sharedTrigger && hoverPanelDoubleConfirmCheckBox.isChecked());
+    hoverPanelDelayLabel.setEnabled(panelAuto);
+    hoverPanelDelayBox.setEnabled(panelAuto);
+    // The wheel trigger consumes wheel events over cards, so the board cannot scroll there.
+    const bool wheelBound = hoverZoomTriggerSelector.currentIndex() == wheelTrigger ||
+                            hoverPanelTriggerSelector.currentIndex() == wheelTrigger;
+    hoverWheelNoteLabel.setVisible(wheelBound);
+}
+
 void UserInterfaceSettingsPage::retranslateUi()
 {
     generalGroupBox->setTitle(tr("General interface settings"));
@@ -379,6 +471,21 @@ void UserInterfaceSettingsPage::retranslateUi()
     arrowDrawAnimationCheckBox.setText(tr("&Arrow draw animation"));
     lifeCounterAnimationsCheckBox.setText(tr("Life counter flash"));
     battlefieldFlashCheckBox.setText(tr("Battlefield flash on damage"));
+
+    hoverPanelGroupBox->setTitle(tr("Hover panel settings"));
+    hoverPanelTriggerLabel.setText(tr("Show the card panel on:"));
+    hoverZoomTriggerLabel.setText(tr("Zoom the card on:"));
+    for (auto *selector : {&hoverPanelTriggerSelector, &hoverZoomTriggerSelector}) {
+        selector->setItemText(CardsDisplaySettings::HoverPanelTriggerHover, tr("Hover"));
+        selector->setItemText(CardsDisplaySettings::HoverPanelTriggerRightClick, tr("Right-click"));
+        selector->setItemText(CardsDisplaySettings::HoverPanelTriggerWheel, tr("Mouse wheel"));
+        selector->setItemText(CardsDisplaySettings::HoverPanelTriggerShortcut, tr("Keyboard shortcut"));
+    }
+    hoverPanelDoubleConfirmCheckBox.setText(tr("Zoom first; repeat the action to show the panel"));
+    hoverZoomDelayLabel.setText(tr("Time before the zoom kicks in:"));
+    hoverPanelDelayLabel.setText(tr("Time before the tab panel shows up:"));
+    hoverWheelNoteLabel.setText(
+        tr("Note: the mouse wheel action replaces board scrolling over cards; scroll up to zoom back out."));
 
     deckEditorGroupBox->setTitle(tr("Deck editor/storage settings"));
     openDeckInNewTabCheckBox.setText(tr("Open deck in new tab by default"));
