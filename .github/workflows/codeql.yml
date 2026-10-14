@@ -60,8 +60,10 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y --no-install-recommends \
+          ca-certificates \
           cmake \
           g++ \
+          libcurl4-openssl-dev \
           libgl-dev \
           liblzma-dev \
           libmariadb-dev-compat \

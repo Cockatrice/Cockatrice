@@ -400,6 +400,21 @@ if(WITH_CLIENT)
     ${CMAKE_SOURCE_DIR}/cockatrice/src
     ${CMAKE_SOURCE_DIR}/libcockatrice_utility
   )
+  # CrashReporter is client code; DEFINITIONS keeps the test hermetic by compiling the
+  # no-op path (no sentry-native headers needed) regardless of WITH_CRASH_REPORTING.
+  cockatrice_add_test(
+    NAME
+    crash_reporter_test
+    SOURCES
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/client/crash/crash_reporter.cpp
+    crash_reporter_test.cpp
+    LIBS
+    libcockatrice_settings
+    INCLUDE_DIRS
+    ${CMAKE_SOURCE_DIR}/cockatrice/src
+    DEFINITIONS
+    COCKATRICE_WITH_CRASH_REPORTING=0
+  )
 endif()
 
 add_subdirectory(card_zone_algorithms)
