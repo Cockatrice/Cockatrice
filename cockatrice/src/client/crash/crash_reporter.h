@@ -8,6 +8,7 @@
 
 #include <QLoggingCategory>
 #include <QString>
+#include <memory>
 
 #ifndef COCKATRICE_WITH_CRASH_REPORTING
 #define COCKATRICE_WITH_CRASH_REPORTING 0
@@ -16,6 +17,8 @@
 #ifndef COCKATRICE_SENTRY_DSN
 #define COCKATRICE_SENTRY_DSN ""
 #endif
+
+class QLockFile;
 
 Q_DECLARE_LOGGING_CATEGORY(CrashReportLog);
 
@@ -28,15 +31,21 @@ Q_DECLARE_LOGGING_CATEGORY(CrashReportLog);
  * as before. With a DSN, init() arms require-user-consent and before_send
  * scrubbing; giveConsent()/revokeConsent() gate uploads, and sendReport()
  * captures a redacted message event with the log preview attached. All SDK
- * calls are guarded so OFF builds compile to no-ops.
+ * calls are guarded so OFF builds compile to no-ops. Session tracking
+ * (beginSession/endSession) is SDK-independent: a QLockFile per process in the
+ * database dir detects unclean exits cross-platform, replacing the legacy
+ * Windows-only .dmp scan. The held lock makes the reporter non-copyable and
+ * non-movable.
  */
 class CrashReporter
 {
 public:
-    CrashReporter() = default;
+    CrashReporter();
     CrashReporter(const CrashReporter &) = delete;
     CrashReporter &operator=(const CrashReporter &) = delete;
-    ~CrashReporter() = default;
+    CrashReporter(CrashReporter &&) = delete;
+    CrashReporter &operator=(CrashReporter &&) = delete;
+    ~CrashReporter();
 
     void init(const QString &dsn, const QString &release, const QString &databasePath, int consentMode);
     [[nodiscard]] bool isReady() const;
@@ -45,12 +54,22 @@ public:
     void revokeConsent();
     bool sendReport(const QString &redactedPreview);
 
+    /**
+     * @brief Claim this process's session lock, reporting a previous unclean exit.
+     * @return true if a leftover session lock from a dead process (or an unreadable
+     * garbage file) was found and cleaned; live concurrent instances are ignored.
+     */
+    bool beginSession(const QString &dir);
+    void endSession();
+
     static QString sanitizeLogLine(const QString &line);
     static QString redactCockatriceUrls(const QString &line);
 
 private:
     bool ready = false;
     QString sentryDatabasePath;
+    QString sessionLockPath;
+    std::unique_ptr<QLockFile> sessionLock;
 };
 
 #endif

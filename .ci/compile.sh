@@ -195,6 +195,14 @@ if [[ $USE_VCPKG ]]; then
   flags+=("-DUSE_VCPKG=1")
   flags+=("-DVCPKG_INSTALL_OPTIONS=--x-abi-tools-use-exact-versions")
 fi
+if [[ ${BUILDTYPE:-Release} == "Release" && -n ${COCKATRICE_SENTRY_DSN:-} ]]; then
+  # Release-only: Debug builds stay DSN-free so crashes from developer builds
+  # never reach Sentry. Empty (local builds, forks without the secret) keeps
+  # today's mock fallback via the compiled-in default. CI passes the value
+  # from the SENTRY_DSN secret on Release builds (including CI test legs,
+  # which build the Release configuration).
+  flags+=("-DCOCKATRICE_SENTRY_DSN=$COCKATRICE_SENTRY_DSN")
+fi
 
 # Add cmake --build flags
 buildflags=(--config "$BUILDTYPE")

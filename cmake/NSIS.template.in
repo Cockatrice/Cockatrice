@@ -1195,11 +1195,11 @@ ${If} $PortableMode = 0
 	${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
 	IntFmt $0 "0x%08X" $0
 
-	; Enable Windows User-Mode Dumps
+	; No Windows Error Reporting LocalDumps registration: crash capture belongs to
+	; the in-app reporter (Sentry/breakpad, MiniDumpNormal-class data only). Opting
+	; machines into OS-level full dumps (DumpType 2) would leave unredacted memory
+	; dumps on user machines that nothing consumes.
 	; https://learn.microsoft.com/en-us/windows/win32/wer/collecting-user-mode-dumps
-	WriteRegExpandStr HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe" "DumpFolder" "%LOCALAPPDATA%\CrashDumps\Cockatrice"
-	WriteRegDWORD HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe" "DumpCount" "5"
-	WriteRegDWORD HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe" "DumpType" "2"
 
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayIcon" "$INSTDIR\cockatrice.exe"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayName" "Cockatrice"

@@ -36,13 +36,16 @@ if(WITH_CRASH_REPORTING AND WITH_CLIENT)
   include(FetchContent)
 
   if(ENABLE_SANITIZERS)
-    # The crashpad handler cannot run under ASan/UBSan, so there is no backend to capture with.
+    # The crash handler cannot run under ASan/UBSan, so there is no backend to capture with.
     set(_sentry_backend "none")
-  elseif(WIN32 OR APPLE)
-    # Out-of-process handler; shipping the handler binary is a later increment.
-    set(_sentry_backend "crashpad")
   else()
-    # In-process, no extra binary to ship.
+    # Breakpad on every OS (increment 3 probe, 2026-10-14): the crashpad sources
+    # do vendor friction-free (FetchContent inits all submodules recursively by
+    # default, verified populated in a local build tree), but the crashpad backend
+    # would need its out-of-process crashpad_handler binary installed next to the
+    # exe, into the macOS bundle, and through NSIS, plus handler-path wiring and
+    # notarization care. Breakpad is in-process, needs no extra binary and no
+    # packaging on any OS sentry-native builds, so simplicity wins.
     set(_sentry_backend "breakpad")
   endif()
   # FORCE so toggling ENABLE_SANITIZERS on a reused build dir cannot leave a stale backend behind.

@@ -5,7 +5,10 @@
 #endif
 
 #include <QByteArray>
+#include <QCoreApplication>
 #include <QDir>
+#include <QFile>
+#include <QLockFile>
 #include <QRegularExpression>
 #include <QUrl>
 #include <cstring>
@@ -119,9 +122,9 @@ void scrubBreadcrumbs(sentry_value_t event)
  * breadcrumbs can carry raw log lines. Covers the top-level message,
  * logentry.formatted, and every breadcrumbs.values[].message plus trivially
  * reachable data-object string values. Native crash minidumps bypass this
- * hook: crashpad (and macOS generally) deliver crashes out-of-process, and
- * fast-fail crashes on Windows skip the local handler, so before_send is
- * never invoked for those.
+ * hook regardless of backend: breakpad captures them in-process without
+ * invoking before_send, and fast-fail crashes on Windows skip the local
+ * handler, so before_send is never invoked for those.
  */
 sentry_value_t scrubEventBeforeSend(sentry_value_t event, sentry_hint_t *hint, void *userData)
 {
@@ -177,6 +180,71 @@ void CrashReporter::shutdown()
     }
 #endif
     ready = false;
+}
+
+CrashReporter::~CrashReporter() = default;
+CrashReporter::CrashReporter() = default;
+
+bool CrashReporter::beginSession(const QString &dir)
+{
+    // Restartable: releasing first keeps begin->end->begin round-trips clean.
+    endSession();
+
+    QDir().mkpath(dir);
+    const QDir sessionDir(dir);
+    const QString selfName = QStringLiteral("session-%1").arg(QCoreApplication::applicationPid());
+
+    bool unclean = false;
+    const QStringList leftovers = sessionDir.entryList({QStringLiteral("session-*")}, QDir::Files);
+    for (const QString &name : leftovers) {
+        if (name == selfName) {
+            continue;
+        }
+        const QString path = sessionDir.filePath(name);
+        QLockFile probe(path);
+        // Long-lived session lock: stale means "owner dead", regardless of file age, so a
+        // crash followed by an immediate relaunch (younger than the 30 s default) is still
+        // detected. tryLock() only deletes the file when it finds it stale, so a live
+        // concurrent instance's lock is never touched here. (The static
+        // QLockFile::removeStaleLockFile(path) form does not exist in Qt5/Qt6, and the
+        // member removeStaleLockFile() force-removes without a staleness check, so neither
+        // is usable for this scan.)
+        probe.setStaleLockTime(0);
+        if (probe.tryLock(0)) {
+            unclean = true;
+            probe.unlock(); // deletes the stale file
+            continue;
+        }
+        // tryLock failed: either a live concurrent instance owns the file, or it is
+        // unreadable (garbage/empty) and therefore has no live owner. Only the latter is
+        // cleaned up; a live instance is left alone.
+        qint64 pid = 0;
+        QString hostname, appname;
+        if (!probe.getLockInfo(&pid, &hostname, &appname)) {
+            QFile::remove(path);
+            unclean = true;
+        }
+    }
+
+    sessionLockPath = sessionDir.filePath(selfName);
+    sessionLock = std::make_unique<QLockFile>(sessionLockPath);
+    sessionLock->setStaleLockTime(0);
+    if (!sessionLock->tryLock(0)) {
+        qCWarning(CrashReportLog) << "Failed to claim session lock at" << sessionLockPath;
+    }
+    return unclean;
+}
+
+void CrashReporter::endSession()
+{
+    if (sessionLock) {
+        sessionLock->unlock();
+        sessionLock.reset();
+    }
+    if (!sessionLockPath.isEmpty()) {
+        QFile::remove(sessionLockPath);
+        sessionLockPath.clear();
+    }
 }
 
 void CrashReporter::giveConsent()
