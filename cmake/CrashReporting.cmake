@@ -120,3 +120,76 @@ else()
                  "(WITH_CRASH_REPORTING=${WITH_CRASH_REPORTING}, WITH_CLIENT=${WITH_CLIENT})"
   )
 endif()
+
+# Installer failure reporting (increment 4): parse COCKATRICE_SENTRY_DSN into the parts the Windows installer
+# needs. These are CPACK_* so CPack snapshots them at include(CPack) time and substitutes them into
+# cmake/NSIS.template.in at package time; on non-Windows they are inert (only the NSIS template consumes them).
+# Stored in CACHE (FORCE) so they are derived from COCKATRICE_SENTRY_DSN on every configure and toggling the
+# DSN cannot leave stale values behind. CPACK_SENTRY_RELEASE intentionally matches what the installer reports
+# in its own log ("installer start: <name> <CPACK_PACKAGE_VERSION>"): PROJECT_VERSION is final here because
+# getversion.cmake ran before this file was included, and it is the same string CPack derives the version from.
+if(COCKATRICE_SENTRY_DSN MATCHES "(https?)://([^@]+)@([^/]+)/([0-9]+)")
+  set(CPACK_SENTRY_KEY
+      "${CMAKE_MATCH_2}"
+      CACHE STRING "Sentry public key for installer-log posts (derived from COCKATRICE_SENTRY_DSN)" FORCE
+  )
+  set(CPACK_SENTRY_HOST
+      "${CMAKE_MATCH_3}"
+      CACHE STRING "Sentry ingest host for installer-log posts (derived from COCKATRICE_SENTRY_DSN)" FORCE
+  )
+  set(CPACK_SENTRY_PROJECT_ID
+      "${CMAKE_MATCH_4}"
+      CACHE STRING "Sentry project id for installer-log posts (derived from COCKATRICE_SENTRY_DSN)" FORCE
+  )
+  # Scheme comes from the DSN, not an assumption: self-hosted (GlitchTip) DSNs may be plain http.
+  set(CPACK_SENTRY_ENVELOPE_URL
+      "${CMAKE_MATCH_1}://${CMAKE_MATCH_3}/api/${CMAKE_MATCH_4}/envelope/"
+      CACHE STRING "Sentry envelope endpoint for installer-log posts (derived from COCKATRICE_SENTRY_DSN)" FORCE
+  )
+  set(CPACK_SENTRY_DSN_FULL
+      "${COCKATRICE_SENTRY_DSN}"
+      CACHE STRING "Full Sentry DSN for the installer-log envelope header (derived from COCKATRICE_SENTRY_DSN)" FORCE
+  )
+  set(CPACK_SENTRY_RELEASE
+      "${PROJECT_VERSION}"
+      CACHE STRING "Release tag sent with installer-log events (same version the installer reports)" FORCE
+  )
+  set(CPACK_SENTRY_ENABLED
+      "1"
+      CACHE STRING "Whether AbortInstall may offer to send the installer log to Sentry" FORCE
+  )
+else()
+  if(NOT COCKATRICE_SENTRY_DSN STREQUAL "")
+    message(WARNING "COCKATRICE_SENTRY_DSN is set but malformed "
+                    "(expected <scheme>://<key>@<host>/<project-id>); installer log reporting disabled"
+    )
+  endif()
+  set(CPACK_SENTRY_KEY
+      ""
+      CACHE STRING "Sentry public key for installer-log posts (derived from COCKATRICE_SENTRY_DSN)" FORCE
+  )
+  set(CPACK_SENTRY_HOST
+      ""
+      CACHE STRING "Sentry ingest host for installer-log posts (derived from COCKATRICE_SENTRY_DSN)" FORCE
+  )
+  set(CPACK_SENTRY_PROJECT_ID
+      ""
+      CACHE STRING "Sentry project id for installer-log posts (derived from COCKATRICE_SENTRY_DSN)" FORCE
+  )
+  set(CPACK_SENTRY_ENVELOPE_URL
+      ""
+      CACHE STRING "Sentry envelope endpoint for installer-log posts (derived from COCKATRICE_SENTRY_DSN)" FORCE
+  )
+  set(CPACK_SENTRY_DSN_FULL
+      ""
+      CACHE STRING "Full Sentry DSN for the installer-log envelope header (derived from COCKATRICE_SENTRY_DSN)" FORCE
+  )
+  set(CPACK_SENTRY_RELEASE
+      "${PROJECT_VERSION}"
+      CACHE STRING "Release tag sent with installer-log events (same version the installer reports)" FORCE
+  )
+  set(CPACK_SENTRY_ENABLED
+      "0"
+      CACHE STRING "Whether AbortInstall may offer to send the installer log to Sentry" FORCE
+  )
+endif()

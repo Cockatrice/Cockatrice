@@ -28,9 +28,15 @@ Var LogFindHandle
 Var LogFindName
 Var LogMatchLabel
 Var LogMatchPattern
+; Sentry installer-log hook state (see AbortInstall)
+Var SentryEnabled
+Var SentryReason
+Var SentryResult
+Var SentryOutput
 
 !include LogicLib.nsh
 !include FileFunc.nsh
+!include StrFunc.nsh
 !include MUI2.nsh
 !include x64.nsh
 
@@ -588,6 +594,34 @@ Function AbortInstall
     ${If} $ReinstallMode = 1
     ${OrIfNot} ${Silent}
         MessageBox MB_OK|MB_ICONEXCLAMATION "$AbortReason$\r$\n$\r$\nA detailed installer log was written to:$\r$\n$InstallLogPath"
+        ; Offer to send the installer log to Sentry so aborted installs can be diagnosed. This block already runs
+        ; only when someone is at the keyboard (attended install, or the updater's /R upgrade whose launcher has
+        ; quit), so a silent or package-manager install never reaches the prompt and its behavior is unchanged.
+        StrCpy $SentryEnabled "@CPACK_SENTRY_ENABLED@"
+        ${If} $SentryEnabled == "1"
+            MessageBox MB_YESNO|MB_ICONQUESTION "Send the installer log to the developers to help fix this? No account needed. The log may contain file paths from this machine." IDYES sentry_send
+            Goto sentry_done
+            sentry_send:
+            ; $AbortReason carries real CRLFs ($\r$\n) that would break the quoted -Reason argument below, and a
+            ; stray double-quote would end it early. Fold newlines and strip quotes; the verbatim text is already
+            ; in the log file via CockLog, so nothing of diagnostic value is lost.
+            ${StrRep} $SentryReason $AbortReason '"' ''
+            ${StrRep} $SentryReason $SentryReason '$\r$\n' ' '
+            ${StrRep} $SentryReason $SentryReason '$\r' ' '
+            ${StrRep} $SentryReason $SentryReason '$\n' ' '
+            InitPluginsDir
+            File "/oname=$PLUGINSDIR\send-installer-log.ps1" "@CPACK_SENTRY_PS1_PATH@"
+            nsExec::ExecToStack /TIMEOUT=60000 'powershell -NoProfile -ExecutionPolicy Bypass -File "$PLUGINSDIR\send-installer-log.ps1" -LogPath "$InstallLogPath" -Reason "$SentryReason"'
+            Pop $SentryResult
+            Pop $SentryOutput
+            !insertmacro CockLog "sentry send: result=$SentryResult output=$SentryOutput"
+            ${If} $SentryResult == "0"
+                MessageBox MB_OK|MB_ICONINFORMATION "The installer log was sent. Thank you for helping improve Cockatrice!"
+            ${Else}
+                MessageBox MB_OK|MB_ICONEXCLAMATION "The installer log could not be sent. You can still share it manually; it was written to:$\r$\n$InstallLogPath"
+            ${EndIf}
+            sentry_done:
+        ${EndIf}
     ${EndIf}
     SetErrorLevel 1
     Abort
