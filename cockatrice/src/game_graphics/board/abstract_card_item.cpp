@@ -20,6 +20,7 @@
 #include <QFont>
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsView>
 #include <QHash>
 #include <QLineF>
 #include <QList>
@@ -28,6 +29,7 @@
 #include <QPen>
 #include <QPixmap>
 #include <QPointF>
+#include <QPropertyAnimation>
 #include <QRectF>
 #include <QTimer>
 #include <QTransform>
@@ -41,6 +43,13 @@
 
 class QSizeF;
 
+// Width the hovered card smooth-zooms to: exactly the hover panel picture size, so
+// all four corners coincide when the panel swaps in over it.
+static constexpr qreal HOVER_ZOOM_WIDTH = 270.0;
+static constexpr int HOVER_ZOOM_IN_MS = 220;
+static constexpr int HOVER_ZOOM_OUT_MS = 140;
+static constexpr int FADE_DURATION_MS = 140;
+
 AbstractCardItem::AbstractCardItem(QGraphicsItem *parent, const CardRef &cardRef, PlayerLogic *_owner, int _id)
     : ArrowTarget(_owner, parent), state(new CardState(this, nullptr, cardRef, _id)), tapAngle(0),
       bgColor(Qt::transparent), isHovered(false), realZValue(0)
@@ -53,11 +62,35 @@ AbstractCardItem::AbstractCardItem(QGraphicsItem *parent, const CardRef &cardRef
     connect(state, &CardState::cardInfoChanged, this, &AbstractCardItem::onCardInfoChanged);
     connect(state, &CardState::cardRefChanged, this, &AbstractCardItem::onCardRefChanged);
     connect(state, &CardState::tappedChanged, this, &AbstractCardItem::onTappedChanged);
-    connect(state, &CardState::facedownChanged, this, [this] { update(); });
+    connect(state, &CardState::facedownChanged, this, [this](bool faceDown) {
+        update();
+        emit faceDownChanged(faceDown);
+    });
     connect(state, &CardState::colorChanged, this, [this] {
         cacheBgColor();
         update();
     });
+
+    hoverZoom = new QPropertyAnimation(this, "cardScale", this);
+    hoverZoom->setEasingCurve(QEasingCurve::InOutCubic);
+    // Settling the unhover waits for the shrink-out to finish: the stacking override,
+    // the clip escape and the ancestor lift all stay put while the card is still large,
+    // so siblings and the clip container cannot cut through the shrinking card.
+    connect(hoverZoom, &QPropertyAnimation::finished, this, [this] {
+        if (!isHovered) {
+            setZValue(realZValue);
+            // Final repaint at the settled footprint: with no scale delta the animation
+            // emits no per-frame updates, and zones would keep a stale clip hole behind.
+            if (scene()) {
+                scene()->update(sceneBoundingRect());
+            }
+            emit hoverShrinkFinished(this);
+        }
+    });
+
+    opacityAnim = new QPropertyAnimation(this, "cardOpacity", this);
+    opacityAnim->setDuration(FADE_DURATION_MS);
+    opacityAnim->setEasingCurve(QEasingCurve::OutCubic);
 
     connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::displayCardNamesChanged, this,
             [this] { update(); });
@@ -261,15 +294,97 @@ void AbstractCardItem::setHovered(bool _hovered)
     }
 
     isHovered = _hovered;
-    setZValue(_hovered ? ZValues::HOVERED_CARD : realZValue);
-    setScale(_hovered && SettingsCache::instance().cardsDisplay().getScaleCards() ? 1.1 : 1);
-    setTransformOriginPoint(_hovered ? CardDimensions::WIDTH_HALF_F : 0, _hovered ? CardDimensions::HEIGHT_HALF_F : 0);
+    // The stacking override is one-directional: it applies the moment the hover starts
+    // and only drops once the shrink-out finishes (see the hoverZoom finished handler).
+    // Restoring it here would let siblings paint over the still-enlarged card.
+    if (_hovered) {
+        setZValue(ZValues::HOVERED_CARD);
+    }
+    // Scale about the center in both directions: at scale 1 the origin is moot,
+    // and keeping it centered avoids drift while shrinking back down.
+    setTransformOriginPoint(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F);
+
+    // Smooth-zoom up to the hover picture size (instead of the old 1.1 snap) so the
+    // hover panel can then swap in over the zoomed card with matching corners.
+    // The target is constant ON-SCREEN pixels: divide out the board view zoom so
+    // fullscreen (or zoomed) boards don't overshoot while the fixed-size panel matches.
+    qreal target = 1.0;
+    if (_hovered && SettingsCache::instance().cardsDisplay().getScaleCards()) {
+        const qreal w = boundingRect().width();
+        qreal viewScale = 1.0;
+        if (scene() && !scene()->views().isEmpty()) {
+            if (const auto *view = scene()->views().first()) {
+                viewScale = qAbs(view->transform().m11());
+            }
+        }
+        if (w > 0.0 && viewScale > 0.0) {
+            target = qBound(1.0, HOVER_ZOOM_WIDTH / (w * viewScale), 6.0);
+        }
+    }
+    hoverZoom->stop();
+    hoverZoom->setStartValue(scale());
+    hoverZoom->setEndValue(target);
+    hoverZoom->setDuration(_hovered ? HOVER_ZOOM_IN_MS : HOVER_ZOOM_OUT_MS);
+    hoverZoom->start();
     update();
 }
 
 void AbstractCardItem::setColor(const QString &_color)
 {
     state->setColor(_color);
+}
+
+qreal AbstractCardItem::getCardScale() const
+{
+    return scale();
+}
+
+void AbstractCardItem::setCardScale(qreal _scale)
+{
+    if (qFuzzyCompare(_scale, scale())) {
+        return;
+    }
+    // The scale animates every frame: keep the scene index in step or hover
+    // picking tests a stale rect and the hover oscillates on/off by itself.
+    // Repaint the union of the old and new footprints, not just the card: zones
+    // dodge the zoomed card via a clip hole computed at paint time, and without
+    // a repaint they keep a stale hole — covering the card mid-animation and
+    // leaving a black rect behind once the hover ends.
+    const QRectF oldFootprint = sceneBoundingRect();
+    prepareGeometryChange();
+    setScale(_scale);
+    if (scene()) {
+        scene()->update(oldFootprint.united(sceneBoundingRect()));
+    } else {
+        update();
+    }
+}
+
+qreal AbstractCardItem::getCardOpacity() const
+{
+    return opacity();
+}
+
+void AbstractCardItem::setCardOpacity(qreal _opacity)
+{
+    setOpacity(_opacity);
+    update();
+}
+
+void AbstractCardItem::fadeCardOut()
+{
+    opacityAnim->stop();
+    opacityAnim->setStartValue(opacity());
+    opacityAnim->setEndValue(0.0);
+    opacityAnim->start();
+}
+
+void AbstractCardItem::fadeCardIn()
+{
+    opacityAnim->stop();
+    opacityAnim->setStartValue(opacity());
+    opacityAnim->setEndValue(1.0);
+    opacityAnim->start();
 }
 
 void AbstractCardItem::cacheBgColor()
@@ -309,6 +424,7 @@ void AbstractCardItem::cacheBgColor()
 
 void AbstractCardItem::onTappedChanged(bool newTapped, bool canAnimate)
 {
+    emit tappedChanged(newTapped);
     if (SettingsCache::instance().cardsDisplay().getTapAnimation() && canAnimate) {
         static_cast<GameScene *>(scene())->registerAnimationItem(this);
     } else {

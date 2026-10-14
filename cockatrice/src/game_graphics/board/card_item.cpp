@@ -117,6 +117,11 @@ void CardItem::deleteLater()
 void CardItem::setZone(CardZoneLogic *_zone)
 {
     state->setZone(_zone);
+    // A card faded out under the open hover panel must come back as soon as it changes
+    // zones; otherwise it stays invisible at its destination until the panel closes.
+    if (opacity() < 1.0) {
+        fadeCardIn();
+    }
 }
 
 void CardItem::retranslateUi()

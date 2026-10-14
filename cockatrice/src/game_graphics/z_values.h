@@ -34,6 +34,10 @@ constexpr qreal OVERLAY_BASE = ZValueLayerManager::OVERLAY_BASE;
 
 // Overlay layer Z-values for items that should appear above normal cards
 constexpr qreal HOVERED_CARD = ZValueLayerManager::overlayZValue(1.0);
+// Lifts the hovered card's whole player area above sibling areas (and their zone
+// decorations) while hovering. One level only: Qt compares subtrees at their highest
+// differing ancestor, so the top ancestor decides. Below arrows/views/drags on purpose.
+constexpr qreal HOVERED_AREA = ZValueLayerManager::overlayZValue(2.0);
 constexpr qreal ARROWS = ZValueLayerManager::overlayZValue(3.0);
 constexpr qreal ZONE_VIEW_WIDGET = ZValueLayerManager::overlayZValue(4.0);
 constexpr qreal DRAG_ITEM = ZValueLayerManager::overlayZValue(5.0);
