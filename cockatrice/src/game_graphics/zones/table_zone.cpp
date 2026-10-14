@@ -118,6 +118,15 @@ bool TableZone::isInverted() const
 
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
+    // The hovered (zoomed) card may spill over this zone: cut it out of every layer
+    // below so washes, indicators, dimming and the land divider never paint over it,
+    // whatever the stacking order is.
+    const QRect hoverHole = hoveredCardHole();
+    const bool hasHole = !hoverHole.isNull();
+    if (hasHole) {
+        painter->setClipRegion(QRegion(boundingRect().toRect()) - QRegion(hoverHole));
+    }
+
     if (playmatActive) {
         // Subtle overlay to distinguish table zone from stack zone
         painter->fillRect(boundingRect(), QColor(0, 0, 0, 60));
@@ -142,6 +151,32 @@ void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
     }
 
     paintLandDivider(painter);
+
+    if (hasHole) {
+        painter->setClipping(false);
+    }
+}
+
+/**
+ * @brief The hovered card's footprint in zone coordinates, or null when it does not
+ * overlap this zone. Lets every paint layer dodge the zoomed card instead of painting
+ * over it.
+ */
+QRect TableZone::hoveredCardHole() const
+{
+    auto *scene = qobject_cast<GameScene *>(this->scene());
+    if (!scene) {
+        return {};
+    }
+    CardItem *hovered = scene->getHoveredCard();
+    if (!hovered) {
+        return {};
+    }
+    QRect hole = mapRectFromScene(hovered->sceneBoundingRect()).toRect();
+    if (!hole.intersects(boundingRect().toRect())) {
+        return {};
+    }
+    return hole & boundingRect().toRect();
 }
 
 void TableZone::onPlaymatChanged(bool active)

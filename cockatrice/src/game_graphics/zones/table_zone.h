@@ -221,6 +221,7 @@ private:
 
     void paintZoneOutline(QPainter *painter);
     void paintLandDivider(QPainter *painter);
+    [[nodiscard]] QRect hoveredCardHole() const;
 
     /*
     Calculates card stack widths so mapping functions work properly

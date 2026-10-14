@@ -29,6 +29,7 @@ class GameView : public QGraphicsView
     Q_OBJECT
 private:
     QAction *aCloseMostRecentZoneView;
+    QAction *aShowHoverPanel;
     QRubberBand *rubberBand;
     QLabel *dragCountLabel;
     QLabel *totalCountLabel;

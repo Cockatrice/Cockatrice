@@ -69,6 +69,10 @@ GameView::GameView(GameScene *scene, QWidget *parent) : QGraphicsView(scene, par
 
     connect(aCloseMostRecentZoneView, &QAction::triggered, scene, &GameScene::closeMostRecentZoneView);
     addAction(aCloseMostRecentZoneView);
+
+    aShowHoverPanel = new QAction(this);
+    connect(aShowHoverPanel, &QAction::triggered, scene, &GameScene::summonHoverPanel);
+    addAction(aShowHoverPanel);
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &GameView::refreshShortcuts);
     refreshShortcuts();
@@ -208,6 +212,7 @@ void GameView::refreshShortcuts()
 {
     aCloseMostRecentZoneView->setShortcuts(
         SettingsCache::instance().shortcuts().getShortcut("Player/aCloseMostRecentZoneView"));
+    aShowHoverPanel->setShortcuts(SettingsCache::instance().shortcuts().getShortcut("Player/aShowHoverPanel"));
 }
 
 void GameView::clearTallyLabels()
