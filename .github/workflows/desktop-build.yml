@@ -525,6 +525,17 @@ jobs:
       # sccache is only useful for the Ninja job: a compiler cache has to wrap the
       # compiler, and MSBuild is driven by cmake instead of running it, so a
       # launcher handed to MSBuild is ignored without a word.
+      # Experiment: sccache 0.18 may read ACTIONS_CACHE_URL (v1) while the runner
+      # only provides ACTIONS_RESULTS_URL (v2, see ACTIONS_CACHE_SERVICE_V2), which
+      # would leave the GHA backend disengaged and everything local-only with zero
+      # cross-run hits. Export both spellings and watch for sccache-* keys.
+      - name: "[Windows/Ninja] Export cache service URLs for sccache"
+        if: matrix.os == 'Windows' && matrix.cmake_generator == 'Ninja'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || process.env.ACTIONS_RESULTS_URL || '');
+            core.exportVariable('ACTIONS_RESULTS_URL', process.env.ACTIONS_RESULTS_URL || '');
       - name: "[Windows/Ninja] Set up sccache"
         if: matrix.os == 'Windows' && matrix.cmake_generator == 'Ninja'
         uses: mozilla-actions/sccache-action@v0.0.11
