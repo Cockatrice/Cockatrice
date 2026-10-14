@@ -9,6 +9,7 @@
 #include <QLoggingCategory>
 #include <QString>
 #include <libcockatrice/settings/personal_settings.h>
+#include <memory>
 
 #ifndef COCKATRICE_WITH_CRASH_REPORTING
 #define COCKATRICE_WITH_CRASH_REPORTING 0
@@ -17,6 +18,8 @@
 #ifndef COCKATRICE_SENTRY_DSN
 #define COCKATRICE_SENTRY_DSN ""
 #endif
+
+class QLockFile;
 
 Q_DECLARE_LOGGING_CATEGORY(CrashReportLog);
 
@@ -28,17 +31,24 @@ Q_DECLARE_LOGGING_CATEGORY(CrashReportLog);
  * consent) skips the SDK entirely, so the mock dialog fallback behaves exactly
  * as before. With a DSN, init() arms require-user-consent and before_send
  * scrubbing (stale persisted consent from a previous AlwaysSend run is cleared
- * before init when the mode is not AlwaysSend); giveConsent()/revokeConsent()
+ * before init when the mode is not AlwaysSend, and cached crash envelopes are
+ * held for the dialog instead of being dropped); giveConsent()/revokeConsent()
  * gate uploads, and sendReport() captures a redacted message event with the log
  * preview attached. All SDK calls are guarded so OFF builds compile to no-ops.
+ * Session tracking (beginSession/endSession) is SDK-independent: a QLockFile per
+ * process in the database dir detects unclean exits cross-platform, replacing the
+ * legacy Windows-only .dmp scan. The held lock makes the reporter non-copyable and
+ * non-movable.
  */
 class CrashReporter
 {
 public:
-    CrashReporter() = default;
+    CrashReporter();
     CrashReporter(const CrashReporter &) = delete;
     CrashReporter &operator=(const CrashReporter &) = delete;
-    ~CrashReporter() = default;
+    CrashReporter(CrashReporter &&) = delete;
+    CrashReporter &operator=(CrashReporter &&) = delete;
+    ~CrashReporter();
 
     void init(const QString &dsn,
               const QString &release,
@@ -55,12 +65,22 @@ public:
      */
     static bool isReportingEnabled(const QString &dsn, PersonalSettings::CrashReportingMode consentMode);
 
+    /**
+     * @brief Claim this process's session lock, reporting a previous unclean exit.
+     * @return true if a leftover session lock from a dead process (or an unreadable
+     * garbage file) was found and cleaned; live concurrent instances are ignored.
+     */
+    bool beginSession(const QString &dir);
+    void endSession();
+
     static QString sanitizeLogLine(const QString &line);
     static QString redactCockatriceUrls(const QString &line);
 
 private:
     bool ready = false;
     QString sentryDatabasePath;
+    QString sessionLockPath;
+    std::unique_ptr<QLockFile> sessionLock;
 };
 
 #endif
