@@ -15,6 +15,16 @@ class CardsDisplaySettings : public SettingsManager, public ICardsDisplaySetting
     friend class SettingsCache;
 
 public:
+    /// What can summon the hover zoom or panel. Stored as int; values are the
+    /// serialization contract, so never reorder or renumber.
+    enum HoverPanelTrigger
+    {
+        HoverPanelTriggerHover = 0,
+        HoverPanelTriggerRightClick = 1,
+        HoverPanelTriggerWheel = 2,
+        HoverPanelTriggerShortcut = 3
+    };
+
     [[nodiscard]] bool getDisplayCardNames() const override;
     [[nodiscard]] bool getRoundCardCorners() const override;
     [[nodiscard]] bool getOverrideAllCardArtWithPersonalPreference() const override;
@@ -26,6 +36,16 @@ public:
     [[nodiscard]] bool getArrowDrawAnimation() const override;
     [[nodiscard]] bool getAutoRotateSidewaysLayoutCards() const override;
     [[nodiscard]] bool getScaleCards() const override;
+    /// What summons the in-game card hover panel (a HoverPanelTrigger value).
+    [[nodiscard]] int getHoverPanelTrigger() const override;
+    /// What zooms the hovered card (a HoverPanelTrigger value). Zoom and panel triggers are independent.
+    [[nodiscard]] int getHoverZoomTrigger() const override;
+    /// When true, the trigger first only zooms; repeating it shows the panel.
+    [[nodiscard]] bool getHoverPanelDoubleConfirm() const override;
+    /// Hover dwell before the zoom kicks in (ms). Only used with the hover trigger.
+    [[nodiscard]] int getHoverZoomDelayMs() const override;
+    /// Wait after the zoom before the tab panel shows (ms). Hover trigger, one-step only.
+    [[nodiscard]] int getHoverPanelDelayMs() const override;
     [[nodiscard]] int getStackCardOverlapPercent() const override;
     [[nodiscard]] int getCardInfoViewMode() const override;
     [[nodiscard]] int getVisualDeckStorageCardSize() const override;
@@ -49,6 +69,11 @@ public:
     void setArrowDrawAnimation(bool _arrowDrawAnimation);
     void setAutoRotateSidewaysLayoutCards(bool _autoRotateSidewaysLayoutCards);
     void setCardScaling(bool _scaleCards);
+    void setHoverPanelTrigger(int _trigger);
+    void setHoverZoomTrigger(int _trigger);
+    void setHoverPanelDoubleConfirm(bool _doubleConfirm);
+    void setHoverZoomDelayMs(int _ms);
+    void setHoverPanelDelayMs(int _ms);
     void setStackCardOverlapPercent(int _verticalCardOverlapPercent);
     void setCardInfoViewMode(int _viewMode);
     void setVisualDeckStorageCardSize(int _cardSize);
@@ -78,6 +103,11 @@ signals:
     void sampleHandSizeChanged(int amount);
     void cardLangChanged(const QString &lang);
     void cardSearchLanguageChanged(int cardSearchLanguage);
+    void hoverPanelTriggerChanged(int trigger);
+    void hoverZoomTriggerChanged(int trigger);
+    void hoverPanelDoubleConfirmChanged(bool doubleConfirm);
+    void hoverZoomDelayMsChanged(int ms);
+    void hoverPanelDelayMsChanged(int ms);
 
 public:
     explicit CardsDisplaySettings(const QString &settingPath, QObject *parent = nullptr);
