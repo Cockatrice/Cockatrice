@@ -1,0 +1,73 @@
+#include "client/crash/crash_reporter.h"
+
+#include <QString>
+#include <gtest/gtest.h>
+#include <libcockatrice/settings/debug_settings.h>
+#include <string>
+
+namespace
+{
+
+TEST(CrashReporterTest, SanitizeLogLineStripsAnsiColorCodes)
+{
+    ASSERT_EQ(CrashReporter::sanitizeLogLine(QStringLiteral("\033[32mhello\033[0m")), QStringLiteral("hello"));
+    ASSERT_EQ(CrashReporter::sanitizeLogLine(QStringLiteral("\033[1;31mfatal\033[0m")), QStringLiteral("fatal"));
+    ASSERT_EQ(CrashReporter::sanitizeLogLine(QStringLiteral("plain line")), QStringLiteral("plain line"));
+}
+
+TEST(CrashReporterTest, RedactCockatriceUrlsKeepsSchemeAndHostOnly)
+{
+    ASSERT_EQ(
+        CrashReporter::redactCockatriceUrls(QStringLiteral("open cockatrice://opendeck?token=secret&user=me now")),
+        QStringLiteral("open cockatrice://opendeck now"));
+}
+
+TEST(CrashReporterTest, RedactCockatriceUrlsIsIdempotent)
+{
+    // A secret-free URL must not match again after redaction (regression: this hung forever).
+    ASSERT_EQ(CrashReporter::redactCockatriceUrls(QStringLiteral("open cockatrice://opendeck now")),
+              QStringLiteral("open cockatrice://opendeck now"));
+}
+
+TEST(CrashReporterTest, RedactCockatriceUrlsLeavesOtherTextAlone)
+{
+    ASSERT_EQ(CrashReporter::redactCockatriceUrls(QStringLiteral("https://cockatrice.github.io/?token=secret")),
+              QStringLiteral("https://cockatrice.github.io/?token=secret"));
+    ASSERT_EQ(CrashReporter::sanitizeLogLine(QStringLiteral("")), QStringLiteral(""));
+}
+
+TEST(CrashReporterTest, InitSkippedWithoutDsn)
+{
+    CrashReporter reporter;
+    reporter.init(QString(), QStringLiteral("3.1.2"), QStringLiteral("/tmp/cockatrice-crash-test"),
+                  static_cast<int>(DebugSettings::CrashReportingMode::Ask));
+    ASSERT_FALSE(reporter.isReady());
+    reporter.shutdown();
+    ASSERT_FALSE(reporter.isReady());
+}
+
+TEST(CrashReporterTest, InitSkippedWhenNeverSend)
+{
+    CrashReporter reporter;
+    reporter.init(QStringLiteral("https://key@sentry.io/1"), QStringLiteral("3.1.2"),
+                  QStringLiteral("/tmp/cockatrice-crash-test"),
+                  static_cast<int>(DebugSettings::CrashReportingMode::NeverSend));
+    ASSERT_FALSE(reporter.isReady());
+    reporter.shutdown();
+}
+
+TEST(CrashReporterTest, ShutdownWithoutInitIsSafe)
+{
+    CrashReporter reporter;
+    ASSERT_FALSE(reporter.isReady());
+    reporter.shutdown();
+    ASSERT_FALSE(reporter.isReady());
+}
+
+} // namespace
+
+int main(int argc, char **argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

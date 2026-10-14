@@ -18,7 +18,10 @@ class DebugSettings : public SettingsManager
     Q_OBJECT
     friend class SettingsCache;
 
+public:
     explicit DebugSettings(const QString &settingPath, QObject *parent = nullptr);
+
+private:
     DebugSettings(const DebugSettings & /*other*/);
 
 public:
@@ -28,6 +31,19 @@ public:
     int getLocalGamePlayerCount() const;
 
     QString getDeckPathForPlayer(const QString &playerName) const;
+
+    enum class CrashReportingMode
+    {
+        Ask = 0,
+        AlwaysSend = 1,
+        NeverSend = 2
+    };
+
+    CrashReportingMode getCrashReportingMode() const;
+    void setCrashReportingMode(CrashReportingMode _crashReportingMode);
+
+signals:
+    void crashReportingModeChanged(CrashReportingMode mode);
 };
 
 #endif // DEBUG_SETTINGS_H

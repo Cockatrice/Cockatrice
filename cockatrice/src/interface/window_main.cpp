@@ -23,6 +23,7 @@
 #include "../client/network/update/client/client_update_checker.h"
 #include "../client/settings/cache_settings.h"
 #include "../client/settings/shortcuts_settings.h"
+#include "../interface/widgets/dialogs/dlg_crash_report.h"
 #include "../interface/widgets/dialogs/dlg_edit_tokens.h"
 #include "../interface/widgets/dialogs/dlg_local_game_options.h"
 #include "../interface/widgets/dialogs/dlg_manage_sets.h"
@@ -336,6 +337,12 @@ void MainWindow::actViewLog()
     logviewDialog->activateWindow();
 }
 
+void MainWindow::actSendCrashReport()
+{
+    DlgCrashReport dlg(this);
+    dlg.exec();
+}
+
 void MainWindow::actOpenSettingsFolder()
 {
     QString dir = SettingsCache::instance().getSettingsPath();
@@ -381,6 +388,7 @@ void MainWindow::retranslateUi()
     aCheckCardUpdatesBackground->setText(tr("Check for Card Updates (Automatic)"));
     aStatusBar->setText(tr("Show Status Bar"));
     aViewLog->setText(tr("View &Debug Log"));
+    aSendCrashReport->setText(tr("Send crash report (preview)"));
     aOpenSettingsFolder->setText(tr("Open Settings Folder"));
     aFirstRunWizard->setText(tr("Re-run Onboarding Wizard..."));
 
@@ -442,6 +450,8 @@ void MainWindow::createActions()
             &InterfaceSettings::setShowStatusBar);
     aViewLog = new QAction(this);
     connect(aViewLog, &QAction::triggered, this, &MainWindow::actViewLog);
+    aSendCrashReport = new QAction(this);
+    connect(aSendCrashReport, &QAction::triggered, this, &MainWindow::actSendCrashReport);
     aOpenSettingsFolder = new QAction(this);
     connect(aOpenSettingsFolder, &QAction::triggered, this, &MainWindow::actOpenSettingsFolder);
     aFirstRunWizard = new QAction(this);
@@ -523,6 +533,7 @@ void MainWindow::createMenus()
     helpMenu->addSeparator();
     helpMenu->addAction(aStatusBar);
     helpMenu->addAction(aViewLog);
+    helpMenu->addAction(aSendCrashReport);
     helpMenu->addAction(aOpenSettingsFolder);
     helpMenu->addSeparator();
     helpMenu->addAction(aFirstRunWizard);

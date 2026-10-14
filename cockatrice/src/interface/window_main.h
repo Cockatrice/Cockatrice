@@ -102,6 +102,7 @@ private slots:
     void actTips();
     void actUpdate();
     void actViewLog();
+    void actSendCrashReport();
     void actOpenSettingsFolder();
     void actShow();
     void showWindowIfHidden();
@@ -185,7 +186,7 @@ private:
     QAction *aManageSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet,
         *aReloadCardDatabase;
     QAction *aTips, *aUpdate, *aCheckCardUpdates, *aCheckCardUpdatesBackground, *aFirstRunWizard, *aStatusBar,
-        *aViewLog, *aOpenSettingsFolder;
+        *aViewLog, *aSendCrashReport, *aOpenSettingsFolder;
 
     TabSupervisor *tabSupervisor;
     IntentUrlParser *urlParser;

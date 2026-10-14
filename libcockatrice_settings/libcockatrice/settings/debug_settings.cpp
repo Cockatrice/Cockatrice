@@ -35,3 +35,24 @@ QString DebugSettings::getDeckPathForPlayer(const QString &playerName) const
 {
     return getValue(playerName, "localgame", "deck").toString();
 }
+
+DebugSettings::CrashReportingMode DebugSettings::getCrashReportingMode() const
+{
+    const int raw = getValue("crashReportingMode", QString(), QString(), 0).toInt();
+    switch (raw) {
+        case 1:
+            return CrashReportingMode::AlwaysSend;
+        case 2:
+            return CrashReportingMode::NeverSend;
+        case 0:
+        default:
+            // Clamp corrupt ini values back to Ask; the QSettings key string is unchanged (no migration).
+            return CrashReportingMode::Ask;
+    }
+}
+
+void DebugSettings::setCrashReportingMode(CrashReportingMode _crashReportingMode)
+{
+    setValue(static_cast<int>(_crashReportingMode), "crashReportingMode");
+    emit crashReportingModeChanged(_crashReportingMode);
+}

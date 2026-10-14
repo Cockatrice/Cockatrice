@@ -4,6 +4,7 @@
 #include <QDir>
 #include <QHash>
 #include <QList>
+#include <QSettings>
 #include <QString>
 #include <QStringList>
 #include <QTemporaryDir>
@@ -11,6 +12,7 @@
 #include <libcockatrice/settings/cache_storage_settings.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/chat_settings.h>
+#include <libcockatrice/settings/debug_settings.h>
 #include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/game_settings.h>
@@ -339,6 +341,34 @@ TEST_F(SettingsDefaultsTest, Personal_ShowTipsOnStartup_Default)
 {
     PersonalSettings s(settingsPath, nullptr);
     ASSERT_EQ(s.getShowTipsOnStartup(), true);
+}
+
+// --- DebugSettings ---
+
+TEST_F(SettingsDefaultsTest, Debug_CrashReportingMode_Default)
+{
+    DebugSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getCrashReportingMode(), DebugSettings::CrashReportingMode::Ask);
+}
+
+TEST_F(SettingsDefaultsTest, Debug_CrashReportingMode_SetAndGet)
+{
+    DebugSettings s(settingsPath, nullptr);
+    s.setCrashReportingMode(DebugSettings::CrashReportingMode::AlwaysSend);
+    ASSERT_EQ(s.getCrashReportingMode(), DebugSettings::CrashReportingMode::AlwaysSend);
+    s.setCrashReportingMode(DebugSettings::CrashReportingMode::NeverSend);
+    ASSERT_EQ(s.getCrashReportingMode(), DebugSettings::CrashReportingMode::NeverSend);
+    s.setCrashReportingMode(DebugSettings::CrashReportingMode::Ask);
+    ASSERT_EQ(s.getCrashReportingMode(), DebugSettings::CrashReportingMode::Ask);
+}
+
+TEST_F(SettingsDefaultsTest, Debug_CrashReportingMode_ClampsCorruptValue)
+{
+    QSettings raw(settingsPath + "debug.ini", QSettings::IniFormat);
+    raw.setValue("debug/crashReportingMode", 99);
+    raw.sync();
+    DebugSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getCrashReportingMode(), DebugSettings::CrashReportingMode::Ask);
 }
 
 // --- DownloadSettings ---

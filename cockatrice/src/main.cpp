@@ -20,6 +20,7 @@
 
 #include "main.h"
 
+#include "client/crash/crash_reporter.h"
 #include "client/network/update/card_spoiler/spoiler_background_updater.h"
 #include "client/settings/cache_settings.h"
 #include "client/sound_engine.h"
@@ -30,6 +31,7 @@
 #include "interface/logger.h"
 #include "interface/pixel_map_generator.h"
 #include "interface/theme_manager.h"
+#include "interface/widgets/dialogs/dlg_crash_report.h"
 #include "interface/window_main.h"
 #include "libcockatrice/card/database/card_database.h"
 #include "libcockatrice/rng/rng_abstract.h"
@@ -44,6 +46,7 @@
 #include <QCoreApplication>
 #include <QCryptographicHash>
 #include <QDebug>
+#include <QDir>
 #include <QFileInfo>
 #include <QGuiApplication>
 #include <QIcon>
@@ -66,6 +69,7 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/rng/rng_sfmt.h>
 #include <libcockatrice/settings/card_database_settings.h>
+#include <libcockatrice/settings/debug_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/network_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
@@ -259,6 +263,20 @@ int main(int argc, char *argv[])
     qApp->setAttribute(Qt::AA_DontShowIconsInMenus, true);
 #endif
 
+    // Crash reporting (increment 1): init the SDK early so a crash anywhere below is captured into the
+    // local database; the next-startup dialog flushes or clears it. An empty DSN skips the SDK entirely
+    // and the mock fallback further below behaves exactly as before.
+    CrashReporter crashReporter;
+    {
+        QString crashDsn = QString::fromUtf8(qgetenv("COCKATRICE_SENTRY_DSN"));
+        if (crashDsn.isEmpty()) {
+            crashDsn = QString::fromLatin1(COCKATRICE_SENTRY_DSN);
+        }
+        const QString crashDatabasePath = SettingsCache::instance().getSettingsPath() + QStringLiteral("sentry");
+        crashReporter.init(crashDsn, QString::fromLatin1(VERSION_STRING), crashDatabasePath,
+                           static_cast<int>(SettingsCache::instance().debug().getCrashReportingMode()));
+    }
+
     // Translations
 #ifdef Q_OS_MAC
     translationPath = qApp->applicationDirPath() + "/../Resources/translations";
@@ -276,7 +294,9 @@ int main(int argc, char *argv[])
 
     parser.addOptions(
         {{{"c", "connect"}, QCoreApplication::translate("main", "Connect on startup"), "user:pass@host:port"},
-         {{"d", "debug-output"}, QCoreApplication::translate("main", "Debug to file")}});
+         {{"d", "debug-output"}, QCoreApplication::translate("main", "Debug to file")},
+         {"simulate-crash",
+          QCoreApplication::translate("main", "Show the mock crash-report dialog (nothing is sent)")}});
 
     parser.process(app);
 
@@ -413,6 +433,31 @@ int main(int argc, char *argv[])
     ui.show();
     qCInfo(MainLog) << "ui.show() finished";
 
+    // MOCK crash-report flow (UI + settings only): no sentry-native, no network.
+    {
+        QString crashDumpDir;
+#ifdef Q_OS_WIN
+        crashDumpDir = QString::fromLocal8Bit(qgetenv("LOCALAPPDATA")) + "/CrashDumps/Cockatrice";
+        if (qgetenv("LOCALAPPDATA").isEmpty()) {
+            crashDumpDir = QDir::tempPath();
+        }
+#else
+        crashDumpDir = QDir::tempPath();
+#endif
+        const bool crashDumpFound =
+            !QDir(crashDumpDir).entryList({QStringLiteral("cockatrice.crash.*.dmp")}, QDir::Files).isEmpty();
+        if (parser.isSet("simulate-crash") || crashDumpFound) {
+            const DebugSettings::CrashReportingMode crashMode =
+                SettingsCache::instance().debug().getCrashReportingMode();
+            if (crashMode == DebugSettings::CrashReportingMode::AlwaysSend) {
+                DlgCrashReport::writeMockReport(DlgCrashReport::buildRedactedPreview());
+            } else if (crashMode == DebugSettings::CrashReportingMode::Ask) {
+                DlgCrashReport crashDialog(&ui);
+                crashDialog.exec();
+            }
+        }
+    }
+
     // force shortcuts to be shown/hidden in right-click menus, regardless of system defaults
     qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus,
                        !SettingsCache::instance().userInterface().getShowShortcuts());
@@ -436,6 +481,8 @@ int main(int argc, char *argv[])
     });
 
     int ret = app.exec();
+
+    crashReporter.shutdown();
 
     qCInfo(MainLog) << "Event loop finished, terminating...";
     delete rng;
