@@ -5,12 +5,15 @@
 #endif
 
 #include <QByteArray>
+#include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QLockFile>
 #include <QLoggingCategory>
 #include <QRegularExpression>
+#include <QThread>
 #include <QUrl>
 #include <cstring>
 #include <libcockatrice/settings/personal_settings.h>
@@ -263,8 +266,13 @@ void CrashReporter::init(const QString &dsn,
     sentry_options_set_release(options, release.toUtf8().constData());
     sentry_options_set_database_path(options, sentryDatabasePath.toUtf8().constData());
     // Consent-gated uploads: crashes are captured into the local database but
-    // nothing leaves the machine until giveConsent().
+    // nothing leaves the machine until giveConsent(). cache_keep holds the previous run's
+    // crash envelope in <database>/cache instead of dropping it at init, so the Ask dialog
+    // decides its fate: giveConsent() flushes it via the transport retry, revokeConsent()
+    // deletes it below. This also covers the first crash after switching to AlwaysSend,
+    // which giveConsent() (running after init) would otherwise miss.
     sentry_options_set_require_user_consent(options, 1);
+    sentry_options_set_cache_keep(options, SENTRY_CACHE_KEEP_OFFLINE);
     sentry_options_set_before_send(options, scrubEventBeforeSend, nullptr);
     ready = (sentry_init(options) == 0);
 #else
@@ -291,6 +299,79 @@ void CrashReporter::shutdown()
     ready = false;
 }
 
+CrashReporter::~CrashReporter() = default;
+CrashReporter::CrashReporter() = default;
+
+bool CrashReporter::beginSession(const QString &dir)
+{
+    // Restartable: releasing first keeps begin->end->begin round-trips clean.
+    endSession();
+
+    QDir().mkpath(dir);
+    const QDir sessionDir(dir);
+    const QString selfName = QStringLiteral("session-%1").arg(QCoreApplication::applicationPid());
+
+    bool unclean = false;
+    const QStringList leftovers = sessionDir.entryList({QStringLiteral("session-*")}, QDir::Files);
+    for (const QString &name : leftovers) {
+        if (name == selfName) {
+            continue;
+        }
+        const QString path = sessionDir.filePath(name);
+        QLockFile probe(path);
+        // Long-lived session lock: stale means "owner dead", regardless of file age, so a
+        // crash followed by an immediate relaunch (younger than the 30 s default) is still
+        // detected. tryLock() only deletes the file when it finds it stale, so a live
+        // concurrent instance's lock is never touched here. (The static
+        // QLockFile::removeStaleLockFile(path) form does not exist in Qt5/Qt6, and the
+        // member removeStaleLockFile() force-removes without a staleness check, so neither
+        // is usable for this scan.)
+        probe.setStaleLockTime(0);
+        if (probe.tryLock(0)) {
+            unclean = true;
+            probe.unlock(); // deletes the stale file
+            continue;
+        }
+        // tryLock failed: either a live concurrent instance owns the file, or it is
+        // unreadable (garbage/empty) and therefore has no live owner. Only the latter is
+        // cleaned up; a live instance is left alone. On Unix QLockFile creates the file
+        // before writing the pid, so a second instance starting at the same moment can
+        // briefly observe an empty (or half-written) file for a live owner: re-read once
+        // after a beat so a live owner's fresh lock is never mistaken for garbage and deleted.
+        qint64 pid = 0;
+        QString hostname, appname;
+        if (!probe.getLockInfo(&pid, &hostname, &appname)) {
+            QThread::msleep(100);
+            if (!probe.getLockInfo(&pid, &hostname, &appname)) {
+                QFile::remove(path);
+                unclean = true;
+            }
+        }
+    }
+
+    sessionLockPath = sessionDir.filePath(selfName);
+    sessionLock = std::make_unique<QLockFile>(sessionLockPath);
+    sessionLock->setStaleLockTime(0);
+    if (!sessionLock->tryLock(0)) {
+        qCWarning(CrashReportLog) << "Failed to claim session lock at" << sessionLockPath;
+    }
+    return unclean;
+}
+
+void CrashReporter::endSession()
+{
+    if (sessionLock) {
+        // unlock() removes the lock file; nothing left to clean up.
+        sessionLock->unlock();
+        sessionLock.reset();
+    } else if (!sessionLockPath.isEmpty()) {
+        // The lock was never claimed (a live concurrent instance owns its file): only our
+        // own unclaimed file, if tryLock left one behind, is removed.
+        QFile::remove(sessionLockPath);
+    }
+    sessionLockPath.clear();
+}
+
 void CrashReporter::giveConsent()
 {
 #if COCKATRICE_WITH_CRASH_REPORTING
@@ -307,6 +388,10 @@ void CrashReporter::revokeConsent()
     // return to unknown, which blocks uploads too but loses the decision.
     if (ready) {
         sentry_user_consent_revoke();
+        // Drop the held crash envelope: without this it would sit in <database>/cache and
+        // upload on the next give (e.g. after switching to AlwaysSend), after the user
+        // explicitly refused it. The SDK recreates the directory as needed.
+        QDir(sentryDatabasePath + QStringLiteral("/cache")).removeRecursively();
     }
 #endif
 }

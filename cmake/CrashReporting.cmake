@@ -46,12 +46,14 @@ if(WITH_CRASH_REPORTING AND WITH_CLIENT)
   if(ENABLE_SANITIZERS)
     # The crash handler cannot run under ASan/UBSan, so there is no backend to capture with.
     set(_sentry_backend "none")
-  elseif(WIN32 OR APPLE)
-    # Out-of-process handler; shipping the handler binary is a later increment, which unifies
-    # every OS on breakpad (in-process, no extra binary to ship).
-    set(_sentry_backend "crashpad")
   else()
-    # In-process, no extra binary to ship.
+    # Breakpad on every OS (increment 3 probe, 2026-10-14): the crashpad sources
+    # do vendor friction-free (FetchContent inits all submodules recursively by
+    # default, verified populated in a local build tree), but the crashpad backend
+    # would need its out-of-process crashpad_handler binary installed next to the
+    # exe, into the macOS bundle, and through NSIS, plus handler-path wiring and
+    # notarization care. Breakpad is in-process, needs no extra binary and no
+    # packaging on any OS sentry-native builds, so simplicity wins.
     set(_sentry_backend "breakpad")
   endif()
   # FORCE so toggling ENABLE_SANITIZERS on a reused build dir cannot leave a stale backend behind.
@@ -60,6 +62,18 @@ if(WITH_CRASH_REPORTING AND WITH_CLIENT)
       CACHE STRING "Crash handler backend for sentry-native" FORCE
   )
   unset(_sentry_backend)
+
+  if(NOT MSVC)
+    # Symbol upload needs debug info in Release binaries: the top-level flags build GCC
+    # Release as -s -O2 (stripped, no DWARF) and Clang/Apple Release as plain -O2 (no DWARF),
+    # both of which upload nothing useful. Keep -g and drop the strip flag while the SDK is
+    # on; the OFF default leaves local, distro and Debug builds untouched. MSVC already
+    # links /DEBUG with PDBs in release (see top-level CMakeLists.txt), so it needs nothing.
+    string(REGEX REPLACE "(^| )-s( |$)" "\\1\\2" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+    if(NOT CMAKE_CXX_FLAGS_RELEASE MATCHES "(^| )-g( |$)")
+      set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g")
+    endif()
+  endif()
 
   # No Qt integration: it runs find_package(Qt6) inside the vendored build, which
   # cannot see our thin/aqt Qt layouts (macOS CI) under foreign toolchains, and its
