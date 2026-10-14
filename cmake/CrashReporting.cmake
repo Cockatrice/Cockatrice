@@ -77,6 +77,7 @@ if(WITH_CRASH_REPORTING AND WITH_CLIENT)
     sentry
     GIT_REPOSITORY https://github.com/getsentry/sentry-native.git
     GIT_TAG ${COCKATRICE_SENTRY_TAG}
+    GIT_SHALLOW TRUE
   )
   fetchcontent_makeavailable(sentry)
 

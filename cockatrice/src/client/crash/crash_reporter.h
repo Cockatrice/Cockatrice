@@ -6,6 +6,7 @@
 #ifndef CRASH_REPORTER_H
 #define CRASH_REPORTER_H
 
+#include <QLoggingCategory>
 #include <QString>
 #include <libcockatrice/settings/personal_settings.h>
 
@@ -17,18 +18,19 @@
 #define COCKATRICE_SENTRY_DSN ""
 #endif
 
+Q_DECLARE_LOGGING_CATEGORY(CrashReportLog);
+
 /**
  * @brief Sentry-backed crash-report facade, owned by main().
  *
  * Single responsibility: init/shutdown the sentry-native SDK behind consent
  * gating, plus the shared log redaction helpers. An empty DSN (or Never
  * consent) skips the SDK entirely, so the mock dialog fallback behaves exactly
- * as before. init() arms require-user-consent so cached crash envelopes never
- * upload before the user is asked; giveConsent()/revokeConsent() (driven by
- * the reporting-mode setting and the crash dialog) gate uploads, and any stale
- * persisted consent from a previous AlwaysSend run is cleared before init when
- * the mode is not AlwaysSend. The real send path is a later increment. All SDK
- * calls are guarded so OFF builds compile to no-ops.
+ * as before. With a DSN, init() arms require-user-consent and before_send
+ * scrubbing (stale persisted consent from a previous AlwaysSend run is cleared
+ * before init when the mode is not AlwaysSend); giveConsent()/revokeConsent()
+ * gate uploads, and sendReport() captures a redacted message event with the log
+ * preview attached. All SDK calls are guarded so OFF builds compile to no-ops.
  */
 class CrashReporter
 {
@@ -46,6 +48,7 @@ public:
     void shutdown();
     void giveConsent();
     void revokeConsent();
+    bool sendReport(const QString &redactedPreview);
 
     /**
      * @brief SDK-independent gating decision, unit-testable in OFF builds.
