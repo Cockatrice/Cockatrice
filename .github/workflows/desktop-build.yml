@@ -544,8 +544,10 @@ jobs:
           # A fork pull request can read the cache, but the token it runs with
           # cannot write to the base branch's scope.
           SCCACHE_GHA_RW_MODE: ${{ github.event.pull_request.head.repo.fork && 'READ_ONLY' || 'READ_WRITE' }}
-          # A cache that cannot be reached must not fail the build.
-          SCCACHE_IGNORE_SERVER_IO_ERROR: "1"
+          # Experiment: surface backend errors for one run instead of swallowing
+          # them. Three runs stored 343 entries locally with zero cross-run hits
+          # and no sccache-* keys; if writes are refused (quota) or the backend
+          # never engages (URL skew), the error string names it. Revert after.
 
       - name: "[Windows] Install NSIS"
         if: matrix.os == 'Windows'
