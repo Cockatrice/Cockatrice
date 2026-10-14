@@ -23,10 +23,13 @@ class PlayerLogic;
 class CardInfo;
 class QPainter;
 class QPoint;
+class QPropertyAnimation;
 
 class AbstractCardItem : public ArrowTarget, public IAnimatedItem
 {
     Q_OBJECT
+    Q_PROPERTY(qreal cardScale READ getCardScale WRITE setCardScale)
+    Q_PROPERTY(qreal cardOpacity READ getCardOpacity WRITE setCardOpacity)
 protected:
     CardState *state;
     int tapAngle;
@@ -37,6 +40,8 @@ private:
     qreal realZValue;
     bool pendingSelectionCollapse;
     int selectionCollapseGeneration = 0; ///< Guards the deferred collapse timer against stale firings
+    QPropertyAnimation *hoverZoom = nullptr;
+    QPropertyAnimation *opacityAnim = nullptr;
 private slots:
     void pixmapUpdated();
     void onCardInfoChanged();
@@ -57,6 +62,10 @@ signals:
     void playSelectedFaceDown(AbstractCardItem *card);
     void hideSelected(AbstractCardItem *card);
     void selectionChanged(AbstractCardItem *card, bool selected);
+    void tappedChanged(bool tapped);
+    void faceDownChanged(bool faceDown);
+    /** @brief Emitted when the hover shrink-out animation runs to completion while unhovered. */
+    void hoverShrinkFinished(AbstractCardItem *card);
 
 public:
     enum
@@ -116,6 +125,13 @@ public:
     }
     void setRealZValue(qreal _zValue);
     void setHovered(bool _hovered);
+    qreal getCardScale() const;
+    void setCardScale(qreal scale);
+    qreal getCardOpacity() const;
+    void setCardOpacity(qreal opacity);
+    /** @brief Fades the card out under the hover panel, or back in when it closes. */
+    void fadeCardOut();
+    void fadeCardIn();
     bool getIsHovered() const
     {
         return isHovered;
