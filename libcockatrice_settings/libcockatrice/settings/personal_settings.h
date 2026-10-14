@@ -24,8 +24,19 @@ public:
     void setShowTipsOnStartup(bool _showTipsOnStartup);
     void setSeenTips(const QList<int> &_seenTips);
 
+    enum class CrashReportingMode
+    {
+        Ask = 0,
+        AlwaysSend = 1,
+        NeverSend = 2
+    };
+
+    [[nodiscard]] CrashReportingMode getCrashReportingMode() const;
+    void setCrashReportingMode(CrashReportingMode _crashReportingMode);
+
 signals:
     void langChanged();
+    void crashReportingModeChanged(CrashReportingMode mode);
 
 public:
     explicit PersonalSettings(const QString &settingPath, QObject *parent = nullptr);

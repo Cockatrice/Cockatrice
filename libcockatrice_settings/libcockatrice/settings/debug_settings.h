@@ -18,7 +18,10 @@ class DebugSettings : public SettingsManager
     Q_OBJECT
     friend class SettingsCache;
 
+public:
     explicit DebugSettings(const QString &settingPath, QObject *parent = nullptr);
+
+private:
     DebugSettings(const DebugSettings & /*other*/);
 
 public:
