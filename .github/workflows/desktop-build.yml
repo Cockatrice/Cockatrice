@@ -512,11 +512,14 @@ jobs:
       # job. A scope nobody has written to yet therefore leaves the directory missing
       # and fails the job, which is exactly the state every scope starts in. Make the
       # directory up front so an empty scope is a cache miss instead of an error.
+      # The save also runs when the job failed before this step did, so keep the guard
+      # unconditional, or the post step buries the real failure under the same error.
       - name: "Create vcpkg cache directory"
+        if: always()
         shell: bash
         env:
           CACHE_DIR: '${{ steps.vcpkg-cache.outputs.path }}'
-        run: mkdir -p "$CACHE_DIR"
+        run: mkdir -p "${CACHE_DIR:-${{ github.workspace }}/.vcpkg-cache}"
 
       # Uses environment variables, see compile.sh for more details
       - name: "Build Cockatrice"
