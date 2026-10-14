@@ -11,6 +11,7 @@ RUN apt-get update && \
         g++ \
         gcovr \
         git \
+        libcurl4-openssl-dev \
         libgl-dev \
         liblzma-dev \
         libmariadb-dev-compat \

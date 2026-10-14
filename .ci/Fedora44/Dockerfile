@@ -1,10 +1,12 @@
 FROM fedora:44
 
 RUN dnf install -y \
+        ca-certificates \
         ccache \
         cmake \
         gcc-c++ \
         git \
+        libcurl-devel \
         mariadb-devel \
         ninja-build \
         openssl-devel \

@@ -40,6 +40,10 @@ Var SentryOutput
 !include MUI2.nsh
 !include x64.nsh
 
+; StrFunc functions must be constructed with the Using macro before use,
+; otherwise makensis aborts with "You forgot ${Using:StrFunc} StrRep".
+${Using:StrFunc} StrRep
+
 !define MUI_ABORTWARNING
 !define MUI_WELCOMEFINISHPAGE_BITMAP "${NSIS_SOURCE_PATH}\cmake\leftimage.bmp"
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP "${NSIS_SOURCE_PATH}\cmake\leftimage.bmp"

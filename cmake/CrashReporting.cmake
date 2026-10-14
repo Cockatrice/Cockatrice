@@ -55,10 +55,13 @@ if(WITH_CRASH_REPORTING AND WITH_CLIENT)
   )
   unset(_sentry_backend)
 
-  # qDebug messages become Sentry breadcrumbs for free.
+  # No Qt integration: it runs find_package(Qt6) inside the vendored build, which
+  # cannot see our thin/aqt Qt layouts (macOS CI) under foreign toolchains, and its
+  # breadcrumbs could carry unredacted log lines into native crash events that bypass
+  # before_send. Our attached redacted log preview already carries the log context.
   set(SENTRY_INTEGRATION_QT
-      ON
-      CACHE BOOL "Build the sentry-native Qt integration" FORCE
+      OFF
+      CACHE BOOL "Qt log-message breadcrumbs for sentry-native (off: discovery + secret surface)" FORCE
   )
   # The transport stays at the SDK default (curl on Apple/Linux, winhttp on Windows).
   set(SENTRY_BUILD_TESTS

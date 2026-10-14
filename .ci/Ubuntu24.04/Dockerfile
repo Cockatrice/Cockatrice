@@ -3,12 +3,14 @@ FROM ubuntu:24.04
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         build-essential \
+        ca-certificates \
         ccache \
         clang-format \
         cmake \
         file \
         g++ \
         git \
+        libcurl4-openssl-dev \
         libgl-dev \
         liblzma-dev \
         libmariadb-dev-compat \
