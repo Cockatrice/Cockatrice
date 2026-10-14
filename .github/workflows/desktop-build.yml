@@ -385,17 +385,20 @@ jobs:
             target: 10
             runner: windows-2025    # https://github.com/actions/runner-images/blob/main/images/windows/Windows2025-VS2026-Readme.md
 
-            # Set build_profile: 1 to have the build write an MSBuild performance
-            # summary and a binary log; empty on every entry that runs by default.
-            build_profile: ''
-
-            cmake_generator: "Visual Studio 18 2026"
-            cmake_generator_platform: x64
+            # Ninja builds the whole dependency graph at once instead of one
+            # MSBuild node at a time, runs the compiler itself, and matches the
+            # Linux and macOS legs. Its median build phase measured ~17 min
+            # against ~21 for the Visual Studio generator (shared 4-core hosts
+            # swing either by minutes, so read medians, not single runs).
+            cmake_generator: Ninja
             make_package: 1
             package_suffix: "-Win10"
             qt_version: 6.11.*
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             type: Release
+            # Scope is named after the vs2026 toolchain, not the generator: the
+            # ABI hash covers cl.exe, which is identical, so this leg keeps
+            # restoring the warm archives. Renaming would orphan them.
             vcpkg_scope: 'vcpkg/windows10-x64-vs2026/'
             vcpkg_upload: 1    # only one leg per vcpkg_scope hands its archives over
 
@@ -404,7 +407,6 @@ jobs:
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 100
     env:
-      BUILD_PROFILE: '${{ matrix.build_profile }}'
       CCACHE_DIR: ${{ github.workspace }}/.cache/
       CCACHE_SIZE: 600M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
 
@@ -492,6 +494,13 @@ jobs:
         shell: bash
         run: choco install nsis
 
+      # Ninja invokes cl.exe directly and needs the MSVC environment on PATH.
+      - name: "[Windows] Set up MSVC environment"
+        if: matrix.os == 'Windows'
+        uses: TheMrMilchmann/setup-msvc-dev@368ef7d1ee4d1171b31d4a7f67f4d954f903f5a9 # v4.1.0
+        with:
+          arch: x64
+
       - name: "Setup vcpkg cache"
         id: vcpkg-cache
         uses: TAServers/vcpkg-cache@v3
@@ -526,7 +535,6 @@ jobs:
           BUILDTYPE: '${{ matrix.type }}'
           CCACHE_EVICTION_AGE: ${{ matrix.ccache_eviction_age }}
           CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
-          CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform }}
           DEVELOPER_DIR: '/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer'
           GITHUB_TOKEN: ${{ github.token }}    # needed for vcpkg dependency graph updates, see VCPKG_FEATURE_FLAGS
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
@@ -695,6 +703,8 @@ jobs:
           if-no-files-found: error
           path: ${{ steps.build.outputs.path }}
 
+      # Ninja is single-config: binaries and their PDBs land directly in the
+      # target directories instead of a Release subdirectory.
       - name: "[Windows] Upload PDBs (Program Databases)"
         if: matrix.os == 'Windows' && github.ref_type != 'tag'
         uses: actions/upload-artifact@v7
@@ -702,20 +712,9 @@ jobs:
           if-no-files-found: error
           name: ${{ steps.build.outputs.name }}-PDBs
           path: |
-            build/cockatrice/Release/*.pdb
-            build/oracle/Release/*.pdb
-            build/servatrice/Release/*.pdb
-
-      # Written only when the matrix entry sets build_profile, so the artifact
-      # exists exactly on the runs that were asked to produce one.
-      - name: "[Windows] Upload MSBuild binary log"
-        if: always() && matrix.os == 'Windows' && env.BUILD_PROFILE == '1'
-        uses: actions/upload-artifact@v7
-        with:
-          if-no-files-found: error
-          name: ${{ steps.build.outputs.name }}-msbuild
-          path: build/msbuild.binlog
-          retention-days: 7
+            build/cockatrice/*.pdb
+            build/oracle/*.pdb
+            build/servatrice/*.pdb
 
       - name: "Upload to release"
         if: needs.configure.outputs.tag != null && matrix.make_package == '1'
