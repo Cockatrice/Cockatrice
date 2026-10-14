@@ -168,7 +168,7 @@ jobs:
     continue-on-error: ${{ matrix.allow-failure == 'yes' }}
     timeout-minutes: 70
     env:
-      CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}    # directory holding the build image and ccache, only the image subdir is cached below
+      CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}    # scratch dir for the container image build and throwaway ccache; nothing below is cached
       CCACHE_EVICTION_AGE: 7d
       CCACHE_SIZE: 600M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CMAKE_GENERATOR: 'Ninja'
@@ -179,29 +179,16 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@v7
 
-      # Only the image half of this cache is worth keeping. A compile on these legs runs
-      # inside a container, so ccache measures a 0.00 to 1.85 percent hit rate here against
-      # 49 to 50 percent on the macOS legs, and the roughly 420 MiB of ccache each entry
-      # carried was buying nothing. Caching $CACHE/image alone drops that.
-      # The key changes name because the cached content does: the old ccache-<distro>
-      # entries hold an image plus a ccache directory, and expire on their own untouched.
-      - name: "Restore build image cache"
-        id: restore_image_cache
-        uses: actions/cache/restore@v6
-        with:
-          key: image-${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}-${{ hashFiles(format('.ci/{0}{1}/**', matrix.distro, matrix.version)) }}
-          path: ${{ env.CACHE }}/image
-
+      # Nothing on these legs is worth persisting. A compile here runs inside a
+      # container, so ccache measures a 0.00 to 1.85 percent hit rate against 49 to
+      # 50 percent on the macOS legs: persisting it spent a few hundred MiB per
+      # entry buying nothing. The build image is not an alternative: it runs 1.1 to
+      # 2.4 GB per leg on disk, about 5 to 6 GB of quota for all nine legs once
+      # compressed, so caching it would cost more than dropping the ccache frees.
+      # The old ccache-<distro> entries are never read again and expire on their own.
       - name: "Build ${{ matrix.distro }} ${{ matrix.version }} Docker image"
         shell: bash
-        run: |
-          # --get/--save wire the $CACHE/image dir restored/saved above into the
-          # build: without them the image is rebuilt from scratch every run and
-          # the image cache saves nothing. Only persist on master; PR runs just
-          # reuse whatever the restore step found.
-          args=(--get --build)
-          [[ $GITHUB_REF == "refs/heads/master" ]] && args+=(--save)
-          source .ci/docker.sh "${args[@]}"
+        run: source .ci/docker.sh --build
 
       - name: "Build debug and test"
         if: matrix.test != 'skip'
@@ -262,25 +249,6 @@ jobs:
           args+=(--suffix "$SUFFIX")
 
           RUN --server --release --package "$package" "${args[@]}"
-
-      # Delete used cache to emulate a cache update. See https://github.com/actions/cache/issues/342
-      - name: "[Linux] Delete used cache to emulate a cache update"
-        if: github.ref == 'refs/heads/master' && steps.restore_image_cache.outputs.cache-hit
-        continue-on-error: true
-        env:
-          CACHE_PRIMARY_KEY: ${{ steps.restore_image_cache.outputs.cache-primary-key }}
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if gh cache delete --repo "$GITHUB_REPOSITORY" "$CACHE_PRIMARY_KEY"; then
-            echo "Cache deleted successfully"
-          fi
-
-      - name: "Save updated build image cache"
-        if: github.ref == 'refs/heads/master'
-        uses: actions/cache/save@v6
-        with:
-          key: ${{ steps.restore_image_cache.outputs.cache-primary-key }}
-          path: ${{ env.CACHE }}/image
 
       - name: "Upload artifact"
         id: upload_artifact
