@@ -240,6 +240,18 @@ int main(int argc, char **argv)
 
     QLoggingCategory::setFilterRules("card_picture_loader.*=false\nsettings_cache.*=false");
 
+    ::testing::InitGoogleTest(&argc, argv);
+
+    // CMake's gtest discovery runs this binary with --gtest_list_tests, which lists
+    // without running any test body. Arming the cleanup guard here would make it the
+    // sole SettingsCache::instance() call in that mode, instantiating the
+    // Q_GLOBAL_STATIC singleton (and its QNetworkAccessManagers) just to tear down at
+    // exit — which LeakSanitizer reports as leaks and fails discovery on the sanitizer
+    // leg. Skip the sandbox cleanup entirely when only listing.
+    if (::testing::GTEST_FLAG(list_tests)) {
+        return RUN_ALL_TESTS();
+    }
+
     // Best-effort cleanup of this process's settings sandbox. QStandardPaths test
     // mode is never auto-cleaned, and on macOS the $HOME override above is ignored,
     // so without this every run litters ~/.qttest with one pid-unique directory.
@@ -250,6 +262,5 @@ int main(int argc, char **argv)
         QDir(SettingsCache::instance().getCachePath()).removeRecursively();
     });
 
-    ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
