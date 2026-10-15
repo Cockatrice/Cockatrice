@@ -20,6 +20,7 @@
 #include <QMessageBox>
 #include <QMessageLogger>
 #include <QPushButton>
+#include <QRect>
 #include <QScreen>
 #include <QSize>
 #include <QVBoxLayout>
@@ -30,8 +31,27 @@
 
 DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
 {
-    auto rec = QGuiApplication::primaryScreen()->availableGeometry();
-    setMinimumSize(qMin(750, rec.width()), qMin(700, rec.height()));
+    // Fill the main window with small margins so multi-group pages (e.g. Deck Editor) are not buried in a scroll.
+    // 90% of the host window leaves ~5% margins on each side; falls back to 90% of the screen when parentless.
+    QWidget *hostWindow = parent ? parent->window() : nullptr;
+    QScreen *screen = nullptr;
+    QSize hostSize;
+    if (hostWindow) {
+        hostSize = hostWindow->size();
+        screen = QGuiApplication::screenAt(hostWindow->geometry().center());
+    }
+    if (!screen) {
+        screen = QGuiApplication::primaryScreen();
+    }
+    const QRect available = screen ? screen->availableGeometry() : QRect(0, 0, 1280, 800);
+    const QSize minimum(qMin(750, available.width()), qMin(700, available.height()));
+    setMinimumSize(minimum);
+
+    QSize target = !hostSize.isEmpty() ? QSize(qRound(hostSize.width() * 0.9), qRound(hostSize.height() * 0.9))
+                                       : QSize(qRound(available.width() * 0.9), qRound(available.height() * 0.9));
+    target = target.expandedTo(minimum).boundedTo(available.size());
+    resize(target);
+    setSizeGripEnabled(true);
 
     connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this, &DlgSettings::updateLanguage);
 
@@ -54,8 +74,6 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
 
     connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this, &DlgSettings::retranslateUi);
     retranslateUi();
-
-    adjustSize();
 }
 
 void DlgSettings::setTab(int index)
