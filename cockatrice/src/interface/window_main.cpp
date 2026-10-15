@@ -662,13 +662,15 @@ static QString resolveBackupRoot(const QString &appDir)
 // True when a portable offender must stay out of the safety backup: replays (size),
 // downloaded pictures (large and re-downloadable - everything under pics/ except the
 // seeded CUSTOM dir) and the regenerable redirect/cache dir.
-static bool isPortableBackupExcluded(const QString &offender,
-                                     const QString &replaysPath,
-                                     const QString &picsPath,
-                                     const QString &customPicsPath,
-                                     const QString &redirectsPath,
-                                     const QString &cacheDir)
+static bool isPortableBackupExcluded(const QString &offender)
 {
+    auto &paths = SettingsCache::instance().paths();
+    const QString replaysPath = QDir::cleanPath(paths.getReplaysPath());
+    const QString picsPath = QDir::cleanPath(paths.getPicsPath());
+    const QString customPicsPath = QDir::cleanPath(paths.getCustomPicsPath());
+    const QString redirectsPath = QDir::cleanPath(paths.getRedirectCachePath());
+    const QString cacheDir = QDir::cleanPath(SettingsCache::instance().getCachePath());
+
     if (!replaysPath.isEmpty() && PathsSettings::isInsideDir(offender, replaysPath)) {
         return true;
     }
@@ -734,17 +736,12 @@ MainWindow::AtRiskPaths MainWindow::collectPortableAtRiskPaths(const QString &ap
     // old uninstaller deletes all the same. Cover any offender that is not
     // already inside a backed-up source; when an offender is a parent of
     // already-collected sources it supersedes them.
-    const QString replaysPath = QDir::cleanPath(paths.getReplaysPath());
-    const QString picsPath = QDir::cleanPath(paths.getPicsPath());
-    const QString customPicsPath = QDir::cleanPath(paths.getCustomPicsPath());
-    const QString redirectsPath = QDir::cleanPath(paths.getRedirectCachePath());
-    const QString cacheDir = QDir::cleanPath(SettingsCache::instance().getCachePath());
     for (const QString &offender : paths.pathsInsideDir(appDir)) {
         if (!QFileInfo::exists(offender)) {
             continue;
         }
         const QString cleanedOffender = QDir::cleanPath(offender);
-        if (isPortableBackupExcluded(cleanedOffender, replaysPath, picsPath, customPicsPath, redirectsPath, cacheDir)) {
+        if (isPortableBackupExcluded(cleanedOffender)) {
             continue;
         }
         mergeCoveringSource(atRisk.sourcesToBackUp, cleanedOffender);
