@@ -21,6 +21,7 @@
 
 #include <QAbstractAnimation>
 #include <QAbstractItemView>
+#include <QApplication>
 #include <QBrush>
 #include <QColor>
 #include <QCoreApplication>
@@ -288,6 +289,9 @@ void SettingsView::setupNavTree()
     Q_ASSERT(!pageItems.contains(nullptr));
 
     connect(navTree, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem *current) {
+        // Any selection change consumes a preceding press: only a press without a
+        // following change counts as a re-click (handled in itemClicked)
+        pressWasOnCurrentItem = false;
         if (!current) {
             return;
         }
@@ -300,6 +304,31 @@ void SettingsView::setupNavTree()
             navigateToSection(index, section);
         } else {
             onTabClicked(index);
+        }
+    });
+
+    connect(navTree, &QTreeWidget::itemPressed, this, [this](QTreeWidgetItem *item) {
+        // Left button only: context presses must never toggle the filter
+        pressWasOnCurrentItem =
+            QApplication::mouseButtons() == Qt::LeftButton && item != nullptr && item == navTree->currentItem();
+    });
+
+    connect(navTree, &QTreeWidget::itemClicked, this, [this](QTreeWidgetItem *item) {
+        const bool wasReClick = pressWasOnCurrentItem;
+        pressWasOnCurrentItem = false;
+        // A fresh click already navigated via currentItemChanged; only a press that
+        // started on the current item is a re-click. Re-clicking the isolated
+        // section restores the full page.
+        if (!wasReClick || item == nullptr || item != navTree->currentItem() || isolatedSection == nullptr ||
+            fromWidgetId(item->data(0, SectionWidgetRole).value<WidgetId>()) != isolatedSection) {
+            return;
+        }
+        bool ok = false;
+        const int index = item->data(0, Qt::UserRole).toInt(&ok);
+        if (ok) {
+            // setActiveTab, not onTabClicked: the page is already current and
+            // only setActiveTab clears the section filter
+            setActiveTab(index);
         }
     });
 }
@@ -535,6 +564,7 @@ void SettingsView::applySectionFilter(int pageIndex, QWidget *sectionWidget)
     if (!known) {
         sectionWidget = nullptr;
     }
+    isolatedSection = sectionWidget;
 
     for (const SettingsPageSection &section : sections) {
         if (section.sectionWidget) {
