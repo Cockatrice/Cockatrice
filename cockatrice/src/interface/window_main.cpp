@@ -83,10 +83,12 @@
 #include <QPixmapCache>
 #include <QPushButton>
 #include <QSharedPointer>
+#include <QSize>
 #include <QStatusBar>
 #include <QStringLiteral>
 #include <QSystemTrayIcon>
 #include <QTimer>
+#include <QToolButton>
 #include <QWidget>
 #include <QtConcurrentRun>
 #include <QtGlobal>
@@ -359,6 +361,8 @@ void MainWindow::retranslateUi()
     aForgotPassword->setText(tr("&Restore password..."));
     aSettings->setText(tr("&Settings..."));
     aSettings->setIcon(themePixmap(QStringLiteral("icons/settings")));
+    settingsButton->setToolTip(tr("Settings"));
+    settingsButton->setIcon(themePixmap(QStringLiteral("icons/settings")));
     aExit->setText(tr("&Exit"));
 
 #if defined(__APPLE__) /* For OSX */
@@ -562,6 +566,13 @@ MainWindow::MainWindow(QWidget *parent)
     tabSupervisor->initStartupTabs();
 
     setCentralWidget(tabSupervisor);
+
+    // Subtle settings entry in the tab bar corner, mirroring the menu action
+    settingsButton = new QToolButton(tabSupervisor);
+    settingsButton->setAutoRaise(true);
+    settingsButton->setIconSize(QSize(20, 20));
+    connect(settingsButton, &QToolButton::clicked, this, &MainWindow::actSettings);
+    tabSupervisor->setCornerWidget(settingsButton, Qt::TopRightCorner);
 
     retranslateUi();
 
