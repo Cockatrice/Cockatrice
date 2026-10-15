@@ -128,12 +128,20 @@ void OracleWizard::accept()
 
 void OracleWizard::reject()
 {
+    cancelled = true;
+
     // The wizard is being closed while a page may still run a worker on the
     // importer. Ask it to stop before the wizard (and the importer child) is
     // destroyed, so the worker thread never touches freed memory.
     if (auto *active = dynamic_cast<OracleWizardPage *>(currentPage())) {
         active->cancelWork();
     }
+
+    const auto replies = nam->findChildren<QNetworkReply *>();
+    for (QNetworkReply *reply : replies) {
+        reply->abort();
+    }
+
     QWizard::reject();
 }
 

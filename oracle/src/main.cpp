@@ -85,5 +85,8 @@ int main(int argc, char *argv[])
         QTimer::singleShot(0, &wizard, [&wizard]() { wizard.runInBackground(); });
     }
 
-    return app.exec();
+    const int execResult = app.exec();
+    // A cancel only counts when nothing was written yet: closing the wizard
+    // after the card database was already saved on disk is still an update.
+    return (wizard.wasCancelled() && !wizard.hasSavedDatabase()) ? 1 : execResult;
 }

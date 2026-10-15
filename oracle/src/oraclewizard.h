@@ -20,6 +20,19 @@ public:
     explicit OracleWizard(QWidget *parent = nullptr);
     void accept() override;
     void reject() override;
+    bool wasCancelled()
+    {
+        return cancelled;
+    }
+    /** @brief Records that the card database was written to disk, so a later cancel still counts as an update. */
+    void markDatabaseSaved()
+    {
+        databaseSaved = true;
+    }
+    bool hasSavedDatabase()
+    {
+        return databaseSaved;
+    }
     void enableButtons();
     void disableButtons();
     void retranslateUi();
@@ -67,6 +80,8 @@ private:
     QByteArray tokensData;
     QString cardSourceUrl;
     QString cardSourceVersion;
+    bool cancelled = false;
+    bool databaseSaved = false;
 
     void migrateOracleSettings();
     /**

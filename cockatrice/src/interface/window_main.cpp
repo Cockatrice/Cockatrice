@@ -1253,7 +1253,7 @@ void MainWindow::createCardUpdateProcess(bool background)
                                          << dir.absoluteFilePath(binaryName);
         QMessageBox::warning(this, tr("Error"),
                              tr("Unable to run the card database updater: ") + dir.absoluteFilePath(binaryName));
-        exitCardDatabaseUpdate();
+        exitCardDatabaseUpdate(false);
         emit cardDatabaseUpdateFinished(false);
         return;
     }
@@ -1330,7 +1330,7 @@ void MainWindow::cardUpdateStandardError()
     }
 }
 
-void MainWindow::exitCardDatabaseUpdate()
+void MainWindow::exitCardDatabaseUpdate(bool doReload)
 {
     if (!cardUpdateProcess) {
         return;
@@ -1339,9 +1339,11 @@ void MainWindow::exitCardDatabaseUpdate()
     cardUpdateProcess = nullptr;
     statusBar()->clearMessage();
 
-    // This can be the first successful load of the session (e.g. the onboarding
-    // download), so it must own the set check for that load.
-    reloadCardDatabaseAndCheckSets();
+    if (doReload) {
+        // This can be the first successful load of the session (e.g. the onboarding
+        // download), so it must own the set check for that load.
+        reloadCardDatabaseAndCheckSets();
+    }
 }
 
 void MainWindow::reloadCardDatabaseAndCheckSets()
@@ -1387,7 +1389,7 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
     }
 
     qCWarning(CardDatabaseUpdateLog) << "The card database updater exited with an error:" << error;
-    exitCardDatabaseUpdate();
+    exitCardDatabaseUpdate(false);
     QMessageBox::warning(this, tr("Error"), tr("The card database updater exited with an error:\n%1").arg(error));
     emit cardDatabaseUpdateFinished(false);
 }
@@ -1400,12 +1402,14 @@ void MainWindow::cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatu
     cardUpdateProgressOutput(); // drain any progress lines not yet parsed
 
     const bool success = (exitStatus == QProcess::NormalExit) && (exitCode == 0);
-    if (exitStatus == QProcess::NormalExit) {
+    if (success) {
         SettingsCache::instance().updates().setLastCardUpdateCheck(QDateTime::currentDateTime().date());
+    } else if (exitStatus == QProcess::NormalExit) {
+        statusBar()->showMessage(tr("Card database update cancelled."), 10000);
     }
     qCInfo(CardDatabaseUpdateLog) << "The card database updater finished with exit code" << exitCode << "exit status"
                                   << static_cast<int>(exitStatus) << "success:" << success;
-    exitCardDatabaseUpdate();
+    exitCardDatabaseUpdate(success);
     notifyCardUpdateFinishedFromTray(success);
     emit cardDatabaseUpdateFinished(success);
 }

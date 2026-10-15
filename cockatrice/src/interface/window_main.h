@@ -157,7 +157,7 @@ private:
         return "oracle";
     }
     void createCardUpdateProcess(bool background = false);
-    void exitCardDatabaseUpdate();
+    void exitCardDatabaseUpdate(bool doReload);
     /**
      * @brief Reloads the card database on a worker thread and runs checkUnknownSets() once the finished
      *        snapshot has been swapped in.
