@@ -13,6 +13,7 @@
 #include <QImage>
 #include <QImageWriter>
 #include <QLoggingCategory>
+#include <QScopeGuard>
 #include <QSharedPointer>
 #include <QStandardPaths>
 #include <QString>
@@ -223,8 +224,43 @@ int main(int argc, char **argv)
     }
 
     QCoreApplication app(argc, argv);
+
+    // Every TEST() runs as its own process and CI runs them in parallel (ctest -j4),
+    // while the picture paths round-trip through the process-global SettingsCache
+    // file. Parallel cases must therefore never share one settings directory: on
+    // platforms where QStandardPaths ignores the $HOME override above (macOS
+    // resolves the home directory via system APIs), every case would otherwise read
+    // and write the same paths.ini, and a sibling's setPicsPath can land between our
+    // own set and the loader's get — so the loader searches a foreign (or empty)
+    // directory and flakily returns a null image. Scope the settings to this process
+    // with a pid-unique application name; PIDs are never reused by live processes.
+    QCoreApplication::setOrganizationName(QStringLiteral("CockatriceTest"));
+    QCoreApplication::setApplicationName(
+        QStringLiteral("loader-local-matching-test-%1").arg(QCoreApplication::applicationPid()));
+
     QLoggingCategory::setFilterRules("card_picture_loader.*=false\nsettings_cache.*=false");
 
     ::testing::InitGoogleTest(&argc, argv);
+
+    // CMake's gtest discovery runs this binary with --gtest_list_tests, which lists
+    // without running any test body. Arming the cleanup guard here would make it the
+    // sole SettingsCache::instance() call in that mode, instantiating the
+    // Q_GLOBAL_STATIC singleton (and its QNetworkAccessManagers) just to tear down at
+    // exit — which LeakSanitizer reports as leaks and fails discovery on the sanitizer
+    // leg. Skip the sandbox cleanup entirely when only listing.
+    if (::testing::GTEST_FLAG(list_tests)) {
+        return RUN_ALL_TESTS();
+    }
+
+    // Best-effort cleanup of this process's settings sandbox. QStandardPaths test
+    // mode is never auto-cleaned, and on macOS the $HOME override above is ignored,
+    // so without this every run litters ~/.qttest with one pid-unique directory.
+    // Safe under parallel runs: the pid-unique application name above guarantees
+    // this directory belongs to this process alone.
+    const auto cleanupSandbox = qScopeGuard([] {
+        QDir(SettingsCache::instance().getDataPath()).removeRecursively();
+        QDir(SettingsCache::instance().getCachePath()).removeRecursively();
+    });
+
     return RUN_ALL_TESTS();
 }
