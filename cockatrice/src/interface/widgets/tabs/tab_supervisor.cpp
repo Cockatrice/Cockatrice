@@ -39,6 +39,7 @@
 #include "tab_report.h"
 #include "tab_room.h"
 #include "tab_server.h"
+#include "tab_settings.h"
 #include "tab_visual_database_display.h"
 #include "user_level.h"
 #include "visual_deck_editor/tab_deck_editor_visual.h"
@@ -154,9 +155,9 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
 
 TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent)
     : QTabWidget(parent), userInfo(nullptr), client(_client), tabsMenu(tabsMenu), tabHome(nullptr),
-      tabVisualDeckStorage(nullptr), tabServer(nullptr), tabAccount(nullptr), tabDeckStorage(nullptr),
-      tabReplays(nullptr), tabAdmin(nullptr), tabCardArtRules(nullptr), tabLog(nullptr), tabReport(nullptr),
-      tabModeration(nullptr), tabDeveloper(nullptr), isLocalGame(false)
+      tabVisualDeckStorage(nullptr), tabServer(nullptr), tabSettings(nullptr), tabAccount(nullptr),
+      tabDeckStorage(nullptr), tabReplays(nullptr), tabAdmin(nullptr), tabCardArtRules(nullptr), tabLog(nullptr),
+      tabReport(nullptr), tabModeration(nullptr), tabDeveloper(nullptr), isLocalGame(false)
 {
     setElideMode(Qt::ElideRight);
     setMovable(true);
@@ -293,6 +294,7 @@ void TabSupervisor::retranslateUi()
     // tabs
     QList<Tab *> tabs;
     tabs.append(tabServer);
+    tabs.append(tabSettings);
     tabs.append(tabReplays);
     tabs.append(tabDeckStorage);
     tabs.append(tabAdmin);
@@ -751,6 +753,25 @@ void TabSupervisor::openTabServer()
         aTabServer->setChecked(false);
     });
     aTabServer->setChecked(true);
+}
+
+/**
+ * @brief Opens the singleton settings tab, creating it on first use
+ *
+ * @param pageIndex Initial SettingsView page, or -1 to keep the current page
+ * @return The settings tab
+ */
+TabSettings *TabSupervisor::openTabSettings(int pageIndex)
+{
+    if (!tabSettings) {
+        tabSettings = new TabSettings(this, pageIndex);
+        myAddTab(tabSettings, nullptr);
+        connect(tabSettings, &QObject::destroyed, this, [this] { tabSettings = nullptr; });
+    } else if (pageIndex >= 0) {
+        tabSettings->setTab(pageIndex);
+    }
+    setCurrentWidget(tabSettings);
+    return tabSettings;
 }
 
 void TabSupervisor::actTabAccount(bool checked)
