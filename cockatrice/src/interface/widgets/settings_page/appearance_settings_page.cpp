@@ -474,6 +474,20 @@ static bool isBrokenStyle(const QString &style)
            style.compare("windowsvista", Qt::CaseInsensitive) == 0;
 }
 
+static int findFusionIndex(const QComboBox &combo)
+{
+    int fusionIdx = combo.findData(QStringLiteral("Fusion"));
+    if (fusionIdx >= 0) {
+        return fusionIdx;
+    }
+    for (int i = 0; i < combo.count(); ++i) {
+        if (combo.itemData(i).toString().compare(QStringLiteral("Fusion"), Qt::CaseInsensitive) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 void AppearanceSettingsPage::updateStyleWarning()
 {
     styleWarningLabel.setVisible(isBrokenStyle(styleCombo.currentData().toString()));
@@ -503,23 +517,16 @@ void AppearanceSettingsPage::styleComboChanged(int index)
         tr("It can also render controls such as combo boxes unreadable, especially in dark mode.\n\n"
            "Fusion is the recommended style on every platform. Switch to Fusion instead?"));
 
-    int fusionIdx = styleCombo.findData(QStringLiteral("Fusion"));
-    if (fusionIdx < 0) {
-        for (int i = 0; i < styleCombo.count(); ++i) {
-            if (styleCombo.itemData(i).toString().compare(QStringLiteral("Fusion"), Qt::CaseInsensitive) == 0) {
-                fusionIdx = i;
-                break;
-            }
-        }
-    }
+    int fusionIdx = findFusionIndex(styleCombo);
     QPushButton *fusionButton = nullptr;
     if (fusionIdx >= 0) {
         fusionButton = msgBox.addButton(tr("Use Fusion instead"), QMessageBox::AcceptRole);
-        msgBox.setDefaultButton(fusionButton);
     }
     QPushButton *keepButton = msgBox.addButton(tr("Use %1 anyway").arg(newStyle), QMessageBox::DestructiveRole);
     msgBox.addButton(QMessageBox::Cancel);
-    if (fusionButton == nullptr) {
+    if (fusionButton != nullptr) {
+        msgBox.setDefaultButton(fusionButton);
+    } else {
         msgBox.setDefaultButton(keepButton);
     }
 
