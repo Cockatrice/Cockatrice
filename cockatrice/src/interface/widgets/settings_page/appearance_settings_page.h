@@ -23,6 +23,7 @@ private slots:
     void editPalette();
     void updateHomeTabSettingsVisibility();
     void updateStyleWarning();
+    void styleComboChanged(int index);
     void showShortcutsChanged(QT_STATE_CHANGED_T enabled);
     void overrideAllCardArtWithPersonalPreferenceToggled(QT_STATE_CHANGED_T enabled);
 
@@ -40,6 +41,7 @@ private:
     QComboBox styleCombo;
     QLabel styleWarningLabel;
     QPushButton editPaletteButton;
+    QString previousStyle;
 
     QLabel homeTabBackgroundSourceLabel;
     QComboBox homeTabBackgroundSourceBox;
