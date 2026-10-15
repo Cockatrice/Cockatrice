@@ -46,6 +46,7 @@
 #include <qtmetamacros.h>
 
 class QAction;
+class QToolButton;
 class QWidget;
 struct LocalGameOptions;
 
@@ -178,6 +179,7 @@ private:
     QList<QMenu *> tabMenus;
     QMenu *cockatriceMenu, *dbMenu, *tabsMenu, *helpMenu, *trayIconMenu;
     QAction *aAbout, *aSettings, *aShow, *aExit;
+    QToolButton *settingsButton = nullptr;
     QAction *aConnect, *aDisconnect, *aRegister, *aForgotPassword, *aSinglePlayer, *aWatchReplay, *aFullScreen;
     QAction *aManageSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet,
         *aReloadCardDatabase;
