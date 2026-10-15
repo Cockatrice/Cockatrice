@@ -17,7 +17,8 @@ class QObject;
 class QEvent;
 
 class QStackedWidget;
-class QToolButton;
+class QTreeWidget;
+class QTreeWidgetItem;
 class QListView;
 class QLineEdit;
 class AbstractSettingsPage;
@@ -25,9 +26,9 @@ class SettingsSearchModel;
 class SettingsSearchDelegate;
 
 /**
- * @brief Settings pages with tabbed navigation and search, without any dialog chrome
+ * @brief Settings pages with grouped left navigation and search, without any dialog chrome
  *
- * Owns the search bar, the tab bar, the stacked settings pages and the search
+ * Owns the search bar, the navigation tree, the stacked settings pages and the search
  * results view. Dialog/tab hosts only add their own frame (buttons, titles).
  */
 class SettingsView : public QWidget
@@ -35,7 +36,7 @@ class SettingsView : public QWidget
     Q_OBJECT
 public:
     /**
-     * @brief Page order in the tab bar, matching the order pages are added in setupUi()
+     * @brief Page order in the navigation, matching the order pages are added in setupUi()
      *
      * Use these values instead of raw indices so reordering pages never silently
      * breaks external callers like tab_room.cpp.
@@ -65,12 +66,13 @@ private slots:
 
 private:
     // UI elements
-    QLineEdit *searchEdit;           ///< Search bar for filtering settings
-    QWidget *tabBarWidget;           ///< Container widget for the tab buttons
-    QList<QToolButton *> tabButtons; ///< Navigation tab buttons
-    QStackedWidget *pagesWidget;     ///< Stacked widget containing settings pages
-    QListView *searchResultsView;    ///< Search results list view
-    QWidget *pagesContainer;         ///< Container stacking pages and search results
+    QLineEdit *searchEdit;               ///< Search bar for filtering settings
+    QTreeWidget *navTree;                ///< Grouped navigation tree for the pages
+    QList<QTreeWidgetItem *> groupItems; ///< Group header rows, indexed by group
+    QList<QTreeWidgetItem *> pageItems;  ///< Page rows, indexed by SettingsPage
+    QStackedWidget *pagesWidget;         ///< Stacked widget containing settings pages
+    QListView *searchResultsView;        ///< Search results list view
+    QWidget *pagesContainer;             ///< Container stacking pages and search results
 
     // Data
     QList<AbstractSettingsPage *> pages;    ///< All settings page instances
@@ -80,7 +82,7 @@ private:
     bool searchActive;                      ///< Whether search mode is active
 
     void setupUi();
-    void setupTabBar();
+    void setupNavTree();
     void buildSearchIndex();
     void switchToTabMode();
     void switchToSearchMode();
@@ -88,9 +90,10 @@ private:
     void setActiveTab(int index);
     static void flashWidget(QWidget *widget);
     static QStringList translatedPageNames();
+    static QStringList translatedGroupNames();
 
     void retranslateUi();
-    void retranslateTabNames();
+    void retranslateNavNames();
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;

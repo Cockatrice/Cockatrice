@@ -30,7 +30,6 @@
 #include <QEasingCurve>
 #include <QEvent>
 #include <QFlags>
-#include <QFrame>
 #include <QGraphicsOpacityEffect>
 #include <QHBoxLayout>
 #include <QIcon>
@@ -55,7 +54,7 @@
 #include <QStackedLayout>
 #include <QStackedWidget>
 #include <QStringLiteral>
-#include <QToolButton>
+#include <QTreeWidget>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QtGlobal>
@@ -117,8 +116,8 @@ void SettingsView::setupUi()
     auto *searchLayout = new QHBoxLayout;
     searchLayout->addWidget(searchEdit);
 
-    // Tab bar (built in setupTabBar)
-    setupTabBar();
+    // Navigation tree (built in setupNavTree)
+    setupNavTree();
 
     // Pages stacked widget
     pagesWidget = new QStackedWidget;
@@ -169,8 +168,10 @@ void SettingsView::setupUi()
 
     connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this, [this] {
         const QStringList icons = pageIconResources();
-        for (int i = 0; i < tabButtons.size() && i < icons.size(); ++i) {
-            tabButtons[i]->setIcon(QPixmap(icons[i]));
+        for (int i = 0; i < pageItems.size() && i < icons.size(); ++i) {
+            if (pageItems[i]) {
+                pageItems[i]->setIcon(0, QPixmap(icons[i]));
+            }
         }
         searchDelegate->setPageIcons(icons);
         searchResultsView->viewport()->update();
@@ -187,16 +188,14 @@ void SettingsView::setupUi()
     containerLayout->addWidget(searchResultsView);
     pagesContainer->setLayout(containerLayout);
 
-    // Main layout
+    // Main layout: search on top, navigation + pages side by side below
+    auto *contentLayout = new QHBoxLayout;
+    contentLayout->addWidget(navTree);
+    contentLayout->addWidget(pagesContainer, 1);
+
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(searchLayout);
-    mainLayout->addWidget(tabBarWidget);
-    auto *separator = new QFrame;
-    separator->setFrameShape(QFrame::HLine);
-    separator->setFrameShadow(QFrame::Sunken);
-    mainLayout->addWidget(separator);
-    mainLayout->addWidget(pagesContainer);
-    mainLayout->addSpacing(4);
+    mainLayout->addLayout(contentLayout);
     setLayout(mainLayout);
 
     // Keyboard shortcuts
@@ -205,13 +204,13 @@ void SettingsView::setupUi()
 
     auto *nextTabShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Tab), this);
     connect(nextTabShortcut, &QShortcut::activated, this, [this] {
-        int next = (currentTabIndex + 1) % tabButtons.size();
+        int next = (currentTabIndex + 1) % pages.size();
         setActiveTab(next);
     });
 
     auto *prevTabShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Tab), this);
     connect(prevTabShortcut, &QShortcut::activated, this, [this] {
-        int prev = (currentTabIndex - 1 + tabButtons.size()) % tabButtons.size();
+        int prev = (currentTabIndex - 1 + pages.size()) % pages.size();
         setActiveTab(prev);
     });
 
@@ -219,32 +218,56 @@ void SettingsView::setupUi()
     setActiveTab(0);
 }
 
-void SettingsView::setupTabBar()
+void SettingsView::setupNavTree()
 {
-    tabBarWidget = new QWidget;
-    auto *tabLayout = new QHBoxLayout;
-    tabLayout->setContentsMargins(0, 0, 0, 0);
-    tabLayout->setSpacing(2);
+    navTree = new QTreeWidget;
+    navTree->setHeaderHidden(true);
+    navTree->setRootIsDecorated(true);
+    navTree->setIconSize(QSize(24, 24));
+    navTree->setMinimumWidth(230);
+    navTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    navTree->setStyleSheet(
+        "QTreeWidget::item:selected { background: palette(highlight); color: palette(highlighted-text); }");
 
+    // Groups of SettingsPage values, in navigation order
+    static const QList<QList<SettingsPage>> groupedPages = {
+        {GeneralPage, AppearancePage, UserInterfacePage},
+        {DeckEditorPage, StoragePage},
+        {MessagesPage, SoundPage},
+        {ShortcutsPage},
+    };
+
+    const QStringList groupNames = translatedGroupNames();
+    const QStringList pageNames = translatedPageNames();
     const QStringList iconResources = pageIconResources();
 
-    for (int i = 0; i < iconResources.size(); ++i) {
-        auto *tabButton = new QToolButton;
-        tabButton->setCheckable(true);
-        tabButton->setIcon(QPixmap(iconResources[i]));
-        tabButton->setIconSize(QSize(48, 48));
-        tabButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-        tabButton->setAutoExclusive(true);
-        tabButton->setMinimumHeight(85);
-        tabButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-
-        connect(tabButton, &QToolButton::clicked, this, [this, idx = i] { onTabClicked(idx); });
-
-        tabButtons.append(tabButton);
-        tabLayout->addWidget(tabButton);
+    pageItems.resize(NumPages);
+    for (int i = 0; i < groupedPages.size(); ++i) {
+        auto *group = new QTreeWidgetItem(navTree, {groupNames[i]});
+        group->setFlags(Qt::ItemIsEnabled); // header row: expandable, not selectable
+        group->setExpanded(true);
+        groupItems.append(group);
+        for (SettingsPage page : groupedPages[i]) {
+            auto *item = new QTreeWidgetItem(group, {pageNames[page]});
+            item->setIcon(0, QPixmap(iconResources[page]));
+            item->setData(0, Qt::UserRole, static_cast<int>(page));
+            pageItems[page] = item;
+        }
     }
 
-    tabBarWidget->setLayout(tabLayout);
+    Q_ASSERT(groupItems.size() == groupedPages.size());
+    Q_ASSERT(!pageItems.contains(nullptr));
+
+    connect(navTree, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem *current) {
+        if (!current) {
+            return;
+        }
+        bool ok = false;
+        int index = current->data(0, Qt::UserRole).toInt(&ok);
+        if (ok) {
+            onTabClicked(index);
+        }
+    });
 }
 
 void SettingsView::buildSearchIndex()
@@ -272,35 +295,27 @@ void SettingsView::onTabClicked(int index)
 {
     if (searchActive) {
         switchToTabMode();
+    } else if (index == currentTabIndex) {
+        return;
     }
     setActiveTab(index);
 }
 
 void SettingsView::setActiveTab(int index)
 {
-    if (index < 0 || index >= tabButtons.size()) {
+    if (index < 0 || index >= pageItems.size() || !pageItems[index]) {
         return;
     }
 
     currentTabIndex = index;
     pagesWidget->setCurrentIndex(index);
 
-    for (int i = 0; i < tabButtons.size(); ++i) {
-        tabButtons[i]->setChecked(i == index);
+    // Selecting the item also expands a collapsed group; selecting the already
+    // current item emits nothing, so the currentItemChanged handler cannot loop.
+    if (QTreeWidgetItem *parent = pageItems[index]->parent()) {
+        parent->setExpanded(true);
     }
-
-    // Style active tab with a thick accent border + subtle background tint
-    for (int i = 0; i < tabButtons.size(); ++i) {
-        if (i == index) {
-            tabButtons[i]->setStyleSheet("QToolButton { border: none; border-bottom: 3px solid palette(highlight); "
-                                         "border-top-left-radius: 4px; border-top-right-radius: 4px; "
-                                         "background: palette(window); padding-bottom: 1px; }");
-        } else {
-            tabButtons[i]->setStyleSheet("QToolButton { border: none; border-bottom: 1px solid transparent; "
-                                         "border-top-left-radius: 4px; border-top-right-radius: 4px; "
-                                         "background: transparent; }");
-        }
-    }
+    navTree->setCurrentItem(pageItems[index]);
 }
 
 void SettingsView::flashWidget(QWidget *widget)
@@ -362,7 +377,7 @@ void SettingsView::onSearchTextChanged(const QString &text)
 void SettingsView::switchToSearchMode()
 {
     searchActive = true;
-    tabBarWidget->setVisible(false);
+    navTree->setVisible(false);
     pagesWidget->setVisible(false);
     searchResultsView->setVisible(true);
     if (searchModel->rowCount(QModelIndex()) > 0) {
@@ -373,7 +388,7 @@ void SettingsView::switchToSearchMode()
 void SettingsView::switchToTabMode()
 {
     searchActive = false;
-    tabBarWidget->setVisible(true);
+    navTree->setVisible(true);
     pagesWidget->setVisible(true);
     searchResultsView->setVisible(false);
     searchEdit->blockSignals(true);
@@ -415,7 +430,7 @@ void SettingsView::navigateToSearchResult(const QModelIndex &index)
 
 void SettingsView::setTab(int index)
 {
-    if (index >= 0 && index < tabButtons.size()) {
+    if (index >= 0 && index < pageItems.size()) {
         setActiveTab(index);
     }
 }
@@ -476,7 +491,7 @@ void SettingsView::updateLanguage()
 
 void SettingsView::retranslateUi()
 {
-    retranslateTabNames();
+    retranslateNavNames();
 
     // NOTE: the "DlgSettings" context is deliberate — these strings lived in DlgSettings
     // before the view was extracted, and keeping the context preserves existing translations.
@@ -499,11 +514,22 @@ QStringList SettingsView::translatedPageNames()
             QCoreApplication::translate("DlgSettings", "Shortcuts")};
 }
 
-void SettingsView::retranslateTabNames()
+void SettingsView::retranslateNavNames()
 {
-    const QStringList tabLabels = translatedPageNames();
-
-    for (int i = 0; i < tabButtons.size() && i < tabLabels.size(); ++i) {
-        tabButtons[i]->setText(tabLabels[i]);
+    const QStringList groupNames = translatedGroupNames();
+    for (int i = 0; i < groupItems.size() && i < groupNames.size(); ++i) {
+        groupItems[i]->setText(0, groupNames[i]);
     }
+
+    const QStringList pageNames = translatedPageNames();
+    for (int i = 0; i < pageItems.size() && i < pageNames.size(); ++i) {
+        if (pageItems[i]) {
+            pageItems[i]->setText(0, pageNames[i]);
+        }
+    }
+}
+
+QStringList SettingsView::translatedGroupNames()
+{
+    return {tr("Application"), tr("Cards & Data"), tr("Chat & Sound"), tr("Advanced")};
 }
