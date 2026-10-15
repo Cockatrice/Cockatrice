@@ -49,6 +49,10 @@ public:
     {
         return originZone;
     }
+    bool doubleClickActsOnSelection() const override
+    {
+        return true;
+    }
 
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;

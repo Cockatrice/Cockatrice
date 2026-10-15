@@ -41,6 +41,8 @@ protected:
 private:
     bool isHovered;
     qreal realZValue;
+    bool pendingSelectionCollapse;
+    int selectionCollapseGeneration = 0; ///< Guards the deferred collapse timer against stale firings
 private slots:
     void pixmapUpdated();
 
@@ -130,6 +132,8 @@ public:
     }
     void setFaceDown(bool _facedown);
     void processHoverEvent();
+    /** @brief Drop a pending collapse and disarm any deferred collapse timer. */
+    void cancelPendingSelectionCollapse();
     void deleteCardInfoPopup()
     {
         emit deleteCardInfoPopup(cardRef.name);
@@ -144,6 +148,16 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
     void cacheBgColor();
+    /**
+     * @brief Whether a double-click on this item acts on the whole selection.
+     *
+     * When true, a release without drag defers the multi-selection collapse
+     * until the double-click window passes, so a following double-click still
+     * sees every selected card. Subclasses that handle double-clicks on the
+     * selection must return true here and call
+     * cancelPendingSelectionCollapse() from their double-click handler.
+     */
+    virtual bool doubleClickActsOnSelection() const;
 };
 
 #endif
