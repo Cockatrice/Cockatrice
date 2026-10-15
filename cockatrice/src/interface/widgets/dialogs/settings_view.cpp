@@ -501,6 +501,14 @@ void SettingsView::navigateToSection(int pageIndex, QWidget *sectionWidget)
         return;
     }
 
+    // Resolve the section row first: setActiveTab() re-selects the page row,
+    // so the whole switch must run under a signal blocker with a single
+    // explicit selection restore at the end. Restoring with only
+    // setCurrentItem() leaves the parent row selected, which is what made the
+    // selection visibly snap back to the parent on mouse release.
+    QTreeWidgetItem *sectionItem = findSectionItem(pageIndex, sectionWidget);
+    const QSignalBlocker blocker(navTree);
+
     if (currentTabIndex != pageIndex) {
         if (searchActive) {
             switchToTabMode();
@@ -511,8 +519,9 @@ void SettingsView::navigateToSection(int pageIndex, QWidget *sectionWidget)
 
     // setActiveTab selects the page row, so restore the clicked section row
     // without re-triggering navigation; unknown widgets show the full page
-    if (QTreeWidgetItem *sectionItem = findSectionItem(pageIndex, sectionWidget)) {
-        const QSignalBlocker blocker(navTree);
+    if (sectionItem) {
+        navTree->clearSelection();
+        sectionItem->setSelected(true);
         navTree->setCurrentItem(sectionItem);
         flashWidget(sectionWidget);
     }
