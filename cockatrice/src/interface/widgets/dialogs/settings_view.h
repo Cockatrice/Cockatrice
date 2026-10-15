@@ -79,6 +79,8 @@ private:
     SettingsSearchDelegate *searchDelegate; ///< Delegate for search result rendering
     int currentTabIndex;                    ///< Currently active tab index
     bool searchActive;                      ///< Whether search mode is active
+    QWidget *isolatedSection = nullptr;     ///< Isolated section group box, or nullptr for full pages
+    bool pressWasOnCurrentItem = false;     ///< True when the mouse press started on the already-current item
 
     void setupUi();
     void setupNavTree();
