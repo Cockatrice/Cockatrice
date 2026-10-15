@@ -20,6 +20,7 @@
 #include <QPropertyAnimation>
 #include <QRect>
 #include <QScreen>
+#include <QScrollBar>
 #include <QSharedPointer>
 #include <QSize>
 #include <QString>
@@ -103,6 +104,7 @@ bool CardCompleterStyler::eventFilter(QObject *obj, QEvent *ev)
             case QEvent::Show:
             case QEvent::Move:
             case QEvent::Resize:
+                applyPopupWidth();
                 updateOrientation();
                 reposition();
                 break;
@@ -155,6 +157,42 @@ bool CardCompleterStyler::handlePopupKeyPress(QKeyEvent *event)
     }
 
     return true;
+}
+
+// ---------------------------------------------------------------------------
+
+void CardCompleterStyler::applyPopupWidth()
+{
+    auto *popup = completer->popup();
+
+    // QCompleter sizes its popup to the line edit, so a narrow search field
+    // would crush the rows. Ask for the width the rows are designed for (plus
+    // the frame and scrollbar) and let QWidget's geometry clamping keep the
+    // popup that wide, clamped to the screen it is shown on.
+    int contentWidth = CardCompleterDelegate::PopupRowWidth + popup->frameWidth() * 2;
+    if (auto *vbar = popup->verticalScrollBar(); vbar != nullptr) {
+        contentWidth += vbar->sizeHint().width();
+    }
+
+    const QScreen *screen = popup->screen();
+    const QRect available = screen ? screen->availableGeometry() : QRect();
+
+    const int minWidth = available.isEmpty() ? contentWidth : qMin(contentWidth, available.width());
+    popup->setMinimumWidth(minWidth);
+
+    // setMinimumWidth() already widened the popup if it was narrower, but
+    // QCompleter positioned it for the line-edit width, so the widened popup
+    // can now extend past the right screen edge. The popup is a top-level
+    // Qt::Popup window, so geometry()/move() are already in screen
+    // coordinates: clamp the x from geometry() and move directly.
+    if (!available.isEmpty()) {
+        const QRect geom = popup->geometry();
+        const int clampedX =
+            qBound(available.left(), geom.x(), qMax(available.left(), available.right() - geom.width() + 1));
+        if (clampedX != geom.x()) {
+            popup->move(QPoint(clampedX, popup->y()));
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------
