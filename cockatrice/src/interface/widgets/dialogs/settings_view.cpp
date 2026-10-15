@@ -54,6 +54,7 @@
 #include <QStringLiteral>
 #include <QTreeWidget>
 #include <QVBoxLayout>
+#include <QVariant>
 #include <QWidget>
 #include <QtGlobal>
 #include <libcockatrice/settings/personal_settings.h>
@@ -88,6 +89,33 @@ static QStringList pageIconResources()
             QStringLiteral("theme:config/sound"),     QStringLiteral("theme:config/shorcuts")};
 }
 
+namespace
+{
+/// Item data role holding a sub-page row's section widget, stored as a WidgetId
+constexpr int SectionWidgetRole = Qt::UserRole + 1;
+using WidgetId = quintptr;
+
+/**
+ * @brief Packs a section widget for storage in a tree item's data role
+ * @param widget The section's group box (owned by its settings page)
+ * @return The widget as an opaque id
+ */
+WidgetId toWidgetId(QWidget *widget)
+{
+    return reinterpret_cast<WidgetId>(widget);
+}
+
+/**
+ * @brief Unpacks a section widget from a tree item's data role
+ * @param id The stored id, or 0 for page rows without a section
+ * @return The section widget, or nullptr when unset
+ */
+QWidget *fromWidgetId(WidgetId id)
+{
+    return reinterpret_cast<QWidget *>(id);
+}
+} // namespace
+
 SettingsView::SettingsView(QWidget *parent) : QWidget(parent), currentTabIndex(0), searchActive(false)
 {
     setupUi();
@@ -109,9 +137,6 @@ void SettingsView::setupUi()
 
     auto *searchLayout = new QHBoxLayout;
     searchLayout->addWidget(searchEdit);
-
-    // Navigation tree (built in setupNavTree)
-    setupNavTree();
 
     // Pages stacked widget
     pagesWidget = new QStackedWidget;
@@ -144,6 +169,9 @@ void SettingsView::setupUi()
     pagesWidget->addWidget(shortcutsPage);
 
     Q_ASSERT(pages.size() == NumPages);
+
+    // Navigation tree (needs the pages for their sections)
+    setupNavTree();
 
     // Search results view (hidden by default)
     searchResultsView = new QListView;
@@ -246,6 +274,12 @@ void SettingsView::setupNavTree()
             item->setIcon(0, QPixmap(iconResources[page]));
             item->setData(0, Qt::UserRole, static_cast<int>(page));
             pageItems[page] = item;
+            // Sub-page rows deep-link into the page's sections (scroll + highlight)
+            for (const SettingsPageSection &section : pages[page]->getSections()) {
+                auto *sectionItem = new QTreeWidgetItem(item, {section.title});
+                sectionItem->setData(0, Qt::UserRole, static_cast<int>(page));
+                sectionItem->setData(0, SectionWidgetRole, QVariant::fromValue(toWidgetId(section.sectionWidget)));
+            }
         }
     }
 
@@ -258,7 +292,12 @@ void SettingsView::setupNavTree()
         }
         bool ok = false;
         int index = current->data(0, Qt::UserRole).toInt(&ok);
-        if (ok) {
+        if (!ok) {
+            return;
+        }
+        if (QWidget *section = fromWidgetId(current->data(0, SectionWidgetRole).value<WidgetId>())) {
+            navigateToSection(index, section);
+        } else {
             onTabClicked(index);
         }
     });
@@ -409,17 +448,42 @@ void SettingsView::navigateToSearchResult(const QModelIndex &index)
 
     // Scroll to the widget, focus it, and flash to highlight it
     if (entry.widget) {
-        QWidget *widget = entry.widget;
-        while (widget) {
-            if (auto *scrollArea = qobject_cast<QScrollArea *>(widget)) {
-                scrollArea->ensureWidgetVisible(entry.widget);
-                break;
-            }
-            widget = widget->parentWidget();
-        }
+        scrollToAndFlash(entry.widget);
         entry.widget->setFocus();
-        flashWidget(entry.widget);
     }
+}
+
+void SettingsView::navigateToSection(int pageIndex, QWidget *sectionWidget)
+{
+    if (pageIndex < 0 || pageIndex >= pages.size() || !sectionWidget) {
+        return;
+    }
+
+    if (currentTabIndex != pageIndex) {
+        if (searchActive) {
+            switchToTabMode();
+        }
+        setActiveTab(pageIndex);
+    }
+
+    // Focus stays in the navigation tree; only scroll and highlight the section
+    scrollToAndFlash(sectionWidget);
+}
+
+void SettingsView::scrollToAndFlash(QWidget *target)
+{
+    if (!target) {
+        return;
+    }
+    QWidget *widget = target;
+    while (widget) {
+        if (auto *scrollArea = qobject_cast<QScrollArea *>(widget)) {
+            scrollArea->ensureWidgetVisible(target);
+            break;
+        }
+        widget = widget->parentWidget();
+    }
+    flashWidget(target);
 }
 
 void SettingsView::setTab(int index)
@@ -513,6 +577,18 @@ void SettingsView::retranslateNavNames()
     for (int i = 0; i < pageItems.size() && i < pageNames.size(); ++i) {
         if (pageItems[i]) {
             pageItems[i]->setText(0, pageNames[i]);
+        }
+    }
+
+    // Sub-page rows mirror the pages' group box titles (already retranslated by the pages)
+    for (int i = 0; i < pageItems.size() && i < pages.size(); ++i) {
+        if (!pageItems[i]) {
+            continue;
+        }
+        const QList<SettingsPageSection> sections = pages[i]->getSections();
+        Q_ASSERT(pageItems[i]->childCount() == sections.size());
+        for (int c = 0; c < pageItems[i]->childCount() && c < sections.size(); ++c) {
+            pageItems[i]->child(c)->setText(0, sections[c].title);
         }
     }
 }
