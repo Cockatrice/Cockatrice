@@ -3,6 +3,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 set(HEADERS
+    game/dump_zone_range.h
     game/server_abstract_participant.h
     game/server_abstract_player.h
     game/server_arrow.h
@@ -33,6 +34,7 @@ qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
 add_library(
   libcockatrice_network_server_remote STATIC
   ${MOC_SOURCES}
+  game/dump_zone_range.cpp
   game/server_abstract_participant.cpp
   game/server_abstract_player.cpp
   game/server_arrow.cpp
@@ -62,3 +64,5 @@ target_link_libraries(
   libcockatrice_network_server_remote PUBLIC libcockatrice_protocol libcockatrice_utility libcockatrice_rng
                                              libcockatrice_deck_list ${COCKATRICE_QT_MODULES}
 )
+
+target_precompile_headers(libcockatrice_network_server_remote PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtcore_pch.h")

@@ -1,6 +1,7 @@
 #include "libcockatrice/card/card_localization.h"
 
 #include "gtest/gtest.h"
+#include <QDir>
 #include <QHash>
 #include <QList>
 #include <QString>
@@ -15,6 +16,7 @@
 #include <libcockatrice/settings/game_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/network_settings.h>
+#include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/sound_settings.h>
 #include <libcockatrice/settings/tabs_settings.h>
@@ -693,6 +695,55 @@ TEST_F(SettingsDefaultsTest, VisualDeckStorage_ShowUploadTime_SetAndGet)
     VisualDeckStorageSettings s(settingsPath, nullptr);
     s.setVisualDeckStorageShowUploadTime(false);
     ASSERT_EQ(s.getVisualDeckStorageShowUploadTime(), false);
+}
+
+TEST_F(SettingsDefaultsTest, Paths_AppDirWarningAcknowledged_Default)
+{
+    PathsSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getAppDirWarningAcknowledged(), false);
+}
+
+TEST_F(SettingsDefaultsTest, Paths_AppDirWarningAcknowledged_SetAndGet)
+{
+    PathsSettings s(settingsPath, nullptr);
+    s.setAppDirWarningAcknowledged(true);
+    ASSERT_EQ(s.getAppDirWarningAcknowledged(), true);
+}
+
+TEST_F(SettingsDefaultsTest, Paths_PathsInsideDir_DetectsNestedAndIgnoresSiblings)
+{
+    PathsSettings s(settingsPath, nullptr);
+    const QString base = QDir::cleanPath(settingsPath);
+
+    s.setDeckPath(base + "/decks/");
+    s.setPicsPath(base + "/pics");
+    s.setReplaysPath(base + "2"); // sibling sharing the name prefix, not nested
+
+    const QStringList offenders = s.pathsInsideDir(base);
+    ASSERT_EQ(offenders.size(), 2);
+    ASSERT_TRUE(offenders.contains(base + "/decks"));
+    ASSERT_TRUE(offenders.contains(base + "/pics"));
+}
+
+TEST_F(SettingsDefaultsTest, Paths_PathsInsideDir_EmptyWhenNothingMatches)
+{
+    PathsSettings s(settingsPath, nullptr);
+    s.setDeckPath("/somewhere/else/decks");
+    ASSERT_TRUE(s.pathsInsideDir(QDir::cleanPath(settingsPath)).isEmpty());
+}
+
+TEST_F(SettingsDefaultsTest, Paths_PathsInsideDir_MatchesExactBaseAndNormalizesDots)
+{
+    PathsSettings s(settingsPath, nullptr);
+    const QString base = QDir::cleanPath(settingsPath);
+
+    s.setCustomPicsPath(base);                // exactly the base directory
+    s.setThemesPath(base + "/pics/../decks"); // needs cleanPath normalization
+
+    const QStringList offenders = s.pathsInsideDir(base);
+    ASSERT_EQ(offenders.size(), 2);
+    ASSERT_TRUE(offenders.contains(base));
+    ASSERT_TRUE(offenders.contains(base + "/decks"));
 }
 
 } // namespace

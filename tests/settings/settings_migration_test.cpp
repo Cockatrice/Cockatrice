@@ -705,6 +705,71 @@ TEST_F(SettingsMigrationTest, LegacyMigrationCamelCasesKeys)
     ASSERT_EQ(readFromIni("gamefilters.ini", "filter_games/gameType/deadbeef"), QVariant(true));
 }
 
+TEST_F(SettingsMigrationTest, LegacyMigrationMapsCreatorNameFilterToHostNameFilter)
+{
+    {
+        QSettings nativeSettings;
+        nativeSettings.setValue("filter_games/creator_name_filter", QStringList({"Alice", "Bob"}));
+        nativeSettings.sync();
+    }
+
+    ASSERT_TRUE(SettingsMigration::migrateLegacySettings(settingsPath));
+
+    ASSERT_TRUE(fileExists("gamefilters.ini"));
+    ASSERT_EQ(readFromIni("gamefilters.ini", "filter_games/hostNameFilter"), QVariant(QStringList({"Alice", "Bob"})));
+}
+
+TEST_F(SettingsMigrationTest, GameFiltersIniSnakeCaseMigratesToCamelCase)
+{
+    {
+        QSettings filtersIni(settingsPath + "gamefilters.ini", QSettings::IniFormat);
+        filtersIni.setValue("filter_games/hide_full_games", true);
+        filtersIni.setValue("filter_games/hide_games_that_started", true);
+        filtersIni.setValue("filter_games/game_name_filter", "test game");
+        filtersIni.setValue("filter_games/creator_name_filter", QStringList({"Alice"}));
+        filtersIni.setValue("filter_games/game_type/deadbeef", true);
+        filtersIni.sync();
+    }
+
+    ASSERT_TRUE(SettingsMigration::migrateGameFiltersToCamelCase(settingsPath));
+
+    ASSERT_EQ(readFromIni("gamefilters.ini", "filter_games/hideFullGames"), QVariant(true));
+    ASSERT_EQ(readFromIni("gamefilters.ini", "filter_games/hideGamesThatStarted"), QVariant(true));
+    ASSERT_EQ(readFromIni("gamefilters.ini", "filter_games/gameNameFilter"), QVariant("test game"));
+    ASSERT_EQ(readFromIni("gamefilters.ini", "filter_games/hostNameFilter"), QVariant(QStringList({"Alice"})));
+    ASSERT_EQ(readFromIni("gamefilters.ini", "filter_games/gameType/deadbeef"), QVariant(true));
+
+    // Idempotent: a second run has nothing left to do
+    ASSERT_FALSE(SettingsMigration::migrateGameFiltersToCamelCase(settingsPath));
+}
+
+TEST_F(SettingsMigrationTest, GameFiltersIniOrphanCreatorNameFilterMigratesToHostName)
+{
+    {
+        QSettings filtersIni(settingsPath + "gamefilters.ini", QSettings::IniFormat);
+        filtersIni.setValue("filter_games/creatorNameFilter", QStringList({"Alice"}));
+        filtersIni.sync();
+    }
+
+    ASSERT_TRUE(SettingsMigration::migrateGameFiltersToCamelCase(settingsPath));
+    ASSERT_EQ(readFromIni("gamefilters.ini", "filter_games/hostNameFilter"), QVariant(QStringList({"Alice"})));
+    ASSERT_FALSE(SettingsMigration::migrateGameFiltersToCamelCase(settingsPath));
+}
+
+TEST_F(SettingsMigrationTest, GameFiltersIniKeepsNewerCamelCaseValues)
+{
+    {
+        QSettings filtersIni(settingsPath + "gamefilters.ini", QSettings::IniFormat);
+        filtersIni.setValue("filter_games/hide_full_games", true);
+        filtersIni.setValue("filter_games/hideFullGames", false);
+        filtersIni.sync();
+    }
+
+    // Nothing to do: the current-format key already exists and must win
+    ASSERT_FALSE(SettingsMigration::migrateGameFiltersToCamelCase(settingsPath));
+    ASSERT_EQ(readFromIni("gamefilters.ini", "filter_games/hideFullGames"), QVariant(false));
+}
+
 TEST_F(SettingsMigrationTest, LegacyMigrationEmptyNativeFormatWritesSentinel)
 {
     QSettings().clear();

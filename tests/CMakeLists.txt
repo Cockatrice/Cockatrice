@@ -208,6 +208,17 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  server_dump_zone_test
+  SOURCES
+  server_dump_zone_test.cpp
+  LIBS
+  libcockatrice_rng
+  libcockatrice_network
+  LABELS
+  server
+)
+cockatrice_add_test(
+  NAME
   server_counter_test
   SOURCES
   server_counter_test.cpp
@@ -222,6 +233,18 @@ cockatrice_add_test(
   NO_SANITIZE
   SOURCES
   server_developer_role_test.cpp
+  LIBS
+  libcockatrice_network
+  libcockatrice_rng
+  LABELS
+  server
+)
+cockatrice_add_test(
+  NAME
+  server_moderator_role_test
+  NO_SANITIZE
+  SOURCES
+  server_moderator_role_test.cpp
   LIBS
   libcockatrice_network
   libcockatrice_rng

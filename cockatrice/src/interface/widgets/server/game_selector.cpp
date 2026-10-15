@@ -113,6 +113,17 @@ GameSelector::GameSelector(AbstractClient *_client,
                     quickFilterToolBar->setVisible(
                         SettingsCache::instance().userInterface().getShowGameSelectorFilterToolbar());
                 });
+        // The quick-filter toolbar only updates the in-memory model, so persist every change.
+        // Otherwise each new GameSelector (room switch, reconnect, restart) would revert to stale
+        // saved values and e.g. hide full/started games the user had unchecked. The save is
+        // debounced so typing in the search field does not rewrite the settings file on every
+        // keystroke; a pending save is flushed in the destructor.
+        filterSaveDebounceTimer.setSingleShot(true);
+        filterSaveDebounceTimer.setInterval(500);
+        connect(&filterSaveDebounceTimer, &QTimer::timeout, this,
+                [this] { gameListProxyModel->saveFilterParameters(gameTypeMap); });
+        connect(gameListProxyModel, &GamesProxyModel::filtersChanged, this,
+                [this] { filterSaveDebounceTimer.start(); });
     } else {
         quickFilterToolBar = nullptr;
     }
@@ -185,6 +196,18 @@ GameSelector::GameSelector(AbstractClient *_client,
     connect(client, &AbstractClient::ignoreListReceived, this, &GameSelector::ignoreListReceived);
     connect(client, &AbstractClient::addToListEventReceived, this, &GameSelector::processAddToListEvent);
     connect(client, &AbstractClient::removeFromListEventReceived, this, &GameSelector::processRemoveFromListEvent);
+}
+
+GameSelector::~GameSelector()
+{
+    // Nothing else persists quick-filter toolbar edits: the toolbar only updates the in-memory model,
+    // and the debounced timer above is the sole writer for that path (actSetFilter/actClearFilter save
+    // synchronously, but the toolbar does not). Flush a pending debounced save so edits made within
+    // the debounce interval before destruction are not lost on room switch, reconnect, or close.
+    if (filterSaveDebounceTimer.isActive()) {
+        filterSaveDebounceTimer.stop();
+        gameListProxyModel->saveFilterParameters(gameTypeMap);
+    }
 }
 
 void GameSelector::ignoreListReceived(const QList<ServerInfo_User> &)

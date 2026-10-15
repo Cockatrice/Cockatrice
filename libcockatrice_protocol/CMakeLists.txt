@@ -24,3 +24,5 @@ target_include_directories(
   libcockatrice_protocol PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
                                 ${CMAKE_CURRENT_BINARY_DIR} # points to the generated headers
 )
+
+target_precompile_headers(libcockatrice_protocol PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtcore_pch.h")

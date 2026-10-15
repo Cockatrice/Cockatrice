@@ -182,6 +182,15 @@ void DeckView::mouseDoubleClickEvent(QMouseEvent *event)
         QList<MoveCard_ToZone> result;
         QList<QGraphicsItem *> sel = scene()->selectedItems();
 
+        // The double-click goes to the view, not the card, so cancel any pending
+        // selection collapse on the cards before reading the selection.
+        for (auto *item : sel) {
+            if (auto *c = dynamic_cast<DeckViewCard *>(item)) {
+                c->cancelPendingSelectionCollapse();
+            }
+        }
+        sel = scene()->selectedItems();
+
         for (int i = 0; i < sel.size(); i++) {
             auto *c = static_cast<DeckViewCard *>(sel.at(i));
             auto *zone = static_cast<DeckViewCardContainer *>(c->parentItem());

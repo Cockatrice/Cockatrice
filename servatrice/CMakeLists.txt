@@ -31,6 +31,9 @@ set(servatrice_RESOURCES servatrice.qrc)
 cockatrice_disable_sanitizers_for(
   src/smtp/qxthmac.cpp src/smtp/qxtmailattachment.cpp src/smtp/qxtmailmessage.cpp src/smtp/qxtsmtp.cpp
 )
+cockatrice_disable_coverage_for(
+  src/smtp/qxthmac.cpp src/smtp/qxtmailattachment.cpp src/smtp/qxtmailmessage.cpp src/smtp/qxtsmtp.cpp
+)
 
 if(WIN32)
   set(servatrice_SOURCES ${servatrice_SOURCES} servatrice.rc)

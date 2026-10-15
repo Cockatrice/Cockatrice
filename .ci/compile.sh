@@ -9,14 +9,17 @@
 # --server compiles servatrice
 # --test runs tests
 # --sanitize builds with AddressSanitizer and UndefinedBehaviorSanitizer, gcc/clang only
+# --coverage instruments the test run for line coverage and prints a gcovr summary, gcc only
+
 # --debug or --release sets the build type ie CMAKE_BUILD_TYPE
 # --ccache [<size>] uses ccache and shows stats, optionally provide size
 # --evict-ccache <age> runs ccache eviction based on given age after build
 # --dir <dir> sets the name of the build dir, default is "build"
 # --cmake-generator <generator> sets CMAKE_GENERATOR as used by cmake
 # --target-macos-version <version> sets the min os version - only used for macOS builds
-# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_NO_CLIENT MAKE_TEST USE_CCACHE CCACHE_SIZE CCACHE_EVICTION_AGE BUILD_DIR CMAKE_GENERATOR TARGET_MACOS_VERSION
-# (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir>)
+# --profile writes an MSBuild performance summary and binary log, Windows only
+# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_NO_CLIENT MAKE_TEST USE_CCACHE CCACHE_SIZE CCACHE_EVICTION_AGE BUILD_DIR CMAKE_GENERATOR TARGET_MACOS_VERSION MAKE_SANITIZE MAKE_COVERAGE VCPKG_TARGET_MACOS_VERSION BUILD_PARALLEL_LEVEL BUILD_PROFILE
+# (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --sanitize --coverage --ccache <ccache_size> --dir <dir> --profile)
 # exitcode: 1 for failure, 3 for invalid arguments
 
 # Read arguments
@@ -60,6 +63,10 @@ while [[ $# != 0 ]]; do
       ;;
     '--sanitize')
       MAKE_SANITIZE=1
+      shift
+      ;;
+    '--coverage')
+      MAKE_COVERAGE=1
       shift
       ;;
     '--debug')
@@ -109,6 +116,10 @@ while [[ $# != 0 ]]; do
       export CMAKE_GENERATOR=$1
       shift
       ;;
+    '--profile')
+      BUILD_PROFILE=1
+      shift
+      ;;
     '--target-macos-version')
       shift
       if [[ $# == 0 ]]; then
@@ -136,6 +147,15 @@ if [[ ! $BUILD_DIR ]]; then
   BUILD_DIR="build"
 fi
 mkdir -p "$BUILD_DIR"
+
+if [[ $MAKE_COVERAGE ]]; then
+  # Resolved while the working directory is still the source root. $0 is relative to the
+  # directory the script was invoked from, so after the cd below it no longer resolves, and
+  # under `set -e` the failed subshell would abort the build rather than just yielding an empty
+  # variable. Only the coverage report needs this, so only coverage pays for it.
+  SRC_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+fi
+
 cd "$BUILD_DIR"
 
 # Set minimum CMake Version
@@ -159,6 +179,9 @@ else
   # ENABLE_SANITIZERS=ON left over from the debug step would otherwise leak
   # into the shipped binaries (libasan/libubsan Depends in the DEB).
   flags+=("-DENABLE_SANITIZERS=OFF")
+fi
+if [[ $MAKE_COVERAGE ]]; then
+  flags+=("-DENABLE_COVERAGE=ON")
 fi
 if [[ $USE_CCACHE ]]; then
   flags+=("-DUSE_CCACHE=1")
@@ -189,6 +212,22 @@ function ccachestatsverbose() {
   else
     ccache --show-stats
   fi
+}
+
+function cpuinfo() {
+  # The number of cores decides how much build parallelism is useful; the hosted
+  # runners are not all sized alike, so read it off the machine instead of assuming.
+  case "$RUNNER_OS" in
+  Windows)
+    echo "cores: ${NUMBER_OF_PROCESSORS:-unknown}"
+    ;;
+  macOS)
+    echo "cores: $(sysctl -n hw.ncpu)"
+    ;;
+  *)
+    echo "cores: $(nproc 2>/dev/null || echo unknown)"
+    ;;
+  esac
 }
 
 # Compile
@@ -225,8 +264,14 @@ if [[ $RUNNER_OS == macOS ]]; then
       triplet_source="../vcpkg/triplets/community/$arch-osx.cmake"
     fi
     cp "$triplet_source" "$triplet_file"
-    echo "set(VCPKG_CMAKE_SYSTEM_VERSION $TARGET_MACOS_VERSION)" >>"$triplet_file"
-    echo "set(VCPKG_OSX_DEPLOYMENT_TARGET $TARGET_MACOS_VERSION)" >>"$triplet_file"
+    # The triplet is what vcpkg hashes into the ABI hash of every port, so two legs that
+    # agree here reuse each other's binary cache. Targets 14, 15 and 26 on the same Xcode
+    # produce identical binaries when they share the lowest deployment target, so they all
+    # build against 14 to keep one vcpkg cache scope instead of three.
+    # Keep in sync with "vcpkg_scope" and "vcpkg_deployment_target" in desktop-build.yml.
+    vcpkg_target="${VCPKG_TARGET_MACOS_VERSION:-$TARGET_MACOS_VERSION}"
+    echo "set(VCPKG_CMAKE_SYSTEM_VERSION $vcpkg_target)" >>"$triplet_file"
+    echo "set(VCPKG_OSX_DEPLOYMENT_TARGET $vcpkg_target)" >>"$triplet_file"
     flags+=("-DVCPKG_OVERLAY_TRIPLETS=$triplets_dir")
     flags+=("-DVCPKG_HOST_TRIPLET=$triplet_version")
     flags+=("-DVCPKG_TARGET_TRIPLET=$triplet_version")
@@ -269,9 +314,34 @@ if [[ $RUNNER_OS == macOS ]]; then
   fi
 
 elif [[ $RUNNER_OS == Windows ]]; then
-  # Enable MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
-  # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
-  buildflags+=(-- -p:UseMultiToolTask=true -p:EnableClServerMode=true)
+  if [[ $CMAKE_GENERATOR == "Visual Studio"* ]]; then
+    # cmake only hands MSBuild a job count when one is asked for, and without it
+    # MSBuild builds a single node: one project at a time, whatever MTT does inside
+    # it. Ask for a node per core.
+    if [[ ! $BUILD_PARALLEL_LEVEL ]]; then
+      BUILD_PARALLEL_LEVEL="${NUMBER_OF_PROCESSORS:-1}"
+    fi
+    buildflags+=(--parallel "$BUILD_PARALLEL_LEVEL")
+
+    # Enable MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
+    # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
+    # EnforceProcessCountAcrossBuilds makes the CL_MPCount ceiling apply across all
+    # the projects the nodes are building, instead of each node running its own
+    # cl.exe processes and /m and MTT multiplying into an oversubscribed machine.
+    buildflags+=(-- -p:UseMultiToolTask=true -p:EnableClServerMode=true -p:EnforceProcessCountAcrossBuilds=true -p:CL_MPCount="$BUILD_PARALLEL_LEVEL")
+    if [[ $BUILD_PROFILE ]]; then
+      # A performance summary says which projects and tasks cost what, the binary log
+      # keeps the full timeline; both are far too noisy to always produce. The files
+      # land next to the solution, i.e. in the build dir the workflow uploads. These
+      # join the MTT options above, which already carried the "--" separator.
+      buildflags+=("-flp:PerformanceSummary;v=q;LogFile=msbuild-perf.log" -bl:msbuild.binlog)
+    fi
+  else
+    # Ninja runs the compiler itself, so it neither takes the MSBuild switches
+    # (it rejects -p: options outright) nor a job count: it sizes its own pool
+    # for the cores it finds.
+    echo "ninja $(ninja --version)"
+  fi
 fi
 
 if [[ $USE_CCACHE ]]; then
@@ -287,9 +357,18 @@ cmake .. "${flags[@]}"
 echo "::endgroup::"
 
 echo "::group::Build project"
+cpuinfo
 echo "Running cmake --build with flags: ${buildflags[*]}"
 cmake --build . "${buildflags[@]}"
 echo "::endgroup::"
+
+if [[ $BUILD_PROFILE && $RUNNER_OS == Windows && -f msbuild-perf.log ]]; then
+  # Repeat the summary in the job log so the numbers are readable without
+  # downloading the binary log, which is hundreds of megabytes.
+  echo "::group::MSBuild performance summary"
+  cat msbuild-perf.log
+  echo "::endgroup::"
+fi
 
 if [[ $USE_CCACHE ]]; then
   if [[ $CCACHE_EVICTION_AGE ]]; then
@@ -338,6 +417,31 @@ if [[ $MAKE_TEST ]]; then
   # run concurrently: the only one that claims a fixed resource is single_instance_manager_test,
   # which already scopes its local socket name to its own pid so parallel copies cannot collide.
   ctest -C "$BUILDTYPE" --output-on-failure -j "${CTEST_JOBS:-4}"
+  echo "::endgroup::"
+fi
+
+if [[ $MAKE_COVERAGE ]]; then
+  # gcovr is not a build dependency and is not available everywhere, so a missing one is reported
+  # and skipped rather than failing an otherwise green build.
+  echo "::group::Coverage report"
+  GCOVR="$(command -v gcovr || true)"
+  if [[ -z $GCOVR ]]; then
+    echo "gcovr not found; install it to produce a coverage report"
+  else
+    "$GCOVR" --version
+    # This script configures with `cmake ..`, so the build dir it was started from is the object
+    # directory and the source root is one level up. Both are passed explicitly: gcovr otherwise
+    # walks the current directory and trips over in-tree build directories left by other tooling,
+    # whose stale .gcno files cannot be resolved. --config is named too, so the filters apply no
+    # matter what directory gcovr happens to start from.
+    GCOVR_ARGS=("." --root "$SRC_ROOT" --object-directory "." --config "$SRC_ROOT/gcovr.cfg")
+    "$GCOVR" "${GCOVR_ARGS[@]}" --txt --decisions
+    "$GCOVR" "${GCOVR_ARGS[@]}" --html-details coverage-details.html --html-title "Cockatrice line coverage"
+    "$GCOVR" "${GCOVR_ARGS[@]}" --lcov -o coverage.lcov
+    "$GCOVR" "${GCOVR_ARGS[@]}" --cobertura-pretty -o coverage.xml
+    "$GCOVR" "${GCOVR_ARGS[@]}" --json-summary-pretty -o coverage-summary.json
+    echo "Coverage artifacts written to coverage-details.html, coverage.lcov, coverage.xml and coverage-summary.json"
+  fi
   echo "::endgroup::"
 fi
 

@@ -21,6 +21,7 @@
 #define SERVATRICE_H
 
 #include "metrics_registry.h"
+#include "smtpclient.h"
 
 #include <QByteArray>
 #include <QDateTime>
@@ -181,6 +182,7 @@ private:
     QMap<QString, bool> serverRequiredFeatureList;
     QString officialWarnings;
     Servatrice_DatabaseInterface *servatriceDatabaseInterface;
+    bool cleanupDatabaseForEmail(const QString &userName, EmailType type, const QString &token, qint64 rowId);
     int serverId;
     int uptime;
     QMutex txBytesMutex, rxBytesMutex;
@@ -231,6 +233,12 @@ public slots:
     void scheduleShutdown(const QString &reason, int minutes);
     void updateLoginMessage();
     void setRequiredFeatures(const QString &featureList);
+    void onEmailDelivered(const QString &userName, EmailType type, const QString &token, qint64 rowId);
+    void onEmailPermanentlyFailed(const QString &userName,
+                                  EmailType type,
+                                  FailureReason reason,
+                                  const QString &token,
+                                  qint64 rowId);
 
 public:
     explicit Servatrice(QObject *parent = nullptr);

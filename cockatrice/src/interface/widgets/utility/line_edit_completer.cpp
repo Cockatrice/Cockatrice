@@ -130,10 +130,19 @@ void LineEditCompleter::keyPressEvent(QKeyEvent *event)
     CompleterInfo *active = nullptr;
     QString prefix;
 
+    // An open "[[" card link takes precedence over a mention: while the cursor is
+    // inside it, an earlier "@" must not shadow the card completer.
+    const int openCardPos = textValue.lastIndexOf("[[", cursorPos - 1);
+    const int closeCardPos = openCardPos == -1 ? -1 : textValue.indexOf("]]", openCardPos + 2);
+    const bool insideCardLink = openCardPos != -1 && (closeCardPos == -1 || closeCardPos >= cursorPos);
+
     for (auto &info : completers) {
         bool triggered = false;
         switch (info.trigger) {
             case CompleterTrigger::Mention: {
+                if (insideCardLink) {
+                    break;
+                }
                 int triggerPos = textValue.lastIndexOf("@", cursorPos - 1);
                 if (triggerPos != -1 && (triggerPos == 0 || textValue[triggerPos - 1].isSpace())) {
                     triggered = true;
