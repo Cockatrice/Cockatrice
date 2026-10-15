@@ -89,7 +89,10 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           cache-from: type=gha,scope=${{ env.CACHE_SCOPE }}
-          cache-to: ${{ case(github.ref == 'refs/heads/master', format('type=gha,mode=max,scope={0}', env.CACHE_SCOPE), '') }}
+          # mode=min exports only the layers of the final image. mode=max also exports
+          # every intermediate build layer, which for this multi-stage build is where the
+          # bulk of the 42 cached blobs came from, and none of it survives into the image.
+          cache-to: ${{ case(github.ref == 'refs/heads/master', format('type=gha,mode=min,scope={0}', env.CACHE_SCOPE), '') }}
           context: .
           platforms: ${{ matrix.platform }}
           push: false
@@ -101,7 +104,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           cache-from: type=gha,scope=${{ env.CACHE_SCOPE }}
-          cache-to: type=gha,mode=max,scope=${{ env.CACHE_SCOPE }}
+          cache-to: type=gha,mode=min,scope=${{ env.CACHE_SCOPE }}
           context: .
           labels: |
             org.opencontainers.image.description=${{ env.OCI_DESCRIPTION }}

@@ -168,7 +168,7 @@ jobs:
     continue-on-error: ${{ matrix.allow-failure == 'yes' }}
     timeout-minutes: 70
     env:
-      CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}    # directory for caching docker image and ccache
+      CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}    # scratch dir for the container image build and throwaway ccache; nothing below is cached
       CCACHE_EVICTION_AGE: 7d
       CCACHE_SIZE: 600M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CMAKE_GENERATOR: 'Ninja'
@@ -179,13 +179,13 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@v7
 
-      - name: "Restore compiler cache (ccache)"
-        id: restore_ccache
-        uses: actions/cache/restore@v6
-        with:
-          key: ccache-${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}
-          path: ${{ env.CACHE }}/.ccache
-
+      # Nothing on these legs is worth persisting. A compile here runs inside a
+      # container, so ccache measures a 0.00 to 1.85 percent hit rate against 49 to
+      # 50 percent on the macOS legs: persisting it spent a few hundred MiB per
+      # entry buying nothing. The build image is not an alternative: it runs 1.1 to
+      # 2.4 GB per leg on disk, about 5 to 6 GB of quota for all nine legs once
+      # compressed, so caching it would cost more than dropping the ccache frees.
+      # The old ccache-<distro> entries are never read again and expire on their own.
       - name: "Build ${{ matrix.distro }} ${{ matrix.version }} Docker image"
         shell: bash
         run: source .ci/docker.sh --build
@@ -249,25 +249,6 @@ jobs:
           args+=(--suffix "$SUFFIX")
 
           RUN --server --release --package "$package" "${args[@]}"
-
-      # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
-      - name: "Delete remote compiler cache (ccache)"
-        if: github.ref == 'refs/heads/master' && steps.restore_ccache.outputs.cache-hit
-        continue-on-error: true
-        env:
-          CACHE_PRIMARY_KEY: ${{ steps.restore_ccache.outputs.cache-primary-key }}
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if gh cache delete --repo "$GITHUB_REPOSITORY" "$CACHE_PRIMARY_KEY"; then
-            echo "Cache deleted successfully"
-          fi
-
-      - name: "Save updated compiler cache (ccache)"
-        if: github.ref == 'refs/heads/master'
-        uses: actions/cache/save@v6
-        with:
-          key: ${{ steps.restore_ccache.outputs.cache-primary-key }}
-          path: ${{ env.CACHE }}/.ccache
 
       - name: "Upload artifact"
         id: upload_artifact
