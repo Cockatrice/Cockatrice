@@ -151,7 +151,8 @@ public:
         MessageTargetRoom,
         MessageTargetGame,
         MessageTargetChat,
-        MessageTargetIslRoom
+        MessageTargetIslRoom,
+        MessageTargetRoomChannel
     };
     virtual void logMessage(const int /* senderId */,
                             const QString & /* senderName */,
@@ -159,7 +160,8 @@ public:
                             const QString & /* logMessage */,
                             LogMessage_TargetType /* targetType */,
                             const int /* targetId */,
-                            const QString & /* targetName */)
+                            const QString & /* targetName */,
+                            const QString & /* channel */ = QString())
     {
     }
     virtual bool checkUserIsBanned(Server_ProtocolHandler * /* session */,

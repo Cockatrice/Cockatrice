@@ -276,6 +276,17 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  server_room_channels_test
+  SOURCES
+  server_room_channels_test.cpp
+  LIBS
+  libcockatrice_network_server_remote
+  libcockatrice_rng
+  LABELS
+  server
+)
+cockatrice_add_test(
+  NAME
   latency_tracker_test
   SOURCES
   latency_tracker_test.cpp

@@ -177,7 +177,8 @@ public:
                     const QString &logMessage,
                     LogMessage_TargetType targetType,
                     const int targetId,
-                    const QString &targetName) override;
+                    const QString &targetName,
+                    const QString &channel = QString()) override;
     bool changeUserPassword(const QString &user, const QString &password, bool passwordNeedsHash) override;
     bool changeUserPassword(const QString &user,
                             const QString &oldPassword,

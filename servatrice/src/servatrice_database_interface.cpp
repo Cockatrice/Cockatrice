@@ -1286,7 +1286,8 @@ void Servatrice_DatabaseInterface::logMessage(const int senderId,
                                               const QString &logMessage,
                                               LogMessage_TargetType targetType,
                                               const int targetId,
-                                              const QString &targetName)
+                                              const QString &targetName,
+                                              const QString &channel)
 {
     QString targetTypeString;
     switch (targetType) {
@@ -1295,6 +1296,12 @@ void Servatrice_DatabaseInterface::logMessage(const int senderId,
                 return;
             }
             targetTypeString = "room";
+            break;
+        case MessageTargetRoomChannel:
+            if (!settingsCache->value("logging/log_user_msg_room", 0).toBool()) {
+                return;
+            }
+            targetTypeString = "room_channel";
             break;
         case MessageTargetGame:
             if (!settingsCache->value("logging/log_user_msg_game", 0).toBool()) {
@@ -1319,8 +1326,9 @@ void Servatrice_DatabaseInterface::logMessage(const int senderId,
     }
 
     QSqlQuery *query = prepareQuery("insert into {prefix}_log (log_time, sender_id, sender_name, sender_ip, "
-                                    "log_message, target_type, target_id, target_name) values (now(), :sender_id, "
-                                    ":sender_name, :sender_ip, :log_message, :target_type, :target_id, :target_name)");
+                                    "log_message, target_type, target_id, target_name, channel) values (now(), "
+                                    ":sender_id, :sender_name, :sender_ip, :log_message, :target_type, :target_id, "
+                                    ":target_name, :channel)");
     query->bindValue(":sender_id", senderId < 1 ? QVariant() : senderId);
     query->bindValue(":sender_name", senderName);
     query->bindValue(":sender_ip", senderIp);
@@ -1328,6 +1336,7 @@ void Servatrice_DatabaseInterface::logMessage(const int senderId,
     query->bindValue(":target_type", targetTypeString);
     query->bindValue(":target_id", (targetType == MessageTargetChat && targetId < 1) ? QVariant() : targetId);
     query->bindValue(":target_name", targetName);
+    query->bindValue(":channel", channel.isEmpty() ? QVariant() : channel);
     execSqlQuery(query);
 }
 
@@ -1846,9 +1855,9 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
 
         if (room) {
             if (game || chat) {
-                queryString.append(" OR `target_type` = 'room'");
+                queryString.append(" OR `target_type` = 'room' OR `target_type` = 'room_channel'");
             } else {
-                queryString.append("`target_type` = 'room'");
+                queryString.append("`target_type` = 'room' OR `target_type` = 'room_channel'");
             }
         }
         queryString.append(")");
@@ -1899,6 +1908,7 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
         chatMessage.set_target_type(QString(query->value(5).toString()).toStdString());
         chatMessage.set_target_id(QString(query->value(6).toString()).toStdString());
         chatMessage.set_target_name(QString(query->value(7).toString()).toStdString());
+        chatMessage.set_channel(QString(query->value(8).toString()).toStdString());
         results << chatMessage;
     }
 

@@ -35,10 +35,10 @@ TabLog::TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool _can
     : Tab(_tabSupervisor), client(_client), canUseDeveloperCommands(_canUseDeveloperCommands)
 {
     roomTable = new QTableWidget();
-    roomTable->setColumnCount(6);
+    roomTable->setColumnCount(7);
     roomTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     roomTable->setHorizontalHeaderLabels(
-        QString(tr("Time;SenderName;SenderIP;Message;TargetID;TargetName")).split(";"));
+        QString(tr("Time;SenderName;SenderIP;Message;TargetID;TargetName;Channel")).split(";"));
 
     gameTable = new QTableWidget();
     gameTable->setColumnCount(6);
@@ -317,7 +317,8 @@ void TabLog::viewLogHistory_processResponse(const Response &resp)
 
     for (int i = 0; i < response.log_message_size(); ++i) {
         ServerInfo_ChatMessage message = response.log_message(i);
-        if (QString::fromStdString(message.target_type()) == "room") {
+        const QString targetType = QString::fromStdString(message.target_type());
+        if (targetType == "room" || targetType == "room_channel") {
             roomTable->insertRow(roomCounter);
             roomTable->setItem(roomCounter, 0, new QTableWidgetItem(QString::fromStdString(message.time())));
             roomTable->setItem(roomCounter, 1, new QTableWidgetItem(QString::fromStdString(message.sender_name())));
@@ -325,10 +326,11 @@ void TabLog::viewLogHistory_processResponse(const Response &resp)
             roomTable->setItem(roomCounter, 3, new QTableWidgetItem(QString::fromStdString(message.message())));
             roomTable->setItem(roomCounter, 4, new QTableWidgetItem(QString::fromStdString(message.target_id())));
             roomTable->setItem(roomCounter, 5, new QTableWidgetItem(QString::fromStdString(message.target_name())));
+            roomTable->setItem(roomCounter, 6, new QTableWidgetItem(QString::fromStdString(message.channel())));
             ++roomCounter;
         }
 
-        if (QString::fromStdString(message.target_type()) == "game") {
+        if (targetType == "game") {
             gameTable->insertRow(gameCounter);
             gameTable->setItem(gameCounter, 0, new QTableWidgetItem(QString::fromStdString(message.time())));
             gameTable->setItem(gameCounter, 1, new QTableWidgetItem(QString::fromStdString(message.sender_name())));
@@ -339,7 +341,7 @@ void TabLog::viewLogHistory_processResponse(const Response &resp)
             ++gameCounter;
         }
 
-        if (QString::fromStdString(message.target_type()) == "chat") {
+        if (targetType == "chat") {
             chatTable->insertRow(chatCounter);
             chatTable->setItem(chatCounter, 0, new QTableWidgetItem(QString::fromStdString(message.time())));
             chatTable->setItem(chatCounter, 1, new QTableWidgetItem(QString::fromStdString(message.sender_name())));
