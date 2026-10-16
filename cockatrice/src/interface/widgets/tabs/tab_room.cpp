@@ -172,6 +172,10 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     chatView = channelViews.value(MAIN_CHANNEL);
     chatViewStack->setCurrentWidget(chatView);
     channelTabBar->setCurrentIndex(0);
+    // Old servers never send a channel catalog, so the tab bar would only show
+    // a single "Main" tab where a misclick hides the chat. Only show it when
+    // there is more than one channel to switch between.
+    channelTabBar->setVisible(channelIds.size() > 1);
     connect(channelTabBar, &QTabBar::currentChanged, this, &TabRoom::onChannelChanged);
     connect(channelTabBar, &QTabBar::tabBarClicked, this, &TabRoom::onChannelTabClicked);
     connect(&SettingsCache::instance().chat(), &ChatSettings::chatMentionCompleterChanged, this,
@@ -360,12 +364,23 @@ void TabRoom::sendMessage()
         sayEdit->hideCompleterPopups();
         return;
     } else {
+        ChatView *targetView = channelViews.value(activeChannelId, chatView);
+        auto onFinished = [this, targetView](const Response &response) {
+            if (response.response_code() == Response::RespChatFlood) {
+                targetView->appendMessage(tr("You are flooding the chat. Please wait a couple of seconds."));
+            } else if (response.response_code() == Response::RespFunctionNotAllowed ||
+                       response.response_code() == Response::RespInvalidCommand) {
+                targetView->appendMessage(tr("Your message could not be sent: the channel is not available or you "
+                                            "are not allowed to talk there."));
+            }
+        };
+
         if (activeChannelId.isEmpty()) {
             Command_RoomSay cmd;
             cmd.set_message(sayEdit->text().toStdString());
 
             PendingCommand *pend = prepareRoomCommand(cmd);
-            connect(pend, &PendingCommand::finished, this, &TabRoom::sayFinished);
+            connect(pend, &PendingCommand::finished, this, onFinished);
             sendRoomCommand(pend);
         } else {
             Command_RoomChannelSay cmd;
@@ -373,7 +388,7 @@ void TabRoom::sendMessage()
             cmd.set_message(sayEdit->text().toStdString());
 
             PendingCommand *pend = prepareRoomCommand(cmd);
-            connect(pend, &PendingCommand::finished, this, &TabRoom::sayFinished);
+            connect(pend, &PendingCommand::finished, this, onFinished);
             sendRoomCommand(pend);
         }
         sayEdit->clear();
@@ -471,7 +486,7 @@ void TabRoom::updateChannelTab(const QString &channelId)
     }
 }
 
-bool TabRoom::messageContainsMention(const QString &message) const
+bool TabRoom::messageContainsMention(const QString &message, const ServerInfo_User &senderInfo) const
 {
     if (ownUser == nullptr) {
         return false;
@@ -480,22 +495,41 @@ bool TabRoom::messageContainsMention(const QString &message) const
     if (ownName.isEmpty()) {
         return false;
     }
-    if (message.contains("@" + ownName, Qt::CaseInsensitive)) {
+    // Match ChatView::checkMention / checkWord: whole-word, case-insensitive.
+    // "@zach" must not match "@zachary", and highlight words match full words.
+    auto containsWholeWord = [](const QString &haystack, const QString &needle) {
+        if (needle.isEmpty()) {
+            return false;
+        }
+        QRegularExpression re(QStringLiteral("\\b%1\\b").arg(QRegularExpression::escape(needle)),
+                              QRegularExpression::CaseInsensitiveOption);
+        return re.match(haystack).hasMatch();
+    };
+
+    if (containsWholeWord(message, "@" + ownName)) {
         return true;
     }
-    if (message.contains("@all", Qt::CaseInsensitive)) {
+    // ChatView only highlights @all for moderator/admin senders
+    // (ChatView::isModeratorSendingGlobal). Gating here keeps the tab
+    // mention color from drifting ahead of the message view.
+    const uint32_t senderLevel = senderInfo.user_level();
+    const bool senderIsPrivileged =
+        (senderLevel & ServerInfo_User::IsModerator) || (senderLevel & ServerInfo_User::IsAdmin);
+    if (senderIsPrivileged && containsWholeWord(message, "@all")) {
         return true;
     }
     const QStringList words = SettingsCache::instance().chat().getHighlightWords().split(' ', Qt::SkipEmptyParts);
     for (const QString &word : words) {
-        if (!word.isEmpty() && message.contains(word, Qt::CaseInsensitive)) {
+        if (containsWholeWord(message, word)) {
             return true;
         }
     }
     return false;
 }
 
-void TabRoom::markChannelMessage(const QString &channelId, const QString &message)
+void TabRoom::markChannelMessage(const QString &channelId,
+                                 const QString &message,
+                                 const ServerInfo_User &senderInfo)
 {
     bool roomVisible = (tabSupervisor->currentWidget() == this);
     bool viewing = (channelId == activeChannelId) && !chatCollapsed && roomVisible;
@@ -503,10 +537,29 @@ void TabRoom::markChannelMessage(const QString &channelId, const QString &messag
         return;
     }
     channelUnreadCounts[channelId] = channelUnreadCounts.value(channelId, 0) + 1;
-    if (messageContainsMention(message)) {
+    if (messageContainsMention(message, senderInfo)) {
         channelMentioned[channelId] = true;
     }
     updateChannelTab(channelId);
+}
+
+bool TabRoom::isRoomMessageIgnored(const QString &senderName, ServerInfo_User &userInfoOut) const
+{
+    if (userListProxy->isUserIgnored(senderName)) {
+        return true;
+    }
+
+    UserListTWI *twi = userList->getUsers().value(senderName);
+    if (twi) {
+        userInfoOut = twi->getUserInfo();
+        if (SettingsCache::instance().chat().getIgnoreUnregisteredUsers() &&
+            !UserLevelFlags(userInfoOut.user_level()).testFlag(ServerInfo_User::IsRegistered)) {
+            return true;
+        }
+    } else {
+        userInfoOut = ServerInfo_User{};
+    }
+    return false;
 }
 
 ChatView *TabRoom::makeChatView()
@@ -520,17 +573,6 @@ ChatView *TabRoom::makeChatView()
     connect(view, &ChatView::deleteCardInfoPopup, this, &TabRoom::deleteCardInfoPopup);
     connect(view, &ChatView::addMentionTag, this, &TabRoom::addMentionTag);
     return view;
-}
-
-void TabRoom::sayFinished(const Response &response)
-{
-    if (response.response_code() == Response::RespChatFlood) {
-        chatView->appendMessage(tr("You are flooding the chat. Please wait a couple of seconds."));
-    } else if (response.response_code() == Response::RespFunctionNotAllowed ||
-               response.response_code() == Response::RespInvalidCommand) {
-        chatView->appendMessage(tr("Your message could not be sent: the channel is not available or you are not "
-                                   "allowed to talk there."));
-    }
 }
 
 void TabRoom::actClearChat()
@@ -606,18 +648,9 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
     QString senderName = QString::fromStdString(event.name());
     QString message = QString::fromStdString(event.message());
 
-    if (userListProxy->isUserIgnored(senderName)) {
-        return;
-    }
-
-    UserListTWI *twi = userList->getUsers().value(senderName);
     ServerInfo_User userInfo = {};
-    if (twi) {
-        userInfo = twi->getUserInfo();
-        if (SettingsCache::instance().chat().getIgnoreUnregisteredUsers() &&
-            !UserLevelFlags(userInfo.user_level()).testFlag(ServerInfo_User::IsRegistered)) {
-            return;
-        }
+    if (isRoomMessageIgnored(senderName, userInfo)) {
+        return;
     }
 
     if (event.message_type() == Event_RoomSay::ChatHistory && !SettingsCache::instance().chat().getRoomHistory()) {
@@ -638,7 +671,7 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
 
     mainView->appendMessage(message, event.message_type(), userInfo, true);
     if (event.message_type() != Event_RoomSay::ChatHistory) {
-        markChannelMessage(MAIN_CHANNEL, message);
+        markChannelMessage(MAIN_CHANNEL, message, userInfo);
     }
     emit userEvent(false);
 }
@@ -654,18 +687,9 @@ void TabRoom::processRoomChannelSayEvent(const Event_RoomChannelSay &event)
     QString senderName = QString::fromStdString(event.name());
     QString message = QString::fromStdString(event.message());
 
-    if (userListProxy->isUserIgnored(senderName)) {
-        return;
-    }
-
-    UserListTWI *twi = userList->getUsers().value(senderName);
     ServerInfo_User userInfo = {};
-    if (twi) {
-        userInfo = twi->getUserInfo();
-        if (SettingsCache::instance().chat().getIgnoreUnregisteredUsers() &&
-            !UserLevelFlags(userInfo.user_level()).testFlag(ServerInfo_User::IsRegistered)) {
-            return;
-        }
+    if (isRoomMessageIgnored(senderName, userInfo)) {
+        return;
     }
 
     if (senderName.isEmpty()) {
@@ -681,7 +705,7 @@ void TabRoom::processRoomChannelSayEvent(const Event_RoomChannelSay &event)
     view->appendMessage(message, {}, userInfo, true);
     if (!senderName.isEmpty()) {
         // Empty senders mark replayed history, which must not count as unread
-        markChannelMessage(channelId, message);
+        markChannelMessage(channelId, message, userInfo);
     }
     emit userEvent(false);
 }

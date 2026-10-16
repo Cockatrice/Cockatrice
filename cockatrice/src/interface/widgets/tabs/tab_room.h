@@ -104,7 +104,6 @@ signals:
     void gameListUpdated();
 private slots:
     void sendMessage();
-    void sayFinished(const Response &response);
     void onChannelChanged(int index);
     void onChannelTabClicked(int index);
     void setChatCollapsed(bool collapsed);
@@ -127,8 +126,9 @@ private slots:
     ChatView *makeChatView();
     void updateChannelTab(const QString &channelId);
     void updateSayEnabled();
-    void markChannelMessage(const QString &channelId, const QString &message);
-    [[nodiscard]] bool messageContainsMention(const QString &message) const;
+    void markChannelMessage(const QString &channelId, const QString &message, const ServerInfo_User &senderInfo);
+    [[nodiscard]] bool messageContainsMention(const QString &message, const ServerInfo_User &senderInfo) const;
+    [[nodiscard]] bool isRoomMessageIgnored(const QString &senderName, ServerInfo_User &userInfoOut) const;
     static QColor parseColorHex(const QString &hex, const QColor &fallback);
 
 protected slots:
