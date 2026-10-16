@@ -1,0 +1,9 @@
+syntax = "proto2";
+import "response.proto";
+
+message Response_RemoveUserBanner {
+    extend Response {
+        optional Response_RemoveUserBanner ext = 1221;
+    }
+    optional string user_name = 1;
+}
