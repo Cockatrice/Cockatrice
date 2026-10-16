@@ -33,16 +33,6 @@ void AppearanceSettings::setStyleUserList(bool _styleUserList)
     emit styleUserListChanged();
 }
 
-int AppearanceSettings::getMaxFontSize() const
-{
-    return getValue("maxFontSize", QString(), QString(), 12).toInt();
-}
-
-void AppearanceSettings::setMaxFontSize(int _max)
-{
-    setValue(_max, "maxFontSize");
-}
-
 QString AppearanceSettings::getHomeTabBackgroundSource() const
 {
     return getValue("homeTabBackgroundSource", QString(), QString(), "themed").toString();
