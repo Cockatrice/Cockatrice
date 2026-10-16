@@ -18,7 +18,6 @@
 #include <QPointF>
 #include <QRectF>
 #include <QString>
-#include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <string>
 
@@ -58,19 +57,13 @@ void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
         x = calcDropIndexFromY(dropPoint.y(), !sameZone);
     }
 
-    Command_MoveCard cmd;
-    cmd.set_start_player_id(startZone->getPlayer()->getPlayerInfo()->getId());
-    cmd.set_start_zone(startZone->getName().toStdString());
-    cmd.set_target_player_id(getLogic()->getPlayer()->getPlayerInfo()->getId());
-    cmd.set_target_zone(getLogic()->getName().toStdString());
-    cmd.set_x(x);
-    cmd.set_y(-1);
-
-    for (int i = 0; i < dragItems.size(); ++i) {
-        cmd.mutable_cards_to_move()->add_card()->set_card_id(dragItems[i]->getId());
+    QList<CardMoveRequest> cards;
+    cards.reserve(dragItems.size());
+    for (const CardDragItem *item : dragItems) {
+        cards.append(CardMoveRequest{item->getId()});
     }
 
-    getLogic()->getPlayer()->getPlayerActions()->sendGameCommand(cmd);
+    getLogic()->getPlayer()->getPlayerActions()->moveCards(startZone, getLogic(), x, -1, cards);
 }
 
 QRectF HandZone::boundingRect() const
