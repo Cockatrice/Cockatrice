@@ -1,5 +1,6 @@
 #include "tab_report.h"
 
+#include "../interface/theme_manager.h"
 #include "../server/user/user_context_menu.h"
 #include "../utility/report_utils.h"
 #include "abstract_client.h"
@@ -138,13 +139,8 @@ TabReport::TabReport(TabSupervisor *_tabSupervisor, AbstractClient *_client) : T
     chatGroup = new QGroupBox;
     chatLogEdit = new QTextEdit;
     chatLogEdit->setReadOnly(true);
-    QFont monoFont("monospace");
-    monoFont.setStyleHint(QFont::Monospace);
-    const int systemPointSize = QFontDatabase::systemFont(QFontDatabase::GeneralFont).pointSize();
-    if (systemPointSize > 0) {
-        monoFont.setPointSize(systemPointSize);
-    }
-    chatLogEdit->setFont(monoFont);
+    applyChatLogFont();
+    connect(themeManager, &ThemeManager::fontsChanged, this, &TabReport::applyChatLogFont);
     auto *chatLayout = new QVBoxLayout(chatGroup);
     chatLayout->setContentsMargins(4, 4, 4, 4);
     chatLayout->addWidget(chatLogEdit);
@@ -275,6 +271,18 @@ TabReport::TabReport(TabSupervisor *_tabSupervisor, AbstractClient *_client) : T
 
     setActionsEnabled(false);
     refreshList();
+}
+
+void TabReport::applyChatLogFont()
+{
+    // Family comes from the ChatLog theme role; size stays caller-side as before.
+    QFont monoFont = themeManager->appFont(AppFont::ChatLog);
+    monoFont.setStyleHint(QFont::Monospace);
+    const int systemPointSize = QFontDatabase::systemFont(QFontDatabase::GeneralFont).pointSize();
+    if (systemPointSize > 0) {
+        monoFont.setPointSize(systemPointSize);
+    }
+    chatLogEdit->setFont(monoFont);
 }
 
 void TabReport::retranslateUi()
