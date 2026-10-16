@@ -141,7 +141,8 @@ public:
         p->drawEllipse(QRectF(rect.left() + 9, rect.top() + (rect.height() - 8) / 2.0, 8, 8));
 
         // Game title (bold, elided)
-        QFont tf = option.font;
+        // Family comes from the InterfaceDefault theme role; bold stays caller-side.
+        QFont tf = themeManager->appFont(AppFont::InterfaceDefault);
         tf.setBold(true);
         p->setFont(tf);
         p->setPen(pal.color(QPalette::Text));
@@ -153,7 +154,7 @@ public:
 
         // Player count
         const bool full = game.player_count() >= game.max_players();
-        p->setFont(option.font);
+        p->setFont(themeManager->appFont(AppFont::InterfaceDefault));
         p->setPen(full ? QColor(249, 115, 22) : pal.color(QPalette::Disabled, QPalette::Text));
         p->drawText(QRect(rect.right() - countW - 4, rect.top(), countW, rect.height()),
                     Qt::AlignVCenter | Qt::AlignRight,
@@ -322,7 +323,8 @@ void UserInfoHeaderWidget::paintEvent(QPaintEvent *)
     const int tx = ax + AvatarSize + AvatarToTextGap;
     const int tw = rect.width() - tx - 8;
 
-    QFont nf = font();
+    // Family comes from the InterfaceDefault theme role; the *1.12 size and bold stay caller-side.
+    QFont nf = themeManager->appFont(AppFont::InterfaceDefault);
     nf.setBold(true);
     nf.setPointSizeF(nf.pointSizeF() * 1.12);
     p.setFont(nf);
@@ -351,7 +353,7 @@ void UserInfoHeaderWidget::paintEvent(QPaintEvent *)
     }
 
     if (!badge.text.isEmpty()) {
-        QFont bf = font();
+        QFont bf = themeManager->appFont(AppFont::InterfaceDefault);
         bf.setPointSizeF(bf.pointSizeF() * 0.70);
         bf.setBold(true);
         p.setFont(bf);
@@ -368,7 +370,8 @@ void UserInfoHeaderWidget::paintEvent(QPaintEvent *)
 
     // The painter font at this point depends on whether a badge was drawn
     // (badge font vs username font), so pin an explicit font for the pill.
-    p.setFont(font());
+    // Family follows the InterfaceDefault theme role like the rest of the popup chrome.
+    p.setFont(themeManager->appFont(AppFont::InterfaceDefault));
 
     // Only show the attribution when there is actually art on screen: on a
     // cache miss cardArt is null and the pill would float over the plain
@@ -397,6 +400,7 @@ UserInfoPopup::UserInfoPopup(TabSupervisor *_ts,
     // Restyle the popup chrome when the theme or its color scheme changes.
     if (themeManager) {
         connect(themeManager, &ThemeManager::themeChanged, this, &UserInfoPopup::applyTheme);
+        connect(themeManager, &ThemeManager::fontsChanged, this, &UserInfoPopup::applyTheme);
     }
 }
 
@@ -476,15 +480,24 @@ void UserInfoPopup::applyTheme()
 
     separator->setStyleSheet(QStringLiteral("color:%1; margin: 0 8px;").arg(colorStr(theme.border)));
 
-    gamesLabel->setStyleSheet(QStringLiteral("color:%1; font-size:11px; font-weight:bold; background:transparent;")
-                                  .arg(colorStr(theme.subText)));
+    gamesLabel->setStyleSheet(QStringLiteral("color:%1; background:transparent;").arg(colorStr(theme.subText)));
+    QFont gamesLabelFont = themeManager->appFont(AppFont::InterfaceDefault);
+    gamesLabelFont.setPointSize(11);
+    gamesLabelFont.setWeight(QFont::Bold);
+    gamesLabel->setFont(gamesLabelFont);
 
-    refreshBtn->setStyleSheet(QStringLiteral("QPushButton{color:%1;border:none;font-size:14px;background:transparent;}"
+    refreshBtn->setStyleSheet(QStringLiteral("QPushButton{color:%1;border:none;background:transparent;}"
                                              "QPushButton:hover{color:%2;}")
                                   .arg(colorStr(theme.subText), colorStr(theme.text)));
+    QFont refreshFont = themeManager->appFont(AppFont::InterfaceDefault);
+    refreshFont.setPointSize(14);
+    refreshBtn->setFont(refreshFont);
 
-    gamesStatus->setStyleSheet(QStringLiteral("color:%1; font-size:11px; padding:10px; background:transparent;")
-                                   .arg(colorStr(theme.statusText)));
+    gamesStatus->setStyleSheet(
+        QStringLiteral("color:%1; padding:10px; background:transparent;").arg(colorStr(theme.statusText)));
+    QFont statusFont = themeManager->appFont(AppFont::InterfaceDefault);
+    statusFont.setPointSize(11);
+    gamesStatus->setFont(statusFont);
 
     gamesView->setStyleSheet(QStringLiteral("QListView{background:%1;border:none;}"
                                             "QListView::item:selected{background:%2;}")
@@ -492,9 +505,12 @@ void UserInfoPopup::applyTheme()
 
     closeBtn->setStyleSheet(
         QStringLiteral("QPushButton{background:%1;color:%2;"
-                       "border:none;border-radius:11px;font-size:10px;}"
+                       "border:none;border-radius:11px;}"
                        "QPushButton:hover{color:%3;background:%4;}")
             .arg(colorStr(theme.closeBg), colorStr(theme.subText), colorStr(theme.text), colorStr(theme.closeHover)));
+    QFont closeFont = themeManager->appFont(AppFont::InterfaceDefault);
+    closeFont.setPointSize(10);
+    closeBtn->setFont(closeFont);
 
     header->update();
 }
@@ -509,13 +525,17 @@ static QPushButton *makeBtn(const QString &label, const QString &tip, QWidget *p
     b->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     b->setStyleSheet(QStringLiteral("QPushButton{"
                                     "  background:%1;color:%2;border:1px solid %3;"
-                                    "  border-radius:4px;font-size:11px;padding:0 4px;"
+                                    "  border-radius:4px;padding:0 4px;"
                                     "}"
                                     "QPushButton:hover{background:%4;color:%5;}"
                                     "QPushButton:pressed{background:%6;}"
                                     "QPushButton:disabled{color:%7;border-color:%3;}")
                          .arg(colorStr(t.buttonBg), colorStr(t.text), colorStr(t.buttonBorder), colorStr(t.buttonHover),
                               colorStr(t.text), colorStr(t.buttonPressed), colorStr(t.buttonDisabled)));
+    // Family comes from the InterfaceDefault theme role; the 11px size stays caller-side.
+    QFont btnFont = themeManager->appFont(AppFont::InterfaceDefault);
+    btnFont.setPointSize(11);
+    b->setFont(btnFont);
     return b;
 }
 

@@ -48,6 +48,7 @@ signals:
 private slots:
     void toggleBuddyVisibility() const;
     void updateDropdownIconState() const;
+    void applyInterfaceDefaultFont();
 };
 
 #endif // BANNER_WIDGET_H
