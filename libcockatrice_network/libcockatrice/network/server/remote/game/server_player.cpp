@@ -257,6 +257,19 @@ Server_Player::cmdDeckSelect(const Command_DeckSelect &cmd, ResponseContainer &r
         return Response::RespInternalError;
     }
 
+    // Card art rules apply to playmats as well: never broadcast a DENY-listed
+    // printing as a playmat. Stripping keeps the deck selectable while hiding
+    // the banned art from all clients.
+    const auto deckPlaymat = newDeck->getPlaymat();
+    if (!deckPlaymat.card.name.isEmpty()) {
+        auto *db = game->getRoom()->getServer()->getDatabaseInterface();
+        // Check the truncated values actually broadcast below; the rule columns are varchar(255).
+        if (db && !db->isCardArtAllowed(deckPlaymat.card.name.left(MAX_NAME_LENGTH),
+                                        deckPlaymat.card.providerId.left(MAX_NAME_LENGTH))) {
+            newDeck->setPlaymat({});
+        }
+    }
+
     delete deck;
     deck = newDeck;
     sideboardLocked = true;
@@ -630,6 +643,14 @@ Server_Player::cmdSetPlaymat(const Command_SetPlaymat &cmd, ResponseContainer &r
     const auto rawProviderId = QString::fromStdString(pp.card_provider_id());
     if (rawName.length() > MAX_NAME_LENGTH || rawProviderId.length() > MAX_NAME_LENGTH) {
         return Response::RespInvalidData;
+    }
+    // Card art rules apply to playmats as well: reject DENY-listed art, like
+    // cmdSetCardArtParams does. Empty clears the playmat and is always allowed.
+    if (!rawName.isEmpty()) {
+        auto *db = game->getRoom()->getServer()->getDatabaseInterface();
+        if (db && !db->isCardArtAllowed(rawName, rawProviderId)) {
+            return Response::RespFunctionNotAllowed;
+        }
     }
     PlaymatInfo playmat;
     playmat.card.name = rawName;

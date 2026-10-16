@@ -3481,26 +3481,6 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountImage(const Comm
     return Response::RespOk;
 }
 
-bool AbstractServerSocketInterface::isCardNameAllowed(const QString &cardName, const QString &cardProviderId)
-{
-    QSqlQuery *q = sqlInterface->prepareQuery(
-        "SELECT mode FROM {prefix}_card_art_name_rules WHERE card_name = :name AND card_provider_id = :provider");
-
-    q->bindValue(":name", cardName);
-    q->bindValue(":provider", cardProviderId);
-
-    if (!sqlInterface->execSqlQuery(q)) {
-        qWarning() << "Card art rule lookup failed; failing open for" << cardName;
-        return true;
-    }
-
-    if (!q->next()) {
-        return true; // default allow
-    }
-
-    return q->value(0).toString() != "DENY";
-}
-
 Response::ResponseCode AbstractServerSocketInterface::cmdSetCardArtParams(const Command_SetCardArtParams &cmd,
                                                                           ResponseContainer & /* rc */)
 {
@@ -3527,7 +3507,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdSetCardArtParams(const 
         return Response::RespOk;
     }
 
-    if (!isCardNameAllowed(cardName, cardProviderId)) {
+    if (!sqlInterface->isCardArtAllowed(cardName, cardProviderId)) {
         return Response::RespFunctionNotAllowed;
     }
 
