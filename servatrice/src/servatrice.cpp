@@ -1241,9 +1241,9 @@ QByteArray Servatrice::getLegacyBackupKey() const
 int Servatrice::getLegacyBackupTtlDays() const
 {
     bool ok = false;
-    const int days = settingsCache->value("security/legacy_backup_ttl_days", 90).toInt(&ok);
+    const int days = settingsCache->value("security/legacy_backup_ttl_days", 180).toInt(&ok);
     if (!ok || days < 1 || days > 3650) {
-        return 90;
+        return 180;
     }
     return days;
 }
