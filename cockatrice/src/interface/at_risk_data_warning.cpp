@@ -49,6 +49,27 @@ static QString resolveBackupRoot(const QString &appDir)
     return backupRoot;
 }
 
+QStringList AtRiskDataWarning::collectInstalledAtRiskPaths(const QString &appDir)
+{
+    QStringList offenders = SettingsCache::instance().paths().pathsInsideDir(appDir);
+
+    // Loose decks sitting directly in the program folder are wiped by the old uninstaller
+    // just like configured paths. Mirror the installer backup set (DeckLoader extensions
+    // minus *.txt) so a manual run of the old uninstall.exe is covered too.
+    const QDir appDirHandle(appDir);
+    const QStringList topLevelFiles = appDirHandle.entryList(QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot);
+    for (const QString &fileName : topLevelFiles) {
+        if (!isDeckFileSuffix(QFileInfo(fileName).suffix().toLower())) {
+            continue;
+        }
+        const QString looseDeck = QDir::cleanPath(appDirHandle.absoluteFilePath(fileName));
+        if (!isInsideAnyDir(looseDeck, offenders)) {
+            offenders.append(looseDeck);
+        }
+    }
+    return offenders;
+}
+
 AtRiskDataWarning::AtRiskBackupOutcome AtRiskDataWarning::backUpAtRiskPaths(const QStringList &sources,
                                                                             const QString &appDir)
 {
