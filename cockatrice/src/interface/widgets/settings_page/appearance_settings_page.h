@@ -71,8 +71,6 @@ private:
     QCheckBox autoRotateSidewaysLayoutCardsCheckBox;
     QCheckBox cardScalingCheckBox;
     QCheckBox roundCardCornersCheckBox;
-    QLabel maxFontSizeForCardsLabel;
-    QSpinBox maxFontSizeForCardsEdit;
 
     QLabel verticalCardOverlapPercentLabel;
     QSpinBox verticalCardOverlapPercentBox;
