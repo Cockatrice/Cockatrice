@@ -60,7 +60,6 @@
 #include <QVariant>
 #include <QtGlobal>
 #include <compare>
-#include <optional>
 #include <game/server_game.h>
 #include <google/protobuf/stubs/port.h>
 #include <libcockatrice/protocol/featureset.h>
@@ -69,6 +68,7 @@
 #include <libcockatrice/protocol/pb/event_server_shutdown.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_room_channel.pb.h>
 #include <new>
+#include <optional>
 #include <qlogging.h>
 #include <qnamespace.h>
 #include <server_room.h>
@@ -420,10 +420,10 @@ bool Servatrice::initServer()
                 }
                 seenChannelIds.insert(channelId);
                 const QString accessKey = query3->value(2).toString();
-                auto accessLevel = accessKey.trimmed().isEmpty()
-                                       ? std::optional<ServerInfo_RoomChannel::AccessLevel>(
-                                             ServerInfo_RoomChannel::Public)
-                                       : roomChannelAccessFromKey(accessKey);
+                auto accessLevel =
+                    accessKey.trimmed().isEmpty()
+                        ? std::optional<ServerInfo_RoomChannel::AccessLevel>(ServerInfo_RoomChannel::Public)
+                        : roomChannelAccessFromKey(accessKey);
                 if (!accessLevel.has_value()) {
                     qWarning() << "Skipping room channel with unknown access level" << accessKey << "for id"
                                << channelId;
@@ -485,10 +485,10 @@ bool Servatrice::initServer()
                 }
                 seenChannelIds.insert(channelId);
                 const QString accessKey = settingsCache->value("access").toString();
-                auto accessLevel = accessKey.trimmed().isEmpty()
-                                       ? std::optional<ServerInfo_RoomChannel::AccessLevel>(
-                                             ServerInfo_RoomChannel::Public)
-                                       : roomChannelAccessFromKey(accessKey);
+                auto accessLevel =
+                    accessKey.trimmed().isEmpty()
+                        ? std::optional<ServerInfo_RoomChannel::AccessLevel>(ServerInfo_RoomChannel::Public)
+                        : roomChannelAccessFromKey(accessKey);
                 if (!accessLevel.has_value()) {
                     qWarning() << "Skipping room channel with unknown access level" << accessKey << "for id"
                                << channelId;
