@@ -187,6 +187,39 @@ public:
     virtual void observeGameStartDurationMs(qint64 /* elapsedMs */)
     {
     }
+    /**
+     * @brief Record a failed login attempt for the (address, username) pair; returns true if now locked out.
+     *
+     * Keyed by pair so a successful login as one user cannot wipe out another
+     * user's failure history from the same address (e.g. a guest login or the
+     * attacker's own account clearing the way for further guessing).
+     */
+    virtual bool recordFailedLogin(const QString & /*ipAddress*/, const QString & /*userName*/)
+    {
+        return false;
+    }
+    /**
+     * @brief True if the (address, username) pair is already locked out of logging in.
+     *
+     * Consulted before any authentication work (database round trip, password
+     * verification) so a blocked pair cannot burn server CPU per attempt.
+     */
+    virtual bool isLoginRateLimited(const QString & /*ipAddress*/, const QString & /*userName*/)
+    {
+        return false;
+    }
+    /**
+     * @brief Seconds remaining before the login rate limit for the (address, username) pair lifts.
+     * Returns 0 if not limited.
+     */
+    virtual int loginRateLimitRemainingSeconds(const QString & /*ipAddress*/, const QString & /*userName*/)
+    {
+        return 0;
+    }
+    /** @brief Clear any failed-login lockout for the (address, username) pair, e.g. after a successful login. */
+    virtual void clearFailedLogins(const QString & /*ipAddress*/, const QString & /*userName*/)
+    {
+    }
 
     Server_DatabaseInterface *getDatabaseInterface() const;
     int getNextLocalGameId()

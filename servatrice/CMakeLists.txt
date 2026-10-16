@@ -9,6 +9,7 @@ set(servatrice_SOURCES
     src/event_loop_watchdog.cpp
     src/main.cpp
     src/metrics_registry.cpp
+    src/ratelimiter.cpp
     src/servatrice.cpp
     src/servatrice_connection_pool.cpp
     src/servatrice_database_interface.cpp

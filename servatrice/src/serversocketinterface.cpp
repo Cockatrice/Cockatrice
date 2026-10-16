@@ -3263,6 +3263,15 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
                                          false);
         }
 
+        Response_Register *re = new Response_Register;
+        re->set_denied_reason_str("Too many registration attempts");
+        int remaining = servatrice->getRateLimiter()->retryAfterSeconds("register:" + this->getAddress(),
+                                                                        servatrice->getMaxRegistrationsPerIp(),
+                                                                        servatrice->getRegistrationWindowSeconds());
+        if (remaining > 0) {
+            re->set_denied_end_time(QDateTime::currentDateTime().addSecs(remaining).toSecsSinceEpoch());
+        }
+        rc.setResponseExtension(re);
         return Response::RespTooManyRequests;
     }
 
@@ -3330,9 +3339,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
 bool AbstractServerSocketInterface::tooManyRegistrationAttempts(const QString &ipAddress)
 {
-    //! \todo Implement registration attempt limiting.
-    Q_UNUSED(ipAddress);
-    return false;
+    return servatrice->recordRegistrationAttempt(ipAddress);
 }
 
 Response::ResponseCode AbstractServerSocketInterface::cmdActivateAccount(const Command_Activate &cmd,
@@ -3687,6 +3694,15 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordRequest(c
 
     qCDebug(AbstractServerSocketInterfaceLog) << "Received reset password request from user:" << userName;
 
+    if (servatrice->recordForgotPasswordAttempt(this->getAddress())) {
+        if (servatrice->getEnableForgotPasswordAudit()) {
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "PASSWORD_RESET_REQUEST", "Too many requests from this ip address", false);
+        }
+
+        return Response::RespTooManyRequests;
+    }
+
     if (!servatrice->getEnableForgotPassword()) {
         if (servatrice->getEnableForgotPasswordAudit()) {
             sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
@@ -3828,6 +3844,14 @@ AbstractServerSocketInterface::cmdForgotPasswordChallenge(const Command_ForgotPa
     const QString clientId = nameFromStdString(cmd.clientid());
 
     qCDebug(AbstractServerSocketInterfaceLog) << "Received reset password challenge from user:" << userName;
+
+    if (servatrice->recordForgotPasswordAttempt(this->getAddress())) {
+        if (servatrice->getEnableForgotPasswordAudit()) {
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "PASSWORD_RESET_CHALLENGE", "Too many requests from this ip address", false);
+        }
+        return Response::RespTooManyRequests;
+    }
 
     if (!servatrice->getEnableForgotPasswordChallenge()) {
         if (servatrice->getEnableForgotPasswordAudit()) {

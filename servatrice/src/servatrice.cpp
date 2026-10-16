@@ -51,6 +51,7 @@
 #include <QSsl>
 #include <QString>
 #include <QStringList>
+#include <QStringLiteral>
 #include <QThread>
 #include <QTimer>
 #include <QTypeInfo>
@@ -1284,6 +1285,105 @@ bool Servatrice::getEnableForgotPassword() const
 int Servatrice::getForgotPasswordTokenLife() const
 {
     return settingsCache->value("forgotpassword/tokenlife", 60).toInt();
+}
+
+/**
+ * @brief Rate limiter key for one login target.
+ *
+ * Keyed by (address, username) so a success only clears that pair's history:
+ * a guest login or a login as the attacker's own account from the same
+ * address must not wipe out another user's failure count. Lowercased so
+ * case variations of the same name share one bucket.
+ */
+static QString loginLimitKey(const QString &ipAddress, const QString &userName)
+{
+    return QStringLiteral("login:") + ipAddress + QStringLiteral(":") + userName.toLower();
+}
+
+bool Servatrice::recordFailedLogin(const QString &ipAddress, const QString &userName)
+{
+    if (isRateLimitExempt(ipAddress)) {
+        return false;
+    }
+    return rateLimiter.recordAttempt(loginLimitKey(ipAddress, userName), getMaxLoginAttemptsPerIp(),
+                                     getLoginAttemptWindowSeconds());
+}
+
+bool Servatrice::isLoginRateLimited(const QString &ipAddress, const QString &userName)
+{
+    if (isRateLimitExempt(ipAddress)) {
+        return false;
+    }
+    return rateLimiter.isBlocked(loginLimitKey(ipAddress, userName), getMaxLoginAttemptsPerIp(),
+                                 getLoginAttemptWindowSeconds());
+}
+
+int Servatrice::loginRateLimitRemainingSeconds(const QString &ipAddress, const QString &userName)
+{
+    return rateLimiter.retryAfterSeconds(loginLimitKey(ipAddress, userName), getMaxLoginAttemptsPerIp(),
+                                         getLoginAttemptWindowSeconds());
+}
+
+bool Servatrice::recordRegistrationAttempt(const QString &ipAddress)
+{
+    if (isRateLimitExempt(ipAddress)) {
+        return false;
+    }
+    return rateLimiter.recordAttempt("register:" + ipAddress, getMaxRegistrationsPerIp(),
+                                     getRegistrationWindowSeconds());
+}
+
+bool Servatrice::recordForgotPasswordAttempt(const QString &ipAddress)
+{
+    if (isRateLimitExempt(ipAddress)) {
+        return false;
+    }
+    return rateLimiter.recordAttempt("forgot:" + ipAddress, getMaxForgotPasswordRequestsPerIp(),
+                                     getForgotPasswordWindowSeconds());
+}
+
+bool Servatrice::isRateLimitExempt(const QString &ipAddress) const
+{
+    // Mirrors the max_users_per_address bypass in initSession: trusted sources
+    // (e.g. 127.0.0.1 for Webatrice behind local nginx, where every websocket
+    // client shares one address) are not subject to per-address limits.
+    const QString trustedSources = settingsCache->value("security/trusted_sources", "127.0.0.1,::1").toString();
+    return trustedSources.contains(ipAddress, Qt::CaseInsensitive);
+}
+
+void Servatrice::clearFailedLogins(const QString &ipAddress, const QString &userName)
+{
+    rateLimiter.clearAttempts(loginLimitKey(ipAddress, userName));
+}
+
+int Servatrice::getMaxLoginAttemptsPerIp() const
+{
+    return settingsCache->value("security/max_login_attempts_per_ip", 5).toInt();
+}
+
+int Servatrice::getLoginAttemptWindowSeconds() const
+{
+    return settingsCache->value("security/login_attempt_window_seconds", 900).toInt();
+}
+
+int Servatrice::getMaxRegistrationsPerIp() const
+{
+    return settingsCache->value("security/max_registrations_per_ip", 2).toInt();
+}
+
+int Servatrice::getRegistrationWindowSeconds() const
+{
+    return settingsCache->value("security/registration_window_seconds", 3600).toInt();
+}
+
+int Servatrice::getMaxForgotPasswordRequestsPerIp() const
+{
+    return settingsCache->value("security/max_forgot_password_requests_per_ip", 3).toInt();
+}
+
+int Servatrice::getForgotPasswordWindowSeconds() const
+{
+    return settingsCache->value("security/forgot_password_window_seconds", 3600).toInt();
 }
 
 bool Servatrice::getEnableForgotPasswordChallenge() const

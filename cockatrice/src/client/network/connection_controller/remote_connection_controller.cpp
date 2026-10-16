@@ -239,6 +239,17 @@ void ConnectionController::onLoginError(int r,
             break;
         }
 
+        case Response::RespTooManyRequests: {
+            QString bannedStr = endTime ? tr("Too many login attempts. Try again after %1.")
+                                              .arg(QDateTime::fromSecsSinceEpoch(endTime).toString())
+                                        : tr("Too many login attempts. Please try again later.");
+            if (!reasonStr.isEmpty()) {
+                bannedStr.append("\n\n" + reasonStr);
+            }
+            QMessageBox::critical(dialogParent, tr("Error"), bannedStr);
+            break;
+        }
+
         case Response::RespWrongPassword: {
             QMessageBox::critical(dialogParent, tr("Error"),
                                   tr("Incorrect username or password. "
@@ -365,12 +376,15 @@ void ConnectionController::onRegisterError(int r, QString reasonStr, quint32 end
             break;
         }
         case Response::RespTooManyRequests: {
-            QMessageBox::critical(dialogParent, tr("Registration denied"),
-                                  tr("It appears you are attempting to register a new account on this server yet you "
-                                     "already have an account registered with the email provided. This server "
-                                     "restricts the number of accounts a user can register per address. Please "
-                                     "contact the server operator for further assistance or to obtain your "
-                                     "credential information."));
+            QString deniedStr =
+                endTime ? tr("Too many registration attempts. Try again after %1.")
+                              .arg(QDateTime::fromSecsSinceEpoch(endTime).toString())
+                        : tr("It appears you are attempting to register a new account on this server yet you "
+                             "already have an account registered with the email provided. This server "
+                             "restricts the number of accounts a user can register per address. Please "
+                             "contact the server operator for further assistance or to obtain your "
+                             "credential information.");
+            QMessageBox::critical(dialogParent, tr("Registration denied"), deniedStr);
             break;
         }
         case Response::RespPasswordTooShort: {
