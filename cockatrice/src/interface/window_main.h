@@ -165,13 +165,13 @@ private:
         QStringList sourcesToBackUp;     ///< existing paths that need a safety copy
         QStringList offendersForDisplay; ///< paths listed in the warning (empty for portable)
     };
-    AtRiskPaths collectPortableAtRiskPaths(const QString &appDir) const;
-    QStringList collectInstalledAtRiskPaths(const QString &appDir) const;
-    AtRiskBackupOutcome backUpAtRiskPaths(const QStringList &sources, const QString &appDir) const;
-    QString buildPortableAtRiskMessage(const AtRiskBackupOutcome &outcome, bool emptySources) const;
-    QString buildInstalledAtRiskMessage(const QStringList &offenders,
-                                        const QStringList &sources,
-                                        const AtRiskBackupOutcome &outcome) const;
+    static AtRiskPaths collectPortableAtRiskPaths(const QString &appDir);
+    static QStringList collectInstalledAtRiskPaths(const QString &appDir);
+    static AtRiskBackupOutcome backUpAtRiskPaths(const QStringList &sources, const QString &appDir);
+    static QString buildPortableAtRiskMessage(const AtRiskBackupOutcome &outcome, bool emptySources);
+    static QString buildInstalledAtRiskMessage(const QStringList &offenders,
+                                               const QStringList &sources,
+                                               const AtRiskBackupOutcome &outcome);
     void showAtRiskDataWarning(const QString &title, const QString &message);
 
     inline QString getCardUpdaterBinaryName()

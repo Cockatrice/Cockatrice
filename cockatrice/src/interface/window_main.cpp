@@ -687,7 +687,7 @@ static bool isPortableBackupExcluded(const QString &offender)
     return false;
 }
 
-MainWindow::AtRiskPaths MainWindow::collectPortableAtRiskPaths(const QString &appDir) const
+MainWindow::AtRiskPaths MainWindow::collectPortableAtRiskPaths(const QString &appDir)
 {
     auto &paths = SettingsCache::instance().paths();
     AtRiskPaths atRisk;
@@ -757,7 +757,7 @@ MainWindow::AtRiskPaths MainWindow::collectPortableAtRiskPaths(const QString &ap
     return atRisk;
 }
 
-QStringList MainWindow::collectInstalledAtRiskPaths(const QString &appDir) const
+QStringList MainWindow::collectInstalledAtRiskPaths(const QString &appDir)
 {
     QStringList offenders = SettingsCache::instance().paths().pathsInsideDir(appDir);
 
@@ -778,7 +778,7 @@ QStringList MainWindow::collectInstalledAtRiskPaths(const QString &appDir) const
     return offenders;
 }
 
-MainWindow::AtRiskBackupOutcome MainWindow::backUpAtRiskPaths(const QStringList &sources, const QString &appDir) const
+MainWindow::AtRiskBackupOutcome MainWindow::backUpAtRiskPaths(const QStringList &sources, const QString &appDir)
 {
     AtRiskBackupOutcome outcome;
     const QString backupRoot = resolveBackupRoot(appDir);
@@ -837,7 +837,7 @@ MainWindow::AtRiskBackupOutcome MainWindow::backUpAtRiskPaths(const QStringList 
     return outcome;
 }
 
-QString MainWindow::buildPortableAtRiskMessage(const AtRiskBackupOutcome &outcome, bool emptySources) const
+QString MainWindow::buildPortableAtRiskMessage(const AtRiskBackupOutcome &outcome, bool emptySources)
 {
     const QString backupVerb = outcome.reused ? tr("is already available") : tr("has been created");
     const QString sizeInfo = tr("%1 MB (automatic backups are capped at %2 MB)")
@@ -883,7 +883,7 @@ QString MainWindow::buildPortableAtRiskMessage(const AtRiskBackupOutcome &outcom
 
 QString MainWindow::buildInstalledAtRiskMessage(const QStringList &offenders,
                                                 const QStringList &sources,
-                                                const AtRiskBackupOutcome &outcome) const
+                                                const AtRiskBackupOutcome &outcome)
 {
     const QString backupVerb = outcome.reused ? tr("is already available") : tr("has been created");
     const QString sizeInfo = tr("%1 MB (automatic backups are capped at %2 MB)")
