@@ -99,6 +99,17 @@ QUERY(SetCodeWrongSet2, doctor, "set:cat", false)
 
 QUERY(BracketNextToUnquotedString, cat, "(o:woof OR o:meow)", true)
 
+// Spaces around the colon are optional for all field queries (e.g. "o: flying")
+QUERY(OracleSpaceAfterColon, cat, "o: meow", true)
+QUERY(OracleSpaceBeforeColon, cat, "o :meow", true)
+QUERY(OracleSpacesAroundColon, cat, "o : meow", true)
+QUERY(OracleSpaceAfterColonNoMatch, cat, "o: woof", false)
+QUERY(TypeSpaceAfterColon, cat, "t: creature", true)
+QUERY(FieldSpaceAfterColon, cat, "pt: \"3/3\"", true)
+QUERY(ColorSpaceAfterColon, cat, "c: g", true)
+QUERY(ColorSpaceBeforeOperator, cat, "c !g", true)
+QUERY(SetSpaceAfterColon, cat, "set: cat", true)
+
 CardInfoPtr localizedCat()
 {
     CardInfoPtr localized = CardInfo::newInstance("Cat", "Meow!", false, {}, {}, {}, {}, {});
@@ -134,6 +145,13 @@ TEST_F(CardQuery, SearchLanguageBothMatchesEitherLanguage)
     const CardData localized = localizedCat();
     ASSERT_TRUE(FilterString("Cat", CardSearchLanguage{"de", SearchLanguageMode::Both}).check(localized));
     ASSERT_TRUE(FilterString("Kater", CardSearchLanguage{"de", SearchLanguageMode::Both}).check(localized));
+}
+
+TEST_F(CardQuery, SearchLanguageBothMatchesOracleTextWithSpaceAfterColon)
+{
+    const CardData localized = localizedCat();
+    ASSERT_TRUE(FilterString("o: Meow", CardSearchLanguage{"de", SearchLanguageMode::Both}).check(localized));
+    ASSERT_TRUE(FilterString("o: miaut", CardSearchLanguage{"de", SearchLanguageMode::Both}).check(localized));
 }
 
 TEST_F(CardQuery, SearchLanguageIsBoundPerInstance)
