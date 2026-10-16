@@ -78,6 +78,8 @@ private slots:
     void addRule();
     void removeSelected();
     void refresh();
+    void clearBlacklistedBanners();
+    void clearBlacklistedBannersResponse(const Response &r);
 
 private:
     AbstractClient *client;
@@ -97,6 +99,7 @@ private:
     QPushButton *addBtn;
     QPushButton *removeBtn;
     QPushButton *refreshBtn;
+    QPushButton *clearBannedBtn;
 
     QTableView *table;
     CardArtRulesModel *tableModel;

@@ -30,6 +30,7 @@
 #include <libcockatrice/protocol/pb/moderator_commands.pb.h>
 #include <libcockatrice/protocol/pb/response_moderator_last_logins.pb.h>
 #include <libcockatrice/protocol/pb/response_remove_user_avatar.pb.h>
+#include <libcockatrice/protocol/pb/response_remove_user_banner.pb.h>
 #include <libcockatrice/protocol/pb/response_report_user_info.pb.h>
 #include <libcockatrice/protocol/pb/response_reset_user_password.pb.h>
 #include <libcockatrice/protocol/pb/response_user_alts.pb.h>
@@ -85,12 +86,16 @@ TabModeration::TabModeration(TabSupervisor *_tabSupervisor, AbstractClient *_cli
     removeAvatarButton = new QPushButton;
     connect(removeAvatarButton, &QPushButton::clicked, this, &TabModeration::removeAvatar);
 
+    removeBannerButton = new QPushButton;
+    connect(removeBannerButton, &QPushButton::clicked, this, &TabModeration::removeBanner);
+
     auto *topBar = new QHBoxLayout;
     topBar->addWidget(searchEdit);
     topBar->addWidget(investigateButton);
     topBar->addStretch();
     topBar->addWidget(resetPasswordButton);
     topBar->addWidget(removeAvatarButton);
+    topBar->addWidget(removeBannerButton);
 
     userInfoGroup = new QGroupBox;
     userInfoNameLabel = new QLabel;
@@ -186,6 +191,7 @@ void TabModeration::retranslateUi()
     investigateButton->setText(tr("Investigate"));
     resetPasswordButton->setText(tr("Reset Password"));
     removeAvatarButton->setText(tr("Remove Avatar"));
+    removeBannerButton->setText(tr("Remove Banner"));
     refreshStaffButton->setText(tr("Refresh"));
 
     userInfoGroup->setTitle(tr("User Info"));
@@ -227,6 +233,7 @@ void TabModeration::clearUserData()
     sessionsTable->setRowCount(0);
     resetPasswordButton->setEnabled(false);
     removeAvatarButton->setEnabled(false);
+    removeBannerButton->setEnabled(false);
 }
 
 void TabModeration::investigate(const QString &userName)
@@ -247,6 +254,7 @@ void TabModeration::investigateUser()
     currentUser = userName;
     resetPasswordButton->setEnabled(true);
     removeAvatarButton->setEnabled(true);
+    removeBannerButton->setEnabled(true);
     altsTable->setRowCount(0);
     sessionsTable->setRowCount(0);
     requestUserInfo(userName);
@@ -476,4 +484,38 @@ void TabModeration::removeAvatarResponse(const Response &response)
     const Response_RemoveUserAvatar &resp = response.GetExtension(Response_RemoveUserAvatar::ext);
     QMessageBox::information(this, tr("Avatar removed"),
                              tr("The avatar of %1 has been removed.").arg(QString::fromStdString(resp.user_name())));
+}
+
+void TabModeration::removeBanner()
+{
+    if (currentUser.isEmpty()) {
+        return;
+    }
+
+    QMessageBox::StandardButton choice = QMessageBox::warning(
+        this, tr("Remove Banner"),
+        tr("Remove the banner card of %1? The user will have to choose a new one.").arg(currentUser),
+        QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel);
+    if (choice != QMessageBox::Ok) {
+        return;
+    }
+
+    Command_RemoveUserBanner cmd;
+    cmd.set_user_name(currentUser.toStdString());
+    PendingCommand *pend = client->prepareModeratorCommand(cmd);
+    connect(pend, &PendingCommand::finished, this, &TabModeration::removeBannerResponse);
+    client->sendCommand(pend);
+}
+
+void TabModeration::removeBannerResponse(const Response &response)
+{
+    if (response.response_code() != Response::RespOk) {
+        QMessageBox::critical(this, tr("Error"), tr("Could not remove the banner card."));
+        return;
+    }
+
+    const Response_RemoveUserBanner &resp = response.GetExtension(Response_RemoveUserBanner::ext);
+    QMessageBox::information(
+        this, tr("Banner removed"),
+        tr("The banner card of %1 has been removed.").arg(QString::fromStdString(resp.user_name())));
 }

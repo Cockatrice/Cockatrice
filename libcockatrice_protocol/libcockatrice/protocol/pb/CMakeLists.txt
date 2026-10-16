@@ -174,6 +174,8 @@ set(PROTO_FILES
     response_report_user_info.proto
     response_moderator_last_logins.proto
     response_remove_user_avatar.proto
+    response_remove_user_banner.proto
+    response_clear_blacklisted_banners.proto
     response_reset_user_password.proto
     response_user_alts.proto
     response_user_sessions.proto
