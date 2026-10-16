@@ -371,7 +371,7 @@ void TabRoom::sendMessage()
             } else if (response.response_code() == Response::RespFunctionNotAllowed ||
                        response.response_code() == Response::RespInvalidCommand) {
                 targetView->appendMessage(tr("Your message could not be sent: the channel is not available or you "
-                                            "are not allowed to talk there."));
+                                             "are not allowed to talk there."));
             }
         };
 
@@ -527,9 +527,7 @@ bool TabRoom::messageContainsMention(const QString &message, const ServerInfo_Us
     return false;
 }
 
-void TabRoom::markChannelMessage(const QString &channelId,
-                                 const QString &message,
-                                 const ServerInfo_User &senderInfo)
+void TabRoom::markChannelMessage(const QString &channelId, const QString &message, const ServerInfo_User &senderInfo)
 {
     bool roomVisible = (tabSupervisor->currentWidget() == this);
     bool viewing = (channelId == activeChannelId) && !chatCollapsed && roomVisible;
