@@ -1,6 +1,7 @@
 #include "counter_general.h"
 
 #include "../../interface/pixel_map_generator.h"
+#include "../../interface/theme_manager.h"
 #include "abstract_graphics_item.h"
 
 #include <QFont>
@@ -41,7 +42,7 @@ void GeneralCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /
     painter->drawPixmap(QPoint(0, 0), pixmap);
 
     if (value) {
-        QFont f("Serif");
+        QFont f = themeManager->appFont(AppFont::CardText);
         f.setPixelSize(qMax((int)(radius * scaleFactor), 10));
         f.setWeight(QFont::Bold);
         painter->setPen(Qt::black);
