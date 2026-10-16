@@ -50,6 +50,7 @@ class TabAdmin;
 class TabMessage;
 class TabReport;
 class TabModeration;
+class TabAlts;
 class TabAccount;
 class TabDeckEditor;
 class TabDeveloper;
@@ -116,6 +117,7 @@ private:
     TabLog *tabLog;
     TabReport *tabReport;
     TabModeration *tabModeration;
+    TabAlts *tabAlts;
     TabDeveloper *tabDeveloper;
     QMap<int, TabRoom *> roomTabs;
     QMap<int, TabGame *> gameTabs;
@@ -209,6 +211,7 @@ public slots:
     /** Joins or spectates a game listed on a user's profile hover card. */
     void joinGameFromUserCard(int gameId, int roomId, bool asSpectator);
     void openTabModeration(const QString &userName = {});
+    void openTabAlts(const QString &userName = {});
     void switchToFirstAvailableNetworkTab();
     void maximizeMainWindow();
     void actTabVisualDeckStorage(bool checked);
