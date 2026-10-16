@@ -368,6 +368,15 @@ void DeckViewCardContainer::setWidth(qreal _width)
 
 DeckViewScene::DeckViewScene(QObject *parent) : QGraphicsScene(parent), locked(true), deck(0), optimalAspectRatio(1.0)
 {
+    // Zone headers read the DeckList role at paint time and cache their
+    // rendering, so touch every item to invalidate the caches and pick up the
+    // new family on font changes (containers cannot connect this themselves:
+    // QGraphicsItem is not a QObject).
+    connect(themeManager, &ThemeManager::fontsChanged, this, [this] {
+        for (auto *item : items()) {
+            item->update();
+        }
+    });
 }
 
 DeckViewScene::~DeckViewScene()
@@ -579,6 +588,9 @@ DeckView::DeckView(QWidget *parent) : QGraphicsView(parent)
     connect(deckViewScene, &DeckViewScene::sceneRectChanged, this, &DeckView::updateSceneRect);
     connect(deckViewScene, &DeckViewScene::newCardAdded, this, &DeckView::newCardAdded);
     connect(deckViewScene, &DeckViewScene::sideboardPlanChanged, this, &DeckView::sideboardPlanChanged);
+    // The scene already touches its items on fontsChanged; repaint the
+    // viewport here so the new DeckList family shows without interaction.
+    connect(themeManager, &ThemeManager::fontsChanged, this, [this] { viewport()->update(); });
 }
 
 void DeckView::resizeEvent(QResizeEvent *event)

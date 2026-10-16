@@ -10,6 +10,16 @@
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <qnamespace.h>
 
+DeckListStyleProxy::DeckListStyleProxy(QObject *parent) : QIdentityProxyModel(parent)
+{
+    // FontRole data reads the DeckList role live; rebroadcast so attached
+    // views re-query instead of waiting for an incidental repaint.
+    connect(themeManager, &ThemeManager::fontsChanged, this, [this] {
+        emit layoutAboutToBeChanged();
+        emit layoutChanged();
+    });
+}
+
 QVariant DeckListStyleProxy::data(const QModelIndex &index, int role) const
 {
     QModelIndex src = mapToSource(index);

@@ -20,6 +20,12 @@ FilterTreeModel::FilterTreeModel(QObject *parent) : QAbstractItemModel(parent)
     connect(fTree, &FilterTree::postInsertRow, this, &FilterTreeModel::proxyEndInsertRow);
     connect(fTree, &FilterTree::preRemoveRow, this, &FilterTreeModel::proxyBeginRemoveRow);
     connect(fTree, &FilterTree::postRemoveRow, this, &FilterTreeModel::proxyEndRemoveRow);
+    // FontRole data reads the DeckList role live; rebroadcast so attached
+    // views re-query instead of waiting for an incidental repaint.
+    connect(themeManager, &ThemeManager::fontsChanged, this, [this] {
+        emit layoutAboutToBeChanged();
+        emit layoutChanged();
+    });
 }
 
 FilterTreeModel::~FilterTreeModel()

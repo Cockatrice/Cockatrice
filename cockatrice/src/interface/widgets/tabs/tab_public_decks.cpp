@@ -53,6 +53,9 @@ TabPublicDecks::TabPublicDecks(TabSupervisor *_tabSupervisor, AbstractClient *_c
         QFont refreshedFont = themeManager->appFont(AppFont::InterfaceDefault);
         refreshedFont.setBold(true);
         titleLabel->setFont(refreshedFont);
+        // Preview cells paint with the live role font; repaint the grid so the
+        // new family shows without waiting for a scroll or hover.
+        flowWidget->update();
     });
 
     auto *headerLayout = new QHBoxLayout;
