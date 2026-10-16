@@ -45,6 +45,7 @@
 #include <QObject>
 #include <QProcessEnvironment>
 #include <QReadLocker>
+#include <QSet>
 #include <QSharedPointer>
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -65,6 +66,7 @@
 #include <libcockatrice/protocol/pb/event_connection_closed.pb.h>
 #include <libcockatrice/protocol/pb/event_server_message.pb.h>
 #include <libcockatrice/protocol/pb/event_server_shutdown.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_room_channel.pb.h>
 #include <new>
 #include <qlogging.h>
 #include <qnamespace.h>
@@ -249,6 +251,34 @@ Servatrice::~Servatrice()
     prepareDestroy();
 }
 
+/**
+ * @brief Maps a configured channel access level (database column or ini value)
+ *        onto the ServerInfo_RoomChannel privilege ladder.
+ *
+ * Unknown keywords fall back to Public so a typo never hides a channel that was
+ * meant to be broadly readable.
+ */
+static ServerInfo_RoomChannel::AccessLevel roomChannelAccessFromKey(const QString &key)
+{
+    const QString level = key.trimmed().toLower();
+    if (level == "developer") {
+        return ServerInfo_RoomChannel::Developer;
+    }
+    if (level == "admin") {
+        return ServerInfo_RoomChannel::Admin;
+    }
+    if (level == "moderator") {
+        return ServerInfo_RoomChannel::Moderator;
+    }
+    if (level == "judge") {
+        return ServerInfo_RoomChannel::Judge;
+    }
+    if (level == "registered") {
+        return ServerInfo_RoomChannel::Registered;
+    }
+    return ServerInfo_RoomChannel::Public;
+}
+
 bool Servatrice::initServer()
 {
 
@@ -360,10 +390,41 @@ bool Servatrice::initServer()
             while (query2->next()) {
                 gameTypes.append(query2->value(0).toString());
             }
+
+            QSqlQuery *query3 = servatriceDatabaseInterface->prepareQuery(
+                "select channel_id, display_name, access_level from {prefix}_rooms_channels where id_room = :id_room "
+                "AND id_server = :id_server order by channel_id asc");
+            query3->bindValue(":id_server", serverId);
+            query3->bindValue(":id_room", query->value(0).toInt());
+            servatriceDatabaseInterface->execSqlQuery(query3);
+            QList<ServerInfo_RoomChannel> channels;
+            QSet<QString> seenChannelIds;
+            while (query3->next()) {
+                const QString channelId = query3->value(0).toString();
+                if (channelId.isEmpty()) {
+                    qWarning() << "Skipping room channel with empty id";
+                    continue;
+                }
+                if (Server_Room::isMainChannel(channelId)) {
+                    qWarning() << "Skipping room channel with reserved id" << channelId;
+                    continue;
+                }
+                if (seenChannelIds.contains(channelId)) {
+                    qWarning() << "Skipping duplicate room channel id" << channelId;
+                    continue;
+                }
+                seenChannelIds.insert(channelId);
+                ServerInfo_RoomChannel channel;
+                channel.set_id(channelId.toStdString());
+                channel.set_display_name(query3->value(1).toString().toStdString());
+                channel.set_access_level(roomChannelAccessFromKey(query3->value(2).toString()));
+                channels.append(channel);
+            }
+
             addRoom(new Server_Room(query->value(0).toInt(), query->value(7).toInt(), query->value(1).toString(),
                                     query->value(2).toString(), query->value(3).toString().toLower(),
                                     query->value(4).toString().toLower(), static_cast<bool>(query->value(5).toInt()),
-                                    query->value(6).toString(), gameTypes, this));
+                                    query->value(6).toString(), gameTypes, this, channels));
         }
     } else {
         int size = settingsCache->beginReadArray("rooms/roomlist");
@@ -376,12 +437,38 @@ bool Servatrice::initServer()
                 gameTypes.append(settingsCache->value("name").toString());
             }
             settingsCache->endArray();
+            QList<ServerInfo_RoomChannel> channels;
+            QSet<QString> seenChannelIds;
+            int size3 = settingsCache->beginReadArray("channels");
+            for (int k = 0; k < size3; ++k) {
+                settingsCache->setArrayIndex(k);
+                const QString channelId = settingsCache->value("id").toString();
+                if (channelId.isEmpty()) {
+                    qWarning() << "Skipping room channel with empty id";
+                    continue;
+                }
+                if (Server_Room::isMainChannel(channelId)) {
+                    qWarning() << "Skipping room channel with reserved id" << channelId;
+                    continue;
+                }
+                if (seenChannelIds.contains(channelId)) {
+                    qWarning() << "Skipping duplicate room channel id" << channelId;
+                    continue;
+                }
+                seenChannelIds.insert(channelId);
+                ServerInfo_RoomChannel channel;
+                channel.set_id(channelId.toStdString());
+                channel.set_display_name(settingsCache->value("displayname").toString().toStdString());
+                channel.set_access_level(roomChannelAccessFromKey(settingsCache->value("access").toString()));
+                channels.append(channel);
+            }
+            settingsCache->endArray();
             Server_Room *newRoom = new Server_Room(
                 i, settingsCache->value("chathistorysize").toInt(), settingsCache->value("name").toString(),
                 settingsCache->value("description").toString(),
                 settingsCache->value("permissionlevel").toString().toLower(),
                 settingsCache->value("privilegelevel").toString().toLower(), settingsCache->value("autojoin").toBool(),
-                settingsCache->value("joinmessage").toString(), gameTypes, this);
+                settingsCache->value("joinmessage").toString(), gameTypes, this, channels);
             addRoom(newRoom);
         }
 
