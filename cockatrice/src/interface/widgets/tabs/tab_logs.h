@@ -49,7 +49,23 @@ private:
     QVBoxLayout *mainLayout;
     QTableWidget *roomTable, *gameTable, *chatTable;
 
+    int currentOffset = 0;
+    int pageSize = 200;
+    int roomCounter = 0, gameCounter = 0, chatCounter = 0;
+    bool isFetching = false;
+    bool hasMoreResults = false;
+
     void createDock();
+    void fetchPage(int offset);
+    void appendChatMessage(QTableWidget *table,
+                           int &counter,
+                           const QString &time,
+                           const QString &senderName,
+                           const QString &senderIp,
+                           const QString &messageText,
+                           const QString &targetId,
+                           const QString &targetName);
+    void checkFetchMore();
 signals:
 
 private slots:
