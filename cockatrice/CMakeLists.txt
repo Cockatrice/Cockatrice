@@ -141,6 +141,8 @@ set(cockatrice_SOURCES
     src/game_graphics/zones/view_zone.cpp
     src/game_graphics/zones/view_zone_widget.cpp
     src/game_graphics/board/abstract_graphics_item.cpp
+    src/interface/at_risk_data_warning.cpp
+    src/interface/at_risk_data_warning.h
     src/interface/card_database_update/card_database_update_status_bar.cpp
     src/interface/card_database_update/card_database_update_status_bar.h
     src/interface/card_database_update/card_update_progress.cpp

@@ -149,9 +149,6 @@ private:
 
     void runFirstRunWizard(bool firstRun = false);
 
-    /** @brief Warns once when a non-portable install keeps its data paths inside the program directory. */
-    void warnAboutDataPathsInProgramDir();
-
     inline QString getCardUpdaterBinaryName()
     {
         return "oracle";

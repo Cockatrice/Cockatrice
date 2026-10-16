@@ -37,6 +37,7 @@
 #include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../main.h"
 #include "abstract_client.h"
+#include "at_risk_data_warning.h"
 #include "card_database_update/card_database_update_status_bar.h"
 #include "card_database_update/card_update_progress.h"
 #include "intents/contexts/context_connect_to_server.h"
@@ -58,13 +59,12 @@
 #include <QAction>
 #include <QApplication>
 #include <QButtonGroup>
-#include <QCheckBox>
 #include <QCloseEvent>
-#include <QCoreApplication>
 #include <QDateTime>
 #include <QDebug>
 #include <QDesktopServices>
 #include <QDialog>
+#include <QDir>
 #include <QEvent>
 #include <QFile>
 #include <QFileDialog>
@@ -606,38 +606,9 @@ MainWindow::MainWindow(QWidget *parent)
     QTimer::singleShot(0, this, &MainWindow::applyStartupDestination);
 }
 
-void MainWindow::warnAboutDataPathsInProgramDir()
-{
-    auto &paths = SettingsCache::instance().paths();
-    if (SettingsCache::instance().getIsPortableBuild() || paths.getAppDirWarningAcknowledged()) {
-        return;
-    }
-
-    const QStringList offenders = paths.pathsInsideDir(QCoreApplication::applicationDirPath());
-    if (offenders.isEmpty()) {
-        return;
-    }
-
-    QMessageBox box(QMessageBox::Warning, tr("Data paths inside the program directory"),
-                    tr("These paths are configured inside the Cockatrice program directory:\n\n%1\n\n"
-                       "Cockatrice keeps its own data outside the program directory by default. Files "
-                       "stored inside it can be deleted by an update or by uninstalling Cockatrice. "
-                       "Change them in the Settings dialog - most are on the General page - to keep "
-                       "them safe.")
-                        .arg(offenders.join(QLatin1Char('\n'))),
-                    QMessageBox::Ok, this);
-    box.setTextFormat(Qt::PlainText);
-    auto *dontShowAgain = new QCheckBox(tr("Don't show this again"));
-    box.setCheckBox(dontShowAgain);
-    box.exec();
-    if (dontShowAgain->isChecked()) {
-        paths.setAppDirWarningAcknowledged(true);
-    }
-}
-
 void MainWindow::startupConfigCheck()
 {
-    warnAboutDataPathsInProgramDir();
+    AtRiskDataWarning::warnAboutDataPathsInProgramDir(this);
 
     const bool isCleanInstall = SettingsCache::instance().network().getClientVersion() == CLIENT_INFO_NOT_SET;
 
