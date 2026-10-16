@@ -27,7 +27,6 @@
 #include <qtmetamacros.h>
 #include <sys/types.h>
 
-class CardItem;
 class CardState;
 class CardZoneLogic;
 class PlayerLogic;
@@ -62,7 +61,7 @@ template <typename T> class QList;
  * Design notes:
  * - All event handlers assume events are authoritative and already validated
  *   by the server.
- * - Most handlers mutate both logical state (CardItem, CardZoneLogic, counters)
+ * - Most handlers mutate both logical state (CardState, CardZoneLogic, counters)
  *   and visual/UI state (views, arrows, menus).
  * - Logging signals are emitted *after* or *during* state mutation, depending
  *   on whether later mutations would invalidate log data.
@@ -267,8 +266,8 @@ signals:
     void logAlwaysLookAtTopCard(PlayerLogic *player, CardZoneLogic *zone, bool reveal);
     /** @} */
 
-    void cardZoneChanged(CardItem *card, bool sameZone);
-    void requestCardMenuUpdate(CardItem *card);
+    void cardZoneChanged(CardState *card, bool sameZone);
+    void requestCardMenuUpdate(CardState *card);
     /**
      * @brief A card was just moved by the server and its view needs refreshing.
      *
