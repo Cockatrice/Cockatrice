@@ -408,19 +408,6 @@ TEST_F(SettingsDefaultsTest, Appearance_StyleUserList_Default)
     ASSERT_EQ(s.getStyleUserList(), true);
 }
 
-TEST_F(SettingsDefaultsTest, Appearance_MaxFontSize_Default)
-{
-    AppearanceSettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getMaxFontSize(), 12);
-}
-
-TEST_F(SettingsDefaultsTest, Appearance_MaxFontSize_SetAndGet)
-{
-    AppearanceSettings s(settingsPath, nullptr);
-    s.setMaxFontSize(14);
-    ASSERT_EQ(s.getMaxFontSize(), 14);
-}
-
 TEST_F(SettingsDefaultsTest, Appearance_HomeTabBackgroundSource_Default)
 {
     AppearanceSettings s(settingsPath, nullptr);

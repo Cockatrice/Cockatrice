@@ -36,7 +36,6 @@
 #include <QtGlobal>
 #include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/debug_settings.h>
 #include <qnamespace.h>
@@ -136,8 +135,8 @@ QSizeF AbstractCardItem::getTranslatedSize(QPainter *painter) const
 
 void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &translatedSize, int angle)
 {
-    const int MAX_FONT_SIZE = SettingsCache::instance().appearance().getMaxFontSize();
-    const int fontSize = std::max(9, MAX_FONT_SIZE);
+    const int minSize = std::max(1, themeManager->cardTextMinSize());
+    const int fontSize = std::max(minSize, std::max(1, themeManager->cardTextMaxSize()));
 
     QRectF totalBoundingRect = painter->combinedTransform().mapRect(boundingRect());
 
