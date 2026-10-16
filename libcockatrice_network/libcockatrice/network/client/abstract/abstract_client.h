@@ -133,6 +133,7 @@ protected:
     QMap<int, PendingCommand *> pendingCommands;
     QString userName, password, email, country, realName, token;
     bool serverSupportsPasswordHash;
+    bool serverSupportsChallengeResponse;
     void setStatus(ClientStatus _status);
     int getNewCmdId()
     {
@@ -165,6 +166,10 @@ public:
     bool getServerSupportsPasswordHash() const
     {
         return serverSupportsPasswordHash;
+    }
+    bool getServerSupportsChallengeResponse() const
+    {
+        return serverSupportsChallengeResponse;
     }
     const QString &getUserName() const
     {
