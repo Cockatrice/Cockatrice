@@ -1,5 +1,6 @@
 #include "dlg_report_user.h"
 
+#include "../interface/theme_manager.h"
 #include "abstract_client.h"
 #include "libcockatrice/protocol/pb/response.pb.h"
 
@@ -92,13 +93,8 @@ DlgReportUser::DlgReportUser(AbstractClient *_client,
     auto *chatLayout = new QVBoxLayout(chatGroup);
     chatLogEdit = new QTextEdit;
     chatLogEdit->setReadOnly(true);
-    QFont monoFont("monospace");
-    monoFont.setStyleHint(QFont::Monospace);
-    const int systemPointSize = QFontDatabase::systemFont(QFontDatabase::GeneralFont).pointSize();
-    if (systemPointSize > 0) {
-        monoFont.setPointSize(systemPointSize);
-    }
-    chatLogEdit->setFont(monoFont);
+    applyChatLogFont();
+    connect(themeManager, &ThemeManager::fontsChanged, this, &DlgReportUser::applyChatLogFont);
     if (!_autoChatLog.isEmpty()) {
         chatLogEdit->setPlainText(_autoChatLog);
     } else {
@@ -125,6 +121,18 @@ DlgReportUser::DlgReportUser(AbstractClient *_client,
     layout->addWidget(descGroup);
     layout->addWidget(chatGroup);
     layout->addWidget(buttonBox);
+}
+
+void DlgReportUser::applyChatLogFont()
+{
+    // Family comes from the ChatLog theme role; size stays caller-side as before.
+    QFont monoFont = themeManager->appFont(AppFont::ChatLog);
+    monoFont.setStyleHint(QFont::Monospace);
+    const int systemPointSize = QFontDatabase::systemFont(QFontDatabase::GeneralFont).pointSize();
+    if (systemPointSize > 0) {
+        monoFont.setPointSize(systemPointSize);
+    }
+    chatLogEdit->setFont(monoFont);
 }
 
 void DlgReportUser::actSubmit()

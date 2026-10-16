@@ -12,6 +12,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QFlags>
+#include <QFontDatabase>
 #include <QGuiApplication>
 #include <QIODevice>
 #include <QLatin1Char>
@@ -658,8 +659,24 @@ QFont ThemeManager::appFont(AppFont::Role role) const
         return it.value();
     }
 
-    // No per-role scaling: every unset role resolves to the application font,
-    // so with no fonts.toml present the result is identical to before.
+    // Role fallbacks preserve the pre-theme defaults when no fonts.toml is
+    // present: chat logs rendered monospace (matching the report dialogs),
+    // card text from a serif basis, everything else from the app font.
+    if (role == AppFont::ChatLog) {
+        QFont monoFont(QStringLiteral("monospace"));
+        monoFont.setStyleHint(QFont::Monospace);
+        const int systemPointSize = QFontDatabase::systemFont(QFontDatabase::GeneralFont).pointSize();
+        if (systemPointSize > 0) {
+            monoFont.setPointSize(systemPointSize);
+        }
+        return monoFont;
+    }
+    if (role == AppFont::CardText) {
+        return QFont(QStringLiteral("Serif"));
+    }
+
+    // No per-role scaling: every other unset role resolves to the application
+    // font, so with no fonts.toml present the result is identical to before.
     return qApp->font();
 }
 
