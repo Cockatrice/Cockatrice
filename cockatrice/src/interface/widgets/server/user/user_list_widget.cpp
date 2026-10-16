@@ -514,6 +514,19 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
             userTree->viewport()->update();
             userTree->update();
         });
+        // Divider headers store their font on the item, so re-apply the role
+        // family here; the painter reads the role live and needs only the
+        // repaint below.
+        connect(themeManager, &ThemeManager::fontsChanged, this, [this] {
+            QFont dividerFont = themeManager->appFont(AppFont::InterfaceDefault);
+            dividerFont.setBold(true);
+            for (auto it = sectionItems.constBegin(); it != sectionItems.constEnd(); ++it) {
+                it.value()->setFont(0, dividerFont);
+                it.value()->setSizeHint(0, QSize(0, QFontMetrics(dividerFont).height() + 16));
+            }
+            userTree->viewport()->update();
+            userTree->update();
+        });
     }
 
     QVBoxLayout *vbox = new QVBoxLayout;
