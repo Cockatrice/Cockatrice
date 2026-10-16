@@ -984,6 +984,196 @@ TEST_F(SettingsMigrationTest, IsNotMigrationPendingWithoutLegacyData)
     ASSERT_FALSE(SettingsMigration::isMigrationPending(settingsPath));
 }
 
+TEST_F(SettingsMigrationTest, AppearanceMaxFontSize_NonDefaultSeedsThemeAndDeletesKey)
+{
+    const QString themesPath = tempDir.path() + "/themes";
+    ASSERT_TRUE(QDir().mkpath(themesPath + "/MyTheme"));
+    {
+        QSettings paths(settingsPath + "paths.ini", QSettings::IniFormat);
+        paths.setValue("paths/themes", themesPath);
+        paths.sync();
+    }
+    {
+        QSettings appearance(settingsPath + "appearance.ini", QSettings::IniFormat);
+        appearance.setValue("appearance/maxFontSize", 18);
+        appearance.sync();
+    }
+
+    ASSERT_TRUE(SettingsMigration::migrateAppearanceMaxFontSizeToTheme(settingsPath));
+
+    ASSERT_FALSE(readFromIni("appearance.ini", "appearance/maxFontSize").isValid());
+
+    const QString fontsPath = themesPath + "/MyTheme/fonts.toml";
+    ASSERT_TRUE(QFile::exists(fontsPath));
+    QFile f(fontsPath);
+    ASSERT_TRUE(f.open(QIODevice::ReadOnly | QIODevice::Text));
+    const QString content = QString::fromUtf8(f.readAll());
+    EXPECT_TRUE(content.contains("CardText"));
+    EXPECT_TRUE(content.contains("18"));
+    EXPECT_TRUE(content.contains("Serif"));
+
+    ASSERT_FALSE(SettingsMigration::migrateAppearanceMaxFontSizeToTheme(settingsPath));
+}
+
+TEST_F(SettingsMigrationTest, AppearanceMaxFontSize_SeedsActiveStockTheme)
+{
+    // A stock theme resolves to the system directory, so there is no user theme
+    // folder to seed. The migration has to create the active theme's folder,
+    // otherwise the retired size is deleted without landing anywhere.
+    const QString themesPath = tempDir.path() + "/themes";
+    {
+        QSettings paths(settingsPath + "paths.ini", QSettings::IniFormat);
+        paths.setValue("paths/themes", themesPath);
+        paths.sync();
+    }
+    {
+        QSettings appearance(settingsPath + "appearance.ini", QSettings::IniFormat);
+        appearance.setValue("appearance/themeName", "Fabric");
+        appearance.setValue("appearance/maxFontSize", 18);
+        appearance.sync();
+    }
+
+    ASSERT_TRUE(SettingsMigration::migrateAppearanceMaxFontSizeToTheme(settingsPath));
+
+    ASSERT_FALSE(readFromIni("appearance.ini", "appearance/maxFontSize").isValid());
+
+    const QString fontsPath = themesPath + "/Fabric/fonts.toml";
+    ASSERT_TRUE(QFile::exists(fontsPath));
+    QFile f(fontsPath);
+    ASSERT_TRUE(f.open(QIODevice::ReadOnly | QIODevice::Text));
+    const QString content = QString::fromUtf8(f.readAll());
+    EXPECT_TRUE(content.contains("CardText"));
+    EXPECT_TRUE(content.contains("18"));
+}
+
+TEST_F(SettingsMigrationTest, AppearanceMaxFontSize_KeepsExistingActiveTheme)
+{
+    const QString themesPath = tempDir.path() + "/themes";
+    ASSERT_TRUE(QDir().mkpath(themesPath + "/Fabric"));
+    {
+        QFile f(themesPath + "/Fabric/fonts.toml");
+        ASSERT_TRUE(f.open(QIODevice::WriteOnly | QIODevice::Text));
+        QTextStream out(&f);
+        out << "[Fonts]\nCardText = \"Inter, 10\"\n";
+    }
+    {
+        QSettings paths(settingsPath + "paths.ini", QSettings::IniFormat);
+        paths.setValue("paths/themes", themesPath);
+        paths.sync();
+    }
+    {
+        QSettings appearance(settingsPath + "appearance.ini", QSettings::IniFormat);
+        appearance.setValue("appearance/themeName", "Fabric");
+        appearance.setValue("appearance/maxFontSize", 18);
+        appearance.sync();
+    }
+
+    ASSERT_TRUE(SettingsMigration::migrateAppearanceMaxFontSizeToTheme(settingsPath));
+
+    QFile f(themesPath + "/Fabric/fonts.toml");
+    ASSERT_TRUE(f.open(QIODevice::ReadOnly | QIODevice::Text));
+    const QString content = QString::fromUtf8(f.readAll());
+    EXPECT_TRUE(content.contains("Inter, 10"));
+    EXPECT_FALSE(content.contains("18"));
+}
+
+TEST_F(SettingsMigrationTest, AppearanceMaxFontSize_DefaultDeletesKeyWithoutFiles)
+{
+    const QString themesPath = tempDir.path() + "/themes";
+    ASSERT_TRUE(QDir().mkpath(themesPath + "/MyTheme"));
+    {
+        QSettings paths(settingsPath + "paths.ini", QSettings::IniFormat);
+        paths.setValue("paths/themes", themesPath);
+        paths.sync();
+    }
+    {
+        QSettings appearance(settingsPath + "appearance.ini", QSettings::IniFormat);
+        appearance.setValue("appearance/maxFontSize", 12);
+        appearance.sync();
+    }
+
+    ASSERT_TRUE(SettingsMigration::migrateAppearanceMaxFontSizeToTheme(settingsPath));
+    ASSERT_FALSE(readFromIni("appearance.ini", "appearance/maxFontSize").isValid());
+    ASSERT_FALSE(QFile::exists(themesPath + "/MyTheme/fonts.toml"));
+}
+
+TEST_F(SettingsMigrationTest, AppearanceMaxFontSize_DoesNotOverwriteExplicitMax)
+{
+    const QString themesPath = tempDir.path() + "/themes";
+    ASSERT_TRUE(QDir().mkpath(themesPath + "/MyTheme"));
+    {
+        QFile f(themesPath + "/MyTheme/fonts.toml");
+        ASSERT_TRUE(f.open(QIODevice::WriteOnly | QIODevice::Text));
+        QTextStream out(&f);
+        out << "[Fonts]\nCardText = \"Inter, 10\"\n";
+    }
+    {
+        QSettings paths(settingsPath + "paths.ini", QSettings::IniFormat);
+        paths.setValue("paths/themes", themesPath);
+        paths.sync();
+    }
+    {
+        QSettings appearance(settingsPath + "appearance.ini", QSettings::IniFormat);
+        appearance.setValue("appearance/maxFontSize", 18);
+        appearance.sync();
+    }
+
+    ASSERT_TRUE(SettingsMigration::migrateAppearanceMaxFontSizeToTheme(settingsPath));
+
+    QFile f(themesPath + "/MyTheme/fonts.toml");
+    ASSERT_TRUE(f.open(QIODevice::ReadOnly | QIODevice::Text));
+    const QString content = QString::fromUtf8(f.readAll());
+    EXPECT_TRUE(content.contains("10"));
+    EXPECT_FALSE(content.contains("18"));
+}
+
+TEST_F(SettingsMigrationTest, AppearanceMaxFontSize_MergesWithOtherRoles)
+{
+    const QString themesPath = tempDir.path() + "/themes";
+    ASSERT_TRUE(QDir().mkpath(themesPath + "/MyTheme"));
+    {
+        QFile f(themesPath + "/MyTheme/fonts.toml");
+        ASSERT_TRUE(f.open(QIODevice::WriteOnly | QIODevice::Text));
+        QTextStream out(&f);
+        out << "[Fonts]\nInterfaceDefault = \"Inter, 10\"\n";
+    }
+    {
+        QSettings paths(settingsPath + "paths.ini", QSettings::IniFormat);
+        paths.setValue("paths/themes", themesPath);
+        paths.sync();
+    }
+    {
+        QSettings appearance(settingsPath + "appearance.ini", QSettings::IniFormat);
+        appearance.setValue("appearance/maxFontSize", 20);
+        appearance.sync();
+    }
+
+    ASSERT_TRUE(SettingsMigration::migrateAppearanceMaxFontSizeToTheme(settingsPath));
+
+    QFile f(themesPath + "/MyTheme/fonts.toml");
+    ASSERT_TRUE(f.open(QIODevice::ReadOnly | QIODevice::Text));
+    const QString content = QString::fromUtf8(f.readAll());
+    EXPECT_TRUE(content.contains("InterfaceDefault"));
+    EXPECT_TRUE(content.contains("CardText"));
+    EXPECT_TRUE(content.contains("20"));
+}
+
+TEST_F(SettingsMigrationTest, AppearanceMaxFontSize_AbsentKeyDoesNothing)
+{
+    ASSERT_FALSE(SettingsMigration::migrateAppearanceMaxFontSizeToTheme(settingsPath));
+}
+
+TEST_F(SettingsMigrationTest, IsMigrationPendingWhenMaxFontSizePresent)
+{
+    {
+        QSettings appearance(settingsPath + "appearance.ini", QSettings::IniFormat);
+        appearance.setValue("appearance/maxFontSize", 18);
+        appearance.sync();
+    }
+
+    ASSERT_TRUE(SettingsMigration::isMigrationPending(settingsPath));
+}
+
 } // namespace
 
 int main(int argc, char **argv)

@@ -284,20 +284,11 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&roundCardCornersCheckBox, &QAbstractButton::toggled, &settings.cardsDisplay(),
             &CardsDisplaySettings::setRoundCardCorners);
 
-    connect(&maxFontSizeForCardsEdit, qOverload<int>(&QSpinBox::valueChanged), &settings.appearance(),
-            &AppearanceSettings::setMaxFontSize);
-    maxFontSizeForCardsEdit.setValue(settings.appearance().getMaxFontSize());
-    maxFontSizeForCardsLabel.setBuddy(&maxFontSizeForCardsEdit);
-    maxFontSizeForCardsEdit.setMinimum(9);
-    maxFontSizeForCardsEdit.setMaximum(100);
-
     auto *cardsGrid = new QGridLayout;
     cardsGrid->addWidget(&displayCardNamesCheckBox, 0, 0, 1, 2);
     cardsGrid->addWidget(&autoRotateSidewaysLayoutCardsCheckBox, 1, 0, 1, 2);
     cardsGrid->addWidget(&cardScalingCheckBox, 2, 0, 1, 2);
     cardsGrid->addWidget(&roundCardCornersCheckBox, 3, 0, 1, 2);
-    cardsGrid->addWidget(&maxFontSizeForCardsLabel, 4, 0, 1, 1);
-    cardsGrid->addWidget(&maxFontSizeForCardsEdit, 4, 1, 1, 1);
 
     cardsGroupBox = new QGroupBox;
     cardsGroupBox->setLayout(cardsGrid);
@@ -658,7 +649,6 @@ void AppearanceSettingsPage::retranslateUi()
     autoRotateSidewaysLayoutCardsCheckBox.setText(tr("Auto-Rotate cards with sideways layout"));
     cardScalingCheckBox.setText(tr("Scale cards on mouse over"));
     roundCardCornersCheckBox.setText(tr("Use rounded card corners"));
-    maxFontSizeForCardsLabel.setText(tr("Maximum font size for information displayed on cards:"));
 
     cardLayoutGroupBox->setTitle(tr("Card layout"));
     verticalCardOverlapPercentLabel.setText(

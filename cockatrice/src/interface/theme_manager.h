@@ -169,6 +169,10 @@ public:
      *         "what this role resolves to" must use this, because appFont()
      *         reflects a live preview while the editor is open. */
     QFont defaultAppFont(AppFont::Role role) const;
+    /** @brief CardText max size: stored CardText point size, else 12. */
+    int cardTextMaxSize() const;
+    /** @brief CardText shrink-to-fit floor: stored CardTextMinSize, else 1. */
+    int cardTextMinSize() const;
 
     QBrush &getBgBrush(Role zone);
     QBrush getExtraBgBrush(Role zone, int zoneId = 0);

@@ -13,6 +13,7 @@
 
 static constexpr int MIN_FONT_SIZE = 6;
 static constexpr int MAX_FONT_SIZE = 72;
+static constexpr int CARD_TEXT_MIN_SIZE = 1;
 static constexpr int FALLBACK_FONT_SIZE = 10;
 
 static const QMap<AppFont::Role, const char *> APP_FONT_DESCRIPTIONS = {
@@ -46,6 +47,7 @@ FontGridWidget::FontGridWidget(QWidget *parent) : QWidget(parent)
     grid->setColumnStretch(0, 0);
     grid->setColumnStretch(1, 1);
     grid->setColumnStretch(2, 0);
+    grid->setColumnStretch(3, 0);
 
     QMetaEnum fontEnum = QMetaEnum::fromType<AppFont::Role>();
     for (int i = 0; i < fontEnum.keyCount(); ++i) {
@@ -58,6 +60,30 @@ FontGridWidget::FontGridWidget(QWidget *parent) : QWidget(parent)
         grid->addWidget(familyCombo, i, 1);
         connect(familyCombo, &QFontComboBox::currentFontChanged, this, [this] { emit fontsChanged(); });
 
+        if (role == AppFont::CardText) {
+            auto *minSpin = new QSpinBox(this);
+            minSpin->setRange(CARD_TEXT_MIN_SIZE, MAX_FONT_SIZE);
+            grid->addWidget(minSpin, i, 2);
+            connect(minSpin, &QSpinBox::valueChanged, this, [this] { emit fontsChanged(); });
+
+            auto *maxSpin = new QSpinBox(this);
+            maxSpin->setRange(MIN_FONT_SIZE, MAX_FONT_SIZE);
+            grid->addWidget(maxSpin, i, 3);
+            connect(maxSpin, &QSpinBox::valueChanged, this, [this] { emit fontsChanged(); });
+
+            // Keep the range consistent: otherwise min 20 / max 12 saves as-is
+            // and cardTextMaxSize() silently clamps the max up to the min, so
+            // the max spin shows a size that is never used. Moving one spin
+            // pulls the other's bound along.
+            connect(minSpin, &QSpinBox::valueChanged, this, [maxSpin](int value) { maxSpin->setMinimum(value); });
+            connect(maxSpin, &QSpinBox::valueChanged, this, [minSpin](int value) { minSpin->setMaximum(value); });
+
+            label->setBuddy(familyCombo);
+
+            fontRows[role] = {label, familyCombo, maxSpin, minSpin};
+            continue;
+        }
+
         auto *sizeSpin = new QSpinBox(this);
         sizeSpin->setRange(MIN_FONT_SIZE, MAX_FONT_SIZE);
         grid->addWidget(sizeSpin, i, 2);
@@ -65,7 +91,7 @@ FontGridWidget::FontGridWidget(QWidget *parent) : QWidget(parent)
 
         label->setBuddy(familyCombo);
 
-        fontRows[role] = {label, familyCombo, sizeSpin};
+        fontRows[role] = {label, familyCombo, sizeSpin, nullptr};
     }
 
     retranslateUi();
@@ -96,6 +122,11 @@ void FontGridWidget::loadFonts(const FontConfig &cfg)
             size = FALLBACK_FONT_SIZE;
         }
         row.sizeSpin->setValue(qBound(MIN_FONT_SIZE, size, MAX_FONT_SIZE));
+
+        if (role == AppFont::CardText && row.minSpin != nullptr) {
+            int minSize = cfg.cardTextMinSize > 0 ? cfg.cardTextMinSize : themeManager->cardTextMinSize();
+            row.minSpin->setValue(qBound(CARD_TEXT_MIN_SIZE, minSize, MAX_FONT_SIZE));
+        }
     }
     blockSignals(false);
 }
@@ -113,6 +144,10 @@ FontConfig FontGridWidget::currentFontConfig() const
         QFont font(row.familyCombo->currentFont().family());
         font.setPointSize(row.sizeSpin->value());
         cfg.fonts[role] = font;
+
+        if (role == AppFont::CardText && row.minSpin != nullptr) {
+            cfg.cardTextMinSize = row.minSpin->value();
+        }
     }
     return cfg;
 }
@@ -128,6 +163,15 @@ void FontGridWidget::retranslateUi()
         row.label->setToolTip(tr(APP_FONT_DESCRIPTIONS.value(role, "")));
         row.familyCombo->setToolTip(tr(APP_FONT_DESCRIPTIONS.value(role, "")));
         row.familyCombo->setAccessibleName(roleDisplayName(role));
+        if (role == AppFont::CardText && row.minSpin != nullptr) {
+            row.minSpin->setToolTip(tr("Minimum card text size"));
+            row.minSpin->setAccessibleName(tr("Minimum card text size"));
+            row.minSpin->setSuffix(tr(" pt"));
+            row.sizeSpin->setToolTip(tr("Maximum card text size"));
+            row.sizeSpin->setAccessibleName(tr("Maximum card text size"));
+            row.sizeSpin->setSuffix(tr(" pt"));
+            continue;
+        }
         row.sizeSpin->setToolTip(tr("Point size for %1").arg(roleDisplayName(role)));
         row.sizeSpin->setAccessibleName(tr("Point size for %1").arg(roleDisplayName(role)));
         row.sizeSpin->setSuffix(tr(" pt"));

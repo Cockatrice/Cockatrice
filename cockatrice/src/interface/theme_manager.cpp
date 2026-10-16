@@ -689,6 +689,7 @@ QFont ThemeManager::cardTextFont() const
     }
     QFont serifFont(QStringLiteral("Serif"));
     serifFont.setStyleHint(QFont::Serif);
+    serifFont.setPointSize(12);
     return serifFont;
 }
 
@@ -708,6 +709,26 @@ QFont ThemeManager::defaultAppFont(AppFont::Role /*role*/) const
     // captured at startup, which is what the theme falls back to once the
     // editor closes.
     return defaultFont;
+}
+
+int ThemeManager::cardTextMaxSize() const
+{
+    const auto it = currentFonts.fonts.constFind(AppFont::CardText);
+    if (it != currentFonts.fonts.constEnd()) {
+        const int size = it.value().pointSize();
+        if (size > 0) {
+            return size;
+        }
+    }
+    return 12;
+}
+
+int ThemeManager::cardTextMinSize() const
+{
+    if (currentFonts.cardTextMinSize > 0) {
+        return currentFonts.cardTextMinSize;
+    }
+    return 1;
 }
 
 void ThemeManager::themeChangedSlot()
