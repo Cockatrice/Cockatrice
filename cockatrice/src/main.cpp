@@ -283,6 +283,18 @@ int main(int argc, char *argv[])
             // Silent opt-in: cached crash envelopes flush automatically once consent is given.
             crashReporter.giveConsent();
         }
+        // Mid-session mode changes must reach the SDK: without this, switching from AlwaysSend to
+        // NeverSend (or Ask) leaves consent given until restart, so a later crash in this session
+        // would still upload after the user opted out. crashReporter outlives main(), so capturing
+        // it here is safe.
+        QObject::connect(&SettingsCache::instance().personal(), &PersonalSettings::crashReportingModeChanged,
+                         [&crashReporter](PersonalSettings::CrashReportingMode mode) {
+                             if (mode == PersonalSettings::CrashReportingMode::AlwaysSend) {
+                                 crashReporter.giveConsent();
+                             } else {
+                                 crashReporter.revokeConsent();
+                             }
+                         });
     }
 
     // Persistent session log: keeps this run's logs on disk so the next-startup crash dialog can
