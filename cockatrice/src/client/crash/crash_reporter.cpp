@@ -188,9 +188,12 @@ void CrashReporter::init(const QString &dsn,
     // crash envelope in <database>/cache instead of dropping it at init, so the Ask dialog
     // decides its fate: giveConsent() flushes it via the transport retry, revokeConsent()
     // deletes it below. This also covers the first crash after switching to AlwaysSend,
-    // which giveConsent() (running after init) would otherwise miss.
+    // which giveConsent() (running after init) would otherwise miss. http_retry is required
+    // for the flush: without it the held envelope is written with a plain filename the retry
+    // scanner skips, and giveConsent()'s sentry_transport_retry() sends nothing.
     sentry_options_set_require_user_consent(options, 1);
     sentry_options_set_cache_keep(options, SENTRY_CACHE_KEEP_OFFLINE);
+    sentry_options_set_http_retry(options, 1);
     sentry_options_set_before_send(options, scrubEventBeforeSend, nullptr);
     ready = (sentry_init(options) == 0);
 #else
