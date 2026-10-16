@@ -7,6 +7,8 @@
 #ifndef DLG_CREATETOKEN_H
 #define DLG_CREATETOKEN_H
 
+#include "../../game/player/token_info.h"
+
 #include <QDialog>
 #include <QList>
 #include <QString>
@@ -24,17 +26,6 @@ class TokenDisplayModel;
 class CardInfoPictureWidget;
 class QModelIndex;
 class QWidget;
-
-struct TokenInfo
-{
-    QString name;
-    QString color;
-    QString pt;
-    QString annotation;
-    bool destroy = true;
-    bool faceDown = false;
-    QString providerId;
-};
 
 class DlgCreateToken : public QDialog
 {
