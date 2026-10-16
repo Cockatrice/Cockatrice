@@ -32,7 +32,6 @@
 #include <QPen>
 #include <QRect>
 #include <QVBoxLayout>
-#include <QVariant>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/playmat_resolver.h>
 #include <libcockatrice/protocol/pb/command_deck_select.pb.h>
@@ -318,7 +317,6 @@ void DeckViewContainer::loadDeckFromDeckList(const DeckList &deck)
     Command_DeckSelect cmd;
     cmd.set_deck(deckString.toStdString());
     PendingCommand *pend = parentGame->getGame()->getGameEventHandler()->prepareGameCommand(cmd);
-    pend->setExtraData(deck.getPlaymat().card.name);
     connect(pend, &PendingCommand::finished, this, &DeckViewContainer::deckSelectFinished);
     parentGame->getGame()->getGameEventHandler()->sendGameCommand(pend, playerId);
 
@@ -357,18 +355,18 @@ void DeckViewContainer::resolveAndSendPlaymat()
     pp->set_zoom(resolved.params.zoom);
     PendingCommand *playmatPend = parentGame->getGame()->getGameEventHandler()->prepareGameCommand(playmatCmd);
     const QString sentName = resolved.card.name;
-    connect(playmatPend, &PendingCommand::finished, this,
-            [this, sentName](const Response &r, const CommandContainer & /*cmd*/, const QVariant & /*extra*/) {
-                if (r.response_code() != Response::RespOk) {
-                    if (!sentName.isEmpty()) {
-                        notifyPlaymatBlacklisted(
-                            sentName,
-                            tr("The selected playmat card is blacklisted on this server or another error occurred."));
-                    }
-                } else if (!sentName.isEmpty()) {
-                    lastBlacklistedPlaymatNotice.clear();
-                }
-            });
+    connect(playmatPend, &PendingCommand::finished, this, [this, sentName](const Response &r) {
+        // Only RespFunctionNotAllowed signals a card art DENY rule. Older servers that predate
+        // playmats answer RespInvalidCommand and strip the mat from DeckSelect, which must stay silent.
+        if (r.response_code() == Response::RespFunctionNotAllowed) {
+            if (!sentName.isEmpty()) {
+                notifyPlaymatBlacklisted(
+                    sentName, tr("The selected playmat card is blacklisted on this server, so it was not applied."));
+            }
+        } else if (r.response_code() == Response::RespOk && !sentName.isEmpty()) {
+            lastBlacklistedPlaymatNotice.clear();
+        }
+    });
     parentGame->getGame()->getGameEventHandler()->sendGameCommand(playmatPend, playerId);
 }
 
@@ -389,9 +387,6 @@ void DeckViewContainer::loadRemoteDeck()
         Command_DeckSelect cmd;
         cmd.set_deck_id(dlg.getDeckId());
         PendingCommand *pend = parentGame->getGame()->getGameEventHandler()->prepareGameCommand(cmd);
-        // The requested deck lives on the server, so its playmat is unknown
-        // client-side: strip detection in deckSelectFinished is intentionally skipped.
-        pend->setExtraData(QString());
         connect(pend, &PendingCommand::finished, this, &DeckViewContainer::deckSelectFinished);
         parentGame->getGame()->getGameEventHandler()->sendGameCommand(pend, playerId);
     }
@@ -421,23 +416,10 @@ void DeckViewContainer::loadFromWebsite()
     loadDeckFromDeckList(deck);
 }
 
-void DeckViewContainer::deckSelectFinished(const Response &r,
-                                           const CommandContainer & /*cmd*/,
-                                           const QVariant &extraData)
+void DeckViewContainer::deckSelectFinished(const Response &r)
 {
     const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
     DeckList newDeck = DeckList(QString::fromStdString(resp.deck()));
-    if (r.response_code() == Response::RespOk) {
-        // The server strips playmats whose art is blacklisted but still answers
-        // RespOk, so detect the strip by comparing against the requested mat.
-        const QString requestedName = extraData.toString();
-        if (!requestedName.isEmpty() && newDeck.getPlaymat().card.name.isEmpty()) {
-            notifyPlaymatBlacklisted(
-                requestedName, tr("The selected playmat card is blacklisted on this server, so it was not applied."));
-        } else if (!newDeck.getPlaymat().card.name.isEmpty()) {
-            lastBlacklistedPlaymatNotice.clear();
-        }
-    }
     CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(newDeck.getCardRefList()));
     setDeck(newDeck);
     switchToDeckLoadedView();

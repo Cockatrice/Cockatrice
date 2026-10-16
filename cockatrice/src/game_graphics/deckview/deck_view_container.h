@@ -19,8 +19,6 @@ class QVBoxLayout;
 class AbstractCardItem;
 class VisualDeckStorageWidget;
 class Response;
-class CommandContainer;
-class QVariant;
 class TabGame;
 class DeckView;
 
@@ -80,7 +78,7 @@ private slots:
     void unloadDeck();
     void readyStart();
     void forceStart();
-    void deckSelectFinished(const Response &r, const CommandContainer &cmd, const QVariant &extraData);
+    void deckSelectFinished(const Response &r);
     void sideboardPlanChanged();
     void sideboardLockButtonClicked();
     void updateSideboardLockButtonText();
