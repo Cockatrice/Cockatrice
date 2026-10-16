@@ -2,6 +2,7 @@
 
 #include "../theme_config.h"
 #include "../theme_manager.h"
+#include "font_grid_widget.h"
 #include "palette_generator.h"
 #include "palette_grid_widget.h"
 #include "quick_setup_panel.h"
@@ -41,6 +42,7 @@ PaletteEditorDialog::PaletteEditorDialog(const QString &_themeDirPath, const QSt
 
     // Load both scheme configs upfront so switching is instant
     loadSchemes();
+    loadFonts();
 
     loadedScheme = themeManager->isDarkMode(themeDirPath) ? "Dark" : "Light";
 
@@ -125,6 +127,32 @@ void PaletteEditorDialog::setupUi()
     paletteGrid->setVisible(false);
     root->addWidget(paletteGrid, 1);
 
+    // Font section — sibling to the palette grid, sharing its collapsible
+    // advanced area pattern. Fonts are shared per theme, not split by scheme.
+    fontToggleButton = new QPushButton(this);
+    fontToggleButton->setCheckable(true);
+    fontToggleButton->setChecked(false);
+    fontToggleButton->setFlat(true);
+    fontToggleButton->setStyleSheet("QPushButton { text-align: left; padding: 5px 12px; font-weight: bold; }"
+                                    "QPushButton:checked { }");
+    root->addWidget(fontToggleButton);
+
+    fontSeparator = makeSeparator();
+    fontSeparator->setVisible(false);
+    root->addWidget(fontSeparator);
+
+    fontSection = new QWidget;
+    auto *fontSectionLayout = new QVBoxLayout(fontSection);
+    fontSectionLayout->setContentsMargins(0, 0, 0, 0);
+    fontSectionLayout->setSpacing(0);
+    fontNoteLabel = new QLabel(fontSection);
+    fontNoteLabel->setContentsMargins(12, 4, 12, 0);
+    fontSectionLayout->addWidget(fontNoteLabel);
+    fontGrid = new FontGridWidget(fontSection);
+    fontSectionLayout->addWidget(fontGrid);
+    fontSection->setVisible(false);
+    root->addWidget(fontSection);
+
     // Footer
     root->addWidget(makeSeparator());
     footer = new QWidget;
@@ -157,6 +185,7 @@ void PaletteEditorDialog::setupUi()
     connect(autoApplyTimer, &QTimer::timeout, this, &PaletteEditorDialog::onApply);
     connect(quickSetupPanel, &QuickSetupPanel::valueChanged, this, &PaletteEditorDialog::onGenerateFromAccent);
     connect(paletteGrid, &PaletteGridWidget::paletteChanged, this, [this] { autoApplyTimer->start(); });
+    connect(fontGrid, &FontGridWidget::fontsChanged, this, [this] { autoApplyTimer->start(); });
     connect(revertButton, &QPushButton::clicked, this, &PaletteEditorDialog::onRevertToDefault);
     connect(resetBtn, &QPushButton::clicked, this, &PaletteEditorDialog::onReset);
     connect(saveBtn, &QPushButton::clicked, this, &PaletteEditorDialog::onSave);
@@ -166,15 +195,32 @@ void PaletteEditorDialog::setupUi()
         paletteGridToggleButton->setText(open ? tr("▼  Edit Palette") : tr("▶  Edit Palette"));
         paletteGridSeparator->setVisible(open);
         paletteGrid->setVisible(open);
-
-        if (open) {
-            setMinimumHeight(680);
-            resize(width(), 680);
-        } else {
-            setMinimumHeight(220);
-            adjustSize(); // shrinks to fit just the visible content
-        }
+        updateAdvancedHeight();
     });
+    connect(fontToggleButton, &QPushButton::toggled, this, [this](bool open) {
+        fontToggleButton->setText(open ? tr("▼  Edit Fonts") : tr("▶  Edit Fonts"));
+        fontSeparator->setVisible(open);
+        fontSection->setVisible(open);
+        updateAdvancedHeight();
+    });
+}
+
+void PaletteEditorDialog::updateAdvancedHeight()
+{
+    int height = 220;
+    if (paletteGridToggleButton->isChecked()) {
+        height += 460;
+    }
+    if (fontToggleButton->isChecked()) {
+        height += 200;
+    }
+    setMinimumHeight(height);
+
+    if (paletteGrid->isVisible() || fontSection->isVisible()) {
+        resize(width(), height);
+    } else {
+        adjustSize(); // shrinks to fit just the visible content
+    }
 }
 
 void PaletteEditorDialog::retranslateUi()
@@ -189,12 +235,16 @@ void PaletteEditorDialog::retranslateUi()
     editingLabel->setText(tr("Editing:"));
     paletteGridToggleButton->setText(tr("▶  Edit Palette"));
     paletteGridToggleButton->setToolTip(tr("Show or hide the per-role colour grid for manual tweaks"));
+    fontToggleButton->setText(fontSection->isVisible() ? tr("▼  Edit Fonts") : tr("▶  Edit Fonts"));
+    fontToggleButton->setToolTip(tr("Show or hide the per-purpose font settings for this theme"));
+    fontNoteLabel->setText(tr("Fonts belong to theme %1").arg(themeName));
+    fontGrid->retranslateUi();
     revertButton->setText(tr("↺  Revert to theme default"));
 
     resetBtn->setText(tr("Reset"));
     saveBtn->setText(tr("Save"));
-    resetBtn->setToolTip(tr("Discard unsaved edits and restore the last saved palette"));
-    saveBtn->setToolTip(tr("Write palette-%1.toml and reload the theme").arg(loadedScheme.toLower()));
+    resetBtn->setToolTip(tr("Discard unsaved edits and restore the last saved palette and fonts"));
+    saveBtn->setToolTip(tr("Write palette-%1.toml and fonts.toml, then reload the theme").arg(loadedScheme.toLower()));
 
     if (saveDir.isEmpty() || !ThemeManager::isDirReallyWritable(saveDir)) {
         saveBtn->setEnabled(false);
@@ -228,6 +278,19 @@ void PaletteEditorDialog::loadSchemes()
     }
 }
 
+void PaletteEditorDialog::loadFonts()
+{
+    // Same user-dir > system-dir fallback ThemeManager uses: the shipped
+    // fonts.toml may live in the system theme directory rather than the
+    // resolved (user) theme directory.
+    FontConfig cfg = ThemeManager::loadFontConfig(themeDirPath);
+    if (!cfg.hasFonts()) {
+        cfg = ThemeManager::loadDefaultFontConfig(themeDirPath, themeName);
+    }
+    savedFontConfig = cfg;
+    fontGrid->loadFonts(cfg);
+}
+
 void PaletteEditorDialog::seedAccentFromScheme(const QString &scheme)
 {
     QColor seed = workingConfig.value(scheme).colors.value(QPalette::Active).value(QPalette::Highlight);
@@ -258,6 +321,7 @@ void PaletteEditorDialog::onGenerateFromAccent(const QColor &accent, int intensi
 void PaletteEditorDialog::onApply()
 {
     themeManager->previewPalette(paletteGrid->currentPaletteConfig(), loadedScheme);
+    themeManager->previewFonts(fontGrid->currentFontConfig());
 }
 
 void PaletteEditorDialog::onSave()
@@ -308,6 +372,17 @@ void PaletteEditorDialog::onSave()
         savedConfig[it.key()] = it.value();
     }
 
+    // Persist the shared per-theme fonts when they changed.
+    const FontConfig fontCfg = fontGrid->currentFontConfig();
+    if (fontCfg != savedFontConfig) {
+        if (!ThemeManager::saveFontConfig(saveDir, fontCfg)) {
+            QMessageBox::warning(this, tr("Save failed"),
+                                 tr("Could not write %1 to:\n%2").arg(FontConfig::fileName(), saveDir));
+            return;
+        }
+        savedFontConfig = fontCfg;
+    }
+
     themeManager->reloadCurrentTheme();
     accept();
 }
@@ -316,6 +391,7 @@ void PaletteEditorDialog::onReset()
 {
     workingConfig[loadedScheme] = savedConfig[loadedScheme];
     paletteGrid->loadPalette(savedConfig[loadedScheme]);
+    fontGrid->loadFonts(savedFontConfig);
     seedAccentFromScheme(loadedScheme);
 }
 
@@ -350,6 +426,18 @@ void PaletteEditorDialog::onRevertToDefault()
     workingConfig[loadedScheme] = def;
     paletteGrid->loadPalette(def);
     seedAccentFromScheme(loadedScheme);
+
+    // Revert the shared per-theme fonts the same way: delete the user-written
+    // fonts.toml so the theme falls back to its shipped default, then reflect
+    // the resolved fonts in the editor.
+    QFile::remove(QDir(saveDir).absoluteFilePath(FontConfig::fileName()));
+
+    // Reload the live theme so the font revert takes effect immediately.
+    themeManager->reloadCurrentTheme();
+
+    const FontConfig fontDef = ThemeManager::loadDefaultFontConfig(themeDirPath, themeName);
+    savedFontConfig = fontDef;
+    fontGrid->loadFonts(fontDef);
 }
 
 void PaletteEditorDialog::changeEvent(QEvent *e)

@@ -132,6 +132,9 @@ public:
     // theme directory when it is absent from the resolved (user) directory.
     static PaletteConfig
     loadDefaultPaletteConfig(const QString &themeDirPath, const QString &themeName, const QString &colorScheme);
+    // Load the theme's shipped default fonts, falling back to the system theme
+    // directory when fonts.toml is absent from the resolved (user) directory.
+    static FontConfig loadDefaultFontConfig(const QString &themeDirPath, const QString &themeName);
     /** @brief Writes cfg to disk as the theme's palette-<scheme>.toml and updates the
      *         theme's stored colour scheme to match. Shared by PaletteEditorDialog::onSave
      *         and FirstRunWizard's theme step so the two "generate + keep" paths can't drift. */
