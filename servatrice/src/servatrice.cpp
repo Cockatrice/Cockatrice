@@ -1231,8 +1231,7 @@ QByteArray Servatrice::getLegacyBackupKey() const
     }
     static const QRegularExpression validHexKey(QStringLiteral("^[0-9a-fA-F]{64}$"));
     if (!validHexKey.match(keyHex).hasMatch()) {
-        qDebug() << "security/legacy_backup_key is not 64 hex characters;"
-                 << "legacy password backups are disabled";
+        qDebug() << "security/legacy_backup_key is not 64 hex characters;" << "legacy password backups are disabled";
         return {};
     }
     return QByteArray::fromHex(keyHex.toUtf8());
