@@ -12,6 +12,8 @@ public:
     [[nodiscard]] virtual bool getChatMentionCompleter() const = 0;
     [[nodiscard]] virtual QString getChatMentionColor() const = 0;
     [[nodiscard]] virtual QString getChatHighlightColor() const = 0;
+    [[nodiscard]] virtual QString getChannelUnreadColor() const = 0;
+    [[nodiscard]] virtual QString getChannelMentionColor() const = 0;
     [[nodiscard]] virtual bool getChatMentionForeground() const = 0;
     [[nodiscard]] virtual bool getChatHighlightForeground() const = 0;
     [[nodiscard]] virtual bool getIgnoreUnregisteredUsers() const = 0;

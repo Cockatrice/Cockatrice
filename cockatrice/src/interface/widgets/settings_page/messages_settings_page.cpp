@@ -118,6 +118,26 @@ MessagesSettingsPage::MessagesSettingsPage()
     highlightGroupBox = new QGroupBox;
     highlightGroupBox->setLayout(highlightNotice);
 
+    channelUnreadColor = new QLineEdit();
+    channelUnreadColor->setText(SettingsCache::instance().chat().getChannelUnreadColor());
+    updateChannelUnreadPreview();
+    connect(channelUnreadColor, &QLineEdit::textChanged, this, &MessagesSettingsPage::updateChannelUnreadColor);
+
+    channelMentionColor = new QLineEdit();
+    channelMentionColor->setText(SettingsCache::instance().chat().getChannelMentionColor());
+    updateChannelMentionPreview();
+    connect(channelMentionColor, &QLineEdit::textChanged, this, &MessagesSettingsPage::updateChannelMentionColor);
+
+    auto *channelGrid = new QGridLayout;
+    channelGrid->addWidget(&channelUnreadColorLabel, 0, 0);
+    channelGrid->addWidget(channelUnreadColor, 0, 1);
+    channelGrid->addWidget(&hexChannelUnreadLabel, 0, 2);
+    channelGrid->addWidget(&channelMentionColorLabel, 1, 0);
+    channelGrid->addWidget(channelMentionColor, 1, 1);
+    channelGrid->addWidget(&hexChannelMentionLabel, 1, 2);
+    channelGroupBox = new QGroupBox;
+    channelGroupBox->setLayout(channelGrid);
+
     messageList = new QListWidget;
 
     int count = SettingsCache::instance().messages().getCount();
@@ -159,6 +179,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     mainLayout->addWidget(messageGroupBox);
     mainLayout->addWidget(chatGroupBox);
     mainLayout->addWidget(highlightGroupBox);
+    mainLayout->addWidget(channelGroupBox);
 
     setLayout(mainLayout);
 
@@ -195,6 +216,34 @@ void MessagesSettingsPage::updateHighlightColor(const QString &value)
     }
 }
 
+void MessagesSettingsPage::updateChannelUnreadColor(const QString &value)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0))
+    QColor colorToSet = QColor::fromString("#" + value);
+#else
+    QColor colorToSet;
+    colorToSet.setNamedColor("#" + value);
+#endif
+    if (colorToSet.isValid()) {
+        SettingsCache::instance().chat().setChannelUnreadColor(value);
+        updateChannelUnreadPreview();
+    }
+}
+
+void MessagesSettingsPage::updateChannelMentionColor(const QString &value)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0))
+    QColor colorToSet = QColor::fromString("#" + value);
+#else
+    QColor colorToSet;
+    colorToSet.setNamedColor("#" + value);
+#endif
+    if (colorToSet.isValid()) {
+        SettingsCache::instance().chat().setChannelMentionColor(value);
+        updateChannelMentionPreview();
+    }
+}
+
 void MessagesSettingsPage::updateTextColor(QT_STATE_CHANGED_T value)
 {
     SettingsCache::instance().chat().setChatMentionForeground(value);
@@ -219,6 +268,18 @@ void MessagesSettingsPage::updateHighlightPreview()
     highlightColor->setStyleSheet(
         "QLineEdit{background:#" + SettingsCache::instance().chat().getChatHighlightColor() +
         ";color: " + (SettingsCache::instance().chat().getChatHighlightForeground() ? "white" : "black") + ";}");
+}
+
+void MessagesSettingsPage::updateChannelUnreadPreview()
+{
+    channelUnreadColor->setStyleSheet("QLineEdit{background:#" +
+                                      SettingsCache::instance().chat().getChannelUnreadColor() + ";}");
+}
+
+void MessagesSettingsPage::updateChannelMentionPreview()
+{
+    channelMentionColor->setStyleSheet("QLineEdit{background:#" +
+                                       SettingsCache::instance().chat().getChannelMentionColor() + ";}");
 }
 
 void MessagesSettingsPage::storeSettings()
@@ -267,6 +328,9 @@ void MessagesSettingsPage::retranslateUi()
 {
     chatGroupBox->setTitle(tr("Chat settings"));
     highlightGroupBox->setTitle(tr("Custom alert words"));
+    channelGroupBox->setTitle(tr("Room channel tabs"));
+    channelUnreadColorLabel.setText(tr("Unread messages color"));
+    channelMentionColorLabel.setText(tr("Mentioned messages color"));
     chatMentionCheckBox.setText(tr("Enable chat mentions"));
     chatMentionCompleterCheckbox.setText(tr("Enable mention completer"));
     messageGroupBox->setTitle(tr("In-game message macros"));
@@ -284,6 +348,8 @@ void MessagesSettingsPage::retranslateUi()
     useGameTimeCheckBox.setText(tr("Use game time instead of local time in game logs"));
     hexLabel.setText(tr("(Color is hexadecimal)"));
     hexHighlightLabel.setText(tr("(Color is hexadecimal)"));
+    hexChannelUnreadLabel.setText(tr("(Color is hexadecimal)"));
+    hexChannelMentionLabel.setText(tr("(Color is hexadecimal)"));
     customAlertStringLabel.setText(tr("Separate words with a space, alphanumeric characters only"));
     customAlertString->setPlaceholderText(tr("Word1 Word2 Word3"));
     aAdd->setText(tr("Add New Message"));

@@ -10,6 +10,7 @@
 
 #include "tab.h"
 
+#include <QColor>
 #include <QList>
 #include <QMap>
 #include <QString>
@@ -18,8 +19,12 @@
 
 class UserListProxy;
 class QAction;
+class QTabBar;
+class QWidget;
 class QGroupBox;
+class QSplitter;
 class QMenu;
+class QStackedWidget;
 class QStringListModel;
 class TabSupervisor;
 
@@ -42,6 +47,7 @@ class Event_ListGames;
 class Event_JoinRoom;
 class Event_LeaveRoom;
 class Event_RoomSay;
+class Event_RoomChannelSay;
 class Event_RemoveMessages;
 class GameSelector;
 class Response;
@@ -64,10 +70,23 @@ private:
     UserListWidget *userList;
     const UserListProxy *userListProxy;
     ChatView *chatView;
+    QStackedWidget *chatViewStack;
+    QTabBar *channelTabBar;
+    QWidget *sayWidget;
+    QMap<QString, ChatView *> channelViews;
+    QMap<QString, QString> channelDisplayNames;
+    QMap<QString, int> channelUnreadCounts;
+    QMap<QString, bool> channelMentioned;
+    QMap<QString, bool> channelWritable;
+    QStringList channelIds;
+    QString activeChannelId;
+    bool chatCollapsed;
     QLabel *sayLabel;
     LineEditCompleter *sayEdit;
     QStringListModel *mentionModel;
     QGroupBox *chatGroupBox;
+    QSplitter *chatSplitter;
+    QList<int> savedSplitterSizes;
 
     QMenu *roomMenu;
     QAction *aLeaveRoom;
@@ -85,7 +104,9 @@ signals:
     void gameListUpdated();
 private slots:
     void sendMessage();
-    void sayFinished(const Response &response);
+    void onChannelChanged(int index);
+    void onChannelTabClicked(int index);
+    void setChatCollapsed(bool collapsed);
     void actClearChat();
     void actOpenChatSettings();
     void addMentionTag(QString mentionTag);
@@ -98,8 +119,17 @@ private slots:
     void processJoinRoomEvent(const Event_JoinRoom &event);
     void processLeaveRoomEvent(const Event_LeaveRoom &event);
     void processRoomSayEvent(const Event_RoomSay &event);
+    void processRoomChannelSayEvent(const Event_RoomChannelSay &event);
     void processRemoveMessagesEvent(const Event_RemoveMessages &event);
     void refreshShortcuts();
+
+    ChatView *makeChatView();
+    void updateChannelTab(const QString &channelId);
+    void updateSayEnabled();
+    void markChannelMessage(const QString &channelId, const QString &message, const ServerInfo_User &senderInfo);
+    [[nodiscard]] bool messageContainsMention(const QString &message, const ServerInfo_User &senderInfo) const;
+    [[nodiscard]] bool isRoomMessageIgnored(const QString &senderName, ServerInfo_User &userInfoOut) const;
+    static QColor parseColorHex(const QString &hex, const QColor &fallback);
 
 protected slots:
     void closeEvent(QCloseEvent *event) override;
