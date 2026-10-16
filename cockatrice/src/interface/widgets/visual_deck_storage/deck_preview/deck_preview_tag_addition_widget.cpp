@@ -28,6 +28,10 @@ DeckPreviewTagAdditionWidget::DeckPreviewTagAdditionWidget(QWidget *_parent, QSt
 
     // Adjust widget size
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+
+    // The tag text reads the InterfaceDefault role at paint time, so a font
+    // change only needs a repaint.
+    connect(themeManager, &ThemeManager::fontsChanged, this, [this] { update(); });
 }
 
 QSize DeckPreviewTagAdditionWidget::sizeHint() const

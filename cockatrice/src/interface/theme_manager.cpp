@@ -662,8 +662,9 @@ QFont ThemeManager::appFont(AppFont::Role role) const
     // Role fallbacks preserve the pre-theme defaults when no fonts.toml is
     // present: an unset role resolves to the application font, so the result is
     // identical to before. The report dialogs that used to hardcode monospace
-    // ask for it explicitly (report_utils::reportLogFont), and the counter
-    // painters that used to hardcode Serif ask for it through cardTextFont().
+    // ask for it explicitly (report_utils::reportLogFont); the counter painters
+    // and deck lists that used to hardcode Serif ask for it through
+    // cardTextFont() and deckListFont().
     return qApp->font();
 }
 
