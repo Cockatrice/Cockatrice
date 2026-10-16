@@ -53,6 +53,7 @@ public:
     void rawInsertCard(CardItem *card, int index)
     {
         cards.insert(index, card);
+        emit cardCountChanged();
     }
 
     [[nodiscard]] const CardList &getCards() const
@@ -63,6 +64,7 @@ public:
     void sortCards(const QList<CardList::SortOption> &options)
     {
         cards.sortBy(options);
+        emit cardCountChanged();
     }
     [[nodiscard]] QString getName() const
     {

@@ -43,6 +43,7 @@ signals:
     void cardPixmapUpdated();
     void tappedChanged(bool newTapped, bool canAnimate);
     void facedownChanged(bool newFaceDown);
+    void stateReset();
 
     void attackingChanged(bool newValue);
     void countersChanged(const QMap<int, int> &newCounters);
