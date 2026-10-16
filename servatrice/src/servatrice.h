@@ -303,6 +303,7 @@ public:
     int getDeckShareCleanupInterval() const;
     int getDeckShareMaxDecksPerShare() const;
     int getDeckShareMaxSharesPerDay() const;
+    int getDeckSyncMaxVersions() const;
     int getMaxUsersPerAddress() const;
     int getMessageCountingInterval() const override;
     int getMaxMessageCountPerInterval() const override;

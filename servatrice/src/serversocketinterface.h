@@ -155,6 +155,7 @@ private:
     Response::ResponseCode cmdDeckDelDir(const Command_DeckDelDir &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckDel(const Command_DeckDel &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckUpload(const Command_DeckUpload &cmd, ResponseContainer &rc);
+    bool storeDeckVersion(int deckId, const QString &content, const QString &hash);
     DeckList *getDeckFromDatabase(int deckId);
     Response::ResponseCode cmdDeckDownload(const Command_DeckDownload &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckDownloadPublic(const Command_DeckDownloadPublic &cmd, ResponseContainer &rc);

@@ -510,3 +510,12 @@ max_decks_per_share=50
 ; A value of 0 disables the limit.
 ; Default: 50
 max_shares_per_day=50
+
+
+[deck_sync]
+
+; Maximum number of stored versions kept per deck. Each upload with changed
+; content adds a version; older versions beyond this limit are pruned.
+; Minimum enforced: 1.
+; Default: 20
+max_versions=20
