@@ -1,15 +1,6 @@
 #include "game_scene.h"
 
 #include "../client/settings/cache_settings.h"
-#include "../game/abstract_game.h"
-#include "../game/arrow_registry.h"
-#include "../game/board/arrow_data.h"
-#include "../game/player/player_actions.h"
-#include "../game/player/player_event_handler.h"
-#include "../game/player/player_info.h"
-#include "../game/player/player_logic.h"
-#include "../game/zones/card_zone_logic.h"
-#include "../game/zones/view_zone_logic.h"
 #include "animated_item.h"
 #include "board/abstract_card_item.h"
 #include "board/arrow_item.h"
@@ -41,6 +32,14 @@
 #include <QtMath>
 #include <algorithm>
 #include <functional>
+#include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/board/arrow_data.h>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_event_handler.h>
+#include <libcockatrice/game/player/player_info.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
+#include <libcockatrice/game/zones/view_zone_logic.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <numeric>

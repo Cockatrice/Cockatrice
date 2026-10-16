@@ -1,17 +1,6 @@
 #include "card_item.h"
 
 #include "../../client/settings/cache_settings.h"
-#include "../../game/abstract_game.h"
-#include "../../game/board/card_state.h"
-#include "../../game/game_state.h"
-#include "../../game/phase.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_info.h"
-#include "../../game/player/player_logic.h"
-#include "../../game/player/player_manager.h"
-#include "../../game/zones/card_zone_logic.h"
-#include "../../game/zones/table_zone_logic.h"
-#include "../../game/zones/view_zone_logic.h"
 #include "../card_dimensions.h"
 #include "../game_scene.h"
 #include "arrow_item.h"
@@ -41,6 +30,17 @@
 #include <QVariant>
 #include <QtGlobal>
 #include <libcockatrice/card/card_info.h>
+#include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/board/card_state.h>
+#include <libcockatrice/game/game_state.h>
+#include <libcockatrice/game/phase.h>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_info.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/player/player_manager.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
+#include <libcockatrice/game/zones/table_zone_logic.h>
+#include <libcockatrice/game/zones/view_zone_logic.h>
 #include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/card_ref.h>

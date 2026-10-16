@@ -3,6 +3,7 @@
 #include <QSharedPointer>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/card/database/card_database_querier.h>
 
 void CardState::resetState(bool keepAnnotations)
 {

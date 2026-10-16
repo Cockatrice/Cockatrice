@@ -16,6 +16,8 @@
 #include <qtmetamacros.h>
 
 class AbstractGame;
+class ICardPreferenceProvider;
+class IInterfaceSettingsProvider;
 class PlayerLogic;
 
 class PlayerManager : public QObject
@@ -23,7 +25,12 @@ class PlayerManager : public QObject
     Q_OBJECT
 
 public:
-    PlayerManager(AbstractGame *_game, int _localPlayerId, bool _localPlayerIsJudge, bool localPlayerIsSpectator);
+    PlayerManager(AbstractGame *_game,
+                  int _localPlayerId,
+                  bool _localPlayerIsJudge,
+                  bool localPlayerIsSpectator,
+                  IInterfaceSettingsProvider *interfaceSettings = nullptr,
+                  ICardPreferenceProvider *cardPreferences = nullptr);
 
     AbstractGame *game;
     QMap<int, PlayerLogic *> players;
@@ -31,6 +38,9 @@ public:
     bool localPlayerIsJudge;
     bool localPlayerIsSpectator;
     QMap<int, ServerInfo_User> spectators;
+    // Borrowed settings providers forwarded to each PlayerLogic (owned by the application).
+    IInterfaceSettingsProvider *interfaceSettings;
+    ICardPreferenceProvider *cardPreferences;
 
     [[nodiscard]] bool isSpectator() const
     {

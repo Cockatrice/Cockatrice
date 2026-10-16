@@ -1,11 +1,5 @@
 #include "stack_zone.h"
 
-#include "../../game/board/card_list.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_info.h"
-#include "../../game/player/player_logic.h"
-#include "../../game/zones/card_zone_logic.h"
-#include "../../game/zones/stack_zone_logic.h"
 #include "../../interface/theme_manager.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
@@ -19,6 +13,12 @@
 #include <QPoint>
 #include <QRectF>
 #include <QString>
+#include <libcockatrice/game/board/card_list.h>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_info.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
+#include <libcockatrice/game/zones/stack_zone_logic.h>
 #include <qnumeric.h>
 #include <string>
 

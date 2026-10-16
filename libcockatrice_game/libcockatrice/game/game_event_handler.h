@@ -37,7 +37,6 @@
 class AbstractClient;
 class AbstractGame;
 class GameEventContainer;
-class GameEventContext;
 class PendingCommand;
 class PlayerLogic;
 class Response;

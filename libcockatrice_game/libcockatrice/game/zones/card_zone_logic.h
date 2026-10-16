@@ -7,8 +7,8 @@
 #ifndef COCKATRICE_CARD_ZONE_LOGIC_H
 #define COCKATRICE_CARD_ZONE_LOGIC_H
 
-#include "../../client/translation.h"
 #include "../board/card_list.h"
+#include "../translation.h"
 
 #include <QList>
 #include <QLoggingCategory>
@@ -21,9 +21,6 @@ inline Q_LOGGING_CATEGORY(CardZoneLogicLog, "card_zone_logic");
 
 class PlayerLogic;
 class ZoneViewZoneLogic;
-class QMenu;
-class QAction;
-class QPainter;
 class CardDragItem;
 
 class CardZoneLogic : public QObject
