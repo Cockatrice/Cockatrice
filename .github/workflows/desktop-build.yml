@@ -270,6 +270,9 @@ jobs:
 
       - name: "Install sentry-cli"
         if: matrix.package != 'skip' && needs.configure.outputs.tag != null
+        # Downloads from Sentry's release registry: a Sentry outage or a broken install under
+        # Git Bash must not take down the release assets below.
+        continue-on-error: true
         shell: bash
         env:
           SENTRY_CLI_VERSION: '3.8.0'
@@ -621,6 +624,9 @@ jobs:
 
       - name: "Install sentry-cli"
         if: needs.configure.outputs.tag != null && matrix.make_package == '1'
+        # Same as the Linux leg above: the install downloads from Sentry's registry, so a
+        # failure here must not block the release upload below.
+        continue-on-error: true
         shell: bash
         env:
           SENTRY_CLI_VERSION: '3.8.0'

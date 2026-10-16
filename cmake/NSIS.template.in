@@ -1539,9 +1539,13 @@ ${If} $PortableMode = 0
 	; Older installers did register cockatrice.exe above (and the removed
 	; MiniDumpWithFullMemory writer filled that folder), and that key survives this
 	; install, so WER would keep writing full dumps. Remove it, and clear the
-	; legacy dumps nothing consumes anymore.
+	; legacy dumps nothing consumes anymore. $LOCALAPPDATA resolves per shell context:
+	; under "all" it points at ProgramData, so switch to "current" for the per-user
+	; dumps folder and back afterwards; the registry delete works in either context.
 	DeleteRegKey HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe"
+	SetShellVarContext current
 	RMDir /r "$LOCALAPPDATA\CrashDumps\Cockatrice"
+	SetShellVarContext all
 
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayIcon" "$INSTDIR\cockatrice.exe"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayName" "Cockatrice"
@@ -1644,9 +1648,12 @@ Section "un.Application" UnSecApplication
 
 	; Leftover WER LocalDumps key from pre-Sentry installers (see the installer note
 	; above): removing it here covers machines that uninstall without reinstalling.
-	; The legacy full-memory dumps go with it; nothing consumes them anymore.
+	; The legacy full-memory dumps go with it; nothing consumes them anymore. Same shell
+	; context note as the installer: the per-user dumps folder needs "current".
 	DeleteRegKey HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe"
+	SetShellVarContext current
 	RMDir /r "$LOCALAPPDATA\CrashDumps\Cockatrice"
+	SetShellVarContext all
 
 	; Only remove the file/protocol associations if we registered them (i.e. the
 	; install was not portable) and .cod is still owned by Cockatrice, so we don't
