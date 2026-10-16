@@ -60,6 +60,7 @@ private:
     QColor textColor;
     QColor outlineColor;
     int fontSize;
+    bool hasExplicitFontSize = false;
     Qt::Alignment textAlignment;
     bool highlighted;
 };

@@ -84,15 +84,23 @@ struct PaletteConfig
  * @code
  * [Fonts]
  * InterfaceDefault = "Inter, 10"
+ * CardText = "Noto Serif, 12"
+ * CardTextMinSize = 1
  * @endcode
+ * CardText stores family + MAX size; cardTextMinSize stores the overlay
+ * shrink-to-fit floor (omitted from TOML when 1).
  */
 struct FontConfig
 {
     QMap<AppFont::Role, QFont> fonts;
+    int cardTextMinSize = 1;
+    /// Optional size-only maximum for CardText, used by the retired maxFontSize
+    /// migration so seeding it does not have to pin a family.
+    int cardTextMaxSize = 0;
 
     bool operator==(const FontConfig &rhs) const
     {
-        return fonts == rhs.fonts;
+        return fonts == rhs.fonts && cardTextMinSize == rhs.cardTextMinSize && cardTextMaxSize == rhs.cardTextMaxSize;
     }
     bool operator!=(const FontConfig &rhs) const
     {
