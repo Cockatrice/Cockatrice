@@ -149,6 +149,7 @@ void PaletteEditorDialog::setupUi()
     fontSectionLayout->setSpacing(0);
     fontNoteLabel = new QLabel(fontSection);
     fontNoteLabel->setContentsMargins(12, 4, 12, 0);
+    fontNoteLabel->setWordWrap(true);
     fontSectionLayout->addWidget(fontNoteLabel);
     fontGrid = new FontGridWidget(fontSection);
     fontSectionLayout->addWidget(fontGrid);
@@ -242,7 +243,7 @@ void PaletteEditorDialog::retranslateUi()
     paletteGridToggleButton->setToolTip(tr("Show or hide the per-role colour grid for manual tweaks"));
     fontToggleButton->setText(fontSection->isVisible() ? tr("▼  Edit Fonts") : tr("▶  Edit Fonts"));
     fontToggleButton->setToolTip(tr("Show or hide the per-purpose font settings for this theme"));
-    fontNoteLabel->setText(tr("Fonts belong to theme %1").arg(themeName));
+    fontNoteLabel->setText(tr("Fonts belong to theme %1 (shared by Light and Dark schemes)").arg(themeName));
     fontGrid->retranslateUi();
     revertButton->setText(tr("↺  Revert to theme default"));
 
