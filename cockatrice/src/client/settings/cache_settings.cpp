@@ -137,6 +137,9 @@ SettingsCache::SettingsCache()
     // before that rename (idempotent, safe to run on every startup, portable builds included).
     SettingsMigration::migrateGameFiltersToCamelCase(settingsPath);
 
+    // Retire appearance/maxFontSize into per-theme CardText max (idempotent, safe every startup).
+    SettingsMigration::migrateAppearanceMaxFontSizeToTheme(settingsPath);
+
     shortcutsSettings = new ShortcutsSettings(settingsPath, this);
     cardDatabaseSettings = new CardDatabaseSettings(settingsPath, this);
     serversSettings = new ServersSettings(settingsPath, this);

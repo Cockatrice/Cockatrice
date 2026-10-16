@@ -154,6 +154,10 @@ public:
      *         ChatLog, serif basis for CardText and DeckList, the application
      *         font for the remaining roles). */
     QFont appFont(AppFont::Role role) const;
+    /** @brief CardText max size: stored CardText point size, else 12. */
+    int cardTextMaxSize() const;
+    /** @brief CardText shrink-to-fit floor: stored CardTextMinSize, else 1. */
+    int cardTextMinSize() const;
 
     QBrush &getBgBrush(Role zone);
     QBrush getExtraBgBrush(Role zone, int zoneId = 0);

@@ -17,6 +17,7 @@
 #include <QSharedPointer>
 #include <QStringList>
 #include <QStringLiteral>
+#include <QTextStream>
 #include <QVariant>
 #include <algorithm>
 #include <utility>
@@ -395,7 +396,6 @@ static void migrateAppearanceSettings(const QString &settingsPath, QSettings &gl
 {
     const QMap<QString, QString> appearanceKeyMap = {
         {"theme/name", "appearance/themeName"},
-        {"game/maxfontsize", "appearance/maxFontSize"},
         {"home/background", "appearance/homeTabBackgroundSource"},
         {"home/background/shuffleTimer", "appearance/homeTabBackgroundShuffleFrequency"},
         {"home/background/displayCardName", "appearance/homeTabDisplayCardName"},
@@ -422,6 +422,166 @@ static void migrateAppearanceSettings(const QString &settingsPath, QSettings &gl
             appearanceIni.setValue(it.value(), value);
         }
     }
+}
+
+static QString themesPathForSettings(const QString &settingsPath)
+{
+    QSettings pathsIni(settingsPath + "paths.ini", QSettings::IniFormat);
+    const QString configured = pathsIni.value("paths/themes").toString().trimmed();
+    if (!configured.isEmpty()) {
+        return configured;
+    }
+    // Default layout: <data>/themes/ sibling of <data>/settings/.
+    return QDir::cleanPath(QDir(settingsPath).absoluteFilePath("../themes"));
+}
+
+static bool fontsTomlHasExplicitCardTextMax(const QString &filePath)
+{
+    QFile f(filePath);
+    if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return false;
+    }
+
+    QString currentSection;
+    QTextStream in(&f);
+    while (!in.atEnd()) {
+        QString line = in.readLine().trimmed();
+        if (line.isEmpty() || line.startsWith('#') || line.startsWith(';')) {
+            continue;
+        }
+        if (line.startsWith('[') && line.endsWith(']')) {
+            currentSection = line.mid(1, line.length() - 2).trimmed();
+            continue;
+        }
+        if (currentSection.compare("Fonts", Qt::CaseInsensitive) != 0) {
+            continue;
+        }
+        int eq = line.indexOf('=');
+        if (eq < 0) {
+            continue;
+        }
+        QString key = line.left(eq).trimmed();
+        QString value = line.mid(eq + 1).trimmed();
+        for (int i = 1; i < value.size(); ++i) {
+            if ((value[i] == '#' || value[i] == ';') && value[i - 1].isSpace()) {
+                value = value.left(i).trimmed();
+                break;
+            }
+        }
+        if (value.size() >= 2 &&
+            ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith('\'') && value.endsWith('\'')))) {
+            value = value.mid(1, value.size() - 2).trimmed();
+        }
+        if (key.startsWith("AppFont::")) {
+            key = key.mid(QStringLiteral("AppFont::").size());
+        }
+        if (key.compare("CardText", Qt::CaseInsensitive) != 0) {
+            continue;
+        }
+        int comma = value.lastIndexOf(',');
+        if (comma < 0) {
+            continue;
+        }
+        QString family = value.left(comma).trimmed();
+        if (family.size() >= 2 &&
+            ((family.startsWith('"') && family.endsWith('"')) || (family.startsWith('\'') && family.endsWith('\'')))) {
+            family = family.mid(1, family.size() - 2).trimmed();
+        }
+        bool ok = false;
+        int pointSize = value.mid(comma + 1).trimmed().toInt(&ok);
+        if (!ok || family.isEmpty() || pointSize <= 0) {
+            continue;
+        }
+        return true;
+    }
+    return false;
+}
+
+static bool seedCardTextMaxIntoThemeDir(const QString &themeDirPath, int maxSize)
+{
+    if (themeDirPath.isEmpty() || maxSize <= 0) {
+        return false;
+    }
+    QDir dir(themeDirPath);
+    if (!dir.exists()) {
+        return false;
+    }
+    const QString filePath = dir.absoluteFilePath("fonts.toml");
+    if (fontsTomlHasExplicitCardTextMax(filePath)) {
+        return false;
+    }
+
+    QString existing;
+    if (QFile::exists(filePath)) {
+        QFile in(filePath);
+        if (!in.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            return false;
+        }
+        existing = QString::fromUtf8(in.readAll());
+    }
+
+    const QString entry =
+        QString("%1 = \"%2, %3\"\n").arg(QStringLiteral("CardText"), -20).arg(QStringLiteral("Serif")).arg(maxSize);
+
+    QString out;
+    if (existing.isEmpty()) {
+        out = "[Fonts]\n" + entry + "\n";
+    } else if (existing.contains("[Fonts]", Qt::CaseInsensitive)) {
+        out = existing;
+        if (!out.endsWith('\n')) {
+            out += '\n';
+        }
+        out += entry;
+    } else {
+        out = existing;
+        if (!out.endsWith('\n')) {
+            out += '\n';
+        }
+        out += "\n[Fonts]\n" + entry + "\n";
+    }
+
+    QFile f(filePath);
+    if (!f.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+        return false;
+    }
+    QTextStream stream(&f);
+    stream << out;
+    return true;
+}
+
+static bool appearanceMaxFontSizeMigrationPending(const QString &settingsPath)
+{
+    if (!QFile::exists(settingsPath + "appearance.ini")) {
+        return false;
+    }
+    QSettings appearanceIni(settingsPath + "appearance.ini", QSettings::IniFormat);
+    return appearanceIni.contains("appearance/maxFontSize");
+}
+
+bool SettingsMigration::migrateAppearanceMaxFontSizeToTheme(const QString &settingsPath)
+{
+    if (!appearanceMaxFontSizeMigrationPending(settingsPath)) {
+        return false;
+    }
+
+    QSettings appearanceIni(settingsPath + "appearance.ini", QSettings::IniFormat);
+    // Retired default was 12 in AppearanceSettings::getMaxFontSize; only
+    // non-default values are seeded, default users rely on the theme fallback.
+    const int legacy = appearanceIni.value("appearance/maxFontSize").toInt();
+    if (legacy != 12 && legacy > 0) {
+        const QString themesPath = themesPathForSettings(settingsPath);
+        QDir themesDir(themesPath);
+        if (themesDir.exists()) {
+            const QStringList themes = themesDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+            for (const QString &theme : themes) {
+                seedCardTextMaxIntoThemeDir(themesDir.absoluteFilePath(theme), legacy);
+            }
+        }
+    }
+
+    appearanceIni.remove("appearance/maxFontSize");
+    appearanceIni.sync();
+    return true;
 }
 
 static void migrateNetworkSettings(const QString &settingsPath, QSettings &globalIni)
@@ -818,6 +978,10 @@ bool SettingsMigration::isMigrationPending(const QString &settingsPath)
     }
 
     if (gameFiltersCamelCaseMigrationPending(settingsPath)) {
+        return true;
+    }
+
+    if (appearanceMaxFontSizeMigrationPending(settingsPath)) {
         return true;
     }
 
