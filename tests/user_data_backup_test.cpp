@@ -98,10 +98,12 @@ TEST(UserDataBackup, BackupDirectoryCreatesTimestampedCopy)
     deck.write("<cockatrice_deck version=\"1\"/>\n");
     deck.close();
 
-    QString backupLocation;
-    EXPECT_TRUE(UserDataBackup::backupAtRiskPath(sourceDir.path(), backupRoot.path(), &backupLocation));
-    EXPECT_TRUE(QFile::exists(backupLocation + "/mydeck.cod"));
-    EXPECT_TRUE(backupLocation.startsWith(QDir(backupRoot.path()).absolutePath()));
+    QStringList locations;
+    QString sessionDir;
+    EXPECT_TRUE(UserDataBackup::backupAtRiskPaths({sourceDir.path()}, backupRoot.path(), &locations, &sessionDir));
+    ASSERT_EQ(locations.size(), 1);
+    EXPECT_TRUE(QFile::exists(locations.first() + "/mydeck.cod"));
+    EXPECT_TRUE(locations.first().startsWith(QDir(backupRoot.path()).absolutePath()));
 }
 
 TEST(UserDataBackup, BackupSingleFile)
@@ -116,17 +118,23 @@ TEST(UserDataBackup, BackupSingleFile)
     db.write("<cockatrice_card_database/>\n");
     db.close();
 
-    QString backupLocation;
-    EXPECT_TRUE(UserDataBackup::backupAtRiskPath(cardDb, backupRoot.path(), &backupLocation));
-    EXPECT_TRUE(QFile::exists(backupLocation));
-    EXPECT_TRUE(backupLocation.endsWith("cards.xml"));
+    QStringList locations;
+    EXPECT_TRUE(UserDataBackup::backupAtRiskPaths({cardDb}, backupRoot.path(), &locations, nullptr));
+    ASSERT_EQ(locations.size(), 1);
+    EXPECT_TRUE(QFile::exists(locations.first()));
+    EXPECT_TRUE(locations.first().endsWith("cards.xml"));
 }
 
 TEST(UserDataBackup, BackupMissingSourceFails)
 {
     QTemporaryDir backupRoot;
     ASSERT_TRUE(backupRoot.isValid());
-    EXPECT_FALSE(UserDataBackup::backupAtRiskPath("/nonexistent-cockatrice-path-xyz", backupRoot.path(), nullptr));
+    QStringList locations;
+    QString sessionDir;
+    EXPECT_FALSE(UserDataBackup::backupAtRiskPaths({QDir(backupRoot.path()).absoluteFilePath("does-not-exist.cod")},
+                                                   backupRoot.path(), &locations, &sessionDir));
+    EXPECT_TRUE(locations.isEmpty());
+    EXPECT_TRUE(sessionDir.isEmpty());
 }
 
 TEST(UserDataBackup, BackupPathsShareSingleSessionDir)
@@ -241,7 +249,7 @@ TEST(UserDataBackup, ListSessionsFindsRecentAndPrunesOld)
     // Newest first
     EXPECT_EQ(sessions.first(), secondSession);
 
-    const QString recent = UserDataBackup::findRecentBackupSession(backupRoot.path(), 24);
+    const QString recent = UserDataBackup::findRecentUsableBackupSession(backupRoot.path(), {sourceDir.path()}, 24);
     EXPECT_EQ(recent, secondSession);
 
     const QStringList reusedLocations = UserDataBackup::listSessionBackupLocations(recent);
@@ -262,7 +270,10 @@ TEST(UserDataBackup, FindRecentReturnsEmptyWhenNone)
     QTemporaryDir backupRoot;
     ASSERT_TRUE(backupRoot.isValid());
     EXPECT_TRUE(UserDataBackup::listBackupSessions(backupRoot.path()).isEmpty());
-    EXPECT_TRUE(UserDataBackup::findRecentBackupSession(backupRoot.path(), 24).isEmpty());
+    EXPECT_TRUE(UserDataBackup::findRecentUsableBackupSession(backupRoot.path(), {backupRoot.path() + "/missing"}, 24)
+                    .isEmpty());
+    EXPECT_TRUE(UserDataBackup::findRecentCoveringBackupSession(backupRoot.path(), {backupRoot.path() + "/missing"}, 24)
+                    .isEmpty());
     EXPECT_TRUE(UserDataBackup::listSessionBackupLocations(backupRoot.path() + "/missing").isEmpty());
     EXPECT_FALSE(UserDataBackup::isBackupSessionComplete(backupRoot.path() + "/missing"));
     // Pruning an empty root must not fail
@@ -292,7 +303,10 @@ TEST(UserDataBackup, EmptySessionsAreSkippedAndPruned)
     // An empty session from a failed attempt must never block a retry
     EXPECT_TRUE(UserDataBackup::listSessionBackupLocations(emptySession).isEmpty());
     EXPECT_FALSE(UserDataBackup::isBackupSessionComplete(emptySession));
-    EXPECT_TRUE(UserDataBackup::findRecentBackupSession(backupRoot.path(), 24).isEmpty());
+    EXPECT_TRUE(UserDataBackup::findRecentUsableBackupSession(backupRoot.path(), {backupRoot.path() + "/missing"}, 24)
+                    .isEmpty());
+    EXPECT_TRUE(UserDataBackup::findRecentCoveringBackupSession(backupRoot.path(), {backupRoot.path() + "/missing"}, 24)
+                    .isEmpty());
     UserDataBackup::pruneOldBackupSessions(backupRoot.path(), 5);
     EXPECT_FALSE(QDir(emptySession).exists());
 }
@@ -321,7 +335,7 @@ TEST(UserDataBackup, SuccessfulBackupIsMarkedComplete)
     }
 }
 
-TEST(UserDataBackup, IncompleteMarkerReportsIncompleteButRemainsReusable)
+TEST(UserDataBackup, IncompleteMarkerIsNotUsableButRemainsCovering)
 {
     QTemporaryDir sourceDir;
     QTemporaryDir backupRoot;
@@ -342,11 +356,13 @@ TEST(UserDataBackup, IncompleteMarkerReportsIncompleteButRemainsReusable)
     marker.close();
 
     EXPECT_FALSE(UserDataBackup::isBackupSessionComplete(sessionDir));
-    // Still non-empty, so throttling reuses it and the caller warns instead of copying again
-    EXPECT_EQ(UserDataBackup::findRecentBackupSession(backupRoot.path(), 24), sessionDir);
+    // Incomplete sessions are skipped by the usable search but still found by the
+    // covering search, so a failed copy falls back to the salvaged content.
+    EXPECT_TRUE(UserDataBackup::findRecentUsableBackupSession(backupRoot.path(), {sourceDir.path()}, 24).isEmpty());
+    EXPECT_EQ(UserDataBackup::findRecentCoveringBackupSession(backupRoot.path(), {sourceDir.path()}, 24), sessionDir);
 }
 
-TEST(UserDataBackup, LegacySessionWithoutMarkerCountsAsComplete)
+TEST(UserDataBackup, SessionWithoutMarkerCountsAsIncomplete)
 {
     QTemporaryDir backupRoot;
     ASSERT_TRUE(backupRoot.isValid());
@@ -357,8 +373,12 @@ TEST(UserDataBackup, LegacySessionWithoutMarkerCountsAsComplete)
     ASSERT_TRUE(deck.open(QIODevice::WriteOnly | QIODevice::Text));
     deck.write("<cockatrice_deck version=\"1\"/>\n");
     deck.close();
-    EXPECT_TRUE(UserDataBackup::isBackupSessionComplete(sessionDir));
-    EXPECT_EQ(UserDataBackup::findRecentBackupSession(backupRoot.path(), 24), sessionDir);
+    EXPECT_FALSE(UserDataBackup::isBackupSessionComplete(sessionDir));
+    // No source manifest either, so neither search reuses it.
+    EXPECT_TRUE(UserDataBackup::findRecentUsableBackupSession(backupRoot.path(), {backupRoot.path() + "/missing"}, 24)
+                    .isEmpty());
+    EXPECT_TRUE(UserDataBackup::findRecentCoveringBackupSession(backupRoot.path(), {backupRoot.path() + "/missing"}, 24)
+                    .isEmpty());
 }
 
 TEST(UserDataBackup, FindRecentIgnoresExpiredSessions)
@@ -375,7 +395,8 @@ TEST(UserDataBackup, FindRecentIgnoresExpiredSessions)
     QStringList locations;
     QString sessionDir;
     ASSERT_TRUE(UserDataBackup::backupAtRiskPaths({sourceDir.path()}, backupRoot.path(), &locations, &sessionDir));
-    EXPECT_TRUE(UserDataBackup::findRecentBackupSession(backupRoot.path(), 0).isEmpty());
+    EXPECT_TRUE(UserDataBackup::findRecentUsableBackupSession(backupRoot.path(), {sourceDir.path()}, 0).isEmpty());
+    EXPECT_TRUE(UserDataBackup::findRecentCoveringBackupSession(backupRoot.path(), {sourceDir.path()}, 0).isEmpty());
 }
 
 TEST(UserDataBackup, EstimateBackupSize)
@@ -414,7 +435,7 @@ TEST(UserDataBackup, SessionCoversSourcesRequiresManifestMatch)
     EXPECT_FALSE(UserDataBackup::sessionCoversSources(sessionDir, {sourceB.path()}));
 }
 
-TEST(UserDataBackup, LegacySessionWithoutManifestIsNotCovering)
+TEST(UserDataBackup, SessionWithoutManifestIsNotCovering)
 {
     QTemporaryDir backupRoot;
     ASSERT_TRUE(backupRoot.isValid());
@@ -539,14 +560,16 @@ TEST(UserDataBackup, CopyDirectoryDoesNotSilentlyEmptyDirSymlink)
     }
 }
 
-TEST(UserDataBackup, SingularBackupClearsOutParamOnTotalFailure)
+TEST(UserDataBackup, PluralBackupClearsOutParamsOnTotalFailure)
 {
     QTemporaryDir backupRoot;
     ASSERT_TRUE(backupRoot.isValid());
-    QString location = QStringLiteral("stale");
+    QStringList locations = {QStringLiteral("stale")};
+    QString sessionDir = QStringLiteral("stale");
     const QString missing = QDir(backupRoot.path()).absoluteFilePath("does-not-exist.cod");
-    EXPECT_FALSE(UserDataBackup::backupAtRiskPath(missing, backupRoot.path(), &location));
-    EXPECT_TRUE(location.isEmpty());
+    EXPECT_FALSE(UserDataBackup::backupAtRiskPaths({missing}, backupRoot.path(), &locations, &sessionDir));
+    EXPECT_TRUE(locations.isEmpty());
+    EXPECT_TRUE(sessionDir.isEmpty());
 }
 
 } // namespace

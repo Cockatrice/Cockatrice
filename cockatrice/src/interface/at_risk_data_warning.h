@@ -1,7 +1,7 @@
 #ifndef AT_RISK_DATA_WARNING_H
 #define AT_RISK_DATA_WARNING_H
 
-#include <QObject>
+#include <QCoreApplication>
 #include <QString>
 #include <QStringList>
 #include <QtGlobal>
@@ -12,13 +12,15 @@ class QWidget;
  * @brief Warns when user data lives inside the program directory and backs it up first.
  *
  * The uninstallers shipped in Cockatrice 3.1.0/3.1.1 delete the whole install
- * tree, so data paths configured inside the program directory (and portable
- * installs, whose data lives there by design) get a safety backup outside the
- * install directory before the warning is shown.
+ * tree, so data paths configured inside the program directory get a safety
+ * backup outside the install directory before the warning is shown.
+ * Portable installs keep their data inside the program directory by design but
+ * never shipped an uninstaller, so they are skipped.
  */
-class AtRiskDataWarning : public QObject
+class AtRiskDataWarning
 {
-    Q_OBJECT
+    Q_DECLARE_TR_FUNCTIONS(AtRiskDataWarning)
+
 public:
     struct AtRiskBackupOutcome
     {
@@ -29,11 +31,6 @@ public:
         bool skippedDueToSize = false; ///< true when the automatic copy was skipped for size
         qint64 bytes = 0;              ///< estimated bytes, only set when a fresh copy was attempted
     };
-    struct AtRiskPaths
-    {
-        QStringList sourcesToBackUp;     ///< existing paths that need a safety copy
-        QStringList offendersForDisplay; ///< paths listed in the warning (empty for portable)
-    };
 
     /**
      * @brief Backs up at-risk data paths and warns about them.
@@ -42,10 +39,8 @@ public:
     static void warnAboutDataPathsInProgramDir(QWidget *parent);
 
 private:
-    static AtRiskPaths collectPortableAtRiskPaths(const QString &appDir);
     static QStringList collectInstalledAtRiskPaths(const QString &appDir);
     static AtRiskBackupOutcome backUpAtRiskPaths(const QStringList &sources, const QString &appDir);
-    static QString buildPortableAtRiskMessage(const AtRiskBackupOutcome &outcome, bool emptySources);
     static QString buildInstalledAtRiskMessage(const QStringList &offenders,
                                                const QStringList &sources,
                                                const AtRiskBackupOutcome &outcome);

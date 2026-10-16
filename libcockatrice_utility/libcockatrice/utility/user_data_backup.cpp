@@ -33,8 +33,8 @@ bool pathsEqual(const QString &a, const QString &b)
 
 void writeCompletionMarker(const QString &sessionDir, bool complete)
 {
-    // Best effort: a missing marker only means isBackupSessionComplete() falls
-    // back to the legacy content check below.
+    // Best effort: a missing marker only means isBackupSessionComplete()
+    // reports the session as incomplete.
     QFile marker(QDir(sessionDir).absoluteFilePath(complete ? COMPLETE_MARKER : INCOMPLETE_MARKER));
     if (marker.open(QIODevice::WriteOnly | QIODevice::Text)) {
         marker.write(complete ? "complete\n" : "incomplete\n");
@@ -132,20 +132,6 @@ bool createBackupSessionDir(const QString &backupRoot, QString *sessionDirOut)
     return true;
 }
 
-bool backupAtRiskPath(const QString &sourcePath, const QString &backupRoot, QString *backupLocationOut)
-{
-    QStringList locations;
-    const bool ok = backupAtRiskPaths({sourcePath}, backupRoot, &locations, nullptr);
-    if (backupLocationOut) {
-        if (!locations.isEmpty()) {
-            *backupLocationOut = locations.first();
-        } else {
-            backupLocationOut->clear();
-        }
-    }
-    return ok;
-}
-
 bool backupAtRiskPaths(const QStringList &sourcePaths,
                        const QString &backupRoot,
                        QStringList *backupLocationsOut,
@@ -204,7 +190,7 @@ bool backupAtRiskPaths(const QStringList &sourcePaths,
     }
     if (locations.isEmpty()) {
         // Nothing salvaged: remove the session again so the empty directory
-        // neither blocks a retry via findRecentBackupSession() nor evicts a
+        // neither blocks a retry via the recent-session reuse nor evicts a
         // good session in pruneOldBackupSessions().
         QDir(sessionDir).removeRecursively();
         if (backupLocationsOut) {
@@ -287,29 +273,6 @@ QStringList listBackupSessions(const QString &backupRoot)
     return sessions;
 }
 
-QString findRecentBackupSession(const QString &backupRoot, int maxAgeHours)
-{
-    const QStringList sessions = listBackupSessions(backupRoot);
-    const QDateTime now = QDateTime::currentDateTime();
-    for (const QString &session : sessions) {
-        const QFileInfo info(session);
-        if (!info.exists()) {
-            continue;
-        }
-        // No early break: filename order is not guaranteed to match mtime order
-        // (clock adjustments, externally touched dirs), and session counts are tiny.
-        if (info.lastModified().secsTo(now) >= static_cast<qint64>(maxAgeHours) * 3600) {
-            continue;
-        }
-        // Skip empty sessions from failed attempts: they must never block a retry.
-        if (listSessionBackupLocations(session).isEmpty()) {
-            continue;
-        }
-        return session;
-    }
-    return {};
-}
-
 QString findRecentCoveringBackupSession(const QString &backupRoot, const QStringList &sourcePaths, int maxAgeHours)
 {
     const QStringList sessions = listBackupSessions(backupRoot);
@@ -368,15 +331,7 @@ bool isBackupSessionComplete(const QString &sessionDir)
     if (!session.exists()) {
         return false;
     }
-    if (QFileInfo::exists(session.absoluteFilePath(COMPLETE_MARKER))) {
-        return true;
-    }
-    if (QFileInfo::exists(session.absoluteFilePath(INCOMPLETE_MARKER))) {
-        return false;
-    }
-    // Legacy sessions from before markers existed: content means the copy
-    // reported success at the time, so treat them as complete.
-    return !listSessionBackupLocations(session.absolutePath()).isEmpty();
+    return QFileInfo::exists(session.absoluteFilePath(COMPLETE_MARKER));
 }
 
 void pruneOldBackupSessions(const QString &backupRoot, int keepCount)
@@ -421,8 +376,8 @@ bool sessionCoversSources(const QString &sessionDir, const QStringList &sourcePa
 {
     QFile manifest(QDir(sessionDir).absoluteFilePath(SOURCES_MANIFEST));
     if (!manifest.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        // Legacy sessions predate the manifest: coverage cannot be verified,
-        // so report not-covered and let the caller take a fresh copy.
+        // No readable manifest (e.g. the write failed): coverage cannot be
+        // verified, so report not-covered and let the caller take a fresh copy.
         return false;
     }
     QStringList recorded;

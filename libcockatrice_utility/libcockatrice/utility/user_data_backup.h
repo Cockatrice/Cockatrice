@@ -22,8 +22,9 @@
 namespace UserDataBackup
 {
 
-/** @brief Above this total, the client skips the automatic startup backup and asks for a manual copy. */
-constexpr qint64 MAX_AUTO_BACKUP_BYTES = 500LL * 1024 * 1024;
+/** @brief Above this total, the client skips the automatic startup backup and asks for a manual copy.
+ * Kept small on purpose: the copy runs synchronously on the UI thread at startup. */
+constexpr qint64 MAX_AUTO_BACKUP_BYTES = 200LL * 1024 * 1024;
 
 /**
  * @brief Recursively copies @p sourceDir into @p destDir, creating it as needed.
@@ -41,19 +42,6 @@ bool copyDirectoryRecursively(const QString &sourceDir, const QString &destDir);
  * successive calls (e.g. one per installer phase) from sharing a directory.
  */
 bool createBackupSessionDir(const QString &backupRoot, QString *sessionDirOut);
-
-/**
- * @brief Copies an at-risk path (file or directory) to a timestamped folder under @p backupRoot.
- * @param sourcePath file or directory holding user data (must exist).
- * @param backupRoot directory OUTSIDE the install tree that will hold timestamped backups.
- * @param backupLocationOut receives the created backup file or directory whenever a target
- * was created, even when the copy was only partial (i.e. also on failure with a partial copy).
- * Cleared when nothing was salvaged.
- * @returns true when the whole source was copied, false when the source is missing or
- * any entry failed. A false return with a non-empty @p backupLocationOut means a partial
- * backup exists at that location.
- */
-bool backupAtRiskPath(const QString &sourcePath, const QString &backupRoot, QString *backupLocationOut = nullptr);
 
 /**
  * @brief Copies several at-risk paths into a single timestamped session directory.
@@ -93,22 +81,10 @@ QString defaultBackupRoot();
 QStringList listBackupSessions(const QString &backupRoot);
 
 /**
- * @brief Returns the newest non-empty session directory younger than @p maxAgeHours, or empty.
- *
- * Used to throttle startup safety backups so dismissing the warning without
- * "Don't show again" does not create a full duplicate on every launch.
- * Empty sessions (failed attempts) are skipped so they never block a retry.
- * Every session is age-checked individually; no early exit assumes filename
- * order matches mtime order (clock adjustments or externally touched dirs
- * can break that assumption).
- */
-QString findRecentBackupSession(const QString &backupRoot, int maxAgeHours = 24);
-
-/**
  * @brief Returns the newest session that is non-empty, complete and covering @p sourcePaths, or empty.
  *
- * Unlike findRecentBackupSession(), an incomplete newest session (partial failure) or one
- * covering a different source set does not block reuse of an older good session.
+ * An incomplete newest session (partial failure) or one covering a different
+ * source set does not block reuse of an older good session.
  */
 QString findRecentUsableBackupSession(const QString &backupRoot, const QStringList &sourcePaths, int maxAgeHours = 24);
 
@@ -123,9 +99,8 @@ findRecentCoveringBackupSession(const QString &backupRoot, const QStringList &so
 
 /**
  * @brief Reports whether @p sessionDir holds a complete backup.
- * @returns true when the session carries the complete marker, or when it predates
- * markers but holds backup content (legacy sessions); false for partial backups
- * and for empty/missing sessions.
+ * @returns true when the session carries the complete marker, false otherwise
+ * (partial backups and empty/missing sessions).
  */
 bool isBackupSessionComplete(const QString &sessionDir);
 
@@ -146,9 +121,9 @@ QStringList listSessionBackupLocations(const QString &sessionDir);
 /**
  * @brief Reports whether @p sessionDir was recorded as covering all of @p sourcePaths.
  * @returns true when the session's source manifest lists every entry of @p sourcePaths
- * (normalized via QDir::cleanPath, case-insensitive on Windows/macOS). Legacy sessions
- * without a manifest return false so a changed source set always triggers a fresh copy
- * instead of reusing a backup that may not cover it.
+ * (normalized via QDir::cleanPath, case-insensitive on Windows/macOS). Sessions
+ * without a readable manifest return false so a changed source set always triggers
+ * a fresh copy instead of reusing a backup that may not cover it.
  */
 bool sessionCoversSources(const QString &sessionDir, const QStringList &sourcePaths);
 

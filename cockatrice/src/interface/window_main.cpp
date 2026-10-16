@@ -606,14 +606,9 @@ MainWindow::MainWindow(QWidget *parent)
     QTimer::singleShot(0, this, &MainWindow::applyStartupDestination);
 }
 
-void MainWindow::warnAboutDataPathsInProgramDir()
-{
-    AtRiskDataWarning::warnAboutDataPathsInProgramDir(this);
-}
-
 void MainWindow::startupConfigCheck()
 {
-    warnAboutDataPathsInProgramDir();
+    AtRiskDataWarning::warnAboutDataPathsInProgramDir(this);
 
     const bool isCleanInstall = SettingsCache::instance().network().getClientVersion() == CLIENT_INFO_NOT_SET;
 

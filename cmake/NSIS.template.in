@@ -18,7 +18,9 @@ Var OldUninstallString
 Var OldInstallDir
 Var DataBackupDir
 Var DataBackupDone
+Var DataBackupForDir
 Var LooseDecksBackupDone
+Var InstallSubdirsBackupDone
 Var LooseDeckNoticeShown
 Var StaleFindHandle
 Var StaleFindName
@@ -135,6 +137,11 @@ StrCpy $InstallLogPath "$TEMP\Cockatrice-installer.log"
 ; No backup has been taken yet; RestoreUserDataAfterUninstall must be a no-op
 ; until BackupUserDataBeforeUninstall sets this after actually copying something.
 StrCpy $DataBackupDir ""
+StrCpy $DataBackupDone ""
+StrCpy $DataBackupForDir ""
+StrCpy $LooseDecksBackupDone ""
+StrCpy $InstallSubdirsBackupDone ""
+StrCpy $LooseDeckNoticeShown ""
 ; No old install location resolved yet; Backup/Restore fall back to $INSTDIR
 ; when this is empty (the /R path where $INSTDIR already is the old dir).
 StrCpy $OldInstallDir ""
@@ -367,16 +374,30 @@ FunctionEnd
 ; outside $INSTDIR before invoking it and put it back afterwards. Best effort
 ; only: a failed backup must never abort the install.
 ;
-; The backup is intentionally left in %TEMP% afterwards as a second safety copy.
-; Non-portable data paths beyond loose decks are covered by the client's
-; startup safety backup (warnAboutDataPathsInProgramDir).
+; The backup is left in %TEMP% afterwards on a best-effort basis only: the next
+; installer run that takes a new backup wipes it first (see below), so it is not
+; a durable second copy. Anything this backup does not cover - e.g. loose files
+; with other extensions - relies on the client's startup safety backup
+; (warnAboutDataPathsInProgramDir), which only exists after the first launch of
+; the new client.
+;
+; The 32-bit and 64-bit uninstall blocks below share $TEMP\CockatriceDataBackup.
+; When both are registered with different InstallLocations, backing up the second
+; directory into the first one's backup would restore the first dir's files into
+; the second one. BackupUserDataBeforeUninstall therefore starts over when
+; $OldInstallDir changes: the previous pass already restored its own backup, so
+; only its leftover %TEMP% copy is lost. RelocateRestoredDataToInstDir only sees
+; the last pass, so with two different old dirs plus a new target dir the first
+; dir's restored data stays in place instead of moving along - no loss, but the
+; user has to copy it manually.
 ;
 ; The portable-data branch below is defensive: both callers (AutoUninstallIfNeeded
 ; on /R, componentsPagePre interactively) only run for non-portable installs, and
 ; portable installs never write the registry uninstall keys that trigger them.
 ; It fires only when $OldInstallDir nevertheless contains portable.dat - e.g. a
 ; stale registry InstallLocation pointing at a portable dir, or portable.dat added
-; to a normal install dir. The loose-decks branch is the live one for normal installs.
+; to a normal install dir. The loose-decks and install-subdirs branches are the
+; live ones for normal installs.
 Function BackupUserDataBeforeUninstall
 ; $OldInstallDir is the directory being uninstalled: on the /R path it equals
 ; $INSTDIR (updater passes /D=<appDir>), on the interactive path componentsPagePre
@@ -393,6 +414,22 @@ ${EndIf}
 ; so the second call in sequence (32-bit then 64-bit uninstall) still merges.
 ${If} $DataBackupDir == ""
     RMDir /r "$TEMP\CockatriceDataBackup"
+${EndIf}
+; The 32-bit and 64-bit uninstall blocks share one backup dir. When the second
+; block points at a different directory, merging would restore the first dir's
+; files into the second one, so start over instead. The previous pass already
+; restored its own backup; only its leftover %TEMP% copy is discarded.
+; StrCmp is case-sensitive while Windows paths are not, so a casing-only
+; difference triggers a harmless redundant re-backup of the same content.
+${If} $DataBackupDir != ""
+${AndIf} $DataBackupForDir != ""
+${AndIf} $OldInstallDir != $DataBackupForDir
+    !insertmacro CockLog "pre-uninstall backup: old dir changed ($DataBackupForDir -> $OldInstallDir), starting a fresh backup"
+    RMDir /r "$TEMP\CockatriceDataBackup"
+    StrCpy $DataBackupDir ""
+    StrCpy $DataBackupDone ""
+    StrCpy $LooseDecksBackupDone ""
+    StrCpy $InstallSubdirsBackupDone ""
 ${EndIf}
 ${If} ${FileExists} "$OldInstallDir\portable.dat"
 ${AndIf} ${FileExists} "$OldInstallDir\data"
@@ -448,6 +485,49 @@ ${OrIf} ${FileExists} "$OldInstallDir\*.mwDeck"
     CopyFiles /SILENT "$OldInstallDir\*.dek" "$DataBackupDir\loose_decks\"
     CopyFiles /SILENT "$OldInstallDir\*.mwDeck" "$DataBackupDir\loose_decks\"
 ${EndIf}
+; Data folders below the top level (e.g. $OldInstallDir\decks) are deleted by the
+; old "RMDir /r $INSTDIR" just like loose decks, and on a 3.1.1 -> new upgrade the
+; client's startup backup has never run yet, so stash every top-level directory
+; that is not part of the payload. Payload dirs stay in place: they are rewritten
+; by the section below, and restoring them could put stale DLLs next to the new
+; executables. "data" is skipped once the portable branch above already took it;
+; without portable.dat it is user content like any other unknown dir.
+FindFirst $DataBackupFindHandle $DataBackupFindName "$OldInstallDir\*.*"
+${If} $DataBackupFindHandle != ""
+backup_subdirs_loop:
+    ${If} $DataBackupFindName != "."
+    ${AndIf} $DataBackupFindName != ".."
+    ${AndIf} $DataBackupFindName != "plugins"
+    ${AndIf} $DataBackupFindName != "Plugins"
+    ${AndIf} $DataBackupFindName != "translations"
+    ${AndIf} $DataBackupFindName != "sounds"
+    ${AndIf} $DataBackupFindName != "themes"
+        ${If} $DataBackupFindName == "data"
+        ${AndIf} $DataBackupDone == "1"
+            Goto backup_subdirs_next
+        ${EndIf}
+        ${If} ${FileExists} "$OldInstallDir\$DataBackupFindName\*.*"
+            ${If} $DataBackupDir == ""
+                StrCpy $DataBackupDir "$TEMP\CockatriceDataBackup"
+            ${EndIf}
+            StrCpy $InstallSubdirsBackupDone "1"
+            !insertmacro CockLog "pre-uninstall backup: copying subdir $OldInstallDir\$DataBackupFindName"
+            DetailPrint "Backing up $DataBackupFindName stored in the install directory..."
+            CreateDirectory "$DataBackupDir\install_subdirs\$DataBackupFindName"
+            CopyFiles /SILENT "$OldInstallDir\$DataBackupFindName\*.*" "$DataBackupDir\install_subdirs\$DataBackupFindName\"
+        ${EndIf}
+    ${EndIf}
+backup_subdirs_next:
+    ClearErrors
+    FindNext $DataBackupFindHandle $DataBackupFindName
+    IfErrors 0 backup_subdirs_loop
+    FindClose $DataBackupFindHandle
+${EndIf}
+; Remember which directory the current backup belongs to, so a later pass for a
+; different directory starts over instead of merging (see above).
+${If} $DataBackupDir != ""
+    StrCpy $DataBackupForDir $OldInstallDir
+${EndIf}
 FunctionEnd
 
 Function RestoreUserDataAfterUninstall
@@ -481,12 +561,37 @@ ${AndIf} ${FileExists} "$DataBackupDir\loose_decks"
     CopyFiles /SILENT "$DataBackupDir\loose_decks\*.dek" "$OldInstallDir\"
     CopyFiles /SILENT "$DataBackupDir\loose_decks\*.mwDeck" "$OldInstallDir\"
     DetailPrint "Restored deck files stored in the install directory."
-    ; Runs once per uninstall block, and there are two (32-bit, 64-bit): show the
-    ; notice a single time per installer run.
-    ${IfNot} ${Silent}
-    ${AndIf} $LooseDeckNoticeShown != "1"
+${EndIf}
+${If} $InstallSubdirsBackupDone == "1"
+${AndIf} ${FileExists} "$DataBackupDir\install_subdirs"
+    !insertmacro CockLog "post-uninstall restore: restoring install subdirectories"
+    CreateDirectory "$OldInstallDir"
+    FindFirst $DataBackupFindHandle $DataBackupFindName "$DataBackupDir\install_subdirs\*.*"
+    ${If} $DataBackupFindHandle != ""
+    restore_subdirs_loop:
+        ${If} $DataBackupFindName != "."
+        ${AndIf} $DataBackupFindName != ".."
+        ${AndIf} ${FileExists} "$DataBackupDir\install_subdirs\$DataBackupFindName\*.*"
+            !insertmacro CockLog "post-uninstall restore: restoring subdir $OldInstallDir\$DataBackupFindName"
+            CreateDirectory "$OldInstallDir\$DataBackupFindName"
+            CopyFiles /SILENT "$DataBackupDir\install_subdirs\$DataBackupFindName\*.*" "$OldInstallDir\$DataBackupFindName\"
+        ${EndIf}
+        ClearErrors
+        FindNext $DataBackupFindHandle $DataBackupFindName
+        IfErrors 0 restore_subdirs_loop
+        FindClose $DataBackupFindHandle
+    ${EndIf}
+    DetailPrint "Restored folders stored in the install directory."
+${EndIf}
+; Runs once per uninstall block, and there are two (32-bit, 64-bit): show the
+; notice a single time per installer run, covering both loose decks and
+; restored subdirectories.
+${IfNot} ${Silent}
+${AndIf} $LooseDeckNoticeShown != "1"
+    ${If} $LooseDecksBackupDone == "1"
+    ${OrIf} $InstallSubdirsBackupDone == "1"
         StrCpy $LooseDeckNoticeShown "1"
-        MessageBox MB_OK|MB_ICONINFORMATION "Your decks were stored inside the Cockatrice install folder ($OldInstallDir), which the previous version's uninstaller deletes.$\n$\nThey have been restored from a backup to that folder (deck files ending in .txt are not backed up - move those manually). If you install to a different folder, they are moved there automatically. Please move them out of the install folder afterwards (Settings -> General -> Paths) so a future uninstall cannot delete them again."
+        MessageBox MB_OK|MB_ICONINFORMATION "Your decks or data folders were stored inside the Cockatrice install folder ($OldInstallDir), which the previous version's uninstaller deletes.$\n$\nThey have been restored from a backup to that folder (loose deck files ending in .txt are not backed up - move those manually). If you install to a different folder, they are moved there automatically. Please move them out of the install folder afterwards (Settings -> General -> Paths) so a future uninstall cannot delete them again."
     ${EndIf}
 ${EndIf}
 done:
@@ -500,6 +605,9 @@ FunctionEnd
 ; target directory, the restored user data would otherwise stay orphaned in the
 ; old directory while the new install starts empty. Copy it across when they differ
 ; (a copy, not a move: the source is user data and is deliberately left in place).
+; Only the last uninstall pass's $OldInstallDir is relocated (see the shared-backup
+; comment above); with two different old dirs the first one's data stays restored
+; in place instead of moving along.
 ; StrCmp is case-sensitive while Windows paths are not; a casing-only difference
 ; triggers a harmless redundant copy onto itself.
 Function RelocateRestoredDataToInstDir
@@ -525,6 +633,25 @@ ${If} $LooseDecksBackupDone == "1"
         CopyFiles /SILENT "$OldInstallDir\*.dek" "$INSTDIR\"
         CopyFiles /SILENT "$OldInstallDir\*.mwDeck" "$INSTDIR\"
         DetailPrint "Copied restored deck files to the new install folder."
+    ${EndIf}
+${EndIf}
+${If} $InstallSubdirsBackupDone == "1"
+${AndIf} ${FileExists} "$DataBackupDir\install_subdirs"
+    FindFirst $DataBackupFindHandle $DataBackupFindName "$DataBackupDir\install_subdirs\*.*"
+    ${If} $DataBackupFindHandle != ""
+    relocate_subdirs_loop:
+        ${If} $DataBackupFindName != "."
+        ${AndIf} $DataBackupFindName != ".."
+        ${AndIf} ${FileExists} "$OldInstallDir\$DataBackupFindName\*.*"
+            !insertmacro CockLog "relocate: copying restored subdir $OldInstallDir\$DataBackupFindName -> $INSTDIR\$DataBackupFindName"
+            CreateDirectory "$INSTDIR\$DataBackupFindName"
+            CopyFiles /SILENT "$OldInstallDir\$DataBackupFindName\*.*" "$INSTDIR\$DataBackupFindName\"
+            DetailPrint "Copied restored folder $DataBackupFindName to the new install folder."
+        ${EndIf}
+        ClearErrors
+        FindNext $DataBackupFindHandle $DataBackupFindName
+        IfErrors 0 relocate_subdirs_loop
+        FindClose $DataBackupFindHandle
     ${EndIf}
 ${EndIf}
 done:
