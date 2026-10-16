@@ -50,6 +50,7 @@ private slots:
     void refreshShortcuts();
     void updateTotalSelectionCount(const QSize &viewSize = QSize());
     void setFocusDisabled(bool disabled);
+    void applyDeckListFont();
 public slots:
     void updateSceneRect(const QRectF &rect);
 

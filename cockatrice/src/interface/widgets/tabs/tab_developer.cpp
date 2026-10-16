@@ -6,6 +6,7 @@
 
 #include "tab_developer.h"
 
+#include "../interface/theme_manager.h"
 #include "libcockatrice/protocol/pb/response.pb.h"
 
 #include <QAbstractItemView>
@@ -155,7 +156,8 @@ void TabDeveloper::appendSeparatorRow(const QString &sectionTitle)
     const int row = statsTable->rowCount();
     statsTable->insertRow(row);
     auto *labelItem = new QTableWidgetItem(sectionTitle);
-    auto font = labelItem->font();
+    // Family comes from the InterfaceDefault theme role; bold stays caller-side.
+    QFont font = themeManager->appFont(AppFont::InterfaceDefault);
     font.setBold(true);
     labelItem->setFont(font);
     labelItem->setFlags(labelItem->flags() & ~Qt::ItemIsSelectable);

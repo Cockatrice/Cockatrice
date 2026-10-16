@@ -1,9 +1,11 @@
 #include "banner_widget.h"
 
 #include "../../../pixel_map_generator.h"
+#include "../../../theme_manager.h"
 
 #include <QBrush>
 #include <QColor>
+#include <QFont>
 #include <QHBoxLayout>
 #include <QLinearGradient>
 #include <QPainter>
@@ -28,7 +30,9 @@ BannerWidget::BannerWidget(QWidget *parent, const QString &text, Qt::Orientation
     if (transparency > 50) {
         textColor = " color: white;";
     }
-    bannerLabel->setStyleSheet("font-size: 24px; font-weight: bold;" + textColor);
+    bannerLabel->setStyleSheet(textColor);
+    applyInterfaceDefaultFont();
+    connect(themeManager, &ThemeManager::fontsChanged, this, &BannerWidget::applyInterfaceDefaultFont);
 
     layout->addWidget(iconLabel);
     layout->addWidget(bannerLabel);
@@ -54,6 +58,16 @@ void BannerWidget::mousePressEvent(QMouseEvent *event)
 void BannerWidget::setText(const QString &text) const
 {
     bannerLabel->setText(text);
+}
+
+void BannerWidget::applyInterfaceDefaultFont()
+{
+    // Family comes from the InterfaceDefault theme role; the 24px size and
+    // bold weight previously carried by the stylesheet stay caller-side.
+    QFont bannerFont = themeManager->appFont(AppFont::InterfaceDefault);
+    bannerFont.setPointSize(24);
+    bannerFont.setWeight(QFont::Bold);
+    bannerLabel->setFont(bannerFont);
 }
 
 void BannerWidget::setClickable(bool _clickable)
