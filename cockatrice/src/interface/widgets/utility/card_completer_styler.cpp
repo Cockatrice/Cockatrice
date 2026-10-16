@@ -133,28 +133,32 @@ bool CardCompleterStyler::handlePopupKeyPress(QKeyEvent *event)
         return false;
     }
 
-    if (!above) {
-        return false;
-    }
-
     auto *popup = completer->popup();
     const int rowCount = completer->completionModel()->rowCount();
     if (rowCount == 0) {
         return true;
     }
 
+    // Handle navigation ourselves so arrow keys move the highlight without
+    // rewriting the line edit. QCompleter's default handling selects with a
+    // selection change that QLineEdit turns into setText(), which fights the
+    // user while typing (e.g. typing "A" becomes "Axe" and cannot be edited).
     // With the popup above the text edit the rows are shown in reverse order and
     // the closest match is in the bottom-most row. The up arrow then advances
     // through the list (towards its end at the top of the popup).
-    const int currentRow = popup->currentIndex().row();
-    const int step = (key == Qt::Key_Up) ? -1 : 1;
-    const int newRow = qBound(0, currentRow + step, rowCount - 1);
-
-    if (newRow != currentRow) {
-        const QModelIndex newIndex = completer->completionModel()->index(newRow, completer->completionColumn());
-        popup->selectionModel()->setCurrentIndex(newIndex,
-                                                 QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+    const QModelIndex current = popup->currentIndex();
+    int newRow;
+    if (!current.isValid()) {
+        newRow = (key == Qt::Key_Down) ? 0 : rowCount - 1;
+    } else {
+        const int step = (key == Qt::Key_Up) ? -1 : 1;
+        newRow = qBound(0, current.row() + step, rowCount - 1);
+        if (newRow == current.row()) {
+            return true;
+        }
     }
+
+    selectWithoutRewrite(completer->completionModel()->index(newRow, completer->completionColumn()));
 
     return true;
 }
@@ -218,8 +222,37 @@ void CardCompleterStyler::ensureClosestSelected()
     const int closestRow = rowCount - 1;
 
     if (currentRow != closestRow) {
-        popup->selectionModel()->setCurrentIndex(completionModel->index(closestRow, completer->completionColumn()),
-                                                 QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+        selectWithoutRewrite(completionModel->index(closestRow, completer->completionColumn()));
+    }
+}
+
+// ---------------------------------------------------------------------------
+
+void CardCompleterStyler::selectWithoutRewrite(const QModelIndex &index)
+{
+    auto *popup = completer->popup();
+    auto *selectionModel = popup->selectionModel();
+
+    // Changing the popup selection emits selectionChanged, which QCompleter
+    // turns into highlighted() and QLineEdit turns into setText(). That
+    // rewrites what the user typed (e.g. "A" becomes "Axe") and fights further
+    // typing. Block the signals so the highlight and preview move without
+    // touching the line edit; Enter/click still activates via activated().
+    const bool wasBlocked = selectionModel->blockSignals(true);
+    if (!index.isValid()) {
+        selectionModel->clear();
+    } else {
+        selectionModel->setCurrentIndex(index, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+    }
+    selectionModel->blockSignals(wasBlocked);
+    popup->viewport()->update();
+
+    // currentRowChanged was suppressed above, so sync the preview manually.
+    updatePreview(index);
+    if (index.isValid()) {
+        popup->scrollTo(index, QAbstractItemView::EnsureVisible);
+    } else {
+        popup->scrollToTop();
     }
 }
 

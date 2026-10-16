@@ -55,6 +55,7 @@ private:
     void applyPopupWidth();
     void updateOrientation();
     void ensureClosestSelected();
+    void selectWithoutRewrite(const QModelIndex &index);
 
     bool handlePopupKeyPress(QKeyEvent *event);
     bool isPopupAboveWidget() const;
