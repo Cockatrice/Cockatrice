@@ -1,6 +1,9 @@
 #include "edhrec_commander_api_response_bracket_navigation_widget.h"
 
+#include "../../interface/theme_manager.h"
+
 #include <QChar>
+#include <QFont>
 #include <QGridLayout>
 #include <QLabel>
 #include <QPushButton>
@@ -25,7 +28,7 @@ EdhrecCommanderApiResponseBracketNavigationWidget::EdhrecCommanderApiResponseBra
         QString label = option.isEmpty() ? "All" : option.at(0).toUpper() + option.mid(1);
         QPushButton *optionButton = new QPushButton(label, this);
         optionButton->setMinimumHeight(84);
-        optionButton->setStyleSheet("font-size: 24px");
+        optionButton->setStyleSheet(QString());
         gameChangerButtons[option] = optionButton;
         layout->addWidget(optionButton, 2, i);
         connect(optionButton, &QPushButton::clicked, this, [=, this]() {
@@ -34,6 +37,10 @@ EdhrecCommanderApiResponseBracketNavigationWidget::EdhrecCommanderApiResponseBra
             emit requestNavigation();
         });
     }
+
+    applyInterfaceDefaultFont();
+    connect(themeManager, &ThemeManager::fontsChanged, this,
+            &EdhrecCommanderApiResponseBracketNavigationWidget::applyInterfaceDefaultFont);
 
     updateOptionButtonSelection(gameChangerButtons, "");
 
@@ -94,8 +101,18 @@ void EdhrecCommanderApiResponseBracketNavigationWidget::updateOptionButtonSelect
     const QString &selectedKey)
 {
     for (auto it = buttons.begin(); it != buttons.end(); ++it) {
-        it.value()->setStyleSheet(it.key() == selectedKey
-                                      ? "background-color: lightblue; font-weight: bold; font-size: 24px;"
-                                      : "font-size: 24px");
+        const bool selected = (it.key() == selectedKey);
+        it.value()->setStyleSheet(selected ? QStringLiteral("background-color: lightblue;") : QString());
+        QFont buttonFont = themeManager->appFont(AppFont::InterfaceDefault);
+        buttonFont.setPointSize(24);
+        buttonFont.setWeight(selected ? QFont::Bold : QFont::Normal);
+        it.value()->setFont(buttonFont);
     }
+}
+
+void EdhrecCommanderApiResponseBracketNavigationWidget::applyInterfaceDefaultFont()
+{
+    // Family comes from the InterfaceDefault theme role; the 24px size stays
+    // caller-side and the selected button keeps its bold emphasis.
+    updateOptionButtonSelection(gameChangerButtons, selectedGameChanger);
 }

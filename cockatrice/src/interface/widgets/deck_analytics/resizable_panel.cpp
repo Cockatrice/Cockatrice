@@ -1,5 +1,6 @@
 #include "resizable_panel.h"
 
+#include "../interface/theme_manager.h"
 #include "abstract_analytics_panel_widget.h"
 #include "libcockatrice/utility/qt_utils.h"
 
@@ -12,6 +13,7 @@
 #include <QDropEvent>
 #include <QEvent>
 #include <QFlags>
+#include <QFont>
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QMimeData>
@@ -98,9 +100,18 @@ ResizablePanel::ResizablePanel(const QString &_typeId, AbstractAnalyticsPanelWid
 
     dragButton->setStyleSheet(QString("QPushButton { "
                                       "background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 %1, stop:1 %2); "
-                                      "border: none; color: %3; font-size: 10px; }"
+                                      "border: none; color: %3; }"
                                       "QPushButton:hover { background: %4; }")
                                   .arg(mid.name(), dark.name(), placeholderText.name(), midLight.name()));
+    // Family comes from the InterfaceDefault theme role; the 10px size stays caller-side.
+    QFont dragFont = themeManager->appFont(AppFont::InterfaceDefault);
+    dragFont.setPointSize(10);
+    dragButton->setFont(dragFont);
+    connect(themeManager, &ThemeManager::fontsChanged, this, [this]() {
+        QFont refreshedFont = themeManager->appFont(AppFont::InterfaceDefault);
+        refreshedFont.setPointSize(10);
+        dragButton->setFont(refreshedFont);
+    });
 
     resizeHandle->setStyleSheet(QString("QWidget { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, "
                                         "stop:0 %1, stop:1 %2); }")

@@ -1,5 +1,7 @@
 #include "deck_list_style_proxy.h"
 
+#include "../../theme_manager.h"
+
 #include <QBrush>
 #include <QColor>
 #include <QFont>
@@ -20,7 +22,8 @@ QVariant DeckListStyleProxy::data(const QModelIndex &index, int role) const
     bool isCard = src.data(DeckRoles::IsCardRole).toBool();
 
     if (role == Qt::FontRole && !isCard) {
-        QFont f;
+        // Family comes from the DeckList theme role; bold stays caller-side.
+        QFont f = themeManager->appFont(AppFont::DeckList);
         f.setBold(true);
         return f;
     }

@@ -1,6 +1,7 @@
 #include "user_list_painter.h"
 
 #include "../../interface/pixel_map_generator.h"
+#include "../../interface/theme_manager.h"
 #include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 
 #include <QAbstractScrollArea>
@@ -292,7 +293,9 @@ void UserListPainter::drawUserName(QPainter *painter,
                                    bool online,
                                    const Style &style)
 {
-    QFont nameFont = option.font;
+    Q_UNUSED(option);
+    // Family comes from the InterfaceDefault theme role; bold stays caller-side.
+    QFont nameFont = themeManager->appFont(AppFont::InterfaceDefault);
     nameFont.setBold(true);
     painter->setFont(nameFont);
 
@@ -351,7 +354,9 @@ void UserListPainter::drawBadges(QPainter *painter,
         return;
     }
 
-    QFont badgeFont = option.font;
+    Q_UNUSED(option);
+    // Family comes from the InterfaceDefault theme role; the *0.68 size and bold stay caller-side.
+    QFont badgeFont = themeManager->appFont(AppFont::InterfaceDefault);
     badgeFont.setPointSizeF(badgeFont.pointSizeF() * 0.68);
     badgeFont.setBold(true);
     painter->setFont(badgeFont);

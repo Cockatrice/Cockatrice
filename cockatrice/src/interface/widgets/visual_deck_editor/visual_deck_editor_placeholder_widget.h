@@ -15,6 +15,9 @@ public:
     explicit VisualDeckEditorPlaceholderWidget(QWidget *parent = nullptr);
     void retranslateUi();
 
+private slots:
+    void applyInterfaceDefaultFont();
+
 private:
     QVBoxLayout *mainLayout;
     QLabel *imageLabel;
