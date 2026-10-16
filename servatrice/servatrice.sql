@@ -163,7 +163,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_rooms_channels` (
   `id_server` tinyint(3) NOT NULL DEFAULT 1,
   `channel_id` varchar(50) NOT NULL,
   `display_name` varchar(50) NOT NULL,
-  `access_level` ENUM('public','moderator') NOT NULL DEFAULT 'public',
+  `access_level` ENUM('public','registered','judge','moderator','admin','developer') NOT NULL DEFAULT 'public',
   PRIMARY KEY (`id_room`, `id_server`, `channel_id`),
   FOREIGN KEY(`id_room`) REFERENCES `cockatrice_rooms`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;

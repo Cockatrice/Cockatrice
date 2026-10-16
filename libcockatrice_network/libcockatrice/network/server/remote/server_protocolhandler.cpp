@@ -871,7 +871,8 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
         rc.enqueuePostResponseItem(ServerMessage::ROOM_EVENT, room->prepareRoomEvent(roomChatHistory));
     }
 
-    // Replay the history of every catalog channel public to the joining user.
+    // Replay the history of every catalog channel. Privilege filtering for
+    // restricted channels is applied on top of this in the moderator stack.
     for (const ServerInfo_RoomChannel &channel : room->getChannels()) {
         const QList<ServerInfo_ChatMessage> channelHistory = room->getChatHistory(QString::fromStdString(channel.id()));
         for (const ServerInfo_ChatMessage &chatMessage : channelHistory) {

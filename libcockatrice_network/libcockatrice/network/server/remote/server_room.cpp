@@ -53,12 +53,8 @@ Server_Room::Server_Room(int _id,
                          const QList<ServerInfo_RoomChannel> &_channels)
     : QObject(parent), id(_id), chatHistorySize(_chatHistorySize), name(_name), description(_description),
       permissionLevel(_permissionLevel), privilegeLevel(_privilegeLevel), autoJoin(_autoJoin),
-      joinMessage(_joinMessage), gameTypes(_gameTypes), channels(_channels), gamesLock(QReadWriteLock::Recursive)
+       joinMessage(_joinMessage), gameTypes(_gameTypes), channels(_channels), gamesLock(QReadWriteLock::Recursive)
 {
-    for (const ServerInfo_RoomChannel &channel : channels) {
-        channelIndex.insert(QString::fromStdString(channel.id()), channel);
-    }
-
     connect(
         this, &Server_Room::gameListChanged, this, [this](auto gameInfo) { broadcastGameListUpdate(gameInfo); },
         Qt::QueuedConnection);
@@ -175,8 +171,12 @@ bool Server_Room::isMainChannel(const QString &channelId)
 
 const ServerInfo_RoomChannel *Server_Room::findChannel(const QString &channelId) const
 {
-    auto it = channelIndex.constFind(channelId);
-    return it == channelIndex.constEnd() ? nullptr : &it.value();
+    for (const ServerInfo_RoomChannel &channel : channels) {
+        if (QString::fromStdString(channel.id()) == channelId) {
+            return &channel;
+        }
+    }
+    return nullptr;
 }
 
 QList<ServerInfo_ChatMessage> Server_Room::getChatHistory(const QString &channelId) const

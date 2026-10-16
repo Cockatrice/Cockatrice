@@ -45,6 +45,7 @@
 #include <QObject>
 #include <QProcessEnvironment>
 #include <QReadLocker>
+#include <QSet>
 #include <QSharedPointer>
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -397,9 +398,24 @@ bool Servatrice::initServer()
             query3->bindValue(":id_room", query->value(0).toInt());
             servatriceDatabaseInterface->execSqlQuery(query3);
             QList<ServerInfo_RoomChannel> channels;
+            QSet<QString> seenChannelIds;
             while (query3->next()) {
+                const QString channelId = query3->value(0).toString();
+                if (channelId.isEmpty()) {
+                    qWarning() << "Skipping room channel with empty id";
+                    continue;
+                }
+                if (Server_Room::isMainChannel(channelId)) {
+                    qWarning() << "Skipping room channel with reserved id" << channelId;
+                    continue;
+                }
+                if (seenChannelIds.contains(channelId)) {
+                    qWarning() << "Skipping duplicate room channel id" << channelId;
+                    continue;
+                }
+                seenChannelIds.insert(channelId);
                 ServerInfo_RoomChannel channel;
-                channel.set_id(query3->value(0).toString().toStdString());
+                channel.set_id(channelId.toStdString());
                 channel.set_display_name(query3->value(1).toString().toStdString());
                 channel.set_access_level(roomChannelAccessFromKey(query3->value(2).toString()));
                 channels.append(channel);
@@ -422,11 +438,26 @@ bool Servatrice::initServer()
             }
             settingsCache->endArray();
             QList<ServerInfo_RoomChannel> channels;
+            QSet<QString> seenChannelIds;
             int size3 = settingsCache->beginReadArray("channels");
             for (int k = 0; k < size3; ++k) {
                 settingsCache->setArrayIndex(k);
+                const QString channelId = settingsCache->value("id").toString();
+                if (channelId.isEmpty()) {
+                    qWarning() << "Skipping room channel with empty id";
+                    continue;
+                }
+                if (Server_Room::isMainChannel(channelId)) {
+                    qWarning() << "Skipping room channel with reserved id" << channelId;
+                    continue;
+                }
+                if (seenChannelIds.contains(channelId)) {
+                    qWarning() << "Skipping duplicate room channel id" << channelId;
+                    continue;
+                }
+                seenChannelIds.insert(channelId);
                 ServerInfo_RoomChannel channel;
-                channel.set_id(settingsCache->value("id").toString().toStdString());
+                channel.set_id(channelId.toStdString());
                 channel.set_display_name(settingsCache->value("displayname").toString().toStdString());
                 channel.set_access_level(roomChannelAccessFromKey(settingsCache->value("access").toString()));
                 channels.append(channel);

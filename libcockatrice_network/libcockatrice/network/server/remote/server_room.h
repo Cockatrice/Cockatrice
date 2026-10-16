@@ -49,7 +49,6 @@ private:
     QString joinMessage;
     QStringList gameTypes;
     QList<ServerInfo_RoomChannel> channels;
-    QMap<QString, ServerInfo_RoomChannel> channelIndex;
     QMap<int, Server_Game *> games;
     QMap<int, ServerInfo_Game> externalGames;
     QMap<QString, Server_ProtocolHandler *> users;
