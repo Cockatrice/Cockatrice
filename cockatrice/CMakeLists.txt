@@ -174,6 +174,7 @@ set(cockatrice_SOURCES
     src/interface/palette_editor/palette_generator.cpp
     src/interface/palette_editor/quick_setup_panel.cpp
     src/interface/palette_editor/palette_grid_widget.cpp
+    src/interface/palette_editor/font_grid_widget.cpp
     src/interface/palette_editor/palette_editor_dialog.cpp
     src/interface/widgets/cards/additional_info/color_identity_widget.cpp
     src/interface/widgets/cards/additional_info/deck_color_identity.cpp
