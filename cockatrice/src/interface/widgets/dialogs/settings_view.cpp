@@ -370,18 +370,28 @@ void SettingsView::setActiveTab(int index)
         return;
     }
 
+    switchPageContent(index);
+
+    // Selecting the item also expands a collapsed group; selecting the already
+    // current item emits nothing, so the currentItemChanged handler cannot loop.
+    navTree->setCurrentItem(pageItems[index]);
+}
+
+void SettingsView::switchPageContent(int index)
+{
+    if (index < 0 || index >= pageItems.size() || !pageItems[index]) {
+        return;
+    }
+
     currentTabIndex = index;
     pagesWidget->setCurrentIndex(index);
 
     // A page row always shows the full page; sections filter down from here
     applySectionFilter(index, nullptr);
 
-    // Selecting the item also expands a collapsed group; selecting the already
-    // current item emits nothing, so the currentItemChanged handler cannot loop.
     if (QTreeWidgetItem *parent = pageItems[index]->parent()) {
         parent->setExpanded(true);
     }
-    navTree->setCurrentItem(pageItems[index]);
 }
 
 void SettingsView::flashWidget(QWidget *widget)
@@ -501,28 +511,29 @@ void SettingsView::navigateToSection(int pageIndex, QWidget *sectionWidget)
         return;
     }
 
-    // Resolve the section row first: setActiveTab() re-selects the page row,
-    // so the whole switch must run under a signal blocker with a single
-    // explicit selection restore at the end. Restoring with only
-    // setCurrentItem() leaves the parent row selected, which is what made the
-    // selection visibly snap back to the parent on mouse release.
+    // Never steal the view's own selection mid-gesture: when this runs from
+    // currentItemChanged the section row is already current (mouse press or arrow key),
+    // and re-selecting the page row here is what made the selection visibly snap back
+    // to the parent on mouse release. Switch page content without touching selection,
+    // then only sync selection for programmatic callers where the section is not current yet.
     QTreeWidgetItem *sectionItem = findSectionItem(pageIndex, sectionWidget);
-    const QSignalBlocker blocker(navTree);
 
     if (currentTabIndex != pageIndex) {
         if (searchActive) {
             switchToTabMode();
         }
-        setActiveTab(pageIndex);
+        const QSignalBlocker blocker(navTree);
+        switchPageContent(pageIndex);
     }
     applySectionFilter(pageIndex, sectionWidget);
 
-    // setActiveTab selects the page row, so restore the clicked section row
-    // without re-triggering navigation; unknown widgets show the full page
-    if (sectionItem) {
-        navTree->clearSelection();
-        sectionItem->setSelected(true);
-        navTree->setCurrentItem(sectionItem);
+    // Unknown widgets show the full page; known sections keep their row selected
+    if (sectionItem && pageIndex >= 0 && pageIndex < pageItems.size() && pageItems[pageIndex]) {
+        pageItems[pageIndex]->setExpanded(true);
+        if (navTree->currentItem() != sectionItem) {
+            const QSignalBlocker blocker(navTree);
+            navTree->setCurrentItem(sectionItem);
+        }
         flashWidget(sectionWidget);
     }
 }

@@ -90,6 +90,7 @@ private:
     void navigateToSearchResult(const QModelIndex &index);
     void navigateToSection(int pageIndex, QWidget *sectionWidget);
     void setActiveTab(int index);
+    void switchPageContent(int index);
     void applySectionFilter(int pageIndex, QWidget *sectionWidget);
     QTreeWidgetItem *findSectionItem(int pageIndex, QWidget *sectionWidget) const;
     static void flashWidget(QWidget *widget);
