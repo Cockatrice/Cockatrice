@@ -1,0 +1,32 @@
+syntax = "proto2";
+
+// Player-entered tournament metadata as shown in the standings and bracket views.
+message TournamentPlayer {
+    optional sint32 player_id = 1;
+    optional string player_name = 2;
+    optional uint32 wins = 3;
+    optional uint32 losses = 4;
+    optional uint32 draws = 5;
+    optional bool deck_submitted = 6;
+}
+
+// A single match pairing within a tournament round.
+message TournamentPairing {
+    optional sint32 player1_id = 1;
+    // -1 when the pairing is a bye.
+    optional sint32 player2_id = 2 [default = -1];
+    optional sint32 game_id = 3;
+    // The winning player's ID, or -1 when the match ended in a draw (is_draw).
+    // An unset field reads back as -1 too; has_winner_id() distinguishes those.
+    optional sint32 winner_id = 4 [default = -1];
+    optional uint32 player1_match_wins = 5;
+    optional uint32 player2_match_wins = 6;
+    // Whether the match ended in a draw; winner_id is meaningless then.
+    optional bool is_draw = 7;
+}
+
+// Settings governing all matches of a tournament.
+message TournamentSettings {
+    // Number of games per match (e.g. 3 for best of 3).
+    optional uint32 games_per_match = 1 [default = 1];
+}
