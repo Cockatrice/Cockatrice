@@ -36,6 +36,7 @@ public:
 
 private slots:
     void investigateUser();
+    void openAltsGraph();
     void userInfoResponse(const Response &response);
     void sessionsResponse(const Response &response);
     void altsResponse(const Response &response);
@@ -77,6 +78,7 @@ private:
 
     QGroupBox *altsGroup;
     QTableWidget *altsTable;
+    QPushButton *openAltsButton;
     QGroupBox *sessionsGroup;
     QTableWidget *sessionsTable;
     QGroupBox *staffGroup;
