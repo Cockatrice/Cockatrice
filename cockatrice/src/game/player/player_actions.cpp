@@ -3,8 +3,6 @@
 #include "../../client/settings/cache_settings.h"
 #include "../../game_graphics/board/card_item.h"
 #include "../../game_graphics/dialogs/dlg_create_token.h"
-#include "../../game_graphics/dialogs/dlg_move_top_cards_until.h"
-#include "../../game_graphics/player/card_menu_action_type.h"
 #include "../../game_graphics/zones/table_zone.h"
 #include "../../interface/deck_loader/loaded_deck.h"
 #include "../abstract_game.h"
@@ -31,8 +29,6 @@
 #include <QChar>
 #include <QColor>
 #include <QFlags>
-#include <QInputDialog>
-#include <QKeyEvent>
 #include <QList>
 #include <QMap>
 #include <QMapIterator>
@@ -1493,16 +1489,6 @@ void PlayerActions::actReduceLifeByPower(QList<CardItem *> selectedCards)
     cmd.set_counter_id(lifeCounter->getId());
     cmd.set_delta(-total);
     sendGameCommand(prepareGameCommand(cmd));
-}
-
-void AnnotationDialog::keyPressEvent(QKeyEvent *event)
-{
-    if (event->key() == Qt::Key_Return && event->modifiers() & Qt::ControlModifier) {
-        event->accept();
-        accept();
-        return;
-    }
-    QInputDialog::keyPressEvent(event);
 }
 
 void PlayerActions::actRequestSetAnnotationDialog(QList<CardItem *> selectedCards)

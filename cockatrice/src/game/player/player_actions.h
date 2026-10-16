@@ -9,11 +9,11 @@
 #define COCKATRICE_PLAYER_ACTIONS_H
 
 #include "../../game_graphics/board/card_item.h" // IWYU pragma: keep - moc instantiates the metatype for QList<CardItem *>, which Qt 6.4 needs complete
-#include "../../game_graphics/dialogs/dlg_create_token.h"
-#include "../../game_graphics/dialogs/dlg_move_top_cards_until.h"
-#include "../../game_graphics/player/card_menu_action_type.h"
 #include "../board/card_list.h"
+#include "card_menu_action_type.h"
 #include "libcockatrice/card/card_info.h"
+#include "move_top_cards_until_options.h"
+#include "token_info.h"
 
 #include <QObject>
 #include <QString>
