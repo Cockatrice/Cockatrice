@@ -1,5 +1,6 @@
 #include "quick_setup_panel.h"
 
+#include "../theme_manager.h"
 #include "color_button.h"
 
 #include <QApplication>
@@ -28,10 +29,17 @@ QuickSetupPanel::QuickSetupPanel(QWidget *parent) : QWidget(parent)
 
     labelLow = new QLabel(this);
     labelHigh = new QLabel(this);
-    QFont small = labelLow->font();
+    // Family comes from the InterfaceDefault theme role; the *0.82 size stays caller-side.
+    QFont small = themeManager->appFont(AppFont::InterfaceDefault);
     small.setPointSizeF(small.pointSizeF() * 0.82);
     labelLow->setFont(small);
     labelHigh->setFont(small);
+    connect(themeManager, &ThemeManager::fontsChanged, this, [this]() {
+        QFont refreshedSmall = themeManager->appFont(AppFont::InterfaceDefault);
+        refreshedSmall.setPointSizeF(refreshedSmall.pointSizeF() * 0.82);
+        labelLow->setFont(refreshedSmall);
+        labelHigh->setFont(refreshedSmall);
+    });
     QPalette dimmed = labelLow->palette();
     dimmed.setColor(QPalette::WindowText, qApp->palette().color(QPalette::Mid));
     labelLow->setPalette(dimmed);

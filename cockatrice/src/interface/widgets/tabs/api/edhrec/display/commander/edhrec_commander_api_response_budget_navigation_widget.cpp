@@ -1,6 +1,9 @@
 #include "edhrec_commander_api_response_budget_navigation_widget.h"
 
+#include "../../interface/theme_manager.h"
+
 #include <QChar>
+#include <QFont>
 #include <QGridLayout>
 #include <QLabel>
 #include <QPushButton>
@@ -25,7 +28,7 @@ EdhrecCommanderApiResponseBudgetNavigationWidget::EdhrecCommanderApiResponseBudg
         QString label = option.isEmpty() ? "Any" : option.at(0).toUpper() + option.mid(1);
         QPushButton *btn = new QPushButton(label, this);
         btn->setMinimumHeight(84);
-        btn->setStyleSheet("font-size: 24px");
+        btn->setStyleSheet(QString());
         budgetButtons[option] = btn;
         layout->addWidget(btn, 4, i);
         connect(btn, &QPushButton::clicked, this, [=, this]() {
@@ -34,6 +37,10 @@ EdhrecCommanderApiResponseBudgetNavigationWidget::EdhrecCommanderApiResponseBudg
             emit requestNavigation();
         });
     }
+
+    applyInterfaceDefaultFont();
+    connect(themeManager, &ThemeManager::fontsChanged, this,
+            &EdhrecCommanderApiResponseBudgetNavigationWidget::applyInterfaceDefaultFont);
 
     updateOptionButtonSelection(budgetButtons, "");
 
@@ -96,8 +103,18 @@ void EdhrecCommanderApiResponseBudgetNavigationWidget::updateOptionButtonSelecti
     const QString &selectedKey)
 {
     for (auto it = buttons.begin(); it != buttons.end(); ++it) {
-        it.value()->setStyleSheet(it.key() == selectedKey
-                                      ? "background-color: lightblue; font-weight: bold; font-size: 24px;"
-                                      : "font-size: 24px");
+        const bool selected = (it.key() == selectedKey);
+        it.value()->setStyleSheet(selected ? QStringLiteral("background-color: lightblue;") : QString());
+        QFont buttonFont = themeManager->appFont(AppFont::InterfaceDefault);
+        buttonFont.setPointSize(24);
+        buttonFont.setWeight(selected ? QFont::Bold : QFont::Normal);
+        it.value()->setFont(buttonFont);
     }
+}
+
+void EdhrecCommanderApiResponseBudgetNavigationWidget::applyInterfaceDefaultFont()
+{
+    // Family comes from the InterfaceDefault theme role; the 24px size stays
+    // caller-side and the selected button keeps its bold emphasis.
+    updateOptionButtonSelection(budgetButtons, selectedBudget);
 }

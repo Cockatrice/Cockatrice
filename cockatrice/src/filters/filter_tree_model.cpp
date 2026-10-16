@@ -1,5 +1,7 @@
 #include "filter_tree_model.h"
 
+#include "../interface/theme_manager.h"
+
 #include <QFlags>
 #include <QFont>
 #include <QString>
@@ -196,7 +198,8 @@ QVariant FilterTreeModel::data(const QModelIndex &index, int role) const
     switch (role) {
         case Qt::FontRole:
             if (!node->isLeaf()) {
-                QFont f;
+                // Family comes from the DeckList theme role; bold stays caller-side.
+                QFont f = themeManager->appFont(AppFont::DeckList);
                 f.setBold(true);
                 return f;
             }

@@ -1,5 +1,7 @@
 #include "bar_chart_widget.h"
 
+#include "../../interface/theme_manager.h"
+
 #include <QBrush>
 #include <QFlags>
 #include <QFont>
@@ -146,7 +148,8 @@ void BarChartWidget::paintEvent(QPaintEvent *)
 
         // draw label below bar
         QRect labelRect(left + i * (barWidth + spacing), bottom, barWidth, LABEL_H);
-        QFont f = p.font();
+        // Family comes from the InterfaceDefault theme role; bold stays caller-side.
+        QFont f = themeManager->appFont(AppFont::InterfaceDefault);
         f.setBold(true);
         p.setFont(f);
         p.setPen(Qt::black);

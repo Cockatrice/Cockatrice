@@ -263,7 +263,6 @@ QGroupBox *HomeWidget::createButtons()
     QGroupBox *box = new QGroupBox(this);
     box->setStyleSheet(R"(
     QGroupBox {
-        font-size: 20px;
         color: white;         /* Title text color */
         background: transparent;
     }
@@ -274,6 +273,15 @@ QGroupBox *HomeWidget::createButtons()
         subcontrol-position: top center;  /* or top left / right */
     }
 )");
+    // Family comes from the InterfaceDefault theme role; the 20px size stays caller-side.
+    QFont boxFont = themeManager->appFont(AppFont::InterfaceDefault);
+    boxFont.setPointSize(20);
+    box->setFont(boxFont);
+    connect(themeManager, &ThemeManager::fontsChanged, this, [this, box]() {
+        QFont refreshedFont = themeManager->appFont(AppFont::InterfaceDefault);
+        refreshedFont.setPointSize(20);
+        box->setFont(refreshedFont);
+    });
     box->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     QVBoxLayout *boxLayout = new QVBoxLayout;
     boxLayout->setAlignment(Qt::AlignHCenter);
@@ -438,7 +446,9 @@ void HomeWidget::paintEvent(QPaintEvent *event)
     constexpr int margin = 15;
     constexpr qreal attributionMargin = 4.0;
 
-    QFont attributionFont = painter.font();
+    // Family comes from the InterfaceDefault theme role; the 14px sizes and
+    // bold weights stay caller-side as before.
+    QFont attributionFont = themeManager->appFont(AppFont::InterfaceDefault);
     attributionFont.setPointSize(14);
     attributionFont.setBold(true);
     painter.setFont(attributionFont);
@@ -451,7 +461,7 @@ void HomeWidget::paintEvent(QPaintEvent *event)
 
     // Card name bubble above the attribution (when enabled).
     if (!cardName.isEmpty() && SettingsCache::instance().appearance().getHomeTabDisplayCardName()) {
-        QFont font = painter.font();
+        QFont font = themeManager->appFont(AppFont::InterfaceDefault);
         font.setPointSize(14);
         font.setBold(true);
         painter.setFont(font);

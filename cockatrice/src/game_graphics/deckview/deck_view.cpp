@@ -240,7 +240,8 @@ void DeckViewCardContainer::paint(QPainter *painter, const QStyleOptionGraphicsI
     painter->drawLine(QPointF(0, separatorY), QPointF(width, separatorY));
 
     painter->setPen(QColor(Qt::white));
-    QFont f("Serif");
+    // Family comes from the DeckList theme role; pixel sizes/weights unchanged.
+    QFont f = themeManager->appFont(AppFont::DeckList);
     f.setStyleHint(QFont::Serif);
     f.setPixelSize(24);
     f.setWeight(QFont::Bold);
@@ -292,7 +293,8 @@ QList<QPair<int, int>> DeckViewCardContainer::getRowsAndCols() const
 
 int DeckViewCardContainer::getCardTypeTextWidth() const
 {
-    QFont f("Serif");
+    // Family comes from the DeckList theme role; pixel size/weight unchanged.
+    QFont f = themeManager->appFont(AppFont::DeckList);
     f.setStyleHint(QFont::Serif);
     f.setPixelSize(16);
     f.setWeight(QFont::Bold);

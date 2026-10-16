@@ -1,5 +1,6 @@
 #include "dynamic_font_size_push_button.h"
 
+#include "../../interface/theme_manager.h"
 #include "dynamic_font_size_label.h"
 
 #include <QBrush>
@@ -20,10 +21,12 @@ void DynamicFontSizePushButton::paintEvent(QPaintEvent *event)
     // Call the base class paintEvent to preserve any other painting behavior
     QPushButton::paintEvent(event);
 
-    // Adjust the font size dynamically based on the text
-    QFont newFont = font();
+    // Adjust the font size dynamically based on the text. Family follows the
+    // InterfaceDefault theme role; the fitted size stays computed as before.
+    QFont newFont = themeManager->appFont(AppFont::InterfaceDefault);
     float fontSize = DynamicFontSizeLabel::getWidgetMaximumFontSize(this, this->text());
     newFont.setPointSizeF(fontSize);
+    newFont.setBold(font().bold());
     setFont(newFont);
 
     // Get painter for custom painting
