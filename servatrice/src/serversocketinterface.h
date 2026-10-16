@@ -103,6 +103,7 @@ class Command_ReportUserInfo;
 class Command_RequestPasswordSalt;
 class Command_ResetUserPassword;
 class Command_SetCardArtParams;
+class Command_SubmitPasswordVerifier;
 class Command_UpdateAdminNotes;
 class Command_ViewLogHistory;
 class Command_WarnUser;
