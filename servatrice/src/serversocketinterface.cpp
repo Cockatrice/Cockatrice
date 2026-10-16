@@ -124,6 +124,7 @@
 #include <libcockatrice/protocol/pb/event_user_message.pb.h>
 #include <libcockatrice/protocol/pb/response_ban_history.pb.h>
 #include <libcockatrice/protocol/pb/response_card_art_rule_entry.pb.h>
+#include <libcockatrice/protocol/pb/response_clear_blacklisted_banners.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_download.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_list.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_share_create.pb.h>
@@ -138,6 +139,7 @@
 #include <libcockatrice/protocol/pb/response_password_salt.pb.h>
 #include <libcockatrice/protocol/pb/response_register.pb.h>
 #include <libcockatrice/protocol/pb/response_remove_user_avatar.pb.h>
+#include <libcockatrice/protocol/pb/response_remove_user_banner.pb.h>
 #include <libcockatrice/protocol/pb/response_replay_download.pb.h>
 #include <libcockatrice/protocol/pb/response_replay_download_by_game_id.pb.h>
 #include <libcockatrice/protocol/pb/response_replay_get_code.pb.h>
@@ -478,6 +480,10 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedModeratorCo
             return cmdGetModeratorLastLogins(cmd.GetExtension(Command_GetModeratorLastLogins::ext), rc);
         case ModeratorCommand::REMOVE_USER_AVATAR:
             return cmdRemoveUserAvatar(cmd.GetExtension(Command_RemoveUserAvatar::ext), rc);
+        case ModeratorCommand::REMOVE_USER_BANNER:
+            return cmdRemoveUserBanner(cmd.GetExtension(Command_RemoveUserBanner::ext), rc);
+        case ModeratorCommand::CLEAR_BLACKLISTED_BANNERS:
+            return cmdClearBlacklistedBanners(cmd.GetExtension(Command_ClearBlacklistedBanners::ext), rc);
         default:
             return Response::RespFunctionNotAllowed;
     }
@@ -2682,6 +2688,54 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveUserAvatar(const 
 
     Response_RemoveUserAvatar *re = new Response_RemoveUserAvatar;
     re->set_user_name(userName.toStdString());
+    rc.setResponseExtension(re);
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdRemoveUserBanner(const Command_RemoveUserBanner &cmd,
+                                                                          ResponseContainer &rc)
+{
+    if (!sqlInterface->checkSql()) {
+        return Response::RespInternalError;
+    }
+
+    const QString userName = nameFromStdString(cmd.user_name()).simplified();
+    if (userName.isEmpty()) {
+        return Response::RespContextError;
+    }
+
+    if (!sqlInterface->removeUserBanner(userName)) {
+        return Response::RespInternalError;
+    }
+
+    sqlInterface->addAuditRecord(userName, this->getAddress(), QString::fromStdString(userInfo->clientid()),
+                                 "REMOVE_USER_BANNER", "Moderator removed user banner card", true);
+
+    Response_RemoveUserBanner *re = new Response_RemoveUserBanner;
+    re->set_user_name(userName.toStdString());
+    rc.setResponseExtension(re);
+    return Response::RespOk;
+}
+
+Response::ResponseCode
+AbstractServerSocketInterface::cmdClearBlacklistedBanners(const Command_ClearBlacklistedBanners & /* cmd */,
+                                                          ResponseContainer &rc)
+{
+    if (!sqlInterface->checkSql()) {
+        return Response::RespInternalError;
+    }
+
+    const int cleared = sqlInterface->clearBlacklistedBanners();
+    if (cleared < 0) {
+        return Response::RespInternalError;
+    }
+
+    sqlInterface->addAuditRecord(QString::fromStdString(userInfo->name()), this->getAddress(),
+                                 QString::fromStdString(userInfo->clientid()), "CLEAR_BLACKLISTED_BANNERS",
+                                 QString("Moderator cleared %1 blacklisted banner(s)").arg(cleared), true);
+
+    Response_ClearBlacklistedBanners *re = new Response_ClearBlacklistedBanners;
+    re->set_cleared_count(static_cast<unsigned int>(cleared));
     rc.setResponseExtension(re);
     return Response::RespOk;
 }

@@ -18,6 +18,7 @@
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <QList>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QSharedPointer>
 #include <QTableView>
@@ -29,6 +30,7 @@
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/moderator_commands.pb.h>
 #include <libcockatrice/protocol/pb/response_card_art_rule_entry.pb.h>
+#include <libcockatrice/protocol/pb/response_clear_blacklisted_banners.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <string>
 
@@ -172,6 +174,7 @@ void TabCardArtRules::setupUi()
     addBtn = new QPushButton;
     removeBtn = new QPushButton;
     refreshBtn = new QPushButton;
+    clearBannedBtn = new QPushButton;
 
     modeBox->addItems({"ALLOW", "DENY"});
 
@@ -192,6 +195,7 @@ void TabCardArtRules::setupUi()
     buttons->addWidget(addBtn);
     buttons->addWidget(removeBtn);
     buttons->addWidget(refreshBtn);
+    buttons->addWidget(clearBannedBtn);
 
     auto *layout = new QVBoxLayout;
     layout->addLayout(form);
@@ -206,6 +210,8 @@ void TabCardArtRules::setupUi()
     connect(removeBtn, &QPushButton::clicked, this, &TabCardArtRules::removeSelected);
 
     connect(refreshBtn, &QPushButton::clicked, this, &TabCardArtRules::refresh);
+
+    connect(clearBannedBtn, &QPushButton::clicked, this, &TabCardArtRules::clearBlacklistedBanners);
 
     retranslateUi();
 }
@@ -263,6 +269,7 @@ void TabCardArtRules::retranslateUi()
     addBtn->setText(tr("Add rule"));
     removeBtn->setText(tr("Remove rule"));
     refreshBtn->setText(tr("Refresh"));
+    clearBannedBtn->setText(tr("Clear blacklisted banners"));
 }
 
 void TabCardArtRules::refresh()
@@ -299,4 +306,32 @@ void TabCardArtRules::removeSelected()
     client->sendCommand(client->prepareModeratorCommand(cmd));
 
     refresh();
+}
+
+void TabCardArtRules::clearBlacklistedBanners()
+{
+    auto choice = QMessageBox::warning(
+        this, tr("Clear blacklisted banners"),
+        tr("Remove the banner card from every user whose current banner is blacklisted (DENY rule)?"),
+        QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel);
+    if (choice != QMessageBox::Ok) {
+        return;
+    }
+
+    Command_ClearBlacklistedBanners cmd;
+    PendingCommand *pend = client->prepareModeratorCommand(cmd);
+    connect(pend, &PendingCommand::finished, this, &TabCardArtRules::clearBlacklistedBannersResponse);
+    client->sendCommand(pend);
+}
+
+void TabCardArtRules::clearBlacklistedBannersResponse(const Response &r)
+{
+    if (r.response_code() != Response::RespOk) {
+        QMessageBox::critical(this, tr("Error"), tr("Could not clear blacklisted banners."));
+        return;
+    }
+
+    const auto &resp = r.GetExtension(Response_ClearBlacklistedBanners::ext);
+    QMessageBox::information(this, tr("Banners cleared"),
+                             tr("%n banner(s) cleared.", "number of banners cleared", resp.cleared_count()));
 }
