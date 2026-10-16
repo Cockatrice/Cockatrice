@@ -53,7 +53,7 @@ Server_Room::Server_Room(int _id,
                          const QList<ServerInfo_RoomChannel> &_channels)
     : QObject(parent), id(_id), chatHistorySize(_chatHistorySize), name(_name), description(_description),
       permissionLevel(_permissionLevel), privilegeLevel(_privilegeLevel), autoJoin(_autoJoin),
-       joinMessage(_joinMessage), gameTypes(_gameTypes), channels(_channels), gamesLock(QReadWriteLock::Recursive)
+      joinMessage(_joinMessage), gameTypes(_gameTypes), channels(_channels), gamesLock(QReadWriteLock::Recursive)
 {
     connect(
         this, &Server_Room::gameListChanged, this, [this](auto gameInfo) { broadcastGameListUpdate(gameInfo); },
