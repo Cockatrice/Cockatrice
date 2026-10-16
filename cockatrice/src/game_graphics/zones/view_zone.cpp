@@ -26,7 +26,6 @@
 #include <QtMath>
 #include <functional>
 #include <libcockatrice/card/card_localization.h>
-#include <libcockatrice/protocol/pb/command_dump_zone.pb.h>
 #include <libcockatrice/protocol/pb/response_dump_zone.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
@@ -98,15 +97,10 @@ void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardLis
         }
         reorganizeCards();
     } else if (!qobject_cast<ZoneViewZoneLogic *>(getLogic())->getOriginalZone()->contentsKnown()) {
-        Command_DumpZone cmd;
-        cmd.set_player_id(getLogic()->getPlayer()->getPlayerInfo()->getId());
-        cmd.set_zone_name(getLogic()->getName().toStdString());
-        cmd.set_number_cards(numberCards);
-        cmd.set_is_reversed(qobject_cast<ZoneViewZoneLogic *>(getLogic())->getIsReversed());
-
-        PendingCommand *pend = getLogic()->getPlayer()->getPlayerActions()->prepareGameCommand(cmd);
-        connect(pend, &PendingCommand::finished, this, &ZoneViewZone::zoneDumpReceived);
-        getLogic()->getPlayer()->getPlayerActions()->sendGameCommand(pend);
+        PendingCommand *pend = qobject_cast<ZoneViewZoneLogic *>(getLogic())->requestZoneDump();
+        if (pend != nullptr) {
+            connect(pend, &PendingCommand::finished, this, &ZoneViewZone::zoneDumpReceived);
+        }
     } else {
         const CardList &c = qobject_cast<ZoneViewZoneLogic *>(getLogic())->getOriginalZone()->getCards();
         int number = numberCards == -1 ? c.size() : (numberCards < c.size() ? numberCards : c.size());
