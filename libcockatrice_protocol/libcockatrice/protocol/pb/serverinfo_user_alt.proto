@@ -17,4 +17,5 @@ message ServerInfo_UserAlt {
     optional uint32 depth = 10;       // BFS distance from investigated account; 1 = direct, 2+ = alt-of-alt
     optional uint32 shared_count =
         11; // distinct users sharing the matched identifier; high values suggest VPN/shared network
+    optional uint32 ip_count = 12; // distinct recent session IPs of this account in the search window
 }
