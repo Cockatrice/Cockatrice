@@ -151,28 +151,6 @@ private:
 
     /** @brief Warns once when a non-portable install keeps its data paths inside the program directory. */
     void warnAboutDataPathsInProgramDir();
-    struct AtRiskBackupOutcome
-    {
-        QStringList locations;         ///< backup targets created for this check
-        QString sessionDir;            ///< session directory holding the backup
-        bool complete = true;          ///< false when only a partial/fallback backup exists
-        bool reused = false;           ///< true when a recent session was reused instead of copying
-        bool skippedDueToSize = false; ///< true when the automatic copy was skipped for size
-        qint64 bytes = 0;              ///< estimated bytes, only set when a fresh copy was attempted
-    };
-    struct AtRiskPaths
-    {
-        QStringList sourcesToBackUp;     ///< existing paths that need a safety copy
-        QStringList offendersForDisplay; ///< paths listed in the warning (empty for portable)
-    };
-    static AtRiskPaths collectPortableAtRiskPaths(const QString &appDir);
-    static QStringList collectInstalledAtRiskPaths(const QString &appDir);
-    static AtRiskBackupOutcome backUpAtRiskPaths(const QStringList &sources, const QString &appDir);
-    static QString buildPortableAtRiskMessage(const AtRiskBackupOutcome &outcome, bool emptySources);
-    static QString buildInstalledAtRiskMessage(const QStringList &offenders,
-                                               const QStringList &sources,
-                                               const AtRiskBackupOutcome &outcome);
-    void showAtRiskDataWarning(const QString &title, const QString &message);
 
     inline QString getCardUpdaterBinaryName()
     {
