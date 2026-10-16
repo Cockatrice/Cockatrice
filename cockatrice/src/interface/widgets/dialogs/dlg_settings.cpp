@@ -29,6 +29,29 @@
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 
+static constexpr int MIN_DIALOG_WIDTH = 750;
+static constexpr int MIN_DIALOG_HEIGHT = 700;
+static constexpr int MAX_DIALOG_WIDTH = 1280;
+static constexpr double DIALOG_SIZE_RATIO = 0.9;
+
+/**
+ * @brief Calculates the initial dialog size from the host window or screen
+ * @param hostSize Size of the hosting main window, or empty when parentless
+ * @param availableSize Available screen area the dialog must fit into
+ * @param minimumSize Minimum dialog size already applied via setMinimumSize
+ * @return Target size at ~90% of the host with small margins, clamped to fit
+ */
+static QSize calculateDialogSize(const QSize &hostSize, const QSize &availableSize, const QSize &minimumSize)
+{
+    QSize target = !hostSize.isEmpty() ? QSize(qRound(hostSize.width() * DIALOG_SIZE_RATIO),
+                                               qRound(hostSize.height() * DIALOG_SIZE_RATIO))
+                                       : QSize(qRound(availableSize.width() * DIALOG_SIZE_RATIO),
+                                               qRound(availableSize.height() * DIALOG_SIZE_RATIO));
+    // Evenly-spaced columns leave unnatural dead space on very wide windows, so clamp the width.
+    target.setWidth(qMin(target.width(), MAX_DIALOG_WIDTH));
+    return target.expandedTo(minimumSize).boundedTo(availableSize);
+}
+
 DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
 {
     // Fill the main window with small margins so multi-group pages (e.g. Deck Editor) are not buried in a scroll.
@@ -44,16 +67,10 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
         screen = QGuiApplication::primaryScreen();
     }
     const QRect available = screen ? screen->availableGeometry() : QRect(0, 0, 1280, 800);
-    const QSize minimum(qMin(750, available.width()), qMin(700, available.height()));
+    const QSize minimum(qMin(MIN_DIALOG_WIDTH, available.width()), qMin(MIN_DIALOG_HEIGHT, available.height()));
     setMinimumSize(minimum);
 
-    QSize target = !hostSize.isEmpty() ? QSize(qRound(hostSize.width() * 0.9), qRound(hostSize.height() * 0.9))
-                                       : QSize(qRound(available.width() * 0.9), qRound(available.height() * 0.9));
-    // Evenly-spaced columns leave unnatural dead space on very wide windows; clamp the width per review.
-    static constexpr int MAX_DIALOG_WIDTH = 1280;
-    target.setWidth(qMin(target.width(), MAX_DIALOG_WIDTH));
-    target = target.expandedTo(minimum).boundedTo(available.size());
-    resize(target);
+    resize(calculateDialogSize(hostSize, available.size(), minimum));
     setSizeGripEnabled(true);
 
     connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this, &DlgSettings::updateLanguage);
