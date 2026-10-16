@@ -7,6 +7,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../pixel_map_generator.h"
+#include "../interface/theme_manager.h"
 #include "../main.h"
 #include "../settings_page/abstract_settings_page.h"
 #include "../settings_page/appearance_settings_page.h"
@@ -189,6 +190,10 @@ void DlgSettings::setupUi()
         searchDelegate->setPageIcons(icons);
         searchResultsView->viewport()->update();
     });
+    // The search delegate reads the InterfaceDefault role at paint time, so a
+    // font change only needs a repaint, mirroring the theme change above.
+    connect(themeManager, &ThemeManager::fontsChanged, searchResultsView,
+            [this] { searchResultsView->viewport()->update(); });
 
     // Build search index after pages are created
     buildSearchIndex();

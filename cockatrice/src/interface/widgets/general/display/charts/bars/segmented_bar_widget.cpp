@@ -24,6 +24,10 @@ SegmentedBarWidget::SegmentedBarWidget(QString label, QVector<Segment> segments,
     setMinimumWidth(36);
     setMaximumWidth(50);
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+
+    // The label reads the InterfaceDefault role at paint time, so a font
+    // change only needs a repaint.
+    connect(themeManager, &ThemeManager::fontsChanged, this, [this] { update(); });
 }
 
 QSize SegmentedBarWidget::sizeHint() const

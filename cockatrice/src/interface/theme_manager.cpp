@@ -661,7 +661,9 @@ QFont ThemeManager::appFont(AppFont::Role role) const
 
     // Role fallbacks preserve the pre-theme defaults when no fonts.toml is
     // present: chat logs rendered monospace (matching the report dialogs),
-    // card text from a serif basis, everything else from the app font.
+    // card text and deck lists from a serif basis (deck_view.cpp and
+    // deck_loader.cpp previously hardcoded "Serif"), everything else from the
+    // app font. Only the family basis is fixed here; sizes stay caller-side.
     if (role == AppFont::ChatLog) {
         QFont monoFont(QStringLiteral("monospace"));
         monoFont.setStyleHint(QFont::Monospace);
@@ -671,7 +673,7 @@ QFont ThemeManager::appFont(AppFont::Role role) const
         }
         return monoFont;
     }
-    if (role == AppFont::CardText) {
+    if (role == AppFont::CardText || role == AppFont::DeckList) {
         return QFont(QStringLiteral("Serif"));
     }
 

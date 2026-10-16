@@ -1,5 +1,6 @@
 #include "card_completer_styler.h"
 
+#include "../../interface/theme_manager.h"
 #include "../cards/card_info_picture_enlarged_widget.h"
 #include "card_completer_delegate.h"
 #include "libcockatrice/card/database/card_database_querier.h"
@@ -71,6 +72,10 @@ CardCompleterStyler::CardCompleterStyler(QCompleter *completer, QObject *parent)
     popup->setItemDelegate(new CardCompleterDelegate(popup));
 
     popup->viewport()->setMouseTracking(true);
+
+    // The delegate reads the CardText role at paint time, so a font change
+    // only needs a repaint of the popup.
+    connect(themeManager, &ThemeManager::fontsChanged, popup, [popup] { popup->viewport()->update(); });
 
     popup->installEventFilter(this);
     popup->viewport()->installEventFilter(this);
