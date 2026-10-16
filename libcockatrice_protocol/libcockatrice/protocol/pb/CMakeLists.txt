@@ -33,6 +33,7 @@ set(PROTO_FILES
     command_dump_zone.proto
     command_flip_card.proto
     command_game_say.proto
+    command_get_private_chat_history.proto
     command_get_server_stats.proto
     command_inc_card_counter.proto
     command_inc_counter.proto
@@ -161,6 +162,7 @@ set(PROTO_FILES
     response_list_users.proto
     response_login.proto
     response_password_salt.proto
+    response_private_chat_history.proto
     response_register.proto
     response_replay_download.proto
     response_replay_download_by_game_id.proto
@@ -197,6 +199,7 @@ set(PROTO_FILES
     serverinfo_player.proto
     serverinfo_playerping.proto
     serverinfo_playerproperties.proto
+    serverinfo_private_chat_message.proto
     serverinfo_replay.proto
     serverinfo_replay_match.proto
     serverinfo_report.proto

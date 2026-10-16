@@ -78,6 +78,7 @@ message Response {
         PASSWORD_SALT = 1017;           // Response containing password salt
         GET_ADMIN_NOTES = 1018;         // Response with admin notes
         GET_SERVER_STATS = 1019;        // Response with server status statistics
+        PRIVATE_CHAT_HISTORY = 1020;    // Response with the caller's private conversation
         REPLAY_LIST = 1100;             // Response listing replays
         REPLAY_DOWNLOAD = 1101;         // Response for replay download
         REPLAY_GET_CODE = 1102;         // Response containing replay code

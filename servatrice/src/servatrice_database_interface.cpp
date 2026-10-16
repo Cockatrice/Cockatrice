@@ -33,6 +33,7 @@
 #include <QStringList>
 #include <QVariant>
 #include <QVariantList>
+#include <algorithm>
 #include <google/protobuf/stubs/common.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
@@ -1781,6 +1782,84 @@ bool Servatrice_DatabaseInterface::removeUserAvatar(const QString &userName)
         return false;
     }
     return query->numRowsAffected() > 0;
+}
+
+bool Servatrice_DatabaseInterface::getPrivateChatHistory(int callerId,
+                                                         const QString &peer,
+                                                         quint64 before,
+                                                         int limit,
+                                                         QList<ServerInfo_PrivateChatMessage> &messages,
+                                                         bool &hasMore)
+{
+    messages.clear();
+    hasMore = false;
+    if (!checkSql()) {
+        return false;
+    }
+
+    const QString conversationFilter = " FROM {prefix}_log WHERE target_type = 'chat'"
+                                       " AND ((sender_id = :caller_sender_id AND target_name = :peer_target)"
+                                       " OR (target_id = :caller_target_id AND sender_name = :peer_sender))";
+    const QString selectMessages = "SELECT UNIX_TIMESTAMP(log_time), sender_name, log_message";
+    const auto bindParticipants = [&](QSqlQuery *query) {
+        query->bindValue(":caller_sender_id", callerId);
+        query->bindValue(":peer_target", peer);
+        query->bindValue(":peer_sender", peer);
+        query->bindValue(":caller_target_id", callerId);
+    };
+    const auto readMessages = [&](QSqlQuery *query) {
+        while (query->next()) {
+            ServerInfo_PrivateChatMessage message;
+            message.set_time(query->value(0).toULongLong());
+            message.set_sender_name(query->value(1).toString().toStdString());
+            message.set_message(query->value(2).toString().toStdString());
+            messages.append(message);
+        }
+    };
+
+    QString queryString = selectMessages + conversationFilter;
+    if (before) {
+        queryString.append(" AND log_time < FROM_UNIXTIME(:before)");
+    }
+    queryString.append(" ORDER BY log_time DESC LIMIT :limit_size");
+    QSqlQuery *query = prepareQuery(queryString);
+    bindParticipants(query);
+    if (before) {
+        query->bindValue(":before", before);
+    }
+    query->bindValue(":limit_size", limit + 1);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+    readMessages(query);
+
+    hasMore = messages.size() > limit;
+    if (hasMore) {
+        const quint64 boundary = messages.at(limit).time();
+        while (!messages.isEmpty() && messages.last().time() == boundary) {
+            messages.removeLast();
+        }
+        if (messages.isEmpty()) {
+            query = prepareQuery(selectMessages + conversationFilter + " AND log_time = FROM_UNIXTIME(:second)");
+            bindParticipants(query);
+            query->bindValue(":second", boundary);
+            if (!execSqlQuery(query)) {
+                return false;
+            }
+            readMessages(query);
+
+            query = prepareQuery("SELECT 1" + conversationFilter + " AND log_time < FROM_UNIXTIME(:before) LIMIT 1");
+            bindParticipants(query);
+            query->bindValue(":before", boundary);
+            if (!execSqlQuery(query)) {
+                return false;
+            }
+            hasMore = query->next();
+        }
+    }
+
+    std::reverse(messages.begin(), messages.end());
+    return true;
 }
 
 QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory(const QString &user,

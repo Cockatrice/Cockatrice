@@ -80,6 +80,7 @@ class Command_ForgotPasswordReset;
 class Command_GetAdminNotes;
 class Command_GetBanHistory;
 class Command_GetModeratorLastLogins;
+class Command_GetPrivateChatHistory;
 class Command_GetServerStats;
 class Command_GetUserAlts;
 class Command_GetUserSessions;
@@ -137,6 +138,7 @@ private:
 
     Response::ResponseCode cmdAddToList(const Command_AddToList &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdRemoveFromList(const Command_RemoveFromList &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdGetPrivateChatHistory(const Command_GetPrivateChatHistory &cmd, ResponseContainer &rc);
     int getDeckPathId(int basePathId, QStringList path);
     int getDeckPathId(const QString &path);
     bool deckListHelper(int folderId,

@@ -1,0 +1,16 @@
+syntax = "proto2";
+import "session_commands.proto";
+
+/**
+ * Fetch the caller's private conversation with user_name.
+ * before is exclusive Unix seconds; zero or unset applies no upper time bound.
+ * limit is clamped to 1..200; a whole second may exceed it to preserve pagination.
+ */
+message Command_GetPrivateChatHistory {
+    extend SessionCommand {
+        optional Command_GetPrivateChatHistory ext = 1034;
+    }
+    optional string user_name = 1;
+    optional uint64 before = 2;
+    optional uint32 limit = 3 [default = 50];
+}

@@ -453,6 +453,10 @@ log_user_msg_chat=false
 ; Log user messages coming from other servers in the network
 log_user_msg_isl=false
 
+; Allow registered users to read their retained private messages; requires log_user_msg_chat=true
+; Privacy: exposes previously logged conversations to their participants on any device
+allow_user_chat_history=false
+
 [audit]
 
 ; Servatrice can record certain actions being performed in the database for server operators to better understand
