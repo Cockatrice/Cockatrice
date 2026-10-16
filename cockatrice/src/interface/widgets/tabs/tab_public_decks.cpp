@@ -46,13 +46,16 @@ TabPublicDecks::TabPublicDecks(TabSupervisor *_tabSupervisor, AbstractClient *_c
 
     titleLabel = new QLabel(tr("Public decks of %1").arg(userName.toHtmlEscaped()), this);
     // Family comes from the InterfaceDefault theme role; bold stays caller-side.
-    auto applyTitleFont = [this]() {
+    auto applyThemeFonts = [this]() {
         QFont titleFont = themeManager->appFont(AppFont::InterfaceDefault);
         titleFont.setBold(true);
         titleLabel->setFont(titleFont);
+        // Preview cells paint with the live role font; repaint the grid so the
+        // new family shows without waiting for a scroll or hover.
+        flowWidget->update();
     };
-    applyTitleFont();
-    connect(themeManager, &ThemeManager::fontsChanged, this, applyTitleFont);
+    applyThemeFonts();
+    connect(themeManager, &ThemeManager::fontsChanged, this, applyThemeFonts);
 
     auto *headerLayout = new QHBoxLayout;
     headerLayout->addWidget(titleLabel);

@@ -646,6 +646,9 @@ void DeckLoader::printDeckList(QPrinter *printer, const DeckList &deckList)
     QTextDocument doc;
 
     // Family comes from the DeckList theme role; the print sizes/weights below stay unchanged.
+    // Print output is a one-shot snapshot and intentionally does not subscribe
+    // to fontsChanged (there is no live view to repaint); reprinting picks up
+    // the current role font.
     QFont font = themeManager->appFont(AppFont::DeckList);
     font.setStyleHint(QFont::Serif);
     doc.setDefaultFont(font);

@@ -151,8 +151,8 @@ public:
     QColor appColor(AppColor::Role role) const;
     /** @brief Resolves an application font role: the theme's stored [Fonts]
      *         value when present, otherwise a per-role fallback (monospace for
-     *         ChatLog, serif basis for CardText, the application font for the
-     *         remaining roles). */
+     *         ChatLog, serif basis for CardText and DeckList, the application
+     *         font for the remaining roles). */
     QFont appFont(AppFont::Role role) const;
     /** @brief Whether the active theme defines this role in fonts.toml. */
     bool hasAppFont(AppFont::Role role) const;

@@ -658,7 +658,9 @@ QFont ThemeManager::appFont(AppFont::Role role) const
 
     // Role fallbacks preserve the pre-theme defaults when no fonts.toml is
     // present: chat logs rendered monospace (matching the report dialogs),
-    // card text from a serif basis, everything else from the app font.
+    // card text and deck lists from a serif basis (deck_view.cpp and
+    // deck_loader.cpp previously hardcoded "Serif"), everything else from the
+    // app font. Only the family basis is fixed here; sizes stay caller-side.
     if (role == AppFont::ChatLog) {
         // ChatView never set a font before the theme role existed, so an unset
         // ChatLog must keep resolving to the application font. The report
@@ -668,7 +670,8 @@ QFont ThemeManager::appFont(AppFont::Role role) const
     }
     // No per-role scaling: an unset role resolves to the application font, so
     // with no fonts.toml present the result is identical to before. The counter
-    // painters that used to hardcode Serif ask for it through cardTextFont().
+    // painters that used to hardcode Serif ask for it through cardTextFont(),
+    // and the two deck-list sites that did through deckListFont().
     return qApp->font();
 }
 

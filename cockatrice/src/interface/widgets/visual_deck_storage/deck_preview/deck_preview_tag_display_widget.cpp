@@ -43,6 +43,10 @@ DeckPreviewTagDisplayWidget::DeckPreviewTagDisplayWidget(QWidget *parent, const 
     // Adjust widget size
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
+    // The tag text reads the InterfaceDefault role at paint time, so a font
+    // change only needs a repaint.
+    connect(themeManager, &ThemeManager::fontsChanged, this, [this] { update(); });
+
     // Connect close button to the remove signal
     // connect(closeButton, &QPushButton::clicked, this, &DeckPreviewTagDisplayWidget::tagClosed);
 }
