@@ -68,6 +68,7 @@
 #include <libcockatrice/protocol/pb/event_server_shutdown.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_room_channel.pb.h>
 #include <new>
+#include <optional>
 #include <qlogging.h>
 #include <qnamespace.h>
 #include <server_room.h>
@@ -255,10 +256,10 @@ Servatrice::~Servatrice()
  * @brief Maps a configured channel access level (database column or ini value)
  *        onto the ServerInfo_RoomChannel privilege ladder.
  *
- * Unknown keywords fall back to Public so a typo never hides a channel that was
- * meant to be broadly readable.
+ * Returns nullopt for unknown keywords so callers can fail closed instead of
+ * silently downgrading a restricted channel to Public.
  */
-static ServerInfo_RoomChannel::AccessLevel roomChannelAccessFromKey(const QString &key)
+static std::optional<ServerInfo_RoomChannel::AccessLevel> roomChannelAccessFromKey(const QString &key)
 {
     const QString level = key.trimmed().toLower();
     if (level == "developer") {
@@ -276,7 +277,10 @@ static ServerInfo_RoomChannel::AccessLevel roomChannelAccessFromKey(const QStrin
     if (level == "registered") {
         return ServerInfo_RoomChannel::Registered;
     }
-    return ServerInfo_RoomChannel::Public;
+    if (level == "public") {
+        return ServerInfo_RoomChannel::Public;
+    }
+    return std::nullopt;
 }
 
 bool Servatrice::initServer()
@@ -392,7 +396,8 @@ bool Servatrice::initServer()
             }
 
             QSqlQuery *query3 = servatriceDatabaseInterface->prepareQuery(
-                "select channel_id, display_name, access_level from {prefix}_rooms_channels where id_room = :id_room "
+                "select channel_id, display_name, access_level, write_access_level, banner_message from "
+                "{prefix}_rooms_channels where id_room = :id_room "
                 "AND id_server = :id_server order by channel_id asc");
             query3->bindValue(":id_server", serverId);
             query3->bindValue(":id_room", query->value(0).toInt());
@@ -414,10 +419,33 @@ bool Servatrice::initServer()
                     continue;
                 }
                 seenChannelIds.insert(channelId);
+                const QString accessKey = query3->value(2).toString();
+                auto accessLevel =
+                    accessKey.trimmed().isEmpty()
+                        ? std::optional<ServerInfo_RoomChannel::AccessLevel>(ServerInfo_RoomChannel::Public)
+                        : roomChannelAccessFromKey(accessKey);
+                if (!accessLevel.has_value()) {
+                    qWarning() << "Skipping room channel with unknown access level" << accessKey << "for id"
+                               << channelId;
+                    continue;
+                }
                 ServerInfo_RoomChannel channel;
                 channel.set_id(channelId.toStdString());
                 channel.set_display_name(query3->value(1).toString().toStdString());
-                channel.set_access_level(roomChannelAccessFromKey(query3->value(2).toString()));
+                channel.set_access_level(accessLevel.value());
+                if (!query3->isNull(3)) {
+                    const QString writeKey = query3->value(3).toString();
+                    if (!writeKey.trimmed().isEmpty()) {
+                        auto writeLevel = roomChannelAccessFromKey(writeKey);
+                        if (!writeLevel.has_value()) {
+                            qWarning() << "Skipping room channel with unknown write access level" << writeKey
+                                       << "for id" << channelId;
+                            continue;
+                        }
+                        channel.set_write_access_level(writeLevel.value());
+                    }
+                }
+                channel.set_banner_message(query3->value(4).toString().toStdString());
                 channels.append(channel);
             }
 
@@ -456,10 +484,33 @@ bool Servatrice::initServer()
                     continue;
                 }
                 seenChannelIds.insert(channelId);
+                const QString accessKey = settingsCache->value("access").toString();
+                auto accessLevel =
+                    accessKey.trimmed().isEmpty()
+                        ? std::optional<ServerInfo_RoomChannel::AccessLevel>(ServerInfo_RoomChannel::Public)
+                        : roomChannelAccessFromKey(accessKey);
+                if (!accessLevel.has_value()) {
+                    qWarning() << "Skipping room channel with unknown access level" << accessKey << "for id"
+                               << channelId;
+                    continue;
+                }
                 ServerInfo_RoomChannel channel;
                 channel.set_id(channelId.toStdString());
                 channel.set_display_name(settingsCache->value("displayname").toString().toStdString());
-                channel.set_access_level(roomChannelAccessFromKey(settingsCache->value("access").toString()));
+                channel.set_access_level(accessLevel.value());
+                if (settingsCache->contains("writeaccess")) {
+                    const QString writeKey = settingsCache->value("writeaccess").toString();
+                    if (!writeKey.trimmed().isEmpty()) {
+                        auto writeLevel = roomChannelAccessFromKey(writeKey);
+                        if (!writeLevel.has_value()) {
+                            qWarning() << "Skipping room channel with unknown write access level" << writeKey
+                                       << "for id" << channelId;
+                            continue;
+                        }
+                        channel.set_write_access_level(writeLevel.value());
+                    }
+                }
+                channel.set_banner_message(settingsCache->value("banner").toString().toStdString());
                 channels.append(channel);
             }
             settingsCache->endArray();

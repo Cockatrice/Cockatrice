@@ -119,6 +119,24 @@ public:
     const ServerInfo_RoomChannel *findChannel(const QString &channelId) const;
     /** @brief True when @p channelId refers to the implicit Main channel. */
     static bool isMainChannel(const QString &channelId);
+    /**
+     * @brief True when the flags in @p userInfo satisfy @p requiredLevel.
+     *
+     * User flags are independent bits, not a ladder: IsDeveloper does not
+     * imply IsModerator or IsAdmin, so developer-only users cannot read or
+     * post in moderator/admin channels. Admins hold the moderator bit
+     * alongside the admin bit and moderators are admitted to judge channels.
+     */
+    static bool hasChannelPrivilege(const ServerInfo_User &userInfo, ServerInfo_RoomChannel::AccessLevel requiredLevel);
+    /** @brief True when @p userInfo may read @p channel. */
+    static bool mayReadChannel(const ServerInfo_User &userInfo, const ServerInfo_RoomChannel &channel);
+    /**
+     * @brief True when @p userInfo may write to @p channel.
+     *
+     * Writing requires the channel's write level, or — when no explicit write
+     * level is configured — the same level as reading.
+     */
+    static bool mayWriteChannel(const ServerInfo_User &userInfo, const ServerInfo_RoomChannel &channel);
     const QMap<int, Server_Game *> &getGames() const
     {
         return games;
@@ -128,8 +146,11 @@ public:
         return externalGames;
     }
     Server *getServer() const;
-    const ServerInfo_Room &
-    getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes = false, bool includeExternalData = true) const;
+    const ServerInfo_Room &getInfo(ServerInfo_Room &result,
+                                   bool complete,
+                                   bool showGameTypes = false,
+                                   bool includeExternalData = true,
+                                   const ServerInfo_User *forUser = nullptr) const;
     int getGamesCreatedByUser(const QString &name) const;
     QList<ServerInfo_Game> getGamesOfUser(const QString &name) const;
     QList<ServerInfo_ChatMessage> getChatHistory(const QString &channelId) const;
@@ -155,7 +176,9 @@ public:
     void addGame(Server_Game *game);
     void removeGame(Server_Game *game);
 
-    void sendRoomEvent(RoomEvent *event, bool sendToIsl = true);
+    void sendRoomEvent(RoomEvent *event,
+                       bool sendToIsl = true,
+                       ServerInfo_RoomChannel::AccessLevel accessLevel = ServerInfo_RoomChannel::Public);
     RoomEvent *prepareRoomEvent(const ::google::protobuf::Message &roomEvent);
 };
 
