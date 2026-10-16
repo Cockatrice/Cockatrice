@@ -1,0 +1,23 @@
+syntax = "proto2";
+
+message ServerInfo_RoomChannel {
+    enum AccessLevel {
+        // Minimum privilege level, evaluated against the privilege ladder
+        // Public < Registered < Judge < Moderator < Admin < Developer.
+        Public = 0;
+        Registered = 1;
+        Judge = 2;
+        Moderator = 3;
+        Admin = 4;
+        Developer = 5;
+    }
+    optional string id = 1;                                   // stable ASCII id, e.g. "deck-discussion"
+    optional string display_name = 2;                         // server-provided, localizable only server-side
+    optional AccessLevel access_level = 3 [default = Public]; // minimum privilege level required to read the channel
+    // Minimum privilege level required to write to the channel. When unset, writing requires the same level as
+    // reading. This allows read-mostly channels such as a developer news feed: readable by everyone, writable
+    // only by developers.
+    optional AccessLevel write_access_level = 4;
+    // Static banner shown at the top of the channel, analogous to the room join message on Main. Empty = none.
+    optional string banner_message = 5;
+}
