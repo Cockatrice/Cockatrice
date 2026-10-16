@@ -871,7 +871,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
         rc.enqueuePostResponseItem(ServerMessage::ROOM_EVENT, room->prepareRoomEvent(roomChatHistory));
     }
 
-<    // Replay the history of every catalog channel the joining user may see.
+    // Replay the history of every catalog channel the joining user may see.
     // Public channels are replayed to everyone; restricted channels only to
     // members whose privilege level meets the channel's access level.
     for (const ServerInfo_RoomChannel &channel : room->getChannels()) {
