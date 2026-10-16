@@ -7,6 +7,8 @@
 #ifndef DLG_MOVE_TOP_CARDS_UNTIL_H
 #define DLG_MOVE_TOP_CARDS_UNTIL_H
 
+#include "../../game/player/move_top_cards_until_options.h"
+
 #include <QDialog>
 #include <QList>
 #include <QString>
@@ -20,13 +22,6 @@ class QDialogButtonBox;
 class QLabel;
 class QSpinBox;
 class QWidget;
-
-struct MoveTopCardsUntilOptions
-{
-    QStringList exprs = {};
-    int numberOfHits = 1;
-    bool autoPlay = false;
-};
 
 class DlgMoveTopCardsUntil : public QDialog
 {
