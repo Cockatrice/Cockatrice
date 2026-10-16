@@ -4,6 +4,7 @@
 #include "../utility/report_utils.h"
 #include "abstract_client.h"
 #include "libcockatrice/protocol/pb/response.pb.h"
+#include "report_status_delegate.h"
 #include "tab_supervisor.h"
 
 #include <QAbstractItemView>
@@ -24,7 +25,7 @@
 #include <QPushButton>
 #include <QSharedPointer>
 #include <QSignalBlocker>
-#include <QSplitter>
+#include <QTabWidget>
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QTextCursor>
@@ -125,17 +126,34 @@ TabReport::TabReport(TabSupervisor *_tabSupervisor, AbstractClient *_client) : T
     connect(table, &QTableWidget::itemSelectionChanged, this, &TabReport::onSelectionChanged);
     table->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(table, &QTableWidget::customContextMenuRequested, this, &TabReport::showTableContextMenu);
+    table->setItemDelegateForColumn(COL_STATUS, new ReportStatusDelegate(table));
     userContextMenu = new UserContextMenu(tabSupervisor, this);
     connect(userContextMenu, &UserContextMenu::openMessageDialog, this, &TabReport::openMessageDialog);
 
-    descGroup = new QGroupBox;
+    reportHeaderName = new QLabel;
+    QFont displayFont = reportHeaderName->font();
+    displayFont.setPointSize(displayFont.pointSize() + 6);
+    displayFont.setBold(true);
+    reportHeaderName->setFont(displayFont);
+    reportHeaderStatus = new QLabel;
+    QFont statusFont = reportHeaderStatus->font();
+    statusFont.setBold(true);
+    reportHeaderStatus->setFont(statusFont);
+    reportHeaderSubline = new QLabel;
+
+    auto *reportIdentityRow = new QHBoxLayout;
+    reportIdentityRow->addWidget(reportHeaderName);
+    reportIdentityRow->addStretch();
+    reportIdentityRow->addWidget(reportHeaderStatus);
+
+    auto *descPage = new QWidget;
     descriptionEdit = new QTextEdit;
     descriptionEdit->setReadOnly(true);
-    auto *descLayout = new QVBoxLayout(descGroup);
+    auto *descLayout = new QVBoxLayout(descPage);
     descLayout->setContentsMargins(4, 4, 4, 4);
     descLayout->addWidget(descriptionEdit);
 
-    chatGroup = new QGroupBox;
+    auto *chatPage = new QWidget;
     chatLogEdit = new QTextEdit;
     chatLogEdit->setReadOnly(true);
     QFont monoFont("monospace");
@@ -145,11 +163,11 @@ TabReport::TabReport(TabSupervisor *_tabSupervisor, AbstractClient *_client) : T
         monoFont.setPointSize(systemPointSize);
     }
     chatLogEdit->setFont(monoFont);
-    auto *chatLayout = new QVBoxLayout(chatGroup);
+    auto *chatLayout = new QVBoxLayout(chatPage);
     chatLayout->setContentsMargins(4, 4, 4, 4);
     chatLayout->addWidget(chatLogEdit);
 
-    commentsGroup = new QGroupBox;
+    auto *commentsPage = new QWidget;
     commentsEdit = new QTextEdit;
     commentsEdit->setReadOnly(true);
     auto *commentInputRow = new QHBoxLayout;
@@ -160,12 +178,12 @@ TabReport::TabReport(TabSupervisor *_tabSupervisor, AbstractClient *_client) : T
     connect(commentInput, &QLineEdit::returnPressed, this, &TabReport::addComment);
     commentInputRow->addWidget(commentInput);
     commentInputRow->addWidget(commentButton);
-    auto *commentsLayout = new QVBoxLayout(commentsGroup);
+    auto *commentsLayout = new QVBoxLayout(commentsPage);
     commentsLayout->setContentsMargins(4, 4, 4, 4);
     commentsLayout->addWidget(commentsEdit);
     commentsLayout->addLayout(commentInputRow);
 
-    userContextGroup = new QGroupBox;
+    auto *userPage = new QWidget;
     userContextName = new QLabel;
     userContextAccountAge = new QLabel;
     userContextReports = new QLabel;
@@ -184,7 +202,7 @@ TabReport::TabReport(TabSupervisor *_tabSupervisor, AbstractClient *_client) : T
     userContextWarnsLabel = new QLabel;
     userContextNotesLabel = new QLabel;
     userContextRecentReportsLabel = new QLabel;
-    auto *ucLayout = new QGridLayout(userContextGroup);
+    auto *ucLayout = new QGridLayout(userPage);
     ucLayout->setContentsMargins(8, 8, 8, 8);
     ucLayout->addWidget(userContextUserLabel, 0, 0);
     ucLayout->addWidget(userContextName, 0, 1, 1, 3);
@@ -200,7 +218,6 @@ TabReport::TabReport(TabSupervisor *_tabSupervisor, AbstractClient *_client) : T
     ucLayout->addWidget(userContextNotes, 3, 1, 1, 3);
     ucLayout->addWidget(userContextRecentReportsLabel, 4, 0, 1, 4);
     ucLayout->addWidget(userContextRecentReports, 5, 0, 1, 4);
-    userContextGroup->setVisible(false);
 
     statsGroup = new QGroupBox;
     statsGroup->setCheckable(true);
@@ -228,13 +245,11 @@ TabReport::TabReport(TabSupervisor *_tabSupervisor, AbstractClient *_client) : T
         }
     });
 
-    detailSplitter = new QSplitter(Qt::Vertical);
-    detailSplitter->addWidget(descGroup);
-    detailSplitter->addWidget(chatGroup);
-    detailSplitter->addWidget(commentsGroup);
-    detailSplitter->setStretchFactor(0, 1);
-    detailSplitter->setStretchFactor(1, 1);
-    detailSplitter->setStretchFactor(2, 2);
+    detailTabs = new QTabWidget;
+    detailTabs->addTab(descPage, QString());
+    detailTabs->addTab(chatPage, QString());
+    detailTabs->addTab(commentsPage, QString());
+    detailTabs->addTab(userPage, QString());
 
     assignButton = new QPushButton;
     resolveButton = new QPushButton;
@@ -266,12 +281,14 @@ TabReport::TabReport(TabSupervisor *_tabSupervisor, AbstractClient *_client) : T
     layout->addLayout(topBar);
     layout->addWidget(statsLabel);
     layout->addWidget(table, 2);
-    layout->addWidget(detailSplitter, 1);
-    layout->addWidget(userContextGroup);
+    layout->addLayout(reportIdentityRow);
+    layout->addWidget(reportHeaderSubline);
+    layout->addWidget(detailTabs, 2);
     layout->addWidget(statsGroup);
     layout->addLayout(actionBar);
 
     retranslateUi();
+    clearReportHeader();
 
     setActionsEnabled(false);
     refreshList();
@@ -293,18 +310,18 @@ void TabReport::retranslateUi()
     table->setHorizontalHeaderLabels({tr("#"), tr("Time"), tr("Reporter"), tr("Reported User"), tr("Category"),
                                       tr("Game ID"), tr("Status"), tr("Assigned To"), tr("Replay"), tr("Room")});
 
-    descGroup->setTitle(tr("Description"));
-    chatGroup->setTitle(tr("Chat Log Context"));
-    chatGroup->setToolTip(
-        tr("Chat log attached by the reporter. It is captured from their client and may be incomplete or edited."));
-    commentsGroup->setTitle(tr("Comments / Thread"));
+    detailTabs->setTabText(0, tr("Description"));
+    detailTabs->setTabText(1, tr("Chat Log Context"));
+    detailTabs->setTabToolTip(1, tr("Chat log attached by the reporter. It is captured from their client and may be "
+                                    "incomplete or edited."));
+    detailTabs->setTabText(2, tr("Comments / Thread"));
+    detailTabs->setTabText(3, tr("Reported User"));
     descriptionEdit->setPlaceholderText(tr("No description."));
     chatLogEdit->setPlaceholderText(tr("No chat log attached."));
     commentsEdit->setPlaceholderText(tr("No comments yet."));
     commentInput->setPlaceholderText(tr("Type a reply..."));
     commentButton->setText(tr("Send"));
 
-    userContextGroup->setTitle(tr("Reported User Context"));
     userContextUserLabel->setText(tr("User:"));
     userContextAgeLabel->setText(tr("Account Age:"));
     userContextReportsLabel->setText(tr("Reports:"));
@@ -312,10 +329,18 @@ void TabReport::retranslateUi()
     userContextWarnsLabel->setText(tr("Warns:"));
     userContextNotesLabel->setText(tr("Admin Notes:"));
     userContextRecentReportsLabel->setText(tr("Recent Reports Against User:"));
-    userContextAccountAge->setText(QString());
-    userContextReports->setText(QString());
-    userContextBans->setText(QString());
-    userContextWarns->setText(QString());
+
+    if (headerReportId >= 0) {
+        for (const ServerInfo_Report &r : filteredReports) {
+            if (r.report_id() == headerReportId) {
+                updateReportHeader(r);
+                const QString status = QString::fromStdString(r.status());
+                const bool canComment = (status == "open" || status == "assigned");
+                commentInput->setPlaceholderText(canComment ? tr("Type a reply...") : tr("This report is closed."));
+                break;
+            }
+        }
+    }
 
     statsGroup->setTitle(tr("Report Statistics"));
 
@@ -408,7 +433,8 @@ void TabReport::reportListResponse(const Response &response)
             chatLogEdit->clear();
             commentsEdit->clear();
             setActionsEnabled(false);
-            userContextGroup->setVisible(false);
+            clearReportHeader();
+            clearUserContext();
         }
     }
 
@@ -449,7 +475,7 @@ void TabReport::applyFilters()
         const ServerInfo_Report &r = filteredReports[row];
 
         report_utils::fillReportTableRow(table, row, r, COL_ID, COL_TIME, COL_REPORTED, COL_CATEGORY, COL_GAMEID,
-                                         COL_STATUS, COL_ASSIGNED);
+                                         COL_STATUS, COL_ASSIGNED, false);
 
         table->setItem(row, COL_REPORTER, new QTableWidgetItem(QString::fromStdString(r.reporter_name())));
 
@@ -460,9 +486,31 @@ void TabReport::applyFilters()
                        new QTableWidgetItem(r.has_room_id() && r.room_id() > 0 ? QString::number(r.room_id()) : ""));
     }
 
+    QFont reportedFont = table->font();
+    reportedFont.setBold(true);
+    for (int row = 0; row < filteredReports.size(); ++row) {
+        if (auto *reportedItem = table->item(row, COL_REPORTED)) {
+            reportedItem->setFont(reportedFont);
+        }
+    }
+
     table->setSortingEnabled(true);
     table->resizeColumnsToContents();
     table->horizontalHeader()->setSectionResizeMode(COL_REPORTED, QHeaderView::Stretch);
+
+    if (headerReportId >= 0) {
+        bool stillVisible = false;
+        for (const ServerInfo_Report &r : filteredReports) {
+            if (r.report_id() == headerReportId) {
+                stillVisible = true;
+                break;
+            }
+        }
+        if (!stillVisible) {
+            clearReportHeader();
+            clearUserContext();
+        }
+    }
 
     statusLabel->setText(tr("%1 report(s)").arg(filteredReports.size()));
 }
@@ -490,6 +538,31 @@ void TabReport::updateStats()
                             .arg(dismissed));
 }
 
+void TabReport::updateReportHeader(const ServerInfo_Report &report)
+{
+    reportHeaderName->setText(QString::fromStdString(report.reported_user_name()));
+    reportHeaderStatus->setText(report_utils::formatReportStatus(QString::fromStdString(report.status())));
+
+    QStringList parts;
+    parts << QString::fromStdString(report.category());
+    parts << QDateTime::fromSecsSinceEpoch(report.report_time()).toLocalTime().toString("yyyy-MM-dd HH:mm");
+    if (report.has_room_id() && report.room_id() > 0) {
+        parts << tr("Room %1").arg(report.room_id());
+    }
+    if (report.game_id() > 0) {
+        parts << tr("Game %1").arg(report.game_id());
+    }
+    reportHeaderSubline->setText(parts.join(QStringLiteral(" · ")));
+}
+
+void TabReport::clearReportHeader()
+{
+    headerReportId = -1;
+    reportHeaderName->setText(tr("Select a report to inspect."));
+    reportHeaderStatus->clear();
+    reportHeaderSubline->clear();
+}
+
 void TabReport::onSelectionChanged()
 {
     const int row = table->currentRow();
@@ -500,13 +573,26 @@ void TabReport::onSelectionChanged()
         commentInput->clear();
         commentButton->setEnabled(false);
         setActionsEnabled(false);
-        userContextGroup->setVisible(false);
+        clearReportHeader();
+        clearUserContext();
         return;
     }
 
     const int reportId = table->item(row, COL_ID)->data(Qt::UserRole).toInt();
     loadReportDetails(reportId);
     updateActionStates();
+}
+
+void TabReport::clearUserContext()
+{
+    lastRequestedUser.clear();
+    userContextName->setText(tr("—"));
+    userContextAccountAge->clear();
+    userContextReports->clear();
+    userContextBans->clear();
+    userContextWarns->clear();
+    userContextNotes->setPlainText(tr("Select a report to inspect."));
+    userContextRecentReports->clear();
 }
 
 void TabReport::showTableContextMenu(const QPoint &pos)
@@ -546,12 +632,17 @@ void TabReport::loadReportDetails(int reportId)
     for (const ServerInfo_Report &r : filteredReports) {
         if (r.report_id() == reportId) {
             descriptionEdit->setPlainText(QString::fromStdString(r.description()));
+            updateReportHeader(r);
+            if (headerReportId != reportId) {
+                headerReportId = reportId;
+                detailTabs->setCurrentIndex(0);
+            }
 
             QString reportedUser = QString::fromStdString(r.reported_user_name());
             if (!reportedUser.isEmpty()) {
                 requestUserInfo(reportedUser);
             } else {
-                userContextGroup->setVisible(false);
+                clearUserContext();
             }
 
             QString status = QString::fromStdString(r.status());
@@ -871,12 +962,11 @@ void TabReport::addCommentResponse(const Response &response)
 void TabReport::requestUserInfo(const QString &userName)
 {
     if (userName.isEmpty()) {
-        userContextGroup->setVisible(false);
+        clearUserContext();
         return;
     }
 
     lastRequestedUser = userName;
-    userContextGroup->setVisible(true);
     userContextName->setText(userName);
     userContextAccountAge->setText(tr("Loading..."));
     userContextReports->clear();

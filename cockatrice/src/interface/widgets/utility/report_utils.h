@@ -13,6 +13,7 @@ namespace report_utils
 
 QString formatReportCategory(const QString &category);
 QString formatReportTime(qint64 secondsSinceEpoch);
+QString formatReportStatus(const QString &status);
 
 void fillReportTableRow(QTableWidget *table,
                         int row,
@@ -23,7 +24,8 @@ void fillReportTableRow(QTableWidget *table,
                         int categoryColumn,
                         int gameIdColumn,
                         int statusColumn,
-                        int assignedColumn);
+                        int assignedColumn,
+                        bool colorizeStatus = true);
 
 void renderReportDetails(QTextEdit *chatLogEdit,
                          QTextEdit *commentsEdit,
