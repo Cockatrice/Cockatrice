@@ -124,6 +124,16 @@ QList<CardItem *> GameScene::selectedCards() const
     return selectedCards;
 }
 
+CardItem *GameScene::getActiveCard() const
+{
+    return activeCard;
+}
+
+void GameScene::setActiveCard(CardItem *card)
+{
+    activeCard = card;
+}
+
 void GameScene::onCardSelectionChanged(AbstractCardItem *abstractCard, bool selected)
 {
     CardItem *card = qobject_cast<CardItem *>(abstractCard);
@@ -139,7 +149,7 @@ void GameScene::onCardSelectionChanged(AbstractCardItem *abstractCard, bool sele
     }
 
     if (selectedItems().isEmpty()) {
-        owner->getGame()->setActiveCard(nullptr);
+        setActiveCard(nullptr);
         owner->requestCardMenuUpdate(nullptr);
     }
 }
@@ -158,7 +168,7 @@ void GameScene::onCardRightClicked(AbstractCardItem *abstractCard, QPoint screen
         return;
     }
 
-    card->getOwner()->getGame()->setActiveCard(card);
+    setActiveCard(card);
 
     if (auto *menu = view->getPlayerMenu()->updateCardMenu(card)) {
         menu->popup(screenPos);
