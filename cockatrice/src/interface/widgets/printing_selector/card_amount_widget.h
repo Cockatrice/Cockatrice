@@ -67,6 +67,7 @@ private slots:
     void removePrintingSideboard();
     void removePrintingTokensboard();
     void adjustFontSize(int scalePercentage);
+    void applyCardTextFont();
 };
 
 #endif // CARD_AMOUNT_WIDGET_H

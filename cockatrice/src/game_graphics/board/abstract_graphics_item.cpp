@@ -1,5 +1,7 @@
 #include "abstract_graphics_item.h"
 
+#include "../../interface/theme_manager.h"
+
 #include <QBrush>
 #include <QFont>
 #include <QFontMetrics>
@@ -20,7 +22,7 @@ void AbstractGraphicsItem::paintNumberEllipse(int number,
     painter->save();
 
     QString numStr = QString::number(number);
-    QFont font("Serif");
+    QFont font = themeManager->appFont(AppFont::CardText);
     font.setPixelSize(fontSize);
     font.setWeight(QFont::Bold);
 

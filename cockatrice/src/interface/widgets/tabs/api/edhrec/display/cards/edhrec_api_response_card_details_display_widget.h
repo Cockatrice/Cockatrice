@@ -30,6 +30,9 @@ public slots:
 signals:
     void requestUrl(QString url);
 
+private slots:
+    void applyCardTextFont();
+
 private:
     EdhrecApiResponseCardDetails toDisplay;
     QVBoxLayout *layout;
