@@ -2068,3 +2068,25 @@ void Servatrice_DatabaseInterface::addAuditRecord(const QString &user,
     query->bindValue(":details", details);
     execSqlQuery(query);
 }
+
+bool Servatrice_DatabaseInterface::isCardArtAllowed(const QString &cardName, const QString &cardProviderId)
+{
+    if (cardName.isEmpty()) {
+        return true;
+    }
+    QSqlQuery *q = prepareQuery(
+        "SELECT mode FROM {prefix}_card_art_name_rules WHERE card_name = :name AND card_provider_id = :provider");
+    q->bindValue(":name", cardName);
+    q->bindValue(":provider", cardProviderId);
+
+    if (!execSqlQuery(q)) {
+        qWarning() << "Card art rule lookup failed; failing open for" << cardName;
+        return true;
+    }
+
+    if (!q->next()) {
+        return true; // default allow
+    }
+
+    return q->value(0).toString() != "DENY";
+}

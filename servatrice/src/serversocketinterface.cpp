@@ -3483,22 +3483,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountImage(const Comm
 
 bool AbstractServerSocketInterface::isCardNameAllowed(const QString &cardName, const QString &cardProviderId)
 {
-    QSqlQuery *q = sqlInterface->prepareQuery(
-        "SELECT mode FROM {prefix}_card_art_name_rules WHERE card_name = :name AND card_provider_id = :provider");
-
-    q->bindValue(":name", cardName);
-    q->bindValue(":provider", cardProviderId);
-
-    if (!sqlInterface->execSqlQuery(q)) {
-        qWarning() << "Card art rule lookup failed; failing open for" << cardName;
-        return true;
-    }
-
-    if (!q->next()) {
-        return true; // default allow
-    }
-
-    return q->value(0).toString() != "DENY";
+    // Single source of truth lives on the database interface so game commands
+    // (e.g. playmats) can enforce the same rules without SQL here.
+    return sqlInterface->isCardArtAllowed(cardName, cardProviderId);
 }
 
 Response::ResponseCode AbstractServerSocketInterface::cmdSetCardArtParams(const Command_SetCardArtParams &cmd,

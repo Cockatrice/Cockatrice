@@ -218,6 +218,7 @@ public:
     };
     UptimeSnapshot getLatestUptimeSnapshot(int serverId);
     bool removeUserAvatar(const QString &userName);
+    bool isCardArtAllowed(const QString &cardName, const QString &cardProviderId) override;
     bool addForgotPassword(const QString &user);
     bool removeForgotPassword(const QString &user) override;
     bool doesForgotPasswordExist(const QString &user);
