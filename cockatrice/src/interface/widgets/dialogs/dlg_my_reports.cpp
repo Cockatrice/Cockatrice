@@ -1,5 +1,6 @@
 #include "dlg_my_reports.h"
 
+#include "../interface/theme_manager.h"
 #include "../utility/report_utils.h"
 #include "abstract_client.h"
 #include "libcockatrice/protocol/pb/response.pb.h"
@@ -24,7 +25,6 @@
 #include <libcockatrice/protocol/pb/response_report_details.pb.h>
 #include <libcockatrice/protocol/pb/response_report_my_list.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 #include <string>
 
@@ -69,7 +69,8 @@ DlgMyReports::DlgMyReports(AbstractClient *_client, QWidget *parent)
     auto *chatGroup = new QGroupBox(tr("Chat Log Context"));
     chatLogEdit = new QTextEdit;
     chatLogEdit->setReadOnly(true);
-    chatLogEdit->setFont(QtUtils::monospaceFont());
+    applyChatLogFont();
+    connect(themeManager, &ThemeManager::fontsChanged, this, &DlgMyReports::applyChatLogFont);
     auto *chatLayout = new QVBoxLayout(chatGroup);
     chatLayout->setContentsMargins(4, 4, 4, 4);
     chatLayout->addWidget(chatLogEdit);
@@ -120,6 +121,18 @@ DlgMyReports::DlgMyReports(AbstractClient *_client, QWidget *parent)
 
     setActionsEnabled(false);
     refreshList();
+}
+
+void DlgMyReports::applyChatLogFont()
+{
+    // Family comes from the ChatLog theme role; size stays caller-side as before.
+    QFont monoFont = themeManager->appFont(AppFont::ChatLog);
+    monoFont.setStyleHint(QFont::Monospace);
+    const int systemPointSize = QFontDatabase::systemFont(QFontDatabase::GeneralFont).pointSize();
+    if (systemPointSize > 0) {
+        monoFont.setPointSize(systemPointSize);
+    }
+    chatLogEdit->setFont(monoFont);
 }
 
 void DlgMyReports::refreshList()
