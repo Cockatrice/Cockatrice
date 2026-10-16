@@ -3,6 +3,7 @@
 #include "../../client/settings/cache_settings.h"
 #include "../../interface/card_localization.h"
 #include "../../interface/card_picture_loader/card_picture_loader.h"
+#include "../../interface/theme_manager.h"
 #include "../card_dimensions.h"
 #include "../game_scene.h"
 #include "../z_values.h"
@@ -146,7 +147,7 @@ void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &transla
     painter->rotate(angle);
     painter->translate(-translatedSize.width() / 2, -translatedSize.height() / 2);
 
-    QFont f;
+    QFont f = themeManager->appFont(AppFont::CardText);
     f.setPixelSize(fontSize * scale);
 
     painter->setFont(f);

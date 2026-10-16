@@ -1,5 +1,6 @@
 #include "edhrec_api_response_commander_details_display_widget.h"
 
+#include "../../../../../../theme_manager.h"
 #include "../../../../../cards/card_info_picture_widget.h"
 #include "../../../../../cards/card_size_widget.h"
 #include "../../api_response/cards/edhrec_commander_api_response_commander_details.h"
@@ -8,6 +9,7 @@
 #include "edhrec_commander_api_response_navigation_widget.h"
 #include "libcockatrice/card/database/card_database_querier.h"
 
+#include <QFont>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QObject>
@@ -55,15 +57,16 @@ EdhrecCommanderResponseCommanderDetailsDisplayWidget::EdhrecCommanderResponseCom
     commanderName = new QLabel(this);
     commanderName->setText(commanderDetails.getName());
     commanderName->setAlignment(Qt::AlignCenter);
-    commanderName->setStyleSheet("font-size: 28px; font-weight: bold");
 
     label = new QLabel(this);
     label->setAlignment(Qt::AlignCenter);
-    label->setStyleSheet("font-size: 16px");
 
     salt = new QLabel(this);
     salt->setAlignment(Qt::AlignCenter);
-    salt->setStyleSheet("font-size: 16px");
+
+    applyCardTextFont();
+    connect(themeManager, &ThemeManager::fontsChanged, this,
+            &EdhrecCommanderResponseCommanderDetailsDisplayWidget::applyCardTextFont);
 
     cardPricesDisplayWidget = new EdhrecApiResponseCardPricesDisplayWidget(this, commanderDetails.getPrices());
 
@@ -89,4 +92,19 @@ void EdhrecCommanderResponseCommanderDetailsDisplayWidget::retranslateUi()
 {
     label->setText(commanderDetails.getLabel());
     salt->setText(tr("Salt: ") + QString::number(commanderDetails.getSalt()));
+}
+
+void EdhrecCommanderResponseCommanderDetailsDisplayWidget::applyCardTextFont()
+{
+    // Family comes from the CardText theme role; the point sizes and the
+    // bold weight previously carried by the stylesheets stay caller-side.
+    QFont nameFont = themeManager->appFont(AppFont::CardText);
+    nameFont.setPointSize(28);
+    nameFont.setWeight(QFont::Bold);
+    commanderName->setFont(nameFont);
+
+    QFont detailsFont = themeManager->appFont(AppFont::CardText);
+    detailsFont.setPointSize(16);
+    label->setFont(detailsFont);
+    salt->setFont(detailsFont);
 }

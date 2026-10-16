@@ -1,5 +1,6 @@
 #include "all_zones_card_amount_widget.h"
 
+#include "../../theme_manager.h"
 #include "../general/display/shadow_background_label.h"
 #include "card_amount_widget.h"
 #include "libcockatrice/card/card_info.h"
@@ -67,6 +68,7 @@ AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
     buttonBoxSideboard->setVisible(!isToken);
 
     connect(cardSizeSlider, &QSlider::valueChanged, this, &AllZonesCardAmountWidget::adjustFontSize);
+    connect(themeManager, &ThemeManager::fontsChanged, this, &AllZonesCardAmountWidget::applyCardTextFont);
 
     QTimer::singleShot(10, this, [this]() { adjustFontSize(this->cardSizeSlider->value()); });
 
@@ -90,8 +92,9 @@ void AllZonesCardAmountWidget::adjustFontSize(int scalePercentage)
     int newFontSize = minFontSize + (scalePercentage - basePercentage) * (maxFontSize - minFontSize) / 225;
     newFontSize = std::clamp(newFontSize, minFontSize, maxFontSize);
 
-    // Update the font labels
-    QFont zoneLabelFont = zoneLabelMainboard->font();
+    // Update the font labels. The family comes from the CardText theme
+    // role; the slider-driven point size stays as before.
+    QFont zoneLabelFont = themeManager->appFont(AppFont::CardText);
     zoneLabelFont.setPointSize(newFontSize);
     zoneLabelMainboard->setFont(zoneLabelFont);
     zoneLabelSideboard->setFont(zoneLabelFont);
@@ -99,6 +102,11 @@ void AllZonesCardAmountWidget::adjustFontSize(int scalePercentage)
 
     // Repaint the widget (if necessary)
     repaint();
+}
+
+void AllZonesCardAmountWidget::applyCardTextFont()
+{
+    adjustFontSize(cardSizeSlider->value());
 }
 
 void AllZonesCardAmountWidget::setAmounts(int mainboardAmount, int sideboardAmount, int tokensboardAmount)

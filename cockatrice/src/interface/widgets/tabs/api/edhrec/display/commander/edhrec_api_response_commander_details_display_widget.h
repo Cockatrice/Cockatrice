@@ -30,6 +30,9 @@ public:
         QString baseUrl);
     void retranslateUi();
 
+private slots:
+    void applyCardTextFont();
+
 private:
     EdhrecCommanderApiResponseCommanderDetails commanderDetails;
     QHBoxLayout *layout;
