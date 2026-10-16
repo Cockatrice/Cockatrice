@@ -1,5 +1,6 @@
 #include "art_crop_attribution.h"
 
+#include "../../theme_manager.h"
 #include "libcockatrice/card/printing/printing_info.h"
 
 #include <QColor>
@@ -35,7 +36,10 @@ QRectF paintArtAttribution(QPainter &painter,
 
     painter.save();
 
+    // Family comes from the CardText theme role; the incoming painter size
+    // stays the basis for the scale factor exactly as before.
     QFont font = painter.font();
+    font.setFamily(themeManager->appFont(AppFont::CardText).family());
     font.setPointSizeF(qMax(6.0, font.pointSizeF() * scale));
     painter.setFont(font);
 
