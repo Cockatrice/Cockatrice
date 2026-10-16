@@ -11,6 +11,15 @@ message ServerInfo_DeckStorage_File {
     // Tag names associated with the deck. Empty for decks uploaded before the
     // tags column existed.
     repeated string tags = 6;
+    // Stable per-deck identity for two-way collection sync. Empty for decks
+    // uploaded before the sync migration until they are re-uploaded.
+    optional string guid = 7;
+    // Content hash (DeckList::getDeckHash) for change detection without
+    // downloading the full list.
+    optional string hash = 8;
+    // Last modification time, seconds since Unix epoch. Drives newest-wins
+    // default and conflict-dialog recency highlight.
+    optional uint64 last_modified = 9;
 }
 
 message ServerInfo_DeckStorage_Folder {
