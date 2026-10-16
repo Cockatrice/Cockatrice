@@ -13,6 +13,7 @@
 
 class CardItem;
 class AbstractClient;
+class CardState;
 class GameEventHandler;
 class GameMetaInfo;
 class GameReplay;
@@ -57,7 +58,7 @@ public:
 
     void loadReplay(const GameReplay *replay);
 
-    CardItem *getCard(int playerId, const QString &zoneName, int cardId) const;
+    CardState *getCard(int playerId, const QString &zoneName, int cardId) const;
 };
 
 #endif // COCKATRICE_ABSTRACT_GAME_H
