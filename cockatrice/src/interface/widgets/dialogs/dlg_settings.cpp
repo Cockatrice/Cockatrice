@@ -49,6 +49,9 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
 
     QSize target = !hostSize.isEmpty() ? QSize(qRound(hostSize.width() * 0.9), qRound(hostSize.height() * 0.9))
                                        : QSize(qRound(available.width() * 0.9), qRound(available.height() * 0.9));
+    // Evenly-spaced columns leave unnatural dead space on very wide windows; clamp the width per review.
+    static constexpr int MAX_DIALOG_WIDTH = 1280;
+    target.setWidth(qMin(target.width(), MAX_DIALOG_WIDTH));
     target = target.expandedTo(minimum).boundedTo(available.size());
     resize(target);
     setSizeGripEnabled(true);
