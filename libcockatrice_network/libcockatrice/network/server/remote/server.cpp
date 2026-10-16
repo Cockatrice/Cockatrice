@@ -451,6 +451,12 @@ void Server::externalRoomSay(int roomId, const QString &userName, const QString 
         qDebug() << "externalRoomSay: room id=" << roomId << "not found";
         return;
     }
+    if (!channelId.isEmpty() && !Server_Room::isMainChannel(channelId) && room->findChannel(channelId) == nullptr) {
+        // The receiver does not know this channel; say() would drop it, so do
+        // not log what was never delivered.
+        qDebug() << "externalRoomSay: unknown channel" << channelId << "for room id=" << roomId << "dropping";
+        return;
+    }
     room->say(userName, message, channelId, false);
 
     if (channelId.isEmpty()) {
