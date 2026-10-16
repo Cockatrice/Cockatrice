@@ -393,6 +393,8 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/api/edhrec/tab_edhrec.cpp
     src/interface/widgets/tabs/api/edhrec/tab_edhrec_main.cpp
     src/interface/widgets/tabs/alt_table_delegate.cpp
+    src/interface/widgets/tabs/moderation_header_style.cpp
+    src/interface/widgets/tabs/moderation_tab_style.cpp
     src/interface/widgets/tabs/report_status_delegate.cpp
     src/interface/widgets/tabs/tab.cpp
     src/interface/widgets/tabs/tab_account.cpp
