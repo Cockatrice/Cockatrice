@@ -2071,7 +2071,7 @@ void Servatrice_DatabaseInterface::addAuditRecord(const QString &user,
 
 bool Servatrice_DatabaseInterface::isCardArtAllowed(const QString &cardName, const QString &cardProviderId)
 {
-    if (cardName.isEmpty()) {
+    if (cardName.isEmpty() || !checkSql()) {
         return true;
     }
     QSqlQuery *q = prepareQuery(

@@ -192,7 +192,7 @@ public:
      * @brief Whether the given card art may be shown (card art rules).
      *
      * Default allows everything; the real server overrides this with a lookup
-     * in cockatrice_card_art_name_rules. Empty names are always allowed (clear path).
+     * in {prefix}_card_art_name_rules. Empty names are always allowed (clear path).
      */
     virtual bool isCardArtAllowed(const QString & /* cardName */, const QString & /* providerId */)
     {

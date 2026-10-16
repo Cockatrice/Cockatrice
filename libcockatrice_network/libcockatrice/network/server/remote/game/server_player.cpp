@@ -263,7 +263,9 @@ Server_Player::cmdDeckSelect(const Command_DeckSelect &cmd, ResponseContainer &r
     const auto deckPlaymat = newDeck->getPlaymat();
     if (!deckPlaymat.card.name.isEmpty()) {
         auto *db = game->getRoom()->getServer()->getDatabaseInterface();
-        if (db && !db->isCardArtAllowed(deckPlaymat.card.name, deckPlaymat.card.providerId)) {
+        // Check the truncated values actually broadcast below; the rule columns are varchar(255).
+        if (db && !db->isCardArtAllowed(deckPlaymat.card.name.left(MAX_NAME_LENGTH),
+                                        deckPlaymat.card.providerId.left(MAX_NAME_LENGTH))) {
             newDeck->setPlaymat({});
         }
     }

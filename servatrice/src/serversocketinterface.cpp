@@ -3481,13 +3481,6 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountImage(const Comm
     return Response::RespOk;
 }
 
-bool AbstractServerSocketInterface::isCardNameAllowed(const QString &cardName, const QString &cardProviderId)
-{
-    // Single source of truth lives on the database interface so game commands
-    // (e.g. playmats) can enforce the same rules without SQL here.
-    return sqlInterface->isCardArtAllowed(cardName, cardProviderId);
-}
-
 Response::ResponseCode AbstractServerSocketInterface::cmdSetCardArtParams(const Command_SetCardArtParams &cmd,
                                                                           ResponseContainer & /* rc */)
 {
@@ -3514,7 +3507,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdSetCardArtParams(const 
         return Response::RespOk;
     }
 
-    if (!isCardNameAllowed(cardName, cardProviderId)) {
+    if (!sqlInterface->isCardArtAllowed(cardName, cardProviderId)) {
         return Response::RespFunctionNotAllowed;
     }
 
