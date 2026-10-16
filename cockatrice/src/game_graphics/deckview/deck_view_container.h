@@ -19,6 +19,8 @@ class QVBoxLayout;
 class AbstractCardItem;
 class VisualDeckStorageWidget;
 class Response;
+class CommandContainer;
+class QVariant;
 class TabGame;
 class DeckView;
 
@@ -60,12 +62,14 @@ private:
     VisualDeckStorageWidget *visualDeckStorageWidget;
     TabGame *parentGame;
     int playerId;
-    int playmatRotationIndex = 0;    ///< Per-match cursor for round-robin playmat mode.
-    DeckList currentDeck;            ///< Cached deck for live settings re-resolution.
-    PlaymatInfo lastResolvedPlaymat; ///< Tracks last sent playmat to avoid repeats in random mode.
+    int playmatRotationIndex = 0;         ///< Per-match cursor for round-robin playmat mode.
+    DeckList currentDeck;                 ///< Cached deck for live settings re-resolution.
+    PlaymatInfo lastResolvedPlaymat;      ///< Tracks last sent playmat to avoid repeats in random mode.
+    QString lastBlacklistedPlaymatNotice; ///< Card name already reported as blacklisted, to avoid repeat popups.
 
     void tryCreateVisualDeckStorageWidget();
     void sendReadyStartCommand(bool ready);
+    void notifyPlaymatBlacklisted(const QString &cardName, const QString &message);
 private slots:
     void switchToDeckSelectView();
     void switchToDeckLoadedView();
@@ -76,7 +80,7 @@ private slots:
     void unloadDeck();
     void readyStart();
     void forceStart();
-    void deckSelectFinished(const Response &r);
+    void deckSelectFinished(const Response &r, const CommandContainer &cmd, const QVariant &extraData);
     void sideboardPlanChanged();
     void sideboardLockButtonClicked();
     void updateSideboardLockButtonText();
