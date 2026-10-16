@@ -26,6 +26,7 @@ class Event_UserLeft;
 class Event_JoinRoom;
 class Event_LeaveRoom;
 class Event_RoomSay;
+class Event_RoomChannelSay;
 class Event_ListGames;
 class Event_RemoveMessages;
 class Command_JoinGame;
@@ -49,7 +50,7 @@ signals:
     void externalUserLeft(QString userName);
     void externalRoomUserJoined(int roomId, ServerInfo_User userInfo);
     void externalRoomUserLeft(int roomId, QString userName);
-    void externalRoomSay(int roomId, QString userName, QString message);
+    void externalRoomSay(int roomId, QString userName, QString message, QString channelId);
     void externalRoomGameListChanged(int roomId, ServerInfo_Game gameInfo);
     void externalRoomRemoveMessages(int roomId, QString userName, int amount);
     void joinGameCommandReceived(const Command_JoinGame &cmd, int cmdId, int roomId, int serverId, qint64 sessionId);
@@ -79,6 +80,7 @@ private:
     void roomEvent_UserJoined(int roomId, const Event_JoinRoom &event);
     void roomEvent_UserLeft(int roomId, const Event_LeaveRoom &event);
     void roomEvent_Say(int roomId, const Event_RoomSay &event);
+    void roomEvent_ChannelSay(int roomId, const Event_RoomChannelSay &event);
     void roomEvent_ListGames(int roomId, const Event_ListGames &event);
     void roomEvent_RemoveMessages(int roomId, const Event_RemoveMessages &event);
 
