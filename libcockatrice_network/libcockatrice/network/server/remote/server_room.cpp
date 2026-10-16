@@ -219,7 +219,7 @@ bool Server_Room::mayReadChannel(const ServerInfo_User &userInfo, const ServerIn
 bool Server_Room::mayWriteChannel(const ServerInfo_User &userInfo, const ServerInfo_RoomChannel &channel)
 {
     const auto writeLevel = channel.has_write_access_level() ? channel.write_access_level() : channel.access_level();
-    return hasChannelPrivilege(userInfo, writeLevel);
+    return mayReadChannel(userInfo, channel) && hasChannelPrivilege(userInfo, writeLevel);
 }
 
 QList<ServerInfo_ChatMessage> Server_Room::getChatHistory(const QString &channelId) const
