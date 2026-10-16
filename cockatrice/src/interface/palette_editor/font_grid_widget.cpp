@@ -71,6 +71,9 @@ FontGridWidget::FontGridWidget(QWidget *parent) : QWidget(parent)
 
 void FontGridWidget::loadFonts(const FontConfig &cfg)
 {
+    // Suppress fontsChanged while materializing fallback rows so the initial
+    // load never reads as a user edit (mirrors paletteGrid blocking).
+    blockSignals(true);
     QMetaEnum fontEnum = QMetaEnum::fromType<AppFont::Role>();
     for (int i = 0; i < fontEnum.keyCount(); ++i) {
         auto role = static_cast<AppFont::Role>(fontEnum.value(i));
@@ -92,6 +95,7 @@ void FontGridWidget::loadFonts(const FontConfig &cfg)
         }
         row.sizeSpin->setValue(qBound(MIN_FONT_SIZE, size, MAX_FONT_SIZE));
     }
+    blockSignals(false);
 }
 
 FontConfig FontGridWidget::currentFontConfig() const

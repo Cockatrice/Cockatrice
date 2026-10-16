@@ -747,16 +747,7 @@ void ThemeManager::themeChangedSlot()
     applyStyleAndPalette(themeName, themeCfg, palette, activeScheme);
 
     // ── Load fonts: shared per theme, no light/dark split ───────────────────
-    FontConfig fonts = loadFontConfig(dirPath);
-    if (!fonts.hasFonts()) {
-        // The shipped fonts.toml may live in the system theme directory rather
-        // than the resolved (user) theme directory, so built-in themes still
-        // get their curated fonts.
-        const QString sysFontPath = QDir(systemThemesBasePath()).absoluteFilePath(themeName);
-        if (sysFontPath != dirPath) {
-            fonts = loadFontConfig(sysFontPath);
-        }
-    }
+    FontConfig fonts = loadDefaultFontConfig(dirPath, themeName);
     currentFonts = fonts;
     const auto fontIt = currentFonts.fonts.constFind(AppFont::InterfaceDefault);
     if (fontIt != currentFonts.fonts.constEnd()) {

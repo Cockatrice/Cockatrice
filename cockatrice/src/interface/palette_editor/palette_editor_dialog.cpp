@@ -186,7 +186,10 @@ void PaletteEditorDialog::setupUi()
     connect(autoApplyTimer, &QTimer::timeout, this, &PaletteEditorDialog::onApply);
     connect(quickSetupPanel, &QuickSetupPanel::valueChanged, this, &PaletteEditorDialog::onGenerateFromAccent);
     connect(paletteGrid, &PaletteGridWidget::paletteChanged, this, [this] { autoApplyTimer->start(); });
-    connect(fontGrid, &FontGridWidget::fontsChanged, this, [this] { autoApplyTimer->start(); });
+    connect(fontGrid, &FontGridWidget::fontsChanged, this, [this] {
+        fontsDirty = true;
+        autoApplyTimer->start();
+    });
     connect(revertButton, &QPushButton::clicked, this, &PaletteEditorDialog::onRevertToDefault);
     connect(resetBtn, &QPushButton::clicked, this, &PaletteEditorDialog::onReset);
     connect(saveBtn, &QPushButton::clicked, this, &PaletteEditorDialog::onSave);
@@ -281,15 +284,11 @@ void PaletteEditorDialog::loadSchemes()
 
 void PaletteEditorDialog::loadFonts()
 {
-    // Same user-dir > system-dir fallback ThemeManager uses: the shipped
-    // fonts.toml may live in the system theme directory rather than the
-    // resolved (user) theme directory.
-    FontConfig cfg = ThemeManager::loadFontConfig(themeDirPath);
-    if (!cfg.hasFonts()) {
-        cfg = ThemeManager::loadDefaultFontConfig(themeDirPath, themeName);
-    }
-    savedFontConfig = cfg;
-    fontGrid->loadFonts(cfg);
+    savedFontConfig = ThemeManager::loadDefaultFontConfig(themeDirPath, themeName);
+    fontGrid->blockSignals(true);
+    fontGrid->loadFonts(savedFontConfig);
+    fontGrid->blockSignals(false);
+    fontsDirty = false;
 }
 
 void PaletteEditorDialog::seedAccentFromScheme(const QString &scheme)
@@ -322,7 +321,9 @@ void PaletteEditorDialog::onGenerateFromAccent(const QColor &accent, int intensi
 void PaletteEditorDialog::onApply()
 {
     themeManager->previewPalette(paletteGrid->currentPaletteConfig(), loadedScheme);
-    themeManager->previewFonts(fontGrid->currentFontConfig());
+    if (fontsDirty) {
+        themeManager->previewFonts(fontGrid->currentFontConfig());
+    }
 }
 
 void PaletteEditorDialog::onSave()
@@ -374,14 +375,17 @@ void PaletteEditorDialog::onSave()
     }
 
     // Persist the shared per-theme fonts when they changed.
-    const FontConfig fontCfg = fontGrid->currentFontConfig();
-    if (fontCfg != savedFontConfig) {
-        if (!ThemeManager::saveFontConfig(saveDir, fontCfg)) {
-            QMessageBox::warning(this, tr("Save failed"),
-                                 tr("Could not write %1 to:\n%2").arg(FontConfig::fileName(), saveDir));
-            return;
+    if (fontsDirty) {
+        const FontConfig fontCfg = fontGrid->currentFontConfig();
+        if (fontCfg != savedFontConfig) {
+            if (!ThemeManager::saveFontConfig(saveDir, fontCfg)) {
+                QMessageBox::warning(this, tr("Save failed"),
+                                     tr("Could not write %1 to:\n%2").arg(FontConfig::fileName(), saveDir));
+                return;
+            }
+            savedFontConfig = fontCfg;
         }
-        savedFontConfig = fontCfg;
+        fontsDirty = false;
     }
 
     themeManager->reloadCurrentTheme();
@@ -390,6 +394,7 @@ void PaletteEditorDialog::onSave()
 
 void PaletteEditorDialog::onReset()
 {
+    const bool hadFontPreview = fontsDirty;
     workingConfig[loadedScheme] = savedConfig[loadedScheme];
     paletteGrid->loadPalette(savedConfig[loadedScheme]);
     // Restore the live theme before re-reading the grid: loadFonts resolves
@@ -397,6 +402,10 @@ void PaletteEditorDialog::onReset()
     // config until the theme is reloaded.
     themeManager->reloadCurrentTheme();
     fontGrid->loadFonts(savedFontConfig);
+    fontsDirty = false;
+    if (hadFontPreview) {
+        themeManager->previewFonts(savedFontConfig);
+    }
     seedAccentFromScheme(loadedScheme);
 }
 
@@ -443,6 +452,15 @@ void PaletteEditorDialog::onRevertToDefault()
     const FontConfig fontDef = ThemeManager::loadDefaultFontConfig(themeDirPath, themeName);
     savedFontConfig = fontDef;
     fontGrid->loadFonts(fontDef);
+    fontsDirty = false;
+}
+
+void PaletteEditorDialog::reject()
+{
+    // Discard any unsaved live preview (palette and fonts) so closing without
+    // Save restores the active theme instead of leaking the preview globally.
+    themeManager->reloadCurrentTheme();
+    QDialog::reject();
 }
 
 void PaletteEditorDialog::changeEvent(QEvent *e)
