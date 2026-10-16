@@ -489,21 +489,49 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
                     return NotLoggedIn;
                 }
 
-                // A migrated (scrypt) row can only be presented the legacy hash by a
-                // pre-challenge client; accept it against the encrypted legacy backup
-                // while that backup is fresh. Without one there is no downgrade path.
-                QString storedCredential = correctPasswordSha512;
-                bool usedLegacyBackup = false;
+                // A migrated (scrypt) row distinguishes how the credential arrived:
+                // a plaintext password (passwordNeedsHash) is verified directly against
+                // the scrypt verifier, so email changes (cmdAccountEdit) and old clients
+                // that still send `password` keep working without a legacy backup key.
+                // A pre-hashed legacy value is accepted against the encrypted legacy
+                // backup while that backup is fresh. Without one there is no downgrade
+                // path. The backup window is refreshed only when the backup is what
+                // actually matched, so a plaintext proof never keeps the
+                // fast-crackable hash alive.
                 if (!PasswordHasher::isLegacyFormat(correctPasswordSha512)) {
-                    storedCredential = getUsableLegacyBackup(user);
-                    if (storedCredential.isEmpty()) {
+                    if (passwordNeedsHash) {
+                        // Cost is bounded by costParamsAreSane inside parsePasswordVerifier.
+                        if (PasswordHasher::verifyPassword(password, correctPasswordSha512)) {
+                            if (forceChange) {
+                                qCDebug(DatabaseInterfaceLog) << "Login accepted but password change required";
+                                return PasswordChangeRequired;
+                            }
+                            qCDebug(DatabaseInterfaceLog) << "Login accepted: password right";
+                            return PasswordRight;
+                        }
+                        qCDebug(DatabaseInterfaceLog) << "Login denied: password wrong";
+                        return NotLoggedIn;
+                    }
+                    const QString backupCredential = getUsableLegacyBackup(user);
+                    if (backupCredential.isEmpty()) {
                         qCDebug(DatabaseInterfaceLog)
                             << "Login denied: migrated account without a usable legacy backup";
                         return NotLoggedIn;
                     }
-                    usedLegacyBackup = true;
+                    if (PasswordHasher::constantTimeEquals(backupCredential.toUtf8(), password.toUtf8())) {
+                        touchLegacyBackup(user);
+                        if (forceChange) {
+                            qCDebug(DatabaseInterfaceLog) << "Login accepted but password change required";
+                            return PasswordChangeRequired;
+                        }
+                        qCDebug(DatabaseInterfaceLog) << "Login accepted: password right";
+                        return PasswordRight;
+                    }
+                    qCDebug(DatabaseInterfaceLog) << "Login denied: password wrong";
+                    return NotLoggedIn;
                 }
 
+                QString storedCredential = correctPasswordSha512;
                 QString hashedPassword;
                 if (passwordNeedsHash) {
                     hashedPassword = PasswordHasher::computeHash(password, storedCredential.left(16));
@@ -511,9 +539,6 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
                     hashedPassword = password;
                 }
                 if (PasswordHasher::constantTimeEquals(storedCredential.toUtf8(), hashedPassword.toUtf8())) {
-                    if (usedLegacyBackup) {
-                        touchLegacyBackup(user);
-                    }
                     if (forceChange) {
                         qCDebug(DatabaseInterfaceLog) << "Login accepted but password change required";
                         return PasswordChangeRequired;
@@ -741,22 +766,23 @@ bool Servatrice_DatabaseInterface::submitPasswordVerifier(const QString &user, c
     // Read the credential that is about to be replaced: while it is still in the
     // legacy format it becomes the encrypted downgrade backup, sealed before the
     // row is overwritten with the scrypt verifier.
-    QSqlQuery *currentQuery = prepareQuery("SELECT password_sha512 FROM {prefix}_users WHERE name = :name");
+    QSqlQuery *currentQuery = prepareQuery("SELECT name, password_sha512 FROM {prefix}_users WHERE name = :name");
     currentQuery->bindValue(":name", user);
     if (!execSqlQuery(currentQuery) || !currentQuery->next()) {
         return false;
     }
-    const QString currentCredential = currentQuery->value(0).toString();
+    // Use the stored row name (not the caller-supplied one) as the AAD: name is
+    // utf8mb4_unicode_ci, so `alice` logs in as `Alice` and the SELECT still finds
+    // the row while a client-typed name would fail the GCM tag check on open.
+    const QString storedName = currentQuery->value(0).toString();
+    const QString currentCredential = currentQuery->value(1).toString();
 
     QString sealedBackup;
     QDateTime backupUsedAt;
     if (PasswordHasher::isLegacyFormat(currentCredential)) {
         const QByteArray key = server->getLegacyBackupKey();
         if (!key.isEmpty()) {
-            // The AAD binds the backup to the account: use the same normalized name
-            // on both sides, since sealing sees the stored row name while opening
-            // sees the simplified login name.
-            const QByteArray aad = user.simplified().toUtf8();
+            const QByteArray aad = storedName.simplified().toUtf8();
             sealedBackup = CryptoUtil::encryptSecret(currentCredential.toUtf8(), key, aad);
             if (sealedBackup.isEmpty() || sealedBackup.length() > MAX_LEGACY_BACKUP_LENGTH) {
                 qCWarning(DatabaseInterfaceLog)
@@ -805,14 +831,18 @@ QString Servatrice_DatabaseInterface::getUsableLegacyBackup(const QString &user)
     checkSql();
 
     QSqlQuery *query = prepareQuery(
-        "SELECT password_legacy_backup, password_legacy_backup_used_at FROM {prefix}_users WHERE name = :name");
+        "SELECT name, password_legacy_backup, password_legacy_backup_used_at FROM {prefix}_users WHERE name = :name");
     query->bindValue(":name", user);
     if (!execSqlQuery(query) || !query->next()) {
         return {};
     }
 
-    const QString sealed = query->value(0).toString();
-    const QString usedAt = query->value(1).toString();
+    // Open with the stored row name as the AAD: sealing used the canonical DB name
+    // while the caller passes the client-typed name, and the two differ whenever
+    // the login case does not match the stored case (utf8mb4_unicode_ci).
+    const QString storedName = query->value(0).toString();
+    const QString sealed = query->value(1).toString();
+    const QString usedAt = query->value(2).toString();
     if (sealed.isEmpty()) {
         return {};
     }
@@ -825,7 +855,7 @@ QString Servatrice_DatabaseInterface::getUsableLegacyBackup(const QString &user)
         return {};
     }
 
-    const QByteArray legacyCredential = CryptoUtil::decryptSecret(sealed, key, user.simplified().toUtf8());
+    const QByteArray legacyCredential = CryptoUtil::decryptSecret(sealed, key, storedName.simplified().toUtf8());
     if (legacyCredential.isEmpty()) {
         qCWarning(DatabaseInterfaceLog) << "Legacy backup for user" << user << "failed to decrypt"
                                         << "- check security/legacy_backup_key";

@@ -593,8 +593,12 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
         return Response::RespContextError;
     }
 
-    // In strict mode only challenge-response logins are accepted.
-    if (server->requiresChallengeResponseAuth() &&
+    // In strict mode only challenge-response logins are accepted, but only for
+    // registered SQL accounts: guests (no DB row) and non-SQL authentication
+    // methods have no stored verifier to challenge against. userExists is false
+    // for both (it requires AuthenticationSql), so a single check covers them.
+    const bool isRegisteredAccount = databaseInterface != nullptr && databaseInterface->userExists(userName);
+    if (server->requiresChallengeResponseAuth() && isRegisteredAccount &&
         (!cmd.has_hashed_password() || cmd.hashed_password().rfind("$challenge$", 0) != 0)) {
         auto *re = new Response_Login;
         re->set_denied_reason_str("Client upgrade required");

@@ -428,7 +428,18 @@ forgot_password_window_seconds=3600
 ; * mixed: accept both legacy hashes and challenge-response authentication (default);
 ; * strict: only accept challenge-response authentication from clients that support it,
 ;           and reject plain password submissions.  Legacy accounts are migrated to scrypt
-;           automatically on their next successful login.
+;           automatically on their next successful login. Strict only constrains
+;           registered SQL accounts: guest/unregistered logins and servers with
+;           authentication/method set to none or password are unaffected, since
+;           they have no stored verifier to challenge against.
+;
+; Note: anyone holding only the legacy salt+hash of a not-yet-migrated account
+; (e.g. from a wire capture of an old client, or an old database dump) can log in
+; with it and then set a brand new password of their choosing. Before
+; challenge-response a captured hash yielded a session, but changing the password
+; still required the plaintext old password. There is no way around this without
+; a plaintext proof at migration time, so not-yet-migrated rows should be treated
+; accordingly.
 ;
 ; Challenge-response verifiers are scrypt (RFC 7914, N=32768, r=8, p=1) stored as
 ; "$scrypt$<n>$<r>$<p>$<salt>$<verifier>". The stored verifier is password-equivalent:

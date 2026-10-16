@@ -208,8 +208,12 @@ bool AbstractServerSocketInterface::initSession()
         // Challenge-response is advertised in every strictness mode: legacy accounts keep
         // logging in with the legacy hash, but already-migrated scrypt rows are always
         // served challenge-response (authentication_strictness only governs NEW credentials).
-        Event_ServerIdentification::ServerOptions serverOptions = Event_ServerIdentification::SupportsAll;
-        identEvent.set_server_options(serverOptions);
+        // server_options stays exactly SupportsPasswordHash on the wire: already-released
+        // clients parse an unknown proto2 enum value as NoOptions and would fall back to
+        // plaintext passwords. Challenge support is advertised in the separate
+        // supports_challenge_response field, which old clients simply ignore.
+        identEvent.set_server_options(Event_ServerIdentification::SupportsPasswordHash);
+        identEvent.set_supports_challenge_response(true);
     }
     SessionEvent *identSe = prepareSessionEvent(identEvent);
     sendProtocolItem(*identSe);

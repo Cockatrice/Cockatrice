@@ -130,8 +130,11 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         return;
     }
     serverSupportsPasswordHash = event.server_options() & Event_ServerIdentification::SupportsPasswordHash;
-    serverSupportsChallengeResponse =
-        event.server_options() & Event_ServerIdentification::SupportsChallengeResponseAuth;
+    // Challenge-response is advertised in its own field so server_options stays
+    // exactly SupportsPasswordHash on the wire for already-released clients
+    // (proto2 enums are closed: an unknown value parses as NoOptions and those
+    // clients would fall back to plaintext passwords).
+    serverSupportsChallengeResponse = event.has_supports_challenge_response() && event.supports_challenge_response();
 
     if (getStatus() == StatusRequestingForgotPassword) {
         Command_ForgotPasswordRequest cmdForgotPasswordRequest;
