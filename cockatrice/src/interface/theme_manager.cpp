@@ -440,6 +440,34 @@ PaletteConfig ThemeManager::loadDefaultPaletteConfig(const QString &themeDirPath
     return cfg;
 }
 
+FontConfig ThemeManager::loadFontConfig(const QString &themeDirPath)
+{
+    if (themeDirPath.isEmpty()) {
+        return {};
+    }
+    return FontConfig::fromThemeDir(themeDirPath);
+}
+
+bool ThemeManager::saveFontConfig(const QString &themeDirPath, const FontConfig &cfg)
+{
+    if (themeDirPath.isEmpty()) {
+        return false;
+    }
+
+    QDir dir(themeDirPath);
+    if (!dir.exists()) {
+        dir.mkpath(".");
+    }
+
+    QFile f(dir.absoluteFilePath(FontConfig::fileName()));
+    if (!f.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+        return false;
+    }
+
+    QTextStream(&f) << cfg.toToml();
+    return true;
+}
+
 bool ThemeManager::commitPalette(const QString &themeDirPath, const QString &colorScheme, const PaletteConfig &cfg)
 {
     if (!savePaletteConfig(themeDirPath, colorScheme, cfg)) {
@@ -486,6 +514,27 @@ void ThemeManager::previewPalette(const PaletteConfig &cfg, const QString &schem
     const QString dirPath = getAvailableThemes().value(themeName);
     const ThemeConfig themeCfg = ThemeConfig::fromThemeDir(dirPath);
     applyStyleAndPalette(themeName, themeCfg, cfg, scheme);
+}
+
+void ThemeManager::previewFonts(const FontConfig &cfg)
+{
+    currentFonts = cfg;
+
+    const auto it = cfg.fonts.constFind(AppFont::InterfaceDefault);
+    if (it != cfg.fonts.constEnd()) {
+        qApp->setFont(it.value());
+
+        // Repolish every widget immediately so the preview applies without
+        // waiting for natural expose events, mirroring applyStyleAndPalette.
+        QStyle *style = qApp->style();
+        for (QWidget *widget : qApp->allWidgets()) {
+            style->unpolish(widget);
+            style->polish(widget);
+            widget->update();
+        }
+    }
+
+    emit fontsChanged();
 }
 
 void ThemeManager::applyStyleAndPalette(const QString &themeName,
@@ -591,6 +640,18 @@ QColor ThemeManager::appColor(AppColor::Role role) const
     return accent;
 }
 
+QFont ThemeManager::appFont(AppFont::Role role) const
+{
+    const auto it = currentFonts.fonts.constFind(role);
+    if (it != currentFonts.fonts.constEnd()) {
+        return it.value();
+    }
+
+    // No per-role scaling: every unset role resolves to the application font,
+    // so with no fonts.toml present the result is identical to before.
+    return qApp->font();
+}
+
 void ThemeManager::themeChangedSlot()
 {
     QString themeName = SettingsCache::instance().getThemeName();
@@ -641,6 +702,24 @@ void ThemeManager::themeChangedSlot()
     }
 
     applyStyleAndPalette(themeName, themeCfg, palette, activeScheme);
+
+    // ── Load fonts: shared per theme, no light/dark split ───────────────────
+    FontConfig fonts = loadFontConfig(dirPath);
+    if (!fonts.hasFonts()) {
+        // The shipped fonts.toml may live in the system theme directory rather
+        // than the resolved (user) theme directory, so built-in themes still
+        // get their curated fonts.
+        const QString sysFontPath = QDir(systemThemesBasePath()).absoluteFilePath(themeName);
+        if (sysFontPath != dirPath) {
+            fonts = loadFontConfig(sysFontPath);
+        }
+    }
+    currentFonts = fonts;
+    const auto fontIt = currentFonts.fonts.constFind(AppFont::InterfaceDefault);
+    if (fontIt != currentFonts.fonts.constEnd()) {
+        qApp->setFont(fontIt.value());
+    }
+    emit fontsChanged();
 
     QStringList resources;
     if (!dirPath.isEmpty()) {
