@@ -7,6 +7,8 @@
 #ifndef DECK_VIEW_CONTAINER_H
 #define DECK_VIEW_CONTAINER_H
 
+#include "../../interface/deck_loader/deck_loader.h"
+#include "../../interface/widgets/general/tutorial/tutorial_controller.h"
 #include "libcockatrice/deck_list/deck_list.h"
 #include "libcockatrice/utility/playmat_params.h"
 
@@ -91,6 +93,7 @@ signals:
 public:
     DeckViewContainer(int _playerId, TabGame *parent);
     void retranslateUi();
+    TutorialSequence generateTutorialSequence();
     void setReadyStart(bool ready);
     void readyAndUpdate();
     void setSideboardLocked(bool locked);

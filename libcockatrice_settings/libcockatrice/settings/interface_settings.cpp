@@ -5,6 +5,8 @@
 #include "libcockatrice/utility/playmat_params.h"
 
 #include <QChar>
+#include <QDir>
+#include <QFileInfo>
 #include <QList>
 #include <QVariant>
 #include <QtGlobal>
@@ -199,6 +201,11 @@ bool InterfaceSettings::getShowShortcuts() const
 bool InterfaceSettings::getShowGameSelectorFilterToolbar() const
 {
     return getValue("showGameSelectorFilterToolbar", QString(), QString(), true).toBool();
+}
+
+bool InterfaceSettings::getTutorialCompleted() const
+{
+    return getValue("tutorialCompleted", QString(), QString(), false).toBool();
 }
 
 int InterfaceSettings::getPlaymatVisibility() const
@@ -411,6 +418,11 @@ void InterfaceSettings::setShowGameSelectorFilterToolbar(bool _showGameSelectorF
 {
     setValue(_showGameSelectorFilterToolbar, "showGameSelectorFilterToolbar");
     emit showGameSelectorFilterToolbarChanged(_showGameSelectorFilterToolbar);
+}
+
+void InterfaceSettings::setTutorialCompleted(bool value)
+{
+    setValue(value, "tutorialCompleted");
 }
 
 void InterfaceSettings::setPlaymatVisibility(int _visibility)

@@ -7,7 +7,18 @@
 #ifndef VISUAL_DATABASE_DISPLAY_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_WIDGET_H
 
+#include "../../../filters/filter_tree_model.h"
+#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
+#include "../../key_signals.h"
+#include "../cards/card_info_picture_with_text_overlay_widget.h"
+#include "../cards/card_size_widget.h"
+#include "../general/layout_containers/flow_widget.h"
+#include "../general/layout_containers/overlap_control_widget.h"
+#include "../general/tutorial/tutorial_controller.h"
+#include "../utility/custom_line_edit.h"
 #include "libcockatrice/card/card_info.h"
+#include "visual_database_display_color_filter_widget.h"
+#include "visual_database_display_filter_toolbar_widget.h"
 
 #include <QLoggingCategory>
 #include <QMouseEvent>
@@ -40,6 +51,7 @@ class VisualDatabaseDisplayColorFilterWidget;
 class VisualDatabaseDisplayFilterToolbarWidget;
 template <typename T> class QList;
 
+class TutorialController;
 inline Q_LOGGING_CATEGORY(VisualDatabaseDisplayLog, "visual_database_display");
 
 class VisualDatabaseDisplayWidget : public QWidget
@@ -87,6 +99,7 @@ public:
     bool isVisualDisplayMode() const;
 
 public slots:
+    TutorialSequence addTutorialSteps();
     void onSearchModelChanged();
 
 signals:

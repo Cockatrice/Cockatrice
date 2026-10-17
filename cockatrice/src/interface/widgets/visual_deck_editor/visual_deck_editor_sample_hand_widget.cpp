@@ -4,12 +4,16 @@
 #include "../cards/card_info_picture_widget.h"
 #include "../cards/card_size_widget.h"
 #include "../deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.h"
+#include "../deck_analytics/deck_list_statistics_analyzer.h"
 #include "../general/layout_containers/flow_widget.h"
+#include "../general/tutorial/tutorial_controller.h"
+#include "../tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.h"
 #include "deck_list_model.h"
 #include "libcockatrice/card/card_info.h"
 #include "libcockatrice/card/database/card_database_querier.h"
 #include "libcockatrice/deck_list/tree/deck_list_card_node.h"
 #include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
+#include "libcockatrice/utility/qt_utils.h"
 
 #include <QDebug>
 #include <QHBoxLayout>
@@ -87,6 +91,27 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
     layout->addWidget(splitter);
 
     retranslateUi();
+}
+
+TutorialSequence VisualDeckEditorSampleHandWidget::generateTutorialSequence()
+{
+    TutorialSequence sampleHandSequence;
+    sampleHandSequence.name = tr("Sample Hand");
+
+    TutorialStep introStep;
+    introStep.targetWidget = this;
+    introStep.text = tr("This is the sample hand tab.\n\nHere, you can draw a sample hand from your deck without "
+                        "having to start a game as well as view statistical information about your draws.");
+    introStep.onEnter = [this]() {
+        auto tabWidget = QtUtils::findParentOfType<TabDeckEditorVisualTabWidget>(this);
+        if (tabWidget) {
+            tabWidget->setCurrentWidget(tabWidget->sampleHandWidget);
+        }
+    };
+
+    sampleHandSequence.addStep(introStep);
+
+    return sampleHandSequence;
 }
 
 void VisualDeckEditorSampleHandWidget::retranslateUi()

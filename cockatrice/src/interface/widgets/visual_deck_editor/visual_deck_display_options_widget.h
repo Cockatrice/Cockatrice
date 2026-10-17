@@ -1,6 +1,7 @@
 #ifndef COCKATRICE_VISUAL_DECK_DISPLAY_OPTIONS_WIDGET_H
 #define COCKATRICE_VISUAL_DECK_DISPLAY_OPTIONS_WIDGET_H
 
+#include "../general/tutorial/tutorial_controller.h"
 #include "visual_deck_editor_widget.h"
 
 #include <QList>
@@ -93,6 +94,8 @@ public:
     {
         return activeSortCriteria;
     }
+
+    void generateTutorialSequence(TutorialSequence &sequence);
 
 private slots:
     /**

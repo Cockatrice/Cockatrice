@@ -6,6 +6,17 @@
 #ifndef VISUAL_DECK_STORAGE_WIDGET_H
 #define VISUAL_DECK_STORAGE_WIDGET_H
 
+#include "../../deck_loader/deck_loader.h"
+#include "../cards/card_size_widget.h"
+#include "../general/tutorial/tutorial_controller.h"
+#include "../quick_settings/settings_button_widget.h"
+#include "deck_preview/deck_preview_color_identity_filter_widget.h"
+#include "visual_deck_storage_folder_display_widget.h"
+#include "visual_deck_storage_quick_settings_widget.h"
+#include "visual_deck_storage_search_widget.h"
+#include "visual_deck_storage_sort_widget.h"
+#include "visual_deck_storage_tag_filter_widget.h"
+
 #include <QSet>
 #include <QString>
 #include <QStringList>
@@ -35,6 +46,7 @@ public:
     explicit VisualDeckStorageWidget(QWidget *parent);
     void refreshIfPossible();
     void retranslateUi();
+    void generateTutorialSequence(TutorialSequence &vdsSequence);
     void setShareSelectable(bool selectable);
     [[nodiscard]] bool isShareSelectable() const;
     [[nodiscard]] QStringList selectedFilePaths() const;
