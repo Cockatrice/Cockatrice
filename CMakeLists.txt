@@ -341,10 +341,6 @@ elseif(WIN32)
   # cmake/CrashReporting.cmake). Always generated on Windows so makensis has a file to embed even when reporting
   # is disabled; AbortInstall only runs it when CPACK_SENTRY_ENABLED is 1.
   configure_file("${COCKATRICE_CMAKE_PATH}/SendInstallerLog.ps1.in" "${PROJECT_BINARY_DIR}/SendInstallerLog.ps1" @ONLY)
-  set(CPACK_SENTRY_PS1_PATH
-      "${PROJECT_BINARY_DIR}/SendInstallerLog.ps1"
-      CACHE STRING "Absolute path of the generated installer-log sender embedded by the NSIS template" FORCE
-  )
 
   # Every runtime DLL a Windows install has to contain, as paths relative to the
   # install root. .ci/compile.sh reads this and fails the build when the packaged
