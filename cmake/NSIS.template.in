@@ -926,7 +926,11 @@ Function AbortInstall
             ; reason-shaped crosses the command line, which keeps quoting trivial and needs
             ; no NSIS string functions.
             InitPluginsDir
-            File "/oname=$PLUGINSDIR\send-installer-log.ps1" "@CPACK_SENTRY_PS1_PATH@"
+            ; Embedded by the same relative path that resolves NSIS.definitions.nsh above (both are
+            ; configure_file'd into the build root, which is three levels up from project.nsi). An
+            ; absolute CMake path here carries forward slashes, which makensis does not treat as
+            ; absolute and so fails to find the file at package time.
+            File "/oname=$PLUGINSDIR\send-installer-log.ps1" "..\..\..\SendInstallerLog.ps1"
             nsExec::ExecToStack /TIMEOUT=60000 'powershell -NoProfile -ExecutionPolicy Bypass -File "$PLUGINSDIR\send-installer-log.ps1" -LogPath "$InstallLogPath"'
             Pop $SentryResult
             Pop $SentryOutput
