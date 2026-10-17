@@ -6,8 +6,10 @@
 #ifndef CRASH_REPORTER_H
 #define CRASH_REPORTER_H
 
+#include <QByteArray>
 #include <QLoggingCategory>
 #include <QString>
+#include <QStringList>
 #include <libcockatrice/settings/personal_settings.h>
 
 #ifndef COCKATRICE_WITH_CRASH_REPORTING
@@ -29,8 +31,12 @@ Q_DECLARE_LOGGING_CATEGORY(CrashReportLog);
  * as before. With a DSN, init() arms require-user-consent and before_send
  * scrubbing (stale persisted consent from a previous AlwaysSend run is cleared
  * before init when the mode is not AlwaysSend); giveConsent()/revokeConsent()
- * gate uploads, and sendReport() captures a redacted message event with the log
- * preview attached. All SDK calls are guarded so OFF builds compile to no-ops.
+ * gate uploads. attachToPendingCrashEnvelopes() folds the redacted log and the
+ * optional user note into the pending native crash event(s) before consent
+ * releases them, so dump, stack, log and note arrive as ONE Sentry event;
+ * sendReport() is the fallback for unclean exits that produced no native crash
+ * event, capturing a redacted message event with the log preview attached. All
+ * SDK calls are guarded so OFF builds compile to no-ops.
  */
 class CrashReporter
 {
@@ -48,7 +54,52 @@ public:
     void shutdown();
     void giveConsent();
     void revokeConsent();
-    bool sendReport(const QString &redactedPreview);
+    bool sendReport(const QString &redactedPreview, const QString &userNote = QString());
+
+    /**
+     * @brief Append the redacted log (and optional user note) to every pending
+     * native crash envelope in the local database, so the crashed event uploads
+     * with dump, stack, log and note together instead of the log arriving as a
+     * separate event that has to be correlated by hand. Both storage locations
+     * are covered: consent-held envelopes in <database>/cache (Ask mode) and
+     * in-flight envelopes dumped into <database>/<run>.run (AlwaysSend mode).
+     *
+     * For the AlwaysSend variant run this BEFORE init() (static overload): the
+     * startup replay of *.run envelopes happens inside sentry_init. SDK-independent
+     * plain-file surgery on the Sentry envelope format, so it stays unit-testable
+     * in OFF builds.
+     *
+     * @return the number of envelopes that received the attachments.
+     */
+    int attachToPendingCrashEnvelopes(const QString &redactedLogText, const QString &userNoteText);
+    static int attachToPendingCrashEnvelopes(const QString &databasePath,
+                                             const QString &redactedLogText,
+                                             const QString &userNoteText);
+
+    /**
+     * @brief Append one attachment item to a cached Sentry envelope file.
+     *
+     * An envelope is a newline-separated stream of item-header-line + payload
+     * pairs. The retry transport replays cached envelopes byte-for-byte
+     * (sentry-native 0.17.3 reads them raw and serializes raw envelopes back
+     * verbatim), so appending well-formed items associates them with the event
+     * already in the file; the first line (event id header) is never touched.
+     *
+     * @param filename ASCII-only item filename, embedded verbatim in the header.
+     */
+    static bool
+    appendAttachmentToEnvelope(const QString &envelopePath, const QString &filename, const QByteArray &payload);
+
+    /**
+     * @brief Pending crash envelopes in <database>: the consent-held files in
+     * <database>/cache and the in-flight files in <database>/<run>.run.
+     *
+     * Matches the cache filename conventions sentry-native accepts (see
+     * sentry__parse_cache_filename): bare "<uuid>.envelope" and retry
+     * "<ts>-<count>-<uuid>.envelope"; run dirs accept plain "<uuid>.envelope"
+     * minus the SDK's own "__sentry-crash.envelope" marker.
+     */
+    static QStringList pendingEnvelopePaths(const QString &databasePath);
 
     /**
      * @brief SDK-independent gating decision, unit-testable in OFF builds.

@@ -34,6 +34,11 @@ DlgCrashReport::DlgCrashReport(QWidget *parent, bool _realSending, CrashReporter
     previewArea->setReadOnly(true);
     previewArea->setPlainText(buildRedactedPreview());
 
+    noteArea = new QPlainTextEdit(this);
+    // Optional free text ("what I was doing when it crashed") — a few lines are
+    // enough for a description, leave the rest of the space to the log excerpt.
+    noteArea->setMaximumHeight(70);
+
     rememberBox = new QCheckBox(this);
 
     sendButton = new QPushButton(this);
@@ -53,6 +58,7 @@ DlgCrashReport::DlgCrashReport(QWidget *parent, bool _realSending, CrashReporter
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(infoLabel);
     mainLayout->addWidget(accountLabel);
+    mainLayout->addWidget(noteArea);
     mainLayout->addWidget(previewArea);
     mainLayout->addLayout(buttonLayout);
     setLayout(mainLayout);
@@ -92,6 +98,7 @@ void DlgCrashReport::retranslateUi()
     }
     accountLabel->setText(tr("No account needed, and no contact info is collected. Login links "
                              "(cockatrice://...) are scrubbed before sending."));
+    noteArea->setPlaceholderText(tr("Here's what I was doing when it crashed (optional)"));
     rememberBox->setText(tr("Remember my choice"));
     sendButton->setText(tr("Send"));
     dontSendButton->setText(tr("Don't send"));
@@ -122,7 +129,7 @@ QString DlgCrashReport::buildRedactedPreview()
     return lines.join(QStringLiteral("\n"));
 }
 
-QString DlgCrashReport::writeMockReport(const QString &previewText)
+QString DlgCrashReport::writeMockReport(const QString &previewText, const QString &userNote)
 {
     Logger &logger = Logger::getInstance();
 
@@ -134,6 +141,7 @@ QString DlgCrashReport::writeMockReport(const QString &previewText)
     report[QStringLiteral("systemLocale")] = logger.getSystemLocale();
     report[QStringLiteral("installInfo")] = logger.getClientInstallInfo();
     report[QStringLiteral("logPreview")] = previewText;
+    report[QStringLiteral("userNote")] = userNote;
 
     QString fileName = QStringLiteral("crash-report-mock-%1.json")
                            .arg(QDateTime::currentDateTimeUtc().toString(QStringLiteral("yyyyMMdd-HHmmss")));
@@ -154,9 +162,17 @@ void DlgCrashReport::actSend()
         SettingsCache::instance().personal().setCrashReportingMode(PersonalSettings::CrashReportingMode::AlwaysSend);
     }
     const QString preview = previewArea->toPlainText();
+    const QString userNote = noteArea->toPlainText().trimmed();
     if (realSending && reporter != nullptr) {
+        // Fold log and note into the pending native crash event(s) BEFORE consent:
+        // giveConsent() releases the held envelopes for upload, so dump, stack,
+        // log and note arrive as one Sentry event. Without a pending crash event
+        // (unclean exit that produced no native crash) this returns 0 and
+        // sendReport() falls back to a standalone message event with the same
+        // attachments.
+        const int attached = reporter->attachToPendingCrashEnvelopes(preview, userNote);
         reporter->giveConsent();
-        if (reporter->sendReport(preview)) {
+        if (attached > 0 || reporter->sendReport(preview, userNote)) {
             accept();
             return;
         }
@@ -177,7 +193,7 @@ void DlgCrashReport::actSend()
         failureBox.setEscapeButton(QMessageBox::Cancel);
         const QMessageBox::StandardButton choice = static_cast<QMessageBox::StandardButton>(failureBox.exec());
         if (choice == QMessageBox::Save) {
-            const QString savedPath = writeMockReport(preview);
+            const QString savedPath = writeMockReport(preview, userNote);
             if (savedPath.isEmpty()) {
                 QMessageBox::warning(this, tr("Send crash report"), tr("Could not save the crash report locally."));
             } else {
@@ -194,7 +210,7 @@ void DlgCrashReport::actSend()
         }
         return;
     }
-    const QString savedPath = writeMockReport(preview);
+    const QString savedPath = writeMockReport(preview, userNote);
     if (savedPath.isEmpty()) {
         qCWarning(CrashReportLog) << "Could not save the mock crash report locally";
     } else {

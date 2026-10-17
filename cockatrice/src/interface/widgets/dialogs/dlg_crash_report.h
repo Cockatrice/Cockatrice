@@ -22,8 +22,11 @@ class CrashReporter;
  *
  * Mock mode (default): the Send path writes a redacted JSON file to the temp
  * dir instead of uploading anything. Real mode (realSending, with a live
- * CrashReporter): Send gives consent and captures a redacted message event
- * with the log preview attached; failure offers a local save instead.
+ * CrashReporter): Send first folds the redacted log and the optional user note
+ * into the pending native crash event(s), then gives consent so dump, stack,
+ * log and note upload as one Sentry event; when no pending crash event exists
+ * it falls back to a standalone message event with the same attachments.
+ * Failure offers a local save instead.
  */
 class DlgCrashReport : public QDialog
 {
@@ -32,7 +35,7 @@ public:
     explicit DlgCrashReport(QWidget *parent = nullptr, bool realSending = false, CrashReporter *_reporter = nullptr);
 
     static QString buildRedactedPreview();
-    static QString writeMockReport(const QString &previewText);
+    static QString writeMockReport(const QString &previewText, const QString &userNote = QString());
 
     void reject() override;
 
@@ -43,6 +46,7 @@ private:
     QLabel *infoLabel;
     QLabel *accountLabel;
     QPlainTextEdit *previewArea;
+    QPlainTextEdit *noteArea;
     QCheckBox *rememberBox;
     QPushButton *sendButton;
     QPushButton *dontSendButton;

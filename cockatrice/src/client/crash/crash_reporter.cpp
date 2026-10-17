@@ -227,7 +227,7 @@ void CrashReporter::revokeConsent()
 #endif
 }
 
-bool CrashReporter::sendReport(const QString &redactedPreview)
+bool CrashReporter::sendReport(const QString &redactedPreview, const QString &userNote)
 {
 #if COCKATRICE_WITH_CRASH_REPORTING
     if (!ready) {
@@ -250,10 +250,20 @@ bool CrashReporter::sendReport(const QString &redactedPreview)
     if (!attachOk) {
         qCWarning(CrashReportLog) << "Could not attach crash log to crash report";
     }
+    bool noteAttachOk = true;
+    if (!userNote.isEmpty()) {
+        const QByteArray noteBytes = userNote.toUtf8();
+        const sentry_uuid_t noteId = sentry_scope_attach_bytes(scope, noteBytes.constData(),
+                                                               static_cast<size_t>(noteBytes.size()), "user-note.txt");
+        noteAttachOk = sentry_uuid_is_nil(&noteId) == 0;
+        if (!noteAttachOk) {
+            qCWarning(CrashReportLog) << "Could not attach user note to crash report";
+        }
+    }
 
     // Release is attached automatically from the init options. Deliberately no
     // sentry_set_user call: the report must carry no PII. The dialog collects
-    // no contact info, so the message event + attachment is the whole payload
+    // no contact info, so the message event + attachments are the whole payload
     // (sentry_value_new_feedback/sentry_capture_feedback exist but stay unused).
     sentry_value_t event = sentry_value_new_message_event(SENTRY_LEVEL_ERROR, "crash-report", "Crash report");
     const sentry_uuid_t eventId = sentry_scope_capture_event(scope, event, nullptr);
@@ -270,11 +280,135 @@ bool CrashReporter::sendReport(const QString &redactedPreview)
     qCInfo(CrashReportLog) << "Crash report queued, event id:" << eventIdStr;
     // A failed attachment still captures the event above, but reports failure
     // so callers offer the local-save fallback instead of silent success.
-    return attachOk;
+    return attachOk && noteAttachOk;
 #else
     Q_UNUSED(redactedPreview);
+    Q_UNUSED(userNote);
     return false;
 #endif
+}
+
+bool CrashReporter::appendAttachmentToEnvelope(const QString &envelopePath,
+                                               const QString &filename,
+                                               const QByteArray &payload)
+{
+    // QIODevice::ReadWrite creates a missing file; appending to a file that was never
+    // written by the SDK would fabricate an envelope, so require it to exist.
+    if (!QFile::exists(envelopePath)) {
+        return false;
+    }
+    QFile file(envelopePath);
+    if (!file.open(QIODevice::ReadWrite)) {
+        return false;
+    }
+    // Item boundaries are single newlines: make sure the header starts on a fresh line.
+    if (file.size() > 0) {
+        if (!file.seek(file.size() - 1)) {
+            return false;
+        }
+        char lastByte = 0;
+        if (file.read(&lastByte, 1) != 1) {
+            return false;
+        }
+        if (lastByte != '\n' && file.write("\n", 1) != 1) {
+            return false;
+        }
+    }
+    // Item shape mirrors sentry__envelope_add_attachment in the SDK. `length` is what the
+    // SDK's envelope re-parser uses to frame the payload (a missing length ends the item at
+    // the next newline, which would truncate a multi-line log and make the rest of the file
+    // fail to parse); `attachment_length` is the logical attachment size the SDK also emits.
+    // The filename is a compile-time ASCII constant from the callers, so no JSON escaping is
+    // needed.
+    const QByteArray header = QByteArrayLiteral("{\"type\":\"attachment\",\"length\":") +
+                              QByteArray::number(payload.size()) + QByteArrayLiteral(",\"attachment_length\":") +
+                              QByteArray::number(payload.size()) + QByteArrayLiteral(",\"filename\":\"") +
+                              filename.toUtf8() + QByteArrayLiteral("\",\"content_type\":\"text/plain\"}") + '\n';
+    if (file.write(header) != header.size()) {
+        return false;
+    }
+    return file.write(payload) == payload.size();
+}
+
+QStringList CrashReporter::pendingEnvelopePaths(const QString &databasePath)
+{
+    static const auto isUuid = [](const QString &id) { return id.size() == 36 && id.count(QLatin1Char('-')) == 4; };
+    static const auto isEnvelopeName = [](const QString &name) {
+        if (name == QStringLiteral("__sentry-crash.envelope")) {
+            return false;
+        }
+        const QString stem = name.left(name.size() - 9); // strip ".envelope"
+        if (isUuid(stem)) {
+            return true;
+        }
+        // Retry cache filename: "<ts>-<count>-<uuid>".
+        const qsizetype firstSep = stem.indexOf(QLatin1Char('-'));
+        const qsizetype secondSep = firstSep > 0 ? stem.indexOf(QLatin1Char('-'), firstSep + 1) : -1;
+        return firstSep > 0 && secondSep > 0 && isUuid(stem.mid(secondSep + 1)) && stem.left(firstSep).toLongLong() > 0;
+    };
+    QStringList result;
+    const QDir dbDir(databasePath);
+    if (!dbDir.exists()) {
+        return result;
+    }
+    // Consent-held envelopes (Ask mode: the SDK cached them at crash time instead
+    // of sending, see sentry__submit_envelope). Bare "<uuid>.envelope" with
+    // cache_keep only, "<ts>-<count>-<uuid>.envelope" with http_retry.
+    const QDir cacheDir(databasePath + QStringLiteral("/cache"));
+    const QStringList cacheNames = cacheDir.entryList({QStringLiteral("*.envelope")}, QDir::Files, QDir::Name);
+    for (const QString &name : cacheNames) {
+        if (isEnvelopeName(name)) {
+            result.append(cacheDir.filePath(name));
+        }
+    }
+    // In-flight envelopes dumped to the crashed run's own directory (AlwaysSend
+    // mode: consent was already given, so the transport dump wrote them there and
+    // sentry_init's process_old_runs replays them at startup — attach before init).
+    const QStringList runDirs =
+        dbDir.entryList({QStringLiteral("*.run")}, QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+    for (const QString &runDir : runDirs) {
+        const QDir dir(dbDir.filePath(runDir));
+        const QStringList names = dir.entryList({QStringLiteral("*.envelope")}, QDir::Files, QDir::Name);
+        for (const QString &name : names) {
+            if (isEnvelopeName(name)) {
+                result.append(dir.filePath(name));
+            }
+        }
+    }
+    return result;
+}
+
+int CrashReporter::attachToPendingCrashEnvelopes(const QString &redactedLogText, const QString &userNoteText)
+{
+    return attachToPendingCrashEnvelopes(sentryDatabasePath, redactedLogText, userNoteText);
+}
+
+int CrashReporter::attachToPendingCrashEnvelopes(const QString &databasePath,
+                                                 const QString &redactedLogText,
+                                                 const QString &userNoteText)
+{
+    if (databasePath.isEmpty()) {
+        return 0;
+    }
+    const QByteArray logBytes = redactedLogText.toUtf8();
+    const QByteArray noteBytes = userNoteText.toUtf8();
+    int attached = 0;
+    const QStringList envelopes = pendingEnvelopePaths(databasePath);
+    for (const QString &path : envelopes) {
+        bool ok = appendAttachmentToEnvelope(path, QStringLiteral("crash-log.txt"), logBytes);
+        if (ok && !noteBytes.isEmpty()) {
+            ok = appendAttachmentToEnvelope(path, QStringLiteral("user-note.txt"), noteBytes);
+        }
+        if (ok) {
+            ++attached;
+        } else {
+            qCWarning(CrashReportLog) << "Failed to attach crash log to pending envelope" << path;
+        }
+    }
+    if (attached > 0) {
+        qCInfo(CrashReportLog) << "Attached crash log and user note to" << attached << "pending crash envelope(s)";
+    }
+    return attached;
 }
 
 QString CrashReporter::sanitizeLogLine(const QString &line)

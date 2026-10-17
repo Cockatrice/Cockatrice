@@ -264,6 +264,15 @@ int main(int argc, char *argv[])
     qApp->setAttribute(Qt::AA_DontShowIconsInMenus, true);
 #endif
 
+    // Persistent session log: keeps this run's logs on disk so the next-startup crash dialog can
+    // attach the crashed session's tail (the in-memory buffer is lost on crash). Opened in Append
+    // mode with a per-launch session marker; read back via Logger::getPreviousSessionTail().
+    // Declared before crash-reporter init: the startup attach below needs the log tail while the
+    // file still holds the crashed session's lines.
+    const QString persistentLogPath =
+        SettingsCache::instance().getSettingsPath() + QStringLiteral("logs/cockatrice.log");
+    Logger::getInstance().setPersistentLogPath(persistentLogPath);
+
     // Crash reporting: init the SDK early so a crash anywhere below is captured into the
     // local database. Uploads stay consent-gated (require_user_consent, armed in CrashReporter::init):
     // AlwaysSend gives consent here so cached envelopes flush at startup; any other mode starts
@@ -271,15 +280,29 @@ int main(int argc, char *argv[])
     // the mock fallback further below behaves exactly as before.
     CrashReporter crashReporter;
     const QString crashDatabasePath = SettingsCache::instance().getSettingsPath() + QStringLiteral("sentry");
+    // Envelopes that received the redacted log at startup (AlwaysSend path); 0 means the log was
+    // NOT folded into a pending crash event and a standalone log event is still needed below.
+    int crashLogAttachedEnvelopes = 0;
     {
         QString crashDsn = QString::fromUtf8(qgetenv("COCKATRICE_SENTRY_DSN"));
         if (crashDsn.isEmpty()) {
             crashDsn = QString::fromUtf8(COCKATRICE_SENTRY_DSN);
         }
-        crashReporter.init(crashDsn, QString::fromUtf8(VERSION_STRING), crashDatabasePath,
-                           SettingsCache::instance().personal().getCrashReportingMode());
-        if (crashReporter.isReady() && SettingsCache::instance().personal().getCrashReportingMode() ==
-                                           PersonalSettings::CrashReportingMode::AlwaysSend) {
+        const PersonalSettings::CrashReportingMode crashMode =
+            SettingsCache::instance().personal().getCrashReportingMode();
+        // AlwaysSend folds the crashed session's redacted log into the pending crash
+        // envelope(s) BEFORE init: sentry_init replays the crashed run's *.run
+        // envelopes immediately when consent is already persisted, so attaching any
+        // later would be too late. Consent given below then releases them, and dump,
+        // stack and log upload as a single Sentry event. Ask mode attaches at the
+        // dialog instead — its cache-held envelopes stay untouched until giveConsent().
+        if (crashMode == PersonalSettings::CrashReportingMode::AlwaysSend &&
+            CrashReporter::isReportingEnabled(crashDsn, crashMode)) {
+            crashLogAttachedEnvelopes = CrashReporter::attachToPendingCrashEnvelopes(
+                crashDatabasePath, DlgCrashReport::buildRedactedPreview(), QString());
+        }
+        crashReporter.init(crashDsn, QString::fromUtf8(VERSION_STRING), crashDatabasePath, crashMode);
+        if (crashReporter.isReady() && crashMode == PersonalSettings::CrashReportingMode::AlwaysSend) {
             // Silent opt-in: cached native crash envelopes flush automatically once consent is given.
             crashReporter.giveConsent();
         }
@@ -296,13 +319,6 @@ int main(int argc, char *argv[])
                              }
                          });
     }
-
-    // Persistent session log: keeps this run's logs on disk so the next-startup crash dialog can
-    // attach the crashed session's tail (the in-memory buffer is lost on crash). Opened in Append
-    // mode with a per-launch session marker; read back via Logger::getPreviousSessionTail().
-    const QString persistentLogPath =
-        SettingsCache::instance().getSettingsPath() + QStringLiteral("logs/cockatrice.log");
-    Logger::getInstance().setPersistentLogPath(persistentLogPath);
 
     // Translations
 #ifdef Q_OS_MAC
@@ -492,13 +508,16 @@ int main(int argc, char *argv[])
             const bool crashReady = crashReporter.isReady();
             if (crashMode == PersonalSettings::CrashReportingMode::AlwaysSend) {
                 if (crashReady) {
-                    // Silent path: consent was given at startup, so native crash
-                    // envelopes flush automatically; this sends the log preview
-                    // event on top.
-                    const QString crashPreview = DlgCrashReport::buildRedactedPreview();
-                    if (!crashReporter.sendReport(crashPreview)) {
-                        const QString savedPath = DlgCrashReport::writeMockReport(crashPreview);
-                        qCWarning(MainLog) << "Failed to send crash report, saved locally to" << savedPath;
+                    // Silent path: the redacted log was folded into the pending native crash
+                    // envelope(s) at startup and consent already released them. Only when no
+                    // pending crash event existed (e.g. --simulate-crash) does a standalone
+                    // log event still need to go out here.
+                    if (crashLogAttachedEnvelopes == 0) {
+                        const QString crashPreview = DlgCrashReport::buildRedactedPreview();
+                        if (!crashReporter.sendReport(crashPreview)) {
+                            const QString savedPath = DlgCrashReport::writeMockReport(crashPreview);
+                            qCWarning(MainLog) << "Failed to send crash report, saved locally to" << savedPath;
+                        }
                     }
                 } else {
                     DlgCrashReport::writeMockReport(DlgCrashReport::buildRedactedPreview());
