@@ -301,7 +301,7 @@ int main(int argc, char *argv[])
             crashLogAttachedEnvelopes = CrashReporter::attachToPendingCrashEnvelopes(
                 crashDatabasePath, DlgCrashReport::buildRedactedPreview(), QString());
         }
-        crashReporter.init(crashDsn, QString::fromUtf8(VERSION_STRING), crashDatabasePath, crashMode);
+        crashReporter.init(crashDsn, QString::fromUtf8(COCKATRICE_SENTRY_RELEASE), crashDatabasePath, crashMode);
         if (crashReporter.isReady() && crashMode == PersonalSettings::CrashReportingMode::AlwaysSend) {
             // Silent opt-in: cached native crash envelopes flush automatically once consent is given.
             crashReporter.giveConsent();

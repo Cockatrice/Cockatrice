@@ -20,6 +20,10 @@
 #define COCKATRICE_SENTRY_DSN ""
 #endif
 
+#ifndef COCKATRICE_SENTRY_RELEASE
+#define COCKATRICE_SENTRY_RELEASE ""
+#endif
+
 Q_DECLARE_LOGGING_CATEGORY(CrashReportLog);
 
 /**
