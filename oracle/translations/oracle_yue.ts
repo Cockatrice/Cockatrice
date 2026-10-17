@@ -607,7 +607,7 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="24"/>
         <source>English</source>
-        <translation>粵 (Cantonese)</translation>
+        <translation>粵語 (Cantonese)</translation>
     </message>
 </context>
 <context>
