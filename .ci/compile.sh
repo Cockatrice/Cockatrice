@@ -206,6 +206,14 @@ if [[ ${WITH_CRASH_REPORTING:-} == "ON" ]]; then
   # developer builds never reach Sentry.
   flags+=("-DWITH_CRASH_REPORTING=ON")
 fi
+if [[ ${BUILDTYPE:-Release} == "Release" && -n ${COCKATRICE_SENTRY_DSN:-} ]]; then
+  # Release-only: Debug builds stay DSN-free so crashes from developer builds
+  # never reach Sentry. Empty (local builds, forks without the secret, and non-tag
+  # CI builds, which never receive the secret) keeps today's mock fallback via the
+  # compiled-in default. CI passes the value from the SENTRY_DSN secret on tag
+  # Release builds only, so pre-release test artifacts never report to Sentry.
+  flags+=("-DCOCKATRICE_SENTRY_DSN=$COCKATRICE_SENTRY_DSN")
+fi
 
 # Add cmake --build flags
 buildflags=(--config "$BUILDTYPE")

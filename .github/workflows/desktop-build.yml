@@ -240,6 +240,9 @@ jobs:
           package: '${{ matrix.package }}'
           server_only: '${{ matrix.server_only }}'
           WITH_CRASH_REPORTING: 'ON'
+          # Tag builds only: artifacts from master pushes and PR branches must not report to
+          # Sentry. Forks get no secrets on pull_request, so they keep the mock fallback either way.
+          COCKATRICE_SENTRY_DSN: ${{ needs.configure.outputs.tag != null && secrets.SENTRY_DSN || '' }}
         run: |
           source .ci/docker.sh
           args=()
@@ -248,8 +251,43 @@ jobs:
           args+=(--ccache "$CCACHE_SIZE")
           args+=(--cmake-generator "$CMAKE_GENERATOR")
           args+=(--suffix "$SUFFIX")
+          # The container inherits no environment, so the DSN rides in explicitly. -e without
+          # =value passes it through (possibly empty); compile.sh only consumes it for Release
+          # configures, and empty keeps the mock fallback.
+          export RUN_ARGS="${RUN_ARGS:-} -e COCKATRICE_SENTRY_DSN"
 
           RUN --server --release --package "$package" "${args[@]}"
+
+      - name: "Install sentry-cli"
+        if: matrix.package != 'skip' && needs.configure.outputs.tag != null
+        # Downloads from Sentry's release registry: a Sentry outage or a broken install under
+        # Git Bash must not take down the release assets below.
+        continue-on-error: true
+        shell: bash
+        env:
+          SENTRY_CLI_VERSION: '3.8.0'
+        run: |
+          export INSTALL_DIR="$GITHUB_WORKSPACE/.sentry-cli"
+          curl -sL https://sentry.io/get-cli/ | bash
+          echo "$GITHUB_WORKSPACE/.sentry-cli" >> "$GITHUB_PATH"
+
+      - name: "Upload debug symbols to Sentry"
+        if: matrix.package != 'skip' && needs.configure.outputs.tag != null
+        # A Sentry outage or rotated token must not take down the release assets below.
+        continue-on-error: true
+        shell: bash
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        run: |
+          paths=()
+          for dir in build/cockatrice build/oracle build/servatrice; do
+            [[ -d $dir ]] && paths+=("$dir")
+          done
+          if [[ ${#paths[@]} == 0 ]]; then
+            echo "No build output dirs found, skipping symbol upload"
+            exit 0
+          fi
+          sentry-cli debug-files upload --org cockatrice --project cockatrice-desktop "${paths[@]}"
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "Delete remote compiler cache (ccache)"
@@ -536,6 +574,9 @@ jobs:
           BUILDTYPE: '${{ matrix.type }}'
           CCACHE_EVICTION_AGE: ${{ matrix.ccache_eviction_age }}
           CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
+          # Tag builds only: artifacts from master pushes and PR branches must not report to
+          # Sentry. Forks get no secrets on pull_request, so they keep the mock fallback either way.
+          COCKATRICE_SENTRY_DSN: ${{ needs.configure.outputs.tag != null && secrets.SENTRY_DSN || '' }}
           DEVELOPER_DIR: '/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer'
           GITHUB_TOKEN: ${{ github.token }}    # needed for vcpkg dependency graph updates, see VCPKG_FEATURE_FLAGS
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
@@ -562,6 +603,55 @@ jobs:
           # Release legs compile the sentry-native SDK; Debug legs stay SDK-free.
           WITH_CRASH_REPORTING: ${{ matrix.type == 'Release' && 'ON' || '' }}
         run: .ci/compile.sh --server --test --vcpkg
+
+      - name: "Install sentry-cli"
+        if: needs.configure.outputs.tag != null && matrix.make_package == '1'
+        # Same as the Linux leg above: the install downloads from Sentry's registry, so a
+        # failure here must not block the release upload below.
+        continue-on-error: true
+        shell: bash
+        env:
+          SENTRY_CLI_VERSION: '3.8.0'
+        run: |
+          export INSTALL_DIR="$GITHUB_WORKSPACE/.sentry-cli"
+          curl -sL https://sentry.io/get-cli/ | bash
+          echo "$GITHUB_WORKSPACE/.sentry-cli" >> "$GITHUB_PATH"
+
+      - name: "Upload debug symbols to Sentry"
+        if: needs.configure.outputs.tag != null && matrix.make_package == '1'
+        # A Sentry outage or rotated token must not take down the release assets below.
+        continue-on-error: true
+        shell: bash
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        run: |
+          paths=()
+          if [[ '${{ matrix.os }}' == 'Windows' ]]; then
+            # Top-level CMakeLists.txt links /DEBUG even in release, so PDBs land
+            # next to the binaries (same dirs as the PDB artifact step below).
+            for dir in build/cockatrice/Release build/oracle/Release build/servatrice/Release; do
+              [[ -d $dir ]] && paths+=("$dir")
+            done
+          else
+            # Release builds carry DWARF (-g, kept by CrashReporting.cmake); macOS keeps its
+            # debug info in dSYM bundles, so materialize them before uploading.
+            for app in cockatrice oracle servatrice; do
+              binary="build/$app/$app.app/Contents/MacOS/$app"
+              if [[ -f $binary ]]; then
+                if [[ '${{ matrix.os }}' == 'macOS' ]]; then
+                  dsymutil "$binary" -o "$binary.dSYM"
+                  paths+=("$binary.dSYM")
+                else
+                  paths+=("$binary")
+                fi
+              fi
+            done
+          fi
+          if [[ ${#paths[@]} == 0 ]]; then
+            echo "No symbol paths found, skipping symbol upload"
+            exit 0
+          fi
+          sentry-cli debug-files upload --org cockatrice --project cockatrice-desktop "${paths[@]}"
 
       # CPack reports a failed makensis run as "Problem running NSIS command"
       # plus a path to NSISOutput.log, and that log lives only on the runner, so
