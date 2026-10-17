@@ -1,0 +1,16 @@
+filters:
+  - filter_type: file
+    # all supported i18n types: https://help.transifex.com/en/collections/3519116-file-formats
+    file_format: QT
+    source_language: en
+    source_file: cockatrice/cockatrice_en@source.ts
+    # path expression to translation files, must contain <lang> placeholder
+    translation_files_expression: 'cockatrice/translations/cockatrice_<lang>.ts'
+
+  - filter_type: file
+    file_format: QT
+    source_language: en
+    source_file: oracle/oracle_en@source.ts
+    translation_files_expression: 'oracle/translations/oracle_<lang>.ts'
+
+# https://help.transifex.com/en/articles/6265125-github-installation-and-configuration
