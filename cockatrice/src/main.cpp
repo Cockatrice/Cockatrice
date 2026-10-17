@@ -342,9 +342,11 @@ int main(int argc, char *argv[])
     parser.addOptions(
         {{{"c", "connect"}, QCoreApplication::translate("main", "Connect on startup"), "user:pass@host:port"},
          {{"d", "debug-output"}, QCoreApplication::translate("main", "Debug to file")},
-         {"simulate-crash",
-          QCoreApplication::translate("main",
-                                      "Show the crash-report dialog (saves a mock file when no DSN is configured)")}});
+         {"simulate-crash", QCoreApplication::translate(
+                                "main", "Show the crash-report dialog (saves a mock file when no DSN is configured)")},
+         {"simulate-native-crash",
+          QCoreApplication::translate("main", "Crash the app on purpose to test native crash capture (only captured "
+                                              "with a DSN configured and crash reporting not off)")}});
 
     parser.process(app);
 
@@ -397,6 +399,36 @@ int main(int argc, char *argv[])
     // endSession() as a crash, including SIGTERM at logout, Task Manager kills and
     // session-end shutdowns; in AlwaysSend those send a report too.
     const bool uncleanExit = crashReporter.beginSession(crashDatabasePath);
+
+    // Deliberate native fault to verify crash capture (breakpad via sentry-native) end to
+    // end. Fires here, after the SDK is armed and the session lock is claimed, so the
+    // backend captures a real minidump and the leftover lock survives (the fault skips
+    // unwinding, so ~CrashReporter never runs to release it). Run WITHOUT a debugger
+    // attached: a debugger swallows the first-chance exception before the in-process
+    // handler sees it. The volatile write defeats optimizer elision of the null dereference
+    // — and, just as usefully, GCC's -Wnull-dereference, which fires on the plain form at
+    // -O1+ and would break the -Werror build.
+    //
+    // What the leftover lock actually does depends on the mode: Ask (the default) shows the
+    // crash dialog on the next launch as described, AlwaysSend flushes the cached envelope
+    // silently at init instead, and NeverSend ignores the crash entirely. Not usable with
+    // ENABLE_SANITIZERS either: CrashReporting.cmake forces the backend to "none" there and
+    // ASan intercepts the signal first. Under AlwaysSend the report lands in the real
+    // project with nothing marking it as deliberate. Takes precedence over
+    // --simulate-crash: this fault happens here, so the dialog block further down is
+    // never reached.
+    if (parser.isSet("simulate-native-crash")) {
+        qCWarning(MainLog) << "simulate-native-crash: raising an intentional access violation";
+        if (!crashReporter.isReady()) {
+            // Necessary but not sufficient: ready is true with ENABLE_SANITIZERS, where the
+            // backend is "none". Best the log can do is keep the no-op from being silent.
+            qCWarning(MainLog) << "simulate-native-crash: no crash backend armed (empty DSN, "
+                                  "crash reporting off, or built without sentry-native) - the fault "
+                                  "below cannot be captured";
+        }
+        volatile int *nullPointer = nullptr;
+        *nullPointer = 1;
+    }
 
     rng = new RNG_SFMT(CryptoUtil::randomUInt64());
     themeManager = new ThemeManager;
