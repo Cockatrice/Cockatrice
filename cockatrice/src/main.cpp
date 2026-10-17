@@ -265,9 +265,10 @@ int main(int argc, char *argv[])
     parser.addOptions(
         {{{"c", "connect"}, QCoreApplication::translate("main", "Connect on startup"), "user:pass@host:port"},
          {{"d", "debug-output"}, QCoreApplication::translate("main", "Debug to file")},
-         {"simulate-crash",
-          QCoreApplication::translate("main",
-                                      "Show the crash-report dialog (saves a mock file when no DSN is configured)")}});
+         {"simulate-crash", QCoreApplication::translate(
+                                "main", "Show the crash-report dialog (saves a mock file when no DSN is configured)")},
+         {"simulate-native-crash",
+          QCoreApplication::translate("main", "Raise a real access violation to test native crash capture")}});
 
     parser.process(app);
 
@@ -320,6 +321,18 @@ int main(int argc, char *argv[])
     // endSession() as a crash, including SIGTERM at logout, Task Manager kills and
     // session-end shutdowns; in AlwaysSend those send a report too.
     const bool uncleanExit = crashReporter.beginSession(crashDatabasePath);
+
+    // Deliberate native fault to verify crash capture (breakpad via sentry-native) end to
+    // end. Fires here, after the SDK is armed and the session lock is claimed, so the
+    // backend captures a real minidump and the leftover lock makes the next launch show
+    // the crash dialog. Run WITHOUT a debugger attached: a debugger swallows the
+    // first-chance exception before the in-process handler sees it. The volatile write
+    // defeats any optimizer elision of the null dereference.
+    if (parser.isSet("simulate-native-crash")) {
+        qCWarning(MainLog) << "simulate-native-crash: raising an intentional access violation";
+        volatile int *nullPointer = nullptr;
+        *nullPointer = 1;
+    }
 
     rng = new RNG_SFMT(CryptoUtil::randomUInt64());
     themeManager = new ThemeManager;
