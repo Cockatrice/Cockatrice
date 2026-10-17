@@ -30,14 +30,16 @@ DlgCrashReport::DlgCrashReport(QWidget *parent, bool _realSending, CrashReporter
     accountLabel = new QLabel(this);
     accountLabel->setWordWrap(true);
 
-    previewArea = new QPlainTextEdit(this);
-    previewArea->setReadOnly(true);
-    previewArea->setPlainText(buildRedactedPreview());
-
+    // Constructed before previewArea: Qt derives the default Tab chain from construction
+    // order, and note sits visually above the log excerpt, so this keeps Tab moving downward.
     noteArea = new QPlainTextEdit(this);
     // Optional free text ("what I was doing when it crashed") — a few lines are
     // enough for a description, leave the rest of the space to the log excerpt.
     noteArea->setMaximumHeight(70);
+
+    previewArea = new QPlainTextEdit(this);
+    previewArea->setReadOnly(true);
+    previewArea->setPlainText(buildRedactedPreview());
 
     rememberBox = new QCheckBox(this);
 
@@ -81,24 +83,31 @@ void DlgCrashReport::retranslateUi()
     if (realSending) {
         // The preview below prefers the crashed session's persisted log tail
         // (Logger::getPreviousSessionTail), falling back to this restart's in-memory buffer only
-        // when no previous session was saved. The native crash data (minidump + version/OS
-        // metadata cached in the Sentry DB dir by breakpad) is flushed separately on
-        // giveConsent(); the preview is attached as crash-log.txt.
-        infoLabel->setText(
-            tr("Cockatrice closed unexpectedly. Sending uploads the stored crash data from the previous "
-               "run (crash dump plus app version and operating system info) together with the redacted "
-               "log excerpt shown below (last lines from the crashed session, attached as crash-log.txt). "
-               "If no log from the crashed session was saved, this restart's early logs are shown instead."));
+        // when no previous session was saved. On send it is attached as crash-log.txt to the
+        // pending native crash event (dump + stack + log + note in one report); when no native
+        // crash event exists, it rides the fallback message event instead.
+        infoLabel->setText(tr("Oops, we crashed — and now we need your help to make Cockatrice better!\n\n"
+                              "The good thing is, helping is easy and convenient. Sending uploads what the "
+                              "previous run left behind when it crashed: the crash dump with the stack trace, "
+                              "the app version and operating system info, the redacted log excerpt shown below, "
+                              "and anything you write in the note box. If no log from the crashed session was "
+                              "saved, this restart's early logs are shown instead.\n\n"
+                              "Reports are what let us fix crashes like this one. Check \u201cRemember my choice\u201d "
+                              "and Send, and future crash reports are sent automatically without interruption."));
     } else {
-        infoLabel->setText(
-            tr("Cockatrice closed unexpectedly (mock preview, nothing will be uploaded). A real report "
-               "would contain the stored crash data from the previous run plus the redacted log excerpt "
-               "shown below (last lines from the crashed session). If no log from the crashed session was "
-               "saved, this restart's early logs are shown instead. A mock file is saved locally instead."));
+        infoLabel->setText(tr("(Mock preview — nothing will be uploaded.)\n\n"
+                              "Cockatrice closed unexpectedly. A real report would contain what the previous run "
+                              "left behind when it crashed: the crash dump with the stack trace, the app version "
+                              "and operating system info, the redacted log excerpt shown below, and anything you "
+                              "write in the note box. If no log from the crashed session was saved, this restart's "
+                              "early logs are shown instead.\n\n"
+                              "A mock file is written locally for inspection."));
     }
     accountLabel->setText(tr("No account needed, and no contact info is collected. Login links "
                              "(cockatrice://...) are scrubbed before sending."));
-    noteArea->setPlaceholderText(tr("Here's what I was doing when it crashed (optional)"));
+    noteArea->setPlaceholderText(tr("(Optional) Describe what you were doing when it crashed"));
+    // Direction-neutral on purpose: the same box also remembers a "Don't send" decision
+    // (reject() persists NeverSend when it is checked), so it must not promise sending.
     rememberBox->setText(tr("Remember my choice"));
     sendButton->setText(tr("Send"));
     dontSendButton->setText(tr("Don't send"));
