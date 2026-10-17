@@ -1,6 +1,6 @@
 /**
  * @file settings_view.h
- * @brief Settings content widget hosted by the settings dialog (and, later, the settings tab)
+ * @brief Settings content widget hosted by the settings dialog
  * @ingroup Dialogs
  */
 #ifndef SETTINGS_VIEW_H
@@ -28,7 +28,7 @@ class SettingsSearchDelegate;
  * @brief Settings pages with tabbed navigation and search, without any dialog chrome
  *
  * Owns the search bar, the tab bar, the stacked settings pages and the search
- * results view. Dialog/tab hosts only add their own frame (buttons, titles).
+ * results view. The settings dialog only adds its own frame (buttons, titles).
  */
 class SettingsView : public QWidget
 {
