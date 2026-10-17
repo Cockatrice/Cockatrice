@@ -82,10 +82,12 @@
 #include <QPixmapCache>
 #include <QPushButton>
 #include <QSharedPointer>
+#include <QSize>
 #include <QStatusBar>
 #include <QStringLiteral>
 #include <QSystemTrayIcon>
 #include <QTimer>
+#include <QToolButton>
 #include <QWidget>
 #include <QtConcurrentRun>
 #include <QtGlobal>
@@ -355,6 +357,9 @@ void MainWindow::retranslateUi()
     aForgotPassword->setText(tr("&Restore password..."));
     aSettings->setText(tr("&Settings..."));
     aSettings->setIcon(themePixmap(QStringLiteral("icons/settings")));
+    settingsButton->setToolTip(tr("Settings"));
+    settingsButton->setAccessibleName(tr("Settings"));
+    settingsButton->setIcon(themePixmap(QStringLiteral("icons/cogwheel")));
     aExit->setText(tr("&Exit"));
 
 #if defined(__APPLE__) /* For OSX */
@@ -558,6 +563,19 @@ MainWindow::MainWindow(QWidget *parent)
     tabSupervisor->initStartupTabs();
 
     setCentralWidget(tabSupervisor);
+
+    // Unobtrusive settings entry in the tab bar corner: flat icon-only button that blends into the tab
+    // bar until hovered, mirroring the menu action for discoverability
+    settingsButton = new QToolButton(tabSupervisor);
+    settingsButton->setAutoRaise(true);
+    settingsButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    settingsButton->setIconSize(QSize(16, 16));
+    settingsButton->setCursor(Qt::PointingHandCursor);
+    settingsButton->setFocusPolicy(Qt::NoFocus);
+    settingsButton->setStyleSheet(
+        QStringLiteral("QToolButton { border: none; background: transparent; padding: 4px; }"));
+    connect(settingsButton, &QToolButton::clicked, this, &MainWindow::actSettings);
+    tabSupervisor->setCornerWidget(settingsButton, Qt::TopRightCorner);
 
     retranslateUi();
 
