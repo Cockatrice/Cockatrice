@@ -337,6 +337,11 @@ elseif(WIN32)
   # Configure file with custom definitions for NSIS.
   configure_file("${COCKATRICE_CMAKE_PATH}/NSIS.definitions.nsh.in" "${PROJECT_BINARY_DIR}/NSIS.definitions.nsh")
 
+  # Installer-log sender for the AbortInstall Sentry hook (values parsed out of COCKATRICE_SENTRY_DSN in
+  # cmake/CrashReporting.cmake). Always generated on Windows so makensis has a file to embed even when reporting
+  # is disabled; AbortInstall only runs it when CPACK_SENTRY_ENABLED is 1.
+  configure_file("${COCKATRICE_CMAKE_PATH}/SendInstallerLog.ps1.in" "${PROJECT_BINARY_DIR}/SendInstallerLog.ps1" @ONLY)
+
   # Every runtime DLL a Windows install has to contain, as paths relative to the
   # install root. .ci/compile.sh reads this and fails the build when the packaged
   # installer is missing one of them, or carries a runtime it does not know about.
