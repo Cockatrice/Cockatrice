@@ -239,6 +239,7 @@ jobs:
           SUFFIX: '-${{ matrix.distro }}${{ matrix.version }}'
           package: '${{ matrix.package }}'
           server_only: '${{ matrix.server_only }}'
+          WITH_CRASH_REPORTING: 'ON'
         run: |
           source .ci/docker.sh
           args=()
@@ -558,6 +559,8 @@ jobs:
           VCPKG_DISABLE_METRICS: 1
           VCPKG_FEATURE_FLAGS: dependencygraph
           VCPKG_TARGET_MACOS_VERSION: ${{ matrix.vcpkg_deployment_target }}
+          # Release legs compile the sentry-native SDK; Debug legs stay SDK-free.
+          WITH_CRASH_REPORTING: ${{ matrix.type == 'Release' && 'ON' || '' }}
         run: .ci/compile.sh --server --test --vcpkg
 
       # CPack reports a failed makensis run as "Problem running NSIS command"

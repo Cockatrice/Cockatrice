@@ -5,6 +5,8 @@
 #include <QApplication>
 #include <QDateTime>
 #include <QDebug>
+#include <QDir>
+#include <QFileInfo>
 #include <QFlags>
 #include <QIODevice>
 #include <QLocale>
@@ -18,8 +20,11 @@
 
 #define LOGGER_MAX_ENTRIES 128
 #define LOGGER_FILENAME "qdebug.txt"
+#define LOGGER_SESSION_MARKER "Log session started at"
+#define LOGGER_PERSISTENT_MAX_BYTES (512 * 1024)
+#define LOGGER_PERSISTENT_KEEP_LINES 2000
 
-Logger::Logger() : logToFileEnabled(false)
+Logger::Logger() : logToFileEnabled(false), persistentLogEnabled(false)
 {
     logBuffer.append(getClientVersion());
     logBuffer.append(getSystemArchitecture());
@@ -35,6 +40,7 @@ Logger::Logger() : logToFileEnabled(false)
 Logger::~Logger()
 {
     closeLogfileSession();
+    closePersistentLogSession();
     logBuffer.clear();
 }
 
@@ -82,6 +88,137 @@ void Logger::closeLogfileSession()
     fileHandle.close();
 }
 
+void Logger::setPersistentLogPath(const QString &path)
+{
+    QMutexLocker locker(&mutex);
+    if (path.isEmpty() || (persistentLogEnabled && persistentLogPath == path)) {
+        return;
+    }
+
+    QDir().mkpath(QFileInfo(path).absolutePath());
+    persistentLogPath = path;
+    openPersistentLog(path);
+}
+
+void Logger::prunePersistentLog(const QString &path)
+{
+    QFileInfo info(path);
+    if (!info.exists() || info.size() <= LOGGER_PERSISTENT_MAX_BYTES) {
+        return;
+    }
+
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return;
+    }
+    QList<QString> allLines;
+    QTextStream in(&file);
+    while (!in.atEnd()) {
+        allLines.append(in.readLine());
+    }
+    file.close();
+
+    const int start =
+        allLines.size() > LOGGER_PERSISTENT_KEEP_LINES ? allLines.size() - LOGGER_PERSISTENT_KEEP_LINES : 0;
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
+        return;
+    }
+    QTextStream out(&file);
+    for (int i = start; i < allLines.size(); ++i) {
+        out << allLines.at(i) << Qt::endl;
+    }
+    file.close();
+}
+
+void Logger::openPersistentLog(const QString &path)
+{
+    prunePersistentLog(path);
+
+    persistentFileHandle.setFileName(path);
+    if (!persistentFileHandle.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
+        qWarning() << "Logger failed to open persistent log" << path << "for writing";
+        return;
+    }
+    persistentFileStream.setDevice(&persistentFileHandle);
+    persistentFileStream << LOGGER_SESSION_MARKER << " " << QDateTime::currentDateTime().toString() << Qt::endl;
+    persistentFileStream << getClientVersion() << Qt::endl;
+    persistentFileStream << getSystemArchitecture() << Qt::endl;
+    persistentFileStream << getClientInstallInfo() << Qt::endl;
+    persistentFileStream.flush();
+    persistentLogEnabled = true;
+}
+
+void Logger::closePersistentLogSession()
+{
+    if (!persistentLogEnabled) {
+        return;
+    }
+
+    persistentLogEnabled = false;
+    persistentFileStream << "Log session closed at " << QDateTime::currentDateTime().toString() << Qt::endl;
+    persistentFileStream.flush();
+    persistentFileHandle.close();
+}
+
+QList<QString> Logger::getPreviousSessionTail(int maxLines) const
+{
+    QString path;
+    {
+        QMutexLocker locker(&mutex);
+        path = persistentLogPath;
+    }
+    if (path.isEmpty()) {
+        return {};
+    }
+    return extractPreviousSessionTail(path, maxLines);
+}
+
+QList<QString> Logger::extractPreviousSessionTail(const QString &filePath, int maxLines)
+{
+    QList<QString> result;
+    if (maxLines <= 0) {
+        return result;
+    }
+
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return result;
+    }
+    QList<QString> allLines;
+    QTextStream in(&file);
+    while (!in.atEnd()) {
+        allLines.append(in.readLine());
+    }
+    file.close();
+
+    QList<int> markerIndexes;
+    for (int i = 0; i < allLines.size(); ++i) {
+        if (allLines.at(i).contains(QLatin1String(LOGGER_SESSION_MARKER))) {
+            markerIndexes.append(i);
+        }
+    }
+
+    QList<QString> tail;
+    if (markerIndexes.isEmpty()) {
+        tail = allLines;
+    } else if (markerIndexes.size() == 1) {
+        // Only the current session has been recorded; there is no previous session yet.
+        return result;
+    } else {
+        const int previousStart = markerIndexes.at(markerIndexes.size() - 2);
+        const int currentStart = markerIndexes.last();
+        for (int i = previousStart; i < currentStart; ++i) {
+            tail.append(allLines.at(i));
+        }
+    }
+
+    const int start = tail.size() > maxLines ? tail.size() - maxLines : 0;
+    for (int i = start; i < tail.size(); ++i) {
+        result.append(tail.at(i));
+    }
+    return result;
+}
+
 void Logger::log(QtMsgType /* type */, const QMessageLogContext & /* ctx */, const QString &message)
 {
     QMetaObject::invokeMethod(this, "internalLog", Qt::QueuedConnection, Q_ARG(const QString &, message));
@@ -101,6 +238,11 @@ void Logger::internalLog(const QString &message)
 
     if (logToFileEnabled) {
         fileStream << message << Qt::endl; // Print to fileStream
+    }
+
+    if (persistentLogEnabled) {
+        persistentFileStream << message << Qt::endl;
+        persistentFileStream.flush();
     }
 }
 

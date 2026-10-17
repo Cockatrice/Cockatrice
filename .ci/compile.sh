@@ -200,6 +200,12 @@ if [[ $USE_VCPKG ]]; then
   flags+=("-DUSE_VCPKG=1")
   flags+=("-DVCPKG_INSTALL_OPTIONS=--x-abi-tools-use-exact-versions")
 fi
+if [[ ${WITH_CRASH_REPORTING:-} == "ON" ]]; then
+  # Release CI opts into the sentry-native SDK (default is OFF so from-source, distro and
+  # offline package builds never fetch it). Debug builds stay SDK-free so crashes from
+  # developer builds never reach Sentry.
+  flags+=("-DWITH_CRASH_REPORTING=ON")
+fi
 
 # Add cmake --build flags
 buildflags=(--config "$BUILDTYPE")
