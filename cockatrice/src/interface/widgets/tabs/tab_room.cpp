@@ -365,7 +365,7 @@ void TabRoom::sendMessage()
         return;
     } else {
         ChatView *targetView = channelViews.value(activeChannelId, chatView);
-        auto onFinished = [this, targetView](const Response &response) {
+        auto onFinished = [targetView](const Response &response) {
             if (response.response_code() == Response::RespChatFlood) {
                 targetView->appendMessage(tr("You are flooding the chat. Please wait a couple of seconds."));
             } else if (response.response_code() == Response::RespFunctionNotAllowed ||
