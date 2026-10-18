@@ -79,6 +79,8 @@ private:
     SettingsSearchDelegate *searchDelegate; ///< Delegate for search result rendering
     int currentTabIndex;                    ///< Currently active tab index
     bool searchActive;                      ///< Whether search mode is active
+    QWidget *isolatedSection = nullptr;     ///< Isolated section group box, or nullptr for full pages
+    bool pressWasOnCurrentItem = false;     ///< True when the mouse press started on the already-current item
 
     void setupUi();
     void setupNavTree();
@@ -88,6 +90,10 @@ private:
     void navigateToSearchResult(const QModelIndex &index);
     void navigateToSection(int pageIndex, QWidget *sectionWidget);
     void setActiveTab(int index);
+    void switchPageContent(int index);
+    void applySectionFilter(int pageIndex, QWidget *sectionWidget);
+    void selectSectionRow(int pageIndex, QWidget *sectionWidget);
+    QTreeWidgetItem *findSectionItem(int pageIndex, QWidget *sectionWidget) const;
     static void flashWidget(QWidget *widget);
     static void scrollToAndFlash(QWidget *target);
     static QStringList translatedPageNames();

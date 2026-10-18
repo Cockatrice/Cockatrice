@@ -37,6 +37,7 @@
 #include <QListView>
 #include <QMessageLogger>
 #include <QModelIndex>
+#include <QMouseEvent>
 #include <QObject>
 #include <QPalette>
 #include <QPixmap>
@@ -47,6 +48,7 @@
 #include <QScrollBar>
 #include <QSequentialAnimationGroup>
 #include <QShortcut>
+#include <QSignalBlocker>
 #include <QSize>
 #include <QSizePolicy>
 #include <QStackedLayout>
@@ -251,6 +253,13 @@ void SettingsView::setupNavTree()
     navTree->setStyleSheet(
         "QTreeWidget::item:selected { background: palette(highlight); color: palette(highlighted-text); }");
 
+    // Re-click detection has to sample the selection before the view handles the
+    // press: QAbstractItemView updates the current item (emitting
+    // currentItemChanged) and only then emits itemPressed, so itemPressed always
+    // sees the pressed item as "current" and cannot tell a re-click from a first
+    // click. The viewport event filter runs before QAbstractItemView::mousePressEvent.
+    navTree->viewport()->installEventFilter(this);
+
     // Groups of SettingsPage values, in navigation order
     static const QList<QList<SettingsPage>> groupedPages = {
         {GeneralPage, AppearancePage, UserInterfacePage},
@@ -301,6 +310,26 @@ void SettingsView::setupNavTree()
             onTabClicked(index);
         }
     });
+
+    connect(navTree, &QTreeWidget::itemClicked, this, [this](QTreeWidgetItem *item) {
+        const bool wasReClick = pressWasOnCurrentItem;
+        pressWasOnCurrentItem = false;
+        // A fresh click already navigated via currentItemChanged; only a press that
+        // started on the already-current item (captured by the viewport event filter
+        // before the view updated the selection) is a re-click. Re-clicking the
+        // isolated section restores the full page.
+        if (!wasReClick || item == nullptr || item != navTree->currentItem() || isolatedSection == nullptr ||
+            fromWidgetId(item->data(0, SectionWidgetRole).value<WidgetId>()) != isolatedSection) {
+            return;
+        }
+        bool ok = false;
+        const int index = item->data(0, Qt::UserRole).toInt(&ok);
+        if (ok) {
+            // setActiveTab, not onTabClicked: the page is already current and
+            // only setActiveTab clears the section filter
+            setActiveTab(index);
+        }
+    });
 }
 
 void SettingsView::buildSearchIndex()
@@ -328,7 +357,9 @@ void SettingsView::onTabClicked(int index)
 {
     if (searchActive) {
         switchToTabMode();
-    } else if (index == currentTabIndex) {
+    } else if (index == currentTabIndex && isolatedSection == nullptr) {
+        // Re-selecting the current page row is a no-op, but it must still clear
+        // an isolated section so the page's widgets come back.
         return;
     }
     setActiveTab(index);
@@ -340,15 +371,28 @@ void SettingsView::setActiveTab(int index)
         return;
     }
 
-    currentTabIndex = index;
-    pagesWidget->setCurrentIndex(index);
+    switchPageContent(index);
 
     // Selecting the item also expands a collapsed group; selecting the already
     // current item emits nothing, so the currentItemChanged handler cannot loop.
+    navTree->setCurrentItem(pageItems[index]);
+}
+
+void SettingsView::switchPageContent(int index)
+{
+    if (index < 0 || index >= pageItems.size() || !pageItems[index]) {
+        return;
+    }
+
+    currentTabIndex = index;
+    pagesWidget->setCurrentIndex(index);
+
+    // A page row always shows the full page; sections filter down from here
+    applySectionFilter(index, nullptr);
+
     if (QTreeWidgetItem *parent = pageItems[index]->parent()) {
         parent->setExpanded(true);
     }
-    navTree->setCurrentItem(pageItems[index]);
 }
 
 void SettingsView::flashWidget(QWidget *widget)
@@ -446,8 +490,19 @@ void SettingsView::navigateToSearchResult(const QModelIndex &index)
     switchToTabMode();
     setActiveTab(entry.pageIndex);
 
-    // Scroll to the widget, focus it, and flash to highlight it
+    // Isolate the control's section, then scroll to the widget, focus it, and flash it
     if (entry.widget) {
+        QWidget *section = nullptr;
+        for (const SettingsPageSection &candidate : pages[entry.pageIndex]->getSections()) {
+            if (candidate.sectionWidget == entry.widget ||
+                (candidate.sectionWidget && candidate.sectionWidget->isAncestorOf(entry.widget))) {
+                section = candidate.sectionWidget;
+                break;
+            }
+        }
+        applySectionFilter(entry.pageIndex, section);
+        // Keep the sidebar in sync with the deep link: highlight the setting's section row
+        selectSectionRow(entry.pageIndex, section);
         scrollToAndFlash(entry.widget);
         entry.widget->setFocus();
     }
@@ -459,15 +514,110 @@ void SettingsView::navigateToSection(int pageIndex, QWidget *sectionWidget)
         return;
     }
 
+    // Never steal the view's own selection mid-gesture: when this runs from
+    // currentItemChanged the section row is already current (mouse press or arrow key),
+    // and re-selecting the page row here is what made the selection visibly snap back
+    // to the parent on mouse release. selectSectionRow only acts on a known section
+    // that is not current yet, so it syncs programmatic callers without disturbing a gesture.
     if (currentTabIndex != pageIndex) {
         if (searchActive) {
             switchToTabMode();
         }
-        setActiveTab(pageIndex);
+        const QSignalBlocker blocker(navTree);
+        switchPageContent(pageIndex);
+    }
+    applySectionFilter(pageIndex, sectionWidget);
+
+    // Unknown widgets show the full page; known sections keep their row selected
+    selectSectionRow(pageIndex, sectionWidget);
+}
+
+/**
+ * @brief Selects the nav row for a section, expanding its page row
+ *
+ * A null or unknown section (a page whose sections are its own group boxes) leaves
+ * the current selection untouched, so callers can pass a lookup result directly.
+ *
+ * @param pageIndex SettingsPage owning the section
+ * @param sectionWidget Section's group box, or nullptr for no section
+ */
+void SettingsView::selectSectionRow(int pageIndex, QWidget *sectionWidget)
+{
+    if (!sectionWidget) {
+        return;
     }
 
-    // Focus stays in the navigation tree; only scroll and highlight the section
-    scrollToAndFlash(sectionWidget);
+    QTreeWidgetItem *sectionItem = findSectionItem(pageIndex, sectionWidget);
+    if (!sectionItem) {
+        return;
+    }
+
+    pageItems[pageIndex]->setExpanded(true);
+    if (navTree->currentItem() != sectionItem) {
+        const QSignalBlocker blocker(navTree);
+        navTree->setCurrentItem(sectionItem);
+    }
+}
+
+/**
+ * @brief Finds the nav row for a section widget
+ * @param pageIndex SettingsPage owning the section
+ * @param sectionWidget Section's group box
+ * @return The section's tree item, or nullptr when it has no row
+ */
+QTreeWidgetItem *SettingsView::findSectionItem(int pageIndex, QWidget *sectionWidget) const
+{
+    if (pageIndex < 0 || pageIndex >= pageItems.size() || !pageItems[pageIndex]) {
+        return nullptr;
+    }
+    for (int c = 0; c < pageItems[pageIndex]->childCount(); ++c) {
+        QTreeWidgetItem *child = pageItems[pageIndex]->child(c);
+        if (fromWidgetId(child->data(0, SectionWidgetRole).value<WidgetId>()) == sectionWidget) {
+            return child;
+        }
+    }
+    return nullptr;
+}
+
+/**
+ * @brief Shows only the given section of a page, hiding its siblings
+ *
+ * A null sectionWidget restores the full page. Unknown widgets fall back to
+ * the full page so a stale reference can never leave a blank page.
+ *
+ * @param pageIndex SettingsPage to filter
+ * @param sectionWidget Section's group box, or nullptr to show all sections
+ */
+void SettingsView::applySectionFilter(int pageIndex, QWidget *sectionWidget)
+{
+    if (pageIndex < 0 || pageIndex >= pages.size()) {
+        return;
+    }
+
+    const QList<SettingsPageSection> sections = pages[pageIndex]->getSections();
+
+    bool known = sectionWidget == nullptr;
+    for (const SettingsPageSection &section : sections) {
+        if (section.sectionWidget == sectionWidget) {
+            known = true;
+        }
+    }
+    if (!known) {
+        sectionWidget = nullptr;
+    }
+    isolatedSection = sectionWidget;
+
+    for (const SettingsPageSection &section : sections) {
+        if (section.sectionWidget) {
+            section.sectionWidget->setVisible(sectionWidget == nullptr || section.sectionWidget == sectionWidget);
+        }
+    }
+
+    if (auto *scrollArea = qobject_cast<QScrollArea *>(pagesWidget->widget(pageIndex))) {
+        if (QScrollBar *scrollBar = scrollArea->verticalScrollBar()) {
+            scrollBar->setValue(0);
+        }
+    }
 }
 
 void SettingsView::scrollToAndFlash(QWidget *target)
@@ -500,6 +650,17 @@ AbstractSettingsPage *SettingsView::page(SettingsPage which) const
 
 bool SettingsView::eventFilter(QObject *watched, QEvent *event)
 {
+    if (watched == navTree->viewport()) {
+        if (event->type() == QEvent::MouseButtonPress) {
+            auto *mouseEvent = static_cast<QMouseEvent *>(event);
+            // Left button only: context presses must never toggle the filter
+            QTreeWidgetItem *pressedItem = navTree->itemAt(mouseEvent->position().toPoint());
+            pressWasOnCurrentItem = mouseEvent->button() == Qt::LeftButton && pressedItem != nullptr &&
+                                    pressedItem == navTree->currentItem();
+        }
+        return false; // observation only: the view still handles the press
+    }
+
     if (watched == searchEdit && event->type() == QEvent::KeyPress) {
         auto *keyEvent = static_cast<QKeyEvent *>(event);
         if (keyEvent->key() == Qt::Key_Escape) {
