@@ -467,16 +467,18 @@ int main(int argc, char *argv[])
     {
         QString crashDumpDir;
 #ifdef Q_OS_WIN
-        // Mirrors the writer's location: %LOCALAPPDATA%/CrashDumps/Cockatrice. When the handler's
-        // known-folder lookup fails it falls back to <temp>/../.., so the scan has to walk up the
-        // same two levels; plain QDir::tempPath() would look in a directory nothing ever writes to.
-        crashDumpDir = QString::fromLocal8Bit(qgetenv("LOCALAPPDATA")) + "/CrashDumps/Cockatrice";
-        if (qgetenv("LOCALAPPDATA").isEmpty()) {
-            QDir fallback(QDir::tempPath());
-            fallback.cdUp();
-            fallback.cdUp();
-            crashDumpDir = fallback.absolutePath();
+        // Mirrors the writer (CockatriceUnhandledExceptionFilter): it appends CrashDumps/Cockatrice
+        // to %LOCALAPPDATA%, or, when its known-folder lookup fails, to the temp directory walked up
+        // two parent_path() steps. %LOCALAPPDATA% is this scan's stand-in for FOLDERID_LocalAppData:
+        // both come from the same profile, so when the lookup fails the variable is normally unset.
+        QString crashDumpRootPath = QString::fromLocal8Bit(qgetenv("LOCALAPPDATA"));
+        if (crashDumpRootPath.isEmpty()) {
+            // The writer's fallback expression, verbatim — QDir::cdUp() is existence-checked and
+            // would silently leave the path alone here, parent_path() is not.
+            const std::filesystem::path fallback = std::filesystem::temp_directory_path().parent_path().parent_path();
+            crashDumpRootPath = QString::fromStdWString(fallback.wstring());
         }
+        crashDumpDir = QDir(crashDumpRootPath).absoluteFilePath(QStringLiteral("CrashDumps/Cockatrice"));
 #else
         crashDumpDir = QDir::tempPath();
 #endif
