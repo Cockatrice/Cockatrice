@@ -37,6 +37,9 @@ private:
     QMap<QString, QPushButton *> budgetButtons;
 
     void updateOptionButtonSelection(QMap<QString, QPushButton *> &buttons, const QString &selectedKey);
+
+private slots:
+    void applyInterfaceDefaultFont();
 };
 
 #endif // COCKATRICE_EDHREC_COMMANDER_API_RESPONSE_BUDGET_NAVIGATION_WIDGET_H

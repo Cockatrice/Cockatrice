@@ -1496,7 +1496,7 @@ QTreeWidgetItem *UserListWidget::createSectionItem(Section section)
     // They act as collapsible section headers once they have focus.
     divider->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 
-    QFont font = userTree->font();
+    QFont font = themeManager->appFont(AppFont::InterfaceDefault);
     font.setBold(true);
     divider->setFont(0, font);
     // A little taller than a plain text row so the header reads as a section

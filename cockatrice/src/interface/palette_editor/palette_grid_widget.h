@@ -34,6 +34,10 @@ private:
     void changeEvent(QEvent *e);
     void refreshChromePalettes();
 
+private slots:
+    void applyInterfaceDefaultFont();
+
+private:
     QMap<QPalette::ColorGroup, QMap<QPalette::ColorRole, ColorButton *>> colorButtons;
     QMap<AppColor::Role, ColorButton *> appColorButtons;
     QScrollArea *scroll;
