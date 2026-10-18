@@ -321,6 +321,8 @@ public:
     int getDeckShareMaxDecksPerShare() const;
     int getDeckShareMaxSharesPerDay() const;
     int getMaxUsersPerAddress() const;
+    /// Raw security/trusted_sources list; match addresses against it with isTrustedSource().
+    QString getTrustedSources() const;
     int getMessageCountingInterval() const override;
     int getMaxMessageCountPerInterval() const override;
     int getMaxMessageSizePerInterval() const override;

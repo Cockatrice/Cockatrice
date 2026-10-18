@@ -33,6 +33,7 @@
 #include "serversocketinterface.h"
 #include "settingscache.h"
 #include "smtpclient.h"
+#include "trusted_sources.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -322,6 +323,14 @@ bool Servatrice::initServer()
         qDebug() << "Maximum total user limit:" << getMaxUserTotal();
         qDebug() << "Maximum tcp user limit:" << getMaxTcpUserLimit();
         qDebug() << "Maximum websocket user limit:" << getMaxWebSocketUserLimit();
+    }
+
+    // trusted_sources entries are matched as exact addresses; older configs may hold hostnames,
+    // prefixes or subnets that substring matching used to accept and that now never match.
+    for (const QString &entry : getTrustedSources().split(',', Qt::SkipEmptyParts)) {
+        if (QHostAddress(entry.trimmed()).isNull()) {
+            qWarning() << "security/trusted_sources entry is not an IP address and will be ignored:" << entry.trimmed();
+        }
     }
 
     qDebug() << "Accept registered users only:" << getRegOnlyServerEnabled();
@@ -1324,6 +1333,11 @@ int Servatrice::getMaxUsersPerAddress() const
     return settingsCache->value("security/max_users_per_address", 4).toInt();
 }
 
+QString Servatrice::getTrustedSources() const
+{
+    return settingsCache->value("security/trusted_sources", "127.0.0.1,::1").toString();
+}
+
 int Servatrice::getMessageCountingInterval() const
 {
     return settingsCache->value("security/message_counting_interval", 10).toInt();
@@ -1538,8 +1552,7 @@ bool Servatrice::isRateLimitExempt(const QString &ipAddress) const
     // Mirrors the max_users_per_address bypass in initSession: trusted sources
     // (e.g. 127.0.0.1 for Webatrice behind local nginx, where every websocket
     // client shares one address) are not subject to per-address limits.
-    const QString trustedSources = settingsCache->value("security/trusted_sources", "127.0.0.1,::1").toString();
-    return trustedSources.contains(ipAddress, Qt::CaseInsensitive);
+    return isTrustedSource(getTrustedSources(), ipAddress);
 }
 
 void Servatrice::clearFailedLogins(const QString &ipAddress, const QString &userName)
