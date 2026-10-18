@@ -10,6 +10,7 @@
 #include "../game/player/player_logic.h"
 #include "../game/zones/card_zone_logic.h"
 #include "../game/zones/view_zone_logic.h"
+#include "../interface/theme_manager.h"
 #include "animated_item.h"
 #include "board/abstract_card_item.h"
 #include "board/arrow_item.h"
@@ -63,6 +64,14 @@ GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
     addItem(phasesToolbar);
     connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::minPlayersForMultiColumnLayoutChanged, this,
             &GameScene::rearrange);
+    // CardText items (P/T boxes, counters, player names) read the role at
+    // paint time and cache their rendering, so touch every item to invalidate
+    // the caches and pick up the new family on font changes.
+    connect(themeManager, &ThemeManager::fontsChanged, this, [this] {
+        for (auto *item : items()) {
+            item->update();
+        }
+    });
 
     rearrange();
 }
