@@ -16,25 +16,6 @@ $SentryKey = '@CPACK_SENTRY_KEY@'
 $Release = '@CPACK_SENTRY_RELEASE@'
 $Dsn = '@CPACK_SENTRY_DSN_FULL@'
 
-# A DSN on the environment (set by a test harness, e.g. next to the installer's
-# /CRASHTEST switch) targets a scratch project instead of the one baked in at
-# package time. The envelope URL and key are re-derived from whichever DSN wins
-# so all three always agree — pointing the header at one project while posting
-# to another would split the log away from its event.
-if (-not [string]::IsNullOrWhiteSpace($env:COCKATRICE_SENTRY_DSN)) {
-    $Dsn = $env:COCKATRICE_SENTRY_DSN
-    # Same shape cmake/CrashReporting.cmake accepts: <scheme>://<key>@<host>/<project-id>.
-    if ($Dsn -match '^(https?)://([^@/]+)@([^/]+)/([0-9]+)') {
-        $SentryKey = $Matches[2]
-        $EnvelopeUrl = "$($Matches[1])://$($Matches[3])/api/$($Matches[4])/envelope/"
-    } else {
-        # A non-empty but malformed override must not fall back to the baked
-        # project — that would post the log somewhere the tester never chose.
-        Write-Output "FAILED: COCKATRICE_SENTRY_DSN is set but malformed (expected <scheme>://<key>@<host>/<project-id>)"
-        exit 1
-    }
-}
-
 try {
     # The envelope endpoint is TLS-only; stock powershell.exe on older systems
     # still negotiates TLS 1.0 otherwise, so opt into 1.2 explicitly.
@@ -115,7 +96,7 @@ try {
     # --- Send ----------------------------------------------------------------
     # The key travels in the auth header only; stdout below never contains it.
     $auth = 'Sentry sentry_version=7, sentry_client=cockatrice.installer/' + $Release + ', sentry_key=' + $SentryKey
-    Invoke-RestMethod -Uri $EnvelopeUrl -Method Post -ContentType 'application/x-sentry-envelope' -Headers @{ 'X-Sentry-Auth' = $auth } -Body $bodyBytes | Out-Null
+    Invoke-RestMethod -Uri $EnvelopeUrl -Method Post -TimeoutSec 45 -ContentType 'application/x-sentry-envelope' -Headers @{ 'X-Sentry-Auth' = $auth } -Body $bodyBytes | Out-Null
     Write-Output ('SENT ' + $eventId)
     exit 0
 } catch {
@@ -126,6 +107,12 @@ try {
     }
     if ($msg -and $Dsn) {
         $msg = $msg.Replace($Dsn, '<redacted>')
+    }
+    # Flatten to one line: this text is echoed into the installer log, which is
+    # itself uploaded as an attachment, so a multi-line transport error must not
+    # be able to forge extra lines in the artifact we send.
+    if ($msg) {
+        $msg = ($msg -replace '\s+', ' ').Trim()
     }
     Write-Output ('FAILED: ' + $msg)
     exit 1

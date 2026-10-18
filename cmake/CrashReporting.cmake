@@ -184,21 +184,19 @@ endif()
 # needs. These are CPACK_* so CPack snapshots them at include(CPack) time and substitutes them into
 # cmake/NSIS.template.in at package time; on non-Windows they are inert (only the NSIS template consumes them).
 # Stored in CACHE (FORCE) so they are derived from COCKATRICE_SENTRY_DSN on every configure and toggling the
-# DSN cannot leave stale values behind. CPACK_SENTRY_RELEASE intentionally matches what the installer reports
-# in its own log ("installer start: <name> <CPACK_PACKAGE_VERSION>"): PROJECT_VERSION is final here because
-# getversion.cmake ran before this file was included, and it is the same string CPack derives the version from.
+# DSN cannot leave stale values behind. CPACK_SENTRY_RELEASE is deliberately PROJECT_VERSION: that is what the
+# client bakes as its Sentry release and what CI passes to `sentry-cli debug-files upload`, so installer and
+# client events group under one release. It is not the CPACK_PACKAGE_VERSION the installer logs in its own log
+# line — on Development tags PROJECT_VERSION carries a "-<label>" suffix (getversion.cmake) while
+# CPACK_PACKAGE_VERSION is only MAJOR.MINOR.PATCH.
+#
+# Canonical <scheme>://<key>@<host>/<project-id>. Deliberately unanchored, so a trailing slash still matches.
+# A self-hosted DSN with a path prefix (e.g. GlitchTip behind a subpath) does not match and falls through to the
+# disabled-and-warn branch below instead of deriving a wrong endpoint from the tail of the path.
 if(COCKATRICE_SENTRY_DSN MATCHES "(https?)://([^@]+)@([^/]+)/([0-9]+)")
   set(CPACK_SENTRY_KEY
       "${CMAKE_MATCH_2}"
       CACHE STRING "Sentry public key for installer-log posts (derived from COCKATRICE_SENTRY_DSN)" FORCE
-  )
-  set(CPACK_SENTRY_HOST
-      "${CMAKE_MATCH_3}"
-      CACHE STRING "Sentry ingest host for installer-log posts (derived from COCKATRICE_SENTRY_DSN)" FORCE
-  )
-  set(CPACK_SENTRY_PROJECT_ID
-      "${CMAKE_MATCH_4}"
-      CACHE STRING "Sentry project id for installer-log posts (derived from COCKATRICE_SENTRY_DSN)" FORCE
   )
   # Scheme comes from the DSN, not an assumption: self-hosted (GlitchTip) DSNs may be plain http.
   set(CPACK_SENTRY_ENVELOPE_URL
@@ -226,14 +224,6 @@ else()
   set(CPACK_SENTRY_KEY
       ""
       CACHE STRING "Sentry public key for installer-log posts (derived from COCKATRICE_SENTRY_DSN)" FORCE
-  )
-  set(CPACK_SENTRY_HOST
-      ""
-      CACHE STRING "Sentry ingest host for installer-log posts (derived from COCKATRICE_SENTRY_DSN)" FORCE
-  )
-  set(CPACK_SENTRY_PROJECT_ID
-      ""
-      CACHE STRING "Sentry project id for installer-log posts (derived from COCKATRICE_SENTRY_DSN)" FORCE
   )
   set(CPACK_SENTRY_ENVELOPE_URL
       ""
