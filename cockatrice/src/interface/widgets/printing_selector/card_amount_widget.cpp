@@ -1,5 +1,6 @@
 #include "card_amount_widget.h"
 
+#include "../../theme_manager.h"
 #include "../deck_editor/deck_state_manager.h"
 #include "../general/display/dynamic_font_size_push_button.h"
 #include "deck_list_model.h"
@@ -78,6 +79,7 @@ CardAmountWidget::CardAmountWidget(QWidget *parent,
 
     // Connect slider for dynamic font size adjustment
     connect(cardSizeSlider, &QSlider::valueChanged, this, &CardAmountWidget::adjustFontSize);
+    connect(themeManager, &ThemeManager::fontsChanged, this, &CardAmountWidget::applyCardTextFont);
 }
 
 int CardAmountWidget::getAmount()
@@ -139,8 +141,9 @@ void CardAmountWidget::adjustFontSize(int scalePercentage)
     int newFontSize = minFontSize + (scalePercentage - basePercentage) * (maxFontSize - minFontSize) / 225;
     newFontSize = std::clamp(newFontSize, minFontSize, maxFontSize);
 
-    // Update the font for card count label
-    QFont cardCountFont = cardCountInZone->font();
+    // Update the font for card count label. The family comes from the
+    // CardText theme role; the slider-driven point size stays as before.
+    QFont cardCountFont = themeManager->appFont(AppFont::CardText);
     cardCountFont.setPointSize(newFontSize);
     cardCountInZone->setFont(cardCountFont);
 
@@ -149,6 +152,11 @@ void CardAmountWidget::adjustFontSize(int scalePercentage)
 
     // Repaint the widget
     repaint();
+}
+
+void CardAmountWidget::applyCardTextFont()
+{
+    adjustFontSize(cardSizeSlider->value());
 }
 
 /**
