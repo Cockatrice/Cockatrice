@@ -86,8 +86,10 @@ private:
     void switchToTabMode();
     void switchToSearchMode();
     void navigateToSearchResult(const QModelIndex &index);
+    void navigateToSection(int pageIndex, QWidget *sectionWidget);
     void setActiveTab(int index);
     static void flashWidget(QWidget *widget);
+    static void scrollToAndFlash(QWidget *target);
     static QStringList translatedPageNames();
     static QStringList translatedGroupNames();
 
