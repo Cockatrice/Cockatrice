@@ -32,22 +32,28 @@ Q_DECLARE_LOGGING_CATEGORY(CrashReportLog);
 /**
  * @brief Sentry-backed crash-report facade, owned by main().
  *
- * Single responsibility: init/shutdown the sentry-native SDK behind consent
- * gating, plus the shared log redaction helpers. An empty DSN (or Never
- * consent) skips the SDK entirely, so the mock dialog fallback behaves exactly
- * as before. With a DSN, init() arms require-user-consent and before_send
- * scrubbing (stale persisted consent from a previous AlwaysSend run is cleared
- * before init when the mode is not AlwaysSend, and cached crash envelopes are
- * held for the dialog instead of being dropped); giveConsent()/revokeConsent()
- * gate uploads. attachToPendingCrashEnvelopes() folds the redacted log and the
- * optional user note into the pending native crash event(s) before consent
- * releases them, so dump, stack, log and note arrive as ONE Sentry event;
- * sendReport() is the fallback for unclean exits that produced no native crash
- * event, capturing a redacted message event with the log preview attached. All
- * SDK calls are guarded so OFF builds compile to no-ops.
- * Session tracking (beginSession/endSession) is SDK-independent: a QLockFile per
- * process in the database dir detects unclean exits cross-platform, replacing the
- * legacy Windows-only .dmp scan. The held lock makes the reporter non-copyable and
+ * An empty DSN (or Never consent) skips the SDK entirely, so the mock dialog
+ * fallback behaves exactly as before. All SDK calls are guarded so OFF builds
+ * compile to no-ops.
+ *
+ * @par Consent gating
+ * init() arms require-user-consent and before_send scrubbing. Stale persisted
+ * consent from a previous AlwaysSend run is cleared before init when the mode is
+ * not AlwaysSend, and cached crash envelopes are held for the dialog instead of
+ * being dropped. giveConsent()/revokeConsent() gate uploads.
+ *
+ * @par Envelope and log helpers
+ * attachToPendingCrashEnvelopes() folds the redacted log and the optional user
+ * note into the pending native crash event(s) before consent releases them, so
+ * dump, stack, log and note arrive as ONE Sentry event. sendReport() is the
+ * fallback for unclean exits that produced no native crash event, capturing a
+ * redacted message event with the log preview attached. The log redaction
+ * helpers are static and SDK-independent.
+ *
+ * @par Session tracking
+ * beginSession()/endSession() are SDK-independent: a QLockFile per process in
+ * the database dir detects unclean exits cross-platform, replacing the legacy
+ * Windows-only .dmp scan. The held lock makes the reporter non-copyable and
  * non-movable.
  */
 class CrashReporter
