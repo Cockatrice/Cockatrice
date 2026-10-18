@@ -35,6 +35,7 @@ private:
         QLabel *label = nullptr;
         QFontComboBox *familyCombo = nullptr;
         QSpinBox *sizeSpin = nullptr;
+        QSpinBox *minSpin = nullptr; // CardText only: shrink-to-fit floor
     };
 
     QMap<AppFont::Role, FontRow> fontRows;

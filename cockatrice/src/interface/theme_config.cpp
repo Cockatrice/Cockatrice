@@ -308,7 +308,7 @@ QPalette PaletteConfig::apply(QPalette base) const
 
 bool FontConfig::hasFonts() const
 {
-    return !fonts.isEmpty();
+    return !fonts.isEmpty() || cardTextMinSize != 1;
 }
 
 QString FontConfig::toToml() const
@@ -332,6 +332,10 @@ QString FontConfig::toToml() const
         }
 
         entries += QString("%1 = \"%2, %3\"\n").arg(QString(roleName), -20).arg(family).arg(pointSize);
+    }
+
+    if (cardTextMinSize != 1) {
+        entries += QString("%1 = %2\n").arg(QStringLiteral("CardTextMinSize"), -20).arg(cardTextMinSize);
     }
 
     if (entries.isEmpty()) {
@@ -399,6 +403,22 @@ FontConfig FontConfig::fromFile(const QString &filePath)
         if (value.size() >= 2 &&
             ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith('\'') && value.endsWith('\'')))) {
             value = value.mid(1, value.size() - 2).trimmed();
+        }
+
+        // CardText floor: bare integer, e.g. CardTextMinSize = 2. Tolerate
+        // quoting like the family entries; skip invalid lines.
+        QString minKey = key;
+        if (minKey.startsWith("AppFont::")) {
+            minKey = minKey.mid(QStringLiteral("AppFont::").size());
+        }
+        if (minKey.compare("CardTextMinSize", Qt::CaseInsensitive) == 0) {
+            bool ok = false;
+            int minSize = value.trimmed().toInt(&ok);
+            if (!ok || minSize <= 0) {
+                continue;
+            }
+            cfg.cardTextMinSize = minSize;
+            continue;
         }
 
         int comma = value.lastIndexOf(',');

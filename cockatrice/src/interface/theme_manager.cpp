@@ -673,13 +673,38 @@ QFont ThemeManager::appFont(AppFont::Role role) const
         }
         return monoFont;
     }
-    if (role == AppFont::CardText || role == AppFont::DeckList) {
+    if (role == AppFont::CardText) {
+        QFont serifFont(QStringLiteral("Serif"));
+        serifFont.setPointSize(12);
+        return serifFont;
+    }
+    if (role == AppFont::DeckList) {
         return QFont(QStringLiteral("Serif"));
     }
 
     // No per-role scaling: every other unset role resolves to the application
     // font, so with no fonts.toml present the result is identical to before.
     return qApp->font();
+}
+
+int ThemeManager::cardTextMaxSize() const
+{
+    const auto it = currentFonts.fonts.constFind(AppFont::CardText);
+    if (it != currentFonts.fonts.constEnd()) {
+        int size = it.value().pointSize();
+        if (size > 0) {
+            return size;
+        }
+    }
+    return 12;
+}
+
+int ThemeManager::cardTextMinSize() const
+{
+    if (currentFonts.cardTextMinSize > 0) {
+        return currentFonts.cardTextMinSize;
+    }
+    return 1;
 }
 
 void ThemeManager::themeChangedSlot()
