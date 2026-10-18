@@ -22,6 +22,7 @@
 
 #include "deck_tag_serialization.h"
 #include "email_parser.h"
+#include "forwarded_address.h"
 #include "libcockatrice/protocol/pb/admin_commands.pb.h"
 #include "libcockatrice/protocol/pb/developer_commands.pb.h"
 #include "libcockatrice/protocol/pb/moderator_commands.pb.h"
@@ -4560,8 +4561,7 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
         // Only trust the forwarded header if the connection itself comes from a trusted proxy,
         // otherwise a client could spoof its address to bypass bans and rate limits.
         if (isTrustedSource(servatrice->getTrustedSources(), socket->peerAddress())) {
-            QString header(socket->request().rawHeader(websocketIPHeader));
-            QHostAddress parsed(header);
+            const QHostAddress parsed = parseForwardedAddress(socket->request().rawHeader(websocketIPHeader));
             if (!parsed.isNull()) {
                 address = parsed;
             }

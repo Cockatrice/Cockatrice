@@ -210,6 +210,17 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  forwarded_address_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/servatrice/src/forwarded_address.cpp
+  forwarded_address_test.cpp
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/servatrice/src
+  LABELS
+  server
+)
+cockatrice_add_test(
+  NAME
   trusted_sources_test
   SOURCES
   ${CMAKE_SOURCE_DIR}/servatrice/src/trusted_sources.cpp
