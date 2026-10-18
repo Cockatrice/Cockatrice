@@ -27,6 +27,7 @@ public:
 private slots:
     void actSubmit();
     void reportResponse(const Response &response);
+    void applyChatLogFont();
 
 private:
     static QString categoryLabel(const QString &key);
