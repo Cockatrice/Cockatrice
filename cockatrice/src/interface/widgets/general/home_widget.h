@@ -14,6 +14,7 @@
 #include <QPixmap>
 #include <QWidget>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
+#include <optional>
 #include <qtmetamacros.h>
 
 class QGridLayout;
@@ -36,6 +37,7 @@ public:
     static QPair<QColor, QColor> extractDominantColors(const QPixmap &pixmap);
 
 public slots:
+    void retranslateUi();
     void paintEvent(QPaintEvent *event) override;
     void initializeBackgroundFromSource();
     void onBackgroundShuffleFrequencyChanged();
@@ -54,6 +56,14 @@ private:
     QLabel *logoLabel = nullptr;
     QPair<QColor, QColor> gradientColors;
     HomeStyledButton *connectButton;
+    HomeStyledButton *visualDeckEditorButton = nullptr;
+    HomeStyledButton *visualDeckStorageButton = nullptr;
+    HomeStyledButton *visualDatabaseDisplayButton = nullptr;
+    HomeStyledButton *edhrecButton = nullptr;
+    HomeStyledButton *archidektButton = nullptr;
+    HomeStyledButton *replayButton = nullptr;
+    HomeStyledButton *exitButton = nullptr;
+    std::optional<ClientStatus> connectionStatus;
 
     void setRandomCard(ExactCard &newCard);
     void loadBackgroundSourceDeck();

@@ -292,6 +292,7 @@ void TabSupervisor::retranslateUi()
 
     // tabs
     QList<Tab *> tabs;
+    tabs.append(tabHome);
     tabs.append(tabServer);
     tabs.append(tabReplays);
     tabs.append(tabDeckStorage);
