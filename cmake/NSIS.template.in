@@ -937,6 +937,9 @@ Function AbortInstall
             ; absolute CMake path here carries forward slashes, which makensis does not treat as
             ; absolute and so fails to find the file at package time.
             File "/oname=$PLUGINSDIR\send-installer-log.ps1" "..\..\..\SendInstallerLog.ps1"
+            ; The send can take up to the /TIMEOUT below, so put something on the details pane
+            ; the moment the user says yes rather than leaving the window blank until it returns.
+            DetailPrint "Sending installer log..."
             nsExec::ExecToStack /TIMEOUT=60000 'powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$PLUGINSDIR\send-installer-log.ps1" -LogPath "$InstallLogPath"'
             Pop $SentryResult
             Pop $SentryOutput
