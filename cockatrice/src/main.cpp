@@ -467,11 +467,15 @@ int main(int argc, char *argv[])
     {
         QString crashDumpDir;
 #ifdef Q_OS_WIN
-        // Mirrors the writer's location: %LOCALAPPDATA%/CrashDumps/Cockatrice, with the same
-        // temp-path fallback the writer uses when the known-folder lookup fails.
+        // Mirrors the writer's location: %LOCALAPPDATA%/CrashDumps/Cockatrice. When the handler's
+        // known-folder lookup fails it falls back to <temp>/../.., so the scan has to walk up the
+        // same two levels; plain QDir::tempPath() would look in a directory nothing ever writes to.
         crashDumpDir = QString::fromLocal8Bit(qgetenv("LOCALAPPDATA")) + "/CrashDumps/Cockatrice";
         if (qgetenv("LOCALAPPDATA").isEmpty()) {
-            crashDumpDir = QDir::tempPath();
+            QDir fallback(QDir::tempPath());
+            fallback.cdUp();
+            fallback.cdUp();
+            crashDumpDir = fallback.absolutePath();
         }
 #else
         crashDumpDir = QDir::tempPath();
