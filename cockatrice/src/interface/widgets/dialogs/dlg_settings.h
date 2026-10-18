@@ -22,7 +22,8 @@ inline Q_LOGGING_CATEGORY(DlgSettingsLog, "dlg_settings");
  *
  * Thin QDialog frame around SettingsView: only the window title, the OK button
  * and the close validation live here. All pages, navigation and search are
- * owned by SettingsView so other hosts (e.g. a settings tab) can reuse them.
+ * owned by SettingsView. The dialog fills ~90% of the main window so dense
+ * pages stay visible without losing the modal adjust-and-return flow.
  */
 class DlgSettings : public QDialog
 {
