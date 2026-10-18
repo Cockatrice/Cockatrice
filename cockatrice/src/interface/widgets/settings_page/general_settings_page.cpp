@@ -133,8 +133,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     versionGroupBox = new QGroupBox;
     versionGroupBox->setLayout(versionGrid);
 
-    // crash reporting consent (lives in personal.ini, not debug.ini): Ask shows the crash dialog
-    // after an unclean exit, AlwaysSend uploads without asking, NeverSend stays silent.
+    // crash reporting consent (stored in personal.ini, not debug.ini)
     crashReportingBox.addItem(""); // texts set in retranslateUi
     crashReportingBox.addItem("");
     crashReportingBox.addItem("");

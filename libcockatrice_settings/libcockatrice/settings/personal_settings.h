@@ -26,9 +26,9 @@ public:
 
     enum class CrashReportingMode
     {
-        Ask = 0,
-        AlwaysSend = 1,
-        NeverSend = 2
+        Ask = 0,        ///< Show the crash-report dialog after an unclean exit.
+        AlwaysSend = 1, ///< Upload crash reports without asking.
+        NeverSend = 2   ///< Never upload; stay silent.
     };
 
     [[nodiscard]] CrashReportingMode getCrashReportingMode() const;
