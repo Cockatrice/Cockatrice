@@ -1551,8 +1551,11 @@ bool Servatrice::isRateLimitExempt(const QString &ipAddress) const
 {
     // Mirrors the max_users_per_address bypass in initSession: trusted sources
     // (e.g. 127.0.0.1 for Webatrice behind local nginx, where every websocket
-    // client shares one address) are not subject to per-address limits.
-    return isTrustedSource(getTrustedSources(), ipAddress);
+    // client shares one address) are not subject to per-address limits. Loopback
+    // is always exempt, so a same-host proxy whose forwarded address could not be
+    // resolved cannot lock every user out together when trusted_sources is
+    // customized.
+    return QHostAddress(ipAddress).isLoopback() || isTrustedSource(getTrustedSources(), ipAddress);
 }
 
 void Servatrice::clearFailedLogins(const QString &ipAddress, const QString &userName)
