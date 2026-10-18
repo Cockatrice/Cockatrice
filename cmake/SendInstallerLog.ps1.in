@@ -46,9 +46,9 @@ try {
     # --- Abort reason, read from the log itself --------------------------------
     # AbortInstall logs "ABORT: ..." first, so the reason travels inside the file
     # and nothing reason-shaped crosses the command line (no quoting hazards).
-    # Only the first physical line is used for the message; any continuation lines
-    # stay in the attached log. Non-ASCII paths may garble here; the attachment is
-    # byte-exact regardless.
+    # Select-String yields the matching line alone, so the reason is already one
+    # physical line for the message; anything else stays in the attached log.
+    # Non-ASCII paths may garble here; the attachment is byte-exact regardless.
     $Reason = 'unknown (no ABORT line in log)'
     if (Test-Path -LiteralPath $LogPath) {
         $abortLine = Select-String -LiteralPath $LogPath -Pattern '^ABORT: ' | Select-Object -Last 1
@@ -60,8 +60,9 @@ try {
     # --- Event ---------------------------------------------------------------
     $eventId = [guid]::NewGuid().ToString('N')
     $now = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
-    $firstLine = ($Reason -split "`r?`n")[0]
-    $event = [ordered]@{
+    # $Event is an automatic variable (Microsoft.PowerShell.Utility\Register-ObjectEvent),
+    # so the local is named $sentryEvent to avoid shadowing it.
+    $sentryEvent = [ordered]@{
         event_id = $eventId
         timestamp = $now
         platform = 'other'
@@ -70,13 +71,13 @@ try {
         release = $Release
         environment = 'installer'
         sdk = @{ name = 'cockatrice.installer'; version = $Release }
-        message = @{ formatted = 'Installer aborted: ' + $firstLine }
+        message = @{ formatted = 'Installer aborted: ' + $Reason }
         extra = @{
             reason = $Reason
             os = [System.Environment]::OSVersion.VersionString
         }
     }
-    $eventJson = $event | ConvertTo-Json -Compress -Depth 6
+    $eventJson = $sentryEvent | ConvertTo-Json -Compress -Depth 6
     $eventBytes = [System.Text.Encoding]::UTF8.GetBytes($eventJson)
 
     # --- Envelope, assembled as bytes (the log is opaque binary) -------------
