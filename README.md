@@ -21,7 +21,6 @@
 <b>To help with development &#8674; learn [how to contribute](#contribute)</b>
 </pre><p><br>
 
-[Official CONTRIBUTING](https://github.com/Cockatrice/Cockatrice/blob/master/.github/CONTRIBUTING.md)
 
 # Cockatrice
 
@@ -85,7 +84,7 @@ Join our [Discord community](https://discord.gg/3Z9yzmA) to connect with other p
 
 ### Code
 
-To commit code to the project, please review our [contribution guidelines](https://github.com/Cockatrice/Cockatrice/blob/master/.github/CONTRIBUTING.md) first.<br>
+To commit code to the project, please review our [Contribution Guidelines](https://github.com/Cockatrice/Cockatrice/blob/master/.github/CONTRIBUTING.md) first.<br>
 We maintain two tags for contributors to easier find issues to potentially work on:
 - [![Good first issue](https://img.shields.io/github/issues/cockatrice/cockatrice/Good%20First%20Issue)](https://github.com/Cockatrice/Cockatrice/issues?utf8=%E2%9C%93&q=is%3Aopen%20is%3Aissue%20label%3A%22Good%20first%20issue%22%20)<br>
 Issues tagged in this way provide a simple way to get started. They don't require much experience to be worked on.
