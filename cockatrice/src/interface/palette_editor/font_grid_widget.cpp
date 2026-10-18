@@ -63,6 +63,8 @@ FontGridWidget::FontGridWidget(QWidget *parent) : QWidget(parent)
         grid->addWidget(sizeSpin, i, 2);
         connect(sizeSpin, &QSpinBox::valueChanged, this, [this] { emit fontsChanged(); });
 
+        label->setBuddy(familyCombo);
+
         fontRows[role] = {label, familyCombo, sizeSpin};
     }
 
@@ -123,6 +125,9 @@ void FontGridWidget::retranslateUi()
         row.label->setText(roleDisplayName(role));
         row.label->setToolTip(tr(APP_FONT_DESCRIPTIONS.value(role, "")));
         row.familyCombo->setToolTip(tr(APP_FONT_DESCRIPTIONS.value(role, "")));
-        row.sizeSpin->setToolTip(tr("Point size"));
+        row.familyCombo->setAccessibleName(roleDisplayName(role));
+        row.sizeSpin->setToolTip(tr("Point size for %1").arg(roleDisplayName(role)));
+        row.sizeSpin->setAccessibleName(tr("Point size for %1").arg(roleDisplayName(role)));
+        row.sizeSpin->setSuffix(tr(" pt"));
     }
 }
