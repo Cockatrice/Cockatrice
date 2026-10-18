@@ -533,7 +533,6 @@ void SettingsView::navigateToSection(int pageIndex, QWidget *sectionWidget)
             const QSignalBlocker blocker(navTree);
             navTree->setCurrentItem(sectionItem);
         }
-        flashWidget(sectionWidget);
     }
 }
 
