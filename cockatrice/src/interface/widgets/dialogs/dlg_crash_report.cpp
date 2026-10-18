@@ -136,9 +136,9 @@ void DlgCrashReport::actSend()
     }
     const QString savedPath = writeMockReport(previewArea->toPlainText());
     if (savedPath.isEmpty()) {
-        qWarning() << "Could not save the mock crash report locally";
+        qCWarning(CrashReportLog) << "Could not save the mock crash report locally";
     } else {
-        qInfo() << "Mock crash report saved locally to" << savedPath;
+        qCInfo(CrashReportLog) << "Mock crash report saved locally to" << savedPath;
     }
     accept();
 }

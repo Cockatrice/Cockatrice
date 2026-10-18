@@ -6,6 +6,7 @@
 #ifndef CRASH_REPORTER_H
 #define CRASH_REPORTER_H
 
+#include <QLoggingCategory>
 #include <QString>
 #include <libcockatrice/settings/personal_settings.h>
 
@@ -16,6 +17,8 @@
 #ifndef COCKATRICE_SENTRY_DSN
 #define COCKATRICE_SENTRY_DSN ""
 #endif
+
+Q_DECLARE_LOGGING_CATEGORY(CrashReportLog);
 
 /**
  * @brief Sentry-backed crash-report facade, owned by main().

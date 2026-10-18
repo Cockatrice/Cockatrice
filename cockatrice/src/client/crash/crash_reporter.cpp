@@ -6,9 +6,12 @@
 
 #include <QDir>
 #include <QFile>
+#include <QLoggingCategory>
 #include <QRegularExpression>
 #include <QUrl>
 #include <libcockatrice/settings/personal_settings.h>
+
+Q_LOGGING_CATEGORY(CrashReportLog, "crash_report");
 
 bool CrashReporter::isReportingEnabled(const QString &dsn, PersonalSettings::CrashReportingMode consentMode)
 {
