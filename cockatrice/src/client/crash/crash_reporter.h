@@ -110,6 +110,36 @@ public:
      */
     static bool isReportingEnabled(const QString &dsn, PersonalSettings::CrashReportingMode consentMode);
 
+    /**
+     * @brief Whether a DSN has the shape the build and the SDK require:
+     * <scheme>://<key>@<host>/<project-id>.
+     *
+     * Deliberately the same unanchored pattern cmake/CrashReporting.cmake matches (CMake's MATCHES
+     * searches rather than anchoring), so a DSN this build accepted is never rejected here. The SDK
+     * refuses to even build a request for a DSN it considers invalid, so an unchecked typo disables
+     * uploading with no error anywhere.
+     */
+    static bool isDsnWellFormed(const QString &dsn);
+
+    /**
+     * @brief Human-readable destination of a DSN, e.g. "o0.ingest.sentry.io (project 1234567)".
+     *
+     * Safe to log: the public key is never part of the result. Empty for a malformed DSN.
+     */
+    static QString describeDsn(const QString &dsn);
+
+    /**
+     * @brief Describe the captured-for DSN of a pending envelope when it points at a different
+     * destination than the DSN this session would upload it with; empty when they agree.
+     *
+     * sentry-native posts every envelope with the DSN held in the transport state of the session
+     * doing the sending (envelopes restored from disk are raw and their own "dsn" header is never
+     * read), so a cached crash envelope captured for one project can silently be uploaded to
+     * another - the exact way a tester's report lands in the wrong place. Compares destinations
+     * (host and project id), not raw strings, so a different key for the same project stays quiet.
+     */
+    static QString describeOriginMismatch(const QString &envelopePath, const QString &currentDsn);
+
     static QString sanitizeLogLine(const QString &line);
     static QString redactCockatriceUrls(const QString &line);
 

@@ -75,6 +75,68 @@ TEST(CrashReporterTest, ReportingEnabledGating)
     ASSERT_FALSE(CrashReporter::isReportingEnabled(dsn, Mode::NeverSend));
 }
 
+TEST(CrashReporterTest, IsDsnWellFormedAcceptsWhatTheBuildAcceptsAndRejectsUiLinks)
+{
+    ASSERT_TRUE(CrashReporter::isDsnWellFormed(QStringLiteral("https://abc123@o0.ingest.sentry.io/1234567")));
+    ASSERT_TRUE(CrashReporter::isDsnWellFormed(QStringLiteral("http://key@localhost:9000/42")));
+    // Unanchored like cmake/CrashReporting.cmake's MATCHES, so a DSN the build baked is never
+    // rejected here: a trailing path still matches.
+    ASSERT_TRUE(CrashReporter::isDsnWellFormed(QStringLiteral("https://key@host.example/7/extra")));
+    // The project-settings URL is the mistake a tester actually makes.
+    ASSERT_FALSE(CrashReporter::isDsnWellFormed(
+        QStringLiteral("https://sentry.io/settings/cockatrice/projects/cockatrice-desktop/keys/")));
+    ASSERT_FALSE(CrashReporter::isDsnWellFormed(QStringLiteral("https://key@host.example/not-a-number")));
+    ASSERT_FALSE(CrashReporter::isDsnWellFormed(QStringLiteral("o0.ingest.sentry.io/1234567")));
+    ASSERT_FALSE(CrashReporter::isDsnWellFormed(QString()));
+}
+
+TEST(CrashReporterTest, DescribeDsnNamesHostAndProjectWithoutTheKey)
+{
+    const QString described =
+        CrashReporter::describeDsn(QStringLiteral("https://supersecretkey@o0.ingest.sentry.io/1234567"));
+    ASSERT_EQ(described, QStringLiteral("o0.ingest.sentry.io (project 1234567)"));
+    ASSERT_FALSE(described.contains(QStringLiteral("supersecretkey")));
+    ASSERT_TRUE(CrashReporter::describeDsn(QStringLiteral("not a dsn")).isEmpty());
+    ASSERT_TRUE(CrashReporter::describeDsn(QString()).isEmpty());
+}
+
+TEST(CrashReporterTest, DescribeOriginMismatchReportsOnlyRealDestinationChanges)
+{
+    const QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    const QString envelopePath = dir.filePath(QStringLiteral("crash.envelope"));
+    QFile file(envelopePath);
+    ASSERT_TRUE(file.open(QIODevice::WriteOnly));
+    file.write(QByteArrayLiteral("{\"event_id\":\"x\",\"dsn\":\"https://keyA@hostA.example/111\"}\n"));
+    file.write(QByteArrayLiteral("{\"type\":\"event\",\"length\":2}\n{}\n"));
+    file.close();
+
+    const QString described =
+        CrashReporter::describeOriginMismatch(envelopePath, QStringLiteral("https://keyB@hostB.example/222"));
+    ASSERT_FALSE(described.isEmpty());
+    ASSERT_TRUE(described.contains(QStringLiteral("hostA.example")));
+    ASSERT_TRUE(described.contains(QStringLiteral("hostB.example")));
+    ASSERT_FALSE(described.contains(QStringLiteral("keyA")));
+    ASSERT_FALSE(described.contains(QStringLiteral("keyB")));
+
+    // A different key for the SAME host and project is not a routing change and must stay quiet.
+    ASSERT_TRUE(
+        CrashReporter::describeOriginMismatch(envelopePath, QStringLiteral("https://otherkey@hostA.example/111"))
+            .isEmpty());
+    // An unreadable envelope, a header without a dsn, or no current dsn are all silent.
+    ASSERT_TRUE(CrashReporter::describeOriginMismatch(dir.filePath(QStringLiteral("absent.envelope")),
+                                                      QStringLiteral("https://keyB@hostB.example/222"))
+                    .isEmpty());
+    ASSERT_TRUE(CrashReporter::describeOriginMismatch(envelopePath, QString()).isEmpty());
+    const QString headerlessPath = dir.filePath(QStringLiteral("no-dsn.envelope"));
+    QFile headerless(headerlessPath);
+    ASSERT_TRUE(headerless.open(QIODevice::WriteOnly));
+    headerless.write(QByteArrayLiteral("{\"event_id\":\"y\"}\n"));
+    headerless.close();
+    ASSERT_TRUE(CrashReporter::describeOriginMismatch(headerlessPath, QStringLiteral("https://keyB@hostB.example/222"))
+                    .isEmpty());
+}
+
 TEST(CrashReporterTest, ShutdownWithoutInitIsSafe)
 {
     CrashReporter reporter;

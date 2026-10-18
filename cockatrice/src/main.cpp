@@ -285,8 +285,28 @@ int main(int argc, char *argv[])
     int crashLogAttachedEnvelopes = 0;
     {
         QString crashDsn = QString::fromUtf8(qgetenv("COCKATRICE_SENTRY_DSN"));
-        if (crashDsn.isEmpty()) {
+        const bool dsnFromEnvironment = !crashDsn.isEmpty();
+        if (!dsnFromEnvironment) {
             crashDsn = QString::fromUtf8(COCKATRICE_SENTRY_DSN);
+        }
+        if (crashDsn.isEmpty()) {
+            // Nothing is armed without a DSN, so no crash is ever captured and nothing is ever sent.
+            // It is the one disabled configuration a tester cannot see from the UI, so say it here.
+            qCWarning(CrashReportLog) << "crash reporting disabled: no DSN configured (COCKATRICE_SENTRY_DSN is "
+                                         "not set and this build has no DSN baked in)";
+        } else if (!CrashReporter::isDsnWellFormed(crashDsn)) {
+            // Same rule the installer applies (cmake/CrashReporting.cmake): a malformed DSN disables
+            // reporting rather than silently falling back to the project baked into the build, which
+            // would upload where the tester never chose. The SDK would otherwise refuse to build a
+            // request at all and report nothing about it.
+            qCWarning(CrashReportLog) << "crash reporting disabled:"
+                                      << (dsnFromEnvironment ? "COCKATRICE_SENTRY_DSN is set but malformed"
+                                                             : "the DSN baked into this build is malformed")
+                                      << "(expected <scheme>://<key>@<host>/<project-id>)";
+            crashDsn.clear();
+        } else if (dsnFromEnvironment) {
+            // Destination and mode are logged by CrashReporter::init() once it resolves them.
+            qCInfo(CrashReportLog) << "using COCKATRICE_SENTRY_DSN from the environment";
         }
         const PersonalSettings::CrashReportingMode crashMode =
             SettingsCache::instance().personal().getCrashReportingMode();

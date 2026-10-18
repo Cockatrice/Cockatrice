@@ -7,6 +7,8 @@
 #include <QByteArray>
 #include <QDir>
 #include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QLoggingCategory>
 #include <QRegularExpression>
 #include <QUrl>
@@ -151,6 +153,67 @@ sentry_value_t scrubEventBeforeSend(sentry_value_t event, sentry_hint_t *hint, v
 } // namespace
 #endif
 
+namespace
+{
+
+/**
+ * @brief DSN matcher shared by isDsnWellFormed() and describeDsn().
+ *
+ * Kept unanchored on purpose, mirroring the MATCHES in cmake/CrashReporting.cmake (CMake searches
+ * rather than anchoring), so the client never rejects a DSN the build itself baked in. Compiled once
+ * because QRegularExpression construction is not free and both helpers are called per pending
+ * envelope.
+ */
+const QRegularExpression &dsnPattern()
+{
+    static const QRegularExpression pattern(QStringLiteral("(https?)://([^@]+)@([^/]+)/([0-9]+)"));
+    return pattern;
+}
+
+} // namespace
+
+bool CrashReporter::isDsnWellFormed(const QString &dsn)
+{
+    return dsnPattern().match(dsn).hasMatch();
+}
+
+QString CrashReporter::describeDsn(const QString &dsn)
+{
+    const QRegularExpressionMatch match = dsnPattern().match(dsn);
+    if (!match.hasMatch()) {
+        return QString();
+    }
+    // Host and project id only: the key in group 2 must never reach a log line.
+    return QStringLiteral("%1 (project %2)").arg(match.captured(3), match.captured(4));
+}
+
+QString CrashReporter::describeOriginMismatch(const QString &envelopePath, const QString &currentDsn)
+{
+    const QString destination = describeDsn(currentDsn);
+    if (destination.isEmpty()) {
+        return QString();
+    }
+
+    QFile file(envelopePath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        return QString();
+    }
+    // The envelope header is the first line and is small; the cap only keeps a corrupt file from
+    // being read in full.
+    const QByteArray headerLine = file.readLine(4096).trimmed();
+    if (headerLine.isEmpty() || !headerLine.startsWith('{')) {
+        return QString();
+    }
+    const QString originDsn = QJsonDocument::fromJson(headerLine).object().value(QStringLiteral("dsn")).toString();
+    const QString origin = describeDsn(originDsn);
+    // Equal destinations are not a mismatch: a different key for the same host and project still
+    // uploads where the crash was captured.
+    if (origin.isEmpty() || origin == destination) {
+        return QString();
+    }
+    return QStringLiteral("was captured for %1 but this session uploads with %2").arg(origin, destination);
+}
+
 bool CrashReporter::isReportingEnabled(const QString &dsn, PersonalSettings::CrashReportingMode consentMode)
 {
     return !dsn.isEmpty() && consentMode != PersonalSettings::CrashReportingMode::NeverSend;
@@ -164,10 +227,28 @@ void CrashReporter::init(const QString &dsn,
     shutdown();
     sentryDatabasePath = databasePath;
     if (!isReportingEnabled(dsn, consentMode)) {
+        if (!dsn.isEmpty()) {
+            // A deliberate choice rather than a misconfiguration, so it is not a warning. The
+            // no-DSN case is reported by the caller, which is the only place that knows whether
+            // the environment or the build supplied the DSN.
+            qCInfo(CrashReportLog) << "crash reporting disabled by preference (Never send)";
+        }
         return;
     }
     // Only created when the SDK will actually run: no-DSN launches stay side-effect free.
 #if COCKATRICE_WITH_CRASH_REPORTING
+    // A crash captured by an earlier run is uploaded by THIS session's transport, which posts every
+    // envelope with the DSN it was armed with (sentry-native keeps the DSN in the transport state,
+    // and envelopes restored from disk are raw, so their own "dsn" header is never read). When the
+    // two disagree the report lands in a project nobody chose, which no other log line reveals.
+    const QStringList pendingEnvelopes = pendingEnvelopePaths(sentryDatabasePath);
+    for (const QString &envelopePath : pendingEnvelopes) {
+        const QString mismatch = describeOriginMismatch(envelopePath, dsn);
+        if (!mismatch.isEmpty()) {
+            qCWarning(CrashReportLog) << "pending crash envelope" << envelopePath << mismatch;
+        }
+    }
+    qCInfo(CrashReportLog) << "crash reporting armed for" << describeDsn(dsn);
     QDir().mkpath(sentryDatabasePath);
     if (consentMode != PersonalSettings::CrashReportingMode::AlwaysSend) {
         // sentry-native persists consent to <database>/user-consent and reloads it in sentry_init
@@ -188,6 +269,9 @@ void CrashReporter::init(const QString &dsn,
     ready = (sentry_init(options) == 0);
 #else
     Q_UNUSED(release);
+    // Not a misconfiguration like an empty DSN: this build cannot report whatever the DSN says, so
+    // a tester forcing a crash needs to know the difference.
+    qCInfo(CrashReportLog) << "crash reporting unavailable: built without Sentry support";
     ready = false;
 #endif
 }
