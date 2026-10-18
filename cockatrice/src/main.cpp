@@ -145,6 +145,47 @@ static QString redactActivationUrl(const QString &url)
     return parsed.scheme() + "://" + parsed.host();
 }
 
+/**
+ * @brief Run the startup crash-report flow for an unclean exit (or --simulate-crash).
+ *
+ * With a configured DSN the SDK owns capture and upload (consent-gated); with an
+ * empty DSN the flow falls back to a local mock file. AlwaysSend uploads silently
+ * (the log was folded into the pending native envelope(s) at startup); Ask offers
+ * the dialog; NeverSend skips silently.
+ *
+ * @param attachedEnvelopes number of pending native envelopes that already carry the
+ *                          redacted log, so an AlwaysSend run only sends a standalone
+ *                          log event when no crash event existed.
+ */
+static void runCrashReportFlow(CrashReporter &crashReporter, QWidget *parent, int attachedEnvelopes)
+{
+    const PersonalSettings::CrashReportingMode crashMode = SettingsCache::instance().personal().getCrashReportingMode();
+    const bool crashReady = crashReporter.isReady();
+    if (crashMode == PersonalSettings::CrashReportingMode::AlwaysSend) {
+        if (crashReady) {
+            // Silent path: the redacted log was folded into the pending native crash
+            // envelope(s) at startup and consent already released them. Only when no
+            // pending crash event existed (e.g. --simulate-crash) does a standalone
+            // log event still need to go out here.
+            if (attachedEnvelopes == 0) {
+                const QString crashPreview = DlgCrashReport::buildRedactedPreview();
+                if (!crashReporter.sendReport(crashPreview)) {
+                    const QString savedPath = DlgCrashReport::writeMockReport(crashPreview);
+                    qCWarning(MainLog) << "Failed to send crash report, saved locally to" << savedPath;
+                }
+            }
+        } else {
+            DlgCrashReport::writeMockReport(DlgCrashReport::buildRedactedPreview());
+        }
+    } else if (crashMode == PersonalSettings::CrashReportingMode::Ask) {
+        // Real mode: Send gives consent + captures the event, Don't send revokes
+        // consent; the dialog owns both via the reporter.
+        DlgCrashReport crashDialog(parent, crashReady, crashReady ? &crashReporter : nullptr);
+        crashDialog.exec();
+    }
+    // NeverSend: skip silently (no dialog, nothing written or sent).
+}
+
 int main(int argc, char *argv[])
 {
     // No custom unhandled-exception filter: sentry owns native crash capture on all
@@ -450,40 +491,11 @@ int main(int argc, char *argv[])
     ui.show();
     qCInfo(MainLog) << "ui.show() finished";
 
-    // Crash-report flow: with a configured DSN the SDK owns capture and upload
-    // (consent-gated); with an empty DSN the dialog falls back to a local mock
-    // file and behaves exactly as before. The trigger is --simulate-crash or an
-    // unclean previous exit (leftover session lock); the old
-    // %LOCALAPPDATA%/CrashDumps .dmp scan is gone with the exception filter.
-    {
-        if (parser.isSet("simulate-crash") || uncleanExit) {
-            const PersonalSettings::CrashReportingMode crashMode =
-                SettingsCache::instance().personal().getCrashReportingMode();
-            const bool crashReady = crashReporter.isReady();
-            if (crashMode == PersonalSettings::CrashReportingMode::AlwaysSend) {
-                if (crashReady) {
-                    // Silent path: the redacted log was folded into the pending native crash
-                    // envelope(s) at startup and consent already released them. Only when no
-                    // pending crash event existed (e.g. --simulate-crash) does a standalone
-                    // log event still need to go out here.
-                    if (crashLogAttachedEnvelopes == 0) {
-                        const QString crashPreview = DlgCrashReport::buildRedactedPreview();
-                        if (!crashReporter.sendReport(crashPreview)) {
-                            const QString savedPath = DlgCrashReport::writeMockReport(crashPreview);
-                            qCWarning(MainLog) << "Failed to send crash report, saved locally to" << savedPath;
-                        }
-                    }
-                } else {
-                    DlgCrashReport::writeMockReport(DlgCrashReport::buildRedactedPreview());
-                }
-            } else if (crashMode == PersonalSettings::CrashReportingMode::Ask) {
-                // Real mode: Send gives consent + captures the event, Don't
-                // send revokes consent; the dialog owns both via the reporter.
-                DlgCrashReport crashDialog(&ui, crashReady, crashReady ? &crashReporter : nullptr);
-                crashDialog.exec();
-            }
-            // NeverSend: skip silently (no dialog, nothing written or sent).
-        }
+    // Crash-report flow: the trigger is --simulate-crash or an unclean previous exit
+    // (leftover session lock; the old %LOCALAPPDATA%/CrashDumps .dmp scan is gone with
+    // the exception filter). See runCrashReportFlow() for the per-mode handling.
+    if (parser.isSet("simulate-crash") || uncleanExit) {
+        runCrashReportFlow(crashReporter, &ui, crashLogAttachedEnvelopes);
     }
 
     // force shortcuts to be shown/hidden in right-click menus, regardless of system defaults
