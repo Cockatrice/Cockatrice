@@ -92,6 +92,7 @@ private:
     void setActiveTab(int index);
     void switchPageContent(int index);
     void applySectionFilter(int pageIndex, QWidget *sectionWidget);
+    void selectSectionRow(int pageIndex, QWidget *sectionWidget);
     QTreeWidgetItem *findSectionItem(int pageIndex, QWidget *sectionWidget) const;
     static void flashWidget(QWidget *widget);
     static void scrollToAndFlash(QWidget *target);

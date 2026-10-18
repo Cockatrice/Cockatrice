@@ -501,6 +501,8 @@ void SettingsView::navigateToSearchResult(const QModelIndex &index)
             }
         }
         applySectionFilter(entry.pageIndex, section);
+        // Keep the sidebar in sync with the deep link: highlight the setting's section row
+        selectSectionRow(entry.pageIndex, section);
         scrollToAndFlash(entry.widget);
         entry.widget->setFocus();
     }
@@ -515,10 +517,8 @@ void SettingsView::navigateToSection(int pageIndex, QWidget *sectionWidget)
     // Never steal the view's own selection mid-gesture: when this runs from
     // currentItemChanged the section row is already current (mouse press or arrow key),
     // and re-selecting the page row here is what made the selection visibly snap back
-    // to the parent on mouse release. Switch page content without touching selection,
-    // then only sync selection for programmatic callers where the section is not current yet.
-    QTreeWidgetItem *sectionItem = findSectionItem(pageIndex, sectionWidget);
-
+    // to the parent on mouse release. selectSectionRow only acts on a known section
+    // that is not current yet, so it syncs programmatic callers without disturbing a gesture.
     if (currentTabIndex != pageIndex) {
         if (searchActive) {
             switchToTabMode();
@@ -529,12 +529,33 @@ void SettingsView::navigateToSection(int pageIndex, QWidget *sectionWidget)
     applySectionFilter(pageIndex, sectionWidget);
 
     // Unknown widgets show the full page; known sections keep their row selected
-    if (sectionItem && pageIndex >= 0 && pageIndex < pageItems.size() && pageItems[pageIndex]) {
-        pageItems[pageIndex]->setExpanded(true);
-        if (navTree->currentItem() != sectionItem) {
-            const QSignalBlocker blocker(navTree);
-            navTree->setCurrentItem(sectionItem);
-        }
+    selectSectionRow(pageIndex, sectionWidget);
+}
+
+/**
+ * @brief Selects the nav row for a section, expanding its page row
+ *
+ * A null or unknown section (a page whose sections are its own group boxes) leaves
+ * the current selection untouched, so callers can pass a lookup result directly.
+ *
+ * @param pageIndex SettingsPage owning the section
+ * @param sectionWidget Section's group box, or nullptr for no section
+ */
+void SettingsView::selectSectionRow(int pageIndex, QWidget *sectionWidget)
+{
+    if (!sectionWidget) {
+        return;
+    }
+
+    QTreeWidgetItem *sectionItem = findSectionItem(pageIndex, sectionWidget);
+    if (!sectionItem) {
+        return;
+    }
+
+    pageItems[pageIndex]->setExpanded(true);
+    if (navTree->currentItem() != sectionItem) {
+        const QSignalBlocker blocker(navTree);
+        navTree->setCurrentItem(sectionItem);
     }
 }
 
