@@ -357,7 +357,9 @@ void SettingsView::onTabClicked(int index)
 {
     if (searchActive) {
         switchToTabMode();
-    } else if (index == currentTabIndex) {
+    } else if (index == currentTabIndex && isolatedSection == nullptr) {
+        // Re-selecting the current page row is a no-op, but it must still clear
+        // an isolated section so the page's widgets come back.
         return;
     }
     setActiveTab(index);
