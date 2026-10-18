@@ -19,7 +19,27 @@ $Dsn = '@CPACK_SENTRY_DSN_FULL@'
 try {
     # The envelope endpoint is TLS-only; stock powershell.exe on older systems
     # still negotiates TLS 1.0 otherwise, so opt into 1.2 explicitly.
-    try {
+# TEMPORARY (drop before merge): a DSN on the environment (set next to the
+# installer's /CRASHTEST switch) targets a scratch project instead of the one
+# baked in at package time, which is what makes the switch usable on a CI
+# artifact. The envelope URL and key are re-derived from whichever DSN wins so
+# all three always agree — pointing the header at one project while posting to
+# another would split the log away from its event.
+if (-not [string]::IsNullOrWhiteSpace($env:COCKATRICE_SENTRY_DSN)) {
+    $Dsn = $env:COCKATRICE_SENTRY_DSN
+    # Same shape cmake/CrashReporting.cmake accepts: <scheme>://<key>@<host>/<project-id>.
+    if ($Dsn -match '^(https?)://([^@/]+)@([^/]+)/([0-9]+)') {
+        $SentryKey = $Matches[2]
+        $EnvelopeUrl = "$($Matches[1])://$($Matches[3])/api/$($Matches[4])/envelope/"
+    } else {
+        # A non-empty but malformed override must not fall back to the baked
+        # project — that would post the log somewhere the tester never chose.
+        Write-Output "FAILED: COCKATRICE_SENTRY_DSN is set but malformed (expected <scheme>://<key>@<host>/<project-id>)"
+        exit 1
+    }
+}
+
+try {
         [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
     } catch {
     }
