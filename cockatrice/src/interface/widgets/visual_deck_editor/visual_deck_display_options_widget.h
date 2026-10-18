@@ -11,6 +11,7 @@
 
 class CompactPushButton;
 class QComboBox;
+class QEvent;
 class QHBoxLayout;
 class QLabel;
 class QListWidget;
@@ -93,6 +94,9 @@ public:
     {
         return activeSortCriteria;
     }
+
+protected:
+    void changeEvent(QEvent *event) override;
 
 private slots:
     /**
