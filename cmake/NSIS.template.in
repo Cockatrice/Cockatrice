@@ -38,7 +38,6 @@ Var LogFindName
 Var LogMatchLabel
 Var LogMatchPattern
 ; Sentry installer-log hook state (see AbortInstall)
-Var SentryEnabled
 Var SentryResult
 Var SentryOutput
 
@@ -916,13 +915,14 @@ Function AbortInstall
         ; Offer to send the installer log to Sentry so aborted installs can be diagnosed. This block already runs
         ; only when someone is at the keyboard (attended install, or the updater's /R upgrade whose launcher has
         ; quit), so a silent or package-manager install never reaches the prompt and its behavior is unchanged.
-        StrCpy $SentryEnabled "@CPACK_SENTRY_ENABLED@"
-        ; Only a package built with a baked DSN offers to send, so the prompt can only appear
-        ; when a send can actually go out. No /SD here: a /SD would suppress this prompt on the
-        ; silent /R upgrade, which is exactly the attended-update case this offer exists for.
-        ; The gate below is the hang protection — a package-manager /S install without /R never
-        ; reaches this box, matching the two sibling MessageBox sites in this file.
-        ${If} $SentryEnabled == "1"
+        ; Only a package built with a baked DSN offers to send, so the prompt can only appear when a send
+        ; can actually go out. A preprocessor guard rather than a runtime test: a package built without a
+        ; DSN compiles the block out entirely, so it cannot even carry the helper or its baked endpoint.
+        ; No /SD here: a /SD would suppress this prompt on the silent /R upgrade, which is exactly the
+        ; attended-update case this offer exists for. The runtime gate above (ReinstallMode/Silent) is the
+        ; hang protection — a package-manager /S install without /R never reaches this box, matching the
+        ; two sibling MessageBox sites in this file.
+        !if "@CPACK_SENTRY_ENABLED@" == "1"
             MessageBox MB_YESNO|MB_ICONQUESTION "Send the installer log to the developers to help fix this? No account needed. The log may contain file paths from this machine." IDYES sentry_send
             !insertmacro CockLog "sentry send: declined by user"
             Goto sentry_done
@@ -950,7 +950,7 @@ Function AbortInstall
                 MessageBox MB_OK|MB_ICONEXCLAMATION "The installer log could not be sent. You can still share it manually; it was written to:$\r$\n$InstallLogPath"
             ${EndIf}
             sentry_done:
-        ${EndIf}
+        !endif
     ${EndIf}
     SetErrorLevel 1
     Abort
