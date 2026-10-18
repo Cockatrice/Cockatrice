@@ -210,6 +210,17 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  trusted_sources_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/servatrice/src/trusted_sources.cpp
+  trusted_sources_test.cpp
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/servatrice/src
+  LABELS
+  server
+)
+cockatrice_add_test(
+  NAME
   server_card_counter_test
   SOURCES
   server_card_counter_test.cpp

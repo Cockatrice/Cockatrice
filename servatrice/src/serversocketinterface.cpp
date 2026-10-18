@@ -42,6 +42,7 @@
 #include "server_logger.h"
 #include "server_protocolhandler.h"
 #include "settingscache.h"
+#include "trusted_sources.h"
 #include "version_string.h"
 
 #include <QChar>
@@ -220,8 +221,7 @@ bool AbstractServerSocketInterface::initSession()
     delete identSe;
 
     // allow unlimited number of connections from the trusted sources
-    QString trustedSources = settingsCache->value("security/trusted_sources", "127.0.0.1,::1").toString();
-    if (trustedSources.contains(getAddress(), Qt::CaseInsensitive)) {
+    if (isTrustedSource(servatrice->getTrustedSources(), getPeerAddress())) {
         return true;
     }
 
@@ -1908,9 +1908,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
     if (amountRemove != 0) {
         removeSaidMessages(userName, amountRemove);
     }
-    QString trustedSources = settingsCache->value("server/trusted_sources", "127.0.0.1,::1").toString();
     int minutes = cmd.minutes();
-    if (trustedSources.contains(address, Qt::CaseInsensitive)) {
+    if (isTrustedSource(servatrice->getTrustedSources(), address)) {
         address = "";
     }
 
@@ -4560,8 +4559,7 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
     if (websocketIPHeader.length() > 0 && socket->request().hasRawHeader(websocketIPHeader)) {
         // Only trust the forwarded header if the connection itself comes from a trusted proxy,
         // otherwise a client could spoof its address to bypass bans and rate limits.
-        QString trustedSources = settingsCache->value("security/trusted_sources", "127.0.0.1,::1").toString();
-        if (trustedSources.contains(socket->peerAddress().toString(), Qt::CaseInsensitive)) {
+        if (isTrustedSource(servatrice->getTrustedSources(), socket->peerAddress())) {
             QString header(socket->request().rawHeader(websocketIPHeader));
             QHostAddress parsed(header);
             if (!parsed.isNull()) {

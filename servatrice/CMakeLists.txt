@@ -18,6 +18,7 @@ set(servatrice_SOURCES
     src/settingscache.cpp
     src/isl_interface.cpp
     src/signalhandler.cpp
+    src/trusted_sources.cpp
     ${VERSION_STRING_CPP}
     src/smtpclient.cpp
     src/smtp/qxthmac.cpp
