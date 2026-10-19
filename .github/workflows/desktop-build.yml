@@ -269,7 +269,9 @@ jobs:
           RUN --server --release --package "$package" "${args[@]}"
 
       - name: "Install sentry-cli"
-        if: matrix.package != 'skip' && needs.configure.outputs.tag != null
+        # [TEMP] drop before merge: `|| startsWith(...)` also uploads symbols for the
+        # crash-report/* stack branches so PR artifacts can be symbolicated while testing.
+        if: matrix.package != 'skip' && (needs.configure.outputs.tag != null || startsWith(github.head_ref, 'crash-report/'))
         # Downloads from Sentry's release registry: a Sentry outage or a broken install under
         # Git Bash must not take down the release assets below.
         continue-on-error: true
@@ -283,7 +285,9 @@ jobs:
 
       - name: "Upload debug symbols to Sentry"
         # Like the DSN above, this runs for every tag — beta (Development) tags included.
-        if: matrix.package != 'skip' && needs.configure.outputs.tag != null
+        # [TEMP] drop before merge: `|| startsWith(...)` also uploads symbols for the
+        # crash-report/* stack branches so PR artifacts can be symbolicated while testing.
+        if: matrix.package != 'skip' && (needs.configure.outputs.tag != null || startsWith(github.head_ref, 'crash-report/'))
         # A Sentry outage or rotated token must not take down the release assets below.
         continue-on-error: true
         shell: bash
@@ -626,7 +630,8 @@ jobs:
         run: .ci/compile.sh --server --test --vcpkg
 
       - name: "Install sentry-cli"
-        if: needs.configure.outputs.tag != null && matrix.make_package == '1'
+        # [TEMP] drop before merge: see the Linux leg — also upload for crash-report/* PRs.
+        if: matrix.make_package == '1' && (needs.configure.outputs.tag != null || startsWith(github.head_ref, 'crash-report/'))
         # Same as the Linux leg above: the install downloads from Sentry's registry, so a
         # failure here must not block the release upload below.
         continue-on-error: true
@@ -640,7 +645,8 @@ jobs:
 
       - name: "Upload debug symbols to Sentry"
         # Like the DSN above, this runs for every tag — beta (Development) tags included.
-        if: needs.configure.outputs.tag != null && matrix.make_package == '1'
+        # [TEMP] drop before merge: see the Linux leg — also upload for crash-report/* PRs.
+        if: matrix.make_package == '1' && (needs.configure.outputs.tag != null || startsWith(github.head_ref, 'crash-report/'))
         # A Sentry outage or rotated token must not take down the release assets below.
         continue-on-error: true
         shell: bash
