@@ -665,6 +665,50 @@ jobs:
               paths+=("build/$target"/*.exe "build/$target"/*.pdb)
             done
             shopt -u nullglob
+
+            # Qt's own runtime DLLs, taken from required-runtime.txt — the manifest
+            # .ci/compile.sh asserts the installer against — so the set uploaded is
+            # the set an install actually carries. The PE is the only carrier of
+            # unwind information for a 64-bit image, and sending it in the same
+            # invocation as a PDB is what lets sentry-cli associate the PE's code
+            # identifier with the PDB's debug identifier. Qt ships no PDBs with the
+            # SDK, so Qt frames resolve through the export table: names, no lines.
+            qt_dir=
+            qt_core_dir=
+            # Existence guards matter: the step runs under `bash -eo pipefail`, so a
+            # redirection-less sed over a missing file would abort the step outright
+            # and continue-on-error would hide it.
+            if [[ -f build/CMakeCache.txt ]]; then
+              qt_core_dir=$(sed -n 's/^Qt6Core_DIR:PATH=//p' build/CMakeCache.txt | head -1)
+            fi
+            if [[ -n $qt_core_dir ]]; then
+              qt_dir=$(dirname "$(dirname "$(dirname "$qt_core_dir")")")
+            fi
+            if [[ -z $qt_dir || ! -d $qt_dir ]]; then
+              # Warnings, not failures: the upload of our own binaries is what this
+              # step is for, and continue-on-error already means an upload failure
+              # cannot be told apart from a successful one.
+              echo "::warning::Qt runtime directory not resolved from build/CMakeCache.txt; Qt images get no unwind information"
+            elif [[ ! -f build/required-runtime.txt ]]; then
+              echo "::warning::build/required-runtime.txt is missing; cannot tell which Qt DLLs ship"
+            else
+              while IFS= read -r runtime; do
+                name=${runtime##*/}
+                if [[ $runtime == */* ]]; then
+                  # A Qt plugin: the install root keeps it as plugins/<type>/<name>.
+                  # `|| true`: an unmatched glob makes ls exit non-zero, and pipefail
+                  # turns that into a step abort.
+                  runtime_path=$(ls "$qt_dir/plugins"/*/"$name" 2>/dev/null | head -1) || true
+                else
+                  runtime_path="$qt_dir/bin/$name"
+                fi
+                if [[ -f ${runtime_path:-} ]]; then
+                  paths+=("$runtime_path")
+                else
+                  echo "::warning::shipped Qt runtime $runtime not found under $qt_dir"
+                fi
+              done < <(grep -E '^(Qt6[^/]*\.dll|Plugins/)' build/required-runtime.txt)
+            fi
           else
             # Release builds carry DWARF (-g, kept by CrashReporting.cmake); macOS keeps its
             # debug info in dSYM bundles, so materialize them before uploading.
