@@ -220,6 +220,7 @@ endif()
 # when ENABLE_SANITIZERS or ENABLE_COVERAGE is on.
 include(Sanitizers)
 include(Coverage)
+include(CrashReporting)
 
 # GNU systems need to define the Mersenne exponent for the RNG to compile w/o warning
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
@@ -335,6 +336,15 @@ elseif(WIN32)
 
   # Configure file with custom definitions for NSIS.
   configure_file("${COCKATRICE_CMAKE_PATH}/NSIS.definitions.nsh.in" "${PROJECT_BINARY_DIR}/NSIS.definitions.nsh")
+
+  # Installer-log sender for the AbortInstall Sentry hook (values parsed out of COCKATRICE_SENTRY_DSN in
+  # cmake/CrashReporting.cmake). Generated only when a DSN was parsed: cmake/NSIS.template.in embeds it under
+  # the same CPACK_SENTRY_ENABLED check, so a build without reporting never references or carries the helper.
+  if(CPACK_SENTRY_ENABLED)
+    configure_file(
+      "${COCKATRICE_CMAKE_PATH}/SendInstallerLog.ps1.in" "${PROJECT_BINARY_DIR}/SendInstallerLog.ps1" @ONLY
+    )
+  endif()
 
   # Every runtime DLL a Windows install has to contain, as paths relative to the
   # install root. .ci/compile.sh reads this and fails the build when the packaged

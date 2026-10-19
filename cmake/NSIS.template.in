@@ -37,6 +37,9 @@ Var LogFindHandle
 Var LogFindName
 Var LogMatchLabel
 Var LogMatchPattern
+; Sentry installer-log hook state (see AbortInstall)
+Var SentryResult
+Var SentryOutput
 
 !include LogicLib.nsh
 !include FileFunc.nsh
@@ -909,6 +912,48 @@ Function AbortInstall
     ${If} $ReinstallMode = 1
     ${OrIfNot} ${Silent}
         MessageBox MB_OK|MB_ICONEXCLAMATION "$AbortReason$\r$\n$\r$\nA detailed installer log was written to:$\r$\n$InstallLogPath"
+        ; Offer to send the installer log to Sentry so aborted installs can be diagnosed. This block already runs
+        ; only when someone is at the keyboard (attended install, or the updater's /R upgrade whose launcher has
+        ; quit), so a silent or package-manager install never reaches the prompt and its behavior is unchanged.
+        ; Only a package built with a baked DSN offers to send, so the prompt can only appear when a send
+        ; can actually go out. A preprocessor guard rather than a runtime test: a package built without a
+        ; DSN compiles the block out entirely, so it cannot even carry the helper or its baked endpoint.
+        ; No /SD here: a /SD would suppress this prompt on the silent /R upgrade, which is exactly the
+        ; attended-update case this offer exists for. The runtime gate above (ReinstallMode/Silent) is the
+        ; hang protection — a package-manager /S install without /R never reaches this box, matching the
+        ; two sibling MessageBox sites in this file.
+        !if "@CPACK_SENTRY_ENABLED@" == "1"
+            MessageBox MB_YESNO|MB_ICONQUESTION "Send the installer log to the developers to help fix this? The log contains file paths from this machine, which may include your Windows user name." IDYES sentry_send
+            !insertmacro CockLog "sentry send: declined by user"
+            Goto sentry_done
+            sentry_send:
+            ; The abort reason is already in the log file (CockLog writes "ABORT: ..." as the
+            ; first thing AbortInstall does), so the helper reads it from there. Nothing
+            ; reason-shaped crosses the command line, which keeps quoting trivial and needs
+            ; no NSIS string functions.
+            InitPluginsDir
+            ; Embedded by the same relative path that resolves NSIS.definitions.nsh above (both are
+            ; configure_file'd into the build root, which is three levels up from project.nsi). An
+            ; absolute CMake path here carries forward slashes, which makensis does not treat as
+            ; absolute and so fails to find the file at package time.
+            File "/oname=$PLUGINSDIR\send-installer-log.ps1" "..\..\..\SendInstallerLog.ps1"
+            ; The send can take up to the /TIMEOUT below, so put something on the details pane
+            ; the moment the user says yes rather than leaving the window blank until it returns.
+            DetailPrint "Sending installer log..."
+            nsExec::ExecToStack /TIMEOUT=60000 'powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$PLUGINSDIR\send-installer-log.ps1" -LogPath "$InstallLogPath"'
+            Pop $SentryResult
+            Pop $SentryOutput
+            ; $SentryOutput is a single line by construction: the helper flattens its message
+            ; and this log file is uploaded verbatim, so a stray newline must not be able to
+            ; forge extra lines into the artifact we send.
+            !insertmacro CockLog "sentry send: result=$SentryResult output=$SentryOutput"
+            ${If} $SentryResult == "0"
+                MessageBox MB_OK|MB_ICONINFORMATION "The installer log was sent. Thank you for helping improve Cockatrice!"
+            ${Else}
+                MessageBox MB_OK|MB_ICONEXCLAMATION "The installer log could not be sent. You can still share it manually; it was written to:$\r$\n$InstallLogPath"
+            ${EndIf}
+            sentry_done:
+        !endif
     ${EndIf}
     SetErrorLevel 1
     Abort
@@ -1530,11 +1575,22 @@ ${If} $PortableMode = 0
 	${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
 	IntFmt $0 "0x%08X" $0
 
-	; Enable Windows User-Mode Dumps
+	; No Windows Error Reporting LocalDumps registration: crash capture belongs to
+	; the in-app reporter (Sentry/breakpad, MiniDumpNormal-class data only). Opting
+	; machines into OS-level full dumps (DumpType 2) would leave unredacted memory
+	; dumps on user machines that nothing consumes.
 	; https://learn.microsoft.com/en-us/windows/win32/wer/collecting-user-mode-dumps
-	WriteRegExpandStr HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe" "DumpFolder" "%LOCALAPPDATA%\CrashDumps\Cockatrice"
-	WriteRegDWORD HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe" "DumpCount" "5"
-	WriteRegDWORD HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe" "DumpType" "2"
+
+	; Older installers did register cockatrice.exe above (and the removed
+	; MiniDumpWithFullMemory writer filled that folder), and that key survives this
+	; install, so WER would keep writing full dumps. Remove it, and clear the
+	; legacy dumps nothing consumes anymore. $LOCALAPPDATA resolves per shell context:
+	; under "all" it points at ProgramData, so switch to "current" for the per-user
+	; dumps folder and back afterwards; the registry delete works in either context.
+	DeleteRegKey HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe"
+	SetShellVarContext current
+	RMDir /r "$LOCALAPPDATA\CrashDumps\Cockatrice"
+	SetShellVarContext all
 
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayIcon" "$INSTDIR\cockatrice.exe"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayName" "Cockatrice"
@@ -1634,6 +1690,15 @@ Section "un.Application" UnSecApplication
 	RMDir /r "$SMPROGRAMS\Cockatrice"
 
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice"
+
+	; Leftover WER LocalDumps key from pre-Sentry installers (see the installer note
+	; above): removing it here covers machines that uninstall without reinstalling.
+	; The legacy full-memory dumps go with it; nothing consumes them anymore. Same shell
+	; context note as the installer: the per-user dumps folder needs "current".
+	DeleteRegKey HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe"
+	SetShellVarContext current
+	RMDir /r "$LOCALAPPDATA\CrashDumps\Cockatrice"
+	SetShellVarContext all
 
 	; Only remove the file/protocol associations if we registered them (i.e. the
 	; install was not portable) and .cod is still owned by Cockatrice, so we don't

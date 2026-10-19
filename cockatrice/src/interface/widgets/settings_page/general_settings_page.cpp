@@ -133,6 +133,27 @@ GeneralSettingsPage::GeneralSettingsPage()
     versionGroupBox = new QGroupBox;
     versionGroupBox->setLayout(versionGrid);
 
+    // crash reporting consent (stored in personal.ini, not debug.ini)
+    crashReportingBox.addItem(""); // texts set in retranslateUi
+    crashReportingBox.addItem("");
+    crashReportingBox.addItem("");
+    crashReportingBox.setCurrentIndex(static_cast<int>(settings.personal().getCrashReportingMode()));
+
+    connect(&crashReportingBox, qOverload<int>(&QComboBox::currentIndexChanged), this, [](int index) {
+        if (index < 0 || index > static_cast<int>(PersonalSettings::CrashReportingMode::NeverSend)) {
+            return;
+        }
+        SettingsCache::instance().personal().setCrashReportingMode(
+            static_cast<PersonalSettings::CrashReportingMode>(index));
+    });
+
+    auto *crashReportingGrid = new QGridLayout;
+    crashReportingGrid->addWidget(&crashReportingLabel, 0, 0);
+    crashReportingGrid->addWidget(&crashReportingBox, 0, 1);
+
+    crashReportingGroupBox = new QGroupBox;
+    crashReportingGroupBox->setLayout(crashReportingGrid);
+
     // card database settings
     startupCardUpdateCheckBehaviorSelector.addItem(""); // these will be set in retranslateUI
     startupCardUpdateCheckBehaviorSelector.addItem("");
@@ -336,6 +357,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(languageGroupBox);
     mainLayout->addWidget(versionGroupBox);
+    mainLayout->addWidget(crashReportingGroupBox);
     mainLayout->addWidget(cardDatabaseGroupBox);
     mainLayout->addWidget(startupGroupBox);
     mainLayout->addWidget(pathsGroupBox);
@@ -569,12 +591,18 @@ void GeneralSettingsPage::retranslateUi()
                                       tr("English and selected card language"));
     advertiseTranslationPageLabel.setText(
         QString("<a href='%1'>%2</a>").arg(WIKI_TRANSLATION_FAQ).arg(tr("How to help with translations")));
-
     versionGroupBox->setTitle(tr("Version settings"));
     updateReleaseChannelLabel.setText(tr("Update channel"));
     startupUpdateCheckCheckBox.setText(tr("Check for client updates on startup"));
     updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));
     newVersionOracleCheckBox.setText(tr("Automatically run Oracle when running a new version of Cockatrice"));
+
+    crashReportingGroupBox->setTitle(tr("Crash reporting"));
+    crashReportingLabel.setText(tr("Send crash reports:"));
+    crashReportingBox.setItemText(static_cast<int>(PersonalSettings::CrashReportingMode::Ask), tr("Ask every time"));
+    crashReportingBox.setItemText(static_cast<int>(PersonalSettings::CrashReportingMode::AlwaysSend),
+                                  tr("Always send"));
+    crashReportingBox.setItemText(static_cast<int>(PersonalSettings::CrashReportingMode::NeverSend), tr("Never send"));
 
     // We can't change the strings after they're put into the QComboBox, so this is our workaround
     int oldIndex = updateReleaseChannelBox.currentIndex();
