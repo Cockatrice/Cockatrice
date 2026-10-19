@@ -148,7 +148,8 @@ void VisualDatabaseDisplayColorFilterWidget::removeFilter(QChar color)
 
         case FilterMode::Commander:
             removeFilters(filterModel, color, CardFilter::Attr::AttrColorIdentity);
-            filterModel->addFilter(new CardFilter(color, CardFilter::Type::TypeAndNot, CardFilter::Attr::AttrColorIdentity));
+            filterModel->addFilter(
+                new CardFilter(color, CardFilter::Type::TypeAndNot, CardFilter::Attr::AttrColorIdentity));
             break;
     }
 }
@@ -210,9 +211,7 @@ QList<QChar> VisualDatabaseDisplayColorFilterWidget::getActiveColors()
 void VisualDatabaseDisplayColorFilterWidget::syncWithFilterModel()
 {
     QList<const CardFilter *> allColorFilters = filterModel->getFiltersOfType(
-        currentMode == FilterMode::Commander
-            ? CardFilter::Attr::AttrColorIdentity
-            : CardFilter::Attr::AttrColor);
+        currentMode == FilterMode::Commander ? CardFilter::Attr::AttrColorIdentity : CardFilter::Attr::AttrColor);
 
     QList<ManaSymbolWidget *> manaSymbolWidgets = findChildren<ManaSymbolWidget *>();
 
@@ -223,25 +222,30 @@ void VisualDatabaseDisplayColorFilterWidget::syncWithFilterModel()
             if (symbol == filter->term()) {
                 switch (currentMode) {
                     case FilterMode::ExactMatch:
-                        if (filter->type() == CardFilter::Type::TypeAnd)
+                        if (filter->type() == CardFilter::Type::TypeAnd) {
                             found = true;
+                        }
                         break;
                     case FilterMode::Includes:
                     case FilterMode::IncludeExclude:
-                        if (filter->type() == CardFilter::Type::TypeOr)
+                        if (filter->type() == CardFilter::Type::TypeOr) {
                             found = true;
+                        }
                         break;
                     case FilterMode::Excludes:
-                        if (filter->type() == CardFilter::Type::TypeAndNot)
+                        if (filter->type() == CardFilter::Type::TypeAndNot) {
                             found = true;
+                        }
                         break;
                     case FilterMode::Commander:
-                        if (filter->type() == CardFilter::Type::TypeAndNot)
+                        if (filter->type() == CardFilter::Type::TypeAndNot) {
                             found = false;
+                        }
                         break;
                 }
-                if (found)
+                if (found) {
                     break;
+                }
             }
         }
 

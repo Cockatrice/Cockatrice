@@ -227,7 +227,7 @@ bool FilterItem::acceptSubType(const CardInfoPtr info) const
     return typeParts.size() > 1 && typeParts[1].contains(term, Qt::CaseInsensitive);
 }
 
-static bool matchesColor(QString const &term, QString const &colors) {
+static bool matchesColor(const QString &term, const QString &colors) {
     QString converted_term = term.trimmed().toLower();
 
     converted_term.replace("green", "g");
