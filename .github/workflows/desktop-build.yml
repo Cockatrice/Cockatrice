@@ -651,10 +651,19 @@ jobs:
           if [[ '${{ matrix.os }}' == 'Windows' ]]; then
             # Top-level CMakeLists.txt links /DEBUG even in release, so the linker PDBs
             # land next to the binaries. Ninja is single-config, so that is
-            # build/<target>/ and NOT build/<target>/Release/ — the same globs the PDB
+            # build/<target>/ and NOT build/<target>/Release/ — the same globs the symbol
             # artifact step below uses.
+            #
+            # The executables are uploaded as well, in the same invocation. On 64-bit
+            # Windows the Call Frame Information (.pdata/.xdata) lives in the PE and is
+            # not copied into the PDB, so a PDB on its own leaves Sentry reporting
+            # "Stack Unwinding: Missing" for the image. sentry-cli also needs to see the
+            # PE and its PDB together: only then does it associate the PE's code
+            # identifier with the PDB's debug identifier.
             shopt -s nullglob
-            paths+=(build/cockatrice/*.pdb build/oracle/*.pdb build/servatrice/*.pdb)
+            for target in cockatrice oracle servatrice; do
+              paths+=("build/$target"/*.exe "build/$target"/*.pdb)
+            done
             shopt -u nullglob
           else
             # Release builds carry DWARF (-g, kept by CrashReporting.cmake); macOS keeps its
@@ -665,6 +674,9 @@ jobs:
                 if [[ '${{ matrix.os }}' == 'macOS' ]]; then
                   dsymutil "$binary" -o "$binary.dSYM"
                   paths+=("$binary.dSYM")
+                  # The dSYM holds the debug information, but the unwind information
+                  # Sentry needs to walk a minidump stack lives in the Mach-O itself.
+                  paths+=("$binary")
                 else
                   paths+=("$binary")
                 fi
@@ -846,15 +858,22 @@ jobs:
       # build this artifact is the only durable copy of the symbols: the Sentry
       # upload is continue-on-error, so without it a failed upload would lose
       # the ability to symbolicate that release permanently.
-      - name: "[Windows] Upload PDBs (Program Databases)"
+      #
+      # The executables travel with their PDBs: re-uploading the pair together is
+      # what lets sentry-cli associate the PE's code identifier with the PDB's
+      # debug identifier, and the PE is what carries the unwind information.
+      - name: "[Windows] Upload debug symbols (exe + pdb)"
         if: matrix.os == 'Windows'
         uses: actions/upload-artifact@v7
         with:
           if-no-files-found: error
-          name: ${{ steps.build.outputs.name }}-PDBs
+          name: ${{ steps.build.outputs.name }}-Symbols
           path: |
+            build/cockatrice/*.exe
             build/cockatrice/*.pdb
+            build/oracle/*.exe
             build/oracle/*.pdb
+            build/servatrice/*.exe
             build/servatrice/*.pdb
 
       - name: "Attest binary provenance"
