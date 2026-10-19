@@ -289,10 +289,6 @@ jobs:
         shell: bash
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          # Same release string the client reports its events under (COCKATRICE_SENTRY_RELEASE
-          # = PROJECT_VERSION, see cmake/CrashReporting.cmake), so stack traces from this build
-          # de-symbolicate against these symbols.
-          SENTRY_RELEASE: ${{ needs.configure.outputs.sentry_release }}
         run: |
           paths=()
           for dir in build/cockatrice build/oracle build/servatrice; do
@@ -303,7 +299,11 @@ jobs:
             exit 0
           fi
           # Project slug on Sentry; must match the project the baked DSN points at.
-          sentry-cli debug-files upload --org cockatrice --project cockatrice-desktop --release "$SENTRY_RELEASE" "${paths[@]}"
+          # No --release here: `debug-files upload` has no such option (sentry-cli errors on
+          # the unknown flag and uploads nothing), and debug information files are matched to
+          # events by debug ID via the event's debug_meta, not by release. The release grouping
+          # comes from the client event itself (COCKATRICE_SENTRY_RELEASE).
+          sentry-cli debug-files upload --org cockatrice --project cockatrice-desktop "${paths[@]}"
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "Delete remote compiler cache (ccache)"
@@ -643,10 +643,6 @@ jobs:
         shell: bash
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          # Same release string the client reports its events under (COCKATRICE_SENTRY_RELEASE
-          # = PROJECT_VERSION, see cmake/CrashReporting.cmake), so stack traces from this build
-          # de-symbolicate against these symbols.
-          SENTRY_RELEASE: ${{ needs.configure.outputs.sentry_release }}
         run: |
           paths=()
           if [[ '${{ matrix.os }}' == 'Windows' ]]; then
@@ -675,7 +671,9 @@ jobs:
             exit 0
           fi
           # Project slug on Sentry; must match the project the baked DSN points at.
-          sentry-cli debug-files upload --org cockatrice --project cockatrice-desktop --release "$SENTRY_RELEASE" "${paths[@]}"
+          # No --release: see the Linux leg above — the flag does not exist on
+          # `debug-files upload` and DIFs are matched by debug ID, not release.
+          sentry-cli debug-files upload --org cockatrice --project cockatrice-desktop "${paths[@]}"
 
       # CPack reports a failed makensis run as "Problem running NSIS command"
       # plus a path to NSISOutput.log, and that log lives only on the runner, so
