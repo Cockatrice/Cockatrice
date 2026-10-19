@@ -220,6 +220,7 @@ endif()
 # when ENABLE_SANITIZERS or ENABLE_COVERAGE is on.
 include(Sanitizers)
 include(Coverage)
+include(CrashReporting)
 
 # GNU systems need to define the Mersenne exponent for the RNG to compile w/o warning
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")

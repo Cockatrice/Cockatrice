@@ -20,6 +20,7 @@
 
 #include "main.h"
 
+#include "client/crash/crash_reporter.h"
 #include "client/network/update/card_spoiler/spoiler_background_updater.h"
 #include "client/settings/cache_settings.h"
 #include "client/sound_engine.h"
@@ -30,6 +31,7 @@
 #include "interface/logger.h"
 #include "interface/pixel_map_generator.h"
 #include "interface/theme_manager.h"
+#include "interface/widgets/dialogs/dlg_crash_report.h"
 #include "interface/window_main.h"
 #include "libcockatrice/card/database/card_database.h"
 #include "libcockatrice/rng/rng_abstract.h"
@@ -44,6 +46,9 @@
 #include <QCoreApplication>
 #include <QCryptographicHash>
 #include <QDebug>
+#include <QDialog>
+#include <QDir>
+#include <QFile>
 #include <QFileInfo>
 #include <QGuiApplication>
 #include <QIcon>
@@ -259,6 +264,46 @@ int main(int argc, char *argv[])
     qApp->setAttribute(Qt::AA_DontShowIconsInMenus, true);
 #endif
 
+    // Crash reporting (increment 1): init the SDK early so a crash anywhere below is captured into the
+    // local database. Uploads stay consent-gated (require_user_consent, armed in CrashReporter::init):
+    // AlwaysSend gives consent here so cached envelopes flush at startup; any other mode starts
+    // unconsented and the dialog below drives give/revoke. An empty DSN skips the SDK entirely and
+    // the mock fallback further below behaves exactly as before.
+    CrashReporter crashReporter;
+    const QString crashDatabasePath = SettingsCache::instance().getSettingsPath() + QStringLiteral("sentry");
+    {
+        QString crashDsn = QString::fromUtf8(qgetenv("COCKATRICE_SENTRY_DSN"));
+        if (crashDsn.isEmpty()) {
+            crashDsn = QString::fromLatin1(COCKATRICE_SENTRY_DSN);
+        }
+        crashReporter.init(crashDsn, QString::fromLatin1(VERSION_STRING), crashDatabasePath,
+                           SettingsCache::instance().personal().getCrashReportingMode());
+        if (crashReporter.isReady() && SettingsCache::instance().personal().getCrashReportingMode() ==
+                                           PersonalSettings::CrashReportingMode::AlwaysSend) {
+            // Silent opt-in: cached crash envelopes flush automatically once consent is given.
+            crashReporter.giveConsent();
+        }
+        // Mid-session mode changes must reach the SDK: without this, switching from AlwaysSend to
+        // NeverSend (or Ask) leaves consent given until restart, so a later crash in this session
+        // would still upload after the user opted out. crashReporter outlives main(), so capturing
+        // it here is safe.
+        QObject::connect(&SettingsCache::instance().personal(), &PersonalSettings::crashReportingModeChanged,
+                         [&crashReporter](PersonalSettings::CrashReportingMode mode) {
+                             if (mode == PersonalSettings::CrashReportingMode::AlwaysSend) {
+                                 crashReporter.giveConsent();
+                             } else {
+                                 crashReporter.revokeConsent();
+                             }
+                         });
+    }
+
+    // Persistent session log: keeps this run's logs on disk so the next-startup crash dialog can
+    // attach the crashed session's tail (the in-memory buffer is lost on crash). Opened in Append
+    // mode with a per-launch session marker; read back via Logger::getPreviousSessionTail().
+    const QString persistentLogPath =
+        SettingsCache::instance().getSettingsPath() + QStringLiteral("logs/cockatrice.log");
+    Logger::getInstance().setPersistentLogPath(persistentLogPath);
+
     // Translations
 #ifdef Q_OS_MAC
     translationPath = qApp->applicationDirPath() + "/../Resources/translations";
@@ -276,7 +321,9 @@ int main(int argc, char *argv[])
 
     parser.addOptions(
         {{{"c", "connect"}, QCoreApplication::translate("main", "Connect on startup"), "user:pass@host:port"},
-         {{"d", "debug-output"}, QCoreApplication::translate("main", "Debug to file")}});
+         {{"d", "debug-output"}, QCoreApplication::translate("main", "Debug to file")},
+         {"simulate-crash",
+          QCoreApplication::translate("main", "Show the mock crash-report dialog (nothing is sent)")}});
 
     parser.process(app);
 
@@ -413,6 +460,51 @@ int main(int argc, char *argv[])
     ui.show();
     qCInfo(MainLog) << "ui.show() finished";
 
+    // MOCK crash-report flow (UI + settings only): no sentry-native upload, no network.
+    // Triggered by --simulate-crash or by leftover Windows crash dumps. Handled dumps are deleted
+    // after Send / Don't send (or a silent NeverSend skip) so one crash never prompts twice; on
+    // non-Windows nothing writes cockatrice.crash.*.dmp yet, so --simulate-crash is the trigger there.
+    {
+        QString crashDumpDir;
+#ifdef Q_OS_WIN
+        // Mirrors the writer (CockatriceUnhandledExceptionFilter): it appends CrashDumps/Cockatrice
+        // to %LOCALAPPDATA%, or, when its known-folder lookup fails, to the temp directory walked up
+        // two parent_path() steps. %LOCALAPPDATA% is this scan's stand-in for FOLDERID_LocalAppData:
+        // both come from the same profile, so when the lookup fails the variable is normally unset.
+        QString crashDumpRootPath = QString::fromLocal8Bit(qgetenv("LOCALAPPDATA"));
+        if (crashDumpRootPath.isEmpty()) {
+            // The writer's fallback expression, verbatim — QDir::cdUp() is existence-checked and
+            // would silently leave the path alone here, parent_path() is not.
+            const std::filesystem::path fallback = std::filesystem::temp_directory_path().parent_path().parent_path();
+            crashDumpRootPath = QString::fromStdWString(fallback.wstring());
+        }
+        crashDumpDir = QDir(crashDumpRootPath).absoluteFilePath(QStringLiteral("CrashDumps/Cockatrice"));
+#else
+        crashDumpDir = QDir::tempPath();
+#endif
+        const QStringList crashDumps =
+            QDir(crashDumpDir).entryList({QStringLiteral("cockatrice.crash.*.dmp")}, QDir::Files);
+        if (parser.isSet("simulate-crash") || !crashDumps.isEmpty()) {
+            const PersonalSettings::CrashReportingMode crashMode =
+                SettingsCache::instance().personal().getCrashReportingMode();
+            if (crashMode == PersonalSettings::CrashReportingMode::AlwaysSend) {
+                crashReporter.giveConsent();
+                DlgCrashReport::writeMockReport(DlgCrashReport::buildRedactedPreview());
+            } else if (crashMode == PersonalSettings::CrashReportingMode::Ask) {
+                DlgCrashReport crashDialog(&ui);
+                if (crashDialog.exec() == QDialog::Accepted) {
+                    crashReporter.giveConsent();
+                } else {
+                    crashReporter.revokeConsent();
+                }
+            }
+            // NeverSend: skip silently (no dialog, nothing written or sent).
+            for (const QString &dump : crashDumps) {
+                QFile::remove(crashDumpDir + QStringLiteral("/") + dump);
+            }
+        }
+    }
+
     // force shortcuts to be shown/hidden in right-click menus, regardless of system defaults
     qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus,
                        !SettingsCache::instance().userInterface().getShowShortcuts());
@@ -436,6 +528,8 @@ int main(int argc, char *argv[])
     });
 
     int ret = app.exec();
+
+    crashReporter.shutdown();
 
     qCInfo(MainLog) << "Event loop finished, terminating...";
     delete rng;
