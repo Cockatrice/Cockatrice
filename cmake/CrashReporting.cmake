@@ -32,6 +32,12 @@ function(cockatrice_target_enable_crash_reporting _target)
   endif()
   # Always baked in (possibly empty): main() prefers the COCKATRICE_SENTRY_DSN env var at runtime.
   target_compile_definitions(${_target} PRIVATE "COCKATRICE_SENTRY_DSN=\"${COCKATRICE_SENTRY_DSN}\"")
+  # Sentry release for events from this target: PROJECT_VERSION (getversion.cmake ran before this
+  # file was included). Deliberately not PROJECT_VERSION_FRIENDLY / VERSION_STRING — that carries
+  # a build date, so every build of the same version would land in a different Sentry release.
+  # PROJECT_VERSION matches what the installer reports in its own log and what CPack derives the
+  # package version from, so client and installer events group under one release.
+  target_compile_definitions(${_target} PRIVATE "COCKATRICE_SENTRY_RELEASE=\"${PROJECT_VERSION}\"")
 endfunction()
 
 if(WITH_CRASH_REPORTING AND WITH_CLIENT)
@@ -77,6 +83,7 @@ if(WITH_CRASH_REPORTING AND WITH_CLIENT)
     sentry
     GIT_REPOSITORY https://github.com/getsentry/sentry-native.git
     GIT_TAG ${COCKATRICE_SENTRY_TAG}
+    GIT_SHALLOW TRUE
   )
   fetchcontent_makeavailable(sentry)
 

@@ -264,23 +264,66 @@ int main(int argc, char *argv[])
     qApp->setAttribute(Qt::AA_DontShowIconsInMenus, true);
 #endif
 
-    // Crash reporting (increment 1): init the SDK early so a crash anywhere below is captured into the
+    // Persistent session log: keeps this run's logs on disk so the next-startup crash dialog can
+    // attach the crashed session's tail (the in-memory buffer is lost on crash). Opened in Append
+    // mode with a per-launch session marker; read back via Logger::getPreviousSessionTail().
+    // Declared before crash-reporter init: the startup attach below needs the log tail while the
+    // file still holds the crashed session's lines.
+    const QString persistentLogPath =
+        SettingsCache::instance().getSettingsPath() + QStringLiteral("logs/cockatrice.log");
+    Logger::getInstance().setPersistentLogPath(persistentLogPath);
+
+    // Crash reporting: init the SDK early so a crash anywhere below is captured into the
     // local database. Uploads stay consent-gated (require_user_consent, armed in CrashReporter::init):
     // AlwaysSend gives consent here so cached envelopes flush at startup; any other mode starts
     // unconsented and the dialog below drives give/revoke. An empty DSN skips the SDK entirely and
     // the mock fallback further below behaves exactly as before.
     CrashReporter crashReporter;
     const QString crashDatabasePath = SettingsCache::instance().getSettingsPath() + QStringLiteral("sentry");
+    // Envelopes that received the redacted log at startup (AlwaysSend path); 0 means the log was
+    // NOT folded into a pending crash event and a standalone log event is still needed below.
+    int crashLogAttachedEnvelopes = 0;
     {
         QString crashDsn = QString::fromUtf8(qgetenv("COCKATRICE_SENTRY_DSN"));
-        if (crashDsn.isEmpty()) {
-            crashDsn = QString::fromLatin1(COCKATRICE_SENTRY_DSN);
+        const bool dsnFromEnvironment = !crashDsn.isEmpty();
+        if (!dsnFromEnvironment) {
+            crashDsn = QString::fromUtf8(COCKATRICE_SENTRY_DSN);
         }
-        crashReporter.init(crashDsn, QString::fromLatin1(VERSION_STRING), crashDatabasePath,
-                           SettingsCache::instance().personal().getCrashReportingMode());
-        if (crashReporter.isReady() && SettingsCache::instance().personal().getCrashReportingMode() ==
-                                           PersonalSettings::CrashReportingMode::AlwaysSend) {
-            // Silent opt-in: cached crash envelopes flush automatically once consent is given.
+        if (crashDsn.isEmpty()) {
+            // Nothing is armed without a DSN, so no crash is ever captured and nothing is ever sent.
+            // It is the one disabled configuration a tester cannot see from the UI, so say it here.
+            qCWarning(CrashReportLog) << "crash reporting disabled: no DSN configured (COCKATRICE_SENTRY_DSN is "
+                                         "not set and this build has no DSN baked in)";
+        } else if (!CrashReporter::isDsnWellFormed(crashDsn)) {
+            // Same rule the installer applies (cmake/CrashReporting.cmake): a malformed DSN disables
+            // reporting rather than silently falling back to the project baked into the build, which
+            // would upload where the tester never chose. The SDK would otherwise refuse to build a
+            // request at all and report nothing about it.
+            qCWarning(CrashReportLog) << "crash reporting disabled:"
+                                      << (dsnFromEnvironment ? "COCKATRICE_SENTRY_DSN is set but malformed"
+                                                             : "the DSN baked into this build is malformed")
+                                      << "(expected <scheme>://<key>@<host>/<project-id>)";
+            crashDsn.clear();
+        } else if (dsnFromEnvironment) {
+            // Destination and mode are logged by CrashReporter::init() once it resolves them.
+            qCInfo(CrashReportLog) << "using COCKATRICE_SENTRY_DSN from the environment";
+        }
+        const PersonalSettings::CrashReportingMode crashMode =
+            SettingsCache::instance().personal().getCrashReportingMode();
+        // AlwaysSend folds the crashed session's redacted log into the pending crash
+        // envelope(s) BEFORE init: sentry_init replays the crashed run's *.run
+        // envelopes immediately when consent is already persisted, so attaching any
+        // later would be too late. Consent given below then releases them, and dump,
+        // stack and log upload as a single Sentry event. Ask mode attaches at the
+        // dialog instead — its cache-held envelopes stay untouched until giveConsent().
+        if (crashMode == PersonalSettings::CrashReportingMode::AlwaysSend &&
+            CrashReporter::isReportingEnabled(crashDsn, crashMode)) {
+            crashLogAttachedEnvelopes = CrashReporter::attachToPendingCrashEnvelopes(
+                crashDatabasePath, DlgCrashReport::buildRedactedPreview(), QString());
+        }
+        crashReporter.init(crashDsn, QString::fromUtf8(COCKATRICE_SENTRY_RELEASE), crashDatabasePath, crashMode);
+        if (crashReporter.isReady() && crashMode == PersonalSettings::CrashReportingMode::AlwaysSend) {
+            // Silent opt-in: cached native crash envelopes flush automatically once consent is given.
             crashReporter.giveConsent();
         }
         // Mid-session mode changes must reach the SDK: without this, switching from AlwaysSend to
@@ -296,13 +339,6 @@ int main(int argc, char *argv[])
                              }
                          });
     }
-
-    // Persistent session log: keeps this run's logs on disk so the next-startup crash dialog can
-    // attach the crashed session's tail (the in-memory buffer is lost on crash). Opened in Append
-    // mode with a per-launch session marker; read back via Logger::getPreviousSessionTail().
-    const QString persistentLogPath =
-        SettingsCache::instance().getSettingsPath() + QStringLiteral("logs/cockatrice.log");
-    Logger::getInstance().setPersistentLogPath(persistentLogPath);
 
     // Translations
 #ifdef Q_OS_MAC
@@ -323,7 +359,8 @@ int main(int argc, char *argv[])
         {{{"c", "connect"}, QCoreApplication::translate("main", "Connect on startup"), "user:pass@host:port"},
          {{"d", "debug-output"}, QCoreApplication::translate("main", "Debug to file")},
          {"simulate-crash",
-          QCoreApplication::translate("main", "Show the mock crash-report dialog (nothing is sent)")}});
+          QCoreApplication::translate("main",
+                                      "Show the crash-report dialog (saves a mock file when no DSN is configured)")}});
 
     parser.process(app);
 
@@ -460,10 +497,11 @@ int main(int argc, char *argv[])
     ui.show();
     qCInfo(MainLog) << "ui.show() finished";
 
-    // MOCK crash-report flow (UI + settings only): no sentry-native upload, no network.
-    // Triggered by --simulate-crash or by leftover Windows crash dumps. Handled dumps are deleted
-    // after Send / Don't send (or a silent NeverSend skip) so one crash never prompts twice; on
-    // non-Windows nothing writes cockatrice.crash.*.dmp yet, so --simulate-crash is the trigger there.
+    // Crash-report flow: with a configured DSN the SDK owns capture and upload
+    // (consent-gated); with an empty DSN the dialog falls back to a local mock
+    // file and behaves exactly as before. Triggered by --simulate-crash or by
+    // leftover Windows crash dumps, which are consumed after handling so one
+    // crash never prompts twice.
     {
         QString crashDumpDir;
 #ifdef Q_OS_WIN
@@ -487,18 +525,31 @@ int main(int argc, char *argv[])
         if (parser.isSet("simulate-crash") || !crashDumps.isEmpty()) {
             const PersonalSettings::CrashReportingMode crashMode =
                 SettingsCache::instance().personal().getCrashReportingMode();
+            const bool crashReady = crashReporter.isReady();
             if (crashMode == PersonalSettings::CrashReportingMode::AlwaysSend) {
-                crashReporter.giveConsent();
-                DlgCrashReport::writeMockReport(DlgCrashReport::buildRedactedPreview());
-            } else if (crashMode == PersonalSettings::CrashReportingMode::Ask) {
-                DlgCrashReport crashDialog(&ui);
-                if (crashDialog.exec() == QDialog::Accepted) {
-                    crashReporter.giveConsent();
+                if (crashReady) {
+                    // Silent path: the redacted log was folded into the pending native crash
+                    // envelope(s) at startup and consent already released them. Only when no
+                    // pending crash event existed (e.g. --simulate-crash) does a standalone
+                    // log event still need to go out here.
+                    if (crashLogAttachedEnvelopes == 0) {
+                        const QString crashPreview = DlgCrashReport::buildRedactedPreview();
+                        if (!crashReporter.sendReport(crashPreview)) {
+                            const QString savedPath = DlgCrashReport::writeMockReport(crashPreview);
+                            qCWarning(MainLog) << "Failed to send crash report, saved locally to" << savedPath;
+                        }
+                    }
                 } else {
-                    crashReporter.revokeConsent();
+                    DlgCrashReport::writeMockReport(DlgCrashReport::buildRedactedPreview());
                 }
+            } else if (crashMode == PersonalSettings::CrashReportingMode::Ask) {
+                // Real mode: Send gives consent + captures the event, Don't
+                // send revokes consent; the dialog owns both via the reporter.
+                DlgCrashReport crashDialog(&ui, crashReady, crashReady ? &crashReporter : nullptr);
+                crashDialog.exec();
             }
             // NeverSend: skip silently (no dialog, nothing written or sent).
+            // Handled dumps are consumed so one crash never prompts twice.
             for (const QString &dump : crashDumps) {
                 QFile::remove(crashDumpDir + QStringLiteral("/") + dump);
             }
