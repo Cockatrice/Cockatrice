@@ -827,19 +827,6 @@ jobs:
           if-no-files-found: error
           path: ${{ steps.build.outputs.path }}
 
-      # Ninja is single-config: binaries and their PDBs land directly in the
-      # target directories instead of a Release subdirectory.
-      - name: "[Windows] Upload PDBs (Program Databases)"
-        if: matrix.os == 'Windows' && github.ref_type != 'tag'
-        uses: actions/upload-artifact@v7
-        with:
-          if-no-files-found: error
-          name: ${{ steps.build.outputs.name }}-PDBs
-          path: |
-            build/cockatrice/*.pdb
-            build/oracle/*.pdb
-            build/servatrice/*.pdb
-
       - name: "Upload to release"
         if: needs.configure.outputs.tag != null && matrix.make_package == '1'
         id: upload_release
@@ -850,6 +837,25 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           tag_name: ${{ needs.configure.outputs.tag }}
         run: gh release upload "$tag_name" "$asset_path#$asset_name"
+
+      # Ninja is single-config: binaries and their PDBs land directly in the
+      # target directories instead of a Release subdirectory.
+      #
+      # Archived for tag builds as well, and ordered after the release upload so
+      # a missing PDB can never block a release from being published. On a tag
+      # build this artifact is the only durable copy of the symbols: the Sentry
+      # upload is continue-on-error, so without it a failed upload would lose
+      # the ability to symbolicate that release permanently.
+      - name: "[Windows] Upload PDBs (Program Databases)"
+        if: matrix.os == 'Windows'
+        uses: actions/upload-artifact@v7
+        with:
+          if-no-files-found: error
+          name: ${{ steps.build.outputs.name }}-PDBs
+          path: |
+            build/cockatrice/*.pdb
+            build/oracle/*.pdb
+            build/servatrice/*.pdb
 
       - name: "Attest binary provenance"
         if: steps.upload_release.outcome == 'success'
