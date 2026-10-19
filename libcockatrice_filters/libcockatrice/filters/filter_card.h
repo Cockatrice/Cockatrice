@@ -32,6 +32,7 @@ public:
     {
         AttrCmc = 0,
         AttrColor,
+        AttrColorIdentity,
         AttrLoyalty,
         AttrManaCost,
         AttrName,
@@ -54,7 +55,7 @@ private:
     enum Attr a;
 
 public:
-    CardFilter(QString &term, Type type, Attr attr) : trm(term), t(type), a(attr)
+    CardFilter(QString const &term, Type type, Attr attr) : trm(term), t(type), a(attr)
     {
     }
 

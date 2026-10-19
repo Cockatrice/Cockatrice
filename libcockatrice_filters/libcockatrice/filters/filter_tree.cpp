@@ -227,27 +227,26 @@ bool FilterItem::acceptSubType(const CardInfoPtr info) const
     return typeParts.size() > 1 && typeParts[1].contains(term, Qt::CaseInsensitive);
 }
 
-bool FilterItem::acceptColor(const CardInfoPtr info) const
-{
-    QString converted_term = term.trimmed();
+static bool matchesColor(QString const &term, QString const &colors) {
+    QString converted_term = term.trimmed().toLower();
 
-    converted_term.replace("green", "g", Qt::CaseInsensitive);
-    converted_term.replace("grn", "g", Qt::CaseInsensitive);
-    converted_term.replace("blue", "u", Qt::CaseInsensitive);
-    converted_term.replace("blu", "u", Qt::CaseInsensitive);
-    converted_term.replace("black", "b", Qt::CaseInsensitive);
-    converted_term.replace("blk", "b", Qt::CaseInsensitive);
-    converted_term.replace("red", "r", Qt::CaseInsensitive);
-    converted_term.replace("white", "w", Qt::CaseInsensitive);
-    converted_term.replace("wht", "w", Qt::CaseInsensitive);
-    converted_term.replace("colorless", "c", Qt::CaseInsensitive);
-    converted_term.replace("colourless", "c", Qt::CaseInsensitive);
-    converted_term.replace("none", "c", Qt::CaseInsensitive);
+    converted_term.replace("green", "g");
+    converted_term.replace("grn", "g");
+    converted_term.replace("blue", "u");
+    converted_term.replace("blu", "u");
+    converted_term.replace("black", "b");
+    converted_term.replace("blk", "b");
+    converted_term.replace("red", "r");
+    converted_term.replace("white", "w");
+    converted_term.replace("wht", "w");
+    converted_term.replace("colorless", "c");
+    converted_term.replace("colourless", "c");
+    converted_term.replace("none", "c");
 
-    converted_term.replace(QString(" "), QString(""), Qt::CaseInsensitive);
+    converted_term.replace(QString(" "), QString(""));
 
     // Colorless card filter
-    if (converted_term.toLower() == "c" && info->getColors().length() < 1) {
+    if (converted_term == "c" && colors.length() < 1) {
         return true;
     }
 
@@ -257,12 +256,22 @@ bool FilterItem::acceptColor(const CardInfoPtr info) const
      */
     int match_count = 0;
     for (auto &it : converted_term) {
-        if (info->getColors().contains(it, Qt::CaseInsensitive)) {
+        if (colors.contains(it, Qt::CaseInsensitive)) {
             match_count++;
         }
     }
 
     return match_count == converted_term.length();
+}
+
+bool FilterItem::acceptColor(const CardInfoPtr info) const
+{
+    return matchesColor(term, info->getColors());
+}
+
+bool FilterItem::acceptColorIdentity(const CardInfoPtr info) const
+{
+    return matchesColor(term, info->getColorIdentity());
 }
 
 bool FilterItem::acceptText(const CardInfoPtr info, const CardSearchLanguage &searchLanguage) const
@@ -485,6 +494,8 @@ bool FilterItem::acceptCardAttr(const CardInfoPtr info,
             return acceptType(info);
         case CardFilter::AttrColor:
             return acceptColor(info);
+        case CardFilter::AttrColorIdentity:
+            return acceptColorIdentity(info);
         case CardFilter::AttrText:
             return acceptText(info, searchLanguage);
         case CardFilter::AttrSet:
