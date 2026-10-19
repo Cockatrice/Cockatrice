@@ -20,6 +20,7 @@
 
 #include "main.h"
 
+#include "client/crash/crash_reporter.h"
 #include "client/network/update/card_spoiler/spoiler_background_updater.h"
 #include "client/settings/cache_settings.h"
 #include "client/sound_engine.h"
@@ -30,6 +31,7 @@
 #include "interface/logger.h"
 #include "interface/pixel_map_generator.h"
 #include "interface/theme_manager.h"
+#include "interface/widgets/dialogs/dlg_crash_report.h"
 #include "interface/window_main.h"
 #include "libcockatrice/card/database/card_database.h"
 #include "libcockatrice/rng/rng_abstract.h"
@@ -103,60 +105,6 @@ static void CockatriceLogger(QtMsgType type, const QMessageLogContext &ctx, cons
     Logger::getInstance().log(type, ctx, logMessage);
 }
 
-#ifdef Q_OS_WIN
-// clang-format off
-#include <Windows.h>
-#include <DbgHelp.h>
-#include <ShlObj.h>
-#include <ctime>
-#include <filesystem>
-
-#pragma comment(lib, "DbgHelp.lib") // Link the DbgHelp library
-// clang-format on
-
-LONG WINAPI CockatriceUnhandledExceptionFilter(EXCEPTION_POINTERS *exceptionPointers)
-{
-    std::filesystem::path path;
-
-    // Find %LOCALAPPDATA% (or cheat at finding it)
-    wchar_t *localAppDataFolder;
-    if (SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_CREATE, NULL, &localAppDataFolder) != S_OK) {
-        path = std::filesystem::temp_directory_path().parent_path().parent_path();
-    } else {
-        path = std::filesystem::path(localAppDataFolder);
-    }
-
-    // Plan on writing crash files into %LOCALAPPDATA%/CrashDumps/Cockatrice/cockatrice.crash.*.dmp
-    path /= "CrashDumps";
-    path /= "Cockatrice";
-    if (!std::filesystem::exists(path)) {
-        std::filesystem::create_directories(path);
-    }
-    path /= "cockatrice.crash." + std::to_string(std::time(0)) + ".dmp";
-
-    // Create and write crash files
-#ifdef UNICODE
-    HANDLE hDumpFile =
-        CreateFile(path.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-#else
-    HANDLE hDumpFile =
-        CreateFile(path.string().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-#endif
-
-    MINIDUMP_EXCEPTION_INFORMATION mei;
-    mei.ExceptionPointers = exceptionPointers;
-    mei.ThreadId = GetCurrentThreadId();
-    mei.ClientPointers = 1;
-
-    MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hDumpFile, MiniDumpWithFullMemory, &mei, nullptr,
-                      nullptr);
-
-    CloseHandle(hDumpFile);
-
-    return EXCEPTION_EXECUTE_HANDLER;
-}
-#endif
-
 void installNewTranslator()
 {
     QString lang = SettingsCache::instance().personal().getLang();
@@ -197,11 +145,52 @@ static QString redactActivationUrl(const QString &url)
     return parsed.scheme() + "://" + parsed.host();
 }
 
+/**
+ * @brief Run the startup crash-report flow for an unclean exit (or --simulate-crash).
+ *
+ * With a configured DSN the SDK owns capture and upload (consent-gated); with an
+ * empty DSN the flow falls back to a local mock file. AlwaysSend uploads silently
+ * (the log was folded into the pending native envelope(s) at startup); Ask offers
+ * the dialog; NeverSend skips silently.
+ *
+ * @param attachedEnvelopes number of pending native envelopes that already carry the
+ *                          redacted log, so an AlwaysSend run only sends a standalone
+ *                          log event when no crash event existed.
+ */
+static void runCrashReportFlow(CrashReporter &crashReporter, QWidget *parent, int attachedEnvelopes)
+{
+    const PersonalSettings::CrashReportingMode crashMode = SettingsCache::instance().personal().getCrashReportingMode();
+    const bool crashReady = crashReporter.isReady();
+    if (crashMode == PersonalSettings::CrashReportingMode::AlwaysSend) {
+        if (crashReady) {
+            // Silent path: the redacted log was folded into the pending native crash
+            // envelope(s) at startup and consent already released them. Only when no
+            // pending crash event existed (e.g. --simulate-crash) does a standalone
+            // log event still need to go out here.
+            if (attachedEnvelopes == 0) {
+                const QString crashPreview = DlgCrashReport::buildRedactedPreview();
+                if (!crashReporter.sendReport(crashPreview)) {
+                    const QString savedPath = DlgCrashReport::writeMockReport(crashPreview);
+                    qCWarning(MainLog) << "Failed to send crash report, saved locally to" << savedPath;
+                }
+            }
+        } else {
+            DlgCrashReport::writeMockReport(DlgCrashReport::buildRedactedPreview());
+        }
+    } else if (crashMode == PersonalSettings::CrashReportingMode::Ask) {
+        // Real mode: Send gives consent + captures the event, Don't send revokes
+        // consent; the dialog owns both via the reporter.
+        DlgCrashReport crashDialog(parent, crashReady, crashReady ? &crashReporter : nullptr);
+        crashDialog.exec();
+    }
+    // NeverSend: skip silently (no dialog, nothing written or sent).
+}
+
 int main(int argc, char *argv[])
 {
-#ifdef Q_OS_WIN
-    SetUnhandledExceptionFilter(CockatriceUnhandledExceptionFilter);
-#endif
+    // No custom unhandled-exception filter: sentry owns native crash capture on all
+    // platforms. (The legacy MiniDumpWithFullMemory writer was removed as a privacy
+    // liability; unclean exits are detected via CrashReporter::beginSession below.)
 
     // Logging setup
 #ifdef Q_OS_APPLE
@@ -259,6 +248,82 @@ int main(int argc, char *argv[])
     qApp->setAttribute(Qt::AA_DontShowIconsInMenus, true);
 #endif
 
+    // Persistent session log: keeps this run's logs on disk so the next-startup crash dialog can
+    // attach the crashed session's tail (the in-memory buffer is lost on crash). Opened in Append
+    // mode with a per-launch session marker; read back via Logger::getPreviousSessionTail().
+    // Declared before crash-reporter init: the startup attach below needs the log tail while the
+    // file still holds the crashed session's lines.
+    const QString persistentLogPath =
+        SettingsCache::instance().getSettingsPath() + QStringLiteral("logs/cockatrice.log");
+    Logger::getInstance().setPersistentLogPath(persistentLogPath);
+
+    // Crash reporting: init the SDK early so a crash anywhere below is captured into the
+    // local database. Uploads stay consent-gated (require_user_consent, armed in CrashReporter::init):
+    // AlwaysSend gives consent here so cached envelopes flush at startup; any other mode starts
+    // unconsented and the dialog below drives give/revoke. An empty DSN skips the SDK entirely and
+    // the mock fallback further below behaves exactly as before.
+    CrashReporter crashReporter;
+    const QString crashDatabasePath = SettingsCache::instance().getSettingsPath() + QStringLiteral("sentry");
+    // Envelopes that received the redacted log at startup (AlwaysSend path); 0 means the log was
+    // NOT folded into a pending crash event and a standalone log event is still needed below.
+    int crashLogAttachedEnvelopes = 0;
+    {
+        QString crashDsn = QString::fromUtf8(qgetenv("COCKATRICE_SENTRY_DSN"));
+        const bool dsnFromEnvironment = !crashDsn.isEmpty();
+        if (!dsnFromEnvironment) {
+            crashDsn = QString::fromUtf8(COCKATRICE_SENTRY_DSN);
+        }
+        if (crashDsn.isEmpty()) {
+            // Nothing is armed without a DSN, so no crash is ever captured and nothing is ever sent.
+            // It is the one disabled configuration a tester cannot see from the UI, so say it here.
+            qCWarning(CrashReportLog) << "crash reporting disabled: no DSN configured (COCKATRICE_SENTRY_DSN is "
+                                         "not set and this build has no DSN baked in)";
+        } else if (!CrashReporter::isDsnWellFormed(crashDsn)) {
+            // Same rule the installer applies (cmake/CrashReporting.cmake): a malformed DSN disables
+            // reporting rather than silently falling back to the project baked into the build, which
+            // would upload where the tester never chose. The SDK would otherwise refuse to build a
+            // request at all and report nothing about it.
+            qCWarning(CrashReportLog) << "crash reporting disabled:"
+                                      << (dsnFromEnvironment ? "COCKATRICE_SENTRY_DSN is set but malformed"
+                                                             : "the DSN baked into this build is malformed")
+                                      << "(expected <scheme>://<key>@<host>/<project-id>)";
+            crashDsn.clear();
+        } else if (dsnFromEnvironment) {
+            // Destination and mode are logged by CrashReporter::init() once it resolves them.
+            qCInfo(CrashReportLog) << "using COCKATRICE_SENTRY_DSN from the environment";
+        }
+        const PersonalSettings::CrashReportingMode crashMode =
+            SettingsCache::instance().personal().getCrashReportingMode();
+        // AlwaysSend folds the crashed session's redacted log into the pending crash
+        // envelope(s) BEFORE init: sentry_init replays the crashed run's *.run
+        // envelopes immediately when consent is already persisted, so attaching any
+        // later would be too late. Consent given below then releases them, and dump,
+        // stack and log upload as a single Sentry event. Ask mode attaches at the
+        // dialog instead — its cache-held envelopes stay untouched until giveConsent().
+        if (crashMode == PersonalSettings::CrashReportingMode::AlwaysSend &&
+            CrashReporter::isReportingEnabled(crashDsn, crashMode)) {
+            crashLogAttachedEnvelopes = CrashReporter::attachToPendingCrashEnvelopes(
+                crashDatabasePath, DlgCrashReport::buildRedactedPreview(), QString());
+        }
+        crashReporter.init(crashDsn, QString::fromUtf8(COCKATRICE_SENTRY_RELEASE), crashDatabasePath, crashMode);
+        if (crashReporter.isReady() && crashMode == PersonalSettings::CrashReportingMode::AlwaysSend) {
+            // Silent opt-in: cached native crash envelopes flush automatically once consent is given.
+            crashReporter.giveConsent();
+        }
+        // Mid-session mode changes must reach the SDK: without this, switching from AlwaysSend to
+        // NeverSend (or Ask) leaves consent given until restart, so a later crash in this session
+        // would still upload after the user opted out. crashReporter outlives main(), so capturing
+        // it here is safe.
+        QObject::connect(&SettingsCache::instance().personal(), &PersonalSettings::crashReportingModeChanged,
+                         [&crashReporter](PersonalSettings::CrashReportingMode mode) {
+                             if (mode == PersonalSettings::CrashReportingMode::AlwaysSend) {
+                                 crashReporter.giveConsent();
+                             } else {
+                                 crashReporter.revokeConsent();
+                             }
+                         });
+    }
+
     // Translations
 #ifdef Q_OS_MAC
     translationPath = qApp->applicationDirPath() + "/../Resources/translations";
@@ -276,7 +341,10 @@ int main(int argc, char *argv[])
 
     parser.addOptions(
         {{{"c", "connect"}, QCoreApplication::translate("main", "Connect on startup"), "user:pass@host:port"},
-         {{"d", "debug-output"}, QCoreApplication::translate("main", "Debug to file")}});
+         {{"d", "debug-output"}, QCoreApplication::translate("main", "Debug to file")},
+         {"simulate-crash",
+          QCoreApplication::translate("main",
+                                      "Show the crash-report dialog (saves a mock file when no DSN is configured)")}});
 
     parser.process(app);
 
@@ -319,6 +387,16 @@ int main(int argc, char *argv[])
             qInfo() << "No existing instance found, starting server";
         }
     }
+
+    // Unclean-exit detection (cross-platform QLockFile session tracking, replacing the
+    // legacy Windows-only .dmp scan): a leftover session lock means the previous run died
+    // without reaching endSession(). Our own lock is held until the event loop finishes.
+    // Deliberately placed after parser.process() (--help/--version exit inside it and must
+    // not leak a lock) and after the instance hand-off (a handed-off secondary exits
+    // immediately and must never take a lock). Note this counts any death without
+    // endSession() as a crash, including SIGTERM at logout, Task Manager kills and
+    // session-end shutdowns; in AlwaysSend those send a report too.
+    const bool uncleanExit = crashReporter.beginSession(crashDatabasePath);
 
     rng = new RNG_SFMT(CryptoUtil::randomUInt64());
     themeManager = new ThemeManager;
@@ -413,6 +491,13 @@ int main(int argc, char *argv[])
     ui.show();
     qCInfo(MainLog) << "ui.show() finished";
 
+    // Crash-report flow: the trigger is --simulate-crash or an unclean previous exit
+    // (leftover session lock; the old %LOCALAPPDATA%/CrashDumps .dmp scan is gone with
+    // the exception filter). See runCrashReportFlow() for the per-mode handling.
+    if (parser.isSet("simulate-crash") || uncleanExit) {
+        runCrashReportFlow(crashReporter, &ui, crashLogAttachedEnvelopes);
+    }
+
     // force shortcuts to be shown/hidden in right-click menus, regardless of system defaults
     qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus,
                        !SettingsCache::instance().userInterface().getShowShortcuts());
@@ -443,6 +528,11 @@ int main(int argc, char *argv[])
     CountryPixmapGenerator::clear();
     UserLevelPixmapGenerator::clear();
     ManaSymbolPixmapGenerator::clear();
+
+    // Released last: crashes anywhere in the teardown above (a common place for Qt apps to
+    // crash) are still captured by the SDK and detected as unclean exits on the next launch.
+    crashReporter.shutdown();
+    crashReporter.endSession();
 
     return ret;
 }

@@ -9,6 +9,7 @@ RUN apt-get update && \
         file \
         g++ \
         git \
+        libcurl4-openssl-dev \
         libgl-dev \
         liblzma-dev \
         libmariadb-dev-compat \

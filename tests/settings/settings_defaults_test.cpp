@@ -4,6 +4,7 @@
 #include <QDir>
 #include <QHash>
 #include <QList>
+#include <QSettings>
 #include <QString>
 #include <QStringList>
 #include <QTemporaryDir>
@@ -365,6 +366,32 @@ TEST_F(SettingsDefaultsTest, Personal_ShowTipsOnStartup_Default)
 {
     PersonalSettings s(settingsPath, nullptr);
     ASSERT_EQ(s.getShowTipsOnStartup(), true);
+}
+
+TEST_F(SettingsDefaultsTest, Personal_CrashReportingMode_Default)
+{
+    PersonalSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getCrashReportingMode(), PersonalSettings::CrashReportingMode::Ask);
+}
+
+TEST_F(SettingsDefaultsTest, Personal_CrashReportingMode_SetAndGet)
+{
+    PersonalSettings s(settingsPath, nullptr);
+    s.setCrashReportingMode(PersonalSettings::CrashReportingMode::AlwaysSend);
+    ASSERT_EQ(s.getCrashReportingMode(), PersonalSettings::CrashReportingMode::AlwaysSend);
+    s.setCrashReportingMode(PersonalSettings::CrashReportingMode::NeverSend);
+    ASSERT_EQ(s.getCrashReportingMode(), PersonalSettings::CrashReportingMode::NeverSend);
+    s.setCrashReportingMode(PersonalSettings::CrashReportingMode::Ask);
+    ASSERT_EQ(s.getCrashReportingMode(), PersonalSettings::CrashReportingMode::Ask);
+}
+
+TEST_F(SettingsDefaultsTest, Personal_CrashReportingMode_ClampsCorruptValue)
+{
+    QSettings raw(settingsPath + "personal.ini", QSettings::IniFormat);
+    raw.setValue("personal/crashReportingMode", 99);
+    raw.sync();
+    PersonalSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getCrashReportingMode(), PersonalSettings::CrashReportingMode::Ask);
 }
 
 // --- DownloadSettings ---

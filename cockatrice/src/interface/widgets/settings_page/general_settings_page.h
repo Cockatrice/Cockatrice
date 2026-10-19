@@ -49,6 +49,7 @@ private slots:
 private:
     QGroupBox *languageGroupBox;
     QGroupBox *versionGroupBox;
+    QGroupBox *crashReportingGroupBox;
     QGroupBox *cardDatabaseGroupBox;
     QGroupBox *startupGroupBox;
     QGroupBox *pathsGroupBox;
@@ -69,6 +70,9 @@ private:
     QCheckBox startupUpdateCheckCheckBox;
     QCheckBox updateNotificationCheckBox;
     QCheckBox newVersionOracleCheckBox;
+
+    QLabel crashReportingLabel;
+    QComboBox crashReportingBox;
 
     QLabel startupCardUpdateCheckBehaviorLabel;
     QComboBox startupCardUpdateCheckBehaviorSelector;
