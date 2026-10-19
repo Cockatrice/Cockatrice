@@ -295,8 +295,11 @@ jobs:
             [[ -d $dir ]] && paths+=("$dir")
           done
           if [[ ${#paths[@]} == 0 ]]; then
-            echo "No build output dirs found, skipping symbol upload"
-            exit 0
+            # Fail loudly instead of skipping: see the Windows/macOS leg below — this step
+            # is the only way symbols reach Sentry and `continue-on-error` keeps the job
+            # green either way, so a silent skip looks exactly like a successful upload.
+            echo "::error::No debug symbol files found; nothing would be uploaded"
+            exit 1
           fi
           # Project slug on Sentry; must match the project the baked DSN points at.
           # No --release here: `debug-files upload` has no such option (sentry-cli errors on
@@ -646,11 +649,13 @@ jobs:
         run: |
           paths=()
           if [[ '${{ matrix.os }}' == 'Windows' ]]; then
-            # Top-level CMakeLists.txt links /DEBUG even in release, so PDBs land
-            # next to the binaries (same dirs as the PDB artifact step below).
-            for dir in build/cockatrice/Release build/oracle/Release build/servatrice/Release; do
-              [[ -d $dir ]] && paths+=("$dir")
-            done
+            # Top-level CMakeLists.txt links /DEBUG even in release, so the linker PDBs
+            # land next to the binaries. Ninja is single-config, so that is
+            # build/<target>/ and NOT build/<target>/Release/ — the same globs the PDB
+            # artifact step below uses.
+            shopt -s nullglob
+            paths+=(build/cockatrice/*.pdb build/oracle/*.pdb build/servatrice/*.pdb)
+            shopt -u nullglob
           else
             # Release builds carry DWARF (-g, kept by CrashReporting.cmake); macOS keeps its
             # debug info in dSYM bundles, so materialize them before uploading.
@@ -667,8 +672,12 @@ jobs:
             done
           fi
           if [[ ${#paths[@]} == 0 ]]; then
-            echo "No symbol paths found, skipping symbol upload"
-            exit 0
+            # Fail loudly instead of skipping: this step is the only way symbols reach
+            # Sentry, and `continue-on-error` keeps the job green either way, so a
+            # silent skip is indistinguishable from a successful upload. It also hid a
+            # wrong Windows path (build/<target>/Release, which Ninja never creates).
+            echo "::error::No debug symbol files found; nothing would be uploaded"
+            exit 1
           fi
           # Project slug on Sentry; must match the project the baked DSN points at.
           # No --release: see the Linux leg above — the flag does not exist on
