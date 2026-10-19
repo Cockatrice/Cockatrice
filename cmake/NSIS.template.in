@@ -28,6 +28,11 @@ Var DataBackupFindHandle
 Var DataBackupFindName
 Var IsUpgrade
 Var AbortReason
+; Diagnostics for a failed purge: the process lookup in LogProcessesUsingInstallDir
+; writes $HolderOutput (one log line) and sets $HolderFound when it named anything.
+Var HolderExit
+Var HolderOutput
+Var HolderFound
 Var WaitPid
 Var LauncherExited
 Var InstallLogPath
@@ -1171,6 +1176,132 @@ Function CheckStaleRuntimeMask
     ${EndIf}
 FunctionEnd
 
+; Turns a Win32 error code into the wording that goes into the log.
+; usage: set $0 to the code, result in $R0.
+;
+; These are Windows' own names for the codes and deliberately nothing more. A
+; code on its own cannot say whether an upgrade was blocked by a running instance
+; or by a permission: deleting a file whose image is mapped by another process
+; surfaces as ACCESS_DENIED, exactly like a file whose ACL denies delete does.
+; LogProcessesUsingInstallDir is what separates the two, which is why it runs
+; right after this and why the two are read together.
+Function GetWin32ErrorText
+    ${If} $0 = 2
+        StrCpy $R0 "already gone"
+    ${ElseIf} $0 = 3
+        StrCpy $R0 "path not found"
+    ${ElseIf} $0 = 5
+        StrCpy $R0 "access denied"
+    ${ElseIf} $0 = 19
+        StrCpy $R0 "write-protected media"
+    ${ElseIf} $0 = 32
+        StrCpy $R0 "sharing violation"
+    ${ElseIf} $0 = 33
+        StrCpy $R0 "lock violation"
+    ${ElseIf} $0 = 1224
+        StrCpy $R0 "file is mapped in memory"
+    ${Else}
+        StrCpy $R0 "windows error"
+    ${EndIf}
+FunctionEnd
+
+; Records which runtime files the purge left behind, what Windows said about each
+; one, and which processes are using the install directory.
+;
+; Diagnostic only, and only on the abort path: it deletes nothing, so it can never
+; turn a failed upgrade into a half-removed old install, and it decides nothing -
+; the abort that called it is already decided. It exists because NSIS Delete/RMDir
+; only set the error flag: without this, a report of "files of a previous version
+; survived the purge" said which files were present but never which one was held,
+; and never whether the cause was a lock or a permission.
+;
+; The probe opens each survivor for DELETE access and then closes it again
+; without deleting anything. The code is read by the plugin right after that call
+; (?e), so a failure reports what Windows refused; clearing LastError first is
+; what makes a zero code mean "this open worked", i.e. the purge-time failure was
+; transient (an antivirus scan that has finished, an instance still shutting
+; down) rather than a standing condition. The plugin parses the call's arguments
+; between the clear and the call, so a non-zero code is reported as what Windows
+; said rather than as proof of a cause - the wording below never claims one.
+Function LogStaleRuntimeDiagnostics
+    FindFirst $StaleFindHandle $StaleFindName "$INSTDIR\*.dll"
+    ${If} $StaleFindHandle != ""
+    stale_diag_loop:
+        ; ClearErrors tells a plugin failure apart from an API failure: the System
+        ; plugin sets the error flag only when it could not make the call at all,
+        ; in which case it pushes its own message instead of the call's value and
+        ; the pop below must not run.
+        ClearErrors
+        System::Call 'kernel32::SetLastError(i 0)'
+        System::Call 'kernel32::CreateFileW(w "$INSTDIR\$StaleFindName", i 0x00010000, i 0, p 0, i 3, i 0, p 0) p.R1 ?e'
+        ${If} ${Errors}
+            StrCpy $R0 "the delete probe could not be run"
+        ${Else}
+            Pop $R2
+            ${If} $R2 = 0
+                ; A valid handle: close it, and the file was deletable all along.
+                System::Call 'kernel32::CloseHandle(p R1)'
+                StrCpy $R0 "the failure does not reproduce any more"
+            ${Else}
+                StrCpy $0 $R2
+                Call GetWin32ErrorText
+                StrCpy $R0 "win32 error $R2: $R0"
+            ${EndIf}
+        ${EndIf}
+        !insertmacro CockLog "stale-runtime: '$StaleFindName' is still present: $R0"
+        ClearErrors
+        FindNext $StaleFindHandle $StaleFindName
+        IfErrors 0 stale_diag_loop
+        FindClose $StaleFindHandle
+    ${EndIf}
+    Call LogProcessesUsingInstallDir
+FunctionEnd
+
+; Names the processes that have the install directory's image, or one of its
+; modules, mapped. Writes one line to the log and sets $HolderFound (1 when a
+; process was named), so the abort message can repeat it to the user.
+;
+; $INSTDIR travels through the same COCKATRICE_GUARD_DIR environment variable the
+; running-instance guard uses, so a path with apostrophes cannot break the
+; command and the directory never has to be embedded in it.
+;
+; Image paths are checked first: an instance the user started again while the
+; installer was running is the holder those checks can name. The module scan only
+; runs when that found nothing, and covers a process that loaded a DLL out of the
+; directory without its own image living there. Neither can see a plain file
+; handle held by something else - an antivirus scanner - and that absence is
+; itself an answer: nothing nameable is holding the files, so the codes logged
+; above are the whole story. The lookup is best effort by design; anything it
+; cannot inspect is skipped rather than reported as a failure, which is also what
+; keeps a third-party process that merely shares an image name out of the list.
+;
+; The entries read "cockatrice.exe (pid 24340, running)": the same string goes into
+; the abort message, where the user has to recognise the program and close it, so
+; it names the process the way Task Manager does instead of saying "image".
+Function LogProcessesUsingInstallDir
+    StrCpy $HolderExit 0
+    StrCpy $HolderOutput ""
+    StrCpy $HolderFound 0
+    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$INSTDIR")'
+    ; /TIMEOUT because this runs on the abort path, ahead of the message box: a
+    ; scan that stalls (the module pass walks every process on the machine) must
+    ; not leave the installer hanging with nothing on screen. On a timeout nsExec
+    ; reports it through the exit code and whatever output it captured, both of
+    ; which are logged like any other result.
+    nsExec::ExecToStack /TIMEOUT=60000 'powershell -NoProfile -Command "$$d=$$env:COCKATRICE_GUARD_DIR; $$r=@(); $$procs=Get-Process; foreach($$p in $$procs){ try { $$x=$$p.Path; if($$x -and $$x.StartsWith($$d,[StringComparison]::OrdinalIgnoreCase)){ $$r+=($$p.ProcessName+$\'.exe (pid $\'+$$p.Id.ToString()+$\', running)$\') } } catch {} }; if($$r.Count -eq 0){ foreach($$p in $$procs){ try { foreach($$m in $$p.Modules){ if($$m.FileName -and $$m.FileName.StartsWith($$d,[StringComparison]::OrdinalIgnoreCase)){ $$r+=($$p.ProcessName+$\'.exe (pid $\'+$$p.Id.ToString()+$\', using a DLL from there)$\'); break } } } catch {}; if($$r.Count -ge 5){break} } }; if($$r.Count -eq 0){ Write-Output $\'none$\'; exit 0 } else { Write-Output ($$r -join $\'; $\'); exit 1 }"'
+    Pop $HolderExit
+    Pop $HolderOutput
+    ; The exit code, not the text, decides whether anything was named: it cannot
+    ; be mangled by whatever nsExec leaves on the end of the captured output.
+    ${If} $HolderExit == "1"
+        StrCpy $HolderFound 1
+    ${EndIf}
+    ${If} $HolderOutput == ""
+        StrCpy $HolderOutput "the lookup produced no output"
+    ${EndIf}
+    !insertmacro CockLog "holders: $HolderOutput"
+FunctionEnd
+
 ; Uninstaller copies of the same routines (the uninstaller gets its own
 ; function set compiled in, it cannot call the installer functions).
 Function un.IsAppRunning
@@ -1512,6 +1643,26 @@ ${EndIf}
 
 ; Remove any runtime DLLs left over from older versions, so a mismatched
 ; Qt/OpenSSL/protobuf set cannot survive next to the new executables.
+;
+; A purge that fails is reported with evidence, not only as a survivor list: the
+; abort below logs which files survived, what Windows said about each of them and
+; which processes still have the install directory mapped (see
+; LogStaleRuntimeDiagnostics). Two alternatives were considered and dropped.
+;
+; Re-running the running-instance check here would only narrow the window the
+; uninstaller ExecWait and the backup/restore copy open between .onInit and this
+; point, and on /R it would now abort after the old version has already been
+; removed - leaving no install at all. The surviving files are the authority on
+; whether anything still holds the directory, and they are measured anyway.
+;
+; Restart Manager (RmRegisterResources/RmGetList) would name every holder,
+; including one that only has a plain file handle. It was dropped for this change
+; because marshalling RM_PROCESS_INFO through the System plugin is a table of
+; hand-computed offsets that cannot be validated without the Windows toolchain,
+; and the process-and-module scan covers the case that produced the abort log
+; this diagnostics was written for. It stays the right answer for a future change
+; that can be built and tested on Windows, and would then make the "no holder
+; named, only a code" branch unnecessary.
 Call IsExistingCockatriceInstall
 !insertmacro CockLog "section: IsExistingCockatriceInstall=$R0"
 ; Remembered because the stale-runtime check below must only ever fire for a
@@ -1525,6 +1676,11 @@ ${AndIf} $R0 = 1
 	!insertmacro CockLog "section: non-portable upgrade purge"
 	!insertmacro CockLogListing "before-purge" "*.dll"
 	RMDir /r "$INSTDIR\Plugins"
+	; RMDir /r reports a failure only through the error flag, and only as a
+	; boolean; the surviving file names come from the listing below.
+	${If} ${FileExists} "$INSTDIR\Plugins\*.*"
+		!insertmacro CockLog "purge: '$INSTDIR\Plugins' could not be removed completely"
+	${EndIf}
 	Delete "$INSTDIR\*.dll"
 	!insertmacro CockLogListing "after-purge" "*.dll"
 	!insertmacro CockLogListing "after-plugins" "Plugins\*.*"
@@ -1549,6 +1705,10 @@ ${EndIf}
 ${If} $R0 = 1
     !insertmacro CockLog "section: aborting, files of a previous version survived the purge"
     DetailPrint "Files of a previous version could not be removed; aborting the installation."
+    ; Who is holding the payload is recorded before the abort, so the log that
+    ; reaches us answers the question the message can only guess at, and so the
+    ; message can name the processes to close whenever any were found.
+    Call LogStaleRuntimeDiagnostics
     ; The in-app updater runs this installer silent and detached and never looks
     ; at its exit code, so the user has to be told what happened. A /S install
     ; without /R is unattended (a package manager, for instance) and a message
@@ -1556,6 +1716,9 @@ ${If} $R0 = 1
     ; and the exit code. AbortInstall owns that decision.
     StrCpy $AbortReason \
         "The installation could not remove all files of a previous version of Cockatrice, most likely because it is still running or was started as administrator, and was cancelled rather than leave a mismatched install behind.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice and run the installer again."
+    ${If} $HolderFound = 1
+        StrCpy $AbortReason "$AbortReason$\r$\n$\r$\nStill using the install directory:$\r$\n$HolderOutput"
+    ${EndIf}
     Call AbortInstall
 ${EndIf}
 
