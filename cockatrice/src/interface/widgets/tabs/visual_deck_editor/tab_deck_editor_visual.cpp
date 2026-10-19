@@ -268,11 +268,19 @@ void TabDeckEditorVisual::processDatabaseCardClick(const QMouseEvent *event, con
     if (event->button() == Qt::LeftButton) {
         if (QApplication::keyboardModifiers() & Qt::ControlModifier) {
             addCard(card, DECK_ZONE_SIDE);
+        } else if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
+            addCard(card, DECK_ZONE_MAYBEBOARD);
         } else {
             addCard(card, DECK_ZONE_MAIN);
         }
     } else if (event->button() == Qt::RightButton) {
-        decrementCard(card, DECK_ZONE_MAIN);
+        if (QApplication::keyboardModifiers() & Qt::ControlModifier) {
+            decrementCard(card, DECK_ZONE_SIDE);
+        } else if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
+            decrementCard(card, DECK_ZONE_MAYBEBOARD);
+        } else {
+            decrementCard(card, DECK_ZONE_MAIN);
+        }
     } else if (event->button() == Qt::MiddleButton) {
         deckDockWidget->actRemoveCard();
     }
