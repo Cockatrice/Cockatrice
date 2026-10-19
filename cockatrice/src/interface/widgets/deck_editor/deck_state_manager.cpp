@@ -234,10 +234,12 @@ QModelIndex DeckStateManager::decrementCard(const ExactCard &card, const QString
         return {};
     }
 
+    QString zone = card.getInfo().getIsToken() ? DECK_ZONE_TOKENS : zoneName;
+
     QString providerId = card.getPrinting().getUuid();
     QString collectorNumber = card.getPrinting().getProperty("num");
 
-    QModelIndex idx = deckListModel->findCard(card.getName(), zoneName, providerId, collectorNumber);
+    QModelIndex idx = deckListModel->findCard(card.getName(), zone, providerId, collectorNumber);
     if (!idx.isValid()) {
         return {};
     }
@@ -249,7 +251,7 @@ QModelIndex DeckStateManager::decrementCard(const ExactCard &card, const QString
     }
 
     // old index is no longer safe since rows could have been removed
-    QModelIndex newIdx = deckListModel->findCard(card.getName(), zoneName, providerId, collectorNumber);
+    QModelIndex newIdx = deckListModel->findCard(card.getName(), zone, providerId, collectorNumber);
     if (newIdx.isValid()) {
         emit focusIndexChanged(newIdx, true);
     }
