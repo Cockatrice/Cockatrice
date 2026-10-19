@@ -291,8 +291,13 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: |
           paths=()
-          for dir in build/cockatrice build/oracle build/servatrice; do
-            [[ -d $dir ]] && paths+=("$dir")
+          # The binaries only, not the directories: a directory makes sentry-cli walk the
+          # whole build tree, where it finds (and uploads) object files and other fragments
+          # that can never match a stack frame. The packaged copy is split and stripped by
+          # cpack, but keeps this binary's GNU build-id, which is how Sentry matches it.
+          for app in cockatrice oracle servatrice; do
+            binary="build/$app/$app"
+            [[ -f $binary ]] && paths+=("$binary")
           done
           if [[ ${#paths[@]} == 0 ]]; then
             # Fail loudly instead of skipping: see the Windows/macOS leg below — this step
@@ -897,17 +902,18 @@ jobs:
       # Ninja is single-config: binaries and their PDBs land directly in the
       # target directories instead of a Release subdirectory.
       #
-      # Archived for tag builds as well, and ordered after the release upload so
+      # Archived for tag builds only, and ordered after the release upload so
       # a missing PDB can never block a release from being published. On a tag
       # build this artifact is the only durable copy of the symbols: the Sentry
       # upload is continue-on-error, so without it a failed upload would lose
-      # the ability to symbolicate that release permanently.
+      # the ability to symbolicate that release permanently. Other builds upload
+      # no symbols at all, so archiving them there would only cost storage.
       #
       # The executables travel with their PDBs: re-uploading the pair together is
       # what lets sentry-cli associate the PE's code identifier with the PDB's
       # debug identifier, and the PE is what carries the unwind information.
       - name: "[Windows] Upload debug symbols (exe + pdb)"
-        if: matrix.os == 'Windows'
+        if: matrix.os == 'Windows' && needs.configure.outputs.tag != null
         uses: actions/upload-artifact@v7
         with:
           if-no-files-found: error
