@@ -179,3 +179,34 @@ if(WITH_CRASH_REPORTING
     )
   endif()
 endif()
+
+# Installer failure reporting (increment 4): parse COCKATRICE_SENTRY_DSN into the parts the Windows installer
+# needs. These are CPACK_* so CPack snapshots them at include(CPack) time and substitutes them into
+# cmake/NSIS.template.in at package time; on non-Windows they are inert (only the NSIS template consumes them).
+# Set from COCKATRICE_SENTRY_DSN on every configure, so a changed or removed DSN can never leave a stale value
+# behind. Plain variables, not CACHE: they only need to be in scope when include(CPack) later snapshots every
+# CPACK_* variable into CPackConfig.cmake.
+set(CPACK_SENTRY_ENABLED "0")
+set(CPACK_SENTRY_KEY "")
+set(CPACK_SENTRY_ENVELOPE_URL "")
+set(CPACK_SENTRY_DSN_FULL "")
+# Deliberately PROJECT_VERSION: that is what the client bakes as its Sentry release and what CI passes to
+# `sentry-cli debug-files upload`, so installer and client events group under one release. It is not the
+# CPACK_PACKAGE_VERSION the installer logs in its own log line — on Development tags PROJECT_VERSION carries a
+# "-<label>" suffix (getversion.cmake) while CPACK_PACKAGE_VERSION is only MAJOR.MINOR.PATCH.
+set(CPACK_SENTRY_RELEASE "${PROJECT_VERSION}")
+
+# Canonical <scheme>://<key>@<host>/<project-id>. Deliberately unanchored, so a trailing slash still matches.
+# A self-hosted DSN with a path prefix (e.g. GlitchTip behind a subpath) does not match and falls through to the
+# disabled-and-warn branch instead of deriving a wrong endpoint from the tail of the path.
+if(COCKATRICE_SENTRY_DSN MATCHES "(https?)://([^@]+)@([^/]+)/([0-9]+)")
+  set(CPACK_SENTRY_ENABLED "1")
+  set(CPACK_SENTRY_KEY "${CMAKE_MATCH_2}")
+  # Scheme comes from the DSN, not an assumption: self-hosted (GlitchTip) DSNs may be plain http.
+  set(CPACK_SENTRY_ENVELOPE_URL "${CMAKE_MATCH_1}://${CMAKE_MATCH_3}/api/${CMAKE_MATCH_4}/envelope/")
+  set(CPACK_SENTRY_DSN_FULL "${COCKATRICE_SENTRY_DSN}")
+elseif(NOT COCKATRICE_SENTRY_DSN STREQUAL "")
+  message(WARNING "COCKATRICE_SENTRY_DSN is set but malformed "
+                  "(expected <scheme>://<key>@<host>/<project-id>); installer log reporting disabled"
+  )
+endif()
