@@ -1530,11 +1530,22 @@ ${If} $PortableMode = 0
 	${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
 	IntFmt $0 "0x%08X" $0
 
-	; Enable Windows User-Mode Dumps
+	; No Windows Error Reporting LocalDumps registration: crash capture belongs to
+	; the in-app reporter (Sentry/breakpad, MiniDumpNormal-class data only). Opting
+	; machines into OS-level full dumps (DumpType 2) would leave unredacted memory
+	; dumps on user machines that nothing consumes.
 	; https://learn.microsoft.com/en-us/windows/win32/wer/collecting-user-mode-dumps
-	WriteRegExpandStr HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe" "DumpFolder" "%LOCALAPPDATA%\CrashDumps\Cockatrice"
-	WriteRegDWORD HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe" "DumpCount" "5"
-	WriteRegDWORD HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe" "DumpType" "2"
+
+	; Older installers did register cockatrice.exe above (and the removed
+	; MiniDumpWithFullMemory writer filled that folder), and that key survives this
+	; install, so WER would keep writing full dumps. Remove it, and clear the
+	; legacy dumps nothing consumes anymore. $LOCALAPPDATA resolves per shell context:
+	; under "all" it points at ProgramData, so switch to "current" for the per-user
+	; dumps folder and back afterwards; the registry delete works in either context.
+	DeleteRegKey HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe"
+	SetShellVarContext current
+	RMDir /r "$LOCALAPPDATA\CrashDumps\Cockatrice"
+	SetShellVarContext all
 
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayIcon" "$INSTDIR\cockatrice.exe"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayName" "Cockatrice"
@@ -1634,6 +1645,15 @@ Section "un.Application" UnSecApplication
 	RMDir /r "$SMPROGRAMS\Cockatrice"
 
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice"
+
+	; Leftover WER LocalDumps key from pre-Sentry installers (see the installer note
+	; above): removing it here covers machines that uninstall without reinstalling.
+	; The legacy full-memory dumps go with it; nothing consumes them anymore. Same shell
+	; context note as the installer: the per-user dumps folder needs "current".
+	DeleteRegKey HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe"
+	SetShellVarContext current
+	RMDir /r "$LOCALAPPDATA\CrashDumps\Cockatrice"
+	SetShellVarContext all
 
 	; Only remove the file/protocol associations if we registered them (i.e. the
 	; install was not portable) and .cod is still owned by Cockatrice, so we don't

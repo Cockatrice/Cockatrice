@@ -1,10 +1,14 @@
 #include "client/crash/crash_reporter.h"
 
 #include <QByteArray>
+#include <QCoreApplication>
 #include <QDir>
 #include <QFile>
+#include <QLockFile>
 #include <QString>
+#include <QSysInfo>
 #include <QTemporaryDir>
+#include <QTextStream>
 #include <gtest/gtest.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <string>
@@ -337,6 +341,81 @@ TEST(CrashReporterTest, AttachSkipsNoteWhenEmptyAndFindsRunDirEnvelopes)
     const QByteArray content = readFileBytes(envelopePath);
     ASSERT_TRUE(content.contains(QByteArrayLiteral("\"filename\":\"crash-log.txt\"")));
     ASSERT_FALSE(content.contains(QByteArrayLiteral("user-note.txt")));
+}
+
+TEST(CrashReporterTest, BeginSessionOnEmptyDirReportsClean)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    CrashReporter reporter;
+    ASSERT_FALSE(reporter.beginSession(dir.path()));
+    reporter.endSession();
+}
+
+TEST(CrashReporterTest, BeginSessionIgnoresLiveConcurrentInstance)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    // A second QLockFile held in-process stands in for a live concurrent instance: same
+    // pid, alive, so the scan must leave it alone and report a clean start.
+    QLockFile liveInstance(dir.filePath(QStringLiteral("session-424242")));
+    ASSERT_TRUE(liveInstance.tryLock(0));
+    CrashReporter reporter;
+    ASSERT_FALSE(reporter.beginSession(dir.path()));
+    ASSERT_TRUE(QFile::exists(liveInstance.fileName()));
+    reporter.endSession();
+    liveInstance.unlock();
+}
+
+TEST(CrashReporterTest, BeginSessionDetectsStaleDeadOwnerLock)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    // A well-formed lock whose owner is dead: our own pid (so the host matches) but a
+    // process name that cannot match, which is how QLockFile spots pid reuse. Must be
+    // reported unclean and cleaned up, even though the file is brand new (this is why
+    // the scan probes with staleLockTime 0 rather than the 30 s default).
+    const QString stalePath = dir.filePath(QStringLiteral("session-stale-owner"));
+    QFile stale(stalePath);
+    ASSERT_TRUE(stale.open(QIODevice::WriteOnly | QIODevice::Text));
+    QTextStream out(&stale);
+    out << QCoreApplication::applicationPid() << '\n'
+        << QStringLiteral("definitely-not-the-test-binary") << '\n'
+        << QSysInfo::machineHostName() << '\n';
+    stale.close();
+
+    CrashReporter reporter;
+    ASSERT_TRUE(reporter.beginSession(dir.path()));
+    ASSERT_FALSE(QFile::exists(stalePath));
+    reporter.endSession();
+}
+
+TEST(CrashReporterTest, BeginSessionCleansGarbageFileAndReportsUnclean)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    // An unreadable lock file has no live owner by definition: report unclean and remove it.
+    const QString garbagePath = dir.filePath(QStringLiteral("session-garbage"));
+    QFile garbage(garbagePath);
+    ASSERT_TRUE(garbage.open(QIODevice::WriteOnly));
+    garbage.write("not-a-lock-file\x00\xff", 17);
+    garbage.close();
+
+    CrashReporter reporter;
+    ASSERT_TRUE(reporter.beginSession(dir.path()));
+    ASSERT_FALSE(QFile::exists(garbagePath));
+    reporter.endSession();
+}
+
+TEST(CrashReporterTest, BeginSessionEndSessionRoundTripReportsClean)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    CrashReporter reporter;
+    ASSERT_FALSE(reporter.beginSession(dir.path()));
+    reporter.endSession();
+    ASSERT_FALSE(reporter.beginSession(dir.path()));
+    reporter.endSession();
 }
 
 } // namespace

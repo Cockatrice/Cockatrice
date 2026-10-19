@@ -46,6 +46,11 @@ jobs:
     outputs:
       tag: ${{ steps.configure.outputs.tag }}
       sha: ${{ steps.configure.outputs.sha }}
+      # MAJ.MIN.PATCH[-beta[.N]] of a tag build; empty otherwise. Mirrors what
+      # cmake/getversion.cmake derives as PROJECT_VERSION, which the client bakes as its
+      # Sentry release (cmake/CrashReporting.cmake) — symbol uploads must use the same
+      # string so stack traces de-symbolicate against this build's binaries.
+      sentry_release: ${{ steps.configure.outputs.sentry_release }}
 
     steps:
       - name: "Configure"
@@ -56,6 +61,9 @@ jobs:
         run: |
           if [[ "$GITHUB_REF_TYPE" == 'tag' ]]; then    # release
             echo "tag=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
+            # Tag format is YYYY-MM-DD-{Release|Development}-MAJ.MIN.PATCH[-beta[.N]];
+            # PROJECT_VERSION is the tail after the type (see cmake/getversion.cmake).
+            echo "sentry_release=$(sed -E 's/^[0-9]{4}-[0-9]{2}-[0-9]{2}-(Release|Development)-//' <<< "$GITHUB_REF_NAME")" >> "$GITHUB_OUTPUT"
           fi
           echo "sha=$RESOLVED_SHA" >> "$GITHUB_OUTPUT"
 
@@ -240,6 +248,11 @@ jobs:
           package: '${{ matrix.package }}'
           server_only: '${{ matrix.server_only }}'
           WITH_CRASH_REPORTING: 'ON'
+          # Tag builds only: artifacts from master pushes and PR branches must not report to
+          # Sentry. Forks get no secrets on pull_request, so they keep the mock fallback either way.
+          # configure.outputs.tag is set for ANY tag, so beta (Development) tags get the DSN
+          # and the symbol upload below just like full releases.
+          COCKATRICE_SENTRY_DSN: ${{ needs.configure.outputs.tag != null && secrets.SENTRY_DSN || '' }}
         run: |
           source .ci/docker.sh
           args=()
@@ -248,8 +261,57 @@ jobs:
           args+=(--ccache "$CCACHE_SIZE")
           args+=(--cmake-generator "$CMAKE_GENERATOR")
           args+=(--suffix "$SUFFIX")
+          # The container inherits no environment, so the DSN rides in explicitly. -e without
+          # =value passes it through (possibly empty); compile.sh only consumes it for Release
+          # configures, and empty keeps the mock fallback.
+          export RUN_ARGS="${RUN_ARGS:-} -e COCKATRICE_SENTRY_DSN"
 
           RUN --server --release --package "$package" "${args[@]}"
+
+      - name: "Install sentry-cli"
+        if: matrix.package != 'skip' && needs.configure.outputs.tag != null
+        # Downloads from Sentry's release registry: a Sentry outage or a broken install under
+        # Git Bash must not take down the release assets below.
+        continue-on-error: true
+        shell: bash
+        env:
+          SENTRY_CLI_VERSION: '3.8.0'
+        run: |
+          export INSTALL_DIR="$GITHUB_WORKSPACE/.sentry-cli"
+          curl -sL https://sentry.io/get-cli/ | bash
+          echo "$GITHUB_WORKSPACE/.sentry-cli" >> "$GITHUB_PATH"
+
+      - name: "Upload debug symbols to Sentry"
+        # Like the DSN above, this runs for every tag — beta (Development) tags included.
+        if: matrix.package != 'skip' && needs.configure.outputs.tag != null
+        # A Sentry outage or rotated token must not take down the release assets below.
+        continue-on-error: true
+        shell: bash
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        run: |
+          paths=()
+          # The binaries only, not the directories: a directory makes sentry-cli walk the
+          # whole build tree, where it finds (and uploads) object files and other fragments
+          # that can never match a stack frame. The packaged copy is split and stripped by
+          # cpack, but keeps this binary's GNU build-id, which is how Sentry matches it.
+          for app in cockatrice oracle servatrice; do
+            binary="build/$app/$app"
+            [[ -f $binary ]] && paths+=("$binary")
+          done
+          if [[ ${#paths[@]} == 0 ]]; then
+            # Fail loudly instead of skipping: see the Windows/macOS leg below — this step
+            # is the only way symbols reach Sentry and `continue-on-error` keeps the job
+            # green either way, so a silent skip looks exactly like a successful upload.
+            echo "::error::No debug symbol files found; nothing would be uploaded"
+            exit 1
+          fi
+          # Project slug on Sentry; must match the project the baked DSN points at.
+          # No --release here: `debug-files upload` has no such option (sentry-cli errors on
+          # the unknown flag and uploads nothing), and debug information files are matched to
+          # events by debug ID via the event's debug_meta, not by release. The release grouping
+          # comes from the client event itself (COCKATRICE_SENTRY_RELEASE).
+          sentry-cli debug-files upload --org cockatrice --project cockatrice-desktop "${paths[@]}"
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "Delete remote compiler cache (ccache)"
@@ -536,6 +598,11 @@ jobs:
           BUILDTYPE: '${{ matrix.type }}'
           CCACHE_EVICTION_AGE: ${{ matrix.ccache_eviction_age }}
           CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
+          # Tag builds only: artifacts from master pushes and PR branches must not report to
+          # Sentry. Forks get no secrets on pull_request, so they keep the mock fallback either way.
+          # configure.outputs.tag is set for ANY tag, so beta (Development) tags get the DSN
+          # and the symbol upload below just like full releases.
+          COCKATRICE_SENTRY_DSN: ${{ needs.configure.outputs.tag != null && secrets.SENTRY_DSN || '' }}
           DEVELOPER_DIR: '/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer'
           GITHUB_TOKEN: ${{ github.token }}    # needed for vcpkg dependency graph updates, see VCPKG_FEATURE_FLAGS
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
@@ -562,6 +629,121 @@ jobs:
           # Release legs compile the sentry-native SDK; Debug legs stay SDK-free.
           WITH_CRASH_REPORTING: ${{ matrix.type == 'Release' && 'ON' || '' }}
         run: .ci/compile.sh --server --test --vcpkg
+
+      - name: "Install sentry-cli"
+        if: needs.configure.outputs.tag != null && matrix.make_package == '1'
+        # Same as the Linux leg above: the install downloads from Sentry's registry, so a
+        # failure here must not block the release upload below.
+        continue-on-error: true
+        shell: bash
+        env:
+          SENTRY_CLI_VERSION: '3.8.0'
+        run: |
+          export INSTALL_DIR="$GITHUB_WORKSPACE/.sentry-cli"
+          curl -sL https://sentry.io/get-cli/ | bash
+          echo "$GITHUB_WORKSPACE/.sentry-cli" >> "$GITHUB_PATH"
+
+      - name: "Upload debug symbols to Sentry"
+        # Like the DSN above, this runs for every tag — beta (Development) tags included.
+        if: needs.configure.outputs.tag != null && matrix.make_package == '1'
+        # A Sentry outage or rotated token must not take down the release assets below.
+        continue-on-error: true
+        shell: bash
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        run: |
+          paths=()
+          if [[ '${{ matrix.os }}' == 'Windows' ]]; then
+            # Top-level CMakeLists.txt links /DEBUG even in release, so the linker PDBs
+            # land next to the binaries. Ninja is single-config, so that is
+            # build/<target>/ and NOT build/<target>/Release/ — the same globs the symbol
+            # artifact step below uses.
+            #
+            # The executables are uploaded as well, in the same invocation. On 64-bit
+            # Windows the Call Frame Information (.pdata/.xdata) lives in the PE and is
+            # not copied into the PDB, so a PDB on its own leaves Sentry reporting
+            # "Stack Unwinding: Missing" for the image. sentry-cli also needs to see the
+            # PE and its PDB together: only then does it associate the PE's code
+            # identifier with the PDB's debug identifier.
+            shopt -s nullglob
+            for target in cockatrice oracle servatrice; do
+              paths+=("build/$target"/*.exe "build/$target"/*.pdb)
+            done
+            shopt -u nullglob
+
+            # Qt's own runtime DLLs, taken from required-runtime.txt — the manifest
+            # .ci/compile.sh asserts the installer against — so the set uploaded is
+            # the set an install actually carries. The PE is the only carrier of
+            # unwind information for a 64-bit image, and sending it in the same
+            # invocation as a PDB is what lets sentry-cli associate the PE's code
+            # identifier with the PDB's debug identifier. Qt ships no PDBs with the
+            # SDK, so Qt frames resolve through the export table: names, no lines.
+            qt_dir=
+            qt_core_dir=
+            # Existence guards matter: the step runs under `bash -eo pipefail`, so a
+            # redirection-less sed over a missing file would abort the step outright
+            # and continue-on-error would hide it.
+            if [[ -f build/CMakeCache.txt ]]; then
+              qt_core_dir=$(sed -n 's/^Qt6Core_DIR:PATH=//p' build/CMakeCache.txt | head -1)
+            fi
+            if [[ -n $qt_core_dir ]]; then
+              qt_dir=$(dirname "$(dirname "$(dirname "$qt_core_dir")")")
+            fi
+            if [[ -z $qt_dir || ! -d $qt_dir ]]; then
+              # Warnings, not failures: the upload of our own binaries is what this
+              # step is for, and continue-on-error already means an upload failure
+              # cannot be told apart from a successful one.
+              echo "::warning::Qt runtime directory not resolved from build/CMakeCache.txt; Qt images get no unwind information"
+            elif [[ ! -f build/required-runtime.txt ]]; then
+              echo "::warning::build/required-runtime.txt is missing; cannot tell which Qt DLLs ship"
+            else
+              while IFS= read -r runtime; do
+                name=${runtime##*/}
+                if [[ $runtime == */* ]]; then
+                  # A Qt plugin: the install root keeps it as plugins/<type>/<name>.
+                  # `|| true`: an unmatched glob makes ls exit non-zero, and pipefail
+                  # turns that into a step abort.
+                  runtime_path=$(ls "$qt_dir/plugins"/*/"$name" 2>/dev/null | head -1) || true
+                else
+                  runtime_path="$qt_dir/bin/$name"
+                fi
+                if [[ -f ${runtime_path:-} ]]; then
+                  paths+=("$runtime_path")
+                else
+                  echo "::warning::shipped Qt runtime $runtime not found under $qt_dir"
+                fi
+              done < <(grep -E '^(Qt6[^/]*\.dll|Plugins/)' build/required-runtime.txt)
+            fi
+          else
+            # Release builds carry DWARF (-g, kept by CrashReporting.cmake); macOS keeps its
+            # debug info in dSYM bundles, so materialize them before uploading.
+            for app in cockatrice oracle servatrice; do
+              binary="build/$app/$app.app/Contents/MacOS/$app"
+              if [[ -f $binary ]]; then
+                if [[ '${{ matrix.os }}' == 'macOS' ]]; then
+                  dsymutil "$binary" -o "$binary.dSYM"
+                  paths+=("$binary.dSYM")
+                  # The dSYM holds the debug information, but the unwind information
+                  # Sentry needs to walk a minidump stack lives in the Mach-O itself.
+                  paths+=("$binary")
+                else
+                  paths+=("$binary")
+                fi
+              fi
+            done
+          fi
+          if [[ ${#paths[@]} == 0 ]]; then
+            # Fail loudly instead of skipping: this step is the only way symbols reach
+            # Sentry, and `continue-on-error` keeps the job green either way, so a
+            # silent skip is indistinguishable from a successful upload. It also hid a
+            # wrong Windows path (build/<target>/Release, which Ninja never creates).
+            echo "::error::No debug symbol files found; nothing would be uploaded"
+            exit 1
+          fi
+          # Project slug on Sentry; must match the project the baked DSN points at.
+          # No --release: see the Linux leg above — the flag does not exist on
+          # `debug-files upload` and DIFs are matched by debug ID, not release.
+          sentry-cli debug-files upload --org cockatrice --project cockatrice-desktop "${paths[@]}"
 
       # CPack reports a failed makensis run as "Problem running NSIS command"
       # plus a path to NSISOutput.log, and that log lives only on the runner, so
@@ -706,19 +888,6 @@ jobs:
           if-no-files-found: error
           path: ${{ steps.build.outputs.path }}
 
-      # Ninja is single-config: binaries and their PDBs land directly in the
-      # target directories instead of a Release subdirectory.
-      - name: "[Windows] Upload PDBs (Program Databases)"
-        if: matrix.os == 'Windows' && github.ref_type != 'tag'
-        uses: actions/upload-artifact@v7
-        with:
-          if-no-files-found: error
-          name: ${{ steps.build.outputs.name }}-PDBs
-          path: |
-            build/cockatrice/*.pdb
-            build/oracle/*.pdb
-            build/servatrice/*.pdb
-
       - name: "Upload to release"
         if: needs.configure.outputs.tag != null && matrix.make_package == '1'
         id: upload_release
@@ -729,6 +898,33 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           tag_name: ${{ needs.configure.outputs.tag }}
         run: gh release upload "$tag_name" "$asset_path#$asset_name"
+
+      # Ninja is single-config: binaries and their PDBs land directly in the
+      # target directories instead of a Release subdirectory.
+      #
+      # Archived for tag builds only, and ordered after the release upload so
+      # a missing PDB can never block a release from being published. On a tag
+      # build this artifact is the only durable copy of the symbols: the Sentry
+      # upload is continue-on-error, so without it a failed upload would lose
+      # the ability to symbolicate that release permanently. Other builds upload
+      # no symbols at all, so archiving them there would only cost storage.
+      #
+      # The executables travel with their PDBs: re-uploading the pair together is
+      # what lets sentry-cli associate the PE's code identifier with the PDB's
+      # debug identifier, and the PE is what carries the unwind information.
+      - name: "[Windows] Upload debug symbols (exe + pdb)"
+        if: matrix.os == 'Windows' && needs.configure.outputs.tag != null
+        uses: actions/upload-artifact@v7
+        with:
+          if-no-files-found: error
+          name: ${{ steps.build.outputs.name }}-Symbols
+          path: |
+            build/cockatrice/*.exe
+            build/cockatrice/*.pdb
+            build/oracle/*.exe
+            build/oracle/*.pdb
+            build/servatrice/*.exe
+            build/servatrice/*.pdb
 
       - name: "Attest binary provenance"
         if: steps.upload_release.outcome == 'success'
