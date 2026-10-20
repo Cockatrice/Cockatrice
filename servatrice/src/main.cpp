@@ -222,6 +222,10 @@ int main(int argc, char *argv[])
         retval = EXIT_FAILURE;
     }
 
+    // The handler reads the logger and settingsCache globals torn down below; leaving it
+    // installed lets Qt's own shutdown warnings dereference freed memory.
+    qInstallMessageHandler(nullptr);
+
     delete smtpClient;
     delete rng;
     delete signalhandler;
