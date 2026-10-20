@@ -133,6 +133,10 @@ ExactCard CardDatabaseQuerier::getCard(const CardRef &cardRef) const
 ExactCard CardDatabaseQuerier::guessCard(const CardRef &cardRef) const
 {
     auto card = lookupCardByName(cardRef.name);
+    if (!card) {
+        return {};
+    }
+
     auto printing =
         cardRef.providerId.isEmpty() ? getPreferredPrinting(card) : findPrintingWithId(card, cardRef.providerId);
 
@@ -173,10 +177,14 @@ ExactCard CardDatabaseQuerier::getCardFromSameSet(const QString &cardName, const
  *
  * @param cardInfo The CardInfo to search
  * @param providerId The uuid to look for
- * @return The PrintingInfo, or a default-constructed PrintingInfo if not found.
+ * @return The PrintingInfo, or a default-constructed PrintingInfo if not found or if cardInfo is null.
  */
 PrintingInfo CardDatabaseQuerier::findPrintingWithId(const CardInfoPtr &cardInfo, const QString &providerId) const
 {
+    if (!cardInfo) {
+        return PrintingInfo();
+    }
+
     for (const auto &printings : cardInfo->getSets()) {
         for (const auto &printing : printings) {
             if (printing.getUuid() == providerId) {

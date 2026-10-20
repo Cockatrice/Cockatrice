@@ -1,6 +1,7 @@
 #include "libcockatrice/card/database/card_database.h"
 #include "libcockatrice/card/database/card_database_loader.h"
 #include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
 #include "libcockatrice/card/set/card_set.h"
 #include "libcockatrice/card/set/card_set_list.h"
 #include "test_card_database_path_provider.h"
@@ -29,6 +30,7 @@
 #include <libcockatrice/interfaces/interface_card_set_priority_controller.h>
 #include <libcockatrice/interfaces/noop_card_preference_provider.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
+#include <libcockatrice/utility/card_ref.h>
 #include <string>
 
 namespace
@@ -58,6 +60,31 @@ TEST(CardDatabaseTest, LoadXml)
     ASSERT_EQ(0, db->getSetList().size()) << "Sets not empty after clear";
     ASSERT_EQ(0, db->query()->getAllMainCardTypes().size()) << "Types not empty after clear";
     ASSERT_EQ(NotLoaded, db->getLoadStatus()) << "Incorrect status after clear";
+}
+
+TEST(CardDatabaseTest, GuessCardWithProviderIdOnUnknownCardReturnsEmpty)
+{
+    // An unknown name plus a providerId used to dereference the missing card
+    // inside findPrintingWithId(); the lookup must come back empty instead.
+    NoopCardPreferenceProvider prefs;
+    TestCardDatabasePathProvider pathProvider;
+    NoopCardSetPriorityController controller;
+    CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
+
+    const ExactCard guessed = db.query()->guessCard({"Not a Card", "card_Not a Card_fixture"});
+
+    EXPECT_TRUE(guessed.isEmpty());
+    EXPECT_FALSE(guessed);
+}
+
+TEST(CardDatabaseTest, FindPrintingWithIdOnNullCardInfoReturnsEmpty)
+{
+    NoopCardPreferenceProvider prefs;
+    TestCardDatabasePathProvider pathProvider;
+    NoopCardSetPriorityController controller;
+    CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
+
+    EXPECT_TRUE(db.query()->findPrintingWithId(nullptr, "card_Not a Card_fixture").isEmpty());
 }
 
 TEST(CardDatabaseTest, Xml4LocalizedDataRoundTrip)
