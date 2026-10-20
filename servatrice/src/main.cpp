@@ -170,7 +170,8 @@ int main(int argc, char *argv[])
 
     loggerThread = new QThread;
     loggerThread->setObjectName("logger");
-    logger = new ServerLogger(logToConsole);
+    logger = new ServerLogger(logToConsole, settingsCache->value("server/writelog", 1).toBool(),
+                              settingsCache->value("server/logfilters").toString());
     logger->moveToThread(loggerThread);
 
     loggerThread->start();
