@@ -65,7 +65,7 @@ TypeQuery <- [tT] 'ype'? ws? [:] ws? StringValue
 Color <- < [Ww] 'hite'? / [Uu] / [Bb] 'lack'? / [Rr] 'ed'? / [Gg] 'reen'?  / [Bb] 'lue'? >
 ColorEx <- Color / [mc]
 
-ColorQuery <- [cC] 'olor'? ws? <[iI]?> ws? <[:!]> ws? ColorEx*
+ColorQuery <- [cC] 'olor'? <[iI]?> ws? <[:!]> ws? ColorEx*
 
 FieldQuery <- String ws? [:] ws? MatcherString / String ws? NumericExpression
 

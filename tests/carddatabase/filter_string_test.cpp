@@ -118,6 +118,22 @@ CardInfoPtr localizedCat()
     return localized;
 }
 
+CardInfoPtr greenIdentityCard()
+{
+    return CardInfo::newInstance("Identity Cat", "", false, {{"colors", "G"}, {"coloridentity", "G"}}, {}, {}, {}, {});
+}
+
+// Whitespace belongs around the separator, never inside an operator token: "c i: g" must not
+// be read as the color-identity operator "ci" (it is a generic "c" AND a field query on "i").
+TEST_F(CardQuery, ColorIdentityOperatorIsNotSplitByWhitespace)
+{
+    const CardData identityCard = greenIdentityCard();
+    ASSERT_TRUE(FilterString("ci:g").check(identityCard));
+    ASSERT_TRUE(FilterString("ci: g").check(identityCard));
+    ASSERT_TRUE(FilterString("ci : g").check(identityCard));
+    ASSERT_FALSE(FilterString("c i: g").check(identityCard));
+}
+
 TEST_F(CardQuery, SearchLanguageEnglishMatchesOnlyEnglish)
 {
     const CardData localized = localizedCat();
