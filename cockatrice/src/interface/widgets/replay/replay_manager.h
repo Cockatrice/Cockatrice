@@ -66,6 +66,16 @@ public:
         return replayTimeline;
     }
 
+    /**
+     * @brief Index of the last event the game state has processed.
+     *
+     * @return The event index, or -1 while no event has been replayed yet
+     */
+    [[nodiscard]] int getLastProcessedEventIndex() const
+    {
+        return currentEvent - 1;
+    }
+
     void setTimeScaleFactor(qreal _timeScaleFactor);
     void setSkipEmptySections(bool value);
 

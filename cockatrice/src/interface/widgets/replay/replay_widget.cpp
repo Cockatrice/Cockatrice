@@ -19,6 +19,11 @@
 
 class GameReplay;
 
+int ReplayWidget::getLastProcessedEventIndex() const
+{
+    return replayManager->getLastProcessedEventIndex();
+}
+
 ReplayWidget::ReplayWidget(QWidget *parent, GameReplay *replay)
     : QWidget(parent), replayPlayButton(nullptr), replayFastForwardButton(nullptr), aReplaySkipForward(nullptr),
       aReplaySkipBackward(nullptr), aReplaySkipForwardBig(nullptr), aReplaySkipBackwardBig(nullptr)
