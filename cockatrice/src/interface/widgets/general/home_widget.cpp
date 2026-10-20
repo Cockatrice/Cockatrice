@@ -125,14 +125,7 @@ void HomeWidget::retranslateUi()
         exitButton->setText(tr("Quit"));
     }
 
-    if (!connectionStatus) {
-        return;
-    }
-
-    switch (*connectionStatus) {
-        case StatusConnecting:
-            connectButton->setText(tr("Connecting..."));
-            break;
+    switch (connectionStatus) {
         case StatusDisconnected:
             connectButton->setText(tr("Connect"));
             break;
@@ -140,6 +133,8 @@ void HomeWidget::retranslateUi()
             connectButton->setText(tr("Play"));
             break;
         default:
+            // Connecting, registering, activating, logging in, etc.
+            connectButton->setText(tr("Connecting..."));
             break;
     }
 }
@@ -315,7 +310,7 @@ QGroupBox *HomeWidget::createButtons()
     updateLogoOverlay();
     boxLayout->addSpacing(25);
 
-    connectButton = new HomeStyledButton("Connect/Play", gradientColors);
+    connectButton = new HomeStyledButton(QString(), gradientColors);
     boxLayout->addWidget(connectButton);
 
     visualDeckEditorButton = new HomeStyledButton(QString(), gradientColors);
@@ -352,20 +347,18 @@ QGroupBox *HomeWidget::createButtons()
 
 void HomeWidget::updateConnectButton(const ClientStatus status)
 {
+    connectionStatus = status;
     disconnect(connectButton, &QPushButton::clicked, nullptr, nullptr);
     switch (status) {
         case StatusConnecting:
-            connectionStatus = status;
             connectButton->setEnabled(false);
             break;
         case StatusDisconnected:
-            connectionStatus = status;
             connectButton->setEnabled(true);
             connect(connectButton, &QPushButton::clicked, qobject_cast<MainWindow *>(tabSupervisor->parentWidget()),
                     &MainWindow::actConnect);
             break;
         case StatusLoggedIn:
-            connectionStatus = status;
             connectButton->setEnabled(true);
             connect(connectButton, &QPushButton::clicked, tabSupervisor,
                     &TabSupervisor::switchToFirstAvailableNetworkTab);
