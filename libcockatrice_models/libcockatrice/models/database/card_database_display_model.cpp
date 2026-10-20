@@ -82,13 +82,12 @@ int CardDatabaseDisplayModel::rowCount(const QModelIndex &parent) const
 
 bool CardDatabaseDisplayModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
 {
-
-    QString leftString = sourceModel()->data(left, CardDatabaseModel::SortRole).toString();
-    QString rightString = sourceModel()->data(right, CardDatabaseModel::SortRole).toString();
+    const QString leftString = sourceModel()->data(left, CardDatabaseModel::SortRole).toString();
+    const QString rightString = sourceModel()->data(right, CardDatabaseModel::SortRole).toString();
 
     if (!cardName.isEmpty() && left.column() == CardDatabaseModel::NameColumn) {
-        bool isLeftType = leftString.startsWith(cardName, Qt::CaseInsensitive);
-        bool isRightType = rightString.startsWith(cardName, Qt::CaseInsensitive);
+        const bool isLeftType = leftString.startsWith(cardName, Qt::CaseInsensitive);
+        const bool isRightType = rightString.startsWith(cardName, Qt::CaseInsensitive);
 
         // test for an exact match: isLeftType && leftString.size() == cardName.size()
         // or an exclusive start match: isLeftType && !isRightType
@@ -101,31 +100,36 @@ bool CardDatabaseDisplayModel::lessThan(const QModelIndex &left, const QModelInd
             return false;
         }
     } else if (right.column() == CardDatabaseModel::PTColumn && left.column() == CardDatabaseModel::PTColumn) {
-        QStringList leftList = leftString.split("/");
-        QStringList rightList = rightString.split("/");
+        // The comparator runs O(n log n) times while the view is sorted, so
+        // splitting every power/toughness string into a QStringList allocates
+        // a lot for data that has exactly one separator. Work on views and
+        // only split the two halves out when both strings are well formed.
+        const QStringView leftPT = leftString;
+        const QStringView rightPT = rightString;
+        const qsizetype leftSlash = leftPT.indexOf(u'/');
+        const qsizetype rightSlash = rightPT.indexOf(u'/');
 
-        if (leftList.size() == 2 && rightList.size() == 2) {
-
-            // cool, have both P/T in list now
-            int lessThanNum = lessThanNumerically(leftList.at(0), rightList.at(0));
-            if (lessThanNum != 0) {
-                return lessThanNum < 0;
-            } else {
-                // power equal, check toughness
-                return lessThanNumerically(leftList.at(1), rightList.at(1)) < 0;
+        if (leftSlash >= 0 && rightSlash >= 0 && leftPT.indexOf(u'/', leftSlash + 1) < 0 &&
+            rightPT.indexOf(u'/', rightSlash + 1) < 0) {
+            const int powerComparison = lessThanNumerically(leftPT.left(leftSlash), rightPT.left(rightSlash));
+            if (powerComparison != 0) {
+                return powerComparison < 0;
             }
+            // power equal, check toughness
+            return lessThanNumerically(leftPT.mid(leftSlash + 1), rightPT.mid(rightSlash + 1)) < 0;
         }
     }
     return QString::localeAwareCompare(leftString, rightString) < 0;
 }
 
-int CardDatabaseDisplayModel::lessThanNumerically(const QString &left, const QString &right)
+int CardDatabaseDisplayModel::lessThanNumerically(QStringView left, QStringView right)
 {
     if (left == right) {
         return 0;
     }
 
-    bool okLeft, okRight;
+    bool okLeft = false;
+    bool okRight = false;
     float leftNum = left.toFloat(&okLeft);
     float rightNum = right.toFloat(&okRight);
 
@@ -139,11 +143,11 @@ int CardDatabaseDisplayModel::lessThanNumerically(const QString &left, const QSt
         }
     }
     // try and parsing again, for weird ones like "1+*"
-    QString leftAfterNum = "";
-    QString rightAfterNum = "";
+    QStringView leftAfterNum;
+    QStringView rightAfterNum;
     if (!okLeft) {
         int leftNumIndex = 0;
-        for (; leftNumIndex < left.length(); leftNumIndex++) {
+        for (; leftNumIndex < left.size(); leftNumIndex++) {
             if (!left.at(leftNumIndex).isDigit()) {
                 break;
             }
@@ -155,7 +159,7 @@ int CardDatabaseDisplayModel::lessThanNumerically(const QString &left, const QSt
     }
     if (!okRight) {
         int rightNumIndex = 0;
-        for (; rightNumIndex < right.length(); rightNumIndex++) {
+        for (; rightNumIndex < right.size(); rightNumIndex++) {
             if (!right.at(rightNumIndex).isDigit()) {
                 break;
             }
