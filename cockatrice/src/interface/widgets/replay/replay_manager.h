@@ -40,10 +40,10 @@ class ReplayManager : public QObject
                                   ///< to rewind buffering
     int currentEvent = 0;         ///< current event's index
 
-    void skipToTime(int newTime, bool doRewindBuffering);
-    void handleBackwardsSkip(bool doRewindBuffering);
-    void processRewind();
-    void processNewEvents(PlaybackMode playbackMode);
+    void skipToTime(int newTime, bool doRewindBuffering, bool includeEventsAtTime = false);
+    void handleBackwardsSkip(bool doRewindBuffering, bool includeEventsAtTime = false);
+    void processRewind(bool includeEventsAtTime = false);
+    void processNewEvents(PlaybackMode playbackMode, bool includeEventsAtTime = false);
     void handleSkipEmptySection();
 
 private slots:
@@ -73,6 +73,7 @@ public slots:
     void startReplay();
     void stopReplay();
     void setTime(int time);
+    void setTimeToEvent(int eventIndex);
     void skipByAmount(int amount); // use a negative amount to skip backwards
 
 signals:
