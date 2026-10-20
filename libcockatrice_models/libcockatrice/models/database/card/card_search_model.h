@@ -51,13 +51,8 @@ private:
     {
         CardInfoPtr card;
         int distance;
+        int nameLength;
     };
-
-    /** @brief The names a card is searched by with the current search language. */
-    [[nodiscard]] QStringList searchableNames(const CardInfoPtr &card) const;
-
-    /** @brief The name used to break distance ties when sorting suggestions. */
-    [[nodiscard]] QString sortableName(const CardInfoPtr &card) const;
 
     CardDatabaseDisplayModel *sourceModel;
     QList<SearchResult> searchResults;

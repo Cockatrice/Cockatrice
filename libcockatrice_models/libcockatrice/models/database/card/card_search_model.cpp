@@ -57,6 +57,7 @@ void CardSearchModel::updateSearchResults(const QString &query)
     }
 
     const QString lowerQuery = query.toLower();
+    const bool englishOnly = searchLanguage.isEnglishOnly();
 
     QList<SearchResult> prefixMatches;
     QList<SearchResult> containsMatches;
@@ -72,28 +73,45 @@ void CardSearchModel::updateSearchResults(const QString &query)
         // The completer suggestions match against the same languages the card
         // search uses, so typing a localized name finds the card. In Both mode
         // either language can match.
-        for (const QString &matchName : searchableNames(card)) {
-            const QString lowerName = matchName.toLower();
+        QString lowerName;
+        if (englishOnly) {
+            lowerName = card->getName().toLower();
             if (!lowerName.contains(lowerQuery)) {
                 continue;
             }
-
-            const int distance = levenshteinDistance(lowerQuery, lowerName);
-
-            if (lowerName.startsWith(lowerQuery)) {
-                prefixMatches.append({card, distance});
-            } else {
-                containsMatches.append({card, distance});
+        } else if (searchLanguage.mode == SearchLanguageMode::Selected) {
+            lowerName = card->getLocalizedName(searchLanguage.language).toLower();
+            if (!lowerName.contains(lowerQuery)) {
+                continue;
             }
-            break;
+        } else {
+            lowerName = card->getName().toLower();
+            if (!lowerName.contains(lowerQuery)) {
+                lowerName = card->getLocalizedName(searchLanguage.language).toLower();
+                if (!lowerName.contains(lowerQuery)) {
+                    continue;
+                }
+            }
+        }
+
+        const int distance = levenshteinDistance(lowerQuery, lowerName);
+        // Length of the name used to break distance ties. Stored here so the
+        // comparator does not look the name up again for every comparison.
+        const int nameLength =
+            static_cast<int>((englishOnly ? card->getName() : card->getLocalizedName(searchLanguage.language)).size());
+
+        if (lowerName.startsWith(lowerQuery)) {
+            prefixMatches.append({card, distance, nameLength});
+        } else {
+            containsMatches.append({card, distance, nameLength});
         }
     }
 
-    auto sortByDistanceThenLength = [this](const SearchResult &a, const SearchResult &b) {
+    auto sortByDistanceThenLength = [](const SearchResult &a, const SearchResult &b) {
         if (a.distance != b.distance) {
             return a.distance < b.distance;
         }
-        return sortableName(a.card).size() < sortableName(b.card).size();
+        return a.nameLength < b.nameLength;
     };
 
     std::sort(prefixMatches.begin(), prefixMatches.end(), sortByDistanceThenLength);
@@ -110,26 +128,4 @@ void CardSearchModel::updateSearchResults(const QString &query)
     }
 
     endResetModel();
-}
-
-QStringList CardSearchModel::searchableNames(const CardInfoPtr &card) const
-{
-    if (searchLanguage.isEnglishOnly()) {
-        return {card->getName()};
-    }
-
-    const QString localizedName = card->getLocalizedName(searchLanguage.language);
-    if (searchLanguage.mode == SearchLanguageMode::Selected) {
-        return {localizedName};
-    }
-
-    return {card->getName(), localizedName};
-}
-
-QString CardSearchModel::sortableName(const CardInfoPtr &card) const
-{
-    if (searchLanguage.isEnglishOnly()) {
-        return card->getName();
-    }
-    return card->getLocalizedName(searchLanguage.language);
 }
