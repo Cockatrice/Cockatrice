@@ -123,6 +123,7 @@ signals:
 
 protected:
     void logDebugMessage(const QString &message) override;
+    [[nodiscard]] bool logsDebugMessages() const override;
     bool tooManyRegistrationAttempts(const QString &ipAddress);
     void processCommandContainer(const CommandContainer &cont) override;
     bool acceptsCredentialFormat(bool passwordNeedsHash, const QString &password) const;
