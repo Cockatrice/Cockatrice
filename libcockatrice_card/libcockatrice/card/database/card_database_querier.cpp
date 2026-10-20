@@ -182,7 +182,7 @@ ExactCard CardDatabaseQuerier::getCardFromSameSet(const QString &cardName, const
 PrintingInfo CardDatabaseQuerier::findPrintingWithId(const CardInfoPtr &cardInfo, const QString &providerId) const
 {
     if (!cardInfo) {
-        return PrintingInfo(nullptr);
+        return PrintingInfo();
     }
 
     for (const auto &printings : cardInfo->getSets()) {
