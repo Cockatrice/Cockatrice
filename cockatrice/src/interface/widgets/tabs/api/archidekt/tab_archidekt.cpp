@@ -343,7 +343,7 @@ void TabArchidekt::connectSignals()
     // Format filters trigger search
     connect(edhBracketCombo, &QComboBox::currentIndexChanged, this, &TabArchidekt::doSearch);
     connect(minDeckSizeSpin, qOverload<int>(&QSpinBox::valueChanged), this, &TabArchidekt::doSearch);
-    connect(minDeckSizeLogicCombo, &QComboBox::currentTextChanged, this, &TabArchidekt::doSearch);
+    connect(minDeckSizeLogicCombo, &QComboBox::currentIndexChanged, this, &TabArchidekt::doSearch);
 
     // Allow Enter key in text fields to trigger search
     connect(nameField, &QLineEdit::returnPressed, this, &TabArchidekt::doSearchImmediate);
@@ -394,12 +394,14 @@ void TabArchidekt::retranslateUi()
     deckTagNameField->setPlaceholderText(tr("Tag..."));
 
     bracketLabel->setText(tr("Bracket:"));
+    // Index 0 is the "Any" placeholder added in setupFilterWidgets()
     edhBracketCombo->setItemText(0, tr("Any"));
 
     formatButton->setButtonText(tr("Formats"));
     deckSizeButton->setButtonText(tr("Deck Size"));
     cardsLabel->setText(tr("Cards:"));
     minDeckSizeSpin->setSpecialValueText(tr("Any"));
+    minDeckSizeLogicCombo->setItemText(0, tr("Exact"));
 
     searchButton->setText(tr("Search"));
 
@@ -489,13 +491,17 @@ QString TabArchidekt::buildSearchUrl()
         query.addQueryItem("size", QString::number(minDeckSizeSpin->value()));
 
         QString logic = "GTE";
-        QString selected = minDeckSizeLogicCombo->currentText();
-        if (selected == "≥") {
-            logic = "GTE";
-        } else if (selected == "≤") {
-            logic = "LTE";
-        } else {
-            logic = "";
+        // Index order matches setupFilterWidgets(): 0 = Exact, 1 = ≥, 2 = ≤
+        switch (minDeckSizeLogicCombo->currentIndex()) {
+            case 1:
+                logic = "GTE";
+                break;
+            case 2:
+                logic = "LTE";
+                break;
+            default:
+                logic = "";
+                break;
         }
 
         if (!logic.isEmpty()) {

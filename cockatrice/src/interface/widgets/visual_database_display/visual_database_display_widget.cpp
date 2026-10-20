@@ -262,6 +262,10 @@ void VisualDatabaseDisplayWidget::retranslateUi()
 {
     databaseLoadIndicator->setText(tr("Loading database ..."));
     clearFilterWidget->setToolTip(tr("Clear all filters"));
+    searchEdit->setPlaceholderText(tr("Search by card name (or search expressions)"));
+    displayModeButton->setText(displayModeButton->isChecked() ? tr("Table") : tr("Visual"));
+    colorFilterWidget->retranslateUi();
+    filterContainer->retranslateUi();
 }
 
 void VisualDatabaseDisplayWidget::highlightAllSearchEdit()
