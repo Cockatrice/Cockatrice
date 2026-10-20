@@ -41,6 +41,7 @@
 #include <QThread>
 #include <QVariant>
 #include <QVector>
+#include <cstdlib>
 #include <google/protobuf/stubs/common.h>
 #include <iostream>
 #include <libcockatrice/rng/rng_sfmt.h>
@@ -162,7 +163,7 @@ int main(int argc, char *argv[])
         configPath = SettingsCache::guessConfigurationPath();
     } else if (!QFile::exists(configPath)) {
         qCritical() << "Could not find configuration file at" << configPath;
-        return 1;
+        return EXIT_FAILURE;
     }
     qWarning() << "Using configuration file: " << configPath;
     settingsCache = new SettingsCache(configPath);
@@ -214,6 +215,10 @@ int main(int argc, char *argv[])
 
         std::cerr << "Server quit." << std::endl;
         std::cerr << "-------------------------" << std::endl;
+    } else {
+        // initServer() logged the reason; a failed startup must not look like a clean exit.
+        std::cerr << "Server initialization failed, exiting." << std::endl;
+        retval = EXIT_FAILURE;
     }
 
     delete smtpClient;
