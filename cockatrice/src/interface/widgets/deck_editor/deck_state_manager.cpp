@@ -234,14 +234,29 @@ QModelIndex DeckStateManager::decrementCard(const ExactCard &card, const QString
         return {};
     }
 
-    QString zone = card.getInfo().getIsToken() ? DECK_ZONE_TOKENS : zoneName;
+    QString zone = zoneName;
 
     QString providerId = card.getPrinting().getUuid();
     QString collectorNumber = card.getPrinting().getProperty("num");
 
     QModelIndex idx = deckListModel->findCard(card.getName(), zone, providerId, collectorNumber);
+
     if (!idx.isValid()) {
-        return {};
+
+        // Tokens are usually added to the token zone, but it is possible for imported/hand-edited
+        // decks to contain them in the main or sideboards. This is why we only try to remove the
+        // token from the token zone if it does not exist in the given zone, allowing us to still
+        // remove it from there.
+        if (card.getInfo().getIsToken()) {
+            zone = DECK_ZONE_TOKENS;
+            idx = deckListModel->findCard(card.getName(), zone, providerId, collectorNumber);
+
+            if (!idx.isValid()) {
+                return {};
+            }
+        } else {
+            return {};
+        }
     }
 
     bool success = offsetCountAtIndex(idx, -1);
