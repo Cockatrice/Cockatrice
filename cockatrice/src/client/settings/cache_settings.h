@@ -99,6 +99,7 @@ private:
 
 public:
     SettingsCache();
+    ~SettingsCache() override;
     QString getDataPath();
     QString getSettingsPath();
     [[nodiscard]] QString getCachePath() const;
