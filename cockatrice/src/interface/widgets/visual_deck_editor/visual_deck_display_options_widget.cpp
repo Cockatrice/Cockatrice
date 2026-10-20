@@ -111,6 +111,13 @@ void VisualDeckDisplayOptionsWidget::retranslateUi()
     sortByLabel->setText(tr("Sort by:"));
     sortLabel->setText(tr("Click and drag to change the sort order within the groups"));
     sortCriteriaButton->setToolTip(tr("Configure how cards are sorted within their groups"));
+    updateDisplayTypeButton();
+    displayTypeButton->setToolTip(
+        tr("Change how cards are displayed within zones (i.e. overlapped or fully visible.)"));
+}
+
+void VisualDeckDisplayOptionsWidget::updateDisplayTypeButton()
+{
     switch (currentDisplayType) {
         case DisplayType::Flat:
             displayTypeButton->setButtonText(tr("Toggle Layout: Flat"));
@@ -121,8 +128,6 @@ void VisualDeckDisplayOptionsWidget::retranslateUi()
             displayTypeButton->setButtonIcon(themePixmap(QStringLiteral("icons/scales")));
             break;
     }
-    displayTypeButton->setToolTip(
-        tr("Change how cards are displayed within zones (i.e. overlapped or fully visible.)"));
 }
 
 void VisualDeckDisplayOptionsWidget::changeEvent(QEvent *event)
@@ -149,8 +154,8 @@ void VisualDeckDisplayOptionsWidget::updateDisplayType()
     // Toggle the display type
     currentDisplayType = (currentDisplayType == DisplayType::Overlap) ? DisplayType::Flat : DisplayType::Overlap;
 
-    // Update UI and emit signal
-    retranslateUi();
+    // Update only the toggle button, not every string in the widget
+    updateDisplayTypeButton();
     emit displayTypeChanged(currentDisplayType);
 }
 

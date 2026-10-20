@@ -58,6 +58,7 @@ public slots:
      * @brief Updates all UI text for retranslation/localization.
      *
      * Called when the application language changes.
+     * Also refreshes the layout toggle button text for the current display type.
      */
     void retranslateUi();
     void updateCompactMode(bool mode);
@@ -96,6 +97,7 @@ public:
     }
 
 protected:
+    /** @brief Retranslates on QEvent::LanguageChange. */
     void changeEvent(QEvent *event) override;
 
 private slots:
@@ -114,6 +116,8 @@ private slots:
     void updateDisplayType();
 
 private:
+    /** @brief Updates the layout toggle button's text and icon for the current display type. */
+    void updateDisplayTypeButton();
     /** @brief Layout for grouping and sorting UI elements. */
     QHBoxLayout *groupAndSortLayout;
 
