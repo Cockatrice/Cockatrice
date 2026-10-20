@@ -262,25 +262,25 @@ void TabDeckEditorVisual::processMainboardCardClick(const QMouseEvent *event,
     }
 }
 
+/** @brief Get a zone name corresponding to keyboard modifiers. */
+static QString zoneForClickModifiers(const Qt::KeyboardModifiers &modifiers)
+{
+    if (modifiers.testFlag(Qt::ControlModifier)) {
+        return DECK_ZONE_SIDE;
+    } else if (modifiers.testFlag(Qt::ShiftModifier)) {
+        return DECK_ZONE_MAYBEBOARD;
+    } else {
+        return DECK_ZONE_MAIN;
+    }
+}
+
 /** @brief Handles clicks on cards in the database display. */
 void TabDeckEditorVisual::processDatabaseCardClick(const QMouseEvent *event, const ExactCard &card)
 {
     if (event->button() == Qt::LeftButton) {
-        if (QApplication::keyboardModifiers() & Qt::ControlModifier) {
-            addCard(card, DECK_ZONE_SIDE);
-        } else if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
-            addCard(card, DECK_ZONE_MAYBEBOARD);
-        } else {
-            addCard(card, DECK_ZONE_MAIN);
-        }
+        addCard(card, zoneForClickModifiers(event->modifiers()));
     } else if (event->button() == Qt::RightButton) {
-        if (QApplication::keyboardModifiers() & Qt::ControlModifier) {
-            decrementCard(card, DECK_ZONE_SIDE);
-        } else if (QApplication::keyboardModifiers() & Qt::ShiftModifier) {
-            decrementCard(card, DECK_ZONE_MAYBEBOARD);
-        } else {
-            decrementCard(card, DECK_ZONE_MAIN);
-        }
+        decrementCard(card, zoneForClickModifiers(event->modifiers()));
     } else if (event->button() == Qt::MiddleButton) {
         deckDockWidget->actRemoveCard();
     }
