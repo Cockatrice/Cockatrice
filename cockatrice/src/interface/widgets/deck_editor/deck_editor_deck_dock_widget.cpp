@@ -762,18 +762,6 @@ void DeckEditorDeckDockWidget::actSwapSelection()
     update();
 }
 
-void DeckEditorDeckDockWidget::actDecrementCard(const ExactCard &card, QString zoneName)
-{
-    if (!card) {
-        return;
-    }
-    if (card.getInfo().getIsToken()) {
-        zoneName = DECK_ZONE_TOKENS;
-    }
-
-    deckStateManager->decrementCard(card, zoneName);
-}
-
 void DeckEditorDeckDockWidget::actDecrementSelection()
 {
     auto selectedRows = getSelectedCardNodeSourceIndices();
