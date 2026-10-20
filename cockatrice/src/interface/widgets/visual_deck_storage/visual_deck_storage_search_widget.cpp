@@ -1,7 +1,7 @@
 #include "visual_deck_storage_search_widget.h"
 
 #include "../../../filters/syntax_help.h"
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 
 #include <QAction>
 #include <QHBoxLayout>
@@ -27,9 +27,9 @@ VisualDeckStorageSearchWidget::VisualDeckStorageSearchWidget(QWidget *parent) : 
     searchBar = new QLineEdit(this);
     searchBar->setPlaceholderText(tr("Search by filename (or search expression)"));
     searchBar->setClearButtonEnabled(true);
-    searchBar->addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
+    searchBar->addAction(loadThemedIcon(QStringLiteral("icons/search")), QLineEdit::LeadingPosition);
 
-    auto help = searchBar->addAction(themePixmap(QStringLiteral("icons/info")), QLineEdit::TrailingPosition);
+    auto help = searchBar->addAction(loadThemedIcon(QStringLiteral("icons/info")), QLineEdit::TrailingPosition);
     connect(help, &QAction::triggered, this, [this] { createDeckSearchSyntaxHelpWindow(searchBar); });
 
     layout->addWidget(searchBar);

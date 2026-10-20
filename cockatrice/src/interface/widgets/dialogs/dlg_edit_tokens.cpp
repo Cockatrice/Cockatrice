@@ -1,6 +1,6 @@
 #include "dlg_edit_tokens.h"
 
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 #include "../interface/widgets/utility/get_text_with_max.h"
 #include "card_database_display_model.h"
 #include "libcockatrice/card/card_info.h"
@@ -107,10 +107,10 @@ DlgEditTokens::DlgEditTokens(QWidget *parent) : QDialog(parent), currentCard(nul
             &DlgEditTokens::tokenSelectionChanged);
 
     QAction *aAddToken = new QAction(tr("Add token"), this);
-    aAddToken->setIcon(themePixmap(QStringLiteral("icons/increment")));
+    aAddToken->setIcon(loadThemedIcon(QStringLiteral("icons/increment")));
     connect(aAddToken, &QAction::triggered, this, &DlgEditTokens::actAddToken);
     QAction *aRemoveToken = new QAction(tr("Remove token"), this);
-    aRemoveToken->setIcon(themePixmap(QStringLiteral("icons/decrement")));
+    aRemoveToken->setIcon(loadThemedIcon(QStringLiteral("icons/decrement")));
     connect(aRemoveToken, &QAction::triggered, this, &DlgEditTokens::actRemoveToken);
 
     auto *databaseToolBar = new QToolBar;

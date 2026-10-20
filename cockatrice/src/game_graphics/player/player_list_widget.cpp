@@ -1,6 +1,7 @@
 #include "player_list_widget.h"
 
 #include "../../interface/pixel_map_generator.h"
+#include "../../interface/theme_icon.h"
 #include "../../interface/widgets/server/user/user_context_menu.h"
 #include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 #include "user_level.h"
@@ -67,13 +68,13 @@ PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor,
                                    QWidget *parent)
     : QTreeWidget(parent), tabSupervisor(_tabSupervisor), client(_client), game(_game), gameStarted(false)
 {
-    readyIcon = themePixmap(QStringLiteral("icons/ready_start"));
-    notReadyIcon = themePixmap(QStringLiteral("icons/not_ready_start"));
-    concededIcon = themePixmap(QStringLiteral("icons/conceded"));
-    playerIcon = loadColorAdjustedPixmap("theme:icons/player");
-    judgeIcon = loadColorAdjustedPixmap("theme:icons/scales");
-    spectatorIcon = loadColorAdjustedPixmap("theme:icons/spectator");
-    lockIcon = themePixmap(QStringLiteral("icons/lock"));
+    readyIcon = loadThemedIcon(QStringLiteral("icons/ready_start"));
+    notReadyIcon = loadThemedIcon(QStringLiteral("icons/not_ready_start"));
+    concededIcon = loadThemedIcon(QStringLiteral("icons/conceded"));
+    playerIcon = loadThemedIcon(QStringLiteral("icons/player"));
+    judgeIcon = loadThemedIcon(QStringLiteral("icons/scales"));
+    spectatorIcon = loadThemedIcon(QStringLiteral("icons/spectator"));
+    lockIcon = loadThemedIcon(QStringLiteral("icons/lock"));
 
     if (tabSupervisor) {
         itemDelegate = new PlayerListItemDelegate(this);

@@ -50,6 +50,7 @@
 #include "latency_tracker.h"
 #include "logger.h"
 #include "pixel_map_generator.h"
+#include "theme_icon.h"
 #include "version_string.h"
 #include "widgets/dialogs/dlg_connect.h"
 #include "widgets/server/handle_public_servers.h"
@@ -356,10 +357,10 @@ void MainWindow::retranslateUi()
     aRegister->setText(tr("&Register to server..."));
     aForgotPassword->setText(tr("&Restore password..."));
     aSettings->setText(tr("&Settings..."));
-    aSettings->setIcon(themePixmap(QStringLiteral("icons/settings")));
+    aSettings->setIcon(loadThemedIcon(QStringLiteral("icons/settings")));
     settingsButton->setToolTip(tr("Settings"));
     settingsButton->setAccessibleName(tr("Settings"));
-    settingsButton->setIcon(themePixmap(QStringLiteral("icons/cogwheel")));
+    settingsButton->setIcon(loadThemedIcon(QStringLiteral("icons/settings")));
     aExit->setText(tr("&Exit"));
 
 #if defined(__APPLE__) /* For OSX */

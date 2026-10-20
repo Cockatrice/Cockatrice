@@ -1,9 +1,9 @@
 #include "pixel_map_generator.h"
 
 #include "libcockatrice/network/server/remote/user_level.h"
+#include "theme_icon.h"
 #include "theme_manager.h"
 
-#include <QApplication>
 #include <QBrush>
 #include <QByteArray>
 #include <QChar>
@@ -15,7 +15,6 @@
 #include <QDomNodeList>
 #include <QFile>
 #include <QIODevice>
-#include <QImage>
 #include <QImageReader>
 #include <QLatin1Char>
 #include <QLatin1String>
@@ -444,8 +443,11 @@ QPixmap LockPixmapGenerator::generatePixmap(int height)
         return pmCache.value(key);
     }
 
-    QPixmap pixmap = tryLoadImage(QStringLiteral("theme:") + themeManager->assetPath(QStringLiteral("icons/lock")),
-                                  QSize(height, height), true);
+    const QString resolved = themeManager->assetPath(QStringLiteral("icons/lock"));
+    QPixmap pixmap = loadSentinelSvgPixmap(resolved, QPalette::WindowText, QSize(height, height));
+    if (pixmap.isNull()) {
+        pixmap = tryLoadImage(QStringLiteral("theme:") + resolved, QSize(height, height), true);
+    }
     pmCache.insert(key, pixmap);
     return pixmap;
 }
@@ -459,9 +461,12 @@ QPixmap DropdownIconPixmapGenerator::generatePixmap(int height, bool expanded)
         return pmCache.value(key);
     }
 
-    QString name = expanded ? "dropdown_expanded" : "dropdown_collapsed";
-    QPixmap pixmap = tryLoadImage(QStringLiteral("theme:") + themeManager->assetPath(QStringLiteral("icons/") + name),
-                                  QSize(height, height), true);
+    const QString prefix = QStringLiteral("icons/") + (expanded ? "dropdown_expanded" : "dropdown_collapsed");
+    const QString resolved = themeManager->assetPath(prefix);
+    QPixmap pixmap = loadSentinelSvgPixmap(resolved, QPalette::WindowText, QSize(height, height));
+    if (pixmap.isNull()) {
+        pixmap = tryLoadImage(QStringLiteral("theme:") + resolved, QSize(height, height), true);
+    }
 
     pmCache.insert(key, pixmap);
     return pixmap;
@@ -520,30 +525,11 @@ QPixmap ManaSymbolPixmapGenerator::generatePixmap(const QString &symbol, const Q
 QHash<QString, QPixmap> ManaSymbolPixmapGenerator::masterCache;
 QHash<QString, QPixmap> ManaSymbolPixmapGenerator::scaledCache;
 
-QPixmap loadColorAdjustedPixmap(const QString &name)
-{
-    // Prefer an authored scheme-qualified variant when one exists for this asset.
-    const QString variant = themeManager->schemeVariantPath(QStringView(name).mid(QStringLiteral("theme:").size()));
-    if (!variant.isEmpty()) {
-        return QPixmap(QStringLiteral("theme:") + variant);
-    }
-
-    // Legacy fallback: runtime-invert for dark mode when no authored variant.
-    if (qApp->palette().windowText().color().lightness() > 200) {
-        QImage img(name);
-        img.invertPixels();
-        QPixmap result;
-        result.convertFromImage(img);
-        return result;
-    } else {
-        return QPixmap(name);
-    }
-}
-
 QPixmap themePixmap(QStringView prefix)
 {
     const QString resolved = themeManager->assetPath(prefix);
-    return QPixmap(QStringLiteral("theme:") + resolved);
+    const QPixmap sentinel = loadSentinelSvgPixmap(resolved);
+    return sentinel.isNull() ? QPixmap(QStringLiteral("theme:") + resolved) : sentinel;
 }
 
 void clearPixmapGeneratorCaches()
