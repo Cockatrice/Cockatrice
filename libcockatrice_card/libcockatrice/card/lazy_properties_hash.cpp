@@ -20,15 +20,15 @@ LazyPropertiesHash::LazyPropertiesHash(const QHash<QString, QString> &properties
 LazyPropertiesHash::LazyPropertiesHash(const LazyPropertiesHash &other)
 {
     // since we do not allow dematerialization, we only need to lock if not materialized yet
-    if (other.isMaterialized) {
+    if (other.isMaterialized.load(std::memory_order_acquire)) {
         blob = other.blob;
         properties = other.properties;
-        isMaterialized = true;
+        isMaterialized.store(true, std::memory_order_relaxed);
     } else {
         QMutexLocker lock(&other.propertiesMutex);
         blob = other.blob;
         properties = other.properties;
-        isMaterialized = false;
+        isMaterialized.store(other.isMaterialized.load(std::memory_order_relaxed), std::memory_order_relaxed);
     }
 }
 
@@ -39,15 +39,15 @@ LazyPropertiesHash &LazyPropertiesHash::operator=(const LazyPropertiesHash &othe
     }
 
     // since we do not allow dematerialization, we only need to lock if not materialized yet
-    if (other.isMaterialized) {
+    if (other.isMaterialized.load(std::memory_order_acquire)) {
         blob = other.blob;
         properties = other.properties;
-        isMaterialized = true;
+        isMaterialized.store(true, std::memory_order_relaxed);
     } else {
         QMutexLocker lock(&other.propertiesMutex);
         blob = other.blob;
         properties = other.properties;
-        isMaterialized = false;
+        isMaterialized.store(false, std::memory_order_relaxed);
     }
 
     return *this;
@@ -55,9 +55,15 @@ LazyPropertiesHash &LazyPropertiesHash::operator=(const LazyPropertiesHash &othe
 
 void LazyPropertiesHash::ensureMaterialized() const
 {
+    // Materialization happens once and is never undone, so the common case can
+    // skip the mutex entirely once it has happened.
+    if (isMaterialized.load(std::memory_order_acquire)) {
+        return;
+    }
+
     QMutexLocker lock(&propertiesMutex);
 
-    if (isMaterialized) {
+    if (isMaterialized.load(std::memory_order_relaxed)) {
         return;
     }
 
@@ -69,7 +75,7 @@ void LazyPropertiesHash::ensureMaterialized() const
 
     blob.clear();
 
-    isMaterialized = true;
+    isMaterialized.store(true, std::memory_order_release);
 }
 
 QString LazyPropertiesHash::value(const QString &key) const

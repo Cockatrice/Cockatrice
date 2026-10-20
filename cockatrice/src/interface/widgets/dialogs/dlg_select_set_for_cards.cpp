@@ -274,9 +274,9 @@ QMap<QString, int> DlgSelectSetForCards::getSetsForCards()
             continue;
         }
 
-        SetToPrintingsMap setMap = infoPtr->getSets();
-        for (auto &setName : setMap.keys()) {
-            setCounts[setName]++;
+        const auto &setMap = infoPtr->getSets();
+        for (auto it = setMap.constBegin(); it != setMap.constEnd(); ++it) {
+            setCounts[it.key()]++;
         }
     }
 
@@ -393,8 +393,8 @@ QMap<QString, QStringList> DlgSelectSetForCards::getCardsForSets()
             continue;
         }
 
-        SetToPrintingsMap setMap = infoPtr->getSets();
-        for (auto it = setMap.begin(); it != setMap.end(); ++it) {
+        const auto &setMap = infoPtr->getSets();
+        for (auto it = setMap.constBegin(); it != setMap.constEnd(); ++it) {
             setCards[it.key()].append(cardName);
         }
     }

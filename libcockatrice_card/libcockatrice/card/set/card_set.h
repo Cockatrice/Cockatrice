@@ -110,19 +110,19 @@ public:
     [[nodiscard]] QString getCorrectedShortName() const;
 
     /** @return Short identifier of the set. */
-    [[nodiscard]] QString getShortName() const
+    [[nodiscard]] const QString &getShortName() const
     {
         return shortName;
     }
 
     /** @return Descriptive name of the set. */
-    [[nodiscard]] QString getLongName() const
+    [[nodiscard]] const QString &getLongName() const
     {
         return longName;
     }
 
     /** @return Type/category string of the set. */
-    [[nodiscard]] QString getSetType() const
+    [[nodiscard]] const QString &getSetType() const
     {
         return setType;
     }
@@ -239,7 +239,7 @@ public:
      */
     [[nodiscard]] bool getIsKnownIgnored() const
     {
-        return longName.length() + setType.length() + releaseDate.toString().length() == 0;
+        return longName.isEmpty() && setType.isEmpty() && !releaseDate.isValid();
     }
 };
 

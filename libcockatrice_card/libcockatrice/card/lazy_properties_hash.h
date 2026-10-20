@@ -5,6 +5,7 @@
 #include <QHash>
 #include <QMutex>
 #include <QString>
+#include <atomic>
 
 /**
  * @brief A property map that can lazily deserialize blobs to avoid loading overhead.
@@ -18,10 +19,10 @@
 class LazyPropertiesHash
 {
 
-    mutable QByteArray blob;                    ///< Serialized properties (load form).
-    mutable QHash<QString, QString> properties; ///< Materialized properties (query form).
-    mutable QMutex propertiesMutex;             ///< Guards lazy materialization.
-    mutable bool isMaterialized = false;        ///< Whether propertiesCache is valid.
+    mutable QByteArray blob;                         ///< Serialized properties (load form).
+    mutable QHash<QString, QString> properties;      ///< Materialized properties (query form).
+    mutable QMutex propertiesMutex;                  ///< Guards lazy materialization.
+    mutable std::atomic<bool> isMaterialized{false}; ///< Whether properties is valid.
 
     /**
      * @brief Materializes properties from blob if not already done. Clears blob afterward.

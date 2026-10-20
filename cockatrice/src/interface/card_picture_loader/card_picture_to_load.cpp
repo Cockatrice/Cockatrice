@@ -74,19 +74,20 @@ QList<CardSetPtr> CardPictureToLoad::extractSetsSorted(const ExactCard &card)
 //! \todo Check if going through all sets is still necessary after the ExactCard refactor.
 static PrintingInfo findPrintingForSet(const ExactCard &card, const QString &setName)
 {
-    SetToPrintingsMap setsToPrintings = card.getInfo().getSets();
+    const auto &setsToPrintings = card.getInfo().getSets();
 
-    if (!setsToPrintings.contains(setName)) {
+    const auto setPrintings = setsToPrintings.constFind(setName);
+    if (setPrintings == setsToPrintings.constEnd() || setPrintings.value().isEmpty()) {
         return PrintingInfo();
     }
 
-    for (const auto &printing : setsToPrintings[setName]) {
+    for (const auto &printing : setPrintings.value()) {
         if (printing.getUuid() == card.getPrinting().getUuid()) {
             return printing;
         }
     }
 
-    return setsToPrintings[setName][0];
+    return setPrintings.value().first();
 }
 
 void CardPictureToLoad::populateSetUrls()
@@ -183,10 +184,14 @@ static int parse(const QString &urlTemplate,
 {
     static const QRegularExpression rxFillWith("^(.+)_fill_with_(.+)$");
     static const QRegularExpression rxSubStr("^(.+)_substr_(\\d+)_(\\d+)$");
+    static const QRegularExpression rxCardProp("!prop:([^!]+)!");
+    static const QRegularExpression rxCardSet("!set:([^!]+)!");
 
-    const QRegularExpression rxCardProp("!" + propType + ":([^!]+)!");
+    // The property type only takes two values, so keep the expression that was
+    // compiled for it instead of rebuilding one per URL template.
+    const QRegularExpression &rxCardPropSelector = propType == "prop" ? rxCardProp : rxCardSet;
 
-    auto matches = rxCardProp.globalMatch(urlTemplate);
+    auto matches = rxCardPropSelector.globalMatch(urlTemplate);
     while (matches.hasNext()) {
         auto match = matches.next();
         QString templatePropertyName = match.captured(1);
@@ -303,10 +308,10 @@ QString CardPictureToLoad::transformUrl(const QString &urlTemplate) const
     }
 
     QString transformedUrl = urlTemplate;
-    for (const QString &prop : transformMap.keys()) {
-        if (transformedUrl.contains(prop)) {
-            if (!transformMap[prop].isEmpty()) {
-                transformedUrl.replace(prop, QUrl::toPercentEncoding(transformMap[prop]));
+    for (auto it = transformMap.constBegin(); it != transformMap.constEnd(); ++it) {
+        if (transformedUrl.contains(it.key())) {
+            if (!it.value().isEmpty()) {
+                transformedUrl.replace(it.key(), QUrl::toPercentEncoding(it.value()));
             } else {
                 /* This means the template is requesting information that is not
                  * populated in this card, so it should return an empty string,
@@ -314,7 +319,7 @@ QString CardPictureToLoad::transformUrl(const QString &urlTemplate) const
                  */
                 qCDebug(CardPictureToLoadLog).nospace()
                     << "PictureLoader: [card: " << cardName << " set: " << setName << "]: Requested information ("
-                    << prop << ") for Url template (" << urlTemplate << ") is not available";
+                    << it.key() << ") for Url template (" << urlTemplate << ") is not available";
                 return QString();
             }
         }

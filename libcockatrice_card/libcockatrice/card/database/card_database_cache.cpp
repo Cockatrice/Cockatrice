@@ -210,7 +210,7 @@ void writeCard(QDataStream &out, const CardInfoPtr &card)
     // per-printing alt-name scan entirely.
     writeString(out, card->getSimpleName());
     {
-        const QSet<QString> altNames = card->getAltNames();
+        const QSet<QString> &altNames = card->getAltNames();
         out << static_cast<quint32>(altNames.size());
         for (const QString &alt : altNames) {
             writeString(out, alt);
@@ -218,7 +218,7 @@ void writeCard(QDataStream &out, const CardInfoPtr &card)
     }
 
     // setsToPrintings
-    const SetToPrintingsMap sets = card->getSets();
+    const auto &sets = card->getSets();
     out << static_cast<quint32>(sets.size());
     for (auto it = sets.constBegin(); it != sets.constEnd(); ++it) {
         writeString(out, it.key());
