@@ -43,31 +43,31 @@ SomewhatComplexQueryPart <- [(] QueryPartList [)] / QueryPart
 QueryPart <- NotQuery / SetQuery / RarityQuery / CMCQuery / FormatQuery / PowerQuery / ToughnessQuery / ColorQuery / TypeQuery / OracleQuery / FieldQuery / GenericQuery
 
 NotQuery <- ('NOT' ws/'-') SomewhatComplexQueryPart
-SetQuery <- ('e'/'set') SetQueryValue
-SetQueryValue <- ([=:] FlexStringValue) / (<[!][=]?> FlexStringValue) / SetExpression
-OracleQuery <- 'o' [:] MatcherString
+SetQuery <- ('e'/'set') ws? SetQueryValue
+SetQueryValue <- ([=:] ws? FlexStringValue) / (<[!][=]?> ws? FlexStringValue) / SetExpression
+OracleQuery <- 'o' ws? [:] ws? MatcherString
 
 
 CMCQuery <- ('cmc'/'mv') ws? NumericExpression
 PowerQuery <- [Pp] 'ow' 'er'? ws? NumericExpression
 ToughnessQuery <- [Tt] 'ou' 'ghness'? ws? NumericExpression
 
-RarityQuery <- [rR] ':' Rarity
+RarityQuery <- [rR] ws? ':' ws? Rarity
 Rarity <- [Cc] 'ommon'? / [Uu] 'ncommon'? / [Rr] 'are'? / [Mm] 'ythic'? / [Ss] 'pecial'? / [a-zA-Z] [a-z]*
 
-FormatQuery <- 'f' ':' Format / Legality ':' Format
+FormatQuery <- 'f' ws? ':' ws? Format / Legality ws? ':' ws? Format
 Format <- [a-zA-Z] [a-z]*
 Legality <- [Ll] 'egal'? / [Bb] 'anned'? / [Rr] 'estricted'
 
 
-TypeQuery <- [tT] 'ype'? [:] StringValue
+TypeQuery <- [tT] 'ype'? ws? [:] ws? StringValue
 
 Color <- < [Ww] 'hite'? / [Uu] / [Bb] 'lack'? / [Rr] 'ed'? / [Gg] 'reen'?  / [Bb] 'lue'? >
 ColorEx <- Color / [mc]
 
-ColorQuery <- [cC] 'olor'? <[iI]?> <[:!]> ColorEx*
+ColorQuery <- [cC] 'olor'? <[iI]?> ws? <[:!]> ws? ColorEx*
 
-FieldQuery <- String [:] MatcherString / String ws? NumericExpression
+FieldQuery <- String ws? [:] ws? MatcherString / String ws? NumericExpression
 
 NonDoubleQuoteUnlessEscaped <- '\\\"'. / !["].
 NonSingleQuoteUnlessEscaped <- "\\\'". / !['].
