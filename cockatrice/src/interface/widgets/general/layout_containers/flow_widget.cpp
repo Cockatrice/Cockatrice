@@ -105,9 +105,9 @@ void FlowWidget::addWidget(QWidget *widget_to_add)
  *
  * The widget is filtered for arrow-key events so keyboard navigation between
  * the flow items keeps working even when the flow sits inside a QScrollArea,
- * which swallows arrow keys before they can reach FlowWidget::keyPressEvent.
- * Only widgets added through this method are affected; anything that needs its
- * own arrow keys should use plain addWidget.
+ * which swallows arrow keys before they can bubble up. Only widgets added
+ * through this method are affected; anything that needs its own arrow keys
+ * should use plain addWidget.
  *
  * @param widget_to_add The widget to add to the flow layout.
  */
@@ -207,17 +207,12 @@ QLayoutItem *FlowWidget::itemAt(int index) const
     return flowLayout->itemAt(index);
 }
 
-void FlowWidget::keyPressEvent(QKeyEvent *event)
-{
-    if (moveFocus(event)) {
-        event->accept();
-        return;
-    }
-    QWidget::keyPressEvent(event);
-}
-
 bool FlowWidget::eventFilter(QObject *watched, QEvent *event)
 {
+    // Arrow-key navigation is deliberately scoped to widgets that opted in via
+    // addNavigableWidget(). Handling arrow keys in keyPressEvent() as well would
+    // also catch the events ordinary children (QLineEdit, ...) ignore and move
+    // focus away from the control the user is typing in.
     if (event->type() == QEvent::KeyPress && moveFocus(static_cast<QKeyEvent *>(event))) {
         return true;
     }
