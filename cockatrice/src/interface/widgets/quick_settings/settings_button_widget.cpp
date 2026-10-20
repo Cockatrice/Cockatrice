@@ -1,12 +1,12 @@
 #include "settings_button_widget.h"
 
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 #include "settings_popup_widget.h"
 
 #include <QApplication>
 #include <QHBoxLayout>
+#include <QIcon>
 #include <QMouseEvent>
-#include <QPixmap>
 #include <QPoint>
 #include <QPointF>
 #include <QRect>
@@ -20,7 +20,7 @@
 SettingsButtonWidget::SettingsButtonWidget(QWidget *parent)
     : QWidget(parent), button(new QToolButton(this)), popup(new SettingsPopupWidget(nullptr))
 {
-    button->setIcon(themePixmap(QStringLiteral("icons/cogwheel")));
+    button->setIcon(loadThemedIcon(QStringLiteral("icons/settings")));
     button->setCheckable(true);
     button->setFixedSize(32, 32);
     connect(button, &QToolButton::clicked, this, &SettingsButtonWidget::togglePopup);
@@ -49,9 +49,9 @@ void SettingsButtonWidget::removeSettingsWidget(QWidget *toRemove) const
     popup->removeSettingsWidget(toRemove);
 }
 
-void SettingsButtonWidget::setButtonIcon(QPixmap iconMap)
+void SettingsButtonWidget::setButtonIcon(const QIcon &icon)
 {
-    button->setIcon(iconMap);
+    button->setIcon(icon);
 }
 
 void SettingsButtonWidget::setButtonText(const QString &text)

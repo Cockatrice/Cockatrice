@@ -9,6 +9,7 @@
 #include "../../game/zones/card_zone_logic.h"
 #include "../../game/zones/view_zone_logic.h"
 #include "../../interface/pixel_map_generator.h"
+#include "../../interface/theme_icon.h"
 #include "../card_dimensions.h"
 #include "../z_values.h"
 #include "libcockatrice/utility/macros.h"
@@ -93,8 +94,8 @@ ZoneViewWidget::ZoneViewWidget(PlayerLogic *_player,
         searchEdit.setFocusPolicy(Qt::ClickFocus);
         searchEdit.setPlaceholderText(tr("Search by card name (or search expressions)"));
         searchEdit.setClearButtonEnabled(true);
-        searchEdit.addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
-        auto help = searchEdit.addAction(themePixmap(QStringLiteral("icons/info")), QLineEdit::TrailingPosition);
+        searchEdit.addAction(loadThemedIcon(QStringLiteral("icons/search")), QLineEdit::LeadingPosition);
+        auto help = searchEdit.addAction(loadThemedIcon(QStringLiteral("icons/info")), QLineEdit::TrailingPosition);
 
         connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(&searchEdit); });
 

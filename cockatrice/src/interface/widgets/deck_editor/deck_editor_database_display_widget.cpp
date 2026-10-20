@@ -3,7 +3,7 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../../filters/syntax_help.h"
 #include "../../key_signals.h"
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 #include "../utility/custom_line_edit.h"
 #include "card_database_display_model.h"
 #include "card_database_model.h"
@@ -40,8 +40,8 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent
     searchEdit->setObjectName("searchEdit");
     searchEdit->setPlaceholderText(tr("Search by card name (or search expressions)"));
     searchEdit->setClearButtonEnabled(true);
-    searchEdit->addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
-    auto help = searchEdit->addAction(themePixmap(QStringLiteral("icons/info")), QLineEdit::TrailingPosition);
+    searchEdit->addAction(loadThemedIcon(QStringLiteral("icons/search")), QLineEdit::LeadingPosition);
+    auto help = searchEdit->addAction(loadThemedIcon(QStringLiteral("icons/info")), QLineEdit::TrailingPosition);
 
     setFocusProxy(searchEdit);
     setFocusPolicy(Qt::ClickFocus);
@@ -83,13 +83,13 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent
             &DeckEditorDatabaseDisplayWidget::onRelatedCardClicked);
 
     aAddCard = new QAction(QString(), this);
-    aAddCard->setIcon(themePixmap(QStringLiteral("icons/arrow_right_green")));
+    aAddCard->setIcon(loadThemedIcon(QStringLiteral("icons/arrow_right")));
     connect(aAddCard, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
     auto *tbAddCard = new QToolButton(this);
     tbAddCard->setDefaultAction(aAddCard);
 
     aAddCardToSideboard = new QAction(QString(), this);
-    aAddCardToSideboard->setIcon(themePixmap(QStringLiteral("icons/arrow_right_blue")));
+    aAddCardToSideboard->setIcon(loadThemedIcon(QStringLiteral("icons/arrow_right_sideboard")));
     connect(aAddCardToSideboard, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
     auto *tbAddCardToSideboard = new QToolButton(this);
     tbAddCardToSideboard->setDefaultAction(aAddCardToSideboard);

@@ -2,7 +2,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 #include "../interface/widgets/dialogs/dlg_settings.h"
 #include "../interface/widgets/server/chat_view/chat_view.h"
 #include "../interface/widgets/server/game_link.h"
@@ -198,7 +198,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     connect(aOpenChatSettings, &QAction::triggered, this, &TabRoom::actOpenChatSettings);
 
     auto *chatSettingsButton = new QToolButton;
-    chatSettingsButton->setIcon(themePixmap(QStringLiteral("icons/settings")));
+    chatSettingsButton->setIcon(loadThemedIcon(QStringLiteral("icons/settings")));
     chatSettingsButton->setMenu(chatSettingsMenu);
     chatSettingsButton->setPopupMode(QToolButton::InstantPopup);
 

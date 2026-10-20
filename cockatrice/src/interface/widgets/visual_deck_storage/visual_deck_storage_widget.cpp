@@ -1,7 +1,7 @@
 #include "visual_deck_storage_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 #include "deck_preview/deck_preview_color_identity_filter_widget.h"
 #include "deck_preview/deck_preview_widget.h"
 #include "libcockatrice/card/database/card_database.h"
@@ -61,12 +61,12 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     searchWidget = new VisualDeckStorageSearchWidget(this);
 
     refreshButton = new QToolButton(this);
-    refreshButton->setIcon(themePixmap(QStringLiteral("icons/reload")));
+    refreshButton->setIcon(loadThemedIcon(QStringLiteral("icons/reload")));
     refreshButton->setFixedSize(32, 32);
     connect(refreshButton, &QPushButton::clicked, this, &VisualDeckStorageWidget::refreshIfPossible);
 
     shareButton = new QToolButton(this);
-    shareButton->setIcon(themePixmap(QStringLiteral("icons/share")));
+    shareButton->setIcon(loadThemedIcon(QStringLiteral("icons/share")));
     shareButton->setFixedSize(32, 32);
     shareButton->setVisible(false);
     connect(shareButton, &QPushButton::clicked, this, &VisualDeckStorageWidget::shareRequested);

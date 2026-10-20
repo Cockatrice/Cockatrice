@@ -1,7 +1,7 @@
 #include "dlg_manage_sets.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 #include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../interface/widgets/utility/custom_line_edit.h"
 #include "libcockatrice/card/database/card_database.h"
@@ -57,28 +57,28 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     setsEditToolBar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
     aTop = new QAction(QString(), this);
-    aTop->setIcon(themePixmap(QStringLiteral("icons/arrow_top_green")));
+    aTop->setIcon(loadThemedIcon(QStringLiteral("icons/arrow_to_top")));
     aTop->setToolTip(tr("Move selected set to the top"));
     aTop->setEnabled(false);
     connect(aTop, &QAction::triggered, this, &WndSets::actTop);
     setsEditToolBar->addAction(aTop);
 
     aUp = new QAction(QString(), this);
-    aUp->setIcon(themePixmap(QStringLiteral("icons/arrow_up_green")));
+    aUp->setIcon(loadThemedIcon(QStringLiteral("icons/arrow_up")));
     aUp->setToolTip(tr("Move selected set up"));
     aUp->setEnabled(false);
     connect(aUp, &QAction::triggered, this, &WndSets::actUp);
     setsEditToolBar->addAction(aUp);
 
     aDown = new QAction(QString(), this);
-    aDown->setIcon(themePixmap(QStringLiteral("icons/arrow_down_green")));
+    aDown->setIcon(loadThemedIcon(QStringLiteral("icons/arrow_down")));
     aDown->setToolTip(tr("Move selected set down"));
     aDown->setEnabled(false);
     connect(aDown, &QAction::triggered, this, &WndSets::actDown);
     setsEditToolBar->addAction(aDown);
 
     aBottom = new QAction(QString(), this);
-    aBottom->setIcon(themePixmap(QStringLiteral("icons/arrow_bottom_green")));
+    aBottom->setIcon(loadThemedIcon(QStringLiteral("icons/arrow_to_bottom")));
     aBottom->setToolTip(tr("Move selected set to the bottom"));
     aBottom->setEnabled(false);
     connect(aBottom, &QAction::triggered, this, &WndSets::actBottom);
@@ -88,7 +88,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     searchField = new LineEditUnfocusable;
     searchField->setObjectName("searchEdit");
     searchField->setPlaceholderText(tr("Search by set name, code, type, or release date"));
-    searchField->addAction(themePixmap(QStringLiteral("icons/search")), LineEditUnfocusable::LeadingPosition);
+    searchField->addAction(loadThemedIcon(QStringLiteral("icons/search")), LineEditUnfocusable::LeadingPosition);
     searchField->setClearButtonEnabled(true);
     setFocusProxy(searchField);
 

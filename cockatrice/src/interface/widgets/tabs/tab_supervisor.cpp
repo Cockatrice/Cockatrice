@@ -11,6 +11,7 @@
 #include "../../intents/contexts/context_join_room.h"
 #include "../../intents/intent.h"
 #include "../../intents/intent_join_server_game.h"
+#include "../../theme_icon.h"
 #include "../interface/pixel_map_generator.h"
 #include "../interface/widgets/server/game_link.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
@@ -1386,7 +1387,7 @@ void TabSupervisor::tabUserEvent(bool globalEvent)
     auto *tab = static_cast<Tab *>(sender());
     if (tab != currentWidget()) {
         tab->setContentsChanged(true);
-        setTabIcon(indexOf(tab), themePixmap(QStringLiteral("icons/tab_changed")));
+        setTabIcon(indexOf(tab), loadThemedIcon(QStringLiteral("icons/tab_changed")));
     }
     if (globalEvent && SettingsCache::instance().userInterface().getNotificationsEnabled()) {
         QApplication::alert(this);

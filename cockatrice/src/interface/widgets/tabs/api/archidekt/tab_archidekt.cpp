@@ -1,7 +1,7 @@
 #include "tab_archidekt.h"
 
 #include "../../../../../client/settings/cache_settings.h"
-#include "../../../../pixel_map_generator.h"
+#include "../../../../theme_icon.h"
 #include "../../../cards/additional_info/mana_symbol_widget.h"
 #include "../../../cards/card_size_widget.h"
 #include "../../../quick_settings/settings_button_widget.h"
@@ -237,7 +237,7 @@ void TabArchidekt::setupFilterWidgets()
     // Format filter (collapsible)
     formatButton = new SettingsButtonWidget(secondaryToolbar);
     formatButton->setButtonText(tr("Formats"));
-    formatButton->setButtonIcon(themePixmap(QStringLiteral("icons/scale_balanced")));
+    formatButton->setButtonIcon(loadThemedIcon(QStringLiteral("icons/scales")));
 
     QWidget *formatContainer = new QWidget(secondaryToolbar);
     QGridLayout *formatLayout = new QGridLayout(formatContainer);

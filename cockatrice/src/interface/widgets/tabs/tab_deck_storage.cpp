@@ -4,7 +4,7 @@
 #include "../../deck_loader/deck_file_format.h"
 #include "../../deck_loader/deck_loader.h"
 #include "../../deck_loader/loaded_deck.h"
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 #include "../cards/additional_info/deck_color_identity.h"
 #include "../deck_share/deck_share_utils.h"
 #include "../deck_share/share_bar_widget.h"
@@ -188,19 +188,19 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
 
     // Left side actions
     aOpenLocalDeck = new QAction(this);
-    aOpenLocalDeck->setIcon(themePixmap(QStringLiteral("icons/pencil")));
+    aOpenLocalDeck->setIcon(loadThemedIcon(QStringLiteral("icons/pencil")));
     connect(aOpenLocalDeck, &QAction::triggered, this, &TabDeckStorage::actOpenLocalDeck);
     aRenameLocal = new QAction(this);
-    aRenameLocal->setIcon(themePixmap(QStringLiteral("icons/rename")));
+    aRenameLocal->setIcon(loadThemedIcon(QStringLiteral("icons/rename")));
     connect(aRenameLocal, &QAction::triggered, this, &TabDeckStorage::actRenameLocal);
     aUpload = new QAction(this);
-    aUpload->setIcon(themePixmap(QStringLiteral("icons/arrow_right_green")));
+    aUpload->setIcon(loadThemedIcon(QStringLiteral("icons/arrow_right")));
     connect(aUpload, &QAction::triggered, this, &TabDeckStorage::actUpload);
     aNewLocalFolder = new QAction(this);
     aNewLocalFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_FileDialogNewFolder));
     connect(aNewLocalFolder, &QAction::triggered, this, &TabDeckStorage::actNewLocalFolder);
     aDeleteLocalDeck = new QAction(this);
-    aDeleteLocalDeck->setIcon(themePixmap(QStringLiteral("icons/remove_row")));
+    aDeleteLocalDeck->setIcon(loadThemedIcon(QStringLiteral("icons/remove_row")));
     connect(aDeleteLocalDeck, &QAction::triggered, this, &TabDeckStorage::actDeleteLocalDeck);
 
     aOpenDecksFolder = new QAction(this);
@@ -209,24 +209,24 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
 
     // Right side actions
     aOpenRemoteDeck = new QAction(this);
-    aOpenRemoteDeck->setIcon(themePixmap(QStringLiteral("icons/pencil")));
+    aOpenRemoteDeck->setIcon(loadThemedIcon(QStringLiteral("icons/pencil")));
     connect(aOpenRemoteDeck, &QAction::triggered, this, &TabDeckStorage::actOpenRemoteDeck);
     aDownload = new QAction(this);
-    aDownload->setIcon(themePixmap(QStringLiteral("icons/arrow_left_green")));
+    aDownload->setIcon(loadThemedIcon(QStringLiteral("icons/arrow_left")));
     connect(aDownload, &QAction::triggered, this, &TabDeckStorage::actDownload);
     aNewFolder = new QAction(this);
     aNewFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_FileDialogNewFolder));
     connect(aNewFolder, &QAction::triggered, this, &TabDeckStorage::actNewFolder);
     aDeleteRemoteDeck = new QAction(this);
-    aDeleteRemoteDeck->setIcon(themePixmap(QStringLiteral("icons/remove_row")));
+    aDeleteRemoteDeck->setIcon(loadThemedIcon(QStringLiteral("icons/remove_row")));
     connect(aDeleteRemoteDeck, &QAction::triggered, this, &TabDeckStorage::actDeleteRemoteDeck);
 
     aShareDecks = new QAction(this);
-    aShareDecks->setIcon(themePixmap(QStringLiteral("icons/share")));
+    aShareDecks->setIcon(loadThemedIcon(QStringLiteral("icons/share")));
     connect(aShareDecks, &QAction::triggered, this, &TabDeckStorage::actShareDecks);
 
     aPublishDeck = new QAction(this);
-    aPublishDeck->setIcon(QPixmap("theme:icons/lock"));
+    aPublishDeck->setIcon(loadThemedIcon(QStringLiteral("icons/lock")));
     connect(aPublishDeck, &QAction::triggered, this, &TabDeckStorage::actPublishDeck);
 
     // Add actions to toolbars

@@ -1,7 +1,7 @@
 #include "deck_editor_settings_page.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 #include "../dialogs/path_safety_warning.h"
 #include "update/card_spoiler/spoiler_background_updater.h"
 
@@ -79,19 +79,19 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     }
 
     aAdd = new QAction(this);
-    aAdd->setIcon(themePixmap(QStringLiteral("icons/increment")));
+    aAdd->setIcon(loadThemedIcon(QStringLiteral("icons/increment")));
     connect(aAdd, &QAction::triggered, this, &DeckEditorSettingsPage::actAddURL);
 
     aEdit = new QAction(this);
-    aEdit->setIcon(themePixmap(QStringLiteral("icons/pencil")));
+    aEdit->setIcon(loadThemedIcon(QStringLiteral("icons/pencil")));
     connect(aEdit, &QAction::triggered, this, &DeckEditorSettingsPage::actEditURL);
 
     aRemove = new QAction(this);
-    aRemove->setIcon(themePixmap(QStringLiteral("icons/decrement")));
+    aRemove->setIcon(loadThemedIcon(QStringLiteral("icons/decrement")));
     connect(aRemove, &QAction::triggered, this, &DeckEditorSettingsPage::actRemoveURL);
 
     aRateLimit = new QAction(this);
-    aRateLimit->setIcon(themePixmap(QStringLiteral("icons/cogwheel")));
+    aRateLimit->setIcon(loadThemedIcon(QStringLiteral("icons/settings")));
     connect(aRateLimit, &QAction::triggered, this, &DeckEditorSettingsPage::actAdjustRateLimit);
 
     auto *urlToolBar = new QToolBar;

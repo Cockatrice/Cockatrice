@@ -1,7 +1,7 @@
 #include "dlg_connect.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 #include "../server/handle_public_servers.h"
 #include "../server/user/user_info_connection.h"
 #include "libcockatrice/utility/macros.h"
@@ -37,7 +37,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     previousHosts = new QComboBox(this);
 
     btnDeleteServer = new QPushButton(this);
-    btnDeleteServer->setIcon(themePixmap(QStringLiteral("icons/remove_row")));
+    btnDeleteServer->setIcon(loadThemedIcon(QStringLiteral("icons/remove_row")));
     btnDeleteServer->setToolTip(tr("Delete the currently selected saved server"));
     btnDeleteServer->setFixedWidth(30);
 
@@ -45,7 +45,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 
     hps = new HandlePublicServers(this);
     btnRefreshServers = new QPushButton(this);
-    btnRefreshServers->setIcon(themePixmap(QStringLiteral("icons/sync")));
+    btnRefreshServers->setIcon(loadThemedIcon(QStringLiteral("icons/sync")));
     btnRefreshServers->setToolTip(tr("Refresh the server list with known public servers"));
     btnRefreshServers->setFixedWidth(30);
 
@@ -115,7 +115,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     updateDisplayInfo(previousHosts->currentText());
 
     btnForgotPassword = new QPushButton(this);
-    btnForgotPassword->setIcon(themePixmap(QStringLiteral("icons/forgot_password")));
+    btnForgotPassword->setIcon(loadThemedIcon(QStringLiteral("icons/forgot_password")));
     btnForgotPassword->setToolTip(tr("Reset Password"));
     btnForgotPassword->setFixedWidth(30);
     connect(btnForgotPassword, &QPushButton::released, this, &DlgConnect::actForgotPassword);
