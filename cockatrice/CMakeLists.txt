@@ -172,6 +172,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/utility/reversed_completer_model.cpp
     src/interface/pixel_map_generator.cpp
     src/interface/theme_config.cpp
+    src/interface/theme_icon.cpp
     src/interface/theme_manager.cpp
     src/interface/palette_editor/color_button.cpp
     src/interface/palette_editor/palette_generator.cpp
