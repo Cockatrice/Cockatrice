@@ -249,6 +249,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/quick_settings/settings_button_widget.cpp
     src/interface/widgets/quick_settings/settings_popup_widget.cpp
     src/interface/widgets/replay/replay_event_index.cpp
+    src/interface/widgets/replay/replay_event_sidebar.cpp
     src/interface/widgets/replay/replay_manager.cpp
     src/interface/widgets/replay/replay_quick_settings_widget.cpp
     src/interface/widgets/replay/replay_timeline_widget.cpp
