@@ -21,7 +21,6 @@
 #include "tab_deck_editor_visual_tab_widget.h"
 
 #include <QAction>
-#include <QApplication>
 #include <QByteArray>
 #include <QDebug>
 #include <QDockWidget>
