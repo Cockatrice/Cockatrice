@@ -27,6 +27,7 @@
 #include <QVBoxLayout>
 #include <functional>
 #include <libcockatrice/card/import/card_name_normalizer.h>
+#include <libcockatrice/network/network_manager.h>
 #include <qnamespace.h>
 #include <version_string.h>
 
@@ -34,7 +35,7 @@ class QWidget;
 
 DlgLoadDeckFromWebsite::DlgLoadDeckFromWebsite(QWidget *parent) : QDialog(parent)
 {
-    nam = new QNetworkAccessManager(this);
+    nam = NetworkManagerFactory::create(this);
 
     layout = new QVBoxLayout(this);
     setLayout(layout);
