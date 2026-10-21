@@ -17,7 +17,6 @@
 #include <QSet>
 #include <QSharedPointer>
 #include <QSpinBox>
-#include <QTimer>
 #include <QVBoxLayout>
 #include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -70,9 +69,8 @@ VisualDatabaseDisplaySubTypeFilterWidget::VisualDatabaseDisplaySubTypeFilterWidg
     toggleButton = new QPushButton(this);
     layout->addWidget(toggleButton);
     connect(toggleButton, &QPushButton::clicked, this, &VisualDatabaseDisplaySubTypeFilterWidget::updateFilterMode);
-    connect(filterModel, &FilterTreeModel::layoutChanged, this, [this]() {
-        QTimer::singleShot(100, this, &VisualDatabaseDisplaySubTypeFilterWidget::syncWithFilterModel);
-    });
+    connect(filterModel, &FilterTreeModel::layoutChanged, this,
+            [this]() { syncDebouncer.call([this] { syncWithFilterModel(); }); });
 
     createSubTypeButtons(); // Populate buttons initially
     updateFilterMode();     // Initialize the toggle button text

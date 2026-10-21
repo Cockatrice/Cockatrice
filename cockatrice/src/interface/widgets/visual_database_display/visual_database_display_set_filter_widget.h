@@ -10,6 +10,7 @@
 #include <QMap>
 #include <QString>
 #include <QWidget>
+#include <libcockatrice/utility/debouncer.h>
 #include <qtmetamacros.h>
 
 class FilterTreeModel;
@@ -64,6 +65,7 @@ private:
     QMap<QString, bool> activeSets;           // Track active set filters
 
     bool exactMatchMode = true; // Toggle between "Exact Match" and "Includes"
+    QtUtils::Debouncer syncDebouncer{100};
 };
 
 #endif // VISUAL_DATABASE_DISPLAY_SET_FILTER_WIDGET_H

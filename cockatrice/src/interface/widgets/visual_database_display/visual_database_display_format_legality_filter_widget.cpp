@@ -16,7 +16,6 @@
 #include <QSet>
 #include <QSharedPointer>
 #include <QSpinBox>
-#include <QTimer>
 #include <QVBoxLayout>
 #include <QtGlobal>
 #include <algorithm>
@@ -72,9 +71,8 @@ VisualDatabaseDisplayFormatLegalityFilterWidget::VisualDatabaseDisplayFormatLega
     layout->addWidget(toggleButton);
     connect(toggleButton, &QPushButton::clicked, this,
             &VisualDatabaseDisplayFormatLegalityFilterWidget::updateFilterMode);
-    connect(filterModel, &FilterTreeModel::layoutChanged, this, [this]() {
-        QTimer::singleShot(100, this, &VisualDatabaseDisplayFormatLegalityFilterWidget::syncWithFilterModel);
-    });
+    connect(filterModel, &FilterTreeModel::layoutChanged, this,
+            [this]() { syncDebouncer.call([this] { syncWithFilterModel(); }); });
 
     createFormatButtons(); // Populate buttons initially
     updateFilterMode();    // Initialize toggle button text
