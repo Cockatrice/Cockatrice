@@ -11,6 +11,7 @@
 #include "libcockatrice/card/set/card_set_list.h"
 
 #include <QAbstractTableModel>
+#include <QCollator>
 #include <QList>
 #include <QMimeData>
 #include <QModelIndex>
@@ -112,6 +113,9 @@ protected:
     [[nodiscard]] bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
     [[nodiscard]] bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
     void fetchMore(const QModelIndex &index) override;
+
+private:
+    QCollator collator;
 };
 
 #endif

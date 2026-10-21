@@ -300,6 +300,7 @@ SetsDisplayModel::SetsDisplayModel(QObject *parent) : QSortFilterProxyModel(pare
 {
     setFilterCaseSensitivity(Qt::CaseInsensitive);
     setSortCaseSensitivity(Qt::CaseInsensitive);
+    collator.setNumericMode(true);
 }
 
 void SetsDisplayModel::fetchMore(const QModelIndex &index)
@@ -331,5 +332,5 @@ bool SetsDisplayModel::lessThan(const QModelIndex &left, const QModelIndex &righ
     QString leftString = sourceModel()->data(left, SetsModel::SortRole).toString();
     QString rightString = sourceModel()->data(right, SetsModel::SortRole).toString();
 
-    return QString::localeAwareCompare(leftString, rightString) < 0;
+    return collator.compare(leftString, rightString) < 0;
 }

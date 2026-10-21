@@ -23,6 +23,7 @@ CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)
     : QSortFilterProxyModel(parent), isToken(ShowAll), filterString(nullptr)
 {
     filterTree = nullptr;
+    collator.setNumericMode(true);
     setFilterCaseSensitivity(Qt::CaseInsensitive);
     setSortCaseSensitivity(Qt::CaseInsensitive);
 
@@ -120,10 +121,10 @@ bool CardDatabaseDisplayModel::lessThan(const QModelIndex &left, const QModelInd
             return lessThanNumerically(leftPT.mid(leftSlash + 1), rightPT.mid(rightSlash + 1)) < 0;
         }
     }
-    return QString::localeAwareCompare(leftString, rightString) < 0;
+    return collator.compare(leftString, rightString) < 0;
 }
 
-int CardDatabaseDisplayModel::lessThanNumerically(QStringView left, QStringView right)
+int CardDatabaseDisplayModel::lessThanNumerically(const QString &left, const QString &right) const
 {
     if (left == right) {
         return 0;
@@ -182,7 +183,7 @@ int CardDatabaseDisplayModel::lessThanNumerically(QStringView left, QStringView 
         } else {
             // both parsed, same number, but at least one has something else
             // so compare the part after the number - prefer nothing
-            return QString::localeAwareCompare(leftAfterNum, rightAfterNum);
+            return collator.compare(leftAfterNum, rightAfterNum);
         }
     } else if (okLeft) {
         return -1;
@@ -190,7 +191,7 @@ int CardDatabaseDisplayModel::lessThanNumerically(QStringView left, QStringView 
         return 1;
     }
     // couldn't parse it, just return String comparison
-    return QString::localeAwareCompare(left, right);
+    return collator.compare(left, right);
 }
 bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
 {
