@@ -1,11 +1,15 @@
 #ifndef COCKATRICE_QT_UTILS_H
 #define COCKATRICE_QT_UTILS_H
+#include <QDesktopServices>
 #include <QFont>
 #include <QFontDatabase>
 #include <QLayout>
+#include <QMessageBox>
 #include <QObject>
+#include <QPropertyAnimation>
 #include <QScrollArea>
 #include <QString>
+#include <QUrl>
 #include <QWidget>
 
 namespace QtUtils
@@ -140,6 +144,64 @@ static inline QFont monospaceFont()
         font.setPointSize(systemPointSize);
     }
     return font;
+}
+
+/**
+ * @brief Fades @p window between two opacity values.
+ *
+ * @param window           Window to animate.
+ * @param startOpacity     Starting opacity.
+ * @param endOpacity       Ending opacity.
+ * @param durationMs       Duration in milliseconds.
+ * @param hideWhenFinished Hide the window when the animation finishes.
+ * @return The running animation. It is owned by @p window and deletes itself when stopped.
+ */
+static inline QPropertyAnimation *
+fadeWindow(QWidget *window, qreal startOpacity, qreal endOpacity, int durationMs, bool hideWhenFinished = false)
+{
+    auto *animation = new QPropertyAnimation(window, "windowOpacity", window);
+    animation->setDuration(durationMs);
+    animation->setStartValue(startOpacity);
+    animation->setEndValue(endOpacity);
+    if (hideWhenFinished) {
+        QObject::connect(animation, &QPropertyAnimation::finished, window, &QWidget::hide);
+    }
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
+    return animation;
+}
+
+/**
+ * @brief Opens @p path with the platform's file manager or default handler.
+ */
+static inline bool openPathInFileManager(const QString &path)
+{
+    return QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+}
+
+/**
+ * @brief Returns @p font with bold styling enabled.
+ */
+static inline QFont boldFont(QFont font)
+{
+    font.setBold(true);
+    return font;
+}
+
+/**
+ * @brief Shows a Yes/No confirmation dialog and returns true when the user confirms.
+ *
+ * @param parent        Parent widget.
+ * @param title         Dialog title.
+ * @param text          Dialog text.
+ * @param defaultButton Button focused by default. NoButton lets Qt choose.
+ */
+static inline bool confirm(QWidget *parent,
+                           const QString &title,
+                           const QString &text,
+                           QMessageBox::StandardButton defaultButton = QMessageBox::NoButton)
+{
+    return QMessageBox::question(parent, title, text, QMessageBox::Yes | QMessageBox::No, defaultButton) ==
+           QMessageBox::Yes;
 }
 } // namespace QtUtils
 
