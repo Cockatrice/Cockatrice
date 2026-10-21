@@ -71,7 +71,22 @@ void DlgEditAvatar::actBrowse()
 
     QImageReader imgReader;
     imgReader.setDecideFormatFromContent(true);
+    // Honour the EXIF orientation phone cameras write; otherwise portrait
+    // photos are shown and stored sideways.
+    imgReader.setAutoTransform(true);
     imgReader.setFileName(fileName);
+
+    // Decode straight to the maximum avatar size. Scaling afterwards decodes
+    // the full-resolution image first, which can be tens of megabytes for a
+    // modern camera photo.
+    const QSize sourceSize = imgReader.size();
+    if (sourceSize.isValid() &&
+        (sourceSize.width() > MAX_AVATAR_DIMENSION || sourceSize.height() > MAX_AVATAR_DIMENSION)) {
+        QSize targetSize = sourceSize;
+        targetSize.scale(MAX_AVATAR_DIMENSION, MAX_AVATAR_DIMENSION, Qt::KeepAspectRatio);
+        imgReader.setScaledSize(targetSize);
+    }
+
     if (!imgReader.read(&image)) {
         qCWarning(DlgEditAvatarLog) << "Avatar image loading failed for file:" << fileName;
         imageLabel->setText(tr("Invalid image chosen."));
