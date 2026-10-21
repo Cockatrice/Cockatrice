@@ -22,6 +22,7 @@
 #include <QSettings>
 #include <QVBoxLayout>
 #include <QVariant>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 DeckAnalyticsWidget::DeckAnalyticsWidget(QWidget *parent, DeckListStatisticsAnalyzer *_statsAnalyzer)
@@ -54,8 +55,7 @@ DeckAnalyticsWidget::DeckAnalyticsWidget(QWidget *parent, DeckListStatisticsAnal
     connect(includeSideboardCheckBox, &QCheckBox::clicked, this, &DeckAnalyticsWidget::includeSideboardChanged);
 
     // Scroll area and container
-    scrollArea = new QScrollArea(this);
-    scrollArea->setWidgetResizable(true);
+    scrollArea = QtUtils::makeScrollArea(this, Qt::ScrollBarAsNeeded, Qt::ScrollBarAsNeeded);
     scrollArea->setFrameShape(QFrame::NoFrame);
 
     panelContainer = new QWidget(scrollArea);
