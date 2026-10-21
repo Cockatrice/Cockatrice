@@ -22,7 +22,6 @@
 #include <QSet>
 #include <QSharedPointer>
 #include <QSpinBox>
-#include <QTimer>
 #include <QVBoxLayout>
 #include <QtGlobal>
 #include <algorithm>
@@ -101,7 +100,7 @@ VisualDatabaseDisplaySetFilterWidget::VisualDatabaseDisplaySetFilterWidget(QWidg
     layout->addWidget(toggleButton);
     connect(toggleButton, &QPushButton::clicked, this, &VisualDatabaseDisplaySetFilterWidget::updateFilterMode);
     connect(filterModel, &FilterTreeModel::layoutChanged, this,
-            [this]() { QTimer::singleShot(100, this, &VisualDatabaseDisplaySetFilterWidget::syncWithFilterModel); });
+            [this]() { syncDebouncer.call([this] { syncWithFilterModel(); }); });
 
     createSetButtons(); // Populate buttons initially
     updateFilterMode();
@@ -304,5 +303,5 @@ void VisualDatabaseDisplaySetFilterWidget::updateFilterMode()
 
     // Reconnect the layoutChanged -> sync lambda
     connect(filterModel, &FilterTreeModel::layoutChanged, this,
-            [this]() { QTimer::singleShot(100, this, &VisualDatabaseDisplaySetFilterWidget::syncWithFilterModel); });
+            [this]() { syncDebouncer.call([this] { syncWithFilterModel(); }); });
 }
