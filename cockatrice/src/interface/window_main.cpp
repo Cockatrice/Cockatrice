@@ -62,7 +62,6 @@
 #include <QCloseEvent>
 #include <QDateTime>
 #include <QDebug>
-#include <QDesktopServices>
 #include <QDialog>
 #include <QDir>
 #include <QEvent>
@@ -112,6 +111,7 @@
 #include <libcockatrice/settings/tabs_settings.h>
 #include <libcockatrice/settings/updates_settings.h>
 #include <libcockatrice/utility/local_server_name.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <memory>
 #include <qlogging.h>
 #include <qnamespace.h>
@@ -341,7 +341,7 @@ void MainWindow::actViewLog()
 void MainWindow::actOpenSettingsFolder()
 {
     QString dir = SettingsCache::instance().getSettingsPath();
-    QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
+    QtUtils::openPathInFileManager(dir);
 }
 
 void MainWindow::retranslateUi()
@@ -937,8 +937,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
                                     : tr("A card database update is still running: %1.\nQuitting now will cancel it.\n"
                                          "Are you sure you want to quit?")
                                           .arg(runningFor);
-        if (QMessageBox::question(this, tr("Are you sure?"), message, QMessageBox::Yes | QMessageBox::No,
-                                  QMessageBox::No) == QMessageBox::No) {
+        if (!QtUtils::confirm(this, tr("Are you sure?"), message, QMessageBox::No)) {
             event->ignore();
             bClosingDown = false;
             return;
@@ -1491,13 +1490,13 @@ void MainWindow::refreshShortcuts()
 void MainWindow::actOpenCustomFolder()
 {
     QString dir = SettingsCache::instance().paths().getCustomPicsPath();
-    QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
+    QtUtils::openPathInFileManager(dir);
 }
 
 void MainWindow::actOpenCustomsetsFolder()
 {
     QString dir = SettingsCache::instance().getCustomCardDatabasePath();
-    QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
+    QtUtils::openPathInFileManager(dir);
 }
 
 void MainWindow::actAddCustomSet()

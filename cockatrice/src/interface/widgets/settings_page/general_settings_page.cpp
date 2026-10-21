@@ -35,6 +35,7 @@
 #include <libcockatrice/settings/tabs_settings.h>
 #include <libcockatrice/settings/updates_settings.h>
 #include <libcockatrice/utility/macros.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <libcockatrice/utility/translation_loader.h>
 #include <qlogging.h>
 #include <qnamespace.h>
@@ -547,12 +548,9 @@ void GeneralSettingsPage::cardLanguageBoxChanged(int index)
     }
     message += tr("<p>Run Oracle now?</p>");
 
-    const QMessageBox::StandardButton answer = QMessageBox::question(
-        this, tr("Card text & images language changed"), message, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-
     // The answer only controls whether Oracle starts right away; the caches stay
     // cleared so the next import or launch rebuilds them in the new language.
-    if (answer == QMessageBox::Yes) {
+    if (QtUtils::confirm(this, tr("Card text & images language changed"), message, QMessageBox::Yes)) {
         emit cardDatabaseUpdateRequested();
     }
 }
