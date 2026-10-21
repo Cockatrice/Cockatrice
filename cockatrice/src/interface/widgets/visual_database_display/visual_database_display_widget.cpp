@@ -116,7 +116,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     setFocusProxy(searchEdit);
     setFocusPolicy(Qt::ClickFocus);
 
-    displayModeButton = new QPushButton(tr("Visual"), this);
+    displayModeButton = new QPushButton(this);
     displayModeButton->setCheckable(true); // Toggle button
 
     connect(displayModeButton, &QPushButton::toggled, this, &VisualDatabaseDisplayWidget::onDisplayModeChanged);
@@ -263,7 +263,7 @@ void VisualDatabaseDisplayWidget::retranslateUi()
     databaseLoadIndicator->setText(tr("Loading database ..."));
     clearFilterWidget->setToolTip(tr("Clear all filters"));
     searchEdit->setPlaceholderText(tr("Search by card name (or search expressions)"));
-    displayModeButton->setText(displayModeButton->isChecked() ? tr("Table") : tr("Visual"));
+    updateDisplayModeButton();
     colorFilterWidget->retranslateUi();
     filterContainer->retranslateUi();
 }
@@ -271,6 +271,11 @@ void VisualDatabaseDisplayWidget::retranslateUi()
 void VisualDatabaseDisplayWidget::highlightAllSearchEdit()
 {
     searchEdit->setSelection(0, searchEdit->text().length());
+}
+
+void VisualDatabaseDisplayWidget::updateDisplayModeButton()
+{
+    displayModeButton->setText(displayModeButton->isChecked() ? tr("Table") : tr("Visual"));
 }
 
 void VisualDatabaseDisplayWidget::resizeEvent(QResizeEvent *event)
@@ -281,16 +286,15 @@ void VisualDatabaseDisplayWidget::resizeEvent(QResizeEvent *event)
 
 void VisualDatabaseDisplayWidget::onDisplayModeChanged(bool checked)
 {
+    updateDisplayModeButton();
     if (checked) {
         // Table mode
-        displayModeButton->setText(tr("Table"));
         flowWidget->setVisible(false);
         cardSizeWidget->setVisible(false);
         databaseView->setItemDelegate(new QStyledItemDelegate(databaseView));
         databaseView->setVisible(true);
     } else {
         // Visual mode
-        displayModeButton->setText(tr("Visual"));
         flowWidget->setVisible(true);
         cardSizeWidget->setVisible(true);
         databaseView->setVisible(false);
