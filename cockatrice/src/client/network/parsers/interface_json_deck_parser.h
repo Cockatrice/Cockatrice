@@ -11,6 +11,7 @@
 
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QList>
 #include <libcockatrice/card/import/card_name_normalizer.h>
 #include <libcockatrice/deck_list/deck_list.h>
 
@@ -108,6 +109,81 @@ public:
                 QString setName = cardData.value("set").toString().toUpper();
                 QString collectorNumber = cardData.value("cn").toString();
                 QString providerId = cardData.value("scryfall_id").toString();
+
+                deckList.setBannerCard({commanderName, providerId});
+                deckList.addCard(commanderName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
+            }
+        }
+
+        return deckList;
+    }
+};
+
+class ManaboxJsonParser : public IJsonDeckParser
+{
+    enum BoardType : quint32
+    {
+        MainBoard = 0,
+        SideBoard = 1,
+        Commander = 2,
+        MaybeBoard = 3,
+    };
+
+public:
+    DeckList parse(const QJsonObject &obj) override
+    {
+        DeckList deckList;
+
+        QString deckName = obj.value("name").toString();
+
+        deckList.setName(deckName);
+
+        QString outputText;
+        QString mainboardText;
+        QString sideboardText;
+        QTextStream mainboardStream(&mainboardText);
+        QTextStream sideboardStream(&sideboardText);
+        QTextStream outStream(&outputText);
+
+        auto commanderList = QList<QJsonObject>();
+        for (auto entry : obj.value("cards").toArray()) {
+            auto card = entry.toObject();
+
+            auto collectorNumber = card.value("collectorNumber").toString();
+            auto cardName = card.value("name").toString();
+            auto boardType = static_cast<BoardType>(card.value("boardCategory").toInt());
+            auto setName = card.value("setId").toString();
+            auto quantity = card.value("quantity").toInt();
+            auto providerId = card.value("scryfallId").toString();
+
+            switch (boardType) {
+                case MainBoard:
+                    mainboardStream << quantity << ' ' << cardName << " (" << setName << ") " << collectorNumber
+                                    << '\n';
+                    break;
+                case SideBoard:
+                case MaybeBoard:
+                    sideboardStream << quantity << ' ' << cardName << " (" << setName << ") " << collectorNumber
+                                    << '\n';
+                    break;
+                case Commander:
+                    commanderList.append(card);
+                    break;
+            }
+        }
+
+        outStream << mainboardText << '\n' << sideboardText;
+
+        deckList.loadFromStream_Plain(outStream, false, CardNameNormalizer());
+        deckList.forEachCard(CardNodeFunction::ResolveProviderId());
+
+        if (commanderList.count() > 0) {
+            for (auto commanderCard : commanderList) {
+
+                QString commanderName = commanderCard.value("name").toString();
+                QString setName = commanderCard.value("set").toString().toUpper();
+                QString collectorNumber = commanderCard.value("cn").toString();
+                QString providerId = commanderCard.value("scryfall_id").toString();
 
                 deckList.setBannerCard({commanderName, providerId});
                 deckList.addCard(commanderName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
