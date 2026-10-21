@@ -26,11 +26,12 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/tree/deck_list_card_node.h>
+#include <libcockatrice/network/network_manager.h>
 #include <version_string.h>
 
 TappedOutInterface::TappedOutInterface(QObject *parent) : QObject(parent)
 {
-    manager = new QNetworkAccessManager(this);
+    manager = NetworkManagerFactory::create(this);
     connect(manager, &QNetworkAccessManager::finished, this, &TappedOutInterface::queryFinished);
 }
 

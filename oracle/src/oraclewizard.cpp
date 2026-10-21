@@ -22,6 +22,7 @@
 #include <QWindow>
 #include <QWizardPage>
 #include <QtGlobal>
+#include <libcockatrice/network/network_manager.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/utility/local_server_name.h>
@@ -53,7 +54,7 @@ OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
     // foreignData for any other language is never imported.
     importer->setCardLang(SettingsCache::instance().cardsDisplay().getCardLang());
 
-    nam = new QNetworkAccessManager(this);
+    nam = NetworkManagerFactory::create(this);
 
     QList<OracleWizardPage *> pages;
 

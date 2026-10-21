@@ -12,12 +12,13 @@
 #include <QStringLiteral>
 #include <QUrl>
 #include <QVariant>
+#include <libcockatrice/network/network_manager.h>
 #include <libcockatrice/settings/commander_bracket_settings.h>
 
 static const QUrl COMMANDER_BRACKET_JSON_URL(QStringLiteral("https://cockatrice.github.io/commander-brackets.json"));
 
 HandleCommanderBrackets::HandleCommanderBrackets(QObject *parent)
-    : QObject(parent), nam(new QNetworkAccessManager(this)), reply(nullptr)
+    : QObject(parent), nam(NetworkManagerFactory::create(this)), reply(nullptr)
 {
 }
 
