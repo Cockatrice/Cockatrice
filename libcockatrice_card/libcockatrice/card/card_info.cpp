@@ -264,6 +264,13 @@ void CardInfo::resetReverseRelatedCards2Me()
     reverseRelatedCardsToMe = QList<CardRelation *>();
 }
 
+void CardInfo::clearDirectRelations()
+{
+    relatedCards = QList<CardRelation *>();
+    reverseRelatedCards = QList<CardRelation *>();
+    reverseRelatedCardsToMe = QList<CardRelation *>();
+}
+
 // Back-compatibility methods. Remove ASAP
 QString CardInfo::getCardType() const
 {

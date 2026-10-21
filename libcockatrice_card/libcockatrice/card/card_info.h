@@ -433,6 +433,14 @@ public:
         return result;
     }
     void resetReverseRelatedCards2Me();
+    /**
+     * @brief Clears the raw relation lists without deleting the CardRelation objects.
+     *
+     * Callers that schedule the relations for deletion (e.g. CardDatabase::removeCard())
+     * must use this to drop the now-dangling pointers from this CardInfo, which may
+     * outlive them through external shared pointers.
+     */
+    void clearDirectRelations();
     void addReverseRelatedCards2Me(CardRelation *cardRelation)
     {
         reverseRelatedCardsToMe.append(cardRelation);

@@ -168,6 +168,10 @@ void CardDatabase::removeCard(const CardInfoPtr &card)
         cardRelation->deleteLater();
     }
 
+    // The relations are only scheduled for deletion; the CardInfo may outlive
+    // them through an external shared pointer, so drop the raw pointers now.
+    card->clearDirectRelations();
+
     QMutexLocker locker(removeCardMutex);
     cards.remove(card->getName());
     simpleNameCards.remove(card->getSimpleName());
@@ -271,6 +275,9 @@ void CardDatabase::swapInDatabaseData(CardDatabaseData data)
         for (auto *rel : card->getReverseRelatedCards2Me()) {
             rel->deleteLater();
         }
+        // Replacement cards take over the database; old CardInfo objects may
+        // still be referenced by the UI, so clear their dangling relations.
+        card->clearDirectRelations();
     }
 
     cards = std::move(data.cards);
