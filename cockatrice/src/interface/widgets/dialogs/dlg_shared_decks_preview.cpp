@@ -40,7 +40,7 @@ DlgSharedDecksPreview::DlgSharedDecksPreview(QWidget *parent,
     titleFont.setBold(true);
     titleFont.setPointSize(titleFont.pointSize() + 2);
     titleLabel->setFont(titleFont);
-    connect(themeManager, &ThemeManager::fontsChanged, this, [this, titleLabel]() {
+    connect(themeManager, &ThemeManager::fontsChanged, this, [titleLabel]() {
         QFont refreshedFont = themeManager->appFont(AppFont::InterfaceDefault);
         refreshedFont.setBold(true);
         refreshedFont.setPointSize(refreshedFont.pointSize() + 2);
