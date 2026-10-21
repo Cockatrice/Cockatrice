@@ -1,7 +1,6 @@
 #include "player_actions.h"
 
 #include "../../client/settings/cache_settings.h"
-#include "../../game_graphics/board/card_item.h"
 #include "../../game_graphics/dialogs/dlg_create_token.h"
 #include "../abstract_game.h"
 #include "../board/arrow_data.h"

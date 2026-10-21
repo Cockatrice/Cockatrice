@@ -229,36 +229,13 @@ void CardItem::setPT(const QString &_pt)
 
 void CardItem::setAttachedTo(CardItem *_attachedTo)
 {
-    if (state->getAttachedTo() != nullptr) {
-        state->getAttachedTo()->removeAttachedCard(state);
-    }
+    CardState *newParent = _attachedTo == nullptr ? nullptr : _attachedTo->getState();
+    state->setAttachedTo(newParent);
 
-    state->setGridPoint(QPoint(-1, state->getGridPoint().y()));
-    state->setAttachedTo(_attachedTo == nullptr ? nullptr : _attachedTo->getState());
-    if (state->getAttachedTo() != nullptr) {
-        // If the zone is being torn down, it might already be null by the time a card tries to un-attach all its
-        // attached cards
-        if (state->getAttachedTo()->getZone() == nullptr) {
-            deleteLater();
-        } else {
-            emit state->getAttachedTo()->getZone()->cardAdded(state);
-            state->getAttachedTo()->addAttachedCard(state);
-            if (state->getZone() != state->getAttachedTo()->getZone()) {
-                state->getAttachedTo()->getZone()->reorganizeCards();
-            }
-        }
-    } else {
-        // If the zone is being torn down, it might already be null by the time a card tries to un-attach all its
-        // attached cards
-        if (state->getZone() == nullptr) {
-            deleteLater();
-        } else {
-            emit state->getZone()->cardAdded(state);
-        }
-    }
-
-    if (state->getZone() != nullptr) {
-        state->getZone()->reorganizeCards();
+    // If the zone is being torn down, it might already be null by the time a card tries to un-attach all its attached
+    // cards
+    if (newParent != nullptr ? newParent->getZone() == nullptr : state->getZone() == nullptr) {
+        deleteLater();
     }
 }
 

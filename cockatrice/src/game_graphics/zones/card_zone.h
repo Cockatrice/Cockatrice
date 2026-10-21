@@ -22,6 +22,7 @@ class QAction;
 class QGraphicsItem;
 class QMenu;
 class QPoint;
+class ServerInfo_Card;
 template <typename T> class QList;
 
 class CardItem;

@@ -28,6 +28,7 @@
 #include <QtGlobal>
 #include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/card/database/card_database_querier.h>
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/protocol/pb/context_undo_draw.pb.h>
@@ -366,13 +367,8 @@ void PlayerEventHandler::eventMoveCard(const Event_MoveCard &event, const GameEv
 
     if (card->getAttachedTo() && (startZone != targetZone)) {
         CardState *parentCard = card->getAttachedTo();
-        // Route through CardItem so the old parent's attachedCards list is cleaned up: CardState::setAttachedTo
-        // only repoints the pointer, leaving a dangling entry that reorganizeCards/prepareDelete would dereference.
-        if (CardItem *item = toCardItem(card)) {
-            item->setAttachedTo(nullptr);
-        } else {
-            card->setAttachedTo(nullptr);
-        }
+        // CardState::setAttachedTo removes the card from the old parent's attachedCards list and emits the zone events.
+        card->setAttachedTo(nullptr);
         parentCard->getZone()->reorganizeCards();
     }
 
@@ -485,14 +481,7 @@ void PlayerEventHandler::eventAttachCard(const Event_AttachCard &event)
 
     CardState *oldParent = startCard->getAttachedTo();
 
-    // Route through CardItem::setAttachedTo to keep the attachedCards graph, grid-x reset and zone emits intact:
-    // CardState::setAttachedTo alone only repoints the pointer, so the target would never list the card and the old
-    // parent would keep a dangling pointer.
-    if (CardItem *startItem = toCardItem(startCard)) {
-        startItem->setAttachedTo(toCardItem(targetCard));
-    } else {
-        startCard->setAttachedTo(targetCard);
-    }
+    startCard->setAttachedTo(targetCard);
 
     startZone->reorganizeCards();
     if ((startZone != targetZone) && targetZone) {
