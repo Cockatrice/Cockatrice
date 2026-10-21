@@ -54,6 +54,7 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/tree/inner_deck_list_node.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <utility>
 
 class QMouseEvent;
@@ -92,10 +93,8 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     // Set up main layout and widgets
     setMinimumSize(0, 0);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    mainLayout = new QVBoxLayout(this);
+    mainLayout = QtUtils::makeLayout<QVBoxLayout>(this, 0, 1);
     setLayout(mainLayout);
-    mainLayout->setSpacing(1);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarPolicy::ScrollBarAsNeeded);
     cardSizeWidget = new CardSizeWidget(this, flowWidget,

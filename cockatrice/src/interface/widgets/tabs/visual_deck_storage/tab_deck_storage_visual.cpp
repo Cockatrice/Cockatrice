@@ -23,6 +23,7 @@
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/network_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <optional>
 #include <string>
 
@@ -46,8 +47,7 @@ TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor, Abstra
     });
 
     auto *widget = new QWidget(this);
-    auto *layout = new QVBoxLayout(widget);
-    layout->setContentsMargins(0, 0, 0, 0);
+    auto *layout = QtUtils::makeLayout<QVBoxLayout>(widget);
     layout->setSpacing(0);
     widget->setLayout(layout);
     this->setCentralWidget(widget);

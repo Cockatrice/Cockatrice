@@ -20,8 +20,7 @@ ArchidektApiResponseDeckListingsDisplayWidget::ArchidektApiResponseDeckListingsD
     CardSizeWidget *_cardSizeSlider)
     : QWidget(parent), cardSizeSlider(_cardSizeSlider)
 {
-    layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout = QtUtils::makeLayout<QHBoxLayout>(this);
     setLayout(layout);
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);

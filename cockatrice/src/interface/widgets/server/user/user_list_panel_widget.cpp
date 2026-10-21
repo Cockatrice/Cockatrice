@@ -9,6 +9,7 @@
 #include <QStringLiteral>
 #include <QVBoxLayout>
 #include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 
 namespace
 {
@@ -31,8 +32,7 @@ QString sectionKey(UserListWidget::Section section)
 UserListPanelWidget::UserListPanelWidget(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent)
     : QWidget(parent)
 {
-    auto *mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
+    auto *mainLayout = QtUtils::makeLayout<QVBoxLayout>(this);
     mainLayout->setSpacing(2);
 
     searchBar = new QLineEdit(this);

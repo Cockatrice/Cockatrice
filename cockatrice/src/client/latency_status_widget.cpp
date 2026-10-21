@@ -14,6 +14,7 @@
 #include <QObject>
 #include <QPoint>
 #include <QVBoxLayout>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 LatencyStatusWidget::LatencyStatusWidget(QWidget *parent) : QWidget(parent)
@@ -24,8 +25,7 @@ LatencyStatusWidget::LatencyStatusWidget(QWidget *parent) : QWidget(parent)
     latencyGraph = new LatencyGraphWidget(this);
     latencyGraph->setFixedSize(90, 14);
 
-    auto *layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
+    auto *layout = QtUtils::makeLayout<QHBoxLayout>(this);
     layout->setSpacing(4);
     layout->addWidget(latencyGraph);
     layout->addWidget(pingLabel);

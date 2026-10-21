@@ -19,6 +19,7 @@
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/utility/card_ref.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 struct CardRef;
@@ -49,15 +50,13 @@ CardInfoFrameWidget::CardInfoFrameWidget(QWidget *parent)
     insertTab(ImageAndTextView, tab3, QString());
     connect(this, &CardInfoFrameWidget::currentChanged, this, &CardInfoFrameWidget::setViewMode);
 
-    tab1Layout = new QVBoxLayout();
+    tab1Layout = QtUtils::makeLayout<QVBoxLayout>();
     tab1Layout->setObjectName("tab1Layout");
-    tab1Layout->setContentsMargins(0, 0, 0, 0);
     tab1Layout->setSpacing(0);
     tab1->setLayout(tab1Layout);
 
-    tab2Layout = new QVBoxLayout();
+    tab2Layout = QtUtils::makeLayout<QVBoxLayout>();
     tab2Layout->setObjectName("tab2Layout");
-    tab2Layout->setContentsMargins(0, 0, 0, 0);
     tab2Layout->setSpacing(0);
     tab2->setLayout(tab2Layout);
 
@@ -65,9 +64,8 @@ CardInfoFrameWidget::CardInfoFrameWidget(QWidget *parent)
     splitter->setObjectName("splitter");
     splitter->setOrientation(Qt::Vertical);
 
-    tab3Layout = new QVBoxLayout();
+    tab3Layout = QtUtils::makeLayout<QVBoxLayout>();
     tab3Layout->setObjectName("tab3Layout");
-    tab3Layout->setContentsMargins(0, 0, 0, 0);
     tab3Layout->setSpacing(0);
     tab3Layout->addWidget(splitter);
     tab3->setLayout(tab3Layout);

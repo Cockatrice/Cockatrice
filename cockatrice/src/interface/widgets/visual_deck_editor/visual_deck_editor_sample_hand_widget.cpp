@@ -25,6 +25,7 @@
 #include <compare>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qlogging.h>
 #include <qnamespace.h>
 #include <qobjectdefs.h>
@@ -41,8 +42,7 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
     layout->setSpacing(0);
     setLayout(layout);
 
-    auto upperLayout = new QVBoxLayout();
-    upperLayout->setContentsMargins(0, 0, 0, 0);
+    auto upperLayout = QtUtils::makeLayout<QVBoxLayout>();
     upperLayout->setSpacing(0);
 
     resetAndHandSizeContainerWidget = new QWidget(this);
