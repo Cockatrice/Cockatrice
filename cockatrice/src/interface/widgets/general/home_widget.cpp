@@ -303,7 +303,7 @@ QGroupBox *HomeWidget::createButtons()
     QFont boxFont = themeManager->appFont(AppFont::InterfaceDefault);
     boxFont.setPointSize(20);
     box->setFont(boxFont);
-    connect(themeManager, &ThemeManager::fontsChanged, this, [this, box]() {
+    connect(themeManager, &ThemeManager::fontsChanged, this, [box]() {
         QFont refreshedFont = themeManager->appFont(AppFont::InterfaceDefault);
         refreshedFont.setPointSize(20);
         box->setFont(refreshedFont);
