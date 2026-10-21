@@ -4570,8 +4570,8 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
 
     connect(socket, SIGNAL(binaryMessageReceived(const QByteArray &)), this,
             SLOT(binaryMessageReceived(const QByteArray &)));
-    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this,
-            SLOT(catchSocketError(QAbstractSocket::SocketError)));
+    connect(socket, &QWebSocket::errorOccurred, this,
+            [this](QAbstractSocket::SocketError error) { catchSocketError(error); });
     connect(socket, SIGNAL(disconnected()), this, SLOT(catchSocketDisconnected()));
 
     // Add this object to the server's list of connections before it can receive socket events.
