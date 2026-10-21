@@ -1,7 +1,3 @@
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
-
 set(HEADERS local_server.h local_server_interface.h)
 
 set(SOURCES local_server.cpp local_server_interface.cpp)

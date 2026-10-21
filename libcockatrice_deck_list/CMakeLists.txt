@@ -1,7 +1,3 @@
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
-
 set(HEADERS
     libcockatrice/deck_list/tree/abstract_deck_list_card_node.h
     libcockatrice/deck_list/tree/abstract_deck_list_node.h

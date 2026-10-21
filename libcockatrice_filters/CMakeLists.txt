@@ -1,7 +1,3 @@
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
-
 set(HEADERS libcockatrice/filters/filter_card.h libcockatrice/filters/filter_string.h
             libcockatrice/filters/filter_tree.h
 )
