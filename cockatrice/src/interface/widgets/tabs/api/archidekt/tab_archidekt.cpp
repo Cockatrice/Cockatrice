@@ -49,6 +49,7 @@
 #include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qlogging.h>
 #include <qnamespace.h>
 #include <version_string.h>
@@ -186,10 +187,7 @@ void TabArchidekt::initializeUi()
     secondaryToolbarLayout->setSpacing(6);
 
     // Scrollable results area
-    scrollArea = new QScrollArea(container);
-    scrollArea->setWidgetResizable(true);
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    scrollArea = QtUtils::makeScrollArea(container);
 
     resultsContainer = new QWidget();
     resultsLayout = new QVBoxLayout(resultsContainer);
@@ -599,11 +597,7 @@ void TabArchidekt::processTopDecksResponse(QJsonObject reply)
 
     // New search → clear everything
     if (currentPage == 1) {
-        QLayoutItem *item;
-        while ((item = resultsLayout->takeAt(0)) != nullptr) {
-            delete item->widget();
-            delete item;
-        }
+        QtUtils::clearLayoutRec(resultsLayout, QtUtils::DeletePolicy::Immediate);
 
         listingsWidget = new ArchidektApiResponseDeckListingsDisplayWidget(resultsContainer, deckData, cardSizeSlider);
 
@@ -629,11 +623,7 @@ void TabArchidekt::processDeckResponse(QJsonObject reply)
     isListMode = false;
 
     // Clear existing results for single deck view
-    QLayoutItem *item;
-    while ((item = resultsLayout->takeAt(0)) != nullptr) {
-        delete item->widget();
-        delete item;
-    }
+    QtUtils::clearLayoutRec(resultsLayout, QtUtils::DeletePolicy::Immediate);
 
     auto display = new ArchidektApiResponseDeckDisplayWidget(resultsContainer, deckData, cardSizeSlider);
     connect(display, &ArchidektApiResponseDeckDisplayWidget::requestNavigation, this, &TabArchidekt::actNavigatePage);

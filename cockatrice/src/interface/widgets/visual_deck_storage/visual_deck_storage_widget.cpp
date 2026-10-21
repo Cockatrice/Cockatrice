@@ -33,6 +33,7 @@
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(parent)
@@ -98,10 +99,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
             &VisualDeckStorageWidget::updateSelectionAnimationEnabled);
 
     // deck area
-    scrollArea = new QScrollArea(this);
-    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    scrollArea->setWidgetResizable(true);
+    scrollArea = QtUtils::makeScrollArea(this);
 
     // putting everything together
     layout->addWidget(searchAndSortContainer);

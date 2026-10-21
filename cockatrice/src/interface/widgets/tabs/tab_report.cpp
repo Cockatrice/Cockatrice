@@ -12,8 +12,6 @@
 #include <QComboBox>
 #include <QDateTime>
 #include <QDebug>
-#include <QFont>
-#include <QFontDatabase>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -52,6 +50,7 @@
 #include <libcockatrice/protocol/pb/response_report_user_info.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_report.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 #include <string>
 
@@ -138,13 +137,7 @@ TabReport::TabReport(TabSupervisor *_tabSupervisor, AbstractClient *_client) : T
     chatGroup = new QGroupBox;
     chatLogEdit = new QTextEdit;
     chatLogEdit->setReadOnly(true);
-    QFont monoFont("monospace");
-    monoFont.setStyleHint(QFont::Monospace);
-    const int systemPointSize = QFontDatabase::systemFont(QFontDatabase::GeneralFont).pointSize();
-    if (systemPointSize > 0) {
-        monoFont.setPointSize(systemPointSize);
-    }
-    chatLogEdit->setFont(monoFont);
+    chatLogEdit->setFont(QtUtils::monospaceFont());
     auto *chatLayout = new QVBoxLayout(chatGroup);
     chatLayout->setContentsMargins(4, 4, 4, 4);
     chatLayout->addWidget(chatLogEdit);

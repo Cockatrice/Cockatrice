@@ -15,6 +15,7 @@
 #include <QSlider>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 EdhrecApiResponseCardDetailsDisplayWidget::EdhrecApiResponseCardDetailsDisplayWidget(
@@ -47,15 +48,7 @@ EdhrecApiResponseCardDetailsDisplayWidget::EdhrecApiResponseCardDetailsDisplayWi
 
     layout->addWidget(backgroundPlateWidget);
 
-    QWidget *currentParent = parentWidget();
-    TabEdhRecMain *parentTab = nullptr;
-
-    while (currentParent) {
-        if ((parentTab = qobject_cast<TabEdhRecMain *>(currentParent))) {
-            break;
-        }
-        currentParent = currentParent->parentWidget();
-    }
+    auto *parentTab = QtUtils::findParentOfType<TabEdhRecMain>(this);
 
     if (parentTab) {
         cardPictureWidget->setScaleFactor(parentTab->getCardSizeSlider()->getSlider()->value());

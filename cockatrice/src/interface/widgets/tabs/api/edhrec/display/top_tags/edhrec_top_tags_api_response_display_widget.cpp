@@ -10,6 +10,7 @@
 #include <QResizeEvent>
 #include <QScrollArea>
 #include <QVBoxLayout>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 EdhrecTopTagsApiResponseDisplayWidget::EdhrecTopTagsApiResponseDisplayWidget(QWidget *parent,
@@ -29,10 +30,7 @@ EdhrecTopTagsApiResponseDisplayWidget::EdhrecTopTagsApiResponseDisplayWidget(QWi
     }
 
     // Create a QScrollArea to hold the card display widgets
-    scrollArea = new QScrollArea(this);
-    scrollArea->setWidgetResizable(true);
-    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scrollArea = QtUtils::makeScrollArea(this);
 
     // Set the cardDisplayLayout inside the scroll area
     auto scrollWidget = new QWidget(scrollArea);

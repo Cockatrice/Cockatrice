@@ -19,6 +19,7 @@
 #include <QSize>
 #include <QSizePolicy>
 #include <QWidget>
+#include <libcockatrice/utility/qt_utils.h>
 
 /**
  * @brief Constructs a FlowWidget.
@@ -55,13 +56,9 @@ FlowWidget::FlowWidget(QWidget *parent,
 
     // Scroll area (optional)
     if (useScrollArea) {
-        scrollArea = new QScrollArea(this);
-        scrollArea->setWidgetResizable(true);
+        scrollArea = QtUtils::makeScrollArea(this, verticalPolicy, horizontalPolicy);
         scrollArea->setMinimumSize(0, 0);
         scrollArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        // Set scrollbar policies
-        scrollArea->setHorizontalScrollBarPolicy(horizontalPolicy);
-        scrollArea->setVerticalScrollBarPolicy(verticalPolicy);
     } else {
         scrollArea = nullptr;
     }
@@ -136,13 +133,7 @@ void FlowWidget::removeWidget(QWidget *widgetToRemove) const
 void FlowWidget::clearLayout()
 {
     if (flowLayout) {
-        QLayoutItem *item;
-        while ((item = flowLayout->takeAt(0))) {
-            if (item->widget()) {
-                item->widget()->deleteLater();
-            }
-            delete item;
-        }
+        QtUtils::clearLayoutRec(flowLayout);
     } else {
         // Defensive fallback: recreate the layout if it was deleted externally.
         flowLayout = new FlowLayout(container, flowDirection);

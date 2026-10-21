@@ -60,6 +60,7 @@
 #include <QWidget>
 #include <QtGlobal>
 #include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 /**
@@ -71,10 +72,8 @@ static QScrollArea *makeScrollable(QWidget *widget)
 {
     widget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Maximum);
 
-    auto *scrollArea = new QScrollArea;
-    scrollArea->setWidgetResizable(true);
+    auto *scrollArea = QtUtils::makeScrollArea();
     scrollArea->setContentsMargins(0, 0, 0, 0);
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     scrollArea->horizontalScrollBar()->setEnabled(false);
     scrollArea->setWidget(widget);
     return scrollArea;
@@ -625,13 +624,8 @@ void SettingsView::scrollToAndFlash(QWidget *target)
     if (!target) {
         return;
     }
-    QWidget *widget = target;
-    while (widget) {
-        if (auto *scrollArea = qobject_cast<QScrollArea *>(widget)) {
-            scrollArea->ensureWidgetVisible(target);
-            break;
-        }
-        widget = widget->parentWidget();
+    if (auto *scrollArea = QtUtils::findParentOfType<QScrollArea>(target, true)) {
+        scrollArea->ensureWidgetVisible(target);
     }
     flashWidget(target);
 }
