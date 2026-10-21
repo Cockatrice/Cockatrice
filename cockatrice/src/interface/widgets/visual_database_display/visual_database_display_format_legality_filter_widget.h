@@ -4,6 +4,7 @@
 #include <QMap>
 #include <QString>
 #include <QWidget>
+#include <libcockatrice/utility/debouncer.h>
 #include <qtmetamacros.h>
 
 class FilterTreeModel;
@@ -42,6 +43,7 @@ private:
     QMap<QString, QPushButton *> formatButtons; // Store toggle buttons
 
     bool exactMatchMode = true; // Toggle between "Exact Match" and "Includes"
+    QtUtils::Debouncer syncDebouncer{100};
 };
 
 #endif // COCKATRICE_VISUAL_DATABASE_DISPLAY_FORMAT_LEGALITY_FILTER_WIDGET_H
