@@ -199,7 +199,8 @@ AbstractServerSocketInterface::AbstractServerSocketInterface(Servatrice *_server
     // Never call flushOutputQueue directly from outputQueueChanged. In case of a socket error,
     // it could lead to this object being destroyed while another function is still on the call stack. -> mutex
     // deadlocks etc.
-    connect(this, SIGNAL(outputQueueChanged()), this, SLOT(flushOutputQueue()), Qt::QueuedConnection);
+    connect(this, &AbstractServerSocketInterface::outputQueueChanged, this,
+            &AbstractServerSocketInterface::flushOutputQueue, Qt::QueuedConnection);
 }
 
 bool AbstractServerSocketInterface::initSession()
@@ -1982,7 +1983,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
             SessionEvent *se = userList[i]->prepareSessionEvent(event);
             userList[i]->sendProtocolItem(*se);
             delete se;
-            QMetaObject::invokeMethod(userList[i], "prepareDestroy", Qt::QueuedConnection);
+            QMetaObject::invokeMethod(
+                userList[i], [user = userList[i]] { user->prepareDestroy(); }, Qt::QueuedConnection);
         }
     }
 
@@ -4191,15 +4193,16 @@ Response::ResponseCode
 AbstractServerSocketInterface::cmdUpdateServerMessage(const Command_UpdateServerMessage & /*cmd*/,
                                                       ResponseContainer & /*rc*/)
 {
-    QMetaObject::invokeMethod(server, "updateLoginMessage");
+    QMetaObject::invokeMethod(servatrice, [this] { servatrice->updateLoginMessage(); });
     return Response::RespOk;
 }
 
 Response::ResponseCode AbstractServerSocketInterface::cmdShutdownServer(const Command_ShutdownServer &cmd,
                                                                         ResponseContainer & /*rc*/)
 {
-    QMetaObject::invokeMethod(server, "scheduleShutdown", Q_ARG(QString, textFromStdString(cmd.reason())),
-                              Q_ARG(int, cmd.minutes()));
+    QMetaObject::invokeMethod(servatrice, [this, reason = textFromStdString(cmd.reason()), minutes = cmd.minutes()] {
+        servatrice->scheduleShutdown(reason, minutes);
+    });
     return Response::RespOk;
 }
 
@@ -4208,7 +4211,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReloadConfig(const Comm
 {
     logDebugMessage("Received admin command: reloading configuration");
     settingsCache->sync();
-    QMetaObject::invokeMethod(server, "setRequiredFeatures", Q_ARG(QString, server->getRequiredFeatures()));
+    QMetaObject::invokeMethod(servatrice, [this, features = servatrice->getRequiredFeatures()] {
+        servatrice->setRequiredFeatures(features);
+    });
     return Response::RespOk;
 }
 
@@ -4260,7 +4265,7 @@ bool AbstractServerSocketInterface::removeAdminFlagFromUser(const QString &userN
         delete se;
     }
 
-    QMetaObject::invokeMethod(user, "prepareDestroy", Qt::QueuedConnection);
+    QMetaObject::invokeMethod(user, [user] { user->prepareDestroy(); }, Qt::QueuedConnection);
     return true;
 }
 
@@ -4435,10 +4440,10 @@ TcpServerSocketInterface::TcpServerSocketInterface(Servatrice *_server,
 {
     socket = new QTcpSocket(this);
     socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
-    connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()));
-    connect(socket, SIGNAL(disconnected()), this, SLOT(catchSocketDisconnected()));
-    connect(socket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this,
-            SLOT(catchSocketError(QAbstractSocket::SocketError)));
+    connect(socket, &QTcpSocket::readyRead, this, [this] { readClient(); });
+    connect(socket, &QTcpSocket::disconnected, this, [this] { catchSocketDisconnected(); });
+    connect(socket, &QTcpSocket::errorOccurred, this,
+            [this](QAbstractSocket::SocketError error) { catchSocketError(error); });
 }
 
 TcpServerSocketInterface::~TcpServerSocketInterface()
@@ -4660,8 +4665,7 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
         }
     }
 
-    connect(socket, SIGNAL(binaryMessageReceived(const QByteArray &)), this,
-            SLOT(binaryMessageReceived(const QByteArray &)));
+    connect(socket, &QWebSocket::binaryMessageReceived, this, &WebsocketServerSocketInterface::binaryMessageReceived);
     // QWebSocket::errorOccurred was added in Qt 6.5 (error() is deprecated from 6.5 on),
     // so a typed connect cannot compile against the 6.4 floor.
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
@@ -4671,7 +4675,7 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this,
             SLOT(catchSocketError(QAbstractSocket::SocketError)));
 #endif
-    connect(socket, SIGNAL(disconnected()), this, SLOT(catchSocketDisconnected()));
+    connect(socket, &QWebSocket::disconnected, this, [this] { catchSocketDisconnected(); });
 
     // Add this object to the server's list of connections before it can receive socket events.
     // Otherwise, in case of a socket error, it could be removed from the list before it is added.
