@@ -84,7 +84,7 @@ void DlgLoadDeckFromWebsite::accept()
             qCWarning(DlgLoadDeckFromWebsiteLog) << "No parser found for provider";
             QMessageBox::warning(this, tr("Load Deck from Website"),
                                  tr("No parser available for this deck provider.\n (Archidekt, Deckstats, Moxfield, "
-                                    "and TappedOut are supported.)"));
+                                    "Manabox and TappedOut are supported.)"));
             QDialog::reject();
             return;
         }
@@ -151,6 +151,7 @@ void DlgLoadDeckFromWebsite::accept()
                                 "https://archidekt.com/decks/9999999\n"
                                 "https://deckstats.net/decks/99999/9999999-your-deck-name/en\n"
                                 "https://moxfield.com/decks/XYZxx-XYZ99Yyy-xyzXzzz\n"
+                                "https://manabox.app/decks/XYZxxaXYZ99YyyxxyzXzzz\n"
                                 "https://tappedout.net/mtg-decks/your-deck-name/"));
         QDialog::reject();
     }
@@ -163,6 +164,8 @@ QSharedPointer<IJsonDeckParser> DlgLoadDeckFromWebsite::createParserForProvider(
             return QSharedPointer<IJsonDeckParser>(new ArchidektJsonParser());
         case DeckProvider::Moxfield:
             return QSharedPointer<IJsonDeckParser>(new MoxfieldJsonParser());
+        case DeckProvider::Manabox:
+            return QSharedPointer<IJsonDeckParser>(new ManaboxJsonParser());
         default:
             return QSharedPointer<IJsonDeckParser>(nullptr);
     }

@@ -15,6 +15,7 @@ enum class DeckProvider
     Archidekt,
     Moxfield,
     Deckstats,
+    Manabox,
     Unknown
 };
 
