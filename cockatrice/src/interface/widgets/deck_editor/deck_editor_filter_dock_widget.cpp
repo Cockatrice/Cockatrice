@@ -28,6 +28,7 @@
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QWidget>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 DeckEditorFilterDockWidget::DeckEditorFilterDockWidget(AbstractTabDeckEditor *parent)
@@ -80,9 +81,8 @@ void DeckEditorFilterDockWidget::createFiltersDock()
     filterDelAll->setDefaultAction(aClearFilterAll);
     filterDelAll->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
-    auto *filterLayout = new QGridLayout;
+    auto *filterLayout = QtUtils::makeLayout<QGridLayout>();
     filterLayout->setObjectName("filterLayout");
-    filterLayout->setContentsMargins(0, 0, 0, 0);
     filterLayout->addWidget(filterBuilder, 0, 0, 1, 3);
     filterLayout->addWidget(filterView, 1, 0, 1, 3);
     filterLayout->addWidget(filterDelOne, 2, 0, 1, 1);

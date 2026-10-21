@@ -78,6 +78,7 @@
 #include <libcockatrice/settings/debug_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/layouts_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <qnamespace.h>
 #include <qobjectdefs.h>
@@ -1287,8 +1288,7 @@ void TabGame::createPlayAreaWidget(bool bReplay)
     connect(game->getGameEventHandler(), &GameEventHandler::arrowDeleted, scene, &GameScene::deleteArrow);
     gameView = new GameView(scene);
 
-    auto gamePlayAreaVBox = new QVBoxLayout;
-    gamePlayAreaVBox->setContentsMargins(0, 0, 0, 0);
+    auto gamePlayAreaVBox = QtUtils::makeLayout<QVBoxLayout>();
     gamePlayAreaVBox->addWidget(gameView);
 
     gamePlayAreaWidget = new QWidget;
@@ -1320,8 +1320,7 @@ void TabGame::createDeckViewContainerWidget(bool bReplay)
 
     deckViewContainerWidget = new QWidget();
     deckViewContainerWidget->setObjectName("deckViewContainerWidget");
-    deckViewContainerLayout = new QVBoxLayout;
-    deckViewContainerLayout->setContentsMargins(0, 0, 0, 0);
+    deckViewContainerLayout = QtUtils::makeLayout<QVBoxLayout>();
     deckViewContainerWidget->setLayout(deckViewContainerLayout);
 }
 
@@ -1336,8 +1335,7 @@ void TabGame::createCardInfoDock(bool bReplay)
 
     cardInfoFrameWidget = new CardInfoFrameWidget();
     auto cardHInfoLayout = new QHBoxLayout;
-    auto cardVInfoLayout = new QVBoxLayout;
-    cardVInfoLayout->setContentsMargins(0, 0, 0, 0);
+    auto cardVInfoLayout = QtUtils::makeLayout<QVBoxLayout>();
     cardVInfoLayout->addWidget(cardInfoFrameWidget);
     cardVInfoLayout->addLayout(cardHInfoLayout);
 
@@ -1364,8 +1362,7 @@ void TabGame::createPlayerListDock(bool bReplay)
     playerListWidget->setFocusPolicy(Qt::NoFocus);
 
     auto *playerListBox = new QWidget(this);
-    auto *vbox = new QVBoxLayout(playerListBox);
-    vbox->setContentsMargins(0, 0, 0, 0);
+    auto *vbox = QtUtils::makeLayout<QVBoxLayout>(playerListBox);
     vbox->setSpacing(0);
 
     vbox->addWidget(playerListWidget);
@@ -1391,8 +1388,7 @@ void TabGame::createPlayerListDock(bool bReplay)
 
 void TabGame::createMessageDock(bool bReplay)
 {
-    auto messageLogLayout = new QVBoxLayout;
-    messageLogLayout->setContentsMargins(0, 0, 0, 0);
+    auto messageLogLayout = QtUtils::makeLayout<QVBoxLayout>();
 
     // clock
     if (!bReplay) {

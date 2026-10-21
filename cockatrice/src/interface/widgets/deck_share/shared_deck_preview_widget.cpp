@@ -15,6 +15,7 @@
 #include <QStringLiteral>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_querier.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 SharedDeckPreviewWidget::SharedDeckPreviewWidget(QWidget *parent,
@@ -62,8 +63,7 @@ SharedDeckPreviewWidget::SharedDeckPreviewWidget(QWidget *parent,
     selectionRow->addWidget(selectionCheckBox);
     selectionRow->addStretch(1);
 
-    auto *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
+    auto *layout = QtUtils::makeLayout<QVBoxLayout>(this);
     layout->addLayout(selectionRow);
     layout->addWidget(bannerCardDisplayWidget, 0, Qt::AlignHCenter);
     layout->addWidget(colorIdentityWidget, 0, Qt::AlignHCenter);

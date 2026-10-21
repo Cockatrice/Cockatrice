@@ -15,6 +15,7 @@
 #include <QPushButton>
 #include <QStringLiteral>
 #include <QToolTip>
+#include <libcockatrice/utility/qt_utils.h>
 
 SequenceEdit::SequenceEdit(const QString &_shortcutName, QWidget *parent) : QWidget(parent)
 {
@@ -26,8 +27,7 @@ SequenceEdit::SequenceEdit(const QString &_shortcutName, QWidget *parent) : QWid
     clearButton->setIcon(themePixmap(QStringLiteral("icons/clearsearch")));
     defaultButton->setIcon(themePixmap(QStringLiteral("icons/update")));
 
-    auto *layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
+    auto *layout = QtUtils::makeLayout<QHBoxLayout>(this);
     layout->setSpacing(1);
     layout->addWidget(lineEdit);
     layout->addWidget(clearButton);

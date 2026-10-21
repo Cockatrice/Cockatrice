@@ -55,6 +55,7 @@
 #include <libcockatrice/protocol/pb/response_get_games_of_user.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/card_ref.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnumeric.h>
 #include <string>
 
@@ -402,8 +403,7 @@ UserInfoPopup::UserInfoPopup(TabSupervisor *_ts,
 
 void UserInfoPopup::buildUi()
 {
-    auto *root = new QVBoxLayout(this);
-    root->setContentsMargins(0, 0, 0, 0);
+    auto *root = QtUtils::makeLayout<QVBoxLayout>(this);
     root->setSpacing(0);
 
     // Header

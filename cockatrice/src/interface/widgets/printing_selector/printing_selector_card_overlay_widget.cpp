@@ -40,6 +40,7 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/settings/card_override_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 class DeckStateManager;
@@ -108,8 +109,7 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
     : QWidget(parent), deckEditor(_deckEditor), rootCard(_rootCard)
 {
     // Set up the main layout
-    auto *mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
+    auto *mainLayout = QtUtils::makeLayout<QVBoxLayout>(this);
     mainLayout->setSpacing(0);
     setLayout(mainLayout);
 
