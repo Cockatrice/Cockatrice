@@ -20,6 +20,7 @@
 #include <QVariant>
 #include <QWidget>
 #include <QtGlobal>
+#include <libcockatrice/utility/qt_utils.h>
 
 namespace
 {
@@ -68,9 +69,8 @@ PreferencesSetupPage::PreferencesSetupPage(QWidget *parent) : FirstRunWizardPage
 
     contentLayout->addStretch();
 
-    auto *scrollArea = new QScrollArea(this);
+    auto *scrollArea = QtUtils::makeScrollArea(this, Qt::ScrollBarAsNeeded, Qt::ScrollBarAsNeeded);
     scrollArea->setWidget(content);
-    scrollArea->setWidgetResizable(true);
     scrollArea->setFrameShape(QFrame::NoFrame);
 
     auto *layout = new QVBoxLayout(this);
