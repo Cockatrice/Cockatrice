@@ -21,6 +21,7 @@ set(UTILITY_HEADERS
     libcockatrice/utility/card_ref.h
     libcockatrice/utility/color.h
     libcockatrice/utility/cryptoutil.h
+    libcockatrice/utility/debouncer.h
     libcockatrice/utility/expression.h
     libcockatrice/utility/levenshtein.h
     libcockatrice/utility/local_server_name.h
