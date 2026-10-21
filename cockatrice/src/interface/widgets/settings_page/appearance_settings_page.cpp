@@ -17,7 +17,6 @@
 #include <QColor>
 #include <QColorDialog>
 #include <QDebug>
-#include <QDesktopServices>
 #include <QDir>
 #include <QGridLayout>
 #include <QGroupBox>
@@ -30,7 +29,6 @@
 #include <QStringLiteral>
 #include <QStyleFactory>
 #include <QTimer>
-#include <QUrl>
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QtGlobal>
@@ -39,6 +37,7 @@
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 AppearanceSettingsPage::AppearanceSettingsPage()
@@ -446,7 +445,7 @@ void AppearanceSettingsPage::openThemeLocation()
     dirDir.cdUp();
     // open if dir exists, create if parent dir does exist
     if (dirDir.exists() && dirDir.mkpath(dir)) {
-        QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
+        QtUtils::openPathInFileManager(dir);
     } else {
         QMessageBox::critical(this, tr("Error"), tr("Could not create themes directory at '%1'.").arg(dir));
     }

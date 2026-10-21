@@ -128,12 +128,8 @@ void DlgReportUser::actSubmit()
         return;
     }
 
-    QMessageBox::StandardButton reply =
-        QMessageBox::question(this, tr("Confirm Report"),
-                              tr("Submit report against %1 for %2?").arg(reportedUser, categoryBox->currentText()),
-                              QMessageBox::Yes | QMessageBox::No);
-
-    if (reply != QMessageBox::Yes) {
+    if (!QtUtils::confirm(this, tr("Confirm Report"),
+                          tr("Submit report against %1 for %2?").arg(reportedUser, categoryBox->currentText()))) {
         return;
     }
 

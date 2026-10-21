@@ -32,9 +32,8 @@ FirstRunWizard::FirstRunWizard(QWidget *parent) : QDialog(parent)
     bannerHost = new BannerHost(this);
 
     titleLabel = new QLabel(this);
-    QFont titleFont = titleLabel->font();
+    QFont titleFont = QtUtils::boldFont(titleLabel->font());
     titleFont.setPointSizeF(titleFont.pointSizeF() * 1.4);
-    titleFont.setBold(true);
     titleLabel->setFont(titleFont);
 
     subtitleLabel = new QLabel(this);

@@ -41,6 +41,7 @@
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qlogging.h>
 #include <qnamespace.h>
 #include <string>
@@ -420,10 +421,8 @@ void GameSelector::joinGame(const ServerInfo_Game &game, const bool asSpectator,
     // spectator join, so ask first instead of surprising the player.
     const bool gameFull = game.player_count() == game.max_players();
     if (gameFull && !asSpectator && !asJudge && !overrideRestrictions) {
-        const QMessageBox::StandardButton answer =
-            QMessageBox::question(this, tr("Join game"), tr("The game is full. Join as a spectator instead?"),
-                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-        if (answer != QMessageBox::Yes) {
+        if (!QtUtils::confirm(this, tr("Join game"), tr("The game is full. Join as a spectator instead?"),
+                              QMessageBox::No)) {
             return;
         }
     }

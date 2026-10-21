@@ -79,6 +79,7 @@
 #include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/tabs_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <memory>
 #include <qnamespace.h>
 #include <string>
@@ -362,9 +363,8 @@ void TabSupervisor::closeEvent(QCloseEvent *event)
     QTabWidget::closeEvent(event);
 
     if (getGameCount()) {
-        if (QMessageBox::question(this, tr("Are you sure?"),
-                                  tr("There are still open games. Are you sure you want to quit?"),
-                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No) {
+        if (!QtUtils::confirm(this, tr("Are you sure?"),
+                              tr("There are still open games. Are you sure you want to quit?"), QMessageBox::No)) {
             event->ignore();
             return;
         }

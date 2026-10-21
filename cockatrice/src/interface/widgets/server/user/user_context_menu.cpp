@@ -49,6 +49,7 @@
 #include <libcockatrice/protocol/pb/response_warn_list.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 #include <string>
 
@@ -685,10 +686,8 @@ void UserContextMenu::execRemoveFromIgnore(const QString &userName)
 
 void UserContextMenu::execKick(int playerId)
 {
-    auto result = QMessageBox::question(static_cast<QWidget *>(parent()), tr("Kick Player"),
-                                        tr("Are you sure you want to kick this player from the game?"),
-                                        QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-    if (result == QMessageBox::Yes) {
+    if (QtUtils::confirm(static_cast<QWidget *>(parent()), tr("Kick Player"),
+                         tr("Are you sure you want to kick this player from the game?"), QMessageBox::No)) {
         Command_KickFromGame cmd;
         cmd.set_player_id(playerId);
 

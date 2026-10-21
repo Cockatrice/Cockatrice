@@ -13,6 +13,7 @@
 #include <QVBoxLayout>
 #include <google/protobuf/repeated_ptr_field.h>
 #include <libcockatrice/protocol/pb/serverinfo_deck_share_item.pb.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 class QWidget;
@@ -34,8 +35,7 @@ DlgSharedDecksPreview::DlgSharedDecksPreview(QWidget *parent,
     // QLabels render AutoText and markup would otherwise be shown as rich text.
     auto *titleLabel =
         new QLabel(tr("Share: %1").arg((shareName.isEmpty() ? tr("Untitled") : shareName).toHtmlEscaped()), this);
-    QFont titleFont = titleLabel->font();
-    titleFont.setBold(true);
+    QFont titleFont = QtUtils::boldFont(titleLabel->font());
     titleFont.setPointSize(titleFont.pointSize() + 2);
     titleLabel->setFont(titleFont);
     mainLayout->addWidget(titleLabel);
