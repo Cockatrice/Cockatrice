@@ -11,6 +11,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QSlider>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 ArchidektApiResponseDeckListingsDisplayWidget::ArchidektApiResponseDeckListingsDisplayWidget(
@@ -64,7 +65,5 @@ void ArchidektApiResponseDeckListingsDisplayWidget::append(const ArchidektDeckLi
 void ArchidektApiResponseDeckListingsDisplayWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-    layout->invalidate();
-    layout->activate();
-    layout->update();
+    QtUtils::relayout(layout);
 }
