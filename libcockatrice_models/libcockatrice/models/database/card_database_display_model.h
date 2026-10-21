@@ -40,7 +40,6 @@ private:
     QSet<QString> cardNameSet, cardTypes, cardColors;
     FilterTree *filterTree;
     FilterString *filterString;
-    int loadedRowCount;
     QTimer dirtyTimer;
     CardSearchLanguage searchLanguage;
     QString searchText;
@@ -81,8 +80,6 @@ public:
     }
     void clearFilterAll();
     [[nodiscard]] int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    [[nodiscard]] bool canFetchMore(const QModelIndex &parent) const override;
-    void fetchMore(const QModelIndex &parent) override;
 signals:
     void modelDirty();
 
