@@ -17,6 +17,7 @@
 #include <QAbstractItemModel>
 #include <QApplication>
 #include <QByteArray>
+#include <QCollator>
 #include <QColor>
 #include <QContextMenuEvent>
 #include <QCursor>
@@ -273,6 +274,15 @@ void UserListTWI::setOnline(bool online)
  */
 bool UserListTWI::operator<(const QTreeWidgetItem &other) const
 {
+    // QCollator caches the locale data, unlike QString::localeAwareCompare,
+    // which rebuilds it for every pair. The tree sorts one list at a time, so a
+    // single shared, immutable collator is enough.
+    static const QCollator collator = [] {
+        QCollator result;
+        result.setNumericMode(true);
+        return result;
+    }();
+
     // Sort by online/offline
     if (data(0, UserListRoles::Online) != other.data(0, UserListRoles::Online)) {
         return data(0, UserListRoles::Online).toBool();
@@ -288,8 +298,7 @@ bool UserListTWI::operator<(const QTreeWidgetItem &other) const
     for (const auto &userLevelEntry : userLevelWithNoOtherPrefOrder) {
         if (lhsUserLevelFlags.testFlag(userLevelEntry) &&
             lhsUserLevelFlags.testFlag(userLevelEntry) == rhsUserLevelFlags.testFlag(userLevelEntry)) {
-            return QString::localeAwareCompare(data(2, Qt::UserRole).toString(),
-                                               other.data(2, Qt::UserRole).toString()) < 0;
+            return collator.compare(data(2, Qt::UserRole).toString(), other.data(2, Qt::UserRole).toString()) < 0;
         } else if (lhsUserLevelFlags.testFlag(userLevelEntry) != rhsUserLevelFlags.testFlag(userLevelEntry)) {
             return lhsUserLevelFlags.testFlag(userLevelEntry) > rhsUserLevelFlags.testFlag(userLevelEntry);
         }
@@ -314,7 +323,7 @@ bool UserListTWI::operator<(const QTreeWidgetItem &other) const
     }
 
     // Sort by name
-    return QString::localeAwareCompare(data(2, Qt::UserRole).toString(), other.data(2, Qt::UserRole).toString()) < 0;
+    return collator.compare(data(2, Qt::UserRole).toString(), other.data(2, Qt::UserRole).toString()) < 0;
 }
 
 UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
