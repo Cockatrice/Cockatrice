@@ -410,11 +410,6 @@ void VisualDatabaseDisplayWidget::loadNextPage()
     int start = currentPage * cardsPerPage;
     int end = qMin(start + cardsPerPage, rowCount);
 
-    // Load more cards if we are at the end of the current list and can fetch more
-    if (end >= rowCount && databaseDisplayModel->canFetchMore(QModelIndex())) {
-        databaseDisplayModel->fetchMore(QModelIndex());
-    }
-
     // Load the next page of cards and add them to the flow widget
     flowWidget->setUpdatesEnabled(false);
     loadPage(start, end);
