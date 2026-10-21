@@ -43,9 +43,7 @@ EdhrecTopCardsApiResponseDisplayWidget::EdhrecTopCardsApiResponseDisplayWidget(Q
 void EdhrecTopCardsApiResponseDisplayWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-    layout->invalidate();
-    layout->activate();
-    layout->update();
+    QtUtils::relayout(layout);
     if (scrollArea && scrollArea->widget()) {
         scrollArea->widget()->resize(event->size());
     }
