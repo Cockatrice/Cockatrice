@@ -15,7 +15,11 @@ static const QString ARCHIDEKT_SUFFIX = "/?format=json";
 static const QString MOXFIELD_BASE = "https://api.moxfield.com/v2/decks/all/";
 static const QString MOXFIELD_SUFFIX = "/";
 
+static const QString DECKSTATS_BASE = "https://deckstats.net/decks/";
 static const QString DECKSTATS_SUFFIX = "?include_comments=1&export_mtgarena=1";
+
+static const QString MANABOX_BASE = "https://cloud.manabox.app/decks/";
+static const QString MANABOX_SUFFIX = "";
 
 bool parseDeckUrl(const QString &url, ParsedDeckInfo &outInfo)
 {
@@ -23,6 +27,7 @@ bool parseDeckUrl(const QString &url, ParsedDeckInfo &outInfo)
     static QRegularExpression rxArchidekt("archidekt\\.com/decks/(\\d+)");
     static QRegularExpression rxMoxfield("moxfield\\.com/decks/([a-zA-Z0-9_-]+)");
     static QRegularExpression rxDeckstats("deckstats\\.net/decks/(\\d+/[a-zA-Z0-9_-]+)");
+    static QRegularExpression rxManabox("manabox\\.app/decks/([a-zA-Z0-9_-]+)");
 
     QRegularExpressionMatch match;
 
@@ -49,10 +54,17 @@ bool parseDeckUrl(const QString &url, ParsedDeckInfo &outInfo)
         return true;
     } else if ((match = rxDeckstats.match(url)).hasMatch()) {
         QString deckPath = match.captured(1);
-        outInfo = ParsedDeckInfo{.baseUrl = "https://deckstats.net/decks/",
+        outInfo = ParsedDeckInfo{.baseUrl = DECKSTATS_BASE,
                                  .deckID = deckPath,
-                                 .fullUrl = "https://deckstats.net/decks/" + deckPath + DECKSTATS_SUFFIX,
+                                 .fullUrl = DECKSTATS_BASE + deckPath + DECKSTATS_SUFFIX,
                                  .provider = DeckProvider::Deckstats};
+        return true;
+    } else if ((match = rxManabox.match(url)).hasMatch()) {
+        QString deckPath = match.captured(1);
+        outInfo = ParsedDeckInfo{.baseUrl = MANABOX_BASE,
+                                 .deckID = deckPath,
+                                 .fullUrl = MANABOX_BASE + deckPath + MANABOX_SUFFIX,
+                                 .provider = DeckProvider::Manabox};
         return true;
     }
 
