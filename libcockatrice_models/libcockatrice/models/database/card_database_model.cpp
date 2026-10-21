@@ -27,9 +27,11 @@ CardDatabaseModel::CardDatabaseModel(CardDatabase *_db, bool _showOnlyCardsFromE
 
 CardDatabaseModel::~CardDatabaseModel() = default;
 
-int CardDatabaseModel::rowCount(const QModelIndex & /*parent*/) const
+int CardDatabaseModel::rowCount(const QModelIndex &parent) const
 {
-    return cardList.size();
+    // A list model's card rows are leaves; returning the full card count for a
+    // valid parent makes every row claim all cards as children.
+    return parent.isValid() ? 0 : cardList.size();
 }
 
 int CardDatabaseModel::columnCount(const QModelIndex & /*parent*/) const
