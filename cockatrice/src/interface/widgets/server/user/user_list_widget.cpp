@@ -56,6 +56,7 @@
 #include <QVariant>
 #include <QWidget>
 #include <QtGlobal>
+#include <libcockatrice/models/natural_sort_collator.h>
 #include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
@@ -276,11 +277,7 @@ bool UserListTWI::operator<(const QTreeWidgetItem &other) const
     // QCollator caches the locale data, unlike QString::localeAwareCompare,
     // which rebuilds it for every pair. The tree sorts one list at a time, so a
     // single shared, immutable collator is enough.
-    static const QCollator collator = [] {
-        QCollator result;
-        result.setNumericMode(true);
-        return result;
-    }();
+    static const QCollator collator = makeNaturalSortCollator();
 
     // Sort by online/offline
     if (data(0, UserListRoles::Online) != other.data(0, UserListRoles::Online)) {

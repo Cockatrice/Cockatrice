@@ -1,5 +1,6 @@
 #include "card_database_display_model.h"
 
+#include "../natural_sort_collator.h"
 #include "card_database_model.h"
 #include "libcockatrice/card/card_localization.h"
 #include "libcockatrice/filters/filter_string.h"
@@ -23,7 +24,7 @@ CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)
     : QSortFilterProxyModel(parent), isToken(ShowAll), filterString(nullptr)
 {
     filterTree = nullptr;
-    collator.setNumericMode(true);
+    collator = makeNaturalSortCollator();
     setFilterCaseSensitivity(Qt::CaseInsensitive);
     setSortCaseSensitivity(Qt::CaseInsensitive);
 

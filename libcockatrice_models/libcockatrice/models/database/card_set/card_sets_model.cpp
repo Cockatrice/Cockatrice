@@ -1,5 +1,6 @@
 #include "card_sets_model.h"
 
+#include "../../natural_sort_collator.h"
 #include "libcockatrice/card/database/card_database.h"
 #include "libcockatrice/card/set/card_set.h"
 #include "libcockatrice/interfaces/interface_card_set_priority_controller.h"
@@ -300,7 +301,7 @@ SetsDisplayModel::SetsDisplayModel(QObject *parent) : QSortFilterProxyModel(pare
 {
     setFilterCaseSensitivity(Qt::CaseInsensitive);
     setSortCaseSensitivity(Qt::CaseInsensitive);
-    collator.setNumericMode(true);
+    collator = makeNaturalSortCollator();
 }
 
 void SetsDisplayModel::fetchMore(const QModelIndex &index)

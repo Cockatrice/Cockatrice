@@ -7,6 +7,8 @@
 #ifndef COCKATRICE_DECK_LIST_SORT_FILTER_PROXY_MODEL_H
 #define COCKATRICE_DECK_LIST_SORT_FILTER_PROXY_MODEL_H
 
+#include "../natural_sort_collator.h"
+
 #include <QCollator>
 #include <QList>
 #include <QSortFilterProxyModel>
@@ -22,7 +24,7 @@ class DeckListSortFilterProxyModel : public QSortFilterProxyModel
 public:
     explicit DeckListSortFilterProxyModel(QObject *parent = nullptr) : QSortFilterProxyModel(parent)
     {
-        collator.setNumericMode(true);
+        collator = makeNaturalSortCollator();
     }
 
     void setSortCriteria(const QStringList &criteria)
