@@ -477,29 +477,48 @@ if [[ $RUNNER_OS == Windows && ! $MAKE_NO_CLIENT ]]; then
   probe_check="./holder-probe-check.ps1"
   cat >"$probe_check" <<'POWERSHELL'
 $ErrorActionPreference = "Stop"
-$dir = Join-Path ([IO.Path]::GetTempPath()) "cockatrice-holder-probe"
+$dir = Join-Path ([IO.Path]::GetTempPath()) "cockatrice-holder-probe-$PID"
 Remove-Item -Recurse -Force $dir -ErrorAction SilentlyContinue
 New-Item -ItemType Directory -Force $dir | Out-Null
-$file = Join-Path $dir "locked.dll"
-[IO.File]::WriteAllText($file, "x")
-$handle = [IO.File]::Open($file, "Open", "ReadWrite", "None")
-try {
-    $env:COCKATRICE_GUARD_DIR = $dir
-    $found = & $env:PROBE_EXE
-    $code = $LASTEXITCODE
-} finally {
-    $handle.Dispose()
+$probe = (Resolve-Path -LiteralPath $env:PROBE_EXE).Path
+
+function Invoke-Probe([string] $guardDir) {
+    $start = New-Object System.Diagnostics.ProcessStartInfo
+    $start.FileName = $probe
+    $start.UseShellExecute = $false
+    $start.RedirectStandardOutput = $true
+    $start.EnvironmentVariables["COCKATRICE_GUARD_DIR"] = $guardDir
+    $process = [System.Diagnostics.Process]::Start($start)
+    $read = $process.StandardOutput.ReadToEndAsync()
+    if (-not $process.WaitForExit(20000)) {
+        try { $process.Kill() } catch { }
+        throw "the holder probe did not finish within 20 s for $guardDir"
+    }
+    $output = $read.Result
+    $code = $process.ExitCode
+    $process.Dispose()
+    return @{ Code = $code; Output = $output }
 }
-if ($code -ne 1) { throw "expected exit 1 for a locked file, got $code : $found" }
-if ($found -notmatch "pid\s+$PID\b") { throw "the lookup did not name this process: $found" }
-$empty = Join-Path $dir "empty"
-New-Item -ItemType Directory -Force $empty | Out-Null
-$env:COCKATRICE_GUARD_DIR = $empty
-$nothing = & $env:PROBE_EXE
-$code = $LASTEXITCODE
-if ($code -ne 0) { throw "expected exit 0 for a directory with nothing open, got $code : $nothing" }
-Remove-Item -Recurse -Force $dir
-Write-Host "holder lookup named pid $PID for a locked file and named nothing for an empty directory"
+
+try {
+    $file = Join-Path $dir "locked.dll"
+    [IO.File]::WriteAllText($file, "x")
+    $handle = [IO.File]::Open($file, "Open", "ReadWrite", "None")
+    try {
+        $locked = Invoke-Probe $dir
+    } finally {
+        $handle.Dispose()
+    }
+    if ($locked.Code -ne 1) { throw "expected exit 1 for a locked file, got $($locked.Code) : $($locked.Output)" }
+    if ($locked.Output -notmatch "pid\s+$PID\b") { throw "the lookup did not name this process: $($locked.Output)" }
+    $empty = Join-Path $dir "empty"
+    New-Item -ItemType Directory -Force $empty | Out-Null
+    $nothing = Invoke-Probe $empty
+    if ($nothing.Code -ne 0) { throw "expected exit 0 for a directory with nothing open, got $($nothing.Code) : $($nothing.Output)" }
+    Write-Host "holder lookup named pid $PID for a locked file and named nothing for an empty directory"
+} finally {
+    Remove-Item -Recurse -Force $dir -ErrorAction SilentlyContinue
+}
 POWERSHELL
   if ! PROBE_EXE="$probe" powershell -NoProfile -File "$probe_check"; then
     rm -f "$probe_check"

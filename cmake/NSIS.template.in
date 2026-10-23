@@ -1239,9 +1239,23 @@ Function LogStaleRuntimeDiagnostics
         ${Else}
             Pop $R2
             ${If} $R2 = 0
-                ; A valid handle: close it, and the file was deletable all along.
+                ; A valid handle: close it. The open proves the file is not held
+                ; open, but not that Delete would succeed: a read-only file opens
+                ; for DELETE and still fails DeleteFile until the attribute is
+                ; cleared, which the purge does not do. Report that standing
+                ; cause instead of calling the failure transient.
                 System::Call 'kernel32::CloseHandle(p R1)'
-                StrCpy $R0 "the failure does not reproduce any more"
+                System::Call 'kernel32::GetFileAttributesW(w "$INSTDIR\$StaleFindName") i.R3'
+                ${If} $R3 = -1
+                    StrCpy $R0 "a delete-access open now succeeds, but its attributes could not be read"
+                ${Else}
+                    IntOp $R3 $R3 & 1
+                    ${If} $R3 = 1
+                        StrCpy $R0 "a delete-access open now succeeds, but it is still read-only, which Delete does not clear"
+                    ${Else}
+                        StrCpy $R0 "a delete-access open now succeeds"
+                    ${EndIf}
+                ${EndIf}
             ${Else}
                 StrCpy $0 $R2
                 Call GetWin32ErrorText
