@@ -1,6 +1,6 @@
 #include "visual_database_display_filter_toolbar_widget.h"
 
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 #include "../deck_editor/card_database_view.h"
 #include "../quick_settings/settings_button_widget.h"
 #include "card_database_display_model.h"
@@ -44,13 +44,13 @@ VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidg
     sortGroupBox = new QGroupBox(this);
     filterGroupBox = new QGroupBox(this);
 
-    auto scalePixmap = [](const QString &fileName) { return QIcon(QPixmap(fileName)).pixmap({20, 20}); };
+    auto scalePixmap = [](const QString &prefix) { return loadThemedIcon(prefix).pixmap({20, 20}); };
 
     sortByLabel = new QLabel(this);
-    sortByLabel->setPixmap(scalePixmap("theme:icons/sort_arrow_down"));
+    sortByLabel->setPixmap(scalePixmap("icons/sort_arrow_down"));
 
     filterByLabel = new QLabel(this);
-    filterByLabel->setPixmap(scalePixmap("theme:icons/filter"));
+    filterByLabel->setPixmap(scalePixmap("icons/filter"));
 
     sortColumnCombo = new QComboBox(this);
     sortColumnCombo->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);
@@ -88,22 +88,22 @@ VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidg
     });
 
     quickFilterSaveLoadWidget = new SettingsButtonWidget(this);
-    quickFilterSaveLoadWidget->setButtonIcon(themePixmap(QStringLiteral("icons/floppy_disk")));
+    quickFilterSaveLoadWidget->setButtonIcon(loadThemedIcon(QStringLiteral("icons/floppy_disk")));
 
     quickFilterNameWidget = new SettingsButtonWidget(this);
-    quickFilterNameWidget->setButtonIcon(themePixmap(QStringLiteral("icons/pen_to_square")));
+    quickFilterNameWidget->setButtonIcon(loadThemedIcon(QStringLiteral("icons/pen_to_square")));
 
     quickFilterMainTypeWidget = new SettingsButtonWidget(this);
-    quickFilterMainTypeWidget->setButtonIcon(themePixmap(QStringLiteral("icons/circle_half_stroke")));
+    quickFilterMainTypeWidget->setButtonIcon(loadThemedIcon(QStringLiteral("icons/circle_half_stroke")));
 
     quickFilterSubTypeWidget = new SettingsButtonWidget(this);
-    quickFilterSubTypeWidget->setButtonIcon(themePixmap(QStringLiteral("icons/dragon")));
+    quickFilterSubTypeWidget->setButtonIcon(loadThemedIcon(QStringLiteral("icons/dragon")));
 
     quickFilterSetWidget = new SettingsButtonWidget(this);
-    quickFilterSetWidget->setButtonIcon(themePixmap(QStringLiteral("icons/scroll")));
+    quickFilterSetWidget->setButtonIcon(loadThemedIcon(QStringLiteral("icons/scroll")));
 
     quickFilterFormatLegalityWidget = new SettingsButtonWidget(this);
-    quickFilterFormatLegalityWidget->setButtonIcon(themePixmap(QStringLiteral("icons/scale_balanced")));
+    quickFilterFormatLegalityWidget->setButtonIcon(loadThemedIcon(QStringLiteral("icons/scales")));
 
     retranslateUi();
 }

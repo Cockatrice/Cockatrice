@@ -1,7 +1,7 @@
 #include "game_selector.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 #include "../interface/widgets/dialogs/dlg_create_game.h"
 #include "../interface/widgets/dialogs/dlg_filter_games.h"
 #include "../interface/widgets/tabs/tab_room.h"
@@ -129,10 +129,10 @@ GameSelector::GameSelector(AbstractClient *_client,
     }
 
     filterButton = new QPushButton;
-    filterButton->setIcon(themePixmap(QStringLiteral("icons/search")));
+    filterButton->setIcon(loadThemedIcon(QStringLiteral("icons/search")));
     connect(filterButton, &QPushButton::clicked, this, &GameSelector::actSetFilter);
     clearFilterButton = new QPushButton;
-    clearFilterButton->setIcon(themePixmap(QStringLiteral("icons/clearsearch")));
+    clearFilterButton->setIcon(loadThemedIcon(QStringLiteral("icons/clearsearch")));
     bool filtersSetToDefault = showFilters && gameListProxyModel->areFilterParametersSetToDefaults();
     clearFilterButton->setEnabled(!filtersSetToDefault);
     connect(clearFilterButton, &QPushButton::clicked, this, &GameSelector::actClearFilter);

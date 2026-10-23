@@ -6,7 +6,7 @@
 #include "settings_view.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 #include "../settings_page/abstract_settings_page.h"
 #include "../settings_page/appearance_settings_page.h"
 #include "../settings_page/deck_editor_settings_page.h"
@@ -133,7 +133,7 @@ void SettingsView::setupUi()
     // Search bar
     searchEdit = new QLineEdit;
     searchEdit->setClearButtonEnabled(true);
-    searchEdit->addAction(themePixmap(QStringLiteral("icons/search")), QLineEdit::LeadingPosition);
+    searchEdit->addAction(loadThemedIcon(QStringLiteral("icons/search")), QLineEdit::LeadingPosition);
     searchEdit->installEventFilter(this);
     connect(searchEdit, &QLineEdit::textChanged, this, &SettingsView::onSearchTextChanged);
 

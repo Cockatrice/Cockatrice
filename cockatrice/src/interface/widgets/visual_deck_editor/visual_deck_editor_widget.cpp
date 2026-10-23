@@ -1,7 +1,7 @@
 #include "visual_deck_editor_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 #include "../cards/card_size_widget.h"
 #include "../cards/deck_card_zone_display_widget.h"
 #include "../general/layout_containers/flow_widget.h"
@@ -143,7 +143,7 @@ void VisualDeckEditorWidget::initializeSearchBarAndCompleter()
 
     // Search button functionality
     searchPushButton = new CompactPushButton(searchContainer);
-    searchPushButton->setButtonIcon(themePixmap(QStringLiteral("icons/search")));
+    searchPushButton->setButtonIcon(loadThemedIcon(QStringLiteral("icons/search")));
     connect(searchPushButton, &QPushButton::clicked, this, [this] { addCardFromSearch(); });
 
     searchLayout->addWidget(searchPushButton);

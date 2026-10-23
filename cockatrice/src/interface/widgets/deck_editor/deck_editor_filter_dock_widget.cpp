@@ -5,7 +5,7 @@
 #include "../../../filters/filter_builder.h"
 #include "../../../filters/filter_tree_model.h"
 #include "../../key_signals.h"
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 #include "../tabs/abstract_tab_deck_editor.h"
 #include "libcockatrice/filters/filter_card.h"
 
@@ -63,11 +63,11 @@ void DeckEditorFilterDockWidget::createFiltersDock()
     connect(filterBuilder, &FilterBuilder::add, filterModel, &FilterTreeModel::addFilter);
 
     aClearFilterOne = new QAction(QString(), this);
-    aClearFilterOne->setIcon(themePixmap(QStringLiteral("icons/decrement")));
+    aClearFilterOne->setIcon(loadThemedIcon(QStringLiteral("icons/decrement")));
     connect(aClearFilterOne, &QAction::triggered, this, &DeckEditorFilterDockWidget::actClearFilterOne);
 
     aClearFilterAll = new QAction(QString(), this);
-    aClearFilterAll->setIcon(themePixmap(QStringLiteral("icons/clearsearch")));
+    aClearFilterAll->setIcon(loadThemedIcon(QStringLiteral("icons/clearsearch")));
     connect(aClearFilterAll, &QAction::triggered, this, &DeckEditorFilterDockWidget::actClearFilterAll);
 
     auto *filterDelOne = new QToolButton();
