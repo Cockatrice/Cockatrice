@@ -27,7 +27,7 @@ static const int MAX_BACKOFF_SHIFT = 10;
 
 inline Q_LOGGING_CATEGORY(SmtpClientLog, "smtp_client")
 
-static QString pendingKey(const QString &userName, EmailType type, const QString &token)
+    static QString pendingKey(const QString &userName, EmailType type, const QString &token)
 {
     const char *typeName = (type == EmailType::Activation) ? "activation" : "forgotpassword";
     // The token is part of the key: a regenerated token (forgot-password issues a
@@ -55,24 +55,23 @@ SmtpClient::SmtpClient(QObject *parent) : QObject(parent)
 
     idleTimer = new QTimer(this);
     idleTimer->setSingleShot(true);
-    connect(idleTimer, SIGNAL(timeout()), this, SLOT(idleTimeout()));
+    connect(idleTimer, &QTimer::timeout, this, &SmtpClient::idleTimeout);
 
-    connect(smtp, SIGNAL(authenticated()), this, SLOT(authenticated()));
-    connect(smtp, SIGNAL(authenticationFailed(const QByteArray &)), this,
-            SLOT(authenticationFailed(const QByteArray &)));
-    connect(smtp, SIGNAL(connected()), this, SLOT(connected()));
-    connect(smtp, SIGNAL(connectionFailed(const QByteArray &)), this, SLOT(connectionFailed(const QByteArray &)));
-    connect(smtp, SIGNAL(disconnected()), this, SLOT(disconnected()));
-    connect(smtp, SIGNAL(encrypted()), this, SLOT(encrypted()));
-    connect(smtp, SIGNAL(encryptionFailed(const QByteArray &)), this, SLOT(encryptionFailed(const QByteArray &)));
-    connect(smtp, SIGNAL(finished()), this, SLOT(finished()));
-    connect(smtp, SIGNAL(mailFailed(int, int, const QByteArray &)), this,
-            SLOT(mailFailed(int, int, const QByteArray &)));
-    connect(smtp, SIGNAL(mailSent(int)), this, SLOT(mailSent(int)));
-    connect(smtp, SIGNAL(recipientRejected(int, const QString &, const QByteArray &)), this,
-            SLOT(recipientRejected(int, const QString &, const QByteArray &)));
-    connect(smtp, SIGNAL(senderRejected(int, const QString &, const QByteArray &)), this,
-            SLOT(senderRejected(int, const QString &, const QByteArray &)));
+    connect(smtp, &QxtSmtp::authenticated, this, &SmtpClient::authenticated);
+    connect(smtp, qOverload<const QByteArray &>(&QxtSmtp::authenticationFailed), this,
+            &SmtpClient::authenticationFailed);
+    connect(smtp, &QxtSmtp::connected, this, &SmtpClient::connected);
+    connect(smtp, qOverload<const QByteArray &>(&QxtSmtp::connectionFailed), this, &SmtpClient::connectionFailed);
+    connect(smtp, &QxtSmtp::disconnected, this, &SmtpClient::disconnected);
+    connect(smtp, &QxtSmtp::encrypted, this, &SmtpClient::encrypted);
+    connect(smtp, qOverload<const QByteArray &>(&QxtSmtp::encryptionFailed), this, &SmtpClient::encryptionFailed);
+    connect(smtp, &QxtSmtp::finished, this, &SmtpClient::finished);
+    connect(smtp, qOverload<int, int, const QByteArray &>(&QxtSmtp::mailFailed), this, &SmtpClient::mailFailed);
+    connect(smtp, &QxtSmtp::mailSent, this, &SmtpClient::mailSent);
+    connect(smtp, qOverload<int, const QString &, const QByteArray &>(&QxtSmtp::recipientRejected), this,
+            &SmtpClient::recipientRejected);
+    connect(smtp, qOverload<int, const QString &, const QByteArray &>(&QxtSmtp::senderRejected), this,
+            &SmtpClient::senderRejected);
 }
 
 SmtpClient::~SmtpClient()
