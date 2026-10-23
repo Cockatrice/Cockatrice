@@ -432,10 +432,11 @@ void VisualDatabaseDisplayWidget::loadPage(int start, int end)
 
         if (CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(name.toString())) {
             if (!setFilters.empty()) {
-                SetToPrintingsMap setMap = info->getSets();
+                const auto &setMap = info->getSets();
                 for (const CardFilter *setFilter : setFilters) {
-                    if (setMap.contains(setFilter->term())) {
-                        for (PrintingInfo printing : setMap[setFilter->term()]) {
+                    const auto it = setMap.constFind(setFilter->term());
+                    if (it != setMap.constEnd()) {
+                        for (const PrintingInfo &printing : it.value()) {
                             addCardToDisplay(ExactCard(info, printing));
                         }
                     }

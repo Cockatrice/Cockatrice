@@ -401,7 +401,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     }
 
     // sets
-    const SetToPrintingsMap setMap = info->getSets();
+    const auto &setMap = info->getSets();
     for (const auto &printings : setMap) {
         for (const PrintingInfo &set : printings) {
             xml.writeStartElement("set");

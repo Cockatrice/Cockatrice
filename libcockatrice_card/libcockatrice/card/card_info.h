@@ -280,7 +280,7 @@ public:
     {
         return simpleName;
     }
-    const QSet<QString> &getAltNames()
+    const QSet<QString> &getAltNames() const
     {
         return altNames;
     }
@@ -395,7 +395,9 @@ public:
 
     [[nodiscard]] QString getProperty(const QString &propertyName) const
     {
-        return getPropertiesHash().value(propertyName);
+        const auto &propertiesHash = getPropertiesHash();
+        const auto it = propertiesHash.constFind(propertyName);
+        return it != propertiesHash.constEnd() ? it.value() : QString();
     }
     void setProperty(const QString &_name, const QString &_value);
     [[nodiscard]] bool hasProperty(const QString &propertyName) const

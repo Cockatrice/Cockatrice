@@ -208,7 +208,7 @@ QList<PrintingInfo> PrintingSelectorCardSortingWidget::prependPrintingsInDeck(co
         return {};
     }
 
-    SetToPrintingsMap setMap = selectedCard->getSets();
+    const auto &setMap = selectedCard->getSets();
     QList<QPair<PrintingInfo, int>> countList;
 
     // Collect sets with their counts

@@ -17,10 +17,10 @@ void PrintingInfo::setProperty(const QString &_name, const QString &_value)
  */
 QString PrintingInfo::getUuid() const
 {
-    return getPropertiesHash().value("uuid");
+    return getProperty("uuid");
 }
 
 QString PrintingInfo::getFlavorName() const
 {
-    return getPropertiesHash().value("flavorName");
+    return getProperty("flavorName");
 }
