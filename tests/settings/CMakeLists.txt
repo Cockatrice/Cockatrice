@@ -1,5 +1,7 @@
 cockatrice_add_test(NAME settings_manager_test SOURCES settings_manager_test.cpp LIBS libcockatrice_settings)
 
+cockatrice_add_test(NAME servers_settings_test SOURCES servers_settings_test.cpp LIBS libcockatrice_settings)
+
 cockatrice_add_test(
   NAME
   settings_defaults_test
