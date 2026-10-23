@@ -9,6 +9,7 @@
 #include <QtGlobal>
 #include <algorithm>
 #include <libcockatrice/utility/levenshtein.h>
+#include <utility>
 
 CardSearchModel::CardSearchModel(CardDatabaseDisplayModel *sourceModel, QObject *parent)
     : QAbstractListModel(parent), sourceModel(sourceModel)
@@ -57,7 +58,6 @@ void CardSearchModel::updateSearchResults(const QString &query)
     }
 
     const QString lowerQuery = query.toLower();
-    const bool englishOnly = searchLanguage.isEnglishOnly();
 
     QList<SearchResult> prefixMatches;
     QList<SearchResult> containsMatches;
@@ -70,37 +70,17 @@ void CardSearchModel::updateSearchResults(const QString &query)
             continue;
         }
 
-        // The completer suggestions match against the same languages the card
-        // search uses, so typing a localized name finds the card. In Both mode
-        // either language can match.
-        QString lowerName;
-        if (englishOnly) {
-            lowerName = card->getName().toLower();
-            if (!lowerName.contains(lowerQuery)) {
-                continue;
-            }
-        } else if (searchLanguage.mode == SearchLanguageMode::Selected) {
-            lowerName = card->getLocalizedName(searchLanguage.language).toLower();
-            if (!lowerName.contains(lowerQuery)) {
-                continue;
-            }
-        } else {
-            lowerName = card->getName().toLower();
-            if (!lowerName.contains(lowerQuery)) {
-                lowerName = card->getLocalizedName(searchLanguage.language).toLower();
-                if (!lowerName.contains(lowerQuery)) {
-                    continue;
-                }
-            }
+        const std::optional<QString> lowerName = matchingLowercaseName(card, lowerQuery);
+        if (!lowerName) {
+            continue;
         }
 
-        const int distance = levenshteinDistance(lowerQuery, lowerName);
-        // Length of the name used to break distance ties. Stored here so the
-        // comparator does not look the name up again for every comparison.
-        const int nameLength =
-            static_cast<int>((englishOnly ? card->getName() : card->getLocalizedName(searchLanguage.language)).size());
+        const int distance = levenshteinDistance(lowerQuery, *lowerName);
+        // Length of the matched name, used to break distance ties. Stored here
+        // so the comparator does not look the name up again for every comparison.
+        const int nameLength = static_cast<int>(lowerName->size());
 
-        if (lowerName.startsWith(lowerQuery)) {
+        if (lowerName->startsWith(lowerQuery)) {
             prefixMatches.append({card, distance, nameLength});
         } else {
             containsMatches.append({card, distance, nameLength});
@@ -128,4 +108,30 @@ void CardSearchModel::updateSearchResults(const QString &query)
     }
 
     endResetModel();
+}
+
+std::optional<QString> CardSearchModel::matchingLowercaseName(const CardInfoPtr &card, const QString &lowerQuery) const
+{
+    if (!searchLanguage.isEnglishOnly() && searchLanguage.mode == SearchLanguageMode::Selected) {
+        QString localizedName = card->getLocalizedName(searchLanguage.language).toLower();
+        if (localizedName.contains(lowerQuery)) {
+            return std::optional<QString>(std::move(localizedName));
+        }
+        return std::nullopt;
+    }
+
+    QString englishName = card->getName().toLower();
+    if (englishName.contains(lowerQuery)) {
+        return std::optional<QString>(std::move(englishName));
+    }
+
+    if (searchLanguage.isEnglishOnly()) {
+        return std::nullopt;
+    }
+
+    QString localizedName = card->getLocalizedName(searchLanguage.language).toLower();
+    if (localizedName.contains(lowerQuery)) {
+        return std::optional<QString>(std::move(localizedName));
+    }
+    return std::nullopt;
 }

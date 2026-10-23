@@ -16,6 +16,7 @@
 #include <QSharedPointer>
 #include <QString>
 #include <QStringList>
+#include <optional>
 #include <qnamespace.h>
 #include <qtmetamacros.h>
 
@@ -53,6 +54,18 @@ private:
         int distance;
         int nameLength;
     };
+
+    /**
+     * @brief Finds the lowercased card name that matches the query.
+     *
+     * The completer suggestions match against the same languages the card
+     * search uses, so typing a localized name finds the card. In Both mode
+     * either language can match.
+     *
+     * @return The matched lowercased name, or std::nullopt when the card does not match.
+     */
+    [[nodiscard]] std::optional<QString> matchingLowercaseName(const CardInfoPtr &card,
+                                                               const QString &lowerQuery) const;
 
     CardDatabaseDisplayModel *sourceModel;
     QList<SearchResult> searchResults;

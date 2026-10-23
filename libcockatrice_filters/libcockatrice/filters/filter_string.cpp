@@ -163,39 +163,28 @@ static void setupParserRules()
             auto matcher = std::any_cast<StringMatcher>(sv[0]);
             return [=](const CardData &x) -> bool {
                 const auto &sets = x->getSets();
-                for (auto it = sets.constBegin(); it != sets.constEnd(); ++it) {
-                    if (matcher(it.key())) {
-                        return true;
-                    }
-                }
-                return false;
+                return std::any_of(sets.keyValueBegin(), sets.keyValueEnd(),
+                                   [&matcher](const auto &set) { return matcher(set.first); });
             };
         }
         if (sv.choice() == 1) {
             auto matcher = std::any_cast<StringMatcher>(sv[0]);
             return [=](const CardData &x) -> bool {
                 const auto &sets = x->getSets();
-                for (auto it = sets.constBegin(); it != sets.constEnd(); ++it) {
-                    if (matcher(it.key())) {
-                        return false;
-                    }
-                }
-                return true;
+                return std::none_of(sets.keyValueBegin(), sets.keyValueEnd(),
+                                    [&matcher](const auto &set) { return matcher(set.first); });
             };
         }
 
         auto matcher = std::any_cast<NumberMatcher>(sv[0]);
         return [=](const CardData &x) -> bool {
             const auto &sets = x->getSets();
-            for (auto it = sets.constBegin(); it != sets.constEnd(); ++it) {
-                for (const auto &printing : it.value()) {
-                    const CardSetPtr &set = printing.getSet();
-                    if (set && set->getEnabled() && matcher(set->getReleaseDate().toJulianDay())) {
-                        return true;
-                    }
-                }
-            }
-            return false;
+            return std::any_of(sets.constBegin(), sets.constEnd(), [&matcher](const auto &printings) {
+                return std::any_of(printings.begin(), printings.end(), [&matcher](const PrintingInfo &printing) {
+                    const CardSetPtr set = printing.getSet();
+                    return set && set->getEnabled() && matcher(set->getReleaseDate().toJulianDay());
+                });
+            });
         };
     };
     search["Rarity"] = [](const peg::SemanticValues &sv) -> QString {
@@ -420,7 +409,7 @@ static void setupParserRules()
         const bool identity = sv.tokens[0].empty() || sv.tokens[0][0] != 'i';
         if (sv.tokens[1][0] == ':') {
             return [=](const CardData &x) {
-                const QString &match = identity ? x->getColors() : x->getProperty("coloridentity");
+                const QString match = identity ? x->getColors() : x->getProperty("coloridentity");
                 if (parts.contains("m") && match.length() < 2) {
                     return false;
                 }
@@ -438,7 +427,7 @@ static void setupParserRules()
         }
 
         return [=](const CardData &x) {
-            const QString &match = identity ? x->getColors() : x->getProperty("colorIdentity");
+            const QString match = identity ? x->getColors() : x->getProperty("colorIdentity");
             if (parts.contains("m") && match.length() < 2) {
                 return false;
             }
