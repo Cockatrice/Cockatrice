@@ -171,6 +171,7 @@ public:
           setsToPrintings(other.setsToPrintings), uiAttributes(other.uiAttributes), setsNames(other.setsNames),
           altNames(other.altNames)
     {
+        // The copy deliberately starts unowned: the QSharedPointer that wraps it registers the self reference.
     }
 
     /**
@@ -515,7 +516,8 @@ private:
     /**
      * @brief Emits cardInfoChanged() with a strong reference to this card.
      *
-     * Does nothing when the card is not managed by a QSharedPointer or is already being destroyed.
+     * A CardInfo is always owned by a QSharedPointer, so the self reference is always available; a released
+     * build that somehow finds it missing warns rather than emitting a null card.
      */
     void notifyChanged();
 

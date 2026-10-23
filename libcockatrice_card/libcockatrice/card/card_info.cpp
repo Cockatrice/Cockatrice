@@ -6,6 +6,7 @@
 #include "relation/card_relation.h"
 #include "set/card_set.h"
 
+#include <QDebug>
 #include <QHashIterator>
 #include <QRegularExpression>
 #include <QSharedPointer>
@@ -21,9 +22,14 @@ const QHash<QString, QString> &CardInfo::getPropertiesHash() const
 
 void CardInfo::notifyChanged()
 {
-    if (const CardInfoPtr self = sharedFromThis()) {
-        emit cardInfoChanged(self);
+    const CardInfoPtr self = sharedFromThis();
+    Q_ASSERT_X(self, "CardInfo::notifyChanged", "every CardInfo is owned by a QSharedPointer");
+    if (!self) {
+        qCWarning(CardInfoLog) << "notifyChanged() on an unowned CardInfo" << name << "- observers stay stale";
+        return;
     }
+
+    emit cardInfoChanged(self);
 }
 
 void CardInfo::setProperty(const QString &_name, const QString &_value)
@@ -169,7 +175,9 @@ bool CardInfo::isLegalInFormat(const QString &format) const
 void CardInfo::addToSet(const CardSetPtr &_set, const PrintingInfo &_info)
 {
     const CardInfoPtr self = sharedFromThis();
+    Q_ASSERT_X(self, "CardInfo::addToSet", "every CardInfo is owned by a QSharedPointer");
     if (!self) {
+        qCWarning(CardInfoLog) << "addToSet() on an unowned CardInfo" << name << "- the set will not list it";
         return;
     }
 
