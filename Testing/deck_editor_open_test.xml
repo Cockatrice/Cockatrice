@@ -1,0 +1,4 @@
+<events>
+  <!-- Open a new deck editor tab from the home page -->
+  <event widget="MainWindow/tabSupervisor/stackedWidget/TabHome/homeWidget/homeButtonsBox/homeCreateNewDeckButton" command="activate" arguments="" />
+</events>

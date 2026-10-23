@@ -54,6 +54,7 @@
 #include <QPainter>
 #include <QRect>
 #include <QSharedPointer>
+#include <QStackedWidget>
 #include <QStringLiteral>
 #include <QStyle>
 #include <QStyleOption>
@@ -157,6 +158,15 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
       tabReplays(nullptr), tabAdmin(nullptr), tabCardArtRules(nullptr), tabLog(nullptr), tabReport(nullptr),
       tabModeration(nullptr), tabDeveloper(nullptr), isLocalGame(false)
 {
+    setObjectName("tabSupervisor");
+
+    // QTabWidget keeps tab pages in an internal stacked widget. Give it a stable
+    // name so the GUI tests can address the pages by a readable path
+    // (tabSupervisor/stackedWidget/<TabName>).
+    if (auto *stackedWidget = findChild<QStackedWidget *>()) {
+        stackedWidget->setObjectName("stackedWidget");
+    }
+
     setElideMode(Qt::ElideRight);
     setMovable(true);
     setIconSize(QSize(15, 15));
@@ -462,6 +472,9 @@ void TabSupervisor::addCloseButtonToTab(Tab *tab, int tabIndex, QAction *manager
     auto closeSide = static_cast<QTabBar::ButtonPosition>(
         tabBar()->style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, nullptr, tabBar()));
     auto *closeButton = new CloseButton(tab);
+    // No object name: the tab bar index shifts when tabs move or close, so an
+    // index-derived name would go stale (or collide). Callers find the button
+    // through the tab widget instead.
     if (manager) {
         // If managed, all close requests should go through the menu action
         connect(closeButton, &CloseButton::clicked, this, [manager] { checkAndTrigger(manager, false); });
