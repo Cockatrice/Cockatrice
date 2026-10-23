@@ -308,7 +308,8 @@ bool Servatrice::initServer()
         authenticationMethod = AuthenticationPassword;
     } else {
         if (getRegOnlyServerEnabled()) {
-            qDebug() << "Registration only server enabled but no authentication method defined: Error.";
+            qCCritical(ServatriceLog) << "Registration only server enabled but no authentication method defined; "
+                                         "refusing to start.";
             return false;
         }
         qDebug() << "Authenticating method: none";
@@ -379,7 +380,7 @@ bool Servatrice::initServer()
         bool dbOpened = servatriceDatabaseInterface->initDatabase(
             "QMYSQL", getDBHostNameString(), getDBDatabaseNameString(), getDBUserNameString(), getDBPasswordString());
         if (!dbOpened) {
-            qDebug() << "Failed to open database";
+            qCCritical(ServatriceLog) << "Failed to open the database; refusing to start.";
             return false;
         }
         updateServerList();
@@ -604,7 +605,7 @@ bool Servatrice::initServer()
             }
         }
     } catch (QString &error) {
-        qDebug() << "ERROR --" << error;
+        qCCritical(ServatriceLog) << "Failed to start the ISL server:" << error;
         return false;
     }
 
@@ -641,7 +642,7 @@ bool Servatrice::initServer()
         if (gameServer->listen(tcpHost, static_cast<quint16>(getServerTCPPort()))) {
             qDebug() << "Server listening.";
         } else {
-            qDebug() << "gameServer->listen(): Error:" << gameServer->errorString();
+            qCCritical(ServatriceLog) << "Failed to listen for TCP clients:" << gameServer->errorString();
             return false;
         }
     }
@@ -657,7 +658,8 @@ bool Servatrice::initServer()
         if (websocketGameServer->listen(webSocketHost, static_cast<quint16>(getServerWebSocketPort()))) {
             qDebug() << "Websocket server listening.";
         } else {
-            qDebug() << "websocketGameServer->listen(): Error:" << websocketGameServer->errorString();
+            qCCritical(ServatriceLog) << "Failed to listen for websocket clients:"
+                                      << websocketGameServer->errorString();
             return false;
         }
     }
