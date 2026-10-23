@@ -2,6 +2,8 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../card_picture_loader/card_picture_loader.h"
+#include "../../theme_icon.h"
+#include "../../theme_manager.h"
 #include "../cards/card_info_picture_widget.h"
 #include "../tabs/abstract_tab_deck_editor.h"
 #include "all_zones_card_amount_widget.h"
@@ -16,7 +18,6 @@
 #include <QFileDialog>
 #include <QGuiApplication>
 #include <QImage>
-#include <QImageReader>
 #include <QLabel>
 #include <QList>
 #include <QMenu>
@@ -36,7 +37,6 @@
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QtGlobal>
-#include <QtMath>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/settings/card_override_settings.h>
@@ -121,6 +121,12 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
     mainLayout->addWidget(cardInfoPicture);
 
     initializePinBadge();
+    auto refreshPinBadge = [this] {
+        initializePinBadge();
+        updatePinBadgeVisibility();
+    };
+    connect(themeManager, &ThemeManager::paletteChanged, this, refreshPinBadge);
+    connect(themeManager, &ThemeManager::themeChanged, this, refreshPinBadge);
 
     // Parent the preview to this overlay so it is destroyed with it (Qt::ToolTip keeps
     // it a frameless, non-activating top-level window despite the parent).
@@ -402,10 +408,11 @@ void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
 }
 
 /**
- * @brief Initializes the pin badge overlay and loads its icon with DPI-aware rasterization.
+ * @brief Initializes the pin badge overlay and loads a DPI-aware icon pixmap.
  *
- * The icon is rasterized once using the label's device pixel ratio so it stays crisp on HiDPI
- * displays. The resulting pixmap is cached on the QLabel and simply shown/hidden when needed.
+ * The icon is asked for at the label's device pixel ratio so it stays crisp on HiDPI
+ * displays, and re-rendered when the palette or theme changes so the badge follows the
+ * surrounding UI instead of freezing at its first colors.
  * If the SVG cannot be read, a textual fallback badge is created instead.
  */
 void PrintingSelectorCardOverlayWidget::initializePinBadge()
@@ -421,24 +428,15 @@ void PrintingSelectorCardOverlayWidget::initializePinBadge()
     }
 
     bool pinLoaded = false;
-    QImageReader pinReader(QStringLiteral("theme:icons/pin"));
-
-    if (pinReader.canRead()) {
-        // Rasterize a 64×64 logical icon so it has a consistent size regardless of card scaling.
-        const QSize targetSize(64, 64);
-        const qreal dpr = pinBadge->devicePixelRatioF();
-        const QSize rasterSize(qMax(1, qCeil(targetSize.width() * dpr)), qMax(1, qCeil(targetSize.height() * dpr)));
-        pinReader.setScaledSize(rasterSize);
-        const QImage pinImage = pinReader.read();
-        if (!pinImage.isNull()) {
-            // Tag the pixmap with the same DPR so Qt renders it at the correct physical size.
-            QPixmap pinPix = QPixmap::fromImage(pinImage);
-            pinPix.setDevicePixelRatio(dpr);
-            pinBadge->setPixmap(pinPix);
-            pinBadge->setFixedSize(targetSize);
-            pinBadge->setStyleSheet(QStringLiteral("background: transparent;"));
-            pinLoaded = true;
-        }
+    // Ask QIcon for a 64×64 logical pixmap; QIcon applies the target DPR itself.
+    const QSize targetSize(64, 64);
+    const QPixmap pinPix =
+        loadThemedIcon(QStringLiteral("icons/pin")).pixmap(targetSize, pinBadge->devicePixelRatioF());
+    if (!pinPix.isNull()) {
+        pinBadge->setPixmap(pinPix);
+        pinBadge->setFixedSize(targetSize);
+        pinBadge->setStyleSheet(QStringLiteral("background: transparent;"));
+        pinLoaded = true;
     }
 
     if (!pinLoaded) {
