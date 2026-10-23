@@ -28,7 +28,10 @@ void ensureGuiApplication()
     static int argc = 1;
     static char name[] = "theme_icon_test";
     static char *argv[] = {name, nullptr};
-    static QApplication app(argc, argv);
+    // Leaked on purpose: a function-local static QApplication is destroyed before Qt's
+    // own library statics at exit, and the network module's destructors then run
+    // against a torn-down QObject layer (SEGV under AddressSanitizer).
+    static QApplication *app = new QApplication(argc, argv);
     Q_UNUSED(app);
 }
 
