@@ -16,11 +16,9 @@ set(HEADERS
     libcockatrice/deck_list/sideboard_plan.h
 )
 
-qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-
 add_library(
   libcockatrice_deck_list STATIC
-  ${MOC_SOURCES}
+  ${HEADERS}
   libcockatrice/deck_list/tree/abstract_deck_list_card_node.cpp
   libcockatrice/deck_list/tree/abstract_deck_list_node.cpp
   libcockatrice/deck_list/tree/deck_list_card_node.cpp

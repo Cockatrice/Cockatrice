@@ -6,9 +6,7 @@ set(HEADERS local_server.h local_server_interface.h)
 
 set(SOURCES local_server.cpp local_server_interface.cpp)
 
-qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-
-add_library(libcockatrice_network_server_local STATIC ${MOC_SOURCES} ${SOURCES})
+add_library(libcockatrice_network_server_local STATIC ${HEADERS} ${SOURCES})
 
 add_dependencies(libcockatrice_network_server_local libcockatrice_protocol)
 
