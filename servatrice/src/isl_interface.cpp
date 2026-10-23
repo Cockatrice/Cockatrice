@@ -268,12 +268,6 @@ void IslInterface::readClient()
     // consumed message from the front would memmove the remaining bytes once
     // per message; the consumed prefix is dropped once parsing stops.
     qsizetype readOffset = 0;
-    const auto compactBuffer = [this, &readOffset]() {
-        if (readOffset > 0) {
-            inputBuffer.remove(0, readOffset);
-            readOffset = 0;
-        }
-    };
 
     while (true) {
         if (!messageInProgress) {
@@ -291,13 +285,11 @@ void IslInterface::readClient()
                 readOffset += 4;
                 messageInProgress = true;
             } else {
-                compactBuffer();
-                return;
+                break;
             }
         }
         if (inputBuffer.size() - readOffset < messageLength) {
-            compactBuffer();
-            return;
+            break;
         }
 
         IslMessage newMessage;
@@ -310,6 +302,11 @@ void IslInterface::readClient()
         } else {
             qCWarning(IslInterfaceLog) << "parsing error!";
         }
+    }
+
+    // Drop the consumed prefix once, instead of shifting the buffer per message.
+    if (readOffset > 0) {
+        inputBuffer.remove(0, readOffset);
     }
 }
 

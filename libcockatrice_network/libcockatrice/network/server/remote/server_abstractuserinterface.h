@@ -63,17 +63,7 @@ public:
      *
      * @return True if the game is known; otherwise false and the outputs are untouched.
      */
-    bool getGameInfo(int gameId, int &roomId, int &playerId) const
-    {
-        QMutexLocker locker(&gameListMutex);
-        const auto it = games.constFind(gameId);
-        if (it == games.constEnd()) {
-            return false;
-        }
-        roomId = it.value().first;
-        playerId = it.value().second;
-        return true;
-    }
+    bool getGameInfo(int gameId, int &roomId, int &playerId) const;
 
     virtual void sendProtocolItem(const Response &item) = 0;
     virtual void sendProtocolItem(const SessionEvent &item) = 0;

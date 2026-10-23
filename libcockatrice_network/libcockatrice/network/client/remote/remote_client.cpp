@@ -501,12 +501,6 @@ void RemoteClient::readData()
     // remaining bytes once per message; instead the consumed prefix is dropped
     // once parsing stops.
     qsizetype readOffset = 0;
-    const auto compactBuffer = [this, &readOffset]() {
-        if (readOffset > 0) {
-            inputBuffer.remove(0, readOffset);
-            readOffset = 0;
-        }
-    };
 
     while (true) {
         if (!messageInProgress) {
@@ -527,13 +521,11 @@ void RemoteClient::readData()
                     messageInProgress = true;
                 }
             } else {
-                compactBuffer();
-                return;
+                break;
             }
         }
         if (inputBuffer.size() - readOffset < messageLength) {
-            compactBuffer();
-            return;
+            break;
         }
 
         ServerMessage newServerMessage;
@@ -555,6 +547,11 @@ void RemoteClient::readData()
         if (getStatus() == StatusDisconnecting) { // use thread-safe getter
             doDisconnectFromServer();
         }
+    }
+
+    // Drop the consumed prefix once, instead of shifting the buffer per message.
+    if (readOffset > 0) {
+        inputBuffer.remove(0, readOffset);
     }
 }
 
