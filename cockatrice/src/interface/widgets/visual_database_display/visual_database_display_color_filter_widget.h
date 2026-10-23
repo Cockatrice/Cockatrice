@@ -39,9 +39,11 @@ private:
 
 enum class FilterMode
 {
-    ExactMatch,    // Only selected colors are included, all others are excluded.
-    Includes,      // Include selected colors (OR condition).
-    IncludeExclude // Include selected colors (OR) and exclude unselected colors (AND NOT).
+    ExactMatch,     // Only selected colors are included, all others are excluded.
+    Includes,       // Include selected colors (OR condition).
+    Excludes,       // Exclude selected colors (OR).
+    IncludeExclude, // Include selected colors (OR) and exclude unselected colors (AND NOT).
+    Commander       // Only include colors in the selected color identity.
 };
 
 Q_DECLARE_METATYPE(FilterMode)

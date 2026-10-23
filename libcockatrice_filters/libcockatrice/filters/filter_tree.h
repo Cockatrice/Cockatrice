@@ -223,6 +223,7 @@ public:
     [[nodiscard]] bool acceptMainType(CardInfoPtr info) const;
     [[nodiscard]] bool acceptSubType(CardInfoPtr info) const;
     [[nodiscard]] bool acceptColor(CardInfoPtr info) const;
+    [[nodiscard]] bool acceptColorIdentity(CardInfoPtr info) const;
     [[nodiscard]] bool acceptText(CardInfoPtr info, const CardSearchLanguage &searchLanguage) const;
     [[nodiscard]] bool acceptSet(CardInfoPtr info) const;
     [[nodiscard]] bool acceptManaCost(CardInfoPtr info) const;
