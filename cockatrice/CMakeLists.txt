@@ -562,6 +562,11 @@ target_link_libraries(
 
 cockatrice_target_enable_crash_reporting(cockatrice)
 
+if(WITH_GUI_TEST)
+  target_link_libraries(cockatrice PRIVATE QtTesting)
+  target_compile_definitions(cockatrice PRIVATE WITH_GUI_TEST)
+endif()
+
 if(UNIX)
   if(APPLE)
     set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME}")

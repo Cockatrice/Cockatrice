@@ -20,6 +20,8 @@ option(WITH_CLIENT "Build Cockatrice client" ON)
 option(WITH_ORACLE "Build Cockatrice card database tool (Oracle)" ON)
 # Compile Servatrice
 option(WITH_SERVER "Build Cockatrice server (Servatrice)" OFF)
+# Compile GUI tests (QtTesting widget-level playback)
+option(WITH_GUI_TEST "Build the QtTesting-based GUI test harness" ON)
 # Compile tests
 option(TEST "Build tests" OFF)
 # Build with AddressSanitizer and UndefinedBehaviorSanitizer
@@ -28,6 +30,16 @@ option(ENABLE_SANITIZERS "Build with AddressSanitizer and UndefinedBehaviorSanit
 option(ENABLE_COVERAGE "Build instrumented for GCC line coverage" OFF)
 # Use vcpkg regardless of OS
 option(USE_VCPKG "Use vcpkg regardless of OS" OFF)
+
+# The GUI test harness lives in a submodule; a checkout without it must still configure.
+if(WITH_GUI_TEST AND NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/qttesting/CMakeLists.txt")
+  message(
+    WARNING
+      "WITH_GUI_TEST is ON but external/qttesting is missing, so GUI tests are disabled.\n"
+      "Run 'git submodule update --init external/qttesting' to enable them."
+  )
+  set(WITH_GUI_TEST OFF)
+endif()
 
 # Default to "Release" build type
 # User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
@@ -453,6 +465,25 @@ endif()
 if(WITH_ORACLE)
   add_subdirectory(oracle)
   set(CPACK_INSTALL_CMAKE_PROJECTS "Oracle;Oracle;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
+endif()
+
+if(WITH_GUI_TEST)
+  set(QtTesting_QT_VERSION "6")
+  # QtTesting registers its own unit tests when BUILD_TESTING is on. They target the
+  # Qt version the harness was written for and fail on Qt 6.11 (toolbutton
+  # long-press recording), and they are not Cockatrice's tests, so suppress them
+  # for the duration of the subdirectory instead of painting ctest red.
+  if(DEFINED BUILD_TESTING)
+    set(_cockatrice_saved_build_testing ${BUILD_TESTING})
+  endif()
+  set(BUILD_TESTING OFF CACHE BOOL "Build the testing tree." FORCE)
+  add_subdirectory(external/qttesting)
+  if(DEFINED _cockatrice_saved_build_testing)
+    set(BUILD_TESTING ${_cockatrice_saved_build_testing} CACHE BOOL "Build the testing tree." FORCE)
+  else()
+    unset(BUILD_TESTING CACHE)
+  endif()
+  target_compile_options(qttesting PRIVATE -Wno-error)
 endif()
 
 if(TEST)
