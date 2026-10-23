@@ -40,6 +40,7 @@ class QWidget;
 
 DlgEditTokens::DlgEditTokens(QWidget *parent) : QDialog(parent), currentCard(nullptr)
 {
+    setObjectName("editTokensDialog");
     nameLabel = new QLabel(tr("&Name:"));
     nameEdit = new QLineEdit;
     nameEdit->setMaxLength(MAX_NAME_LENGTH);

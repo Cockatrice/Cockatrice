@@ -73,6 +73,8 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
     resize(calculateDialogSize(hostSize, available.size(), minimum));
     setSizeGripEnabled(true);
 
+    setObjectName("settingsDialog");
+
     connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this, &DlgSettings::updateLanguage);
 
     settingsView = new SettingsView(this);
@@ -82,6 +84,7 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
     buttonBox->addStretch();
     okButton = new QPushButton;
     okButton->setDefault(true);
+    okButton->setObjectName("settingsOkButton");
     connect(okButton, &QPushButton::clicked, this, &DlgSettings::close);
     buttonBox->addWidget(okButton);
 
