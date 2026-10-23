@@ -50,6 +50,13 @@ SettingsCache &SettingsCache::instance()
     return *settingsCache; // returns a QT managed singleton reference
 }
 
+SettingsCache::~SettingsCache()
+{
+    for (ReleaseChannel *releaseChannel : releaseChannels) {
+        delete releaseChannel;
+    }
+}
+
 QString SettingsCache::getDataPath()
 {
     if (isPortableBuild) {
