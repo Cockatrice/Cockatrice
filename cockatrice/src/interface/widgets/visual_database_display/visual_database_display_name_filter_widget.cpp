@@ -142,8 +142,7 @@ void VisualDatabaseDisplayNameFilterWidget::updateFilterModel()
 
     {
         // Scope the blockers so both models are unblocked before the explicit
-        // change notifications below. This used to unblock twice, and the
-        // second pair was a no-op only by accident.
+        // change notifications below.
         const QSignalBlocker modelBlocker(filterModel);
         const QSignalBlocker treeBlocker(filterModel->filterTree());
 
