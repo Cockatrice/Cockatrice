@@ -22,6 +22,7 @@
 #include <QStringList>
 #include <QTemporaryDir>
 #include <QVector>
+#include <QWeakPointer>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/card/database/card_database_data.h>
 #include <libcockatrice/card/database/parser/cockatrice_xml_4.h>
@@ -608,6 +609,42 @@ TEST_F(CardDatabaseCacheInvalidationTest, MarkAllSetsAsKnownIsBatched)
     EXPECT_FALSE(controller.isEnabled("BBB"));
     // Ignored sets keep their known state but are enabled.
     EXPECT_TRUE(controller.isEnabled("XXX"));
+}
+
+TEST_F(CardDatabaseCacheInvalidationTest, ReloadReleasesPreviousSnapshot)
+{
+    NoopCardPreferenceProvider prefs;
+    SandboxPathProvider pathProvider(root);
+    CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
+
+    db.loadCardDatabases();
+    CardInfoPtr card = db.getCardList().value("Cat");
+    ASSERT_FALSE(card.isNull());
+    QWeakPointer<CardInfo> weakCard(card);
+    card.clear();
+
+    db.reloadCardDatabasesAndNotify();
+
+    // CardSet holds strong CardInfoPtrs and CardInfo holds the CardSetPtr through its printings; if that
+    // cycle is not broken, the previous snapshot survives the reload.
+    EXPECT_TRUE(weakCard.isNull()) << "a reload must release the previous card snapshot";
+}
+
+TEST_F(CardDatabaseCacheInvalidationTest, ClearReleasesCards)
+{
+    NoopCardPreferenceProvider prefs;
+    SandboxPathProvider pathProvider(root);
+    CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
+
+    db.loadCardDatabases();
+    CardInfoPtr card = db.getCardList().value("Cat");
+    ASSERT_FALSE(card.isNull());
+    QWeakPointer<CardInfo> weakCard(card);
+    card.clear();
+
+    db.clear();
+
+    EXPECT_TRUE(weakCard.isNull()) << "clear() must release cards held by set membership";
 }
 
 TEST_F(CardDatabaseCacheInvalidationTest, RemoveSelfPointerStillNotifiesDatabaseCard)
