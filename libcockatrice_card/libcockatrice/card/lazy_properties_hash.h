@@ -4,6 +4,7 @@
 #include <QByteArray>
 #include <QHash>
 #include <QMutex>
+#include <QMutexLocker>
 #include <QString>
 #include <QStringList>
 #include <atomic>
@@ -30,6 +31,32 @@ class LazyPropertiesHash
      * Safe to call from const getters (members are mutable).
      */
     void ensureMaterialized() const;
+
+    /**
+     * @brief Runs the accessor for the current storage form.
+     *
+     * The common case skips the mutex once the properties are materialized. While they are
+     * still in blob form, the mutex is taken and @p onBlob reads the values straight out of
+     * the blob without building the hash, so ordinary queries stay allocation-light.
+     *
+     * @param onMaterialized Called with the materialized hash when it is available.
+     * @param onBlob Called with the blob when it is still the source of truth.
+     * @return Whatever the invoked accessor returns; both accessors must return the same type.
+     */
+    template <typename MaterializedFn, typename BlobFn>
+    auto read(MaterializedFn &&onMaterialized, BlobFn &&onBlob) const
+    {
+        if (isMaterialized.load(std::memory_order_acquire)) {
+            return onMaterialized(properties);
+        }
+
+        QMutexLocker lock(&propertiesMutex);
+        if (isMaterialized.load(std::memory_order_relaxed)) {
+            return onMaterialized(properties);
+        }
+
+        return onBlob(blob);
+    }
 
 public:
     /**

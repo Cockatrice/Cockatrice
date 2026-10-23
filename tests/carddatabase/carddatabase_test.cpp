@@ -137,8 +137,8 @@ TEST(CardDatabaseTest, Xml4LocalizedDataRoundTrip)
     setsInfo["TST"].append(printing);
 
     CardInfo::UiAttributes attributes = {.tableRow = 1};
-    CardInfoPtr card = CardInfo::newInstance("Lightning Bolt", "Deal 3 damage.", false, QHash<QString, QString>{}, {},
-                                             {}, setsInfo, attributes);
+    CardInfoPtr card =
+        CardInfo::newInstance("Lightning Bolt", "Deal 3 damage.", false, {}, {}, {}, setsInfo, attributes);
     card->setLocalizedName("de", "Blitzschlag");
     card->setLocalizedText("de", "Blitzschlag fügt 3 Schadenspunkte zu.");
     card->setProperty("format-standard", "legal");
@@ -168,7 +168,7 @@ TEST(CardDatabaseTest, Xml4LocalizedDataRoundTrip)
     ASSERT_EQ(loaded->getLocalizedText("fr"), "Deal 3 damage.");
     ASSERT_EQ(loaded->getProperty("format-standard"), "legal");
     ASSERT_TRUE(loaded->hasProperty("colors"));
-    ASSERT_EQ(loaded->getPropertyCount(), 2);
+    ASSERT_EQ(loaded->getProperties().size(), 2);
 
     const QList<PrintingInfo> printings = loaded->getSets().value("TST");
     ASSERT_FALSE(printings.isEmpty());

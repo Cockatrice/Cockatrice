@@ -125,7 +125,7 @@ RunResult runLoad(CardDatabase *db, ChurnCounters &counters)
     result.churn.modelResets = counters.modelResets - before.modelResets;
 
     for (const CardInfoPtr &card : db->getCardList()) {
-        result.propTotal += card->getPropertyCount();
+        result.propTotal += card->getProperties().size();
         if (!card->getProperty("colors").isEmpty()) {
             ++result.propsQueried;
         }

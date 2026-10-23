@@ -117,9 +117,7 @@ public:
      */
     [[nodiscard]] QString getProperty(const QString &propertyName) const
     {
-        const auto &propertiesHash = getPropertiesHash();
-        const auto it = propertiesHash.constFind(propertyName);
-        return it != propertiesHash.constEnd() ? it.value() : QString();
+        return properties.value(propertyName);
     }
 
     /**

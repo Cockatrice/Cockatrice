@@ -182,7 +182,7 @@ void DlgEditTokens::actAddToken()
     SetToPrintingsMap sets;
     sets[setName].append(PrintingInfo(databaseModel->getDatabase()->getSet(setName)));
     CardInfo::UiAttributes attributes = {.tableRow = -1};
-    CardInfoPtr card = CardInfo::newInstance(name, "", true, QHash<QString, QString>{}, {}, {}, sets, attributes);
+    CardInfoPtr card = CardInfo::newInstance(name, "", true, {}, {}, {}, sets, attributes);
     card->setCardType("Token");
 
     databaseModel->getDatabase()->addCard(card);

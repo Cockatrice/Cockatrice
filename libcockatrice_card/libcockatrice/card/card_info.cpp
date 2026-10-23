@@ -81,7 +81,7 @@ CardInfo::CardInfo(const QString &_name,
 
 CardInfoPtr CardInfo::newInstance(const QString &_name)
 {
-    return newInstance(_name, "", false, QHash<QString, QString>{}, {}, {}, {}, {});
+    return newInstance(_name, "", false, {}, {}, {}, {}, {});
 }
 
 CardInfoPtr CardInfo::newInstance(const QString &_name,
@@ -117,11 +117,11 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
                                   const QList<CardRelation *> &_reverseRelatedCards,
                                   SetToPrintingsMap _sets,
                                   const UiAttributes _uiAttributes,
-                                  QMap<QString, QString> _localizedNames,
-                                  QMap<QString, QString> _localizedTexts,
-                                  bool _appendToSets,
                                   QString _simpleName,
-                                  QSet<QString> _altNames)
+                                  QSet<QString> _altNames,
+                                  bool _appendToSets,
+                                  QMap<QString, QString> _localizedNames,
+                                  QMap<QString, QString> _localizedTexts)
 {
     CardInfoPtr ptr(new CardInfo(_name, _text, _isToken, std::move(_propertiesBlob), _relatedCards,
                                  _reverseRelatedCards, _sets, _uiAttributes, std::move(_simpleName),

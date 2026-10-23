@@ -112,7 +112,7 @@ QUERY(SetSpaceAfterColon, cat, "set: cat", true)
 
 CardInfoPtr localizedCat()
 {
-    CardInfoPtr localized = CardInfo::newInstance("Cat", "Meow!", false, QHash<QString, QString>{}, {}, {}, {}, {});
+    CardInfoPtr localized = CardInfo::newInstance("Cat", "Meow!", false, {}, {}, {}, {}, {});
     localized->setLocalizedName("de", "Kater");
     localized->setLocalizedText("de", "miaut");
     return localized;
@@ -217,8 +217,7 @@ protected:
         for (const auto &printing : printings) {
             setsInfo[printing.first].append(PrintingInfo(printing.second));
         }
-        return CardInfo::newInstance("Test Card", "", false, QHash<QString, QString>{}, {}, {}, setsInfo,
-                                     CardInfo::UiAttributes());
+        return CardInfo::newInstance("Test Card", "", false, {}, {}, {}, setsInfo, CardInfo::UiAttributes());
     }
 
     NoopCardSetPriorityController controller;

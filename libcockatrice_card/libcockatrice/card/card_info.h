@@ -211,10 +211,9 @@ public:
      * @brief Creates a new instance from a serialized properties blob.
      *
      * The properties stay in blob form, so the QHash<QString, QString> is not
-     * built at load time (it is materialized on first query). The derived cache
-     * fields are computed here unless the caller supplies them: the binary
-     * cache passes @p _simpleName and @p _altNames to skip the Unicode
-     * normalization and the printing scan.
+     * built at load time (it is materialized on first query). The derived state
+     * is required so it is never recomputed here, and the overload cannot be a
+     * candidate for a shorter call that passes a property hash instead of a blob.
      *
      * @param _name Name of the card.
      * @param _text Rules text or description.
@@ -224,14 +223,16 @@ public:
      * @param _reverseRelatedCards Reverse relationships.
      * @param _sets Printing information per set.
      * @param _uiAttributes Attributes that affect display and game logic.
-     * @param _localizedNames Localized card names, keyed by language code.
-     * @param _localizedTexts Localized rules text, keyed by language code.
-     * @param _appendToSets When true (default), the card is appended to each of
+     * @param _simpleName Precomputed simplified name; pass {} to derive it from
+     *        @p _name.
+     * @param _altNames Precomputed alternate names; pass {} to derive them from
+     *        the printings.
+     * @param _appendToSets When true, the card is appended to each of
      *        its CardSets. Pass false when building cards in parallel so the
      *        (non-thread-safe) set membership is populated in a later
      *        single-threaded pass.
-     * @param _simpleName Precomputed simplified name; derived from @p _name when empty.
-     * @param _altNames Precomputed alternate names; derived from the printings when empty.
+     * @param _localizedNames Localized card names, keyed by language code.
+     * @param _localizedTexts Localized rules text, keyed by language code.
      * @return Shared pointer to the new CardInfo instance.
      */
     static CardInfoPtr newInstance(const QString &_name,
@@ -242,11 +243,11 @@ public:
                                    const QList<CardRelation *> &_reverseRelatedCards,
                                    SetToPrintingsMap _sets,
                                    UiAttributes _uiAttributes,
+                                   QString _simpleName,
+                                   QSet<QString> _altNames,
+                                   bool _appendToSets,
                                    QMap<QString, QString> _localizedNames = {},
-                                   QMap<QString, QString> _localizedTexts = {},
-                                   bool _appendToSets = true,
-                                   QString _simpleName = {},
-                                   QSet<QString> _altNames = {});
+                                   QMap<QString, QString> _localizedTexts = {});
 
     /**
      * @brief Clones the current CardInfo instance.
@@ -393,14 +394,6 @@ public:
     [[nodiscard]] QStringList getProperties() const
     {
         return properties.keys();
-    }
-
-    /**
-     * @brief Returns the number of properties without building the name list.
-     */
-    [[nodiscard]] int getPropertyCount() const
-    {
-        return properties.size();
     }
 
     /**

@@ -132,6 +132,64 @@ private:
     quint32 remaining = 0;
     bool valid = false;
 };
+
+/**
+ * @brief Looks up @p key in a serialized blob without materializing it.
+ */
+QString blobValue(const QByteArray &blob, const QString &key)
+{
+    BlobReader reader(blob);
+    int keyPos = 0;
+    int valuePos = 0;
+    quint32 keyLength = 0;
+    quint32 valueLength = 0;
+    while (reader.next(keyPos, keyLength, valuePos, valueLength)) {
+        if (blobKeyEquals(blob, keyPos, keyLength, key)) {
+            return blobString(blob, valuePos, valueLength);
+        }
+    }
+
+    return {};
+}
+
+/**
+ * @brief Checks whether @p key is present in a serialized blob without materializing it.
+ */
+bool blobContains(const QByteArray &blob, const QString &key)
+{
+    BlobReader reader(blob);
+    int keyPos = 0;
+    int valuePos = 0;
+    quint32 keyLength = 0;
+    quint32 valueLength = 0;
+    while (reader.next(keyPos, keyLength, valuePos, valueLength)) {
+        if (blobKeyEquals(blob, keyPos, keyLength, key)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * @brief Lists the keys of a serialized blob without materializing it.
+ */
+QStringList blobKeys(const QByteArray &blob)
+{
+    BlobReader reader(blob);
+    QStringList result;
+    result.reserve(static_cast<int>(reader.entryCount()));
+
+    int keyPos = 0;
+    int valuePos = 0;
+    quint32 keyLength = 0;
+    quint32 valueLength = 0;
+    while (reader.next(keyPos, keyLength, valuePos, valueLength)) {
+        result.append(blobString(blob, keyPos, keyLength));
+    }
+
+    return result;
+}
 } // namespace
 
 LazyPropertiesHash::LazyPropertiesHash() : isMaterialized(true)
@@ -219,66 +277,20 @@ QByteArray LazyPropertiesHash::serialize(const QHash<QString, QString> &properti
 
 QString LazyPropertiesHash::value(const QString &key) const
 {
-    if (isMaterialized.load(std::memory_order_acquire)) {
-        return properties.value(key);
-    }
-
-    QMutexLocker lock(&propertiesMutex);
-    if (isMaterialized.load(std::memory_order_relaxed)) {
-        return properties.value(key);
-    }
-
-    BlobReader reader(blob);
-    int keyPos = 0;
-    int valuePos = 0;
-    quint32 keyLength = 0;
-    quint32 valueLength = 0;
-    while (reader.next(keyPos, keyLength, valuePos, valueLength)) {
-        if (blobKeyEquals(blob, keyPos, keyLength, key)) {
-            return blobString(blob, valuePos, valueLength);
-        }
-    }
-
-    return {};
+    return read([&key](const QHash<QString, QString> &materialized) { return materialized.value(key); },
+                [&key](const QByteArray &blob) { return blobValue(blob, key); });
 }
 
 bool LazyPropertiesHash::contains(const QString &key) const
 {
-    if (isMaterialized.load(std::memory_order_acquire)) {
-        return properties.contains(key);
-    }
-
-    QMutexLocker lock(&propertiesMutex);
-    if (isMaterialized.load(std::memory_order_relaxed)) {
-        return properties.contains(key);
-    }
-
-    BlobReader reader(blob);
-    int keyPos = 0;
-    int valuePos = 0;
-    quint32 keyLength = 0;
-    quint32 valueLength = 0;
-    while (reader.next(keyPos, keyLength, valuePos, valueLength)) {
-        if (blobKeyEquals(blob, keyPos, keyLength, key)) {
-            return true;
-        }
-    }
-
-    return false;
+    return read([&key](const QHash<QString, QString> &materialized) { return materialized.contains(key); },
+                [&key](const QByteArray &blob) { return blobContains(blob, key); });
 }
 
 int LazyPropertiesHash::size() const
 {
-    if (isMaterialized.load(std::memory_order_acquire)) {
-        return properties.size();
-    }
-
-    QMutexLocker lock(&propertiesMutex);
-    if (isMaterialized.load(std::memory_order_relaxed)) {
-        return properties.size();
-    }
-
-    return static_cast<int>(BlobReader(blob).entryCount());
+    return read([](const QHash<QString, QString> &materialized) { return static_cast<int>(materialized.size()); },
+                [](const QByteArray &blob) { return static_cast<int>(BlobReader(blob).entryCount()); });
 }
 
 bool LazyPropertiesHash::isEmpty() const
@@ -288,44 +300,18 @@ bool LazyPropertiesHash::isEmpty() const
 
 QStringList LazyPropertiesHash::keys() const
 {
-    if (isMaterialized.load(std::memory_order_acquire)) {
-        return properties.keys();
-    }
-
-    QMutexLocker lock(&propertiesMutex);
-    if (isMaterialized.load(std::memory_order_relaxed)) {
-        return properties.keys();
-    }
-
-    QStringList result;
-    BlobReader reader(blob);
-    result.reserve(static_cast<int>(reader.entryCount()));
-
-    int keyPos = 0;
-    int valuePos = 0;
-    quint32 keyLength = 0;
-    quint32 valueLength = 0;
-    while (reader.next(keyPos, keyLength, valuePos, valueLength)) {
-        result.append(blobString(blob, keyPos, keyLength));
-    }
-
-    return result;
+    return read([](const QHash<QString, QString> &materialized) { return QStringList(materialized.keys()); },
+                [](const QByteArray &blob) { return blobKeys(blob); });
 }
 
 QByteArray LazyPropertiesHash::serialized() const
 {
-    if (isMaterialized.load(std::memory_order_acquire)) {
-        return serialize(properties);
-    }
-
-    QMutexLocker lock(&propertiesMutex);
-    if (isMaterialized.load(std::memory_order_relaxed)) {
-        return serialize(properties);
-    }
-
-    // An empty blob is the "unknown/absent" form used by failed cache reads; give callers a
-    // well-formed serialization of the (empty) property map instead.
-    return blob.isEmpty() ? serialize({}) : blob;
+    return read([](const QHash<QString, QString> &materialized) { return serialize(materialized); },
+                [](const QByteArray &blob) {
+                    // An empty blob is the "unknown/absent" form used by failed cache reads; give callers a
+                    // well-formed serialization of the (empty) property map instead.
+                    return blob.isEmpty() ? serialize({}) : blob;
+                });
 }
 
 bool LazyPropertiesHash::insert(const QString &key, const QString &value)

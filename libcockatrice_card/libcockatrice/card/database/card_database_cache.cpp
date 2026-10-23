@@ -325,7 +325,7 @@ CardInfoPtr readCard(QDataStream &in, const SetNameMap &sets)
     }
 
     CardInfoPtr card = CardInfo::newInstance(name, text, isToken, propertiesBlob, related, reverse, cardSets, ui,
-                                             localizedNames, localizedTexts, false, simpleName, altNames);
+                                             simpleName, altNames, false, localizedNames, localizedTexts);
 
     return card;
 }

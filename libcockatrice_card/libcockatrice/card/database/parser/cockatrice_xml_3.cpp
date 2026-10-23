@@ -325,8 +325,9 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                                                  .landscapeOrientation = landscapeOrientation,
                                                  .tableRow = tableRow,
                                                  .upsideDownArt = upsideDown};
-            CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, LazyPropertiesHash::serialize(properties),
-                                                        relatedCards, reverseRelatedCards, _sets, attributes);
+            CardInfoPtr newCard =
+                CardInfo::newInstance(name, text, isToken, LazyPropertiesHash::serialize(properties), relatedCards,
+                                      reverseRelatedCards, _sets, attributes, {}, {}, true);
             if (targetData) {
                 if (auto existing = targetData->cards.value(name)) {
                     for (const auto &printings : newCard->getSets()) {
