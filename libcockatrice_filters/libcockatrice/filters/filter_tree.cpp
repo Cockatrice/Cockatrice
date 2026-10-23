@@ -16,11 +16,7 @@
 namespace
 {
 /** Separator between the main and sub types of a card type ("Creature — Elf"). */
-const QString &mainSubTypeSeparator()
-{
-    static const QString separator = QStringLiteral(" — ");
-    return separator;
-}
+const QString MAIN_SUB_TYPE_SEPARATOR = QStringLiteral(" — ");
 } // namespace
 
 template <class T> FilterTreeNode *FilterTreeBranch<T>::nodeAt(int i) const
@@ -339,8 +335,8 @@ bool FilterItem::acceptType(const CardInfoPtr &info) const
 
 bool FilterItem::acceptMainType(const CardInfoPtr &info) const
 {
-    const QString &type = info->getCardType();
-    const qsizetype separator = type.indexOf(mainSubTypeSeparator());
+    const QString type = info->getCardType();
+    const qsizetype separator = type.indexOf(MAIN_SUB_TYPE_SEPARATOR);
     if (separator >= 0) {
         return QStringView(type).left(separator).contains(term, Qt::CaseInsensitive);
     }
@@ -349,15 +345,14 @@ bool FilterItem::acceptMainType(const CardInfoPtr &info) const
 
 bool FilterItem::acceptSubType(const CardInfoPtr &info) const
 {
-    const QString &type = info->getCardType();
-    const QString &separatorText = mainSubTypeSeparator();
-    const qsizetype separator = type.indexOf(separatorText);
+    const QString type = info->getCardType();
+    const qsizetype separator = type.indexOf(MAIN_SUB_TYPE_SEPARATOR);
     if (separator < 0) {
         return false;
     }
 
-    const qsizetype subTypeStart = separator + separatorText.size();
-    const qsizetype nextSeparator = type.indexOf(separatorText, subTypeStart);
+    const qsizetype subTypeStart = separator + MAIN_SUB_TYPE_SEPARATOR.size();
+    const qsizetype nextSeparator = type.indexOf(MAIN_SUB_TYPE_SEPARATOR, subTypeStart);
     const QStringView subType = nextSeparator < 0 ? QStringView(type).mid(subTypeStart)
                                                   : QStringView(type).mid(subTypeStart, nextSeparator - subTypeStart);
     return subType.contains(term, Qt::CaseInsensitive);
@@ -365,7 +360,7 @@ bool FilterItem::acceptSubType(const CardInfoPtr &info) const
 
 bool FilterItem::acceptColor(const CardInfoPtr &info) const
 {
-    const QString &colors = info->getColors();
+    const QString colors = info->getColors();
 
     // Colorless card filter
     if (convertedColorTerm.toLower() == "c" && colors.length() < 1) {
@@ -413,7 +408,7 @@ bool FilterItem::acceptSet(const CardInfoPtr &info) const
 {
     for (const auto &printings : info->getSets()) {
         for (const auto &printing : printings) {
-            const CardSetPtr &set = printing.getSet();
+            const CardSetPtr set = printing.getSet();
             if (set && (set->getShortName().compare(term, Qt::CaseInsensitive) == 0 ||
                         set->getLongName().compare(term, Qt::CaseInsensitive) == 0)) {
                 return true;
@@ -442,7 +437,7 @@ bool FilterItem::acceptManaCost(const CardInfoPtr &info) const
 
 bool FilterItem::acceptCmc(const CardInfoPtr &info) const
 {
-    const QString &cmc = info->getCmc();
+    const QString cmc = info->getCmc();
     bool convertSuccess;
     int cmcInt = cmc.toInt(&convertSuccess);
     // if conversion failed, check for the "//" separator used in split cards
@@ -468,7 +463,7 @@ bool FilterItem::acceptFormat(const CardInfoPtr &info) const
 
 bool FilterItem::acceptLoyalty(const CardInfoPtr &info) const
 {
-    const QString &loyaltyString = info->getLoyalty();
+    const QString loyaltyString = info->getLoyalty();
     if (loyaltyString.isEmpty()) {
         return false;
     }
@@ -484,7 +479,7 @@ bool FilterItem::acceptLoyalty(const CardInfoPtr &info) const
 
 bool FilterItem::acceptPowerToughness(const CardInfoPtr &info, CardFilter::Attr attr) const
 {
-    const QString &powTough = info->getPowTough();
+    const QString powTough = info->getPowTough();
     const qsizetype slash = powTough.indexOf("/");
     if (slash == -1) {
         return false;
