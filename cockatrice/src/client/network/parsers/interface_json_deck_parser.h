@@ -12,8 +12,12 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QList>
+#include <QString>
+#include <QTextStream>
 #include <libcockatrice/card/import/card_name_normalizer.h>
 #include <libcockatrice/deck_list/deck_list.h>
+
+inline Q_LOGGING_CATEGORY(InterfaceJsonDeckParserLog, "interface_json_deck_parser");
 
 class IJsonDeckParser
 {
@@ -33,9 +37,6 @@ public:
         QString deckName = obj.value("name").toString();
         QString deckDescription = obj.value("description").toString();
 
-        deckList.setName(deckName);
-        deckList.setComments(deckDescription);
-
         QString outputText;
         QTextStream outStream(&outputText);
 
@@ -53,6 +54,8 @@ public:
 
         deckList.loadFromStream_Plain(outStream, false, CardNameNormalizer());
         deckList.forEachCard(CardNodeFunction::ResolveProviderId());
+        deckList.setName(deckName);
+        deckList.setComments(deckDescription);
 
         return deckList;
     }
@@ -67,9 +70,6 @@ public:
 
         QString deckName = obj.value("name").toString();
         QString deckDescription = obj.value("description").toString();
-
-        deckList.setName(deckName);
-        deckList.setComments(deckDescription);
 
         QString outputText;
         QTextStream outStream(&outputText);
@@ -100,6 +100,8 @@ public:
 
         deckList.loadFromStream_Plain(outStream, false, CardNameNormalizer());
         deckList.forEachCard(CardNodeFunction::ResolveProviderId());
+        deckList.setName(deckName);
+        deckList.setComments(deckDescription);
 
         QJsonObject commandersObj = obj.value("commanders").toObject();
         if (!commandersObj.isEmpty()) {
@@ -136,8 +138,6 @@ public:
 
         QString deckName = obj.value("name").toString();
 
-        deckList.setName(deckName);
-
         QString outputText;
         QString mainboardText;
         QString sideboardText;
@@ -162,12 +162,19 @@ public:
                                     << '\n';
                     break;
                 case SideBoard:
-                case MaybeBoard:
                     sideboardStream << quantity << ' ' << cardName << " (" << setName << ") " << collectorNumber
                                     << '\n';
                     break;
+                case MaybeBoard:
+                    for (int x = 0; x < quantity; x++) {
+                        deckList.addCard(cardName, DECK_ZONE_MAYBEBOARD, -1, setName, collectorNumber, providerId);
+                    }
+                    break;
                 case Commander:
                     commanderList.append(card);
+                    break;
+                default:
+                    qCWarning(InterfaceJsonDeckParserLog) << "Unknown ManaBox Zone";
                     break;
             }
         }
@@ -175,15 +182,16 @@ public:
         outStream << mainboardText << '\n' << sideboardText;
 
         deckList.loadFromStream_Plain(outStream, false, CardNameNormalizer());
+        deckList.setName(deckName);
         deckList.forEachCard(CardNodeFunction::ResolveProviderId());
 
-        if (commanderList.count() > 0) {
-            for (auto commanderCard : commanderList) {
+        if (!commanderList.isEmpty()) {
+            for (const auto &commanderCard : commanderList) {
 
                 QString commanderName = commanderCard.value("name").toString();
-                QString setName = commanderCard.value("set").toString().toUpper();
-                QString collectorNumber = commanderCard.value("cn").toString();
-                QString providerId = commanderCard.value("scryfall_id").toString();
+                QString setName = commanderCard.value("setId").toString().toUpper();
+                QString collectorNumber = commanderCard.value("collectorNumber").toString();
+                QString providerId = commanderCard.value("scryfallId").toString();
 
                 deckList.setBannerCard({commanderName, providerId});
                 deckList.addCard(commanderName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
