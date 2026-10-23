@@ -17,10 +17,12 @@
 #include <QIODevice>
 #include <QList>
 #include <QSharedPointer>
+#include <QSignalSpy>
 #include <QString>
 #include <QStringList>
 #include <QTemporaryDir>
 #include <QVector>
+#include <QWeakPointer>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/card/database/card_database_data.h>
 #include <libcockatrice/card/database/parser/cockatrice_xml_4.h>
@@ -535,6 +537,88 @@ TEST_F(CardDatabaseCacheInvalidationTest, MarkAllSetsAsKnownIsBatched)
     // Ignored sets keep their known state but are enabled.
     EXPECT_TRUE(controller.isEnabled("XXX"));
 }
+
+TEST_F(CardDatabaseCacheInvalidationTest, ReloadReleasesPreviousSnapshot)
+{
+    NoopCardPreferenceProvider prefs;
+    SandboxPathProvider pathProvider(root);
+    CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
+
+    db.loadCardDatabases();
+    CardInfoPtr card = db.getCardList().value("Cat");
+    ASSERT_FALSE(card.isNull());
+    QWeakPointer<CardInfo> weakCard(card);
+    card.clear();
+
+    db.reloadCardDatabasesAndNotify();
+
+    // CardSet holds strong CardInfoPtrs and CardInfo holds the CardSetPtr through its printings; if that
+    // cycle is not broken, the previous snapshot survives the reload.
+    EXPECT_TRUE(weakCard.isNull()) << "a reload must release the previous card snapshot";
+}
+
+TEST_F(CardDatabaseCacheInvalidationTest, ClearReleasesCards)
+{
+    NoopCardPreferenceProvider prefs;
+    SandboxPathProvider pathProvider(root);
+    CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
+
+    db.loadCardDatabases();
+    CardInfoPtr card = db.getCardList().value("Cat");
+    ASSERT_FALSE(card.isNull());
+    QWeakPointer<CardInfo> weakCard(card);
+    card.clear();
+
+    db.clear();
+
+    EXPECT_TRUE(weakCard.isNull()) << "clear() must release cards held by set membership";
+}
+
+TEST_F(CardDatabaseCacheInvalidationTest, RemoveSelfPointerStillNotifiesDatabaseCard)
+{
+    // cardInfoChanged() used to be emitted through a self pointer stored on the card. Without it the
+    // card must still notify its observers whenever its properties change.
+    NoopCardPreferenceProvider prefs;
+    SandboxPathProvider pathProvider(root);
+    CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
+
+    db.loadCardDatabases();
+    const CardInfoPtr card = db.getCardList().value("Cat");
+    ASSERT_FALSE(card.isNull());
+    QSignalSpy spy(card.data(), &CardInfo::cardInfoChanged);
+
+    card->setProperty("manacost", "1G");
+
+    ASSERT_EQ(spy.count(), 1) << "a property change on a database card must still emit cardInfoChanged";
+    const QList<QVariant> arguments = spy.takeFirst();
+    ASSERT_EQ(arguments.size(), 1);
+    EXPECT_EQ(arguments.first().value<CardInfoPtr>().data(), card.data())
+        << "the signal must carry the card that changed";
+}
+
+TEST_F(CardDatabaseCacheInvalidationTest, RemoveSelfPointerCloneNotifiesAsItself)
+{
+    // A clone owns its own shared reference, so its changes must be reported as the clone's, never the
+    // original's: decks and views listening to the original must not be invalidated by a clone edit.
+    NoopCardPreferenceProvider prefs;
+    SandboxPathProvider pathProvider(root);
+    CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
+
+    db.loadCardDatabases();
+    const CardInfoPtr original = db.getCardList().value("Cat");
+    ASSERT_FALSE(original.isNull());
+    const CardInfoPtr clone = original->clone();
+    QSignalSpy originalSpy(original.data(), &CardInfo::cardInfoChanged);
+    QSignalSpy cloneSpy(clone.data(), &CardInfo::cardInfoChanged);
+
+    clone->setProperty("manacost", "1G");
+
+    ASSERT_EQ(cloneSpy.count(), 1) << "the clone must notify its own observers";
+    EXPECT_EQ(cloneSpy.first().first().value<CardInfoPtr>().data(), clone.data())
+        << "the clone's signal must carry the clone";
+    EXPECT_EQ(originalSpy.count(), 0) << "the clone must not notify the original's observers";
+}
+
 } // namespace
 
 int main(int argc, char **argv)
