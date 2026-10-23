@@ -4,3 +4,6 @@
 [submodule "doxygen-awesome-css"]
 	path = doc/doxygen/theme
 	url = https://github.com/jothepro/doxygen-awesome-css.git
+[submodule "external/qttesting"]
+	path = external/qttesting
+	url = https://github.com/Kitware/QtTesting.git
