@@ -144,6 +144,7 @@ void SettingsView::setupUi()
 
     // Pages stacked widget
     pagesWidget = new QStackedWidget;
+    pagesWidget->setObjectName("pagesWidget");
 
     auto *generalPage = new GeneralSettingsPage;
     auto *appearancePage = new AppearanceSettingsPage;
@@ -208,6 +209,7 @@ void SettingsView::setupUi()
 
     // Pages container (stacked widget + search results overlay)
     pagesContainer = new QWidget;
+    pagesContainer->setObjectName("pagesContainer");
     auto *containerLayout = new QStackedLayout;
     containerLayout->setStackingMode(QStackedLayout::StackAll);
     containerLayout->addWidget(pagesWidget);
@@ -247,6 +249,7 @@ void SettingsView::setupUi()
 void SettingsView::setupNavTree()
 {
     navTree = new QTreeWidget;
+    navTree->setObjectName("navTree");
     navTree->setHeaderHidden(true);
     navTree->setRootIsDecorated(true);
     navTree->setIconSize(QSize(24, 24));
