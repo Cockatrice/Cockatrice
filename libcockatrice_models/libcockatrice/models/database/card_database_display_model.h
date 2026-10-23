@@ -10,6 +10,7 @@
 
 #include "libcockatrice/card/card_info.h"
 
+#include <QCollator>
 #include <QModelIndex>
 #include <QSet>
 #include <QSortFilterProxyModel>
@@ -48,6 +49,9 @@ private:
 
     /** The translation table that will be used for sanitizeCardName. */
     static QMap<wchar_t, wchar_t> characterTranslation;
+
+    /** Natural, locale-aware comparison shared by every sort in this model. */
+    QCollator collator;
 
 public:
     explicit CardDatabaseDisplayModel(QObject *parent = nullptr);
@@ -89,7 +93,7 @@ signals:
 
 protected:
     [[nodiscard]] bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
-    static int lessThanNumerically(QStringView left, QStringView right);
+    int lessThanNumerically(const QString &left, const QString &right) const;
     [[nodiscard]] bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
     [[nodiscard]] bool rowMatchesCardName(CardInfoPtr info) const;
 
