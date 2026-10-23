@@ -50,3 +50,17 @@ A test is a `<events>` list. Widgets are named by their path from the main windo
 | `activate` | action or menu name | triggers a QAction (menus are opened first) |
 | `key` | Qt key code | presses that key on the focused widget |
 | `pause` | milliseconds | waits, letting the UI settle |
+| `clickCard` | `card,zone` | left click the card found in that zone |
+| `flipCard` | `card,zone` | right-click → *Turn Over* |
+| `cardAction` | `card,zone,label` | right-click → first menu entry whose label contains `label` (submenus included) |
+| `moveCard` | `card,srcZone,dstZone` | drags the card onto the destination zone |
+| `drawArrow` | `srcCard,srcZone,dstCard,dstZone` | right-drag an arrow between two cards |
+| `createToken` | `name,color,pt` | creates a token as the active local player |
+| `selectItem` | `item label` | selects the tree/list entry with that label |
+| `typeText` | `text` | types text one key event at a time |
+| `expectProperty` | `property,value` | fails playback unless the widget property matches |
+
+The card, item and property commands are `pqCockatriceEventPlayer`
+(`cockatrice/src/game_graphics/pq_cockatrice_event_player.h`). They resolve cards by name
+and zone through the `QGraphicsScene` and send real mouse events at the card's current
+viewport position, so a test does not depend on the window size or screen resolution.

@@ -50,6 +50,7 @@
 #include "latency_tracker.h"
 #include "logger.h"
 #ifdef WITH_GUI_TEST
+#include "../game_graphics/pq_cockatrice_event_player.h"
 #include "pqEventObserver.h"
 #include "pqEventSource.h"
 #include "pqEventTypes.h"
@@ -685,6 +686,7 @@ MainWindow::MainWindow(QWidget *parent)
     testUtility->setRecordWithDialog(true);
     testUtility->addEventObserver("xml", new XMLEventObserver(this));
     testUtility->addEventSource("xml", new XMLEventSource(this));
+    testUtility->eventPlayer()->addWidgetEventPlayer(new pqCockatriceEventPlayer(this));
 #endif
 }
 

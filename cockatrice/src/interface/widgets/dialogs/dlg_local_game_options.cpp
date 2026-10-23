@@ -16,8 +16,11 @@ class QWidget;
 
 DlgLocalGameOptions::DlgLocalGameOptions(QWidget *parent) : QDialog(parent)
 {
+    setObjectName("localGameDialog");
+
     numberPlayersLabel = new QLabel(tr("Players:"), this);
     numberPlayersEdit = new QSpinBox(this);
+    numberPlayersEdit->setObjectName("numberPlayersEdit");
     numberPlayersEdit->setMinimum(1);
     numberPlayersEdit->setMaximum(8);
     numberPlayersEdit->setValue(1);
@@ -28,10 +31,12 @@ DlgLocalGameOptions::DlgLocalGameOptions(QWidget *parent) : QDialog(parent)
     generalGrid->addWidget(numberPlayersLabel, 0, 0);
     generalGrid->addWidget(numberPlayersEdit, 0, 1);
     generalGroupBox = new QGroupBox(tr("General"), this);
+    generalGroupBox->setObjectName("generalGroupBox");
     generalGroupBox->setLayout(generalGrid);
 
     startingLifeTotalLabel = new QLabel(tr("Starting life total:"), this);
     startingLifeTotalEdit = new QSpinBox(this);
+    startingLifeTotalEdit->setObjectName("startingLifeTotalEdit");
     startingLifeTotalEdit->setMinimum(-999999999);
     startingLifeTotalEdit->setMaximum(999999999);
     startingLifeTotalEdit->setValue(20);
@@ -42,11 +47,14 @@ DlgLocalGameOptions::DlgLocalGameOptions(QWidget *parent) : QDialog(parent)
     gameSetupGrid->addWidget(startingLifeTotalLabel, 0, 0);
     gameSetupGrid->addWidget(startingLifeTotalEdit, 0, 1);
     gameSetupOptionsGroupBox = new QGroupBox(tr("Game setup options"), this);
+    gameSetupOptionsGroupBox->setObjectName("gameSetupOptionsGroupBox");
     gameSetupOptionsGroupBox->setLayout(gameSetupGrid);
 
     rememberSettingsCheckBox = new QCheckBox(tr("Remember settings"), this);
+    rememberSettingsCheckBox->setObjectName("rememberSettingsCheckBox");
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
+    buttonBox->setObjectName("buttonBox");
     connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgLocalGameOptions::actOK);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgLocalGameOptions::reject);
 
