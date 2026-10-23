@@ -1,6 +1,7 @@
 #include "visual_database_display_filter_toolbar_widget.h"
 
 #include "../../theme_icon.h"
+#include "../../theme_manager.h"
 #include "../deck_editor/card_database_view.h"
 #include "../quick_settings/settings_button_widget.h"
 #include "card_database_display_model.h"
@@ -47,10 +48,15 @@ VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidg
     auto scalePixmap = [](const QString &prefix) { return loadThemedIcon(prefix).pixmap({20, 20}); };
 
     sortByLabel = new QLabel(this);
-    sortByLabel->setPixmap(scalePixmap("icons/sort_arrow_down"));
-
     filterByLabel = new QLabel(this);
-    filterByLabel->setPixmap(scalePixmap("icons/filter"));
+
+    auto refreshStaticPixmaps = [this, scalePixmap] {
+        sortByLabel->setPixmap(scalePixmap("icons/sort_arrow_down"));
+        filterByLabel->setPixmap(scalePixmap("icons/filter"));
+    };
+    refreshStaticPixmaps();
+    connect(themeManager, &ThemeManager::paletteChanged, this, refreshStaticPixmaps);
+    connect(themeManager, &ThemeManager::themeChanged, this, refreshStaticPixmaps);
 
     sortColumnCombo = new QComboBox(this);
     sortColumnCombo->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);
