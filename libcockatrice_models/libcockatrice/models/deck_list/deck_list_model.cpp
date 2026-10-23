@@ -134,6 +134,13 @@ void DeckListModel::rebuildTree()
 
 int DeckListModel::rowCount(const QModelIndex &parent) const
 {
+    // Only column 0 carries children. Column 1 and later indexes are siblings
+    // used by views for the remaining cells of a row, and a model that hangs
+    // children off them breaks QAbstractItemModelTester and proxy models.
+    if (parent.isValid() && parent.column() != 0) {
+        return 0;
+    }
+
     // debugIndexInfo("rowCount", parent);
     auto *node = getNode<InnerDecklistNode *>(parent);
     if (node) {
@@ -282,7 +289,7 @@ QVariant DeckListModel::headerData(const int section, const Qt::Orientation orie
 QModelIndex DeckListModel::index(int row, int column, const QModelIndex &parent) const
 {
     // debugIndexInfo("index", parent);
-    if (!hasIndex(row, column, parent)) {
+    if ((parent.isValid() && parent.column() != 0) || !hasIndex(row, column, parent)) {
         return {};
     }
 
