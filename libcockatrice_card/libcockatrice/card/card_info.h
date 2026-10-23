@@ -7,6 +7,7 @@
 
 #include <QByteArray>
 #include <QChar>
+#include <QEnableSharedFromThis>
 #include <QHash>
 #include <QList>
 #include <QLoggingCategory>
@@ -50,7 +51,7 @@ Q_DECLARE_METATYPE(CardInfoPtr)
  * Each CardInfo may belong to multiple sets through its printings, and can
  * be related to other cards through defined relationships.
  */
-class CardInfo : public QObject
+class CardInfo : public QObject, public QEnableSharedFromThis<CardInfo>
 {
     Q_OBJECT
 
@@ -74,11 +75,10 @@ private:
      *  @anchor PrivateCardProperties
      */
     ///@{
-    CardInfoPtr smartThis; ///< Smart pointer to self for safe cross-references.
-    QString name;          ///< Full name of the card.
-    QString simpleName;    ///< Simplified name for fuzzy matching.
-    QString text;          ///< Text description or rules text of the card.
-    bool isToken;          ///< Whether this card is a token or not.
+    QString name;       ///< Full name of the card.
+    QString simpleName; ///< Simplified name for fuzzy matching.
+    QString text;       ///< Text description or rules text of the card.
+    bool isToken;       ///< Whether this card is a token or not.
 
     QMap<QString, QString> localizedNames; ///< Localized card names, keyed by language code.
     QMap<QString, QString> localizedTexts; ///< Localized rules text, keyed by language code.
@@ -162,9 +162,9 @@ public:
      * @param other Another CardInfo to copy.
      */
     CardInfo(const CardInfo &other)
-        : QObject(other.parent()), name(other.name), simpleName(other.simpleName), text(other.text),
-          isToken(other.isToken), localizedNames(other.localizedNames), localizedTexts(other.localizedTexts),
-          properties(other.properties), relatedCards(other.relatedCards),
+        : QObject(other.parent()), QEnableSharedFromThis<CardInfo>(), name(other.name), simpleName(other.simpleName),
+          text(other.text), isToken(other.isToken), localizedNames(other.localizedNames),
+          localizedTexts(other.localizedTexts), properties(other.properties), relatedCards(other.relatedCards),
           reverseRelatedCards(other.reverseRelatedCards), reverseRelatedCardsToMe(other.reverseRelatedCardsToMe),
           setsToPrintings(other.setsToPrintings), uiAttributes(other.uiAttributes), setsNames(other.setsNames),
           altNames(other.altNames)
@@ -252,27 +252,13 @@ public:
     /**
      * @brief Clones the current CardInfo instance.
      *
-     * Uses the copy constructor and ensures the smart pointer is properly set.
+     * Uses the copy constructor; the copy is managed by its own shared pointer.
      *
      * @return Shared pointer to the cloned CardInfo.
      */
     [[nodiscard]] CardInfoPtr clone() const
     {
-        auto newCardInfo = CardInfoPtr(new CardInfo(*this));
-        newCardInfo->setSmartPointer(newCardInfo); // Set the smart pointer for the new instance
-        return newCardInfo;
-    }
-
-    /**
-     * @brief Sets the internal smart pointer to self.
-     *
-     * Used internally to allow safe cross-references among CardInfo and CardSet.
-     *
-     * @param _ptr Shared pointer pointing to this instance.
-     */
-    void setSmartPointer(CardInfoPtr _ptr)
-    {
-        smartThis = std::move(_ptr);
+        return CardInfoPtr(new CardInfo(*this));
     }
 
     /** @name Basic Properties Accessors */ //@{
@@ -295,7 +281,7 @@ public:
     void setText(const QString &_text)
     {
         text = _text;
-        emit cardInfoChanged(smartThis);
+        notifyChanged();
     }
 
     /**
@@ -358,7 +344,7 @@ public:
             return;
         }
         localizedNames.insert(lang, _localizedName);
-        emit cardInfoChanged(smartThis);
+        notifyChanged();
     }
 
     /**
@@ -373,7 +359,7 @@ public:
             return;
         }
         localizedTexts.insert(lang, _localizedText);
-        emit cardInfoChanged(smartThis);
+        notifyChanged();
     }
 
     /**
@@ -552,6 +538,13 @@ public:
     static QString simplifyName(const QString &name);
 
 private:
+    /**
+     * @brief Emits cardInfoChanged() with a strong reference to this card.
+     *
+     * Does nothing when the card is not managed by a QSharedPointer or is already being destroyed.
+     */
+    void notifyChanged();
+
     /**
      * @brief Refreshes the cached, human-readable list of set names.
      *

@@ -19,6 +19,13 @@ const QHash<QString, QString> &CardInfo::getPropertiesHash() const
     return properties.getProperties();
 }
 
+void CardInfo::notifyChanged()
+{
+    if (const CardInfoPtr self = sharedFromThis()) {
+        emit cardInfoChanged(self);
+    }
+}
+
 void CardInfo::setProperty(const QString &_name, const QString &_value)
 {
     bool changed = properties.insert(_name, _value);
@@ -26,7 +33,7 @@ void CardInfo::setProperty(const QString &_name, const QString &_value)
         return;
     }
 
-    emit cardInfoChanged(smartThis);
+    notifyChanged();
 }
 
 CardInfo::CardInfo(const QString &_name,
@@ -97,7 +104,6 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
 {
     CardInfoPtr ptr(new CardInfo(_name, _text, _isToken, _properties, _relatedCards, _reverseRelatedCards, _sets,
                                  _uiAttributes, std::move(_localizedNames), std::move(_localizedTexts)));
-    ptr->setSmartPointer(ptr);
 
     for (const auto &printings : _sets) {
         for (const PrintingInfo &printing : printings) {
@@ -126,7 +132,6 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
     CardInfoPtr ptr(new CardInfo(_name, _text, _isToken, std::move(_propertiesBlob), _relatedCards,
                                  _reverseRelatedCards, _sets, _uiAttributes, std::move(_simpleName),
                                  std::move(_altNames), std::move(_localizedNames), std::move(_localizedTexts)));
-    ptr->setSmartPointer(ptr);
 
     if (_appendToSets) {
         for (const auto &printings : _sets) {
@@ -169,8 +174,13 @@ bool CardInfo::isLegalInFormat(const QString &format) const
 
 void CardInfo::addToSet(const CardSetPtr &_set, const PrintingInfo &_info)
 {
-    if (!_set->contains(smartThis)) {
-        _set->append(smartThis);
+    const CardInfoPtr self = sharedFromThis();
+    if (!self) {
+        return;
+    }
+
+    if (!_set->contains(self)) {
+        _set->append(self);
     }
     if (!setsToPrintings[_set->getShortName()].contains(_info)) {
         setsToPrintings[_set->getShortName()].append(_info);
@@ -188,7 +198,7 @@ void CardInfo::combineLegalities(const QHash<QString, QString> &props)
             properties.insert(it.key(), it.value());
         }
     }
-    emit cardInfoChanged(smartThis);
+    notifyChanged();
 }
 
 void CardInfo::refreshCachedSets()
