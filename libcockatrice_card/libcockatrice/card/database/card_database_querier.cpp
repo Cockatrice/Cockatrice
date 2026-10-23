@@ -339,7 +339,7 @@ QMap<QString, int> CardDatabaseQuerier::getAllMainCardTypesWithCount() const
     // (trivially cheap) rebuild.
     if (mainCardTypeCountsCache.isEmpty()) {
         for (const auto &card : db->cards) {
-            const QString &type = card->getMainCardType();
+            const QString type = card->getMainCardType();
             mainCardTypeCountsCache[type]++;
         }
     }
@@ -351,7 +351,7 @@ QMap<QString, int> CardDatabaseQuerier::getAllSubCardTypesWithCount() const
 {
     if (subCardTypeCountsCache.isEmpty()) {
         for (const auto &card : db->cards) {
-            const QString &type = card->getCardType();
+            const QString type = card->getCardType();
 
             const QStringList parts = type.split(" — ");
 

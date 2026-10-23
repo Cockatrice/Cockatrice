@@ -110,19 +110,19 @@ public:
     [[nodiscard]] QString getCorrectedShortName() const;
 
     /** @return Short identifier of the set. */
-    [[nodiscard]] const QString &getShortName() const
+    [[nodiscard]] QString getShortName() const
     {
         return shortName;
     }
 
     /** @return Descriptive name of the set. */
-    [[nodiscard]] const QString &getLongName() const
+    [[nodiscard]] QString getLongName() const
     {
         return longName;
     }
 
     /** @return Type/category string of the set. */
-    [[nodiscard]] const QString &getSetType() const
+    [[nodiscard]] QString getSetType() const
     {
         return setType;
     }

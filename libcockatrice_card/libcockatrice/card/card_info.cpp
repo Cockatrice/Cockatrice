@@ -245,7 +245,7 @@ QString CardInfo::simplifyName(const QString &name)
 
 QChar CardInfo::getColorChar() const
 {
-    const QString &colors = getColors();
+    const QString colors = getColors();
     switch (colors.size()) {
         case 0:
             return QChar();
@@ -265,7 +265,7 @@ void CardInfo::resetReverseRelatedCards2Me()
 }
 
 // Back-compatibility methods. Remove ASAP
-const QString &CardInfo::getCardType() const
+QString CardInfo::getCardType() const
 {
     return getProperty(Mtg::CardType);
 }
@@ -273,11 +273,11 @@ void CardInfo::setCardType(const QString &value)
 {
     setProperty(Mtg::CardType, value);
 }
-const QString &CardInfo::getCmc() const
+QString CardInfo::getCmc() const
 {
     return getProperty(Mtg::ConvertedManaCost);
 }
-const QString &CardInfo::getColors() const
+QString CardInfo::getColors() const
 {
     return getProperty(Mtg::Colors);
 }
@@ -285,19 +285,19 @@ void CardInfo::setColors(const QString &value)
 {
     setProperty(Mtg::Colors, value);
 }
-const QString &CardInfo::getLoyalty() const
+QString CardInfo::getLoyalty() const
 {
     return getProperty(Mtg::Loyalty);
 }
-const QString &CardInfo::getMainCardType() const
+QString CardInfo::getMainCardType() const
 {
     return getProperty(Mtg::MainCardType);
 }
-const QString &CardInfo::getManaCost() const
+QString CardInfo::getManaCost() const
 {
     return getProperty(Mtg::ManaCost);
 }
-const QString &CardInfo::getPowTough() const
+QString CardInfo::getPowTough() const
 {
     return getProperty(Mtg::PowTough);
 }

@@ -393,12 +393,11 @@ public:
     }
     [[nodiscard]] const QHash<QString, QString> &getPropertiesHash() const;
 
-    [[nodiscard]] const QString &getProperty(const QString &propertyName) const
+    [[nodiscard]] QString getProperty(const QString &propertyName) const
     {
-        static const QString emptyProperty;
         const auto &propertiesHash = getPropertiesHash();
         const auto it = propertiesHash.constFind(propertyName);
-        return it != propertiesHash.constEnd() ? it.value() : emptyProperty;
+        return it != propertiesHash.constEnd() ? it.value() : QString();
     }
     void setProperty(const QString &_name, const QString &_value);
     [[nodiscard]] bool hasProperty(const QString &propertyName) const
@@ -452,15 +451,15 @@ public:
     [[nodiscard]] QChar getColorChar() const;
 
     /** @name Legacy/Convenience Property Accessors */ //@{
-    [[nodiscard]] const QString &getCardType() const;
+    [[nodiscard]] QString getCardType() const;
     void setCardType(const QString &value);
-    [[nodiscard]] const QString &getCmc() const;
-    [[nodiscard]] const QString &getColors() const;
+    [[nodiscard]] QString getCmc() const;
+    [[nodiscard]] QString getColors() const;
     void setColors(const QString &value);
-    [[nodiscard]] const QString &getLoyalty() const;
-    [[nodiscard]] const QString &getMainCardType() const;
-    [[nodiscard]] const QString &getManaCost() const;
-    [[nodiscard]] const QString &getPowTough() const;
+    [[nodiscard]] QString getLoyalty() const;
+    [[nodiscard]] QString getMainCardType() const;
+    [[nodiscard]] QString getManaCost() const;
+    [[nodiscard]] QString getPowTough() const;
     void setPowTough(const QString &value);
     //@}
 
