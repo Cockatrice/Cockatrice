@@ -33,6 +33,7 @@ class HomeWidget : public QWidget
 public:
     HomeWidget(QWidget *parent, TabSupervisor *tabSupervisor);
     void updateRandomCard();
+    void retranslateUi();
     static QPair<QColor, QColor> extractDominantColors(const QPixmap &pixmap);
 
 public slots:
@@ -53,7 +54,15 @@ private:
     DeckList backgroundSourceDeck;
     QLabel *logoLabel = nullptr;
     QPair<QColor, QColor> gradientColors;
-    HomeStyledButton *connectButton;
+    HomeStyledButton *connectButton = nullptr;
+    HomeStyledButton *visualDeckEditorButton = nullptr;
+    HomeStyledButton *visualDeckStorageButton = nullptr;
+    HomeStyledButton *visualDatabaseDisplayButton = nullptr;
+    HomeStyledButton *edhrecButton = nullptr;
+    HomeStyledButton *archidektButton = nullptr;
+    HomeStyledButton *replayButton = nullptr;
+    HomeStyledButton *exitButton = nullptr;
+    ClientStatus connectionStatus = StatusDisconnected;
 
     void setRandomCard(ExactCard &newCard);
     void loadBackgroundSourceDeck();
