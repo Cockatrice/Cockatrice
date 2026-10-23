@@ -144,6 +144,10 @@ SettingsCache::SettingsCache()
     loadPaths();
 }
 
+// The real destructor deletes the release channels; this mock never creates any,
+// but the vtable still needs the definition.
+SettingsCache::~SettingsCache() = default;
+
 void SettingsCache::loadPaths()
 {
     QString dataPath = getDataPath();
