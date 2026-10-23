@@ -15,12 +15,12 @@ void PrintingInfo::setProperty(const QString &_name, const QString &_value)
 /**
  * Gets the uuid property of the printing, or an empty string if the property isn't present
  */
-const QString &PrintingInfo::getUuid() const
+QString PrintingInfo::getUuid() const
 {
     return getProperty("uuid");
 }
 
-const QString &PrintingInfo::getFlavorName() const
+QString PrintingInfo::getFlavorName() const
 {
     return getProperty("flavorName");
 }

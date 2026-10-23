@@ -79,7 +79,7 @@ public:
      *
      * @return Pointer to the associated CardSet.
      */
-    [[nodiscard]] const CardSetPtr &getSet() const
+    [[nodiscard]] CardSetPtr getSet() const
     {
         return set;
     }
@@ -105,12 +105,11 @@ public:
      * @param propertyName The key name of the property to query.
      * @return The property value as a string, or an empty string if not set.
      */
-    [[nodiscard]] const QString &getProperty(const QString &propertyName) const
+    [[nodiscard]] QString getProperty(const QString &propertyName) const
     {
-        static const QString emptyProperty;
         const auto &propertiesHash = getPropertiesHash();
         const auto it = propertiesHash.constFind(propertyName);
-        return it != propertiesHash.constEnd() ? it.value() : emptyProperty;
+        return it != propertiesHash.constEnd() ? it.value() : QString();
     }
 
     /**
@@ -128,14 +127,14 @@ public:
      *
      * @return A string representing the providerID.
      */
-    [[nodiscard]] const QString &getUuid() const;
+    [[nodiscard]] QString getUuid() const;
 
     /**
      * @brief Returns the flavorName for this printing.
      *
      * @return The flavorName, or empty if it isn't present.
      */
-    [[nodiscard]] const QString &getFlavorName() const;
+    [[nodiscard]] QString getFlavorName() const;
 
     /**
      * @brief Returns the artist name credited for this printing's artwork.
@@ -144,7 +143,7 @@ public:
      *
      * @return The artist name, or empty if it isn't present.
      */
-    [[nodiscard]] const QString &getArtist() const
+    [[nodiscard]] QString getArtist() const
     {
         return getProperty("artist");
     }
