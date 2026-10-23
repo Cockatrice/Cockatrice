@@ -383,8 +383,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                             }
                             printingProps.insert(attrName, attr.value().toString());
                         }
-                        PrintingInfo printingInfo(set,
-                                                  LazyPropertiesHash(LazyPropertiesHash::serialize(printingProps)));
+                        PrintingInfo printingInfo(set, LazyPropertiesHash::serializedFrom(printingProps));
                         _sets[setName].append(printingInfo);
                     }
                     // related cards

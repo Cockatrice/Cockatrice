@@ -268,7 +268,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                         if (attrs.hasAttribute("rarity")) {
                             printingProps.insert("rarity", attrs.value("rarity").toString());
                         }
-                        PrintingInfo setInfo(set, LazyPropertiesHash(LazyPropertiesHash::serialize(printingProps)));
+                        PrintingInfo setInfo(set, LazyPropertiesHash::serializedFrom(printingProps));
                         _sets[setName].append(setInfo);
                     }
                     // related cards

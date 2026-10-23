@@ -69,8 +69,8 @@ TEST(CardDatabaseTest, LazyPropertiesHashStreamsBlobAccessors)
     props.insert("colors", "R");
     props.insert("format-standard", "legal");
 
-    const QByteArray blob = LazyPropertiesHash::serialize(props);
-    LazyPropertiesHash lazy(blob);
+    LazyPropertiesHash lazy = LazyPropertiesHash::serializedFrom(props);
+    const QByteArray blob = lazy.serialized();
 
     EXPECT_EQ(3, lazy.size());
     EXPECT_FALSE(lazy.isEmpty());

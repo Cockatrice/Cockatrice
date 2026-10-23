@@ -73,70 +73,49 @@ QString blobString(const QByteArray &blob, int pos, quint32 length)
 
     return result;
 }
+} // namespace
 
-/**
- * @brief Iterates over the key/value pairs of a serialized QHash blob without materializing it.
- */
-class BlobReader
+LazyPropertiesHash::BlobReader::BlobReader(const QByteArray &_blob) : blob(_blob)
 {
-public:
-    explicit BlobReader(const QByteArray &_blob) : blob(_blob)
-    {
-        if (blob.size() < 4) {
-            return;
-        }
-
-        const auto *bytes = reinterpret_cast<const uchar *>(blob.constData());
-        remaining =
-            (quint32(bytes[0]) << 24) | (quint32(bytes[1]) << 16) | (quint32(bytes[2]) << 8) | quint32(bytes[3]);
-        pos = 4;
-        valid = true;
+    if (blob.size() < 4) {
+        return;
     }
 
-    /**
-     * @brief Reads the next pair's offsets.
-     * @return False when there are no more pairs or the blob is malformed.
-     */
-    bool next(int &keyPos, quint32 &keyLength, int &valuePos, quint32 &valueLength)
-    {
-        if (!valid || remaining == 0) {
-            return false;
-        }
+    const auto *bytes = reinterpret_cast<const uchar *>(blob.constData());
+    remaining = (quint32(bytes[0]) << 24) | (quint32(bytes[1]) << 16) | (quint32(bytes[2]) << 8) | quint32(bytes[3]);
+    valid = true;
+}
 
-        if (!readBlobLength(blob, pos, keyLength)) {
-            valid = false;
-            return false;
-        }
-        keyPos = pos;
-        pos += static_cast<int>(keyLength);
-
-        if (!readBlobLength(blob, pos, valueLength)) {
-            valid = false;
-            return false;
-        }
-        valuePos = pos;
-        pos += static_cast<int>(valueLength);
-
-        --remaining;
-        return true;
+bool LazyPropertiesHash::BlobReader::next(int &keyPos, quint32 &keyLength, int &valuePos, quint32 &valueLength)
+{
+    if (!valid || remaining == 0) {
+        return false;
     }
 
-    [[nodiscard]] quint32 entryCount() const
-    {
-        return valid ? remaining : 0;
+    if (!readBlobLength(blob, pos, keyLength)) {
+        valid = false;
+        return false;
     }
+    keyPos = pos;
+    pos += static_cast<int>(keyLength);
 
-private:
-    const QByteArray &blob;
-    int pos = 4;
-    quint32 remaining = 0;
-    bool valid = false;
-};
+    if (!readBlobLength(blob, pos, valueLength)) {
+        valid = false;
+        return false;
+    }
+    valuePos = pos;
+    pos += static_cast<int>(valueLength);
 
-/**
- * @brief Looks up @p key in a serialized blob without materializing it.
- */
-QString blobValue(const QByteArray &blob, const QString &key)
+    --remaining;
+    return true;
+}
+
+quint32 LazyPropertiesHash::BlobReader::entryCount() const
+{
+    return valid ? remaining : 0;
+}
+
+QString LazyPropertiesHash::blobValue(const QByteArray &blob, const QString &key)
 {
     BlobReader reader(blob);
     int keyPos = 0;
@@ -152,10 +131,7 @@ QString blobValue(const QByteArray &blob, const QString &key)
     return {};
 }
 
-/**
- * @brief Checks whether @p key is present in a serialized blob without materializing it.
- */
-bool blobContains(const QByteArray &blob, const QString &key)
+bool LazyPropertiesHash::blobContains(const QByteArray &blob, const QString &key)
 {
     BlobReader reader(blob);
     int keyPos = 0;
@@ -171,10 +147,7 @@ bool blobContains(const QByteArray &blob, const QString &key)
     return false;
 }
 
-/**
- * @brief Lists the keys of a serialized blob without materializing it.
- */
-QStringList blobKeys(const QByteArray &blob)
+QStringList LazyPropertiesHash::blobKeys(const QByteArray &blob)
 {
     BlobReader reader(blob);
     QStringList result;
@@ -190,7 +163,6 @@ QStringList blobKeys(const QByteArray &blob)
 
     return result;
 }
-} // namespace
 
 LazyPropertiesHash::LazyPropertiesHash() : isMaterialized(true)
 {
@@ -275,16 +247,21 @@ QByteArray LazyPropertiesHash::serialize(const QHash<QString, QString> &properti
     return result;
 }
 
+LazyPropertiesHash LazyPropertiesHash::serializedFrom(const QHash<QString, QString> &properties)
+{
+    return LazyPropertiesHash(serialize(properties));
+}
+
 QString LazyPropertiesHash::value(const QString &key) const
 {
     return read([&key](const QHash<QString, QString> &materialized) { return materialized.value(key); },
-                [&key](const QByteArray &blob) { return blobValue(blob, key); });
+                [&key](const QByteArray &blob) { return LazyPropertiesHash::blobValue(blob, key); });
 }
 
 bool LazyPropertiesHash::contains(const QString &key) const
 {
     return read([&key](const QHash<QString, QString> &materialized) { return materialized.contains(key); },
-                [&key](const QByteArray &blob) { return blobContains(blob, key); });
+                [&key](const QByteArray &blob) { return LazyPropertiesHash::blobContains(blob, key); });
 }
 
 int LazyPropertiesHash::size() const

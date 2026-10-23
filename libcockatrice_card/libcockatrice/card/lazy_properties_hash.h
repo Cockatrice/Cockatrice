@@ -20,6 +20,46 @@
  */
 class LazyPropertiesHash
 {
+    /**
+     * @brief Iterates over the key/value pairs of a serialized QHash blob without materializing it.
+     *
+     * The blob layout is the one produced by QDataStream for QHash: a quint32 entry count followed by each entry's
+     * serialized key and value.
+     */
+    class BlobReader
+    {
+    public:
+        explicit BlobReader(const QByteArray &_blob);
+
+        /**
+         * @brief Reads the next pair's offsets.
+         * @return False when there are no more pairs or the blob is malformed.
+         */
+        bool next(int &keyPos, quint32 &keyLength, int &valuePos, quint32 &valueLength);
+
+        [[nodiscard]] quint32 entryCount() const;
+
+    private:
+        const QByteArray &blob;
+        int pos = 4;
+        quint32 remaining = 0;
+        bool valid = false;
+    };
+
+    /**
+     * @brief Looks up @p key in a serialized blob without materializing it.
+     */
+    static QString blobValue(const QByteArray &blob, const QString &key);
+
+    /**
+     * @brief Checks whether @p key is present in a serialized blob without materializing it.
+     */
+    static bool blobContains(const QByteArray &blob, const QString &key);
+
+    /**
+     * @brief Lists the keys of a serialized blob without materializing it.
+     */
+    static QStringList blobKeys(const QByteArray &blob);
 
     mutable QByteArray blob;                         ///< Serialized properties (load form).
     mutable QHash<QString, QString> properties;      ///< Materialized properties (query form).
@@ -86,6 +126,17 @@ public:
      * @return The serialized blob
      */
     static QByteArray serialize(const QHash<QString, QString> &properties);
+
+    /**
+     * @brief Creates an unmaterialized LazyPropertiesHash from a property map.
+     *
+     * Serializes @p properties once so queries read them from the blob form instead of first materializing a second
+     * copy of the hash.
+     *
+     * @param properties The properties to serialize
+     * @return An unmaterialized LazyPropertiesHash holding the serialized properties
+     */
+    static LazyPropertiesHash serializedFrom(const QHash<QString, QString> &properties);
 
     /**
      * @brief Gets the value for a key, reading it from the blob when possible.
