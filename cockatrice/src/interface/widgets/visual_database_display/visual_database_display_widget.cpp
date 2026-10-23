@@ -5,40 +5,29 @@
 #include "../../../filters/syntax_help.h"
 #include "../../key_signals.h"
 #include "../../pixel_map_generator.h"
-#include "../cards/card_info_picture_widget.h"
-#include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../cards/card_size_widget.h"
 #include "../deck_editor/card_database_view.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../utility/custom_line_edit.h"
 #include "card_database_display_model.h"
 #include "card_database_model.h"
+#include "card_database_visual_display_model.h"
+#include "card_database_visual_view.h"
 #include "deck_list_model.h"
 #include "libcockatrice/card/card_localization.h"
 #include "libcockatrice/card/database/card_database_loader.h"
 #include "libcockatrice/card/database/card_database_querier.h"
 #include "libcockatrice/card/printing/exact_card.h"
-#include "libcockatrice/card/printing/printing_info.h"
 #include "libcockatrice/filters/filter_card.h"
 #include "libcockatrice/filters/filter_tree.h"
 #include "visual_database_display_color_filter_widget.h"
 #include "visual_database_display_filter_toolbar_widget.h"
 
-#include <QAbstractItemModel>
 #include <QAction>
-#include <QDebug>
 #include <QIcon>
 #include <QLabel>
 #include <QLineEdit>
-#include <QList>
-#include <QMessageLogger>
-#include <QModelIndex>
-#include <QPair>
-#include <QPersistentModelIndex>
 #include <QPushButton>
-#include <QScrollArea>
-#include <QScrollBar>
-#include <QSharedPointer>
 #include <QSizePolicy>
 #include <QSlider>
 #include <QStringLiteral>
@@ -48,14 +37,11 @@
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QtGlobal>
-#include <algorithm>
-#include <libcockatrice/card/card_info_comparator.h>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/tree/inner_deck_list_node.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
-#include <utility>
 
 class QMouseEvent;
 
@@ -64,11 +50,6 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
                                                          DeckListModel *deckListModel)
     : QWidget(parent)
 {
-    debounceTimer = new QTimer(this);
-    debounceTimer->setSingleShot(true); // Ensure it only fires once after the timeout
-
-    connect(debounceTimer, &QTimer::timeout, this, &VisualDatabaseDisplayWidget::onSearchModelChanged);
-
     // Create display model
     databaseDisplayModel = new CardDatabaseDisplayModel(this);
     databaseDisplayModel->setObjectName("databaseDisplayModel");
@@ -86,22 +67,11 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::cardSearchLanguageChanged, this,
             applyCardSearchLanguage);
 
-    cards = new QList<ExactCard>;
-    connect(databaseDisplayModel, &CardDatabaseDisplayModel::modelDirty, this,
-            &VisualDatabaseDisplayWidget::modelDirty);
-
     // Set up main layout and widgets
     setMinimumSize(0, 0);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     mainLayout = QtUtils::makeLayout<QVBoxLayout>(this, 0, 1);
     setLayout(mainLayout);
-
-    flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarPolicy::ScrollBarAsNeeded);
-    cardSizeWidget = new CardSizeWidget(this, flowWidget,
-                                        SettingsCache::instance().cardsDisplay().getVisualDatabaseDisplayCardSize());
-    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance().cardsDisplay(),
-            &CardsDisplaySettings::setVisualDatabaseDisplayCardSize);
-    cardSizeWidget->enableCtrlScrollResize(flowWidget);
 
     searchContainer = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
 
@@ -159,6 +129,25 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     connect(databaseView, &CardDatabaseView::relatedCardClicked, this,
             &VisualDatabaseDisplayWidget::onRelatedCardClicked);
 
+    // The visual grid is a real view on a flattened model: one row per displayed
+    // card picture, painted on demand.
+    visualDisplayModel = new CardDatabaseVisualDisplayModel(databaseDisplayModel, CardDatabaseManager::query(), this);
+
+    cardView = new CardDatabaseVisualView(visualDisplayModel, this);
+    cardView->setObjectName("visualCardView");
+    connect(cardView, &CardDatabaseVisualView::cardClicked, this,
+            &VisualDatabaseDisplayWidget::cardClickedDatabaseDisplay);
+    connect(cardView, &CardDatabaseVisualView::cardHovered, this,
+            &VisualDatabaseDisplayWidget::cardHoveredDatabaseDisplay);
+
+    const int cardSize = SettingsCache::instance().cardsDisplay().getVisualDatabaseDisplayCardSize();
+    cardSizeWidget = new CardSizeWidget(this, nullptr, cardSize);
+    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::setVisualDatabaseDisplayCardSize);
+    connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, cardView, &CardDatabaseVisualView::setCardSizeFactor);
+    cardView->setCardSizeFactor(cardSize);
+    cardSizeWidget->enableCtrlScrollResize(cardView);
+
     colorFilterWidget = new VisualDatabaseDisplayColorFilterWidget(this, filterModel);
 
     filterContainer = new VisualDatabaseDisplayFilterToolbarWidget(this, deckListModel);
@@ -190,8 +179,6 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
         databaseLoadIndicator->setVisible(false);
     }
 
-    QScrollBar *scrollBar = flowWidget->scrollArea->verticalScrollBar();
-    connect(scrollBar, &QScrollBar::valueChanged, [this](int /*value*/) { loadCurrentPage(); });
     retranslateUi();
 }
 
@@ -210,7 +197,7 @@ void VisualDatabaseDisplayWidget::initialize()
 
     mainLayout->addWidget(databaseView);
 
-    mainLayout->addWidget(flowWidget);
+    mainLayout->addWidget(cardView);
 
     mainLayout->addWidget(cardSizeWidget);
 
@@ -240,8 +227,6 @@ void VisualDatabaseDisplayWidget::initializeFilters()
         filterContainer->setVisible(true);
 
         databaseDisplayModel->setFilterTree(filterModel->filterTree());
-
-        QTimer::singleShot(5000, this, [this] { loadCurrentPage(); });
 
         retranslateUi();
     });
@@ -278,50 +263,21 @@ void VisualDatabaseDisplayWidget::updateDisplayModeButton()
     displayModeButton->setText(displayModeButton->isChecked() ? tr("Table") : tr("Visual"));
 }
 
-void VisualDatabaseDisplayWidget::resizeEvent(QResizeEvent *event)
-{
-    QWidget::resizeEvent(event);
-    loadCurrentPage();
-}
-
 void VisualDatabaseDisplayWidget::onDisplayModeChanged(bool checked)
 {
     updateDisplayModeButton();
     if (checked) {
         // Table mode
-        flowWidget->setVisible(false);
+        cardView->setVisible(false);
         cardSizeWidget->setVisible(false);
         databaseView->setItemDelegate(new QStyledItemDelegate(databaseView));
         databaseView->setVisible(true);
     } else {
         // Visual mode
-        flowWidget->setVisible(true);
+        cardView->setVisible(true);
         cardSizeWidget->setVisible(true);
         databaseView->setVisible(false);
-        populateCards();
     }
-}
-
-void VisualDatabaseDisplayWidget::onClick(QMouseEvent *event, const ExactCard &card)
-{
-    emit cardClickedDatabaseDisplay(event, card);
-}
-
-void VisualDatabaseDisplayWidget::onHover(const ExactCard &hoveredCard)
-{
-    emit cardHoveredDatabaseDisplay(hoveredCard);
-}
-
-void VisualDatabaseDisplayWidget::addCardToDisplay(const ExactCard &cardToAdd)
-{
-    cards->append(cardToAdd);
-    auto *display = new CardInfoPictureWithTextOverlayWidget(flowWidget, false);
-    display->setScaleFactor(cardSizeWidget->getSlider()->value());
-    display->setCard(cardToAdd);
-    flowWidget->addWidget(display);
-    connect(display, &CardInfoPictureWithTextOverlayWidget::cardClicked, this, &VisualDatabaseDisplayWidget::onClick);
-    connect(display, &CardInfoPictureWithTextOverlayWidget::hoveredOnCard, this, &VisualDatabaseDisplayWidget::onHover);
-    connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, display, &CardInfoPictureWidget::setScaleFactor);
 }
 
 bool VisualDatabaseDisplayWidget::isVisualDisplayMode() const
@@ -329,20 +285,14 @@ bool VisualDatabaseDisplayWidget::isVisualDisplayMode() const
     return !displayModeButton->isChecked();
 }
 
+QStringList VisualDatabaseDisplayWidget::collectSetFilterTerms() const
+{
+    return filterModel->getFilterTermsOfType(CardFilter::AttrSet);
+}
+
 void VisualDatabaseDisplayWidget::onSearchModelChanged()
 {
-    if (flowWidget->isVisible()) {
-        // Clear the current page and prepare for new data
-        flowWidget->clearLayout(); // Clear existing cards
-        cards->clear();            // Clear the card list
-        // Reset scrollbar position to the top after loading new cards
-        QScrollBar *scrollBar = flowWidget->scrollArea->verticalScrollBar();
-        scrollBar->setValue(0); // Reset scrollbar to top
-
-        currentPage = 0;
-        loadCurrentPage();
-        qCDebug(VisualDatabaseDisplayLog) << "Search model changed";
-    }
+    visualDisplayModel->setSetFilterTerms(collectSetFilterTerms());
 }
 
 void VisualDatabaseDisplayWidget::onSelectedCardChanged(const QString &cardName)
@@ -367,114 +317,4 @@ void VisualDatabaseDisplayWidget::onRelatedCardClicked(const QString &relatedCar
 {
     ExactCard exactCard = CardDatabaseManager::query()->guessCard({relatedCard});
     emit cardInfoRequested(exactCard);
-}
-
-bool VisualDatabaseDisplayWidget::nearEndOfPage() const
-{
-    if (!flowWidget->isVisible()) {
-        return false;
-    }
-
-    QScrollBar *scrollBar = flowWidget->scrollArea->verticalScrollBar();
-    if (scrollBar->value() + scrollBar->pageStep() * 2 < scrollBar->maximum()) {
-        return false; // there is at least two pages of space to scroll remaining
-    }
-
-    return true;
-}
-
-void VisualDatabaseDisplayWidget::loadCurrentPage()
-{
-    // Ensure only the initial page is loaded
-    if (currentPage == 0) {
-        if (!initialLoadScheduled) {
-            initialLoadScheduled = true;
-            qCDebug(VisualDatabaseDisplayLog) << "Loading the first page";
-            // Defer the first page so the tab switch stays responsive. The card
-            // grid builds one event loop turn later. This also applies to
-            // search-driven reloads, which reset currentPage back to 0.
-            QTimer::singleShot(0, this, [this] {
-                initialLoadScheduled = false;
-                populateCards();
-            });
-        }
-    } else if (nearEndOfPage()) {
-        // If not the first page, just load the next page and append to the flow widget
-        loadNextPage();
-    }
-}
-
-void VisualDatabaseDisplayWidget::populateCards()
-{
-    cards->clear();
-    loadNextPage();
-}
-
-void VisualDatabaseDisplayWidget::loadNextPage()
-{
-    // Calculate the start and end indices for the next page
-    int rowCount = databaseDisplayModel->rowCount();
-    int start = currentPage * cardsPerPage;
-    int end = qMin(start + cardsPerPage, rowCount);
-
-    // Load more cards if we are at the end of the current list and can fetch more
-    if (end >= rowCount && databaseDisplayModel->canFetchMore(QModelIndex())) {
-        databaseDisplayModel->fetchMore(QModelIndex());
-    }
-
-    // Load the next page of cards and add them to the flow widget
-    flowWidget->setUpdatesEnabled(false);
-    loadPage(start, end);
-    flowWidget->setUpdatesEnabled(true);
-}
-
-void VisualDatabaseDisplayWidget::loadPage(int start, int end)
-{
-    QList<const CardFilter *> setFilters = filterModel->getFiltersOfType(CardFilter::AttrSet);
-    for (int row = start; row < end; ++row) {
-        qCDebug(VisualDatabaseDisplayLog) << "Adding " << row;
-        QModelIndex index = databaseDisplayModel->index(row, CardDatabaseModel::NameColumn);
-        QVariant name = databaseDisplayModel->data(index, Qt::DisplayRole);
-        qCDebug(VisualDatabaseDisplayLog) << name.toString();
-
-        if (CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(name.toString())) {
-            if (!setFilters.empty()) {
-                const auto &setMap = info->getSets();
-                for (const CardFilter *setFilter : setFilters) {
-                    const auto it = setMap.constFind(setFilter->term());
-                    if (it != setMap.constEnd()) {
-                        for (const PrintingInfo &printing : it.value()) {
-                            addCardToDisplay(ExactCard(info, printing));
-                        }
-                    }
-                }
-            } else {
-                addCardToDisplay(CardDatabaseManager::query()->getPreferredCard(info));
-            }
-        } else {
-            qCDebug(VisualDatabaseDisplayLog) << "Card not found in database!";
-        }
-    }
-    currentPage++;
-}
-
-void VisualDatabaseDisplayWidget::modelDirty() const
-{
-    debounceTimer->start(debounceTime);
-}
-
-void VisualDatabaseDisplayWidget::sortCardList(const QStringList &properties,
-                                               Qt::SortOrder order = Qt::AscendingOrder) const
-{
-    CardInfoComparator comparator(properties, order);
-    std::sort(cards->begin(), cards->end(), [comparator](const ExactCard &a, const ExactCard &b) {
-        return comparator(a.getCardPtr(), b.getCardPtr());
-    });
-}
-
-void VisualDatabaseDisplayWidget::databaseDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
-{
-    (void)topLeft;
-    (void)bottomRight;
-    qCDebug(VisualDatabaseDisplayLog) << "Database Data changed";
 }

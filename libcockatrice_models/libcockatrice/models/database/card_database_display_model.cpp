@@ -21,7 +21,7 @@
 class QObject;
 
 CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)
-    : QSortFilterProxyModel(parent), isToken(ShowAll), filterString(nullptr),
+    : QSortFilterProxyModel(parent), isToken(ShowAll), filterString(nullptr), cardModel(nullptr),
       collator(NaturalSort::makeNaturalSortCollator())
 {
     filterTree = nullptr;
@@ -39,6 +39,7 @@ CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)
 
 void CardDatabaseDisplayModel::setSourceModel(QAbstractItemModel *model)
 {
+    cardModel = qobject_cast<CardDatabaseModel *>(model);
     QSortFilterProxyModel::setSourceModel(model);
 
     connect(model, &QAbstractItemModel::rowsInserted, this, [this]() { dirty(); });
@@ -49,6 +50,25 @@ void CardDatabaseDisplayModel::setSourceModel(QAbstractItemModel *model)
         loadedRowCount = 0;
         dirty();
     });
+}
+
+QVariant CardDatabaseDisplayModel::data(const QModelIndex &index, int role) const
+{
+    if (role == CardInfoRole) {
+        return QVariant::fromValue(cardInfoAt(index));
+    }
+
+    return QSortFilterProxyModel::data(index, role);
+}
+
+CardInfoPtr CardDatabaseDisplayModel::cardInfoAt(const QModelIndex &index) const
+{
+    if (!index.isValid() || cardModel == nullptr) {
+        return {};
+    }
+
+    const QModelIndex sourceIndex = mapToSource(index);
+    return sourceIndex.isValid() ? cardModel->getCard(sourceIndex.row()) : CardInfoPtr();
 }
 
 QMap<wchar_t, wchar_t> CardDatabaseDisplayModel::characterTranslation = {{L'“', L'\"'},

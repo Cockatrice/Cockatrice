@@ -5,6 +5,7 @@ set(CMAKE_AUTORCC ON)
 set(HEADERS
     card_database_model.h
     card_database_display_model.h
+    card_database_visual_display_model.h
     card/card_completer_proxy_model.h
     card/card_search_model.h
     card_set/card_sets_model.h
@@ -17,6 +18,7 @@ add_library(
   ${HEADERS}
   card_database_model.cpp
   card_database_display_model.cpp
+  card_database_visual_display_model.cpp
   card/card_completer_proxy_model.cpp
   card/card_search_model.cpp
   card_set/card_sets_model.cpp

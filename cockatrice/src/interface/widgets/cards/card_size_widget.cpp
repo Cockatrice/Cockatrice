@@ -2,6 +2,7 @@
 
 #include "../general/layout_containers/flow_widget.h"
 
+#include <QAbstractScrollArea>
 #include <QEvent>
 #include <QFlags>
 #include <QHBoxLayout>
@@ -33,8 +34,8 @@ CardSizeWidget::CardSizeWidget(QWidget *parent, FlowWidget *_flowWidget, int def
     cardSizeLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
     cardSizeSlider = new QSlider(Qt::Horizontal, this);
-    cardSizeSlider->setRange(50, 250);      ///< Slider range for card size adjustment.
-    cardSizeSlider->setValue(defaultValue); ///< Initial slider value.
+    cardSizeSlider->setRange(MIN_CARD_SIZE, MAX_CARD_SIZE); ///< Slider range for card size adjustment.
+    cardSizeSlider->setValue(defaultValue);                 ///< Initial slider value.
 
     cardSizeLayout->addWidget(cardSizeLabel);
     cardSizeLayout->addWidget(cardSizeSlider);
@@ -73,13 +74,26 @@ QSlider *CardSizeWidget::getSlider() const
 
 void CardSizeWidget::enableCtrlScrollResize(QWidget *host)
 {
-    host->installEventFilter(this);
-
-    const auto scrollAreas = host->findChildren<QScrollArea *>();
-    for (QScrollArea *scrollArea : scrollAreas) {
-        if (QWidget *content = scrollArea->widget()) {
-            content->installEventFilter(this);
+    const auto watchScrollArea = [this](QAbstractScrollArea *scrollArea) {
+        if (scrollArea == nullptr) {
+            return;
         }
+        if (QWidget *viewport = scrollArea->viewport()) {
+            viewport->installEventFilter(this);
+        }
+        if (auto *contentScrollArea = qobject_cast<QScrollArea *>(scrollArea)) {
+            if (QWidget *content = contentScrollArea->widget()) {
+                content->installEventFilter(this);
+            }
+        }
+    };
+
+    host->installEventFilter(this);
+    watchScrollArea(qobject_cast<QAbstractScrollArea *>(host));
+
+    const auto scrollAreas = host->findChildren<QAbstractScrollArea *>();
+    for (QAbstractScrollArea *scrollArea : scrollAreas) {
+        watchScrollArea(scrollArea);
     }
 }
 
