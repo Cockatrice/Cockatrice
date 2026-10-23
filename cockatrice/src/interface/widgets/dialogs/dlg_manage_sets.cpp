@@ -48,6 +48,7 @@
 
 WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
 {
+    setObjectName("manageSetsWindow");
     setOrderIsSorted = false;
 
     // left toolbar
@@ -221,6 +222,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
 
 WndSets::~WndSets()
 {
+    disconnect(view->header(), &QHeaderView::geometriesChanged, this, &WndSets::saveHeaderState);
 }
 
 void WndSets::closeEvent(QCloseEvent * /*ev*/)

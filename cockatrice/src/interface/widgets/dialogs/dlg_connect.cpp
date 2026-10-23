@@ -33,6 +33,7 @@ class QWidget;
 
 DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 {
+    setObjectName("connectDialog");
     previousHostButton = new QRadioButton(tr("Known Hosts"), this);
     previousHosts = new QComboBox(this);
 
@@ -84,6 +85,11 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     passwordEdit->setMaxLength(MAX_NAME_LENGTH);
     passwordLabel->setBuddy(passwordEdit);
     passwordEdit->setEchoMode(QLineEdit::Password);
+
+    hostEdit->setObjectName("connectHostEdit");
+    portEdit->setObjectName("connectPortEdit");
+    playernameEdit->setObjectName("connectPlayernameEdit");
+    passwordEdit->setObjectName("connectPasswordEdit");
 
     savePasswordCheckBox = new QCheckBox(tr("&Save password"));
 

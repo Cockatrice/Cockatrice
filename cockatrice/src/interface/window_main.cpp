@@ -431,24 +431,33 @@ void MainWindow::retranslateUi()
 void MainWindow::createActions()
 {
     aConnect = new QAction(this);
+    aConnect->setObjectName("actionConnect");
     connect(aConnect, &QAction::triggered, this, &MainWindow::actConnect);
     aDisconnect = new QAction(this);
+    aDisconnect->setObjectName("actionDisconnect");
     aDisconnect->setEnabled(false);
     connect(aDisconnect, &QAction::triggered, this, &MainWindow::actDisconnect);
     aSinglePlayer = new QAction(this);
+    aSinglePlayer->setObjectName("actionSinglePlayer");
     connect(aSinglePlayer, &QAction::triggered, this, &MainWindow::actSinglePlayer);
     aWatchReplay = new QAction(this);
+    aWatchReplay->setObjectName("actionWatchReplay");
     connect(aWatchReplay, &QAction::triggered, this, &MainWindow::actWatchReplay);
     aFullScreen = new QAction(this);
+    aFullScreen->setObjectName("actionFullScreen");
     aFullScreen->setCheckable(true);
     connect(aFullScreen, &QAction::toggled, this, &MainWindow::actFullScreen);
     aRegister = new QAction(this);
+    aRegister->setObjectName("actionRegister");
     connect(aRegister, &QAction::triggered, connectionController, &ConnectionController::registerToServer);
     aForgotPassword = new QAction(this);
+    aForgotPassword->setObjectName("actionForgotPassword");
     connect(aForgotPassword, &QAction::triggered, connectionController, &ConnectionController::forgotPasswordRequest);
     aSettings = new QAction(this);
+    aSettings->setObjectName("actionSettings");
     connect(aSettings, &QAction::triggered, this, &MainWindow::actSettings);
     aExit = new QAction(this);
+    aExit->setObjectName("actionExit");
     connect(aExit, &QAction::triggered, this, &MainWindow::actExit);
 
     aManageSets = new QAction(QString(), this);
@@ -533,6 +542,7 @@ void MainWindow::createMenus()
 {
     menuBar()->setObjectName("menubar");
     cockatriceMenu = menuBar()->addMenu(QString());
+    cockatriceMenu->setObjectName("cockatriceMenu");
     cockatriceMenu->addAction(aConnect);
     cockatriceMenu->addAction(aDisconnect);
     cockatriceMenu->addAction(aRegister);
@@ -548,6 +558,7 @@ void MainWindow::createMenus()
     cockatriceMenu->addAction(aExit);
 
     dbMenu = menuBar()->addMenu(QString());
+    dbMenu->setObjectName("dbMenu");
     dbMenu->addAction(aManageSets);
     dbMenu->addAction(aEditTokens);
     dbMenu->addSeparator();
@@ -558,6 +569,7 @@ void MainWindow::createMenus()
     dbMenu->addAction(aReloadCardDatabase);
 
     tabsMenu = menuBar()->addMenu(QString());
+    tabsMenu->setObjectName("tabsMenu");
 
     helpMenu = menuBar()->addMenu(QString());
     helpMenu->setObjectName("helpMenu");
