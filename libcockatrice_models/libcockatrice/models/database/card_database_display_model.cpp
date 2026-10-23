@@ -108,9 +108,10 @@ bool CardDatabaseDisplayModel::lessThan(const QModelIndex &left, const QModelInd
         const QStringView rightPT = rightString;
         const qsizetype leftSlash = leftPT.indexOf(u'/');
         const qsizetype rightSlash = rightPT.indexOf(u'/');
+        const bool leftIsWellFormed = leftSlash >= 0 && leftPT.indexOf(u'/', leftSlash + 1) < 0;
+        const bool rightIsWellFormed = rightSlash >= 0 && rightPT.indexOf(u'/', rightSlash + 1) < 0;
 
-        if (leftSlash >= 0 && rightSlash >= 0 && leftPT.indexOf(u'/', leftSlash + 1) < 0 &&
-            rightPT.indexOf(u'/', rightSlash + 1) < 0) {
+        if (leftIsWellFormed && rightIsWellFormed) {
             const int powerComparison = lessThanNumerically(leftPT.left(leftSlash), rightPT.left(rightSlash));
             if (powerComparison != 0) {
                 return powerComparison < 0;
