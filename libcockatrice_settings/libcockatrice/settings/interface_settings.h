@@ -50,6 +50,7 @@ public:
     [[nodiscard]] bool getShowStatusBar() const override;
     [[nodiscard]] bool getShowShortcuts() const override;
     [[nodiscard]] bool getShowGameSelectorFilterToolbar() const override;
+    [[nodiscard]] bool getTutorialCompleted() const;
     [[nodiscard]] int getPlaymatVisibility() const override;
     [[nodiscard]] QList<PlaymatInfo> getPlaymatFallbackList() const override;
     [[nodiscard]] int getPlaymatMode() const override;
@@ -89,6 +90,7 @@ public:
     void setShowStatusBar(bool _showStatusBar);
     void setShowShortcuts(bool _showShortcuts);
     void setShowGameSelectorFilterToolbar(bool _showGameSelectorFilterToolbar);
+    void setTutorialCompleted(bool value);
     void setPlaymatVisibility(int _visibility);
     void setPlaymatFallbackList(const QList<PlaymatInfo> &_fallbackList);
     void setPlaymatMode(int _mode);

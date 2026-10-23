@@ -131,6 +131,23 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     switchToDeckSelectView();
 }
 
+TutorialSequence DeckViewContainer::generateTutorialSequence()
+{
+    TutorialSequence deckViewContainerSequence;
+    deckViewContainerSequence.name = tr("Loading and selecting decks");
+
+    deckViewContainerSequence.addStep(
+        {this, tr("There are multiple ways to select a deck:\n\n- From a local file"
+                  "\n- From the contents of your clipboard\nFrom an external online service")});
+
+    // The VDS widget only exists when "show visual deck storage in game" is on.
+    if (visualDeckStorageWidget) {
+        visualDeckStorageWidget->generateTutorialSequence(deckViewContainerSequence);
+    }
+
+    return deckViewContainerSequence;
+}
+
 /**
  * Creates the VDS widget and inserts it into the layout. No-ops if the widget already exists
  */

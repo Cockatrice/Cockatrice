@@ -174,6 +174,10 @@ public:
     {
         return tabServer;
     }
+    [[nodiscard]] TabHome *getTabHome() const
+    {
+        return tabHome;
+    }
     [[nodiscard]] const QMap<int, TabRoom *> &getRoomTabs() const
     {
         return roomTabs;

@@ -7,6 +7,10 @@
 #ifndef VISUAL_DECK_EDITOR_SAMPLE_HAND_WIDGET_H
 #define VISUAL_DECK_EDITOR_SAMPLE_HAND_WIDGET_H
 
+#include "../cards/card_size_widget.h"
+#include "../deck_analytics/deck_list_statistics_analyzer.h"
+#include "../general/layout_containers/flow_widget.h"
+#include "../general/tutorial/tutorial_controller.h"
 #include "libcockatrice/card/printing/exact_card.h"
 
 #include <QList>
@@ -31,6 +35,7 @@ public:
                                      DeckListModel *deckListModel,
                                      DeckListStatisticsAnalyzer *statsAnalyzer);
     QList<ExactCard> getRandomCards(int amountToGet);
+    TutorialSequence generateTutorialSequence();
 
 public slots:
     void updateDisplay();

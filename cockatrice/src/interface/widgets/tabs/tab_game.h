@@ -47,6 +47,8 @@ inline Q_LOGGING_CATEGORY(TabGameLog, "tab_game");
 
 class UserListProxy;
 class AbstractClient;
+class TutorialController;
+class CardDatabase;
 class GameView;
 class GameScene;
 class ReplayWidget;
@@ -68,6 +70,9 @@ class TabGame : public Tab
     Q_OBJECT
 private:
     AbstractGame *game;
+    TutorialController *tutorialController = nullptr;
+    bool tutorialStarted = false;
+    bool tutorialInitialized = false;
     const UserListProxy *userListProxy;
     ReplayWidget *replayWidget = nullptr;
     QStringList gameTypes;
@@ -141,6 +146,7 @@ private:
     void createReplayDock(GameReplay *replay);
     void updateInviteButtonState();
 signals:
+    void localPlayerReadyStateChanged(bool ready);
     void gameClosing(TabGame *tab);
     void containerProcessingStarted(const GameEventContext &context);
     void containerProcessingDone();
@@ -182,16 +188,17 @@ private slots:
     void processPlayerLeave(PlayerLogic *leavingPlayer);
     void actResetLayout();
 
-    void hideEvent(QHideEvent *event) override;
-
 protected slots:
     void closeEvent(QCloseEvent *event) override;
+    void showEvent(QShowEvent *event) override;
+    void hideEvent(QHideEvent *event) override;
 
 public:
     TabGame(TabSupervisor *_tabSupervisor,
             QList<AbstractClient *> &_clients,
             const Event_GameJoined &event,
             const QMap<int, QString> &_roomGameTypes);
+    void finishTutorialInitialization();
     void connectToGameState();
     void connectToPlayerManager();
     void connectToGameEventHandler();

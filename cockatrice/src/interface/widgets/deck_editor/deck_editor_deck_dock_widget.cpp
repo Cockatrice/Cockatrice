@@ -4,8 +4,10 @@
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../../key_signals.h"
 #include "../../pixel_map_generator.h"
+#include "../general/tutorial/tutorial_controller.h"
 #include "../playmat/playmat_settings_dialog.h"
 #include "../quick_settings/settings_button_widget.h"
+#include "../settings_page/user_interface_settings_page.h"
 #include "../tabs/abstract_tab_deck_editor.h"
 #include "../tabs/api/commander_spellbook/commander_bracket_widget.h"
 #include "../utility/custom_line_edit.h"
@@ -349,6 +351,22 @@ void DeckEditorDeckDockWidget::createDeckDock()
     if (CardDatabaseManager::getInstance()->getLoadStatus() == LoadStatus::Ok) {
         initializeFormats();
     }
+}
+
+TutorialSequence DeckEditorDeckDockWidget::generateTutorialSequence()
+{
+    TutorialSequence sequence;
+    sequence.name = tr("The Deck Info Widget");
+
+    TutorialStep introStep;
+    introStep.targetWidget = this;
+    introStep.text = tr("This is the deck info widget.\n\nHere, you can adjust all kinds of metadata such as the name, "
+                        "the comments, or the tags of a deck.\nIt also displays the contents of your deck in a list "
+                        "and provides buttons to manipulate the decklist.");
+
+    sequence.addStep(introStep);
+
+    return sequence;
 }
 
 void DeckEditorDeckDockWidget::initializeFormats()
