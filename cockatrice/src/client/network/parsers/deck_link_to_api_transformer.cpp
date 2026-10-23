@@ -19,7 +19,6 @@ static const QString DECKSTATS_BASE = "https://deckstats.net/decks/";
 static const QString DECKSTATS_SUFFIX = "?include_comments=1&export_mtgarena=1";
 
 static const QString MANABOX_BASE = "https://cloud.manabox.app/decks/";
-static const QString MANABOX_SUFFIX = "";
 
 bool parseDeckUrl(const QString &url, ParsedDeckInfo &outInfo)
 {
@@ -63,7 +62,7 @@ bool parseDeckUrl(const QString &url, ParsedDeckInfo &outInfo)
         QString deckPath = match.captured(1);
         outInfo = ParsedDeckInfo{.baseUrl = MANABOX_BASE,
                                  .deckID = deckPath,
-                                 .fullUrl = MANABOX_BASE + deckPath + MANABOX_SUFFIX,
+                                 .fullUrl = MANABOX_BASE + deckPath,
                                  .provider = DeckProvider::Manabox};
         return true;
     }

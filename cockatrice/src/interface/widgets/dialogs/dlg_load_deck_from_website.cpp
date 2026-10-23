@@ -33,6 +33,7 @@
 
 class QWidget;
 
+static const char *SUPPORTED_PROVIDERS = "Archidekt, Deckstats, Moxfield, ManaBox and TappedOut";
 DlgLoadDeckFromWebsite::DlgLoadDeckFromWebsite(QWidget *parent) : QDialog(parent)
 {
     nam = NetworkManagerFactory::create(this);
@@ -64,8 +65,8 @@ DlgLoadDeckFromWebsite::DlgLoadDeckFromWebsite(QWidget *parent) : QDialog(parent
 
 void DlgLoadDeckFromWebsite::retranslateUi()
 {
-    instructionLabel->setText(tr("Paste a link to a decklist site here to import it.\n(Archidekt, Deckstats, Moxfield, "
-                                 "and TappedOut are supported.)"));
+    instructionLabel->setText(
+        tr("Paste a link to a decklist site here to import it.\n(%1 are supported)").arg(SUPPORTED_PROVIDERS));
 }
 
 bool DlgLoadDeckFromWebsite::testValidUrl()
@@ -83,9 +84,9 @@ void DlgLoadDeckFromWebsite::accept()
         auto jsonParser = createParserForProvider(info.provider);
         if (!jsonParser && info.provider != DeckProvider::Deckstats && info.provider != DeckProvider::TappedOut) {
             qCWarning(DlgLoadDeckFromWebsiteLog) << "No parser found for provider";
-            QMessageBox::warning(this, tr("Load Deck from Website"),
-                                 tr("No parser available for this deck provider.\n (Archidekt, Deckstats, Moxfield, "
-                                    "Manabox and TappedOut are supported.)"));
+            QMessageBox::warning(
+                this, tr("Load Deck from Website"),
+                tr("No parser available for this deck provider.\n(%1 are supported)").arg(SUPPORTED_PROVIDERS));
             QDialog::reject();
             return;
         }
@@ -152,7 +153,7 @@ void DlgLoadDeckFromWebsite::accept()
                                 "https://archidekt.com/decks/9999999\n"
                                 "https://deckstats.net/decks/99999/9999999-your-deck-name/en\n"
                                 "https://moxfield.com/decks/XYZxx-XYZ99Yyy-xyzXzzz\n"
-                                "https://manabox.app/decks/XYZxxaXYZ99YyyxxyzXzzz\n"
+                                "https://manabox.app/decks/XYZxxa-YZ99Yyyx_yzXzzz\n"
                                 "https://tappedout.net/mtg-decks/your-deck-name/"));
         QDialog::reject();
     }
