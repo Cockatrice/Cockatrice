@@ -14,6 +14,7 @@
 #include <QSet>
 #include <QSortFilterProxyModel>
 #include <QString>
+#include <QStringView>
 #include <QTimer>
 #include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/filters/filter_string.h>
@@ -88,7 +89,7 @@ signals:
 
 protected:
     [[nodiscard]] bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
-    static int lessThanNumerically(const QString &left, const QString &right);
+    static int lessThanNumerically(QStringView left, QStringView right);
     [[nodiscard]] bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
     [[nodiscard]] bool rowMatchesCardName(CardInfoPtr info) const;
 
