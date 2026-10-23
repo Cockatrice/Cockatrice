@@ -55,6 +55,13 @@
 #include "widgets/server/handle_public_servers.h"
 #include "widgets/settings_page/abstract_settings_page.h"
 #include "widgets/tabs/api/commander_spellbook/handle_commander_brackets.h"
+#ifdef WITH_GUI_TEST
+#include "pqEventObserver.h"
+#include "pqEventSource.h"
+#include "pqEventTypes.h"
+#include "pqTestUtility.h"
+#include "recording.h"
+#endif
 
 #include <QAction>
 #include <QApplication>
@@ -310,6 +317,7 @@ void MainWindow::actAbout()
     mb.setIconPixmap(
         themePixmap(QStringLiteral("cockatrice")).scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     mb.setTextInteractionFlags(Qt::TextBrowserInteraction);
+    mb.setObjectName("aboutDialog");
     mb.exec();
 }
 
@@ -347,6 +355,24 @@ void MainWindow::actOpenSettingsFolder()
     QString dir = SettingsCache::instance().getSettingsPath();
     QtUtils::openPathInFileManager(dir);
 }
+
+#ifdef WITH_GUI_TEST
+void MainWindow::actRecord()
+{
+    QString filename = QFileDialog::getSaveFileName(this, tr("Test File Name"), QString(), tr("XML Files (*.xml)"));
+    if (!filename.isEmpty()) {
+        testUtility->recordTests(filename);
+    }
+}
+
+void MainWindow::actPlayRecording()
+{
+    QString filename = QFileDialog::getOpenFileName(this, tr("Test File Name"), QString(), tr("XML Files (*.xml)"));
+    if (!filename.isEmpty()) {
+        testUtility->playTests(filename);
+    }
+}
+#endif
 
 void MainWindow::retranslateUi()
 {
@@ -392,6 +418,10 @@ void MainWindow::retranslateUi()
     aViewLog->setText(tr("View &Debug Log"));
     aOpenSettingsFolder->setText(tr("Open Settings Folder"));
     aFirstRunWizard->setText(tr("Re-run Onboarding Wizard..."));
+#ifdef WITH_GUI_TEST
+    aRecord->setText(tr("&Record Test..."));
+    aPlayRecording->setText(tr("&Play Test..."));
+#endif
 
     aShow->setText(tr("Show/Hide"));
 
@@ -455,6 +485,12 @@ void MainWindow::createActions()
     connect(aOpenSettingsFolder, &QAction::triggered, this, &MainWindow::actOpenSettingsFolder);
     aFirstRunWizard = new QAction(this);
     connect(aFirstRunWizard, &QAction::triggered, this, [this] { runFirstRunWizard(); });
+#ifdef WITH_GUI_TEST
+    aRecord = new QAction(this);
+    connect(aRecord, &QAction::triggered, this, &MainWindow::actRecord);
+    aPlayRecording = new QAction(this);
+    connect(aPlayRecording, &QAction::triggered, this, &MainWindow::actPlayRecording);
+#endif
 
     aShow = new QAction(this);
     connect(aShow, &QAction::triggered, this, &MainWindow::actShow);
@@ -495,6 +531,7 @@ void MainWindow::createActions()
 
 void MainWindow::createMenus()
 {
+    menuBar()->setObjectName("menubar");
     cockatriceMenu = menuBar()->addMenu(QString());
     cockatriceMenu->addAction(aConnect);
     cockatriceMenu->addAction(aDisconnect);
@@ -523,6 +560,7 @@ void MainWindow::createMenus()
     tabsMenu = menuBar()->addMenu(QString());
 
     helpMenu = menuBar()->addMenu(QString());
+    helpMenu->setObjectName("helpMenu");
     helpMenu->addAction(aAbout);
     helpMenu->addAction(aTips);
     helpMenu->addSeparator();
@@ -535,12 +573,19 @@ void MainWindow::createMenus()
     helpMenu->addAction(aOpenSettingsFolder);
     helpMenu->addSeparator();
     helpMenu->addAction(aFirstRunWizard);
+#ifdef WITH_GUI_TEST
+    helpMenu->addSeparator();
+    helpMenu->addAction(aRecord);
+    helpMenu->addAction(aPlayRecording);
+#endif
 }
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), localServer(nullptr), bHasActivated(false), askedForDbUpdater(false),
+    : QMainWindow(parent), localServer(nullptr), bHasActivated(false), askedForDbUpdater(false), noConnect(false),
       cardUpdateProcess(nullptr), logviewDialog(nullptr)
 {
+    setObjectName("MainWindow");
+
     connect(&SettingsCache::instance().cacheStorage(), &CacheStorageSettings::pixmapCacheSizeChanged, this,
             &MainWindow::pixmapCacheSizeChanged);
     pixmapCacheSizeChanged(SettingsCache::instance().cacheStorage().getPixmapCacheSize());
@@ -626,6 +671,13 @@ MainWindow::MainWindow(QWidget *parent)
     // run startup check async
     QTimer::singleShot(0, this, &MainWindow::startupConfigCheck);
     QTimer::singleShot(0, this, &MainWindow::applyStartupDestination);
+
+#ifdef WITH_GUI_TEST
+    testUtility = new pqTestUtility(this);
+    testUtility->setRecordWithDialog(true);
+    testUtility->addEventObserver("xml", new XMLEventObserver(this));
+    testUtility->addEventSource("xml", new XMLEventSource(this));
+#endif
 }
 
 void MainWindow::startupConfigCheck()
@@ -780,6 +832,11 @@ void MainWindow::runFirstRunWizard(bool firstRun)
  */
 void MainWindow::applyStartupDestination()
 {
+    if (noConnect) {
+        qCInfo(WindowMainStartupAutoconnectLog) << "Startup destination suppressed (--no-connect)";
+        return;
+    }
+
     // An explicit command-line connect takes precedence over the startup destination.
     if (!connectTo.isEmpty()) {
         return;
@@ -1049,6 +1106,10 @@ void MainWindow::handleCockatriceLink(const QString &url)
 
 void MainWindow::attemptStartupAutoConnect()
 {
+    if (noConnect) {
+        qCInfo(WindowMainStartupAutoconnectLog) << "Auto-connect suppressed (--no-connect)";
+        return;
+    }
     if (startupAutoConnectAttempted || skipStartupAutoConnect) {
         return;
     }
