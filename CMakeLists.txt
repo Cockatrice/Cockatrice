@@ -431,6 +431,13 @@ if(WITH_CLIENT)
   set(CPACK_INSTALL_CMAKE_PROJECTS "Cockatrice;Cockatrice;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
 endif()
 
+if(WIN32 AND WITH_CLIENT)
+  # Runs from the installer's $PLUGINSDIR when a purge fails, and is never installed
+  # (see LogProcessesUsingInstallDir in cmake/NSIS.template.in), so it has no install
+  # rules and is not part of the client's staged tree.
+  add_subdirectory(${CMAKE_SOURCE_DIR}/tools/installer-holder-probe ${CMAKE_BINARY_DIR}/tools/installer-holder-probe)
+endif()
+
 if(WITH_ORACLE)
   add_subdirectory(oracle)
   set(CPACK_INSTALL_CMAKE_PROJECTS "Oracle;Oracle;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})

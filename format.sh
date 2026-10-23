@@ -19,7 +19,8 @@ libcockatrice_* \
 "oracle/src" \
 "servatrice/src" \
 "cmake/pch" \
-"tests")
+"tests" \
+"tools/installer-holder-probe")
 exclude=("libcockatrice_rng/libcockatrice/rng/sfmt/" \
 "libcockatrice_utility/libcockatrice/utility/peglib.h" \
 "oracle/src/lzma/" \
