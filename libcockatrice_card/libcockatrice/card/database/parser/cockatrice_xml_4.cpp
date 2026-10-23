@@ -383,7 +383,8 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                             }
                             printingProps.insert(attrName, attr.value().toString());
                         }
-                        PrintingInfo printingInfo(set, LazyPropertiesHash(printingProps));
+                        PrintingInfo printingInfo(set,
+                                                  LazyPropertiesHash(LazyPropertiesHash::serialize(printingProps)));
                         _sets[setName].append(printingInfo);
                     }
                     // related cards
@@ -450,9 +451,9 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                                                  .landscapeOrientation = landscapeOrientation,
                                                  .tableRow = tableRow,
                                                  .upsideDownArt = upsideDown};
-            CardInfoPtr newCard =
-                CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards, _sets,
-                                      attributes, std::move(localizedNames), std::move(localizedTexts));
+            CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, LazyPropertiesHash::serialize(properties),
+                                                        relatedCards, reverseRelatedCards, _sets, attributes,
+                                                        std::move(localizedNames), std::move(localizedTexts));
             if (targetData) {
                 // Mirror CardDatabase::addCard: if a card with this name already
                 // exists, merge the new printings into it instead of replacing.

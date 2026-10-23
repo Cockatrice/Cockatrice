@@ -62,6 +62,43 @@ TEST(CardDatabaseTest, LoadXml)
     ASSERT_EQ(NotLoaded, db->getLoadStatus()) << "Incorrect status after clear";
 }
 
+TEST(CardDatabaseTest, LazyPropertiesHashStreamsBlobAccessors)
+{
+    QHash<QString, QString> props;
+    props.insert("manacost", "1R");
+    props.insert("colors", "R");
+    props.insert("format-standard", "legal");
+
+    const QByteArray blob = LazyPropertiesHash::serialize(props);
+    LazyPropertiesHash lazy(blob);
+
+    EXPECT_EQ(3, lazy.size());
+    EXPECT_FALSE(lazy.isEmpty());
+    EXPECT_TRUE(lazy.contains("colors"));
+    EXPECT_FALSE(lazy.contains("missing"));
+    EXPECT_EQ("1R", lazy.value("manacost"));
+    EXPECT_EQ(QString(), lazy.value("missing"));
+    EXPECT_EQ(blob, lazy.serialized()) << "an untouched blob must be passed through unchanged";
+
+    QStringList keys = lazy.keys();
+    keys.sort();
+    QStringList expectedKeys = props.keys();
+    expectedKeys.sort();
+    EXPECT_EQ(expectedKeys, keys);
+
+    // Mutating materializes the hash, after which every accessor keeps working.
+    EXPECT_TRUE(lazy.insert("loyalty", "3"));
+    EXPECT_FALSE(lazy.insert("loyalty", "3"));
+    EXPECT_EQ(4, lazy.size());
+    EXPECT_EQ("3", lazy.value("loyalty"));
+    EXPECT_TRUE(lazy.contains("loyalty"));
+
+    LazyPropertiesHash roundTrip(lazy.serialized());
+    EXPECT_EQ(4, roundTrip.size());
+    EXPECT_EQ("3", roundTrip.value("loyalty"));
+    EXPECT_EQ("legal", roundTrip.value("format-standard"));
+}
+
 TEST(CardDatabaseTest, GuessCardWithProviderIdOnUnknownCardReturnsEmpty)
 {
     // An unknown name plus a providerId used to dereference the missing card
@@ -100,10 +137,12 @@ TEST(CardDatabaseTest, Xml4LocalizedDataRoundTrip)
     setsInfo["TST"].append(printing);
 
     CardInfo::UiAttributes attributes = {.tableRow = 1};
-    CardInfoPtr card =
-        CardInfo::newInstance("Lightning Bolt", "Deal 3 damage.", false, {}, {}, {}, setsInfo, attributes);
+    CardInfoPtr card = CardInfo::newInstance("Lightning Bolt", "Deal 3 damage.", false, QHash<QString, QString>{}, {},
+                                             {}, setsInfo, attributes);
     card->setLocalizedName("de", "Blitzschlag");
     card->setLocalizedText("de", "Blitzschlag fügt 3 Schadenspunkte zu.");
+    card->setProperty("format-standard", "legal");
+    card->setProperty("colors", "R");
 
     SetNameMap sets;
     sets.insert("TST", set);
@@ -127,6 +166,13 @@ TEST(CardDatabaseTest, Xml4LocalizedDataRoundTrip)
     ASSERT_EQ(loaded->getLocalizedName("de"), "Blitzschlag");
     ASSERT_EQ(loaded->getLocalizedText("de"), "Blitzschlag fügt 3 Schadenspunkte zu.");
     ASSERT_EQ(loaded->getLocalizedText("fr"), "Deal 3 damage.");
+    ASSERT_EQ(loaded->getProperty("format-standard"), "legal");
+    ASSERT_TRUE(loaded->hasProperty("colors"));
+    ASSERT_EQ(loaded->getPropertyCount(), 2);
+
+    const QList<PrintingInfo> printings = loaded->getSets().value("TST");
+    ASSERT_FALSE(printings.isEmpty());
+    ASSERT_EQ(printings.first().getProperty("manacost"), "1R");
 }
 
 /**

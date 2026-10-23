@@ -96,7 +96,7 @@ void AbstractCardItem::refreshCardInfo()
 
     if (!exactCard && !cardRef.name.isEmpty()) {
         CardInfo::UiAttributes attributes = {.tableRow = -1};
-        auto info = CardInfo::newInstance(cardRef.name, "", true, {}, {}, {}, {}, attributes);
+        auto info = CardInfo::newInstance(cardRef.name, "", true, QHash<QString, QString>{}, {}, {}, {}, attributes);
         exactCard = ExactCard(info);
     }
     if (exactCard) {
