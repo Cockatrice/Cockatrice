@@ -57,6 +57,15 @@ void CardDatabase::clear()
 {
     QMutexLocker locker(clearDatabaseMutex);
 
+    // CardInfo keeps its CardSetPtr in setsToPrintings while CardSet keeps strong CardInfoPtrs in its
+    // QList base, so the two form a reference cycle. Empty the sets before dropping the cards;
+    // otherwise a reload leaves the whole previous database alive.
+    for (const auto &set : sets) {
+        if (set) {
+            set->clear();
+        }
+    }
+
     for (const auto &card : cards.values()) {
         if (card) {
             removeCard(card);
@@ -168,6 +177,17 @@ void CardDatabase::removeCard(const CardInfoPtr &card)
         cardRelation->deleteLater();
     }
 
+    // Detach the card from its sets as well: the set holds a strong reference back to the card,
+    // so leaving it there keeps both objects alive after the database drops the card.
+    for (const auto &printings : card->getSets()) {
+        for (const PrintingInfo &printing : printings) {
+            if (const CardSetPtr set = printing.getSet()) {
+                set->removeAll(card);
+            }
+            break;
+        }
+    }
+
     QMutexLocker locker(removeCardMutex);
     cards.remove(card->getName());
     simpleNameCards.remove(card->getSimpleName());
@@ -270,6 +290,14 @@ void CardDatabase::swapInDatabaseData(CardDatabaseData data)
         }
         for (auto *rel : card->getReverseRelatedCards2Me()) {
             rel->deleteLater();
+        }
+    }
+
+    // Break the CardSet <-> CardInfo cycle before replacing the containers, otherwise the previous
+    // snapshot survives the reload through the sets' strong card lists.
+    for (const auto &set : sets) {
+        if (set) {
+            set->clear();
         }
     }
 
