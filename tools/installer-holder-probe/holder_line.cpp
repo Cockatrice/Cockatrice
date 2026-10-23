@@ -39,13 +39,21 @@ std::wstring formatHolder(const Holder &holder)
 
 std::wstring formatHolders(const std::vector<Holder> &holders)
 {
-    const std::size_t listed = std::min(holders.size(), HOLDER_LINE_MAX);
+    const std::size_t wanted = std::min(holders.size(), HOLDER_LINE_MAX);
     std::wstring line;
-    for (std::size_t index = 0; index < listed; ++index) {
+    std::size_t listed = 0;
+    for (; listed < wanted; ++listed) {
+        const std::wstring entry = formatHolder(holders[listed]);
+        const std::size_t separator = line.empty() ? 0 : 2;
+        // The first holder is always named, however long its name: it is the answer the
+        // dialog exists to show, and Windows bounds one entry below the whole budget.
+        if (!line.empty() && line.size() + separator + entry.size() > HOLDER_LINE_CHAR_MAX) {
+            break;
+        }
         if (!line.empty()) {
             line += L"; ";
         }
-        line += formatHolder(holders[index]);
+        line += entry;
     }
     if (holders.size() > listed) {
         line += L"; and ";

@@ -459,6 +459,56 @@ if [[ $MAKE_COVERAGE ]]; then
   echo "::endgroup::"
 fi
 
+if [[ $RUNNER_OS == Windows && ! $MAKE_NO_CLIENT ]]; then
+  echo "::group::Probe the installer's holder lookup"
+  # The working directory is still the build dir here: the package steps below are what
+  # leave and re-enter it, and that is what made a $BUILD_DIR-prefixed path name
+  # build/build. Both paths are relative to the dir the probe was built into.
+  probe="./installer-holder-probe.exe"
+  if [[ ! -f $probe ]]; then
+    echo "::error file=$0::installer-holder-probe.exe was not built"
+    exit 1
+  fi
+  # The probe exists to name a holder that a process-and-module scan cannot see: one
+  # that has a file open without having loaded it. Holding a temporary DLL with
+  # FileShare.None is exactly that case, so this asserts the reason the probe was
+  # added instead of only that the Restart Manager answers at all. It needs no NSIS
+  # and no packaging, so it runs on every Windows build that gets this far.
+  probe_check="./holder-probe-check.ps1"
+  cat >"$probe_check" <<'POWERSHELL'
+$ErrorActionPreference = "Stop"
+$dir = Join-Path ([IO.Path]::GetTempPath()) "cockatrice-holder-probe"
+Remove-Item -Recurse -Force $dir -ErrorAction SilentlyContinue
+New-Item -ItemType Directory -Force $dir | Out-Null
+$file = Join-Path $dir "locked.dll"
+[IO.File]::WriteAllText($file, "x")
+$handle = [IO.File]::Open($file, "Open", "ReadWrite", "None")
+try {
+    $env:COCKATRICE_GUARD_DIR = $dir
+    $found = & $env:PROBE_EXE
+    $code = $LASTEXITCODE
+} finally {
+    $handle.Dispose()
+}
+if ($code -ne 1) { throw "expected exit 1 for a locked file, got $code : $found" }
+if ($found -notmatch "pid\s+$PID\b") { throw "the lookup did not name this process: $found" }
+$empty = Join-Path $dir "empty"
+New-Item -ItemType Directory -Force $empty | Out-Null
+$env:COCKATRICE_GUARD_DIR = $empty
+$nothing = & $env:PROBE_EXE
+$code = $LASTEXITCODE
+if ($code -ne 0) { throw "expected exit 0 for a directory with nothing open, got $code : $nothing" }
+Remove-Item -Recurse -Force $dir
+Write-Host "holder lookup named pid $PID for a locked file and named nothing for an empty directory"
+POWERSHELL
+  if ! PROBE_EXE="$probe" powershell -NoProfile -File "$probe_check"; then
+    rm -f "$probe_check"
+    exit 1
+  fi
+  rm -f "$probe_check"
+  echo "::endgroup::"
+fi
+
 if [[ $MAKE_INSTALL ]]; then
   echo "::group::Install"
   cmake --build . --target install --config "$BUILDTYPE"
@@ -623,51 +673,6 @@ if [[ $MAKE_PACKAGE ]]; then
         echo "Installer carries no runtime files beyond the linked Qt modules"
       fi
     fi
-    echo "::endgroup::"
-
-    echo "::group::Probe the installer's holder lookup"
-    probe="$BUILD_DIR/installer-holder-probe.exe"
-    if [[ ! -f $probe ]]; then
-      echo "::error file=$0::installer-holder-probe.exe was not built"
-      exit 1
-    fi
-    # The probe exists to name a holder that a process-and-module scan cannot see: one
-    # that has a file open without having loaded it. Holding a temporary DLL with
-    # FileShare.None is exactly that case, so this asserts the reason the probe was
-    # added instead of only that the Restart Manager answers at all. It needs no NSIS
-    # and no packaging, so it runs on every Windows build that gets this far.
-    probe_check="$BUILD_DIR/holder-probe-check.ps1"
-    cat >"$probe_check" <<'POWERSHELL'
-$ErrorActionPreference = "Stop"
-$dir = Join-Path ([IO.Path]::GetTempPath()) "cockatrice-holder-probe"
-Remove-Item -Recurse -Force $dir -ErrorAction SilentlyContinue
-New-Item -ItemType Directory -Force $dir | Out-Null
-$file = Join-Path $dir "locked.dll"
-[IO.File]::WriteAllText($file, "x")
-$handle = [IO.File]::Open($file, "Open", "ReadWrite", "None")
-try {
-    $env:COCKATRICE_GUARD_DIR = $dir
-    $found = & $env:PROBE_EXE
-    $code = $LASTEXITCODE
-} finally {
-    $handle.Dispose()
-}
-if ($code -ne 1) { throw "expected exit 1 for a locked file, got $code : $found" }
-if ($found -notmatch "pid\s+$PID\b") { throw "the lookup did not name this process: $found" }
-$empty = Join-Path $dir "empty"
-New-Item -ItemType Directory -Force $empty | Out-Null
-$env:COCKATRICE_GUARD_DIR = $empty
-$nothing = & $env:PROBE_EXE
-$code = $LASTEXITCODE
-if ($code -ne 0) { throw "expected exit 0 for a directory with nothing open, got $code : $nothing" }
-Remove-Item -Recurse -Force $dir
-Write-Host "holder lookup named pid $PID for a locked file and named nothing for an empty directory"
-POWERSHELL
-    if ! PROBE_EXE="$probe" powershell -NoProfile -File "$probe_check"; then
-      rm -f "$probe_check"
-      exit 1
-    fi
-    rm -f "$probe_check"
     echo "::endgroup::"
   fi
 fi

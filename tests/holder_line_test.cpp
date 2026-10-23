@@ -78,6 +78,24 @@ TEST(HolderLine, CountsTheHoldersItLeavesOut)
     EXPECT_NE(line.find(L"and 2 more"), std::wstring::npos);
 }
 
+TEST(HolderLine, StopsNamingHoldersBeforeTheLineOutgrowsTheDialog)
+{
+    // A Windows service name can be 255 characters, and the abort dialog has to fit the
+    // list next to its own text and the log path in a 1024-character NSIS string.
+    std::vector<Holder> holders;
+    for (unsigned long processId = 1; processId <= 3; ++processId) {
+        holders.push_back(service(std::wstring(255, L'S'), L"S", processId));
+    }
+    const std::wstring line = formatHolders(holders);
+    // The first holder is still named in full; the others are counted rather than written
+    // out until the line overflows.
+    EXPECT_EQ(line.compare(0, 255, std::wstring(255, L'S')), 0);
+    EXPECT_NE(line.find(L"(pid 1, service S)"), std::wstring::npos);
+    EXPECT_EQ(line.find(L"pid 2"), std::wstring::npos);
+    EXPECT_NE(line.find(L"and 2 more"), std::wstring::npos);
+    EXPECT_LE(line.size(), HOLDER_LINE_CHAR_MAX + 20);
+}
+
 TEST(HolderLine, FormatsNothingAsAnEmptyLine)
 {
     EXPECT_EQ(formatHolders({}), std::wstring());
