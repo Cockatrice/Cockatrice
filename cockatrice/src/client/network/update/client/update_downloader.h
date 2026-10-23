@@ -32,6 +32,7 @@ private:
     QUrl originalUrl;
     QNetworkAccessManager *netMan;
     QNetworkReply *response;
+    bool errorReported = false;
 private slots:
     void fileFinished();
     void downloadProgress(qint64 bytesRead, qint64 totalBytes);
