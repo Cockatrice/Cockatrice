@@ -358,6 +358,7 @@ cockatrice_add_test(
   ${VERSION_STRING_CPP}
   loader_local_matching_test.cpp
   LIBS
+  libcockatrice_network
   libcockatrice_settings
   INCLUDE_DIRS
   ${CMAKE_SOURCE_DIR}/cockatrice/src

@@ -28,6 +28,7 @@
 #include <QVariant>
 #include <QtGlobal>
 #include <compare>
+#include <libcockatrice/network/network_manager.h>
 #include <libcockatrice/settings/cache_storage_settings.h>
 #include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
@@ -46,11 +47,10 @@ CardPictureLoaderWorker::CardPictureLoaderWorker()
     : QObject(nullptr), picDownload(SettingsCache::instance().downloads().getPicDownload()),
       hostRequestLimits(SettingsCache::instance().downloads().getHostRequestLimits())
 {
-    networkManager = new QNetworkAccessManager(this);
+    networkManager = NetworkManagerFactory::create(this);
     // We need a timeout to ensure requests don't hang indefinitely in case of
     // cache corruption, see related Qt bug: https://bugreports.qt.io/browse/QTBUG-111397
     // Use Qt's default timeout (30s, as of 2023-02-22)
-    networkManager->setTransferTimeout();
     cache = new QNetworkDiskCache(this);
     cache->setCacheDirectory(SettingsCache::instance().getNetworkCachePath());
     cache->setMaximumCacheSize(1024L * 1024L *
