@@ -21,6 +21,7 @@
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/download_settings.h>
+#include <utility>
 
 CardPictureToLoad::CardPictureToLoad(const ExactCard &_card)
     : card(_card), urlTemplates(SettingsCache::instance().downloads().getAllURLs())
@@ -308,10 +309,10 @@ QString CardPictureToLoad::transformUrl(const QString &urlTemplate) const
     }
 
     QString transformedUrl = urlTemplate;
-    for (auto it = transformMap.constBegin(); it != transformMap.constEnd(); ++it) {
-        if (transformedUrl.contains(it.key())) {
-            if (!it.value().isEmpty()) {
-                transformedUrl.replace(it.key(), QUrl::toPercentEncoding(it.value()));
+    for (const auto &[prop, value] : std::as_const(transformMap).asKeyValueRange()) {
+        if (transformedUrl.contains(prop)) {
+            if (!value.isEmpty()) {
+                transformedUrl.replace(prop, QUrl::toPercentEncoding(value));
             } else {
                 /* This means the template is requesting information that is not
                  * populated in this card, so it should return an empty string,
@@ -319,7 +320,7 @@ QString CardPictureToLoad::transformUrl(const QString &urlTemplate) const
                  */
                 qCDebug(CardPictureToLoadLog).nospace()
                     << "PictureLoader: [card: " << cardName << " set: " << setName << "]: Requested information ("
-                    << it.key() << ") for Url template (" << urlTemplate << ") is not available";
+                    << prop << ") for Url template (" << urlTemplate << ") is not available";
                 return QString();
             }
         }
