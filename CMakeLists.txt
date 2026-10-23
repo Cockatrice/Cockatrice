@@ -250,7 +250,9 @@ message(STATUS "Update Translations: ${UPDATE_TRANSLATIONS}")
 
 include(FindQtRuntime)
 
-set(CMAKE_AUTOMOC TRUE)
+# AUTOMOC/AUTOUIC/AUTORCC and the common include path are set once here
+# for every target; per-directory copies are no longer needed.
+qt_standard_project_setup(REQUIRES 6.4)
 
 # Find other needed libraries
 find_package(Protobuf CONFIG)

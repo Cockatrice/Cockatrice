@@ -1,0 +1,59 @@
+-- Found CCache /usr/bin/ccache
+-- The C compiler identification is GNU 15.3.1
+-- The CXX compiler identification is GNU 15.3.1
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found Git: /usr/bin/git (found version "2.56.0")
+-- Commit is not a release or prerelease (no git tag found)
+-- Project version: 3.1.2-custom-0fe4fd0
+-- Friendly project version: 3.1.2-custom-0fe4fd0 (2026-10-20)
+-- Project version filename: Cockatrice-3.1.2-custom-0fe4fd0
+-- Performing Test CXX_HAS_WARNING_-Wcast-align
+-- Performing Test CXX_HAS_WARNING_-Wcast-align - Success
+-- Performing Test CXX_HAS_WARNING_-Wmissing-declarations
+-- Performing Test CXX_HAS_WARNING_-Wmissing-declarations - Success
+-- Performing Test CXX_HAS_WARNING_-Wno-long-long
+-- Performing Test CXX_HAS_WARNING_-Wno-long-long - Success
+-- Performing Test CXX_HAS_WARNING_-Wno-error=extra
+-- Performing Test CXX_HAS_WARNING_-Wno-error=extra - Success
+-- Performing Test CXX_HAS_WARNING_-Wno-error=delete-non-virtual-dtor
+-- Performing Test CXX_HAS_WARNING_-Wno-error=delete-non-virtual-dtor - Success
+-- Performing Test CXX_HAS_WARNING_-Wno-error=sign-compare
+-- Performing Test CXX_HAS_WARNING_-Wno-error=sign-compare - Success
+-- Performing Test CXX_HAS_WARNING_-Wno-error=missing-declarations
+-- Performing Test CXX_HAS_WARNING_-Wno-error=missing-declarations - Success
+-- Performing Test CXX_HAS_WARNING_-Wno-error=sfinae-incomplete
+-- Performing Test CXX_HAS_WARNING_-Wno-error=sfinae-incomplete - Failed
+-- Crash reporting: SDK not vendored (WITH_CRASH_REPORTING=OFF, WITH_CLIENT=ON)
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Update Translations: OFF
+-- Performing Test HAVE_STDATOMIC
+-- Performing Test HAVE_STDATOMIC - Success
+-- Found OpenGL: /usr/lib64/libOpenGL.so
+-- Found Qt 6.11.2 at: /usr/lib64/cmake/Qt6
+-- Found ZLIB: /usr/lib64/libz.so (found version "1.3.2")
+-- Found OpenSSL: /usr/lib64/libcrypto.so (found version "3.6.5")
+-- Found MySQL connector at: /usr/lib64/libmysqlclient.so
+src/interface/widgets/onboarding/shaders/brand_banner.frag -> brand_banner.frag.qsb exposed as :/onboarding/shaders/brand_banner.frag.qsb
+src/interface/widgets/onboarding/shaders/brand_plate.frag -> brand_plate.frag.qsb exposed as :/onboarding/shaders/brand_plate.frag.qsb
+-- Looking for lzma_auto_decoder in /usr/lib64/liblzma.so
+-- Looking for lzma_auto_decoder in /usr/lib64/liblzma.so - found
+-- Looking for lzma_easy_encoder in /usr/lib64/liblzma.so
+-- Looking for lzma_easy_encoder in /usr/lib64/liblzma.so - found
+-- Looking for lzma_lzma_preset in /usr/lib64/liblzma.so
+-- Looking for lzma_lzma_preset in /usr/lib64/liblzma.so - found
+-- Found LibLZMA: /usr/lib64/liblzma.so (found version "5.8.4")
+-- Found GTest: /usr/lib64/cmake/GTest/GTestConfig.cmake (found version "1.17.0")
+-- Configuring done (10.7s)
+-- Generating done (1.6s)
+-- Build files have been written to: /tmp/qt6-cmake-setup/build

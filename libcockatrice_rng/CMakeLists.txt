@@ -1,7 +1,3 @@
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
-
 set(HEADERS libcockatrice/rng/rng_abstract.h libcockatrice/rng/rng_sfmt.h libcockatrice/rng/sfmt/SFMT.h)
 
 qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
