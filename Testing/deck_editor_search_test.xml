@@ -1,0 +1,14 @@
+<events>
+  <!-- Open a new visual deck editor tab from the home page -->
+  <event widget="MainWindow/tabSupervisor/stackedWidget/TabHome/homeWidget/homeButtonsBox/homeCreateNewDeckButton" command="activate" arguments="" />
+  <!-- Type "Lightning" into the search box (keycodes for L-i-g-h-t-n-i-n-g) -->
+  <event widget="MainWindow/tabSupervisor/stackedWidget/TabDeckEditorVisual/databaseDisplayDock/databaseDisplayDockContents/databaseDisplayWidget/searchEdit" command="key" arguments="76" />
+  <event widget="MainWindow/tabSupervisor/stackedWidget/TabDeckEditorVisual/databaseDisplayDock/databaseDisplayDockContents/databaseDisplayWidget/searchEdit" command="key" arguments="105" />
+  <event widget="MainWindow/tabSupervisor/stackedWidget/TabDeckEditorVisual/databaseDisplayDock/databaseDisplayDockContents/databaseDisplayWidget/searchEdit" command="key" arguments="103" />
+  <event widget="MainWindow/tabSupervisor/stackedWidget/TabDeckEditorVisual/databaseDisplayDock/databaseDisplayDockContents/databaseDisplayWidget/searchEdit" command="key" arguments="104" />
+  <event widget="MainWindow/tabSupervisor/stackedWidget/TabDeckEditorVisual/databaseDisplayDock/databaseDisplayDockContents/databaseDisplayWidget/searchEdit" command="key" arguments="116" />
+  <event widget="MainWindow/tabSupervisor/stackedWidget/TabDeckEditorVisual/databaseDisplayDock/databaseDisplayDockContents/databaseDisplayWidget/searchEdit" command="key" arguments="110" />
+  <event widget="MainWindow/tabSupervisor/stackedWidget/TabDeckEditorVisual/databaseDisplayDock/databaseDisplayDockContents/databaseDisplayWidget/searchEdit" command="key" arguments="105" />
+  <event widget="MainWindow/tabSupervisor/stackedWidget/TabDeckEditorVisual/databaseDisplayDock/databaseDisplayDockContents/databaseDisplayWidget/searchEdit" command="key" arguments="110" />
+  <event widget="MainWindow/tabSupervisor/stackedWidget/TabDeckEditorVisual/databaseDisplayDock/databaseDisplayDockContents/databaseDisplayWidget/searchEdit" command="key" arguments="103" />
+</events>

@@ -1,0 +1,13 @@
+<events>
+  <!-- Tier 5: State verification — open Settings, search for a page, close -->
+  <event widget="MainWindow/menubar" command="activate" arguments="cockatriceMenu" />
+  <event widget="MainWindow/menubar/cockatriceMenu" command="activate" arguments="actionSettings" />
+  <!-- Type "sound" in the settings search to filter pages -->
+  <event widget="MainWindow/settingsDialog/settingsView/settingsSearchEdit" command="key" arguments="115" />
+  <event widget="MainWindow/settingsDialog/settingsView/settingsSearchEdit" command="key" arguments="111" />
+  <event widget="MainWindow/settingsDialog/settingsView/settingsSearchEdit" command="key" arguments="117" />
+  <event widget="MainWindow/settingsDialog/settingsView/settingsSearchEdit" command="key" arguments="110" />
+  <event widget="MainWindow/settingsDialog/settingsView/settingsSearchEdit" command="key" arguments="100" />
+  <!-- Close settings -->
+  <event widget="MainWindow/settingsDialog/settingsOkButton" command="activate" arguments="" />
+</events>
