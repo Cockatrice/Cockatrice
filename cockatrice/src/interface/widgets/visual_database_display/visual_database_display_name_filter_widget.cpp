@@ -16,6 +16,7 @@
 #include <QPersistentModelIndex>
 #include <QPushButton>
 #include <QSharedPointer>
+#include <QSignalBlocker>
 #include <QStringList>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -139,19 +140,18 @@ void VisualDatabaseDisplayNameFilterWidget::updateFilterModel()
     emit filterModel->layoutAboutToBeChanged();
     filterModel->clearFiltersOfType(CardFilter::Attr::AttrNameExact);
 
-    filterModel->blockSignals(true);
-    filterModel->filterTree()->blockSignals(true);
+    {
+        // Scope the blockers so both models are unblocked before the explicit
+        // change notifications below.
+        const QSignalBlocker modelBlocker(filterModel);
+        const QSignalBlocker treeBlocker(filterModel->filterTree());
 
-    for (const auto &name : activeFilters.keys()) {
-        QString nameString = name;
-        filterModel->addFilter(new CardFilter(nameString, CardFilter::Type::TypeOr, CardFilter::Attr::AttrNameExact));
+        for (const auto &name : activeFilters.keys()) {
+            QString nameString = name;
+            filterModel->addFilter(
+                new CardFilter(nameString, CardFilter::Type::TypeOr, CardFilter::Attr::AttrNameExact));
+        }
     }
-
-    filterModel->blockSignals(false);
-    filterModel->filterTree()->blockSignals(false);
-
-    filterModel->blockSignals(false);
-    filterModel->filterTree()->blockSignals(false);
 
     emit filterModel->filterTree()->changed();
     emit filterModel->layoutChanged();
