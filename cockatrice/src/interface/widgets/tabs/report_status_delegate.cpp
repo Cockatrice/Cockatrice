@@ -30,7 +30,7 @@ void ReportStatusDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
         tintRole = QPalette::Highlight;
     } else if (status == QStringLiteral("assigned")) {
         tintRole = QPalette::Link;
-    } else if (status == QStringLiteral("resolved")) {
+    } else if (status == QStringLiteral("resolved") || status == QStringLiteral("dismissed")) {
         tintRole = QPalette::PlaceholderText;
     }
 
