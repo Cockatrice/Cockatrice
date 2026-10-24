@@ -165,6 +165,7 @@ message Command_GetUserAlts {
         optional Command_GetUserAlts ext = 1014;
     }
     optional string user_name = 1;
+    optional uint32 depth = 2 [default = 1]; // BFS depth: 1 = direct matches only, up to 3 for transitive alts-of-alts
 }
 
 message Command_GetModeratorLastLogins {
