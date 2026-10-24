@@ -23,7 +23,7 @@ bool DeckListSortFilterProxyModel::lessThan(const QModelIndex &left, const QMode
     if (!leftIsCard || !rightIsCard) {
         QString lName = src->data(left.siblingAtColumn(DeckListModelColumns::CARD_NAME), Qt::EditRole).toString();
         QString rName = src->data(right.siblingAtColumn(DeckListModelColumns::CARD_NAME), Qt::EditRole).toString();
-        return lName.localeAwareCompare(rName) < 0;
+        return collator.compare(lName, rName) < 0;
     }
 
     // Both are cards -> apply sort criteria
@@ -38,7 +38,7 @@ bool DeckListSortFilterProxyModel::lessThan(const QModelIndex &left, const QMode
         if (crit == "name") {
             QString ln = lNode->getName();
             QString rn = rNode->getName();
-            int cmp = ln.localeAwareCompare(rn);
+            int cmp = collator.compare(ln, rn);
             if (cmp != 0) {
                 return cmp < 0;
             }
@@ -51,14 +51,14 @@ bool DeckListSortFilterProxyModel::lessThan(const QModelIndex &left, const QMode
         } else if (crit == "colors") {
             QString lr = lInfo ? lInfo->getColors() : QString();
             QString rr = rInfo ? rInfo->getColors() : QString();
-            int cmp = lr.localeAwareCompare(rr);
+            int cmp = collator.compare(lr, rr);
             if (cmp != 0) {
                 return cmp < 0;
             }
         } else if (crit == "maintype") {
             QString lr = lInfo ? lInfo->getMainCardType() : QString();
             QString rr = rInfo ? rInfo->getMainCardType() : QString();
-            int cmp = lr.localeAwareCompare(rr);
+            int cmp = collator.compare(lr, rr);
             if (cmp != 0) {
                 return cmp < 0;
             }
