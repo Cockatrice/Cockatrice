@@ -34,6 +34,7 @@
 #include <libcockatrice/protocol/pb/response_deck_download.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <optional>
 #include <qnamespace.h>
 
@@ -44,9 +45,7 @@ TabPublicDecks::TabPublicDecks(TabSupervisor *_tabSupervisor, AbstractClient *_c
     cardSize = SettingsCache::instance().cardsDisplay().getVisualDeckStorageCardSize();
 
     titleLabel = new QLabel(tr("Public decks of %1").arg(userName.toHtmlEscaped()), this);
-    QFont titleFont = titleLabel->font();
-    titleFont.setBold(true);
-    titleLabel->setFont(titleFont);
+    titleLabel->setFont(QtUtils::boldFont(titleLabel->font()));
 
     auto *headerLayout = new QHBoxLayout;
     headerLayout->addWidget(titleLabel);

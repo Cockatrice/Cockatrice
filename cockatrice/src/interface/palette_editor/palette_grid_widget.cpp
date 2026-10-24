@@ -102,9 +102,7 @@ void PaletteGridWidget::buildGrid(QWidget *host)
         auto *label = new QLabel(groupHeaders[col], host);
         label->setAlignment(Qt::AlignCenter);
         label->setToolTip(groupTips[col]);
-        QFont f = label->font();
-        f.setBold(true);
-        label->setFont(f);
+        label->setFont(QtUtils::boldFont(label->font()));
         label->setAutoFillBackground(true);
         label->setContentsMargins(4, 4, 4, 4);
         grid->addWidget(label, 0, col + 1);
@@ -149,9 +147,7 @@ void PaletteGridWidget::buildGrid(QWidget *host)
 
     auto *appHeader = new QLabel(tr("App colors"), host);
     appHeader->setToolTip(tr("Application-specific colors layered on top of the Qt palette"));
-    QFont appHeaderFont = appHeader->font();
-    appHeaderFont.setBold(true);
-    appHeader->setFont(appHeaderFont);
+    appHeader->setFont(QtUtils::boldFont(appHeader->font()));
     appHeader->setAutoFillBackground(true);
     appHeader->setContentsMargins(4, 4, 4, 4);
     grid->addWidget(appHeader, appHeaderRow, 0, 1, 4);

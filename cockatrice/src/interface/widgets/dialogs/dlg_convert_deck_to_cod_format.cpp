@@ -13,6 +13,7 @@
 #include <QObject>
 #include <QVBoxLayout>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 
 DialogConvertDeckToCodFormat::DialogConvertDeckToCodFormat(QWidget *parent) : QDialog(parent)
 {
@@ -57,11 +58,8 @@ bool confirmOverwriteIfExists(QWidget *parent, const QString &filePath)
     QString newFileName = QDir::toNativeSeparators(fileInfo.path() + "/" + fileInfo.completeBaseName() + ".cod");
 
     if (QFile::exists(newFileName)) {
-        QMessageBox::StandardButton reply =
-            QMessageBox::question(parent, QObject::tr("Overwrite Existing File?"),
-                                  QObject::tr("A .cod version of this deck already exists. Overwrite it?"),
-                                  QMessageBox::Yes | QMessageBox::No);
-        return reply == QMessageBox::Yes;
+        return QtUtils::confirm(parent, QObject::tr("Overwrite Existing File?"),
+                                QObject::tr("A .cod version of this deck already exists. Overwrite it?"));
     }
     return true; // Safe to proceed
 }
