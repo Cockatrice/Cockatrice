@@ -27,6 +27,7 @@ set(UTILITY_HEADERS
     libcockatrice/utility/macros.h
     libcockatrice/utility/passwordhasher.h
     libcockatrice/utility/playmat_params.h
+    libcockatrice/utility/qt_utils.h
     libcockatrice/utility/report_categories.h
     libcockatrice/utility/string_limits.h
     libcockatrice/utility/dice_limits.h
