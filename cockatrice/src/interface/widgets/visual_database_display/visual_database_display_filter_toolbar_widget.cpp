@@ -111,12 +111,10 @@ VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidg
 
 void VisualDatabaseDisplayFilterToolbarWidget::initialize()
 {
-    auto sortLayout = QtUtils::makeLayout<QHBoxLayout>(sortGroupBox);
-    sortLayout->setSpacing(0);
+    auto sortLayout = QtUtils::makeLayout<QHBoxLayout>(sortGroupBox, 0);
     sortLayout->setAlignment(Qt::AlignLeft);
 
-    auto filterLayout = QtUtils::makeLayout<QHBoxLayout>(filterGroupBox);
-    filterLayout->setSpacing(2);
+    auto filterLayout = QtUtils::makeLayout<QHBoxLayout>(filterGroupBox, 2);
     filterLayout->setAlignment(Qt::AlignLeft);
 
     // create settings widgets

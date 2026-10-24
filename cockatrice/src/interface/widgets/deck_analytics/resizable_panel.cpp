@@ -36,16 +36,14 @@ ResizablePanel::ResizablePanel(const QString &_typeId, AbstractAnalyticsPanelWid
 {
     setAcceptDrops(true);
 
-    auto *mainLayout = QtUtils::makeLayout<QVBoxLayout>(this);
-    mainLayout->setSpacing(0);
+    auto *mainLayout = QtUtils::makeLayout<QVBoxLayout>(this, 0);
 
     // Frame for selection highlight
     frame = new QFrame(this);
     frame->setFrameShape(QFrame::Box);
     frame->setLineWidth(2);
 
-    auto *frameLayout = QtUtils::makeLayout<QVBoxLayout>(frame);
-    frameLayout->setSpacing(0);
+    auto *frameLayout = QtUtils::makeLayout<QVBoxLayout>(frame, 0);
 
     // Add the analytics panel
     frameLayout->addWidget(analyticsPanel);
@@ -62,8 +60,7 @@ ResizablePanel::ResizablePanel(const QString &_typeId, AbstractAnalyticsPanelWid
 
     // Bottom bar with drag button and resize handle
     auto *bottomBar = new QWidget(frame);
-    auto *bottomLayout = QtUtils::makeLayout<QHBoxLayout>(bottomBar);
-    bottomLayout->setSpacing(0);
+    auto *bottomLayout = QtUtils::makeLayout<QHBoxLayout>(bottomBar, 0);
 
     // Drag button on the left
     dragButton = new QPushButton("☰", bottomBar);

@@ -25,8 +25,7 @@ LatencyStatusWidget::LatencyStatusWidget(QWidget *parent) : QWidget(parent)
     latencyGraph = new LatencyGraphWidget(this);
     latencyGraph->setFixedSize(90, 14);
 
-    auto *layout = QtUtils::makeLayout<QHBoxLayout>(this);
-    layout->setSpacing(4);
+    auto *layout = QtUtils::makeLayout<QHBoxLayout>(this, 4);
     layout->addWidget(latencyGraph);
     layout->addWidget(pingLabel);
 

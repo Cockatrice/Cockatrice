@@ -94,8 +94,7 @@ void ManaCurveCategoryWidget::updateDisplay(int minCmc,
 
         row->setFixedHeight(MIN_ROW_HEIGHT);
 
-        QHBoxLayout *rowLayout = QtUtils::makeLayout<QHBoxLayout>(row);
-        rowLayout->setSpacing(4);
+        QHBoxLayout *rowLayout = QtUtils::makeLayout<QHBoxLayout>(row, 4);
 
         QLabel *categoryLabel = new QLabel(cat, row);
         categoryLabel->setFixedWidth(80);

@@ -1362,8 +1362,7 @@ void TabGame::createPlayerListDock(bool bReplay)
     playerListWidget->setFocusPolicy(Qt::NoFocus);
 
     auto *playerListBox = new QWidget(this);
-    auto *vbox = QtUtils::makeLayout<QVBoxLayout>(playerListBox);
-    vbox->setSpacing(0);
+    auto *vbox = QtUtils::makeLayout<QVBoxLayout>(playerListBox, 0);
 
     vbox->addWidget(playerListWidget);
 

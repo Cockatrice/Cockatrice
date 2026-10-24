@@ -47,8 +47,7 @@ TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor, Abstra
     });
 
     auto *widget = new QWidget(this);
-    auto *layout = QtUtils::makeLayout<QVBoxLayout>(widget);
-    layout->setSpacing(0);
+    auto *layout = QtUtils::makeLayout<QVBoxLayout>(widget, 0);
     widget->setLayout(layout);
     this->setCentralWidget(widget);
     layout->addWidget(visualDeckStorageWidget);

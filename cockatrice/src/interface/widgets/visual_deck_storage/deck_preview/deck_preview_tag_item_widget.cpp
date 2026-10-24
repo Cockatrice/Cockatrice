@@ -7,8 +7,7 @@
 DeckPreviewTagItemWidget::DeckPreviewTagItemWidget(const QString &tagName, bool isChecked, QWidget *parent)
     : QWidget(parent), checkBox_(new QCheckBox(this))
 {
-    auto *layout = QtUtils::makeLayout<QHBoxLayout>(this);
-    layout->setSpacing(5);
+    auto *layout = QtUtils::makeLayout<QHBoxLayout>(this, 5);
 
     checkBox_->setText(tagName);      // Set the tag name as the checkbox label
     checkBox_->setChecked(isChecked); // Set the initial state of the checkbox

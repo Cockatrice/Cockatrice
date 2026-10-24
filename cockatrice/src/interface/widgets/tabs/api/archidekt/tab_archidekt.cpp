@@ -81,8 +81,7 @@ void TabArchidekt::initializeUi()
 {
     // Main container
     container = new QWidget(this);
-    mainLayout = QtUtils::makeLayout<QVBoxLayout>(container);
-    mainLayout->setSpacing(0);
+    mainLayout = QtUtils::makeLayout<QVBoxLayout>(container, 0);
 
     // Primary toolbar (most important filters)
     primaryToolbar = new QWidget(container);
@@ -105,8 +104,7 @@ void TabArchidekt::initializeUi()
 
     // Color filter (inline)
     QWidget *colorWidget = new QWidget(primaryToolbar);
-    QHBoxLayout *colorLayout = QtUtils::makeLayout<QHBoxLayout>(colorWidget);
-    colorLayout->setSpacing(2);
+    QHBoxLayout *colorLayout = QtUtils::makeLayout<QHBoxLayout>(colorWidget, 2);
 
     QString colorIdentity = "WUBRG";
     for (const QChar &color : colorIdentity) {
@@ -188,8 +186,7 @@ void TabArchidekt::initializeUi()
     scrollArea = QtUtils::makeScrollArea(container);
 
     resultsContainer = new QWidget();
-    resultsLayout = QtUtils::makeLayout<QVBoxLayout>(resultsContainer);
-    resultsLayout->setSpacing(0);
+    resultsLayout = QtUtils::makeLayout<QVBoxLayout>(resultsContainer, 0);
 
     scrollArea->setWidget(resultsContainer);
 
