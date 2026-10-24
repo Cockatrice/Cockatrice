@@ -12,6 +12,7 @@
 #include "../card_dimensions.h"
 #include "../z_values.h"
 #include "libcockatrice/utility/macros.h"
+#include "libcockatrice/utility/qt_utils.h"
 #include "view_zone.h"
 
 #include <QAction>
@@ -356,12 +357,8 @@ QRectF ZoneViewWidget::closeButtonRect(QWidget *styleWidget) const
 
 QGraphicsView *ZoneViewWidget::findDragView(QWidget *eventWidget) const
 {
-    QWidget *current = eventWidget;
-    while (current) {
-        if (auto *view = qobject_cast<QGraphicsView *>(current)) {
-            return view;
-        }
-        current = current->parentWidget();
+    if (auto *view = QtUtils::findParentOfType<QGraphicsView>(eventWidget, true)) {
+        return view;
     }
 
     if (scene() && !scene()->views().isEmpty()) {

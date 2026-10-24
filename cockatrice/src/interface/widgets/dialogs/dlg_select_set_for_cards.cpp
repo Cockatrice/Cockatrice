@@ -50,6 +50,7 @@
 #include <algorithm>
 #include <functional>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qalgorithms.h>
 #include <qnamespace.h>
 #include <qobjectdefs.h>
@@ -71,10 +72,7 @@ DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckStateManager *de
     QSplitter *splitter = new QSplitter(Qt::Vertical, this);
 
     // Top scroll area
-    scrollArea = new QScrollArea(this);
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    scrollArea->setWidgetResizable(true);
+    scrollArea = QtUtils::makeScrollArea(this);
 
     listContainer = new QWidget(scrollArea);
     listLayout = new QVBoxLayout(listContainer);
@@ -90,10 +88,7 @@ DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckStateManager *de
     leftLayout->setContentsMargins(0, 0, 0, 0);
 
     uneditedCardsLabel = new QLabel(this);
-    uneditedCardsArea = new QScrollArea(this);
-    uneditedCardsArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    uneditedCardsArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    uneditedCardsArea->setWidgetResizable(true);
+    uneditedCardsArea = QtUtils::makeScrollArea(this);
 
     uneditedCardsFlowWidget =
         new FlowWidget(uneditedCardsArea, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
@@ -109,10 +104,7 @@ DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckStateManager *de
     rightLayout->setContentsMargins(0, 0, 0, 0);
 
     modifiedCardsLabel = new QLabel(this);
-    modifiedCardsArea = new QScrollArea(this);
-    modifiedCardsArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    modifiedCardsArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    modifiedCardsArea->setWidgetResizable(true);
+    modifiedCardsArea = QtUtils::makeScrollArea(this);
 
     modifiedCardsFlowWidget =
         new FlowWidget(modifiedCardsArea, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
