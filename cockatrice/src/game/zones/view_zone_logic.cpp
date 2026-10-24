@@ -147,7 +147,7 @@ void ZoneViewZoneLogic::removeCard(int position, bool toNewZone)
     }
 
     CardItem *card = cards.takeAt(position);
-    card->deleteLater();
+    card->getState()->deleteView();
 
     // The toNewZone check is to prevent the view from auto-closing if the view contains only a single card and that
     // card gets dragged within the view.
@@ -165,7 +165,7 @@ void ZoneViewZoneLogic::removeCard(int position, bool toNewZone)
 void ZoneViewZoneLogic::clearCards()
 {
     for (auto card : cards) {
-        card->deleteLater();
+        card->getState()->deleteView();
     }
     cards.clear();
     emit cardCountChanged();
