@@ -11,6 +11,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QSlider>
+#include <libcockatrice/network/network_manager.h>
 #include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
@@ -27,8 +28,7 @@ ArchidektApiResponseDeckListingsDisplayWidget::ArchidektApiResponseDeckListingsD
 
     cardSizeSlider->enableCtrlScrollResize(flowWidget);
 
-    imageNetworkManager = new QNetworkAccessManager(this);
-    imageNetworkManager->setTransferTimeout(); // Use Qt's default timeout
+    imageNetworkManager = NetworkManagerFactory::create(this);
     imageNetworkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
 
     // Add widgets for deck listings

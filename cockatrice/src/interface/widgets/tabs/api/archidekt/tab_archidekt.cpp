@@ -48,6 +48,7 @@
 #include <QWidget>
 #include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/network/network_manager.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
 #include <qlogging.h>
@@ -58,8 +59,7 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor)
     : Tab(_tabSupervisor), currentPage(1), isLoadingMore(false), isListMode(true)
 {
     // Initialize network
-    networkManager = new QNetworkAccessManager(this);
-    networkManager->setTransferTimeout();
+    networkManager = NetworkManagerFactory::create(this);
     networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
     connect(networkManager, &QNetworkAccessManager::finished, this, &TabArchidekt::processApiJson);
 
