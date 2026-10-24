@@ -297,11 +297,10 @@ QStringList SetsModel::mimeTypes() const
     return QStringList() << "application/x-cockatricecardset";
 }
 
-SetsDisplayModel::SetsDisplayModel(QObject *parent) : QSortFilterProxyModel(parent)
+SetsDisplayModel::SetsDisplayModel(QObject *parent) : QSortFilterProxyModel(parent), collator(makeNaturalSortCollator())
 {
     setFilterCaseSensitivity(Qt::CaseInsensitive);
     setSortCaseSensitivity(Qt::CaseInsensitive);
-    collator = makeNaturalSortCollator();
 }
 
 void SetsDisplayModel::fetchMore(const QModelIndex &index)

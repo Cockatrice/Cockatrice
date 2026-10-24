@@ -21,10 +21,9 @@
 class QObject;
 
 CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)
-    : QSortFilterProxyModel(parent), isToken(ShowAll), filterString(nullptr)
+    : QSortFilterProxyModel(parent), isToken(ShowAll), filterString(nullptr), collator(makeNaturalSortCollator())
 {
     filterTree = nullptr;
-    collator = makeNaturalSortCollator();
     setFilterCaseSensitivity(Qt::CaseInsensitive);
     setSortCaseSensitivity(Qt::CaseInsensitive);
 

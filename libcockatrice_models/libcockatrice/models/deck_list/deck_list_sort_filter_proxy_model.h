@@ -22,9 +22,9 @@ class DeckListSortFilterProxyModel : public QSortFilterProxyModel
 {
     Q_OBJECT
 public:
-    explicit DeckListSortFilterProxyModel(QObject *parent = nullptr) : QSortFilterProxyModel(parent)
+    explicit DeckListSortFilterProxyModel(QObject *parent = nullptr)
+        : QSortFilterProxyModel(parent), collator(makeNaturalSortCollator())
     {
-        collator = makeNaturalSortCollator();
     }
 
     void setSortCriteria(const QStringList &criteria)
