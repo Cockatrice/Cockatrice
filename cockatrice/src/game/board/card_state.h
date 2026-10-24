@@ -12,8 +12,6 @@
 #include <qtmetamacros.h>
 
 class CardZoneLogic;
-class CardItem;
-
 class CardState : public QObject
 {
     Q_OBJECT
@@ -35,7 +33,7 @@ private:
     QString color;
 
     CardState *attachedTo = nullptr;
-    QList<CardItem *> attachedCards;
+    QList<CardState *> attachedCards;
     CardZoneLogic *zone = nullptr;
 
 signals:
@@ -226,17 +224,17 @@ public:
 
     void setAttachedTo(CardState *_attachedTo);
 
-    void addAttachedCard(CardItem *card)
+    void addAttachedCard(CardState *card)
     {
         attachedCards.append(card);
     }
 
-    void removeAttachedCard(CardItem *card)
+    void removeAttachedCard(CardState *card)
     {
         attachedCards.removeOne(card);
     }
 
-    const QList<CardItem *> &getAttachedCards() const
+    const QList<CardState *> &getAttachedCards() const
     {
         return attachedCards;
     }
