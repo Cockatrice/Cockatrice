@@ -1,7 +1,5 @@
 #include "player_actions.h"
 
-#include "../../client/settings/cache_settings.h"
-#include "../../game_graphics/dialogs/dlg_create_token.h"
 #include "../abstract_game.h"
 #include "../board/arrow_data.h"
 #include "../board/card_state.h"
@@ -47,6 +45,8 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/deck_list/loaded_deck.h>
+#include <libcockatrice/interfaces/interface_card_preference_provider.h>
+#include <libcockatrice/interfaces/interface_interface_settings_provider.h>
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/command_change_zone_properties.pb.h>
 #include <libcockatrice/protocol/pb/command_create_arrow.pb.h>
@@ -65,8 +65,7 @@
 #include <libcockatrice/protocol/pb/command_set_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
 #include <libcockatrice/protocol/pb/command_undo_draw.pb.h>
-#include <libcockatrice/settings/card_override_settings.h>
-#include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/utility/clamped_arithmetic.h>
 #include <libcockatrice/utility/color.h>
 #include <libcockatrice/utility/counter_limits.h>
@@ -80,8 +79,11 @@
 // milliseconds in between triggers of the move top cards until action
 static constexpr int MOVE_TOP_CARD_UNTIL_INTERVAL = 100;
 
-PlayerActions::PlayerActions(PlayerLogic *_player)
-    : QObject(_player), player(_player), lastTokenTableRow(0), movingCardsUntil(false)
+PlayerActions::PlayerActions(PlayerLogic *_player,
+                             IInterfaceSettingsProvider *_interfaceSettings,
+                             ICardPreferenceProvider *_cardPreferences)
+    : QObject(_player), player(_player), interfaceSettings(_interfaceSettings), cardPreferences(_cardPreferences),
+      lastTokenTableRow(0), movingCardsUntil(false)
 {
     connect(this, &PlayerActions::requestZoneViewToggle, player, &PlayerLogic::onRequestZoneViewToggle);
 
@@ -89,6 +91,26 @@ PlayerActions::PlayerActions(PlayerLogic *_player)
     moveTopCardTimer->setInterval(MOVE_TOP_CARD_UNTIL_INTERVAL);
     moveTopCardTimer->setSingleShot(true);
     connect(moveTopCardTimer, &QTimer::timeout, [this]() { actMoveTopCardToPlay(); });
+}
+
+bool PlayerActions::getPlayToStack() const
+{
+    return interfaceSettings ? interfaceSettings->getPlayToStack() : true;
+}
+
+int PlayerActions::getStartingHandSize() const
+{
+    return interfaceSettings ? interfaceSettings->getStartingHandSize() : 7;
+}
+
+bool PlayerActions::getAnnotateTokens() const
+{
+    return interfaceSettings ? interfaceSettings->getAnnotateTokens() : false;
+}
+
+QString PlayerActions::getCardPreferenceOverride(const QString &cardName) const
+{
+    return cardPreferences ? cardPreferences->getCardPreferenceOverride(cardName) : QString();
 }
 
 void PlayerActions::playCard(CardState *card, bool faceDown)
@@ -112,7 +134,7 @@ void PlayerActions::playCard(CardState *card, bool faceDown)
     const CardInfo &info = exactCard.getInfo();
 
     int tableRow = info.getUiAttributes().tableRow;
-    bool playToStack = SettingsCache::instance().userInterface().getPlayToStack();
+    bool playToStack = getPlayToStack();
     QString currentZone = card->getZone()->getName();
     if (!faceDown && currentZone == ZoneNames::STACK && tableRow == 3) {
         cmd.set_target_zone(ZoneNames::GRAVE);
@@ -214,7 +236,7 @@ void PlayerActions::createArrow(CardState *startCard, const ArrowData &arrow, in
     // if the card is in hand then it has just been moved to the stack or table as part of drawing the arrow
     if (arrow.startZone == ZoneNames::HAND) {
         CardInfoPtr ci = startCard->getCard().getCardPtr();
-        bool playToStack = SettingsCache::instance().userInterface().getPlayToStack();
+        bool playToStack = getPlayToStack();
         if (ci && ((!playToStack && ci->getUiAttributes().tableRow == 3) ||
                    (playToStack && ci->getUiAttributes().tableRow != 0 &&
                     startCard->getZone()->getName() != ZoneNames::STACK))) {
@@ -409,7 +431,7 @@ void PlayerActions::actDrawCard()
 
 void PlayerActions::actRequestMulliganDialog()
 {
-    int startSize = SettingsCache::instance().userInterface().getStartingHandSize();
+    int startSize = getStartingHandSize();
     int handSize = player->getHandZone()->getCards().size();
     int deckSize = player->getDeckZone()->getCards().size() + handSize;
 
@@ -425,7 +447,7 @@ void PlayerActions::actMulligan(int number)
     }
 
     doMulligan(number);
-    SettingsCache::instance().userInterface().setStartingHandSize(number);
+    emit startingHandSizeChosen(number);
 }
 
 void PlayerActions::actMulliganSameSize()
@@ -974,13 +996,12 @@ void PlayerActions::setLastTokenInfo(CardInfoPtr cardInfo)
         return;
     }
 
-    lastTokenInfo = {
-        .name = cardInfo->getName(),
-        .color = cardInfo->getColors().isEmpty() ? QString() : cardInfo->getColors().left(1).toLower(),
-        .pt = cardInfo->getPowTough(),
-        .annotation = SettingsCache::instance().userInterface().getAnnotateTokens() ? cardInfo->getText() : "",
-        .destroy = true,
-        .providerId = SettingsCache::instance().cardOverrides().getCardPreferenceOverride(cardInfo->getName())};
+    lastTokenInfo = {.name = cardInfo->getName(),
+                     .color = cardInfo->getColors().isEmpty() ? QString() : cardInfo->getColors().left(1).toLower(),
+                     .pt = cardInfo->getPowTough(),
+                     .annotation = getAnnotateTokens() ? cardInfo->getText() : "",
+                     .destroy = true,
+                     .providerId = getCardPreferenceOverride(cardInfo->getName())};
 
     lastTokenTableRow = TableZoneLogic::tableRowToGridY(cardInfo->getUiAttributes().tableRow);
 
@@ -1208,7 +1229,7 @@ void PlayerActions::createCard(const CardState *sourceCard,
     }
 
     cmd.set_pt(cardInfo->getPowTough().toStdString());
-    if (SettingsCache::instance().userInterface().getAnnotateTokens()) {
+    if (getAnnotateTokens()) {
         cmd.set_annotation(cardInfo->getText().toStdString());
     } else {
         cmd.set_annotation("");

@@ -1,13 +1,13 @@
 #include "card_zone.h"
 
-#include "../../game/board/card_list.h"
-#include "../../game/zones/card_zone_logic.h"
 #include "../board/abstract_graphics_item.h"
 #include "../board/card_item.h"
 
 #include <QAction>
 #include <QGraphicsSceneMouseEvent>
 #include <QMenu>
+#include <libcockatrice/game/board/card_list.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
 #include <qnamespace.h>
 
 class QGraphicsItem;

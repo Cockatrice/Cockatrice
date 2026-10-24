@@ -7,7 +7,6 @@
 #ifndef CARDITEM_H
 #define CARDITEM_H
 
-#include "../../game/board/card_state.h"
 #include "abstract_card_item.h"
 #include "graphics_item_type.h"
 
@@ -16,6 +15,7 @@
 #include <QPointF>
 #include <QString>
 #include <QVariantList>
+#include <libcockatrice/game/board/card_state.h>
 #include <qtmetamacros.h>
 
 class CardDragItem;

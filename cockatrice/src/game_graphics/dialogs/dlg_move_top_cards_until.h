@@ -7,12 +7,11 @@
 #ifndef DLG_MOVE_TOP_CARDS_UNTIL_H
 #define DLG_MOVE_TOP_CARDS_UNTIL_H
 
-#include "../../game/player/move_top_cards_until_options.h"
-
 #include <QDialog>
 #include <QList>
 #include <QString>
 #include <QStringList>
+#include <libcockatrice/game/player/move_top_cards_until_options.h>
 #include <qtmetamacros.h>
 
 class FilterString;

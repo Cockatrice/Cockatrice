@@ -1,13 +1,13 @@
 #include "replay_manager.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../../game/player/event_processing_options.h"
 #include "libcockatrice/protocol/pb/game_event.pb.h"
 #include "libcockatrice/protocol/pb/game_event_container.pb.h"
 #include "libcockatrice/protocol/pb/game_replay.pb.h"
 
 #include <QTimer>
 #include <algorithm>
+#include <libcockatrice/game/player/event_processing_options.h>
 #include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <qnumeric.h>

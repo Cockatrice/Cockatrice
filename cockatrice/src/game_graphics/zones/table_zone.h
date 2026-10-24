@@ -18,6 +18,7 @@
 #include <QPoint>
 #include <QPointF>
 #include <QtGlobal>
+#include <libcockatrice/game/zones/table_zone_logic.h>
 #include <qtmetamacros.h>
 
 class CardDragItem;

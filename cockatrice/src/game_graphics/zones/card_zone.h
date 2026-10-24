@@ -16,11 +16,13 @@
 
 class CardDragItem;
 class CardItem;
+class CardState;
 class CardZoneLogic;
 class QAction;
 class QGraphicsItem;
 class QMenu;
 class QPoint;
+class ServerInfo_Card;
 template <typename T> class QList;
 
 class CardItem;

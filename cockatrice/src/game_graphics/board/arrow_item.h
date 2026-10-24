@@ -1,7 +1,6 @@
 #ifndef ARROWITEM_H
 #define ARROWITEM_H
 
-#include "../../game/board/arrow_data.h"
 #include "../animated_item.h"
 #include "arrow_target.h"
 #include "graphics_item_type.h"
@@ -18,6 +17,7 @@
 #include <QRectF>
 #include <QSharedPointer>
 #include <QtGlobal>
+#include <libcockatrice/game/board/arrow_data.h>
 #include <qtmetamacros.h>
 
 class CardItem;
