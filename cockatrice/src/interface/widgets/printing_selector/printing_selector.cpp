@@ -32,6 +32,7 @@
 #include <QVBoxLayout>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/utility/macros.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 /**
@@ -84,9 +85,7 @@ PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deck
     displayOptionsWidget->addSettingsWidget(cardSizeWidget);
 
     sortAndOptionsContainer = new QWidget(this);
-    sortAndOptionsLayout = new QHBoxLayout(sortAndOptionsContainer);
-    sortAndOptionsLayout->setSpacing(3);
-    sortAndOptionsLayout->setContentsMargins(0, 0, 0, 0);
+    sortAndOptionsLayout = QtUtils::makeLayout<QHBoxLayout>(sortAndOptionsContainer, 0, 3);
     sortAndOptionsContainer->setLayout(sortAndOptionsLayout);
 
     searchBar = new PrintingSelectorCardSearchWidget(this);

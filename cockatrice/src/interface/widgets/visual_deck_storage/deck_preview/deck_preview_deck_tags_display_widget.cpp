@@ -16,6 +16,7 @@
 #include <QHBoxLayout>
 #include <QSizePolicy>
 #include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <optional>
 #include <qnamespace.h>
 
@@ -26,8 +27,7 @@ DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_par
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
     // Create layout
-    auto *layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
+    auto *layout = QtUtils::makeLayout<QHBoxLayout>(this);
 
     setFixedHeight(100);
 

@@ -21,6 +21,7 @@
 #include <QToolButton>
 #include <QVBoxLayout>
 #include <libcockatrice/settings/deck_editor_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 template <class T> class QSharedPointer;
@@ -44,8 +45,7 @@ CommanderBracketWidget::CommanderBracketWidget(QWidget *parent) : QWidget(parent
 
     connect(bracketRefreshButton, &QToolButton::clicked, this, &CommanderBracketWidget::requestBracketEstimate);
 
-    auto *layout = new QGridLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
+    auto *layout = QtUtils::makeLayout<QGridLayout>(this);
     layout->addWidget(bracketLabel, 0, 0);
 
     auto *bracketRow = new QHBoxLayout;
@@ -110,8 +110,7 @@ bool CommanderBracketWidget::promptCommanderSpellbookIntegration()
 
     // Create label + explainer button
     auto *labelWidget = new QWidget(&dialog);
-    auto *labelLayout = new QHBoxLayout(labelWidget);
-    labelLayout->setContentsMargins(0, 0, 0, 0);
+    auto *labelLayout = QtUtils::makeLayout<QHBoxLayout>(labelWidget);
 
     auto *namingLabel = new QLabel(tr("Bracket naming:"), labelWidget);
     auto *explainerButton = new QToolButton(labelWidget);

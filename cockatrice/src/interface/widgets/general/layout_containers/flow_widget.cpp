@@ -48,8 +48,7 @@ FlowWidget::FlowWidget(QWidget *parent,
         setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     }
 
-    mainLayout = new QHBoxLayout(this);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout = QtUtils::makeLayout<QHBoxLayout>(this);
     setLayout(mainLayout);
 
     const bool useScrollArea = (horizontalPolicy != Qt::ScrollBarAlwaysOff || verticalPolicy != Qt::ScrollBarAlwaysOff);

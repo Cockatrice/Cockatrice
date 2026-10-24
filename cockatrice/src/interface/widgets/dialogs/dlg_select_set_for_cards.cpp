@@ -84,8 +84,7 @@ DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckStateManager *de
 
     // Left container
     QWidget *leftContainer = new QWidget(this);
-    QVBoxLayout *leftLayout = new QVBoxLayout(leftContainer);
-    leftLayout->setContentsMargins(0, 0, 0, 0);
+    QVBoxLayout *leftLayout = QtUtils::makeLayout<QVBoxLayout>(leftContainer);
 
     uneditedCardsLabel = new QLabel(this);
     uneditedCardsArea = QtUtils::makeScrollArea(this);
@@ -100,8 +99,7 @@ DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckStateManager *de
 
     // Right container
     QWidget *rightContainer = new QWidget(this);
-    QVBoxLayout *rightLayout = new QVBoxLayout(rightContainer);
-    rightLayout->setContentsMargins(0, 0, 0, 0);
+    QVBoxLayout *rightLayout = QtUtils::makeLayout<QVBoxLayout>(rightContainer);
 
     modifiedCardsLabel = new QLabel(this);
     modifiedCardsArea = QtUtils::makeScrollArea(this);

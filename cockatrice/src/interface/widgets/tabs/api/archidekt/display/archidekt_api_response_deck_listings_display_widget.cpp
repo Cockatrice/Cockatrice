@@ -11,6 +11,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QSlider>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 ArchidektApiResponseDeckListingsDisplayWidget::ArchidektApiResponseDeckListingsDisplayWidget(
@@ -19,8 +20,7 @@ ArchidektApiResponseDeckListingsDisplayWidget::ArchidektApiResponseDeckListingsD
     CardSizeWidget *_cardSizeSlider)
     : QWidget(parent), cardSizeSlider(_cardSizeSlider)
 {
-    layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout = QtUtils::makeLayout<QHBoxLayout>(this);
     setLayout(layout);
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
@@ -64,7 +64,5 @@ void ArchidektApiResponseDeckListingsDisplayWidget::append(const ArchidektDeckLi
 void ArchidektApiResponseDeckListingsDisplayWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-    layout->invalidate();
-    layout->activate();
-    layout->update();
+    QtUtils::relayout(layout);
 }
