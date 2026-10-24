@@ -4,6 +4,8 @@
 #include "../utility/report_utils.h"
 #include "abstract_client.h"
 #include "libcockatrice/protocol/pb/response.pb.h"
+#include "moderation_header_style.h"
+#include "moderation_tab_style.h"
 #include "report_status_delegate.h"
 #include "tab_supervisor.h"
 
@@ -123,6 +125,7 @@ TabReport::TabReport(TabSupervisor *_tabSupervisor, AbstractClient *_client) : T
     table->horizontalHeader()->setSectionResizeMode(COL_TIME, QHeaderView::ResizeToContents);
     table->horizontalHeader()->setSectionResizeMode(COL_REPORTED, QHeaderView::Stretch);
     table->horizontalHeader()->setSectionResizeMode(COL_REPORTER, QHeaderView::ResizeToContents);
+    table->horizontalHeader()->setStyle(new ModerationHeaderStyle(table->horizontalHeader()->style()));
     connect(table, &QTableWidget::itemSelectionChanged, this, &TabReport::onSelectionChanged);
     table->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(table, &QTableWidget::customContextMenuRequested, this, &TabReport::showTableContextMenu);
@@ -246,6 +249,7 @@ TabReport::TabReport(TabSupervisor *_tabSupervisor, AbstractClient *_client) : T
     });
 
     detailTabs = new QTabWidget;
+    detailTabs->tabBar()->setStyle(new ModerationTabStyle(detailTabs->tabBar()->style()));
     detailTabs->addTab(descPage, QString());
     detailTabs->addTab(chatPage, QString());
     detailTabs->addTab(commentsPage, QString());
