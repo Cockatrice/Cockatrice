@@ -6,8 +6,8 @@
 #   git push upstream <tag>
 #
 # Tag convention (see cmake/getversion.cmake):
-#   first beta for a version:  YYYY-MM-DD-Development-X.Y.Z-beta
-#   subsequent betas:           YYYY-MM-DD-Development-X.Y.Z-beta.2, .3, ...
+#   First beta for a version:  YYYY-MM-DD-Development-X.Y.Z-beta
+#   Subsequent betas:          YYYY-MM-DD-Development-X.Y.Z-beta.2, .3, ...
 # Version defaults to the PROJECT VERSION in CMakeLists.txt.
 #
 # Usage:
@@ -15,9 +15,9 @@
 
 set -euo pipefail
 
+VERSION=""
 REMOTE="upstream"
 BRANCH="master"
-VERSION=""
 DRY_RUN=0
 ASSUME_YES=0
 
@@ -29,8 +29,8 @@ Options:
   --version X.Y.Z   Version to tag (default: parsed from CMakeLists.txt)
   --remote NAME     Remote to update and push the tag to (default: upstream)
   --branch NAME     Branch to tag from (default: master)
-  --dry-run         Print what would be done without creating/pushing the tag
-  --yes             Skip the confirmation prompt
+  --dry-run         Print what would be done without creating/pushing the tag (default: false)
+  --yes             Skip the confirmation prompt (default: false)
   -h, --help        Show this help
 EOF
 }
@@ -128,7 +128,7 @@ PATTERN="*-Development-${VERSION}-beta*"
 
 # Highest beta number used so far for this version.
 # A bare "-beta" (no suffix) counts as 1; "-beta.N" counts as N.
-MAX_BETA=0
+BETA_COUNT=0
 while IFS= read -r tag; do
     [[ -n "$tag" ]] || continue
     if [[ "$tag" =~ -beta\.([0-9]+)$ ]]; then
@@ -138,12 +138,12 @@ while IFS= read -r tag; do
     else
         continue
     fi
-    if [[ "$NUM" -gt "$MAX_BETA" ]]; then
-        MAX_BETA="$NUM"
+    if [[ "$NUM" -gt "$BETA_COUNT" ]]; then
+        BETA_COUNT="$NUM"
     fi
 done < <(git tag --list "$PATTERN")
 
-NEXT_BETA=$((MAX_BETA + 1))
+NEXT_BETA=$((BETA_COUNT + 1))
 if [[ "$NEXT_BETA" -le 1 ]]; then
     NEW_TAG="${DATE}-Development-${VERSION}-beta"
 else
@@ -152,7 +152,7 @@ fi
 
 echo ""
 echo "Version:      $VERSION"
-echo "Latest beta:  $MAX_BETA (for $VERSION)"
+echo "Latest beta:  $BETA_COUNT (for $VERSION)"
 echo "New tag:      $NEW_TAG"
 echo "Head:         $(git rev-parse --short HEAD) $(git log -1 --oneline | head -c 120)"
 echo ""
