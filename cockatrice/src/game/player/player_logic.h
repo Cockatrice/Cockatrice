@@ -104,7 +104,7 @@ public:
     void processCardAttachment(const ServerInfo_Player &info);
 
     void addCard(CardItem *c);
-    void deleteCard(CardItem *c);
+    void deleteCard(CardState *c);
 
     bool clearCardsToDelete();
 
@@ -256,7 +256,7 @@ private:
     QMap<int, CounterState *> counters;
 
     bool dialogSemaphore;
-    QList<CardItem *> cardsToDelete;
+    QList<CardState *> cardsToDelete;
 
     // Playmat from player properties (for opponent display)
     CardRef remotePlaymatCard;

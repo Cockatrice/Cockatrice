@@ -23,6 +23,8 @@ class QMenu;
 class QPoint;
 template <typename T> class QList;
 
+class CardItem;
+
 inline Q_LOGGING_CATEGORY(CardZoneLog, "card_zone");
 
 /**
@@ -55,7 +57,7 @@ public slots:
      * Virtual so subclasses (e.g. SelectZone) can override parenting behavior — the Qt signal
      * connection in CardZone's constructor dispatches through the vtable.
      */
-    virtual void onCardAdded(CardItem *addedCard);
+    virtual void onCardAdded(CardState *addedCard);
 
 public:
     enum

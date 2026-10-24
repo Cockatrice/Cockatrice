@@ -1,7 +1,7 @@
 #include "pile_zone_logic.h"
 
-#include "../../game_graphics/board/card_item.h"
 #include "../board/card_list.h"
+#include "../board/card_state.h"
 
 class PlayerLogic;
 class QObject;
@@ -16,9 +16,9 @@ PileZoneLogic::PileZoneLogic(PlayerLogic *_player,
 {
 }
 
-void PileZoneLogic::addCardImpl(CardItem *card, int x, int /*y*/)
+void PileZoneLogic::addCardImpl(CardState *card, int x, int /*y*/)
 {
-    connect(card->getState(), &CardState::cardPixmapUpdated, this, &PileZoneLogic::callUpdate);
+    connect(card, &CardState::cardPixmapUpdated, this, &PileZoneLogic::callUpdate);
     // if x is negative set it to add at end
     if (x < 0 || x >= cards.size()) {
         x = cards.size();
@@ -32,5 +32,5 @@ void PileZoneLogic::addCardImpl(CardItem *card, int x, int /*y*/)
             cards.at(x + 1)->setCardRef({});
         }
     }
-    card->resetState();
+    card->resetState(false);
 }
