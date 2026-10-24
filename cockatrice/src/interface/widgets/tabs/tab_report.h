@@ -16,8 +16,8 @@ class QGroupBox;
 class QLabel;
 class QLineEdit;
 class QPushButton;
-class QSplitter;
 class QTableWidget;
+class QTabWidget;
 class QTextEdit;
 class QTimer;
 class GameReplay;
@@ -71,6 +71,9 @@ private:
     void applyFilters();
     void updateStats();
     void loadReportDetails(int reportId);
+    void updateReportHeader(const ServerInfo_Report &report);
+    void clearReportHeader();
+    void clearUserContext();
 
     AbstractClient *client;
 
@@ -80,10 +83,10 @@ private:
     QPushButton *refreshButton;
     QLabel *statsLabel;
     QTableWidget *table;
-    QSplitter *detailSplitter;
-    QGroupBox *descGroup;
-    QGroupBox *chatGroup;
-    QGroupBox *commentsGroup;
+    QLabel *reportHeaderName;
+    QLabel *reportHeaderStatus;
+    QLabel *reportHeaderSubline;
+    QTabWidget *detailTabs;
     QTextEdit *descriptionEdit;
     QTextEdit *chatLogEdit;
     QTextEdit *commentsEdit;
@@ -99,7 +102,6 @@ private:
     QTimer *refreshTimer;
     UserContextMenu *userContextMenu;
 
-    QGroupBox *userContextGroup;
     QLabel *userContextName;
     QLabel *userContextAccountAge;
     QLabel *userContextReports;
@@ -124,6 +126,7 @@ private:
 
     QList<ServerInfo_Report> allReports;
     QList<ServerInfo_Report> filteredReports;
+    int headerReportId = -1;
     int detailsRequestedReportId = -1;
     int detailsRequestSeq = 0;
     int selectedReportIdBeforeRefresh = -1;
