@@ -171,11 +171,13 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
 
     publishDate = release->getPublishDate().toString(QLocale().dateFormat(QLocale::LongFormat));
     if (isCompatible) {
-        if (QtUtils::confirm(window(), tr("Update Available"),
-                             tr("A new version of Cockatrice is available!") + "<br><br>" + "<b>" + tr("New version") +
-                                 QString(":</b> %1<br>").arg(release->getName()) + "<b>" + tr("Released") +
-                                 QString(":</b> %1 (<a href=\"%2\">").arg(publishDate, release->getDescriptionUrl()) +
-                                 tr("Changelog") + "</a>)<br><br>" + tr("Do you want to update now?"))) {
+        const QString message = tr("A new version of Cockatrice is available!") + "<br><br>" + "<b>" +
+                                tr("New version") + QString(":</b> %1<br>").arg(release->getName()) + "<b>" +
+                                tr("Released") +
+                                QString(":</b> %1 (<a href=\"%2\">").arg(publishDate, release->getDescriptionUrl()) +
+                                tr("Changelog") + "</a>)<br><br>" + tr("Do you want to update now?");
+
+        if (QtUtils::confirm(window(), tr("Update Available"), message)) {
             downloadUpdate(release->getName());
         } else {
             closeDialog();
