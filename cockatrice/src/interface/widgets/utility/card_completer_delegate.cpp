@@ -1,5 +1,6 @@
 #include "card_completer_delegate.h"
 
+#include "../../interface/theme_manager.h"
 #include "../../pixel_map_generator.h"
 #include "../cards/additional_info/mana_cost_widget.h"
 #include "libcockatrice/card/database/card_database_querier.h"
@@ -181,7 +182,7 @@ void CardCompleterDelegate::drawManaSymbol(QPainter *p, QPoint centre, const QSt
     p->setBrush(Qt::NoBrush);
     p->drawEllipse(pip.adjusted(1, 1, -1, -1));
 
-    QFont f = p->font();
+    QFont f = themeManager->appFont(AppFont::CardText);
     f.setPixelSize(qMax(radius - 1, 7));
     f.setBold(true);
 
@@ -429,7 +430,7 @@ void CardCompleterDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         const QRect nameRect = showInfoBand ? QRect(textLeft, rect.top() + 2, textWidth, 20)
                                             : QRect(textLeft, rect.top() + 2, textWidth, rect.height() - 4);
 
-        QFont f = option.font;
+        QFont f = themeManager->appFont(AppFont::CardText);
         f.setPixelSize(13);
         f.setBold(true);
 
@@ -451,7 +452,7 @@ void CardCompleterDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     if (showInfoBand) {
         const QRect infoRect(textLeft, rect.top() + 22, textWidth, rect.height() - 24);
 
-        QFont f = option.font;
+        QFont f = themeManager->appFont(AppFont::CardText);
         f.setPixelSize(10);
 
         painter->setFont(f);

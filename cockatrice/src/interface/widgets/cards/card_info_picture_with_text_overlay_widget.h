@@ -47,6 +47,9 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     [[nodiscard]] QSize minimumSizeHint() const override;
 
+private slots:
+    void applyCardTextFont();
+
 private:
     void drawOutlinedText(QPainter &painter,
                           const QRect &textRect,
