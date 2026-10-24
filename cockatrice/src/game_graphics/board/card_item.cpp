@@ -63,6 +63,14 @@ CardItem::CardItem(PlayerLogic *_owner,
             update();
         }
     });
+
+    connect(state, &CardState::stateReset, this, [this] {
+        attachedCards.clear();
+        if (scene()) {
+            static_cast<GameScene *>(scene())->unregisterAnimationItem(this);
+        }
+        update();
+    });
 }
 
 void CardItem::prepareDelete()
@@ -250,13 +258,6 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
 void CardItem::resetState(bool keepAnnotations)
 {
     state->resetState(keepAnnotations);
-    attachedCards.clear();
-    setTapped(false, false);
-    setDoesntUntap(false);
-    if (scene()) {
-        static_cast<GameScene *>(scene())->unregisterAnimationItem(this);
-    }
-    update();
 }
 
 void CardItem::processCardInfo(const ServerInfo_Card &_info)
