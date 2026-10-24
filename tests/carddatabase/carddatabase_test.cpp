@@ -26,6 +26,7 @@
 #include <libcockatrice/card/database/parser/cockatrice_xml_4.h>
 #include <libcockatrice/card/lazy_properties_hash.h>
 #include <libcockatrice/card/printing/printing_info.h>
+#include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/interfaces/interface_card_database_path_provider.h>
 #include <libcockatrice/interfaces/interface_card_set_priority_controller.h>
 #include <libcockatrice/interfaces/noop_card_preference_provider.h>
@@ -122,6 +123,32 @@ TEST(CardDatabaseTest, FindPrintingWithIdOnNullCardInfoReturnsEmpty)
     CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
 
     EXPECT_TRUE(db.query()->findPrintingWithId(nullptr, "card_Not a Card_fixture").isEmpty());
+}
+
+TEST(CardInfoTest, ClearDirectRelationsDropsRawPointers)
+{
+    auto *forward = new CardRelation("Child");
+    auto *reverse = new CardRelation("Parent");
+    auto *toMe = new CardRelation("Child");
+
+    auto card = CardInfo::newInstance("Parent", "", false, QHash<QString, QString>(), {forward}, {reverse},
+                                      SetToPrintingsMap(), CardInfo::UiAttributes());
+    card->addReverseRelatedCards2Me(toMe);
+    ASSERT_EQ(1, card->getRelatedCards().size());
+    ASSERT_EQ(1, card->getReverseRelatedCards().size());
+    ASSERT_EQ(1, card->getReverseRelatedCards2Me().size());
+    ASSERT_EQ(2, card->getAllRelatedCards().size());
+
+    card->clearDirectRelations();
+
+    EXPECT_TRUE(card->getRelatedCards().isEmpty());
+    EXPECT_TRUE(card->getReverseRelatedCards().isEmpty());
+    EXPECT_TRUE(card->getReverseRelatedCards2Me().isEmpty());
+    EXPECT_TRUE(card->getAllRelatedCards().isEmpty());
+
+    delete forward;
+    delete reverse;
+    delete toMe;
 }
 
 TEST(CardDatabaseTest, Xml4LocalizedDataRoundTrip)
