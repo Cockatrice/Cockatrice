@@ -77,11 +77,11 @@ static inline void clearLayoutRec(QLayout *l, DeletePolicy policy = DeletePolicy
  * @brief Creates a layout of type @c LayoutT with zero margins.
  *
  * @param parent  Parent widget, or nullptr when the layout is added later.
- * @param margin  Uniform margin. Defaults to zero.
  * @param spacing Optional spacing. Values below zero leave the style's default spacing
  *                untouched; pass a non-negative value to call setSpacing().
+ * @param margin  Uniform margin. Defaults to zero.
  */
-template <typename LayoutT> LayoutT *makeLayout(QWidget *parent = nullptr, int margin = 0, int spacing = -1)
+template <typename LayoutT> LayoutT *makeLayout(QWidget *parent = nullptr, int spacing = -1, int margin = 0)
 {
     auto *layout = new LayoutT(parent);
     layout->setContentsMargins(margin, margin, margin, margin);
@@ -97,7 +97,7 @@ template <typename LayoutT> LayoutT *makeLayout(QWidget *parent = nullptr, int m
  * Convenience for the invalidate/activate/update sequence used after changing a layout's
  * contents outside of a resize event.
  */
-static inline void relayout(QLayout *layout)
+inline void relayout(QLayout *layout)
 {
     if (!layout) {
         return;
