@@ -558,6 +558,9 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
         widget->update();
     }
 
+    // Palette-only previews do not run themeChangedSlot(), so drop snapshots
+    // generated under the previous palette here as well.
+    clearPixmapGeneratorCaches();
     emit paletteChanged();
 }
 
