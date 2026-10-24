@@ -1,10 +1,6 @@
 #include "pile_zone_logic.h"
 
-#include "../board/card_list.h"
 #include "../board/card_state.h"
-
-class PlayerLogic;
-class QObject;
 
 PileZoneLogic::PileZoneLogic(PlayerLogic *_player,
                              const QString &_name,
