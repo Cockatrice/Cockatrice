@@ -62,7 +62,8 @@ TableZone::TableZone(TableZoneLogic *_logic, bool _mirrored, QGraphicsItem *pare
 
     updateBg();
 
-    height = MARGIN_TOP + MARGIN_BOTTOM + TABLEROWS * CardDimensions::HEIGHT + (TABLEROWS - 1) * PADDING_Y;
+    height = MARGIN_TOP + MARGIN_BOTTOM + TableZoneLogic::ROW_COUNT * CardDimensions::HEIGHT +
+             (TableZoneLogic::ROW_COUNT - 1) * PADDING_Y;
     width = MIN_WIDTH;
     currentMinimumWidth = width;
 
@@ -397,7 +398,7 @@ QPointF TableZone::mapFromGrid(QPoint gridPoint) const
     }
 
     if (isInverted()) {
-        gridPoint.setY(TABLEROWS - 1 - gridPoint.y());
+        gridPoint.setY(TableZoneLogic::ROW_COUNT - 1 - gridPoint.y());
     }
 
     // Start with margin plus stacked card offset
@@ -423,10 +424,10 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
     const int gridPointHeight = CardDimensions::HEIGHT + PADDING_Y;
     int gridPointY = (y + PADDING_Y / 2) / gridPointHeight;
 
-    gridPointY = clampValidTableRow(gridPointY);
+    gridPointY = TableZoneLogic::clampValidTableRow(gridPointY);
 
     if (isInverted()) {
-        gridPointY = TABLEROWS - 1 - gridPointY;
+        gridPointY = TableZoneLogic::ROW_COUNT - 1 - gridPointY;
     }
 
     // Calculating the x-coordinate of the grid space requires adding up the
@@ -470,23 +471,4 @@ QPointF TableZone::closestGridPoint(const QPointF &point)
         gridPoint.setX(gridPoint.x() + 1);
     }
     return mapFromGrid(gridPoint);
-}
-
-int TableZone::clampValidTableRow(const int row)
-{
-    if (row < 0) {
-        return 0;
-    }
-    if (row >= TABLEROWS) {
-        return TABLEROWS - 1;
-    }
-    return row;
-}
-
-int TableZone::tableRowToGridY(int tableRow)
-{
-    if (tableRow > 2) {
-        tableRow = 1;
-    }
-    return clampValidTableRow(2 - tableRow);
 }
