@@ -1,5 +1,6 @@
 #include "deck_loader.h"
 
+#include "../theme_manager.h"
 #include "libcockatrice/card/card_info.h"
 #include "libcockatrice/card/database/card_database_querier.h"
 #include "libcockatrice/deck_list/tree/abstract_deck_list_card_node.h"
@@ -579,6 +580,8 @@ void DeckLoader::printDeckListNode(QTextCursor *cursor, const InnerDecklistNode 
     if (!cards.isEmpty()) {
         QTextBlockFormat blockFormat;
         QTextCharFormat charFormat;
+        // Family comes from the DeckList theme role; sizes/weights unchanged.
+        charFormat.setFontFamilies({themeManager->appFont(AppFont::DeckList).family()});
         charFormat.setFontPointSize(11);
         charFormat.setFontWeight(QFont::Bold);
         cursor->insertBlock(blockFormat, charFormat);
@@ -592,6 +595,7 @@ void DeckLoader::printDeckListNode(QTextCursor *cursor, const InnerDecklistNode 
             const AbstractDecklistCardNode *card = cards[i];
 
             QTextCharFormat cellCharFormat;
+            cellCharFormat.setFontFamilies({themeManager->appFont(AppFont::DeckList).family()});
             cellCharFormat.setFontPointSize(9);
 
             QTextTableCell cell = table->cellAt(i, 0);
@@ -613,6 +617,7 @@ void DeckLoader::printDeckListNode(QTextCursor *cursor, const InnerDecklistNode 
 
         QTextBlockFormat blockFormat;
         QTextCharFormat charFormat;
+        charFormat.setFontFamilies({themeManager->appFont(AppFont::DeckList).family()});
         charFormat.setFontPointSize(14);
         charFormat.setFontWeight(QFont::Bold);
 
@@ -640,7 +645,8 @@ void DeckLoader::printDeckList(QPrinter *printer, const DeckList &deckList)
 {
     QTextDocument doc;
 
-    QFont font("Serif");
+    // Family comes from the DeckList theme role; the print sizes/weights below stay unchanged.
+    QFont font = themeManager->appFont(AppFont::DeckList);
     font.setStyleHint(QFont::Serif);
     doc.setDefaultFont(font);
 
@@ -648,6 +654,7 @@ void DeckLoader::printDeckList(QPrinter *printer, const DeckList &deckList)
 
     QTextBlockFormat headerBlockFormat;
     QTextCharFormat headerCharFormat;
+    headerCharFormat.setFontFamilies({themeManager->appFont(AppFont::DeckList).family()});
     headerCharFormat.setFontPointSize(16);
     headerCharFormat.setFontWeight(QFont::Bold);
 

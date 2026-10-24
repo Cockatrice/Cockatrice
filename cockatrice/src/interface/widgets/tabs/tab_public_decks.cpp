@@ -5,6 +5,7 @@
 #include "../../deck_loader/loaded_deck.h"
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
+#include "../interface/theme_manager.h"
 #include "../visual_deck_storage/deck_preview/deck_preview_color_identity_filter_widget.h"
 #include "../visual_deck_storage/deck_preview/public_deck_preview_widget.h"
 #include "../visual_deck_storage/remote_public_decks_model.h"
@@ -44,9 +45,15 @@ TabPublicDecks::TabPublicDecks(TabSupervisor *_tabSupervisor, AbstractClient *_c
     cardSize = SettingsCache::instance().cardsDisplay().getVisualDeckStorageCardSize();
 
     titleLabel = new QLabel(tr("Public decks of %1").arg(userName.toHtmlEscaped()), this);
-    QFont titleFont = titleLabel->font();
+    // Family comes from the InterfaceDefault theme role; bold stays caller-side.
+    QFont titleFont = themeManager->appFont(AppFont::InterfaceDefault);
     titleFont.setBold(true);
     titleLabel->setFont(titleFont);
+    connect(themeManager, &ThemeManager::fontsChanged, this, [this]() {
+        QFont refreshedFont = themeManager->appFont(AppFont::InterfaceDefault);
+        refreshedFont.setBold(true);
+        titleLabel->setFont(refreshedFont);
+    });
 
     auto *headerLayout = new QHBoxLayout;
     headerLayout->addWidget(titleLabel);

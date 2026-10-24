@@ -2,6 +2,7 @@
 
 #include "../deck_share/shared_deck_preview_widget.h"
 #include "../general/layout_containers/flow_widget.h"
+#include "../interface/theme_manager.h"
 
 #include <QAbstractButton>
 #include <QDateTime>
@@ -34,10 +35,17 @@ DlgSharedDecksPreview::DlgSharedDecksPreview(QWidget *parent,
     // QLabels render AutoText and markup would otherwise be shown as rich text.
     auto *titleLabel =
         new QLabel(tr("Share: %1").arg((shareName.isEmpty() ? tr("Untitled") : shareName).toHtmlEscaped()), this);
-    QFont titleFont = titleLabel->font();
+    // Family comes from the InterfaceDefault theme role; the +2 size and bold stay caller-side.
+    QFont titleFont = themeManager->appFont(AppFont::InterfaceDefault);
     titleFont.setBold(true);
     titleFont.setPointSize(titleFont.pointSize() + 2);
     titleLabel->setFont(titleFont);
+    connect(themeManager, &ThemeManager::fontsChanged, this, [titleLabel]() {
+        QFont refreshedFont = themeManager->appFont(AppFont::InterfaceDefault);
+        refreshedFont.setBold(true);
+        refreshedFont.setPointSize(refreshedFont.pointSize() + 2);
+        titleLabel->setFont(refreshedFont);
+    });
     mainLayout->addWidget(titleLabel);
 
     if (!serverText.isEmpty()) {

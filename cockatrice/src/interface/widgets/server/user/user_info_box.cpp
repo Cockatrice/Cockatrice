@@ -1,6 +1,7 @@
 #include "user_info_box.h"
 
 #include "../../interface/pixel_map_generator.h"
+#include "../../interface/theme_manager.h"
 #include "../../interface/widgets/dialogs/dlg_edit_avatar.h"
 #include "../../interface/widgets/dialogs/dlg_edit_password.h"
 #include "../../interface/widgets/dialogs/dlg_edit_user.h"
@@ -39,10 +40,8 @@
 UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *parent, Qt::WindowFlags flags)
     : QWidget(parent, flags), client(_client), editable(_editable)
 {
-    QFont nameFont = nameLabel.font();
-    nameFont.setBold(true);
-    nameFont.setPointSizeF(nameFont.pointSizeF() * 1.5);
-    nameLabel.setFont(nameFont);
+    applyInterfaceDefaultFont();
+    connect(themeManager, &ThemeManager::fontsChanged, this, &UserInfoBox::applyInterfaceDefaultFont);
 
     auto *userIconAndNameLayout = new QHBoxLayout;
     userIconAndNameLayout->addWidget(&userLevelIcon, 0, Qt::AlignCenter);
@@ -90,6 +89,16 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
     setWindowTitle(tr("User Information"));
     setLayout(mainLayout);
     retranslateUi();
+}
+
+void UserInfoBox::applyInterfaceDefaultFont()
+{
+    // Family comes from the InterfaceDefault theme role; the *1.5 size
+    // multiplier and bold weight stay caller-side as before.
+    QFont nameFont = themeManager->appFont(AppFont::InterfaceDefault);
+    nameFont.setBold(true);
+    nameFont.setPointSizeF(nameFont.pointSizeF() * 1.5);
+    nameLabel.setFont(nameFont);
 }
 
 void UserInfoBox::retranslateUi()
