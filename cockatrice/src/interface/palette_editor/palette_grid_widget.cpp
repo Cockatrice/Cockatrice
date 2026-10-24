@@ -66,8 +66,7 @@ static const QMap<AppColor::Role, const char *> APP_ROLE_DESCRIPTIONS = {
 
 PaletteGridWidget::PaletteGridWidget(QWidget *parent) : QWidget(parent)
 {
-    scroll = new QScrollArea(this);
-    scroll->setWidgetResizable(true);
+    scroll = QtUtils::makeScrollArea(this, Qt::ScrollBarAsNeeded, Qt::ScrollBarAsNeeded);
     scroll->setFrameShape(QFrame::NoFrame);
 
     gridHost = new QWidget;
