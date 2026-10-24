@@ -17,6 +17,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 
 DlgDefaultTagsEditor::DlgDefaultTagsEditor(QWidget *parent) : QDialog(parent)
 {
@@ -120,8 +121,7 @@ void DlgDefaultTagsEditor::addItem()
     // Add new tag
     auto *item = new QListWidgetItem(listWidget);
     QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-    layout->setContentsMargins(0, 0, 0, 0);
+    QHBoxLayout *layout = QtUtils::makeLayout<QHBoxLayout>(widget);
 
     // Editable tag label
     QLineEdit *lineEdit = new QLineEdit(newTag, this);

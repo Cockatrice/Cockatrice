@@ -210,8 +210,7 @@ TabReport::TabReport(TabSupervisor *_tabSupervisor, AbstractClient *_client) : T
     sgLayout->addWidget(statsTrendLabel);
     sgLayout->addWidget(statsCategoriesLabel);
     sgLayout->addWidget(statsDetailText);
-    auto *statsGroupLayout = new QVBoxLayout(statsGroup);
-    statsGroupLayout->setContentsMargins(0, 0, 0, 0);
+    auto *statsGroupLayout = QtUtils::makeLayout<QVBoxLayout>(statsGroup);
     statsGroupLayout->addWidget(statsContent);
     statsGroup->setChecked(true);
     connect(statsGroup, &QGroupBox::toggled, this, [this, statsContent](bool checked) {

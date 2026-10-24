@@ -22,6 +22,7 @@
 #include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/filters/filter_tree.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 VisualDatabaseDisplaySubTypeFilterWidget::VisualDatabaseDisplaySubTypeFilterWidget(QWidget *parent,
@@ -47,8 +48,7 @@ VisualDatabaseDisplaySubTypeFilterWidget::VisualDatabaseDisplaySubTypeFilterWidg
     layout->addWidget(flowWidget);
 
     // Create a container for the threshold control
-    auto *thresholdLayout = new QHBoxLayout();
-    thresholdLayout->setContentsMargins(0, 0, 0, 0);
+    auto *thresholdLayout = QtUtils::makeLayout<QHBoxLayout>();
 
     thresholdLabel = new QLabel(this);
     thresholdLayout->addWidget(thresholdLabel);

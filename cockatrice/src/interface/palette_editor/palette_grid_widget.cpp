@@ -18,6 +18,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QtGlobal>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 #include <utility>
 
@@ -74,8 +75,7 @@ PaletteGridWidget::PaletteGridWidget(QWidget *parent) : QWidget(parent)
     refreshChromePalettes();
     scroll->setWidget(gridHost);
 
-    layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout = QtUtils::makeLayout<QVBoxLayout>(this);
     layout->addWidget(scroll);
 }
 

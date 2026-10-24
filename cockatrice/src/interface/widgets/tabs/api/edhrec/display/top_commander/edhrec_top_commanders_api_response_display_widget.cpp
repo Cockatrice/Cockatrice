@@ -48,9 +48,7 @@ void EdhrecTopCommandersApiResponseDisplayWidget::resizeEvent(QResizeEvent *even
 {
     QWidget::resizeEvent(event);
     qDebug() << event->size();
-    layout->invalidate();
-    layout->activate();
-    layout->update();
+    QtUtils::relayout(layout);
     if (scrollArea && scrollArea->widget()) {
         scrollArea->widget()->resize(event->size());
     }

@@ -17,6 +17,7 @@
 #include <QPushButton>
 #include <QStackedWidget>
 #include <QVBoxLayout>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 #include <utility>
 
@@ -51,8 +52,7 @@ FirstRunWizard::FirstRunWizard(QWidget *parent) : QDialog(parent)
     connect(skipButton, &QPushButton::clicked, this, &FirstRunWizard::skip);
     connect(nextButton, &QPushButton::clicked, this, &FirstRunWizard::goNext);
 
-    auto *headerLayout = new QVBoxLayout;
-    headerLayout->setContentsMargins(0, 0, 0, 0);
+    auto *headerLayout = QtUtils::makeLayout<QVBoxLayout>();
     headerLayout->addWidget(bannerHost);
     headerLayout->addSpacing(12);
     headerLayout->addWidget(titleLabel);

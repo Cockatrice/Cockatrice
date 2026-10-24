@@ -25,6 +25,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <initializer_list>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 PaletteEditorDialog::PaletteEditorDialog(const QString &_themeDirPath, const QString &_themeName, QWidget *parent)
@@ -57,9 +58,7 @@ PaletteEditorDialog::PaletteEditorDialog(const QString &_themeDirPath, const QSt
 
 void PaletteEditorDialog::setupUi()
 {
-    auto *root = new QVBoxLayout(this);
-    root->setSpacing(0);
-    root->setContentsMargins(0, 0, 0, 0);
+    auto *root = QtUtils::makeLayout<QVBoxLayout>(this, 0, 0);
 
     // Header
     header = new QWidget;
