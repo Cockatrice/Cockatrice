@@ -2,6 +2,7 @@
 #define COCKATRICE_THEME_CONFIG_H
 
 #include <QColor>
+#include <QFont>
 #include <QMap>
 #include <QPalette>
 #include <QSharedPointer>
@@ -22,6 +23,23 @@ enum Role
 };
 Q_ENUM_NS(Role)
 } // namespace AppColor
+
+// Application-specific font roles, one configurable family + point size per
+// purpose. Stored in a shared fonts.toml under a [Fonts] section (one file per
+// theme, not split by light/dark). Only family and point size are stored;
+// weight/italic are stripped on load and stay caller-side concerns.
+namespace AppFont
+{
+Q_NAMESPACE
+enum Role
+{
+    InterfaceDefault,
+    ChatLog,
+    CardText,
+    DeckList,
+};
+Q_ENUM_NS(Role)
+} // namespace AppFont
 
 struct ThemeConfig
 {
@@ -58,6 +76,35 @@ struct PaletteConfig
     static PaletteConfig fromDefault(const QString &themeDirPath, const QString &colorScheme);
 
     QPalette apply(QPalette base) const;
+};
+
+/** @brief Per-purpose font configuration, stored as family + point size only.
+ *
+ * Serialized to a shared fonts.toml file with a [Fonts] section, e.g.
+ * @code
+ * [Fonts]
+ * InterfaceDefault = "Inter, 10"
+ * @endcode
+ */
+struct FontConfig
+{
+    QMap<AppFont::Role, QFont> fonts;
+
+    bool operator==(const FontConfig &rhs) const
+    {
+        return fonts == rhs.fonts;
+    }
+    bool operator!=(const FontConfig &rhs) const
+    {
+        return !(*this == rhs);
+    }
+    bool hasFonts() const;
+    QString toToml() const;
+
+    static QString fileName();
+
+    static FontConfig fromFile(const QString &filePath);
+    static FontConfig fromThemeDir(const QString &themeDirPath);
 };
 
 #endif // COCKATRICE_THEME_CONFIG_H
