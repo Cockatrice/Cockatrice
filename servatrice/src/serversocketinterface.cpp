@@ -2577,7 +2577,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetUserAlts(const Comma
 
     Response_UserAlts *re = new Response_UserAlts;
     const int depth = cmd.has_depth() ? static_cast<int>(cmd.depth()) : 1;
-    const QList<ServerInfo_UserAlt> alts = sqlInterface->getUserAlts(userName, depth);
+    const int sessionMonths = cmd.has_session_months() ? static_cast<int>(cmd.session_months()) : 6;
+    const QList<ServerInfo_UserAlt> alts = sqlInterface->getUserAlts(
+        userName, depth, cmd.include_email(), cmd.include_clientid(), cmd.include_ip(), sessionMonths);
     for (const ServerInfo_UserAlt &alt : alts) {
         re->add_alts()->CopyFrom(alt);
     }
