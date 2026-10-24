@@ -277,7 +277,7 @@ bool UserListTWI::operator<(const QTreeWidgetItem &other) const
     // QCollator caches the locale data, unlike QString::localeAwareCompare,
     // which rebuilds it for every pair. The tree sorts one list at a time, so a
     // single shared, immutable collator is enough.
-    static const QCollator collator = makeNaturalSortCollator();
+    static const QCollator collator = NaturalSort::makeNaturalSortCollator();
 
     // Sort by online/offline
     if (data(0, UserListRoles::Online) != other.data(0, UserListRoles::Online)) {

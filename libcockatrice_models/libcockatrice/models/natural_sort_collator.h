@@ -4,6 +4,9 @@
 #include <QCollator>
 #include <QLocale>
 
+namespace NaturalSort
+{
+
 /**
  * @brief A collator that compares runs of digits numerically, whatever the process locale is.
  *
@@ -21,5 +24,7 @@ inline QCollator makeNaturalSortCollator()
     }
     return collator;
 }
+
+} // namespace NaturalSort
 
 #endif // NATURAL_SORT_COLLATOR_H
