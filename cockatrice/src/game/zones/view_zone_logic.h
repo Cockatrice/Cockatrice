@@ -12,6 +12,7 @@
 
 class PlayerLogic;
 class QObject;
+class PendingCommand;
 
 class ZoneViewZoneLogic : public CardZoneLogic
 {
@@ -72,6 +73,16 @@ public:
     {
         return origZone;
     }
+
+    /**
+     * @brief Prepares and sends the zone-dump command for this view.
+     * @return The pending command, or nullptr when there is no zone to dump.
+     *
+     * Keeps command construction in game/ so graphics views don't reach
+     * through the player into PlayerActions to set it up. The command is sent
+     * asynchronously, so callers connect to finished() after calling this.
+     */
+    PendingCommand *requestZoneDump();
 
 protected:
     void addCardImpl(CardItem *card, int x, int y) override;

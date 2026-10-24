@@ -3,6 +3,8 @@
 #include "../../client/settings/cache_settings.h"
 #include "../../game_graphics/board/card_item.h"
 #include "../board/card_list.h"
+#include "../player/player_actions.h"
+#include "../player/player_logic.h"
 
 #include <QtGlobal>
 #include <libcockatrice/settings/interface_settings.h>
@@ -177,4 +179,14 @@ void ZoneViewZoneLogic::setWriteableRevealZone(bool _writeableRevealZone)
         emit removeFromViews();
     }
     writeableRevealZone = _writeableRevealZone;
+}
+
+PendingCommand *ZoneViewZoneLogic::requestZoneDump()
+{
+    PlayerActions *actions = getPlayer()->getPlayerActions();
+    PendingCommand *pend = actions->prepareZoneDump(this, numberCards);
+    if (pend != nullptr) {
+        actions->sendGameCommand(pend);
+    }
+    return pend;
 }
