@@ -13,7 +13,6 @@
 #ifndef VISUAL_DECK_STORAGE_MODEL_H
 #define VISUAL_DECK_STORAGE_MODEL_H
 
-#include "../../deck_loader/loaded_deck.h"
 #include "libcockatrice/utility/card_ref.h"
 
 #include <QAbstractListModel>
@@ -24,6 +23,9 @@
 #include <QString>
 #include <QStringList>
 #include <QVector>
+#include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/deck_list/loaded_deck.h>
+#include <optional>
 #include <qnamespace.h>
 #include <qtmetamacros.h>
 

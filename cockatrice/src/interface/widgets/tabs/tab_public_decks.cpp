@@ -2,7 +2,6 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../deck_loader/deck_loader.h"
-#include "../../deck_loader/loaded_deck.h"
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../visual_deck_storage/deck_preview/deck_preview_color_identity_filter_widget.h"
@@ -28,6 +27,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <functional>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_deck_download_public.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>

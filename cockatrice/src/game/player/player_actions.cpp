@@ -3,7 +3,6 @@
 #include "../../client/settings/cache_settings.h"
 #include "../../game_graphics/board/card_item.h"
 #include "../../game_graphics/dialogs/dlg_create_token.h"
-#include "../../interface/deck_loader/loaded_deck.h"
 #include "../abstract_game.h"
 #include "../board/arrow_data.h"
 #include "../board/counter_state.h"
@@ -47,6 +46,7 @@
 #include <google/protobuf/stubs/port.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/command_change_zone_properties.pb.h>
 #include <libcockatrice/protocol/pb/command_create_arrow.pb.h>

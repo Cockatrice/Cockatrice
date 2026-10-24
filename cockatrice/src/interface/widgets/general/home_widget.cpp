@@ -4,7 +4,6 @@
 #include "../../../interface/widgets/tabs/tab_supervisor.h"
 #include "../../deck_loader/deck_file_format.h"
 #include "../../deck_loader/deck_loader.h"
-#include "../../deck_loader/loaded_deck.h"
 #include "../../pixel_map_generator.h"
 #include "../../theme_config.h"
 #include "../../theme_manager.h"
@@ -57,6 +56,7 @@
 #include <QtGlobal>
 #include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/network/client/remote/remote_client.h>
 #include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/paths_settings.h>

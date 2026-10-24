@@ -3,7 +3,6 @@
 #include "../../../../client/settings/cache_settings.h"
 #include "../../../deck_loader/deck_file_format.h"
 #include "../../../deck_loader/deck_loader.h"
-#include "../../../deck_loader/loaded_deck.h"
 #include "../../general/layout_containers/flow_widget.h"
 #include "deck_preview_tag_addition_widget.h"
 #include "deck_preview_tag_dialog.h"
@@ -15,6 +14,7 @@
 #include <QDirIterator>
 #include <QHBoxLayout>
 #include <QSizePolicy>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <optional>
 #include <qnamespace.h>
