@@ -20,7 +20,6 @@
 #include <QAction>
 #include <QApplication>
 #include <QDebug>
-#include <QDesktopServices>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -45,7 +44,6 @@
 #include <QTimer>
 #include <QToolBar>
 #include <QTreeView>
-#include <QUrl>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QtGlobal>
@@ -65,6 +63,7 @@
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/network_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <optional>
 #include <qlogging.h>
@@ -524,7 +523,7 @@ void TabDeckStorage::actDeleteLocalDeck()
 void TabDeckStorage::actOpenDecksFolder()
 {
     QString dir = localDirModel->rootPath();
-    QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
+    QtUtils::openPathInFileManager(dir);
 }
 
 void TabDeckStorage::actRemoteDoubleClick(const QModelIndex &curRight)

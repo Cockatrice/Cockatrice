@@ -606,15 +606,14 @@ void TabGame::actConcede()
         return;
     }
     if (!player->getConceded()) {
-        if (QMessageBox::question(this, tr("Concede"), tr("Are you sure you want to concede this game?"),
-                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes) {
+        if (!QtUtils::confirm(this, tr("Concede"), tr("Are you sure you want to concede this game?"),
+                              QMessageBox::No)) {
             return;
         }
         emit game->getPlayerManager()->activeLocalPlayerConceded();
     } else {
-        if (QMessageBox::question(this, tr("Unconcede"),
-                                  tr("You have already conceded.  Do you want to return to this game?"),
-                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes) {
+        if (!QtUtils::confirm(this, tr("Unconcede"),
+                              tr("You have already conceded.  Do you want to return to this game?"), QMessageBox::No)) {
             return;
         }
         emit game->getPlayerManager()->activeLocalPlayerUnconceded();
@@ -631,8 +630,8 @@ bool TabGame::leaveGame()
     if (!game->getGameState()->isGameClosed()) {
         if (!game->getPlayerManager()->isSpectator()) {
             tabSupervisor->setCurrentWidget(this);
-            if (QMessageBox::question(this, tr("Leave game"), tr("Are you sure you want to leave this game?"),
-                                      QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes) {
+            if (!QtUtils::confirm(this, tr("Leave game"), tr("Are you sure you want to leave this game?"),
+                                  QMessageBox::No)) {
                 return false;
             }
         }

@@ -28,6 +28,7 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/settings/servers_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <memory>
 #include <qlogging.h>
 #include <qnamespace.h>
@@ -115,9 +116,7 @@ Intent *IntentUrlParser::createJoinGameIntent(const QUrlQuery &query, PendingInt
     const QString gameDescription = query.queryItemValue("game", QUrl::FullyDecoded);
     const QString message = generateJoinGameMessage(*ctx, gameDescription);
 
-    const QMessageBox::StandardButton answer = QMessageBox::question(
-        mainWindow, tr("Join game"), message, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-    if (answer != QMessageBox::Yes) {
+    if (!QtUtils::confirm(mainWindow, tr("Join game"), message, QMessageBox::Yes)) {
         return nullptr;
     }
 
@@ -231,11 +230,10 @@ Intent *IntentUrlParser::createOpenDeckIntent(const QUrlQuery &query, PendingInt
         if (client->getStatus() == StatusLoggedIn) {
             const QString current =
                 QStringLiteral("%1:%2").arg(client->serverName(), QString::number(client->serverPort()));
-            const QMessageBox::StandardButton answer = QMessageBox::question(
-                mainWindow, tr("Open shared deck"),
-                tr("Opening this share link connects you to %1 instead of %2.\n\nContinue?").arg(target, current),
-                QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-            if (answer != QMessageBox::Yes) {
+            if (!QtUtils::confirm(
+                    mainWindow, tr("Open shared deck"),
+                    tr("Opening this share link connects you to %1 instead of %2.\n\nContinue?").arg(target, current),
+                    QMessageBox::Yes)) {
                 return nullptr;
             }
             chain.migrationTargetHost = ctx->serverContext.hostname;

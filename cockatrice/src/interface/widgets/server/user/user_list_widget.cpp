@@ -13,7 +13,6 @@
 #include "user_list_painter.h"
 #include "user_list_proxy.h"
 
-#include <QAbstractAnimation>
 #include <QAbstractItemModel>
 #include <QApplication>
 #include <QByteArray>
@@ -41,7 +40,6 @@
 #include <QPalette>
 #include <QPoint>
 #include <QPointF>
-#include <QPropertyAnimation>
 #include <QRect>
 #include <QScreen>
 #include <QScrollBar>
@@ -58,6 +56,7 @@
 #include <QWidget>
 #include <QtGlobal>
 #include <libcockatrice/settings/appearance_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 class QPixmap;
@@ -895,11 +894,7 @@ void UserListWidget::showPopupForUser(UserListTWI *item)
         return;
     }
 
-    auto *fade = new QPropertyAnimation(userInfoPopup, "windowOpacity", userInfoPopup);
-    fade->setDuration(120);
-    fade->setStartValue(0.0);
-    fade->setEndValue(1.0);
-    fade->start(QAbstractAnimation::DeleteWhenStopped);
+    QtUtils::fadeWindow(userInfoPopup, 0.0, 1.0, 120);
 }
 
 void UserListWidget::positionPopup(UserListTWI *item)
@@ -976,12 +971,7 @@ void UserListWidget::hidePopup(bool immediate)
     }
 
     // Fade out
-    auto *fade = new QPropertyAnimation(userInfoPopup, "windowOpacity", userInfoPopup);
-    fade->setDuration(100);
-    fade->setStartValue(userInfoPopup->windowOpacity());
-    fade->setEndValue(0.0);
-    connect(fade, &QPropertyAnimation::finished, userInfoPopup, &QWidget::hide);
-    fade->start(QAbstractAnimation::DeleteWhenStopped);
+    QtUtils::fadeWindow(userInfoPopup, userInfoPopup->windowOpacity(), 0.0, 100, true);
 }
 
 bool UserListWidget::isPressInsideListUi(const QWidget *widget) const
