@@ -17,7 +17,6 @@
 #include "libcockatrice/utility/playmat_params.h"
 
 #include <QColor>
-#include <QInputDialog>
 #include <QList>
 #include <QLoggingCategory>
 #include <QMap>
@@ -256,17 +255,6 @@ private:
     CardRef remotePlaymatCard;
     PlaymatParams remotePlaymatParams;
     bool hasRemotePlaymat = false;
-};
-
-class AnnotationDialog : public QInputDialog
-{
-    Q_OBJECT
-    void keyPressEvent(QKeyEvent *e) override;
-
-public:
-    explicit AnnotationDialog(QWidget *parent = nullptr) : QInputDialog(parent)
-    {
-    }
 };
 
 #endif
