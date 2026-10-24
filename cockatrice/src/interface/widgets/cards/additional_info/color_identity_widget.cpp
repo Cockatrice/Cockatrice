@@ -23,8 +23,7 @@
 ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, const QString &_colorIdentity)
     : QWidget(parent), colorIdentity(_colorIdentity)
 {
-    layout = QtUtils::makeLayout<QHBoxLayout>(this);
-    layout->setSpacing(5);                 // Small spacing between icons
+    layout = QtUtils::makeLayout<QHBoxLayout>(this, 5);
     layout->setAlignment(Qt::AlignCenter); // Ensure icons are centered
     setLayout(layout);
 

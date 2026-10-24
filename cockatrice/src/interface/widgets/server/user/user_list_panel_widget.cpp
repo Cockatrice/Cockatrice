@@ -32,8 +32,7 @@ QString sectionKey(UserListWidget::Section section)
 UserListPanelWidget::UserListPanelWidget(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent)
     : QWidget(parent)
 {
-    auto *mainLayout = QtUtils::makeLayout<QVBoxLayout>(this);
-    mainLayout->setSpacing(2);
+    auto *mainLayout = QtUtils::makeLayout<QVBoxLayout>(this, 2);
 
     searchBar = new QLineEdit(this);
     searchBar->setClearButtonEnabled(true);

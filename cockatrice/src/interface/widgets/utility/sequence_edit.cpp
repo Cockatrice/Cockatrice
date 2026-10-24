@@ -27,8 +27,7 @@ SequenceEdit::SequenceEdit(const QString &_shortcutName, QWidget *parent) : QWid
     clearButton->setIcon(themePixmap(QStringLiteral("icons/clearsearch")));
     defaultButton->setIcon(themePixmap(QStringLiteral("icons/update")));
 
-    auto *layout = QtUtils::makeLayout<QHBoxLayout>(this);
-    layout->setSpacing(1);
+    auto *layout = QtUtils::makeLayout<QHBoxLayout>(this, 1);
     layout->addWidget(lineEdit);
     layout->addWidget(clearButton);
     layout->addWidget(defaultButton);

@@ -43,8 +43,7 @@ CardAmountWidget::CardAmountWidget(QWidget *parent,
     : QWidget(parent), deckStateManager(deckStateManager), cardSizeSlider(cardSizeSlider), rootCard(rootCard),
       zoneName(zoneName), hovered(false)
 {
-    layout = QtUtils::makeLayout<QHBoxLayout>(this);
-    layout->setSpacing(10);
+    layout = QtUtils::makeLayout<QHBoxLayout>(this, 10);
     this->setLayout(layout);
     this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     layout->setAlignment(Qt::AlignHCenter);

@@ -42,8 +42,7 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
     layout->setSpacing(0);
     setLayout(layout);
 
-    auto upperLayout = QtUtils::makeLayout<QVBoxLayout>();
-    upperLayout->setSpacing(0);
+    auto upperLayout = QtUtils::makeLayout<QVBoxLayout>(nullptr, 0);
 
     resetAndHandSizeContainerWidget = new QWidget(this);
     resetAndHandSizeLayout = new QHBoxLayout(resetAndHandSizeContainerWidget);

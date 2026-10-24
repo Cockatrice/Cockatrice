@@ -403,8 +403,7 @@ UserInfoPopup::UserInfoPopup(TabSupervisor *_ts,
 
 void UserInfoPopup::buildUi()
 {
-    auto *root = QtUtils::makeLayout<QVBoxLayout>(this);
-    root->setSpacing(0);
+    auto *root = QtUtils::makeLayout<QVBoxLayout>(this, 0);
 
     // Header
     header = new UserInfoHeaderWidget(this);

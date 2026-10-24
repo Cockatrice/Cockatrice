@@ -109,8 +109,7 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
     : QWidget(parent), deckEditor(_deckEditor), rootCard(_rootCard)
 {
     // Set up the main layout
-    auto *mainLayout = QtUtils::makeLayout<QVBoxLayout>(this);
-    mainLayout->setSpacing(0);
+    auto *mainLayout = QtUtils::makeLayout<QVBoxLayout>(this, 0);
     setLayout(mainLayout);
 
     // Add CardInfoPictureWidget
