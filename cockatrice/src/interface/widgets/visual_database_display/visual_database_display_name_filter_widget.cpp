@@ -62,7 +62,7 @@ VisualDatabaseDisplayNameFilterWidget::VisualDatabaseDisplayNameFilterWidget(QWi
             &VisualDatabaseDisplayNameFilterWidget::actLoadFromClipboard);
 
     connect(filterModel, &FilterTreeModel::layoutChanged, this,
-            [this]() { QTimer::singleShot(100, this, &VisualDatabaseDisplayNameFilterWidget::syncWithFilterModel); });
+            [this]() { syncDebouncer.call([this] { syncWithFilterModel(); }); });
 
     retranslateUi();
 }

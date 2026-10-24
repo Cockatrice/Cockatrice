@@ -10,6 +10,7 @@
 #include <QMap>
 #include <QString>
 #include <QWidget>
+#include <libcockatrice/utility/debouncer.h>
 #include <qtmetamacros.h>
 
 class FilterTreeModel;
@@ -48,6 +49,7 @@ private:
     QMap<QString, QPushButton *> typeButtons; // Store toggle buttons
 
     bool exactMatchMode = true; // Toggle between "Exact Match" and "Includes"
+    QtUtils::Debouncer syncDebouncer{100};
 };
 
 #endif // VISUAL_DATABASE_DISPLAY_MAIN_TYPE_FILTER_WIDGET_H
