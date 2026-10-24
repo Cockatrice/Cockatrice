@@ -125,7 +125,7 @@ bool CardDatabaseDisplayModel::lessThan(const QModelIndex &left, const QModelInd
     return collator.compare(leftString, rightString) < 0;
 }
 
-int CardDatabaseDisplayModel::lessThanNumerically(const QString &left, const QString &right) const
+int CardDatabaseDisplayModel::lessThanNumerically(QStringView left, QStringView right) const
 {
     if (left == right) {
         return 0;

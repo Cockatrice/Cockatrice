@@ -93,7 +93,7 @@ signals:
 
 protected:
     [[nodiscard]] bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
-    int lessThanNumerically(const QString &left, const QString &right) const;
+    int lessThanNumerically(QStringView left, QStringView right) const;
     [[nodiscard]] bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
     [[nodiscard]] bool rowMatchesCardName(CardInfoPtr info) const;
 
