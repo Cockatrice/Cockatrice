@@ -1,0 +1,9 @@
+syntax = "proto2";
+import "response.proto";
+
+message Response_ClearBlacklistedBanners {
+    extend Response {
+        optional Response_ClearBlacklistedBanners ext = 1222;
+    }
+    optional uint32 cleared_count = 1 [default = 0];
+}

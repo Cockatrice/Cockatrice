@@ -2077,6 +2077,86 @@ bool Servatrice_DatabaseInterface::removeUserAvatar(const QString &userName)
     return query->numRowsAffected() > 0;
 }
 
+bool Servatrice_DatabaseInterface::removeUserBanner(const QString &userName)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("UPDATE {prefix}_users SET card_art_params = NULL WHERE name = :user_name");
+    query->bindValue(":user_name", userName);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+    return query->numRowsAffected() > 0;
+}
+
+int Servatrice_DatabaseInterface::clearBlacklistedBanners()
+{
+    if (!checkSql()) {
+        return -1;
+    }
+
+    QSqlQuery *ruleQuery = prepareQuery("SELECT card_name, card_provider_id FROM {prefix}_card_art_name_rules "
+                                        "WHERE mode = 'DENY'");
+    if (!execSqlQuery(ruleQuery)) {
+        return -1;
+    }
+
+    QSet<QPair<QString, QString>> denied;
+    while (ruleQuery->next()) {
+        denied.insert({ruleQuery->value(0).toString(), ruleQuery->value(1).toString()});
+    }
+    if (denied.isEmpty()) {
+        return 0;
+    }
+
+    QSqlQuery *userQuery =
+        prepareQuery("SELECT id, card_art_params FROM {prefix}_users WHERE card_art_params IS NOT NULL");
+    if (!execSqlQuery(userQuery)) {
+        return -1;
+    }
+
+    QList<QVariant> matchingIds;
+    while (userQuery->next()) {
+        const QJsonDocument doc = QJsonDocument::fromJson(userQuery->value(1).toString().toUtf8());
+        if (!doc.isObject()) {
+            continue;
+        }
+        const QJsonObject obj = doc.object();
+        const QPair<QString, QString> key{obj.value("card_name").toString(), obj.value("card_provider_id").toString()};
+        if (denied.contains(key)) {
+            matchingIds.append(userQuery->value(0));
+        }
+    }
+
+    if (matchingIds.isEmpty()) {
+        return 0;
+    }
+
+    // Chunk the UPDATE so very large user tables do not exceed driver placeholder limits.
+    int cleared = 0;
+    constexpr int batchSize = 500;
+    for (int i = 0; i < matchingIds.size(); i += batchSize) {
+        const QList<QVariant> batch = matchingIds.mid(i, batchSize);
+        QStringList placeholders;
+        placeholders.reserve(batch.size());
+        for (int j = 0; j < batch.size(); ++j) {
+            placeholders.append(QString(":id%1").arg(j));
+        }
+        QSqlQuery *clearQuery = prepareQuery(
+            QString("UPDATE {prefix}_users SET card_art_params = NULL WHERE id IN (%1)").arg(placeholders.join(",")));
+        for (int j = 0; j < batch.size(); ++j) {
+            clearQuery->bindValue(placeholders.at(j), batch.at(j));
+        }
+        if (!execSqlQuery(clearQuery)) {
+            return -1;
+        }
+        cleared += clearQuery->numRowsAffected();
+    }
+    return cleared;
+}
+
 QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory(const QString &user,
                                                                                  const QString &ipaddress,
                                                                                  const QString &gamename,
