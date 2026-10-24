@@ -74,6 +74,40 @@ static inline void clearLayoutRec(QLayout *l, DeletePolicy policy = DeletePolicy
 }
 
 /**
+ * @brief Creates a layout of type @c LayoutT with zero margins.
+ *
+ * @param parent  Parent widget, or nullptr when the layout is added later.
+ * @param spacing Optional spacing. Values below zero leave the style's default spacing
+ *                untouched; pass a non-negative value to call setSpacing().
+ * @param margin  Uniform margin. Defaults to zero.
+ */
+template <typename LayoutT> LayoutT *makeLayout(QWidget *parent = nullptr, int spacing = -1, int margin = 0)
+{
+    auto *layout = new LayoutT(parent);
+    layout->setContentsMargins(margin, margin, margin, margin);
+    if (spacing >= 0) {
+        layout->setSpacing(spacing);
+    }
+    return layout;
+}
+
+/**
+ * @brief Forces @p layout to recompute and repaint immediately.
+ *
+ * Convenience for the invalidate/activate/update sequence used after changing a layout's
+ * contents outside of a resize event.
+ */
+inline void relayout(QLayout *layout)
+{
+    if (!layout) {
+        return;
+    }
+    layout->invalidate();
+    layout->activate();
+    layout->update();
+}
+
+/**
  * @brief Creates a QScrollArea using the conventions the client applies nearly everywhere:
  *        the inner widget resizes with the viewport and the horizontal bar is disabled.
  *
