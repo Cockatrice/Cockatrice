@@ -96,12 +96,13 @@ GeneralSettingsPage::GeneralSettingsPage()
     auto *languageGrid = new QGridLayout;
     languageGrid->addWidget(&languageLabel, 0, 0);
     languageGrid->addWidget(&languageBox, 0, 1);
-    languageGrid->addWidget(&cardLanguageLabel, 1, 0);
-    languageGrid->addWidget(&cardLanguageBox, 1, 1);
-    languageGrid->addWidget(&cardLanguageNoteLabel, 2, 1);
-    languageGrid->addWidget(&cardSearchLanguageLabel, 3, 0);
-    languageGrid->addWidget(&cardSearchLanguageBox, 3, 1);
-    languageGrid->addWidget(&advertiseTranslationPageLabel, 4, 1, Qt::AlignRight);
+    languageGrid->addWidget(&advertiseTranslationPageLabel, 1, 1, Qt::AlignRight);
+    languageGrid->addWidget(&cardLanguageLabel, 2, 0);
+    languageGrid->addWidget(&cardLanguageBox, 2, 1);
+    languageGrid->addWidget(&cardLanguageNoteLabel, 3, 1);
+    languageGrid->addWidget(&cardSearchLanguageLabel, 4, 0);
+    languageGrid->addWidget(&cardSearchLanguageBox, 4, 1);
+
 
     cardLanguageNoteLabel.setWordWrap(true);
     cardLanguageNoteLabel.setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
@@ -576,7 +577,7 @@ void GeneralSettingsPage::retranslateUi()
     const auto &settings = SettingsCache::instance();
 
     languageGroupBox->setTitle(tr("Language settings"));
-    languageLabel.setText(tr("Language:"));
+    languageLabel.setText(tr("Interface language:"));
     cardLanguageBox.setItemText(0, tr("English"));
     cardLanguageLabel.setText(tr("Card text & images language:"));
     cardLanguageNoteLabel.setText(
