@@ -10,7 +10,6 @@
 #include <QBuffer>
 #include <QCheckBox>
 #include <QComboBox>
-#include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
 #include <QFile>
@@ -39,7 +38,6 @@
 #include <QTextEdit>
 #include <QTextStream>
 #include <QTimer>
-#include <QTranslator>
 #include <QUrl>
 #include <QVariant>
 #include <QWizard>
@@ -203,16 +201,23 @@ IntroPage::IntroPage(QWidget *parent) : OracleWizardPage(parent)
 
     QStringList languageCodes = findQmFiles();
     for (const QString &code : languageCodes) {
-        QString langName = languageName(code);
-        languageBox->addItem(langName, code);
+        languageBox->addItem(TranslationLoader::languageDisplayName(code), code);
     }
 
-    QString setLanguage = QCoreApplication::translate("i18n", DEFAULT_LANG_NAME);
-    int index = languageBox->findText(setLanguage, Qt::MatchExactly);
-    if (index == -1) {
-        qWarning() << "could not find language" << setLanguage;
-    } else {
+    // Select the language the wizard runs with: its own entry, the base language for a variant without a
+    // file of its own (de_CH -> de), and English for an unset setting, which has no file to name it.
+    const QString configuredLanguage = SettingsCache::instance().personal().getLang();
+    int index = languageBox->findData(configuredLanguage);
+    if (index < 0) {
+        index = languageBox->findData(configuredLanguage.section('_', 0, 0));
+    }
+    if (index < 0) {
+        index = languageBox->findData(QStringLiteral("en_US"));
+    }
+    if (index >= 0) {
         languageBox->setCurrentIndex(index);
+    } else {
+        qWarning() << "could not find language" << configuredLanguage;
     }
 
     connect(languageBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &IntroPage::languageBoxChanged);
@@ -237,18 +242,6 @@ QStringList IntroPage::findQmFiles()
 {
     return TranslationLoader::availableLanguages(translationPrefix,
                                                  TranslationLoader::applicationTranslationPaths(translationPath));
-}
-
-QString IntroPage::languageName(const QString &lang)
-{
-    QTranslator qTranslator;
-
-    // Only the language name is needed here, so the file is loaded without logging a line per
-    // language: findQmFiles() asked for languages whose files exist in the first place.
-    TranslationLoader::loadFrom(qTranslator, translationPrefix + "_" + lang,
-                                TranslationLoader::applicationTranslationPaths(translationPath));
-
-    return qTranslator.translate("i18n", DEFAULT_LANG_NAME);
 }
 
 void IntroPage::languageBoxChanged(int index)

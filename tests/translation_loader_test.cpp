@@ -2,6 +2,7 @@
 #include <QByteArray>
 #include <QCoreApplication>
 #include <QDir>
+#include <QFileInfo>
 #include <QLibraryInfo>
 #include <QList>
 #include <QSet>
@@ -17,6 +18,11 @@
 // build. QTranslator rejects anything that is not a real .qm file, so a stub cannot stand in here.
 #ifndef TRANSLATION_LOADER_TEST_DIR
 #define TRANSLATION_LOADER_TEST_DIR ""
+#endif
+
+// The client's translation files, whose language codes are the languages the language selector offers.
+#ifndef COCKATRICE_TRANSLATIONS_DIR
+#define COCKATRICE_TRANSLATIONS_DIR ""
 #endif
 
 namespace
@@ -231,6 +237,44 @@ TEST(TranslationLoaderTest, AvailableLanguagesListsTheTranslationsThatCanBeLoade
     EXPECT_TRUE(TranslationLoader::availableLanguages(QStringLiteral("some_other_app"), {testTranslationDirectory()})
                     .isEmpty());
     EXPECT_TRUE(TranslationLoader::availableLanguages(QStringLiteral("translation_loader_test"), {}).isEmpty());
+}
+
+TEST(TranslationLoaderTest, LanguageDisplayNamesDoNotNeedATranslationFile)
+{
+    // The regression this guards: the selector took every label from the language's own .qm file, so it
+    // went blank as soon as translators had not translated the "English" placeholder in the i18n context.
+    EXPECT_EQ(QStringLiteral("Deutsch (German)"), TranslationLoader::languageDisplayName(QStringLiteral("de")));
+    EXPECT_EQ(QStringLiteral("简体中文 (Chinese Simplified)"),
+              TranslationLoader::languageDisplayName(QStringLiteral("zh-Hans")));
+    EXPECT_EQ(QStringLiteral("English, arr! (Pirate English)"),
+              TranslationLoader::languageDisplayName(QStringLiteral("en@pirate")));
+}
+
+TEST(TranslationLoaderTest, EveryLanguageTheClientShipsHasItsOwnDisplayName)
+{
+    // The shipped translation files are what the selector offers, so each of them has to end up with a
+    // label: an empty one is what made the dropdown look broken, and two equal ones are a coin flip.
+    const QDir translations(QStringLiteral(COCKATRICE_TRANSLATIONS_DIR));
+    const QStringList files = translations.entryList({QStringLiteral("cockatrice_*.ts")}, QDir::Files);
+    ASSERT_FALSE(files.isEmpty());
+
+    QSet<QString> displayNames;
+    for (const QString &file : files) {
+        const QString language = QFileInfo(file).completeBaseName().section(QLatin1Char('_'), 1);
+        const QString displayName = TranslationLoader::languageDisplayName(language);
+        EXPECT_FALSE(displayName.isEmpty()) << language.toStdString();
+        displayNames.insert(displayName);
+    }
+
+    EXPECT_EQ(files.size(), displayNames.size());
+}
+
+TEST(TranslationLoaderTest, UnknownLanguagesFallBackToTheNativeNameThenTheCode)
+{
+    // A language added after the table, and a code Qt does not know either.
+    EXPECT_FALSE(TranslationLoader::languageDisplayName(QStringLiteral("sv_FI")).isEmpty());
+    EXPECT_EQ(QStringLiteral("zz_QQ"), TranslationLoader::languageDisplayName(QStringLiteral("zz_QQ")));
+    EXPECT_TRUE(TranslationLoader::languageDisplayName(QString()).isEmpty());
 }
 
 TEST(TranslationLoaderTest, LoadApplicationReportsAMissingTranslationDirectory)

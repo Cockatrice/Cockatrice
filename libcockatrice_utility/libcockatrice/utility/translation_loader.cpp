@@ -5,8 +5,10 @@
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
+#include <QHash>
 #include <QLatin1Char>
 #include <QLibraryInfo>
+#include <QLocale>
 #include <QMessageLogger>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
@@ -98,6 +100,55 @@ QList<QString> TranslationLoader::availableLanguages(const QString &_prefix, con
     QList<QString> sortedLanguages(languages.cbegin(), languages.cend());
     std::sort(sortedLanguages.begin(), sortedLanguages.end());
     return sortedLanguages;
+}
+
+QString TranslationLoader::languageDisplayName(const QString &_lang)
+{
+    if (_lang.isEmpty()) {
+        return QString();
+    }
+
+    // The native name first, so a speaker finds their own language, then the English one, so everyone
+    // else does. A language shipped with a .qm file belongs in here: the names used to come from the
+    // translation files, where a missing translation left the selector blank.
+    static const QHash<QString, QString> displayNames = {
+        {QStringLiteral("ca"), QStringLiteral("Català (Catalan)")},
+        {QStringLiteral("cs"), QStringLiteral("Česky (Czech)")},
+        {QStringLiteral("de"), QStringLiteral("Deutsch (German)")},
+        {QStringLiteral("el"), QStringLiteral("Ελληνικά (Greek)")},
+        {QStringLiteral("en@pirate"), QStringLiteral("English, arr! (Pirate English)")},
+        {QStringLiteral("en_US"), QStringLiteral("English (United States)")},
+        {QStringLiteral("es"), QStringLiteral("Español (Spanish)")},
+        {QStringLiteral("et"), QStringLiteral("Eesti Keel (Estonian)")},
+        {QStringLiteral("fi"), QStringLiteral("Suomi (Finnish)")},
+        {QStringLiteral("fr"), QStringLiteral("Français (French)")},
+        {QStringLiteral("hu"), QStringLiteral("Magyar (Hungarian)")},
+        {QStringLiteral("it"), QStringLiteral("Italiano (Italian)")},
+        {QStringLiteral("ja"), QStringLiteral("日本語 (Japanese)")},
+        {QStringLiteral("ko"), QStringLiteral("한국어 (Korean)")},
+        {QStringLiteral("nb"), QStringLiteral("Norsk Bokmål (Norwegian Bokmål)")},
+        {QStringLiteral("nl"), QStringLiteral("Nederlands (Dutch)")},
+        {QStringLiteral("pl"), QStringLiteral("Polski (Polish)")},
+        {QStringLiteral("pt"), QStringLiteral("Português (Portuguese)")},
+        {QStringLiteral("pt_BR"), QStringLiteral("Português do Brasil (Brazilian Portuguese)")},
+        {QStringLiteral("ru"), QStringLiteral("Русский (Russian)")},
+        {QStringLiteral("sr"), QStringLiteral("Srpski (Serbian)")},
+        {QStringLiteral("sv"), QStringLiteral("Svenska (Swedish)")},
+        {QStringLiteral("tr"), QStringLiteral("Türkçe (Turkish)")},
+        {QStringLiteral("yue"), QStringLiteral("粵語 (Cantonese)")},
+        {QStringLiteral("zh-Hans"), QStringLiteral("简体中文 (Chinese Simplified)")},
+        {QStringLiteral("zh-Hant"), QStringLiteral("繁體中文 (Chinese Traditional)")},
+    };
+
+    const QString displayName = displayNames.value(_lang);
+    if (!displayName.isEmpty()) {
+        return displayName;
+    }
+
+    // A language added after this table still gets a label instead of the blank one this function exists
+    // to prevent. Qt knows no name for an unknown code and answers with an empty string.
+    const QString nativeName = QLocale(_lang).nativeLanguageName();
+    return nativeName.isEmpty() ? _lang : nativeName;
 }
 
 TranslationLoadResult

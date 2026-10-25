@@ -8,7 +8,6 @@
 #include "update/client/release_channel.h"
 
 #include <QByteArray>
-#include <QCoreApplication>
 #include <QDate>
 #include <QDebug>
 #include <QFile>
@@ -22,7 +21,6 @@
 #include <QPushButton>
 #include <QSharedPointer>
 #include <QSizePolicy>
-#include <QTranslator>
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QVariantList>
@@ -51,18 +49,24 @@ enum startupCardUpdateCheckBehaviorIndex
 GeneralSettingsPage::GeneralSettingsPage()
 {
     // language settings
-    QStringList languageCodes = findQmFiles();
-    for (const QString &code : languageCodes) {
-        QString langName = languageName(code);
-        languageBox.addItem(langName, code);
+    for (const QString &code : findQmFiles()) {
+        languageBox.addItem(TranslationLoader::languageDisplayName(code), code);
     }
 
-    QString setLanguage = QCoreApplication::translate("i18n", DEFAULT_LANG_NAME);
-    int index = languageBox.findText(setLanguage, Qt::MatchExactly);
-    if (index == -1) {
-        qWarning() << "could not find language" << setLanguage;
-    } else {
+    // Select the language the client runs with: its own entry, the base language for a variant without a
+    // file of its own (de_CH -> de), and English for an unset setting, which has no file to name it.
+    const QString configuredLanguage = SettingsCache::instance().personal().getLang();
+    int index = languageBox.findData(configuredLanguage);
+    if (index < 0) {
+        index = languageBox.findData(configuredLanguage.section('_', 0, 0));
+    }
+    if (index < 0) {
+        index = languageBox.findData(QStringLiteral("en_US"));
+    }
+    if (index >= 0) {
         languageBox.setCurrentIndex(index);
+    } else {
+        qWarning() << "could not find language" << configuredLanguage;
     }
 
     advertiseTranslationPageLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
@@ -382,18 +386,6 @@ QStringList GeneralSettingsPage::findQmFiles()
 {
     return TranslationLoader::availableLanguages(translationPrefix,
                                                  TranslationLoader::applicationTranslationPaths(translationPath));
-}
-
-QString GeneralSettingsPage::languageName(const QString &lang)
-{
-    QTranslator qTranslator;
-
-    // Only the language name is needed here, so the file is loaded without logging a line per
-    // language: findQmFiles() asked for languages whose files exist in the first place.
-    TranslationLoader::loadFrom(qTranslator, translationPrefix + "_" + lang,
-                                TranslationLoader::applicationTranslationPaths(translationPath));
-
-    return qTranslator.translate("i18n", DEFAULT_LANG_NAME);
 }
 
 void GeneralSettingsPage::deckPathButtonClicked()

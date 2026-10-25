@@ -75,6 +75,18 @@ TranslationLoadResult loadQt(QTranslator &_translator, const QString &_lang);
 QList<QString> availableLanguages(const QString &_prefix, const QList<QString> &_directories);
 
 /**
+ * @brief A human-readable name for a language, e.g. "Deutsch (German)".
+ *
+ * The names are data, not translations: a language selector has to be readable before any translation
+ * is loaded, and its labels must not depend on the translation of the language they name.
+ *
+ * @param _lang The language code, e.g. "de" or "pt_BR".
+ * @return The curated name; for a code it does not know, the native language name; the code itself when
+ *         Qt has no name for it either; an empty string when _lang is empty.
+ */
+QString languageDisplayName(const QString &_lang);
+
+/**
  * @brief Loads the <_prefix>_<_lang>.qm translation file from _directories into _translator.
  *
  * @param _translator The translator to load into; must not also be used for Qt's own translation.
