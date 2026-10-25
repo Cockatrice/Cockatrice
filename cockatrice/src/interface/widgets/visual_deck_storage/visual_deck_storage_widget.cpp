@@ -184,7 +184,9 @@ void VisualDeckStorageWidget::resizeEvent(QResizeEvent *event)
 
 void VisualDeckStorageWidget::retranslateUi()
 {
-    databaseLoadIndicator->setText(tr("Loading database ..."));
+    if (databaseLoadIndicator) {
+        databaseLoadIndicator->setText(tr("Loading database ..."));
+    }
 
     refreshButton->setToolTip(tr("Refresh loaded files"));
     shareButton->setToolTip(tr("Select decks to share"));
@@ -278,6 +280,14 @@ void VisualDeckStorageWidget::createRootFolderWidget()
 
     folderWidget =
         new VisualDeckStorageFolderDisplayWidget(this, this, QString(), false, quickSettingsWidget->getShowFolders());
+
+    // QScrollArea::setWidget() deletes the widget it currently holds. If that is still the
+    // database load indicator, take it back first so the label stays alive for retranslateUi().
+    if (databaseLoadIndicator && scrollArea->widget() == databaseLoadIndicator) {
+        scrollArea->takeWidget();
+        databaseLoadIndicator->setParent(this);
+        databaseLoadIndicator->setVisible(false);
+    }
 
     scrollArea->setWidget(folderWidget); // this automatically destroys the old folderWidget
     scrollArea->widget()->setMaximumWidth(scrollArea->viewport()->width());
