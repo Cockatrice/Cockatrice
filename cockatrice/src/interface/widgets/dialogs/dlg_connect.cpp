@@ -295,9 +295,15 @@ void DlgConnect::updateDisplayInfo(const QString &saveName)
         const QString stored = _data.at(4);
         if (stored.startsWith("$")) {
             storedVerifier = stored;
+            passwordEdit->clear();
+            passwordEdit->setPlaceholderText(tr("Password saved"));
         } else {
             passwordEdit->setText(stored);
+            passwordEdit->setPlaceholderText(QString());
         }
+    } else {
+        passwordEdit->clear();
+        passwordEdit->setPlaceholderText(QString());
     }
 
     if (!_data.at(6).isEmpty()) {
@@ -323,6 +329,7 @@ void DlgConnect::newHostSelected(bool state)
         portEdit->setDisabled(false);
         playernameEdit->clear();
         passwordEdit->clear();
+        passwordEdit->setPlaceholderText(QString());
         storedVerifier.clear();
         saveEdit->clear();
         saveEdit->setPlaceholderText(tr("Unique Server Name"));
