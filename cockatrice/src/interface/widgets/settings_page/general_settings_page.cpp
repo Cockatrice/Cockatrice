@@ -103,7 +103,6 @@ GeneralSettingsPage::GeneralSettingsPage()
     languageGrid->addWidget(&cardSearchLanguageLabel, 4, 0);
     languageGrid->addWidget(&cardSearchLanguageBox, 4, 1);
 
-
     cardLanguageNoteLabel.setWordWrap(true);
     cardLanguageNoteLabel.setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
