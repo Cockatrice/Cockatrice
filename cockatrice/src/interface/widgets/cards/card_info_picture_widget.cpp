@@ -491,7 +491,14 @@ void CardInfoPictureWidget::showEnlargedPixmap()
     enlargedPixmapWidget->setCardPixmap(exactCard, enlargedSize);
 
     const QPoint cursorPos = QCursor::pos();
-    const QRect screenGeometry = QGuiApplication::screenAt(cursorPos)->geometry();
+    QScreen *screen = QGuiApplication::screenAt(cursorPos);
+    if (!screen) {
+        screen = QGuiApplication::primaryScreen();
+    }
+    if (!screen) {
+        return;
+    }
+    const QRect screenGeometry = screen->geometry();
     const QSize widgetSize = enlargedPixmapWidget->size();
 
     int newX = cursorPos.x() + ENLARGED_PIXMAP_OFFSET;
