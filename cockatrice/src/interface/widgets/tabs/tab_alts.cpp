@@ -57,9 +57,14 @@ TabAlts::TabAlts(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
     investigateButton = new QPushButton;
     connect(investigateButton, &QPushButton::clicked, this, &TabAlts::investigateUser);
 
+    backButton = new QPushButton;
+    backButton->setEnabled(false);
+    connect(backButton, &QPushButton::clicked, this, &TabAlts::goBack);
+
     statusLabel = new QLabel;
 
     auto *topBar = new QHBoxLayout;
+    topBar->addWidget(backButton);
     topBar->addWidget(searchEdit);
     topBar->addWidget(depthSpin);
     topBar->addWidget(investigateButton);
@@ -72,6 +77,12 @@ TabAlts::TabAlts(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
     altsTable->setAlternatingRowColors(true);
     altsTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     altsTable->horizontalHeader()->setStretchLastSection(true);
+    connect(altsTable, &QTableWidget::cellDoubleClicked, this, [this](int row, int) {
+        auto *userItem = altsTable->item(row, COL_ALTS_USER);
+        if (userItem != nullptr && !userItem->text().isEmpty() && userItem->text() != currentUser) {
+            investigate(userItem->text());
+        }
+    });
 
     auto *mainLayout = new QVBoxLayout(centralWidget);
     mainLayout->addLayout(topBar);
@@ -88,6 +99,8 @@ void TabAlts::retranslateUi()
     depthSpin->setPrefix(tr("Depth: "));
     depthSpin->setToolTip(tr("Search depth: 1 finds direct matches, higher values follow alts of alts."));
     investigateButton->setText(tr("Investigate"));
+    backButton->setText(tr("Back"));
+    backButton->setToolTip(tr("Back to the previously investigated user"));
     if (currentUser.isEmpty()) {
         statusLabel->setText(tr("Enter a user name to investigate."));
     }
@@ -107,9 +120,29 @@ QString TabAlts::formatEpoch(quint64 ts) const
 
 void TabAlts::investigate(const QString &userName)
 {
-    if (userName.isEmpty()) {
+    if (userName.isEmpty() || userName == currentUser) {
         return;
     }
+    if (!currentUser.isEmpty()) {
+        backStack << currentUser;
+        backButton->setEnabled(true);
+    }
+    loadUser(userName);
+}
+
+void TabAlts::goBack()
+{
+    if (backStack.isEmpty()) {
+        return;
+    }
+    const QString previousUser = backStack.takeLast();
+    backButton->setEnabled(!backStack.isEmpty());
+    loadUser(previousUser);
+}
+
+void TabAlts::loadUser(const QString &userName)
+{
+    currentUser = userName;
     searchEdit->setText(userName);
     investigateUser();
 }
