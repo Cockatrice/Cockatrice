@@ -7,6 +7,7 @@
 #include <QObject>
 #include <QString>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 
 class QWidget;
 
@@ -30,10 +31,7 @@ bool OverridePrintingWarning::execMessageBox(QWidget *parent, bool enable)
             "Are you sure you would like to disable this feature?");
     }
 
-    QMessageBox::StandardButton result =
-        QMessageBox::question(parent, QObject::tr("Confirm Change"), message, QMessageBox::Yes | QMessageBox::No);
-
-    if (result == QMessageBox::Yes) {
+    if (QtUtils::confirm(parent, QObject::tr("Confirm Change"), message)) {
         SettingsCache::instance().cardsDisplay().setOverrideAllCardArtWithPersonalPreference(enable);
         // Caches are now invalid.
         CardPictureLoader::clearPixmapCache();

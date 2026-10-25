@@ -51,8 +51,6 @@
 #include <QDebug>
 #include <QFlag>
 #include <QIcon>
-#include <QListIterator>
-#include <QMapIterator>
 #include <QMenu>
 #include <QMessageBox>
 #include <QMessageLogger>
@@ -79,6 +77,7 @@
 #include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/tabs_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <memory>
 #include <qnamespace.h>
 #include <string>
@@ -291,48 +290,11 @@ void TabSupervisor::retranslateUi()
     aTabDeveloper->setText(tr("Developer"));
 
     // tabs
-    QList<Tab *> tabs;
-    tabs.append(tabServer);
-    tabs.append(tabReplays);
-    tabs.append(tabDeckStorage);
-    tabs.append(tabAdmin);
-    tabs.append(tabAccount);
-    tabs.append(tabLog);
-    tabs.append(tabReport);
-    tabs.append(tabModeration);
-    tabs.append(tabCardArtRules);
-    tabs.append(tabDeveloper);
-    QMapIterator<int, TabRoom *> roomIterator(roomTabs);
-    while (roomIterator.hasNext()) {
-        tabs.append(roomIterator.next().value());
-    }
-    QMapIterator<int, TabGame *> gameIterator(gameTabs);
-    while (gameIterator.hasNext()) {
-        tabs.append(gameIterator.next().value());
-    }
-    QMapIterator<QString, TabPublicDecks *> publicDecksIterator(publicDecksTabs);
-    while (publicDecksIterator.hasNext()) {
-        tabs.append(publicDecksIterator.next().value());
-    }
-    QListIterator<TabGame *> replayIterator(replayTabs);
-    while (replayIterator.hasNext()) {
-        tabs.append(replayIterator.next());
-    }
-    QListIterator<AbstractTabDeckEditor *> deckEditorIterator(deckEditorTabs);
-    while (deckEditorIterator.hasNext()) {
-        tabs.append(deckEditorIterator.next());
-    }
-    QMapIterator<QString, TabMessage *> messageIterator(messageTabs);
-    while (messageIterator.hasNext()) {
-        tabs.append(messageIterator.next().value());
-    }
-
-    for (auto &tab : tabs) {
-        if (tab) {
-            int idx = indexOf(tab);
+    for (int i = 0; i < count(); ++i) {
+        if (auto *tab = qobject_cast<Tab *>(widget(i))) {
             QString tabText = tab->getTabText();
-            setTabText(idx, sanitizeTabName(tabText));
-            setTabToolTip(idx, sanitizeHtml(tabText));
+            setTabText(i, sanitizeTabName(tabText));
+            setTabToolTip(i, sanitizeHtml(tabText));
             tab->retranslateUi();
         }
     }
@@ -362,9 +324,8 @@ void TabSupervisor::closeEvent(QCloseEvent *event)
     QTabWidget::closeEvent(event);
 
     if (getGameCount()) {
-        if (QMessageBox::question(this, tr("Are you sure?"),
-                                  tr("There are still open games. Are you sure you want to quit?"),
-                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No) {
+        if (!QtUtils::confirm(this, tr("Are you sure?"),
+                              tr("There are still open games. Are you sure you want to quit?"), QMessageBox::No)) {
             event->ignore();
             return;
         }

@@ -9,6 +9,7 @@
 #include <QLineEdit>
 #include <QStringLiteral>
 #include <QTimer>
+#include <libcockatrice/utility/qt_utils.h>
 
 /**
  * @brief Constructs a search bar for filtering decks in the Visual Deck Storage.
@@ -20,8 +21,7 @@
  */
 VisualDeckStorageSearchWidget::VisualDeckStorageSearchWidget(QWidget *parent) : QWidget(parent)
 {
-    layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout = QtUtils::makeLayout<QHBoxLayout>(this);
     setLayout(layout);
 
     searchBar = new QLineEdit(this);

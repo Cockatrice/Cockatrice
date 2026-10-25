@@ -12,4 +12,5 @@ TabHome::TabHome(TabSupervisor *_tabSupervisor, AbstractClient *_client) : Tab(_
 
 void TabHome::retranslateUi()
 {
+    homeWidget->retranslateUi();
 }

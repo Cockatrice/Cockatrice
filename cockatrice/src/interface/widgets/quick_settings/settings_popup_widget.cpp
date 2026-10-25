@@ -8,6 +8,7 @@
 #include <QScrollArea>
 #include <QSize>
 #include <QVBoxLayout>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 SettingsPopupWidget::SettingsPopupWidget(QWidget *parent) : QWidget(parent, Qt::Popup | Qt::FramelessWindowHint)
@@ -54,11 +55,8 @@ void SettingsPopupWidget::adjustSizeToFitScreen()
     if (contentHeight > maxHeight) {
         // Create a scroll area and add the container widget to it if not already created
         if (!scrollArea) {
-            scrollArea = new QScrollArea(this);
-            scrollArea->setWidgetResizable(true);
+            scrollArea = QtUtils::makeScrollArea(this, Qt::ScrollBarAlwaysOn);
             scrollArea->setFrameShape(QFrame::NoFrame);
-            scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // No horizontal scrollbar
-            scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);    // Enable vertical scrollbar when needed
         }
 
         // Set maximum height for the scroll area and show vertical scrollbar

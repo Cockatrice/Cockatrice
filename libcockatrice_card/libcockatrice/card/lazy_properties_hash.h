@@ -4,30 +4,99 @@
 #include <QByteArray>
 #include <QHash>
 #include <QMutex>
+#include <QMutexLocker>
 #include <QString>
+#include <QStringList>
+#include <atomic>
 
 /**
  * @brief A property map that can lazily deserialize blobs to avoid loading overhead.
  *
- * Properties are stored as a pre-serialized blob (cheap to load), and the QString is materialized on the first query,
- * so the database load avoids constructing thousands of QString per card.
+ * Properties are stored as a pre-serialized blob (cheap to load), and individual values are read straight out of that
+ * blob, so the database load and ordinary queries avoid constructing thousands of QString per card.
  *
- * Once the properties are materialized, it cannot be unmaterialized.
- * If you want to reset the properties to an unmaterialized state, you should create a new LazyPropertiesHash.
+ * A full QHash<QString, QString> is only built on the first insert() or getProperties() call. Once materialized, it
+ * cannot be unmaterialized; create a new LazyPropertiesHash to return to the blob form.
  */
 class LazyPropertiesHash
 {
+    /**
+     * @brief Iterates over the key/value pairs of a serialized QHash blob without materializing it.
+     *
+     * The blob layout is the one produced by QDataStream for QHash: a quint32 entry count followed by each entry's
+     * serialized key and value.
+     */
+    class BlobReader
+    {
+    public:
+        explicit BlobReader(const QByteArray &_blob);
 
-    mutable QByteArray blob;                    ///< Serialized properties (load form).
-    mutable QHash<QString, QString> properties; ///< Materialized properties (query form).
-    mutable QMutex propertiesMutex;             ///< Guards lazy materialization.
-    mutable bool isMaterialized = false;        ///< Whether propertiesCache is valid.
+        /**
+         * @brief Reads the next pair's offsets.
+         * @return False when there are no more pairs or the blob is malformed.
+         */
+        bool next(int &keyPos, quint32 &keyLength, int &valuePos, quint32 &valueLength);
+
+        [[nodiscard]] quint32 entryCount() const;
+
+    private:
+        const QByteArray &blob;
+        int pos = 4;
+        quint32 remaining = 0;
+        bool valid = false;
+    };
+
+    /**
+     * @brief Looks up @p key in a serialized blob without materializing it.
+     */
+    static QString blobValue(const QByteArray &blob, const QString &key);
+
+    /**
+     * @brief Checks whether @p key is present in a serialized blob without materializing it.
+     */
+    static bool blobContains(const QByteArray &blob, const QString &key);
+
+    /**
+     * @brief Lists the keys of a serialized blob without materializing it.
+     */
+    static QStringList blobKeys(const QByteArray &blob);
+
+    mutable QByteArray blob;                         ///< Serialized properties (load form).
+    mutable QHash<QString, QString> properties;      ///< Materialized properties (query form).
+    mutable QMutex propertiesMutex;                  ///< Guards lazy materialization.
+    mutable std::atomic<bool> isMaterialized{false}; ///< Whether properties is valid.
 
     /**
      * @brief Materializes properties from blob if not already done. Clears blob afterward.
      * Safe to call from const getters (members are mutable).
      */
     void ensureMaterialized() const;
+
+    /**
+     * @brief Runs the accessor for the current storage form.
+     *
+     * The common case skips the mutex once the properties are materialized. While they are
+     * still in blob form, the mutex is taken and @p onBlob reads the values straight out of
+     * the blob without building the hash, so ordinary queries stay allocation-light.
+     *
+     * @param onMaterialized Called with the materialized hash when it is available.
+     * @param onBlob Called with the blob when it is still the source of truth.
+     * @return Whatever the invoked accessor returns; both accessors must return the same type.
+     */
+    template <typename MaterializedFn, typename BlobFn>
+    auto read(MaterializedFn &&onMaterialized, BlobFn &&onBlob) const
+    {
+        if (isMaterialized.load(std::memory_order_acquire)) {
+            return onMaterialized(properties);
+        }
+
+        QMutexLocker lock(&propertiesMutex);
+        if (isMaterialized.load(std::memory_order_relaxed)) {
+            return onMaterialized(properties);
+        }
+
+        return onBlob(blob);
+    }
 
 public:
     /**
@@ -52,11 +121,59 @@ public:
     LazyPropertiesHash &operator=(const LazyPropertiesHash &other);
 
     /**
-     * @brief Gets the value from the materialized properties hash
+     * @brief Serializes a property map into the blob form understood by this class.
+     * @param properties The properties to serialize
+     * @return The serialized blob
+     */
+    static QByteArray serialize(const QHash<QString, QString> &properties);
+
+    /**
+     * @brief Creates an unmaterialized LazyPropertiesHash from a property map.
+     *
+     * Serializes @p properties once so queries read them from the blob form instead of first materializing a second
+     * copy of the hash.
+     *
+     * @param properties The properties to serialize
+     * @return An unmaterialized LazyPropertiesHash holding the serialized properties
+     */
+    static LazyPropertiesHash serializedFrom(const QHash<QString, QString> &properties);
+
+    /**
+     * @brief Gets the value for a key, reading it from the blob when possible.
      * @param key The key
      * @return The value, or an empty string if the key is not present
      */
     QString value(const QString &key) const;
+
+    /**
+     * @brief Checks whether a key is present, reading the blob when possible.
+     * @param key The key
+     * @return True if the key is present
+     */
+    bool contains(const QString &key) const;
+
+    /**
+     * @brief Returns the number of properties.
+     */
+    int size() const;
+
+    /**
+     * @brief Returns whether there are no properties.
+     */
+    bool isEmpty() const;
+
+    /**
+     * @brief Returns the property names, reading them from the blob when possible.
+     */
+    QStringList keys() const;
+
+    /**
+     * @brief Returns the properties in serialized blob form.
+     *
+     * While the object is unmaterialized this is a cheap copy of the stored blob; after materialization the hash is
+     * serialized on demand.
+     */
+    QByteArray serialized() const;
 
     /**
      * @brief Inserts a value into the materialized properties hash
@@ -67,7 +184,7 @@ public:
     bool insert(const QString &key, const QString &value);
 
     /**
-     * @brief Gets a view of the materialized properties hash.
+     * @brief Gets a view of the materialized properties hash, materializing it if needed.
      * @return The properties hash
      */
     const QHash<QString, QString> &getProperties() const;

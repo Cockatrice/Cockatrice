@@ -20,7 +20,7 @@ class TabSupervisor;
 /**
  * Staff investigation tool. Lets moderators look up a user's account data,
  * alternate accounts, login sessions, and staff login activity, and offers
- * the password-reset and remove-avatar actions.
+ * the password-reset, remove-avatar, and remove-banner actions.
  */
 class TabModeration : public Tab
 {
@@ -44,6 +44,8 @@ private slots:
     void resetPasswordResponse(const Response &response);
     void removeAvatar();
     void removeAvatarResponse(const Response &response);
+    void removeBanner();
+    void removeBannerResponse(const Response &response);
 
 private:
     void requestUserInfo(const QString &userName);
@@ -60,6 +62,7 @@ private:
     QPushButton *investigateButton;
     QPushButton *resetPasswordButton;
     QPushButton *removeAvatarButton;
+    QPushButton *removeBannerButton;
 
     QGroupBox *userInfoGroup;
     QLabel *userInfoNameLabel;

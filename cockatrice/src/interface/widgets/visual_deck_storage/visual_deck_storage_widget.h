@@ -6,6 +6,7 @@
 #ifndef VISUAL_DECK_STORAGE_WIDGET_H
 #define VISUAL_DECK_STORAGE_WIDGET_H
 
+#include <QPointer>
 #include <QSet>
 #include <QString>
 #include <QStringList>
@@ -87,7 +88,7 @@ private:
     QVBoxLayout *layout;
     QWidget *searchAndSortContainer;
     QHBoxLayout *searchAndSortLayout;
-    QLabel *databaseLoadIndicator;
+    QPointer<QLabel> databaseLoadIndicator;
     VisualDeckStorageSortWidget *sortWidget;
     VisualDeckStorageSearchWidget *searchWidget;
     DeckPreviewColorIdentityFilterWidget *deckPreviewColorIdentityFilterWidget;

@@ -14,6 +14,7 @@
 #include <QSlider>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 EdhrecCommanderResponseCommanderDetailsDisplayWidget::EdhrecCommanderResponseCommanderDetailsDisplayWidget(
@@ -33,15 +34,7 @@ EdhrecCommanderResponseCommanderDetailsDisplayWidget::EdhrecCommanderResponseCom
     commanderPicture = new CardInfoPictureWidget(this);
     commanderPicture->setCard(CardDatabaseManager::query()->getCard({commanderDetails.getName()}));
 
-    QWidget *currentParent = parentWidget();
-    TabEdhRecMain *parentTab = nullptr;
-
-    while (currentParent) {
-        if ((parentTab = qobject_cast<TabEdhRecMain *>(currentParent))) {
-            break;
-        }
-        currentParent = currentParent->parentWidget();
-    }
+    auto *parentTab = QtUtils::findParentOfType<TabEdhRecMain>(this);
 
     if (parentTab) {
         connect(parentTab->getCardSizeSlider()->getSlider(), &QSlider::valueChanged, commanderPicture,

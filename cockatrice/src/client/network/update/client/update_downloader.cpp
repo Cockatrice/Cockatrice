@@ -9,10 +9,11 @@
 #include <QNetworkRequest>
 #include <QUrl>
 #include <QVariant>
+#include <libcockatrice/network/network_manager.h>
 
 UpdateDownloader::UpdateDownloader(QObject *parent) : QObject(parent), response(nullptr)
 {
-    netMan = new QNetworkAccessManager(this);
+    netMan = NetworkManagerFactory::create(this);
 }
 
 void UpdateDownloader::beginDownload(QUrl downloadUrl)

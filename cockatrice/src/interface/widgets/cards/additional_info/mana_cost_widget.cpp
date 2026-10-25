@@ -11,12 +11,11 @@
 #include <QResizeEvent>
 #include <QSize>
 #include <QtGlobal>
+#include <libcockatrice/utility/qt_utils.h>
 
 ManaCostWidget::ManaCostWidget(QWidget *parent, CardInfoPtr _card) : QWidget(parent), card(_card)
 {
-    layout = new QHBoxLayout(this);
-    layout->setSpacing(5); // Small spacing between icons
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout = QtUtils::makeLayout<QHBoxLayout>(this, 5);
     setLayout(layout);
 
     setFixedHeight(50); // Fixed height

@@ -10,6 +10,7 @@
 #include <QMap>
 #include <QString>
 #include <QWidget>
+#include <libcockatrice/utility/debouncer.h>
 #include <qtmetamacros.h>
 
 class DeckListModel;
@@ -46,6 +47,7 @@ private:
     QPushButton *loadFromClipboardButton;
 
     QMap<QString, QPushButton *> activeFilters; // Store active name filter buttons
+    QtUtils::Debouncer syncDebouncer{100};
 
 private slots:
     void actLoadFromDeck();

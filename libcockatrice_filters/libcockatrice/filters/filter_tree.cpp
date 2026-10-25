@@ -9,8 +9,15 @@
 #include <QList>
 #include <QSharedPointer>
 #include <QStringList>
+#include <QStringView>
 #include <algorithm>
 #include <qnamespace.h>
+
+namespace
+{
+/** Separator between the main and sub types of a card type ("Creature — Elf"). */
+const QString MAIN_SUB_TYPE_SEPARATOR = QStringLiteral(" — ");
+} // namespace
 
 template <class T> FilterTreeNode *FilterTreeBranch<T>::nodeAt(int i) const
 {
@@ -108,7 +115,7 @@ FilterTreeNode *FilterItemList::termNode(const QString &term)
     return childNodes.at(i);
 }
 
-bool FilterItemList::testTypeAnd(const CardInfoPtr info,
+bool FilterItemList::testTypeAnd(const CardInfoPtr &info,
                                  CardFilter::Attr attr,
                                  const CardSearchLanguage &searchLanguage) const
 {
@@ -125,7 +132,7 @@ bool FilterItemList::testTypeAnd(const CardInfoPtr info,
     return true;
 }
 
-bool FilterItemList::testTypeAndNot(const CardInfoPtr info,
+bool FilterItemList::testTypeAndNot(const CardInfoPtr &info,
                                     CardFilter::Attr attr,
                                     const CardSearchLanguage &searchLanguage) const
 {
@@ -133,7 +140,7 @@ bool FilterItemList::testTypeAndNot(const CardInfoPtr info,
     return !testTypeOr(info, attr, searchLanguage);
 }
 
-bool FilterItemList::testTypeOr(const CardInfoPtr info,
+bool FilterItemList::testTypeOr(const CardInfoPtr &info,
                                 CardFilter::Attr attr,
                                 const CardSearchLanguage &searchLanguage) const
 {
@@ -156,7 +163,7 @@ bool FilterItemList::testTypeOr(const CardInfoPtr info,
     return noChildEnabledChild;
 }
 
-bool FilterItemList::testTypeOrNot(const CardInfoPtr info,
+bool FilterItemList::testTypeOrNot(const CardInfoPtr &info,
                                    CardFilter::Attr attr,
                                    const CardSearchLanguage &searchLanguage) const
 {
@@ -164,7 +171,118 @@ bool FilterItemList::testTypeOrNot(const CardInfoPtr info,
     return !testTypeAnd(info, attr, searchLanguage);
 }
 
-bool FilterItem::acceptName(const CardInfoPtr info, const CardSearchLanguage &searchLanguage) const
+FilterItem::FilterItem(QString trm, FilterItemList *parent) : p(parent), term(std::move(trm))
+{
+    lowercaseTerm = term.toLower();
+
+    switch (attr()) {
+        case CardFilter::AttrColor: {
+            QString converted = term.trimmed();
+
+            converted.replace("green", "g", Qt::CaseInsensitive);
+            converted.replace("grn", "g", Qt::CaseInsensitive);
+            converted.replace("blue", "u", Qt::CaseInsensitive);
+            converted.replace("blu", "u", Qt::CaseInsensitive);
+            converted.replace("black", "b", Qt::CaseInsensitive);
+            converted.replace("blk", "b", Qt::CaseInsensitive);
+            converted.replace("red", "r", Qt::CaseInsensitive);
+            converted.replace("white", "w", Qt::CaseInsensitive);
+            converted.replace("wht", "w", Qt::CaseInsensitive);
+            converted.replace("colorless", "c", Qt::CaseInsensitive);
+            converted.replace("colourless", "c", Qt::CaseInsensitive);
+            converted.replace("none", "c", Qt::CaseInsensitive);
+
+            converted.replace(QString(" "), QString(""), Qt::CaseInsensitive);
+
+            convertedColorTerm = converted;
+            break;
+        }
+        case CardFilter::AttrRarity: {
+            QString converted = term.trimmed();
+
+            /*
+             * The purpose of this loop is to only apply one of the replacement
+             * policies and then escape. If we attempt to layer them on top of
+             * each other, we will get awkward results (i.e. comythic rare mythic rareon)
+             * Conditional statement will exit once a case is successful in
+             * replacement OR we go through all possible cases.
+             * Will also need to replace just "mythic"
+             */
+            for (int i = 0; converted.length() <= 3 && i <= 6; i++) {
+                switch (i) {
+                    case 0:
+                        converted.replace("mr", "mythic", Qt::CaseInsensitive);
+                        break;
+                    case 1:
+                        converted.replace("m r", "mythic", Qt::CaseInsensitive);
+                        break;
+                    case 2:
+                        converted.replace("m", "mythic", Qt::CaseInsensitive);
+                        break;
+                    case 3:
+                        converted.replace("c", "common", Qt::CaseInsensitive);
+                        break;
+                    case 4:
+                        converted.replace("u", "uncommon", Qt::CaseInsensitive);
+                        break;
+                    case 5:
+                        converted.replace("r", "rare", Qt::CaseInsensitive);
+                        break;
+                    case 6:
+                        converted.replace("s", "special", Qt::CaseInsensitive);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            convertedRarityTerm = converted;
+            break;
+        }
+        case CardFilter::AttrManaCost:
+            sortedManaCostTerm = term.toUpper();
+            // Sort the mana cost so it will be easy to find
+            std::sort(sortedManaCostTerm.begin(), sortedManaCostTerm.end());
+            break;
+        case CardFilter::AttrLoyalty:
+            uppercaseLoyaltyTerm = term.trimmed().toUpper();
+            break;
+        default:
+            break;
+    }
+
+    // Parse the numeric relation used by cmc, power, toughness and loyalty once.
+    // If the term is not numeric, it probably starts with an operator.
+    const QString trimmedTerm = term.trimmed();
+    bool converted = false;
+    const int value = trimmedTerm.toInt(&converted);
+    if (converted) {
+        numericOperator = NumericOperator::Equal;
+        numericOperand = value;
+    } else if (trimmedTerm.size() > 1) {
+        if (trimmedTerm.at(1) == '=') {
+            numericOperand = trimmedTerm.mid(2).toInt();
+            if (trimmedTerm.startsWith('<')) {
+                numericOperator = NumericOperator::LessEqual;
+            } else if (trimmedTerm.startsWith('>')) {
+                numericOperator = NumericOperator::GreaterEqual;
+            } else {
+                numericOperator = NumericOperator::Equal;
+            }
+        } else {
+            numericOperand = trimmedTerm.mid(1).toInt();
+            if (trimmedTerm.startsWith('<')) {
+                numericOperator = NumericOperator::Less;
+            } else if (trimmedTerm.startsWith('>')) {
+                numericOperator = NumericOperator::Greater;
+            } else if (trimmedTerm.startsWith('=')) {
+                numericOperator = NumericOperator::Equal;
+            }
+        }
+    }
+}
+
+bool FilterItem::acceptName(const CardInfoPtr &info, const CardSearchLanguage &searchLanguage) const
 {
     const QString &englishName = info->getName();
     const QString &localizedName = info->getLocalizedName(searchLanguage.language);
@@ -187,7 +305,7 @@ bool FilterItem::acceptName(const CardInfoPtr info, const CardSearchLanguage &se
     return false;
 }
 
-bool FilterItem::acceptNameExact(const CardInfoPtr info, const CardSearchLanguage &searchLanguage) const
+bool FilterItem::acceptNameExact(const CardInfoPtr &info, const CardSearchLanguage &searchLanguage) const
 {
     const QString &englishName = info->getName();
     const QString &localizedName = info->getLocalizedName(searchLanguage.language);
@@ -210,44 +328,42 @@ bool FilterItem::acceptNameExact(const CardInfoPtr info, const CardSearchLanguag
     return false;
 }
 
-bool FilterItem::acceptType(const CardInfoPtr info) const
+bool FilterItem::acceptType(const CardInfoPtr &info) const
 {
     return info->getCardType().contains(term, Qt::CaseInsensitive);
 }
 
-bool FilterItem::acceptMainType(const CardInfoPtr info) const
+bool FilterItem::acceptMainType(const CardInfoPtr &info) const
 {
-    const QStringList typeParts = info->getCardType().split(" — ");
-    return !typeParts.isEmpty() && typeParts[0].contains(term, Qt::CaseInsensitive);
+    const QString type = info->getCardType();
+    const qsizetype separator = type.indexOf(MAIN_SUB_TYPE_SEPARATOR);
+    if (separator >= 0) {
+        return QStringView(type).left(separator).contains(term, Qt::CaseInsensitive);
+    }
+    return type.contains(term, Qt::CaseInsensitive);
 }
 
-bool FilterItem::acceptSubType(const CardInfoPtr info) const
+bool FilterItem::acceptSubType(const CardInfoPtr &info) const
 {
-    const QStringList typeParts = info->getCardType().split(" — ");
-    return typeParts.size() > 1 && typeParts[1].contains(term, Qt::CaseInsensitive);
+    const QString type = info->getCardType();
+    const qsizetype separator = type.indexOf(MAIN_SUB_TYPE_SEPARATOR);
+    if (separator < 0) {
+        return false;
+    }
+
+    const qsizetype subTypeStart = separator + MAIN_SUB_TYPE_SEPARATOR.size();
+    const qsizetype nextSeparator = type.indexOf(MAIN_SUB_TYPE_SEPARATOR, subTypeStart);
+    const QStringView subType = nextSeparator < 0 ? QStringView(type).mid(subTypeStart)
+                                                  : QStringView(type).mid(subTypeStart, nextSeparator - subTypeStart);
+    return subType.contains(term, Qt::CaseInsensitive);
 }
 
-bool FilterItem::acceptColor(const CardInfoPtr info) const
+bool FilterItem::acceptColor(const CardInfoPtr &info) const
 {
-    QString converted_term = term.trimmed();
-
-    converted_term.replace("green", "g", Qt::CaseInsensitive);
-    converted_term.replace("grn", "g", Qt::CaseInsensitive);
-    converted_term.replace("blue", "u", Qt::CaseInsensitive);
-    converted_term.replace("blu", "u", Qt::CaseInsensitive);
-    converted_term.replace("black", "b", Qt::CaseInsensitive);
-    converted_term.replace("blk", "b", Qt::CaseInsensitive);
-    converted_term.replace("red", "r", Qt::CaseInsensitive);
-    converted_term.replace("white", "w", Qt::CaseInsensitive);
-    converted_term.replace("wht", "w", Qt::CaseInsensitive);
-    converted_term.replace("colorless", "c", Qt::CaseInsensitive);
-    converted_term.replace("colourless", "c", Qt::CaseInsensitive);
-    converted_term.replace("none", "c", Qt::CaseInsensitive);
-
-    converted_term.replace(QString(" "), QString(""), Qt::CaseInsensitive);
+    const QString colors = info->getColors();
 
     // Colorless card filter
-    if (converted_term.toLower() == "c" && info->getColors().length() < 1) {
+    if (convertedColorTerm.toLower() == "c" && colors.length() < 1) {
         return true;
     }
 
@@ -256,16 +372,16 @@ bool FilterItem::acceptColor(const CardInfoPtr info) const
      * then we should match all of them to the card's colors
      */
     int match_count = 0;
-    for (auto &it : converted_term) {
-        if (info->getColors().contains(it, Qt::CaseInsensitive)) {
+    for (const QChar &color : convertedColorTerm) {
+        if (colors.contains(color, Qt::CaseInsensitive)) {
             match_count++;
         }
     }
 
-    return match_count == converted_term.length();
+    return match_count == convertedColorTerm.length();
 }
 
-bool FilterItem::acceptText(const CardInfoPtr info, const CardSearchLanguage &searchLanguage) const
+bool FilterItem::acceptText(const CardInfoPtr &info, const CardSearchLanguage &searchLanguage) const
 {
     const QString &englishText = info->getText();
     const QString &localizedText = info->getLocalizedText(searchLanguage.language);
@@ -288,51 +404,47 @@ bool FilterItem::acceptText(const CardInfoPtr info, const CardSearchLanguage &se
     return false;
 }
 
-bool FilterItem::acceptSet(const CardInfoPtr info) const
+bool FilterItem::acceptSet(const CardInfoPtr &info) const
 {
-    bool status = false;
     for (const auto &printings : info->getSets()) {
-        for (const auto &set : printings) {
-            if (set.getSet()->getShortName().compare(term, Qt::CaseInsensitive) == 0 ||
-                set.getSet()->getLongName().compare(term, Qt::CaseInsensitive) == 0) {
-                status = true;
-                break;
+        for (const auto &printing : printings) {
+            const CardSetPtr set = printing.getSet();
+            if (set && (set->getShortName().compare(term, Qt::CaseInsensitive) == 0 ||
+                        set->getLongName().compare(term, Qt::CaseInsensitive) == 0)) {
+                return true;
             }
         }
     }
 
-    return status;
+    return false;
 }
 
-bool FilterItem::acceptManaCost(const CardInfoPtr info) const
+bool FilterItem::acceptManaCost(const CardInfoPtr &info) const
 {
-    QString partialCost = term.toUpper();
-
-    // Sort the mana cost so it will be easy to find
-    std::sort(partialCost.begin(), partialCost.end());
-
     // Try to seperate the mana cost in case it's a split card
     // if it's not a split card the loop will run only once
-    for (QString fullManaCost : info->getManaCost().split("//")) {
+    for (const QString &manaCostPart : info->getManaCost().split("//")) {
+        QString fullManaCost = manaCostPart;
         std::sort(fullManaCost.begin(), fullManaCost.end());
 
         // If the partial is found in the full, return true
-        if (fullManaCost.contains(partialCost)) {
+        if (fullManaCost.contains(sortedManaCostTerm)) {
             return true;
         }
     }
     return false;
 }
 
-bool FilterItem::acceptCmc(const CardInfoPtr info) const
+bool FilterItem::acceptCmc(const CardInfoPtr &info) const
 {
+    const QString cmc = info->getCmc();
     bool convertSuccess;
-    int cmcInt = info->getCmc().toInt(&convertSuccess);
+    int cmcInt = cmc.toInt(&convertSuccess);
     // if conversion failed, check for the "//" separator used in split cards
     if (!convertSuccess) {
         int cmcSum = 0;
-        for (const QString &cmc : info->getCmc().split("//")) {
-            cmcInt = cmc.toInt();
+        for (const QString &cmcPart : cmc.split("//")) {
+            cmcInt = cmcPart.toInt();
             cmcSum += cmcInt;
             if (relationCheck(cmcInt)) {
                 return true;
@@ -344,39 +456,36 @@ bool FilterItem::acceptCmc(const CardInfoPtr info) const
     }
 }
 
-bool FilterItem::acceptFormat(const CardInfoPtr info) const
+bool FilterItem::acceptFormat(const CardInfoPtr &info) const
 {
-    return info->getLegalityProp(term.toLower()) == "legal";
+    return info->getLegalityProp(lowercaseTerm) == "legal";
 }
 
-bool FilterItem::acceptLoyalty(const CardInfoPtr info) const
+bool FilterItem::acceptLoyalty(const CardInfoPtr &info) const
 {
-    if (info->getLoyalty().isEmpty()) {
+    const QString loyaltyString = info->getLoyalty();
+    if (loyaltyString.isEmpty()) {
         return false;
-    } else {
-        bool success;
-        // if loyalty can't be converted to "int" it must be "X"
-        int loyalty = info->getLoyalty().toInt(&success);
-        if (success) {
-            return relationCheck(loyalty);
-        } else {
-            return term.trimmed().toUpper() == info->getLoyalty();
-        }
     }
+
+    bool success;
+    // if loyalty can't be converted to "int" it must be "X"
+    int loyalty = loyaltyString.toInt(&success);
+    if (success) {
+        return relationCheck(loyalty);
+    }
+    return uppercaseLoyaltyTerm == loyaltyString;
 }
 
-bool FilterItem::acceptPowerToughness(const CardInfoPtr info, CardFilter::Attr attr) const
+bool FilterItem::acceptPowerToughness(const CardInfoPtr &info, CardFilter::Attr attr) const
 {
-    int slash = info->getPowTough().indexOf("/");
+    const QString powTough = info->getPowTough();
+    const qsizetype slash = powTough.indexOf("/");
     if (slash == -1) {
         return false;
     }
-    QString valueString;
-    if (attr == CardFilter::AttrPow) {
-        valueString = info->getPowTough().mid(0, slash);
-    } else {
-        valueString = info->getPowTough().mid(slash + 1);
-    }
+
+    QString valueString = attr == CardFilter::AttrPow ? powTough.mid(0, slash) : powTough.mid(slash + 1);
     if (term == valueString) {
         return true;
     }
@@ -386,49 +495,11 @@ bool FilterItem::acceptPowerToughness(const CardInfoPtr info, CardFilter::Attr a
     return conversion ? relationCheck(value) : false;
 }
 
-bool FilterItem::acceptRarity(const CardInfoPtr info) const
+bool FilterItem::acceptRarity(const CardInfoPtr &info) const
 {
-    QString converted_term = term.trimmed();
-
-    /*
-     * The purpose of this loop is to only apply one of the replacement
-     * policies and then escape. If we attempt to layer them on top of
-     * each other, we will get awkward results (i.e. comythic rare mythic rareon)
-     * Conditional statement will exit once a case is successful in
-     * replacement OR we go through all possible cases.
-     * Will also need to replace just "mythic"
-     */
-    for (int i = 0; converted_term.length() <= 3 && i <= 6; i++) {
-        switch (i) {
-            case 0:
-                converted_term.replace("mr", "mythic", Qt::CaseInsensitive);
-                break;
-            case 1:
-                converted_term.replace("m r", "mythic", Qt::CaseInsensitive);
-                break;
-            case 2:
-                converted_term.replace("m", "mythic", Qt::CaseInsensitive);
-                break;
-            case 3:
-                converted_term.replace("c", "common", Qt::CaseInsensitive);
-                break;
-            case 4:
-                converted_term.replace("u", "uncommon", Qt::CaseInsensitive);
-                break;
-            case 5:
-                converted_term.replace("r", "rare", Qt::CaseInsensitive);
-                break;
-            case 6:
-                converted_term.replace("s", "special", Qt::CaseInsensitive);
-                break;
-            default:
-                break;
-        }
-    }
-
     for (const auto &printings : info->getSets()) {
         for (const auto &printing : printings) {
-            if (printing.getProperty("rarity").compare(converted_term, Qt::CaseInsensitive) == 0) {
+            if (printing.getProperty("rarity").compare(convertedRarityTerm, Qt::CaseInsensitive) == 0) {
                 return true;
             }
         }
@@ -438,41 +509,25 @@ bool FilterItem::acceptRarity(const CardInfoPtr info) const
 
 bool FilterItem::relationCheck(int cardInfo) const
 {
-    bool result, conversion;
-
-    // if int conversion fails, there's probably an operator at the start
-    result = (cardInfo == term.toInt(&conversion));
-    if (!conversion) {
-        // leading whitespaces could cause indexing to fail
-        QString trimmedTerm = term.trimmed();
-        // check whether it's a 2 char operator (<=, >=, or ==)
-        if (trimmedTerm[1] == '=') {
-            int termInt = trimmedTerm.mid(2).toInt();
-            if (trimmedTerm.startsWith('<')) {
-                result = (cardInfo <= termInt);
-            } else if (trimmedTerm.startsWith('>')) {
-                result = (cardInfo >= termInt);
-            } else {
-                result = (cardInfo == termInt);
-            }
-        } else {
-            int termInt = trimmedTerm.mid(1).toInt();
-            if (trimmedTerm.startsWith('<')) {
-                result = (cardInfo < termInt);
-            } else if (trimmedTerm.startsWith('>')) {
-                result = (cardInfo > termInt);
-            } else if (trimmedTerm.startsWith("=")) {
-                result = (cardInfo == termInt);
-            } else {
-                // the int conversion hasn't failed due to an operator at the start
-                result = false;
-            }
-        }
+    switch (numericOperator) {
+        case NumericOperator::Equal:
+            return cardInfo == numericOperand;
+        case NumericOperator::Less:
+            return cardInfo < numericOperand;
+        case NumericOperator::LessEqual:
+            return cardInfo <= numericOperand;
+        case NumericOperator::Greater:
+            return cardInfo > numericOperand;
+        case NumericOperator::GreaterEqual:
+            return cardInfo >= numericOperand;
+        case NumericOperator::Invalid:
+            return false;
     }
-    return result;
+
+    return false;
 }
 
-bool FilterItem::acceptCardAttr(const CardInfoPtr info,
+bool FilterItem::acceptCardAttr(const CardInfoPtr &info,
                                 CardFilter::Attr attr,
                                 const CardSearchLanguage &searchLanguage) const
 {
@@ -556,7 +611,7 @@ FilterTreeNode *FilterTree::termNode(const CardFilter *f)
     return termNode(f->attr(), f->type(), f->term());
 }
 
-bool FilterTree::testAttr(const CardInfoPtr info, const LogicMap *lm, const CardSearchLanguage &searchLanguage) const
+bool FilterTree::testAttr(const CardInfoPtr &info, const LogicMap *lm, const CardSearchLanguage &searchLanguage) const
 {
     const FilterItemList *fil;
     bool status = true;
@@ -589,7 +644,7 @@ bool FilterTree::testAttr(const CardInfoPtr info, const LogicMap *lm, const Card
     return status;
 }
 
-bool FilterTree::acceptsCard(const CardInfoPtr info, const CardSearchLanguage &searchLanguage) const
+bool FilterTree::acceptsCard(const CardInfoPtr &info, const CardSearchLanguage &searchLanguage) const
 {
     for (auto i = childNodes.constBegin(); i != childNodes.constEnd(); i++) {
         if ((*i)->isEnabled() && !testAttr(info, *i, searchLanguage)) {

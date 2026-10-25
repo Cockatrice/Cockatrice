@@ -47,7 +47,7 @@ public:
      *
      * May be null if the ExactCard is empty.
      */
-    [[nodiscard]] CardInfoPtr getCardPtr() const
+    [[nodiscard]] const CardInfoPtr &getCardPtr() const
     {
         return card;
     }
@@ -57,7 +57,7 @@ public:
      *
      * May be empty if no specific printing was assigned.
      */
-    [[nodiscard]] PrintingInfo getPrinting() const
+    [[nodiscard]] const PrintingInfo &getPrinting() const
     {
         return printing;
     }

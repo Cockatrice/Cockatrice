@@ -22,6 +22,7 @@
 #include <QWidget>
 #include <algorithm>
 #include <libcockatrice/utility/color.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 #include <utility>
 
@@ -47,12 +48,7 @@ ManaBaseWidget::ManaBaseWidget(QWidget *parent, DeckListStatisticsAnalyzer *anal
 void ManaBaseWidget::updateDisplay()
 {
     // Clear previous widgets
-    while (QLayoutItem *item = barLayout->takeAt(0)) {
-        if (item->widget()) {
-            item->widget()->deleteLater();
-        }
-        delete item;
-    }
+    QtUtils::clearLayoutRec(barLayout);
 
     auto &pipCount = analyzer->getProductionPipCount();
     auto &cardCount = analyzer->getProductionCardCount();

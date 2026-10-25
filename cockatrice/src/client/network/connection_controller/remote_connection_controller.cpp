@@ -24,6 +24,7 @@
 #include <libcockatrice/network/client/remote/remote_client.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/settings/servers_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 class QWidget;
@@ -300,9 +301,8 @@ void ConnectionController::onLoginError(int r,
         }
 
         case Response::RespRegistrationRequired: {
-            if (QMessageBox::question(dialogParent, tr("Error"),
-                                      tr("This server requires user registration. Do you want to register now?"),
-                                      QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+            if (QtUtils::confirm(dialogParent, tr("Error"),
+                                 tr("This server requires user registration. Do you want to register now?"))) {
                 registerToServer();
             }
             return; // don't re-prompt connect

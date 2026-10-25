@@ -17,6 +17,7 @@
 #include <QString>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/utility/qt_utils.h>
 
 class QWidget;
 
@@ -30,9 +31,8 @@ CardInfoDisplayWidget::CardInfoDisplayWidget(const CardRef &cardRef, QWidget *pa
     text->setObjectName("text");
     connect(text, &CardInfoTextWidget::linkActivated, this, [this](const QString &card) { setCard({card}); });
 
-    auto *layout = new QVBoxLayout();
+    auto *layout = QtUtils::makeLayout<QVBoxLayout>();
     layout->setObjectName("layout");
-    layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
     layout->addWidget(pic, 0, Qt::AlignCenter);
     layout->addWidget(text, 0, Qt::AlignCenter);

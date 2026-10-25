@@ -16,14 +16,13 @@
 #include <QVBoxLayout>
 #include <QVector>
 #include <algorithm>
+#include <libcockatrice/utility/qt_utils.h>
 
 constexpr int MIN_ROW_HEIGHT = 100; // Minimum readable height per row
 
 ManaCurveCategoryWidget::ManaCurveCategoryWidget(QWidget *parent) : QWidget(parent)
 {
-    layout = new QVBoxLayout(this);
-    layout->setSpacing(4);
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout = QtUtils::makeLayout<QVBoxLayout>(this, 0, 4);
 
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 }
@@ -95,9 +94,7 @@ void ManaCurveCategoryWidget::updateDisplay(int minCmc,
 
         row->setFixedHeight(MIN_ROW_HEIGHT);
 
-        QHBoxLayout *rowLayout = new QHBoxLayout(row);
-        rowLayout->setContentsMargins(0, 0, 0, 0);
-        rowLayout->setSpacing(4);
+        QHBoxLayout *rowLayout = QtUtils::makeLayout<QHBoxLayout>(row, 4);
 
         QLabel *categoryLabel = new QLabel(cat, row);
         categoryLabel->setFixedWidth(80);

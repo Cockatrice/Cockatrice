@@ -1,0 +1,11 @@
+syntax = "proto2";
+import "response.proto";
+
+message Response_RemoveUserBanner {
+    extend Response {
+        optional Response_RemoveUserBanner ext = 1221;
+    }
+    optional string user_name = 1;
+    // false when the user exists but had no banner card set, so nothing was cleared
+    optional bool had_banner = 2 [default = true];
+}
