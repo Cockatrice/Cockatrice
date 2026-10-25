@@ -55,6 +55,17 @@ protected:
     virtual void logDebugMessage(const QString & /* message */)
     {
     }
+    /**
+     * @brief Whether debug messages produced by this handler are actually written anywhere.
+     *
+     * Formatting a protocol message for the log is expensive, so callers only
+     * build the debug string when this returns true. The base handler has no
+     * log destination and therefore never needs one.
+     */
+    [[nodiscard]] virtual bool logsDebugMessages() const
+    {
+        return false;
+    }
 
 private:
     QList<int> messageSizeOverTime, messageCountOverTime, commandCountOverTime;

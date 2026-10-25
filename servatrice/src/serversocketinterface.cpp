@@ -265,6 +265,11 @@ void AbstractServerSocketInterface::logDebugMessage(const QString &message)
     logger->logMessage(message, this);
 }
 
+bool AbstractServerSocketInterface::logsDebugMessages() const
+{
+    return logger != nullptr && logger->isLoggingEnabled();
+}
+
 void AbstractServerSocketInterface::processCommandContainer(const CommandContainer &cont)
 {
     QElapsedTimer timer;
@@ -4431,13 +4436,17 @@ void TcpServerSocketInterface::readClient()
     servatrice->incRxBytes(data.size());
     inputBuffer.append(data);
 
-    do {
+    // Parse messages straight out of inputBuffer at readOffset. Removing each
+    // consumed message from the front would memmove the remaining bytes once
+    // per message; the consumed prefix is dropped once parsing stops.
+    qsizetype readOffset = 0;
+
+    while (true) {
         if (!messageInProgress) {
-            if (inputBuffer.size() >= 4) {
-                messageLength = (((quint32)(unsigned char)inputBuffer[0]) << 24) +
-                                (((quint32)(unsigned char)inputBuffer[1]) << 16) +
-                                (((quint32)(unsigned char)inputBuffer[2]) << 8) +
-                                ((quint32)(unsigned char)inputBuffer[3]);
+            if (inputBuffer.size() - readOffset >= 4) {
+                const auto *header = reinterpret_cast<const unsigned char *>(inputBuffer.constData() + readOffset);
+                messageLength = (static_cast<quint32>(header[0]) << 24) + (static_cast<quint32>(header[1]) << 16) +
+                                (static_cast<quint32>(header[2]) << 8) + static_cast<quint32>(header[3]);
                 // Reject implausible lengths instead of buffering until they arrive.
                 // This also handles lengths that overflow into negative int values.
                 if (messageLength < 0 || messageLength > MAX_TCP_MESSAGE_SIZE) {
@@ -4446,32 +4455,33 @@ void TcpServerSocketInterface::readClient()
                     prepareDestroy();
                     return;
                 }
-                inputBuffer.remove(0, 4);
+                readOffset += 4;
                 messageInProgress = true;
             } else {
-                return;
+                break;
             }
         }
-        if (inputBuffer.size() < messageLength) {
-            return;
+        if (inputBuffer.size() - readOffset < messageLength) {
+            break;
         }
 
         CommandContainer newCommandContainer;
-        bool ok;
+        bool ok = false;
         try {
-            ok = newCommandContainer.ParseFromArray(inputBuffer.data(), messageLength);
+            ok = newCommandContainer.ParseFromArray(inputBuffer.constData() + readOffset, messageLength);
         } catch (std::exception &e) {
-            qCWarning(TcpServerSocketInterfaceLog) << "Caught std::exception in" << __FILE__ << __LINE__ <<
+            qCWarning(TcpServerSocketInterfaceLog)
+                << "Caught std::exception in" << __FILE__ << __LINE__ <<
 #ifdef _MSC_VER // Visual Studio
                 __FUNCTION__
 #else
                 __PRETTY_FUNCTION__
 #endif
-                                                   << Qt::endl
-                                                   << "Exception:" << e.what() << Qt::endl
-                                                   << "Message coming from:" << getAddress() << Qt::endl
-                                                   << "Message length:" << messageLength << Qt::endl
-                                                   << "Message content:" << inputBuffer.toHex();
+                << Qt::endl
+                << "Exception:" << e.what() << Qt::endl
+                << "Message coming from:" << getAddress() << Qt::endl
+                << "Message length:" << messageLength << Qt::endl
+                << "Message content:" << inputBuffer.mid(readOffset, messageLength).toHex();
         } catch (...) {
             qCWarning(TcpServerSocketInterfaceLog) << "Unhandled exception in" << __FILE__ << __LINE__ <<
 #ifdef _MSC_VER // Visual Studio
@@ -4482,7 +4492,7 @@ void TcpServerSocketInterface::readClient()
                                                    << Qt::endl
                                                    << "Message coming from:" << getAddress();
         }
-        inputBuffer.remove(0, messageLength);
+        readOffset += messageLength;
         messageInProgress = false;
 
         if (ok) {
@@ -4499,8 +4509,12 @@ void TcpServerSocketInterface::readClient()
         } else {
             qCWarning(TcpServerSocketInterfaceLog) << "parsing error!";
         }
+    }
 
-    } while (!inputBuffer.isEmpty());
+    // Drop the consumed prefix once, instead of shifting the buffer per message.
+    if (readOffset > 0) {
+        inputBuffer.remove(0, readOffset);
+    }
 }
 
 bool TcpServerSocketInterface::initTcpSession()
