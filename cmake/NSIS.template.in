@@ -27,6 +27,11 @@ Var StaleFindName
 Var DataBackupFindHandle
 Var DataBackupFindName
 Var IsUpgrade
+; Set together by whichever purge block ran: the verdict RetryDllPurge measured
+; and whether a purge ran at all - a portable install into a directory without
+; portable.dat is neither purge block, and the abort below measures it itself.
+Var StaleRuntimeAfterPurge
+Var DllPurgeRan
 Var AbortReason
 ; Diagnostics for a failed purge: the holder probe in LogProcessesUsingInstallDir writes
 ; $HolderOutput (one log line) and sets $HolderFound when it named anything.
@@ -153,6 +158,10 @@ StrCpy $LooseDeckNoticeShown ""
 ; No old install location resolved yet; Backup/Restore fall back to $INSTDIR
 ; when this is empty (the /R path where $INSTDIR already is the old dir).
 StrCpy $OldInstallDir ""
+; No purge has run and nothing has been measured yet. The section sets both
+; after a purge, or measures the directory itself when neither purge applies.
+StrCpy $StaleRuntimeAfterPurge 0
+StrCpy $DllPurgeRan 0
 ; Start each run from a clean file so the log that gets sent back is the last
 ; run, not every past run glued together.
 FileOpen $LogHandle "$InstallLogPath" w
@@ -1176,6 +1185,33 @@ Function CheckStaleRuntimeMask
     ${EndIf}
 FunctionEnd
 
+; Removes the Plugins directory and all top-level DLLs from $INSTDIR, then
+; retries up to two more times (2 s apart) when files remain locked, so that
+; transient holders such as antivirus scanners have a chance to release their
+; handles before the installer gives up. Three attempts total.
+; Sets $R0 to 0 when the purge is clean, or to 1 when stale DLLs remain
+; after all attempts.
+Function RetryDllPurge
+    StrCpy $R5 0        ; counts retries after the initial attempt
+    rdp_loop:
+    RMDir /r "$INSTDIR\Plugins"
+    Delete "$INSTDIR\*.dll"
+    Call HasStaleRuntimeFiles
+    ; $R0 = 0: all clear, nothing left to do.
+    ${If} $R0 = 0
+        Return
+    ${EndIf}
+    IntOp $R5 $R5 + 1
+    ; Allow two retries after the initial attempt ($R5 is the retry counter,
+    ; so the loop runs at most 3 times: attempt + retry 1 + retry 2).
+    ${If} $R5 > 2
+        !insertmacro CockLog "RetryDllPurge: stale files remain after 3 attempts, giving up"
+        Return          ; $R0 is already 1
+    ${EndIf}
+    !insertmacro CockLog "RetryDllPurge: retry $R5 of 2 after stale purge, sleeping 2 s"
+    Sleep 2000
+    Goto rdp_loop
+FunctionEnd  ; RetryDllPurge
 ; Turns a Win32 error code into the wording that goes into the log.
 ; usage: set $0 to the code, result in $R0.
 ;
@@ -1631,6 +1667,23 @@ ${If} $ReinstallMode = 0
     Call EnsureAppsNotRunning
 ${EndIf}
 
+; Measured before either purge block, because it has to describe the directory as
+; it arrived here and not what a purge left of it: IsExistingCockatriceInstall
+; looks for cockatrice.exe, oracle.exe, servatrice.exe, uninstall.exe, Qt6*.dll
+; and qt.conf, and the portable purge below deletes exactly those. Taken after
+; that purge it answered "not an install" as soon as the only survivor was a file
+; it does not look for - a locked abseil_dll.dll or libssl-3-x64.dll, say - and
+; the abort further down was then skipped for the very directory the purge had
+; just failed in.
+; Remembered because the stale-runtime check below must only ever fire for a
+; directory this installer recognised as a Cockatrice install. Scanning for
+; leftovers in an unrelated directory (a first-time install into a folder that
+; happens to hold some Qt5 DLLs, say) would otherwise turn those files into an
+; abort reason even though the payload is about to overwrite nothing of theirs.
+Call IsExistingCockatriceInstall
+!insertmacro CockLog "section: IsExistingCockatriceInstall=$R0"
+StrCpy $IsUpgrade $R0
+
 ${If} $PortableMode = 1
 ${AndIf} ${FileExists} "$INSTDIR\portable.dat"
 	; upgrade portable mode
@@ -1654,7 +1707,12 @@ ${AndIf} ${FileExists} "$INSTDIR\portable.dat"
 	; what this has to guarantee is that nothing from the previous build is left
 	; to be loaded next to the new executables. Naming the families by hand is
 	; what let abseil_dll.dll through; see HasStaleRuntimeFiles.
-	Delete "$INSTDIR\*.dll"
+	Call RetryDllPurge
+	; The purge's own verdict: HasStaleRuntimeFiles measures *.dll + Plugins\*.*,
+	; the set that catches any leftover runtime DLL, Qt or otherwise. Held in a
+	; variable because $R0 is reused by the next function call in this section.
+	StrCpy $StaleRuntimeAfterPurge $R0
+	StrCpy $DllPurgeRan 1
 	Delete "$INSTDIR\qt.conf"
 	Delete "$INSTDIR\qdebug.txt"
 	Delete "$INSTDIR\servatrice.sql"
@@ -1685,25 +1743,13 @@ ${EndIf}
 ; checked without a Windows toolchain. Compiled by the same build that compiles this
 ; installer, the layout belongs to the Windows SDK, and .ci/compile.sh runs the probe
 ; on the Windows runners instead of trusting that it compiles.
-Call IsExistingCockatriceInstall
-!insertmacro CockLog "section: IsExistingCockatriceInstall=$R0"
-; Remembered because the stale-runtime check below must only ever fire for a
-; directory this installer recognised as a Cockatrice install. Scanning for
-; leftovers in an unrelated directory (a first-time install into a folder that
-; happens to hold some Qt5 DLLs, say) would otherwise turn those files into an
-; abort reason even though the payload is about to overwrite nothing of theirs.
-StrCpy $IsUpgrade $R0
 ${If} $PortableMode = 0
-${AndIf} $R0 = 1
+${AndIf} $IsUpgrade = 1
 	!insertmacro CockLog "section: non-portable upgrade purge"
 	!insertmacro CockLogListing "before-purge" "*.dll"
-	RMDir /r "$INSTDIR\Plugins"
-	; RMDir /r reports a failure only through the error flag, and only as a
-	; boolean; the surviving file names come from the listing below.
-	${If} ${FileExists} "$INSTDIR\Plugins\*.*"
-		!insertmacro CockLog "purge: '$INSTDIR\Plugins' could not be removed completely"
-	${EndIf}
-	Delete "$INSTDIR\*.dll"
+	Call RetryDllPurge
+	StrCpy $StaleRuntimeAfterPurge $R0
+	StrCpy $DllPurgeRan 1
 	!insertmacro CockLogListing "after-purge" "*.dll"
 	!insertmacro CockLogListing "after-plugins" "Plugins\*.*"
 ${EndIf}
@@ -1718,13 +1764,29 @@ ${EndIf}
 ; run on Windows or it contains an error", so stop here instead of compounding
 ; it. Nothing of the new payload has been written at this point, so the next run,
 ; with the applications closed, gets a clean install.
+; $StaleRuntimeAfterPurge is RetryDllPurge's verdict, measured with
+; HasStaleRuntimeFiles (*.dll + Plugins\*.*) - the set that catches any leftover
+; runtime DLL, Qt or otherwise. It exists only when a purge ran, and the two
+; purge blocks above cover every upgrade except one: a portable install into a
+; directory without portable.dat is neither of them, so that directory is
+; measured here instead. A test of $IsUpgrade alone could not stand in for it -
+; that only says the directory was ours before the purge, not what the purge
+; left behind.
+; A directory this installer did not recognise as an install never aborts: the
+; unrelated DLLs already in it (a first-time install into a folder that happens
+; to hold some Qt5 DLLs, say) are not leftovers, and the payload overwrites
+; nothing of theirs.
 ${If} $IsUpgrade = 1
-    Call HasStaleRuntimeFiles
-    !insertmacro CockLog "section: HasStaleRuntimeFiles=$R0"
+    ${If} $DllPurgeRan = 0
+        !insertmacro CockLog "section: no purge applies, measuring the directory instead"
+        Call HasStaleRuntimeFiles
+        StrCpy $StaleRuntimeAfterPurge $R0
+    ${EndIf}
+    !insertmacro CockLog "section: stale-runtime after purge=$StaleRuntimeAfterPurge"
 ${Else}
-    StrCpy $R0 0
+    StrCpy $StaleRuntimeAfterPurge 0
 ${EndIf}
-${If} $R0 = 1
+${If} $StaleRuntimeAfterPurge = 1
     !insertmacro CockLog "section: aborting, files of a previous version survived the purge"
     DetailPrint "Files of a previous version could not be removed; aborting the installation."
     ; Who is holding the payload is recorded before the abort, so the log that
