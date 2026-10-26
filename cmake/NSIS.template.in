@@ -38,6 +38,9 @@ Var AbortReason
 Var HolderExit
 Var HolderOutput
 Var HolderFound
+; OfferToCloseAndRetryPurge counts the accepted close-and-retry rounds, so the
+; prompt can stop repeating an offer that provably did not help (see there).
+Var HolderCloseRounds
 Var WaitPid
 Var LauncherExited
 Var InstallLogPath
@@ -766,8 +769,16 @@ Function CloseMatchingApps
     ; or one owned by another account running as SYSTEM) as a match would make
     ; the installer close a third party application, and it runs elevated, so
     ; CloseMainWindow() would succeed on it.
+    ;
+    ; The window is activated first, because WM_CLOSE is answered, not obeyed:
+    ; Cockatrice replies with a confirmation of its own while a card database
+    ; update is running, a game is open or a deck is unsaved. Without the
+    ; activation that dialog opens behind the installer's own prompt, where it
+    ; looks like the close did nothing and the second WM_CLOSE is delivered to a
+    ; main window its own modal dialog has disabled, which is ignored. Failing to
+    ; activate is harmless and swallowed: the close request still goes out.
     System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$GuardDir")'
-    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_GUARD_DIR, [StringComparison]::OrdinalIgnoreCase) } else { $$false } } catch { $$false } } | ForEach-Object { $$null = $$_.CloseMainWindow() }"'
+    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_GUARD_DIR, [StringComparison]::OrdinalIgnoreCase) } else { $$false } } catch { $$false } } | ForEach-Object { try { $$null = (New-Object -ComObject WScript.Shell).AppActivate($$_.Id) } catch { }; $$null = $$_.CloseMainWindow() }"'
     Pop $R3
 FunctionEnd
 
@@ -1425,16 +1436,19 @@ FunctionEnd
 ; Called after a purge left files behind and LogStaleRuntimeDiagnostics named who
 ; is holding them. Instead of aborting straight away - which on /R strands the
 ; user, since the old version is already uninstalled - ask, close what this
-; installer owns, purge again, and repeat while the user keeps saying Yes. Sets
+; installer owns, purge again, and retry while the user keeps asking. Sets
 ; $StaleRuntimeAfterPurge to the last purge's verdict, so the caller still aborts
 ; when the files survive.
 ;
-; Nothing is force-closed. Cockatrice, Oracle and Servatrice are asked to close
-; (WM_CLOSE, the same request as clicking the window's close button); Cockatrice
-; may be showing a "really leave this game?" confirmation or holding an unsaved
-; deck, and that stays its decision, exactly as the running-instance guard treats
-; it. Everything else the probe named - a scanner, a service, an editor - is left
-; to the user, whom the prompt names it to.
+; Cockatrice is asked to close (WM_CLOSE, the same request as clicking the
+; window's close button) and keeps the last word: it may be waiting for an answer
+; to its own "really quit?" confirmation (a running card database update, an open
+; game, an unsaved deck), and that stays its decision, exactly as the
+; running-instance guard treats it. Oracle and Servatrice have no window to send a
+; close to at all, and nothing here is force-stopped: Oracle writes the card
+; database in place and killing it mid-write would corrupt it. Everything the
+; probe named that this installer cannot close - those two included - is left to
+; the user, whom the prompt names it to.
 ;
 ; Restart Manager's RmShutdown was the alternative and was rejected: it shuts down
 ; services as well as applications, and the only way to bring them back is
@@ -1447,6 +1461,13 @@ FunctionEnd
 ; uses for its message box. No offer either when the probe named nobody: there is
 ; nothing to close, and the abort's per-file diagnostics already record what
 ; Windows said.
+;
+; The first round offers the close; every later one stops offering it and says
+; what to do instead. Repeating the same question is what made an accepted close
+; look like a Yes that was ignored: when Cockatrice was blocked on its own
+; confirmation, the second Yes was delivered to a window that dialog had disabled,
+; so nothing closed, the holders were unchanged, and the identical prompt came
+; back with no hint of what had happened.
 Function OfferToCloseAndRetryPurge
     ${If} $ReinstallMode = 0
     ${AndIf} ${Silent}
@@ -1457,19 +1478,29 @@ Function OfferToCloseAndRetryPurge
         !insertmacro CockLog "close-holders: no holder was named, nothing to offer"
         Return
     ${EndIf}
+    StrCpy $HolderCloseRounds 0
     ocrp_prompt:
-    MessageBox MB_YESNO|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
-        "Files of the previous version of Cockatrice are still in use by:$\r$\n$\r$\n$HolderOutput$\r$\n$\r$\nThe installer can close Cockatrice, Oracle and Servatrice for you.$\r$\nClose any other program listed above, then choose Yes to try again.$\r$\n$\r$\nChoose No to cancel the installation." \
-        IDYES ocrp_close
-    !insertmacro CockLog "close-holders: declined by user"
+    ${If} $HolderCloseRounds = 0
+        MessageBox MB_YESNO|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
+            "Files of the previous version of Cockatrice are still in use by:$\r$\n$\r$\n$HolderOutput$\r$\n$\r$\nThe installer can close Cockatrice for you. It may first ask you to confirm quitting - it does while a card database update is running, a game is open or a deck is unsaved - so answer that window. Close Oracle, Servatrice and any other program listed above by hand.$\r$\n$\r$\nChoose Yes to close Cockatrice and try again, or No to cancel the installation." \
+            IDYES ocrp_close
+        !insertmacro CockLog "close-holders: declined by user"
+        Return
+    ${EndIf}
+    MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
+        "Files of the previous version of Cockatrice are still in use by:$\r$\n$\r$\n$HolderOutput$\r$\n$\r$\nCockatrice may be waiting for an answer in its own window - it asks before quitting while a card database update is running, a game is open or a deck is unsaved. Switch to it and confirm, then close Oracle, Servatrice and any other program listed above.$\r$\n$\r$\nChoose Retry once they are closed, or Cancel to cancel the installation." \
+        IDRETRY ocrp_close
+    !insertmacro CockLog "close-holders: declined by user after $HolderCloseRounds round(s)"
     Return
     ocrp_close:
-    !insertmacro CockLog "close-holders: accepted, holders were [$HolderOutput]"
-    DetailPrint "Closing Cockatrice, Oracle and Servatrice ..."
+    IntOp $HolderCloseRounds $HolderCloseRounds + 1
+    !insertmacro CockLog "close-holders: accepted (round $HolderCloseRounds), holders were [$HolderOutput]"
+    DetailPrint "Closing Cockatrice ..."
     Call AskCockatriceAppsToClose
-    ; Give a closing instance time to release its modules; RetryDllPurge waits
-    ; another 6 s over its own attempts.
-    Sleep 2000
+    ; The close is a request, not a fact: wait for Cockatrice to go before
+    ; measuring. A fixed two-second sleep measured the files while its
+    ; confirmation was still up and reported the same holders again.
+    Call WaitForCockatriceToExit
     Call RetryDllPurge
     StrCpy $StaleRuntimeAfterPurge $R0
     !insertmacro CockLogListing "after-close-purge" "*.dll"
@@ -1488,18 +1519,59 @@ Function OfferToCloseAndRetryPurge
     Goto ocrp_prompt
 FunctionEnd
 
-; Asks Cockatrice, Oracle and Servatrice to close, without forcing anything.
-; CloseMatchingApps sends WM_CLOSE to processes whose image lives under $INSTDIR,
-; so a third-party application that merely shares an image name is never touched.
-; Oracle and Servatrice are console applications without a window, so the request
-; does nothing for them; the prompt names them and the user closes them. Skipped
-; when PowerShell cannot be started at all, because the lookup that would find
-; them is unavailable too - the prompt then names them from Restart Manager's
+; Waits up to 30 s for a running Cockatrice to exit after CloseMatchingApps asked
+; it to, and stops as soon as it is gone. WM_CLOSE is answered rather than obeyed:
+; Cockatrice shows a confirmation of its own when a card database update is
+; running, a game is open or a deck is unsaved, and that dialog stays up until the
+; user answers it - with the installer's window still in front, that is exactly
+; the moment the user has to be sent back to it.
+Function WaitForCockatriceToExit
+    StrCpy $GuardDir $INSTDIR
+    StrCpy $R2 "cockatrice"
+    Call IsAppRunning
+    ${If} $R0 != 1
+        Return
+    ${EndIf}
+    DetailPrint "Waiting for Cockatrice to close ..."
+    System::Call 'kernel32::GetTickCount()i.s'
+    Pop $R9
+    wcte_loop:
+    Sleep 1000
+    Call IsAppRunning
+    ${If} $R0 != 1
+        !insertmacro CockLog "close-holders: cockatrice exited after the close request"
+        Return
+    ${EndIf}
+    System::Call 'kernel32::GetTickCount()i.s'
+    Pop $R8
+    IntOp $R8 $R8 - $R9
+    ${If} $R8 < 30000
+        Goto wcte_loop
+    ${EndIf}
+    !insertmacro CockLog "close-holders: cockatrice still running 30 s after the close request"
+FunctionEnd
+
+; Asks the installed applications to close. CloseMatchingApps sends WM_CLOSE and
+; uses the strict path filter, so a third-party application that merely shares an
+; image name is never touched.
+;
+; Nothing is force-stopped here, unlike the silent upgrade's guard, which does
+; stop Oracle and Servatrice once its grace period is over: Oracle writes the card
+; database in place, and killing it mid-write corrupts the file the user is
+; updating to keep. An interactive install has a user in front of it, and the
+; prompt names what it could not close.
+;
+; Oracle and Servatrice are console applications, so CloseMainWindow() has nothing
+; to send a WM_CLOSE to and returns false for them - a no-op that costs one
+; PowerShell run and leaves them to the user the prompt names.
+;
+; Skipped when PowerShell cannot be started at all, because the lookup that would
+; find them is unavailable too - the prompt then names them from Restart Manager's
 ; answer instead.
 Function AskCockatriceAppsToClose
     Call IsProcessLookupAvailable
     ${If} $R0 = 0
-        !insertmacro CockLog "close-holders: powershell unavailable, not asking the applications to close"
+        !insertmacro CockLog "close-holders: powershell unavailable, nothing was asked to close"
         Return
     ${EndIf}
     StrCpy $GuardDir $INSTDIR
