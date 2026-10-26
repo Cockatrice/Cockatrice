@@ -590,20 +590,22 @@ if [[ $MAKE_PACKAGE ]]; then
       fi
       # 7-Zip writes CRLF on Windows, so the \r has to come off before any
       # whole-line comparison below. Normalize separators to /, and strip the
-      # install-root prefixes an NSIS listing may carry, so the entries can be
-      # compared as exact relative paths. -xF keeps a '.' in a DLL name from
-      # being a wildcard; -i because that is how the installed tree behaves -
-      # the uninstaller clears both $INSTDIR\plugins and $INSTDIR\Plugins.
-      # The archive side and the manifest side have to agree on line endings.
-      # CMake writes required-runtime.txt with the platform's line ending and
-      # 7-Zip writes CRLF on Windows, so a trailing \r survives on $entry and
-      # defeats the whole-line match - every entry then reads as missing even
-      # though the listing holds it verbatim.
+      # install-root prefixes a listing may carry - $INSTDIR/$OUTDIR/$PLUGINSDIR
+      # from NSIS, {app} from Inno Setup - so the entries can be compared as exact
+      # relative paths. -xF keeps a '.' in a DLL name from being a wildcard; -i
+      # because that is how the installed tree behaves - the uninstaller clears
+      # both $INSTDIR\plugins and $INSTDIR\Plugins. The archive side and the
+      # manifest side have to agree on line endings. CMake writes
+      # required-runtime.txt with the platform's line ending and 7-Zip writes CRLF
+      # on Windows, so a trailing \r survives on $entry and defeats the whole-line
+      # match - every entry then reads as missing even though the listing holds it
+      # verbatim.
       # [$] rather than \$ so the literal dollar is a bracket expression and the
-      # linter does not read these as unexpanded shell variables (SC2016).
+      # linter does not read these as unexpanded shell variables (SC2016). The
+      # same goes for the braces of Inno Setup's {app} prefix.
       installer_paths="$("$seven_zip" l -slt "$package" | tr -d '\r' |
         sed -n 's/^Path = //p' |
-        sed -e 's|\\|/|g' -e 's|^[$]INSTDIR/||' -e 's|^[$]OUTDIR/||' -e 's|^[$]PLUGINSDIR/||' -e 's|^\./||' -e 's|^/||')"
+        sed -e 's|\\|/|g' -e 's|^[$]INSTDIR/||' -e 's|^[$]OUTDIR/||' -e 's|^[$]PLUGINSDIR/||' -e 's|^[{]app[}]/||' -e 's|^\./||' -e 's|^/||')"
       manifest="$(tr -d '\r' <required-runtime.txt)"
       missing=""
       checked=0

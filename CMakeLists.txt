@@ -327,15 +327,32 @@ if(UNIX)
     endif()
   endif()
 elseif(WIN32)
-  set(CPACK_GENERATOR NSIS ${CPACK_GENERATOR})
-  if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(TRICE_IS_64_BIT 1)
-  else()
-    set(TRICE_IS_64_BIT 0)
+  # Which tool writes the installer. NSIS is the incumbent and stays the default;
+  # InnoSetup selects CPack's own Inno Setup generator (see cmake/InnoSetup.cmake). Both
+  # consume the same install() rules, so this is a packaging choice, never a build change,
+  # and the two installers can be built from one tree and compared on a real upgrade.
+  set(COCKATRICE_WIN_INSTALLER
+      "NSIS"
+      CACHE STRING "Windows installer generator: NSIS (incumbent) or InnoSetup"
+  )
+  set_property(CACHE COCKATRICE_WIN_INSTALLER PROPERTY STRINGS NSIS InnoSetup)
+  if(NOT COCKATRICE_WIN_INSTALLER MATCHES "^(NSIS|InnoSetup)$")
+    message(FATAL_ERROR "COCKATRICE_WIN_INSTALLER must be NSIS or InnoSetup, not '${COCKATRICE_WIN_INSTALLER}'")
   endif()
 
-  # Configure file with custom definitions for NSIS.
-  configure_file("${COCKATRICE_CMAKE_PATH}/NSIS.definitions.nsh.in" "${PROJECT_BINARY_DIR}/NSIS.definitions.nsh")
+  if(COCKATRICE_WIN_INSTALLER STREQUAL "InnoSetup")
+    include(${COCKATRICE_CMAKE_PATH}/InnoSetup.cmake)
+  else()
+    set(CPACK_GENERATOR NSIS ${CPACK_GENERATOR})
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+      set(TRICE_IS_64_BIT 1)
+    else()
+      set(TRICE_IS_64_BIT 0)
+    endif()
+
+    # Configure file with custom definitions for NSIS.
+    configure_file("${COCKATRICE_CMAKE_PATH}/NSIS.definitions.nsh.in" "${PROJECT_BINARY_DIR}/NSIS.definitions.nsh")
+  endif()
 
   # Installer-log sender for the AbortInstall Sentry hook (values parsed out of COCKATRICE_SENTRY_DSN in
   # cmake/CrashReporting.cmake). Generated only when a DSN was parsed: cmake/NSIS.template.in embeds it under
@@ -379,7 +396,9 @@ elseif(WIN32)
   # is available to CMake, requiring the vcpkg half would mean guessing names
   # again, which is what produced this bug report in the first place. So assert
   # what is derived from the build's own link lists and leave the rest to the
-  # purge in cmake/NSIS.template.in, which removes every DLL regardless of name.
+  # installer's own delete: the purge in cmake/NSIS.template.in and the
+  # install-delete section in cmake/InnoSetup.install.iss both remove every DLL
+  # regardless of name.
   set(_required_runtime "")
   foreach(_qt_module IN LISTS COCKATRICE_QT_MODULES SERVATRICE_QT_MODULES ORACLE_QT_MODULES)
     get_target_property(_qt_module_type ${_qt_module} TYPE)
@@ -395,7 +414,7 @@ elseif(WIN32)
   string(REPLACE ";" "\n" _required_runtime "${_required_runtime}")
   file(WRITE "${PROJECT_BINARY_DIR}/required-runtime.txt" "${_required_runtime}\n")
 
-  # include vcredist into the package; NSIS will take care of running it
+  # include vcredist into the package; both installers run it after the payload
   if(VCREDISTRUNTIME_FOUND)
     install(FILES "${VCREDISTRUNTIME_FILE}" DESTINATION ./)
   endif()
