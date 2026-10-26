@@ -182,6 +182,9 @@ jobs:
       CMAKE_GENERATOR: 'Ninja'
       NAME: ${{ matrix.distro }}${{ matrix.version }}
       IMAGE_SUFFIX: ${{ matrix.variant }}
+      # The sanitizer and coverage legs run their suite in Debug under instrumentation; every
+      # other leg tests the release build it may also package.
+      INSTRUMENTED: ${{ matrix.sanitize == 'yes' || matrix.coverage == 'yes' }}
 
     steps:
       - name: "Checkout"
@@ -198,8 +201,12 @@ jobs:
         shell: bash
         run: source .ci/docker.sh --build
 
+      # The two instrumented legs are the only ones that still build Debug: their suite is
+      # meant to run against symbols and instrumentation, and their build is never the one
+      # that ships. Every other leg runs its tests against the release build below, so
+      # testing and packaging cost one compile instead of two.
       - name: "Build debug and test"
-        if: matrix.test != 'skip'
+        if: env.INSTRUMENTED == 'true'
         shell: bash
         env:
           sanitize: '${{ matrix.sanitize }}'
@@ -239,15 +246,25 @@ jobs:
           path: coverage/
           if-no-files-found: warn
 
-      - name: "Build release package"
+      # One build serves both purposes: the suite runs against the same configuration that
+      # gets packaged, so a packaging leg no longer pays for a full Debug compile it then
+      # throws away. macOS and Windows have always tested their release build.
+      #
+      # Instrumented legs reach this step only when they package (the sanitizer leg currently
+      # does, the coverage leg does not); their suite already ran in the debug step above, so
+      # the tests are not repeated here.
+      - name: "Build release, test and package"
         id: build
-        if: matrix.package != 'skip'
+        if: matrix.package != 'skip' || (matrix.test != 'skip' && env.INSTRUMENTED != 'true')
         shell: bash
         env:
           SUFFIX: '-${{ matrix.distro }}${{ matrix.version }}'
           package: '${{ matrix.package }}'
           server_only: '${{ matrix.server_only }}'
-          WITH_CRASH_REPORTING: 'ON'
+          test: '${{ matrix.test }}'
+          # Only a leg that packages builds the shipping configuration; a release build that
+          # only runs tests stays free of the crash reporting SDK.
+          WITH_CRASH_REPORTING: ${{ matrix.package != 'skip' && 'ON' || '' }}
           # Tag builds only: artifacts from master pushes and PR branches must not report to
           # Sentry. Forks get no secrets on pull_request, so they keep the mock fallback either way.
           # configure.outputs.tag is set for ANY tag, so beta (Development) tags get the DSN
@@ -257,6 +274,7 @@ jobs:
           source .ci/docker.sh
           args=()
           [[ $server_only == yes ]] && args+=(--no-client)
+          [[ $test != skip && $INSTRUMENTED != true ]] && args+=(--test)
           [[ $GITHUB_REF == "refs/heads/master" ]] && args+=(--evict-ccache "$CCACHE_EVICTION_AGE")
           args+=(--ccache "$CCACHE_SIZE")
           args+=(--cmake-generator "$CMAKE_GENERATOR")
@@ -266,7 +284,14 @@ jobs:
           # configures, and empty keeps the mock fallback.
           export RUN_ARGS="${RUN_ARGS:-} -e COCKATRICE_SENTRY_DSN"
 
-          RUN --server --release --package "$package" "${args[@]}"
+          # --package takes an optional type, so the flag and its argument have to travel
+          # together or the type would become the next flag.
+          package_args=()
+          [[ -n $package && $package != skip ]] && package_args+=(--package "$package")
+
+          # compile.sh runs the tests before the package target, so a failing suite stops the
+          # leg before anything is built into an installer.
+          RUN --server --release "${package_args[@]}" "${args[@]}"
 
       - name: "Install sentry-cli"
         if: matrix.package != 'skip' && needs.configure.outputs.tag != null
