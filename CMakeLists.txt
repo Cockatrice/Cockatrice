@@ -327,17 +327,30 @@ if(UNIX)
     endif()
   endif()
 elseif(WIN32)
-  # Which tool writes the installer. NSIS is the incumbent and stays the default;
-  # InnoSetup selects CPack's own Inno Setup generator (see cmake/InnoSetup.cmake). Both
-  # consume the same install() rules, so this is a packaging choice, never a build change,
-  # and the two installers can be built from one tree and compared on a real upgrade.
+  # Which tool writes the installer. InnoSetup, through CPack's own Inno Setup generator
+  # (cmake/InnoSetup.cmake), is the default. NSIS stays selectable for one release as the
+  # fallback for anyone who needs the old installer, and so the two can still be built from
+  # one tree and compared on a real upgrade. Both consume the same install() rules, so this
+  # is a packaging choice, never a build change.
   set(COCKATRICE_WIN_INSTALLER
-      "NSIS"
-      CACHE STRING "Windows installer generator: NSIS (incumbent) or InnoSetup"
+      "InnoSetup"
+      CACHE STRING "Windows installer generator: InnoSetup (default) or NSIS (legacy)"
   )
   set_property(CACHE COCKATRICE_WIN_INSTALLER PROPERTY STRINGS NSIS InnoSetup)
   if(NOT COCKATRICE_WIN_INSTALLER MATCHES "^(NSIS|InnoSetup)$")
     message(FATAL_ERROR "COCKATRICE_WIN_INSTALLER must be NSIS or InnoSetup, not '${COCKATRICE_WIN_INSTALLER}'")
+  endif()
+
+  # Installer-log sender for the failure hooks of both installers (values parsed out of
+  # COCKATRICE_SENTRY_DSN in cmake/CrashReporting.cmake). Generated only when a DSN was
+  # parsed: cmake/NSIS.template.in and cmake/InnoSetup.install.iss embed it under the same
+  # CPACK_SENTRY_ENABLED check, so a build without reporting never references or carries the
+  # helper. Configured above the installer choice because both branches consume it.
+  if(CPACK_SENTRY_ENABLED)
+    configure_file(
+      "${COCKATRICE_CMAKE_PATH}/SendInstallerLog.ps1.in" "${PROJECT_BINARY_DIR}/SendInstallerLog.ps1" @ONLY
+    )
+    set(COCKATRICE_SENTRY_INSTALLER_LOG "${PROJECT_BINARY_DIR}/SendInstallerLog.ps1")
   endif()
 
   if(COCKATRICE_WIN_INSTALLER STREQUAL "InnoSetup")
@@ -352,15 +365,6 @@ elseif(WIN32)
 
     # Configure file with custom definitions for NSIS.
     configure_file("${COCKATRICE_CMAKE_PATH}/NSIS.definitions.nsh.in" "${PROJECT_BINARY_DIR}/NSIS.definitions.nsh")
-  endif()
-
-  # Installer-log sender for the AbortInstall Sentry hook (values parsed out of COCKATRICE_SENTRY_DSN in
-  # cmake/CrashReporting.cmake). Generated only when a DSN was parsed: cmake/NSIS.template.in embeds it under
-  # the same CPACK_SENTRY_ENABLED check, so a build without reporting never references or carries the helper.
-  if(CPACK_SENTRY_ENABLED)
-    configure_file(
-      "${COCKATRICE_CMAKE_PATH}/SendInstallerLog.ps1.in" "${PROJECT_BINARY_DIR}/SendInstallerLog.ps1" @ONLY
-    )
   endif()
 
   # Every runtime DLL a Windows install has to contain, as paths relative to the

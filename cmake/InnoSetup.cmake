@@ -1,9 +1,9 @@
 # Windows installer written by Inno Setup, through CPack's own InnoSetup generator.
 #
 # Included from the WIN32 branch of the top-level CMakeLists.txt when
-# COCKATRICE_WIN_INSTALLER is InnoSetup. It sits next to the NSIS template rather than
-# replacing it so both installers can be built from the same tree and compared on a real
-# upgrade.
+# COCKATRICE_WIN_INSTALLER is InnoSetup, which is the default. The NSIS template is kept
+# next to this file rather than deleted so both installers can still be built from one tree
+# and compared on a real upgrade.
 #
 # The generator writes [Files], [Dirs], [Icons], [Run] and [Registry] from the install()
 # rules the project already declares, so nothing here repeats them. What is added is only
@@ -17,8 +17,10 @@ if(CMAKE_VERSION VERSION_LESS 3.27)
   message(FATAL_ERROR "COCKATRICE_WIN_INSTALLER=InnoSetup needs CMake >= 3.27 (found ${CMAKE_VERSION})")
 endif()
 
-# CPack is allowed to be told -DCPACK_GENERATOR=... by the caller; do not list the
-# generator twice when that caller already asked for it.
+# CPack may be told -DCPACK_GENERATOR=... by the caller. For the Windows installers the
+# choice is made by COCKATRICE_WIN_INSTALLER instead (.ci/compile.sh --package NSIS or
+# InnoSetup maps to it), because picking the generator here and the installer tool there can
+# silently build both in one run. Only guard against asking for InnoSetup twice.
 if(NOT "InnoSetup" IN_LIST CPACK_GENERATOR)
   set(CPACK_GENERATOR InnoSetup ${CPACK_GENERATOR})
 endif()
@@ -88,5 +90,14 @@ set(CPACK_INNOSETUP_SETUP_UninstallDisplayIcon "{app}\\cockatrice.exe")
 # cannot express (legacy migration, portable marker, C++ runtime bootstrap).
 set(CPACK_INNOSETUP_EXTRA_SCRIPTS "${COCKATRICE_CMAKE_PATH}/InnoSetup.install.iss")
 set(CPACK_INNOSETUP_CODE_FILES "${COCKATRICE_CMAKE_PATH}/InnoSetup.code.iss")
+
+# The installer-log sender the failure hook in InnoSetup.code.iss offers after an upgrade
+# that did not finish. CPack passes these as public ISCC macros (/Dname=value), so the extra
+# script can embed the helper with a [Files] dontcopy entry and the code can extract it at
+# send time. Undefined when the build carries no reporting, which is what the ifdef guards in
+# both scripts test.
+if(CPACK_SENTRY_ENABLED)
+  set(CPACK_INNOSETUP_DEFINE_SentryHelperPath "${COCKATRICE_SENTRY_INSTALLER_LOG}")
+endif()
 
 message(STATUS "Windows installer: Inno Setup (CPack InnoSetup generator, ${CPACK_INNOSETUP_ARCHITECTURE})")

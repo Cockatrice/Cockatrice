@@ -194,7 +194,14 @@ if [[ $USE_CCACHE ]]; then
   fi
 fi
 if [[ $PACKAGE_TYPE ]]; then
-  flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
+  if [[ $PACKAGE_TYPE == NSIS || $PACKAGE_TYPE == InnoSetup ]]; then
+    # The Windows installer is chosen by a CMake option, and that option then adds its CPack
+    # generator itself. Passing CPACK_GENERATOR as well would list both installers and build
+    # both in one run.
+    flags+=("-DCOCKATRICE_WIN_INSTALLER=$PACKAGE_TYPE")
+  else
+    flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
+  fi
 fi
 if [[ $USE_VCPKG ]]; then
   flags+=("-DUSE_VCPKG=1")

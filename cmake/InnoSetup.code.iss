@@ -14,6 +14,12 @@ const
 var
   PortablePage: TCustomPage;
   PortableCheck: TNewCheckBox;
+  // Progress of this run, for the failure hook further down. Setup has no "the installation
+  // failed" callback, and DeinitializeSetup runs on every way out of the wizard, so the two
+  // steps that bracket the file work are what distinguishes those ways.
+  InstallStarted: Boolean;
+  InstallCompleted: Boolean;
+  UserCancelled: Boolean;
 
 // True when the given switch appears on the setup command line. Used for the legacy
 // portable switch, which the in-app updater and the older installers pass.
@@ -147,20 +153,93 @@ end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
+  if CurStep = ssInstall then
+    InstallStarted := True;
   if CurStep = ssPostInstall then
   begin
     InstallVCRedist();
     WritePortableMarker();
     RemoveLegacyNSISRegistration();
   end;
+  if CurStep = ssDone then
+    InstallCompleted := True;
 end;
 
-// The 3.1.x client launches the installer with two switches that belong to the NSIS build:
-// /R (silent reinstall) and /PID= (the process to wait for). Recording them from the log is
-// how the first test of this installer answers the one open question about the migration:
-// whether Inno Setup reaches this point at all with them on the command line. If it does,
-// the updater keeps working across the switch; if it does not, Setup rejects them before
-// running any script and the updater needs a version gate instead.
+// Cancel is a decision, not a failure, so the hook below stays quiet after one.
+procedure CancelButtonClick(CurPageID: Integer; var Cancel, Confirm: Boolean);
+begin
+  UserCancelled := True;
+end;
+
+#ifdef SentryHelperPath
+// The failure hook, which is what the NSIS template's AbortInstall did for updates that
+// stopped half way. The three conditions it watched for - the application would not close,
+// the stale runtime could not be purged, the launcher did not exit - are Restart Manager's
+// and the [InstallDelete] section's job here, so what is left is the outcome rather than the
+// cause: a silent run the in-app updater started, which began replacing files and never
+// reached the end. That run is the one that needs it, because the updater quits after
+// launching Setup and leaves no window on screen to read an error from; an interactive user
+// sees the message Setup shows and can find the log in the temporary directory themselves.
+procedure OfferToSendInstallerLog();
+var
+  LogPath, Params: String;
+  ResultCode: Integer;
+begin
+  LogPath := ExpandConstant('{log}');
+  if LogPath = '' then
+    Exit;
+  // The sender takes the reason from the log (see SendInstallerLog.ps1.in), so record it
+  // whether or not the user agrees: it is the first thing to look at in a report either way.
+  Log('ABORT: the update did not finish installing');
+  Log('full installer log: ' + LogPath);
+  if MsgBox('Send the installer log to the developers to help fix this? The log contains'
+    + ' file paths from this machine, which may include your Windows user name.',
+    mbConfirmation, MB_YESNO) <> IDYES then
+  begin
+    Log('Sentry send: declined by user');
+    Exit;
+  end;
+  ExtractTemporaryFile('SendInstallerLog.ps1');
+  Params := '-NoProfile -NonInteractive -ExecutionPolicy Bypass -File "'
+    + ExpandConstant('{tmp}\SendInstallerLog.ps1') + '" -LogPath "' + LogPath + '"';
+  ResultCode := -1;
+  if Exec('powershell.exe', Params, '', SW_HIDE, ewWaitUntilTerminated, ResultCode)
+    and (ResultCode = 0) then
+  begin
+    Log('Sentry send: result=' + IntToStr(ResultCode));
+    MsgBox('The installer log was sent. Thank you for helping improve Cockatrice!',
+      mbInformation, MB_OK);
+  end
+  else
+  begin
+    Log('Sentry send: result=' + IntToStr(ResultCode));
+    MsgBox('The installer log could not be sent. You can still share it manually; it was'
+      + ' written to:' + #13#10 + LogPath, mbError, MB_OK);
+  end;
+end;
+#endif
+
+// Runs after logging has started and while the log is still open and flushed, which is what
+// makes the log of this run available to the sender.
+procedure DeinitializeSetup();
+begin
+#ifdef SentryHelperPath
+  // /UPDATER is the client's own mark on the command lines it hands either installer.
+  // Requiring it keeps this offer out of a package manager's silent install, where a message
+  // box that nobody answers would block the install - the case the NSIS template kept clear
+  // of by prompting on its /R switch rather than on silence alone.
+  if WizardSilent and HasSwitch('/UPDATER') and InstallStarted and not InstallCompleted
+    and not UserCancelled then
+    OfferToSendInstallerLog();
+#endif
+end;
+
+// The in-app updater used to pass two switches that belong to the NSIS build: /R (silent
+// reinstall) and /PID= (the process to wait for). Setup ignores switches it does not know -
+// its command line is an if/else-if chain over the ones it does know, with no fallback that
+// rejects the rest (ProcessCommandLine in Setup.MainFunc.pas) - so an older client still
+// installs from this one, it just walks the wizard instead of running silently. Logging the
+// switches keeps both cases visible in the log of the first upgrade that comes through here.
 function InitializeSetup(): Boolean;
 var
   I: Integer;
@@ -170,8 +249,9 @@ begin
   for I := 1 to ParamCount do
   begin
     Param := ParamStr(I);
-    if (CompareText(Param, '/R') = 0) or (CompareText(Copy(Param, 1, 5), '/PID=') = 0) then
-      Log('Legacy in-app updater switch: ' + Param);
+    if (CompareText(Param, '/R') = 0) or (CompareText(Param, '/UPDATER') = 0)
+      or (CompareText(Copy(Param, 1, 5), '/PID=') = 0) then
+      Log('In-app updater switch: ' + Param);
   end;
   Result := True;
 end;
