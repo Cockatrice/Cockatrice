@@ -87,6 +87,14 @@ QList<QString> availableLanguages(const QString &_prefix, const QList<QString> &
 QString languageDisplayName(const QString &_lang);
 
 /**
+ * @brief The language a client runs with when none is configured, for preselecting a selector entry.
+ *
+ * English is the untranslated default and ships no translation file of its own, so a selector has nothing
+ * of its own to point at and uses the entry that carries an English translation instead.
+ */
+QString defaultLanguageCode();
+
+/**
  * @brief Loads the <_prefix>_<_lang>.qm translation file from _directories into _translator.
  *
  * @param _translator The translator to load into; must not also be used for Qt's own translation.

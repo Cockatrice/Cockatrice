@@ -258,15 +258,20 @@ TEST(TranslationLoaderTest, EveryLanguageTheClientShipsHasItsOwnDisplayName)
     const QStringList files = translations.entryList({QStringLiteral("cockatrice_*.ts")}, QDir::Files);
     ASSERT_FALSE(files.isEmpty());
 
+    QStringList languages;
     QSet<QString> displayNames;
     for (const QString &file : files) {
         const QString language = QFileInfo(file).completeBaseName().section(QLatin1Char('_'), 1);
         const QString displayName = TranslationLoader::languageDisplayName(language);
         EXPECT_FALSE(displayName.isEmpty()) << language.toStdString();
+        languages << language;
         displayNames.insert(displayName);
     }
 
     EXPECT_EQ(files.size(), displayNames.size());
+
+    // The selector preselects this one for an unset setting, so it has to be offered at all.
+    EXPECT_TRUE(languages.contains(TranslationLoader::defaultLanguageCode()));
 }
 
 TEST(TranslationLoaderTest, UnknownLanguagesFallBackToTheNativeNameThenTheCode)

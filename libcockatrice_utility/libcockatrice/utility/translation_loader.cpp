@@ -151,6 +151,11 @@ QString TranslationLoader::languageDisplayName(const QString &_lang)
     return nativeName.isEmpty() ? _lang : nativeName;
 }
 
+QString TranslationLoader::defaultLanguageCode()
+{
+    return QStringLiteral("en_US");
+}
+
 TranslationLoadResult
 TranslationLoader::loadFrom(QTranslator &_translator, const QString &_nameHint, const QList<QString> &_directories)
 {

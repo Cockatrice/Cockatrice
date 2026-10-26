@@ -205,14 +205,14 @@ IntroPage::IntroPage(QWidget *parent) : OracleWizardPage(parent)
     }
 
     // Select the language the wizard runs with: its own entry, the base language for a variant without a
-    // file of its own (de_CH -> de), and English for an unset setting, which has no file to name it.
+    // file of its own (de_CH -> de), and the default language for an unset setting, which names no file.
     const QString configuredLanguage = SettingsCache::instance().personal().getLang();
     int index = languageBox->findData(configuredLanguage);
     if (index < 0) {
         index = languageBox->findData(configuredLanguage.section('_', 0, 0));
     }
     if (index < 0) {
-        index = languageBox->findData(QStringLiteral("en_US"));
+        index = languageBox->findData(TranslationLoader::defaultLanguageCode());
     }
     if (index >= 0) {
         languageBox->setCurrentIndex(index);
