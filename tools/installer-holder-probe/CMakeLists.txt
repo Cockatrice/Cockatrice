@@ -4,7 +4,7 @@
 # the installer and is extracted to $PLUGINSDIR there, never installed, so it links
 # nothing from this project: no Qt, and a static C runtime because the installed runtime
 # is exactly what the purge may have failed to replace.
-add_executable(installer-holder-probe holder_line.cpp main.cpp restart_manager_holders.cpp)
+add_executable(installer-holder-probe close_holders.cpp holder_line.cpp main.cpp restart_manager_holders.cpp)
 
 target_link_libraries(installer-holder-probe PRIVATE rstrtmgr)
 

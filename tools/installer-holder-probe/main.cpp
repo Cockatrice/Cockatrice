@@ -1,3 +1,4 @@
+#include "close_holders.h"
 #include "holder_line.h"
 #include "restart_manager_holders.h"
 
@@ -12,8 +13,16 @@ namespace
 /// trailing backslash then never has to survive NSIS quoting or a command line.
 constexpr wchar_t INSTALL_DIR_VARIABLE[] = L"COCKATRICE_GUARD_DIR";
 
+/// How long the close mode waits for the instance it asked to exit before it reports the
+/// process as still running. The installer measures the purge right after this call, so
+/// the wait belongs here: it is the only place that holds a handle on the process whose
+/// exit it is waiting for.
+constexpr unsigned long CLOSE_WAIT_MILLISECONDS = 30000;
+
 /// Exit codes the installer reads. "Something was found" is deliberately not 0, so an
 /// answer of "nothing holds the files" stays distinguishable from a probe that failed.
+/// In the close mode 1 means a close was actually sent and 0 that every holder was left
+/// to the user, which is what the report line next to the code spells out.
 enum ExitCode
 {
     EXIT_NO_HOLDERS = 0,
@@ -21,6 +30,20 @@ enum ExitCode
     EXIT_NOT_CONFIGURED = 2,
     EXIT_PROBE_FAILED = 3,
 };
+
+/// The probe has two modes, selected by the first argument:
+///
+///   (none)           name what holds the install directory, one line, for the abort
+///                     dialog and the log
+///   --close-holders  bring the running Cockatrice forward, ask it to close, and wait for
+///                     it to exit, for the offer to close after a failed purge
+///
+/// Both answer from the same Restart Manager query, so the close can only ever reach a
+/// process that is holding a file of the version being replaced.
+bool closeModeRequested(int argumentCount, char **arguments)
+{
+    return argumentCount > 1 && std::string(arguments[1]) == "--close-holders";
+}
 
 /// Writes one line to the pipe nsExec reads. Narrowed to ASCII on purpose: the bytes
 /// come back to the installer as an ANSI string, so a non-ASCII process name would be
@@ -54,7 +77,7 @@ std::wstring installDirFromEnvironment()
 }
 } // namespace
 
-int main()
+int main(int argumentCount, char **arguments)
 {
     const std::wstring installDir = installDirFromEnvironment();
     if (installDir.empty()) {
@@ -68,11 +91,23 @@ int main()
         writeLine(L"the Restart Manager lookup failed with win32 error " + std::to_wstring(error));
         return EXIT_PROBE_FAILED;
     }
+
+    const bool closeMode = closeModeRequested(argumentCount, arguments);
     if (holders.empty()) {
-        // No output: the installer words the "nothing is holding them" case, and it
-        // owns the message either way.
+        // No output in the naming mode: the installer words the "nothing is holding them"
+        // case, and it owns the message either way. The close mode says it itself, because
+        // its line is logged verbatim next to what it was asked to do.
+        if (closeMode) {
+            writeLine(L"nothing is holding the files");
+        }
         return EXIT_NO_HOLDERS;
     }
-    writeLine(formatHolders(holders));
-    return EXIT_HOLDERS_FOUND;
+    if (!closeMode) {
+        writeLine(formatHolders(holders));
+        return EXIT_HOLDERS_FOUND;
+    }
+
+    const CloseHoldersResult result = closeCockatriceHolders(holders, CLOSE_WAIT_MILLISECONDS);
+    writeLine(result.report);
+    return result.askedToClose > 0 ? EXIT_HOLDERS_FOUND : EXIT_NO_HOLDERS;
 }
