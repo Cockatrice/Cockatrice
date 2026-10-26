@@ -7,17 +7,19 @@
 #include <vector>
 
 /**
- * @brief Lists the files a failed purge can be holding up, as full paths.
+ * @brief Lists the payload files, as full paths.
  *
- * Everything directly in @p installDir plus everything below its Plugins directory:
- * those are the two things the purge removes, so they are the two sets of files a
- * holder can be holding. Restart Manager refuses a directory with ERROR_ACCESS_DENIED,
- * which is why the probe registers files and this has to name them first.
+ * The set is what the installer replaces and the purge removes: the three executables,
+ * qt.conf, every top-level DLL and everything below Plugins. A document, a log or a
+ * screenshot the user happens to have open in the install directory is not part of it,
+ * so it cannot be mistaken for a running instance and block an upgrade.
  *
- * Missing or unreadable directories are skipped rather than reported, and the list is
- * capped: this runs on the abort path and must not walk a tree of downloaded pictures.
+ * Restart Manager refuses a directory with ERROR_ACCESS_DENIED, which is why the probe
+ * registers files and this has to name them first. Missing files and unreadable
+ * directories are skipped rather than reported, and the list is capped: this runs before
+ * the first page and on the abort path, and must not walk a tree of downloaded pictures.
  */
-std::vector<std::wstring> collectProbeFiles(const std::wstring &installDir);
+std::vector<std::wstring> collectPayloadFiles(const std::wstring &installDir);
 
 /**
  * @brief Names the applications and services that have one of @p files open or mapped.
@@ -31,5 +33,28 @@ std::vector<std::wstring> collectProbeFiles(const std::wstring &installDir);
  *         Win32 code of the Restart Manager call that failed.
  */
 unsigned long findProcessesUsingFiles(const std::vector<std::wstring> &files, std::vector<Holder> &holders);
+
+/**
+ * @brief Lists every process whose image lives in @p installDir, whether or not it has a
+ *        payload file open.
+ *
+ * Restart Manager answers the question "who has this file open", and a running instance
+ * does not necessarily have one open: its own image and the modules it loaded are mapped
+ * into it, not opened by it, and RmGetList does not reliably report a mapping. That is
+ * the state the failed updates this probe exists for were in - every DLL still on disk,
+ * an instance running from the directory, and "nothing is holding them any more" as the
+ * answer - so an answer built on file handles alone cannot be the guard's authority.
+ *
+ * Reading the image path needs PROCESS_QUERY_LIMITED_INFORMATION and
+ * QueryFullProcessImageNameW, neither of which depends on the bitness of either process,
+ * so a 64-bit instance is named from this 32-bit stub. The comparison is on the
+ * directory, not on an image name, so a process that merely shares a name (an Oracle
+ * database server next to a Cockatrice install) is never named.
+ *
+ * @param installDir the directory being replaced, as a full path.
+ * @return one entry per process running from it, in snapshot order, without the probe
+ *         itself; empty when the directory is empty or no process runs from it.
+ */
+std::vector<Holder> findProcessesRunningFrom(const std::wstring &installDir);
 
 #endif

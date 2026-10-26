@@ -515,7 +515,27 @@ try {
     New-Item -ItemType Directory -Force $empty | Out-Null
     $nothing = Invoke-Probe $empty
     if ($nothing.Code -ne 0) { throw "expected exit 0 for a directory with nothing open, got $($nothing.Code) : $($nothing.Output)" }
-    Write-Host "holder lookup named pid $PID for a locked file and named nothing for an empty directory"
+    # A process running from the directory is a holder even when it has no file open: an
+    # instance holds its payload as mapped images, not as handles, and that is the state
+    # the guard used to miss - it passed, the purge failed, and the install ended in a
+    # warning with no offer to close and try again. The image is a copy of a native
+    # Windows program, so it starts without its usual directory next to it.
+    $copy = Join-Path $dir "fake-cockatrice.exe"
+    Copy-Item -LiteralPath (Join-Path $env:SystemRoot "System32\cmd.exe") -Destination $copy
+    $running = Start-Process -FilePath $copy -ArgumentList "/c", "ping -n 20 127.0.0.1 >nul" -PassThru
+    try {
+        Start-Sleep -Milliseconds 1500
+        $byImage = Invoke-Probe $dir
+    } finally {
+        try { $running.Kill() } catch { }
+        # Wait for the image to be released, or the cleanup below leaves the copy behind.
+        try { $running.WaitForExit(5000) | Out-Null } catch { }
+    }
+    if ($byImage.Code -ne 1) { throw "expected exit 1 for a process running from the directory, got $($byImage.Code) : $($byImage.Output)" }
+    if ($byImage.Output -notmatch "fake-cockatrice\.exe \(pid\s+$($running.Id)") {
+        throw "the lookup did not name the process running from the directory: $($byImage.Output)"
+    }
+    Write-Host "holder lookup named pid $PID for a locked file, named nothing for an empty directory, and named pid $($running.Id) for a process running from the directory"
 } finally {
     Remove-Item -Recurse -Force $dir -ErrorAction SilentlyContinue
 }
