@@ -406,6 +406,7 @@ if(TARGET Qt6::lrelease)
     libcockatrice_utility
     DEFINITIONS
     TRANSLATION_LOADER_TEST_DIR="${CMAKE_CURRENT_BINARY_DIR}"
+    COCKATRICE_TRANSLATIONS_DIR="${CMAKE_SOURCE_DIR}/cockatrice/translations"
   )
   add_dependencies(translation_loader_test translation_loader_test_qm)
 
