@@ -1444,11 +1444,12 @@ FunctionEnd
 ; window's close button) and keeps the last word: it may be waiting for an answer
 ; to its own "really quit?" confirmation (a running card database update, an open
 ; game, an unsaved deck), and that stays its decision, exactly as the
-; running-instance guard treats it. Oracle and Servatrice have no window to send a
-; close to at all, and nothing here is force-stopped: Oracle writes the card
-; database in place and killing it mid-write would corrupt it. Everything the
-; probe named that this installer cannot close - those two included - is left to
-; the user, whom the prompt names it to.
+; running-instance guard treats it. The instance is brought forward first, so that
+; confirmation is on screen rather than behind this installer's prompt. Oracle and
+; Servatrice have no window to send a close to at all, and nothing here is
+; force-stopped: Oracle writes the card database in place and killing it mid-write
+; would corrupt it. Everything the probe named that this installer cannot close -
+; those two included - is left to the user, whom the prompt names it to.
 ;
 ; Restart Manager's RmShutdown was the alternative and was rejected: it shuts down
 ; services as well as applications, and the only way to bring them back is
@@ -1495,12 +1496,10 @@ Function OfferToCloseAndRetryPurge
     ocrp_close:
     IntOp $HolderCloseRounds $HolderCloseRounds + 1
     !insertmacro CockLog "close-holders: accepted (round $HolderCloseRounds), holders were [$HolderOutput]"
-    DetailPrint "Closing Cockatrice ..."
+    ; The close is a request, not a fact: AskCockatriceAppsToClose waits for the
+    ; instances it asked to exit, so a confirmation of Cockatrice's that is still up is
+    ; reported as still running instead of being measured as a successful close.
     Call AskCockatriceAppsToClose
-    ; The close is a request, not a fact: wait for Cockatrice to go before
-    ; measuring. A fixed two-second sleep measured the files while its
-    ; confirmation was still up and reported the same holders again.
-    Call WaitForCockatriceToExit
     Call RetryDllPurge
     StrCpy $StaleRuntimeAfterPurge $R0
     !insertmacro CockLogListing "after-close-purge" "*.dll"
@@ -1519,68 +1518,38 @@ Function OfferToCloseAndRetryPurge
     Goto ocrp_prompt
 FunctionEnd
 
-; Waits up to 30 s for a running Cockatrice to exit after CloseMatchingApps asked
-; it to, and stops as soon as it is gone. WM_CLOSE is answered rather than obeyed:
-; Cockatrice shows a confirmation of its own when a card database update is
-; running, a game is open or a deck is unsaved, and that dialog stays up until the
-; user answers it - with the installer's window still in front, that is exactly
-; the moment the user has to be sent back to it.
-Function WaitForCockatriceToExit
-    StrCpy $GuardDir $INSTDIR
-    StrCpy $R2 "cockatrice"
-    Call IsAppRunning
-    ${If} $R0 != 1
-        Return
-    ${EndIf}
-    DetailPrint "Waiting for Cockatrice to close ..."
-    System::Call 'kernel32::GetTickCount()i.s'
-    Pop $R9
-    wcte_loop:
-    Sleep 1000
-    Call IsAppRunning
-    ${If} $R0 != 1
-        !insertmacro CockLog "close-holders: cockatrice exited after the close request"
-        Return
-    ${EndIf}
-    System::Call 'kernel32::GetTickCount()i.s'
-    Pop $R8
-    IntOp $R8 $R8 - $R9
-    ${If} $R8 < 30000
-        Goto wcte_loop
-    ${EndIf}
-    !insertmacro CockLog "close-holders: cockatrice still running 30 s after the close request"
-FunctionEnd
-
-; Asks the installed applications to close. CloseMatchingApps sends WM_CLOSE and
-; uses the strict path filter, so a third-party application that merely shares an
-; image name is never touched.
+; Asks the running Cockatrice to close, and waits for it to exit.
 ;
-; Nothing is force-stopped here, unlike the silent upgrade's guard, which does
-; stop Oracle and Servatrice once its grace period is over: Oracle writes the card
-; database in place, and killing it mid-write corrupts the file the user is
-; updating to keep. An interactive install has a user in front of it, and the
-; prompt names what it could not close.
+; The set is the Restart Manager answer from LogProcessesUsingInstallDir: exactly the
+; processes holding a file of the version being replaced. tools\installer-holder-probe
+; closes that set by pid, which is why nothing here has to match an executable path or
+; depend on powershell.exe. Only cockatrice.exe is asked: Oracle writes the card database
+; in place and Servatrice has no window, so both stay the user's job, as the prompt says.
 ;
-; Oracle and Servatrice are console applications, so CloseMainWindow() has nothing
-; to send a WM_CLOSE to and returns false for them - a no-op that costs one
-; PowerShell run and leaves them to the user the prompt names.
+; Each instance is brought to the foreground before WM_CLOSE is posted to its main
+; window. WM_CLOSE is answered, not obeyed - Cockatrice asks before it quits while a card
+; database update is running, a game is open or a deck is unsaved - and that question is
+; only useful if it is in front of the installer instead of behind it.
 ;
-; Skipped when PowerShell cannot be started at all, because the lookup that would
-; find them is unavailable too - the prompt then names them from Restart Manager's
-; answer instead.
+; The probe waits up to 30 s for the processes it asked to exit, so the purge that follows
+; measures a settled directory rather than sleeping for a fixed time. Its line goes into
+; the log as it stands: it names every holder, including the ones left to the user, so a
+; close that did nothing can be told apart from one that was never sent.
 Function AskCockatriceAppsToClose
-    Call IsProcessLookupAvailable
-    ${If} $R0 = 0
-        !insertmacro CockLog "close-holders: powershell unavailable, nothing was asked to close"
-        Return
-    ${EndIf}
-    StrCpy $GuardDir $INSTDIR
-    StrCpy $R2 "cockatrice"
-    Call CloseMatchingApps
-    StrCpy $R2 "oracle"
-    Call CloseMatchingApps
-    StrCpy $R2 "servatrice"
-    Call CloseMatchingApps
+    InitPluginsDir
+    ; LogProcessesUsingInstallDir extracted it already; the check keeps a single copy of
+    ; the executable in the installer and still works if that order ever changes.
+    IfFileExists "$PLUGINSDIR\installer-holder-probe.exe" ck_close_probe_ready
+        File "/oname=$PLUGINSDIR\installer-holder-probe.exe" "..\..\..\installer-holder-probe.exe"
+    ck_close_probe_ready:
+    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$INSTDIR")'
+    ; The probe waits 30 s itself. The timeout here only bounds a probe that never
+    ; returns; the Restart Manager call inside it is the same one the holder listing makes.
+    nsExec::ExecToStack /TIMEOUT=40000 '"$PLUGINSDIR\installer-holder-probe.exe" --close-holders'
+    Pop $R3
+    Pop $R4
+    !insertmacro CockLog "close-holders: probe exit=$R3 [$R4]"
+    DetailPrint "Closing Cockatrice: $R4"
 FunctionEnd
 
 ; Uninstaller copies of the same routines (the uninstaller gets its own
