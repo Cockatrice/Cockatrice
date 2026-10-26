@@ -1360,6 +1360,66 @@ Function LogProcessesUsingInstallDir
     !insertmacro CockLog "holders: $HolderOutput"
 FunctionEnd
 
+; Called after a purge left files behind and LogStaleRuntimeDiagnostics named who is
+; holding them. Instead of aborting straight away - which on /R strands the user, since
+; the old version is already uninstalled - offer to close those processes and purge
+; again. Sets $StaleRuntimeAfterPurge to the retry's verdict (unchanged when nothing
+; was retried), so the caller still aborts when the files survive.
+;
+; No offer when nobody is at the keyboard (a /S install without /R, e.g. a package
+; manager): a dialog would block forever, and closing programs unasked is not ours to
+; do. No offer either when the probe named nobody: there is nothing to close, and the
+; abort's diagnostics already record what Windows said about each file.
+Function CloseHoldersAndRetryPurge
+    ${If} $ReinstallMode = 0
+    ${AndIf} ${Silent}
+        !insertmacro CockLog "close-holders: unattended install, not offering to close holders"
+        Return
+    ${EndIf}
+    ${If} $HolderFound != 1
+        !insertmacro CockLog "close-holders: no holder was named, nothing to offer"
+        Return
+    ${EndIf}
+    ; No /SD: on the silent /R upgrade the user is present (the client that started
+    ; the installer has quit) and this prompt is exactly what keeps them from being
+    ; left without an install. The /S-without-/R case returned above.
+    MessageBox MB_YESNO|MB_ICONEXCLAMATION \
+        "Files of the previous version of Cockatrice are still in use by:$\r$\n$\r$\n$HolderOutput$\r$\n$\r$\nClose these programs and retry the installation?$\r$\nUnsaved work in them may be lost.$\r$\n$\r$\nChoose No to cancel the installation." \
+        IDYES chp_close
+    !insertmacro CockLog "close-holders: declined by user"
+    Return
+    chp_close:
+    !insertmacro CockLog "close-holders: accepted, closing [$HolderOutput]"
+    DetailPrint "Closing programs that still use files of the previous version ..."
+    ; Our own applications first, through the guard that already knows how to close
+    ; them: Cockatrice gracefully (never force-stopped by the guard), Oracle and
+    ; Servatrice by PID after the grace period.
+    Call EnsureAppsNotRunning
+    ; Then everything else Restart Manager named - a scanner, a service, a Cockatrice
+    ; started from elsewhere - via the probe's --close mode: graceful shutdown first,
+    ; forced only for what refuses. The probe was extracted to $PLUGINSDIR by
+    ; LogProcessesUsingInstallDir; its exit code and line describe what is left.
+    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$INSTDIR")'
+    nsExec::ExecToStack /TIMEOUT=60000 '"$PLUGINSDIR\installer-holder-probe.exe" --close'
+    Pop $HolderExit
+    Pop $HolderOutput
+    !insertmacro CockLog "close-holders: probe --close exit=$HolderExit output=$HolderOutput"
+    ; Give Windows a moment to unmap the closed processes' modules.
+    Sleep 1000
+    Call RetryDllPurge
+    StrCpy $StaleRuntimeAfterPurge $R0
+    !insertmacro CockLogListing "after-close-purge" "*.dll"
+    !insertmacro CockLogListing "after-close-plugins" "Plugins\*.*"
+    !insertmacro CockLog "close-holders: stale-runtime after retry=$StaleRuntimeAfterPurge"
+    ${If} $StaleRuntimeAfterPurge = 1
+        ; Still stuck: refresh the diagnostics so the abort message and the log that
+        ; can be sent to us name what survived the close, not what was there before.
+        Call LogStaleRuntimeDiagnostics
+    ${Else}
+        DetailPrint "Files of the previous version were removed; continuing the installation."
+    ${EndIf}
+FunctionEnd
+
 ; Uninstaller copies of the same routines (the uninstaller gets its own
 ; function set compiled in, it cannot call the installer functions).
 Function un.IsAppRunning
@@ -1787,12 +1847,19 @@ ${Else}
     StrCpy $StaleRuntimeAfterPurge 0
 ${EndIf}
 ${If} $StaleRuntimeAfterPurge = 1
+    !insertmacro CockLog "section: files of a previous version survived the purge"
+    ; Who is holding the payload is recorded first, so the log that reaches us
+    ; answers the question the message can only guess at, and so the user can be
+    ; offered to close exactly those processes instead of being sent away.
+    Call LogStaleRuntimeDiagnostics
+    ; On /R the previous version is already uninstalled at this point, so an abort
+    ; leaves the user with no working Cockatrice. Offer to close the holders and
+    ; purge again; this updates $StaleRuntimeAfterPurge with the retry's verdict.
+    Call CloseHoldersAndRetryPurge
+${EndIf}
+${If} $StaleRuntimeAfterPurge = 1
     !insertmacro CockLog "section: aborting, files of a previous version survived the purge"
     DetailPrint "Files of a previous version could not be removed; aborting the installation."
-    ; Who is holding the payload is recorded before the abort, so the log that
-    ; reaches us answers the question the message can only guess at, and so the
-    ; message can name the processes to close whenever any were found.
-    Call LogStaleRuntimeDiagnostics
     ; The in-app updater runs this installer silent and detached and never looks
     ; at its exit code, so the user has to be told what happened. A /S install
     ; without /R is unattended (a package manager, for instance) and a message
@@ -1802,6 +1869,12 @@ ${If} $StaleRuntimeAfterPurge = 1
         "The installation could not remove all files of a previous version of Cockatrice, most likely because it is still running or was started as administrator, and was cancelled rather than leave a mismatched install behind.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice and run the installer again."
     ${If} $HolderFound = 1
         StrCpy $AbortReason "$AbortReason$\r$\n$\r$\nStill using the install directory:$\r$\n$HolderOutput"
+    ${EndIf}
+    ; "Run the installer again" is not enough on an in-app update: the old version
+    ; was uninstalled before the purge, so point at the installer that was downloaded.
+    ${If} $ReinstallMode = 1
+    ${AndIf} $PortableMode = 0
+        StrCpy $AbortReason "$AbortReason$\r$\n$\r$\nThe previous version has already been removed. To finish the update, run this installer again:$\r$\n$EXEPATH"
     ${EndIf}
     Call AbortInstall
 ${EndIf}

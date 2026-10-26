@@ -109,20 +109,17 @@ std::vector<std::wstring> collectProbeFiles(const std::wstring &installDir)
     return files;
 }
 
-unsigned long findProcessesUsingFiles(const std::vector<std::wstring> &files, std::vector<Holder> &holders)
+namespace
 {
-    holders.clear();
-    if (files.empty()) {
-        return ERROR_SUCCESS;
-    }
-
-    DWORD session = 0;
+/// Starts a Restart Manager session with every file in @p files registered. On
+/// success @p session is open and the caller must end it; on failure it is closed.
+DWORD openSessionFor(const std::vector<std::wstring> &files, DWORD &session)
+{
     wchar_t sessionKey[CCH_RM_SESSION_KEY + 1] = {};
     DWORD error = RmStartSession(&session, 0, sessionKey);
     if (error != ERROR_SUCCESS) {
         return error;
     }
-
     // One call for the whole set, as the API asks: RmRegisterResources does registry
     // work per file and is documented as too expensive to call once per file.
     std::vector<LPCWSTR> names;
@@ -131,8 +128,49 @@ unsigned long findProcessesUsingFiles(const std::vector<std::wstring> &files, st
         names.push_back(file.c_str());
     }
     error = RmRegisterResources(session, static_cast<UINT>(names.size()), names.data(), 0, nullptr, 0, nullptr);
+    if (error != ERROR_SUCCESS) {
+        RmEndSession(session);
+    }
+    return error;
+}
+} // namespace
 
-    if (error == ERROR_SUCCESS) {
+unsigned long closeProcessesUsingFiles(const std::vector<std::wstring> &files)
+{
+    if (files.empty()) {
+        return ERROR_SUCCESS;
+    }
+    DWORD session = 0;
+    DWORD error = openSessionFor(files, session);
+    if (error != ERROR_SUCCESS) {
+        return error;
+    }
+    // Graceful first: Restart Manager sends the session-end messages to applications
+    // and asks services to stop, which lets a holder flush what it has. Only what
+    // refuses that is then forced, and only because the user agreed to close it.
+    // Critical system processes are never shut down by Restart Manager either way.
+    error = RmShutdown(session, 0, nullptr);
+    if (error != ERROR_SUCCESS) {
+        error = RmShutdown(session, RmForceShutdown, nullptr);
+    }
+    RmEndSession(session);
+    return error;
+}
+
+unsigned long findProcessesUsingFiles(const std::vector<std::wstring> &files, std::vector<Holder> &holders)
+{
+    holders.clear();
+    if (files.empty()) {
+        return ERROR_SUCCESS;
+    }
+
+    DWORD session = 0;
+    DWORD error = openSessionFor(files, session);
+    if (error != ERROR_SUCCESS) {
+        return error;
+    }
+
+    {
         UINT needed = 0;
         UINT count = 0;
         DWORD rebootReasons = 0;

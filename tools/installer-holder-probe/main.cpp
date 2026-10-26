@@ -54,7 +54,7 @@ std::wstring installDirFromEnvironment()
 }
 } // namespace
 
-int main()
+int main(int argc, char *argv[])
 {
     const std::wstring installDir = installDirFromEnvironment();
     if (installDir.empty()) {
@@ -62,17 +62,34 @@ int main()
         return EXIT_NOT_CONFIGURED;
     }
 
+    // --close: the user agreed in the installer's dialog to close the holders. Shut
+    // them down, then fall through to the normal listing, so the exit code and the
+    // one output line describe what is *still* holding the files (0 = nothing).
+    const std::vector<std::wstring> files = collectProbeFiles(installDir);
+    std::wstring closeNote;
+    if (argc > 1 && std::string(argv[1]) == "--close") {
+        const unsigned long closeError = closeProcessesUsingFiles(files);
+        if (closeError != ERROR_SUCCESS) {
+            // Not fatal on its own: the listing below says whether anything survived.
+            // Kept on the same line, because the installer logs exactly one line.
+            closeNote = L"closing reported win32 error " + std::to_wstring(closeError) + L"; ";
+        }
+    }
+
     std::vector<Holder> holders;
-    const unsigned long error = findProcessesUsingFiles(collectProbeFiles(installDir), holders);
+    const unsigned long error = findProcessesUsingFiles(files, holders);
     if (error != ERROR_SUCCESS) {
-        writeLine(L"the Restart Manager lookup failed with win32 error " + std::to_wstring(error));
+        writeLine(closeNote + L"the Restart Manager lookup failed with win32 error " + std::to_wstring(error));
         return EXIT_PROBE_FAILED;
     }
     if (holders.empty()) {
-        // No output: the installer words the "nothing is holding them" case, and it
-        // owns the message either way.
+        // The installer words the "nothing is holding them" case, and it owns the
+        // message either way; a close error is still worth the log line.
+        if (!closeNote.empty()) {
+            writeLine(closeNote);
+        }
         return EXIT_NO_HOLDERS;
     }
-    writeLine(formatHolders(holders));
+    writeLine(closeNote + formatHolders(holders));
     return EXIT_HOLDERS_FOUND;
 }
