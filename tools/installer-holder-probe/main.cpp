@@ -33,13 +33,14 @@ enum ExitCode
 
 /// The probe has two modes, selected by the first argument:
 ///
-///   (none)           name what holds the install directory, one line, for the abort
-///                     dialog and the log
+///   (none)           name what holds the payload, one line, for the guard prompt and the
+///                     abort dialog/log
 ///   --close-holders  bring the running Cockatrice forward, ask it to close, and wait for
 ///                     it to exit, for the offer to close after a failed purge
 ///
-/// Both answer from the same Restart Manager query, so the close can only ever reach a
-/// process that is holding a file of the version being replaced.
+/// Both answer from the same Restart Manager query over the same payload files, so the
+/// close can only ever reach a process that is holding a file of the version being
+/// replaced.
 bool closeModeRequested(int argumentCount, char **arguments)
 {
     return argumentCount > 1 && std::string(arguments[1]) == "--close-holders";
@@ -86,7 +87,7 @@ int main(int argumentCount, char **arguments)
     }
 
     std::vector<Holder> holders;
-    const unsigned long error = findProcessesUsingFiles(collectProbeFiles(installDir), holders);
+    const unsigned long error = findProcessesUsingFiles(collectPayloadFiles(installDir), holders);
     if (error != ERROR_SUCCESS) {
         writeLine(L"the Restart Manager lookup failed with win32 error " + std::to_wstring(error));
         return EXIT_PROBE_FAILED;

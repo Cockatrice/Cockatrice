@@ -1,9 +1,10 @@
-# Windows-only. The installer runs this on the abort path of a failed purge to name the
-# applications and services holding the install directory open (Restart Manager); see
-# the LogProcessesUsingInstallDir function in cmake/NSIS.template.in. It ships inside
-# the installer and is extracted to $PLUGINSDIR there, never installed, so it links
-# nothing from this project: no Qt, and a static C runtime because the installed runtime
-# is exactly what the purge may have failed to replace.
+# Windows-only. The installer runs this before anything is replaced (the running-instance
+# guard in .onInit) and on the abort path of a failed purge, to name the applications and
+# services holding the payload open (Restart Manager); see the GuardAppsNotRunning and
+# LogProcessesUsingInstallDir functions in cmake/NSIS.template.in. It ships inside the
+# installer and the uninstaller and is extracted to $PLUGINSDIR there, never installed, so
+# it links nothing from this project: no Qt, and a static C runtime because the installed
+# runtime is exactly what the purge may have failed to replace.
 add_executable(installer-holder-probe close_holders.cpp holder_line.cpp main.cpp restart_manager_holders.cpp)
 
 target_link_libraries(installer-holder-probe PRIVATE rstrtmgr)

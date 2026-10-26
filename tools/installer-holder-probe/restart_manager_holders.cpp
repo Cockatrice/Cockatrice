@@ -20,6 +20,9 @@ constexpr std::size_t MAX_PROBED_FILES = 2000;
 /// How deep the Plugins walk goes. Its real shape is Plugins\<category>\<plugin>.dll.
 constexpr int MAX_PLUGIN_DEPTH = 4;
 
+/// The payload files the installer replaces by name; the DLLs are matched by mask below.
+constexpr const wchar_t *PAYLOAD_FILES[] = {L"cockatrice.exe", L"oracle.exe", L"servatrice.exe", L"qt.conf"};
+
 void collectFilesOf(const std::wstring &directory, int depth, int maxDepth, std::vector<std::wstring> &files)
 {
     if (files.size() >= MAX_PROBED_FILES) {
@@ -96,13 +99,39 @@ Holder holderOf(const RM_PROCESS_INFO &info)
 }
 } // namespace
 
-std::vector<std::wstring> collectProbeFiles(const std::wstring &installDir)
+std::vector<std::wstring> collectPayloadFiles(const std::wstring &installDir)
 {
     std::vector<std::wstring> files;
-    // depth 0, maxDepth 0: the install root's files and nothing below it. Its data
-    // directory holds downloaded pictures, which the purge does not touch and which
-    // would turn this into a walk over thousands of files.
-    collectFilesOf(installDir, 0, 0, files);
+    for (const wchar_t *name : PAYLOAD_FILES) {
+        const std::wstring path = installDir + L"\\" + name;
+        const DWORD attributes = GetFileAttributesW(path.c_str());
+        if (attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0) {
+            files.push_back(path);
+        }
+    }
+
+    // Every top-level DLL: the set the purge deletes and therefore the set a running
+    // instance can have mapped. Matched by mask rather than by a list of expected names,
+    // so a transitive dependency nobody thought of is covered as well.
+    WIN32_FIND_DATAW entry{};
+    const HANDLE dlls = FindFirstFileW((installDir + L"\\*.dll").c_str(), &entry);
+    if (dlls != INVALID_HANDLE_VALUE) {
+        do {
+            if (files.size() >= MAX_PROBED_FILES) {
+                break;
+            }
+            if ((entry.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0 ||
+                (entry.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0) {
+                continue;
+            }
+            files.push_back(installDir + L"\\" + entry.cFileName);
+        } while (FindNextFileW(dlls, &entry) != 0);
+        FindClose(dlls);
+    }
+
+    // Plugins is the other tree the purge removes. Its data directory is not: it holds
+    // downloaded pictures, which the purge does not touch and which would turn this into
+    // a walk over thousands of files.
     if (files.size() < MAX_PROBED_FILES) {
         collectFilesOf(installDir + L"\\Plugins", 0, MAX_PLUGIN_DEPTH, files);
     }
