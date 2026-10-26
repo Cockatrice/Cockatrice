@@ -21,6 +21,7 @@
 #include <libcockatrice/protocol/pb/response_deck_share_list.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_deck_share_item.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <optional>
 #include <qnamespace.h>
 #include <string>
@@ -184,13 +185,11 @@ void IntentOpenSharedDeck::onItemFailure(const QString &reason)
     }
 
     const int downloadedCount = loadedDecks.size();
-    const QMessageBox::StandardButton answer = QMessageBox::question(
-        previewDialog, tr("Open shared decks"),
-        tr("Could not download the deck \"%1\".\n\n%n deck(s) were already downloaded. Open them?", "", downloadedCount)
-            .arg(itemNames.value(currentItemId, tr("Unknown deck"))),
-        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-
-    if (answer == QMessageBox::Yes) {
+    if (QtUtils::confirm(previewDialog, tr("Open shared decks"),
+                         tr("Could not download the deck \"%1\".\n\n%n deck(s) were already downloaded. Open them?", "",
+                            downloadedCount)
+                             .arg(itemNames.value(currentItemId, tr("Unknown deck"))),
+                         QMessageBox::Yes)) {
         finishAll();
     } else {
         previewDialog->deleteLater();

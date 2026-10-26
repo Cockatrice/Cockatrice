@@ -16,6 +16,7 @@
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 PublicDeckPreviewWidget::PublicDeckPreviewWidget(QWidget *parent, const RemotePublicDecksModel::DeckEntry &entry)
@@ -36,8 +37,7 @@ PublicDeckPreviewWidget::PublicDeckPreviewWidget(QWidget *parent, const RemotePu
     tagsFlowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     tagsFlowWidget->setSpacing(3, 3);
 
-    auto *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
+    auto *layout = QtUtils::makeLayout<QVBoxLayout>(this);
     layout->addWidget(bannerCardDisplayWidget);
     layout->addWidget(uploadTimeLabel);
     layout->addWidget(colorIdentityWidget);

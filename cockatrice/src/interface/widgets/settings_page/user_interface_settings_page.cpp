@@ -18,6 +18,7 @@
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 enum visualDeckStoragePromptForConversionIndex
@@ -248,8 +249,7 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 
     updateCommanderSpellbookUiState();
 
-    auto *labelLayout = new QHBoxLayout;
-    labelLayout->setContentsMargins(0, 0, 0, 0);
+    auto *labelLayout = QtUtils::makeLayout<QHBoxLayout>();
     labelLayout->addWidget(&commanderSpellbookIntegrationUseOfficialBracketNamesLabel);
     labelLayout->addWidget(&commanderSpellbookIntegrationUseOfficialBracketNamesExplainer);
 

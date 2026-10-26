@@ -12,7 +12,6 @@ Var NormalDestDir
 Var PortableDestDir
 Var PortableMode
 Var ReinstallMode
-Var AllowForceClose
 Var GuardDir
 Var OldUninstallString
 Var OldInstallDir
@@ -27,9 +26,30 @@ Var StaleFindName
 Var DataBackupFindHandle
 Var DataBackupFindName
 Var IsUpgrade
+; Set together by whichever purge block ran: the verdict RetryDllPurge measured
+; and whether a purge ran at all - a portable install into a directory without
+; portable.dat is neither purge block, and the abort below measures it itself.
+Var StaleRuntimeAfterPurge
+Var DllPurgeRan
 Var AbortReason
+; Diagnostics for a failed purge: the holder probe in LogProcessesUsingInstallDir writes
+; $HolderOutput (one log line) and sets $HolderFound when it named anything.
+Var HolderExit
+Var HolderOutput
+Var HolderFound
+; What the last RunHolderProbe call answered: its exit code and its line. Kept
+; apart from $HolderExit/$HolderOutput because the guard only wants to know
+; whether the payload is free, while the abort dialog reports what survived.
+Var GuardExit
+Var GuardOutput
+; Whether the guard already asked Cockatrice to close once (see GuardAppsNotRunning)
+Var GuardCloseTried
 Var WaitPid
 Var LauncherExited
+; How long one WaitForSingleObject on the launcher's handle waits before asking the user
+; (see WaitForLauncherToExit). A variable because the first slice is short and the ones
+; after the first question are not.
+Var WaitSlice
 Var InstallLogPath
 Var LogHandle
 Var LogMessage
@@ -94,7 +114,10 @@ Page Custom PortableModePageCreate PortableModePageLeave
     Call CockLogWrite
 !macroend
 
-Function CockLogWrite
+; The body is shared because the uninstaller needs its own copy: un.* functions are
+; compiled into a separate binary, and inside one a Call may only name an un. function,
+; so CockLog's Call to CockLogWrite cannot be used there.
+!macro CockLogWriteBody
     Pop $LogMessage
     FileOpen $LogHandle "$InstallLogPath" a
     ${If} $LogHandle == ""
@@ -106,6 +129,20 @@ Function CockLogWrite
     FileSeek $LogHandle 0 END
     FileWrite $LogHandle "$LogMessage$\r$\n"
     FileClose $LogHandle
+!macroend
+
+Function CockLogWrite
+    !insertmacro CockLogWriteBody
+FunctionEnd
+
+; CockLog for un.* code: same lines, prefixed call target.
+!macro CockLogUn text
+    Push "${text}"
+    Call un.CockLogWrite
+!macroend
+
+Function un.CockLogWrite
+    !insertmacro CockLogWriteBody
 FunctionEnd
 
 ; Logs every file matching $INSTDIR\<mask>. Used to record the DLL inventory
@@ -148,6 +185,10 @@ StrCpy $LooseDeckNoticeShown ""
 ; No old install location resolved yet; Backup/Restore fall back to $INSTDIR
 ; when this is empty (the /R path where $INSTDIR already is the old dir).
 StrCpy $OldInstallDir ""
+; No purge has run and nothing has been measured yet. The section sets both
+; after a purge, or measures the directory itself when neither purge applies.
+StrCpy $StaleRuntimeAfterPurge 0
+StrCpy $DllPurgeRan 0
 ; Start each run from a clean file so the log that gets sent back is the last
 ; run, not every past run glued together.
 FileOpen $LogHandle "$InstallLogPath" w
@@ -214,10 +255,10 @@ ${EndIf}
 ; /PID= carries the process id of the application that started this installer.
 ; The in-app updater launches the installer and only then quits itself, so
 ; without it the installer has to guess whether the launching process is still
-; alive by polling powershell.exe for an image name - a guess that can come back
-; "not running" or "could not determine" while the process is very much alive and
-; still has its Qt DLLs mapped. An older client does not pass /PID= and an older
-; installer ignores it, so both sides of the pair have to keep working.
+; alive from the files it still has open - a guess that can come back "nothing
+; is holding them" while the client is very much alive and still has its Qt DLLs
+; mapped. An older client does not pass /PID= and an older installer ignores it,
+; so both sides of the pair have to keep working.
 ; Note that /D= must stay the last parameter on the command line, which is why
 ; the client puts it last and this one anywhere.
 StrCpy $WaitPid ""
@@ -255,18 +296,16 @@ ${Else}
 ${EndIf}
 
 ; Wait for the process that launched this installer to exit before anything is
-; replaced or deleted. It goes first because it is the one check here that needs
-; no powershell.exe: on a machine where the process lookup cannot run at all, the
-; launcher is still proven gone here instead of the whole upgrade being cancelled
-; by a check that was only ever a proxy for this one.
+; replaced or deleted. It goes first because a real handle on that process is
+; authority: the holder probe that follows asks the same question indirectly, by
+; looking at which files are still open.
 ;
 ; Then make sure no *other* application instance is still running (and holding
-; file locks) before the previous version is uninstalled. On a silent update
-; (/R /S) the running processes are asked to close gracefully and waited for;
-; Cockatrice itself is never force-killed (data loss, e.g. an unsaved deck) so the
-; update is aborted instead, while the console applications Oracle and Servatrice
-; are force-stopped by PID once the grace period is over. On interactive installs
-; the user is prompted to close them instead.
+; file locks) before the previous version is uninstalled. The probe names them
+; and the user is asked to close them; nothing is ever force-stopped, because
+; Cockatrice may hold an unsaved deck and Oracle writes the card database in
+; place. On /R the old version is about to be removed, so an answer the probe
+; cannot give cancels the upgrade before it starts rather than after it.
 ; Only needed this early for /R, where AutoUninstallIfNeeded runs below; for
 ; interactive installs the section re-checks after the directory page, when
 ; $INSTDIR is the directory the user actually picked.
@@ -289,6 +328,14 @@ Function un.onInit
 ${If} ${NSIS_IS_64_BIT} == 1
     SetRegView 64
 ${EndIf}
+
+; The uninstaller logs to its own file: the installer truncates its log on every run, so
+; sharing one would mean either side erasing the other's account of a failed upgrade.
+StrCpy $InstallLogPath "$TEMP\Cockatrice-uninstaller.log"
+FileOpen $LogHandle "$InstallLogPath" w
+FileClose $LogHandle
+!insertmacro CockLogUn "=================================================================="
+!insertmacro CockLogUn "uninstaller start: @CPACK_PACKAGE_NAME@ @CPACK_PACKAGE_VERSION@ dir=$INSTDIR"
 
 ; Ensure no application instance is still running before removing files.
 Call un.EnsureAppsNotRunning
@@ -668,222 +715,196 @@ FunctionEnd
 ; "The procedure entry point X could not be located in the dynamic link
 ; library ...Qt6Network.dll" on the next start.
 ;
-; On a silent update (/R /S) matching processes are asked to close gracefully
-; (WM_CLOSE) and waited for up to 60 s. Cockatrice is never force-stopped: it
-; may be holding an unsaved deck or showing a "really leave this game?"
-; confirmation, so if it refuses to close the install is aborted - nothing has
-; been replaced yet, so the update is simply deferred. Oracle and Servatrice
-; are console applications without a main window, so CloseMainWindow() does
-; nothing for them and waiting cannot help; they hold no unsaved user data and
-; are force-stopped by PID once the grace period is over. On interactive
-; installs and uninstalls the user is prompted to close them instead.
+; Both questions this installer has about running processes - "may I replace
+; the payload?" and "what is holding this file I could not delete?" - are
+; answered by tools/installer-holder-probe, a small executable built from this
+; repository and embedded in the installer and the uninstaller alike. It names
+; every process and service that has one of the payload files open or mapped
+; (the Restart Manager, RmRegisterResources/RmGetList) and, separately, every
+; process whose image lives in the directory being replaced.
 ;
-; Processes are matched by image name AND by their executable path living
-; under the guarded directory ($GuardDir, normally $INSTDIR), so unrelated
-; processes that merely share an image name (e.g. the Oracle DB instance
-; "oracle.exe") are never touched.
-
-; usage: set $R2 to the base image name (without extension, e.g. "cockatrice",
-;        as accepted by Get-Process -Name), call this, result in $R0
-;        (1 = running from $GuardDir, 0 = not running, 2 = could not determine)
-Function IsAppRunning
-    ; Every caller has to set $GuardDir; an empty one would make the path check
-    ; below match every process that merely shares the image name, which is the
-    ; opposite of what this guard is for.
-    ${If} $GuardDir == ""
-        StrCpy $R0 2
-        Return
-    ${EndIf}
-    ; Pass the directory to guard to PowerShell via an environment variable so
-    ; it never has to be embedded into the -Command string: apostrophes in a
-    ; path would terminate the command early, and the path in a -like pattern
-    ; would treat [ and ] as wildcard characters.
-    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$GuardDir")'
-    ; Exit the process explicitly so nsExec's pop reflects whether a matching
-    ; process was found: powershell.exe exits 0 whether or not the pipeline
-    ; produced objects. 0 = not running, 1 = running, anything else = could not
-    ; be determined (see IsProcessLookupAvailable).
-    ; A process is only a match when its path is readable and lives under
-    ; $GuardDir. A process we cannot inspect is not one of ours: the updater is
-    ; always started by the application it updates, so it runs in the same user
-    ; session, and an interactive install is elevated and can read the paths of
-    ; the user's own processes. Assuming a match instead would be a hard stop
-    ; rather than a fail-closed guard - an Oracle database instance running as
-    ; SYSTEM has a process named "oracle" whose path raises Access denied, and
-    ; that would make every silent update abort and every interactive install
-    ; loop on the Retry prompt with no way out but Cancel.
-    nsExec::ExecToLog 'powershell -NoProfile -Command "if (Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_GUARD_DIR, [StringComparison]::OrdinalIgnoreCase) } else { $$false } } catch { $$false } } | Select-Object -First 1) { exit 1 } else { exit 0 }"'
-    Pop $R0
-    ${If} $R0 == "0"
-        StrCpy $R0 0
-    ${ElseIf} $R0 == "1"
-        StrCpy $R0 1
-    ${Else}
-        ; powershell.exe could not be run at all (nsExec pushes the string
-        ; "error"), or died with an unexpected code. That is "could not
-        ; determine", which has to stay distinguishable from "definitely
-        ; running": a state that can never clear would block the installer
-        ; forever. IsProcessLookupAvailable warns about that case once.
-        StrCpy $R0 2
-    ${EndIf}
-FunctionEnd
-
-; Sets $R0 to 1 if PowerShell can be started at all, 0 if it cannot. The
-; running instance check is built on top of it, so a machine where
-; powershell.exe is missing, blocked by policy or refused by antivirus is
-; reported once instead of being reported as "Cockatrice is running" on every
-; single check.
-Function IsProcessLookupAvailable
-    nsExec::ExecToLog 'powershell -NoProfile -Command "exit 0"'
-    Pop $R0
-    ${If} $R0 == "0"
-        StrCpy $R0 1
-    ${Else}
-        StrCpy $R0 0
-    ${EndIf}
-FunctionEnd
-
-Function CloseMatchingApps
-    ; gracefully ask every matching instance to close (sends WM_CLOSE)
-    ;
-    ; The filter here is deliberately the strict one: a process is only asked to
-    ; close when its path is readable and lives under $GuardDir. Treating a
-    ; process whose path cannot be read (an unrelated oracle.exe / servatrice.exe,
-    ; or one owned by another account running as SYSTEM) as a match would make
-    ; the installer close a third party application, and it runs elevated, so
-    ; CloseMainWindow() would succeed on it.
-    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$GuardDir")'
-    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_GUARD_DIR, [StringComparison]::OrdinalIgnoreCase) } else { $$false } } catch { $$false } } | ForEach-Object { $$null = $$_.CloseMainWindow() }"'
-    Pop $R3
-FunctionEnd
-
-Function ForceCloseApps
-    ; stop the matching instances by PID once the grace period is over. Only
-    ; used for the console applications ($AllowForceClose), which have no window
-    ; to close and hold no unsaved user data. Same strict filter as above.
-    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$GuardDir")'
-    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_GUARD_DIR, [StringComparison]::OrdinalIgnoreCase) } else { $$false } } catch { $$false } } | ForEach-Object { Stop-Process -Id $$_.Id -Force -ErrorAction SilentlyContinue }"'
-    Pop $R3
-FunctionEnd
-
-Function WaitForAppToClose
-    ; usage: set $R1 to the display name (e.g. "cockatrice.exe") and $R2 to the
-    ; base image name (e.g. "cockatrice")
-    Call IsAppRunning
-    !insertmacro CockLog "guard $R1: state=$R0 (dir=$GuardDir)"
-    ; Only a definite "running" is worth waiting for. "Not running" is done, and
-    ; "could not determine" must not keep the installer waiting on an answer it
-    ; will never get - but it cannot simply be waved through either, see
-    ; HandleUnknownAppState.
-    ${If} $R0 = 0
-        Return
-    ${EndIf}
-    ${If} $R0 = 2
-        Call HandleUnknownAppState
-        Return
-    ${EndIf}
-
-    ${If} ${Silent}
-        ; ask the application to close gracefully (WM_CLOSE), then wait for it to exit
-        DetailPrint "Closing $R1 ..."
-        Call CloseMatchingApps
-        ; wall-clock deadline: each poll has to spawn a fresh powershell.exe, so
-        ; a bare loop counter would not bound the real wait time to 60 s.
-        System::Call 'kernel32::GetTickCount()i.s'
-        Pop $R8
-        ck_wait_loop:
-        Sleep 500
-        Call IsAppRunning
-        ${If} $R0 = 0
-            !insertmacro CockLog "guard $R1: closed gracefully"
-            DetailPrint "$R1 closed."
-            Return
-        ${EndIf}
-        ${If} $R0 = 2
-            Call HandleUnknownAppState
-            Return
-        ${EndIf}
-        System::Call 'kernel32::GetTickCount()i.s'
-        Pop $R9
-        IntOp $R9 $R9 - $R8
-        ${If} $R9 < 60000
-            Goto ck_wait_loop
-        ${EndIf}
-        ; The grace period is over. Cockatrice is never force-stopped: it may be
-        ; showing a "really leave this game?" confirmation or holding an unsaved
-        ; deck, and nothing has been replaced yet, so aborting just defers the
-        ; update and preserves the user's data.
-        ${If} $AllowForceClose = 0
-            !insertmacro CockLog "guard $R1: still running after 60s, aborting (no force close)"
-            DetailPrint "$R1 is still running after 60 s; aborting the update so that no data is lost."
-            StrCpy $AbortReason \
-                "$R1 did not close within 60 seconds, so the installation was aborted to avoid losing unsaved data.$\r$\n$\r$\nPlease close $R1 and run the installer again."
-            Call AbortInstall
-        ${EndIf}
-        ; Oracle and Servatrice are console applications: CloseMainWindow()
-        ; returned false for them and waiting longer cannot help. They hold no
-        ; unsaved user data, so stop them by PID.
-        !insertmacro CockLog "guard $R1: still running after 60s, force-stopping"
-        DetailPrint "Force-stopping $R1 ..."
-        Call ForceCloseApps
-        Sleep 2000
-        Call IsAppRunning
-        ${If} $R0 = 0
-            !insertmacro CockLog "guard $R1: force-stopped"
-            DetailPrint "$R1 closed."
-            Return
-        ${EndIf}
-        ${If} $R0 = 2
-            Call HandleUnknownAppState
-            Return
-        ${EndIf}
-        !insertmacro CockLog "guard $R1: could not be stopped, aborting"
-        DetailPrint "$R1 is still running after 60 s; aborting the update."
-        StrCpy $AbortReason \
-            "$R1 could not be stopped, so the installation was aborted.$\r$\n$\r$\nPlease close $R1 and run the installer again."
-        Call AbortInstall
-    ${Else}
-        ck_wait_prompt:
-        MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
-            "$R1 is still running.$\r$\n$\r$\nPlease close it, then click Retry.$\r$\nClick Cancel to abort." \
-            IDCANCEL ck_abort_install
-        Call IsAppRunning
-        ${If} $R0 = 0
-            Return
-        ${EndIf}
-        ${If} $R0 = 2
-            Call HandleUnknownAppState
-            Return
-        ${EndIf}
-        Goto ck_wait_prompt
-        ck_abort_install:
-        Abort
-    ${EndIf}
-FunctionEnd
-
-; A process lookup came back "could not determine": powershell.exe ran but the
-; answer was not usable, e.g. the process could not be inspected at all. That
-; state is fine to carry on from when the user is at the keyboard - they can
-; close the applications by hand and the stale-runtime check still stands
-; between a failed guard and a mismatched install.
+; The second lookup is not redundant. Restart Manager answers "who has this
+; file open", and a running instance does not have to have one open: its own
+; image and the modules it loaded are mapped into it rather than opened by it,
+; and a mapped image is not reliably reported. That is the state the failed
+; updates this probe exists for were in - every DLL still on disk, an instance
+; running from the directory, and "nothing is holding them any more" as the
+; answer. A guard built on file handles alone therefore misses exactly the
+; instance it exists to find; it would pass, the purge would fail, and the
+; install would end in a warning with no offer to close and try again.
 ;
-; It is not fine on a silent upgrade. There the whole point of this guard is to
-; know that nothing holds locks on the files about to be replaced, and this is
-; exactly the state where that is unknown, with no one to click a dialog: the
-; old code returned and let the install carry on into the mixed Qt DLL set that
-; made the next start fail. Cancel the update instead; the next attempt runs
-; with the applications closed and succeeds.
-Function HandleUnknownAppState
-    ${If} $ReinstallMode = 1
+; Why not enumerate processes from this script: the NSIS stub is a 32-bit
+; process, so a bare "powershell" started from it is the 32-bit Windows
+; PowerShell, whose Get-Process cannot read the path of a 64-bit process. A
+; guard built on that misses exactly the running instance it exists to find.
+; The probe opens each process with PROCESS_QUERY_LIMITED_INFORMATION and calls
+; QueryFullProcessImageNameW, which has no bitness mismatch, and Restart
+; Manager is a system API rather than a view of this process's architecture.
+;
+; The files that count are the payload the purge removes and the installer
+; replaces: the three executables, the top-level DLLs, qt.conf and everything
+; below Plugins. A document, a log or a screenshot the user happens to have
+; open in the install directory is not part of it and cannot block an upgrade;
+; the image lookup matches on the directory a process runs from, so it does not
+; widen that set.
+;
+; Nothing is force-stopped anywhere: Cockatrice may be holding an unsaved deck
+; or showing a "really leave this game?" confirmation, Oracle writes the card
+; database in place and killing it mid-write would corrupt it, and Servatrice
+; has no window to ask. A close is a request (WM_CLOSE), made automatically once
+; because that is what the user started the installer to do, and again whenever
+; they ask for it from the prompt; when it is not answered the user is told which
+; program is in the way instead of having it killed.
+
+; Emitted once for the installer and once for the uninstaller: the uninstaller
+; cannot call installer functions, and its own copy of the probe keeps a running
+; 64-bit instance from being missed there too.
+!macro CockHolderProbeFunctions prefix tag
+Function ${prefix}ExtractHolderProbe
+    InitPluginsDir
+    IfFileExists "$PLUGINSDIR\installer-holder-probe.exe" ck_probe_ready_${tag}
+        File "/oname=$PLUGINSDIR\installer-holder-probe.exe" "..\..\..\installer-holder-probe.exe"
+    ck_probe_ready_${tag}:
+FunctionEnd
+
+; usage: set $GuardDir to the directory to check, then call this. Sets
+; $GuardExit to the probe's exit code and $GuardOutput to its one-line answer.
+; 0 = nothing holds the payload and nothing runs from the directory, 1 = the
+; line names what does, anything else = the probe could not answer (2 = no
+; directory was given, 3 = the Restart Manager call failed and no process runs
+; from the directory either, "timeout" = it did not return in time).
+Function ${prefix}RunHolderProbe
+    Call ${prefix}ExtractHolderProbe
+    ; The directory travels in an environment variable, never on the command
+    ; line: a path with spaces, quotes or a trailing backslash then does not
+    ; have to survive NSIS quoting.
+    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$GuardDir")'
+    ; /TIMEOUT because this can run before the first page: a Restart Manager
+    ; that does not answer must not leave the installer with no window and no
+    ; way out.
+    nsExec::ExecToStack /TIMEOUT=20000 '"$PLUGINSDIR\installer-holder-probe.exe"'
+    Pop $GuardExit
+    Pop $GuardOutput
+FunctionEnd
+
+; usage: set $GuardDir to the directory being replaced, then call this. Asks the running
+; Cockatrice to close, and waits for it to exit.
+;
+; The set is what the probe names: the processes holding a file of the version being
+; replaced, plus the processes running from the directory. tools\installer-holder-probe
+; closes that set by pid, which is why nothing here has to match an executable path. Only
+; cockatrice.exe is asked: Oracle writes the card database in place and Servatrice has no
+; window, so both stay the user's job, as the prompt says.
+;
+; Each instance is brought to the foreground before WM_CLOSE is posted to its main window.
+; WM_CLOSE is answered, not obeyed - Cockatrice asks before it quits while a card database
+; update is running, a game is open or a deck is unsaved - and that question is only useful
+; if it is in front of the installer instead of behind it.
+;
+; The probe waits up to 30 s for the processes it asked to exit, so the check that follows
+; measures a settled directory rather than sleeping for a fixed time. Its line goes into the
+; log as it stands: it names every holder, including the ones left to the user, so a close
+; that did nothing can be told apart from one that was never sent.
+;
+; Never a force-close: the application decides whether to quit, and one that does not answer
+; is left to the user instead of being killed.
+Function ${prefix}CloseHolders
+    Call ${prefix}ExtractHolderProbe
+    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$GuardDir")'
+    ; The probe waits 30 s itself. The timeout here only bounds a probe that never returns;
+    ; the Restart Manager call inside it is the same one the holder listing makes.
+    nsExec::ExecToStack /TIMEOUT=40000 '"$PLUGINSDIR\installer-holder-probe.exe" --close-holders'
+    Pop $R3
+    Pop $R4
+    ; Not the CockLog macro: this function exists twice and the uninstaller copy may only
+    ; Call un. functions, so the macro's two lines are spelled with the prefix here.
+    Push "close-holders: probe exit=$R3 [$R4]"
+    Call ${prefix}CockLogWrite
+    DetailPrint "Closing Cockatrice: $R4"
+FunctionEnd
+!macroend
+
+!insertmacro CockHolderProbeFunctions "" install
+!insertmacro CockHolderProbeFunctions "un." uninstall
+
+; usage: set $GuardDir to the directory to guard, then call this.
+;
+; Asks Cockatrice to close once, then prompts until the payload is free. The automatic
+; close is the same request clicking the window's close button makes, so the common case -
+; the client was still shutting down - never turns into a question. The prompt is what
+; remains when the close cannot reach everything: Oracle writes the card database in
+; place, Servatrice has no window, and Cockatrice may still be waiting for an answer in
+; its own confirmation. It offers one more close (Yes), a plain re-check for after the
+; user closed them by hand (No), and Cancel.
+;
+; An error is always shown, in every mode. A /S install without /R has nobody at
+; the keyboard, but this installer does not promise unattended runs: when an
+; error needs a decision, asking for one is better than silently leaving a
+; half-updated install behind. The happy path has no dialog, so a /S reinstall
+; that has nothing to report stays silent.
+Function GuardAppsNotRunning
+    !insertmacro CockLog "guard: checking $GuardDir (launcherExited=$LauncherExited)"
+    StrCpy $GuardCloseTried 0
+    guard_check:
+    Call RunHolderProbe
+    ${If} $GuardExit == "0"
+        !insertmacro CockLog "guard: nothing is holding the payload"
+        DetailPrint "No running Cockatrice, Oracle or Servatrice instance was found."
+        Return
+    ${EndIf}
+    ${If} $GuardExit == "1"
+        !insertmacro CockLog "guard: still in use by $GuardOutput"
+        ; Close it for the user first. The probe knows exactly which cockatrice.exe holds
+        ; these files, and asking it to close is the same request as clicking the window's
+        ; close button - the application still answers its own "really quit?" prompt, so
+        ; nothing is lost. One attempt per guard call keeps the common case (the client was
+        ; still shutting down) from turning into a question, without hiding the case where
+        ; the close did not help: the pass after it names what is still holding the files.
+        ${If} $GuardCloseTried = 0
+            StrCpy $GuardCloseTried 1
+            !insertmacro CockLog "guard: asking cockatrice to close, then checking again"
+            Call CloseHolders
+            Goto guard_check
+        ${EndIf}
+        DetailPrint "The install directory is in use by: $GuardOutput"
+        ; Three answers, and the close is one of them: the automatic attempt above ran
+        ; before this prompt and could not have answered Cockatrice's own confirmation, so a
+        ; second close is often exactly what is needed once the user has dealt with that
+        ; window. NSIS does not let a MessageBox relabel its buttons, so the text says what
+        ; Yes, No and Cancel do.
+        MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
+            "Cockatrice, Oracle or Servatrice is still using files of the installation:$\r$\n$\r$\n$GuardOutput$\r$\n$\r$\nChoose Yes to close Cockatrice and check again. It may ask you to confirm quitting - it does while a card database update is running, a game is open or a deck is unsaved - so answer that window.$\r$\n$\r$\nClose Oracle, Servatrice and any other program listed above by hand. Choose No to check again after that, or Cancel to cancel the installation." \
+            IDYES guard_close IDNO guard_check
+        !insertmacro CockLog "guard: cancelled by user"
         StrCpy $AbortReason \
-            "The installation was cancelled because it could not determine whether Cockatrice is still running.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice and run the installer again."
+            "The installation was cancelled because Cockatrice, Oracle or Servatrice is still running and holding files of the previous version.$\r$\n$\r$\nClose them and run the installer again."
         Call AbortInstall
+        ; Only reached through Yes: AbortInstall does not return.
+        guard_close:
+        !insertmacro CockLog "guard: closing cockatrice on request, then checking again"
+        Call CloseHolders
+        Goto guard_check
     ${EndIf}
-    DetailPrint "Could not determine whether $R1 is running; close Cockatrice, Oracle and Servatrice manually if the installation reports a problem."
-    ${IfNot} ${Silent}
-        MessageBox MB_OK|MB_ICONEXCLAMATION \
-            "This installer could not determine whether $R1 is still running.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice manually before continuing."
-    ${EndIf}
+    ; Not an answer at all: the probe was not configured, the Restart Manager
+    ; call failed and nothing runs from the directory, or it timed out. Carrying
+    ; on from that is a decision, so it is asked for rather than assumed - the
+    ; stale-runtime check after the purge still stands between a failed guard
+    ; and a mismatched install, but it only fires after files have been
+    ; replaced, and on an upgrade the launcher asked for nobody is watching the
+    ; installer's exit code. Retry asks the probe again (a Restart Manager that
+    ; was busy answers the second time), Ignore installs anyway, Abort cancels
+    ; instead of writing a payload next to files the guard could not rule out.
+    !insertmacro CockLog "guard: the holder probe could not answer ($GuardExit): $GuardOutput"
+    DetailPrint "Could not check whether Cockatrice is still running: $GuardOutput"
+    MessageBox MB_ABORTRETRYIGNORE|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
+        "This installer could not check whether Cockatrice, Oracle or Servatrice is still running.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nClose them, then choose Retry to check again. Choose Ignore to install anyway, or Abort to cancel the installation." \
+        IDRETRY guard_check IDABORT guard_unknown_abort
+    !insertmacro CockLog "guard: continuing without an answer from the probe"
+    Return
+    guard_unknown_abort:
+    StrCpy $AbortReason \
+        "The installation was cancelled because it could not check whether Cockatrice, Oracle or Servatrice is still running.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nPlease close them and run the installer again."
+    Call AbortInstall
 FunctionEnd
 
 Function EnsureAppsNotRunning
@@ -894,67 +915,55 @@ FunctionEnd
 
 ; Aborts the installation, showing $AbortReason to the user.
 ;
-; Every abort goes through here so the unattended case is handled the same way
-; everywhere: the in-app updater runs this installer silent and detached and
-; never looks at its exit code, so a plain Abort would leave the user with no
-; update and no explanation, while a /S install without /R is unattended - by a
-; package manager, for instance - and a message box there would block forever.
-; Only the first of those two gets a dialog; the second reports through the log
-; and the exit code.
+; Every abort goes through here so no failure ends silently: the in-app updater
+; runs this installer silent and detached and never looks at its exit code, and
+; a /S install without /R has nobody watching its exit code either, so a plain
+; Abort would leave the user with no update and no explanation. An error always
+; shows its dialog, in every mode; a silent run stays silent only for as long
+; as nothing goes wrong. The log path is part of the dialog, so a report can be
+; acted on without asking the user to find the file.
 Function AbortInstall
     !insertmacro CockLog "ABORT: $AbortReason"
     !insertmacro CockLog "full installer log: $InstallLogPath"
-    ; Show a dialog whenever someone is at the keyboard to see it: an interactive
-    ; install, or the in-app updater's /R upgrade. The /R upgrade is silent, but
-    ; the client that launched the installer has already quit, so the user is
-    ; still there. Only a /S install without /R is attended by a package manager
-    ; and must go straight to the exit code.
-    ${If} $ReinstallMode = 1
-    ${OrIfNot} ${Silent}
-        MessageBox MB_OK|MB_ICONEXCLAMATION "$AbortReason$\r$\n$\r$\nA detailed installer log was written to:$\r$\n$InstallLogPath"
-        ; Offer to send the installer log to Sentry so aborted installs can be diagnosed. This block already runs
-        ; only when someone is at the keyboard (attended install, or the updater's /R upgrade whose launcher has
-        ; quit), so a silent or package-manager install never reaches the prompt and its behavior is unchanged.
-        ; Only a package built with a baked DSN offers to send, so the prompt can only appear when a send
-        ; can actually go out. A preprocessor guard rather than a runtime test: a package built without a
-        ; DSN compiles the block out entirely, so it cannot even carry the helper or its baked endpoint.
-        ; No /SD here: a /SD would suppress this prompt on the silent /R upgrade, which is exactly the
-        ; attended-update case this offer exists for. The runtime gate above (ReinstallMode/Silent) is the
-        ; hang protection — a package-manager /S install without /R never reaches this box, matching the
-        ; two sibling MessageBox sites in this file.
-        !if "@CPACK_SENTRY_ENABLED@" == "1"
-            MessageBox MB_YESNO|MB_ICONQUESTION "Send the installer log to the developers to help fix this? The log contains file paths from this machine, which may include your Windows user name." IDYES sentry_send
-            !insertmacro CockLog "sentry send: declined by user"
-            Goto sentry_done
-            sentry_send:
-            ; The abort reason is already in the log file (CockLog writes "ABORT: ..." as the
-            ; first thing AbortInstall does), so the helper reads it from there. Nothing
-            ; reason-shaped crosses the command line, which keeps quoting trivial and needs
-            ; no NSIS string functions.
-            InitPluginsDir
-            ; Embedded by the same relative path that resolves NSIS.definitions.nsh above (both are
-            ; configure_file'd into the build root, which is three levels up from project.nsi). An
-            ; absolute CMake path here carries forward slashes, which makensis does not treat as
-            ; absolute and so fails to find the file at package time.
-            File "/oname=$PLUGINSDIR\send-installer-log.ps1" "..\..\..\SendInstallerLog.ps1"
-            ; The send can take up to the /TIMEOUT below, so put something on the details pane
-            ; the moment the user says yes rather than leaving the window blank until it returns.
-            DetailPrint "Sending installer log..."
-            nsExec::ExecToStack /TIMEOUT=60000 'powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$PLUGINSDIR\send-installer-log.ps1" -LogPath "$InstallLogPath"'
-            Pop $SentryResult
-            Pop $SentryOutput
-            ; $SentryOutput is a single line by construction: the helper flattens its message
-            ; and this log file is uploaded verbatim, so a stray newline must not be able to
-            ; forge extra lines into the artifact we send.
-            !insertmacro CockLog "sentry send: result=$SentryResult output=$SentryOutput"
-            ${If} $SentryResult == "0"
-                MessageBox MB_OK|MB_ICONINFORMATION "The installer log was sent. Thank you for helping improve Cockatrice!"
-            ${Else}
-                MessageBox MB_OK|MB_ICONEXCLAMATION "The installer log could not be sent. You can still share it manually; it was written to:$\r$\n$InstallLogPath"
-            ${EndIf}
-            sentry_done:
-        !endif
-    ${EndIf}
+    MessageBox MB_OK|MB_ICONEXCLAMATION "$AbortReason$\r$\n$\r$\nA detailed installer log was written to:$\r$\n$InstallLogPath"
+    ; Offer to send the installer log to Sentry so aborted installs can be diagnosed.
+    ; Only a package built with a baked DSN offers to send, so the prompt can only appear
+    ; when a send can actually go out. A preprocessor guard rather than a runtime test: a
+    ; package built without a DSN compiles the block out entirely, so it cannot even carry
+    ; the helper or its baked endpoint. No /SD: the abort is exactly the case the offer
+    ; exists for, including on the silent /R upgrade.
+    !if "@CPACK_SENTRY_ENABLED@" == "1"
+        MessageBox MB_YESNO|MB_ICONQUESTION "Send the installer log to the developers to help fix this? The log contains file paths from this machine, which may include your Windows user name." IDYES sentry_send
+        !insertmacro CockLog "sentry send: declined by user"
+        Goto sentry_done
+        sentry_send:
+        ; The abort reason is already in the log file (CockLog writes "ABORT: ..." as the
+        ; first thing AbortInstall does), so the helper reads it from there. Nothing
+        ; reason-shaped crosses the command line, which keeps quoting trivial and needs
+        ; no NSIS string functions.
+        InitPluginsDir
+        ; Embedded by the same relative path that resolves NSIS.definitions.nsh above (both are
+        ; configure_file'd into the build root, which is three levels up from project.nsi). An
+        ; absolute CMake path here carries forward slashes, which makensis does not treat as
+        ; absolute and so fails to find the file at package time.
+        File "/oname=$PLUGINSDIR\send-installer-log.ps1" "..\..\..\SendInstallerLog.ps1"
+        ; The send can take up to the /TIMEOUT below, so put something on the details pane
+        ; the moment the user says yes rather than leaving the window blank until it returns.
+        DetailPrint "Sending installer log..."
+        nsExec::ExecToStack /TIMEOUT=60000 'powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$PLUGINSDIR\send-installer-log.ps1" -LogPath "$InstallLogPath"'
+        Pop $SentryResult
+        Pop $SentryOutput
+        ; $SentryOutput is a single line by construction: the helper flattens its message
+        ; and this log file is uploaded verbatim, so a stray newline must not be able to
+        ; forge extra lines into the artifact we send.
+        !insertmacro CockLog "sentry send: result=$SentryResult output=$SentryOutput"
+        ${If} $SentryResult == "0"
+            MessageBox MB_OK|MB_ICONINFORMATION "The installer log was sent. Thank you for helping improve Cockatrice!"
+        ${Else}
+            MessageBox MB_OK|MB_ICONEXCLAMATION "The installer log could not be sent. You can still share it manually; it was written to:$\r$\n$InstallLogPath"
+        ${EndIf}
+        sentry_done:
+    !endif
     SetErrorLevel 1
     Abort
 FunctionEnd
@@ -964,16 +973,15 @@ FunctionEnd
 ;
 ; This is the authority for the one question the rest of the installer can only
 ; approximate: is the process that started us still holding its Qt DLLs mapped?
-; A mapped module cannot be deleted, so an answer of "not running" obtained by
-; enumerating process names is what allows the update to write a new payload on
+; A mapped module cannot be deleted, so an answer of "nothing is holding them"
+; obtained from file handles is what allows the update to write a new payload on
 ; top of files it could not remove. Waiting on a real handle has no such gap,
-; needs no powershell.exe, and is unaffected by a process whose path cannot be
-; read - the case the name based check has to treat as "not ours" so it never
-; closes a third party application.
+; needs no process enumeration at all, and is unaffected by a process the holder
+; probe cannot inspect.
 ;
 ; Sets $LauncherExited to 0 when no usable /PID= was given, which is the older
 ; client that does not pass one; the caller then has no authority available and
-; falls back to the name based guard.
+; falls back to the holder probe.
 Function WaitForLauncherToExit
     StrCpy $LauncherExited 0
     !insertmacro CockLog "wait-launcher: pid='$WaitPid'"
@@ -989,6 +997,17 @@ Function WaitForLauncherToExit
     ; $RN. The caller reads $R0/$R1, so the uppercase .RN form is required; the
     ; original .r0/.r1 wrote $0/$1 and left $R1 empty, which made the "did not
     ; exit" test below compare "" against "0" and abort on every /PID= upgrade.
+    ; Reopened on every Retry below, so a launcher that exited in the meantime answers
+    ; "already exited" instead of being waited on again.
+    ;
+    ; Ten seconds, not the full grace: a client that started an update exits in well
+    ; under a second, so at ten seconds it is either flushing a card database or - far
+    ; more often - sitting on its own "quit anyway?" confirmation with nobody looking at
+    ; it. Silence for a minute is what makes that read as a hung installer. The full
+    ; grace is spent after the first question, so a user who answers Cockatrice's
+    ; confirmation is not asked again while they do it.
+    StrCpy $WaitSlice 10000
+    wait_launcher_open:
     ClearErrors
     System::Call 'kernel32::OpenProcess(i 0x00100000, i 0, i $WaitPid) p.R0'
     ; OpenProcess returns a null handle for a process that is already gone. The
@@ -1008,17 +1027,39 @@ Function WaitForLauncherToExit
         Return
     ${EndIf}
     DetailPrint "Waiting for the application that started this installer to exit ..."
-    ; Same 60 s grace period the name based check uses, so a client that is slow
-    ; to flush its card database does not get less room than it used to.
     ; WAIT_OBJECT_0 is 0; WAIT_TIMEOUT is 258 and a failed wait reports 0xFFFFFFFF.
-    System::Call 'kernel32::WaitForSingleObject(p R0, i 60000) i.R1'
+    System::Call 'kernel32::WaitForSingleObject(p R0, i $WaitSlice) i.R1'
     System::Call 'kernel32::CloseHandle(p R0)'
     ${If} $R1 != 0
-        !insertmacro CockLog "wait-launcher: did not exit within 60s (wait=$R1)"
-        DetailPrint "The application that started this installer did not exit within 60 s."
+        !insertmacro CockLog "wait-launcher: did not exit within $WaitSlice ms (wait=$R1)"
+        DetailPrint "The application that started this installer did not exit in time."
+        ; Two answers, and "carry on anyway" is not one of them. A live process has its
+        ; image and its Qt DLLs mapped, so writing the payload over them is the broken
+        ; install this wait exists to prevent - and the guard that runs next names the
+        ; same process by its image path and stops there anyway, so an "ignore" would
+        ; only put the same question a moment later, after a close attempt nobody asked
+        ; for. Waiting again is what helps: the client is most likely showing its own
+        ; "quit anyway?" confirmation, and that window is the thing to answer.
+        MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
+            "Cockatrice has not finished closing, so the installation is paused rather than replace files it is still using.$\r$\n$\r$\nIt may be waiting for you to answer its own question about an unsaved deck, an open game or a card database update. Answer that window - choose Retry to bring it to the front, ask it to close again and keep waiting. If it does not answer at all, close it from Task Manager first.$\r$\n$\r$\nChoose Retry to wait again, or Cancel to cancel the installation." \
+            IDRETRY wait_launcher_retry
+        !insertmacro CockLog "wait-launcher: cancelled by user"
         StrCpy $AbortReason \
             "The application that started this update has not exited yet, so the installation was cancelled rather than replace files it is still using.$\r$\n$\r$\nPlease close Cockatrice and run the installer again."
         Call AbortInstall
+        ; Only reached through Retry: AbortInstall does not return.
+        wait_launcher_retry:
+        ; The question has been asked and answered once; from here the wait is the full
+        ; grace again, so a slow flush or a confirmation being answered does not turn
+        ; into a stream of prompts.
+        StrCpy $WaitSlice 60000
+        ; The same request the window's close button makes, and the same close the guard
+        ; would send a moment later. It brings the client forward as well, which is the
+        ; part that helps when the confirmation is behind something else. Nothing is
+        ; force-stopped: a client that is waiting for an answer keeps the last word.
+        StrCpy $GuardDir $INSTDIR
+        Call CloseHolders
+        Goto wait_launcher_open
     ${EndIf}
     !insertmacro CockLog "wait-launcher: launcher exited"
     DetailPrint "The application that started this installer has exited."
@@ -1041,57 +1082,6 @@ Function EnsureOldInstallNotRunning
     ${EndIf}
     StrCpy $GuardDir $R3
     Call GuardAppsNotRunning
-FunctionEnd
-
-Function GuardAppsNotRunning
-    ; usage: set $GuardDir to the directory to guard, then call this
-    Call IsProcessLookupAvailable
-    !insertmacro CockLog "guard: powershell available=$R0 dir=$GuardDir launcherExited=$LauncherExited"
-    ${If} $R0 = 0
-        ; Without PowerShell we cannot tell whether a running instance is
-        ; holding locks on the files we are about to replace.
-        !insertmacro CockLog "guard: powershell unavailable, skipping instance check"
-        DetailPrint "Could not start powershell.exe; skipping the running instance check. Close Cockatrice, Oracle and Servatrice manually if the installation reports a problem."
-        ; On a silent upgrade that used to be a warning and nothing more, which
-        ; left the very process that launched the installer free to go on
-        ; replacing files it still had mapped - the one outcome this guard exists
-        ; to prevent - and then writing the new payload on top of them. Cancel
-        ; instead. An interactive install can still continue: the user is at the
-        ; keyboard, and refusing outright would leave them with an installer that
-        ; can never complete.
-        ;
-        ; Unless the launcher has already been waited on directly: WaitForLauncherToExit
-        ; needs no powershell.exe, so when it has run, Cockatrice is known to be
-        ; gone and the lookup failing to run costs nothing but the Oracle and
-        ; Servatrice checks. An older client that passes no /PID= leaves no such
-        ; authority, and there the upgrade is cancelled as before.
-        ${If} $LauncherExited != 1
-        ${AndIf} $ReinstallMode = 1
-            StrCpy $AbortReason \
-                "The installation was cancelled because it could not check whether Cockatrice is still running, because powershell.exe could not be started.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice and run the installer again."
-            Call AbortInstall
-        ${EndIf}
-        ; The user has to be told to close the applications by hand, but a /S
-        ; install without /R is unattended and would block on this forever.
-        ${If} $ReinstallMode = 1
-        ${OrIfNot} ${Silent}
-            MessageBox MB_OK|MB_ICONEXCLAMATION "This installer could not check whether Cockatrice is still running, because powershell.exe could not be started.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice manually before continuing."
-        ${EndIf}
-        Return
-    ${EndIf}
-    StrCpy $R1 "cockatrice.exe"
-    StrCpy $R2 "cockatrice"
-    ; a GUI application with unsaved user data: graceful close only
-    StrCpy $AllowForceClose 0
-    Call WaitForAppToClose
-    StrCpy $R1 "oracle.exe"
-    StrCpy $R2 "oracle"
-    StrCpy $AllowForceClose 1
-    Call WaitForAppToClose
-    StrCpy $R1 "servatrice.exe"
-    StrCpy $R2 "servatrice"
-    StrCpy $AllowForceClose 1
-    Call WaitForAppToClose
 FunctionEnd
 
 ; Sets $R0 to 1 if $INSTDIR looks like an existing Cockatrice install. Used to
@@ -1171,142 +1161,336 @@ Function CheckStaleRuntimeMask
     ${EndIf}
 FunctionEnd
 
-; Uninstaller copies of the same routines (the uninstaller gets its own
-; function set compiled in, it cannot call the installer functions).
-Function un.IsAppRunning
-    ; An unset $GuardDir would match every process that merely shares the image
-    ; name, see IsAppRunning in the installer.
-    ${If} $GuardDir == ""
-        StrCpy $R0 2
+; Clears the read-only attribute of everything the purge is about to delete.
+;
+; Delete and RMDir only set the error flag: a read-only file is left on disk
+; untouched, and the retry loop then cannot make progress however long it waits,
+; because the file is not held - it is protected. The abort diagnostics have a
+; branch for exactly that ("read-only, which stops Delete"), so a survivor that
+; is both free and read-only was a dead end until now. This runs on every
+; attempt, so an attribute set again between attempts is cleared as well.
+; SetFileAttributes has no wildcard support, hence the walks.
+Function ClearReadOnlyPurgeTargets
+    FindFirst $StaleFindHandle $StaleFindName "$INSTDIR\*.dll"
+    ${If} $StaleFindHandle != ""
+    crp_dll_loop:
+        SetFileAttributes "$INSTDIR\$StaleFindName" NORMAL
+        ClearErrors
+        FindNext $StaleFindHandle $StaleFindName
+        IfErrors 0 crp_dll_loop
+        FindClose $StaleFindHandle
+    ${EndIf}
+    StrCpy $R6 "$INSTDIR\Plugins"
+    Call ClearReadOnlyTree
+FunctionEnd
+
+; usage: set $R6 to a directory. Clears the read-only attribute of every entry
+; below it, so RMDir /r is not stopped by a single file. Saves and restores the
+; registers it works in, because it recurses into itself.
+Function ClearReadOnlyTree
+    Push $R6
+    Push $R7
+    Push $R8
+    FindFirst $R7 $R8 "$R6\*.*"
+    ${If} $R7 != ""
+    crt_loop:
+        ${If} $R8 != "."
+        ${AndIf} $R8 != ".."
+            SetFileAttributes "$R6\$R8" NORMAL
+            ; Only an entry with contents has anything below it that the purge
+            ; would fail on; an empty directory's own attribute is already
+            ; cleared above and there is nothing left to descend into.
+            ${If} ${FileExists} "$R6\$R8\*.*"
+                Push $R6
+                StrCpy $R6 "$R6\$R8"
+                Call ClearReadOnlyTree
+                Pop $R6
+            ${EndIf}
+        ${EndIf}
+        ClearErrors
+        FindNext $R7 $R8
+        IfErrors 0 crt_loop
+        FindClose $R7
+    ${EndIf}
+    Pop $R8
+    Pop $R7
+    Pop $R6
+FunctionEnd
+
+; Removes the Plugins directory and all top-level DLLs from $INSTDIR, then
+; retries up to two more times (2 s apart) when files remain locked, so that
+; transient holders such as antivirus scanners have a chance to release their
+; handles before the installer gives up. Three attempts total. The read-only
+; attribute is cleared before each attempt: a protected file is not a held one
+; and would never clear on its own.
+; Sets $R0 to 0 when the purge is clean, or to 1 when stale DLLs remain
+; after all attempts.
+Function RetryDllPurge
+    StrCpy $R5 0        ; counts retries after the initial attempt
+    rdp_loop:
+    Call ClearReadOnlyPurgeTargets
+    RMDir /r "$INSTDIR\Plugins"
+    Delete "$INSTDIR\*.dll"
+    Call HasStaleRuntimeFiles
+    ; $R0 = 0: all clear, nothing left to do.
+    ${If} $R0 = 0
         Return
     ${EndIf}
-    ; Pass the directory to guard to PowerShell via an environment variable so
-    ; it never has to be embedded into the -Command string: apostrophes in a
-    ; path would terminate the command early, and the path in a -like pattern
-    ; would treat [ and ] as wildcard characters.
-    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$GuardDir")'
-    ; Exit the process explicitly so nsExec's pop reflects whether a matching
-    ; process was found: powershell.exe exits 0 whether or not the pipeline
-    ; produced objects. 0 = not running, 1 = running, anything else = could not
-    ; be determined (see un.IsProcessLookupAvailable).
-    ; Strict match: a readable path under $GuardDir, same as in the installer.
-    nsExec::ExecToLog 'powershell -NoProfile -Command "if (Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_GUARD_DIR, [StringComparison]::OrdinalIgnoreCase) } else { $$false } } catch { $$false } } | Select-Object -First 1) { exit 1 } else { exit 0 }"'
-    Pop $R0
-    ${If} $R0 == "0"
-        StrCpy $R0 0
-    ${ElseIf} $R0 == "1"
-        StrCpy $R0 1
+    IntOp $R5 $R5 + 1
+    ; Allow two retries after the initial attempt ($R5 is the retry counter,
+    ; so the loop runs at most 3 times: attempt + retry 1 + retry 2).
+    ${If} $R5 > 2
+        !insertmacro CockLog "RetryDllPurge: stale files remain after 3 attempts, giving up"
+        Return          ; $R0 is already 1
+    ${EndIf}
+    !insertmacro CockLog "RetryDllPurge: retry $R5 of 2 after stale purge, sleeping 2 s"
+    Sleep 2000
+    Goto rdp_loop
+FunctionEnd  ; RetryDllPurge
+; Turns a Win32 error code into the wording that goes into the log.
+; usage: set $0 to the code, result in $R0.
+;
+; These are Windows' own names for the codes and deliberately nothing more. A
+; code on its own cannot say whether an upgrade was blocked by a running instance
+; or by a permission: deleting a file whose image is mapped by another process
+; surfaces as ACCESS_DENIED, exactly like a file whose ACL denies delete does.
+; LogProcessesUsingInstallDir is what separates the two, which is why it runs
+; right after this and why the two are read together.
+Function GetWin32ErrorText
+    ${If} $0 = 2
+        StrCpy $R0 "already gone"
+    ${ElseIf} $0 = 3
+        StrCpy $R0 "path not found"
+    ${ElseIf} $0 = 5
+        StrCpy $R0 "access denied"
+    ${ElseIf} $0 = 19
+        StrCpy $R0 "write-protected media"
+    ${ElseIf} $0 = 32
+        StrCpy $R0 "sharing violation"
+    ${ElseIf} $0 = 33
+        StrCpy $R0 "lock violation"
+    ${ElseIf} $0 = 1224
+        StrCpy $R0 "file is mapped in memory"
     ${Else}
-        ; powershell.exe could not be run at all (nsExec pushes the string
-        ; "error"), or died with an unexpected code. That is "could not
-        ; determine", which has to stay distinguishable from "definitely
-        ; running": a state that can never clear would block the uninstaller
-        ; forever. un.IsProcessLookupAvailable warns about that case once.
-        StrCpy $R0 2
+        StrCpy $R0 "windows error"
     ${EndIf}
 FunctionEnd
 
-Function un.IsProcessLookupAvailable
-    nsExec::ExecToLog 'powershell -NoProfile -Command "exit 0"'
-    Pop $R0
-    ${If} $R0 == "0"
-        StrCpy $R0 1
-    ${Else}
-        StrCpy $R0 0
+; Records which runtime files the purge left behind, what Windows said about each
+; one, and which processes are using the install directory.
+;
+; Diagnostic only, and only on the abort path: it deletes nothing, so it can never
+; turn a failed upgrade into a half-removed old install, and it decides nothing -
+; the abort that called it is already decided. It exists because NSIS Delete/RMDir
+; only set the error flag: without this, a report of "files of a previous version
+; survived the purge" said which files were present but never which one was held,
+; and never whether the cause was a lock or a permission.
+;
+; Each survivor is opened for DELETE access and then asked the question DeleteFile
+; asks: SetFileInformationByHandle(FileDispositionInfo) marks it for deletion on
+; close, and the mark is cleared again right away, so nothing is deleted (and if
+; that cancel ever failed, the file would go when the handle closes - a file the
+; purge already tried to delete, and the line says so). That separates the three
+; causes a failed Delete cannot tell apart: another handle that does not share
+; delete refuses the mark, a read-only attribute refuses it, and a file nobody
+; holds accepts it and would have been deleted. The mark is read through ?e, so a
+; refusal reports Windows' own code; clearing LastError first keeps a zero code
+; meaning "accepted". The wording below reports what Windows said and never claims
+; a cause the code cannot prove. Which process is holding a survivor, if any, is
+; what the holders line after the loop answers.
+Function LogStaleRuntimeDiagnostics
+    FindFirst $StaleFindHandle $StaleFindName "$INSTDIR\*.dll"
+    ${If} $StaleFindHandle != ""
+    stale_diag_loop:
+        ; ClearErrors tells a plugin failure apart from an API failure: the System
+        ; plugin sets the error flag only when it could not make the call at all,
+        ; in which case it pushes its own message instead of the call's value and
+        ; the pop below must not run.
+        ClearErrors
+        System::Call 'kernel32::SetLastError(i 0)'
+        System::Call 'kernel32::CreateFileW(w "$INSTDIR\$StaleFindName", i 0x00010000, i 0, p 0, i 3, i 0, p 0) p.R1 ?e'
+        ${If} ${Errors}
+            StrCpy $R0 "the delete probe could not be run"
+        ${Else}
+            Pop $R2
+            ${If} $R2 = 0
+                ; The open worked, which says nothing about Delete: a DLL a running
+                ; process has mapped opens for DELETE and still refuses DeleteFile, and
+                ; a read-only file does the same until its attribute is cleared. Ask
+                ; Windows the question the purge actually asks - mark the file for
+                ; deletion on close, then cancel that again. This is the same request
+                ; DeleteFile makes on a temporary handle, so its answer says whether a
+                ; delete would succeed now.
+                ClearErrors
+                System::Call '*(&i1 1) p.R4'
+                System::Call 'kernel32::SetFileInformationByHandle(p R1, i 4, p R4, i 1) i.R5 ?e'
+                ${If} ${Errors}
+                    StrCpy $R0 "a delete-access open now succeeds, but Windows could not be asked whether it would delete it"
+                ${Else}
+                    Pop $R6
+                    ${If} $R5 != 0
+                        ; Accepted: cancel the mark again, so this stays a question and
+                        ; does not turn into the deletion it is asking about. A cancel
+                        ; that fails leaves the file to go when the handle closes, which
+                        ; is what the purge wanted anyway; the line says so.
+                        ClearErrors
+                        System::Call '*(&i1 0) p.R4'
+                        System::Call 'kernel32::SetFileInformationByHandle(p R1, i 4, p R4, i 1) i.R5 ?e'
+                        ${If} ${Errors}
+                            StrCpy $R0 "a delete would succeed now, but the check could not undo the mark it set"
+                        ${Else}
+                            Pop $R6
+                            ${If} $R5 != 0
+                                StrCpy $R0 "a delete would succeed now - the earlier failure was transient"
+                            ${Else}
+                                StrCpy $R0 "a delete would succeed now, and it is marked for deletion from here on"
+                            ${EndIf}
+                        ${EndIf}
+                    ${Else}
+                        StrCpy $0 $R6
+                        Call GetWin32ErrorText
+                        StrCpy $R0 "a delete-access open now succeeds, but Windows refused to mark it for deletion: win32 error $R6: $R0"
+                    ${EndIf}
+                ${EndIf}
+                System::Call 'kernel32::CloseHandle(p R1)'
+                ; The read-only attribute is a cause on its own, and the purge clears it
+                ; before every attempt, so a survivor that is read-only had it set again.
+                System::Call 'kernel32::GetFileAttributesW(w "$INSTDIR\$StaleFindName") i.R3'
+                ${If} $R3 != -1
+                    IntOp $R3 $R3 & 1
+                    ${If} $R3 = 1
+                        StrCpy $R0 "$R0; it is read-only again"
+                    ${EndIf}
+                ${EndIf}
+            ${Else}
+                StrCpy $0 $R2
+                Call GetWin32ErrorText
+                StrCpy $R0 "win32 error $R2: $R0"
+            ${EndIf}
+        ${EndIf}
+        !insertmacro CockLog "stale-runtime: '$StaleFindName' is still present: $R0"
+        ClearErrors
+        FindNext $StaleFindHandle $StaleFindName
+        IfErrors 0 stale_diag_loop
+        FindClose $StaleFindHandle
     ${EndIf}
+    Call LogProcessesUsingInstallDir
 FunctionEnd
 
-Function un.CloseMatchingApps
-    ; gracefully ask every matching instance to close (sends WM_CLOSE)
-    ;
-    ; Strict filter, same as in the installer: never close a process whose path
-    ; cannot be read, it is not necessarily one of ours.
-    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$GuardDir")'
-    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_GUARD_DIR, [StringComparison]::OrdinalIgnoreCase) } else { $$false } } catch { $$false } } | ForEach-Object { $$null = $$_.CloseMainWindow() }"'
-    Pop $R3
+; Names the applications and services that still have the payload open or mapped.
+; Writes one line to the log and sets $HolderFound (1 when anything was named), so the
+; abort message can repeat that line to the user.
+;
+; The lookup is tools/installer-holder-probe, the same executable the guard runs before
+; anything is replaced; here it answers the other question, about files a purge could not
+; remove. It asks the Restart Manager (RmRegisterResources/RmGetList), which names a
+; process holding a plain handle on a file - an antivirus scanner - and names services as
+; well as user programs, and it adds every process running from the directory, because a
+; running instance holds its payload as mapped images rather than as open handles and the
+; Restart Manager does not reliably report those. Its remaining blind spot is a handle
+; taken in kernel mode, where there is no process to name; then the per-file codes logged
+; above are the whole story, and the probe says so by naming nothing rather than by
+; failing.
+;
+; $INSTDIR travels through the same COCKATRICE_GUARD_DIR environment variable the guard
+; uses, so a path with spaces or apostrophes never has to be embedded in a command line.
+Function LogProcessesUsingInstallDir
+    StrCpy $HolderExit 0
+    StrCpy $HolderOutput ""
+    StrCpy $HolderFound 0
+    ; The directory that just failed the purge, not whatever a check before the directory
+    ; page looked at: a portable install into a custom folder reaches here with the two
+    ; being different.
+    StrCpy $GuardDir $INSTDIR
+    Call RunHolderProbe
+    StrCpy $HolderExit $GuardExit
+    StrCpy $HolderOutput $GuardOutput
+    ; The exit code, not the text, decides what happened: it cannot be mangled by what
+    ; nsExec leaves on the end of the captured output. 1 = the line below names what is
+    ; holding the files, 0 = nothing holds them any more, anything else = the probe could
+    ; not answer, and says why in its own output.
+    ${If} $HolderExit == "1"
+        StrCpy $HolderFound 1
+    ${ElseIf} $HolderExit == "0"
+        StrCpy $HolderOutput "nothing is holding them and no program is running from the directory"
+    ${Else}
+        StrCpy $HolderOutput "the holder probe could not run: $HolderOutput"
+    ${EndIf}
+    !insertmacro CockLog "holders: $HolderOutput"
 FunctionEnd
 
-Function un.ForceCloseApps
-    ; stop the matching instances by PID once the grace period is over, see
-    ; ForceCloseApps in the installer.
-    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$GuardDir")'
-    nsExec::ExecToLog 'powershell -NoProfile -Command "Get-Process -Name $\'$R2$\' -ErrorAction SilentlyContinue | Where-Object { try { $$p = $$_.Path; if ($$p) { $$p.StartsWith($$env:COCKATRICE_GUARD_DIR, [StringComparison]::OrdinalIgnoreCase) } else { $$false } } catch { $$false } } | ForEach-Object { Stop-Process -Id $$_.Id -Force -ErrorAction SilentlyContinue }"'
-    Pop $R3
-FunctionEnd
-
-Function un.WaitForAppToClose
-    Call un.IsAppRunning
-    ; Only a definite "running" is worth waiting for, see WaitForAppToClose.
-    ${If} $R0 != 1
+; Called after a purge left files behind and LogStaleRuntimeDiagnostics named who is
+; holding them. Instead of aborting straight away - which on /R strands the user, since
+; the old version is already uninstalled - ask, close what this installer owns, purge
+; again, and retry while the user keeps asking. Sets $StaleRuntimeAfterPurge to the last
+; purge's verdict, so the caller still aborts when the files survive.
+;
+; Cockatrice is asked to close (WM_CLOSE, the same request as clicking the window's close
+; button) and keeps the last word: it may be waiting for an answer to its own "really
+; quit?" confirmation (a running card database update, an open game, an unsaved deck), and
+; that stays its decision. The instance is brought forward first, so that confirmation is
+; on screen rather than behind this installer's prompt. Oracle and Servatrice have no
+; window to send a close to at all, and nothing here is force-stopped: Oracle writes the
+; card database in place and killing it mid-write would corrupt it. Everything the probe
+; named that this installer cannot close - those two included - is left to the user, whom
+; the prompt names it to.
+;
+; Restart Manager's RmShutdown was the alternative and was rejected: it shuts down
+; services as well as applications, and the only way to bring them back is RmRestart,
+; which would restart this very application into files that are about to be replaced.
+;
+; Always offered, in every mode: a /S install without /R is the only case without someone
+; at the keyboard, and this installer does not promise unattended runs - if an error needs
+; a decision, it asks for one. No offer when the probe named nobody: there is nothing to
+; close, and the abort's per-file diagnostics already record what Windows said.
+;
+; Every round offers all three answers: Yes closes Cockatrice and purges again, No purges
+; again without asking it to close (for when the user closed things by hand), and Cancel
+; gives up. The close stays on offer after one that did nothing because the usual reason is
+; Cockatrice's own confirmation still waiting for an answer - the probe waits for that, the
+; user can answer it in the application's window, and the next round can then collect the
+; process the earlier attempt could not. Each round re-reads the holders, so the prompt
+; names what survived the last attempt rather than repeating the first listing.
+Function RecoverFromHolders
+    ${If} $HolderFound != 1
+        !insertmacro CockLog "recover-holders: no holder was named, nothing to offer"
         Return
     ${EndIf}
-
-    ${If} ${Silent}
-        DetailPrint "Closing $R1 ..."
-        Call un.CloseMatchingApps
-        ; wall-clock deadline: each poll has to spawn a fresh powershell.exe, so
-        ; a bare loop counter would not bound the real wait time to 60 s.
-        System::Call 'kernel32::GetTickCount()i.s'
-        Pop $R8
-        un_ck_wait_loop:
-        Sleep 500
-        Call un.IsAppRunning
-        ${If} $R0 = 0
-            DetailPrint "$R1 closed."
-            Return
-        ${EndIf}
-        ${If} $R0 != 1
-            Return
-        ${EndIf}
-        System::Call 'kernel32::GetTickCount()i.s'
-        Pop $R9
-        IntOp $R9 $R9 - $R8
-        ${If} $R9 < 60000
-            Goto un_ck_wait_loop
-        ${EndIf}
-        ; The grace period is over. Cockatrice is never force-stopped, see
-        ; WaitForAppToClose in the installer. A silent uninstall only reports
-        ; through the log and its exit code: it is also run unattended (the /R
-        ; updater uses it via QuietUninstallString, package managers use it
-        ; directly), and a message box would block there. The installer that ran
-        ; us reports the incomplete result to the user itself.
-        ${If} $AllowForceClose = 0
-            DetailPrint "$R1 is still running after 60 s; aborting so that no data is lost."
-            SetErrorLevel 1
-            Abort
-        ${EndIf}
-        DetailPrint "Force-stopping $R1 ..."
-        Call un.ForceCloseApps
-        Sleep 2000
-        Call un.IsAppRunning
-        ${If} $R0 = 0
-            DetailPrint "$R1 closed."
-            Return
-        ${EndIf}
-        ${If} $R0 != 1
-            Return
-        ${EndIf}
-        DetailPrint "$R1 is still running after 60 s; aborting."
-        SetErrorLevel 1
-        Abort
-    ${Else}
-        un_ck_wait_prompt:
-        MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
-            "$R1 is still running.$\r$\n$\r$\nPlease close it, then click Retry.$\r$\nClick Cancel to abort." \
-            IDCANCEL un_ck_abort_install
-        Call un.IsAppRunning
-        ${If} $R0 = 0
-            Return
-        ${EndIf}
-        ${If} $R0 != 1
-            Return
-        ${EndIf}
-        Goto un_ck_wait_prompt
-        un_ck_abort_install:
-        Abort
+    rfh_prompt:
+    MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
+        "Files of the previous version of Cockatrice are still in use by:$\r$\n$\r$\n$HolderOutput$\r$\n$\r$\nChoose Yes to close Cockatrice and try the removal again. It may ask you to confirm quitting - it does while a card database update is running, a game is open or a deck is unsaved - so answer that window. Close Oracle, Servatrice and any other program listed above by hand.$\r$\n$\r$\nChoose No to try again after closing the programs yourself, or Cancel to cancel the installation." \
+        IDYES rfh_close IDNO rfh_retry
+    !insertmacro CockLog "recover-holders: declined by user"
+    Return
+    rfh_close:
+    !insertmacro CockLog "recover-holders: closing cockatrice on request, holders were [$HolderOutput]"
+    ; The close is a request, not a fact: CloseHolders waits for the instances it asked to
+    ; exit, so a confirmation of Cockatrice's that is still up is reported as still running
+    ; instead of being measured as a successful close.
+    StrCpy $GuardDir $INSTDIR
+    Call CloseHolders
+    rfh_retry:
+    Call RetryDllPurge
+    StrCpy $StaleRuntimeAfterPurge $R0
+    !insertmacro CockLogListing "after-retry-purge" "*.dll"
+    !insertmacro CockLogListing "after-retry-plugins" "Plugins\*.*"
+    !insertmacro CockLog "recover-holders: stale-runtime after retry=$StaleRuntimeAfterPurge"
+    ${If} $StaleRuntimeAfterPurge = 0
+        DetailPrint "Files of the previous version were removed; continuing the installation."
+        Return
     ${EndIf}
+    ; Still stuck: refresh the names, so the next prompt and the log describe what
+    ; survived the close and not what was there before it.
+    Call LogStaleRuntimeDiagnostics
+    ${If} $HolderFound != 1
+        Return
+    ${EndIf}
+    Goto rfh_prompt
 FunctionEnd
 
+; Uninstaller copy of the guard (the uninstaller gets its own function set compiled in, it
+; cannot call the installer functions). ExtractHolderProbe and RunHolderProbe come from
+; CockHolderProbeFunctions above; only the policy differs.
 Function un.EnsureAppsNotRunning
     ; guards the install directory; the uninstaller only ever has to check this one
     StrCpy $GuardDir $INSTDIR
@@ -1314,29 +1498,54 @@ Function un.EnsureAppsNotRunning
 FunctionEnd
 
 Function un.GuardAppsNotRunning
-    Call un.IsProcessLookupAvailable
-    ${If} $R0 = 0
-        ; Same reasoning as in the installer: without PowerShell we cannot tell
-        ; whether a running instance still holds file locks, and refusing to
-        ; uninstall would leave the user with an uninstaller that never
-        ; completes. Warn once and continue.
-        DetailPrint "Could not start powershell.exe; skipping the running instance check. Close Cockatrice, Oracle and Servatrice manually if the uninstall reports a problem."
-        MessageBox MB_OK|MB_ICONEXCLAMATION "This uninstaller could not check whether Cockatrice is still running, because powershell.exe could not be started.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice manually before continuing."
+    StrCpy $GuardCloseTried 0
+    un_guard_check:
+    !insertmacro CockLogUn "uninst-guard: checking $GuardDir"
+    Call un.RunHolderProbe
+    ${If} $GuardExit == "0"
+        !insertmacro CockLogUn "uninst-guard: nothing is holding the payload"
         Return
     ${EndIf}
-    StrCpy $R1 "cockatrice.exe"
-    StrCpy $R2 "cockatrice"
-    ; a GUI application with unsaved user data: graceful close only
-    StrCpy $AllowForceClose 0
-    Call un.WaitForAppToClose
-    StrCpy $R1 "oracle.exe"
-    StrCpy $R2 "oracle"
-    StrCpy $AllowForceClose 1
-    Call un.WaitForAppToClose
-    StrCpy $R1 "servatrice.exe"
-    StrCpy $R2 "servatrice"
-    StrCpy $AllowForceClose 1
-    Call un.WaitForAppToClose
+    ${If} $GuardExit == "1"
+        !insertmacro CockLogUn "uninst-guard: still in use by $GuardOutput"
+        ; Same convenience as in the installer: ask Cockatrice to close once, then report
+        ; what the close could not reach.
+        ${If} $GuardCloseTried = 0
+            StrCpy $GuardCloseTried 1
+            !insertmacro CockLogUn "uninst-guard: asking cockatrice to close, then checking again"
+            Call un.CloseHolders
+            Goto un_guard_check
+        ${EndIf}
+        DetailPrint "The install directory is in use by: $GuardOutput"
+        ; Same three answers as the installer's guard; the automatic close above already
+        ; ran once before this prompt.
+        MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
+            "Cockatrice, Oracle or Servatrice is still using files of the installation:$\r$\n$\r$\n$GuardOutput$\r$\n$\r$\nChoose Yes to close Cockatrice and check again. It may ask you to confirm quitting - it does while a card database update is running, a game is open or a deck is unsaved - so answer that window.$\r$\n$\r$\nClose Oracle, Servatrice and any other program listed above by hand. Choose No to check again after that, or Cancel to cancel the uninstallation." \
+            IDYES un_guard_close IDNO un_guard_check
+        !insertmacro CockLogUn "uninst-guard: cancelled by user"
+        SetErrorLevel 1
+        Abort
+        ; Only reached through Yes: Abort does not return.
+        un_guard_close:
+        !insertmacro CockLogUn "uninst-guard: closing cockatrice on request, then checking again"
+        Call un.CloseHolders
+        Goto un_guard_check
+    ${EndIf}
+    ; Same reasoning as in the installer: without an answer from the probe we cannot tell
+    ; whether a running instance still holds file locks, and refusing outright would leave
+    ; the user with an uninstaller that never completes. Same three answers too, so an
+    ; uninstall that hits a Restart Manager that was busy can simply be retried.
+    !insertmacro CockLogUn "uninst-guard: the holder probe could not answer ($GuardExit): $GuardOutput"
+    DetailPrint "Could not check whether Cockatrice is still running: $GuardOutput"
+    MessageBox MB_ABORTRETRYIGNORE|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
+        "This uninstaller could not check whether Cockatrice, Oracle or Servatrice is still running.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nClose them, then choose Retry to check again. Choose Ignore to uninstall anyway, or Abort to cancel the uninstallation." \
+        IDRETRY un_guard_check IDABORT un_guard_unknown_abort
+    !insertmacro CockLogUn "uninst-guard: continuing without an answer from the probe"
+    Return
+    un_guard_unknown_abort:
+    !insertmacro CockLogUn "uninst-guard: cancelled after the probe could not answer"
+    SetErrorLevel 1
+    Abort
 FunctionEnd
 
 Function PortableModePageCreate
@@ -1478,6 +1687,23 @@ ${If} $ReinstallMode = 0
     Call EnsureAppsNotRunning
 ${EndIf}
 
+; Measured before either purge block, because it has to describe the directory as
+; it arrived here and not what a purge left of it: IsExistingCockatriceInstall
+; looks for cockatrice.exe, oracle.exe, servatrice.exe, uninstall.exe, Qt6*.dll
+; and qt.conf, and the portable purge below deletes exactly those. Taken after
+; that purge it answered "not an install" as soon as the only survivor was a file
+; it does not look for - a locked abseil_dll.dll or libssl-3-x64.dll, say - and
+; the abort further down was then skipped for the very directory the purge had
+; just failed in.
+; Remembered because the stale-runtime check below must only ever fire for a
+; directory this installer recognised as a Cockatrice install. Scanning for
+; leftovers in an unrelated directory (a first-time install into a folder that
+; happens to hold some Qt5 DLLs, say) would otherwise turn those files into an
+; abort reason even though the payload is about to overwrite nothing of theirs.
+Call IsExistingCockatriceInstall
+!insertmacro CockLog "section: IsExistingCockatriceInstall=$R0"
+StrCpy $IsUpgrade $R0
+
 ${If} $PortableMode = 1
 ${AndIf} ${FileExists} "$INSTDIR\portable.dat"
 	; upgrade portable mode
@@ -1501,7 +1727,12 @@ ${AndIf} ${FileExists} "$INSTDIR\portable.dat"
 	; what this has to guarantee is that nothing from the previous build is left
 	; to be loaded next to the new executables. Naming the families by hand is
 	; what let abseil_dll.dll through; see HasStaleRuntimeFiles.
-	Delete "$INSTDIR\*.dll"
+	Call RetryDllPurge
+	; The purge's own verdict: HasStaleRuntimeFiles measures *.dll + Plugins\*.*,
+	; the set that catches any leftover runtime DLL, Qt or otherwise. Held in a
+	; variable because $R0 is reused by the next function call in this section.
+	StrCpy $StaleRuntimeAfterPurge $R0
+	StrCpy $DllPurgeRan 1
 	Delete "$INSTDIR\qt.conf"
 	Delete "$INSTDIR\qdebug.txt"
 	Delete "$INSTDIR\servatrice.sql"
@@ -1512,20 +1743,33 @@ ${EndIf}
 
 ; Remove any runtime DLLs left over from older versions, so a mismatched
 ; Qt/OpenSSL/protobuf set cannot survive next to the new executables.
-Call IsExistingCockatriceInstall
-!insertmacro CockLog "section: IsExistingCockatriceInstall=$R0"
-; Remembered because the stale-runtime check below must only ever fire for a
-; directory this installer recognised as a Cockatrice install. Scanning for
-; leftovers in an unrelated directory (a first-time install into a folder that
-; happens to hold some Qt5 DLLs, say) would otherwise turn those files into an
-; abort reason even though the payload is about to overwrite nothing of theirs.
-StrCpy $IsUpgrade $R0
+;
+; A purge that fails is reported with evidence, not only as a survivor list: the
+; abort below logs which files survived, what Windows said about each of them and
+; which processes still have the install directory mapped (see
+; LogStaleRuntimeDiagnostics).
+;
+; Re-running the running-instance check here was considered and dropped: it would only
+; narrow the window the uninstaller ExecWait and the backup/restore copy open between
+; .onInit and this point, and on /R it would now abort after the old version has already
+; been removed - leaving no install at all. The surviving files are the authority on
+; whether anything still holds the directory, and they are measured anyway.
+;
+; The holder list comes from Restart Manager (RmRegisterResources/RmGetList), the API
+; that names every process and service with one of these files open or mapped. It is
+; called from tools/installer-holder-probe rather than from this script, because the
+; RM_PROCESS_INFO array is a table of hand-computed offsets when it is marshalled
+; through the System plugin, and that table is the one thing here that cannot be
+; checked without a Windows toolchain. Compiled by the same build that compiles this
+; installer, the layout belongs to the Windows SDK, and .ci/compile.sh runs the probe
+; on the Windows runners instead of trusting that it compiles.
 ${If} $PortableMode = 0
-${AndIf} $R0 = 1
+${AndIf} $IsUpgrade = 1
 	!insertmacro CockLog "section: non-portable upgrade purge"
 	!insertmacro CockLogListing "before-purge" "*.dll"
-	RMDir /r "$INSTDIR\Plugins"
-	Delete "$INSTDIR\*.dll"
+	Call RetryDllPurge
+	StrCpy $StaleRuntimeAfterPurge $R0
+	StrCpy $DllPurgeRan 1
 	!insertmacro CockLogListing "after-purge" "*.dll"
 	!insertmacro CockLogListing "after-plugins" "Plugins\*.*"
 ${EndIf}
@@ -1540,22 +1784,78 @@ ${EndIf}
 ; run on Windows or it contains an error", so stop here instead of compounding
 ; it. Nothing of the new payload has been written at this point, so the next run,
 ; with the applications closed, gets a clean install.
+; $StaleRuntimeAfterPurge is RetryDllPurge's verdict, measured with
+; HasStaleRuntimeFiles (*.dll + Plugins\*.*) - the set that catches any leftover
+; runtime DLL, Qt or otherwise. It exists only when a purge ran, and the two
+; purge blocks above cover every upgrade except one: a portable install into a
+; directory without portable.dat is neither of them, so that directory is
+; measured here instead. A test of $IsUpgrade alone could not stand in for it -
+; that only says the directory was ours before the purge, not what the purge
+; left behind.
+; A directory this installer did not recognise as an install never aborts: the
+; unrelated DLLs already in it (a first-time install into a folder that happens
+; to hold some Qt5 DLLs, say) are not leftovers, and the payload overwrites
+; nothing of theirs.
 ${If} $IsUpgrade = 1
-    Call HasStaleRuntimeFiles
-    !insertmacro CockLog "section: HasStaleRuntimeFiles=$R0"
+    ${If} $DllPurgeRan = 0
+        !insertmacro CockLog "section: no purge applies, measuring the directory instead"
+        Call HasStaleRuntimeFiles
+        StrCpy $StaleRuntimeAfterPurge $R0
+    ${EndIf}
+    !insertmacro CockLog "section: stale-runtime after purge=$StaleRuntimeAfterPurge"
 ${Else}
-    StrCpy $R0 0
+    StrCpy $StaleRuntimeAfterPurge 0
 ${EndIf}
-${If} $R0 = 1
+${If} $StaleRuntimeAfterPurge = 1
+    !insertmacro CockLog "section: files of a previous version survived the purge"
+    ; Who is holding the payload is recorded first, so the log that reaches us
+    ; answers the question the message can only guess at, and so the prompt can
+    ; name them and offer to close the ones this installer owns.
+    Call LogStaleRuntimeDiagnostics
+    ${If} $HolderFound = 1
+        ; On /R the previous version is already uninstalled at this point, so an abort
+        ; leaves the user with no working Cockatrice. Offer to close and purge again,
+        ; repeating while the user keeps saying Yes; this updates
+        ; $StaleRuntimeAfterPurge with the last retry's verdict.
+        Call RecoverFromHolders
+    ${Else}
+        ; Nothing is holding them. The three attempts in RetryDllPurge were two seconds
+        ; apart and all failed with no process to blame, which is the transient case a
+        ; virus scanner or a background indexer creates - or a permission problem that
+        ; will not clear. Give the delete one last chance before giving up: it costs a
+        ; second on a path that is about to abort anyway, and it keeps a lock that was
+        ; released in the meantime from turning into a failed upgrade.
+        !insertmacro CockLog "section: no holder named, one final purge attempt"
+        Sleep 1000
+        Call RetryDllPurge
+        StrCpy $StaleRuntimeAfterPurge $R0
+        !insertmacro CockLog "section: final-purge stale-runtime=$StaleRuntimeAfterPurge"
+    ${EndIf}
+${EndIf}
+${If} $StaleRuntimeAfterPurge = 1
     !insertmacro CockLog "section: aborting, files of a previous version survived the purge"
     DetailPrint "Files of a previous version could not be removed; aborting the installation."
-    ; The in-app updater runs this installer silent and detached and never looks
-    ; at its exit code, so the user has to be told what happened. A /S install
-    ; without /R is unattended (a package manager, for instance) and a message
-    ; box there would block forever, so that case only reports through the log
-    ; and the exit code. AbortInstall owns that decision.
+    ; Say what is known and nothing more: the guard ran before anything was replaced,
+    ; so "most likely still running" is no longer a fair guess and would send the user
+    ; to close programs that are already closed.
     StrCpy $AbortReason \
-        "The installation could not remove all files of a previous version of Cockatrice, most likely because it is still running or was started as administrator, and was cancelled rather than leave a mismatched install behind.$\r$\n$\r$\nPlease close Cockatrice, Oracle and Servatrice and run the installer again."
+        "The installation could not remove all files of a previous version of Cockatrice, and was cancelled rather than leave a mismatched installation behind."
+    ${If} $HolderFound = 1
+        StrCpy $AbortReason "$AbortReason$\r$\n$\r$\nStill using the install directory:$\r$\n$HolderOutput$\r$\n$\r$\nClose them and run the installer again."
+    ${ElseIf} $HolderExit == "0"
+        StrCpy $AbortReason "$AbortReason$\r$\n$\r$\nNo running program was found using those files. A file permission or a virus scanner may be preventing their removal; the installer log records what Windows reported for each file."
+    ${Else}
+        ; The check itself failed, so "no running program was found" would be a claim this
+        ; installer cannot make. Name the failure instead, and leave the per-file codes to
+        ; the log, where they already are.
+        StrCpy $AbortReason "$AbortReason$\r$\n$\r$\nThe check for a running program could not be completed: $HolderOutput$\r$\n$\r$\nClose Cockatrice, Oracle and Servatrice and run the installer again; the installer log records what Windows reported for each file."
+    ${EndIf}
+    ; "Run the installer again" is not enough on an in-app update: the old version
+    ; was uninstalled before the purge, so point at the installer that was downloaded.
+    ${If} $ReinstallMode = 1
+    ${AndIf} $PortableMode = 0
+        StrCpy $AbortReason "$AbortReason$\r$\n$\r$\nThe previous version has already been removed. To finish the update, run this installer again:$\r$\n$EXEPATH"
+    ${EndIf}
     Call AbortInstall
 ${EndIf}
 

@@ -73,6 +73,7 @@ class Command_AccountPassword;
 class Command_Activate;
 class Command_AddCardArtRule;
 class Command_AdjustMod;
+class Command_ClearBlacklistedBanners;
 class Command_ForceActivateUser;
 class Command_ForgotPasswordChallenge;
 class Command_ForgotPasswordRequest;
@@ -90,6 +91,7 @@ class Command_ListCardArtRules;
 class Command_Register;
 class Command_RemoveCardArtRule;
 class Command_RemoveUserAvatar;
+class Command_RemoveUserBanner;
 class Command_Report;
 class Command_ReportAddComment;
 class Command_ReportAssign;
@@ -123,6 +125,7 @@ signals:
 
 protected:
     void logDebugMessage(const QString &message) override;
+    [[nodiscard]] bool logsDebugMessages() const override;
     bool tooManyRegistrationAttempts(const QString &ipAddress);
     void processCommandContainer(const CommandContainer &cont) override;
     bool acceptsCredentialFormat(bool passwordNeedsHash, const QString &password) const;
@@ -235,6 +238,9 @@ private:
     Response::ResponseCode cmdGetModeratorLastLogins(const Command_GetModeratorLastLogins &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdResetUserPassword(const Command_ResetUserPassword &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdRemoveUserAvatar(const Command_RemoveUserAvatar &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdRemoveUserBanner(const Command_RemoveUserBanner &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdClearBlacklistedBanners(const Command_ClearBlacklistedBanners &cmd,
+                                                      ResponseContainer &rc);
 
     Response::ResponseCode cmdGetServerStats(const Command_GetServerStats &cmd, ResponseContainer &rc);
 

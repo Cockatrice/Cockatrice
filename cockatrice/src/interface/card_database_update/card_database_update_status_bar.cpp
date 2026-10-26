@@ -7,6 +7,7 @@
 #include <QProgressBar>
 #include <QtGlobal>
 #include <climits>
+#include <libcockatrice/utility/qt_utils.h>
 
 namespace
 {
@@ -32,8 +33,7 @@ QString stageName(CardUpdateStage stage, const QString &fallback)
 
 CardDatabaseUpdateStatusBar::CardDatabaseUpdateStatusBar(QWidget *parent) : QWidget(parent)
 {
-    layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout = QtUtils::makeLayout<QHBoxLayout>(this);
 
     stageLabel = new QLabel(this);
     progressBar = new QProgressBar(this);

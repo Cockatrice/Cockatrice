@@ -231,6 +231,18 @@ public:
     };
     UptimeSnapshot getLatestUptimeSnapshot(int serverId);
     bool removeUserAvatar(const QString &userName);
+
+    // Outcome of removeUserBanner(), so the caller can tell a missing user apart
+    // from a user who simply has no banner card set.
+    enum class RemoveUserBannerResult
+    {
+        Removed,
+        NothingToRemove,
+        NoSuchUser,
+        DatabaseError,
+    };
+    RemoveUserBannerResult removeUserBanner(const QString &userName);
+    int clearBlacklistedBanners();
     bool isCardArtAllowed(const QString &cardName, const QString &cardProviderId) override;
     bool addForgotPassword(const QString &user);
     bool removeForgotPassword(const QString &user) override;

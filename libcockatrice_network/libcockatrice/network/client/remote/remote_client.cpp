@@ -496,9 +496,15 @@ void RemoteClient::readData()
 
     inputBuffer.append(data);
 
-    do {
+    // Parse messages straight out of inputBuffer at readOffset. Removing each
+    // consumed message from the front of the buffer would memmove all of the
+    // remaining bytes once per message; instead the consumed prefix is dropped
+    // once parsing stops.
+    qsizetype readOffset = 0;
+
+    while (true) {
         if (!messageInProgress) {
-            if (inputBuffer.size() >= 4) {
+            if (inputBuffer.size() - readOffset >= 4) {
                 // dirty hack to be compatible with v14 server that sends 60 bytes of garbage at the beginning
                 if (!handshakeStarted) {
                     handshakeStarted = true;
@@ -508,29 +514,30 @@ void RemoteClient::readData()
                     }
                 } else {
                     // end of hack
-                    messageLength = (((quint32)(unsigned char)inputBuffer[0]) << 24) +
-                                    (((quint32)(unsigned char)inputBuffer[1]) << 16) +
-                                    (((quint32)(unsigned char)inputBuffer[2]) << 8) +
-                                    ((quint32)(unsigned char)inputBuffer[3]);
-                    inputBuffer.remove(0, 4);
+                    const auto *header = reinterpret_cast<const unsigned char *>(inputBuffer.constData() + readOffset);
+                    messageLength = (static_cast<quint32>(header[0]) << 24) + (static_cast<quint32>(header[1]) << 16) +
+                                    (static_cast<quint32>(header[2]) << 8) + static_cast<quint32>(header[3]);
+                    readOffset += 4;
                     messageInProgress = true;
                 }
             } else {
-                return;
+                break;
             }
         }
-        if (inputBuffer.size() < messageLength) {
-            return;
+        if (inputBuffer.size() - readOffset < messageLength) {
+            break;
         }
 
         ServerMessage newServerMessage;
-        bool ok = newServerMessage.ParseFromArray(inputBuffer.data(), messageLength);
+        bool ok = newServerMessage.ParseFromArray(inputBuffer.constData() + readOffset, messageLength);
 
-        inputBuffer.remove(0, messageLength);
+        readOffset += messageLength;
         messageInProgress = false;
 
         if (ok) {
-            qCDebug(RemoteClientLog).noquote() << "IN" << getSafeDebugString(newServerMessage);
+            if (RemoteClientLog().isDebugEnabled()) {
+                qCDebug(RemoteClientLog).noquote() << "IN" << getSafeDebugString(newServerMessage);
+            }
 
             processProtocolItem(newServerMessage);
         } else {
@@ -540,7 +547,12 @@ void RemoteClient::readData()
         if (getStatus() == StatusDisconnecting) { // use thread-safe getter
             doDisconnectFromServer();
         }
-    } while (!inputBuffer.isEmpty());
+    }
+
+    // Drop the consumed prefix once, instead of shifting the buffer per message.
+    if (readOffset > 0) {
+        inputBuffer.remove(0, readOffset);
+    }
 }
 
 void RemoteClient::websocketMessageReceived(const QByteArray &message)
@@ -548,7 +560,9 @@ void RemoteClient::websocketMessageReceived(const QByteArray &message)
     lastDataReceived = timeRunning;
     ServerMessage newServerMessage;
     if (newServerMessage.ParseFromArray(message.data(), message.length())) {
-        qCDebug(RemoteClientLog).noquote() << "IN" << getSafeDebugString(newServerMessage);
+        if (RemoteClientLog().isDebugEnabled()) {
+            qCDebug(RemoteClientLog).noquote() << "IN" << getSafeDebugString(newServerMessage);
+        }
 
         processProtocolItem(newServerMessage);
     } else {
@@ -564,7 +578,9 @@ void RemoteClient::sendCommandContainer(const CommandContainer &cont)
     auto size = static_cast<unsigned int>(cont.ByteSize());
 #endif
 
-    qCDebug(RemoteClientLog).noquote() << "OUT" << getSafeDebugString(cont);
+    if (RemoteClientLog().isDebugEnabled()) {
+        qCDebug(RemoteClientLog).noquote() << "OUT" << getSafeDebugString(cont);
+    }
 
     QByteArray buf;
     bool ok;

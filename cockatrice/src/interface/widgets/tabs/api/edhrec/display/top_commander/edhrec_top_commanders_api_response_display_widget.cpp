@@ -12,6 +12,7 @@
 #include <QScrollArea>
 #include <QSize>
 #include <QVBoxLayout>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qlogging.h>
 #include <qnamespace.h>
 
@@ -33,10 +34,7 @@ EdhrecTopCommandersApiResponseDisplayWidget::EdhrecTopCommandersApiResponseDispl
     }
 
     // Create a QScrollArea to hold the card display widgets
-    scrollArea = new QScrollArea(this);
-    scrollArea->setWidgetResizable(true);
-    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scrollArea = QtUtils::makeScrollArea(this);
 
     // Set the cardDisplayLayout inside the scroll area
     auto scrollWidget = new QWidget(scrollArea);
@@ -50,9 +48,7 @@ void EdhrecTopCommandersApiResponseDisplayWidget::resizeEvent(QResizeEvent *even
 {
     QWidget::resizeEvent(event);
     qDebug() << event->size();
-    layout->invalidate();
-    layout->activate();
-    layout->update();
+    QtUtils::relayout(layout);
     if (scrollArea && scrollArea->widget()) {
         scrollArea->widget()->resize(event->size());
     }

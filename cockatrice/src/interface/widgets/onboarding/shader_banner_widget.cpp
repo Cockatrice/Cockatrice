@@ -19,6 +19,7 @@
 #include <QString>
 #include <QUrl>
 #include <QtGlobal>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qmath.h>
 #include <qnamespace.h>
 #include <qnumeric.h>
@@ -151,8 +152,7 @@ BannerHost::BannerHost(QWidget *parent) : QWidget(parent)
 {
     setFixedHeight(150);
 
-    stack = new QStackedLayout(this);
-    stack->setContentsMargins(0, 0, 0, 0);
+    stack = QtUtils::makeLayout<QStackedLayout>(this);
 
     fallback = new GradientFallbackWidget(this);
     stack->addWidget(fallback);

@@ -17,6 +17,7 @@
 #include <QPushButton>
 #include <QStackedWidget>
 #include <QVBoxLayout>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 #include <utility>
 
@@ -31,9 +32,8 @@ FirstRunWizard::FirstRunWizard(QWidget *parent) : QDialog(parent)
     bannerHost = new BannerHost(this);
 
     titleLabel = new QLabel(this);
-    QFont titleFont = titleLabel->font();
+    QFont titleFont = QtUtils::boldFont(titleLabel->font());
     titleFont.setPointSizeF(titleFont.pointSizeF() * 1.4);
-    titleFont.setBold(true);
     titleLabel->setFont(titleFont);
 
     subtitleLabel = new QLabel(this);
@@ -51,8 +51,7 @@ FirstRunWizard::FirstRunWizard(QWidget *parent) : QDialog(parent)
     connect(skipButton, &QPushButton::clicked, this, &FirstRunWizard::skip);
     connect(nextButton, &QPushButton::clicked, this, &FirstRunWizard::goNext);
 
-    auto *headerLayout = new QVBoxLayout;
-    headerLayout->setContentsMargins(0, 0, 0, 0);
+    auto *headerLayout = QtUtils::makeLayout<QVBoxLayout>();
     headerLayout->addWidget(bannerHost);
     headerLayout->addSpacing(12);
     headerLayout->addWidget(titleLabel);
