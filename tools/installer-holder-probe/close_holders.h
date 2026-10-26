@@ -28,15 +28,22 @@ struct CloseHoldersResult
  * asked to close. Oracle and Servatrice are left to the user - Oracle writes the card
  * database in place - and so is every service.
  *
- * Two things happen per instance. Its top-level window is restored and brought to the
- * foreground, because Cockatrice may answer the close with a confirmation of its own that
- * would otherwise open behind the installer's prompt, and then WM_CLOSE is posted to the
- * main window, the same request as clicking its close button. Stopping the process is
- * never attempted.
+ * Two things happen per instance. Every window it left behind is shown again and its main
+ * window is brought to the foreground, because Cockatrice may answer the close with a
+ * confirmation of its own that would otherwise open behind the installer's prompt - and an
+ * instance that already answered an earlier close by hiding instead of quitting has that
+ * confirmation hidden with the window that owns it, where nobody can answer it. Then
+ * WM_CLOSE is posted to the main window, the same request as clicking its close button -
+ * unless the instance is asking a question of its own, which disables that window: posting
+ * the close then only hides the question, so it is brought forward and left to the user.
+ * Stopping the process is never attempted.
  *
  * Once the requests are out, this waits up to @c waitMilliseconds for the processes to
  * exit, so the caller can measure the purge immediately afterwards instead of sleeping
- * for a fixed time or re-asking a question this call already answered.
+ * for a fixed time or re-asking a question this call already answered. A process that is
+ * still running is described further: whether its window is gone, still open, hidden
+ * again, and whether it answers at all, so the log can tell an instance that refused the
+ * close from one that never received it.
  *
  * @param holders the Restart Manager answer, one entry per application or service
  * @param waitMilliseconds how long to wait for the asked instances to exit, 0 to not wait
