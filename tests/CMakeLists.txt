@@ -364,6 +364,26 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  deck_state_manager_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/cache_settings.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/card_counter_settings.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/shortcuts_settings.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network/update/client/release_channel.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/deck_editor/deck_state_manager.cpp
+  ${VERSION_STRING_CPP}
+  deck_state_manager_test.cpp
+  LIBS
+  libcockatrice_card
+  libcockatrice_deck_list
+  libcockatrice_models
+  libcockatrice_settings
+  libcockatrice_utility
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src
+)
+cockatrice_add_test(
+  NAME
   deck_hash_performance_test
   SOURCES
   deck_hash_performance_test.cpp
