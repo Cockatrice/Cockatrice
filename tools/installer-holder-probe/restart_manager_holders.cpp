@@ -5,10 +5,12 @@
 // here is a requirement; Regroup would sort them the other way round.
 #include <windows.h>
 #include <restartmanager.h>
+#include <tlhelp32.h>
 // clang-format on
 
 #include <algorithm>
 #include <iterator>
+#include <utility>
 
 namespace
 {
@@ -77,6 +79,30 @@ std::wstring fileNameOf(const std::wstring &path)
 {
     const std::size_t separator = path.find_last_of(L"\\/");
     return separator == std::wstring::npos ? path : path.substr(separator + 1);
+}
+
+/// @p directory with exactly one trailing separator, so that a sibling whose name merely
+/// begins with the same letters ("Cockatrice-old" next to "Cockatrice") cannot pass for a
+/// subdirectory of it.
+std::wstring directoryPrefixOf(const std::wstring &directory)
+{
+    std::wstring prefix = directory;
+    while (!prefix.empty() && (prefix.back() == L'\\' || prefix.back() == L'/')) {
+        prefix.pop_back();
+    }
+    prefix += L'\\';
+    return prefix;
+}
+
+/// Whether @p path lies inside @p prefix, which is a directory with a trailing separator.
+/// Ordinal and case-insensitive, as Windows compares paths.
+bool isUnderDirectory(const std::wstring &path, const std::wstring &prefix)
+{
+    if (path.size() < prefix.size()) {
+        return false;
+    }
+    const int length = static_cast<int>(prefix.size());
+    return CompareStringOrdinal(path.c_str(), length, prefix.c_str(), length, TRUE) == CSTR_EQUAL;
 }
 
 /// Copies a fixed-size, NUL-terminated WCHAR array the API filled in.
@@ -186,4 +212,45 @@ unsigned long findProcessesUsingFiles(const std::vector<std::wstring> &files, st
 
     RmEndSession(session);
     return error;
+}
+
+std::vector<Holder> findProcessesRunningFrom(const std::wstring &installDir)
+{
+    std::vector<Holder> holders;
+    if (installDir.empty()) {
+        return holders;
+    }
+
+    const std::wstring prefix = directoryPrefixOf(installDir);
+    // Never the probe itself: it runs from the directory being replaced when the
+    // uninstaller asks in place or the installer was copied next to the payload, and
+    // naming it would ask the user to close the process that is doing the asking.
+    const DWORD self = GetCurrentProcessId();
+
+    const HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (snapshot == INVALID_HANDLE_VALUE) {
+        return holders;
+    }
+    PROCESSENTRY32W entry{};
+    entry.dwSize = sizeof(entry);
+    if (Process32FirstW(snapshot, &entry) != FALSE) {
+        do {
+            if (entry.th32ProcessID == self) {
+                continue;
+            }
+            // One process at a time, because the path is per process; a process that
+            // refuses to be read is not named here and is still named by Restart
+            // Manager when it holds a handle. The idle process has no image at all.
+            const std::wstring imagePath = imagePathOf(entry.th32ProcessID);
+            if (!isUnderDirectory(imagePath, prefix)) {
+                continue;
+            }
+            Holder holder;
+            holder.processId = entry.th32ProcessID;
+            holder.imageName = fileNameOf(imagePath);
+            holders.push_back(std::move(holder));
+        } while (Process32NextW(snapshot, &entry) != FALSE);
+    }
+    CloseHandle(snapshot);
+    return holders;
 }

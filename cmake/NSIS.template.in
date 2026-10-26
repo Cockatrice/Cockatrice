@@ -714,9 +714,20 @@ FunctionEnd
 ; Both questions this installer has about running processes - "may I replace
 ; the payload?" and "what is holding this file I could not delete?" - are
 ; answered by tools/installer-holder-probe, a small executable built from this
-; repository and embedded in the installer and the uninstaller alike. It asks
-; the Restart Manager (RmRegisterResources/RmGetList) and names every process
-; and service that has one of the payload files open or mapped.
+; repository and embedded in the installer and the uninstaller alike. It names
+; every process and service that has one of the payload files open or mapped
+; (the Restart Manager, RmRegisterResources/RmGetList) and, separately, every
+; process whose image lives in the directory being replaced.
+;
+; The second lookup is not redundant. Restart Manager answers "who has this
+; file open", and a running instance does not have to have one open: its own
+; image and the modules it loaded are mapped into it rather than opened by it,
+; and a mapped image is not reliably reported. That is the state the failed
+; updates this probe exists for were in - every DLL still on disk, an instance
+; running from the directory, and "nothing is holding them any more" as the
+; answer. A guard built on file handles alone therefore misses exactly the
+; instance it exists to find; it would pass, the purge would fail, and the
+; install would end in a warning with no offer to close and try again.
 ;
 ; Why not enumerate processes from this script: the NSIS stub is a 32-bit
 ; process, so a bare "powershell" started from it is the 32-bit Windows
@@ -729,7 +740,9 @@ FunctionEnd
 ; The files that count are the payload the purge removes and the installer
 ; replaces: the three executables, the top-level DLLs, qt.conf and everything
 ; below Plugins. A document, a log or a screenshot the user happens to have
-; open in the install directory is not part of it and cannot block an upgrade.
+; open in the install directory is not part of it and cannot block an upgrade;
+; the image lookup matches on the directory a process runs from, so it does not
+; widen that set.
 ;
 ; Nothing is force-stopped anywhere: Cockatrice may be holding an unsaved deck
 ; or showing a "really leave this game?" confirmation, Oracle writes the card
@@ -752,9 +765,10 @@ FunctionEnd
 
 ; usage: set $GuardDir to the directory to check, then call this. Sets
 ; $GuardExit to the probe's exit code and $GuardOutput to its one-line answer.
-; 0 = nothing holds the payload, 1 = the line names what does, anything else =
-; the probe could not answer (2 = no directory was given, 3 = the Restart
-; Manager call failed, "timeout" = it did not return in time).
+; 0 = nothing holds the payload and nothing runs from the directory, 1 = the
+; line names what does, anything else = the probe could not answer (2 = no
+; directory was given, 3 = the Restart Manager call failed and no process runs
+; from the directory either, "timeout" = it did not return in time).
 Function ${prefix}RunHolderProbe
     Call ${prefix}ExtractHolderProbe
     ; The directory travels in an environment variable, never on the command
@@ -772,11 +786,11 @@ FunctionEnd
 ; usage: set $GuardDir to the directory being replaced, then call this. Asks the running
 ; Cockatrice to close, and waits for it to exit.
 ;
-; The set is the Restart Manager answer over the payload: exactly the processes holding a
-; file of the version being replaced. tools\installer-holder-probe closes that set by pid,
-; which is why nothing here has to match an executable path. Only cockatrice.exe is asked:
-; Oracle writes the card database in place and Servatrice has no window, so both stay the
-; user's job, as the prompt says.
+; The set is what the probe names: the processes holding a file of the version being
+; replaced, plus the processes running from the directory. tools\installer-holder-probe
+; closes that set by pid, which is why nothing here has to match an executable path. Only
+; cockatrice.exe is asked: Oracle writes the card database in place and Servatrice has no
+; window, so both stay the user's job, as the prompt says.
 ;
 ; Each instance is brought to the foreground before WM_CLOSE is posted to its main window.
 ; WM_CLOSE is answered, not obeyed - Cockatrice asks before it quits while a card database
@@ -868,21 +882,25 @@ Function GuardAppsNotRunning
         Goto guard_check
     ${EndIf}
     ; Not an answer at all: the probe was not configured, the Restart Manager
-    ; call failed or it timed out. That is fine to carry on from when the user
-    ; is at the keyboard - they can close the applications by hand and the
+    ; call failed and nothing runs from the directory, or it timed out. Carrying
+    ; on from that is a decision, so it is asked for rather than assumed - the
     ; stale-runtime check after the purge still stands between a failed guard
-    ; and a mismatched install - but never on an upgrade the launcher asked for,
-    ; where this is exactly the unknown state the guard exists to rule out.
+    ; and a mismatched install, but it only fires after files have been
+    ; replaced, and on an upgrade the launcher asked for nobody is watching the
+    ; installer's exit code. Retry asks the probe again (a Restart Manager that
+    ; was busy answers the second time), Ignore installs anyway, Abort cancels
+    ; instead of writing a payload next to files the guard could not rule out.
     !insertmacro CockLog "guard: the holder probe could not answer ($GuardExit): $GuardOutput"
     DetailPrint "Could not check whether Cockatrice is still running: $GuardOutput"
-    ${If} $LauncherExited != 1
-    ${AndIf} $ReinstallMode = 1
-        StrCpy $AbortReason \
-            "The installation was cancelled because it could not check whether Cockatrice, Oracle or Servatrice is still running.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nPlease close them and run the installer again."
-        Call AbortInstall
-    ${EndIf}
-    MessageBox MB_OK|MB_ICONEXCLAMATION \
-        "This installer could not check whether Cockatrice, Oracle or Servatrice is still running.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nClose them manually before continuing if the installation reports a problem."
+    MessageBox MB_ABORTRETRYIGNORE|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
+        "This installer could not check whether Cockatrice, Oracle or Servatrice is still running.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nClose them, then choose Retry to check again. Choose Ignore to install anyway, or Abort to cancel the installation." \
+        IDRETRY guard_check IDABORT guard_unknown_abort
+    !insertmacro CockLog "guard: continuing without an answer from the probe"
+    Return
+    guard_unknown_abort:
+    StrCpy $AbortReason \
+        "The installation was cancelled because it could not check whether Cockatrice, Oracle or Servatrice is still running.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nPlease close them and run the installer again."
+    Call AbortInstall
 FunctionEnd
 
 Function EnsureAppsNotRunning
@@ -1330,9 +1348,12 @@ FunctionEnd
 ; anything is replaced; here it answers the other question, about files a purge could not
 ; remove. It asks the Restart Manager (RmRegisterResources/RmGetList), which names a
 ; process holding a plain handle on a file - an antivirus scanner - and names services as
-; well as user programs. Its blind spot is a handle taken in kernel mode, where there is
-; no process to name; then the per-file codes logged above are the whole story, and the
-; probe says so by naming nothing rather than by failing.
+; well as user programs, and it adds every process running from the directory, because a
+; running instance holds its payload as mapped images rather than as open handles and the
+; Restart Manager does not reliably report those. Its remaining blind spot is a handle
+; taken in kernel mode, where there is no process to name; then the per-file codes logged
+; above are the whole story, and the probe says so by naming nothing rather than by
+; failing.
 ;
 ; $INSTDIR travels through the same COCKATRICE_GUARD_DIR environment variable the guard
 ; uses, so a path with spaces or apostrophes never has to be embedded in a command line.
@@ -1354,7 +1375,7 @@ Function LogProcessesUsingInstallDir
     ${If} $HolderExit == "1"
         StrCpy $HolderFound 1
     ${ElseIf} $HolderExit == "0"
-        StrCpy $HolderOutput "nothing is holding them any more"
+        StrCpy $HolderOutput "nothing is holding them and no program is running from the directory"
     ${Else}
         StrCpy $HolderOutput "the holder probe could not run: $HolderOutput"
     ${EndIf}
@@ -1474,12 +1495,20 @@ Function un.GuardAppsNotRunning
         Goto un_guard_check
     ${EndIf}
     ; Same reasoning as in the installer: without an answer from the probe we cannot tell
-    ; whether a running instance still holds file locks, but refusing to uninstall would
-    ; leave the user with an uninstaller that never completes. Say what could not be
-    ; checked, then let the deletion report for itself.
+    ; whether a running instance still holds file locks, and refusing outright would leave
+    ; the user with an uninstaller that never completes. Same three answers too, so an
+    ; uninstall that hits a Restart Manager that was busy can simply be retried.
     !insertmacro CockLogUn "uninst-guard: the holder probe could not answer ($GuardExit): $GuardOutput"
     DetailPrint "Could not check whether Cockatrice is still running: $GuardOutput"
-    MessageBox MB_OK|MB_ICONEXCLAMATION "This uninstaller could not check whether Cockatrice is still running.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nClose them manually before continuing if the uninstallation reports a problem."
+    MessageBox MB_ABORTRETRYIGNORE|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
+        "This uninstaller could not check whether Cockatrice, Oracle or Servatrice is still running.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nClose them, then choose Retry to check again. Choose Ignore to uninstall anyway, or Abort to cancel the uninstallation." \
+        IDRETRY un_guard_check IDABORT un_guard_unknown_abort
+    !insertmacro CockLogUn "uninst-guard: continuing without an answer from the probe"
+    Return
+    un_guard_unknown_abort:
+    !insertmacro CockLogUn "uninst-guard: cancelled after the probe could not answer"
+    SetErrorLevel 1
+    Abort
 FunctionEnd
 
 Function PortableModePageCreate
@@ -1776,8 +1805,13 @@ ${If} $StaleRuntimeAfterPurge = 1
         "The installation could not remove all files of a previous version of Cockatrice, and was cancelled rather than leave a mismatched installation behind."
     ${If} $HolderFound = 1
         StrCpy $AbortReason "$AbortReason$\r$\n$\r$\nStill using the install directory:$\r$\n$HolderOutput$\r$\n$\r$\nClose them and run the installer again."
-    ${Else}
+    ${ElseIf} $HolderExit == "0"
         StrCpy $AbortReason "$AbortReason$\r$\n$\r$\nNo running program was found using those files. A file permission or a virus scanner may be preventing their removal; the installer log records what Windows reported for each file."
+    ${Else}
+        ; The check itself failed, so "no running program was found" would be a claim this
+        ; installer cannot make. Name the failure instead, and leave the per-file codes to
+        ; the log, where they already are.
+        StrCpy $AbortReason "$AbortReason$\r$\n$\r$\nThe check for a running program could not be completed: $HolderOutput$\r$\n$\r$\nClose Cockatrice, Oracle and Servatrice and run the installer again; the installer log records what Windows reported for each file."
     ${EndIf}
     ; "Run the installer again" is not enough on an in-app update: the old version
     ; was uninstalled before the purge, so point at the installer that was downloaded.

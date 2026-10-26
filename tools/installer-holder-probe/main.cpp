@@ -2,6 +2,7 @@
 #include "holder_line.h"
 #include "restart_manager_holders.h"
 
+#include <algorithm>
 #include <string>
 #include <vector>
 #include <windows.h>
@@ -22,7 +23,9 @@ constexpr unsigned long CLOSE_WAIT_MILLISECONDS = 30000;
 /// Exit codes the installer reads. "Something was found" is deliberately not 0, so an
 /// answer of "nothing holds the files" stays distinguishable from a probe that failed.
 /// In the close mode 1 means a close was actually sent and 0 that every holder was left
-/// to the user, which is what the report line next to the code spells out.
+/// to the user, which is what the report line next to the code spells out. 3 is only for
+/// a lookup that failed and named nobody: one that failed but still named a process
+/// running from the directory is answered with that process.
 enum ExitCode
 {
     EXIT_NO_HOLDERS = 0,
@@ -38,9 +41,12 @@ enum ExitCode
 ///   --close-holders  bring the running Cockatrice forward, ask it to close, and wait for
 ///                     it to exit, for the offer to close after a failed purge
 ///
-/// Both answer from the same Restart Manager query over the same payload files, so the
-/// close can only ever reach a process that is holding a file of the version being
-/// replaced.
+/// Both answer from two lookups that cover each other's blind spot: the Restart Manager
+/// names whoever has a payload file open, and every process running from the directory is
+/// named as well, because a running instance holds its own image and the modules it
+/// loaded as mappings rather than open files and the Restart Manager does not always
+/// report those. Neither lookup alone is the guard's authority: an instance the file
+/// handles do not name is exactly the case that left a half-replaced install behind.
 bool closeModeRequested(int argumentCount, char **arguments)
 {
     return argumentCount > 1 && std::string(arguments[1]) == "--close-holders";
@@ -86,9 +92,26 @@ int main(int argumentCount, char **arguments)
         return EXIT_NOT_CONFIGURED;
     }
 
-    std::vector<Holder> holders;
-    const unsigned long error = findProcessesUsingFiles(collectPayloadFiles(installDir), holders);
-    if (error != ERROR_SUCCESS) {
+    // Processes running from the directory first: they are the instance the user is asked
+    // to close, and the Restart Manager may not name any of them (see
+    // findProcessesRunningFrom). The file holders follow, deduplicated by process, so an
+    // instance that both runs from the directory and holds a payload file is named once.
+    std::vector<Holder> holders = findProcessesRunningFrom(installDir);
+    std::vector<Holder> fileHolders;
+    const unsigned long error = findProcessesUsingFiles(collectPayloadFiles(installDir), fileHolders);
+    for (const Holder &holder : fileHolders) {
+        const bool alreadyNamed = std::any_of(holders.begin(), holders.end(), [&holder](const Holder &named) {
+            return named.processId == holder.processId;
+        });
+        if (!alreadyNamed) {
+            holders.push_back(holder);
+        }
+    }
+
+    // A failed lookup only makes the probe unable to answer when it also named nobody: with
+    // a process running from the directory the installer still knows what to close, and
+    // that is worth more to the guard than the code of the query that missed it.
+    if (error != ERROR_SUCCESS && holders.empty()) {
         writeLine(L"the Restart Manager lookup failed with win32 error " + std::to_wstring(error));
         return EXIT_PROBE_FAILED;
     }

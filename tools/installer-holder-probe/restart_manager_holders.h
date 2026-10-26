@@ -34,4 +34,27 @@ std::vector<std::wstring> collectPayloadFiles(const std::wstring &installDir);
  */
 unsigned long findProcessesUsingFiles(const std::vector<std::wstring> &files, std::vector<Holder> &holders);
 
+/**
+ * @brief Lists every process whose image lives in @p installDir, whether or not it has a
+ *        payload file open.
+ *
+ * Restart Manager answers the question "who has this file open", and a running instance
+ * does not necessarily have one open: its own image and the modules it loaded are mapped
+ * into it, not opened by it, and RmGetList does not reliably report a mapping. That is
+ * the state the failed updates this probe exists for were in - every DLL still on disk,
+ * an instance running from the directory, and "nothing is holding them any more" as the
+ * answer - so an answer built on file handles alone cannot be the guard's authority.
+ *
+ * Reading the image path needs PROCESS_QUERY_LIMITED_INFORMATION and
+ * QueryFullProcessImageNameW, neither of which depends on the bitness of either process,
+ * so a 64-bit instance is named from this 32-bit stub. The comparison is on the
+ * directory, not on an image name, so a process that merely shares a name (an Oracle
+ * database server next to a Cockatrice install) is never named.
+ *
+ * @param installDir the directory being replaced, as a full path.
+ * @return one entry per process running from it, in snapshot order, without the probe
+ *         itself; empty when the directory is empty or no process runs from it.
+ */
+std::vector<Holder> findProcessesRunningFrom(const std::wstring &installDir);
+
 #endif
