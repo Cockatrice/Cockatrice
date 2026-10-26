@@ -993,6 +993,9 @@ Function WaitForLauncherToExit
     ; $RN. The caller reads $R0/$R1, so the uppercase .RN form is required; the
     ; original .r0/.r1 wrote $0/$1 and left $R1 empty, which made the "did not
     ; exit" test below compare "" against "0" and abort on every /PID= upgrade.
+    ; Reopened on every Retry below, so a launcher that exited in the meantime answers
+    ; "already exited" instead of being waited on again.
+    wait_launcher_open:
     ClearErrors
     System::Call 'kernel32::OpenProcess(i 0x00100000, i 0, i $WaitPid) p.R0'
     ; OpenProcess returns a null handle for a process that is already gone. The
@@ -1020,9 +1023,29 @@ Function WaitForLauncherToExit
     ${If} $R1 != 0
         !insertmacro CockLog "wait-launcher: did not exit within 60s (wait=$R1)"
         DetailPrint "The application that started this installer did not exit within 60 s."
+        ; Two answers, and "carry on anyway" is not one of them. A live process has its
+        ; image and its Qt DLLs mapped, so writing the payload over them is the broken
+        ; install this wait exists to prevent - and the guard that runs next names the
+        ; same process by its image path and stops there anyway, so an "ignore" would
+        ; only put the same question a moment later, after a close attempt nobody asked
+        ; for. Waiting again is what helps: the client is most likely showing its own
+        ; "quit anyway?" confirmation, and that window is the thing to answer.
+        MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
+            "Cockatrice has not finished closing, so the installation is paused rather than replace files it is still using.$\r$\n$\r$\nIt may be waiting for you to answer its own question about an unsaved deck, an open game or a card database update. Answer that window - choose Retry to bring it to the front, ask it to close again and keep waiting. If it does not answer at all, close it from Task Manager first.$\r$\n$\r$\nChoose Retry to wait again, or Cancel to cancel the installation." \
+            IDRETRY wait_launcher_retry
+        !insertmacro CockLog "wait-launcher: cancelled by user"
         StrCpy $AbortReason \
             "The application that started this update has not exited yet, so the installation was cancelled rather than replace files it is still using.$\r$\n$\r$\nPlease close Cockatrice and run the installer again."
         Call AbortInstall
+        ; Only reached through Retry: AbortInstall does not return.
+        wait_launcher_retry:
+        ; The same request the window's close button makes, and the same close the guard
+        ; would send a moment later. It brings the client forward as well, which is the
+        ; part that helps when the confirmation is behind something else. Nothing is
+        ; force-stopped: a client that is waiting for an answer keeps the last word.
+        StrCpy $GuardDir $INSTDIR
+        Call CloseHolders
+        Goto wait_launcher_open
     ${EndIf}
     !insertmacro CockLog "wait-launcher: launcher exited"
     DetailPrint "The application that started this installer has exited."
