@@ -32,15 +32,4 @@ std::vector<std::wstring> collectProbeFiles(const std::wstring &installDir);
  */
 unsigned long findProcessesUsingFiles(const std::vector<std::wstring> &files, std::vector<Holder> &holders);
 
-/**
- * @brief Closes the applications and services that have one of @p files open or mapped.
- *
- * Asks them to shut down gracefully through Restart Manager first and forces only what
- * refuses. Only called after the user agreed in the installer's dialog to close them.
- *
- * @return 0 when Restart Manager reported every holder shut down; otherwise the Win32
- *         code of the call that failed. The caller re-lists holders to see what is left.
- */
-unsigned long closeProcessesUsingFiles(const std::vector<std::wstring> &files);
-
 #endif

@@ -1185,15 +1185,74 @@ Function CheckStaleRuntimeMask
     ${EndIf}
 FunctionEnd
 
+; Clears the read-only attribute of everything the purge is about to delete.
+;
+; Delete and RMDir only set the error flag: a read-only file is left on disk
+; untouched, and the retry loop then cannot make progress however long it waits,
+; because the file is not held - it is protected. The abort diagnostics have a
+; branch for exactly that ("read-only, which stops Delete"), so a survivor that
+; is both free and read-only was a dead end until now. This runs on every
+; attempt, so an attribute set again between attempts is cleared as well.
+; SetFileAttributes has no wildcard support, hence the walks.
+Function ClearReadOnlyPurgeTargets
+    FindFirst $StaleFindHandle $StaleFindName "$INSTDIR\*.dll"
+    ${If} $StaleFindHandle != ""
+    crp_dll_loop:
+        SetFileAttributes "$INSTDIR\$StaleFindName" NORMAL
+        ClearErrors
+        FindNext $StaleFindHandle $StaleFindName
+        IfErrors 0 crp_dll_loop
+        FindClose $StaleFindHandle
+    ${EndIf}
+    StrCpy $R6 "$INSTDIR\Plugins"
+    Call ClearReadOnlyTree
+FunctionEnd
+
+; usage: set $R6 to a directory. Clears the read-only attribute of every entry
+; below it, so RMDir /r is not stopped by a single file. Saves and restores the
+; registers it works in, because it recurses into itself.
+Function ClearReadOnlyTree
+    Push $R6
+    Push $R7
+    Push $R8
+    FindFirst $R7 $R8 "$R6\*.*"
+    ${If} $R7 != ""
+    crt_loop:
+        ${If} $R8 != "."
+        ${AndIf} $R8 != ".."
+            SetFileAttributes "$R6\$R8" NORMAL
+            ; Only an entry with contents has anything below it that the purge
+            ; would fail on; an empty directory's own attribute is already
+            ; cleared above and there is nothing left to descend into.
+            ${If} ${FileExists} "$R6\$R8\*.*"
+                Push $R6
+                StrCpy $R6 "$R6\$R8"
+                Call ClearReadOnlyTree
+                Pop $R6
+            ${EndIf}
+        ${EndIf}
+        ClearErrors
+        FindNext $R7 $R8
+        IfErrors 0 crt_loop
+        FindClose $R7
+    ${EndIf}
+    Pop $R8
+    Pop $R7
+    Pop $R6
+FunctionEnd
+
 ; Removes the Plugins directory and all top-level DLLs from $INSTDIR, then
 ; retries up to two more times (2 s apart) when files remain locked, so that
 ; transient holders such as antivirus scanners have a chance to release their
-; handles before the installer gives up. Three attempts total.
+; handles before the installer gives up. Three attempts total. The read-only
+; attribute is cleared before each attempt: a protected file is not a held one
+; and would never clear on its own.
 ; Sets $R0 to 0 when the purge is clean, or to 1 when stale DLLs remain
 ; after all attempts.
 Function RetryDllPurge
     StrCpy $R5 0        ; counts retries after the initial attempt
     rdp_loop:
+    Call ClearReadOnlyPurgeTargets
     RMDir /r "$INSTDIR\Plugins"
     Delete "$INSTDIR\*.dll"
     Call HasStaleRuntimeFiles
@@ -1253,12 +1312,14 @@ FunctionEnd
 ;
 ; The probe opens each survivor for DELETE access and then closes it again
 ; without deleting anything. The code is read by the plugin right after that call
-; (?e), so a failure reports what Windows refused; clearing LastError first is
-; what makes a zero code mean "this open worked", i.e. the purge-time failure was
-; transient (an antivirus scan that has finished, an instance still shutting
-; down) rather than a standing condition. The plugin parses the call's arguments
-; between the clear and the call, so a non-zero code is reported as what Windows
-; said rather than as proof of a cause - the wording below never claims one.
+; (?e), so a failure reports what Windows refused; clearing LastError first makes
+; a zero code mean "the open worked". That is all it means: Windows lets a DLL a
+; running process has mapped be opened for DELETE, and DeleteFile still refuses
+; it until the image is unloaded, so a zero code is not evidence that the
+; failure was transient - the holders line is what names a running process. The
+; plugin parses the call's arguments between the clear and the call, so a
+; non-zero code is reported as what Windows said rather than as proof of a
+; cause - the wording below never claims one.
 Function LogStaleRuntimeDiagnostics
     FindFirst $StaleFindHandle $StaleFindName "$INSTDIR\*.dll"
     ${If} $StaleFindHandle != ""
@@ -1275,11 +1336,12 @@ Function LogStaleRuntimeDiagnostics
         ${Else}
             Pop $R2
             ${If} $R2 = 0
-                ; A valid handle: close it. The open proves the file is not held
-                ; open, but not that Delete would succeed: a read-only file opens
-                ; for DELETE and still fails DeleteFile until the attribute is
-                ; cleared, which the purge does not do. Report that standing
-                ; cause instead of calling the failure transient.
+                ; A valid handle: close it. The open says nothing about Delete:
+                ; a DLL a running process has mapped opens for DELETE and still
+                ; refuses DeleteFile, and a read-only file does the same until its
+                ; attribute is cleared (the purge clears it before every attempt
+                ; now, so a survivor that is read-only had it set again). Report
+                ; that standing cause instead of calling the failure transient.
                 System::Call 'kernel32::CloseHandle(p R1)'
                 System::Call 'kernel32::GetFileAttributesW(w "$INSTDIR\$StaleFindName") i.R3'
                 ${If} $R3 = -1
@@ -1287,9 +1349,9 @@ Function LogStaleRuntimeDiagnostics
                 ${Else}
                     IntOp $R3 $R3 & 1
                     ${If} $R3 = 1
-                        StrCpy $R0 "a delete-access open now succeeds, but it is still read-only, which Delete does not clear"
+                        StrCpy $R0 "a delete-access open now succeeds, but it is read-only, which stops Delete"
                     ${Else}
-                        StrCpy $R0 "a delete-access open now succeeds"
+                        StrCpy $R0 "a delete-access open now succeeds, but a DLL a running process has mapped still refuses Delete - see holders"
                     ${EndIf}
                 ${EndIf}
             ${Else}
@@ -1360,17 +1422,32 @@ Function LogProcessesUsingInstallDir
     !insertmacro CockLog "holders: $HolderOutput"
 FunctionEnd
 
-; Called after a purge left files behind and LogStaleRuntimeDiagnostics named who is
-; holding them. Instead of aborting straight away - which on /R strands the user, since
-; the old version is already uninstalled - offer to close those processes and purge
-; again. Sets $StaleRuntimeAfterPurge to the retry's verdict (unchanged when nothing
-; was retried), so the caller still aborts when the files survive.
+; Called after a purge left files behind and LogStaleRuntimeDiagnostics named who
+; is holding them. Instead of aborting straight away - which on /R strands the
+; user, since the old version is already uninstalled - ask, close what this
+; installer owns, purge again, and repeat while the user keeps saying Yes. Sets
+; $StaleRuntimeAfterPurge to the last purge's verdict, so the caller still aborts
+; when the files survive.
+;
+; Nothing is force-closed. Cockatrice, Oracle and Servatrice are asked to close
+; (WM_CLOSE, the same request as clicking the window's close button); Cockatrice
+; may be showing a "really leave this game?" confirmation or holding an unsaved
+; deck, and that stays its decision, exactly as the running-instance guard treats
+; it. Everything else the probe named - a scanner, a service, an editor - is left
+; to the user, whom the prompt names it to.
+;
+; Restart Manager's RmShutdown was the alternative and was rejected: it shuts down
+; services as well as applications, and the only way to bring them back is
+; RmRestart, which would restart this very application into files that are about
+; to be replaced.
 ;
 ; No offer when nobody is at the keyboard (a /S install without /R, e.g. a package
-; manager): a dialog would block forever, and closing programs unasked is not ours to
-; do. No offer either when the probe named nobody: there is nothing to close, and the
-; abort's diagnostics already record what Windows said about each file.
-Function CloseHoldersAndRetryPurge
+; manager): a dialog there would block forever. /R is the in-app updater, whose
+; client has already quit, so the user is there - the same reasoning AbortInstall
+; uses for its message box. No offer either when the probe named nobody: there is
+; nothing to close, and the abort's per-file diagnostics already record what
+; Windows said.
+Function OfferToCloseAndRetryPurge
     ${If} $ReinstallMode = 0
     ${AndIf} ${Silent}
         !insertmacro CockLog "close-holders: unattended install, not offering to close holders"
@@ -1380,44 +1457,58 @@ Function CloseHoldersAndRetryPurge
         !insertmacro CockLog "close-holders: no holder was named, nothing to offer"
         Return
     ${EndIf}
-    ; No /SD: on the silent /R upgrade the user is present (the client that started
-    ; the installer has quit) and this prompt is exactly what keeps them from being
-    ; left without an install. The /S-without-/R case returned above.
-    MessageBox MB_YESNO|MB_ICONEXCLAMATION \
-        "Files of the previous version of Cockatrice are still in use by:$\r$\n$\r$\n$HolderOutput$\r$\n$\r$\nClose these programs and retry the installation?$\r$\nUnsaved work in them may be lost.$\r$\n$\r$\nChoose No to cancel the installation." \
-        IDYES chp_close
+    ocrp_prompt:
+    MessageBox MB_YESNO|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
+        "Files of the previous version of Cockatrice are still in use by:$\r$\n$\r$\n$HolderOutput$\r$\n$\r$\nThe installer can close Cockatrice, Oracle and Servatrice for you.$\r$\nClose any other program listed above, then choose Yes to try again.$\r$\n$\r$\nChoose No to cancel the installation." \
+        IDYES ocrp_close
     !insertmacro CockLog "close-holders: declined by user"
     Return
-    chp_close:
-    !insertmacro CockLog "close-holders: accepted, closing [$HolderOutput]"
-    DetailPrint "Closing programs that still use files of the previous version ..."
-    ; Our own applications first, through the guard that already knows how to close
-    ; them: Cockatrice gracefully (never force-stopped by the guard), Oracle and
-    ; Servatrice by PID after the grace period.
-    Call EnsureAppsNotRunning
-    ; Then everything else Restart Manager named - a scanner, a service, a Cockatrice
-    ; started from elsewhere - via the probe's --close mode: graceful shutdown first,
-    ; forced only for what refuses. The probe was extracted to $PLUGINSDIR by
-    ; LogProcessesUsingInstallDir; its exit code and line describe what is left.
-    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$INSTDIR")'
-    nsExec::ExecToStack /TIMEOUT=60000 '"$PLUGINSDIR\installer-holder-probe.exe" --close'
-    Pop $HolderExit
-    Pop $HolderOutput
-    !insertmacro CockLog "close-holders: probe --close exit=$HolderExit output=$HolderOutput"
-    ; Give Windows a moment to unmap the closed processes' modules.
-    Sleep 1000
+    ocrp_close:
+    !insertmacro CockLog "close-holders: accepted, holders were [$HolderOutput]"
+    DetailPrint "Closing Cockatrice, Oracle and Servatrice ..."
+    Call AskCockatriceAppsToClose
+    ; Give a closing instance time to release its modules; RetryDllPurge waits
+    ; another 6 s over its own attempts.
+    Sleep 2000
     Call RetryDllPurge
     StrCpy $StaleRuntimeAfterPurge $R0
     !insertmacro CockLogListing "after-close-purge" "*.dll"
     !insertmacro CockLogListing "after-close-plugins" "Plugins\*.*"
     !insertmacro CockLog "close-holders: stale-runtime after retry=$StaleRuntimeAfterPurge"
-    ${If} $StaleRuntimeAfterPurge = 1
-        ; Still stuck: refresh the diagnostics so the abort message and the log that
-        ; can be sent to us name what survived the close, not what was there before.
-        Call LogStaleRuntimeDiagnostics
-    ${Else}
+    ${If} $StaleRuntimeAfterPurge = 0
         DetailPrint "Files of the previous version were removed; continuing the installation."
+        Return
     ${EndIf}
+    ; Still stuck: refresh the names, so the next prompt and the log describe what
+    ; survived the close and not what was there before it.
+    Call LogStaleRuntimeDiagnostics
+    ${If} $HolderFound != 1
+        Return
+    ${EndIf}
+    Goto ocrp_prompt
+FunctionEnd
+
+; Asks Cockatrice, Oracle and Servatrice to close, without forcing anything.
+; CloseMatchingApps sends WM_CLOSE to processes whose image lives under $INSTDIR,
+; so a third-party application that merely shares an image name is never touched.
+; Oracle and Servatrice are console applications without a window, so the request
+; does nothing for them; the prompt names them and the user closes them. Skipped
+; when PowerShell cannot be started at all, because the lookup that would find
+; them is unavailable too - the prompt then names them from Restart Manager's
+; answer instead.
+Function AskCockatriceAppsToClose
+    Call IsProcessLookupAvailable
+    ${If} $R0 = 0
+        !insertmacro CockLog "close-holders: powershell unavailable, not asking the applications to close"
+        Return
+    ${EndIf}
+    StrCpy $GuardDir $INSTDIR
+    StrCpy $R2 "cockatrice"
+    Call CloseMatchingApps
+    StrCpy $R2 "oracle"
+    Call CloseMatchingApps
+    StrCpy $R2 "servatrice"
+    Call CloseMatchingApps
 FunctionEnd
 
 ; Uninstaller copies of the same routines (the uninstaller gets its own
@@ -1849,13 +1940,14 @@ ${EndIf}
 ${If} $StaleRuntimeAfterPurge = 1
     !insertmacro CockLog "section: files of a previous version survived the purge"
     ; Who is holding the payload is recorded first, so the log that reaches us
-    ; answers the question the message can only guess at, and so the user can be
-    ; offered to close exactly those processes instead of being sent away.
+    ; answers the question the message can only guess at, and so the prompt can
+    ; name them and offer to close the ones this installer owns.
     Call LogStaleRuntimeDiagnostics
     ; On /R the previous version is already uninstalled at this point, so an abort
-    ; leaves the user with no working Cockatrice. Offer to close the holders and
-    ; purge again; this updates $StaleRuntimeAfterPurge with the retry's verdict.
-    Call CloseHoldersAndRetryPurge
+    ; leaves the user with no working Cockatrice. Offer to close and purge again,
+    ; repeating while the user keeps saying Yes; this updates
+    ; $StaleRuntimeAfterPurge with the last retry's verdict.
+    Call OfferToCloseAndRetryPurge
 ${EndIf}
 ${If} $StaleRuntimeAfterPurge = 1
     !insertmacro CockLog "section: aborting, files of a previous version survived the purge"
