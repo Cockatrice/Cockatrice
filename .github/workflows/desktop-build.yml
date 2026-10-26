@@ -178,7 +178,13 @@ jobs:
     env:
       CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}    # directory for caching docker image and ccache
       CCACHE_EVICTION_AGE: 7d
-      CCACHE_SIZE: 600M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
+      # A configuration needs roughly 500 MB of objects on Linux, so the 600M every leg used
+      # to keep evicted entries the same build had just written (585 cleanup passes in one
+      # inspected run) and only served 1.8% of calls from cache. A bound below what a leg
+      # produces makes ccache spend the build deleting its own work, so the bound is set
+      # above one configuration; ccache only stores what a build actually produced, and the
+      # prune job below keeps the repository inside its 10Gi.
+      CCACHE_SIZE: 800M
       CMAKE_GENERATOR: 'Ninja'
       NAME: ${{ matrix.distro }}${{ matrix.version }}
       IMAGE_SUFFIX: ${{ matrix.variant }}
@@ -471,7 +477,10 @@ jobs:
     timeout-minutes: 100
     env:
       CCACHE_DIR: ${{ github.workspace }}/.cache/
-      CCACHE_SIZE: 600M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
+      # One macOS configuration compiles about twice the TUs of a Linux one, so the bound that
+      # keeps a Linux leg from evicting its own work has to be higher here. See CCACHE_SIZE in
+      # build-linux for the measurement.
+      CCACHE_SIZE: 1200M
 
     steps:
       - name: "Checkout"
@@ -1005,3 +1014,30 @@ jobs:
           done <"$RUNNER_TEMP/caches.tsv"
 
           echo "::notice::deleted $deleted of $(wc -l <"$RUNNER_TEMP/caches.tsv") cache entries"
+
+      # docker-release's image builds store their layers here, one entry per blob, scoped to the
+      # ref that built them. A layer cache is only worth something to an image build within days
+      # of the one that wrote it, and releases are months apart, so an entry nothing has touched
+      # for a week is dead weight. These were 2.9Gi of the repository's 10Gi, which is the room
+      # the compiler caches above need.
+      - name: "Delete stale image layer cache"
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cutoff="$(( $(date -u +%s) - 7 * 24 * 3600 ))"
+          gh api --paginate "repos/$GITHUB_REPOSITORY/actions/caches?per_page=100" \
+            --jq '.actions_caches[] | select(.key | startswith("buildkit-blob-")) | [.id, .key, .last_accessed_at] | @tsv' >"$RUNNER_TEMP/layers.tsv"
+
+          deleted=0
+          while IFS=$'\t' read -r id key accessed; do
+            [[ -n $id ]] || continue
+            stamp="$(date -u -d "$accessed" +%s 2>/dev/null || echo 0)"
+            if [[ $stamp -ne 0 && $stamp -lt $cutoff ]]; then
+              echo "::notice::deleting $key, unused since $accessed"
+              gh api -X DELETE "repos/$GITHUB_REPOSITORY/actions/caches/$id"
+              deleted=$((deleted + 1))
+            fi
+          done <"$RUNNER_TEMP/layers.tsv"
+
+          echo "::notice::deleted $deleted stale image layer entries"
