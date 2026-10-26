@@ -50,4 +50,33 @@ struct CloseHoldersResult
  */
 CloseHoldersResult closeCockatriceHolders(const std::vector<Holder> &holders, unsigned long waitMilliseconds);
 
+/**
+ * @brief What ending the holders did, in the form the installer logs.
+ *
+ * @c report is one line naming every holder, including the ones this deliberately leaves
+ * alone, because the installer repeats it in its log.
+ */
+struct EndHoldersResult
+{
+    unsigned int ended = 0; ///< holders TerminateProcess was accepted for
+    std::wstring report;    ///< one line, narrowed to ASCII when written
+};
+
+/**
+ * @brief Ends every running Cockatrice the probe named.
+ *
+ * This is the last resort behind the installer's "end it now" answer, never a first move: a
+ * client that is still running may have an unsaved deck, an open game or a settings write in
+ * flight, so the caller only gets here after the user picked it from a prompt that says so.
+ * Only cockatrice.exe is ended - Oracle writes the card database in place and Servatrice is a
+ * service, so both are named and left to the user, exactly as they are for the close.
+ *
+ * Waits up to @c waitMilliseconds for what it ended to be gone, so the caller can measure the
+ * purge immediately afterwards instead of racing a process that is still exiting.
+ *
+ * @param holders what the probe named, one entry per application or service
+ * @param waitMilliseconds how long to wait for the ended instances to be gone, 0 to not wait
+ */
+EndHoldersResult endCockatriceHolders(const std::vector<Holder> &holders, unsigned long waitMilliseconds);
+
 #endif

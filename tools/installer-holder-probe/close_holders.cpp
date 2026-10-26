@@ -44,6 +44,24 @@ std::wstring processLabel(const Holder &holder)
     return label;
 }
 
+/// Joins the per-holder lines into the one line the installer logs and cuts it to what one
+/// NSIS string holds.
+std::wstring joinReport(const std::vector<std::wstring> &lines)
+{
+    std::wstring report;
+    for (const std::wstring &line : lines) {
+        if (!report.empty()) {
+            report += L"; ";
+        }
+        report += line;
+    }
+    if (report.size() > REPORT_CHAR_MAX) {
+        report.erase(REPORT_CHAR_MAX);
+        report += L"...";
+    }
+    return report;
+}
+
 struct WindowSearch
 {
     DWORD processId = 0;
@@ -282,15 +300,61 @@ CloseHoldersResult closeCockatriceHolders(const std::vector<Holder> &holders, un
         result.report = L"nothing is holding the files";
         return result;
     }
-    for (const std::wstring &line : lines) {
-        if (!result.report.empty()) {
-            result.report += L"; ";
+    result.report = joinReport(lines);
+    return result;
+}
+
+EndHoldersResult endCockatriceHolders(const std::vector<Holder> &holders, unsigned long waitMilliseconds)
+{
+    EndHoldersResult result;
+    std::vector<std::wstring> lines;
+    std::vector<HANDLE> ended;
+    std::vector<std::size_t> endedLines;
+
+    for (const Holder &holder : holders) {
+        if (holder.isService || !isCockatriceImage(holder.imageName)) {
+            // The same split as the close: Oracle writes the card database in place and a
+            // service has nothing to ask, so neither is ever ended here.
+            lines.push_back(processLabel(holder) + L" left to you");
+            continue;
         }
-        result.report += line;
+
+        const HANDLE process = OpenProcess(PROCESS_TERMINATE | SYNCHRONIZE, FALSE, holder.processId);
+        if (process == nullptr) {
+            lines.push_back(processLabel(holder) + L" could not be ended (win32 " + std::to_wstring(GetLastError()) +
+                            L")");
+            continue;
+        }
+        if (TerminateProcess(process, 1) == FALSE) {
+            // Read the error before CloseHandle, which is free to reset it.
+            const DWORD error = GetLastError();
+            CloseHandle(process);
+            lines.push_back(processLabel(holder) + L" could not be ended (win32 " + std::to_wstring(error) + L")");
+            continue;
+        }
+        ++result.ended;
+        endedLines.push_back(lines.size());
+        lines.push_back(processLabel(holder) + L" ended");
+        ended.push_back(process);
     }
-    if (result.report.size() > REPORT_CHAR_MAX) {
-        result.report.erase(REPORT_CHAR_MAX);
-        result.report += L"...";
+
+    if (!ended.empty() && waitMilliseconds > 0) {
+        unsigned long long elapsed = 0;
+        const bool allExited = waitForExit(ended, waitMilliseconds, elapsed);
+        for (std::size_t index = 0; index < ended.size(); ++index) {
+            const bool exited = allExited || WaitForSingleObject(ended[index], 0) == WAIT_OBJECT_0;
+            lines[endedLines[index]] += exited ? L", exited after " + std::to_wstring(elapsed) + L" ms"
+                                               : L", still running after " + std::to_wstring(elapsed) + L" ms";
+        }
     }
+    for (const HANDLE process : ended) {
+        CloseHandle(process);
+    }
+
+    if (lines.empty()) {
+        result.report = L"nothing is holding the files";
+        return result;
+    }
+    result.report = joinReport(lines);
     return result;
 }
