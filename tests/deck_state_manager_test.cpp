@@ -120,10 +120,35 @@ TEST(DeckStateManager, DecrementTokens)
     containsExactly(manager, {}, DECK_ZONE_TOKENS, "Beast", 2);
 
     // Removing tokens from a given zone should remove them from the
-    // token zone instead if that zone does not contain the token.
+    // token zone if the given zone does not contain the token.
     manager.decrementCard(ExactCard(CardInfo::newInstance("Beast", "", true, {}, {}, {}, {}, {})), DECK_ZONE_SIDE);
     containsExactly(manager, {}, DECK_ZONE_TOKENS, "Beast", 1);
 
+    manager.decrementCard(ExactCard(CardInfo::newInstance("Beast", "", true, {}, {}, {}, {}, {})), DECK_ZONE_MAIN);
+    ASSERT_EQ(manager.getDeckList().getZoneNodes().size(), 0);
+}
+
+TEST(DeckStateManager, DecrementTokenMainboard)
+{
+    DeckStateManager manager;
+
+    // Add cards to the deck list directly so tokens are not
+    // automatically added to the token zone.
+    manager.getDeckListShared()->addCard("Beast", DECK_ZONE_MAIN);
+    manager.getDeckListShared()->addCard("Beast", DECK_ZONE_TOKENS);
+    ASSERT_EQ(manager.getDeckList().getZoneNodes().size(), 2);
+    containsExactly(manager, {DECK_ZONE_MAIN}, DECK_ZONE_MAIN, "Beast", 1);
+    containsExactly(manager, {DECK_ZONE_TOKENS}, DECK_ZONE_TOKENS, "Beast", 1);
+
+    // decrementCard uses the model to find the card, so we need to rebuild it.
+    manager.getModel()->rebuildTree();
+
+    // Tokens should be removed from the main zone first.
+    manager.decrementCard(ExactCard(CardInfo::newInstance("Beast", "", true, {}, {}, {}, {}, {})), DECK_ZONE_MAIN);
+    ASSERT_EQ(manager.getDeckList().getZoneNodes({DECK_ZONE_MAIN}).size(), 0);
+    containsExactly(manager, {DECK_ZONE_TOKENS}, DECK_ZONE_TOKENS, "Beast", 1);
+
+    // If the main zone is empty they can be removed from the token zone.
     manager.decrementCard(ExactCard(CardInfo::newInstance("Beast", "", true, {}, {}, {}, {}, {})), DECK_ZONE_MAIN);
     ASSERT_EQ(manager.getDeckList().getZoneNodes().size(), 0);
 }
