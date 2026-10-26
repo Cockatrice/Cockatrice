@@ -178,7 +178,19 @@ jobs:
     env:
       CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}    # directory for caching docker image and ccache
       CCACHE_EVICTION_AGE: 7d
-      CCACHE_SIZE: 600M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
+      # A configuration needs roughly 500 MB of objects on Linux, so the 600M bound is below
+      # what a leg writes: ccache spent each build deleting the entries the next run would
+      # ask for, with 585 cleanup passes and 1.8% of calls served in one inspected run.
+      #
+      # The bound cannot simply be raised. The repository's 10Gi quota
+      # (https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy)
+      # is shared by the 9 Linux legs, the 4 macOS ones, the CodeQL trap (~1G), vcpkg
+      # (~1G) and Qt (~0.2G), which funds about 600M per leg. 800M here and 1200M on macOS
+      # would ask for 12G of ccache alone, and GitHub would then evict a whole leg's entry
+      # and start that leg cold. The prune job below deletes by ref, scope and age only,
+      # never by total size, so it cannot make room for a bigger bound either: raising the
+      # bound means caching fewer legs.
+      CCACHE_SIZE: 600M
       CMAKE_GENERATOR: 'Ninja'
       NAME: ${{ matrix.distro }}${{ matrix.version }}
       IMAGE_SUFFIX: ${{ matrix.variant }}
@@ -471,7 +483,11 @@ jobs:
     timeout-minutes: 100
     env:
       CCACHE_DIR: ${{ github.workspace }}/.cache/
-      CCACHE_SIZE: 600M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
+      # One macOS configuration compiles about twice the TUs of a Linux one, so this is the
+      # leg that would gain most from a bigger bound. It draws on the same 10Gi quota as the
+      # Linux legs (see CCACHE_SIZE in build-linux): 4 macOS legs at 1200M would be 4.8G of
+      # that quota on their own, so the bound stays at the Linux value.
+      CCACHE_SIZE: 600M
 
     steps:
       - name: "Checkout"
@@ -1005,3 +1021,30 @@ jobs:
           done <"$RUNNER_TEMP/caches.tsv"
 
           echo "::notice::deleted $deleted of $(wc -l <"$RUNNER_TEMP/caches.tsv") cache entries"
+
+      # docker-release's image builds store their layers here, one entry per blob, scoped to the
+      # ref that built them. A layer cache is only worth something to an image build within days
+      # of the one that wrote it, and releases are months apart, so an entry nothing has touched
+      # for a week is dead weight. These were 2.9Gi of the repository's 10Gi, which is the room
+      # the compiler caches above need.
+      - name: "Delete stale image layer cache"
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cutoff="$(( $(date -u +%s) - 7 * 24 * 3600 ))"
+          gh api --paginate "repos/$GITHUB_REPOSITORY/actions/caches?per_page=100" \
+            --jq '.actions_caches[] | select(.key | startswith("buildkit-blob-")) | [.id, .key, .last_accessed_at] | @tsv' >"$RUNNER_TEMP/layers.tsv"
+
+          deleted=0
+          while IFS=$'\t' read -r id key accessed; do
+            [[ -n $id ]] || continue
+            stamp="$(date -u -d "$accessed" +%s 2>/dev/null || echo 0)"
+            if [[ $stamp -ne 0 && $stamp -lt $cutoff ]]; then
+              echo "::notice::deleting $key, unused since $accessed"
+              gh api -X DELETE "repos/$GITHUB_REPOSITORY/actions/caches/$id"
+              deleted=$((deleted + 1))
+            fi
+          done <"$RUNNER_TEMP/layers.tsv"
+
+          echo "::notice::deleted $deleted stale image layer entries"

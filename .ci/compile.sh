@@ -187,7 +187,11 @@ if [[ $USE_CCACHE ]]; then
   flags+=("-DUSE_CCACHE=1")
   # PCH-aware caching is required or ccache refuses to cache any TU that
   # consumes a precompiled header, silently recompiling everything on every run.
-  ccache --set-config sloppiness=pch_defines,time_macros
+  # The mtime and ctime entries are what ccache recommends for newly created files, which
+  # is what a fresh checkout hands it: a source stamped at or after the invocation is read
+  # as a race and disables caching, and the direct mode stays off until the timestamps are
+  # older than the run. Keep in sync with CMakeLists.txt.
+  ccache --set-config sloppiness=pch_defines,time_macros,include_file_mtime,include_file_ctime
   if [[ $CCACHE_SIZE ]]; then
     # note, this setting persists after running the script
     ccache --max-size "$CCACHE_SIZE"

@@ -55,7 +55,12 @@ if(USE_CCACHE AND NOT WIN32)
     # PCH-aware caching, matching .ci/compile.sh: without this ccache refuses
     # to cache any TU that consumes a precompiled header, so every PCH-backed
     # target recompiles from scratch on each build.
-    execute_process(COMMAND ${CCACHE_PROGRAM} --set-config sloppiness=pch_defines,time_macros)
+    # The mtime and ctime entries are what ccache recommends for newly created
+    # files (ccache(1), "Handling of newly created source files"): a source
+    # stamped at or after the invocation is read as a race and disables caching,
+    # which is every file of a fresh checkout.
+    set(ccache_sloppiness "pch_defines,time_macros,include_file_mtime,include_file_ctime")
+    execute_process(COMMAND ${CCACHE_PROGRAM} --set-config "sloppiness=${ccache_sloppiness}")
     message(STATUS "Found CCache ${CCACHE_PROGRAM}")
   endif()
 elseif(USE_CCACHE AND WIN32)
