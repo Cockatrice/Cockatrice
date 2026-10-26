@@ -46,6 +46,10 @@ Var GuardOutput
 Var GuardCloseTried
 Var WaitPid
 Var LauncherExited
+; How long one WaitForSingleObject on the launcher's handle waits before asking the user
+; (see WaitForLauncherToExit). A variable because the first slice is short and the ones
+; after the first question are not.
+Var WaitSlice
 Var InstallLogPath
 Var LogHandle
 Var LogMessage
@@ -995,6 +999,14 @@ Function WaitForLauncherToExit
     ; exit" test below compare "" against "0" and abort on every /PID= upgrade.
     ; Reopened on every Retry below, so a launcher that exited in the meantime answers
     ; "already exited" instead of being waited on again.
+    ;
+    ; Ten seconds, not the full grace: a client that started an update exits in well
+    ; under a second, so at ten seconds it is either flushing a card database or - far
+    ; more often - sitting on its own "quit anyway?" confirmation with nobody looking at
+    ; it. Silence for a minute is what makes that read as a hung installer. The full
+    ; grace is spent after the first question, so a user who answers Cockatrice's
+    ; confirmation is not asked again while they do it.
+    StrCpy $WaitSlice 10000
     wait_launcher_open:
     ClearErrors
     System::Call 'kernel32::OpenProcess(i 0x00100000, i 0, i $WaitPid) p.R0'
@@ -1015,14 +1027,12 @@ Function WaitForLauncherToExit
         Return
     ${EndIf}
     DetailPrint "Waiting for the application that started this installer to exit ..."
-    ; Same 60 s grace period the name based check uses, so a client that is slow
-    ; to flush its card database does not get less room than it used to.
     ; WAIT_OBJECT_0 is 0; WAIT_TIMEOUT is 258 and a failed wait reports 0xFFFFFFFF.
-    System::Call 'kernel32::WaitForSingleObject(p R0, i 60000) i.R1'
+    System::Call 'kernel32::WaitForSingleObject(p R0, i $WaitSlice) i.R1'
     System::Call 'kernel32::CloseHandle(p R0)'
     ${If} $R1 != 0
-        !insertmacro CockLog "wait-launcher: did not exit within 60s (wait=$R1)"
-        DetailPrint "The application that started this installer did not exit within 60 s."
+        !insertmacro CockLog "wait-launcher: did not exit within $WaitSlice ms (wait=$R1)"
+        DetailPrint "The application that started this installer did not exit in time."
         ; Two answers, and "carry on anyway" is not one of them. A live process has its
         ; image and its Qt DLLs mapped, so writing the payload over them is the broken
         ; install this wait exists to prevent - and the guard that runs next names the
@@ -1039,6 +1049,10 @@ Function WaitForLauncherToExit
         Call AbortInstall
         ; Only reached through Retry: AbortInstall does not return.
         wait_launcher_retry:
+        ; The question has been asked and answered once; from here the wait is the full
+        ; grace again, so a slow flush or a confirmation being answered does not turn
+        ; into a stream of prompts.
+        StrCpy $WaitSlice 60000
         ; The same request the window's close button makes, and the same close the guard
         ; would send a moment later. It brings the client forward as well, which is the
         ; part that helps when the confirmation is behind something else. Nothing is
