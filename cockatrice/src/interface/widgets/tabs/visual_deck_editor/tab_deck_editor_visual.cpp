@@ -61,8 +61,8 @@ TabDeckEditorVisual::TabDeckEditorVisual(TabSupervisor *_tabSupervisor) : Abstra
 {
     setObjectName("TabDeckEditorVisual");
 
-    createCentralFrame();
     createMenus();
+    createCentralFrame();
 
     installEventFilter(this);
 
@@ -105,7 +105,6 @@ void TabDeckEditorVisual::createCentralFrame()
 
     centralFrame->addWidget(tabContainer);
     setCentralWidget(centralWidget);
-    setDockOptions(QMainWindow::AnimatedDocks | QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks);
 }
 
 /** @brief Updates the visual deck, analytics, and sample hand after a deck change. */
