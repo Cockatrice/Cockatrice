@@ -63,13 +63,20 @@ struct EndHoldersResult
 };
 
 /**
- * @brief Ends every running Cockatrice the probe named.
+ * @brief Ends every running Cockatrice, Oracle and Servatrice the probe named.
  *
  * This is the last resort behind the installer's "end it now" answer, never a first move: a
  * client that is still running may have an unsaved deck, an open game or a settings write in
- * flight, so the caller only gets here after the user picked it from a prompt that says so.
- * Only cockatrice.exe is ended - Oracle writes the card database in place and Servatrice is a
- * service, so both are named and left to the user, exactly as they are for the close.
+ * flight, Oracle may be part-way through writing the card database, and Servatrice may be
+ * serving a game, so the caller only gets here after the user picked it from a prompt that
+ * says so.
+ *
+ * Every program the payload installs is ended, services included. A service is terminated
+ * like a process rather than stopped through the Service Control Manager: the installer has
+ * asked the user first, and the SCM notices the process exit and marks the service stopped
+ * afterwards, so it can be started again normally. Anything else the Restart Manager named -
+ * a scanner holding a DLL, a program the user keeps in the install directory - is left to
+ * the user, because ending it would destroy something this installer does not own.
  *
  * Waits up to @c waitMilliseconds for what it ended to be gone, so the caller can measure the
  * purge immediately afterwards instead of racing a process that is still exiting.
@@ -77,6 +84,6 @@ struct EndHoldersResult
  * @param holders what the probe named, one entry per application or service
  * @param waitMilliseconds how long to wait for the ended instances to be gone, 0 to not wait
  */
-EndHoldersResult endCockatriceHolders(const std::vector<Holder> &holders, unsigned long waitMilliseconds);
+EndHoldersResult endHolders(const std::vector<Holder> &holders, unsigned long waitMilliseconds);
 
 #endif

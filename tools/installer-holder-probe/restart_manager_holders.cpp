@@ -34,16 +34,6 @@ constexpr const wchar_t *PAYLOAD_FILES[] = {L"cockatrice.exe", L"oracle.exe", L"
 /// exists to name, so askingProcessIds() stops its walk up the parent chain at one.
 constexpr const wchar_t *PAYLOAD_PROGRAMS[] = {L"cockatrice.exe", L"oracle.exe", L"servatrice.exe"};
 
-bool isPayloadProgram(const std::wstring &imageName)
-{
-    for (const wchar_t *program : PAYLOAD_PROGRAMS) {
-        if (CompareStringOrdinal(imageName.c_str(), -1, program, -1, TRUE) == CSTR_EQUAL) {
-            return true;
-        }
-    }
-    return false;
-}
-
 void collectFilesOf(const std::wstring &directory, int depth, int maxDepth, std::vector<std::wstring> &files)
 {
     if (files.size() >= MAX_PROBED_FILES) {
@@ -143,6 +133,16 @@ Holder holderOf(const RM_PROCESS_INFO &info)
     return holder;
 }
 } // namespace
+
+bool isPayloadProgram(const std::wstring &imageName)
+{
+    for (const wchar_t *program : PAYLOAD_PROGRAMS) {
+        if (CompareStringOrdinal(imageName.c_str(), -1, program, -1, TRUE) == CSTR_EQUAL) {
+            return true;
+        }
+    }
+    return false;
+}
 
 std::vector<std::wstring> collectPayloadFiles(const std::wstring &installDir)
 {
