@@ -46,7 +46,7 @@ enum ExitCode
 ///   --close-holders  bring the running Cockatrice forward, ask it to close, and wait for
 ///                     it to exit, for the offer to close after a failed purge
 ///   --end-holders    end the running Cockatrice and wait for it to be gone, for the last
-///                     resort the guard prompt offers after a close was asked for twice
+///                     resort the guard prompt offers when a close did not free the files
 ///
 /// All three answer from two lookups that cover each other's blind spot: the Restart Manager
 /// names whoever has a payload file open, and every process running from the directory is
