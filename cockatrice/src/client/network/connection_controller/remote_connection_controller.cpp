@@ -3,6 +3,7 @@
 #include "../../../interface/pixel_map_generator.h"
 #include "../../settings/cache_settings.h"
 #include "../interface/widgets/dialogs/dlg_connect.h"
+#include "../interface/widgets/dialogs/dlg_edit_password.h"
 #include "../interface/widgets/dialogs/dlg_forgot_password_challenge.h"
 #include "../interface/widgets/dialogs/dlg_forgot_password_request.h"
 #include "../interface/widgets/dialogs/dlg_forgot_password_reset.h"
@@ -99,6 +100,10 @@ void ConnectionController::wireClientSignals()
 
     connect(remoteClient, &RemoteClient::sigPasswordVerifierReady, this,
             &ConnectionController::onPasswordVerifierReady);
+
+    connect(remoteClient, &RemoteClient::sigPasswordChangeSuccess, this,
+            &ConnectionController::onPasswordChangeSuccess);
+    connect(remoteClient, &RemoteClient::sigPasswordChangeError, this, &ConnectionController::onPasswordChangeError);
 }
 
 void ConnectionController::connectToServer()
@@ -341,10 +346,16 @@ void ConnectionController::onLoginError(int r,
         }
 
         case Response::RespPasswordChangeRequired: {
-            QMessageBox::information(
-                dialogParent, tr("Password Change Required"),
-                tr("An administrator has reset your password. Please contact your server administrator to obtain "
-                   "your temporary password, then log in and change it via Account -> Change Password."));
+            // The credentials were right, but the account may not be used until a new password
+            // is chosen. Let the user complete the change here: sending them off to "ask the
+            // administrator for your temporary password" sends them in circles, since they just
+            // logged in with it and the session ends without a way to comply.
+            DlgEditPassword dlg(dialogParent);
+            dlg.setWindowTitle(tr("Password Change Required"));
+            if (dlg.exec()) {
+                remoteClient->changePasswordToServer(dlg.getOldPassword(), dlg.getNewPassword());
+                return; // onPasswordChangeSuccess/onPasswordChangeError decides the next step
+            }
             remoteClient->disconnectFromServer();
             return;
         }
@@ -505,6 +516,43 @@ void ConnectionController::onNotifyUserAboutUpdate()
            "This is most likely not a problem, but this message might mean there is a new version of "
            "Cockatrice available or this server is running a custom or pre-release version.\n\n"
            "To update your client, go to Help -> Check for Updates."));
+}
+
+void ConnectionController::onPasswordChangeSuccess()
+{
+    // The credential saved for this profile is stale now: drop it so the next login asks for
+    // the new password instead of replaying the old verifier.
+    if (!pendingSaveName.isEmpty()) {
+        SettingsCache::instance().servers().setServerPassword(pendingSaveName, "");
+    }
+
+    QMessageBox::information(dialogParent, tr("Password Changed"),
+                             tr("Your password has been changed. Please log in again with your new password."));
+    remoteClient->disconnectFromServer();
+    connectToServer();
+}
+
+void ConnectionController::onPasswordChangeError(int responseCode)
+{
+    QString reason;
+    switch (static_cast<Response::ResponseCode>(responseCode)) {
+        case Response::RespWrongPassword:
+            reason = tr("The current password is incorrect.");
+            break;
+        case Response::RespPasswordTooShort:
+            reason = tr("The new password is too short.");
+            break;
+        case Response::RespClientUpdateRequired:
+            reason = tr("The server does not accept the new password format.");
+            break;
+        default:
+            reason = tr("The password could not be changed (error %1).").arg(responseCode);
+            break;
+    }
+
+    QMessageBox::critical(dialogParent, tr("Password Change Failed"), reason);
+    remoteClient->disconnectFromServer();
+    connectToServer();
 }
 
 void ConnectionController::onForgotPasswordSuccess()
