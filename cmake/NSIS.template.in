@@ -15,6 +15,16 @@ Var ReinstallMode
 Var GuardDir
 Var OldUninstallString
 Var OldInstallDir
+; What ExecWait reported for the previous version's uninstaller (empty when it could not be
+; started at all). Read by WaitForOldPayloadToDisappear: an uninstaller that ran in place
+; (_?=) and failed or was cancelled will not remove anything more, however long we wait.
+Var OldUninstallExit
+; Retry counter of RemoveOldPayloadLeftovers.
+Var OldPayloadPass
+; Scratch state of AppendUninstallerLog.
+Var UninstLogHandle
+Var UninstLogLine
+Var UninstLogChar
 Var DataBackupDir
 Var DataBackupDone
 Var DataBackupForDir
@@ -198,6 +208,7 @@ StrCpy $LooseDeckNoticeShown ""
 ; No old install location resolved yet; Backup/Restore fall back to $INSTDIR
 ; when this is empty (the /R path where $INSTDIR already is the old dir).
 StrCpy $OldInstallDir ""
+StrCpy $OldUninstallExit ""
 ; No purge has run and nothing has been measured yet. The section sets both
 ; after a purge, or measures the directory itself when neither purge applies.
 StrCpy $StaleRuntimeAfterPurge 0
@@ -404,7 +415,9 @@ StrCpy $OldInstallDir $INSTDIR
 StrCmp $R0 "" done32
 DetailPrint "Removing previous version (32-bit)..."
 Call BackupUserDataBeforeUninstall
+StrCpy $R5 ""
 ExecWait '$R0 _?=$OldInstallDir' $R5
+StrCpy $OldUninstallExit $R5
 !insertmacro CockLog "uninstall (32-bit): exit=$R5"
 Call WaitForOldPayloadToDisappear
 Call RestoreUserDataAfterUninstall
@@ -419,7 +432,9 @@ ${If} ${RunningX64}
     StrCpy $OldInstallDir $INSTDIR
     !insertmacro CockLog "uninstall (64-bit): '$R0 _?=$OldInstallDir'"
     StrCmp $R0 "" done64
+    StrCpy $R5 ""
     DetailPrint "Removing previous version (64-bit)..."
+    StrCpy $OldUninstallExit $R5
     Call BackupUserDataBeforeUninstall
     ExecWait '$R0 _?=$OldInstallDir' $R5
     !insertmacro CockLog "uninstall (64-bit): exit=$R5"
@@ -439,6 +454,12 @@ FunctionEnd
 ; ExecWait returns at once while the copy keeps deleting - and it finishes after this
 ; window has closed, removing the version that was just installed. Waiting for
 ; cockatrice.exe to disappear covers both cases, and stops with a message instead of
+;
+; When the payload is still there after the wait, $OldUninstallExit decides: a non-zero
+; code means the uninstaller was cancelled or failed, and the install aborts saying so.
+; A zero code means it finished but skipped files someone was holding (NSIS Delete does
+; that silently), so RemoveOldPayloadLeftovers frees and removes them, and the install
+; only aborts - naming the holders - when even that fails.
 ; installing over a directory that is still being emptied.
 Function WaitForOldPayloadToDisappear
 ${If} $OldInstallDir == ""
@@ -449,9 +470,24 @@ old_uninstall_wait:
 IfFileExists "$OldInstallDir\cockatrice.exe" 0 old_uninstall_gone
 IntOp $R2 $R2 + 1
 ${If} $R2 > 60
-    !insertmacro CockLog "old uninstall: $OldInstallDir still holds cockatrice.exe after 30 s"
+    !insertmacro CockLog "old uninstall: $OldInstallDir still holds cockatrice.exe after 30 s (uninstaller exit=$OldUninstallExit)"
+    ; The uninstaller's own account of what it skipped or why it stopped lives in its
+    ; separate log; copy it here so the report sent from AbortInstall carries it.
+    Call AppendUninstallerLog
+    ${If} $OldUninstallExit != "0"
+        ; Cancelled, failed, or could not be started at all (empty code): the old version
+        ; was not meant to be removed, so nothing is deleted on its behalf.
+        StrCpy $AbortReason \
+            "The previous version in $OldInstallDir is still there because its uninstaller was cancelled or failed (exit code '$OldUninstallExit').$\r$\n$\r$\nClose anything still using those files and run this installer again."
+        Call AbortInstall
+    ${EndIf}
+    ; The uninstaller finished but skipped files - a running instance or a scanner holding
+    ; them, which NSIS Delete passes over silently. Free them and remove what is left.
+    Call RemoveOldPayloadLeftovers
+    ; $R2 was reused by the removal, so its result is checked here and not via the loop.
+    IfFileExists "$OldInstallDir\cockatrice.exe" 0 old_leftovers_removed
     StrCpy $AbortReason \
-        "The previous version in $OldInstallDir is still there after its uninstaller ran.$\r$\n$\r$\nIf that uninstaller was cancelled or reported an error, close anything still using those files and run this installer again."
+        "The previous version in $OldInstallDir is still there after its uninstaller ran, and its files could not be removed.$\r$\n$\r$\nStill in use by: $HolderOutput$\r$\n$\r$\nClose anything still using those files and run this installer again."
     Call AbortInstall
 ${EndIf}
 Sleep 500
@@ -467,6 +503,84 @@ ${If} $R2 > 0
 ${Else}
     !insertmacro CockLog "old uninstall: $OldInstallDir was already clear when ExecWait returned"
 ${EndIf}
+Return
+old_leftovers_removed:
+!insertmacro CockLog "old uninstall: continuing after removing the leftovers the uninstaller skipped"
+FunctionEnd
+
+; Called when the old uninstaller exited successfully but left its payload behind.
+; Frees the files the same way the guard does (close, then offer to end), deletes what
+; the uninstaller skipped, and on failure records which files survived and who holds
+; them in $HolderOutput, for the abort message.
+Function RemoveOldPayloadLeftovers
+    !insertmacro CockLog "old uninstall: removing leftovers of $OldInstallDir"
+    StrCpy $HolderOutput "nothing could be named"
+    StrCpy $GuardDir $OldInstallDir
+    Call GuardAppsNotRunning
+    ; The purge helpers work on $INSTDIR; point them at the old directory for the
+    ; duration (on /R the two are the same anyway).
+    Push $INSTDIR
+    StrCpy $INSTDIR $OldInstallDir
+    StrCpy $R2 0
+    rop_loop:
+    SetFileAttributes "$INSTDIR\cockatrice.exe" NORMAL
+    SetFileAttributes "$INSTDIR\oracle.exe" NORMAL
+    SetFileAttributes "$INSTDIR\servatrice.exe" NORMAL
+    SetFileAttributes "$INSTDIR\uninstall.exe" NORMAL
+    Delete "$INSTDIR\cockatrice.exe"
+    Delete "$INSTDIR\oracle.exe"
+    Delete "$INSTDIR\servatrice.exe"
+    Delete "$INSTDIR\uninstall.exe"
+    Delete "$INSTDIR\qt.conf"
+    Call RetryDllPurge
+    IfFileExists "$INSTDIR\cockatrice.exe" 0 rop_done
+    IntOp $R2 $R2 + 1
+    ${If} $R2 < 3
+        !insertmacro CockLog "old uninstall: cockatrice.exe survived removal attempt $R2, retrying in 2 s"
+        Sleep 2000
+        Goto rop_loop
+    ${EndIf}
+    !insertmacro CockLog "old uninstall: cockatrice.exe still present after 3 removal attempts"
+    !insertmacro CockLogListing "old-leftovers" "*.*"
+    ; Per-file Windows codes for the DLLs plus the holder probe's line ($HolderOutput).
+    Call LogStaleRuntimeDiagnostics
+    Pop $INSTDIR
+    Return
+    rop_done:
+    !insertmacro CockLog "old uninstall: leftovers of $OldInstallDir removed"
+    !insertmacro CockLogListing "old-leftovers-after-removal" "*.*"
+    Pop $INSTDIR
+FunctionEnd
+
+; Copies the old uninstaller's log ($TEMP\Cockatrice-uninstaller.log) into this
+; installer's log, so the report AbortInstall sends shows what the uninstaller did.
+; Uninstallers older than this log simply have no file; that is logged too.
+Function AppendUninstallerLog
+    ClearErrors
+    FileOpen $UninstLogHandle "$TEMP\Cockatrice-uninstaller.log" r
+    ${If} ${Errors}
+    ${OrIf} $UninstLogHandle == ""
+        !insertmacro CockLog "uninstaller log: not found at $TEMP\Cockatrice-uninstaller.log"
+        Return
+    ${EndIf}
+    !insertmacro CockLog "uninstaller log begin ----------------------------------------"
+    aul_loop:
+    ClearErrors
+    FileRead $UninstLogHandle $UninstLogLine
+    IfErrors aul_done
+    ; Strip the line break FileRead keeps, so CockLog does not double it.
+    aul_trim:
+    StrCpy $R9 $UninstLogLine 1 -1
+    ${If} $R9 == "$\n"
+    ${OrIf} $R9 == "$\r"
+        StrCpy $UninstLogLine $UninstLogLine -1
+        Goto aul_trim
+    ${EndIf}
+    !insertmacro CockLog "uninstaller: $UninstLogLine"
+    Goto aul_loop
+    aul_done:
+    FileClose $UninstLogHandle
+    !insertmacro CockLog "uninstaller log end ------------------------------------------"
 FunctionEnd
 
 ; BackupUserDataBeforeUninstall / RestoreUserDataAfterUninstall
@@ -1818,7 +1932,9 @@ ${If} $PortableMode = 0
     !insertmacro CockLog "componentsPagePre: old 32-bit uninstall '$OldUninstallString _?=$OldInstallDir' (oldDir=$OldInstallDir InstDir=$INSTDIR)"
     ClearErrors
     Call BackupUserDataBeforeUninstall
+    StrCpy $R5 ""
     ExecWait "$OldUninstallString _?=$OldInstallDir" $R5
+    StrCpy $OldUninstallExit $R5
     !insertmacro CockLog "componentsPagePre: old 32-bit uninstall exit=$R5"
     Call WaitForOldPayloadToDisappear
     Call RestoreUserDataAfterUninstall
@@ -1854,7 +1970,9 @@ ${If} $PortableMode = 0
 	    !insertmacro CockLog "componentsPagePre: old 64-bit uninstall '$OldUninstallString _?=$OldInstallDir' (oldDir=$OldInstallDir InstDir=$INSTDIR)"
 	    ClearErrors
 	    Call BackupUserDataBeforeUninstall
+	    StrCpy $R5 ""
 	    ExecWait "$OldUninstallString _?=$OldInstallDir" $R5
+	    StrCpy $OldUninstallExit $R5
 	    !insertmacro CockLog "componentsPagePre: old 64-bit uninstall exit=$R5"
 	    Call WaitForOldPayloadToDisappear
 	    Call RestoreUserDataAfterUninstall
