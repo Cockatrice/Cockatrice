@@ -211,15 +211,15 @@ QModelIndex DeckStateManager::addCard(const ExactCard &card, const QString &zone
         return {};
     }
 
-    QString zone = card.getInfo().getIsToken() ? DECK_ZONE_TOKENS : zoneName;
+    QString targetZone = card.getInfo().getIsToken() ? DECK_ZONE_TOKENS : zoneName;
 
     CardSetPtr set = card.getPrinting().getSet();
     QString setName = set ? set->getCorrectedShortName() : "";
 
     QString reason =
-        tr("Added (%1): %2 (%3) %4").arg(zone, card.getName(), setName, card.getPrinting().getProperty("num"));
+        tr("Added (%1): %2 (%3) %4").arg(targetZone, card.getName(), setName, card.getPrinting().getProperty("num"));
 
-    QModelIndex idx = modifyDeck(reason, [&card, &zone](auto model) { return model->addCard(card, zone); });
+    QModelIndex idx = modifyDeck(reason, [&card, &targetZone](auto model) { return model->addCard(card, targetZone); });
 
     if (idx.isValid()) {
         emit focusIndexChanged(idx, true);
@@ -234,12 +234,12 @@ QModelIndex DeckStateManager::decrementCard(const ExactCard &card, const QString
         return {};
     }
 
-    QString zone = zoneName;
+    QString targetZone = zoneName;
 
     QString providerId = card.getPrinting().getUuid();
     QString collectorNumber = card.getPrinting().getProperty("num");
 
-    QModelIndex idx = deckListModel->findCard(card.getName(), zone, providerId, collectorNumber);
+    QModelIndex idx = deckListModel->findCard(card.getName(), targetZone, providerId, collectorNumber);
 
     if (!idx.isValid()) {
         // Tokens are usually added to the token zone, but it is possible for imported/hand-edited
@@ -247,8 +247,8 @@ QModelIndex DeckStateManager::decrementCard(const ExactCard &card, const QString
         // token from the token zone if it does not exist in the given zone, allowing us to still
         // remove it from there.
         if (card.getInfo().getIsToken()) {
-            zone = DECK_ZONE_TOKENS;
-            idx = deckListModel->findCard(card.getName(), zone, providerId, collectorNumber);
+            targetZone = DECK_ZONE_TOKENS;
+            idx = deckListModel->findCard(card.getName(), targetZone, providerId, collectorNumber);
 
             if (!idx.isValid()) {
                 return {};
@@ -265,7 +265,7 @@ QModelIndex DeckStateManager::decrementCard(const ExactCard &card, const QString
     }
 
     // old index is no longer safe since rows could have been removed
-    QModelIndex newIdx = deckListModel->findCard(card.getName(), zone, providerId, collectorNumber);
+    QModelIndex newIdx = deckListModel->findCard(card.getName(), targetZone, providerId, collectorNumber);
     if (newIdx.isValid()) {
         emit focusIndexChanged(newIdx, true);
     }
