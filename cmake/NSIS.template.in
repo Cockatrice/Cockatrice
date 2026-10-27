@@ -801,6 +801,15 @@ FunctionEnd
 ; in the way and is offered to end all three themselves - the last resort, with what it
 ; costs spelled out in the prompt.
 
+; One sentence for every prompt whose Yes ends the whole set, so that answer reads the same
+; wherever the user meets it: this guard before anything is replaced, the uninstaller's, and
+; the recovery prompt after a failed purge.
+!define END_COST "An unsaved deck, a running game or an unwritten setting is lost, Servatrice drops its players, and ending Oracle while it writes the card database can damage it."
+
+; The other half of that answer - what is left to do when nothing is ended - is shared by
+; the two prompts that name the holders, for the same reason.
+!define AFTER_CLOSING_GUIDANCE "If Cockatrice is open it has been brought forward, so answer its confirmation; one in the notification area has to be opened from the tray first. If ending one fails, close it from Task Manager and choose No."
+
 ; Emitted once for the installer and once for the uninstaller: the uninstaller
 ; cannot call installer functions, and its own copy of the probe keeps a running
 ; 64-bit instance from being missed there too.
@@ -947,7 +956,7 @@ Function GuardAppsNotRunning
         ; end nothing stay reachable from the same dialog: the instance's own confirmation,
         ; and closing anything by hand.
         MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
-            "Cockatrice, Oracle or Servatrice is still using files of the installation:$\r$\n$\r$\n$GuardOutput$\r$\n$\r$\nChoose Yes to end every program listed above. An unsaved deck, a running game or an unwritten setting is lost, Servatrice drops its players, and ending Oracle while it writes the card database can damage it.$\r$\n$\r$\nChoose No to check again after closing them. If Cockatrice is open it has been brought forward behind this window, so answer its confirmation; one in the notification area has to be opened from the tray first. If ending one fails, close it from Task Manager and choose No.$\r$\n$\r$\nChoose Cancel to cancel the installation." \
+            "Cockatrice, Oracle or Servatrice is still using files of the installation:$\r$\n$\r$\n$GuardOutput$\r$\n$\r$\nChoose Yes to end every program listed above. ${END_COST}$\r$\n$\r$\nChoose No to check again after closing them yourself. ${AFTER_CLOSING_GUIDANCE}$\r$\n$\r$\nChoose Cancel to cancel the installation." \
             IDYES guard_end IDNO guard_check
         !insertmacro CockLog "guard: cancelled by user"
         StrCpy $AbortReason \
@@ -1074,7 +1083,7 @@ Function WaitForLauncherToExit
     ; $RN. The caller reads $R0/$R1, so the uppercase .RN form is required; the
     ; original .r0/.r1 wrote $0/$1 and left $R1 empty, which made the "did not
     ; exit" test below compare "" against "0" and abort on every /PID= upgrade.
-    ; Reopened on every Retry below, so a launcher that exited in the meantime answers
+    ; Reopened on every round below, so a launcher that exited in the meantime answers
     ; "already exited" instead of being waited on again.
     ;
     ; Ten seconds, not the full grace: a client that started an update exits in well
@@ -1110,21 +1119,38 @@ Function WaitForLauncherToExit
     ${If} $R1 != 0
         !insertmacro CockLog "wait-launcher: did not exit within $WaitSlice ms (wait=$R1)"
         DetailPrint "The application that started this installer did not exit in time."
-        ; Two answers, and "carry on anyway" is not one of them. A live process has its
-        ; image and its Qt DLLs mapped, so writing the payload over them is the broken
-        ; install this wait exists to prevent - and the guard that runs next names the
-        ; same process by its image path and stops there anyway, so an "ignore" would
-        ; only put the same question a moment later, after a close attempt nobody asked
-        ; for. Waiting again is what helps: the client is most likely showing its own
-        ; "quit anyway?" confirmation, and that window is the thing to answer.
-        MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
-            "Cockatrice has not finished closing, so the installation is paused rather than replace files it is still using.$\r$\n$\r$\nIt may be waiting for you to answer its own question about an unsaved deck, an open game or a card database update. Answer that window - choose Retry to bring it to the front, ask it to close again and keep waiting. If it does not answer at all, close it from Task Manager first.$\r$\n$\r$\nChoose Retry to wait again, or Cancel to cancel the installation." \
-            IDRETRY wait_launcher_retry
+        ; Same three answers as every other prompt that waits on a running program, and
+        ; "carry on anyway" is not one of them: a live process has its image and its Qt
+        ; DLLs mapped, so writing the payload over them is the broken install this wait
+        ; exists to prevent. Yes ends the launcher, No asks it to close again and keeps
+        ; waiting, Cancel cancels - the launcher is the client the user started this update
+        ; from, and ending it is the same offer the guard makes a moment later.
+        MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
+            "Cockatrice has not finished closing, so the installation is paused rather than replace files it is still using.$\r$\n$\r$\nIt may be waiting for you to answer its own question about an unsaved deck, an open game or a card database update.$\r$\n$\r$\nChoose Yes to end it now - an unsaved deck, a running game or an unwritten setting is lost.$\r$\n$\r$\nChoose No to bring it to the front, ask it to close again and keep waiting, or Cancel to cancel the installation." \
+            IDYES wait_launcher_end IDNO wait_launcher_retry
         !insertmacro CockLog "wait-launcher: cancelled by user"
         StrCpy $AbortReason \
             "The application that started this update has not exited yet, so the installation was cancelled rather than replace files it is still using.$\r$\n$\r$\nPlease close Cockatrice and run the installer again."
         Call AbortInstall
-        ; Only reached through Retry: AbortInstall does not return.
+        ; Only reached through Yes or No: AbortInstall does not return.
+        wait_launcher_end:
+        ; By pid, not through the probe: this wait holds the launcher's pid and $GuardDir
+        ; is not known until the guard that follows reads it. The pid is the launcher the
+        ; client passed in /PID=, so nothing else can be hit by it.
+        !insertmacro CockLog "wait-launcher: ending the launcher on request"
+        ClearErrors
+        System::Call 'kernel32::OpenProcess(i 0x0001, i 0, i $WaitPid) p.R2'
+        ${If} ${Errors}
+            StrCpy $R2 0
+        ${EndIf}
+        ${If} $R2 == 0
+            !insertmacro CockLog "wait-launcher: the launcher could not be opened to end it"
+        ${Else}
+            System::Call 'kernel32::TerminateProcess(p R2, i 1) i.R3'
+            System::Call 'kernel32::CloseHandle(p R2)'
+            !insertmacro CockLog "wait-launcher: ending the launcher returned $R3"
+        ${EndIf}
+        Goto wait_launcher_open
         wait_launcher_retry:
         ; The question has been asked and answered once; from here the wait is the full
         ; grace again, so a slow flush or a confirmation being answered does not turn
@@ -1133,7 +1159,7 @@ Function WaitForLauncherToExit
         ; The same request the window's close button makes, and the same close the guard
         ; would send a moment later. It brings the client forward as well, which is the
         ; part that helps when the confirmation is behind something else. Nothing is
-        ; force-stopped: a client that is waiting for an answer keeps the last word.
+        ; force-stopped here: the answer that does that is Yes.
         StrCpy $GuardDir $INSTDIR
         Call CloseHolders
         Goto wait_launcher_open
@@ -1498,19 +1524,25 @@ FunctionEnd
 
 ; Called after a purge left files behind and LogStaleRuntimeDiagnostics named who is
 ; holding them. Instead of aborting straight away - which on /R strands the user, since
-; the old version is already uninstalled - ask, close what this installer owns, purge
-; again, and retry while the user keeps asking. Sets $StaleRuntimeAfterPurge to the last
-; purge's verdict, so the caller still aborts when the files survive.
+; the old version is already uninstalled - it closes once, purges again, and only then
+; asks: end what is still holding the files, or try the removal again by hand. Sets
+; $StaleRuntimeAfterPurge to the last purge's verdict, so the caller still aborts when the
+; files survive.
 ;
-; Cockatrice is asked to close (WM_CLOSE, the same request as clicking the window's close
-; button) and keeps the last word: it may be waiting for an answer to its own "really
-; quit?" confirmation (a running card database update, an open game, an unsaved deck), and
-; that stays its decision. The instance is brought forward first, so that confirmation is
-; on screen rather than behind this installer's prompt. Oracle and Servatrice have no
-; window to send a close to at all, and nothing here is force-stopped: Oracle writes the
-; card database in place and killing it mid-write would corrupt it. Everything the probe
-; named that this installer cannot close - those two included - is left to the user, whom
-; the prompt names it to.
+; The shape is the guard's, deliberately: one automatic attempt at a graceful close, then a
+; prompt whose Yes ends the payload programs and whose No retries. A client that was still
+; shutting down releases the files in the automatic round and never sees a question, and an
+; Oracle or Servatrice - which a close cannot reach - is what the prompt exists for, so the
+; user is never left with a dialog whose answers cannot free anything.
+;
+; The automatic close is a request (WM_CLOSE) and the client keeps the last word: it may be
+; waiting for an answer to its own "really quit?" confirmation (a running card database
+; update, an open game, an unsaved deck), and that stays its decision. The instance is
+; brought forward first, so that confirmation is on screen rather than behind this
+; installer's prompt.
+;
+; Ending is the same last resort the guard offers, with the same cost spelled out, and only
+; ever the programs the payload installs - see EndHolders.
 ;
 ; Restart Manager's RmShutdown was the alternative and was rejected: it shuts down
 ; services as well as applications, and the only way to bring them back is RmRestart,
@@ -1519,33 +1551,32 @@ FunctionEnd
 ; Always offered, in every mode: a /S install without /R is the only case without someone
 ; at the keyboard, and this installer does not promise unattended runs - if an error needs
 ; a decision, it asks for one. No offer when the probe named nobody: there is nothing to
-; close, and the abort's per-file diagnostics already record what Windows said.
+; end, and the abort's per-file diagnostics already record what Windows said.
 ;
-; Every round offers all three answers: Yes closes Cockatrice and purges again, No purges
-; again without asking it to close (for when the user closed things by hand), and Cancel
-; gives up. The close stays on offer after one that did nothing because the usual reason is
-; Cockatrice's own confirmation still waiting for an answer - the probe waits for that, the
-; user can answer it in the application's window, and the next round can then collect the
-; process the earlier attempt could not. Each round re-reads the holders, so the prompt
-; names what survived the last attempt rather than repeating the first listing.
+; Every round offers all three answers: Yes ends the programs named and purges again, No
+; purges again without ending anything (for when the user closed things by hand), and
+; Cancel gives up. Each round re-reads the holders, so the prompt names what survived the
+; last attempt rather than repeating the first listing.
 Function RecoverFromHolders
     ${If} $HolderFound != 1
         !insertmacro CockLog "recover-holders: no holder was named, nothing to offer"
         Return
     ${EndIf}
-    rfh_prompt:
-    MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
-        "Files of the previous version of Cockatrice are still in use by:$\r$\n$\r$\n$HolderOutput$\r$\n$\r$\nChoose Yes to close Cockatrice and try the removal again. It may ask you to confirm quitting - it does while a card database update is running, a game is open or a deck is unsaved - so answer that window. Close Oracle, Servatrice and any other program listed above by hand.$\r$\n$\r$\nChoose No to try again after closing the programs yourself, or Cancel to cancel the installation." \
-        IDYES rfh_close IDNO rfh_retry
-    !insertmacro CockLog "recover-holders: declined by user"
-    Return
-    rfh_close:
-    !insertmacro CockLog "recover-holders: closing cockatrice on request, holders were [$HolderOutput]"
-    ; The close is a request, not a fact: CloseHolders waits for the instances it asked to
-    ; exit, so a confirmation of Cockatrice's that is still up is reported as still running
-    ; instead of being measured as a successful close.
+    ; The automatic attempt, the same one the guard makes before it asks anything.
+    !insertmacro CockLog "recover-holders: closing cockatrice, then trying the removal again"
     StrCpy $GuardDir $INSTDIR
     Call CloseHolders
+    Goto rfh_retry
+    rfh_prompt:
+    MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
+        "Files of the previous version of Cockatrice are still in use by:$\r$\n$\r$\n$HolderOutput$\r$\n$\r$\nChoose Yes to end every program listed above. ${END_COST}$\r$\n$\r$\nChoose No to try the removal again after closing them yourself. ${AFTER_CLOSING_GUIDANCE}$\r$\n$\r$\nChoose Cancel to cancel the installation." \
+        IDYES rfh_end IDNO rfh_retry
+    !insertmacro CockLog "recover-holders: cancelled by user"
+    Return
+    ; Only reached through Yes: Return does not come back here.
+    rfh_end:
+    !insertmacro CockLog "recover-holders: ending the payload programs on request, then trying the removal again"
+    Call EndHolders
     rfh_retry:
     Call RetryDllPurge
     StrCpy $StaleRuntimeAfterPurge $R0
@@ -1557,7 +1588,7 @@ Function RecoverFromHolders
         Return
     ${EndIf}
     ; Still stuck: refresh the names, so the next prompt and the log describe what
-    ; survived the close and not what was there before it.
+    ; survived the last attempt and not what was there before it.
     Call LogStaleRuntimeDiagnostics
     ${If} $HolderFound != 1
         Return
@@ -1601,7 +1632,7 @@ Function un.GuardAppsNotRunning
         ; answers that end nothing - the instance's own question, and closing anything by hand
         ; - reachable from the same dialog.
         MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
-            "Cockatrice, Oracle or Servatrice is still using files of the installation:$\r$\n$\r$\n$GuardOutput$\r$\n$\r$\nChoose Yes to end every program listed above. An unsaved deck, a running game or an unwritten setting is lost, Servatrice drops its players, and ending Oracle while it writes the card database can damage it.$\r$\n$\r$\nChoose No to check again after closing them. If Cockatrice is open it has been brought forward behind this window, so answer its confirmation; one in the notification area has to be opened from the tray first. If ending one fails, close it from Task Manager and choose No.$\r$\n$\r$\nChoose Cancel to cancel the uninstallation." \
+            "Cockatrice, Oracle or Servatrice is still using files of the installation:$\r$\n$\r$\n$GuardOutput$\r$\n$\r$\nChoose Yes to end every program listed above. ${END_COST}$\r$\n$\r$\nChoose No to check again after closing them yourself. ${AFTER_CLOSING_GUIDANCE}$\r$\n$\r$\nChoose Cancel to cancel the uninstallation." \
             IDYES un_guard_end IDNO un_guard_check
         !insertmacro CockLogUn "uninst-guard: cancelled by user"
         SetErrorLevel 1
@@ -1925,9 +1956,9 @@ ${If} $StaleRuntimeAfterPurge = 1
     Call LogStaleRuntimeDiagnostics
     ${If} $HolderFound = 1
         ; On /R the previous version is already uninstalled at this point, so an abort
-        ; leaves the user with no working Cockatrice. Offer to close and purge again,
-        ; repeating while the user keeps saying Yes; this updates
-        ; $StaleRuntimeAfterPurge with the last retry's verdict.
+        ; leaves the user with no working Cockatrice. It closes once, then offers to end
+        ; what is left or to try the removal again; this updates $StaleRuntimeAfterPurge
+        ; with the last retry's verdict.
         Call RecoverFromHolders
     ${Else}
         ; Nothing is holding them. The three attempts in RetryDllPurge were two seconds
