@@ -79,6 +79,32 @@ BOOL CALLBACK collectProcessWindow(HWND window, LPARAM parameter)
     return TRUE;
 }
 
+/// Whether a window is one the user could be asked to answer.
+///
+/// Only a framed, non-empty window qualifies. Qt keeps hidden top-level windows of its own
+/// next to the application's: the tray icon creates one to receive the TaskbarCreated
+/// message, styled WS_OVERLAPPED - which is no frame at all - and titled
+/// QTrayIconMessageWindow. Showing one of those puts an empty white rectangle on the
+/// taskbar that nothing ever closes again: it has no window procedure of its own to hide it,
+/// and the process is busy in the loop this is meant to break, so it stays until the process
+/// dies. Posting a close to one is worse than useless too: Qt's tray window answers WM_CLOSE
+/// by asking the application to terminate, without going through the confirmation the close
+/// is supposed to reach.
+bool isAnswerableWindow(HWND window)
+{
+    if ((GetWindowLongPtr(window, GWL_EXSTYLE) & WS_EX_TOOLWINDOW) != 0) {
+        return false;
+    }
+    if ((GetWindowLongPtr(window, GWL_STYLE) & WS_CAPTION) == 0) {
+        return false;
+    }
+    RECT bounds{};
+    if (GetWindowRect(window, &bounds) == FALSE) {
+        return false;
+    }
+    return bounds.right > bounds.left && bounds.bottom > bounds.top;
+}
+
 /// Shows the windows an instance left hidden, and restores the ones it left minimized.
 ///
 /// A window that exists but is not visible is not noise to skip: an instance that answered an
@@ -88,12 +114,14 @@ BOOL CALLBACK collectProcessWindow(HWND window, LPARAM parameter)
 /// is hidden with it. Showing them again is what puts that question back in front of the user,
 /// where answering it is the only way the instance can finish quitting.
 ///
-/// Only tool windows are left alone: they are tooltips and popups, never a question.
+/// Only windows the user could answer are shown - see isAnswerableWindow - so the instance's
+/// own bookkeeping windows stay hidden, and only the application's own windows are counted
+/// in the report.
 unsigned int restoreHiddenWindows(const std::vector<HWND> &windows)
 {
     unsigned int restored = 0;
     for (const HWND window : windows) {
-        if ((GetWindowLongPtr(window, GWL_EXSTYLE) & WS_EX_TOOLWINDOW) != 0) {
+        if (!isAnswerableWindow(window)) {
             continue;
         }
         if (IsWindowVisible(window) == FALSE) {
@@ -116,12 +144,16 @@ struct CloseTarget
     bool modalOpen = false; ///< the window a close would reach is disabled, so a dialog of its own is up
 };
 
+/// Only the windows the user could answer are candidates - see isAnswerableWindow. An
+/// instance left with nothing but Qt's own bookkeeping windows visible has no window to ask:
+/// the caller reports that instead of posting a close the application would answer with a
+/// terminate that skips its own confirmation.
 CloseTarget chooseCloseTarget(const std::vector<HWND> &windows)
 {
     CloseTarget target;
     HWND topmost = nullptr;
     for (const HWND window : windows) {
-        if (IsWindowVisible(window) == FALSE) {
+        if (IsWindowVisible(window) == FALSE || !isAnswerableWindow(window)) {
             continue;
         }
         if (topmost == nullptr) {
@@ -131,10 +163,11 @@ CloseTarget chooseCloseTarget(const std::vector<HWND> &windows)
             target.main = window;
         }
     }
-    target.toRaise = topmost != nullptr ? topmost : (target.main != nullptr ? target.main : windows.front());
+    target.toRaise = topmost != nullptr ? topmost : target.main;
     // A modal dialog disables the windows behind it, so a disabled main window is the
     // instance asking a question of its own.
-    target.modalOpen = IsWindowEnabled(target.main != nullptr ? target.main : target.toRaise) == FALSE;
+    target.modalOpen =
+        target.toRaise != nullptr && IsWindowEnabled(target.main != nullptr ? target.main : target.toRaise) == FALSE;
     return target;
 }
 
@@ -235,6 +268,13 @@ CloseHoldersResult closeCockatriceHolders(const std::vector<Holder> &holders, un
 
         const unsigned int restored = restoreHiddenWindows(search.windows);
         const CloseTarget target = chooseCloseTarget(search.windows);
+        if (target.main == nullptr) {
+            // Nothing but Qt's own bookkeeping windows is left: there is no question to bring
+            // back and no window a close could reach, so the instance is named and left to
+            // the user - the same answer as one that has no window at all.
+            lines.push_back(processLabel(holder) + L" has no window to ask, left to you");
+            continue;
+        }
         std::wstring line = processLabel(holder);
         line += bringForward(target.toRaise) ? L" brought forward" : L" could not be brought forward";
         if (restored == 1) {
