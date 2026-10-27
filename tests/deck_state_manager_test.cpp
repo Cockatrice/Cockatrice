@@ -5,6 +5,9 @@
 
 #include "libcockatrice/card/database/card_database.h"
 
+#include <QCoreApplication>
+#include <QDir>
+#include <QStandardPaths>
 #include <client/settings/cache_settings.h>
 #include <deck_list_model.h>
 #include <gtest/gtest.h>
@@ -12,9 +15,6 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/printing/exact_card.h>
 #include <libcockatrice/deck_list/tree/inner_deck_list_node.h>
-#include <QCoreApplication>
-#include <QDir>
-#include <QStandardPaths>
 
 namespace
 {
@@ -50,7 +50,6 @@ static CardInfoPtr makeToken(QString name)
 {
     return CardInfo::newInstance(name, "", true, {}, {}, {}, {}, {});
 }
-
 
 // =====================================================================================================================
 // addCard
