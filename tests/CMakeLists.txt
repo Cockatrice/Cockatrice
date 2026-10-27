@@ -376,26 +376,6 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
-  deck_state_manager_test
-  SOURCES
-  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/cache_settings.cpp
-  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/card_counter_settings.cpp
-  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/shortcuts_settings.cpp
-  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network/update/client/release_channel.cpp
-  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/deck_editor/deck_state_manager.cpp
-  ${VERSION_STRING_CPP}
-  deck_state_manager_test.cpp
-  LIBS
-  libcockatrice_card
-  libcockatrice_deck_list
-  libcockatrice_models
-  libcockatrice_settings
-  libcockatrice_utility
-  INCLUDE_DIRS
-  ${CMAKE_SOURCE_DIR}/cockatrice/src
-)
-cockatrice_add_test(
-  NAME
   deck_hash_performance_test
   SOURCES
   deck_hash_performance_test.cpp
@@ -490,4 +470,29 @@ endif()
 # a client/UI-capable target is being built.
 if(WITH_ORACLE OR WITH_CLIENT)
   add_subdirectory(picture_loader_benchmark)
+endif()
+
+# deck_state_manager links libcockatrice_settings and libcockatrice_models,
+# which only exists when a client/UI-capable target is being built.
+if(WITH_ORACLE OR WITH_CLIENT)
+  cockatrice_add_test(
+    NAME
+    deck_state_manager_test
+    SOURCES
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/deck_editor/deck_state_manager.cpp
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network/update/client/release_channel.cpp
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/cache_settings.cpp
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/card_counter_settings.cpp
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/shortcuts_settings.cpp
+    ${VERSION_STRING_CPP}
+    deck_state_manager_test.cpp
+    LIBS
+    libcockatrice_card
+    libcockatrice_deck_list
+    libcockatrice_models
+    libcockatrice_settings
+    libcockatrice_utility
+    INCLUDE_DIRS
+    ${CMAKE_SOURCE_DIR}/cockatrice/src
+  )
 endif()
