@@ -45,8 +45,9 @@ enum ExitCode
 ///                     abort dialog/log
 ///   --close-holders  bring the running Cockatrice forward, ask it to close, and wait for
 ///                     it to exit, for the offer to close after a failed purge
-///   --end-holders    end the running Cockatrice and wait for it to be gone, for the last
-///                     resort the guard prompt offers when a close did not free the files
+///   --end-holders    end the running Cockatrice, Oracle and Servatrice and wait for them to
+///                     be gone, for the last resort the guard prompt offers when a close did
+///                     not free the files
 ///
 /// All three answer from two lookups that cover each other's blind spot: the Restart Manager
 /// names whoever has a payload file open, and every process running from the directory is
@@ -161,7 +162,7 @@ int main(int argumentCount, char **arguments)
         return EXIT_HOLDERS_FOUND;
     }
     if (mode == Mode::End) {
-        const EndHoldersResult result = endCockatriceHolders(holders, END_WAIT_MILLISECONDS);
+        const EndHoldersResult result = endHolders(holders, END_WAIT_MILLISECONDS);
         writeLine(result.report);
         return result.ended > 0 ? EXIT_HOLDERS_FOUND : EXIT_NO_HOLDERS;
     }

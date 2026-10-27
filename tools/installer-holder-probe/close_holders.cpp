@@ -1,5 +1,7 @@
 #include "close_holders.h"
 
+#include "restart_manager_holders.h"
+
 // clang-format off
 // windows.h has to come before anything that pulls in a Windows type, as everywhere in
 // this tool.
@@ -310,7 +312,7 @@ CloseHoldersResult closeCockatriceHolders(const std::vector<Holder> &holders, un
     return result;
 }
 
-EndHoldersResult endCockatriceHolders(const std::vector<Holder> &holders, unsigned long waitMilliseconds)
+EndHoldersResult endHolders(const std::vector<Holder> &holders, unsigned long waitMilliseconds)
 {
     EndHoldersResult result;
     std::vector<std::wstring> lines;
@@ -318,13 +320,16 @@ EndHoldersResult endCockatriceHolders(const std::vector<Holder> &holders, unsign
     std::vector<std::size_t> endedLines;
 
     for (const Holder &holder : holders) {
-        if (holder.isService || !isCockatriceImage(holder.imageName)) {
-            // The same split as the close: Oracle writes the card database in place and a
-            // service has nothing to ask, so neither is ever ended here.
+        if (!isPayloadProgram(holder.imageName)) {
+            // Not one of the programs the payload installs: a scanner that has a DLL open, or
+            // a program the user keeps in the install directory. It is named and left to the
+            // user, because ending it would destroy something this installer does not own.
             lines.push_back(processLabel(holder) + L" left to you");
             continue;
         }
 
+        // Services included: the installer asked before getting here, and the Service
+        // Control Manager reports the terminated process as a stopped service afterwards.
         const HANDLE process = OpenProcess(PROCESS_TERMINATE | SYNCHRONIZE, FALSE, holder.processId);
         if (process == nullptr) {
             lines.push_back(processLabel(holder) + L" could not be ended (win32 " + std::to_wstring(GetLastError()) +

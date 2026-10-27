@@ -304,10 +304,10 @@ ${EndIf}
 ;
 ; Then make sure no *other* application instance is still running (and holding
 ; file locks) before the previous version is uninstalled. The probe names them
-; and the user is asked to close them; nothing is ever force-stopped, because
-; Cockatrice may hold an unsaved deck and Oracle writes the card database in
-; place. On /R the old version is about to be removed, so an answer the probe
-; cannot give cancels the upgrade before it starts rather than after it.
+; and the user is asked to close them; nothing is force-stopped without that
+; answer, because Cockatrice may hold an unsaved deck and Oracle writes the card
+; database in place. On /R the old version is about to be removed, so an answer
+; the probe cannot give cancels the upgrade before it starts rather than after it.
 ; Only needed this early for /R, where AutoUninstallIfNeeded runs below; for
 ; interactive installs the section re-checks after the directory page, when
 ; $INSTDIR is the directory the user actually picked.
@@ -794,12 +794,12 @@ FunctionEnd
 ;
 ; Nothing is force-stopped without the user asking for it: Cockatrice may be holding
 ; an unsaved deck or showing a "really leave this game?" confirmation, Oracle writes
-; the card database in place and killing it mid-write would corrupt it, and Servatrice
-; has no window to ask. A close is a request (WM_CLOSE), made automatically once
-; because that is what the user started the installer to do. When it is not answered
-; the user is told which program is in the way and is offered to end Cockatrice
-; themselves - the last resort, with what it costs spelled out, and never applied to
-; Oracle or Servatrice.
+; the card database in place and can be killed mid-write, and Servatrice may be serving
+; a game. A close is a request (WM_CLOSE), made automatically once because that is what
+; the user started the installer to do, and only Cockatrice can answer one - the other
+; two have no window. When the close is not answered the user is told which program is
+; in the way and is offered to end all three themselves - the last resort, with what it
+; costs spelled out in the prompt.
 
 ; Emitted once for the installer and once for the uninstaller: the uninstaller
 ; cannot call installer functions, and its own copy of the probe keeps a running
@@ -839,7 +839,7 @@ FunctionEnd
 ; replaced, plus the processes running from the directory. tools\installer-holder-probe
 ; closes that set by pid, which is why nothing here has to match an executable path. Only
 ; cockatrice.exe is asked: Oracle writes the card database in place and Servatrice has no
-; window, so both stay the user's job, as the prompt says.
+; window to ask, so both are left alone here and only ended by the explicit answer.
 ;
 ; Each instance is brought to the foreground before WM_CLOSE is posted to its main window.
 ; WM_CLOSE is answered, not obeyed - Cockatrice asks before it quits while a card database
@@ -851,9 +851,9 @@ FunctionEnd
 ; log as it stands: it names every holder, including the ones left to the user, so a close
 ; that did nothing can be told apart from one that was never sent.
 ;
-; Never a force-close here: the application decides whether to quit. Ending it is a separate
+; Never a force-close here: the application decides whether to quit. Ending is a separate
 ; answer the guard prompt offers when a close did not free the files, spelled out with what
-; it costs - see EndHolders - and it is only ever applied to cockatrice.exe.
+; it costs - see EndHolders - and it ends every program the payload installs.
 Function ${prefix}CloseHolders
     Call ${prefix}ExtractHolderProbe
     System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$GuardDir")'
@@ -870,13 +870,14 @@ Function ${prefix}CloseHolders
 FunctionEnd
 
 ; usage: set $GuardDir to the directory being replaced, then call this. Ends the running
-; Cockatrice instances the probe names.
+; Cockatrice, Oracle and Servatrice instances the probe names.
 ;
 ; This is the only place anything is stopped without being asked to stop, so it is only
 ; reached after the user picked it from a prompt that says what it costs: a client that is
-; still running may have an unsaved deck, a game or a settings write in flight. The probe
-; ends cockatrice.exe and nothing else - Oracle writes the card database in place and
-; Servatrice is a service, so both stay the user's job, exactly as they do for the close.
+; still running may have an unsaved deck, a game or a settings write in flight, Oracle may
+; be part-way through writing the card database, and Servatrice may be serving a game. The
+; probe ends the three programs the payload installs, services included, and nothing else:
+; a scanner or a program the user keeps in the directory is named and left to the user.
 Function ${prefix}EndHolders
     Call ${prefix}ExtractHolderProbe
     System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$GuardDir")'
@@ -887,7 +888,7 @@ Function ${prefix}EndHolders
     Pop $R4
     Push "end-holders: probe exit=$R3 [$R4]"
     Call ${prefix}CockLogWrite
-    DetailPrint "Ending Cockatrice: $R4"
+    DetailPrint "Ending Cockatrice, Oracle and Servatrice: $R4"
 FunctionEnd
 !macroend
 
@@ -901,9 +902,9 @@ FunctionEnd
 ; the client was still shutting down - never turns into a question. The prompt is what
 ; remains when the close cannot reach everything: Oracle writes the card database in
 ; place, Servatrice has no window, and Cockatrice may still be waiting for an answer in
-; its own confirmation. It offers to end a Cockatrice that is still running (Yes, with
-; what that costs in the text), a plain re-check for after the user closed things by hand
-; (No), and Cancel - ending is the last resort, see EndHolders.
+; its own confirmation. It offers to end every program the guard named (Yes, with what that
+; costs in the text), a plain re-check for after the user closed things by hand (No), and
+; Cancel - ending is the last resort, see EndHolders.
 ;
 ; An error is always shown, in every mode. A /S install without /R has nobody at
 ; the keyboard, but this installer does not promise unattended runs: when an
@@ -940,13 +941,13 @@ Function GuardAppsNotRunning
         ; confirmation of its own, and the close probe leaves such an instance alone so that a
         ; second WM_CLOSE cannot hide the window the question is in - which is how a pre-3.1.2
         ; update used to leave a headless process behind. An instance with no window has
-        ; nothing to ask at all. Offer to end it on this first prompt instead, with what that
-        ; costs in the text, and keep the two answers that end nothing - answering the
-        ; instance's own question, and closing Oracle and Servatrice by hand - reachable from
-        ; the same dialog. Oracle and Servatrice are never ended: Oracle writes the card
-        ; database in place and Servatrice is a service.
+        ; nothing to ask at all. Ending is what is left that can free the files, so the prompt
+        ; offers it here, with what it costs in the text: an unsaved deck, a game, a settings
+        ; write, and an Oracle that may be mid-way through the card database. The answers that
+        ; end nothing stay reachable from the same dialog: the instance's own confirmation,
+        ; and closing anything by hand.
         MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
-            "Cockatrice, Oracle or Servatrice is still using files of the installation:$\r$\n$\r$\n$GuardOutput$\r$\n$\r$\nChoose Yes to end Cockatrice now - an unsaved deck, a running game or a setting it has not written yet will be lost. If Yes leaves it listed, close it from Task Manager and choose No.$\r$\n$\r$\nClose Oracle, Servatrice and any other program listed above by hand - one that is waiting for an answer to a question of its own has been brought forward, so answer that window. Then choose No to check again, or Cancel to cancel the installation." \
+            "Cockatrice, Oracle or Servatrice is still using files of the installation:$\r$\n$\r$\n$GuardOutput$\r$\n$\r$\nChoose Yes to end every program listed above. An unsaved deck, a running game or an unwritten setting is lost, Servatrice drops its players, and ending Oracle while it writes the card database can damage it.$\r$\n$\r$\nChoose No to check again after closing them. If Cockatrice is open it has been brought forward behind this window, so answer its confirmation; one in the notification area has to be opened from the tray first. If ending one fails, close it from Task Manager and choose No.$\r$\n$\r$\nChoose Cancel to cancel the installation." \
             IDYES guard_end IDNO guard_check
         !insertmacro CockLog "guard: cancelled by user"
         StrCpy $AbortReason \
@@ -954,10 +955,11 @@ Function GuardAppsNotRunning
         Call AbortInstall
         ; Only reached through Yes: AbortInstall does not return.
         guard_end:
-        !insertmacro CockLog "guard: ending cockatrice on request, then checking again"
+        !insertmacro CockLog "guard: ending the payload programs on request, then checking again"
         Call EndHolders
-        ; Oracle and Servatrice are never ended, so what is left may still have to be
-        ; closed by hand; go back to the same prompt after the end.
+        ; Everything the payload installs is ended, but a program that could not be opened
+        ; (another account, a protected process) survives, so what is left may still have to
+        ; be closed by hand; go back to the same prompt after the end.
         Goto guard_check
     ${EndIf}
     ; Not an answer at all: the probe was not configured, the Restart Manager
@@ -1594,22 +1596,23 @@ Function un.GuardAppsNotRunning
         DetailPrint "The install directory is in use by: $GuardOutput"
         ; Same approach as in the installer's guard: the automatic close already ran once, and
         ; asking again is unlikely to help an instance that is sitting on its own confirmation
-        ; or has no window a close could reach. Offer to end it on this first prompt instead,
-        ; with what that costs in the text, while keeping the answers that end nothing - the
-        ; instance's own question, and Oracle and Servatrice by hand - reachable from the same
-        ; dialog. Neither is ever ended, so both stay the user's job.
+        ; or has no window a close could reach. Ending is what is left that can free the files,
+        ; so the prompt offers it here, with what it costs in the text, while keeping the
+        ; answers that end nothing - the instance's own question, and closing anything by hand
+        ; - reachable from the same dialog.
         MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
-            "Cockatrice, Oracle or Servatrice is still using files of the installation:$\r$\n$\r$\n$GuardOutput$\r$\n$\r$\nChoose Yes to end Cockatrice now - an unsaved deck, a running game or a setting it has not written yet will be lost. If Yes leaves it listed, close it from Task Manager and choose No.$\r$\n$\r$\nClose Oracle, Servatrice and any other program listed above by hand - one that is waiting for an answer to a question of its own has been brought forward, so answer that window. Then choose No to check again, or Cancel to cancel the uninstallation." \
+            "Cockatrice, Oracle or Servatrice is still using files of the installation:$\r$\n$\r$\n$GuardOutput$\r$\n$\r$\nChoose Yes to end every program listed above. An unsaved deck, a running game or an unwritten setting is lost, Servatrice drops its players, and ending Oracle while it writes the card database can damage it.$\r$\n$\r$\nChoose No to check again after closing them. If Cockatrice is open it has been brought forward behind this window, so answer its confirmation; one in the notification area has to be opened from the tray first. If ending one fails, close it from Task Manager and choose No.$\r$\n$\r$\nChoose Cancel to cancel the uninstallation." \
             IDYES un_guard_end IDNO un_guard_check
         !insertmacro CockLogUn "uninst-guard: cancelled by user"
         SetErrorLevel 1
         Abort
         ; Only reached through Yes: Abort does not return.
         un_guard_end:
-        !insertmacro CockLogUn "uninst-guard: ending cockatrice on request, then checking again"
+        !insertmacro CockLogUn "uninst-guard: ending the payload programs on request, then checking again"
         Call un.EndHolders
-        ; Oracle and Servatrice are never ended, so what is left may still have to be
-        ; closed by hand; go back to the same prompt after the end.
+        ; Everything the payload installs is ended, but a program that could not be opened
+        ; (another account, a protected process) survives, so what is left may still have to
+        ; be closed by hand; go back to the same prompt after the end.
         Goto un_guard_check
     ${EndIf}
     ; Same reasoning as in the installer: without an answer from the probe we cannot tell

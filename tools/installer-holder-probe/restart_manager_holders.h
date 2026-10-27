@@ -22,6 +22,18 @@
 std::vector<std::wstring> collectPayloadFiles(const std::wstring &installDir);
 
 /**
+ * @brief Whether @p imageName is one of the programs the payload installs.
+ *
+ * The single place that answers which images are Cockatrice's own, so the guard ends the
+ * same set it names. Matched case-insensitively on the image name alone: only holders are
+ * ever tested against it, and a holder is a process that has a payload file open or runs
+ * from the install directory.
+ *
+ * @param imageName the file name of a process image, empty when it could not be read.
+ */
+bool isPayloadProgram(const std::wstring &imageName);
+
+/**
  * @brief Names the applications and services that have one of @p files open or mapped.
  *
  * Restart Manager reports both a process that loaded one of the files as a module and
