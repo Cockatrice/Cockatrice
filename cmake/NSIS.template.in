@@ -42,7 +42,9 @@ Var HolderFound
 ; whether the payload is free, while the abort dialog reports what survived.
 Var GuardExit
 Var GuardOutput
-; Whether the guard already asked Cockatrice to close once (see GuardAppsNotRunning)
+; How many closes the guard has asked for: 0 before the automatic one, 1 after it, and one
+; more for every "Yes" at the prompt. From the second one on, the prompt offers to end the
+; instance instead (see GuardAppsNotRunning).
 Var GuardCloseTried
 Var WaitPid
 Var LauncherExited
@@ -391,7 +393,9 @@ StrCpy $OldInstallDir $INSTDIR
 StrCmp $R0 "" done32
 DetailPrint "Removing previous version (32-bit)..."
 Call BackupUserDataBeforeUninstall
-ExecWait '$R0 _?=$OldInstallDir'
+ExecWait '$R0 _?=$OldInstallDir' $R5
+!insertmacro CockLog "uninstall (32-bit): exit=$R5"
+Call WaitForOldPayloadToDisappear
 Call RestoreUserDataAfterUninstall
 
 done32:
@@ -406,12 +410,52 @@ ${If} ${RunningX64}
     StrCmp $R0 "" done64
     DetailPrint "Removing previous version (64-bit)..."
     Call BackupUserDataBeforeUninstall
-    ExecWait '$R0 _?=$OldInstallDir'
+    ExecWait '$R0 _?=$OldInstallDir' $R5
+    !insertmacro CockLog "uninstall (64-bit): exit=$R5"
+    Call WaitForOldPayloadToDisappear
     Call RestoreUserDataAfterUninstall
 
     done64:
 ${EndIf}
 
+FunctionEnd
+
+; Waits for the previous installation's payload to be gone, so the sections below never
+; write into a directory an old uninstaller is still emptying.
+;
+; ExecWait only waits for as long as the uninstaller runs in place: an NSIS uninstaller
+; that did not get a usable _?= copies itself to %TEMP%, starts that copy and exits, so
+; ExecWait returns at once while the copy keeps deleting - and it finishes after this
+; window has closed, removing the version that was just installed. Waiting for
+; cockatrice.exe to disappear covers both cases, and stops with a message instead of
+; installing over a directory that is still being emptied.
+Function WaitForOldPayloadToDisappear
+${If} $OldInstallDir == ""
+    Return
+${EndIf}
+StrCpy $R2 0
+old_uninstall_wait:
+IfFileExists "$OldInstallDir\cockatrice.exe" 0 old_uninstall_gone
+IntOp $R2 $R2 + 1
+${If} $R2 > 60
+    !insertmacro CockLog "old uninstall: $OldInstallDir still holds cockatrice.exe after 30 s"
+    StrCpy $AbortReason \
+        "The previous version in $OldInstallDir is still there after its uninstaller ran.$\r$\n$\r$\nIf that uninstaller was cancelled or reported an error, close anything still using those files and run this installer again."
+    Call AbortInstall
+${EndIf}
+Sleep 500
+Goto old_uninstall_wait
+old_uninstall_gone:
+${If} $R2 > 0
+    ; ExecWait returned while the old payload was still there: that uninstaller
+    ; copied itself to %TEMP%, and the copy is still working through its file list.
+    ; cockatrice.exe is gone before the rest of it, so let the copy settle before
+    ; the sections below start writing files it would otherwise remove.
+    Sleep 1000
+    !insertmacro CockLog "old uninstall: ExecWait returned early, settled 1 s after $R2 * 500 ms"
+${Else}
+    !insertmacro CockLog "old uninstall: $OldInstallDir was already clear when ExecWait returned"
+${EndIf}
 FunctionEnd
 
 ; BackupUserDataBeforeUninstall / RestoreUserDataAfterUninstall
@@ -748,13 +792,15 @@ FunctionEnd
 ; the image lookup matches on the directory a process runs from, so it does not
 ; widen that set.
 ;
-; Nothing is force-stopped anywhere: Cockatrice may be holding an unsaved deck
-; or showing a "really leave this game?" confirmation, Oracle writes the card
-; database in place and killing it mid-write would corrupt it, and Servatrice
+; Nothing is force-stopped without the user asking for it: Cockatrice may be holding
+; an unsaved deck or showing a "really leave this game?" confirmation, Oracle writes
+; the card database in place and killing it mid-write would corrupt it, and Servatrice
 ; has no window to ask. A close is a request (WM_CLOSE), made automatically once
 ; because that is what the user started the installer to do, and again whenever
-; they ask for it from the prompt; when it is not answered the user is told which
-; program is in the way instead of having it killed.
+; they ask for it from the prompt. When it is not answered the user is told which
+; program is in the way, and once a close has been asked for twice without freeing
+; the files they are offered to end Cockatrice themselves - the last resort, with
+; what it costs spelled out, and never applied to Oracle or Servatrice.
 
 ; Emitted once for the installer and once for the uninstaller: the uninstaller
 ; cannot call installer functions, and its own copy of the probe keeps a running
@@ -806,8 +852,9 @@ FunctionEnd
 ; log as it stands: it names every holder, including the ones left to the user, so a close
 ; that did nothing can be told apart from one that was never sent.
 ;
-; Never a force-close: the application decides whether to quit, and one that does not answer
-; is left to the user instead of being killed.
+; Never a force-close here: the application decides whether to quit. Ending it is a separate
+; answer the prompt offers once a close has been asked for twice and ignored, spelled out
+; with what it costs - see EndHolders - and it is only ever applied to cockatrice.exe.
 Function ${prefix}CloseHolders
     Call ${prefix}ExtractHolderProbe
     System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$GuardDir")'
@@ -822,6 +869,27 @@ Function ${prefix}CloseHolders
     Call ${prefix}CockLogWrite
     DetailPrint "Closing Cockatrice: $R4"
 FunctionEnd
+
+; usage: set $GuardDir to the directory being replaced, then call this. Ends the running
+; Cockatrice instances the probe names.
+;
+; This is the only place anything is stopped without being asked to stop, so it is only
+; reached after the user picked it from a prompt that says what it costs: a client that is
+; still running may have an unsaved deck, a game or a settings write in flight. The probe
+; ends cockatrice.exe and nothing else - Oracle writes the card database in place and
+; Servatrice is a service, so both stay the user's job, exactly as they do for the close.
+Function ${prefix}EndHolders
+    Call ${prefix}ExtractHolderProbe
+    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$GuardDir")'
+    ; The probe waits up to 5 s for what it ended to be gone, so the check that follows
+    ; measures a settled directory instead of racing the processes it just terminated.
+    nsExec::ExecToStack /TIMEOUT=20000 '"$PLUGINSDIR\installer-holder-probe.exe" --end-holders'
+    Pop $R3
+    Pop $R4
+    Push "end-holders: probe exit=$R3 [$R4]"
+    Call ${prefix}CockLogWrite
+    DetailPrint "Ending Cockatrice: $R4"
+FunctionEnd
 !macroend
 
 !insertmacro CockHolderProbeFunctions "" install
@@ -835,7 +903,8 @@ FunctionEnd
 ; remains when the close cannot reach everything: Oracle writes the card database in
 ; place, Servatrice has no window, and Cockatrice may still be waiting for an answer in
 ; its own confirmation. It offers one more close (Yes), a plain re-check for after the
-; user closed them by hand (No), and Cancel.
+; user closed them by hand (No), and Cancel. Once a close has been asked for twice without
+; freeing the files, it offers to end Cockatrice instead - the last resort, see EndHolders.
 ;
 ; An error is always shown, in every mode. A /S install without /R has nobody at
 ; the keyboard, but this installer does not promise unattended runs: when an
@@ -867,13 +936,35 @@ Function GuardAppsNotRunning
             Goto guard_check
         ${EndIf}
         DetailPrint "The install directory is in use by: $GuardOutput"
+        ; A close that has been asked for twice and changed nothing is where asking again
+        ; stops being a plan: the instance is either waiting on a question the user has not
+        ; answered, or stuck where a close cannot reach it. Offer to end it - the only thing
+        ; left that can free the files - with the cost in the text, because a client that is
+        ; still running may have an unsaved deck, a game or a settings write in flight.
+        ${If} $GuardCloseTried >= 2
+            MessageBox MB_YESNO|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
+                "Cockatrice is still running after being asked to close twice.$\r$\n$\r$\nChoose Yes to end it now - an unsaved deck, a running game or a setting it has not written yet will be lost - or No to ask it to close again.$\r$\n$\r$\n$GuardOutput" \
+                IDYES guard_end IDNO guard_close
+            !insertmacro CockLog "guard: cancelled by user"
+            StrCpy $AbortReason \
+                "The installation was cancelled because Cockatrice, Oracle or Servatrice is still running and holding files of the previous version.$\r$\n$\r$\nClose them and run the installer again."
+            Call AbortInstall
+            ; Only reached through Yes: AbortInstall does not return.
+            guard_end:
+            !insertmacro CockLog "guard: ending cockatrice on request, then checking again"
+            Call EndHolders
+            ; Back to the ordinary prompt afterwards: Oracle and Servatrice are never ended,
+            ; so what is left may still have to be closed by hand.
+            StrCpy $GuardCloseTried 1
+            Goto guard_check
+        ${EndIf}
         ; Three answers, and the close is one of them: the automatic attempt above ran
         ; before this prompt and could not have answered Cockatrice's own confirmation, so a
         ; second close is often exactly what is needed once the user has dealt with that
         ; window. NSIS does not let a MessageBox relabel its buttons, so the text says what
         ; Yes, No and Cancel do.
         MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
-            "Cockatrice, Oracle or Servatrice is still using files of the installation:$\r$\n$\r$\n$GuardOutput$\r$\n$\r$\nChoose Yes to close Cockatrice and check again. It may ask you to confirm quitting - it does while a card database update is running, a game is open or a deck is unsaved - so answer that window.$\r$\n$\r$\nClose Oracle, Servatrice and any other program listed above by hand. Choose No to check again after that, or Cancel to cancel the installation." \
+            "Cockatrice, Oracle or Servatrice is still using files of the installation:$\r$\n$\r$\n$GuardOutput$\r$\n$\r$\nChoose Yes to close Cockatrice and check again. It may ask you to confirm quitting - it does while a card database update is running, a game is open or a deck is unsaved - so answer that window. If it has no window on screen, open it from the notification area first.$\r$\n$\r$\nClose Oracle, Servatrice and any other program listed above by hand. Choose No to check again after that, or Cancel to cancel the installation." \
             IDYES guard_close IDNO guard_check
         !insertmacro CockLog "guard: cancelled by user"
         StrCpy $AbortReason \
@@ -881,6 +972,7 @@ Function GuardAppsNotRunning
         Call AbortInstall
         ; Only reached through Yes: AbortInstall does not return.
         guard_close:
+        IntOp $GuardCloseTried $GuardCloseTried + 1
         !insertmacro CockLog "guard: closing cockatrice on request, then checking again"
         Call CloseHolders
         Goto guard_check
@@ -1517,16 +1609,33 @@ Function un.GuardAppsNotRunning
             Goto un_guard_check
         ${EndIf}
         DetailPrint "The install directory is in use by: $GuardOutput"
+        ; Same escalation as in the installer's guard: after a second close that changed
+        ; nothing, offer to end the instance, with what it costs in the text.
+        ${If} $GuardCloseTried >= 2
+            MessageBox MB_YESNO|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
+                "Cockatrice is still running after being asked to close twice.$\r$\n$\r$\nChoose Yes to end it now - an unsaved deck, a running game or a setting it has not written yet will be lost - or No to ask it to close again.$\r$\n$\r$\n$GuardOutput" \
+                IDYES un_guard_end IDNO un_guard_close
+            !insertmacro CockLogUn "uninst-guard: cancelled by user"
+            SetErrorLevel 1
+            Abort
+            ; Only reached through Yes: Abort does not return.
+            un_guard_end:
+            !insertmacro CockLogUn "uninst-guard: ending cockatrice on request, then checking again"
+            Call un.EndHolders
+            StrCpy $GuardCloseTried 1
+            Goto un_guard_check
+        ${EndIf}
         ; Same three answers as the installer's guard; the automatic close above already
         ; ran once before this prompt.
         MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
-            "Cockatrice, Oracle or Servatrice is still using files of the installation:$\r$\n$\r$\n$GuardOutput$\r$\n$\r$\nChoose Yes to close Cockatrice and check again. It may ask you to confirm quitting - it does while a card database update is running, a game is open or a deck is unsaved - so answer that window.$\r$\n$\r$\nClose Oracle, Servatrice and any other program listed above by hand. Choose No to check again after that, or Cancel to cancel the uninstallation." \
+            "Cockatrice, Oracle or Servatrice is still using files of the installation:$\r$\n$\r$\n$GuardOutput$\r$\n$\r$\nChoose Yes to close Cockatrice and check again. It may ask you to confirm quitting - it does while a card database update is running, a game is open or a deck is unsaved - so answer that window. If it has no window on screen, open it from the notification area first.$\r$\n$\r$\nClose Oracle, Servatrice and any other program listed above by hand. Choose No to check again after that, or Cancel to cancel the uninstallation." \
             IDYES un_guard_close IDNO un_guard_check
         !insertmacro CockLogUn "uninst-guard: cancelled by user"
         SetErrorLevel 1
         Abort
         ; Only reached through Yes: Abort does not return.
         un_guard_close:
+        IntOp $GuardCloseTried $GuardCloseTried + 1
         !insertmacro CockLogUn "uninst-guard: closing cockatrice on request, then checking again"
         Call un.CloseHolders
         Goto un_guard_check
@@ -1601,7 +1710,10 @@ ${If} $PortableMode = 0
 
     ${If} $ReinstallMode = 0
         MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Cockatrice must be uninstalled before installing the new one." IDOK uninst32
-        Abort
+        ; Abort would only skip this page and install over the old version anyway;
+        ; the message said the old one must go first, so Cancel means cancel.
+        !insertmacro CockLog "componentsPagePre: cancelled at the previous-version prompt"
+        Quit
     ${Else}
         Goto uninst32
     ${EndIf}
@@ -1618,10 +1730,24 @@ ${If} $PortableMode = 0
     StrCpy $OldUninstallString $R0
     Call EnsureOldInstallNotRunning
     StrCpy $OldInstallDir $GuardDir
+    ; Run it silently. The question above is the one the user answered; the
+    ; uninstaller's own confirmation page would be a second one, and that one opens
+    ; behind this window, where nobody can answer it. The installer then looks hung,
+    ; the user clicks Next on it, the new version is installed, and the uninstaller
+    ; removes everything once this window closes. /S leaves no window to be behind,
+    ; so ExecWait is waiting for something that cannot outlive it.
+    ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "QuietUninstallString"
+    ${If} $R1 == ""
+        StrCpy $OldUninstallString "$OldUninstallString /S"
+    ${Else}
+        StrCpy $OldUninstallString $R1
+    ${EndIf}
     !insertmacro CockLog "componentsPagePre: old 32-bit uninstall '$OldUninstallString _?=$OldInstallDir' (oldDir=$OldInstallDir InstDir=$INSTDIR)"
     ClearErrors
     Call BackupUserDataBeforeUninstall
-    ExecWait "$OldUninstallString _?=$OldInstallDir"
+    ExecWait "$OldUninstallString _?=$OldInstallDir" $R5
+    !insertmacro CockLog "componentsPagePre: old 32-bit uninstall exit=$R5"
+    Call WaitForOldPayloadToDisappear
     Call RestoreUserDataAfterUninstall
 
 	done32:
@@ -1635,7 +1761,8 @@ ${If} $PortableMode = 0
 
 	    ${If} $ReinstallMode = 0
             MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Cockatrice must be uninstalled before installing the new one." IDOK uninst64
-            Abort
+            !insertmacro CockLog "componentsPagePre: cancelled at the previous-version prompt"
+            Quit
         ${Else}
             Goto uninst64
         ${EndIf}
@@ -1644,10 +1771,19 @@ ${If} $PortableMode = 0
 	    StrCpy $OldUninstallString $R0
 	    Call EnsureOldInstallNotRunning
 	    StrCpy $OldInstallDir $GuardDir
+	    ; Silent, for the reason given in the 32-bit branch above.
+	    ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "QuietUninstallString"
+	    ${If} $R1 == ""
+	        StrCpy $OldUninstallString "$OldUninstallString /S"
+	    ${Else}
+	        StrCpy $OldUninstallString $R1
+	    ${EndIf}
 	    !insertmacro CockLog "componentsPagePre: old 64-bit uninstall '$OldUninstallString _?=$OldInstallDir' (oldDir=$OldInstallDir InstDir=$INSTDIR)"
 	    ClearErrors
 	    Call BackupUserDataBeforeUninstall
-	    ExecWait "$OldUninstallString _?=$OldInstallDir"
+	    ExecWait "$OldUninstallString _?=$OldInstallDir" $R5
+	    !insertmacro CockLog "componentsPagePre: old 64-bit uninstall exit=$R5"
+	    Call WaitForOldPayloadToDisappear
 	    Call RestoreUserDataAfterUninstall
 
 		done64:
