@@ -22,8 +22,27 @@ constexpr std::size_t MAX_PROBED_FILES = 2000;
 /// How deep the Plugins walk goes. Its real shape is Plugins\<category>\<plugin>.dll.
 constexpr int MAX_PLUGIN_DEPTH = 4;
 
+/// How many parents askingProcessIds() walks up before it stops on its own. A real chain
+/// is the probe, the installer or uninstaller, and the shell that started it; the bound
+/// only keeps a snapshot with a cycle in it from walking forever.
+constexpr int MAX_ASKER_LEVELS = 8;
+
 /// The payload files the installer replaces by name; the DLLs are matched by mask below.
 constexpr const wchar_t *PAYLOAD_FILES[] = {L"cockatrice.exe", L"oracle.exe", L"servatrice.exe", L"qt.conf"};
+
+/// The payload programs, by image name. A process running one of these is what the guard
+/// exists to name, so askingProcessIds() stops its walk up the parent chain at one.
+constexpr const wchar_t *PAYLOAD_PROGRAMS[] = {L"cockatrice.exe", L"oracle.exe", L"servatrice.exe"};
+
+bool isPayloadProgram(const std::wstring &imageName)
+{
+    for (const wchar_t *program : PAYLOAD_PROGRAMS) {
+        if (CompareStringOrdinal(imageName.c_str(), -1, program, -1, TRUE) == CSTR_EQUAL) {
+            return true;
+        }
+    }
+    return false;
+}
 
 void collectFilesOf(const std::wstring &directory, int depth, int maxDepth, std::vector<std::wstring> &files)
 {
@@ -214,6 +233,45 @@ unsigned long findProcessesUsingFiles(const std::vector<std::wstring> &files, st
     return error;
 }
 
+std::vector<unsigned long> askingProcessIds()
+{
+    std::vector<unsigned long> asking;
+    asking.push_back(GetCurrentProcessId());
+
+    // One snapshot for the whole walk: the parent ids come from it, so a level costs no
+    // second lookup.
+    std::vector<PROCESSENTRY32W> processes;
+    const HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (snapshot == INVALID_HANDLE_VALUE) {
+        return asking;
+    }
+    PROCESSENTRY32W entry{};
+    entry.dwSize = sizeof(entry);
+    if (Process32FirstW(snapshot, &entry) != FALSE) {
+        do {
+            processes.push_back(entry);
+        } while (Process32NextW(snapshot, &entry) != FALSE);
+    }
+    CloseHandle(snapshot);
+
+    unsigned long current = asking.back();
+    for (int level = 0; level < MAX_ASKER_LEVELS; ++level) {
+        const auto named = std::find_if(processes.begin(), processes.end(), [current](const PROCESSENTRY32W &process) {
+            return process.th32ProcessID == current;
+        });
+        if (named == processes.end() || named->th32ParentProcessID == 0) {
+            break;
+        }
+        const unsigned long parent = named->th32ParentProcessID;
+        if (isPayloadProgram(fileNameOf(imagePathOf(parent)))) {
+            break;
+        }
+        asking.push_back(parent);
+        current = parent;
+    }
+    return asking;
+}
+
 std::vector<Holder> findProcessesRunningFrom(const std::wstring &installDir)
 {
     std::vector<Holder> holders;
@@ -222,10 +280,10 @@ std::vector<Holder> findProcessesRunningFrom(const std::wstring &installDir)
     }
 
     const std::wstring prefix = directoryPrefixOf(installDir);
-    // Never the probe itself: it runs from the directory being replaced when the
-    // uninstaller asks in place or the installer was copied next to the payload, and
-    // naming it would ask the user to close the process that is doing the asking.
-    const DWORD self = GetCurrentProcessId();
+    // Never the probe, and never the installer or uninstaller that started it: either can
+    // run from the directory being replaced, and naming one asks the user to close the
+    // program that is asking (see askingProcessIds).
+    const std::vector<unsigned long> asking = askingProcessIds();
 
     const HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (snapshot == INVALID_HANDLE_VALUE) {
@@ -235,7 +293,7 @@ std::vector<Holder> findProcessesRunningFrom(const std::wstring &installDir)
     entry.dwSize = sizeof(entry);
     if (Process32FirstW(snapshot, &entry) != FALSE) {
         do {
-            if (entry.th32ProcessID == self) {
+            if (std::find(asking.begin(), asking.end(), entry.th32ProcessID) != asking.end()) {
                 continue;
             }
             // One process at a time, because the path is per process; a process that

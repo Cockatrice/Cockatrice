@@ -52,9 +52,30 @@ unsigned long findProcessesUsingFiles(const std::vector<std::wstring> &files, st
  * database server next to a Cockatrice install) is never named.
  *
  * @param installDir the directory being replaced, as a full path.
- * @return one entry per process running from it, in snapshot order, without the probe
- *         itself; empty when the directory is empty or no process runs from it.
+ * @return one entry per process running from it, in snapshot order, without the processes
+ *         named by askingProcessIds(); empty when the directory is empty or no process
+ *         runs from it.
  */
 std::vector<Holder> findProcessesRunningFrom(const std::wstring &installDir);
+
+/**
+ * @brief The processes that must never be named as holders: the probe and the ones that
+ *        started it.
+ *
+ * The installer or uninstaller doing the asking can legitimately run from the directory it
+ * is replacing - the old uninstaller is started with _?= so it stays in $INSTDIR, and an
+ * installer can be downloaded into the folder - and naming it asks the user to close the
+ * program that is asking. That cannot be answered: the close skips it, the end offer skips
+ * it, and the guard loops until the user cancels, which is what a run that named itself
+ * did.
+ *
+ * The walk up the parent chain stops at the first program the payload installs, because in
+ * an in-app update the installer's own parent is the Cockatrice instance being replaced -
+ * the one the guard exists to name.
+ *
+ * @return process ids, the probe first, then its ancestors while they are not payload
+ *         programs; only the probe itself when the snapshot fails.
+ */
+std::vector<unsigned long> askingProcessIds();
 
 #endif

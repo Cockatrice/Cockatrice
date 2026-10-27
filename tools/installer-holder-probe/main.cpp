@@ -119,10 +119,17 @@ int main(int argumentCount, char **arguments)
     // to close, and the Restart Manager may not name any of them (see
     // findProcessesRunningFrom). The file holders follow, deduplicated by process, so an
     // instance that both runs from the directory and holds a payload file is named once.
+    // Neither lookup may name the probe or the process that started it, whichever one found
+    // it: an installer or uninstaller running from the directory it is replacing would
+    // otherwise be named as a holder, and closing it is a request nobody can answer.
     std::vector<Holder> holders = findProcessesRunningFrom(installDir);
+    const std::vector<unsigned long> asking = askingProcessIds();
     std::vector<Holder> fileHolders;
     const unsigned long error = findProcessesUsingFiles(collectPayloadFiles(installDir), fileHolders);
     for (const Holder &holder : fileHolders) {
+        if (std::find(asking.begin(), asking.end(), holder.processId) != asking.end()) {
+            continue;
+        }
         const bool alreadyNamed = std::any_of(holders.begin(), holders.end(), [&holder](const Holder &named) {
             return named.processId == holder.processId;
         });
