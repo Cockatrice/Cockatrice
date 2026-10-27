@@ -20,6 +20,7 @@
 #include <QVariant>
 #include <QVariantMap>
 #include <QtGlobal>
+#include <libcockatrice/network/network_manager.h>
 #include <optional>
 #include <qnamespace.h>
 #include <qprocessordetection.h>
@@ -62,7 +63,7 @@ std::optional<int> getProductVersionMajor()
 
 } // namespace
 
-ReleaseChannel::ReleaseChannel() : netMan(new QNetworkAccessManager(this)), response(nullptr), lastRelease(nullptr)
+ReleaseChannel::ReleaseChannel() : netMan(NetworkManagerFactory::create(this)), response(nullptr), lastRelease(nullptr)
 {
 }
 

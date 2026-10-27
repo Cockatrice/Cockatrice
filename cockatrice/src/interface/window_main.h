@@ -194,7 +194,17 @@ private:
     LagMonitor lagMonitor;                        ///< watches the main thread for event loop stalls
     LatencyStatusWidget *latencyStatus = nullptr; ///< status bar widget with live round-trip stats and history graph
     bool bHasActivated, askedForDbUpdater;
-    bool bClosingDown = false; ///< guards closeEvent() against re-entrancy
+    /**
+     * How far a shutdown that was asked for has got. A close request that arrives while one is
+     * already asking the user something must not be accepted - see closeEvent().
+     */
+    enum class ShutdownState
+    {
+        Idle,       ///< no shutdown has been asked for
+        Confirming, ///< asking about a card database update, open games or an unsaved deck
+        Accepted,   ///< the close was accepted and the window is hiding
+    };
+    ShutdownState shutdownState = ShutdownState::Idle;
     bool skipStartupAutoConnect = false;
     bool startupAutoConnectAttempted = false;
     bool firstRunWizardActive = false;

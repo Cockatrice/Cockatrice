@@ -16,6 +16,7 @@
 #include <QString>
 #include <QStringList>
 #include <QWidget>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qtmetamacros.h>
 
 class QFrame;
@@ -131,13 +132,9 @@ protected:
                 // If popup is not open, forward event to parent scroll area
                 if (!combo->view()->isVisible()) {
                     // Try to find a scrollable parent and manually send the event
-                    QWidget *parent = combo->parentWidget();
-                    while (parent) {
-                        if (auto *scroll = qobject_cast<QAbstractScrollArea *>(parent)) {
-                            QApplication::sendEvent(scroll->viewport(), event);
-                            return true; // Mark event as handled
-                        }
-                        parent = parent->parentWidget();
+                    if (auto *scroll = QtUtils::findParentOfType<QAbstractScrollArea>(combo)) {
+                        QApplication::sendEvent(scroll->viewport(), event);
+                        return true; // Mark event as handled
                     }
                     // If no scrollable parent found, just block
                     return true;

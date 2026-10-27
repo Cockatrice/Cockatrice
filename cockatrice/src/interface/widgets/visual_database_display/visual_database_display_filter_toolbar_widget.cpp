@@ -29,6 +29,7 @@
 #include <QVariant>
 #include <QWidget>
 #include <QtGlobal>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 class DeckListModel;
@@ -110,14 +111,10 @@ VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidg
 
 void VisualDatabaseDisplayFilterToolbarWidget::initialize()
 {
-    auto sortLayout = new QHBoxLayout(sortGroupBox);
-    sortLayout->setContentsMargins(0, 0, 0, 0);
-    sortLayout->setSpacing(0);
+    auto sortLayout = QtUtils::makeLayout<QHBoxLayout>(sortGroupBox, 0);
     sortLayout->setAlignment(Qt::AlignLeft);
 
-    auto filterLayout = new QHBoxLayout(filterGroupBox);
-    filterLayout->setContentsMargins(0, 0, 0, 0);
-    filterLayout->setSpacing(2);
+    auto filterLayout = QtUtils::makeLayout<QHBoxLayout>(filterGroupBox, 2);
     filterLayout->setAlignment(Qt::AlignLeft);
 
     // create settings widgets

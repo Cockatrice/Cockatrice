@@ -24,6 +24,7 @@
 #include <QVariant>
 #include <QWidget>
 #include <QtGlobal>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 #include <version_string.h>
 
@@ -241,9 +242,7 @@ void ArchidektApiResponseDeckEntryDisplayWidget::updateScaledPreview()
 void ArchidektApiResponseDeckEntryDisplayWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-    layout->invalidate();
-    layout->activate();
-    layout->update();
+    QtUtils::relayout(layout);
 }
 
 void ArchidektApiResponseDeckEntryDisplayWidget::actRequestNavigationToDeck()

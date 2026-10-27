@@ -239,7 +239,7 @@ public:
      */
     [[nodiscard]] bool getIsKnownIgnored() const
     {
-        return longName.length() + setType.length() + releaseDate.toString().length() == 0;
+        return longName.isEmpty() && setType.isEmpty() && !releaseDate.isValid();
     }
 };
 

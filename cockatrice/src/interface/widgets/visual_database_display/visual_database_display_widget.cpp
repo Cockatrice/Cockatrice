@@ -54,6 +54,7 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/tree/inner_deck_list_node.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <utility>
 
 class QMouseEvent;
@@ -92,10 +93,8 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     // Set up main layout and widgets
     setMinimumSize(0, 0);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    mainLayout = new QVBoxLayout(this);
+    mainLayout = QtUtils::makeLayout<QVBoxLayout>(this, 0, 1);
     setLayout(mainLayout);
-    mainLayout->setSpacing(1);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarPolicy::ScrollBarAsNeeded);
     cardSizeWidget = new CardSizeWidget(this, flowWidget,
@@ -117,7 +116,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     setFocusProxy(searchEdit);
     setFocusPolicy(Qt::ClickFocus);
 
-    displayModeButton = new QPushButton(tr("Visual"), this);
+    displayModeButton = new QPushButton(this);
     displayModeButton->setCheckable(true); // Toggle button
 
     connect(displayModeButton, &QPushButton::toggled, this, &VisualDatabaseDisplayWidget::onDisplayModeChanged);
@@ -263,11 +262,20 @@ void VisualDatabaseDisplayWidget::retranslateUi()
 {
     databaseLoadIndicator->setText(tr("Loading database ..."));
     clearFilterWidget->setToolTip(tr("Clear all filters"));
+    searchEdit->setPlaceholderText(tr("Search by card name (or search expressions)"));
+    updateDisplayModeButton();
+    colorFilterWidget->retranslateUi();
+    filterContainer->retranslateUi();
 }
 
 void VisualDatabaseDisplayWidget::highlightAllSearchEdit()
 {
     searchEdit->setSelection(0, searchEdit->text().length());
+}
+
+void VisualDatabaseDisplayWidget::updateDisplayModeButton()
+{
+    displayModeButton->setText(displayModeButton->isChecked() ? tr("Table") : tr("Visual"));
 }
 
 void VisualDatabaseDisplayWidget::resizeEvent(QResizeEvent *event)
@@ -278,16 +286,15 @@ void VisualDatabaseDisplayWidget::resizeEvent(QResizeEvent *event)
 
 void VisualDatabaseDisplayWidget::onDisplayModeChanged(bool checked)
 {
+    updateDisplayModeButton();
     if (checked) {
         // Table mode
-        displayModeButton->setText(tr("Table"));
         flowWidget->setVisible(false);
         cardSizeWidget->setVisible(false);
         databaseView->setItemDelegate(new QStyledItemDelegate(databaseView));
         databaseView->setVisible(true);
     } else {
         // Visual mode
-        displayModeButton->setText(tr("Visual"));
         flowWidget->setVisible(true);
         cardSizeWidget->setVisible(true);
         databaseView->setVisible(false);
@@ -432,10 +439,11 @@ void VisualDatabaseDisplayWidget::loadPage(int start, int end)
 
         if (CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(name.toString())) {
             if (!setFilters.empty()) {
-                SetToPrintingsMap setMap = info->getSets();
+                const auto &setMap = info->getSets();
                 for (const CardFilter *setFilter : setFilters) {
-                    if (setMap.contains(setFilter->term())) {
-                        for (PrintingInfo printing : setMap[setFilter->term()]) {
+                    const auto it = setMap.constFind(setFilter->term());
+                    if (it != setMap.constEnd()) {
+                        for (const PrintingInfo &printing : it.value()) {
                             addCardToDisplay(ExactCard(info, printing));
                         }
                     }

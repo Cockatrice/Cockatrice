@@ -31,6 +31,7 @@
 #include <functional>
 #include <libcockatrice/card/import/card_name_normalizer.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qlogging.h>
 #include <qnamespace.h>
 
@@ -66,10 +67,7 @@ ArchidektApiResponseDeckDisplayWidget::ArchidektApiResponseDeckDisplayWidget(QWi
     connect(displayOptionsWidget, &VisualDeckDisplayOptionsWidget::groupCriteriaChanged, this,
             &ArchidektApiResponseDeckDisplayWidget::onGroupCriteriaChange);
 
-    scrollArea = new QScrollArea(this);
-    scrollArea->setWidgetResizable(true);
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    scrollArea = QtUtils::makeScrollArea(this);
 
     layout->addWidget(scrollArea);
 
@@ -240,7 +238,5 @@ void ArchidektApiResponseDeckDisplayWidget::constructZoneWidgetsFromDeckListMode
 void ArchidektApiResponseDeckDisplayWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-    layout->invalidate();
-    layout->activate();
-    layout->update();
+    QtUtils::relayout(layout);
 }

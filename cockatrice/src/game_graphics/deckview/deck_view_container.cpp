@@ -43,6 +43,7 @@
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <optional>
 #include <qnamespace.h>
@@ -111,10 +112,9 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     connect(deckView, &DeckView::newCardAdded, this, &DeckViewContainer::newCardAdded);
     connect(deckView, &DeckView::sideboardPlanChanged, this, &DeckViewContainer::sideboardPlanChanged);
 
-    deckViewLayout = new QVBoxLayout;
+    deckViewLayout = QtUtils::makeLayout<QVBoxLayout>();
     deckViewLayout->addLayout(buttonHBox);
     deckViewLayout->addWidget(deckView);
-    deckViewLayout->setContentsMargins(0, 0, 0, 0);
     setLayout(deckViewLayout);
 
     retranslateUi();
@@ -442,9 +442,7 @@ void DeckViewContainer::readyStart()
 void DeckViewContainer::forceStart()
 {
     const auto msg = tr("Are you sure you want to force start?\nThis will kick all non-ready players from the game.");
-    const auto res =
-        QMessageBox::question(this, tr("Cockatrice"), msg, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-    if (res == QMessageBox::No) {
+    if (!QtUtils::confirm(this, tr("Cockatrice"), msg, QMessageBox::Yes)) {
         return;
     }
 

@@ -268,7 +268,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                         if (attrs.hasAttribute("rarity")) {
                             printingProps.insert("rarity", attrs.value("rarity").toString());
                         }
-                        PrintingInfo setInfo(set, LazyPropertiesHash(printingProps));
+                        PrintingInfo setInfo(set, LazyPropertiesHash::serializedFrom(printingProps));
                         _sets[setName].append(setInfo);
                     }
                     // related cards
@@ -325,8 +325,9 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                                                  .landscapeOrientation = landscapeOrientation,
                                                  .tableRow = tableRow,
                                                  .upsideDownArt = upsideDown};
-            CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards,
-                                                        reverseRelatedCards, _sets, attributes);
+            CardInfoPtr newCard =
+                CardInfo::newInstance(name, text, isToken, LazyPropertiesHash::serialize(properties), relatedCards,
+                                      reverseRelatedCards, _sets, attributes, {}, {}, true);
             if (targetData) {
                 if (auto existing = targetData->cards.value(name)) {
                     for (const auto &printings : newCard->getSets()) {
@@ -401,7 +402,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     }
 
     // sets
-    const SetToPrintingsMap setMap = info->getSets();
+    const auto &setMap = info->getSets();
     for (const auto &printings : setMap) {
         for (const PrintingInfo &set : printings) {
             xml.writeStartElement("set");

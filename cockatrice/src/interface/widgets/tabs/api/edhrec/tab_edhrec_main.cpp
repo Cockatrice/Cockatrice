@@ -32,6 +32,7 @@
 #include <libcockatrice/models/database/card/card_search_model.h>
 #include <libcockatrice/models/database/card_database_display_model.h>
 #include <libcockatrice/models/database/card_database_model.h>
+#include <libcockatrice/network/network_manager.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <version_string.h>
 
@@ -44,8 +45,7 @@ static bool canBeCommander(const CardInfoPtr &cardInfo)
 
 TabEdhRecMain::TabEdhRecMain(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 {
-    networkManager = new QNetworkAccessManager(this);
-    networkManager->setTransferTimeout(); // Use Qt's default timeout
+    networkManager = NetworkManagerFactory::create(this);
     networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
     connect(networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(processApiJson(QNetworkReply *)));
 

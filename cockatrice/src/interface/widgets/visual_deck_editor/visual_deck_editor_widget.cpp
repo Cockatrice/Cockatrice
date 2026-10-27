@@ -42,6 +42,7 @@
 #include <libcockatrice/models/database/card_database_model.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
@@ -188,13 +189,8 @@ void VisualDeckEditorWidget::initializeDisplayOptionsAndSearchWidget()
 
 void VisualDeckEditorWidget::initializeScrollAreaAndZoneContainer()
 {
-    scrollArea = new QScrollArea(this);
-    scrollArea->setWidgetResizable(true);
+    scrollArea = QtUtils::makeScrollArea(this);
     scrollArea->setMinimumSize(0, 0);
-
-    // Set scrollbar policies
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
     zoneContainer = new QWidget(scrollArea);
     zoneContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

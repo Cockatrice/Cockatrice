@@ -28,6 +28,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QtGlobal>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 ResizablePanel::ResizablePanel(const QString &_typeId, AbstractAnalyticsPanelWidget *analyticsPanel, QWidget *parent)
@@ -35,18 +36,14 @@ ResizablePanel::ResizablePanel(const QString &_typeId, AbstractAnalyticsPanelWid
 {
     setAcceptDrops(true);
 
-    auto *mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
-    mainLayout->setSpacing(0);
+    auto *mainLayout = QtUtils::makeLayout<QVBoxLayout>(this, 0);
 
     // Frame for selection highlight
     frame = new QFrame(this);
     frame->setFrameShape(QFrame::Box);
     frame->setLineWidth(2);
 
-    auto *frameLayout = new QVBoxLayout(frame);
-    frameLayout->setContentsMargins(0, 0, 0, 0);
-    frameLayout->setSpacing(0);
+    auto *frameLayout = QtUtils::makeLayout<QVBoxLayout>(frame, 0);
 
     // Add the analytics panel
     frameLayout->addWidget(analyticsPanel);
@@ -63,9 +60,7 @@ ResizablePanel::ResizablePanel(const QString &_typeId, AbstractAnalyticsPanelWid
 
     // Bottom bar with drag button and resize handle
     auto *bottomBar = new QWidget(frame);
-    auto *bottomLayout = new QHBoxLayout(bottomBar);
-    bottomLayout->setContentsMargins(0, 0, 0, 0);
-    bottomLayout->setSpacing(0);
+    auto *bottomLayout = QtUtils::makeLayout<QHBoxLayout>(bottomBar, 0);
 
     // Drag button on the left
     dragButton = new QPushButton("☰", bottomBar);

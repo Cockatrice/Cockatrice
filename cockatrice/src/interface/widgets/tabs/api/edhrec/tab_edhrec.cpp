@@ -18,14 +18,14 @@
 #include <QRegularExpression>
 #include <QSharedPointer>
 #include <QUrl>
+#include <libcockatrice/network/network_manager.h>
 #include <qlogging.h>
 
 class TabSupervisor;
 
 TabEdhRec::TabEdhRec(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 {
-    networkManager = new QNetworkAccessManager(this);
-    networkManager->setTransferTimeout(); // Use Qt's default timeout
+    networkManager = NetworkManagerFactory::create(this);
     networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
     connect(networkManager, &QNetworkAccessManager::finished, this, &TabEdhRec::processApiJson);
 }

@@ -54,6 +54,11 @@ void ServerLogger::startLog(const QString &logFileName)
     connect(this, SIGNAL(sigFlushBuffer()), this, SLOT(flushBuffer()), Qt::QueuedConnection);
 }
 
+bool ServerLogger::isLoggingEnabled() const
+{
+    return logFile != nullptr && settingsCache->value("server/writelog", 1).toBool();
+}
+
 void ServerLogger::logMessage(const QString &message, void *caller)
 {
     if (!logFile) {

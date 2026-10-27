@@ -1,6 +1,7 @@
 #include "libcockatrice/card/database/card_database.h"
 #include "libcockatrice/card/database/card_database_loader.h"
 #include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
 #include "libcockatrice/card/set/card_set.h"
 #include "libcockatrice/card/set/card_set_list.h"
 #include "test_card_database_path_provider.h"
@@ -25,10 +26,12 @@
 #include <libcockatrice/card/database/parser/cockatrice_xml_4.h>
 #include <libcockatrice/card/lazy_properties_hash.h>
 #include <libcockatrice/card/printing/printing_info.h>
+#include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/interfaces/interface_card_database_path_provider.h>
 #include <libcockatrice/interfaces/interface_card_set_priority_controller.h>
 #include <libcockatrice/interfaces/noop_card_preference_provider.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
+#include <libcockatrice/utility/card_ref.h>
 #include <string>
 
 namespace
@@ -60,6 +63,94 @@ TEST(CardDatabaseTest, LoadXml)
     ASSERT_EQ(NotLoaded, db->getLoadStatus()) << "Incorrect status after clear";
 }
 
+TEST(CardDatabaseTest, LazyPropertiesHashStreamsBlobAccessors)
+{
+    QHash<QString, QString> props;
+    props.insert("manacost", "1R");
+    props.insert("colors", "R");
+    props.insert("format-standard", "legal");
+
+    LazyPropertiesHash lazy = LazyPropertiesHash::serializedFrom(props);
+    const QByteArray blob = lazy.serialized();
+
+    EXPECT_EQ(3, lazy.size());
+    EXPECT_FALSE(lazy.isEmpty());
+    EXPECT_TRUE(lazy.contains("colors"));
+    EXPECT_FALSE(lazy.contains("missing"));
+    EXPECT_EQ("1R", lazy.value("manacost"));
+    EXPECT_EQ(QString(), lazy.value("missing"));
+    EXPECT_EQ(blob, lazy.serialized()) << "an untouched blob must be passed through unchanged";
+
+    QStringList keys = lazy.keys();
+    keys.sort();
+    QStringList expectedKeys = props.keys();
+    expectedKeys.sort();
+    EXPECT_EQ(expectedKeys, keys);
+
+    // Mutating materializes the hash, after which every accessor keeps working.
+    EXPECT_TRUE(lazy.insert("loyalty", "3"));
+    EXPECT_FALSE(lazy.insert("loyalty", "3"));
+    EXPECT_EQ(4, lazy.size());
+    EXPECT_EQ("3", lazy.value("loyalty"));
+    EXPECT_TRUE(lazy.contains("loyalty"));
+
+    LazyPropertiesHash roundTrip(lazy.serialized());
+    EXPECT_EQ(4, roundTrip.size());
+    EXPECT_EQ("3", roundTrip.value("loyalty"));
+    EXPECT_EQ("legal", roundTrip.value("format-standard"));
+}
+
+TEST(CardDatabaseTest, GuessCardWithProviderIdOnUnknownCardReturnsEmpty)
+{
+    // An unknown name plus a providerId used to dereference the missing card
+    // inside findPrintingWithId(); the lookup must come back empty instead.
+    NoopCardPreferenceProvider prefs;
+    TestCardDatabasePathProvider pathProvider;
+    NoopCardSetPriorityController controller;
+    CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
+
+    const ExactCard guessed = db.query()->guessCard({"Not a Card", "card_Not a Card_fixture"});
+
+    EXPECT_TRUE(guessed.isEmpty());
+    EXPECT_FALSE(guessed);
+}
+
+TEST(CardDatabaseTest, FindPrintingWithIdOnNullCardInfoReturnsEmpty)
+{
+    NoopCardPreferenceProvider prefs;
+    TestCardDatabasePathProvider pathProvider;
+    NoopCardSetPriorityController controller;
+    CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
+
+    EXPECT_TRUE(db.query()->findPrintingWithId(nullptr, "card_Not a Card_fixture").isEmpty());
+}
+
+TEST(CardInfoTest, ClearDirectRelationsDropsRawPointers)
+{
+    auto *forward = new CardRelation("Child");
+    auto *reverse = new CardRelation("Parent");
+    auto *toMe = new CardRelation("Child");
+
+    auto card = CardInfo::newInstance("Parent", "", false, QHash<QString, QString>(), {forward}, {reverse},
+                                      SetToPrintingsMap(), CardInfo::UiAttributes());
+    card->addReverseRelatedCards2Me(toMe);
+    ASSERT_EQ(1, card->getRelatedCards().size());
+    ASSERT_EQ(1, card->getReverseRelatedCards().size());
+    ASSERT_EQ(1, card->getReverseRelatedCards2Me().size());
+    ASSERT_EQ(2, card->getAllRelatedCards().size());
+
+    card->clearDirectRelations();
+
+    EXPECT_TRUE(card->getRelatedCards().isEmpty());
+    EXPECT_TRUE(card->getReverseRelatedCards().isEmpty());
+    EXPECT_TRUE(card->getReverseRelatedCards2Me().isEmpty());
+    EXPECT_TRUE(card->getAllRelatedCards().isEmpty());
+
+    delete forward;
+    delete reverse;
+    delete toMe;
+}
+
 TEST(CardDatabaseTest, Xml4LocalizedDataRoundTrip)
 {
     NoopCardSetPriorityController controller;
@@ -77,6 +168,8 @@ TEST(CardDatabaseTest, Xml4LocalizedDataRoundTrip)
         CardInfo::newInstance("Lightning Bolt", "Deal 3 damage.", false, {}, {}, {}, setsInfo, attributes);
     card->setLocalizedName("de", "Blitzschlag");
     card->setLocalizedText("de", "Blitzschlag fügt 3 Schadenspunkte zu.");
+    card->setProperty("format-standard", "legal");
+    card->setProperty("colors", "R");
 
     SetNameMap sets;
     sets.insert("TST", set);
@@ -100,6 +193,13 @@ TEST(CardDatabaseTest, Xml4LocalizedDataRoundTrip)
     ASSERT_EQ(loaded->getLocalizedName("de"), "Blitzschlag");
     ASSERT_EQ(loaded->getLocalizedText("de"), "Blitzschlag fügt 3 Schadenspunkte zu.");
     ASSERT_EQ(loaded->getLocalizedText("fr"), "Deal 3 damage.");
+    ASSERT_EQ(loaded->getProperty("format-standard"), "legal");
+    ASSERT_TRUE(loaded->hasProperty("colors"));
+    ASSERT_EQ(loaded->getProperties().size(), 2);
+
+    const QList<PrintingInfo> printings = loaded->getSets().value("TST");
+    ASSERT_FALSE(printings.isEmpty());
+    ASSERT_EQ(printings.first().getProperty("manacost"), "1R");
 }
 
 /**

@@ -53,13 +53,10 @@ QString readString(QDataStream &in)
 // Stores a QHash<QString, QString> as a single pre-serialized blob. The reader keeps the
 // blob as-is and materializes the QHash<QString, QString> lazily on first query, which is
 // what removes the allocation storm from database load (see card_info.cpp /
-// printing_info.cpp).
-void writeHashBlob(QDataStream &out, const QHash<QString, QString> &h)
+// printing_info.cpp). Writing the already-serialized blob also keeps cache writes from
+// materializing every card's property hash.
+void writeBlob(QDataStream &out, const QByteArray &blob)
 {
-    QByteArray blob;
-    QDataStream blobOut(&blob, QIODevice::WriteOnly);
-    blobOut.setVersion(QDataStream::Qt_6_4);
-    blobOut << h;
     out << static_cast<quint32>(blob.size());
     out.writeRawData(blob.constData(), blob.size());
 }
@@ -156,7 +153,7 @@ CardRelation *readRelation(QDataStream &in)
 void writePrinting(QDataStream &out, const PrintingInfo &p)
 {
     writeString(out, p.getSet() ? p.getSet()->getShortName() : QString());
-    writeHashBlob(out, p.getPropertiesHash());
+    writeBlob(out, p.getPropertiesBlob());
 }
 
 PrintingInfo readPrinting(QDataStream &in, const SetNameMap &sets)
@@ -198,7 +195,7 @@ void writeCard(QDataStream &out, const CardInfoPtr &card)
     writeString(out, card->getName());
     writeString(out, card->getText());
     out << card->getIsToken();
-    writeHashBlob(out, card->getPropertiesHash());
+    writeBlob(out, card->getPropertiesBlob());
 
     CardInfo::UiAttributes ui = card->getUiAttributes();
     out << ui.cipt;
@@ -210,7 +207,7 @@ void writeCard(QDataStream &out, const CardInfoPtr &card)
     // per-printing alt-name scan entirely.
     writeString(out, card->getSimpleName());
     {
-        const QSet<QString> altNames = card->getAltNames();
+        const QSet<QString> &altNames = card->getAltNames();
         out << static_cast<quint32>(altNames.size());
         for (const QString &alt : altNames) {
             writeString(out, alt);
@@ -218,7 +215,7 @@ void writeCard(QDataStream &out, const CardInfoPtr &card)
     }
 
     // setsToPrintings
-    const SetToPrintingsMap sets = card->getSets();
+    const auto &sets = card->getSets();
     out << static_cast<quint32>(sets.size());
     for (auto it = sets.constBegin(); it != sets.constEnd(); ++it) {
         writeString(out, it.key());

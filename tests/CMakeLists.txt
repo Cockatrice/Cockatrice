@@ -178,6 +178,17 @@ cockatrice_add_test(NAME user_data_backup_test SOURCES user_data_backup_test.cpp
 cockatrice_add_test(NAME password_hash_test SOURCES password_hash_test.cpp LIBS libcockatrice_utility)
 cockatrice_add_test(NAME report_categories_test SOURCES report_categories_test.cpp LIBS libcockatrice_utility)
 cockatrice_add_test(NAME warning_categories_test SOURCES warning_categories_test.cpp LIBS libcockatrice_utility)
+# The installer's holder probe is Windows-only, but the wording it produces is plain C++
+# and is what a stuck user has to act on, so it is tested everywhere.
+cockatrice_add_test(
+  NAME
+  holder_line_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/tools/installer-holder-probe/holder_line.cpp
+  holder_line_test.cpp
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/tools/installer-holder-probe
+)
 cockatrice_add_test(
   NAME
   playmat_resolver_test
@@ -358,6 +369,7 @@ cockatrice_add_test(
   ${VERSION_STRING_CPP}
   loader_local_matching_test.cpp
   LIBS
+  libcockatrice_network
   libcockatrice_settings
   INCLUDE_DIRS
   ${CMAKE_SOURCE_DIR}/cockatrice/src
@@ -394,6 +406,7 @@ if(TARGET Qt6::lrelease)
     libcockatrice_utility
     DEFINITIONS
     TRANSLATION_LOADER_TEST_DIR="${CMAKE_CURRENT_BINARY_DIR}"
+    COCKATRICE_TRANSLATIONS_DIR="${CMAKE_SOURCE_DIR}/cockatrice/translations"
   )
   add_dependencies(translation_loader_test translation_loader_test_qm)
 

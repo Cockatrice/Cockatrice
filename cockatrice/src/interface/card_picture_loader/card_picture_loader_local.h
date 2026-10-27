@@ -5,10 +5,12 @@
 #include <QLoggingCategory>
 #include <QMultiHash>
 #include <QObject>
+#include <QSet>
 #include <QString>
 #include <qtmetamacros.h>
 
 class ExactCard;
+class QFileSystemWatcher;
 class QTimer;
 
 inline Q_LOGGING_CATEGORY(CardPictureLoaderLocalLog, "card_picture_loader.local");
@@ -41,6 +43,18 @@ public:
     explicit CardPictureLoaderLocal(QObject *parent);
 
     /**
+     * @brief Constructs the loader against explicit folders without SettingsCache.
+     *
+     * Used by tests and by callers that already resolved the configured paths.
+     */
+    CardPictureLoaderLocal(QObject *parent, const QString &picsPath, const QString &customPicsPath);
+
+    /**
+     * @brief Returns every indexed file whose base name matches @p baseName.
+     */
+    [[nodiscard]] QStringList indexedPaths(const QString &baseName) const;
+
+    /**
      * @brief Attempts to load a card image from local disk or custom folders.
      * @param toLoad ExactCard object representing the card to load.
      * @return Loaded QImage if found; otherwise, an empty QImage.
@@ -54,7 +68,10 @@ private:
     QString customPicsPath; ///< Path to custom card image folder
 
     QMultiHash<QString, QString> customFolderIndex; ///< Multimap from cardName to file paths in CUSTOM folder
-    QTimer *refreshTimer;                           ///< Timer for periodic folder index refresh
+    QFileSystemWatcher *folderWatcher;              ///< Watches the custom folder tree for changes
+    QTimer *indexRefreshTimer;                      ///< Debounces bursts of filesystem events
+    QTimer *fallbackRefreshTimer;                   ///< Slow poll for filesystems without change notification
+    QSet<QString> watchedDirectories;               ///< Directories currently registered with folderWatcher
 
     /**
      * @brief Rebuilds the index of the custom image folder.
@@ -64,6 +81,11 @@ private:
      * and complete base name.
      */
     void refreshIndex();
+
+    /**
+     * @brief Keeps the watcher registered on exactly @p directories.
+     */
+    void updateWatchedDirectories(const QSet<QString> &directories);
 
     /**
      * @brief Attempts to load a card image from disk given its set and name info.
@@ -81,6 +103,12 @@ private:
                                                   const QString &correctedCardName,
                                                   const QString &collectorNumber,
                                                   const QString &providerId) const;
+
+signals:
+    /**
+     * @brief Emitted after the custom folder index has been rebuilt.
+     */
+    void indexChanged();
 
 private slots:
     /**
