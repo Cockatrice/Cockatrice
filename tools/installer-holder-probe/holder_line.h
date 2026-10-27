@@ -26,12 +26,15 @@ inline constexpr std::size_t HOLDER_LINE_MAX = 5;
 /**
  * @brief How many characters the summary may spend on the holders it names.
  *
- * The line is not the whole string: the abort dialog puts it after a fixed paragraph and
- * before the path of the installer log, inside an NSIS string of 1024 characters. Windows
- * caps one application or service name well below this budget, so it bounds the list
- * without ever cutting a single holder short.
+ * The line is not the whole string: every prompt puts it after a fixed paragraph and before
+ * the answers, and one NSIS string holds 1024 characters. Those paragraphs grew when the
+ * guard started spelling out what ending the programs costs and what is left to do by hand,
+ * so this budget is what keeps the longest message - the one that also says the last end
+ * freed nothing, plus the "; and N more" the summary appends after the budget - complete,
+ * including the Cancel line at its end. Windows caps one application or service name well
+ * below this, so it bounds the list without ever cutting a single holder short.
  */
-inline constexpr std::size_t HOLDER_LINE_CHAR_MAX = 400;
+inline constexpr std::size_t HOLDER_LINE_CHAR_MAX = 320;
 
 /**
  * @brief Renders one holder the way the user has to recognise it, e.g.
