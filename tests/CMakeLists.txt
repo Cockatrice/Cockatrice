@@ -490,6 +490,7 @@ if(WITH_ORACLE OR WITH_CLIENT)
     libcockatrice_card
     libcockatrice_deck_list
     libcockatrice_models
+    libcockatrice_network
     libcockatrice_settings
     libcockatrice_utility
     INCLUDE_DIRS
