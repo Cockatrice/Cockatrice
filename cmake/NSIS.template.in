@@ -539,11 +539,9 @@ Function RemoveOldPayloadLeftovers
     SetFileAttributes "$INSTDIR\cockatrice.exe" NORMAL
     SetFileAttributes "$INSTDIR\oracle.exe" NORMAL
     SetFileAttributes "$INSTDIR\servatrice.exe" NORMAL
-    SetFileAttributes "$INSTDIR\uninstall.exe" NORMAL
     Delete "$INSTDIR\cockatrice.exe"
     Delete "$INSTDIR\oracle.exe"
     Delete "$INSTDIR\servatrice.exe"
-    Delete "$INSTDIR\uninstall.exe"
     Delete "$INSTDIR\qt.conf"
     Call RetryDllPurge
     ; $R0 is RetryDllPurge's verdict (1 = a DLL or the Plugins directory survived).
@@ -570,6 +568,11 @@ Function RemoveOldPayloadLeftovers
     Return
     rop_done:
     StrCpy $OldPayloadRemoved 1
+    ; Only now that the recovery has succeeded: deleting the old uninstaller on a
+    ; failed attempt would leave a directory whose UninstallString points at nothing,
+    ; so no later run could remove it. WriteUninstaller recreates it on success anyway.
+    SetFileAttributes "$INSTDIR\uninstall.exe" NORMAL
+    Delete "$INSTDIR\uninstall.exe"
     !insertmacro CockLog "old uninstall: leftovers of $OldInstallDir removed"
     !insertmacro CockLogListing "old-leftovers-after-removal" "*.*"
     Pop $INSTDIR
