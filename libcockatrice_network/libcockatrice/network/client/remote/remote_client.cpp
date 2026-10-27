@@ -84,6 +84,7 @@ RemoteClient::RemoteClient(QObject *parent, INetworkSettingsProvider *_networkSe
             &RemoteClient::doSubmitForgotPasswordResetToServer);
     connect(this, &RemoteClient::sigSubmitForgotPasswordChallengeToServer, this,
             &RemoteClient::doSubmitForgotPasswordChallengeToServer);
+    connect(this, &RemoteClient::sigChangePasswordToServer, this, &RemoteClient::doChangePasswordToServer);
 }
 
 RemoteClient::~RemoteClient()
@@ -310,6 +311,35 @@ void RemoteClient::submitPasswordVerifierResponse(const Response &response)
         }
     } else {
         qCWarning(RemoteClientLog) << "Failed to migrate password verifier:" << response.response_code();
+    }
+}
+
+void RemoteClient::changePasswordToServer(const QString &oldPassword, const QString &newPassword)
+{
+    emit sigChangePasswordToServer(oldPassword, newPassword);
+}
+
+void RemoteClient::doChangePasswordToServer(const QString &oldPassword, const QString &newPassword)
+{
+    Command_AccountPassword cmd;
+    cmd.set_old_password(oldPassword.toStdString());
+    if (serverSupportsChallengeResponse) {
+        cmd.set_hashed_new_password(PasswordHasher::generatePasswordVerifier(newPassword).toStdString());
+    } else {
+        cmd.set_new_password(newPassword.toStdString());
+    }
+
+    PendingCommand *pend = prepareSessionCommand(cmd);
+    connect(pend, &PendingCommand::finished, this, &RemoteClient::accountPasswordResponse);
+    sendCommand(pend);
+}
+
+void RemoteClient::accountPasswordResponse(const Response &response)
+{
+    if (response.response_code() == Response::RespOk) {
+        emit sigPasswordChangeSuccess();
+    } else {
+        emit sigPasswordChangeError(response.response_code());
     }
 }
 
