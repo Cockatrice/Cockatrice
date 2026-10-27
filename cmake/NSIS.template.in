@@ -52,6 +52,10 @@ Var LauncherExited
 ; (see WaitForLauncherToExit). A variable because the first slice is short and the ones
 ; after the first question are not.
 Var WaitSlice
+; Whether that handle carries PROCESS_TERMINATE as well as SYNCHRONIZE, and can therefore
+; be ended from the answer the dialog offers. Cleared when only the synchronize right could
+; be had (see WaitForLauncherToExit).
+Var WaitCanEnd
 Var InstallLogPath
 Var LogHandle
 Var LogMessage
@@ -1075,16 +1079,23 @@ Function WaitForLauncherToExit
         !insertmacro CockLog "wait-launcher: no pid given, falling back to name check"
         Return
     ${EndIf}
-    ; PROCESS_SYNCHRONIZE is the only access this needs - enough to wait on the
-    ; handle, and the least likely to be refused for a reason that has nothing to
-    ; do with the upgrade.
-    ;
     ; System.dll maps its output registers so that .rN writes $N and .RN writes
     ; $RN. The caller reads $R0/$R1, so the uppercase .RN form is required; the
     ; original .r0/.r1 wrote $0/$1 and left $R1 empty, which made the "did not
     ; exit" test below compare "" against "0" and abort on every /PID= upgrade.
     ; Reopened on every round below, so a launcher that exited in the meantime answers
     ; "already exited" instead of being waited on again.
+    ;
+    ; PROCESS_TERMINATE rides along with PROCESS_SYNCHRONIZE so that the "end it"
+    ; answer below acts on this very handle: the pid looked up again after a dialog
+    ; that can stay open as long as the user takes would name whatever process holds
+    ; that pid by then, and a handle cannot be handed to another process.
+    ;
+    ; When those rights are refused - a launcher started by another account, a
+    ; protected process - the wait still has to happen, so the ask is repeated with
+    ; synchronize access alone and $WaitCanEnd records that ending is not on offer.
+    ; Reporting "already exited" instead would be the worse answer: the payload would
+    ; be written over a live process, which is what this wait exists to prevent.
     ;
     ; Ten seconds, not the full grace: a client that started an update exits in well
     ; under a second, so at ten seconds it is either flushing a card database or - far
@@ -1095,7 +1106,8 @@ Function WaitForLauncherToExit
     StrCpy $WaitSlice 10000
     wait_launcher_open:
     ClearErrors
-    System::Call 'kernel32::OpenProcess(i 0x00100000, i 0, i $WaitPid) p.R0'
+    StrCpy $WaitCanEnd 1
+    System::Call 'kernel32::OpenProcess(i 0x00100001, i 0, i $WaitPid) p.R0'
     ; OpenProcess returns a null handle for a process that is already gone. The
     ; System plugin does not raise the NSIS error flag from a called function's
     ; return value, so ${Errors} alone never saw that case and the null handle was
@@ -1105,8 +1117,17 @@ Function WaitForLauncherToExit
         StrCpy $R0 0
     ${EndIf}
     ${If} $R0 == 0
+        StrCpy $WaitCanEnd 0
+        ClearErrors
+        System::Call 'kernel32::OpenProcess(i 0x00100000, i 0, i $WaitPid) p.R0'
+        ${If} ${Errors}
+            StrCpy $R0 0
+        ${EndIf}
+    ${EndIf}
+    ${If} $R0 == 0
     ; The launcher is gone - OpenProcess cannot open a dead process - which is
-    ; exactly the state the wait was for.
+    ; exactly the state the wait was for. A handle refused for want of the terminate
+    ; right is not this case; the synchronize-only ask above covers it.
         !insertmacro CockLog "wait-launcher: already exited"
         DetailPrint "The application that started this installer has already exited."
         StrCpy $LauncherExited 1
@@ -1115,9 +1136,10 @@ Function WaitForLauncherToExit
     DetailPrint "Waiting for the application that started this installer to exit ..."
     ; WAIT_OBJECT_0 is 0; WAIT_TIMEOUT is 258 and a failed wait reports 0xFFFFFFFF.
     System::Call 'kernel32::WaitForSingleObject(p R0, i $WaitSlice) i.R1'
-    System::Call 'kernel32::CloseHandle(p R0)'
     ${If} $R1 != 0
-        !insertmacro CockLog "wait-launcher: did not exit within $WaitSlice ms (wait=$R1)"
+    ; $R0 is deliberately still open: it is the process that timed out, and the answer
+    ; below has to act on that process and not on whatever $WaitPid names by then.
+        !insertmacro CockLog "wait-launcher: did not exit within $WaitSlice ms (wait=$R1, canEnd=$WaitCanEnd)"
         DetailPrint "The application that started this installer did not exit in time."
         ; Same three answers as every other prompt that waits on a running program, and
         ; "carry on anyway" is not one of them: a live process has its image and its Qt
@@ -1134,24 +1156,22 @@ Function WaitForLauncherToExit
         Call AbortInstall
         ; Only reached through Yes or No: AbortInstall does not return.
         wait_launcher_end:
-        ; By pid, not through the probe: this wait holds the launcher's pid and $GuardDir
-        ; is not known until the guard that follows reads it. The pid is the launcher the
-        ; client passed in /PID=, so nothing else can be hit by it.
+        ; End it through the handle waited on above, and through nothing else: no pid is
+        ; looked up again, so a process that inherited the number in the meantime - or a
+        ; /PID= that was not the launcher to begin with - cannot be hit by this.
         !insertmacro CockLog "wait-launcher: ending the launcher on request"
-        ClearErrors
-        System::Call 'kernel32::OpenProcess(i 0x0001, i 0, i $WaitPid) p.R2'
-        ${If} ${Errors}
-            StrCpy $R2 0
+        ${If} $WaitCanEnd == 0
+            !insertmacro CockLog "wait-launcher: the launcher could not be opened to end it, asking it to close instead"
+            Goto wait_launcher_retry
         ${EndIf}
-        ${If} $R2 == 0
-            !insertmacro CockLog "wait-launcher: the launcher could not be opened to end it"
-        ${Else}
-            System::Call 'kernel32::TerminateProcess(p R2, i 1) i.R3'
-            System::Call 'kernel32::CloseHandle(p R2)'
-            !insertmacro CockLog "wait-launcher: ending the launcher returned $R3"
-        ${EndIf}
+        System::Call 'kernel32::TerminateProcess(p R0, i 1) i.R3'
+        System::Call 'kernel32::CloseHandle(p R0)'
+        StrCpy $R0 0
+        !insertmacro CockLog "wait-launcher: ending the launcher returned $R3"
         Goto wait_launcher_open
         wait_launcher_retry:
+        System::Call 'kernel32::CloseHandle(p R0)'
+        StrCpy $R0 0
         ; The question has been asked and answered once; from here the wait is the full
         ; grace again, so a slow flush or a confirmation being answered does not turn
         ; into a stream of prompts.
@@ -1164,6 +1184,8 @@ Function WaitForLauncherToExit
         Call CloseHolders
         Goto wait_launcher_open
     ${EndIf}
+    System::Call 'kernel32::CloseHandle(p R0)'
+    StrCpy $R0 0
     !insertmacro CockLog "wait-launcher: launcher exited"
     DetailPrint "The application that started this installer has exited."
     StrCpy $LauncherExited 1
