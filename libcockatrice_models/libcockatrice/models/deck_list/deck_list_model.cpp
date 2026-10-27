@@ -432,6 +432,9 @@ DecklistModelCardNode *DeckListModel::findCardNode(const QString &cardName,
                                                    const QString &cardNumber) const
 {
     CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(cardName);
+    if (!info) {
+        return nullptr;
+    }
 
     // 1. Board zone lookup: search the criteria groups, then the custom zones
     //    nested under the board.
