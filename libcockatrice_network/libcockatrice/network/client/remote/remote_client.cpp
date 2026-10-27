@@ -837,7 +837,7 @@ void RemoteClient::requestForgotPasswordResponse(const Response &response)
             emit sigPromptForForgotPasswordReset();
         }
     } else {
-        emit sigForgotPasswordError();
+        emit sigForgotPasswordError(response.response_code());
     }
 
     doDisconnectFromServer();
@@ -873,7 +873,7 @@ void RemoteClient::submitForgotPasswordResetResponse(const Response &response)
             derivedVerifier.clear();
         }
     } else {
-        emit sigForgotPasswordError();
+        emit sigForgotPasswordError(response.response_code());
     }
 
     doDisconnectFromServer();
@@ -908,7 +908,7 @@ void RemoteClient::submitForgotPasswordChallengeResponse(const Response &respons
     if (response.response_code() == Response::RespOk) {
         emit sigPromptForForgotPasswordReset();
     } else {
-        emit sigForgotPasswordError();
+        emit sigForgotPasswordError(response.response_code());
     }
 
     doDisconnectFromServer();
