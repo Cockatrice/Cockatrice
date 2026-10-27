@@ -105,37 +105,6 @@ bool isAnswerableWindow(HWND window)
     return bounds.right > bounds.left && bounds.bottom > bounds.top;
 }
 
-/// Shows the windows an instance left hidden, and restores the ones it left minimized.
-///
-/// A window that exists but is not visible is not noise to skip: an instance that answered an
-/// earlier close by hiding instead of quitting - which is what a shutdown stuck in a
-/// confirmation of its own does, because accepting a second close hides the dialog together
-/// with the window that owns it - has no visible window left, and the question it is waiting on
-/// is hidden with it. Showing them again is what puts that question back in front of the user,
-/// where answering it is the only way the instance can finish quitting.
-///
-/// Only windows the user could answer are shown - see isAnswerableWindow - so the instance's
-/// own bookkeeping windows stay hidden, and only the application's own windows are counted
-/// in the report.
-unsigned int restoreHiddenWindows(const std::vector<HWND> &windows)
-{
-    unsigned int restored = 0;
-    for (const HWND window : windows) {
-        if (!isAnswerableWindow(window)) {
-            continue;
-        }
-        if (IsWindowVisible(window) == FALSE) {
-            ShowWindow(window, SW_SHOW);
-            if (IsWindowVisible(window) != FALSE) {
-                ++restored;
-            }
-        } else if (IsIconic(window) != FALSE) {
-            ShowWindow(window, SW_RESTORE);
-        }
-    }
-    return restored;
-}
-
 /// Picks the window to post the close to and the one the user should end up looking at.
 struct CloseTarget
 {
@@ -266,22 +235,19 @@ CloseHoldersResult closeCockatriceHolders(const std::vector<Holder> &holders, un
             continue;
         }
 
-        const unsigned int restored = restoreHiddenWindows(search.windows);
         const CloseTarget target = chooseCloseTarget(search.windows);
         if (target.main == nullptr) {
-            // Nothing but Qt's own bookkeeping windows is left: there is no question to bring
-            // back and no window a close could reach, so the instance is named and left to
-            // the user - the same answer as one that has no window at all.
+            // Nothing visible that a user could answer: the instance is hidden - in the
+            // notification area, say - or has nothing but Qt's own bookkeeping windows on
+            // screen. Neither is a window a close could reach, and showing one from here does
+            // not help: Windows would display it while the application still believes it is
+            // hidden, so it stays blank and answers nothing. The instance is named and left to
+            // the user, who can open it from the notification area.
             lines.push_back(processLabel(holder) + L" has no window to ask, left to you");
             continue;
         }
         std::wstring line = processLabel(holder);
         line += bringForward(target.toRaise) ? L" brought forward" : L" could not be brought forward";
-        if (restored == 1) {
-            line += L", restored a hidden window";
-        } else if (restored > 1) {
-            line += L", restored " + std::to_wstring(restored) + L" hidden windows";
-        }
 
         // Posting the close to an instance that is asking a question of its own is what made
         // an earlier attempt useless: the client accepts it, hides this window and the dialog

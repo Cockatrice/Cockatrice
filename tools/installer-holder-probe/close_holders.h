@@ -28,15 +28,15 @@ struct CloseHoldersResult
  * asked to close. Oracle and Servatrice are left to the user - Oracle writes the card
  * database in place - and so is every service.
  *
- * Two things happen per instance. Every window it left behind is shown again and its main
- * window is brought to the foreground, because Cockatrice may answer the close with a
- * confirmation of its own that would otherwise open behind the installer's prompt - and an
- * instance that already answered an earlier close by hiding instead of quitting has that
- * confirmation hidden with the window that owns it, where nobody can answer it. Then
- * WM_CLOSE is posted to the main window, the same request as clicking its close button -
- * unless the instance is asking a question of its own, which disables that window: posting
- * the close then only hides the question, so it is brought forward and left to the user.
- * Stopping the process is never attempted.
+ * One thing happens per instance: its main window is brought to the foreground, because
+ * Cockatrice may answer the close with a confirmation of its own that would otherwise open
+ * behind the installer's prompt. Then WM_CLOSE is posted to the main window, the same
+ * request as clicking its close button - unless the instance is asking a question of its
+ * own, which disables that window: posting the close then only hides the question, so it is
+ * brought forward and left to the user. An instance with no window a user could answer -
+ * one hidden in the notification area, say - is named and left to the user as well; showing
+ * its windows from here does not help, because the application would still believe they are
+ * hidden and never paint them. Stopping the process is never attempted.
  *
  * Once the requests are out, this waits up to @c waitMilliseconds for the processes to
  * exit, so the caller can measure the purge immediately afterwards instead of sleeping

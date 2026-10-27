@@ -440,7 +440,7 @@ IntOp $R2 $R2 + 1
 ${If} $R2 > 60
     !insertmacro CockLog "old uninstall: $OldInstallDir still holds cockatrice.exe after 30 s"
     StrCpy $AbortReason \
-        "The previous version in $OldInstallDir is still being removed.$\r$\n$\r$\nWait until its uninstaller has finished, then run this installer again."
+        "The previous version in $OldInstallDir is still there after its uninstaller ran.$\r$\n$\r$\nIf that uninstaller was cancelled or reported an error, close anything still using those files and run this installer again."
     Call AbortInstall
 ${EndIf}
 Sleep 500
@@ -964,7 +964,7 @@ Function GuardAppsNotRunning
         ; window. NSIS does not let a MessageBox relabel its buttons, so the text says what
         ; Yes, No and Cancel do.
         MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
-            "Cockatrice, Oracle or Servatrice is still using files of the installation:$\r$\n$\r$\n$GuardOutput$\r$\n$\r$\nChoose Yes to close Cockatrice and check again. It may ask you to confirm quitting - it does while a card database update is running, a game is open or a deck is unsaved - so answer that window. If it has no window on screen, Yes brings it back.$\r$\n$\r$\nClose Oracle, Servatrice and any other program listed above by hand. Choose No to check again after that, or Cancel to cancel the installation." \
+            "Cockatrice, Oracle or Servatrice is still using files of the installation:$\r$\n$\r$\n$GuardOutput$\r$\n$\r$\nChoose Yes to close Cockatrice and check again. It may ask you to confirm quitting - it does while a card database update is running, a game is open or a deck is unsaved - so answer that window. If it has no window on screen, open it from the notification area first.$\r$\n$\r$\nClose Oracle, Servatrice and any other program listed above by hand. Choose No to check again after that, or Cancel to cancel the installation." \
             IDYES guard_close IDNO guard_check
         !insertmacro CockLog "guard: cancelled by user"
         StrCpy $AbortReason \
@@ -1628,7 +1628,7 @@ Function un.GuardAppsNotRunning
         ; Same three answers as the installer's guard; the automatic close above already
         ; ran once before this prompt.
         MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
-            "Cockatrice, Oracle or Servatrice is still using files of the installation:$\r$\n$\r$\n$GuardOutput$\r$\n$\r$\nChoose Yes to close Cockatrice and check again. It may ask you to confirm quitting - it does while a card database update is running, a game is open or a deck is unsaved - so answer that window. If it has no window on screen, Yes brings it back.$\r$\n$\r$\nClose Oracle, Servatrice and any other program listed above by hand. Choose No to check again after that, or Cancel to cancel the uninstallation." \
+            "Cockatrice, Oracle or Servatrice is still using files of the installation:$\r$\n$\r$\n$GuardOutput$\r$\n$\r$\nChoose Yes to close Cockatrice and check again. It may ask you to confirm quitting - it does while a card database update is running, a game is open or a deck is unsaved - so answer that window. If it has no window on screen, open it from the notification area first.$\r$\n$\r$\nClose Oracle, Servatrice and any other program listed above by hand. Choose No to check again after that, or Cancel to cancel the uninstallation." \
             IDYES un_guard_close IDNO un_guard_check
         !insertmacro CockLogUn "uninst-guard: cancelled by user"
         SetErrorLevel 1
