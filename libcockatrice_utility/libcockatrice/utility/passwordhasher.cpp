@@ -62,9 +62,11 @@ QByteArray PasswordHasher::deriveKey(const QString &password, const QByteArray &
 {
     QByteArray key(SCRYPT_VERIFIER_LENGTH, '\0');
     const QByteArray passwordUtf8 = password.toUtf8();
-    // EVP_PBE_scrypt aborts unless maxmem covers the required working memory,
-    // which is roughly 128 * n * r bytes (plus the small Salsa20/8 block array).
-    const auto maxmem = static_cast<quint64>(128) * n * r + static_cast<quint64>(128) * r * p + 4096;
+    // EVP_PBE_scrypt aborts unless maxmem covers the required working memory: V is 128 * n *
+    // r bytes, B is 128 * r * p, and XY is 256 * r. Under-budgeting XY makes OpenSSL fail
+    // for r >= 17, which costParamsAreSane still accepts.
+    const auto maxmem =
+        static_cast<quint64>(128) * n * r + static_cast<quint64>(128) * r * p + static_cast<quint64>(256) * r + 4096;
     if (EVP_PBE_scrypt(passwordUtf8.constData(), passwordUtf8.size(),
                        reinterpret_cast<const unsigned char *>(salt.constData()), salt.size(), n, r, p, maxmem,
                        reinterpret_cast<unsigned char *>(key.data()), key.size()) != 1) {
