@@ -517,14 +517,38 @@ void ConnectionController::onForgotPasswordSuccess()
     SettingsCache::instance().servers().setFPPlayerName("");
 }
 
-void ConnectionController::onForgotPasswordError()
+void ConnectionController::onForgotPasswordError(int responseCode)
 {
-    QMessageBox::warning(
-        dialogParent, tr("Reset Password"),
-        tr("Failed to reset user account password, please contact the server operator to reset your password."));
-    SettingsCache::instance().servers().setFPHostName("");
-    SettingsCache::instance().servers().setFPPort("");
-    SettingsCache::instance().servers().setFPPlayerName("");
+    // Rate limiting is retryable, so it must not clear the prefill.
+    bool keepPrefill = false;
+    QString message;
+    switch (static_cast<Response::ResponseCode>(responseCode)) {
+        case Response::RespTooManyRequests:
+            // Retryable: keep the host/port/user prefill so the user can try again. The window
+            // is server-configured (an hour by default), so do not promise a shorter wait.
+            keepPrefill = true;
+            message = tr("Too many password reset attempts from your address. Please wait before "
+                         "requesting a new reset.");
+            break;
+        case Response::RespFunctionNotAllowed:
+            // Also returned for an unknown user, a banned user, and an expired token or
+            // challenge, so the message must not claim a single cause.
+            message = tr("The server did not accept the reset request. Check the user name, or contact "
+                         "the server operator to reset your password.");
+            break;
+        default:
+            message = tr("Failed to reset user account password, please contact the server operator to reset your "
+                         "password.");
+            break;
+    }
+
+    QMessageBox::warning(dialogParent, tr("Reset Password"), message);
+
+    if (!keepPrefill) {
+        SettingsCache::instance().servers().setFPHostName("");
+        SettingsCache::instance().servers().setFPPort("");
+        SettingsCache::instance().servers().setFPPlayerName("");
+    }
 }
 
 void ConnectionController::onPromptForgotPasswordReset()
