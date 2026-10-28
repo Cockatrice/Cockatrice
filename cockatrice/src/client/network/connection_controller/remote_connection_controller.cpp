@@ -244,17 +244,27 @@ void ConnectionController::onLoginError(int r,
 {
     switch (static_cast<Response::ResponseCode>(r)) {
         case Response::RespClientUpdateRequired: {
-            QString formatted = "Missing Features: ";
-            for (int i = 0; i < missingFeatures.size(); ++i) {
-                formatted.append(QString("\n     %1").arg(QChar(0x2022)) + " " + missingFeatures.value(i));
-            }
-
             QMessageBox msgBox(dialogParent);
             msgBox.setIcon(QMessageBox::Critical);
             msgBox.setWindowTitle(tr("Failed Login"));
-            msgBox.setText(tr("Your client seems to be missing features this server requires for connection.") +
-                           "\n\n" + tr("To update your client, go to 'Help -> Check for Client Updates'."));
-            msgBox.setDetailedText(formatted);
+
+            if (missingFeatures.isEmpty()) {
+                // Without a feature list this is either a login the client stopped itself or a
+                // strict server asking for a password; the reason string already says which and
+                // what to do. No client update can fix any of those causes, so show it instead of
+                // the update advice.
+                msgBox.setText(reasonStr.isEmpty() ? tr("The login did not complete.") : reasonStr);
+            } else {
+                QString formatted = tr("Missing Features:");
+                for (const QString &feature : missingFeatures) {
+                    formatted.append(QString("\n     %1 ").arg(QChar(0x2022)) + feature);
+                }
+
+                msgBox.setText(tr("Your client seems to be missing features this server requires for connection.") +
+                               "\n\n" + tr("To update your client, go to 'Help -> Check for Client Updates'."));
+                msgBox.setDetailedText(formatted);
+            }
+
             msgBox.exec();
             break;
         }
