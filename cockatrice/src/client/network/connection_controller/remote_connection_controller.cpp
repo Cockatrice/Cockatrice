@@ -249,13 +249,11 @@ void ConnectionController::onLoginError(int r,
             msgBox.setWindowTitle(tr("Failed Login"));
 
             if (missingFeatures.isEmpty()) {
-                // The client aborts some logins locally and reports them with this server
-                // response code, explaining why in the reason string. No client update can fix
-                // any of those causes, so say what actually happened instead.
-                msgBox.setText(tr("Login was aborted before it could complete."));
-                msgBox.setInformativeText(reasonStr.isEmpty()
-                                              ? tr("The client stopped this login before it reached the server.")
-                                              : reasonStr);
+                // Without a feature list this is either a login the client stopped itself or a
+                // strict server asking for a password; the reason string already says which and
+                // what to do. No client update can fix any of those causes, so show it instead of
+                // the update advice.
+                msgBox.setText(reasonStr.isEmpty() ? tr("The login did not complete.") : reasonStr);
             } else {
                 QString formatted = tr("Missing Features:");
                 for (const QString &feature : missingFeatures) {

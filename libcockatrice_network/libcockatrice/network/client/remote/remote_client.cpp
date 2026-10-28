@@ -40,31 +40,45 @@ class QObject;
 
 static const unsigned int protocolVersion = 14;
 
-// Explanations for logins that RemoteClient aborts locally. They all travel with
-// RespClientUpdateRequired and are shown by the same dialog, so their wording is kept
-// together here and adjusted as a set. The context has to stay "RemoteClient" for the
-// tr() calls at the use sites to find the translations.
+// Explanations for logins that do not complete but carry no missing-feature list: the
+// ones RemoteClient stops itself, plus a strict server asking for a password. They all
+// travel with RespClientUpdateRequired and are shown by the same dialog, so their wording
+// is kept together here and adjusted as a set. The context has to stay "RemoteClient" for
+// the tr() calls at the use sites to find the translations.
 namespace
 {
+// The server warns that this account still uses the legacy password hash while this client
+// holds a scrypt verifier. Sending the verifier would downgrade the proof, so the client
+// stops; the login only succeeds after the saved verifier is gone and the user types the
+// password, which also upgrades the account.
 constexpr const char *const LOGIN_ABORT_AUTH_DOWNGRADE = QT_TRANSLATE_NOOP(
     "RemoteClient",
-    "The server asked this client to fall back to a weaker password hash, so the login was refused. If "
-    "the server was recently restored or reset, contact its operator to migrate your account.");
+    "The server still uses an old password format for this account, so the saved login on this computer cannot be "
+    "used. Untick 'Save password' in the Connect window and connect; when it opens again, type your password.");
+// The account is still on the legacy hash and only the plaintext password can produce it.
 constexpr const char *const LOGIN_ABORT_PASSWORD_REQUIRED =
     QT_TRANSLATE_NOOP("RemoteClient",
-                      "This account must be logged in with its password once. Log in again and type "
-                      "your password.");
+                      "This account still uses an old password format. Type your password in the Connect window and "
+                      "log in; the account is upgraded automatically.");
+// Rejected by PasswordHasher::costParamsAreSane, either for being weak or for being too
+// expensive for this client. Nothing on the client side can fix it.
 constexpr const char *const LOGIN_ABORT_UNSAFE_SCRYPT_PARAMS =
     QT_TRANSLATE_NOOP("RemoteClient",
-                      "The server asked for password parameters that are not safe to use. The login was stopped.");
+                      "The server asked for password settings that Cockatrice will not accept because they are too "
+                      "weak or too demanding. The login was stopped; only the server's staff can change this.");
+// Scrypt derivation failed locally: a device resource problem, or server parameters this
+// client cannot satisfy.
 constexpr const char *const LOGIN_ABORT_VERIFIER_NOT_DERIVED =
-    QT_TRANSLATE_NOOP("RemoteClient", "The password verifier could not be derived on this device.");
+    QT_TRANSLATE_NOOP("RemoteClient",
+                      "Cockatrice could not prepare your password for this login. Try again; if it keeps happening, "
+                      "the server's password settings may be too demanding for this version of Cockatrice.");
 constexpr const char *const LOGIN_ABORT_STORED_VERIFIER_UNUSABLE =
     QT_TRANSLATE_NOOP("RemoteClient",
-                      "The saved login for this account is unusable. Log in again, type your password, "
-                      "and save it again.");
+                      "The saved login for this account cannot be used. Type your password in the Connect window; if "
+                      "'Save password' is ticked, a new saved login is created after you log in.");
 constexpr const char *const LOGIN_ABORT_PASSWORD_MISSING =
-    QT_TRANSLATE_NOOP("RemoteClient", "This server requires your password to log in.");
+    QT_TRANSLATE_NOOP("RemoteClient",
+                      "This server requires your password to log in. Type it in the Connect window and try again.");
 } // namespace
 
 RemoteClient::RemoteClient(QObject *parent, INetworkSettingsProvider *_networkSettingsProvider)
