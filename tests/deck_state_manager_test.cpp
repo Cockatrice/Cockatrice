@@ -178,7 +178,7 @@ int main(int argc, char **argv)
     db->addCard(CardInfo::newInstance("Swords to Plowshares"));
     db->addCard(makeToken("Beast"));
 
-    int success = RUN_ALL_TESTS();
+    int result = RUN_ALL_TESTS();
 
     // Clean up the settings directory in ~/.qttest if the tests ran.
     if (!::testing::GTEST_FLAG(list_tests)) {
@@ -186,5 +186,5 @@ int main(int argc, char **argv)
         QDir(SettingsCache::instance().getCachePath()).removeRecursively();
     }
 
-    return success;
+    return result;
 }
