@@ -15,8 +15,6 @@
 
 namespace
 {
-constexpr wchar_t COCKATRICE_IMAGE[] = L"cockatrice.exe";
-
 /// How long one poll of the asked processes takes. One WaitForSingleObject per process
 /// and no enumeration, so polling costs nothing next to the seconds this is called on.
 constexpr unsigned long WAIT_POLL_MILLISECONDS = 200;
@@ -25,11 +23,6 @@ constexpr unsigned long WAIT_POLL_MILLISECONDS = 200;
 /// characters, and this one is written there verbatim; every holder is named, so normally
 /// the line stays far below it.
 constexpr std::size_t REPORT_CHAR_MAX = 900;
-
-bool isCockatriceImage(const std::wstring &imageName)
-{
-    return CompareStringOrdinal(imageName.c_str(), -1, COCKATRICE_IMAGE, -1, TRUE) == CSTR_EQUAL;
-}
 
 /// The holder as the log has to name it to be actionable. Deliberately not
 /// formatHolder(): that one is worded for the dialog, where ", running" says something
@@ -112,7 +105,7 @@ struct CloseTarget
 {
     HWND main = nullptr;    ///< first visible window without an owner: the application's own
     HWND toRaise = nullptr; ///< topmost visible window: a dialog when one is up
-    bool modalOpen = false; ///< the window a close would reach is disabled, so a dialog of its own is up
+    bool modalOpen = false; ///< the only window a user could answer is the instance's own question
 };
 
 /// Only the windows the user could answer are candidates - see isAnswerableWindow. An
@@ -136,9 +129,11 @@ CloseTarget chooseCloseTarget(const std::vector<HWND> &windows)
     }
     target.toRaise = topmost != nullptr ? topmost : target.main;
     // A modal dialog disables the windows behind it, so a disabled main window is the
-    // instance asking a question of its own.
-    target.modalOpen =
-        target.toRaise != nullptr && IsWindowEnabled(target.main != nullptr ? target.main : target.toRaise) == FALSE;
+    // instance asking a question of its own. A visible window with no unowned main window
+    // next to it is one too: what is on screen is then the question itself - the window
+    // behind it is hidden, not gone - and there is no window a close could be posted to
+    // without hiding the question with it.
+    target.modalOpen = target.toRaise != nullptr && (target.main == nullptr || IsWindowEnabled(target.main) == FALSE);
     return target;
 }
 
@@ -213,6 +208,12 @@ bool waitForExit(const std::vector<HANDLE> &processes, unsigned long waitMillise
 }
 } // namespace
 
+bool isCockatriceImage(const std::wstring &imageName)
+{
+    constexpr wchar_t COCKATRICE_IMAGE[] = L"cockatrice.exe";
+    return CompareStringOrdinal(imageName.c_str(), -1, COCKATRICE_IMAGE, -1, TRUE) == CSTR_EQUAL;
+}
+
 CloseHoldersResult closeCockatriceHolders(const std::vector<Holder> &holders, unsigned long waitMilliseconds)
 {
     CloseHoldersResult result;
@@ -233,18 +234,20 @@ CloseHoldersResult closeCockatriceHolders(const std::vector<Holder> &holders, un
         search.processId = holder.processId;
         EnumWindows(collectProcessWindow, reinterpret_cast<LPARAM>(&search));
         if (search.windows.empty()) {
+            ++result.withoutWindow;
             lines.push_back(processLabel(holder) + L" has no window to close, left to you");
             continue;
         }
 
         const CloseTarget target = chooseCloseTarget(search.windows);
-        if (target.main == nullptr) {
+        if (target.toRaise == nullptr) {
             // Nothing visible that a user could answer: the instance is hidden - in the
             // notification area, say - or has nothing but Qt's own bookkeeping windows on
             // screen. Neither is a window a close could reach, and showing one from here does
             // not help: Windows would display it while the application still believes it is
             // hidden, so it stays blank and answers nothing. The instance is named and left to
             // the user, who can open it from the notification area.
+            ++result.withoutWindow;
             lines.push_back(processLabel(holder) + L" has no window to ask, left to you");
             continue;
         }
@@ -255,7 +258,8 @@ CloseHoldersResult closeCockatriceHolders(const std::vector<Holder> &holders, un
         // an earlier attempt useless: the client accepts it, hides this window and the dialog
         // with it, and stays alive inside the nested loop the dialog opened, where nothing can
         // reach it any more. The question is the request now, so it is brought forward and
-        // left alone.
+        // left alone - including a question whose owner window is hidden, which is the only
+        // thing left on screen and has no unowned window a close could be posted to.
         if (target.modalOpen) {
             lines.push_back(line + L", and is waiting for an answer to a question of its own");
             continue;
