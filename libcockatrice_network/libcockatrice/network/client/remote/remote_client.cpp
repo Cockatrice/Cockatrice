@@ -40,6 +40,33 @@ class QObject;
 
 static const unsigned int protocolVersion = 14;
 
+// Explanations for logins that RemoteClient aborts locally. They all travel with
+// RespClientUpdateRequired and are shown by the same dialog, so their wording is kept
+// together here and adjusted as a set. The context has to stay "RemoteClient" for the
+// tr() calls at the use sites to find the translations.
+namespace
+{
+constexpr const char *const LOGIN_ABORT_AUTH_DOWNGRADE = QT_TRANSLATE_NOOP(
+    "RemoteClient",
+    "The server asked this client to fall back to a weaker password hash, so the login was refused. If "
+    "the server was recently restored or reset, contact its operator to migrate your account.");
+constexpr const char *const LOGIN_ABORT_PASSWORD_REQUIRED =
+    QT_TRANSLATE_NOOP("RemoteClient",
+                      "This account must be logged in with its password once. Log in again and type "
+                      "your password.");
+constexpr const char *const LOGIN_ABORT_UNSAFE_SCRYPT_PARAMS =
+    QT_TRANSLATE_NOOP("RemoteClient",
+                      "The server asked for password parameters that are not safe to use. The login was stopped.");
+constexpr const char *const LOGIN_ABORT_VERIFIER_NOT_DERIVED =
+    QT_TRANSLATE_NOOP("RemoteClient", "The password verifier could not be derived on this device.");
+constexpr const char *const LOGIN_ABORT_STORED_VERIFIER_UNUSABLE =
+    QT_TRANSLATE_NOOP("RemoteClient",
+                      "The saved login for this account is unusable. Log in again, type your password, "
+                      "and save it again.");
+constexpr const char *const LOGIN_ABORT_PASSWORD_MISSING =
+    QT_TRANSLATE_NOOP("RemoteClient", "This server requires your password to log in.");
+} // namespace
+
 RemoteClient::RemoteClient(QObject *parent, INetworkSettingsProvider *_networkSettingsProvider)
     : AbstractClient(parent), networkSettingsProvider(_networkSettingsProvider), timeRunning(0), lastDataReceived(0),
       messageInProgress(false), handshakeStarted(false), usingWebSocket(false), messageLength(0), hashedPassword(),
@@ -335,11 +362,7 @@ void RemoteClient::passwordSaltResponse(const Response &response)
             // 1000-round legacy hash is a downgrade of the KDF — refuse it rather
             // than hand an attacker a weakly-keyed HMAC they can attack offline.
             if (resp.needs_migration() && PasswordHasher::parsePasswordVerifier(storedVerifier).isValid) {
-                emit loginError(Response::RespClientUpdateRequired,
-                                tr("The server asked this client to fall back to a weaker password hash, so the "
-                                   "login was refused. If the server was recently restored or reset, contact its "
-                                   "operator to migrate your account."),
-                                0, {});
+                emit loginError(Response::RespClientUpdateRequired, tr(LOGIN_ABORT_AUTH_DOWNGRADE), 0, {});
                 return;
             }
             QByteArray key;
@@ -347,10 +370,7 @@ void RemoteClient::passwordSaltResponse(const Response &response)
                 // The account still uses the legacy format; the legacy full hash
                 // is only derivable from the plaintext password.
                 if (password.isEmpty()) {
-                    emit loginError(Response::RespClientUpdateRequired,
-                                    tr("This account must be logged in with its password once. Log in again and type "
-                                       "your password."),
-                                    0, {});
+                    emit loginError(Response::RespClientUpdateRequired, tr(LOGIN_ABORT_PASSWORD_REQUIRED), 0, {});
                     return;
                 }
                 key = PasswordHasher::computeHash(password, passwordSalt).toUtf8();
@@ -361,10 +381,7 @@ void RemoteClient::passwordSaltResponse(const Response &response)
                 const int r = resp.has_r() ? resp.r() : SCRYPT_R;
                 const int p = resp.has_p() ? resp.p() : SCRYPT_P;
                 if (!PasswordHasher::costParamsAreSane(n, r, p)) {
-                    emit loginError(
-                        Response::RespClientUpdateRequired,
-                        tr("The server asked for password parameters that are not safe to use. The login was stopped."),
-                        0, {});
+                    emit loginError(Response::RespClientUpdateRequired, tr(LOGIN_ABORT_UNSAFE_SCRYPT_PARAMS), 0, {});
                     return;
                 }
                 // password_salt may carry a legacy backup salt for pre-challenge clients;
@@ -373,8 +390,7 @@ void RemoteClient::passwordSaltResponse(const Response &response)
                     resp.has_scrypt_salt() ? QString::fromStdString(resp.scrypt_salt()) : passwordSalt;
                 key = PasswordHasher::deriveKey(password, QByteArray::fromBase64(scryptSalt.toUtf8()), n, r, p);
                 if (key.isEmpty()) {
-                    emit loginError(Response::RespClientUpdateRequired,
-                                    tr("The password verifier could not be derived on this device."), 0, {});
+                    emit loginError(Response::RespClientUpdateRequired, tr(LOGIN_ABORT_VERIFIER_NOT_DERIVED), 0, {});
                     return;
                 }
                 derivedVerifier =
@@ -382,10 +398,8 @@ void RemoteClient::passwordSaltResponse(const Response &response)
             } else if (!storedVerifier.isEmpty()) {
                 const PasswordVerifier verifier = PasswordHasher::parsePasswordVerifier(storedVerifier);
                 if (!verifier.isValid) {
-                    emit loginError(Response::RespClientUpdateRequired,
-                                    tr("The saved login for this account is unusable. Log in again, type your "
-                                       "password, and save it again."),
-                                    0, {});
+                    emit loginError(Response::RespClientUpdateRequired, tr(LOGIN_ABORT_STORED_VERIFIER_UNUSABLE), 0,
+                                    {});
                     return;
                 }
                 key = verifier.verifier;
@@ -462,7 +476,7 @@ void RemoteClient::loginResponse(const Response &response)
         if (response.response_code() == Response::RespClientUpdateRequired && missingFeatures.size() == 1 &&
             missingFeatures.first() == "challenge_response_auth" && password.isEmpty() && storedVerifier.isEmpty()) {
             missingFeatures.clear();
-            reasonStr = tr("This server requires your password to log in.");
+            reasonStr = tr(LOGIN_ABORT_PASSWORD_MISSING);
         }
 
         emit loginError(response.response_code(), reasonStr, static_cast<quint32>(resp.denied_end_time()),
