@@ -274,8 +274,11 @@ CloseHoldersResult closeCockatriceHolders(const std::vector<Holder> &holders, un
                     CloseHandle(process);
                 }
                 ++result.withoutWindow;
-                lines.push_back(processLabel(holder) + L" has no window to ask, and the quit request could not be sent (win32 " +
-                                std::to_wstring(postError) + L"), left to you");
+                std::wstring line = processLabel(holder);
+                line += L" has no window to ask, and the quit request could not be sent (win32 ";
+                line += std::to_wstring(postError);
+                line += L"), left to you";
+                lines.push_back(std::move(line));
                 continue;
             }
             ++result.askedToClose;

@@ -177,7 +177,7 @@ public:
         qCInfo(MainLog) << "Installer asked this instance to quit";
         // Leave the native dispatch before any confirmation opens its own event loop.
         QPointer<MainWindow> target = window;
-        QTimer::singleShot(0, target, [target]() {
+        QTimer::singleShot(0, target.data(), [target]() {
             if (!target) {
                 return;
             }
