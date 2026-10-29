@@ -10,15 +10,15 @@
  * @brief What asking the holders to close did, in the form the installer logs.
  *
  * @c report is one line naming every holder, including the ones this deliberately
- * leaves alone, because the installer repeats it in its log and in the second prompt.
- * @c withoutWindow counts the holders that had no visible window a user could answer: they
- * were named and left alone, and the launcher mode reads that count as "nothing to ask"
- * rather than as a window the user still has to answer.
+ * leaves alone, because the installer repeats it in its log.
+ * @c withoutWindow counts the holders that had no window of their own to ask: they were
+ * named and left alone, and the launcher mode reads that count as "nothing to ask" rather
+ * than as a window the user still has to answer.
  */
 struct CloseHoldersResult
 {
     unsigned int askedToClose = 0;  ///< holders a WM_CLOSE was posted to
-    unsigned int withoutWindow = 0; ///< holders with no visible window a user could answer
+    unsigned int withoutWindow = 0; ///< holders with no window of their own to ask
     std::wstring report;            ///< one line, narrowed to ASCII when written
 };
 
@@ -42,27 +42,34 @@ bool isCockatriceImage(const std::wstring &imageName);
  * asked to close. Oracle and Servatrice are left to the user - Oracle writes the card
  * database in place - and so is every service.
  *
- * One thing happens per instance: its main window is brought to the foreground, because
- * Cockatrice may answer the close with a confirmation of its own that would otherwise open
- * behind the installer's prompt. Then WM_CLOSE is posted to the main window, the same
- * request as clicking its close button - unless the instance is asking a question of its
- * own, which disables that window: posting the close then only hides the question, so it is
- * brought forward and left to the user. An instance with no window a user could answer -
- * one hidden in the notification area, say - is named and left to the user as well; showing
- * its windows from here does not help, because the application would still believe they are
- * hidden and never paint them. Stopping the process is never attempted.
+ * One thing happens per instance: its own window is asked to close with WM_CLOSE, the same
+ * request as clicking that window's close button - whether it is on screen or only in the
+ * notification area, since the request does not need the window to be visible and the
+ * confirmation Cockatrice answers it with is a window Qt shows itself, painted, unlike one
+ * restored from outside. A window that is on screen is brought forward first, because that
+ * confirmation would otherwise open behind the installer's prompt; nothing is shown from
+ * here. Qt's own bookkeeping windows are never the target - posting a close to the
+ * notification-area one terminates the instance without its confirmation - so a process
+ * without a window of its own is named and left to the guard, which offers to end it.
+ * Stopping the process is never attempted here.
  *
  * Once the requests are out, this waits up to @c waitMilliseconds for the processes to
  * exit, so the caller can measure the purge immediately afterwards instead of sleeping
  * for a fixed time or re-asking a question this call already answered. A process that is
- * still running is described further: whether its window is gone, still open, hidden
- * again, and whether it answers at all, so the log can tell an instance that refused the
- * close from one that never received it.
+ * still running is described further: whether its window is gone, still open, still
+ * hidden or hidden again, and whether it answers at all, so the log can tell an instance
+ * that refused the close from one that never received it.
  *
  * @param holders the Restart Manager answer, one entry per application or service
  * @param waitMilliseconds how long to wait for the asked instances to exit, 0 to not wait
+ * @param askHiddenWindows whether a window that is not on screen is asked to close too.
+ *        The guard wants that: an instance in the notification area is the one this update
+ *        has no other way to reach. The launcher mode does not - a launcher without a
+ *        visible window has already answered its own close and is stuck in shutdown, and
+ *        the installer ends it instead of putting a question to a user who is not there.
  */
-CloseHoldersResult closeCockatriceHolders(const std::vector<Holder> &holders, unsigned long waitMilliseconds);
+CloseHoldersResult
+closeCockatriceHolders(const std::vector<Holder> &holders, unsigned long waitMilliseconds, bool askHiddenWindows);
 
 /**
  * @brief What ending the holders did, in the form the installer logs.

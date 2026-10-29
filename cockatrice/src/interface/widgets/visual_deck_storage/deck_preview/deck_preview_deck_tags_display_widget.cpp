@@ -12,9 +12,9 @@
 
 #include <QDialog>
 #include <QDir>
-#include <QPointer>
 #include <QDirIterator>
 #include <QHBoxLayout>
+#include <QPointer>
 #include <QSizePolicy>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
