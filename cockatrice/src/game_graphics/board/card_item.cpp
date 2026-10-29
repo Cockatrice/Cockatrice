@@ -174,6 +174,20 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         painter->restore();
     }
 
+    if (state->getDoesntUntapOnce()) {
+        painter->save();
+
+        painter->setRenderHint(QPainter::Antialiasing, false);
+
+        QPen pen;
+        pen.setColor(Qt::cyan);
+        pen.setWidth(0); // Cosmetic pen
+        painter->setPen(pen);
+        painter->drawPath(shape());
+
+        painter->restore();
+    }
+
     painter->restore();
 }
 
@@ -198,6 +212,12 @@ void CardItem::setAnnotation(const QString &_annotation)
 void CardItem::setDoesntUntap(bool _doesntUntap)
 {
     state->setDoesntUntap(_doesntUntap);
+    update();
+}
+
+void CardItem::setDoesntUntapOnce(bool _doesntUntapOnce)
+{
+    state->setDoesntUntapOnce(_doesntUntapOnce);
     update();
 }
 
@@ -251,6 +271,7 @@ void CardItem::resetState(bool keepAnnotations)
     attachedCards.clear();
     setTapped(false, false);
     setDoesntUntap(false);
+    setDoesntUntapOnce(false);
     if (scene()) {
         static_cast<GameScene *>(scene())->unregisterAnimationItem(this);
     }
@@ -276,6 +297,7 @@ void CardItem::processCardInfo(const ServerInfo_Card &_info)
     setTapped(_info.tapped());
     setDestroyOnZoneChange(_info.destroy_on_zone_change());
     setDoesntUntap(_info.doesnt_untap());
+    setDoesntUntapOnce(_info.doesnt_untap_once());
 }
 
 CardDragItem *CardItem::createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool forceFaceDown)
