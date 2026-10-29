@@ -11,12 +11,26 @@
  *
  * @c report is one line naming every holder, including the ones this deliberately
  * leaves alone, because the installer repeats it in its log and in the second prompt.
+ * @c withoutWindow counts the holders that had no visible window a user could answer: they
+ * were named and left alone, and the launcher mode reads that count as "nothing to ask"
+ * rather than as a window the user still has to answer.
  */
 struct CloseHoldersResult
 {
-    unsigned int askedToClose = 0; ///< holders a WM_CLOSE was posted to
-    std::wstring report;           ///< one line, narrowed to ASCII when written
+    unsigned int askedToClose = 0;  ///< holders a WM_CLOSE was posted to
+    unsigned int withoutWindow = 0; ///< holders with no visible window a user could answer
+    std::wstring report;            ///< one line, narrowed to ASCII when written
 };
+
+/**
+ * @brief Whether @p imageName is the client the update belongs to, matched without case.
+ *
+ * The close mode asks only this image to close, and the launcher mode is only allowed to
+ * report it as safe to end, so both read the answer from here.
+ *
+ * @param imageName the file name of a process image, empty when it could not be read
+ */
+bool isCockatriceImage(const std::wstring &imageName);
 
 /**
  * @brief Brings every running Cockatrice holding an installer file forward and asks it

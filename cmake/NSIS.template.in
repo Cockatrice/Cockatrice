@@ -74,6 +74,11 @@ Var WaitSlice
 ; be ended from the answer the dialog offers. Cleared when only the synchronize right could
 ; be had (see WaitForLauncherToExit).
 Var WaitCanEnd
+; How far the launcher wait got with a launcher that has no window to ask: 0 before the
+; first round, 1 after the grace it was given, 2 after it was ended. A launcher whose
+; window is gone has answered its own close and is stuck in shutdown, so the dialog cannot
+; reach it and the wait may end it instead of asking the user (see WaitForLauncherToExit).
+Var WaitWindowless
 Var InstallLogPath
 Var LogHandle
 Var LogMessage
@@ -1241,6 +1246,33 @@ Function AbortInstall
     Abort
 FunctionEnd
 
+; usage: set $GuardDir and $WaitPid, then call this. Asks the one process the installer
+; waits on to close and sets $R3 to what it could do: 1 = a window exists and was asked to
+; close (or is waiting on a question of its own), 4 = it has no window a user could answer,
+; anything else = the probe could not answer. Only 4 lets the wait act on its own; every
+; other code keeps the user in the decision, because the installer holds a live handle and
+; "the probe did not find it" is not the same answer as "it is gone".
+;
+; The guard's CloseHolders answers the same question for every holder and leaves a
+; windowless instance to the user, which is right there: the prompt names it. The launcher
+; is the one process nobody can be asked about - the in-app updater runs the installer
+; silent and detached, and a client that has already hidden its window has answered its
+; own prompts - so this answer has to say whether there was a window to ask at all.
+Function CloseLauncher
+    Call ExtractHolderProbe
+    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_GUARD_DIR", "$GuardDir")'
+    System::Call 'kernel32::SetEnvironmentVariable(t, t) i ("COCKATRICE_LAUNCHER_PID", "$WaitPid")'
+    ; The probe waits 30 s itself when it posts a close. The timeout here only bounds a
+    ; probe that never returns; the Restart Manager call the other modes make is not
+    ; reached in this one.
+    nsExec::ExecToStack /TIMEOUT=40000 '"$PLUGINSDIR\installer-holder-probe.exe" --close-launcher'
+    Pop $R3
+    Pop $R4
+    Push "close-launcher: probe exit=$R3 [$R4]"
+    Call CockLogWrite
+    DetailPrint "Closing Cockatrice: $R4"
+FunctionEnd
+
 ; Waits for the application that launched this installer to exit, using the /PID=
 ; it passed. Sets $LauncherExited to 1 when that process is provably gone.
 ;
@@ -1255,8 +1287,16 @@ FunctionEnd
 ; Sets $LauncherExited to 0 when no usable /PID= was given, which is the older
 ; client that does not pass one; the caller then has no authority available and
 ; falls back to the holder probe.
+;
+; A launcher that survives the first grace is asked to close by the probe, and the
+; probe also answers whether there was a window a close could reach. A client hides
+; its window the moment its own close is accepted, so a launcher without one has
+; already answered its own prompts and is stuck in shutdown: no dialog can reach it
+; there, and the wait ends it after one more grace instead of asking the user a
+; question whose "keep waiting" answer can never change anything.
 Function WaitForLauncherToExit
     StrCpy $LauncherExited 0
+    StrCpy $WaitWindowless 0
     !insertmacro CockLog "wait-launcher: pid='$WaitPid'"
     ${If} $WaitPid == ""
         !insertmacro CockLog "wait-launcher: no pid given, falling back to name check"
@@ -1324,14 +1364,58 @@ Function WaitForLauncherToExit
     ; below has to act on that process and not on whatever $WaitPid names by then.
         !insertmacro CockLog "wait-launcher: did not exit within $WaitSlice ms (wait=$R1, canEnd=$WaitCanEnd)"
         DetailPrint "The application that started this installer did not exit in time."
-        ; Same three answers as every other prompt that waits on a running program, and
-        ; "carry on anyway" is not one of them: a live process has its image and its Qt
-        ; DLLs mapped, so writing the payload over them is the broken install this wait
-        ; exists to prevent. Yes ends the launcher, No asks it to close again and keeps
-        ; waiting, Cancel cancels - the launcher is the client the user started this update
-        ; from, and ending it is the same offer the guard makes a moment later.
+        ; Ask the launcher itself before asking the user. A client that has already hidden
+        ; its window has answered its own prompts and is stuck in shutdown: there is nothing
+        ; left a dialog could reach, and the "ask it to close again" answer the dialog used
+        ; to offer could only repeat itself until the user cancelled.
+        StrCpy $GuardDir $INSTDIR
+        Call CloseLauncher
+        ; $R3 = what the probe could do (see CloseLauncher), $R4 = its line, already logged.
+        ; A process that answered the close during the probe's own wait is gone by now.
+        System::Call 'kernel32::WaitForSingleObject(p R0, i 0) i.R1'
+        ${If} $R1 == 0
+            System::Call 'kernel32::CloseHandle(p R0)'
+            StrCpy $R0 0
+            Goto wait_launcher_open
+        ${EndIf}
+        ${If} $R3 == "4"
+            ; Nothing a user could answer: the window is gone, so the launcher is past its
+            ; own prompts and stuck in shutdown. It cannot be asked, and it is not going to
+            ; ask the user anything either, so the dialog below would be unanswerable.
+            ${If} $WaitCanEnd == 1
+                ${If} $WaitWindowless == 0
+                    ; Hiding the window is what the client does when its close is accepted,
+                    ; so what remains is the shutdown it already started: one full grace for
+                    ; that, without a question nobody could act on.
+                    StrCpy $WaitWindowless 1
+                    StrCpy $WaitSlice 60000
+                    !insertmacro CockLog "wait-launcher: no window to ask, giving it one more minute"
+                    System::Call 'kernel32::CloseHandle(p R0)'
+                    StrCpy $R0 0
+                    Goto wait_launcher_open
+                ${EndIf}
+                ${If} $WaitWindowless == 1
+                    ; It did not use that minute either. Ending it is what the dialog's Yes
+                    ; answer would have done, and there is no question left to put to the
+                    ; user: the instance lost its window before this round started.
+                    StrCpy $WaitWindowless 2
+                    !insertmacro CockLog "wait-launcher: still no window to ask; ending the launcher"
+                    DetailPrint "The application that started this installer could not be asked to close; ending it."
+                    System::Call 'kernel32::TerminateProcess(p R0, i 1) i.R2'
+                    !insertmacro CockLog "wait-launcher: ending the launcher returned $R2"
+                    System::Call 'kernel32::CloseHandle(p R0)'
+                    StrCpy $R0 0
+                    Goto wait_launcher_open
+                ${EndIf}
+            ${EndIf}
+        ${EndIf}
+        ; A window exists, or the launcher cannot be ended from here: the three answers
+        ; below. "Carry on anyway" is not one of them - a live process has its image and its
+        ; Qt DLLs mapped, so writing the payload over them is the broken install this wait
+        ; exists to prevent. Yes ends the launcher, Cancel cancels, and No keeps waiting:
+        ; the close and the bring-forward just happened above.
         MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
-            "Cockatrice has not finished closing, so the installation is paused rather than replace files it is still using.$\r$\n$\r$\nIt may be waiting for you to answer its own question about an unsaved deck, an open game or a card database update.$\r$\n$\r$\nChoose Yes to end it now - an unsaved deck, a running game or an unwritten setting is lost.$\r$\n$\r$\nChoose No to bring it to the front, ask it to close again and keep waiting, or Cancel to cancel the installation." \
+            "Cockatrice has not finished closing, so the installation is paused rather than replace files it is still using.$\r$\n$\r$\nIt may be waiting for you to answer its own question about an unsaved deck, an open game or a card database update.$\r$\n$\r$\nChoose Yes to end it now - an unsaved deck, a running game or an unwritten setting is lost.$\r$\n$\r$\nChoose No to keep waiting, or Cancel to cancel the installation." \
             IDYES wait_launcher_end IDNO wait_launcher_retry
         !insertmacro CockLog "wait-launcher: cancelled by user"
         StrCpy $AbortReason \
@@ -1357,14 +1441,12 @@ Function WaitForLauncherToExit
         StrCpy $R0 0
         ; The question has been asked and answered once; from here the wait is the full
         ; grace again, so a slow flush or a confirmation being answered does not turn
-        ; into a stream of prompts.
+        ; into a stream of prompts. The close itself and the bring-forward already
+        ; happened just before the dialog, so this only waits. The windowless grace starts
+        ; over as well: "keep waiting" must not be answered by ending the process a minute
+        ; later without asking again.
+        StrCpy $WaitWindowless 0
         StrCpy $WaitSlice 60000
-        ; The same request the window's close button makes, and the same close the guard
-        ; would send a moment later. It brings the client forward as well, which is the
-        ; part that helps when the confirmation is behind something else. Nothing is
-        ; force-stopped here: the answer that does that is Yes.
-        StrCpy $GuardDir $INSTDIR
-        Call CloseHolders
         Goto wait_launcher_open
     ${EndIf}
     System::Call 'kernel32::CloseHandle(p R0)'
