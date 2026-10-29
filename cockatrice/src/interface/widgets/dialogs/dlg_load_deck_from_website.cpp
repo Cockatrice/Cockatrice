@@ -28,12 +28,13 @@
 #include <functional>
 #include <libcockatrice/card/import/card_name_normalizer.h>
 #include <libcockatrice/network/network_manager.h>
+#include <qcontainerfwd.h>
 #include <qnamespace.h>
 #include <version_string.h>
 
 class QWidget;
 
-static const char *SUPPORTED_PROVIDERS = "Archidekt, Deckstats, Moxfield, ManaBox and TappedOut";
+static const QStringList SUPPORTED_PROVIDERS = {"Archidekt", "Deckstats", "Moxfield", "ManaBox", "TappedOut"};
 DlgLoadDeckFromWebsite::DlgLoadDeckFromWebsite(QWidget *parent) : QDialog(parent)
 {
     nam = NetworkManagerFactory::create(this);
@@ -65,8 +66,8 @@ DlgLoadDeckFromWebsite::DlgLoadDeckFromWebsite(QWidget *parent) : QDialog(parent
 
 void DlgLoadDeckFromWebsite::retranslateUi()
 {
-    instructionLabel->setText(
-        tr("Paste a link to a decklist site here to import it.\n(%1 are supported)").arg(SUPPORTED_PROVIDERS));
+    instructionLabel->setText(tr("Paste a link to a decklist site here to import it") + "\n" +
+                              tr("Supported services: %1").arg(SUPPORTED_PROVIDERS.join(", ")));
 }
 
 bool DlgLoadDeckFromWebsite::testValidUrl()
@@ -84,9 +85,9 @@ void DlgLoadDeckFromWebsite::accept()
         auto jsonParser = createParserForProvider(info.provider);
         if (!jsonParser && info.provider != DeckProvider::Deckstats && info.provider != DeckProvider::TappedOut) {
             qCWarning(DlgLoadDeckFromWebsiteLog) << "No parser found for provider";
-            QMessageBox::warning(
-                this, tr("Load Deck from Website"),
-                tr("No parser available for this deck provider.\n(%1 are supported)").arg(SUPPORTED_PROVIDERS));
+            QMessageBox::warning(this, tr("Load Deck from Website"),
+                                 tr("No parser available for this deck provider") + "\n" +
+                                     tr("Supported services: %1").arg(SUPPORTED_PROVIDERS.join(", ")));
             QDialog::reject();
             return;
         }
