@@ -77,6 +77,16 @@
 #include <qnamespace.h>
 #include <qsystemdetection.h>
 
+#ifdef Q_OS_WIN
+#include <QAbstractNativeEventFilter>
+#include <QPointer>
+#include <QTimer>
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
+
 QTranslator *translator, *qtTranslator;
 RNG_Abstract *rng;
 SoundEngine *soundEngine;
@@ -132,6 +142,60 @@ QString const generateClientID()
     QString strClientID = QCryptographicHash::hash(macList.toUtf8(), QCryptographicHash::Sha1).toHex().right(15);
     return strClientID;
 }
+
+#ifdef Q_OS_WIN
+/**
+ * @brief Answers the installer's quit request for an instance the user cannot see.
+ *
+ * The installer's holder probe (tools/installer-holder-probe/close_holders.cpp) posts
+ * WM_CLOSE to a visible main window, but an instance minimized to the notification area has
+ * none, so it used to be left running and the update was cancelled with "Cockatrice is still
+ * running". The probe posts this registered message to any of the instance's windows instead;
+ * it is answered by showing the main window and closing it through the normal path, so an
+ * unsaved deck or a running game is still confirmed with the user, in front of the installer.
+ */
+class InstallerQuitRequestFilter : public QAbstractNativeEventFilter
+{
+public:
+    explicit InstallerQuitRequestFilter(MainWindow *window)
+        : window(window), quitRequest(RegisterWindowMessageW(L"Cockatrice.InstallerQuitRequest"))
+    {
+    }
+
+    bool nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result) override
+    {
+        if (quitRequest == 0 || eventType != "windows_generic_MSG") {
+            return false;
+        }
+        const MSG *msg = static_cast<const MSG *>(message);
+        if (msg == nullptr || msg->message != quitRequest) {
+            return false;
+        }
+        if (result != nullptr) {
+            *result = 0;
+        }
+        qCInfo(MainLog) << "Installer asked this instance to quit";
+        // Leave the native dispatch before any confirmation opens its own event loop.
+        QPointer<MainWindow> target = window;
+        QTimer::singleShot(0, target, [target]() {
+            if (!target) {
+                return;
+            }
+            target->showNormal();
+            target->raise();
+            target->activateWindow();
+            if (!target->closeForUpdate()) {
+                qCInfo(MainLog) << "Installer quit request not completed: a confirmation is pending or was declined";
+            }
+        });
+        return true;
+    }
+
+private:
+    MainWindow *window;
+    UINT quitRequest;
+};
+#endif
 
 static QString redactActivationUrl(const QString &url)
 {
@@ -490,6 +554,11 @@ int main(int argc, char *argv[])
 
     ui.show();
     qCInfo(MainLog) << "ui.show() finished";
+
+#ifdef Q_OS_WIN
+    InstallerQuitRequestFilter installerQuitRequestFilter(&ui);
+    app.installNativeEventFilter(&installerQuitRequestFilter);
+#endif
 
     // Crash-report flow: the trigger is --simulate-crash or an unclean previous exit
     // (leftover session lock; the old %LOCALAPPDATA%/CrashDumps .dmp scan is gone with

@@ -208,6 +208,12 @@ bool waitForExit(const std::vector<HANDLE> &processes, unsigned long waitMillise
 }
 } // namespace
 
+unsigned int installerQuitRequestMessage()
+{
+    // Must match the name the client registers in cockatrice/src/main.cpp.
+    return RegisterWindowMessageW(L"Cockatrice.InstallerQuitRequest");
+}
+
 bool isCockatriceImage(const std::wstring &imageName)
 {
     constexpr wchar_t COCKATRICE_IMAGE[] = L"cockatrice.exe";
@@ -243,12 +249,46 @@ CloseHoldersResult closeCockatriceHolders(const std::vector<Holder> &holders, un
         if (target.toRaise == nullptr) {
             // Nothing visible that a user could answer: the instance is hidden - in the
             // notification area, say - or has nothing but Qt's own bookkeeping windows on
-            // screen. Neither is a window a close could reach, and showing one from here does
-            // not help: Windows would display it while the application still believes it is
-            // hidden, so it stays blank and answers nothing. The instance is named and left to
-            // the user, who can open it from the notification area.
-            ++result.withoutWindow;
-            lines.push_back(processLabel(holder) + L" has no window to ask, left to you");
+            // screen. Showing one of those from here does not help, and WM_CLOSE to Qt's tray
+            // window terminates without the confirmation. Instead the instance is sent the
+            // installer quit request: a registered message Cockatrice answers by showing its own
+            // main window and closing it the normal way, confirmations included. Any of its
+            // windows reaches the same GUI-thread filter, so the first one that accepts the post
+            // is enough.
+            const UINT quitRequest = installerQuitRequestMessage();
+            const HANDLE process = quitRequest != 0 ? OpenProcess(SYNCHRONIZE, FALSE, holder.processId) : nullptr;
+            const DWORD openError = process == nullptr ? GetLastError() : ERROR_SUCCESS;
+            bool posted = false;
+            DWORD postError = ERROR_SUCCESS;
+            if (quitRequest != 0) {
+                for (const HWND window : search.windows) {
+                    if (PostMessageW(window, quitRequest, 0, 0) != FALSE) {
+                        posted = true;
+                        break;
+                    }
+                    postError = GetLastError();
+                }
+            }
+            if (!posted) {
+                if (process != nullptr) {
+                    CloseHandle(process);
+                }
+                ++result.withoutWindow;
+                lines.push_back(processLabel(holder) + L" has no window to ask, and the quit request could not be sent (win32 " +
+                                std::to_wstring(postError) + L"), left to you");
+                continue;
+            }
+            ++result.askedToClose;
+            std::wstring line = processLabel(holder) + L" was hidden and sent the installer quit request";
+            if (process == nullptr) {
+                line += L", but its exit could not be watched (win32 " + std::to_wstring(openError) + L")";
+            } else {
+                askedLines.push_back(lines.size());
+                asked.push_back(process);
+                // No window to describe afterwards: describeWindowState reports a null window as gone.
+                askedWindows.push_back(nullptr);
+            }
+            lines.push_back(std::move(line));
             continue;
         }
         std::wstring line = processLabel(holder);

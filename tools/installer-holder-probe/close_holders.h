@@ -33,6 +33,16 @@ struct CloseHoldersResult
 bool isCockatriceImage(const std::wstring &imageName);
 
 /**
+ * @brief The registered window message a running Cockatrice answers by showing its main
+ *        window and closing it the normal way, confirmations included.
+ *
+ * Used for an instance with no visible window to post WM_CLOSE to - one hidden in the
+ * notification area - which would otherwise be left to the user. The name is shared with
+ * cockatrice/src/main.cpp. Returns 0 when the message could not be registered.
+ */
+unsigned int installerQuitRequestMessage();
+
+/**
  * @brief Brings every running Cockatrice holding an installer file forward and asks it
  *        to close.
  *
