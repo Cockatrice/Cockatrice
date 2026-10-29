@@ -8,6 +8,7 @@
 #define INTERFACE_JSON_DECK_PARSER_H
 
 #include "../../../interface/deck_loader/card_node_function.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
 
 #include <QJsonArray>
 #include <QJsonObject>
@@ -16,6 +17,7 @@
 #include <QTextStream>
 #include <libcockatrice/card/import/card_name_normalizer.h>
 #include <libcockatrice/deck_list/deck_list.h>
+#include <qobject.h>
 
 inline Q_LOGGING_CATEGORY(InterfaceJsonDeckParserLog, "interface_json_deck_parser");
 
@@ -146,6 +148,7 @@ public:
         QTextStream outStream(&outputText);
 
         auto commanderList = QList<QJsonObject>();
+        auto maybeboardList = QList<QJsonObject>();
         for (auto entry : obj.value("cards").toArray()) {
             auto card = entry.toObject();
 
@@ -162,13 +165,11 @@ public:
                                     << '\n';
                     break;
                 case SideBoard:
-                    sideboardStream << quantity << ' ' << cardName << " (" << setName << ") " << collectorNumber
-                                    << '\n';
+                    sideboardStream << "SB: " << quantity << ' ' << cardName << " (" << setName << ") "
+                                    << collectorNumber << '\n';
                     break;
                 case MaybeBoard:
-                    for (int x = 0; x < quantity; x++) {
-                        deckList.addCard(cardName, DECK_ZONE_MAYBEBOARD, -1, setName, collectorNumber, providerId);
-                    }
+                    maybeboardList.append(card);
                     break;
                 case Commander:
                     commanderList.append(card);
@@ -179,12 +180,25 @@ public:
             }
         }
 
-        outStream << mainboardText << '\n' << sideboardText;
+        outStream << mainboardText << sideboardText;
 
         deckList.loadFromStream_Plain(outStream, false, CardNameNormalizer());
         deckList.setName(deckName);
         deckList.forEachCard(CardNodeFunction::ResolveProviderId());
 
+        if (!maybeboardList.isEmpty()) {
+            for (const auto &maybeboardCard : maybeboardList) {
+                QString cardName = maybeboardCard.value("name").toString();
+                QString setName = maybeboardCard.value("setId").toString().toUpper();
+                QString collectorNumber = maybeboardCard.value("collectorNumber").toString();
+                QString providerId = maybeboardCard.value("scryfallId").toString();
+                auto quantity = maybeboardCard.value("quantity").toInt();
+
+                for (int x = 0; x < quantity; x++) {
+                    deckList.addCard(cardName, DECK_ZONE_MAYBEBOARD, -1, setName, collectorNumber, providerId);
+                }
+            }
+        }
         if (!commanderList.isEmpty()) {
             for (const auto &commanderCard : commanderList) {
 

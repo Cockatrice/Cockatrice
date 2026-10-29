@@ -34,7 +34,7 @@
 
 class QWidget;
 
-static const QStringList SUPPORTED_PROVIDERS = {"Archidekt", "Deckstats", "Moxfield", "ManaBox", "TappedOut"};
+static const QStringList SUPPORTED_PROVIDERS = {"Archidekt", "Deckstats", "ManaBox", "Moxfield", "TappedOut"};
 DlgLoadDeckFromWebsite::DlgLoadDeckFromWebsite(QWidget *parent) : QDialog(parent)
 {
     nam = NetworkManagerFactory::create(this);
