@@ -15,10 +15,14 @@ Var ReinstallMode
 Var GuardDir
 Var OldUninstallString
 Var OldInstallDir
-; What ExecWait reported for the previous version's uninstaller (empty when it could not be
-; started at all). Read by WaitForOldPayloadToDisappear: an uninstaller that ran in place
+; What ExecWait reported for the previous version's uninstaller, or "missing" /
+; "launch-failed" when RunOldUninstaller could not start it. Read by WaitForOldPayloadToDisappear: an uninstaller that ran in place
 ; (_?=) and failed or was cancelled will not remove anything more, however long we wait.
 Var OldUninstallExit
+; Executable path parsed out of $OldUninstallString by ResolveOldUninstallExe. Used to
+; tell an uninstaller that is missing or cannot be started ("missing" / "launch-failed"
+; in $OldUninstallExit) from one that ran and failed.
+Var OldUninstallExe
 ; Set to 1 by RemoveOldPayloadLeftovers only when every leftover it is responsible for is
 ; gone; WaitForOldPayloadToDisappear aborts while it is still 0.
 Var OldPayloadRemoved
@@ -397,6 +401,61 @@ ${If} $ReinstallMode = 1
 ${EndIf}
 FunctionEnd
 
+; Sets $OldUninstallExe to the executable named in $OldUninstallString (everything up to
+; and including the first ".exe", without a leading quote), or "" when there is none.
+Function ResolveOldUninstallExe
+    Push $R7
+    Push $R8
+    StrLen $R8 $OldUninstallString
+    StrCpy $R7 0
+    roue_loop:
+    ${If} $R7 >= $R8
+        StrCpy $OldUninstallExe ""
+        Goto roue_out
+    ${EndIf}
+    StrCpy $OldUninstallExe $OldUninstallString 4 $R7
+    ${If} $OldUninstallExe == ".exe"
+        IntOp $R7 $R7 + 4
+        StrCpy $OldUninstallExe $OldUninstallString $R7
+        StrCpy $R8 $OldUninstallExe 1
+        ${If} $R8 == '"'
+            StrCpy $OldUninstallExe $OldUninstallExe "" 1
+        ${EndIf}
+        Goto roue_out
+    ${EndIf}
+    IntOp $R7 $R7 + 1
+    Goto roue_loop
+    roue_out:
+    Pop $R8
+    Pop $R7
+FunctionEnd
+
+; Runs "$OldUninstallString _?=$OldInstallDir" in place and sets $OldUninstallExit:
+; the uninstaller's own exit code when it ran, "missing" when the executable the
+; registry names does not exist, "launch-failed" when ExecWait could not start it.
+; The last two used to leave the code empty, which WaitForOldPayloadToDisappear read
+; as a cancelled uninstall and aborted on, although nobody had cancelled anything.
+; Uses $R5 for the exit code, as the callers did before.
+Function RunOldUninstaller
+    Call ResolveOldUninstallExe
+    StrCpy $R5 ""
+    ${If} $OldUninstallExe == ""
+    ${OrIfNot} ${FileExists} "$OldUninstallExe"
+        StrCpy $OldUninstallExit "missing"
+        !insertmacro CockLog "old uninstall: uninstaller '$OldUninstallExe' does not exist (command '$OldUninstallString')"
+        Return
+    ${EndIf}
+    ClearErrors
+    ExecWait '$OldUninstallString _?=$OldInstallDir' $R5
+    ${If} ${Errors}
+    ${OrIf} $R5 == ""
+        StrCpy $OldUninstallExit "launch-failed"
+        !insertmacro CockLog "old uninstall: could not start '$OldUninstallString _?=$OldInstallDir'"
+        Return
+    ${EndIf}
+    StrCpy $OldUninstallExit $R5
+FunctionEnd
+
 Function AutoUninstallIfNeeded
 
 SetShellVarContext all
@@ -421,10 +480,9 @@ StrCpy $OldInstallDir $INSTDIR
 StrCmp $R0 "" done32
 DetailPrint "Removing previous version (32-bit)..."
 Call BackupUserDataBeforeUninstall
-StrCpy $R5 ""
-ExecWait '$R0 _?=$OldInstallDir' $R5
-StrCpy $OldUninstallExit $R5
-!insertmacro CockLog "uninstall (32-bit): exit=$R5"
+StrCpy $OldUninstallString $R0
+Call RunOldUninstaller
+!insertmacro CockLog "uninstall (32-bit): exit=$OldUninstallExit"
 Call WaitForOldPayloadToDisappear
 Call RestoreUserDataAfterUninstall
 
@@ -438,12 +496,11 @@ ${If} ${RunningX64}
     StrCpy $OldInstallDir $INSTDIR
     !insertmacro CockLog "uninstall (64-bit): '$R0 _?=$OldInstallDir'"
     StrCmp $R0 "" done64
-    StrCpy $R5 ""
     DetailPrint "Removing previous version (64-bit)..."
     Call BackupUserDataBeforeUninstall
-    ExecWait '$R0 _?=$OldInstallDir' $R5
-    StrCpy $OldUninstallExit $R5
-    !insertmacro CockLog "uninstall (64-bit): exit=$R5"
+    StrCpy $OldUninstallString $R0
+    Call RunOldUninstaller
+    !insertmacro CockLog "uninstall (64-bit): exit=$OldUninstallExit"
     Call WaitForOldPayloadToDisappear
     Call RestoreUserDataAfterUninstall
 
@@ -471,6 +528,28 @@ Function WaitForOldPayloadToDisappear
 ${If} $OldInstallDir == ""
     Return
 ${EndIf}
+; The registered uninstaller could not be run at all (missing, or ExecWait could not
+; start it): nothing is going to empty the directory, so waiting is pointless and
+; aborting as "cancelled" was wrong. Remove the previous payload the same way the
+; skipped-files recovery below does, and abort - naming why - only if that fails.
+${If} $OldUninstallExit == "missing"
+${OrIf} $OldUninstallExit == "launch-failed"
+    ${IfNot} ${FileExists} "$OldInstallDir\*.*"
+        !insertmacro CockLog "old uninstall: uninstaller $OldUninstallExit and $OldInstallDir is already gone"
+        Return
+    ${EndIf}
+    !insertmacro CockLog "old uninstall: uninstaller $OldUninstallExit ('$OldUninstallString'); removing $OldInstallDir payload directly"
+    Call AppendUninstallerLog
+    Call RemoveOldPayloadLeftovers
+    ${If} $OldPayloadRemoved != "1"
+        StrCpy $AbortReason \
+            "The previous version in $OldInstallDir could not be removed: its uninstaller ($OldUninstallExe) could not be run ($OldUninstallExit), and removing the files directly failed.$\r$\n$\r$\nStill in use by: $HolderOutput$\r$\n$\r$\nClose anything still using those files and run this installer again."
+        Call RestoreUserDataAfterUninstall
+        Call AbortInstall
+    ${EndIf}
+    !insertmacro CockLog "old uninstall: continuing after removing the payload of an uninstaller that could not run"
+    Return
+${EndIf}
 StrCpy $R2 0
 old_uninstall_wait:
 IfFileExists "$OldInstallDir\cockatrice.exe" 0 old_uninstall_gone
@@ -481,8 +560,9 @@ ${If} $R2 > 60
     ; separate log; copy it here so the report sent from AbortInstall carries it.
     Call AppendUninstallerLog
     ${If} $OldUninstallExit != "0"
-        ; Cancelled, failed, or could not be started at all (empty code): the old version
-        ; was not meant to be removed, so nothing is deleted on its behalf.
+        ; Cancelled or failed with a non-zero exit code (an uninstaller that could not be
+        ; started is handled above): the old version was not meant to be removed, so
+        ; nothing is deleted on its behalf.
         StrCpy $AbortReason \
             "The previous version in $OldInstallDir is still there because its uninstaller was cancelled or failed (exit code '$OldUninstallExit').$\r$\n$\r$\nClose anything still using those files and run this installer again."
         ; The backup was taken before the uninstaller ran; an abort must not leave the
@@ -524,7 +604,8 @@ ${EndIf}
 Return
 FunctionEnd
 
-; Called when the old uninstaller exited successfully but left its payload behind.
+; Called when the old uninstaller exited successfully but left its payload behind, or
+; could not be run at all (missing or not startable) and the payload is still there.
 ; Frees the files the same way the guard does (close, then offer to end), deletes what
 ; the uninstaller skipped, and on failure records which files survived and who holds
 ; them in $HolderOutput, for the abort message. Sets $OldPayloadRemoved to 1 only when
@@ -2046,10 +2127,8 @@ ${If} $PortableMode = 0
     !insertmacro CockLog "componentsPagePre: old 32-bit uninstall '$OldUninstallString _?=$OldInstallDir' (oldDir=$OldInstallDir InstDir=$INSTDIR)"
     ClearErrors
     Call BackupUserDataBeforeUninstall
-    StrCpy $R5 ""
-    ExecWait "$OldUninstallString _?=$OldInstallDir" $R5
-    StrCpy $OldUninstallExit $R5
-    !insertmacro CockLog "componentsPagePre: old 32-bit uninstall exit=$R5"
+    Call RunOldUninstaller
+    !insertmacro CockLog "componentsPagePre: old 32-bit uninstall exit=$OldUninstallExit"
     Call WaitForOldPayloadToDisappear
     Call RestoreUserDataAfterUninstall
 
@@ -2084,10 +2163,8 @@ ${If} $PortableMode = 0
 	    !insertmacro CockLog "componentsPagePre: old 64-bit uninstall '$OldUninstallString _?=$OldInstallDir' (oldDir=$OldInstallDir InstDir=$INSTDIR)"
 	    ClearErrors
 	    Call BackupUserDataBeforeUninstall
-	    StrCpy $R5 ""
-	    ExecWait "$OldUninstallString _?=$OldInstallDir" $R5
-	    StrCpy $OldUninstallExit $R5
-	    !insertmacro CockLog "componentsPagePre: old 64-bit uninstall exit=$R5"
+	    Call RunOldUninstaller
+	    !insertmacro CockLog "componentsPagePre: old 64-bit uninstall exit=$OldUninstallExit"
 	    Call WaitForOldPayloadToDisappear
 	    Call RestoreUserDataAfterUninstall
 
