@@ -1742,12 +1742,16 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetLogHistory(const Com
 
     int dateRange = cmd.date_range();
     int maximumResults = cmd.maximum_results();
+    const int offset = cmd.has_offset() ? static_cast<int>(cmd.offset()) : 0;
 
     Response_ViewLogHistory *re = new Response_ViewLogHistory;
 
     if (servatrice->getEnableLogQuery()) {
-        QListIterator<ServerInfo_ChatMessage> messageIterator(sqlInterface->getMessageLogHistory(
-            userName, ipAddress, gameName, gameID, message, chatType, gameType, roomType, dateRange, maximumResults));
+        bool hasMore = false;
+        QList<ServerInfo_ChatMessage> history =
+            sqlInterface->getMessageLogHistory(userName, ipAddress, gameName, gameID, message, chatType, gameType,
+                                               roomType, dateRange, maximumResults, offset, &hasMore);
+        QListIterator<ServerInfo_ChatMessage> messageIterator(history);
         while (messageIterator.hasNext()) {
             ServerInfo_ChatMessage chatMessage = messageIterator.next();
             if (!allowPrivateChat) {
@@ -1755,6 +1759,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetLogHistory(const Com
             }
             re->add_log_message()->CopyFrom(chatMessage);
         }
+        re->set_has_more(hasMore);
     } else {
         ServerInfo_ChatMessage chatMessage;
 

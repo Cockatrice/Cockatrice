@@ -13,6 +13,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QRadioButton>
+#include <QScrollBar>
 #include <QSharedPointer>
 #include <QSizePolicy>
 #include <QSpinBox>
@@ -21,6 +22,7 @@
 #include <QTableWidgetItem>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/moderator_commands.pb.h>
 #include <libcockatrice/protocol/pb/response_viewlog_history.pb.h>
@@ -58,6 +60,10 @@ TabLog::TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool _can
     tabManager->addTab(chatTable, tr("Chat Logs"));
     setCentralWidget(tabManager);
 
+    connect(roomTable->verticalScrollBar(), &QScrollBar::valueChanged, this, &TabLog::checkFetchMore);
+    connect(gameTable->verticalScrollBar(), &QScrollBar::valueChanged, this, &TabLog::checkFetchMore);
+    connect(chatTable->verticalScrollBar(), &QScrollBar::valueChanged, this, &TabLog::checkFetchMore);
+
     createDock();
     restartLayout();
     clearClicked();
@@ -74,12 +80,9 @@ void TabLog::retranslateUi()
 
 void TabLog::getClicked()
 {
-    if (findUsername->text().isEmpty() && findIPAddress->text().isEmpty() && findGameName->text().isEmpty() &&
-        findGameID->text().isEmpty() && findMessage->text().isEmpty()) {
-        QMessageBox::critical(this, tr("Error"), tr("You must select at least one filter."));
-        return;
-    }
-
+    // Empty filters are a valid browse: room/game history going back from
+    // today, paginated. Only require a date range + location, both of which
+    // get sensible defaults below so a bare "Get" just works.
     if (!lastHour->isChecked() && !today->isChecked() && !pastDays->isChecked()) {
         pastDays->setChecked(true);
         pastXDays->setValue(20);
@@ -99,7 +102,26 @@ void TabLog::getClicked()
     }
 
     if (maximumResults->value() == 0) {
-        maximumResults->setValue(1000);
+        maximumResults->setValue(200);
+    }
+    pageSize = qBound(1, maximumResults->value(), 1000);
+
+    // Fresh search: reset pagination state and clear previous pages.
+    currentOffset = 0;
+    roomCounter = 0;
+    gameCounter = 0;
+    chatCounter = 0;
+    roomTable->setRowCount(0);
+    gameTable->setRowCount(0);
+    chatTable->setRowCount(0);
+
+    fetchPage(0);
+}
+
+void TabLog::fetchPage(int offset)
+{
+    if (isFetching) {
+        return;
     }
 
     int dateRange = 0;
@@ -131,7 +153,8 @@ void TabLog::getClicked()
         cmd.add_log_location("chat");
     };
     cmd.set_date_range(dateRange);
-    cmd.set_maximum_results(maximumResults->value());
+    cmd.set_maximum_results(pageSize);
+    cmd.set_offset(offset);
 
     PendingCommand *pend;
     if (canUseDeveloperCommands) {
@@ -141,8 +164,31 @@ void TabLog::getClicked()
         pend = client->prepareModeratorCommand(cmd);
     }
 
+    isFetching = true;
+    getButton->setEnabled(false);
+
     connect(pend, &PendingCommand::finished, this, &TabLog::viewLogHistory_processResponse);
     client->sendCommand(pend);
+}
+
+void TabLog::checkFetchMore()
+{
+    if (isFetching || !hasMoreResults) {
+        return;
+    }
+
+    // Prefetch well before the bottom so scrolling never visibly stalls.
+    // Any of the three tables near its end means the shared page window is
+    // running out, since pagination is over the combined result set.
+    auto nearBottom = [](QTableWidget *table) {
+        QScrollBar *bar = table->verticalScrollBar();
+        return (bar->maximum() - bar->value()) < 300;
+    };
+    if (!nearBottom(roomTable) && !nearBottom(gameTable) && !nearBottom(chatTable)) {
+        return;
+    }
+
+    fetchPage(currentOffset);
 }
 
 void TabLog::clearClicked()
@@ -166,6 +212,8 @@ void TabLog::clearClicked()
     pastDays->setAutoExclusive(true);
     today->setAutoExclusive(true);
     lastHour->setAutoExclusive(true);
+    currentOffset = 0;
+    hasMoreResults = false;
 }
 
 void TabLog::createDock()
@@ -209,14 +257,15 @@ void TabLog::createDock()
     pastXDays = new QSpinBox;
     pastXDays->setMaximum(20);
 
-    labelMaximum = new QLabel(tr("Maximum Results: "));
+    labelMaximum = new QLabel(tr("Results per page: "));
     maximumResults = new QSpinBox;
     maximumResults->setMaximum(1000);
+    maximumResults->setToolTip(tr("Page size for smooth scrolling: more rows load automatically as you scroll."));
 
-    labelDescription = new QLabel(tr(
-        "At least one filter is required.\nThe more information you put in, the more specific your results will be."));
+    labelDescription = new QLabel(tr("Leave filters empty to browse recent room and game messages.\n"
+                                     "More rows load automatically as you scroll."));
 
-    getButton = new QPushButton(tr("Get User Logs"));
+    getButton = new QPushButton(tr("Get Logs"));
     getButton->setAutoDefault(true);
     connect(getButton, &QPushButton::clicked, this, &TabLog::getClicked);
 
@@ -262,7 +311,7 @@ void TabLog::createDock()
     maxResultsGrid->addWidget(labelMaximum, 0, 0);
     maxResultsGrid->addWidget(maximumResults, 0, 1);
 
-    maxResultsGroupBox = new QGroupBox(tr("Maximum Results"));
+    maxResultsGroupBox = new QGroupBox(tr("Results per page"));
     maxResultsGroupBox->setLayout(maxResultsGrid);
 
     descriptionGrid = new QGridLayout;
@@ -295,84 +344,118 @@ void TabLog::createDock()
     searchDock->setWidget(searchDockContents);
 }
 
+void TabLog::appendChatMessage(QTableWidget *table,
+                               int &counter,
+                               const QString &time,
+                               const QString &senderName,
+                               const QString &senderIp,
+                               const QString &messageText,
+                               const QString &targetId,
+                               const QString &targetName,
+                               const QString &channel)
+{
+    table->insertRow(counter);
+    table->setItem(counter, 0, new QTableWidgetItem(time));
+    table->setItem(counter, 1, new QTableWidgetItem(senderName));
+    table->setItem(counter, 2, new QTableWidgetItem(senderIp));
+    table->setItem(counter, 3, new QTableWidgetItem(messageText));
+    table->setItem(counter, 4, new QTableWidgetItem(targetId));
+    table->setItem(counter, 5, new QTableWidgetItem(targetName));
+    if (table->columnCount() > 6) {
+        table->setItem(counter, 6, new QTableWidgetItem(channel));
+    }
+    ++counter;
+}
+
 void TabLog::viewLogHistory_processResponse(const Response &resp)
 {
     const Response_ViewLogHistory &response = resp.GetExtension(Response_ViewLogHistory::ext);
+    const bool isFirstPage = (currentOffset == 0);
+    isFetching = false;
+    getButton->setEnabled(true);
+
     if (resp.response_code() != Response::RespOk) {
         QMessageBox::critical(static_cast<QWidget *>(parent()), tr("Message History"),
                               tr("Failed to collect message history information."));
         return;
     }
 
-    if (response.log_message_size() == 0) {
+    if (isFirstPage && response.log_message_size() == 0) {
         QMessageBox::information(static_cast<QWidget *>(parent()), tr("Message History"),
                                  tr("There are no messages for the selected filters."));
+        hasMoreResults = false;
         return;
     }
-
-    int roomCounter = 0, gameCounter = 0, chatCounter = 0;
-    roomTable->setRowCount(roomCounter);
-    gameTable->setRowCount(gameCounter);
-    chatTable->setRowCount(chatCounter);
 
     for (int i = 0; i < response.log_message_size(); ++i) {
         ServerInfo_ChatMessage message = response.log_message(i);
         const QString targetType = QString::fromStdString(message.target_type());
         if (targetType == "room" || targetType == "room_channel") {
-            roomTable->insertRow(roomCounter);
-            roomTable->setItem(roomCounter, 0, new QTableWidgetItem(QString::fromStdString(message.time())));
-            roomTable->setItem(roomCounter, 1, new QTableWidgetItem(QString::fromStdString(message.sender_name())));
-            roomTable->setItem(roomCounter, 2, new QTableWidgetItem(QString::fromStdString(message.sender_ip())));
-            roomTable->setItem(roomCounter, 3, new QTableWidgetItem(QString::fromStdString(message.message())));
-            roomTable->setItem(roomCounter, 4, new QTableWidgetItem(QString::fromStdString(message.target_id())));
-            roomTable->setItem(roomCounter, 5, new QTableWidgetItem(QString::fromStdString(message.target_name())));
-            roomTable->setItem(roomCounter, 6, new QTableWidgetItem(QString::fromStdString(message.channel())));
-            ++roomCounter;
+            appendChatMessage(roomTable, roomCounter, QString::fromStdString(message.time()),
+                              QString::fromStdString(message.sender_name()),
+                              QString::fromStdString(message.sender_ip()), QString::fromStdString(message.message()),
+                              QString::fromStdString(message.target_id()),
+                              QString::fromStdString(message.target_name()),
+                              QString::fromStdString(message.channel()));
         }
 
         if (targetType == "game") {
-            gameTable->insertRow(gameCounter);
-            gameTable->setItem(gameCounter, 0, new QTableWidgetItem(QString::fromStdString(message.time())));
-            gameTable->setItem(gameCounter, 1, new QTableWidgetItem(QString::fromStdString(message.sender_name())));
-            gameTable->setItem(gameCounter, 2, new QTableWidgetItem(QString::fromStdString(message.sender_ip())));
-            gameTable->setItem(gameCounter, 3, new QTableWidgetItem(QString::fromStdString(message.message())));
-            gameTable->setItem(gameCounter, 4, new QTableWidgetItem(QString::fromStdString(message.target_id())));
-            gameTable->setItem(gameCounter, 5, new QTableWidgetItem(QString::fromStdString(message.target_name())));
-            ++gameCounter;
+            appendChatMessage(gameTable, gameCounter, QString::fromStdString(message.time()),
+                              QString::fromStdString(message.sender_name()),
+                              QString::fromStdString(message.sender_ip()), QString::fromStdString(message.message()),
+                              QString::fromStdString(message.target_id()),
+                              QString::fromStdString(message.target_name()));
         }
 
         if (targetType == "chat") {
-            chatTable->insertRow(chatCounter);
-            chatTable->setItem(chatCounter, 0, new QTableWidgetItem(QString::fromStdString(message.time())));
-            chatTable->setItem(chatCounter, 1, new QTableWidgetItem(QString::fromStdString(message.sender_name())));
-            chatTable->setItem(chatCounter, 2, new QTableWidgetItem(QString::fromStdString(message.sender_ip())));
-            chatTable->setItem(chatCounter, 3, new QTableWidgetItem(QString::fromStdString(message.message())));
-            chatTable->setItem(chatCounter, 4, new QTableWidgetItem(QString::fromStdString(message.target_id())));
-            chatTable->setItem(chatCounter, 5, new QTableWidgetItem(QString::fromStdString(message.target_name())));
-            ++chatCounter;
+            appendChatMessage(chatTable, chatCounter, QString::fromStdString(message.time()),
+                              QString::fromStdString(message.sender_name()),
+                              QString::fromStdString(message.sender_ip()), QString::fromStdString(message.message()),
+                              QString::fromStdString(message.target_id()),
+                              QString::fromStdString(message.target_name()));
         }
+    }
+
+    currentOffset += response.log_message_size();
+    if (response.has_has_more()) {
+        hasMoreResults = response.has_more();
+    } else {
+        // Legacy server without has_more: a full page implies more may exist.
+        hasMoreResults = (response.log_message_size() >= pageSize);
     }
 
     if (roomCounter) {
         roomTable->show();
-        roomTable->resizeColumnsToContents();
+        if (isFirstPage) {
+            roomTable->resizeColumnsToContents();
+        }
     } else {
         roomTable->hide();
     }
 
     if (gameCounter) {
-        gameTable->resizeColumnsToContents();
+        if (isFirstPage) {
+            gameTable->resizeColumnsToContents();
+        }
         gameTable->show();
     } else {
         gameTable->hide();
     }
 
     if (chatCounter) {
-        chatTable->resizeColumnsToContents();
+        if (isFirstPage) {
+            chatTable->resizeColumnsToContents();
+        }
         chatTable->show();
     } else {
         chatTable->hide();
     }
+
+    // The new rows may already fill less than a viewport (or the user is
+    // still parked at the bottom), so chain the next page without waiting
+    // for another scroll event. The prefetch stays invisible: rows simply
+    // keep appearing as you scroll.
+    checkFetchMore();
 }
 
 void TabLog::restartLayout()
