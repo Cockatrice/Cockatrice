@@ -103,44 +103,50 @@ bool isAnswerableWindow(HWND window)
 /// Picks the window to post the close to and the one the user should end up looking at.
 struct CloseTarget
 {
-    HWND main = nullptr;    ///< first visible window without an owner: the application's own
+    HWND main = nullptr;    ///< first answerable window without an owner: the application's own
     HWND toRaise = nullptr; ///< topmost visible window: a dialog when one is up
-    bool modalOpen = false; ///< the only window a user could answer is the instance's own question
+    bool hidden = false;    ///< the window being closed is not on screen (notification area)
 };
 
-/// Only the windows the user could answer are candidates - see isAnswerableWindow. An
-/// instance left with nothing but Qt's own bookkeeping windows visible has no window to ask:
-/// the caller reports that instead of posting a close the application would answer with a
-/// terminate that skips its own confirmation.
-CloseTarget chooseCloseTarget(const std::vector<HWND> &windows)
+/// Only the windows the user could be asked to answer are candidates - see isAnswerableWindow.
+///
+/// A hidden window is a candidate like a visible one: WM_CLOSE does not need a window on
+/// screen, so an instance that is only in the notification area answers it the way it answers
+/// its own close button, and the confirmation it raises then is a window Qt shows itself -
+/// painted, unlike one restored from outside. Nothing is shown from here. Qt's own bookkeeping
+/// windows stay excluded, because a close posted to the notification-area one terminates the
+/// instance without the confirmation and that is worse than no close at all.
+///
+/// @param windows every top-level window the process owns, in Z-order
+/// @param askHidden when false, only a window that is on screen is a target: the launcher
+///        mode reads "no window" as "past its own prompts and stuck", which stops being true
+///        the moment a hidden window is asked to close
+CloseTarget chooseCloseTarget(const std::vector<HWND> &windows, bool askHidden)
 {
     CloseTarget target;
-    HWND topmost = nullptr;
     for (const HWND window : windows) {
-        if (IsWindowVisible(window) == FALSE || !isAnswerableWindow(window)) {
+        if (!isAnswerableWindow(window)) {
             continue;
         }
-        if (topmost == nullptr) {
-            topmost = window;
+        const bool visible = IsWindowVisible(window) != FALSE;
+        if (visible && target.toRaise == nullptr) {
+            target.toRaise = window;
         }
-        if (target.main == nullptr && GetWindow(window, GW_OWNER) == nullptr) {
+        if (target.main == nullptr && GetWindow(window, GW_OWNER) == nullptr && (visible || askHidden)) {
             target.main = window;
+            target.hidden = !visible;
         }
     }
-    target.toRaise = topmost != nullptr ? topmost : target.main;
-    // A modal dialog disables the windows behind it, so a disabled main window is the
-    // instance asking a question of its own. A visible window with no unowned main window
-    // next to it is one too: what is on screen is then the question itself - the window
-    // behind it is hidden, not gone - and there is no window a close could be posted to
-    // without hiding the question with it.
-    target.modalOpen = target.toRaise != nullptr && (target.main == nullptr || IsWindowEnabled(target.main) == FALSE);
     return target;
 }
 
 /// What is left of the window the close was posted to, so a log line tells an instance that
 /// answered by hiding from one that never answered at all. A process that hid its window and
-/// stayed alive is the one that needs the next close to bring it back into view.
-std::wstring describeWindowState(HWND window)
+/// stayed alive is the one the guard's end answer is for.
+///
+/// @param window the window the close was posted to, or null when there was none
+/// @param wasHidden whether that window was already off screen before the close
+std::wstring describeWindowState(HWND window, bool wasHidden)
 {
     if (window == nullptr || IsWindow(window) == FALSE) {
         return L", its window is gone";
@@ -151,7 +157,12 @@ std::wstring describeWindowState(HWND window)
     DWORD_PTR ignored = 0;
     const bool responding =
         SendMessageTimeoutW(window, WM_NULL, 0, 0, SMTO_ABORTIFHUNG | SMTO_BLOCK, 1000, &ignored) != 0;
-    std::wstring state = IsWindowVisible(window) != FALSE ? L", window still open" : L", window hidden again";
+    std::wstring state;
+    if (IsWindowVisible(window) != FALSE) {
+        state = L", window still open";
+    } else {
+        state = wasHidden ? L", window still hidden" : L", window hidden again";
+    }
     if (!responding) {
         state += L" and not responding";
     }
@@ -208,25 +219,21 @@ bool waitForExit(const std::vector<HANDLE> &processes, unsigned long waitMillise
 }
 } // namespace
 
-unsigned int installerQuitRequestMessage()
-{
-    // Must match the name the client registers in cockatrice/src/main.cpp.
-    return RegisterWindowMessageW(L"Cockatrice.InstallerQuitRequest");
-}
-
 bool isCockatriceImage(const std::wstring &imageName)
 {
     constexpr wchar_t COCKATRICE_IMAGE[] = L"cockatrice.exe";
     return CompareStringOrdinal(imageName.c_str(), -1, COCKATRICE_IMAGE, -1, TRUE) == CSTR_EQUAL;
 }
 
-CloseHoldersResult closeCockatriceHolders(const std::vector<Holder> &holders, unsigned long waitMilliseconds)
+CloseHoldersResult
+closeCockatriceHolders(const std::vector<Holder> &holders, unsigned long waitMilliseconds, bool askHiddenWindows)
 {
     CloseHoldersResult result;
     std::vector<std::wstring> lines;
     std::vector<HANDLE> asked;
     std::vector<std::size_t> askedLines;
     std::vector<HWND> askedWindows;
+    std::vector<bool> askedWasHidden;
 
     for (const Holder &holder : holders) {
         if (holder.isService || !isCockatriceImage(holder.imageName)) {
@@ -239,75 +246,36 @@ CloseHoldersResult closeCockatriceHolders(const std::vector<Holder> &holders, un
         WindowSearch search;
         search.processId = holder.processId;
         EnumWindows(collectProcessWindow, reinterpret_cast<LPARAM>(&search));
-        if (search.windows.empty()) {
+        CloseTarget target = chooseCloseTarget(search.windows, askHiddenWindows);
+        if (target.main == nullptr) {
+            // Nothing of the application's own to post a close to: every window left is one of
+            // Qt's bookkeeping windows, or the only thing on screen is a question whose owner
+            // window is gone. Neither is a close the application would answer - a close to the
+            // notification-area window terminates without the confirmation - so the instance is
+            // named and the guard's end answer is what can free its files.
             ++result.withoutWindow;
-            lines.push_back(processLabel(holder) + L" has no window to close, left to you");
+            lines.push_back(processLabel(holder) + L" has no window of its own to close");
             continue;
         }
 
-        const CloseTarget target = chooseCloseTarget(search.windows);
-        if (target.toRaise == nullptr) {
-            // Nothing visible that a user could answer: the instance is hidden - in the
-            // notification area, say - or has nothing but Qt's own bookkeeping windows on
-            // screen. Showing one of those from here does not help, and WM_CLOSE to Qt's tray
-            // window terminates without the confirmation. Instead the instance is sent the
-            // installer quit request: a registered message Cockatrice answers by showing its own
-            // main window and closing it the normal way, confirmations included. Any of its
-            // windows reaches the same GUI-thread filter, so the first one that accepts the post
-            // is enough.
-            const UINT quitRequest = installerQuitRequestMessage();
-            const HANDLE process = quitRequest != 0 ? OpenProcess(SYNCHRONIZE, FALSE, holder.processId) : nullptr;
-            const DWORD openError = process == nullptr ? GetLastError() : ERROR_SUCCESS;
-            bool posted = false;
-            DWORD postError = ERROR_SUCCESS;
-            if (quitRequest != 0) {
-                for (const HWND window : search.windows) {
-                    if (PostMessageW(window, quitRequest, 0, 0) != FALSE) {
-                        posted = true;
-                        break;
-                    }
-                    postError = GetLastError();
-                }
-            }
-            if (!posted) {
-                if (process != nullptr) {
-                    CloseHandle(process);
-                }
-                ++result.withoutWindow;
-                std::wstring line = processLabel(holder);
-                line += L" has no window to ask, and the quit request could not be sent (win32 ";
-                line += std::to_wstring(postError);
-                line += L"), left to you";
-                lines.push_back(std::move(line));
-                continue;
-            }
-            ++result.askedToClose;
-            std::wstring line = processLabel(holder) + L" was hidden and sent the installer quit request";
-            if (process == nullptr) {
-                line += L", but its exit could not be watched (win32 " + std::to_wstring(openError) + L")";
-            } else {
-                askedLines.push_back(lines.size());
-                asked.push_back(process);
-                // No window to describe afterwards: describeWindowState reports a null window as gone.
-                askedWindows.push_back(nullptr);
-            }
-            lines.push_back(std::move(line));
-            continue;
-        }
         std::wstring line = processLabel(holder);
-        line += bringForward(target.toRaise) ? L" brought forward" : L" could not be brought forward";
-
-        // Posting the close to an instance that is asking a question of its own is what made
-        // an earlier attempt useless: the client accepts it, hides this window and the dialog
-        // with it, and stays alive inside the nested loop the dialog opened, where nothing can
-        // reach it any more. The question is the request now, so it is brought forward and
-        // left alone - including a question whose owner window is hidden, which is the only
-        // thing left on screen and has no unowned window a close could be posted to.
-        if (target.modalOpen) {
-            lines.push_back(line + L", and is waiting for an answer to a question of its own");
-            continue;
+        if (target.hidden) {
+            line += L" is hidden in the notification area";
+        } else {
+            if (target.toRaise == nullptr) {
+                target.toRaise = target.main;
+            }
+            line += bringForward(target.toRaise) ? L" brought forward" : L" could not be brought forward";
         }
 
+        // Posted to the instance's own window even when a question of its own is up. The close
+        // is what that window's close button does, and the application is the one that answers
+        // it: a current client refuses the close while its confirmation is pending, leaving the
+        // question in front, and only a client from before that guard accepts it and hides the
+        // window with the question. Withholding the request therefore protected nobody - it
+        // left the installer asking the user to close a program it had never asked - while the
+        // guard's end answer is what frees the files when the close cannot.
+        //
         // Kept open across the wait so a pid reused after the process exits cannot be
         // mistaken for the instance that was asked to close.
         const HANDLE process = OpenProcess(SYNCHRONIZE, FALSE, holder.processId);
@@ -330,6 +298,7 @@ CloseHoldersResult closeCockatriceHolders(const std::vector<Holder> &holders, un
             askedLines.push_back(lines.size());
             asked.push_back(process);
             askedWindows.push_back(target.main);
+            askedWasHidden.push_back(target.hidden);
         }
         lines.push_back(std::move(line));
     }
@@ -343,7 +312,7 @@ CloseHoldersResult closeCockatriceHolders(const std::vector<Holder> &holders, un
                 lines[askedLines[index]] += L", exited after " + std::to_wstring(elapsed) + L" ms";
             } else {
                 lines[askedLines[index]] += L", still running after " + std::to_wstring(elapsed) + L" ms" +
-                                            describeWindowState(askedWindows[index]);
+                                            describeWindowState(askedWindows[index], askedWasHidden[index]);
             }
         }
     }

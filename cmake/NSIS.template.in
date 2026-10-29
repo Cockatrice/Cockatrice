@@ -61,12 +61,8 @@ Var GuardOutput
 ; close, 1 after it. The prompt that follows offers to end the instance rather than asking
 ; a second time (see GuardAppsNotRunning).
 Var GuardCloseTried
-; Set when the user answered Yes to ending the programs and the files were still in use
-; afterwards, so the prompt that follows says the end did not help instead of reappearing
-; word for word (see CockEndPrompt).
-Var GuardEndFailed
-; The question CockEndPrompt assembles: one sentence in it is conditional, and the result
-; has to stay inside the characters one NSIS string holds.
+; The question CockEndPrompt assembles: fixed sentences around the probe's line, and the
+; result has to stay inside the characters one NSIS string holds.
 Var GuardPrompt
 Var WaitPid
 Var LauncherExited
@@ -1043,8 +1039,9 @@ FunctionEnd
 ; the recovery prompt after a failed purge.
 !define END_COST "An unsaved deck, a running game or an unwritten setting is lost, Servatrice drops its players, and an Oracle that is mid-write can damage the card database."
 
-; The other half of that answer - what is left to do when nothing is ended - is shared by
-; every prompt that names the holders, for the same reason.
+; What the user does instead when they say no: the prompt's other answer stops the run, so they
+; are told how to get past the same wall next time. Also used by the abort dialogs, which is
+; where the answer to "why did it stop" ends up.
 !define AFTER_CLOSING_GUIDANCE "Answer the confirmation Cockatrice may be showing - open it from the notification area if it is hidden there - and use Task Manager for a program that would not end."
 
 ; usage: set the variable named by the second argument to the probe's listing, then call
@@ -1056,23 +1053,22 @@ FunctionEnd
 ; else the probe named has to be closed by hand, so a listing that includes a scanner or a
 ; service hosted elsewhere does not come with an answer that cannot do what it says.
 ;
+; Two answers, one of each: the automatic close already ran when this is asked, so Yes is the
+; only thing left that can free the files and No stops the run. There is deliberately no
+; "try again" - the same question, word for word, with nothing changed in between was what
+; made an abort out of a stall.
+;
 ; The assembled string has to fit the characters one NSIS string holds, which is what
 ; bounds HOLDER_LINE_CHAR_MAX in tools\installer-holder-probe\holder_line.h: with the
-; longest listing that can arrive and the sentence only a failed end adds, it stays inside
-; that budget instead of being cut off at the tail, where the Cancel line is.
+; longest listing that can arrive it stays inside that budget instead of being cut off at
+; the tail, where the cancel line is.
 ;
 ; @param header the sentence that introduces the listing, with its trailing colon
 ; @param listing the variable holding the probe's line, $GuardOutput or $HolderOutput
-; @param cancelWord what Cancel gives up, "installation" or "uninstallation"
+; @param cancelWord what No gives up, "installation" or "uninstallation"
 !macro CockEndPrompt header listing cancelWord
     StrCpy $GuardPrompt "${header}$\r$\n$\r$\n${listing}"
-    ; Said only after the previous answer was Yes: without it the same dialog reappears word
-    ; for word, which is what "nothing happened" looked like - the end can fail on a process
-    ; the installer may not open, and it never touches a program that is not one of ours.
-    ${If} $GuardEndFailed = 1
-        StrCpy $GuardPrompt "$GuardPrompt$\r$\n$\r$\nEnding them did not free the files."
-    ${EndIf}
-    StrCpy $GuardPrompt "$GuardPrompt$\r$\n$\r$\nChoose Yes to end the Cockatrice, Oracle and Servatrice programs listed above. ${END_COST}$\r$\n$\r$\nChoose No to try again after closing anything else listed above by hand. ${AFTER_CLOSING_GUIDANCE}$\r$\n$\r$\nChoose Cancel to cancel the ${cancelWord}."
+    StrCpy $GuardPrompt "$GuardPrompt$\r$\n$\r$\nChoose Yes to end the Cockatrice, Oracle and Servatrice programs listed above. ${END_COST}$\r$\n$\r$\nChoose No to cancel the ${cancelWord}. ${AFTER_CLOSING_GUIDANCE}"
 !macroend
 
 ; Emitted once for the installer and once for the uninstaller: the uninstaller
@@ -1115,10 +1111,12 @@ FunctionEnd
 ; cockatrice.exe is asked: Oracle writes the card database in place and Servatrice has no
 ; window to ask, so both are left alone here and only ended by the explicit answer.
 ;
-; Each instance is brought to the foreground before WM_CLOSE is posted to its main window.
-; WM_CLOSE is answered, not obeyed - Cockatrice asks before it quits while a card database
-; update is running, a game is open or a deck is unsaved - and that question is only useful
-; if it is in front of the installer instead of behind it.
+; Each instance's own window is asked to close with WM_CLOSE - whether it is on screen or
+; only in the notification area, since the request does not need a visible window and the
+; notification-area instance is the one this update has no other way to reach. A visible
+; window is brought forward first. WM_CLOSE is answered, not obeyed - Cockatrice asks before
+; it quits while a card database update is running, a game is open or a deck is unsaved - and
+; that question is only useful if it is in front of the installer instead of behind it.
 ;
 ; The probe waits up to 30 s for the processes it asked to exit, so the check that follows
 ; measures a settled directory rather than sleeping for a fixed time. Its line goes into the
@@ -1171,14 +1169,16 @@ FunctionEnd
 
 ; usage: set $GuardDir to the directory to guard, then call this.
 ;
-; Asks Cockatrice to close once, then prompts until the payload is free. The automatic
-; close is the same request clicking the window's close button makes, so the common case -
-; the client was still shutting down - never turns into a question. The prompt is what
-; remains when the close cannot reach everything: Oracle writes the card database in
-; place, Servatrice has no window, and Cockatrice may still be waiting for an answer in
-; its own confirmation. It offers to end the programs the payload installs - and only those,
-; which the text says - with what that costs (Yes), a plain re-check for after the user
-; closed things by hand (No), and Cancel - ending is the last resort, see EndHolders.
+; Asks Cockatrice to close once, then asks one question with one answer that can free the
+; payload. The automatic close is the same request clicking the window's close button makes,
+; so the common case - the client was still shutting down - never turns into a question. The
+; prompt is what remains when the close cannot reach everything: Oracle writes the card
+; database in place, Servatrice has no window, and a client that is sitting on its own
+; confirmation needs an answer nobody can give it from here. It offers to end the programs
+; the payload installs - and only those, which the text says - with what that costs (Yes),
+; and its other answer stops the install (No) instead of repeating the same dialog. What
+; survives an end is reported in the abort, never asked about again - ending is the last
+; resort, see EndHolders.
 ;
 ; An error is always shown, in every mode. A /S install without /R has nobody at
 ; the keyboard, but this installer does not promise unattended runs: when an
@@ -1188,7 +1188,6 @@ FunctionEnd
 Function GuardAppsNotRunning
     !insertmacro CockLog "guard: checking $GuardDir (launcherExited=$LauncherExited)"
     StrCpy $GuardCloseTried 0
-    StrCpy $GuardEndFailed 0
     guard_check:
     Call RunHolderProbe
     ${If} $GuardExit == "0"
@@ -1211,21 +1210,15 @@ Function GuardAppsNotRunning
             Goto guard_check
         ${EndIf}
         DetailPrint "The install directory is in use by: $GuardOutput"
-        ; The automatic close already ran once. Asking Cockatrice to close again is unlikely
-        ; to help: an instance that did not answer the first one is usually sitting on a
-        ; confirmation of its own, and the close probe leaves such an instance alone so that a
-        ; second WM_CLOSE cannot hide the window the question is in - which is how a pre-3.1.2
-        ; update used to leave a headless process behind. An instance with no window has
-        ; nothing to ask at all. Ending is what is left that can free the files, so the prompt
-        ; offers it here, with what it costs in the text: an unsaved deck, a game, a settings
-        ; write, and an Oracle that may be mid-way through the card database. The answers that
-        ; end nothing stay reachable from the same dialog: the instance's own confirmation,
-        ; and closing anything by hand.
+        ; The close ran and did not free the files, so ending them is the only thing left that
+        ; can - and that is the one question, asked once. Its other answer stops the run
+        ; instead of asking again: a second identical dialog, with nothing changed in between,
+        ; is what made users cancel an update the installer could have finished by itself.
         !insertmacro CockEndPrompt "Cockatrice, Oracle or Servatrice is still using files of the installation:" $GuardOutput "installation"
-        MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON2 "$GuardPrompt" IDYES guard_end IDNO guard_check
+        MessageBox MB_YESNO|MB_ICONEXCLAMATION|MB_DEFBUTTON2 "$GuardPrompt" IDYES guard_end
         !insertmacro CockLog "guard: cancelled by user"
         StrCpy $AbortReason \
-            "The installation was cancelled because Cockatrice, Oracle or Servatrice is still running and holding files of the previous version.$\r$\n$\r$\nClose them and run the installer again."
+            "The installation was cancelled because Cockatrice, Oracle or Servatrice is still running and holding files of the previous version.$\r$\n$\r$\n${AFTER_CLOSING_GUIDANCE}$\r$\n$\r$\nClose them and run the installer again."
         ; RemoveOldPayloadLeftovers runs with the pre-uninstall backup already taken;
         ; restoring here keeps this abort from stranding the only copy in %TEMP%.
         Call RestoreUserDataAfterUninstall
@@ -1234,12 +1227,25 @@ Function GuardAppsNotRunning
         guard_end:
         !insertmacro CockLog "guard: ending the payload programs on request, then checking again"
         Call EndHolders
-        ; Everything the payload installs is ended, but a program that could not be opened
-        ; (another account, a protected process) survives, and a program that is not one of
-        ; ours is never touched at all, so what is left may still have to be closed by hand.
-        ; Go back to the same prompt, which says the end did not free the files.
-        StrCpy $GuardEndFailed 1
-        Goto guard_check
+        ; Measure once and report, rather than asking the same question again. Everything the
+        ; payload installs was ended, so what survived is a program this installer may not
+        ; open or does not own - another dialog offering to end it again would only repeat
+        ; itself.
+        Call RunHolderProbe
+        ${If} $GuardExit == "0"
+            !insertmacro CockLog "guard: nothing is holding the payload"
+            Return
+        ${EndIf}
+        !insertmacro CockLog "guard: still in use after ending them ($GuardExit): $GuardOutput"
+        ${If} $GuardExit == "1"
+            StrCpy $AbortReason \
+                "The installation was cancelled because these programs still hold files of the previous version and could not be ended:$\r$\n$\r$\n$GuardOutput$\r$\n$\r$\n${AFTER_CLOSING_GUIDANCE}$\r$\n$\r$\nClose them and run the installer again."
+        ${Else}
+            StrCpy $AbortReason \
+                "The installation was cancelled because, after ending Cockatrice, Oracle and Servatrice, the installer could not check whether they still hold files of the previous version.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nClose them and run the installer again."
+        ${EndIf}
+        Call RestoreUserDataAfterUninstall
+        Call AbortInstall
     ${EndIf}
     ; Not an answer at all: the probe was not configured, the Restart Manager
     ; call failed and nothing runs from the directory, or it timed out. Carrying
@@ -1921,36 +1927,20 @@ FunctionEnd
 ; a decision, it asks for one. No offer when the probe named nobody: there is nothing to
 ; end, and the abort's per-file diagnostics already record what Windows said.
 ;
-; Every round offers all three answers: Yes ends the programs the payload installs - and
-; says so, because anything else the probe named is left to the user - and purges again, No
-; purges again without ending anything (for when the user closed things by hand), and
-; Cancel gives up. Each round re-reads the holders, so the prompt names what survived the
-; last attempt rather than repeating the first listing.
+; One question after the automatic close, and never a loop: Yes ends the programs the
+; payload installs - and says so, because anything else the probe named is left to the user -
+; and purges again; the other answer gives up, and the caller's abort names what survived.
+; The listing is re-read before the question, so it says what is left now rather than
+; repeating the first one.
 Function RecoverFromHolders
     ${If} $HolderFound != 1
         !insertmacro CockLog "recover-holders: no holder was named, nothing to offer"
         Return
     ${EndIf}
-    StrCpy $GuardEndFailed 0
     ; The automatic attempt, the same one the guard makes before it asks anything.
     !insertmacro CockLog "recover-holders: closing cockatrice, then trying the removal again"
     StrCpy $GuardDir $INSTDIR
     Call CloseHolders
-    Goto rfh_retry
-    rfh_prompt:
-    ; The same question the guard asks, so the two cannot drift apart in what they promise.
-    !insertmacro CockEndPrompt "Files of the previous version of Cockatrice are still in use by:" $HolderOutput "installation"
-    MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON2 "$GuardPrompt" IDYES rfh_end IDNO rfh_retry
-    !insertmacro CockLog "recover-holders: cancelled by user"
-    Return
-    ; Only reached through Yes: Return does not come back here.
-    rfh_end:
-    !insertmacro CockLog "recover-holders: ending the payload programs on request, then trying the removal again"
-    Call EndHolders
-    ; The next prompt says the end did not free the files, instead of naming the same
-    ; survivors word for word.
-    StrCpy $GuardEndFailed 1
-    rfh_retry:
     Call RetryDllPurge
     StrCpy $StaleRuntimeAfterPurge $R0
     !insertmacro CockLogListing "after-retry-purge" "*.dll"
@@ -1960,13 +1950,33 @@ Function RecoverFromHolders
         DetailPrint "Files of the previous version were removed; continuing the installation."
         Return
     ${EndIf}
-    ; Still stuck: refresh the names, so the next prompt and the log describe what
-    ; survived the last attempt and not what was there before it.
+    ; Still stuck: refresh the names, so the prompt and the log describe what survived the
+    ; last attempt and not what was there before it.
     Call LogStaleRuntimeDiagnostics
     ${If} $HolderFound != 1
         Return
     ${EndIf}
-    Goto rfh_prompt
+    ; One question, the same one the guard asks and with the same two answers. No retry loop:
+    ; the purge has already been tried after the close, so the only thing that can still free
+    ; the files is ending them, and the caller's abort names whatever survives that.
+    !insertmacro CockEndPrompt "Files of the previous version of Cockatrice are still in use by:" $HolderOutput "installation"
+    MessageBox MB_YESNO|MB_ICONEXCLAMATION|MB_DEFBUTTON2 "$GuardPrompt" IDYES rfh_end
+    !insertmacro CockLog "recover-holders: cancelled by user"
+    Return
+    ; Only reached through Yes: Return does not come back here.
+    rfh_end:
+    !insertmacro CockLog "recover-holders: ending the payload programs on request, then trying the removal again"
+    Call EndHolders
+    Call RetryDllPurge
+    StrCpy $StaleRuntimeAfterPurge $R0
+    !insertmacro CockLog "recover-holders: stale-runtime after end=$StaleRuntimeAfterPurge"
+    ${If} $StaleRuntimeAfterPurge = 0
+        DetailPrint "Files of the previous version were removed; continuing the installation."
+        Return
+    ${EndIf}
+    ; Refresh the names one last time so the abort that follows describes what survived the
+    ; end, and then let it stop the run: the same dialog again would only repeat itself.
+    Call LogStaleRuntimeDiagnostics
 FunctionEnd
 
 ; Uninstaller copy of the guard (the uninstaller gets its own function set compiled in, it
@@ -1980,7 +1990,6 @@ FunctionEnd
 
 Function un.GuardAppsNotRunning
     StrCpy $GuardCloseTried 0
-    StrCpy $GuardEndFailed 0
     un_guard_check:
     !insertmacro CockLogUn "uninst-guard: checking $GuardDir"
     Call un.RunHolderProbe
@@ -1999,15 +2008,12 @@ Function un.GuardAppsNotRunning
             Goto un_guard_check
         ${EndIf}
         DetailPrint "The install directory is in use by: $GuardOutput"
-        ; Same approach as in the installer's guard: the automatic close already ran once, and
-        ; asking again is unlikely to help an instance that is sitting on its own confirmation
-        ; or has no window a close could reach. Ending is what is left that can free the files,
-        ; so the prompt offers it here, with what it costs in the text, while keeping the
-        ; answers that end nothing - the instance's own question, and closing anything by hand
-        ; - reachable from the same dialog. CockEndPrompt words it, so this copy and the
+        ; Same question as in the installer's guard, and the same two answers: Yes ends the
+        ; programs the payload installs, anything else stops the uninstallation. Asking again
+        ; after a No only repeated the dialog. CockEndPrompt words it, so this copy and the
         ; installer's promise the same thing.
         !insertmacro CockEndPrompt "Cockatrice, Oracle or Servatrice is still using files of the installation:" $GuardOutput "uninstallation"
-        MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON2 "$GuardPrompt" IDYES un_guard_end IDNO un_guard_check
+        MessageBox MB_YESNO|MB_ICONEXCLAMATION|MB_DEFBUTTON2 "$GuardPrompt" IDYES un_guard_end
         !insertmacro CockLogUn "uninst-guard: cancelled by user"
         SetErrorLevel 1
         Abort
@@ -2015,12 +2021,17 @@ Function un.GuardAppsNotRunning
         un_guard_end:
         !insertmacro CockLogUn "uninst-guard: ending the payload programs on request, then checking again"
         Call un.EndHolders
-        ; Everything the payload installs is ended, but a program that could not be opened
-        ; (another account, a protected process) survives, and a program that is not one of
-        ; ours is never touched at all, so what is left may still have to be closed by hand.
-        ; Go back to the same prompt, which says the end did not free the files.
-        StrCpy $GuardEndFailed 1
-        Goto un_guard_check
+        ; One measurement and a stop, not another question: what survived a terminate is a
+        ; program this uninstaller may not open or does not own, and ending it again cannot
+        ; change that.
+        Call un.RunHolderProbe
+        ${If} $GuardExit == "0"
+            !insertmacro CockLogUn "uninst-guard: nothing is holding the payload"
+            Return
+        ${EndIf}
+        !insertmacro CockLogUn "uninst-guard: still in use after ending them ($GuardExit): $GuardOutput"
+        SetErrorLevel 1
+        Abort
     ${EndIf}
     ; Same reasoning as in the installer: without an answer from the probe we cannot tell
     ; whether a running instance still holds file locks, and refusing outright would leave
@@ -2333,8 +2344,8 @@ ${If} $StaleRuntimeAfterPurge = 1
     ${If} $HolderFound = 1
         ; On /R the previous version is already uninstalled at this point, so an abort
         ; leaves the user with no working Cockatrice. It closes once, then offers to end
-        ; what is left or to try the removal again; this updates $StaleRuntimeAfterPurge
-        ; with the last retry's verdict.
+        ; what is left; this updates $StaleRuntimeAfterPurge with the verdict after that
+        ; close, or after the end when the user asked for one.
         Call RecoverFromHolders
     ${Else}
         ; Nothing is holding them. The three attempts in RetryDllPurge were two seconds

@@ -29,9 +29,9 @@ inline constexpr std::size_t HOLDER_LINE_MAX = 5;
  * The line is not the whole string: every prompt puts it after a fixed paragraph and before
  * the answers, and one NSIS string holds 1024 characters. Those paragraphs grew when the
  * guard started spelling out what ending the programs costs and what is left to do by hand,
- * so this budget is what keeps the longest message - the one that also says the last end
- * freed nothing, plus the "; and N more" the summary appends after the budget - complete,
- * including the Cancel line at its end. Windows caps one application or service name well
+ * so this budget is what keeps the longest message - the one with the longest listing, plus
+ * the "; and N more" the summary appends after the budget - complete, including the sentence
+ * that offers the other answer at its end. Windows caps one application or service name well
  * below this, so it bounds the list without ever cutting a single holder short.
  */
 inline constexpr std::size_t HOLDER_LINE_CHAR_MAX = 320;

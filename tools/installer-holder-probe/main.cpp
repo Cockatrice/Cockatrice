@@ -148,9 +148,9 @@ bool launcherProcessIdFromEnvironment(unsigned long &processId)
 ///
 /// The guard closes a set and reports every holder; here there is exactly one process, and
 /// the installer needs an answer it can act on rather than a sentence: a launcher with no
-/// window to ask is past its own prompts and stuck in shutdown, so no answer the installer
-/// offers would ever reach it. Everything else - a window that was asked, or one that is
-/// waiting on a question of its own - is still the user's decision.
+/// visible window has already answered its own close and is stuck in shutdown, so no answer
+/// the installer offers would ever reach it. A window that was asked - including one the
+/// instance is showing a question in - is still the user's decision.
 int closeLauncher(const std::wstring &installDir)
 {
     unsigned long processId = 0;
@@ -170,7 +170,7 @@ int closeLauncher(const std::wstring &installDir)
             writeLine(L"the launcher is not cockatrice.exe, left to you");
             return EXIT_PROBE_FAILED;
         }
-        const CloseHoldersResult result = closeCockatriceHolders({holder}, CLOSE_WAIT_MILLISECONDS);
+        const CloseHoldersResult result = closeCockatriceHolders({holder}, CLOSE_WAIT_MILLISECONDS, false);
         writeLine(result.report);
         if (result.askedToClose > 0) {
             return EXIT_HOLDERS_FOUND;
@@ -251,7 +251,9 @@ int main(int argumentCount, char **arguments)
         return result.ended > 0 ? EXIT_HOLDERS_FOUND : EXIT_NO_HOLDERS;
     }
 
-    const CloseHoldersResult result = closeCockatriceHolders(holders, CLOSE_WAIT_MILLISECONDS);
+    // Hidden windows are asked to close here: an instance in the notification area is the one
+    // this update has no other way to reach, and the guard's end answer is behind that attempt.
+    const CloseHoldersResult result = closeCockatriceHolders(holders, CLOSE_WAIT_MILLISECONDS, true);
     writeLine(result.report);
     return result.askedToClose > 0 ? EXIT_HOLDERS_FOUND : EXIT_NO_HOLDERS;
 }
