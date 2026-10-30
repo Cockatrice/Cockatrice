@@ -965,6 +965,16 @@ jobs:
       # entry under the prefix on every run, so a dead ABI generation keeps its access
       # date fresh forever and age based eviction can never reach it. Deleting by age
       # alone cannot fix that, only knowing which scope an entry belongs to can.
+      #
+      # docker-release's image builds store their layers under the same budget: one blob per
+      # layer, keyed buildkit-blob-1-<digest>, plus one index-<scope>-1-<hash> entry per image
+      # scope that lists them. buildkit can serve a build through the index without downloading
+      # a blob, so a blob's own access date goes stale while the layer is still in use. They are
+      # judged per ref as a set instead: a ref's whole buildkit cache, index and blobs, is
+      # dropped together or not at all, because an index left pointing at a deleted blob breaks
+      # the next image build. A ref that is still building keeps all of it, since docker-release
+      # rewrites master's index on every push; together these were 2.9Gi of the 10Gi, and
+      # reclaiming that from a live ref would have to be a size-aware policy, not an age one.
       - name: "Delete unusable cache entries"
         shell: bash
         env:
@@ -978,19 +988,41 @@ jobs:
 
           cutoff="$(( $(date -u +%s) - 7 * 24 * 3600 ))"
           live=" ${LIVE_VCPKG_SCOPES} "
+
+          # Newest access date of the buildkit entries of each ref. A blob key carries no
+          # scope, so a ref is the smallest unit that can be dropped without leaving an index
+          # behind; one touched entry keeps the ref's whole buildkit cache alive.
+          declare -A buildkit_newest=()
+          while IFS=$'\t' read -r id ref key accessed; do
+            [[ $key == buildkit-* || $key == index-* ]] || continue
+            stamp="$(date -u -d "$accessed" +%s 2>/dev/null || echo 0)"
+            if [[ $stamp -gt ${buildkit_newest[$ref]:-0} ]]; then
+              buildkit_newest[$ref]=$stamp
+            fi
+          done <"$RUNNER_TEMP/caches.tsv"
+
           deleted=0
           while IFS=$'\t' read -r id ref key accessed; do
             [[ -n $id ]] || continue
-            # Only ever touch the key shapes this workflow creates, so that an entry of
-            # some other workflow can never be deleted by accident
+            # Only ever touch the key shapes our workflows create (the buildkit entries come
+            # from docker-release.yml), so that an entry of some other workflow can never be
+            # deleted by accident
             case "$key" in
-              vcpkg/* | ccache-* | Qt*) ;;
+              vcpkg/* | ccache-* | Qt* | buildkit-* | index-*) ;;
               *) continue ;;
             esac
 
             reason=""
+            age_check=1
             if [[ $ref != refs/heads/master ]]; then
               reason="scoped to $ref"
+            elif [[ $key == buildkit-* || $key == index-* ]]; then
+              # Judged as a whole ref above, never on its own date
+              age_check=0
+              newest="${buildkit_newest[$ref]:-0}"
+              if [[ $newest -ne 0 && $newest -lt $cutoff ]]; then
+                reason="image layers of $ref unused for 7 days"
+              fi
             elif [[ $key == vcpkg/* ]]; then
               # "<scope>/<abi hash>", cut the hash off the end to get the scope
               scope="vcpkg/${key#vcpkg/}"
@@ -999,7 +1031,7 @@ jobs:
                 reason="no matrix leg uses $scope"
               fi
             fi
-            if [[ -z $reason ]]; then
+            if [[ -z $reason && $age_check -eq 1 ]]; then
               stamp="$(date -u -d "$accessed" +%s 2>/dev/null || echo 0)"
               if [[ $stamp -ne 0 && $stamp -lt $cutoff ]]; then
                 reason="unused since $accessed"
@@ -1014,30 +1046,3 @@ jobs:
           done <"$RUNNER_TEMP/caches.tsv"
 
           echo "::notice::deleted $deleted of $(wc -l <"$RUNNER_TEMP/caches.tsv") cache entries"
-
-      # docker-release's image builds store their layers here, one entry per blob, scoped to the
-      # ref that built them. A layer cache is only worth something to an image build within days
-      # of the one that wrote it, and releases are months apart, so an entry nothing has touched
-      # for a week is dead weight. These were 2.9Gi of the repository's 10Gi, which is the room
-      # the compiler caches above need.
-      - name: "Delete stale image layer cache"
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          cutoff="$(( $(date -u +%s) - 7 * 24 * 3600 ))"
-          gh api --paginate "repos/$GITHUB_REPOSITORY/actions/caches?per_page=100" \
-            --jq '.actions_caches[] | select(.key | startswith("buildkit-blob-")) | [.id, .key, .last_accessed_at] | @tsv' >"$RUNNER_TEMP/layers.tsv"
-
-          deleted=0
-          while IFS=$'\t' read -r id key accessed; do
-            [[ -n $id ]] || continue
-            stamp="$(date -u -d "$accessed" +%s 2>/dev/null || echo 0)"
-            if [[ $stamp -ne 0 && $stamp -lt $cutoff ]]; then
-              echo "::notice::deleting $key, unused since $accessed"
-              gh api -X DELETE "repos/$GITHUB_REPOSITORY/actions/caches/$id"
-              deleted=$((deleted + 1))
-            fi
-          done <"$RUNNER_TEMP/layers.tsv"
-
-          echo "::notice::deleted $deleted stale image layer entries"
