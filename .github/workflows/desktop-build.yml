@@ -188,9 +188,15 @@ jobs:
       CMAKE_GENERATOR: 'Ninja'
       NAME: ${{ matrix.distro }}${{ matrix.version }}
       IMAGE_SUFFIX: ${{ matrix.variant }}
-      # Which build the suite runs in: the instrumented legs (symbols and instrumentation
-      # matter) and the two newest distro toolchains, which only fail on a warning in Debug.
+      # Which build the suite runs in, decided once per leg here so the steps' if: conditions
+      # and their shells cannot drift apart. A step's own env is not visible to its if:, which
+      # is why these live at job level rather than on the release step.
+      #   DEBUG_TEST  the instrumented legs (symbols and instrumentation matter) and the two
+      #               newest distro toolchains, which only fail on a warning in Debug.
+      #   RUN_TESTS   every other leg that tests runs the suite against the release build it may
+      #               also package, so testing and packaging cost one compile instead of two.
       DEBUG_TEST: ${{ matrix.sanitize == 'yes' || matrix.coverage == 'yes' || matrix.debug_test == 'yes' }}
+      RUN_TESTS: ${{ matrix.test != 'skip' && !(matrix.sanitize == 'yes' || matrix.coverage == 'yes' || matrix.debug_test == 'yes') }}
 
     steps:
       - name: "Checkout"
@@ -260,13 +266,12 @@ jobs:
       # step above, so the tests are not repeated here.
       - name: "Build release, test and package"
         id: build
-        if: matrix.package != 'skip' || (matrix.test != 'skip' && env.DEBUG_TEST != 'true')
+        if: matrix.package != 'skip' || env.RUN_TESTS == 'true'
         shell: bash
         env:
           SUFFIX: '-${{ matrix.distro }}${{ matrix.version }}'
           package: '${{ matrix.package }}'
           server_only: '${{ matrix.server_only }}'
-          test: '${{ matrix.test }}'
           # Only a leg that packages builds the shipping configuration; a release build that
           # only runs tests stays free of the crash reporting SDK.
           WITH_CRASH_REPORTING: ${{ matrix.package != 'skip' && 'ON' || '' }}
@@ -279,7 +284,7 @@ jobs:
           source .ci/docker.sh
           args=()
           [[ $server_only == yes ]] && args+=(--no-client)
-          [[ $test != skip && $DEBUG_TEST != true ]] && args+=(--test)
+          [[ $RUN_TESTS == true ]] && args+=(--test)
           [[ $GITHUB_REF == "refs/heads/master" ]] && args+=(--evict-ccache "$CCACHE_EVICTION_AGE")
           args+=(--ccache "$CCACHE_SIZE")
           args+=(--cmake-generator "$CMAKE_GENERATOR")
