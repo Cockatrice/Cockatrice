@@ -369,6 +369,15 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  font_config_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/theme_config.cpp
+  font_config_test.cpp
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src
+)
+cockatrice_add_test(
+  NAME
   loader_local_matching_test
   SOURCES
   ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/card_picture_loader/card_picture_loader_local.cpp
