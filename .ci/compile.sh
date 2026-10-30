@@ -567,8 +567,9 @@ Start-Sleep -Seconds 120
     # instance holds its payload as mapped images, not as handles, and that is the state
     # the guard used to miss - it passed, the purge failed, and the install ended in a
     # warning with no offer to close and try again. The image is a copy of a native
-    # Windows program, so it starts without its usual directory next to it.
-    $copy = Join-Path $dir "fake-cockatrice.exe"
+    # Windows program, so it starts without its usual directory next to it, and it carries
+    # one of the payload's own names because that is what the lookup names.
+    $copy = Join-Path $dir "cockatrice.exe"
     Copy-Item -LiteralPath (Join-Path $env:SystemRoot "System32\cmd.exe") -Destination $copy
     $running = Start-Process -FilePath $copy -ArgumentList "/c", "ping -n 20 127.0.0.1 >nul" -PassThru
     try {
@@ -580,10 +581,49 @@ Start-Sleep -Seconds 120
         try { $running.WaitForExit(5000) | Out-Null } catch { }
     }
     if ($byImage.Code -ne 1) { throw "expected exit 1 for a process running from the directory, got $($byImage.Code) : $($byImage.Output)" }
-    if ($byImage.Output -notmatch "fake-cockatrice\.exe \(pid\s+$($running.Id)") {
+    if ($byImage.Output -notmatch "cockatrice\.exe \(pid\s+$($running.Id)") {
         throw "the lookup did not name the process running from the directory: $($byImage.Output)"
     }
-    Write-Host "holder lookup named pid $($holder.Id) for a file another process holds, named nothing for a file only the asking process holds, named nothing for an empty directory, and named pid $($running.Id) for a process running from the directory"
+
+    # A program in a folder below the directory is not an instance of the installation, even
+    # when it carries a payload program's name: the install directory can be a folder the
+    # user keeps other applications in, each in its own subfolder, and naming one of those
+    # asked for a close the probe never sends and an end it refuses to perform, so the guard
+    # could only abort the update. A program that really does hold a payload file is still
+    # named, by the Restart Manager lookup exercised above.
+    $nested = Join-Path $dir "other"
+    New-Item -ItemType Directory -Force $nested | Out-Null
+    $nestedImage = Join-Path $nested "cockatrice.exe"
+    Copy-Item -LiteralPath (Join-Path $env:SystemRoot "System32\cmd.exe") -Destination $nestedImage
+    $nestedRunning = Start-Process -FilePath $nestedImage -ArgumentList "/c", "ping -n 20 127.0.0.1 >nul" -PassThru
+    try {
+        Start-Sleep -Milliseconds 1500
+        $inSubfolder = Invoke-Probe $dir
+    } finally {
+        try { $nestedRunning.Kill() } catch { }
+        try { $nestedRunning.WaitForExit(5000) | Out-Null } catch { }
+    }
+    if ($inSubfolder.Code -ne 0) {
+        throw "expected exit 0 for a program in a folder below the directory, got $($inSubfolder.Code) : $($inSubfolder.Output)"
+    }
+
+    # A program the user keeps in the directory itself is not a payload program either: the
+    # guard ends only what the payload installs, and naming anything else asks for an answer
+    # that cannot free a single file.
+    $foreign = Join-Path $dir "tool.exe"
+    Copy-Item -LiteralPath (Join-Path $env:SystemRoot "System32\cmd.exe") -Destination $foreign
+    $foreignRunning = Start-Process -FilePath $foreign -ArgumentList "/c", "ping -n 20 127.0.0.1 >nul" -PassThru
+    try {
+        Start-Sleep -Milliseconds 1500
+        $ignored = Invoke-Probe $dir
+    } finally {
+        try { $foreignRunning.Kill() } catch { }
+        try { $foreignRunning.WaitForExit(5000) | Out-Null } catch { }
+    }
+    if ($ignored.Code -ne 0) {
+        throw "expected exit 0 for a program the payload does not install, got $($ignored.Code) : $($ignored.Output)"
+    }
+    Write-Host "holder lookup named pid $($holder.Id) for a file another process holds, named nothing for a file only the asking process holds, named nothing for an empty directory, named pid $($running.Id) for a payload program running from the directory, and named nothing for a payload program in a folder below it or for a program the payload does not install"
 } finally {
     Remove-Item -Recurse -Force $dir -ErrorAction SilentlyContinue
 }

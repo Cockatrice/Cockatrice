@@ -34,7 +34,7 @@ constexpr unsigned long END_WAIT_MILLISECONDS = 5000;
 /// answer of "nothing holds the files" stays distinguishable from a probe that failed.
 /// In the close mode 1 means a close was actually sent and 0 that every holder was left
 /// to the user, which is what the report line next to the code spells out. 3 is only for
-/// a lookup that failed and named nobody: one that failed but still named a process
+/// a lookup that failed and named nobody: one that failed but still named a payload program
 /// running from the directory is answered with that process. 4 is only the launcher mode:
 /// the process the installer waits on has no window a user could answer, which is the one
 /// answer the installer acts on by itself instead of asking the user.
@@ -61,11 +61,13 @@ enum ExitCode
 ///                     no window has answered its own close and is stuck in shutdown
 ///
 /// The guard's three modes answer from two lookups that cover each other's blind spot: the
-/// Restart Manager names whoever has a payload file open, and every process running from the
-/// directory is named as well, because a running instance holds its own image and the modules
-/// it loaded as mappings rather than open files and the Restart Manager does not always
-/// report those. Neither lookup alone is the guard's authority: an instance the file
-/// handles do not name is exactly the case that left a half-replaced install behind.
+/// Restart Manager names whoever has a payload file open, and every payload program running
+/// from the directory itself is named as well, because a running instance holds its own image
+/// and the modules it loaded as mappings rather than open files and the Restart Manager does
+/// not always report those. Neither lookup alone is the guard's authority: an instance the
+/// file handles do not name is exactly the case that left a half-replaced install behind.
+/// A program in a folder below the directory is not named by the second lookup: it is not an
+/// instance of this payload, and the guard could neither close nor end it.
 enum class Mode
 {
     Name,          ///< name the holders
@@ -201,8 +203,8 @@ int main(int argumentCount, char **arguments)
         return closeLauncher(installDir);
     }
 
-    // Processes running from the directory first: they are the instance the user is asked
-    // to close, and the Restart Manager may not name any of them (see
+    // The payload programs running from the directory first: they are the instance the user
+    // is asked to close, and the Restart Manager may not name any of them (see
     // findProcessesRunningFrom). The file holders follow, deduplicated by process, so an
     // instance that both runs from the directory and holds a payload file is named once.
     // Neither lookup may name the probe or the process that started it, whichever one found
@@ -225,8 +227,8 @@ int main(int argumentCount, char **arguments)
     }
 
     // A failed lookup only makes the probe unable to answer when it also named nobody: with
-    // a process running from the directory the installer still knows what to close, and
-    // that is worth more to the guard than the code of the query that missed it.
+    // a payload program running from the directory the installer still knows what to close,
+    // and that is worth more to the guard than the code of the query that missed it.
     if (error != ERROR_SUCCESS && holders.empty()) {
         writeLine(L"the Restart Manager lookup failed with win32 error " + std::to_wstring(error));
         return EXIT_PROBE_FAILED;

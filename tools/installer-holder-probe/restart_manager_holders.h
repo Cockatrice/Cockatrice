@@ -2,6 +2,7 @@
 #define RESTART_MANAGER_HOLDERS_H
 
 #include "holder_line.h"
+#include "payload_paths.h"
 
 #include <string>
 #include <vector>
@@ -22,18 +23,6 @@
 std::vector<std::wstring> collectPayloadFiles(const std::wstring &installDir);
 
 /**
- * @brief Whether @p imageName is one of the programs the payload installs.
- *
- * The single place that answers which images are Cockatrice's own, so the guard ends the
- * same set it names. Matched case-insensitively on the image name alone: only holders are
- * ever tested against it, and a holder is a process that has a payload file open or runs
- * from the install directory.
- *
- * @param imageName the file name of a process image, empty when it could not be read.
- */
-bool isPayloadProgram(const std::wstring &imageName);
-
-/**
  * @brief Names the applications and services that have one of @p files open or mapped.
  *
  * Restart Manager reports both a process that loaded one of the files as a module and
@@ -47,8 +36,7 @@ bool isPayloadProgram(const std::wstring &imageName);
 unsigned long findProcessesUsingFiles(const std::vector<std::wstring> &files, std::vector<Holder> &holders);
 
 /**
- * @brief Lists every process whose image lives in @p installDir, whether or not it has a
- *        payload file open.
+ * @brief Lists every payload program whose image lies in @p installDir itself.
  *
  * Restart Manager answers the question "who has this file open", and a running instance
  * does not necessarily have one open: its own image and the modules it loaded are mapped
@@ -57,16 +45,23 @@ unsigned long findProcessesUsingFiles(const std::vector<std::wstring> &files, st
  * an instance running from the directory, and "nothing is holding them any more" as the
  * answer - so an answer built on file handles alone cannot be the guard's authority.
  *
+ * Only the programs the payload installs are named, and only when the image lies directly
+ * in @p installDir. A folder a user installs into can hold other applications, each in its
+ * own subfolder, and those are not instances of this one: they hold none of the payload,
+ * neither closing nor ending them would free a file the purge removes, and naming them
+ * leaves the guard with an answer that can never be carried out. A program below the
+ * directory that does hold a payload file is still named, by findProcessesUsingFiles.
+ *
  * Reading the image path needs PROCESS_QUERY_LIMITED_INFORMATION and
  * QueryFullProcessImageNameW, neither of which depends on the bitness of either process,
- * so a 64-bit instance is named from this 32-bit stub. The comparison is on the
- * directory, not on an image name, so a process that merely shares a name (an Oracle
- * database server next to a Cockatrice install) is never named.
+ * so a 64-bit instance is named from this 32-bit stub. The comparison is on the directory,
+ * not on an image name alone, so a program that merely shares a name with a payload program
+ * is never named.
  *
  * @param installDir the directory being replaced, as a full path.
- * @return one entry per process running from it, in snapshot order, without the processes
- *         named by askingProcessIds(); empty when the directory is empty or no process
- *         runs from it.
+ * @return one entry per payload program running from it, in snapshot order, without the
+ *         processes named by askingProcessIds(); empty when the directory is empty or no
+ *         payload program runs from it.
  */
 std::vector<Holder> findProcessesRunningFrom(const std::wstring &installDir);
 

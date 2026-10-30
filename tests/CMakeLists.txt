@@ -178,14 +178,24 @@ cockatrice_add_test(NAME user_data_backup_test SOURCES user_data_backup_test.cpp
 cockatrice_add_test(NAME password_hash_test SOURCES password_hash_test.cpp LIBS libcockatrice_utility)
 cockatrice_add_test(NAME report_categories_test SOURCES report_categories_test.cpp LIBS libcockatrice_utility)
 cockatrice_add_test(NAME warning_categories_test SOURCES warning_categories_test.cpp LIBS libcockatrice_utility)
-# The installer's holder probe is Windows-only, but the wording it produces is plain C++
-# and is what a stuck user has to act on, so it is tested everywhere.
+# The installer's holder probe is Windows-only, but the wording it produces and the
+# question which programs are the payload's own are plain C++ and are what a stuck user
+# has to act on, so they are tested everywhere.
 cockatrice_add_test(
   NAME
   holder_line_test
   SOURCES
   ${CMAKE_SOURCE_DIR}/tools/installer-holder-probe/holder_line.cpp
   holder_line_test.cpp
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/tools/installer-holder-probe
+)
+cockatrice_add_test(
+  NAME
+  payload_paths_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/tools/installer-holder-probe/payload_paths.cpp
+  payload_paths_test.cpp
   INCLUDE_DIRS
   ${CMAKE_SOURCE_DIR}/tools/installer-holder-probe
 )
