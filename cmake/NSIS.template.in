@@ -998,7 +998,8 @@ FunctionEnd
 ; repository and embedded in the installer and the uninstaller alike. It names
 ; every process and service that has one of the payload files open or mapped
 ; (the Restart Manager, RmRegisterResources/RmGetList) and, separately, every
-; process whose image lives in the directory being replaced.
+; payload program whose image lies in the directory being replaced rather than
+; in a folder below it.
 ;
 ; The second lookup is not redundant. Restart Manager answers "who has this
 ; file open", and a running instance does not have to have one open: its own
@@ -1084,10 +1085,10 @@ FunctionEnd
 
 ; usage: set $GuardDir to the directory to check, then call this. Sets
 ; $GuardExit to the probe's exit code and $GuardOutput to its one-line answer.
-; 0 = nothing holds the payload and nothing runs from the directory, 1 = the
+; 0 = nothing holds the payload and no payload program runs from the directory, 1 = the
 ; line names what does, anything else = the probe could not answer (2 = no
-; directory was given, 3 = the Restart Manager call failed and no process runs
-; from the directory either, "timeout" = it did not return in time).
+; directory was given, 3 = the Restart Manager call failed and no payload program
+; runs from the directory either, "timeout" = it did not return in time).
 Function ${prefix}RunHolderProbe
     Call ${prefix}ExtractHolderProbe
     ; The directory travels in an environment variable, never on the command
@@ -1106,7 +1107,7 @@ FunctionEnd
 ; Cockatrice to close, and waits for it to exit.
 ;
 ; The set is what the probe names: the processes holding a file of the version being
-; replaced, plus the processes running from the directory. tools\installer-holder-probe
+; replaced, plus the payload programs running from the directory itself. The probe
 ; closes that set by pid, which is why nothing here has to match an executable path. Only
 ; cockatrice.exe is asked: Oracle writes the card database in place and Servatrice has no
 ; window to ask, so both are left alone here and only ended by the explicit answer.
@@ -1248,14 +1249,15 @@ Function GuardAppsNotRunning
         Call AbortInstall
     ${EndIf}
     ; Not an answer at all: the probe was not configured, the Restart Manager
-    ; call failed and nothing runs from the directory, or it timed out. Carrying
-    ; on from that is a decision, so it is asked for rather than assumed - the
-    ; stale-runtime check after the purge still stands between a failed guard
-    ; and a mismatched install, but it only fires after files have been
-    ; replaced, and on an upgrade the launcher asked for nobody is watching the
-    ; installer's exit code. Retry asks the probe again (a Restart Manager that
-    ; was busy answers the second time), Ignore installs anyway, Abort cancels
-    ; instead of writing a payload next to files the guard could not rule out.
+    ; call failed and no payload program runs from the directory, or it timed
+    ; out. Carrying on from that is a decision, so it is asked for rather than
+    ; assumed - the stale-runtime check after the purge still stands between a
+    ; failed guard and a mismatched install, but it only fires after files have
+    ; been replaced, and on an upgrade the launcher asked for nobody is watching
+    ; the installer's exit code. Retry asks the probe again (a Restart Manager
+    ; that was busy answers the second time), Ignore installs anyway, Abort
+    ; cancels instead of writing a payload next to files the guard could not
+    ; rule out.
     !insertmacro CockLog "guard: the holder probe could not answer ($GuardExit): $GuardOutput"
     DetailPrint "Could not check whether Cockatrice is still running: $GuardOutput"
     MessageBox MB_ABORTRETRYIGNORE|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
@@ -1862,12 +1864,13 @@ FunctionEnd
 ; anything is replaced; here it answers the other question, about files a purge could not
 ; remove. It asks the Restart Manager (RmRegisterResources/RmGetList), which names a
 ; process holding a plain handle on a file - an antivirus scanner - and names services as
-; well as user programs, and it adds every process running from the directory, because a
-; running instance holds its payload as mapped images rather than as open handles and the
-; Restart Manager does not reliably report those. Its remaining blind spot is a handle
-; taken in kernel mode, where there is no process to name; then the per-file codes logged
-; above are the whole story, and the probe says so by naming nothing rather than by
-; failing.
+; well as user programs, and it adds every payload program running from the directory
+; itself - not one in a folder below it, which is another application the user installed
+; there - because a running instance holds its payload as mapped images rather than as open
+; handles and the Restart Manager does not reliably report those. Its remaining blind spot
+; is a handle taken in kernel mode, where there is no process to name; then the per-file
+; codes logged above are the whole story, and the probe says so by naming nothing rather
+; than by failing.
 ;
 ; $INSTDIR travels through the same COCKATRICE_GUARD_DIR environment variable the guard
 ; uses, so a path with spaces or apostrophes never has to be embedded in a command line.
@@ -1889,7 +1892,7 @@ Function LogProcessesUsingInstallDir
     ${If} $HolderExit == "1"
         StrCpy $HolderFound 1
     ${ElseIf} $HolderExit == "0"
-        StrCpy $HolderOutput "nothing is holding them and no program is running from the directory"
+        StrCpy $HolderOutput "nothing is holding them and no payload program is running from the directory"
     ${Else}
         StrCpy $HolderOutput "the holder probe could not run: $HolderOutput"
     ${EndIf}

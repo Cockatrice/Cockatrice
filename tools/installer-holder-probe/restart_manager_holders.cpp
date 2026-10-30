@@ -30,10 +30,6 @@ constexpr int MAX_ASKER_LEVELS = 8;
 /// The payload files the installer replaces by name; the DLLs are matched by mask below.
 constexpr const wchar_t *PAYLOAD_FILES[] = {L"cockatrice.exe", L"oracle.exe", L"servatrice.exe", L"qt.conf"};
 
-/// The payload programs, by image name. A process running one of these is what the guard
-/// exists to name, so askingProcessIds() stops its walk up the parent chain at one.
-constexpr const wchar_t *PAYLOAD_PROGRAMS[] = {L"cockatrice.exe", L"oracle.exe", L"servatrice.exe"};
-
 void collectFilesOf(const std::wstring &directory, int depth, int maxDepth, std::vector<std::wstring> &files)
 {
     if (files.size() >= MAX_PROBED_FILES) {
@@ -84,15 +80,9 @@ std::wstring imagePathOf(unsigned long processId)
     return imagePath;
 }
 
-std::wstring fileNameOf(const std::wstring &path)
-{
-    const std::size_t separator = path.find_last_of(L"\\/");
-    return separator == std::wstring::npos ? path : path.substr(separator + 1);
-}
-
-/// @p directory with exactly one trailing separator, so that a sibling whose name merely
-/// begins with the same letters ("Cockatrice-old" next to "Cockatrice") cannot pass for a
-/// subdirectory of it.
+/// @p directory with exactly one trailing separator, so that two spellings of the same
+/// directory compare equal and a sibling whose name merely begins with the same letters
+/// ("Cockatrice-old" next to "Cockatrice") cannot pass for it.
 std::wstring directoryPrefixOf(const std::wstring &directory)
 {
     std::wstring prefix = directory;
@@ -103,15 +93,17 @@ std::wstring directoryPrefixOf(const std::wstring &directory)
     return prefix;
 }
 
-/// Whether @p path lies inside @p prefix, which is a directory with a trailing separator.
-/// Ordinal and case-insensitive, as Windows compares paths.
-bool isUnderDirectory(const std::wstring &path, const std::wstring &prefix)
+/// Whether @p left and @p right name the same directory, compared the way the file system
+/// does: a difference in case is not a difference in directory, and a trailing separator
+/// changes nothing.
+bool isSameDirectory(const std::wstring &left, const std::wstring &right)
 {
-    if (path.size() < prefix.size()) {
+    if (left.empty() || right.empty()) {
         return false;
     }
-    const int length = static_cast<int>(prefix.size());
-    return CompareStringOrdinal(path.c_str(), length, prefix.c_str(), length, TRUE) == CSTR_EQUAL;
+    const std::wstring leftPrefix = directoryPrefixOf(left);
+    const std::wstring rightPrefix = directoryPrefixOf(right);
+    return CompareStringOrdinal(leftPrefix.c_str(), -1, rightPrefix.c_str(), -1, TRUE) == CSTR_EQUAL;
 }
 
 /// Copies a fixed-size, NUL-terminated WCHAR array the API filled in.
@@ -133,16 +125,6 @@ Holder holderOf(const RM_PROCESS_INFO &info)
     return holder;
 }
 } // namespace
-
-bool isPayloadProgram(const std::wstring &imageName)
-{
-    for (const wchar_t *program : PAYLOAD_PROGRAMS) {
-        if (CompareStringOrdinal(imageName.c_str(), -1, program, -1, TRUE) == CSTR_EQUAL) {
-            return true;
-        }
-    }
-    return false;
-}
 
 std::vector<std::wstring> collectPayloadFiles(const std::wstring &installDir)
 {
@@ -279,7 +261,6 @@ std::vector<Holder> findProcessesRunningFrom(const std::wstring &installDir)
         return holders;
     }
 
-    const std::wstring prefix = directoryPrefixOf(installDir);
     // Never the probe, and never the installer or uninstaller that started it: either can
     // run from the directory being replaced, and naming one asks the user to close the
     // program that is asking (see askingProcessIds).
@@ -300,12 +281,20 @@ std::vector<Holder> findProcessesRunningFrom(const std::wstring &installDir)
             // refuses to be read is not named here and is still named by Restart
             // Manager when it holds a handle. The idle process has no image at all.
             const std::wstring imagePath = imagePathOf(entry.th32ProcessID);
-            if (!isUnderDirectory(imagePath, prefix)) {
+            const std::wstring imageName = fileNameOf(imagePath);
+            // Only the programs the payload installs, and only those started from the
+            // directory itself: a folder a user installs into can hold other applications,
+            // each in its own subfolder, and one of those is not an instance of this
+            // payload. Naming it would ask for a close the probe cannot send and an end it
+            // would refuse to perform, so the guard could only ever abort. A program below
+            // the directory that really does hold a payload file is named by
+            // findProcessesUsingFiles, which is the lookup for that question.
+            if (!isPayloadProgram(imageName) || !isSameDirectory(parentDirectoryOf(imagePath), installDir)) {
                 continue;
             }
             Holder holder;
             holder.processId = entry.th32ProcessID;
-            holder.imageName = fileNameOf(imagePath);
+            holder.imageName = imageName;
             holders.push_back(std::move(holder));
         } while (Process32NextW(snapshot, &entry) != FALSE);
     }

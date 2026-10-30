@@ -1,5 +1,6 @@
 #include "close_holders.h"
 
+#include "payload_paths.h"
 #include "restart_manager_holders.h"
 
 // clang-format off
