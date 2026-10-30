@@ -4,12 +4,14 @@ name: Import vcpkg cache
 # rebuilds protobuf, openssl and abseil from source and saves them into the shared
 # cache, where every later run can restore them.
 #
-# Only master pushes are imported here: the collect step, keys.txt and the zip
-# contents all come from the workflow run being imported, so importing from an
-# unmerged pull request would let anyone who can push a branch — or a bot actor
-# such as Dependabot, whose PRs are same-repo — promote arbitrary binaries into
-# the scope that master and tag builds restore and link into signed releases.
-# Forks build untrusted code and must never reach that scope either.
+# Only master pushes and the nightly schedule run on master are imported here: the
+# collect step, keys.txt and the zip contents all come from the workflow run being
+# imported, so importing from an unmerged pull request would let anyone who can push
+# a branch — or a bot actor such as Dependabot, whose PRs are same-repo — promote
+# arbitrary binaries into the scope that master and tag builds restore and link into
+# signed releases. Forks build untrusted code and must never reach that scope either.
+# A scheduled run is the default branch at the commit a master push already built, so
+# it carries the same trust as a push.
 #
 # repository_dispatch is not used on purpose: it would also resolve to the default branch,
 # but it counts as a low-trust trigger and may only write there when it declares a
@@ -38,7 +40,7 @@ jobs:
     # the shared scope even if they somehow target the default branch.
     if: >-
       github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'push' &&
+      (github.event.workflow_run.event == 'push' || github.event.workflow_run.event == 'schedule') &&
       github.event.workflow_run.head_branch == 'master' &&
       github.event.workflow_run.head_repository.full_name == github.repository &&
       !endsWith(github.event.workflow_run.actor.login, '[bot]') &&
