@@ -129,6 +129,8 @@ ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
     defaultStyleName = usableDefaultStyle(qApp->style()->objectName());
     // Capture the untouched application palette before any theme is applied.
     defaultPalette = qApp->palette();
+    // Capture the untouched application font before any theme font is applied.
+    defaultFont = qApp->font();
     ensureThemeDirectoryExists();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
     connect(QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged, this, [this] {
@@ -448,6 +450,18 @@ FontConfig ThemeManager::loadFontConfig(const QString &themeDirPath)
     return FontConfig::fromThemeDir(themeDirPath);
 }
 
+FontConfig ThemeManager::loadDefaultFontConfig(const QString &themeDirPath, const QString &themeName)
+{
+    FontConfig cfg = FontConfig::fromThemeDir(themeDirPath);
+    if (!cfg.hasFonts()) {
+        // The shipped fonts.toml may live in the system theme directory rather
+        // than the resolved (user) theme directory, so built-in themes still
+        // get their curated fonts.
+        cfg = FontConfig::fromThemeDir(QDir(systemThemesBasePath()).absoluteFilePath(themeName));
+    }
+    return cfg;
+}
+
 bool ThemeManager::saveFontConfig(const QString &themeDirPath, const FontConfig &cfg)
 {
     if (themeDirPath.isEmpty()) {
@@ -718,6 +732,10 @@ void ThemeManager::themeChangedSlot()
     const auto fontIt = currentFonts.fonts.constFind(AppFont::InterfaceDefault);
     if (fontIt != currentFonts.fonts.constEnd()) {
         qApp->setFont(fontIt.value());
+    } else {
+        // No theme font: restore the pristine application font captured at
+        // startup, so a reverted preview cannot leak into the live theme.
+        qApp->setFont(defaultFont);
     }
     emit fontsChanged();
 

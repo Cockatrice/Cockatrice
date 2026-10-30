@@ -48,6 +48,10 @@ private:
     // palette is applied. Used as the base when a theme supplies no palette, so
     // switching away from a custom palette restores the original colours.
     QPalette defaultPalette;
+    // Pristine application font captured at startup, before any theme font is
+    // applied. Used to restore the original font when a theme supplies none,
+    // mirroring defaultPalette above.
+    QFont defaultFont;
     QString currentThemePath;
     std::array<QBrush, Role::MaxRole + 1> brushes;
     QStringMap availableThemes;
@@ -128,6 +132,9 @@ public:
     // theme directory when it is absent from the resolved (user) directory.
     static PaletteConfig
     loadDefaultPaletteConfig(const QString &themeDirPath, const QString &themeName, const QString &colorScheme);
+    // Load the theme's shipped default fonts, falling back to the system theme
+    // directory when fonts.toml is absent from the resolved (user) directory.
+    static FontConfig loadDefaultFontConfig(const QString &themeDirPath, const QString &themeName);
     /** @brief Writes cfg to disk as the theme's palette-<scheme>.toml and updates the
      *         theme's stored colour scheme to match. Shared by PaletteEditorDialog::onSave
      *         and FirstRunWizard's theme step so the two "generate + keep" paths can't drift. */
