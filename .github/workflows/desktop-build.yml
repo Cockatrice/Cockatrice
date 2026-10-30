@@ -111,6 +111,7 @@ jobs:
 
             allow-failure: yes
             package: skip    # We are packaged in Arch already
+            debug_test: yes    # see the note on Fedora 44 below
 
           - distro: Servatrice_Debian
             version: 12
@@ -140,6 +141,11 @@ jobs:
             version: 44
 
             package: RPM
+            # Arch and Fedora 44 are the two newest toolchains, and the -Wno-error= exceptions
+            # in CMakeLists.txt exist for exactly their warnings. They keep compiling Debug:
+            # only the Debug configuration passes -Werror, so these two are the legs where a
+            # new warning in either compiler still fails the build.
+            debug_test: yes
 
           - distro: Ubuntu
             version: 24.04
@@ -182,9 +188,9 @@ jobs:
       CMAKE_GENERATOR: 'Ninja'
       NAME: ${{ matrix.distro }}${{ matrix.version }}
       IMAGE_SUFFIX: ${{ matrix.variant }}
-      # The sanitizer and coverage legs run their suite in Debug under instrumentation; every
-      # other leg tests the release build it may also package.
-      INSTRUMENTED: ${{ matrix.sanitize == 'yes' || matrix.coverage == 'yes' }}
+      # Which build the suite runs in: the instrumented legs (symbols and instrumentation
+      # matter) and the two newest distro toolchains, which only fail on a warning in Debug.
+      DEBUG_TEST: ${{ matrix.sanitize == 'yes' || matrix.coverage == 'yes' || matrix.debug_test == 'yes' }}
 
     steps:
       - name: "Checkout"
@@ -201,12 +207,11 @@ jobs:
         shell: bash
         run: source .ci/docker.sh --build
 
-      # The two instrumented legs are the only ones that still build Debug: their suite is
-      # meant to run against symbols and instrumentation, and their build is never the one
-      # that ships. Every other leg runs its tests against the release build below, so
-      # testing and packaging cost one compile instead of two.
+      # The instrumented legs and the two newest distro toolchains build and test Debug; every
+      # other leg runs its suite against the release build below, so testing and packaging cost
+      # one compile instead of two.
       - name: "Build debug and test"
-        if: env.INSTRUMENTED == 'true'
+        if: env.DEBUG_TEST == 'true'
         shell: bash
         env:
           sanitize: '${{ matrix.sanitize }}'
@@ -250,12 +255,12 @@ jobs:
       # gets packaged, so a packaging leg no longer pays for a full Debug compile it then
       # throws away. macOS and Windows have always tested their release build.
       #
-      # Instrumented legs reach this step only when they package (the sanitizer leg currently
-      # does, the coverage leg does not); their suite already ran in the debug step above, so
-      # the tests are not repeated here.
+      # Instrumented and debug-test legs reach this step only when they package (the sanitizer
+      # leg currently does, the coverage leg does not); their suite already ran in the debug
+      # step above, so the tests are not repeated here.
       - name: "Build release, test and package"
         id: build
-        if: matrix.package != 'skip' || (matrix.test != 'skip' && env.INSTRUMENTED != 'true')
+        if: matrix.package != 'skip' || (matrix.test != 'skip' && env.DEBUG_TEST != 'true')
         shell: bash
         env:
           SUFFIX: '-${{ matrix.distro }}${{ matrix.version }}'
@@ -274,7 +279,7 @@ jobs:
           source .ci/docker.sh
           args=()
           [[ $server_only == yes ]] && args+=(--no-client)
-          [[ $test != skip && $INSTRUMENTED != true ]] && args+=(--test)
+          [[ $test != skip && $DEBUG_TEST != true ]] && args+=(--test)
           [[ $GITHUB_REF == "refs/heads/master" ]] && args+=(--evict-ccache "$CCACHE_EVICTION_AGE")
           args+=(--ccache "$CCACHE_SIZE")
           args+=(--cmake-generator "$CMAKE_GENERATOR")
