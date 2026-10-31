@@ -442,7 +442,7 @@ void CardItem::playCard(bool faceDown)
                 emit playSelected(this);
             }
         } else {
-            state->getZone()->getPlayer()->getPlayerActions()->playCard(this, faceDown);
+            state->getZone()->getPlayer()->getPlayerActions()->playCard(state, faceDown);
         }
     }
 }
