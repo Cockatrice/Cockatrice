@@ -94,6 +94,10 @@ private slots:
     // Persists the derived scrypt verifier after a successful challenge-response login
     void onPasswordVerifierReady(const QString &verifier);
 
+    // Completes the forced password change the server demanded at login
+    void onPasswordChangeSuccess();
+    void onPasswordChangeError(int responseCode);
+
 private:
     void wireClientSignals();
     void updateWindowTitle();

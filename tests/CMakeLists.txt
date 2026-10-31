@@ -319,6 +319,17 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  server_forced_password_change_test
+  SOURCES
+  server_forced_password_change_test.cpp
+  LIBS
+  libcockatrice_network_server_remote
+  libcockatrice_rng
+  LABELS
+  server
+)
+cockatrice_add_test(
+  NAME
   server_room_channels_test
   SOURCES
   server_room_channels_test.cpp
