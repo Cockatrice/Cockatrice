@@ -445,6 +445,22 @@ if(WITH_CLIENT)
     ${CMAKE_SOURCE_DIR}/cockatrice/src
     ${CMAKE_SOURCE_DIR}/libcockatrice_utility
   )
+  # The installer's probe and the client build the socket name independently, and the
+  # command they exchange is spelled in both places. Compiling both ends into one test is
+  # what keeps them from drifting apart unnoticed: a mismatch would leave the installer
+  # unable to close an instance whose window it cannot reach.
+  cockatrice_add_test(
+    NAME
+    installer_close_server_test
+    SOURCES
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/installer_close_server.cpp
+    ${CMAKE_SOURCE_DIR}/tools/installer-holder-probe/installer_close_name.cpp
+    installer_close_server_test.cpp
+    INCLUDE_DIRS
+    ${CMAKE_SOURCE_DIR}/cockatrice/src
+    ${CMAKE_SOURCE_DIR}/libcockatrice_utility
+    ${CMAKE_SOURCE_DIR}/tools/installer-holder-probe
+  )
   # CrashReporter is client code; DEFINITIONS keeps the test hermetic by compiling the
   # no-op path (no sentry-native headers needed) regardless of WITH_CRASH_REPORTING.
   cockatrice_add_test(

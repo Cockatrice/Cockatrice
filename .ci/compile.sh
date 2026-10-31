@@ -559,6 +559,29 @@ Start-Sleep -Seconds 120
     }
     if ($self.Code -ne 0) { throw "expected exit 0 when the asking process is the only holder, got $($self.Code) : $($self.Output)" }
     if ($self.Output -match "pid\s+$PID\b") { throw "the lookup named the process that started it: $($self.Output)" }
+
+    # A payload executable that refuses to be replaced is running, whether or not this probe
+    # may name it: the Restart Manager does not report every mapping, and the image path of a
+    # process under another account cannot be read from here, so both process lookups can
+    # come back empty while the program is still there. Held here by the asking process, so
+    # that it cannot be named - the answer has to be "could not name it", never "nothing is
+    # holding it", which is what sent an update into an uninstall that could only fail
+    # halfway. Exit 3 is the code the guard answers by asking the user to close it and retry.
+    $image = Join-Path $dir "oracle.exe"
+    [IO.File]::WriteAllText($image, "x")
+    $handle = [IO.File]::Open($image, "Open", "ReadWrite", "None")
+    try {
+        $unnameable = Invoke-Probe $dir
+    } finally {
+        $handle.Dispose()
+    }
+    if ($unnameable.Code -ne 3) {
+        throw "expected exit 3 for a payload executable that is in use but cannot be named, got $($unnameable.Code) : $($unnameable.Output)"
+    }
+    if ($unnameable.Output -notmatch "oracle\.exe is in use") {
+        throw "the answer did not name the executable it could not replace: $($unnameable.Output)"
+    }
+
     $empty = Join-Path $dir "empty"
     New-Item -ItemType Directory -Force $empty | Out-Null
     $nothing = Invoke-Probe $empty
@@ -623,7 +646,7 @@ Start-Sleep -Seconds 120
     if ($ignored.Code -ne 0) {
         throw "expected exit 0 for a program the payload does not install, got $($ignored.Code) : $($ignored.Output)"
     }
-    Write-Host "holder lookup named pid $($holder.Id) for a file another process holds, named nothing for a file only the asking process holds, named nothing for an empty directory, named pid $($running.Id) for a payload program running from the directory, and named nothing for a payload program in a folder below it or for a program the payload does not install"
+    Write-Host "holder lookup named pid $($holder.Id) for a file another process holds, named nothing for a file only the asking process holds, reported a payload executable it could not name as in use instead of free, named nothing for an empty directory, named pid $($running.Id) for a payload program running from the directory, and named nothing for a payload program in a folder below it or for a program the payload does not install"
 } finally {
     Remove-Item -Recurse -Force $dir -ErrorAction SilentlyContinue
 }

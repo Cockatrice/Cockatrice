@@ -6,10 +6,22 @@
 # it links nothing from this project: no Qt, and a static C runtime because the installed
 # runtime is exactly what the purge may have failed to replace.
 add_executable(
-  installer-holder-probe close_holders.cpp holder_line.cpp main.cpp payload_paths.cpp restart_manager_holders.cpp
+  installer-holder-probe
+  close_holders.cpp
+  holder_line.cpp
+  installer_close_name.cpp
+  installer_close_request.cpp
+  main.cpp
+  payload_locks.cpp
+  payload_paths.cpp
+  restart_manager_holders.cpp
 )
 
 target_link_libraries(installer-holder-probe PRIVATE rstrtmgr)
+
+# The close command is a header-only constant shared with the client. The probe still links
+# nothing from this project: the header is plain C++ and pulls in no library.
+target_include_directories(installer-holder-probe PRIVATE ${CMAKE_SOURCE_DIR}/libcockatrice_utility)
 
 # The NSIS template embeds the built file by the same relative path that resolves
 # NSIS.definitions.nsh, and that path points at the build root.

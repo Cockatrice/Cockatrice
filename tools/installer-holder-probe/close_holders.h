@@ -17,7 +17,7 @@
  */
 struct CloseHoldersResult
 {
-    unsigned int askedToClose = 0;  ///< holders a WM_CLOSE was posted to
+    unsigned int askedToClose = 0;  ///< holders asked to close, over the socket or with WM_CLOSE
     unsigned int withoutWindow = 0; ///< holders with no window of their own to ask
     std::wstring report;            ///< one line, narrowed to ASCII when written
 };
@@ -42,16 +42,19 @@ bool isCockatriceImage(const std::wstring &imageName);
  * asked to close. Oracle and Servatrice are left to the user - Oracle writes the card
  * database in place - and so is every service.
  *
- * One thing happens per instance: its own window is asked to close with WM_CLOSE, the same
- * request as clicking that window's close button - whether it is on screen or only in the
- * notification area, since the request does not need the window to be visible and the
- * confirmation Cockatrice answers it with is a window Qt shows itself, painted, unlike one
- * restored from outside. A window that is on screen is brought forward first, because that
- * confirmation would otherwise open behind the installer's prompt; nothing is shown from
- * here. Qt's own bookkeeping windows are never the target - posting a close to the
- * notification-area one terminates the instance without its confirmation - so a process
- * without a window of its own is named and left to the guard, which offers to end it.
- * Stopping the process is never attempted here.
+ * One thing happens per instance: it is asked to close over the local socket it listens on,
+ * which is the same request as clicking its close button and is the only way to reach one
+ * whose window is hidden in the notification area or is sitting on its own confirmation. A
+ * client from before that socket is asked with WM_CLOSE on its own window instead, whether
+ * the window is on screen or only in the notification area, since the request does not need
+ * the window to be visible and the confirmation Cockatrice answers it with is a window Qt
+ * shows itself, painted, unlike one restored from outside. A window that is on screen is
+ * brought forward first, because that confirmation would otherwise open behind the
+ * installer's prompt; nothing is shown from here. Qt's own bookkeeping windows are never the
+ * target - posting a close to the notification-area one terminates the instance without its
+ * confirmation - so a process without a window of its own that does not answer the socket is
+ * named and left to the guard, which offers to end it. Stopping the process is never
+ * attempted here.
  *
  * Once the requests are out, this waits up to @c waitMilliseconds for the processes to
  * exit, so the caller can measure the purge immediately afterwards instead of sleeping
