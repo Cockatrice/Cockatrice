@@ -41,6 +41,7 @@
 #include <QThread>
 #include <QVariant>
 #include <QVector>
+#include <cstdlib>
 #include <google/protobuf/stubs/common.h>
 #include <iostream>
 #include <libcockatrice/rng/rng_sfmt.h>
@@ -162,14 +163,15 @@ int main(int argc, char *argv[])
         configPath = SettingsCache::guessConfigurationPath();
     } else if (!QFile::exists(configPath)) {
         qCritical() << "Could not find configuration file at" << configPath;
-        return 1;
+        return EXIT_FAILURE;
     }
     qWarning() << "Using configuration file: " << configPath;
     settingsCache = new SettingsCache(configPath);
 
     loggerThread = new QThread;
     loggerThread->setObjectName("logger");
-    logger = new ServerLogger(logToConsole);
+    logger = new ServerLogger(logToConsole, settingsCache->value("server/writelog", 1).toBool(),
+                              settingsCache->value("server/logfilters").toString());
     logger->moveToThread(loggerThread);
 
     loggerThread->start();
@@ -214,7 +216,15 @@ int main(int argc, char *argv[])
 
         std::cerr << "Server quit." << std::endl;
         std::cerr << "-------------------------" << std::endl;
+    } else {
+        // initServer() logged the reason; a failed startup must not look like a clean exit.
+        std::cerr << "Server initialization failed, exiting." << std::endl;
+        retval = EXIT_FAILURE;
     }
+
+    // The handler reads the logger and settingsCache globals torn down below; leaving it
+    // installed lets Qt's own shutdown warnings dereference freed memory.
+    qInstallMessageHandler(nullptr);
 
     delete smtpClient;
     delete rng;
