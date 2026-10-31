@@ -28,14 +28,17 @@ signals:
 
 private:
     bool logToConsole;
-    bool writeLog;
-    bool messageFilterActive;
+    bool writeLog = true;
+    bool messageFilterActive = false;
     QStringList logFilters;
     // Guards writeLog/messageFilterActive/logFilters: SIGHUP rewrites them while other threads log.
     QMutex configMutex;
     QFile *logFile = nullptr;
     bool flushRunning;
     QStringList buffer;
+    // Console lines wait here for the logger thread, so game threads never block on stdout.
+    QStringList consoleBuffer;
+    // Guards buffer and consoleBuffer.
     QMutex bufferMutex;
 };
 

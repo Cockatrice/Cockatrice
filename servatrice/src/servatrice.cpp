@@ -601,7 +601,7 @@ bool Servatrice::initServer()
             if (islServer->listen(QHostAddress::Any, static_cast<quint16>(getISLNetworkPort()))) {
                 qDebug() << "ISL server listening.";
             } else {
-                throw QString("islServer->listen()");
+                throw islServer->errorString();
             }
         }
     } catch (QString &error) {

@@ -2,6 +2,7 @@
 
 #include "gtest/gtest.h"
 #include <QFile>
+#include <QMetaObject>
 #include <QTemporaryDir>
 #include <iostream>
 #include <sstream>
@@ -35,6 +36,13 @@ private:
     std::streambuf *previousBuffer;
 };
 
+// The console sink is written by the logger thread; drive it directly here, as the event
+// loop would in the server.
+void flushLogger(ServerLogger &logger)
+{
+    QMetaObject::invokeMethod(&logger, "flushBuffer", Qt::DirectConnection);
+}
+
 // Regression: --log-to-console used to be gated behind a successfully opened logfile, so an
 // empty server/logfile silenced every diagnostic, including critical startup errors.
 TEST(ServerLoggerTest, ConsoleSinkDoesNotDependOnLogFile)
@@ -44,6 +52,7 @@ TEST(ServerLoggerTest, ConsoleSinkDoesNotDependOnLogFile)
 
     CoutCapture capture;
     logger.logMessage("could not open the database");
+    flushLogger(logger);
 
     EXPECT_TRUE(capture.text().contains("could not open the database")) << capture.text().toStdString();
 }
@@ -59,6 +68,7 @@ TEST(ServerLoggerTest, ConsoleSinkSurvivesDisabledFileLog)
 
     CoutCapture capture;
     logger.logMessage("startup failed");
+    flushLogger(logger);
 
     EXPECT_TRUE(capture.text().contains("startup failed")) << capture.text().toStdString();
 }
@@ -71,6 +81,7 @@ TEST(ServerLoggerTest, ConsoleSinkIgnoresLogFilters)
 
     CoutCapture capture;
     logger.logMessage("unrelated message");
+    flushLogger(logger);
 
     EXPECT_TRUE(capture.text().contains("unrelated message")) << capture.text().toStdString();
 }
@@ -82,6 +93,7 @@ TEST(ServerLoggerTest, StaysQuietWhenConsoleIsDisabled)
 
     CoutCapture capture;
     logger.logMessage("not for the console");
+    flushLogger(logger);
 
     EXPECT_TRUE(capture.text().isEmpty()) << capture.text().toStdString();
 }

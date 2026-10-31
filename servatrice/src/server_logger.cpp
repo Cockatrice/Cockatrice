@@ -15,10 +15,9 @@
 #include <string>
 
 ServerLogger::ServerLogger(bool _logToConsole, bool _writeLog, const QString &_logFilters, QObject *parent)
-    : QObject(parent), logToConsole(_logToConsole), writeLog(_writeLog),
-      messageFilterActive(!_logFilters.trimmed().isEmpty()),
-      logFilters(_logFilters.split(QStringLiteral(","), Qt::SkipEmptyParts)), flushRunning(false)
+    : QObject(parent), logToConsole(_logToConsole), flushRunning(false)
 {
+    reloadConfig(_writeLog, _logFilters);
     connect(this, SIGNAL(sigFlushBuffer()), this, SLOT(flushBuffer()), Qt::QueuedConnection);
 }
 
@@ -73,12 +72,17 @@ void ServerLogger::logMessage(const QString &message, void *caller)
     }
 
     const QString line = QDateTime::currentDateTime().toString() + " " + callerString + message;
+    bool queued = false;
 
     // The console is an independent sink: writelog and logfilters only describe the logfile
     // (see servatrice.ini.example), so a disabled or unopenable logfile must not swallow
-    // startup errors such as a refused database connection.
+    // startup errors such as a refused database connection. Lines are buffered for the logger
+    // thread instead of written here, so a stalled stdout reader cannot stall game threads.
     if (logToConsole) {
-        std::cout << (line + QLatin1Char('\n')).toStdString() << std::flush;
+        bufferMutex.lock();
+        consoleBuffer.append(line);
+        bufferMutex.unlock();
+        queued = true;
     }
 
     configMutex.lock();
@@ -87,56 +91,74 @@ void ServerLogger::logMessage(const QString &message, void *caller)
     const QStringList filters = logFilters;
     configMutex.unlock();
 
-    if (!logFile || !shouldWriteFile) {
-        return;
-    }
-
-    // filter out all log entries based on values in configuration file
-    if (filterMessages) {
-        bool shouldWeSkipLine = true;
-        for (const QString &logFilter : filters) {
-            if (message.contains(logFilter, Qt::CaseInsensitive)) {
-                shouldWeSkipLine = false;
-                break;
+    if (logFile && shouldWriteFile) {
+        // filter out all log entries based on values in configuration file
+        bool shouldWriteLine = !filterMessages;
+        if (filterMessages) {
+            for (const QString &logFilter : filters) {
+                if (message.contains(logFilter, Qt::CaseInsensitive)) {
+                    shouldWriteLine = true;
+                    break;
+                }
             }
         }
-        if (shouldWeSkipLine) {
-            return;
+
+        if (shouldWriteLine) {
+            bufferMutex.lock();
+            buffer.append(line);
+            bufferMutex.unlock();
+            queued = true;
         }
     }
 
-    bufferMutex.lock();
-    buffer.append(line);
-    bufferMutex.unlock();
-    emit sigFlushBuffer();
+    if (queued) {
+        emit sigFlushBuffer();
+    }
 }
 
 void ServerLogger::flushBuffer()
 {
-    if (!logFile) {
-        return;
-    }
-
     if (flushRunning) {
         return;
     }
 
     flushRunning = true;
-    QTextStream stream(logFile);
-    forever
-    {
-        bufferMutex.lock();
-        if (buffer.isEmpty()) {
-            bufferMutex.unlock();
-            flushRunning = false;
-            return;
-        }
-        QString message = buffer.takeFirst();
-        bufferMutex.unlock();
 
-        stream << message << "\n";
-        stream.flush();
+    bufferMutex.lock();
+    QStringList consoleLines;
+    consoleLines.swap(consoleBuffer);
+    bufferMutex.unlock();
+
+    for (const QString &line : consoleLines) {
+        std::cout << line.toStdString() << '\n';
     }
+    if (!consoleLines.isEmpty()) {
+        std::cout.flush();
+    }
+
+    if (logFile) {
+        QTextStream stream(logFile);
+        forever
+        {
+            bufferMutex.lock();
+            if (buffer.isEmpty()) {
+                bufferMutex.unlock();
+                break;
+            }
+            QString message = buffer.takeFirst();
+            bufferMutex.unlock();
+
+            stream << message << "\n";
+            stream.flush();
+        }
+    } else {
+        // No logfile to write to; do not let the buffer grow without bound.
+        bufferMutex.lock();
+        buffer.clear();
+        bufferMutex.unlock();
+    }
+
+    flushRunning = false;
 }
 
 void ServerLogger::rotateLogs()
