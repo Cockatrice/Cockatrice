@@ -51,6 +51,11 @@ jobs:
         # https://docs.github.com/en/code-security/reference/code-scanning/codeql/codeql-queries/actions-built-in-queries
         queries: security-extended
         dependency-caching: true
+        # A TRAP cache costs about 974 MiB per language here. On master that is worth
+        # paying, because the next push reuses it. On a pull request it is pure loss:
+        # the cache lands on refs/pull/N/merge, which no other run ever reads, so every
+        # new pull request leaves a dead 974 MiB entry behind.
+        trap-caching: ${{ github.event_name != 'pull_request' }}
 
     - name: "[C++] Install dependencies"
       if: matrix.language == 'cpp' && matrix.build-mode == 'manual'
