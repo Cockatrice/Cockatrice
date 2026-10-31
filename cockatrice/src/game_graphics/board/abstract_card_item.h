@@ -23,7 +23,6 @@ class AbstractCardItem : public ArrowTarget, public IAnimatedItem
 protected:
     CardState *state;
     int tapAngle;
-    QString color;
     QColor bgColor;
 
 private:
@@ -114,9 +113,9 @@ public:
     {
         return isHovered;
     }
-    QString getColor() const
+    [[nodiscard]] QString getColor() const
     {
-        return color;
+        return state->getColor();
     }
     void setColor(const QString &_color);
     bool getTapped() const
