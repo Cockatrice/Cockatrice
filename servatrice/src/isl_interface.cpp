@@ -67,7 +67,7 @@ IslInterface::IslInterface(int _socketDescriptor,
                            const QSslCertificate &cert,
                            const QSslKey &privateKey,
                            Servatrice *_server)
-    : QObject(), socketDescriptor(_socketDescriptor), server(_server), messageInProgress(false)
+    : QObject(), serverId(-1), socketDescriptor(_socketDescriptor), server(_server), messageInProgress(false)
 {
     sharedCtor(cert, privateKey);
 }
