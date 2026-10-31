@@ -2,10 +2,6 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
-#include "../../../game/abstract_game.h"
-#include "../../../game/player/player_info.h"
-#include "../../../game/player/player_logic.h"
-#include "../../../game/player/player_manager.h"
 #include "../../../game_graphics/zones/hand_zone.h"
 #include "../../../game_graphics/zones/pile_zone.h"
 #include "../../../game_graphics/zones/table_zone.h"
@@ -26,6 +22,10 @@
 
 #include <QMenu>
 #include <QString>
+#include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/player/player_info.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/player/player_manager.h>
 
 PlayerMenu::PlayerMenu(PlayerGraphicsItem *_player) : QObject(_player), player(_player)
 {

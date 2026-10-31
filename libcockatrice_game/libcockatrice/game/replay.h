@@ -1,0 +1,32 @@
+/**
+ * @file replay.h
+ * @ingroup GameLogic
+ * @ingroup Replay
+ */
+//! \todo Document this file.
+
+#ifndef COCKATRICE_REPLAY_H
+#define COCKATRICE_REPLAY_H
+
+#include "abstract_game.h"
+
+#include <qtmetamacros.h>
+
+class GameReplay;
+class QObject;
+class ICardPreferenceProvider;
+class IInterfaceSettingsProvider;
+
+class Replay : public AbstractGame
+{
+    Q_OBJECT
+
+public:
+    explicit Replay(QObject *_parent,
+                    const GameReplay *_replay,
+                    bool isLocalGame,
+                    IInterfaceSettingsProvider *interfaceSettings = nullptr,
+                    ICardPreferenceProvider *cardPreferences = nullptr);
+};
+
+#endif // COCKATRICE_REPLAY_H

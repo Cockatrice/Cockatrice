@@ -1,8 +1,6 @@
 #ifndef GAMESCENE_H
 #define GAMESCENE_H
 
-#include "../game/board/arrow_data.h"
-#include "../game/zones/card_zone_logic.h"
 #include "animated_item.h"
 #include "board/arrow_item.h"
 #include "board/arrow_registry.h"
@@ -20,6 +18,8 @@
 #include <QString>
 #include <QTransform>
 #include <QtGlobal>
+#include <libcockatrice/game/board/arrow_data.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
 #include <qtmetamacros.h>
 
 // IWYU pragma: keep

@@ -37,7 +37,6 @@
 // signatures, which the moc-generated code needs to be complete.
 #include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
 
-class CardItem;
 class CounterState;
 class QWidget;
 class ServerInfo_PlayerProperties;
@@ -48,6 +47,8 @@ template <class T> class QSharedPointer;
 inline Q_LOGGING_CATEGORY(PlayerLog, "player");
 class AbstractCardItem;
 class AbstractGame;
+class ICardPreferenceProvider;
+class IInterfaceSettingsProvider;
 class PlayerInfo;
 class PlayerEventHandler;
 class PlayerActions;
@@ -93,7 +94,13 @@ public slots:
     void onRequestZoneViewToggle(const QString &zoneName, int numberCards, bool isReversed);
 
 public:
-    PlayerLogic(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent);
+    PlayerLogic(const ServerInfo_User &info,
+                int _id,
+                bool _local,
+                bool _judge,
+                AbstractGame *_parent,
+                IInterfaceSettingsProvider *interfaceSettings = nullptr,
+                ICardPreferenceProvider *cardPreferences = nullptr);
     ~PlayerLogic() override;
 
     void initializeZones();

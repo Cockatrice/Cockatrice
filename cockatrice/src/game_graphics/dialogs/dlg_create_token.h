@@ -7,12 +7,11 @@
 #ifndef DLG_CREATETOKEN_H
 #define DLG_CREATETOKEN_H
 
-#include "../../game/player/token_info.h"
-
 #include <QDialog>
 #include <QList>
 #include <QString>
 #include <QStringList>
+#include <libcockatrice/game/player/token_info.h>
 #include <qtmetamacros.h>
 
 class QLabel;
