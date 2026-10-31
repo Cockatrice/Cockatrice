@@ -24,9 +24,7 @@ set(HEADERS
     libcockatrice/interfaces/noop_card_set_priority_controller.h
 )
 
-qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-
-add_library(libcockatrice_interfaces STATIC ${MOC_SOURCES})
+add_library(libcockatrice_interfaces STATIC ${HEADERS})
 
 target_include_directories(libcockatrice_interfaces PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
