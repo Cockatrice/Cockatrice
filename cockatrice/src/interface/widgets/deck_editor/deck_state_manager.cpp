@@ -1,7 +1,6 @@
 #include "deck_state_manager.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../deck_loader/loaded_deck.h"
 #include "deck_list_model.h"
 #include "libcockatrice/card/card_info.h"
 #include "libcockatrice/card/database/card_database_querier.h"
@@ -18,6 +17,7 @@
 #include <QVariant>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list_history_manager.h>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/deck_list/tree/inner_deck_list_node.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <qnamespace.h>

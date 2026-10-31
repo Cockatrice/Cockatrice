@@ -11,9 +11,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
-#include "../../deck_loader/deck_file_format.h"
 #include "../../deck_loader/deck_loader.h"
-#include "../../deck_loader/loaded_deck.h"
 #include "../cards/additional_info/deck_color_identity.h"
 #include "../cards/card_info_frame_widget.h"
 #include "../client/network/interfaces/deck_stats_interface.h"
@@ -55,6 +53,8 @@
 #include <QUrl>
 #include <google/protobuf/stubs/port.h>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/deck_list/deck_file_format.h>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/models/database/card_database_model.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>

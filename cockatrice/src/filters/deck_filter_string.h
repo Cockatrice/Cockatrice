@@ -11,6 +11,7 @@
 #include <QString>
 #include <functional>
 #include <libcockatrice/card/card_localization.h>
+#include <libcockatrice/deck_list/loaded_deck.h>
 
 struct CardSearchLanguage;
 struct LoadedDeck;
