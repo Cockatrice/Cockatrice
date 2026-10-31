@@ -5,15 +5,19 @@
 #include "lazy_properties_hash.h"
 #include "printing/printing_info.h"
 
-#include <QDate>
+#include <QByteArray>
+#include <QChar>
 #include <QHash>
 #include <QList>
 #include <QLoggingCategory>
 #include <QMap>
 #include <QMetaType>
-#include <QMutex>
+#include <QObject>
+#include <QSet>
 #include <QSharedPointer>
-#include <QVariant>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
 #include <utility>
 
 inline Q_LOGGING_CATEGORY(CardInfoLog, "card_info");
@@ -21,7 +25,6 @@ inline Q_LOGGING_CATEGORY(CardInfoLog, "card_info");
 class CardInfo;
 class CardSet;
 class CardRelation;
-class ICardDatabaseParser;
 
 typedef QSharedPointer<CardInfo> CardInfoPtr;
 typedef QSharedPointer<CardSet> CardSetPtr;
@@ -118,14 +121,12 @@ public:
                       QMap<QString, QString> _localizedTexts = {});
 
     /**
-     * @brief Constructs a CardInfo from a cache snapshot with precomputed derived
-     *        state.
+     * @brief Constructs a CardInfo from a serialized properties blob.
      *
-     * Used by the binary cache reader to skip recomputing @p _simpleName and
-     * @p _altNames (which otherwise require a Unicode normalization and a full
-     * printing scan). Properties are supplied as a pre-serialized @p _propertiesBlob
-     * so the QHash<QString, QString> is not built at load time (it is materialized on first
-     * query).
+     * Properties stay in @p _propertiesBlob so the QHash<QString, QString> is not
+     * built at load time (it is materialized on first query). @p _simpleName and
+     * @p _altNames are filled in when empty; the binary cache supplies them to
+     * skip the Unicode normalization and the printing scan.
      *
      * @param _name The card name.
      * @param _text Rules text or description of the card.
@@ -135,8 +136,8 @@ public:
      * @param _reverseRelatedCards Reverse relationships.
      * @param _sets Printing information per set.
      * @param _uiAttributes Attributes that affect display and game logic.
-     * @param _simpleName Precomputed simplified name.
-     * @param _altNames Precomputed alternate names.
+     * @param _simpleName Precomputed simplified name; derived from @p _name when empty.
+     * @param _altNames Precomputed alternate names; derived from the printings when empty.
      * @param _localizedNames Localized card names, keyed by language code.
      * @param _localizedTexts Localized rules text, keyed by language code.
      */
@@ -207,20 +208,26 @@ public:
                                    QMap<QString, QString> _localizedTexts = {});
 
     /**
-     * @brief Creates a new instance from a cache snapshot with precomputed
-     *        derived state.
+     * @brief Creates a new instance from a serialized properties blob.
+     *
+     * The properties stay in blob form, so the QHash<QString, QString> is not
+     * built at load time (it is materialized on first query). The derived state
+     * is required so it is never recomputed here, and the overload cannot be a
+     * candidate for a shorter call that passes a property hash instead of a blob.
      *
      * @param _name Name of the card.
      * @param _text Rules text or description.
      * @param _isToken Token flag.
-     * @param _propertiesBlob Pre-serialized properties blob (as written by the cache).
+     * @param _propertiesBlob Serialized properties blob.
      * @param _relatedCards Forward relationships.
      * @param _reverseRelatedCards Reverse relationships.
      * @param _sets Printing information per set.
      * @param _uiAttributes Attributes that affect display and game logic.
-     * @param _simpleName Precomputed simplified name.
-     * @param _altNames Precomputed alternate names.
-     * @param _appendToSets When true (default), the card is appended to each of
+     * @param _simpleName Precomputed simplified name; pass {} to derive it from
+     *        @p _name.
+     * @param _altNames Precomputed alternate names; pass {} to derive them from
+     *        the printings.
+     * @param _appendToSets When true, the card is appended to each of
      *        its CardSets. Pass false when building cards in parallel so the
      *        (non-thread-safe) set membership is populated in a later
      *        single-threaded pass.
@@ -238,7 +245,7 @@ public:
                                    UiAttributes _uiAttributes,
                                    QString _simpleName,
                                    QSet<QString> _altNames,
-                                   bool _appendToSets = true,
+                                   bool _appendToSets,
                                    QMap<QString, QString> _localizedNames = {},
                                    QMap<QString, QString> _localizedTexts = {});
 
@@ -277,7 +284,7 @@ public:
     {
         return simpleName;
     }
-    const QSet<QString> &getAltNames()
+    const QSet<QString> &getAltNames() const
     {
         return altNames;
     }
@@ -386,18 +393,34 @@ public:
     }
     [[nodiscard]] QStringList getProperties() const
     {
-        return getPropertiesHash().keys();
+        return properties.keys();
     }
+
+    /**
+     * @brief Returns the properties in their serialized blob form.
+     *
+     * Cheap while the properties were never materialized (the cache and the XML parsers pass the blob through).
+     */
+    [[nodiscard]] QByteArray getPropertiesBlob() const
+    {
+        return properties.serialized();
+    }
+
+    /**
+     * @brief Returns the materialized property hash, forcing deserialization of the blob.
+     *
+     * Prefer getProperty(), hasProperty() or getPropertiesBlob(), which avoid building the hash.
+     */
     [[nodiscard]] const QHash<QString, QString> &getPropertiesHash() const;
 
     [[nodiscard]] QString getProperty(const QString &propertyName) const
     {
-        return getPropertiesHash().value(propertyName);
+        return properties.value(propertyName);
     }
     void setProperty(const QString &_name, const QString &_value);
     [[nodiscard]] bool hasProperty(const QString &propertyName) const
     {
-        return getPropertiesHash().contains(propertyName);
+        return properties.contains(propertyName);
     }
     [[nodiscard]] const SetToPrintingsMap &getSets() const
     {
@@ -430,6 +453,14 @@ public:
         return result;
     }
     void resetReverseRelatedCards2Me();
+    /**
+     * @brief Clears the raw relation lists without deleting the CardRelation objects.
+     *
+     * Callers that schedule the relations for deletion (e.g. CardDatabase::removeCard())
+     * must use this to drop the now-dangling pointers from this CardInfo, which may
+     * outlive them through external shared pointers.
+     */
+    void clearDirectRelations();
     void addReverseRelatedCards2Me(CardRelation *cardRelation)
     {
         reverseRelatedCardsToMe.append(cardRelation);

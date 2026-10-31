@@ -6,8 +6,16 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QForeach>
+#include <QIODevice>
 #include <QTextStream>
+#include <QThread>
+#include <QVariant>
+#include <QtGlobal>
 #include <iostream>
+#include <qnamespace.h>
+#include <qobjectdefs.h>
+#include <string>
 
 ServerLogger::ServerLogger(bool _logToConsole, QObject *parent)
     : QObject(parent), logToConsole(_logToConsole), flushRunning(false)
@@ -44,6 +52,11 @@ void ServerLogger::startLog(const QString &logFileName)
     }
 
     connect(this, SIGNAL(sigFlushBuffer()), this, SLOT(flushBuffer()), Qt::QueuedConnection);
+}
+
+bool ServerLogger::isLoggingEnabled() const
+{
+    return logFile != nullptr && settingsCache->value("server/writelog", 1).toBool();
 }
 
 void ServerLogger::logMessage(const QString &message, void *caller)

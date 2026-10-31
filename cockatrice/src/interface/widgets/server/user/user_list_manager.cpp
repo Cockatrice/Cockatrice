@@ -1,8 +1,11 @@
 #include "user_list_manager.h"
 
-#include "../../client/sound_engine.h"
-#include "user_info_box.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 
+#include <QList>
+#include <QSharedPointer>
+#include <algorithm>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/event_add_to_list.pb.h>
 #include <libcockatrice/protocol/pb/event_remove_from_list.pb.h>

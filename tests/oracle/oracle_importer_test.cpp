@@ -1,15 +1,34 @@
 #include "../../oracle/src/oracleimporter.h"
+#include "../../oracle/src/raw_json_scanner.h"
+#include "libcockatrice/card/card_info.h"
 
 #include "gtest/gtest.h"
+#include <QByteArray>
+#include <QChar>
+#include <QDate>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonParseError>
+#include <QJsonValue>
+#include <QJsonValueRef>
+#include <QList>
+#include <QMap>
 #include <QObject>
 #include <QPair>
-#include <QSet>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QSharedPointer>
+#include <QString>
+#include <QUuid>
+#include <QVariant>
+#include <QVariantMap>
+#include <QtGlobal>
 #include <libcockatrice/card/format/format_legality_rules.h>
 #include <libcockatrice/card/set/card_set.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
+#include <string>
+#include <utility>
 
 class OracleImporterTest : public ::testing::Test
 {

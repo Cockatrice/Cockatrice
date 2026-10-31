@@ -7,14 +7,23 @@
 #ifndef COCKATRICE_DECK_LIST_SORT_FILTER_PROXY_MODEL_H
 #define COCKATRICE_DECK_LIST_SORT_FILTER_PROXY_MODEL_H
 
+#include "../natural_sort_collator.h"
+
+#include <QCollator>
+#include <QList>
 #include <QSortFilterProxyModel>
-#include <libcockatrice/card/database/card_database_manager.h>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
+
+class QObject;
 
 class DeckListSortFilterProxyModel : public QSortFilterProxyModel
 {
     Q_OBJECT
 public:
-    explicit DeckListSortFilterProxyModel(QObject *parent = nullptr) : QSortFilterProxyModel(parent)
+    explicit DeckListSortFilterProxyModel(QObject *parent = nullptr)
+        : QSortFilterProxyModel(parent), collator(NaturalSort::makeNaturalSortCollator())
     {
     }
 
@@ -29,6 +38,7 @@ protected:
 
 private:
     QStringList sortCriteria;
+    QCollator collator;
 };
 
 #endif // COCKATRICE_DECK_LIST_SORT_FILTER_PROXY_MODEL_H

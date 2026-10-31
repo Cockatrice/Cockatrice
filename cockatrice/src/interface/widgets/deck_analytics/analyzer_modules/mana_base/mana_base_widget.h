@@ -7,16 +7,17 @@
 #ifndef MANA_BASE_WIDGET_H
 #define MANA_BASE_WIDGET_H
 
-#include "../../../general/display/banner_widget.h"
 #include "../../abstract_analytics_panel_widget.h"
-#include "../../deck_list_statistics_analyzer.h"
 #include "mana_base_config.h"
 
-#include <QHBoxLayout>
-#include <QWidget>
-#include <libcockatrice/deck_list/deck_list.h>
-#include <libcockatrice/models/deck_list/deck_list_model.h>
-#include <utility>
+#include <QJsonObject>
+#include <QList>
+#include <QString>
+#include <qtmetamacros.h>
+
+class DeckListStatisticsAnalyzer;
+class QHBoxLayout;
+class QWidget;
 
 class ManaBaseWidget : public AbstractAnalyticsPanelWidget
 {

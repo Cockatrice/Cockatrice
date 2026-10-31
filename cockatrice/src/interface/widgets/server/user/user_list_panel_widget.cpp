@@ -1,13 +1,15 @@
 #include "user_list_panel_widget.h"
 
 #include "../../../../client/settings/cache_settings.h"
-#include "user_list_manager.h"
 #include "user_list_widget.h"
 
 #include <QLineEdit>
+#include <QList>
+#include <QStringList>
+#include <QStringLiteral>
 #include <QVBoxLayout>
-#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 
 namespace
 {
@@ -30,9 +32,7 @@ QString sectionKey(UserListWidget::Section section)
 UserListPanelWidget::UserListPanelWidget(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent)
     : QWidget(parent)
 {
-    auto *mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
-    mainLayout->setSpacing(2);
+    auto *mainLayout = QtUtils::makeLayout<QVBoxLayout>(this, 2);
 
     searchBar = new QLineEdit(this);
     searchBar->setClearButtonEnabled(true);

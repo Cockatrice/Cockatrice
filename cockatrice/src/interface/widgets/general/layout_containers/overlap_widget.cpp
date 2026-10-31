@@ -1,9 +1,10 @@
 #include "overlap_widget.h"
 
-#include "../../../layouts/flow_layout.h"
+#include "../../../layouts/overlap_layout.h"
 
+#include <QLayoutItem>
 #include <QWidget>
-#include <libcockatrice/models/deck_list/deck_list_model.h>
+#include <libcockatrice/utility/qt_utils.h>
 
 /**
  * @class OverlapWidget
@@ -80,11 +81,7 @@ void OverlapWidget::removeWidget(QWidget *widgetToRemove) const
 void OverlapWidget::clearLayout()
 {
     if (overlapLayout != nullptr) {
-        QLayoutItem *item;
-        while ((item = overlapLayout->takeAt(0)) != nullptr) {
-            item->widget()->deleteLater();
-            delete item;
-        }
+        QtUtils::clearLayoutRec(overlapLayout);
     }
 
     // If layout is null, create a new layout; otherwise, reuse the existing one

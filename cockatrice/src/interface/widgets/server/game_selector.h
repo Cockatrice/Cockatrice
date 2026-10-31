@@ -1,25 +1,35 @@
 #ifndef GAMESELECTOR_H
 #define GAMESELECTOR_H
 
-#include "game_selector_quick_filter_toolbar.h"
 #include "game_type_map.h"
 
 #include <QGroupBox>
-#include <libcockatrice/protocol/pb/commands.pb.h>
-#include <libcockatrice/protocol/pb/event_add_to_list.pb.h>
-#include <libcockatrice/protocol/pb/event_remove_from_list.pb.h>
+#include <QTimer>
+#include <qtmetamacros.h>
+// IWYU pragma: keep
+// ServerInfo_User appears by value and inside QList in slot signatures, so the
+// moc-generated code needs the complete type.
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
 class QTreeView;
 class GamesModel;
 class GamesProxyModel;
 class QPushButton;
-class QCheckBox;
-class QLabel;
 class AbstractClient;
 class TabSupervisor;
 class TabRoom;
 class ServerInfo_Game;
 class Response;
+class Event_AddToList;
+class Event_RemoveFromList;
+class GameSelectorQuickFilterToolBar;
+class QModelIndex;
+class QPoint;
+class QString;
+class QWidget;
+class ServerInfo_User;
+template <class Key, class T> class QMap;
+template <typename T> class QList;
 
 /**
  * @class GameSelector
@@ -139,6 +149,9 @@ private:
     const bool showFilters;  /**< Determines whether filter buttons are displayed. */
     GameTypeMap gameTypeMap; /**< Mapping of game types for the current room. */
 
+    QTimer filterSaveDebounceTimer; /**< Delays persisting quick-filter edits so typing does not rewrite the settings
+                                       file on every keystroke. */
+
     /**
      * @brief Updates the widget title to reflect the current number of displayed games.
      *
@@ -202,6 +215,7 @@ public:
                  const bool restoresettings,
                  const bool _showfilters,
                  QWidget *parent = nullptr);
+    ~GameSelector() override;
 
     /**
      * @brief Updates UI text for translation/localization.

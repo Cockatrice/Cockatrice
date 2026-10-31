@@ -5,6 +5,7 @@ message RoomCommand {
         ROOM_SAY = 1001;
         CREATE_GAME = 1002;
         JOIN_GAME = 1003;
+        ROOM_CHANNEL_SAY = 1004;
     }
     extensions 100 to max;
 }
@@ -20,6 +21,14 @@ message Command_RoomSay {
         optional Command_RoomSay ext = 1001;
     }
     optional string message = 1;
+}
+
+message Command_RoomChannelSay {
+    extend RoomCommand {
+        optional Command_RoomChannelSay ext = 1004;
+    }
+    optional string channel_id = 1;
+    optional string message = 2;
 }
 
 // Create a new game in the room

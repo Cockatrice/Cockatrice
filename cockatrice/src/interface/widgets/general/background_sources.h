@@ -9,7 +9,10 @@
 
 #include <QList>
 #include <QObject>
+#include <QSharedPointer>
 #include <QString>
+#include <QtGlobal>
+#include <qtmetamacros.h>
 
 class BackgroundSources
 {

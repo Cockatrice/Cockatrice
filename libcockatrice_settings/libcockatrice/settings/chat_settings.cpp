@@ -1,5 +1,11 @@
 #include "chat_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QVariant>
+
+class QObject;
+
 ChatSettings::ChatSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "chat.ini", "chat", QString(), parent)
 {
@@ -23,6 +29,16 @@ QString ChatSettings::getChatMentionColor() const
 QString ChatSettings::getChatHighlightColor() const
 {
     return getValue("highlightColor", QString(), QString(), "A6120D").toString();
+}
+
+QString ChatSettings::getChannelUnreadColor() const
+{
+    return getValue("channelUnreadColor", QString(), QString(), "1A7B00").toString();
+}
+
+QString ChatSettings::getChannelMentionColor() const
+{
+    return getValue("channelMentionColor", QString(), QString(), "A6120D").toString();
 }
 
 bool ChatSettings::getChatMentionForeground() const
@@ -70,6 +86,11 @@ bool ChatSettings::getIgnoreAllPrivateMessages() const
     return getValue("ignoreAllPrivateMessages", QString(), QString(), false).toBool();
 }
 
+bool ChatSettings::getUseGameTime() const
+{
+    return getValue("useGameTime", QString(), QString(), false).toBool();
+}
+
 QString ChatSettings::getHighlightWords() const
 {
     return getValue("highlightWords").toString();
@@ -94,6 +115,16 @@ void ChatSettings::setChatMentionColor(const QString &_chatMentionColor)
 void ChatSettings::setChatHighlightColor(const QString &_chatHighlightColor)
 {
     setValue(_chatHighlightColor, "highlightColor");
+}
+
+void ChatSettings::setChannelUnreadColor(const QString &_channelUnreadColor)
+{
+    setValue(_channelUnreadColor, "channelUnreadColor");
+}
+
+void ChatSettings::setChannelMentionColor(const QString &_channelMentionColor)
+{
+    setValue(_channelMentionColor, "channelMentionColor");
 }
 
 void ChatSettings::setChatMentionForeground(bool _chatMentionForeground)
@@ -139,6 +170,11 @@ void ChatSettings::setRoomHistory(bool _roomHistory)
 void ChatSettings::setIgnoreAllPrivateMessages(bool _ignoreAllPrivateMessages)
 {
     setValue(_ignoreAllPrivateMessages, "ignoreAllPrivateMessages");
+}
+
+void ChatSettings::setUseGameTime(bool _useGameTime)
+{
+    setValue(_useGameTime, "useGameTime");
 }
 
 void ChatSettings::setHighlightWords(const QString &_highlightWords)

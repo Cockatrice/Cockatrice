@@ -46,6 +46,11 @@ jobs:
     outputs:
       tag: ${{ steps.configure.outputs.tag }}
       sha: ${{ steps.configure.outputs.sha }}
+      # MAJ.MIN.PATCH[-beta[.N]] of a tag build; empty otherwise. Mirrors what
+      # cmake/getversion.cmake derives as PROJECT_VERSION, which the client bakes as its
+      # Sentry release (cmake/CrashReporting.cmake) — symbol uploads must use the same
+      # string so stack traces de-symbolicate against this build's binaries.
+      sentry_release: ${{ steps.configure.outputs.sentry_release }}
 
     steps:
       - name: "Configure"
@@ -56,6 +61,9 @@ jobs:
         run: |
           if [[ "$GITHUB_REF_TYPE" == 'tag' ]]; then    # release
             echo "tag=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
+            # Tag format is YYYY-MM-DD-{Release|Development}-MAJ.MIN.PATCH[-beta[.N]];
+            # PROJECT_VERSION is the tail after the type (see cmake/getversion.cmake).
+            echo "sentry_release=$(sed -E 's/^[0-9]{4}-[0-9]{2}-[0-9]{2}-(Release|Development)-//' <<< "$GITHUB_REF_NAME")" >> "$GITHUB_OUTPUT"
           fi
           echo "sha=$RESOLVED_SHA" >> "$GITHUB_OUTPUT"
 
@@ -144,17 +152,36 @@ jobs:
 
             package: DEB
 
-    name: ${{ matrix.distro }} ${{ matrix.version }}
+            # The one leg that runs the suite under AddressSanitizer and
+            # UndefinedBehaviorSanitizer. Debian 13 and Fedora 44 keep covering the
+            # uninstrumented suite, so nothing is lost by instrumenting this one.
+            sanitize: yes
+
+          - distro: Ubuntu
+            version: 26.04
+            variant: cover    # separate image and ccache, same distro
+
+            # The one leg that runs instrumented for line coverage and publishes the report as
+            # a workflow artifact. It is a separate leg rather than a second flag on the
+            # sanitizer leg because the two instruments answer different questions: the
+            # sanitizer leg reports what the run did wrong, the coverage leg reports what the
+            # run never touched at all. Combining them would also slow both down. Packaging is
+            # skipped because the leg above already publishes the DEB for this distro.
+            coverage: yes
+            package: skip
+
+    name: ${{ matrix.distro }} ${{ matrix.version }}${{ matrix.variant && format(' {0}', matrix.variant) || '' }}
     needs: configure
     runs-on: ubuntu-latest    # https://github.com/actions/runner-images
     continue-on-error: ${{ matrix.allow-failure == 'yes' }}
     timeout-minutes: 70
     env:
-      CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}    # directory for caching docker image and ccache
+      CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}    # directory for caching docker image and ccache
       CCACHE_EVICTION_AGE: 7d
       CCACHE_SIZE: 600M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CMAKE_GENERATOR: 'Ninja'
       NAME: ${{ matrix.distro }}${{ matrix.version }}
+      IMAGE_SUFFIX: ${{ matrix.variant }}
 
     steps:
       - name: "Checkout"
@@ -164,8 +191,8 @@ jobs:
         id: restore_ccache
         uses: actions/cache/restore@v6
         with:
-          key: ccache-${{ matrix.distro }}${{ matrix.version }}
-          path: ${{ env.CACHE }}
+          key: ccache-${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}
+          path: ${{ env.CACHE }}/.ccache
 
       - name: "Build ${{ matrix.distro }} ${{ matrix.version }} Docker image"
         shell: bash
@@ -174,6 +201,9 @@ jobs:
       - name: "Build debug and test"
         if: matrix.test != 'skip'
         shell: bash
+        env:
+          sanitize: '${{ matrix.sanitize }}'
+          coverage: '${{ matrix.coverage }}'
         run: |
           source .ci/docker.sh
           args=()
@@ -181,7 +211,33 @@ jobs:
           args+=(--ccache "$CCACHE_SIZE")
           args+=(--cmake-generator "$CMAKE_GENERATOR")
 
-          RUN --server --debug --test "${args[@]}"
+          extra=()
+          [[ $sanitize == yes ]] && extra+=(--sanitize)
+          [[ $coverage == yes ]] && extra+=(--coverage)
+
+          RUN --server --debug --test "${extra[@]}" "${args[@]}"
+
+      # RUN bind-mounts the workspace into the container, so the report the build wrote into
+      # build/ is already on the host and no second container is needed to collect it.
+      - name: "Collect coverage report"
+        if: matrix.coverage == 'yes'
+        shell: bash
+        run: |
+          mkdir -p coverage
+          # --html-details writes one page per source file plus a stylesheet and script, and the
+          # index links to all of them by relative name. Copying the index alone would publish a
+          # report where every link 404s, so the whole family has to travel together.
+          cp build/coverage-details* coverage/
+          cp build/coverage.lcov build/coverage.xml build/coverage-summary.json coverage/
+          ls -la coverage/
+
+      - name: "Upload coverage artifact"
+        if: matrix.coverage == 'yes'
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-report
+          path: coverage/
+          if-no-files-found: warn
 
       - name: "Build release package"
         id: build
@@ -191,6 +247,12 @@ jobs:
           SUFFIX: '-${{ matrix.distro }}${{ matrix.version }}'
           package: '${{ matrix.package }}'
           server_only: '${{ matrix.server_only }}'
+          WITH_CRASH_REPORTING: 'ON'
+          # Tag builds only: artifacts from master pushes and PR branches must not report to
+          # Sentry. Forks get no secrets on pull_request, so they keep the mock fallback either way.
+          # configure.outputs.tag is set for ANY tag, so beta (Development) tags get the DSN
+          # and the symbol upload below just like full releases.
+          COCKATRICE_SENTRY_DSN: ${{ needs.configure.outputs.tag != null && secrets.SENTRY_DSN || '' }}
         run: |
           source .ci/docker.sh
           args=()
@@ -199,8 +261,57 @@ jobs:
           args+=(--ccache "$CCACHE_SIZE")
           args+=(--cmake-generator "$CMAKE_GENERATOR")
           args+=(--suffix "$SUFFIX")
+          # The container inherits no environment, so the DSN rides in explicitly. -e without
+          # =value passes it through (possibly empty); compile.sh only consumes it for Release
+          # configures, and empty keeps the mock fallback.
+          export RUN_ARGS="${RUN_ARGS:-} -e COCKATRICE_SENTRY_DSN"
 
           RUN --server --release --package "$package" "${args[@]}"
+
+      - name: "Install sentry-cli"
+        if: matrix.package != 'skip' && needs.configure.outputs.tag != null
+        # Downloads from Sentry's release registry: a Sentry outage or a broken install under
+        # Git Bash must not take down the release assets below.
+        continue-on-error: true
+        shell: bash
+        env:
+          SENTRY_CLI_VERSION: '3.8.0'
+        run: |
+          export INSTALL_DIR="$GITHUB_WORKSPACE/.sentry-cli"
+          curl -sL https://sentry.io/get-cli/ | bash
+          echo "$GITHUB_WORKSPACE/.sentry-cli" >> "$GITHUB_PATH"
+
+      - name: "Upload debug symbols to Sentry"
+        # Like the DSN above, this runs for every tag — beta (Development) tags included.
+        if: matrix.package != 'skip' && needs.configure.outputs.tag != null
+        # A Sentry outage or rotated token must not take down the release assets below.
+        continue-on-error: true
+        shell: bash
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        run: |
+          paths=()
+          # The binaries only, not the directories: a directory makes sentry-cli walk the
+          # whole build tree, where it finds (and uploads) object files and other fragments
+          # that can never match a stack frame. The packaged copy is split and stripped by
+          # cpack, but keeps this binary's GNU build-id, which is how Sentry matches it.
+          for app in cockatrice oracle servatrice; do
+            binary="build/$app/$app"
+            [[ -f $binary ]] && paths+=("$binary")
+          done
+          if [[ ${#paths[@]} == 0 ]]; then
+            # Fail loudly instead of skipping: see the Windows/macOS leg below — this step
+            # is the only way symbols reach Sentry and `continue-on-error` keeps the job
+            # green either way, so a silent skip looks exactly like a successful upload.
+            echo "::error::No debug symbol files found; nothing would be uploaded"
+            exit 1
+          fi
+          # Project slug on Sentry; must match the project the baked DSN points at.
+          # No --release here: `debug-files upload` has no such option (sentry-cli errors on
+          # the unknown flag and uploads nothing), and debug information files are matched to
+          # events by debug ID via the event's debug_meta, not by release. The release grouping
+          # comes from the client event itself (COCKATRICE_SENTRY_RELEASE).
+          sentry-cli debug-files upload --org cockatrice --project cockatrice-desktop "${paths[@]}"
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "Delete remote compiler cache (ccache)"
@@ -219,7 +330,7 @@ jobs:
         uses: actions/cache/save@v6
         with:
           key: ${{ steps.restore_ccache.outputs.cache-primary-key }}
-          path: ${{ env.CACHE }}
+          path: ${{ env.CACHE }}/.ccache
 
       - name: "Upload artifact"
         id: upload_artifact
@@ -272,11 +383,13 @@ jobs:
             make_package: 1
             override_target: 13
             package_suffix: "-macOS13_Intel"
-            qt_version: 6.11.1
-            qt_modules: qtimageformats qtmultimedia qtwebsockets qtshadertools
+            qt_version: 6.11.*
+            qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Intel
             type: Release
             use_ccache: 1
+            vcpkg_scope: 'vcpkg/macos13-x64-xcode26.3/'
+            vcpkg_upload: 1    # only one leg per vcpkg_scope hands its archives over
 
           - os: macOS
             target: 14    # EOL 2026-09-14
@@ -287,14 +400,17 @@ jobs:
             make_package: 1
             override_target: 14
             package_suffix: "-macOS14"
-            qt_version: 6.11.1
-            qt_modules: qtimageformats qtmultimedia qtwebsockets qtshadertools
+            qt_version: 6.11.*
+            qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Apple
             type: Release
             use_ccache: 1
+            vcpkg_deployment_target: 14
+            vcpkg_scope: 'vcpkg/macos14-arm64-xcode26.6/'
+            vcpkg_upload: 1    # only one leg per vcpkg_scope hands its archives over
 
           - os: macOS
-            target: 15    # 2027-??
+            target: 15    # EOL 2027-??
             runner: xcode-27    # https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md
 
             ccache_eviction_age: 7d
@@ -302,11 +418,13 @@ jobs:
             make_package: 1
             override_target: 15
             package_suffix: "-macOS15"
-            qt_version: 6.11.1
-            qt_modules: qtimageformats qtmultimedia qtwebsockets qtshadertools
+            qt_version: 6.11.*
+            qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Apple
             type: Release
             use_ccache: 1
+            vcpkg_deployment_target: 14
+            vcpkg_scope: 'vcpkg/macos14-arm64-xcode26.6/'
 
           - os: macOS
             target: 27
@@ -314,23 +432,34 @@ jobs:
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
-            qt_version: 6.11.1
-            qt_modules: qtimageformats qtmultimedia qtwebsockets qtshadertools
+            qt_version: 6.11.*
+            qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Apple
             type: Debug
             use_ccache: 1
+            vcpkg_deployment_target: 14
+            vcpkg_scope: 'vcpkg/macos14-arm64-xcode26.6/'
 
           - os: Windows
             target: 10
             runner: windows-2025    # https://github.com/actions/runner-images/blob/main/images/windows/Windows2025-VS2026-Readme.md
 
-            cmake_generator: "Visual Studio 18 2026"
-            cmake_generator_platform: x64
+            # Ninja builds the whole dependency graph at once instead of one
+            # MSBuild node at a time, runs the compiler itself, and matches the
+            # Linux and macOS legs. Its median build phase measured ~17 min
+            # against ~21 for the Visual Studio generator (shared 4-core hosts
+            # swing either by minutes, so read medians, not single runs).
+            cmake_generator: Ninja
             make_package: 1
             package_suffix: "-Win10"
-            qt_version: 6.11.1
-            qt_modules: qtimageformats qtmultimedia qtwebsockets qtshadertools
+            qt_version: 6.11.*
+            qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             type: Release
+            # Scope is named after the vs2026 toolchain, not the generator: the
+            # ABI hash covers cl.exe, which is identical, so this leg keeps
+            # restoring the warm archives. Renaming would orphan them.
+            vcpkg_scope: 'vcpkg/windows10-x64-vs2026/'
+            vcpkg_upload: 1    # only one leg per vcpkg_scope hands its archives over
 
     name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
@@ -364,18 +493,20 @@ jobs:
           key: ccache-${{ matrix.os }}${{ matrix.override_target }}-${{ matrix.runner }}
           path: ${{ env.CCACHE_DIR }}
 
-      - name: "Install aqtinstall"
+      - name: "[macOS] Install aqtinstall"
+        if: matrix.os == 'macOS'
         run: pipx install aqtinstall
 
       # Resolve given wildcard versions (e.g. Qt 6.6.*) to latest version via aqtinstall to avoid stale caches on new releases
-      - name: "Resolve latest Qt patch version"
+      - name: "[macOS] Resolve latest Qt from ${{ matrix.qt_version }} input"
+        if: matrix.os == 'macOS'
         env:
           QT_VERSION: ${{ matrix.qt_version }}
         id: resolve_qt_version
         shell: bash
         run: .ci/resolve_latest_aqt_qt_version.sh "$QT_VERSION"
 
-      - name: "[macOS] Restore thin Qt ${{ steps.resolve_qt_version.outputs.version }} libraries"
+      - name: "[macOS] Restore thin Qt ${{ steps.resolve_qt_version.outputs.version }}"
         if: matrix.os == 'macOS'
         id: restore_qt
         uses: actions/cache/restore@v6
@@ -385,21 +516,22 @@ jobs:
 
       # Using jurplel/install-qt-action to install Qt without using brew
       # Qt build using vcpkg either just fails or takes too long to build
-      - name: "[macOS] Install fat Qt ${{ steps.resolve_qt_version.outputs.version }}"
+      - name: "[macOS] Install fat Qt ${{ matrix.qt_version }}"
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         uses: jurplel/install-qt-action@v4
         with:
           cache: false
-          dir: ${{ github.workspace }}
+          # cache-key-prefix: Qt
+          dir: ${{ github.workspace }}    # thinning script depends on this location
           modules: ${{ matrix.qt_modules }}
-          version: ${{ steps.resolve_qt_version.outputs.version }}
+          version: ${{ matrix.qt_version }}
 
       - name: "[macOS] Create thin Qt libraries"
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         run: .ci/thin_macos_qtlib.sh
 
       - name: "[macOS] Cache thin Qt libraries"
-        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true' && github.ref == 'refs/heads/master'
         uses: actions/cache/save@v6
         with:
           key: ${{ steps.restore_qt.outputs.cache-primary-key }}
@@ -411,21 +543,48 @@ jobs:
         with:
           # Qt 6.11.0 only works with aqtinstall directly from git until aqtinstall 3.4 is released
           aqtsource: git+https://github.com/miurahr/aqtinstall.git
-          cache: true
+          cache: ${{ github.ref == 'refs/heads/master' }}
           cache-key-prefix: Qt
           modules: ${{ matrix.qt_modules }}
-          version: ${{ steps.resolve_qt_version.outputs.version }}
+          version: ${{ matrix.qt_version }}
 
       - name: "[Windows] Install NSIS"
         if: matrix.os == 'Windows'
         shell: bash
         run: choco install nsis
 
+      # Ninja invokes cl.exe directly and needs the MSVC environment on PATH.
+      - name: "[Windows] Set up MSVC environment"
+        if: matrix.os == 'Windows'
+        uses: TheMrMilchmann/setup-msvc-dev@368ef7d1ee4d1171b31d4a7f67f4d954f903f5a9 # v4.1.0
+        with:
+          arch: x64
+
       - name: "Setup vcpkg cache"
         id: vcpkg-cache
         uses: TAServers/vcpkg-cache@v3
         with:
+          # Every entry is keyed by vcpkg ABI hash, and one hash set exists per platform,
+          # target and toolchain. The action restores every entry it finds under the
+          # prefix, not just the hashes vcpkg asks for, so with one shared vcpkg/
+          # namespace every leg downloads all 66 archives of all 5 legs on every run.
+          # Each of those restores also refreshes the entry's last access date, which
+          # is why a dead ABI generation is never evicted by age. Naming the scope is
+          # what makes those generations identifiable, and prune-caches below able to
+          # delete them.
+          prefix: ${{ matrix.vcpkg_scope }}
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      # The action only creates its directory when the prefix matched at least one
+      # entry, and it reads that directory unguarded when it saves at the end of the
+      # job. A scope nobody has written to yet therefore leaves the directory missing
+      # and fails the job, which is exactly the state every scope starts in. Make the
+      # directory up front so an empty scope is a cache miss instead of an error.
+      - name: "Create vcpkg cache directory"
+        shell: bash
+        env:
+          CACHE_DIR: '${{ steps.vcpkg-cache.outputs.path }}'
+        run: mkdir -p "$CACHE_DIR"
 
       # Uses environment variables, see compile.sh for more details
       - name: "Build Cockatrice"
@@ -435,7 +594,11 @@ jobs:
           BUILDTYPE: '${{ matrix.type }}'
           CCACHE_EVICTION_AGE: ${{ matrix.ccache_eviction_age }}
           CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
-          CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform }}
+          # Tag builds only: artifacts from master pushes and PR branches must not report to
+          # Sentry. Forks get no secrets on pull_request, so they keep the mock fallback either way.
+          # configure.outputs.tag is set for ANY tag, so beta (Development) tags get the DSN
+          # and the symbol upload below just like full releases.
+          COCKATRICE_SENTRY_DSN: ${{ needs.configure.outputs.tag != null && secrets.SENTRY_DSN || '' }}
           GITHUB_TOKEN: ${{ github.token }}    # needed for vcpkg dependency graph updates, see VCPKG_FEATURE_FLAGS
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
@@ -445,10 +608,205 @@ jobs:
           PACKAGE_SUFFIX: '${{ matrix.package_suffix }}'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
           USE_CCACHE: ${{ matrix.use_ccache }}
-          VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
+          # Only pushes to the default branch may write the shared binary cache: the
+          # archives a run compiles are only as trustworthy as the code they were
+          # built from, and only merged code may populate the scope that master and
+          # release builds restore and link. Pull requests (same-repository ones
+          # included) restore the shared cache but never write it; with the source
+          # left at read the collect step below finds nothing on PRs, so no
+          # pull-request-scoped entry is ever saved that no later run could restore.
+          # Forks pushing to their own default branch resolve github.ref against
+          # their own repository, so they keep a working cache of their own there.
+          VCPKG_BINARY_SOURCES: "clear;files,${{ steps.vcpkg-cache.outputs.path }},${{ case(github.ref == 'refs/heads/master', 'readwrite', 'read') }}"
           VCPKG_DISABLE_METRICS: 1
           VCPKG_FEATURE_FLAGS: dependencygraph
+          VCPKG_TARGET_MACOS_VERSION: ${{ matrix.vcpkg_deployment_target }}
+          # Release legs compile the sentry-native SDK; Debug legs stay SDK-free.
+          WITH_CRASH_REPORTING: ${{ matrix.type == 'Release' && 'ON' || '' }}
         run: .ci/compile.sh --server --test --vcpkg
+
+      - name: "Install sentry-cli"
+        if: needs.configure.outputs.tag != null && matrix.make_package == '1'
+        # Same as the Linux leg above: the install downloads from Sentry's registry, so a
+        # failure here must not block the release upload below.
+        continue-on-error: true
+        shell: bash
+        env:
+          SENTRY_CLI_VERSION: '3.8.0'
+        run: |
+          export INSTALL_DIR="$GITHUB_WORKSPACE/.sentry-cli"
+          curl -sL https://sentry.io/get-cli/ | bash
+          echo "$GITHUB_WORKSPACE/.sentry-cli" >> "$GITHUB_PATH"
+
+      - name: "Upload debug symbols to Sentry"
+        # Like the DSN above, this runs for every tag — beta (Development) tags included.
+        if: needs.configure.outputs.tag != null && matrix.make_package == '1'
+        # A Sentry outage or rotated token must not take down the release assets below.
+        continue-on-error: true
+        shell: bash
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        run: |
+          paths=()
+          if [[ '${{ matrix.os }}' == 'Windows' ]]; then
+            # Top-level CMakeLists.txt links /DEBUG even in release, so the linker PDBs
+            # land next to the binaries. Ninja is single-config, so that is
+            # build/<target>/ and NOT build/<target>/Release/ — the same globs the symbol
+            # artifact step below uses.
+            #
+            # The executables are uploaded as well, in the same invocation. On 64-bit
+            # Windows the Call Frame Information (.pdata/.xdata) lives in the PE and is
+            # not copied into the PDB, so a PDB on its own leaves Sentry reporting
+            # "Stack Unwinding: Missing" for the image. sentry-cli also needs to see the
+            # PE and its PDB together: only then does it associate the PE's code
+            # identifier with the PDB's debug identifier.
+            shopt -s nullglob
+            for target in cockatrice oracle servatrice; do
+              paths+=("build/$target"/*.exe "build/$target"/*.pdb)
+            done
+            shopt -u nullglob
+
+            # Qt's own runtime DLLs, taken from required-runtime.txt — the manifest
+            # .ci/compile.sh asserts the installer against — so the set uploaded is
+            # the set an install actually carries. The PE is the only carrier of
+            # unwind information for a 64-bit image, and sending it in the same
+            # invocation as a PDB is what lets sentry-cli associate the PE's code
+            # identifier with the PDB's debug identifier. Qt ships no PDBs with the
+            # SDK, so Qt frames resolve through the export table: names, no lines.
+            qt_dir=
+            qt_core_dir=
+            # Existence guards matter: the step runs under `bash -eo pipefail`, so a
+            # redirection-less sed over a missing file would abort the step outright
+            # and continue-on-error would hide it.
+            if [[ -f build/CMakeCache.txt ]]; then
+              qt_core_dir=$(sed -n 's/^Qt6Core_DIR:PATH=//p' build/CMakeCache.txt | head -1)
+            fi
+            if [[ -n $qt_core_dir ]]; then
+              qt_dir=$(dirname "$(dirname "$(dirname "$qt_core_dir")")")
+            fi
+            if [[ -z $qt_dir || ! -d $qt_dir ]]; then
+              # Warnings, not failures: the upload of our own binaries is what this
+              # step is for, and continue-on-error already means an upload failure
+              # cannot be told apart from a successful one.
+              echo "::warning::Qt runtime directory not resolved from build/CMakeCache.txt; Qt images get no unwind information"
+            elif [[ ! -f build/required-runtime.txt ]]; then
+              echo "::warning::build/required-runtime.txt is missing; cannot tell which Qt DLLs ship"
+            else
+              while IFS= read -r runtime; do
+                name=${runtime##*/}
+                if [[ $runtime == */* ]]; then
+                  # A Qt plugin: the install root keeps it as plugins/<type>/<name>.
+                  # `|| true`: an unmatched glob makes ls exit non-zero, and pipefail
+                  # turns that into a step abort.
+                  runtime_path=$(ls "$qt_dir/plugins"/*/"$name" 2>/dev/null | head -1) || true
+                else
+                  runtime_path="$qt_dir/bin/$name"
+                fi
+                if [[ -f ${runtime_path:-} ]]; then
+                  paths+=("$runtime_path")
+                else
+                  echo "::warning::shipped Qt runtime $runtime not found under $qt_dir"
+                fi
+              done < <(grep -E '^(Qt6[^/]*\.dll|Plugins/)' build/required-runtime.txt)
+            fi
+          else
+            # Release builds carry DWARF (-g, kept by CrashReporting.cmake); macOS keeps its
+            # debug info in dSYM bundles, so materialize them before uploading.
+            for app in cockatrice oracle servatrice; do
+              binary="build/$app/$app.app/Contents/MacOS/$app"
+              if [[ -f $binary ]]; then
+                if [[ '${{ matrix.os }}' == 'macOS' ]]; then
+                  dsymutil "$binary" -o "$binary.dSYM"
+                  paths+=("$binary.dSYM")
+                  # The dSYM holds the debug information, but the unwind information
+                  # Sentry needs to walk a minidump stack lives in the Mach-O itself.
+                  paths+=("$binary")
+                else
+                  paths+=("$binary")
+                fi
+              fi
+            done
+          fi
+          if [[ ${#paths[@]} == 0 ]]; then
+            # Fail loudly instead of skipping: this step is the only way symbols reach
+            # Sentry, and `continue-on-error` keeps the job green either way, so a
+            # silent skip is indistinguishable from a successful upload. It also hid a
+            # wrong Windows path (build/<target>/Release, which Ninja never creates).
+            echo "::error::No debug symbol files found; nothing would be uploaded"
+            exit 1
+          fi
+          # Project slug on Sentry; must match the project the baked DSN points at.
+          # No --release: see the Linux leg above — the flag does not exist on
+          # `debug-files upload` and DIFs are matched by debug ID, not release.
+          sentry-cli debug-files upload --org cockatrice --project cockatrice-desktop "${paths[@]}"
+
+      # CPack reports a failed makensis run as "Problem running NSIS command"
+      # plus a path to NSISOutput.log, and that log lives only on the runner, so
+      # the actual compile error is otherwise nowhere in the workflow output.
+      # Dump it, or a broken installer script is undiagnosable from CI alone.
+      # shell: bash matters here - the default pwsh resolves `find` to Windows'
+      # text-search find.exe, which errors instead of searching.
+      - name: "Dump NSIS compile log"
+        if: failure() && matrix.os == 'Windows'
+        shell: bash
+        run: find . -name NSISOutput.log -exec cat {} +
+
+      # A master run hands over the archives it had to build itself so that
+      # vcpkg-cache-import.yml, which runs in the default branch scope, can save them
+      # where later runs can restore them. Pull requests hand over nothing: their cache
+      # entries would be scoped to refs/pull/<n>/merge and stay unreadable for every
+      # other run, so writing them only burns the repository's quota.
+      # vcpkg_upload keeps this to one leg per scope: macOS 14, 15 and 26 share a scope
+      # by design, and all three rebuild the same archives, so uploading from each of them
+      # would publish three identical 269 MB artifacts under one artifact name and make
+      # the importer spawn a save job per copy.
+      - name: "Collect new vcpkg entries"
+        id: vcpkg_new
+        if: github.ref == 'refs/heads/master' && matrix.vcpkg_upload == 1
+        shell: bash
+        env:
+          CACHE_DIR: '${{ steps.vcpkg-cache.outputs.path }}'
+          GH_TOKEN: ${{ github.token }}
+          VCPKG_SCOPE: '${{ matrix.vcpkg_scope }}'
+        run: |
+          # The archive name is the ABI hash, so a missing key is exactly what vcpkg had
+          # to compile from source in this job.
+          gh api --paginate \
+            "repos/$GITHUB_REPOSITORY/actions/caches?ref=refs/heads/master&key=$VCPKG_SCOPE&per_page=100" \
+            --jq '.actions_caches[].key' | sort -u >"$RUNNER_TEMP/master-keys.txt"
+          find "$CACHE_DIR" -type f -name '*.zip' -exec basename {} .zip \; |
+            sed "s|^|$VCPKG_SCOPE|" | sort -u >"$RUNNER_TEMP/local-keys.txt"
+          comm -23 "$RUNNER_TEMP/local-keys.txt" "$RUNNER_TEMP/master-keys.txt" >"$RUNNER_TEMP/new-keys.txt"
+
+          mkdir -p "$RUNNER_TEMP/vcpkg-new"
+          : >"$RUNNER_TEMP/vcpkg-new/keys.txt"
+          while read -r key; do
+            hash="${key##*/}"
+            archive="$(find "$CACHE_DIR" -type f -name "$hash.zip" -print -quit)"
+            dir="$RUNNER_TEMP/vcpkg-new/${hash:0:2}"    # vcpkg's own two character fanout
+            mkdir -p "$dir"
+            cp "$archive" "$dir/"
+            echo "$key ${hash:0:2}/$hash.zip" >>"$RUNNER_TEMP/vcpkg-new/keys.txt"
+          done <"$RUNNER_TEMP/new-keys.txt"
+
+          count="$(wc -l <"$RUNNER_TEMP/new-keys.txt")"
+          echo "vcpkg scope $VCPKG_SCOPE: $count entries to import"
+          echo "count=$count" >>"$GITHUB_OUTPUT"
+          echo "slug=$(sed -e 's|^vcpkg/||' -e 's|/$||' -e 's|/|-|g' <<<"$VCPKG_SCOPE")" >>"$GITHUB_OUTPUT"
+
+      # archive: false accepts a single file and nothing else, and a scope hands over one
+      # archive per ABI hash vcpkg had to rebuild, which is 23 files on a cold runner.
+      # Zipping the directory keeps the fanout at the artifact root, which is where
+      # vcpkg-cache-import.yml looks for keys.txt once download-artifact unpacks it.
+      - name: "Upload new vcpkg entries"
+        # An empty count means the step above did not run at all, on master and on forks
+        if: steps.vcpkg_new.outputs.count != '' && steps.vcpkg_new.outputs.count != '0'
+        uses: actions/upload-artifact@v7
+        with:
+          if-no-files-found: error    # a count above zero with nothing staged is a bug
+          name: vcpkg-new-${{ steps.vcpkg_new.outputs.slug }}
+          path: ${{ runner.temp }}/vcpkg-new
+          retention-days: 1
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "[macOS] Delete remote compiler cache (ccache)"
@@ -525,17 +883,6 @@ jobs:
           if-no-files-found: error
           path: ${{ steps.build.outputs.path }}
 
-      - name: "[Windows] Upload PDBs (Program Databases)"
-        if: matrix.os == 'Windows' && github.ref_type != 'tag'
-        uses: actions/upload-artifact@v7
-        with:
-          if-no-files-found: error
-          name: ${{ steps.build.outputs.name }}-PDBs
-          path: |
-            build/cockatrice/Release/*.pdb
-            build/oracle/Release/*.pdb
-            build/servatrice/Release/*.pdb
-
       - name: "Upload to release"
         if: needs.configure.outputs.tag != null && matrix.make_package == '1'
         id: upload_release
@@ -546,6 +893,33 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           tag_name: ${{ needs.configure.outputs.tag }}
         run: gh release upload "$tag_name" "$asset_path#$asset_name"
+
+      # Ninja is single-config: binaries and their PDBs land directly in the
+      # target directories instead of a Release subdirectory.
+      #
+      # Archived for tag builds only, and ordered after the release upload so
+      # a missing PDB can never block a release from being published. On a tag
+      # build this artifact is the only durable copy of the symbols: the Sentry
+      # upload is continue-on-error, so without it a failed upload would lose
+      # the ability to symbolicate that release permanently. Other builds upload
+      # no symbols at all, so archiving them there would only cost storage.
+      #
+      # The executables travel with their PDBs: re-uploading the pair together is
+      # what lets sentry-cli associate the PE's code identifier with the PDB's
+      # debug identifier, and the PE is what carries the unwind information.
+      - name: "[Windows] Upload debug symbols (exe + pdb)"
+        if: matrix.os == 'Windows' && needs.configure.outputs.tag != null
+        uses: actions/upload-artifact@v7
+        with:
+          if-no-files-found: error
+          name: ${{ steps.build.outputs.name }}-Symbols
+          path: |
+            build/cockatrice/*.exe
+            build/cockatrice/*.pdb
+            build/oracle/*.exe
+            build/oracle/*.pdb
+            build/servatrice/*.exe
+            build/servatrice/*.pdb
 
       - name: "Attest binary provenance"
         if: steps.upload_release.outcome == 'success'
@@ -562,3 +936,67 @@ jobs:
           BUILD_PATH: ${{ steps.build.outputs.path }}
           GH_TOKEN: ${{ github.token }}
         run: gh attestation verify "$BUILD_PATH" --repo Cockatrice/Cockatrice
+
+  prune-caches:
+    name: Prune caches
+    # Only master writes caches at all, so only master may clean them up too
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-slim    # https://github.com/actions/runner-images/blob/main/images/ubuntu-slim/ubuntu-slim-Readme.md
+    continue-on-error: true    # freeing space must never fail a build
+
+    steps:
+      # The repository holds 10Gi of cache against entries that want more, and GitHub
+      # evicts the least recently used entry whenever that is exceeded. The vcpkg
+      # entries are the reason that never happens: the restore above touches every
+      # entry under the prefix on every run, so a dead ABI generation keeps its access
+      # date fresh forever and age based eviction can never reach it. Deleting by age
+      # alone cannot fix that, only knowing which scope an entry belongs to can.
+      - name: "Delete unusable cache entries"
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # Must list every vcpkg_scope of the build-vcpkg matrix above, or the entries of
+          # a scope that is still in use get deleted on the next run.
+          LIVE_VCPKG_SCOPES: 'vcpkg/macos13-x64-xcode26.3/ vcpkg/macos14-arm64-xcode26.6/ vcpkg/windows10-x64-vs2026/'
+        run: |
+          gh api --paginate "repos/$GITHUB_REPOSITORY/actions/caches?per_page=100" \
+            --jq '.actions_caches[] | [.id, .ref, .key, .last_accessed_at] | @tsv' >"$RUNNER_TEMP/caches.tsv"
+
+          cutoff="$(( $(date -u +%s) - 7 * 24 * 3600 ))"
+          live=" ${LIVE_VCPKG_SCOPES} "
+          deleted=0
+          while IFS=$'\t' read -r id ref key accessed; do
+            [[ -n $id ]] || continue
+            # Only ever touch the key shapes this workflow creates, so that an entry of
+            # some other workflow can never be deleted by accident
+            case "$key" in
+              vcpkg/* | ccache-* | Qt*) ;;
+              *) continue ;;
+            esac
+
+            reason=""
+            if [[ $ref != refs/heads/master ]]; then
+              reason="scoped to $ref"
+            elif [[ $key == vcpkg/* ]]; then
+              # "<scope>/<abi hash>", cut the hash off the end to get the scope
+              scope="vcpkg/${key#vcpkg/}"
+              scope="${scope%/*}/"
+              if [[ $live != *" $scope "* ]]; then
+                reason="no matrix leg uses $scope"
+              fi
+            fi
+            if [[ -z $reason ]]; then
+              stamp="$(date -u -d "$accessed" +%s 2>/dev/null || echo 0)"
+              if [[ $stamp -ne 0 && $stamp -lt $cutoff ]]; then
+                reason="unused since $accessed"
+              fi
+            fi
+
+            if [[ -n $reason ]]; then
+              echo "::notice::deleting $key, $reason"
+              gh api -X DELETE "repos/$GITHUB_REPOSITORY/actions/caches/$id"
+              deleted=$((deleted + 1))
+            fi
+          done <"$RUNNER_TEMP/caches.tsv"
+
+          echo "::notice::deleted $deleted of $(wc -l <"$RUNNER_TEMP/caches.tsv") cache entries"

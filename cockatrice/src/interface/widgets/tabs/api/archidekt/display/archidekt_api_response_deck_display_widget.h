@@ -1,18 +1,22 @@
 #ifndef COCKATRICE_ARCHIDEKT_API_RESPONSE_DECK_DISPLAY_WIDGET_H
 #define COCKATRICE_ARCHIDEKT_API_RESPONSE_DECK_DISPLAY_WIDGET_H
 
-#include "../../../../../deck_loader/deck_loader.h"
-#include "../../../../cards/card_size_widget.h"
-#include "../../../../general/layout_containers/flow_widget.h"
-#include "../../../../visual_deck_editor/visual_deck_display_options_widget.h"
 #include "../api_response/deck/archidekt_api_response_deck.h"
-#include "deck_list_model.h"
 
-#include <QPushButton>
-#include <QResizeEvent>
-#include <QScrollArea>
-#include <QVBoxLayout>
+#include <QHash>
+#include <QPersistentModelIndex>
+#include <QString>
 #include <QWidget>
+#include <qtmetamacros.h>
+
+class CardSizeWidget;
+class DeckListModel;
+class QHBoxLayout;
+class QPushButton;
+class QScrollArea;
+class QVBoxLayout;
+class VisualDeckDisplayOptionsWidget;
+struct LoadedDeck;
 
 /**
  * @class ArchidektApiResponseDeckDisplayWidget

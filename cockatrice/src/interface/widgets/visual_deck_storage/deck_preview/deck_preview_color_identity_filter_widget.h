@@ -8,20 +8,21 @@
 
 #include "../visual_deck_storage_sort_filter_proxy_model.h"
 
-#include <QHBoxLayout>
+#include <QChar>
 #include <QMap>
-#include <QPushButton>
 #include <QSet>
 #include <QWidget>
+#include <qtmetamacros.h>
 
-class VisualDeckStorageWidget;
+class QHBoxLayout;
+class QPushButton;
 
 class DeckPreviewColorIdentityFilterWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit DeckPreviewColorIdentityFilterWidget(VisualDeckStorageWidget *parent);
+    explicit DeckPreviewColorIdentityFilterWidget(QWidget *parent = nullptr);
     void retranslateUi();
 
     /**

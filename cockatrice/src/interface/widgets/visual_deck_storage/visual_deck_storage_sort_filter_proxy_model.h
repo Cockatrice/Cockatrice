@@ -15,11 +15,15 @@
 #ifndef VISUAL_DECK_STORAGE_SORT_FILTER_PROXY_MODEL_H
 #define VISUAL_DECK_STORAGE_SORT_FILTER_PROXY_MODEL_H
 
-#include "visual_deck_storage_model.h"
-
+#include <QChar>
+#include <QList>
 #include <QSet>
 #include <QSortFilterProxyModel>
 #include <QString>
+#include <qtmetamacros.h>
+
+class QObject;
+class VisualDeckStorageModel;
 
 class VisualDeckStorageSortFilterProxyModel : public QSortFilterProxyModel
 {
@@ -101,5 +105,15 @@ private:
     QList<bool> tagMatches;    ///< Per-row tag match.
     QList<bool> colorMatches;  ///< Per-row color identity match.
 };
+
+/**
+ * @brief Whether an identity string matches the active color-identity filter.
+ *
+ * The single source of truth for the color identity matching rule, shared by
+ * the Visual Deck Storage proxy and the remote public decks model.
+ */
+[[nodiscard]] bool colorIdentityMatches(VisualDeckStorageSortFilterProxyModel::FilterMode mode,
+                                        const QSet<QChar> &colors,
+                                        const QString &identity);
 
 #endif // VISUAL_DECK_STORAGE_SORT_FILTER_PROXY_MODEL_H

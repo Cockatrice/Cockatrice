@@ -2,6 +2,7 @@
 #define COCKATRICE_DECK_LIST_STYLE_PROXY_H
 
 #include <QIdentityProxyModel>
+#include <qtmetamacros.h>
 
 class DeckListStyleProxy : public QIdentityProxyModel
 {

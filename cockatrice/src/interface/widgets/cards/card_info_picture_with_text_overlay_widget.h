@@ -11,8 +11,14 @@
 #include "card_info_picture_widget.h"
 
 #include <QColor>
-#include <QSize>
+#include <QString>
 #include <QTextOption>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
+
+class QPainter;
+class QRect;
+class QWidget;
 
 class CardInfoPictureWithTextOverlayWidget : public CardInfoPictureWidget
 {

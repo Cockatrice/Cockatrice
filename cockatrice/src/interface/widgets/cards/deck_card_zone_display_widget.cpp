@@ -1,12 +1,39 @@
 #include "deck_card_zone_display_widget.h"
 
+#include "../../../client/settings/cache_settings.h"
+#include "../general/display/banner_widget.h"
+#include "../visual_deck_editor/visual_deck_editor_widget.h"
+#include "card_group_display_widgets/card_group_display_widget.h"
 #include "card_group_display_widgets/flat_card_group_display_widget.h"
 #include "card_group_display_widgets/overlapped_card_group_display_widget.h"
+#include "libcockatrice/card/card_info.h"
 #include "libcockatrice/card/database/card_database_manager.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/deck_list/tree/deck_list_card_node.h"
+#include "libcockatrice/settings/cards_display_settings.h"
 
-#include <QResizeEvent>
-#include <algorithm>
+#include <QAbstractItemModel>
+#include <QDebug>
+#include <QItemSelection>
+#include <QItemSelectionModel>
+#include <QItemSelectionRange>
+#include <QLayout>
+#include <QLayoutItem>
+#include <QModelIndex>
+#include <QSharedPointer>
+#include <QSizePolicy>
+#include <QStringLiteral>
+#include <QTimer>
+#include <QVBoxLayout>
+#include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qnamespace.h>
+
+class CardSizeWidget;
+class QMouseEvent;
 
 DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
                                                      DeckListModel *_deckListModel,
@@ -39,6 +66,7 @@ DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
     banner->setBuddy(cardGroupContainer);
 
     displayCards();
+    updateZoneCardCount();
 
     connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &DeckCardZoneDisplayWidget::onCategoryAddition);
     if (selectionModel) {
@@ -46,6 +74,11 @@ DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
                 &DeckCardZoneDisplayWidget::onSelectionChanged);
     }
     connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &DeckCardZoneDisplayWidget::onCategoryRemoval);
+    connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &DeckCardZoneDisplayWidget::updateZoneCardCount);
+    connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &DeckCardZoneDisplayWidget::updateZoneCardCount);
+    connect(deckListModel, &QAbstractItemModel::dataChanged, this, &DeckCardZoneDisplayWidget::updateZoneCardCount);
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::visualDeckEditorShowCardCountsChanged,
+            this, &DeckCardZoneDisplayWidget::updateZoneCardCount);
 }
 
 // =====================================================================================================================
@@ -147,15 +180,7 @@ void DeckCardZoneDisplayWidget::displayCards()
 void DeckCardZoneDisplayWidget::refreshDisplayType(const DisplayType &_displayType)
 {
     displayType = _displayType;
-    QLayoutItem *item;
-    while ((item = cardGroupLayout->takeAt(0)) != nullptr) {
-        if (item->widget()) {
-            item->widget()->deleteLater();
-        } else if (item->layout()) {
-            item->layout()->deleteLater();
-        }
-        delete item;
-    }
+    QtUtils::clearLayoutRec(cardGroupLayout);
 
     indexToWidgetMap.clear();
 
@@ -244,4 +269,22 @@ QList<QString> DeckCardZoneDisplayWidget::getGroupCriteriaValueList()
     groupCriteriaValues.sort();
 
     return groupCriteriaValues;
+}
+
+void DeckCardZoneDisplayWidget::updateZoneCardCount()
+{
+    if (!banner || !deckListModel) {
+        return;
+    }
+
+    QString text = zoneName;
+    if (SettingsCache::instance().cardsDisplay().getVisualDeckEditorShowCardCounts()) {
+        int total = 0;
+        const auto cardNodes = deckListModel->getCardNodesForZone(zoneName);
+        for (const auto *node : cardNodes) {
+            total += node->getNumber();
+        }
+        text += QStringLiteral(" (%1)").arg(total);
+    }
+    banner->setText(text);
 }

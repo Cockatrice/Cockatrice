@@ -1,14 +1,14 @@
 #ifndef SERVER_LOGGER_H
 #define SERVER_LOGGER_H
 
+#include <QList>
 #include <QMutex>
 #include <QObject>
+#include <QString>
 #include <QStringList>
-#include <QThread>
-#include <QWaitCondition>
+#include <qtmetamacros.h>
 
 class QFile;
-class Server_ProtocolHandler;
 
 class ServerLogger : public QObject
 {
@@ -16,6 +16,15 @@ class ServerLogger : public QObject
 public:
     ServerLogger(bool _logToConsole, QObject *parent = 0);
     ~ServerLogger();
+
+    /**
+     * @brief Whether messages passed to logMessage() would be written anywhere.
+     *
+     * Callers use this to avoid formatting expensive debug payloads that
+     * logMessage() would discard.
+     */
+    [[nodiscard]] bool isLoggingEnabled() const;
+
 public slots:
     void startLog(const QString &logFileName);
     void logMessage(const QString &message, void *caller = 0);

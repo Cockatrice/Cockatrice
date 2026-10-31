@@ -7,12 +7,18 @@
 #ifndef COCKATRICE_CARD_MENU_H
 #define COCKATRICE_CARD_MENU_H
 
+#include <QList>
 #include <QMenu>
-#include <libcockatrice/utility/card_ref.h>
+#include <QPair>
+#include <QString>
+#include <qtmetamacros.h>
 
 class CardItem;
 class PlayerGraphicsItem;
 class PlayerLogic;
+class QAction;
+struct CardRef;
+
 class CardMenu : public QMenu
 {
     Q_OBJECT

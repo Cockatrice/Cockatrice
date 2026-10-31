@@ -4,18 +4,65 @@
 #include "../../interface/pixel_map_generator.h"
 #include "../../interface/theme_manager.h"
 #include "../../interface/widgets/tabs/tab_supervisor.h"
+#include "user_avatar_provider.h"
+#include "user_card_art_provider.h"
 #include "user_context_menu.h"
+#include "user_info_popup.h"
+#include "user_level.h"
+#include "user_list_manager.h"
 #include "user_list_painter.h"
+#include "user_list_proxy.h"
 
+#include <QAbstractItemModel>
+#include <QApplication>
+#include <QByteArray>
+#include <QCollator>
+#include <QColor>
+#include <QContextMenuEvent>
+#include <QCursor>
 #include <QEvent>
+#include <QFlag>
+#include <QFlags>
+#include <QFont>
+#include <QFontMetrics>
+#include <QFrame>
+#include <QGuiApplication>
 #include <QHeaderView>
+#include <QIcon>
+#include <QItemSelection>
+#include <QItemSelectionModel>
+#include <QKeyEvent>
+#include <QLayout>
 #include <QMenu>
+#include <QModelIndex>
 #include <QMouseEvent>
+#include <QObject>
 #include <QPainter>
+#include <QPalette>
+#include <QPoint>
+#include <QPointF>
+#include <QRect>
+#include <QScreen>
 #include <QScrollBar>
+#include <QSharedPointer>
+#include <QSignalBlocker>
+#include <QSize>
+#include <QStringLiteral>
+#include <QStyle>
+#include <QStyleOptionViewItem>
 #include <QTimer>
+#include <QTreeWidget>
 #include <QVBoxLayout>
+#include <QVariant>
+#include <QWidget>
+#include <QtGlobal>
+#include <libcockatrice/models/natural_sort_collator.h>
 #include <libcockatrice/settings/appearance_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qnamespace.h>
+
+class QPixmap;
+struct GameInviteOption;
 
 namespace UserListRoles
 {
@@ -218,14 +265,20 @@ void UserListTWI::setOnline(bool online)
  * 2) Admins, judge/vip/donator status ignored
  * 3) Moderators, judge/vip/donator status ignored
  * 4) Judges
- * 5) VIPs
- * 6) Donators
- * 7) Everyone else
+ * 5) Developers
+ * 6) VIPs
+ * 7) Donators
+ * 8) Everyone else
  * @param other RHS to compare to
  * @return Left is less than the Right
  */
 bool UserListTWI::operator<(const QTreeWidgetItem &other) const
 {
+    // QCollator caches the locale data, unlike QString::localeAwareCompare,
+    // which rebuilds it for every pair. The tree sorts one list at a time, so a
+    // single shared, immutable collator is enough.
+    static const QCollator collator = NaturalSort::makeNaturalSortCollator();
+
     // Sort by online/offline
     if (data(0, UserListRoles::Online) != other.data(0, UserListRoles::Online)) {
         return data(0, UserListRoles::Online).toBool();
@@ -234,25 +287,23 @@ bool UserListTWI::operator<(const QTreeWidgetItem &other) const
     const auto &lhsUserLevelFlags = UserLevelFlags(data(0, Qt::UserRole).toInt());
     const auto &rhsUserLevelFlags = UserLevelFlags(other.data(0, Qt::UserRole).toInt());
 
-    // Admins, Developers & Mods need no additional comparison checks, just to see if they're an admin, a developer
+    // Admins & Moderators need no additional comparison checks, just to see if they're an admin
     // or a moderator
     static const QList<ServerInfo_User_UserLevelFlag> userLevelWithNoOtherPrefOrder = {
-        ServerInfo_User_UserLevelFlag_IsAdmin, ServerInfo_User_UserLevelFlag_IsDeveloper,
-        ServerInfo_User_UserLevelFlag_IsModerator};
+        ServerInfo_User_UserLevelFlag_IsAdmin, ServerInfo_User_UserLevelFlag_IsModerator};
     for (const auto &userLevelEntry : userLevelWithNoOtherPrefOrder) {
         if (lhsUserLevelFlags.testFlag(userLevelEntry) &&
             lhsUserLevelFlags.testFlag(userLevelEntry) == rhsUserLevelFlags.testFlag(userLevelEntry)) {
-            return QString::localeAwareCompare(data(2, Qt::UserRole).toString(),
-                                               other.data(2, Qt::UserRole).toString()) < 0;
+            return collator.compare(data(2, Qt::UserRole).toString(), other.data(2, Qt::UserRole).toString()) < 0;
         } else if (lhsUserLevelFlags.testFlag(userLevelEntry) != rhsUserLevelFlags.testFlag(userLevelEntry)) {
             return lhsUserLevelFlags.testFlag(userLevelEntry) > rhsUserLevelFlags.testFlag(userLevelEntry);
         }
     }
 
-    // Judges can be sorted by their additional ranks
-    static const QList<ServerInfo_User_UserLevelFlag> userLevelOrder = {ServerInfo_User_UserLevelFlag_IsJudge,
-                                                                        ServerInfo_User_UserLevelFlag_IsRegistered,
-                                                                        ServerInfo_User_UserLevelFlag_IsUser};
+    // Judges and developers can be sorted by their additional ranks
+    static const QList<ServerInfo_User_UserLevelFlag> userLevelOrder = {
+        ServerInfo_User_UserLevelFlag_IsJudge, ServerInfo_User_UserLevelFlag_IsDeveloper,
+        ServerInfo_User_UserLevelFlag_IsRegistered, ServerInfo_User_UserLevelFlag_IsUser};
     for (const auto &userLevelEntry : userLevelOrder) {
         if (lhsUserLevelFlags.testFlag(userLevelEntry) != rhsUserLevelFlags.testFlag(userLevelEntry)) {
             return lhsUserLevelFlags.testFlag(userLevelEntry) > rhsUserLevelFlags.testFlag(userLevelEntry);
@@ -268,7 +319,7 @@ bool UserListTWI::operator<(const QTreeWidgetItem &other) const
     }
 
     // Sort by name
-    return QString::localeAwareCompare(data(2, Qt::UserRole).toString(), other.data(2, Qt::UserRole).toString()) < 0;
+    return collator.compare(data(2, Qt::UserRole).toString(), other.data(2, Qt::UserRole).toString()) < 0;
 }
 
 UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
@@ -430,9 +481,6 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
             hidePopup(true);
             requestVisibleItemResources();
         });
-
-        // Forward join requests from popup upward
-        connect(userInfoPopup, &UserInfoPopup::joinGameRequested, this, &UserListWidget::joinGameRequested);
     } else {
         // Dialog mode: keyboard selection drives the Invite button.
         connect(userTree, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem *current, QTreeWidgetItem *) {
@@ -692,6 +740,17 @@ void UserListWidget::connectPopupSignals()
             [this](const QString &n) { userContextMenu->execAdjustJudge(n, true); });
     connect(userInfoPopup, &UserInfoPopup::demoteFromJudgeRequested, this,
             [this](const QString &n) { userContextMenu->execAdjustJudge(n, false); });
+
+    // Joining is a tab-level action, not a per-user one: the popup's games list
+    // spans every room the user is in, so the target room may not be open yet.
+    // Hand it to the supervisor, which owns the intent that joins the room if
+    // needed. The popup closes here because that intent switches tabs, which
+    // would otherwise strand it on a list that is no longer on screen.
+    connect(userInfoPopup, &UserInfoPopup::joinGameRequested, this,
+            [this](const int gameId, const int roomId, const bool asSpectator) {
+                hidePopup(true);
+                tabSupervisor->joinGameFromUserCard(gameId, roomId, asSpectator);
+            });
 }
 
 bool UserListWidget::eventFilter(QObject *obj, QEvent *event)
@@ -841,11 +900,7 @@ void UserListWidget::showPopupForUser(UserListTWI *item)
         return;
     }
 
-    auto *fade = new QPropertyAnimation(userInfoPopup, "windowOpacity", userInfoPopup);
-    fade->setDuration(120);
-    fade->setStartValue(0.0);
-    fade->setEndValue(1.0);
-    fade->start(QAbstractAnimation::DeleteWhenStopped);
+    QtUtils::fadeWindow(userInfoPopup, 0.0, 1.0, 120);
 }
 
 void UserListWidget::positionPopup(UserListTWI *item)
@@ -922,12 +977,7 @@ void UserListWidget::hidePopup(bool immediate)
     }
 
     // Fade out
-    auto *fade = new QPropertyAnimation(userInfoPopup, "windowOpacity", userInfoPopup);
-    fade->setDuration(100);
-    fade->setStartValue(userInfoPopup->windowOpacity());
-    fade->setEndValue(0.0);
-    connect(fade, &QPropertyAnimation::finished, userInfoPopup, &QWidget::hide);
-    fade->start(QAbstractAnimation::DeleteWhenStopped);
+    QtUtils::fadeWindow(userInfoPopup, userInfoPopup->windowOpacity(), 0.0, 100, true);
 }
 
 bool UserListWidget::isPressInsideListUi(const QWidget *widget) const

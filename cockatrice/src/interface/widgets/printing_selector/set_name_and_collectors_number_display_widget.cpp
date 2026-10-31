@@ -1,6 +1,12 @@
 #include "set_name_and_collectors_number_display_widget.h"
 
-#include <QSlider>
+#include <QFontMetrics>
+#include <QLabel>
+#include <QRect>
+#include <QSizePolicy>
+#include <QVBoxLayout>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qnamespace.h>
 
 /**
  * @class SetNameAndCollectorsNumberDisplayWidget
@@ -14,8 +20,7 @@ SetNameAndCollectorsNumberDisplayWidget::SetNameAndCollectorsNumberDisplayWidget
     : QWidget(parent)
 {
     // Set up the layout for the widget
-    layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout = QtUtils::makeLayout<QVBoxLayout>(this);
     layout->setSpacing(1);
     setLayout(layout);
 

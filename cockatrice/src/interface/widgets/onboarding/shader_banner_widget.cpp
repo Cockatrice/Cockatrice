@@ -1,16 +1,28 @@
 #include "shader_banner_widget.h"
 
+#include "../../theme_config.h"
 #include "../../theme_manager.h"
 #include "banner_shader_config.h"
 #include "brand_colors.h"
 
 #include <QApplication>
+#include <QBrush>
+#include <QDebug>
+#include <QLinearGradient>
 #include <QPainter>
+#include <QPalette>
 #include <QQmlContext>
 #include <QQmlEngine>
 #include <QQuickWidget>
-#include <QResizeEvent>
+#include <QRgb>
 #include <QStackedLayout>
+#include <QString>
+#include <QUrl>
+#include <QtGlobal>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qmath.h>
+#include <qnamespace.h>
+#include <qnumeric.h>
 
 namespace
 {
@@ -140,8 +152,7 @@ BannerHost::BannerHost(QWidget *parent) : QWidget(parent)
 {
     setFixedHeight(150);
 
-    stack = new QStackedLayout(this);
-    stack->setContentsMargins(0, 0, 0, 0);
+    stack = QtUtils::makeLayout<QStackedLayout>(this);
 
     fallback = new GradientFallbackWidget(this);
     stack->addWidget(fallback);

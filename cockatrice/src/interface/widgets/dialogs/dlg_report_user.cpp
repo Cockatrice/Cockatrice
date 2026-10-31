@@ -1,20 +1,30 @@
 #include "dlg_report_user.h"
 
 #include "abstract_client.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
 
 #include <QComboBox>
 #include <QDialogButtonBox>
-#include <QFontDatabase>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QLabel>
+#include <QLatin1String>
 #include <QLineEdit>
+#include <QList>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSharedPointer>
 #include <QTextEdit>
 #include <QVBoxLayout>
+#include <QVariant>
 #include <libcockatrice/protocol/pb/command_report.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <libcockatrice/utility/report_categories.h>
+#include <qnamespace.h>
+#include <string>
+
+class QWidget;
 
 DlgReportUser::DlgReportUser(AbstractClient *_client,
                              const QString &_reportedUser,
@@ -56,22 +66,14 @@ DlgReportUser::DlgReportUser(AbstractClient *_client,
     auto *categoryGrid = new QGridLayout(categoryGroup);
 
     categoryBox = new QComboBox;
-    categoryBox->addItem(tr("Cheating / Unsporting behavior"), "cheating");
-    categoryBox->setItemData(categoryBox->count() - 1,
-                             tr("Using external tools, card marked manipulation, or exploiting game bugs"),
-                             Qt::ToolTipRole);
-    categoryBox->addItem(tr("Harassment / Abuse"), "harassment");
-    categoryBox->setItemData(categoryBox->count() - 1, tr("Threatening, bullying, or persistent unwanted contact"),
-                             Qt::ToolTipRole);
-    categoryBox->addItem(tr("Hate speech"), "hate_speech");
-    categoryBox->setItemData(categoryBox->count() - 1,
-                             tr("Discriminatory language targeting race, gender, religion, etc."), Qt::ToolTipRole);
-    categoryBox->addItem(tr("Spam"), "spam");
-    categoryBox->setItemData(categoryBox->count() - 1, tr("Repeated unwanted messages or advertisements"),
-                             Qt::ToolTipRole);
-    categoryBox->addItem(tr("Other"), "other");
-    categoryBox->setItemData(categoryBox->count() - 1, tr("Any behavior not covered by the above categories"),
-                             Qt::ToolTipRole);
+    for (const QString &key : ReportCategories::keys()) {
+        const QString label = categoryLabel(key);
+        if (label.isEmpty()) {
+            continue; // skip keys without a dialog label
+        }
+        categoryBox->addItem(label, key);
+        categoryBox->setItemData(categoryBox->count() - 1, categoryToolTip(key), Qt::ToolTipRole);
+    }
 
     categoryGrid->addWidget(new QLabel(tr("Category:")), 0, 0);
     categoryGrid->addWidget(categoryBox, 0, 1);
@@ -89,13 +91,7 @@ DlgReportUser::DlgReportUser(AbstractClient *_client,
     auto *chatLayout = new QVBoxLayout(chatGroup);
     chatLogEdit = new QTextEdit;
     chatLogEdit->setReadOnly(true);
-    QFont monoFont("monospace");
-    monoFont.setStyleHint(QFont::Monospace);
-    const int systemPointSize = QFontDatabase::systemFont(QFontDatabase::GeneralFont).pointSize();
-    if (systemPointSize > 0) {
-        monoFont.setPointSize(systemPointSize);
-    }
-    chatLogEdit->setFont(monoFont);
+    chatLogEdit->setFont(QtUtils::monospaceFont());
     if (!_autoChatLog.isEmpty()) {
         chatLogEdit->setPlainText(_autoChatLog);
     } else {
@@ -132,12 +128,8 @@ void DlgReportUser::actSubmit()
         return;
     }
 
-    QMessageBox::StandardButton reply =
-        QMessageBox::question(this, tr("Confirm Report"),
-                              tr("Submit report against %1 for %2?").arg(reportedUser, categoryBox->currentText()),
-                              QMessageBox::Yes | QMessageBox::No);
-
-    if (reply != QMessageBox::Yes) {
+    if (!QtUtils::confirm(this, tr("Confirm Report"),
+                          tr("Submit report against %1 for %2?").arg(reportedUser, categoryBox->currentText()))) {
         return;
     }
 
@@ -188,4 +180,56 @@ void DlgReportUser::reportResponse(const Response &response)
     } else {
         QMessageBox::warning(this, tr("Submission Failed"), tr("Failed to submit report. Please try again."));
     }
+}
+
+QString DlgReportUser::categoryLabel(const QString &key)
+{
+    if (key == QLatin1String("cheating")) {
+        return tr("Cheating / Unsporting behavior");
+    }
+    if (key == QLatin1String("bug_abuse")) {
+        return tr("Bug Abuse");
+    }
+    if (key == QLatin1String("harassment")) {
+        return tr("Harassment / Abuse");
+    }
+    if (key == QLatin1String("verbal_abuse")) {
+        return tr("Verbal Abuse");
+    }
+    if (key == QLatin1String("hate_speech")) {
+        return tr("Hate speech");
+    }
+    if (key == QLatin1String("spam")) {
+        return tr("Spam");
+    }
+    if (key == QLatin1String("other")) {
+        return tr("Other");
+    }
+    return QString();
+}
+
+QString DlgReportUser::categoryToolTip(const QString &key)
+{
+    if (key == QLatin1String("cheating")) {
+        return tr("Using external tools, cheat programs, or exploiting game bugs");
+    }
+    if (key == QLatin1String("bug_abuse")) {
+        return tr("Exploiting a bug or glitch to gain an unfair advantage");
+    }
+    if (key == QLatin1String("harassment")) {
+        return tr("Threatening, bullying, or persistent unwanted contact");
+    }
+    if (key == QLatin1String("verbal_abuse")) {
+        return tr("Abusive or offensive language directed at another player");
+    }
+    if (key == QLatin1String("hate_speech")) {
+        return tr("Discriminatory language targeting race, gender, religion, etc.");
+    }
+    if (key == QLatin1String("spam")) {
+        return tr("Repeated unwanted messages or advertisements");
+    }
+    if (key == QLatin1String("other")) {
+        return tr("Any behavior not covered by the above categories");
+    }
+    return QString();
 }

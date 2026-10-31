@@ -3,17 +3,32 @@
 #include "oraclewizard.h"
 
 #include <QCheckBox>
+#include <QDebug>
 #include <QDir>
+#include <QFile>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QGridLayout>
+#include <QIODevice>
 #include <QLabel>
 #include <QLineEdit>
+#include <QList>
 #include <QMessageBox>
+#include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QObject>
 #include <QProgressBar>
 #include <QPushButton>
 #include <QRadioButton>
-#include <QtGui>
+#include <QSettings>
+#include <QSharedPointer>
+#include <QUrl>
+#include <QVariant>
+#include <qlogging.h>
+#include <qnamespace.h>
+
+class QWidget;
 
 SimpleDownloadFilePage::SimpleDownloadFilePage(QWidget *parent) : OracleWizardPage(parent)
 {
@@ -112,7 +127,7 @@ bool SimpleDownloadFilePage::validatePage()
             return false;
         }
 
-        progressLabel->setText(tr("Downloading (0MB)"));
+        progressLabel->setText(tr("Downloading (0 MB)"));
         // show an infinite progressbar
         progressBar->setMaximum(0);
         progressBar->setMinimum(0);
@@ -163,6 +178,10 @@ void SimpleDownloadFilePage::actDownloadFinished()
 {
     // check for a reply
     auto *reply = dynamic_cast<QNetworkReply *>(sender());
+    if (wizard()->wasCancelled()) {
+        reply->deleteLater();
+        return;
+    }
     QNetworkReply::NetworkError errorCode = reply->error();
     if (errorCode != QNetworkReply::NoError) {
         QMessageBox::critical(this, tr("Error"), tr("Network error: %1.").arg(reply->errorString()));
@@ -227,6 +246,7 @@ bool SimpleDownloadFilePage::saveToFile()
 
     // clean saved downloadData
     downloadData = QByteArray();
+    wizard()->markDatabaseSaved();
     return true;
 }
 

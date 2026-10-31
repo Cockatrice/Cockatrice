@@ -4,6 +4,7 @@
 #include <QMutex>
 #include <QMutexLocker>
 #include <QObject>
+#include <qtmetamacros.h>
 
 class Servatrice_DatabaseInterface;
 

@@ -1,10 +1,22 @@
 #include "edhrec_api_response_card_details_display_widget.h"
 
+#include "../../../../../cards/card_info_picture_widget.h"
+#include "../../../../../cards/card_size_widget.h"
 #include "../../../../../general/display/background_plate_widget.h"
+#include "../../api_response/cards/edhrec_api_response_card_details.h"
 #include "../../tab_edhrec_main.h"
+#include "edhrec_api_response_card_inclusion_display_widget.h"
+#include "edhrec_api_response_card_synergy_display_widget.h"
+#include "libcockatrice/card/database/card_database_querier.h"
 
+#include <QLabel>
 #include <QMouseEvent>
+#include <QObject>
+#include <QSlider>
+#include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qnamespace.h>
 
 EdhrecApiResponseCardDetailsDisplayWidget::EdhrecApiResponseCardDetailsDisplayWidget(
     QWidget *parent,
@@ -36,15 +48,7 @@ EdhrecApiResponseCardDetailsDisplayWidget::EdhrecApiResponseCardDetailsDisplayWi
 
     layout->addWidget(backgroundPlateWidget);
 
-    QWidget *currentParent = parentWidget();
-    TabEdhRecMain *parentTab = nullptr;
-
-    while (currentParent) {
-        if ((parentTab = qobject_cast<TabEdhRecMain *>(currentParent))) {
-            break;
-        }
-        currentParent = currentParent->parentWidget();
-    }
+    auto *parentTab = QtUtils::findParentOfType<TabEdhRecMain>(this);
 
     if (parentTab) {
         cardPictureWidget->setScaleFactor(parentTab->getCardSizeSlider()->getSlider()->value());
@@ -54,6 +58,7 @@ EdhrecApiResponseCardDetailsDisplayWidget::EdhrecApiResponseCardDetailsDisplayWi
                 &CardInfoPictureWidget::setScaleFactor);
         connect(this, &EdhrecApiResponseCardDetailsDisplayWidget::requestUrl, parentTab,
                 &TabEdhRecMain::actNavigatePage);
+        parentTab->getCardSizeSlider()->enableCtrlScrollResize(this);
     }
 }
 

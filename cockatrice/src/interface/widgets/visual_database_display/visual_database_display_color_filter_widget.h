@@ -7,11 +7,17 @@
 #ifndef VISUAL_DATABASE_DISPLAY_COLOR_FILTER_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_COLOR_FILTER_WIDGET_H
 
-#include "../../../filters/filter_tree_model.h"
-
-#include <QComboBox>
-#include <QHBoxLayout>
+#include <QByteArray>
+#include <QChar>
+#include <QList>
+#include <QMetaType>
 #include <QWidget>
+#include <libcockatrice/utility/debouncer.h>
+#include <qtmetamacros.h>
+
+class FilterTreeModel;
+class QComboBox;
+class QHBoxLayout;
 
 class VisualDatabaseDisplayColorFilterCircleWidget : public QWidget
 {
@@ -66,6 +72,7 @@ private:
     QHBoxLayout *layout;
     QComboBox *modeComboBox;
     FilterMode currentMode = FilterMode::Includes; // Default mode
+    QtUtils::Debouncer syncDebouncer{100};
 };
 
 #endif // VISUAL_DATABASE_DISPLAY_COLOR_FILTER_WIDGET_H

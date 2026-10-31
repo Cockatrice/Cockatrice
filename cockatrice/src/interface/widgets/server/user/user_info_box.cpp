@@ -5,20 +5,37 @@
 #include "../../interface/widgets/dialogs/dlg_edit_password.h"
 #include "../../interface/widgets/dialogs/dlg_edit_user.h"
 #include "../../interface/widgets/utility/get_text_with_max.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/utility/days_years_between.h"
 #include "user_card_settings_dialog.h"
+#include "user_level.h"
+#include "user_list_painter.h"
 
+#include <QByteArray>
+#include <QDate>
 #include <QDateTime>
+#include <QDialog>
+#include <QFlag>
+#include <QFont>
 #include <QGridLayout>
 #include <QHBoxLayout>
-#include <QInputDialog>
 #include <QLabel>
+#include <QLineEdit>
+#include <QLocale>
 #include <QMessageBox>
+#include <QSharedPointer>
+#include <QSize>
+#include <QSizePolicy>
+#include <QtGlobal>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/response_get_user_info.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/passwordhasher.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <string>
+#include <sys/types.h>
 
 UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *parent, Qt::WindowFlags flags)
     : QWidget(parent, flags), client(_client), editable(_editable)
@@ -37,8 +54,7 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
     avatarPic.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     avatarPic.setAlignment(Qt::AlignCenter);
 
-    auto *avatarLayout = new QHBoxLayout;
-    avatarLayout->setContentsMargins(0, 0, 0, 0);
+    auto *avatarLayout = QtUtils::makeLayout<QHBoxLayout>();
     avatarLayout->addStretch(1);
     avatarLayout->addWidget(&avatarPic, 3);
     avatarLayout->addStretch(1);
@@ -285,7 +301,9 @@ void UserInfoBox::changePassword(const QString &oldPassword, const QString &newP
 {
     Command_AccountPassword cmd;
     cmd.set_old_password(oldPassword.toStdString());
-    if (client->getServerSupportsPasswordHash()) {
+    if (client->getServerSupportsChallengeResponse()) {
+        cmd.set_hashed_new_password(PasswordHasher::generatePasswordVerifier(newPassword).toStdString());
+    } else if (client->getServerSupportsPasswordHash()) {
         auto passwordSalt = PasswordHasher::generateRandomSalt();
         QString hashedPassword = PasswordHasher::computeHash(newPassword, passwordSalt);
         cmd.set_hashed_new_password(hashedPassword.toStdString());

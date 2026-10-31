@@ -5,12 +5,14 @@
 #include <QList>
 #include <QSharedPointer>
 #include <QString>
-#include <libcockatrice/interfaces/interface_card_set_priority_controller.h>
 
 class CardInfo;
+class ICardSetPriorityController;
+
 using CardInfoPtr = QSharedPointer<CardInfo>;
 
 class CardSet;
+
 using CardSetPtr = QSharedPointer<CardSet>;
 
 /**
@@ -225,6 +227,10 @@ public:
      * @param _isknown True if known, false if unknown.
      */
     void setIsKnown(bool _isknown);
+    void setIsKnownInMemory(bool _isknown)
+    {
+        isknown = _isknown;
+    }
 
     /**
      * @brief Determines whether the set has incomplete metadata and should be ignored.
@@ -233,7 +239,7 @@ public:
      */
     [[nodiscard]] bool getIsKnownIgnored() const
     {
-        return longName.length() + setType.length() + releaseDate.toString().length() == 0;
+        return longName.isEmpty() && setType.isEmpty() && !releaseDate.isValid();
     }
 };
 

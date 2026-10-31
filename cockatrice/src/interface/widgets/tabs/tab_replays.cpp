@@ -3,21 +3,49 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../pixel_map_generator.h"
 #include "../interface/widgets/server/remote/remote_replay_list_tree_widget.h"
-#include "tab_game.h"
+#include "libcockatrice/protocol/pb/commands.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_replay.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_replay_match.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+#include "libcockatrice/protocol/pb/session_commands.pb.h"
 
+#include <QAbstractItemModel>
+#include <QAbstractItemView>
 #include <QAction>
 #include <QApplication>
+#include <QByteArray>
 #include <QClipboard>
-#include <QDesktopServices>
+#include <QDebug>
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
 #include <QFileSystemModel>
+#include <QGridLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QIODevice>
 #include <QInputDialog>
+#include <QItemSelectionModel>
+#include <QLineEdit>
+#include <QList>
+#include <QLoggingCategory>
 #include <QMessageBox>
+#include <QMessageLogger>
+#include <QModelIndex>
+#include <QModelIndexList>
+#include <QPushButton>
+#include <QSet>
+#include <QSharedPointer>
+#include <QSize>
+#include <QSizePolicy>
+#include <QStringList>
+#include <QStringLiteral>
+#include <QStyle>
 #include <QToolBar>
 #include <QTreeView>
-#include <QUrl>
+#include <QVBoxLayout>
+#include <QWidget>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_replay_delete_match.pb.h>
 #include <libcockatrice/protocol/pb/command_replay_download.pb.h>
@@ -31,8 +59,20 @@
 #include <libcockatrice/protocol/pb/response_replay_get_code.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <string>
+
+class TabSupervisor;
 
 inline Q_LOGGING_CATEGORY(TabReplaysLog, "replays_tab");
+
+namespace
+{
+// File name filters for the local replay files Cockatrice can load.
+const QStringList REPLAY_FILE_NAME_FILTERS = {"*.cor"};
+} // namespace
 
 TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User *currentUserInfo)
     : Tab(_tabSupervisor), client(_client)
@@ -62,6 +102,8 @@ QGroupBox *TabReplays::createLeftLayout()
 {
     localDirModel = new QFileSystemModel(this);
     localDirModel->setRootPath(SettingsCache::instance().paths().getReplaysPath());
+    localDirModel->setNameFilters(REPLAY_FILE_NAME_FILTERS);
+    localDirModel->setNameFilterDisables(false);
     localDirModel->sort(0, Qt::AscendingOrder);
 
     localDirView = new QTreeView;
@@ -263,6 +305,10 @@ void TabReplays::actOpenLocalReplay()
         }
         QString filePath = localDirModel->filePath(curLeft);
 
+        if (!QDir::match(REPLAY_FILE_NAME_FILTERS, QFileInfo(filePath).fileName())) {
+            continue;
+        }
+
         QFile f(filePath);
         if (!f.open(QIODevice::ReadOnly)) {
             continue;
@@ -353,7 +399,7 @@ void TabReplays::actDeleteLocalReplay()
 void TabReplays::actOpenReplaysFolder()
 {
     QString dir = localDirModel->rootPath();
-    QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
+    QtUtils::openPathInFileManager(dir);
 }
 
 void TabReplays::actRemoteDoubleClick(const QModelIndex &curRight)

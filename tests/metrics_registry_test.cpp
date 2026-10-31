@@ -2,6 +2,7 @@
 #include <QList>
 #include <gtest/gtest.h>
 #include <metrics_registry.h>
+#include <string>
 
 TEST(MetricsRegistryTest, EmptyRegistryHasZeroedCounters)
 {

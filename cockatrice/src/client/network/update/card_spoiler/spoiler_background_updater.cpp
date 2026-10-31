@@ -1,21 +1,37 @@
 #include "spoiler_background_updater.h"
 
-#include "../../../../interface/window_main.h"
 #include "../../../../main.h"
 #include "../../../settings/cache_settings.h"
 
+#include <QChar>
 #include <QCryptographicHash>
 #include <QDateTime>
 #include <QDebug>
+#include <QDir>
 #include <QFile>
+#include <QFileInfo>
+#include <QFutureWatcher>
+#include <QIODevice>
+#include <QList>
 #include <QLocale>
+#include <QMessageLogger>
+#include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QSharedPointer>
+#include <QSystemTrayIcon>
+#include <QTimeZone>
 #include <QUrl>
-#include <QtConcurrent>
+#include <QtConcurrentRun>
+#include <QtGlobal>
+#include <functional>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/network/network_manager.h>
 #include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
+#include <tuple>
+#include <utility>
 #include <version_string.h>
 
 #define SPOILERS_STATUS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Spoiler/files/SpoilerSeasonEnabled"
@@ -41,7 +57,7 @@ void SpoilerBackgroundUpdater::startSpoilerDownloadProcess(QString url, bool sav
 
 void SpoilerBackgroundUpdater::downloadFromURL(QUrl url, bool saveResults)
 {
-    auto *nam = new QNetworkAccessManager(this);
+    auto *nam = NetworkManagerFactory::create(this);
     auto request = QNetworkRequest(url);
     request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
     QNetworkReply *reply = nam->get(request);
@@ -163,7 +179,15 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
 
     // Data written, so reload the card database
     qCInfo(SpoilerBackgroundUpdaterLog) << "Spoiler Service Data Written";
-    const auto reloadOk = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
+    // Spoilers can introduce sets the config has never seen; the loader never
+    // runs checkUnknownSets() itself, so run it once the finished snapshot has
+    // been swapped in.
+    auto *watcher = new QFutureWatcher<void>(this);
+    connect(watcher, &QFutureWatcher<void>::finished, this, [watcher] {
+        watcher->deleteLater();
+        CardDatabaseManager::getInstance()->checkUnknownSets();
+    });
+    watcher->setFuture(QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); }));
 
     // If the user has notifications enabled, let them know
     // when the database was last updated

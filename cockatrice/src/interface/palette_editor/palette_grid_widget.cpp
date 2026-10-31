@@ -1,14 +1,26 @@
 #include "palette_grid_widget.h"
 
+#include "../theme_config.h"
 #include "../theme_manager.h"
+#include "color_button.h"
 
 #include <QApplication>
+#include <QColor>
+#include <QEvent>
+#include <QFont>
+#include <QFrame>
 #include <QGridLayout>
 #include <QLabel>
 #include <QMetaEnum>
 #include <QScrollArea>
+#include <QString>
+#include <QStringList>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <QtGlobal>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qnamespace.h>
+#include <utility>
 
 static QList<QPalette::ColorRole> allRoles()
 {
@@ -54,8 +66,7 @@ static const QMap<AppColor::Role, const char *> APP_ROLE_DESCRIPTIONS = {
 
 PaletteGridWidget::PaletteGridWidget(QWidget *parent) : QWidget(parent)
 {
-    scroll = new QScrollArea(this);
-    scroll->setWidgetResizable(true);
+    scroll = QtUtils::makeScrollArea(this, Qt::ScrollBarAsNeeded, Qt::ScrollBarAsNeeded);
     scroll->setFrameShape(QFrame::NoFrame);
 
     gridHost = new QWidget;
@@ -63,8 +74,7 @@ PaletteGridWidget::PaletteGridWidget(QWidget *parent) : QWidget(parent)
     refreshChromePalettes();
     scroll->setWidget(gridHost);
 
-    layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout = QtUtils::makeLayout<QVBoxLayout>(this);
     layout->addWidget(scroll);
 }
 
@@ -91,9 +101,7 @@ void PaletteGridWidget::buildGrid(QWidget *host)
         auto *label = new QLabel(groupHeaders[col], host);
         label->setAlignment(Qt::AlignCenter);
         label->setToolTip(groupTips[col]);
-        QFont f = label->font();
-        f.setBold(true);
-        label->setFont(f);
+        label->setFont(QtUtils::boldFont(label->font()));
         label->setAutoFillBackground(true);
         label->setContentsMargins(4, 4, 4, 4);
         grid->addWidget(label, 0, col + 1);
@@ -138,9 +146,7 @@ void PaletteGridWidget::buildGrid(QWidget *host)
 
     auto *appHeader = new QLabel(tr("App colors"), host);
     appHeader->setToolTip(tr("Application-specific colors layered on top of the Qt palette"));
-    QFont appHeaderFont = appHeader->font();
-    appHeaderFont.setBold(true);
-    appHeader->setFont(appHeaderFont);
+    appHeader->setFont(QtUtils::boldFont(appHeader->font()));
     appHeader->setAutoFillBackground(true);
     appHeader->setContentsMargins(4, 4, 4, 4);
     grid->addWidget(appHeader, appHeaderRow, 0, 1, 4);

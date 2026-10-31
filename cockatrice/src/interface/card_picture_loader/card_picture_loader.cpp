@@ -4,26 +4,45 @@
 #include "../pixel_map_generator.h"
 #include "card_picture_loader_cache_method.h"
 #include "card_picture_loader_local_schemes.h"
+#include "card_picture_loader_status_bar.h"
+#include "card_picture_loader_worker.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
 
 #include <QApplication>
-#include <QBuffer>
+#include <QChar>
+#include <QColor>
+#include <QDateTime>
 #include <QDebug>
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
+#include <QImage>
+#include <QLatin1Char>
+#include <QList>
 #include <QMainWindow>
-#include <QMovie>
-#include <QNetworkRequest>
-#include <QPainter>
+#include <QMessageLogger>
+#include <QMetaObject>
+#include <QMetaType>
+#include <QPixmap>
 #include <QPixmapCache>
 #include <QScreen>
+#include <QSharedPointer>
+#include <QSize>
 #include <QStatusBar>
+#include <QString>
+#include <QStringLiteral>
 #include <QThread>
-#include <algorithm>
+#include <QWidget>
+#include <QtGlobal>
+#include <compare>
 #include <libcockatrice/settings/cache_storage_settings.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
-#include <utility>
+#include <qnamespace.h>
 
 // never cache more than 300 cards at once for a single deck
 #define CACHED_CARD_PER_DECK_MAX 300
@@ -43,6 +62,7 @@ CardPictureLoader::CardPictureLoader() : QObject(nullptr)
 
     qRegisterMetaType<ExactCard>("ExactCard");
     connect(worker, &CardPictureLoaderWorker::imageLoaded, this, &CardPictureLoader::imageLoaded);
+    connect(worker, &CardPictureLoaderWorker::networkCacheCleared, this, &CardPictureLoader::networkCacheCleared);
 
     statusBar = new CardPictureLoaderStatusBar(nullptr);
     QMainWindow *mainWindow = qobject_cast<QMainWindow *>(QApplication::activeWindow());
@@ -58,7 +78,18 @@ CardPictureLoader::CardPictureLoader() : QObject(nullptr)
 
 CardPictureLoader::~CardPictureLoader()
 {
-    worker->deleteLater();
+    if (worker) {
+        // Capture the thread first: shutdownThread() blocks until the worker has been freed by the
+        // finished() -> deleteLater chain, after which the worker pointer must not be dereferenced.
+        QThread *pictureLoaderThread = worker->workerThread();
+        const bool stopped = worker->shutdownThread();
+        worker = nullptr;
+        // Deleting a QThread that is still running is undefined behaviour, so only free it once the
+        // bounded wait in shutdownThread() confirmed that it stopped.
+        if (stopped) {
+            delete pictureLoaderThread;
+        }
+    }
 }
 
 void CardPictureLoader::getCardBackPixmap(QPixmap &pixmap, QSize size)
@@ -457,7 +488,17 @@ void CardPictureLoader::clearPixmapCache()
 
 void CardPictureLoader::clearNetworkCache()
 {
-    getInstance().worker->clearNetworkCache();
+    // During teardown the worker is released before this singleton, so a queued clear may still
+    // arrive with no worker left to run it.
+    CardPictureLoaderWorker *worker = getInstance().worker;
+    if (!worker) {
+        return;
+    }
+    // The disk cache and redirect cache are owned by the worker thread, so the clear has to run
+    // there. Invoke it asynchronously to keep the GUI responsive while the worker may be walking
+    // the user's picture directories or recursively deleting the cache directory; callers that
+    // need to know when it is done can listen for networkCacheCleared().
+    QMetaObject::invokeMethod(worker, &CardPictureLoaderWorker::clearNetworkCache, Qt::QueuedConnection);
 }
 
 void CardPictureLoader::cacheCardPixmaps(const QList<ExactCard> &cards)

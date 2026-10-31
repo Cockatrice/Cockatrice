@@ -10,7 +10,12 @@
 #include "settings_manager.h"
 
 #include <QLoggingCategory>
-#include <QObject>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
+
+class QObject;
+
 #define SERVERSETTINGS_DEFAULT_HOST "server.cockatrice.us"
 #define SERVERSETTINGS_DEFAULT_PORT "4748"
 
@@ -46,6 +51,8 @@ public:
     void setFPHostName(QString hostname);
     void setFPPort(QString port);
     void setFPPlayerName(QString playerName);
+    //! \brief Store a password (or a "$scrypt$..." verifier) for the given saved server.
+    void setServerPassword(const QString &saveName, const QString &password);
     void addNewServer(const QString &saveName,
                       const QString &serv,
                       const QString &port,
@@ -61,7 +68,14 @@ public:
                               QString password,
                               bool savePassword,
                               QString site = QString());
+    void updateServerFields(int index,
+                            const QString &saveName,
+                            const QString &username,
+                            const QString &password,
+                            bool savePassword,
+                            const QString &site);
     int findServerIndex(const QString &host, const QString &port) const;
+    int findHostIndex(const QString &host) const;
     bool hasUsername(const QString &host, const QString &port) const;
     bool hasCredentials(const QString &host, const QString &port) const;
     bool hasLoginData(const QString &host, const QString &port) const;

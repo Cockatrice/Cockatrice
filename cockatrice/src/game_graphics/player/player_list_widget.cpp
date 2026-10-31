@@ -2,16 +2,30 @@
 
 #include "../../interface/pixel_map_generator.h"
 #include "../../interface/widgets/server/user/user_context_menu.h"
-#include "../../interface/widgets/server/user/user_list_manager.h"
-#include "../../interface/widgets/server/user/user_list_widget.h"
-#include "../../interface/widgets/tabs/tab_game.h"
-#include "../../interface/widgets/tabs/tab_supervisor.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+#include "user_level.h"
 
-#include <QHeaderView>
+#include <QBrush>
+#include <QColor>
+#include <QEvent>
+#include <QFlag>
+#include <QList>
+#include <QMapIterator>
+#include <QModelIndex>
 #include <QMouseEvent>
-#include <libcockatrice/protocol/pb/command_kick_from_game.pb.h>
+#include <QPalette>
+#include <QPointF>
+#include <QSharedPointer>
+#include <QSize>
+#include <QStringLiteral>
+#include <QVariant>
 #include <libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h>
-#include <libcockatrice/protocol/pb/session_commands.pb.h>
+#include <qnamespace.h>
+
+class QModelIndex;
+class QObject;
+class QPoint;
+class QWidget;
 
 PlayerListItemDelegate::PlayerListItemDelegate(QObject *const parent) : QStyledItemDelegate(parent)
 {

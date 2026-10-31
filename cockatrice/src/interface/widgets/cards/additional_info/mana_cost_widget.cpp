@@ -1,18 +1,21 @@
 #include "mana_cost_widget.h"
 
+#include "libcockatrice/card/card_info.h"
 #include "mana_symbol_widget.h"
 
 #include <QHBoxLayout>
-#include <QLabel>
+#include <QList>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QRegularExpressionMatchIterator>
 #include <QResizeEvent>
 #include <QSize>
-#include <qregularexpression.h>
+#include <QtGlobal>
+#include <libcockatrice/utility/qt_utils.h>
 
 ManaCostWidget::ManaCostWidget(QWidget *parent, CardInfoPtr _card) : QWidget(parent), card(_card)
 {
-    layout = new QHBoxLayout(this);
-    layout->setSpacing(5); // Small spacing between icons
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout = QtUtils::makeLayout<QHBoxLayout>(this, 5);
     setLayout(layout);
 
     setFixedHeight(50); // Fixed height

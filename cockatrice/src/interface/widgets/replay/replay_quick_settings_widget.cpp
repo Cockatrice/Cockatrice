@@ -1,12 +1,17 @@
 #include "replay_quick_settings_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../quick_settings/settings_button_widget.h"
+#include "libcockatrice/utility/macros.h"
 
+#include <QDebug>
 #include <QGridLayout>
 #include <QLabel>
 #include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 
 ReplayQuickSettingsWidget::ReplayQuickSettingsWidget(QWidget *parent) : SettingsButtonWidget(parent)
 {
@@ -24,8 +29,7 @@ ReplayQuickSettingsWidget::ReplayQuickSettingsWidget(QWidget *parent) : Settings
 
     // putting it all together
     auto *widget = new QWidget;
-    auto *grid = new QGridLayout(widget);
-    grid->setContentsMargins(0, 0, 0, 0);
+    auto *grid = QtUtils::makeLayout<QGridLayout>(widget);
     grid->addWidget(&fastForwardSpeedLabel, 0, 0, 1, 1);
     grid->addWidget(&fastForwardSpeedBox, 0, 1, 1, 1);
     grid->addWidget(&skipEmptyCheckBox, 1, 0, 1, 2);

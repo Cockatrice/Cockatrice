@@ -8,8 +8,13 @@
 #define SHORTCUT_TREEVIEW_H
 
 #include <QSortFilterProxyModel>
-#include <QStandardItemModel>
+#include <QString>
 #include <QTreeView>
+#include <qtmetamacros.h>
+
+class QObject;
+class QStandardItemModel;
+class QWidget;
 
 /**
  * Custom implementation of QSortFilterProxyModel that appends the source and parent strings together when filtering

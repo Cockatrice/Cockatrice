@@ -2,6 +2,7 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../../client/sound_engine.h"
+#include "../first_run_wizard_page.h"
 #include "libcockatrice/settings/interface_settings.h"
 #include "libcockatrice/settings/sound_settings.h"
 #include "libcockatrice/settings/tabs_settings.h"
@@ -9,10 +10,17 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QFormLayout>
+#include <QFrame>
 #include <QGroupBox>
 #include <QLabel>
+#include <QList>
 #include <QScrollArea>
+#include <QString>
 #include <QVBoxLayout>
+#include <QVariant>
+#include <QWidget>
+#include <QtGlobal>
+#include <libcockatrice/utility/qt_utils.h>
 
 namespace
 {
@@ -61,9 +69,8 @@ PreferencesSetupPage::PreferencesSetupPage(QWidget *parent) : FirstRunWizardPage
 
     contentLayout->addStretch();
 
-    auto *scrollArea = new QScrollArea(this);
+    auto *scrollArea = QtUtils::makeScrollArea(this, Qt::ScrollBarAsNeeded, Qt::ScrollBarAsNeeded);
     scrollArea->setWidget(content);
-    scrollArea->setWidgetResizable(true);
     scrollArea->setFrameShape(QFrame::NoFrame);
 
     auto *layout = new QVBoxLayout(this);

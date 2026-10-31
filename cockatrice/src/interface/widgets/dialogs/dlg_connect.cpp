@@ -2,19 +2,34 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../pixel_map_generator.h"
+#include "../server/handle_public_servers.h"
+#include "../server/user/user_info_connection.h"
+#include "libcockatrice/utility/macros.h"
 
 #include <QCheckBox>
 #include <QComboBox>
+#include <QDebug>
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QGroupBox>
-#include <QKeyEvent>
+#include <QHBoxLayout>
+#include <QIntValidator>
 #include <QLabel>
+#include <QList>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QRadioButton>
+#include <QSharedPointer>
+#include <QSize>
+#include <QStringList>
+#include <QStringLiteral>
+#include <QVBoxLayout>
+#include <QtGlobal>
 #include <libcockatrice/settings/servers_settings.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <qnamespace.h>
+
+class QWidget;
 
 DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 {
@@ -274,9 +289,21 @@ void DlgConnect::updateDisplayInfo(const QString &saveName)
     playernameEdit->setText(_data.at(3));
     playernameEdit->setFocus();
     savePasswordCheckBox->setChecked(savePasswordStatus);
+    storedVerifier.clear();
 
     if (savePasswordStatus) {
-        passwordEdit->setText(_data.at(4));
+        const QString stored = _data.at(4);
+        if (stored.startsWith("$")) {
+            storedVerifier = stored;
+            passwordEdit->clear();
+            passwordEdit->setPlaceholderText(tr("Password saved"));
+        } else {
+            passwordEdit->setText(stored);
+            passwordEdit->setPlaceholderText(QString());
+        }
+    } else {
+        passwordEdit->clear();
+        passwordEdit->setPlaceholderText(QString());
     }
 
     if (!_data.at(6).isEmpty()) {
@@ -302,6 +329,8 @@ void DlgConnect::newHostSelected(bool state)
         portEdit->setDisabled(false);
         playernameEdit->clear();
         passwordEdit->clear();
+        passwordEdit->setPlaceholderText(QString());
+        storedVerifier.clear();
         saveEdit->clear();
         saveEdit->setPlaceholderText(tr("Unique Server Name"));
         saveEdit->setDisabled(false);
@@ -327,6 +356,11 @@ void DlgConnect::actOk()
 {
     ServersSettings &servers = SettingsCache::instance().servers();
 
+    // Never write a newly typed plaintext password to disk when a verifier is already stored:
+    // the typed value is used for this connection and a fresh verifier is persisted after a
+    // successful login. Without a stored verifier we keep the previous (plaintext legacy) behavior.
+    const QString passwordToSave = storedVerifier.isEmpty() ? passwordEdit->text() : storedVerifier;
+
     if (newHostButton->isChecked()) {
         if (saveEdit->text().isEmpty()) {
             QMessageBox::critical(this, tr("Connection Warning"), tr("You need to name your new connection profile."));
@@ -334,10 +368,10 @@ void DlgConnect::actOk()
         }
 
         servers.addNewServer(saveEdit->text().trimmed(), hostEdit->text().trimmed(), portEdit->text().trimmed(),
-                             playernameEdit->text().trimmed(), passwordEdit->text(), savePasswordCheckBox->isChecked());
+                             playernameEdit->text().trimmed(), passwordToSave, savePasswordCheckBox->isChecked());
     } else {
         servers.updateExistingServer(saveEdit->text().trimmed(), hostEdit->text().trimmed(), portEdit->text().trimmed(),
-                                     playernameEdit->text().trimmed(), passwordEdit->text(),
+                                     playernameEdit->text().trimmed(), passwordToSave,
                                      savePasswordCheckBox->isChecked());
     }
 

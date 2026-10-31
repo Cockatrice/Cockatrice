@@ -1,16 +1,42 @@
 #include "tab_card_art_rules.h"
 
 #include "../utility/completer_utils.h"
+#include "card_database_display_model.h"
+#include "card_database_model.h"
+#include "libcockatrice/card/card_info.h"
 #include "libcockatrice/card/database/card_database_manager.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
 
+#include <QAbstractItemView>
+#include <QComboBox>
 #include <QCompleter>
 #include <QFormLayout>
 #include <QHBoxLayout>
+#include <QLineEdit>
+#include <QList>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QSharedPointer>
+#include <QTableView>
 #include <QVBoxLayout>
+#include <QVariant>
+#include <QWidget>
+#include <QtGlobal>
+#include <google/protobuf/repeated_ptr_field.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/moderator_commands.pb.h>
 #include <libcockatrice/protocol/pb/response_card_art_rule_entry.pb.h>
+#include <libcockatrice/protocol/pb/response_clear_blacklisted_banners.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <string>
+
+class QObject;
+class TabSupervisor;
 
 CardArtRulesModel::CardArtRulesModel(AbstractClient *client, QObject *parent)
     : QAbstractTableModel(parent), client(client)
@@ -149,6 +175,7 @@ void TabCardArtRules::setupUi()
     addBtn = new QPushButton;
     removeBtn = new QPushButton;
     refreshBtn = new QPushButton;
+    clearBannedArtBtn = new QPushButton;
 
     modeBox->addItems({"ALLOW", "DENY"});
 
@@ -165,10 +192,14 @@ void TabCardArtRules::setupUi()
     form->addRow(tr("Mode:"), modeBox);
     form->addRow(tr("Reason:"), reasonEdit);
 
+    // The bulk clear acts on every user, so keep it visibly apart from the
+    // rules this tab edits.
     auto *buttons = new QHBoxLayout;
     buttons->addWidget(addBtn);
     buttons->addWidget(removeBtn);
     buttons->addWidget(refreshBtn);
+    buttons->addStretch();
+    buttons->addWidget(clearBannedArtBtn);
 
     auto *layout = new QVBoxLayout;
     layout->addLayout(form);
@@ -183,6 +214,8 @@ void TabCardArtRules::setupUi()
     connect(removeBtn, &QPushButton::clicked, this, &TabCardArtRules::removeSelected);
 
     connect(refreshBtn, &QPushButton::clicked, this, &TabCardArtRules::refresh);
+
+    connect(clearBannedArtBtn, &QPushButton::clicked, this, &TabCardArtRules::clearBlacklistedBanners);
 
     retranslateUi();
 }
@@ -240,6 +273,7 @@ void TabCardArtRules::retranslateUi()
     addBtn->setText(tr("Add rule"));
     removeBtn->setText(tr("Remove rule"));
     refreshBtn->setText(tr("Refresh"));
+    clearBannedArtBtn->setText(tr("Clear blacklisted banners"));
 }
 
 void TabCardArtRules::refresh()
@@ -276,4 +310,47 @@ void TabCardArtRules::removeSelected()
     client->sendCommand(client->prepareModeratorCommand(cmd));
 
     refresh();
+}
+
+void TabCardArtRules::clearBlacklistedBanners()
+{
+    if (!QtUtils::confirm(this, tr("Clear blacklisted banners"),
+                          tr("Remove the banner card from every user whose current banner matches a DENY rule?\n\n"
+                             "Users who are online keep showing their banner until they log in again."),
+                          QMessageBox::No)) {
+        return;
+    }
+
+    Command_ClearBlacklistedBanners cmd;
+    PendingCommand *pend = client->prepareModeratorCommand(cmd);
+    connect(pend, &PendingCommand::finished, this, &TabCardArtRules::clearBlacklistedBannersResponse);
+    client->sendCommand(pend);
+}
+
+void TabCardArtRules::clearBlacklistedBannersResponse(const Response &r)
+{
+    switch (r.response_code()) {
+        case Response::RespOk:
+            break;
+        case Response::RespFunctionNotAllowed:
+            QMessageBox::warning(this, tr("Not supported"),
+                                 tr("This server does not support clearing blacklisted banners. It may be running an "
+                                    "older version."));
+            return;
+        case Response::RespInternalError:
+            QMessageBox::critical(this, tr("Error"),
+                                  tr("The server could not clear blacklisted banners because of a database error."));
+            return;
+        default:
+            QMessageBox::critical(this, tr("Error"),
+                                  tr("The server rejected the request: %1")
+                                      .arg(QString::fromStdString(Response_ResponseCode_Name(r.response_code()))));
+            return;
+    }
+
+    const auto &resp = r.GetExtension(Response_ClearBlacklistedBanners::ext);
+    QMessageBox::information(this, tr("Banners cleared"),
+                             tr("%n banner card(s) cleared.\n\n"
+                                "Users who are online keep showing their banner until they log in again.",
+                                "number of banners cleared", resp.cleared_count()));
 }

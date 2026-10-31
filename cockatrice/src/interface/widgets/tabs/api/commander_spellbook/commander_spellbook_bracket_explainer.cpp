@@ -1,5 +1,9 @@
 #include "commander_spellbook_bracket_explainer.h"
 
+#include "api_response/commander_spellbook_card_result.h"
+#include "api_response/commander_spellbook_estimate_bracket_result.h"
+#include "api_response/commander_spellbook_variant_result.h"
+
 static QString cardList(const QList<CommanderSpellbookCardResult> &cards, int max = 5)
 {
     QStringList names;

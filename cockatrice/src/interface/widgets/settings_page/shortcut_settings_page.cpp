@@ -8,8 +8,18 @@
 #include "../interface/widgets/utility/sequence_edit.h"
 
 #include <QAbstractItemView>
+#include <QGridLayout>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QLabel>
 #include <QMessageBox>
+#include <QPushButton>
+#include <QSizePolicy>
+#include <QStringLiteral>
+#include <QVBoxLayout>
 #include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qnamespace.h>
 
 ShortcutSettingsPage::ShortcutSettingsPage()
 {
@@ -103,16 +113,15 @@ void ShortcutSettingsPage::currentItemChanged(const QString &key)
 
 void ShortcutSettingsPage::resetShortcuts()
 {
-    if (QMessageBox::question(this, tr("Restore all default shortcuts"),
-                              tr("Do you really want to restore all default shortcuts?")) == QMessageBox::Yes) {
+    if (QtUtils::confirm(this, tr("Restore all default shortcuts"),
+                         tr("Do you really want to restore all default shortcuts?"))) {
         SettingsCache::instance().shortcuts().resetAllShortcuts();
     }
 }
 
 void ShortcutSettingsPage::clearShortcuts()
 {
-    if (QMessageBox::question(this, tr("Clear all default shortcuts"),
-                              tr("Do you really want to clear all shortcuts?")) == QMessageBox::Yes) {
+    if (QtUtils::confirm(this, tr("Clear all default shortcuts"), tr("Do you really want to clear all shortcuts?"))) {
         SettingsCache::instance().shortcuts().clearAllShortcuts();
     }
 }

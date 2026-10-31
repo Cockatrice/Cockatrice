@@ -7,16 +7,23 @@
 
 #ifndef HOME_WIDGET_H
 #define HOME_WIDGET_H
-#include "../../../interface/widgets/tabs/tab_supervisor.h"
-#include "../cards/card_info_picture_art_crop_widget.h"
-#include "home_styled_button.h"
+#include "libcockatrice/deck_list/deck_list.h"
 
-#include <QGridLayout>
+#include <QColor>
+#include <QPair>
+#include <QPixmap>
 #include <QWidget>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
+#include <qtmetamacros.h>
 
 class QGridLayout;
 class QLabel;
+class CardInfoPictureArtCropWidget;
+class ExactCard;
+class HomeStyledButton;
+class QGroupBox;
+class QTimer;
+class TabSupervisor;
 
 class HomeWidget : public QWidget
 {
@@ -26,6 +33,7 @@ class HomeWidget : public QWidget
 public:
     HomeWidget(QWidget *parent, TabSupervisor *tabSupervisor);
     void updateRandomCard();
+    void retranslateUi();
     static QPair<QColor, QColor> extractDominantColors(const QPixmap &pixmap);
 
 public slots:
@@ -46,7 +54,15 @@ private:
     DeckList backgroundSourceDeck;
     QLabel *logoLabel = nullptr;
     QPair<QColor, QColor> gradientColors;
-    HomeStyledButton *connectButton;
+    HomeStyledButton *connectButton = nullptr;
+    HomeStyledButton *visualDeckEditorButton = nullptr;
+    HomeStyledButton *visualDeckStorageButton = nullptr;
+    HomeStyledButton *visualDatabaseDisplayButton = nullptr;
+    HomeStyledButton *edhrecButton = nullptr;
+    HomeStyledButton *archidektButton = nullptr;
+    HomeStyledButton *replayButton = nullptr;
+    HomeStyledButton *exitButton = nullptr;
+    ClientStatus connectionStatus = StatusDisconnected;
 
     void setRandomCard(ExactCard &newCard);
     void loadBackgroundSourceDeck();

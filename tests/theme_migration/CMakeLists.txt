@@ -1,0 +1,21 @@
+cockatrice_add_test(
+  NAME
+  theme_migration_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/theme_manager.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/theme_config.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/pixel_map_generator.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/cache_settings.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/card_counter_settings.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/shortcuts_settings.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network/update/client/release_channel.cpp
+  ${VERSION_STRING_CPP}
+  theme_migration_test.cpp
+  LIBS
+  libcockatrice_settings
+  libcockatrice_network
+  libcockatrice_network_server_remote
+  libcockatrice_protocol
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src
+)

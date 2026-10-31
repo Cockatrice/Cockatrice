@@ -1,5 +1,8 @@
 #include "pending_command.h"
 
+class CommandContainer;
+class Response;
+
 PendingCommand::PendingCommand(const CommandContainer &_commandContainer, QVariant _extraData)
     : commandContainer(_commandContainer), extraData(_extraData), ticks(0)
 {

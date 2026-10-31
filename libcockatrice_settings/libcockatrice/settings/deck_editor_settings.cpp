@@ -1,5 +1,11 @@
 #include "deck_editor_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QVariant>
+
+class QObject;
+
 DeckEditorSettings::DeckEditorSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "deck_editor.ini", "deckeditor", QString(), parent)
 {

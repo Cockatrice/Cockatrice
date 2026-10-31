@@ -4,8 +4,10 @@
 #include "tab.h"
 
 #include <QList>
-#include <libcockatrice/protocol/pb/response.pb.h>
+#include <QPoint>
+#include <QString>
 #include <libcockatrice/protocol/pb/serverinfo_report.pb.h>
+#include <qtmetamacros.h>
 
 class AbstractClient;
 class QCheckBox;
@@ -19,6 +21,9 @@ class QTableWidget;
 class QTextEdit;
 class QTimer;
 class GameReplay;
+class Response;
+class TabSupervisor;
+class UserContextMenu;
 
 class TabReport : public Tab
 {
@@ -34,15 +39,17 @@ public:
 signals:
     void openReplay(GameReplay *replay);
     void requestJoinGame(int gameId, int roomId);
+    void openMessageDialog(const QString &userName, bool focus);
 
 private slots:
     void refreshList();
     void reportListResponse(const Response &response);
     void assignReport();
     void assignResponse(const Response &response);
-    void resolveReport(bool dismissed, bool promptNote);
+    void resolveReport(bool dismissed);
     void resolveResponse(const Response &response);
     void onSelectionChanged();
+    void showTableContextMenu(const QPoint &pos);
     void viewReplay();
     void viewReplayResponse(const Response &response);
     void joinGame();
@@ -53,6 +60,8 @@ private slots:
     void reportDetailsResponse(const Response &response);
     void requestStats();
     void statsResponse(const Response &response);
+    void reopenReport();
+    void reopenResponse(const Response &response);
 
 private:
     int selectedReportId() const;
@@ -82,12 +91,13 @@ private:
     QPushButton *commentButton;
     QPushButton *assignButton;
     QPushButton *resolveButton;
-    QPushButton *resolveWithNoteButton;
     QPushButton *dismissButton;
+    QPushButton *reopenButton;
     QPushButton *viewReplayButton;
     QPushButton *joinGameButton;
     QLabel *statusLabel;
     QTimer *refreshTimer;
+    UserContextMenu *userContextMenu;
 
     QGroupBox *userContextGroup;
     QLabel *userContextName;
@@ -105,6 +115,7 @@ private:
     QLabel *userContextNotesLabel;
     QLabel *userContextRecentReportsLabel;
     QString lastRequestedUser;
+    QString pendingStatusMessage;
     QGroupBox *statsGroup;
     QLabel *statsTotalLabel;
     QLabel *statsTrendLabel;

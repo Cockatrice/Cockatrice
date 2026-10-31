@@ -1,6 +1,16 @@
 #include "card_database_settings.h"
 
+#include "libcockatrice/interfaces/interface_card_set_priority_controller.h"
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QList>
 #include <QMutexLocker>
+#include <QSettings>
+#include <QStringList>
+#include <QVariant>
+#include <functional>
+
+class QObject;
 
 CardDatabaseSettings::CardDatabaseSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "cardDatabase.ini", QString(), QString(), parent)
@@ -78,6 +88,20 @@ ICardSetPriorityController::SetOptions CardDatabaseSettings::getSetOptions(QStri
     return setOptionsCache.value(shortName);
 }
 
+QStringList CardDatabaseSettings::getEnabledSetNames() const
+{
+    QMutexLocker lock(&setOptionsMutex);
+    ensureSetOptionsLoaded();
+    QStringList names;
+    for (auto it = setOptionsCache.constBegin(); it != setOptionsCache.constEnd(); ++it) {
+        if (it.value().enabled) {
+            names << it.key();
+        }
+    }
+    names.sort();
+    return names;
+}
+
 void CardDatabaseSettings::saveSets(const QVector<ICardSetPriorityController::SetSaveData> &data)
 {
     batchWrite([&](QSettings &s) {
@@ -86,6 +110,7 @@ void CardDatabaseSettings::saveSets(const QVector<ICardSetPriorityController::Se
             s.beginGroup(entry.shortName);
             s.setValue("sortKey", entry.sortKey);
             s.setValue("enabled", entry.enabled);
+            s.setValue("isKnown", entry.isKnown);
             s.endGroup();
         }
         s.endGroup();
@@ -97,5 +122,6 @@ void CardDatabaseSettings::saveSets(const QVector<ICardSetPriorityController::Se
         SetOptions &o = setOptionsCache[entry.shortName];
         o.sortKey = entry.sortKey;
         o.enabled = entry.enabled;
+        o.isKnown = entry.isKnown;
     }
 }

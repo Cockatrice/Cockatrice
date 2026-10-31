@@ -3,8 +3,13 @@
 #include "../card_database_display_model.h"
 #include "../card_database_model.h"
 
+#include <QAbstractItemModel>
+#include <QObject>
+#include <QVariant>
+#include <QtGlobal>
 #include <algorithm>
 #include <libcockatrice/utility/levenshtein.h>
+#include <utility>
 
 CardSearchModel::CardSearchModel(CardDatabaseDisplayModel *sourceModel, QObject *parent)
     : QAbstractListModel(parent), sourceModel(sourceModel)
@@ -65,17 +70,20 @@ void CardSearchModel::updateSearchResults(const QString &query)
             continue;
         }
 
-        const QString lowerName = card->getName().toLower();
-        if (!lowerName.contains(lowerQuery)) {
+        const std::optional<QString> lowerName = matchingLowercaseName(card, lowerQuery);
+        if (!lowerName) {
             continue;
         }
 
-        const int distance = levenshteinDistance(lowerQuery, lowerName);
+        const int distance = levenshteinDistance(lowerQuery, *lowerName);
+        // Length of the matched name, used to break distance ties. Stored here
+        // so the comparator does not look the name up again for every comparison.
+        const int nameLength = static_cast<int>(lowerName->size());
 
-        if (lowerName.startsWith(lowerQuery)) {
-            prefixMatches.append({card, distance});
+        if (lowerName->startsWith(lowerQuery)) {
+            prefixMatches.append({card, distance, nameLength});
         } else {
-            containsMatches.append({card, distance});
+            containsMatches.append({card, distance, nameLength});
         }
     }
 
@@ -83,7 +91,7 @@ void CardSearchModel::updateSearchResults(const QString &query)
         if (a.distance != b.distance) {
             return a.distance < b.distance;
         }
-        return a.card->getName().size() < b.card->getName().size();
+        return a.nameLength < b.nameLength;
     };
 
     std::sort(prefixMatches.begin(), prefixMatches.end(), sortByDistanceThenLength);
@@ -100,4 +108,30 @@ void CardSearchModel::updateSearchResults(const QString &query)
     }
 
     endResetModel();
+}
+
+std::optional<QString> CardSearchModel::matchingLowercaseName(const CardInfoPtr &card, const QString &lowerQuery) const
+{
+    if (!searchLanguage.isEnglishOnly() && searchLanguage.mode == SearchLanguageMode::Selected) {
+        QString localizedName = card->getLocalizedName(searchLanguage.language).toLower();
+        if (localizedName.contains(lowerQuery)) {
+            return std::optional<QString>(std::move(localizedName));
+        }
+        return std::nullopt;
+    }
+
+    QString englishName = card->getName().toLower();
+    if (englishName.contains(lowerQuery)) {
+        return std::optional<QString>(std::move(englishName));
+    }
+
+    if (searchLanguage.isEnglishOnly()) {
+        return std::nullopt;
+    }
+
+    QString localizedName = card->getLocalizedName(searchLanguage.language).toLower();
+    if (localizedName.contains(lowerQuery)) {
+        return std::optional<QString>(std::move(localizedName));
+    }
+    return std::nullopt;
 }

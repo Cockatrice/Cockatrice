@@ -10,6 +10,11 @@
 
 #include "abstract_game.h"
 
+#include <qtmetamacros.h>
+
+class GameReplay;
+class QObject;
+
 class Replay : public AbstractGame
 {
     Q_OBJECT

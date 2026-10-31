@@ -1,13 +1,25 @@
 #include "card_info_display_widget.h"
 
-#include "../../../game_graphics/board/card_item.h"
+#include "../../../game_graphics/board/abstract_card_item.h"
+#include "../../../game_graphics/card_dimensions.h"
 #include "card_info_picture_widget.h"
 #include "card_info_text_widget.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/utility/card_ref.h"
 
-#include <QApplication>
+#include <QGuiApplication>
+#include <QObject>
+#include <QRect>
 #include <QScreen>
+#include <QSize>
+#include <QString>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/utility/qt_utils.h>
+
+class QWidget;
 
 CardInfoDisplayWidget::CardInfoDisplayWidget(const CardRef &cardRef, QWidget *parent, Qt::WindowFlags flags)
     : QFrame(parent, flags), aspectRatio(CardDimensions::HEIGHT_F / CardDimensions::WIDTH_F)
@@ -19,9 +31,8 @@ CardInfoDisplayWidget::CardInfoDisplayWidget(const CardRef &cardRef, QWidget *pa
     text->setObjectName("text");
     connect(text, &CardInfoTextWidget::linkActivated, this, [this](const QString &card) { setCard({card}); });
 
-    auto *layout = new QVBoxLayout();
+    auto *layout = QtUtils::makeLayout<QVBoxLayout>();
     layout->setObjectName("layout");
-    layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
     layout->addWidget(pic, 0, Qt::AlignCenter);
     layout->addWidget(text, 0, Qt::AlignCenter);

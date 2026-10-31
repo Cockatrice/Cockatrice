@@ -2,25 +2,68 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../interface/widgets/tabs/tab_supervisor.h"
+#include "../../deck_loader/deck_file_format.h"
+#include "../../deck_loader/deck_loader.h"
+#include "../../deck_loader/loaded_deck.h"
 #include "../../pixel_map_generator.h"
+#include "../../theme_config.h"
 #include "../../theme_manager.h"
 #include "../../window_main.h"
 #include "../cards/art_crop_attribution.h"
+#include "../cards/card_info_picture_art_crop_widget.h"
+#include "abstract_client.h"
 #include "background_sources.h"
 #include "home_styled_button.h"
 #include "home_tab_button_color.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database.h"
+#include "libcockatrice/card/database/card_database_loader.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/utility/card_ref.h"
 
+#include <QBrush>
+#include <QDebug>
+#include <QFlags>
+#include <QFont>
+#include <QFontMetrics>
+#include <QGridLayout>
 #include <QGroupBox>
+#include <QImage>
 #include <QLabel>
 #include <QLinearGradient>
+#include <QList>
+#include <QMap>
+#include <QObject>
 #include <QPainter>
 #include <QPainterPath>
+#include <QPoint>
+#include <QPointF>
 #include <QPushButton>
+#include <QRandomGenerator>
+#include <QRect>
+#include <QRectF>
+#include <QRgb>
+#include <QSharedPointer>
+#include <QSize>
+#include <QSizePolicy>
+#include <QString>
+#include <QStringLiteral>
+#include <QTimer>
 #include <QVBoxLayout>
+#include <QVector>
+#include <QtGlobal>
+#include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/remote/remote_client.h>
 #include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
+#include <optional>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <utility>
 
 HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     : QWidget(parent), tabSupervisor(_tabSupervisor), background(themePixmap(QStringLiteral("backgrounds/home")))
@@ -68,6 +111,32 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     connect(themeManager, &ThemeManager::paletteChanged, this, &HomeWidget::updateLogoOverlay);
     connect(&SettingsCache::instance().appearance(), &AppearanceSettings::homeTabButtonColorChanged, this,
             &HomeWidget::updateButtonsToBackgroundColor);
+}
+
+void HomeWidget::retranslateUi()
+{
+    visualDeckEditorButton->setText(tr("Create New Deck"));
+    visualDeckStorageButton->setText(tr("Browse Decks"));
+    visualDatabaseDisplayButton->setText(tr("Browse Card Database"));
+    edhrecButton->setText(tr("Browse EDHRec"));
+    archidektButton->setText(tr("Browse Archidekt"));
+    replayButton->setText(tr("View Replays"));
+    if (exitButton) {
+        exitButton->setText(tr("Quit"));
+    }
+
+    switch (connectionStatus) {
+        case StatusDisconnected:
+            connectButton->setText(tr("Connect"));
+            break;
+        case StatusLoggedIn:
+            connectButton->setText(tr("Play"));
+            break;
+        default:
+            // Connecting, registering, activating, logging in, etc.
+            connectButton->setText(tr("Connecting..."));
+            break;
+    }
 }
 
 void HomeWidget::initializeBackgroundFromSource()
@@ -241,32 +310,32 @@ QGroupBox *HomeWidget::createButtons()
     updateLogoOverlay();
     boxLayout->addSpacing(25);
 
-    connectButton = new HomeStyledButton("Connect/Play", gradientColors);
+    connectButton = new HomeStyledButton(QString(), gradientColors);
     boxLayout->addWidget(connectButton);
 
-    auto visualDeckEditorButton = new HomeStyledButton(tr("Create New Deck"), gradientColors);
+    visualDeckEditorButton = new HomeStyledButton(QString(), gradientColors);
     connect(visualDeckEditorButton, &QPushButton::clicked, tabSupervisor,
             [this] { tabSupervisor->openDeckInNewTab(LoadedDeck()); });
     boxLayout->addWidget(visualDeckEditorButton);
-    auto visualDeckStorageButton = new HomeStyledButton(tr("Browse Decks"), gradientColors);
+    visualDeckStorageButton = new HomeStyledButton(QString(), gradientColors);
     connect(visualDeckStorageButton, &QPushButton::clicked, tabSupervisor,
             [this] { tabSupervisor->actTabVisualDeckStorage(true); });
     boxLayout->addWidget(visualDeckStorageButton);
-    auto visualDatabaseDisplayButton = new HomeStyledButton(tr("Browse Card Database"), gradientColors);
+    visualDatabaseDisplayButton = new HomeStyledButton(QString(), gradientColors);
     connect(visualDatabaseDisplayButton, &QPushButton::clicked, tabSupervisor,
             &TabSupervisor::addVisualDatabaseDisplayTab);
     boxLayout->addWidget(visualDatabaseDisplayButton);
-    auto edhrecButton = new HomeStyledButton(tr("Browse EDHRec"), gradientColors);
+    edhrecButton = new HomeStyledButton(QString(), gradientColors);
     connect(edhrecButton, &QPushButton::clicked, tabSupervisor, &TabSupervisor::addEdhrecMainTab);
     boxLayout->addWidget(edhrecButton);
-    auto archidektButton = new HomeStyledButton(tr("Browse Archidekt"), gradientColors);
+    archidektButton = new HomeStyledButton(QString(), gradientColors);
     connect(archidektButton, &QPushButton::clicked, tabSupervisor, &TabSupervisor::addArchidektTab);
     boxLayout->addWidget(archidektButton);
-    auto replaybutton = new HomeStyledButton(tr("View Replays"), gradientColors);
-    connect(replaybutton, &QPushButton::clicked, tabSupervisor, [this] { tabSupervisor->actTabReplays(true); });
-    boxLayout->addWidget(replaybutton);
+    replayButton = new HomeStyledButton(QString(), gradientColors);
+    connect(replayButton, &QPushButton::clicked, tabSupervisor, [this] { tabSupervisor->actTabReplays(true); });
+    boxLayout->addWidget(replayButton);
     if (qobject_cast<MainWindow *>(tabSupervisor->parentWidget())) {
-        auto exitButton = new HomeStyledButton(tr("Quit"), gradientColors);
+        exitButton = new HomeStyledButton(QString(), gradientColors);
         connect(exitButton, &QPushButton::clicked, qobject_cast<MainWindow *>(tabSupervisor->parentWidget()),
                 &MainWindow::actExit);
         boxLayout->addWidget(exitButton);
@@ -278,20 +347,18 @@ QGroupBox *HomeWidget::createButtons()
 
 void HomeWidget::updateConnectButton(const ClientStatus status)
 {
+    connectionStatus = status;
     disconnect(connectButton, &QPushButton::clicked, nullptr, nullptr);
     switch (status) {
         case StatusConnecting:
-            connectButton->setText(tr("Connecting..."));
             connectButton->setEnabled(false);
             break;
         case StatusDisconnected:
-            connectButton->setText(tr("Connect"));
             connectButton->setEnabled(true);
             connect(connectButton, &QPushButton::clicked, qobject_cast<MainWindow *>(tabSupervisor->parentWidget()),
                     &MainWindow::actConnect);
             break;
         case StatusLoggedIn:
-            connectButton->setText(tr("Play"));
             connectButton->setEnabled(true);
             connect(connectButton, &QPushButton::clicked, tabSupervisor,
                     &TabSupervisor::switchToFirstAvailableNetworkTab);
@@ -299,6 +366,7 @@ void HomeWidget::updateConnectButton(const ClientStatus status)
         default:
             break;
     }
+    retranslateUi();
 }
 
 QPair<QColor, QColor> HomeWidget::extractDominantColors(const QPixmap &pixmap)

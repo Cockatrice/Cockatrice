@@ -1,11 +1,21 @@
 #include "edhrec_api_response_commander_details_display_widget.h"
 
 #include "../../../../../cards/card_info_picture_widget.h"
+#include "../../../../../cards/card_size_widget.h"
+#include "../../api_response/cards/edhrec_commander_api_response_commander_details.h"
 #include "../../tab_edhrec_main.h"
 #include "../card_prices/edhrec_api_response_card_prices_display_widget.h"
-#include "edhrec_commander_api_response_bracket_navigation_widget.h"
+#include "edhrec_commander_api_response_navigation_widget.h"
+#include "libcockatrice/card/database/card_database_querier.h"
 
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QObject>
+#include <QSlider>
+#include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qnamespace.h>
 
 EdhrecCommanderResponseCommanderDetailsDisplayWidget::EdhrecCommanderResponseCommanderDetailsDisplayWidget(
     QWidget *parent,
@@ -24,20 +34,13 @@ EdhrecCommanderResponseCommanderDetailsDisplayWidget::EdhrecCommanderResponseCom
     commanderPicture = new CardInfoPictureWidget(this);
     commanderPicture->setCard(CardDatabaseManager::query()->getCard({commanderDetails.getName()}));
 
-    QWidget *currentParent = parentWidget();
-    TabEdhRecMain *parentTab = nullptr;
-
-    while (currentParent) {
-        if ((parentTab = qobject_cast<TabEdhRecMain *>(currentParent))) {
-            break;
-        }
-        currentParent = currentParent->parentWidget();
-    }
+    auto *parentTab = QtUtils::findParentOfType<TabEdhRecMain>(this);
 
     if (parentTab) {
         connect(parentTab->getCardSizeSlider()->getSlider(), &QSlider::valueChanged, commanderPicture,
                 &CardInfoPictureWidget::setScaleFactor);
         commanderPicture->setScaleFactor(parentTab->getCardSizeSlider()->getSlider()->value());
+        parentTab->getCardSizeSlider()->enableCtrlScrollResize(this);
     }
 
     commanderDetails.debugPrint();

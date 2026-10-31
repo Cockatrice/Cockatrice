@@ -1,6 +1,7 @@
 #include "card_zone_algorithms.h"
 
 #include <gtest/gtest.h>
+#include <string>
 #include <vector>
 
 struct MockCardRef

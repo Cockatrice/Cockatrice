@@ -1,20 +1,16 @@
 #include "card_info.h"
 
 #include "game_specific_terms.h"
+#include "libcockatrice/card/lazy_properties_hash.h"
 #include "printing/printing_info.h"
 #include "relation/card_relation.h"
 #include "set/card_set.h"
 
-#include <QDir>
+#include <QHashIterator>
 #include <QRegularExpression>
 #include <QSharedPointer>
 #include <QString>
-#include <algorithm>
 #include <utility>
-
-class CardRelation;
-class CardSet;
-class CardInfo;
 
 using CardInfoPtr = QSharedPointer<CardInfo>;
 
@@ -71,10 +67,16 @@ CardInfo::CardInfo(const QString &_name,
       reverseRelatedCards(_reverseRelatedCards), setsToPrintings(std::move(_sets)), uiAttributes(_uiAttributes),
       altNames(std::move(_altNames))
 {
-    // propertiesBlob is materialized lazily on first query; simpleName and
-    // altNames are supplied by the caller (binary cache). Only the set-name
-    // display list still depends on the current enabled-set state.
+    // propertiesBlob is materialized lazily on first query. The binary cache supplies simpleName
+    // and altNames to skip the Unicode normalization and the printing scan; the XML parsers leave
+    // them empty and get the same derived state the property-hash constructor computes.
+    if (simpleName.isEmpty()) {
+        simpleName = simplifyName(name);
+    }
     refreshCachedSetNames();
+    if (altNames.isEmpty()) {
+        refreshCachedAltNames();
+    }
 }
 
 CardInfoPtr CardInfo::newInstance(const QString &_name)
@@ -249,7 +251,7 @@ QString CardInfo::simplifyName(const QString &name)
 
 QChar CardInfo::getColorChar() const
 {
-    QString colors = getColors();
+    const QString colors = getColors();
     switch (colors.size()) {
         case 0:
             return QChar();
@@ -265,6 +267,13 @@ void CardInfo::resetReverseRelatedCards2Me()
     for (CardRelation *cardRelation : this->getReverseRelatedCards2Me()) {
         cardRelation->deleteLater();
     }
+    reverseRelatedCardsToMe = QList<CardRelation *>();
+}
+
+void CardInfo::clearDirectRelations()
+{
+    relatedCards = QList<CardRelation *>();
+    reverseRelatedCards = QList<CardRelation *>();
     reverseRelatedCardsToMe = QList<CardRelation *>();
 }
 

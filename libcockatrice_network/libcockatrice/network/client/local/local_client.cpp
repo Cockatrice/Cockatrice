@@ -1,9 +1,17 @@
 #include "local_client.h"
 
 #include "../../server/local/local_server_interface.h"
+#include "abstract_client.h"
+#include "libcockatrice/protocol/pb/commands.pb.h"
+#include "libcockatrice/protocol/pb/server_message.pb.h"
 
+#include <QDebug>
+#include <QMessageLogger>
 #include <libcockatrice/protocol/debug_pb_message.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
+#include <string>
+
+class QObject;
 
 LocalClient::LocalClient(LocalServerInterface *_lsi,
                          const QString &_playerName,
@@ -31,14 +39,18 @@ LocalClient::~LocalClient()
 
 void LocalClient::sendCommandContainer(const CommandContainer &cont)
 {
-    qCDebug(LocalClientLog).noquote() << userName << "OUT" << getSafeDebugString(cont);
+    if (LocalClientLog().isDebugEnabled()) {
+        qCDebug(LocalClientLog).noquote() << userName << "OUT" << getSafeDebugString(cont);
+    }
 
     lsi->itemFromClient(cont);
 }
 
 void LocalClient::itemFromServer(const ServerMessage &item)
 {
-    qCDebug(LocalClientLog).noquote() << userName << "IN" << getSafeDebugString(item);
+    if (LocalClientLog().isDebugEnabled()) {
+        qCDebug(LocalClientLog).noquote() << userName << "IN" << getSafeDebugString(item);
+    }
 
     processProtocolItem(item);
 }

@@ -3,30 +3,32 @@
 
 #include "server_player_reference.h"
 
+#include <QList>
+#include <QMap>
 #include <QMultiMap>
 #include <QMutex>
+#include <QMutexLocker>
 #include <QObject>
 #include <QReadWriteLock>
-#include <libcockatrice/protocol/pb/commands.pb.h>
-#include <libcockatrice/protocol/pb/serverinfo_ban.pb.h>
-#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <QString>
+#include <QtGlobal>
+#include <qtmetamacros.h>
 
 class Server_DatabaseInterface;
-class Server_Game;
 class Server_Room;
 class Server_ProtocolHandler;
 class Server_AbstractUserInterface;
-class GameReplay;
 class IslMessage;
 class SessionEvent;
 class RoomEvent;
-class DeckList;
 class ServerInfo_Game;
 class ServerInfo_Room;
 class Response;
 class GameEventContainer;
 class CommandContainer;
 class Command_JoinGame;
+class QThread;
+class ServerInfo_User;
 
 enum AuthenticationResult
 {
@@ -84,6 +86,11 @@ public:
     virtual QMap<QString, bool> getServerRequiredFeatureList() const
     {
         return QMap<QString, bool>();
+    }
+    /** @brief True when only challenge-response logins are accepted (strict mode). */
+    virtual bool requiresChallengeResponseAuth() const
+    {
+        return false;
     }
     void addClient(Server_ProtocolHandler *player);
     void removeClient(Server_ProtocolHandler *player);
@@ -185,6 +192,39 @@ public:
     virtual void observeGameStartDurationMs(qint64 /* elapsedMs */)
     {
     }
+    /**
+     * @brief Record a failed login attempt for the (address, username) pair; returns true if now locked out.
+     *
+     * Keyed by pair so a successful login as one user cannot wipe out another
+     * user's failure history from the same address (e.g. a guest login or the
+     * attacker's own account clearing the way for further guessing).
+     */
+    virtual bool recordFailedLogin(const QString & /*ipAddress*/, const QString & /*userName*/)
+    {
+        return false;
+    }
+    /**
+     * @brief True if the (address, username) pair is already locked out of logging in.
+     *
+     * Consulted before any authentication work (database round trip, password
+     * verification) so a blocked pair cannot burn server CPU per attempt.
+     */
+    virtual bool isLoginRateLimited(const QString & /*ipAddress*/, const QString & /*userName*/)
+    {
+        return false;
+    }
+    /**
+     * @brief Seconds remaining before the login rate limit for the (address, username) pair lifts.
+     * Returns 0 if not limited.
+     */
+    virtual int loginRateLimitRemainingSeconds(const QString & /*ipAddress*/, const QString & /*userName*/)
+    {
+        return 0;
+    }
+    /** @brief Clear any failed-login lockout for the (address, username) pair, e.g. after a successful login. */
+    virtual void clearFailedLogins(const QString & /*ipAddress*/, const QString & /*userName*/)
+    {
+    }
 
     Server_DatabaseInterface *getDatabaseInterface() const;
     int getNextLocalGameId()
@@ -230,7 +270,7 @@ protected slots:
     void externalUserLeft(const QString &userName);
     void externalRoomUserJoined(int roomId, const ServerInfo_User &userInfo);
     void externalRoomUserLeft(int roomId, const QString &userName);
-    void externalRoomSay(int roomId, const QString &userName, const QString &message);
+    void externalRoomSay(int roomId, const QString &userName, const QString &message, const QString &channelId);
     void externalRoomRemoveMessages(int roomId, const QString &userName, int amount);
     void externalRoomGameListChanged(int roomId, const ServerInfo_Game &gameInfo);
     void

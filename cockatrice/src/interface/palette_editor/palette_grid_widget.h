@@ -2,15 +2,19 @@
 #define COCKATRICE_PALETTE_GRID_WIDGET_H
 
 #include "../theme_config.h"
-#include "color_button.h"
 
+#include <QList>
 #include <QMap>
 #include <QPalette>
-#include <QVBoxLayout>
+#include <QVector>
 #include <QWidget>
+#include <qtmetamacros.h>
 
 class QLabel;
 class QScrollArea;
+class ColorButton;
+class QVBoxLayout;
+
 // Scrollable grid of ColorButtons — one per (ColorGroup × ColorRole) cell.
 // Owns the load/read round-trip for PaletteConfig but has no file I/O itself.
 class PaletteGridWidget : public QWidget

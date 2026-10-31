@@ -3,7 +3,11 @@
 
 #include "settings_manager.h"
 
+#include <QString>
 #include <libcockatrice/interfaces/interface_chat_settings_provider.h>
+#include <qtmetamacros.h>
+
+class QObject;
 
 class ChatSettings : public SettingsManager, public IChatSettingsProvider
 {
@@ -15,6 +19,8 @@ public:
     [[nodiscard]] bool getChatMentionCompleter() const override;
     [[nodiscard]] QString getChatMentionColor() const override;
     [[nodiscard]] QString getChatHighlightColor() const override;
+    [[nodiscard]] QString getChannelUnreadColor() const override;
+    [[nodiscard]] QString getChannelMentionColor() const override;
     [[nodiscard]] bool getChatMentionForeground() const override;
     [[nodiscard]] bool getChatHighlightForeground() const override;
     [[nodiscard]] bool getIgnoreUnregisteredUsers() const override;
@@ -24,12 +30,15 @@ public:
     [[nodiscard]] bool getShowMentionPopup() const override;
     [[nodiscard]] bool getRoomHistory() const override;
     [[nodiscard]] bool getIgnoreAllPrivateMessages() const override;
+    [[nodiscard]] bool getUseGameTime() const override;
     [[nodiscard]] QString getHighlightWords() const override;
 
     void setChatMention(bool _chatMention);
     void setChatMentionCompleter(bool _chatMentionCompleter);
     void setChatMentionColor(const QString &_chatMentionColor);
     void setChatHighlightColor(const QString &_chatHighlightColor);
+    void setChannelUnreadColor(const QString &_channelUnreadColor);
+    void setChannelMentionColor(const QString &_channelMentionColor);
     void setChatMentionForeground(bool _chatMentionForeground);
     void setChatHighlightForeground(bool _chatHighlightForeground);
     void setIgnoreUnregisteredUsers(bool _ignoreUnregisteredUsers);
@@ -39,6 +48,7 @@ public:
     void setShowMentionPopups(bool _showMentionPopups);
     void setRoomHistory(bool _roomHistory);
     void setIgnoreAllPrivateMessages(bool _ignoreAllPrivateMessages);
+    void setUseGameTime(bool _useGameTime);
     void setHighlightWords(const QString &_highlightWords);
 
 signals:

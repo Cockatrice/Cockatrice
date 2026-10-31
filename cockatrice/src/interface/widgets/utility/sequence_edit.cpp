@@ -4,9 +4,18 @@
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../../pixel_map_generator.h"
 
+#include <QChar>
+#include <QEvent>
+#include <QFlags>
 #include <QHBoxLayout>
 #include <QKeyEvent>
+#include <QLineEdit>
+#include <QList>
+#include <QPoint>
+#include <QPushButton>
+#include <QStringLiteral>
 #include <QToolTip>
+#include <libcockatrice/utility/qt_utils.h>
 
 SequenceEdit::SequenceEdit(const QString &_shortcutName, QWidget *parent) : QWidget(parent)
 {
@@ -18,9 +27,7 @@ SequenceEdit::SequenceEdit(const QString &_shortcutName, QWidget *parent) : QWid
     clearButton->setIcon(themePixmap(QStringLiteral("icons/clearsearch")));
     defaultButton->setIcon(themePixmap(QStringLiteral("icons/update")));
 
-    auto *layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(1);
+    auto *layout = QtUtils::makeLayout<QHBoxLayout>(this, 1);
     layout->addWidget(lineEdit);
     layout->addWidget(clearButton);
     layout->addWidget(defaultButton);

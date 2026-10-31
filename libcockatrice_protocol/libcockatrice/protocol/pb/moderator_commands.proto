@@ -20,12 +20,15 @@ message ModeratorCommand {
         GET_MODERATOR_LAST_LOGINS = 1015;
         RESET_USER_PASSWORD = 1016;
         REMOVE_USER_AVATAR = 1017;
+        REMOVE_USER_BANNER = 1018;
+        CLEAR_BLACKLISTED_BANNERS = 1019;
         REPORT_LIST = 1200;
         REPORT_ASSIGN = 1201;
         REPORT_RESOLVE = 1202;
         REPLAY_DOWNLOAD_BY_GAME_ID = 1203;
         REPORT_USER_INFO = 1204;
         REPORT_STATS = 1205;
+        REPORT_REOPEN = 1206;
     }
     extensions 100 to max;
 }
@@ -177,4 +180,17 @@ message Command_RemoveUserAvatar {
         optional Command_RemoveUserAvatar ext = 1017;
     }
     optional string user_name = 1;
+}
+
+message Command_RemoveUserBanner {
+    extend ModeratorCommand {
+        optional Command_RemoveUserBanner ext = 1018;
+    }
+    optional string user_name = 1;
+}
+
+message Command_ClearBlacklistedBanners {
+    extend ModeratorCommand {
+        optional Command_ClearBlacklistedBanners ext = 1019;
+    }
 }

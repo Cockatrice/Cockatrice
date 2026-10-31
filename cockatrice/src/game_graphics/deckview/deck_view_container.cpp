@@ -2,18 +2,36 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../../client/settings/shortcuts_settings.h"
+#include "../../game/abstract_game.h"
+#include "../../game/game_event_handler.h"
+#include "../../game/game_state.h"
 #include "../../interface/card_picture_loader/card_picture_loader.h"
+#include "../../interface/deck_loader/deck_file_format.h"
 #include "../../interface/deck_loader/deck_loader.h"
+#include "../../interface/deck_loader/loaded_deck.h"
 #include "../../interface/widgets/dialogs/dlg_load_deck.h"
 #include "../../interface/widgets/dialogs/dlg_load_deck_from_clipboard.h"
 #include "../../interface/widgets/dialogs/dlg_load_deck_from_website.h"
 #include "../../interface/widgets/dialogs/dlg_load_remote_deck.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../../interface/widgets/visual_deck_storage/visual_deck_storage_widget.h"
+#include "../board/abstract_card_item.h"
 #include "deck_view.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/interfaces/interface_interface_settings_provider.h"
+#include "libcockatrice/protocol/pb/move_card_to_zone.pb.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h"
+#include "libcockatrice/utility/card_ref.h"
 
+#include <QHBoxLayout>
+#include <QList>
 #include <QMessageBox>
-#include <libcockatrice/card/database/card_database.h>
+#include <QPainter>
+#include <QPen>
+#include <QRect>
+#include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/playmat_resolver.h>
 #include <libcockatrice/protocol/pb/command_deck_select.pb.h>
@@ -25,7 +43,11 @@
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <optional>
+#include <qnamespace.h>
+#include <string>
 
 ToggleButton::ToggleButton(QWidget *parent) : QPushButton(parent), state(false)
 {
@@ -90,10 +112,9 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     connect(deckView, &DeckView::newCardAdded, this, &DeckViewContainer::newCardAdded);
     connect(deckView, &DeckView::sideboardPlanChanged, this, &DeckViewContainer::sideboardPlanChanged);
 
-    deckViewLayout = new QVBoxLayout;
+    deckViewLayout = QtUtils::makeLayout<QVBoxLayout>();
     deckViewLayout->addLayout(buttonHBox);
     deckViewLayout->addWidget(deckView);
-    deckViewLayout->setContentsMargins(0, 0, 0, 0);
     setLayout(deckViewLayout);
 
     retranslateUi();
@@ -333,6 +354,19 @@ void DeckViewContainer::resolveAndSendPlaymat()
     pp->set_vertical_offset(resolved.params.verticalOffset);
     pp->set_zoom(resolved.params.zoom);
     PendingCommand *playmatPend = parentGame->getGame()->getGameEventHandler()->prepareGameCommand(playmatCmd);
+    const QString sentName = resolved.card.name;
+    connect(playmatPend, &PendingCommand::finished, this, [this, sentName](const Response &r) {
+        // Only RespFunctionNotAllowed signals a card art DENY rule. Older servers that predate
+        // playmats answer RespInvalidCommand and strip the mat from DeckSelect, which must stay silent.
+        if (r.response_code() == Response::RespFunctionNotAllowed) {
+            if (!sentName.isEmpty()) {
+                notifyPlaymatBlacklisted(
+                    sentName, tr("The selected playmat card is blacklisted on this server, so it was not applied."));
+            }
+        } else if (r.response_code() == Response::RespOk && !sentName.isEmpty()) {
+            lastBlacklistedPlaymatNotice.clear();
+        }
+    });
     parentGame->getGame()->getGameEventHandler()->sendGameCommand(playmatPend, playerId);
 }
 
@@ -391,6 +425,15 @@ void DeckViewContainer::deckSelectFinished(const Response &r)
     switchToDeckLoadedView();
 }
 
+void DeckViewContainer::notifyPlaymatBlacklisted(const QString &cardName, const QString &message)
+{
+    if (cardName.isEmpty() || cardName == lastBlacklistedPlaymatNotice) {
+        return;
+    }
+    lastBlacklistedPlaymatNotice = cardName;
+    QMessageBox::critical(this, tr("Error"), message);
+}
+
 void DeckViewContainer::readyStart()
 {
     sendReadyStartCommand(!readyStartButton->getState());
@@ -399,9 +442,7 @@ void DeckViewContainer::readyStart()
 void DeckViewContainer::forceStart()
 {
     const auto msg = tr("Are you sure you want to force start?\nThis will kick all non-ready players from the game.");
-    const auto res =
-        QMessageBox::question(this, tr("Cockatrice"), msg, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-    if (res == QMessageBox::No) {
+    if (!QtUtils::confirm(this, tr("Cockatrice"), msg, QMessageBox::Yes)) {
         return;
     }
 

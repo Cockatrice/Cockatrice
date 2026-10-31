@@ -4,35 +4,57 @@
 #include "main.h"
 #include "oracleimporter.h"
 #include "oraclewizard.h"
-#include "pages.h"
 #include "pagetemplates.h"
 #include "version_string.h"
 
-#include <QAbstractButton>
 #include <QBuffer>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDebug>
 #include <QDir>
+#include <QFile>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QGridLayout>
+#include <QIODevice>
+#include <QJsonDocument>
+#include <QJsonParseError>
 #include <QLabel>
 #include <QLineEdit>
+#include <QList>
+#include <QMap>
 #include <QMessageBox>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QObject>
 #include <QPointer>
 #include <QProgressBar>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QScrollBar>
-#include <QStandardPaths>
+#include <QSettings>
+#include <QSharedPointer>
 #include <QTextEdit>
 #include <QTextStream>
-#include <QtConcurrent>
-#include <QtGui>
+#include <QTimer>
+#include <QUrl>
+#include <QVariant>
+#include <QWizard>
+#include <QtConcurrentRun>
+#include <QtGlobal>
 #include <cstdio>
+#include <functional>
 #include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/utility/translation_loader.h>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <qnumeric.h>
+#include <stdlib.h>
+#include <tuple>
+#include <utility>
+
+class QWidget;
 
 #ifdef HAS_LZMA
 #include "lzma/decompress.h"
@@ -58,13 +80,12 @@
 #endif
 
 /**
- * @brief Emits one machine-readable background-run progress line to stdout.
+ * @brief Emits one machine-readable progress line to stdout.
  *
- * Used only in background mode, so the hosting Cockatrice client can parse these
- * lines to drive a determinate progress bar. stderr stays reserved for
- * human-readable log output.
+ * The hosting Cockatrice client parses these lines to drive a determinate
+ * progress bar. stderr stays reserved for human-readable log output.
  */
-static void emitBackgroundProgress(const char *stage, qint64 done, qint64 total)
+static void emitProgress(const char *stage, qint64 done, qint64 total)
 {
     QTextStream out(stdout);
     out << "PROGRESS " << stage << ' ' << done << ' ' << total << '\n';
@@ -180,16 +201,23 @@ IntroPage::IntroPage(QWidget *parent) : OracleWizardPage(parent)
 
     QStringList languageCodes = findQmFiles();
     for (const QString &code : languageCodes) {
-        QString langName = languageName(code);
-        languageBox->addItem(langName, code);
+        languageBox->addItem(TranslationLoader::languageDisplayName(code), code);
     }
 
-    QString setLanguage = QCoreApplication::translate("i18n", DEFAULT_LANG_NAME);
-    int index = languageBox->findText(setLanguage, Qt::MatchExactly);
-    if (index == -1) {
-        qWarning() << "could not find language" << setLanguage;
-    } else {
+    // Select the language the wizard runs with: its own entry, the base language for a variant without a
+    // file of its own (de_CH -> de), and the default language for an unset setting, which names no file.
+    const QString configuredLanguage = SettingsCache::instance().personal().getLang();
+    int index = languageBox->findData(configuredLanguage);
+    if (index < 0) {
+        index = languageBox->findData(configuredLanguage.section('_', 0, 0));
+    }
+    if (index < 0) {
+        index = languageBox->findData(TranslationLoader::defaultLanguageCode());
+    }
+    if (index >= 0) {
         languageBox->setCurrentIndex(index);
+    } else {
+        qWarning() << "could not find language" << configuredLanguage;
     }
 
     connect(languageBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &IntroPage::languageBoxChanged);
@@ -212,23 +240,8 @@ void IntroPage::initializePage()
 
 QStringList IntroPage::findQmFiles()
 {
-    QDir dir(translationPath);
-    QStringList fileNames = dir.entryList(QStringList(translationPrefix + "_*.qm"), QDir::Files, QDir::Name);
-    fileNames.replaceInStrings(QRegularExpression(translationPrefix + "_(.*)\\.qm"), "\\1");
-    return fileNames;
-}
-
-QString IntroPage::languageName(const QString &lang)
-{
-    QTranslator qTranslator;
-
-    QString appNameHint = translationPrefix + "_" + lang;
-    bool appTranslationLoaded = qTranslator.load(appNameHint, translationPath);
-    if (!appTranslationLoaded) {
-        qDebug() << "Unable to load" << translationPrefix << "translation" << appNameHint << "at" << translationPath;
-    }
-
-    return qTranslator.translate("i18n", DEFAULT_LANG_NAME);
+    return TranslationLoader::availableLanguages(translationPrefix,
+                                                 TranslationLoader::applicationTranslationPaths(translationPath));
 }
 
 void IntroPage::languageBoxChanged(int index)
@@ -452,9 +465,7 @@ void LoadSetsPage::downloadSetsFile(const QUrl &url)
 
 void LoadSetsPage::actDownloadProgressSetsFile(qint64 received, qint64 total)
 {
-    if (wizard()->backgroundMode) {
-        emitBackgroundProgress("download", received, total);
-    }
+    emitProgress("download", received, total);
     if (total > 0) {
         progressBar->setMaximum(static_cast<int>(total));
         progressBar->setValue(static_cast<int>(received));
@@ -466,6 +477,10 @@ void LoadSetsPage::actDownloadFinishedSetsFile()
 {
     // check for a reply
     auto *reply = dynamic_cast<QNetworkReply *>(sender());
+    if (wizard()->wasCancelled()) {
+        reply->deleteLater();
+        return;
+    }
     auto errorCode = reply->error();
     if (errorCode != QNetworkReply::NoError) {
         QMessageBox::critical(this, tr("Error"), tr("Network error: %1.").arg(reply->errorString()));
@@ -513,7 +528,7 @@ void LoadSetsPage::updateParsingProgress(int bytesRead, int totalBytes)
 
 void LoadSetsPage::scanProgressToStdout(int bytesRead, int totalBytes)
 {
-    emitBackgroundProgress("scan", bytesRead, totalBytes);
+    emitProgress("scan", bytesRead, totalBytes);
 }
 
 void LoadSetsPage::beginLoadSets(bool compressedFile)
@@ -820,18 +835,18 @@ void SaveSetsPage::updateTotalProgress(int cardsImported, int setIndex, const QS
         const int cardCount = wizard()->importer->getCardList().size();
         if (wizard()->backgroundMode) {
             qInfo() << tr("Import finished: %1 cards.").arg(cardCount);
-            emitBackgroundProgress("import", totalSets, totalSets);
         } else {
             messageLog->append("<b>" + tr("Import finished: %1 cards.").arg(cardCount) + "</b>");
         }
+        emitProgress("import", totalSets, totalSets);
     } else {
         progressBar->setValue(setIndex);
         if (wizard()->backgroundMode) {
             qInfo() << tr("%1: %2 cards imported").arg(setName).arg(cardsImported);
-            emitBackgroundProgress("import", setIndex, totalSets);
         } else {
             messageLog->append(tr("%1: %2 cards imported").arg(setName).arg(cardsImported));
         }
+        emitProgress("import", setIndex, totalSets);
     }
 
     messageLog->verticalScrollBar()->setValue(messageLog->verticalScrollBar()->maximum());
@@ -877,6 +892,7 @@ bool SaveSetsPage::validatePage()
         return false;
     }
 
+    wizard()->markDatabaseSaved();
     return true;
 }
 

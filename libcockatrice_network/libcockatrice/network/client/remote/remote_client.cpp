@@ -1,5 +1,8 @@
 #include "remote_client.h"
 
+#include "abstract_client.h"
+#include "libcockatrice/protocol/pb/commands.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 #include "version_string.h"
 
 #include <QCryptographicHash>
@@ -7,13 +10,21 @@
 #include <QHostAddress>
 #include <QHostInfo>
 #include <QList>
+#include <QMap>
+#include <QMessageLogger>
+#include <QMutableMapIterator>
+#include <QSharedPointer>
+#include <QStringList>
 #include <QThread>
 #include <QTimer>
+#include <QUrl>
 #include <QWebSocket>
+#include <QWebSocketProtocol>
+#include <QtGlobal>
+#include <google/protobuf/stubs/common.h>
 #include <libcockatrice/interfaces/interface_network_settings_provider.h>
 #include <libcockatrice/protocol/debug_pb_message.h>
 #include <libcockatrice/protocol/pb/event_server_identification.pb.h>
-#include <libcockatrice/protocol/pb/response_activate.pb.h>
 #include <libcockatrice/protocol/pb/response_forgotpasswordrequest.pb.h>
 #include <libcockatrice/protocol/pb/response_login.pb.h>
 #include <libcockatrice/protocol/pb/response_password_salt.pb.h>
@@ -22,12 +33,58 @@
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/passwordhasher.h>
+#include <string>
+
+class Event_ConnectionClosed;
+class QObject;
 
 static const unsigned int protocolVersion = 14;
 
+// Explanations for logins that do not complete but carry no missing-feature list: the
+// ones RemoteClient stops itself, plus a strict server asking for a password. They all
+// travel with RespClientUpdateRequired and are shown by the same dialog, so their wording
+// is kept together here and adjusted as a set. The context has to stay "RemoteClient" for
+// the tr() calls at the use sites to find the translations.
+namespace
+{
+// The server warns that this account still uses the legacy password hash while this client
+// holds a scrypt verifier. Sending the verifier would downgrade the proof, so the client
+// stops; the login only succeeds after the saved verifier is gone and the user types the
+// password, which also upgrades the account.
+constexpr const char *const LOGIN_ABORT_AUTH_DOWNGRADE = QT_TRANSLATE_NOOP(
+    "RemoteClient",
+    "The server still uses an old password format for this account, so the saved login on this computer cannot be "
+    "used. Untick 'Save password' in the Connect window and connect; when it opens again, type your password.");
+// The account is still on the legacy hash and only the plaintext password can produce it.
+constexpr const char *const LOGIN_ABORT_PASSWORD_REQUIRED =
+    QT_TRANSLATE_NOOP("RemoteClient",
+                      "This account still uses an old password format. Type your password in the Connect window and "
+                      "log in; the account is upgraded automatically.");
+// Rejected by PasswordHasher::costParamsAreSane, either for being weak or for being too
+// expensive for this client. Nothing on the client side can fix it.
+constexpr const char *const LOGIN_ABORT_UNSAFE_SCRYPT_PARAMS =
+    QT_TRANSLATE_NOOP("RemoteClient",
+                      "The server asked for password settings that Cockatrice will not accept because they are too "
+                      "weak or too demanding. The login was stopped; only the server's staff can change this.");
+// Scrypt derivation failed locally: a device resource problem, or server parameters this
+// client cannot satisfy.
+constexpr const char *const LOGIN_ABORT_VERIFIER_NOT_DERIVED =
+    QT_TRANSLATE_NOOP("RemoteClient",
+                      "Cockatrice could not prepare your password for this login. Try again; if it keeps happening, "
+                      "the server's password settings may be too demanding for this version of Cockatrice.");
+constexpr const char *const LOGIN_ABORT_STORED_VERIFIER_UNUSABLE =
+    QT_TRANSLATE_NOOP("RemoteClient",
+                      "The saved login for this account cannot be used. Type your password in the Connect window; if "
+                      "'Save password' is ticked, a new saved login is created after you log in.");
+constexpr const char *const LOGIN_ABORT_PASSWORD_MISSING =
+    QT_TRANSLATE_NOOP("RemoteClient",
+                      "This server requires your password to log in. Type it in the Connect window and try again.");
+} // namespace
+
 RemoteClient::RemoteClient(QObject *parent, INetworkSettingsProvider *_networkSettingsProvider)
     : AbstractClient(parent), networkSettingsProvider(_networkSettingsProvider), timeRunning(0), lastDataReceived(0),
-      messageInProgress(false), handshakeStarted(false), usingWebSocket(false), messageLength(0), hashedPassword()
+      messageInProgress(false), handshakeStarted(false), usingWebSocket(false), messageLength(0), hashedPassword(),
+      passwordNeedsMigration(false)
 {
 
     clearNewClientFeatures();
@@ -114,6 +171,11 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         return;
     }
     serverSupportsPasswordHash = event.server_options() & Event_ServerIdentification::SupportsPasswordHash;
+    // Challenge-response is advertised in its own field so server_options stays
+    // exactly SupportsPasswordHash on the wire for already-released clients
+    // (proto2 enums are closed: an unknown value parses as NoOptions and those
+    // clients would fall back to plaintext passwords).
+    serverSupportsChallengeResponse = event.has_supports_challenge_response() && event.supports_challenge_response();
 
     if (getStatus() == StatusRequestingForgotPassword) {
         Command_ForgotPasswordRequest cmdForgotPasswordRequest;
@@ -130,7 +192,13 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         cmdForgotPasswordReset.set_user_name(userName.toStdString());
         cmdForgotPasswordReset.set_clientid(getSrvClientID(lastHostname).toStdString());
         cmdForgotPasswordReset.set_token(token.toStdString());
-        if (!password.isEmpty() && serverSupportsPasswordHash) {
+        if (!password.isEmpty() && serverSupportsChallengeResponse) {
+            hashedPassword = PasswordHasher::generatePasswordVerifier(password);
+            // Only this branch yields a challenge-response verifier worth persisting; the
+            // legacy-hash and plaintext branches below must not be saved under the password key.
+            derivedVerifier = hashedPassword;
+            cmdForgotPasswordReset.set_hashed_new_password(hashedPassword.toStdString());
+        } else if (!password.isEmpty() && serverSupportsPasswordHash) {
             auto passwordSalt = PasswordHasher::generateRandomSalt();
             hashedPassword = PasswordHasher::computeHash(password, passwordSalt);
             cmdForgotPasswordReset.set_hashed_new_password(hashedPassword.toStdString());
@@ -158,7 +226,10 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
     if (getStatus() == StatusRegistering) {
         Command_Register cmdRegister;
         cmdRegister.set_user_name(userName.toStdString());
-        if (!password.isEmpty() && serverSupportsPasswordHash) {
+        if (!password.isEmpty() && serverSupportsChallengeResponse) {
+            hashedPassword = PasswordHasher::generatePasswordVerifier(password);
+            cmdRegister.set_hashed_password(hashedPassword.toStdString());
+        } else if (!password.isEmpty() && serverSupportsPasswordHash) {
             auto passwordSalt = PasswordHasher::generateRandomSalt();
             hashedPassword = PasswordHasher::computeHash(password, passwordSalt);
             cmdRegister.set_hashed_password(hashedPassword.toStdString());
@@ -223,7 +294,9 @@ Command_Login RemoteClient::generateCommandLogin()
 
 void RemoteClient::doLogin()
 {
-    if (!password.isEmpty() && serverSupportsPasswordHash) {
+    if ((!password.isEmpty() || !storedVerifier.isEmpty()) && serverSupportsChallengeResponse) {
+        doRequestPasswordSalt(); // ask salt + nonce to build the challenge response
+    } else if (!password.isEmpty() && serverSupportsPasswordHash) {
         //! \todo Store and log in using stored hashed password.
         if (hashedPassword.isEmpty()) {
             doRequestPasswordSalt(); // ask salt to create hashedPassword, then log in
@@ -257,6 +330,30 @@ void RemoteClient::doHashedLogin()
     sendCommand(pend);
 }
 
+void RemoteClient::doSubmitPasswordVerifier()
+{
+    pendingVerifier = PasswordHasher::generatePasswordVerifier(password);
+    Command_SubmitPasswordVerifier cmdSubmitVerifier;
+    cmdSubmitVerifier.set_password_verifier(pendingVerifier.toStdString());
+
+    PendingCommand *pend = prepareSessionCommand(cmdSubmitVerifier);
+    connect(pend, &PendingCommand::finished, this, &RemoteClient::submitPasswordVerifierResponse);
+    sendCommand(pend);
+}
+
+void RemoteClient::submitPasswordVerifierResponse(const Response &response)
+{
+    if (response.response_code() == Response::RespOk) {
+        qCDebug(RemoteClientLog) << "Password verifier migrated successfully";
+        if (!pendingVerifier.isEmpty()) {
+            emit sigPasswordVerifierReady(pendingVerifier);
+            pendingVerifier.clear();
+        }
+    } else {
+        qCWarning(RemoteClientLog) << "Failed to migrate password verifier:" << response.response_code();
+    }
+}
+
 void RemoteClient::processConnectionClosedEvent(const Event_ConnectionClosed & /*event*/)
 {
     doDisconnectFromServer();
@@ -269,7 +366,65 @@ void RemoteClient::passwordSaltResponse(const Response &response)
         auto passwordSalt = QString::fromStdString(resp.password_salt());
         if (passwordSalt.isEmpty()) { // the server does not recognize the user but allows them to enter unregistered
             password.clear();         // the password will not be used
+            storedVerifier.clear();
             doLogin();
+        } else if (serverSupportsChallengeResponse && resp.has_nonce()) {
+            const QByteArray nonce = QByteArray::fromStdString(resp.nonce());
+            // needs_migration is a server-controlled flag over an unauthenticated
+            // transport (plain TCP by default). If we already hold a scrypt
+            // verifier for this account, a server telling us to fall back to the
+            // 1000-round legacy hash is a downgrade of the KDF — refuse it rather
+            // than hand an attacker a weakly-keyed HMAC they can attack offline.
+            if (resp.needs_migration() && PasswordHasher::parsePasswordVerifier(storedVerifier).isValid) {
+                emit loginError(Response::RespClientUpdateRequired, tr(LOGIN_ABORT_AUTH_DOWNGRADE), 0, {});
+                return;
+            }
+            QByteArray key;
+            if (resp.needs_migration()) {
+                // The account still uses the legacy format; the legacy full hash
+                // is only derivable from the plaintext password.
+                if (password.isEmpty()) {
+                    emit loginError(Response::RespClientUpdateRequired, tr(LOGIN_ABORT_PASSWORD_REQUIRED), 0, {});
+                    return;
+                }
+                key = PasswordHasher::computeHash(password, passwordSalt).toUtf8();
+            } else if (!password.isEmpty()) {
+                // A hostile server must not be able to make us run or allocate for
+                // unreasonable scrypt parameters.
+                const int n = resp.has_n() ? resp.n() : SCRYPT_N;
+                const int r = resp.has_r() ? resp.r() : SCRYPT_R;
+                const int p = resp.has_p() ? resp.p() : SCRYPT_P;
+                if (!PasswordHasher::costParamsAreSane(n, r, p)) {
+                    emit loginError(Response::RespClientUpdateRequired, tr(LOGIN_ABORT_UNSAFE_SCRYPT_PARAMS), 0, {});
+                    return;
+                }
+                // password_salt may carry a legacy backup salt for pre-challenge clients;
+                // the verifier itself is always derived from scrypt_salt when present.
+                const QString scryptSalt =
+                    resp.has_scrypt_salt() ? QString::fromStdString(resp.scrypt_salt()) : passwordSalt;
+                key = PasswordHasher::deriveKey(password, QByteArray::fromBase64(scryptSalt.toUtf8()), n, r, p);
+                if (key.isEmpty()) {
+                    emit loginError(Response::RespClientUpdateRequired, tr(LOGIN_ABORT_VERIFIER_NOT_DERIVED), 0, {});
+                    return;
+                }
+                derivedVerifier =
+                    QString("$scrypt$%1$%2$%3$%4$%5").arg(n).arg(r).arg(p).arg(scryptSalt).arg(QString(key.toBase64()));
+            } else if (!storedVerifier.isEmpty()) {
+                const PasswordVerifier verifier = PasswordHasher::parsePasswordVerifier(storedVerifier);
+                if (!verifier.isValid) {
+                    emit loginError(Response::RespClientUpdateRequired, tr(LOGIN_ABORT_STORED_VERIFIER_UNUSABLE), 0,
+                                    {});
+                    return;
+                }
+                key = verifier.verifier;
+            } else {
+                emit loginError(Response::RespLoginNeeded, {}, 0, {});
+                return;
+            }
+            passwordNeedsMigration = resp.needs_migration();
+            const QByteArray responseBytes = PasswordHasher::computeResponse(key, nonce);
+            hashedPassword = "$challenge$" + QString(nonce.toBase64()) + "$" + QString(responseBytes.toBase64());
+            doHashedLogin();
         } else {
             hashedPassword = PasswordHasher::computeHash(password, passwordSalt);
             doHashedLogin();
@@ -293,6 +448,14 @@ void RemoteClient::loginResponse(const Response &response)
     if (response.response_code() == Response::RespOk) {
         setStatus(StatusLoggedIn);
         emit userInfoChanged(resp.user_info());
+
+        if (passwordNeedsMigration) {
+            // The account still used the legacy password format; upgrade it to scrypt.
+            doSubmitPasswordVerifier();
+        } else if (!derivedVerifier.isEmpty()) {
+            emit sigPasswordVerifierReady(derivedVerifier);
+            derivedVerifier.clear();
+        }
 
         QList<ServerInfo_User> buddyList;
         for (int i = resp.buddy_list_size() - 1; i >= 0; --i) {
@@ -319,8 +482,19 @@ void RemoteClient::loginResponse(const Response &response)
                 missingFeatures << QString::fromStdString(resp.missing_features(i));
             }
         }
-        emit loginError(response.response_code(), QString::fromStdString(resp.denied_reason_str()),
-                        static_cast<quint32>(resp.denied_end_time()), missingFeatures);
+
+        QString reasonStr = QString::fromStdString(resp.denied_reason_str());
+        // A strict server reports a login that carried no credential as a missing feature,
+        // because challenge-response needs one. No client update can supply a password, so
+        // report it like the other local aborts instead of advising an update.
+        if (response.response_code() == Response::RespClientUpdateRequired && missingFeatures.size() == 1 &&
+            missingFeatures.first() == "challenge_response_auth" && password.isEmpty() && storedVerifier.isEmpty()) {
+            missingFeatures.clear();
+            reasonStr = tr(LOGIN_ABORT_PASSWORD_MISSING);
+        }
+
+        emit loginError(response.response_code(), reasonStr, static_cast<quint32>(resp.denied_end_time()),
+                        missingFeatures);
         setStatus(StatusDisconnecting);
     }
 }
@@ -369,9 +543,15 @@ void RemoteClient::readData()
 
     inputBuffer.append(data);
 
-    do {
+    // Parse messages straight out of inputBuffer at readOffset. Removing each
+    // consumed message from the front of the buffer would memmove all of the
+    // remaining bytes once per message; instead the consumed prefix is dropped
+    // once parsing stops.
+    qsizetype readOffset = 0;
+
+    while (true) {
         if (!messageInProgress) {
-            if (inputBuffer.size() >= 4) {
+            if (inputBuffer.size() - readOffset >= 4) {
                 // dirty hack to be compatible with v14 server that sends 60 bytes of garbage at the beginning
                 if (!handshakeStarted) {
                     handshakeStarted = true;
@@ -381,29 +561,30 @@ void RemoteClient::readData()
                     }
                 } else {
                     // end of hack
-                    messageLength = (((quint32)(unsigned char)inputBuffer[0]) << 24) +
-                                    (((quint32)(unsigned char)inputBuffer[1]) << 16) +
-                                    (((quint32)(unsigned char)inputBuffer[2]) << 8) +
-                                    ((quint32)(unsigned char)inputBuffer[3]);
-                    inputBuffer.remove(0, 4);
+                    const auto *header = reinterpret_cast<const unsigned char *>(inputBuffer.constData() + readOffset);
+                    messageLength = (static_cast<quint32>(header[0]) << 24) + (static_cast<quint32>(header[1]) << 16) +
+                                    (static_cast<quint32>(header[2]) << 8) + static_cast<quint32>(header[3]);
+                    readOffset += 4;
                     messageInProgress = true;
                 }
             } else {
-                return;
+                break;
             }
         }
-        if (inputBuffer.size() < messageLength) {
-            return;
+        if (inputBuffer.size() - readOffset < messageLength) {
+            break;
         }
 
         ServerMessage newServerMessage;
-        bool ok = newServerMessage.ParseFromArray(inputBuffer.data(), messageLength);
+        bool ok = newServerMessage.ParseFromArray(inputBuffer.constData() + readOffset, messageLength);
 
-        inputBuffer.remove(0, messageLength);
+        readOffset += messageLength;
         messageInProgress = false;
 
         if (ok) {
-            qCDebug(RemoteClientLog).noquote() << "IN" << getSafeDebugString(newServerMessage);
+            if (RemoteClientLog().isDebugEnabled()) {
+                qCDebug(RemoteClientLog).noquote() << "IN" << getSafeDebugString(newServerMessage);
+            }
 
             processProtocolItem(newServerMessage);
         } else {
@@ -413,7 +594,12 @@ void RemoteClient::readData()
         if (getStatus() == StatusDisconnecting) { // use thread-safe getter
             doDisconnectFromServer();
         }
-    } while (!inputBuffer.isEmpty());
+    }
+
+    // Drop the consumed prefix once, instead of shifting the buffer per message.
+    if (readOffset > 0) {
+        inputBuffer.remove(0, readOffset);
+    }
 }
 
 void RemoteClient::websocketMessageReceived(const QByteArray &message)
@@ -421,7 +607,9 @@ void RemoteClient::websocketMessageReceived(const QByteArray &message)
     lastDataReceived = timeRunning;
     ServerMessage newServerMessage;
     if (newServerMessage.ParseFromArray(message.data(), message.length())) {
-        qCDebug(RemoteClientLog).noquote() << "IN" << getSafeDebugString(newServerMessage);
+        if (RemoteClientLog().isDebugEnabled()) {
+            qCDebug(RemoteClientLog).noquote() << "IN" << getSafeDebugString(newServerMessage);
+        }
 
         processProtocolItem(newServerMessage);
     } else {
@@ -437,7 +625,9 @@ void RemoteClient::sendCommandContainer(const CommandContainer &cont)
     auto size = static_cast<unsigned int>(cont.ByteSize());
 #endif
 
-    qCDebug(RemoteClientLog).noquote() << "OUT" << getSafeDebugString(cont);
+    if (RemoteClientLog().isDebugEnabled()) {
+        qCDebug(RemoteClientLog).noquote() << "OUT" << getSafeDebugString(cont);
+    }
 
     QByteArray buf;
     bool ok;
@@ -550,6 +740,8 @@ void RemoteClient::doDisconnectFromServer()
         websocket->close();
     }
     socket->close();
+    derivedVerifier.clear();
+    pendingVerifier.clear();
 }
 
 void RemoteClient::ping()
@@ -559,6 +751,15 @@ void RemoteClient::ping()
         PendingCommand *pend = i.next().value();
         if (pend->tick() > maxTimeout) {
             i.remove();
+            // Answer the command instead of dropping it silently: the connection may still
+            // be alive (other traffic keeps lastDataReceived fresh) while this single
+            // command stalled, and awaiters such as TabServer's room-join dedup can only
+            // release their in-flight markers when `finished` fires. A silent drop wedges
+            // them permanently - e.g. a room whose join timing never surfaces again.
+            Response response;
+            response.set_response_code(Response::RespNotConnected);
+            response.set_cmd_id(pend->getCommandContainer().cmd_id());
+            pend->processResponse(response);
             pend->deleteLater();
         }
     }
@@ -683,7 +884,7 @@ void RemoteClient::requestForgotPasswordResponse(const Response &response)
             emit sigPromptForForgotPasswordReset();
         }
     } else {
-        emit sigForgotPasswordError();
+        emit sigForgotPasswordError(response.response_code());
     }
 
     doDisconnectFromServer();
@@ -712,8 +913,14 @@ void RemoteClient::submitForgotPasswordResetResponse(const Response &response)
 {
     if (response.response_code() == Response::RespOk) {
         emit sigForgotPasswordSuccess();
+        // Persist only a real scrypt verifier; a legacy hash must not be stored under
+        // the password key, where it would break future challenge-response logins.
+        if (!derivedVerifier.isEmpty()) {
+            emit sigPasswordVerifierReady(derivedVerifier);
+            derivedVerifier.clear();
+        }
     } else {
-        emit sigForgotPasswordError();
+        emit sigForgotPasswordError(response.response_code());
     }
 
     doDisconnectFromServer();
@@ -748,7 +955,7 @@ void RemoteClient::submitForgotPasswordChallengeResponse(const Response &respons
     if (response.response_code() == Response::RespOk) {
         emit sigPromptForForgotPasswordReset();
     } else {
-        emit sigForgotPasswordError();
+        emit sigForgotPasswordError(response.response_code());
     }
 
     doDisconnectFromServer();

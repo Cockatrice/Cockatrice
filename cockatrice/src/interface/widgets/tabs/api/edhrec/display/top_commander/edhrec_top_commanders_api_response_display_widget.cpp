@@ -1,7 +1,20 @@
 #include "edhrec_top_commanders_api_response_display_widget.h"
 
+#include "../../api_response/cards/edhrec_api_response_card_container.h"
+#include "../../api_response/cards/edhrec_api_response_card_list.h"
 #include "../../api_response/top_commanders/edhrec_top_commanders_api_response.h"
 #include "../cards/edhrec_api_response_card_list_display_widget.h"
+
+#include <QDebug>
+#include <QHBoxLayout>
+#include <QList>
+#include <QResizeEvent>
+#include <QScrollArea>
+#include <QSize>
+#include <QVBoxLayout>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qlogging.h>
+#include <qnamespace.h>
 
 EdhrecTopCommandersApiResponseDisplayWidget::EdhrecTopCommandersApiResponseDisplayWidget(
     QWidget *parent,
@@ -21,10 +34,7 @@ EdhrecTopCommandersApiResponseDisplayWidget::EdhrecTopCommandersApiResponseDispl
     }
 
     // Create a QScrollArea to hold the card display widgets
-    scrollArea = new QScrollArea(this);
-    scrollArea->setWidgetResizable(true);
-    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scrollArea = QtUtils::makeScrollArea(this);
 
     // Set the cardDisplayLayout inside the scroll area
     auto scrollWidget = new QWidget(scrollArea);
@@ -38,9 +48,7 @@ void EdhrecTopCommandersApiResponseDisplayWidget::resizeEvent(QResizeEvent *even
 {
     QWidget::resizeEvent(event);
     qDebug() << event->size();
-    layout->invalidate();
-    layout->activate();
-    layout->update();
+    QtUtils::relayout(layout);
     if (scrollArea && scrollArea->widget()) {
         scrollArea->widget()->resize(event->size());
     }

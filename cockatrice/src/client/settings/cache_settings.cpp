@@ -2,15 +2,20 @@
 
 #include "../network/update/client/release_channel.h"
 #include "card_counter_settings.h"
+#include "libcockatrice/interfaces/interface_card_database_path_provider.h"
 #include "shortcuts_settings.h"
-#include "version_string.h"
 
+#include <QApplication>
 #include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QGlobalStatic>
+#include <QMessageLogger>
 #include <QSettings>
+#include <QSharedPointer>
 #include <QStandardPaths>
+#include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/cache_storage_settings.h>
 #include <libcockatrice/settings/card_database_settings.h>
@@ -110,6 +115,16 @@ SettingsCache::SettingsCache()
 
     settings = new QSettings(settingsPath + "global.ini", QSettings::IniFormat, this);
 
+    // Both migrations below overwrite per-domain files in place, so snapshot the whole settings
+    // folder first: global.ini is preserved as global.ini.old, but pre-existing per-domain files
+    // (and a re-migration after a downgrade) would otherwise have no way back.
+    if (SettingsMigration::isMigrationPending(settingsPath)) {
+        const QString backupPath = SettingsMigration::backupSettingsDirectory(settingsPath);
+        if (!backupPath.isEmpty()) {
+            qCInfo(SettingsCacheLog) << "[SettingsCache] Settings backed up before migration:" << backupPath;
+        }
+    }
+
     // Migrate from legacy NativeFormat settings to per-class INI files (runs at most once)
     if (!isPortableBuild) {
         SettingsMigration::migrateLegacySettings(settingsPath);
@@ -117,6 +132,10 @@ SettingsCache::SettingsCache()
 
     // Migrate settings from global.ini to per-class INI files (runs at most once)
     SettingsMigration::migrateSettingsFromGlobalIni(settingsPath);
+
+    // Repair gamefilters.ini keys renamed to camelCase by #7084 for profiles that migrated
+    // before that rename (idempotent, safe to run on every startup, portable builds included).
+    SettingsMigration::migrateGameFiltersToCamelCase(settingsPath);
 
     shortcutsSettings = new ShortcutsSettings(settingsPath, this);
     cardDatabaseSettings = new CardDatabaseSettings(settingsPath, this);

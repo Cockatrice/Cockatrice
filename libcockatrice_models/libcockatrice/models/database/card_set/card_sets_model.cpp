@@ -1,6 +1,20 @@
 #include "card_sets_model.h"
 
+#include "../../natural_sort_collator.h"
+#include "libcockatrice/card/database/card_database.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/interfaces/interface_card_set_priority_controller.h"
+
+#include <QAbstractItemModel>
+#include <QChar>
+#include <QDate>
+#include <QFlags>
+#include <QMultiMap>
+#include <QObject>
+#include <QSharedPointer>
 #include <QSortFilterProxyModel>
+#include <QVariant>
+#include <QVector>
 
 SetsModel::SetsModel(CardDatabase *_db, QObject *parent) : QAbstractTableModel(parent), sets(_db->getSetList())
 {
@@ -253,7 +267,7 @@ void SetsModel::save(CardDatabase *db)
         const bool enabled = enabledSets.contains(sets[i]);
         sets[i]->setSortKeyInMemory(sortKey);
         sets[i]->setEnabledInMemory(enabled);
-        saveData.append({sets[i]->getShortName(), sortKey, enabled});
+        saveData.append({sets[i]->getShortName(), sortKey, enabled, sets[i]->getIsKnown()});
     }
 
     db->getPriorityController()->saveSets(saveData);
@@ -283,7 +297,8 @@ QStringList SetsModel::mimeTypes() const
     return QStringList() << "application/x-cockatricecardset";
 }
 
-SetsDisplayModel::SetsDisplayModel(QObject *parent) : QSortFilterProxyModel(parent)
+SetsDisplayModel::SetsDisplayModel(QObject *parent)
+    : QSortFilterProxyModel(parent), collator(NaturalSort::makeNaturalSortCollator())
 {
     setFilterCaseSensitivity(Qt::CaseInsensitive);
     setSortCaseSensitivity(Qt::CaseInsensitive);
@@ -318,5 +333,5 @@ bool SetsDisplayModel::lessThan(const QModelIndex &left, const QModelIndex &righ
     QString leftString = sourceModel()->data(left, SetsModel::SortRole).toString();
     QString rightString = sourceModel()->data(right, SetsModel::SortRole).toString();
 
-    return QString::localeAwareCompare(leftString, rightString) < 0;
+    return collator.compare(leftString, rightString) < 0;
 }

@@ -1,15 +1,31 @@
 #include "edhrec_commander_api_response_display_widget.h"
 
-#include "../../../../../cards/card_info_picture_widget.h"
+#include "../../api_response/cards/edhrec_api_response_card_container.h"
+#include "../../api_response/cards/edhrec_api_response_card_list.h"
 #include "../../api_response/commander/edhrec_commander_api_response.h"
 #include "../cards/edhrec_api_response_card_list_display_widget.h"
 #include "edhrec_api_response_commander_details_display_widget.h"
 
+#include <QAbstractItemView>
+#include <QDebug>
+#include <QHBoxLayout>
+#include <QLayoutItem>
+#include <QList>
 #include <QListView>
+#include <QModelIndex>
+#include <QObject>
 #include <QResizeEvent>
 #include <QScrollArea>
+#include <QSize>
 #include <QSplitter>
+#include <QStringList>
 #include <QStringListModel>
+#include <QVBoxLayout>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qlogging.h>
+#include <qnamespace.h>
+
+class QModelIndex;
 
 EdhrecCommanderApiResponseDisplayWidget::EdhrecCommanderApiResponseDisplayWidget(QWidget *parent,
                                                                                  EdhrecCommanderApiResponse response,
@@ -46,10 +62,7 @@ EdhrecCommanderApiResponseDisplayWidget::EdhrecCommanderApiResponseDisplayWidget
     }
 
     // Create a QScrollArea to hold the card display widgets
-    scrollArea = new QScrollArea(splitter);
-    scrollArea->setWidgetResizable(true);
-    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scrollArea = QtUtils::makeScrollArea(splitter);
 
     // Set the cardDisplayLayout inside the scroll area
     auto scrollWidget = new QWidget(scrollArea);
@@ -94,9 +107,7 @@ void EdhrecCommanderApiResponseDisplayWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
     qDebug() << event->size();
-    layout->invalidate();
-    layout->activate();
-    layout->update();
+    QtUtils::relayout(layout);
     if (scrollArea && scrollArea->widget()) {
         scrollArea->widget()->resize(event->size());
     }

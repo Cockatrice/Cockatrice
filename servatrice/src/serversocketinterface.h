@@ -20,52 +20,97 @@
 #ifndef SERVERSOCKETINTERFACE_H
 #define SERVERSOCKETINTERFACE_H
 
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/server_message.pb.h"
+
+#include <QAbstractSocket>
+#include <QByteArray>
 #include <QHostAddress>
+#include <QList>
 #include <QMutex>
+#include <QString>
+#include <QStringList>
 #include <QTcpSocket>
 #include <QWebSocket>
-#include <libcockatrice/protocol/pb/command_get_server_stats.pb.h>
-#include <libcockatrice/protocol/pb/command_replay_download_by_game_id.pb.h>
-#include <libcockatrice/protocol/pb/command_report.pb.h>
-#include <libcockatrice/protocol/pb/command_report_add_comment.pb.h>
-#include <libcockatrice/protocol/pb/command_report_assign.pb.h>
-#include <libcockatrice/protocol/pb/command_report_details.pb.h>
-#include <libcockatrice/protocol/pb/command_report_list.pb.h>
-#include <libcockatrice/protocol/pb/command_report_my_list.pb.h>
-#include <libcockatrice/protocol/pb/command_report_resolve.pb.h>
-#include <libcockatrice/protocol/pb/command_report_stats.pb.h>
-#include <libcockatrice/protocol/pb/command_report_user_info.pb.h>
+#include <QtGlobal>
+#include <qtmetamacros.h>
 #include <server_protocolhandler.h>
 
 class Servatrice;
 class Servatrice_DatabaseInterface;
 class DeckList;
 class ServerInfo_DeckStorage_Folder;
-
 class Command_AddToList;
 class Command_RemoveFromList;
 class Command_DeckList;
+class Command_DeckListOtherUser;
 class Command_DeckNewDir;
 class Command_DeckDelDir;
 class Command_DeckDel;
 class Command_DeckDownload;
+class Command_DeckDownloadPublic;
 class Command_DeckUpload;
+class Command_DeckSetVisibility;
+class Command_DeckShareCreate;
+class Command_DeckShareList;
+class Command_DeckShareListMine;
+class Command_DeckShareRemove;
+class Command_DeckShareDownload;
 class Command_ReplayList;
 class Command_ReplayDownload;
 class Command_ReplayModifyMatch;
 class Command_ReplayDeleteMatch;
 class Command_ReplayGetCode;
 class Command_ReplaySubmitCode;
-
 class Command_BanFromServer;
 class Command_UpdateServerMessage;
 class Command_ShutdownServer;
 class Command_ReloadConfig;
 class Command_ReplayDownloadByGameId;
-
 class Command_AccountEdit;
 class Command_AccountImage;
 class Command_AccountPassword;
+class Command_Activate;
+class Command_AddCardArtRule;
+class Command_AdjustMod;
+class Command_ClearBlacklistedBanners;
+class Command_ForceActivateUser;
+class Command_ForgotPasswordChallenge;
+class Command_ForgotPasswordRequest;
+class Command_ForgotPasswordReset;
+class Command_GetAdminNotes;
+class Command_GetBanHistory;
+class Command_GetModeratorLastLogins;
+class Command_GetServerStats;
+class Command_GetUserAlts;
+class Command_GetUserSessions;
+class Command_GetWarnHistory;
+class Command_GetWarnList;
+class Command_GrantReplayAccess;
+class Command_ListCardArtRules;
+class Command_Register;
+class Command_RemoveCardArtRule;
+class Command_RemoveUserAvatar;
+class Command_RemoveUserBanner;
+class Command_Report;
+class Command_ReportAddComment;
+class Command_ReportAssign;
+class Command_ReportDetails;
+class Command_ReportList;
+class Command_ReportMyList;
+class Command_ReportReopen;
+class Command_ReportResolve;
+class Command_ReportStats;
+class Command_ReportUserInfo;
+class Command_RequestPasswordSalt;
+class Command_ResetUserPassword;
+class Command_SetCardArtParams;
+class Command_SubmitPasswordVerifier;
+class Command_UpdateAdminNotes;
+class Command_ViewLogHistory;
+class Command_WarnUser;
+class QObject;
+class ResponseContainer;
 
 class AbstractServerSocketInterface : public Server_ProtocolHandler
 {
@@ -80,8 +125,10 @@ signals:
 
 protected:
     void logDebugMessage(const QString &message) override;
+    [[nodiscard]] bool logsDebugMessages() const override;
     bool tooManyRegistrationAttempts(const QString &ipAddress);
     void processCommandContainer(const CommandContainer &cont) override;
+    bool acceptsCredentialFormat(bool passwordNeedsHash, const QString &password) const;
 
     virtual void writeToSocket(QByteArray &data) = 0;
     virtual void flushSocket() = 0;
@@ -97,8 +144,16 @@ private:
     Response::ResponseCode cmdRemoveFromList(const Command_RemoveFromList &cmd, ResponseContainer &rc);
     int getDeckPathId(int basePathId, QStringList path);
     int getDeckPathId(const QString &path);
-    bool deckListHelper(int folderId, ServerInfo_DeckStorage_Folder *folder);
+    bool deckListHelper(int folderId,
+                        ServerInfo_DeckStorage_Folder *folder,
+                        int userId,
+                        bool inheritedPublic,
+                        bool publicOnly);
+    int getDeckOwnerId(int deckId);
+    bool isDeckEffectivelyPublic(int deckId);
     Response::ResponseCode cmdDeckList(const Command_DeckList &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckListOtherUser(const Command_DeckListOtherUser &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckSetVisibility(const Command_DeckSetVisibility &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckNewDir(const Command_DeckNewDir &cmd, ResponseContainer &rc);
     void deckDelDirHelper(int basePathId);
     void sendServerMessage(const QString userName, const QString message);
@@ -107,6 +162,12 @@ private:
     Response::ResponseCode cmdDeckUpload(const Command_DeckUpload &cmd, ResponseContainer &rc);
     DeckList *getDeckFromDatabase(int deckId);
     Response::ResponseCode cmdDeckDownload(const Command_DeckDownload &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckDownloadPublic(const Command_DeckDownloadPublic &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckShareCreate(const Command_DeckShareCreate &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckShareList(const Command_DeckShareList &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckShareListMine(const Command_DeckShareListMine &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckShareRemove(const Command_DeckShareRemove &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckShareDownload(const Command_DeckShareDownload &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReplayList(const Command_ReplayList &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReplayDownload(const Command_ReplayDownload &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReplayModifyMatch(const Command_ReplayModifyMatch &cmd, ResponseContainer &rc);
@@ -126,6 +187,7 @@ private:
     Response::ResponseCode cmdUpdateServerMessage(const Command_UpdateServerMessage &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReportAssign(const Command_ReportAssign &cmd, ResponseContainer &);
     Response::ResponseCode cmdReportResolve(const Command_ReportResolve &cmd, ResponseContainer &);
+    Response::ResponseCode cmdReportReopen(const Command_ReportReopen &cmd, ResponseContainer &);
     Response::ResponseCode cmdReportUserInfo(const Command_ReportUserInfo &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReportStats(const Command_ReportStats &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdRegisterAccount(const Command_Register &cmd, ResponseContainer &rc);
@@ -148,6 +210,7 @@ private:
     Response::ResponseCode cmdReportDetails(const Command_ReportDetails &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReportAddComment(const Command_ReportAddComment &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReplayDownloadByGameId(const Command_ReplayDownloadByGameId &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdSubmitPasswordVerifier(const Command_SubmitPasswordVerifier &cmd, ResponseContainer &rc);
     Response::ResponseCode
     processExtendedSessionCommand(int cmdType, const SessionCommand &cmd, ResponseContainer &rc) override;
     Response::ResponseCode
@@ -159,7 +222,6 @@ private:
 
     Response::ResponseCode cmdAccountEdit(const Command_AccountEdit &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdAccountImage(const Command_AccountImage &cmd, ResponseContainer &rc);
-    bool isCardNameAllowed(const QString &cardName, const QString &cardProviderId);
     Response::ResponseCode cmdSetCardArtParams(const Command_SetCardArtParams &cmd, ResponseContainer &);
     Response::ResponseCode cmdAddCardArtRule(const Command_AddCardArtRule &cmd, ResponseContainer &);
     Response::ResponseCode cmdRemoveCardArtRule(const Command_RemoveCardArtRule &cmd, ResponseContainer &);
@@ -176,6 +238,9 @@ private:
     Response::ResponseCode cmdGetModeratorLastLogins(const Command_GetModeratorLastLogins &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdResetUserPassword(const Command_ResetUserPassword &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdRemoveUserAvatar(const Command_RemoveUserAvatar &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdRemoveUserBanner(const Command_RemoveUserBanner &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdClearBlacklistedBanners(const Command_ClearBlacklistedBanners &cmd,
+                                                      ResponseContainer &rc);
 
     Response::ResponseCode cmdGetServerStats(const Command_GetServerStats &cmd, ResponseContainer &rc);
 

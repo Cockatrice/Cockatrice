@@ -2,14 +2,22 @@
 
 #include "settings_search_model.h"
 
+#include <QChar>
 #include <QCheckBox>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QLabel>
+#include <QLatin1Char>
 #include <QLayout>
+#include <QLayoutItem>
 #include <QLineEdit>
+#include <QObject>
 #include <QPair>
 #include <QSpinBox>
+#include <QString>
+#include <QStringList>
+#include <QTextDocument>
+#include <utility>
 
 /**
  * @brief Recursively collects all widgets within a layout
@@ -127,6 +135,30 @@ static QString buildFullSearchText(const QString &groupTitle, const QString &cle
 QList<SettingsSearchEntry> AbstractSettingsPage::getSearchEntries()
 {
     return autoDetectSearchEntries(this, -1);
+}
+
+QList<SettingsPageSection> AbstractSettingsPage::getSections()
+{
+    QList<SettingsPageSection> sections;
+
+    // Walk the top-level layout in display order (creation order differs on some pages)
+    if (QLayout *mainLayout = layout()) {
+        for (int i = 0; i < mainLayout->count(); ++i) {
+            QLayoutItem *item = mainLayout->itemAt(i);
+            QWidget *widget = item ? item->widget() : nullptr;
+            auto *groupBox = qobject_cast<QGroupBox *>(widget);
+            if (!groupBox || groupBox->title().isEmpty()) {
+                continue;
+            }
+            sections.append({groupBox->title(), groupBox});
+        }
+    }
+
+    // A single group is the page itself; sub-page entries would only duplicate it
+    if (sections.size() < 2) {
+        sections.clear();
+    }
+    return sections;
 }
 
 QList<SettingsSearchEntry> AbstractSettingsPage::autoDetectSearchEntries(QWidget *page, int pageIndex)

@@ -1,19 +1,31 @@
 #include "deck_stats_interface.h"
 
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
+
+#include <QByteArray>
 #include <QDesktopServices>
 #include <QMessageBox>
+#include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QSharedPointer>
+#include <QString>
+#include <QUrl>
 #include <QUrlQuery>
+#include <functional>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/tree/deck_list_card_node.h>
+#include <libcockatrice/network/network_manager.h>
 #include <version_string.h>
 
 DeckStatsInterface::DeckStatsInterface(QObject *parent) : QObject(parent)
 {
-    manager = new QNetworkAccessManager(this);
+    manager = NetworkManagerFactory::create(this);
     connect(manager, &QNetworkAccessManager::finished, this, &DeckStatsInterface::queryFinished);
 }
 

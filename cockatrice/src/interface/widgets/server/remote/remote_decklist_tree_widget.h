@@ -8,13 +8,23 @@
 #ifndef REMOTEDECKLIST_TREEWIDGET_H
 #define REMOTEDECKLIST_TREEWIDGET_H
 
+#include <QAbstractItemModel>
 #include <QDateTime>
+#include <QIcon>
+#include <QList>
+#include <QModelIndex>
+#include <QString>
+#include <QStringList>
 #include <QTreeView>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
 
 class Response;
 class AbstractClient;
 class QSortFilterProxyModel;
 class ServerInfo_DeckStorage_TreeItem;
+class QObject;
+class QWidget;
 
 class RemoteDeckList_TreeModel : public QAbstractItemModel
 {
@@ -22,14 +32,17 @@ class RemoteDeckList_TreeModel : public QAbstractItemModel
 public:
     class DirectoryNode;
     class FileNode;
+
     class Node
     {
     protected:
         DirectoryNode *parent;
         QString name;
+        bool publicFlag;
 
     public:
-        explicit Node(const QString &_name, DirectoryNode *_parent = nullptr) : parent(_parent), name(_name)
+        explicit Node(const QString &_name, DirectoryNode *_parent = nullptr)
+            : parent(_parent), name(_name), publicFlag(false)
         {
         }
         virtual ~Node() = default;
@@ -40,6 +53,14 @@ public:
         [[nodiscard]] QString getName() const
         {
             return name;
+        }
+        [[nodiscard]] bool isPublic() const
+        {
+            return publicFlag;
+        }
+        void setIsPublic(bool _public)
+        {
+            publicFlag = _public;
         }
     };
     class DirectoryNode : public Node, public QList<Node *>
@@ -59,9 +80,14 @@ public:
         QDateTime uploadTime;
 
     public:
-        FileNode(const QString &_name, int _id, const QDateTime &_uploadTime, DirectoryNode *_parent = nullptr)
+        FileNode(const QString &_name,
+                 int _id,
+                 const QDateTime &_uploadTime,
+                 DirectoryNode *_parent = nullptr,
+                 bool _isPublic = false)
             : Node(_name, _parent), id(_id), uploadTime(_uploadTime)
         {
+            setIsPublic(_isPublic);
         }
         [[nodiscard]] int getId() const
         {
@@ -109,6 +135,11 @@ public:
     {
         return root;
     }
+    /**
+     * @brief Whether a node is visible to other users (own flag or inherited
+     * from any ancestor folder).
+     */
+    [[nodiscard]] bool isEffectivelyPublic(const Node *node) const;
     void addFileToTree(const ServerInfo_DeckStorage_TreeItem &file, DirectoryNode *parent);
     void addFolderToTree(const ServerInfo_DeckStorage_TreeItem &folder, DirectoryNode *parent);
     DirectoryNode *addNamedFolderToTree(const QString &name, DirectoryNode *parent);

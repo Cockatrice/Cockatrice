@@ -2,17 +2,22 @@
 #define COCKATRICE_REMOTE_CONNECTION_CONTROLLER_H
 
 #include "abstract_client.h"
+#include "latency_tracker.h"
 
 #include <QMessageBox>
 #include <QObject>
 #include <QString>
-#include <QThread>
-#include <libcockatrice/protocol/pb/event_connection_closed.pb.h>
-#include <libcockatrice/protocol/pb/event_server_shutdown.pb.h>
+#include <QtGlobal>
+#include <qtmetamacros.h>
 
 class RemoteClient;
 class ServerInfo_User;
 class DlgConnect;
+class Event_ConnectionClosed;
+class Event_ServerShutdown;
+class QThread;
+class QWidget;
+template <typename T> class QList;
 
 /**
  * Owns the RemoteClient and its worker thread.
@@ -35,8 +40,13 @@ public:
     void registerToServer();
     void forgotPasswordRequest();
     void connectToServer();
-    void
-    connectToServerDirect(const QString &host, unsigned int port, const QString &playerName, const QString &password);
+    void connectToServerDirect(const QString &host,
+                               unsigned int port,
+                               const QString &playerName,
+                               const QString &password,
+                               const QString &storedVerifier = QString(),
+                               const QString &saveName = QString(),
+                               bool savePassword = false);
     void disconnectFromServer();
 
     void refreshWindowTitle()
@@ -77,9 +87,12 @@ private slots:
 
     // Forgot-password flow
     void onForgotPasswordSuccess();
-    void onForgotPasswordError();
+    void onForgotPasswordError(int responseCode);
     void onPromptForgotPasswordReset();
     void onPromptForgotPasswordChallenge();
+
+    // Persists the derived scrypt verifier after a successful challenge-response login
+    void onPasswordVerifierReady(const QString &verifier);
 
 private:
     void wireClientSignals();
@@ -97,6 +110,10 @@ private:
 
     // Kept as a member so the forgot-password signal can be wired to it
     DlgConnect *dlgConnect{nullptr};
+
+    // Captured from the connect dialog when a connection is initiated
+    QString pendingSaveName;
+    bool pendingSavePassword{false};
 };
 
 #endif // COCKATRICE_REMOTE_CONNECTION_CONTROLLER_H

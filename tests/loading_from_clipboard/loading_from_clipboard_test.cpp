@@ -1,5 +1,11 @@
 #include "clipboard_testing.h"
 
+#include <QList>
+#include <QString>
+#include <gtest/gtest.h>
+#include <string>
+#include <utility>
+
 // Testing is done by using the DeckList::loadFromString_Plain function in common/decklist.h
 // It does not check if cards are in the database at all, so no comparisons to the database will be made.
 
@@ -71,6 +77,20 @@ TEST(LoadingFromClipboardTest, WeirdWhitespaceIsIgnored)
                   {{"Our Market Research Shows That Players Like Really Long Card Names So We Made This Card to Have "
                     "the Absolute Longest Card Name Ever Elemental",
                     1}});
+    testDeck(clipboard, result);
+}
+
+TEST(LoadingFromClipboardTest, TabSeparatedImport)
+{
+    QString clipboard("2\tMystic Snake\tStreets of New Capenna\n"
+                      "3x\tCounterspell\tNPH\n"
+                      "\t2\tSol Ring\tFMB\n"
+                      "1\tForest\n"
+                      "\n"
+                      "2x\tDoom Blade\tM11\n");
+
+    Result result("", "", {{"Mystic Snake", 2}, {"Counterspell", 3}, {"Sol Ring", 2}, {"Forest", 1}},
+                  {{"Doom Blade", 2}});
     testDeck(clipboard, result);
 }
 

@@ -1,16 +1,28 @@
 #ifndef COCKATRICE_DLG_CARD_ART_RULES_H
 #define COCKATRICE_DLG_CARD_ART_RULES_H
 
-#include "card/card_search_model.h"
-#include "tab_supervisor.h"
+#include "tab.h"
 
 #include <QAbstractTableModel>
-#include <QComboBox>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QTableView>
+#include <QModelIndex>
+#include <QString>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
+#include <vector>
 
 class AbstractClient;
+class CardCompleterProxyModel;
+class CardDatabaseDisplayModel;
+class CardDatabaseModel;
+class CardSearchModel;
+class QComboBox;
+class QCompleter;
+class QLineEdit;
+class QObject;
+class QPushButton;
+class QTableView;
+class Response;
+class TabSupervisor;
 
 class CardArtRulesModel : public QAbstractTableModel
 {
@@ -66,6 +78,8 @@ private slots:
     void addRule();
     void removeSelected();
     void refresh();
+    void clearBlacklistedBanners();
+    void clearBlacklistedBannersResponse(const Response &r);
 
 private:
     AbstractClient *client;
@@ -85,6 +99,7 @@ private:
     QPushButton *addBtn;
     QPushButton *removeBtn;
     QPushButton *refreshBtn;
+    QPushButton *clearBannedArtBtn;
 
     QTableView *table;
     CardArtRulesModel *tableModel;

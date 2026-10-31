@@ -10,8 +10,11 @@
 #include "abstract_player_component.h"
 
 #include <QMenu>
+#include <QString>
+#include <qtmetamacros.h>
 
 class PlayerGraphicsItem;
+
 class CustomZoneMenu : public QMenu, public AbstractPlayerComponent
 {
     Q_OBJECT

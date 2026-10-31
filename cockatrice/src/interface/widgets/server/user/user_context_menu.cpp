@@ -1,20 +1,42 @@
 #include "user_context_menu.h"
 
+#include "../../../../game/abstract_game.h"
+#include "../../../../game/game_event_handler.h"
+#include "../../../../game/game_meta_info.h"
 #include "../../dialogs/dlg_report_user.h"
-#include "../../interface/widgets/tabs/tab_account.h"
-#include "../../interface/widgets/tabs/tab_game.h"
 #include "../../interface/widgets/tabs/tab_supervisor.h"
 #include "../chat_view/chat_view.h"
+#include "../game_link.h"
 #include "../game_selector.h"
+#include "../game_type_map.h"
+#include "libcockatrice/protocol/pb/admin_commands.pb.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_ban.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_gametype.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_room.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_warning.pb.h"
 #include "user_info_box.h"
+#include "user_level.h"
 #include "user_list_dialog.h"
 #include "user_list_manager.h"
 #include "user_list_proxy.h"
 
 #include <QAction>
+#include <QClipboard>
+#include <QCursor>
+#include <QDialog>
+#include <QFlags>
+#include <QGuiApplication>
+#include <QHeaderView>
+#include <QMap>
 #include <QMenu>
-#include <QtGui>
-#include <QtWidgets>
+#include <QMessageBox>
+#include <QSharedPointer>
+#include <QSizePolicy>
+#include <QTableWidget>
+#include <QTableWidgetItem>
+#include <QWidget>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_kick_from_game.pb.h>
 #include <libcockatrice/protocol/pb/commands.pb.h>
@@ -27,6 +49,11 @@
 #include <libcockatrice/protocol/pb/response_warn_list.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qnamespace.h>
+#include <string>
+
+class QVariant;
 
 UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *parent, AbstractGame *_game)
     : QObject(parent), client(_tabSupervisor->getClient()), tabSupervisor(_tabSupervisor),
@@ -37,6 +64,7 @@ UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *parent,
     aDetails = new QAction(QString(), this);
     aChat = new QAction(QString(), this);
     aShowGames = new QAction(QString(), this);
+    aViewPublicDecks = new QAction(QString(), this);
     aAddToBuddyList = new QAction(QString(), this);
     aRemoveFromBuddyList = new QAction(QString(), this);
     aAddToIgnoreList = new QAction(QString(), this);
@@ -64,6 +92,7 @@ void UserContextMenu::retranslateUi()
     aDetails->setText(tr("User &details"));
     aChat->setText(tr("Private &chat"));
     aShowGames->setText(tr("Show this user's &games"));
+    aViewPublicDecks->setText(tr("View this user's &public decks"));
     aAddToBuddyList->setText(tr("Add to &buddy list"));
     aRemoveFromBuddyList->setText(tr("Remove from &buddy list"));
     aAddToIgnoreList->setText(tr("Add to &ignore list"));
@@ -376,6 +405,9 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
     }
     menu->addAction(aDetails);
     menu->addAction(aShowGames);
+    if (userLevel.testFlag(ServerInfo_User::IsRegistered)) {
+        menu->addAction(aViewPublicDecks);
+    }
     menu->addAction(aChat);
     const QList<GameInviteOption> inviteOptions = inviteOptionsForUser(userName);
     if (!inviteOptions.isEmpty()) {
@@ -455,6 +487,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
     aChat->setEnabled(anotherUser && online && !userListProxy->isUserIgnored(userName));
     aShowGames->setEnabled(online);
     aReport->setEnabled(anotherUser);
+    aViewPublicDecks->setEnabled(anotherUser);
     aAddToBuddyList->setEnabled(anotherUser);
     aRemoveFromBuddyList->setEnabled(anotherUser);
     aAddToIgnoreList->setEnabled(anotherUser);
@@ -481,6 +514,8 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         execChat(userName);
     } else if (actionClicked == aShowGames) {
         execShowGames(userName);
+    } else if (actionClicked == aViewPublicDecks) {
+        execViewPublicDecks(userName);
     } else if (actionClicked == aAddToBuddyList) {
         execAddToBuddy(userName);
     } else if (actionClicked == aRemoveFromBuddyList) {
@@ -604,6 +639,11 @@ void UserContextMenu::execShowGames(const QString &userName)
     client->sendCommand(pend);
 }
 
+void UserContextMenu::execViewPublicDecks(const QString &userName)
+{
+    tabSupervisor->openTabPublicDecks(userName);
+}
+
 void UserContextMenu::execAddToBuddy(const QString &userName)
 {
     Command_AddToList cmd;
@@ -646,10 +686,8 @@ void UserContextMenu::execRemoveFromIgnore(const QString &userName)
 
 void UserContextMenu::execKick(int playerId)
 {
-    auto result = QMessageBox::question(static_cast<QWidget *>(parent()), tr("Kick Player"),
-                                        tr("Are you sure you want to kick this player from the game?"),
-                                        QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-    if (result == QMessageBox::Yes) {
+    if (QtUtils::confirm(static_cast<QWidget *>(parent()), tr("Kick Player"),
+                         tr("Are you sure you want to kick this player from the game?"), QMessageBox::No)) {
         Command_KickFromGame cmd;
         cmd.set_player_id(playerId);
 

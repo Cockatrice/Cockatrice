@@ -9,6 +9,7 @@
 
 #include <QModelIndex>
 #include <QObject>
+#include <qtmetamacros.h>
 
 class CardInfoPictureEnlargedWidget;
 class QCompleter;
@@ -51,8 +52,10 @@ private:
     void stopPreviewFade();
     void reposition();
 
+    void applyPopupWidth();
     void updateOrientation();
     void ensureClosestSelected();
+    void selectWithoutRewrite(const QModelIndex &index);
 
     bool handlePopupKeyPress(QKeyEvent *event);
     bool isPopupAboveWidget() const;

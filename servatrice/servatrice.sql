@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   PRIMARY KEY  (`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
-INSERT INTO cockatrice_schema_version VALUES(36);
+INSERT INTO cockatrice_schema_version VALUES(40);
 
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
@@ -31,7 +31,9 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `admin` tinyint(1) NOT NULL,
   `name` varchar(35) NOT NULL,
   `realname` varchar(255) NOT NULL,
-  `password_sha512` char(120) NOT NULL,
+  `password_sha512` varchar(255) NOT NULL,
+  `password_legacy_backup` varchar(255) NOT NULL DEFAULT '',
+  `password_legacy_backup_used_at` datetime DEFAULT NULL,
   `email` varchar(255) NOT NULL,
   `country` char(2) NOT NULL,
   `avatar_bmp` mediumblob NOT NULL,
@@ -66,9 +68,48 @@ CREATE TABLE IF NOT EXISTS `cockatrice_decklist_files` (
   `name` varchar(50) NOT NULL,
   `upload_time` datetime NOT NULL,
   `content` text NOT NULL,
+  `is_public` tinyint(1) NOT NULL DEFAULT 0,
+  `banner_card_name` varchar(255) NULL,
+  `banner_card_provider` varchar(32) NULL,
+  `color_identity` varchar(5) NULL,
+  `tags` text NULL,
   PRIMARY KEY  (`id`),
   KEY `FolderPlusUser` (`id_folder`,`id_user`),
   FOREIGN KEY(`id_user`) REFERENCES `cockatrice_users`(`id`)  ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
+
+-- Temporary deck shares: a named bundle of decks that can be fetched by
+-- anyone who knows the (unguessable) token, until the share expires.
+CREATE TABLE IF NOT EXISTS `cockatrice_deck_share` (
+  `id` int(7) unsigned zerofill NOT NULL auto_increment,
+  `token` varchar(64) COLLATE utf8mb4_bin NOT NULL,
+  `name` varchar(64) NOT NULL,
+  `created_by` int(7) unsigned NULL,
+  `created_at` datetime NOT NULL,
+  `expires_at` datetime NOT NULL,
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `token` (`token`),
+  KEY `expires_at` (`expires_at`),
+  FOREIGN KEY(`created_by`) REFERENCES `cockatrice_users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
+
+-- Individual decks inside a share bundle. Content is materialized at share
+-- time so expiring/deleting a share can cascade cleanly. The metadata columns
+-- are nullable because Qt's MySQL driver binds empty QStrings as NULL when
+-- using prepared statements.
+CREATE TABLE IF NOT EXISTS `cockatrice_deck_share_item` (
+  `id` int(7) unsigned zerofill NOT NULL auto_increment,
+  `share_id` int(7) unsigned zerofill NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `tags` text NULL,
+  `banner_card` varchar(255) NULL,
+  `game_format` varchar(50) NULL,
+  `color_identity` varchar(5) NULL,
+  `content` text NOT NULL,
+  `position` int(7) NOT NULL,
+  PRIMARY KEY  (`id`),
+  KEY `share_id` (`share_id`),
+  FOREIGN KEY(`share_id`) REFERENCES `cockatrice_deck_share`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_decklist_folders` (
@@ -76,6 +117,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_decklist_folders` (
   `id_parent` int(7) unsigned zerofill NOT NULL,
   `id_user` int(7) unsigned NULL,
   `name` varchar(30) NOT NULL,
+  `is_public` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY  (`id`),
   KEY `ParentPlusUser` (`id_parent`,`id_user`),
   FOREIGN KEY(`id_user`) REFERENCES `cockatrice_users`(`id`)  ON DELETE CASCADE ON UPDATE CASCADE
@@ -115,6 +157,18 @@ CREATE TABLE IF NOT EXISTS `cockatrice_rooms_gametypes` (
   `id_room` int(7) unsigned NOT NULL,
   `name` varchar(50) NOT NULL,
   `id_server` tinyint(3) NOT NULL DEFAULT 1,
+  FOREIGN KEY(`id_room`) REFERENCES `cockatrice_rooms`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `cockatrice_rooms_channels` (
+  `id_room` int(7) unsigned NOT NULL,
+  `id_server` tinyint(3) NOT NULL DEFAULT 1,
+  `channel_id` varchar(50) NOT NULL,
+  `display_name` varchar(50) NOT NULL,
+  `access_level` ENUM('public','registered','judge','moderator','admin','developer') NOT NULL DEFAULT 'public',
+  `write_access_level` ENUM('public','registered','judge','moderator','admin','developer') NULL DEFAULT NULL,
+  `banner_message` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id_room`, `id_server`, `channel_id`),
   FOREIGN KEY(`id_room`) REFERENCES `cockatrice_rooms`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
@@ -289,9 +343,10 @@ CREATE TABLE IF NOT EXISTS `cockatrice_log` (
   `sender_name` varchar(35) NOT NULL,
   `sender_ip` varchar(45) NOT NULL,
   `log_message` text NOT NULL,
-  `target_type` ENUM('room', 'game', 'chat'),
+  `target_type` ENUM('room', 'game', 'chat', 'room_channel'),
   `target_id` int(7) NULL,
   `target_name` varchar(50) NOT NULL,
+  `channel` varchar(50) NULL,
   KEY `sender_name` (`sender_name`),
   KEY `sender_ip` (`sender_ip`),
   KEY `target_id` (`target_id`),

@@ -4,6 +4,11 @@
 
 #include <QCoreApplication>
 #include <QList>
+#include <QSharedPointer>
+#include <QString>
+#include <QVariant>
+#include <QVariantList>
+#include <QtGlobal>
 #include <algorithm>
 
 static int sumPowers(const QList<CardItem *> &cards)

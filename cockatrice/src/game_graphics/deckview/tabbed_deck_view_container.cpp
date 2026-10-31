@@ -1,7 +1,15 @@
 #include "tabbed_deck_view_container.h"
 
-#include "../../interface/widgets/tabs/tab_game.h"
+#include "../board/abstract_card_item.h"
 #include "deck_view.h"
+#include "deck_view_container.h"
+
+#include <QSharedPointer>
+#include <QTabBar>
+#include <QWidget>
+
+class DeckList;
+class TabGame;
 
 TabbedDeckViewContainer::TabbedDeckViewContainer(int _playerId, TabGame *parent)
     : QTabWidget(nullptr), playerId(_playerId), parentGame(parent)

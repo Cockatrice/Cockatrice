@@ -1,16 +1,27 @@
 #include "card_picture_to_load.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
 
-#include <QCoreApplication>
 #include <QDate>
+#include <QDebug>
+#include <QMap>
+#include <QMessageLogger>
 #include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QRegularExpressionMatchIterator>
+#include <QSharedPointer>
 #include <QUrl>
+#include <QtGlobal>
 #include <algorithm>
+#include <functional>
 #include <libcockatrice/card/set/card_set_comparator.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/download_settings.h>
+#include <utility>
 
 CardPictureToLoad::CardPictureToLoad(const ExactCard &_card)
     : card(_card), urlTemplates(SettingsCache::instance().downloads().getAllURLs())
@@ -64,19 +75,20 @@ QList<CardSetPtr> CardPictureToLoad::extractSetsSorted(const ExactCard &card)
 //! \todo Check if going through all sets is still necessary after the ExactCard refactor.
 static PrintingInfo findPrintingForSet(const ExactCard &card, const QString &setName)
 {
-    SetToPrintingsMap setsToPrintings = card.getInfo().getSets();
+    const auto &setsToPrintings = card.getInfo().getSets();
 
-    if (!setsToPrintings.contains(setName)) {
+    const auto setPrintings = setsToPrintings.constFind(setName);
+    if (setPrintings == setsToPrintings.constEnd() || setPrintings.value().isEmpty()) {
         return PrintingInfo();
     }
 
-    for (const auto &printing : setsToPrintings[setName]) {
+    for (const auto &printing : setPrintings.value()) {
         if (printing.getUuid() == card.getPrinting().getUuid()) {
             return printing;
         }
     }
 
-    return setsToPrintings[setName][0];
+    return setPrintings.value().first();
 }
 
 void CardPictureToLoad::populateSetUrls()
@@ -94,8 +106,7 @@ void CardPictureToLoad::populateSetUrls()
         }
     }
 
-    const QStringList orderedTemplates = urlTemplates;
-    for (const QString &urlTemplate : orderedTemplates) {
+    for (const QString &urlTemplate : urlTemplates) {
         QString transformedUrl = transformUrl(urlTemplate);
 
         if (!transformedUrl.isEmpty()) {
@@ -174,10 +185,14 @@ static int parse(const QString &urlTemplate,
 {
     static const QRegularExpression rxFillWith("^(.+)_fill_with_(.+)$");
     static const QRegularExpression rxSubStr("^(.+)_substr_(\\d+)_(\\d+)$");
+    static const QRegularExpression rxCardProp("!prop:([^!]+)!");
+    static const QRegularExpression rxCardSet("!set:([^!]+)!");
 
-    const QRegularExpression rxCardProp("!" + propType + ":([^!]+)!");
+    // The property type only takes two values, so keep the expression that was
+    // compiled for it instead of rebuilding one per URL template.
+    const QRegularExpression &rxCardPropSelector = propType == "prop" ? rxCardProp : rxCardSet;
 
-    auto matches = rxCardProp.globalMatch(urlTemplate);
+    auto matches = rxCardPropSelector.globalMatch(urlTemplate);
     while (matches.hasNext()) {
         auto match = matches.next();
         QString templatePropertyName = match.captured(1);
@@ -294,10 +309,10 @@ QString CardPictureToLoad::transformUrl(const QString &urlTemplate) const
     }
 
     QString transformedUrl = urlTemplate;
-    for (const QString &prop : transformMap.keys()) {
+    for (const auto &[prop, value] : std::as_const(transformMap).asKeyValueRange()) {
         if (transformedUrl.contains(prop)) {
-            if (!transformMap[prop].isEmpty()) {
-                transformedUrl.replace(prop, QUrl::toPercentEncoding(transformMap[prop]));
+            if (!value.isEmpty()) {
+                transformedUrl.replace(prop, QUrl::toPercentEncoding(value));
             } else {
                 /* This means the template is requesting information that is not
                  * populated in this card, so it should return an empty string,

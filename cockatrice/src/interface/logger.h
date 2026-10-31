@@ -8,10 +8,15 @@
 #define LOGGER_H
 
 #include <QFile>
+#include <QList>
 #include <QMutex>
+#include <QObject>
 #include <QString>
 #include <QTextStream>
-#include <QVector>
+#include <qlogging.h>
+#include <qprocessordetection.h>
+#include <qtmetamacros.h>
+#include <string>
 
 #if defined(Q_PROCESSOR_X86_32)
 #define BUILD_ARCHITECTURE "32-bit"
@@ -44,6 +49,9 @@ public:
     {
         return logBuffer;
     }
+    void setPersistentLogPath(const QString &path);
+    QList<QString> getPreviousSessionTail(int maxLines = 60) const;
+    static QList<QString> extractPreviousSessionTail(const QString &filePath, int maxLines = 60);
 
 private:
     Logger();
@@ -56,11 +64,18 @@ private:
     QTextStream fileStream;
     QFile fileHandle;
     QList<QString> logBuffer;
-    QMutex mutex;
+    mutable QMutex mutex;
+    QString persistentLogPath;
+    bool persistentLogEnabled;
+    QTextStream persistentFileStream;
+    QFile persistentFileHandle;
 
 protected:
     void openLogfileSession();
     void closeLogfileSession();
+    void openPersistentLog(const QString &path);
+    void prunePersistentLog(const QString &path);
+    void closePersistentLogSession();
 
 protected slots:
     void internalLog(const QString &message);

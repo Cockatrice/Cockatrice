@@ -1,11 +1,34 @@
 #include "isl_interface.h"
 
+#include "libcockatrice/protocol/pb/commands.pb.h"
+#include "libcockatrice/protocol/pb/room_commands.pb.h"
+#include "libcockatrice/protocol/pb/room_event.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_room.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+#include "libcockatrice/protocol/pb/session_event.pb.h"
 #include "main.h"
+#include "servatrice.h"
+#include "server_abstractuserinterface.h"
 #include "server_logger.h"
+#include "serverinfo_user_container.h"
 
+#include <QDebug>
+#include <QHostAddress>
+#include <QList>
 #include <QLoggingCategory>
+#include <QMap>
+#include <QMapIterator>
+#include <QMessageLogger>
+#include <QMutexLocker>
+#include <QReadLocker>
+#include <QReadWriteLock>
+#include <QSharedPointer>
+#include <QSslError>
 #include <QSslSocket>
 #include <google/protobuf/descriptor.h>
+#include <google/protobuf/message.h>
+#include <google/protobuf/stubs/common.h>
 #include <libcockatrice/protocol/debug_pb_message.h>
 #include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/event_game_joined.pb.h>
@@ -13,14 +36,19 @@
 #include <libcockatrice/protocol/pb/event_leave_room.pb.h>
 #include <libcockatrice/protocol/pb/event_list_games.pb.h>
 #include <libcockatrice/protocol/pb/event_remove_messages.pb.h>
+#include <libcockatrice/protocol/pb/event_room_channel_say.pb.h>
 #include <libcockatrice/protocol/pb/event_room_say.pb.h>
 #include <libcockatrice/protocol/pb/event_server_complete_list.pb.h>
 #include <libcockatrice/protocol/pb/event_user_joined.pb.h>
 #include <libcockatrice/protocol/pb/event_user_left.pb.h>
-#include <libcockatrice/protocol/pb/event_user_message.pb.h>
 #include <libcockatrice/protocol/pb/isl_message.pb.h>
+#include <qnamespace.h>
+#include <qobjectdefs.h>
 #include <server_protocolhandler.h>
 #include <server_room.h>
+
+// Maximum size of a single ISL message.
+static const int MAX_ISL_MESSAGE_SIZE = 4 * 1024 * 1024;
 
 inline Q_LOGGING_CATEGORY(IslInterfaceLog, "isl_interface");
 
@@ -236,26 +264,37 @@ void IslInterface::readClient()
     server->incRxBytes(data.size());
     inputBuffer.append(data);
 
-    do {
+    // Parse messages straight out of inputBuffer at readOffset. Removing each
+    // consumed message from the front would memmove the remaining bytes once
+    // per message; the consumed prefix is dropped once parsing stops.
+    qsizetype readOffset = 0;
+
+    while (true) {
         if (!messageInProgress) {
-            if (inputBuffer.size() >= 4) {
-                messageLength = (((quint32)(unsigned char)inputBuffer[0]) << 24) +
-                                (((quint32)(unsigned char)inputBuffer[1]) << 16) +
-                                (((quint32)(unsigned char)inputBuffer[2]) << 8) +
-                                ((quint32)(unsigned char)inputBuffer[3]);
-                inputBuffer.remove(0, 4);
+            if (inputBuffer.size() - readOffset >= 4) {
+                const auto *header = reinterpret_cast<const unsigned char *>(inputBuffer.constData() + readOffset);
+                messageLength = (static_cast<quint32>(header[0]) << 24) + (static_cast<quint32>(header[1]) << 16) +
+                                (static_cast<quint32>(header[2]) << 8) + static_cast<quint32>(header[3]);
+                // Reject implausible lengths instead of buffering until they arrive.
+                // This also handles lengths that overflow into negative int values.
+                if (messageLength < 0 || messageLength > MAX_ISL_MESSAGE_SIZE) {
+                    qCWarning(IslInterfaceLog) << "Invalid message length" << messageLength << "from" << peerAddress;
+                    socket->disconnectFromHost();
+                    return;
+                }
+                readOffset += 4;
                 messageInProgress = true;
             } else {
-                return;
+                break;
             }
         }
-        if (inputBuffer.size() < messageLength) {
-            return;
+        if (inputBuffer.size() - readOffset < messageLength) {
+            break;
         }
 
         IslMessage newMessage;
-        bool ok = newMessage.ParseFromArray(inputBuffer.data(), messageLength);
-        inputBuffer.remove(0, messageLength);
+        bool ok = newMessage.ParseFromArray(inputBuffer.constData() + readOffset, messageLength);
+        readOffset += messageLength;
         messageInProgress = false;
 
         if (ok) {
@@ -263,7 +302,12 @@ void IslInterface::readClient()
         } else {
             qCWarning(IslInterfaceLog) << "parsing error!";
         }
-    } while (!inputBuffer.isEmpty());
+    }
+
+    // Drop the consumed prefix once, instead of shifting the buffer per message.
+    if (readOffset > 0) {
+        inputBuffer.remove(0, readOffset);
+    }
 }
 
 void IslInterface::catchSocketError(QAbstractSocket::SocketError socketError)
@@ -349,7 +393,14 @@ void IslInterface::roomEvent_UserLeft(int roomId, const Event_LeaveRoom &event)
 
 void IslInterface::roomEvent_Say(int roomId, const Event_RoomSay &event)
 {
-    emit externalRoomSay(roomId, QString::fromStdString(event.name()), QString::fromStdString(event.message()));
+    emit externalRoomSay(roomId, QString::fromStdString(event.name()), QString::fromStdString(event.message()),
+                         QString());
+}
+
+void IslInterface::roomEvent_ChannelSay(int roomId, const Event_RoomChannelSay &event)
+{
+    emit externalRoomSay(roomId, QString::fromStdString(event.name()), QString::fromStdString(event.message()),
+                         QString::fromStdString(event.channel_id()));
 }
 
 void IslInterface::roomEvent_ListGames(int roomId, const Event_ListGames &event)
@@ -425,6 +476,9 @@ void IslInterface::processRoomEvent(const RoomEvent &event)
         case RoomEvent::ROOM_SAY:
             roomEvent_Say(event.room_id(), event.GetExtension(Event_RoomSay::ext));
             break;
+        case RoomEvent::ROOM_CHANNEL_SAY:
+            roomEvent_ChannelSay(event.room_id(), event.GetExtension(Event_RoomChannelSay::ext));
+            break;
         case RoomEvent::LIST_GAMES:
             roomEvent_ListGames(event.room_id(), event.GetExtension(Event_ListGames::ext));
             break;
@@ -450,7 +504,9 @@ void IslInterface::processRoomCommand(const CommandContainer &cont, qint64 sessi
 
 void IslInterface::processMessage(const IslMessage &item)
 {
-    qCDebug(IslInterfaceLog) << getSafeDebugString(item);
+    if (IslInterfaceLog().isDebugEnabled()) {
+        qCDebug(IslInterfaceLog) << getSafeDebugString(item);
+    }
 
     switch (item.message_type()) {
         case IslMessage::ROOM_COMMAND_CONTAINER: {

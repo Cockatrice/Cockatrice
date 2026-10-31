@@ -7,8 +7,10 @@
 #ifndef CARDFILTER_H
 #define CARDFILTER_H
 
+#include <QJsonObject>
 #include <QObject>
 #include <QString>
+#include <qtmetamacros.h>
 
 class CardFilter : public QObject
 {

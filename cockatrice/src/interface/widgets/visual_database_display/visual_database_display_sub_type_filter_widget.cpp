@@ -1,15 +1,28 @@
 #include "visual_database_display_sub_type_filter_widget.h"
 
 #include "../../../filters/filter_tree_model.h"
+#include "../general/layout_containers/flow_widget.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/filters/filter_card.h"
 #include "visual_database_display_filter_button.h"
 
+#include <QAbstractItemModel>
+#include <QDebug>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QList>
+#include <QPersistentModelIndex>
 #include <QPushButton>
+#include <QSet>
+#include <QSharedPointer>
 #include <QSpinBox>
-#include <QTimer>
+#include <QVBoxLayout>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/filters/filter_tree.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qnamespace.h>
 
 VisualDatabaseDisplaySubTypeFilterWidget::VisualDatabaseDisplaySubTypeFilterWidget(QWidget *parent,
                                                                                    FilterTreeModel *_filterModel)
@@ -34,8 +47,7 @@ VisualDatabaseDisplaySubTypeFilterWidget::VisualDatabaseDisplaySubTypeFilterWidg
     layout->addWidget(flowWidget);
 
     // Create a container for the threshold control
-    auto *thresholdLayout = new QHBoxLayout();
-    thresholdLayout->setContentsMargins(0, 0, 0, 0);
+    auto *thresholdLayout = QtUtils::makeLayout<QHBoxLayout>();
 
     thresholdLabel = new QLabel(this);
     thresholdLayout->addWidget(thresholdLabel);
@@ -57,9 +69,8 @@ VisualDatabaseDisplaySubTypeFilterWidget::VisualDatabaseDisplaySubTypeFilterWidg
     toggleButton = new QPushButton(this);
     layout->addWidget(toggleButton);
     connect(toggleButton, &QPushButton::clicked, this, &VisualDatabaseDisplaySubTypeFilterWidget::updateFilterMode);
-    connect(filterModel, &FilterTreeModel::layoutChanged, this, [this]() {
-        QTimer::singleShot(100, this, &VisualDatabaseDisplaySubTypeFilterWidget::syncWithFilterModel);
-    });
+    connect(filterModel, &FilterTreeModel::layoutChanged, this,
+            [this]() { syncDebouncer.call([this] { syncWithFilterModel(); }); });
 
     createSubTypeButtons(); // Populate buttons initially
     updateFilterMode();     // Initialize the toggle button text

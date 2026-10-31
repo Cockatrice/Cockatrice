@@ -60,3 +60,5 @@ target_link_libraries(
   PUBLIC libcockatrice_utility
   PUBLIC ${QT_CORE_MODULE}
 )
+
+target_precompile_headers(libcockatrice_card PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtcore_pch.h")

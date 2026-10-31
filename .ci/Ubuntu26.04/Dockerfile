@@ -5,11 +5,12 @@ RUN apt-get update && \
         build-essential \
         ca-certificates \
         ccache \
-        clang-format \
         cmake \
         file \
         g++ \
+        gcovr \
         git \
+        libcurl4-openssl-dev \
         libgl-dev \
         liblzma-dev \
         libmariadb-dev-compat \
@@ -19,12 +20,12 @@ RUN apt-get update && \
         libssl-dev \
         ninja-build \
         protobuf-compiler \
+        qt6-declarative-dev \
         qt6-image-formats-plugins \
         qt6-l10n-tools \
         qt6-multimedia-dev \
-        qt6-declarative-dev \
-        qt6-svg-dev \
         qt6-shadertools-dev \
+        qt6-svg-dev \
         qt6-tools-dev \
         qt6-tools-dev-tools \
         qt6-websockets-dev \

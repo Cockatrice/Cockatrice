@@ -1,26 +1,35 @@
 #ifndef COCKATRICE_TAB_ARCHIDEKT_H
 #define COCKATRICE_TAB_ARCHIDEKT_H
 
-#include "../../interface/widgets/cards/card_size_widget.h"
-#include "../../interface/widgets/quick_settings/settings_button_widget.h"
 #include "../../tab.h"
-#include "display/archidekt_api_response_deck_listings_display_widget.h"
+#include "libcockatrice/card/card_info.h"
 
-#include <QCheckBox>
-#include <QComboBox>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QLineEdit>
-#include <QNetworkAccessManager>
-#include <QPushButton>
-#include <QScrollArea>
+#include <QChar>
+#include <QJsonObject>
+#include <QJsonValue>
+#include <QList>
 #include <QSet>
-#include <QSpinBox>
 #include <QString>
-#include <QTimer>
-#include <QVBoxLayout>
-#include <QWidget>
-#include <libcockatrice/card/database/card_database.h>
+#include <QVector>
+#include <qtmetamacros.h>
+
+class ArchidektApiResponseDeckListingsDisplayWidget;
+class CardSizeWidget;
+class QCheckBox;
+class QComboBox;
+class QHBoxLayout;
+class QLabel;
+class QLineEdit;
+class QNetworkAccessManager;
+class QNetworkReply;
+class QPushButton;
+class QScrollArea;
+class QSpinBox;
+class QTimer;
+class QVBoxLayout;
+class QWidget;
+class SettingsButtonWidget;
+class TabSupervisor;
 
 /** Base API link for Archidekt deck search */
 inline QString archidektApiLink = "https://archidekt.com/api/decks/v3/?name=";
@@ -278,9 +287,11 @@ private:
 
     SettingsButtonWidget *formatButton; ///< Collapsible button for format filters
     QVector<QCheckBox *> formatChecks;  ///< Individual checkboxes for each format
+    QLabel *bracketLabel;               ///< Label for EDH bracket selection
     QComboBox *edhBracketCombo;         ///< Dropdown for EDH bracket selection
 
     SettingsButtonWidget *deckSizeButton; ///< Collapsible button for deck size filter
+    QLabel *cardsLabel;                   ///< Label for deck size selection
     QSpinBox *minDeckSizeSpin;            ///< Spinner to select minimum deck size
     QComboBox *minDeckSizeLogicCombo;     ///< Combo box for size comparison logic
 

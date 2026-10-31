@@ -1,5 +1,12 @@
 #include "tabs_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QSharedPointer>
+#include <QVariant>
+
+class QObject;
+
 TabsSettings::TabsSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "tabs.ini", "tabs", QString(), parent)
 {

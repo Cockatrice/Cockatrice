@@ -1,9 +1,16 @@
 #include "abstract_analytics_panel_widget.h"
 
 #include "../../pixel_map_generator.h"
+#include "../general/display/banner_widget.h"
 #include "deck_list_statistics_analyzer.h"
 
+#include <QDialog>
+#include <QHBoxLayout>
 #include <QPushButton>
+#include <QSizePolicy>
+#include <QStringLiteral>
+#include <QVBoxLayout>
+#include <qnamespace.h>
 
 AbstractAnalyticsPanelWidget::AbstractAnalyticsPanelWidget(QWidget *parent, DeckListStatisticsAnalyzer *analyzer)
     : QWidget(parent), analyzer(analyzer)

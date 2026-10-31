@@ -2,12 +2,20 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../z_values.h"
+#include "abstract_card_item.h"
 
+#include <QBrush>
+#include <QColor>
 #include <QCursor>
-#include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
+#include <QPainterPath>
+#include <QTransform>
+#include <QtGlobal>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <qnamespace.h>
+
+class QPointF;
 
 const QColor GHOST_MASK = QColor(255, 255, 255, 50);
 

@@ -13,6 +13,10 @@
 
 #include "abstract_deck_list_node.h"
 
+#include <QString>
+
+class InnerDecklistNode;
+
 /**
  * @class AbstractDecklistCardNode
  * @ingroup DeckModels

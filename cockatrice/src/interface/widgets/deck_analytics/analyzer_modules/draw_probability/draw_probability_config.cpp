@@ -1,5 +1,8 @@
 #include "draw_probability_config.h"
 
+#include <QJsonValue>
+#include <QJsonValueRef>
+
 QJsonObject DrawProbabilityConfig::toJson() const
 {
     QJsonObject o;

@@ -1,8 +1,13 @@
 #include "tab_moderation.h"
 
 #include "abstract_client.h"
-#include "tab_supervisor.h"
+#include "libcockatrice/protocol/pb/admin_commands.pb.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_moderator_login.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user_alt.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user_session.pb.h"
 
+#include <QAbstractItemView>
 #include <QDateTime>
 #include <QGridLayout>
 #include <QGroupBox>
@@ -10,22 +15,33 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <QLineEdit>
+#include <QList>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSharedPointer>
 #include <QSplitter>
+#include <QStringList>
 #include <QTableWidget>
+#include <QTableWidgetItem>
 #include <QTextEdit>
 #include <QVBoxLayout>
+#include <QWidget>
 #include <libcockatrice/protocol/pb/command_report_user_info.pb.h>
 #include <libcockatrice/protocol/pb/moderator_commands.pb.h>
 #include <libcockatrice/protocol/pb/response_moderator_last_logins.pb.h>
 #include <libcockatrice/protocol/pb/response_remove_user_avatar.pb.h>
+#include <libcockatrice/protocol/pb/response_remove_user_banner.pb.h>
 #include <libcockatrice/protocol/pb/response_report_user_info.pb.h>
 #include <libcockatrice/protocol/pb/response_reset_user_password.pb.h>
 #include <libcockatrice/protocol/pb/response_user_alts.pb.h>
 #include <libcockatrice/protocol/pb/response_user_sessions.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qnamespace.h>
+#include <string>
+
+class TabSupervisor;
 
 namespace
 {
@@ -71,12 +87,16 @@ TabModeration::TabModeration(TabSupervisor *_tabSupervisor, AbstractClient *_cli
     removeAvatarButton = new QPushButton;
     connect(removeAvatarButton, &QPushButton::clicked, this, &TabModeration::removeAvatar);
 
+    removeBannerButton = new QPushButton;
+    connect(removeBannerButton, &QPushButton::clicked, this, &TabModeration::removeBanner);
+
     auto *topBar = new QHBoxLayout;
     topBar->addWidget(searchEdit);
     topBar->addWidget(investigateButton);
     topBar->addStretch();
     topBar->addWidget(resetPasswordButton);
     topBar->addWidget(removeAvatarButton);
+    topBar->addWidget(removeBannerButton);
 
     userInfoGroup = new QGroupBox;
     userInfoNameLabel = new QLabel;
@@ -172,6 +192,7 @@ void TabModeration::retranslateUi()
     investigateButton->setText(tr("Investigate"));
     resetPasswordButton->setText(tr("Reset Password"));
     removeAvatarButton->setText(tr("Remove Avatar"));
+    removeBannerButton->setText(tr("Remove Banner"));
     refreshStaffButton->setText(tr("Refresh"));
 
     userInfoGroup->setTitle(tr("User Info"));
@@ -213,6 +234,7 @@ void TabModeration::clearUserData()
     sessionsTable->setRowCount(0);
     resetPasswordButton->setEnabled(false);
     removeAvatarButton->setEnabled(false);
+    removeBannerButton->setEnabled(false);
 }
 
 void TabModeration::investigate(const QString &userName)
@@ -233,6 +255,7 @@ void TabModeration::investigateUser()
     currentUser = userName;
     resetPasswordButton->setEnabled(true);
     removeAvatarButton->setEnabled(true);
+    removeBannerButton->setEnabled(true);
     altsTable->setRowCount(0);
     sessionsTable->setRowCount(0);
     requestUserInfo(userName);
@@ -400,13 +423,11 @@ void TabModeration::resetPassword()
         return;
     }
 
-    QMessageBox::StandardButton choice =
-        QMessageBox::warning(this, tr("Reset Password"),
-                             tr("Reset the password of %1? A temporary password will be generated and shown to you. "
-                                "The user must change it on their first login.")
-                                 .arg(currentUser),
-                             QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel);
-    if (choice != QMessageBox::Ok) {
+    if (!QtUtils::confirm(this, tr("Reset Password"),
+                          tr("Reset the password of %1? A temporary password will be generated and shown to you. "
+                             "The user must change it on their first login.")
+                              .arg(currentUser),
+                          QMessageBox::No)) {
         return;
     }
 
@@ -437,11 +458,9 @@ void TabModeration::removeAvatar()
         return;
     }
 
-    QMessageBox::StandardButton choice =
-        QMessageBox::warning(this, tr("Remove Avatar"),
-                             tr("Remove the avatar of %1? The user will have to upload a new one.").arg(currentUser),
-                             QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel);
-    if (choice != QMessageBox::Ok) {
+    if (!QtUtils::confirm(this, tr("Remove Avatar"),
+                          tr("Remove the avatar of %1? The user will have to upload a new one.").arg(currentUser),
+                          QMessageBox::No)) {
         return;
     }
 
@@ -462,4 +481,68 @@ void TabModeration::removeAvatarResponse(const Response &response)
     const Response_RemoveUserAvatar &resp = response.GetExtension(Response_RemoveUserAvatar::ext);
     QMessageBox::information(this, tr("Avatar removed"),
                              tr("The avatar of %1 has been removed.").arg(QString::fromStdString(resp.user_name())));
+}
+
+void TabModeration::removeBanner()
+{
+    if (currentUser.isEmpty()) {
+        return;
+    }
+
+    if (!QtUtils::confirm(this, tr("Remove Banner"),
+                          tr("Remove the banner card of %1? The user will have to choose a new one.\n\n"
+                             "Other players stop seeing the banner the next time %1 logs in.")
+                              .arg(currentUser),
+                          QMessageBox::No)) {
+        return;
+    }
+
+    Command_RemoveUserBanner cmd;
+    cmd.set_user_name(currentUser.toStdString());
+    PendingCommand *pend = client->prepareModeratorCommand(cmd);
+    connect(pend, &PendingCommand::finished, this, &TabModeration::removeBannerResponse);
+    client->sendCommand(pend);
+}
+
+void TabModeration::removeBannerResponse(const Response &response)
+{
+    const QString target = currentUser.isEmpty() ? tr("this user") : currentUser;
+
+    switch (response.response_code()) {
+        case Response::RespOk:
+            break;
+        case Response::RespNameNotFound:
+            QMessageBox::warning(this, tr("User not found"),
+                                 tr("The server does not know a user named %1.").arg(target));
+            return;
+        case Response::RespFunctionNotAllowed:
+            QMessageBox::warning(this, tr("Not supported"),
+                                 tr("This server does not support removing banner cards. It may be running an older "
+                                    "version."));
+            return;
+        case Response::RespInternalError:
+            QMessageBox::critical(
+                this, tr("Error"),
+                tr("The server could not clear the banner card of %1 because of a database error.").arg(target));
+            return;
+        default:
+            QMessageBox::critical(
+                this, tr("Error"),
+                tr("The server rejected the request for %1: %2")
+                    .arg(target, QString::fromStdString(Response_ResponseCode_Name(response.response_code()))));
+            return;
+    }
+
+    const Response_RemoveUserBanner &resp = response.GetExtension(Response_RemoveUserBanner::ext);
+    const QString removedUser = resp.user_name().empty() ? target : QString::fromStdString(resp.user_name());
+    if (!resp.had_banner()) {
+        QMessageBox::information(this, tr("No banner set"),
+                                 tr("%1 has no banner card set, so there was nothing to remove.").arg(removedUser));
+        return;
+    }
+
+    QMessageBox::information(this, tr("Banner removed"),
+                             tr("The banner card of %1 has been removed.\n\n"
+                                "Other players stop seeing it the next time %1 logs in.")
+                                 .arg(removedUser));
 }

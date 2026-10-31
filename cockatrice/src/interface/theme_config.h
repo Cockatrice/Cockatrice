@@ -3,9 +3,10 @@
 
 #include <QColor>
 #include <QMap>
-#include <QObject>
 #include <QPalette>
+#include <QSharedPointer>
 #include <QString>
+#include <qtmetamacros.h>
 
 // Application-specific color roles, layered on top of the fixed QPalette role
 // set. Stored in the same palette-<scheme>.toml under an [AppColors] section

@@ -8,12 +8,17 @@
 #ifndef FLOW_WIDGET_H
 #define FLOW_WIDGET_H
 
-#include "../../../layouts/flow_layout.h"
-
-#include <QHBoxLayout>
 #include <QLoggingCategory>
-#include <QScrollArea>
 #include <QWidget>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
+
+class FlowLayout;
+class QHBoxLayout;
+class QKeyEvent;
+class QLayoutItem;
+class QScrollArea;
 
 inline Q_LOGGING_CATEGORY(FlowWidgetLog, "flow_widget", QtInfoMsg);
 inline Q_LOGGING_CATEGORY(FlowWidgetSizeLog, "flow_widget.size", QtInfoMsg);
@@ -28,7 +33,8 @@ public:
                Qt::ScrollBarPolicy horizontalPolicy,
                Qt::ScrollBarPolicy verticalPolicy);
 
-    void addWidget(QWidget *widget_to_add) const;
+    void addWidget(QWidget *widget_to_add);
+    void addNavigableWidget(QWidget *widget_to_add);
     void insertWidgetAtIndex(QWidget *toInsert, int index);
     void removeWidget(QWidget *widgetToRemove) const;
     void clearLayout();
@@ -43,9 +49,14 @@ public slots:
     void setSpacing(int hSpacing, int vSpacing);
 
 protected:
+    bool eventFilter(QObject *watched, QEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 
 private:
+    /// @brief Moves keyboard focus to an adjacent flow item for an arrow-key event.
+    /// @return True when the event was an arrow key and was handled.
+    bool moveFocus(QKeyEvent *event);
+
     Qt::Orientation flowDirection;
     QHBoxLayout *mainLayout;
     FlowLayout *flowLayout;

@@ -2,6 +2,8 @@
 #define COCKATRICE_INTENT_H
 
 #include <QObject>
+#include <QString>
+#include <qtmetamacros.h>
 
 class Intent : public QObject
 {
@@ -16,6 +18,7 @@ public:
 signals:
     void finished();
     void failed(QString reason);
+    void cancelled();
 
 protected:
     // --- Subclasses must implement these ---
@@ -29,6 +32,7 @@ protected:
     // Emit the outcome exactly once; ignore late signals after the intent is done.
     void emitFinished();
     void emitFailed(const QString &reason);
+    void emitCancelled();
 
 private:
     bool completed = false;

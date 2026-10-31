@@ -10,7 +10,11 @@
 #include <QByteArray>
 #include <QLoggingCategory>
 #include <QObject>
-#include <QProcess>
+#include <QString>
+#include <qtmetamacros.h>
+
+class QProcess;
+class QUrl;
 
 inline Q_LOGGING_CATEGORY(SpoilerBackgroundUpdaterLog, "spoiler_background_updater");
 

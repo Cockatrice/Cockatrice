@@ -1,10 +1,19 @@
 #include "update_downloader.h"
 
+#include <QByteArray>
+#include <QChar>
+#include <QDir>
+#include <QFile>
+#include <QIODevice>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
 #include <QUrl>
+#include <QVariant>
+#include <libcockatrice/network/network_manager.h>
 
 UpdateDownloader::UpdateDownloader(QObject *parent) : QObject(parent), response(nullptr)
 {
-    netMan = new QNetworkAccessManager(this);
+    netMan = NetworkManagerFactory::create(this);
 }
 
 void UpdateDownloader::beginDownload(QUrl downloadUrl)

@@ -1,0 +1,9 @@
+syntax = "proto2";
+import "session_commands.proto";
+
+message Command_DeckListOtherUser {
+    extend SessionCommand {
+        optional Command_DeckListOtherUser ext = 1029;
+    }
+    optional string user_name = 1;
+}

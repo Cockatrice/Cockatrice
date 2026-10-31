@@ -1,8 +1,18 @@
 #include "visual_database_display_color_filter_widget.h"
 
 #include "../cards/additional_info/mana_symbol_widget.h"
+#include "filter_tree_model.h"
+#include "libcockatrice/filters/filter_card.h"
 
-#include <QTimer>
+#include <QAbstractItemModel>
+#include <QComboBox>
+#include <QDebug>
+#include <QHBoxLayout>
+#include <QPersistentModelIndex>
+#include <QSharedPointer>
+#include <QString>
+#include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/filters/filter_tree.h>
 
 /**
@@ -38,7 +48,7 @@ VisualDatabaseDisplayColorFilterWidget::VisualDatabaseDisplayColorFilterWidget(Q
             &VisualDatabaseDisplayColorFilterWidget::updateFilterMode);
 
     connect(filterModel, &FilterTreeModel::layoutChanged, this,
-            [this]() { QTimer::singleShot(100, this, &VisualDatabaseDisplayColorFilterWidget::syncWithFilterModel); });
+            [this]() { syncDebouncer.call([this] { syncWithFilterModel(); }); });
 
     // Call retranslateUi to set the initial text
     retranslateUi();

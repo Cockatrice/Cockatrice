@@ -1,5 +1,7 @@
 #include "card_set.h"
 
+#include "libcockatrice/interfaces/interface_card_set_priority_controller.h"
+
 #include <QSet>
 #include <utility>
 
@@ -32,10 +34,14 @@ CardSetPtr CardSet::newInstance(ICardSetPriorityController *_priorityController,
 QString CardSet::getCorrectedShortName() const
 {
     // For Windows machines.
-    QSet<QString> invalidFileNames;
-    invalidFileNames << "CON" << "PRN" << "AUX" << "NUL" << "COM1" << "COM2" << "COM3" << "COM4" << "COM5" << "COM6"
-                     << "COM7" << "COM8" << "COM9" << "LPT1" << "LPT2" << "LPT3" << "LPT4" << "LPT5" << "LPT6" << "LPT7"
-                     << "LPT8" << "LPT9";
+    static const QSet<QString> invalidFileNames = {
+        QStringLiteral("CON"),  QStringLiteral("PRN"),  QStringLiteral("AUX"),  QStringLiteral("NUL"),
+        QStringLiteral("COM1"), QStringLiteral("COM2"), QStringLiteral("COM3"), QStringLiteral("COM4"),
+        QStringLiteral("COM5"), QStringLiteral("COM6"), QStringLiteral("COM7"), QStringLiteral("COM8"),
+        QStringLiteral("COM9"), QStringLiteral("LPT1"), QStringLiteral("LPT2"), QStringLiteral("LPT3"),
+        QStringLiteral("LPT4"), QStringLiteral("LPT5"), QStringLiteral("LPT6"), QStringLiteral("LPT7"),
+        QStringLiteral("LPT8"), QStringLiteral("LPT9"),
+    };
 
     return invalidFileNames.contains(shortName) ? shortName + "_" : shortName;
 }

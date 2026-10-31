@@ -1,6 +1,11 @@
 #ifndef COCKATRICE_GAME_FILTER_CONFIGS_H
 #define COCKATRICE_GAME_FILTER_CONFIGS_H
 
+#include <QList>
+#include <QSet>
+#include <QSharedPointer>
+#include <QString>
+#include <QStringList>
 #include <QTime>
 
 /**
@@ -12,7 +17,9 @@ struct GameFilterConfigs
     static constexpr int DEFAULT_MAX_PLAYERS_MAX = 99;
 
     bool hideBuddiesOnlyGames = false;
-    bool hideIgnoredUserGames = false;
+    // Defaults to true to match GameFiltersSettings::isHideIgnoredUserGames(), so freshly loaded
+    // filters compare equal to a default-constructed config.
+    bool hideIgnoredUserGames = true;
     bool hideFullGames = false;
     bool hideGamesThatStarted = false;
     bool hidePasswordProtectedGames = false;

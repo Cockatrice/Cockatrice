@@ -8,11 +8,23 @@
 #ifndef COCKATRICE_CARD_DATABASE_DISPLAY_MODEL_H
 #define COCKATRICE_CARD_DATABASE_DISPLAY_MODEL_H
 
+#include "libcockatrice/card/card_info.h"
+
+#include <QCollator>
+#include <QModelIndex>
+#include <QSet>
 #include <QSortFilterProxyModel>
+#include <QString>
+#include <QStringView>
 #include <QTimer>
+#include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/filters/filter_string.h>
+#include <qtmetamacros.h>
 
 class FilterTree;
+class QObject;
+template <class Key, class T> class QMap;
+
 class CardDatabaseDisplayModel : public QSortFilterProxyModel
 {
     Q_OBJECT
@@ -32,9 +44,14 @@ private:
     FilterString *filterString;
     int loadedRowCount;
     QTimer dirtyTimer;
+    CardSearchLanguage searchLanguage;
+    QString searchText;
 
     /** The translation table that will be used for sanitizeCardName. */
     static QMap<wchar_t, wchar_t> characterTranslation;
+
+    /** Natural, locale-aware comparison shared by every sort in this model. */
+    QCollator collator;
 
 public:
     explicit CardDatabaseDisplayModel(QObject *parent = nullptr);
@@ -55,17 +72,13 @@ public:
         cardName = sanitizeCardName(_cardName, characterTranslation);
         dirty();
     }
-    void setStringFilter(const QString &_src)
-    {
-        delete filterString;
-        filterString = new FilterString(_src);
-        dirty();
-    }
+    void setStringFilter(const QString &_src);
     void setCardNameSet(const QSet<QString> &_cardNameSet)
     {
         cardNameSet = _cardNameSet;
         dirty();
     }
+    void setSearchLanguage(const CardSearchLanguage &searchLang);
 
     void dirty()
     {
@@ -80,7 +93,7 @@ signals:
 
 protected:
     [[nodiscard]] bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
-    static int lessThanNumerically(const QString &left, const QString &right);
+    int lessThanNumerically(QStringView left, QStringView right) const;
     [[nodiscard]] bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
     [[nodiscard]] bool rowMatchesCardName(CardInfoPtr info) const;
 

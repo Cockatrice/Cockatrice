@@ -5,12 +5,16 @@
 
 #include <../../cockatrice/src/client/settings/cache_settings.h>
 #include <QApplication>
+#include <QCommandLineOption>
 #include <QCommandLineParser>
+#include <QCoreApplication>
+#include <QGuiApplication>
 #include <QIcon>
-#include <QLibraryInfo>
+#include <QString>
 #include <QTimer>
 #include <QTranslator>
 #include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/utility/translation_loader.h>
 
 QTranslator *translator, *qtTranslator;
 ThemeManager *themeManager;
@@ -24,24 +28,13 @@ void installNewTranslator()
 {
     QString lang = SettingsCache::instance().personal().getLang();
 
-    QString qtNameHint = "qt_" + lang;
-    QString qtTranslationPath = QLibraryInfo::path(QLibraryInfo::TranslationsPath);
-
-    bool qtTranslationLoaded = qtTranslator->load(qtNameHint, qtTranslationPath);
-    if (!qtTranslationLoaded) {
-        qDebug() << "Unable to load qt translation" << qtNameHint << "at" << qtTranslationPath;
-    } else {
-        qDebug() << "Loaded qt translation" << qtNameHint << "at" << qtTranslationPath;
-    }
+    // Qt's own strings and ours need a translator each: QTranslator discards its previous contents
+    // on every load, so loading both files into one translator silently drops the first of them.
+    TranslationLoader::loadQt(*qtTranslator, lang);
     qApp->installTranslator(qtTranslator);
 
-    QString appNameHint = translationPrefix + "_" + lang;
-    bool appTranslationLoaded = qtTranslator->load(appNameHint, translationPath);
-    if (!appTranslationLoaded) {
-        qDebug() << "Unable to load" << translationPrefix << "translation" << appNameHint << "at" << translationPath;
-    } else {
-        qDebug() << "Loaded" << translationPrefix << "translation" << appNameHint << "at" << translationPath;
-    }
+    TranslationLoader::loadApplication(*translator, translationPrefix, lang,
+                                       TranslationLoader::applicationTranslationPaths(translationPath));
     qApp->installTranslator(translator);
 }
 
@@ -82,8 +75,9 @@ int main(int argc, char *argv[])
 
     QIcon icon("theme:appicon.svg");
     wizard.setWindowIcon(icon);
-    // set name of the app desktop file; used by wayland to load the window icon
-    QGuiApplication::setDesktopFileName("Oracle");
+    // Base name of the installed oracle.desktop; wayland reads the window icon from it and
+    // xdg-desktop-portal registers it as the app ID, so the case has to match the file name.
+    QGuiApplication::setDesktopFileName("oracle");
 
     wizard.show();
 
@@ -91,5 +85,8 @@ int main(int argc, char *argv[])
         QTimer::singleShot(0, &wizard, [&wizard]() { wizard.runInBackground(); });
     }
 
-    return app.exec();
+    const int execResult = app.exec();
+    // A cancel only counts when nothing was written yet: closing the wizard
+    // after the card database was already saved on disk is still an update.
+    return (wizard.wasCancelled() && !wizard.hasSavedDatabase()) ? 1 : execResult;
 }

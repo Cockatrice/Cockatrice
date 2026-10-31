@@ -1,15 +1,27 @@
 #include "card_info_text_widget.h"
 
-#include "../../../game_graphics/board/card_item.h"
+#include "../../../client/settings/cache_settings.h"
 #include "../../card_localization.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/settings/cards_display_settings.h"
 
 #include <QGridLayout>
 #include <QLabel>
+#include <QList>
 #include <QScrollArea>
 #include <QScrollBar>
+#include <QSharedPointer>
+#include <QSize>
+#include <QStringList>
 #include <QTextEdit>
+#include <QWidget>
 #include <libcockatrice/card/game_specific_terms.h>
 #include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qnamespace.h>
+#include <qobjectdefs.h>
 
 CardInfoTextWidget::CardInfoTextWidget(QWidget *parent) : QFrame(parent)
 {
@@ -22,9 +34,7 @@ CardInfoTextWidget::CardInfoTextWidget(QWidget *parent) : QFrame(parent)
     textLabel->setReadOnly(true);
     textLabel->setMinimumSize(35, 35);
 
-    propsScroll = new QScrollArea(this);
-    propsScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    propsScroll->setWidgetResizable(true);
+    propsScroll = QtUtils::makeScrollArea(this);
     propsScroll->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     propsScroll->setContentsMargins(0, 0, 0, 0);
     propsScroll->setFrameStyle(QFrame::NoFrame);

@@ -3,7 +3,11 @@
 
 #include "settings_manager.h"
 
+#include <QString>
 #include <libcockatrice/interfaces/interface_cache_storage_settings_provider.h>
+#include <qtmetamacros.h>
+
+class QObject;
 
 // In MB (Increments of 64)
 #define PIXMAPCACHE_SIZE_DEFAULT 2048

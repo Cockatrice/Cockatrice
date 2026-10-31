@@ -2,7 +2,14 @@
 
 #include "dynamic_font_size_label.h"
 
+#include <QBrush>
+#include <QFont>
+#include <QLinearGradient>
 #include <QPainter>
+#include <QPen>
+#include <QSize>
+#include <QWidget>
+#include <qnamespace.h>
 
 DynamicFontSizePushButton::DynamicFontSizePushButton(QWidget *parent) : QPushButton(parent)
 {

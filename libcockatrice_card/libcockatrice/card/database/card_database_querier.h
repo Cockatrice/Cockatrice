@@ -3,12 +3,18 @@
 
 #include "../card_info.h"
 #include "../printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
 
+#include <QList>
+#include <QMap>
 #include <QObject>
-#include <libcockatrice/interfaces/interface_card_preference_provider.h>
-#include <libcockatrice/utility/card_ref.h>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
 
 class CardDatabase;
+class ICardPreferenceProvider;
+struct CardRef;
 
 /**
  * @class CardDatabaseQuerier

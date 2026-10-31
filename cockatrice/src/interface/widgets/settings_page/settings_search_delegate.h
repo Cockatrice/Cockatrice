@@ -6,8 +6,14 @@
 #ifndef COCKATRICE_SETTINGS_SEARCH_DELEGATE_H
 #define COCKATRICE_SETTINGS_SEARCH_DELEGATE_H
 
+#include <QList>
 #include <QPixmap>
+#include <QString>
+#include <QStringList>
 #include <QStyledItemDelegate>
+#include <qtmetamacros.h>
+
+class QObject;
 
 /**
  * @brief Custom paint delegate for settings search result items

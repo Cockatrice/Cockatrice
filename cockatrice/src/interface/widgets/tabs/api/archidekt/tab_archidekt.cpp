@@ -3,39 +3,63 @@
 #include "../../../../../client/settings/cache_settings.h"
 #include "../../../../pixel_map_generator.h"
 #include "../../../cards/additional_info/mana_symbol_widget.h"
+#include "../../../cards/card_size_widget.h"
+#include "../../../quick_settings/settings_button_widget.h"
 #include "../../../utility/completer_utils.h"
+#include "../../tab.h"
 #include "../../tab_supervisor.h"
 #include "api_response/archidekt_deck_listing_api_response.h"
+#include "api_response/deck/archidekt_api_response_deck.h"
+#include "card_database_display_model.h"
+#include "card_database_model.h"
 #include "display/archidekt_api_response_deck_display_widget.h"
 #include "display/archidekt_api_response_deck_listings_display_widget.h"
 
+#include <QByteArray>
+#include <QCheckBox>
+#include <QComboBox>
 #include <QDebug>
-#include <QFormLayout>
+#include <QEvent>
 #include <QGridLayout>
-#include <QGroupBox>
 #include <QHBoxLayout>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonValueRef>
+#include <QLabel>
+#include <QLayoutItem>
+#include <QLineEdit>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QPoint>
 #include <QPushButton>
-#include <QResizeEvent>
 #include <QScrollArea>
-#include <QScrollBar>
+#include <QSharedPointer>
+#include <QSizePolicy>
+#include <QSpinBox>
+#include <QStringList>
+#include <QStringLiteral>
+#include <QTimer>
+#include <QUrl>
 #include <QUrlQuery>
+#include <QVBoxLayout>
+#include <QWheelEvent>
+#include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/models/database/card/card_completer_proxy_model.h>
-#include <libcockatrice/models/database/card/card_search_model.h>
+#include <libcockatrice/network/network_manager.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qlogging.h>
+#include <qnamespace.h>
 #include <version_string.h>
 
 TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor)
     : Tab(_tabSupervisor), currentPage(1), isLoadingMore(false), isListMode(true)
 {
     // Initialize network
-    networkManager = new QNetworkAccessManager(this);
-    networkManager->setTransferTimeout();
+    networkManager = NetworkManagerFactory::create(this);
     networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
     connect(networkManager, &QNetworkAccessManager::finished, this, &TabArchidekt::processApiJson);
 
@@ -57,9 +81,7 @@ void TabArchidekt::initializeUi()
 {
     // Main container
     container = new QWidget(this);
-    mainLayout = new QVBoxLayout(container);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
-    mainLayout->setSpacing(0);
+    mainLayout = QtUtils::makeLayout<QVBoxLayout>(container, 0);
 
     // Primary toolbar (most important filters)
     primaryToolbar = new QWidget(container);
@@ -82,9 +104,7 @@ void TabArchidekt::initializeUi()
 
     // Color filter (inline)
     QWidget *colorWidget = new QWidget(primaryToolbar);
-    QHBoxLayout *colorLayout = new QHBoxLayout(colorWidget);
-    colorLayout->setContentsMargins(0, 0, 0, 0);
-    colorLayout->setSpacing(2);
+    QHBoxLayout *colorLayout = QtUtils::makeLayout<QHBoxLayout>(colorWidget, 2);
 
     QString colorIdentity = "WUBRG";
     for (const QChar &color : colorIdentity) {
@@ -163,15 +183,10 @@ void TabArchidekt::initializeUi()
     secondaryToolbarLayout->setSpacing(6);
 
     // Scrollable results area
-    scrollArea = new QScrollArea(container);
-    scrollArea->setWidgetResizable(true);
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    scrollArea = QtUtils::makeScrollArea(container);
 
     resultsContainer = new QWidget();
-    resultsLayout = new QVBoxLayout(resultsContainer);
-    resultsLayout->setContentsMargins(0, 0, 0, 0);
-    resultsLayout->setSpacing(0);
+    resultsLayout = QtUtils::makeLayout<QVBoxLayout>(resultsContainer, 0);
 
     scrollArea->setWidget(resultsContainer);
 
@@ -205,9 +220,9 @@ void TabArchidekt::setupFilterWidgets()
     // Advanced filters (in secondary toolbar)
 
     // EDH Bracket
-    auto *bracketLabel = new QLabel(tr("Bracket:"), secondaryToolbar);
+    bracketLabel = new QLabel(secondaryToolbar);
     edhBracketCombo = new QComboBox(secondaryToolbar);
-    edhBracketCombo->addItem(tr("Any"));
+    edhBracketCombo->addItem(QString());
     edhBracketCombo->addItems({"1", "2", "3", "4", "5"});
     edhBracketCombo->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
@@ -261,7 +276,6 @@ void TabArchidekt::setupFilterWidgets()
     sizeLayout->setContentsMargins(4, 4, 4, 4);
 
     minDeckSizeSpin = new QSpinBox(sizeContainer);
-    minDeckSizeSpin->setSpecialValueText(tr("Any"));
     minDeckSizeSpin->setRange(0, 200);
     minDeckSizeSpin->setValue(0);
 
@@ -269,7 +283,8 @@ void TabArchidekt::setupFilterWidgets()
     minDeckSizeLogicCombo->addItems({"Exact", "≥", "≤"});
     minDeckSizeLogicCombo->setCurrentIndex(1);
 
-    sizeLayout->addWidget(new QLabel(tr("Cards:"), sizeContainer));
+    cardsLabel = new QLabel(sizeContainer);
+    sizeLayout->addWidget(cardsLabel);
     sizeLayout->addWidget(minDeckSizeSpin);
     sizeLayout->addWidget(minDeckSizeLogicCombo);
 
@@ -326,9 +341,9 @@ void TabArchidekt::connectSignals()
     });
 
     // Format filters trigger search
-    connect(edhBracketCombo, &QComboBox::currentTextChanged, this, &TabArchidekt::doSearch);
+    connect(edhBracketCombo, &QComboBox::currentIndexChanged, this, &TabArchidekt::doSearch);
     connect(minDeckSizeSpin, qOverload<int>(&QSpinBox::valueChanged), this, &TabArchidekt::doSearch);
-    connect(minDeckSizeLogicCombo, &QComboBox::currentTextChanged, this, &TabArchidekt::doSearch);
+    connect(minDeckSizeLogicCombo, &QComboBox::currentIndexChanged, this, &TabArchidekt::doSearch);
 
     // Allow Enter key in text fields to trigger search
     connect(nameField, &QLineEdit::returnPressed, this, &TabArchidekt::doSearchImmediate);
@@ -378,8 +393,15 @@ void TabArchidekt::retranslateUi()
     commandersField->setPlaceholderText(tr("Commander..."));
     deckTagNameField->setPlaceholderText(tr("Tag..."));
 
+    bracketLabel->setText(tr("Bracket:"));
+    // Index 0 is the "Any" placeholder added in setupFilterWidgets()
+    edhBracketCombo->setItemText(0, tr("Any"));
+
     formatButton->setButtonText(tr("Formats"));
     deckSizeButton->setButtonText(tr("Deck Size"));
+    cardsLabel->setText(tr("Cards:"));
+    minDeckSizeSpin->setSpecialValueText(tr("Any"));
+    minDeckSizeLogicCombo->setItemText(0, tr("Exact"));
 
     searchButton->setText(tr("Search"));
 
@@ -469,13 +491,17 @@ QString TabArchidekt::buildSearchUrl()
         query.addQueryItem("size", QString::number(minDeckSizeSpin->value()));
 
         QString logic = "GTE";
-        QString selected = minDeckSizeLogicCombo->currentText();
-        if (selected == "≥") {
-            logic = "GTE";
-        } else if (selected == "≤") {
-            logic = "LTE";
-        } else {
-            logic = "";
+        // Index order matches setupFilterWidgets(): 0 = Exact, 1 = ≥, 2 = ≤
+        switch (minDeckSizeLogicCombo->currentIndex()) {
+            case 1:
+                logic = "GTE";
+                break;
+            case 2:
+                logic = "LTE";
+                break;
+            default:
+                logic = "";
+                break;
         }
 
         if (!logic.isEmpty()) {
@@ -576,11 +602,7 @@ void TabArchidekt::processTopDecksResponse(QJsonObject reply)
 
     // New search → clear everything
     if (currentPage == 1) {
-        QLayoutItem *item;
-        while ((item = resultsLayout->takeAt(0)) != nullptr) {
-            delete item->widget();
-            delete item;
-        }
+        QtUtils::clearLayoutRec(resultsLayout, QtUtils::DeletePolicy::Immediate);
 
         listingsWidget = new ArchidektApiResponseDeckListingsDisplayWidget(resultsContainer, deckData, cardSizeSlider);
 
@@ -606,11 +628,7 @@ void TabArchidekt::processDeckResponse(QJsonObject reply)
     isListMode = false;
 
     // Clear existing results for single deck view
-    QLayoutItem *item;
-    while ((item = resultsLayout->takeAt(0)) != nullptr) {
-        delete item->widget();
-        delete item;
-    }
+    QtUtils::clearLayoutRec(resultsLayout, QtUtils::DeletePolicy::Immediate);
 
     auto display = new ArchidektApiResponseDeckDisplayWidget(resultsContainer, deckData, cardSizeSlider);
     connect(display, &ArchidektApiResponseDeckDisplayWidget::requestNavigation, this, &TabArchidekt::actNavigatePage);

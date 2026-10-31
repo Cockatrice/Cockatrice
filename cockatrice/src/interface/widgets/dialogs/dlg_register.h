@@ -5,12 +5,16 @@
 #include <QDialog>
 #include <QLineEdit>
 #include <QMap>
+#include <QString>
+#include <qtmetamacros.h>
+#include <utility>
 
 class HandlePublicServers;
 class QLabel;
 class QPushButton;
 class QRadioButton;
 class UserConnection_Information;
+class QWidget;
 
 class DlgRegister : public QDialog
 {

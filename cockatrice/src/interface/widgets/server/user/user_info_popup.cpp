@@ -4,26 +4,62 @@
 #include "../../interface/pixel_map_generator.h"
 #include "../../interface/theme_manager.h"
 #include "../../interface/widgets/tabs/tab_supervisor.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+#include "libcockatrice/protocol/pb/session_commands.pb.h"
+#include "user_level.h"
 #include "user_list_painter.h"
 
 #include <QApplication>
+#include <QBrush>
+#include <QChar>
+#include <QFlag>
+#include <QFlags>
+#include <QFont>
+#include <QFontMetrics>
 #include <QGridLayout>
 #include <QHBoxLayout>
+#include <QImage>
 #include <QLabel>
+#include <QLayout>
+#include <QLinearGradient>
+#include <QList>
+#include <QListView>
+#include <QMap>
+#include <QMenu>
+#include <QModelIndex>
 #include <QPainter>
 #include <QPainterPath>
-#include <QPropertyAnimation>
+#include <QPen>
+#include <QPoint>
 #include <QPushButton>
-#include <QScreen>
-#include <QScrollBar>
+#include <QRect>
+#include <QRectF>
+#include <QSharedPointer>
+#include <QSize>
+#include <QSizePolicy>
 #include <QStandardItem>
+#include <QStandardItemModel>
+#include <QStringLiteral>
+#include <QStyle>
+#include <QStyleOptionViewItem>
 #include <QStyledItemDelegate>
 #include <QVBoxLayout>
+#include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
-#include <libcockatrice/protocol/pb/commands.pb.h>
 #include <libcockatrice/protocol/pb/response_get_games_of_user.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/utility/card_ref.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qnumeric.h>
+#include <string>
+
+class QAction;
 
 /// Qt stylesheets accept #aarrggbb, which is QColor::name(QColor::HexArgb).
 static QString colorStr(const QColor &color)
@@ -367,9 +403,7 @@ UserInfoPopup::UserInfoPopup(TabSupervisor *_ts,
 
 void UserInfoPopup::buildUi()
 {
-    auto *root = new QVBoxLayout(this);
-    root->setContentsMargins(0, 0, 0, 0);
-    root->setSpacing(0);
+    auto *root = QtUtils::makeLayout<QVBoxLayout>(this, 0);
 
     // Header
     header = new UserInfoHeaderWidget(this);
@@ -634,9 +668,10 @@ void UserInfoPopup::onGamesContextMenu(const QPoint &pos)
                        "QMenu::item:selected{background:%4;}")
             .arg(colorStr(theme.bg), colorStr(theme.text), colorStr(theme.border), colorStr(theme.buttonHover)));
 
-    const bool canJoin = !game.started() && game.player_count() < game.max_players();
+    // Never grey the join action out: GameSelector::joinGame() asks whether to
+    // fall back to spectating when the game is full or already running, so a
+    // disabled entry would just read as a dead button.
     QAction *join = menu.addAction(tr("Join game"));
-    join->setEnabled(canJoin);
 
     QAction *spec = nullptr;
     if (game.spectators_allowed()) {

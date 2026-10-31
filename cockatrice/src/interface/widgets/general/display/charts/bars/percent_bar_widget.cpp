@@ -1,5 +1,13 @@
 #include "percent_bar_widget.h"
 
+#include <QBrush>
+#include <QPainter>
+#include <QPen>
+#include <QRect>
+#include <QtGlobal>
+#include <qnamespace.h>
+#include <qnumeric.h>
+
 PercentBarWidget::PercentBarWidget(QWidget *parent, double initialValue) : QWidget(parent), valueToDisplay(initialValue)
 {
     setMinimumSize(50, 10);

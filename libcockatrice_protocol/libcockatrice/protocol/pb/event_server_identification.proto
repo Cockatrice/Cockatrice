@@ -13,4 +13,10 @@ message Event_ServerIdentification {
     optional string server_version = 2;
     optional uint32 protocol_version = 3;
     optional ServerOptions server_options = 4 [default = NoOptions];
+    // Advertises challenge-response authentication separately from server_options.
+    // server_options must stay exactly SupportsPasswordHash on the wire: it is a
+    // proto2 enum (closed), so already-released clients compiled without any new
+    // enumerator parse an unknown value as NoOptions and fall back to sending
+    // the plaintext password. New clients check this field instead.
+    optional bool supports_challenge_response = 5;
 }

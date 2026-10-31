@@ -9,12 +9,13 @@
 #define DLG_STARTGAME_H
 
 #include <QDialog>
+#include <qtmetamacros.h>
 
 class RemoteDeckList_TreeWidget;
 class QModelIndex;
 class AbstractClient;
-class QPushButton;
 class QDialogButtonBox;
+class QWidget;
 
 class DlgLoadRemoteDeck : public QDialog
 {

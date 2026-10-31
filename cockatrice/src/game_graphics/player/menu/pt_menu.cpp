@@ -1,9 +1,13 @@
 #include "pt_menu.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
+#include "../../game_scene.h"
 #include "../player_graphics_item.h"
+
+#include <QAction>
 
 PtMenu::PtMenu(PlayerGraphicsItem *player) : QMenu(tr("Power / toughness"))
 {

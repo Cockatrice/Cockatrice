@@ -4,6 +4,8 @@
 #include "card_set.h"
 
 #include <QList>
+#include <QSharedPointer>
+#include <QStringList>
 
 /**
  * @class CardSetList
@@ -38,36 +40,37 @@ public:
     void sortByKey();
 
     /**
-     * @brief Reassigns sort keys based on the current order.
+     * @brief Enables every set with fresh sort keys, persisting in one flush.
      *
-     * Calls defaultSort() and then assigns sequential sort keys
-     * to all sets according to their resulting positions, replacing
-     * any existing sort keys to ensure consistent ordering.
+     * Assigns sequential sort keys in default-sorted order and marks every set
+     * known and enabled, writing all records through the controller's batched
+     * saveSets() in a single settings flush instead of ~3 QSettings rewrite
+     * cycles per set, which froze the GUI thread for seconds on a first run
+     * with a full database.
+     * @param controller The set priority controller to persist the records with.
      */
-    void guessSortKeys();
+    void enableAllBatched(ICardSetPriorityController *controller);
 
     /**
-     * @brief Enables all sets that are unknown or ignored.
+     * @brief Enables all sets that are unknown or ignored, persisting in one flush.
      *
      * Sets that are not marked as known and not ignored are marked as known
      * and enabled. Ignored-known sets are also enabled, but remain ignored.
+     * Only changed sets are written, so the common case of a few new sets costs
+     * a single settings flush no matter how large the database is.
+     * @param controller The set priority controller to persist the records with.
      */
-    void enableAllUnknown();
+    void enableAllUnknownBatched(ICardSetPriorityController *controller);
 
     /**
-     * @brief Enables all sets in the list.
-     *
-     * Equivalent to calling `setEnabled(true)` on each entry.
-     */
-    void enableAll();
-
-    /**
-     * @brief Marks all sets as known and adjusts their enabled state.
+     * @brief Marks all sets as known and adjusts their enabled state, persisting in one flush.
      *
      * Unknown, non-ignored sets become known and disabled.
      * Ignored-known sets are enabled if they were previously disabled.
+     * Only changed sets are written; when nothing is unknown no flush happens at all.
+     * @param controller The set priority controller to persist the records with.
      */
-    void markAllAsKnown();
+    void markAllAsKnownBatched(ICardSetPriorityController *controller);
 
     /**
      * @brief Counts the number of sets that are currently enabled.

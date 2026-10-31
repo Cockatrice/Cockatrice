@@ -1,23 +1,34 @@
 #include "server_player.h"
 
 #include "../server.h"
-#include "../server_abstractuserinterface.h"
 #include "../server_database_interface.h"
 #include "../server_room.h"
+#include "game/server_abstract_participant.h"
+#include "game/server_abstract_player.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
+#include "libcockatrice/protocol/pb/color.pb.h"
+#include "libcockatrice/protocol/pb/move_card_to_zone.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_card.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_counter.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_zone.pb.h"
+#include "libcockatrice/utility/card_ref.h"
+#include "libcockatrice/utility/playmat_params.h"
 #include "server_card.h"
 #include "server_cardzone.h"
 #include "server_counter.h"
 #include "server_game.h"
 #include "server_move_card_struct.h"
+#include "server_response_containers.h"
 
-#include <QDebug>
-#include <QRegularExpression>
-#include <algorithm>
+#include <QMapIterator>
+#include <QSet>
+#include <QSharedPointer>
+#include <QString>
+#include <QtGlobal>
+#include <google/protobuf/stubs/port.h>
 #include <libcockatrice/deck_list/deck_list.h>
-#include <libcockatrice/deck_list/tree/deck_list_card_node.h>
-#include <libcockatrice/protocol/pb/command_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/command_change_zone_properties.pb.h>
-#include <libcockatrice/protocol/pb/command_concede.pb.h>
 #include <libcockatrice/protocol/pb/command_create_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_select.pb.h>
 #include <libcockatrice/protocol/pb/command_del_counter.pb.h>
@@ -43,13 +54,15 @@
 #include <libcockatrice/protocol/pb/event_shuffle.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_download.pb.h>
-#include <libcockatrice/protocol/pb/response_dump_zone.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
-#include <libcockatrice/rng/rng_abstract.h>
 #include <libcockatrice/utility/color.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <libcockatrice/utility/zone_names.h>
+#include <qalgorithms.h>
+#include <string>
+
+class Server_AbstractUserInterface;
 
 Server_Player::Server_Player(Server_Game *_game,
                              int _playerId,
@@ -242,6 +255,19 @@ Server_Player::cmdDeckSelect(const Command_DeckSelect &cmd, ResponseContainer &r
 
     if (!newDeck) {
         return Response::RespInternalError;
+    }
+
+    // Card art rules apply to playmats as well: never broadcast a DENY-listed
+    // printing as a playmat. Stripping keeps the deck selectable while hiding
+    // the banned art from all clients.
+    const auto deckPlaymat = newDeck->getPlaymat();
+    if (!deckPlaymat.card.name.isEmpty()) {
+        auto *db = game->getRoom()->getServer()->getDatabaseInterface();
+        // Check the truncated values actually broadcast below; the rule columns are varchar(255).
+        if (db && !db->isCardArtAllowed(deckPlaymat.card.name.left(MAX_NAME_LENGTH),
+                                        deckPlaymat.card.providerId.left(MAX_NAME_LENGTH))) {
+            newDeck->setPlaymat({});
+        }
     }
 
     delete deck;
@@ -617,6 +643,14 @@ Server_Player::cmdSetPlaymat(const Command_SetPlaymat &cmd, ResponseContainer &r
     const auto rawProviderId = QString::fromStdString(pp.card_provider_id());
     if (rawName.length() > MAX_NAME_LENGTH || rawProviderId.length() > MAX_NAME_LENGTH) {
         return Response::RespInvalidData;
+    }
+    // Card art rules apply to playmats as well: reject DENY-listed art, like
+    // cmdSetCardArtParams does. Empty clears the playmat and is always allowed.
+    if (!rawName.isEmpty()) {
+        auto *db = game->getRoom()->getServer()->getDatabaseInterface();
+        if (db && !db->isCardArtAllowed(rawName, rawProviderId)) {
+            return Response::RespFunctionNotAllowed;
+        }
     }
     PlaymatInfo playmat;
     playmat.card.name = rawName;

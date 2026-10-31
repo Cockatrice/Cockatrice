@@ -1,19 +1,39 @@
 #include "printing_selector.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../../interface/card_picture_loader/card_picture_loader.h"
-#include "../../../interface/widgets/dialogs/dlg_select_set_for_cards.h"
+#include "../cards/card_size_widget.h"
 #include "../deck_editor/deck_state_manager.h"
+#include "../general/layout_containers/flow_widget.h"
+#include "../quick_settings/settings_button_widget.h"
+#include "../tabs/abstract_tab_deck_editor.h"
+#include "deck_list_model.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/deck_list/tree/deck_list_card_node.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
 #include "printing_selector_card_display_widget.h"
 #include "printing_selector_card_search_widget.h"
 #include "printing_selector_card_selection_widget.h"
 #include "printing_selector_card_sorting_widget.h"
 #include "printing_selector_placeholder_widget.h"
 
-#include <QBoxLayout>
+#include <QCheckBox>
+#include <QDebug>
+#include <QHBoxLayout>
+#include <QList>
+#include <QMap>
+#include <QScrollArea>
 #include <QScrollBar>
+#include <QSharedPointer>
+#include <QSizePolicy>
+#include <QString>
+#include <QTimer>
+#include <QVBoxLayout>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/utility/macros.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qnamespace.h>
 
 /**
  * @brief Constructs a PrintingSelector widget to display and manage card printings.
@@ -58,15 +78,14 @@ PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deck
                                         SettingsCache::instance().cardsDisplay().getPrintingSelectorCardSize());
     connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance().cardsDisplay(),
             &CardsDisplaySettings::setPrintingSelectorCardSize);
+    cardSizeWidget->enableCtrlScrollResize(flowWidget);
 
     displayOptionsWidget->addSettingsWidget(sortToolBar);
     displayOptionsWidget->addSettingsWidget(navigationCheckBox);
     displayOptionsWidget->addSettingsWidget(cardSizeWidget);
 
     sortAndOptionsContainer = new QWidget(this);
-    sortAndOptionsLayout = new QHBoxLayout(sortAndOptionsContainer);
-    sortAndOptionsLayout->setSpacing(3);
-    sortAndOptionsLayout->setContentsMargins(0, 0, 0, 0);
+    sortAndOptionsLayout = QtUtils::makeLayout<QHBoxLayout>(sortAndOptionsContainer, 0, 3);
     sortAndOptionsContainer->setLayout(sortAndOptionsLayout);
 
     searchBar = new PrintingSelectorCardSearchWidget(this);
@@ -209,7 +228,7 @@ void PrintingSelector::getAllSetsForCurrentCard()
         return;
     }
 
-    SetToPrintingsMap setMap = selectedCard->getSets();
+    const auto &setMap = selectedCard->getSets();
     const QList<PrintingInfo> sortedPrintings = sortToolBar->sortSets(setMap);
     const QList<PrintingInfo> filteredPrintings =
         sortToolBar->filterSets(sortedPrintings, searchBar->getSearchText().trimmed().toLower());

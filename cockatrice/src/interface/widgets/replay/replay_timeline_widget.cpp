@@ -1,9 +1,15 @@
 #include "replay_timeline_widget.h"
 
-#include "../../../client/settings/cache_settings.h"
-
+#include <QBrush>
+#include <QColor>
+#include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
+#include <QPointF>
+#include <QSize>
+#include <QtGlobal>
+#include <qnamespace.h>
+#include <qnumeric.h>
 
 static constexpr int BIN_LENGTH = 5000;
 static constexpr int MIN_RESOLUTION_MS = 1000;

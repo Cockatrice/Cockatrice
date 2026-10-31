@@ -19,16 +19,36 @@
  ***************************************************************************/
 #include "server.h"
 
+#include "game/server_abstract_participant.h"
 #include "game/server_game.h"
-#include "game/server_player.h"
+#include "libcockatrice/protocol/pb/commands.pb.h"
+#include "libcockatrice/protocol/pb/game_commands.pb.h"
+#include "libcockatrice/protocol/pb/game_event_container.pb.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/room_commands.pb.h"
+#include "libcockatrice/protocol/pb/room_event.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_ban.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_room.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+#include "server_abstractuserinterface.h"
 #include "server_database_interface.h"
 #include "server_protocolhandler.h"
 #include "server_remoteuserinterface.h"
+#include "server_response_containers.h"
 #include "server_room.h"
+#include "serverinfo_user_container.h"
 
-#include <QCoreApplication>
+#include <QDateTime>
 #include <QDebug>
+#include <QMapIterator>
+#include <QMetaType>
+#include <QPair>
+#include <QReadLocker>
+#include <QSharedPointer>
 #include <QThread>
+#include <QWriteLocker>
+#include <google/protobuf/stubs/port.h>
 #include <libcockatrice/protocol/debug_pb_message.h>
 #include <libcockatrice/protocol/pb/event_connection_closed.pb.h>
 #include <libcockatrice/protocol/pb/event_list_rooms.pb.h>
@@ -36,6 +56,10 @@
 #include <libcockatrice/protocol/pb/event_user_left.pb.h>
 #include <libcockatrice/protocol/pb/isl_message.pb.h>
 #include <libcockatrice/protocol/pb/session_event.pb.h>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <string>
+#include <utility>
 
 Server::Server(QObject *parent) : QObject(parent), nextLocalGameId(0), tcpUserCount(0), webSocketUserCount(0)
 {
@@ -417,7 +441,7 @@ void Server::externalRoomUserLeft(int roomId, const QString &userName)
     room->removeExternalUser(userName);
 }
 
-void Server::externalRoomSay(int roomId, const QString &userName, const QString &message)
+void Server::externalRoomSay(int roomId, const QString &userName, const QString &message, const QString &channelId)
 {
     // This function is always called from the main thread via signal/slot.
     QReadLocker locker(&roomsLock);
@@ -427,10 +451,22 @@ void Server::externalRoomSay(int roomId, const QString &userName, const QString 
         qDebug() << "externalRoomSay: room id=" << roomId << "not found";
         return;
     }
-    room->say(userName, message, false);
+    if (!channelId.isEmpty() && !Server_Room::isMainChannel(channelId) && room->findChannel(channelId) == nullptr) {
+        // The receiver does not know this channel; say() would drop it, so do
+        // not log what was never delivered.
+        qDebug() << "externalRoomSay: unknown channel" << channelId << "for room id=" << roomId << "dropping";
+        return;
+    }
+    room->say(userName, message, channelId, false);
 
-    getDatabaseInterface()->logMessage(0, userName, "ISL", message, Server_DatabaseInterface::MessageTargetIslRoom,
-                                       room->getId(), room->getName());
+    if (channelId.isEmpty()) {
+        getDatabaseInterface()->logMessage(0, userName, "ISL", message, Server_DatabaseInterface::MessageTargetIslRoom,
+                                           room->getId(), room->getName());
+    } else {
+        getDatabaseInterface()->logMessage(0, userName, "ISL", message,
+                                           Server_DatabaseInterface::MessageTargetRoomChannel, room->getId(),
+                                           room->getName(), channelId);
+    }
 }
 
 void Server::externalRoomRemoveMessages(int roomId, const QString &userName, int amount)

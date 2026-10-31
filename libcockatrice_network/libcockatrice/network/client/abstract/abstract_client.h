@@ -11,10 +11,27 @@
 
 #include <QElapsedTimer>
 #include <QLoggingCategory>
+#include <QMap>
 #include <QMutex>
-#include <QVariant>
-#include <libcockatrice/protocol/pb/response.pb.h>
+#include <QMutexLocker>
+#include <QObject>
+#include <QString>
+
+// IWYU pragma: keep
+// ServerInfo_User appears in signal signatures, including inside QList, so the
+// moc-generated code needs the complete type.
+#include <QtGlobal>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <qtmetamacros.h>
+
+namespace google
+{
+namespace protobuf
+{
+class Message;
+} // namespace protobuf
+} // namespace google
+template <typename T> class QList;
 
 inline Q_LOGGING_CATEGORY(AbstractClientLog, "abstract_client");
 
@@ -36,7 +53,6 @@ class Event_NotifyUser;
 class Event_ConnectionClosed;
 class Event_ServerShutdown;
 class Event_ReplayAdded;
-class FeatureSet;
 
 enum ClientStatus
 {
@@ -117,6 +133,7 @@ protected:
     QMap<int, PendingCommand *> pendingCommands;
     QString userName, password, email, country, realName, token;
     bool serverSupportsPasswordHash;
+    bool serverSupportsChallengeResponse;
     void setStatus(ClientStatus _status);
     int getNewCmdId()
     {
@@ -149,6 +166,10 @@ public:
     bool getServerSupportsPasswordHash() const
     {
         return serverSupportsPasswordHash;
+    }
+    bool getServerSupportsChallengeResponse() const
+    {
+        return serverSupportsChallengeResponse;
     }
     const QString &getUserName() const
     {

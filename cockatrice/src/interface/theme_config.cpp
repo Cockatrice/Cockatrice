@@ -1,9 +1,17 @@
 #include "theme_config.h"
 
+#include <QByteArray>
+#include <QChar>
 #include <QDir>
 #include <QFile>
+#include <QFlags>
+#include <QIODevice>
+#include <QList>
 #include <QMetaEnum>
+#include <QPair>
 #include <QTextStream>
+#include <qnamespace.h>
+#include <utility>
 
 bool ThemeConfig::isEmpty() const
 {

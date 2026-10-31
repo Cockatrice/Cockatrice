@@ -2,8 +2,14 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../../game_graphics/board/card_item.h"
+#include "../board/card_list.h"
 
+#include <QtGlobal>
 #include <libcockatrice/settings/interface_settings.h>
+
+class PlayerLogic;
+class QObject;
+
 /**
  * @param _player the player that the cards are revealed to.
  * @param _origZone the zone the cards were revealed from.
@@ -152,6 +158,14 @@ void ZoneViewZoneLogic::removeCard(int position, bool toNewZone)
 
     updateCardIds(REMOVE_CARD);
     reorganizeCards();
+}
+
+void ZoneViewZoneLogic::clearCards()
+{
+    for (auto card : cards) {
+        card->deleteLater();
+    }
+    cards.clear();
 }
 
 void ZoneViewZoneLogic::setWriteableRevealZone(bool _writeableRevealZone)

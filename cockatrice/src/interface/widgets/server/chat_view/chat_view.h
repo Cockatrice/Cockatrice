@@ -8,22 +8,34 @@
 #ifndef CHATVIEW_H
 #define CHATVIEW_H
 
-#include "../../interface/widgets/tabs/tab_supervisor.h"
-#include "../user/user_list_widget.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 
-#include <QAction>
 #include <QColor>
+#include <QDateTime>
+#include <QList>
+#include <QMap>
+#include <QString>
+#include <QStringList>
+#include <QTextBlock>
 #include <QTextBrowser>
+#include <QTextCharFormat>
 #include <QTextCursor>
 #include <QTextFragment>
+#include <QVector>
 #include <libcockatrice/network/server/remote/room_message_type.h>
 #include <libcockatrice/network/server/remote/user_level.h>
+#include <qtmetamacros.h>
 
 class AbstractGame;
-class QTextTable;
-class QMouseEvent;
 class UserContextMenu;
 class UserListProxy;
+class QAction;
+class QPoint;
+class QUrl;
+class QWidget;
+class TabSupervisor;
+struct CardRef;
+template <typename Enum> class QFlags;
 
 class UserMessagePosition
 {
@@ -107,9 +119,8 @@ public:
     ChatView(TabSupervisor *_tabSupervisor, AbstractGame *_game, bool _showTimestamps, QWidget *parent = nullptr);
     void retranslateUi();
     void appendHtml(const QString &html);
-    void virtual appendHtmlServerMessage(const QString &html,
-                                         bool optionalIsBold = false,
-                                         QString optionalFontColor = QString());
+    virtual void
+    appendHtmlServerMessage(const QString &html, bool optionalIsBold = false, QString optionalFontColor = QString());
     void appendMessage(QString message,
                        RoomMessageTypeFlags messageType = {},
                        const ServerInfo_User &userInfo = {},
@@ -119,6 +130,7 @@ public:
     QString getRecentChatLog(int maxMessages = 50) const;
 
 protected:
+    [[nodiscard]] virtual QString getCurrentTime() const;
     void enterEvent(QEnterEvent *event) override;
     void leaveEvent(QEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;

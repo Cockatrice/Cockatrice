@@ -1,6 +1,15 @@
+#include "libcockatrice/interfaces/interface_interface_settings_provider.h"
+#include "libcockatrice/utility/card_ref.h"
+#include "libcockatrice/utility/playmat_params.h"
+
+#include <QList>
+#include <QString>
+#include <QStringList>
+#include <QStringLiteral>
 #include <gtest/gtest.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/playmat_resolver.h>
+#include <string>
 
 namespace
 {

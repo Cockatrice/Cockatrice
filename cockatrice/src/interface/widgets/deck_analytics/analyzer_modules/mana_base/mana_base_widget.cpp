@@ -3,12 +3,28 @@
 #include "../../../general/display/charts/bars/bar_widget.h"
 #include "../../../general/display/charts/bars/color_bar.h"
 #include "../../../general/display/charts/pies/color_pie.h"
+#include "../../abstract_analytics_panel_widget.h"
 #include "../../analytics_panel_widget_registrar.h"
+#include "../../deck_list_statistics_analyzer.h"
 #include "mana_base_config_dialog.h"
 
+#include <QColor>
 #include <QDialog>
-#include <QListWidget>
+#include <QHBoxLayout>
+#include <QHash>
+#include <QLayoutItem>
+#include <QMap>
+#include <QObject>
+#include <QPair>
+#include <QSharedPointer>
+#include <QSize>
+#include <QVBoxLayout>
+#include <QWidget>
+#include <algorithm>
 #include <libcockatrice/utility/color.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qnamespace.h>
+#include <utility>
 
 namespace
 {
@@ -32,12 +48,7 @@ ManaBaseWidget::ManaBaseWidget(QWidget *parent, DeckListStatisticsAnalyzer *anal
 void ManaBaseWidget::updateDisplay()
 {
     // Clear previous widgets
-    while (QLayoutItem *item = barLayout->takeAt(0)) {
-        if (item->widget()) {
-            item->widget()->deleteLater();
-        }
-        delete item;
-    }
+    QtUtils::clearLayoutRec(barLayout);
 
     auto &pipCount = analyzer->getProductionPipCount();
     auto &cardCount = analyzer->getProductionCardCount();

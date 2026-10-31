@@ -6,17 +6,20 @@
 #ifndef DECK_PREVIEW_WIDGET_H
 #define DECK_PREVIEW_WIDGET_H
 
-#include "../../cards/deck_preview_card_picture_widget.h"
-#include "../visual_deck_storage_model.h"
-
 #include <QAbstractItemView>
+#include <QAbstractScrollArea>
 #include <QApplication>
 #include <QComboBox>
 #include <QEvent>
-#include <QVBoxLayout>
+#include <QList>
+#include <QObject>
+#include <QString>
+#include <QStringList>
 #include <QWidget>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qtmetamacros.h>
 
-class QEnterEvent;
+class QFrame;
 class QLabel;
 class QMenu;
 class QMouseEvent;
@@ -25,6 +28,8 @@ class DeckPreviewCardPictureWidget;
 class DeckPreviewDeckTagsDisplayWidget;
 class VisualDeckStorageModel;
 class VisualDeckStorageWidget;
+class QVBoxLayout;
+struct LoadedDeck;
 
 class DeckPreviewWidget final : public QWidget
 {
@@ -41,9 +46,19 @@ public:
      */
     DeckPreviewCardPictureWidget *bannerCardDisplayWidget;
 
+    /** @brief The path of the deck file backing this preview. */
+    QString filePath;
+
+    void setShareSelectable(bool selectable);
+    void setShareSelected(bool selected);
+    [[nodiscard]] bool isShareSelected() const;
+    [[nodiscard]] bool isShareSelectable() const;
+
 signals:
     void deckLoadRequested(const QString &filePath);
     void openDeckEditor(const LoadedDeck &deck);
+    void shareDeckRequested(const QString &filePath);
+    void shareSelectionToggled(bool selected);
 
 public slots:
     /**
@@ -66,6 +81,7 @@ public slots:
 protected:
     void enterEvent(QEnterEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
     [[nodiscard]] int row() const;
@@ -76,6 +92,7 @@ private:
     QMenu *createRightClickMenu();
     void addSetBannerCardMenu(QMenu *menu);
     void imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
+    void imageSingleClicked();
     void imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
 
     void actRenameDeck();
@@ -84,7 +101,6 @@ private:
 
     VisualDeckStorageWidget *visualDeckStorageWidget;
     VisualDeckStorageModel *model;
-    QString filePath;
     QVBoxLayout *layout;
     ColorIdentityWidget *colorIdentityWidget;
     DeckPreviewDeckTagsDisplayWidget *deckTagsDisplayWidget;
@@ -92,6 +108,12 @@ private:
     QComboBox *bannerCardComboBox;
     QList<QWidget *> fixedWidthChildren; ///< Children clamped to the picture width on resize.
     int lastKnownBannerWidth = -1;       ///< The picture width last applied to the children.
+    QFrame *selectionFrame = nullptr;
+    bool shareSelectable = false;
+    bool shareSelected = false;
+
+    void updateSelectionStyle();
+    void updateSelectionFrameGeometry();
 };
 
 class NoScrollFilter : public QObject
@@ -110,13 +132,9 @@ protected:
                 // If popup is not open, forward event to parent scroll area
                 if (!combo->view()->isVisible()) {
                     // Try to find a scrollable parent and manually send the event
-                    QWidget *parent = combo->parentWidget();
-                    while (parent) {
-                        if (auto *scroll = qobject_cast<QAbstractScrollArea *>(parent)) {
-                            QApplication::sendEvent(scroll->viewport(), event);
-                            return true; // Mark event as handled
-                        }
-                        parent = parent->parentWidget();
+                    if (auto *scroll = QtUtils::findParentOfType<QAbstractScrollArea>(combo)) {
+                        QApplication::sendEvent(scroll->viewport(), event);
+                        return true; // Mark event as handled
                     }
                     // If no scrollable parent found, just block
                     return true;

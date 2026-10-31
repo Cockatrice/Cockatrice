@@ -1,5 +1,9 @@
 #include "archidekt_api_response_deck_category.h"
 
+#include <QDebug>
+#include <QJsonValue>
+#include <qlogging.h>
+
 void ArchidektApiResponseDeckCategory::fromJson(const QJsonObject &json)
 {
     id = json.value("id").toInt();

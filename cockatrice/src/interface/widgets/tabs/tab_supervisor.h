@@ -8,29 +8,36 @@
 #ifndef TAB_SUPERVISOR_H
 #define TAB_SUPERVISOR_H
 
-#include "../../deck_loader/deck_loader.h"
 #include "../interface/widgets/server/game_link.h"
-#include "../interface/widgets/server/user/user_list_proxy.h"
-#include "abstract_tab_deck_editor.h"
-#include "api/archidekt/tab_archidekt.h"
-#include "api/edhrec/tab_edhrec.h"
-#include "api/edhrec/tab_edhrec_main.h"
-#include "tab_visual_database_display.h"
-#include "visual_deck_editor/tab_deck_editor_visual.h"
-#include "visual_deck_storage/tab_deck_storage_visual.h"
+#include "libcockatrice/card/card_info.h"
 
 #include <QAbstractButton>
+#include <QList>
 #include <QLoggingCategory>
 #include <QMap>
+#include <QMenu>
 #include <QProxyStyle>
+#include <QSize>
+#include <QString>
 #include <QTabWidget>
 #include <libcockatrice/network/client/abstract/latency_tracker.h>
+#include <qtmetamacros.h>
 
 class TabCardArtRules;
+class AbstractTabDeckEditor;
+class QAction;
+class QWidget;
+class TabArchidekt;
+class TabDeckEditorVisual;
+class TabDeckStorageVisual;
+class TabEdhRec;
+class TabEdhRecMain;
+class TabVisualDatabaseDisplay;
+struct LoadedDeck;
+
 inline Q_LOGGING_CATEGORY(TabSupervisorLog, "tab_supervisor");
 
 class UserListManager;
-class QMenu;
 class AbstractClient;
 class Tab;
 class TabServer;
@@ -47,6 +54,7 @@ class TabAccount;
 class TabDeckEditor;
 class TabDeveloper;
 class TabLog;
+class TabPublicDecks;
 class RoomEvent;
 class GameEventContainer;
 class Event_GameJoined;
@@ -55,7 +63,6 @@ class Event_NotifyUser;
 class ServerInfo_Room;
 class ServerInfo_User;
 class GameReplay;
-class DeckList;
 
 class MacOSTabFixStyle : public QProxyStyle
 {
@@ -114,6 +121,7 @@ private:
     QMap<int, TabGame *> gameTabs;
     QList<TabGame *> replayTabs;
     QMap<QString, TabMessage *> messageTabs;
+    QMap<QString, TabPublicDecks *> publicDecksTabs;
     QList<AbstractTabDeckEditor *> deckEditorTabs;
     bool isLocalGame;
 
@@ -126,6 +134,8 @@ private:
     static QString sanitizeTabName(QString dirty);
     static QString sanitizeHtml(QString dirty);
     void resetTabsMenu();
+    /** Shared join/spectate driver behind the report tab and the profile hover card. */
+    void joinGameByIntent(int gameId, int roomId, bool asSpectator);
 
 public:
     explicit TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent = nullptr);
@@ -152,6 +162,10 @@ public:
         return userInfo;
     }
     [[nodiscard]] AbstractClient *getClient() const;
+    [[nodiscard]] AbstractClient *getServerClient() const
+    {
+        return client;
+    }
     [[nodiscard]] UserListManager *getUserListManager() const
     {
         return userListManager;
@@ -192,6 +206,8 @@ public slots:
     TabEdhRec *addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCommander = false);
     void openReplay(GameReplay *replay);
     void joinReportGame(int gameId, int roomId);
+    /** Joins or spectates a game listed on a user's profile hover card. */
+    void joinGameFromUserCard(int gameId, int roomId, bool asSpectator);
     void openTabModeration(const QString &userName = {});
     void switchToFirstAvailableNetworkTab();
     void maximizeMainWindow();
@@ -199,6 +215,7 @@ public slots:
     void actTabReplays(bool checked);
     void openTabServer();
     void addRoomTab(const ServerInfo_Room &info, bool setCurrent);
+    void openTabPublicDecks(const QString &userName);
 private slots:
     void refreshShortcuts();
 
@@ -231,6 +248,7 @@ private slots:
     void localGameJoined(const Event_GameJoined &event);
     void gameLeft(TabGame *tab);
     void roomLeft(TabRoom *tab);
+    void publicDecksClosed(TabPublicDecks *tab);
     TabMessage *addMessageTab(const QString &userName, bool focus);
     void replayLeft(TabGame *tab);
     void processUserLeft(const QString &userName);

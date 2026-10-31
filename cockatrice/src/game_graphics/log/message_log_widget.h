@@ -7,14 +7,23 @@
 #ifndef MESSAGELOGWIDGET_H
 #define MESSAGELOGWIDGET_H
 
-#include "../../game/zones/card_zone_logic.h"
 #include "../../interface/widgets/server/chat_view/chat_view.h"
+
+#include <QPair>
+#include <QString>
+#include <qtmetamacros.h>
+#include <sys/types.h>
 
 class AbstractGame;
 class CardItem;
 class GameEventContext;
 class PlayerLogic;
 class PlayerEventHandler;
+class CardZoneLogic;
+class QWidget;
+class ServerInfo_User;
+class TabSupervisor;
+template <typename T> class QList;
 
 class MessageLogWidget : public ChatView
 {
@@ -104,6 +113,9 @@ public slots:
     void appendHtmlServerMessage(const QString &html,
                                  bool optionalIsBold = false,
                                  QString optionalFontColor = QString()) override;
+
+private:
+    [[nodiscard]] QString getCurrentTime() const override;
 };
 
 #endif

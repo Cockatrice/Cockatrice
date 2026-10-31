@@ -3,6 +3,8 @@
 
 #include "intent.h"
 
+#include <qtmetamacros.h>
+
 class IntentWaitForDatabaseLoad : public Intent
 {
     Q_OBJECT

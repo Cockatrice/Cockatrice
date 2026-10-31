@@ -1,7 +1,19 @@
 #include "archidekt_api_response_deck_listings_display_widget.h"
 
-#include "../../../../cards/card_info_picture_with_text_overlay_widget.h"
+#include "../../../../cards/card_size_widget.h"
+#include "../../../../general/layout_containers/flow_widget.h"
+#include "../api_response/archidekt_deck_listing_api_response.h"
+#include "../api_response/deck_listings/archidekt_api_response_deck_listing_container.h"
 #include "archidekt_api_response_deck_entry_display_widget.h"
+
+#include <QHBoxLayout>
+#include <QList>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QSlider>
+#include <libcockatrice/network/network_manager.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qnamespace.h>
 
 ArchidektApiResponseDeckListingsDisplayWidget::ArchidektApiResponseDeckListingsDisplayWidget(
     QWidget *parent,
@@ -9,14 +21,14 @@ ArchidektApiResponseDeckListingsDisplayWidget::ArchidektApiResponseDeckListingsD
     CardSizeWidget *_cardSizeSlider)
     : QWidget(parent), cardSizeSlider(_cardSizeSlider)
 {
-    layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout = QtUtils::makeLayout<QHBoxLayout>(this);
     setLayout(layout);
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
 
-    imageNetworkManager = new QNetworkAccessManager(this);
-    imageNetworkManager->setTransferTimeout(); // Use Qt's default timeout
+    cardSizeSlider->enableCtrlScrollResize(flowWidget);
+
+    imageNetworkManager = NetworkManagerFactory::create(this);
     imageNetworkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
 
     // Add widgets for deck listings
@@ -52,7 +64,5 @@ void ArchidektApiResponseDeckListingsDisplayWidget::append(const ArchidektDeckLi
 void ArchidektApiResponseDeckListingsDisplayWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-    layout->invalidate();
-    layout->activate();
-    layout->update();
+    QtUtils::relayout(layout);
 }

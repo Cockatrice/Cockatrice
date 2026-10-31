@@ -5,11 +5,14 @@
 
 #include <QCheckBox>
 #include <QComboBox>
-#include <QGroupBox>
 #include <QLabel>
+#include <QList>
 #include <QPushButton>
 #include <QSpinBox>
 #include <libcockatrice/utility/macros.h>
+#include <qtmetamacros.h>
+
+class QGroupBox;
 
 class AppearanceSettingsPage : public AbstractSettingsPage
 {
@@ -19,6 +22,8 @@ private slots:
     void openThemeLocation();
     void editPalette();
     void updateHomeTabSettingsVisibility();
+    void updateStyleWarning();
+    void styleComboChanged(int index);
     void showShortcutsChanged(QT_STATE_CHANGED_T enabled);
     void overrideAllCardArtWithPersonalPreferenceToggled(QT_STATE_CHANGED_T enabled);
 
@@ -34,7 +39,9 @@ private:
     QComboBox schemeCombo;
     QLabel styleComboLabel;
     QComboBox styleCombo;
+    QLabel styleWarningLabel;
     QPushButton editPaletteButton;
+    QString previousStyle;
 
     QLabel homeTabBackgroundSourceLabel;
     QComboBox homeTabBackgroundSourceBox;

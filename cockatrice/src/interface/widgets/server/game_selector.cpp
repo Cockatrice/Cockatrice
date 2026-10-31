@@ -1,32 +1,55 @@
 #include "game_selector.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../../pixel_map_generator.h"
 #include "../interface/widgets/dialogs/dlg_create_game.h"
 #include "../interface/widgets/dialogs/dlg_filter_games.h"
-#include "../interface/widgets/tabs/tab_account.h"
-#include "../interface/widgets/tabs/tab_game.h"
 #include "../interface/widgets/tabs/tab_room.h"
 #include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../interface/widgets/utility/get_text_with_max.h"
 #include "game_link.h"
+#include "game_selector_quick_filter_toolbar.h"
 #include "games_model.h"
+#include "libcockatrice/protocol/pb/event_add_to_list.pb.h"
+#include "libcockatrice/protocol/pb/event_remove_from_list.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 #include "user/user_list_manager.h"
 
+#include <QAction>
 #include <QClipboard>
 #include <QDebug>
 #include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QItemSelectionModel>
+#include <QLineEdit>
+#include <QMap>
+#include <QMenu>
 #include <QMessageBox>
+#include <QModelIndex>
 #include <QPushButton>
+#include <QSize>
+#include <QString>
+#include <QStringLiteral>
 #include <QTreeView>
+#include <QVBoxLayout>
+#include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/room_commands.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <string>
+
+class QModelIndex;
+class QPoint;
+class QWidget;
+template <typename T> class QList;
 
 GameSelector::GameSelector(AbstractClient *_client,
                            TabSupervisor *_tabSupervisor,
@@ -91,6 +114,17 @@ GameSelector::GameSelector(AbstractClient *_client,
                     quickFilterToolBar->setVisible(
                         SettingsCache::instance().userInterface().getShowGameSelectorFilterToolbar());
                 });
+        // The quick-filter toolbar only updates the in-memory model, so persist every change.
+        // Otherwise each new GameSelector (room switch, reconnect, restart) would revert to stale
+        // saved values and e.g. hide full/started games the user had unchecked. The save is
+        // debounced so typing in the search field does not rewrite the settings file on every
+        // keystroke; a pending save is flushed in the destructor.
+        filterSaveDebounceTimer.setSingleShot(true);
+        filterSaveDebounceTimer.setInterval(500);
+        connect(&filterSaveDebounceTimer, &QTimer::timeout, this,
+                [this] { gameListProxyModel->saveFilterParameters(gameTypeMap); });
+        connect(gameListProxyModel, &GamesProxyModel::filtersChanged, this,
+                [this] { filterSaveDebounceTimer.start(); });
     } else {
         quickFilterToolBar = nullptr;
     }
@@ -163,6 +197,18 @@ GameSelector::GameSelector(AbstractClient *_client,
     connect(client, &AbstractClient::ignoreListReceived, this, &GameSelector::ignoreListReceived);
     connect(client, &AbstractClient::addToListEventReceived, this, &GameSelector::processAddToListEvent);
     connect(client, &AbstractClient::removeFromListEventReceived, this, &GameSelector::processRemoveFromListEvent);
+}
+
+GameSelector::~GameSelector()
+{
+    // Nothing else persists quick-filter toolbar edits: the toolbar only updates the in-memory model,
+    // and the debounced timer above is the sole writer for that path (actSetFilter/actClearFilter save
+    // synchronously, but the toolbar does not). Flush a pending debounced save so edits made within
+    // the debounce interval before destruction are not lost on room switch, reconnect, or close.
+    if (filterSaveDebounceTimer.isActive()) {
+        filterSaveDebounceTimer.stop();
+        gameListProxyModel->saveFilterParameters(gameTypeMap);
+    }
 }
 
 void GameSelector::ignoreListReceived(const QList<ServerInfo_User> &)
@@ -375,10 +421,8 @@ void GameSelector::joinGame(const ServerInfo_Game &game, const bool asSpectator,
     // spectator join, so ask first instead of surprising the player.
     const bool gameFull = game.player_count() == game.max_players();
     if (gameFull && !asSpectator && !asJudge && !overrideRestrictions) {
-        const QMessageBox::StandardButton answer =
-            QMessageBox::question(this, tr("Join game"), tr("The game is full. Join as a spectator instead?"),
-                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-        if (answer != QMessageBox::Yes) {
+        if (!QtUtils::confirm(this, tr("Join game"), tr("The game is full. Join as a spectator instead?"),
+                              QMessageBox::No)) {
             return;
         }
     }

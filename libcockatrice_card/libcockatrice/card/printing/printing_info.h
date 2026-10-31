@@ -4,9 +4,12 @@
 #include "../set/card_set.h"
 #include "libcockatrice/card/lazy_properties_hash.h"
 
+#include <QHash>
 #include <QList>
 #include <QMap>
 #include <QSharedPointer>
+#include <QString>
+#include <QStringList>
 
 class PrintingInfo;
 
@@ -51,10 +54,7 @@ public:
      * @param other Another PrintingInfo to compare against.
      * @return True if both set and properties are equal, otherwise false.
      */
-    bool operator==(const PrintingInfo &other) const
-    {
-        return this->set == other.set && this->getPropertiesHash() == other.getPropertiesHash();
-    }
+    bool operator==(const PrintingInfo &other) const;
 
     /**
      * @brief check if the info is empty, as if default constructed.
@@ -63,7 +63,7 @@ public:
      */
     bool isEmpty() const
     {
-        return set == nullptr && getPropertiesHash().isEmpty();
+        return set == nullptr && properties.isEmpty();
     }
 
 private:
@@ -88,9 +88,22 @@ public:
      */
     [[nodiscard]] QStringList getProperties() const
     {
-        return getPropertiesHash().keys();
+        return properties.keys();
     }
 
+    /**
+     * @brief Returns the printing properties in their serialized blob form.
+     */
+    [[nodiscard]] QByteArray getPropertiesBlob() const
+    {
+        return properties.serialized();
+    }
+
+    /**
+     * @brief Returns the materialized property hash, forcing deserialization of the blob.
+     *
+     * Prefer getProperty() or getPropertiesBlob(), which avoid building the hash.
+     */
     [[nodiscard]] const QHash<QString, QString> &getPropertiesHash() const
     {
         return properties.getProperties();

@@ -6,9 +6,20 @@
 #include "../zones/view_zone.h"
 #include "card_item.h"
 
+#include <QBrush>
+#include <QColor>
 #include <QCursor>
+#include <QGraphicsItem>
+#include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
+#include <QList>
+#include <QObject>
 #include <QPainter>
+#include <QPoint>
+#include <QSharedPointer>
+#include <qnamespace.h>
+
+class CardZoneLogic;
 
 CardDragItem::CardDragItem(CardItem *_item,
                            int _id,

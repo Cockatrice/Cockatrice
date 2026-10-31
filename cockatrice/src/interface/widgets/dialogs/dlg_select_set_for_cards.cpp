@@ -1,26 +1,60 @@
 #include "dlg_select_set_for_cards.h"
 
 #include "../../deck_loader/card_node_function.h"
-#include "../../deck_loader/deck_loader.h"
 #include "../deck_editor/deck_state_manager.h"
 #include "../interface/widgets/cards/card_info_picture_widget.h"
 #include "../interface/widgets/general/layout_containers/flow_widget.h"
+#include "deck_list_model.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/card/printing/printing_info.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
 
+#include <QBrush>
+#include <QByteArray>
 #include <QCheckBox>
+#include <QColor>
 #include <QDialogButtonBox>
+#include <QDrag>
+#include <QDragEnterEvent>
+#include <QDragMoveEvent>
+#include <QDropEvent>
+#include <QHBoxLayout>
+#include <QImage>
 #include <QLabel>
-#include <QMessageBox>
+#include <QLayoutItem>
 #include <QMimeData>
+#include <QModelIndex>
+#include <QMouseEvent>
+#include <QObject>
 #include <QPainter>
+#include <QPair>
+#include <QPixmap>
+#include <QPoint>
+#include <QPointF>
 #include <QPushButton>
+#include <QRect>
+#include <QScrollArea>
 #include <QScrollBar>
+#include <QSet>
+#include <QSharedPointer>
+#include <QSizePolicy>
 #include <QSplitter>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <QVariant>
+#include <QVector>
 #include <algorithm>
+#include <functional>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <qdrag.h>
-#include <qevent.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qalgorithms.h>
+#include <qnamespace.h>
+#include <qobjectdefs.h>
+#include <utility>
 
 DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckStateManager *deckStateManger)
     : QDialog(parent), deckStateManager(deckStateManger)
@@ -38,10 +72,7 @@ DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckStateManager *de
     QSplitter *splitter = new QSplitter(Qt::Vertical, this);
 
     // Top scroll area
-    scrollArea = new QScrollArea(this);
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    scrollArea->setWidgetResizable(true);
+    scrollArea = QtUtils::makeScrollArea(this);
 
     listContainer = new QWidget(scrollArea);
     listLayout = new QVBoxLayout(listContainer);
@@ -53,14 +84,10 @@ DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckStateManager *de
 
     // Left container
     QWidget *leftContainer = new QWidget(this);
-    QVBoxLayout *leftLayout = new QVBoxLayout(leftContainer);
-    leftLayout->setContentsMargins(0, 0, 0, 0);
+    QVBoxLayout *leftLayout = QtUtils::makeLayout<QVBoxLayout>(leftContainer);
 
     uneditedCardsLabel = new QLabel(this);
-    uneditedCardsArea = new QScrollArea(this);
-    uneditedCardsArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    uneditedCardsArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    uneditedCardsArea->setWidgetResizable(true);
+    uneditedCardsArea = QtUtils::makeScrollArea(this);
 
     uneditedCardsFlowWidget =
         new FlowWidget(uneditedCardsArea, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
@@ -72,14 +99,10 @@ DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckStateManager *de
 
     // Right container
     QWidget *rightContainer = new QWidget(this);
-    QVBoxLayout *rightLayout = new QVBoxLayout(rightContainer);
-    rightLayout->setContentsMargins(0, 0, 0, 0);
+    QVBoxLayout *rightLayout = QtUtils::makeLayout<QVBoxLayout>(rightContainer);
 
     modifiedCardsLabel = new QLabel(this);
-    modifiedCardsArea = new QScrollArea(this);
-    modifiedCardsArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    modifiedCardsArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    modifiedCardsArea->setWidgetResizable(true);
+    modifiedCardsArea = QtUtils::makeScrollArea(this);
 
     modifiedCardsFlowWidget =
         new FlowWidget(modifiedCardsArea, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
@@ -241,9 +264,9 @@ QMap<QString, int> DlgSelectSetForCards::getSetsForCards()
             continue;
         }
 
-        SetToPrintingsMap setMap = infoPtr->getSets();
-        for (auto &setName : setMap.keys()) {
-            setCounts[setName]++;
+        const auto &setMap = infoPtr->getSets();
+        for (auto it = setMap.constBegin(); it != setMap.constEnd(); ++it) {
+            setCounts[it.key()]++;
         }
     }
 
@@ -360,8 +383,8 @@ QMap<QString, QStringList> DlgSelectSetForCards::getCardsForSets()
             continue;
         }
 
-        SetToPrintingsMap setMap = infoPtr->getSets();
-        for (auto it = setMap.begin(); it != setMap.end(); ++it) {
+        const auto &setMap = infoPtr->getSets();
+        for (auto it = setMap.constBegin(); it != setMap.constEnd(); ++it) {
             setCards[it.key()].append(cardName);
         }
     }

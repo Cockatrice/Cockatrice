@@ -1,11 +1,53 @@
 #include "settings_migration.h"
 
+#include <QChar>
+#include <QDateTime>
+#include <QDebug>
+#include <QDir>
+#include <QDirIterator>
 #include <QFile>
+#include <QFileInfo>
+#include <QFileInfoList>
+#include <QFlags>
+#include <QList>
+#include <QLoggingCategory>
 #include <QMap>
+#include <QMessageLogger>
 #include <QSettings>
+#include <QSharedPointer>
 #include <QStringList>
+#include <QStringLiteral>
+#include <QVariant>
+#include <algorithm>
+#include <utility>
+
+inline Q_LOGGING_CATEGORY(SettingsMigrationLog, "settings_migration");
 
 static const QString MIGRATION_SENTINEL_KEY = QStringLiteral("migration/perfile_complete");
+
+/**
+ * True when global.ini holds keys that migrateSettingsFromGlobalIni() would still move, i.e. the
+ * exact condition that function uses to decide whether it has work to do. If a user runs an older
+ * Cockatrice build that writes to global.ini (non-sentinel keys) and then upgrades back, those new
+ * keys would otherwise be silently ignored, so they are re-migrated instead.
+ */
+static bool hasPendingGlobalIniSettings(const QString &settingsPath)
+{
+    if (!QFile::exists(settingsPath + "global.ini")) {
+        return false;
+    }
+
+    QSettings globalIni(settingsPath + "global.ini", QSettings::IniFormat);
+    if (!globalIni.value(MIGRATION_SENTINEL_KEY, false).toBool()) {
+        return true;
+    }
+
+    // The sentinel is set, so any key besides it was written after the migration, i.e. by an
+    // older build sharing this file. Those are exactly the keys to re-migrate.
+    QStringList otherKeys = globalIni.allKeys();
+    otherKeys.removeAll(MIGRATION_SENTINEL_KEY);
+    return !otherKeys.isEmpty();
+}
 
 static void migrateTabsSettings(const QString &settingsPath, QSettings &globalIni)
 {
@@ -217,7 +259,6 @@ static void migrateCardsDisplaySettings(const QString &settingsPath, QSettings &
         {"cards/roundcardcorners", "cards/roundCardCorners"},
         {"cards/overrideallcardartwithpersonalpreference", "cards/overrideAllCardArtWithPersonalPreference"},
         {"cards/bumpsetswithcardsindecktotop", "cards/bumpSetsWithCardsInDeckToTop"},
-        {"cards/includerebalancedcards", "cards/includerebalancedcards"},
         {"cards/tapanimation", "cards/tapAnimation"},
         {"cards/autorotatesidewayslayoutcards", "cards/autoRotateSidewaysLayoutCards"},
         {"cards/scaleCards", "cards/scaleCards"},
@@ -529,9 +570,15 @@ static void migrateLegacySets(const QString &settingsPath)
     QSettings cardDbIni(settingsPath + "cardDatabase.ini", QSettings::IniFormat);
     for (const auto &shortName : groups) {
         legacySetting.beginGroup(shortName);
-        cardDbIni.setValue("sets/" + shortName + "/sortKey", legacySetting.value("sortkey"));
-        cardDbIni.setValue("sets/" + shortName + "/enabled", legacySetting.value("enabled"));
-        cardDbIni.setValue("sets/" + shortName + "/isKnown", legacySetting.value("isknown"));
+        if (legacySetting.contains("sortkey")) {
+            cardDbIni.setValue("sets/" + shortName + "/sortKey", legacySetting.value("sortkey"));
+        }
+        if (legacySetting.contains("enabled")) {
+            cardDbIni.setValue("sets/" + shortName + "/enabled", legacySetting.value("enabled"));
+        }
+        if (legacySetting.contains("isknown")) {
+            cardDbIni.setValue("sets/" + shortName + "/isKnown", legacySetting.value("isknown"));
+        }
         legacySetting.endGroup();
     }
     legacySetting.endGroup();
@@ -595,6 +642,34 @@ static void migrateLegacyMessages(const QString &settingsPath)
     legacySetting.endGroup();
 }
 
+/**
+ * gamefilters.ini keys renamed to camelCase by #7084. Profiles that migrated from the legacy
+ * native store before that rename still hold the old snake_case keys, which nothing reads
+ * anymore, so their saved filters silently stopped loading.
+ */
+static const QMap<QString, QString> &renamedGameFilterKeys()
+{
+    static const QMap<QString, QString> keyMap = {
+        {"hide_buddies_only_games", "hideBuddiesOnlyGames"},
+        {"hide_full_games", "hideFullGames"},
+        {"hide_games_that_started", "hideGamesThatStarted"},
+        {"hide_password_protected_games", "hidePasswordProtectedGames"},
+        {"hide_ignored_user_games", "hideIgnoredUserGames"},
+        {"hide_not_buddy_created_games", "hideNotBuddyCreatedGames"},
+        {"hide_open_decklist_games", "hideOpenDecklistGames"},
+        {"game_name_filter", "gameNameFilter"},
+        {"creator_name_filter", "hostNameFilter"},
+        {"min_players", "minPlayers"},
+        {"max_players", "maxPlayers"},
+        {"max_game_age_time", "maxGameAgeTime"},
+        {"show_only_if_spectators_can_watch", "showOnlyIfSpectatorsCanWatch"},
+        {"show_spectator_password_protected", "showSpectatorPasswordProtected"},
+        {"show_only_if_spectators_can_chat", "showOnlyIfSpectatorsCanChat"},
+        {"show_only_if_spectators_can_see_hands", "showOnlyIfSpectatorsCanSeeHands"},
+    };
+    return keyMap;
+}
+
 static void migrateLegacyGameFilters(const QString &settingsPath)
 {
     QSettings legacySetting;
@@ -605,24 +680,7 @@ static void migrateLegacyGameFilters(const QString &settingsPath)
         return;
     }
 
-    const QMap<QString, QString> filterKeyMap = {
-        {"hide_buddies_only_games", "hideBuddiesOnlyGames"},
-        {"hide_full_games", "hideFullGames"},
-        {"hide_games_that_started", "hideGamesThatStarted"},
-        {"hide_password_protected_games", "hidePasswordProtectedGames"},
-        {"hide_ignored_user_games", "hideIgnoredUserGames"},
-        {"hide_not_buddy_created_games", "hideNotBuddyCreatedGames"},
-        {"hide_open_decklist_games", "hideOpenDecklistGames"},
-        {"game_name_filter", "gameNameFilter"},
-        {"creator_name_filter", "creatorNameFilter"},
-        {"min_players", "minPlayers"},
-        {"max_players", "maxPlayers"},
-        {"max_game_age_time", "maxGameAgeTime"},
-        {"show_only_if_spectators_can_watch", "showOnlyIfSpectatorsCanWatch"},
-        {"show_spectator_password_protected", "showSpectatorPasswordProtected"},
-        {"show_only_if_spectators_can_chat", "showOnlyIfSpectatorsCanChat"},
-        {"show_only_if_spectators_can_see_hands", "showOnlyIfSpectatorsCanSeeHands"},
-    };
+    const QMap<QString, QString> &filterKeyMap = renamedGameFilterKeys();
 
     QSettings filtersIni(settingsPath + "gamefilters.ini", QSettings::IniFormat);
     for (auto it = filterKeyMap.constBegin(); it != filterKeyMap.constEnd(); ++it) {
@@ -637,6 +695,68 @@ static void migrateLegacyGameFilters(const QString &settingsPath)
         }
     }
     legacySetting.endGroup();
+}
+
+static const QString LEGACY_GAME_FILTERS_GAME_TYPE_PREFIX = QStringLiteral("filter_games/game_type/");
+static const QString GAME_FILTERS_GAME_TYPE_PREFIX = QStringLiteral("filter_games/gameType/");
+
+static bool gameFiltersCamelCaseMigrationPending(const QString &settingsPath)
+{
+    if (!QFile::exists(settingsPath + "gamefilters.ini")) {
+        return false;
+    }
+
+    QSettings filtersIni(settingsPath + "gamefilters.ini", QSettings::IniFormat);
+    const QMap<QString, QString> &keyMap = renamedGameFilterKeys();
+    for (auto it = keyMap.constBegin(); it != keyMap.constEnd(); ++it) {
+        if (filtersIni.contains("filter_games/" + it.key()) && !filtersIni.contains("filter_games/" + it.value())) {
+            return true;
+        }
+    }
+    // Orphaned by #7084, which migrated the legacy host-name filter to a key nothing reads.
+    if (filtersIni.contains("filter_games/creatorNameFilter") && !filtersIni.contains("filter_games/hostNameFilter")) {
+        return true;
+    }
+    for (const auto &key : filtersIni.allKeys()) {
+        if (key.startsWith(LEGACY_GAME_FILTERS_GAME_TYPE_PREFIX) &&
+            !filtersIni.contains(GAME_FILTERS_GAME_TYPE_PREFIX +
+                                 key.mid(LEGACY_GAME_FILTERS_GAME_TYPE_PREFIX.size()))) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool SettingsMigration::migrateGameFiltersToCamelCase(const QString &settingsPath)
+{
+    if (!gameFiltersCamelCaseMigrationPending(settingsPath)) {
+        return false;
+    }
+
+    QSettings filtersIni(settingsPath + "gamefilters.ini", QSettings::IniFormat);
+    const QMap<QString, QString> &keyMap = renamedGameFilterKeys();
+    for (auto it = keyMap.constBegin(); it != keyMap.constEnd(); ++it) {
+        const QString oldKey = "filter_games/" + it.key();
+        const QString newKey = "filter_games/" + it.value();
+        if (filtersIni.contains(oldKey) && !filtersIni.contains(newKey)) {
+            filtersIni.setValue(newKey, filtersIni.value(oldKey));
+        }
+    }
+    if (filtersIni.contains("filter_games/creatorNameFilter") && !filtersIni.contains("filter_games/hostNameFilter")) {
+        filtersIni.setValue("filter_games/hostNameFilter", filtersIni.value("filter_games/creatorNameFilter"));
+    }
+    for (const auto &key : filtersIni.allKeys()) {
+        if (key.startsWith(LEGACY_GAME_FILTERS_GAME_TYPE_PREFIX)) {
+            const QString newKey = GAME_FILTERS_GAME_TYPE_PREFIX + key.mid(LEGACY_GAME_FILTERS_GAME_TYPE_PREFIX.size());
+            if (!filtersIni.contains(newKey)) {
+                filtersIni.setValue(newKey, filtersIni.value(key));
+            }
+        }
+    }
+    // The old keys are deliberately kept: pre-#7084 builds still read them, so removing them
+    // would break downgrades, and nothing in the current code reads them anymore.
+    filtersIni.sync();
+    return true;
 }
 
 bool SettingsMigration::migrateLegacySettings(const QString &settingsPath)
@@ -658,21 +778,11 @@ bool SettingsMigration::migrateLegacySettings(const QString &settingsPath)
 
 bool SettingsMigration::migrateSettingsFromGlobalIni(const QString &settingsPath)
 {
-    if (!QFile::exists(settingsPath + "global.ini")) {
+    if (!hasPendingGlobalIniSettings(settingsPath)) {
         return false;
     }
 
     QSettings globalIni(settingsPath + "global.ini", QSettings::IniFormat);
-    if (globalIni.value(MIGRATION_SENTINEL_KEY, false).toBool()) {
-        // If a user runs an older Cockatrice build that writes to global.ini (non-sentinel keys)
-        // and then upgrades back, those new keys will be silently ignored. Re-migrate them.
-        globalIni.sync();
-        auto allKeys = globalIni.allKeys();
-        allKeys.removeAll(MIGRATION_SENTINEL_KEY);
-        if (allKeys.isEmpty()) {
-            return false;
-        }
-    }
 
     migrateTabsSettings(settingsPath, globalIni);
     migrateSoundSettings(settingsPath, globalIni);
@@ -699,4 +809,83 @@ bool SettingsMigration::migrateSettingsFromGlobalIni(const QString &settingsPath
     newGlobalIni.sync();
 
     return true;
+}
+
+bool SettingsMigration::isMigrationPending(const QString &settingsPath)
+{
+    if (hasPendingGlobalIniSettings(settingsPath)) {
+        return true;
+    }
+
+    if (gameFiltersCamelCaseMigrationPending(settingsPath)) {
+        return true;
+    }
+
+    QSettings personalIni(settingsPath + "personal.ini", QSettings::IniFormat);
+    if (personalIni.value("migration/legacy_complete", false).toBool()) {
+        return false;
+    }
+
+    // migrateLegacySettings() also runs on an empty profile, where it only writes its sentinel.
+    // Reporting that as pending would leave a backup folder behind on every fresh install, so
+    // only count it when there really are legacy keys left to move.
+    return !QSettings().allKeys().isEmpty();
+}
+
+QString SettingsMigration::backupSettingsDirectory(const QString &settingsPath)
+{
+    QDir settingsDir(QDir::cleanPath(settingsPath));
+    if (!settingsDir.exists()) {
+        return QString();
+    }
+
+    const QDir::Filters fileFilters = QDir::Files | QDir::Hidden | QDir::System | QDir::NoDotAndDotDot;
+
+    // A profile holding nothing but empty files has nothing to lose, and backing it up would only
+    // leave clutter next to the settings folder.
+    const QFileInfoList files = settingsDir.entryInfoList(fileFilters);
+    const bool hasContent =
+        std::any_of(files.cbegin(), files.cend(), [](const QFileInfo &file) { return file.size() > 0; });
+    if (!hasContent) {
+        return QString();
+    }
+
+    // Keep the backup a sibling of the settings folder rather than a child: a folder that is never
+    // copied into its own backup, and one the "Open settings folder" action does not have to skip.
+    QDir backupParentDir(settingsDir.absolutePath());
+    if (!backupParentDir.cdUp()) {
+        qCWarning(SettingsMigrationLog) << "[SettingsMigration] Could not resolve the parent of the settings folder:"
+                                        << settingsDir.absolutePath();
+        return QString();
+    }
+
+    const QString backupName =
+        QStringLiteral("settings-backup-") + QDateTime::currentDateTime().toString("yyyyMMdd-HHmmss");
+    QString backupPath = backupParentDir.absoluteFilePath(backupName);
+    // Two migrations inside the same second must not merge into a single folder.
+    for (int suffix = 1; QFileInfo::exists(backupPath); ++suffix) {
+        backupPath = backupParentDir.absoluteFilePath(backupName + '-' + QString::number(suffix));
+    }
+
+    if (!QDir().mkpath(backupPath)) {
+        qCWarning(SettingsMigrationLog) << "[SettingsMigration] Could not create the settings backup folder:"
+                                        << backupPath;
+        return QString();
+    }
+
+    QDir backupDir(backupPath);
+    QDirIterator it(settingsDir.absolutePath(), fileFilters, QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        it.next();
+
+        const QString target = backupDir.absoluteFilePath(settingsDir.relativeFilePath(it.filePath()));
+        QDir().mkpath(QFileInfo(target).absolutePath());
+        if (!QFile::copy(it.filePath(), target)) {
+            // A partially copied backup still beats none: report it and let the migration run.
+            qCWarning(SettingsMigrationLog) << "[SettingsMigration] Could not back up settings file:" << it.filePath();
+        }
+    }
+
+    qCInfo(SettingsMigrationLog) << "[SettingsMigration] Settings backed up to" << backupPath;
+    return backupPath;
 }

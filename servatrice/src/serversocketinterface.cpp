@@ -20,35 +20,83 @@
 
 #include "serversocketinterface.h"
 
+#include "deck_tag_serialization.h"
 #include "email_parser.h"
+#include "forwarded_address.h"
+#include "libcockatrice/protocol/pb/admin_commands.pb.h"
+#include "libcockatrice/protocol/pb/developer_commands.pb.h"
+#include "libcockatrice/protocol/pb/moderator_commands.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_deck_share_item.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_deck_share_summary.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_replay_match.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_report.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_warning.pb.h"
+#include "libcockatrice/protocol/pb/session_commands.pb.h"
+#include "libcockatrice/protocol/pb/session_event.pb.h"
+#include "libcockatrice/utility/card_ref.h"
 #include "main.h"
+#include "metrics_registry.h"
 #include "servatrice.h"
 #include "servatrice_database_interface.h"
+#include "server.h"
+#include "server_database_interface.h"
 #include "server_logger.h"
+#include "server_protocolhandler.h"
 #include "settingscache.h"
+#include "trusted_sources.h"
 #include "version_string.h"
 
+#include <QChar>
+#include <QCryptographicHash>
 #include <QDateTime>
 #include <QDebug>
 #include <QElapsedTimer>
 #include <QHostAddress>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonValueRef>
+#include <QListIterator>
 #include <QLoggingCategory>
-#include <QRegularExpression>
+#include <QMap>
+#include <QMessageLogger>
+#include <QMetaObject>
+#include <QMetaType>
+#include <QMutexLocker>
+#include <QNetworkRequest>
+#include <QRandomGenerator>
+#include <QReadLocker>
+#include <QReadWriteLock>
+#include <QSharedPointer>
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QString>
-#include <game/server_player.h>
+#include <QStringLiteral>
+#include <QTextStream>
+#include <QVariant>
+#include <QtGlobal>
+#include <algorithm>
+#include <exception>
 #include <google/protobuf/descriptor.h>
+#include <google/protobuf/repeated_ptr_field.h>
+#include <google/protobuf/stubs/common.h>
+#include <google/protobuf/stubs/port.h>
+#include <initializer_list>
 #include <iostream>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/command_deck_del.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_del_dir.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_download.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_download_public.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_list.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_list_other_user.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_new_dir.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_set_visibility.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_share_create.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_share_download.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_share_list.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_share_list_mine.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_share_remove.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pb/command_get_server_stats.pb.h>
 #include <libcockatrice/protocol/pb/command_replay_delete_match.pb.h>
@@ -64,6 +112,7 @@
 #include <libcockatrice/protocol/pb/command_report_details.pb.h>
 #include <libcockatrice/protocol/pb/command_report_list.pb.h>
 #include <libcockatrice/protocol/pb/command_report_my_list.pb.h>
+#include <libcockatrice/protocol/pb/command_report_reopen.pb.h>
 #include <libcockatrice/protocol/pb/command_report_resolve.pb.h>
 #include <libcockatrice/protocol/pb/command_report_stats.pb.h>
 #include <libcockatrice/protocol/pb/command_report_user_info.pb.h>
@@ -74,13 +123,16 @@
 #include <libcockatrice/protocol/pb/event_remove_from_list.pb.h>
 #include <libcockatrice/protocol/pb/event_replay_added.pb.h>
 #include <libcockatrice/protocol/pb/event_server_identification.pb.h>
-#include <libcockatrice/protocol/pb/event_server_message.pb.h>
-#include <libcockatrice/protocol/pb/event_user_joined.pb.h>
 #include <libcockatrice/protocol/pb/event_user_message.pb.h>
 #include <libcockatrice/protocol/pb/response_ban_history.pb.h>
 #include <libcockatrice/protocol/pb/response_card_art_rule_entry.pb.h>
+#include <libcockatrice/protocol/pb/response_clear_blacklisted_banners.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_download.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_list.pb.h>
+#include <libcockatrice/protocol/pb/response_deck_share_create.pb.h>
+#include <libcockatrice/protocol/pb/response_deck_share_download.pb.h>
+#include <libcockatrice/protocol/pb/response_deck_share_list.pb.h>
+#include <libcockatrice/protocol/pb/response_deck_share_list_mine.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_upload.pb.h>
 #include <libcockatrice/protocol/pb/response_forgotpasswordrequest.pb.h>
 #include <libcockatrice/protocol/pb/response_get_admin_notes.pb.h>
@@ -89,6 +141,7 @@
 #include <libcockatrice/protocol/pb/response_password_salt.pb.h>
 #include <libcockatrice/protocol/pb/response_register.pb.h>
 #include <libcockatrice/protocol/pb/response_remove_user_avatar.pb.h>
+#include <libcockatrice/protocol/pb/response_remove_user_banner.pb.h>
 #include <libcockatrice/protocol/pb/response_replay_download.pb.h>
 #include <libcockatrice/protocol/pb/response_replay_download_by_game_id.pb.h>
 #include <libcockatrice/protocol/pb/response_replay_get_code.pb.h>
@@ -112,18 +165,30 @@
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user_alt.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user_session.pb.h>
+#include <libcockatrice/utility/cryptoutil.h>
 #include <libcockatrice/utility/passwordhasher.h>
+#include <libcockatrice/utility/report_categories.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <libcockatrice/utility/warning_categories.h>
+#include <memory>
+#include <qlogging.h>
+#include <qnamespace.h>
 #include <server_response_containers.h>
 #include <server_room.h>
+#include <stddef.h>
 #include <string>
+#include <utility>
+
+class QObject;
 
 inline Q_LOGGING_CATEGORY(AbstractServerSocketInterfaceLog, "abstract_server_socket_interface");
 inline Q_LOGGING_CATEGORY(TcpServerSocketInterfaceLog, "tcp_server_socket_interface");
 inline Q_LOGGING_CATEGORY(WebsocketServerSocketInterfaceLog, "websocket_server_socket_interface");
 
 static const int protocolVersion = 14;
+
+// Maximum size of a single TCP protocol message. Matches the websocket limit.
+static const int MAX_TCP_MESSAGE_SIZE = 1500000;
 
 AbstractServerSocketInterface::AbstractServerSocketInterface(Servatrice *_server,
                                                              Servatrice_DatabaseInterface *_databaseInterface,
@@ -144,15 +209,22 @@ bool AbstractServerSocketInterface::initSession()
     identEvent.set_server_version(VERSION_STRING);
     identEvent.set_protocol_version(protocolVersion);
     if (servatrice->getAuthenticationMethod() == Servatrice::AuthenticationSql) {
+        // Challenge-response is advertised in every strictness mode: legacy accounts keep
+        // logging in with the legacy hash, but already-migrated scrypt rows are always
+        // served challenge-response (authentication_strictness only governs NEW credentials).
+        // server_options stays exactly SupportsPasswordHash on the wire: already-released
+        // clients parse an unknown proto2 enum value as NoOptions and would fall back to
+        // plaintext passwords. Challenge support is advertised in the separate
+        // supports_challenge_response field, which old clients simply ignore.
         identEvent.set_server_options(Event_ServerIdentification::SupportsPasswordHash);
+        identEvent.set_supports_challenge_response(true);
     }
     SessionEvent *identSe = prepareSessionEvent(identEvent);
     sendProtocolItem(*identSe);
     delete identSe;
 
     // allow unlimited number of connections from the trusted sources
-    QString trustedSources = settingsCache->value("security/trusted_sources", "127.0.0.1,::1").toString();
-    if (trustedSources.contains(getAddress(), Qt::CaseInsensitive)) {
+    if (isTrustedSource(servatrice->getTrustedSources(), getPeerAddress())) {
         return true;
     }
 
@@ -193,6 +265,11 @@ void AbstractServerSocketInterface::transmitProtocolItem(const ServerMessage &it
 void AbstractServerSocketInterface::logDebugMessage(const QString &message)
 {
     logger->logMessage(message, this);
+}
+
+bool AbstractServerSocketInterface::logsDebugMessages() const
+{
+    return logger != nullptr && logger->isLoggingEnabled();
 }
 
 void AbstractServerSocketInterface::processCommandContainer(const CommandContainer &cont)
@@ -277,6 +354,12 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionComm
             return cmdRemoveFromList(cmd.GetExtension(Command_RemoveFromList::ext), rc);
         case SessionCommand::DECK_LIST:
             return cmdDeckList(cmd.GetExtension(Command_DeckList::ext), rc);
+        case SessionCommand::DECK_LIST_OTHER_USER:
+            return cmdDeckListOtherUser(cmd.GetExtension(Command_DeckListOtherUser::ext), rc);
+        case SessionCommand::DECK_SET_VISIBILITY:
+            return cmdDeckSetVisibility(cmd.GetExtension(Command_DeckSetVisibility::ext), rc);
+        case SessionCommand::DECK_DOWNLOAD_PUBLIC:
+            return cmdDeckDownloadPublic(cmd.GetExtension(Command_DeckDownloadPublic::ext), rc);
         case SessionCommand::DECK_NEW_DIR:
             return cmdDeckNewDir(cmd.GetExtension(Command_DeckNewDir::ext), rc);
         case SessionCommand::DECK_DEL_DIR:
@@ -320,6 +403,16 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionComm
             return cmdAccountImage(cmd.GetExtension(Command_AccountImage::ext), rc);
         case SessionCommand::SET_CARD_ART_PARAMS:
             return cmdSetCardArtParams(cmd.GetExtension(Command_SetCardArtParams::ext), rc);
+        case SessionCommand::DECK_SHARE_CREATE:
+            return cmdDeckShareCreate(cmd.GetExtension(Command_DeckShareCreate::ext), rc);
+        case SessionCommand::DECK_SHARE_LIST:
+            return cmdDeckShareList(cmd.GetExtension(Command_DeckShareList::ext), rc);
+        case SessionCommand::DECK_SHARE_LIST_MINE:
+            return cmdDeckShareListMine(cmd.GetExtension(Command_DeckShareListMine::ext), rc);
+        case SessionCommand::DECK_SHARE_REMOVE:
+            return cmdDeckShareRemove(cmd.GetExtension(Command_DeckShareRemove::ext), rc);
+        case SessionCommand::DECK_SHARE_DOWNLOAD:
+            return cmdDeckShareDownload(cmd.GetExtension(Command_DeckShareDownload::ext), rc);
         case SessionCommand::ACCOUNT_PASSWORD:
             return cmdAccountPassword(cmd.GetExtension(Command_AccountPassword::ext), rc);
         case SessionCommand::REQUEST_PASSWORD_SALT:
@@ -333,6 +426,8 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionComm
             return cmdReportAddComment(cmd.GetExtension(Command_ReportAddComment::ext), rc);
         case SessionCommand::REPORT_DETAILS:
             return cmdReportDetails(cmd.GetExtension(Command_ReportDetails::ext), rc);
+        case SessionCommand::SUBMIT_PASSWORD_VERIFIER:
+            return cmdSubmitPasswordVerifier(cmd.GetExtension(Command_SubmitPasswordVerifier::ext), rc);
         default:
             return Response::RespFunctionNotAllowed;
     }
@@ -359,6 +454,8 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedModeratorCo
             return cmdReportAssign(cmd.GetExtension(Command_ReportAssign::ext), rc);
         case ModeratorCommand::REPORT_RESOLVE:
             return cmdReportResolve(cmd.GetExtension(Command_ReportResolve::ext), rc);
+        case ModeratorCommand::REPORT_REOPEN:
+            return cmdReportReopen(cmd.GetExtension(Command_ReportReopen::ext), rc);
         case ModeratorCommand::VIEWLOG_HISTORY:
             return cmdGetLogHistory(cmd.GetExtension(Command_ViewLogHistory::ext), rc, true);
         case ModeratorCommand::GRANT_REPLAY_ACCESS:
@@ -389,6 +486,10 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedModeratorCo
             return cmdGetModeratorLastLogins(cmd.GetExtension(Command_GetModeratorLastLogins::ext), rc);
         case ModeratorCommand::REMOVE_USER_AVATAR:
             return cmdRemoveUserAvatar(cmd.GetExtension(Command_RemoveUserAvatar::ext), rc);
+        case ModeratorCommand::REMOVE_USER_BANNER:
+            return cmdRemoveUserBanner(cmd.GetExtension(Command_RemoveUserBanner::ext), rc);
+        case ModeratorCommand::CLEAR_BLACKLISTED_BANNERS:
+            return cmdClearBlacklistedBanners(cmd.GetExtension(Command_ClearBlacklistedBanners::ext), rc);
         default:
             return Response::RespFunctionNotAllowed;
     }
@@ -566,46 +667,73 @@ int AbstractServerSocketInterface::getDeckPathId(const QString &path)
     return getDeckPathId(0, path.split("/"));
 }
 
-bool AbstractServerSocketInterface::deckListHelper(int folderId, ServerInfo_DeckStorage_Folder *folder)
+bool AbstractServerSocketInterface::deckListHelper(int folderId,
+                                                   ServerInfo_DeckStorage_Folder *folder,
+                                                   int userId,
+                                                   bool inheritedPublic,
+                                                   bool publicOnly)
 {
-    QSqlQuery *query = sqlInterface->prepareQuery(
-        "select id, name from {prefix}_decklist_folders where id_parent = :id_parent and id_user = :id_user");
+    QSqlQuery *query = sqlInterface->prepareQuery("select id, name, is_public from {prefix}_decklist_folders where "
+                                                  "id_parent = :id_parent and id_user = :id_user");
     query->bindValue(":id_parent", folderId);
-    query->bindValue(":id_user", userInfo->id());
+    query->bindValue(":id_user", userId);
     if (!sqlInterface->execSqlQuery(query)) {
         return false;
     }
 
-    QMap<int, QString> results;
+    QList<std::pair<int, std::pair<QString, bool>>> folderRows;
     while (query->next()) {
-        results[query->value(0).toInt()] = query->value(1).toString();
+        folderRows.append({query->value(0).toInt(), {query->value(1).toString(), query->value(2).toBool()}});
     }
+    std::sort(folderRows.begin(), folderRows.end(), [](const auto &a, const auto &b) { return a.first < b.first; });
 
-    for (int key : results.keys()) {
+    for (const auto &[folderIdValue, folderInfo] : folderRows) {
+        const QString name = folderInfo.first;
+        const bool ownPublic = folderInfo.second;
+        const bool effectivePublic = inheritedPublic || ownPublic;
+
         ServerInfo_DeckStorage_TreeItem *newItem = folder->add_items();
-        newItem->set_id(key);
-        newItem->set_name(results.value(key).toStdString());
+        newItem->set_id(folderIdValue);
+        newItem->set_name(name.toStdString());
+        newItem->mutable_folder()->set_is_public(ownPublic);
 
-        if (!deckListHelper(newItem->id(), newItem->mutable_folder())) {
+        if (!deckListHelper(newItem->id(), newItem->mutable_folder(), userId, effectivePublic, publicOnly)) {
             return false;
+        }
+
+        if (publicOnly && !effectivePublic && newItem->mutable_folder()->items_size() == 0) {
+            folder->mutable_items()->RemoveLast();
         }
     }
 
-    query = sqlInterface->prepareQuery("select id, name, upload_time from {prefix}_decklist_files where id_folder = "
-                                       ":id_folder and id_user = :id_user");
+    query = sqlInterface->prepareQuery("select id, name, upload_time, is_public, banner_card_name, "
+                                       "banner_card_provider, color_identity, tags from {prefix}_decklist_files where "
+                                       "id_folder = :id_folder and id_user = :id_user");
     query->bindValue(":id_folder", folderId);
-    query->bindValue(":id_user", userInfo->id());
+    query->bindValue(":id_user", userId);
     if (!sqlInterface->execSqlQuery(query)) {
         return false;
     }
 
     while (query->next()) {
+        const bool ownPublic = query->value(3).toBool();
+        if (publicOnly && !(inheritedPublic || ownPublic)) {
+            continue;
+        }
+
         ServerInfo_DeckStorage_TreeItem *newItem = folder->add_items();
         newItem->set_id(query->value(0).toInt());
         newItem->set_name(query->value(1).toString().toStdString());
 
         ServerInfo_DeckStorage_File *newFile = newItem->mutable_file();
         newFile->set_creation_time(query->value(2).toDateTime().toSecsSinceEpoch());
+        newFile->set_is_public(ownPublic);
+        newFile->set_banner_card_name(query->value(4).toString().toStdString());
+        newFile->set_banner_card_provider(query->value(5).toString().toStdString());
+        newFile->set_color_identity(query->value(6).toString().toStdString());
+        for (const QString &tag : deserializeDeckTags(query->value(7).toString())) {
+            newFile->add_tags(tag.toStdString());
+        }
     }
 
     return true;
@@ -626,11 +754,165 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckList(const Command_
     Response_DeckList *re = new Response_DeckList;
     ServerInfo_DeckStorage_Folder *root = re->mutable_root();
 
-    if (!deckListHelper(0, root)) {
+    if (!deckListHelper(0, root, userInfo->id(), false, false)) {
         return Response::RespContextError;
     }
 
     rc.setResponseExtension(re);
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdDeckListOtherUser(const Command_DeckListOtherUser &cmd,
+                                                                           ResponseContainer &rc)
+{
+    if (authState != PasswordRight) {
+        return Response::RespFunctionNotAllowed;
+    }
+
+    sqlInterface->checkSql();
+
+    const QString userName = nameFromStdString(cmd.user_name());
+    const int userId = sqlInterface->getUserIdInDB(userName);
+    if (userId == -1) {
+        return Response::RespNameNotFound;
+    }
+
+    Response_DeckList *re = new Response_DeckList;
+    ServerInfo_DeckStorage_Folder *root = re->mutable_root();
+
+    if (!deckListHelper(0, root, userId, false, true)) {
+        return Response::RespContextError;
+    }
+
+    rc.setResponseExtension(re);
+    return Response::RespOk;
+}
+
+int AbstractServerSocketInterface::getDeckOwnerId(int deckId)
+{
+    QSqlQuery *query = sqlInterface->prepareQuery("select id_user from {prefix}_decklist_files where id = :id");
+    query->bindValue(":id", deckId);
+    if (!sqlInterface->execSqlQuery(query)) {
+        return -1;
+    }
+    if (!query->next()) {
+        return -1;
+    }
+    return query->value(0).toInt();
+}
+
+bool AbstractServerSocketInterface::isDeckEffectivelyPublic(int deckId)
+{
+    QSqlQuery *query =
+        sqlInterface->prepareQuery("select is_public, id_folder from {prefix}_decklist_files where id = :id");
+    query->bindValue(":id", deckId);
+    if (!sqlInterface->execSqlQuery(query)) {
+        return false;
+    }
+    if (!query->next()) {
+        return false;
+    }
+    if (query->value(0).toBool()) {
+        return true;
+    }
+
+    int folderId = query->value(1).toInt();
+    int guard = 0;
+    while (folderId != 0 && guard < 100) {
+        QSqlQuery *folderQuery =
+            sqlInterface->prepareQuery("select is_public, id_parent from {prefix}_decklist_folders where id = :id");
+        folderQuery->bindValue(":id", folderId);
+        if (!sqlInterface->execSqlQuery(folderQuery)) {
+            return false;
+        }
+        if (!folderQuery->next()) {
+            return false;
+        }
+        if (folderQuery->value(0).toBool()) {
+            return true;
+        }
+        folderId = folderQuery->value(1).toInt();
+        ++guard;
+    }
+    return false;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdDeckSetVisibility(const Command_DeckSetVisibility &cmd,
+                                                                           ResponseContainer & /*rc*/)
+{
+    if (authState != PasswordRight) {
+        return Response::RespFunctionNotAllowed;
+    }
+
+    sqlInterface->checkSql();
+
+    if (cmd.has_deck_id()) {
+        QSqlQuery *query =
+            sqlInterface->prepareQuery("select 1 from {prefix}_decklist_files where id = :id and id_user = :id_user");
+        query->bindValue(":id", cmd.deck_id());
+        query->bindValue(":id_user", userInfo->id());
+        sqlInterface->execSqlQuery(query);
+        if (!query->next()) {
+            return Response::RespNameNotFound;
+        }
+
+        query = sqlInterface->prepareQuery("update {prefix}_decklist_files set is_public = :is_public where id = :id "
+                                           "and id_user = :id_user");
+        query->bindValue(":is_public", cmd.is_public() ? 1 : 0);
+        query->bindValue(":id", cmd.deck_id());
+        query->bindValue(":id_user", userInfo->id());
+        if (!sqlInterface->execSqlQuery(query)) {
+            return Response::RespContextError;
+        }
+    } else if (cmd.has_folder_path()) {
+        const int folderId = getDeckPathId(nameFromStdString(cmd.folder_path()));
+        if (folderId == -1 || folderId == 0) {
+            return Response::RespNameNotFound;
+        }
+
+        QSqlQuery *query =
+            sqlInterface->prepareQuery("update {prefix}_decklist_folders set is_public = :is_public where id = :id "
+                                       "and id_user = :id_user");
+        query->bindValue(":is_public", cmd.is_public() ? 1 : 0);
+        query->bindValue(":id", folderId);
+        query->bindValue(":id_user", userInfo->id());
+        if (!sqlInterface->execSqlQuery(query)) {
+            return Response::RespContextError;
+        }
+    } else {
+        return Response::RespInvalidData;
+    }
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdDeckDownloadPublic(const Command_DeckDownloadPublic &cmd,
+                                                                            ResponseContainer &rc)
+{
+    if (authState != PasswordRight) {
+        return Response::RespFunctionNotAllowed;
+    }
+
+    sqlInterface->checkSql();
+
+    const int deckId = cmd.deck_id();
+    const int ownerId = getDeckOwnerId(deckId);
+    if (ownerId == -1 || !isDeckEffectivelyPublic(deckId)) {
+        return Response::RespNameNotFound;
+    }
+
+    DeckList *deck;
+    try {
+        deck = sqlInterface->getDeckFromDatabase(deckId, ownerId);
+    } catch (Response::ResponseCode &r) {
+        return r;
+    }
+
+    Response_DeckDownload *re = new Response_DeckDownload;
+    re->set_deck(deck->writeToString_Native().toStdString());
+    rc.setResponseExtension(re);
+    delete deck;
+
     return Response::RespOk;
 }
 
@@ -742,6 +1024,22 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckDel(const Command_D
     return Response::RespOk;
 }
 
+namespace
+{
+/** @brief Keeps only the WUBRG colors from a color identity string, deduplicated. */
+QString sanitizeColorIdentity(const QString &colorIdentity)
+{
+    QString sanitized;
+    for (const QChar &color : colorIdentity) {
+        const QChar upper = color.toUpper();
+        if (QStringLiteral("WUBRG").contains(upper) && !sanitized.contains(upper)) {
+            sanitized.append(upper);
+        }
+    }
+    return sanitized;
+}
+} // namespace
+
 Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Command_DeckUpload &cmd,
                                                                     ResponseContainer &rc)
 {
@@ -750,6 +1048,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
     }
 
     if (!cmd.has_deck_list()) {
+        return Response::RespInvalidData;
+    }
+
+    if (cmd.deck_list().size() > static_cast<std::string::size_type>(MAX_FILE_LENGTH)) {
         return Response::RespInvalidData;
     }
 
@@ -766,6 +1068,14 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
         deckName = "Unnamed deck";
     }
 
+    // The server derives the banner card and tags from the deck itself. Only the
+    // color identity must come from the client, since the server has no card
+    // database to compute it. All values are bounded to the column sizes.
+    const QString bannerCardName = deck.getBannerCard().name.left(255);
+    const QString bannerCardProvider = deck.getBannerCard().providerId.left(32);
+    const QString tagsJson = serializeDeckTags(deck.getTags());
+    const QString colorIdentity = sanitizeColorIdentity(nameFromStdString(cmd.color_identity()));
+
     if (cmd.has_path()) {
         int folderId = getDeckPathId(nameFromStdString(cmd.path()));
         if (folderId == -1) {
@@ -774,38 +1084,74 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
 
         QSqlQuery *query =
             sqlInterface->prepareQuery("insert into {prefix}_decklist_files (id_folder, id_user, name, upload_time, "
-                                       "content) values(:id_folder, :id_user, :name, NOW(), :content)");
+                                       "content, is_public, banner_card_name, banner_card_provider, color_identity, "
+                                       "tags) values(:id_folder, :id_user, :name, NOW(), :content, :is_public, "
+                                       ":banner_card_name, :banner_card_provider, :color_identity, :tags)");
         query->bindValue(":id_folder", folderId);
         query->bindValue(":id_user", userInfo->id());
         query->bindValue(":name", deckName);
         query->bindValue(":content", deckStr);
-        sqlInterface->execSqlQuery(query);
+        query->bindValue(":is_public", cmd.has_is_public() && cmd.is_public() ? 1 : 0);
+        query->bindValue(":banner_card_name", bannerCardName);
+        query->bindValue(":banner_card_provider", bannerCardProvider);
+        query->bindValue(":color_identity", colorIdentity);
+        query->bindValue(":tags", tagsJson);
+        if (!sqlInterface->execSqlQuery(query)) {
+            return Response::RespContextError;
+        }
 
         Response_DeckUpload *re = new Response_DeckUpload;
         ServerInfo_DeckStorage_TreeItem *fileInfo = re->mutable_new_file();
         fileInfo->set_id(query->lastInsertId().toInt());
         fileInfo->set_name(deckName.toStdString());
         fileInfo->mutable_file()->set_creation_time(QDateTime::currentDateTime().toSecsSinceEpoch());
+        fileInfo->mutable_file()->set_is_public(cmd.has_is_public() && cmd.is_public());
         rc.setResponseExtension(re);
     } else if (cmd.has_deck_id()) {
-        QSqlQuery *query =
-            sqlInterface->prepareQuery("update {prefix}_decklist_files set name=:name, upload_time=NOW(), "
-                                       "content=:content where id = :id_deck and id_user = :id_user");
+        QString updateQuery = "update {prefix}_decklist_files set name=:name, upload_time=NOW(), content=:content, "
+                              "banner_card_name=:banner_card_name, banner_card_provider=:banner_card_provider, "
+                              "color_identity=:color_identity, tags=:tags";
+        if (cmd.has_is_public()) {
+            updateQuery += ", is_public=:is_public";
+        }
+        updateQuery += " where id = :id_deck and id_user = :id_user";
+
+        QSqlQuery *query = sqlInterface->prepareQuery(updateQuery);
         query->bindValue(":id_deck", cmd.deck_id());
         query->bindValue(":id_user", userInfo->id());
         query->bindValue(":name", deckName);
         query->bindValue(":content", deckStr);
-        sqlInterface->execSqlQuery(query);
+        query->bindValue(":banner_card_name", bannerCardName);
+        query->bindValue(":banner_card_provider", bannerCardProvider);
+        query->bindValue(":color_identity", colorIdentity);
+        query->bindValue(":tags", tagsJson);
+        if (cmd.has_is_public()) {
+            query->bindValue(":is_public", cmd.is_public() ? 1 : 0);
+        }
+        if (!sqlInterface->execSqlQuery(query)) {
+            return Response::RespContextError;
+        }
 
         if (query->numRowsAffected() == 0) {
             return Response::RespNameNotFound;
         }
+
+        QSqlQuery *visibilityQuery =
+            sqlInterface->prepareQuery("select is_public from {prefix}_decklist_files where id = :id and "
+                                       "id_user = :id_user");
+        visibilityQuery->bindValue(":id", cmd.deck_id());
+        visibilityQuery->bindValue(":id_user", userInfo->id());
+        if (!sqlInterface->execSqlQuery(visibilityQuery)) {
+            return Response::RespContextError;
+        }
+        const bool isPublic = visibilityQuery->next() && visibilityQuery->value(0).toBool();
 
         Response_DeckUpload *re = new Response_DeckUpload;
         ServerInfo_DeckStorage_TreeItem *fileInfo = re->mutable_new_file();
         fileInfo->set_id(cmd.deck_id());
         fileInfo->set_name(deckName.toStdString());
         fileInfo->mutable_file()->set_creation_time(QDateTime::currentDateTime().toSecsSinceEpoch());
+        fileInfo->mutable_file()->set_is_public(isPublic);
         rc.setResponseExtension(re);
     } else {
         return Response::RespInvalidData;
@@ -832,6 +1178,248 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckDownload(const Comm
     re->set_deck(deck->writeToString_Native().toStdString());
     rc.setResponseExtension(re);
     delete deck;
+
+    return Response::RespOk;
+}
+
+namespace
+{
+/** @brief Builds a cryptographically random, URL-safe share token. */
+QString generateShareToken()
+{
+    QByteArray bytes(32, Qt::Uninitialized);
+    QRandomGenerator::system()->fillRange(reinterpret_cast<quint32 *>(bytes.data()), bytes.size() / sizeof(quint32));
+    return QString::fromLatin1(bytes.toBase64(QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals));
+}
+
+/** @brief Extracts the share metadata for a deck, materializing its content. */
+DeckShareItemRecord makeShareItemFromDeck(const DeckList &deck, const QString &colorIdentity)
+{
+    DeckShareItemRecord item;
+    item.name = deck.getName();
+    if (item.name.isEmpty()) {
+        item.name = "Unnamed deck";
+    }
+    item.tags = deck.getTags();
+    item.bannerCard = deck.getBannerCard().name;
+    item.gameFormat = deck.getGameFormat();
+    item.colorIdentity = sanitizeColorIdentity(colorIdentity);
+    item.content = deck.writeToString_Native();
+    return item;
+}
+} // namespace
+
+Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareCreate(const Command_DeckShareCreate &cmd,
+                                                                         ResponseContainer &rc)
+{
+    if (authState != PasswordRight) {
+        return Response::RespFunctionNotAllowed;
+    }
+
+    sqlInterface->checkSql();
+
+    const int maxItems = servatrice->getDeckShareMaxDecksPerShare();
+    if (maxItems > 0 && cmd.items_size() > maxItems) {
+        return Response::RespInvalidData;
+    }
+
+    // Per-user rate limit so share links cannot be used to build an unbounded
+    // word-of-mouth leak of public decks.
+    const int maxSharesPerDay = servatrice->getDeckShareMaxSharesPerDay();
+    if (maxSharesPerDay > 0) {
+        QSqlQuery *countQuery = sqlInterface->prepareQuery("select count(*) from {prefix}_deck_share where "
+                                                           "created_by = :created_by and created_at >= "
+                                                           "DATE_SUB(NOW(), INTERVAL 1 DAY)");
+        countQuery->bindValue(":created_by", userInfo->id());
+        if (!sqlInterface->execSqlQuery(countQuery) || !countQuery->next()) {
+            return Response::RespContextError;
+        }
+        if (countQuery->value(0).toInt() >= maxSharesPerDay) {
+            return Response::RespTooManyRequests;
+        }
+    }
+
+    QList<DeckShareItemRecord> items;
+    if (cmd.items_size() > 0) {
+        for (const DeckShareItem &shareItem : cmd.items()) {
+            if (shareItem.has_deck_list()) {
+                DeckList deck;
+                if (!deck.loadFromString_Native(fileFromStdString(shareItem.deck_list()))) {
+                    return Response::RespContextError;
+                }
+                items.append(makeShareItemFromDeck(deck, nameFromStdString(shareItem.color_identity())));
+            } else if (shareItem.has_deck_id()) {
+                DeckList *deck;
+                try {
+                    deck = sqlInterface->getDeckFromDatabase(shareItem.deck_id(), userInfo->id());
+                } catch (Response::ResponseCode &r) {
+                    return r;
+                }
+                items.append(makeShareItemFromDeck(*deck, nameFromStdString(shareItem.color_identity())));
+                delete deck;
+            } else {
+                return Response::RespInvalidData;
+            }
+        }
+    } else if (cmd.has_folder_path()) {
+        const int folderId = getDeckPathId(nameFromStdString(cmd.folder_path()));
+        if (folderId == -1) {
+            return Response::RespNameNotFound;
+        }
+
+        // Drain the deck list before resolving each deck: getDeckFromDatabase
+        // issues its own query on the same cached statement set.
+        QSqlQuery *query =
+            sqlInterface->prepareQuery("select id, color_identity from {prefix}_decklist_files where id_folder = "
+                                       ":id_folder and id_user = :id_user");
+        query->bindValue(":id_folder", folderId);
+        query->bindValue(":id_user", userInfo->id());
+        if (!sqlInterface->execSqlQuery(query)) {
+            return Response::RespContextError;
+        }
+        QList<std::pair<int, QString>> deckRows;
+        while (query->next()) {
+            deckRows.append({query->value(0).toInt(), query->value(1).toString()});
+        }
+        for (const auto &[deckId, colorIdentity] : deckRows) {
+            DeckList *deck;
+            try {
+                deck = sqlInterface->getDeckFromDatabase(deckId, userInfo->id());
+            } catch (Response::ResponseCode &r) {
+                return r;
+            }
+            items.append(makeShareItemFromDeck(*deck, colorIdentity));
+            delete deck;
+        }
+    } else {
+        return Response::RespInvalidData;
+    }
+
+    if (items.isEmpty() || (maxItems > 0 && items.size() > maxItems)) {
+        return Response::RespInvalidData;
+    }
+
+    QString shareName = nameFromStdString(cmd.name());
+    if (shareName.isEmpty()) {
+        shareName = "Shared decks";
+    }
+
+    const QString token = generateShareToken();
+    qint64 expiresAt = 0;
+    if (!sqlInterface->createDeckShare(token, shareName, userInfo->id(), items, servatrice->getDeckShareExpiryDays(),
+                                       expiresAt)) {
+        return Response::RespInvalidData;
+    }
+
+    Response_DeckShareCreate *re = new Response_DeckShareCreate;
+    re->set_token(token.toStdString());
+    re->set_expires_at(expiresAt);
+    re->set_item_count(items.size());
+    rc.setResponseExtension(re);
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareListMine(const Command_DeckShareListMine & /*cmd*/,
+                                                                           ResponseContainer &rc)
+{
+    if (authState != PasswordRight) {
+        return Response::RespFunctionNotAllowed;
+    }
+
+    sqlInterface->checkSql();
+
+    QList<DeckShareSummaryRecord> shares;
+    if (!sqlInterface->getDeckSharesForUser(userInfo->id(), shares)) {
+        return Response::RespContextError;
+    }
+
+    Response_DeckShareListMine *re = new Response_DeckShareListMine;
+    for (const DeckShareSummaryRecord &share : shares) {
+        ServerInfo_DeckShareSummary *summary = re->add_shares();
+        summary->set_id(share.id);
+        summary->set_name(share.name.toStdString());
+        summary->set_creation_time(share.creationTime);
+        summary->set_expires_at(share.expiresAt);
+        summary->set_item_count(share.itemCount);
+    }
+    rc.setResponseExtension(re);
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareRemove(const Command_DeckShareRemove &cmd,
+                                                                         ResponseContainer & /*rc*/)
+{
+    if (authState != PasswordRight) {
+        return Response::RespFunctionNotAllowed;
+    }
+
+    if (!cmd.has_share_id()) {
+        return Response::RespInvalidData;
+    }
+
+    sqlInterface->checkSql();
+
+    if (!sqlInterface->deleteDeckShare(cmd.share_id(), userInfo->id())) {
+        return Response::RespNameNotFound;
+    }
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareList(const Command_DeckShareList &cmd,
+                                                                       ResponseContainer &rc)
+{
+    if (authState != PasswordRight) {
+        return Response::RespFunctionNotAllowed;
+    }
+
+    sqlInterface->checkSql();
+
+    QString name;
+    qint64 expiresAt = 0;
+    QList<DeckShareItemRecord> items;
+    if (!sqlInterface->getDeckShareList(nameFromStdString(cmd.token()), name, expiresAt, items)) {
+        return Response::RespNameNotFound;
+    }
+
+    Response_DeckShareList *re = new Response_DeckShareList;
+    re->set_name(name.toStdString());
+    re->set_expires_at(expiresAt);
+    for (const DeckShareItemRecord &item : items) {
+        ServerInfo_DeckShareItem *itemInfo = re->add_items();
+        itemInfo->set_id(item.id);
+        itemInfo->set_name(item.name.toStdString());
+        for (const QString &tag : item.tags) {
+            itemInfo->add_tags(tag.toStdString());
+        }
+        itemInfo->set_banner_card(item.bannerCard.toStdString());
+        itemInfo->set_game_format(item.gameFormat.toStdString());
+        itemInfo->set_color_identity(item.colorIdentity.toStdString());
+    }
+    rc.setResponseExtension(re);
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareDownload(const Command_DeckShareDownload &cmd,
+                                                                           ResponseContainer &rc)
+{
+    if (authState != PasswordRight) {
+        return Response::RespFunctionNotAllowed;
+    }
+
+    sqlInterface->checkSql();
+
+    QString content;
+    if (!sqlInterface->getDeckShareItem(nameFromStdString(cmd.token()), cmd.item_id(), content)) {
+        return Response::RespNameNotFound;
+    }
+
+    Response_DeckShareDownload *re = new Response_DeckShareDownload;
+    re->set_deck(content.toStdString());
+    rc.setResponseExtension(re);
 
     return Response::RespOk;
 }
@@ -1332,9 +1920,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
     if (amountRemove != 0) {
         removeSaidMessages(userName, amountRemove);
     }
-    QString trustedSources = settingsCache->value("server/trusted_sources", "127.0.0.1,::1").toString();
     int minutes = cmd.minutes();
-    if (trustedSources.contains(address, Qt::CaseInsensitive)) {
+    if (isTrustedSource(servatrice->getTrustedSources(), address)) {
         address = "";
     }
 
@@ -1421,6 +2008,29 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
     return Response::RespOk;
 }
 
+namespace
+{
+int reportUserLevel(bool userExists, int adminFlags)
+{
+    int userLevel = ServerInfo_User::IsUser;
+    if (userExists) {
+        userLevel |= ServerInfo_User::IsRegistered;
+        if (adminFlags & 1) {
+            userLevel |= ServerInfo_User::IsAdmin | ServerInfo_User::IsModerator;
+        } else if (adminFlags & 2) {
+            userLevel |= ServerInfo_User::IsModerator;
+        }
+        if (adminFlags & 4) {
+            userLevel |= ServerInfo_User::IsJudge;
+        }
+        if (adminFlags & 8) {
+            userLevel |= ServerInfo_User::IsDeveloper;
+        }
+    }
+    return userLevel;
+}
+} // namespace
+
 Response::ResponseCode AbstractServerSocketInterface::cmdReportList(const Command_ReportList &cmd,
                                                                     ResponseContainer &rc)
 {
@@ -1434,8 +2044,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportList(const Comman
 
     // Columns: 0=id, 1=reporter_name, 2=reported_user_name, 3=game_id,
     //          4=category, 5=description, 6=created_at, 7=status,
-    //          8=resolution_note, 9=assigned_mod_name,
-    //          10=room_id, 11=replay_id
+    //          8=resolution_note, 9=assigned_mod_name, 10=resolved_by_name,
+    //          11=room_id, 12=replay_id,
+    //          13=reported_user_id, 14=reported_user_admin
     QString whereClause;
     if (unresolvedOnly) {
         whereClause = "WHERE r.status = 'open' OR r.status = 'assigned' ";
@@ -1450,11 +2061,13 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportList(const Comman
 
     QString queryStr = "SELECT r.id, r.reporter_name, r.reported_user_name, r.game_id, "
                        "r.category, r.description, r.created_at, r.status, "
-                       "r.resolution_note, u.name AS assigned_mod_name, r.room_id, "
+                       "r.resolution_note, u.name AS assigned_mod_name, ru.name AS resolved_by_name, r.room_id, "
                        "(SELECT id FROM {prefix}_replays WHERE id_game = r.game_id ORDER BY id DESC LIMIT 1) "
-                       "AS replay_id "
+                       "AS replay_id, u2.id AS reported_user_id, u2.admin AS reported_user_admin "
                        "FROM {prefix}_reports r "
-                       "LEFT JOIN {prefix}_users u ON r.assigned_to = u.id ";
+                       "LEFT JOIN {prefix}_users u ON r.assigned_to = u.id "
+                       "LEFT JOIN {prefix}_users ru ON r.resolved_by = ru.id "
+                       "LEFT JOIN {prefix}_users u2 ON u2.name = r.reported_user_name ";
 
     if (unresolvedOnly) {
         queryStr += "WHERE r.status = 'open' OR r.status = 'assigned' ";
@@ -1495,14 +2108,19 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportList(const Comman
         if (!query->value(9).isNull()) {
             info->set_assigned_mod_name(query->value(9).toString().toStdString());
         }
-
         if (!query->value(10).isNull()) {
-            info->set_room_id(query->value(10).toInt());
+            info->set_resolved_by_name(query->value(10).toString().toStdString());
         }
 
         if (!query->value(11).isNull()) {
-            info->set_replay_id(query->value(11).toInt());
+            info->set_room_id(query->value(11).toInt());
         }
+
+        if (!query->value(12).isNull()) {
+            info->set_replay_id(query->value(12).toInt());
+        }
+
+        info->set_reported_user_level(reportUserLevel(!query->value(13).isNull(), query->value(14).toInt()));
     }
 
     rc.setResponseExtension(re);
@@ -2079,6 +2697,67 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveUserAvatar(const 
     return Response::RespOk;
 }
 
+Response::ResponseCode AbstractServerSocketInterface::cmdRemoveUserBanner(const Command_RemoveUserBanner &cmd,
+                                                                          ResponseContainer &rc)
+{
+    if (!sqlInterface->checkSql()) {
+        return Response::RespInternalError;
+    }
+
+    const QString userName = nameFromStdString(cmd.user_name()).simplified();
+    if (userName.isEmpty()) {
+        return Response::RespContextError;
+    }
+
+    bool hadBanner = true;
+    switch (sqlInterface->removeUserBanner(userName)) {
+        case Servatrice_DatabaseInterface::RemoveUserBannerResult::Removed:
+            break;
+        case Servatrice_DatabaseInterface::RemoveUserBannerResult::NothingToRemove:
+            hadBanner = false;
+            break;
+        case Servatrice_DatabaseInterface::RemoveUserBannerResult::NoSuchUser:
+            return Response::RespNameNotFound;
+        case Servatrice_DatabaseInterface::RemoveUserBannerResult::DatabaseError:
+        default:
+            return Response::RespInternalError;
+    }
+
+    if (hadBanner) {
+        sqlInterface->addAuditRecord(userName, this->getAddress(), QString::fromStdString(userInfo->clientid()),
+                                     "REMOVE_USER_BANNER", "Moderator removed user banner card", true);
+    }
+
+    Response_RemoveUserBanner *re = new Response_RemoveUserBanner;
+    re->set_user_name(userName.toStdString());
+    re->set_had_banner(hadBanner);
+    rc.setResponseExtension(re);
+    return Response::RespOk;
+}
+
+Response::ResponseCode
+AbstractServerSocketInterface::cmdClearBlacklistedBanners(const Command_ClearBlacklistedBanners & /* cmd */,
+                                                          ResponseContainer &rc)
+{
+    if (!sqlInterface->checkSql()) {
+        return Response::RespInternalError;
+    }
+
+    const int cleared = sqlInterface->clearBlacklistedBanners();
+    if (cleared < 0) {
+        return Response::RespInternalError;
+    }
+
+    sqlInterface->addAuditRecord(QString::fromStdString(userInfo->name()), this->getAddress(),
+                                 QString::fromStdString(userInfo->clientid()), "CLEAR_BLACKLISTED_BANNERS",
+                                 QString("Moderator cleared %1 blacklisted banner(s)").arg(cleared), true);
+
+    Response_ClearBlacklistedBanners *re = new Response_ClearBlacklistedBanners;
+    re->set_cleared_count(static_cast<unsigned int>(cleared));
+    rc.setResponseExtension(re);
+    return Response::RespOk;
+}
+
 void AbstractServerSocketInterface::sendPendingReportNotifications(ResponseContainer &rc)
 {
     if (!sqlInterface->checkSql()) {
@@ -2175,11 +2854,13 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportMyList(const Comm
 
     QString queryStr = "SELECT r.id, r.reporter_name, r.reported_user_name, r.game_id, "
                        "r.category, r.description, r.created_at, r.status, "
-                       "r.resolution_note, u.name AS assigned_mod_name, r.room_id, "
+                       "r.resolution_note, u.name AS assigned_mod_name, ru.name AS resolved_by_name, r.room_id, "
                        "(SELECT id FROM {prefix}_replays WHERE id_game = r.game_id ORDER BY id DESC LIMIT 1) "
-                       "AS replay_id "
+                       "AS replay_id, u2.id AS reported_user_id, u2.admin AS reported_user_admin "
                        "FROM {prefix}_reports r "
                        "LEFT JOIN {prefix}_users u ON r.assigned_to = u.id "
+                       "LEFT JOIN {prefix}_users ru ON r.resolved_by = ru.id "
+                       "LEFT JOIN {prefix}_users u2 ON u2.name = r.reported_user_name "
                        "WHERE r.reporter_id = :reporter_id "
                        "ORDER BY r.created_at DESC LIMIT 200";
 
@@ -2215,17 +2896,58 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportMyList(const Comm
         if (!query->value(9).isNull()) {
             info->set_assigned_mod_name(query->value(9).toString().toStdString());
         }
-
         if (!query->value(10).isNull()) {
-            info->set_room_id(query->value(10).toInt());
+            info->set_resolved_by_name(query->value(10).toString().toStdString());
         }
 
         if (!query->value(11).isNull()) {
-            info->set_replay_id(query->value(11).toInt());
+            info->set_room_id(query->value(11).toInt());
         }
+
+        if (!query->value(12).isNull()) {
+            info->set_replay_id(query->value(12).toInt());
+        }
+
+        info->set_reported_user_level(reportUserLevel(!query->value(13).isNull(), query->value(14).toInt()));
     }
 
     rc.setResponseExtension(re);
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdReportReopen(const Command_ReportReopen &cmd,
+                                                                      ResponseContainer & /*rc*/)
+{
+    if (!sqlInterface->checkSql()) {
+        return Response::RespInternalError;
+    }
+
+    int reportId = cmd.report_id();
+    QString note = textFromStdString(cmd.reopen_note());
+
+    QSqlQuery *query = sqlInterface->prepareQuery("UPDATE {prefix}_reports "
+                                                  "SET status = 'open', resolution_note = NULL, "
+                                                  "resolution_time = NULL, resolved_by = NULL, assigned_to = NULL, "
+                                                  "notified = 0 "
+                                                  "WHERE id = :id AND status IN ('resolved', 'dismissed')");
+
+    query->bindValue(":id", reportId);
+
+    if (!sqlInterface->execSqlQuery(query)) {
+        return Response::RespInternalError;
+    }
+
+    if (query->numRowsAffected() == 0) {
+        return Response::RespInvalidData;
+    }
+
+    QString auditDetails = QString("Report #%1 reopened").arg(reportId);
+    if (!note.isEmpty()) {
+        auditDetails += QString(". Reason: %1").arg(note.left(200));
+    }
+    sqlInterface->addAuditRecord(QString::number(reportId), this->getAddress(),
+                                 QString::fromStdString(userInfo->clientid()), "REPORT_REOPENED", auditDetails, true);
+
     return Response::RespOk;
 }
 
@@ -2244,17 +2966,19 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportDetails(const Com
 
     // Columns: 0=id, 1=reporter_id, 2=reporter_name, 3=reported_user_name, 4=game_id,
     //          5=category, 6=description, 7=created_at, 8=status,
-    //          9=resolution_note, 10=assigned_mod_name, 11=chat_log,
-    //          12=room_id, 13=resolution_time, 14=replay_id
-    QString queryStr = "SELECT r.id, r.reporter_id, r.reporter_name, r.reported_user_name, r.game_id, "
-                       "r.category, r.description, r.created_at, r.status, "
-                       "r.resolution_note, u.name AS assigned_mod_name, r.chat_log, r.room_id, "
-                       "r.resolution_time, "
-                       "(SELECT id FROM {prefix}_replays WHERE id_game = r.game_id ORDER BY id DESC LIMIT 1) "
-                       "AS replay_id "
-                       "FROM {prefix}_reports r "
-                       "LEFT JOIN {prefix}_users u ON r.assigned_to = u.id "
-                       "WHERE r.id = :id";
+    //          9=resolution_note, 10=assigned_mod_name, 11=resolved_by_name,
+    //          12=chat_log, 13=room_id, 14=resolution_time, 15=replay_id
+    QString queryStr =
+        "SELECT r.id, r.reporter_id, r.reporter_name, r.reported_user_name, r.game_id, "
+        "r.category, r.description, r.created_at, r.status, "
+        "r.resolution_note, u.name AS assigned_mod_name, ru.name AS resolved_by_name, r.chat_log, r.room_id, "
+        "r.resolution_time, "
+        "(SELECT id FROM {prefix}_replays WHERE id_game = r.game_id ORDER BY id DESC LIMIT 1) "
+        "AS replay_id "
+        "FROM {prefix}_reports r "
+        "LEFT JOIN {prefix}_users u ON r.assigned_to = u.id "
+        "LEFT JOIN {prefix}_users ru ON r.resolved_by = ru.id "
+        "WHERE r.id = :id";
     QSqlQuery *query = sqlInterface->prepareQuery(queryStr);
     query->bindValue(":id", reportId);
 
@@ -2293,21 +3017,24 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportDetails(const Com
     if (!query->value(10).isNull()) {
         info->set_assigned_mod_name(query->value(10).toString().toStdString());
     }
-
     if (!query->value(11).isNull()) {
-        info->set_chat_log(query->value(11).toString().toStdString());
+        info->set_resolved_by_name(query->value(11).toString().toStdString());
     }
 
     if (!query->value(12).isNull()) {
-        info->set_room_id(query->value(12).toInt());
+        info->set_chat_log(query->value(12).toString().toStdString());
     }
 
     if (!query->value(13).isNull()) {
-        info->set_resolution_time(query->value(13).toDateTime().toSecsSinceEpoch());
+        info->set_room_id(query->value(13).toInt());
     }
 
     if (!query->value(14).isNull()) {
-        info->set_replay_id(query->value(14).toInt());
+        info->set_resolution_time(query->value(14).toDateTime().toSecsSinceEpoch());
+    }
+
+    if (!query->value(15).isNull()) {
+        info->set_replay_id(query->value(15).toInt());
     }
 
     QSqlQuery *commentQuery =
@@ -2619,6 +3346,15 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
                                          false);
         }
 
+        Response_Register *re = new Response_Register;
+        re->set_denied_reason_str("Too many registration attempts");
+        int remaining = servatrice->getRateLimiter()->retryAfterSeconds("register:" + this->getAddress(),
+                                                                        servatrice->getMaxRegistrationsPerIp(),
+                                                                        servatrice->getRegistrationWindowSeconds());
+        if (remaining > 0) {
+            re->set_denied_end_time(QDateTime::currentDateTime().addSecs(remaining).toSecsSinceEpoch());
+        }
+        rc.setResponseExtension(re);
         return Response::RespTooManyRequests;
     }
 
@@ -2643,6 +3379,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
         return Response::RespRegistrationFailed;
     } else {
         password = QString::fromStdString(cmd.hashed_password());
+    }
+
+    // Reject credential formats the configured authentication strictness does not accept.
+    if (!acceptsCredentialFormat(passwordNeedsHash, password)) {
+        return Response::RespClientUpdateRequired;
     }
 
     bool requireEmailActivation = settingsCache->value("registration/requireemailactivation", true).toBool();
@@ -2686,9 +3427,31 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
 bool AbstractServerSocketInterface::tooManyRegistrationAttempts(const QString &ipAddress)
 {
-    //! \todo Implement registration attempt limiting.
-    Q_UNUSED(ipAddress);
-    return false;
+    return servatrice->recordRegistrationAttempt(ipAddress);
+}
+
+bool AbstractServerSocketInterface::acceptsCredentialFormat(bool passwordNeedsHash, const QString &password) const
+{
+    // An empty credential must never reach the database: it would be accepted
+    // as a legacy format and stored as '' (fail-open on login, see the empty
+    // stored-credential guard in Servatrice_DatabaseInterface).
+    if (password.isEmpty()) {
+        return false;
+    }
+    // "scryptFormat" means the client sent a derived verifier rather than a
+    // password to hash ourselves. parsePasswordVerifier enforces the sane-cost
+    // clamp, so nothing starting with '$' reaches the database unparsed.
+    const bool scryptFormat = !passwordNeedsHash && PasswordHasher::parsePasswordVerifier(password).isValid;
+
+    // The strictness mode governs how existing legacy accounts are served, not which new-credential
+    // formats are tolerated: a legacy-mode server must still accept scrypt verifiers, because clients
+    // derive them whenever challenge-response is advertised (and it must be, so already-migrated
+    // scrypt rows keep logging in). strict is the only mode that rejects legacy formats.
+    if (servatrice->getAuthenticationStrictness() == Servatrice::AuthenticationStrict) {
+        return scryptFormat;
+    }
+    // legacy and mixed accept a valid scrypt verifier or a genuine legacy salt+hash.
+    return scryptFormat || PasswordHasher::isLegacyFormat(password);
 }
 
 Response::ResponseCode AbstractServerSocketInterface::cmdActivateAccount(const Command_Activate &cmd,
@@ -2830,26 +3593,6 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountImage(const Comm
     return Response::RespOk;
 }
 
-bool AbstractServerSocketInterface::isCardNameAllowed(const QString &cardName, const QString &cardProviderId)
-{
-    QSqlQuery *q = sqlInterface->prepareQuery(
-        "SELECT mode FROM {prefix}_card_art_name_rules WHERE card_name = :name AND card_provider_id = :provider");
-
-    q->bindValue(":name", cardName);
-    q->bindValue(":provider", cardProviderId);
-
-    if (!sqlInterface->execSqlQuery(q)) {
-        qWarning() << "Card art rule lookup failed; failing open for" << cardName;
-        return true;
-    }
-
-    if (!q->next()) {
-        return true; // default allow
-    }
-
-    return q->value(0).toString() != "DENY";
-}
-
 Response::ResponseCode AbstractServerSocketInterface::cmdSetCardArtParams(const Command_SetCardArtParams &cmd,
                                                                           ResponseContainer & /* rc */)
 {
@@ -2876,7 +3619,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdSetCardArtParams(const 
         return Response::RespOk;
     }
 
-    if (!isCardNameAllowed(cardName, cardProviderId)) {
+    if (!sqlInterface->isCardArtAllowed(cardName, cardProviderId)) {
         return Response::RespFunctionNotAllowed;
     }
 
@@ -3025,6 +3768,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountPassword(const C
         newPassword = QString::fromStdString(cmd.hashed_new_password());
     }
 
+    // Reject new credential formats the configured authentication strictness does not accept.
+    if (!acceptsCredentialFormat(newPasswordNeedsHash, newPassword)) {
+        return Response::RespClientUpdateRequired;
+    }
+
     QString userName = QString::fromStdString(userInfo->name());
     if (!databaseInterface->changeUserPassword(userName, oldPassword, true, newPassword, newPasswordNeedsHash)) {
         return Response::RespWrongPassword;
@@ -3042,6 +3790,15 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordRequest(c
     const QString clientId = nameFromStdString(cmd.clientid());
 
     qCDebug(AbstractServerSocketInterfaceLog) << "Received reset password request from user:" << userName;
+
+    if (servatrice->recordForgotPasswordAttempt(this->getAddress())) {
+        if (servatrice->getEnableForgotPasswordAudit()) {
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "PASSWORD_RESET_REQUEST", "Too many requests from this ip address", false);
+        }
+
+        return Response::RespTooManyRequests;
+    }
 
     if (!servatrice->getEnableForgotPassword()) {
         if (servatrice->getEnableForgotPasswordAudit()) {
@@ -3162,6 +3919,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
         password = QString::fromStdString(cmd.hashed_new_password());
     }
 
+    // Reject new credential formats the configured authentication strictness does not accept.
+    if (!acceptsCredentialFormat(passwordNeedsHash, password)) {
+        return Response::RespClientUpdateRequired;
+    }
+
     if (sqlInterface->changeUserPassword(nameFromStdString(cmd.user_name()), password, passwordNeedsHash)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
             sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
@@ -3184,6 +3946,14 @@ AbstractServerSocketInterface::cmdForgotPasswordChallenge(const Command_ForgotPa
     const QString clientId = nameFromStdString(cmd.clientid());
 
     qCDebug(AbstractServerSocketInterfaceLog) << "Received reset password challenge from user:" << userName;
+
+    if (servatrice->recordForgotPasswordAttempt(this->getAddress())) {
+        if (servatrice->getEnableForgotPasswordAudit()) {
+            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                         "PASSWORD_RESET_CHALLENGE", "Too many requests from this ip address", false);
+        }
+        return Response::RespTooManyRequests;
+    }
 
     if (!servatrice->getEnableForgotPasswordChallenge()) {
         if (servatrice->getEnableForgotPasswordAudit()) {
@@ -3221,9 +3991,11 @@ AbstractServerSocketInterface::cmdForgotPasswordChallenge(const Command_ForgotPa
 Response::ResponseCode AbstractServerSocketInterface::cmdRequestPasswordSalt(const Command_RequestPasswordSalt &cmd,
                                                                              ResponseContainer &rc)
 {
-    const QString userName = nameFromStdString(cmd.user_name());
-    QString passwordSalt = sqlInterface->getUserSalt(userName);
-    if (passwordSalt.isEmpty()) {
+    // Simplified exactly like cmdLogin, so the nonce bound to userName here validates
+    // against the same normalized name during the login's challenge-response check.
+    const QString userName = nameFromStdString(cmd.user_name()).simplified();
+    const QString storedPasswordData = sqlInterface->getUserPasswordData(userName);
+    if (storedPasswordData.isEmpty()) {
         if (server->getRegOnlyServerEnabled()) {
             return Response::RespRegistrationRequired;
         } else {
@@ -3231,8 +4003,46 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRequestPasswordSalt(con
             return Response::RespOk;
         }
     }
+
     auto *re = new Response_PasswordSalt;
-    re->set_password_salt(passwordSalt.toStdString());
+    if (PasswordHasher::isLegacyFormat(storedPasswordData)) {
+        re->set_password_salt(storedPasswordData.left(16).toStdString());
+        re->set_needs_migration(true);
+        // Legacy rows get a challenge-response nonce only outside legacy mode (there the client
+        // logs in with the legacy hash and the account is migrated). In legacy mode the row is
+        // served the legacy salt, since legacy mode only governs what NEW credentials are accepted.
+        if (servatrice->getAuthenticationStrictness() != Servatrice::AuthenticationLegacy) {
+            const QByteArray nonce = CryptoUtil::randomBytes(32);
+            setAuthNonce(nonce, userName);
+            re->set_nonce(nonce.constData(), nonce.size());
+        }
+    } else {
+        const PasswordVerifier verifier = PasswordHasher::parsePasswordVerifier(storedPasswordData);
+        if (!verifier.isValid) {
+            delete re;
+            return Response::RespContextError;
+        }
+        const QString scryptSalt = QString(verifier.salt.toBase64());
+        re->set_password_salt(scryptSalt.toStdString());
+        re->set_scrypt_salt(scryptSalt.toStdString());
+        re->set_n(verifier.n);
+        re->set_r(verifier.r);
+        re->set_p(verifier.p);
+        re->set_needs_migration(false);
+        // Pre-challenge clients derive the legacy hash from password_salt. While a fresh
+        // encrypted legacy backup exists, serve its salt there so they can still log in;
+        // challenge-response clients must use scrypt_salt, which always carries the
+        // verifier salt.
+        const QString legacyBackup = sqlInterface->getUsableLegacyBackup(userName);
+        if (!legacyBackup.isEmpty()) {
+            re->set_password_salt(legacyBackup.left(16).toStdString());
+        }
+        // scrypt rows are served challenge-response in every mode so migrated accounts never lock out.
+        const QByteArray nonce = CryptoUtil::randomBytes(32);
+        setAuthNonce(nonce, userName);
+        re->set_nonce(nonce.constData(), nonce.size());
+    }
+
     rc.setResponseExtension(re);
     return Response::RespOk;
 }
@@ -3261,8 +4071,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReport(const Command_Re
         return Response::RespInvalidData;
     }
 
-    static const QStringList validCategories = {"cheating", "bug_abuse", "verbal_abuse", "other"};
-    if (!validCategories.contains(category.toLower())) {
+    if (!ReportCategories::isValid(category)) {
         return Response::RespInvalidData;
     }
 
@@ -3328,6 +4137,39 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReport(const Command_Re
         return Response::RespInternalError;
     }
 
+    return Response::RespOk;
+}
+
+Response::ResponseCode
+AbstractServerSocketInterface::cmdSubmitPasswordVerifier(const Command_SubmitPasswordVerifier &cmd,
+                                                         ResponseContainer & /*rc*/)
+{
+    if (authState != PasswordRight) {
+        return Response::RespLoginNeeded;
+    }
+
+    // Limit to the size of the database column (password_sha512 varchar(255)).
+    constexpr int MAX_PASSWORD_VERIFIER_LENGTH = 255;
+    const QString passwordVerifier = QString::fromStdString(cmd.password_verifier());
+    if (passwordVerifier.isEmpty() || passwordVerifier.length() > MAX_PASSWORD_VERIFIER_LENGTH ||
+        PasswordHasher::isLegacyFormat(passwordVerifier)) {
+        return Response::RespContextError;
+    }
+
+    // Reject unparseable or hostile cost parameters before they reach the database.
+    const PasswordVerifier parsedVerifier = PasswordHasher::parsePasswordVerifier(passwordVerifier);
+    if (!parsedVerifier.isValid) {
+        qCWarning(AbstractServerSocketInterfaceLog)
+            << "Rejecting password verifier submission with invalid or insane cost parameters";
+        return Response::RespContextError;
+    }
+
+    if (!sqlInterface->submitPasswordVerifier(QString::fromStdString(userInfo->name()), passwordVerifier)) {
+        return Response::RespContextError;
+    }
+
+    qCDebug(AbstractServerSocketInterfaceLog)
+        << "Password verifier migrated for user" << QString::fromStdString(userInfo->name());
     return Response::RespOk;
 }
 
@@ -3661,39 +4503,52 @@ void TcpServerSocketInterface::readClient()
     servatrice->incRxBytes(data.size());
     inputBuffer.append(data);
 
-    do {
+    // Parse messages straight out of inputBuffer at readOffset. Removing each
+    // consumed message from the front would memmove the remaining bytes once
+    // per message; the consumed prefix is dropped once parsing stops.
+    qsizetype readOffset = 0;
+
+    while (true) {
         if (!messageInProgress) {
-            if (inputBuffer.size() >= 4) {
-                messageLength = (((quint32)(unsigned char)inputBuffer[0]) << 24) +
-                                (((quint32)(unsigned char)inputBuffer[1]) << 16) +
-                                (((quint32)(unsigned char)inputBuffer[2]) << 8) +
-                                ((quint32)(unsigned char)inputBuffer[3]);
-                inputBuffer.remove(0, 4);
+            if (inputBuffer.size() - readOffset >= 4) {
+                const auto *header = reinterpret_cast<const unsigned char *>(inputBuffer.constData() + readOffset);
+                messageLength = (static_cast<quint32>(header[0]) << 24) + (static_cast<quint32>(header[1]) << 16) +
+                                (static_cast<quint32>(header[2]) << 8) + static_cast<quint32>(header[3]);
+                // Reject implausible lengths instead of buffering until they arrive.
+                // This also handles lengths that overflow into negative int values.
+                if (messageLength < 0 || messageLength > MAX_TCP_MESSAGE_SIZE) {
+                    qCWarning(TcpServerSocketInterfaceLog)
+                        << "Invalid message length" << messageLength << "from" << getAddress();
+                    prepareDestroy();
+                    return;
+                }
+                readOffset += 4;
                 messageInProgress = true;
             } else {
-                return;
+                break;
             }
         }
-        if (inputBuffer.size() < messageLength || messageLength < 0) {
-            return;
+        if (inputBuffer.size() - readOffset < messageLength) {
+            break;
         }
 
         CommandContainer newCommandContainer;
-        bool ok;
+        bool ok = false;
         try {
-            ok = newCommandContainer.ParseFromArray(inputBuffer.data(), messageLength);
+            ok = newCommandContainer.ParseFromArray(inputBuffer.constData() + readOffset, messageLength);
         } catch (std::exception &e) {
-            qCWarning(TcpServerSocketInterfaceLog) << "Caught std::exception in" << __FILE__ << __LINE__ <<
+            qCWarning(TcpServerSocketInterfaceLog)
+                << "Caught std::exception in" << __FILE__ << __LINE__ <<
 #ifdef _MSC_VER // Visual Studio
                 __FUNCTION__
 #else
                 __PRETTY_FUNCTION__
 #endif
-                                                   << Qt::endl
-                                                   << "Exception:" << e.what() << Qt::endl
-                                                   << "Message coming from:" << getAddress() << Qt::endl
-                                                   << "Message length:" << messageLength << Qt::endl
-                                                   << "Message content:" << inputBuffer.toHex();
+                << Qt::endl
+                << "Exception:" << e.what() << Qt::endl
+                << "Message coming from:" << getAddress() << Qt::endl
+                << "Message length:" << messageLength << Qt::endl
+                << "Message content:" << inputBuffer.mid(readOffset, messageLength).toHex();
         } catch (...) {
             qCWarning(TcpServerSocketInterfaceLog) << "Unhandled exception in" << __FILE__ << __LINE__ <<
 #ifdef _MSC_VER // Visual Studio
@@ -3704,7 +4559,7 @@ void TcpServerSocketInterface::readClient()
                                                    << Qt::endl
                                                    << "Message coming from:" << getAddress();
         }
-        inputBuffer.remove(0, messageLength);
+        readOffset += messageLength;
         messageInProgress = false;
 
         if (ok) {
@@ -3721,8 +4576,12 @@ void TcpServerSocketInterface::readClient()
         } else {
             qCWarning(TcpServerSocketInterfaceLog) << "parsing error!";
         }
+    }
 
-    } while (!inputBuffer.isEmpty());
+    // Drop the consumed prefix once, instead of shifting the buffer per message.
+    if (readOffset > 0) {
+        inputBuffer.remove(0, readOffset);
+    }
 }
 
 bool TcpServerSocketInterface::initTcpSession()
@@ -3780,10 +4639,13 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
 
     QByteArray websocketIPHeader = settingsCache->value("server/web_socket_ip_header", "").toByteArray();
     if (websocketIPHeader.length() > 0 && socket->request().hasRawHeader(websocketIPHeader)) {
-        QString header(socket->request().rawHeader(websocketIPHeader));
-        QHostAddress parsed(header);
-        if (!parsed.isNull()) {
-            address = parsed;
+        // Only trust the forwarded header if the connection itself comes from a trusted proxy,
+        // otherwise a client could spoof its address to bypass bans and rate limits.
+        if (isTrustedSource(servatrice->getTrustedSources(), socket->peerAddress())) {
+            const QHostAddress parsed = parseForwardedAddress(socket->request().rawHeader(websocketIPHeader));
+            if (!parsed.isNull()) {
+                address = parsed;
+            }
         }
     }
 

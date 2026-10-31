@@ -1,10 +1,14 @@
 #include "deck_list_model_custom_zones.h"
 
 #include "deck_list_model.h"
+#include "libcockatrice/deck_list/tree/abstract_deck_list_node.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
 
 #include <../../../../libcockatrice_deck_list/libcockatrice/deck_list/tree/deck_list_card_node.h>
 #include <QHash>
+#include <QSharedPointer>
 #include <QVector>
+#include <utility>
 
 namespace DeckListModelCustomZones
 {

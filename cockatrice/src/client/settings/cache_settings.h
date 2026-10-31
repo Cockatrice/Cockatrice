@@ -7,17 +7,18 @@
 #ifndef SETTINGSCACHE_H
 #define SETTINGSCACHE_H
 
+#include <QList>
 #include <QLoggingCategory>
+#include <QString>
 #include <QStringList>
 #include <libcockatrice/interfaces/interface_card_database_path_provider.h>
 #include <libcockatrice/interfaces/interface_network_settings_provider.h>
-#include <libcockatrice/utility/macros.h>
+#include <qtmetamacros.h>
 
 inline Q_LOGGING_CATEGORY(SettingsCacheLog, "settings_cache");
 
 class ReleaseChannel;
 
-#define DEFAULT_LANG_NAME "English"
 #define CLIENT_INFO_NOT_SET "notset"
 
 #define DEFAULT_FONT_SIZE 12
@@ -58,33 +59,33 @@ signals:
     void themeChanged();
 
 private:
-    QSettings *settings;
-    ShortcutsSettings *shortcutsSettings;
-    CardDatabaseSettings *cardDatabaseSettings;
-    ServersSettings *serversSettings;
-    MessageSettings *messageSettings;
-    GameFiltersSettings *gameFiltersSettings;
-    LayoutsSettings *layoutsSettings;
-    DownloadSettings *downloadSettings;
-    RecentsSettings *recentsSettings;
-    CardOverrideSettings *cardOverrideSettings;
-    DebugSettings *debugSettings;
-    CardCounterSettings *cardCounterSettings;
-    TabsSettings *tabsSettings;
-    SoundSettings *soundSettings;
-    GameSettings *gameSettings;
-    ChatSettings *chatSettings;
-    CacheStorageSettings *cacheStorageSettings;
-    UpdatesSettings *updatesSettings;
-    PersonalSettings *personalSettings;
-    CardsDisplaySettings *cardsDisplaySettings;
-    InterfaceSettings *interfaceSettings;
-    DeckEditorSettings *deckEditorSettings;
-    PathsSettings *pathsSettings;
-    VisualDeckStorageSettings *visualDeckStorageSettings;
-    AppearanceSettings *appearanceSettings;
-    NetworkSettings *networkSettings;
-    CommanderBracketSettings *commanderBracketSettings;
+    QSettings *settings = nullptr;
+    ShortcutsSettings *shortcutsSettings = nullptr;
+    CardDatabaseSettings *cardDatabaseSettings = nullptr;
+    ServersSettings *serversSettings = nullptr;
+    MessageSettings *messageSettings = nullptr;
+    GameFiltersSettings *gameFiltersSettings = nullptr;
+    LayoutsSettings *layoutsSettings = nullptr;
+    DownloadSettings *downloadSettings = nullptr;
+    RecentsSettings *recentsSettings = nullptr;
+    CardOverrideSettings *cardOverrideSettings = nullptr;
+    DebugSettings *debugSettings = nullptr;
+    CardCounterSettings *cardCounterSettings = nullptr;
+    TabsSettings *tabsSettings = nullptr;
+    SoundSettings *soundSettings = nullptr;
+    GameSettings *gameSettings = nullptr;
+    ChatSettings *chatSettings = nullptr;
+    CacheStorageSettings *cacheStorageSettings = nullptr;
+    UpdatesSettings *updatesSettings = nullptr;
+    PersonalSettings *personalSettings = nullptr;
+    CardsDisplaySettings *cardsDisplaySettings = nullptr;
+    InterfaceSettings *interfaceSettings = nullptr;
+    DeckEditorSettings *deckEditorSettings = nullptr;
+    PathsSettings *pathsSettings = nullptr;
+    VisualDeckStorageSettings *visualDeckStorageSettings = nullptr;
+    AppearanceSettings *appearanceSettings = nullptr;
+    NetworkSettings *networkSettings = nullptr;
+    CommanderBracketSettings *commanderBracketSettings = nullptr;
 
     QString themeName;
 

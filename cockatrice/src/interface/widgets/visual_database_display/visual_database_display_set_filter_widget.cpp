@@ -2,21 +2,40 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../filters/filter_tree_model.h"
+#include "../general/layout_containers/flow_widget.h"
+#include "libcockatrice/card/database/card_database.h"
+#include "libcockatrice/card/set/card_set.h"
+#include "libcockatrice/card/set/card_set_list.h"
+#include "libcockatrice/filters/filter_card.h"
+#include "libcockatrice/utility/macros.h"
 #include "visual_database_display_filter_button.h"
 
+#include <QAbstractItemModel>
+#include <QCheckBox>
+#include <QDateTime>
+#include <QDebug>
+#include <QHBoxLayout>
 #include <QLineEdit>
+#include <QList>
+#include <QPersistentModelIndex>
 #include <QPushButton>
-#include <QTimer>
+#include <QSet>
+#include <QSharedPointer>
+#include <QSpinBox>
+#include <QVBoxLayout>
+#include <QtGlobal>
 #include <algorithm>
+#include <compare>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/filters/filter_tree.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qnamespace.h>
 
 VisualDatabaseDisplayRecentSetFilterSettingsWidget::VisualDatabaseDisplayRecentSetFilterSettingsWidget(QWidget *parent)
     : QWidget(parent)
 {
-    layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout = QtUtils::makeLayout<QHBoxLayout>(this);
 
     setLayout(layout);
 
@@ -81,7 +100,7 @@ VisualDatabaseDisplaySetFilterWidget::VisualDatabaseDisplaySetFilterWidget(QWidg
     layout->addWidget(toggleButton);
     connect(toggleButton, &QPushButton::clicked, this, &VisualDatabaseDisplaySetFilterWidget::updateFilterMode);
     connect(filterModel, &FilterTreeModel::layoutChanged, this,
-            [this]() { QTimer::singleShot(100, this, &VisualDatabaseDisplaySetFilterWidget::syncWithFilterModel); });
+            [this]() { syncDebouncer.call([this] { syncWithFilterModel(); }); });
 
     createSetButtons(); // Populate buttons initially
     updateFilterMode();
@@ -284,5 +303,5 @@ void VisualDatabaseDisplaySetFilterWidget::updateFilterMode()
 
     // Reconnect the layoutChanged -> sync lambda
     connect(filterModel, &FilterTreeModel::layoutChanged, this,
-            [this]() { QTimer::singleShot(100, this, &VisualDatabaseDisplaySetFilterWidget::syncWithFilterModel); });
+            [this]() { syncDebouncer.call([this] { syncWithFilterModel(); }); });
 }

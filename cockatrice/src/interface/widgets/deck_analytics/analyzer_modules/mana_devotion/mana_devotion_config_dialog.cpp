@@ -1,5 +1,19 @@
 #include "mana_devotion_config_dialog.h"
 
+#include "../../deck_list_statistics_analyzer.h"
+
+#include <QAbstractItemView>
+#include <QComboBox>
+#include <QDialogButtonBox>
+#include <QHash>
+#include <QLabel>
+#include <QListWidget>
+#include <QListWidgetItem>
+#include <QStringList>
+#include <QVBoxLayout>
+
+class QWidget;
+
 ManaDevotionConfigDialog::ManaDevotionConfigDialog(DeckListStatisticsAnalyzer *analyzer,
                                                    ManaDevotionConfig initial,
                                                    QWidget *parent)

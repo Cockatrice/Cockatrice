@@ -8,14 +8,26 @@
 #include "../interface/widgets/dialogs/dlg_forgot_password_reset.h"
 #include "../interface/widgets/dialogs/dlg_register.h"
 #include "../interface/widgets/utility/get_text_with_max.h"
+#include "libcockatrice/protocol/pb/event_connection_closed.pb.h"
+#include "libcockatrice/protocol/pb/event_server_shutdown.pb.h"
 
+#include <QChar>
 #include <QDateTime>
+#include <QDebug>
 #include <QLineEdit>
+#include <QList>
 #include <QMessageBox>
+#include <QPixmap>
+#include <QStringList>
+#include <QStringLiteral>
 #include <QThread>
 #include <libcockatrice/network/client/remote/remote_client.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/settings/servers_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qnamespace.h>
+
+class QWidget;
 
 ConnectionController::ConnectionController(QWidget *dialogParent, QObject *parent)
     : QObject(parent), dialogParent(dialogParent)
@@ -84,6 +96,9 @@ void ConnectionController::wireClientSignals()
 
     connect(remoteClient, &RemoteClient::sigPromptForForgotPasswordChallenge, this,
             &ConnectionController::onPromptForgotPasswordChallenge);
+
+    connect(remoteClient, &RemoteClient::sigPasswordVerifierReady, this,
+            &ConnectionController::onPasswordVerifierReady);
 }
 
 void ConnectionController::connectToServer()
@@ -92,16 +107,32 @@ void ConnectionController::connectToServer()
     connect(dlgConnect, &DlgConnect::sigStartForgotPasswordRequest, this, &ConnectionController::forgotPasswordRequest);
 
     if (dlgConnect->exec()) {
+        pendingSaveName = dlgConnect->getSaveName();
+        pendingSavePassword = dlgConnect->getSavePassword();
+        remoteClient->setStoredVerifier(dlgConnect->getStoredVerifier());
         remoteClient->connectToServer(dlgConnect->getHost(), static_cast<unsigned int>(dlgConnect->getPort()),
                                       dlgConnect->getPlayerName(), dlgConnect->getPassword());
+    }
+}
+
+void ConnectionController::onPasswordVerifierReady(const QString &verifier)
+{
+    if (pendingSavePassword) {
+        SettingsCache::instance().servers().setServerPassword(pendingSaveName, verifier);
     }
 }
 
 void ConnectionController::connectToServerDirect(const QString &host,
                                                  unsigned int port,
                                                  const QString &playerName,
-                                                 const QString &password)
+                                                 const QString &password,
+                                                 const QString &storedVerifier,
+                                                 const QString &saveName,
+                                                 bool savePassword)
 {
+    pendingSaveName = saveName;
+    pendingSavePassword = savePassword;
+    remoteClient->setStoredVerifier(storedVerifier);
     remoteClient->connectToServer(host, port, playerName, password);
 }
 
@@ -213,18 +244,39 @@ void ConnectionController::onLoginError(int r,
 {
     switch (static_cast<Response::ResponseCode>(r)) {
         case Response::RespClientUpdateRequired: {
-            QString formatted = "Missing Features: ";
-            for (int i = 0; i < missingFeatures.size(); ++i) {
-                formatted.append(QString("\n     %1").arg(QChar(0x2022)) + " " + missingFeatures.value(i));
-            }
-
             QMessageBox msgBox(dialogParent);
             msgBox.setIcon(QMessageBox::Critical);
             msgBox.setWindowTitle(tr("Failed Login"));
-            msgBox.setText(tr("Your client seems to be missing features this server requires for connection.") +
-                           "\n\n" + tr("To update your client, go to 'Help -> Check for Client Updates'."));
-            msgBox.setDetailedText(formatted);
+
+            if (missingFeatures.isEmpty()) {
+                // Without a feature list this is either a login the client stopped itself or a
+                // strict server asking for a password; the reason string already says which and
+                // what to do. No client update can fix any of those causes, so show it instead of
+                // the update advice.
+                msgBox.setText(reasonStr.isEmpty() ? tr("The login did not complete.") : reasonStr);
+            } else {
+                QString formatted = tr("Missing Features:");
+                for (const QString &feature : missingFeatures) {
+                    formatted.append(QString("\n     %1 ").arg(QChar(0x2022)) + feature);
+                }
+
+                msgBox.setText(tr("Your client seems to be missing features this server requires for connection.") +
+                               "\n\n" + tr("To update your client, go to 'Help -> Check for Client Updates'."));
+                msgBox.setDetailedText(formatted);
+            }
+
             msgBox.exec();
+            break;
+        }
+
+        case Response::RespTooManyRequests: {
+            QString bannedStr = endTime ? tr("Too many login attempts. Try again after %1.")
+                                              .arg(QDateTime::fromSecsSinceEpoch(endTime).toString())
+                                        : tr("Too many login attempts. Please try again later.");
+            if (!reasonStr.isEmpty()) {
+                bannedStr.append("\n\n" + reasonStr);
+            }
+            QMessageBox::critical(dialogParent, tr("Error"), bannedStr);
             break;
         }
 
@@ -259,9 +311,8 @@ void ConnectionController::onLoginError(int r,
         }
 
         case Response::RespRegistrationRequired: {
-            if (QMessageBox::question(dialogParent, tr("Error"),
-                                      tr("This server requires user registration. Do you want to register now?"),
-                                      QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+            if (QtUtils::confirm(dialogParent, tr("Error"),
+                                 tr("This server requires user registration. Do you want to register now?"))) {
                 registerToServer();
             }
             return; // don't re-prompt connect
@@ -354,12 +405,15 @@ void ConnectionController::onRegisterError(int r, QString reasonStr, quint32 end
             break;
         }
         case Response::RespTooManyRequests: {
-            QMessageBox::critical(dialogParent, tr("Registration denied"),
-                                  tr("It appears you are attempting to register a new account on this server yet you "
-                                     "already have an account registered with the email provided. This server "
-                                     "restricts the number of accounts a user can register per address. Please "
-                                     "contact the server operator for further assistance or to obtain your "
-                                     "credential information."));
+            QString deniedStr =
+                endTime ? tr("Too many registration attempts. Try again after %1.")
+                              .arg(QDateTime::fromSecsSinceEpoch(endTime).toString())
+                        : tr("It appears you are attempting to register a new account on this server yet you "
+                             "already have an account registered with the email provided. This server "
+                             "restricts the number of accounts a user can register per address. Please "
+                             "contact the server operator for further assistance or to obtain your "
+                             "credential information.");
+            QMessageBox::critical(dialogParent, tr("Registration denied"), deniedStr);
             break;
         }
         case Response::RespPasswordTooShort: {
@@ -473,14 +527,38 @@ void ConnectionController::onForgotPasswordSuccess()
     SettingsCache::instance().servers().setFPPlayerName("");
 }
 
-void ConnectionController::onForgotPasswordError()
+void ConnectionController::onForgotPasswordError(int responseCode)
 {
-    QMessageBox::warning(
-        dialogParent, tr("Reset Password"),
-        tr("Failed to reset user account password, please contact the server operator to reset your password."));
-    SettingsCache::instance().servers().setFPHostName("");
-    SettingsCache::instance().servers().setFPPort("");
-    SettingsCache::instance().servers().setFPPlayerName("");
+    // Rate limiting is retryable, so it must not clear the prefill.
+    bool keepPrefill = false;
+    QString message;
+    switch (static_cast<Response::ResponseCode>(responseCode)) {
+        case Response::RespTooManyRequests:
+            // Retryable: keep the host/port/user prefill so the user can try again. The window
+            // is server-configured (an hour by default), so do not promise a shorter wait.
+            keepPrefill = true;
+            message = tr("Too many password reset attempts from your address. Please wait before "
+                         "requesting a new reset.");
+            break;
+        case Response::RespFunctionNotAllowed:
+            // Also returned for an unknown user, a banned user, and an expired token or
+            // challenge, so the message must not claim a single cause.
+            message = tr("The server did not accept the reset request. Check the user name, or contact "
+                         "the server operator to reset your password.");
+            break;
+        default:
+            message = tr("Failed to reset user account password, please contact the server operator to reset your "
+                         "password.");
+            break;
+    }
+
+    QMessageBox::warning(dialogParent, tr("Reset Password"), message);
+
+    if (!keepPrefill) {
+        SettingsCache::instance().servers().setFPHostName("");
+        SettingsCache::instance().servers().setFPPort("");
+        SettingsCache::instance().servers().setFPPlayerName("");
+    }
 }
 
 void ConnectionController::onPromptForgotPasswordReset()

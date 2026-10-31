@@ -6,7 +6,13 @@
 
 #ifndef HOME_STYLED_BUTTON_H
 #define HOME_STYLED_BUTTON_H
+#include <QColor>
+#include <QPair>
 #include <QPushButton>
+#include <QString>
+#include <qtmetamacros.h>
+
+class QWidget;
 
 class HomeStyledButton : public QPushButton
 {

@@ -1,12 +1,16 @@
 #ifndef PICTURE_LOADER_STATUS_BAR_H
 #define PICTURE_LOADER_STATUS_BAR_H
 
-#include "../../interface/widgets/quick_settings/settings_button_widget.h"
-#include "card_picture_loader_worker_work.h"
-
-#include <QHBoxLayout>
-#include <QProgressBar>
+#include <QString>
 #include <QWidget>
+#include <qtmetamacros.h>
+
+class ExactCard;
+class QHBoxLayout;
+class QProgressBar;
+class QTimer;
+class QUrl;
+class SettingsButtonWidget;
 
 /**
  * @class CardPictureLoaderStatusBar

@@ -1,8 +1,8 @@
 #ifndef COCKATRICE_MANA_DISTRIBUTION_CONFIG_H
 #define COCKATRICE_MANA_DISTRIBUTION_CONFIG_H
 
-#include <QJsonArray>
 #include <QJsonObject>
+#include <QList>
 #include <QString>
 #include <QStringList>
 

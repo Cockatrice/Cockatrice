@@ -15,9 +15,10 @@
 ---
 
 <br><pre><p align='center'>
-<b>To get started with Cockatrice &#8674; [view our webpage](https://cockatrice.github.io/)</b><br>
-<b>To get support, or suggest changes to the app &#8674; [file an issue](https://github.com/Cockatrice/Cockatrice/issues) ([How?](https://github.com/Cockatrice/Cockatrice/wiki/How-to-Create-a-GitHub-Ticket-Regarding-Cockatrice))</b>
-<b>To help with development &#8674; learn [how to contribute](#contribute-)</b>
+<b>To get started with Cockatrice &#8674; [view our webpage](https://cockatrice.github.io/)</b>
+<b>To get support, or suggest changes to the app &#8674; [file an issue](https://github.com/Cockatrice/Cockatrice/issues) ([How?](https://github.com/Cockatrice/Cockatrice/wiki/How-to-Create-a-GitHub-Ticket-Regarding-Cockatrice))</b><br>
+<b>To learn about the app and its code &#8674; [read our code documentation](https://cockatrice.github.io/docs/)</b>
+<b>To help with development &#8674; learn [how to contribute](#contribute)</b>
 </pre><p><br>
 
 
@@ -83,7 +84,7 @@ Join our [Discord community](https://discord.gg/3Z9yzmA) to connect with other p
 
 ### Code
 
-To contribute code to the project, please review our [guidelines](https://github.com/Cockatrice/Cockatrice/blob/master/.github/CONTRIBUTING.md) first.<br>
+To commit code to the project, please review our [Contribution Guidelines](https://github.com/Cockatrice/Cockatrice/blob/master/.github/CONTRIBUTING.md) first.<br>
 We maintain two tags for contributors to easier find issues to potentially work on:
 - [![Good first issue](https://img.shields.io/github/issues/cockatrice/cockatrice/Good%20First%20Issue)](https://github.com/Cockatrice/Cockatrice/issues?utf8=%E2%9C%93&q=is%3Aopen%20is%3Aissue%20label%3A%22Good%20first%20issue%22%20)<br>
 Issues tagged in this way provide a simple way to get started. They don't require much experience to be worked on.
@@ -95,15 +96,17 @@ We'll happily advice on how best to implement a feature, or we can show you wher
 
 You can also have a look at our `Todo List` in our [Code Documentation](https://cockatrice.github.io/docs) or search the repo for [`\todo` comments](https://github.com/search?q=repo%3ACockatrice%2FCockatrice%20%5Ctodo&type=code).
 
-### Documentation [![CI Docs](https://github.com/Cockatrice/Cockatrice/actions/workflows/documentation-build.yml/badge.svg?event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/documentation-build.yml?query=event%3Apush)
+### Documentation [![CI Docs](https://github.com/Cockatrice/Cockatrice/actions/workflows/documentation-build.yml/badge.svg?event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/documentation-build.yml?query=event%3Arelease+event%3Aworkflow_dispatch)
 
 There are various places where useful information for different needs are maintained:
 - [Official Code Documentation](https://cockatrice.github.io/docs/) 
 - [Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki) `Community supported`
 - [Official Webpage](https://cockatrice.github.io/)
 - [Official README](https://github.com/Cockatrice/Cockatrice/blob/master/README.md) `This file`
+- [Official CONTRIBUTING](https://github.com/Cockatrice/Cockatrice/blob/master/.github/CONTRIBUTING.md)
 
-Cockatrice tries to use the [Google Developer Documentation Style Guide](https://developers.google.com/style/) to ensure consistent documentation. We encourage you to improve the documentation by suggesting edits based on this guide.
+Cockatrice tries to use the [Google Developer Documentation Style Guide](https://developers.google.com/style/) to ensure consistent documentation.  
+We encourage everybody to improve the documentation by suggesting edits based on this guide.
 
 ### Translation [![Transifex Project](https://img.shields.io/badge/translate-on%20transifex-brightgreen)](https://explore.transifex.com/cockatrice/cockatrice/)
 
@@ -158,6 +161,12 @@ The following flags (with their non-default values) can be passed to `cmake`:
 | `-DWARNING_AS_ERROR=0`     | Don't treat compilation warnings as errors in debug mode                                                                                      |
 | `-DUPDATE_TRANSLATIONS=1`  |  Configure `make` to update the translation .ts files for new strings in the source code<br> **Note:** `make clean` will remove the .ts files |
 | `-DTEST=1`                 | Enable regression tests<br> **Note:** `make test` to run tests, *googletest* will be downloaded if not available                              |
+
+> [!TIP]
+> Build code documentation ([Doxygen](https://www.doxygen.nl)) according to our [configuration](https://github.com/Cockatrice/Cockatrice/blob/master/Doxyfile) into `/docs`:
+> ```bash
+> doxygen Doxyfile
+> ```
 
 
 # Run

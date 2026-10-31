@@ -3,8 +3,9 @@
 
 #include <QDialog>
 #include <QList>
-#include <libcockatrice/protocol/pb/response.pb.h>
+#include <QString>
 #include <libcockatrice/protocol/pb/serverinfo_report.pb.h>
+#include <qtmetamacros.h>
 
 class AbstractClient;
 class QTableWidget;
@@ -12,6 +13,8 @@ class QTextEdit;
 class QLineEdit;
 class QPushButton;
 class QLabel;
+class QWidget;
+class Response;
 
 class DlgMyReports : public QDialog
 {

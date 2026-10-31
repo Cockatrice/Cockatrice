@@ -1,5 +1,12 @@
 #include "personal_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QList>
+#include <QVariant>
+
+class QObject;
+
 PersonalSettings::PersonalSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "personal.ini", "personal", QString(), parent)
 {
@@ -43,4 +50,25 @@ void PersonalSettings::setSeenTips(const QList<int> &_seenTips)
         storedTipList.append(tipNumber);
     }
     setValue(QVariant::fromValue(storedTipList), "seenTips", "tipOfDay");
+}
+
+PersonalSettings::CrashReportingMode PersonalSettings::getCrashReportingMode() const
+{
+    const int raw = getValue("crashReportingMode", QString(), QString(), 0).toInt();
+    switch (raw) {
+        case 1:
+            return CrashReportingMode::AlwaysSend;
+        case 2:
+            return CrashReportingMode::NeverSend;
+        case 0:
+        default:
+            // Clamp corrupt ini values back to Ask; the QSettings key string is unchanged (no migration).
+            return CrashReportingMode::Ask;
+    }
+}
+
+void PersonalSettings::setCrashReportingMode(CrashReportingMode _crashReportingMode)
+{
+    setValue(static_cast<int>(_crashReportingMode), "crashReportingMode");
+    emit crashReportingModeChanged(_crashReportingMode);
 }

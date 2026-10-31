@@ -1,12 +1,15 @@
 #ifndef COCKATRICE_COMMANDER_SPELLBOOK_API_ACCESSOR_H
 #define COCKATRICE_COMMANDER_SPELLBOOK_API_ACCESSOR_H
 
-#include "api_response/commander_spellbook_estimate_bracket_result.h"
-
 #include <QNetworkAccessManager>
-#include <QNetworkReply>
 #include <QObject>
-#include <libcockatrice/deck_list/deck_list.h>
+#include <QString>
+#include <QtGlobal>
+#include <qtmetamacros.h>
+
+class DeckList;
+class QNetworkReply;
+struct EstimateBracketResult;
 
 class CommanderSpellbookApiAccessor final : public QObject
 {

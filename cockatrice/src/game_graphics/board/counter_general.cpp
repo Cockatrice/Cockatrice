@@ -3,7 +3,20 @@
 #include "../../interface/pixel_map_generator.h"
 #include "abstract_graphics_item.h"
 
+#include <QFont>
 #include <QPainter>
+#include <QPixmap>
+#include <QPoint>
+#include <QRectF>
+#include <QSizeF>
+#include <QString>
+#include <QTransform>
+#include <QtGlobal>
+#include <qnamespace.h>
+
+class CounterState;
+class PlayerLogic;
+class QGraphicsItem;
 
 GeneralCounter::GeneralCounter(CounterState *state, PlayerLogic *player, bool useNameForShortcut, QGraphicsItem *parent)
     : AbstractCounter(state, player, true, useNameForShortcut, parent)

@@ -5,6 +5,8 @@
 
 #include <QMap>
 #include <QMutex>
+#include <QMutexLocker>
+#include <QPair>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/server_message.pb.h>
 
@@ -12,9 +14,15 @@ class SessionEvent;
 class GameEventContainer;
 class RoomEvent;
 class ResponseContainer;
-
 class Server;
 class Server_Game;
+namespace google
+{
+namespace protobuf
+{
+class Message;
+} // namespace protobuf
+} // namespace google
 
 class Server_AbstractUserInterface : public ServerInfo_User_Container
 {
@@ -49,6 +57,13 @@ public:
         QMutexLocker locker(&gameListMutex);
         return games;
     }
+
+    /**
+     * @brief Looks up the room and player id of one game without copying the game list.
+     *
+     * @return True if the game is known; otherwise false and the outputs are untouched.
+     */
+    bool getGameInfo(int gameId, int &roomId, int &playerId) const;
 
     virtual void sendProtocolItem(const Response &item) = 0;
     virtual void sendProtocolItem(const SessionEvent &item) = 0;

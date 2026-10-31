@@ -7,13 +7,25 @@
 #ifndef SETSMODEL_H
 #define SETSMODEL_H
 
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/set/card_set_list.h"
+
 #include <QAbstractTableModel>
+#include <QCollator>
+#include <QList>
 #include <QMimeData>
+#include <QModelIndex>
+#include <QModelIndexList>
 #include <QSet>
 #include <QSortFilterProxyModel>
-#include <libcockatrice/card/database/card_database.h>
+#include <QString>
+#include <QStringList>
+#include <QtGlobal>
+#include <qnamespace.h>
+#include <qtmetamacros.h>
 
-class SetsProxyModel;
+class CardDatabase;
+class QObject;
 
 class SetsMimeData : public QMimeData
 {
@@ -101,6 +113,9 @@ protected:
     [[nodiscard]] bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
     [[nodiscard]] bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
     void fetchMore(const QModelIndex &index) override;
+
+private:
+    QCollator collator;
 };
 
 #endif

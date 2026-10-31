@@ -2,8 +2,14 @@
 
 #include "../database/card_database_manager.h"
 #include "../printing/exact_card.h"
+#include "libcockatrice/card/database/card_database_querier.h"
 
+#include <QHash>
+#include <QList>
 #include <QRegularExpression>
+#include <QStringList>
+#include <libcockatrice/utility/card_ref.h>
+#include <utility>
 
 /**
  * @brief Resolves the complete display name of a card.

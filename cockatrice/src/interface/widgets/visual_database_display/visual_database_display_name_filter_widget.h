@@ -7,14 +7,18 @@
 #ifndef VISUAL_DATABASE_DISPLAY_NAME_FILTER_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_NAME_FILTER_WIDGET_H
 
-#include "../../../filters/filter_tree_model.h"
-#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
-#include "../general/layout_containers/flow_widget.h"
-
-#include <QLineEdit>
 #include <QMap>
-#include <QPushButton>
+#include <QString>
 #include <QWidget>
+#include <libcockatrice/utility/debouncer.h>
+#include <qtmetamacros.h>
+
+class DeckListModel;
+class FilterTreeModel;
+class FlowWidget;
+class QLineEdit;
+class QPushButton;
+class QVBoxLayout;
 
 class VisualDatabaseDisplayNameFilterWidget : public QWidget
 {
@@ -43,6 +47,7 @@ private:
     QPushButton *loadFromClipboardButton;
 
     QMap<QString, QPushButton *> activeFilters; // Store active name filter buttons
+    QtUtils::Debouncer syncDebouncer{100};
 
 private slots:
     void actLoadFromDeck();

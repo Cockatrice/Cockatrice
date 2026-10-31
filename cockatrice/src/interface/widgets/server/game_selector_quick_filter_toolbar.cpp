@@ -1,12 +1,23 @@
 #include "game_selector_quick_filter_toolbar.h"
 
+#include "game_filter_configs.h"
 #include "games_model.h"
-#include "user/user_list_manager.h"
 
 #include <QCheckBox>
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QLineEdit>
+#include <QMapIterator>
+#include <QSet>
+#include <QSharedPointer>
+#include <QSignalBlocker>
+#include <QString>
+#include <QVariant>
+#include <QtGlobal>
+#include <libcockatrice/utility/qt_utils.h>
+
+class TabSupervisor;
+template <class Key, class T> class QMap;
 
 GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,
                                                                TabSupervisor *_tabSupervisor,
@@ -14,8 +25,7 @@ GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,
                                                                const QMap<int, QString> &allGameTypes)
     : QWidget(parent), tabSupervisor(_tabSupervisor), model(_model)
 {
-    mainLayout = new QHBoxLayout(this);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout = QtUtils::makeLayout<QHBoxLayout>(this);
     mainLayout->setSpacing(5);
 
     const GameFilterConfigs &filters = model->getFilters();

@@ -1,5 +1,11 @@
 #include "appearance_settings.h"
 
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QVariant>
+
+class QObject;
+
 AppearanceSettings::AppearanceSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "appearance.ini", "appearance", QString(), parent)
 {

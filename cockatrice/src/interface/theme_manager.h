@@ -10,20 +10,20 @@
 #include "theme_config.h"
 
 #include <QBrush>
-#include <QDir>
+#include <QColor>
 #include <QLoggingCategory>
 #include <QMap>
 #include <QObject>
-#include <QPixmap>
+#include <QPalette>
 #include <QString>
+#include <QStringView>
 #include <array>
+#include <qtmetamacros.h>
 
 inline Q_LOGGING_CATEGORY(ThemeManagerLog, "theme_manager");
 
 typedef QMap<QString, QString> QStringMap;
 typedef QMap<int, QBrush> QBrushMap;
-
-class QApplication;
 
 class ThemeManager : public QObject
 {
@@ -71,6 +71,14 @@ public:
     // read-only system themes fall back to the user themes directory, creating
     // it if needed, so customisations never get lost on upgrade.
     static QString writableThemeDir(const QString &themeName);
+    // Carries a user profile's customised "Default" theme directory over to the
+    // "System" directory the theme was renamed to, so zone graphics,
+    // stylesheets, palettes and theme.cfg survive the rename. Renames the
+    // directory when "System" does not exist yet, otherwise merges file by
+    // file without overwriting what "System" already has. No-op unless the
+    // active theme is one of the two names, so a hand-made "Default" folder of
+    // a user on another theme is left alone.
+    static void migrateLegacyThemeDir(const QString &themesPath, const QString &currentThemeName);
     // Probe whether a directory is truly writable by trying to create and remove
     // a temporary file. QFileInfo::isWritable() on a directory is unreliable
     // (notably on Windows where UAC VirtualStore can make a system dir appear

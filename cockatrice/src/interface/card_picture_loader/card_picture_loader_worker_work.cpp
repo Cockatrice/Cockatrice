@@ -2,19 +2,35 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "card_picture_loader_worker.h"
+#include "card_picture_to_load.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/utility/server_rate_limiter.h"
 
 #include <QBuffer>
-#include <QDirIterator>
+#include <QByteArray>
+#include <QCryptographicHash>
+#include <QDateTime>
+#include <QDebug>
+#include <QImageReader>
+#include <QList>
 #include <QLoggingCategory>
+#include <QMessageLogger>
 #include <QMovie>
 #include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QRandomGenerator>
-#include <QThread>
-#include <QThreadPool>
+#include <QSharedPointer>
+#include <QStringList>
 #include <QTimer>
+#include <QUrl>
+#include <QVariant>
 
 ServerRateLimiter CardPictureLoaderWorkerWork::s_rateLimiter;
+#include <QtGlobal>
 #include <libcockatrice/settings/download_settings.h>
+#include <qnamespace.h>
+#include <qobjectdefs.h>
 
 // Card back returned by gatherer when card is not found
 static const QStringList MD5_BLACKLIST = {
@@ -22,8 +38,13 @@ static const QStringList MD5_BLACKLIST = {
     "fbc7d763c08771c260b39e2115414eeb"  // Current card back hash
 };
 
-CardPictureLoaderWorkerWork::CardPictureLoaderWorkerWork(const CardPictureLoaderWorker *worker, const ExactCard &toLoad)
-    : QObject(nullptr), cardToDownload(CardPictureToLoad(toLoad)),
+const ServerRateLimiter &CardPictureLoaderWorkerWork::rateLimiter()
+{
+    return s_rateLimiter;
+}
+
+CardPictureLoaderWorkerWork::CardPictureLoaderWorkerWork(CardPictureLoaderWorker *worker, const ExactCard &toLoad)
+    : QObject(worker), cardToDownload(CardPictureToLoad(toLoad)),
       picDownload(SettingsCache::instance().downloads().getPicDownload())
 {
     // Hook up signals to the orchestrator
@@ -168,7 +189,7 @@ void CardPictureLoaderWorkerWork::handleFailedReply(const QNetworkReply *reply)
                 << "PictureLoader: [card: " << cardToDownload.getCard().getName()
                 << " set: " << cardToDownload.getSetName() << "]: Too many requests from " << host
                 << ", backing off until " << backoffUntil.toString(Qt::ISODate) << ", retrying the same url";
-            scheduleDeferredRetry();
+            scheduleDeferredRetry(host);
         } else {
             qCWarning(CardPictureLoaderWorkerWorkLog).nospace()
                 << "PictureLoader: [card: " << cardToDownload.getCard().getName()
@@ -273,14 +294,16 @@ QImage CardPictureLoaderWorkerWork::tryLoadImageFromReply(QNetworkReply *reply)
     return imgReader.read();
 }
 
-void CardPictureLoaderWorkerWork::scheduleDeferredRetry()
+void CardPictureLoaderWorkerWork::scheduleDeferredRetry(const QString &preferredHost)
 {
     QDateTime now = QDateTime::currentDateTime();
 
-    // Prefer waiting on the current URL's server so we retry the same source.
-    QString currentHost = QUrl(cardToDownload.getCurrentUrl()).host();
-    QDateTime backoffUntil = s_rateLimiter.deadline(currentHost);
-    if (!s_rateLimiter.isRateLimited(currentHost, now)) {
+    // Prefer waiting on the server that is actually blocking the request: callers hand in the
+    // rate-limited host when it differs from the current URL (e.g. a cached redirect target still
+    // in backoff), otherwise fall back to the current URL's server so we retry the same source.
+    QString waitHost = preferredHost.isEmpty() ? QUrl(cardToDownload.getCurrentUrl()).host() : preferredHost;
+    QDateTime backoffUntil = s_rateLimiter.deadline(waitHost);
+    if (!s_rateLimiter.isRateLimited(waitHost, now)) {
         backoffUntil = s_rateLimiter.earliestDeadline(now);
     }
 

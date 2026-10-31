@@ -1,9 +1,22 @@
 #ifndef SERVER_DATABASE_INTERFACE_H
 #define SERVER_DATABASE_INTERFACE_H
 
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 #include "server.h"
 
+#include <QMap>
 #include <QObject>
+#include <QString>
+#include <QStringList>
+#include <QtGlobal>
+#include <qtmetamacros.h>
+
+class DeckList;
+class GameReplay;
+class ServerInfo_Game;
+class Server_ProtocolHandler;
+template <typename T> class QList;
+template <typename T> class QSet;
 
 class Server_DatabaseInterface : public QObject
 {
@@ -39,6 +52,14 @@ public:
     virtual QString getUserSalt(const QString & /* user */)
     {
         return {};
+    }
+    virtual QString getUserPasswordData(const QString & /* user */)
+    {
+        return {};
+    }
+    virtual bool submitPasswordVerifier(const QString & /* user */, const QString & /* passwordVerifier */)
+    {
+        return false;
     }
     virtual QMap<QString, ServerInfo_User> getBuddyList(const QString & /* name */)
     {
@@ -138,7 +159,8 @@ public:
         MessageTargetRoom,
         MessageTargetGame,
         MessageTargetChat,
-        MessageTargetIslRoom
+        MessageTargetIslRoom,
+        MessageTargetRoomChannel
     };
     virtual void logMessage(const int /* senderId */,
                             const QString & /* senderName */,
@@ -146,7 +168,8 @@ public:
                             const QString & /* logMessage */,
                             LogMessage_TargetType /* targetType */,
                             const int /* targetId */,
-                            const QString & /* targetName */)
+                            const QString & /* targetName */,
+                            const QString & /* channel */ = QString())
     {
     }
     virtual bool checkUserIsBanned(Server_ProtocolHandler * /* session */,
@@ -174,6 +197,16 @@ public:
     }
     virtual void setForcePasswordChange(const QString & /* user */, bool /* force */)
     {
+    }
+    /**
+     * @brief Whether the given card art may be shown (card art rules).
+     *
+     * Default allows everything; the real server overrides this with a lookup
+     * in {prefix}_card_art_name_rules. Empty names are always allowed (clear path).
+     */
+    virtual bool isCardArtAllowed(const QString & /* cardName */, const QString & /* providerId */)
+    {
+        return true;
     }
 };
 

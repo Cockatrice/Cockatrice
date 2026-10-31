@@ -4,10 +4,15 @@
 #include "abstract_settings_page.h"
 
 #include <QCheckBox>
-#include <QGroupBox>
 #include <QLabel>
-#include <QListWidget>
+#include <QString>
 #include <libcockatrice/utility/macros.h>
+#include <qtmetamacros.h>
+
+class QAction;
+class QGroupBox;
+class QLineEdit;
+class QListWidget;
 
 class MessagesSettingsPage : public AbstractSettingsPage
 {
@@ -22,6 +27,8 @@ private slots:
     void actRemove();
     void updateColor(const QString &value);
     void updateHighlightColor(const QString &value);
+    void updateChannelUnreadColor(const QString &value);
+    void updateChannelMentionColor(const QString &value);
     void updateTextColor(QT_STATE_CHANGED_T value);
     void updateTextHighlightColor(QT_STATE_CHANGED_T value);
 
@@ -41,20 +48,30 @@ private:
     QCheckBox mentionPopups;
     QCheckBox roomHistory;
     QCheckBox ignoreAllPrivateMessagesCheckBox;
+    QCheckBox useGameTimeCheckBox;
     QGroupBox *chatGroupBox;
     QGroupBox *highlightGroupBox;
+    QGroupBox *channelGroupBox;
     QGroupBox *messageGroupBox;
     QLineEdit *mentionColor;
     QLineEdit *highlightColor;
+    QLineEdit *channelUnreadColor;
+    QLineEdit *channelMentionColor;
     QLineEdit *customAlertString;
     QLabel hexLabel;
     QLabel hexHighlightLabel;
+    QLabel channelUnreadColorLabel;
+    QLabel channelMentionColorLabel;
+    QLabel hexChannelUnreadLabel;
+    QLabel hexChannelMentionLabel;
     QLabel customAlertStringLabel;
     QLabel explainMessagesLabel;
 
     void storeSettings();
     void updateMentionPreview();
     void updateHighlightPreview();
+    void updateChannelUnreadPreview();
+    void updateChannelMentionPreview();
 };
 
 #endif // COCKATRICE_MESSAGES_SETTINGS_PAGE_H

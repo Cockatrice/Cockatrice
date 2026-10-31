@@ -2,23 +2,23 @@
 <context>
     <name>IntroPage</name>
     <message>
-        <location filename="src/pages.cpp" line="127"/>
+        <location filename="src/pages.cpp" line="239"/>
         <source>Introduction</source>
         <translation>Introduzione</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="128"/>
+        <location filename="src/pages.cpp" line="240"/>
         <source>This wizard will import the list of sets, cards, and tokens that will be used by Cockatrice.</source>
         <translation>Questo wizard importerà la lista di set, carte
 e pedine che verranno usate da Cockatrice.</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="130"/>
+        <location filename="src/pages.cpp" line="242"/>
         <source>Interface language:</source>
         <translation>Lingua dell&apos;interfaccia:</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="131"/>
+        <location filename="src/pages.cpp" line="243"/>
         <source>Version:</source>
         <translation>Versione:</translation>
     </message>
@@ -26,192 +26,206 @@ e pedine che verranno usate da Cockatrice.</translation>
 <context>
     <name>LoadSetsPage</name>
     <message>
-        <location filename="src/pages.cpp" line="200"/>
+        <location filename="src/pages.cpp" line="317"/>
         <source>Source selection</source>
         <translation>Selezione sorgente</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="201"/>
+        <location filename="src/pages.cpp" line="318"/>
         <source>Please specify a compatible source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
         <translation>Specifica una sorgente compatibile per la lista dei set e delle carte. Puoi specificare un indirizzo URL da cui scaricare il file o selezionare un file già presente nel tuo computer.</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="205"/>
+        <location filename="src/pages.cpp" line="322"/>
         <source>Download URL:</source>
         <translation>Indirizzo download:</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="206"/>
+        <location filename="src/pages.cpp" line="323"/>
         <source>Local file:</source>
         <translation>File nel pc:</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="207"/>
+        <location filename="src/pages.cpp" line="324"/>
         <source>Restore default URL</source>
         <translation>Usa l&apos;indirizzo predefinito</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="208"/>
+        <location filename="src/pages.cpp" line="325"/>
         <source>Choose file...</source>
         <translation>Scegli file...</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="218"/>
+        <location filename="src/pages.cpp" line="335"/>
         <source>Load sets file</source>
         <translation>Carica file dei set</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="228"/>
+        <location filename="src/pages.cpp" line="345"/>
         <source>Sets file (%1)</source>
         <oldsource>Sets JSON file (%1)</oldsource>
         <translation>File dei set (%1)</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="258"/>
-        <location filename="src/pages.cpp" line="277"/>
-        <location filename="src/pages.cpp" line="282"/>
-        <location filename="src/pages.cpp" line="354"/>
-        <location filename="src/pages.cpp" line="485"/>
-        <location filename="src/pages.cpp" line="498"/>
-        <location filename="src/pages.cpp" line="519"/>
+        <location filename="src/pages.cpp" line="375"/>
+        <location filename="src/pages.cpp" line="394"/>
+        <location filename="src/pages.cpp" line="469"/>
+        <location filename="src/pages.cpp" line="604"/>
+        <location filename="src/pages.cpp" line="644"/>
         <source>Error</source>
         <translation>Errore</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="258"/>
+        <location filename="src/pages.cpp" line="375"/>
         <source>The provided URL is not valid.</source>
         <translation>L&apos;indirizzo specificato non è valido.</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="262"/>
-        <source>Downloading (0MB)</source>
-        <translation>Scaricamento (0MB)</translation>
-    </message>
-    <message>
-        <location filename="src/pages.cpp" line="277"/>
+        <location filename="src/pages.cpp" line="394"/>
         <source>Please choose a file.</source>
         <translation>Seleziona un file.</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="282"/>
+        <location filename="src/pages.cpp" line="576"/>
         <source>Cannot open file &apos;%1&apos;.</source>
         <translation>Impossibile aprire il file &apos;%1&apos;.</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="345"/>
-        <source>Downloading (%1MB)</source>
-        <translation>Scaricamento (%1MB)</translation>
-    </message>
-    <message>
-        <location filename="src/pages.cpp" line="354"/>
+        <location filename="src/pages.cpp" line="469"/>
         <source>Network error: %1.</source>
         <translation>Errore di rete: %1</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="392"/>
+        <location filename="src/pages.cpp" line="524"/>
         <source>Parsing file</source>
         <translation>Analisi dei file</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="414"/>
+        <location filename="src/pages.cpp" line="100"/>
         <source>Xz extraction failed.</source>
         <translation>Estrazione da file xz fallita.</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="421"/>
+        <location filename="src/pages.cpp" line="108"/>
         <source>Sorry, this version of Oracle does not support xz compressed files.</source>
         <translation>Spiacente, ma questa versione di Oracle non supporta i file xz.</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="441"/>
+        <location filename="src/pages.cpp" line="120"/>
         <source>Failed to open Zip archive: %1.</source>
         <translation>Impossibile aprire il file Zip: %1</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="446"/>
+        <location filename="src/pages.cpp" line="126"/>
         <source>Zip extraction failed: the Zip archive doesn&apos;t contain exactly one file.</source>
         <translation>Estrazione file Zip fallita: lo Zip non contiene un solo file.</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="454"/>
+        <location filename="src/pages.cpp" line="137"/>
         <source>Zip extraction failed: %1.</source>
         <translation>Estrazione file Zip fallita: %1</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="462"/>
+        <location filename="src/pages.cpp" line="144"/>
         <source>Sorry, this version of Oracle does not support zipped files.</source>
         <translation>Spiacente, ma questa versione di Oracle non supporta i file zip.</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="485"/>
+        <location filename="src/pages.cpp" line="164"/>
         <source>Failed to interpret downloaded data.</source>
         <translation>Impossibile interpretare i dati scaricati.</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="498"/>
+        <location filename="src/pages.cpp" line="379"/>
+        <source>Downloading (0 MB)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/pages.cpp" line="460"/>
+        <source>Downloading (%1 MB)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/pages.cpp" line="509"/>
+        <source>Parsing file (%1%)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/pages.cpp" line="524"/>
+        <source>Extracting file...</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="src/pages.cpp" line="604"/>
         <source>Do you want to download the uncompressed file instead?</source>
         <translation>Vuoi provare a scaricare il file non compresso?</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="520"/>
+        <location filename="src/pages.cpp" line="635"/>
+        <location filename="src/pages.cpp" line="657"/>
         <source>The file was retrieved successfully, but it does not contain any sets data.</source>
         <translation>Il file è stato analizzato correttamente, ma non contiene i dati di nessun set.</translation>
+    </message>
+    <message>
+        <location filename="src/pages.cpp" line="666"/>
+        <source>Parsing file (100%)</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>LoadSpoilersPage</name>
     <message>
-        <location filename="src/pages.cpp" line="716"/>
+        <location filename="src/pages.cpp" line="952"/>
         <source>Save spoiler database</source>
         <translation>Salva archivio spoiler</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="721"/>
+        <location filename="src/pages.cpp" line="957"/>
         <source>XML; spoiler database (*.xml)</source>
         <translation>XML; archivio spoiler (*.xml)</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="726"/>
+        <location filename="src/pages.cpp" line="962"/>
         <source>spoiler</source>
         <translation>spoiler</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="731"/>
+        <location filename="src/pages.cpp" line="967"/>
         <source>Spoilers import</source>
         <translation>Importazione spoiler</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="732"/>
+        <location filename="src/pages.cpp" line="968"/>
         <source>Please specify a compatible source for spoiler data.</source>
         <translation>Specifica una sorgente compatibile per gli spoiler.</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="734"/>
+        <location filename="src/pages.cpp" line="970"/>
         <source>Download URL:</source>
         <translation>Indirizzo download:</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="735"/>
+        <location filename="src/pages.cpp" line="971"/>
         <source>Local file:</source>
         <translation>File nel pc:</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="736"/>
+        <location filename="src/pages.cpp" line="972"/>
         <source>Restore default URL</source>
         <translation>Usa l&apos;indirizzo predefinito</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="737"/>
+        <location filename="src/pages.cpp" line="973"/>
         <source>Choose file...</source>
         <translation>Scegli file...</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="739"/>
+        <location filename="src/pages.cpp" line="975"/>
         <source>The spoiler database will be saved at the following location:</source>
         <translation>L&apos;archivio degli spoiler verrà salvato nel seguente percorso:</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="741"/>
+        <location filename="src/pages.cpp" line="977"/>
         <source>Save to a custom path (not recommended)</source>
         <translation>Salva in un percorso diverso (sconsigliato)</translation>
     </message>
@@ -219,57 +233,57 @@ e pedine che verranno usate da Cockatrice.</translation>
 <context>
     <name>LoadTokensPage</name>
     <message>
-        <location filename="src/pages.cpp" line="671"/>
+        <location filename="src/pages.cpp" line="907"/>
         <source>Save token database</source>
         <translation>Salva archivio pedine</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="676"/>
+        <location filename="src/pages.cpp" line="912"/>
         <source>XML; token database (*.xml)</source>
         <translation>XML; archivio pedine (*.xml)</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="681"/>
+        <location filename="src/pages.cpp" line="917"/>
         <source>tokens</source>
         <translation>pedine</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="686"/>
+        <location filename="src/pages.cpp" line="922"/>
         <source>Tokens import</source>
         <translation>Importazione pedine</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="687"/>
+        <location filename="src/pages.cpp" line="923"/>
         <source>Please specify a compatible source for token data.</source>
         <translation>Specifica una sorgente compatibile per le pedine.</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="689"/>
+        <location filename="src/pages.cpp" line="925"/>
         <source>Download URL:</source>
         <translation>Indirizzo download:</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="690"/>
+        <location filename="src/pages.cpp" line="926"/>
         <source>Local file:</source>
         <translation>File nel pc:</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="691"/>
+        <location filename="src/pages.cpp" line="927"/>
         <source>Restore default URL</source>
         <translation>Usa l&apos;indirizzo predefinito</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="692"/>
+        <location filename="src/pages.cpp" line="928"/>
         <source>Choose file...</source>
         <translation>Scegli file...</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="694"/>
+        <location filename="src/pages.cpp" line="930"/>
         <source>The token database will be saved at the following location:</source>
         <translation>L&apos;archivio delle pedine verrà salvato nel seguente percorso:</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="696"/>
+        <location filename="src/pages.cpp" line="932"/>
         <source>Save to a custom path (not recommended)</source>
         <translation>Salva in un percorso diverso (sconsigliato)</translation>
     </message>
@@ -277,7 +291,7 @@ e pedine che verranno usate da Cockatrice.</translation>
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="src/oracleimporter.cpp" line="542"/>
+        <location filename="src/oracleimporter.cpp" line="770"/>
         <source>Dummy set containing tokens</source>
         <translation>Set finto contenente i token</translation>
     </message>
@@ -285,7 +299,7 @@ e pedine che verranno usate da Cockatrice.</translation>
 <context>
     <name>OracleWizard</name>
     <message>
-        <location filename="src/oraclewizard.cpp" line="101"/>
+        <location filename="src/oraclewizard.cpp" line="106"/>
         <source>Oracle Importer</source>
         <translation>Oracle Importer</translation>
     </message>
@@ -293,22 +307,22 @@ e pedine che verranno usate da Cockatrice.</translation>
 <context>
     <name>OutroPage</name>
     <message>
-        <location filename="src/pages.cpp" line="136"/>
+        <location filename="src/pages.cpp" line="248"/>
         <source>Finished</source>
         <translation>Finito</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="137"/>
+        <location filename="src/pages.cpp" line="249"/>
         <source>The wizard has finished.</source>
         <translation>Il wizard è completato.</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="138"/>
+        <location filename="src/pages.cpp" line="250"/>
         <source>You can now start using Cockatrice with the newly updated cards.</source>
         <translation>Adesso puoi iniziare ad usare Cockatrice con le nuove carte aggiornate.</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="139"/>
+        <location filename="src/pages.cpp" line="251"/>
         <source>If the card databases don&apos;t reload automatically, restart the Cockatrice client.</source>
         <translation>Se il database delle carte non si ricarica in automatico, riavvia il programma Cockatrice.</translation>
     </message>
@@ -316,73 +330,76 @@ e pedine che verranno usate da Cockatrice.</translation>
 <context>
     <name>SaveSetsPage</name>
     <message>
-        <location filename="src/pages.cpp" line="563"/>
-        <location filename="src/pages.cpp" line="638"/>
+        <location filename="src/pages.cpp" line="789"/>
+        <location filename="src/pages.cpp" line="874"/>
         <source>Error</source>
         <translation>Errore</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="563"/>
+        <location filename="src/pages.cpp" line="780"/>
+        <location filename="src/pages.cpp" line="789"/>
         <source>No set has been imported.</source>
         <translation>Nessun set importato.</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="574"/>
+        <location filename="src/pages.cpp" line="795"/>
         <source>Sets imported</source>
         <translation>Set importati</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="576"/>
-        <source>A cockatrice database file of %1 MB has been downloaded.</source>
-        <translation>È stato scaricato un file database di Cockatrice di %1 MB.</translation>
+        <location filename="src/pages.cpp" line="797"/>
+        <source>A Cockatrice card database file of %1 MB has been downloaded.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="579"/>
+        <location filename="src/pages.cpp" line="800"/>
         <source>The following sets have been found:</source>
         <translation>Sono stati trovati i seguenti set:</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="582"/>
+        <location filename="src/pages.cpp" line="803"/>
         <source>Press &quot;Save&quot; to store the imported cards in the Cockatrice database.</source>
         <translation>Premi &quot;Salva&quot; per salvare le carte importate nel database di Cockatrice.</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="583"/>
+        <location filename="src/pages.cpp" line="804"/>
         <source>The card database will be saved at the following location:</source>
         <translation>L&apos;archivio delle carte verrà salvato nel seguente percorso:</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="585"/>
+        <location filename="src/pages.cpp" line="806"/>
         <source>Save to a custom path (not recommended)</source>
         <translation>Salva in un percorso diverso (sconsigliato)</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="587"/>
+        <location filename="src/pages.cpp" line="808"/>
         <source>&amp;Save</source>
         <translation>&amp;Salva</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="593"/>
+        <location filename="src/pages.cpp" line="820"/>
+        <location filename="src/pages.cpp" line="823"/>
         <source>Import finished: %1 cards.</source>
         <translation>Importazione conclusa: %1 carte.</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="596"/>
+        <location filename="src/pages.cpp" line="828"/>
+        <location filename="src/pages.cpp" line="831"/>
         <source>%1: %2 cards imported</source>
         <translation>%1: %2 carte importate</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="605"/>
+        <location filename="src/pages.cpp" line="841"/>
         <source>Save card database</source>
         <translation>Salva archivio carte</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="606"/>
+        <location filename="src/pages.cpp" line="842"/>
         <source>XML; card database (*.xml)</source>
         <translation>XML; archivio carte (*.xml)</translation>
     </message>
     <message>
-        <location filename="src/pages.cpp" line="638"/>
+        <location filename="src/pages.cpp" line="874"/>
         <source>The file could not be saved to %1</source>
         <translation>Impossibile salvare il file su %1</translation>
     </message>
@@ -415,8 +432,9 @@ e pedine che verranno usate da Cockatrice.</translation>
     </message>
     <message>
         <location filename="src/pagetemplates.cpp" line="115"/>
-        <source>Downloading (0MB)</source>
-        <translation>Scaricamento (0MB)</translation>
+        <source>Downloading (0 MB)</source>
+        <oldsource>Downloading (0MB)</oldsource>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="src/pagetemplates.cpp" line="129"/>
@@ -588,7 +606,7 @@ e pedine che verranno usate da Cockatrice.</translation>
 <context>
     <name>i18n</name>
     <message>
-        <location filename="src/oraclewizard.cpp" line="22"/>
+        <location filename="src/oraclewizard.cpp" line="24"/>
         <source>English</source>
         <translation>Italiano (Italian)</translation>
     </message>
@@ -596,12 +614,12 @@ e pedine che verranno usate da Cockatrice.</translation>
 <context>
     <name>main</name>
     <message>
-        <location filename="src/main.cpp" line="62"/>
+        <location filename="src/main.cpp" line="48"/>
         <source>Only run in spoiler mode</source>
         <translation>Avvia solo in modalità spoiler</translation>
     </message>
     <message>
-        <location filename="src/main.cpp" line="63"/>
+        <location filename="src/main.cpp" line="49"/>
         <source>Run in no-confirm background mode</source>
         <translation>Esegui in background senza conferma</translation>
     </message>

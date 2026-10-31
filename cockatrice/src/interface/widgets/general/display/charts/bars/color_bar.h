@@ -2,9 +2,13 @@
 #define COCKATRICE_COLOR_BAR_H
 
 #include <QColor>
-#include <QMap>
+#include <QList>
+#include <QPair>
 #include <QString>
 #include <QWidget>
+#include <qtmetamacros.h>
+
+template <class Key, class T> class QMap;
 
 /**
  * @class ColorBar

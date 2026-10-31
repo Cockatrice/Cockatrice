@@ -1,7 +1,24 @@
 #include "tab_deck_editor_visual_tab_widget.h"
 
+#include "../../deck_analytics/deck_analytics_widget.h"
+#include "../../deck_analytics/deck_list_statistics_analyzer.h"
+#include "../../deck_editor/deck_editor_deck_dock_widget.h"
 #include "../../interface/widgets/visual_database_display/visual_database_display_widget.h"
+#include "../../visual_deck_editor/visual_deck_editor_sample_hand_widget.h"
+#include "../../visual_deck_editor/visual_deck_editor_widget.h"
 #include "../abstract_tab_deck_editor.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
+
+#include <QApplication>
+#include <QFlags>
+#include <QVBoxLayout>
+#include <QWidget>
+#include <qnamespace.h>
+
+class CardDatabaseModel;
+class DeckListModel;
+class QMouseEvent;
 
 /**
  * @brief Constructs the TabDeckEditorVisualTabWidget.

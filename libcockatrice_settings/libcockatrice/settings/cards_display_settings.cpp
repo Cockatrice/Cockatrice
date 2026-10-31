@@ -1,5 +1,13 @@
 #include "cards_display_settings.h"
 
+#include "libcockatrice/card/card_localization.h"
+#include "libcockatrice/settings/settings_manager.h"
+
+#include <QSharedPointer>
+#include <QVariant>
+
+class QObject;
+
 CardsDisplaySettings::CardsDisplaySettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "cards_display.ini", "cards", QString(), parent)
 {
@@ -33,11 +41,6 @@ int CardsDisplaySettings::getPrintingSelectorSortOrder() const
 int CardsDisplaySettings::getPrintingSelectorCardSize() const
 {
     return getValue("printingSelector", "cards", "cardSize", 100).toInt();
-}
-
-bool CardsDisplaySettings::getIncludeRebalancedCards() const
-{
-    return getValue("includerebalancedcards", QString(), QString(), true).toBool();
 }
 
 bool CardsDisplaySettings::getPrintingSelectorNavigationButtonsVisible() const
@@ -90,6 +93,11 @@ int CardsDisplaySettings::getVisualDeckEditorCardSize() const
     return getValue("visualDeckEditor", "cards", "cardSize", 100).toInt();
 }
 
+bool CardsDisplaySettings::getVisualDeckEditorShowCardCounts() const
+{
+    return getValue("visualDeckEditorShowCardCounts", QString(), QString(), true).toBool();
+}
+
 int CardsDisplaySettings::getEDHRecCardSize() const
 {
     return getValue("edhrec", "cards", "cardSize", 100).toInt();
@@ -108,6 +116,11 @@ int CardsDisplaySettings::getSampleHandSize() const
 QString CardsDisplaySettings::getCardLang() const
 {
     return getValue("cardLang", QString(), QString(), "en").toString();
+}
+
+int CardsDisplaySettings::getCardSearchLanguage() const
+{
+    return getValue("cardSearchLanguage", QString(), QString(), static_cast<int>(SearchLanguageMode::English)).toInt();
 }
 
 void CardsDisplaySettings::setDisplayCardNames(bool _displayCardNames)
@@ -147,15 +160,6 @@ void CardsDisplaySettings::setPrintingSelectorCardSize(int _printingSelectorCard
 {
     setValue(_printingSelectorCardSize, "printingSelector", "cards", "cardSize");
     emit printingSelectorCardSizeChanged();
-}
-
-void CardsDisplaySettings::setIncludeRebalancedCards(bool _includeRebalancedCards)
-{
-    if (_includeRebalancedCards == getIncludeRebalancedCards()) {
-        return;
-    }
-    setValue(_includeRebalancedCards, "includerebalancedcards");
-    emit includeRebalancedCardsChanged(_includeRebalancedCards);
 }
 
 void CardsDisplaySettings::setPrintingSelectorNavigationButtonsVisible(bool _navigationButtonsVisible)
@@ -212,6 +216,15 @@ void CardsDisplaySettings::setVisualDeckEditorCardSize(int _cardSize)
     emit visualDeckEditorCardSizeChanged();
 }
 
+void CardsDisplaySettings::setVisualDeckEditorShowCardCounts(bool _showCardCounts)
+{
+    if (_showCardCounts == getVisualDeckEditorShowCardCounts()) {
+        return;
+    }
+    setValue(_showCardCounts, "visualDeckEditorShowCardCounts");
+    emit visualDeckEditorShowCardCountsChanged(_showCardCounts);
+}
+
 void CardsDisplaySettings::setEDHRecCardSize(int _edhrecCardSize)
 {
     setValue(_edhrecCardSize, "edhrec", "cards", "cardSize");
@@ -241,4 +254,13 @@ void CardsDisplaySettings::setCardLang(const QString &_cardLang)
     // observe a stale (pre-change) value.
     sync();
     emit cardLangChanged(_cardLang);
+}
+
+void CardsDisplaySettings::setCardSearchLanguage(int _cardSearchLanguage)
+{
+    if (_cardSearchLanguage == getCardSearchLanguage()) {
+        return;
+    }
+    setValue(_cardSearchLanguage, "cardSearchLanguage");
+    emit cardSearchLanguageChanged(_cardSearchLanguage);
 }

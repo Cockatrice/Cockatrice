@@ -41,6 +41,14 @@ websocket_host=any
 ; The TCP port number servatrice will listen on for websockets clients; default is 4748
 websocket_port=4748
 
+; If websockets are served through a reverse proxy (e.g. nginx), the real client address can be
+; read from an HTTP header such as X-Real-IP or X-Forwarded-For. A comma-separated X-Forwarded-For
+; list resolves to its rightmost entry, which is the one the proxy appended. The header is ONLY
+; trusted when the websocket connection itself originates from an address listed in
+; security/trusted_sources (default 127.0.0.1,::1), so that clients cannot spoof their address to
+; bypass bans or rate limits.
+web_socket_ip_header=
+
 ; When database is enabled, servatrice writes the server status in the "update" database table; this
 ; setting defines every how many milliseconds servatrice will update its status; default is 15000 (15 secs)
 statusupdate=15000
@@ -244,6 +252,16 @@ email=root@localhost
 ; Sender email name
 name="Cockatrice server"
 
+; Maximum number of attempts to deliver a given e-mail before giving up.
+; If the smtp server is unreachable or repeatedly rejects a message, the server
+; will retry with an exponentially growing delay up to this many times, then drop
+; the message from the queue and log the failure. Default: 5
+maxretries=5
+
+; Initial retry delay in seconds between delivery attempts. Doubles with each
+; failed attempt (capped at 30 minutes). Default: 60
+retrydelay=60
+
 ; Email subject
 subject="Cockatrice server account activation token"
 
@@ -316,6 +334,40 @@ roomlist\1\game_types\1\name="GameType1"
 roomlist\1\game_types\2\name="GameType2"
 roomlist\1\game_types\3\name="GameType3"
 
+; Optional chat channels for room number 1, in addition to the implicit Main
+; channel every room has. Each channel needs a stable ASCII id, a display name
+; (server data, like the room name) and an access level. Supported levels, from
+; least to most restrictive, are: public, registered, judge, moderator, admin
+; and developer. Access is evaluated against the member's user flags, not as a
+; ladder: a moderator channel admits moderators (admins hold the moderator
+; flag alongside the admin flag, so they are admitted too), an admin channel
+; admits only admins, and a developer channel admits only developers and
+; admins. In particular, developers cannot read moderator or admin channels.
+; A judge channel additionally admits moderators.
+; Public channels are visible to every room member.
+;
+; Write access defaults to the read level, so by default a channel is readable
+; and writable by the same members. Set writeaccess higher for read-mostly
+; channels (e.g. a developer news feed readable by everyone but writable only
+; by developers). Members who can read but not write see the channel with a
+; disabled message input.
+;
+; banner is an optional static notice shown at the top of the channel, similar
+; to the room joinmessage on Main. Empty or unset = none.
+roomlist\1\channels\size=3
+roomlist\1\channels\1\id=looking-for-players
+roomlist\1\channels\1\displayname="Looking for players"
+roomlist\1\channels\1\access=public
+roomlist\1\channels\1\banner="Find opponents here. Be friendly!"
+roomlist\1\channels\2\id=moderators
+roomlist\1\channels\2\displayname="Moderators"
+roomlist\1\channels\2\access=moderator
+roomlist\1\channels\3\id=developer-news
+roomlist\1\channels\3\displayname="Developer news"
+roomlist\1\channels\3\access=public
+roomlist\1\channels\3\writeaccess=developer
+roomlist\1\channels\3\banner="Official announcements from the developers."
+
 
 [game]
 
@@ -350,9 +402,73 @@ max_users_websocket=500
 ; Maximum number of users that can connect from the same IP address; useful to avoid bots, default is 4
 max_users_per_address=4
 
+; Maximum number of failed login attempts from a single IP address before that
+; address is temporarily locked out.  Default is 5; set to 0 to disable.
+max_login_attempts_per_ip=5
+
+; Length in seconds of the sliding window used for the login lockout. Default is 900 (15 minutes).
+login_attempt_window_seconds=900
+
+; Maximum number of account registrations from a single IP address within the window below.
+; Default is 2; set to 0 to disable.
+max_registrations_per_ip=2
+
+; Length in seconds of the registration window. Default is 3600 (1 hour).
+registration_window_seconds=3600
+
+; Maximum number of forgot-password requests from a single IP address within the window below.
+; Default is 3; set to 0 to disable.
+max_forgot_password_requests_per_ip=3
+
+; Length in seconds of the forgot-password window. Default is 3600 (1 hour).
+forgot_password_window_seconds=3600
+; How strictly new authentication features are enforced.  Possible values:
+; * legacy: accounts that still use the legacy 1000-round SHA-512 hash keep logging in with it
+;           (they are served the legacy salt, never a challenge-response nonce) and are never
+;           auto-migrated to scrypt. Already-migrated scrypt rows keep logging in via
+;           challenge-response. New credentials may use either format;
+; * mixed: accept both legacy hashes and challenge-response authentication (default);
+; * strict: only accept challenge-response authentication from clients that support it,
+;           and reject plain password submissions.  Legacy accounts are migrated to scrypt
+;           automatically on their next successful login. Strict only constrains
+;           registered SQL accounts: guest/unregistered logins and servers with
+;           authentication/method set to none or password are unaffected, since
+;           they have no stored verifier to challenge against.
+;
+; Note: anyone holding only the legacy salt+hash of a not-yet-migrated account
+; (e.g. from a wire capture of an old client, or an old database dump) can log in
+; with it and then set a brand new password of their choosing. Before
+; challenge-response a captured hash yielded a session, but changing the password
+; still required the plaintext old password. There is no way around this without
+; a plaintext proof at migration time, so not-yet-migrated rows should be treated
+; accordingly.
+;
+; Challenge-response verifiers are scrypt (RFC 7914, N=32768, r=8, p=1) stored as
+; "$scrypt$<n>$<r>$<p>$<salt>$<verifier>". The stored verifier is password-equivalent:
+; plaintext passwords never reach the client configuration and never go over the wire, but
+; a database dump yields credentials that can answer a login challenge directly.
+authentication_strictness=mixed
+
+; Optional key that seals the legacy password backup (64 hex characters).
+; Migrating an account to scrypt normally strands old clients, which can only present
+; the legacy hash. With a key configured, the server keeps that hash encrypted next to
+; the scrypt verifier, so old clients can still log in during the window below without
+; the database holding a fast-crackable hash in the clear.
+; Generate with: openssl rand -hex 32
+; If unset, migrated accounts have no downgrade window: old clients must use a password
+; reset to get back in. Rotating the key invalidates existing backups (they become
+; unusable immediately; expired ones are still purged).
+legacy_backup_key=
+
+; Days a legacy password backup may go unused before it is purged from the database.
+; Logging in with an old client refreshes the window; backups that are never touched
+; age out. Default 180.
+legacy_backup_ttl_days=180
+
 ; You may want to allow an unlimited number of users from a trusted source. This setting can contain a
 ; comma-separed list of IP addresses which will allow an unlimited number of connections from each of the
-; IP addresses listed (ignoring the max_users_per_address). Default is "127.0.0.1,::1"; example: "192.73.233.244,81.4.100.74"
+; IP addresses listed (ignoring the max_users_per_address). Entries must be exact IP addresses; hostnames, prefixes
+; and subnets are ignored. Default is "127.0.0.1,::1"; example: "192.73.233.244,81.4.100.74"
 trusted_sources="127.0.0.1,::1"
 
 ; Servatrice can avoid users from flooding rooms with large number of messages in an interval of time.
@@ -452,3 +568,24 @@ ssl_cert=ssl_cert.pem
 
 ; Filename of the private key for the server-to-server certificate
 ssl_key=ssl_key.pem
+
+
+[deck_share]
+
+; How many days a created deck share link remains valid before it expires.
+; Default: 7
+expiry_days=7
+
+; How often (in minutes) the server checks for and removes expired deck shares.
+; A value of 0 disables the automatic cleanup.
+; Default: 60
+cleanup_interval=60
+
+; Maximum number of decks a single share link can contain.
+; Default: 50
+max_decks_per_share=50
+
+; Maximum number of share links a single user may create per day.
+; A value of 0 disables the limit.
+; Default: 50
+max_shares_per_day=50

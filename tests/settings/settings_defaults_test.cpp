@@ -1,5 +1,12 @@
+#include "libcockatrice/card/card_localization.h"
+
 #include "gtest/gtest.h"
+#include <QDir>
+#include <QHash>
+#include <QList>
 #include <QSettings>
+#include <QString>
+#include <QStringList>
 #include <QTemporaryDir>
 #include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/cache_storage_settings.h>
@@ -10,11 +17,14 @@
 #include <libcockatrice/settings/game_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/network_settings.h>
+#include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/sound_settings.h>
 #include <libcockatrice/settings/tabs_settings.h>
 #include <libcockatrice/settings/updates_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <string>
+#include <utility>
 
 namespace
 {
@@ -159,6 +169,12 @@ TEST_F(SettingsDefaultsTest, Updates_NotifyAboutNewVersion_Default)
     ASSERT_EQ(s.getNotifyAboutNewVersion(), true);
 }
 
+TEST_F(SettingsDefaultsTest, Updates_CardDatabaseUpdateTrayNotification_Default)
+{
+    UpdatesSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getCardDatabaseUpdateTrayNotification(), true);
+}
+
 TEST_F(SettingsDefaultsTest, Updates_UpdateReleaseChannelIndex_Default)
 {
     UpdatesSettings s(settingsPath, nullptr);
@@ -270,6 +286,32 @@ TEST_F(SettingsDefaultsTest, Chat_HighlightColor_Default)
     ASSERT_EQ(s.getChatHighlightColor(), QString("A6120D"));
 }
 
+TEST_F(SettingsDefaultsTest, Chat_ChannelUnreadColor_Default)
+{
+    ChatSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getChannelUnreadColor(), QString("1A7B00"));
+}
+
+TEST_F(SettingsDefaultsTest, Chat_ChannelUnreadColor_SetAndGet)
+{
+    ChatSettings s(settingsPath, nullptr);
+    s.setChannelUnreadColor(QString("0000FF"));
+    ASSERT_EQ(s.getChannelUnreadColor(), QString("0000FF"));
+}
+
+TEST_F(SettingsDefaultsTest, Chat_ChannelMentionColor_Default)
+{
+    ChatSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getChannelMentionColor(), QString("A6120D"));
+}
+
+TEST_F(SettingsDefaultsTest, Chat_ChannelMentionColor_SetAndGet)
+{
+    ChatSettings s(settingsPath, nullptr);
+    s.setChannelMentionColor(QString("FF0000"));
+    ASSERT_EQ(s.getChannelMentionColor(), QString("FF0000"));
+}
+
 TEST_F(SettingsDefaultsTest, Chat_MentionForeground_Default)
 {
     ChatSettings s(settingsPath, nullptr);
@@ -306,6 +348,12 @@ TEST_F(SettingsDefaultsTest, Chat_IgnoreAllPrivateMessages_Default)
     ASSERT_EQ(s.getIgnoreAllPrivateMessages(), false);
 }
 
+TEST_F(SettingsDefaultsTest, Chat_UseGameTime_Default)
+{
+    ChatSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getUseGameTime(), false);
+}
+
 // --- PersonalSettings ---
 
 TEST_F(SettingsDefaultsTest, Personal_Lang_Default)
@@ -320,6 +368,32 @@ TEST_F(SettingsDefaultsTest, Personal_ShowTipsOnStartup_Default)
     ASSERT_EQ(s.getShowTipsOnStartup(), true);
 }
 
+TEST_F(SettingsDefaultsTest, Personal_CrashReportingMode_Default)
+{
+    PersonalSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getCrashReportingMode(), PersonalSettings::CrashReportingMode::Ask);
+}
+
+TEST_F(SettingsDefaultsTest, Personal_CrashReportingMode_SetAndGet)
+{
+    PersonalSettings s(settingsPath, nullptr);
+    s.setCrashReportingMode(PersonalSettings::CrashReportingMode::AlwaysSend);
+    ASSERT_EQ(s.getCrashReportingMode(), PersonalSettings::CrashReportingMode::AlwaysSend);
+    s.setCrashReportingMode(PersonalSettings::CrashReportingMode::NeverSend);
+    ASSERT_EQ(s.getCrashReportingMode(), PersonalSettings::CrashReportingMode::NeverSend);
+    s.setCrashReportingMode(PersonalSettings::CrashReportingMode::Ask);
+    ASSERT_EQ(s.getCrashReportingMode(), PersonalSettings::CrashReportingMode::Ask);
+}
+
+TEST_F(SettingsDefaultsTest, Personal_CrashReportingMode_ClampsCorruptValue)
+{
+    QSettings raw(settingsPath + "personal.ini", QSettings::IniFormat);
+    raw.setValue("personal/crashReportingMode", 99);
+    raw.sync();
+    PersonalSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getCrashReportingMode(), PersonalSettings::CrashReportingMode::Ask);
+}
+
 // --- DownloadSettings ---
 
 TEST_F(SettingsDefaultsTest, Download_PicDownload_Default)
@@ -332,6 +406,38 @@ TEST_F(SettingsDefaultsTest, Download_DownloadSpoilersStatus_Default)
 {
     DownloadSettings s(settingsPath, nullptr);
     ASSERT_EQ(s.getDownloadSpoilersStatus(), false);
+}
+
+TEST_F(SettingsDefaultsTest, Download_HostRequestLimits_Default)
+{
+    DownloadSettings s(settingsPath, nullptr);
+    ASSERT_TRUE(s.getHostRequestLimits().isEmpty());
+}
+
+TEST_F(SettingsDefaultsTest, Download_HostRequestLimits_SetAndGet)
+{
+    DownloadSettings s(settingsPath, nullptr);
+    s.setHostRequestLimits({{"api.scryfall.com", 5}});
+    const QHash<QString, int> limits = s.getHostRequestLimits();
+    ASSERT_EQ(limits.size(), 1);
+    ASSERT_EQ(limits.value("api.scryfall.com"), 5);
+}
+
+TEST_F(SettingsDefaultsTest, Download_HostRequestLimits_StackedHostCaps)
+{
+    DownloadSettings s(settingsPath, nullptr);
+    // The developer cap for the Scryfall API lowers the ceiling to 9; a user can
+    // reduce it further but can never raise it above the cap.
+    ASSERT_EQ(s.clampHostRequestLimit("api.scryfall.com", 9), 9);
+    ASSERT_EQ(s.clampHostRequestLimit("api.scryfall.com", 20), 9);
+    ASSERT_EQ(s.clampHostRequestLimit("api.scryfall.com", 5), 5);
+    ASSERT_EQ(s.clampHostRequestLimit("api.scryfall.com", 0), 1);
+    // Hosts without a developer cap fall back to the global default ceiling.
+    ASSERT_EQ(s.clampHostRequestLimit("gatherer.wizards.com", 10), 10);
+    ASSERT_EQ(s.clampHostRequestLimit("gatherer.wizards.com", 20), 10);
+    // The Scryfall CDN is unlocked: no upper bound (values are only floored).
+    ASSERT_EQ(s.clampHostRequestLimit("cards.scryfall.io", 20), 20);
+    ASSERT_EQ(s.clampHostRequestLimit("cards.scryfall.io", 0), 1);
 }
 
 // --- AppearanceSettings ---
@@ -538,6 +644,21 @@ TEST_F(SettingsDefaultsTest, CardsDisplay_VisualDeckEditorCardSize_Default)
     ASSERT_EQ(s.getVisualDeckEditorCardSize(), 100);
 }
 
+TEST_F(SettingsDefaultsTest, CardsDisplay_VisualDeckEditorShowCardCounts_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getVisualDeckEditorShowCardCounts(), true);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_VisualDeckEditorShowCardCounts_SetAndGet)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    s.setVisualDeckEditorShowCardCounts(false);
+    ASSERT_EQ(s.getVisualDeckEditorShowCardCounts(), false);
+    s.setVisualDeckEditorShowCardCounts(true);
+    ASSERT_EQ(s.getVisualDeckEditorShowCardCounts(), true);
+}
+
 TEST_F(SettingsDefaultsTest, CardsDisplay_EDHRecCardSize_Default)
 {
     CardsDisplaySettings s(settingsPath, nullptr);
@@ -575,6 +696,19 @@ TEST_F(SettingsDefaultsTest, CardsDisplay_CardLang_SetAndGet)
     ASSERT_EQ(s.getCardLang(), QString("de"));
 }
 
+TEST_F(SettingsDefaultsTest, CardsDisplay_CardSearchLanguage_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getCardSearchLanguage(), static_cast<int>(SearchLanguageMode::English));
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_CardSearchLanguage_SetAndGet)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    s.setCardSearchLanguage(static_cast<int>(SearchLanguageMode::Selected));
+    ASSERT_EQ(s.getCardSearchLanguage(), static_cast<int>(SearchLanguageMode::Selected));
+}
+
 // --- VisualDeckStorageSettings ---
 
 TEST_F(SettingsDefaultsTest, VisualDeckStorage_SortingOrder_Default)
@@ -601,6 +735,68 @@ TEST_F(SettingsDefaultsTest, VisualDeckStorage_DefaultTagsList_SetAndGet)
     QStringList custom = {"Tag1", "Tag2"};
     s.setVisualDeckStorageDefaultTagsList(custom);
     ASSERT_EQ(s.getVisualDeckStorageDefaultTagsList(), custom);
+}
+
+TEST_F(SettingsDefaultsTest, VisualDeckStorage_ShowUploadTime_Default)
+{
+    VisualDeckStorageSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getVisualDeckStorageShowUploadTime(), true);
+}
+
+TEST_F(SettingsDefaultsTest, VisualDeckStorage_ShowUploadTime_SetAndGet)
+{
+    VisualDeckStorageSettings s(settingsPath, nullptr);
+    s.setVisualDeckStorageShowUploadTime(false);
+    ASSERT_EQ(s.getVisualDeckStorageShowUploadTime(), false);
+}
+
+TEST_F(SettingsDefaultsTest, Paths_AppDirWarningAcknowledged_Default)
+{
+    PathsSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getAppDirWarningAcknowledged(), false);
+}
+
+TEST_F(SettingsDefaultsTest, Paths_AppDirWarningAcknowledged_SetAndGet)
+{
+    PathsSettings s(settingsPath, nullptr);
+    s.setAppDirWarningAcknowledged(true);
+    ASSERT_EQ(s.getAppDirWarningAcknowledged(), true);
+}
+
+TEST_F(SettingsDefaultsTest, Paths_PathsInsideDir_DetectsNestedAndIgnoresSiblings)
+{
+    PathsSettings s(settingsPath, nullptr);
+    const QString base = QDir::cleanPath(settingsPath);
+
+    s.setDeckPath(base + "/decks/");
+    s.setPicsPath(base + "/pics");
+    s.setReplaysPath(base + "2"); // sibling sharing the name prefix, not nested
+
+    const QStringList offenders = s.pathsInsideDir(base);
+    ASSERT_EQ(offenders.size(), 2);
+    ASSERT_TRUE(offenders.contains(base + "/decks"));
+    ASSERT_TRUE(offenders.contains(base + "/pics"));
+}
+
+TEST_F(SettingsDefaultsTest, Paths_PathsInsideDir_EmptyWhenNothingMatches)
+{
+    PathsSettings s(settingsPath, nullptr);
+    s.setDeckPath("/somewhere/else/decks");
+    ASSERT_TRUE(s.pathsInsideDir(QDir::cleanPath(settingsPath)).isEmpty());
+}
+
+TEST_F(SettingsDefaultsTest, Paths_PathsInsideDir_MatchesExactBaseAndNormalizesDots)
+{
+    PathsSettings s(settingsPath, nullptr);
+    const QString base = QDir::cleanPath(settingsPath);
+
+    s.setCustomPicsPath(base);                // exactly the base directory
+    s.setThemesPath(base + "/pics/../decks"); // needs cleanPath normalization
+
+    const QStringList offenders = s.pathsInsideDir(base);
+    ASSERT_EQ(offenders.size(), 2);
+    ASSERT_TRUE(offenders.contains(base));
+    ASSERT_TRUE(offenders.contains(base + "/decks"));
 }
 
 } // namespace

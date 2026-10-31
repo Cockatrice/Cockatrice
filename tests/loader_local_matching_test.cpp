@@ -1,7 +1,11 @@
 #include "client/settings/cache_settings.h"
 #include "interface/card_picture_loader/card_picture_loader_local.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/printing/printing_info.h"
 
 #include "gtest/gtest.h"
+#include <QByteArray>
+#include <QByteArrayView>
 #include <QColor>
 #include <QCoreApplication>
 #include <QDir>
@@ -9,13 +13,19 @@
 #include <QImage>
 #include <QImageWriter>
 #include <QLoggingCategory>
+#include <QScopeGuard>
+#include <QSharedPointer>
 #include <QStandardPaths>
+#include <QString>
 #include <QTemporaryDir>
+#include <QtGlobal>
 #include <libcockatrice/card/lazy_properties_hash.h>
 #include <libcockatrice/card/printing/exact_card.h>
 #include <libcockatrice/card/set/card_set.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 #include <libcockatrice/settings/paths_settings.h>
+#include <qnamespace.h>
+#include <string>
 
 namespace
 {
@@ -66,6 +76,18 @@ protected:
     {
         delete loader;
         loader = nullptr;
+    }
+
+    /**
+     * @brief Destroys and rebuilds the loader so the CUSTOM index is re-scanned.
+     *
+     * The CUSTOM-folder index is snapshotted at construction; rebuild it after
+     * writing files so freshly placed images are discoverable.
+     */
+    void rebuildLoader()
+    {
+        delete loader;
+        loader = new CardPictureLoaderLocal(nullptr);
     }
 
     /**
@@ -162,6 +184,28 @@ TEST_F(LocalMatcherTest, SetFolderCandidateTakesPrecedenceOverRootFallback)
     EXPECT_EQ(image.pixelColor(0, 0), QColor(Qt::red)) << "The set-folder candidate must be preferred";
 }
 
+TEST_F(LocalMatcherTest, CustomSubfolderResolvesExactFile)
+{
+    // Images in the CUSTOM folder are indexed by their full file path (extension included),
+    // unlike the extension-less candidate paths built from the naming schemes.
+    writePngUnderPics("CUSTOM/poker/TestCard.png");
+    rebuildLoader();
+
+    const QImage image = loader->tryLoad(cardFor("TestCard", "", ""));
+
+    EXPECT_FALSE(image.isNull()) << "A CUSTOM-folder image in a subdirectory must resolve";
+}
+
+TEST_F(LocalMatcherTest, CustomSubfolderIgnoresSuffixedFiles)
+{
+    writePngUnderPics("CUSTOM/poker/TestCard (1).png");
+    rebuildLoader();
+
+    const QImage image = loader->tryLoad(cardFor("TestCard", "", ""));
+
+    EXPECT_TRUE(image.isNull()) << "A suffixed CUSTOM-folder file must not satisfy an exact name lookup";
+}
+
 } // namespace
 
 int main(int argc, char **argv)
@@ -180,8 +224,43 @@ int main(int argc, char **argv)
     }
 
     QCoreApplication app(argc, argv);
+
+    // Every TEST() runs as its own process and CI runs them in parallel (ctest -j4),
+    // while the picture paths round-trip through the process-global SettingsCache
+    // file. Parallel cases must therefore never share one settings directory: on
+    // platforms where QStandardPaths ignores the $HOME override above (macOS
+    // resolves the home directory via system APIs), every case would otherwise read
+    // and write the same paths.ini, and a sibling's setPicsPath can land between our
+    // own set and the loader's get — so the loader searches a foreign (or empty)
+    // directory and flakily returns a null image. Scope the settings to this process
+    // with a pid-unique application name; PIDs are never reused by live processes.
+    QCoreApplication::setOrganizationName(QStringLiteral("CockatriceTest"));
+    QCoreApplication::setApplicationName(
+        QStringLiteral("loader-local-matching-test-%1").arg(QCoreApplication::applicationPid()));
+
     QLoggingCategory::setFilterRules("card_picture_loader.*=false\nsettings_cache.*=false");
 
     ::testing::InitGoogleTest(&argc, argv);
+
+    // CMake's gtest discovery runs this binary with --gtest_list_tests, which lists
+    // without running any test body. Arming the cleanup guard here would make it the
+    // sole SettingsCache::instance() call in that mode, instantiating the
+    // Q_GLOBAL_STATIC singleton (and its QNetworkAccessManagers) just to tear down at
+    // exit — which LeakSanitizer reports as leaks and fails discovery on the sanitizer
+    // leg. Skip the sandbox cleanup entirely when only listing.
+    if (::testing::GTEST_FLAG(list_tests)) {
+        return RUN_ALL_TESTS();
+    }
+
+    // Best-effort cleanup of this process's settings sandbox. QStandardPaths test
+    // mode is never auto-cleaned, and on macOS the $HOME override above is ignored,
+    // so without this every run litters ~/.qttest with one pid-unique directory.
+    // Safe under parallel runs: the pid-unique application name above guarantees
+    // this directory belongs to this process alone.
+    const auto cleanupSandbox = qScopeGuard([] {
+        QDir(SettingsCache::instance().getDataPath()).removeRecursively();
+        QDir(SettingsCache::instance().getCachePath()).removeRecursively();
+    });
+
     return RUN_ALL_TESTS();
 }

@@ -2,14 +2,27 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../../../game/abstract_game.h"
+#include "../../../game/game_event_handler.h"
+#include "../../../game/game_meta_info.h"
+#include "../../deck_loader/loaded_deck.h"
+#include "../../intents/contexts/context_connect_to_server.h"
+#include "../../intents/contexts/context_join_game.h"
+#include "../../intents/contexts/context_join_room.h"
+#include "../../intents/intent.h"
 #include "../../intents/intent_join_server_game.h"
 #include "../interface/pixel_map_generator.h"
 #include "../interface/widgets/server/game_link.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
-#include "../interface/widgets/server/user/user_list_widget.h"
 #include "../main.h"
+#include "abstract_tab_deck_editor.h"
 #include "api/archidekt/tab_archidekt.h"
+#include "api/edhrec/tab_edhrec.h"
 #include "api/edhrec/tab_edhrec_main.h"
+#include "latency_tracker.h"
+#include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_gametype.pb.h"
+#include "tab.h"
 #include "tab_account.h"
 #include "tab_admin.h"
 #include "tab_card_art_rules.h"
@@ -21,19 +34,35 @@
 #include "tab_logs.h"
 #include "tab_message.h"
 #include "tab_moderation.h"
+#include "tab_public_decks.h"
 #include "tab_replays.h"
 #include "tab_report.h"
 #include "tab_room.h"
 #include "tab_server.h"
 #include "tab_visual_database_display.h"
+#include "user_level.h"
 #include "visual_deck_editor/tab_deck_editor_visual.h"
-#include "visual_deck_editor/tab_deck_editor_visual_tab_widget.h"
 #include "visual_deck_storage/tab_deck_storage_visual.h"
 
+#include <QAction>
 #include <QApplication>
+#include <QCloseEvent>
+#include <QCommonStyle>
+#include <QDebug>
+#include <QFlag>
+#include <QIcon>
+#include <QMenu>
 #include <QMessageBox>
+#include <QMessageLogger>
+#include <QObject>
 #include <QPainter>
+#include <QRect>
+#include <QSharedPointer>
+#include <QStringLiteral>
+#include <QStyle>
+#include <QStyleOption>
 #include <QSystemTrayIcon>
+#include <QTabBar>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/network/client/remote/remote_client.h>
 #include <libcockatrice/protocol/pb/event_game_joined.pb.h>
@@ -44,11 +73,17 @@
 #include <libcockatrice/protocol/pb/room_event.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_room.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
-#include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/chat_settings.h>
 #include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/tabs_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <memory>
+#include <qnamespace.h>
+#include <string>
+#include <utility>
+
+class QWidget;
 
 QRect MacOSTabFixStyle::subElementRect(SubElement element, const QStyleOption *option, const QWidget *widget) const
 {
@@ -255,44 +290,11 @@ void TabSupervisor::retranslateUi()
     aTabDeveloper->setText(tr("Developer"));
 
     // tabs
-    QList<Tab *> tabs;
-    tabs.append(tabServer);
-    tabs.append(tabReplays);
-    tabs.append(tabDeckStorage);
-    tabs.append(tabAdmin);
-    tabs.append(tabAccount);
-    tabs.append(tabLog);
-    tabs.append(tabReport);
-    tabs.append(tabModeration);
-    tabs.append(tabCardArtRules);
-    tabs.append(tabDeveloper);
-    QMapIterator<int, TabRoom *> roomIterator(roomTabs);
-    while (roomIterator.hasNext()) {
-        tabs.append(roomIterator.next().value());
-    }
-    QMapIterator<int, TabGame *> gameIterator(gameTabs);
-    while (gameIterator.hasNext()) {
-        tabs.append(gameIterator.next().value());
-    }
-    QListIterator<TabGame *> replayIterator(replayTabs);
-    while (replayIterator.hasNext()) {
-        tabs.append(replayIterator.next());
-    }
-    QListIterator<AbstractTabDeckEditor *> deckEditorIterator(deckEditorTabs);
-    while (deckEditorIterator.hasNext()) {
-        tabs.append(deckEditorIterator.next());
-    }
-    QMapIterator<QString, TabMessage *> messageIterator(messageTabs);
-    while (messageIterator.hasNext()) {
-        tabs.append(messageIterator.next().value());
-    }
-
-    for (auto &tab : tabs) {
-        if (tab) {
-            int idx = indexOf(tab);
+    for (int i = 0; i < count(); ++i) {
+        if (auto *tab = qobject_cast<Tab *>(widget(i))) {
             QString tabText = tab->getTabText();
-            setTabText(idx, sanitizeTabName(tabText));
-            setTabToolTip(idx, sanitizeHtml(tabText));
+            setTabText(i, sanitizeTabName(tabText));
+            setTabToolTip(i, sanitizeHtml(tabText));
             tab->retranslateUi();
         }
     }
@@ -322,9 +324,8 @@ void TabSupervisor::closeEvent(QCloseEvent *event)
     QTabWidget::closeEvent(event);
 
     if (getGameCount()) {
-        if (QMessageBox::question(this, tr("Are you sure?"),
-                                  tr("There are still open games. Are you sure you want to quit?"),
-                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No) {
+        if (!QtUtils::confirm(this, tr("Are you sure?"),
+                              tr("There are still open games. Are you sure you want to quit?"), QMessageBox::No)) {
             event->ignore();
             return;
         }
@@ -626,6 +627,10 @@ void TabSupervisor::stop()
         tabsToDelete << i.value();
     }
 
+    for (auto i = publicDecksTabs.cbegin(), end = publicDecksTabs.cend(); i != end; ++i) {
+        tabsToDelete << i.value();
+    }
+
     for (const auto tab : tabsToDelete) {
         tab->close();
     }
@@ -672,7 +677,7 @@ void TabSupervisor::actTabVisualDeckStorage(bool checked)
 
 void TabSupervisor::openTabVisualDeckStorage()
 {
-    tabVisualDeckStorage = new TabDeckStorageVisual(this);
+    tabVisualDeckStorage = new TabDeckStorageVisual(this, client);
     myAddTab(tabVisualDeckStorage, aTabVisualDeckStorage);
     connect(tabVisualDeckStorage, &QObject::destroyed, this, [this] {
         tabVisualDeckStorage = nullptr;
@@ -875,6 +880,7 @@ void TabSupervisor::openTabReport()
     myAddTab(tabReport, aTabReport);
     connect(tabReport, &TabReport::openReplay, this, &TabSupervisor::openReplay);
     connect(tabReport, &TabReport::requestJoinGame, this, &TabSupervisor::joinReportGame);
+    connect(tabReport, &TabReport::openMessageDialog, this, &TabSupervisor::addMessageTab);
     connect(tabReport, &QObject::destroyed, this, [this] {
         tabReport = nullptr;
         aTabReport->setChecked(false);
@@ -1037,6 +1043,30 @@ void TabSupervisor::roomLeft(TabRoom *tab)
     removeTab(indexOf(tab));
 }
 
+void TabSupervisor::openTabPublicDecks(const QString &userName)
+{
+    if (auto *existing = publicDecksTabs.value(userName, nullptr)) {
+        setCurrentWidget(existing);
+        return;
+    }
+
+    auto *tab = new TabPublicDecks(this, client, userName);
+    connect(tab, &TabPublicDecks::closing, this, &TabSupervisor::publicDecksClosed);
+    myAddTab(tab);
+    publicDecksTabs.insert(userName, tab);
+    setCurrentWidget(tab);
+}
+
+void TabSupervisor::publicDecksClosed(TabPublicDecks *tab)
+{
+    if (tab == currentWidget()) {
+        emit setMenu();
+    }
+
+    publicDecksTabs.remove(tab->getUserName());
+    removeTab(indexOf(tab));
+}
+
 void TabSupervisor::switchToFirstAvailableNetworkTab()
 {
     if (!roomTabs.isEmpty()) {
@@ -1068,9 +1098,26 @@ void TabSupervisor::replayLeft(TabGame *tab)
 
 void TabSupervisor::joinReportGame(const int gameId, const int roomId)
 {
+    joinGameByIntent(gameId, roomId, true);
+}
+
+void TabSupervisor::joinGameFromUserCard(const int gameId, const int roomId, const bool asSpectator)
+{
+    joinGameByIntent(gameId, roomId, asSpectator);
+}
+
+/**
+ * Runs the join/spectate intent for @p gameId in @p roomId.
+ *
+ * The intent owns the whole flow: if the room tab is not open yet it joins the
+ * room first, then retries the game, so callers do not have to care whether the
+ * room happens to be on screen.
+ */
+void TabSupervisor::joinGameByIntent(const int gameId, const int roomId, const bool asSpectator)
+{
     auto *remoteClient = qobject_cast<RemoteClient *>(client);
     if (!remoteClient) {
-        actShowPopup(tr("Report joins are only available on a remote server."));
+        actShowPopup(tr("Game joins are only available on a remote server."));
         return;
     }
 
@@ -1079,7 +1126,7 @@ void TabSupervisor::joinReportGame(const int gameId, const int roomId)
     ctx->roomContext.serverContext.port = QString::number(remoteClient->peerPort());
     ctx->roomContext.roomId = roomId;
     ctx->gameId = gameId;
-    ctx->asSpectator = true;
+    ctx->asSpectator = asSpectator;
 
     auto *joinGameIntent = new IntentJoinServerGame(this, remoteClient, std::move(ctx));
     joinGameIntent->setParent(this);

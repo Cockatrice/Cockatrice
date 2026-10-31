@@ -6,8 +6,14 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 set(UTILITY_SOURCES
-    libcockatrice/utility/cryptoutil.cpp libcockatrice/utility/expression.cpp libcockatrice/utility/levenshtein.cpp
-    libcockatrice/utility/passwordhasher.cpp libcockatrice/utility/server_rate_limiter.cpp
+    libcockatrice/utility/cryptoutil.cpp
+    libcockatrice/utility/expression.cpp
+    libcockatrice/utility/levenshtein.cpp
+    libcockatrice/utility/passwordhasher.cpp
+    libcockatrice/utility/report_categories.cpp
+    libcockatrice/utility/server_rate_limiter.cpp
+    libcockatrice/utility/translation_loader.cpp
+    libcockatrice/utility/user_data_backup.cpp
     libcockatrice/utility/warning_categories.cpp
 )
 
@@ -15,11 +21,15 @@ set(UTILITY_HEADERS
     libcockatrice/utility/card_ref.h
     libcockatrice/utility/color.h
     libcockatrice/utility/cryptoutil.h
+    libcockatrice/utility/debouncer.h
     libcockatrice/utility/expression.h
     libcockatrice/utility/levenshtein.h
+    libcockatrice/utility/local_server_name.h
     libcockatrice/utility/macros.h
     libcockatrice/utility/passwordhasher.h
     libcockatrice/utility/playmat_params.h
+    libcockatrice/utility/qt_utils.h
+    libcockatrice/utility/report_categories.h
     libcockatrice/utility/string_limits.h
     libcockatrice/utility/dice_limits.h
     libcockatrice/utility/counter_limits.h
@@ -27,6 +37,8 @@ set(UTILITY_HEADERS
     libcockatrice/utility/zone_names.h
     libcockatrice/utility/days_years_between.h
     libcockatrice/utility/server_rate_limiter.h
+    libcockatrice/utility/translation_loader.h
+    libcockatrice/utility/user_data_backup.h
     libcockatrice/utility/warning_categories.h
 )
 
@@ -41,3 +53,5 @@ target_link_libraries(libcockatrice_utility PUBLIC libcockatrice_rng OpenSSL::Cr
 set(ORACLE_LIBS)
 
 include_directories(${${COCKATRICE_QT_VERSION_NAME}Core_INCLUDE_DIRS})
+
+target_precompile_headers(libcockatrice_utility PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtcore_pch.h")

@@ -2,15 +2,25 @@
 
 #include "../../../client/settings/cache_settings.h"
 
+#include <QByteArray>
+#include <QDebug>
 #include <QJsonDocument>
+#include <QJsonParseError>
+#include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QSharedPointer>
 #include <QUrl>
+#include <QVariant>
+#include <QVariantMap>
+#include <libcockatrice/network/network_manager.h>
 #include <libcockatrice/settings/servers_settings.h>
+#include <qlogging.h>
 
 #define PUBLIC_SERVERS_JSON "https://cockatrice.github.io/public-servers.json"
 
 HandlePublicServers::HandlePublicServers(QObject *parent)
-    : QObject(parent), nam(new QNetworkAccessManager(this)), reply(nullptr)
+    : QObject(parent), nam(NetworkManagerFactory::create(this)), reply(nullptr)
 {
 }
 

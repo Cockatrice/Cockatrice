@@ -1,21 +1,44 @@
 #include "server_room.h"
 
 #include "game/server_game.h"
+#include "libcockatrice/protocol/pb/response.pb.h"
+#include "libcockatrice/protocol/pb/room_event.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_gametype.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+#include "server.h"
+#include "server_abstractuserinterface.h"
 #include "server_protocolhandler.h"
+#include "server_response_containers.h"
+#include "serverinfo_user_container.h"
 
 #include <QDateTime>
-#include <QDebug>
+#include <QMapIterator>
+#include <QMutexLocker>
+#include <QReadLocker>
+#include <QRecursiveMutex>
+#include <QSharedPointer>
 #include <google/protobuf/descriptor.h>
+#include <google/protobuf/message.h>
+#include <iterator>
 #include <libcockatrice/protocol/pb/commands.pb.h>
 #include <libcockatrice/protocol/pb/event_join_room.pb.h>
 #include <libcockatrice/protocol/pb/event_leave_room.pb.h>
 #include <libcockatrice/protocol/pb/event_list_games.pb.h>
 #include <libcockatrice/protocol/pb/event_remove_messages.pb.h>
+#include <libcockatrice/protocol/pb/event_room_channel_say.pb.h>
 #include <libcockatrice/protocol/pb/event_room_say.pb.h>
 #include <libcockatrice/protocol/pb/room_commands.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_chat_message.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_room.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_room_channel.pb.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <qlogging.h>
+#include <qnamespace.h>
+#include <string>
+#include <utility>
+
+const QString Server_Room::MAIN_CHANNEL_KEY = QStringLiteral("__main__");
 
 Server_Room::Server_Room(int _id,
                          int _chatHistorySize,
@@ -26,10 +49,11 @@ Server_Room::Server_Room(int _id,
                          bool _autoJoin,
                          const QString &_joinMessage,
                          const QStringList &_gameTypes,
-                         Server *parent)
+                         Server *parent,
+                         const QList<ServerInfo_RoomChannel> &_channels)
     : QObject(parent), id(_id), chatHistorySize(_chatHistorySize), name(_name), description(_description),
       permissionLevel(_permissionLevel), privilegeLevel(_privilegeLevel), autoJoin(_autoJoin),
-      joinMessage(_joinMessage), gameTypes(_gameTypes), gamesLock(QReadWriteLock::Recursive)
+      joinMessage(_joinMessage), gameTypes(_gameTypes), channels(_channels), gamesLock(QReadWriteLock::Recursive)
 {
     connect(
         this, &Server_Room::gameListChanged, this, [this](auto gameInfo) { broadcastGameListUpdate(gameInfo); },
@@ -83,8 +107,11 @@ Server *Server_Room::getServer() const
     return static_cast<Server *>(parent());
 }
 
-const ServerInfo_Room &
-Server_Room::getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes, bool includeExternalData) const
+const ServerInfo_Room &Server_Room::getInfo(ServerInfo_Room &result,
+                                            bool complete,
+                                            bool showGameTypes,
+                                            bool includeExternalData,
+                                            const ServerInfo_User *forUser) const
 {
     result.set_room_id(id);
     result.set_name(name.toStdString());
@@ -133,7 +160,71 @@ Server_Room::getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes,
         }
     }
 
+    for (const ServerInfo_RoomChannel &channel : channels) {
+        if (forUser != nullptr && !mayReadChannel(*forUser, channel)) {
+            continue;
+        }
+        result.add_channel_list()->CopyFrom(channel);
+    }
+
     return result;
+}
+
+bool Server_Room::isMainChannel(const QString &channelId)
+{
+    return channelId.isEmpty() || channelId == MAIN_CHANNEL_KEY;
+}
+
+const ServerInfo_RoomChannel *Server_Room::findChannel(const QString &channelId) const
+{
+    for (const ServerInfo_RoomChannel &channel : channels) {
+        if (QString::fromStdString(channel.id()) == channelId) {
+            return &channel;
+        }
+    }
+    return nullptr;
+}
+
+bool Server_Room::hasChannelPrivilege(const ServerInfo_User &userInfo,
+                                      ServerInfo_RoomChannel::AccessLevel requiredLevel)
+{
+    // User flags are independent bits, not a ladder: holding IsDeveloper does
+    // not imply IsModerator or IsAdmin. The database grants admins the admin
+    // and the moderator bit together, so admins still reach moderator (and
+    // judge) channels; moderators likewise reach judge channels.
+    const uint32_t userLevel = userInfo.user_level();
+    switch (requiredLevel) {
+        case ServerInfo_RoomChannel::Public:
+            return true;
+        case ServerInfo_RoomChannel::Registered:
+            return userLevel & ServerInfo_User::IsRegistered;
+        case ServerInfo_RoomChannel::Judge:
+            return userLevel & (ServerInfo_User::IsJudge | ServerInfo_User::IsModerator);
+        case ServerInfo_RoomChannel::Moderator:
+            return userLevel & ServerInfo_User::IsModerator;
+        case ServerInfo_RoomChannel::Admin:
+            return userLevel & ServerInfo_User::IsAdmin;
+        case ServerInfo_RoomChannel::Developer:
+            return userLevel & (ServerInfo_User::IsDeveloper | ServerInfo_User::IsAdmin);
+        default:
+            return false;
+    }
+}
+
+bool Server_Room::mayReadChannel(const ServerInfo_User &userInfo, const ServerInfo_RoomChannel &channel)
+{
+    return hasChannelPrivilege(userInfo, channel.access_level());
+}
+
+bool Server_Room::mayWriteChannel(const ServerInfo_User &userInfo, const ServerInfo_RoomChannel &channel)
+{
+    const auto writeLevel = channel.has_write_access_level() ? channel.write_access_level() : channel.access_level();
+    return mayReadChannel(userInfo, channel) && hasChannelPrivilege(userInfo, writeLevel);
+}
+
+QList<ServerInfo_ChatMessage> Server_Room::getChatHistory(const QString &channelId) const
+{
+    return channelChatHistory.value(isMainChannel(channelId) ? MAIN_CHANNEL_KEY : channelId);
 }
 
 RoomEvent *Server_Room::prepareRoomEvent(const ::google::protobuf::Message &roomEvent)
@@ -291,12 +382,35 @@ Response::ResponseCode Server_Room::processJoinGameCommand(const Command_JoinGam
     return result;
 }
 
-void Server_Room::say(const QString &userName, const QString &userMessage, bool sendToIsl)
+void Server_Room::say(const QString &userName, const QString &userMessage, const QString &channelId, bool sendToIsl)
 {
-    Event_RoomSay event;
-    event.set_name(userName.toStdString());
-    event.set_message(userMessage.toStdString());
-    sendRoomEvent(prepareRoomEvent(event), sendToIsl);
+    const bool isMain = isMainChannel(channelId);
+    ServerInfo_RoomChannel::AccessLevel accessLevel = ServerInfo_RoomChannel::Public;
+    if (!isMain) {
+        const ServerInfo_RoomChannel *channel = findChannel(channelId);
+        if (channel == nullptr) {
+            // The channel was not whitelisted against the catalog; drop the message.
+            return;
+        }
+        accessLevel = channel->access_level();
+        // V1 does not relay restricted channels across ISL (plan N5).
+        if (accessLevel != ServerInfo_RoomChannel::Public) {
+            sendToIsl = false;
+        }
+    }
+
+    if (isMain) {
+        Event_RoomSay event;
+        event.set_name(userName.toStdString());
+        event.set_message(userMessage.toStdString());
+        sendRoomEvent(prepareRoomEvent(event), sendToIsl, accessLevel);
+    } else {
+        Event_RoomChannelSay event;
+        event.set_channel_id(channelId.toStdString());
+        event.set_name(userName.toStdString());
+        event.set_message(userMessage.toStdString());
+        sendRoomEvent(prepareRoomEvent(event), sendToIsl, accessLevel);
+    }
 
     if (chatHistorySize != 0) {
         ServerInfo_ChatMessage chatMessage;
@@ -305,13 +419,18 @@ void Server_Room::say(const QString &userName, const QString &userMessage, bool 
         chatMessage.set_time(dateTimeString.toStdString());
         chatMessage.set_sender_name(userName.toStdString());
         chatMessage.set_message(userMessage.simplified().toStdString());
-
-        historyLock.lockForWrite();
-        if (chatHistory.size() >= chatHistorySize) {
-            chatHistory.removeAt(0);
+        if (!isMain) {
+            chatMessage.set_channel(channelId.toStdString());
         }
 
-        chatHistory.push_back(std::move(chatMessage));
+        const QString storageKey = isMain ? MAIN_CHANNEL_KEY : channelId;
+        historyLock.lockForWrite();
+        QList<ServerInfo_ChatMessage> &history = channelChatHistory[storageKey];
+        if (history.size() >= chatHistorySize) {
+            history.removeAt(0);
+        }
+
+        history.push_back(std::move(chatMessage));
         historyLock.unlock();
     }
 }
@@ -325,26 +444,34 @@ void Server_Room::removeSaidMessages(const QString &userName, int amount, bool s
     sendRoomEvent(prepareRoomEvent(event), sendToIsl);
 
     if (chatHistorySize != 0) {
-        int removed = 0;
         historyLock.lockForWrite();
-        // redact [amount] of the most recent messages from this user from history
-        for (auto message = chatHistory.rbegin(); message != chatHistory.rend() && removed != amount; ++message) {
-            if (message->sender_name() == stdStringUserName) {
-                message->clear_message();
-                ++removed;
+        // redact [amount] of the most recent messages from this user from every channel history,
+        // so removed content does not resurface for late joiners on any stream
+        for (auto historyIt = channelChatHistory.begin(); historyIt != channelChatHistory.end(); ++historyIt) {
+            QList<ServerInfo_ChatMessage> &history = historyIt.value();
+            int removed = 0;
+            for (auto message = history.rbegin(); message != history.rend() && removed != amount; ++message) {
+                if (message->sender_name() == stdStringUserName) {
+                    message->clear_message();
+                    ++removed;
+                }
             }
         }
         historyLock.unlock();
     }
 }
 
-void Server_Room::sendRoomEvent(RoomEvent *event, bool sendToIsl)
+void Server_Room::sendRoomEvent(RoomEvent *event, bool sendToIsl, ServerInfo_RoomChannel::AccessLevel accessLevel)
 {
     usersLock.lockForRead();
     {
         QMapIterator<QString, Server_ProtocolHandler *> userIterator(users);
         while (userIterator.hasNext()) {
-            userIterator.next().value()->sendProtocolItem(*event);
+            Server_ProtocolHandler *user = userIterator.next().value();
+            if (!hasChannelPrivilege(*user->getUserInfo(), accessLevel)) {
+                continue;
+            }
+            user->sendProtocolItem(*event);
         }
     }
     usersLock.unlock();

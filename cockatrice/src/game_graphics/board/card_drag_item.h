@@ -9,7 +9,11 @@
 
 #include "abstract_card_drag_item.h"
 
+#include <QPointF>
+#include <qtmetamacros.h>
+
 class CardItem;
+class CardZone;
 
 class CardDragItem : public AbstractCardDragItem
 {

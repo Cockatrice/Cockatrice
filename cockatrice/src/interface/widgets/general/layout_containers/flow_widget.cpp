@@ -6,11 +6,20 @@
 
 #include "flow_widget.h"
 
+#include "../../../layouts/flow_layout.h"
+
+#include <QEvent>
 #include <QHBoxLayout>
+#include <QKeyEvent>
+#include <QLayoutItem>
+#include <QList>
+#include <QMessageLogger>
 #include <QResizeEvent>
 #include <QScrollArea>
+#include <QSize>
 #include <QSizePolicy>
 #include <QWidget>
+#include <libcockatrice/utility/qt_utils.h>
 
 /**
  * @brief Constructs a FlowWidget.
@@ -39,21 +48,16 @@ FlowWidget::FlowWidget(QWidget *parent,
         setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     }
 
-    mainLayout = new QHBoxLayout(this);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout = QtUtils::makeLayout<QHBoxLayout>(this);
     setLayout(mainLayout);
 
     const bool useScrollArea = (horizontalPolicy != Qt::ScrollBarAlwaysOff || verticalPolicy != Qt::ScrollBarAlwaysOff);
 
     // Scroll area (optional)
     if (useScrollArea) {
-        scrollArea = new QScrollArea(this);
-        scrollArea->setWidgetResizable(true);
+        scrollArea = QtUtils::makeScrollArea(this, verticalPolicy, horizontalPolicy);
         scrollArea->setMinimumSize(0, 0);
         scrollArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        // Set scrollbar policies
-        scrollArea->setHorizontalScrollBarPolicy(horizontalPolicy);
-        scrollArea->setVerticalScrollBarPolicy(verticalPolicy);
     } else {
         scrollArea = nullptr;
     }
@@ -80,10 +84,32 @@ FlowWidget::FlowWidget(QWidget *parent,
 /**
  * @brief Adds a widget to the flow layout within the FlowWidget.
  *
+ * Plain widgets are not filtered for arrow keys: intercepting them would steal
+ * Up/Down/Left/Right from controls that use them (combo boxes, spin boxes
+ * etc.). Widgets that want keyboard navigation between flow items must be
+ * added via addNavigableWidget instead.
+ *
  * @param widget_to_add The widget to add to the flow layout.
  */
-void FlowWidget::addWidget(QWidget *widget_to_add) const
+void FlowWidget::addWidget(QWidget *widget_to_add)
 {
+    flowLayout->addWidget(widget_to_add);
+}
+
+/**
+ * @brief Adds a widget and routes its arrow keys to FlowWidget focus navigation.
+ *
+ * The widget is filtered for arrow-key events so keyboard navigation between
+ * the flow items keeps working even when the flow sits inside a QScrollArea,
+ * which swallows arrow keys before they can bubble up. Only widgets added
+ * through this method are affected; anything that needs its own arrow keys
+ * should use plain addWidget.
+ *
+ * @param widget_to_add The widget to add to the flow layout.
+ */
+void FlowWidget::addNavigableWidget(QWidget *widget_to_add)
+{
+    widget_to_add->installEventFilter(this);
     flowLayout->addWidget(widget_to_add);
 }
 
@@ -106,13 +132,7 @@ void FlowWidget::removeWidget(QWidget *widgetToRemove) const
 void FlowWidget::clearLayout()
 {
     if (flowLayout) {
-        QLayoutItem *item;
-        while ((item = flowLayout->takeAt(0))) {
-            if (item->widget()) {
-                item->widget()->deleteLater();
-            }
-            delete item;
-        }
+        QtUtils::clearLayoutRec(flowLayout);
     } else {
         // Defensive fallback: recreate the layout if it was deleted externally.
         flowLayout = new FlowLayout(container, flowDirection);
@@ -175,6 +195,61 @@ void FlowWidget::setMinimumSizeToMaxSizeHint()
 QLayoutItem *FlowWidget::itemAt(int index) const
 {
     return flowLayout->itemAt(index);
+}
+
+bool FlowWidget::eventFilter(QObject *watched, QEvent *event)
+{
+    // Arrow-key navigation is deliberately scoped to widgets that opted in via
+    // addNavigableWidget(). Handling arrow keys in keyPressEvent() as well would
+    // also catch the events ordinary children (QLineEdit, ...) ignore and move
+    // focus away from the control the user is typing in.
+    if (event->type() == QEvent::KeyPress && moveFocus(static_cast<QKeyEvent *>(event))) {
+        return true;
+    }
+    return QWidget::eventFilter(watched, event);
+}
+
+bool FlowWidget::moveFocus(QKeyEvent *event)
+{
+    // Keyboard navigation between the flow items: arrow keys move focus just
+    // like clicking the sibling tiles would. Only items that can take keyboard
+    // focus (e.g. the deck-preview tiles in shared-deck links) are visited.
+    const bool moveForward = event->key() == Qt::Key_Right || event->key() == Qt::Key_Down;
+    const bool moveBackward = event->key() == Qt::Key_Left || event->key() == Qt::Key_Up;
+    if (!moveForward && !moveBackward) {
+        return false;
+    }
+
+    QList<QWidget *> focusableItems;
+    for (int i = 0; i < flowLayout->count(); ++i) {
+        QWidget *item = flowLayout->itemAt(i)->widget();
+        if (item != nullptr && (item->focusPolicy() & Qt::TabFocus)) {
+            focusableItems.append(item);
+        }
+    }
+
+    if (focusableItems.isEmpty()) {
+        return false;
+    }
+
+    int currentIndex = -1;
+    for (int i = 0; i < focusableItems.size(); ++i) {
+        if (focusableItems.at(i)->hasFocus()) {
+            currentIndex = i;
+            break;
+        }
+    }
+
+    const int delta = moveForward ? 1 : -1;
+    int nextIndex;
+    if (currentIndex < 0) {
+        nextIndex = moveForward ? 0 : focusableItems.size() - 1;
+    } else {
+        nextIndex = (currentIndex + delta + focusableItems.size()) % focusableItems.size();
+    }
+    focusableItems.value(nextIndex)->setFocus();
+    event->accept();
+    return true;
 }
 
 int FlowWidget::count() const

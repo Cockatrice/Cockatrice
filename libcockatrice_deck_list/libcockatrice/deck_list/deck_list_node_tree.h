@@ -1,11 +1,17 @@
 #ifndef COCKATRICE_DECKLIST_NODE_TREE_H
 #define COCKATRICE_DECKLIST_NODE_TREE_H
 
-#include "libcockatrice/utility/card_ref.h"
 #include "tree/deck_list_card_node.h"
 #include "tree/inner_deck_list_node.h"
 
+#include <QList>
 #include <QSet>
+#include <QString>
+#include <functional>
+
+class AbstractDecklistNode;
+class QXmlStreamReader;
+class QXmlStreamWriter;
 
 class DecklistNodeTree
 {

@@ -1,16 +1,31 @@
 #include "player_menu.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../../../game/abstract_game.h"
+#include "../../../game/player/player_info.h"
+#include "../../../game/player/player_logic.h"
+#include "../../../game/player/player_manager.h"
 #include "../../../game_graphics/zones/hand_zone.h"
 #include "../../../game_graphics/zones/pile_zone.h"
 #include "../../../game_graphics/zones/table_zone.h"
-#include "../../../interface/widgets/tabs/tab_game.h"
+#include "../../../interface/widgets/menus/tearoff_menu.h"
 #include "../../board/card_item.h"
 #include "../player_graphics_item.h"
+#include "abstract_player_component.h"
 #include "card_menu.h"
+#include "custom_zone_menu.h"
+#include "grave_menu.h"
 #include "hand_menu.h"
+#include "library_menu.h"
+#include "rfg_menu.h"
+#include "say_menu.h"
+#include "sideboard_menu.h"
+#include "tally_menu.h"
+#include "utility_menu.h"
 
-#include <libcockatrice/protocol/pb/command_reveal_cards.pb.h>
+#include <QMenu>
+#include <QString>
 
 PlayerMenu::PlayerMenu(PlayerGraphicsItem *_player) : QObject(_player), player(_player)
 {

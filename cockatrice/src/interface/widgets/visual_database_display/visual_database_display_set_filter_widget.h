@@ -7,16 +7,20 @@
 #ifndef VISUAL_DATABASE_DISPLAY_SET_FILTER_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_SET_FILTER_WIDGET_H
 
-#include "../../../filters/filter_tree_model.h"
-#include "../general/layout_containers/flow_widget.h"
-
-#include <QCheckBox>
-#include <QLineEdit>
 #include <QMap>
-#include <QPushButton>
-#include <QSpinBox>
-#include <QVBoxLayout>
+#include <QString>
 #include <QWidget>
+#include <libcockatrice/utility/debouncer.h>
+#include <qtmetamacros.h>
+
+class FilterTreeModel;
+class FlowWidget;
+class QCheckBox;
+class QHBoxLayout;
+class QLineEdit;
+class QPushButton;
+class QSpinBox;
+class QVBoxLayout;
 
 class VisualDatabaseDisplayRecentSetFilterSettingsWidget : public QWidget
 {
@@ -61,6 +65,7 @@ private:
     QMap<QString, bool> activeSets;           // Track active set filters
 
     bool exactMatchMode = true; // Toggle between "Exact Match" and "Includes"
+    QtUtils::Debouncer syncDebouncer{100};
 };
 
 #endif // VISUAL_DATABASE_DISPLAY_SET_FILTER_WIDGET_H

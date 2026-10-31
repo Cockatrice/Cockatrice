@@ -1,15 +1,17 @@
 FROM fedora:44
 
 RUN dnf install -y \
+        ca-certificates \
         ccache \
         cmake \
         gcc-c++ \
         git \
+        libcurl-devel \
         mariadb-devel \
         ninja-build \
         openssl-devel \
         protobuf-devel \
-        qt6-{qtdeclarative,qtshadertools,qttools,qtsvg,qtmultimedia,qtwebsockets}-devel \
+        qt6-{qtdeclarative,qtmultimedia,qtshadertools,qtsvg,qttools,qtwebsockets}-devel \
         qt6-qtimageformats \
         rpm-build \
         xz-devel \

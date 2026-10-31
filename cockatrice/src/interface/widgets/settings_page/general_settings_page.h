@@ -5,11 +5,16 @@
 
 #include <QCheckBox>
 #include <QComboBox>
-#include <QGroupBox>
 #include <QLabel>
 #include <QLoggingCategory>
-#include <QPushButton>
 #include <QSpinBox>
+#include <QString>
+#include <QStringList>
+#include <qtmetamacros.h>
+
+class QGroupBox;
+class QLineEdit;
+class QPushButton;
 
 inline Q_LOGGING_CATEGORY(GeneralSettingsPageLog, "general_settings_page");
 
@@ -21,7 +26,6 @@ public:
     void retranslateUi() override;
 
     static QStringList findQmFiles();
-    static QString languageName(const QString &lang);
 
 signals:
     /// Request to re-import the card database with the newly selected card language
@@ -38,11 +42,13 @@ private slots:
     void resetAllPathsClicked();
     void languageBoxChanged(int index);
     void cardLanguageBoxChanged(int index);
+    void cardSearchLanguageBoxChanged(int index);
     void updateStartupServerControlsVisibility();
 
 private:
     QGroupBox *languageGroupBox;
     QGroupBox *versionGroupBox;
+    QGroupBox *crashReportingGroupBox;
     QGroupBox *cardDatabaseGroupBox;
     QGroupBox *startupGroupBox;
     QGroupBox *pathsGroupBox;
@@ -55,17 +61,24 @@ private:
     QComboBox cardLanguageBox;
     QLabel cardLanguageNoteLabel;
 
+    QLabel cardSearchLanguageLabel;
+    QComboBox cardSearchLanguageBox;
+
     QLabel updateReleaseChannelLabel;
     QComboBox updateReleaseChannelBox;
     QCheckBox startupUpdateCheckCheckBox;
     QCheckBox updateNotificationCheckBox;
     QCheckBox newVersionOracleCheckBox;
 
+    QLabel crashReportingLabel;
+    QComboBox crashReportingBox;
+
     QLabel startupCardUpdateCheckBehaviorLabel;
     QComboBox startupCardUpdateCheckBehaviorSelector;
     QLabel cardUpdateCheckIntervalLabel;
     QSpinBox cardUpdateCheckIntervalSpinBox;
     QLabel lastCardUpdateCheckDateLabel;
+    QCheckBox cardDatabaseUpdateTrayNotificationCheckBox;
 
     QCheckBox showTipsOnStartup;
     QLabel startupTabLabel;

@@ -6,18 +6,14 @@
 #ifndef VISUAL_DECK_STORAGE_WIDGET_H
 #define VISUAL_DECK_STORAGE_WIDGET_H
 
-#include "visual_deck_storage_model.h"
-#include "visual_deck_storage_sort_filter_proxy_model.h"
-
-#include <QHBoxLayout>
-#include <QScrollArea>
-#include <QToolButton>
-#include <QVBoxLayout>
+#include <QPointer>
+#include <QSet>
+#include <QString>
+#include <QStringList>
 #include <QWidget>
+#include <qtmetamacros.h>
 
 class QLabel;
-class QResizeEvent;
-class QShowEvent;
 class QTimer;
 class DeckPreviewColorIdentityFilterWidget;
 class VisualDeckStorageFolderDisplayWidget;
@@ -25,6 +21,13 @@ class VisualDeckStorageQuickSettingsWidget;
 class VisualDeckStorageSearchWidget;
 class VisualDeckStorageSortWidget;
 class VisualDeckStorageTagFilterWidget;
+class QHBoxLayout;
+class QScrollArea;
+class QToolButton;
+class QVBoxLayout;
+class VisualDeckStorageModel;
+class VisualDeckStorageSortFilterProxyModel;
+struct LoadedDeck;
 
 class VisualDeckStorageWidget final : public QWidget
 {
@@ -33,6 +36,12 @@ public:
     explicit VisualDeckStorageWidget(QWidget *parent);
     void refreshIfPossible();
     void retranslateUi();
+    void setShareSelectable(bool selectable);
+    [[nodiscard]] bool isShareSelectable() const;
+    [[nodiscard]] QStringList selectedFilePaths() const;
+    void setShareSelectedFiles(const QStringList &paths);
+    void clearShareSelection();
+    void setShareAvailable(bool available);
 
     VisualDeckStorageTagFilterWidget *tagFilterWidget;
     bool deckPreviewSelectionAnimationEnabled;
@@ -63,6 +72,9 @@ public slots:
 signals:
     void deckLoadRequested(const QString &filePath);
     void openDeckEditor(const LoadedDeck &deck);
+    void shareDeckRequested(const QString &filePath);
+    void shareSelectionChanged();
+    void shareRequested();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -70,22 +82,25 @@ protected:
 
 private:
     void reapplySortAndFilters();
+    [[nodiscard]] QSet<QString> gatherVisibleTags() const;
 
 private:
     QVBoxLayout *layout;
     QWidget *searchAndSortContainer;
     QHBoxLayout *searchAndSortLayout;
-    QLabel *databaseLoadIndicator;
+    QPointer<QLabel> databaseLoadIndicator;
     VisualDeckStorageSortWidget *sortWidget;
     VisualDeckStorageSearchWidget *searchWidget;
     DeckPreviewColorIdentityFilterWidget *deckPreviewColorIdentityFilterWidget;
     QToolButton *refreshButton;
+    QToolButton *shareButton;
     VisualDeckStorageQuickSettingsWidget *quickSettingsWidget;
     QScrollArea *scrollArea;
     VisualDeckStorageFolderDisplayWidget *folderWidget = nullptr;
     VisualDeckStorageModel *storageModel = nullptr;
     VisualDeckStorageSortFilterProxyModel *storageProxyModel = nullptr;
     QTimer *refreshTimer = nullptr; ///< Coalesces the re-apply/refresh burst following a batch of deck loads.
+    bool shareSelectable = false;
 };
 
 #endif // VISUAL_DECK_STORAGE_WIDGET_H

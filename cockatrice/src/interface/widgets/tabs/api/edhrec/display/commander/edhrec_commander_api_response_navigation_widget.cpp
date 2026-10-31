@@ -1,6 +1,13 @@
 #include "edhrec_commander_api_response_navigation_widget.h"
 
 #include "../../tab_edhrec_main.h"
+#include "edhrec_commander_api_response_bracket_navigation_widget.h"
+#include "edhrec_commander_api_response_budget_navigation_widget.h"
+
+#include <QGridLayout>
+#include <QObject>
+#include <QPushButton>
+#include <libcockatrice/utility/qt_utils.h>
 
 EdhrecCommanderApiResponseNavigationWidget::EdhrecCommanderApiResponseNavigationWidget(
     QWidget *parent,
@@ -34,15 +41,7 @@ EdhrecCommanderApiResponseNavigationWidget::EdhrecCommanderApiResponseNavigation
     layout->addWidget(bracketNavigationWidget, 1, 0, 1, 2);
     layout->addWidget(budgetNavigationWidget, 2, 0, 1, 2);
 
-    QWidget *currentParent = parentWidget();
-    TabEdhRecMain *parentTab = nullptr;
-
-    while (currentParent) {
-        if ((parentTab = qobject_cast<TabEdhRecMain *>(currentParent))) {
-            break;
-        }
-        currentParent = currentParent->parentWidget();
-    }
+    auto *parentTab = QtUtils::findParentOfType<TabEdhRecMain>(this);
 
     if (parentTab) {
         connect(comboPushButton, &QPushButton::clicked, this,

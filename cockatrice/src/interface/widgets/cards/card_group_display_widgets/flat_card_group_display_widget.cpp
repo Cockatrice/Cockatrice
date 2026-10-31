@@ -1,9 +1,19 @@
 #include "flat_card_group_display_widget.h"
 
-#include <QResizeEvent>
-#include <libcockatrice/card/database/card_database_manager.h>
+#include "../../general/display/banner_widget.h"
+#include "../../general/layout_containers/flow_widget.h"
+
+#include <QAbstractItemModel>
+#include <QList>
+#include <QMap>
+#include <QVBoxLayout>
+#include <QWidget>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
+#include <qnamespace.h>
 #include <utility>
+
+class CardSizeWidget;
+class QItemSelectionModel;
 
 FlatCardGroupDisplayWidget::FlatCardGroupDisplayWidget(QWidget *parent,
                                                        DeckListModel *_deckListModel,

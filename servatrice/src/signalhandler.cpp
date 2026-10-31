@@ -5,6 +5,10 @@
 #include "settingscache.h"
 
 #include <QSocketNotifier>
+#include <QThread>
+#include <QtGlobal>
+#include <qobjectdefs.h>
+#include <qsystemdetection.h>
 
 #ifdef Q_OS_UNIX
 #include <cstdio>

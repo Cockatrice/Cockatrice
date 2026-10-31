@@ -2,20 +2,39 @@
 
 #include "../cards/card_info_picture_enlarged_widget.h"
 #include "card_completer_delegate.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
 #include "reversed_completer_model.h"
 
+#include <QAbstractAnimation>
 #include <QAbstractItemModel>
 #include <QAbstractItemView>
+#include <QByteArray>
 #include <QCompleter>
 #include <QEvent>
+#include <QItemSelectionModel>
 #include <QKeyEvent>
+#include <QList>
 #include <QMouseEvent>
+#include <QPoint>
 #include <QPropertyAnimation>
+#include <QRect>
 #include <QScreen>
+#include <QScrollBar>
+#include <QSharedPointer>
 #include <QSize>
+#include <QString>
+#include <QVariant>
+#include <QWidget>
+#include <QtGlobal>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card/card_search_model.h>
+#include <libcockatrice/utility/card_ref.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qnamespace.h>
+
+template <class T> class QSharedPointer;
 
 namespace
 {
@@ -86,6 +105,7 @@ bool CardCompleterStyler::eventFilter(QObject *obj, QEvent *ev)
             case QEvent::Show:
             case QEvent::Move:
             case QEvent::Resize:
+                applyPopupWidth();
                 updateOrientation();
                 reposition();
                 break;
@@ -114,28 +134,70 @@ bool CardCompleterStyler::handlePopupKeyPress(QKeyEvent *event)
         return false;
     }
 
-    if (!above) {
-        return false;
-    }
-
     auto *popup = completer->popup();
     const int rowCount = completer->completionModel()->rowCount();
     if (rowCount == 0) {
         return true;
     }
 
+    // Handle navigation ourselves so arrow keys move the highlight without
+    // rewriting the line edit. QCompleter's default handling selects with a
+    // selection change that QLineEdit turns into setText(), which fights the
+    // user while typing (e.g. typing "A" becomes "Axe" and cannot be edited).
     // With the popup above the text edit the rows are shown in reverse order and
     // the closest match is in the bottom-most row. The up arrow then advances
     // through the list (towards its end at the top of the popup).
-    const int currentRow = popup->currentIndex().row();
-    const int step = (key == Qt::Key_Up) ? -1 : 1;
-    const int newRow = qBound(0, currentRow + step, rowCount - 1);
-
-    if (newRow != currentRow) {
-        popup->setCurrentIndex(completer->completionModel()->index(newRow, completer->completionColumn()));
+    const QModelIndex current = popup->currentIndex();
+    int newRow;
+    if (!current.isValid()) {
+        newRow = (key == Qt::Key_Down) ? 0 : rowCount - 1;
+    } else {
+        const int step = (key == Qt::Key_Up) ? -1 : 1;
+        newRow = qBound(0, current.row() + step, rowCount - 1);
+        if (newRow == current.row()) {
+            return true;
+        }
     }
 
+    selectWithoutRewrite(completer->completionModel()->index(newRow, completer->completionColumn()));
+
     return true;
+}
+
+// ---------------------------------------------------------------------------
+
+void CardCompleterStyler::applyPopupWidth()
+{
+    auto *popup = completer->popup();
+
+    // QCompleter sizes its popup to the line edit, so a narrow search field
+    // would crush the rows. Ask for the width the rows are designed for (plus
+    // the frame and scrollbar) and let QWidget's geometry clamping keep the
+    // popup that wide, clamped to the screen it is shown on.
+    int contentWidth = CardCompleterDelegate::PopupRowWidth + popup->frameWidth() * 2;
+    if (auto *vbar = popup->verticalScrollBar(); vbar != nullptr) {
+        contentWidth += vbar->sizeHint().width();
+    }
+
+    const QScreen *screen = popup->screen();
+    const QRect available = screen ? screen->availableGeometry() : QRect();
+
+    const int minWidth = available.isEmpty() ? contentWidth : qMin(contentWidth, available.width());
+    popup->setMinimumWidth(minWidth);
+
+    // setMinimumWidth() already widened the popup if it was narrower, but
+    // QCompleter positioned it for the line-edit width, so the widened popup
+    // can now extend past the right screen edge. The popup is a top-level
+    // Qt::Popup window, so geometry()/move() are already in screen
+    // coordinates: clamp the x from geometry() and move directly.
+    if (!available.isEmpty()) {
+        const QRect geom = popup->geometry();
+        const int clampedX =
+            qBound(available.left(), geom.x(), qMax(available.left(), available.right() - geom.width() + 1));
+        if (clampedX != geom.x()) {
+            popup->move(QPoint(clampedX, popup->y()));
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -161,7 +223,37 @@ void CardCompleterStyler::ensureClosestSelected()
     const int closestRow = rowCount - 1;
 
     if (currentRow != closestRow) {
-        popup->setCurrentIndex(completionModel->index(closestRow, completer->completionColumn()));
+        selectWithoutRewrite(completionModel->index(closestRow, completer->completionColumn()));
+    }
+}
+
+// ---------------------------------------------------------------------------
+
+void CardCompleterStyler::selectWithoutRewrite(const QModelIndex &index)
+{
+    auto *popup = completer->popup();
+    auto *selectionModel = popup->selectionModel();
+
+    // Changing the popup selection emits selectionChanged, which QCompleter
+    // turns into highlighted() and QLineEdit turns into setText(). That
+    // rewrites what the user typed (e.g. "A" becomes "Axe") and fights further
+    // typing. Block the signals so the highlight and preview move without
+    // touching the line edit; Enter/click still activates via activated().
+    const bool wasBlocked = selectionModel->blockSignals(true);
+    if (!index.isValid()) {
+        selectionModel->clear();
+    } else {
+        selectionModel->setCurrentIndex(index, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+    }
+    selectionModel->blockSignals(wasBlocked);
+    popup->viewport()->update();
+
+    // currentRowChanged was suppressed above, so sync the preview manually.
+    updatePreview(index);
+    if (index.isValid()) {
+        popup->scrollTo(index, QAbstractItemView::EnsureVisible);
+    } else {
+        popup->scrollToTop();
     }
 }
 
@@ -255,12 +347,7 @@ void CardCompleterStyler::showPreview()
     preview->show();
     preview->raise();
 
-    auto *fade = new QPropertyAnimation(preview, "windowOpacity", preview);
-
-    fade->setDuration(FadeDuration);
-    fade->setStartValue(preview->windowOpacity());
-    fade->setEndValue(1.0);
-    fade->start(QAbstractAnimation::DeleteWhenStopped);
+    QtUtils::fadeWindow(preview, preview->windowOpacity(), 1.0, FadeDuration);
 }
 
 // ---------------------------------------------------------------------------

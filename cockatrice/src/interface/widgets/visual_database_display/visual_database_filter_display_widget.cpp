@@ -2,13 +2,19 @@
 
 #include "../../../client/settings/cache_settings.h"
 
+#include <QChar>
 #include <QDir>
 #include <QFile>
 #include <QFontMetrics>
 #include <QHBoxLayout>
 #include <QMessageBox>
+#include <QMouseEvent>
 #include <QPushButton>
+#include <QSize>
+#include <QSizePolicy>
 #include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qnamespace.h>
 
 FilterDisplayWidget::FilterDisplayWidget(QWidget *parent, const QString &filename, FilterTreeModel *_filterModel)
     : QWidget(parent), filterFilename(filename), filterModel(_filterModel)
@@ -64,10 +70,8 @@ void FilterDisplayWidget::loadFilter()
 void FilterDisplayWidget::deleteFilter()
 {
     // Show confirmation dialog before deleting the filter
-    QMessageBox::StandardButton reply = QMessageBox::question(
-        this, tr("Confirm Delete"), tr("Are you sure you want to delete the filter '%1'?").arg(filterFilename),
-        QMessageBox::Yes | QMessageBox::No);
-    if (reply == QMessageBox::Yes) {
+    if (QtUtils::confirm(this, tr("Confirm Delete"),
+                         tr("Are you sure you want to delete the filter '%1'?").arg(filterFilename))) {
         // If confirmed, delete the filter
         QString filePath = SettingsCache::instance().paths().getFiltersPath() + QDir::separator() + filterFilename;
         QFile file(filePath);

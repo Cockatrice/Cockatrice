@@ -3,23 +3,48 @@
 #include "../../client/settings/cache_settings.h"
 #include "../../interface/card_localization.h"
 #include "../../interface/card_picture_loader/card_picture_loader.h"
+#include "../card_dimensions.h"
 #include "../game_scene.h"
 #include "../z_values.h"
+#include "abstract_graphics_item.h"
+#include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
+#include "libcockatrice/utility/card_ref.h"
 
+#include <QApplication>
+#include <QBrush>
+#include <QChar>
 #include <QCursor>
+#include <QFlags>
+#include <QFont>
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
+#include <QHash>
+#include <QLineF>
+#include <QList>
 #include <QPainter>
+#include <QPainterPath>
+#include <QPen>
+#include <QPixmap>
+#include <QPointF>
+#include <QRectF>
+#include <QTimer>
+#include <QTransform>
+#include <QVariant>
+#include <QtGlobal>
 #include <algorithm>
-#include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/debug_settings.h>
+#include <qnamespace.h>
+
+class QSizeF;
 
 AbstractCardItem::AbstractCardItem(QGraphicsItem *parent, const CardRef &cardRef, PlayerLogic *_owner, int _id)
     : ArrowTarget(_owner, parent), id(_id), cardRef(cardRef), tapped(false), facedown(false), tapAngle(0),
-      bgColor(Qt::transparent), isHovered(false), realZValue(0)
+      bgColor(Qt::transparent), isHovered(false), realZValue(0), pendingSelectionCollapse(false)
 {
     setCursor(Qt::OpenHandCursor);
     setFlag(ItemIsSelectable);
@@ -321,6 +346,16 @@ void AbstractCardItem::setFaceDown(bool _facedown)
 
 void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    cancelPendingSelectionCollapse();
+    if (scene() != nullptr) {
+        // A new press starts a new gesture: no card may collapse the selection out from under it afterwards.
+        for (QGraphicsItem *selectedItem : scene()->selectedItems()) {
+            auto *selectedCard = qgraphicsitem_cast<AbstractCardItem *>(selectedItem);
+            if (selectedCard != nullptr && selectedCard != this) {
+                selectedCard->cancelPendingSelectionCollapse();
+            }
+        }
+    }
     if ((event->modifiers() & Qt::AltModifier) && event->button() == Qt::LeftButton) {
         emit cardShiftClicked(cardRef.name);
     } else if ((event->modifiers() & Qt::ControlModifier)) {
@@ -328,6 +363,10 @@ void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     } else if (!isSelected()) {
         scene()->clearSelection();
         setSelected(true);
+    } else if (event->button() == Qt::LeftButton && scene()->selectedItems().count() > 1) {
+        // Part of a multi-selection; collapse only if this turns out to be a click rather than a drag,
+        // so that dragging the whole selection keeps it intact.
+        pendingSelectionCollapse = true;
     }
     if (event->button() == Qt::LeftButton) {
         setCursor(Qt::ClosedHandCursor);
@@ -339,12 +378,49 @@ void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void AbstractCardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+    if (pendingSelectionCollapse) {
+        pendingSelectionCollapse = false;
+        bool dragged = (event->screenPos() - event->buttonDownScreenPos(event->button())).manhattanLength() >=
+                       2 * QApplication::startDragDistance();
+        if (!dragged) {
+            if (doubleClickActsOnSelection()) {
+                // A double-click may still arrive and must act on the whole multi-selection, so collapse only
+                // once the double-click window has passed without one. The generation guard (and the receiver
+                // context) drops the collapse if the item is gone, deselected, or a double-click cancelled it;
+                // the count guard drops it if the selection changed meanwhile (rubber band, ctrl-toggle).
+                const int generation = ++selectionCollapseGeneration;
+                const int armedSelectionCount = scene()->selectedItems().count();
+                QTimer::singleShot(QApplication::doubleClickInterval(), this, [this, generation, armedSelectionCount] {
+                    if (generation == selectionCollapseGeneration && scene() != nullptr && isSelected() &&
+                        scene()->selectedItems().count() == armedSelectionCount && armedSelectionCount > 1) {
+                        scene()->clearSelection();
+                        setSelected(true);
+                    }
+                });
+            } else {
+                scene()->clearSelection();
+                setSelected(true);
+            }
+        }
+    }
+
     if (event->button() == Qt::MiddleButton) {
         emit deleteCardInfoPopup(cardRef.name);
     }
 
     // This function ensures the parent function doesn't mess around with our selection.
     event->accept();
+}
+
+void AbstractCardItem::cancelPendingSelectionCollapse()
+{
+    pendingSelectionCollapse = false;
+    ++selectionCollapseGeneration;
+}
+
+bool AbstractCardItem::doubleClickActsOnSelection() const
+{
+    return false;
 }
 
 void AbstractCardItem::processHoverEvent()

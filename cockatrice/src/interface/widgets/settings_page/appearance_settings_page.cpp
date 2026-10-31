@@ -1,29 +1,44 @@
 #include "appearance_settings_page.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../../client/settings/card_counter_settings.h"
 #include "../../client/settings/card_counter_settings.h"
 #include "../../palette_editor/palette_editor_dialog.h"
+#include "../../theme_config.h"
 #include "../dialogs/override_printing_warning.h"
 #include "../general/home_tab_button_color.h"
 #include "../interface/theme_manager.h"
 #include "../interface/widgets/general/background_sources.h"
 #include "../playmat/playmat_collection_dialog.h"
-#include "../playmat/playmat_settings_dialog.h"
+#include "libcockatrice/interfaces/interface_interface_settings_provider.h"
+#include "libcockatrice/utility/macros.h"
 
+#include <QAbstractButton>
 #include <QApplication>
+#include <QColor>
 #include <QColorDialog>
-#include <QDesktopServices>
+#include <QDebug>
+#include <QDir>
 #include <QGridLayout>
-#include <QHBoxLayout>
+#include <QGroupBox>
 #include <QMessageBox>
+#include <QObject>
+#include <QPushButton>
+#include <QSharedPointer>
+#include <QString>
+#include <QStringList>
+#include <QStringLiteral>
 #include <QStyleFactory>
 #include <QTimer>
+#include <QVBoxLayout>
+#include <QVariant>
+#include <QtGlobal>
 #include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
+#include <qnamespace.h>
 
 AppearanceSettingsPage::AppearanceSettingsPage()
 {
@@ -59,7 +74,8 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&schemeCombo, &QComboBox::currentIndexChanged, this,
             [this] { themeManager->setColorScheme(schemeCombo.currentData().toString()); });
 
-    // Qt widget style; "System" lets the application decide
+    // Qt widget style; "System" lets the application decide. The broken Windows
+    // native styles are still offered, but selecting one raises a warning.
     styleCombo.addItem(tr("System"), QStringLiteral("System"));
     for (const QString &key : QStyleFactory::keys()) {
         styleCombo.addItem(key, key);
@@ -68,9 +84,9 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     const QString currentStyle = cfg.styleName;
     const int styleSeedIdx = currentStyle.isEmpty() ? 0 : styleCombo.findData(currentStyle);
     styleCombo.setCurrentIndex(styleSeedIdx >= 0 ? styleSeedIdx : 0);
+    previousStyle = styleCombo.currentData().toString();
 
-    connect(&styleCombo, &QComboBox::currentIndexChanged, this,
-            [this] { themeManager->setStyleName(styleCombo.currentData().toString()); });
+    connect(&styleCombo, &QComboBox::currentIndexChanged, this, &AppearanceSettingsPage::styleComboChanged);
 
     connect(themeManager, &ThemeManager::themeChanged, this, [this, dirPath] {
         const QString newDir = themeManager->getAvailableThemes().value(SettingsCache::instance().getThemeName());
@@ -87,6 +103,9 @@ AppearanceSettingsPage::AppearanceSettingsPage()
         const int styleIdx = currentStyle.isEmpty() ? 0 : styleCombo.findData(currentStyle);
         styleCombo.setCurrentIndex(styleIdx >= 0 ? styleIdx : 0);
         styleCombo.blockSignals(false);
+        previousStyle = styleCombo.currentData().toString();
+
+        updateStyleWarning();
     });
 
     connect(&editPaletteButton, &QPushButton::clicked, this, &AppearanceSettingsPage::editPalette);
@@ -99,7 +118,11 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     themeGrid->addWidget(&schemeCombo, 2, 1);
     themeGrid->addWidget(&styleComboLabel, 3, 0);
     themeGrid->addWidget(&styleCombo, 3, 1);
-    themeGrid->addWidget(&editPaletteButton, 4, 1);
+    themeGrid->addWidget(&styleWarningLabel, 4, 0, 1, 2);
+    themeGrid->addWidget(&editPaletteButton, 5, 1);
+
+    styleWarningLabel.setWordWrap(true);
+    styleWarningLabel.setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
     themeGroupBox = new QGroupBox;
     themeGroupBox->setLayout(themeGrid);
@@ -422,7 +445,7 @@ void AppearanceSettingsPage::openThemeLocation()
     dirDir.cdUp();
     // open if dir exists, create if parent dir does exist
     if (dirDir.exists() && dirDir.mkpath(dir)) {
-        QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
+        QtUtils::openPathInFileManager(dir);
     } else {
         QMessageBox::critical(this, tr("Error"), tr("Could not create themes directory at '%1'.").arg(dir));
     }
@@ -442,6 +465,90 @@ void AppearanceSettingsPage::updateHomeTabSettingsVisibility()
     homeTabBackgroundShuffleFrequencyLabel.setVisible(visible);
     homeTabBackgroundShuffleFrequencySpinBox.setVisible(visible);
     homeTabDisplayCardNameCheckBox.setVisible(visible);
+}
+
+static bool isBrokenStyle(const QString &style)
+{
+    return style.compare("windows11", Qt::CaseInsensitive) == 0 ||
+           style.compare("windowsvista", Qt::CaseInsensitive) == 0;
+}
+
+static int findFusionIndex(const QComboBox &combo)
+{
+    int fusionIdx = combo.findData(QStringLiteral("Fusion"));
+    if (fusionIdx >= 0) {
+        return fusionIdx;
+    }
+    for (int i = 0; i < combo.count(); ++i) {
+        if (combo.itemData(i).toString().compare(QStringLiteral("Fusion"), Qt::CaseInsensitive) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void AppearanceSettingsPage::updateStyleWarning()
+{
+    styleWarningLabel.setVisible(isBrokenStyle(styleCombo.currentData().toString()));
+}
+
+void AppearanceSettingsPage::styleComboChanged(int index)
+{
+    if (index < 0) {
+        return;
+    }
+
+    const QString newStyle = styleCombo.itemData(index).toString();
+    if (!isBrokenStyle(newStyle)) {
+        themeManager->setStyleName(newStyle);
+        previousStyle = newStyle;
+        updateStyleWarning();
+        return;
+    }
+
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle(tr("Broken style"));
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.setText(tr("The \"%1\" style is broken and can break the game view: dragging cards across zones can "
+                      "shrink the board to a tiny grey window that can only be fixed by rejoining the game.")
+                       .arg(newStyle));
+    msgBox.setInformativeText(
+        tr("It can also render controls such as combo boxes unreadable, especially in dark mode.\n\n"
+           "Fusion is the recommended style on every platform. Switch to Fusion instead?"));
+
+    int fusionIdx = findFusionIndex(styleCombo);
+    QPushButton *fusionButton = nullptr;
+    if (fusionIdx >= 0) {
+        fusionButton = msgBox.addButton(tr("Use Fusion instead"), QMessageBox::AcceptRole);
+    }
+    QPushButton *keepButton = msgBox.addButton(tr("Use %1 anyway").arg(newStyle), QMessageBox::DestructiveRole);
+    msgBox.addButton(QMessageBox::Cancel);
+    if (fusionButton != nullptr) {
+        msgBox.setDefaultButton(fusionButton);
+    } else {
+        msgBox.setDefaultButton(keepButton);
+    }
+
+    msgBox.exec();
+
+    const QAbstractButton *clicked = msgBox.clickedButton();
+    if (fusionButton != nullptr && clicked == fusionButton) {
+        styleCombo.setCurrentIndex(fusionIdx);
+        return;
+    }
+    if (clicked == keepButton) {
+        themeManager->setStyleName(newStyle);
+        previousStyle = newStyle;
+        updateStyleWarning();
+        return;
+    }
+
+    // Cancel: revert to the previously applied style without re-prompting
+    styleCombo.blockSignals(true);
+    const int previousIdx = styleCombo.findData(previousStyle);
+    styleCombo.setCurrentIndex(previousIdx >= 0 ? previousIdx : 0);
+    styleCombo.blockSignals(false);
+    updateStyleWarning();
 }
 
 void AppearanceSettingsPage::showShortcutsChanged(QT_STATE_CHANGED_T value)
@@ -505,7 +612,13 @@ void AppearanceSettingsPage::retranslateUi()
     openThemeButton.setText(tr("Open themes folder"));
     schemeComboLabel.setText(tr("Active theme palette:"));
     styleComboLabel.setText(tr("Active theme style:"));
-    styleCombo.setToolTip(tr("Qt widget style saved to this theme (\"Default\" lets the application decide)"));
+    styleCombo.setToolTip(tr("Qt widget style saved to this theme (\"System\" lets the application decide)"));
+    styleWarningLabel.setText(
+        tr("Warning: the Windows 11 and Windows Vista styles are broken and can break the game view (dragging "
+           "cards can shrink the board to a tiny grey window that requires rejoining to fix), and can render "
+           "controls such as combo boxes unreadable, especially in dark mode. Fusion is the recommended style on "
+           "every platform: it is Qt's cross-platform style and the one Cockatrice is developed against."));
+    updateStyleWarning();
     editPaletteButton.setText(tr("Edit theme palette"));
 
     homeTabGroupBox->setTitle(tr("Home tab settings"));
