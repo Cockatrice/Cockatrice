@@ -63,7 +63,7 @@ set(oracle_RESOURCES oracle.qrc)
 # ------------------------
 # Qt resources
 # ------------------------
-qt6_add_resources(oracle_RESOURCES_RCC ${oracle_RESOURCES})
+qt_add_resources(oracle_RESOURCES_RCC ${oracle_RESOURCES})
 
 # ------------------------
 # Include directories
@@ -108,7 +108,7 @@ set(ORACLE_UNIX_QM_INSTALL_DIR "share/oracle/translations")
 set(ORACLE_WIN32_QM_INSTALL_DIR "translations")
 
 # Qt6 Translations are linked after the executable is created in manual mode
-qt6_add_executable(
+qt_add_executable(
   oracle
   WIN32
   MACOSX_BUNDLE
@@ -283,7 +283,7 @@ endif()
 if(Qt6LinguistTools_FOUND)
   #Qt6 Translations happen after the executable is built up
   if(UPDATE_TRANSLATIONS)
-    qt6_add_translations(
+    qt_add_translations(
       oracle
       TS_FILES
       ${oracle_TS}
@@ -293,7 +293,7 @@ if(Qt6LinguistTools_FOUND)
       oracle_QM
     )
   else()
-    qt6_add_translations(oracle TS_FILES ${oracle_TS} QM_FILES_OUTPUT_VARIABLE oracle_QM)
+    qt_add_translations(oracle TS_FILES ${oracle_TS} QM_FILES_OUTPUT_VARIABLE oracle_QM)
   endif()
 
   if(UNIX)
