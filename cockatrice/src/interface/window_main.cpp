@@ -986,6 +986,30 @@ bool MainWindow::closeForUpdate()
     return close();
 }
 
+void MainWindow::requestInstallerClose()
+{
+    // The same shutdown the in-app updater asks for: close the window, flush settings and let
+    // the tabs answer their own prompts. Never a forced quit - ending a process that has not
+    // agreed is the installer's separate force-close answer, not this one.
+    if (closeForUpdate()) {
+        QTimer::singleShot(0, qApp, [] { QCoreApplication::exit(0); });
+        return;
+    }
+    // A confirmation is already up, or a shutdown is in progress. Bring it forward: an
+    // installer prompt behind a hidden confirmation is the deadlock this request exists to
+    // break, and the user has to be able to answer it. showWindowIfHidden() also clears
+    // Qt::WindowMinimized, which raise() alone does not: a minimized window can keep the
+    // confirmation behind the installer.
+    showWindowIfHidden();
+    if (QWidget *modal = QApplication::activeModalWidget()) {
+        modal->raise();
+        modal->activateWindow();
+    }
+    raise();
+    activateWindow();
+    QApplication::alert(this, 0);
+}
+
 void MainWindow::changeEvent(QEvent *event)
 {
     if (event->type() == QEvent::LanguageChange) {

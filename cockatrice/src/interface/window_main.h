@@ -255,6 +255,17 @@ public:
      */
     bool closeForUpdate();
 
+    /**
+     * @brief Closes this instance because the installer asked it to over its local socket.
+     *
+     * The request reaches an instance hidden in the notification area or sitting on its own
+     * confirmation, which is exactly where a WM_CLOSE from the installer does not. The close
+     * is still the ordinary one: a clean client exits, one with unsaved work raises the same
+     * confirmation the close button does, and a confirmation already up is brought to the
+     * front instead of being left behind the installer.
+     */
+    void requestInstallerClose();
+
 protected:
     void closeEvent(QCloseEvent *event) override;
     void changeEvent(QEvent *event) override;

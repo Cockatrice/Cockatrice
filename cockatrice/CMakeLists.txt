@@ -345,6 +345,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/visual_deck_storage/visual_deck_storage_tag_filter_widget.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_widget.cpp
     src/interface/window_main.cpp
+    src/installer_close_server.cpp
     src/main.cpp
     src/single_instance_manager.cpp
     src/interface/widgets/tabs/abstract_tab_deck_editor.cpp
@@ -450,6 +451,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.h
     src/interface/widgets/utility/compact_push_button.cpp
     src/interface/widgets/utility/compact_push_button.h
+    src/installer_close_server.h
     src/single_instance_manager.h
     src/client/url_scheme_event_filter.h
     src/interface/intents/intent_connect_to_server.cpp

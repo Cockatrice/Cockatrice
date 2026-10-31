@@ -1,5 +1,6 @@
 #include "close_holders.h"
 
+#include "installer_close_request.h"
 #include "payload_paths.h"
 #include "restart_manager_holders.h"
 
@@ -248,19 +249,21 @@ closeCockatriceHolders(const std::vector<Holder> &holders, unsigned long waitMil
         search.processId = holder.processId;
         EnumWindows(collectProcessWindow, reinterpret_cast<LPARAM>(&search));
         CloseTarget target = chooseCloseTarget(search.windows, askHiddenWindows);
-        if (target.main == nullptr) {
-            // Nothing of the application's own to post a close to: every window left is one of
-            // Qt's bookkeeping windows, or the only thing on screen is a question whose owner
-            // window is gone. Neither is a close the application would answer - a close to the
-            // notification-area window terminates without the confirmation - so the instance is
-            // named and the guard's end answer is what can free its files.
+        if (target.main == nullptr && !askHiddenWindows) {
+            // A launcher with no window on screen has already answered its own close and is
+            // stuck in shutdown (see the header): asking it again cannot reach a user who is
+            // not there, so it is named and the installer's wait ends it.
             ++result.withoutWindow;
             lines.push_back(processLabel(holder) + L" has no window of its own to close");
             continue;
         }
 
         std::wstring line = processLabel(holder);
-        if (target.hidden) {
+        if (target.main == nullptr) {
+            // No window of the application's own at all: every window left is one of Qt's
+            // bookkeeping windows, which must never be asked to close. The installer socket
+            // below is the only thing that can reach it.
+        } else if (target.hidden) {
             line += L" is hidden in the notification area";
         } else {
             if (target.toRaise == nullptr) {
@@ -269,19 +272,40 @@ closeCockatriceHolders(const std::vector<Holder> &holders, unsigned long waitMil
             line += bringForward(target.toRaise) ? L" brought forward" : L" could not be brought forward";
         }
 
-        // Posted to the instance's own window even when a question of its own is up. The close
-        // is what that window's close button does, and the application is the one that answers
-        // it: a current client refuses the close while its confirmation is pending, leaving the
-        // question in front, and only a client from before that guard accepts it and hides the
-        // window with the question. Withholding the request therefore protected nobody - it
-        // left the installer asking the user to close a program it had never asked - while the
-        // guard's end answer is what frees the files when the close cannot.
-        //
         // Kept open across the wait so a pid reused after the process exits cannot be
         // mistaken for the instance that was asked to close.
         const HANDLE process = OpenProcess(SYNCHRONIZE, FALSE, holder.processId);
         const DWORD openError = process == nullptr ? GetLastError() : ERROR_SUCCESS;
-        if (PostMessageW(target.main, WM_CLOSE, 0, 0) == FALSE) {
+
+        // Ask over the installer socket first. It is the same request as the window's close
+        // button - the application still answers its own confirmation - but it reaches an
+        // instance whose window is hidden in the notification area or is sitting on that
+        // confirmation, the two states a posted close cannot get through. A client from
+        // before the socket answers with a failed connect, so the posted close below stays
+        // the fallback and older versions keep behaving exactly as they did.
+        if (requestInstallerClose(holder.processId)) {
+            // "and" only when the line already says something about the instance's window.
+            line += target.main == nullptr ? L" asked to close over its installer socket"
+                                           : L" and asked to close over its installer socket";
+        } else if (target.main == nullptr) {
+            // Nothing of the application's own to post a close to, and no socket to ask: the
+            // instance is named and the guard's end answer is what can free its files.
+            if (process != nullptr) {
+                CloseHandle(process);
+            }
+            ++result.withoutWindow;
+            lines.push_back(line + L" has no window of its own to close");
+            continue;
+        } else if (PostMessageW(target.main, WM_CLOSE, 0, 0) == FALSE) {
+            // Posted to the instance's own window even when a question of its own is up. The
+            // close is what that window's close button does, and the application is the one
+            // that answers it: a current client refuses the close while its confirmation is
+            // pending, leaving the question in front, and only a client from before that guard
+            // accepts it and hides the window with the question. Withholding the request
+            // therefore protected nobody - it left the installer asking the user to close a
+            // program it had never asked - while the guard's end answer is what frees the files
+            // when the close cannot.
+            //
             // Read the error before CloseHandle, which is free to reset it.
             const DWORD postError = GetLastError();
             if (process != nullptr) {
@@ -290,8 +314,9 @@ closeCockatriceHolders(const std::vector<Holder> &holders, unsigned long waitMil
             lines.push_back(line + L", and the close request could not be sent (win32 " + std::to_wstring(postError) +
                             L")");
             continue;
+        } else {
+            line += L" and asked to close";
         }
-        line += L" and asked to close";
         ++result.askedToClose;
         if (process == nullptr) {
             line += L", but its exit could not be watched (win32 " + std::to_wstring(openError) + L")";
@@ -311,6 +336,10 @@ closeCockatriceHolders(const std::vector<Holder> &holders, unsigned long waitMil
             const bool exited = allExited || WaitForSingleObject(asked[index], 0) == WAIT_OBJECT_0;
             if (exited) {
                 lines[askedLines[index]] += L", exited after " + std::to_wstring(elapsed) + L" ms";
+            } else if (askedWindows[index] == nullptr) {
+                // Asked over the socket with no window of its own: there is no window state
+                // to describe, only that it is still there.
+                lines[askedLines[index]] += L", still running after " + std::to_wstring(elapsed) + L" ms";
             } else {
                 lines[askedLines[index]] += L", still running after " + std::to_wstring(elapsed) + L" ms" +
                                             describeWindowState(askedWindows[index], askedWasHidden[index]);
