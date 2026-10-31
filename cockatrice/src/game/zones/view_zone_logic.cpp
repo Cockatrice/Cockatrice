@@ -168,6 +168,7 @@ void ZoneViewZoneLogic::clearCards()
         card->deleteLater();
     }
     cards.clear();
+    emit cardCountChanged();
 }
 
 void ZoneViewZoneLogic::setWriteableRevealZone(bool _writeableRevealZone)
