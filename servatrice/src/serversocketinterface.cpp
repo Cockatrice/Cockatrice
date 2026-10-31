@@ -4651,8 +4651,15 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
 
     connect(socket, SIGNAL(binaryMessageReceived(const QByteArray &)), this,
             SLOT(binaryMessageReceived(const QByteArray &)));
+    // QWebSocket::errorOccurred was added in Qt 6.5 (error() is deprecated from 6.5 on),
+    // so a typed connect cannot compile against the 6.4 floor.
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    connect(socket, &QWebSocket::errorOccurred, this,
+            [this](QAbstractSocket::SocketError error) { catchSocketError(error); });
+#else
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this,
             SLOT(catchSocketError(QAbstractSocket::SocketError)));
+#endif
     connect(socket, SIGNAL(disconnected()), this, SLOT(catchSocketDisconnected()));
 
     // Add this object to the server's list of connections before it can receive socket events.
