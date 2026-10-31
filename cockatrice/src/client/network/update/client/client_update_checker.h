@@ -24,8 +24,12 @@ class ClientUpdateChecker : public QObject
 {
     Q_OBJECT
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
+    // Qt::SingleShotConnection arrived in 6.5; older releases keep manual
+    // bookkeeping so the 6.4 minimum still builds.
     QMetaObject::Connection finishedCheckConnection;
     QMetaObject::Connection errorConnection;
+#endif
 
     void actFinishedCheck(bool needToUpdate, bool isCompatible, Release *release);
     void actError(const QString &errorString);
