@@ -228,16 +228,16 @@ void DlgUpdate::setLabel(const QString &newText)
 
 void DlgUpdate::warnInstallerIsWaiting()
 {
-    // Modeless on purpose: the installer asks the application to close exactly once (see
-    // CloseMatchingApps in NSIS.template.in) and only polls afterwards, while Qt drops spontaneous
-    // close events - a WM_CLOSE from the installer - for windows that are blocked by a modal
-    // widget (QGuiApplicationPrivate::processCloseEvent). An application modal message box here
-    // would therefore swallow the installer's one and only request for the rest of its wait.
+    // Modeless on purpose: the installer asks the application to close exactly once - the NSIS
+    // template closes matching windows itself (CloseMatchingApps in NSIS.template.in), Setup asks
+    // through Restart Manager - and then gives up on the update, while Qt drops spontaneous close
+    // events - a WM_CLOSE from the installer - for windows that are blocked by a modal widget
+    // (QGuiApplicationPrivate::processCloseEvent). An application modal message box here would
+    // therefore swallow the installer's one and only request.
     auto *notification = new QMessageBox(QMessageBox::Warning, tr("Update"),
-                                         tr("The update installer is already running and waits about a "
-                                            "minute for Cockatrice to close. Cockatrice is still busy, so "
-                                            "save your work and close it before then. Otherwise the "
-                                            "installer gives up and the update is cancelled."),
+                                         tr("The update installer is waiting for Cockatrice to close. "
+                                            "Cockatrice is still busy, so save your work and close it. "
+                                            "Otherwise the update cannot be installed and is cancelled."),
                                          QMessageBox::Ok, parentWidget());
     notification->setWindowModality(Qt::NonModal);
     notification->setAttribute(Qt::WA_DeleteOnClose);
@@ -275,19 +275,35 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
     QProcess process;
     process.setProgram(installerPath);
 
-    // NSIS needs the /D= argument to be an UNQUOTED string, even if it contains spaces. Qt likes to quote arguments if
-    // they contain spaces, so we use the windows exclusive QProcess::setNativeArguments in the only case where this is
-    // relevant, which preserves the argument unquoted.
-    //
-    // /PID= tells the installer which process to wait for before it replaces anything. We launch the installer first
-    // and only quit afterwards, so it starts while this process is still alive and still has every Qt runtime DLL
-    // mapped, and a mapped DLL cannot be deleted. Without the handle the installer can only poll for an image name and
-    // guess, and a wrong guess is what leaves the update writing new executables next to runtime files of the previous
-    // version, which fails on the next start with "The procedure entry point ... could not be located in the dynamic
-    // link library
-    // ...Qt6QuickWidgets.dll". /D= has to stay the last parameter, which is why it is last here too.
+    // One command line has to drive either installer, because a package can be built with either
+    // one and the client cannot tell which it downloaded:
+    //  - /R runs the NSIS installer silently and reinstalls over the existing installation. Setup
+    //    ignores the switches it does not know, and that covers /R, /PID= and /D=.
+    //  - /VERYSILENT and the switches around it are Setup's spelling of the same thing.
+    //    /CLOSEAPPLICATIONS lets Restart Manager close Cockatrice if this process is still shutting
+    //    down once Setup reaches the files, and /NOFORCECLOSEAPPLICATIONS keeps that from ever
+    //    forcing it: a window that refuses to close still cancels the update rather than losing the
+    //    user's work.
+    //  - /PID= tells the NSIS installer which process to wait for before it replaces anything. We
+    //    launch the installer first and only quit afterwards, so it starts while this process is
+    //    still alive and still has every Qt runtime DLL mapped, and a mapped DLL cannot be deleted.
+    //    Without the handle the installer can only poll for an image name and guess, and a wrong
+    //    guess is what leaves the update writing new executables next to runtime files of the
+    //    previous version, which fails on the next start with "The procedure entry point ... could
+    //    not be located in the dynamic link library ...Qt6QuickWidgets.dll". Setup ignores the
+    //    switch; Restart Manager releases the same handles, which is what /CLOSEAPPLICATIONS above
+    //    asks it to do.
+    //  - /UPDATER marks an install that the in-app updater launched. Both installers ignore it
+    //    while running, and only the Inno Setup package reads it: it is what lets the failure
+    //    hook offer the log of a silent update that did not finish, without ever putting a
+    //    message box in front of a package manager's silent install.
+    // NSIS honours /D= only as the last parameter and requires it unquoted even when it has spaces,
+    // so it stays last here and the whole line goes through QProcess::setNativeArguments.
 #ifdef Q_OS_WIN
-    process.setNativeArguments(QString("/R /PID=%1 /D=%2").arg(QCoreApplication::applicationPid()).arg(appDir));
+    process.setNativeArguments(QString("/R /PID=%1 /UPDATER /VERYSILENT /SUPPRESSMSGBOXES /NORESTART"
+                                       " /CLOSEAPPLICATIONS /NOFORCECLOSEAPPLICATIONS /D=%2")
+                                   .arg(QCoreApplication::applicationPid())
+                                   .arg(appDir));
 #else
     // Linux/macOS: normal argument passing (not relevant since they update differently.)
     process.setArguments({"/R", QString("/D=%1").arg(appDir)});
@@ -296,14 +312,13 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
     // Try to open the installer. If it opens, quit Cockatrice
     if (process.startDetached()) {
         qCInfo(DlgUpdateLog) << "Opened update installer successfully - closing Cockatrice";
-        // Close the main window synchronously so file locks are released before the NSIS installer
+        // Close the main window synchronously so file locks are released before the installer
         // (already launched) starts replacing files. This also flushes settings and shuts down the
         // tabs, but only when the close is actually accepted: MainWindow may veto it for a running
         // card DB update, an open game, or an unsaved deck, and closeForUpdate() also reports a
         // close already in progress (reached from a nested event loop while a shutdown prompt is
         // up). Only quit when the shutdown really ran - otherwise keep running so the user can
-        // resolve the blocker, and warn them that the installer only waits about a minute
-        // before it gives up and cancels the update.
+        // resolve the blocker, and warn them that the installer cannot finish until it closes.
         if (auto *window = qobject_cast<MainWindow *>(parent())) {
             if (window->closeForUpdate()) {
                 QTimer::singleShot(0, qApp, [] { QCoreApplication::exit(0); });
