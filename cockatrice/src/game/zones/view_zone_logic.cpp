@@ -162,6 +162,11 @@ void ZoneViewZoneLogic::removeCard(int position, bool toNewZone)
     reorganizeCards();
 }
 
+void ZoneViewZoneLogic::requestClose()
+{
+    emit closeView();
+}
+
 void ZoneViewZoneLogic::clearCards()
 {
     for (auto card : cards) {
