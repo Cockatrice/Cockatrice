@@ -250,7 +250,13 @@ message(STATUS "Update Translations: ${UPDATE_TRANSLATIONS}")
 
 include(FindQtRuntime)
 
+# Set once here for every target: these variables are inherited by the
+# subdirectories, so the per-directory copies were redundant. Only the
+# variables are set; qt_standard_project_setup would also change the runtime
+# output directories and the install RPATH.
 set(CMAKE_AUTOMOC TRUE)
+set(CMAKE_AUTOUIC TRUE)
+set(CMAKE_AUTORCC TRUE)
 
 # Find other needed libraries
 find_package(Protobuf CONFIG)
