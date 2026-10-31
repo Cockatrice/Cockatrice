@@ -824,4 +824,4 @@ if(Qt6LinguistTools_FOUND)
   endforeach()
 endif()
 
-qt6_finalize_target(cockatrice)
+qt_finalize_target(cockatrice)

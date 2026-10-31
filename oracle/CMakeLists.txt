@@ -319,4 +319,4 @@ if(Qt6LinguistTools_FOUND)
   endforeach()
 endif()
 
-qt6_finalize_target(oracle)
+qt_finalize_target(oracle)
