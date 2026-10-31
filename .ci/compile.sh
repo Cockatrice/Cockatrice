@@ -311,16 +311,22 @@ if [[ $RUNNER_OS == macOS ]]; then
 
   if [[ $MAKE_PACKAGE ]]; then
     # Workaround https://github.com/actions/runner-images/issues/7522
-    # have hdiutil repeat the command 10 times in hope of success
+    # have hdiutil repeat the command 10 times in hope of success.
+    # The wrapper has to exit non-zero once it gives up: CPack reads that status to
+    # decide whether the disk image was created, so a zero exit turns a failed hdiutil
+    # into a much later, misleading "Problem copying the package" error that hides
+    # hdiutil's own message.
     hdiutil_script="/tmp/hdiutil.sh"
     # shellcheck disable=SC2016
     echo '#!/bin/bash
+    attempts=10
     i=0
     while ! hdiutil "$@"; do
-      if (( ++i >= 10 )); then
-        echo "Error: hdiutil failed $i times!" >&2
-        break
+      if (( ++i >= attempts )); then
+        echo "Error: hdiutil failed $i times, giving up" >&2
+        exit 1
       fi
+      echo "hdiutil failed, retrying ($i/$attempts)" >&2
       sleep 1
     done' >"$hdiutil_script"
     chmod +x "$hdiutil_script"
