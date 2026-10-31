@@ -17,7 +17,7 @@ set(COCKATRICE_SENTRY_DSN
 )
 # Pinned stable release; tag verified at https://github.com/getsentry/sentry-native/tags.
 set(COCKATRICE_SENTRY_TAG
-    "0.17.3"
+    "0.17.5"
     CACHE STRING "sentry-native release tag to vendor via FetchContent"
 )
 
