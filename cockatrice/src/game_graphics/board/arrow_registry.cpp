@@ -1,7 +1,7 @@
 #include "arrow_registry.h"
 
-#include "../game_graphics/board/arrow_item.h"
-#include "board/arrow_data.h"
+#include "../../game/board/arrow_data.h"
+#include "arrow_item.h"
 
 #include <QSharedPointer>
 
