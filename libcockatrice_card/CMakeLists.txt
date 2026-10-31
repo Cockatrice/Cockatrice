@@ -21,11 +21,9 @@ set(HEADERS
     libcockatrice/card/relation/card_relation.h
 )
 
-qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-
 add_library(
   libcockatrice_card STATIC
-  ${MOC_SOURCES}
+  ${HEADERS}
   libcockatrice/card/card_info.cpp
   libcockatrice/card/card_info_comparator.cpp
   libcockatrice/card/card_localization.cpp
