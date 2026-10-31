@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cockatrice_carddatabase version="4">
+    <cards>
+        <card>
+            <name>Cat</name>
+            <set>CAT</set>
+            <tablerow>0</tablerow>
+            <text>Meow!</text>
+            <prop>
+                <muid>111</muid>
+                <colors>G</colors>
+                <manacost>2G</manacost>
+                <cmc>2</cmc>
+                <type>Creature — Cat</type>
+                <maintype>Creature</maintype>
+                <pt>3/3</pt>
+            </prop>
+        </card>
+        <card>
+            <name>Grizzly Bears</name>
+            <set>LEA</set>
+            <tablerow>0</tablerow>
+            <cipt>1</cipt>
+            <text></text>
+            <prop>
+                <muid>112</muid>
+                <colors>G</colors>
+                <manacost>1G</manacost>
+                <cmc>2</cmc>
+                <type>Creature — Bear</type>
+                <maintype>Creature</maintype>
+                <pt>2/2</pt>
+            </prop>
+        </card>
+        <card>
+            <name>Lightning Bolt</name>
+            <set>LEA</set>
+            <tablerow>3</tablerow>
+            <text>Lightning Bolt deals 3 damage to any target.</text>
+            <prop>
+                <muid>113</muid>
+                <colors>R</colors>
+                <manacost>R</manacost>
+                <cmc>1</cmc>
+                <type>Instant</type>
+                <maintype>Instant</maintype>
+            </prop>
+        </card>
+        <card>
+            <name>Forest</name>
+            <set>LEA</set>
+            <tablerow>2</tablerow>
+            <text>(Add G.)</text>
+            <prop>
+                <muid>114</muid>
+                <colors>G</colors>
+                <manacost></manacost>
+                <cmc>0</cmc>
+                <type>Land</type>
+                <maintype>Land</maintype>
+            </prop>
+        </card>
+    </cards>
+</cockatrice_carddatabase>
