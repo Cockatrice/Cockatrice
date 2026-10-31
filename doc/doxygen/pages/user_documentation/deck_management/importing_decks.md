@@ -70,4 +70,4 @@ confirm.
 
 The action will automatically import the deck from the online service without any other required user action.
 
-Currently supported services are Archidekt, Deckstats, Moxfield, and TappedOut.
+Currently supported services are Archidekt, Deckstats, ManaBox, Moxfield, and TappedOut.
