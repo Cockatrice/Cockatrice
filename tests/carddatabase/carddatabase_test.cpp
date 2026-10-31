@@ -647,6 +647,28 @@ TEST_F(CardDatabaseCacheInvalidationTest, ClearReleasesCards)
     EXPECT_TRUE(weakCard.isNull()) << "clear() must release cards held by set membership";
 }
 
+TEST_F(CardDatabaseCacheInvalidationTest, RemoveCardDetachesItFromItsSet)
+{
+    // removeCard() is the one teardown path a caller can trigger for a single card (the token editor
+    // uses it). Without the detach the set's strong reference keeps the removed card alive forever.
+    NoopCardPreferenceProvider prefs;
+    SandboxPathProvider pathProvider(root);
+    CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
+
+    db.loadCardDatabases();
+    CardInfoPtr card = db.getCardList().value("Cat");
+    ASSERT_FALSE(card.isNull());
+    const CardSetPtr catSet = db.getSet("CAT");
+    ASSERT_TRUE(catSet->contains(card));
+
+    db.removeCard(card);
+
+    EXPECT_FALSE(catSet->contains(card)) << "removeCard() must detach the card from its set";
+    QWeakPointer<CardInfo> weakCard(card);
+    card.clear();
+    EXPECT_TRUE(weakCard.isNull()) << "a removed card must not stay alive through its set";
+}
+
 TEST_F(CardDatabaseCacheInvalidationTest, RemoveSelfPointerStillNotifiesDatabaseCard)
 {
     // cardInfoChanged() used to be emitted through a self pointer stored on the card. Without it the
