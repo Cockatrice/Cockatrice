@@ -490,7 +490,7 @@ if(APPLE)
   set(cockatrice_SOURCES ${cockatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 endif(APPLE)
 
-qt6_add_resources(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
+qt_add_resources(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
 
 # Declare path variables
 set(ICONDIR
@@ -511,7 +511,7 @@ set(COCKATRICE_MAC_QM_INSTALL_DIR "cockatrice.app/Contents/Resources/translation
 set(COCKATRICE_UNIX_QM_INSTALL_DIR "share/cockatrice/translations")
 set(COCKATRICE_WIN32_QM_INSTALL_DIR "translations")
 
-qt6_add_executable(
+qt_add_executable(
   cockatrice
   WIN32
   MACOSX_BUNDLE
@@ -523,7 +523,7 @@ qt6_add_executable(
 
 target_precompile_headers(cockatrice PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtwidgets_pch.h")
 
-qt6_add_shaders(
+qt_add_shaders(
   cockatrice
   "onboarding_shaders"
   PREFIX
@@ -535,7 +535,7 @@ qt6_add_shaders(
   src/interface/widgets/onboarding/shaders/brand_plate.frag
 )
 
-qt6_add_resources(
+qt_add_resources(
   cockatrice
   "onboarding_qml"
   PREFIX
@@ -768,7 +768,7 @@ endif()
 if(Qt6LinguistTools_FOUND)
   #Qt6 Translations happen after the executable is built up
   if(UPDATE_TRANSLATIONS)
-    qt6_add_translations(
+    qt_add_translations(
       cockatrice
       TS_FILES
       ${cockatrice_TS}
@@ -778,7 +778,7 @@ if(Qt6LinguistTools_FOUND)
       cockatrice_QM
     )
   else()
-    qt6_add_translations(cockatrice TS_FILES ${cockatrice_TS} QM_FILES_OUTPUT_VARIABLE cockatrice_QM)
+    qt_add_translations(cockatrice TS_FILES ${cockatrice_TS} QM_FILES_OUTPUT_VARIABLE cockatrice_QM)
   endif()
 
   if(UNIX)
@@ -804,4 +804,4 @@ if(Qt6LinguistTools_FOUND)
   endforeach()
 endif()
 
-qt6_finalize_target(cockatrice)
+qt_finalize_target(cockatrice)
