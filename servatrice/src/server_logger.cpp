@@ -6,6 +6,7 @@
 #include <QFileInfo>
 #include <QForeach>
 #include <QIODevice>
+#include <QMutexLocker>
 #include <QTextStream>
 #include <QThread>
 #include <QtGlobal>
@@ -66,7 +67,9 @@ void ServerLogger::reloadConfig(bool _writeLog, const QString &_logFilters)
 
 bool ServerLogger::isLoggingEnabled() const
 {
-    return logFile != nullptr && settingsCache->value("server/writelog", 1).toBool();
+    // Mirror logMessage(): the console is an independent sink and the logfile needs writeLog.
+    QMutexLocker locker(&configMutex);
+    return logToConsole || (logFile != nullptr && writeLog);
 }
 
 void ServerLogger::logMessage(const QString &message, void *caller)
