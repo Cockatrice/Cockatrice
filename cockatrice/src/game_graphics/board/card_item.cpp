@@ -71,6 +71,10 @@ CardItem::CardItem(PlayerLogic *_owner,
         update();
     });
 
+    // The retyped logic layer drives CardState setters directly (bypassing the CardItem wrappers that called
+    // update()), so repaint on every state change: attacking, annotation, doesntUntap, P/T and counters.
+    connect(state, &CardState::stateChanged, this, [this] { update(); });
+
     connect(state, &CardState::viewDeleteRequested, this, &CardItem::deleteLater);
 }
 
@@ -233,7 +237,7 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
         if (state->getAttachedTo()->getZone() == nullptr) {
             deleteLater();
         } else {
-            emit state->getAttachedTo()->getZone()->cardAdded(this);
+            emit state->getAttachedTo()->getZone()->cardAdded(state);
             state->getAttachedTo()->addAttachedCard(this);
             if (state->getZone() != state->getAttachedTo()->getZone()) {
                 state->getAttachedTo()->getZone()->reorganizeCards();
@@ -245,7 +249,7 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
         if (state->getZone() == nullptr) {
             deleteLater();
         } else {
-            emit state->getZone()->cardAdded(this);
+            emit state->getZone()->cardAdded(state);
         }
     }
 
@@ -467,7 +471,7 @@ void CardItem::handleClickedToPlay(bool shiftHeld)
         if (SettingsCache::instance().userInterface().getClickPlaysAllSelected()) {
             emit hideSelected(this);
         } else {
-            state->getZone()->removeCard(this);
+            state->getZone()->removeCard(state);
         }
     } else {
         playCard(shiftHeld);
