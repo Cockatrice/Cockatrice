@@ -98,6 +98,28 @@ TEST(ServerLoggerTest, StaysQuietWhenConsoleIsDisabled)
     EXPECT_TRUE(capture.text().isEmpty()) << capture.text().toStdString();
 }
 
+TEST(ServerLoggerTest, IsLoggingEnabledMirrorsTheSinks)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+
+    // The console is a sink of its own: messages must not be discarded for want of a logfile.
+    {
+        ServerLogger logger(true, false, QString());
+        EXPECT_TRUE(logger.isLoggingEnabled());
+    }
+
+    // The logfile sink needs an open file and writelog; reloadConfig() carries the SIGHUP change.
+    {
+        ServerLogger logger(false, true, QString());
+        EXPECT_FALSE(logger.isLoggingEnabled()) << "no logfile is open yet";
+        logger.startLog(dir.filePath("enabled.log"));
+        EXPECT_TRUE(logger.isLoggingEnabled());
+        logger.reloadConfig(false, QString());
+        EXPECT_FALSE(logger.isLoggingEnabled()) << "writelog=false leaves no sink enabled";
+    }
+}
+
 TEST(ServerLoggerTest, WritesMatchingFilteredMessagesToTheLogFile)
 {
     QTemporaryDir dir;

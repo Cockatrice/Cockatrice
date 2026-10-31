@@ -41,7 +41,7 @@ private:
     bool messageFilterActive = false;
     QStringList logFilters;
     // Guards writeLog/messageFilterActive/logFilters: SIGHUP rewrites them while other threads log.
-    QMutex configMutex;
+    mutable QMutex configMutex;
     QFile *logFile = nullptr;
     bool flushRunning;
     QStringList buffer;
