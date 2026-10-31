@@ -57,12 +57,16 @@ Var HolderFound
 ; whether the payload is free, while the abort dialog reports what survived.
 Var GuardExit
 Var GuardOutput
-; Whether the guard has already asked Cockatrice to close by itself: 0 before the automatic
-; close, 1 after it. The prompt that follows offers to end the instance rather than asking
-; a second time (see GuardAppsNotRunning).
-Var GuardCloseTried
-; The question CockEndPrompt assembles: fixed sentences around the probe's line, and the
-; result has to stay inside the characters one NSIS string holds.
+; How many times the guard has asked the payload programs to close by itself. Bounded, and
+; only repeated while the listing changed between rounds (see GuardAppsNotRunning).
+Var GuardCloseRounds
+; The listing the last automatic close was sent against, so a second round is spent only
+; when something actually exited and the rest is worth asking again. Empty before round one.
+Var GuardLastHolders
+; How many times the user asked to check again after closing programs by hand (logged only).
+Var GuardRecheckCount
+; The question CockEndPrompt/CockEndRecheckPrompt assemble: fixed sentences around the
+; probe's line, and the result has to stay inside the characters one NSIS string holds.
 Var GuardPrompt
 Var WaitPid
 Var LauncherExited
@@ -1029,11 +1033,14 @@ FunctionEnd
 ; Nothing is force-stopped without the user asking for it: Cockatrice may be holding
 ; an unsaved deck or showing a "really leave this game?" confirmation, Oracle writes
 ; the card database in place and can be killed mid-write, and Servatrice may be serving
-; a game. A close is a request (WM_CLOSE), made automatically once because that is what
-; the user started the installer to do, and only Cockatrice can answer one - the other
-; two have no window. When the close is not answered the user is told which program is
-; in the way and is offered to end all three themselves - the last resort, with what it
-; costs spelled out in the prompt.
+; a game. A close is a request, made automatically because that is what the user started
+; the installer to do: the probe first asks every instance over its local socket, which
+; reaches a hidden window and an instance sitting on its own confirmation, and falls back
+; to WM_CLOSE for an older client. The automatic close is retried while the set of holders
+; changes, so one instance exiting does not leave the next one unasked. When a close is
+; still not answered the user is told which program is in the way and is offered to force
+; close all three, check again after closing them by hand, or abort - the last resort, with
+; what it costs spelled out in the prompt.
 
 ; One sentence for every prompt whose Yes ends the whole set, so that answer reads the same
 ; wherever the user meets it: this guard before anything is replaced, the uninstaller's, and
@@ -1045,9 +1052,15 @@ FunctionEnd
 ; where the answer to "why did it stop" ends up.
 !define AFTER_CLOSING_GUIDANCE "Answer the confirmation Cockatrice may be showing - open it from the notification area if it is hidden there - and use Task Manager for a program that would not end."
 
+; The escape hatch for a user who would rather not force-close anything: the same release,
+; downloaded and run by hand once Cockatrice is closed. Every abort dialog shows this and
+; offers to open the page, so an update that cannot free the files still leaves the user a
+; way forward that does not end in Task Manager.
+!define LATEST_RELEASE_URL "https://github.com/Cockatrice/Cockatrice/releases/latest"
+!define MANUAL_UPDATE_GUIDANCE "To update safely instead, close Cockatrice and download the latest installer from:$\r$\n${LATEST_RELEASE_URL}$\r$\nThen run it manually."
+
 ; usage: set the variable named by the second argument to the probe's listing, then call
-; this. Sets $GuardPrompt to the question the guard, the uninstaller's guard and the
-; recovery path all ask.
+; this. Sets $GuardPrompt to the question the guard and the recovery path ask.
 ;
 ; One macro rather than three copies, because the wording is a promise: Yes ends the
 ; programs the payload installs - which is exactly the set EndHolders acts on - and anything
@@ -1055,9 +1068,9 @@ FunctionEnd
 ; service hosted elsewhere does not come with an answer that cannot do what it says.
 ;
 ; Two answers, one of each: the automatic close already ran when this is asked, so Yes is the
-; only thing left that can free the files and No stops the run. There is deliberately no
-; "try again" - the same question, word for word, with nothing changed in between was what
-; made an abort out of a stall.
+; only thing left that can free the files and No stops the run. The guard itself uses
+; CockEndRecheckPrompt instead, whose No checks again; this one stays for the recovery path,
+; where a retry cannot change anything because the purge was already retried.
 ;
 ; The assembled string has to fit the characters one NSIS string holds, which is what
 ; bounds HOLDER_LINE_CHAR_MAX in tools\installer-holder-probe\holder_line.h: with the
@@ -1069,7 +1082,29 @@ FunctionEnd
 ; @param cancelWord what No gives up, "installation" or "uninstallation"
 !macro CockEndPrompt header listing cancelWord
     StrCpy $GuardPrompt "${header}$\r$\n$\r$\n${listing}"
-    StrCpy $GuardPrompt "$GuardPrompt$\r$\n$\r$\nChoose Yes to end the Cockatrice, Oracle and Servatrice programs listed above. ${END_COST}$\r$\n$\r$\nChoose No to cancel the ${cancelWord}. ${AFTER_CLOSING_GUIDANCE}"
+    StrCpy $GuardPrompt "$GuardPrompt$\r$\n$\r$\nChoose Yes to force close the Cockatrice, Oracle and Servatrice programs listed above. ${END_COST}$\r$\n$\r$\nChoose No to cancel the ${cancelWord}. ${AFTER_CLOSING_GUIDANCE}"
+!macroend
+
+; usage: like CockEndPrompt, for a MB_YESNOCANCEL question whose No checks again.
+;
+; The automatic close has already run, so the three answers are what is left: force close
+; the programs the payload installs (Yes), close them by hand and check again (No), or stop
+; the run (Cancel). No used to be the only alternative to ending them, which meant a user who
+; would rather close the instance themselves had to abandon the update and start the
+; installer again. The listing the question is asked with is refreshed on every pass, so the
+; question changes as programs go away instead of repeating itself word for word.
+;
+; The manual-update guidance lives in the abort dialog, which is where a Cancel ends up, not
+; in this prompt. With the longest listing HOLDER_LINE_CHAR_MAX allows, the assembled string
+; stays under 900 characters, inside the 1024 one NSIS string holds, so the Cancel line is
+; never the part that gets cut off.
+;
+; @param header the sentence that introduces the listing, with its trailing colon
+; @param listing the variable holding the probe's line, $GuardOutput
+; @param cancelWord what Cancel gives up, "installation" or "uninstallation"
+!macro CockEndRecheckPrompt header listing cancelWord
+    StrCpy $GuardPrompt "${header}$\r$\n$\r$\n${listing}"
+    StrCpy $GuardPrompt "$GuardPrompt$\r$\n$\r$\nChoose Yes to force close the Cockatrice, Oracle and Servatrice programs listed above. ${END_COST}$\r$\n$\r$\nChoose No to close them yourself, then check again - answer the confirmation Cockatrice may be showing, and open it from the notification area if it is hidden there.$\r$\n$\r$\nChoose Cancel to abort the ${cancelWord}."
 !macroend
 
 ; Emitted once for the installer and once for the uninstaller: the uninstaller
@@ -1113,12 +1148,13 @@ FunctionEnd
 ; cockatrice.exe is asked: Oracle writes the card database in place and Servatrice has no
 ; window to ask, so both are left alone here and only ended by the explicit answer.
 ;
-; Each instance's own window is asked to close with WM_CLOSE - whether it is on screen or
-; only in the notification area, since the request does not need a visible window and the
-; notification-area instance is the one this update has no other way to reach. A visible
-; window is brought forward first. WM_CLOSE is answered, not obeyed - Cockatrice asks before
-; it quits while a card database update is running, a game is open or a deck is unsaved - and
-; that question is only useful if it is in front of the installer instead of behind it.
+; Each instance is asked to close over the local socket it listens on, which is the same
+; request as clicking its close button and reaches one whose window is hidden in the
+; notification area or is sitting on its own confirmation. A client from before that socket
+; is asked with WM_CLOSE on its own window instead, and a visible window is brought forward
+; first. Either way the close is answered, not obeyed - Cockatrice asks before it quits while
+; a card database update is running, a game is open or a deck is unsaved - and that question
+; is only useful if it is in front of the installer instead of behind it.
 ;
 ; The probe waits up to 30 s for the processes it asked to exit, so the check that follows
 ; measures a settled directory rather than sleeping for a fixed time. Its line goes into the
@@ -1189,7 +1225,9 @@ FunctionEnd
 ; that has nothing to report stays silent.
 Function GuardAppsNotRunning
     !insertmacro CockLog "guard: checking $GuardDir (launcherExited=$LauncherExited)"
-    StrCpy $GuardCloseTried 0
+    StrCpy $GuardCloseRounds 0
+    StrCpy $GuardRecheckCount 0
+    StrCpy $GuardLastHolders ""
     guard_check:
     Call RunHolderProbe
     ${If} $GuardExit == "0"
@@ -1199,26 +1237,40 @@ Function GuardAppsNotRunning
     ${EndIf}
     ${If} $GuardExit == "1"
         !insertmacro CockLog "guard: still in use by $GuardOutput"
-        ; Close it for the user first. The probe knows exactly which cockatrice.exe holds
-        ; these files, and asking it to close is the same request as clicking the window's
-        ; close button - the application still answers its own "really quit?" prompt, so
-        ; nothing is lost. One attempt per guard call keeps the common case (the client was
-        ; still shutting down) from turning into a question, without hiding the case where
-        ; the close did not help: the pass after it names what is still holding the files.
-        ${If} $GuardCloseTried = 0
-            StrCpy $GuardCloseTried 1
-            !insertmacro CockLog "guard: asking cockatrice to close, then checking again"
+        ; Close it for the user first. The probe asks every instance over its local socket
+        ; and falls back to WM_CLOSE for an older client, so this is the same request as
+        ; clicking the window's close button: the application still answers its own "really
+        ; quit?" prompt, so nothing is lost. A second round is spent only when the listing
+        ; changed, which means something exited and the rest is worth asking again; repeating
+        ; the same request against the same processes cannot change anything.
+        ${If} $GuardCloseRounds < 2
+        ${AndIf} $GuardOutput != $GuardLastHolders
+            StrCpy $GuardLastHolders $GuardOutput
+            IntOp $GuardCloseRounds $GuardCloseRounds + 1
+            !insertmacro CockLog "guard: asking the payload programs to close (round $GuardCloseRounds)"
             Call CloseHolders
             Goto guard_check
         ${EndIf}
         DetailPrint "The install directory is in use by: $GuardOutput"
-        ; The close ran and did not free the files, so ending them is the only thing left that
-        ; can - and that is the one question, asked once. Its other answer stops the run
-        ; instead of asking again: a second identical dialog, with nothing changed in between,
-        ; is what made users cancel an update the installer could have finished by itself.
-        !insertmacro CockEndPrompt "Cockatrice, Oracle or Servatrice is still using files of the installation:" $GuardOutput "installation"
-        MessageBox MB_YESNO|MB_ICONEXCLAMATION|MB_DEFBUTTON2 "$GuardPrompt" IDYES guard_end
-        !insertmacro CockLog "guard: cancelled by user"
+        ; The close ran and did not free the files. Force-closing them is what the installer
+        ; can do (Yes); closing them by hand is what the user can do (No checks again, with
+        ; the fresh listing); Cancel stops the run and the abort dialog offers the same
+        ; update from the official download page. Without the middle answer a user who did
+        ; not want anything killed had no way forward but to abandon the update.
+        guard_ask:
+        !insertmacro CockEndRecheckPrompt "Cockatrice, Oracle or Servatrice is still using files of the installation:" $GuardOutput "installation"
+        MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON2 "$GuardPrompt" IDYES guard_end IDNO guard_recheck
+        Goto guard_cancel
+        guard_recheck:
+        IntOp $GuardRecheckCount $GuardRecheckCount + 1
+        !insertmacro CockLog "guard: user closed programs by hand, checking again (recheck $GuardRecheckCount)"
+        ; A fresh set gets a fresh automatic close, exactly as if the guard had just started:
+        ; what the user closed by hand may have been one instance of several.
+        StrCpy $GuardCloseRounds 0
+        StrCpy $GuardLastHolders ""
+        Goto guard_check
+        guard_cancel:
+        !insertmacro CockLog "guard: cancelled by user after $GuardRecheckCount recheck(s)"
         StrCpy $AbortReason \
             "The installation was cancelled because Cockatrice, Oracle or Servatrice is still running and holding files of the previous version.$\r$\n$\r$\n${AFTER_CLOSING_GUIDANCE}$\r$\n$\r$\nClose them and run the installer again."
         ; RemoveOldPayloadLeftovers runs with the pre-uninstall backup already taken;
@@ -1295,7 +1347,18 @@ FunctionEnd
 Function AbortInstall
     !insertmacro CockLog "ABORT: $AbortReason"
     !insertmacro CockLog "full installer log: $InstallLogPath"
-    MessageBox MB_OK|MB_ICONEXCLAMATION "$AbortReason$\r$\n$\r$\nA detailed installer log was written to:$\r$\n$InstallLogPath"
+    !insertmacro CockLog "manual update: ${LATEST_RELEASE_URL}"
+    ; The reason names what stopped the run; the manual-update paragraph is the way forward
+    ; that does not need this installer to free anything. Shown in every mode, exactly like
+    ; the reason, because a /R upgrade has nobody watching its exit code.
+    MessageBox MB_OK|MB_ICONEXCLAMATION "$AbortReason$\r$\n$\r$\n${MANUAL_UPDATE_GUIDANCE}$\r$\n$\r$\nA detailed installer log was written to:$\r$\n$InstallLogPath"
+    ; Offer the page as well: copying a URL out of a message box is a step users skip.
+    ; explorer.exe hands the URL to the already-running shell, so the browser opens at the
+    ; user's integrity level rather than as the elevated installer.
+    MessageBox MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2 "Open the download page now?$\r$\n$\r$\n${LATEST_RELEASE_URL}" IDNO abort_no_link
+    !insertmacro CockLog "manual update: opening the download page"
+    Exec '"$WINDIR\explorer.exe" "${LATEST_RELEASE_URL}"'
+    abort_no_link:
     ; Offer to send the installer log to Sentry so aborted installs can be diagnosed.
     ; Only a package built with a baked DSN offers to send, so the prompt can only appear
     ; when a send can actually go out. A preprocessor guard rather than a runtime test: a
@@ -1995,7 +2058,9 @@ Function un.EnsureAppsNotRunning
 FunctionEnd
 
 Function un.GuardAppsNotRunning
-    StrCpy $GuardCloseTried 0
+    StrCpy $GuardCloseRounds 0
+    StrCpy $GuardRecheckCount 0
+    StrCpy $GuardLastHolders ""
     un_guard_check:
     !insertmacro CockLogUn "uninst-guard: checking $GuardDir"
     Call un.RunHolderProbe
@@ -2005,24 +2070,36 @@ Function un.GuardAppsNotRunning
     ${EndIf}
     ${If} $GuardExit == "1"
         !insertmacro CockLogUn "uninst-guard: still in use by $GuardOutput"
-        ; Same convenience as in the installer: ask Cockatrice to close once, then report
-        ; what the close could not reach.
-        ${If} $GuardCloseTried = 0
-            StrCpy $GuardCloseTried 1
-            !insertmacro CockLogUn "uninst-guard: asking cockatrice to close, then checking again"
+        ; Same convenience as in the installer: ask every instance to close, repeat only
+        ; while the set changed, then report what the close could not reach.
+        ${If} $GuardCloseRounds < 2
+        ${AndIf} $GuardOutput != $GuardLastHolders
+            StrCpy $GuardLastHolders $GuardOutput
+            IntOp $GuardCloseRounds $GuardCloseRounds + 1
+            !insertmacro CockLogUn "uninst-guard: asking the payload programs to close (round $GuardCloseRounds)"
             Call un.CloseHolders
             Goto un_guard_check
         ${EndIf}
         DetailPrint "The install directory is in use by: $GuardOutput"
-        ; Same question as in the installer's guard, and the same two answers: Yes ends the
-        ; programs the payload installs, anything else stops the uninstallation. Asking again
-        ; after a No only repeated the dialog. CockEndPrompt words it, so this copy and the
-        ; installer's promise the same thing.
-        !insertmacro CockEndPrompt "Cockatrice, Oracle or Servatrice is still using files of the installation:" $GuardOutput "uninstallation"
-        MessageBox MB_YESNO|MB_ICONEXCLAMATION|MB_DEFBUTTON2 "$GuardPrompt" IDYES un_guard_end
-        !insertmacro CockLogUn "uninst-guard: cancelled by user"
+        ; Same question and the same three answers as the installer's guard: force close,
+        ; close by hand and check again, or abort. CockEndRecheckPrompt words it, so the two
+        ; copies promise the same thing.
+        !insertmacro CockEndRecheckPrompt "Cockatrice, Oracle or Servatrice is still using files of the installation:" $GuardOutput "uninstallation"
+        MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON2 "$GuardPrompt" IDYES un_guard_end IDNO un_guard_recheck
+        !insertmacro CockLogUn "uninst-guard: cancelled by user after $GuardRecheckCount recheck(s)"
+        ; The installer's Cancel lands in AbortInstall, which explains what to do next. The
+        ; uninstaller has no such dialog, so say the same thing here: a bare Abort would
+        ; close the window and leave the user with no reason and no next step.
+        MessageBox MB_OK|MB_ICONEXCLAMATION \
+            "The uninstallation was cancelled because Cockatrice, Oracle or Servatrice is still running and holding files of the installation.$\r$\n$\r$\n${AFTER_CLOSING_GUIDANCE}$\r$\n$\r$\nClose them and run the uninstaller again."
         SetErrorLevel 1
         Abort
+        un_guard_recheck:
+        IntOp $GuardRecheckCount $GuardRecheckCount + 1
+        !insertmacro CockLogUn "uninst-guard: user closed programs by hand, checking again (recheck $GuardRecheckCount)"
+        StrCpy $GuardCloseRounds 0
+        StrCpy $GuardLastHolders ""
+        Goto un_guard_check
         ; Only reached through Yes: Abort does not return.
         un_guard_end:
         !insertmacro CockLogUn "uninst-guard: ending the payload programs on request, then checking again"
