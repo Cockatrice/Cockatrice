@@ -55,6 +55,10 @@ if(USE_CCACHE AND NOT WIN32)
     # PCH-aware caching, matching .ci/compile.sh: without this ccache refuses
     # to cache any TU that consumes a precompiled header, so every PCH-backed
     # target recompiles from scratch on each build.
+    # The include_file_mtime/include_file_ctime entries that CI also sets are
+    # deliberately not set here: --set-config writes the user's global
+    # ccache.conf, and those two would turn off the modified-during-compile
+    # check for every project on the machine, not just this one.
     execute_process(COMMAND ${CCACHE_PROGRAM} --set-config sloppiness=pch_defines,time_macros)
     message(STATUS "Found CCache ${CCACHE_PROGRAM}")
   endif()
