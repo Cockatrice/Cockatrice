@@ -14,6 +14,7 @@
 #include <QList>
 #include <QObject>
 #include <QPointF>
+#include <QPointer>
 #include <QRectF>
 #include <qtmetamacros.h>
 
@@ -24,7 +25,8 @@ class AbstractCardDragItem : public QObject, public QGraphicsItem
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
 protected:
-    AbstractCardItem *item;
+    /// Guarded pointer: the source card may be destroyed while this drag item still exists.
+    QPointer<AbstractCardItem> item;
     QPointF hotSpot;
     QList<AbstractCardDragItem *> childDrags;
 
@@ -44,10 +46,8 @@ public:
     }
     [[nodiscard]] QPainterPath shape() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    [[nodiscard]] AbstractCardItem *getItem() const
-    {
-        return item;
-    }
+    /// @return the source card, or nullptr if it has already been destroyed.
+    [[nodiscard]] AbstractCardItem *getItem() const;
     [[nodiscard]] QPointF getHotSpot() const
     {
         return hotSpot;

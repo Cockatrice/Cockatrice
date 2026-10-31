@@ -217,6 +217,9 @@ void TableZone::handleDropEventByGrid(const QList<CardDragItem *> &dragItems,
     cmd.set_y(gridPoint.y());
 
     for (const auto &item : dragItems) {
+        if (item->getItem() == nullptr) {
+            continue; // source card was destroyed mid-drag
+        }
         CardToMove *ctm = cmd.mutable_cards_to_move()->add_card();
         ctm->set_card_id(item->getId());
         if (item->isForceFaceDown()) {

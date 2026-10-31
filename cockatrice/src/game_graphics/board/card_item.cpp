@@ -83,6 +83,15 @@ void CardItem::prepareDelete()
         state->getAttachedTo()->removeAttachedCard(this);
         state->setAttachedTo(nullptr);
     }
+
+    // Detach any in-progress drag item now so it cannot be painted after this card is destroyed.
+    if (dragItem) {
+        dragItem->hide();
+        if (dragItem->scene()) {
+            dragItem->scene()->removeItem(dragItem);
+        }
+        deleteDragItem();
+    }
 }
 
 void CardItem::deleteLater()
