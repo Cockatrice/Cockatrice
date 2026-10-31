@@ -1,8 +1,6 @@
 #include "select_zone.h"
 
 #include "../../client/settings/cache_settings.h"
-#include "../../game/board/card_list.h"
-#include "../../game/zones/card_zone_logic.h"
 #include "../board/card_item.h"
 #include "../game_scene.h"
 
@@ -17,6 +15,8 @@
 #include <QTransform>
 #include <QtGlobal>
 #include <QtMath>
+#include <libcockatrice/game/board/card_list.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <qnamespace.h>
 #include <qnumeric.h>

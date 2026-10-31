@@ -2,8 +2,6 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../../client/settings/card_counter_settings.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_logic.h"
 #include "../../interface/widgets/utility/get_text_with_max.h"
 #include "../board/abstract_counter.h"
 #include "../board/card_item.h"
@@ -18,6 +16,8 @@
 #include <QInputDialog>
 #include <QLineEdit>
 #include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_logic.h>
 #include <libcockatrice/utility/string_limits.h>
 
 PlayerDialogs::PlayerDialogs(PlayerGraphicsItem *_player, PlayerActions *_playerActions)
@@ -35,7 +35,7 @@ PlayerDialogs::PlayerDialogs(PlayerGraphicsItem *_player, PlayerActions *_player
             &PlayerDialogs::onShuffleBottomDialogRequested);
 
     connect(playerActions, &PlayerActions::requestMulliganDialog, this, &PlayerDialogs::onMulliganDialogRequested);
-
+    connect(playerActions, &PlayerActions::startingHandSizeChosen, this, &PlayerDialogs::onStartingHandSizeChosen);
     connect(playerActions, &PlayerActions::requestDrawCardsDialog, this, &PlayerDialogs::onDrawCardsDialogRequested);
 
     connect(playerActions, &PlayerActions::requestMoveTopCardsToDialog, this,
@@ -125,6 +125,11 @@ void PlayerDialogs::onMulliganDialogRequested(int startSize, int handSize, int d
     if (ok) {
         playerActions->actMulligan(number);
     }
+}
+
+void PlayerDialogs::onStartingHandSizeChosen(int number)
+{
+    SettingsCache::instance().userInterface().setStartingHandSize(number);
 }
 
 void PlayerDialogs::onDrawCardsDialogRequested(int defaultNumberTopCards, int deckSize)

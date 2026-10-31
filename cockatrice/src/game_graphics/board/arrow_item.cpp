@@ -2,11 +2,6 @@
 #include "arrow_item.h"
 
 #include "../../client/settings/cache_settings.h"
-#include "../../game/board/arrow_data.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_info.h"
-#include "../../game/player/player_logic.h"
-#include "../../game/zones/card_zone_logic.h"
 #include "../game_scene.h"
 #include "../player/player_target.h"
 #include "../z_values.h"
@@ -27,6 +22,11 @@
 #include <QTransform>
 #include <QtGlobal>
 #include <QtMath>
+#include <libcockatrice/game/board/arrow_data.h>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_info.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <math.h>

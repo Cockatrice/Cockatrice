@@ -18,6 +18,9 @@ class QString;
 template <class Key, class T> class QMap;
 template <typename T> class QList;
 
+class ICardPreferenceProvider;
+class IInterfaceSettingsProvider;
+
 class Game : public AbstractGame
 {
     Q_OBJECT
@@ -27,7 +30,9 @@ public:
          bool isLocalGame,
          QList<AbstractClient *> &_clients,
          const Event_GameJoined &event,
-         const QMap<int, QString> &_roomGameTypes);
+         const QMap<int, QString> &_roomGameTypes,
+         IInterfaceSettingsProvider *interfaceSettings = nullptr,
+         ICardPreferenceProvider *cardPreferences = nullptr);
 };
 
 #endif // COCKATRICE_GAME_H

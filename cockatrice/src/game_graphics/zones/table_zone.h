@@ -7,7 +7,6 @@
 #ifndef TABLEZONE_H
 #define TABLEZONE_H
 
-#include "../../game/zones/table_zone_logic.h"
 #include "../animated_item.h"
 #include "../card_dimensions.h"
 #include "select_zone.h"
@@ -18,6 +17,7 @@
 #include <QPoint>
 #include <QPointF>
 #include <QtGlobal>
+#include <libcockatrice/game/zones/table_zone_logic.h>
 #include <qtmetamacros.h>
 
 class CardDragItem;
