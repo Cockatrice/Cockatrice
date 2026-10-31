@@ -6,10 +6,6 @@
 
 namespace
 {
-/// The payload programs, by image name. A process running one of these is what the guard
-/// exists to name, so askingProcessIds() stops its walk up the parent chain at one.
-constexpr const wchar_t *PAYLOAD_PROGRAMS[] = {L"cockatrice.exe", L"oracle.exe", L"servatrice.exe"};
-
 /// Compares two file names the way the file system does, without a locale.
 ///
 /// Only the names above are ever compared against, and all of them are ASCII, so folding

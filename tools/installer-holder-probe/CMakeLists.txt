@@ -6,7 +6,8 @@
 # it links nothing from this project: no Qt, and a static C runtime because the installed
 # runtime is exactly what the purge may have failed to replace.
 add_executable(
-  installer-holder-probe close_holders.cpp holder_line.cpp main.cpp payload_paths.cpp restart_manager_holders.cpp
+  installer-holder-probe close_holders.cpp holder_line.cpp main.cpp payload_locks.cpp payload_paths.cpp
+                         restart_manager_holders.cpp
 )
 
 target_link_libraries(installer-holder-probe PRIVATE rstrtmgr)
