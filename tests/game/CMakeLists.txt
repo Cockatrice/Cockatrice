@@ -7,6 +7,7 @@ cockatrice_add_test(
   card_zone_logic_test.cpp
   game_event_handler_test.cpp
   player_actions_test.cpp
+  replay_test.cpp
   ${VERSION_STRING_CPP}
   LIBS
   libcockatrice_game
