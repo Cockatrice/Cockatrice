@@ -113,6 +113,15 @@ void GameScene::retranslateUi()
     }
 }
 
+QList<CardState *> GameScene::selectedCardStates() const
+{
+    QList<CardState *> selectedStates;
+    for (auto *card : selectedCards()) {
+        selectedStates.append(card->getState());
+    }
+    return selectedStates;
+}
+
 QList<CardItem *> GameScene::selectedCards() const
 {
     QList<CardItem *> selectedCards;
@@ -235,7 +244,7 @@ void GameScene::playSelected(AbstractCardItem *card)
     if (!card->getOwner()) {
         return;
     }
-    card->getOwner()->getPlayerActions()->actPlay(selectedCards());
+    card->getOwner()->getPlayerActions()->actPlay(selectedCardStates());
 }
 
 void GameScene::playSelectedFaceDown(AbstractCardItem *card)
@@ -246,7 +255,7 @@ void GameScene::playSelectedFaceDown(AbstractCardItem *card)
     if (!card->getOwner()) {
         return;
     }
-    card->getOwner()->getPlayerActions()->actPlayFacedown(selectedCards());
+    card->getOwner()->getPlayerActions()->actPlayFacedown(selectedCardStates());
 }
 
 void GameScene::hideSelected(AbstractCardItem *card)
@@ -257,7 +266,7 @@ void GameScene::hideSelected(AbstractCardItem *card)
     if (!card->getOwner()) {
         return;
     }
-    card->getOwner()->getPlayerActions()->actHide(selectedCards());
+    card->getOwner()->getPlayerActions()->actHide(selectedCardStates());
 }
 
 /**
