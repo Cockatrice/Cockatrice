@@ -1,7 +1,9 @@
 #include "card_zone_logic.h"
 
 #include "../../client/translation.h"
-#include "../../game_graphics/board/card_item.h"
+#include "../../game_graphics/zones/card_zone.h"
+#include "../board/card_list.h"
+#include "../board/card_state.h"
 #include "../player/player_actions.h"
 #include "../player/player_info.h"
 #include "../player/player_logic.h"
@@ -50,10 +52,15 @@ void CardZoneLogic::addCard(CardState *card, const bool reorganize, const int x,
 
     for (auto *viewLogic : views) {
         if (viewLogic->prepareAddCard(x)) {
-            auto copy = new CardItem(player, nullptr, card->getCardRef(), card->getId());
-            copy->setFaceDown(card->getFaceDown());
-
-            viewLogic->addCard(copy->getState(), reorganize, x, y);
+            ServerInfo_Card cardInfo;
+            const CardRef &cardRef = card->getCardRef();
+            cardInfo.set_name(cardRef.name.toStdString());
+            cardInfo.set_provider_id(cardRef.providerId.toStdString());
+            cardInfo.set_id(card->getId());
+            cardInfo.set_face_down(card->getFaceDown());
+            cardInfo.set_x(x);
+            cardInfo.set_y(y);
+            emit viewLogic->createCardRequested(cardInfo, reorganize);
         }
     }
 
@@ -168,9 +175,9 @@ void CardZoneLogic::clearContents()
     for (CardState *card : toClear) {
         // If an incorrectly implemented server doesn't return attached cards to whom they belong before dropping a
         // player, we have to return them to avoid a crash.
-        const QList<CardItem *> &attachedCards = card->getAttachedCards();
-        for (CardItem *attachedCard : attachedCards) {
-            emit attachedCard->getZone()->cardAdded(attachedCard->getState());
+        const QList<CardState *> &attachedCards = card->getAttachedCards();
+        for (CardState *attachedCard : attachedCards) {
+            emit attachedCard->getZone()->cardAdded(attachedCard);
         }
     }
 

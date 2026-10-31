@@ -1,8 +1,9 @@
 #include "player_logic.h"
 
-#include "../../game_graphics/board/card_item.h"
 #include "../abstract_game.h"
 #include "../board/arrow_data.h"
+#include "../board/card_list.h"
+#include "../board/card_state.h"
 #include "../board/counter_state.h"
 #include "../game_meta_info.h"
 #include "../zones/hand_zone_logic.h"
@@ -32,11 +33,6 @@
 #include <libcockatrice/utility/color.h>
 #include <qalgorithms.h>
 #include <string>
-
-static CardItem *toCardItem(CardState *card)
-{
-    return card == nullptr ? nullptr : qobject_cast<CardItem *>(card->parent());
-}
 
 PlayerLogic::PlayerLogic(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent)
     : QObject(_parent), game(_parent), playerInfo(new PlayerInfo(info, _id, _local, _judge)),
@@ -177,22 +173,20 @@ void PlayerLogic::processPlayerInfo(const ServerInfo_Player &info)
         const int cardListSize = zoneInfo.card_list_size();
         if (!cardListSize) {
             for (int j = 0; j < zoneInfo.card_count(); ++j) {
-                zone->addCard((new CardItem(this))->getState(), false, -1);
+                emit zone->createCardRequested(ServerInfo_Card(), false);
             }
         } else {
             for (int j = 0; j < cardListSize; ++j) {
-                const ServerInfo_Card &cardInfo = zoneInfo.card_list(j);
-                auto *card = new CardItem(this);
-                card->processCardInfo(cardInfo);
+                ServerInfo_Card cardInfo = zoneInfo.card_list(j);
                 // Zones without coordinates (hand, piles, stack) preserve the order
                 // they arrive in on the server in the positions of their cards list.
                 // The x coordinate of such cards is always 0, so inserting at it
                 // would reverse the list on reconnect. Append instead.
-                if (zoneInfo.with_coords()) {
-                    zone->addCard(card->getState(), false, cardInfo.x(), cardInfo.y());
-                } else {
-                    zone->addCard(card->getState(), false, -1);
+                if (!zoneInfo.with_coords()) {
+                    cardInfo.set_x(-1);
+                    cardInfo.set_y(-1);
                 }
+                emit zone->createCardRequested(cardInfo, false);
             }
         }
         if (zoneInfo.has_always_reveal_top_card()) {
@@ -232,13 +226,7 @@ void PlayerLogic::processCardAttachment(const ServerInfo_Player &info)
                     continue;
                 }
 
-                // Route through CardItem::setAttachedTo to maintain the attachedCards graph and reparenting;
-                // CardState::setAttachedTo alone only repoints the pointer.
-                if (CardItem *startItem = toCardItem(startCard)) {
-                    startItem->setAttachedTo(toCardItem(targetCard));
-                } else {
-                    startCard->setAttachedTo(targetCard);
-                }
+                startCard->setAttachedTo(targetCard);
             }
         }
     }
@@ -250,7 +238,7 @@ void PlayerLogic::processCardAttachment(const ServerInfo_Player &info)
     }
 }
 
-void PlayerLogic::addCard(CardItem *card)
+void PlayerLogic::addCard(AbstractCardItem *card)
 {
     emit newCardAdded(card);
 }
