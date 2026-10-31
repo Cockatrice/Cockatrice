@@ -22,6 +22,7 @@ class QAction;
 class QGraphicsItem;
 class QMenu;
 class QPoint;
+class ServerInfo_Card;
 template <typename T> class QList;
 
 class CardItem;
@@ -59,6 +60,8 @@ public slots:
      * connection in CardZone's constructor dispatches through the vtable.
      */
     virtual void onCardAdded(CardState *addedCard);
+    /** @brief Builds the card item for @p cardInfo and hands it to this zone's logic. */
+    void onCreateCardRequested(const ServerInfo_Card &cardInfo, bool reorganize);
 
 public:
     enum

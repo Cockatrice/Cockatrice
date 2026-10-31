@@ -11,7 +11,6 @@
 #include <QString>
 #include <qtmetamacros.h>
 
-class CardItem;
 class AbstractClient;
 class CardState;
 class GameEventHandler;

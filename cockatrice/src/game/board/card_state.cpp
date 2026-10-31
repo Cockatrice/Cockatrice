@@ -1,5 +1,7 @@
 #include "card_state.h"
 
+#include "../zones/card_zone_logic.h"
+
 #include <QSharedPointer>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -206,7 +208,33 @@ void CardState::setAttachedTo(CardState *_attachedTo)
     if (attachedTo == _attachedTo) {
         return;
     }
+
+    if (attachedTo != nullptr) {
+        attachedTo->removeAttachedCard(this);
+    }
+
+    setGridPoint(QPoint(-1, getGridPoint().y()));
     attachedTo = _attachedTo;
     emit attachedToChanged(_attachedTo);
     emit stateChanged();
+
+    if (attachedTo != nullptr) {
+        // If the zone is being torn down, it might already be null by the time a card tries to un-attach all its
+        // attached cards. The graphics item that owns this state handles the teardown in that case.
+        CardZoneLogic *parentZone = attachedTo->getZone();
+        if (parentZone == nullptr) {
+            return;
+        }
+        emit parentZone->cardAdded(this);
+        attachedTo->addAttachedCard(this);
+        if (getZone() != parentZone) {
+            parentZone->reorganizeCards();
+        }
+    } else if (getZone() != nullptr) {
+        emit getZone() -> cardAdded(this);
+    }
+
+    if (getZone() != nullptr) {
+        getZone()->reorganizeCards();
+    }
 }
