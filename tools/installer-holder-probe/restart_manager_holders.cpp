@@ -27,9 +27,6 @@ constexpr int MAX_PLUGIN_DEPTH = 4;
 /// only keeps a snapshot with a cycle in it from walking forever.
 constexpr int MAX_ASKER_LEVELS = 8;
 
-/// The payload files the installer replaces by name; the DLLs are matched by mask below.
-constexpr const wchar_t *PAYLOAD_FILES[] = {L"cockatrice.exe", L"oracle.exe", L"servatrice.exe", L"qt.conf"};
-
 void collectFilesOf(const std::wstring &directory, int depth, int maxDepth, std::vector<std::wstring> &files)
 {
     if (files.size() >= MAX_PROBED_FILES) {
@@ -129,7 +126,12 @@ Holder holderOf(const RM_PROCESS_INFO &info)
 std::vector<std::wstring> collectPayloadFiles(const std::wstring &installDir)
 {
     std::vector<std::wstring> files;
-    for (const wchar_t *name : PAYLOAD_FILES) {
+    // The programs the payload installs, by name, plus the configuration file next to
+    // them: what the purge deletes by name, and therefore what an instance can have
+    // mapped.
+    std::vector<std::wstring> replaced(std::begin(PAYLOAD_PROGRAMS), std::end(PAYLOAD_PROGRAMS));
+    replaced.emplace_back(L"qt.conf");
+    for (const std::wstring &name : replaced) {
         const std::wstring path = installDir + L"\\" + name;
         const DWORD attributes = GetFileAttributesW(path.c_str());
         if (attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0) {

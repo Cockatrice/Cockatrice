@@ -1,5 +1,7 @@
 #include "close_holders.h"
 #include "holder_line.h"
+#include "payload_locks.h"
+#include "payload_paths.h"
 #include "restart_manager_holders.h"
 
 #include <algorithm>
@@ -33,11 +35,12 @@ constexpr unsigned long END_WAIT_MILLISECONDS = 5000;
 /// Exit codes the installer reads. "Something was found" is deliberately not 0, so an
 /// answer of "nothing holds the files" stays distinguishable from a probe that failed.
 /// In the close mode 1 means a close was actually sent and 0 that every holder was left
-/// to the user, which is what the report line next to the code spells out. 3 is only for
-/// a lookup that failed and named nobody: one that failed but still named a payload program
-/// running from the directory is answered with that process. 4 is only the launcher mode:
-/// the process the installer waits on has no window a user could answer, which is the one
-/// answer the installer acts on by itself instead of asking the user.
+/// to the user, which is what the report line next to the code spells out. 3 is for an
+/// answer that could not name what it found: a lookup that failed and named nobody, or the
+/// lookups naming nobody while a payload program refuses to be replaced, which is proof one
+/// runs from the directory. 4 is only the launcher mode: the process the installer waits on
+/// has no window a user could answer, which is the one answer the installer acts on by
+/// itself instead of asking the user.
 enum ExitCode
 {
     EXIT_NO_HOLDERS = 0,
@@ -60,12 +63,15 @@ enum ExitCode
 ///                     whether there was a window to ask at all, because an instance with
 ///                     no window has answered its own close and is stuck in shutdown
 ///
-/// The guard's three modes answer from two lookups that cover each other's blind spot: the
-/// Restart Manager names whoever has a payload file open, and every payload program running
+/// The guard's three modes answer from three questions that cover each other's blind spots:
+/// the Restart Manager names whoever has a payload file open, every payload program running
 /// from the directory itself is named as well, because a running instance holds its own image
 /// and the modules it loaded as mappings rather than open files and the Restart Manager does
-/// not always report those. Neither lookup alone is the guard's authority: an instance the
-/// file handles do not name is exactly the case that left a half-replaced install behind.
+/// not always report those, and a payload executable that refuses to be written is running
+/// even when neither lookup could name it (see payloadExecutablesInUse). No one of them is
+/// the guard's authority: an instance the process lookups do not name, while its executable
+/// is locked, is exactly the case that left a half-replaced install behind, so it is reported
+/// as a check that could not name what it found instead of as a free payload.
 /// A program in a folder below the directory is not named by the second lookup: it is not an
 /// instance of this payload, and the guard could neither close nor end it.
 enum class Mode
@@ -107,6 +113,24 @@ void writeLine(const std::wstring &text)
     narrow += "\r\n";
     DWORD written = 0;
     WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), narrow.data(), static_cast<DWORD>(narrow.size()), &written, nullptr);
+}
+
+/// The line for a payload executable that is in use while no lookup could name the program
+/// holding it: the answer the guard shows, so it names the file the user has to free and
+/// says that the program doing it is still to be closed by hand.
+std::wstring inUseLine(const std::vector<std::wstring> &files)
+{
+    std::wstring names;
+    for (const std::wstring &file : files) {
+        if (!names.empty()) {
+            names += L", ";
+        }
+        names += fileNameOf(file);
+    }
+    if (files.size() == 1) {
+        return names + L" is in use and the program holding it could not be identified";
+    }
+    return names + L" are in use and the programs holding them could not be identified";
 }
 
 std::wstring environmentVariable(const wchar_t *name)
@@ -226,15 +250,30 @@ int main(int argumentCount, char **arguments)
         }
     }
 
-    // A failed lookup only makes the probe unable to answer when it also named nobody: with
-    // a payload program running from the directory the installer still knows what to close,
-    // and that is worth more to the guard than the code of the query that missed it.
-    if (error != ERROR_SUCCESS && holders.empty()) {
-        writeLine(L"the Restart Manager lookup failed with win32 error " + std::to_wstring(error));
-        return EXIT_PROBE_FAILED;
-    }
-
+    // Nobody was named. That is not yet the answer that nothing holds the payload: a lookup
+    // that failed only makes the probe unable to answer when it also named nobody, and a
+    // payload executable that refuses to be replaced is running even when neither lookup
+    // could name it.
     if (holders.empty()) {
+        // Neither process lookup is proof that the payload is free: the Restart Manager does
+        // not report every mapping, and a program running under another account cannot be
+        // read from here, so "nobody was named" is not the answer "nothing is running". The
+        // file cannot be missed - a running image refuses the write the replacement needs -
+        // and an answer of "nothing is holding them" over that locked file is what sent
+        // updates into an uninstall that could only fail halfway. Reported as a check that
+        // could not name what it found, so the guard asks the user to close it and retry
+        // instead of replacing a payload that is still running.
+        const std::vector<std::wstring> inUse = payloadExecutablesInUse(installDir);
+        if (!inUse.empty()) {
+            writeLine(inUseLine(inUse));
+            return EXIT_PROBE_FAILED;
+        }
+
+        if (error != ERROR_SUCCESS) {
+            writeLine(L"the Restart Manager lookup failed with win32 error " + std::to_wstring(error));
+            return EXIT_PROBE_FAILED;
+        }
+
         // No output in the naming mode: the installer words the "nothing is holding them"
         // case, and it owns the message either way. The acting modes say it themselves,
         // because their line is logged verbatim next to what they were asked to do.

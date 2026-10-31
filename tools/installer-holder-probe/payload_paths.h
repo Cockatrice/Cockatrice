@@ -4,6 +4,18 @@
 #include <string>
 
 /**
+ * @brief The file names of the programs the payload installs, in the order the guard names
+ *        them.
+ *
+ * The single list behind isPayloadProgram(), so the guard acts on exactly the programs it
+ * names, and so a payload program added later is closed, ended and tested for a lock
+ * without a second list to update. A payload executable that refuses to be written is
+ * running, which is what makes this list the evidence the two process lookups cannot
+ * provide - see payloadExecutablesInUse().
+ */
+inline constexpr const wchar_t *PAYLOAD_PROGRAMS[] = {L"cockatrice.exe", L"oracle.exe", L"servatrice.exe"};
+
+/**
  * @brief The last name in @p path: what follows its last separator, or @p path itself when
  *        it has none.
  *

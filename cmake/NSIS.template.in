@@ -1087,8 +1087,9 @@ FunctionEnd
 ; $GuardExit to the probe's exit code and $GuardOutput to its one-line answer.
 ; 0 = nothing holds the payload and no payload program runs from the directory, 1 = the
 ; line names what does, anything else = the probe could not answer (2 = no
-; directory was given, 3 = the Restart Manager call failed and no payload program
-; runs from the directory either, "timeout" = it did not return in time).
+; directory was given, 3 = no payload program was named but one refuses to be replaced, or
+; the Restart Manager call failed and no payload program runs from the directory either,
+; "timeout" = it did not return in time).
 Function ${prefix}RunHolderProbe
     Call ${prefix}ExtractHolderProbe
     ; The directory travels in an environment variable, never on the command
@@ -1249,25 +1250,27 @@ Function GuardAppsNotRunning
         Call AbortInstall
     ${EndIf}
     ; Not an answer at all: the probe was not configured, the Restart Manager
-    ; call failed and no payload program runs from the directory, or it timed
-    ; out. Carrying on from that is a decision, so it is asked for rather than
-    ; assumed - the stale-runtime check after the purge still stands between a
-    ; failed guard and a mismatched install, but it only fires after files have
-    ; been replaced, and on an upgrade the launcher asked for nobody is watching
-    ; the installer's exit code. Retry asks the probe again (a Restart Manager
-    ; that was busy answers the second time), Ignore installs anyway, Abort
-    ; cancels instead of writing a payload next to files the guard could not
-    ; rule out.
+    ; call failed and no payload program runs from the directory, a payload
+    ; program refuses to be replaced but no lookup could name it (it may run
+    ; under another account), or the probe timed out. Carrying on from that is a
+    ; decision, so it is asked for rather than assumed - the stale-runtime check
+    ; after the purge still stands between a failed guard and a mismatched
+    ; install, but it only fires after files have been replaced, and on an
+    ; upgrade the launcher asked for nobody is watching the installer's exit
+    ; code. Retry asks the probe again (a Restart Manager that was busy answers
+    ; the second time, and a program the user has closed frees its file), Ignore
+    ; installs anyway, Abort cancels instead of writing a payload next to files
+    ; the guard could not rule out.
     !insertmacro CockLog "guard: the holder probe could not answer ($GuardExit): $GuardOutput"
-    DetailPrint "Could not check whether Cockatrice is still running: $GuardOutput"
+    DetailPrint "Could not confirm whether Cockatrice is still running: $GuardOutput"
     MessageBox MB_ABORTRETRYIGNORE|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
-        "This installer could not check whether Cockatrice, Oracle or Servatrice is still running.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nClose them, then choose Retry to check again. Choose Ignore to install anyway, or Abort to cancel the installation." \
+        "This installer could not confirm whether Cockatrice, Oracle or Servatrice is still running.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nClose them, then choose Retry to check again. Choose Ignore to install anyway, or Abort to cancel the installation." \
         IDRETRY guard_check IDABORT guard_unknown_abort
     !insertmacro CockLog "guard: continuing without an answer from the probe"
     Return
     guard_unknown_abort:
     StrCpy $AbortReason \
-        "The installation was cancelled because it could not check whether Cockatrice, Oracle or Servatrice is still running.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nPlease close them and run the installer again."
+        "The installation was cancelled because it could not confirm whether Cockatrice, Oracle or Servatrice is still running.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nPlease close them and run the installer again."
     ; Same reason as the cancel path above: this abort can be reached from the
     ; leftover-removal guard, after the backup was taken.
     Call RestoreUserDataAfterUninstall
@@ -1868,9 +1871,9 @@ FunctionEnd
 ; itself - not one in a folder below it, which is another application the user installed
 ; there - because a running instance holds its payload as mapped images rather than as open
 ; handles and the Restart Manager does not reliably report those. Its remaining blind spot
-; is a handle taken in kernel mode, where there is no process to name; then the per-file
-; codes logged above are the whole story, and the probe says so by naming nothing rather
-; than by failing.
+; is a handle taken in kernel mode, where there is no process to name; a payload executable
+; among the files then still refuses to be replaced, and the probe answers with that file
+; instead of naming nothing.
 ;
 ; $INSTDIR travels through the same COCKATRICE_GUARD_DIR environment variable the guard
 ; uses, so a path with spaces or apostrophes never has to be embedded in a command line.
@@ -1894,7 +1897,7 @@ Function LogProcessesUsingInstallDir
     ${ElseIf} $HolderExit == "0"
         StrCpy $HolderOutput "nothing is holding them and no payload program is running from the directory"
     ${Else}
-        StrCpy $HolderOutput "the holder probe could not run: $HolderOutput"
+        StrCpy $HolderOutput "the holder probe could not name what holds them: $HolderOutput"
     ${EndIf}
     !insertmacro CockLog "holders: $HolderOutput"
 FunctionEnd
@@ -2039,11 +2042,12 @@ Function un.GuardAppsNotRunning
     ; Same reasoning as in the installer: without an answer from the probe we cannot tell
     ; whether a running instance still holds file locks, and refusing outright would leave
     ; the user with an uninstaller that never completes. Same three answers too, so an
-    ; uninstall that hits a Restart Manager that was busy can simply be retried.
+    ; uninstall that hits a Restart Manager that was busy, or a payload program the user has
+    ; not closed yet, can simply be retried.
     !insertmacro CockLogUn "uninst-guard: the holder probe could not answer ($GuardExit): $GuardOutput"
-    DetailPrint "Could not check whether Cockatrice is still running: $GuardOutput"
+    DetailPrint "Could not confirm whether Cockatrice is still running: $GuardOutput"
     MessageBox MB_ABORTRETRYIGNORE|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
-        "This uninstaller could not check whether Cockatrice, Oracle or Servatrice is still running.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nClose them, then choose Retry to check again. Choose Ignore to uninstall anyway, or Abort to cancel the uninstallation." \
+        "This uninstaller could not confirm whether Cockatrice, Oracle or Servatrice is still running.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nClose them, then choose Retry to check again. Choose Ignore to uninstall anyway, or Abort to cancel the uninstallation." \
         IDRETRY un_guard_check IDABORT un_guard_unknown_abort
     !insertmacro CockLogUn "uninst-guard: continuing without an answer from the probe"
     Return
