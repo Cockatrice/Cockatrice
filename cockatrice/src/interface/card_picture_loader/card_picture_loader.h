@@ -146,6 +146,14 @@ signals:
     /** @brief Emitted after the worker has finished clearing the network and redirect caches. */
     void networkCacheCleared();
 
+    /**
+     * @brief Emitted once an image has been loaded and put into the pixmap cache.
+     *
+     * Views that paint cards from the loader without owning a widget per card can
+     * listen to this to repaint the rows whose picture just became available.
+     */
+    void pixmapLoaded(const ExactCard &card);
+
 private slots:
     /**
      * @brief Triggered when the user changes the picture download settings.
