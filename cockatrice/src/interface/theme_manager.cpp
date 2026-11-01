@@ -127,8 +127,10 @@ static QString usableDefaultStyle(const QString &style)
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 {
     defaultStyleName = usableDefaultStyle(qApp->style()->objectName());
-    // Capture the untouched application palette before any theme is applied.
+    // Capture the untouched application palette and font before any theme is
+    // applied.
     defaultPalette = qApp->palette();
+    defaultFont = qApp->font();
     ensureThemeDirectoryExists();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
     connect(QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged, this, [this] {
@@ -520,18 +522,15 @@ void ThemeManager::previewFonts(const FontConfig &cfg)
 {
     currentFonts = cfg;
 
+    // QApplication::setFont already sends a font change to every widget, so a
+    // repolish pass is not needed for fonts (unlike the palette path).
     const auto it = cfg.fonts.constFind(AppFont::InterfaceDefault);
     if (it != cfg.fonts.constEnd()) {
         qApp->setFont(it.value());
-
-        // Repolish every widget immediately so the preview applies without
-        // waiting for natural expose events, mirroring applyStyleAndPalette.
-        QStyle *style = qApp->style();
-        for (QWidget *widget : qApp->allWidgets()) {
-            style->unpolish(widget);
-            style->polish(widget);
-            widget->update();
-        }
+    } else {
+        // A config without InterfaceDefault means "no override": restore the
+        // startup font instead of leaving the last preview applied.
+        qApp->setFont(defaultFont);
     }
 
     emit fontsChanged();
