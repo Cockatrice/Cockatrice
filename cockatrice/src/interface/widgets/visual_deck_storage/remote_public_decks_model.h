@@ -13,6 +13,7 @@
 #include <QDateTime>
 #include <QList>
 #include <QModelIndex>
+#include <QPointer>
 #include <QSet>
 #include <QString>
 #include <QStringList>
@@ -108,16 +109,16 @@ signals:
     void loadFailed(const QString &message);
 
 private slots:
-    void decksReceived(const Response &response, const CommandContainer &commandContainer);
+    void decksReceived(int requestId, const Response &response, const CommandContainer &commandContainer);
     void onLoadingTimeout();
 
 private:
-    void addFolder(const ServerInfo_DeckStorage_Folder &folder);
-    void addTreeItem(const ServerInfo_DeckStorage_TreeItem &item);
+    void addFolder(const ServerInfo_DeckStorage_Folder &folder, QList<DeckEntry> &target);
+    void addTreeItem(const ServerInfo_DeckStorage_TreeItem &item, QList<DeckEntry> &target);
     void rebuildVisibleIndices();
     void setLoading(bool value);
 
-    AbstractClient *client;
+    QPointer<AbstractClient> client;
     QList<DeckEntry> decks;
     QList<int> visibleIndices; ///< Row indices into `decks` that pass the current filters.
     bool loading = false;
