@@ -159,6 +159,11 @@ public:
     /** @brief The CardText role with its historical Serif fallback. Used by the
      *         counter painters, which were Serif before the role existed. */
     QFont cardTextFont() const;
+    /** @brief The DeckList role with its historical Serif fallback. Used by the
+     *         two surfaces that hardcoded Serif before the role existed (the
+     *         deck view zone headers and the printed deck list); every other
+     *         DeckList reader falls back to the application font. */
+    QFont deckListFont() const;
     /** @brief Resolves an application font role against the startup font only,
      *         ignoring any previewed config in currentFonts. Editors that show
      *         "what this role resolves to" must use this, because appFont()

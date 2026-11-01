@@ -241,8 +241,7 @@ void DeckViewCardContainer::paint(QPainter *painter, const QStyleOptionGraphicsI
 
     painter->setPen(QColor(Qt::white));
     // Family comes from the DeckList theme role; pixel sizes/weights unchanged.
-    QFont f = themeManager->appFont(AppFont::DeckList);
-    f.setStyleHint(QFont::Serif);
+    QFont f = themeManager->deckListFont();
     f.setPixelSize(24);
     f.setWeight(QFont::Bold);
     painter->setFont(f);
@@ -294,8 +293,7 @@ QList<QPair<int, int>> DeckViewCardContainer::getRowsAndCols() const
 int DeckViewCardContainer::getCardTypeTextWidth() const
 {
     // Family comes from the DeckList theme role; pixel size/weight unchanged.
-    QFont f = themeManager->appFont(AppFont::DeckList);
-    f.setStyleHint(QFont::Serif);
+    QFont f = themeManager->deckListFont();
     f.setPixelSize(16);
     f.setWeight(QFont::Bold);
     QFontMetrics fm(f);
@@ -588,9 +586,6 @@ DeckView::DeckView(QWidget *parent) : QGraphicsView(parent)
     connect(deckViewScene, &DeckViewScene::sceneRectChanged, this, &DeckView::updateSceneRect);
     connect(deckViewScene, &DeckViewScene::newCardAdded, this, &DeckView::newCardAdded);
     connect(deckViewScene, &DeckViewScene::sideboardPlanChanged, this, &DeckView::sideboardPlanChanged);
-    // The scene already touches its items on fontsChanged; repaint the
-    // viewport here so the new DeckList family shows without interaction.
-    connect(themeManager, &ThemeManager::fontsChanged, this, [this] { viewport()->update(); });
 }
 
 void DeckView::resizeEvent(QResizeEvent *event)
