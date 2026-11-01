@@ -63,7 +63,13 @@ void VisualDatabaseDisplayColorFilterWidget::retranslateUi()
     modeComboBox->addItem(tr("Includes"), QVariant::fromValue(FilterMode::Includes));
     modeComboBox->addItem(tr("Excludes"), QVariant::fromValue(FilterMode::Excludes));
     modeComboBox->addItem(tr("Include / Exclude"), QVariant::fromValue(FilterMode::IncludeExclude));
-    modeComboBox->addItem(tr("Commander"), QVariant::fromValue(FilterMode::Commander));
+    modeComboBox->addItem(tr("Color identity"), QVariant::fromValue(FilterMode::ColorIdentity));
+
+    modeComboBox->setItemData(0, tr("Cards being exactly of the selected colors"), Qt::ToolTipRole);
+    modeComboBox->setItemData(1, tr("Cards containing any of the selected colors"), Qt::ToolTipRole);
+    modeComboBox->setItemData(2, tr("Cards containing none of the selected colors"), Qt::ToolTipRole);
+    modeComboBox->setItemData(3, tr("Cards containing any of the selected colors and none of the unselected colors"), Qt::ToolTipRole);
+    modeComboBox->setItemData(4, tr("Cards whose color identity fits within the selected colors"), Qt::ToolTipRole);
 
     modeComboBox->setToolTip(tr("How selected and unselected colors are combined in the filter"));
 
@@ -117,7 +123,7 @@ void VisualDatabaseDisplayColorFilterWidget::addFilter(QChar color)
             filterModel->addFilter(new CardFilter(color, CardFilter::Type::TypeOr, CardFilter::Attr::AttrColor));
             break;
 
-        case FilterMode::Commander:
+        case FilterMode::ColorIdentity:
             removeFilters(filterModel, color, CardFilter::Attr::AttrColorIdentity);
             break;
     }
@@ -145,10 +151,9 @@ void VisualDatabaseDisplayColorFilterWidget::removeFilter(QChar color)
             filterModel->addFilter(new CardFilter(color, CardFilter::Type::TypeAndNot, CardFilter::Attr::AttrColor));
             break;
 
-        case FilterMode::Commander:
+        case FilterMode::ColorIdentity:
             removeFilters(filterModel, color, CardFilter::Attr::AttrColorIdentity);
-            filterModel->addFilter(
-                new CardFilter(color, CardFilter::Type::TypeAndNot, CardFilter::Attr::AttrColorIdentity));
+            filterModel->addFilter(new CardFilter(color, CardFilter::Type::TypeAndNot, CardFilter::Attr::AttrColorIdentity));
             break;
     }
 }
@@ -210,41 +215,38 @@ QList<QChar> VisualDatabaseDisplayColorFilterWidget::getActiveColors()
 void VisualDatabaseDisplayColorFilterWidget::syncWithFilterModel()
 {
     QList<const CardFilter *> allColorFilters = filterModel->getFiltersOfType(
-        currentMode == FilterMode::Commander ? CardFilter::Attr::AttrColorIdentity : CardFilter::Attr::AttrColor);
+        currentMode == FilterMode::ColorIdentity
+            ? CardFilter::Attr::AttrColorIdentity
+            : CardFilter::Attr::AttrColor);
 
     QList<ManaSymbolWidget *> manaSymbolWidgets = findChildren<ManaSymbolWidget *>();
 
     for (ManaSymbolWidget *manaSymbolWidget : manaSymbolWidgets) {
         QChar symbol = manaSymbolWidget->getSymbolChar();
-        bool found = currentMode == FilterMode::Commander;
+        bool found = currentMode == FilterMode::ColorIdentity;
         for (const CardFilter *filter : allColorFilters) {
             if (symbol == filter->term()) {
                 switch (currentMode) {
                     case FilterMode::ExactMatch:
-                        if (filter->type() == CardFilter::Type::TypeAnd) {
+                        if (filter->type() == CardFilter::Type::TypeAnd)
                             found = true;
-                        }
                         break;
                     case FilterMode::Includes:
                     case FilterMode::IncludeExclude:
-                        if (filter->type() == CardFilter::Type::TypeOr) {
+                        if (filter->type() == CardFilter::Type::TypeOr)
                             found = true;
-                        }
                         break;
                     case FilterMode::Excludes:
-                        if (filter->type() == CardFilter::Type::TypeAndNot) {
+                        if (filter->type() == CardFilter::Type::TypeAndNot)
                             found = true;
-                        }
                         break;
-                    case FilterMode::Commander:
-                        if (filter->type() == CardFilter::Type::TypeAndNot) {
+                    case FilterMode::ColorIdentity:
+                        if (filter->type() == CardFilter::Type::TypeAndNot)
                             found = false;
-                        }
                         break;
                 }
-                if (found) {
+                if (found)
                     break;
-                }
             }
         }
 

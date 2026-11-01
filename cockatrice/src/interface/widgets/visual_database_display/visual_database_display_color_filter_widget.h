@@ -42,9 +42,9 @@ enum class FilterMode
 {
     ExactMatch,     // Only selected colors are included, all others are excluded.
     Includes,       // Include selected colors (OR condition).
-    Excludes,       // Exclude selected colors (OR).
+    Excludes,       // Exclude selected colors (AND NOT).
     IncludeExclude, // Include selected colors (OR) and exclude unselected colors (AND NOT).
-    Commander       // Only include colors in the selected color identity.
+    ColorIdentity   // Keep cards whose color identity is a subset of the selected colors (stored as ANDNOT for each unselected color).
 };
 
 Q_DECLARE_METATYPE(FilterMode)
