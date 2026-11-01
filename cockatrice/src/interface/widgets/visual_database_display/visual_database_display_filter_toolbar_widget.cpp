@@ -1,5 +1,4 @@
 #include "visual_database_display_filter_toolbar_widget.h"
-#include "visual_database_display_tag_filter_widget.h"
 
 #include "../../pixel_map_generator.h"
 #include "../deck_editor/card_database_view.h"
@@ -11,6 +10,7 @@
 #include "visual_database_display_name_filter_widget.h"
 #include "visual_database_display_set_filter_widget.h"
 #include "visual_database_display_sub_type_filter_widget.h"
+#include "visual_database_display_tag_filter_widget.h"
 #include "visual_database_display_widget.h"
 
 #include <QAbstractItemView>

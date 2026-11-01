@@ -5,12 +5,12 @@
 
 #include <QLabel>
 #include <QPointer>
+#include <QPushButton>
 #include <QScopeGuard>
 #include <QSignalBlocker>
-#include <libcockatrice/card/database/card_database.h>
-#include <QPushButton>
 #include <QSpinBox>
 #include <QTimer>
+#include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/filters/filter_tree.h>
 
@@ -76,7 +76,7 @@ VisualDatabaseDisplayTagFilterWidget::VisualDatabaseDisplayTagFilterWidget(QWidg
     connect(filterModel, &FilterTreeModel::layoutChanged, this, scheduleSync);
     connect(filterModel, &FilterTreeModel::modelReset, this, scheduleSync);
 
-    createTagButtons(); // Populate buttons initially
+    createTagButtons();    // Populate buttons initially
     syncWithFilterModel(); // Construction must not change an already loaded filter.
 
     retranslateUi();
@@ -102,7 +102,9 @@ void VisualDatabaseDisplayTagFilterWidget::createTagButtons()
         for (const auto *filter : filters) {
             if (filter->type() == CardFilter::TypeAnd || filter->type() == CardFilter::TypeOr) {
                 const QString tag = filter->term().trimmed().toLower();
-                if (!allTagsWithCount.contains(tag)) allTagsWithCount.insert(tag, 0);
+                if (!allTagsWithCount.contains(tag)) {
+                    allTagsWithCount.insert(tag, 0);
+                }
             }
         }
         qDeleteAll(filters);
@@ -155,7 +157,9 @@ int VisualDatabaseDisplayTagFilterWidget::getMaxTagCount() const
 
 void VisualDatabaseDisplayTagFilterWidget::handleTagToggled(const QString &tag, bool active)
 {
-    if (!filterModel) return;
+    if (!filterModel) {
+        return;
+    }
     QPointer<VisualDatabaseDisplayTagFilterWidget> alive(this);
     QPointer<FilterTreeModel> model(filterModel);
     const auto filters = model->getFiltersOfType(CardFilter::AttrTag);
@@ -167,20 +171,26 @@ void VisualDatabaseDisplayTagFilterWidget::handleTagToggled(const QString &tag, 
         if ((filter->type() == CardFilter::TypeAnd || filter->type() == CardFilter::TypeOr) &&
             filter->term().trimmed().compare(tag, Qt::CaseInsensitive) == 0) {
             model->removeFilter(filter);
-            if (!alive || !model) return;
+            if (!alive || !model) {
+                return;
+            }
         }
     }
     if (active) {
         const CardFilter filter(tag, targetType, CardFilter::AttrTag);
         model->addFilter(&filter);
-        if (!alive || !model) return;
+        if (!alive || !model) {
+            return;
+        }
     }
     syncWithFilterModel();
 }
 
 void VisualDatabaseDisplayTagFilterWidget::updateFilterMode()
 {
-    if (!filterModel) return;
+    if (!filterModel) {
+        return;
+    }
     // An explicit click converts a loaded mixed filter to all selected tags.
     exactMatchMode = mixedMatchMode ? true : !exactMatchMode;
     mixedMatchMode = false;
@@ -196,9 +206,13 @@ void VisualDatabaseDisplayTagFilterWidget::updateFilterMode()
             filter->type() != targetType) {
             const CardFilter replacement(filter->term(), targetType, CardFilter::AttrTag);
             model->removeFilter(filter);
-            if (!alive || !model) return;
+            if (!alive || !model) {
+                return;
+            }
             model->addFilter(&replacement);
-            if (!alive || !model) return;
+            if (!alive || !model) {
+                return;
+            }
         }
     }
     syncWithFilterModel();
@@ -218,13 +232,17 @@ void VisualDatabaseDisplayTagFilterWidget::syncWithFilterModel()
                 hasAnd |= filter->type() == CardFilter::TypeAnd;
                 hasOr |= filter->type() == CardFilter::TypeOr;
                 // A saved custom tag may not occur in the current database.
-                if (!tagButtons.contains(tag)) refreshTimer->start(0);
+                if (!tagButtons.contains(tag)) {
+                    refreshTimer->start(0);
+                }
             }
         }
         qDeleteAll(filters);
     }
     mixedMatchMode = hasAnd && hasOr;
-    if (hasAnd != hasOr) exactMatchMode = hasAnd;
+    if (hasAnd != hasOr) {
+        exactMatchMode = hasAnd;
+    }
     toggleButton->setText(mixedMatchMode ? tr("Mode: Mixed")
                                          : (exactMatchMode ? tr("Mode: Exact Match") : tr("Mode: Includes")));
     for (auto it = tagButtons.begin(); it != tagButtons.end(); ++it) {

@@ -27,7 +27,7 @@ namespace
 {
 constexpr int TAGS_PREVIEW_LIMIT = 3;
 const QString SHOW_ALL_TAGS_LINK = QStringLiteral("cockatrice://show-all-tags");
-}
+} // namespace
 
 CardInfoTextWidget::CardInfoTextWidget(QWidget *parent) : QFrame(parent)
 {

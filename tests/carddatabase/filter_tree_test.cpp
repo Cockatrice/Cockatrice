@@ -1,7 +1,7 @@
+#include <gtest/gtest.h>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/filters/filter_tree.h>
-#include <gtest/gtest.h>
 
 namespace
 {

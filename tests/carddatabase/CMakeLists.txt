@@ -27,8 +27,18 @@ cockatrice_add_test(
 if(WITH_ORACLE OR WITH_CLIENT)
   cockatrice_add_test(
     NAME
+    filter_preset_test
+    SOURCES
+    ${VERSION_STRING_CPP}
+    filter_preset_test.cpp
+    LIBS
+    libcockatrice_filters
+  )
+  cockatrice_add_test(
+    NAME
     card_filter_serialization_test
     SOURCES
+    ${VERSION_STRING_CPP}
     card_filter_serialization_test.cpp
     LIBS
     libcockatrice_filters

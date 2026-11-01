@@ -7,10 +7,10 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QMap>
-#include <QPushButton>
 #include <QPointer>
-#include <QTimer>
+#include <QPushButton>
 #include <QSpinBox>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
 

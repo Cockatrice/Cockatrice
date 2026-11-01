@@ -10,7 +10,7 @@
 #include <QAbstractItemModel>
 #include <QList>
 #include <QModelIndex>
-#include <libcockatrice/filters/filter_card.h>
+#include <libcockatrice/filters/filter_preset.h>
 #include <qnamespace.h>
 #include <qtmetamacros.h>
 
@@ -46,24 +46,10 @@ private:
     QModelIndex nodeIndex(const FilterTreeNode *node, int row, int column) const;
 
 public:
-    struct TermSnapshot
-    {
-        QString term;
-        bool enabled;
-    };
-    struct TypeSnapshot
-    {
-        CardFilter::Type type;
-        bool enabled;
-        QList<TermSnapshot> terms;
-    };
-    struct AttributeSnapshot
-    {
-        CardFilter::Attr attr;
-        bool enabled;
-        QList<TypeSnapshot> types;
-    };
-    using Snapshot = QList<AttributeSnapshot>;
+    using TermSnapshot = FilterPreset::TermSnapshot;
+    using TypeSnapshot = FilterPreset::TypeSnapshot;
+    using AttributeSnapshot = FilterPreset::AttributeSnapshot;
+    using Snapshot = FilterPreset::Snapshot;
 
     FilterTreeModel(QObject *parent = nullptr);
     ~FilterTreeModel() override;

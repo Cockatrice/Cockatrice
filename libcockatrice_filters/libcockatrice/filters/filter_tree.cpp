@@ -1,7 +1,6 @@
 #include "filter_tree.h"
 
 #include "filter_card.h"
-#include <libcockatrice/card/game_specific_terms.h>
 #include "libcockatrice/card/card_localization.h"
 #include "libcockatrice/card/printing/printing_info.h"
 #include "libcockatrice/card/set/card_set.h"
@@ -12,6 +11,7 @@
 #include <QStringList>
 #include <QStringView>
 #include <algorithm>
+#include <libcockatrice/card/game_specific_terms.h>
 #include <qnamespace.h>
 
 namespace

@@ -73,8 +73,8 @@ void FilterDisplayWidget::deleteFilter()
     const QString filename = filterFilename;
     const QString filePath = SettingsCache::instance().paths().getFiltersPath() + QDir::separator() + filename;
     auto *dialog = new QMessageBox(QMessageBox::Question, tr("Confirm Delete"),
-                                  tr("Are you sure you want to delete the filter '%1'?").arg(filename),
-                                  QMessageBox::Yes | QMessageBox::No, this);
+                                   tr("Are you sure you want to delete the filter '%1'?").arg(filename),
+                                   QMessageBox::Yes | QMessageBox::No, this);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     connect(dialog, &QMessageBox::finished, this, [this, filename, filePath](int result) {
         if (result != QMessageBox::Yes) {
@@ -89,8 +89,8 @@ void FilterDisplayWidget::deleteFilter()
             emit filterDeleted(filename);
         } else {
             auto *error = new QMessageBox(QMessageBox::Warning, tr("Delete Failed"),
-                                         tr("Failed to delete filter '%1': %2").arg(filename, file.errorString()),
-                                         QMessageBox::Ok, this);
+                                          tr("Failed to delete filter '%1': %2").arg(filename, file.errorString()),
+                                          QMessageBox::Ok, this);
             error->setAttribute(Qt::WA_DeleteOnClose);
             error->open();
         }
