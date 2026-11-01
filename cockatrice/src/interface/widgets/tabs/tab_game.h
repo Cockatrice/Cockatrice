@@ -90,8 +90,7 @@ private:
     QMap<int, TabbedDeckViewContainer *> deckViewContainers;
     QVBoxLayout *deckViewContainerLayout;
     QWidget *gamePlayAreaWidget, *deckViewContainerWidget;
-    QDockWidget *cardInfoDock, *messageLayoutDock, *playerListDock, *replayDock;
-    QDockWidget *historyDock = nullptr;
+    QDockWidget *cardInfoDock, *messageLayoutDock, *playerListDock, *replayDock, *historyDock;
     QAction *playersSeparator;
     QMenu *gameMenu, *viewMenu;
     TearOffMenu *phasesMenu;

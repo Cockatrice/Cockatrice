@@ -98,7 +98,7 @@ class Message;
 } // namespace google
 
 TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
-    : Tab(_tabSupervisor), sayLabel(nullptr), sayEdit(nullptr)
+    : Tab(_tabSupervisor), sayLabel(nullptr), sayEdit(nullptr), replayDock(nullptr), historyDock(nullptr)
 {
     // THIS CTOR IS USED ON REPLAY
     game = new Replay(this, _replay, tabSupervisor->getIsLocalGame(), &SettingsCache::instance().userInterface(),
@@ -1204,7 +1204,6 @@ void TabGame::createViewMenuItems()
     if (historyDock) {
         registerDockWidget(viewMenu, historyDock, {280, 400});
     }
-
     if (replayDock) {
         registerDockWidget(viewMenu, replayDock, {900, 100});
     }
@@ -1279,7 +1278,6 @@ void TabGame::actResetLayout()
         historyDock->setFloating(false);
         addDockWidget(Qt::LeftDockWidgetArea, historyDock);
     }
-
     if (replayDock) {
         replayDock->setVisible(true);
         replayDock->setFloating(false);
@@ -1354,10 +1352,7 @@ void TabGame::createReplayDock(GameReplay *replay)
     historyDock->setFloating(false);
 
     connect(historySidebar, &ReplayEventSidebar::eventSelected, replayWidget, &ReplayWidget::seekToEvent);
-    connect(replayWidget, &ReplayWidget::timeChanged, historySidebar, &ReplayEventSidebar::setCurrentTime);
-
-    // The replay manager is already at time 0 before the sidebar is connected, so apply the initial time explicitly.
-    historySidebar->setCurrentTime(0);
+    connect(replayWidget, &ReplayWidget::processedEventChanged, historySidebar, &ReplayEventSidebar::setProcessedEvent);
 }
 
 void TabGame::createDeckViewContainerWidget(bool bReplay)

@@ -513,3 +513,33 @@ endif()
 if(WITH_ORACLE OR WITH_CLIENT)
   add_subdirectory(picture_loader_benchmark)
 endif()
+
+# Exercise the production replay components and settings without replacing their implementations.
+if(WITH_CLIENT)
+  add_library(
+    replay_test_support STATIC
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/replay/replay_manager.cpp
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/replay/replay_event_index.cpp
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/replay/replay_event_sidebar.cpp
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/cache_settings.cpp
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/card_counter_settings.cpp
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/shortcuts_settings.cpp
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network/update/client/release_channel.cpp
+    ${VERSION_STRING_CPP}
+  )
+  target_include_directories(replay_test_support PUBLIC ${CMAKE_SOURCE_DIR}/cockatrice/src)
+  target_link_libraries(replay_test_support PUBLIC libcockatrice_game ${TEST_QT_MODULES})
+
+  foreach(_replay_suite manager event_index event_sidebar)
+    add_executable(replay_${_replay_suite}_test replay/replay_${_replay_suite}_test.cpp)
+    target_link_libraries(replay_${_replay_suite}_test PRIVATE replay_test_support)
+    add_test(NAME replay_${_replay_suite}_test COMMAND replay_${_replay_suite}_test)
+    set_tests_properties(
+      replay_${_replay_suite}_test
+      PROPERTIES ENVIRONMENT
+                 "QT_QPA_PLATFORM=offscreen;XDG_DATA_HOME=${CMAKE_CURRENT_BINARY_DIR}/replay-test-data;XDG_CACHE_HOME=${CMAKE_CURRENT_BINARY_DIR}/replay-test-cache"
+                 TIMEOUT 60
+    )
+  endforeach()
+
+endif()

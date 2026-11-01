@@ -28,7 +28,7 @@ public:
     ReplayEventSidebar(QWidget *parent, const GameReplay *replay, const QList<int> &timeline);
 
 public slots:
-    void setCurrentTime(int timeMs);
+    void setProcessedEvent(int eventIndex);
 
 signals:
     void eventSelected(int eventIndex);
@@ -38,7 +38,7 @@ private:
 
     QListWidget *eventList;
     QLabel *emptyLabel;
-    QList<int> eventTimes;
+    QList<int> eventIndices;
     int currentRow = -1;
 };
 

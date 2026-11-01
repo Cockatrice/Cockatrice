@@ -178,9 +178,14 @@ private:
         return spectators.value(playerId, false);
     }
 
-    void rememberPlayer(const ServerInfo_PlayerProperties &properties)
+    static int resolvedPlayerId(const ServerInfo_PlayerProperties &properties, int fallbackPlayerId)
     {
-        const int playerId = properties.player_id();
+        return properties.has_player_id() && properties.player_id() >= 0 ? properties.player_id() : fallbackPlayerId;
+    }
+
+    void rememberPlayer(const ServerInfo_PlayerProperties &properties, int fallbackPlayerId = -1)
+    {
+        const int playerId = resolvedPlayerId(properties, fallbackPlayerId);
         if (playerId < 0) {
             return;
         }
@@ -189,13 +194,19 @@ private:
         if (!name.isEmpty()) {
             playerNames.insert(playerId, name);
         }
-        spectators.insert(playerId, properties.spectator());
+        if (properties.has_spectator()) {
+            spectators.insert(playerId, properties.spectator());
+        }
     }
 
     void rememberCard(int playerId, const QString &zone, int cardId, const QString &name)
     {
-        if (cardId >= 0 && !name.isEmpty()) {
-            cardNames.insert(cardKey(playerId, zone, cardId), name);
+        if (cardId >= 0) {
+            if (name.isEmpty()) {
+                cardNames.remove(cardKey(playerId, zone, cardId));
+            } else {
+                cardNames.insert(cardKey(playerId, zone, cardId), name);
+            }
         }
     }
 
@@ -310,6 +321,25 @@ private:
             const int playerId = player.properties().player_id();
             rememberPlayer(player.properties());
 
+            // PlayerLogic::processPlayerInfo replaces this player's zones and
+            // counters. Keep other players' cached state, but never carry names
+            // from this player's previous snapshot into reused or hidden IDs.
+            const QString playerPrefix = QStringLiteral("%1/").arg(playerId);
+            for (auto it = cardNames.begin(); it != cardNames.end();) {
+                if (it.key().startsWith(playerPrefix)) {
+                    it = cardNames.erase(it);
+                } else {
+                    ++it;
+                }
+            }
+            for (auto it = counterNames.begin(); it != counterNames.end();) {
+                if (it.key().startsWith(playerPrefix)) {
+                    it = counterNames.erase(it);
+                } else {
+                    ++it;
+                }
+            }
+
             for (int j = 0; j < player.zone_list_size(); ++j) {
                 const ServerInfo_Zone &zone = player.zone_list(j);
                 for (int k = 0; k < zone.card_list_size(); ++k) {
@@ -342,8 +372,7 @@ private:
         QString name;
         if (event.has_card_name()) {
             name = QString::fromStdString(event.card_name());
-        }
-        if (name.isEmpty()) {
+        } else {
             name = cardName(startPlayerId, startZone, event.card_id());
         }
 
@@ -354,9 +383,7 @@ private:
 
         const int newCardId = event.has_new_card_id() ? event.new_card_id() : event.card_id();
         forgetCard(startPlayerId, startZone, event.card_id());
-        if (knownName) {
-            rememberCard(targetPlayerId, targetZone, newCardId, name);
-        }
+        rememberCard(targetPlayerId, targetZone, newCardId, knownName ? name : QString());
 
         if (startZone == targetZone) {
             return tr("moved %1 within %2.").arg(name, zonePhrase(targetPlayerId, targetZone, actorId));
@@ -485,16 +512,12 @@ private:
                 case GameEvent::PLAYER_PROPERTIES_CHANGED: {
                     const Event_PlayerPropertiesChanged &propertiesEvent =
                         event.GetExtension(Event_PlayerPropertiesChanged::ext);
-                    const bool hasProperties = propertiesEvent.has_player_properties();
-                    const ServerInfo_PlayerProperties &properties = propertiesEvent.player_properties();
-                    // The server only fills in the field that changed, so player_id is absent from these events
-                    // unless they are about a specific player; fall back to the event's own player id.
-                    const bool describesPlayer = hasProperties && properties.has_player_id();
-                    const int playerId = describesPlayer ? properties.player_id() : eventPlayerId;
-                    if (describesPlayer) {
-                        rememberPlayer(properties);
+                    const int playerId = resolvedPlayerId(propertiesEvent.player_properties(), eventPlayerId);
+                    if (propertiesEvent.has_player_properties()) {
+                        rememberPlayer(propertiesEvent.player_properties(), eventPlayerId);
                     }
 
+                    const ServerInfo_PlayerProperties &properties = propertiesEvent.player_properties();
                     switch (contextType) {
                         case GameEventContext::READY_START:
                             addDetail(details,
@@ -547,11 +570,9 @@ private:
                 case GameEvent::JOIN: {
                     const Event_Join &join = event.GetExtension(Event_Join::ext);
                     if (join.has_player_properties()) {
-                        rememberPlayer(join.player_properties());
+                        rememberPlayer(join.player_properties(), eventPlayerId);
                     }
-                    const int playerId = join.player_properties().player_id() >= 0
-                                             ? join.player_properties().player_id()
-                                             : eventPlayerId;
+                    const int playerId = resolvedPlayerId(join.player_properties(), eventPlayerId);
                     addDetail(details, isSpectator(playerId) ? tr("joined as a spectator.") : tr("joined the game."),
                               tr("JOIN"), ReplayEventKind::System, playerId, forcedByJudge);
                     break;
@@ -695,12 +716,13 @@ private:
                 case GameEvent::FLIP_CARD: {
                     const Event_FlipCard &flipCard = event.GetExtension(Event_FlipCard::ext);
                     const QString zone = QString::fromStdString(flipCard.zone_name());
-                    if (flipCard.has_card_name()) {
+                    // Turning a card face up replaces its reference, even if
+                    // the supplied name is empty. Turning it face down keeps it.
+                    if (!flipCard.face_down()) {
                         rememberCard(eventPlayerId, zone, flipCard.card_id(),
                                      QString::fromStdString(flipCard.card_name()));
                     }
-                    QString name = flipCard.has_card_name() ? QString::fromStdString(flipCard.card_name())
-                                                            : cardName(eventPlayerId, zone, flipCard.card_id());
+                    QString name = cardName(eventPlayerId, zone, flipCard.card_id());
                     if (name.isEmpty()) {
                         name = tr("a card");
                     }
@@ -723,21 +745,19 @@ private:
                     const Event_AttachCard &attachCard = event.GetExtension(Event_AttachCard::ext);
                     const QString startZone = QString::fromStdString(attachCard.start_zone());
                     const QString source = cardName(eventPlayerId, startZone, attachCard.card_id());
-                    const QString sourceText = source.isEmpty() ? tr("a card") : source;
-                    // An unattach event carries no target at all, so the target fields default to player 0 / no zone
-                    // / card 0; only a present target_player_id means the card was attached to something.
+                    const QString sourceName = source.isEmpty() ? tr("a card") : source;
                     if (!attachCard.has_target_player_id()) {
-                        addDetail(details, tr("unattached %1.").arg(sourceText), tr("ATTACH"), ReplayEventKind::Action,
-                                  eventPlayerId, forcedByJudge);
-                        break;
+                        addDetail(details, tr("unattached %1.").arg(sourceName), tr("UNATTACH"),
+                                  ReplayEventKind::Action, eventPlayerId, forcedByJudge);
+                    } else {
+                        const QString targetZone = QString::fromStdString(attachCard.target_zone());
+                        const int targetPlayerId =
+                            attachCard.target_player_id() >= 0 ? attachCard.target_player_id() : eventPlayerId;
+                        const QString target = cardName(targetPlayerId, targetZone, attachCard.target_card_id());
+                        addDetail(details,
+                                  tr("attached %1 to %2.").arg(sourceName, target.isEmpty() ? tr("a card") : target),
+                                  tr("ATTACH"), ReplayEventKind::Action, eventPlayerId, forcedByJudge);
                     }
-                    const QString targetZone = QString::fromStdString(attachCard.target_zone());
-                    const int targetPlayerId =
-                        attachCard.target_player_id() >= 0 ? attachCard.target_player_id() : eventPlayerId;
-                    const QString target = cardName(targetPlayerId, targetZone, attachCard.target_card_id());
-                    addDetail(details,
-                              tr("attached %1 to %2.").arg(sourceText, target.isEmpty() ? tr("a card") : target),
-                              tr("ATTACH"), ReplayEventKind::Action, eventPlayerId, forcedByJudge);
                     break;
                 }
                 case GameEvent::CREATE_TOKEN: {

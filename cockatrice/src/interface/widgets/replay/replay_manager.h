@@ -35,15 +35,13 @@ class ReplayManager : public QObject
     qreal timeScaleFactor = 1.0;
     bool skipEmptySections = false;
 
-    int currentVisualTime = 0;    ///< time currently displayed by the timeline
-    int currentProcessedTime = 0; ///< time that events are currently processed up to. Could differ from visual time due
-                                  ///< to rewind buffering
-    int currentEvent = 0;         ///< current event's index
+    int currentVisualTime = 0; ///< time currently displayed by the timeline
+    int currentEvent = 0;      ///< current event's index
 
-    void skipToTime(int newTime, bool doRewindBuffering, bool includeEventsAtTime = false);
-    void handleBackwardsSkip(bool doRewindBuffering, bool includeEventsAtTime = false);
-    void processRewind(bool includeEventsAtTime = false);
-    void processNewEvents(PlaybackMode playbackMode, bool includeEventsAtTime = false);
+    int eventsBefore(int time) const;
+    void skipToTime(int newTime, bool doRewindBuffering);
+    void processRewind(int targetEvent);
+    void processNewEvents(PlaybackMode playbackMode, int targetEvent);
     void handleSkipEmptySection();
 
 private slots:
@@ -78,6 +76,7 @@ public slots:
 
 signals:
     void timeChanged(int time);
+    void processedEventChanged(int eventIndex);
     void eventReplayed(const GameEventContainer &cont, EventProcessingOptions options);
     void replayFinished();
     void rewound();

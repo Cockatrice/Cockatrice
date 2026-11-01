@@ -18,14 +18,13 @@ static constexpr int EMPTY_SECTION_MARGIN_MS = 500;
 static QList<int> createReplayTimeline(const GameReplay *replay)
 {
     // Create list: event number -> time [ms]
-    unsigned int lastEventTimestamp = 0;
     const int eventCount = replay->event_list_size();
 
     QList<int> replayTimeline;
     for (int i = 0; i < eventCount; ++i) {
+        const auto currentSecond = replay->event_list(i).seconds_elapsed();
         int nextSecondIndex = i + 1;
-        while (nextSecondIndex < eventCount &&
-               replay->event_list(nextSecondIndex).seconds_elapsed() == lastEventTimestamp) {
+        while (nextSecondIndex < eventCount && replay->event_list(nextSecondIndex).seconds_elapsed() == currentSecond) {
             ++nextSecondIndex;
         }
 
@@ -37,9 +36,6 @@ static QList<int> createReplayTimeline(const GameReplay *replay)
             replayTimeline.append(eventMs + distributionMs);
         }
 
-        if (nextSecondIndex < eventCount) {
-            lastEventTimestamp = replay->event_list(nextSecondIndex).seconds_elapsed();
-        }
         i += numberEventsThisSecond - 1;
     }
 
@@ -57,7 +53,7 @@ ReplayManager::ReplayManager(QObject *parent, GameReplay *replay)
 
     rewindBufferingTimer = new QTimer(this);
     rewindBufferingTimer->setSingleShot(true);
-    connect(rewindBufferingTimer, &QTimer::timeout, this, [this] { processRewind(); });
+    connect(rewindBufferingTimer, &QTimer::timeout, this, [this] { processRewind(eventsBefore(currentVisualTime)); });
 }
 
 ReplayManager::~ReplayManager()
@@ -65,102 +61,74 @@ ReplayManager::~ReplayManager()
     delete replay;
 }
 
-void ReplayManager::skipToTime(int newTime, bool doRewindBuffering, bool includeEventsAtTime)
+int ReplayManager::eventsBefore(int time) const
 {
-    // check boundary conditions
-    if (newTime < 0) {
-        newTime = 0;
-    }
-    if (newTime > maxTime) {
-        newTime = maxTime;
-    }
+    return static_cast<int>(std::lower_bound(replayTimeline.cbegin(), replayTimeline.cend(), time) -
+                            replayTimeline.cbegin());
+}
 
-    if (!includeEventsAtTime) {
-        newTime -= newTime % TIMER_INTERVAL_MS; // Time should always be a multiple of the interval
-    }
-
-    const bool isBackwardsSkip = newTime < currentProcessedTime;
+void ReplayManager::skipToTime(int newTime, bool doRewindBuffering)
+{
+    newTime = std::clamp(newTime, 0, maxTime);
+    newTime -= newTime % TIMER_INTERVAL_MS;
     currentVisualTime = newTime;
+    const int targetEvent = eventsBefore(newTime);
 
-    if (isBackwardsSkip) {
-        handleBackwardsSkip(doRewindBuffering, includeEventsAtTime);
+    if (targetEvent < currentEvent) {
+        if (doRewindBuffering) {
+            rewindBufferingTimer->start(SettingsCache::instance().userInterface().getRewindBufferingMs());
+        } else {
+            processRewind(targetEvent);
+        }
     } else {
-        processNewEvents(FORWARD_SKIP, includeEventsAtTime);
-    }
-
-    timeChanged(currentVisualTime);
-}
-
-/**
- * @brief Handles a backwards skip in the replay timeline.
- *
- * @param doRewindBuffering When true, if multiple backward skips are made in quick succession, only a single rewind
- * is processed at the end. When false, the backwards skip will always cause an immediate rewind.
- */
-void ReplayManager::handleBackwardsSkip(bool doRewindBuffering, bool includeEventsAtTime)
-{
-    if (doRewindBuffering) {
-        // We use a one-shot timer to implement the rewind buffering.
-        // The rewind only happens once the timer runs out.
-        // If another backwards skip happens, the timer will just get reset instead of rewinding.
+        // The board already represents a position at or before this target. A
+        // pending rewind belongs to an earlier selection and must not undo it.
         rewindBufferingTimer->stop();
-        rewindBufferingTimer->start(SettingsCache::instance().userInterface().getRewindBufferingMs());
-    } else {
-        // otherwise, process the rewind immediately
-        processRewind(includeEventsAtTime);
+        processNewEvents(FORWARD_SKIP, targetEvent);
     }
+    emit timeChanged(currentVisualTime);
 }
 
-void ReplayManager::processRewind(bool includeEventsAtTime)
+void ReplayManager::processRewind(int targetEvent)
 {
-    // stop any queued-up rewinds
     rewindBufferingTimer->stop();
-
-    // process the rewind
     currentEvent = 0;
     emit rewound();
-    processNewEvents(BACKWARD_SKIP, includeEventsAtTime);
+    processNewEvents(BACKWARD_SKIP, targetEvent);
 }
 
 void ReplayManager::replayTimerTimeout()
 {
+    // A buffered rewind leaves the board at the old position. Apply it before
+    // playback advances, otherwise the clock and board can diverge.
+    if (rewindBufferingTimer->isActive()) {
+        processRewind(eventsBefore(currentVisualTime));
+    }
     currentVisualTime += TIMER_INTERVAL_MS;
-
-    processNewEvents(NORMAL_PLAYBACK);
-
-    timeChanged(currentVisualTime);
+    processNewEvents(NORMAL_PLAYBACK, eventsBefore(currentVisualTime));
+    emit timeChanged(currentVisualTime);
 
     if (skipEmptySections) {
         handleSkipEmptySection();
     }
 }
 
-/** @brief Processes all unprocessed events up to the current time. */
-void ReplayManager::processNewEvents(PlaybackMode playbackMode, bool includeEventsAtTime)
+/** @brief Processes events up to the exclusive event index targetEvent. */
+void ReplayManager::processNewEvents(PlaybackMode playbackMode, int targetEvent)
 {
-    currentProcessedTime = currentVisualTime;
-
-    while (currentEvent < replayTimeline.size() &&
-           (replayTimeline[currentEvent] < currentProcessedTime ||
-            (includeEventsAtTime && replayTimeline[currentEvent] == currentProcessedTime))) {
+    while (currentEvent < targetEvent) {
         EventProcessingOptions options;
-
-        // backwards skip => always skip reveal windows
-        // forwards skip => skip reveal windows that don't happen within a big skip of the target
-        if (playbackMode == BACKWARD_SKIP || currentProcessedTime - replayTimeline[currentEvent] > BIG_SKIP_MS) {
+        if (playbackMode == BACKWARD_SKIP || currentVisualTime - replayTimeline[currentEvent] > BIG_SKIP_MS) {
             options |= SKIP_REVEAL_WINDOW;
         }
-
-        // backwards skip => always skip tap animation
-        // backwards skip => always skip damage animation (battlefield shimmer / life counter flash)
         if (playbackMode == BACKWARD_SKIP) {
             options |= SKIP_TAP_ANIMATION;
             options |= SKIP_DAMAGE_ANIMATION;
         }
-
         emit eventReplayed(replay->event_list(currentEvent), options);
         ++currentEvent;
     }
+    emit processedEventChanged(currentEvent - 1);
     if (currentEvent == replayTimeline.size()) {
         emit replayFinished();
         replayTimer->stop();
@@ -246,16 +214,17 @@ void ReplayManager::setTimeToEvent(int eventIndex)
         return;
     }
 
-    // Flush a pending buffered rewind before seeking, otherwise its timer fires after this seek and rebuilds the
-    // replay state from an outdated currentVisualTime, dropping the event we seek to. Stopping the timer instead
-    // of processing it is not enough: playback ticks advance currentProcessedTime without rewinding currentEvent,
-    // so the board could still be ahead of the target.
-    if (rewindBufferingTimer->isActive()) {
-        processRewind();
+    // Event identity matters when multiple events have the same timestamp.
+    // The selected event is included; later events at the same time are not.
+    rewindBufferingTimer->stop();
+    currentVisualTime = replayTimeline.at(eventIndex);
+    const int targetEvent = eventIndex + 1;
+    if (targetEvent < currentEvent) {
+        processRewind(targetEvent);
+    } else {
+        processNewEvents(FORWARD_SKIP, targetEvent);
     }
-
-    // Unlike a timeline seek, jumping to an event should apply that event immediately.
-    skipToTime(replayTimeline.at(eventIndex), false, true);
+    emit timeChanged(currentVisualTime);
 }
 
 void ReplayManager::skipByAmount(int amount)

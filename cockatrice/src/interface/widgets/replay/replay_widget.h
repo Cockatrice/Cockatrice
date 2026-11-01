@@ -44,6 +44,7 @@ public slots:
 signals:
     void rewound();
     void timeChanged(int time);
+    void processedEventChanged(int eventIndex);
     void eventReplayed(const GameEventContainer &cont, EventProcessingOptions options);
 
 private:

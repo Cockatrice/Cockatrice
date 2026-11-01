@@ -10,6 +10,7 @@
 #include <QListWidgetItem>
 #include <QPainter>
 #include <QPalette>
+#include <QSignalBlocker>
 #include <QStyle>
 #include <QStyledItemDelegate>
 #include <QVBoxLayout>
@@ -24,7 +25,8 @@ enum ItemDataRole
     KindRole,
     ActorRole,
     BadgeRole,
-    DetailRole
+    DetailRole,
+    CurrentRole
 };
 
 QColor accentForKind(ReplayEventKind kind, const QPalette &palette)
@@ -57,7 +59,7 @@ public:
         painter->setRenderHint(QPainter::Antialiasing, true);
 
         const QPalette &palette = option.palette;
-        const bool selected = option.state.testFlag(QStyle::State_Selected);
+        const bool selected = index.data(CurrentRole).toBool();
         const bool hovered = option.state.testFlag(QStyle::State_MouseOver);
         const auto kind = static_cast<ReplayEventKind>(index.data(KindRole).toInt());
         const QColor accent = accentForKind(kind, palette);
@@ -202,7 +204,7 @@ ReplayEventSidebar::ReplayEventSidebar(QWidget *parent, const GameReplay *replay
     layout->addWidget(emptyLabel);
 
     const QList<ReplayEventEntry> entries = buildReplayEventEntries(replay, timeline);
-    eventTimes.reserve(entries.size());
+    eventIndices.reserve(entries.size());
 
     for (const ReplayEventEntry &entry : entries) {
         auto *item = new QListWidgetItem(eventList);
@@ -219,7 +221,7 @@ ReplayEventSidebar::ReplayEventSidebar(QWidget *parent, const GameReplay *replay
         item->setData(Qt::AccessibleTextRole, entry.actor.isEmpty()
                                                   ? tr("%1: %2").arg(entry.timeLabel, entry.detail)
                                                   : tr("%1, %2: %3").arg(entry.timeLabel, entry.actor, entry.detail));
-        eventTimes.append(entry.timeMs);
+        eventIndices.append(entry.eventIndex);
     }
 
     const bool hasEvents = !entries.isEmpty();
@@ -227,29 +229,26 @@ ReplayEventSidebar::ReplayEventSidebar(QWidget *parent, const GameReplay *replay
     emptyLabel->setVisible(!hasEvents);
     emptyLabel->setText(tr("No game events in this replay."));
 
+    // Keep native selection, including the accessible selected state, aligned
+    // with the applied event even when a drag or modifier changes list selection.
+    connect(eventList, &QListWidget::itemSelectionChanged, this, [this] {
+        const QSignalBlocker blocker(eventList);
+        eventList->setCurrentRow(currentRow);
+    });
+
     connect(eventList, &QListWidget::itemClicked, this, [this](QListWidgetItem *item) {
         if (!item) {
             return;
         }
 
-        setCurrentRow(eventList->row(item));
         emit eventSelected(item->data(EventIndexRole).toInt());
     });
-
-    if (hasEvents) {
-        setCurrentRow(-1);
-    }
 }
 
-void ReplayEventSidebar::setCurrentTime(int timeMs)
+void ReplayEventSidebar::setProcessedEvent(int eventIndex)
 {
-    if (eventTimes.isEmpty()) {
-        setCurrentRow(-1);
-        return;
-    }
-
-    const auto it = std::upper_bound(eventTimes.cbegin(), eventTimes.cend(), timeMs);
-    const int row = static_cast<int>(it - eventTimes.cbegin()) - 1;
+    const auto it = std::upper_bound(eventIndices.cbegin(), eventIndices.cend(), eventIndex);
+    const int row = static_cast<int>(it - eventIndices.cbegin()) - 1;
     setCurrentRow(row);
 }
 
@@ -259,24 +258,20 @@ void ReplayEventSidebar::setCurrentRow(int row)
         row = -1;
     }
 
-    if (row >= 0) {
-        // The view's current index also moves on mouse press and can be deselected by a ctrl-click,
-        // so the cached row alone cannot tell whether the view is already in the desired state.
-        const QListWidgetItem *item = eventList->item(row);
-        if (row == eventList->currentRow() && item && item->isSelected()) {
-            return;
-        }
-    } else if (row == currentRow) {
+    if (row == currentRow) {
         return;
     }
-
+    const QSignalBlocker blocker(eventList);
+    if (currentRow >= 0) {
+        eventList->item(currentRow)->setData(CurrentRole, false);
+    }
     currentRow = row;
     eventList->setCurrentRow(currentRow);
-
     if (currentRow >= 0) {
         QListWidgetItem *item = eventList->item(currentRow);
+        item->setData(CurrentRole, true);
         if (!eventList->viewport()->rect().contains(eventList->visualItemRect(item))) {
-            eventList->scrollToItem(item, QAbstractItemView::PositionAtCenter);
+            eventList->scrollToItem(item, QAbstractItemView::EnsureVisible);
         }
     }
 }
