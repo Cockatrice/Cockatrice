@@ -78,7 +78,7 @@ void EdhrecCommanderApiResponseNavigationWidget::applyInterfaceDefaultFont()
 {
     // Family comes from the InterfaceDefault theme role; the 24px size stays caller-side.
     QFont navFont = themeManager->appFont(AppFont::InterfaceDefault);
-    navFont.setPointSize(24);
+    navFont.setPixelSize(24);
     comboPushButton->setFont(navFont);
     averageDeckPushButton->setFont(navFont);
 }

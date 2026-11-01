@@ -26,6 +26,21 @@
 #include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
+namespace
+{
+QFont deckOverlayFont(int pixelSize, bool bold)
+{
+    // The drag/total counters and the tally columns are in-game overlays, not
+    // deck list text: keep the monospace family the stylesheets used to set so
+    // digit widths stay stable as counts tick and `white-space: pre` lines up.
+    QFont font(QStringLiteral("monospace"));
+    font.setStyleHint(QFont::Monospace);
+    font.setPixelSize(pixelSize);
+    font.setBold(bold);
+    return font;
+}
+} // namespace
+
 // QRubberBand calls raise() in showEvent() and changeEvent() to stay on top of siblings.
 // This subclass disables that behavior so dragCountLabel can appear above it.
 class SelectionRubberBand : public QRubberBand
@@ -108,34 +123,21 @@ GameView::GameView(GameScene *scene, QWidget *parent) : QGraphicsView(scene, par
 
 void GameView::applyDeckListFont()
 {
-    // Family comes from the DeckList theme role; the pixel sizes and bold
-    // weights previously carried by the stylesheets stay caller-side.
-    QFont dragFont = themeManager->appFont(AppFont::DeckList);
-    dragFont.setPointSize(14);
-    dragFont.setWeight(QFont::Bold);
-    dragCountLabel->setFont(dragFont);
-
-    QFont totalFont = themeManager->appFont(AppFont::DeckList);
-    totalFont.setPointSize(16);
-    totalFont.setWeight(QFont::Bold);
-    totalCountLabel->setFont(totalFont);
-
-    QFont tallyFont = themeManager->appFont(AppFont::DeckList);
-    tallyFont.setPointSize(12);
-    tallyContainer->setFont(tallyFont);
+    dragCountLabel->setFont(deckOverlayFont(14, true));
+    totalCountLabel->setFont(deckOverlayFont(16, true));
+    tallyContainer->setFont(deckOverlayFont(12, false));
     for (int i = 0; i < tallyLayout->count(); ++i) {
         if (auto *label = qobject_cast<QLabel *>(tallyLayout->itemAt(i)->widget())) {
-            QFont labelFont = themeManager->appFont(AppFont::DeckList);
-            // Count column (odd positions) keeps the 14px bold emphasis.
-            if (i % 2 == 1) {
-                labelFont.setPointSize(14);
-                labelFont.setWeight(QFont::Bold);
-            } else {
-                labelFont.setPointSize(12);
-            }
-            label->setFont(labelFont);
+            // Count column (odd positions) keeps the bold emphasis.
+            const bool count = i % 2 == 1;
+            label->setFont(deckOverlayFont(count ? 14 : 12, count));
         }
     }
+
+    // The container keeps the size computed from the previous fonts, so force
+    // rebuildTallyLabels() to re-measure it instead of reusing cachedTallyRows.
+    cachedTallyRows.clear();
+    updateTotalSelectionCount();
 }
 
 void GameView::resizeEvent(QResizeEvent *event)
@@ -266,18 +268,13 @@ QSize GameView::rebuildTallyLabels(const QList<TallyRow> &entries)
     for (const TallyRow &entry : entries) {
         auto *nameLabel = new QLabel(entry.name, tallyContainer);
         nameLabel->setStyleSheet(nameStyle);
-        QFont nameFont = themeManager->appFont(AppFont::DeckList);
-        nameFont.setPointSize(12);
-        nameLabel->setFont(nameFont);
+        nameLabel->setFont(deckOverlayFont(12, false));
         nameLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
         tallyLayout->addWidget(nameLabel, row, 0);
 
         auto *countLabel = new QLabel(entry.value, tallyContainer);
         countLabel->setStyleSheet(countStyle);
-        QFont countFont = themeManager->appFont(AppFont::DeckList);
-        countFont.setPointSize(14);
-        countFont.setWeight(QFont::Bold);
-        countLabel->setFont(countFont);
+        countLabel->setFont(deckOverlayFont(14, true));
         countLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
         tallyLayout->addWidget(countLabel, row, 1);
 

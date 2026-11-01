@@ -46,14 +46,13 @@ TabPublicDecks::TabPublicDecks(TabSupervisor *_tabSupervisor, AbstractClient *_c
 
     titleLabel = new QLabel(tr("Public decks of %1").arg(userName.toHtmlEscaped()), this);
     // Family comes from the InterfaceDefault theme role; bold stays caller-side.
-    QFont titleFont = themeManager->appFont(AppFont::InterfaceDefault);
-    titleFont.setBold(true);
-    titleLabel->setFont(titleFont);
-    connect(themeManager, &ThemeManager::fontsChanged, this, [this]() {
-        QFont refreshedFont = themeManager->appFont(AppFont::InterfaceDefault);
-        refreshedFont.setBold(true);
-        titleLabel->setFont(refreshedFont);
-    });
+    auto applyTitleFont = [this]() {
+        QFont titleFont = themeManager->appFont(AppFont::InterfaceDefault);
+        titleFont.setBold(true);
+        titleLabel->setFont(titleFont);
+    };
+    applyTitleFont();
+    connect(themeManager, &ThemeManager::fontsChanged, this, applyTitleFont);
 
     auto *headerLayout = new QHBoxLayout;
     headerLayout->addWidget(titleLabel);

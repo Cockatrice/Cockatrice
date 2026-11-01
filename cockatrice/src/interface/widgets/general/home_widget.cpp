@@ -274,14 +274,13 @@ QGroupBox *HomeWidget::createButtons()
     }
 )");
     // Family comes from the InterfaceDefault theme role; the 20px size stays caller-side.
-    QFont boxFont = themeManager->appFont(AppFont::InterfaceDefault);
-    boxFont.setPointSize(20);
-    box->setFont(boxFont);
-    connect(themeManager, &ThemeManager::fontsChanged, this, [box]() {
-        QFont refreshedFont = themeManager->appFont(AppFont::InterfaceDefault);
-        refreshedFont.setPointSize(20);
-        box->setFont(refreshedFont);
-    });
+    auto applyBoxFont = [box]() {
+        QFont boxFont = themeManager->appFont(AppFont::InterfaceDefault);
+        boxFont.setPixelSize(20);
+        box->setFont(boxFont);
+    };
+    applyBoxFont();
+    connect(themeManager, &ThemeManager::fontsChanged, this, applyBoxFont);
     box->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     QVBoxLayout *boxLayout = new QVBoxLayout;
     boxLayout->setAlignment(Qt::AlignHCenter);

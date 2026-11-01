@@ -104,7 +104,7 @@ void EdhrecCommanderApiResponseBracketNavigationWidget::updateOptionButtonSelect
         const bool selected = (it.key() == selectedKey);
         it.value()->setStyleSheet(selected ? QStringLiteral("background-color: lightblue;") : QString());
         QFont buttonFont = themeManager->appFont(AppFont::InterfaceDefault);
-        buttonFont.setPointSize(24);
+        buttonFont.setPixelSize(24);
         buttonFont.setWeight(selected ? QFont::Bold : QFont::Normal);
         it.value()->setFont(buttonFont);
     }

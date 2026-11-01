@@ -33,7 +33,7 @@ void HomeStyledButton::applyInterfaceDefaultFont()
     // Family comes from the InterfaceDefault theme role; the 34px size and
     // bold weight previously carried by the stylesheet stay caller-side.
     QFont buttonFont = themeManager->appFont(AppFont::InterfaceDefault);
-    buttonFont.setPointSize(34);
+    buttonFont.setPixelSize(34);
     buttonFont.setWeight(QFont::Bold);
     setFont(buttonFont);
 }

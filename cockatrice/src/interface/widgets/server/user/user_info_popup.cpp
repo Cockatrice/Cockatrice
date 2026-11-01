@@ -482,7 +482,7 @@ void UserInfoPopup::applyTheme()
 
     gamesLabel->setStyleSheet(QStringLiteral("color:%1; background:transparent;").arg(colorStr(theme.subText)));
     QFont gamesLabelFont = themeManager->appFont(AppFont::InterfaceDefault);
-    gamesLabelFont.setPointSize(11);
+    gamesLabelFont.setPixelSize(11);
     gamesLabelFont.setWeight(QFont::Bold);
     gamesLabel->setFont(gamesLabelFont);
 
@@ -490,13 +490,13 @@ void UserInfoPopup::applyTheme()
                                              "QPushButton:hover{color:%2;}")
                                   .arg(colorStr(theme.subText), colorStr(theme.text)));
     QFont refreshFont = themeManager->appFont(AppFont::InterfaceDefault);
-    refreshFont.setPointSize(14);
+    refreshFont.setPixelSize(14);
     refreshBtn->setFont(refreshFont);
 
     gamesStatus->setStyleSheet(
         QStringLiteral("color:%1; padding:10px; background:transparent;").arg(colorStr(theme.statusText)));
     QFont statusFont = themeManager->appFont(AppFont::InterfaceDefault);
-    statusFont.setPointSize(11);
+    statusFont.setPixelSize(11);
     gamesStatus->setFont(statusFont);
 
     gamesView->setStyleSheet(QStringLiteral("QListView{background:%1;border:none;}"
@@ -509,7 +509,7 @@ void UserInfoPopup::applyTheme()
                        "QPushButton:hover{color:%3;background:%4;}")
             .arg(colorStr(theme.closeBg), colorStr(theme.subText), colorStr(theme.text), colorStr(theme.closeHover)));
     QFont closeFont = themeManager->appFont(AppFont::InterfaceDefault);
-    closeFont.setPointSize(10);
+    closeFont.setPixelSize(10);
     closeBtn->setFont(closeFont);
 
     header->update();
@@ -534,7 +534,7 @@ static QPushButton *makeBtn(const QString &label, const QString &tip, QWidget *p
                               colorStr(t.text), colorStr(t.buttonPressed), colorStr(t.buttonDisabled)));
     // Family comes from the InterfaceDefault theme role; the 11px size stays caller-side.
     QFont btnFont = themeManager->appFont(AppFont::InterfaceDefault);
-    btnFont.setPointSize(11);
+    btnFont.setPixelSize(11);
     b->setFont(btnFont);
     return b;
 }

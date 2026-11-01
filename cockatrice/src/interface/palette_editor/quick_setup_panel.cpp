@@ -30,16 +30,14 @@ QuickSetupPanel::QuickSetupPanel(QWidget *parent) : QWidget(parent)
     labelLow = new QLabel(this);
     labelHigh = new QLabel(this);
     // Family comes from the InterfaceDefault theme role; the *0.82 size stays caller-side.
-    QFont small = themeManager->appFont(AppFont::InterfaceDefault);
-    small.setPointSizeF(small.pointSizeF() * 0.82);
-    labelLow->setFont(small);
-    labelHigh->setFont(small);
-    connect(themeManager, &ThemeManager::fontsChanged, this, [this]() {
-        QFont refreshedSmall = themeManager->appFont(AppFont::InterfaceDefault);
-        refreshedSmall.setPointSizeF(refreshedSmall.pointSizeF() * 0.82);
-        labelLow->setFont(refreshedSmall);
-        labelHigh->setFont(refreshedSmall);
-    });
+    auto applySmallFont = [this]() {
+        QFont small = themeManager->appFont(AppFont::InterfaceDefault);
+        small.setPointSizeF(small.pointSizeF() * 0.82);
+        labelLow->setFont(small);
+        labelHigh->setFont(small);
+    };
+    applySmallFont();
+    connect(themeManager, &ThemeManager::fontsChanged, this, applySmallFont);
     QPalette dimmed = labelLow->palette();
     dimmed.setColor(QPalette::WindowText, qApp->palette().color(QPalette::Mid));
     labelLow->setPalette(dimmed);

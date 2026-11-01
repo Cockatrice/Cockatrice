@@ -36,16 +36,14 @@ DlgSharedDecksPreview::DlgSharedDecksPreview(QWidget *parent,
     auto *titleLabel =
         new QLabel(tr("Share: %1").arg((shareName.isEmpty() ? tr("Untitled") : shareName).toHtmlEscaped()), this);
     // Family comes from the InterfaceDefault theme role; the +2 size and bold stay caller-side.
-    QFont titleFont = themeManager->appFont(AppFont::InterfaceDefault);
-    titleFont.setBold(true);
-    titleFont.setPointSize(titleFont.pointSize() + 2);
-    titleLabel->setFont(titleFont);
-    connect(themeManager, &ThemeManager::fontsChanged, this, [titleLabel]() {
-        QFont refreshedFont = themeManager->appFont(AppFont::InterfaceDefault);
-        refreshedFont.setBold(true);
-        refreshedFont.setPointSize(refreshedFont.pointSize() + 2);
-        titleLabel->setFont(refreshedFont);
-    });
+    auto applyTitleFont = [titleLabel]() {
+        QFont titleFont = themeManager->appFont(AppFont::InterfaceDefault);
+        titleFont.setBold(true);
+        titleFont.setPointSize(titleFont.pointSize() + 2);
+        titleLabel->setFont(titleFont);
+    };
+    applyTitleFont();
+    connect(themeManager, &ThemeManager::fontsChanged, this, applyTitleFont);
     mainLayout->addWidget(titleLabel);
 
     if (!serverText.isEmpty()) {

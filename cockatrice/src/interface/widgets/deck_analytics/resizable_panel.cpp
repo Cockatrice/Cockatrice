@@ -104,14 +104,13 @@ ResizablePanel::ResizablePanel(const QString &_typeId, AbstractAnalyticsPanelWid
                                       "QPushButton:hover { background: %4; }")
                                   .arg(mid.name(), dark.name(), placeholderText.name(), midLight.name()));
     // Family comes from the InterfaceDefault theme role; the 10px size stays caller-side.
-    QFont dragFont = themeManager->appFont(AppFont::InterfaceDefault);
-    dragFont.setPointSize(10);
-    dragButton->setFont(dragFont);
-    connect(themeManager, &ThemeManager::fontsChanged, this, [this]() {
-        QFont refreshedFont = themeManager->appFont(AppFont::InterfaceDefault);
-        refreshedFont.setPointSize(10);
-        dragButton->setFont(refreshedFont);
-    });
+    auto applyDragFont = [this]() {
+        QFont dragFont = themeManager->appFont(AppFont::InterfaceDefault);
+        dragFont.setPixelSize(10);
+        dragButton->setFont(dragFont);
+    };
+    applyDragFont();
+    connect(themeManager, &ThemeManager::fontsChanged, this, applyDragFont);
 
     resizeHandle->setStyleSheet(QString("QWidget { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, "
                                         "stop:0 %1, stop:1 %2); }")
