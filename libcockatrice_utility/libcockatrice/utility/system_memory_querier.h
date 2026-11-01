@@ -7,7 +7,6 @@ class SystemMemoryQuerier
 {
 public:
     static qulonglong totalMemoryBytes();
-    static qulonglong availableMemoryBytes();
 
     static bool hasAtLeastGiB(int gib)
     {
