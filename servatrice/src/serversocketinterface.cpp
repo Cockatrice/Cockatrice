@@ -2641,7 +2641,15 @@ Response::ResponseCode AbstractServerSocketInterface::cmdResetUserPassword(const
     }
 
     const QString tempPassword = PasswordHasher::generateRandomSalt();
-    if (!sqlInterface->changeUserPassword(userName, tempPassword, true)) {
+    // Store a scrypt verifier rather than a legacy salt+hash: a legacy row makes the next
+    // login look like an authentication downgrade, which modern clients refuse when they
+    // still hold a verifier for the account. Where security/legacy_backup_key is configured,
+    // keep a sealed legacy hash of the same temporary password as the downgrade backup so
+    // pre-challenge clients keep the path the reset used to provide; without the key they
+    // have none, which changeUserPasswordWithLegacyBackup warns about.
+    const QString verifier = PasswordHasher::generatePasswordVerifier(tempPassword);
+    const QString legacyCredential = PasswordHasher::computeHash(tempPassword, PasswordHasher::generateRandomSalt());
+    if (!sqlInterface->changeUserPasswordWithLegacyBackup(userName, verifier, legacyCredential)) {
         return Response::RespInternalError;
     }
     sqlInterface->setForcePasswordChange(userName, true);
