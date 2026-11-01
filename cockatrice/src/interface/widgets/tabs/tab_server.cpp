@@ -1,5 +1,6 @@
 #include "tab_server.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "libcockatrice/protocol/pb/response.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_room.pb.h"
 #include "tab_supervisor.h"
@@ -7,9 +8,11 @@
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QMap>
+#include <QMenu>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QSharedPointer>
+#include <QSignalBlocker>
 #include <QTextBrowser>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
@@ -22,6 +25,7 @@
 #include <libcockatrice/protocol/pb/room_commands.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/settings/layouts_settings.h>
 #include <qnamespace.h>
 
 class TabRoom;
@@ -31,11 +35,15 @@ RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent) : QGroupBox
     roomList = new QTreeWidget;
     roomList->setRootIsDecorated(false);
     roomList->setColumnCount(5);
-    roomList->header()->setStretchLastSection(false);
-    roomList->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-    roomList->header()->setSectionResizeMode(1, QHeaderView::Stretch);
-    roomList->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-    roomList->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+    roomList->setSortingEnabled(true);
+    roomList->sortByColumn(0, Qt::AscendingOrder);
+    auto *header = roomList->header();
+    header->setSectionsMovable(true);
+    header->setFirstSectionMovable(true);
+    header->setStretchLastSection(false);
+    header->setSectionResizeMode(QHeaderView::Interactive);
+    roomList->setColumnWidth(0, header->defaultSectionSize() * 1.5);
+    roomList->setColumnWidth(1, header->defaultSectionSize() * 3);
 
     joinButton = new QPushButton;
     connect(joinButton, &QPushButton::clicked, this, &RoomSelector::joinClicked);
@@ -49,9 +57,66 @@ RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent) : QGroupBox
     retranslateUi();
     setLayout(vbox);
 
+    defaultHeaderState = header->saveState();
+    const QByteArray savedState = SettingsCache::instance().layouts().getRoomSelectorHeaderState();
+    if (!savedState.isEmpty() &&
+        (!header->restoreState(savedState) || header->count() != roomList->columnCount() ||
+         header->sortIndicatorSection() < 0 || header->sortIndicatorSection() >= roomList->columnCount())) {
+        header->restoreState(defaultHeaderState);
+    }
+    for (int column = 0; column < roomList->columnCount(); ++column) {
+        header->showSection(column);
+    }
+    header->setSectionResizeMode(QHeaderView::Interactive);
+    header->setStretchLastSection(false);
+    roomList->sortByColumn(header->sortIndicatorSection(), header->sortIndicatorOrder());
+
+    headerSaveDebounceTimer.setSingleShot(true);
+    headerSaveDebounceTimer.setInterval(500);
+    connect(&headerSaveDebounceTimer, &QTimer::timeout, this, &RoomSelector::saveHeaderState);
+    connect(&SettingsCache::instance().layouts(), &LayoutsSettings::roomSelectorHeaderStateChangeStarted,
+            &headerSaveDebounceTimer, &QTimer::stop);
+    const auto headerChanged = [this] {
+        SettingsCache::instance().layouts().beginRoomSelectorHeaderStateChange();
+        headerSaveDebounceTimer.start();
+    };
+    connect(header, &QHeaderView::sectionMoved, this, headerChanged);
+    connect(header, &QHeaderView::sectionResized, this, headerChanged);
+    connect(header, &QHeaderView::sortIndicatorChanged, this, headerChanged);
+    header->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(header, &QHeaderView::customContextMenuRequested, this, [this, header](const QPoint &point) {
+        auto *menu = new QMenu(header);
+        menu->setAttribute(Qt::WA_DeleteOnClose);
+        menu->addAction(tr("Reset columns"), this, &RoomSelector::resetHeaderState);
+        menu->popup(header->mapToGlobal(point));
+    });
+
     connect(client, &AbstractClient::listRoomsEventReceived, this, &RoomSelector::processListRoomsEvent);
     connect(roomList, &QTreeWidget::activated, this, &RoomSelector::joinClicked);
     client->sendCommand(client->prepareSessionCommand(Command_ListRooms()));
+}
+
+RoomSelector::~RoomSelector()
+{
+    if (headerSaveDebounceTimer.isActive()) {
+        saveHeaderState();
+    }
+}
+
+void RoomSelector::saveHeaderState()
+{
+    headerSaveDebounceTimer.stop();
+    SettingsCache::instance().layouts().setRoomSelectorHeaderState(roomList->header()->saveState());
+}
+
+void RoomSelector::resetHeaderState()
+{
+    headerSaveDebounceTimer.stop();
+    auto *header = roomList->header();
+    const QSignalBlocker blocker(header);
+    header->restoreState(defaultHeaderState);
+    roomList->sortByColumn(header->sortIndicatorSection(), header->sortIndicatorOrder());
+    SettingsCache::instance().layouts().setRoomSelectorHeaderState({});
 }
 
 void RoomSelector::retranslateUi()

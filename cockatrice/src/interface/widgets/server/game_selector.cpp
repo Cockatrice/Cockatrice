@@ -27,8 +27,11 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QModelIndex>
+#include <QPersistentModelIndex>
 #include <QPushButton>
+#include <QSignalBlocker>
 #include <QSize>
+#include <QSortFilterProxyModel>
 #include <QString>
 #include <QStringLiteral>
 #include <QTreeView>
@@ -41,7 +44,9 @@
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/settings/layouts_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
+#include <optional>
 #include <qlogging.h>
 #include <qnamespace.h>
 #include <string>
@@ -73,7 +78,12 @@ GameSelector::GameSelector(AbstractClient *_client,
         gameListProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
         gameListView->setModel(gameListProxyModel);
     } else {
-        gameListView->setModel(gameListModel);
+        // User-game windows need sorting without applying the lobby's game filters.
+        auto *sortModel = new QSortFilterProxyModel(this);
+        sortModel->setSourceModel(gameListModel);
+        sortModel->setSortRole(GamesModel::SORT_ROLE);
+        sortModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+        gameListView->setModel(sortModel);
     }
     gameListView->setIconSize(QSize(13, 13));
     gameListView->setSortingEnabled(true);
@@ -90,10 +100,6 @@ GameSelector::GameSelector(AbstractClient *_client,
     gameListView->setColumnWidth(3, gameListView->columnWidth(3) * 1.2);
     // game type width
     gameListView->setColumnWidth(4, gameListView->columnWidth(4) * 1.4);
-    if (_room) {
-        gameListView->header()->hideSection(gameListModel->roomColIndex());
-    }
-
     if (room) {
         gameTypeMap = gameListModel->getGameTypes().value(room->getRoomId());
     }
@@ -102,7 +108,57 @@ GameSelector::GameSelector(AbstractClient *_client,
         gameListProxyModel->loadFilterParameters(gameTypeMap);
     }
 
-    gameListView->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    auto *header = gameListView->header();
+    header->setSectionsMovable(true);
+    header->setFirstSectionMovable(true);
+    header->setStretchLastSection(false);
+    header->setSectionResizeMode(QHeaderView::Interactive);
+    if (room) {
+        header->hideSection(gameListModel->roomColIndex());
+    }
+    defaultHeaderState = header->saveState();
+    const QByteArray savedState = SettingsCache::instance().layouts().getGameSelectorHeaderState(room != nullptr);
+    if (!savedState.isEmpty() &&
+        (!header->restoreState(savedState) || header->count() != gameListModel->columnCount() ||
+         header->sortIndicatorSection() < 0 || header->sortIndicatorSection() >= gameListModel->columnCount())) {
+        header->restoreState(defaultHeaderState);
+    }
+    // Visibility and resize policy belong to this view, not to a saved layout.
+    header->setSectionResizeMode(QHeaderView::Interactive);
+    header->setStretchLastSection(false);
+    for (int column = 0; column < gameListModel->columnCount(); ++column) {
+        header->showSection(column);
+    }
+    // Reapply hiding after sizing so Qt does not retain a hidden column's old width.
+    if (room) {
+        header->hideSection(gameListModel->roomColIndex());
+    }
+    gameListView->sortByColumn(header->sortIndicatorSection(), header->sortIndicatorOrder());
+
+    headerSaveDebounceTimer.setSingleShot(true);
+    headerSaveDebounceTimer.setInterval(500);
+    connect(&headerSaveDebounceTimer, &QTimer::timeout, this, &GameSelector::saveHeaderState);
+    // A newer edit or reset in another window supersedes our older pending save.
+    connect(&SettingsCache::instance().layouts(), &LayoutsSettings::gameSelectorHeaderStateChangeStarted, this,
+            [this](bool roomGames) {
+                if (roomGames == (room != nullptr)) {
+                    headerSaveDebounceTimer.stop();
+                }
+            });
+    const auto headerChanged = [this] {
+        SettingsCache::instance().layouts().beginGameSelectorHeaderStateChange(room != nullptr);
+        headerSaveDebounceTimer.start();
+    };
+    connect(header, &QHeaderView::sectionMoved, this, headerChanged);
+    connect(header, &QHeaderView::sectionResized, this, headerChanged);
+    connect(header, &QHeaderView::sortIndicatorChanged, this, headerChanged);
+    header->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(header, &QHeaderView::customContextMenuRequested, this, [this, header](const QPoint &point) {
+        auto *menu = new QMenu(header);
+        menu->setAttribute(Qt::WA_DeleteOnClose);
+        menu->addAction(tr("Reset columns"), this, &GameSelector::resetHeaderState);
+        menu->popup(header->mapToGlobal(point));
+    });
 
     if (showFilters && restoresettings) {
         quickFilterToolBar = new GameSelectorQuickFilterToolBar(this, tabSupervisor, gameListProxyModel, gameTypeMap);
@@ -201,6 +257,10 @@ GameSelector::GameSelector(AbstractClient *_client,
 
 GameSelector::~GameSelector()
 {
+    // Only flush pending edits; an untouched older tab must not overwrite a newer layout.
+    if (headerSaveDebounceTimer.isActive()) {
+        saveHeaderState();
+    }
     // Nothing else persists quick-filter toolbar edits: the toolbar only updates the in-memory model,
     // and the debounced timer above is the sole writer for that path (actSetFilter/actClearFilter save
     // synchronously, but the toolbar does not). Flush a pending debounced save so edits made within
@@ -209,6 +269,23 @@ GameSelector::~GameSelector()
         filterSaveDebounceTimer.stop();
         gameListProxyModel->saveFilterParameters(gameTypeMap);
     }
+}
+
+void GameSelector::saveHeaderState()
+{
+    headerSaveDebounceTimer.stop();
+    SettingsCache::instance().layouts().setGameSelectorHeaderState(gameListView->header()->saveState(),
+                                                                   room != nullptr);
+}
+
+void GameSelector::resetHeaderState()
+{
+    headerSaveDebounceTimer.stop();
+    auto *header = gameListView->header();
+    const QSignalBlocker blocker(header);
+    header->restoreState(defaultHeaderState);
+    gameListView->sortByColumn(header->sortIndicatorSection(), header->sortIndicatorOrder());
+    SettingsCache::instance().layouts().setGameSelectorHeaderState({}, room != nullptr);
 }
 
 void GameSelector::ignoreListReceived(const QList<ServerInfo_User> &)
@@ -346,57 +423,61 @@ void GameSelector::actJoinAsJudgeSpectator()
 
 void GameSelector::customContextMenu(const QPoint &point)
 {
-    const auto &index = gameListView->indexAt(point);
+    // Sorting and server updates can move or remove rows while the menu is open.
+    const QPersistentModelIndex index(gameListView->indexAt(point));
     if (!index.isValid()) {
         return;
     }
+    const auto selectedGame = [this, index]() -> std::optional<ServerInfo_Game> {
+        if (!index.isValid()) {
+            return std::nullopt;
+        }
+        // Keep a value across join confirmations, which can process more server updates.
+        return gameListModel->getGame(index.data(Qt::UserRole).toInt());
+    };
 
-    QAction joinGame(tr("Join Game"));
-    connect(&joinGame, &QAction::triggered, this, &GameSelector::actJoin);
-
-    QAction spectateGame(tr("Spectate Game"));
-    connect(&spectateGame, &QAction::triggered, this, &GameSelector::actJoinAsSpectator);
-
-    QAction getGameInfo(tr("Game Information"));
-    connect(&getGameInfo, &QAction::triggered, this, [=, this]() {
-        const ServerInfo_Game &gameInfo = gameListModel->getGame(index.data(Qt::UserRole).toInt());
-        const QMap<int, QString> &gameTypes = gameListModel->getGameTypes().value(gameInfo.room_id());
-
-        DlgCreateGame dlg(gameInfo, gameTypes, this);
-        dlg.exec();
+    auto *menu = new QMenu(gameListView);
+    menu->setAttribute(Qt::WA_DeleteOnClose);
+    menu->addAction(tr("Join Game"), this, [this, selectedGame] {
+        if (const auto game = selectedGame()) {
+            joinGame(*game);
+        }
     });
-
-    QAction copyLink(tr("Cop&y game link"));
-    connect(&copyLink, &QAction::triggered, this, [=, this]() {
-        const ServerInfo_Game &gameInfo = gameListModel->getGame(index.data(Qt::UserRole).toInt());
-        QGuiApplication::clipboard()->setText(makeGameJoinLink(client->serverName(), client->serverPort(),
-                                                               gameInfo.room_id(), gameInfo.game_id(),
-                                                               QString::fromStdString(gameInfo.description())));
-    });
-
-    QMenu menu;
-    menu.addAction(&joinGame);
-
     if (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsJudge) {
-        QAction joinGameAsJudge(tr("Join Game as Judge"));
-        connect(&joinGameAsJudge, &QAction::triggered, this, &GameSelector::actJoinAsJudge);
-
-        menu.addAction(&joinGameAsJudge);
-
-        QAction spectateGameAsJudge(tr("Spectate Game as Judge"));
-        connect(&spectateGameAsJudge, &QAction::triggered, this, &GameSelector::actJoinAsJudgeSpectator);
-
-        menu.addAction(&spectateGameAsJudge);
+        menu->addAction(tr("Join Game as Judge"), this, [this, selectedGame] {
+            if (const auto game = selectedGame()) {
+                joinGame(*game, false, true);
+            }
+        });
+        menu->addAction(tr("Spectate Game as Judge"), this, [this, selectedGame] {
+            if (const auto game = selectedGame()) {
+                joinGame(*game, true, true);
+            }
+        });
     }
-
-    menu.addAction(&spectateGame);
-    menu.addAction(&getGameInfo);
-
+    menu->addAction(tr("Spectate Game"), this, [this, selectedGame] {
+        if (const auto game = selectedGame()) {
+            joinGame(*game, true);
+        }
+    });
+    menu->addAction(tr("Game Information"), this, [this, selectedGame] {
+        if (const auto game = selectedGame()) {
+            const auto gameTypes = gameListModel->getGameTypes().value(game->room_id());
+            auto *dialog = new DlgCreateGame(*game, gameTypes, this);
+            dialog->setAttribute(Qt::WA_DeleteOnClose);
+            dialog->open();
+        }
+    });
     if (!client->serverName().isEmpty()) {
-        menu.addAction(&copyLink);
+        menu->addAction(tr("Cop&y game link"), this, [this, selectedGame] {
+            if (const auto game = selectedGame()) {
+                QGuiApplication::clipboard()->setText(makeGameJoinLink(client->serverName(), client->serverPort(),
+                                                                       game->room_id(), game->game_id(),
+                                                                       QString::fromStdString(game->description())));
+            }
+        });
     }
-
-    menu.exec(gameListView->mapToGlobal(point));
+    menu->popup(gameListView->viewport()->mapToGlobal(point));
 }
 
 void GameSelector::joinGame(const bool asSpectator, const bool asJudge)

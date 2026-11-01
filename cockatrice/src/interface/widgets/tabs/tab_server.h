@@ -9,10 +9,12 @@
 
 #include "tab.h"
 
+#include <QByteArray>
 #include <QGroupBox>
 #include <QHash>
 #include <QSet>
 #include <QString>
+#include <QTimer>
 #include <QVariant>
 #include <qtmetamacros.h>
 
@@ -35,6 +37,10 @@ private:
     QTreeWidget *roomList;
     QPushButton *joinButton;
     AbstractClient *client;
+    QByteArray defaultHeaderState;
+    QTimer headerSaveDebounceTimer;
+    void saveHeaderState();
+    void resetHeaderState();
     QString getRoomPermissionDisplay(const ServerInfo_Room &room);
 private slots:
     void processListRoomsEvent(const Event_ListRooms &event);
@@ -44,6 +50,7 @@ signals:
 
 public:
     explicit RoomSelector(AbstractClient *_client, QWidget *parent = nullptr);
+    ~RoomSelector() override;
     void retranslateUi();
 };
 

@@ -3,6 +3,7 @@
 
 #include "game_type_map.h"
 
+#include <QByteArray>
 #include <QGroupBox>
 #include <QTimer>
 #include <qtmetamacros.h>
@@ -148,6 +149,11 @@ private:
 
     const bool showFilters;  /**< Determines whether filter buttons are displayed. */
     GameTypeMap gameTypeMap; /**< Mapping of game types for the current room. */
+
+    QByteArray defaultHeaderState;
+    QTimer headerSaveDebounceTimer;
+    void saveHeaderState();
+    void resetHeaderState();
 
     QTimer filterSaveDebounceTimer; /**< Delays persisting quick-filter edits so typing does not rewrite the settings
                                        file on every keystroke. */
