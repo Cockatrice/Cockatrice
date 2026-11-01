@@ -13,8 +13,11 @@
 #include <QFuture>
 #include <QMetaObject>
 #include <QMetaType>
+#include <QPersistentModelIndex>
+#include <QPointer>
 #include <QSet>
 #include <QSharedPointer>
+#include <QThread>
 #include <QVariant>
 #include <QtConcurrentRun>
 #include <compare>
@@ -101,13 +104,13 @@ QString folderPathFor(const QString &filePath, const QString &deckPath)
  * @brief Scans a deck directory on a worker thread, returning discovered deck
  * files and subfolder paths.
  */
-DeckScanResult scanDeckDirectory(const QString &deckPath)
+DeckScanResult scanDeckDirectory(const QString &deckPath, const std::shared_ptr<std::atomic_bool> &cancelled)
 {
     DeckScanResult result;
 
     QDirIterator fileIt(deckPath, DeckLoader::ACCEPTED_FILE_EXTENSIONS, QDir::Files,
                         QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
-    while (fileIt.hasNext()) {
+    while (!cancelled->load(std::memory_order_relaxed) && fileIt.hasNext()) {
         const QString filePath = fileIt.next();
         DeckPreviewData data;
         data.filePath = filePath;
@@ -117,10 +120,14 @@ DeckScanResult scanDeckDirectory(const QString &deckPath)
         result.decks.append(std::move(data));
     }
 
+    if (cancelled->load(std::memory_order_relaxed)) {
+        return result;
+    }
+
     QSet<QString> seenFolders;
     QDirIterator folderIt(deckPath, QDir::Dirs | QDir::NoDotAndDotDot,
                           QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
-    while (folderIt.hasNext()) {
+    while (!cancelled->load(std::memory_order_relaxed) && folderIt.hasNext()) {
         const QString folderPath = relativePathFromDeckRoot(folderIt.next(), deckPath);
         if (!folderPath.isEmpty() && !seenFolders.contains(folderPath)) {
             seenFolders.insert(folderPath);
@@ -135,6 +142,14 @@ DeckScanResult scanDeckDirectory(const QString &deckPath)
 
 VisualDeckStorageModel::VisualDeckStorageModel(QObject *parent) : QAbstractListModel(parent)
 {
+    // Multiple visual storage views must not each consume all host cores.
+    taskPool.setMaxThreadCount(qBound(1, QThread::idealThreadCount(), 4));
+}
+
+VisualDeckStorageModel::~VisualDeckStorageModel()
+{
+    // Queued tasks become cheap no-ops; the pool then joins active tasks as it is destroyed.
+    scanCancelled->store(true, std::memory_order_relaxed);
 }
 
 int VisualDeckStorageModel::rowCount(const QModelIndex &parent) const
@@ -227,43 +242,51 @@ void VisualDeckStorageModel::reindexFilePaths()
 
 void VisualDeckStorageModel::startScan()
 {
-    ++scanGeneration;
+    scanCancelled->store(true, std::memory_order_relaxed);
+    scanCancelled = std::make_shared<std::atomic_bool>(false);
+    const auto cancelled = scanCancelled;
+    const int generation = ++scanGeneration;
+    const QString currentDeckPath = deckPath;
+    const QPointer<VisualDeckStorageModel> guard(this);
     beginResetModel();
+    if (!guard) {
+        return;
+    }
     decks.clear();
     rowByFilePath.clear();
     folderPaths.clear();
     pendingLoads.clear();
     endResetModel();
-
-    if (deckPath.isEmpty()) {
+    if (!guard || generation != scanGeneration || currentDeckPath.isEmpty()) {
         return;
     }
 
-    const QString currentDeckPath = deckPath;
-    const int generation = scanGeneration;
-
-    // The scan (directory walk + one stat per file) runs on a worker thread so that
-    // constructing the widget never stalls the UI thread on a large deck folder.
-    // The continuation is bound to this model as its context object: it runs on the UI thread,
-    // and Qt drops it if the model is destroyed first, so no result is delivered to a dead model.
-    QFuture<DeckScanResult> scan =
-        QtConcurrent::run([currentDeckPath]() -> DeckScanResult { return scanDeckDirectory(currentDeckPath); });
+    // The continuation remains bound to the model; the pool owns its worker tasks.
+    auto scan = QtConcurrent::run(&taskPool, [currentDeckPath, cancelled] {
+        if (cancelled->load(std::memory_order_relaxed)) {
+            return DeckScanResult{};
+        }
+        return scanDeckDirectory(currentDeckPath, cancelled);
+    });
     scan.then(this, [this, generation](const DeckScanResult &result) {
         if (generation != scanGeneration) {
-            return; // A newer scan started while this one was running; drop the stale result.
+            return;
         }
-
+        const QPointer<VisualDeckStorageModel> guard(this);
         folderPaths = result.folderPaths;
-
         if (result.decks.isEmpty()) {
             return;
         }
-
         beginInsertRows(QModelIndex(), 0, result.decks.size() - 1);
+        if (!guard) {
+            return;
+        }
         decks = result.decks;
         reindexFilePaths();
         endInsertRows();
-
+        if (!guard || generation != scanGeneration) {
+            return;
+        }
         for (int row = 0; row < decks.size(); ++row) {
             beginLoad(row);
         }
@@ -278,14 +301,19 @@ void VisualDeckStorageModel::beginLoad(int row)
 
     DeckPreviewData &data = decks[row];
     data.loadInProgress = true;
+    const quint64 loadId = data.loadId = ++nextLoadId;
+    const auto cancelled = scanCancelled;
 
     const QString filePath = data.filePath;
     const DeckFileFormat::Format fmt = DeckFileFormat::getFormatFromName(filePath);
     const int generation = scanGeneration;
 
-    auto load = QtConcurrent::run([filePath, fmt]() -> std::optional<DeckLoadResult> {
+    auto load = QtConcurrent::run(&taskPool, [filePath, fmt, cancelled]() -> std::optional<DeckLoadResult> {
+        if (cancelled->load(std::memory_order_relaxed)) {
+            return std::nullopt;
+        }
         std::optional<LoadedDeck> deck = DeckLoader::loadFromFile(filePath, fmt, false);
-        if (!deck) {
+        if (!deck || cancelled->load(std::memory_order_relaxed)) {
             return std::nullopt;
         }
         // Color identity walks every card through the database, so compute it here to
@@ -295,7 +323,7 @@ void VisualDeckStorageModel::beginLoad(int row)
     });
 
     // Bound to this model as context: runs on the UI thread and is dropped if the model is destroyed first.
-    load.then(this, [this, filePath, generation](std::optional<DeckLoadResult> result) {
+    load.then(this, [this, filePath, generation, loadId](std::optional<DeckLoadResult> result) {
         if (generation != scanGeneration) {
             return; // The deck list was re-scanned while this load was running; drop the stale result.
         }
@@ -305,6 +333,7 @@ void VisualDeckStorageModel::beginLoad(int row)
         PendingDeckLoad pending;
         pending.filePath = filePath;
         pending.generation = generation;
+        pending.loadId = loadId;
         if (result) {
             pending.ok = true;
             pending.deck = std::move(result->deck);
@@ -328,6 +357,7 @@ void VisualDeckStorageModel::schedulePendingLoadDrain()
 void VisualDeckStorageModel::drainPendingLoads()
 {
     drainScheduled = false;
+    const QPointer<VisualDeckStorageModel> guard(this);
 
     QElapsedTimer timer;
     timer.start();
@@ -345,6 +375,9 @@ void VisualDeckStorageModel::drainPendingLoads()
         }
 
         DeckPreviewData &data = decks[row];
+        if (pending.loadId != data.loadId) {
+            continue;
+        }
         data.loadInProgress = false;
 
         if (!pending.ok) {
@@ -358,7 +391,19 @@ void VisualDeckStorageModel::drainPendingLoads()
         data.colorIdentity = std::move(pending.colorIdentity);
 
         emit dataChanged(index(row), index(row));
-        emit deckLoaded(row);
+        if (!guard) {
+            return;
+        }
+        // A direct signal receiver can refresh, rename or remove rows (or close
+        // the widget). Do not announce the old row as a newly loaded deck.
+        const int currentRow = rowForFilePath(pending.filePath);
+        if (pending.generation == scanGeneration && currentRow >= 0 &&
+            decks.at(currentRow).loadId == pending.loadId) {
+            emit deckLoaded(currentRow);
+            if (!guard) {
+                return;
+            }
+        }
 
         // Checked after applying at least one load, so a single slow application
         // still makes progress instead of starving the queue.
@@ -403,6 +448,12 @@ void VisualDeckStorageModel::setFilePathForRow(int row, const QString &newFilePa
     if (!rowByFilePath.contains(newFilePath)) {
         rowByFilePath.insert(newFilePath, row);
     }
+    if (data.loadInProgress) {
+        // The old job still identifies the previous path. Start a new request so
+        // the renamed row completes, and reject even an old A -> B -> A result.
+        data.loadInProgress = false;
+        beginLoad(row);
+    }
 }
 
 bool VisualDeckStorageModel::renameDeck(int row, const QString &newName)
@@ -412,8 +463,10 @@ bool VisualDeckStorageModel::renameDeck(int row, const QString &newName)
     }
 
     DeckPreviewData &data = decks[row];
+    const QString oldName = data.deck.deckList.getName();
     data.deck.deckList.setName(newName);
     if (!DeckLoader::saveToFile(data.deck)) {
+        data.deck.deckList.setName(oldName);
         return false;
     }
 
@@ -449,8 +502,12 @@ bool VisualDeckStorageModel::renameFile(int row, const QString &newBaseName)
     setFilePathForRow(row, newFilePath);
     data.lastModified = QFileInfo(newFilePath).lastModified();
 
+    const QPointer<VisualDeckStorageModel> guard(this);
+    const QPersistentModelIndex changedRow(index(row));
     emit dataChanged(index(row), index(row));
-    emit deckFilePathChanged(oldFilePath, newFilePath);
+    if (guard && changedRow.isValid() && dataForRow(changedRow.row()).filePath == newFilePath) {
+        emit deckFilePathChanged(oldFilePath, newFilePath);
+    }
     return true;
 }
 
@@ -485,8 +542,10 @@ bool VisualDeckStorageModel::setTags(int row, const QStringList &tags)
     }
 
     DeckPreviewData &data = decks[row];
+    const QStringList oldTags = data.deck.deckList.getTags();
     data.deck.deckList.setTags(tags);
     if (!DeckLoader::saveToFile(data.deck)) {
+        data.deck.deckList.setTags(oldTags);
         return false;
     }
 
@@ -502,8 +561,10 @@ bool VisualDeckStorageModel::setBannerCard(int row, const CardRef &cardRef)
     }
 
     DeckPreviewData &data = decks[row];
+    const CardRef oldBannerCard = data.deck.deckList.getBannerCard();
     data.deck.deckList.setBannerCard(cardRef);
     if (!DeckLoader::saveToFile(data.deck)) {
+        data.deck.deckList.setBannerCard(oldBannerCard);
         return false;
     }
 
@@ -529,9 +590,15 @@ bool VisualDeckStorageModel::convertToCockatriceFormat(int row)
     data.lastModified = QFileInfo(data.filePath).lastModified();
     recomputeDeckMetadata(data);
 
+    // dataChanged can synchronously reset/remove rows or destroy the model.
+    // Keep values, not a reference into decks, across signal delivery.
+    const QString newFilePath = data.filePath;
+    const QPointer<VisualDeckStorageModel> guard(this);
+    const QPersistentModelIndex changedRow(index(row));
     emit dataChanged(index(row), index(row));
-    if (oldFilePath != data.filePath) {
-        emit deckFilePathChanged(oldFilePath, data.filePath);
+    if (guard && changedRow.isValid() && oldFilePath != newFilePath &&
+        dataForRow(changedRow.row()).filePath == newFilePath) {
+        emit deckFilePathChanged(oldFilePath, newFilePath);
     }
     return true;
 }
@@ -556,11 +623,18 @@ bool VisualDeckStorageModel::reloadIfModified(int row)
     }
 
     data.deck = *result;
+    data.loadId = ++nextLoadId;
+    data.loadInProgress = false;
     data.loadSucceeded = true;
     data.lastModified = fileInfo.lastModified();
     recomputeDeckMetadata(data);
 
+    const QPointer<VisualDeckStorageModel> guard(this);
+    const QPersistentModelIndex loadedRow(index(row));
+    const quint64 loadId = data.loadId;
     emit dataChanged(index(row), index(row));
-    emit deckLoaded(row);
+    if (guard && loadedRow.isValid() && dataForRow(loadedRow.row()).loadId == loadId) {
+        emit deckLoaded(loadedRow.row());
+    }
     return true;
 }

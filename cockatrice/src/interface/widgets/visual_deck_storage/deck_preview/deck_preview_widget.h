@@ -13,6 +13,8 @@
 #include <QEvent>
 #include <QList>
 #include <QObject>
+#include <QPersistentModelIndex>
+#include <QPointer>
 #include <QString>
 #include <QStringList>
 #include <QWidget>
@@ -100,7 +102,8 @@ private:
     void actDeleteFile();
 
     VisualDeckStorageWidget *visualDeckStorageWidget;
-    VisualDeckStorageModel *model;
+    QPointer<VisualDeckStorageModel> model;
+    QPersistentModelIndex previewIndex; ///< Original row identity; invalid after removal or reset.
     QVBoxLayout *layout;
     ColorIdentityWidget *colorIdentityWidget;
     DeckPreviewDeckTagsDisplayWidget *deckTagsDisplayWidget;

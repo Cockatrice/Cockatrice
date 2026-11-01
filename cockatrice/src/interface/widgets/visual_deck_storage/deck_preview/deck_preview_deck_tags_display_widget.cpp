@@ -107,12 +107,23 @@ static QStringList findAllKnownTags()
 
 void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
 {
+    const QPointer<DeckPreviewDeckTagsDisplayWidget> self(this);
+    // Copy callbacks before invoking them: a nested event loop can destroy this widget
+    // and its stored callbacks while the callback is still running.
+    const auto prompt = conversionPromptHandler;
     // The deck editor path has no conversion prompt; the VDS path registers one.
-    if (conversionPromptHandler && !conversionPromptHandler()) {
+    if (prompt && !prompt()) {
+        return;
+    }
+    if (!self) {
         return;
     }
 
-    const QStringList knownTags = knownTagsProvider ? knownTagsProvider() : findAllKnownTags();
+    const auto tagsProvider = knownTagsProvider;
+    const QStringList knownTags = tagsProvider ? tagsProvider() : findAllKnownTags();
+    if (!self) {
+        return;
+    }
     execTagDialog(knownTags);
 }
 

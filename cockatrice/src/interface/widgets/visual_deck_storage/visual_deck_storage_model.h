@@ -22,9 +22,12 @@
 #include <QModelIndex>
 #include <QString>
 #include <QStringList>
+#include <QThreadPool>
 #include <QVector>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/loaded_deck.h>
+#include <atomic>
+#include <memory>
 #include <optional>
 #include <qnamespace.h>
 #include <qtmetamacros.h>
@@ -79,6 +82,7 @@ struct DeckPreviewData
     LoadedDeck deck;             ///< The parsed deck; empty until the file has been loaded.
     bool loadSucceeded = false;  ///< Whether the deck file finished loading successfully.
     bool loadInProgress = false; ///< Whether the deck file is currently being loaded.
+    quint64 loadId = 0;          ///< Identifies the current load across renames and reloads.
 };
 
 /**
@@ -88,6 +92,7 @@ struct PendingDeckLoad
 {
     QString filePath;       ///< Identifies the row the result belongs to.
     int generation;         ///< Scan generation the load was started in.
+    quint64 loadId;         ///< Identifies the row load within the generation.
     bool ok = false;        ///< Whether the file parsed successfully.
     LoadedDeck deck;        ///< The parsed deck, valid when ok.
     QDateTime lastModified; ///< File modification time at load, valid when ok.
@@ -106,6 +111,7 @@ class VisualDeckStorageModel : public QAbstractListModel
     Q_OBJECT
 public:
     explicit VisualDeckStorageModel(QObject *parent = nullptr);
+    ~VisualDeckStorageModel() override;
 
     /// @name Qt model overrides
     ///@{
@@ -189,8 +195,12 @@ private:
     QHash<QString, int> rowByFilePath;     ///< Maps each deck's file path to its row for O(1) lookups.
     QStringList folderPaths;               ///< All subdirectories of the deck folder, sorted.
     int scanGeneration = 0;                ///< Bumped on every scan so stale results are ignored.
+    quint64 nextLoadId = 0;                ///< Never reused when a row is removed or renamed.
     QVector<PendingDeckLoad> pendingLoads; ///< Finished background loads waiting to be applied.
     bool drainScheduled = false;           ///< Whether a queued drain pass is already pending.
+    std::shared_ptr<std::atomic_bool> scanCancelled = std::make_shared<std::atomic_bool>(false);
+    // Destroyed first: waits only for this model's tasks before model and database teardown.
+    QThreadPool taskPool;
 };
 
 #endif // VISUAL_DECK_STORAGE_MODEL_H
