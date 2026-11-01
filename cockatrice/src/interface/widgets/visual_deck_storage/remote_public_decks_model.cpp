@@ -34,8 +34,17 @@ RemotePublicDecksModel::RemotePublicDecksModel(AbstractClient *_client, QObject 
                          SettingsCache::instance().network().getKeepAlive() * 1000));
     connect(loadingTimeoutTimer, &QTimer::timeout, this, &RemotePublicDecksModel::onLoadingTimeout);
     connect(client, &AbstractClient::statusChanged, this, [this](ClientStatus status) {
-        if (status == StatusDisconnected) {
-            clear();
+        if (status == StatusDisconnected || status == StatusDisconnecting) {
+            // Retire the active request without discarding the last accepted
+            // snapshot. A disconnect is a transport failure, not a user clear.
+            const bool wasLoading = loading;
+            const quint64 sequence = ++requestSequence;
+            const QPointer<RemotePublicDecksModel> guard(this);
+            loadingTimeoutTimer->stop();
+            setLoading(false);
+            if (guard && sequence == requestSequence && wasLoading) {
+                emit loadFailed(tr("The connection was lost while loading public decks. Reconnect and try again."));
+            }
         }
     });
     connect(client, &QObject::destroyed, this, &RemotePublicDecksModel::clear);
@@ -196,8 +205,15 @@ void RemotePublicDecksModel::replaceDecks(QList<DeckEntry> entries, quint64 sequ
 
 void RemotePublicDecksModel::refresh(const QString &userName)
 {
-    if (!client) {
-        emit loadFailed(tr("The server connection is no longer available."));
+    if (!client || client->getStatus() == StatusDisconnected ||
+        client->getStatus() == StatusDisconnecting) {
+        const quint64 sequence = ++requestSequence;
+        const QPointer<RemotePublicDecksModel> guard(this);
+        loadingTimeoutTimer->stop();
+        setLoading(false);
+        if (guard && sequence == requestSequence) {
+            emit loadFailed(tr("The server connection is unavailable. Reconnect and try again."));
+        }
         return;
     }
     const QPointer<RemotePublicDecksModel> guard(this);
