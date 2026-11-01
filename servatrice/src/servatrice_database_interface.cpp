@@ -33,6 +33,7 @@
 #include <QStringList>
 #include <QVariant>
 #include <QVariantList>
+#include <algorithm>
 #include <google/protobuf/stubs/common.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
@@ -1915,7 +1916,66 @@ QList<ServerInfo_UserSession> Servatrice_DatabaseInterface::getUserSessions(cons
     return results;
 }
 
-QList<ServerInfo_UserAlt> Servatrice_DatabaseInterface::getUserAlts(const QString &userName)
+namespace
+{
+constexpr int MAX_USER_ALT_DEPTH = 3;
+constexpr int MAX_USER_ALTS_PER_LEVEL = 200;
+// Bounds per-level work and the prepared-statement cache (keyed by query text,
+// so every distinct IN-list size is a new entry on the long-lived server).
+// Identifier-heavy frontiers, e.g. VPN users with hundreds of recent IPs, are
+// truncated: this tool is deliberately a first-pass sweep, not an audit.
+constexpr int MAX_USER_ALT_IDENTIFIERS = 200;
+
+QString altInClause(const QString &prefix, const QList<QString> &values)
+{
+    QStringList placeholders;
+    placeholders.reserve(values.size());
+    for (int i = 0; i < values.size(); ++i) {
+        placeholders << prefix + QString::number(i);
+    }
+    return QStringLiteral("(") + placeholders.join(QStringLiteral(",")) + QStringLiteral(")");
+}
+
+void altBindValues(QSqlQuery *query, const QString &prefix, const QList<QString> &values)
+{
+    for (int i = 0; i < values.size(); ++i) {
+        query->bindValue(prefix + QString::number(i), values.at(i));
+    }
+}
+
+struct AltCandidate
+{
+    QString name;
+    QString email;
+    QString clientId;
+    qint64 registrationTime = 0;
+    qint64 lastLogin = 0;
+    bool hasLastLogin = false;
+    int warnCount = 0;
+    int banCount = 0;
+    bool isActive = false;
+};
+
+// Keeps the first-seen order: callers add the strongest evidence first so the
+// cap below drops the least relevant identifiers rather than an arbitrary slice.
+void appendIdentifier(QList<QString> &list, QSet<QString> &seen, const QString &value)
+{
+    if (!value.isEmpty() && !seen.contains(value)) {
+        seen.insert(value);
+        list << value;
+    }
+}
+
+QList<QString> cappedIdentifiers(const QList<QString> &values)
+{
+    if (values.size() <= MAX_USER_ALT_IDENTIFIERS) {
+        return values;
+    }
+    return values.mid(0, MAX_USER_ALT_IDENTIFIERS);
+}
+} // namespace
+
+QList<ServerInfo_UserAlt> Servatrice_DatabaseInterface::getUserAlts(const QString &userName, int depth)
 {
     QList<ServerInfo_UserAlt> results;
 
@@ -1923,63 +1983,344 @@ QList<ServerInfo_UserAlt> Servatrice_DatabaseInterface::getUserAlts(const QStrin
         return results;
     }
 
-    // Seed account identifiers used to find related accounts
-    QSqlQuery *seedQuery = prepareQuery("SELECT email, clientid FROM {prefix}_users WHERE name = :user_name");
+    if (depth < 1) {
+        depth = 1;
+    } else if (depth > MAX_USER_ALT_DEPTH) {
+        depth = MAX_USER_ALT_DEPTH;
+    }
+
+    // Seed must exist; its row anchors the result at depth 0.
+    QSqlQuery *seedQuery = prepareQuery("SELECT u.name, u.email, u.clientid, UNIX_TIMESTAMP(u.registrationDate), "
+                                        "UNIX_TIMESTAMP(a.last_login), "
+                                        "(SELECT COUNT(*) FROM {prefix}_warnings w WHERE w.user_id = u.id), "
+                                        "(SELECT COUNT(*) FROM {prefix}_bans b WHERE b.user_name = u.name), "
+                                        "u.active "
+                                        "FROM {prefix}_users u "
+                                        "LEFT JOIN {prefix}_user_analytics a ON a.id = u.id "
+                                        "WHERE u.name = :user_name");
     seedQuery->bindValue(":user_name", userName);
     if (!execSqlQuery(seedQuery) || !seedQuery->next()) {
         return results;
     }
-    const QString seedEmail = seedQuery->value(0).toString();
-    const QString seedClientId = seedQuery->value(1).toString();
 
-    QString queryString = "SELECT u.name, u.email, u.clientid, UNIX_TIMESTAMP(u.registrationDate), "
-                          "UNIX_TIMESTAMP(a.last_login), "
-                          "(SELECT COUNT(*) FROM {prefix}_warnings w WHERE w.user_id = u.id), "
-                          "(SELECT COUNT(*) FROM {prefix}_bans b WHERE b.user_name = u.name), "
-                          "u.active "
-                          "FROM {prefix}_users u "
-                          "LEFT JOIN {prefix}_user_analytics a ON a.id = u.id "
-                          "WHERE u.name = :user_name";
-    if (!seedEmail.isEmpty()) {
-        queryString.append(" OR u.email = :seed_email");
-    }
-    if (!seedClientId.isEmpty()) {
-        queryString.append(" OR u.clientid = :seed_clientid");
-    }
-    queryString.append(" OR u.name IN (SELECT DISTINCT s.user_name FROM {prefix}_sessions s "
-                       "WHERE s.ip_address IN (SELECT DISTINCT s2.ip_address FROM {prefix}_sessions s2 "
-                       "WHERE s2.user_name = :user_name"
-                       " AND s2.start_time >= DATE_SUB(NOW(), INTERVAL 6 MONTH))"
-                       " AND s.start_time >= DATE_SUB(NOW(), INTERVAL 6 MONTH)) "
-                       "ORDER BY u.name LIMIT 200");
-
-    QSqlQuery *query = prepareQuery(queryString);
-    query->bindValue(":user_name", userName);
-    if (!seedEmail.isEmpty()) {
-        query->bindValue(":seed_email", seedEmail);
-    }
-    if (!seedClientId.isEmpty()) {
-        query->bindValue(":seed_clientid", seedClientId);
-    }
-
-    if (!execSqlQuery(query)) {
-        qCWarning(DatabaseInterfaceLog) << "Failed to collect user alt information: SQL Error";
-        return results;
-    }
-
-    while (query->next()) {
+    auto appendAlt = [&results](const AltCandidate &candidate, const QString &matchReason, int matchDepth,
+                                int sharedCount) {
         ServerInfo_UserAlt altDetails;
-        altDetails.set_user_name(query->value(0).toString().toStdString());
-        altDetails.set_email(query->value(1).toString().toStdString());
-        altDetails.set_clientid(query->value(2).toString().toStdString());
-        altDetails.set_registration_time(query->value(3).toLongLong());
-        if (!query->value(4).isNull()) {
-            altDetails.set_last_login(query->value(4).toLongLong());
+        altDetails.set_user_name(candidate.name.toStdString());
+        altDetails.set_email(candidate.email.toStdString());
+        altDetails.set_clientid(candidate.clientId.toStdString());
+        altDetails.set_registration_time(candidate.registrationTime);
+        if (candidate.hasLastLogin) {
+            altDetails.set_last_login(candidate.lastLogin);
         }
-        altDetails.set_warn_count(query->value(5).toInt());
-        altDetails.set_ban_count(query->value(6).toInt());
-        altDetails.set_is_active(query->value(7).toBool());
+        altDetails.set_warn_count(candidate.warnCount);
+        altDetails.set_ban_count(candidate.banCount);
+        altDetails.set_is_active(candidate.isActive);
+        altDetails.set_match_reason(matchReason.toStdString());
+        altDetails.set_depth(static_cast<google::protobuf::uint32>(matchDepth));
+        altDetails.set_shared_count(static_cast<google::protobuf::uint32>(sharedCount));
         results << altDetails;
+    };
+
+    AltCandidate seed{.name = seedQuery->value(0).toString(),
+                      .email = seedQuery->value(1).toString(),
+                      .clientId = seedQuery->value(2).toString(),
+                      .registrationTime = seedQuery->value(3).toLongLong(),
+                      .lastLogin = seedQuery->value(4).toLongLong(),
+                      .hasLastLogin = !seedQuery->value(4).isNull(),
+                      .warnCount = seedQuery->value(5).toInt(),
+                      .banCount = seedQuery->value(6).toInt(),
+                      .isActive = seedQuery->value(7).toBool()};
+    appendAlt(seed, QStringLiteral("self"), 0, 1);
+
+    // Identifier lookups are case-insensitive in SQL, so the seed must be keyed by
+    // its stored casing: otherwise the level-1 query re-lists it as an alt.
+    QSet<QString> visited{seed.name};
+    QList<QString> frontier{seed.name};
+
+    // Dynamic IN-lists bypass prepareQuery(): it caches by query text, so every
+    // distinct list size would leave a prepared statement in the long-lived cache
+    // and can exhaust MySQL's max_prepared_stmt_count.
+    const QString dbPrefix = server->getDbPrefix();
+    auto prepareDynamicQuery = [&dbPrefix](QSqlQuery &query, const QString &queryText) {
+        QString text = queryText;
+        text.replace(QStringLiteral("{prefix}"), dbPrefix);
+        query.prepare(text);
+    };
+
+    for (int level = 1; level <= depth && !frontier.isEmpty(); ++level) {
+        const QString frontierClause = altInClause(QStringLiteral(":alt_name"), frontier);
+
+        // Current identifiers of the frontier: registration email + client id.
+        // Kept strongest-first so cappedIdentifiers() drops the least useful ones.
+        QList<QString> emails;
+        QList<QString> clientIds;
+        QList<QString> ips;
+        QSet<QString> emailKeys;
+        QSet<QString> clientIdKeys;
+        QSet<QString> ipKeys;
+
+        QSqlQuery frontierQuery(sqlDatabase);
+        prepareDynamicQuery(frontierQuery, QStringLiteral("SELECT email, clientid FROM {prefix}_users WHERE name IN ") +
+                                               frontierClause);
+        altBindValues(&frontierQuery, QStringLiteral(":alt_name"), frontier);
+        if (execSqlQuery(&frontierQuery)) {
+            while (frontierQuery.next()) {
+                // Email comparison is case-insensitive in SQL, so normalise the
+                // keys too or the membership tests below miss real matches.
+                appendIdentifier(emails, emailKeys, frontierQuery.value(0).toString().toLower());
+                appendIdentifier(clientIds, clientIdKeys, frontierQuery.value(1).toString());
+            }
+        }
+
+        // Recent session identifiers: IPs plus historic client ids, most recent
+        // first so a capped list keeps what the account actually used lately.
+        QSqlQuery sessionQuery(sqlDatabase);
+        prepareDynamicQuery(sessionQuery, QStringLiteral("SELECT ip_address, clientid, MAX(start_time) AS last_seen "
+                                                         "FROM {prefix}_sessions WHERE user_name IN ") +
+                                              frontierClause +
+                                              QStringLiteral(" AND start_time >= DATE_SUB(NOW(), INTERVAL 6 MONTH) "
+                                                             "GROUP BY ip_address, clientid ORDER BY last_seen DESC"));
+        altBindValues(&sessionQuery, QStringLiteral(":alt_name"), frontier);
+        if (execSqlQuery(&sessionQuery)) {
+            while (sessionQuery.next()) {
+                appendIdentifier(ips, ipKeys, sessionQuery.value(0).toString());
+                appendIdentifier(clientIds, clientIdKeys, sessionQuery.value(1).toString());
+            }
+        }
+
+        if (emails.isEmpty() && clientIds.isEmpty() && ips.isEmpty()) {
+            break;
+        }
+
+        // Accounts sharing any frontier identifier. Historic client ids are matched
+        // through past sessions so identifier changes do not hide older alts.
+        QString candidateString =
+            QStringLiteral("SELECT u.name, u.email, u.clientid, UNIX_TIMESTAMP(u.registrationDate), "
+                           "UNIX_TIMESTAMP(a.last_login), "
+                           "(SELECT COUNT(*) FROM {prefix}_warnings w WHERE w.user_id = u.id), "
+                           "(SELECT COUNT(*) FROM {prefix}_bans b WHERE b.user_name = u.name), "
+                           "u.active "
+                           "FROM {prefix}_users u "
+                           "LEFT JOIN {prefix}_user_analytics a ON a.id = u.id "
+                           "WHERE ");
+        QStringList conditions;
+        const QList<QString> emailList = cappedIdentifiers(emails);
+        const QList<QString> clientIdList = cappedIdentifiers(clientIds);
+        const QList<QString> ipList = cappedIdentifiers(ips);
+        if (!emailList.isEmpty()) {
+            conditions << QStringLiteral("u.email IN ") + altInClause(QStringLiteral(":alt_email"), emailList);
+        }
+        if (!clientIdList.isEmpty()) {
+            conditions << QStringLiteral("u.clientid IN ") + altInClause(QStringLiteral(":alt_cid"), clientIdList);
+        }
+        if (!ipList.isEmpty()) {
+            conditions << QStringLiteral("u.name IN (SELECT DISTINCT s.user_name FROM {prefix}_sessions s WHERE "
+                                         "s.ip_address IN ") +
+                              altInClause(QStringLiteral(":alt_ip"), ipList) +
+                              QStringLiteral(" AND s.start_time >= DATE_SUB(NOW(), INTERVAL 6 MONTH))");
+        }
+        if (!clientIdList.isEmpty()) {
+            conditions << QStringLiteral("u.name IN (SELECT DISTINCT s.user_name FROM {prefix}_sessions s WHERE "
+                                         "s.clientid IN ") +
+                              altInClause(QStringLiteral(":alt_hcid"), clientIdList) +
+                              QStringLiteral(" AND s.start_time >= DATE_SUB(NOW(), INTERVAL 6 MONTH))");
+        }
+        candidateString += conditions.join(QStringLiteral(" OR "));
+        // Already-visited accounts match their own identifiers at every level and
+        // are dropped below, so widen the row limit by that count: otherwise a
+        // second level can return only visited rows and no new candidates.
+        candidateString +=
+            QStringLiteral(" ORDER BY u.name LIMIT ") + QString::number(MAX_USER_ALTS_PER_LEVEL + visited.size());
+
+        QSqlQuery candidateQuery(sqlDatabase);
+        prepareDynamicQuery(candidateQuery, candidateString);
+        altBindValues(&candidateQuery, QStringLiteral(":alt_email"), emailList);
+        altBindValues(&candidateQuery, QStringLiteral(":alt_cid"), clientIdList);
+        altBindValues(&candidateQuery, QStringLiteral(":alt_ip"), ipList);
+        altBindValues(&candidateQuery, QStringLiteral(":alt_hcid"), clientIdList);
+        if (!execSqlQuery(&candidateQuery)) {
+            qCWarning(DatabaseInterfaceLog) << "Failed to collect user alt information: SQL Error";
+            return results;
+        }
+
+        QList<AltCandidate> candidates;
+        while (candidateQuery.next()) {
+            AltCandidate candidate;
+            candidate.name = candidateQuery.value(0).toString();
+            if (visited.contains(candidate.name)) {
+                continue;
+            }
+            candidate.email = candidateQuery.value(1).toString();
+            candidate.clientId = candidateQuery.value(2).toString();
+            candidate.registrationTime = candidateQuery.value(3).toLongLong();
+            candidate.hasLastLogin = !candidateQuery.value(4).isNull();
+            candidate.lastLogin = candidateQuery.value(4).toLongLong();
+            candidate.warnCount = candidateQuery.value(5).toInt();
+            candidate.banCount = candidateQuery.value(6).toInt();
+            candidate.isActive = candidateQuery.value(7).toBool();
+            candidates << candidate;
+        }
+
+        // Resolve session-level evidence (shared IP or historic client id) for
+        // candidates that do not match on current email or client id.
+        QMap<QString, QString> candidateIp;
+        QMap<QString, QString> candidateHistoricClientId;
+        QList<QString> unexplained;
+        for (const AltCandidate &candidate : candidates) {
+            const bool emailMatch = !candidate.email.isEmpty() && emailKeys.contains(candidate.email.toLower());
+            const bool clientIdMatch = !candidate.clientId.isEmpty() && clientIdKeys.contains(candidate.clientId);
+            if (!emailMatch && !clientIdMatch) {
+                unexplained << candidate.name;
+            }
+        }
+        if (!unexplained.isEmpty() && (!ipKeys.isEmpty() || !clientIdKeys.isEmpty())) {
+            QString evidenceString =
+                QStringLiteral("SELECT DISTINCT user_name, ip_address, clientid FROM {prefix}_sessions WHERE "
+                               "user_name IN ") +
+                altInClause(QStringLiteral(":alt_ev"), unexplained) + QStringLiteral(" AND (");
+            QStringList evidenceConditions;
+            if (!ipList.isEmpty()) {
+                evidenceConditions << QStringLiteral("ip_address IN ") +
+                                          altInClause(QStringLiteral(":alt_eip"), ipList);
+            }
+            if (!clientIdList.isEmpty()) {
+                evidenceConditions << QStringLiteral("clientid IN ") +
+                                          altInClause(QStringLiteral(":alt_ecid"), clientIdList);
+            }
+            evidenceString += evidenceConditions.join(QStringLiteral(" OR "));
+            evidenceString += QStringLiteral(") AND start_time >= DATE_SUB(NOW(), INTERVAL 6 MONTH)");
+
+            QSqlQuery evidenceQuery(sqlDatabase);
+            prepareDynamicQuery(evidenceQuery, evidenceString);
+            altBindValues(&evidenceQuery, QStringLiteral(":alt_ev"), unexplained);
+            altBindValues(&evidenceQuery, QStringLiteral(":alt_eip"), ipList);
+            altBindValues(&evidenceQuery, QStringLiteral(":alt_ecid"), clientIdList);
+            if (execSqlQuery(&evidenceQuery)) {
+                while (evidenceQuery.next()) {
+                    const QString name = evidenceQuery.value(0).toString();
+                    const QString ip = evidenceQuery.value(1).toString();
+                    const QString clientId = evidenceQuery.value(2).toString();
+                    if (!ip.isEmpty() && ipKeys.contains(ip) && !candidateIp.contains(name)) {
+                        candidateIp.insert(name, ip);
+                    }
+                    if (!clientId.isEmpty() && clientIdKeys.contains(clientId) &&
+                        !candidateHistoricClientId.contains(name)) {
+                        candidateHistoricClientId.insert(name, clientId);
+                    }
+                }
+            }
+        }
+
+        // Fan-out counts so moderators can spot VPN/shared-network false positives.
+        QMap<QString, int> emailCounts;
+        QMap<QString, int> clientIdCounts;
+        QMap<QString, int> historicClientIdCounts;
+        QMap<QString, int> ipCounts;
+        QSet<QString> neededEmails;
+        QSet<QString> neededClientIds;
+        QSet<QString> neededHistoricClientIds;
+        QSet<QString> neededIps;
+        for (const AltCandidate &candidate : candidates) {
+            if (!candidate.email.isEmpty() && emailKeys.contains(candidate.email.toLower())) {
+                neededEmails << candidate.email.toLower();
+            } else if (!candidate.clientId.isEmpty() && clientIdKeys.contains(candidate.clientId)) {
+                neededClientIds << candidate.clientId;
+            } else if (candidateHistoricClientId.contains(candidate.name)) {
+                neededHistoricClientIds << candidateHistoricClientId.value(candidate.name);
+            } else if (candidateIp.contains(candidate.name)) {
+                neededIps << candidateIp.value(candidate.name);
+            }
+        }
+        if (!neededEmails.isEmpty()) {
+            const QList<QString> neededEmailList = neededEmails.values();
+            QSqlQuery countQuery(sqlDatabase);
+            prepareDynamicQuery(countQuery, QStringLiteral("SELECT email, COUNT(*) FROM {prefix}_users WHERE "
+                                                           "email IN ") +
+                                                altInClause(QStringLiteral(":alt_ce"), neededEmailList) +
+                                                QStringLiteral(" GROUP BY email"));
+            altBindValues(&countQuery, QStringLiteral(":alt_ce"), neededEmailList);
+            if (execSqlQuery(&countQuery)) {
+                while (countQuery.next()) {
+                    emailCounts.insert(countQuery.value(0).toString().toLower(), countQuery.value(1).toInt());
+                }
+            }
+        }
+        if (!neededClientIds.isEmpty()) {
+            const QList<QString> neededClientIdList = neededClientIds.values();
+            QSqlQuery countQuery(sqlDatabase);
+            prepareDynamicQuery(countQuery, QStringLiteral("SELECT clientid, COUNT(*) FROM {prefix}_users WHERE "
+                                                           "clientid IN ") +
+                                                altInClause(QStringLiteral(":alt_cc"), neededClientIdList) +
+                                                QStringLiteral(" GROUP BY clientid"));
+            altBindValues(&countQuery, QStringLiteral(":alt_cc"), neededClientIdList);
+            if (execSqlQuery(&countQuery)) {
+                while (countQuery.next()) {
+                    clientIdCounts.insert(countQuery.value(0).toString(), countQuery.value(1).toInt());
+                }
+            }
+        }
+        // Historic client ids are matched through sessions, so their fan-out must
+        // come from _sessions too: _users only knows each account's current id.
+        if (!neededHistoricClientIds.isEmpty()) {
+            const QList<QString> neededHistoricClientIdList = neededHistoricClientIds.values();
+            QSqlQuery countQuery(sqlDatabase);
+            prepareDynamicQuery(countQuery,
+                                QStringLiteral("SELECT clientid, COUNT(DISTINCT user_name) FROM {prefix}_sessions "
+                                               "WHERE clientid IN ") +
+                                    altInClause(QStringLiteral(":alt_hcc"), neededHistoricClientIdList) +
+                                    QStringLiteral(" AND start_time >= DATE_SUB(NOW(), INTERVAL 6 MONTH) "
+                                                   "GROUP BY clientid"));
+            altBindValues(&countQuery, QStringLiteral(":alt_hcc"), neededHistoricClientIdList);
+            if (execSqlQuery(&countQuery)) {
+                while (countQuery.next()) {
+                    historicClientIdCounts.insert(countQuery.value(0).toString(), countQuery.value(1).toInt());
+                }
+            }
+        }
+        if (!neededIps.isEmpty()) {
+            const QList<QString> neededIpList = neededIps.values();
+            QSqlQuery countQuery(sqlDatabase);
+            prepareDynamicQuery(countQuery,
+                                QStringLiteral("SELECT ip_address, COUNT(DISTINCT user_name) FROM {prefix}_sessions "
+                                               "WHERE ip_address IN ") +
+                                    altInClause(QStringLiteral(":alt_ci"), neededIpList) +
+                                    QStringLiteral(" AND start_time >= DATE_SUB(NOW(), INTERVAL 6 MONTH) "
+                                                   "GROUP BY ip_address"));
+            altBindValues(&countQuery, QStringLiteral(":alt_ci"), neededIpList);
+            if (execSqlQuery(&countQuery)) {
+                while (countQuery.next()) {
+                    ipCounts.insert(countQuery.value(0).toString(), countQuery.value(1).toInt());
+                }
+            }
+        }
+
+        QList<QString> nextFrontier;
+        for (const AltCandidate &candidate : candidates) {
+            QString matchReason;
+            int sharedCount = 1;
+            if (!candidate.email.isEmpty() && emailKeys.contains(candidate.email.toLower())) {
+                matchReason = QStringLiteral("email");
+                sharedCount = qMax(1, emailCounts.value(candidate.email.toLower(), 1));
+            } else if (!candidate.clientId.isEmpty() && clientIdKeys.contains(candidate.clientId)) {
+                matchReason = QStringLiteral("clientid:") + candidate.clientId;
+                sharedCount = qMax(1, clientIdCounts.value(candidate.clientId, 1));
+            } else if (candidateHistoricClientId.contains(candidate.name)) {
+                const QString historicId = candidateHistoricClientId.value(candidate.name);
+                matchReason = QStringLiteral("clientid:") + historicId;
+                sharedCount = qMax(1, historicClientIdCounts.value(historicId, 1));
+            } else if (candidateIp.contains(candidate.name)) {
+                const QString ip = candidateIp.value(candidate.name);
+                matchReason = QStringLiteral("ip:") + ip;
+                sharedCount = qMax(1, ipCounts.value(ip, 1));
+            } else {
+                continue;
+            }
+            appendAlt(candidate, matchReason, level, sharedCount);
+            visited.insert(candidate.name);
+            nextFrontier << candidate.name;
+        }
+        frontier = nextFrontier;
     }
 
     return results;
