@@ -6,6 +6,7 @@
 #include <QVariant>
 #include <QtGlobal>
 #include <algorithm>
+#include <utility>
 #include <google/protobuf/repeated_ptr_field.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_deck_list_other_user.pb.h>
