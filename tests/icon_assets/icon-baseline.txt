@@ -1,9 +1,0 @@
-# Icon rule baseline (ratchet).
-#
-# One violation per line: <rule> <path relative to cockatrice/resources/icons>.
-# Rules: xml, viewbox, editor-metadata, hardcoded-color, color-filename, no-token, physical-size, raster.
-#
-# This file may only shrink. When an icon is fixed, delete its line(s) in the
-# same change; the test fails while a fixed entry remains. Never add new lines.
-#
-# The UI glyph set is fully migrated; this list is intentionally empty.
