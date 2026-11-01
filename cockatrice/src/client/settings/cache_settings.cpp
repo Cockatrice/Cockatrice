@@ -6,6 +6,7 @@
 #include "shortcuts_settings.h"
 
 #include <QApplication>
+#include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
 #include <QFile>
@@ -47,7 +48,32 @@ Q_GLOBAL_STATIC(SettingsCache, settingsCache)
 
 SettingsCache &SettingsCache::instance()
 {
-    return *settingsCache; // returns a QT managed singleton reference
+    SettingsCache &cache = *settingsCache; // returns a QT managed singleton reference
+    // The release channels own QNetworkAccessManagers, which must be destroyed
+    // while the application object is alive. ~SettingsCache() runs during
+    // static teardown, after QApplication is gone, so hook the application's
+    // shutdown instead. Retried here because the first access may predate the
+    // application object.
+    cache.installShutdownHook();
+    return cache;
+}
+
+void SettingsCache::installShutdownHook()
+{
+    if (shutdownHookInstalled) {
+        return;
+    }
+    QCoreApplication *application = QCoreApplication::instance();
+    if (application == nullptr) {
+        return;
+    }
+    connect(application, &QCoreApplication::aboutToQuit, this, [this] {
+        for (ReleaseChannel *releaseChannel : std::as_const(releaseChannels)) {
+            delete releaseChannel;
+        }
+        releaseChannels.clear();
+    });
+    shutdownHookInstalled = true;
 }
 
 QString SettingsCache::getDataPath()
