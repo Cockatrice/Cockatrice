@@ -1,5 +1,6 @@
 #include "tab_moderation.h"
 
+#include "../utility/table_activation.h"
 #include "abstract_client.h"
 #include "libcockatrice/protocol/pb/admin_commands.pb.h"
 #include "libcockatrice/protocol/pb/response.pb.h"
@@ -169,7 +170,7 @@ TabModeration::TabModeration(TabSupervisor *_tabSupervisor, AbstractClient *_cli
 
     altsTable = new QTableWidget(0, COL_ALTS_COUNT);
     configureTable(altsTable);
-    connect(altsTable, &QTableWidget::activated, this, [this](const QModelIndex &index) {
+    connectTableActivation(altsTable, this, [this](const QModelIndex &index) {
         if (!index.isValid()) {
             return;
         }
@@ -449,7 +450,14 @@ void TabModeration::altsResponse(const Response &response)
     }
 
     const Response_UserAlts &resp = response.GetExtension(Response_UserAlts::ext);
-    cachedAltsCount = resp.alts_size();
+    // The server always includes the frontier user as a depth-0 seed row.
+    int relatedCount = 0;
+    for (int i = 0; i < resp.alts_size(); ++i) {
+        if (!resp.alts(i).has_depth() || resp.alts(i).depth() > 0) {
+            ++relatedCount;
+        }
+    }
+    cachedAltsCount = relatedCount;
     applyAltsCount();
     altsTable->setRowCount(resp.alts_size());
     for (int i = 0; i < resp.alts_size(); ++i) {

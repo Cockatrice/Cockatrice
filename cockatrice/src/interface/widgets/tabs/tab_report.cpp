@@ -471,6 +471,9 @@ void TabReport::applyFilters()
     table->setSortingEnabled(false);
     table->setRowCount(filteredReports.size());
 
+    QFont reportedFont = table->font();
+    reportedFont.setBold(true);
+
     for (int row = 0; row < filteredReports.size(); ++row) {
         const ServerInfo_Report &r = filteredReports[row];
 
@@ -484,11 +487,7 @@ void TabReport::applyFilters()
 
         table->setItem(row, COL_ROOM,
                        new QTableWidgetItem(r.has_room_id() && r.room_id() > 0 ? QString::number(r.room_id()) : ""));
-    }
 
-    QFont reportedFont = table->font();
-    reportedFont.setBold(true);
-    for (int row = 0; row < filteredReports.size(); ++row) {
         if (auto *reportedItem = table->item(row, COL_REPORTED)) {
             reportedItem->setFont(reportedFont);
         }

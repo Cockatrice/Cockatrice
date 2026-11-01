@@ -1,5 +1,6 @@
 #include "tab_alts.h"
 
+#include "../utility/table_activation.h"
 #include "abstract_client.h"
 #include "libcockatrice/protocol/pb/response.pb.h"
 #include "libcockatrice/protocol/pb/response_user_alts.pb.h"
@@ -134,7 +135,7 @@ TabAlts::TabAlts(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
 
     altsTable = new QTableWidget(0, COL_ALTS_COUNT);
     configureAltTable(altsTable);
-    connect(altsTable, &QTableWidget::activated, this, [this](const QModelIndex &index) {
+    connectTableActivation(altsTable, this, [this](const QModelIndex &index) {
         if (!index.isValid()) {
             return;
         }
@@ -390,7 +391,7 @@ void TabAlts::renderTable()
         altsTable->setItem(row, COL_ALTS_BANS, new QTableWidgetItem(QString::number(alt.ban_count())));
         altsTable->setItem(row, COL_ALTS_ACTIVE, new QTableWidgetItem(alt.is_active() ? tr("yes") : tr("no")));
         if (QString::fromStdString(alt.match_reason()).startsWith(QStringLiteral("ip:")) && alt.has_shared_count() &&
-            alt.shared_count() > 1) {
+            alt.shared_count() > 2) {
             for (int col = 0; col < COL_ALTS_COUNT; ++col) {
                 if (auto *item = altsTable->item(row, col)) {
                     item->setForeground(dimColor);

@@ -305,6 +305,8 @@ set(cockatrice_SOURCES
     src/interface/widgets/utility/get_text_with_max.cpp
     src/interface/widgets/utility/report_utils.cpp
     src/interface/widgets/utility/report_utils.h
+    src/interface/widgets/utility/table_activation.cpp
+    src/interface/widgets/utility/table_activation.h
     src/interface/widgets/utility/sequence_edit.cpp
     src/interface/widgets/utility/visibility_change_listener.cpp
     src/interface/widgets/utility/visibility_change_listener.h
