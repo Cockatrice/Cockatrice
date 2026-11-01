@@ -91,10 +91,15 @@ void mirrorCustomZones(const InnerDecklistNode *deckBoardZone, InnerDecklistNode
  * @param root Root of the shadow tree (used to classify board zones).
  * @param node The shadow node whose children are reordered.
  * @param order Sort order to apply.
+ * @param numericGroups Compare criteria-group names as mana values. Custom zone
+ * names and card names retain their normal comparison; nonnumeric groups follow
+ * numeric groups in either sort direction.
  * @return A list of (preSortRow, finalRow) pairs describing how each node moved.
  */
-[[nodiscard]] QList<QPair<int, int>>
-sortWithCustomZonesLast(InnerDecklistNode *root, InnerDecklistNode *node, Qt::SortOrder order);
+[[nodiscard]] QList<QPair<int, int>> sortWithCustomZonesLast(InnerDecklistNode *root,
+                                                             InnerDecklistNode *node,
+                                                             Qt::SortOrder order,
+                                                             bool numericGroups = false);
 
 } // namespace DeckListModelCustomZones
 

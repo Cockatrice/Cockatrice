@@ -340,7 +340,17 @@ bool DeckList::saveToStream_Plain(QTextStream &stream, bool prefixSideboardCards
         }
     };
 
-    forEachCard(writeToStream);
+    // Export the main deck first without changing the saved tree's zone order.
+    forEachCard([&](const auto node, const auto card) {
+        if (node->getName() == DECK_ZONE_MAIN) {
+            writeToStream(node, card);
+        }
+    });
+    forEachCard([&](const auto node, const auto card) {
+        if (node->getName() != DECK_ZONE_MAIN) {
+            writeToStream(node, card);
+        }
+    });
     return true;
 }
 
