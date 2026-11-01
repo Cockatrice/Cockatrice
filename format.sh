@@ -33,6 +33,7 @@ cmakefile="CMakeLists.txt"
 cmakedir="cmake/.*\\.cmake"
 cmakeinclude=("cmake/gtest-CMakeLists.txt.in")
 scripts="*.sh"
+scriptsrx="[^/]*\\.sh$"
 color="--"
 verbosity=0
 sep="----------"
@@ -254,7 +255,7 @@ if [[ $branch ]]; then
   if [[ $do_shell ]]; then
     shell_names=()
     for name in "${basenames[@]}"; do
-      filerx="(^|/)$scripts$"
+      filerx="(^|/)$scriptsrx"
       if [[ $name =~ $filerx ]]; then
         shell_names+=("$name")
       fi
