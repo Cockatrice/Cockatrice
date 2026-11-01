@@ -21,20 +21,12 @@ class QObject;
 RemotePublicDecksModel::RemotePublicDecksModel(AbstractClient *_client, QObject *parent)
     : QAbstractListModel(parent), client(_client)
 {
-    // The ping sweep can drop a pending command without ever emitting finished,
-    // so loading must not be a latch: time it out and clear it when the client
-    // goes away, or the tab is stuck on the loading state for the session.
-    loadingTimeoutTimer = new QTimer(this);
-    loadingTimeoutTimer->setSingleShot(true);
-    loadingTimeoutTimer->setInterval(
-        static_cast<int>((static_cast<qint64>(SettingsCache::instance().network().getTimeOut()) + 1) *
-                         SettingsCache::instance().network().getKeepAlive() * 1000));
-    connect(loadingTimeoutTimer, &QTimer::timeout, this, &RemotePublicDecksModel::onLoadingTimeout);
+    // A transport can drop a pending command without emitting finished. Each
+    // request therefore owns a sequence-guarded single-shot timeout below.
     connect(client, &AbstractClient::statusChanged, this, [this](ClientStatus status) {
         if (status == StatusDisconnected) {
             const bool wasLoading = loading;
             ++requestSequence;
-            loadingTimeoutTimer->stop();
             setLoading(false);
             if (wasLoading) {
                 emit loadFailed(tr("The connection was lost while loading public decks. Try again."));
@@ -144,7 +136,14 @@ void RemotePublicDecksModel::refresh(const QString &userName)
     // the current snapshot or change its loading state.
     const int seq = ++requestSequence;
     setLoading(true);
-    loadingTimeoutTimer->start();
+    const int timeoutMs = static_cast<int>(
+        (static_cast<qint64>(SettingsCache::instance().network().getTimeOut()) + 1) *
+        SettingsCache::instance().network().getKeepAlive() * 1000);
+    QTimer::singleShot(timeoutMs, this, [this, seq]() {
+        if (seq == requestSequence) {
+            onLoadingTimeout();
+        }
+    });
     Command_DeckListOtherUser cmd;
     cmd.set_user_name(userName.toStdString());
     PendingCommand *pend = client->prepareSessionCommand(cmd);
@@ -171,7 +170,6 @@ void RemotePublicDecksModel::clear()
 {
     // Clearing is a new user intent: a late reply must not repopulate the model.
     ++requestSequence;
-    loadingTimeoutTimer->stop();
     setLoading(false);
     decks.clear();
     rebuildVisibleIndices();
@@ -188,8 +186,9 @@ void RemotePublicDecksModel::setLoading(bool value)
 
 void RemotePublicDecksModel::decksReceived(const Response &response, const CommandContainer & /*commandContainer*/)
 {
+    // Invalidate this request's timeout as well as any late duplicate callback.
+    ++requestSequence;
     setLoading(false);
-    loadingTimeoutTimer->stop();
     if (response.response_code() != Response::RespOk) {
         emit loadFailed(tr("Failed to load the user's public decks (server response code %1).")
                             .arg(QString::number(static_cast<int>(response.response_code()))));
