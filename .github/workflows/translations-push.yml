@@ -16,15 +16,14 @@ on:
 
 jobs:
   translations:
+    name: "Push strings"
     # Do not run the scheduled workflow on forks
     if: github.event_name != 'schedule' || github.repository_owner == 'Cockatrice'
-
-    name: Push strings
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-slim    # https://github.com/actions/runner-images/blob/main/images/ubuntu-slim/ubuntu-slim-Readme.md
 
     steps:
       - name: "Checkout repo"
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: "Install lupdate"
         shell: bash
@@ -37,7 +36,7 @@ jobs:
           FILE: cockatrice/cockatrice_en@source.ts
         id: cockatrice
         shell: bash
-        run: >
+        run: |
           DIRS="cockatrice/src $(find . -maxdepth 1 -type d -name 'libcockatrice_*')"
           .ci/update_translation_source_strings.sh
 
@@ -45,13 +44,13 @@ jobs:
         id: oracle
         shell: bash
         env:
-          DIRS: 'oracle/src'
-          FILE: 'oracle/oracle_en@source.ts'
+          DIRS: oracle/src
+          FILE: oracle/oracle_en@source.ts
         run: .ci/update_translation_source_strings.sh
 
       - name: "Render template"
         id: template
-        uses: chuhlomin/render-template/binary@v1
+        uses: chuhlomin/render-template/binary@a7c644e341797d050d1cb24332d83791b9a46dae # v1.12
         with:
           template: .ci/update_translation_source_strings_template.md
           vars: |
@@ -62,7 +61,7 @@ jobs:
       - name: "Create pull request"
         if: github.event_name != 'pull_request'
         id: create_pr
-        uses: peter-evans/create-pull-request@v8
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           add-paths: |
             cockatrice/cockatrice_en@source.ts

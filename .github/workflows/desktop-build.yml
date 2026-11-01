@@ -41,8 +41,9 @@ concurrency:
 
 jobs:
   configure:
-    name: Configure
+    name: "Configure"
     runs-on: ubuntu-slim    # https://github.com/actions/runner-images/blob/main/images/ubuntu-slim/ubuntu-slim-Readme.md
+
     outputs:
       tag: ${{ steps.configure.outputs.tag }}
       sha: ${{ steps.configure.outputs.sha }}
@@ -54,10 +55,10 @@ jobs:
 
     steps:
       - name: "Configure"
-        env:
-          RESOLVED_SHA: ${{ case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha) }}
         id: configure
         shell: bash
+        env:
+          RESOLVED_SHA: ${{ case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha) }}
         run: |
           if [[ "$GITHUB_REF_TYPE" == 'tag' ]]; then    # release
             echo "tag=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
@@ -69,7 +70,7 @@ jobs:
 
       - name: "Checkout"
         if: steps.configure.outputs.tag != null
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0    # fetch all history for all branches and tags
 
@@ -102,6 +103,10 @@ jobs:
             --notes-file "$body_path"
 
   build-linux:
+    name: "${{ matrix.distro }} ${{ matrix.version }}${{ matrix.variant && format(' {0}', matrix.variant) || '' }}"
+    needs: configure
+    runs-on: ubuntu-latest    # https://github.com/actions/runner-images#available-images
+
     strategy:
       fail-fast: false
       matrix:
@@ -110,7 +115,7 @@ jobs:
           - distro: Arch
 
             allow-failure: yes
-            package: skip    # We are packaged in Arch already
+            package: skip    # we are packaged in Arch already
 
           - distro: Servatrice_Debian
             version: 12
@@ -123,7 +128,7 @@ jobs:
             version: 12
 
             package: DEB
-            test: skip    # Running tests on all distros is superfluous
+            test: skip    # running tests on all distros is superfluous
 
           - distro: Debian
             version: 13
@@ -134,7 +139,7 @@ jobs:
             version: 43
 
             package: RPM
-            test: skip    # Running tests on all distros is superfluous
+            test: skip    # running tests on all distros is superfluous
 
           - distro: Fedora
             version: 44
@@ -145,7 +150,7 @@ jobs:
             version: 24.04
 
             package: DEB
-            test: skip    # Running tests on all distros is superfluous
+            test: skip    # running tests on all distros is superfluous
 
           - distro: Ubuntu
             version: 26.04
@@ -170,26 +175,23 @@ jobs:
             coverage: yes
             package: skip
 
-    name: ${{ matrix.distro }} ${{ matrix.version }}${{ matrix.variant && format(' {0}', matrix.variant) || '' }}
-    needs: configure
-    runs-on: ubuntu-latest    # https://github.com/actions/runner-images
     continue-on-error: ${{ matrix.allow-failure == 'yes' }}
     timeout-minutes: 70
     env:
       CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}    # directory for caching docker image and ccache
       CCACHE_EVICTION_AGE: 7d
       CCACHE_SIZE: 600M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
-      CMAKE_GENERATOR: 'Ninja'
+      CMAKE_GENERATOR: Ninja
       NAME: ${{ matrix.distro }}${{ matrix.version }}
       IMAGE_SUFFIX: ${{ matrix.variant }}
 
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: "Restore compiler cache (ccache)"
         id: restore_ccache
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: ccache-${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}
           path: ${{ env.CACHE }}/.ccache
@@ -217,8 +219,8 @@ jobs:
 
           RUN --server --debug --test "${extra[@]}" "${args[@]}"
 
-      # RUN bind-mounts the workspace into the container, so the report the build wrote into
-      # build/ is already on the host and no second container is needed to collect it.
+      # RUN bind-mounts the workspace into the container, so the report the build wrote
+      # into build/ is already on the host and no second container is needed to collect it.
       - name: "Collect coverage report"
         if: matrix.coverage == 'yes'
         shell: bash
@@ -233,7 +235,7 @@ jobs:
 
       - name: "Upload coverage artifact"
         if: matrix.coverage == 'yes'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: coverage-report
           path: coverage/
@@ -327,7 +329,7 @@ jobs:
 
       - name: "Save updated compiler cache (ccache)"
         if: github.ref == 'refs/heads/master'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: ${{ steps.restore_ccache.outputs.cache-primary-key }}
           path: ${{ env.CACHE }}/.ccache
@@ -335,7 +337,7 @@ jobs:
       - name: "Upload artifact"
         id: upload_artifact
         if: matrix.package != 'skip'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           archive: false
           if-no-files-found: error
@@ -355,7 +357,7 @@ jobs:
       - name: "Attest binary provenance"
         id: attestation
         if: steps.upload_release.outcome == 'success'
-        uses: actions/attest@v4
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
         with:
           show-summary: false
           subject-path: ${{ steps.build.outputs.path }}
@@ -369,6 +371,10 @@ jobs:
         run: gh attestation verify "$BUILD_PATH" --repo Cockatrice/Cockatrice
 
   build-vcpkg:
+    name: "${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}"
+    needs: configure
+    runs-on: ${{ matrix.runner }}
+
     strategy:
       fail-fast: false
       matrix:
@@ -465,9 +471,6 @@ jobs:
             vcpkg_scope: 'vcpkg/windows10-x64-vs2026/'
             vcpkg_upload: 1    # only one leg per vcpkg_scope hands its archives over
 
-    name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
-    needs: configure
-    runs-on: ${{ matrix.runner }}
     timeout-minutes: 100
     env:
       CCACHE_DIR: ${{ github.workspace }}/.cache/
@@ -475,24 +478,24 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: recursive
 
       - name: "[Windows] Add msbuild to PATH"
         if: matrix.os == 'Windows'
-        uses: microsoft/setup-msbuild@v3
+        uses: microsoft/setup-msbuild@30375c66a4eea26614e0d39710365f22f8b0af57 # v3.0.0
         with:
           msbuild-architecture: x64
 
-      - name: "[macOS] Setup ccache"
+      - name: "[macOS] Install ccache"
         if: matrix.os == 'macOS' && matrix.use_ccache == 1
         run: brew install ccache
 
       - name: "[macOS] Restore compiler cache (ccache)"
         if: matrix.os == 'macOS' && matrix.use_ccache == 1
         id: restore_ccache
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: ccache-${{ matrix.runner }}_${{ matrix.override_target }}-Xcode${{ matrix.xcode }}
           path: ${{ env.CCACHE_DIR }}
@@ -513,7 +516,7 @@ jobs:
       - name: "[macOS] Restore thin Qt ${{ steps.resolve_qt_version.outputs.version }}"
         if: matrix.os == 'macOS'
         id: restore_qt
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: Qt-${{ steps.resolve_qt_version.outputs.version }}-macOS-${{ matrix.soc }}-${{ matrix.qt_modules }}-thin
           path: ${{ github.workspace }}/Qt
@@ -522,7 +525,7 @@ jobs:
       # Qt build using vcpkg either just fails or takes too long to build
       - name: "[macOS] Install fat Qt ${{ matrix.qt_version }}"
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
-        uses: jurplel/install-qt-action@v4
+        uses: jurplel/install-qt-action@b344308e4483fc892e0d27b3cd1b173ebdd95f06 # v4.5.0
         with:
           cache: false
           # cache-key-prefix: Qt
@@ -536,14 +539,14 @@ jobs:
 
       - name: "[macOS] Cache thin Qt libraries"
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true' && github.ref == 'refs/heads/master'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: ${{ steps.restore_qt.outputs.cache-primary-key }}
           path: ${{ github.workspace }}/Qt
 
       - name: "[Windows] Install Qt ${{ matrix.qt_version }}"
         if: matrix.os == 'Windows'
-        uses: jurplel/install-qt-action@v4
+        uses: jurplel/install-qt-action@b344308e4483fc892e0d27b3cd1b173ebdd95f06 # v4.5.0
         with:
           # Qt 6.11.0 only works with aqtinstall directly from git until aqtinstall 3.4 is released
           aqtsource: git+https://github.com/miurahr/aqtinstall.git
@@ -566,7 +569,7 @@ jobs:
 
       - name: "Setup vcpkg cache"
         id: vcpkg-cache
-        uses: TAServers/vcpkg-cache@v3
+        uses: TAServers/vcpkg-cache@4f07be616a4604dd29f3c6885975cf2c04abee71 # v3.4.2
         with:
           # Every entry is keyed by vcpkg ABI hash, and one hash set exists per platform,
           # target and toolchain. The action restores every entry it finds under the
@@ -716,7 +719,7 @@ jobs:
                 if [[ -f ${runtime_path:-} ]]; then
                   paths+=("$runtime_path")
                 else
-                  echo "::warning::shipped Qt runtime $runtime not found under $qt_dir"
+                  echo "::warning::Shipped Qt runtime $runtime not found under $qt_dir"
                 fi
               done < <(grep -E '^(Qt6[^/]*\.dll|Plugins/)' build/required-runtime.txt)
             fi
@@ -812,7 +815,7 @@ jobs:
       - name: "Upload new vcpkg entries"
         # An empty count means the step above did not run at all, on master and on forks
         if: steps.vcpkg_new.outputs.count != '' && steps.vcpkg_new.outputs.count != '0'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           if-no-files-found: error    # a count above zero with nothing staged is a bug
           name: vcpkg-new-${{ steps.vcpkg_new.outputs.slug }}
@@ -833,7 +836,7 @@ jobs:
 
       - name: "[macOS] Cache updated compiler cache (ccache)"
         if: matrix.os == 'macOS' && matrix.use_ccache == 1 && github.ref == 'refs/heads/master'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: ${{ steps.restore_ccache.outputs.cache-primary-key }}
           path: ${{ env.CCACHE_DIR }}
@@ -888,7 +891,7 @@ jobs:
       - name: "Upload artifact"
         if: matrix.make_package
         id: upload_artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           archive: false
           if-no-files-found: error
@@ -920,7 +923,7 @@ jobs:
       # debug identifier, and the PE is what carries the unwind information.
       - name: "[Windows] Upload debug symbols (exe + pdb)"
         if: matrix.os == 'Windows' && needs.configure.outputs.tag != null
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           if-no-files-found: error
           name: ${{ steps.build.outputs.name }}-Symbols
@@ -935,7 +938,7 @@ jobs:
       - name: "Attest binary provenance"
         if: steps.upload_release.outcome == 'success'
         id: attestation
-        uses: actions/attest@v4
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
         with:
           show-summary: false
           subject-path: ${{ steps.build.outputs.path }}
@@ -949,10 +952,11 @@ jobs:
         run: gh attestation verify "$BUILD_PATH" --repo Cockatrice/Cockatrice
 
   prune-caches:
-    name: Prune caches
+    name: "Prune caches"
     # Only master writes caches at all, so only master may clean them up too
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-slim    # https://github.com/actions/runner-images/blob/main/images/ubuntu-slim/ubuntu-slim-Readme.md
+
     continue-on-error: true    # freeing space must never fail a build
 
     steps:
@@ -987,27 +991,27 @@ jobs:
 
             reason=""
             if [[ $ref != refs/heads/master ]]; then
-              reason="scoped to $ref"
+              reason="Scoped to $ref"
             elif [[ $key == vcpkg/* ]]; then
               # "<scope>/<abi hash>", cut the hash off the end to get the scope
               scope="vcpkg/${key#vcpkg/}"
               scope="${scope%/*}/"
               if [[ $live != *" $scope "* ]]; then
-                reason="no matrix leg uses $scope"
+                reason="No matrix leg uses $scope"
               fi
             fi
             if [[ -z $reason ]]; then
               stamp="$(date -u -d "$accessed" +%s 2>/dev/null || echo 0)"
               if [[ $stamp -ne 0 && $stamp -lt $cutoff ]]; then
-                reason="unused since $accessed"
+                reason="Unused since $accessed"
               fi
             fi
 
             if [[ -n $reason ]]; then
-              echo "::notice::deleting $key, $reason"
+              echo "::notice::Deleting $key, $reason"
               gh api -X DELETE "repos/$GITHUB_REPOSITORY/actions/caches/$id"
               deleted=$((deleted + 1))
             fi
           done <"$RUNNER_TEMP/caches.tsv"
 
-          echo "::notice::deleted $deleted of $(wc -l <"$RUNNER_TEMP/caches.tsv") cache entries"
+          echo "::notice::Deleted $deleted of $(wc -l <"$RUNNER_TEMP/caches.tsv") cache entries"
