@@ -6,25 +6,36 @@
 #include <QPoint>
 #include <QString>
 #include <libcockatrice/game/board/card_state.h>
+#include <libcockatrice/game/board/counter_state.h>
 #include <libcockatrice/game/game_event_handler.h>
+#include <libcockatrice/game/game_meta_info.h>
 #include <libcockatrice/game/game_state.h>
 #include <libcockatrice/game/zones/table_zone_logic.h>
 #include <libcockatrice/protocol/pb/context_concede.pb.h>
 #include <libcockatrice/protocol/pb/event_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/event_change_zone_properties.pb.h>
+#include <libcockatrice/protocol/pb/event_create_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_create_token.pb.h>
+#include <libcockatrice/protocol/pb/event_del_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_destroy_card.pb.h>
 #include <libcockatrice/protocol/pb/event_draw_cards.pb.h>
 #include <libcockatrice/protocol/pb/event_flip_card.pb.h>
+#include <libcockatrice/protocol/pb/event_game_closed.pb.h>
+#include <libcockatrice/protocol/pb/event_game_host_changed.pb.h>
+#include <libcockatrice/protocol/pb/event_game_state_changed.pb.h>
+#include <libcockatrice/protocol/pb/event_kicked.pb.h>
+#include <libcockatrice/protocol/pb/event_leave.pb.h>
 #include <libcockatrice/protocol/pb/event_move_card.pb.h>
 #include <libcockatrice/protocol/pb/event_player_properties_changed.pb.h>
 #include <libcockatrice/protocol/pb/event_set_active_phase.pb.h>
 #include <libcockatrice/protocol/pb/event_set_active_player.pb.h>
 #include <libcockatrice/protocol/pb/event_set_card_attr.pb.h>
 #include <libcockatrice/protocol/pb/event_set_card_counter.pb.h>
+#include <libcockatrice/protocol/pb/event_set_counter.pb.h>
 #include <libcockatrice/protocol/pb/game_event_container.pb.h>
 #include <libcockatrice/protocol/pb/game_event_context.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_counter.pb.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <string>
 
@@ -449,4 +460,107 @@ TEST(GameEventHandlerTest, SetActivePlayerAndPhaseUpdateGameState)
     sendGameEvent(harness, 1, setPhase);
 
     EXPECT_EQ(state->getCurrentPhase(), 3);
+}
+
+TEST(GameEventHandlerTest, CreateSetAndDeletePlayerCounter)
+{
+    GameHarness harness;
+
+    ServerInfo_Counter counter;
+    counter.set_id(1);
+    counter.set_name("life");
+    counter.set_radius(1);
+    counter.set_count(20);
+
+    Event_CreateCounter create;
+    create.mutable_counter_info()->CopyFrom(counter);
+
+    sendGameEvent(harness, 1, create);
+
+    CounterState *state = harness.player()->getCounters().value(1);
+    ASSERT_NE(state, nullptr);
+    EXPECT_EQ(state->getName(), QStringLiteral("life"));
+    EXPECT_EQ(state->getValue(), 20);
+    EXPECT_EQ(harness.player()->getLifeCounter(), state);
+
+    Event_SetCounter set;
+    set.set_counter_id(1);
+    set.set_value(15);
+
+    sendGameEvent(harness, 1, set);
+
+    EXPECT_EQ(state->getValue(), 15);
+
+    // Updating a counter that does not exist is a no-op, not a crash.
+    Event_SetCounter unknown = set;
+    unknown.set_counter_id(99);
+    sendGameEvent(harness, 1, unknown);
+
+    EXPECT_FALSE(harness.player()->getCounters().contains(99));
+
+    Event_DelCounter remove;
+    remove.set_counter_id(1);
+
+    sendGameEvent(harness, 1, remove);
+
+    EXPECT_FALSE(harness.player()->getCounters().contains(1));
+    EXPECT_EQ(harness.player()->getLifeCounter(), nullptr);
+}
+
+TEST(GameEventHandlerTest, LeaveRemovesThePlayer)
+{
+    GameHarness harness;
+    ASSERT_NE(harness.addCardToZone(ZoneNames::TABLE, QStringLiteral("Cat"), 7), nullptr);
+    ASSERT_NE(harness.game()->getPlayerManager()->getPlayer(1), nullptr);
+
+    Event_Leave leave;
+    leave.set_reason(Event_Leave::USER_LEFT);
+
+    sendGameEvent(harness, 1, leave);
+
+    EXPECT_EQ(harness.game()->getPlayerManager()->getPlayer(1), nullptr);
+    EXPECT_TRUE(harness.game()->getPlayerManager()->getPlayers().isEmpty());
+}
+
+TEST(GameEventHandlerTest, KickedSignalsGameClosed)
+{
+    GameHarness harness;
+
+    bool closed = false;
+    QObject::connect(harness.game()->getGameEventHandler(), &GameEventHandler::gameClosed,
+                     [&closed] { closed = true; });
+
+    sendGameEvent(harness, 1, Event_Kicked());
+
+    EXPECT_TRUE(closed);
+}
+
+TEST(GameEventHandlerTest, GameClosedMarksTheSessionClosed)
+{
+    GameHarness harness;
+    ASSERT_FALSE(harness.game()->getGameState()->isGameClosed());
+
+    Event_GameStateChanged started;
+    started.set_game_started(true);
+    sendGameEvent(harness, 1, started);
+    ASSERT_TRUE(harness.game()->getGameMetaInfo()->started());
+
+    sendGameEvent(harness, 1, Event_GameClosed());
+
+    EXPECT_TRUE(harness.game()->getGameState()->isGameClosed());
+    EXPECT_FALSE(harness.game()->getGameMetaInfo()->started());
+}
+
+TEST(GameEventHandlerTest, GameHostChangedMovesTheHostRole)
+{
+    GameHarness harness;
+
+    ServerInfo_User bob;
+    bob.set_name("Bob");
+    bob.set_user_level(ServerInfo_User::IsUser);
+    ASSERT_NE(harness.game()->getPlayerManager()->addPlayer(2, bob), nullptr);
+
+    sendGameEvent(harness, 2, Event_GameHostChanged());
+
+    EXPECT_EQ(harness.game()->getGameState()->getHostId(), 2);
 }
