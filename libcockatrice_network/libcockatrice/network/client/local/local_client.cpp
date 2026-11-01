@@ -47,9 +47,8 @@ void LocalClient::sendCommandContainer(const CommandContainer &cont)
     }
 
     if (lsi.isNull()) {
-        qCWarning(LocalClientLog).noquote() << userName
-                                            << "dropping command, local server interface no longer exists:"
-                                            << getSafeDebugString(cont);
+        qCWarning(LocalClientLog).noquote()
+            << userName << "dropping command, local server interface no longer exists:" << getSafeDebugString(cont);
         return;
     }
 
