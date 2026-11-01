@@ -8,8 +8,8 @@
 #ifndef TAB_DECK_STORAGE_H
 #define TAB_DECK_STORAGE_H
 
-#include "../deck_sync/deck_sync_manager.h"
-#include "../interface/widgets/server/remote/remote_decklist_tree_widget.h"
+#include "../../deck_sync/deck_sync_manager.h"
+#include "../server/remote/remote_decklist_tree_widget.h"
 #include "tab.h"
 
 #include <QList>
@@ -129,7 +129,7 @@ private slots:
 
     void actSyncNow();
     void onSyncStatusMessage(const QString &message);
-    void onSyncFinished(int uploaded, int downloaded, int unchanged, int skipped, const QString &error);
+    void onSyncFinished(const SyncSummary &summary, const QString &error);
 
 public:
     TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User *currentUserInfo);

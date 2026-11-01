@@ -49,11 +49,6 @@ DeckSyncManager::DeckSyncManager(AbstractClient *_client, ColorIdentityProvider 
     colorIdentityProvider = std::move(provider);
 }
 
-void DeckSyncManager::setClient(AbstractClient *_client)
-{
-    client = _client;
-}
-
 void DeckSyncManager::setProfile(const DeckSyncProfile &_profile)
 {
     profile = _profile;
@@ -62,11 +57,6 @@ void DeckSyncManager::setProfile(const DeckSyncProfile &_profile)
 void DeckSyncManager::setDeckPath(const QString &path)
 {
     deckPath = path;
-}
-
-void DeckSyncManager::setColorIdentityProvider(ColorIdentityProvider provider)
-{
-    colorIdentityProvider = std::move(provider);
 }
 
 bool DeckSyncManager::isSyncing() const
@@ -80,12 +70,12 @@ void DeckSyncManager::syncNow()
         return;
     }
     if (client == nullptr || !profile.isValid() || deckPath.isEmpty()) {
-        emit syncFinished(0, 0, 0, 0, tr("Not connected to a server."));
+        emit syncFinished(SyncSummary{}, tr("Not connected to a server."));
         return;
     }
     QDir deckDir(deckPath);
     if (!deckDir.exists()) {
-        emit syncFinished(0, 0, 0, 0, tr("Deck folder not found."));
+        emit syncFinished(SyncSummary{}, tr("Deck folder not found."));
         return;
     }
 
@@ -122,11 +112,9 @@ void DeckSyncManager::syncNow()
             ++skippedCount;
             continue;
         }
-        LocalFile file;
-        file.absolutePath = absolutePath;
-        file.hash = loaded->deckList.getDeckHash();
-        file.modified = QFileInfo(absolutePath).lastModified();
-        localFiles.insert(relativePath, file);
+        localFiles.insert(relativePath, LocalFile{.absolutePath = absolutePath,
+                                                  .hash = loaded->deckList.getDeckHash(),
+                                                  .modified = QFileInfo(absolutePath).lastModified()});
     }
 
     Command_DeckList cmd;
@@ -153,7 +141,7 @@ void DeckSyncManager::collectServerFiles(const ServerInfo_DeckStorage_Folder &fo
             const QString path = prefix.isEmpty() ? name : prefix + "/" + name;
             const ServerInfo_DeckStorage_File &file = item.file();
             ServerFile entry{
-                .id = item.id(),
+                .id = static_cast<int>(item.id()),
                 .guid = QString::fromStdString(file.guid()),
                 .hash = QString::fromStdString(file.hash()),
                 .lastModifiedSecs = file.has_last_modified() ? static_cast<qint64>(file.last_modified()) : 0,
@@ -545,16 +533,27 @@ void DeckSyncManager::onDownloadFinished(const Response &response,
 void DeckSyncManager::failSync(const QString &error)
 {
     syncing = false;
-    emit syncFinished(uploadedCount, downloadedCount, unchangedCount, skippedCount, error);
+    emit syncFinished(currentSummary(), error);
 }
 
 void DeckSyncManager::finishSync()
 {
     syncing = false;
+    const SyncSummary summary = currentSummary();
     emit statusMessage(tr("Sync complete: %1 uploaded, %2 downloaded, %3 unchanged, %4 skipped.")
-                           .arg(uploadedCount)
-                           .arg(downloadedCount)
-                           .arg(unchangedCount)
-                           .arg(skippedCount));
-    emit syncFinished(uploadedCount, downloadedCount, unchangedCount, skippedCount, QString());
+                           .arg(summary.uploaded)
+                           .arg(summary.downloaded)
+                           .arg(summary.unchanged)
+                           .arg(summary.skipped));
+    emit syncFinished(summary, QString());
+}
+
+DeckSyncManager::SyncSummary DeckSyncManager::currentSummary() const
+{
+    return SyncSummary{
+        .uploaded = uploadedCount,
+        .downloaded = downloadedCount,
+        .unchanged = unchangedCount,
+        .skipped = skippedCount,
+    };
 }
