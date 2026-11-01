@@ -26,7 +26,8 @@ public:
     EdhrecApiResponseCardContainer container;
     EdhrecDeckApiResponse deck;
 
-    void fromJson(const QJsonObject &json);
+    // Preserve the previous response on invalid deck data.
+    bool fromJson(const QJsonObject &json);
     void debugPrint() const;
 };
 

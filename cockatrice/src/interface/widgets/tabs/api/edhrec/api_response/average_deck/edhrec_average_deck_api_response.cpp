@@ -8,25 +8,32 @@
 #include <QJsonArray>
 #include <QJsonValue>
 #include <qlogging.h>
+#include <utility>
 
-void EdhrecAverageDeckApiResponse::fromJson(const QJsonObject &json)
+bool EdhrecAverageDeckApiResponse::fromJson(const QJsonObject &json)
 {
-    // Parse the collapsed DeckStatistics
-    deckStats.fromJson(json);
+    if (!json.value("deck").isArray()) {
+        return false;
+    }
+    EdhrecAverageDeckApiResponse parsed;
+    if (!parsed.deck.fromJson(json.value("deck").toArray())) {
+        return false;
+    }
 
-    // Parse Archidekt section
-    QJsonArray archidektJson = json.value("archidekt").toArray();
-    archidekt.fromJson(archidektJson);
+    parsed.deckStats.fromJson(json);
+    parsed.archidekt.fromJson(json.value("archidekt").toArray());
+    parsed.similar = json.value("similar").toObject();
+    parsed.header = json.value("header").toString();
+    parsed.panels = json.value("panels").toObject();
+    parsed.description = json.value("description").toString();
+    parsed.container.fromJson(json.value("container").toObject());
 
-    // Parse other fields
-    similar = json.value("similar").toObject();
-    header = json.value("header").toString();
-    panels = json.value("panels").toObject();
-    description = json.value("description").toString();
-    QJsonObject containerJson = json.value("container").toObject();
-    container.fromJson(containerJson);
-    QJsonArray cardsJson = json.value("deck").toArray();
-    deck.fromJson(cardsJson);
+    parsed.deck.deck.setName(parsed.header.isEmpty() ? parsed.container.getTitle() : parsed.header);
+    parsed.deck.deck.setComments(parsed.description.isEmpty() ? parsed.container.getDescription() : parsed.description);
+    parsed.deck.deck.setGameFormat("commander");
+
+    *this = std::move(parsed);
+    return true;
 }
 
 void EdhrecAverageDeckApiResponse::debugPrint() const

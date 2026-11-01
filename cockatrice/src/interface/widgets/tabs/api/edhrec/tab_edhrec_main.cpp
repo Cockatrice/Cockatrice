@@ -20,6 +20,8 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonParseError>
+#include <QLabel>
 #include <QLineEdit>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -34,6 +36,7 @@
 #include <libcockatrice/models/database/card_database_model.h>
 #include <libcockatrice/network/network_manager.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <version_string.h>
 
 static bool canBeCommander(const CardInfoPtr &cardInfo)
@@ -46,8 +49,6 @@ static bool canBeCommander(const CardInfoPtr &cardInfo)
 TabEdhRecMain::TabEdhRecMain(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 {
     networkManager = NetworkManagerFactory::create(this);
-    networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
-    connect(networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(processApiJson(QNetworkReply *)));
 
     container = new QWidget(this);
     mainLayout = new QVBoxLayout(container);
@@ -78,7 +79,8 @@ TabEdhRecMain::TabEdhRecMain(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor
     connectCardCompleterSearch(searchBar, cardSetup);
 
     searchPushButton = new QPushButton(navigationContainer);
-    connect(searchPushButton, &QPushButton::clicked, this, [=, this]() { doSearch(); });
+    connect(searchPushButton, &QPushButton::clicked, this, &TabEdhRecMain::doSearch);
+    connect(searchBar, &QLineEdit::returnPressed, this, &TabEdhRecMain::doSearch);
 
     settingsButton = new SettingsButtonWidget(this);
 
@@ -100,17 +102,77 @@ TabEdhRecMain::TabEdhRecMain(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor
     currentPageDisplay->setLayout(currentPageLayout);
 
     mainLayout->addWidget(navigationContainer);
+    auto *requestStatusRow = new QHBoxLayout;
+    requestStatusLabel = new QLabel(container);
+    requestStatusLabel->setTextFormat(Qt::PlainText);
+    requestStatusLabel->setWordWrap(true);
+    retryButton = new QPushButton(container);
+    retryButton->hide();
+    connect(retryButton, &QPushButton::clicked, this, [this]() { startRequest(requestUrl, requestKind); });
+    requestStatusRow->addWidget(requestStatusLabel, 1);
+    requestStatusRow->addWidget(retryButton);
+    mainLayout->addLayout(requestStatusRow);
     mainLayout->addWidget(currentPageDisplay);
 
     // Ensure navigation stays at the top and currentPageDisplay takes remaining space
     mainLayout->setStretch(0, 0); // navigationContainer gets minimum space
-    mainLayout->setStretch(1, 1); // currentPageDisplay expands as much as possible
+    mainLayout->setStretch(2, 1); // currentPageDisplay expands as much as possible
 
     setCentralWidget(container);
 
     TabEdhRecMain::retranslateUi();
 
     getTopCards();
+}
+
+TabEdhRecMain::~TabEdhRecMain()
+{
+    cancelRequest();
+}
+
+void TabEdhRecMain::cancelRequest()
+{
+    const QPointer<QNetworkReply> previousReply = activeReply;
+    activeReply = nullptr;
+    if (previousReply) {
+        disconnect(previousReply, nullptr, this, nullptr);
+        previousReply->abort();
+        previousReply->deleteLater();
+    }
+}
+
+void TabEdhRecMain::startRequest(QUrl url, RequestKind kind)
+{
+    cancelRequest();
+    requestUrl = url;
+    requestKind = kind;
+    retryButton->hide();
+    requestStatusLabel->setText(tr("Loading EDHREC…"));
+    requestStatusLabel->show();
+
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
+    auto *reply = networkManager->get(request);
+    activeReply = reply;
+    connect(reply, &QNetworkReply::finished, this, [this, reply]() { processApiJson(reply); });
+}
+
+void TabEdhRecMain::showRequestError(const QString &error, bool canRetry)
+{
+    requestStatusLabel->setText(error);
+    requestStatusLabel->show();
+    retryButton->setVisible(canRetry);
+}
+
+void TabEdhRecMain::clearPage()
+{
+    QtUtils::clearLayoutRec(currentPageLayout, QtUtils::DeletePolicy::Immediate);
+}
+
+void TabEdhRecMain::clearCardSelection()
+{
+    cardToQuery.clear();
+    emit tabTextChanged(this, getTabText());
 }
 
 void TabEdhRecMain::retranslateUi()
@@ -120,12 +182,15 @@ void TabEdhRecMain::retranslateUi()
     tagsPushButton->setText(tr("Tags"));
     searchBar->setPlaceholderText(tr("Search for a card ..."));
     searchPushButton->setText(tr("Search"));
+    retryButton->setText(tr("Retry"));
 }
 
 void TabEdhRecMain::doSearch()
 {
     CardInfoPtr searchedCard = CardDatabaseManager::query()->getCardInfo(searchBar->text());
     if (!searchedCard) {
+        cancelRequest();
+        showRequestError(tr("No matching card was found. Choose a card from the search suggestions."), false);
         return;
     }
 
@@ -137,14 +202,19 @@ void TabEdhRecMain::setCard(CardInfoPtr _cardToQuery, bool isCommander)
     cardToQuery = _cardToQuery;
 
     if (!cardToQuery) {
-        qDebug() << "Invalid card information provided.";
+        cancelRequest();
+        showRequestError(tr("No card was selected."), false);
         return;
     }
 
     emit tabTextChanged(this, getTabText());
 
-    QString cardName = cardToQuery->getName();
-    QString formattedName = cardName.toLower().replace(" ", "-").remove(QRegularExpression("[^a-z0-9\\-]"));
+    QString formattedName = cardToQuery->getName().toLower().replace("æ", "ae");
+    formattedName = formattedName.normalized(QString::NormalizationForm_KD)
+                        .replace(QRegularExpression("\\s+"), "-")
+                        .remove(QRegularExpression("[^a-z0-9-]"))
+                        .replace(QRegularExpression("-+"), "-")
+                        .remove(QRegularExpression("^-|-$"));
 
     QString url;
     if (isCommander) {
@@ -153,203 +223,169 @@ void TabEdhRecMain::setCard(CardInfoPtr _cardToQuery, bool isCommander)
         url = QString("https://json.edhrec.com/pages/cards/%1.json").arg(formattedName);
     }
 
-    QNetworkRequest request{QUrl(url)};
-    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
-
-    networkManager->get(request);
+    startRequest(QUrl(url), RequestKind::Details);
 }
 
 void TabEdhRecMain::actNavigatePage(QString url)
 {
-    QNetworkRequest request{QUrl("https://json.edhrec.com/pages" + url + ".json")};
-    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
+    const QUrl target(url);
+    if (!target.isValid() || (!target.isRelative() && target.host() != "edhrec.com" &&
+                              target.host() != "www.edhrec.com" && target.host() != "json.edhrec.com")) {
+        cancelRequest();
+        showRequestError(tr("This EDHREC link is not supported."), false);
+        return;
+    }
 
-    networkManager->get(request);
+    QString path = target.path();
+    if (path.startsWith("/pages/")) {
+        path.remove(0, 6);
+    }
+    if (path.endsWith(".json")) {
+        path.chop(5);
+    }
+    if (!path.startsWith('/')) {
+        path.prepend('/');
+    }
+    while (path.endsWith('/')) {
+        path.chop(1);
+    }
+
+    RequestKind kind;
+    if (path.startsWith("/average-decks/")) {
+        kind = RequestKind::AverageDeck;
+    } else if (path == "/commanders/year" || path == "/commanders/month" || path == "/commanders/week") {
+        kind = RequestKind::TopCommanders;
+    } else if (path.startsWith("/top/")) {
+        kind = RequestKind::TopCards;
+    } else if (path == "/tags") {
+        kind = RequestKind::TopTags;
+    } else if (path.startsWith("/commanders/") || path.startsWith("/cards/") || path.startsWith("/tags/") ||
+               path.startsWith("/combos/")) {
+        kind = RequestKind::Details;
+    } else {
+        cancelRequest();
+        showRequestError(tr("This EDHREC page is not supported."), false);
+        return;
+    }
+
+    QUrl apiUrl("https://json.edhrec.com");
+    apiUrl.setPath("/pages" + path + ".json");
+    apiUrl.setQuery(target.query());
+    if (kind != RequestKind::AverageDeck) {
+        clearCardSelection();
+    }
+    startRequest(apiUrl, kind);
 }
 
 void TabEdhRecMain::getTopCards()
 {
-    QNetworkRequest request{QUrl("https://json.edhrec.com/pages/top/year.json")};
-    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
-
-    networkManager->get(request);
+    clearCardSelection();
+    startRequest(QUrl("https://json.edhrec.com/pages/top/year.json"), RequestKind::TopCards);
 }
 
 void TabEdhRecMain::getTopCommanders()
 {
-    QNetworkRequest request{QUrl("https://json.edhrec.com/pages/commanders/year.json")};
-    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
-
-    networkManager->get(request);
+    clearCardSelection();
+    startRequest(QUrl("https://json.edhrec.com/pages/commanders/year.json"), RequestKind::TopCommanders);
 }
 
 void TabEdhRecMain::getTopTags()
 {
-    QNetworkRequest request{QUrl("https://json.edhrec.com/pages/tags.json")};
-    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
-    networkManager->get(request);
+    clearCardSelection();
+    startRequest(QUrl("https://json.edhrec.com/pages/tags.json"), RequestKind::TopTags);
 }
 
 void TabEdhRecMain::processApiJson(QNetworkReply *reply)
 {
-    if (reply->error() != QNetworkReply::NoError) {
-        qDebug() << "Network error occurred:" << reply->errorString();
+    if (reply != activeReply) {
         reply->deleteLater();
         return;
     }
-
-    QByteArray responseData = reply->readAll();
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
-
-    if (!jsonDoc.isObject()) {
-        qDebug() << "Invalid JSON response received.";
-        reply->deleteLater();
-        return;
-    }
-
-    QJsonObject jsonObj = jsonDoc.object();
-
-    // Get the actual URL from the reply
-    QString responseUrl = reply->url().toString();
-
-    // Check if the response URL matches a commander request
-    if (responseUrl.startsWith("https://json.edhrec.com/pages/commanders/year.json")) {
-        processTopCommandersResponse(jsonObj);
-    } else if (responseUrl.startsWith("https://json.edhrec.com/pages/commanders/")) {
-        qInfo() << "Received top kek";
-        processCommanderResponse(jsonObj, responseUrl);
-    } else if (responseUrl.startsWith("https://json.edhrec.com/pages/cards/")) {
-        processCommanderResponse(jsonObj);
-    } else if (responseUrl.startsWith("https://json.edhrec.com/pages/tags/")) {
-        processCommanderResponse(jsonObj);
-    } else if (responseUrl.startsWith("https://json.edhrec.com/pages/tags.json")) {
-        processTopTagsResponse(jsonObj);
-    } else if (responseUrl.startsWith("https://json.edhrec.com/pages/top/year.json")) {
-        processTopCardsResponse(jsonObj);
-    } else if (responseUrl.startsWith("https://json.edhrec.com/pages/combos/")) {
-        qInfo() << "Received combos";
-        processCommanderResponse(jsonObj);
-    } else if (responseUrl.startsWith("https://json.edhrec.com/pages/average-decks/")) {
-        processAverageDeckResponse(jsonObj);
-    } else {
-        prettyPrintJson(jsonObj, 4);
-    }
-
+    activeReply = nullptr;
     reply->deleteLater();
+
+    if (reply->error() != QNetworkReply::NoError) {
+        showRequestError(tr("Unable to load EDHREC: %1").arg(reply->errorString()));
+        return;
+    }
+
+    QJsonParseError parseError;
+    const QJsonDocument jsonDoc = QJsonDocument::fromJson(reply->readAll(), &parseError);
+    if (parseError.error != QJsonParseError::NoError || !jsonDoc.isObject()) {
+        showRequestError(tr("Invalid response from EDHREC."));
+        return;
+    }
+
+    const QJsonObject jsonObj = jsonDoc.object();
+    if (requestKind != RequestKind::AverageDeck &&
+        !jsonObj.value("container").toObject().value("json_dict").isObject()) {
+        showRequestError(tr("Invalid page from EDHREC."));
+        return;
+    }
+
+    requestStatusLabel->hide();
+    switch (requestKind) {
+        case RequestKind::TopCards:
+            processTopCardsResponse(jsonObj);
+            break;
+        case RequestKind::TopCommanders:
+            processTopCommandersResponse(jsonObj);
+            break;
+        case RequestKind::TopTags:
+            processTopTagsResponse(jsonObj);
+            break;
+        case RequestKind::Details:
+            processCommanderResponse(jsonObj, reply->url().toString());
+            break;
+        case RequestKind::AverageDeck:
+            processAverageDeckResponse(jsonObj);
+            break;
+    }
 }
 
 void TabEdhRecMain::processTopCardsResponse(QJsonObject reply)
 {
     EdhrecTopCardsApiResponse deckData;
     deckData.fromJson(reply);
-
-    // **Remove previous page display to prevent stacking**
-    if (currentPageDisplay) {
-        mainLayout->removeWidget(currentPageDisplay);
-        delete currentPageDisplay;
-        currentPageDisplay = nullptr;
-    }
-
-    // **Create new currentPageDisplay**
-    currentPageDisplay = new QWidget(container);
-    currentPageLayout = new QVBoxLayout(currentPageDisplay);
-    currentPageDisplay->setLayout(currentPageLayout);
-
-    auto display = new EdhrecTopCardsApiResponseDisplayWidget(currentPageDisplay, deckData);
+    clearPage();
+    auto *display = new EdhrecTopCardsApiResponseDisplayWidget(currentPageDisplay, deckData);
     currentPageLayout->addWidget(display);
-
-    mainLayout->addWidget(currentPageDisplay);
-
-    // **Ensure layout stays correct**
-    mainLayout->setStretch(0, 0); // Keep navigationContainer at the top
-    mainLayout->setStretch(1, 1); // Make sure currentPageDisplay takes remaining space
 }
 
 void TabEdhRecMain::processTopTagsResponse(QJsonObject reply)
 {
     EdhrecTopTagsApiResponse deckData;
     deckData.fromJson(reply);
-
-    // **Remove previous page display to prevent stacking**
-    if (currentPageDisplay) {
-        mainLayout->removeWidget(currentPageDisplay);
-        delete currentPageDisplay;
-        currentPageDisplay = nullptr;
-    }
-
-    // **Create new currentPageDisplay**
-    currentPageDisplay = new QWidget(container);
-    currentPageLayout = new QVBoxLayout(currentPageDisplay);
-    currentPageDisplay->setLayout(currentPageLayout);
-
-    auto display = new EdhrecTopTagsApiResponseDisplayWidget(currentPageDisplay, deckData);
+    clearPage();
+    auto *display = new EdhrecTopTagsApiResponseDisplayWidget(currentPageDisplay, deckData);
     currentPageLayout->addWidget(display);
-
-    mainLayout->addWidget(currentPageDisplay);
-
-    // **Ensure layout stays correct**
-    mainLayout->setStretch(0, 0); // Keep navigationContainer at the top
-    mainLayout->setStretch(1, 1); // Make sure currentPageDisplay takes remaining space
 }
 
 void TabEdhRecMain::processTopCommandersResponse(QJsonObject reply)
 {
     EdhrecTopCommandersApiResponse deckData;
     deckData.fromJson(reply);
-
-    // **Remove previous page display to prevent stacking**
-    if (currentPageDisplay) {
-        mainLayout->removeWidget(currentPageDisplay);
-        delete currentPageDisplay;
-        currentPageDisplay = nullptr;
-    }
-
-    // **Create new currentPageDisplay**
-    currentPageDisplay = new QWidget(container);
-    currentPageLayout = new QVBoxLayout(currentPageDisplay);
-    currentPageDisplay->setLayout(currentPageLayout);
-
-    auto display = new EdhrecTopCommandersApiResponseDisplayWidget(currentPageDisplay, deckData);
+    clearPage();
+    auto *display = new EdhrecTopCommandersApiResponseDisplayWidget(currentPageDisplay, deckData);
     currentPageLayout->addWidget(display);
-
-    mainLayout->addWidget(currentPageDisplay);
-
-    // **Ensure layout stays correct**
-    mainLayout->setStretch(0, 0); // Keep navigationContainer at the top
-    mainLayout->setStretch(1, 1); // Make sure currentPageDisplay takes remaining space
 }
 
 void TabEdhRecMain::processCommanderResponse(QJsonObject reply, QString responseUrl)
 {
     EdhrecCommanderApiResponse deckData;
     deckData.fromJson(reply);
-
-    // **Remove previous page display to prevent stacking**
-    if (currentPageDisplay) {
-        mainLayout->removeWidget(currentPageDisplay);
-        delete currentPageDisplay;
-        currentPageDisplay = nullptr;
-    }
-
-    // **Create new currentPageDisplay**
-    currentPageDisplay = new QWidget(container);
-    currentPageLayout = new QVBoxLayout(currentPageDisplay);
-    currentPageDisplay->setLayout(currentPageLayout);
-
-    auto display = new EdhrecCommanderApiResponseDisplayWidget(currentPageDisplay, deckData, responseUrl);
+    clearPage();
+    auto *display = new EdhrecCommanderApiResponseDisplayWidget(currentPageDisplay, deckData, responseUrl);
     currentPageLayout->addWidget(display);
-
-    mainLayout->addWidget(currentPageDisplay);
-
-    // **Ensure layout stays correct**
-    mainLayout->setStretch(0, 0); // Keep navigationContainer at the top
-    mainLayout->setStretch(1, 1); // Make sure currentPageDisplay takes remaining space
 }
 
 void TabEdhRecMain::processAverageDeckResponse(QJsonObject reply)
 {
     EdhrecAverageDeckApiResponse deckData;
-    deckData.fromJson(reply);
+    if (!deckData.fromJson(reply)) {
+        showRequestError(tr("EDHREC returned an invalid or empty average deck."));
+        return;
+    }
     tabSupervisor->openDeckInNewTab({deckData.deck.deck, {}});
 }
 

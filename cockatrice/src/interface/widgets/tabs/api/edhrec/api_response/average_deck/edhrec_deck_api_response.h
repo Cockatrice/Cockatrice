@@ -17,8 +17,8 @@ public:
     // Constructor
     EdhrecDeckApiResponse() = default;
 
-    // Parse deck-related data from JSON
-    void fromJson(const QJsonArray &json);
+    // Replace the deck only when every array entry produces a card with a positive quantity.
+    bool fromJson(const QJsonArray &json);
 
     // Debug method for logging
     void debugPrint() const;
