@@ -11,6 +11,7 @@
 #include <QList>
 #include <QString>
 #include <QStringList>
+#include <libcockatrice/game/player/token_info.h>
 #include <qtmetamacros.h>
 
 class QLabel;
@@ -24,17 +25,6 @@ class TokenDisplayModel;
 class CardInfoPictureWidget;
 class QModelIndex;
 class QWidget;
-
-struct TokenInfo
-{
-    QString name;
-    QString color;
-    QString pt;
-    QString annotation;
-    bool destroy = true;
-    bool faceDown = false;
-    QString providerId;
-};
 
 class DlgCreateToken : public QDialog
 {

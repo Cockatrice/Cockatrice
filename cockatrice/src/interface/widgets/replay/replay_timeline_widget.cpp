@@ -12,7 +12,6 @@
 #include <qnumeric.h>
 
 static constexpr int BIN_LENGTH = 5000;
-static constexpr int MIN_RESOLUTION_MS = 1000;
 
 ReplayTimelineWidget::ReplayTimelineWidget(QWidget *parent) : QWidget(parent)
 {
@@ -22,28 +21,18 @@ void ReplayTimelineWidget::setTimeline(const QList<int> &replayTimeline)
 {
     histogram.clear();
     currentTime = 0;
+    maxBinValue = 1;
+    maxTime = 0;
 
-    int binEndTime = BIN_LENGTH - 1;
-    int binValue = 0;
-    for (int i : replayTimeline) {
-        if (i > binEndTime) {
-            histogram.append(binValue);
-            if (binValue > maxBinValue) {
-                maxBinValue = binValue;
-            }
-            while (i > binEndTime + BIN_LENGTH) {
-                histogram.append(0);
-                binEndTime += BIN_LENGTH;
-            }
-            binValue = 1;
-            binEndTime += BIN_LENGTH;
-        } else {
-            ++binValue;
-        }
+    for (int time : replayTimeline) {
+        maxTime = qMax(maxTime, time);
     }
-    histogram.append(binValue);
     if (!replayTimeline.isEmpty()) {
-        maxTime = replayTimeline.last();
+        histogram.fill(0, maxTime / BIN_LENGTH + 1);
+        for (int time : replayTimeline) {
+            const int count = ++histogram[qMax(0, time) / BIN_LENGTH];
+            maxBinValue = qMax(maxBinValue, count);
+        }
     }
 
     update();
@@ -52,26 +41,45 @@ void ReplayTimelineWidget::setTimeline(const QList<int> &replayTimeline)
 void ReplayTimelineWidget::paintEvent(QPaintEvent * /* event */)
 {
     QPainter painter(this);
-    painter.drawRect(0, 0, width() - 1, height() - 1);
-
-    qreal binWidth = (qreal)width() / histogram.size();
-    QPainterPath path;
-    path.moveTo(0, height() - 1);
-    for (int i = 0; i < histogram.size(); ++i) {
-        path.lineTo(qRound(i * binWidth), (height() - 1) * (1.0 - (qreal)histogram[i] / maxBinValue));
+    const int contentWidth = width() - 1;
+    const int contentHeight = height() - 1;
+    if (contentWidth <= 0 || contentHeight <= 0) {
+        return;
     }
-    path.lineTo(width() - 1, height() - 1);
-    path.lineTo(0, height() - 1);
+    painter.drawRect(0, 0, contentWidth, contentHeight);
+
+    // An empty replay can be painted before setTimeline(), or after replacing
+    // another replay. A replay containing only time-zero events is also valid.
+    if (histogram.isEmpty()) {
+        return;
+    }
+
+    // The final five-second bin can be partial. Align histogram activity with
+    // the same actual time span used by clicking and the playback indicator.
+    const qreal binWidth = maxTime > 0 ? static_cast<qreal>(contentWidth) * BIN_LENGTH / maxTime : contentWidth;
+    QPainterPath path;
+    path.moveTo(0, contentHeight);
+    for (int i = 0; i < histogram.size(); ++i) {
+        path.lineTo(qRound(i * binWidth), contentHeight * (1.0 - static_cast<qreal>(histogram[i]) / maxBinValue));
+    }
+    path.lineTo(contentWidth, contentHeight * (1.0 - static_cast<qreal>(histogram.constLast()) / maxBinValue));
+    path.lineTo(contentWidth, contentHeight);
+    path.lineTo(0, contentHeight);
     painter.fillPath(path, Qt::black);
 
     const QColor barColor = QColor::fromHsv(120, 255, 255, 100);
-    quint64 w = (quint64)(width() - 1) * (quint64)currentTime / maxTime;
-    painter.fillRect(0, 0, static_cast<int>(w), height() - 1, barColor);
+    const int progressWidth =
+        maxTime > 0 ? static_cast<int>(static_cast<qint64>(contentWidth) * currentTime / maxTime) : 0;
+    painter.fillRect(0, 0, progressWidth, contentHeight, barColor);
 }
 
 void ReplayTimelineWidget::mousePressEvent(QMouseEvent *event)
 {
-    int newTime = static_cast<int>((qint64)maxTime * (qint64)event->position().x() / width());
+    // Use the same drawable span as the progress bar so its right edge reaches
+    // the final event. Clamp dragged/outside coordinates and narrow widgets.
+    const int contentWidth = width() - 1;
+    const qreal position = qBound<qreal>(0, event->position().x(), qMax(0, contentWidth));
+    const int newTime = contentWidth > 0 ? qRound(maxTime * (position / contentWidth)) : 0;
     emit timeClicked(newTime);
 }
 
@@ -83,13 +91,10 @@ void ReplayTimelineWidget::setCurrentTime(int time)
         return;
     }
 
-    bool doUpdate = currentTime / MIN_RESOLUTION_MS != newTime / MIN_RESOLUTION_MS;
-
     currentTime = newTime;
-
-    if (doUpdate) {
-        update();
-    }
+    // Exact event seeks can remain within one second. Repaint their position
+    // immediately; QWidget coalesces redundant paint requests itself.
+    update();
 }
 
 QSize ReplayTimelineWidget::sizeHint() const

@@ -31,7 +31,6 @@ public:
 
 private:
     QStringList findQmFiles();
-    QString languageName(const QString &lang);
 
 private:
     QLabel *label, *languageLabel, *versionLabel;

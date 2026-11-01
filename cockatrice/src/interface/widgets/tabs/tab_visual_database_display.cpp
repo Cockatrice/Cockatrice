@@ -23,6 +23,7 @@ TabVisualDatabaseDisplay::TabVisualDatabaseDisplay(TabSupervisor *_tabSupervisor
 
 void TabVisualDatabaseDisplay::retranslateUi()
 {
+    visualDatabaseDisplayWidget->retranslateUi();
 }
 
 void TabVisualDatabaseDisplay::openEdhrecTab(const CardInfoPtr &info, bool isCommander) const

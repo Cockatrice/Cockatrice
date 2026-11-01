@@ -1,9 +1,7 @@
 #include "tab_deck_storage.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../deck_loader/deck_file_format.h"
 #include "../../deck_loader/deck_loader.h"
-#include "../../deck_loader/loaded_deck.h"
 #include "../../pixel_map_generator.h"
 #include "../cards/additional_info/deck_color_identity.h"
 #include "../deck_share/deck_share_utils.h"
@@ -20,7 +18,6 @@
 #include <QAction>
 #include <QApplication>
 #include <QDebug>
-#include <QDesktopServices>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -45,13 +42,14 @@
 #include <QTimer>
 #include <QToolBar>
 #include <QTreeView>
-#include <QUrl>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QtGlobal>
 #include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/deck_list/deck_file_format.h>
 #include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/protocol/pb/command_deck_del.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_del_dir.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_download.pb.h>
@@ -65,6 +63,7 @@
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/network_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <optional>
 #include <qlogging.h>
@@ -524,7 +523,7 @@ void TabDeckStorage::actDeleteLocalDeck()
 void TabDeckStorage::actOpenDecksFolder()
 {
     QString dir = localDirModel->rootPath();
-    QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
+    QtUtils::openPathInFileManager(dir);
 }
 
 void TabDeckStorage::actRemoteDoubleClick(const QModelIndex &curRight)

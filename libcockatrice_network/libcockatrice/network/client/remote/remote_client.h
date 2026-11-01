@@ -54,7 +54,7 @@ signals:
     void notifyUserAboutUpdate();
     void sigRequestForgotPasswordToServer(const QString &hostname, unsigned int port, const QString &_userName);
     void sigForgotPasswordSuccess();
-    void sigForgotPasswordError();
+    void sigForgotPasswordError(int responseCode);
     void sigPromptForForgotPasswordReset();
     void sigSubmitForgotPasswordResetToServer(const QString &hostname,
                                               unsigned int port,

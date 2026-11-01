@@ -250,6 +250,15 @@ message(STATUS "Update Translations: ${UPDATE_TRANSLATIONS}")
 
 include(FindQtRuntime)
 
+# Reject APIs that were deprecated before the oldest Qt release we support
+# (6.4). Qt 6.5 renamed the switch, so use whichever spelling the found
+# version understands while still compiling everywhere.
+if(Qt6_VERSION VERSION_GREATER_EQUAL 6.5)
+  add_compile_definitions(QT_DISABLE_DEPRECATED_UP_TO=0x060400)
+else()
+  add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060400)
+endif()
+
 set(CMAKE_AUTOMOC TRUE)
 
 # Find other needed libraries
@@ -420,6 +429,9 @@ if(WITH_ORACLE OR WITH_CLIENT)
   add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_models ${CMAKE_BINARY_DIR}/libcockatrice_models)
   add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_filters ${CMAKE_BINARY_DIR}/libcockatrice_filters)
 endif()
+if(WITH_CLIENT)
+  add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_game ${CMAKE_BINARY_DIR}/libcockatrice_game)
+endif()
 
 if(WITH_SERVER)
   add_subdirectory(servatrice)
@@ -429,6 +441,13 @@ endif()
 if(WITH_CLIENT)
   add_subdirectory(cockatrice)
   set(CPACK_INSTALL_CMAKE_PROJECTS "Cockatrice;Cockatrice;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
+endif()
+
+if(WIN32 AND WITH_CLIENT)
+  # Runs from the installer's $PLUGINSDIR when a purge fails, and is never installed
+  # (see LogProcessesUsingInstallDir in cmake/NSIS.template.in), so it has no install
+  # rules and is not part of the client's staged tree.
+  add_subdirectory(${CMAKE_SOURCE_DIR}/tools/installer-holder-probe ${CMAKE_BINARY_DIR}/tools/installer-holder-probe)
 endif()
 
 if(WITH_ORACLE)
@@ -443,5 +462,5 @@ endif()
 
 if(Qt6_FOUND AND Qt6_VERSION_MINOR GREATER_EQUAL 3)
   # Qt6.3+ requires project finalization to support translations
-  qt6_finalize_project()
+  qt_finalize_project()
 endif()

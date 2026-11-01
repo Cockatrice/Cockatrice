@@ -15,8 +15,9 @@ cockatrice_add_manual_test(
   settings_cache_mock.cpp
   LIBS
   libcockatrice_card
-  libcockatrice_settings
   libcockatrice_interfaces
+  libcockatrice_network
+  libcockatrice_settings
   libcockatrice_utility
   INCLUDE_DIRS
   ${CMAKE_SOURCE_DIR}/cockatrice/src

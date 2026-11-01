@@ -1,8 +1,5 @@
 #include "user_context_menu.h"
 
-#include "../../../../game/abstract_game.h"
-#include "../../../../game/game_event_handler.h"
-#include "../../../../game/game_meta_info.h"
 #include "../../dialogs/dlg_report_user.h"
 #include "../../interface/widgets/tabs/tab_supervisor.h"
 #include "../chat_view/chat_view.h"
@@ -37,6 +34,9 @@
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QWidget>
+#include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/game_event_handler.h>
+#include <libcockatrice/game/game_meta_info.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_kick_from_game.pb.h>
 #include <libcockatrice/protocol/pb/commands.pb.h>
@@ -49,6 +49,7 @@
 #include <libcockatrice/protocol/pb/response_warn_list.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 #include <string>
 
@@ -685,10 +686,8 @@ void UserContextMenu::execRemoveFromIgnore(const QString &userName)
 
 void UserContextMenu::execKick(int playerId)
 {
-    auto result = QMessageBox::question(static_cast<QWidget *>(parent()), tr("Kick Player"),
-                                        tr("Are you sure you want to kick this player from the game?"),
-                                        QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-    if (result == QMessageBox::Yes) {
+    if (QtUtils::confirm(static_cast<QWidget *>(parent()), tr("Kick Player"),
+                         tr("Are you sure you want to kick this player from the game?"), QMessageBox::No)) {
         Command_KickFromGame cmd;
         cmd.set_player_id(playerId);
 

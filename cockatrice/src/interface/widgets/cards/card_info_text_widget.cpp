@@ -19,6 +19,7 @@
 #include <QWidget>
 #include <libcockatrice/card/game_specific_terms.h>
 #include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 #include <qobjectdefs.h>
 
@@ -33,9 +34,7 @@ CardInfoTextWidget::CardInfoTextWidget(QWidget *parent) : QFrame(parent)
     textLabel->setReadOnly(true);
     textLabel->setMinimumSize(35, 35);
 
-    propsScroll = new QScrollArea(this);
-    propsScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    propsScroll->setWidgetResizable(true);
+    propsScroll = QtUtils::makeScrollArea(this);
     propsScroll->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     propsScroll->setContentsMargins(0, 0, 0, 0);
     propsScroll->setFrameStyle(QFrame::NoFrame);

@@ -1,7 +1,9 @@
 #ifndef GAMESCENE_H
 #define GAMESCENE_H
 
-#include "../game/arrow_registry.h"
+#include "animated_item.h"
+#include "board/arrow_item.h"
+#include "board/arrow_registry.h"
 
 #include <QGraphicsScene>
 #include <QHash>
@@ -16,6 +18,8 @@
 #include <QString>
 #include <QTransform>
 #include <QtGlobal>
+#include <libcockatrice/game/board/arrow_data.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
 #include <qtmetamacros.h>
 
 // IWYU pragma: keep
@@ -39,6 +43,7 @@ class ZoneViewWidget;
 class CardZone;
 class AbstractCardItem;
 class CardItem;
+class CardState;
 class ServerInfo_Card;
 class PhasesToolbar;
 class QBasicTimer;
@@ -69,6 +74,7 @@ private:
     QList<ZoneViewWidget *> zoneViews;                  ///< Active zone view widgets
     QSize viewSize;                                     ///< Current view size
     QPointer<CardItem> hoveredCard;                     ///< Currently hovered card
+    QPointer<CardItem> activeCard;                      ///< Card the currently open context menu targets
     QBasicTimer *animationTimer;                        ///< Timer for scene animations
     QHash<QObject *, IAnimatedItem *> animatedItems;    ///< Items currently animating
     QHash<QObject *, QMetaObject::Connection>
@@ -107,6 +113,22 @@ public:
 
     /** @brief Gets all selected CardItems. */
     QList<CardItem *> selectedCards() const;
+    QList<CardState *> selectedCardStates() const;
+
+    /** @brief Selects every card sharing the zone of @p card. */
+    void selectAllInZone(const CardItem *card);
+
+    /** @brief Selects the cards laid out in the same visual row as @p card. */
+    void selectSameRow(const CardItem *card);
+
+    /** @brief Selects the cards laid out in the same visual column as @p card. */
+    void selectSameColumn(const CardItem *card);
+
+    /** @brief Card the currently open context menu targets, or null. */
+    CardItem *getActiveCard() const;
+
+    /** @brief Sets the card the currently open context menu targets. */
+    void setActiveCard(CardItem *card);
 
     /**
      * @brief Adds a player to the scene and stores their graphics item.
@@ -261,7 +283,15 @@ public slots:
     /// Queues up arrow deletion but doesn't directly modify the scene
     void requestArrowDeletion(int playerId, int arrowId);
 
-    void onCardZoneChanged(CardItem *card, bool sameZone);
+    void onCardZoneChanged(CardState *card, bool sameZone);
+    /**
+     * @brief Refreshes the view of a card that the server just moved.
+     *
+     * @param card The card that moved.
+     * @param zoneChanged Whether the card crossed a zone boundary.
+     * @param newOwner The player the card now belongs to, or nullptr to leave the owner alone.
+     */
+    void onCardViewRefreshRequested(CardState *card, bool zoneChanged, PlayerLogic *newOwner);
 
 protected:
     /** @brief Handles hover updates. */

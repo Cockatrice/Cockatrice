@@ -486,7 +486,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
             }
         }
 
-        PrintingInfo printingInfo(currentSet, LazyPropertiesHash(printingProps));
+        PrintingInfo printingInfo(currentSet, LazyPropertiesHash::serializedFrom(printingProps));
 
         QString numComponent;
         const QString numProperty = printingInfo.getProperty("num");

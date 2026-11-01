@@ -16,7 +16,6 @@
 #include <QByteArray>
 #include <QClipboard>
 #include <QDebug>
-#include <QDesktopServices>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -45,7 +44,6 @@
 #include <QStyle>
 #include <QToolBar>
 #include <QTreeView>
-#include <QUrl>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
@@ -61,6 +59,7 @@
 #include <libcockatrice/protocol/pb/response_replay_get_code.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qlogging.h>
 #include <qnamespace.h>
 #include <string>
@@ -400,7 +399,7 @@ void TabReplays::actDeleteLocalReplay()
 void TabReplays::actOpenReplaysFolder()
 {
     QString dir = localDirModel->rootPath();
-    QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
+    QtUtils::openPathInFileManager(dir);
 }
 
 void TabReplays::actRemoteDoubleClick(const QModelIndex &curRight)

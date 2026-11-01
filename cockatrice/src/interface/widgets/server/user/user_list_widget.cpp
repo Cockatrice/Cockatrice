@@ -13,10 +13,10 @@
 #include "user_list_painter.h"
 #include "user_list_proxy.h"
 
-#include <QAbstractAnimation>
 #include <QAbstractItemModel>
 #include <QApplication>
 #include <QByteArray>
+#include <QCollator>
 #include <QColor>
 #include <QContextMenuEvent>
 #include <QCursor>
@@ -41,7 +41,6 @@
 #include <QPalette>
 #include <QPoint>
 #include <QPointF>
-#include <QPropertyAnimation>
 #include <QRect>
 #include <QScreen>
 #include <QScrollBar>
@@ -57,7 +56,9 @@
 #include <QVariant>
 #include <QWidget>
 #include <QtGlobal>
+#include <libcockatrice/models/natural_sort_collator.h>
 #include <libcockatrice/settings/appearance_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 class QPixmap;
@@ -273,6 +274,11 @@ void UserListTWI::setOnline(bool online)
  */
 bool UserListTWI::operator<(const QTreeWidgetItem &other) const
 {
+    // QCollator caches the locale data, unlike QString::localeAwareCompare,
+    // which rebuilds it for every pair. The tree sorts one list at a time, so a
+    // single shared, immutable collator is enough.
+    static const QCollator collator = NaturalSort::makeNaturalSortCollator();
+
     // Sort by online/offline
     if (data(0, UserListRoles::Online) != other.data(0, UserListRoles::Online)) {
         return data(0, UserListRoles::Online).toBool();
@@ -288,8 +294,7 @@ bool UserListTWI::operator<(const QTreeWidgetItem &other) const
     for (const auto &userLevelEntry : userLevelWithNoOtherPrefOrder) {
         if (lhsUserLevelFlags.testFlag(userLevelEntry) &&
             lhsUserLevelFlags.testFlag(userLevelEntry) == rhsUserLevelFlags.testFlag(userLevelEntry)) {
-            return QString::localeAwareCompare(data(2, Qt::UserRole).toString(),
-                                               other.data(2, Qt::UserRole).toString()) < 0;
+            return collator.compare(data(2, Qt::UserRole).toString(), other.data(2, Qt::UserRole).toString()) < 0;
         } else if (lhsUserLevelFlags.testFlag(userLevelEntry) != rhsUserLevelFlags.testFlag(userLevelEntry)) {
             return lhsUserLevelFlags.testFlag(userLevelEntry) > rhsUserLevelFlags.testFlag(userLevelEntry);
         }
@@ -314,7 +319,7 @@ bool UserListTWI::operator<(const QTreeWidgetItem &other) const
     }
 
     // Sort by name
-    return QString::localeAwareCompare(data(2, Qt::UserRole).toString(), other.data(2, Qt::UserRole).toString()) < 0;
+    return collator.compare(data(2, Qt::UserRole).toString(), other.data(2, Qt::UserRole).toString()) < 0;
 }
 
 UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
@@ -895,11 +900,7 @@ void UserListWidget::showPopupForUser(UserListTWI *item)
         return;
     }
 
-    auto *fade = new QPropertyAnimation(userInfoPopup, "windowOpacity", userInfoPopup);
-    fade->setDuration(120);
-    fade->setStartValue(0.0);
-    fade->setEndValue(1.0);
-    fade->start(QAbstractAnimation::DeleteWhenStopped);
+    QtUtils::fadeWindow(userInfoPopup, 0.0, 1.0, 120);
 }
 
 void UserListWidget::positionPopup(UserListTWI *item)
@@ -976,12 +977,7 @@ void UserListWidget::hidePopup(bool immediate)
     }
 
     // Fade out
-    auto *fade = new QPropertyAnimation(userInfoPopup, "windowOpacity", userInfoPopup);
-    fade->setDuration(100);
-    fade->setStartValue(userInfoPopup->windowOpacity());
-    fade->setEndValue(0.0);
-    connect(fade, &QPropertyAnimation::finished, userInfoPopup, &QWidget::hide);
-    fade->start(QAbstractAnimation::DeleteWhenStopped);
+    QtUtils::fadeWindow(userInfoPopup, userInfoPopup->windowOpacity(), 0.0, 100, true);
 }
 
 bool UserListWidget::isPressInsideListUi(const QWidget *widget) const

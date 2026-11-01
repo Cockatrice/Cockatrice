@@ -29,6 +29,7 @@ ReplayWidget::ReplayWidget(QWidget *parent, GameReplay *replay)
     connect(replayManager, &ReplayManager::replayFinished, this, &ReplayWidget::replayFinished);
     connect(replayManager, &ReplayManager::rewound, this, &ReplayWidget::rewound);
     connect(replayManager, &ReplayManager::timeChanged, this, &ReplayWidget::timeChanged);
+    connect(replayManager, &ReplayManager::processedEventChanged, this, &ReplayWidget::processedEventChanged);
 
     // timeline widget
     timelineWidget = new ReplayTimelineWidget;
@@ -104,7 +105,7 @@ const QList<int> &ReplayWidget::getReplayTimeline() const
 
 void ReplayWidget::seekToEvent(int eventIndex)
 {
-    replayManager->setTimeForEvent(eventIndex);
+    replayManager->setTimeToEvent(eventIndex);
 }
 
 void ReplayWidget::replayFinished()

@@ -15,6 +15,7 @@
 #include <QSizePolicy>
 #include <QStringLiteral>
 #include <QToolButton>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 SettingsButtonWidget::SettingsButtonWidget(QWidget *parent)
@@ -26,9 +27,8 @@ SettingsButtonWidget::SettingsButtonWidget(QWidget *parent)
     connect(button, &QToolButton::clicked, this, &SettingsButtonWidget::togglePopup);
     connect(popup, &SettingsPopupWidget::aboutToClose, this, &SettingsButtonWidget::onPopupClosed);
 
-    layout = new QHBoxLayout(this);
+    layout = QtUtils::makeLayout<QHBoxLayout>(this);
     layout->addWidget(button);
-    layout->setContentsMargins(0, 0, 0, 0);
     setLayout(layout);
 }
 

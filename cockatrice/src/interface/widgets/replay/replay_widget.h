@@ -8,10 +8,9 @@
 #ifndef REPLAY_WIDGET_H
 #define REPLAY_WIDGET_H
 
-#include "../../../game/player/event_processing_options.h"
-
 #include <QList>
 #include <QWidget>
+#include <libcockatrice/game/player/event_processing_options.h>
 #include <qtmetamacros.h>
 
 class ReplayManager;
@@ -45,6 +44,7 @@ public slots:
 signals:
     void rewound();
     void timeChanged(int time);
+    void processedEventChanged(int eventIndex);
     void eventReplayed(const GameEventContainer &cont, EventProcessingOptions options);
 
 private:

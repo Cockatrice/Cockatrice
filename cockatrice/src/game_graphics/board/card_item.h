@@ -7,7 +7,6 @@
 #ifndef CARDITEM_H
 #define CARDITEM_H
 
-#include "../../game/board/card_state.h"
 #include "abstract_card_item.h"
 #include "graphics_item_type.h"
 
@@ -16,6 +15,7 @@
 #include <QPointF>
 #include <QString>
 #include <QVariantList>
+#include <libcockatrice/game/board/card_state.h>
 #include <qtmetamacros.h>
 
 class CardDragItem;
@@ -33,11 +33,7 @@ class CardItem : public AbstractCardItem
 {
     Q_OBJECT
 private:
-    CardState *state;
-
-    QPoint gridPoint;
     CardDragItem *dragItem;
-    QList<CardItem *> attachedCards;
 
     void prepareDelete();
     void handleClickedToPlay(bool shiftHeld);
@@ -60,10 +56,6 @@ public:
                       CardZoneLogic *_zone = nullptr);
 
     void retranslateUi();
-    [[nodiscard]] CardState *getState() const
-    {
-        return state;
-    }
     [[nodiscard]] CardZoneLogic *getZone() const
     {
         return state->getZone();
@@ -72,15 +64,15 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     [[nodiscard]] QPoint getGridPoint() const
     {
-        return gridPoint;
+        return state->getGridPoint();
     }
     void setGridPoint(const QPoint &_gridPoint)
     {
-        gridPoint = _gridPoint;
+        state->setGridPoint(_gridPoint);
     }
     [[nodiscard]] QPoint getGridPos() const
     {
-        return gridPoint;
+        return state->getGridPoint();
     }
     [[nodiscard]] PlayerLogic *getOwner() const
     {
@@ -123,22 +115,22 @@ public:
     {
         state->setDestroyOnZoneChange(_destroy);
     }
-    [[nodiscard]] CardItem *getAttachedTo() const
+    [[nodiscard]] CardState *getAttachedTo() const
     {
         return state->getAttachedTo();
     }
     void setAttachedTo(CardItem *_attachedTo);
-    void addAttachedCard(CardItem *card)
+    void addAttachedCard(CardState *card)
     {
-        attachedCards.append(card);
+        state->addAttachedCard(card);
     }
-    void removeAttachedCard(CardItem *card)
+    void removeAttachedCard(CardState *card)
     {
-        attachedCards.removeOne(card);
+        state->removeAttachedCard(card);
     }
-    [[nodiscard]] const QList<CardItem *> &getAttachedCards() const
+    [[nodiscard]] const QList<CardState *> &getAttachedCards() const
     {
-        return attachedCards;
+        return state->getAttachedCards();
     }
     void resetState(bool keepAnnotations = false);
     void processCardInfo(const ServerInfo_Card &_info);
@@ -149,26 +141,6 @@ public:
     void drawArrow(const QColor &arrowColor);
     void drawAttachArrow();
     void playCard(bool faceDown);
-
-    /**
-     * @brief Parses a string representing a p/t in order to extract the values from it.
-     *
-     * If the string contains '/', the string will be split at the '/' and each side will be parsed separately,
-     * which means the result list will have two elements.
-     *
-     * If '/' is not found, then the entire string is parsed together, which means the result list will
-     * have a single element.
-     *
-     * If either side of the split is empty, there will also only be a single element in the result list.
-     *
-     * This function will attempt to parse each substring as an int first, handling plus and minus prefixes.
-     * If successful, it will put the parsed value into the QVariant as an int.
-     * If failed, it will just put the substring into the QVariant as a QString.
-     *
-     * @param pt The p/t string
-     * @return A QVariantList that can contain one or two elements, where each QVariant can be either int or QString
-     */
-    static QVariantList parsePT(const QString &pt);
 
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;

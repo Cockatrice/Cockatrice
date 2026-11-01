@@ -17,6 +17,7 @@
 
 class CardItem;
 class CardRelation;
+class CardState;
 class PlayerActions;
 class QWidget;
 struct MoveTopCardsUntilOptions;
@@ -52,12 +53,13 @@ public slots:
                                             bool faceDown);
     void onDrawBottomCardsDialogRequested(int defaultNumberBottomCards, int maxCards);
     void onRollDieDialogRequested();
-    void onCreateRelatedFromRelationDialogRequested(const CardItem *sourceCard, const CardRelation *cardRelation);
+    void onCreateRelatedFromRelationDialogRequested(const CardState *sourceCard, const CardRelation *cardRelation);
     void onCreateTokenDialogRequested(const QStringList &predefinedTokens);
     void onMoveCardXCardsFromTopDialogRequested(int defaultNumberTopCardsToPlaceBelow, int deckSize);
     void onSetPTDialogRequested(const QString &oldPT);
     void onSetAnnotationDialogRequested(const QString &oldAnnotation);
     void onSetCardCounterDialogRequested(int counterId, const QString &oldValueForDlg);
+    void onStartingHandSizeChosen(int number);
 
 private:
     PlayerGraphicsItem *player;

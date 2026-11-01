@@ -17,6 +17,7 @@
 #include <QPoint>
 #include <QPointF>
 #include <QtGlobal>
+#include <libcockatrice/game/zones/table_zone_logic.h>
 #include <qtmetamacros.h>
 
 class CardDragItem;
@@ -25,7 +26,6 @@ class CardZoneLogic;
 class QColor;
 class QGraphicsItem;
 class QPainter;
-class TableZoneLogic;
 template <typename T> class QList;
 
 /**
@@ -42,8 +42,6 @@ signals:
     void sizeChanged();
 
 private:
-    static const int TABLEROWS = 3;
-
     /*
     Margins between table edges and cards, paddings between cards
     */
@@ -180,15 +178,6 @@ public:
     [[nodiscard]] CardItem *getCardFromCoords(const QPointF &point) const;
 
     QPointF closestGridPoint(const QPointF &point) override;
-
-    static int clampValidTableRow(const int row);
-
-    /**
-     * Converts a card's logical table row (0=creatures, 1=noncreatures, 2=lands)
-     * to the corresponding grid Y coordinate. Cards with tableRow > 2 (e.g.,
-     * instants/sorceries) default to the noncreatures row.
-     */
-    static int tableRowToGridY(int tableRow);
 
     /**
        Resizes the TableZone in case CardItems are within or

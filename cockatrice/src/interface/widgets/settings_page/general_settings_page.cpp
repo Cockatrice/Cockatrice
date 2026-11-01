@@ -8,7 +8,6 @@
 #include "update/client/release_channel.h"
 
 #include <QByteArray>
-#include <QCoreApplication>
 #include <QDate>
 #include <QDebug>
 #include <QFile>
@@ -22,7 +21,6 @@
 #include <QPushButton>
 #include <QSharedPointer>
 #include <QSizePolicy>
-#include <QTranslator>
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QVariantList>
@@ -35,6 +33,7 @@
 #include <libcockatrice/settings/tabs_settings.h>
 #include <libcockatrice/settings/updates_settings.h>
 #include <libcockatrice/utility/macros.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <libcockatrice/utility/translation_loader.h>
 #include <qlogging.h>
 #include <qnamespace.h>
@@ -50,18 +49,24 @@ enum startupCardUpdateCheckBehaviorIndex
 GeneralSettingsPage::GeneralSettingsPage()
 {
     // language settings
-    QStringList languageCodes = findQmFiles();
-    for (const QString &code : languageCodes) {
-        QString langName = languageName(code);
-        languageBox.addItem(langName, code);
+    for (const QString &code : findQmFiles()) {
+        languageBox.addItem(TranslationLoader::languageDisplayName(code), code);
     }
 
-    QString setLanguage = QCoreApplication::translate("i18n", DEFAULT_LANG_NAME);
-    int index = languageBox.findText(setLanguage, Qt::MatchExactly);
-    if (index == -1) {
-        qWarning() << "could not find language" << setLanguage;
-    } else {
+    // Select the language the client runs with: its own entry, the base language for a variant without a
+    // file of its own (de_CH -> de), and the default language for an unset setting, which names no file.
+    const QString configuredLanguage = SettingsCache::instance().personal().getLang();
+    int index = languageBox.findData(configuredLanguage);
+    if (index < 0) {
+        index = languageBox.findData(configuredLanguage.section('_', 0, 0));
+    }
+    if (index < 0) {
+        index = languageBox.findData(TranslationLoader::defaultLanguageCode());
+    }
+    if (index >= 0) {
         languageBox.setCurrentIndex(index);
+    } else {
+        qCWarning(GeneralSettingsPageLog) << "could not find language" << configuredLanguage;
     }
 
     advertiseTranslationPageLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
@@ -95,12 +100,12 @@ GeneralSettingsPage::GeneralSettingsPage()
     auto *languageGrid = new QGridLayout;
     languageGrid->addWidget(&languageLabel, 0, 0);
     languageGrid->addWidget(&languageBox, 0, 1);
-    languageGrid->addWidget(&cardLanguageLabel, 1, 0);
-    languageGrid->addWidget(&cardLanguageBox, 1, 1);
-    languageGrid->addWidget(&cardLanguageNoteLabel, 2, 1);
-    languageGrid->addWidget(&cardSearchLanguageLabel, 3, 0);
-    languageGrid->addWidget(&cardSearchLanguageBox, 3, 1);
-    languageGrid->addWidget(&advertiseTranslationPageLabel, 4, 1, Qt::AlignRight);
+    languageGrid->addWidget(&advertiseTranslationPageLabel, 1, 1, Qt::AlignRight);
+    languageGrid->addWidget(&cardLanguageLabel, 2, 0);
+    languageGrid->addWidget(&cardLanguageBox, 2, 1);
+    languageGrid->addWidget(&cardLanguageNoteLabel, 3, 1);
+    languageGrid->addWidget(&cardSearchLanguageLabel, 4, 0);
+    languageGrid->addWidget(&cardSearchLanguageBox, 4, 1);
 
     cardLanguageNoteLabel.setWordWrap(true);
     cardLanguageNoteLabel.setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
@@ -383,18 +388,6 @@ QStringList GeneralSettingsPage::findQmFiles()
                                                  TranslationLoader::applicationTranslationPaths(translationPath));
 }
 
-QString GeneralSettingsPage::languageName(const QString &lang)
-{
-    QTranslator qTranslator;
-
-    // Only the language name is needed here, so the file is loaded without logging a line per
-    // language: findQmFiles() asked for languages whose files exist in the first place.
-    TranslationLoader::loadFrom(qTranslator, translationPrefix + "_" + lang,
-                                TranslationLoader::applicationTranslationPaths(translationPath));
-
-    return qTranslator.translate("i18n", DEFAULT_LANG_NAME);
-}
-
 void GeneralSettingsPage::deckPathButtonClicked()
 {
     QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), deckPathEdit->text());
@@ -547,12 +540,9 @@ void GeneralSettingsPage::cardLanguageBoxChanged(int index)
     }
     message += tr("<p>Run Oracle now?</p>");
 
-    const QMessageBox::StandardButton answer = QMessageBox::question(
-        this, tr("Card text & images language changed"), message, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-
     // The answer only controls whether Oracle starts right away; the caches stay
     // cleared so the next import or launch rebuilds them in the new language.
-    if (answer == QMessageBox::Yes) {
+    if (QtUtils::confirm(this, tr("Card text & images language changed"), message, QMessageBox::Yes)) {
         emit cardDatabaseUpdateRequested();
     }
 }
@@ -578,7 +568,7 @@ void GeneralSettingsPage::retranslateUi()
     const auto &settings = SettingsCache::instance();
 
     languageGroupBox->setTitle(tr("Language settings"));
-    languageLabel.setText(tr("Language:"));
+    languageLabel.setText(tr("Interface language:"));
     cardLanguageBox.setItemText(0, tr("English"));
     cardLanguageLabel.setText(tr("Card text & images language:"));
     cardLanguageNoteLabel.setText(

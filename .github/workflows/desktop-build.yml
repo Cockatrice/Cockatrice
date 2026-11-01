@@ -584,11 +584,17 @@ jobs:
       # job. A scope nobody has written to yet therefore leaves the directory missing
       # and fails the job, which is exactly the state every scope starts in. Make the
       # directory up front so an empty scope is a cache miss instead of an error.
+      # always() covers the cache step itself failing: the action's post save still runs
+      # then, and it should report the real error instead of ENOENT. It cannot rescue a
+      # failure before the cache step, since a post step only runs for an action whose
+      # main step did. The fallback keeps this guard from failing when the cache step was
+      # skipped and left no path output.
       - name: "Create vcpkg cache directory"
+        if: always()
         shell: bash
         env:
           CACHE_DIR: '${{ steps.vcpkg-cache.outputs.path }}'
-        run: mkdir -p "$CACHE_DIR"
+        run: mkdir -p "${CACHE_DIR:-$GITHUB_WORKSPACE/.vcpkg-cache}"
 
       # Uses environment variables, see compile.sh for more details
       - name: "Build Cockatrice"

@@ -29,6 +29,7 @@
 #include <QVariant>
 #include <QtGlobal>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 class CardSizeWidget;
@@ -179,15 +180,7 @@ void DeckCardZoneDisplayWidget::displayCards()
 void DeckCardZoneDisplayWidget::refreshDisplayType(const DisplayType &_displayType)
 {
     displayType = _displayType;
-    QLayoutItem *item;
-    while ((item = cardGroupLayout->takeAt(0)) != nullptr) {
-        if (item->widget()) {
-            item->widget()->deleteLater();
-        } else if (item->layout()) {
-            item->layout()->deleteLater();
-        }
-        delete item;
-    }
+    QtUtils::clearLayoutRec(cardGroupLayout);
 
     indexToWidgetMap.clear();
 
