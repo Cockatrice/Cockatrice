@@ -35,6 +35,17 @@ int countOf(const DeckList &deck, const char *zone, const char *name)
     });
     return count;
 }
+
+QList<DecklistCardNode *> nodesOf(const DeckList &deck, const char *zone, const char *name)
+{
+    QList<DecklistCardNode *> nodes;
+    deck.forEachCard([&](InnerDecklistNode *zoneNode, DecklistCardNode *card) {
+        if (zoneNode->getName() == zone && card->getName() == name) {
+            nodes.append(card);
+        }
+    });
+    return nodes;
+}
 } // namespace
 
 TEST(DeckDiffTest, IdenticalDecksHaveEmptyDiff)
@@ -128,6 +139,39 @@ TEST(DeckDiffTest, MergeKeepsBaseMetadata)
     DeckList merged = DeckDiff::merge(base, DeckDiff::diff(base, base), DeckDiff::diff(base, remote));
     EXPECT_EQ(merged.getName(), "Affinity v3");
     EXPECT_EQ(countOf(merged, "main", "Shock"), 1);
+}
+
+TEST(DeckDiffTest, MergePreservesBasePrintingAndCollapsesNodes)
+{
+    DeckList base;
+    base.addCard("Mountain", "main", -1, "DOM", "250")->setNumber(4);
+    base.refreshDeckHash();
+
+    DeckList local = base;
+    local.addCard("Shock", "main", -1, "M19", "156")->setNumber(2);
+    local.refreshDeckHash();
+
+    DeckList remote = base;
+    remote.addCard("Lightning Bolt", "main", -1, "M10", "146")->setNumber(4);
+    remote.refreshDeckHash();
+
+    const DeckDiffResult localChanges = DeckDiff::diff(base, local);
+    const DeckDiffResult remoteChanges = DeckDiff::diff(base, remote);
+    ASSERT_TRUE(DeckDiff::canAutoMerge(localChanges, remoteChanges));
+
+    const DeckList merged = DeckDiff::merge(base, localChanges, remoteChanges);
+
+    const QList<DecklistCardNode *> mountains = nodesOf(merged, "main", "Mountain");
+    ASSERT_EQ(mountains.size(), 1);
+    EXPECT_EQ(mountains.first()->getNumber(), 4);
+    EXPECT_EQ(mountains.first()->getCardSetShortName(), "DOM");
+    EXPECT_EQ(mountains.first()->getCardCollectorNumber(), "250");
+
+    const QList<DecklistCardNode *> shocks = nodesOf(merged, "main", "Shock");
+    ASSERT_EQ(shocks.size(), 1);
+    EXPECT_EQ(shocks.first()->getNumber(), 2);
+    EXPECT_EQ(shocks.first()->getCardSetShortName(), "M19");
+    EXPECT_EQ(shocks.first()->getCardCollectorNumber(), "156");
 }
 
 int main(int argc, char **argv)
