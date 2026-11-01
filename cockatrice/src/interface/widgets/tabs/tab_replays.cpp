@@ -3,6 +3,7 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../pixel_map_generator.h"
 #include "../interface/widgets/server/remote/remote_replay_list_tree_widget.h"
+#include "../replay/replay_download.h"
 #include "libcockatrice/protocol/pb/commands.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_replay.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_replay_match.pb.h"
@@ -34,6 +35,8 @@
 #include <QMessageLogger>
 #include <QModelIndex>
 #include <QModelIndexList>
+#include <QPersistentModelIndex>
+#include <QPointer>
 #include <QPushButton>
 #include <QSet>
 #include <QSharedPointer>
@@ -60,6 +63,7 @@
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
+#include <memory>
 #include <qlogging.h>
 #include <qnamespace.h>
 #include <string>
@@ -298,17 +302,21 @@ void TabReplays::actLocalDoubleClick(const QModelIndex &curLeft)
 
 void TabReplays::actOpenLocalReplay()
 {
-    QModelIndexList curLefts = localDirView->selectionModel()->selectedRows();
-    for (const auto &curLeft : curLefts) {
+    QStringList filePaths;
+    for (const auto &curLeft : localDirView->selectionModel()->selectedRows()) {
         if (localDirModel->isDir(curLeft)) {
             continue;
         }
-        QString filePath = localDirModel->filePath(curLeft);
+        const QString filePath = localDirModel->filePath(curLeft);
 
         if (!QDir::match(REPLAY_FILE_NAME_FILTERS, QFileInfo(filePath).fileName())) {
             continue;
         }
+        filePaths.append(filePath);
+    }
 
+    const QPointer<TabReplays> alive(this);
+    for (const auto &filePath : filePaths) {
         QFile f(filePath);
         if (!f.open(QIODevice::ReadOnly)) {
             continue;
@@ -316,9 +324,13 @@ void TabReplays::actOpenLocalReplay()
         QByteArray _data = f.readAll();
         f.close();
 
-        GameReplay *replay = new GameReplay;
+        auto replay = std::make_unique<GameReplay>();
         if (replay->ParseFromArray(_data.data(), _data.size())) {
-            emit openReplay(replay);
+            emit openReplay(replay.release());
+            // Opening a replay can close the tab or reset its filesystem model.
+            if (!alive) {
+                return;
+            }
         } else {
             qCWarning(TabReplaysLog) << "could not parse replay!";
         }
@@ -327,30 +339,58 @@ void TabReplays::actOpenLocalReplay()
 
 void TabReplays::actRenameLocal()
 {
-    QModelIndexList curLefts = localDirView->selectionModel()->selectedRows();
+    QList<QPersistentModelIndex> curLefts;
+    for (const auto &index : localDirView->selectionModel()->selectedRows()) {
+        curLefts.append(index);
+    }
+    const QPointer<TabReplays> alive(this);
     for (const auto &curLeft : curLefts) {
+        if (!curLeft.isValid()) {
+            continue;
+        }
         const QFileInfo info = localDirModel->fileInfo(curLeft);
 
-        const QString oldName = info.baseName();
+        const QString oldName = info.isDir() ? info.fileName() : info.completeBaseName();
         const QString title = info.isDir() ? tr("Rename local folder") : tr("Rename local file");
 
         bool ok;
         QString newName = QInputDialog::getText(this, title, tr("New name:"), QLineEdit::Normal, oldName, &ok);
-        if (!ok) { // terminate all remaining selections if user cancels
+        if (!alive || !ok) { // terminate all remaining selections if the tab closes or the user cancels
             return;
         }
-        if (newName.isEmpty() || oldName == newName) {
+        if (!curLeft.isValid() || localDirModel->filePath(curLeft) != info.filePath() || newName.isEmpty() ||
+            oldName == newName) {
             continue;
         }
 
         QString newFileName = newName;
-        if (!info.suffix().isEmpty()) {
+        if (!info.isDir() && !info.suffix().isEmpty()) {
             newFileName += "." + info.suffix();
+        }
+        if (newName == QStringLiteral(".") || newName == QStringLiteral("..") || newName.contains(QLatin1Char('/')) ||
+            newName.contains(QLatin1Char('\\')) || newName.contains(QChar::Null)) {
+            QMessageBox::critical(this, tr("Error"), tr("Enter a name without directory separators."));
+            if (!alive) {
+                return;
+            }
+            continue;
         }
         const QString newFilePath = QFileInfo(info.dir(), newFileName).filePath();
 
+        const QFileInfo destination(newFilePath);
+        if (destination.exists() || destination.isSymLink()) {
+            QMessageBox::critical(this, tr("Error"), tr("A file or folder with that name already exists."));
+            if (!alive) {
+                return;
+            }
+            continue;
+        }
+
         if (!QFile::rename(info.filePath(), newFilePath)) {
             QMessageBox::critical(this, tr("Error"), tr("Rename failed"));
+            if (!alive) {
+                return;
+            }
         }
     }
 }
@@ -359,39 +399,62 @@ void TabReplays::actNewLocalFolder()
 {
     QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
 
-    QModelIndex dirIndex;
+    QPersistentModelIndex dirIndex;
     if (curLeft.isValid() && !localDirModel->isDir(curLeft)) {
         dirIndex = curLeft.parent();
     } else {
-        dirIndex = curLeft;
+        dirIndex = curLeft.isValid() ? curLeft : localDirModel->index(localDirModel->rootPath());
     }
 
+    const QPointer<TabReplays> alive(this);
     bool ok;
     QString folderName =
         QInputDialog::getText(this, tr("New folder"), tr("Name of new folder:"), QLineEdit::Normal, "", &ok);
-    if (!ok || folderName.isEmpty()) {
+    if (!alive || !ok || folderName.isEmpty()) {
         return;
     }
 
-    localDirModel->mkdir(dirIndex, folderName);
+    const bool created = dirIndex.isValid() && localDirModel->mkdir(dirIndex, folderName).isValid();
+    if (!alive) {
+        return;
+    }
+    if (!created) {
+        QMessageBox::critical(this, tr("New folder"), tr("Could not create the selected replay folder."));
+    }
 }
 
 void TabReplays::actDeleteLocalReplay()
 {
-    QModelIndexList curLefts = localDirView->selectionModel()->selectedRows();
+    QList<QPersistentModelIndex> curLefts;
+    for (const auto &index : localDirView->selectionModel()->selectedRows()) {
+        curLefts.append(index);
+    }
 
     if (curLefts.isEmpty()) {
         return;
     }
 
-    if (QMessageBox::warning(this, tr("Delete local file"), tr("Are you sure you want to delete the selected files?"),
-                             QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) {
+    const QPointer<TabReplays> alive(this);
+    const auto answer =
+        QMessageBox::warning(this, tr("Delete local file"), tr("Are you sure you want to delete the selected files?"),
+                             QMessageBox::Yes | QMessageBox::No);
+    if (!alive || answer != QMessageBox::Yes) {
         return;
     }
 
     for (const auto &curLeft : curLefts) {
         if (curLeft.isValid()) {
-            localDirModel->remove(curLeft);
+            const QString filePath = localDirModel->filePath(curLeft);
+            const bool removed = localDirModel->remove(curLeft);
+            if (!alive) {
+                return;
+            }
+            if (!removed) {
+                QMessageBox::critical(this, tr("Delete local file"), tr("Could not delete %1.").arg(filePath));
+                if (!alive) {
+                    return;
+                }
+            }
         }
     }
 }
@@ -434,10 +497,9 @@ void TabReplays::openRemoteReplayFinished(const Response &r)
     }
 
     const Response_ReplayDownload &resp = r.GetExtension(Response_ReplayDownload::ext);
-    GameReplay *replay = new GameReplay;
+    auto replay = std::make_unique<GameReplay>();
     if (replay->ParseFromString(resp.replay_data())) {
-
-        emit openReplay(replay);
+        emit openReplay(replay.release());
     } else {
         qCWarning(TabReplaysLog) << "could not parse remote replay!";
     }
@@ -446,34 +508,57 @@ void TabReplays::openRemoteReplayFinished(const Response &r)
 void TabReplays::actDownload()
 {
     QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
-    while (!localDirModel->isDir(curLeft)) {
+    while (curLeft.isValid() && !localDirModel->isDir(curLeft)) {
         curLeft = curLeft.parent();
     }
+    const QString directoryPath = curLeft.isValid() ? localDirModel->filePath(curLeft) : localDirModel->rootPath();
 
-    for (const auto curRight : serverDirView->selectionModel()->selectedRows()) {
-        downloadNodeAtIndex(curLeft, curRight);
+    QList<QPersistentModelIndex> selectedReplays;
+    for (const auto &index : serverDirView->selectionModel()->selectedRows()) {
+        selectedReplays.append(index);
+    }
+    const QPointer<TabReplays> alive(this);
+    for (const auto &curRight : selectedReplays) {
+        if (!curRight.isValid()) {
+            continue;
+        }
+        downloadNodeAtIndex(directoryPath, curRight);
+        // A folder-error dialog can process a disconnect, model reset or tab close.
+        if (!alive) {
+            return;
+        }
     }
 }
 
-void TabReplays::downloadNodeAtIndex(const QModelIndex &curLeft, const QModelIndex &curRight)
+void TabReplays::downloadNodeAtIndex(const QString &directoryPath, const QModelIndex &curRight)
 {
     if (const auto replayMatch = serverDirView->getReplayMatch(curRight)) {
-        // node at index is a folder
-        const QString name =
-            QString::number(replayMatch->game_id()) + "_" + QString::fromStdString(replayMatch->game_name());
+        QString error;
+        const QString matchDirectory = ReplayDownload::prepareMatchDirectory(
+            directoryPath, replayMatch->game_id(), QString::fromStdString(replayMatch->game_name()), error);
+        if (matchDirectory.isEmpty()) {
+            reportDownloadError(error);
+            return;
+        }
 
-        const auto dirIndex = curLeft.isValid() ? curLeft : localDirModel->index(localDirModel->rootPath());
-        const auto newDirIndex = localDirModel->mkdir(dirIndex, name);
-
-        int rows = serverDirView->model()->rowCount(curRight);
+        QList<QPersistentModelIndex> children;
+        const int rows = serverDirView->model()->rowCount(curRight);
         for (int i = 0; i < rows; i++) {
-            const auto childIndex = serverDirView->model()->index(i, 0, curRight);
-            downloadNodeAtIndex(newDirIndex, childIndex);
+            children.append(serverDirView->model()->index(i, 0, curRight));
+        }
+        const QPointer<TabReplays> alive(this);
+        for (const auto &childIndex : children) {
+            if (!childIndex.isValid()) {
+                continue;
+            }
+            downloadNodeAtIndex(matchDirectory, childIndex);
+            if (!alive) {
+                return;
+            }
         }
     } else if (const auto replay = serverDirView->getReplay(curRight)) {
         // node at index is a replay
-        const QString dirPath = curLeft.isValid() ? localDirModel->filePath(curLeft) : localDirModel->rootPath();
-        const QString filePath = dirPath + QString("/replay_%1.cor").arg(replay->replay_id());
+        const QString filePath = QDir(directoryPath).filePath(QStringLiteral("replay_%1.cor").arg(replay->replay_id()));
 
         Command_ReplayDownload cmd;
         cmd.set_replay_id(replay->replay_id());
@@ -491,20 +576,41 @@ void TabReplays::downloadFinished(const Response &r,
                                   const QVariant &extraData)
 {
     if (r.response_code() != Response::RespOk) {
+        reportDownloadError(tr("The server could not provide the requested replay: %1").arg(extraData.toString()));
         return;
     }
 
-    const Response_ReplayDownload &resp = r.GetExtension(Response_ReplayDownload::ext);
-    QString filePath = extraData.toString();
-
-    const std::string &_data = resp.replay_data();
-    QFile f(filePath);
-    if (!f.open(QIODevice::WriteOnly)) {
-        qWarning() << "failed to open" << filePath << "for writing after downloading replay";
+    if (!r.HasExtension(Response_ReplayDownload::ext)) {
+        reportDownloadError(tr("The server did not provide replay data for %1.").arg(extraData.toString()));
         return;
     }
-    f.write((const char *)_data.data(), _data.size());
-    f.close();
+    const auto &data = r.GetExtension(Response_ReplayDownload::ext).replay_data();
+    QString error;
+    if (!ReplayDownload::save(extraData.toString(), QByteArrayView(data.data(), data.size()), error)) {
+        reportDownloadError(tr("%1: %2").arg(extraData.toString(), error));
+    }
+}
+
+void TabReplays::reportDownloadError(const QString &error)
+{
+    if (!downloadErrorDialog) {
+        downloadErrors.clear();
+        downloadFailureCount = 0;
+        auto *dialog = new QMessageBox(QMessageBox::Critical, tr("Download replay"), QString(), QMessageBox::Ok, this);
+        dialog->setAttribute(Qt::WA_DeleteOnClose);
+        dialog->setTextFormat(Qt::PlainText);
+        downloadErrorDialog = dialog;
+        connect(dialog, &QMessageBox::finished, this, [this] { downloadErrorDialog.clear(); });
+    }
+    ++downloadFailureCount;
+    if (!downloadErrors.contains(error)) {
+        downloadErrors.append(error);
+    }
+    downloadErrorDialog->setText(tr("%n replay download(s) failed.", nullptr, downloadFailureCount));
+    downloadErrorDialog->setDetailedText(downloadErrors.join(QLatin1Char('\n')));
+    // Keep receiving replies without nesting event loops or stacking a dialog for
+    // every replay. Further failures update this same summary until it is closed.
+    downloadErrorDialog->show();
 }
 
 void TabReplays::actKeepRemoteReplay()
@@ -543,25 +649,43 @@ void TabReplays::keepRemoteReplayFinished(const Response &r, const CommandContai
 
 void TabReplays::actDeleteRemoteReplay()
 {
-    const auto curRights = serverDirView->getSelectedReplayMatches();
+    QList<QPersistentModelIndex> curRights;
+    for (const auto &index : serverDirView->selectionModel()->selectedRows()) {
+        const auto matchIndex = serverDirView->getReplayMatch(index) ? index : index.parent();
+        if (serverDirView->getReplayMatch(matchIndex) && !curRights.contains(matchIndex)) {
+            curRights.append(matchIndex);
+        }
+    }
 
     if (curRights.isEmpty()) {
         return;
     }
 
-    if (QMessageBox::warning(this, tr("Delete remote replay"),
-                             tr("Are you sure you want to delete the selected replays?"),
-                             QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) {
+    const QPointer<TabReplays> alive(this);
+    const auto answer = QMessageBox::warning(this, tr("Delete remote replay"),
+                                             tr("Are you sure you want to delete the selected replays?"),
+                                             QMessageBox::Yes | QMessageBox::No);
+    if (!alive || answer != QMessageBox::Yes) {
         return;
     }
 
-    for (const auto curRight : curRights) {
+    for (const auto &curRight : curRights) {
+        if (!curRight.isValid()) {
+            continue;
+        }
+        const auto replayMatch = serverDirView->getReplayMatch(curRight);
+        if (!replayMatch) {
+            continue;
+        }
         Command_ReplayDeleteMatch cmd;
-        cmd.set_game_id(curRight->game_id());
+        cmd.set_game_id(replayMatch->game_id());
 
         PendingCommand *pend = client->prepareSessionCommand(cmd);
         connect(pend, &PendingCommand::finished, this, &TabReplays::deleteRemoteReplayFinished);
         client->sendCommand(pend);
+        if (!alive) {
+            return;
+        }
     }
 }
 
@@ -626,11 +750,12 @@ void TabReplays::getReplayCodeFinished(const Response &r, const CommandContainer
 
 void TabReplays::actSubmitReplayCode()
 {
+    const QPointer<TabReplays> alive(this);
     bool ok;
     QString code = QInputDialog::getText(this, tr("Look up replay by share code"), tr("Replay share code"),
                                          QLineEdit::Normal, "", &ok);
 
-    if (!ok) {
+    if (!alive || !ok) {
         return;
     }
 
