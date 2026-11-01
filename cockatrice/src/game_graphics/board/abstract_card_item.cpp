@@ -289,7 +289,11 @@ void AbstractCardItem::setHovered(bool _hovered)
         // Mark the hovered card's current scene footprint dirty so overlapped
         // sibling zones (e.g. StackZone) repaint after the card moves away.
         if (scene()) {
-            scene()->update(sceneBoundingRect());
+            const QRectF footprint = sceneBoundingRect();
+            scene()->update(footprint);
+            // The hole disappears the moment the card is no longer hovered, even though the
+            // card has not changed size yet: tell the zones so they repaint it shut.
+            emit hoverFootprintChanged(footprint, footprint);
         }
     }
 
@@ -353,8 +357,13 @@ void AbstractCardItem::setCardScale(qreal _scale)
     const QRectF oldFootprint = sceneBoundingRect();
     prepareGeometryChange();
     setScale(_scale);
+    const QRectF newFootprint = sceneBoundingRect();
     if (scene()) {
-        scene()->update(oldFootprint.united(sceneBoundingRect()));
+        scene()->update(oldFootprint.united(newFootprint));
+        // Marking the scene region dirty is not enough for cached items: a zone that cuts a
+        // hover hole out of itself keeps the hole from its last repaint, which then shows as
+        // an uncovered black rectangle under the zoom.
+        emit hoverFootprintChanged(oldFootprint, newFootprint);
     } else {
         update();
     }

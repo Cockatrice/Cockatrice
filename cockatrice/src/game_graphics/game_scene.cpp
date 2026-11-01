@@ -14,6 +14,7 @@
 #include "z_values.h"
 #include "zones/card_zone.h"
 #include "zones/select_zone.h"
+#include "zones/table_zone.h"
 #include "zones/view_zone.h"
 #include "zones/view_zone_widget.h"
 
@@ -819,23 +820,20 @@ void GameScene::updateHoveredCard(CardItem *newCard)
             }
             return;
         }
-        if (cardHoverWidget && cardHoverWidget->isVisible() && cardHoverWidget->getCardItem() == newCard) {
+        if (cardHoverWidget && cardHoverWidget->isVisible() && !cardHoverWidget->isClosing() &&
+            cardHoverWidget->getCardItem() == newCard) {
             // Panel open but zoom dropped (e.g. survived a Leave) — zoom back and refresh.
             beginCardHover(newCard);
             hoveredCard = newCard;
             cardHoverWidget->refreshDisplay();
             return;
         }
-        if (cardHoverWidget && cardHoverWidget->isVisible()) {
-            // Panel open elsewhere — move the zoom at once so it never strands, but let
-            // the panel follow after the configured delay instead of strobing open on
-            // every card swept across.
-            beginCardHover(newCard);
-            hoveredCard = newCard;
+        if (cardHoverWidget && cardHoverWidget->isVisible() && !cardHoverWidget->isClosing()) {
+            // A different card is hovered while the panel is up: close the old panel
+            // first, then fall through to first contact so the new card follows the
+            // normal dwell instead of the old panel trailing the cursor.
+            hideCardHoverPopup();
             confirmArmedCard.clear();
-            hoverPanelTarget = newCard;
-            hoverPanelTimer->start(display.getHoverPanelDelayMs());
-            return;
         }
         if (zoomTrigger != CardsDisplaySettings::HoverPanelTriggerHover &&
             panelTrigger != CardsDisplaySettings::HoverPanelTriggerHover) {
@@ -903,6 +901,8 @@ void GameScene::beginCardHover(CardItem *card)
     liftOwner = card;
     connect(card, &AbstractCardItem::hoverShrinkFinished, this, &GameScene::onHoverShrinkFinished,
             Qt::UniqueConnection);
+    connect(card, &AbstractCardItem::hoverFootprintChanged, this, &GameScene::onHoverFootprintChanged,
+            Qt::UniqueConnection);
 }
 
 void GameScene::endCardHover(CardItem *card)
@@ -928,6 +928,25 @@ void GameScene::onHoverShrinkFinished(AbstractCardItem *card)
         return;
     }
     restoreHoverLift();
+}
+
+void GameScene::onHoverFootprintChanged(const QRectF &oldFootprint, const QRectF &newFootprint)
+{
+    const QRectF dirty = oldFootprint.united(newFootprint);
+    if (dirty.isEmpty()) {
+        return;
+    }
+    // TableZone cuts the hovered card out of its own paint, but it is cached: the card
+    // changing size does not dirty the zone, so the previous hole would stay transparent in
+    // the cache — an uncovered black rectangle under the zoom whenever the card grows across
+    // a zone boundary. Nudge only the zones the footprint touches; the scene repaint itself
+    // is already scheduled by the card.
+    const auto overlapping = items(dirty, Qt::IntersectsItemBoundingRect);
+    for (QGraphicsItem *item : overlapping) {
+        if (auto *zone = qobject_cast<TableZone *>(item->toGraphicsObject())) {
+            zone->update();
+        }
+    }
 }
 
 void GameScene::restoreHoverLift()
@@ -1129,7 +1148,8 @@ void GameScene::fireTriggers(CardItem *card, bool zoomFired, bool panelFired)
         return;
     }
 
-    if (cardHoverWidget && cardHoverWidget->isVisible() && cardHoverWidget->getCardItem() == card) {
+    if (cardHoverWidget && cardHoverWidget->isVisible() && !cardHoverWidget->isClosing() &&
+        cardHoverWidget->getCardItem() == card) {
         cardHoverWidget->refreshDisplay();
         return;
     }

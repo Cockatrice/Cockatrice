@@ -66,6 +66,15 @@ signals:
     void faceDownChanged(bool faceDown);
     /** @brief Emitted when the hover shrink-out animation runs to completion while unhovered. */
     void hoverShrinkFinished(AbstractCardItem *card);
+    /**
+     * @brief Emitted when the hover zoom changes this card's scene footprint.
+     *
+     * Zones (and anything else that dodges the zoomed card) draw from the live footprint at
+     * paint time but are cached: they need this to invalidate, or a stale hole is left behind.
+     * Also emitted once when the hover ends, with both rects equal, because the hole
+     * disappears without the card changing size.
+     */
+    void hoverFootprintChanged(const QRectF &oldFootprint, const QRectF &newFootprint);
 
 public:
     enum

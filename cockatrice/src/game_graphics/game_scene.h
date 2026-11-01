@@ -14,6 +14,7 @@
 #include <QPair>
 #include <QPointF>
 #include <QPointer>
+#include <QRectF>
 #include <QSize>
 #include <QSizeF>
 #include <QString>
@@ -126,6 +127,14 @@ private:
     void restoreHoverLift();
     /** @brief Settles a finished shrink-out: clip container and ancestor lift restore. */
     void onHoverShrinkFinished(AbstractCardItem *card);
+    /**
+     * @brief Repaints the zones that dodge the zoomed card when its footprint moves.
+     *
+     * Those zones cut the hovered card out of their paint, but they are cached: another
+     * item's geometry change does not dirty them, so without this the previous hole stays
+     * transparent in the cache and a black rectangle shows under the zoom.
+     */
+    void onHoverFootprintChanged(const QRectF &oldFootprint, const QRectF &newFootprint);
 
     // Card hover popup methods
     void showCardHoverPopup(CardItem *card);
