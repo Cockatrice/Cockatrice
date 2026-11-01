@@ -106,9 +106,12 @@ TabAlts::TabAlts(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
     trailLabel->setTextFormat(Qt::RichText);
     trailLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
     trailLabel->setOpenExternalLinks(false);
+    // The trail grows with every hop, so let it wrap instead of forcing the tab
+    // wider than the window.
+    trailLabel->setWordWrap(true);
     connect(trailLabel, &QLabel::linkActivated, this, [this](const QString &userName) {
         if (!userName.isEmpty() && userName != currentUser) {
-            investigate(userName);
+            goToTrailEntry(userName);
         }
     });
 
@@ -146,8 +149,6 @@ TabAlts::TabAlts(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
     altsTable = new QTableWidget(0, COL_ALTS_COUNT);
     configureAltTable(altsTable);
     altsDelegate = new AltTableDelegate(COL_ALTS_VIA, COL_ALTS_WARNS, COL_ALTS_BANS, COL_ALTS_SHARED, altsTable);
-    altsDelegate->setVpnThreshold(vpnSpin->value());
-    connect(vpnSpin, &QSpinBox::valueChanged, altsDelegate, &AltTableDelegate::setVpnThreshold);
     altsTable->setItemDelegateForColumn(COL_ALTS_VIA, altsDelegate);
     altsTable->setItemDelegateForColumn(COL_ALTS_WARNS, altsDelegate);
     altsTable->setItemDelegateForColumn(COL_ALTS_BANS, altsDelegate);
@@ -270,6 +271,20 @@ void TabAlts::investigate(const QString &userName)
         backStack << currentUser;
         backButton->setEnabled(true);
     }
+    loadUser(userName);
+}
+
+void TabAlts::goToTrailEntry(const QString &userName)
+{
+    const int index = backStack.indexOf(userName);
+    if (index < 0) {
+        investigate(userName);
+        return;
+    }
+    // Clicking an earlier crumb truncates the history there instead of pushing
+    // another entry, so the trail keeps a single path and Back still works.
+    backStack.erase(backStack.begin() + index, backStack.end());
+    backButton->setEnabled(!backStack.isEmpty());
     loadUser(userName);
 }
 
@@ -438,6 +453,8 @@ void TabAlts::renderTable()
         altsTable->setItem(row, COL_ALTS_WARNS, new QTableWidgetItem(QString::number(alt.warn_count())));
         altsTable->setItem(row, COL_ALTS_BANS, new QTableWidgetItem(QString::number(alt.ban_count())));
         altsTable->setItem(row, COL_ALTS_ACTIVE, new QTableWidgetItem(alt.is_active() ? tr("yes") : tr("no")));
+        // shared_count already includes the investigated account, so anything
+        // above 2 means the address is shared beyond that pair.
         if (QString::fromStdString(alt.match_reason()).startsWith(QStringLiteral("ip:")) && alt.has_shared_count() &&
             alt.shared_count() > 2) {
             for (int col = 0; col < COL_ALTS_COUNT; ++col) {
