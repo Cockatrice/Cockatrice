@@ -33,6 +33,7 @@
 #include <QStringList>
 #include <QVariant>
 #include <QVariantList>
+#include <QtGlobal>
 #include <google/protobuf/stubs/common.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
@@ -2188,8 +2189,14 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
                                                                                  bool &game,
                                                                                  bool &room,
                                                                                  int &range,
-                                                                                 int &maxresults)
+                                                                                 int &maxresults,
+                                                                                 int offset,
+                                                                                 const QString &beforeTime,
+                                                                                 bool *hasMore)
 {
+    if (hasMore != nullptr) {
+        *hasMore = false;
+    }
 
     QList<ServerInfo_ChatMessage> results;
     ServerInfo_ChatMessage chatMessage;
@@ -2198,8 +2205,31 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
         return results;
     }
 
-    if (user.isEmpty() && ipaddress.isEmpty() && gameid.isEmpty() && gamename.isEmpty()) {
-        // To ensure quick results and minimal lag, require an indexed field
+    // Page size guard: always bound the scan so a filter-less browse of room
+    // history cannot become a 50M-row fetch. Zero means "client did not set a
+    // size", so fall back to one smooth-scroll page.
+    const int pageSize = maxresults <= 0 ? 200 : qBound(1, maxresults, 1000);
+    maxresults = pageSize;
+    const int safeOffset = qMax(0, offset);
+
+    const bool hasIndexedFilter = !user.isEmpty() || !ipaddress.isEmpty() || !gameid.isEmpty() || !gamename.isEmpty();
+    const bool hasLocationFilter = chat || game || room;
+    if (!hasLocationFilter) {
+        // No target_type restriction would mix private chat into a room/game
+        // browse, so refuse rather than leak.
+        return results;
+    }
+    // A browse narrowed only by a message substring has no index to serve it, and `range`
+    // has no upper bound on the wire: the client offers 20 days, but a hand-built command
+    // can ask for any value and every LIKE candidate in it is a row the server examines.
+    // Clamping here keeps the guard independent of what the client happens to send.
+    constexpr int maxFilterlessRangeHours = 20 * 24;
+    if (!hasIndexedFilter && range > maxFilterlessRangeHours) {
+        range = maxFilterlessRangeHours;
+    }
+    if (!hasIndexedFilter && range <= 0) {
+        // Filter-less browse must stay time-bounded (idx_log_time) so the
+        // query stays an index range scan instead of a full table scan.
         return results;
     }
 
@@ -2254,9 +2284,22 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
         queryString.append(" AND log_time >= DATE_SUB(now(), INTERVAL :range_time HOUR)");
     }
 
-    if (maxresults) {
-        queryString.append(" LIMIT :limit_size");
+    if (!beforeTime.isEmpty()) {
+        // Pages after the first run against the snapshot fixed by the first one, so rows
+        // logged while the moderator scrolls can no longer push the OFFSET window down and
+        // repeat a row already on screen.
+        queryString.append(" AND log_time <= :before_time");
     }
+
+    // Newest-first keeps "going back from today" stable across pages and lets
+    // the client append older rows at the bottom for smooth infinite scroll.
+    queryString.append(" ORDER BY log_time DESC");
+
+    // Fetch one extra row when the caller wants a has_more cursor so a full
+    // page does not need a second empty round-trip to prove exhaustion.
+    const bool detectMore = (hasMore != nullptr);
+    const int fetchSize = detectMore ? pageSize + 1 : pageSize;
+    queryString.append(" LIMIT :limit_size OFFSET :offset_size");
 
     QSqlQuery *query = prepareQuery(queryString);
     if (!user.isEmpty()) {
@@ -2277,9 +2320,11 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
     if (range) {
         query->bindValue(":range_time", range);
     }
-    if (maxresults) {
-        query->bindValue(":limit_size", maxresults);
+    if (!beforeTime.isEmpty()) {
+        query->bindValue(":before_time", beforeTime);
     }
+    query->bindValue(":limit_size", fetchSize);
+    query->bindValue(":offset_size", safeOffset);
 
     if (!execSqlQuery(query)) {
         qCWarning(DatabaseInterfaceLog) << "Failed to collect log history information: SQL Error";
@@ -2297,6 +2342,11 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
         chatMessage.set_target_name(QString(query->value(7).toString()).toStdString());
         chatMessage.set_channel(QString(query->value(8).toString()).toStdString());
         results << chatMessage;
+    }
+
+    if (detectMore && results.size() > pageSize) {
+        results.removeLast();
+        *hasMore = true;
     }
 
     return results;

@@ -211,7 +211,10 @@ public:
                                                        bool &game,
                                                        bool &room,
                                                        int &range,
-                                                       int &maxresults);
+                                                       int &maxresults,
+                                                       int offset = 0,
+                                                       const QString &beforeTime = QString(),
+                                                       bool *hasMore = nullptr);
     QList<ServerInfo_UserSession> getUserSessions(const QString &userName, int limit);
     QList<ServerInfo_UserAlt> getUserAlts(const QString &userName);
     QList<ServerInfo_ModeratorLogin> getModeratorLastLogins();
