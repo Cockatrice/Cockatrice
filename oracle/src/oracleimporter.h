@@ -170,6 +170,10 @@ private:
      */
     CardNameMap cards;
 
+    // Shared defaults are immutable; card-specific copy limits belong to this import.
+    FormatRulesNameMap magicFormats;
+    bool magicFormatsDirty = true;
+
     /**
      * The sets, indexed by short name.
      */
@@ -299,7 +303,8 @@ public:
     bool saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion);
     int importCardsFromSet(const CardSetPtr &currentSet, const QJsonArray &cardsList);
     /**
-     * @brief Returns the default format rules. The result is memoized on first use and must be treated as immutable.
+     * @brief Returns format rules including finite copy allowances from imported cards.
+     * The result is cached until cards are added or cleared and must be treated as immutable.
      */
     const FormatRulesNameMap &createDefaultMagicFormats();
     const CardNameMap &getCardList() const

@@ -1,4 +1,5 @@
 #include "../../oracle/src/oracleimporter.h"
+#include "../../oracle/src/parsehelpers.h"
 #include "../../oracle/src/raw_json_scanner.h"
 #include "libcockatrice/card/card_info.h"
 
@@ -6,6 +7,8 @@
 #include <QByteArray>
 #include <QChar>
 #include <QDate>
+#include <QFile>
+#include <QIODevice>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -20,10 +23,13 @@
 #include <QRegularExpressionMatch>
 #include <QSharedPointer>
 #include <QString>
+#include <QTemporaryDir>
 #include <QUuid>
 #include <QVariant>
 #include <QVariantMap>
 #include <QtGlobal>
+#include <libcockatrice/card/database/card_database_data.h>
+#include <libcockatrice/card/database/parser/cockatrice_xml_4.h>
 #include <libcockatrice/card/format/format_legality_rules.h>
 #include <libcockatrice/card/set/card_set.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
@@ -316,6 +322,162 @@ TEST_F(OracleImporterTest, CreateDefaultMagicFormatsCaching)
     auto first = importer->createDefaultMagicFormats();
     auto second = importer->createDefaultMagicFormats();
     ASSERT_EQ(first.value("standard").data(), second.value("standard").data());
+}
+
+TEST(DeckCopyLimitParser, ReadsNamedAllowancesWithoutACardNameList)
+{
+    EXPECT_EQ(parseDeckCopyLimit("Seven Dwarves", "A deck can have up to seven cards named Seven Dwarves."), 7);
+    EXPECT_EQ(parseDeckCopyLimit("Nazgûl",
+                                 "Deathtouch\nA deck can have up to nine cards named Nazgûl.\nThe Ring tempts you."),
+              9);
+    EXPECT_EQ(parseDeckCopyLimit("Future Card", "A deck can have up to 17 cards named Future Card."), 17);
+    EXPECT_EQ(parseDeckCopyLimit("Future Card", "A deck can have up to twenty-three cards named Future Card."), 23);
+    EXPECT_EQ(parseDeckCopyLimit("Future Card", "A deck can have up to ninety nine cards named Future Card."), 99);
+    EXPECT_EQ(parseDeckCopyLimit("AEther's Ally", "A deck can have up to six cards named Æther’s Ally."), 6);
+}
+
+TEST(DeckCopyLimitParser, RejectsUnknownMalformedAndOtherCardRules)
+{
+    const QString name = "Example";
+    for (const QString &text :
+         {QString(), QString("A deck can have any number of cards named Example."),
+          QString("A deck can have up to seven cards named Other Card."),
+          QString("A deck can have up to seven cards named Example"),
+          QString("A deck can have up to many cards named Example."),
+          QString("A deck can have up to zero cards named Example."),
+          QString("A deck can have up to 0 cards named Example."),
+          QString("A deck can have up to -7 cards named Example."),
+          QString("A deck can have up to 99999999999999999999 cards named Example."),
+          QString("A deck can have up to twenty zero cards named Example."),
+          QString("If you control a Dragon, A deck can have up to seven cards named Example."),
+          QString(
+              "A deck can have up to seven cards named Example.\nA deck can have up to nine cards named Example.")}) {
+        EXPECT_FALSE(parseDeckCopyLimit(name, text).has_value()) << text.toStdString();
+    }
+}
+
+TEST_F(OracleImporterTest, CreateDefaultMagicFormatsDerivesFiniteLimitsFromCanonicalText)
+{
+    QVariantMap legalities;
+    const auto defaults = importer->createDefaultMagicFormats();
+    for (auto it = defaults.cbegin(); it != defaults.cend(); ++it) {
+        legalities.insert(it.key(), "Legal");
+    }
+    auto dwarves = makeCard("Seven Dwarves", "", "", legalities);
+    dwarves["text"] = "Seven Dwarves gets +1/+1 for each other creature named Seven Dwarves you control.\n"
+                      "A deck can have up to seven cards named Seven Dwarves.";
+    auto nazgul = makeCard("Nazgûl", "", "", legalities);
+    nazgul["text"] = "Deathtouch\nA deck can have up to nine cards named Nazgûl.";
+    auto unknown = makeCard("Unknown Card");
+    unknown["text"] = "A deck can have up to many cards named Unknown Card.";
+    auto otherCard = makeCard("Other Card");
+    otherCard["text"] = "A deck can have up to seven cards named Seven Dwarves.";
+    importer->importCardsFromSet(set, QJsonArray{dwarves, nazgul, unknown, otherCard, makeCard("Ordinary Card")});
+
+    const auto &formats = importer->createDefaultMagicFormats();
+    for (const auto &format : formats) {
+        ASSERT_EQ(format->exceptions.size(), 4);
+        EXPECT_EQ(format->exceptions[0].maxCopies, -1);
+        EXPECT_EQ(format->exceptions[1].maxCopies, -1);
+        for (const auto &expected : {qMakePair(QString("Seven Dwarves"), 7), qMakePair(QString("Nazgûl"), 9)}) {
+            bool found = false;
+            for (const auto &rule : format->exceptions) {
+                if (rule.maxCopies == expected.second) {
+                    ASSERT_EQ(rule.conditions.size(), 2);
+                    EXPECT_EQ(rule.conditions.last().field, "format-" + format->formatName.toLower());
+                    EXPECT_EQ(rule.conditions.last().matchType, "equals");
+                    EXPECT_EQ(rule.conditions.last().value, "legal");
+                    EXPECT_EQ(rule.conditions.first().field, "name");
+                    EXPECT_EQ(rule.conditions.first().matchType, "equals");
+                    EXPECT_EQ(rule.conditions.first().value, expected.first);
+                    EXPECT_TRUE(exceptionAppliesToCard(*importer->getCardList().value(expected.first), rule));
+                    EXPECT_FALSE(exceptionAppliesToCard(*importer->getCardList().value("Other Card"), rule));
+                    found = true;
+                }
+            }
+            EXPECT_TRUE(found);
+        }
+    }
+}
+
+TEST_F(OracleImporterTest, FiniteCopyAllowancesDoNotOverrideFormatEligibility)
+{
+    const QVariantMap legalities{
+        {"standard", "Legal"}, {"modern", "Banned"}, {"vintage", "Restricted"}, {"commander", "Not_Legal"}};
+    auto dwarves = makeCard("Seven Dwarves", "", "", legalities);
+    dwarves["text"] = "A deck can have up to seven cards named Seven Dwarves.";
+    importer->importCardsFromSet(set, QJsonArray{dwarves});
+    const auto &formats = importer->createDefaultMagicFormats();
+    const auto card = importer->getCardList().value("Seven Dwarves");
+    ASSERT_TRUE(card);
+    EXPECT_EQ(cardCopyLimitException(*card, *formats.value("standard")), 7);
+    for (const auto &format : {"modern", "vintage", "commander", "legacy"}) {
+        EXPECT_FALSE(cardCopyLimitException(*card, *formats.value(format)).has_value()) << format;
+    }
+}
+
+TEST_F(OracleImporterTest, DerivedFormatCacheRefreshesWithoutChangingSharedDefaults)
+{
+    OracleImporter otherImporter;
+    const auto defaults = otherImporter.createDefaultMagicFormats();
+    EXPECT_EQ(importer->createDefaultMagicFormats().value("standard"), defaults.value("standard"));
+
+    auto dwarves = makeCard("Seven Dwarves");
+    dwarves["text"] = "A deck can have up to seven cards named Seven Dwarves.";
+    importer->importCardsFromSet(set, QJsonArray{dwarves});
+    const auto first = importer->createDefaultMagicFormats();
+    EXPECT_NE(first.value("standard"), defaults.value("standard"));
+    EXPECT_EQ(first.value("standard"), importer->createDefaultMagicFormats().value("standard"));
+    ASSERT_EQ(first.value("standard")->exceptions.size(), 3);
+
+    auto nazgul = makeCard("Nazgûl");
+    nazgul["text"] = "A deck can have up to nine cards named Nazgûl.";
+    importer->importCardsFromSet(set, QJsonArray{nazgul});
+    const auto second = importer->createDefaultMagicFormats();
+    EXPECT_EQ(second.value("standard")->exceptions.size(), 4);
+    EXPECT_EQ(first.value("standard")->exceptions.size(), 3);
+    EXPECT_EQ(defaults.value("standard")->exceptions.size(), 2);
+    EXPECT_EQ(otherImporter.createDefaultMagicFormats().value("standard"), defaults.value("standard"));
+
+    importer->clear();
+    EXPECT_EQ(importer->createDefaultMagicFormats().value("standard"), defaults.value("standard"));
+}
+
+TEST_F(OracleImporterTest, FiniteCopyRulesSurviveImportSaveAndXmlReload)
+{
+    const QVariantMap legalities{{"commander", "Legal"}, {"modern", "Not_Legal"}};
+    auto dwarves = makeCard("Seven Dwarves", "", "", legalities);
+    dwarves["text"] = "A deck can have up to seven cards named Seven Dwarves.";
+    auto nazgul = makeCard("Nazgûl", "", "", legalities);
+    nazgul["text"] = "A deck can have up to nine cards named Nazgûl.";
+    const QJsonObject setData{{"code", "TST"},
+                              {"name", "Test Set"},
+                              {"type", "expansion"},
+                              {"releaseDate", "2024-01-01"},
+                              {"cards", QJsonArray{dwarves, nazgul}}};
+    const QJsonObject source{{"data", QJsonObject{{"TST", setData}}}};
+    ASSERT_TRUE(importer->readSetsFromByteArray(QJsonDocument(source).toJson()));
+    ASSERT_EQ(importer->startImport(), 1);
+
+    QTemporaryDir directory;
+    ASSERT_TRUE(directory.isValid());
+    const QString filename = directory.filePath("cards.xml");
+    ASSERT_TRUE(importer->saveToFile(filename, "fixture", "1"));
+    QFile file(filename);
+    ASSERT_TRUE(file.open(QIODevice::ReadOnly));
+    CardDatabaseData restored;
+    CockatriceXml4Parser parser(controller);
+    parser.parseFileInto(file, restored);
+    const auto commander = restored.formats.value("commander");
+    const auto modern = restored.formats.value("modern");
+    ASSERT_TRUE(commander);
+    ASSERT_TRUE(modern);
+    for (const auto &expected : {qMakePair(QString("Seven Dwarves"), 7), qMakePair(QString("Nazgûl"), 9)}) {
+        const auto card = restored.cards.value(expected.first);
+        ASSERT_TRUE(card);
+        EXPECT_EQ(cardCopyLimitException(*card, *commander), expected.second);
+        EXPECT_FALSE(cardCopyLimitException(*card, *modern).has_value());
+    }
 }
 
 // ============================================================================
