@@ -1,5 +1,6 @@
 #include "tab_alts.h"
 
+#include "../utility/epoch_format.h"
 #include "abstract_client.h"
 #include "libcockatrice/protocol/pb/response.pb.h"
 #include "libcockatrice/protocol/pb/response_user_alts.pb.h"
@@ -99,10 +100,7 @@ void TabAlts::retranslateUi()
 
 QString TabAlts::formatEpoch(quint64 ts) const
 {
-    if (ts == 0) {
-        return tr("Unknown");
-    }
-    return QDateTime::fromSecsSinceEpoch(ts).toLocalTime().toString("yyyy-MM-dd HH:mm");
+    return formatEpochTimestamp(ts, tr("Unknown"));
 }
 
 void TabAlts::investigate(const QString &userName)
@@ -132,7 +130,11 @@ void TabAlts::requestAlts(const QString &userName, int depth)
     cmd.set_user_name(userName.toStdString());
     cmd.set_depth(static_cast<google::protobuf::uint32>(depth));
     PendingCommand *pend = client->prepareModeratorCommand(cmd);
-    connect(pend, &PendingCommand::finished, this, &TabAlts::altsResponse);
+    connect(pend, &PendingCommand::finished, this, [this, userName](const Response &response) {
+        if (userName == currentUser) {
+            altsResponse(response);
+        }
+    });
     client->sendCommand(pend);
 }
 
@@ -140,14 +142,25 @@ void TabAlts::altsResponse(const Response &response)
 {
     altsTable->setRowCount(0);
     if (response.response_code() != Response::RespOk) {
-        statusLabel->setText(tr("User %1 not found.").arg(currentUser));
+        statusLabel->setText(tr("Could not load alts for %1.").arg(currentUser));
         return;
     }
 
     const Response_UserAlts &resp = response.GetExtension(Response_UserAlts::ext);
+    // The server answers RespOk with no rows when the user does not exist.
+    if (resp.alts_size() == 0) {
+        statusLabel->setText(tr("User %1 not found.").arg(currentUser));
+        return;
+    }
+
     altsTable->setRowCount(resp.alts_size());
+    int relatedCount = 0;
     for (int i = 0; i < resp.alts_size(); ++i) {
         const ServerInfo_UserAlt &alt = resp.alts(i);
+        // The server appends the frontier user as a depth-0 seed row.
+        if (!alt.has_depth() || alt.depth() > 0) {
+            ++relatedCount;
+        }
         altsTable->setItem(i, COL_ALTS_USER, new QTableWidgetItem(QString::fromStdString(alt.user_name())));
         altsTable->setItem(i, COL_ALTS_VIA,
                            new QTableWidgetItem(alt.has_match_reason() && !alt.match_reason().empty()
@@ -166,5 +179,5 @@ void TabAlts::altsResponse(const Response &response)
         altsTable->setItem(i, COL_ALTS_BANS, new QTableWidgetItem(QString::number(alt.ban_count())));
         altsTable->setItem(i, COL_ALTS_ACTIVE, new QTableWidgetItem(alt.is_active() ? tr("yes") : tr("no")));
     }
-    statusLabel->setText(tr("%1 account(s) related to %2.").arg(resp.alts_size()).arg(currentUser));
+    statusLabel->setText(tr("%1 account(s) related to %2.").arg(relatedCount).arg(currentUser));
 }
