@@ -8,6 +8,7 @@
 #ifndef REPLAY_WIDGET_H
 #define REPLAY_WIDGET_H
 
+#include <QList>
 #include <QWidget>
 #include <libcockatrice/game/player/event_processing_options.h>
 #include <qtmetamacros.h>
@@ -35,8 +36,14 @@ public:
      */
     ReplayWidget(QWidget *parent, GameReplay *replay);
 
+    [[nodiscard]] const QList<int> &getReplayTimeline() const;
+
+public slots:
+    void seekToEvent(int eventIndex);
+
 signals:
     void rewound();
+    void timeChanged(int time);
     void eventReplayed(const GameEventContainer &cont, EventProcessingOptions options);
 
 private:
