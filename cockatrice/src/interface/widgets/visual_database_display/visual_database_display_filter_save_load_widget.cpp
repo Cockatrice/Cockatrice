@@ -3,7 +3,6 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "filter_tree_model.h"
-#include "libcockatrice/filters/filter_card.h"
 #include "visual_database_filter_display_widget.h"
 
 #include <QByteArray>
@@ -11,18 +10,38 @@
 #include <QDir>
 #include <QFile>
 #include <QIODevice>
-#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QJsonValue>
-#include <QJsonValueRef>
+#include <QJsonParseError>
 #include <QLineEdit>
+#include <QMessageBox>
+#include <QPointer>
 #include <QPushButton>
 #include <QRegularExpression>
+#include <QSaveFile>
 #include <QVBoxLayout>
-#include <libcockatrice/filters/filter_tree.h>
+#include <QVariant>
+#include <libcockatrice/filters/filter_preset.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <qnamespace.h>
+
+namespace
+{
+bool isFilterFilename(const QString &filename)
+{
+    return !filename.isEmpty() && filename != "." && filename != ".." && !filename.contains('/') &&
+           !filename.contains('\\');
+}
+
+void showFilterError(QWidget *parent, const QString &title, const QString &message)
+{
+    // A parent can disappear while an error is displayed. A heap-owned, async
+    // message box does not leave a stack dialog or a suspended widget method.
+    auto *dialog = new QMessageBox(QMessageBox::Warning, title, message, QMessageBox::Ok, parent);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->open();
+}
+} // namespace
 
 VisualDatabaseDisplayFilterSaveLoadWidget::VisualDatabaseDisplayFilterSaveLoadWidget(QWidget *parent,
                                                                                      FilterTreeModel *_filterModel)
@@ -76,24 +95,24 @@ void VisualDatabaseDisplayFilterSaveLoadWidget::saveFilter()
     if (filename.isEmpty()) {
         return;
     }
+    if (!isFilterFilename(filename)) {
+        showFilterError(this, tr("Save Failed"), tr("Enter a filename without folder separators."));
+        return;
+    }
 
     QString filePath = SettingsCache::instance().paths().getFiltersPath() + QDir::separator() + filename + ".json";
 
-    // Serialize the filter model to JSON
-    QJsonArray filtersArray;
-    QList<const CardFilter *> cardFilters = filterModel->allFilters();
+    const FilterPreset preset{filterModel->snapshot(), filterModel->property("visualDatabaseColorMode").toString()};
+    const QJsonObject root = preset.toJson();
 
-    for (const CardFilter *filter : cardFilters) {
-        filtersArray.append(filter->toJson());
-    }
-
-    QJsonObject root;
-    root["filters"] = filtersArray;
-
-    QFile file(filePath);
-    if (file.open(QIODevice::WriteOnly)) {
-        file.write(QJsonDocument(root).toJson(QJsonDocument::Indented));
-        file.close();
+    QSaveFile file(filePath);
+    const QByteArray data = QJsonDocument(root).toJson(QJsonDocument::Indented);
+    // Check the buffered flush explicitly: Qt 6.4 can otherwise report a
+    // successful commit after a short write while closing the device.
+    if (!file.open(QIODevice::WriteOnly) || file.write(data) != data.size() || !file.flush() || !file.commit()) {
+        showFilterError(this, tr("Save Failed"),
+                        tr("Could not save filter '%1': %2").arg(filename, file.errorString()));
+        return;
     }
 
     filenameInput->clear();
@@ -102,46 +121,48 @@ void VisualDatabaseDisplayFilterSaveLoadWidget::saveFilter()
 
 void VisualDatabaseDisplayFilterSaveLoadWidget::loadFilter(const QString &filename)
 {
+    if (!isFilterFilename(filename)) {
+        showFilterError(this, tr("Load Failed"), tr("Choose a filter from the saved filter list."));
+        return;
+    }
     QString filePath = SettingsCache::instance().paths().getFiltersPath() + QDir::separator() + filename;
 
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly)) {
+        showFilterError(this, tr("Load Failed"),
+                        tr("Could not read filter '%1': %2").arg(filename, file.errorString()));
         return;
     }
 
     QByteArray jsonData = file.readAll();
+    if (file.error() != QFile::NoError) {
+        showFilterError(this, tr("Load Failed"),
+                        tr("Could not read filter '%1': %2").arg(filename, file.errorString()));
+        return;
+    }
     file.close();
 
-    QJsonDocument doc = QJsonDocument::fromJson(jsonData);
-    if (!doc.isObject()) {
+    QJsonParseError parseError;
+    QJsonDocument doc = QJsonDocument::fromJson(jsonData, &parseError);
+    if (parseError.error != QJsonParseError::NoError || !doc.isObject()) {
+        showFilterError(this, tr("Load Failed"),
+                        tr("Filter '%1' is not a valid filter file. The current filters were kept.").arg(filename));
         return;
     }
 
-    QJsonObject root = doc.object();
-    if (!root.contains("filters") || !root["filters"].isArray()) {
+    const auto preset = FilterPreset::fromJson(doc.object());
+    if (!preset) {
+        showFilterError(this, tr("Load Failed"),
+                        tr("Filter '%1' contains an unsupported filter. The current filters were kept.").arg(filename));
         return;
     }
-
-    QJsonArray filtersArray = root["filters"].toArray();
-
-    filterModel->clear();
-
-    filterModel->blockSignals(true);
-    filterModel->filterTree()->blockSignals(true);
-    for (const QJsonValue &value : filtersArray) {
-        if (value.isObject()) {
-            QJsonObject filterObj = value.toObject();
-            CardFilter *filter = CardFilter::fromJson(filterObj);
-            if (filter) {
-                filterModel->addFilter(filter);
-            }
-        }
+    QPointer<FilterTreeModel> model(filterModel);
+    model->replaceSnapshot(preset->snapshot);
+    // Reset/changed observers can destroy the view and its model synchronously.
+    // The accepted document owns this metadata, so notify only a surviving model.
+    if (model) {
+        emit model->filtersLoaded(preset->colorMode);
     }
-    filterModel->blockSignals(false);
-    filterModel->filterTree()->blockSignals(false);
-
-    emit filterModel->filterTree()->changed();
-    emit filterModel->layoutChanged();
 }
 
 void VisualDatabaseDisplayFilterSaveLoadWidget::applySearchFilter(const QString &text)

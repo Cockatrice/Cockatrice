@@ -4,6 +4,47 @@
 #include <QJsonValue>
 #include <QJsonValueRef>
 #include <QSharedPointer>
+#include <iterator>
+
+namespace
+{
+template <typename Enum> struct FilterIdentifier
+{
+    Enum value;
+    const char *id;
+    const char *legacyName;
+};
+
+// The names shown in the UI are translated; persisted identities must not be.
+// Explicit enum values also keep the format stable when attributes are inserted.
+constexpr FilterIdentifier<CardFilter::Type> typeIdentifiers[] = {
+    {CardFilter::TypeAnd, "and", "AND"},
+    {CardFilter::TypeOr, "or", "OR"},
+    {CardFilter::TypeAndNot, "and-not", "AND NOT"},
+    {CardFilter::TypeOrNot, "or-not", "OR NOT"},
+};
+constexpr FilterIdentifier<CardFilter::Attr> attrIdentifiers[] = {
+    {CardFilter::AttrCmc, "mana-value", "Mana Value"},
+    {CardFilter::AttrColor, "color", "Color"},
+    {CardFilter::AttrColorIdentity, "color-identity", "Color Identity"},
+    {CardFilter::AttrLoyalty, "loyalty", "Loyalty"},
+    {CardFilter::AttrManaCost, "mana-cost", "Mana Cost"},
+    {CardFilter::AttrName, "name", "Name"},
+    {CardFilter::AttrNameExact, "name-exact", "Name (Exact)"},
+    {CardFilter::AttrPow, "power", "Power"},
+    {CardFilter::AttrRarity, "rarity", "Rarity"},
+    {CardFilter::AttrSet, "set", "Set"},
+    {CardFilter::AttrText, "text", "Text"},
+    {CardFilter::AttrTough, "toughness", "Toughness"},
+    {CardFilter::AttrType, "type", "Type"},
+    {CardFilter::AttrMainType, "main-type", "Main Type"},
+    {CardFilter::AttrSubType, "sub-type", "Sub Type"},
+    {CardFilter::AttrFormat, "format", "Format"},
+    {CardFilter::AttrTag, "tag", "Tag"},
+};
+static_assert(std::size(typeIdentifiers) == CardFilter::TypeEnd);
+static_assert(std::size(attrIdentifiers) == CardFilter::AttrEnd);
+} // namespace
 
 QJsonObject CardFilter::toJson() const
 {
@@ -11,35 +52,61 @@ QJsonObject CardFilter::toJson() const
     obj["term"] = trm;
     obj["type"] = typeName(t);
     obj["attr"] = attrName(a);
+    // Retain the labels for older readers in the language used to save the file.
+    for (const auto &identifier : typeIdentifiers) {
+        if (identifier.value == t) {
+            obj["typeId"] = QLatin1String(identifier.id);
+            break;
+        }
+    }
+    for (const auto &identifier : attrIdentifiers) {
+        if (identifier.value == a) {
+            obj["attrId"] = QLatin1String(identifier.id);
+            break;
+        }
+    }
     return obj;
 }
 
 CardFilter *CardFilter::fromJson(const QJsonObject &obj)
 {
+    if (!obj["term"].isString()) {
+        return nullptr;
+    }
     QString term = obj["term"].toString();
-    QString typeStr = obj["type"].toString();
-    QString attrStr = obj["attr"].toString();
+    const bool hasIds = obj.contains("typeId") || obj.contains("attrId");
+    const QJsonValue typeValue = obj[hasIds ? "typeId" : "type"];
+    const QJsonValue attrValue = obj[hasIds ? "attrId" : "attr"];
+    if (!typeValue.isString() || !attrValue.isString()) {
+        return nullptr;
+    }
+    const QString typeStr = typeValue.toString();
+    const QString attrStr = attrValue.toString();
 
     Type type = TypeEnd;
     Attr attr = AttrEnd;
 
-    // Convert type string back to enum
-    for (int i = 0; i < TypeEnd; i++) {
-        if (typeName(static_cast<Type>(i)) == typeStr) {
-            type = static_cast<Type>(i);
+    // Existing files contain only labels. Accept the current UI's labels and
+    // untranslated English labels, without guessing an unknown locale's meaning.
+    // Once either ID is present, both must be valid: a malformed ID must never
+    // silently fall back to a label with different semantics.
+    for (const auto &identifier : typeIdentifiers) {
+        if (hasIds ? typeStr == QLatin1String(identifier.id)
+                   : typeStr == typeName(identifier.value) || typeStr == QLatin1String(identifier.legacyName)) {
+            type = identifier.value;
             break;
         }
     }
 
-    // Convert attr string back to enum
-    for (int i = 0; i < AttrEnd; i++) {
-        if (attrName(static_cast<Attr>(i)) == attrStr) {
-            attr = static_cast<Attr>(i);
+    for (const auto &identifier : attrIdentifiers) {
+        if (hasIds ? attrStr == QLatin1String(identifier.id)
+                   : attrStr == attrName(identifier.value) || attrStr == QLatin1String(identifier.legacyName)) {
+            attr = identifier.value;
             break;
         }
     }
 
-    return new CardFilter(term, type, attr);
+    return type == TypeEnd || attr == AttrEnd ? nullptr : new CardFilter(term, type, attr);
 }
 
 const QString CardFilter::typeName(Type t)
@@ -69,6 +136,8 @@ const QString CardFilter::attrName(Attr a)
             return tr("Type");
         case AttrColor:
             return tr("Color");
+        case AttrColorIdentity:
+            return tr("Color Identity");
         case AttrText:
             return tr("Text");
         case AttrSet:
@@ -87,6 +156,8 @@ const QString CardFilter::attrName(Attr a)
             return tr("Loyalty");
         case AttrFormat:
             return tr("Format");
+        case AttrTag:
+            return tr("Tag");
         case AttrMainType:
             return tr("Main Type");
         case AttrSubType:

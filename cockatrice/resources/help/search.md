@@ -22,6 +22,11 @@ In this list of examples below, each entry has an explanation and can be clicked
 <dd>[t:basic](#t:basic) <small>(Any card with the type basic)</small></dd>
 <dd>[t:arcane t:instant](#t:arcane t:instant) <small>(Any card with the types arcane and instant)</small></dd>
 
+<dt>Tags:</dt>
+<dd>[tags:ramp](#tags:ramp) <small>(Any card tagged "ramp" by the Scryfall Tagger community)</small></dd>
+<dd>[tags:draw tags:ramp](#tags:draw tags:ramp) <small>(Any card tagged both "draw" and "ramp")</small></dd>
+<dd>[tags:draw OR tags:ramp](#tags:draw OR tags:ramp) <small>(Any card tagged "draw" or "ramp")</small></dd>
+
 <dt><u>C</u>olors:</dt>
 <dd>[c:w](#c:w) <small>(Any card that is white)</small></dd>
 <dd>[c:wu](#c:wu) <small>(Any card that is white or blue)</small></dd>

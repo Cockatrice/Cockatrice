@@ -1,6 +1,7 @@
 #include "card_database_querier.h"
 
 #include "../card_info.h"
+#include "../game_specific_terms.h"
 #include "../printing/exact_card.h"
 #include "../set/card_set_comparator.h"
 #include "card_database.h"
@@ -31,6 +32,8 @@ void CardDatabaseQuerier::invalidateCaches()
     mainCardTypeCountsCache.clear();
     subCardTypeCountsCache.clear();
     formatsCountCache.clear();
+    tagCountsCache.clear();
+    tagCountsCacheValid = false;
 }
 
 /**
@@ -379,6 +382,23 @@ QMap<QString, int> CardDatabaseQuerier::getAllSubCardTypesWithCount() const
 FormatRulesPtr CardDatabaseQuerier::getFormat(const QString &formatName) const
 {
     return db->formats.value(formatName.toLower());
+}
+
+QMap<QString, int> CardDatabaseQuerier::getAllTagsWithCount() const
+{
+    if (!tagCountsCacheValid) {
+        for (const auto &card : db->cards) {
+            QStringList tags = card->getProperty(Mtg::Tags).toLower().split(" ", Qt::SkipEmptyParts);
+            tags.removeDuplicates();
+
+            for (const QString &tag : tags) {
+                tagCountsCache[tag]++;
+            }
+        }
+    }
+
+    tagCountsCacheValid = true;
+    return tagCountsCache;
 }
 
 QMap<QString, int> CardDatabaseQuerier::getAllFormatsWithCount() const

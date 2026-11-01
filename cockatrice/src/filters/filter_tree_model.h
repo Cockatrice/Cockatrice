@@ -10,7 +10,7 @@
 #include <QAbstractItemModel>
 #include <QList>
 #include <QModelIndex>
-#include <libcockatrice/filters/filter_card.h>
+#include <libcockatrice/filters/filter_preset.h>
 #include <qnamespace.h>
 #include <qtmetamacros.h>
 
@@ -31,6 +31,10 @@ public slots:
     [[nodiscard]] QList<const CardFilter *> getFiltersOfType(CardFilter::Attr filterType) const;
     [[nodiscard]] QList<const CardFilter *> allFilters() const;
 
+signals:
+    // Emitted after a saved filter file has replaced the tree.
+    void filtersLoaded(const QString &colorMode);
+
 private slots:
     void proxyBeginInsertRow(const FilterTreeNode *, int);
     void proxyEndInsertRow(const FilterTreeNode *, int);
@@ -42,6 +46,11 @@ private:
     QModelIndex nodeIndex(const FilterTreeNode *node, int row, int column) const;
 
 public:
+    using TermSnapshot = FilterPreset::TermSnapshot;
+    using TypeSnapshot = FilterPreset::TypeSnapshot;
+    using AttributeSnapshot = FilterPreset::AttributeSnapshot;
+    using Snapshot = FilterPreset::Snapshot;
+
     FilterTreeModel(QObject *parent = nullptr);
     ~FilterTreeModel() override;
     [[nodiscard]] FilterTree *filterTree() const
@@ -56,6 +65,10 @@ public:
     [[nodiscard]] QModelIndex parent(const QModelIndex &ind) const override;
     [[nodiscard]] QModelIndex index(int row, int column, const QModelIndex &parent) const override;
     bool removeRows(int row, int count, const QModelIndex &parent) override;
+    void replaceFilters(const QList<const CardFilter *> &filters);
+    // Value-owned snapshots preserve each checkbox independently of its parents.
+    [[nodiscard]] Snapshot snapshot() const;
+    void replaceSnapshot(const Snapshot &snapshot);
     void clear();
 };
 

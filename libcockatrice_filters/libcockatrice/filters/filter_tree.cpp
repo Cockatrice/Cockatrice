@@ -11,6 +11,7 @@
 #include <QStringList>
 #include <QStringView>
 #include <algorithm>
+#include <libcockatrice/card/game_specific_terms.h>
 #include <qnamespace.h>
 
 namespace
@@ -176,7 +177,8 @@ FilterItem::FilterItem(QString trm, FilterItemList *parent) : p(parent), term(st
     lowercaseTerm = term.toLower();
 
     switch (attr()) {
-        case CardFilter::AttrColor: {
+        case CardFilter::AttrColor:
+        case CardFilter::AttrColorIdentity: {
             QString converted = term.trimmed();
 
             converted.replace("green", "g", Qt::CaseInsensitive);
@@ -358,10 +360,11 @@ bool FilterItem::acceptSubType(const CardInfoPtr &info) const
     return subType.contains(term, Qt::CaseInsensitive);
 }
 
-bool FilterItem::acceptColor(const CardInfoPtr &info) const
+bool FilterItem::matchesColor(const QString &colors) const
 {
-    const QString colors = info->getColors();
-
+    // Each normalized term color must occur in the card property. The identity
+    // widget uses AND NOT for each disallowed color to express the inverse
+    // subset relation; an empty term matches every card.
     // Colorless card filter
     if (convertedColorTerm.toLower() == "c" && colors.length() < 1) {
         return true;
@@ -379,6 +382,16 @@ bool FilterItem::acceptColor(const CardInfoPtr &info) const
     }
 
     return match_count == convertedColorTerm.length();
+}
+
+bool FilterItem::acceptColor(const CardInfoPtr &info) const
+{
+    return matchesColor(info->getColors());
+}
+
+bool FilterItem::acceptColorIdentity(const CardInfoPtr &info) const
+{
+    return matchesColor(info->getColorIdentity());
 }
 
 bool FilterItem::acceptText(const CardInfoPtr &info, const CardSearchLanguage &searchLanguage) const
@@ -461,6 +474,16 @@ bool FilterItem::acceptFormat(const CardInfoPtr &info) const
     return info->getLegalityProp(lowercaseTerm) == "legal";
 }
 
+bool FilterItem::acceptTag(const CardInfoPtr &info) const
+{
+    const QString stored = info->getProperty(Mtg::Tags);
+    if (stored.isEmpty()) {
+        return false;
+    }
+    // Tags are stored space-separated; match whole slugs, not substrings.
+    return stored.split(" ", Qt::SkipEmptyParts).contains(term.trimmed(), Qt::CaseInsensitive);
+}
+
 bool FilterItem::acceptLoyalty(const CardInfoPtr &info) const
 {
     const QString loyaltyString = info->getLoyalty();
@@ -540,6 +563,8 @@ bool FilterItem::acceptCardAttr(const CardInfoPtr &info,
             return acceptType(info);
         case CardFilter::AttrColor:
             return acceptColor(info);
+        case CardFilter::AttrColorIdentity:
+            return acceptColorIdentity(info);
         case CardFilter::AttrText:
             return acceptText(info, searchLanguage);
         case CardFilter::AttrSet:
@@ -558,6 +583,8 @@ bool FilterItem::acceptCardAttr(const CardInfoPtr &info,
             return acceptLoyalty(info);
         case CardFilter::AttrFormat:
             return acceptFormat(info);
+        case CardFilter::AttrTag:
+            return acceptTag(info);
         case CardFilter::AttrMainType:
             return acceptMainType(info);
         case CardFilter::AttrSubType:

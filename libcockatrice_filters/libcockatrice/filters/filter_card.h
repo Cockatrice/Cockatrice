@@ -32,6 +32,7 @@ public:
     {
         AttrCmc = 0,
         AttrColor,
+        AttrColorIdentity,
         AttrLoyalty,
         AttrManaCost,
         AttrName,
@@ -45,6 +46,7 @@ public:
         AttrMainType,
         AttrSubType,
         AttrFormat,
+        AttrTag,
         AttrEnd,
     };
 
@@ -54,7 +56,7 @@ private:
     enum Attr a;
 
 public:
-    CardFilter(QString &term, Type type, Attr attr) : trm(term), t(type), a(attr)
+    CardFilter(const QString &term, Type type, Attr attr) : trm(term), t(type), a(attr)
     {
     }
 
@@ -72,6 +74,7 @@ public:
     }
 
     [[nodiscard]] QJsonObject toJson() const;
+    // Caller owns the result. Invalid or unknown identifiers return nullptr.
     static CardFilter *fromJson(const QJsonObject &json);
     static const QString typeName(Type t);
     static const QString attrName(Attr a);

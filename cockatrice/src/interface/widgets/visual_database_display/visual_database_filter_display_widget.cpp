@@ -13,7 +13,6 @@
 #include <QSize>
 #include <QSizePolicy>
 #include <libcockatrice/settings/paths_settings.h>
-#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 FilterDisplayWidget::FilterDisplayWidget(QWidget *parent, const QString &filename, FilterTreeModel *_filterModel)
@@ -69,17 +68,32 @@ void FilterDisplayWidget::loadFilter()
 
 void FilterDisplayWidget::deleteFilter()
 {
-    // Show confirmation dialog before deleting the filter
-    if (QtUtils::confirm(this, tr("Confirm Delete"),
-                         tr("Are you sure you want to delete the filter '%1'?").arg(filterFilename))) {
-        // If confirmed, delete the filter
-        QString filePath = SettingsCache::instance().paths().getFiltersPath() + QDir::separator() + filterFilename;
+    // Capture the target before opening the dialog. Refreshing/closing the pane
+    // destroys this receiver and disconnects the pending confirmation safely.
+    const QString filename = filterFilename;
+    const QString filePath = SettingsCache::instance().paths().getFiltersPath() + QDir::separator() + filename;
+    auto *dialog = new QMessageBox(QMessageBox::Question, tr("Confirm Delete"),
+                                   tr("Are you sure you want to delete the filter '%1'?").arg(filename),
+                                   QMessageBox::Yes | QMessageBox::No, this);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    connect(dialog, &QMessageBox::finished, this, [this, filename, filePath](int result) {
+        if (result != QMessageBox::Yes) {
+            return;
+        }
         QFile file(filePath);
         if (file.remove()) {
-            emit filterDeleted(filterFilename); // Emit signal for deletion
-            delete this;                        // Delete this widget
+            hide();
+            deleteLater();
+            // A synchronous listener may rebuild or destroy the entire pane.
+            // Do not access this widget after emitting the notification.
+            emit filterDeleted(filename);
         } else {
-            QMessageBox::warning(this, tr("Delete Failed"), tr("Failed to delete filter '%1'.").arg(filterFilename));
+            auto *error = new QMessageBox(QMessageBox::Warning, tr("Delete Failed"),
+                                          tr("Failed to delete filter '%1': %2").arg(filename, file.errorString()),
+                                          QMessageBox::Ok, this);
+            error->setAttribute(Qt::WA_DeleteOnClose);
+            error->open();
         }
-    }
+    });
+    dialog->open();
 }

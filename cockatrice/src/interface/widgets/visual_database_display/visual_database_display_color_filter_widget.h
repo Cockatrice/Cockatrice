@@ -40,9 +40,11 @@ private:
 
 enum class FilterMode
 {
-    ExactMatch,    // Only selected colors are included, all others are excluded.
-    Includes,      // Include selected colors (OR condition).
-    IncludeExclude // Include selected colors (OR) and exclude unselected colors (AND NOT).
+    ExactMatch,     // Only selected colors are included, all others are excluded.
+    Includes,       // Include selected colors (OR condition).
+    Excludes,       // Exclude each selected color (AND NOT).
+    IncludeExclude, // Include selected colors (OR) and exclude unselected colors (AND NOT).
+    ColorIdentity   // Keep identities within selected colors (AND NOT each unselected color).
 };
 
 Q_DECLARE_METATYPE(FilterMode)
@@ -66,8 +68,10 @@ private slots:
     void setManaSymbolActive(QChar color, bool active);
     QList<QChar> getActiveColors();
     void syncWithFilterModel();
+    void restoreModeFromLoadedFilters(const QString &savedMode);
 
 private:
+    void updateModeToolTip();
     FilterTreeModel *filterModel;
     QHBoxLayout *layout;
     QComboBox *modeComboBox;

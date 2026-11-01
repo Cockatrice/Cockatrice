@@ -243,7 +243,9 @@ public:
     [[nodiscard]] bool acceptType(const CardInfoPtr &info) const;
     [[nodiscard]] bool acceptMainType(const CardInfoPtr &info) const;
     [[nodiscard]] bool acceptSubType(const CardInfoPtr &info) const;
+    [[nodiscard]] bool matchesColor(const QString &colors) const;
     [[nodiscard]] bool acceptColor(const CardInfoPtr &info) const;
+    [[nodiscard]] bool acceptColorIdentity(const CardInfoPtr &info) const;
     [[nodiscard]] bool acceptText(const CardInfoPtr &info, const CardSearchLanguage &searchLanguage) const;
     [[nodiscard]] bool acceptSet(const CardInfoPtr &info) const;
     [[nodiscard]] bool acceptManaCost(const CardInfoPtr &info) const;
@@ -254,6 +256,7 @@ public:
     [[nodiscard]] bool
     acceptCardAttr(const CardInfoPtr &info, CardFilter::Attr attr, const CardSearchLanguage &searchLanguage) const;
     [[nodiscard]] bool acceptFormat(const CardInfoPtr &info) const;
+    [[nodiscard]] bool acceptTag(const CardInfoPtr &info) const;
     [[nodiscard]] bool relationCheck(int cardInfo) const;
 };
 
@@ -269,7 +272,6 @@ signals:
     void changed() const;
 
 private:
-    LogicMap *attrLogicMap(CardFilter::Attr attr);
     FilterItemList *attrTypeList(CardFilter::Attr attr, CardFilter::Type type);
 
     bool testAttr(const CardInfoPtr &info, const LogicMap *lm, const CardSearchLanguage &searchLanguage) const;
@@ -299,6 +301,8 @@ public:
     FilterTree();
     ~FilterTree() override;
 
+    // Find or create an attribute group, including empty groups retained in presets.
+    LogicMap *attrLogicMap(CardFilter::Attr attr);
     FilterTreeNode *termNode(CardFilter::Attr attr, CardFilter::Type type, const QString &term);
     FilterTreeNode *termNode(const CardFilter *f);
 
