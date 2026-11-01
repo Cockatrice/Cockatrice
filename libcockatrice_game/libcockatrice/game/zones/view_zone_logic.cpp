@@ -192,12 +192,14 @@ void ZoneViewZoneLogic::setWriteableRevealZone(bool _writeableRevealZone)
     writeableRevealZone = _writeableRevealZone;
 }
 
-PendingCommand *ZoneViewZoneLogic::requestZoneDump()
+PendingCommand *ZoneViewZoneLogic::prepareZoneDump()
 {
-    PlayerActions *actions = getPlayer()->getPlayerActions();
-    PendingCommand *pend = actions->prepareZoneDump(this, numberCards);
-    if (pend != nullptr) {
-        actions->sendGameCommand(pend);
+    return getPlayer()->getPlayerActions()->prepareZoneDump(this, numberCards);
+}
+
+void ZoneViewZoneLogic::sendZoneDump(PendingCommand *pendingCommand)
+{
+    if (pendingCommand != nullptr) {
+        getPlayer()->getPlayerActions()->sendGameCommand(pendingCommand);
     }
-    return pend;
 }
