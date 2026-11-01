@@ -151,10 +151,21 @@ jobs:
             version: 26.04
 
             package: DEB
+            test: skip    # The sanitizer leg below runs this distro's suite
 
-            # The one leg that runs the suite under AddressSanitizer and
-            # UndefinedBehaviorSanitizer. Debian 13 and Fedora 44 keep covering the
-            # uninstrumented suite, so nothing is lost by instrumenting this one.
+          # The one leg that runs the suite under AddressSanitizer and
+          # UndefinedBehaviorSanitizer. Debian 13 and Fedora 44 keep covering the
+          # uninstrumented suite, so nothing is lost by instrumenting this one.
+          #
+          # It packages nothing. A sanitized Debug build is not something to ship, and
+          # carrying the package build here meant 18 minutes of Release compile queued
+          # behind the instrumented one in a single job. The leg above publishes this
+          # distro's DEB.
+          - distro: Ubuntu
+            version: 26.04
+            variant: sanitize    # separate image and ccache, same distro
+
+            package: skip
             sanitize: yes
 
           - distro: Ubuntu
@@ -166,7 +177,7 @@ jobs:
             # sanitizer leg because the two instruments answer different questions: the
             # sanitizer leg reports what the run did wrong, the coverage leg reports what the
             # run never touched at all. Combining them would also slow both down. Packaging is
-            # skipped because the leg above already publishes the DEB for this distro.
+            # skipped because the plain Ubuntu 26.04 leg publishes the DEB for this distro.
             coverage: yes
             package: skip
 
