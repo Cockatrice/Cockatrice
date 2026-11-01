@@ -10,6 +10,7 @@
 #include "../abstract/abstract_client.h"
 
 #include <QLoggingCategory>
+#include <QPointer>
 #include <QString>
 #include <qtmetamacros.h>
 
@@ -24,7 +25,9 @@ class LocalClient : public AbstractClient
 {
     Q_OBJECT
 private:
-    LocalServerInterface *lsi;
+    // Guarded pointer: the LocalServer (and its interfaces) may be destroyed while this client
+    // still has pending commands queued on the event loop.
+    QPointer<LocalServerInterface> lsi;
 
 public:
     LocalClient(LocalServerInterface *_lsi,
