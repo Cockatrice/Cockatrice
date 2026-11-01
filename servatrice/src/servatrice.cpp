@@ -629,7 +629,6 @@ bool Servatrice::initServer()
 
     deckShareCleanupClock = new QTimer(this);
     connect(deckShareCleanupClock, &QTimer::timeout, this, &Servatrice::cleanupExpiredDeckShares);
-    connect(deckShareCleanupClock, &QTimer::timeout, this, &Servatrice::purgeDeckTombstones);
     const int deckShareCleanupInterval = getDeckShareCleanupInterval();
     if (deckShareCleanupInterval > 0) {
         qDebug() << "Starting deck share cleanup clock, interval" << deckShareCleanupInterval << "ms";
@@ -639,6 +638,16 @@ bool Servatrice::initServer()
     legacyBackupSweepClock = new QTimer(this);
     connect(legacyBackupSweepClock, &QTimer::timeout, this, &Servatrice::sweepLegacyBackups);
     legacyBackupSweepClock->start(kLegacyBackupSweepIntervalMs);
+
+    // Tombstone purging runs on its own clock: turning share cleanup off must not
+    // silently disable it as well.
+    deckTombstoneClock = new QTimer(this);
+    connect(deckTombstoneClock, &QTimer::timeout, this, &Servatrice::purgeDeckTombstones);
+    const int deckSyncPurgeInterval = getDeckSyncPurgeInterval();
+    if (deckSyncPurgeInterval > 0) {
+        qDebug() << "Starting deck tombstone purge clock, interval" << deckSyncPurgeInterval << "ms";
+        deckTombstoneClock->start(deckSyncPurgeInterval);
+    }
 
     // SOCKET SERVER
     if (getNumberOfTCPPools() > 0) {
@@ -1411,6 +1420,12 @@ int Servatrice::getDeckSyncMaxVersions() const
 int Servatrice::getDeckSyncTombstoneDays() const
 {
     return qMax(0, settingsCache->value("deck_sync/tombstone_days", 30).toInt());
+}
+
+int Servatrice::getDeckSyncPurgeInterval() const
+{
+    // default: every 60 minutes, independent of deck_share/cleanup_interval
+    return qMax(0, settingsCache->value("deck_sync/purge_interval", 60).toInt()) * 60000;
 }
 
 int Servatrice::getNumberOfTCPPools() const
