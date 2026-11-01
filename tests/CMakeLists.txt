@@ -459,19 +459,14 @@ endif()
 # which only exists when a client/UI-capable target is being built.
 if(WITH_ORACLE OR WITH_CLIENT)
   set(SETTINGS_SOURCES
-    ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network/update/client/release_channel.cpp
-    ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/cache_settings.cpp
-    ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/card_counter_settings.cpp
-    ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/shortcuts_settings.cpp
-    ${VERSION_STRING_CPP}
+      ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network/update/client/release_channel.cpp
+      ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/cache_settings.cpp
+      ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/card_counter_settings.cpp
+      ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/shortcuts_settings.cpp
+      ${VERSION_STRING_CPP}
   )
-  set(SETTINGS_LIBS
-    libcockatrice_network
-    libcockatrice_settings
-  )
-  set(SETTINGS_INCLUDE_DIRS
-    ${CMAKE_SOURCE_DIR}/cockatrice/src
-  )
+  set(SETTINGS_LIBS libcockatrice_network libcockatrice_settings)
+  set(SETTINGS_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/cockatrice/src)
 
   cockatrice_add_test(
     NAME
