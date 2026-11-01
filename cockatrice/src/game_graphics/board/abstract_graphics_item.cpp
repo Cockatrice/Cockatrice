@@ -22,7 +22,7 @@ void AbstractGraphicsItem::paintNumberEllipse(int number,
     painter->save();
 
     QString numStr = QString::number(number);
-    QFont font = themeManager->appFont(AppFont::CardText);
+    QFont font = themeManager->cardTextFont();
     font.setPixelSize(fontSize);
     font.setWeight(QFont::Bold);
 

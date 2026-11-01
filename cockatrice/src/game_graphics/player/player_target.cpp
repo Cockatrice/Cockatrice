@@ -77,7 +77,7 @@ void PlayerCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*
 
     QRectF translatedRect = path.controlPointRect();
     QSize translatedSize = translatedRect.size().toSize();
-    QFont font = themeManager->appFont(AppFont::CardText);
+    QFont font = themeManager->cardTextFont();
     font.setWeight(QFont::Bold);
     font.setPixelSize(qMax(qRound(translatedSize.height() / 1.3), 9));
     painter->setFont(font);
