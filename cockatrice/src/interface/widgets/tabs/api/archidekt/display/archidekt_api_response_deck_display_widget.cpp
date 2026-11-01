@@ -2,7 +2,6 @@
 
 #include "../../../../../../client/settings/cache_settings.h"
 #include "../../../../../deck_loader/card_node_function.h"
-#include "../../../../../deck_loader/loaded_deck.h"
 #include "../../../../cards/deck_card_zone_display_widget.h"
 #include "../../../../visual_deck_editor/visual_deck_display_options_widget.h"
 #include "../../../../visual_deck_editor/visual_deck_editor_widget.h"
@@ -30,7 +29,9 @@
 #include <QVariant>
 #include <functional>
 #include <libcockatrice/card/import/card_name_normalizer.h>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qlogging.h>
 #include <qnamespace.h>
 
@@ -66,10 +67,7 @@ ArchidektApiResponseDeckDisplayWidget::ArchidektApiResponseDeckDisplayWidget(QWi
     connect(displayOptionsWidget, &VisualDeckDisplayOptionsWidget::groupCriteriaChanged, this,
             &ArchidektApiResponseDeckDisplayWidget::onGroupCriteriaChange);
 
-    scrollArea = new QScrollArea(this);
-    scrollArea->setWidgetResizable(true);
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    scrollArea = QtUtils::makeScrollArea(this);
 
     layout->addWidget(scrollArea);
 
@@ -240,7 +238,5 @@ void ArchidektApiResponseDeckDisplayWidget::constructZoneWidgetsFromDeckListMode
 void ArchidektApiResponseDeckDisplayWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-    layout->invalidate();
-    layout->activate();
-    layout->update();
+    QtUtils::relayout(layout);
 }

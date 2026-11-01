@@ -200,6 +200,20 @@ if [[ $USE_VCPKG ]]; then
   flags+=("-DUSE_VCPKG=1")
   flags+=("-DVCPKG_INSTALL_OPTIONS=--x-abi-tools-use-exact-versions")
 fi
+if [[ ${WITH_CRASH_REPORTING:-} == "ON" ]]; then
+  # Release CI opts into the sentry-native SDK (default is OFF so from-source, distro and
+  # offline package builds never fetch it). Debug builds stay SDK-free so crashes from
+  # developer builds never reach Sentry.
+  flags+=("-DWITH_CRASH_REPORTING=ON")
+fi
+if [[ ${BUILDTYPE:-Release} == "Release" && -n ${COCKATRICE_SENTRY_DSN:-} ]]; then
+  # Release-only: Debug builds stay DSN-free so crashes from developer builds
+  # never reach Sentry. Empty (local builds, forks without the secret, and non-tag
+  # CI builds, which never receive the secret) keeps today's mock fallback via the
+  # compiled-in default. CI passes the value from the SENTRY_DSN secret on tag
+  # Release builds only, so pre-release test artifacts never report to Sentry.
+  flags+=("-DCOCKATRICE_SENTRY_DSN=$COCKATRICE_SENTRY_DSN")
+fi
 
 # Add cmake --build flags
 buildflags=(--config "$BUILDTYPE")
@@ -442,6 +456,206 @@ if [[ $MAKE_COVERAGE ]]; then
     "$GCOVR" "${GCOVR_ARGS[@]}" --json-summary-pretty -o coverage-summary.json
     echo "Coverage artifacts written to coverage-details.html, coverage.lcov, coverage.xml and coverage-summary.json"
   fi
+  echo "::endgroup::"
+fi
+
+if [[ $RUNNER_OS == Windows && ! $MAKE_NO_CLIENT ]]; then
+  echo "::group::Probe the installer's holder lookup"
+  # The working directory is still the build dir here: the package steps below are what
+  # leave and re-enter it, and that is what made a $BUILD_DIR-prefixed path name
+  # build/build. Both paths are relative to the dir the probe was built into.
+  probe="./installer-holder-probe.exe"
+  if [[ ! -f $probe ]]; then
+    echo "::error file=$0::installer-holder-probe.exe was not built"
+    exit 1
+  fi
+  # The probe exists to name a holder that a process-and-module scan cannot see: one
+  # that has a file open without having loaded it. Holding a temporary DLL with
+  # FileShare.None is exactly that case, so this asserts the reason the probe was
+  # added instead of only that the Restart Manager answers at all. It needs no NSIS
+  # and no packaging, so it runs on every Windows build that gets this far.
+  # The holder is a process of its own: the probe never names the process that started it,
+  # which is what keeps an in-place uninstaller from being named as a holder of the
+  # directory it is emptying. The same DLL held by the script that starts the probe
+  # therefore has to come back as nothing, and that is the second case below.
+  probe_check="./holder-probe-check.ps1"
+  cat >"$probe_check" <<'POWERSHELL'
+$ErrorActionPreference = "Stop"
+$dir = Join-Path ([IO.Path]::GetTempPath()) "cockatrice-holder-probe-$PID"
+Remove-Item -Recurse -Force $dir -ErrorAction SilentlyContinue
+New-Item -ItemType Directory -Force $dir | Out-Null
+$probe = (Resolve-Path -LiteralPath $env:PROBE_EXE).Path
+
+function Invoke-Probe([string] $guardDir) {
+    $start = New-Object System.Diagnostics.ProcessStartInfo
+    $start.FileName = $probe
+    $start.UseShellExecute = $false
+    $start.RedirectStandardOutput = $true
+    $start.EnvironmentVariables["COCKATRICE_GUARD_DIR"] = $guardDir
+    $process = [System.Diagnostics.Process]::Start($start)
+    $read = $process.StandardOutput.ReadToEndAsync()
+    if (-not $process.WaitForExit(20000)) {
+        try { $process.Kill() } catch { }
+        throw "the holder probe did not finish within 20 s for $guardDir"
+    }
+    $output = $read.Result
+    $code = $process.ExitCode
+    $process.Dispose()
+    return @{ Code = $code; Output = $output }
+}
+
+function Wait-UntilLocked([string] $path) {
+    $deadline = (Get-Date).AddSeconds(15)
+    while ((Get-Date) -lt $deadline) {
+        try {
+            $open = [IO.File]::Open($path, "Open", "ReadWrite", "None")
+            $open.Dispose()
+        } catch {
+            return
+        }
+        Start-Sleep -Milliseconds 100
+    }
+    throw "the holder never locked $path"
+}
+
+try {
+    $file = Join-Path $dir "locked.dll"
+    [IO.File]::WriteAllText($file, "x")
+
+    # The holder is a process of its own, not this script: the probe never names the process
+    # that started it (the case below asserts that), so a file held here would be left out on
+    # purpose and the check would pass for the wrong reason.
+    $holderScript = Join-Path $dir "hold.ps1"
+    Set-Content -LiteralPath $holderScript -Value @'
+param([string] $Path)
+$handle = [IO.File]::Open($Path, "Open", "ReadWrite", "None")
+Start-Sleep -Seconds 120
+'@
+    $powershell = Join-Path $env:SystemRoot "System32\WindowsPowerShell\v1.0\powershell.exe"
+    $holder = Start-Process -FilePath $powershell -PassThru -ArgumentList @(
+        "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "`"$holderScript`"", "-Path", "`"$file`"")
+    try {
+        Wait-UntilLocked $file
+        $locked = Invoke-Probe $dir
+        if ($locked.Code -ne 1) { throw "expected exit 1 for a locked file, got $($locked.Code) : $($locked.Output)" }
+        if ($locked.Output -notmatch "pid\s+$($holder.Id)\b") {
+            throw "the lookup did not name the process holding the file: $($locked.Output)"
+        }
+    } finally {
+        try { $holder.Kill() } catch { }
+        try { $holder.WaitForExit(5000) | Out-Null } catch { }
+    }
+
+    # The probe is started by the installer, or by an uninstaller that runs in place from the
+    # directory it is emptying, so the asking process holds files there itself. Naming it would
+    # ask the user to close the program that is asking - a question neither the close nor the
+    # end offer can answer, so the guard repeated it until the update was cancelled. A holder
+    # that is only the asking process has to come back as nothing.
+    $handle = [IO.File]::Open($file, "Open", "ReadWrite", "None")
+    try {
+        $self = Invoke-Probe $dir
+    } finally {
+        $handle.Dispose()
+    }
+    if ($self.Code -ne 0) { throw "expected exit 0 when the asking process is the only holder, got $($self.Code) : $($self.Output)" }
+    if ($self.Output -match "pid\s+$PID\b") { throw "the lookup named the process that started it: $($self.Output)" }
+
+    # A payload executable that refuses to be replaced is running, whether or not this probe
+    # may name it: the Restart Manager does not report every mapping, and the image path of a
+    # process under another account cannot be read from here, so both process lookups can
+    # come back empty while the program is still there. Held here by the asking process, so
+    # that it cannot be named - the answer has to be "could not name it", never "nothing is
+    # holding it", which is what sent an update into an uninstall that could only fail
+    # halfway. Exit 3 is the code the guard answers by asking the user to close it and retry.
+    $image = Join-Path $dir "oracle.exe"
+    [IO.File]::WriteAllText($image, "x")
+    $handle = [IO.File]::Open($image, "Open", "ReadWrite", "None")
+    try {
+        $unnameable = Invoke-Probe $dir
+    } finally {
+        $handle.Dispose()
+    }
+    if ($unnameable.Code -ne 3) {
+        throw "expected exit 3 for a payload executable that is in use but cannot be named, got $($unnameable.Code) : $($unnameable.Output)"
+    }
+    if ($unnameable.Output -notmatch "oracle\.exe is in use") {
+        throw "the answer did not name the executable it could not replace: $($unnameable.Output)"
+    }
+
+    $empty = Join-Path $dir "empty"
+    New-Item -ItemType Directory -Force $empty | Out-Null
+    $nothing = Invoke-Probe $empty
+    if ($nothing.Code -ne 0) { throw "expected exit 0 for a directory with nothing open, got $($nothing.Code) : $($nothing.Output)" }
+    # A process running from the directory is a holder even when it has no file open: an
+    # instance holds its payload as mapped images, not as handles, and that is the state
+    # the guard used to miss - it passed, the purge failed, and the install ended in a
+    # warning with no offer to close and try again. The image is a copy of a native
+    # Windows program, so it starts without its usual directory next to it, and it carries
+    # one of the payload's own names because that is what the lookup names.
+    $copy = Join-Path $dir "cockatrice.exe"
+    Copy-Item -LiteralPath (Join-Path $env:SystemRoot "System32\cmd.exe") -Destination $copy
+    $running = Start-Process -FilePath $copy -ArgumentList "/c", "ping -n 20 127.0.0.1 >nul" -PassThru
+    try {
+        Start-Sleep -Milliseconds 1500
+        $byImage = Invoke-Probe $dir
+    } finally {
+        try { $running.Kill() } catch { }
+        # Wait for the image to be released, or the cleanup below leaves the copy behind.
+        try { $running.WaitForExit(5000) | Out-Null } catch { }
+    }
+    if ($byImage.Code -ne 1) { throw "expected exit 1 for a process running from the directory, got $($byImage.Code) : $($byImage.Output)" }
+    if ($byImage.Output -notmatch "cockatrice\.exe \(pid\s+$($running.Id)") {
+        throw "the lookup did not name the process running from the directory: $($byImage.Output)"
+    }
+
+    # A program in a folder below the directory is not an instance of the installation, even
+    # when it carries a payload program's name: the install directory can be a folder the
+    # user keeps other applications in, each in its own subfolder, and naming one of those
+    # asked for a close the probe never sends and an end it refuses to perform, so the guard
+    # could only abort the update. A program that really does hold a payload file is still
+    # named, by the Restart Manager lookup exercised above.
+    $nested = Join-Path $dir "other"
+    New-Item -ItemType Directory -Force $nested | Out-Null
+    $nestedImage = Join-Path $nested "cockatrice.exe"
+    Copy-Item -LiteralPath (Join-Path $env:SystemRoot "System32\cmd.exe") -Destination $nestedImage
+    $nestedRunning = Start-Process -FilePath $nestedImage -ArgumentList "/c", "ping -n 20 127.0.0.1 >nul" -PassThru
+    try {
+        Start-Sleep -Milliseconds 1500
+        $inSubfolder = Invoke-Probe $dir
+    } finally {
+        try { $nestedRunning.Kill() } catch { }
+        try { $nestedRunning.WaitForExit(5000) | Out-Null } catch { }
+    }
+    if ($inSubfolder.Code -ne 0) {
+        throw "expected exit 0 for a program in a folder below the directory, got $($inSubfolder.Code) : $($inSubfolder.Output)"
+    }
+
+    # A program the user keeps in the directory itself is not a payload program either: the
+    # guard ends only what the payload installs, and naming anything else asks for an answer
+    # that cannot free a single file.
+    $foreign = Join-Path $dir "tool.exe"
+    Copy-Item -LiteralPath (Join-Path $env:SystemRoot "System32\cmd.exe") -Destination $foreign
+    $foreignRunning = Start-Process -FilePath $foreign -ArgumentList "/c", "ping -n 20 127.0.0.1 >nul" -PassThru
+    try {
+        Start-Sleep -Milliseconds 1500
+        $ignored = Invoke-Probe $dir
+    } finally {
+        try { $foreignRunning.Kill() } catch { }
+        try { $foreignRunning.WaitForExit(5000) | Out-Null } catch { }
+    }
+    if ($ignored.Code -ne 0) {
+        throw "expected exit 0 for a program the payload does not install, got $($ignored.Code) : $($ignored.Output)"
+    }
+    Write-Host "holder lookup named pid $($holder.Id) for a file another process holds, named nothing for a file only the asking process holds, reported a payload executable it could not name as in use instead of free, named nothing for an empty directory, named pid $($running.Id) for a payload program running from the directory, and named nothing for a payload program in a folder below it or for a program the payload does not install"
+} finally {
+    Remove-Item -Recurse -Force $dir -ErrorAction SilentlyContinue
+}
+POWERSHELL
+  if ! PROBE_EXE="$probe" powershell -NoProfile -File "$probe_check"; then
+    rm -f "$probe_check"
+    exit 1
+  fi
+  rm -f "$probe_check"
   echo "::endgroup::"
 fi
 

@@ -6,11 +6,9 @@ set(HEADERS libcockatrice/filters/filter_card.h libcockatrice/filters/filter_str
             libcockatrice/filters/filter_tree.h
 )
 
-qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-
 add_library(
-  libcockatrice_filters STATIC ${MOC_SOURCES} libcockatrice/filters/filter_card.cpp
-                               libcockatrice/filters/filter_string.cpp libcockatrice/filters/filter_tree.cpp
+  libcockatrice_filters STATIC ${HEADERS} libcockatrice/filters/filter_card.cpp libcockatrice/filters/filter_string.cpp
+                               libcockatrice/filters/filter_tree.cpp
 )
 
 add_dependencies(libcockatrice_filters libcockatrice_card)

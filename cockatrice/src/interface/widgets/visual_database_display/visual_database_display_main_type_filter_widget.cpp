@@ -16,11 +16,11 @@
 #include <QSet>
 #include <QSharedPointer>
 #include <QSpinBox>
-#include <QTimer>
 #include <QVBoxLayout>
 #include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/filters/filter_tree.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 VisualDatabaseDisplayMainTypeFilterWidget::VisualDatabaseDisplayMainTypeFilterWidget(QWidget *parent,
@@ -42,8 +42,7 @@ VisualDatabaseDisplayMainTypeFilterWidget::VisualDatabaseDisplayMainTypeFilterWi
     layout->addWidget(flowWidget);
 
     // Create a container for the threshold control
-    auto *thresholdLayout = new QHBoxLayout();
-    thresholdLayout->setContentsMargins(0, 0, 0, 0);
+    auto *thresholdLayout = QtUtils::makeLayout<QHBoxLayout>();
 
     thresholdLabel = new QLabel(this);
     thresholdLayout->addWidget(thresholdLabel);
@@ -65,9 +64,8 @@ VisualDatabaseDisplayMainTypeFilterWidget::VisualDatabaseDisplayMainTypeFilterWi
     toggleButton = new QPushButton(this);
     layout->addWidget(toggleButton);
     connect(toggleButton, &QPushButton::clicked, this, &VisualDatabaseDisplayMainTypeFilterWidget::updateFilterMode);
-    connect(filterModel, &FilterTreeModel::layoutChanged, this, [this]() {
-        QTimer::singleShot(100, this, &VisualDatabaseDisplayMainTypeFilterWidget::syncWithFilterModel);
-    });
+    connect(filterModel, &FilterTreeModel::layoutChanged, this,
+            [this]() { syncDebouncer.call([this] { syncWithFilterModel(); }); });
 
     createMainTypeButtons(); // Populate buttons initially
     updateFilterMode();      // Initialize toggle button text

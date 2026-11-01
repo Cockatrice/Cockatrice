@@ -1,0 +1,80 @@
+# Splits DWARF out of the packaged ELF binaries, then strips them.
+#
+# This is a CPack pre-build script (CPACK_PRE_BUILD_SCRIPTS, wired in CrashReporting.cmake):
+# CPack runs it after staging the install tree and before producing the package, so it only
+# ever touches the copy that becomes the release artifact. The build tree is left alone: -g
+# stays on, and CI uploads symbols to Sentry straight from build/.
+#
+# For every ELF file under CPACK_TEMPORARY_DIRECTORY the script extracts the debug information
+# to COCKATRICE_DEBUG_SYMBOL_DIR and removes the debug sections from the packaged binary.
+# COCKATRICE_DEBUG_SYMBOL_DIR is deliberately outside the staging tree, so sidecars never end
+# up in the package; CI can archive/upload them if wanted (it normally uploads straight from
+# the build tree). The only thing that must survive stripping is .eh_frame (allocatable, used
+# for unwinding), which neither --only-keep-debug nor --strip-debug removes.
+#
+# Tool paths, the symbol directory and the tree to walk are baked in / provided at configure /
+# run time; the guards below refuse to run on anything that is not a CPack staging directory,
+# so a missing variable can never turn the glob into a filesystem-wide walk.
+
+set(_objcopy "@COCKATRICE_OBJCOPY@")
+set(_strip "@COCKATRICE_STRIP_TOOL@")
+set(_symbolDir "@COCKATRICE_DEBUG_SYMBOL_DIR@")
+
+if(_objcopy STREQUAL "" OR _strip STREQUAL "")
+  message(WARNING "split debug symbols: objcopy/strip not found at configure time, packaging unstripped binaries")
+  return()
+endif()
+if(_symbolDir STREQUAL "")
+  message(FATAL_ERROR "split debug symbols: COCKATRICE_DEBUG_SYMBOL_DIR is empty")
+endif()
+
+# CPack sets CPACK_TEMPORARY_DIRECTORY to the staging tree; CMAKE_INSTALL_PREFIX is still the
+# configured /usr prefix here, so globbing it would walk system directories. Refuse to run
+# unless the path exists and really is a CPack staging tree.
+if(NOT CPACK_TEMPORARY_DIRECTORY OR NOT IS_DIRECTORY "${CPACK_TEMPORARY_DIRECTORY}")
+  message(STATUS "split debug symbols: no CPack staging directory, skipping")
+  return()
+endif()
+if(NOT CPACK_TEMPORARY_DIRECTORY MATCHES "_CPack_Packages")
+  message(WARNING "split debug symbols: ${CPACK_TEMPORARY_DIRECTORY} is not a CPack staging tree, skipping")
+  return()
+endif()
+
+file(MAKE_DIRECTORY "${_symbolDir}")
+
+file(
+  GLOB_RECURSE _entries
+  LIST_DIRECTORIES true
+  "${CPACK_TEMPORARY_DIRECTORY}/*"
+)
+set(_processed 0)
+foreach(_file IN LISTS _entries)
+  if(IS_DIRECTORY "${_file}" OR IS_SYMLINK "${_file}")
+    continue()
+  endif()
+  # Only ELF: objcopy would fail on the icons, translations and Qt resources next to it.
+  file(
+    READ "${_file}" _magic
+    OFFSET 0
+    LIMIT 4
+    HEX
+  )
+  if(NOT _magic STREQUAL "7f454c46")
+    continue()
+  endif()
+  get_filename_component(_name "${_file}" NAME)
+  set(_debug "${_symbolDir}/${_name}.debug")
+  execute_process(COMMAND "${_objcopy}" --only-keep-debug "${_file}" "${_debug}" RESULT_VARIABLE _rc)
+  if(NOT _rc EQUAL 0)
+    message(WARNING "split debug symbols: objcopy --only-keep-debug failed for ${_file}")
+    continue()
+  endif()
+  execute_process(COMMAND "${_strip}" --strip-debug --strip-unneeded "${_file}" RESULT_VARIABLE _rc)
+  if(NOT _rc EQUAL 0)
+    message(WARNING "split debug symbols: strip failed for ${_file}")
+    continue()
+  endif()
+  math(EXPR _processed "${_processed} + 1")
+endforeach()
+
+message(STATUS "Split debug symbols for ${_processed} packaged ELF file(s); sidecars in ${_symbolDir}")

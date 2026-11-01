@@ -11,6 +11,7 @@
 #include <QList>
 #include <QString>
 #include <QStringList>
+#include <libcockatrice/game/player/move_top_cards_until_options.h>
 #include <qtmetamacros.h>
 
 class FilterString;
@@ -20,13 +21,6 @@ class QDialogButtonBox;
 class QLabel;
 class QSpinBox;
 class QWidget;
-
-struct MoveTopCardsUntilOptions
-{
-    QStringList exprs = {};
-    int numberOfHits = 1;
-    bool autoPlay = false;
-};
 
 class DlgMoveTopCardsUntil : public QDialog
 {

@@ -14,11 +14,6 @@
 #include <QTransform>
 #include <QtGlobal>
 #include <google/protobuf/stubs/port.h>
-#include <libcockatrice/protocol/pb/command_draw_cards.pb.h>
-#include <libcockatrice/protocol/pb/command_next_turn.pb.h>
-#include <libcockatrice/protocol/pb/command_set_active_phase.pb.h>
-#include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
-#include <libcockatrice/utility/zone_names.h>
 #include <qnamespace.h>
 #include <qnumeric.h>
 
@@ -120,9 +115,9 @@ PhasesToolbar::PhasesToolbar(QGraphicsItem *parent)
     : QGraphicsItem(parent), width(100), height(100), ySpacing(1), symbolSize(8)
 {
     auto *aUntapAll = new QAction(this);
-    connect(aUntapAll, &QAction::triggered, this, &PhasesToolbar::actUntapAll);
+    connect(aUntapAll, &QAction::triggered, this, &PhasesToolbar::untapAllRequested);
     auto *aDrawCard = new QAction(this);
-    connect(aDrawCard, &QAction::triggered, this, &PhasesToolbar::actDrawCard);
+    connect(aDrawCard, &QAction::triggered, this, &PhasesToolbar::drawCardRequested);
 
     PhaseButton *untapButton = new PhaseButton("untap", this, aUntapAll);
     PhaseButton *upkeepButton = new PhaseButton("upkeep", this);
@@ -144,7 +139,7 @@ PhasesToolbar::PhasesToolbar(QGraphicsItem *parent)
     }
 
     nextTurnButton = new PhaseButton("nextturn", this, nullptr, false);
-    connect(nextTurnButton, &PhaseButton::clicked, this, &PhasesToolbar::actNextTurn);
+    connect(nextTurnButton, &PhaseButton::clicked, this, &PhasesToolbar::nextTurnRequested);
 
     rearrangeButtons();
 
@@ -265,31 +260,5 @@ void PhasesToolbar::phaseButtonClicked()
         button->triggerDoubleClickAction();
     }
 
-    Command_SetActivePhase cmd;
-    cmd.set_phase(static_cast<google::protobuf::uint32>(buttonList.indexOf(button)));
-
-    emit sendGameCommand(cmd, -1);
-}
-
-void PhasesToolbar::actNextTurn()
-{
-    emit sendGameCommand(Command_NextTurn(), -1);
-}
-
-void PhasesToolbar::actUntapAll()
-{
-    Command_SetCardAttr cmd;
-    cmd.set_zone(ZoneNames::TABLE);
-    cmd.set_attribute(AttrTapped);
-    cmd.set_attr_value("0");
-
-    emit sendGameCommand(cmd, -1);
-}
-
-void PhasesToolbar::actDrawCard()
-{
-    Command_DrawCards cmd;
-    cmd.set_number(1);
-
-    emit sendGameCommand(cmd, -1);
+    emit setActivePhaseRequested(buttonList.indexOf(button));
 }

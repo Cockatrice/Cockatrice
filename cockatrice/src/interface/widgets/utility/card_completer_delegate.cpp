@@ -34,6 +34,7 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/printing/printing_info.h>
 #include <libcockatrice/models/database/card/card_search_model.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 class QObject;
@@ -181,9 +182,8 @@ void CardCompleterDelegate::drawManaSymbol(QPainter *p, QPoint centre, const QSt
     p->setBrush(Qt::NoBrush);
     p->drawEllipse(pip.adjusted(1, 1, -1, -1));
 
-    QFont f = p->font();
+    QFont f = QtUtils::boldFont(p->font());
     f.setPixelSize(qMax(radius - 1, 7));
-    f.setBold(true);
 
     p->setFont(f);
     p->setPen(mc.text);

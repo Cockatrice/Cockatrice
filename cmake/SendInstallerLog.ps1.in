@@ -1,0 +1,146 @@
+# Sends the NSIS installer log to Sentry as an envelope carrying one error
+# event plus the log as an attachment.
+#
+# Generated at configure time from this template by CMake configure_file: the
+# CPACK_SENTRY_* placeholders are baked in then, so the real values only ever
+# exist in the build directory and the packaged installer, never in the repo.
+# Runs on stock Windows PowerShell 5.1 with no extra modules.
+param(
+    [Parameter(Mandatory = $true)][string]$LogPath
+)
+
+$ErrorActionPreference = 'Stop'
+
+$EnvelopeUrl = '@CPACK_SENTRY_ENVELOPE_URL@'
+$SentryKey = '@CPACK_SENTRY_KEY@'
+$Release = '@CPACK_SENTRY_RELEASE@'
+$Dsn = '@CPACK_SENTRY_DSN_FULL@'
+
+try {
+    # The envelope endpoint is TLS-only; stock powershell.exe on older systems
+    # still negotiates TLS 1.0 otherwise, so opt into 1.2 explicitly.
+    try {
+        [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+    } catch {
+    }
+
+    # --- Log payload, tail-capped at 128 KiB ---------------------------------
+    $MaxLogBytes = 128 * 1024
+    $TruncNotice = '[log truncated to last 128 KB]'
+    if (Test-Path -LiteralPath $LogPath) {
+        $raw = [System.IO.File]::ReadAllBytes($LogPath)
+    } else {
+        $raw = [System.Text.Encoding]::UTF8.GetBytes('(installer log not found: ' + $LogPath + ')')
+    }
+    if ($raw.Length -gt $MaxLogBytes) {
+        $tail = New-Object byte[] $MaxLogBytes
+        [System.Buffer]::BlockCopy($raw, $raw.Length - $MaxLogBytes, $tail, 0, $MaxLogBytes)
+        $prefix = [System.Text.Encoding]::UTF8.GetBytes($TruncNotice + "`r`n")
+        $logBytes = New-Object byte[] ($prefix.Length + $tail.Length)
+        [System.Buffer]::BlockCopy($prefix, 0, $logBytes, 0, $prefix.Length)
+        [System.Buffer]::BlockCopy($tail, 0, $logBytes, $prefix.Length, $tail.Length)
+    } else {
+        $logBytes = $raw
+    }
+
+    # --- Abort reason, read from the log itself --------------------------------
+    # AbortInstall logs "ABORT: ..." first, so the reason travels inside the file
+    # and nothing reason-shaped crosses the command line (no quoting hazards).
+    # Select-String yields the matching line alone, so the reason is already one
+    # physical line for the message; anything else stays in the attached log.
+    # Non-ASCII paths may garble here; the attachment is byte-exact regardless.
+    $Reason = 'unknown (no ABORT line in log)'
+    if (Test-Path -LiteralPath $LogPath) {
+        $abortLine = Select-String -LiteralPath $LogPath -Pattern '^ABORT: ' | Select-Object -Last 1
+        if ($abortLine) {
+            $Reason = ($abortLine.Line -replace '^ABORT:\s*', '')
+        }
+    }
+
+    # --- What was holding the files, read from the log as well -------------------
+    # The guard and the close attempt each log one line naming every holder and what
+    # happened to it. Carrying the last of each as event data keeps an abort caused by
+    # a running instance actionable without opening the attachment. Kept out of the
+    # message so the issue still groups on the reason alone.
+    $Holders = ''
+    $CloseResult = ''
+    $EndResult = ''
+    if (Test-Path -LiteralPath $LogPath) {
+        $holderLine = Select-String -LiteralPath $LogPath -Pattern 'guard: still in use by (.*)$' | Select-Object -Last 1
+        if ($holderLine) {
+            $Holders = $holderLine.Matches[0].Groups[1].Value
+        }
+        $closeLine = Select-String -LiteralPath $LogPath -Pattern '(close-holders: .*)$' | Select-Object -Last 1
+        if ($closeLine) {
+            $CloseResult = $closeLine.Matches[0].Groups[1].Value
+        }
+        $endLine = Select-String -LiteralPath $LogPath -Pattern '(end-holders: .*)$' | Select-Object -Last 1
+        if ($endLine) {
+            $EndResult = $endLine.Matches[0].Groups[1].Value
+        }
+    }
+
+    # --- Event ---------------------------------------------------------------
+    $eventId = [guid]::NewGuid().ToString('N')
+    $now = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+    # $Event is an automatic variable (Microsoft.PowerShell.Utility\Register-ObjectEvent),
+    # so the local is named $sentryEvent to avoid shadowing it.
+    $sentryEvent = [ordered]@{
+        event_id = $eventId
+        timestamp = $now
+        platform = 'other'
+        level = 'error'
+        logger = 'cockatrice-installer'
+        release = $Release
+        environment = 'installer'
+        sdk = @{ name = 'cockatrice.installer'; version = $Release }
+        message = @{ formatted = 'Installer aborted: ' + $Reason }
+        extra = @{
+            reason = $Reason
+            os = [System.Environment]::OSVersion.VersionString
+            holders = $Holders
+            close_result = $CloseResult
+            end_result = $EndResult
+        }
+    }
+    $eventJson = $sentryEvent | ConvertTo-Json -Compress -Depth 6
+    $eventBytes = [System.Text.Encoding]::UTF8.GetBytes($eventJson)
+
+    # --- Envelope, assembled as bytes (the log is opaque binary) -------------
+    $sentAt = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+    $headerLine = '{"event_id":"' + $eventId + '","sent_at":"' + $sentAt + '","dsn":"' + $Dsn + '"}'
+    $eventHeader = '{"type":"event","length":' + $eventBytes.Length + '}'
+    $attachHeader = '{"type":"attachment","filename":"Cockatrice-installer.log","content_type":"text/plain","length":' + $logBytes.Length + '}'
+    $enc = [System.Text.Encoding]::UTF8
+    $lf = [byte[]]@(10)
+    $body = New-Object System.IO.MemoryStream
+    foreach ($chunk in @($enc.GetBytes($headerLine), $lf, $enc.GetBytes($eventHeader), $lf, $eventBytes, $lf, $enc.GetBytes($attachHeader), $lf, $logBytes)) {
+        $body.Write($chunk, 0, $chunk.Length)
+    }
+    $bodyBytes = $body.ToArray()
+    $body.Close()
+
+    # --- Send ----------------------------------------------------------------
+    # The key travels in the auth header only; stdout below never contains it.
+    $auth = 'Sentry sentry_version=7, sentry_client=cockatrice.installer/' + $Release + ', sentry_key=' + $SentryKey
+    Invoke-RestMethod -Uri $EnvelopeUrl -Method Post -TimeoutSec 45 -ContentType 'application/x-sentry-envelope' -Headers @{ 'X-Sentry-Auth' = $auth } -Body $bodyBytes | Out-Null
+    Write-Output ('SENT ' + $eventId)
+    exit 0
+} catch {
+    # Scrub the key/DSN out of the failure text in case a transport error echoes them.
+    $msg = $_.Exception.Message
+    if ($msg -and $SentryKey) {
+        $msg = $msg.Replace($SentryKey, '<redacted>')
+    }
+    if ($msg -and $Dsn) {
+        $msg = $msg.Replace($Dsn, '<redacted>')
+    }
+    # Flatten to one line: this text is echoed into the installer log, which is
+    # itself uploaded as an attachment, so a multi-line transport error must not
+    # be able to forge extra lines in the artifact we send.
+    if ($msg) {
+        $msg = ($msg -replace '\s+', ' ').Trim()
+    }
+    Write-Output ('FAILED: ' + $msg)
+    exit 1
+}

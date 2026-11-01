@@ -22,6 +22,7 @@
 #include <QVariant>
 #include <algorithm>
 #include <functional>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 
 class QModelIndex;
@@ -42,9 +43,7 @@ CardAmountWidget::CardAmountWidget(QWidget *parent,
     : QWidget(parent), deckStateManager(deckStateManager), cardSizeSlider(cardSizeSlider), rootCard(rootCard),
       zoneName(zoneName), hovered(false)
 {
-    layout = new QHBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(10);
+    layout = QtUtils::makeLayout<QHBoxLayout>(this, 10);
     this->setLayout(layout);
     this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     layout->setAlignment(Qt::AlignHCenter);

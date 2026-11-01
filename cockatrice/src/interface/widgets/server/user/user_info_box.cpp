@@ -33,6 +33,7 @@
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/passwordhasher.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <string>
 #include <sys/types.h>
 
@@ -53,8 +54,7 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
     avatarPic.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     avatarPic.setAlignment(Qt::AlignCenter);
 
-    auto *avatarLayout = new QHBoxLayout;
-    avatarLayout->setContentsMargins(0, 0, 0, 0);
+    auto *avatarLayout = QtUtils::makeLayout<QHBoxLayout>();
     avatarLayout->addStretch(1);
     avatarLayout->addWidget(&avatarPic, 3);
     avatarLayout->addStretch(1);

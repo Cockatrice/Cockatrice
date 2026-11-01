@@ -1,6 +1,7 @@
 #include "libcockatrice/card/database/card_database.h"
 #include "libcockatrice/card/database/card_database_loader.h"
 #include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
 #include "libcockatrice/card/set/card_set.h"
 #include "libcockatrice/card/set/card_set_list.h"
 #include "test_card_database_path_provider.h"
@@ -16,19 +17,23 @@
 #include <QIODevice>
 #include <QList>
 #include <QSharedPointer>
+#include <QSignalSpy>
 #include <QString>
 #include <QStringList>
 #include <QTemporaryDir>
 #include <QVector>
+#include <QWeakPointer>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/card/database/card_database_data.h>
 #include <libcockatrice/card/database/parser/cockatrice_xml_4.h>
 #include <libcockatrice/card/lazy_properties_hash.h>
 #include <libcockatrice/card/printing/printing_info.h>
+#include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/interfaces/interface_card_database_path_provider.h>
 #include <libcockatrice/interfaces/interface_card_set_priority_controller.h>
 #include <libcockatrice/interfaces/noop_card_preference_provider.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
+#include <libcockatrice/utility/card_ref.h>
 #include <string>
 
 namespace
@@ -60,6 +65,94 @@ TEST(CardDatabaseTest, LoadXml)
     ASSERT_EQ(NotLoaded, db->getLoadStatus()) << "Incorrect status after clear";
 }
 
+TEST(CardDatabaseTest, LazyPropertiesHashStreamsBlobAccessors)
+{
+    QHash<QString, QString> props;
+    props.insert("manacost", "1R");
+    props.insert("colors", "R");
+    props.insert("format-standard", "legal");
+
+    LazyPropertiesHash lazy = LazyPropertiesHash::serializedFrom(props);
+    const QByteArray blob = lazy.serialized();
+
+    EXPECT_EQ(3, lazy.size());
+    EXPECT_FALSE(lazy.isEmpty());
+    EXPECT_TRUE(lazy.contains("colors"));
+    EXPECT_FALSE(lazy.contains("missing"));
+    EXPECT_EQ("1R", lazy.value("manacost"));
+    EXPECT_EQ(QString(), lazy.value("missing"));
+    EXPECT_EQ(blob, lazy.serialized()) << "an untouched blob must be passed through unchanged";
+
+    QStringList keys = lazy.keys();
+    keys.sort();
+    QStringList expectedKeys = props.keys();
+    expectedKeys.sort();
+    EXPECT_EQ(expectedKeys, keys);
+
+    // Mutating materializes the hash, after which every accessor keeps working.
+    EXPECT_TRUE(lazy.insert("loyalty", "3"));
+    EXPECT_FALSE(lazy.insert("loyalty", "3"));
+    EXPECT_EQ(4, lazy.size());
+    EXPECT_EQ("3", lazy.value("loyalty"));
+    EXPECT_TRUE(lazy.contains("loyalty"));
+
+    LazyPropertiesHash roundTrip(lazy.serialized());
+    EXPECT_EQ(4, roundTrip.size());
+    EXPECT_EQ("3", roundTrip.value("loyalty"));
+    EXPECT_EQ("legal", roundTrip.value("format-standard"));
+}
+
+TEST(CardDatabaseTest, GuessCardWithProviderIdOnUnknownCardReturnsEmpty)
+{
+    // An unknown name plus a providerId used to dereference the missing card
+    // inside findPrintingWithId(); the lookup must come back empty instead.
+    NoopCardPreferenceProvider prefs;
+    TestCardDatabasePathProvider pathProvider;
+    NoopCardSetPriorityController controller;
+    CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
+
+    const ExactCard guessed = db.query()->guessCard({"Not a Card", "card_Not a Card_fixture"});
+
+    EXPECT_TRUE(guessed.isEmpty());
+    EXPECT_FALSE(guessed);
+}
+
+TEST(CardDatabaseTest, FindPrintingWithIdOnNullCardInfoReturnsEmpty)
+{
+    NoopCardPreferenceProvider prefs;
+    TestCardDatabasePathProvider pathProvider;
+    NoopCardSetPriorityController controller;
+    CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
+
+    EXPECT_TRUE(db.query()->findPrintingWithId(nullptr, "card_Not a Card_fixture").isEmpty());
+}
+
+TEST(CardInfoTest, ClearDirectRelationsDropsRawPointers)
+{
+    auto *forward = new CardRelation("Child");
+    auto *reverse = new CardRelation("Parent");
+    auto *toMe = new CardRelation("Child");
+
+    auto card = CardInfo::newInstance("Parent", "", false, QHash<QString, QString>(), {forward}, {reverse},
+                                      SetToPrintingsMap(), CardInfo::UiAttributes());
+    card->addReverseRelatedCards2Me(toMe);
+    ASSERT_EQ(1, card->getRelatedCards().size());
+    ASSERT_EQ(1, card->getReverseRelatedCards().size());
+    ASSERT_EQ(1, card->getReverseRelatedCards2Me().size());
+    ASSERT_EQ(2, card->getAllRelatedCards().size());
+
+    card->clearDirectRelations();
+
+    EXPECT_TRUE(card->getRelatedCards().isEmpty());
+    EXPECT_TRUE(card->getReverseRelatedCards().isEmpty());
+    EXPECT_TRUE(card->getReverseRelatedCards2Me().isEmpty());
+    EXPECT_TRUE(card->getAllRelatedCards().isEmpty());
+
+    delete forward;
+    delete reverse;
+    delete toMe;
+}
+
 TEST(CardDatabaseTest, Xml4LocalizedDataRoundTrip)
 {
     NoopCardSetPriorityController controller;
@@ -77,6 +170,8 @@ TEST(CardDatabaseTest, Xml4LocalizedDataRoundTrip)
         CardInfo::newInstance("Lightning Bolt", "Deal 3 damage.", false, {}, {}, {}, setsInfo, attributes);
     card->setLocalizedName("de", "Blitzschlag");
     card->setLocalizedText("de", "Blitzschlag fügt 3 Schadenspunkte zu.");
+    card->setProperty("format-standard", "legal");
+    card->setProperty("colors", "R");
 
     SetNameMap sets;
     sets.insert("TST", set);
@@ -100,6 +195,13 @@ TEST(CardDatabaseTest, Xml4LocalizedDataRoundTrip)
     ASSERT_EQ(loaded->getLocalizedName("de"), "Blitzschlag");
     ASSERT_EQ(loaded->getLocalizedText("de"), "Blitzschlag fügt 3 Schadenspunkte zu.");
     ASSERT_EQ(loaded->getLocalizedText("fr"), "Deal 3 damage.");
+    ASSERT_EQ(loaded->getProperty("format-standard"), "legal");
+    ASSERT_TRUE(loaded->hasProperty("colors"));
+    ASSERT_EQ(loaded->getProperties().size(), 2);
+
+    const QList<PrintingInfo> printings = loaded->getSets().value("TST");
+    ASSERT_FALSE(printings.isEmpty());
+    ASSERT_EQ(printings.first().getProperty("manacost"), "1R");
 }
 
 /**
@@ -508,6 +610,110 @@ TEST_F(CardDatabaseCacheInvalidationTest, MarkAllSetsAsKnownIsBatched)
     // Ignored sets keep their known state but are enabled.
     EXPECT_TRUE(controller.isEnabled("XXX"));
 }
+
+TEST_F(CardDatabaseCacheInvalidationTest, ReloadReleasesPreviousSnapshot)
+{
+    NoopCardPreferenceProvider prefs;
+    SandboxPathProvider pathProvider(root);
+    CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
+
+    db.loadCardDatabases();
+    CardInfoPtr card = db.getCardList().value("Cat");
+    ASSERT_FALSE(card.isNull());
+    QWeakPointer<CardInfo> weakCard(card);
+    card.clear();
+
+    db.reloadCardDatabasesAndNotify();
+
+    // CardSet holds strong CardInfoPtrs and CardInfo holds the CardSetPtr through its printings; if that
+    // cycle is not broken, the previous snapshot survives the reload.
+    EXPECT_TRUE(weakCard.isNull()) << "a reload must release the previous card snapshot";
+}
+
+TEST_F(CardDatabaseCacheInvalidationTest, ClearReleasesCards)
+{
+    NoopCardPreferenceProvider prefs;
+    SandboxPathProvider pathProvider(root);
+    CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
+
+    db.loadCardDatabases();
+    CardInfoPtr card = db.getCardList().value("Cat");
+    ASSERT_FALSE(card.isNull());
+    QWeakPointer<CardInfo> weakCard(card);
+    card.clear();
+
+    db.clear();
+
+    EXPECT_TRUE(weakCard.isNull()) << "clear() must release cards held by set membership";
+}
+
+TEST_F(CardDatabaseCacheInvalidationTest, RemoveCardDetachesItFromItsSet)
+{
+    // removeCard() is the one teardown path a caller can trigger for a single card (the token editor
+    // uses it). Without the detach the set's strong reference keeps the removed card alive forever.
+    NoopCardPreferenceProvider prefs;
+    SandboxPathProvider pathProvider(root);
+    CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
+
+    db.loadCardDatabases();
+    CardInfoPtr card = db.getCardList().value("Cat");
+    ASSERT_FALSE(card.isNull());
+    const CardSetPtr catSet = db.getSet("CAT");
+    ASSERT_TRUE(catSet->contains(card));
+
+    db.removeCard(card);
+
+    EXPECT_FALSE(catSet->contains(card)) << "removeCard() must detach the card from its set";
+    QWeakPointer<CardInfo> weakCard(card);
+    card.clear();
+    EXPECT_TRUE(weakCard.isNull()) << "a removed card must not stay alive through its set";
+}
+
+TEST_F(CardDatabaseCacheInvalidationTest, RemoveSelfPointerStillNotifiesDatabaseCard)
+{
+    // cardInfoChanged() used to be emitted through a self pointer stored on the card. Without it the
+    // card must still notify its observers whenever its properties change.
+    NoopCardPreferenceProvider prefs;
+    SandboxPathProvider pathProvider(root);
+    CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
+
+    db.loadCardDatabases();
+    const CardInfoPtr card = db.getCardList().value("Cat");
+    ASSERT_FALSE(card.isNull());
+    QSignalSpy spy(card.data(), &CardInfo::cardInfoChanged);
+
+    card->setProperty("manacost", "1G");
+
+    ASSERT_EQ(spy.count(), 1) << "a property change on a database card must still emit cardInfoChanged";
+    const QList<QVariant> arguments = spy.takeFirst();
+    ASSERT_EQ(arguments.size(), 1);
+    EXPECT_EQ(arguments.first().value<CardInfoPtr>().data(), card.data())
+        << "the signal must carry the card that changed";
+}
+
+TEST_F(CardDatabaseCacheInvalidationTest, RemoveSelfPointerCloneNotifiesAsItself)
+{
+    // A clone owns its own shared reference, so its changes must be reported as the clone's, never the
+    // original's: decks and views listening to the original must not be invalidated by a clone edit.
+    NoopCardPreferenceProvider prefs;
+    SandboxPathProvider pathProvider(root);
+    CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
+
+    db.loadCardDatabases();
+    const CardInfoPtr original = db.getCardList().value("Cat");
+    ASSERT_FALSE(original.isNull());
+    const CardInfoPtr clone = original->clone();
+    QSignalSpy originalSpy(original.data(), &CardInfo::cardInfoChanged);
+    QSignalSpy cloneSpy(clone.data(), &CardInfo::cardInfoChanged);
+
+    clone->setProperty("manacost", "1G");
+
+    ASSERT_EQ(cloneSpy.count(), 1) << "the clone must notify its own observers";
+    EXPECT_EQ(cloneSpy.first().first().value<CardInfoPtr>().data(), clone.data())
+        << "the clone's signal must carry the clone";
+    EXPECT_EQ(originalSpy.count(), 0) << "the clone must not notify the original's observers";
+}
+
 } // namespace
 
 int main(int argc, char **argv)

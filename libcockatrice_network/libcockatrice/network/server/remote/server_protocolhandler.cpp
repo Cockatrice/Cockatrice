@@ -208,7 +208,7 @@ Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(co
         Response::ResponseCode resp = Response::RespInvalidCommand;
         const SessionCommand &sc = cont.session_command(i);
         const int num = getPbExtension(sc);
-        if (num != SessionCommand::PING) { // don't log ping commands
+        if (num != SessionCommand::PING && logsDebugMessages()) { // don't log ping commands
             logDebugMessage(getSafeDebugString(sc));
         }
         const auto commandType = static_cast<SessionCommand::SessionCommandType>(num);
@@ -271,7 +271,9 @@ Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const
         Response::ResponseCode resp = Response::RespInvalidCommand;
         const RoomCommand &sc = cont.room_command(i);
         const int num = getPbExtension(sc);
-        logDebugMessage(getSafeDebugString(sc));
+        if (logsDebugMessages()) {
+            logDebugMessage(getSafeDebugString(sc));
+        }
         switch ((RoomCommand::RoomCommandType)num) {
             case RoomCommand::LEAVE_ROOM:
                 resp = cmdLeaveRoom(sc.GetExtension(Command_LeaveRoom::ext), room, rc);
@@ -320,14 +322,14 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
         return Response::RespLoginNeeded;
     }
 
-    QMap<int, QPair<int, int>> gameMap = getGames();
-    if (!gameMap.contains(cont.game_id())) {
+    int roomId;
+    int playerId;
+    if (!getGameInfo(cont.game_id(), roomId, playerId)) {
         return Response::RespNotInRoom;
     }
-    const QPair<int, int> roomIdAndPlayerId = gameMap.value(cont.game_id());
 
     QReadLocker roomsLocker(&server->roomsLock);
-    Server_Room *room = server->getRooms().value(roomIdAndPlayerId.first);
+    Server_Room *room = server->getRooms().value(roomId);
     if (!room) {
         return Response::RespNotInRoom;
     }
@@ -337,14 +339,14 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
     if (!game) {
         if (room->getExternalGames().contains(cont.game_id())) {
             server->sendIsl_GameCommand(cont, room->getExternalGames().value(cont.game_id()).server_id(),
-                                        userInfo->session_id(), roomIdAndPlayerId.first, roomIdAndPlayerId.second);
+                                        userInfo->session_id(), roomId, playerId);
             return Response::RespNothing;
         }
         return Response::RespNotInRoom;
     }
 
     QMutexLocker gameLocker(&game->gameMutex);
-    auto *participant = game->getParticipants().value(roomIdAndPlayerId.second);
+    auto *participant = game->getParticipants().value(playerId);
     if (!participant) {
         return Response::RespNotInRoom;
     }
@@ -357,8 +359,9 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
     Response::ResponseCode finalResponseCode = Response::RespOk;
     for (int i = cont.game_command_size() - 1; i >= 0; --i) {
         const GameCommand &sc = cont.game_command(i);
-        logDebugMessage(QString("game %1 player %2: ").arg(cont.game_id()).arg(roomIdAndPlayerId.second) +
-                        getSafeDebugString(sc));
+        if (logsDebugMessages()) {
+            logDebugMessage(QString("game %1 player %2: ").arg(cont.game_id()).arg(playerId) + getSafeDebugString(sc));
+        }
 
         if (commandCountingInterval > 0) {
             int totalCount = 0;
@@ -407,7 +410,9 @@ Response::ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(
         Response::ResponseCode resp = Response::RespInvalidCommand;
         const ModeratorCommand &sc = cont.moderator_command(i);
         const int num = getPbExtension(sc);
-        logDebugMessage(getSafeDebugString(sc));
+        if (logsDebugMessages()) {
+            logDebugMessage(getSafeDebugString(sc));
+        }
 
         resp = processExtendedModeratorCommand(num, sc, rc);
         if (resp != Response::RespOk) {
@@ -434,7 +439,9 @@ Response::ResponseCode Server_ProtocolHandler::processAdminCommandContainer(cons
         Response::ResponseCode resp = Response::RespInvalidCommand;
         const AdminCommand &sc = cont.admin_command(i);
         const int num = getPbExtension(sc);
-        logDebugMessage(getSafeDebugString(sc));
+        if (logsDebugMessages()) {
+            logDebugMessage(getSafeDebugString(sc));
+        }
 
         resp = processExtendedAdminCommand(num, sc, rc);
         if (resp != Response::RespOk) {
@@ -461,7 +468,9 @@ Response::ResponseCode Server_ProtocolHandler::processDeveloperCommandContainer(
         Response::ResponseCode resp = Response::RespInvalidCommand;
         const DeveloperCommand &sc = cont.developer_command(i);
         const int num = getPbExtension(sc);
-        logDebugMessage(getSafeDebugString(sc));
+        if (logsDebugMessages()) {
+            logDebugMessage(getSafeDebugString(sc));
+        }
 
         resp = processExtendedDeveloperCommand(num, sc, rc);
         if (resp != Response::RespOk) {

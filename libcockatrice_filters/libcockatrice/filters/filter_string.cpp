@@ -18,6 +18,7 @@
 #include <QSharedPointer>
 #include <QString>
 #include <QStringList>
+#include <QStringView>
 #include <algorithm>
 #include <any>
 #include <ctype.h>
@@ -43,31 +44,31 @@ SomewhatComplexQueryPart <- [(] QueryPartList [)] / QueryPart
 QueryPart <- NotQuery / SetQuery / RarityQuery / CMCQuery / FormatQuery / PowerQuery / ToughnessQuery / ColorQuery / TypeQuery / OracleQuery / FieldQuery / GenericQuery
 
 NotQuery <- ('NOT' ws/'-') SomewhatComplexQueryPart
-SetQuery <- ('e'/'set') SetQueryValue
-SetQueryValue <- ([=:] FlexStringValue) / (<[!][=]?> FlexStringValue) / SetExpression
-OracleQuery <- 'o' [:] MatcherString
+SetQuery <- ('e'/'set') ws? SetQueryValue
+SetQueryValue <- ([=:] ws? FlexStringValue) / (<[!][=]?> ws? FlexStringValue) / SetExpression
+OracleQuery <- 'o' ws? [:] ws? MatcherString
 
 
 CMCQuery <- ('cmc'/'mv') ws? NumericExpression
 PowerQuery <- [Pp] 'ow' 'er'? ws? NumericExpression
 ToughnessQuery <- [Tt] 'ou' 'ghness'? ws? NumericExpression
 
-RarityQuery <- [rR] ':' Rarity
+RarityQuery <- [rR] ws? ':' ws? Rarity
 Rarity <- [Cc] 'ommon'? / [Uu] 'ncommon'? / [Rr] 'are'? / [Mm] 'ythic'? / [Ss] 'pecial'? / [a-zA-Z] [a-z]*
 
-FormatQuery <- 'f' ':' Format / Legality ':' Format
+FormatQuery <- 'f' ws? ':' ws? Format / Legality ws? ':' ws? Format
 Format <- [a-zA-Z] [a-z]*
 Legality <- [Ll] 'egal'? / [Bb] 'anned'? / [Rr] 'estricted'
 
 
-TypeQuery <- [tT] 'ype'? [:] StringValue
+TypeQuery <- [tT] 'ype'? ws? [:] ws? StringValue
 
 Color <- < [Ww] 'hite'? / [Uu] / [Bb] 'lack'? / [Rr] 'ed'? / [Gg] 'reen'?  / [Bb] 'lue'? >
 ColorEx <- Color / [mc]
 
-ColorQuery <- [cC] 'olor'? <[iI]?> <[:!]> ColorEx*
+ColorQuery <- [cC] 'olor'? <[iI]?> ws? <[:!]> ws? ColorEx*
 
-FieldQuery <- String [:] MatcherString / String ws? NumericExpression
+FieldQuery <- String ws? [:] ws? MatcherString / String ws? NumericExpression
 
 NonDoubleQuoteUnlessEscaped <- '\\\"'. / !["].
 NonSingleQuoteUnlessEscaped <- "\\\'". / !['].
@@ -161,30 +162,28 @@ static void setupParserRules()
         if (sv.choice() == 0) {
             auto matcher = std::any_cast<StringMatcher>(sv[0]);
             return [=](const CardData &x) -> bool {
-                QList<QString> sets = x->getSets().keys();
-
-                auto matchesSet = [&matcher](const QString &set) { return matcher(set); };
-                return std::any_of(sets.begin(), sets.end(), matchesSet);
+                const auto &sets = x->getSets();
+                return std::any_of(sets.keyValueBegin(), sets.keyValueEnd(),
+                                   [&matcher](const auto &set) { return matcher(set.first); });
             };
         }
         if (sv.choice() == 1) {
             auto matcher = std::any_cast<StringMatcher>(sv[0]);
             return [=](const CardData &x) -> bool {
-                QList<QString> sets = x->getSets().keys();
-
-                auto matchesSet = [&matcher](const QString &set) { return matcher(set); };
-                return std::none_of(sets.begin(), sets.end(), matchesSet);
+                const auto &sets = x->getSets();
+                return std::none_of(sets.keyValueBegin(), sets.keyValueEnd(),
+                                    [&matcher](const auto &set) { return matcher(set.first); });
             };
         }
 
         auto matcher = std::any_cast<NumberMatcher>(sv[0]);
         return [=](const CardData &x) -> bool {
-            const auto &sets = x->getSets().values();
-            auto matchesSet = [&](const PrintingInfo &printing) {
-                return printing.getSet()->getEnabled() && matcher(printing.getSet()->getReleaseDate().toJulianDay());
-            };
-            return std::any_of(sets.begin(), sets.end(), [&](const auto &printings) {
-                return std::any_of(printings.begin(), printings.end(), matchesSet);
+            const auto &sets = x->getSets();
+            return std::any_of(sets.constBegin(), sets.constEnd(), [&matcher](const auto &printings) {
+                return std::any_of(printings.begin(), printings.end(), [&matcher](const PrintingInfo &printing) {
+                    const CardSetPtr set = printing.getSet();
+                    return set && set->getEnabled() && matcher(set->getReleaseDate().toJulianDay());
+                });
             });
         };
     };
@@ -207,15 +206,14 @@ static void setupParserRules()
     search["RarityQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         const auto rarity = std::any_cast<QString>(sv[0]);
         return [=](const CardData &x) -> bool {
-            QList<PrintingInfo> infos;
             for (const auto &printings : x->getSets()) {
                 for (const auto &printing : printings) {
-                    infos.append(printing);
+                    if (rarity == printing.getProperty("rarity")) {
+                        return true;
+                    }
                 }
             }
-
-            auto matchesRarity = [&rarity](const PrintingInfo &info) { return rarity == info.getProperty("rarity"); };
-            return std::any_of(infos.begin(), infos.end(), matchesRarity);
+            return false;
         };
     };
 
@@ -411,7 +409,7 @@ static void setupParserRules()
         const bool identity = sv.tokens[0].empty() || sv.tokens[0][0] != 'i';
         if (sv.tokens[1][0] == ':') {
             return [=](const CardData &x) {
-                QString match = identity ? x->getColors() : x->getProperty("coloridentity");
+                const QString match = identity ? x->getColors() : x->getProperty("coloridentity");
                 if (parts.contains("m") && match.length() < 2) {
                     return false;
                 }
@@ -429,7 +427,7 @@ static void setupParserRules()
         }
 
         return [=](const CardData &x) {
-            QString match = identity ? x->getColors() : x->getProperty("colorIdentity");
+            const QString match = identity ? x->getColors() : x->getProperty("colorIdentity");
             if (parts.contains("m") && match.length() < 2) {
                 return false;
             }
@@ -455,25 +453,37 @@ static void setupParserRules()
     };
     search["PowerQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         const auto matcher = std::any_cast<NumberMatcher>(sv[0]);
-        return [=](const CardData &x) -> bool { return matcher(x->getPowTough().split("/")[0].toInt()); };
+        return [=](const CardData &x) -> bool {
+            const QString &powTough = x->getPowTough();
+            const qsizetype slash = powTough.indexOf('/');
+            return matcher(slash < 0 ? powTough.toInt() : QStringView(powTough).left(slash).toInt());
+        };
     };
     search["ToughnessQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         const auto matcher = std::any_cast<NumberMatcher>(sv[0]);
         return [=](const CardData &x) -> bool {
-            auto parts = x->getPowTough().split("/");
-            return matcher(parts.length() == 2 ? parts[1].toInt() : 0);
+            const QString &powTough = x->getPowTough();
+            const qsizetype slash = powTough.indexOf('/');
+            return matcher(slash < 0 ? 0 : QStringView(powTough).mid(slash + 1).toInt());
         };
     };
     search["FieldQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         const auto field = std::any_cast<QString>(sv[0]);
         if (sv.choice() == 0) {
             const auto matcher = std::any_cast<StringMatcher>(sv[1]);
-            return [=](const CardData &x) -> bool { return x->hasProperty(field) && matcher(x->getProperty(field)); };
+            return [=](const CardData &x) -> bool {
+                const auto &properties = x->getPropertiesHash();
+                const auto it = properties.constFind(field);
+                return it != properties.constEnd() && matcher(it.value());
+            };
         }
 
         const auto matcher = std::any_cast<NumberMatcher>(sv[1]);
-        return
-            [=](const CardData &x) -> bool { return x->hasProperty(field) && matcher(x->getProperty(field).toInt()); };
+        return [=](const CardData &x) -> bool {
+            const auto &properties = x->getPropertiesHash();
+            const auto it = properties.constFind(field);
+            return it != properties.constEnd() && matcher(it.value().toInt());
+        };
     };
     search["GenericQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         const auto matcher = std::any_cast<StringMatcher>(sv[0]);

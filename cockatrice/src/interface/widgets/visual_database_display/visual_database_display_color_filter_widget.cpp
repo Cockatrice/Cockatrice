@@ -11,7 +11,6 @@
 #include <QPersistentModelIndex>
 #include <QSharedPointer>
 #include <QString>
-#include <QTimer>
 #include <QVariant>
 #include <QtGlobal>
 #include <libcockatrice/filters/filter_tree.h>
@@ -49,7 +48,7 @@ VisualDatabaseDisplayColorFilterWidget::VisualDatabaseDisplayColorFilterWidget(Q
             &VisualDatabaseDisplayColorFilterWidget::updateFilterMode);
 
     connect(filterModel, &FilterTreeModel::layoutChanged, this,
-            [this]() { QTimer::singleShot(100, this, &VisualDatabaseDisplayColorFilterWidget::syncWithFilterModel); });
+            [this]() { syncDebouncer.call([this] { syncWithFilterModel(); }); });
 
     // Call retranslateUi to set the initial text
     retranslateUi();

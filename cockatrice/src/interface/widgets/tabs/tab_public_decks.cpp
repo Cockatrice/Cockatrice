@@ -2,7 +2,6 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../deck_loader/deck_loader.h"
-#include "../../deck_loader/loaded_deck.h"
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../visual_deck_storage/deck_preview/deck_preview_color_identity_filter_widget.h"
@@ -28,12 +27,14 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <functional>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_deck_download_public.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_download.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <optional>
 #include <qnamespace.h>
 
@@ -44,9 +45,7 @@ TabPublicDecks::TabPublicDecks(TabSupervisor *_tabSupervisor, AbstractClient *_c
     cardSize = SettingsCache::instance().cardsDisplay().getVisualDeckStorageCardSize();
 
     titleLabel = new QLabel(tr("Public decks of %1").arg(userName.toHtmlEscaped()), this);
-    QFont titleFont = titleLabel->font();
-    titleFont.setBold(true);
-    titleLabel->setFont(titleFont);
+    titleLabel->setFont(QtUtils::boldFont(titleLabel->font()));
 
     auto *headerLayout = new QHBoxLayout;
     headerLayout->addWidget(titleLabel);

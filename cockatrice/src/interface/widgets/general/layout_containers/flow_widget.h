@@ -51,7 +51,6 @@ public slots:
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
-    void keyPressEvent(QKeyEvent *event) override;
 
 private:
     /// @brief Moves keyboard focus to an adjacent flow item for an arrow-key event.

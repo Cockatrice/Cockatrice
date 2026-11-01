@@ -49,6 +49,9 @@ public:
     {
         return logBuffer;
     }
+    void setPersistentLogPath(const QString &path);
+    QList<QString> getPreviousSessionTail(int maxLines = 60) const;
+    static QList<QString> extractPreviousSessionTail(const QString &filePath, int maxLines = 60);
 
 private:
     Logger();
@@ -61,11 +64,18 @@ private:
     QTextStream fileStream;
     QFile fileHandle;
     QList<QString> logBuffer;
-    QMutex mutex;
+    mutable QMutex mutex;
+    QString persistentLogPath;
+    bool persistentLogEnabled;
+    QTextStream persistentFileStream;
+    QFile persistentFileHandle;
 
 protected:
     void openLogfileSession();
     void closeLogfileSession();
+    void openPersistentLog(const QString &path);
+    void prunePersistentLog(const QString &path);
+    void closePersistentLogSession();
 
 protected slots:
     void internalLog(const QString &message);

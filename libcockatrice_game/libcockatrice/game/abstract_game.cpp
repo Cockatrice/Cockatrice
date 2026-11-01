@@ -1,0 +1,62 @@
+#include "abstract_game.h"
+
+#include "game_event_handler.h"
+#include "game_meta_info.h"
+#include "game_state.h"
+#include "libcockatrice/protocol/pb/game_replay.pb.h"
+#include "player/player_info.h"
+#include "player/player_logic.h"
+#include "player/player_manager.h"
+#include "zones/card_zone_logic.h"
+
+#include <QList>
+#include <QMap>
+
+class AbstractClient;
+
+AbstractGame::AbstractGame(QObject *_parent) : QObject(_parent)
+{
+    gameMetaInfo = new GameMetaInfo(this);
+    gameEventHandler = new GameEventHandler(this);
+}
+
+bool AbstractGame::isHost() const
+{
+    return gameState->getHostId() == playerManager->getLocalPlayerId();
+}
+
+AbstractClient *AbstractGame::getClientForPlayer(int playerId) const
+{
+    if (gameState->getClients().size() > 1) {
+        if (playerId == -1) {
+            playerId = playerManager->getActiveLocalPlayer(gameState->getActivePlayer())->getPlayerInfo()->getId();
+        }
+
+        return gameState->getClients().at(playerId);
+    } else if (gameState->getClients().isEmpty()) {
+        return nullptr;
+    } else {
+        return gameState->getClients().first();
+    }
+}
+
+void AbstractGame::loadReplay(const GameReplay *replay)
+{
+    gameMetaInfo->setFromProto(replay->game_info());
+    gameMetaInfo->setSpectatorsOmniscient(true);
+}
+
+CardState *AbstractGame::getCard(int playerId, const QString &zoneName, int cardId) const
+{
+    PlayerLogic *player = playerManager->getPlayer(playerId);
+    if (!player) {
+        return nullptr;
+    }
+
+    CardZoneLogic *zone = player->getZones().value(zoneName, 0);
+    if (!zone) {
+        return nullptr;
+    }
+
+    return zone->getCard(cardId);
+}

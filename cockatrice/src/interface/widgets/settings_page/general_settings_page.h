@@ -26,7 +26,6 @@ public:
     void retranslateUi() override;
 
     static QStringList findQmFiles();
-    static QString languageName(const QString &lang);
 
 signals:
     /// Request to re-import the card database with the newly selected card language
@@ -49,6 +48,7 @@ private slots:
 private:
     QGroupBox *languageGroupBox;
     QGroupBox *versionGroupBox;
+    QGroupBox *crashReportingGroupBox;
     QGroupBox *cardDatabaseGroupBox;
     QGroupBox *startupGroupBox;
     QGroupBox *pathsGroupBox;
@@ -69,6 +69,9 @@ private:
     QCheckBox startupUpdateCheckCheckBox;
     QCheckBox updateNotificationCheckBox;
     QCheckBox newVersionOracleCheckBox;
+
+    QLabel crashReportingLabel;
+    QComboBox crashReportingBox;
 
     QLabel startupCardUpdateCheckBehaviorLabel;
     QComboBox startupCardUpdateCheckBehaviorSelector;

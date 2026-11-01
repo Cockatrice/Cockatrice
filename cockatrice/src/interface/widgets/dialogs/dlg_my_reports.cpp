@@ -6,8 +6,6 @@
 #include "libcockatrice/protocol/pb/serverinfo_report.pb.h"
 
 #include <QAbstractItemView>
-#include <QFont>
-#include <QFontDatabase>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
@@ -26,6 +24,7 @@
 #include <libcockatrice/protocol/pb/response_report_details.pb.h>
 #include <libcockatrice/protocol/pb/response_report_my_list.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 #include <string>
 
@@ -70,13 +69,7 @@ DlgMyReports::DlgMyReports(AbstractClient *_client, QWidget *parent)
     auto *chatGroup = new QGroupBox(tr("Chat Log Context"));
     chatLogEdit = new QTextEdit;
     chatLogEdit->setReadOnly(true);
-    QFont monoFont("monospace");
-    monoFont.setStyleHint(QFont::Monospace);
-    const int systemPointSize = QFontDatabase::systemFont(QFontDatabase::GeneralFont).pointSize();
-    if (systemPointSize > 0) {
-        monoFont.setPointSize(systemPointSize);
-    }
-    chatLogEdit->setFont(monoFont);
+    chatLogEdit->setFont(QtUtils::monospaceFont());
     auto *chatLayout = new QVBoxLayout(chatGroup);
     chatLayout->setContentsMargins(4, 4, 4, 4);
     chatLayout->addWidget(chatLogEdit);

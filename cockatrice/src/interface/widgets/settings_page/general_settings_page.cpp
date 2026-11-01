@@ -8,7 +8,6 @@
 #include "update/client/release_channel.h"
 
 #include <QByteArray>
-#include <QCoreApplication>
 #include <QDate>
 #include <QDebug>
 #include <QFile>
@@ -22,7 +21,6 @@
 #include <QPushButton>
 #include <QSharedPointer>
 #include <QSizePolicy>
-#include <QTranslator>
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QVariantList>
@@ -35,6 +33,7 @@
 #include <libcockatrice/settings/tabs_settings.h>
 #include <libcockatrice/settings/updates_settings.h>
 #include <libcockatrice/utility/macros.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <libcockatrice/utility/translation_loader.h>
 #include <qlogging.h>
 #include <qnamespace.h>
@@ -50,18 +49,24 @@ enum startupCardUpdateCheckBehaviorIndex
 GeneralSettingsPage::GeneralSettingsPage()
 {
     // language settings
-    QStringList languageCodes = findQmFiles();
-    for (const QString &code : languageCodes) {
-        QString langName = languageName(code);
-        languageBox.addItem(langName, code);
+    for (const QString &code : findQmFiles()) {
+        languageBox.addItem(TranslationLoader::languageDisplayName(code), code);
     }
 
-    QString setLanguage = QCoreApplication::translate("i18n", DEFAULT_LANG_NAME);
-    int index = languageBox.findText(setLanguage, Qt::MatchExactly);
-    if (index == -1) {
-        qWarning() << "could not find language" << setLanguage;
-    } else {
+    // Select the language the client runs with: its own entry, the base language for a variant without a
+    // file of its own (de_CH -> de), and the default language for an unset setting, which names no file.
+    const QString configuredLanguage = SettingsCache::instance().personal().getLang();
+    int index = languageBox.findData(configuredLanguage);
+    if (index < 0) {
+        index = languageBox.findData(configuredLanguage.section('_', 0, 0));
+    }
+    if (index < 0) {
+        index = languageBox.findData(TranslationLoader::defaultLanguageCode());
+    }
+    if (index >= 0) {
         languageBox.setCurrentIndex(index);
+    } else {
+        qCWarning(GeneralSettingsPageLog) << "could not find language" << configuredLanguage;
     }
 
     advertiseTranslationPageLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
@@ -95,12 +100,12 @@ GeneralSettingsPage::GeneralSettingsPage()
     auto *languageGrid = new QGridLayout;
     languageGrid->addWidget(&languageLabel, 0, 0);
     languageGrid->addWidget(&languageBox, 0, 1);
-    languageGrid->addWidget(&cardLanguageLabel, 1, 0);
-    languageGrid->addWidget(&cardLanguageBox, 1, 1);
-    languageGrid->addWidget(&cardLanguageNoteLabel, 2, 1);
-    languageGrid->addWidget(&cardSearchLanguageLabel, 3, 0);
-    languageGrid->addWidget(&cardSearchLanguageBox, 3, 1);
-    languageGrid->addWidget(&advertiseTranslationPageLabel, 4, 1, Qt::AlignRight);
+    languageGrid->addWidget(&advertiseTranslationPageLabel, 1, 1, Qt::AlignRight);
+    languageGrid->addWidget(&cardLanguageLabel, 2, 0);
+    languageGrid->addWidget(&cardLanguageBox, 2, 1);
+    languageGrid->addWidget(&cardLanguageNoteLabel, 3, 1);
+    languageGrid->addWidget(&cardSearchLanguageLabel, 4, 0);
+    languageGrid->addWidget(&cardSearchLanguageBox, 4, 1);
 
     cardLanguageNoteLabel.setWordWrap(true);
     cardLanguageNoteLabel.setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
@@ -132,6 +137,27 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     versionGroupBox = new QGroupBox;
     versionGroupBox->setLayout(versionGrid);
+
+    // crash reporting consent (stored in personal.ini, not debug.ini)
+    crashReportingBox.addItem(""); // texts set in retranslateUi
+    crashReportingBox.addItem("");
+    crashReportingBox.addItem("");
+    crashReportingBox.setCurrentIndex(static_cast<int>(settings.personal().getCrashReportingMode()));
+
+    connect(&crashReportingBox, qOverload<int>(&QComboBox::currentIndexChanged), this, [](int index) {
+        if (index < 0 || index > static_cast<int>(PersonalSettings::CrashReportingMode::NeverSend)) {
+            return;
+        }
+        SettingsCache::instance().personal().setCrashReportingMode(
+            static_cast<PersonalSettings::CrashReportingMode>(index));
+    });
+
+    auto *crashReportingGrid = new QGridLayout;
+    crashReportingGrid->addWidget(&crashReportingLabel, 0, 0);
+    crashReportingGrid->addWidget(&crashReportingBox, 0, 1);
+
+    crashReportingGroupBox = new QGroupBox;
+    crashReportingGroupBox->setLayout(crashReportingGrid);
 
     // card database settings
     startupCardUpdateCheckBehaviorSelector.addItem(""); // these will be set in retranslateUI
@@ -336,6 +362,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(languageGroupBox);
     mainLayout->addWidget(versionGroupBox);
+    mainLayout->addWidget(crashReportingGroupBox);
     mainLayout->addWidget(cardDatabaseGroupBox);
     mainLayout->addWidget(startupGroupBox);
     mainLayout->addWidget(pathsGroupBox);
@@ -359,18 +386,6 @@ QStringList GeneralSettingsPage::findQmFiles()
 {
     return TranslationLoader::availableLanguages(translationPrefix,
                                                  TranslationLoader::applicationTranslationPaths(translationPath));
-}
-
-QString GeneralSettingsPage::languageName(const QString &lang)
-{
-    QTranslator qTranslator;
-
-    // Only the language name is needed here, so the file is loaded without logging a line per
-    // language: findQmFiles() asked for languages whose files exist in the first place.
-    TranslationLoader::loadFrom(qTranslator, translationPrefix + "_" + lang,
-                                TranslationLoader::applicationTranslationPaths(translationPath));
-
-    return qTranslator.translate("i18n", DEFAULT_LANG_NAME);
 }
 
 void GeneralSettingsPage::deckPathButtonClicked()
@@ -525,12 +540,9 @@ void GeneralSettingsPage::cardLanguageBoxChanged(int index)
     }
     message += tr("<p>Run Oracle now?</p>");
 
-    const QMessageBox::StandardButton answer = QMessageBox::question(
-        this, tr("Card text & images language changed"), message, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-
     // The answer only controls whether Oracle starts right away; the caches stay
     // cleared so the next import or launch rebuilds them in the new language.
-    if (answer == QMessageBox::Yes) {
+    if (QtUtils::confirm(this, tr("Card text & images language changed"), message, QMessageBox::Yes)) {
         emit cardDatabaseUpdateRequested();
     }
 }
@@ -556,7 +568,7 @@ void GeneralSettingsPage::retranslateUi()
     const auto &settings = SettingsCache::instance();
 
     languageGroupBox->setTitle(tr("Language settings"));
-    languageLabel.setText(tr("Language:"));
+    languageLabel.setText(tr("Interface language:"));
     cardLanguageBox.setItemText(0, tr("English"));
     cardLanguageLabel.setText(tr("Card text & images language:"));
     cardLanguageNoteLabel.setText(
@@ -569,12 +581,18 @@ void GeneralSettingsPage::retranslateUi()
                                       tr("English and selected card language"));
     advertiseTranslationPageLabel.setText(
         QString("<a href='%1'>%2</a>").arg(WIKI_TRANSLATION_FAQ).arg(tr("How to help with translations")));
-
     versionGroupBox->setTitle(tr("Version settings"));
     updateReleaseChannelLabel.setText(tr("Update channel"));
     startupUpdateCheckCheckBox.setText(tr("Check for client updates on startup"));
     updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));
     newVersionOracleCheckBox.setText(tr("Automatically run Oracle when running a new version of Cockatrice"));
+
+    crashReportingGroupBox->setTitle(tr("Crash reporting"));
+    crashReportingLabel.setText(tr("Send crash reports:"));
+    crashReportingBox.setItemText(static_cast<int>(PersonalSettings::CrashReportingMode::Ask), tr("Ask every time"));
+    crashReportingBox.setItemText(static_cast<int>(PersonalSettings::CrashReportingMode::AlwaysSend),
+                                  tr("Always send"));
+    crashReportingBox.setItemText(static_cast<int>(PersonalSettings::CrashReportingMode::NeverSend), tr("Never send"));
 
     // We can't change the strings after they're put into the QComboBox, so this is our workaround
     int oldIndex = updateReleaseChannelBox.currentIndex();

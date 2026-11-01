@@ -12,6 +12,7 @@
 #include <QList>
 #include <QMetaType>
 #include <QWidget>
+#include <libcockatrice/utility/debouncer.h>
 #include <qtmetamacros.h>
 
 class FilterTreeModel;
@@ -73,6 +74,7 @@ private:
     QHBoxLayout *layout;
     QComboBox *modeComboBox;
     FilterMode currentMode = FilterMode::Includes; // Default mode
+    QtUtils::Debouncer syncDebouncer{100};
 };
 
 #endif // VISUAL_DATABASE_DISPLAY_COLOR_FILTER_WIDGET_H

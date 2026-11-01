@@ -220,6 +220,7 @@ endif()
 # when ENABLE_SANITIZERS or ENABLE_COVERAGE is on.
 include(Sanitizers)
 include(Coverage)
+include(CrashReporting)
 
 # GNU systems need to define the Mersenne exponent for the RNG to compile w/o warning
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
@@ -248,6 +249,15 @@ endif()
 message(STATUS "Update Translations: ${UPDATE_TRANSLATIONS}")
 
 include(FindQtRuntime)
+
+# Reject APIs that were deprecated before the oldest Qt release we support
+# (6.4). Qt 6.5 renamed the switch, so use whichever spelling the found
+# version understands while still compiling everywhere.
+if(Qt6_VERSION VERSION_GREATER_EQUAL 6.5)
+  add_compile_definitions(QT_DISABLE_DEPRECATED_UP_TO=0x060400)
+else()
+  add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060400)
+endif()
 
 set(CMAKE_AUTOMOC TRUE)
 
@@ -336,6 +346,15 @@ elseif(WIN32)
   # Configure file with custom definitions for NSIS.
   configure_file("${COCKATRICE_CMAKE_PATH}/NSIS.definitions.nsh.in" "${PROJECT_BINARY_DIR}/NSIS.definitions.nsh")
 
+  # Installer-log sender for the AbortInstall Sentry hook (values parsed out of COCKATRICE_SENTRY_DSN in
+  # cmake/CrashReporting.cmake). Generated only when a DSN was parsed: cmake/NSIS.template.in embeds it under
+  # the same CPACK_SENTRY_ENABLED check, so a build without reporting never references or carries the helper.
+  if(CPACK_SENTRY_ENABLED)
+    configure_file(
+      "${COCKATRICE_CMAKE_PATH}/SendInstallerLog.ps1.in" "${PROJECT_BINARY_DIR}/SendInstallerLog.ps1" @ONLY
+    )
+  endif()
+
   # Every runtime DLL a Windows install has to contain, as paths relative to the
   # install root. .ci/compile.sh reads this and fails the build when the packaged
   # installer is missing one of them, or carries a runtime it does not know about.
@@ -410,6 +429,9 @@ if(WITH_ORACLE OR WITH_CLIENT)
   add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_models ${CMAKE_BINARY_DIR}/libcockatrice_models)
   add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_filters ${CMAKE_BINARY_DIR}/libcockatrice_filters)
 endif()
+if(WITH_CLIENT)
+  add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_game ${CMAKE_BINARY_DIR}/libcockatrice_game)
+endif()
 
 if(WITH_SERVER)
   add_subdirectory(servatrice)
@@ -419,6 +441,13 @@ endif()
 if(WITH_CLIENT)
   add_subdirectory(cockatrice)
   set(CPACK_INSTALL_CMAKE_PROJECTS "Cockatrice;Cockatrice;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
+endif()
+
+if(WIN32 AND WITH_CLIENT)
+  # Runs from the installer's $PLUGINSDIR when a purge fails, and is never installed
+  # (see LogProcessesUsingInstallDir in cmake/NSIS.template.in), so it has no install
+  # rules and is not part of the client's staged tree.
+  add_subdirectory(${CMAKE_SOURCE_DIR}/tools/installer-holder-probe ${CMAKE_BINARY_DIR}/tools/installer-holder-probe)
 endif()
 
 if(WITH_ORACLE)
@@ -433,5 +462,5 @@ endif()
 
 if(Qt6_FOUND AND Qt6_VERSION_MINOR GREATER_EQUAL 3)
   # Qt6.3+ requires project finalization to support translations
-  qt6_finalize_project()
+  qt_finalize_project()
 endif()

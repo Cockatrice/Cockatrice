@@ -1,17 +1,6 @@
 #include "card_item.h"
 
 #include "../../client/settings/cache_settings.h"
-#include "../../game/abstract_game.h"
-#include "../../game/board/card_state.h"
-#include "../../game/game_state.h"
-#include "../../game/phase.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_info.h"
-#include "../../game/player/player_logic.h"
-#include "../../game/player/player_manager.h"
-#include "../../game/zones/card_zone_logic.h"
-#include "../../game/zones/table_zone_logic.h"
-#include "../../game/zones/view_zone_logic.h"
 #include "../card_dimensions.h"
 #include "../game_scene.h"
 #include "arrow_item.h"
@@ -41,6 +30,17 @@
 #include <QVariant>
 #include <QtGlobal>
 #include <libcockatrice/card/card_info.h>
+#include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/board/card_state.h>
+#include <libcockatrice/game/game_state.h>
+#include <libcockatrice/game/phase.h>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_info.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/player/player_manager.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
+#include <libcockatrice/game/zones/table_zone_logic.h>
+#include <libcockatrice/game/zones/view_zone_logic.h>
 #include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/card_ref.h>
@@ -53,8 +53,9 @@ CardItem::CardItem(PlayerLogic *_owner,
                    const CardRef &cardRef,
                    int _cardid,
                    CardZoneLogic *_zone)
-    : AbstractCardItem(parent, cardRef, _owner, _cardid), state(new CardState(this, _zone)), dragItem(nullptr)
+    : AbstractCardItem(parent, cardRef, _owner, _cardid), dragItem(nullptr)
 {
+    state->setZone(_zone);
     owner->addCard(this);
 
     connect(&SettingsCache::instance().cardCounters(), &CardCounterSettings::colorChanged, this, [this](int counterId) {
@@ -62,25 +63,44 @@ CardItem::CardItem(PlayerLogic *_owner,
             update();
         }
     });
+
+    connect(state, &CardState::stateReset, this, [this] {
+        if (scene()) {
+            static_cast<GameScene *>(scene())->unregisterAnimationItem(this);
+        }
+        update();
+    });
+
+    // The retyped logic layer drives CardState setters directly (bypassing the CardItem wrappers that called
+    // update()), so repaint on every state change: attacking, annotation, doesntUntap, P/T and counters.
+    connect(state, &CardState::stateChanged, this, [this] { update(); });
+
+    connect(state, &CardState::viewDeleteRequested, this, &CardItem::deleteLater);
 }
 
 void CardItem::prepareDelete()
 {
     if (owner != nullptr) {
-        if (owner->getGame()->getActiveCard() == this) {
+        auto *gameScene = qobject_cast<GameScene *>(scene());
+        if (gameScene && gameScene->getActiveCard() == this) {
             emit owner->requestCardMenuUpdate(nullptr);
-            owner->getGame()->setActiveCard(nullptr);
+            gameScene->setActiveCard(nullptr);
         }
         owner = nullptr;
     }
 
-    while (!attachedCards.isEmpty()) {
-        attachedCards.first()->setZone(nullptr); // so that it won't try to call reorganizeCards()
-        attachedCards.first()->setAttachedTo(nullptr);
+    const QList<CardState *> &attachedStates = state->getAttachedCards();
+    while (!attachedStates.isEmpty()) {
+        auto *attachedItem = qobject_cast<CardItem *>(attachedStates.first()->parent());
+        if (attachedItem == nullptr) {
+            break;
+        }
+        attachedItem->setZone(nullptr); // so that it won't try to call reorganizeCards()
+        attachedItem->setAttachedTo(nullptr);
     }
 
     if (state->getAttachedTo() != nullptr) {
-        state->getAttachedTo()->removeAttachedCard(this);
+        state->getAttachedTo()->removeAttachedCard(state);
         state->setAttachedTo(nullptr);
     }
 }
@@ -127,7 +147,7 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         painter->save();
         transformPainter(painter, translatedSize, tapAngle);
 
-        if (!getFaceDown() && state->getPT() == exactCard.getInfo().getPowTough()) {
+        if (!getFaceDown() && state->getPT() == state->getCardInfo().getPowTough()) {
             painter->setPen(Qt::white);
         } else {
             painter->setPen(QColor(255, 150, 0)); // dark orange
@@ -209,36 +229,13 @@ void CardItem::setPT(const QString &_pt)
 
 void CardItem::setAttachedTo(CardItem *_attachedTo)
 {
-    if (state->getAttachedTo() != nullptr) {
-        state->getAttachedTo()->removeAttachedCard(this);
-    }
+    CardState *newParent = _attachedTo == nullptr ? nullptr : _attachedTo->getState();
+    state->setAttachedTo(newParent);
 
-    gridPoint.setX(-1);
-    state->setAttachedTo(_attachedTo);
-    if (state->getAttachedTo() != nullptr) {
-        // If the zone is being torn down, it might already be null by the time a card tries to un-attach all its
-        // attached cards
-        if (state->getAttachedTo()->getZone() == nullptr) {
-            deleteLater();
-        } else {
-            emit state->getAttachedTo()->getZone()->cardAdded(this);
-            state->getAttachedTo()->addAttachedCard(this);
-            if (state->getZone() != state->getAttachedTo()->getZone()) {
-                state->getAttachedTo()->getZone()->reorganizeCards();
-            }
-        }
-    } else {
-        // If the zone is being torn down, it might already be null by the time a card tries to un-attach all its
-        // attached cards
-        if (state->getZone() == nullptr) {
-            deleteLater();
-        } else {
-            emit state->getZone()->cardAdded(this);
-        }
-    }
-
-    if (state->getZone() != nullptr) {
-        state->getZone()->reorganizeCards();
+    // If the zone is being torn down, it might already be null by the time a card tries to un-attach all its attached
+    // cards
+    if (newParent != nullptr ? newParent->getZone() == nullptr : state->getZone() == nullptr) {
+        deleteLater();
     }
 }
 
@@ -248,13 +245,6 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
 void CardItem::resetState(bool keepAnnotations)
 {
     state->resetState(keepAnnotations);
-    attachedCards.clear();
-    setTapped(false, false);
-    setDoesntUntap(false);
-    if (scene()) {
-        static_cast<GameScene *>(scene())->unregisterAnimationItem(this);
-    }
-    update();
 }
 
 void CardItem::processCardInfo(const ServerInfo_Card &_info)
@@ -390,7 +380,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
         // Use the buttonDownPos to align the hot spot with the position when
         // the user originally clicked
-        createDragItem(id, event->buttonDownPos(Qt::LeftButton), event->scenePos(), forceFaceDown);
+        createDragItem(state->getId(), event->buttonDownPos(Qt::LeftButton), event->scenePos(), forceFaceDown);
         dragItem->grabMouse();
 
         int childIndex = 0;
@@ -433,40 +423,9 @@ void CardItem::playCard(bool faceDown)
                 emit playSelected(this);
             }
         } else {
-            state->getZone()->getPlayer()->getPlayerActions()->playCard(this, faceDown);
+            state->getZone()->getPlayer()->getPlayerActions()->playCard(state, faceDown);
         }
     }
-}
-
-QVariantList CardItem::parsePT(const QString &pt)
-{
-    QVariantList ptList = QVariantList();
-    if (!pt.isEmpty()) {
-        int sep = pt.indexOf('/');
-        if (sep == 0) {
-            ptList.append(QVariant(pt.mid(1))); // cut off starting '/' and take full string
-        } else {
-            int start = 0;
-            for (;;) {
-                QString item = pt.mid(start, sep - start);
-                if (item.isEmpty()) {
-                    ptList.append(QVariant(QString()));
-                } else if (item[0] == '+') {
-                    ptList.append(QVariant(item.mid(1).toInt())); // add as int
-                } else if (item[0] == '-') {
-                    ptList.append(QVariant(item.toInt())); // add as int
-                } else {
-                    ptList.append(QVariant(item)); // add as qstring
-                }
-                if (sep == -1) {
-                    break;
-                }
-                start = sep + 1;
-                sep = pt.indexOf('/', start);
-            }
-        }
-    }
-    return ptList;
 }
 
 /**
@@ -493,7 +452,7 @@ void CardItem::handleClickedToPlay(bool shiftHeld)
         if (SettingsCache::instance().userInterface().getClickPlaysAllSelected()) {
             emit hideSelected(this);
         } else {
-            state->getZone()->removeCard(this);
+            state->getZone()->removeCard(state);
         }
     } else {
         playCard(shiftHeld);
@@ -537,16 +496,16 @@ bool CardItem::animationEvent()
 {
     int rotation = ROTATION_DEGREES_PER_FRAME;
     bool animationIncomplete = true;
-    if (!tapped) {
+    if (!state->getTapped()) {
         rotation *= -1;
     }
 
     tapAngle += rotation;
-    if (tapped && (tapAngle > 90)) {
+    if (state->getTapped() && (tapAngle > 90)) {
         tapAngle = 90;
         animationIncomplete = false;
     }
-    if (!tapped && (tapAngle < 0)) {
+    if (!state->getTapped() && (tapAngle < 0)) {
         tapAngle = 0;
         animationIncomplete = false;
     }
@@ -567,7 +526,9 @@ QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
         bool selected = value.toBool();
 
         if (selected) {
-            owner->getGame()->setActiveCard(this);
+            if (auto *gameScene = qobject_cast<GameScene *>(scene())) {
+                gameScene->setActiveCard(this);
+            }
         }
 
         emit selectionChanged(this, selected);

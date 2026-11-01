@@ -145,6 +145,7 @@ private:
 
     void initializeFilters();
     void highlightAllSearchEdit();
+    void updateDisplayModeButton();
     bool nearEndOfPage() const;
 
 protected:
