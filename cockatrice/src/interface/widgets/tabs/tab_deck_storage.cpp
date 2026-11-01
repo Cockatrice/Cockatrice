@@ -565,7 +565,7 @@ void TabDeckStorage::onSyncStatusMessage(const QString &message)
     renderSyncStatus();
 }
 
-void TabDeckStorage::onSyncFinished(int uploaded, int downloaded, int unchanged, int skipped, const QString &error)
+void TabDeckStorage::onSyncFinished(const SyncSummary &summary, const QString &error)
 {
     aSyncNow->setEnabled(remoteEnabled);
     if (!error.isEmpty()) {
@@ -574,7 +574,7 @@ void TabDeckStorage::onSyncFinished(int uploaded, int downloaded, int unchanged,
     } else {
         syncStatusType = SyncStatusType::Finished;
         syncStatusDetail.clear();
-        lastSyncSummary = {uploaded, downloaded, unchanged, skipped};
+        lastSyncSummary = summary;
     }
     renderSyncStatus();
     if (error.isEmpty()) {
