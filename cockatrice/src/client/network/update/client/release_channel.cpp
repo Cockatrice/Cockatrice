@@ -3,6 +3,7 @@
 #include "version_string.h"
 
 #include <QByteArray>
+#include <QDateTime>
 #include <QDebug>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -32,7 +33,7 @@
 
 #define STABLERELEASE_URL "https://api.github.com/repos/Cockatrice/Cockatrice/releases/latest"
 #define STABLEMANUALDOWNLOAD_URL "https://github.com/Cockatrice/Cockatrice/releases/latest"
-#define STABLETAG_URL "https://api.github.com/repos/Cockatrice/Cockatrice/git/refs/tags/"
+#define RELEASECOMMIT_URL "https://api.github.com/repos/Cockatrice/Cockatrice/commits/"
 
 #define BETARELEASE_URL "https://api.github.com/repos/Cockatrice/Cockatrice/releases"
 #define BETAMANUALDOWNLOAD_URL "https://github.com/Cockatrice/Cockatrice/releases/"
@@ -69,11 +70,20 @@ ReleaseChannel::ReleaseChannel() : netMan(NetworkManagerFactory::create(this)), 
 
 ReleaseChannel::~ReleaseChannel()
 {
-    netMan->deleteLater();
+    if (response) {
+        disconnect(response, nullptr, this, nullptr);
+        response->abort();
+    }
 }
 
 void ReleaseChannel::checkForUpdates()
 {
+    // Startup and the update dialog can ask at the same time. Both observers
+    // should receive the result of one complete release lookup.
+    if (response || pendingRelease) {
+        return;
+    }
+
     QString releaseChannelUrl = getReleaseChannelUrl();
     qCInfo(ReleaseChannelLog) << "Searching for updates on the channel: " << releaseChannelUrl;
     response = netMan->get(QNetworkRequest(releaseChannelUrl));
@@ -155,7 +165,9 @@ QString ReleaseChannel::findBestDownloadUrl(const QVariantList &assets)
         QString name = asset["name"].toString();
         QString url = asset["browser_download_url"].toString();
         auto version = getTargetVersionForCurrentOS(name);
-        if (!version) {
+        const QUrl downloadUrl(url);
+        if (!version || !downloadUrl.isValid() || downloadUrl.scheme() != QStringLiteral("https") ||
+            downloadUrl.host().isEmpty()) {
             continue;
         }
         if (*version > bestVersion) {
@@ -184,89 +196,112 @@ QString StableReleaseChannel::getReleaseChannelUrl() const
     return QString(STABLERELEASE_URL);
 }
 
-void StableReleaseChannel::releaseListFinished()
+bool ReleaseChannel::readResponse(QJsonDocument &document)
 {
-    auto *reply = static_cast<QNetworkReply *>(sender());
-    QJsonParseError parseError{};
-    QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
+    auto *reply = qobject_cast<QNetworkReply *>(sender());
+    if (!reply || reply != response) {
+        return false;
+    }
+
+    response.clear();
     reply->deleteLater();
+    const int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    if (reply->error() != QNetworkReply::NoError || status < 200 || status >= 300) {
+        pendingRelease.reset();
+        qCWarning(ReleaseChannelLog) << "Release update request failed:" << status << reply->errorString();
+        emit error(tr("Could not retrieve release information from the update server."));
+        return false;
+    }
+
+    QJsonParseError parseError{};
+    document = QJsonDocument::fromJson(reply->readAll(), &parseError);
     if (parseError.error != QJsonParseError::NoError) {
-        qCWarning(ReleaseChannelLog) << "No reply received from the release update server.";
-        emit error(tr("No reply received from the release update server."));
-        return;
+        invalidReply();
+        return false;
     }
-
-    QVariantMap resultMap = jsonResponse.toVariant().toMap();
-    if (!(resultMap.contains("name") && resultMap.contains("html_url") && resultMap.contains("tag_name") &&
-          resultMap.contains("published_at"))) {
-        qCWarning(ReleaseChannelLog) << "Invalid received from the release update server:" << resultMap;
-        emit error(tr("Invalid reply received from the release update server."));
-        return;
-    }
-
-    if (!lastRelease) {
-        lastRelease = new Release;
-    }
-
-    lastRelease->setName(resultMap["name"].toString());
-    lastRelease->setDescriptionUrl(resultMap["html_url"].toString());
-    lastRelease->setPublishDate(resultMap["published_at"].toDate());
-
-    if (resultMap.contains("assets")) {
-        auto url = findBestDownloadUrl(resultMap["assets"].toList());
-        if (!url.isEmpty()) {
-            lastRelease->setDownloadUrl(url);
-        }
-    }
-
-    QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
-    QString myHash = QString(VERSION_COMMIT);
-    qCInfo(ReleaseChannelLog) << "Current hash=" << myHash << "update hash=" << shortHash;
-
-    qCInfo(ReleaseChannelLog) << "Got reply from release server, name=" << lastRelease->getName()
-                              << "desc=" << lastRelease->getDescriptionUrl() << "date=" << lastRelease->getPublishDate()
-                              << "url=" << lastRelease->getDownloadUrl();
-
-    const QString &tagName = resultMap["tag_name"].toString();
-    QString url = QString(STABLETAG_URL) + tagName;
-    qCInfo(ReleaseChannelLog) << "Searching for commit hash corresponding to stable channel tag: " << tagName;
-    response = netMan->get(QNetworkRequest(url));
-    connect(response, &QNetworkReply::finished, this, &StableReleaseChannel::tagListFinished);
+    return true;
 }
 
-void StableReleaseChannel::tagListFinished()
+void ReleaseChannel::invalidReply()
 {
-    auto *reply = static_cast<QNetworkReply *>(sender());
-    QJsonParseError parseError{};
-    QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
-    reply->deleteLater();
-    if (parseError.error != QJsonParseError::NoError) {
-        qCWarning(ReleaseChannelLog) << "No reply received from the tag update server.";
-        emit error(tr("No reply received from the tag update server."));
+    pendingRelease.reset();
+    qCWarning(ReleaseChannelLog) << "Invalid reply received from the release update server.";
+    emit error(tr("Invalid reply received from the release update server."));
+}
+
+void ReleaseChannel::resolveRelease(const QJsonObject &release, bool beta)
+{
+    const QString tagName = release.value("tag_name").toString();
+    const QUrl descriptionUrl(release.value("html_url").toString());
+    const QDate publishDate = QDateTime::fromString(release.value("published_at").toString(), Qt::ISODate).date();
+    if (tagName.isEmpty() || !descriptionUrl.isValid() || descriptionUrl.scheme() != QStringLiteral("https") ||
+        descriptionUrl.host().isEmpty() || !publishDate.isValid() || !release.value("assets").isArray() ||
+        (beta && !release.value("prerelease").isBool())) {
+        invalidReply();
         return;
     }
 
-    QVariantMap resultMap = jsonResponse.toVariant().toMap();
-    if (!(resultMap.contains("object") && resultMap["object"].toMap().contains("sha"))) {
-        qCWarning(ReleaseChannelLog) << "Invalid received from the tag update server.";
-        emit error(tr("Invalid reply received from the tag update server."));
+    // Build a fresh candidate. In particular, a release without a matching
+    // installer must never inherit the preceding release's download URL.
+    pendingRelease = std::make_unique<Release>();
+    // A stable release returned by the beta channel keeps its published title
+    // and release notes; only prereleases use the tag/commit comparison view.
+    pendingBeta = beta && release.value("prerelease").toBool();
+    const QString name = release.value("name").toString();
+    pendingRelease->setName(pendingBeta || name.isEmpty() ? tagName : name);
+    pendingRelease->setDescriptionUrl(descriptionUrl.toString());
+    pendingRelease->setPublishDate(publishDate);
+    pendingRelease->setDownloadUrl(findBestDownloadUrl(release.value("assets").toArray().toVariantList()));
+
+    // A release's target_commitish may be a branch, and a tag ref may point to
+    // an annotated-tag object. The commits endpoint resolves either tag kind
+    // to the actual commit shipped by this release.
+    const QUrl commitUrl = QUrl::fromEncoded(QByteArray(RELEASECOMMIT_URL) + QUrl::toPercentEncoding(tagName));
+    response = netMan->get(QNetworkRequest(commitUrl));
+    connect(response, &QNetworkReply::finished, this, &ReleaseChannel::commitFinished);
+}
+
+void ReleaseChannel::commitFinished()
+{
+    QJsonDocument document;
+    if (!readResponse(document)) {
+        return;
+    }
+    const QString commitHash = document.object().value("sha").toString();
+    static const QRegularExpression validCommitHash(QStringLiteral("^[0-9a-fA-F]{40}$"));
+    if (!document.isObject() || !pendingRelease || !validCommitHash.match(commitHash).hasMatch()) {
+        invalidReply();
         return;
     }
 
-    lastRelease->setCommitHash(resultMap["object"].toMap()["sha"].toString());
-    qCInfo(ReleaseChannelLog) << "Got reply from tag server, commit=" << lastRelease->getCommitHash();
+    pendingRelease->setCommitHash(commitHash);
+    if (pendingBeta) {
+        const QString shortHash = commitHash.left(GIT_SHORT_HASH_LEN);
+        pendingRelease->setName(QString("%1 (%2)").arg(pendingRelease->getName(), shortHash));
+        pendingRelease->setDescriptionUrl(QString(BETARELEASE_CHANGESURL).arg(VERSION_COMMIT, shortHash));
+    }
 
-    QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
-    QString myHash = QString(VERSION_COMMIT);
-    qCInfo(ReleaseChannelLog) << "Current hash=" << myHash << "update hash=" << shortHash;
-    const bool needToUpdate = (QString::compare(shortHash, myHash, Qt::CaseInsensitive) != 0);
-
+    // Consumers can run nested event loops while displaying a release. Keep
+    // completed snapshots alive until the channel is destroyed, so a later
+    // check cannot mutate or invalidate an earlier result still in use.
+    pendingRelease->setParent(this);
+    lastRelease = pendingRelease.release();
+    const QString currentHash = QString::fromLatin1(VERSION_COMMIT);
+    const bool needToUpdate = currentHash.isEmpty() || !commitHash.startsWith(currentHash, Qt::CaseInsensitive);
     emit finishedCheck(needToUpdate, lastRelease->isCompatibleVersionFound(), lastRelease);
 }
 
-void StableReleaseChannel::fileListFinished()
+void StableReleaseChannel::releaseListFinished()
 {
-    // Only implemented to satisfy interface
+    QJsonDocument document;
+    if (!readResponse(document)) {
+        return;
+    }
+    if (!document.isObject()) {
+        invalidReply();
+        return;
+    }
+    resolveRelease(document.object(), false);
 }
 
 QString BetaReleaseChannel::getManualDownloadUrl() const
@@ -286,90 +321,27 @@ QString BetaReleaseChannel::getReleaseChannelUrl() const
 
 void BetaReleaseChannel::releaseListFinished()
 {
-    auto *reply = static_cast<QNetworkReply *>(sender());
-    QByteArray jsonData = reply->readAll();
-    reply->deleteLater();
-
-    QJsonDocument doc = QJsonDocument::fromJson(jsonData);
-    QJsonArray array = doc.array();
-
-    /*
-     * Get the latest release on GitHub
-     * This can be either a pre-release or a published release
-     * depending on timing. Both are acceptable.
-     */
-    const QVariantMap resultMap = array.isEmpty() ? QVariantMap{} : array.first().toObject().toVariantMap();
-
-    if (resultMap.isEmpty()) {
-        qCWarning(ReleaseChannelLog) << "No reply received from the release update server:" << QString(jsonData);
-        emit error(tr("No reply received from the release update server."));
+    QJsonDocument document;
+    if (!readResponse(document)) {
+        return;
+    }
+    if (!document.isArray()) {
+        invalidReply();
         return;
     }
 
-    // Make sure resultMap has all elements we'll need
-    if (!resultMap.contains("assets") || !resultMap.contains("author") || !resultMap.contains("tag_name") ||
-        !resultMap.contains("target_commitish") || !resultMap.contains("assets_url") ||
-        !resultMap.contains("published_at") || !resultMap.contains("name") || !resultMap.contains("html_url") ||
-        !resultMap.contains("prerelease")) {
-        qCWarning(ReleaseChannelLog) << "Invalid received from the release update server:" << resultMap;
-        emit error(tr("Invalid reply received from the release update server."));
-        return;
+    // GitHub lists releases newest first. Both published and prerelease builds
+    // are eligible, while drafts returned to an authenticated proxy are not.
+    for (const auto &entry : document.array()) {
+        if (!entry.isObject()) {
+            invalidReply();
+            return;
+        }
+        const QJsonObject release = entry.toObject();
+        if (!release.value("draft").toBool()) {
+            resolveRelease(release, true);
+            return;
+        }
     }
-
-    if (lastRelease == nullptr) {
-        lastRelease = new Release;
-    }
-
-    lastRelease->setCommitHash(resultMap["target_commitish"].toString());
-    lastRelease->setPublishDate(resultMap["published_at"].toDate());
-
-    QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
-    if (resultMap["prerelease"].toBool()) {
-        lastRelease->setName(QString("%1 (%2)").arg(resultMap["tag_name"].toString()).arg(shortHash));
-        lastRelease->setDescriptionUrl(QString(BETARELEASE_CHANGESURL).arg(VERSION_COMMIT, shortHash));
-    } else {
-        // The beta channel can also return a stable release. Its title and
-        // release notes are the same regardless of the channel used to find it.
-        lastRelease->setName(resultMap["name"].toString());
-        lastRelease->setDescriptionUrl(resultMap["html_url"].toString());
-    }
-
-    qCInfo(ReleaseChannelLog) << "Got reply from release server, size=" << resultMap.size()
-                              << "name=" << lastRelease->getName() << "desc=" << lastRelease->getDescriptionUrl()
-                              << "commit=" << lastRelease->getCommitHash() << "date=" << lastRelease->getPublishDate();
-
-    QString betaBuildDownloadUrl = resultMap["assets_url"].toString();
-
-    qCInfo(ReleaseChannelLog) << "Searching for a corresponding file on the beta channel: " << betaBuildDownloadUrl;
-    response = netMan->get(QNetworkRequest(betaBuildDownloadUrl));
-    connect(response, &QNetworkReply::finished, this, &BetaReleaseChannel::fileListFinished);
-}
-
-void BetaReleaseChannel::fileListFinished()
-{
-    auto *reply = static_cast<QNetworkReply *>(sender());
-    QJsonParseError parseError{};
-    QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
-    reply->deleteLater();
-    if (parseError.error != QJsonParseError::NoError) {
-        qCWarning(ReleaseChannelLog) << "No reply received from the file update server.";
-        emit error(tr("No reply received from the file update server."));
-        return;
-    }
-
-    QVariantList resultList = jsonResponse.toVariant().toList();
-    QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
-    QString myHash = QString(VERSION_COMMIT);
-    qCInfo(ReleaseChannelLog) << "Current hash=" << myHash << "update hash=" << shortHash;
-
-    bool needToUpdate = (QString::compare(shortHash, myHash, Qt::CaseInsensitive) != 0);
-    bool compatibleVersion = false;
-
-    QString downloadUrl = findBestDownloadUrl(resultList);
-    if (!downloadUrl.isEmpty()) {
-        compatibleVersion = true;
-        lastRelease->setDownloadUrl(downloadUrl);
-    }
-
-    emit finishedCheck(needToUpdate, compatibleVersion, lastRelease);
+    invalidReply();
 }

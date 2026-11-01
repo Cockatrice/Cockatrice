@@ -397,6 +397,17 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  release_channel_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network/update/client/release_channel.cpp
+  ${VERSION_STRING_CPP}
+  release_channel_test.cpp
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src
+  ${CMAKE_SOURCE_DIR}/libcockatrice_network
+)
+cockatrice_add_test(
+  NAME
   deck_hash_performance_test
   SOURCES
   deck_hash_performance_test.cpp
