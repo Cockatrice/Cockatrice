@@ -91,7 +91,12 @@ private:
     QString themeName;
 
     QList<ReleaseChannel *> releaseChannels;
+    bool shutdownHookInstalled = false;
     bool isPortableBuild;
+
+    // Connects the aboutToQuit handler that deletes the release channels while
+    // the application object is still alive; a no-op before it exists.
+    void installShutdownHook();
 
     [[nodiscard]] QString getSafeConfigPath(QString configEntry, QString defaultPath) const;
     [[nodiscard]] QString getSafeConfigFilePath(QString configEntry, QString defaultPath) const;
