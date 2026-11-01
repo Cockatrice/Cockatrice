@@ -176,23 +176,24 @@ FilterItem::FilterItem(QString trm, FilterItemList *parent) : p(parent), term(st
     lowercaseTerm = term.toLower();
 
     switch (attr()) {
-        case CardFilter::AttrColor: {
-            QString converted = term.trimmed();
+        case CardFilter::AttrColor:
+        case CardFilter::AttrColorIdentity: {
+            QString converted = term.trimmed().toLower();
 
-            converted.replace("green", "g", Qt::CaseInsensitive);
-            converted.replace("grn", "g", Qt::CaseInsensitive);
-            converted.replace("blue", "u", Qt::CaseInsensitive);
-            converted.replace("blu", "u", Qt::CaseInsensitive);
-            converted.replace("black", "b", Qt::CaseInsensitive);
-            converted.replace("blk", "b", Qt::CaseInsensitive);
-            converted.replace("red", "r", Qt::CaseInsensitive);
-            converted.replace("white", "w", Qt::CaseInsensitive);
-            converted.replace("wht", "w", Qt::CaseInsensitive);
-            converted.replace("colorless", "c", Qt::CaseInsensitive);
-            converted.replace("colourless", "c", Qt::CaseInsensitive);
-            converted.replace("none", "c", Qt::CaseInsensitive);
+            converted.replace("green", "g");
+            converted.replace("grn", "g");
+            converted.replace("blue", "u");
+            converted.replace("blu", "u");
+            converted.replace("black", "b");
+            converted.replace("blk", "b");
+            converted.replace("red", "r");
+            converted.replace("white", "w");
+            converted.replace("wht", "w");
+            converted.replace("colorless", "c");
+            converted.replace("colourless", "c");
+            converted.replace("none", "c");
 
-            converted.replace(QString(" "), QString(""), Qt::CaseInsensitive);
+            converted.replace(QString(" "), QString(""));
 
             convertedColorTerm = converted;
             break;
@@ -358,10 +359,10 @@ bool FilterItem::acceptSubType(const CardInfoPtr &info) const
     return subType.contains(term, Qt::CaseInsensitive);
 }
 
-static bool matchesColor(const QString &convertedColorTerm, const QString &color)
+static bool matchesColor(const QString &convertedColorTerm, const QString &colors)
 {
     // Colorless card filter
-    if (convertedColorTerm.toLower() == "c" && colors.length() < 1) {
+    if (convertedColorTerm == "c" && colors.length() < 1) {
         return true;
     }
 
@@ -386,6 +387,8 @@ bool FilterItem::acceptColor(const CardInfoPtr &info) const
 
 bool FilterItem::acceptColorIdentity(const CardInfoPtr &info) const
 {
+    // if (info->getColorIdentity() == "")
+    //     system(std::format("notify-send \"{}, {}\"", convertedColorTerm.toStdString(), info->getColorIdentity().toStdString()).c_str());
     return matchesColor(convertedColorTerm, info->getColorIdentity());
 }
 
