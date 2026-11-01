@@ -14,6 +14,7 @@
 #include <QFrame>
 #include <QPointer>
 #include <QRect>
+#include <QSize>
 #include <QTransform>
 #include <functional>
 #include <libcockatrice/card/printing/exact_card.h>
@@ -32,6 +33,7 @@ class QStackedWidget;
 class QLabel;
 class QLineEdit;
 class QEnterEvent;
+class QHideEvent;
 class QPropertyAnimation;
 class QResizeEvent;
 class QTimer;
@@ -56,6 +58,9 @@ public:
     void showAnimated();
     void hideAnimated();
 
+    /** @brief True while the panel is fading out towards a hide. */
+    bool isClosing() const;
+
     /** @brief Refreshes the PT, counter, and annotation labels from the current card. */
     void refreshDisplay();
 
@@ -70,6 +75,7 @@ protected:
     void enterEvent(QEnterEvent *event) override;
     void leaveEvent(QEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
+    void hideEvent(QHideEvent *event) override;
 
 signals:
     void hoverEntered();
@@ -88,6 +94,10 @@ private:
     // Which side of the card the panel ended up on (drives the image-adjacent layout flip)
     bool popupOnRight = true;
 
+    // Viewport area the panel covered at its last placement; used to repaint what the
+    // overlay window uncovers when it moves or hides.
+    QRect lastViewportRect;
+
     // Coalesces rapid state-change bursts into a single refresh
     QTimer *refreshTimer;
 
@@ -102,8 +112,14 @@ private:
     QLineEdit *nameEdit;
     QLabel *annotationLabel;
 
-    // P/T controls overlay (bottom-right of card image)
+    // P/T overlay (bottom-right of card image): a compact value pill at rest that
+    // lifts its control rows out of itself while the P/T area is hovered.
     QWidget *ptOverlay;
+    QWidget *ptControls;
+    QLabel *ptPillLabel;
+    bool ptExpanded = false;
+    QSize ptCompactSize;
+    QSize ptFullSize;
     QLabel *ptPowerLabel;
     QLabel *ptToughLabel;
     QPushButton *btnIncP;
@@ -165,6 +181,22 @@ private:
     void addRelatedViewButtons(QVBoxLayout *layout);
     void updatePTDisplay();
     void positionOverlays();
+    /** @brief Shows/hides the P/T control rows; the value pill stays at the bottom. */
+    void setPTExpanded(bool expanded);
+    /** @brief Anchors the pill on the printed P/T box, or the expanded stack above it. */
+    void applyPTOverlayGeometry();
+    /** @brief Resting pill geometry, in @c imageContainer coordinates. */
+    QRect compactPillRect() const;
+    /** @brief Pill plus halo: the only area that opens the rows, in @c pic coordinates. */
+    QRect ptOpenRegion() const;
+    /** @brief Bottom-right band the rows stay open in (never opens them), in @c pic coordinates. */
+    QRect ptHoverRegion() const;
+    /** @brief True while the cursor is over the overlay or the printed P/T area. */
+    bool isCursorOverPTArea() const;
+    /** @brief Re-measures the resting pill from its current text. */
+    QSize measureCompactPTSize() const;
+    /** @brief Repaints the viewport area this window covers and the one it just left. */
+    void invalidateCoveredArea();
 
     void clearLayout(QLayout *layout);
 
