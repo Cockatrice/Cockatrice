@@ -12,6 +12,7 @@
 #include "tab.h"
 
 #include <QList>
+#include <QPointer>
 #include <QString>
 #include <QStringList>
 #include <QVariant>
@@ -30,6 +31,7 @@ class Response;
 class ShareBarWidget;
 class QAction;
 class QModelIndex;
+class QMessageBox;
 class TabSupervisor;
 
 class TabDeckStorage : public Tab
@@ -46,6 +48,7 @@ private:
     QTimer *shareTimeoutTimer;
     int shareRequestSeq = 0;
     int shareInFlightSeq = 0;
+    quint64 remoteSessionRevision = 0;
 
     QAction *aOpenLocalDeck, *aRenameLocal, *aUpload, *aNewLocalFolder, *aDeleteLocalDeck;
     QAction *aOpenDecksFolder;
@@ -53,6 +56,9 @@ private:
     bool visibilityRefreshStarted = false;
     QTimer *visibilityRefreshTimer;
     QStringList visibilityFailures;
+    QPointer<QMessageBox> downloadFailureNotice;
+    int downloadFailureCount = 0;
+    QStringList downloadFailureDetails;
     QString getTargetPath() const;
 
     void setRemoteEnabled(bool enabled);
@@ -61,10 +67,19 @@ private:
 
     void setShareModeEnabled(bool enabled);
 
-    void uploadDeck(const QString &filePath, const QString &targetPath);
-    void deleteRemoteDeck(const RemoteDeckList_TreeModel::Node *node);
+    // False stops the remaining upload batch after cancellation or a session change.
+    bool uploadDeck(const QString &filePath, const QString &targetPath);
 
-    void downloadNodeAtIndex(const QModelIndex &curLeft, const QModelIndex &curRight);
+    struct DeckDownloadTask
+    {
+        int deckId;
+        QString filePath;
+    };
+    void collectDeckDownloads(const QString &directoryPath,
+                              const QModelIndex &curRight,
+                              QList<DeckDownloadTask> &downloads,
+                              QStringList &errors);
+    void reportDownloadFailure(const QString &message);
 
 private slots:
     void handleConnected(const ServerInfo_User &userInfo);

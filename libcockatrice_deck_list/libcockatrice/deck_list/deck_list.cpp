@@ -294,7 +294,7 @@ bool DeckList::saveToFile_Native(QIODevice *device) const
     write(&xml);
 
     xml.writeEndDocument();
-    return true;
+    return !xml.hasError();
 }
 
 /**
@@ -341,7 +341,8 @@ bool DeckList::saveToStream_Plain(QTextStream &stream, bool prefixSideboardCards
     };
 
     forEachCard(writeToStream);
-    return true;
+    stream.flush();
+    return stream.status() == QTextStream::Ok;
 }
 
 bool DeckList::saveToFile_Plain(QIODevice *device, bool prefixSideboardCards, bool slashTappedOutSplitCards) const
