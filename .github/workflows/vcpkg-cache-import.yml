@@ -21,8 +21,10 @@ permissions:
 
 on:
   workflow_run:
-    workflows: ["Build Desktop"]
-    types: [completed]
+    workflows:
+      - 'Build Desktop'
+    types:
+      - completed
 
 # Every import writes the same scopes, so let them queue instead of racing each other
 concurrency:
@@ -31,12 +33,12 @@ concurrency:
 
 jobs:
   list:
-    name: List new vcpkg entries
+    name: "List new vcpkg entries"
     # Only a successful push to the default branch has archives worth importing.
     # Only code that landed on master may populate the scope master runs restore.
     # Bot actors are excluded on top: their runs must never promote binaries into
     # the shared scope even if they somehow target the default branch.
-    if: >-
+    if: |
       github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.event == 'push' &&
       github.event.workflow_run.head_branch == 'master' &&
@@ -44,6 +46,7 @@ jobs:
       !endsWith(github.event.workflow_run.actor.login, '[bot]') &&
       !endsWith(github.event.workflow_run.triggering_actor.login, '[bot]')
     runs-on: ubuntu-slim    # https://github.com/actions/runner-images/blob/main/images/ubuntu-slim/ubuntu-slim-Readme.md
+
     # workflow_run is a low-trust trigger, so cache access is read-only by default even
     # though this run resolves to the default branch. Assert below that this took effect,
     # because a save under read-only access only warns and would import nothing silently.
@@ -53,7 +56,7 @@ jobs:
 
     steps:
       - name: "Download new vcpkg entries"
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: vcpkg-new-*
           path: incoming
@@ -64,7 +67,7 @@ jobs:
         shell: bash
         run: |
           if [[ $ACTIONS_CACHE_MODE != *write* ]]; then
-            echo "::error::expected a write-capable cache, got '$ACTIONS_CACHE_MODE'"
+            echo "::error::Expected a write-capable cache, got '$ACTIONS_CACHE_MODE'"
             exit 1
           fi
 
@@ -86,14 +89,16 @@ jobs:
           # Compact, because a multi line value cannot be written to GITHUB_OUTPUT
           entries="$(jq -cs '.' <<<"$entries")"
           echo "entries=$entries" >>"$GITHUB_OUTPUT"
-          echo "::notice::importing $(jq length <<<"$entries") vcpkg entries"
+          echo "::notice::Importing $(jq length <<<"$entries") vcpkg entries"
 
   save:
     name: "Save ${{ matrix.entry.key }}"
-    needs: list
     if: needs.list.outputs.entries
-    runs-on: ubuntu-slim
+    needs: list
+    runs-on: ubuntu-slim    # https://github.com/actions/runner-images/blob/main/images/ubuntu-slim/ubuntu-slim-Readme.md
+
     cache-mode: write
+
     strategy:
       # One job per archive, they run in parallel and each only uploads a single file
       fail-fast: false
@@ -103,7 +108,7 @@ jobs:
 
     steps:
       - name: "Download new vcpkg entries"
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: ${{ matrix.entry.artifact }}
           path: incoming
@@ -111,7 +116,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "Save vcpkg entry"
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           # The payload is a Windows or macOS archive while the upload runs on Linux, and
           # without this the entry would be stamped as a Linux cache that neither of them
