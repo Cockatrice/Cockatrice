@@ -55,6 +55,6 @@ void PrintingSelectorPlaceholderWidget::applyInterfaceDefaultFont()
 {
     // Family comes from the InterfaceDefault theme role; the 14px size stays caller-side.
     QFont placeholderFont = themeManager->appFont(AppFont::InterfaceDefault);
-    placeholderFont.setPointSize(14);
+    placeholderFont.setPixelSize(14);
     textLabel->setFont(placeholderFont);
 }

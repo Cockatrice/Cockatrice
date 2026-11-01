@@ -65,7 +65,7 @@ void BannerWidget::applyInterfaceDefaultFont()
     // Family comes from the InterfaceDefault theme role; the 24px size and
     // bold weight previously carried by the stylesheet stay caller-side.
     QFont bannerFont = themeManager->appFont(AppFont::InterfaceDefault);
-    bannerFont.setPointSize(24);
+    bannerFont.setPixelSize(24);
     bannerFont.setWeight(QFont::Bold);
     bannerLabel->setFont(bannerFont);
 }
