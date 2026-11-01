@@ -392,6 +392,10 @@ void PaletteEditorDialog::onReset()
 {
     workingConfig[loadedScheme] = savedConfig[loadedScheme];
     paletteGrid->loadPalette(savedConfig[loadedScheme]);
+    // Restore the live theme before re-reading the grid: loadFonts resolves
+    // unset roles, and the preview has currentFonts pointing at the edited
+    // config until the theme is reloaded.
+    themeManager->reloadCurrentTheme();
     fontGrid->loadFonts(savedFontConfig);
     seedAccentFromScheme(loadedScheme);
 }

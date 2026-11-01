@@ -660,6 +660,14 @@ QFont ThemeManager::appFont(AppFont::Role role) const
     return qApp->font();
 }
 
+QFont ThemeManager::defaultAppFont(AppFont::Role /*role*/) const
+{
+    // No per-role scaling and no preview: an unset role resolves to the font
+    // captured at startup, which is what the theme falls back to once the
+    // editor closes.
+    return defaultFont;
+}
+
 void ThemeManager::themeChangedSlot()
 {
     QString themeName = SettingsCache::instance().getThemeName();

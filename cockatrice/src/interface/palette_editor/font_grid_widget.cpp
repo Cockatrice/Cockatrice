@@ -76,9 +76,11 @@ void FontGridWidget::loadFonts(const FontConfig &cfg)
         auto role = static_cast<AppFont::Role>(fontEnum.value(i));
         const FontRow &row = fontRows[role];
 
-        // Roles absent from the file resolve to the theme's effective font, so
-        // unset roles visibly show the system default instead of blanks.
-        const QFont font = cfg.fonts.value(role, themeManager->appFont(role));
+        // Roles absent from the file resolve to the startup font, not to the
+        // live preview: appFont() would return the previewed config, so Reset
+        // and a first load would both show the edited font instead of the
+        // theme's real default.
+        const QFont font = cfg.fonts.value(role, themeManager->defaultAppFont(role));
         row.familyCombo->setCurrentFont(font);
 
         int size = font.pointSize();
