@@ -24,9 +24,9 @@
 #include <QStringList>
 #include <QThreadPool>
 #include <QVector>
+#include <atomic>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/loaded_deck.h>
-#include <atomic>
 #include <memory>
 #include <optional>
 #include <qnamespace.h>
@@ -83,6 +83,7 @@ struct DeckPreviewData
     bool loadSucceeded = false;  ///< Whether the deck file finished loading successfully.
     bool loadInProgress = false; ///< Whether the deck file is currently being loaded.
     quint64 loadId = 0;          ///< Identifies the current load across renames and reloads.
+    quint64 revision = 0;        ///< Changes only when this row's preview content changes.
 };
 
 /**

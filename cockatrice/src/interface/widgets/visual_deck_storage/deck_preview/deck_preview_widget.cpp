@@ -113,34 +113,42 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
 
     // Retain row identity across renames and row movement. Looking up the old
     // filePath after a rename cannot find the renamed row in the model's map.
-    const QPersistentModelIndex previewRow = previewIndex;
-    const auto syncCurrentRow = [this, previewRow] {
-        if (previewRow.isValid()) {
-            filePath = model->dataForRow(previewRow.row()).filePath;
-            syncFromModel();
+    const auto syncCurrentRow = [this] {
+        if (!model) {
+            return;
+        }
+        if (!previewIndex.isValid() && awaitingResetRow) {
+            previewIndex = model->index(model->rowForFilePath(filePath));
+            if (previewIndex.isValid()) {
+                awaitingResetRow = false;
+                syncFromModel();
+            }
+        } else if (previewIndex.isValid()) {
+            // A structural change only moves this row; rebuilding its banner,
+            // printing choices and tag widgets would repeat work for every deck.
+            const auto &data = model->dataForRow(previewIndex.row());
+            filePath = data.filePath;
+            if (lastSyncedRevision != data.revision) {
+                syncFromModel();
+            }
         }
     };
-    connect(model, &QAbstractItemModel::dataChanged, this,
-            [this, previewRow](const QModelIndex &topLeft, const QModelIndex &bottomRight) {
-                if (!previewRow.isValid()) {
-                    return;
-                }
-                const int r = previewRow.row();
-                const QString currentFilePath = model->dataForRow(r).filePath;
-                // A direct receiver may have renamed/moved this row again during
-                // signal delivery. Always adopt its current path, but avoid full
-                // resyncs for unrelated finished deck loads.
-                if (filePath != currentFilePath || (r >= topLeft.row() && r <= bottomRight.row())) {
-                    filePath = currentFilePath;
-                    syncFromModel();
-                }
-            });
+    connect(model, &QAbstractItemModel::dataChanged, this, syncCurrentRow);
     // Structural changes can occur in an earlier direct dataChanged receiver,
     // making its original row range stale before our callback runs.
     connect(model, &QAbstractItemModel::rowsInserted, this, syncCurrentRow);
     connect(model, &QAbstractItemModel::rowsRemoved, this, syncCurrentRow);
     connect(model, &QAbstractItemModel::rowsMoved, this, syncCurrentRow);
     connect(model, &QAbstractItemModel::layoutChanged, this, syncCurrentRow);
+    connect(model, &QAbstractItemModel::modelAboutToBeReset, this, [this] {
+        if (previewIndex.isValid()) {
+            filePath = model->dataForRow(previewIndex.row()).filePath;
+            awaitingResetRow = true;
+        }
+    });
+    // A scan resets to an empty model and inserts its results asynchronously.
+    // Keep the path until that insertion can restore this preview's identity.
+    connect(model, &QAbstractItemModel::modelReset, this, syncCurrentRow);
 
     retranslateUi();
     syncFromModel();
@@ -294,6 +302,7 @@ void DeckPreviewWidget::syncFromModel()
 
     const DeckPreviewData &data = model->dataForRow(r);
     filePath = data.filePath;
+    lastSyncedRevision = data.revision;
 
     const CardRef bannerCardRef = data.deck.deckList.getBannerCard();
     const ExactCard bannerCard =
@@ -510,8 +519,7 @@ QMenu *DeckPreviewWidget::createRightClickMenu()
 
     // A popup survives event-loop turns. Keep the original row identity and path,
     // so even removing and reinserting the same filename cancels its old actions.
-    connect(menu->addAction(tr("Open in deck editor")), &QAction::triggered, this,
-            [this, deckModel, currentRow] {
+    connect(menu->addAction(tr("Open in deck editor")), &QAction::triggered, this, [this, deckModel, currentRow] {
         const int r = currentRow();
         if (r != -1) {
             // Signal receivers can reset or destroy the model during delivery.
@@ -520,8 +528,7 @@ QMenu *DeckPreviewWidget::createRightClickMenu()
         }
     });
 
-    connect(menu->addAction(tr("Share deck...")), &QAction::triggered, this,
-            [this, currentRow, requestedFilePath] {
+    connect(menu->addAction(tr("Share deck...")), &QAction::triggered, this, [this, currentRow, requestedFilePath] {
         if (currentRow() != -1) {
             const QString sharedFilePath = requestedFilePath;
             emit shareDeckRequested(sharedFilePath);
@@ -651,8 +658,7 @@ void DeckPreviewWidget::actRenameFile()
 
     const QString oldName = QFileInfo(originalFilePath).baseName();
     const auto newName = QtUtils::promptText(this, tr("Rename file"), tr("New name:"), oldName);
-    if (!self || !deckModel || !newName || newName->isEmpty() || *newName == oldName ||
-        filePath != originalFilePath) {
+    if (!self || !deckModel || !newName || newName->isEmpty() || *newName == oldName || filePath != originalFilePath) {
         return;
     }
 
@@ -680,7 +686,8 @@ void DeckPreviewWidget::actDeleteFile()
     }
 
     const auto result = QtUtils::messageBox(this, QMessageBox::Warning, tr("Delete file"),
-        tr("Are you sure you want to delete the selected file?"), QMessageBox::Yes | QMessageBox::No);
+                                            tr("Are you sure you want to delete the selected file?"),
+                                            QMessageBox::Yes | QMessageBox::No);
     if (!self || !deckModel || result != QMessageBox::Yes || filePath != originalFilePath) {
         return;
     }

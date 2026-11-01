@@ -390,6 +390,7 @@ void VisualDeckStorageModel::drainPendingLoads()
         recomputeDeckMetadata(data, false);
         data.colorIdentity = std::move(pending.colorIdentity);
 
+        ++data.revision;
         emit dataChanged(index(row), index(row));
         if (!guard) {
             return;
@@ -397,8 +398,7 @@ void VisualDeckStorageModel::drainPendingLoads()
         // A direct signal receiver can refresh, rename or remove rows (or close
         // the widget). Do not announce the old row as a newly loaded deck.
         const int currentRow = rowForFilePath(pending.filePath);
-        if (pending.generation == scanGeneration && currentRow >= 0 &&
-            decks.at(currentRow).loadId == pending.loadId) {
+        if (pending.generation == scanGeneration && currentRow >= 0 && decks.at(currentRow).loadId == pending.loadId) {
             emit deckLoaded(currentRow);
             if (!guard) {
                 return;
@@ -471,6 +471,7 @@ bool VisualDeckStorageModel::renameDeck(int row, const QString &newName)
     }
 
     recomputeDeckMetadata(data);
+    ++data.revision;
     emit dataChanged(index(row), index(row), {VisualDeckStorageRoles::DisplayNameRole});
     return true;
 }
@@ -504,6 +505,7 @@ bool VisualDeckStorageModel::renameFile(int row, const QString &newBaseName)
 
     const QPointer<VisualDeckStorageModel> guard(this);
     const QPersistentModelIndex changedRow(index(row));
+    ++data.revision;
     emit dataChanged(index(row), index(row));
     if (guard && changedRow.isValid() && dataForRow(changedRow.row()).filePath == newFilePath) {
         emit deckFilePathChanged(oldFilePath, newFilePath);
@@ -550,6 +552,7 @@ bool VisualDeckStorageModel::setTags(int row, const QStringList &tags)
     }
 
     data.tags = tags;
+    ++data.revision;
     emit dataChanged(index(row), index(row), {VisualDeckStorageRoles::TagsRole});
     return true;
 }
@@ -569,6 +572,7 @@ bool VisualDeckStorageModel::setBannerCard(int row, const CardRef &cardRef)
     }
 
     data.bannerCard = cardRef;
+    ++data.revision;
     emit dataChanged(index(row), index(row),
                      {VisualDeckStorageRoles::BannerCardNameRole, VisualDeckStorageRoles::BannerCardProviderIdRole});
     return true;
@@ -595,6 +599,7 @@ bool VisualDeckStorageModel::convertToCockatriceFormat(int row)
     const QString newFilePath = data.filePath;
     const QPointer<VisualDeckStorageModel> guard(this);
     const QPersistentModelIndex changedRow(index(row));
+    ++data.revision;
     emit dataChanged(index(row), index(row));
     if (guard && changedRow.isValid() && oldFilePath != newFilePath &&
         dataForRow(changedRow.row()).filePath == newFilePath) {
@@ -632,6 +637,7 @@ bool VisualDeckStorageModel::reloadIfModified(int row)
     const QPointer<VisualDeckStorageModel> guard(this);
     const QPersistentModelIndex loadedRow(index(row));
     const quint64 loadId = data.loadId;
+    ++data.revision;
     emit dataChanged(index(row), index(row));
     if (guard && loadedRow.isValid() && dataForRow(loadedRow.row()).loadId == loadId) {
         emit deckLoaded(loadedRow.row());

@@ -103,7 +103,9 @@ private:
 
     VisualDeckStorageWidget *visualDeckStorageWidget;
     QPointer<VisualDeckStorageModel> model;
-    QPersistentModelIndex previewIndex; ///< Original row identity; invalid after removal or reset.
+    QPersistentModelIndex previewIndex; ///< Row identity across renames and movement.
+    bool awaitingResetRow = false;      ///< Rebind by path after a reset, never after an ordinary removal.
+    quint64 lastSyncedRevision = 0;     ///< Avoid rebuilding unchanged previews after structural signals.
     QVBoxLayout *layout;
     ColorIdentityWidget *colorIdentityWidget;
     DeckPreviewDeckTagsDisplayWidget *deckTagsDisplayWidget;
