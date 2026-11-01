@@ -48,6 +48,10 @@ private:
     // palette is applied. Used as the base when a theme supplies no palette, so
     // switching away from a custom palette restores the original colours.
     QPalette defaultPalette;
+    // Pristine application font captured at startup, before any theme font is
+    // applied. Restored when a theme (or a preview) supplies no InterfaceDefault
+    // font, so switching away from a themed font cannot leave it behind.
+    QFont defaultFont;
     QString currentThemePath;
     std::array<QBrush, Role::MaxRole + 1> brushes;
     QStringMap availableThemes;
