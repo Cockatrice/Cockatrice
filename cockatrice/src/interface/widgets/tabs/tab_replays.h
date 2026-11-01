@@ -10,7 +10,9 @@
 
 #include "tab.h"
 
+#include <QPointer>
 #include <QString>
+#include <QStringList>
 #include <QVariant>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 // IWYU pragma: keep
@@ -29,6 +31,7 @@ class Event_ReplayAdded;
 class CommandContainer;
 class QAction;
 class QModelIndex;
+class QMessageBox;
 class TabSupervisor;
 
 class TabReplays : public Tab
@@ -46,12 +49,17 @@ private:
     QAction *aOpenRemoteReplay, *aDownload, *aKeep, *aDeleteRemoteReplay, *aGetReplayCode;
     QAction *aSubmitReplayCode;
 
+    QPointer<QMessageBox> downloadErrorDialog;
+    QStringList downloadErrors;
+    int downloadFailureCount = 0;
+
     QGroupBox *createLeftLayout();
     QGroupBox *createRightLayout();
 
     void setRemoteEnabled(bool enabled);
 
     void downloadNodeAtIndex(const QString &directoryPath, const QModelIndex &curRight);
+    void reportDownloadError(const QString &error);
 
 private slots:
     void handleConnected(const ServerInfo_User &userInfo);

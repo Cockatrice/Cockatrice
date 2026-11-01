@@ -367,7 +367,24 @@ void TabReplays::actRenameLocal()
         if (!info.isDir() && !info.suffix().isEmpty()) {
             newFileName += "." + info.suffix();
         }
+        if (newName == QStringLiteral(".") || newName == QStringLiteral("..") || newName.contains(QLatin1Char('/')) ||
+            newName.contains(QLatin1Char('\\')) || newName.contains(QChar::Null)) {
+            QMessageBox::critical(this, tr("Error"), tr("Enter a name without directory separators."));
+            if (!alive) {
+                return;
+            }
+            continue;
+        }
         const QString newFilePath = QFileInfo(info.dir(), newFileName).filePath();
+
+        const QFileInfo destination(newFilePath);
+        if (destination.exists() || destination.isSymLink()) {
+            QMessageBox::critical(this, tr("Error"), tr("A file or folder with that name already exists."));
+            if (!alive) {
+                return;
+            }
+            continue;
+        }
 
         if (!QFile::rename(info.filePath(), newFilePath)) {
             QMessageBox::critical(this, tr("Error"), tr("Rename failed"));
@@ -520,7 +537,7 @@ void TabReplays::downloadNodeAtIndex(const QString &directoryPath, const QModelI
         const QString matchDirectory = ReplayDownload::prepareMatchDirectory(
             directoryPath, replayMatch->game_id(), QString::fromStdString(replayMatch->game_name()), error);
         if (matchDirectory.isEmpty()) {
-            QMessageBox::critical(this, tr("Download replay"), error);
+            reportDownloadError(error);
             return;
         }
 
@@ -559,19 +576,41 @@ void TabReplays::downloadFinished(const Response &r,
                                   const QVariant &extraData)
 {
     if (r.response_code() != Response::RespOk) {
-        QMessageBox::critical(this, tr("Download replay"), tr("The server could not provide the requested replay."));
+        reportDownloadError(tr("The server could not provide the requested replay: %1").arg(extraData.toString()));
         return;
     }
 
     if (!r.HasExtension(Response_ReplayDownload::ext)) {
-        QMessageBox::critical(this, tr("Download replay"), tr("The server did not provide replay data."));
+        reportDownloadError(tr("The server did not provide replay data for %1.").arg(extraData.toString()));
         return;
     }
     const auto &data = r.GetExtension(Response_ReplayDownload::ext).replay_data();
     QString error;
     if (!ReplayDownload::save(extraData.toString(), QByteArrayView(data.data(), data.size()), error)) {
-        QMessageBox::critical(this, tr("Download replay"), error);
+        reportDownloadError(tr("%1: %2").arg(extraData.toString(), error));
     }
+}
+
+void TabReplays::reportDownloadError(const QString &error)
+{
+    if (!downloadErrorDialog) {
+        downloadErrors.clear();
+        downloadFailureCount = 0;
+        auto *dialog = new QMessageBox(QMessageBox::Critical, tr("Download replay"), QString(), QMessageBox::Ok, this);
+        dialog->setAttribute(Qt::WA_DeleteOnClose);
+        dialog->setTextFormat(Qt::PlainText);
+        downloadErrorDialog = dialog;
+        connect(dialog, &QMessageBox::finished, this, [this] { downloadErrorDialog.clear(); });
+    }
+    ++downloadFailureCount;
+    if (!downloadErrors.contains(error)) {
+        downloadErrors.append(error);
+    }
+    downloadErrorDialog->setText(tr("%n replay download(s) failed.", nullptr, downloadFailureCount));
+    downloadErrorDialog->setDetailedText(downloadErrors.join(QLatin1Char('\n')));
+    // Keep receiving replies without nesting event loops or stacking a dialog for
+    // every replay. Further failures update this same summary until it is closed.
+    downloadErrorDialog->show();
 }
 
 void TabReplays::actKeepRemoteReplay()
