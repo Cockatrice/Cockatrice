@@ -325,7 +325,7 @@ if [[ $RUNNER_OS == macOS ]]; then
       hdiutil "$@" && exit 0
       rc=$?
       if (( ++i >= attempts )); then
-        echo "Error: hdiutil $1 failed $i times (last status $rc), giving up" >&2
+        echo "::error::hdiutil $1 failed $i times (last status $rc), giving up" >&2
         exit "$rc"
       fi
       echo "hdiutil $1 attempt $i/$attempts failed (status $rc), retrying" >&2
