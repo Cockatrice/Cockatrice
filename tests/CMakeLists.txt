@@ -500,6 +500,23 @@ add_subdirectory(settings)
 
 # libcockatrice_game only exists when the client is built.
 if(WITH_CLIENT)
+  cockatrice_add_test(
+    NAME
+    replay_timeline_test
+    SOURCES
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/replay/replay_timeline_widget.cpp
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/replay/replay_manager.cpp
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/cache_settings.cpp
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/card_counter_settings.cpp
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/shortcuts_settings.cpp
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network/update/client/release_channel.cpp
+    ${VERSION_STRING_CPP}
+    replay_timeline_test.cpp
+    LIBS
+    libcockatrice_game
+    INCLUDE_DIRS
+    ${CMAKE_SOURCE_DIR}/cockatrice/src
+  )
   add_subdirectory(game)
 endif()
 
