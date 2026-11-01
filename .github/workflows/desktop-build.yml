@@ -178,7 +178,19 @@ jobs:
     env:
       CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}    # directory for caching docker image and ccache
       CCACHE_EVICTION_AGE: 7d
-      CCACHE_SIZE: 600M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
+      # A configuration needs roughly 500 MB of objects on Linux, so the 600M bound is below
+      # what a leg writes: ccache spent each build deleting the entries the next run would
+      # ask for, with 585 cleanup passes and 1.8% of calls served in one inspected run.
+      #
+      # The bound cannot simply be raised. The repository's 10Gi quota
+      # (https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy)
+      # is shared by the 9 Linux legs, the 4 macOS ones, the CodeQL trap (~1G), vcpkg
+      # (~1G) and Qt (~0.2G), which funds about 600M per leg. 800M here and 1200M on macOS
+      # would ask for 12G of ccache alone, and GitHub would then evict a whole leg's entry
+      # and start that leg cold. The prune job below deletes by ref, scope and age only,
+      # never by total size, so it cannot make room for a bigger bound either: raising the
+      # bound means caching fewer legs.
+      CCACHE_SIZE: 600M
       CMAKE_GENERATOR: 'Ninja'
       NAME: ${{ matrix.distro }}${{ matrix.version }}
       IMAGE_SUFFIX: ${{ matrix.variant }}
@@ -471,7 +483,11 @@ jobs:
     timeout-minutes: 100
     env:
       CCACHE_DIR: ${{ github.workspace }}/.cache/
-      CCACHE_SIZE: 600M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
+      # One macOS configuration compiles about twice the TUs of a Linux one, so this is the
+      # leg that would gain most from a bigger bound. It draws on the same 10Gi quota as the
+      # Linux legs (see CCACHE_SIZE in build-linux): 4 macOS legs at 1200M would be 4.8G of
+      # that quota on their own, so the bound stays at the Linux value.
+      CCACHE_SIZE: 600M
 
     steps:
       - name: "Checkout"
@@ -962,6 +978,16 @@ jobs:
       # entry under the prefix on every run, so a dead ABI generation keeps its access
       # date fresh forever and age based eviction can never reach it. Deleting by age
       # alone cannot fix that, only knowing which scope an entry belongs to can.
+      #
+      # docker-release's image builds store their layers under the same budget: one blob per
+      # layer, keyed buildkit-blob-1-<digest>, plus one index-<scope>-1-<hash> entry per image
+      # scope that lists them. buildkit can serve a build through the index without downloading
+      # a blob, so a blob's own access date goes stale while the layer is still in use. They are
+      # judged per ref as a set instead: a ref's whole buildkit cache, index and blobs, is
+      # dropped together or not at all, because an index left pointing at a deleted blob breaks
+      # the next image build. A ref that is still building keeps all of it, since docker-release
+      # rewrites master's index on every push; together these were 2.9Gi of the 10Gi, and
+      # reclaiming that from a live ref would have to be a size-aware policy, not an age one.
       - name: "Delete unusable cache entries"
         shell: bash
         env:
@@ -975,19 +1001,41 @@ jobs:
 
           cutoff="$(( $(date -u +%s) - 7 * 24 * 3600 ))"
           live=" ${LIVE_VCPKG_SCOPES} "
+
+          # Newest access date of the buildkit entries of each ref. A blob key carries no
+          # scope, so a ref is the smallest unit that can be dropped without leaving an index
+          # behind; one touched entry keeps the ref's whole buildkit cache alive.
+          declare -A buildkit_newest=()
+          while IFS=$'\t' read -r id ref key accessed; do
+            [[ $key == buildkit-* || $key == index-* ]] || continue
+            stamp="$(date -u -d "$accessed" +%s 2>/dev/null || echo 0)"
+            if [[ $stamp -gt ${buildkit_newest[$ref]:-0} ]]; then
+              buildkit_newest[$ref]=$stamp
+            fi
+          done <"$RUNNER_TEMP/caches.tsv"
+
           deleted=0
           while IFS=$'\t' read -r id ref key accessed; do
             [[ -n $id ]] || continue
-            # Only ever touch the key shapes this workflow creates, so that an entry of
-            # some other workflow can never be deleted by accident
+            # Only ever touch the key shapes our workflows create (the buildkit entries come
+            # from docker-release.yml), so that an entry of some other workflow can never be
+            # deleted by accident
             case "$key" in
-              vcpkg/* | ccache-* | Qt*) ;;
+              vcpkg/* | ccache-* | Qt* | buildkit-* | index-*) ;;
               *) continue ;;
             esac
 
             reason=""
+            age_check=1
             if [[ $ref != refs/heads/master ]]; then
               reason="scoped to $ref"
+            elif [[ $key == buildkit-* || $key == index-* ]]; then
+              # Judged as a whole ref above, never on its own date
+              age_check=0
+              newest="${buildkit_newest[$ref]:-0}"
+              if [[ $newest -ne 0 && $newest -lt $cutoff ]]; then
+                reason="image layers of $ref unused for 7 days"
+              fi
             elif [[ $key == vcpkg/* ]]; then
               # "<scope>/<abi hash>", cut the hash off the end to get the scope
               scope="vcpkg/${key#vcpkg/}"
@@ -996,7 +1044,7 @@ jobs:
                 reason="no matrix leg uses $scope"
               fi
             fi
-            if [[ -z $reason ]]; then
+            if [[ -z $reason && $age_check -eq 1 ]]; then
               stamp="$(date -u -d "$accessed" +%s 2>/dev/null || echo 0)"
               if [[ $stamp -ne 0 && $stamp -lt $cutoff ]]; then
                 reason="unused since $accessed"
