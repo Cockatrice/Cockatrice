@@ -56,6 +56,7 @@ class Command_DeckShareList;
 class Command_DeckShareListMine;
 class Command_DeckShareRemove;
 class Command_DeckShareDownload;
+class Command_DeckHistoryList;
 class Command_DeckSyncCheck;
 class Command_ReplayList;
 class Command_ReplayDownload;
@@ -112,6 +113,7 @@ class Command_ViewLogHistory;
 class Command_WarnUser;
 class QObject;
 class ResponseContainer;
+class Response_DeckHistoryList;
 class Response_DeckSyncStatus;
 
 class AbstractServerSocketInterface : public Server_ProtocolHandler
@@ -167,6 +169,7 @@ private:
     Response::ResponseCode cmdDeckDownload(const Command_DeckDownload &cmd, ResponseContainer &rc);
     bool syncCheckHelper(int userId, qint64 sinceSecs, Response_DeckSyncStatus *status);
     Response::ResponseCode cmdDeckSyncCheck(const Command_DeckSyncCheck &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckHistoryList(const Command_DeckHistoryList &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckDownloadPublic(const Command_DeckDownloadPublic &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckShareCreate(const Command_DeckShareCreate &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckShareList(const Command_DeckShareList &cmd, ResponseContainer &rc);
