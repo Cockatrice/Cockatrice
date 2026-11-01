@@ -99,6 +99,7 @@ class Message;
 TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     : Tab(_tabSupervisor), sayLabel(nullptr), sayEdit(nullptr)
 {
+    setObjectName("TabGame");
     // THIS CTOR IS USED ON REPLAY
     game = new Replay(this, _replay, tabSupervisor->getIsLocalGame(), &SettingsCache::instance().userInterface(),
                       new SettingsCardPreferenceProvider(this));
@@ -116,6 +117,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     addDockWidget(Qt::BottomDockWidgetArea, replayDock);
 
     mainWidget = new QStackedWidget(this);
+    mainWidget->setObjectName("mainWidget");
     mainWidget->addWidget(deckViewContainerWidget);
     mainWidget->addWidget(gamePlayAreaWidget);
     setCentralWidget(mainWidget);
@@ -144,6 +146,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
                  const QMap<int, QString> &_roomGameTypes)
     : Tab(_tabSupervisor), userListProxy(_tabSupervisor->getUserListManager())
 {
+    setObjectName("TabGame");
     // THIS CTOR IS USED ON GAMES
     game = new Game(this, tabSupervisor->getIsLocalGame(), _clients, event, _roomGameTypes,
                     &SettingsCache::instance().userInterface(), new SettingsCardPreferenceProvider(this));
@@ -160,6 +163,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     addDockWidget(Qt::RightDockWidgetArea, messageLayoutDock);
 
     mainWidget = new QStackedWidget(this);
+    mainWidget->setObjectName("mainWidget");
     mainWidget->addWidget(deckViewContainerWidget);
     mainWidget->addWidget(gamePlayAreaWidget);
     mainWidget->setContentsMargins(0, 0, 0, 0);
@@ -515,9 +519,11 @@ void TabGame::refreshShortcuts()
     }
     if (aResetLayout) {
         aResetLayout->setShortcuts(shortcuts.getShortcut("Player/aResetLayout"));
+        aResetLayout->setShortcutContext(Qt::WidgetWithChildrenShortcut);
     }
     if (aFocusChat) {
         aFocusChat->setShortcuts(shortcuts.getShortcut("Player/aFocusChat"));
+        aFocusChat->setShortcutContext(Qt::WidgetWithChildrenShortcut);
     }
 }
 
@@ -1118,6 +1124,7 @@ void TabGame::createMenuItems()
     connect(aFocusChat, &QAction::triggered, sayEdit, qOverload<>(&LineEditCompleter::setFocus));
 
     phasesMenu = new TearOffMenu(this);
+    phasesMenu->setObjectName("phasesMenu");
 
     for (int i = 0; i < phasesToolbar->phaseCount(); ++i) {
         auto *temp = new QAction(QString(), this);
@@ -1128,12 +1135,16 @@ void TabGame::createMenuItems()
 
     phasesMenu->addSeparator();
     phasesMenu->addAction(aNextPhase);
+    aNextPhase->setObjectName("aNextPhase");
     phasesMenu->addAction(aNextPhaseAction);
+    aNextPhaseAction->setObjectName("aNextPhaseAction");
 
     gameMenu = new QMenu(this);
+    gameMenu->setObjectName("gameMenu");
     playersSeparator = gameMenu->addSeparator();
     gameMenu->addMenu(phasesMenu);
     gameMenu->addAction(aNextTurn);
+    aNextTurn->setObjectName("aNextTurn");
     gameMenu->addAction(aReverseTurn);
     gameMenu->addSeparator();
     gameMenu->addAction(aRemoveLocalArrows);

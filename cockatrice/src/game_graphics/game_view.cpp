@@ -48,6 +48,7 @@ protected:
 
 GameView::GameView(GameScene *scene, QWidget *parent) : QGraphicsView(scene, parent), rubberBand(0)
 {
+    setObjectName("gameView");
     setBackgroundBrush(QBrush(QColor(0, 0, 0)));
     setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing);
     setViewportUpdateMode(BoundingRectViewportUpdate);
