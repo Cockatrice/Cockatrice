@@ -36,6 +36,14 @@ public:
         return exactCard;
     }
     [[nodiscard]] QSize sizeHint() const override;
+    /**
+     * @brief Rect of the drawn artwork inside this widget.
+     *
+     * The pixmap is scaled with KeepAspectRatio and centred, and sideways-layout cards may be
+     * rotated, so this is usually smaller than rect(). Callers that overlay the picture (rather
+     * than the widget) must anchor on this. Falls back to rect() until the first paint.
+     */
+    [[nodiscard]] QRect artRect() const;
 
 public slots:
     void setCard(const ExactCard &card);
@@ -49,6 +57,8 @@ signals:
     void cardScaleFactorChanged(int _scale);
     void cardChanged(const ExactCard &card);
     void cardClicked(QMouseEvent *event, const ExactCard &card);
+    /** @brief Emitted when the drawn artwork rect changes (size, scale factor, rotation, card). */
+    void artRectChanged();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -72,6 +82,8 @@ private:
     double scaleFactor = 100;
     QPixmap resizedPixmap;
     bool pixmapDirty;
+    /// Last drawn artwork rect, in widget coordinates; empty until the first paint.
+    QRect artRectCache;
     bool hoverToZoomEnabled;
     bool raiseOnEnter;
 
