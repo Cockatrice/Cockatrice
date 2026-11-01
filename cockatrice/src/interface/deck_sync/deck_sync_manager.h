@@ -170,7 +170,7 @@ private:
     void sendDelete(const QString &relativePath, int deckId);
     void snapshotLocalFile(const QString &relativePath, const QString &guid);
     QString readBaseSnapshot(const QString &guid) const;
-    void classify(const QMap<QString, ServerFile> &serverFiles);
+    void classify(const QMap<int, ServerFile> &serverFiles);
     void queueConflict(const QString &relativePath,
                        const QString &serverPath,
                        int deckId,
@@ -208,7 +208,7 @@ private:
     QList<QString> pendingDeletes;
     QSet<QString> conflictPaths;
     QMap<QString, ConflictDownload> pendingConflicts;
-    QMap<QString, ServerFile> stashedServerFiles;
+    QMap<int, ServerFile> stashedServerFiles;
     ActiveConflict activeConflict;
     DeckSyncMode syncMode = DeckSyncMode::TwoWay;
     int conflictDefault = DeckSyncConflictAsk;
