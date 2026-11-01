@@ -435,20 +435,20 @@ void TabDeckStorage::actUpload()
     const QPointer<TabDeckStorage> alive(this);
     const auto session = remoteSessionRevision;
     for (const auto &filePath : filePaths) {
-        uploadDeck(filePath, targetPath);
-        if (!alive || session != remoteSessionRevision || client->getStatus() != StatusLoggedIn) {
+        const bool continueBatch = uploadDeck(filePath, targetPath);
+        if (!alive || !continueBatch || session != remoteSessionRevision || client->getStatus() != StatusLoggedIn) {
             return;
         }
     }
 }
 
-void TabDeckStorage::uploadDeck(const QString &filePath, const QString &targetPath)
+bool TabDeckStorage::uploadDeck(const QString &filePath, const QString &targetPath)
 {
     const QPointer<TabDeckStorage> alive(this);
     const auto session = remoteSessionRevision;
     if (!isSupportedDeckFile(filePath)) {
         QMessageBox::critical(this, tr("Error"), tr("Invalid deck file"));
-        return;
+        return true;
     }
 
     QFile deckFile(filePath);
@@ -457,7 +457,7 @@ void TabDeckStorage::uploadDeck(const QString &filePath, const QString &targetPa
     std::optional<LoadedDeck> deckOpt = DeckLoader::loadFromFile(filePath, DeckFileFormat::Cockatrice, true);
     if (!deckOpt) {
         QMessageBox::critical(this, tr("Error"), tr("Invalid deck file"));
-        return;
+        return true;
     }
 
     DeckList deck = deckOpt.value().deckList;
@@ -468,7 +468,7 @@ void TabDeckStorage::uploadDeck(const QString &filePath, const QString &targetPa
             getTextWithMax(this, tr("Enter deck name"), tr("This decklist does not have a name.\nPlease enter a name:"),
                            QLineEdit::Normal, deckFileInfo.completeBaseName(), &ok);
         if (!alive || !ok || session != remoteSessionRevision || client->getStatus() != StatusLoggedIn) {
-            return;
+            return false;
         }
         if (deckName.isEmpty()) {
             deckName = tr("Unnamed deck");
@@ -481,7 +481,7 @@ void TabDeckStorage::uploadDeck(const QString &filePath, const QString &targetPa
     QString deckString = deck.writeToString_Native();
     if (deckString.length() > MAX_FILE_LENGTH) {
         QMessageBox::critical(this, tr("Error"), tr("Invalid deck file"));
-        return;
+        return true;
     }
 
     Command_DeckUpload cmd;
@@ -493,6 +493,7 @@ void TabDeckStorage::uploadDeck(const QString &filePath, const QString &targetPa
     PendingCommand *pend = client->prepareSessionCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &TabDeckStorage::uploadFinished);
     client->sendCommand(pend);
+    return true;
 }
 
 void TabDeckStorage::uploadFinished(const Response &r, const CommandContainer &commandContainer)
@@ -803,63 +804,87 @@ void TabDeckStorage::newFolderFinished(const Response &response, const CommandCo
 
 void TabDeckStorage::actDeleteRemoteDeck()
 {
-    QList<QPersistentModelIndex> curRights;
-    for (const auto &index : serverDirView->selectionModel()->selectedRows()) {
-        curRights.append(index);
+    if (client->getStatus() != StatusLoggedIn) {
+        return;
     }
 
-    if (curRights.isEmpty()) {
+    struct DeletionTarget
+    {
+        QPersistentModelIndex index;
+        QString folderPath;
+        int deckId;
+    };
+    QList<DeletionTarget> targets;
+    const auto roots = RemoteDeckDownload::selectionRoots(serverDirView->selectionModel()->selectedRows());
+    for (const auto &index : roots) {
+        const auto *node = serverDirView->getNode(index);
+        if (const auto *folder = dynamic_cast<const RemoteDeckList_TreeModel::DirectoryNode *>(node)) {
+            const QString path = folder->getPath();
+            if (path.isEmpty() || path.length() > MAX_NAME_LENGTH) {
+                continue;
+            }
+            targets.append({index, path, -1});
+        } else if (const auto *file = dynamic_cast<const RemoteDeckList_TreeModel::FileNode *>(node)) {
+            targets.append({index, {}, file->getId()});
+        }
+    }
+    if (targets.isEmpty()) {
         return;
     }
 
     const QPointer<TabDeckStorage> alive(this);
+    const auto session = remoteSessionRevision;
     const auto answer =
         QMessageBox::warning(this, tr("Delete remote decks"), tr("Are you sure you want to delete the selected decks?"),
-                             QMessageBox::Yes | QMessageBox::No);
-    if (!alive || answer != QMessageBox::Yes) {
+                             QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    if (!alive || answer != QMessageBox::Yes || session != remoteSessionRevision ||
+        client->getStatus() != StatusLoggedIn) {
         return;
     }
 
-    for (const auto &curRight : curRights) {
-        if (!curRight.isValid()) {
-            continue;
+    // Confirm that the original items still exist before deleting any of them.
+    // In particular, a refreshed tree must not substitute a new folder or deck
+    // for an item that was selected before the confirmation dialog opened.
+    for (const auto &target : targets) {
+        bool unchanged = false;
+        if (target.index.isValid()) {
+            const auto *node = serverDirView->getNode(target.index);
+            if (!target.folderPath.isEmpty()) {
+                const auto *folder = dynamic_cast<const RemoteDeckList_TreeModel::DirectoryNode *>(node);
+                unchanged = folder && folder->getPath() == target.folderPath;
+            } else {
+                const auto *file = dynamic_cast<const RemoteDeckList_TreeModel::FileNode *>(node);
+                unchanged = file && file->getId() == target.deckId;
+            }
         }
-        deleteRemoteDeck(serverDirView->getNode(curRight));
-        if (!alive) {
+        if (!unchanged) {
+            QMessageBox::information(
+                this, tr("Delete remote decks"),
+                tr("The selected remote items changed. Please select them again before deleting."));
             return;
         }
     }
-}
 
-void TabDeckStorage::deleteRemoteDeck(const RemoteDeckList_TreeModel::Node *curRight)
-{
-    if (!curRight) {
-        return;
-    }
-
-    PendingCommand *pend;
-    if (const auto *dir = dynamic_cast<const RemoteDeckList_TreeModel::DirectoryNode *>(curRight)) {
-        QString targetPath = dir->getPath();
-        if (targetPath.isEmpty()) {
+    // Replies may reset the model synchronously. Once the selection is confirmed,
+    // dispatch only its captured identifiers, stopping if the session changes.
+    for (const auto &target : targets) {
+        if (!alive || session != remoteSessionRevision || client->getStatus() != StatusLoggedIn) {
             return;
         }
-        if (targetPath.length() > MAX_NAME_LENGTH) {
-            qCritical() << "target path to delete is too long" << targetPath;
-            return;
+        PendingCommand *pend;
+        if (!target.folderPath.isEmpty()) {
+            Command_DeckDelDir cmd;
+            cmd.set_path(target.folderPath.toStdString());
+            pend = client->prepareSessionCommand(cmd);
+            connect(pend, &PendingCommand::finished, this, &TabDeckStorage::deleteFolderFinished);
+        } else {
+            Command_DeckDel cmd;
+            cmd.set_deck_id(target.deckId);
+            pend = client->prepareSessionCommand(cmd);
+            connect(pend, &PendingCommand::finished, this, &TabDeckStorage::deleteDeckFinished);
         }
-        Command_DeckDelDir cmd;
-        cmd.set_path(targetPath.toStdString());
-        pend = client->prepareSessionCommand(cmd);
-        connect(pend, &PendingCommand::finished, this, &TabDeckStorage::deleteFolderFinished);
-    } else {
-        const auto *deckNode = dynamic_cast<const RemoteDeckList_TreeModel::FileNode *>(curRight);
-        Command_DeckDel cmd;
-        cmd.set_deck_id(deckNode->getId());
-        pend = client->prepareSessionCommand(cmd);
-        connect(pend, &PendingCommand::finished, this, &TabDeckStorage::deleteDeckFinished);
+        client->sendCommand(pend);
     }
-
-    client->sendCommand(pend);
 }
 
 void TabDeckStorage::deleteDeckFinished(const Response &response, const CommandContainer &commandContainer)

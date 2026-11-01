@@ -67,8 +67,8 @@ private:
 
     void setShareModeEnabled(bool enabled);
 
-    void uploadDeck(const QString &filePath, const QString &targetPath);
-    void deleteRemoteDeck(const RemoteDeckList_TreeModel::Node *node);
+    // False stops the remaining upload batch after cancellation or a session change.
+    bool uploadDeck(const QString &filePath, const QString &targetPath);
 
     struct DeckDownloadTask
     {
