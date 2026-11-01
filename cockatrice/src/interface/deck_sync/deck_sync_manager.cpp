@@ -3,10 +3,12 @@
 #include "../deck_loader/deck_loader.h"
 #include "deck_sync_sidecar.h"
 
+#include <QDebug>
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
 #include <QFileInfo>
+#include <QSaveFile>
 #include <QStringList>
 #include <QUuid>
 #include <libcockatrice/deck_list/deck_file_format.h>
@@ -257,9 +259,14 @@ void DeckSyncManager::onListFinished(const Response &response, const CommandCont
             }
         }
         if (serverId == -1) {
-            if (sidecarRecord.remoteId != -1) {
-                // The server no longer lists this deck: it was deleted elsewhere.
-                // Apply the delete locally, keeping a backup of the file.
+            // The sidecar knows a server row that the listing no longer has: it was
+            // deleted elsewhere. Only mirror that delete when the local file is
+            // still exactly what was synced - an edit made after the remote delete
+            // is newer than the delete and gets uploaded again.
+            const bool knownToServer = sidecarRecord.remoteId != -1 || !sidecarRecord.guid.isEmpty();
+            const bool unchangedSinceSync =
+                !sidecarRecord.baseHash.isEmpty() && it.value().hash == sidecarRecord.baseHash;
+            if (knownToServer && unchangedSinceSync) {
                 const QString absolutePath = deckPath + "/" + it.key();
                 const QString backupPath =
                     absolutePath + BACKUP_SUFFIX + QString::number(QDateTime::currentDateTime().toSecsSinceEpoch());
@@ -678,11 +685,16 @@ void DeckSyncManager::snapshotLocalFile(const QString &relativePath, const QStri
         return;
     }
     QDir().mkpath(deckPath + "/" + SYNC_META_DIR + "/bases");
-    QFile snapshot(deckPath + "/" + SYNC_META_DIR + "/bases/" + guid + ".cod");
-    if (!snapshot.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+    // QSaveFile: a crash or a full disk must not leave a truncated base behind,
+    // because DeckDiff::merge() against a partial base re-adds or drops cards.
+    QSaveFile snapshot(deckPath + "/" + SYNC_META_DIR + "/bases/" + guid + ".cod");
+    if (!snapshot.open(QIODevice::WriteOnly)) {
         return;
     }
     snapshot.write(source.readAll());
+    if (!snapshot.commit()) {
+        qWarning() << "DeckSync: could not write the base snapshot for" << relativePath;
+    }
 }
 
 void DeckSyncManager::failSync(const QString &error)

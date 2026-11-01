@@ -1129,31 +1129,71 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
             return Response::RespNameNotFound;
         }
 
-        QSqlQuery *query =
-            sqlInterface->prepareQuery("insert into {prefix}_decklist_files (id_folder, id_user, name, upload_time, "
-                                       "content, is_public, banner_card_name, banner_card_provider, color_identity, "
-                                       "tags, guid, hash, last_modified) values(:id_folder, :id_user, :name, NOW(), "
-                                       ":content, :is_public, :banner_card_name, :banner_card_provider, "
-                                       ":color_identity, :tags, :guid, :hash, NOW())");
-        query->bindValue(":id_folder", folderId);
-        query->bindValue(":id_user", userInfo->id());
-        query->bindValue(":name", deckName);
-        query->bindValue(":content", deckStr);
-        query->bindValue(":is_public", cmd.has_is_public() && cmd.is_public() ? 1 : 0);
-        query->bindValue(":banner_card_name", bannerCardName);
-        query->bindValue(":banner_card_provider", bannerCardProvider);
-        query->bindValue(":color_identity", colorIdentity);
-        query->bindValue(":tags", tagsJson);
-        query->bindValue(":guid", guid);
-        query->bindValue(":hash", deckHash);
-        if (!sqlInterface->execSqlQuery(query)) {
+        // A deck that was deleted elsewhere leaves a tombstone behind. Revive it
+        // instead of inserting a second row with the same guid, which would split
+        // the deck's version history and leave the tombstone to be purged.
+        int deckId = -1;
+        bool inserted = false;
+        QSqlQuery *tombstoneQuery =
+            sqlInterface->prepareQuery("select id from {prefix}_decklist_files where id_user = :id_user and guid = "
+                                       ":guid and deleted = 1 order by last_modified desc limit 1");
+        tombstoneQuery->bindValue(":id_user", userInfo->id());
+        tombstoneQuery->bindValue(":guid", guid);
+        if (!sqlInterface->execSqlQuery(tombstoneQuery)) {
             return Response::RespContextError;
         }
-        const int deckId = query->lastInsertId().toInt();
+        if (tombstoneQuery->next()) {
+            deckId = tombstoneQuery->value(0).toInt();
+            QSqlQuery *reviveQuery = sqlInterface->prepareQuery(
+                "update {prefix}_decklist_files set id_folder=:id_folder, name=:name, upload_time=NOW(), "
+                "content=:content, is_public=:is_public, banner_card_name=:banner_card_name, "
+                "banner_card_provider=:banner_card_provider, color_identity=:color_identity, tags=:tags, "
+                "hash=:hash, last_modified=NOW(), deleted=0 where id=:id and id_user=:id_user");
+            reviveQuery->bindValue(":id_folder", folderId);
+            reviveQuery->bindValue(":id_user", userInfo->id());
+            reviveQuery->bindValue(":id", deckId);
+            reviveQuery->bindValue(":name", deckName);
+            reviveQuery->bindValue(":content", deckStr);
+            reviveQuery->bindValue(":is_public", cmd.has_is_public() && cmd.is_public() ? 1 : 0);
+            reviveQuery->bindValue(":banner_card_name", bannerCardName);
+            reviveQuery->bindValue(":banner_card_provider", bannerCardProvider);
+            reviveQuery->bindValue(":color_identity", colorIdentity);
+            reviveQuery->bindValue(":tags", tagsJson);
+            reviveQuery->bindValue(":hash", deckHash);
+            if (!sqlInterface->execSqlQuery(reviveQuery)) {
+                return Response::RespContextError;
+            }
+        } else {
+            QSqlQuery *query = sqlInterface->prepareQuery(
+                "insert into {prefix}_decklist_files (id_folder, id_user, name, upload_time, "
+                "content, is_public, banner_card_name, banner_card_provider, color_identity, "
+                "tags, guid, hash, last_modified) values(:id_folder, :id_user, :name, NOW(), "
+                ":content, :is_public, :banner_card_name, :banner_card_provider, "
+                ":color_identity, :tags, :guid, :hash, NOW())");
+            query->bindValue(":id_folder", folderId);
+            query->bindValue(":id_user", userInfo->id());
+            query->bindValue(":name", deckName);
+            query->bindValue(":content", deckStr);
+            query->bindValue(":is_public", cmd.has_is_public() && cmd.is_public() ? 1 : 0);
+            query->bindValue(":banner_card_name", bannerCardName);
+            query->bindValue(":banner_card_provider", bannerCardProvider);
+            query->bindValue(":color_identity", colorIdentity);
+            query->bindValue(":tags", tagsJson);
+            query->bindValue(":guid", guid);
+            query->bindValue(":hash", deckHash);
+            if (!sqlInterface->execSqlQuery(query)) {
+                return Response::RespContextError;
+            }
+            deckId = query->lastInsertId().toInt();
+            inserted = true;
+        }
         if (!storeDeckVersion(deckId, deckStr, deckHash)) {
-            QSqlQuery *cleanupQuery = sqlInterface->prepareQuery("delete from {prefix}_decklist_files where id = :id");
-            cleanupQuery->bindValue(":id", deckId);
-            sqlInterface->execSqlQuery(cleanupQuery);
+            if (inserted) {
+                QSqlQuery *cleanupQuery =
+                    sqlInterface->prepareQuery("delete from {prefix}_decklist_files where id = :id");
+                cleanupQuery->bindValue(":id", deckId);
+                sqlInterface->execSqlQuery(cleanupQuery);
+            }
             return Response::RespContextError;
         }
 
@@ -1163,9 +1203,12 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
         stampQuery->bindValue(":id", deckId);
         stampQuery->bindValue(":id_user", userInfo->id());
         if (!sqlInterface->execSqlQuery(stampQuery) || !stampQuery->next()) {
-            QSqlQuery *cleanupQuery = sqlInterface->prepareQuery("delete from {prefix}_decklist_files where id = :id");
-            cleanupQuery->bindValue(":id", deckId);
-            sqlInterface->execSqlQuery(cleanupQuery);
+            if (inserted) {
+                QSqlQuery *cleanupQuery =
+                    sqlInterface->prepareQuery("delete from {prefix}_decklist_files where id = :id");
+                cleanupQuery->bindValue(":id", deckId);
+                sqlInterface->execSqlQuery(cleanupQuery);
+            }
             return Response::RespContextError;
         }
 
