@@ -150,15 +150,20 @@ public:
     // when present, otherwise a palette-accent-derived fallback.
     QColor appColor(AppColor::Role role) const;
     /** @brief Resolves an application font role: the theme's stored [Fonts]
-     *         value when present, otherwise a per-role fallback (monospace for
-     *         ChatLog, serif basis for CardText and DeckList, the application
-     *         font for the remaining roles). */
+     *         value when present, otherwise the application font. Roles that
+     *         had a historical hardcoded family ask for it through
+     *         cardTextFont() and deckListFont() instead. */
     QFont appFont(AppFont::Role role) const;
     /** @brief Whether the active theme defines this role in fonts.toml. */
     bool hasAppFont(AppFont::Role role) const;
     /** @brief The CardText role with its historical Serif fallback. Used by the
      *         counter painters, which were Serif before the role existed. */
     QFont cardTextFont() const;
+    /** @brief The DeckList role with its historical Serif fallback. Used by the
+     *         two surfaces that hardcoded Serif before the role existed (the
+     *         deck view zone headers and the printed deck list); every other
+     *         DeckList reader falls back to the application font. */
+    QFont deckListFont() const;
     /** @brief Resolves an application font role against the startup font only,
      *         ignoring any previewed config in currentFonts. Editors that show
      *         "what this role resolves to" must use this, because appFont()
