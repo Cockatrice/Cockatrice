@@ -14,7 +14,6 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QFont>
-#include <QFontDatabase>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -275,14 +274,7 @@ TabReport::TabReport(TabSupervisor *_tabSupervisor, AbstractClient *_client) : T
 
 void TabReport::applyChatLogFont()
 {
-    // Family comes from the ChatLog theme role; size stays caller-side as before.
-    QFont monoFont = themeManager->appFont(AppFont::ChatLog);
-    monoFont.setStyleHint(QFont::Monospace);
-    const int systemPointSize = QFontDatabase::systemFont(QFontDatabase::GeneralFont).pointSize();
-    if (systemPointSize > 0) {
-        monoFont.setPointSize(systemPointSize);
-    }
-    chatLogEdit->setFont(monoFont);
+    chatLogEdit->setFont(report_utils::reportLogFont());
 }
 
 void TabReport::retranslateUi()

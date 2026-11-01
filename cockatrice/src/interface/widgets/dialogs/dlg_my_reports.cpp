@@ -8,7 +8,6 @@
 
 #include <QAbstractItemView>
 #include <QFont>
-#include <QFontDatabase>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
@@ -127,14 +126,7 @@ DlgMyReports::DlgMyReports(AbstractClient *_client, QWidget *parent)
 
 void DlgMyReports::applyChatLogFont()
 {
-    // Family comes from the ChatLog theme role; size stays caller-side as before.
-    QFont monoFont = themeManager->appFont(AppFont::ChatLog);
-    monoFont.setStyleHint(QFont::Monospace);
-    const int systemPointSize = QFontDatabase::systemFont(QFontDatabase::GeneralFont).pointSize();
-    if (systemPointSize > 0) {
-        monoFont.setPointSize(systemPointSize);
-    }
-    chatLogEdit->setFont(monoFont);
+    chatLogEdit->setFont(report_utils::reportLogFont());
 }
 
 void DlgMyReports::refreshList()
