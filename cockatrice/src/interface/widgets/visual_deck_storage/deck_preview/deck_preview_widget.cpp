@@ -385,7 +385,9 @@ void DeckPreviewWidget::updateBannerCardComboBox(const QString &currentText)
         const QList<const DecklistCardNode *> cardsInDeck = deckList.getCardNodes();
 
         for (auto currentCard : cardsInDeck) {
-            for (int k = 0; k < currentCard->getNumber(); ++k) {
+            // The selector contains distinct card printings, not individual copies.
+            // Keep UI work bounded by deck entries even when a quantity is very large.
+            if (currentCard->getNumber() > 0) {
                 bannerCardSet.insert(QPair<QString, QString>(currentCard->getName(), currentCard->getCardProviderId()));
             }
         }
