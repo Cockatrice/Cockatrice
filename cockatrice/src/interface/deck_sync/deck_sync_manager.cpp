@@ -7,6 +7,7 @@
 #include <QDirIterator>
 #include <QFile>
 #include <QFileInfo>
+#include <QStringList>
 #include <QUuid>
 #include <libcockatrice/deck_list/deck_file_format.h>
 #include <libcockatrice/deck_list/deck_list.h>
@@ -35,6 +36,35 @@ QString serverPathFor(const QString &relativePath)
         path.chop(4);
     }
     return path;
+}
+
+// Rows are named after the deck, not after the file, so a row name may contain
+// characters a file name cannot ("U/W Control"). Downloads therefore rebuild the
+// local path from the folder plus a sanitised row name, and never from the raw
+// server-supplied path.
+QString sanitizedSegment(const QString &segment)
+{
+    QString safe = segment;
+    safe.replace('/', '-');
+    safe.replace('\\', '-');
+    safe = safe.trimmed();
+    if (safe.isEmpty() || safe == QStringLiteral(".") || safe == QStringLiteral("..")) {
+        return QStringLiteral("deck");
+    }
+    return safe;
+}
+
+QString localPathFor(const QString &dir, const QString &name)
+{
+    // Every segment is server-supplied, so each one is sanitised before it can
+    // become part of a local path.
+    QStringList segments;
+    for (const QString &segment : dir.split('/', Qt::SkipEmptyParts)) {
+        segments << sanitizedSegment(segment);
+    }
+    segments << sanitizedSegment(name);
+    const QString path = segments.join('/');
+    return path.endsWith(".cod", Qt::CaseInsensitive) ? path : path + QStringLiteral(".cod");
 }
 } // namespace
 
@@ -111,7 +141,7 @@ void DeckSyncManager::syncNow()
             continue;
         }
         localFiles.insert(relativePath, LocalFile{.absolutePath = absolutePath,
-                                                  .hash = loaded->deckList.getDeckHash(),
+                                                  .hash = loaded->deckList.getContentHash(),
                                                   .modified = QFileInfo(absolutePath).lastModified()});
     }
 
@@ -123,28 +153,30 @@ void DeckSyncManager::syncNow()
 
 void DeckSyncManager::collectServerFiles(const ServerInfo_DeckStorage_Folder &folder,
                                          const QString &prefix,
-                                         QMap<QString, ServerFile> &files,
+                                         QMap<int, ServerFile> &files,
                                          QSet<QString> &dirs)
 {
     for (const auto &item : folder.items()) {
         const QString name = QString::fromStdString(item.name());
-        if (name.isEmpty() || name == "." || name == ".." || name.contains('/') || name.contains('\\')) {
-            continue;
-        }
+        const QString path = prefix.isEmpty() ? name : prefix + "/" + name;
         if (item.has_folder()) {
-            const QString path = prefix.isEmpty() ? name : prefix + "/" + name;
             dirs.insert(path);
             collectServerFiles(item.folder(), path, files, dirs);
         } else if (item.has_file()) {
-            const QString path = prefix.isEmpty() ? name : prefix + "/" + name;
             const ServerInfo_DeckStorage_File &file = item.file();
+            const int id = static_cast<int>(item.id());
             ServerFile entry{
-                .id = static_cast<int>(item.id()),
+                .id = id,
+                .path = path,
+                .dir = prefix,
+                .name = name,
                 .guid = QString::fromStdString(file.guid()),
                 .hash = QString::fromStdString(file.hash()),
                 .lastModifiedSecs = file.has_last_modified() ? static_cast<qint64>(file.last_modified()) : 0,
             };
-            files.insert(path, entry);
+            // Keyed by id: the server allows several rows with the same name in a
+            // folder, and keying by path silently dropped all but one of them.
+            files.insert(id, entry);
         }
     }
 }
@@ -159,7 +191,7 @@ void DeckSyncManager::onListFinished(const Response &response, const CommandCont
         return;
     }
 
-    QMap<QString, ServerFile> serverFiles;
+    QMap<int, ServerFile> serverFiles;
     QSet<QString> serverDirs;
     const Response_DeckList &list = response.GetExtension(Response_DeckList::ext);
     collectServerFiles(list.root(), QString(), serverFiles, serverDirs);
@@ -169,57 +201,78 @@ void DeckSyncManager::onListFinished(const Response &response, const CommandCont
     DeckSyncSidecar sidecar(sidecarPath);
     sidecar.load();
     const qint64 nowSecs = QDateTime::currentDateTime().toSecsSinceEpoch();
+    // Reuse the sidecar's guid so the server keeps recognizing the row, and mint
+    // one only for a deck that has never been synced.
+    auto guidFor = [&sidecar](const QString &relativePath) {
+        const DeckSyncRecord record = sidecar.get(relativePath);
+        return record.guid.isEmpty() ? QUuid::createUuid().toString(QUuid::WithoutBraces) : record.guid;
+    };
 
-    QMap<int, QString> serverPathById;
-    QMap<QString, QString> serverPathByGuid;
+    QMap<QString, int> serverIdByPath;
+    QMap<QString, int> serverIdByGuid;
     for (auto sit = serverFiles.begin(); sit != serverFiles.end(); ++sit) {
-        serverPathById.insert(sit.value().id, sit.key());
+        serverIdByPath.insert(sit.value().path, sit.key());
         if (!sit.value().guid.isEmpty()) {
-            serverPathByGuid.insert(sit.value().guid, sit.key());
+            serverIdByGuid.insert(sit.value().guid, sit.key());
         }
     }
-    QSet<QString> matchedServerPaths;
+    QSet<int> matchedServerIds;
+
+    // A local file without a usable sidecar record still usually has a server
+    // counterpart: rows are named after the deck, so compare content rather than
+    // file names, and only upload when no unmatched row has the same content.
+    auto unmatchedByHash = [&serverFiles, &matchedServerIds](const QString &hash) {
+        if (hash.isEmpty()) {
+            return -1;
+        }
+        for (auto sit = serverFiles.begin(); sit != serverFiles.end(); ++sit) {
+            if (!matchedServerIds.contains(sit.key()) && sit.value().hash == hash) {
+                return sit.key();
+            }
+        }
+        return -1;
+    };
 
     for (auto it = localFiles.begin(); it != localFiles.end(); ++it) {
         const DeckSyncRecord sidecarRecord = sidecar.get(it.key());
-        QString serverPath;
-        if (sidecarRecord.remoteId != -1 && serverPathById.contains(sidecarRecord.remoteId)) {
-            serverPath = serverPathById.value(sidecarRecord.remoteId);
-        } else if (!sidecarRecord.guid.isEmpty() && serverPathByGuid.contains(sidecarRecord.guid)) {
-            serverPath = serverPathByGuid.value(sidecarRecord.guid);
+        int serverId = -1;
+        if (sidecarRecord.remoteId != -1 && serverFiles.contains(sidecarRecord.remoteId)) {
+            serverId = sidecarRecord.remoteId;
+        } else if (!sidecarRecord.guid.isEmpty() && serverIdByGuid.contains(sidecarRecord.guid)) {
+            serverId = serverIdByGuid.value(sidecarRecord.guid);
         } else {
-            serverPath = serverPathFor(it.key());
-            if (!serverFiles.contains(serverPath)) {
-                UploadOp op;
-                op.relativePath = it.key();
-                op.serverPath = serverPath;
-                op.deckId = -1;
-                op.guid = sidecar.contains(it.key()) && !sidecar.get(it.key()).guid.isEmpty()
-                              ? sidecar.get(it.key()).guid
-                              : QUuid::createUuid().toString(QUuid::WithoutBraces);
-                pendingUploads.append(op);
-                continue;
+            // Content first: a row with the same deck is unambiguous, while a
+            // matching file name may belong to a different deck entirely.
+            serverId = unmatchedByHash(it.value().hash);
+            if (serverId == -1) {
+                const QString wantedPath = serverPathFor(it.key());
+                if (serverIdByPath.contains(wantedPath)) {
+                    const int pathId = serverIdByPath.value(wantedPath);
+                    if (!matchedServerIds.contains(pathId)) {
+                        serverId = pathId;
+                    }
+                }
             }
         }
-        auto serverIt = serverFiles.find(serverPath);
-        if (serverIt == serverFiles.end()) {
-            UploadOp op;
-            op.relativePath = it.key();
-            op.serverPath = serverPath;
-            op.deckId = -1;
-            op.guid = sidecar.contains(it.key()) && !sidecar.get(it.key()).guid.isEmpty()
-                          ? sidecar.get(it.key()).guid
-                          : QUuid::createUuid().toString(QUuid::WithoutBraces);
-            pendingUploads.append(op);
+
+        if (serverId == -1) {
+            const QString serverPath = serverPathFor(it.key());
+            pendingUploads.append(UploadOp{.relativePath = it.key(),
+                                           .serverPath = serverPath,
+                                           .serverDir = parentDir(serverPath),
+                                           .deckId = -1,
+                                           .guid = guidFor(it.key())});
             continue;
         }
-        matchedServerPaths.insert(serverIt.key());
-        if (it.value().hash == serverIt.value().hash) {
+
+        const ServerFile &server = serverFiles.value(serverId);
+        matchedServerIds.insert(serverId);
+        if (it.value().hash == server.hash) {
             DeckSyncRecord record = sidecar.get(it.key());
             if (record.guid.isEmpty()) {
-                record.guid = serverIt.value().guid;
+                record.guid = server.guid;
             }
-            record.remoteId = serverIt.value().id;
+            record.remoteId = server.id;
             record.baseHash = it.value().hash;
             record.lastSyncSecs = nowSecs;
             record.deleted = false;
@@ -230,44 +283,36 @@ void DeckSyncManager::onListFinished(const Response &response, const CommandCont
         const qint64 localSecs = it.value().modified.toSecsSinceEpoch();
         // A server row without last_modified predates sync: the local file wins.
         // Otherwise strictly newer wins; ties go to the server.
-        if (serverIt.value().lastModifiedSecs == 0 || localSecs > serverIt.value().lastModifiedSecs) {
-            UploadOp op;
-            op.relativePath = it.key();
-            op.serverPath = serverPath;
-            op.deckId = serverIt.value().id;
-            op.guid = serverIt.value().guid;
-            pendingUploads.append(op);
+        if (server.lastModifiedSecs == 0 || localSecs > server.lastModifiedSecs) {
+            pendingUploads.append(UploadOp{.relativePath = it.key(),
+                                           .serverPath = server.path,
+                                           .serverDir = server.dir,
+                                           .deckId = server.id,
+                                           .guid = server.guid});
         } else {
-            DownloadOp op;
-            op.relativePath = it.key();
-            op.deckId = serverIt.value().id;
-            op.guid = serverIt.value().guid;
-            op.hash = serverIt.value().hash;
-            op.lastModifiedSecs = serverIt.value().lastModifiedSecs;
-            pendingDownloads.append(op);
+            pendingDownloads.append(DownloadOp{.relativePath = it.key(),
+                                               .deckId = server.id,
+                                               .guid = server.guid,
+                                               .hash = server.hash,
+                                               .lastModifiedSecs = server.lastModifiedSecs});
         }
     }
 
     for (auto it = serverFiles.begin(); it != serverFiles.end(); ++it) {
-        if (matchedServerPaths.contains(it.key())) {
+        if (matchedServerIds.contains(it.key())) {
             continue;
         }
-        const QString wantedPath = it.key().endsWith(".cod", Qt::CaseInsensitive) ? it.key() : it.key() + ".cod";
-        if (localFiles.contains(wantedPath) || QFileInfo(deckPath + "/" + wantedPath).exists()) {
-            continue;
-        }
+        const QString wantedPath = localPathFor(it.value().dir, it.value().name);
         const QString relativePath = uniqueLocalPath(wantedPath);
         if (relativePath.isEmpty()) {
             ++skippedCount;
             continue;
         }
-        DownloadOp op;
-        op.relativePath = relativePath;
-        op.deckId = it.value().id;
-        op.guid = it.value().guid;
-        op.hash = it.value().hash;
-        op.lastModifiedSecs = it.value().lastModifiedSecs;
-        pendingDownloads.append(op);
+        pendingDownloads.append(DownloadOp{.relativePath = relativePath,
+                                           .deckId = it.value().id,
+                                           .guid = it.value().guid,
+                                           .hash = it.value().hash,
+                                           .lastModifiedSecs = it.value().lastModifiedSecs});
     }
 
     sidecar.save();
@@ -297,7 +342,7 @@ void DeckSyncManager::processNext()
 void DeckSyncManager::processNextUpload()
 {
     const UploadOp op = pendingUploads.first();
-    const QString dir = parentDir(op.serverPath);
+    const QString dir = op.serverDir;
     if (!ensuredDirs.contains(dir)) {
         sendMkDirFor(dir);
         return;
@@ -370,7 +415,7 @@ void DeckSyncManager::sendUpload(const UploadOp &op)
 
     Command_DeckUpload cmd;
     if (op.deckId == -1) {
-        cmd.set_path(parentDir(op.serverPath).toStdString());
+        cmd.set_path(op.serverDir.toStdString());
     } else {
         cmd.set_deck_id(op.deckId);
     }
@@ -416,7 +461,7 @@ void DeckSyncManager::onUploadFinished(const Response &response,
         } else {
             record.lastSyncSecs = QDateTime::currentDateTime().toSecsSinceEpoch();
         }
-        record.remoteId = file.id();
+        record.remoteId = static_cast<int>(file.id());
     } else if (localFiles.contains(relativePath)) {
         record.baseHash = localFiles.value(relativePath).hash;
         record.lastSyncSecs = QDateTime::currentDateTime().toSecsSinceEpoch();
@@ -517,7 +562,7 @@ void DeckSyncManager::onDownloadFinished(const Response &response,
     if (!download.hash().empty()) {
         record.baseHash = QString::fromStdString(download.hash());
     } else {
-        record.baseHash = deck.getDeckHash();
+        record.baseHash = deck.getContentHash();
     }
     record.lastSyncSecs = download.has_last_modified() ? static_cast<qint64>(download.last_modified())
                                                        : QDateTime::currentDateTime().toSecsSinceEpoch();

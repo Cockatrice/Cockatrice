@@ -9,6 +9,7 @@
 #include "tree/inner_deck_list_node.h"
 
 #include <QAnyStringView>
+#include <QCryptographicHash>
 #include <QDebug>
 #include <QSet>
 #include <QSharedPointer>
@@ -451,6 +452,16 @@ QString DeckList::getDeckHash() const
 void DeckList::refreshDeckHash()
 {
     cachedDeckHash = QString();
+}
+
+QString DeckList::contentHash(const QString &nativeDeck)
+{
+    return QString::fromLatin1(QCryptographicHash::hash(nativeDeck.toUtf8(), QCryptographicHash::Sha1).toHex());
+}
+
+QString DeckList::getContentHash() const
+{
+    return contentHash(writeToString_Native());
 }
 
 /**
