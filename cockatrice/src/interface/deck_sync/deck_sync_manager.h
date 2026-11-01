@@ -44,7 +44,7 @@ public:
     /** @brief Computes the color identity string uploaded alongside a deck. May be empty. */
     using ColorIdentityProvider = std::function<QString(const DeckList &)>;
 
-    /** @brief Outcome counts for a finished sync run; mirrors syncFinished() parameters. */
+    /** @brief Outcome counts for a finished sync run, carried by syncFinished(). */
     struct SyncSummary
     {
         int uploaded = 0;
@@ -56,10 +56,8 @@ public:
     explicit DeckSyncManager(QObject *parent = nullptr);
     DeckSyncManager(AbstractClient *client, ColorIdentityProvider provider, QObject *parent = nullptr);
 
-    void setClient(AbstractClient *_client);
     void setProfile(const DeckSyncProfile &_profile);
     void setDeckPath(const QString &path);
-    void setColorIdentityProvider(ColorIdentityProvider provider);
     [[nodiscard]] bool isSyncing() const;
 
 public slots:
@@ -68,7 +66,7 @@ public slots:
 signals:
     void syncStarted();
     void statusMessage(const QString &message);
-    void syncFinished(int uploaded, int downloaded, int unchanged, int skipped, const QString &error);
+    void syncFinished(const SyncSummary &summary, const QString &error);
 
 private slots:
     void onListFinished(const Response &response, const CommandContainer &commandContainer);
@@ -111,6 +109,7 @@ private:
 
     void failSync(const QString &error);
     void finishSync();
+    [[nodiscard]] SyncSummary currentSummary() const;
     void collectServerFiles(const ServerInfo_DeckStorage_Folder &folder,
                             const QString &prefix,
                             QMap<QString, ServerFile> &files,
