@@ -287,6 +287,8 @@ set(cockatrice_SOURCES
     src/interface/widgets/utility/custom_line_edit.cpp
     src/interface/widgets/utility/epoch_format.h
     src/interface/widgets/utility/get_text_with_max.cpp
+    src/interface/widgets/utility/pill_painter.cpp
+    src/interface/widgets/utility/pill_painter.h
     src/interface/widgets/utility/report_utils.cpp
     src/interface/widgets/utility/report_utils.h
     src/interface/widgets/utility/table_activation.cpp
