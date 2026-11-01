@@ -96,11 +96,13 @@ private:
     QToolButton *shareButton;
     VisualDeckStorageQuickSettingsWidget *quickSettingsWidget;
     QScrollArea *scrollArea;
-    VisualDeckStorageFolderDisplayWidget *folderWidget = nullptr;
+    QPointer<VisualDeckStorageFolderDisplayWidget> folderWidget;
     VisualDeckStorageModel *storageModel = nullptr;
     VisualDeckStorageSortFilterProxyModel *storageProxyModel = nullptr;
     QTimer *refreshTimer = nullptr; ///< Coalesces the re-apply/refresh burst following a batch of deck loads.
     bool shareSelectable = false;
+    quint64 shareSelectionGeneration = 0; ///< New selection/mode/root changes supersede callbacks already in flight.
+    quint64 folderGeneration = 0; ///< Nested refreshes replace the root being installed.
 };
 
 #endif // VISUAL_DECK_STORAGE_WIDGET_H
