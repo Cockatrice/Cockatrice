@@ -383,6 +383,13 @@ bool AbstractTabDeckEditor::saveDeck(std::function<void()> afterSave)
                 queuedRemoteSave = std::move(request);
             }
         } else {
+            // A failed upload retains the latest explicit save. A plain Save retries
+            // its leave intent only while the revision and destination still match;
+            // a new intent or a changed deck supersedes the retained request.
+            if (queuedRemoteSave && matchesCurrentDeck(*queuedRemoteSave) && !request.afterSave) {
+                request.afterSave = std::move(queuedRemoteSave->afterSave);
+            }
+            queuedRemoteSave.reset();
             startRemoteSave(std::move(request));
         }
         // Enqueueing a command is not a successful save. The matching acknowledgment
@@ -547,10 +554,14 @@ void AbstractTabDeckEditor::finishRemoteSave(quint64 requestId, bool succeeded)
     }
     RemoteSave completed = std::move(*activeRemoteSave);
     activeRemoteSave.reset();
-    auto next = std::move(queuedRemoteSave);
-    queuedRemoteSave.reset();
 
     if (!succeeded) {
+        // Keep the newest requested snapshot and continuation for an explicit retry.
+        // Retain the failed request too when no newer save is queued, so a second
+        // failure cannot discard an intent restored by the first retry.
+        if (!queuedRemoteSave) {
+            queuedRemoteSave = std::move(completed);
+        }
         auto *message = new QMessageBox(QMessageBox::Critical, tr("Error"),
                                        tr("The remote deck could not be saved. Please check your connection and try again."),
                                        QMessageBox::Ok, this);
@@ -559,6 +570,8 @@ void AbstractTabDeckEditor::finishRemoteSave(quint64 requestId, bool succeeded)
         return;
     }
 
+    auto next = std::move(queuedRemoteSave);
+    queuedRemoteSave.reset();
     QPointer<AbstractTabDeckEditor> guard(this);
     const quint64 intent = leaveIntent;
     if (matchesCurrentDeck(completed)) {
