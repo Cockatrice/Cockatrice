@@ -113,7 +113,11 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     refreshTimer->setSingleShot(true);
     refreshTimer->setInterval(150);
     connect(refreshTimer, &QTimer::timeout, this, [this] {
+        const QPointer<VisualDeckStorageWidget> guard(this);
         storageProxyModel->reapplyFilters();
+        if (!guard) {
+            return;
+        }
         // A batch of decks finished loading: re-gather the tag chips from the visible decks once
         // the burst settles instead of on every individual load.
         tagFilterWidget->refreshTags();
@@ -167,7 +171,7 @@ void VisualDeckStorageWidget::refreshIfPossible()
 void VisualDeckStorageWidget::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
-    if (scrollArea->widget() == folderWidget) {
+    if (folderWidget && scrollArea->widget() == folderWidget) {
         scrollArea->widget()->setMaximumWidth(scrollArea->viewport()->width());
         scrollArea->widget()->adjustSize();
     }
@@ -176,7 +180,7 @@ void VisualDeckStorageWidget::showEvent(QShowEvent *event)
 void VisualDeckStorageWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-    if (scrollArea->widget() == folderWidget) {
+    if (folderWidget && scrollArea->widget() == folderWidget) {
         scrollArea->widget()->setMaximumWidth(scrollArea->viewport()->width());
         scrollArea->widget()->adjustSize();
     }
@@ -201,8 +205,16 @@ void VisualDeckStorageWidget::setShareSelectable(bool selectable)
         return;
     }
     shareSelectable = selectable;
-    if (folderWidget != nullptr) {
-        folderWidget->setShareSelectable(selectable);
+    const quint64 generation = ++shareSelectionGeneration;
+    const QPointer<VisualDeckStorageWidget> guard(this);
+    const QPointer<VisualDeckStorageFolderDisplayWidget> root = folderWidget;
+    if (root) {
+        root->setShareSelectable(selectable);
+    }
+    // Disabling sharing clears previews and notifies external observers, which
+    // may delete this view or replace its root during the call above.
+    if (!guard || generation != shareSelectionGeneration || root != folderWidget) {
+        return;
     }
     emit shareSelectionChanged();
 }
@@ -230,12 +242,7 @@ QStringList VisualDeckStorageWidget::selectedFilePaths() const
 
 void VisualDeckStorageWidget::clearShareSelection()
 {
-    if (folderWidget != nullptr) {
-        const auto previews = folderWidget->findChildren<DeckPreviewWidget *>();
-        for (DeckPreviewWidget *preview : previews) {
-            preview->setShareSelected(false);
-        }
-    }
+    setShareSelectedFiles({});
 }
 
 void VisualDeckStorageWidget::setShareAvailable(bool available)
@@ -246,10 +253,27 @@ void VisualDeckStorageWidget::setShareAvailable(bool available)
 
 void VisualDeckStorageWidget::setShareSelectedFiles(const QStringList &paths)
 {
-    if (folderWidget != nullptr) {
-        const auto previews = folderWidget->findChildren<DeckPreviewWidget *>();
-        for (DeckPreviewWidget *preview : previews) {
-            preview->setShareSelected(paths.contains(preview->filePath));
+    const quint64 generation = ++shareSelectionGeneration;
+    const QPointer<VisualDeckStorageWidget> guard(this);
+    const QPointer<VisualDeckStorageFolderDisplayWidget> root = folderWidget;
+    // Copy before the first callback: paths may belong to a caller that is
+    // destroyed by a selection notification. Membership is O(1) per preview.
+    const QSet<QString> selectedPaths(paths.cbegin(), paths.cend());
+    QList<QPointer<DeckPreviewWidget>> previews;
+    if (root) {
+        for (auto *preview : root->findChildren<DeckPreviewWidget *>()) {
+            previews.append(preview);
+        }
+    }
+    for (const auto &preview : previews) {
+        if (preview) {
+            preview->setShareSelected(selectedPaths.contains(preview->filePath));
+        }
+        // All pointers in the snapshot are guarded, including previews a
+        // previous notification deleted. A newer request owns the remaining
+        // selections; this older pass must not overwrite them on return.
+        if (!guard || generation != shareSelectionGeneration || root != folderWidget) {
+            return;
         }
     }
 }
@@ -267,7 +291,11 @@ const VisualDeckStorageQuickSettingsWidget *VisualDeckStorageWidget::settings() 
  */
 void VisualDeckStorageWidget::reapplySortAndFilters()
 {
+    const QPointer<VisualDeckStorageWidget> guard(this);
     storageProxyModel->setSortOrder(sortWidget->currentSortOrder());
+    if (!guard) {
+        return;
+    }
     storageProxyModel->reapplyFilters();
 }
 
@@ -276,10 +304,27 @@ void VisualDeckStorageWidget::reapplySortAndFilters()
  */
 void VisualDeckStorageWidget::createRootFolderWidget()
 {
+    const QPointer<VisualDeckStorageWidget> guard(this);
+    const quint64 generation = ++folderGeneration;
+    ++shareSelectionGeneration;
     storageModel->setDeckPath(SettingsCache::instance().paths().getDeckPath());
+    // Reset notifications can close the view or request a newer root.
+    if (!guard || generation != folderGeneration) {
+        return;
+    }
 
-    folderWidget =
+    const QPointer<VisualDeckStorageFolderDisplayWidget> newRoot =
         new VisualDeckStorageFolderDisplayWidget(this, this, QString(), false, quickSettingsWidget->getShowFolders());
+    if (!guard) {
+        return;
+    }
+    if (generation != folderGeneration) {
+        if (newRoot) {
+            newRoot->deleteLater();
+        }
+        return;
+    }
+    folderWidget = newRoot;
 
     // QScrollArea::setWidget() deletes the widget it currently holds. If that is still the
     // database load indicator, take it back first so the label stays alive for retranslateUi().
@@ -290,8 +335,17 @@ void VisualDeckStorageWidget::createRootFolderWidget()
     }
 
     scrollArea->setWidget(folderWidget); // this automatically destroys the old folderWidget
+    if (!guard || generation != folderGeneration || !folderWidget) {
+        return;
+    }
     scrollArea->widget()->setMaximumWidth(scrollArea->viewport()->width());
+    if (!guard || generation != folderGeneration || !folderWidget) {
+        return;
+    }
     scrollArea->widget()->adjustSize();
+    if (!guard || generation != folderGeneration || !folderWidget) {
+        return;
+    }
 
     // Sort and filter runs against the model data, so it is safe to apply immediately.
     reapplySortAndFilters();
@@ -311,10 +365,14 @@ void VisualDeckStorageWidget::updateSortOrder()
 
 void VisualDeckStorageWidget::updateTagFilter()
 {
+    const QPointer<VisualDeckStorageWidget> guard(this);
     const QStringList selected = tagFilterWidget->selectedTags();
     const QStringList excluded = tagFilterWidget->excludedTags();
     storageProxyModel->setTagFilter(QSet<QString>(selected.cbegin(), selected.cend()),
                                     QSet<QString>(excluded.cbegin(), excluded.cend()));
+    if (!guard) {
+        return;
+    }
     // The visible deck set changed, so the chips are re-gathered from it.
     tagFilterWidget->refreshTags();
 }

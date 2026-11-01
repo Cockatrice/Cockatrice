@@ -10,6 +10,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QObject>
+#include <QPointer>
 #include <QVBoxLayout>
 #include <libcockatrice/deck_list/deck_file_format.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
@@ -70,7 +71,15 @@ bool DialogConvertDeckToCodFormat::promptIfRequired(QWidget *parent,
                                                     const QString &filePath,
                                                     const std::function<bool()> &convert)
 {
-    if (DeckFileFormat::getFormatFromName(filePath) == DeckFileFormat::Cockatrice) {
+    // The caller can be destroyed while a prompt runs its nested event loop.
+    // Keep inputs alive independently, and distinguish a null parent from a deleted one.
+    const QString deckFilePath = filePath;
+    const std::function<bool()> convertDeck = convert;
+    const bool hadParent = parent != nullptr;
+    const QPointer<QWidget> parentGuard(parent);
+    const auto parentWasDeleted = [&] { return hadParent && parentGuard.isNull(); };
+
+    if (DeckFileFormat::getFormatFromName(deckFilePath) == DeckFileFormat::Cockatrice) {
         return true;
     }
 
@@ -80,33 +89,43 @@ bool DialogConvertDeckToCodFormat::promptIfRequired(QWidget *parent,
             return false;
         }
 
-        if (!confirmOverwriteIfExists(parent, filePath)) {
+        if (!confirmOverwriteIfExists(parentGuard.data(), deckFilePath) || parentWasDeleted()) {
             return false;
         }
 
-        return convert();
+        const bool converted = convertDeck();
+        return converted && !parentWasDeleted();
     }
 
-    // Show the dialog to the user
-    DialogConvertDeckToCodFormat conversionDialog(parent);
-    if (conversionDialog.exec() != QDialog::Accepted) {
-        SettingsCache::instance().visualDeckStorage().setVisualDeckStoragePromptForConversion(
-            !conversionDialog.dontAskAgain());
+    // Parent destruction may delete the dialog during exec(), so it must not live on the stack.
+    QPointer<DialogConvertDeckToCodFormat> conversionDialog = new DialogConvertDeckToCodFormat(parentGuard.data());
+    const int result = conversionDialog->exec();
+    if (!conversionDialog) {
+        return false;
+    }
+    const bool rememberChoice = conversionDialog->dontAskAgain();
+    delete conversionDialog.data();
+    if (parentWasDeleted()) {
+        return false;
+    }
+
+    if (result != QDialog::Accepted) {
+        SettingsCache::instance().visualDeckStorage().setVisualDeckStoragePromptForConversion(!rememberChoice);
         SettingsCache::instance().visualDeckStorage().setVisualDeckStorageAlwaysConvert(false);
 
         return false;
     }
 
     // Try to convert file
-    if (!confirmOverwriteIfExists(parent, filePath)) {
+    if (!confirmOverwriteIfExists(parentGuard.data(), deckFilePath) || parentWasDeleted()) {
         return false;
     }
 
-    if (!convert()) {
+    if (!convertDeck() || parentWasDeleted()) {
         return false;
     }
 
-    if (conversionDialog.dontAskAgain()) {
+    if (rememberChoice) {
         SettingsCache::instance().visualDeckStorage().setVisualDeckStoragePromptForConversion(false);
         SettingsCache::instance().visualDeckStorage().setVisualDeckStorageAlwaysConvert(true);
     }

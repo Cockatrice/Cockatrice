@@ -41,8 +41,17 @@ DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_par
 
 void DeckPreviewDeckTagsDisplayWidget::setTags(const QStringList &_tags)
 {
+    if (currentTags == _tags) {
+        return;
+    }
+    invalidatePendingEdits();
     currentTags = _tags;
     refreshTags();
+}
+
+void DeckPreviewDeckTagsDisplayWidget::invalidatePendingEdits()
+{
+    ++editGeneration;
 }
 
 void DeckPreviewDeckTagsDisplayWidget::refreshTags()
@@ -107,28 +116,43 @@ static QStringList findAllKnownTags()
 
 void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
 {
+    const QPointer<DeckPreviewDeckTagsDisplayWidget> self(this);
+    // Copy callbacks before invoking them: a nested event loop can destroy this widget
+    // and its stored callbacks while the callback is still running.
+    const auto prompt = conversionPromptHandler;
     // The deck editor path has no conversion prompt; the VDS path registers one.
-    if (conversionPromptHandler && !conversionPromptHandler()) {
+    if (prompt && !prompt()) {
+        return;
+    }
+    if (!self) {
         return;
     }
 
-    const QStringList knownTags = knownTagsProvider ? knownTagsProvider() : findAllKnownTags();
+    const auto tagsProvider = knownTagsProvider;
+    const QStringList knownTags = tagsProvider ? tagsProvider() : findAllKnownTags();
+    if (!self) {
+        return;
+    }
     execTagDialog(knownTags);
 }
 
 void DeckPreviewDeckTagsDisplayWidget::execTagDialog(const QStringList &knownTags)
 {
     QPointer<DeckPreviewDeckTagsDisplayWidget> self(this);
+    const quint64 generation = editGeneration;
     DeckPreviewTagDialog dialog(knownTags, currentTags);
     if (dialog.exec() == QDialog::Accepted) {
-        // Guard against the widget being destroyed during dialog.exec()'s nested event loop.
-        if (!self) {
+        // A refresh, rename or external tag update can supersede this dialog
+        // while its nested event loop keeps the display widget alive.
+        if (!self || generation != editGeneration) {
             return;
         }
         QStringList updatedTags = dialog.getActiveTags();
         if (updatedTags != currentTags) {
             setTags(updatedTags);
-            emit tagsChanged(updatedTags);
+            if (self) {
+                emit tagsChanged(updatedTags);
+            }
         }
     }
 }

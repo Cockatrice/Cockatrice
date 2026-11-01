@@ -19,11 +19,13 @@
 #include <QMetaType>
 #include <QModelIndex>
 #include <QPersistentModelIndex>
+#include <QPointer>
 #include <QSet>
 #include <QSharedPointer>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QVariant>
+#include <algorithm>
 #include <qnamespace.h>
 
 VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
@@ -69,6 +71,31 @@ VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
     connect(proxy, &QAbstractItemModel::dataChanged, this, &VisualDeckStorageFolderDisplayWidget::scheduleReconcile);
     connect(proxy, &QAbstractItemModel::layoutChanged, this, &VisualDeckStorageFolderDisplayWidget::scheduleReconcile);
 
+    // The preview follows its persistent model row during a rename. Keep the
+    // folder's lookup in sync too, or the next pass replaces that same preview
+    // and loses its share selection, focus and pending interactions.
+    connect(visualDeckStorageWidget->model(), &VisualDeckStorageModel::deckFilePathChanged, this,
+            [this](const QString &oldPath, const QString &newPath) {
+                auto *preview = deckWidgets.take(oldPath);
+                if (!preview) {
+                    return;
+                }
+                // A removed file may have left a preview pending reconciliation
+                // at the destination. The renamed row owns that path now.
+                if (auto *obsolete = deckWidgets.take(newPath); obsolete && obsolete != preview) {
+                    flowWidget->removeWidget(obsolete);
+                    obsolete->hide();
+                    obsolete->deleteLater();
+                }
+                deckWidgets.insert(newPath, preview);
+                for (QString &path : lastOrderedFilePaths) {
+                    if (path == oldPath) {
+                        path = newPath;
+                    }
+                }
+                scheduleReconcile();
+            });
+
     reconcileTimer = new QTimer(this);
     reconcileTimer->setSingleShot(true);
     reconcileTimer->setInterval(150);
@@ -95,6 +122,12 @@ void VisualDeckStorageFolderDisplayWidget::scheduleReconcile()
  */
 void VisualDeckStorageFolderDisplayWidget::reconcile()
 {
+    if (deckPassActive) {
+        // Keep a single queued continuation even if a caller requests an
+        // immediate reconcile while the previous pass is between chunks.
+        deckPassRestartRequested = true;
+        return;
+    }
     beginDeckPass();
 }
 
@@ -105,6 +138,7 @@ void VisualDeckStorageFolderDisplayWidget::beginDeckPass()
     deckPassRow = 0;
     visibleDeckCount = 0;
     deckPassPresentPaths.clear();
+    deckPassOrderedPaths.clear();
 
     continueDeckPass();
 }
@@ -115,8 +149,20 @@ void VisualDeckStorageFolderDisplayWidget::continueDeckPass()
         return;
     }
 
+    // Proxy rows may have moved, disappeared or reset while this continuation
+    // was queued. Restart before using the old cursor against the new model.
+    if (deckPassRestartRequested) {
+        deckPassRestartRequested = false;
+        deckPassRow = 0;
+        visibleDeckCount = 0;
+        deckPassPresentPaths.clear();
+        deckPassOrderedPaths.clear();
+    }
+
     QElapsedTimer passTimer;
     passTimer.start();
+    const QPointer<VisualDeckStorageFolderDisplayWidget> guard(this);
+    bool processedRow = false;
 
     auto *proxy = visualDeckStorageWidget->proxyModel();
     const int proxyRowCount = proxy->rowCount();
@@ -124,6 +170,12 @@ void VisualDeckStorageFolderDisplayWidget::continueDeckPass()
     // Scan rows of this folder, creating missing previews, until the time budget for this
     // event loop turn runs out. The rest continues on the next turn.
     while (deckPassRow < proxyRowCount) {
+        // Skipping another folder's rows still consumes the time budget. Always
+        // process one row so even a slow first lookup makes forward progress.
+        if (processedRow && passTimer.elapsed() >= DECK_PASS_TIME_BUDGET_MS) {
+            break;
+        }
+        processedRow = true;
         const int row = deckPassRow++;
         const QModelIndex index = proxy->index(row, 0);
         if (showFolders && index.data(VisualDeckStorageRoles::FolderPathRole).toString() != folderPath) {
@@ -131,6 +183,7 @@ void VisualDeckStorageFolderDisplayWidget::continueDeckPass()
         }
         const QString filePath = index.data(VisualDeckStorageRoles::FilePathRole).toString();
         deckPassPresentPaths.insert(filePath);
+        deckPassOrderedPaths.append(filePath);
 
         DeckPreviewWidget *deckPreviewWidget = deckWidgets.value(filePath, nullptr);
         if (!deckPreviewWidget) {
@@ -140,26 +193,33 @@ void VisualDeckStorageFolderDisplayWidget::continueDeckPass()
 
         const bool matches = index.data(VisualDeckStorageRoles::FilterMatchRole).toBool();
         deckPreviewWidget->setVisible(matches);
+        if (!guard) {
+            return;
+        }
+        if (deckPassRestartRequested) {
+            break;
+        }
         if (!matches) {
             // A deck that no longer matches the filters is dropped from the selection so its
             // highlight cannot linger on an invisible preview or be counted in the share.
             deckPreviewWidget->setShareSelected(false);
+            // Selection observers can remove this folder or reset/filter the
+            // model synchronously. Do not continue through stale rows.
+            if (!guard) {
+                return;
+            }
+            if (deckPassRestartRequested) {
+                break;
+            }
         }
         if (matches) {
             ++visibleDeckCount;
         }
-
-        if (passTimer.elapsed() >= DECK_PASS_TIME_BUDGET_MS) {
-            break;
-        }
     }
 
-    if (deckPassRestartRequested) {
-        beginDeckPass();
-        return;
-    }
-
-    if (deckPassRow < proxyRowCount) {
+    // A restart yields just like an ordinary continuation. Recursing here can
+    // monopolize the event loop (or exhaust the stack) under repeated changes.
+    if (deckPassRestartRequested || deckPassRow < proxyRowCount) {
         QMetaObject::invokeMethod(this, &VisualDeckStorageFolderDisplayWidget::continueDeckPass, Qt::QueuedConnection);
         return;
     }
@@ -169,8 +229,6 @@ void VisualDeckStorageFolderDisplayWidget::continueDeckPass()
 
 void VisualDeckStorageFolderDisplayWidget::finishDeckPass()
 {
-    auto *proxy = visualDeckStorageWidget->proxyModel();
-
     // Drop previews of decks that no longer exist in the model.
     for (auto it = deckWidgets.begin(); it != deckWidgets.end();) {
         if (!deckPassPresentPaths.contains(it.key())) {
@@ -182,26 +240,15 @@ void VisualDeckStorageFolderDisplayWidget::finishDeckPass()
         }
     }
 
-    // Order the flow layout like the proxy sorts its rows. Filtered-out decks stay part of
-    // the layout, hidden in their sorted place until a filter lets them through again.
-    QStringList orderedFilePaths;
-    orderedFilePaths.reserve(proxy->rowCount());
-    for (int proxyRow = 0; proxyRow < proxy->rowCount(); ++proxyRow) {
-        const QString filePath = proxy->index(proxyRow, 0).data(VisualDeckStorageRoles::FilePathRole).toString();
-        if (deckWidgets.contains(filePath)) {
-            orderedFilePaths.append(filePath);
-        }
-    }
+    // The chunked scan already collected proxy order. Avoid a second, unbounded
+    // traversal of the entire proxy for every folder at the end of each pass.
+    const QStringList &orderedFilePaths = deckPassOrderedPaths;
 
-    // Re-add all widgets so the flow layout order matches the proxy order. Skipped when the
-    // order is unchanged so that data-only updates don't invalidate the flow layout.
+    // Preserve the layout items as well as the previews. Removing/re-adding each
+    // widget asks QLayout to search the shrinking/growing layout repeatedly,
+    // which makes reversing a large folder quadratic.
     if (orderedFilePaths != lastOrderedFilePaths) {
-        for (const QString &filePath : orderedFilePaths) {
-            flowWidget->removeWidget(deckWidgets.value(filePath));
-        }
-        for (const QString &filePath : orderedFilePaths) {
-            flowWidget->addWidget(deckWidgets.value(filePath));
-        }
+        reorderDeckWidgets(orderedFilePaths);
         lastOrderedFilePaths = orderedFilePaths;
     }
 
@@ -213,6 +260,57 @@ void VisualDeckStorageFolderDisplayWidget::finishDeckPass()
     initialPassCompleted = true;
 
     refreshVisibility();
+}
+
+void VisualDeckStorageFolderDisplayWidget::reorderDeckWidgets(const QStringList &orderedFilePaths)
+{
+    if (flowWidget->count() == 0) {
+        return;
+    }
+
+    // FlowWidget places every preview in its container's layout. Validate that
+    // preview-only layout before transferring ownership of any existing items.
+    auto *firstItem = flowWidget->itemAt(0);
+    auto *firstWidget = firstItem ? firstItem->widget() : nullptr;
+    auto *container = firstWidget ? firstWidget->parentWidget() : nullptr;
+    auto *deckLayout = container ? container->layout() : nullptr;
+    QHash<QWidget *, QLayoutItem *> items;
+    bool canTransfer =
+        deckLayout && deckLayout->count() == flowWidget->count() && flowWidget->count() == orderedFilePaths.size();
+    items.reserve(flowWidget->count());
+    for (int i = 0; canTransfer && i < flowWidget->count(); ++i) {
+        auto *item = flowWidget->itemAt(i);
+        auto *widget = item ? item->widget() : nullptr;
+        canTransfer =
+            widget && widget->parentWidget() == container && !items.contains(widget) && deckLayout->itemAt(i) == item;
+        items.insert(widget, item);
+    }
+    QSet<QWidget *> orderedWidgets;
+    for (const QString &filePath : orderedFilePaths) {
+        auto *widget = deckWidgets.value(filePath);
+        canTransfer = canTransfer && widget && items.contains(widget) && !orderedWidgets.contains(widget);
+        orderedWidgets.insert(widget);
+    }
+    if (!canTransfer) {
+        // Keep the ordinary widget path for layouts containing other item kinds.
+        for (const QString &filePath : orderedFilePaths) {
+            flowWidget->removeWidget(deckWidgets.value(filePath));
+        }
+        for (const QString &filePath : orderedFilePaths) {
+            flowWidget->addWidget(deckWidgets.value(filePath));
+        }
+        return;
+    }
+
+    // Keep widgets parented and reuse their items; neither operation searches
+    // the remaining layout or allocates replacement QWidgetItems.
+    while (deckLayout->count() > 0) {
+        deckLayout->takeAt(deckLayout->count() - 1);
+    }
+    for (const QString &filePath : orderedFilePaths) {
+        deckLayout->addItem(items.take(deckWidgets.value(filePath)));
+    }
+    deckLayout->invalidate();
 }
 
 /**
@@ -242,13 +340,32 @@ DeckPreviewWidget *VisualDeckStorageFolderDisplayWidget::createDeckPreviewWidget
 
 void VisualDeckStorageFolderDisplayWidget::setShareSelectable(bool selectable)
 {
-    const auto previews = flowWidget->findChildren<DeckPreviewWidget *>();
-    for (DeckPreviewWidget *preview : previews) {
-        preview->setShareSelectable(selectable);
+    const QPointer<VisualDeckStorageFolderDisplayWidget> guard(this);
+    QList<QPointer<DeckPreviewWidget>> previews;
+    for (auto *preview : flowWidget->findChildren<DeckPreviewWidget *>()) {
+        previews.append(preview);
     }
-    const auto subFolders = findChildren<VisualDeckStorageFolderDisplayWidget *>();
-    for (VisualDeckStorageFolderDisplayWidget *subFolder : subFolders) {
-        subFolder->setShareSelectable(selectable);
+    for (const auto &preview : previews) {
+        if (preview) {
+            preview->setShareSelectable(selectable);
+        }
+        // Disabling sharing clears the selection and notifies external
+        // observers, which may remove this folder or another preview.
+        if (!guard) {
+            return;
+        }
+    }
+    QList<QPointer<VisualDeckStorageFolderDisplayWidget>> subFolders;
+    for (auto *subFolder : subFolderWidgets) {
+        subFolders.append(subFolder);
+    }
+    for (const auto &subFolder : subFolders) {
+        if (subFolder) {
+            subFolder->setShareSelectable(selectable);
+        }
+        if (!guard) {
+            return;
+        }
     }
 }
 
@@ -265,9 +382,10 @@ void VisualDeckStorageFolderDisplayWidget::createSubFolderWidgets()
     }
 
     const QStringList children = childFolderPaths();
+    const QSet<QString> childPaths(children.cbegin(), children.cend());
 
     for (auto it = subFolderWidgets.begin(); it != subFolderWidgets.end();) {
-        if (!children.contains(it.key())) {
+        if (!childPaths.contains(it.key())) {
             containerLayout->removeWidget(it.value());
             it.value()->deleteLater();
             it = subFolderWidgets.erase(it);
@@ -348,10 +466,12 @@ QStringList VisualDeckStorageFolderDisplayWidget::childFolderPaths() const
     QStringList children;
     const QString prefix = folderPath.isEmpty() ? QString() : folderPath + "/";
 
-    for (const QString &candidate : visualDeckStorageWidget->model()->getFolderPaths()) {
-        if (!candidate.startsWith(prefix)) {
-            continue;
-        }
+    // The scan stores folder paths in case-sensitive sorted order. A nested
+    // folder only needs its contiguous prefix range, not every sibling's tree.
+    const QStringList paths = visualDeckStorageWidget->model()->getFolderPaths();
+    auto candidateIt = std::lower_bound(paths.cbegin(), paths.cend(), prefix);
+    for (; candidateIt != paths.cend() && candidateIt->startsWith(prefix); ++candidateIt) {
+        const QString &candidate = *candidateIt;
         const QString rest = candidate.mid(prefix.length());
         if (rest.isEmpty() || rest.contains('/')) {
             continue;

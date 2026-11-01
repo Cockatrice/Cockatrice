@@ -3,14 +3,18 @@
 #include <QDesktopServices>
 #include <QFont>
 #include <QFontDatabase>
+#include <QInputDialog>
 #include <QLayout>
+#include <QLineEdit>
 #include <QMessageBox>
 #include <QObject>
+#include <QPointer>
 #include <QPropertyAnimation>
 #include <QScrollArea>
 #include <QString>
 #include <QUrl>
 #include <QWidget>
+#include <optional>
 
 namespace QtUtils
 {
@@ -187,6 +191,31 @@ static inline QFont boldFont(QFont font)
     return font;
 }
 
+/** Shows an owned message box; parent destruction returns NoButton. */
+static inline QMessageBox::StandardButton
+messageBox(QWidget *parent,
+           QMessageBox::Icon icon,
+           const QString &title,
+           const QString &text,
+           QMessageBox::StandardButtons buttons,
+           QMessageBox::StandardButton defaultButton = QMessageBox::NoButton)
+{
+    // A reload can remove the parent while the nested dialog loop is running.
+    const bool hadParent = parent != nullptr;
+    const QPointer<QWidget> parentGuard(parent);
+    QPointer<QMessageBox> dialog = new QMessageBox(icon, title, text, buttons, parent);
+    if (defaultButton != QMessageBox::NoButton) {
+        dialog->setDefaultButton(defaultButton);
+    }
+    dialog->exec();
+    if (!dialog) {
+        return QMessageBox::NoButton;
+    }
+    const auto result = dialog->standardButton(dialog->clickedButton());
+    delete dialog.data();
+    return hadParent && !parentGuard ? QMessageBox::NoButton : result;
+}
+
 /**
  * @brief Shows a Yes/No confirmation dialog and returns true when the user confirms.
  *
@@ -196,13 +225,40 @@ static inline QFont boldFont(QFont font)
  * @param defaultButton Button focused by default. NoButton lets Qt choose.
  */
 static inline bool confirm(QWidget *parent,
-                           const QString &title,
-                           const QString &text,
-                           QMessageBox::StandardButton defaultButton = QMessageBox::NoButton)
+                    const QString &title,
+                    const QString &text,
+                    QMessageBox::StandardButton defaultButton = QMessageBox::NoButton)
 {
-    return QMessageBox::question(parent, title, text, QMessageBox::Yes | QMessageBox::No, defaultButton) ==
-           QMessageBox::Yes;
+    return messageBox(parent, QMessageBox::Question, title, text,
+                      QMessageBox::Yes | QMessageBox::No, defaultButton) == QMessageBox::Yes;
 }
+
+/** Returns accepted text, including an empty value, or nullopt on cancellation. */
+static inline std::optional<QString> promptText(QWidget *parent,
+                                                const QString &title,
+                                                const QString &label,
+                                                const QString &text)
+{
+    const bool hadParent = parent != nullptr;
+    const QPointer<QWidget> parentGuard(parent);
+    QPointer<QInputDialog> dialog = new QInputDialog(parent);
+    dialog->setWindowTitle(title);
+    dialog->setInputMode(QInputDialog::TextInput);
+    dialog->setLabelText(label);
+    dialog->setTextEchoMode(QLineEdit::Normal);
+    dialog->setTextValue(text);
+    const int result = dialog->exec();
+    if (!dialog) {
+        return std::nullopt;
+    }
+    const QString value = dialog->textValue();
+    delete dialog.data();
+    if (result != QDialog::Accepted || (hadParent && !parentGuard)) {
+        return std::nullopt;
+    }
+    return value;
+}
+
 } // namespace QtUtils
 
 #endif // COCKATRICE_QT_UTILS_H

@@ -67,6 +67,7 @@ private:
     void beginDeckPass();
     void continueDeckPass();
     void finishDeckPass();
+    void reorderDeckWidgets(const QStringList &orderedFilePaths);
     [[nodiscard]] DeckPreviewWidget *createDeckPreviewWidget(const QString &filePath);
     void createSubFolderWidgets();
     void refreshVisibility();
@@ -104,6 +105,7 @@ private:
     bool initialPassCompleted = false;
     int deckPassRow = 0;                ///< Next proxy row to scan in the active pass.
     QSet<QString> deckPassPresentPaths; ///< File paths seen so far in the active pass.
+    QStringList deckPassOrderedPaths;   ///< Proxy order collected within the chunk budget.
 };
 
 #endif // VISUAL_DECK_STORAGE_FOLDER_DISPLAY_WIDGET_H
