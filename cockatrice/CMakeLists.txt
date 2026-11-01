@@ -600,6 +600,75 @@ if(UNIX)
   endif()
 elseif(WIN32)
   install(TARGETS cockatrice RUNTIME DESTINATION ./)
+
+  # Qt knows which runtime libraries and plugins the target actually imports.
+  # Generate the deployment from the target instead of maintaining DLL and
+  # plugin lists by hand; new Qt modules then ship without a CMake edit.
+  # Qt 6.4 spelled the output variable FILENAME_VARIABLE; OUTPUT_SCRIPT only
+  # exists from 6.5, and FindQtRuntime still accepts 6.4.2.
+  if(Qt6_VERSION VERSION_LESS 6.5)
+    qt_generate_deploy_app_script(
+      TARGET cockatrice FILENAME_VARIABLE cockatrice_deploy_script NO_UNSUPPORTED_PLATFORM_ERROR
+    )
+  else()
+    qt_generate_deploy_app_script(
+      TARGET cockatrice OUTPUT_SCRIPT cockatrice_deploy_script NO_UNSUPPORTED_PLATFORM_ERROR
+    )
+  endif()
+  # The generated script assumes CMake's default install layout and deploys into
+  # ${CMAKE_INSTALL_BINDIR}, but this target installs into the prefix root. Point
+  # it at the root; the deploy support file keeps the variable if it is set.
+  install(CODE "set(QT_DEPLOY_BIN_DIR \".\")")
+  install(SCRIPT ${cockatrice_deploy_script})
+
+  # The deploy script deploys Qt and nothing else, and the build directory is
+  # where the vcpkg runtime (protobuf, abseil, OpenSSL, zlib, lzma, FFmpeg) ends
+  # up. Copy those DLLs next to the executable as before.
+  install(
+    DIRECTORY "$<TARGET_FILE_DIR:cockatrice>/"
+    DESTINATION ./
+    FILES_MATCHING
+    PATTERN "*.dll"
+    PATTERN "*.pdb" EXCLUDE
+    PATTERN "*.dir*" EXCLUDE
+    PATTERN "*_autogen*" EXCLUDE
+    PATTERN "*.tlog*" EXCLUDE
+    PATTERN "CMakeFiles*" EXCLUDE
+    PATTERN "x64*" EXCLUDE
+    PATTERN ".qt*" EXCLUDE
+    PATTERN ".qsb*" EXCLUDE
+    PATTERN ".lupdate*" EXCLUDE
+  )
+
+  # The deploy script walks the import table, and QtConcurrent::run and
+  # QFutureWatcher are header-only in Qt 6, so Qt6Concurrent.dll is never an
+  # import and never ships - yet required-runtime.txt lists it. Install the
+  # runtime of every linked module explicitly: an unused DLL costs a few
+  # hundred kilobytes, a missing one stops the client starting after an update.
+  foreach(_qt_module IN LISTS COCKATRICE_QT_MODULES)
+    get_target_property(_qt_module_type ${_qt_module} TYPE)
+    if(_qt_module_type STREQUAL "SHARED_LIBRARY")
+      install(FILES "$<TARGET_FILE:${_qt_module}>" DESTINATION ./)
+    endif()
+  endforeach()
+
+  # Runtime configuration (qtlogging.ini) lives in the build tree; keep copying
+  # it next to the executable. The deploy script handles Qt's own files.
+  install(
+    DIRECTORY "$<TARGET_FILE_DIR:cockatrice>/"
+    DESTINATION ./
+    FILES_MATCHING
+    PATTERN "*.ini"
+    PATTERN "CMakeFiles*" EXCLUDE
+    PATTERN "*.dir*" EXCLUDE
+    PATTERN "*_autogen*" EXCLUDE
+    PATTERN "*.tlog*" EXCLUDE
+    PATTERN "*.pdb" EXCLUDE
+    PATTERN "x64*" EXCLUDE
+    PATTERN ".qt*" EXCLUDE
+    PATTERN ".qsb*" EXCLUDE
+    PATTERN ".lupdate*" EXCLUDE
+  )
 endif()
 
 if(APPLE)
@@ -649,117 +718,6 @@ Data = Resources\")
         set(BU_CHMOD_BUNDLE_ITEMS ON)
         include(BundleUtilities)
         fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/cockatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
-        "
-    COMPONENT Runtime
-  )
-endif()
-
-if(WIN32)
-  # these needs to be relative to CMAKE_INSTALL_PREFIX
-  set(plugin_dest_dir Plugins)
-  set(qtconf_dest_dir .)
-
-  install(
-    DIRECTORY "$<TARGET_FILE_DIR:cockatrice>/"
-    DESTINATION ./
-    FILES_MATCHING
-    PATTERN "*.dll"
-    PATTERN "*.pdb" EXCLUDE
-    PATTERN "*.dir*" EXCLUDE
-    PATTERN "*_autogen*" EXCLUDE
-    PATTERN "*.tlog*" EXCLUDE
-    PATTERN "CMakeFiles*" EXCLUDE
-    PATTERN "x64*" EXCLUDE
-    PATTERN ".qt*" EXCLUDE
-    PATTERN ".qsb*" EXCLUDE
-    PATTERN ".lupdate*" EXCLUDE
-  )
-
-  # fixup_bundle further down copies only the DLLs it can find in Cockatrice.exe's
-  # import table, and the glob above only sees DLLs that were already copied next
-  # to the executable. Qt6::Concurrent is linked but never imported - QtConcurrent::run
-  # and QFutureWatcher are header-only in Qt 6 - so neither step ships
-  # Qt6Concurrent.dll, even though required-runtime.txt lists it and the
-  # Windows package check then fails on a package that is fine to run.
-  # Qt6::ShaderTools is skipped for the same reason.
-  #
-  # Install the runtime of every linked module explicitly. An unused DLL costs a
-  # few hundred kilobytes; a missing one is what stops the client starting after
-  # an update, and it stays invisible until then.
-  foreach(_qt_module IN LISTS COCKATRICE_QT_MODULES)
-    get_target_property(_qt_module_type ${_qt_module} TYPE)
-    if(_qt_module_type STREQUAL "SHARED_LIBRARY")
-      install(FILES "$<TARGET_FILE:${_qt_module}>" DESTINATION ./)
-    endif()
-  endforeach()
-
-  install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/cockatrice/"
-    DESTINATION ./
-    FILES_MATCHING
-    PATTERN "*.ini"
-    PATTERN "CMakeFiles*" EXCLUDE
-    PATTERN "*.dir*" EXCLUDE
-    PATTERN "*_autogen*" EXCLUDE
-    PATTERN "*.tlog*" EXCLUDE
-    PATTERN "*.pdb" EXCLUDE
-    PATTERN "x64*" EXCLUDE
-    PATTERN ".qt*" EXCLUDE
-    PATTERN ".qsb*" EXCLUDE
-    PATTERN ".lupdate*" EXCLUDE
-  )
-
-  # Qt plugins: audio, iconengines, imageformats, multimedia, platforms, printsupport, styles, tls
-  install(
-    DIRECTORY "${QT_PLUGINS_DIR}/"
-    DESTINATION ${plugin_dest_dir}
-    COMPONENT Runtime
-    FILES_MATCHING
-    PATTERN "audio/qtaudio_wasapi.dll"
-    PATTERN "audio/qtaudio_windows.dll"
-    PATTERN "iconengines/qsvgicon.dll"
-    PATTERN "imageformats/*.dll"
-    PATTERN "mediaservice/dsengine.dll"
-    PATTERN "mediaservice/wmfengine.dll"
-    PATTERN "multimedia/*.dll"
-    PATTERN "platforms/qdirect2d.dll"
-    PATTERN "platforms/qminimal.dll"
-    PATTERN "platforms/qoffscreen.dll"
-    PATTERN "platforms/qwindows.dll"
-    PATTERN "printsupport/windowsprintersupport.dll"
-    PATTERN "styles/qcertonlybackend.dll"
-    PATTERN "styles/qopensslbackend.dll"
-    PATTERN "styles/qschannelbackend.dll"
-    PATTERN "styles/qwindowsvistastyle.dll"
-    PATTERN "styles/qwindows11style.dll"
-    PATTERN "styles/qmodernwindowsstyle.dll"
-    PATTERN "styles/qmodernwindowsstyled.dll"
-    PATTERN "tls/qcertonlybackend.dll"
-    PATTERN "tls/qopensslbackend.dll"
-    PATTERN "tls/qschannelbackend.dll"
-  )
-
-  # The Windows install has no Resources directory: the .qm files go to
-  # ${COCKATRICE_WIN32_QM_INSTALL_DIR} and main.cpp looks for them at
-  # applicationDirPath() + "/translations". The macOS bundle above keeps
-  # Resources/translations, which is correct for it.
-  install(
-    CODE "
-        file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
-Plugins = Plugins
-Translations = translations
-Data = Resources\")
-    "
-    COMPONENT Runtime
-  )
-
-  install(
-    CODE "
-        file(GLOB_RECURSE QTPLUGINS
-            \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dll\")
-        set(BU_CHMOD_BUNDLE_ITEMS ON)
-        include(BundleUtilities)
-        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/Cockatrice.exe\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
         "
     COMPONENT Runtime
   )
