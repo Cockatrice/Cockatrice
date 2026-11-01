@@ -111,6 +111,7 @@ jobs:
 
             allow-failure: yes
             package: skip    # We are packaged in Arch already
+            debug_test: yes    # see the note on Fedora 44 below
 
           - distro: Servatrice_Debian
             version: 12
@@ -140,6 +141,11 @@ jobs:
             version: 44
 
             package: RPM
+            # Arch and Fedora 44 are the two newest toolchains, and the -Wno-error= exceptions
+            # in CMakeLists.txt exist for exactly their warnings. They keep compiling Debug:
+            # only the Debug configuration passes -Werror, so these two are the legs where a
+            # new warning in either compiler still fails the build.
+            debug_test: yes
 
           - distro: Ubuntu
             version: 24.04
@@ -182,6 +188,15 @@ jobs:
       CMAKE_GENERATOR: 'Ninja'
       NAME: ${{ matrix.distro }}${{ matrix.version }}
       IMAGE_SUFFIX: ${{ matrix.variant }}
+      # Which build the suite runs in, decided once per leg here so the steps' if: conditions
+      # and their shells cannot drift apart. A step's own env is not visible to its if:, which
+      # is why these live at job level rather than on the release step.
+      #   DEBUG_TEST  the instrumented legs (symbols and instrumentation matter) and the two
+      #               newest distro toolchains, which only fail on a warning in Debug.
+      #   RUN_TESTS   every other leg that tests runs the suite against the release build it may
+      #               also package, so testing and packaging cost one compile instead of two.
+      DEBUG_TEST: ${{ matrix.sanitize == 'yes' || matrix.coverage == 'yes' || matrix.debug_test == 'yes' }}
+      RUN_TESTS: ${{ matrix.test != 'skip' && !(matrix.sanitize == 'yes' || matrix.coverage == 'yes' || matrix.debug_test == 'yes') }}
 
     steps:
       - name: "Checkout"
@@ -198,8 +213,11 @@ jobs:
         shell: bash
         run: source .ci/docker.sh --build
 
+      # The instrumented legs and the two newest distro toolchains build and test Debug; every
+      # other leg runs its suite against the release build below, so testing and packaging cost
+      # one compile instead of two.
       - name: "Build debug and test"
-        if: matrix.test != 'skip'
+        if: env.DEBUG_TEST == 'true'
         shell: bash
         env:
           sanitize: '${{ matrix.sanitize }}'
@@ -239,15 +257,24 @@ jobs:
           path: coverage/
           if-no-files-found: warn
 
-      - name: "Build release package"
+      # One build serves both purposes: the suite runs against the same configuration that
+      # gets packaged, so a packaging leg no longer pays for a full Debug compile it then
+      # throws away. macOS and Windows have always tested their release build.
+      #
+      # Instrumented and debug-test legs reach this step only when they package (the sanitizer
+      # leg currently does, the coverage leg does not); their suite already ran in the debug
+      # step above, so the tests are not repeated here.
+      - name: "Build release, test and package"
         id: build
-        if: matrix.package != 'skip'
+        if: matrix.package != 'skip' || env.RUN_TESTS == 'true'
         shell: bash
         env:
           SUFFIX: '-${{ matrix.distro }}${{ matrix.version }}'
           package: '${{ matrix.package }}'
           server_only: '${{ matrix.server_only }}'
-          WITH_CRASH_REPORTING: 'ON'
+          # Only a leg that packages builds the shipping configuration; a release build that
+          # only runs tests stays free of the crash reporting SDK.
+          WITH_CRASH_REPORTING: ${{ matrix.package != 'skip' && 'ON' || '' }}
           # Tag builds only: artifacts from master pushes and PR branches must not report to
           # Sentry. Forks get no secrets on pull_request, so they keep the mock fallback either way.
           # configure.outputs.tag is set for ANY tag, so beta (Development) tags get the DSN
@@ -257,6 +284,7 @@ jobs:
           source .ci/docker.sh
           args=()
           [[ $server_only == yes ]] && args+=(--no-client)
+          [[ $RUN_TESTS == true ]] && args+=(--test)
           [[ $GITHUB_REF == "refs/heads/master" ]] && args+=(--evict-ccache "$CCACHE_EVICTION_AGE")
           args+=(--ccache "$CCACHE_SIZE")
           args+=(--cmake-generator "$CMAKE_GENERATOR")
@@ -266,7 +294,14 @@ jobs:
           # configures, and empty keeps the mock fallback.
           export RUN_ARGS="${RUN_ARGS:-} -e COCKATRICE_SENTRY_DSN"
 
-          RUN --server --release --package "$package" "${args[@]}"
+          # --package takes an optional type, so the flag and its argument have to travel
+          # together or the type would become the next flag.
+          package_args=()
+          [[ -n $package && $package != skip ]] && package_args+=(--package "$package")
+
+          # compile.sh runs the tests before the package target, so a failing suite stops the
+          # leg before anything is built into an installer.
+          RUN --server --release "${package_args[@]}" "${args[@]}"
 
       - name: "Install sentry-cli"
         if: matrix.package != 'skip' && needs.configure.outputs.tag != null
