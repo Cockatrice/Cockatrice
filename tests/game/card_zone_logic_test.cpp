@@ -3,6 +3,7 @@
 #include <QString>
 #include <libcockatrice/game/board/card_state.h>
 #include <libcockatrice/game/zones/hand_zone_logic.h>
+#include <libcockatrice/game/zones/view_zone_logic.h>
 #include <libcockatrice/utility/card_ref.h>
 
 namespace
@@ -41,20 +42,25 @@ TEST(CardZoneLogicTest, AddsAndTakesCardsWithoutAGraphicsSide)
 TEST(CardZoneLogicTest, AsksTheGraphicsSideToCreateCards)
 {
     HandZoneLogic zone(nullptr, QStringLiteral("library"), false, true, true);
-    QSignalSpy requestSpy(&zone, &CardZoneLogic::createCardRequested);
+    // The graphics side owns the view logic and registers it on the zone it
+    // shows; adding a card then goes through prepareAddCard and the request
+    // signal instead of the test emitting the signal itself.
+    ZoneViewZoneLogic view(nullptr, &zone, 1, true, false, false);
+    zone.getViews().append(&view);
 
-    ServerInfo_Card cardInfo;
-    cardInfo.set_name("Lightning Bolt");
-    cardInfo.set_id(7);
-    cardInfo.set_x(0);
-    cardInfo.set_y(1);
+    QSignalSpy requestSpy(&view, &CardZoneLogic::createCardRequested);
 
-    zone.createCardRequested(cardInfo, true);
+    CardState card(nullptr, nullptr, cardRefFor(QStringLiteral("Lightning Bolt")), 7);
+    zone.addCard(&card, true, 0, 0);
 
     ASSERT_EQ(requestSpy.count(), 1);
     const QList<QVariant> arguments = requestSpy.takeFirst();
-    EXPECT_EQ(arguments.at(0).value<ServerInfo_Card>().id(), 7);
+    const ServerInfo_Card cardInfo = arguments.at(0).value<ServerInfo_Card>();
+    EXPECT_EQ(cardInfo.id(), 7);
+    EXPECT_EQ(cardInfo.name(), "Lightning Bolt");
     EXPECT_TRUE(arguments.at(1).toBool());
+    EXPECT_EQ(card.getZone(), &zone);
+    EXPECT_EQ(zone.getCards().size(), 1);
 }
 
 TEST(CardZoneLogicTest, MoveBetweenZonesUpdatesCardZone)
