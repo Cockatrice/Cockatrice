@@ -2,22 +2,19 @@
 
 #include "../../../../main.h"
 #include "../../../settings/cache_settings.h"
+#include "spoiler_file.h"
 
 #include <QCoreApplication>
-#include <QCryptographicHash>
 #include <QDebug>
-#include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QFutureWatcher>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QSaveFile>
 #include <QSystemTrayIcon>
 #include <QTimer>
 #include <QUrl>
-#include <QXmlStreamReader>
 #include <QtConcurrentRun>
 #include <exception>
 #include <libcockatrice/card/database/card_database.h>
@@ -70,7 +67,8 @@ void SpoilerBackgroundUpdater::begin()
         return;
     }
     if (cancelled || operationId != newestOperation ||
-        (!reloadOnly && (!enabledAtStart || !SettingsCache::instance().downloads().getDownloadSpoilersStatus())) ||
+        (reloadOnly ? SettingsCache::instance().downloads().getDownloadSpoilersStatus()
+                    : (!enabledAtStart || !SettingsCache::instance().downloads().getDownloadSpoilersStatus())) ||
         targetPath != SettingsCache::instance().paths().getSpoilerCardDatabasePath()) {
         finish();
         return;
@@ -97,6 +95,11 @@ void SpoilerBackgroundUpdater::begin()
     if (!isCurrent()) {
         finish();
     } else if (reloadOnly) {
+        if (QFileInfo::exists(targetPath) && !removeSpoilerFile(targetPath)) {
+            finish(tr("The spoiler database could not be removed. Check its file permissions and use Reload Card "
+                      "Database to retry."));
+            return;
+        }
         reloadDatabase(false);
     } else {
         downloadFromURL(SPOILERS_STATUS_URL, false);
@@ -106,13 +109,13 @@ void SpoilerBackgroundUpdater::begin()
 bool SpoilerBackgroundUpdater::isCurrent() const
 {
     return !completed && !cancelled && currentUpdater == this && operationId == newestOperation &&
-           (reloadOnly || SettingsCache::instance().downloads().getDownloadSpoilersStatus()) &&
+           (reloadOnly != SettingsCache::instance().downloads().getDownloadSpoilersStatus()) &&
            targetPath == SettingsCache::instance().paths().getSpoilerCardDatabasePath();
 }
 
 void SpoilerBackgroundUpdater::cancelIfSettingsChanged()
 {
-    if ((!reloadOnly && !SettingsCache::instance().downloads().getDownloadSpoilersStatus()) ||
+    if (reloadOnly == SettingsCache::instance().downloads().getDownloadSpoilersStatus() ||
         targetPath != SettingsCache::instance().paths().getSpoilerCardDatabasePath()) {
         cancel();
     }
@@ -150,8 +153,7 @@ void SpoilerBackgroundUpdater::downloadFromURL(const QUrl &url, bool saveResults
         connect(activeReply, &QNetworkReply::finished, this,
                 &SpoilerBackgroundUpdater::actDownloadFinishedSpoilersFile);
     } else {
-        connect(activeReply, &QNetworkReply::finished, this,
-                &SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled);
+        connect(activeReply, &QNetworkReply::finished, this, &SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled);
     }
 }
 
@@ -204,82 +206,14 @@ void SpoilerBackgroundUpdater::actDownloadFinishedSpoilersFile()
     }
     spoilerData = reply->readAll();
     QString error;
-    const SaveResult result = saveDownloadedFile(spoilerData, error);
-    if (result == SaveResult::Failed) {
+    const auto result = SpoilerFile::save(targetPath, spoilerData, [this] { return isCurrent(); }, error);
+    if (result == SpoilerFile::SaveResult::Failed) {
         finish(isCurrent() ? error : QString());
-    } else if (result == SaveResult::Written || forceReload) {
-        reloadDatabase(result == SaveResult::Written);
+    } else if (result == SpoilerFile::SaveResult::Written || forceReload) {
+        reloadDatabase(result == SpoilerFile::SaveResult::Written);
     } else {
         finish();
     }
-}
-
-QString SpoilerBackgroundUpdater::validateDownloadedFile(const QByteArray &data) const
-{
-    QXmlStreamReader xml(data);
-    if (!xml.readNextStartElement() || xml.name() != QStringLiteral("cockatrice_carddatabase")) {
-        return tr("The download is not a Cockatrice card database. The previous spoiler file was preserved.");
-    }
-    bool versionOk = false;
-    const int version = xml.attributes().value(QStringLiteral("version")).toInt(&versionOk);
-    if (!versionOk || (version != 3 && version != 4)) {
-        return tr("The spoiler database uses an unsupported format. The previous spoiler file was preserved.");
-    }
-    bool hasCards = false;
-    int depth = 1;
-    while (!xml.atEnd()) {
-        const auto token = xml.readNext();
-        if (token == QXmlStreamReader::StartElement) {
-            ++depth;
-            if (depth == 2 && xml.name() == QStringLiteral("cards")) {
-                hasCards = true;
-            }
-        } else if (token == QXmlStreamReader::EndElement) {
-            --depth;
-        }
-    }
-    if (xml.hasError() || !hasCards) {
-        return tr("The spoiler database is incomplete or invalid. The previous spoiler file was preserved.");
-    }
-    return {};
-}
-
-SpoilerBackgroundUpdater::SaveResult SpoilerBackgroundUpdater::saveDownloadedFile(const QByteArray &data,
-                                                                                 QString &error)
-{
-    error = validateDownloadedFile(data);
-    if (!error.isEmpty()) {
-        return SaveResult::Failed;
-    }
-    if (!isCurrent()) {
-        error = tr("The spoiler update was cancelled because its settings changed.");
-        return SaveResult::Failed;
-    }
-    if (getHash(targetPath) == getHash(data)) {
-        return SaveResult::Unchanged;
-    }
-    const QDir directory = QFileInfo(targetPath).dir();
-    if (!directory.exists() && !directory.mkpath(QStringLiteral("."))) {
-        error = tr("Could not create the spoiler database directory: %1").arg(directory.absolutePath());
-        return SaveResult::Failed;
-    }
-    QSaveFile file(targetPath);
-    file.setDirectWriteFallback(false);
-    if (!file.open(QIODevice::WriteOnly) || file.write(data) != data.size() || !file.flush()) {
-        error = tr("Could not save the spoiler database to %1: %2. The previous file was preserved.")
-                    .arg(targetPath, file.errorString());
-        return SaveResult::Failed;
-    }
-    if (!isCurrent()) {
-        file.cancelWriting();
-        return SaveResult::Failed;
-    }
-    if (!file.commit()) {
-        error = tr("Could not replace the spoiler database at %1: %2. The previous file was preserved.")
-                    .arg(targetPath, file.errorString());
-        return SaveResult::Failed;
-    }
-    return SaveResult::Written;
 }
 
 void SpoilerBackgroundUpdater::reloadDatabase(bool updated)
@@ -307,7 +241,10 @@ void SpoilerBackgroundUpdater::reloadDatabase(bool updated)
         if (!isCurrent()) {
             finish();
         } else if (!loaded) {
-            finish(tr("Could not reload card data after updating spoilers. Use Update Spoilers to retry the reload."));
+            finish(reloadOnly
+                       ? tr("Could not reload card data after disabling spoilers. Use Reload Card Database to retry.")
+                       : tr("Could not reload card data after updating spoilers. Use Update Spoilers to retry the "
+                            "reload."));
         } else {
             finish({}, updated);
         }
@@ -356,32 +293,13 @@ void SpoilerBackgroundUpdater::finish(const QString &error, bool updated)
     }
 }
 
-bool SpoilerBackgroundUpdater::deleteSpoilerFile()
+SpoilerBackgroundUpdater *SpoilerBackgroundUpdater::deleteSpoilerFile()
 {
-    const QString path = SettingsCache::instance().paths().getSpoilerCardDatabasePath();
-    if (QFileInfo::exists(path) && !removeSpoilerFile(path)) {
-        return false;
-    }
-    // Explicit disable must clear the in-memory view even when another actor has
-    // already removed the file. Queue behind an older reload through the same
-    // updater lifecycle, so its final snapshot cannot restore disabled spoilers.
+    // Deletion and the following reload share the operation lifetime. Callers can
+    // observe either failure before the queued operation starts, and an explicit
+    // retry still reloads when the file has already been removed.
     auto *updater = new SpoilerBackgroundUpdater(QCoreApplication::instance(), true);
     updater->reloadOnly = true;
     connect(updater, &SpoilerBackgroundUpdater::spoilerCheckerDone, updater, &QObject::deleteLater);
-    return true;
-}
-
-QByteArray SpoilerBackgroundUpdater::getHash(const QString fileName)
-{
-    QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly)) {
-        return {};
-    }
-    QCryptographicHash hash(QCryptographicHash::Sha256);
-    return hash.addData(&file) ? hash.result() : QByteArray();
-}
-
-QByteArray SpoilerBackgroundUpdater::getHash(QByteArray data)
-{
-    return QCryptographicHash::hash(data, QCryptographicHash::Sha256);
+    return updater;
 }

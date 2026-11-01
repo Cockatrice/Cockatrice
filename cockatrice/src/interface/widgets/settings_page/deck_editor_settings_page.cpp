@@ -62,7 +62,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     connect(mpSpoilerPathButton, &QPushButton::clicked, this, &DeckEditorSettingsPage::spoilerPathButtonClicked);
 
     updateNowButton = new QPushButton;
-    updateNowButton->setFixedWidth(150);
+    updateNowButton->setMinimumWidth(150);
     connect(updateNowButton, &QPushButton::clicked, this, &DeckEditorSettingsPage::updateSpoilers);
 
     // Update the GUI depending on if the box is ticked or not
@@ -329,21 +329,28 @@ void DeckEditorSettingsPage::urlListChanged(const QModelIndex &, int, int, const
 
 void DeckEditorSettingsPage::updateSpoilers()
 {
-    // Disable the button so the user can only press it once at a time
-    updateNowButton->setDisabled(true);
-    updateNowButton->setText(tr("Updating..."));
+    if (spoilerUpdater) {
+        return;
+    }
+    // Application ownership lets either operation finish after settings closes.
+    // When disabled, the same button retries file removal and the local reload.
+    auto *sbu = SettingsCache::instance().downloads().getDownloadSpoilersStatus()
+                    ? new SpoilerBackgroundUpdater(QCoreApplication::instance(), true)
+                    : SpoilerBackgroundUpdater::deleteSpoilerFile();
+    observeSpoilerUpdater(sbu);
+}
 
-    // The explicit update also retries a previous reload of an unchanged file.
-    // Application ownership lets it finish if the settings page is closed.
-    auto *sbu = new SpoilerBackgroundUpdater(QCoreApplication::instance(), true);
+void DeckEditorSettingsPage::observeSpoilerUpdater(SpoilerBackgroundUpdater *sbu)
+{
     spoilerUpdater = sbu;
+    unlockSettings();
     connect(sbu, &SpoilerBackgroundUpdater::spoilerCheckerDone, this, [this, sbu] {
         if (spoilerUpdater == sbu) {
             spoilerUpdater.clear();
             unlockSettings();
         }
     });
-    connect(sbu, &SpoilerBackgroundUpdater::spoilerCheckerDone, sbu, &QObject::deleteLater);
+    connect(sbu, &SpoilerBackgroundUpdater::spoilerCheckerDone, sbu, &QObject::deleteLater, Qt::UniqueConnection);
     connect(sbu, &SpoilerBackgroundUpdater::spoilerUpdateFailed, this, [this, sbu](const QString &message) {
         if (spoilerUpdater != sbu) {
             return;
@@ -357,8 +364,11 @@ void DeckEditorSettingsPage::updateSpoilers()
 
 void DeckEditorSettingsPage::unlockSettings()
 {
-    updateNowButton->setEnabled(SettingsCache::instance().downloads().getDownloadSpoilersStatus());
-    updateNowButton->setText(tr("Update Spoilers"));
+    updateNowButton->setEnabled(!spoilerUpdater);
+    updateNowButton->setText(spoilerUpdater ? tr("Updating...")
+                             : SettingsCache::instance().downloads().getDownloadSpoilersStatus()
+                                 ? tr("Update Spoilers")
+                                 : tr("Reload Card Database"));
     lastUpdatedLabel.setText(tr("Last Change") + ": " + getLastUpdateTime());
 }
 
@@ -397,22 +407,13 @@ void DeckEditorSettingsPage::setSpoilersEnabled(bool anInput)
     mpSpoilerSavePathLineEdit->setEnabled(anInput);
     mpSpoilerPathButton->setEnabled(anInput);
     lastUpdatedLabel.setEnabled(anInput);
-    updateNowButton->setEnabled(anInput && !spoilerUpdater);
     infoOnSpoilersLabel.setEnabled(anInput);
 
     if (!anInput && (sender() == &mcDownloadSpoilersCheckBox ||
                      QFileInfo::exists(SettingsCache::instance().paths().getSpoilerCardDatabasePath()))) {
-        if (!SpoilerBackgroundUpdater::deleteSpoilerFile()) {
-            auto *notice = new QMessageBox(QMessageBox::Warning, tr("Spoiler update"),
-                                          tr("The spoiler database could not be removed. Check its file permissions "
-                                             "and try disabling spoilers again."),
-                                          QMessageBox::Ok, this);
-            notice->setTextFormat(Qt::PlainText);
-            notice->setAttribute(Qt::WA_DeleteOnClose);
-            notice->open();
-        }
+        observeSpoilerUpdater(SpoilerBackgroundUpdater::deleteSpoilerFile());
     }
-    lastUpdatedLabel.setText(tr("Last Change") + ": " + getLastUpdateTime());
+    unlockSettings();
 }
 
 void DeckEditorSettingsPage::retranslateUi()
@@ -428,7 +429,7 @@ void DeckEditorSettingsPage::retranslateUi()
     picDownloadCheckBox.setText(tr("Download card pictures on the fly"));
     urlLinkLabel.setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_PIC_URL).arg(tr("How to add a custom URL")));
     resetDownloadURLs.setText(tr("Reset Download URLs"));
-    updateNowButton->setText(tr("Update Spoilers"));
+    unlockSettings();
     aAdd->setText(tr("Add New URL"));
     aEdit->setText(tr("Edit URL"));
     aRemove->setText(tr("Remove URL"));

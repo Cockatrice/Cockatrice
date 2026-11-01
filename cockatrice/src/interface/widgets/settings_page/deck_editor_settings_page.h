@@ -69,6 +69,8 @@ private:
 
     /** @brief Refreshes the displayed label of every URL item after limits or settings change. */
     void refreshUrlItems();
+
+    void observeSpoilerUpdater(SpoilerBackgroundUpdater *updater);
 };
 
 #endif // COCKATRICE_DECK_EDITOR_SETTINGS_PAGE_H
