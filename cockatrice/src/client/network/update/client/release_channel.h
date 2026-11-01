@@ -10,25 +10,31 @@
 #include <QDate>
 #include <QLoggingCategory>
 #include <QObject>
+#include <QPointer>
 #include <QString>
 #include <QVariantList>
+#include <memory>
 #include <optional>
 #include <qtmetamacros.h>
 #include <utility>
 
 inline Q_LOGGING_CATEGORY(ReleaseChannelLog, "release_channel");
 
+class QJsonDocument;
+class QJsonObject;
 class QNetworkReply;
 class QNetworkAccessManager;
 
-class Release
+class Release : public QObject
 {
+    friend class ReleaseChannel;
     friend class StableReleaseChannel;
     friend class BetaReleaseChannel;
 
 public:
-    Release() = default;
-    ~Release() = default;
+    explicit Release(QObject *parent = nullptr) : QObject(parent)
+    {
+    }
 
 private:
     QString name, descriptionUrl, downloadUrl, commitHash;
@@ -47,7 +53,7 @@ protected:
     void setDownloadUrl(QString _downloadUrl)
     {
         downloadUrl = std::move(_downloadUrl);
-        compatibleVersionFound = true;
+        compatibleVersionFound = !downloadUrl.isEmpty();
     }
     void setCommitHash(QString _commitHash)
     {
@@ -94,10 +100,16 @@ public:
 
 protected:
     QNetworkAccessManager *netMan;
-    QNetworkReply *response;
+    QPointer<QNetworkReply> response;
     Release *lastRelease;
+    std::unique_ptr<Release> pendingRelease;
+    bool pendingBeta = false;
 
 protected:
+    bool readResponse(QJsonDocument &document);
+    void resolveRelease(const QJsonObject &release, bool beta);
+    void commitFinished();
+    void invalidReply();
     static std::optional<int> getTargetVersionForCurrentOS(const QString &fileName);
     static QString findBestDownloadUrl(const QVariantList &assets);
     [[nodiscard]] virtual QString getReleaseChannelUrl() const = 0;
@@ -115,7 +127,6 @@ signals:
     void error(QString errorString);
 protected slots:
     virtual void releaseListFinished() = 0;
-    virtual void fileListFinished() = 0;
 };
 
 class StableReleaseChannel : public ReleaseChannel
@@ -134,9 +145,6 @@ protected:
 protected slots:
 
     void releaseListFinished() override;
-    void tagListFinished();
-
-    void fileListFinished() override;
 };
 
 class BetaReleaseChannel : public ReleaseChannel
@@ -155,8 +163,6 @@ protected:
 protected slots:
 
     void releaseListFinished() override;
-
-    void fileListFinished() override;
 };
 
 #endif

@@ -44,6 +44,8 @@ private slots:
 
 private:
     QUrl updateUrl;
+    QString updateReleaseName;
+    bool downloading = false;
     void enableUpdateButton(bool enable);
     void enableOkButton(bool enable);
     void addStopDownloadAndRemoveOthers(bool enable);
