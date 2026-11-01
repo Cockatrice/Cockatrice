@@ -61,8 +61,10 @@ DeckEditorMenu::DeckEditorMenu(AbstractTabDeckEditor *parent) : QMenu(parent), d
     connect(aSaveDeckToClipboardRawNoSetInfo, &QAction::triggered, deckEditor,
             &AbstractTabDeckEditor::actSaveDeckToClipboardRawNoSetInfo);
 
+#ifndef COCKATRICE_DISABLE_PRINTING
     aPrintDeck = new QAction(QString(), this);
     connect(aPrintDeck, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actPrintDeck);
+#endif
 
     aLoadDeckFromWebsite = new QAction(QString(), this);
     connect(aLoadDeckFromWebsite, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actLoadDeckFromWebsite);
@@ -110,7 +112,9 @@ DeckEditorMenu::DeckEditorMenu(AbstractTabDeckEditor *parent) : QMenu(parent), d
     addMenu(editDeckInClipboardMenu);
     addMenu(saveDeckToClipboardMenu);
     addSeparator();
+#ifndef COCKATRICE_DISABLE_PRINTING
     addAction(aPrintDeck);
+#endif
     addAction(aLoadDeckFromWebsite);
     addMenu(analyzeDeckMenu);
     addSeparator();
@@ -135,7 +139,9 @@ void DeckEditorMenu::setSaveStatus(bool newStatus)
     aSaveDeckToClipboardRaw->setEnabled(newStatus);
     aSaveDeckToClipboardRawNoSetInfo->setEnabled(newStatus);
     saveDeckToClipboardMenu->setEnabled(newStatus);
+#ifndef COCKATRICE_DISABLE_PRINTING
     aPrintDeck->setEnabled(newStatus);
+#endif
     analyzeDeckMenu->setEnabled(newStatus);
 }
 
@@ -181,7 +187,9 @@ void DeckEditorMenu::retranslateUi()
     aSaveDeckToClipboardRaw->setText(tr("Not Annotated"));
     aSaveDeckToClipboardRawNoSetInfo->setText(tr("Not Annotated (No set info)"));
 
+#ifndef COCKATRICE_DISABLE_PRINTING
     aPrintDeck->setText(tr("&Print deck..."));
+#endif
 
     aLoadDeckFromWebsite->setText(tr("Load deck from online service..."));
     analyzeDeckMenu->setTitle(tr("&Send deck to online service"));
@@ -203,7 +211,9 @@ void DeckEditorMenu::refreshShortcuts()
     aLoadDeckFromClipboard->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aLoadDeckFromClipboard"));
     aEditDeckInClipboard->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aEditDeckInClipboard"));
     aEditDeckInClipboardRaw->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aEditDeckInClipboardRaw"));
+#ifndef COCKATRICE_DISABLE_PRINTING
     aPrintDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aPrintDeck"));
+#endif
 
     aLoadDeckFromWebsite->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aLoadDeckFromWebsite"));
 

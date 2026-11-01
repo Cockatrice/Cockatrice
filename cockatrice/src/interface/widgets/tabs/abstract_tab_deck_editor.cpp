@@ -46,8 +46,10 @@
 #include <QMainWindow>
 #include <QMenu>
 #include <QMessageBox>
+#ifndef COCKATRICE_DISABLE_PRINTING
 #include <QPrintPreviewDialog>
 #include <QPrinter>
+#endif
 #include <QPushButton>
 #include <QSharedPointer>
 #include <QUrl>
@@ -514,6 +516,7 @@ void AbstractTabDeckEditor::actSaveDeckToClipboardRawNoSetInfo()
     DeckLoader::saveToClipboard(deckStateManager->getDeckList(), false, false);
 }
 
+#ifndef COCKATRICE_DISABLE_PRINTING
 /** @brief Prints the deck using a QPrintPreviewDialog. */
 void AbstractTabDeckEditor::actPrintDeck()
 {
@@ -522,6 +525,7 @@ void AbstractTabDeckEditor::actPrintDeck()
             [this](QPrinter *printer) { DeckLoader::printDeckList(printer, deckStateManager->getDeckList()); });
     dlg->exec();
 }
+#endif
 
 /**
  * @brief Loads a deck from a website.

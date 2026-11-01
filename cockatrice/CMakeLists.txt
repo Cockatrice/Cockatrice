@@ -602,6 +602,25 @@ elseif(WIN32)
   install(TARGETS cockatrice RUNTIME DESTINATION ./)
 endif()
 
+if(WITH_PRINTING AND (APPLE OR WIN32))
+  if(APPLE)
+    set(_COCKATRICE_PRINT_PLUGIN "printsupport/*.dylib")
+    set(_COCKATRICE_PRINT_PLUGIN_DEST "cockatrice.app/Contents/Plugins")
+  else()
+    set(_COCKATRICE_PRINT_PLUGIN "printsupport/windowsprintersupport.dll")
+    set(_COCKATRICE_PRINT_PLUGIN_DEST "Plugins")
+  endif()
+  install(
+    DIRECTORY "${QT_PLUGINS_DIR}/"
+    DESTINATION ${_COCKATRICE_PRINT_PLUGIN_DEST}
+    COMPONENT Runtime
+    FILES_MATCHING
+    PATTERN "*.dSYM" EXCLUDE
+    PATTERN "*_debug.dylib" EXCLUDE
+    PATTERN "${_COCKATRICE_PRINT_PLUGIN}"
+  )
+endif()
+
 if(APPLE)
   # these needs to be relative to CMAKE_INSTALL_PREFIX
   set(plugin_dest_dir cockatrice.app/Contents/Plugins)
@@ -620,7 +639,6 @@ if(APPLE)
     PATTERN "imageformats/*.dylib"
     PATTERN "multimedia/*.dylib"
     PATTERN "platforms/*.dylib"
-    PATTERN "printsupport/*.dylib"
     PATTERN "styles/*.dylib"
     PATTERN "tls/*.dylib"
   )
@@ -726,7 +744,6 @@ if(WIN32)
     PATTERN "platforms/qminimal.dll"
     PATTERN "platforms/qoffscreen.dll"
     PATTERN "platforms/qwindows.dll"
-    PATTERN "printsupport/windowsprintersupport.dll"
     PATTERN "styles/qcertonlybackend.dll"
     PATTERN "styles/qopensslbackend.dll"
     PATTERN "styles/qschannelbackend.dll"

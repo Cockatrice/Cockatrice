@@ -21,7 +21,9 @@
 #include <QMap>
 #include <QMessageLogger>
 #include <QMultiMap>
+#ifndef COCKATRICE_DISABLE_PRINTING
 #include <QPrinter>
+#endif
 #include <QRegularExpression>
 #include <QSaveFile>
 #include <QSet>
@@ -555,6 +557,7 @@ bool DeckLoader::convertToCockatriceFormat(LoadedDeck &deck)
     return true;
 }
 
+#ifndef COCKATRICE_DISABLE_PRINTING
 void DeckLoader::printDeckListNode(QTextCursor *cursor, const InnerDecklistNode *node)
 {
     if (!node || node->isEmpty()) {
@@ -668,3 +671,4 @@ void DeckLoader::printDeckList(QPrinter *printer, const DeckList &deckList)
 
     doc.print(printer);
 }
+#endif

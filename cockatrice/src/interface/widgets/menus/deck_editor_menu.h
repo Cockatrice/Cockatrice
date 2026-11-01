@@ -23,9 +23,11 @@ public:
 
     QAction *aNewDeck, *aLoadDeck, *aClearRecents, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard,
         *aEditDeckInClipboard, *aEditDeckInClipboardRaw, *aSaveDeckToClipboard, *aSaveDeckToClipboardNoSetInfo,
-        *aSaveDeckToClipboardRaw, *aSaveDeckToClipboardRawNoSetInfo, *aPrintDeck, *aLoadDeckFromWebsite,
-        *aExportDeckDecklist, *aExportDeckDecklistXyz, *aAnalyzeDeckDeckstats, *aAnalyzeDeckTappedout, *aShareDeck,
-        *aClose;
+        *aSaveDeckToClipboardRaw, *aSaveDeckToClipboardRawNoSetInfo, *aLoadDeckFromWebsite, *aExportDeckDecklist,
+        *aExportDeckDecklistXyz, *aAnalyzeDeckDeckstats, *aAnalyzeDeckTappedout, *aShareDeck, *aClose;
+#ifndef COCKATRICE_DISABLE_PRINTING
+    QAction *aPrintDeck;
+#endif
     QMenu *loadRecentDeckMenu, *analyzeDeckMenu, *editDeckInClipboardMenu, *saveDeckToClipboardMenu;
 
     void setSaveStatus(bool newStatus);
