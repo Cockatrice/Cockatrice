@@ -683,6 +683,75 @@ TEST_F(SettingsDefaultsTest, CardsDisplay_ArrowDrawAnimation_Default)
     ASSERT_EQ(s.getArrowDrawAnimation(), true);
 }
 
+TEST_F(SettingsDefaultsTest, CardsDisplay_HoverPanelTrigger_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getHoverPanelTrigger(), 0);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_HoverPanelTrigger_SetAndGet)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    s.setHoverPanelTrigger(2);
+    ASSERT_EQ(s.getHoverPanelTrigger(), 2);
+    s.setHoverPanelTrigger(0);
+    ASSERT_EQ(s.getHoverPanelTrigger(), 0);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_HoverZoomTrigger_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getHoverZoomTrigger(), 0);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_HoverZoomTrigger_SetAndGet)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    s.setHoverZoomTrigger(1);
+    ASSERT_EQ(s.getHoverZoomTrigger(), 1);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_HoverPanelDoubleConfirm_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getHoverPanelDoubleConfirm(), false);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_HoverPanelDoubleConfirm_SetAndGet)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    s.setHoverPanelDoubleConfirm(true);
+    ASSERT_EQ(s.getHoverPanelDoubleConfirm(), true);
+    s.setHoverPanelDoubleConfirm(false);
+    ASSERT_EQ(s.getHoverPanelDoubleConfirm(), false);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_HoverZoomDelayMs_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getHoverZoomDelayMs(), 400);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_HoverZoomDelayMs_SetAndGet)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    s.setHoverZoomDelayMs(750);
+    ASSERT_EQ(s.getHoverZoomDelayMs(), 750);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_HoverPanelDelayMs_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getHoverPanelDelayMs(), 200);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_HoverPanelDelayMs_SetAndGet)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    s.setHoverPanelDelayMs(0);
+    ASSERT_EQ(s.getHoverPanelDelayMs(), 0);
+}
+
 TEST_F(SettingsDefaultsTest, CardsDisplay_CardLang_Default)
 {
     CardsDisplaySettings s(settingsPath, nullptr);

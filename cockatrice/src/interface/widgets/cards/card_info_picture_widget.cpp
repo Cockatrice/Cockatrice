@@ -181,6 +181,8 @@ void CardInfoPictureWidget::setScaleFactor(const int scale)
 void CardInfoPictureWidget::updatePixmap()
 {
     pixmapDirty = true;
+    // The artwork rect belongs to the pixmap that is about to be loaded.
+    artRectCache = QRect();
     update();
 }
 
@@ -258,6 +260,24 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
 
     // Draw the pre-scaled pixmap directly
     painter.drawPixmap(targetRect, finalPixmap);
+
+    if (targetRect != artRectCache) {
+        artRectCache = targetRect;
+        // Overlays anchored on the artwork (rather than the widget) re-position on this.
+        emit artRectChanged();
+    }
+}
+
+/**
+ * @brief Rect of the drawn artwork inside this widget.
+ *
+ * Mirrors the target rect paintEvent() computes: the pixmap scaled with KeepAspectRatio and
+ * centred, after the optional sideways-layout rotation. Falls back to rect() until the first
+ * paint, which is the right answer for the usual portrait card.
+ */
+QRect CardInfoPictureWidget::artRect() const
+{
+    return artRectCache.isEmpty() ? rect() : artRectCache;
 }
 
 /**

@@ -23,10 +23,13 @@ class PlayerLogic;
 class CardInfo;
 class QPainter;
 class QPoint;
+class QPropertyAnimation;
 
 class AbstractCardItem : public ArrowTarget, public IAnimatedItem
 {
     Q_OBJECT
+    Q_PROPERTY(qreal cardScale READ getCardScale WRITE setCardScale)
+    Q_PROPERTY(qreal cardOpacity READ getCardOpacity WRITE setCardOpacity)
 protected:
     CardState *state;
     int tapAngle;
@@ -37,6 +40,8 @@ private:
     qreal realZValue;
     bool pendingSelectionCollapse;
     int selectionCollapseGeneration = 0; ///< Guards the deferred collapse timer against stale firings
+    QPropertyAnimation *hoverZoom = nullptr;
+    QPropertyAnimation *opacityAnim = nullptr;
 private slots:
     void pixmapUpdated();
     void onCardInfoChanged();
@@ -57,6 +62,19 @@ signals:
     void playSelectedFaceDown(AbstractCardItem *card);
     void hideSelected(AbstractCardItem *card);
     void selectionChanged(AbstractCardItem *card, bool selected);
+    void tappedChanged(bool tapped);
+    void faceDownChanged(bool faceDown);
+    /** @brief Emitted when the hover shrink-out animation runs to completion while unhovered. */
+    void hoverShrinkFinished(AbstractCardItem *card);
+    /**
+     * @brief Emitted when the hover zoom changes this card's scene footprint.
+     *
+     * Zones (and anything else that dodges the zoomed card) draw from the live footprint at
+     * paint time but are cached: they need this to invalidate, or a stale hole is left behind.
+     * Also emitted once when the hover ends, with both rects equal, because the hole
+     * disappears without the card changing size.
+     */
+    void hoverFootprintChanged(const QRectF &oldFootprint, const QRectF &newFootprint);
 
 public:
     enum
@@ -116,6 +134,13 @@ public:
     }
     void setRealZValue(qreal _zValue);
     void setHovered(bool _hovered);
+    qreal getCardScale() const;
+    void setCardScale(qreal scale);
+    qreal getCardOpacity() const;
+    void setCardOpacity(qreal opacity);
+    /** @brief Fades the card out under the hover panel, or back in when it closes. */
+    void fadeCardOut();
+    void fadeCardIn();
     bool getIsHovered() const
     {
         return isHovered;
