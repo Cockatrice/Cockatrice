@@ -14,6 +14,8 @@
 #include "../../game/player/player_manager.h"
 #include "../../game/zones/card_zone_logic.h"
 #include "../../interface/card_localization.h"
+#include "../../interface/theme_icon.h"
+#include "../../interface/theme_manager.h"
 #include "../../interface/widgets/server/chat_view/chat_view.h"
 #include "../board/card_item.h"
 #include "../board/translate_counter_name.h"
@@ -22,8 +24,12 @@
 #include <QColor>
 #include <QDebug>
 #include <QList>
+#include <QPalette>
+#include <QPixmap>
 #include <QSharedPointer>
 #include <QStringList>
+#include <QTextDocument>
+#include <QUrl>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/protocol/pb/context_mulligan.pb.h>
 #include <libcockatrice/settings/chat_settings.h>
@@ -120,6 +126,7 @@ MessageLogWidget::getFromStr(CardZoneLogic *zone, QString cardName, int position
 void MessageLogWidget::containerProcessingDone()
 {
     currentContext = MessageContext_None;
+    contextJudgeName.clear();
     messageSuffix = messagePrefix = QString();
 }
 
@@ -841,8 +848,27 @@ void MessageLogWidget::logUndoDrawFailed(PlayerLogic *player)
 
 void MessageLogWidget::setContextJudgeName(QString name)
 {
-    messagePrefix = QString("<span style=\"color:black\">");
-    messageSuffix = QString("</span> [<img height=12 src=\"theme:icons/scales\"> %1]").arg(sanitizeHtml(name));
+    contextJudgeName = std::move(name);
+    refreshJudgeSuffix();
+}
+
+void MessageLogWidget::refreshJudgeSuffix()
+{
+    const QPixmap pixmap = loadThemedIcon(QStringLiteral("icons/scales")).pixmap(QSize(24, 24));
+    if (!pixmap.isNull()) {
+        // Rich text cannot resolve `currentColor`; register a palette-rendered
+        // image so already-appended judge tags repaint on a theme switch.
+        document()->addResource(QTextDocument::ImageResource, QUrl(QStringLiteral("cockatrice:scales")), pixmap);
+        document()->markContentsDirty(0, document()->characterCount());
+    }
+
+    if (contextJudgeName.isEmpty()) {
+        return;
+    }
+
+    messagePrefix = QStringLiteral("<span style=\"color:%1\">").arg(palette().color(QPalette::WindowText).name());
+    messageSuffix =
+        QStringLiteral("</span> [<img height=12 src=\"cockatrice:scales\"> %1]").arg(sanitizeHtml(contextJudgeName));
 }
 
 void MessageLogWidget::appendHtmlServerMessage(const QString &html, bool optionalIsBold, QString optionalFontColor)
@@ -891,4 +917,6 @@ void MessageLogWidget::connectToPlayerEventHandler(PlayerEventHandler *playerEve
 MessageLogWidget::MessageLogWidget(TabSupervisor *_tabSupervisor, AbstractGame *_game, QWidget *parent)
     : ChatView(_tabSupervisor, _game, true, parent), currentContext(MessageContext_None)
 {
+    connect(themeManager, &ThemeManager::paletteChanged, this, &MessageLogWidget::refreshJudgeSuffix);
+    connect(themeManager, &ThemeManager::themeChanged, this, &MessageLogWidget::refreshJudgeSuffix);
 }

@@ -38,8 +38,10 @@ private:
 
     MessageContext currentContext;
     QString messagePrefix, messageSuffix;
+    QString contextJudgeName;
 
     static QPair<QString, QString> getFromStr(CardZoneLogic *zone, QString cardName, int position, bool ownerChange);
+    void refreshJudgeSuffix();
 
 public:
     void connectToPlayerEventHandler(PlayerEventHandler *player);
