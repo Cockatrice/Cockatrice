@@ -39,11 +39,12 @@ class ReplayManager : public QObject
     int currentProcessedTime = 0; ///< time that events are currently processed up to. Could differ from visual time due
                                   ///< to rewind buffering
     int currentEvent = 0;         ///< current event's index
+    int pendingRewindEventCount = 0; ///< number of events to restore when the buffered rewind runs
 
-    void skipToTime(int newTime, bool doRewindBuffering, bool includeEventsAtTime = false);
-    void handleBackwardsSkip(bool doRewindBuffering, bool includeEventsAtTime = false);
-    void processRewind(bool includeEventsAtTime = false);
-    void processNewEvents(PlaybackMode playbackMode, bool includeEventsAtTime = false);
+    void skipToTime(int newTime, bool doRewindBuffering, int targetEventCount = -1);
+    void handleBackwardsSkip(bool doRewindBuffering);
+    void processRewind();
+    void processNewEvents(PlaybackMode playbackMode, int targetEventCount = -1);
     void handleSkipEmptySection();
 
 private slots:
