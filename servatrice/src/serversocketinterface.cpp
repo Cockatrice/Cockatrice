@@ -3779,6 +3779,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountPassword(const C
     }
 
     databaseInterface->setForcePasswordChange(userName, false);
+    // The forced change is done, but this session never completed login (see
+    // Server_ProtocolHandler::cmdLogin). It stays restricted to ping and another password
+    // change; the client reconnects with the new password to actually enter the server.
 
     return Response::RespOk;
 }

@@ -125,6 +125,7 @@ RemoteClient::RemoteClient(QObject *parent, INetworkSettingsProvider *_networkSe
             &RemoteClient::doSubmitForgotPasswordResetToServer);
     connect(this, &RemoteClient::sigSubmitForgotPasswordChallengeToServer, this,
             &RemoteClient::doSubmitForgotPasswordChallengeToServer);
+    connect(this, &RemoteClient::sigChangePasswordToServer, this, &RemoteClient::doChangePasswordToServer);
 }
 
 RemoteClient::~RemoteClient()
@@ -354,6 +355,29 @@ void RemoteClient::submitPasswordVerifierResponse(const Response &response)
     }
 }
 
+void RemoteClient::changePasswordToServer(const QString &oldPassword, const QString &newPassword)
+{
+    emit sigChangePasswordToServer(oldPassword, newPassword);
+}
+
+void RemoteClient::doChangePasswordToServer(const QString &oldPassword, const QString &newPassword)
+{
+    const Command_AccountPassword cmd = makeAccountPasswordCommand(oldPassword, newPassword);
+
+    PendingCommand *pend = prepareSessionCommand(cmd);
+    connect(pend, &PendingCommand::finished, this, &RemoteClient::accountPasswordResponse);
+    sendCommand(pend);
+}
+
+void RemoteClient::accountPasswordResponse(const Response &response)
+{
+    if (response.response_code() == Response::RespOk) {
+        emit sigPasswordChangeSuccess();
+    } else {
+        emit sigPasswordChangeError(response.response_code());
+    }
+}
+
 void RemoteClient::processConnectionClosedEvent(const Event_ConnectionClosed & /*event*/)
 {
     doDisconnectFromServer();
@@ -475,6 +499,23 @@ void RemoteClient::loginResponse(const Response &response)
             emit notifyUserAboutUpdate();
         }
 
+    } else if (response.response_code() == Response::RespPasswordChangeRequired) {
+        // The credentials were accepted: the server keeps this session open and serves
+        // nothing but ping and Command_AccountPassword until the password is replaced.
+        // Treating it as a failed login would disconnect before the dialog that collects
+        // the new password (queued to the UI thread behind this slot) can send anything:
+        // the command would sit in pendingCommands forever, because the ping timer that
+        // times it out stops with the connection. Keep the session and let the controller
+        // report the outcome through accountPasswordResponse().
+        QList<QString> missingFeatures;
+        if (resp.missing_features_size() > 0) {
+            for (int i = 0; i < resp.missing_features_size(); ++i) {
+                missingFeatures << QString::fromStdString(resp.missing_features(i));
+            }
+        }
+        setStatus(StatusPasswordChangeRequired);
+        emit loginError(response.response_code(), QString::fromStdString(resp.denied_reason_str()),
+                        static_cast<quint32>(resp.denied_end_time()), missingFeatures);
     } else if (response.response_code() != Response::RespNotConnected) {
         QList<QString> missingFeatures;
         if (resp.missing_features_size() > 0) {

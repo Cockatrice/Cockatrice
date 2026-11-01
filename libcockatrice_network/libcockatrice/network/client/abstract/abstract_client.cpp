@@ -10,6 +10,7 @@
 #include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 #include "libcockatrice/protocol/pb/session_commands.pb.h"
 #include "libcockatrice/protocol/pb/session_event.pb.h"
+#include "libcockatrice/utility/passwordhasher.h"
 
 #include <QDebug>
 #include <QList>
@@ -78,6 +79,26 @@ AbstractClient::AbstractClient(QObject *parent)
 
 AbstractClient::~AbstractClient()
 {
+}
+
+Command_AccountPassword AbstractClient::makeAccountPasswordCommand(const QString &oldPassword,
+                                                                   const QString &newPassword) const
+{
+    Command_AccountPassword cmd;
+    cmd.set_old_password(oldPassword.toStdString());
+    if (getServerSupportsChallengeResponse()) {
+        // A verifier lets the server upgrade the stored credential without ever seeing the
+        // password, and it is what a challenge-response server expects for a new password.
+        cmd.set_hashed_new_password(PasswordHasher::generatePasswordVerifier(newPassword).toStdString());
+    } else if (getServerSupportsPasswordHash()) {
+        // The server hashes the password itself with its own salt; a salted hash is the
+        // strongest form it accepts, so the plaintext never goes on the wire.
+        const QString passwordSalt = PasswordHasher::generateRandomSalt();
+        cmd.set_hashed_new_password(PasswordHasher::computeHash(newPassword, passwordSalt).toStdString());
+    } else {
+        cmd.set_new_password(newPassword.toStdString());
+    }
+    return cmd;
 }
 
 void AbstractClient::processProtocolItem(const ServerMessage &item)

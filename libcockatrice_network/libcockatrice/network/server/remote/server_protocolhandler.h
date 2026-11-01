@@ -46,6 +46,12 @@ protected:
     Server_DatabaseInterface *databaseInterface;
     AuthenticationResult authState;
     bool usingRealPassword;
+    /**
+     * @brief True when the credentials were right but the account must choose a new password
+     *        before it may use the server. Only ping, the password change and disconnecting
+     *        are served while this is set.
+     */
+    bool passwordChangePending;
     bool acceptsUserListChanges;
     bool acceptsRoomListChanges;
     bool idleClientWarningSent;
