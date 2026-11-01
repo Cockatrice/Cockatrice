@@ -1,5 +1,6 @@
 #include "tab_moderation.h"
 
+#include "../utility/epoch_format.h"
 #include "abstract_client.h"
 #include "libcockatrice/protocol/pb/admin_commands.pb.h"
 #include "libcockatrice/protocol/pb/response.pb.h"
@@ -208,10 +209,7 @@ void TabModeration::retranslateUi()
 
 QString TabModeration::formatEpoch(quint64 ts) const
 {
-    if (ts == 0) {
-        return tr("Unknown");
-    }
-    return QDateTime::fromSecsSinceEpoch(ts).toLocalTime().toString("yyyy-MM-dd HH:mm");
+    return formatEpochTimestamp(ts, tr("Unknown"));
 }
 
 void TabModeration::clearUserData()

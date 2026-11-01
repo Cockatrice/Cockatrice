@@ -973,6 +973,7 @@ void TabSupervisor::openTabAlts(const QString &userName)
     }
     tabAlts = new TabAlts(this, client, userName);
     myAddTab(tabAlts);
+    setCurrentWidget(tabAlts);
     connect(tabAlts, &QObject::destroyed, this, [this] { tabAlts = nullptr; });
 }
 
