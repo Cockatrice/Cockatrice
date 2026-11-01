@@ -542,4 +542,13 @@ if(WITH_CLIENT)
     )
   endforeach()
 
+  cockatrice_add_test(
+    NAME
+    replay_timeline_test
+    SOURCES
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/replay/replay_timeline_widget.cpp
+    replay_timeline_test.cpp
+    LIBS
+    replay_test_support
+  )
 endif()

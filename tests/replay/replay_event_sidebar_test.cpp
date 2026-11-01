@@ -17,6 +17,7 @@ class ReplaySidebarTest : public QObject
 private slots:
     void processedPositionAndClick();
     void empty();
+    void pausedBufferedRewind();
 };
 
 void ReplaySidebarTest::processedPositionAndClick()
@@ -107,6 +108,31 @@ void ReplaySidebarTest::empty()
     QVERIFY(label);
     QVERIFY(label->isVisible());
     sidebar.setProcessedEvent(-1);
+}
+
+void ReplaySidebarTest::pausedBufferedRewind()
+{
+    auto *replay = new GameReplay;
+    for (int i = 0; i < 3; ++i) {
+        auto *container = replay->add_event_list();
+        container->set_seconds_elapsed(i == 0 ? 0 : 1);
+        auto *event = container->add_event_list();
+        event->set_player_id(0);
+        event->MutableExtension(Event_GameSay::ext)->set_message("Replay position");
+    }
+    ReplayManager manager(nullptr, replay);
+    ReplayEventSidebar sidebar(nullptr, replay, manager.getReplayTimeline());
+    QObject::connect(&manager, &ReplayManager::processedEventChanged, &sidebar, &ReplayEventSidebar::setProcessedEvent);
+    auto *list = sidebar.findChild<QListWidget *>("replayEventList");
+    QVERIFY(list);
+    manager.setTimeToEvent(2);
+    QCOMPARE(list->currentRow(), 2);
+    manager.skipByAmount(-ReplayManager::SMALL_SKIP_MS);
+    QCOMPARE(list->currentRow(), 2);
+    QTest::qWait(SettingsCache::instance().userInterface().getRewindBufferingMs() + 50);
+    QCOMPARE(list->currentRow(), 0);
+    QCOMPARE(list->selectedItems().size(), 1);
+    QCOMPARE(list->selectedItems().first(), list->item(0));
 }
 
 QTEST_MAIN(ReplaySidebarTest)

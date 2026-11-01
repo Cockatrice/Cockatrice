@@ -70,9 +70,13 @@ int ReplayManager::eventsBefore(int time) const
 void ReplayManager::skipToTime(int newTime, bool doRewindBuffering)
 {
     newTime = std::clamp(newTime, 0, maxTime);
-    newTime -= newTime % TIMER_INTERVAL_MS;
+    // Reaching the end applies the final event, even between playback ticks.
+    const bool atEnd = newTime == maxTime;
+    if (!atEnd) {
+        newTime -= newTime % TIMER_INTERVAL_MS;
+    }
     currentVisualTime = newTime;
-    const int targetEvent = eventsBefore(newTime);
+    const int targetEvent = atEnd ? replayTimeline.size() : eventsBefore(newTime);
 
     if (targetEvent < currentEvent) {
         if (doRewindBuffering) {
