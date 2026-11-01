@@ -152,6 +152,11 @@ public:
     /** @brief Resolves an application font role: the theme's stored [Fonts]
      *         value when present, otherwise the application font. */
     QFont appFont(AppFont::Role role) const;
+    /** @brief Resolves an application font role against the startup font only,
+     *         ignoring any previewed config in currentFonts. Editors that show
+     *         "what this role resolves to" must use this, because appFont()
+     *         reflects a live preview while the editor is open. */
+    QFont defaultAppFont(AppFont::Role role) const;
 
     QBrush &getBgBrush(Role zone);
     QBrush getExtraBgBrush(Role zone, int zoneId = 0);
