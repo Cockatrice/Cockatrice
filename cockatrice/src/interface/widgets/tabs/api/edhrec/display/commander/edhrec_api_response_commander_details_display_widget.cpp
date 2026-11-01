@@ -96,15 +96,16 @@ void EdhrecCommanderResponseCommanderDetailsDisplayWidget::retranslateUi()
 
 void EdhrecCommanderResponseCommanderDetailsDisplayWidget::applyCardTextFont()
 {
-    // Family comes from the CardText theme role; the point sizes and the
-    // bold weight previously carried by the stylesheets stay caller-side.
+    // Family comes from the CardText theme role; the sizes and the bold
+    // weight previously carried by the stylesheets stay caller-side. Pixel
+    // sizes, not point sizes: the stylesheets said 28px and 16px.
     QFont nameFont = themeManager->appFont(AppFont::CardText);
-    nameFont.setPointSize(28);
+    nameFont.setPixelSize(28);
     nameFont.setWeight(QFont::Bold);
     commanderName->setFont(nameFont);
 
     QFont detailsFont = themeManager->appFont(AppFont::CardText);
-    detailsFont.setPointSize(16);
+    detailsFont.setPixelSize(16);
     label->setFont(detailsFont);
     salt->setFont(detailsFont);
 }

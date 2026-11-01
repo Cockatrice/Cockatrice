@@ -42,7 +42,7 @@ void GeneralCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /
     painter->drawPixmap(QPoint(0, 0), pixmap);
 
     if (value) {
-        QFont f = themeManager->appFont(AppFont::CardText);
+        QFont f = themeManager->cardTextFont();
         f.setPixelSize(qMax((int)(radius * scaleFactor), 10));
         f.setWeight(QFont::Bold);
         painter->setPen(Qt::black);

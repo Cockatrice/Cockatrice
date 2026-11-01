@@ -101,9 +101,10 @@ void EdhrecApiResponseCardDetailsDisplayWidget::actRequestPageNavigation()
 void EdhrecApiResponseCardDetailsDisplayWidget::applyCardTextFont()
 {
     // Family comes from the CardText theme role; the 20px size and bold
-    // weight previously carried by the stylesheet stay caller-side.
+    // weight previously carried by the stylesheet stay caller-side. Pixel
+    // size, not point size: the stylesheet said 20px, and 20pt is ~27px.
     QFont cardFont = themeManager->appFont(AppFont::CardText);
-    cardFont.setPointSize(20);
+    cardFont.setPixelSize(20);
     cardFont.setWeight(QFont::Bold);
     nameLabel->setFont(cardFont);
 }

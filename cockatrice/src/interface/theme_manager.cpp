@@ -666,18 +666,25 @@ QFont ThemeManager::appFont(AppFont::Role role) const
         // (report_utils::reportLogFont) instead of through this fallback.
         return qApp->font();
     }
-    if (role == AppFont::CardText) {
-        return QFont(QStringLiteral("Serif"));
-    }
-
-    // No per-role scaling: every other unset role resolves to the application
-    // font, so with no fonts.toml present the result is identical to before.
+    // No per-role scaling: an unset role resolves to the application font, so
+    // with no fonts.toml present the result is identical to before. The counter
+    // painters that used to hardcode Serif ask for it through cardTextFont().
     return qApp->font();
 }
 
 bool ThemeManager::hasAppFont(AppFont::Role role) const
 {
     return currentFonts.fonts.contains(role);
+}
+
+QFont ThemeManager::cardTextFont() const
+{
+    if (hasAppFont(AppFont::CardText)) {
+        return appFont(AppFont::CardText);
+    }
+    QFont serifFont(QStringLiteral("Serif"));
+    serifFont.setStyleHint(QFont::Serif);
+    return serifFont;
 }
 
 QFont ThemeManager::defaultAppFont(AppFont::Role /*role*/) const
