@@ -32,8 +32,13 @@ RemotePublicDecksModel::RemotePublicDecksModel(AbstractClient *_client, QObject 
     connect(loadingTimeoutTimer, &QTimer::timeout, this, &RemotePublicDecksModel::onLoadingTimeout);
     connect(client, &AbstractClient::statusChanged, this, [this](ClientStatus status) {
         if (status == StatusDisconnected) {
+            const bool wasLoading = loading;
+            ++requestSequence;
             loadingTimeoutTimer->stop();
             setLoading(false);
+            if (wasLoading) {
+                emit loadFailed(tr("The connection was lost while loading public decks. Try again."));
+            }
         }
     });
 }
@@ -134,13 +139,9 @@ void RemotePublicDecksModel::rebuildVisibleIndices()
 
 void RemotePublicDecksModel::refresh(const QString &userName)
 {
-    if (loading) {
-        return;
-    }
-    // Every refresh captures its own request id so a reply that lands after its
-    // loading timeout (the reverse of the ping sweep dropping the command) is
-    // recognised as stale: it must not stop the newer request's timer or paint
-    // the grid with out-of-date data.
+    // A new refresh supersedes any request still in flight. Its sequence owns
+    // the timer and result; older commands may finish later but cannot replace
+    // the current snapshot or change its loading state.
     const int seq = ++requestSequence;
     setLoading(true);
     loadingTimeoutTimer->start();
@@ -159,12 +160,19 @@ void RemotePublicDecksModel::refresh(const QString &userName)
 
 void RemotePublicDecksModel::onLoadingTimeout()
 {
+    // Invalidate the timed-out command before exposing the retry state. Some
+    // transports can still deliver its completion after the timeout.
+    ++requestSequence;
     setLoading(false);
     emit loadFailed(tr("The server did not respond in time. Try again."));
 }
 
 void RemotePublicDecksModel::clear()
 {
+    // Clearing is a new user intent: a late reply must not repopulate the model.
+    ++requestSequence;
+    loadingTimeoutTimer->stop();
+    setLoading(false);
     decks.clear();
     rebuildVisibleIndices();
 }
