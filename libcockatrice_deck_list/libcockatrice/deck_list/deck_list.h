@@ -289,6 +289,16 @@ public:
     /** @name Deck identity */
     ///@{
     QString getDeckHash() const;
+    /**
+     * @brief SHA-1 of a native deck string, covering everything the card hash
+     * ignores (name, printings, banner, tokens, comments, sideboard plans).
+     *
+     * Deck-collection sync hashes the exact string it sends or receives, so both
+     * peers compare the same bytes.
+     */
+    static QString contentHash(const QString &nativeDeck);
+    /** @brief contentHash() of this deck's native serialisation. */
+    QString getContentHash() const;
     void refreshDeckHash();
     ///@}
 

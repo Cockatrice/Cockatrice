@@ -1114,7 +1114,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
     const QString bannerCardProvider = deck.getBannerCard().providerId.left(32);
     const QString tagsJson = serializeDeckTags(deck.getTags());
     const QString colorIdentity = sanitizeColorIdentity(nameFromStdString(cmd.color_identity()));
-    const QString deckHash = deck.getDeckHash();
+    // Hash the exact bytes the client sent: both peers must compare the same
+    // string, not each side's re-serialisation of it.
+    const QString deckHash = DeckList::contentHash(deckStr);
     QString guid = cmd.has_guid() ? nameFromStdString(cmd.guid()).left(36) : QString();
     if (QUuid::fromString(guid).isNull()) {
         guid = QUuid::createUuid().toString(QUuid::WithoutBraces);

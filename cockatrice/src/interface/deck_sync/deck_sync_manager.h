@@ -30,9 +30,11 @@ class ServerInfo_DeckStorage_Folder;
  * Each syncNow() run loads the profile sidecar, scans the deck folder, fetches
  * the server tree and mirrors both sides: unknown local decks upload, unknown
  * server decks download, and decks changed on both sides resolve newer-wins
- * (ties go to the server). Matching is path-based; a rename looks like a
- * delete plus an add. Before a download overwrites a locally modified file, the
- * local content is copied to a .sync-backup file next to it.
+ * (ties go to the server). A local file is matched to its server row by the
+ * sidecar's row id, then guid, then the server path, and finally by content, so
+ * renaming either side does not duplicate a deck. Before a download overwrites a
+ * locally modified file, the local content is copied to a .sync-backup file next
+ * to it.
  *
  * Ownership: fire-and-forget per run, driven by PendingCommand round trips.
  * No watcher, no auto triggers, no conflict UI — those arrive in later layers.
@@ -81,6 +83,9 @@ private:
     struct ServerFile
     {
         int id = -1;
+        QString path; ///< Server-side address: folder prefix plus row name.
+        QString dir;  ///< Folder prefix, empty in the root.
+        QString name; ///< Row name exactly as the server stores it.
         QString guid;
         QString hash;
         qint64 lastModifiedSecs = 0;
@@ -94,7 +99,8 @@ private:
     struct UploadOp
     {
         QString relativePath;
-        QString serverPath;
+        QString serverPath; ///< Target address of a brand-new row.
+        QString serverDir;  ///< Folder that must exist before the upload.
         int deckId = -1;
         QString guid;
     };
@@ -112,7 +118,7 @@ private:
     [[nodiscard]] SyncSummary currentSummary() const;
     void collectServerFiles(const ServerInfo_DeckStorage_Folder &folder,
                             const QString &prefix,
-                            QMap<QString, ServerFile> &files,
+                            QMap<int, ServerFile> &files,
                             QSet<QString> &dirs);
     void processNext();
     void processNextUpload();
