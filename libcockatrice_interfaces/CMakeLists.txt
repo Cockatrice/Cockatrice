@@ -1,7 +1,3 @@
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
-
 set(HEADERS
     libcockatrice/interfaces/interface_cache_storage_settings_provider.h
     libcockatrice/interfaces/interface_card_database_path_provider.h
