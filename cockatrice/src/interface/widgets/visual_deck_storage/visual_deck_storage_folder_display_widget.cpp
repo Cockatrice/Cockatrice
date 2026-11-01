@@ -25,6 +25,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QVariant>
+#include <algorithm>
 #include <qnamespace.h>
 
 VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
@@ -243,15 +244,11 @@ void VisualDeckStorageFolderDisplayWidget::finishDeckPass()
     // traversal of the entire proxy for every folder at the end of each pass.
     const QStringList &orderedFilePaths = deckPassOrderedPaths;
 
-    // Re-add all widgets so the flow layout order matches the proxy order. Skipped when the
-    // order is unchanged so that data-only updates don't invalidate the flow layout.
+    // Preserve the layout items as well as the previews. Removing/re-adding each
+    // widget asks QLayout to search the shrinking/growing layout repeatedly,
+    // which makes reversing a large folder quadratic.
     if (orderedFilePaths != lastOrderedFilePaths) {
-        for (const QString &filePath : orderedFilePaths) {
-            flowWidget->removeWidget(deckWidgets.value(filePath));
-        }
-        for (const QString &filePath : orderedFilePaths) {
-            flowWidget->addWidget(deckWidgets.value(filePath));
-        }
+        reorderDeckWidgets(orderedFilePaths);
         lastOrderedFilePaths = orderedFilePaths;
     }
 
@@ -263,6 +260,57 @@ void VisualDeckStorageFolderDisplayWidget::finishDeckPass()
     initialPassCompleted = true;
 
     refreshVisibility();
+}
+
+void VisualDeckStorageFolderDisplayWidget::reorderDeckWidgets(const QStringList &orderedFilePaths)
+{
+    if (flowWidget->count() == 0) {
+        return;
+    }
+
+    // FlowWidget places every preview in its container's layout. Validate that
+    // preview-only layout before transferring ownership of any existing items.
+    auto *firstItem = flowWidget->itemAt(0);
+    auto *firstWidget = firstItem ? firstItem->widget() : nullptr;
+    auto *container = firstWidget ? firstWidget->parentWidget() : nullptr;
+    auto *deckLayout = container ? container->layout() : nullptr;
+    QHash<QWidget *, QLayoutItem *> items;
+    bool canTransfer =
+        deckLayout && deckLayout->count() == flowWidget->count() && flowWidget->count() == orderedFilePaths.size();
+    items.reserve(flowWidget->count());
+    for (int i = 0; canTransfer && i < flowWidget->count(); ++i) {
+        auto *item = flowWidget->itemAt(i);
+        auto *widget = item ? item->widget() : nullptr;
+        canTransfer =
+            widget && widget->parentWidget() == container && !items.contains(widget) && deckLayout->itemAt(i) == item;
+        items.insert(widget, item);
+    }
+    QSet<QWidget *> orderedWidgets;
+    for (const QString &filePath : orderedFilePaths) {
+        auto *widget = deckWidgets.value(filePath);
+        canTransfer = canTransfer && widget && items.contains(widget) && !orderedWidgets.contains(widget);
+        orderedWidgets.insert(widget);
+    }
+    if (!canTransfer) {
+        // Keep the ordinary widget path for layouts containing other item kinds.
+        for (const QString &filePath : orderedFilePaths) {
+            flowWidget->removeWidget(deckWidgets.value(filePath));
+        }
+        for (const QString &filePath : orderedFilePaths) {
+            flowWidget->addWidget(deckWidgets.value(filePath));
+        }
+        return;
+    }
+
+    // Keep widgets parented and reuse their items; neither operation searches
+    // the remaining layout or allocates replacement QWidgetItems.
+    while (deckLayout->count() > 0) {
+        deckLayout->takeAt(deckLayout->count() - 1);
+    }
+    for (const QString &filePath : orderedFilePaths) {
+        deckLayout->addItem(items.take(deckWidgets.value(filePath)));
+    }
+    deckLayout->invalidate();
 }
 
 /**
@@ -334,9 +382,10 @@ void VisualDeckStorageFolderDisplayWidget::createSubFolderWidgets()
     }
 
     const QStringList children = childFolderPaths();
+    const QSet<QString> childPaths(children.cbegin(), children.cend());
 
     for (auto it = subFolderWidgets.begin(); it != subFolderWidgets.end();) {
-        if (!children.contains(it.key())) {
+        if (!childPaths.contains(it.key())) {
             containerLayout->removeWidget(it.value());
             it.value()->deleteLater();
             it = subFolderWidgets.erase(it);
@@ -417,10 +466,12 @@ QStringList VisualDeckStorageFolderDisplayWidget::childFolderPaths() const
     QStringList children;
     const QString prefix = folderPath.isEmpty() ? QString() : folderPath + "/";
 
-    for (const QString &candidate : visualDeckStorageWidget->model()->getFolderPaths()) {
-        if (!candidate.startsWith(prefix)) {
-            continue;
-        }
+    // The scan stores folder paths in case-sensitive sorted order. A nested
+    // folder only needs its contiguous prefix range, not every sibling's tree.
+    const QStringList paths = visualDeckStorageWidget->model()->getFolderPaths();
+    auto candidateIt = std::lower_bound(paths.cbegin(), paths.cend(), prefix);
+    for (; candidateIt != paths.cend() && candidateIt->startsWith(prefix); ++candidateIt) {
+        const QString &candidate = *candidateIt;
         const QString rest = candidate.mid(prefix.length());
         if (rest.isEmpty() || rest.contains('/')) {
             continue;

@@ -67,6 +67,7 @@ private:
     void beginDeckPass();
     void continueDeckPass();
     void finishDeckPass();
+    void reorderDeckWidgets(const QStringList &orderedFilePaths);
     [[nodiscard]] DeckPreviewWidget *createDeckPreviewWidget(const QString &filePath);
     void createSubFolderWidgets();
     void refreshVisibility();
