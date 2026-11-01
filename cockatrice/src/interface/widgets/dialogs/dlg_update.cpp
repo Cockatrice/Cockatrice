@@ -21,6 +21,7 @@
 #include <QMessageBox>
 #include <QMessageLogger>
 #include <QObject>
+#include <QPointer>
 #include <QProcess>
 #include <QProgressBar>
 #include <QPushButton>
@@ -141,7 +142,10 @@ void DlgUpdate::beginUpdateCheck()
 void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Release *release)
 {
 
-    QString publishDate, versionName;
+    const QString channelName = SettingsCache::instance().getUpdateReleaseChannel()->getName().toHtmlEscaped();
+    const QString releaseName = release->getName().toHtmlEscaped();
+    const QString descriptionUrl = release->getDescriptionUrl().toHtmlEscaped();
+    const QString selectedChannel = "<b>" + tr("Selected release channel") + QString(":</b> %1").arg(channelName);
 
     // Update the UI to say we've finished
     progress->setMaximum(100);
@@ -157,25 +161,27 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
 
     // Give the user the appropriate message
     if (!needToUpdate) {
-        // If there's no need to update, tell them that. However we still allow them to run the
-        // downloader themselves if there's a compatible build
+        // The release link retains access to its notes and downloads after this check closes.
+        const QPointer<DlgUpdate> dialog(this);
         QMessageBox::information(
             window(), tr("No Update Available"),
             tr("Cockatrice is up to date!") + "<br><br>" +
                 tr("You are already running the latest version available in the chosen release channel.") + "<br>" +
-                "<b>" + tr("Current version") + QString(":</b> %1<br>").arg(VERSION_STRING) + "<b>" +
-                tr("Selected release channel") +
-                QString(":</b> %1").arg(tr(SettingsCache::instance().getUpdateReleaseChannel()->getName().toUtf8())));
+                "<b>" + tr("Current version") +
+                QString(":</b> <a href=\"%1\">%2</a><br>").arg(descriptionUrl, releaseName) + selectedChannel);
+        if (dialog) {
+            dialog->closeDialog();
+        }
         return;
     }
 
-    publishDate = release->getPublishDate().toString(QLocale().dateFormat(QLocale::LongFormat));
+    const QString publishDate = release->getPublishDate().toString(QLocale().dateFormat(QLocale::LongFormat));
     if (isCompatible) {
         const QString message = tr("A new version of Cockatrice is available!") + "<br><br>" + "<b>" +
-                                tr("New version") + QString(":</b> %1<br>").arg(release->getName()) + "<b>" +
-                                tr("Released") +
-                                QString(":</b> %1 (<a href=\"%2\">").arg(publishDate, release->getDescriptionUrl()) +
-                                tr("Changelog") + "</a>)<br><br>" + tr("Do you want to update now?");
+                                tr("New version") + QString(":</b> %1<br>").arg(releaseName) + "<b>" + tr("Released") +
+                                QString(":</b> %1 (<a href=\"%2\">").arg(publishDate, descriptionUrl) +
+                                tr("Changelog") + "</a>)<br>" + selectedChannel + "<br><br>" +
+                                tr("Do you want to update now?");
 
         if (QtUtils::confirm(window(), tr("Update Available"), message)) {
             downloadUpdate(release->getName());
@@ -186,15 +192,15 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
         QMessageBox::information(
             window(), tr("Update Available"),
             tr("A new version of Cockatrice is available!") + "<br><br>" + "<b>" + tr("New version") +
-                QString(":</b> %1<br>").arg(release->getName()) + "<b>" + tr("Released") +
-                QString(":</b> %1 (<a href=\"%2\">").arg(publishDate, release->getDescriptionUrl()) + tr("Changelog") +
-                "</a>)<br><br>" +
+                QString(":</b> %1<br>").arg(releaseName) + "<b>" + tr("Released") +
+                QString(":</b> %1 (<a href=\"%2\">").arg(publishDate, descriptionUrl) + tr("Changelog") + "</a>)<br>" +
+                selectedChannel + "<br><br>" +
                 tr("Unfortunately, the automatic updater failed to find a compatible download. \nYou may have to "
                    "manually download the new version.") +
                 "<br><br>" +
                 tr("Please check the <a href=\"%1\">releases page</a> on our Github and download the build for your "
                    "system.")
-                    .arg(release->getDescriptionUrl()));
+                    .arg(descriptionUrl));
     }
 }
 

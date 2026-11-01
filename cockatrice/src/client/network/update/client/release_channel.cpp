@@ -298,9 +298,9 @@ void BetaReleaseChannel::releaseListFinished()
      * This can be either a pre-release or a published release
      * depending on timing. Both are acceptable.
      */
-    QVariantMap resultMap = array.at(0).toObject().toVariantMap();
+    const QVariantMap resultMap = array.isEmpty() ? QVariantMap{} : array.first().toObject().toVariantMap();
 
-    if (array.empty() || resultMap.empty()) {
+    if (resultMap.isEmpty()) {
         qCWarning(ReleaseChannelLog) << "No reply received from the release update server:" << QString(jsonData);
         emit error(tr("No reply received from the release update server."));
         return;
@@ -309,7 +309,8 @@ void BetaReleaseChannel::releaseListFinished()
     // Make sure resultMap has all elements we'll need
     if (!resultMap.contains("assets") || !resultMap.contains("author") || !resultMap.contains("tag_name") ||
         !resultMap.contains("target_commitish") || !resultMap.contains("assets_url") ||
-        !resultMap.contains("published_at")) {
+        !resultMap.contains("published_at") || !resultMap.contains("name") || !resultMap.contains("html_url") ||
+        !resultMap.contains("prerelease")) {
         qCWarning(ReleaseChannelLog) << "Invalid received from the release update server:" << resultMap;
         emit error(tr("Invalid reply received from the release update server."));
         return;
@@ -323,8 +324,15 @@ void BetaReleaseChannel::releaseListFinished()
     lastRelease->setPublishDate(resultMap["published_at"].toDate());
 
     QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
-    lastRelease->setName(QString("%1 (%2)").arg(resultMap["tag_name"].toString()).arg(shortHash));
-    lastRelease->setDescriptionUrl(QString(BETARELEASE_CHANGESURL).arg(VERSION_COMMIT, shortHash));
+    if (resultMap["prerelease"].toBool()) {
+        lastRelease->setName(QString("%1 (%2)").arg(resultMap["tag_name"].toString()).arg(shortHash));
+        lastRelease->setDescriptionUrl(QString(BETARELEASE_CHANGESURL).arg(VERSION_COMMIT, shortHash));
+    } else {
+        // The beta channel can also return a stable release. Its title and
+        // release notes are the same regardless of the channel used to find it.
+        lastRelease->setName(resultMap["name"].toString());
+        lastRelease->setDescriptionUrl(resultMap["html_url"].toString());
+    }
 
     qCInfo(ReleaseChannelLog) << "Got reply from release server, size=" << resultMap.size()
                               << "name=" << lastRelease->getName() << "desc=" << lastRelease->getDescriptionUrl()
