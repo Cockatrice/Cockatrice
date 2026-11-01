@@ -17,9 +17,11 @@
 
 #include <QAbstractListModel>
 #include <QDateTime>
+#include <QFutureWatcherBase>
 #include <QHash>
 #include <QList>
 #include <QModelIndex>
+#include <QPointer>
 #include <QString>
 #include <QStringList>
 #include <QVector>
@@ -107,6 +109,12 @@ class VisualDeckStorageModel : public QAbstractListModel
 public:
     explicit VisualDeckStorageModel(QObject *parent = nullptr);
 
+    /**
+     * @brief Cancels and detaches every background scan/load still in flight, so no
+     * QFutureWatcher can deliver a result into (or outlive) a destroyed model.
+     */
+    ~VisualDeckStorageModel() override;
+
     /// @name Qt model overrides
     ///@{
     [[nodiscard]] int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -177,6 +185,8 @@ private:
     static void recomputeDeckMetadata(DeckPreviewData &data, bool recomputeColorIdentity = true);
     void reindexFilePaths();
     void schedulePendingLoadDrain();
+    void trackWatcher(QFutureWatcherBase *watcher);
+    void forgetWatcher(QFutureWatcherBase *watcher);
 
 private slots:
     void drainPendingLoads();
@@ -191,6 +201,7 @@ private:
     int scanGeneration = 0;                ///< Bumped on every scan so stale results are ignored.
     QVector<PendingDeckLoad> pendingLoads; ///< Finished background loads waiting to be applied.
     bool drainScheduled = false;           ///< Whether a queued drain pass is already pending.
+    QList<QPointer<QFutureWatcherBase>> activeWatchers; ///< Scan/load watchers whose future has not finished yet.
 };
 
 #endif // VISUAL_DECK_STORAGE_MODEL_H

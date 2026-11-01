@@ -34,6 +34,7 @@ class VisualDeckStorageWidget final : public QWidget
     Q_OBJECT
 public:
     explicit VisualDeckStorageWidget(QWidget *parent);
+    ~VisualDeckStorageWidget() override;
     void refreshIfPossible();
     void retranslateUi();
     void setShareSelectable(bool selectable);

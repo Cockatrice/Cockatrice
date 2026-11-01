@@ -137,6 +137,39 @@ VisualDeckStorageModel::VisualDeckStorageModel(QObject *parent) : QAbstractListM
 {
 }
 
+VisualDeckStorageModel::~VisualDeckStorageModel()
+{
+    // Invalidate every outstanding result and drop queued work.
+    ++scanGeneration;
+    pendingLoads.clear();
+    drainScheduled = false;
+
+    // Detach and destroy the watchers of still-running futures explicitly, before
+    // QObject teardown, so none of their finished() lambdas (which capture this)
+    // can fire into a half-destroyed model. Futures that have not started yet are
+    // cancelled; ones already running finish on the pool and their result is dropped.
+    const QList<QPointer<QFutureWatcherBase>> watchers = std::exchange(activeWatchers, {});
+    for (const QPointer<QFutureWatcherBase> &watcher : watchers) {
+        if (!watcher) {
+            continue;
+        }
+        disconnect(watcher, nullptr, this, nullptr);
+        watcher->cancel();
+        delete watcher.data();
+    }
+}
+
+void VisualDeckStorageModel::trackWatcher(QFutureWatcherBase *watcher)
+{
+    activeWatchers.append(QPointer<QFutureWatcherBase>(watcher));
+}
+
+void VisualDeckStorageModel::forgetWatcher(QFutureWatcherBase *watcher)
+{
+    activeWatchers.removeIf(
+        [watcher](const QPointer<QFutureWatcherBase> &tracked) { return !tracked || tracked.data() == watcher; });
+}
+
 int VisualDeckStorageModel::rowCount(const QModelIndex &parent) const
 {
     return parent.isValid() ? 0 : decks.size();
@@ -245,7 +278,9 @@ void VisualDeckStorageModel::startScan()
     // The scan (directory walk + one stat per file) runs on a worker thread so that
     // constructing the widget never stalls the UI thread on a large deck folder.
     auto *watcher = new QFutureWatcher<DeckScanResult>(this);
+    trackWatcher(watcher);
     connect(watcher, &QFutureWatcher<DeckScanResult>::finished, this, [this, watcher, generation] {
+        forgetWatcher(watcher);
         watcher->deleteLater();
 
         if (generation != scanGeneration) {
@@ -287,8 +322,10 @@ void VisualDeckStorageModel::beginLoad(int row)
     const int generation = scanGeneration;
 
     auto *watcher = new QFutureWatcher<std::optional<DeckLoadResult>>(this);
+    trackWatcher(watcher);
     connect(watcher, &QFutureWatcher<std::optional<DeckLoadResult>>::finished, this,
             [this, watcher, filePath, generation] {
+                forgetWatcher(watcher);
                 watcher->deleteLater();
 
                 if (generation != scanGeneration) {
