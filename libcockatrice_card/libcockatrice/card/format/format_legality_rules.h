@@ -4,6 +4,7 @@
 #include <QList>
 #include <QSharedPointer>
 #include <QString>
+#include <optional>
 
 class CardInfo;
 
@@ -73,6 +74,9 @@ inline CardMatchType matchTypeFromString(const QString &str)
 bool cardMatchesCondition(const CardInfo &card, const CardCondition &cond);
 
 bool exceptionAppliesToCard(const CardInfo &card, const ExceptionRule &rule);
+
+/** @brief Most permissive matching copy-count exception, or no value when none applies. */
+std::optional<int> cardCopyLimitException(const CardInfo &card, const FormatRules &format);
 
 bool cardHasAnyException(const CardInfo &card, const FormatRules &format);
 
