@@ -24,7 +24,7 @@ RemotePublicDecksModel::RemotePublicDecksModel(AbstractClient *_client, QObject 
     // A transport can drop a pending command without emitting finished. Each
     // request therefore owns a sequence-guarded single-shot timeout below.
     connect(client, &AbstractClient::statusChanged, this, [this](ClientStatus status) {
-        if (status == StatusDisconnected) {
+        if (status == StatusDisconnected || status == StatusDisconnecting) {
             const bool wasLoading = loading;
             ++requestSequence;
             setLoading(false);
@@ -32,6 +32,11 @@ RemotePublicDecksModel::RemotePublicDecksModel(AbstractClient *_client, QObject 
                 emit loadFailed(tr("The connection was lost while loading public decks. Try again."));
             }
         }
+    });
+    connect(client, &QObject::destroyed, this, [this]() {
+        ++requestSequence;
+        setLoading(false);
+        client = nullptr;
     });
 }
 
@@ -131,6 +136,14 @@ void RemotePublicDecksModel::rebuildVisibleIndices()
 
 void RemotePublicDecksModel::refresh(const QString &userName)
 {
+    if (!client || client->getStatus() == StatusDisconnected ||
+        client->getStatus() == StatusDisconnecting) {
+        ++requestSequence;
+        setLoading(false);
+        emit loadFailed(tr("The server connection is unavailable. Reconnect and try again."));
+        return;
+    }
+
     // A new refresh supersedes any request still in flight. Its sequence owns
     // the timer and result; older commands may finish later but cannot replace
     // the current snapshot or change its loading state.
@@ -152,7 +165,7 @@ void RemotePublicDecksModel::refresh(const QString &userName)
                 if (seq != requestSequence) {
                     return; // a newer refresh superseded this one
                 }
-                decksReceived(response, commandContainer);
+                decksReceived(seq, response, commandContainer);
             });
     client->sendCommand(pend);
 }
@@ -171,8 +184,10 @@ void RemotePublicDecksModel::clear()
     // Clearing is a new user intent: a late reply must not repopulate the model.
     ++requestSequence;
     setLoading(false);
+    beginResetModel();
     decks.clear();
-    rebuildVisibleIndices();
+    visibleIndices.clear();
+    endResetModel();
 }
 
 void RemotePublicDecksModel::setLoading(bool value)
@@ -184,9 +199,12 @@ void RemotePublicDecksModel::setLoading(bool value)
     emit loadingChanged(loading);
 }
 
-void RemotePublicDecksModel::decksReceived(const Response &response, const CommandContainer & /*commandContainer*/)
+void RemotePublicDecksModel::decksReceived(int seq, const Response &response, const CommandContainer & /*commandContainer*/)
 {
-    // Invalidate this request's timeout as well as any late duplicate callback.
+    if (seq != requestSequence) {
+        return;
+    }
+    // Invalidate this request's timeout before changing the loading state.
     ++requestSequence;
     setLoading(false);
     if (response.response_code() != Response::RespOk) {
@@ -196,23 +214,53 @@ void RemotePublicDecksModel::decksReceived(const Response &response, const Comma
     }
 
     const Response_DeckList &resp = response.GetExtension(Response_DeckList::ext);
-    decks.clear();
-    addFolder(resp.root());
-    rebuildVisibleIndices();
+    QList<DeckEntry> replacement;
+    addFolder(resp.root(), replacement);
+
+    QList<int> replacementIndices;
+    replacementIndices.reserve(replacement.size());
+    for (int row = 0; row < replacement.size(); ++row) {
+        const DeckEntry &entry = replacement.at(row);
+        if (!searchText.isEmpty() && !entry.name.contains(searchText, Qt::CaseInsensitive)) {
+            continue;
+        }
+        if (!activeColors.isEmpty() &&
+            !colorIdentityMatches(colorFilterMode, activeColors, entry.colorIdentity)) {
+            continue;
+        }
+        const QSet<QString> entryTags(entry.tags.cbegin(), entry.tags.cend());
+        if (!includedTags.isEmpty() &&
+            !std::all_of(includedTags.cbegin(), includedTags.cend(),
+                         [&entryTags](const QString &tag) { return entryTags.contains(tag); })) {
+            continue;
+        }
+        if (!excludedTags.isEmpty() &&
+            std::any_of(excludedTags.cbegin(), excludedTags.cend(),
+                        [&entry](const QString &tag) { return entry.tags.contains(tag); })) {
+            continue;
+        }
+        replacementIndices.append(row);
+    }
+
+    // Publish the complete new snapshot and its filtered index atomically.
+    beginResetModel();
+    decks = std::move(replacement);
+    visibleIndices = std::move(replacementIndices);
+    endResetModel();
 }
 
-void RemotePublicDecksModel::addFolder(const ServerInfo_DeckStorage_Folder &folder)
+void RemotePublicDecksModel::addFolder(const ServerInfo_DeckStorage_Folder &folder, QList<DeckEntry> &target)
 {
     const int itemCount = folder.items_size();
     for (int i = 0; i < itemCount; ++i) {
-        addTreeItem(folder.items(i));
+        addTreeItem(folder.items(i), target);
     }
 }
 
-void RemotePublicDecksModel::addTreeItem(const ServerInfo_DeckStorage_TreeItem &item)
+void RemotePublicDecksModel::addTreeItem(const ServerInfo_DeckStorage_TreeItem &item, QList<DeckEntry> &target)
 {
     if (item.has_folder()) {
-        addFolder(item.folder());
+        addFolder(item.folder(), target);
         return;
     }
 
@@ -229,5 +277,5 @@ void RemotePublicDecksModel::addTreeItem(const ServerInfo_DeckStorage_TreeItem &
         tags.append(QString::fromStdString(tag));
     }
     entry.tags = tags;
-    decks.append(entry);
+    target.append(std::move(entry));
 }
