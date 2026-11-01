@@ -71,6 +71,16 @@ bool copyFixture(const QString &fileName, const QString &targetDir)
 
 int main(int argc, char **argv)
 {
+    ::testing::InitGoogleTest(&argc, argv);
+
+    // gtest_discover_tests runs the binary with --gtest_list_tests while the
+    // build is still in progress. No test runs there, and building the card
+    // database would leave process-lifetime allocations that the sanitizer
+    // leg's default leak detection reports at exit, failing discovery.
+    if (::testing::GTEST_FLAG(list_tests)) {
+        return RUN_ALL_TESTS();
+    }
+
     QStandardPaths::setTestModeEnabled(true);
 
     QTemporaryDir home;
@@ -112,6 +122,5 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
