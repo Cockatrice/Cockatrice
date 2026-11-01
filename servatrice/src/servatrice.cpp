@@ -177,9 +177,9 @@ Servatrice_WebsocketGameServer::Servatrice_WebsocketGameServer(Servatrice *_serv
             Qt::BlockingQueuedConnection);
 
         connectionPools.append(newPool);
-
-        connect(this, &QWebSocketServer::newConnection, this, &Servatrice_WebsocketGameServer::onNewConnection);
     }
+
+    connect(this, &QWebSocketServer::newConnection, this, &Servatrice_WebsocketGameServer::onNewConnection);
 }
 
 Servatrice_WebsocketGameServer::~Servatrice_WebsocketGameServer()
@@ -1106,36 +1106,19 @@ void Servatrice::addIslInterface(int _serverId, IslInterface *interface)
 {
     // Only call with islLock locked for writing
     islInterfaces.insert(_serverId, interface);
-    connect(interface, &IslInterface::externalUserJoined, this,
-            [this](const ServerInfo_User &user) { externalUserJoined(user); });
-    connect(interface, &IslInterface::externalUserLeft, this, [this](const QString &name) { externalUserLeft(name); });
-    connect(interface, &IslInterface::externalRoomUserJoined, this,
-            [this](int roomId, const ServerInfo_User &user) { externalRoomUserJoined(roomId, user); });
-    connect(interface, &IslInterface::externalRoomUserLeft, this,
-            [this](int roomId, const QString &name) { externalRoomUserLeft(roomId, name); });
-    connect(interface, &IslInterface::externalRoomSay, this,
-            [this](int roomId, const QString &user, const QString &message, const QString &channel) {
-                externalRoomSay(roomId, user, message, channel);
-            });
-    connect(
-        interface, &IslInterface::externalRoomRemoveMessages, this,
-        [this](int roomId, const QString &channel, int count) { externalRoomRemoveMessages(roomId, channel, count); });
-    connect(interface, &IslInterface::externalRoomGameListChanged, this,
-            [this](int roomId, const ServerInfo_Game &game) { externalRoomGameListChanged(roomId, game); });
-    connect(interface, &IslInterface::joinGameCommandReceived, this,
-            [this](const Command_JoinGame &cmd, int cmdId, int roomId, int playerId, qint64 sessionId) {
-                externalJoinGameCommandReceived(cmd, cmdId, roomId, playerId, sessionId);
-            });
+    connect(interface, &IslInterface::externalUserJoined, this, &Servatrice::externalUserJoined);
+    connect(interface, &IslInterface::externalUserLeft, this, &Servatrice::externalUserLeft);
+    connect(interface, &IslInterface::externalRoomUserJoined, this, &Servatrice::externalRoomUserJoined);
+    connect(interface, &IslInterface::externalRoomUserLeft, this, &Servatrice::externalRoomUserLeft);
+    connect(interface, &IslInterface::externalRoomSay, this, &Servatrice::externalRoomSay);
+    connect(interface, &IslInterface::externalRoomRemoveMessages, this, &Servatrice::externalRoomRemoveMessages);
+    connect(interface, &IslInterface::externalRoomGameListChanged, this, &Servatrice::externalRoomGameListChanged);
+    connect(interface, &IslInterface::joinGameCommandReceived, this, &Servatrice::externalJoinGameCommandReceived);
     connect(interface, &IslInterface::gameCommandContainerReceived, this,
-            [this](const CommandContainer &container, int playerId, int roomId, qint64 sessionId) {
-                externalGameCommandContainerReceived(container, playerId, roomId, sessionId);
-            });
-    connect(interface, &IslInterface::responseReceived, this,
-            [this](const Response &response, qint64 sessionId) { externalResponseReceived(response, sessionId); });
+            &Servatrice::externalGameCommandContainerReceived);
+    connect(interface, &IslInterface::responseReceived, this, &Servatrice::externalResponseReceived);
     connect(interface, &IslInterface::gameEventContainerReceived, this,
-            [this](const GameEventContainer &container, qint64 sessionId) {
-                externalGameEventContainerReceived(container, sessionId);
-            });
+            &Servatrice::externalGameEventContainerReceived);
 }
 
 void Servatrice::removeIslInterface(int _serverId)
