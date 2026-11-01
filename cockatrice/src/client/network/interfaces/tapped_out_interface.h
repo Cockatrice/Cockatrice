@@ -14,6 +14,7 @@
 inline Q_LOGGING_CATEGORY(TappedOutInterfaceLog, "tapped_out_interface");
 
 class QByteArray;
+class QString;
 class QNetworkAccessManager;
 class QNetworkReply;
 class DeckList;
@@ -29,6 +30,9 @@ class TappedOutInterface : public QObject
     Q_OBJECT
 private:
     QNetworkAccessManager *manager;
+    bool analysisStarted = false;
+    bool replyHandled = false;
+    void showError(const QString &message);
 
     void copyDeckSplitMainAndSide(const DeckList &source, DeckList &mainboard, DeckList &sideboard);
 private slots:

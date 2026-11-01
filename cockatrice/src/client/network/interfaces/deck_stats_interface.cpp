@@ -10,12 +10,14 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QPointer>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QSharedPointer>
 #include <QString>
+#include <QTextDocumentFragment>
 #include <QUrl>
-#include <QUrlQuery>
+#include <QWidget>
 #include <functional>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
@@ -23,36 +25,85 @@
 #include <libcockatrice/network/network_manager.h>
 #include <version_string.h>
 
+namespace
+{
+bool normalizeAnalysisUrl(QUrl &url, const QString &serviceHost)
+{
+    const QString host = url.host().toLower();
+    const bool legacyHttp = url.scheme() == QStringLiteral("http");
+    const int defaultPort = legacyHttp ? 80 : 443;
+    if (!url.isValid() || (!legacyHttp && url.scheme() != QStringLiteral("https")) ||
+        !url.userInfo().isEmpty() || !url.path().startsWith('/') ||
+        (url.port() != -1 && url.port() != defaultPort) ||
+        (host != serviceHost && host != QStringLiteral("www.") + serviceHost)) {
+        return false;
+    }
+    // Both services accept HTTPS. Older public metadata may still identify the
+    // same deck with HTTP; retain its host/path/query while using HTTPS to open it.
+    if (legacyHttp) {
+        url.setScheme(QStringLiteral("https"));
+        url.setPort(-1);
+    }
+    return true;
+}
+} // namespace
+
 DeckStatsInterface::DeckStatsInterface(QObject *parent) : QObject(parent)
 {
     manager = NetworkManagerFactory::create(this);
     connect(manager, &QNetworkAccessManager::finished, this, &DeckStatsInterface::queryFinished);
 }
 
+void DeckStatsInterface::showError(const QString &message)
+{
+    // The notice belongs to the originating editor, not this one-shot request.
+    // Retire the request before opening UI: opening a window may reenter Qt.
+    QWidget *owner = qobject_cast<QWidget *>(parent());
+    auto *notice = new QMessageBox(QMessageBox::Critical, tr("Deck analysis"), message, QMessageBox::Ok, owner);
+    notice->setTextFormat(Qt::PlainText);
+    notice->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+    notice->setAttribute(Qt::WA_DeleteOnClose);
+    deleteLater();
+    notice->open();
+}
+
 void DeckStatsInterface::queryFinished(QNetworkReply *reply)
 {
-    if (reply->error() != QNetworkReply::NoError) {
-        QMessageBox::critical(nullptr, tr("Error"), reply->errorString());
-        reply->deleteLater();
-        deleteLater();
+    if (replyHandled) {
         return;
     }
-
-    QString data(reply->readAll());
+    replyHandled = true;
+    // All terminal paths release the reply before showing UI or invoking an
+    // external URL handler, either of which may destroy the originating editor.
     reply->deleteLater();
-
-    static const QRegularExpression rx("<meta property=\"og:url\" content=\"([^\"]+)\"");
-    auto match = rx.match(data);
-    if (!match.hasMatch()) {
-        QMessageBox::critical(nullptr, tr("Error"), tr("The reply from the server could not be parsed."));
-        deleteLater();
+    if (reply->error() != QNetworkReply::NoError) {
+        showError(reply->errorString());
         return;
     }
 
-    QString deckUrl = match.captured(1);
-    QDesktopServices::openUrl(deckUrl);
+    const QString data = QString::fromUtf8(reply->readAll());
+    static const QRegularExpression rx(
+        R"(<meta\b(?=[^>]*\bproperty\s*=\s*(['"])og:url\1)[^>]*\bcontent\s*=\s*(['"])(.*?)\2)",
+        QRegularExpression::CaseInsensitiveOption | QRegularExpression::DotMatchesEverythingOption);
+    const auto match = rx.match(data);
+    if (!match.hasMatch()) {
+        showError(tr("The reply from Deckstats did not contain a deck address."));
+        return;
+    }
 
+    const QString address = QTextDocumentFragment::fromHtml(match.captured(3)).toPlainText();
+    QUrl deckUrl = reply->url().resolved(QUrl(address, QUrl::StrictMode));
+    if (address.trimmed().isEmpty() || !normalizeAnalysisUrl(deckUrl, QStringLiteral("deckstats.net"))) {
+        showError(tr("The reply from Deckstats contained an invalid deck address."));
+        return;
+    }
+
+    QPointer<DeckStatsInterface> guard(this);
     deleteLater();
+    if (!QDesktopServices::openUrl(deckUrl) && guard) {
+        showError(tr("Could not open your browser. Open this address to see the analyzed deck:\n%1")
+                      .arg(deckUrl.toDisplayString()));
+    }
 }
 
 void DeckStatsInterface::getAnalyzeRequestData(const DeckList &deck, QByteArray &data)
@@ -60,16 +111,16 @@ void DeckStatsInterface::getAnalyzeRequestData(const DeckList &deck, QByteArray 
     DeckList deckWithoutTokens;
     copyDeckWithoutTokens(deck, deckWithoutTokens);
 
-    QUrl params;
-    QUrlQuery urlQuery;
-    urlQuery.addQueryItem("deck", deckWithoutTokens.writeToString_Plain());
-    urlQuery.addQueryItem("decktitle", deck.getName());
-    params.setQuery(urlQuery);
-    data.append(params.query(QUrl::EncodeReserved).toUtf8());
+    data.append("deck=" + QUrl::toPercentEncoding(deckWithoutTokens.writeToString_Plain()));
+    data.append("&decktitle=" + QUrl::toPercentEncoding(deck.getName()));
 }
 
 void DeckStatsInterface::analyzeDeck(const DeckList &deck)
 {
+    if (analysisStarted) {
+        return;
+    }
+    analysisStarted = true;
     QByteArray data;
     getAnalyzeRequestData(deck, data);
 
