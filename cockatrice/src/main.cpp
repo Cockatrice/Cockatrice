@@ -39,6 +39,10 @@
 #include "single_instance_manager.h"
 #include "version_string.h"
 
+#ifdef WITH_GUI_TEST
+#include "pqTestUtility.h"
+#endif
+
 #include <QApplication>
 #include <QByteArray>
 #include <QByteArrayView>
@@ -62,10 +66,12 @@
 #include <QString>
 #include <QStringList>
 #include <QStringLiteral>
+#include <QThread>
 #include <QTranslator>
 #include <QUrl>
 #include <QtGlobal>
 #include <algorithm>
+#include <cstdlib>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/rng/rng_sfmt.h>
 #include <libcockatrice/settings/card_database_settings.h>
@@ -343,9 +349,16 @@ int main(int argc, char *argv[])
     parser.addOptions(
         {{{"c", "connect"}, QCoreApplication::translate("main", "Connect on startup"), "user:pass@host:port"},
          {{"d", "debug-output"}, QCoreApplication::translate("main", "Debug to file")},
-         {"simulate-crash",
-          QCoreApplication::translate("main",
-                                      "Show the crash-report dialog (saves a mock file when no DSN is configured)")}});
+         {"simulate-crash", QCoreApplication::translate(
+                                "main", "Show the crash-report dialog (saves a mock file when no DSN is configured)")},
+         {"no-connect", QCoreApplication::translate("main", "Suppress auto-connect on startup")}
+#ifdef WITH_GUI_TEST
+         ,
+         {{"t", "test"},
+          QCoreApplication::translate("main", "Play back a QtTesting XML test file and exit"),
+          "test-file.xml"}
+#endif
+        });
 
     parser.process(app);
 
@@ -483,6 +496,9 @@ int main(int argc, char *argv[])
     if (parser.isSet("connect")) {
         ui.setConnectTo(parser.value("connect"));
     }
+    if (parser.isSet("no-connect")) {
+        ui.setNoConnect(true);
+    }
     qCInfo(MainLog) << "MainWindow constructor finished";
 
     ui.setWindowIcon(themePixmap(QStringLiteral("cockatrice")));
@@ -522,6 +538,27 @@ int main(int argc, char *argv[])
     for (const QString &file : startupFiles) {
         handleActivation(file);
     }
+
+#ifdef WITH_GUI_TEST
+    if (parser.isSet("test")) {
+        QString testFile = parser.value("test");
+        qCInfo(MainLog) << "Playing test file:" << testFile;
+        QTimer::singleShot(0, &ui, [&ui, testFile]() {
+            bool success = ui.getTestUtility()->playTests(testFile);
+            qCInfo(MainLog) << "Test playback" << (success ? "succeeded" : "FAILED");
+            qApp->exit(success ? 0 : 1);
+
+            // An event that fails while a modal dialog is open aborts the dispatcher,
+            // but the dialog's nested event loop can then keep the application alive
+            // forever. Hard-exit after a grace period so a red test always terminates.
+            auto *watchdog = QThread::create([success] {
+                QThread::sleep(10);
+                ::_Exit(success ? 0 : 1);
+            });
+            watchdog->start();
+        });
+    }
+#endif
 
     // Connect to future file/URL events from other instances
     QObject::connect(&instance, &SingleInstanceManager::filesReceived, [&handleActivation](const QStringList &files) {

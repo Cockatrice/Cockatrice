@@ -563,6 +563,9 @@ target_link_libraries(
 cockatrice_target_enable_crash_reporting(cockatrice)
 
 if(WITH_GUI_TEST)
+  # recording.cpp translates between XML test files and the QtTesting event pipeline;
+  # it needs the QtTesting headers, so it only exists with the harness.
+  target_sources(cockatrice PRIVATE src/interface/recording.cpp)
   target_link_libraries(cockatrice PRIVATE QtTesting)
   target_compile_definitions(cockatrice PRIVATE WITH_GUI_TEST)
 endif()
