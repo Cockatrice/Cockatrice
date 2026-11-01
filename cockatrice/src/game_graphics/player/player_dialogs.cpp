@@ -2,11 +2,10 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../../client/settings/card_counter_settings.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_logic.h"
 #include "../../interface/widgets/utility/get_text_with_max.h"
 #include "../board/abstract_counter.h"
 #include "../board/card_item.h"
+#include "../dialogs/dlg_annotation.h"
 #include "../dialogs/dlg_create_token.h"
 #include "../dialogs/dlg_move_top_cards_until.h"
 #include "../dialogs/dlg_roll_dice.h"
@@ -17,6 +16,8 @@
 #include <QInputDialog>
 #include <QLineEdit>
 #include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_logic.h>
 #include <libcockatrice/utility/string_limits.h>
 
 PlayerDialogs::PlayerDialogs(PlayerGraphicsItem *_player, PlayerActions *_playerActions)
@@ -34,7 +35,7 @@ PlayerDialogs::PlayerDialogs(PlayerGraphicsItem *_player, PlayerActions *_player
             &PlayerDialogs::onShuffleBottomDialogRequested);
 
     connect(playerActions, &PlayerActions::requestMulliganDialog, this, &PlayerDialogs::onMulliganDialogRequested);
-
+    connect(playerActions, &PlayerActions::startingHandSizeChosen, this, &PlayerDialogs::onStartingHandSizeChosen);
     connect(playerActions, &PlayerActions::requestDrawCardsDialog, this, &PlayerDialogs::onDrawCardsDialogRequested);
 
     connect(playerActions, &PlayerActions::requestMoveTopCardsToDialog, this,
@@ -126,6 +127,11 @@ void PlayerDialogs::onMulliganDialogRequested(int startSize, int handSize, int d
     }
 }
 
+void PlayerDialogs::onStartingHandSizeChosen(int number)
+{
+    SettingsCache::instance().userInterface().setStartingHandSize(number);
+}
+
 void PlayerDialogs::onDrawCardsDialogRequested(int defaultNumberTopCards, int deckSize)
 {
     bool ok;
@@ -196,7 +202,7 @@ void PlayerDialogs::onRollDieDialogRequested()
     playerActions->actRollDie(dlg.getDieSideCount(), dlg.getDiceToRollCount());
 }
 
-void PlayerDialogs::onCreateRelatedFromRelationDialogRequested(const CardItem *sourceCard,
+void PlayerDialogs::onCreateRelatedFromRelationDialogRequested(const CardState *sourceCard,
                                                                const CardRelation *cardRelation)
 {
     if (sourceCard == nullptr || cardRelation == nullptr) {
@@ -251,14 +257,14 @@ void PlayerDialogs::onMoveCardXCardsFromTopDialogRequested(int defaultNumberTopC
     number -= 1; // indexes start at 0
 
     if (ok) {
-        playerActions->actMoveCardXCardsFromTop(player->getGameScene()->selectedCards(), number);
+        playerActions->actMoveCardXCardsFromTop(player->getGameScene()->selectedCardStates(), number);
     }
 }
 
 void PlayerDialogs::onSetPTDialogRequested(const QString &oldPT)
 {
     bool ok;
-    auto cards = player->getGameScene()->selectedCards();
+    auto cards = player->getGameScene()->selectedCardStates();
     emit requestDialogSemaphore(true);
     QString pt = getTextWithMax(dialogParent(), tr("Change power/toughness"), tr("Change stats to:"), QLineEdit::Normal,
                                 oldPT, &ok);
@@ -273,7 +279,7 @@ void PlayerDialogs::onSetPTDialogRequested(const QString &oldPT)
 
 void PlayerDialogs::onSetAnnotationDialogRequested(const QString &oldAnnotation)
 {
-    auto cards = player->getGameScene()->selectedCards();
+    auto cards = player->getGameScene()->selectedCardStates();
     emit requestDialogSemaphore(true);
     AnnotationDialog *dialog = new AnnotationDialog(dialogParent());
     dialog->setOptions(QInputDialog::UsePlainTextEditForTextInput);
@@ -291,7 +297,7 @@ void PlayerDialogs::onSetAnnotationDialogRequested(const QString &oldAnnotation)
 
 void PlayerDialogs::onSetCardCounterDialogRequested(int counterId, const QString &oldValueForDlg)
 {
-    auto cards = player->getGameScene()->selectedCards();
+    auto cards = player->getGameScene()->selectedCardStates();
     emit requestDialogSemaphore(true);
 
     auto &cardCounterSettings = SettingsCache::instance().cardCounters();

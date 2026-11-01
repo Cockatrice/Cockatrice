@@ -2,22 +2,25 @@
 #define RESTART_MANAGER_HOLDERS_H
 
 #include "holder_line.h"
+#include "payload_paths.h"
 
 #include <string>
 #include <vector>
 
 /**
- * @brief Lists the files a failed purge can be holding up, as full paths.
+ * @brief Lists the payload files, as full paths.
  *
- * Everything directly in @p installDir plus everything below its Plugins directory:
- * those are the two things the purge removes, so they are the two sets of files a
- * holder can be holding. Restart Manager refuses a directory with ERROR_ACCESS_DENIED,
- * which is why the probe registers files and this has to name them first.
+ * The set is what the installer replaces and the purge removes: the three executables,
+ * qt.conf, every top-level DLL and everything below Plugins. A document, a log or a
+ * screenshot the user happens to have open in the install directory is not part of it,
+ * so it cannot be mistaken for a running instance and block an upgrade.
  *
- * Missing or unreadable directories are skipped rather than reported, and the list is
- * capped: this runs on the abort path and must not walk a tree of downloaded pictures.
+ * Restart Manager refuses a directory with ERROR_ACCESS_DENIED, which is why the probe
+ * registers files and this has to name them first. Missing files and unreadable
+ * directories are skipped rather than reported, and the list is capped: this runs before
+ * the first page and on the abort path, and must not walk a tree of downloaded pictures.
  */
-std::vector<std::wstring> collectProbeFiles(const std::wstring &installDir);
+std::vector<std::wstring> collectPayloadFiles(const std::wstring &installDir);
 
 /**
  * @brief Names the applications and services that have one of @p files open or mapped.
@@ -31,5 +34,55 @@ std::vector<std::wstring> collectProbeFiles(const std::wstring &installDir);
  *         Win32 code of the Restart Manager call that failed.
  */
 unsigned long findProcessesUsingFiles(const std::vector<std::wstring> &files, std::vector<Holder> &holders);
+
+/**
+ * @brief Lists every payload program whose image lies in @p installDir itself.
+ *
+ * Restart Manager answers the question "who has this file open", and a running instance
+ * does not necessarily have one open: its own image and the modules it loaded are mapped
+ * into it, not opened by it, and RmGetList does not reliably report a mapping. That is
+ * the state the failed updates this probe exists for were in - every DLL still on disk,
+ * an instance running from the directory, and "nothing is holding them any more" as the
+ * answer - so an answer built on file handles alone cannot be the guard's authority.
+ *
+ * Only the programs the payload installs are named, and only when the image lies directly
+ * in @p installDir. A folder a user installs into can hold other applications, each in its
+ * own subfolder, and those are not instances of this one: they hold none of the payload,
+ * neither closing nor ending them would free a file the purge removes, and naming them
+ * leaves the guard with an answer that can never be carried out. A program below the
+ * directory that does hold a payload file is still named, by findProcessesUsingFiles.
+ *
+ * Reading the image path needs PROCESS_QUERY_LIMITED_INFORMATION and
+ * QueryFullProcessImageNameW, neither of which depends on the bitness of either process,
+ * so a 64-bit instance is named from this 32-bit stub. The comparison is on the directory,
+ * not on an image name alone, so a program that merely shares a name with a payload program
+ * is never named.
+ *
+ * @param installDir the directory being replaced, as a full path.
+ * @return one entry per payload program running from it, in snapshot order, without the
+ *         processes named by askingProcessIds(); empty when the directory is empty or no
+ *         payload program runs from it.
+ */
+std::vector<Holder> findProcessesRunningFrom(const std::wstring &installDir);
+
+/**
+ * @brief The processes that must never be named as holders: the probe and the ones that
+ *        started it.
+ *
+ * The installer or uninstaller doing the asking can legitimately run from the directory it
+ * is replacing - the old uninstaller is started with _?= so it stays in $INSTDIR, and an
+ * installer can be downloaded into the folder - and naming it asks the user to close the
+ * program that is asking. That cannot be answered: the close skips it, the end offer skips
+ * it, and the guard loops until the user cancels, which is what a run that named itself
+ * did.
+ *
+ * The walk up the parent chain stops at the first program the payload installs, because in
+ * an in-app update the installer's own parent is the Cockatrice instance being replaced -
+ * the one the guard exists to name.
+ *
+ * @return process ids, the probe first, then its ancestors while they are not payload
+ *         programs; only the probe itself when the snapshot fails.
+ */
+std::vector<unsigned long> askingProcessIds();
 
 #endif

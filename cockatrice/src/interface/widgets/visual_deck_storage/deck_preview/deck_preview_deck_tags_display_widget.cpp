@@ -1,9 +1,7 @@
 #include "deck_preview_deck_tags_display_widget.h"
 
 #include "../../../../client/settings/cache_settings.h"
-#include "../../../deck_loader/deck_file_format.h"
 #include "../../../deck_loader/deck_loader.h"
-#include "../../../deck_loader/loaded_deck.h"
 #include "../../general/layout_containers/flow_widget.h"
 #include "deck_preview_tag_addition_widget.h"
 #include "deck_preview_tag_dialog.h"
@@ -14,7 +12,10 @@
 #include <QDir>
 #include <QDirIterator>
 #include <QHBoxLayout>
+#include <QPointer>
 #include <QSizePolicy>
+#include <libcockatrice/deck_list/deck_file_format.h>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
 #include <optional>
@@ -117,8 +118,13 @@ void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
 
 void DeckPreviewDeckTagsDisplayWidget::execTagDialog(const QStringList &knownTags)
 {
+    QPointer<DeckPreviewDeckTagsDisplayWidget> self(this);
     DeckPreviewTagDialog dialog(knownTags, currentTags);
     if (dialog.exec() == QDialog::Accepted) {
+        // Guard against the widget being destroyed during dialog.exec()'s nested event loop.
+        if (!self) {
+            return;
+        }
         QStringList updatedTags = dialog.getActiveTags();
         if (updatedTags != currentTags) {
             setTags(updatedTags);

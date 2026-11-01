@@ -2,16 +2,10 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
-#include "../../../game/abstract_game.h"
-#include "../../../game/game_event_handler.h"
-#include "../../../game/game_meta_info.h"
-#include "../../../game/game_state.h"
-#include "../../../game/player/player_info.h"
-#include "../../../game/player/player_manager.h"
+#include "../../../database/interface/settings_card_preference_provider.h"
 #include "../../../game_graphics/board/abstract_card_item.h"
-#include "../game/game.h"
-#include "../game/player/player_logic.h"
-#include "../game/replay.h"
+#include "../game_graphics/board/arrow_item.h"
+#include "../game_graphics/board/card_item.h"
 #include "../game_graphics/deckview/deck_view_container.h"
 #include "../game_graphics/deckview/tabbed_deck_view_container.h"
 #include "../game_graphics/game_scene.h"
@@ -71,6 +65,15 @@
 #include <QWidget>
 #include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/game.h>
+#include <libcockatrice/game/game_event_handler.h>
+#include <libcockatrice/game/game_meta_info.h>
+#include <libcockatrice/game/game_state.h>
+#include <libcockatrice/game/player/player_info.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/player/player_manager.h>
+#include <libcockatrice/game/replay.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
@@ -97,7 +100,8 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     : Tab(_tabSupervisor), sayLabel(nullptr), sayEdit(nullptr)
 {
     // THIS CTOR IS USED ON REPLAY
-    game = new Replay(this, _replay, tabSupervisor->getIsLocalGame());
+    game = new Replay(this, _replay, tabSupervisor->getIsLocalGame(), &SettingsCache::instance().userInterface(),
+                      new SettingsCardPreferenceProvider(this));
 
     createCardInfoDock(true);
     createPlayerListDock(true);
@@ -141,7 +145,8 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     : Tab(_tabSupervisor), userListProxy(_tabSupervisor->getUserListManager())
 {
     // THIS CTOR IS USED ON GAMES
-    game = new Game(this, tabSupervisor->getIsLocalGame(), _clients, event, _roomGameTypes);
+    game = new Game(this, tabSupervisor->getIsLocalGame(), _clients, event, _roomGameTypes,
+                    &SettingsCache::instance().userInterface(), new SettingsCardPreferenceProvider(this));
 
     createCardInfoDock();
     createPlayerListDock();
@@ -1276,8 +1281,14 @@ void TabGame::createPlayAreaWidget(bool bReplay)
 {
     phasesToolbar = new PhasesToolbar;
     if (!bReplay) {
-        connect(phasesToolbar, &PhasesToolbar::sendGameCommand, game->getGameEventHandler(),
-                qOverload<const ::google::protobuf::Message &, int>(&GameEventHandler::sendGameCommand));
+        connect(phasesToolbar, &PhasesToolbar::setActivePhaseRequested, game->getGameEventHandler(),
+                &GameEventHandler::handleActivePhaseChanged);
+        connect(phasesToolbar, &PhasesToolbar::nextTurnRequested, game->getGameEventHandler(),
+                &GameEventHandler::handleNextTurn);
+        connect(phasesToolbar, &PhasesToolbar::untapAllRequested, game->getGameEventHandler(),
+                &GameEventHandler::handleUntapAll);
+        connect(phasesToolbar, &PhasesToolbar::drawCardRequested, game->getGameEventHandler(),
+                &GameEventHandler::handleDrawCard);
     }
     scene = new GameScene(phasesToolbar, this);
     connect(game->getPlayerManager(), &PlayerManager::playerConceded, scene, &GameScene::rearrange);

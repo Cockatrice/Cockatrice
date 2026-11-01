@@ -26,6 +26,7 @@
 #include "client/sound_engine.h"
 #include "client/url_scheme_event_filter.h"
 #include "database/interface/settings_card_preference_provider.h"
+#include "installer_close_server.h"
 #include "interface/intents/intent.h"
 #include "interface/intents/intent_open_local_deck.h"
 #include "interface/logger.h"
@@ -430,6 +431,15 @@ int main(int argc, char *argv[])
     CardDatabaseManager::getInstance()->loadCardDatabases();
 
     MainWindow ui;
+
+    // The installer asks a running instance to close over this socket, which reaches a
+    // hidden window and one sitting on its own confirmation. Failure is not fatal: the
+    // installer falls back to WM_CLOSE for clients that have no socket.
+    InstallerCloseServer installerClose;
+    if (installerClose.listen()) {
+        QObject::connect(&installerClose, &InstallerCloseServer::closeRequested, &ui,
+                         &MainWindow::requestInstallerClose);
+    }
 
     // A URL launch must own the connection: the intent chain triggered by the
     // URL connects to the server named in the URL, so the window's own startup

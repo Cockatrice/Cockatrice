@@ -244,17 +244,27 @@ void ConnectionController::onLoginError(int r,
 {
     switch (static_cast<Response::ResponseCode>(r)) {
         case Response::RespClientUpdateRequired: {
-            QString formatted = "Missing Features: ";
-            for (int i = 0; i < missingFeatures.size(); ++i) {
-                formatted.append(QString("\n     %1").arg(QChar(0x2022)) + " " + missingFeatures.value(i));
-            }
-
             QMessageBox msgBox(dialogParent);
             msgBox.setIcon(QMessageBox::Critical);
             msgBox.setWindowTitle(tr("Failed Login"));
-            msgBox.setText(tr("Your client seems to be missing features this server requires for connection.") +
-                           "\n\n" + tr("To update your client, go to 'Help -> Check for Client Updates'."));
-            msgBox.setDetailedText(formatted);
+
+            if (missingFeatures.isEmpty()) {
+                // Without a feature list this is either a login the client stopped itself or a
+                // strict server asking for a password; the reason string already says which and
+                // what to do. No client update can fix any of those causes, so show it instead of
+                // the update advice.
+                msgBox.setText(reasonStr.isEmpty() ? tr("The login did not complete.") : reasonStr);
+            } else {
+                QString formatted = tr("Missing Features:");
+                for (const QString &feature : missingFeatures) {
+                    formatted.append(QString("\n     %1 ").arg(QChar(0x2022)) + feature);
+                }
+
+                msgBox.setText(tr("Your client seems to be missing features this server requires for connection.") +
+                               "\n\n" + tr("To update your client, go to 'Help -> Check for Client Updates'."));
+                msgBox.setDetailedText(formatted);
+            }
+
             msgBox.exec();
             break;
         }
@@ -517,14 +527,38 @@ void ConnectionController::onForgotPasswordSuccess()
     SettingsCache::instance().servers().setFPPlayerName("");
 }
 
-void ConnectionController::onForgotPasswordError()
+void ConnectionController::onForgotPasswordError(int responseCode)
 {
-    QMessageBox::warning(
-        dialogParent, tr("Reset Password"),
-        tr("Failed to reset user account password, please contact the server operator to reset your password."));
-    SettingsCache::instance().servers().setFPHostName("");
-    SettingsCache::instance().servers().setFPPort("");
-    SettingsCache::instance().servers().setFPPlayerName("");
+    // Rate limiting is retryable, so it must not clear the prefill.
+    bool keepPrefill = false;
+    QString message;
+    switch (static_cast<Response::ResponseCode>(responseCode)) {
+        case Response::RespTooManyRequests:
+            // Retryable: keep the host/port/user prefill so the user can try again. The window
+            // is server-configured (an hour by default), so do not promise a shorter wait.
+            keepPrefill = true;
+            message = tr("Too many password reset attempts from your address. Please wait before "
+                         "requesting a new reset.");
+            break;
+        case Response::RespFunctionNotAllowed:
+            // Also returned for an unknown user, a banned user, and an expired token or
+            // challenge, so the message must not claim a single cause.
+            message = tr("The server did not accept the reset request. Check the user name, or contact "
+                         "the server operator to reset your password.");
+            break;
+        default:
+            message = tr("Failed to reset user account password, please contact the server operator to reset your "
+                         "password.");
+            break;
+    }
+
+    QMessageBox::warning(dialogParent, tr("Reset Password"), message);
+
+    if (!keepPrefill) {
+        SettingsCache::instance().servers().setFPHostName("");
+        SettingsCache::instance().servers().setFPPort("");
+        SettingsCache::instance().servers().setFPPlayerName("");
+    }
 }
 
 void ConnectionController::onPromptForgotPasswordReset()

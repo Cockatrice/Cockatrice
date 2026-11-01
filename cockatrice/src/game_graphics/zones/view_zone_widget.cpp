@@ -1,13 +1,7 @@
 #include "view_zone_widget.h"
 
 #include "../../client/settings/cache_settings.h"
-#include "../../client/translation.h"
 #include "../../filters/syntax_help.h"
-#include "../../game/board/card_list.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_logic.h"
-#include "../../game/zones/card_zone_logic.h"
-#include "../../game/zones/view_zone_logic.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../card_dimensions.h"
 #include "../z_values.h"
@@ -45,7 +39,12 @@
 #include <QVariant>
 #include <QWidget>
 #include <QtGlobal>
-#include <libcockatrice/protocol/pb/command_shuffle.pb.h>
+#include <libcockatrice/game/board/card_list.h>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/translation.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
+#include <libcockatrice/game/zones/view_zone_logic.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <qnamespace.h>
@@ -178,9 +177,10 @@ ZoneViewWidget::ZoneViewWidget(PlayerLogic *_player,
 
     vbox->addItem(zoneHBox);
 
-    zone = new ZoneViewZone(new ZoneViewZoneLogic(player, _origZone, numberCards, _revealZone, _writeableRevealZone,
-                                                  _isReversed, zoneContainer),
-                            zoneContainer);
+    zone =
+        new ZoneViewZone(new ZoneViewZoneLogic(player, _origZone, numberCards, _revealZone, _writeableRevealZone,
+                                               _isReversed, &SettingsCache::instance().userInterface(), zoneContainer),
+                         zoneContainer);
     connect(zone, &ZoneViewZone::wheelEventReceived, scrollBarProxy, &ScrollableGraphicsProxyWidget::recieveWheelEvent);
 
     retranslateUi();
@@ -570,7 +570,7 @@ void ZoneViewWidget::closeEvent(QCloseEvent *event)
     // manually call zone->close in order to remove it from the origZones views
     zone->close();
     if (shuffleCheckBox.isChecked()) {
-        player->getPlayerActions()->sendGameCommand(Command_Shuffle());
+        player->getPlayerActions()->actShuffle();
     }
     zoneDeleted();
     event->accept();

@@ -87,7 +87,7 @@ private slots:
 
     // Forgot-password flow
     void onForgotPasswordSuccess();
-    void onForgotPasswordError();
+    void onForgotPasswordError(int responseCode);
     void onPromptForgotPasswordReset();
     void onPromptForgotPasswordChallenge();
 

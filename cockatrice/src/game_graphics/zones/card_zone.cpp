@@ -1,13 +1,13 @@
 #include "card_zone.h"
 
-#include "../../game/board/card_list.h"
-#include "../../game/zones/card_zone_logic.h"
 #include "../board/abstract_graphics_item.h"
 #include "../board/card_item.h"
 
 #include <QAction>
 #include <QGraphicsSceneMouseEvent>
 #include <QMenu>
+#include <libcockatrice/game/board/card_list.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
 #include <qnamespace.h>
 
 class QGraphicsItem;
@@ -18,23 +18,60 @@ CardZone::CardZone(CardZoneLogic *_logic, QGraphicsItem *parent)
     : AbstractGraphicsItem(parent), menu(nullptr), doubleClickAction(0), logic(_logic)
 {
     connect(logic, &CardZoneLogic::retranslateUi, this, &CardZone::retranslateUi);
+    // Invalidation is connected before any consumer so a handler that reads cardItems()
+    // during the same signal emission always sees a stale flag and rebuilds.
+    connect(logic, &CardZoneLogic::cardAdded, this, &CardZone::invalidateItems);
+    connect(logic, &CardZoneLogic::cardCountChanged, this, &CardZone::invalidateItems);
+    connect(logic, &CardZoneLogic::reorganizeCards, this, &CardZone::invalidateItems);
     connect(logic, &CardZoneLogic::cardAdded, this, &CardZone::onCardAdded);
+    connect(logic, &CardZoneLogic::createCardRequested, this, &CardZone::onCreateCardRequested);
     connect(logic, &CardZoneLogic::setGraphicsVisibility, this, [this](bool v) { this->setVisible(v); });
     connect(logic, &CardZoneLogic::updateGraphics, this, [this]() { update(); });
     connect(logic, &CardZoneLogic::reorganizeCards, this, &CardZone::reorganizeCards);
 }
 
-void CardZone::onCardAdded(CardItem *addedCard)
+void CardZone::invalidateItems()
 {
-    addedCard->setParentItem(this);
-    addedCard->setVisible(true);
-    addedCard->update();
+    itemsDirty = true;
+}
+
+const QList<CardItem *> &CardZone::cardItems() const
+{
+    if (itemsDirty) {
+        items.clear();
+        for (auto *cardState : getLogic()->getCards()) {
+            if (auto *cardItem = qobject_cast<CardItem *>(cardState->parent())) {
+                items.append(cardItem);
+            }
+        }
+        itemsDirty = false;
+    }
+    return items;
+}
+
+void CardZone::onCardAdded(CardState *addedCard)
+{
+    auto *addedItem = addedCard == nullptr ? nullptr : qobject_cast<CardItem *>(addedCard->parent());
+    if (addedItem == nullptr) {
+        return;
+    }
+    addedItem->setParentItem(this);
+    addedItem->setVisible(true);
+    addedItem->update();
+}
+
+void CardZone::onCreateCardRequested(const ServerInfo_Card &cardInfo, bool reorganize)
+{
+    CardRef cardRef = {QString::fromStdString(cardInfo.name()), QString::fromStdString(cardInfo.provider_id())};
+    auto *card = new CardItem(getLogic()->getPlayer(), nullptr, cardRef, cardInfo.id());
+    card->processCardInfo(cardInfo);
+    getLogic()->addCard(card->getState(), reorganize, cardInfo.x(), cardInfo.y());
 }
 
 void CardZone::retranslateUi()
 {
-    for (int i = 0; i < getLogic()->getCards().size(); ++i) {
-        getLogic()->getCards()[i]->retranslateUi();
+    for (auto *card : cardItems()) {
+        card->retranslateUi();
     }
 }
 

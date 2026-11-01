@@ -6,9 +6,7 @@ set(HEADERS abstract_client.h latency_tracker.h)
 
 set(SOURCES abstract_client.cpp latency_tracker.cpp)
 
-qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-
-add_library(libcockatrice_network_client_abstract STATIC ${MOC_SOURCES} ${SOURCES})
+add_library(libcockatrice_network_client_abstract STATIC ${HEADERS} ${SOURCES})
 
 add_dependencies(libcockatrice_network_client_abstract libcockatrice_protocol libcockatrice_network_server_remote)
 

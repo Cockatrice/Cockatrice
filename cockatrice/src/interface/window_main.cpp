@@ -923,11 +923,28 @@ void MainWindow::actShow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    // workaround Qt bug where closeEvent gets called twice
-    if (bClosingDown) {
-        return;
+    switch (shutdownState) {
+        case ShutdownState::Accepted:
+            // A duplicate close for a shutdown that already went through (Qt delivers the event
+            // twice on some platforms). Accepting it again keeps the quit that is already under
+            // way; ignoring it would cancel it.
+            event->accept();
+            return;
+        case ShutdownState::Confirming:
+            // A second close request arrived while one of our own confirmations is up. Another
+            // program asking us to close - an installer replacing our files, for one - looks
+            // exactly like this, and accepting it would be destructive: close() hides this
+            // window, hides the dialog with it, and leaves the process running inside the nested
+            // loop that dialog opened. Nothing can reach that loop afterwards, so the process
+            // stays alive with no window and every later close request is accepted into the same
+            // dead end. Refuse this one and leave the question in front of the user; the shutdown
+            // that is already running finishes as soon as they answer it.
+            event->ignore();
+            return;
+        case ShutdownState::Idle:
+            break;
     }
-    bClosingDown = true;
+    shutdownState = ShutdownState::Confirming;
 
     if (cardUpdateProcess && cardUpdateProcess->state() != QProcess::NotRunning) {
         const QString runningFor = cardUpdateStatusBar ? cardUpdateStatusBar->statusText() : QString();
@@ -939,19 +956,20 @@ void MainWindow::closeEvent(QCloseEvent *event)
                                           .arg(runningFor);
         if (!QtUtils::confirm(this, tr("Are you sure?"), message, QMessageBox::No)) {
             event->ignore();
-            bClosingDown = false;
+            shutdownState = ShutdownState::Idle;
             return;
         }
     }
 
     if (!tabSupervisor->close()) {
         event->ignore();
-        bClosingDown = false;
+        shutdownState = ShutdownState::Idle;
         return;
     }
     tip->close();
 
     event->accept();
+    shutdownState = ShutdownState::Accepted;
     SettingsCache::instance().layouts().setMainWindowGeometry(saveGeometry());
     tabSupervisor->deleteLater();
 }
@@ -962,10 +980,34 @@ bool MainWindow::closeForUpdate()
     // closeEvent() is blocked on a user prompt). close() would hit the re-entrancy guard and return
     // true without any shutdown having happened, so report faithfully instead: the caller must keep
     // the process alive until the user resolves whatever is blocking the close.
-    if (bClosingDown) {
+    if (shutdownState != ShutdownState::Idle) {
         return false;
     }
     return close();
+}
+
+void MainWindow::requestInstallerClose()
+{
+    // The same shutdown the in-app updater asks for: close the window, flush settings and let
+    // the tabs answer their own prompts. Never a forced quit - ending a process that has not
+    // agreed is the installer's separate force-close answer, not this one.
+    if (closeForUpdate()) {
+        QTimer::singleShot(0, qApp, [] { QCoreApplication::exit(0); });
+        return;
+    }
+    // A confirmation is already up, or a shutdown is in progress. Bring it forward: an
+    // installer prompt behind a hidden confirmation is the deadlock this request exists to
+    // break, and the user has to be able to answer it. showWindowIfHidden() also clears
+    // Qt::WindowMinimized, which raise() alone does not: a minimized window can keep the
+    // confirmation behind the installer.
+    showWindowIfHidden();
+    if (QWidget *modal = QApplication::activeModalWidget()) {
+        modal->raise();
+        modal->activateWindow();
+    }
+    raise();
+    activateWindow();
+    QApplication::alert(this, 0);
 }
 
 void MainWindow::changeEvent(QEvent *event)

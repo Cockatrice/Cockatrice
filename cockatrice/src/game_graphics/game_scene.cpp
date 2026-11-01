@@ -1,18 +1,10 @@
 #include "game_scene.h"
 
 #include "../client/settings/cache_settings.h"
-#include "../game/abstract_game.h"
-#include "../game/arrow_registry.h"
-#include "../game/board/arrow_data.h"
-#include "../game/player/player_actions.h"
-#include "../game/player/player_event_handler.h"
-#include "../game/player/player_info.h"
-#include "../game/player/player_logic.h"
-#include "../game/zones/card_zone_logic.h"
-#include "../game/zones/view_zone_logic.h"
 #include "animated_item.h"
 #include "board/abstract_card_item.h"
 #include "board/arrow_item.h"
+#include "board/arrow_registry.h"
 #include "board/card_item.h"
 #include "phases_toolbar.h"
 #include "player/menu/player_menu.h"
@@ -40,6 +32,15 @@
 #include <QSharedPointer>
 #include <QtMath>
 #include <algorithm>
+#include <functional>
+#include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/board/arrow_data.h>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_event_handler.h>
+#include <libcockatrice/game/player/player_info.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
+#include <libcockatrice/game/zones/view_zone_logic.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <numeric>
@@ -112,6 +113,15 @@ void GameScene::retranslateUi()
     }
 }
 
+QList<CardState *> GameScene::selectedCardStates() const
+{
+    QList<CardState *> selectedStates;
+    for (auto *card : selectedCards()) {
+        selectedStates.append(card->getState());
+    }
+    return selectedStates;
+}
+
 QList<CardItem *> GameScene::selectedCards() const
 {
     QList<CardItem *> selectedCards;
@@ -124,6 +134,67 @@ QList<CardItem *> GameScene::selectedCards() const
     return selectedCards;
 }
 
+/**
+ * @brief Selects every card of @p zone for which @p filter holds.
+ * @param filter A predicate to filter which cards are selected.
+ */
+static void selectCardsInZone(
+    const CardZoneLogic *zone,
+    std::function<bool(const CardItem *)> filter = [](const CardItem *) { return true; })
+{
+    if (!zone) {
+        return;
+    }
+
+    for (auto *cardState : zone->getCards()) {
+        auto *cardItem = cardState == nullptr ? nullptr : qobject_cast<CardItem *>(cardState->parent());
+        if (cardItem && filter(cardItem)) {
+            cardItem->setSelected(true);
+        }
+    }
+}
+
+void GameScene::selectAllInZone(const CardItem *card)
+{
+    if (!card) {
+        return;
+    }
+
+    selectCardsInZone(card->getZone());
+}
+
+void GameScene::selectSameRow(const CardItem *card)
+{
+    if (!card) {
+        return;
+    }
+
+    auto isSameRow = [card](const CardItem *cardItem) {
+        return qAbs(card->scenePos().y() - cardItem->scenePos().y()) < 50;
+    };
+    selectCardsInZone(card->getZone(), isSameRow);
+}
+
+void GameScene::selectSameColumn(const CardItem *card)
+{
+    if (!card) {
+        return;
+    }
+
+    auto isSameColumn = [card](const CardItem *cardItem) { return cardItem->x() == card->x(); };
+    selectCardsInZone(card->getZone(), isSameColumn);
+}
+
+CardItem *GameScene::getActiveCard() const
+{
+    return activeCard;
+}
+
+void GameScene::setActiveCard(CardItem *card)
+{
+    activeCard = card;
+}
+
 void GameScene::onCardSelectionChanged(AbstractCardItem *abstractCard, bool selected)
 {
     CardItem *card = qobject_cast<CardItem *>(abstractCard);
@@ -134,12 +205,12 @@ void GameScene::onCardSelectionChanged(AbstractCardItem *abstractCard, bool sele
     auto *owner = card->getOwner();
 
     if (selected) {
-        owner->requestCardMenuUpdate(card);
+        owner->requestCardMenuUpdate(card->getState());
         return;
     }
 
     if (selectedItems().isEmpty()) {
-        owner->getGame()->setActiveCard(nullptr);
+        setActiveCard(nullptr);
         owner->requestCardMenuUpdate(nullptr);
     }
 }
@@ -158,9 +229,9 @@ void GameScene::onCardRightClicked(AbstractCardItem *abstractCard, QPoint screen
         return;
     }
 
-    card->getOwner()->getGame()->setActiveCard(card);
+    setActiveCard(card);
 
-    if (auto *menu = view->getPlayerMenu()->updateCardMenu(card)) {
+    if (auto *menu = view->getPlayerMenu()->updateCardMenu(card->getState())) {
         menu->popup(screenPos);
     }
 }
@@ -173,7 +244,7 @@ void GameScene::playSelected(AbstractCardItem *card)
     if (!card->getOwner()) {
         return;
     }
-    card->getOwner()->getPlayerActions()->actPlay(selectedCards());
+    card->getOwner()->getPlayerActions()->actPlay(selectedCardStates());
 }
 
 void GameScene::playSelectedFaceDown(AbstractCardItem *card)
@@ -184,7 +255,7 @@ void GameScene::playSelectedFaceDown(AbstractCardItem *card)
     if (!card->getOwner()) {
         return;
     }
-    card->getOwner()->getPlayerActions()->actPlayFacedown(selectedCards());
+    card->getOwner()->getPlayerActions()->actPlayFacedown(selectedCardStates());
 }
 
 void GameScene::hideSelected(AbstractCardItem *card)
@@ -195,7 +266,7 @@ void GameScene::hideSelected(AbstractCardItem *card)
     if (!card->getOwner()) {
         return;
     }
-    card->getOwner()->getPlayerActions()->actHide(selectedCards());
+    card->getOwner()->getPlayerActions()->actHide(selectedCardStates());
 }
 
 /**
@@ -230,6 +301,8 @@ void GameScene::addPlayer(PlayerLogic *player)
             [this, id = player->getPlayerInfo()->getId()]() { clearArrowsForPlayerLocally(id); });
 
     connect(player->getPlayerEventHandler(), &PlayerEventHandler::cardZoneChanged, this, &GameScene::onCardZoneChanged);
+    connect(player->getPlayerEventHandler(), &PlayerEventHandler::cardViewRefreshRequested, this,
+            &GameScene::onCardViewRefreshRequested);
 
     rearrange();
 }
@@ -533,7 +606,11 @@ void GameScene::addArrow(QSharedPointer<ArrowData> data)
         return;
     }
 
-    CardItem *startCard = startZone->getCard(data->startCardId);
+    CardState *startCardState = startZone->getCard(data->startCardId);
+    if (!startCardState) {
+        return;
+    }
+    CardItem *startCard = qobject_cast<CardItem *>(startCardState->parent());
     if (!startCard) {
         return;
     }
@@ -544,7 +621,8 @@ void GameScene::addArrow(QSharedPointer<ArrowData> data)
     } else {
         auto *zone = targetView->getLogic()->getZones().value(data->targetZone);
         if (zone) {
-            targetItem = zone->getCard(data->targetCardId);
+            CardState *targetCardState = zone->getCard(data->targetCardId);
+            targetItem = targetCardState == nullptr ? nullptr : qobject_cast<CardItem *>(targetCardState->parent());
         }
     }
     if (!targetItem) {
@@ -572,11 +650,15 @@ void GameScene::requestArrowDeletion(int playerId, int arrowId)
     }
 }
 
-void GameScene::onCardZoneChanged(CardItem *card, bool sameZone)
+void GameScene::onCardZoneChanged(CardState *card, bool sameZone)
 {
+    auto *item = qobject_cast<CardItem *>(card->parent());
+    if (!item) {
+        return;
+    }
     QList<ArrowItem *> toDelete;
     for (auto *arrow : arrowRegistry.all()) {
-        if (arrow->getStartItem() == card || arrow->getTargetItem() == card) {
+        if (arrow->getStartItem() == item || arrow->getTargetItem() == item) {
             if (sameZone) {
                 arrow->updatePath();
             } else {
@@ -586,6 +668,25 @@ void GameScene::onCardZoneChanged(CardItem *card, bool sameZone)
     }
     for (auto *arrow : toDelete) {
         deleteArrow(arrow->getCreatorId(), arrow->getId());
+    }
+}
+
+void GameScene::onCardViewRefreshRequested(CardState *card, bool zoneChanged, PlayerLogic *newOwner)
+{
+    auto *item = qobject_cast<CardItem *>(card->parent());
+    if (!item) {
+        return;
+    }
+    if (zoneChanged) {
+        item->deleteCardInfoPopup();
+    }
+    item->deleteDragItem();
+    if (zoneChanged) {
+        item->setBeingPointedAt(false);
+        item->setHovered(false);
+    }
+    if (newOwner) {
+        item->setOwner(newOwner);
     }
 }
 

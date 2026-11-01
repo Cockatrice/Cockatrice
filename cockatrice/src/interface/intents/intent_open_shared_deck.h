@@ -1,7 +1,6 @@
 #ifndef COCKATRICE_INTENT_OPEN_SHARED_DECK_H
 #define COCKATRICE_INTENT_OPEN_SHARED_DECK_H
 
-#include "../deck_loader/loaded_deck.h"
 #include "contexts/context_open_deck.h"
 #include "intent.h"
 
@@ -9,6 +8,7 @@
 #include <QMap>
 #include <QScopedPointer>
 #include <QString>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <memory>
 #include <qtmetamacros.h>
 

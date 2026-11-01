@@ -1,6 +1,5 @@
 #include "deck_filter_string.h"
 
-#include "../interface/deck_loader/loaded_deck.h"
 #include "libcockatrice/card/card_localization.h"
 #include "libcockatrice/card/database/card_database_querier.h"
 #include "libcockatrice/deck_list/deck_list.h"
@@ -15,6 +14,7 @@
 #include <algorithm>
 #include <any>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/filters/filter_string.h>
 #include <libcockatrice/utility/peglib.h>
 #include <mutex>

@@ -1,11 +1,10 @@
 #ifndef COCKATRICE_REPLAY_MANAGER_H
 #define COCKATRICE_REPLAY_MANAGER_H
 
-#include "../../../game/player/event_processing_options.h"
-
 #include <QList>
 #include <QObject>
 #include <QtGlobal>
+#include <libcockatrice/game/player/event_processing_options.h>
 #include <qtmetamacros.h>
 
 class GameReplay;

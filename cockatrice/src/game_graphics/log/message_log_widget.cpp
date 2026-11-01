@@ -3,16 +3,6 @@
 #include "../../client/settings/cache_settings.h"
 #include "../../client/settings/card_counter_settings.h"
 #include "../../client/sound_engine.h"
-#include "../../client/translation.h"
-#include "../../game/abstract_game.h"
-#include "../../game/board/card_list.h"
-#include "../../game/game_state.h"
-#include "../../game/phase.h"
-#include "../../game/player/player_event_handler.h"
-#include "../../game/player/player_info.h"
-#include "../../game/player/player_logic.h"
-#include "../../game/player/player_manager.h"
-#include "../../game/zones/card_zone_logic.h"
 #include "../../interface/card_localization.h"
 #include "../../interface/widgets/server/chat_view/chat_view.h"
 #include "../board/card_item.h"
@@ -24,6 +14,16 @@
 #include <QList>
 #include <QSharedPointer>
 #include <QStringList>
+#include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/board/card_list.h>
+#include <libcockatrice/game/game_state.h>
+#include <libcockatrice/game/phase.h>
+#include <libcockatrice/game/player/player_event_handler.h>
+#include <libcockatrice/game/player/player_info.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/player/player_manager.h>
+#include <libcockatrice/game/translation.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/protocol/pb/context_mulligan.pb.h>
 #include <libcockatrice/settings/chat_settings.h>
@@ -283,7 +283,7 @@ void MessageLogWidget::logDestroyCard(PlayerLogic *player, QString cardName)
 }
 
 void MessageLogWidget::logMoveCard(PlayerLogic *player,
-                                   CardItem *card,
+                                   CardState *card,
                                    CardZoneLogic *startZone,
                                    int oldX,
                                    CardZoneLogic *targetZone,
@@ -662,7 +662,7 @@ void MessageLogWidget::logSetActivePlayer(PlayerLogic *player)
                QString(tr("%1's turn.")).arg(player->getPlayerInfo()->getName()) + "</b></font><br>");
 }
 
-void MessageLogWidget::logSetAnnotation(PlayerLogic *player, CardItem *card, QString newAnnotation)
+void MessageLogWidget::logSetAnnotation(PlayerLogic *player, CardState *card, QString newAnnotation)
 {
     appendHtmlServerMessage(
         QString(tr("%1 sets annotation of %2 to %3."))
@@ -706,7 +706,7 @@ void MessageLogWidget::logSetCounter(PlayerLogic *player, QString counterName, i
                                 .arg(value - oldValue));
 }
 
-void MessageLogWidget::logSetDoesntUntap(PlayerLogic *player, CardItem *card, bool doesntUntap)
+void MessageLogWidget::logSetDoesntUntap(PlayerLogic *player, CardState *card, bool doesntUntap)
 {
     QString str;
     if (doesntUntap) {
@@ -717,7 +717,7 @@ void MessageLogWidget::logSetDoesntUntap(PlayerLogic *player, CardItem *card, bo
     appendHtmlServerMessage(str.arg(sanitizeHtml(player->getPlayerInfo()->getName())).arg(cardLink(card->getName())));
 }
 
-void MessageLogWidget::logSetPT(PlayerLogic *player, CardItem *card, QString newPT)
+void MessageLogWidget::logSetPT(PlayerLogic *player, CardState *card, QString newPT)
 {
     if (currentContext == MessageContext_MoveCard) {
         return;
@@ -755,7 +755,7 @@ void MessageLogWidget::logSetSideboardLock(PlayerLogic *player, bool locked)
     }
 }
 
-void MessageLogWidget::logSetTapped(PlayerLogic *player, CardItem *card, bool tapped)
+void MessageLogWidget::logSetTapped(PlayerLogic *player, CardState *card, bool tapped)
 {
     if (currentContext == MessageContext_MoveCard) {
         return;
