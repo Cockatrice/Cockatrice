@@ -29,9 +29,9 @@ public:
     {
         return "oracle";
     }
-    QByteArray getHash(const QString fileName);
-    QByteArray getHash(QByteArray data);
-    static bool deleteSpoilerFile();
+    // Queues removal and reload; the application owns the returned updater and
+    // deletes it on completion. Callers can connect its failure/completion signals.
+    static SpoilerBackgroundUpdater *deleteSpoilerFile();
 
 private slots:
     void begin();
@@ -40,13 +40,6 @@ private slots:
     void cancelIfSettingsChanged();
 
 private:
-    enum class SaveResult
-    {
-        Failed,
-        Unchanged,
-        Written
-    };
-
     const bool enabledAtStart;
     const bool forceReload;
     const QString targetPath;
@@ -66,8 +59,6 @@ private:
     void finish(const QString &error = {}, bool updated = false);
     void downloadFromURL(const QUrl &url, bool saveResults);
     void reloadDatabase(bool updated);
-    QString validateDownloadedFile(const QByteArray &data) const;
-    SaveResult saveDownloadedFile(const QByteArray &data, QString &error);
 
 signals:
     void spoilersUpdatedSuccessfully();
