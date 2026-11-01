@@ -4,6 +4,7 @@
 #include "theme_icon.h"
 #include "theme_manager.h"
 
+#include <QApplication>
 #include <QBrush>
 #include <QByteArray>
 #include <QChar>
@@ -435,39 +436,19 @@ QIcon UserLevelPixmapGenerator::generateIconWithColorOverride(int height,
 
 QMap<QString, QIcon> UserLevelPixmapGenerator::iconCache;
 
-QPixmap LockPixmapGenerator::generatePixmap(int height)
-{
-
-    int key = height;
-    if (pmCache.contains(key)) {
-        return pmCache.value(key);
-    }
-
-    const QString resolved = themeManager->assetPath(QStringLiteral("icons/lock"));
-    QPixmap pixmap = loadSentinelSvgPixmap(resolved, QPalette::WindowText, QSize(height, height));
-    if (pixmap.isNull()) {
-        pixmap = tryLoadImage(QStringLiteral("theme:") + resolved, QSize(height, height), true);
-    }
-    pmCache.insert(key, pixmap);
-    return pixmap;
-}
-
-QMap<int, QPixmap> LockPixmapGenerator::pmCache;
-
 QPixmap DropdownIconPixmapGenerator::generatePixmap(int height, bool expanded)
 {
-    QString key = QString::number(expanded) + ":" + QString::number(height);
+    const QString key = QString::number(expanded) + ":" + QString::number(height);
     if (pmCache.contains(key)) {
         return pmCache.value(key);
     }
 
+    // Render through the themed icon engine: it keeps the glyph's aspect ratio,
+    // follows the palette, and renders at the device pixel ratio instead of
+    // handing a DPR-1 bitmap to a label that would upscale and blur it on a 2x
+    // display.
     const QString prefix = QStringLiteral("icons/") + (expanded ? "dropdown_expanded" : "dropdown_collapsed");
-    const QString resolved = themeManager->assetPath(prefix);
-    QPixmap pixmap = loadSentinelSvgPixmap(resolved, QPalette::WindowText, QSize(height, height));
-    if (pixmap.isNull()) {
-        pixmap = tryLoadImage(QStringLiteral("theme:") + resolved, QSize(height, height), true);
-    }
-
+    const QPixmap pixmap = loadThemedIcon(prefix).pixmap(QSize(height, height), qApp->devicePixelRatio());
     pmCache.insert(key, pixmap);
     return pixmap;
 }
@@ -539,7 +520,6 @@ void clearPixmapGeneratorCaches()
     PingPixmapGenerator::clear();
     CountryPixmapGenerator::clear();
     UserLevelPixmapGenerator::clear();
-    LockPixmapGenerator::clear();
     DropdownIconPixmapGenerator::clear();
     ManaSymbolPixmapGenerator::clear();
 }

@@ -5,6 +5,7 @@
 #include "game_type_map.h"
 
 #include <QAbstractTableModel>
+#include <QIcon>
 #include <QList>
 #include <QMap>
 #include <QModelIndex>
@@ -32,6 +33,7 @@ private:
     QList<ServerInfo_Game> gameList;  /**< List of games currently displayed. */
     QMap<int, QString> rooms;         /**< Map of room IDs to room names. */
     QMap<int, GameTypeMap> gameTypes; /**< Map of room IDs to available game types. */
+    QIcon lockIcon;                   /**< Themed lock for password-protected games. */
 
     static const int NUM_COLS = 8; /**< Number of columns in the table. */
 

@@ -106,19 +106,6 @@ public:
     }
 };
 
-class LockPixmapGenerator
-{
-private:
-    static QMap<int, QPixmap> pmCache;
-
-public:
-    static QPixmap generatePixmap(int height);
-    static void clear()
-    {
-        pmCache.clear();
-    }
-};
-
 class DropdownIconPixmapGenerator
 {
 private:
