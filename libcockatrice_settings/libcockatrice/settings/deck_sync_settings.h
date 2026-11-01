@@ -22,14 +22,19 @@ class DeckSyncSettings : public SettingsManager
     friend class SettingsCache;
 
 public:
+    explicit DeckSyncSettings(const QString &settingPath, QObject *parent = nullptr);
+
     [[nodiscard]] int getConflictDefault() const;
     void setConflictDefault(int _conflictDefault);
+    [[nodiscard]] bool getAutoSync() const;
+    void setAutoSync(bool _autoSync);
+    [[nodiscard]] int getSyncIntervalMinutes() const;
+    void setSyncIntervalMinutes(int _syncIntervalMinutes);
 
 signals:
     void conflictDefaultChanged(int conflictDefault);
-
-public:
-    explicit DeckSyncSettings(const QString &settingPath, QObject *parent = nullptr);
+    void autoSyncChanged(bool autoSync);
+    void syncIntervalMinutesChanged(int syncIntervalMinutes);
 
 private:
     DeckSyncSettings(const DeckSyncSettings & /*other*/);

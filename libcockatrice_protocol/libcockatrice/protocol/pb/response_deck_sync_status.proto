@@ -1,0 +1,21 @@
+syntax = "proto2";
+import "response.proto";
+
+message DeckSyncChangedFile {
+    // Server-relative folder path without file extension, e.g. "Modern/Affinity".
+    optional string path = 1;
+    optional uint32 deck_id = 2;
+    optional string guid = 3;
+    optional string hash = 4;
+    optional uint64 last_modified = 5;
+    optional bool deleted = 6 [default = false];
+}
+
+message Response_DeckSyncStatus {
+    extend Response {
+        optional Response_DeckSyncStatus ext = 1107;
+    }
+    repeated DeckSyncChangedFile changed_files = 1;
+    // Server clock at query time; the client adopts it as its sync baseline.
+    optional uint64 server_time = 2;
+}

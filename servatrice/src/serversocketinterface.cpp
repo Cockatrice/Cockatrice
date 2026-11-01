@@ -98,6 +98,7 @@
 #include <libcockatrice/protocol/pb/command_deck_share_list.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_share_list_mine.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_share_remove.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_sync_check.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pb/command_get_server_stats.pb.h>
 #include <libcockatrice/protocol/pb/command_replay_delete_match.pb.h>
@@ -134,6 +135,7 @@
 #include <libcockatrice/protocol/pb/response_deck_share_download.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_share_list.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_share_list_mine.pb.h>
+#include <libcockatrice/protocol/pb/response_deck_sync_status.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_upload.pb.h>
 #include <libcockatrice/protocol/pb/response_forgotpasswordrequest.pb.h>
 #include <libcockatrice/protocol/pb/response_get_admin_notes.pb.h>
@@ -371,6 +373,8 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionComm
             return cmdDeckUpload(cmd.GetExtension(Command_DeckUpload::ext), rc);
         case SessionCommand::DECK_DOWNLOAD:
             return cmdDeckDownload(cmd.GetExtension(Command_DeckDownload::ext), rc);
+        case SessionCommand::DECK_SYNC_CHECK:
+            return cmdDeckSyncCheck(cmd.GetExtension(Command_DeckSyncCheck::ext), rc);
         case SessionCommand::REPLAY_LIST:
             return cmdReplayList(cmd.GetExtension(Command_ReplayList::ext), rc);
         case SessionCommand::REPLAY_DOWNLOAD:
@@ -891,6 +895,61 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckSetVisibility(const
         return Response::RespInvalidData;
     }
 
+    return Response::RespOk;
+}
+
+bool AbstractServerSocketInterface::syncCheckHelper(int userId, qint64 sinceSecs, Response_DeckSyncStatus *status)
+{
+    // Single query over the user's files: folder rows are hard-deleted while
+    // their files linger as tombstones, so walking the live folder tree would
+    // miss deletes pointing at nonexistent folders. The client only checks
+    // changed_files_size(), so folder paths are not reconstructed here.
+    // last_modified is backfilled by the 37 -> 38 migration, so a plain range
+    // check is enough.
+    QSqlQuery *query = sqlInterface->prepareQuery("select id, guid, hash, last_modified, deleted from "
+                                                  "{prefix}_decklist_files where id_user = :id_user "
+                                                  "and last_modified >= FROM_UNIXTIME(:since)");
+    query->bindValue(":id_user", userId);
+    query->bindValue(":since", sinceSecs);
+    if (!sqlInterface->execSqlQuery(query)) {
+        return false;
+    }
+    while (query->next()) {
+        DeckSyncChangedFile *changed = status->add_changed_files();
+        changed->set_deck_id(query->value(0).toUInt());
+        changed->set_guid(query->value(1).toString().toStdString());
+        changed->set_hash(query->value(2).toString().toStdString());
+        const QDateTime lastModified = query->value(3).toDateTime();
+        if (lastModified.isValid()) {
+            changed->set_last_modified(lastModified.toSecsSinceEpoch());
+        }
+        changed->set_deleted(query->value(4).toBool());
+    }
+    return true;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdDeckSyncCheck(const Command_DeckSyncCheck &cmd,
+                                                                       ResponseContainer &rc)
+{
+    if (authState != PasswordRight) {
+        return Response::RespFunctionNotAllowed;
+    }
+
+    sqlInterface->checkSql();
+
+    Response_DeckSyncStatus *re = new Response_DeckSyncStatus;
+    if (!syncCheckHelper(userInfo->id(), static_cast<qint64>(cmd.last_sync_time()), re)) {
+        delete re;
+        return Response::RespContextError;
+    }
+
+    QSqlQuery *clockQuery = sqlInterface->prepareQuery("select unix_timestamp(now())");
+    if (!sqlInterface->execSqlQuery(clockQuery) || !clockQuery->next()) {
+        delete re;
+        return Response::RespContextError;
+    }
+    re->set_server_time(clockQuery->value(0).toULongLong());
+    rc.setResponseExtension(re);
     return Response::RespOk;
 }
 
