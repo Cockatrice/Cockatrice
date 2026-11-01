@@ -4193,16 +4193,15 @@ Response::ResponseCode
 AbstractServerSocketInterface::cmdUpdateServerMessage(const Command_UpdateServerMessage & /*cmd*/,
                                                       ResponseContainer & /*rc*/)
 {
-    QMetaObject::invokeMethod(servatrice, [this] { servatrice->updateLoginMessage(); });
+    QMetaObject::invokeMethod(servatrice, [srv = servatrice] { srv->updateLoginMessage(); });
     return Response::RespOk;
 }
 
 Response::ResponseCode AbstractServerSocketInterface::cmdShutdownServer(const Command_ShutdownServer &cmd,
                                                                         ResponseContainer & /*rc*/)
 {
-    QMetaObject::invokeMethod(servatrice, [this, reason = textFromStdString(cmd.reason()), minutes = cmd.minutes()] {
-        servatrice->scheduleShutdown(reason, minutes);
-    });
+    QMetaObject::invokeMethod(servatrice, [srv = servatrice, reason = textFromStdString(cmd.reason()),
+                                           minutes = cmd.minutes()] { srv->scheduleShutdown(reason, minutes); });
     return Response::RespOk;
 }
 
@@ -4211,8 +4210,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReloadConfig(const Comm
 {
     logDebugMessage("Received admin command: reloading configuration");
     settingsCache->sync();
-    QMetaObject::invokeMethod(servatrice, [this, features = servatrice->getRequiredFeatures()] {
-        servatrice->setRequiredFeatures(features);
+    QMetaObject::invokeMethod(servatrice, [srv = servatrice, features = servatrice->getRequiredFeatures()] {
+        srv->setRequiredFeatures(features);
     });
     return Response::RespOk;
 }

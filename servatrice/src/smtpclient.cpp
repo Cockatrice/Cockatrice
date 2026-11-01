@@ -25,9 +25,9 @@ static const qint64 IDLE_TIMEOUT_MS = 60000; // 60 seconds
 // MAX_RETRY_DELAY cap is applied, preventing unbounded intermediate values.
 static const int MAX_BACKOFF_SHIFT = 10;
 
-inline Q_LOGGING_CATEGORY(SmtpClientLog, "smtp_client")
+inline Q_LOGGING_CATEGORY(SmtpClientLog, "smtp_client");
 
-    static QString pendingKey(const QString &userName, EmailType type, const QString &token)
+static QString pendingKey(const QString &userName, EmailType type, const QString &token)
 {
     const char *typeName = (type == EmailType::Activation) ? "activation" : "forgotpassword";
     // The token is part of the key: a regenerated token (forgot-password issues a
