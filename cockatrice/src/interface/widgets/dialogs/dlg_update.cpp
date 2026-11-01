@@ -360,8 +360,43 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
     enableUpdateButton(false);
     progress->setRange(0, 1000);
     progress->setValue(1000);
-    setLabel(tr("Installing..."));
 
+#if defined(Q_OS_MACOS)
+    // macOS releases are disk images, not executable NSIS installers. A true
+    // result means the OS accepted the open request, not that mounting or
+    // installation has completed; the current session must remain available.
+    const QPointer<DlgUpdate> dialog(this);
+    setLabel(tr("Opening downloaded update..."));
+    const bool openRequested = QDesktopServices::openUrl(filepath);
+    if (!dialog) {
+        return;
+    }
+    const QString downloadedPath = QDir::toNativeSeparators(filepath.toLocalFile()).toHtmlEscaped();
+    if (openRequested) {
+        setLabel(tr("Update downloaded"));
+        showUpdateMessage(
+            this, QMessageBox::Information, tr("Install Update"),
+            tr("Cockatrice asked macOS to open the downloaded disk image.") + "<br><br>" +
+                tr("After it opens, save your work and close Cockatrice before dragging the new applications "
+                   "into the Applications folder.") +
+                "<br><br>" + tr("If the disk image does not open, open this file in Finder:") + "<br>" +
+                downloadedPath);
+        if (dialog) {
+            dialog->closeDialog();
+        }
+    } else {
+        manualDownload->setText(tr("Retry download"));
+        enableUpdateButton(!updateUrl.isEmpty());
+        setLabel(tr("Error"));
+        showUpdateMessage(
+            this, QMessageBox::Critical, tr("Update Error"),
+            tr("macOS could not open the downloaded disk image. Open it in Finder to install the update.") +
+                "<br><br>" + tr("Download location") + ": " + downloadedPath);
+    }
+    return;
+#endif
+
+    setLabel(tr("Installing..."));
     QString installerPath = filepath.toLocalFile();
 
     const QString overridePath = QDir(QFileInfo(installerPath).absolutePath()).filePath(UPDATE_INSTALLER_OVERRIDE);
@@ -388,7 +423,7 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
 #ifdef Q_OS_WIN
     process.setNativeArguments(QString("/R /PID=%1 /D=%2").arg(QCoreApplication::applicationPid()).arg(appDir));
 #else
-    // Linux/macOS: normal argument passing (not relevant since they update differently.)
+    // Normal argument passing for other platforms; macOS disk images are handled above.
     process.setArguments({"/R", QString("/D=%1").arg(appDir)});
 #endif
 
