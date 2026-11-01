@@ -19,6 +19,7 @@
 #include <QList>
 #include <QListIterator>
 #include <QPainter>
+#include <QPainterPath>
 #include <QRectF>
 #include <QSharedPointer>
 #include <QString>
@@ -34,6 +35,7 @@
 #include <libcockatrice/game/zones/table_zone_logic.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/zone_names.h>
+#include <optional>
 #include <string>
 
 namespace google
@@ -121,10 +123,14 @@ void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
     // The hovered (zoomed) card may spill over this zone: cut it out of every layer
     // below so washes, indicators, dimming and the land divider never paint over it,
     // whatever the stacking order is.
-    const QRect hoverHole = hoveredCardHole();
-    const bool hasHole = !hoverHole.isNull();
-    if (hasHole) {
-        painter->setClipRegion(QRegion(boundingRect().toRect()) - QRegion(hoverHole));
+    const std::optional<QPainterPath> hoverHole = hoveredCardHole();
+    const bool clipped = hoverHole.has_value();
+    if (clipped && hoverHole->isEmpty()) {
+        // The zoom covers this zone entirely: there is nothing left of it to paint.
+        return;
+    }
+    if (clipped) {
+        painter->setClipPath(*hoverHole);
     }
 
     if (playmatActive) {
@@ -152,31 +158,38 @@ void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
 
     paintLandDivider(painter);
 
-    if (hasHole) {
+    if (clipped) {
         painter->setClipping(false);
     }
 }
 
 /**
- * @brief The hovered card's footprint in zone coordinates, or null when it does not
- * overlap this zone. Lets every paint layer dodge the zoomed card instead of painting
- * over it.
+ * @brief This zone's paint area minus the hovered card's painted outline, in zone coordinates.
+ *
+ * @c std::nullopt when no card is hovered or it does not overlap this zone; an *empty* path when
+ * the zoom covers this zone entirely, which means nothing of it is left to paint. Lets every
+ * paint layer dodge the zoomed card instead of painting over it.
  */
-QRect TableZone::hoveredCardHole() const
+std::optional<QPainterPath> TableZone::hoveredCardHole() const
 {
     auto *scene = qobject_cast<GameScene *>(this->scene());
     if (!scene) {
-        return {};
+        return std::nullopt;
     }
     CardItem *hovered = scene->getHoveredCard();
     if (!hovered) {
-        return {};
+        return std::nullopt;
     }
-    QRect hole = mapRectFromScene(hovered->sceneBoundingRect()).toRect();
-    if (!hole.intersects(boundingRect().toRect())) {
-        return {};
+    // Cut out the card's painted outline, not its bounding rectangle: the rectangle's corners
+    // are never covered by the artwork (rounded corners, antialiased edges), so they would stay
+    // black around the zoom.
+    const QPainterPath cardOutline = sceneTransform().inverted().map(hovered->sceneTransform().map(hovered->shape()));
+    if (!cardOutline.boundingRect().intersects(boundingRect())) {
+        return std::nullopt;
     }
-    return hole & boundingRect().toRect();
+    QPainterPath zoneArea;
+    zoneArea.addRect(boundingRect());
+    return zoneArea.subtracted(cardOutline);
 }
 
 void TableZone::onPlaymatChanged(bool active)
