@@ -9,10 +9,8 @@
 
 #include <QLoggingCategory>
 #include <QObject>
-#include <QPrinter>
 #include <QString>
 #include <QStringList>
-#include <QTextCursor>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/loaded_deck.h>
 #include <optional>
@@ -134,12 +132,14 @@ public:
                                    bool addComments = true,
                                    bool addSetNameAndNumber = true);
 
+#ifndef COCKATRICE_DISABLE_PRINTING
     /**
      * @brief Prints the decklist to the provided QPrinter.
      * @param printer The printer to render the decklist to.
      * @param deckList
      */
     static void printDeckList(QPrinter *printer, const DeckList &deckList);
+#endif
 
     /**
      * Converts the given deck's file to the Cockatrice file format.
@@ -164,7 +164,10 @@ public:
 
 private:
     static bool updateLastLoadedTimestamp(LoadedDeck &deck);
+
+#ifndef COCKATRICE_DISABLE_PRINTING
     static void printDeckListNode(QTextCursor *cursor, const InnerDecklistNode *node);
+#endif
     static void saveToStream_DeckHeader(QTextStream &out, const DeckList &deckList);
 
     static void saveToStream_DeckZone(QTextStream &out,

@@ -255,9 +255,11 @@ private:
          ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Open Custom Pictures Folder"),
                      parseSequenceString(""),
                      ShortcutGroup::Deck_Editor)},
+#ifndef COCKATRICE_DISABLE_PRINTING
         {"TabDeckEditor/aPrintDeck", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Print Deck..."),
                                                  parseSequenceString("Ctrl+P"),
                                                  ShortcutGroup::Deck_Editor)},
+#endif
         {"TabDeckEditor/aRemoveCard", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Delete Card"),
                                                   parseSequenceString(""),
                                                   ShortcutGroup::Deck_Editor)},

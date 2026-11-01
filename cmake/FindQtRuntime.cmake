@@ -1,5 +1,5 @@
 # Find a compatible Qt version
-# Inputs: WITH_SERVER, WITH_CLIENT, WITH_ORACLE
+# Inputs: WITH_SERVER, WITH_CLIENT, WITH_ORACLE, WITH_PRINTING
 # Optional Input: QT6_DIR -- Hint as to where Qt6 lives on the system
 # Output: COCKATRICE_QT_VERSION_NAME -- Example values: Qt6
 # Output: SERVATRICE_QT_MODULES
@@ -24,7 +24,6 @@ if(WITH_CLIENT)
       Gui
       Multimedia
       Network
-      PrintSupport
       ShaderTools
       Svg
       WebSockets
@@ -33,6 +32,9 @@ if(WITH_CLIENT)
       Quick
       QuickWidgets
   )
+  if(WITH_PRINTING)
+    list(APPEND _COCKATRICE_NEEDED PrintSupport)
+  endif()
 endif()
 if(WITH_ORACLE)
   set(_ORACLE_NEEDED Concurrent Network Svg Widgets Xml)

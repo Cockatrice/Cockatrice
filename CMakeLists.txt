@@ -92,6 +92,20 @@ endif()
 # Version can be overriden by git tags, see cmake/getversion.cmake
 project("Cockatrice" VERSION 3.1.2)
 
+# Android Qt kits do not provide PrintSupport. Keep desktop printing enabled by default.
+if(ANDROID)
+  set(_COCKATRICE_PRINTING_DEFAULT OFF)
+else()
+  set(_COCKATRICE_PRINTING_DEFAULT ON)
+endif()
+option(WITH_PRINTING "Build deck printing and print preview support" ${_COCKATRICE_PRINTING_DEFAULT})
+unset(_COCKATRICE_PRINTING_DEFAULT)
+if(NOT WITH_PRINTING)
+  # Keep the shared shortcut registry consistent across the client, Oracle and tests.
+  # The default desktop build needs no extra definition or cache invalidation.
+  add_compile_definitions(COCKATRICE_DISABLE_PRINTING)
+endif()
+
 # Set release name if not provided via env/cmake var
 if(NOT DEFINED GIT_TAG_RELEASENAME)
   set(GIT_TAG_RELEASENAME "Reality Check")

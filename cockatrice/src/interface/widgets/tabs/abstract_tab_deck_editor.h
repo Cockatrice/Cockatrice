@@ -222,7 +222,9 @@ protected slots:
     void actSaveDeckToClipboardRawNoSetInfo();
 
     /** @brief Prints the deck using a preview dialog. */
+#ifndef COCKATRICE_DISABLE_PRINTING
     void actPrintDeck();
+#endif
 
     /** @brief Loads a deck from an online website. */
     void actLoadDeckFromWebsite();
