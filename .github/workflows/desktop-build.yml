@@ -552,10 +552,13 @@ jobs:
           modules: ${{ matrix.qt_modules }}
           version: ${{ matrix.qt_version }}
 
-      - name: "[Windows] Install NSIS"
+      # Inno Setup writes the default Windows installer (COCKATRICE_WIN_INSTALLER=InnoSetup);
+      # NSIS stays installed because the option still selects the old installer, and CI has to
+      # be able to build both to compare them on a real upgrade.
+      - name: "[Windows] Install installer tooling"
         if: matrix.os == 'Windows'
         shell: bash
-        run: choco install nsis
+        run: choco install nsis innosetup
 
       # Ninja invokes cl.exe directly and needs the MSVC environment on PATH.
       - name: "[Windows] Set up MSVC environment"
@@ -751,16 +754,26 @@ jobs:
           # `debug-files upload` and DIFs are matched by debug ID, not release.
           sentry-cli debug-files upload --org cockatrice --project cockatrice-desktop "${paths[@]}"
 
-      # CPack reports a failed makensis run as "Problem running NSIS command"
-      # plus a path to NSISOutput.log, and that log lives only on the runner, so
-      # the actual compile error is otherwise nowhere in the workflow output.
-      # Dump it, or a broken installer script is undiagnosable from CI alone.
+      # CPack reports a failed installer compile only as a path to a log that lives on the
+      # runner: NSISOutput.log for makensis, ISCCOutput.log for Inno Setup's compiler. The
+      # Inno Setup error names a line of the script CPack generated, so that script is
+      # dumped too - without them a broken installer script is undiagnosable from CI alone.
       # shell: bash matters here - the default pwsh resolves `find` to Windows'
       # text-search find.exe, which errors instead of searching.
-      - name: "Dump NSIS compile log"
+      - name: "Dump installer compile log"
         if: failure() && matrix.os == 'Windows'
         shell: bash
-        run: find . -name NSISOutput.log -exec cat {} +
+        run: |
+          find . -name NSISOutput.log -o -name ISCCOutput.log | while read -r log; do
+            echo "::group::$log"
+            cat "$log"
+            echo "::endgroup::"
+          done
+          find . -path '*_CPack_Packages*' -name ISScript.iss | while read -r script; do
+            echo "::group::$script"
+            cat "$script"
+            echo "::endgroup::"
+          done
 
       # A master run hands over the archives it had to build itself so that
       # vcpkg-cache-import.yml, which runs in the default branch scope, can save them

@@ -1,5 +1,5 @@
-# Sends the NSIS installer log to Sentry as an envelope carrying one error
-# event plus the log as an attachment.
+# Sends the installer log, from either installer, to Sentry as an envelope carrying one
+# error event plus the log as an attachment.
 #
 # Generated at configure time from this template by CMake configure_file: the
 # CPACK_SENTRY_* placeholders are baked in then, so the real values only ever
@@ -44,16 +44,20 @@ try {
     }
 
     # --- Abort reason, read from the log itself --------------------------------
-    # AbortInstall logs "ABORT: ..." first, so the reason travels inside the file
-    # and nothing reason-shaped crosses the command line (no quoting hazards).
-    # Select-String yields the matching line alone, so the reason is already one
-    # physical line for the message; anything else stays in the attached log.
-    # Non-ASCII paths may garble here; the attachment is byte-exact regardless.
+    # Each installer records the reason before offering to send, so it travels inside the
+    # file and nothing reason-shaped crosses the command line (no quoting hazards).
+    # NSIS writes the line as "ABORT: ..." through CockLog. Inno Setup prefixes every line
+    # of its log with a timestamp and three spaces, so that prefix is optional here and
+    # removed together with the marker. Select-String yields the matching line alone, so
+    # the reason is already one physical line for the message; anything else stays in the
+    # attached log. Non-ASCII paths may garble here; the attachment is byte-exact
+    # regardless.
+    $stamp = '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}\s+'
     $Reason = 'unknown (no ABORT line in log)'
     if (Test-Path -LiteralPath $LogPath) {
-        $abortLine = Select-String -LiteralPath $LogPath -Pattern '^ABORT: ' | Select-Object -Last 1
+        $abortLine = Select-String -LiteralPath $LogPath -Pattern ('^(' + $stamp + ')?ABORT: ') | Select-Object -Last 1
         if ($abortLine) {
-            $Reason = ($abortLine.Line -replace '^ABORT:\s*', '')
+            $Reason = ($abortLine.Line -replace ('^(' + $stamp + ')?ABORT:\s*'), '')
         }
     }
 
