@@ -12,6 +12,7 @@
 #include <QTimer>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/card/database/card_database_querier.h>
 #include <libcockatrice/filters/filter_tree.h>
 
 VisualDatabaseDisplayTagFilterWidget::VisualDatabaseDisplayTagFilterWidget(QWidget *parent,
