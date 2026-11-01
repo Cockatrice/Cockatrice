@@ -9,6 +9,7 @@
 #include "card_info_picture_widget.h"
 #include "card_info_text_widget.h"
 
+#include <QAbstractAnimation>
 #include <QApplication>
 #include <QButtonGroup>
 #include <QEasingCurve>
@@ -52,6 +53,20 @@ static constexpr int FADE_DURATION_MS = 140;
 static constexpr int REFRESH_DEBOUNCE_MS = 30;
 static constexpr int OVERLAY_BTN_SIZE = 24;
 static constexpr int OVERLAY_CORNER_RADIUS = 4;
+
+// P/T pill: centred on the card's printed P/T box, in fractions of the picture rect.
+static constexpr double PT_PILL_ANCHOR_X = 0.92;
+static constexpr double PT_PILL_ANCHOR_Y = 0.94;
+static constexpr int PT_PILL_EDGE_INSET = 2;
+static constexpr int PT_PILL_MIN_WIDTH = 48;
+static constexpr int PT_PILL_MIN_HEIGHT = 22;
+static constexpr int PT_PILL_TEXT_PADDING = 4;
+
+// Hover trigger: the bottom-right quadrant of the art, around the printed P/T box.
+static constexpr double PT_HOVER_REGION_WIDTH = 0.35;
+static constexpr double PT_HOVER_REGION_HEIGHT = 0.20;
+// Halo around the resting pill that still counts as "on the P/T box" for opening the rows.
+static constexpr int PT_OPEN_HALO = 4;
 
 enum HoverPanelPage
 {
@@ -181,6 +196,11 @@ void CardHoverWidget::applyThemeStyle()
                                    "  color: %4; background: %3; border: 1px solid %2;"
                                    "  border-radius: 3px; padding: 2px;"
                                    "  font-weight: bold; font-size: 13px;"
+                                   "}"
+                                   // Accent edge on the resting P/T pill: the cue that the
+                                   // control rows live behind it, and the divider once they lift out.
+                                   "QLabel#cardHoverPTPill {"
+                                   "  border-top: 2px solid %5;"
                                    "}")
                         .arg(window, mid, base, text, highlight, highlightedText, disabled, windowText);
     if (sheet == styleSheet()) {
@@ -196,6 +216,15 @@ static QString overlayBgStyle()
     return QStringLiteral("background-color: rgba(0, 0, 0, 180);"
                           "border-radius: %1px;")
         .arg(OVERLAY_CORNER_RADIUS);
+}
+
+/** @brief Clamps @p start so that a run of @p size stays within [@p origin, @p origin + @p extent]. */
+static int clampToSpan(int origin, int extent, int size, int start)
+{
+    if (size >= extent) {
+        return origin;
+    }
+    return qBound(origin, start, origin + extent - size);
 }
 
 // ---------- Image area with overlaid controls ----------
@@ -223,6 +252,10 @@ void CardHoverWidget::createImageArea()
     createPTOverlay();
 
     pic->installEventFilter(this);
+    // The artwork rect is only known after the pixmap is drawn (letterboxing, sideways-card
+    // rotation), so re-anchor the overlays once it lands.
+    connect(pic, &CardInfoPictureWidget::artRectChanged, this, &CardHoverWidget::positionOverlays,
+            Qt::QueuedConnection);
 }
 
 // ---------- Name bar overlay (top of card) ----------
@@ -282,7 +315,7 @@ void CardHoverWidget::createNameBarOverlay()
     nameLabel->installEventFilter(this);
 }
 
-// ---------- P/T overlay (bottom-right of card) ----------
+// ---------- P/T overlay (bottom-right of card): pill at rest, controls on hover ----------
 
 void CardHoverWidget::createPTOverlay()
 {
@@ -302,14 +335,35 @@ void CardHoverWidget::createPTOverlay()
                                                       : QList<CardState *>();
     };
 
-    ptPowerLabel = new QLabel(ptOverlay);
+    // Control rows: hidden at rest, shown while the P/T area is hovered.
+    ptControls = new QWidget(ptOverlay);
+    ptControls->setObjectName("cardHoverPTControls");
+    ptControls->setMouseTracking(true);
+    ptControls->setStyleSheet(QStringLiteral("background: transparent;"));
+
+    // Value pill: the resting state, and the bottom (never-moving) row of the stack.
+    // The accent top edge is the only cue that controls sit behind the pill; it doubles
+    // as the divider between the pill and the rows once they are lifted out.
+    ptPillLabel = new QLabel(ptOverlay);
+    ptPillLabel->setObjectName("cardHoverPTPill");
+    ptPillLabel->setAlignment(Qt::AlignCenter);
+    // The accent top edge (the only cue that controls sit behind the pill) comes from the
+    // palette-driven sheet in applyThemeStyle(), so it follows theme switches.
+    ptPillLabel->setStyleSheet(QStringLiteral("color: white; font-weight: bold; font-size: 12px;"
+                                              " background: transparent; padding: 0 %1px;")
+                                   .arg(PT_PILL_TEXT_PADDING));
+    ptPillLabel->setMinimumHeight(PT_PILL_MIN_HEIGHT);
+    // Seed text: the resting size has to exist before the first card is shown.
+    ptPillLabel->setText(QStringLiteral("00/00"));
+
+    ptPowerLabel = new QLabel(ptControls);
     ptPowerLabel->setObjectName("cardHoverPTPowerValue");
     ptPowerLabel->setAlignment(Qt::AlignCenter);
     ptPowerLabel->setStyleSheet(
         "color: white; font-weight: bold; font-size: 12px; background: transparent; padding: 0 2px;");
     ptPowerLabel->setMinimumWidth(28);
 
-    ptToughLabel = new QLabel(ptOverlay);
+    ptToughLabel = new QLabel(ptControls);
     ptToughLabel->setObjectName("cardHoverPTToughValue");
     ptToughLabel->setAlignment(Qt::AlignCenter);
     ptToughLabel->setStyleSheet(
@@ -364,13 +418,37 @@ void CardHoverWidget::createPTOverlay()
     btnRow->addWidget(btnSetPT);
     btnRow->addWidget(btnResetPT);
 
+    auto *controlsLayout = new QVBoxLayout(ptControls);
+    controlsLayout->setContentsMargins(4, 3, 4, 3);
+    controlsLayout->setSpacing(2);
+    controlsLayout->addLayout(powerRow);
+    controlsLayout->addLayout(toughRow);
+    controlsLayout->addLayout(btnRow);
+    ptControls->setLayout(controlsLayout);
+
     auto *ptLayout = new QVBoxLayout(ptOverlay);
-    ptLayout->setContentsMargins(4, 3, 4, 3);
+    ptLayout->setContentsMargins(0, 0, 0, 0);
     ptLayout->setSpacing(2);
-    ptLayout->addLayout(powerRow);
-    ptLayout->addLayout(toughRow);
-    ptLayout->addLayout(btnRow);
+    ptLayout->addWidget(ptControls);
+    ptLayout->addWidget(ptPillLabel);
     ptOverlay->setLayout(ptLayout);
+
+    // Both states are driven from sizes cached here: hiding the controls would shrink
+    // layout()->sizeHint(), so the two states must not be measured from the live layout.
+    ptFullSize = ptLayout->sizeHint();
+    ptControls->setVisible(false);
+    ptCompactSize = measureCompactPTSize();
+    ptPillLabel->clear();
+    ptOverlay->resize(ptCompactSize);
+
+    // The whole subtree feeds the hover state: moving onto a button must not read as a leave.
+    ptOverlay->installEventFilter(this);
+    const QList<QWidget *> ptChildren = ptOverlay->findChildren<QWidget *>();
+    for (QWidget *child : ptChildren) {
+        child->installEventFilter(this);
+    }
+
+    ptOverlay->setVisible(false);
 }
 
 // ---------- Nav strip: vertical icon buttons with horizontal text ----------
@@ -1072,7 +1150,6 @@ void CardHoverWidget::positionOverlays()
     nameBarOverlay->show();
 
     int containerWidth = imageContainer->width();
-    int containerHeight = imageContainer->height();
 
     // Name bar at top — width constrained, height from layout
     int nameWidth = containerWidth - 8;
@@ -1080,21 +1157,151 @@ void CardHoverWidget::positionOverlays()
     nameBarOverlay->adjustSize();
     nameBarOverlay->move(4, 4);
 
-    // P/T overlay at bottom-right
-    ptOverlay->adjustSize();
-    int ptWidth = ptOverlay->sizeHint().width();
-    int ptHeight = ptOverlay->sizeHint().height();
-    ptOverlay->setGeometry(containerWidth - ptWidth - 4, containerHeight - ptHeight - 4, ptWidth, ptHeight);
-
-    // Show/hide based on card data
-    bool hasPT = !currentCard->getPT().isEmpty();
+    // Show/hide based on card data; an empty P/T always falls back to the compact pill
+    const bool hasPT = !currentCard->getPT().isEmpty();
+    if (!hasPT && ptExpanded) {
+        setPTExpanded(false);
+    }
+    applyPTOverlayGeometry();
     ptOverlay->setVisible(hasPT);
+}
+
+void CardHoverWidget::setPTExpanded(bool expanded)
+{
+    if (!ptOverlay || !ptControls) {
+        return;
+    }
+    // Nothing to expand into when the card has no P/T.
+    if (expanded && (!currentCard || currentCard->getPT().isEmpty())) {
+        expanded = false;
+    }
+    // Mouse movement drives this on every event; only apply a real state change.
+    if (ptExpanded == expanded) {
+        return;
+    }
+
+    ptExpanded = expanded;
+    ptControls->setVisible(expanded);
+    if (expanded) {
+        // The stack covers more of the art than the pill did; keep it above sibling overlays.
+        ptOverlay->raise();
+    }
+    applyPTOverlayGeometry();
+}
+
+void CardHoverWidget::applyPTOverlayGeometry()
+{
+    if (!ptOverlay || !pic || ptCompactSize.isEmpty() || ptFullSize.isEmpty()) {
+        return;
+    }
+    // Anchor on the drawn artwork, not on imageContainer: the container can be taller than the
+    // picture, and sideways-layout cards are letterboxed inside pic. Both used to drop the
+    // overlay below the printed P/T box.
+    const QRect picture =
+        pic->artRect()
+            .translated(pic->pos())
+            .adjusted(PT_PILL_EDGE_INSET, PT_PILL_EDGE_INSET, -PT_PILL_EDGE_INSET, -PT_PILL_EDGE_INSET);
+    const QRect compact = compactPillRect();
+    if (picture.isEmpty() || compact.isEmpty()) {
+        return;
+    }
+
+    // Expanded: same bottom edge and right edge as the pill, so the controls grow upward
+    // and never appear under the cursor that is resting on the pill. Never narrower than
+    // the current pill, or a three-digit value would clip against the stack's edge.
+    const QSize size =
+        ptExpanded ? QSize(qMax(ptFullSize.width(), ptCompactSize.width()), ptFullSize.height()) : ptCompactSize;
+    const int x = clampToSpan(picture.x(), picture.width(), size.width(), compact.x() + compact.width() - size.width());
+    const int y =
+        clampToSpan(picture.y(), picture.height(), size.height(), compact.y() + compact.height() - size.height());
+
+    ptOverlay->setGeometry(x, y, size.width(), size.height());
+}
+
+QRect CardHoverWidget::compactPillRect() const
+{
+    if (!pic || ptCompactSize.isEmpty()) {
+        return {};
+    }
+    const QRect picture =
+        pic->artRect()
+            .translated(pic->pos())
+            .adjusted(PT_PILL_EDGE_INSET, PT_PILL_EDGE_INSET, -PT_PILL_EDGE_INSET, -PT_PILL_EDGE_INSET);
+    if (picture.isEmpty()) {
+        return {};
+    }
+    // Centred on the printed P/T box (bottom-right of the art).
+    const int anchorX = picture.x() + qRound(picture.width() * PT_PILL_ANCHOR_X);
+    const int anchorY = picture.y() + qRound(picture.height() * PT_PILL_ANCHOR_Y);
+    return QRect(
+        clampToSpan(picture.x(), picture.width(), ptCompactSize.width(), anchorX - ptCompactSize.width() / 2),
+        clampToSpan(picture.y(), picture.height(), ptCompactSize.height(), anchorY - ptCompactSize.height() / 2),
+        ptCompactSize.width(), ptCompactSize.height());
+}
+
+QRect CardHoverWidget::ptOpenRegion() const
+{
+    const QRect pill = compactPillRect();
+    if (pill.isEmpty() || !pic) {
+        return {};
+    }
+    // The opening target is the P/T box itself (plus a small halo), not the whole bottom-right
+    // quadrant: a wider trigger lifts the rows out from under a cursor that merely passed by,
+    // and the click that selects the card would land on a P/T button instead.
+    return pill.translated(-pic->pos()).adjusted(-PT_OPEN_HALO, -PT_OPEN_HALO, PT_OPEN_HALO, PT_OPEN_HALO);
+}
+
+QRect CardHoverWidget::ptHoverRegion() const
+{
+    if (!pic) {
+        return {};
+    }
+    // The band is relative to the drawn artwork, so a letterboxed (sideways-layout) card keeps
+    // its P/T corner where the printed box actually is.
+    const QRect art = pic->artRect();
+    if (art.isEmpty()) {
+        return {};
+    }
+    return QRect(art.x() + qRound(art.width() * (1.0 - PT_HOVER_REGION_WIDTH)),
+                 art.y() + qRound(art.height() * (1.0 - PT_HOVER_REGION_HEIGHT)),
+                 qRound(art.width() * PT_HOVER_REGION_WIDTH), qRound(art.height() * PT_HOVER_REGION_HEIGHT));
+}
+
+bool CardHoverWidget::isCursorOverPTArea() const
+{
+    if (!ptOverlay || !pic || !imageContainer) {
+        return false;
+    }
+    if (ptOverlay->rect().contains(ptOverlay->mapFromGlobal(QCursor::pos()))) {
+        return true;
+    }
+    return ptHoverRegion().translated(pic->pos()).contains(imageContainer->mapFromGlobal(QCursor::pos()));
+}
+
+QSize CardHoverWidget::measureCompactPTSize() const
+{
+    if (!ptPillLabel) {
+        return QSize(PT_PILL_MIN_WIDTH, PT_PILL_MIN_HEIGHT);
+    }
+    // QLabel::sizeHint() leaves out the stylesheet padding, so add it back explicitly.
+    const QSize hint = ptPillLabel->sizeHint();
+    return QSize(qMax(PT_PILL_MIN_WIDTH, hint.width() + 2 * PT_PILL_TEXT_PADDING),
+                 qMax(PT_PILL_MIN_HEIGHT, hint.height()));
 }
 
 void CardHoverWidget::resizeEvent(QResizeEvent *event)
 {
     QFrame::resizeEvent(event);
     positionOverlays();
+}
+
+void CardHoverWidget::hideEvent(QHideEvent *event)
+{
+    // A reopened panel for the same card must not come back with the rows still lifted.
+    setPTExpanded(false);
+    // The window is already hidden here; repaint whatever it was covering.
+    invalidateCoveredArea();
+    QFrame::hideEvent(event);
 }
 
 // ---------- Display updates ----------
@@ -1104,6 +1311,8 @@ void CardHoverWidget::updatePTDisplay()
     if (!currentCard) {
         ptPowerLabel->clear();
         ptToughLabel->clear();
+        ptPillLabel->clear();
+        setPTExpanded(false);
         return;
     }
 
@@ -1111,6 +1320,8 @@ void CardHoverWidget::updatePTDisplay()
     if (pt.isEmpty()) {
         ptPowerLabel->setText("--");
         ptToughLabel->setText("--");
+        ptPillLabel->setText("--");
+        setPTExpanded(false);
     } else {
         int slashIdx = pt.indexOf('/');
         if (slashIdx >= 0) {
@@ -1120,7 +1331,14 @@ void CardHoverWidget::updatePTDisplay()
             ptPowerLabel->setText(pt);
             ptToughLabel->setText("--");
         }
+        ptPillLabel->setText(pt);
     }
+
+    // Three-digit values (100/100, -1/-1) are legal, so the resting pill cannot keep a
+    // size measured from the seed text: re-measure on every value change and carry the
+    // width into the expanded stack.
+    ptCompactSize = measureCompactPTSize();
+    applyPTOverlayGeometry();
 }
 
 // ---------- Card data ----------
@@ -1148,6 +1366,8 @@ void CardHoverWidget::setCard(CardItem *card, PlayerGraphicsItem *player)
     connectCardSignals();
     refreshDisplay();
     rebuildActionsForZone();
+    // A new card always starts compact; the rows only lift out while P/T is hovered.
+    setPTExpanded(false);
     positionOverlays();
     // The widget may have been disabled by a previous teardown; it is interactive again.
     setEnabled(true);
@@ -1192,6 +1412,8 @@ void CardHoverWidget::clearCard()
     annotationLabel->setVisible(false);
     ptPowerLabel->clear();
     ptToughLabel->clear();
+    ptPillLabel->clear();
+    setPTExpanded(false);
     ptOverlay->setVisible(false);
     clearLayout(mainPageLayout);
     clearLayout(movePageLayout);
@@ -1261,6 +1483,30 @@ void CardHoverWidget::positionNextTo(const QRectF &cardSceneRect,
 
     move(x, y);
     resize(popupSize);
+    invalidateCoveredArea();
+}
+
+void CardHoverWidget::invalidateCoveredArea()
+{
+    // The panel is an overlay window: moving or hiding it does not reliably invalidate
+    // the pixels it uncovered in the game view, which then stay stale (a black square)
+    // until something else repaints that area. Do it explicitly, unioned with the
+    // previous placement so a move repaints both sides.
+    QWidget *viewport = parentWidget();
+    if (!viewport) {
+        lastViewportRect = QRect();
+        return;
+    }
+
+    QRect covered;
+    if (isVisible()) {
+        covered = QRect(viewport->mapFromGlobal(geometry().topLeft()), size());
+    }
+    const QRect dirty = lastViewportRect.united(covered);
+    if (!dirty.isEmpty()) {
+        viewport->update(dirty.adjusted(-1, -1, 1, 1));
+    }
+    lastViewportRect = covered;
 }
 
 // ---------- Show / hide: no window travel, the board zoom is the morph ----------
@@ -1287,14 +1533,25 @@ void CardHoverWidget::showAnimated()
     fadeIn->setStartValue(windowOpacity());
     fadeIn->setEndValue(1.0);
     fadeIn->start();
+    invalidateCoveredArea();
 }
 
 void CardHoverWidget::hideAnimated()
 {
+    if (isClosing()) {
+        // Repeated hide requests must not restart the fade, or the panel never finishes
+        // closing while the cursor keeps moving.
+        return;
+    }
     fadeIn->stop();
     fadeOut->setStartValue(windowOpacity());
     fadeOut->setEndValue(0.0);
     fadeOut->start();
+}
+
+bool CardHoverWidget::isClosing() const
+{
+    return fadeOut->state() == QAbstractAnimation::Running;
 }
 
 // ---------- Event filter ----------
@@ -1320,6 +1577,38 @@ bool CardHoverWidget::eventFilter(QObject *obj, QEvent *event)
                 scene->setActiveCard(currentCard);
             }
             currentCard->setSelected(true);
+        }
+    }
+
+    // The P/T trigger is the printed P/T area, not just the pill: hovering that quadrant of
+    // the art lifts the control rows out. Driving it from pic's mouse moves (instead of an
+    // invisible child widget over the picture) keeps click-to-select working underneath.
+    if (obj == pic) {
+        if (event->type() == QEvent::MouseMove) {
+            const auto *me = static_cast<QMouseEvent *>(event);
+            const QPoint pos = me->position().toPoint();
+            if (ptOpenRegion().contains(pos)) {
+                setPTExpanded(true);
+            } else if (!isCursorOverPTArea()) {
+                setPTExpanded(false);
+            }
+        } else if (event->type() == QEvent::Leave && !isCursorOverPTArea()) {
+            setPTExpanded(false);
+        }
+    }
+
+    // P/T overlay: hovering the P/T area lifts the control rows out of the pill. The
+    // filter sits on the whole subtree so moving onto a button keeps it expanded.
+    const auto *ptWidget = qobject_cast<const QWidget *>(obj);
+    if (ptWidget && ptOverlay && (ptWidget == ptOverlay || ptOverlay->isAncestorOf(ptWidget))) {
+        if (event->type() == QEvent::Enter) {
+            setPTExpanded(true);
+        } else if (event->type() == QEvent::Leave) {
+            // Moving onto a child widget fires Leave on the parent too; only collapse once
+            // the cursor has left both the overlay and the printed P/T area.
+            if (!isCursorOverPTArea()) {
+                setPTExpanded(false);
+            }
         }
     }
 
