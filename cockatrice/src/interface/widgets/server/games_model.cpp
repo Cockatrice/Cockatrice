@@ -1,6 +1,7 @@
 #include "games_model.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../theme_icon.h"
 #include "../interface/pixel_map_generator.h"
 #include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 #include "user/user_list_proxy.h"
@@ -188,7 +189,10 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
                     return result.join(", ");
                 }
                 case Qt::DecorationRole: {
-                    return gameentry.with_password() ? QIcon(LockPixmapGenerator::generatePixmap(13)) : QVariant();
+                    // The themed icon follows the palette, so the lock also
+                    // switches to HighlightedText on a selected row, and the
+                    // item view paints it at the device pixel ratio.
+                    return gameentry.with_password() ? loadThemedIcon(QStringLiteral("icons/lock")) : QVariant();
                     case Qt::TextAlignmentRole:
                         return Qt::AlignLeft;
                     default:
