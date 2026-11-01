@@ -201,7 +201,9 @@ private:
     int scanGeneration = 0;                ///< Bumped on every scan so stale results are ignored.
     QVector<PendingDeckLoad> pendingLoads; ///< Finished background loads waiting to be applied.
     bool drainScheduled = false;           ///< Whether a queued drain pass is already pending.
-    QList<QPointer<QFutureWatcherBase>> activeWatchers; ///< Scan/load watchers whose future has not finished yet.
+
+    /// Scan/load watchers whose future has not finished yet.
+    QList<QPointer<QFutureWatcherBase>> activeWatchers;
 };
 
 #endif // VISUAL_DECK_STORAGE_MODEL_H
