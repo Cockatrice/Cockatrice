@@ -30,7 +30,6 @@ class QWidget;
 class TabArchidekt;
 class TabDeckEditorVisual;
 class TabDeckStorageVisual;
-class TabEdhRec;
 class TabEdhRecMain;
 class TabVisualDatabaseDisplay;
 struct LoadedDeck;
@@ -203,7 +202,7 @@ public slots:
     TabVisualDatabaseDisplay *addVisualDatabaseDisplayTab();
     TabEdhRecMain *addEdhrecMainTab();
     TabArchidekt *addArchidektTab();
-    TabEdhRec *addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCommander = false);
+    TabEdhRecMain *addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCommander = false);
     void openReplay(GameReplay *replay);
     void joinReportGame(int gameId, int roomId);
     /** Joins or spectates a game listed on a user's profile hover card. */

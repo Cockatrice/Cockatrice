@@ -12,13 +12,16 @@
 
 #include <QJsonObject>
 #include <QJsonValue>
+#include <QPointer>
 #include <QString>
+#include <QUrl>
 #include <qtmetamacros.h>
 
 class CardSizeWidget;
 class EdhrecCommanderApiResponseDisplayWidget;
 class QHBoxLayout;
 class QLineEdit;
+class QLabel;
 class QNetworkAccessManager;
 class QNetworkReply;
 class QPushButton;
@@ -32,6 +35,7 @@ class TabEdhRecMain : public Tab
     Q_OBJECT
 public:
     explicit TabEdhRecMain(TabSupervisor *_tabSupervisor);
+    ~TabEdhRecMain() override;
 
     void retranslateUi() override;
     void doSearch();
@@ -63,6 +67,26 @@ public slots:
     void getTopTags();
 
 private:
+    enum class RequestKind
+    {
+        TopCards,
+        TopCommanders,
+        TopTags,
+        Details,
+        AverageDeck
+    };
+
+    void startRequest(QUrl url, RequestKind kind);
+    void cancelRequest();
+    void showRequestError(const QString &error, bool canRetry = true);
+    void clearPage();
+    void clearCardSelection();
+
+    QPointer<QNetworkReply> activeReply;
+    QUrl requestUrl;
+    RequestKind requestKind = RequestKind::TopCards;
+    QLabel *requestStatusLabel;
+    QPushButton *retryButton;
     QWidget *container;
     QWidget *navigationContainer;
     QWidget *currentPageDisplay;
@@ -77,7 +101,6 @@ private:
     SettingsButtonWidget *settingsButton;
     CardSizeWidget *cardSizeSlider;
     CardInfoPtr cardToQuery;
-    EdhrecCommanderApiResponseDisplayWidget *displayWidget;
 };
 
 #endif // TAB_EDHREC_MAIN_H

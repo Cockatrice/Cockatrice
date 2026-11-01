@@ -13,7 +13,6 @@
 #include "../main.h"
 #include "abstract_tab_deck_editor.h"
 #include "api/archidekt/tab_archidekt.h"
-#include "api/edhrec/tab_edhrec.h"
 #include "api/edhrec/tab_edhrec_main.h"
 #include "latency_tracker.h"
 #include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
@@ -1320,15 +1319,13 @@ TabVisualDatabaseDisplay *TabSupervisor::addVisualDatabaseDisplayTab()
     return tab;
 }
 
-TabEdhRec *TabSupervisor::addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCommander)
+TabEdhRecMain *TabSupervisor::addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCommander)
 {
-    auto *tab = new TabEdhRec(this);
+    auto *tab = addEdhrecMainTab();
     if (cardToQuery) {
         tab->setCard(cardToQuery, isCommander);
     }
 
-    myAddTab(tab);
-    setCurrentWidget(tab);
     return tab;
 }
 
