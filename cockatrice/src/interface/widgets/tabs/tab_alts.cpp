@@ -93,6 +93,7 @@ TabAlts::TabAlts(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
     depthSpin->setMinimum(1);
     depthSpin->setMaximum(MAX_ALT_DEPTH);
     depthSpin->setValue(1);
+    depthSpin->setKeyboardTracking(false);
     connect(depthSpin, &QSpinBox::valueChanged, this, &TabAlts::onSearchFilterChanged);
 
     investigateButton = new QPushButton;
@@ -140,6 +141,7 @@ TabAlts::TabAlts(TabSupervisor *_tabSupervisor, AbstractClient *_client, const Q
     monthsSpin->setMinimum(1);
     monthsSpin->setMaximum(24);
     monthsSpin->setValue(6);
+    monthsSpin->setKeyboardTracking(false);
     connect(monthsSpin, &QSpinBox::valueChanged, this, &TabAlts::onSearchFilterChanged);
 
     auto *filterBar = new QHBoxLayout;
@@ -334,12 +336,17 @@ void TabAlts::investigateUser()
     }
     currentUser = userName;
     updateTrail();
+    reloadCurrentUser();
+}
+
+void TabAlts::reloadCurrentUser()
+{
     lastAlts.clear();
     selectedUser.clear();
     clearDetails();
     altsTable->setRowCount(0);
     statusLabel->setText(tr("Loading alts for %1...").arg(currentUser));
-    requestAlts(userName, depthSpin->value());
+    requestAlts(currentUser, depthSpin->value());
 }
 
 void TabAlts::requestAlts(const QString &userName, int depth)
@@ -419,9 +426,17 @@ void TabAlts::renderTable()
             ++ipCount;
         }
     }
-    emailChip->setText(tr("Email (%1)").arg(emailCount));
-    clientIdChip->setText(tr("Client ID (%1)").arg(clientIdCount));
-    ipChip->setText(tr("IP (%1)").arg(ipCount));
+    // The server omits unchecked match types, so keep the last count while a
+    // chip is off instead of relabelling it "(0)".
+    if (emailChip->isChecked()) {
+        emailChip->setText(tr("Email (%1)").arg(emailCount));
+    }
+    if (clientIdChip->isChecked()) {
+        clientIdChip->setText(tr("Client ID (%1)").arg(clientIdCount));
+    }
+    if (ipChip->isChecked()) {
+        ipChip->setText(tr("IP (%1)").arg(ipCount));
+    }
 
     QFont userFont = altsTable->font();
     userFont.setBold(true);
@@ -502,7 +517,9 @@ void TabAlts::onSearchFilterChanged()
     if (currentUser.isEmpty()) {
         return;
     }
-    investigateUser();
+    // A filter change reloads the user being investigated; it must not switch
+    // to a name that was typed into the search box but never submitted.
+    reloadCurrentUser();
 }
 
 void TabAlts::onDisplayFilterChanged()

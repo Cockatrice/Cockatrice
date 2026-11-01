@@ -54,6 +54,7 @@ private slots:
 private:
     void loadUser(const QString &userName);
     void updateTrail();
+    void reloadCurrentUser();
     void requestAlts(const QString &userName, int depth);
     void requestDetails(const QString &userName);
     void clearDetails();
