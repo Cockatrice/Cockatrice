@@ -13,6 +13,7 @@
 #include <QVariant>
 #include <QtGlobal>
 #include <libcockatrice/filters/filter_card.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <stddef.h>
 
 FilterBuilder::FilterBuilder(QWidget *parent) : QWidget(parent)
@@ -39,9 +40,8 @@ FilterBuilder::FilterBuilder(QWidget *parent) : QWidget(parent)
     edit->setClearButtonEnabled(true);
     edit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-    QGridLayout *layout = new QGridLayout;
+    QGridLayout *layout = QtUtils::makeLayout<QGridLayout>();
     layout->setObjectName("layout");
-    layout->setContentsMargins(0, 0, 0, 0);
 
     layout->addWidget(typeCombo, 0, 0, 1, 2);
     layout->addWidget(filterCombo, 0, 2, 1, 2);

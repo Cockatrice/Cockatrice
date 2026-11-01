@@ -178,6 +178,27 @@ cockatrice_add_test(NAME user_data_backup_test SOURCES user_data_backup_test.cpp
 cockatrice_add_test(NAME password_hash_test SOURCES password_hash_test.cpp LIBS libcockatrice_utility)
 cockatrice_add_test(NAME report_categories_test SOURCES report_categories_test.cpp LIBS libcockatrice_utility)
 cockatrice_add_test(NAME warning_categories_test SOURCES warning_categories_test.cpp LIBS libcockatrice_utility)
+# The installer's holder probe is Windows-only, but the wording it produces and the
+# question which programs are the payload's own are plain C++ and are what a stuck user
+# has to act on, so they are tested everywhere.
+cockatrice_add_test(
+  NAME
+  holder_line_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/tools/installer-holder-probe/holder_line.cpp
+  holder_line_test.cpp
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/tools/installer-holder-probe
+)
+cockatrice_add_test(
+  NAME
+  payload_paths_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/tools/installer-holder-probe/payload_paths.cpp
+  payload_paths_test.cpp
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/tools/installer-holder-probe
+)
 cockatrice_add_test(
   NAME
   playmat_resolver_test
@@ -225,6 +246,17 @@ cockatrice_add_test(
   SOURCES
   ${CMAKE_SOURCE_DIR}/servatrice/src/trusted_sources.cpp
   trusted_sources_test.cpp
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/servatrice/src
+  LABELS
+  server
+)
+cockatrice_add_test(
+  NAME
+  server_logger_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/servatrice/src/server_logger.cpp
+  server_logger_test.cpp
   INCLUDE_DIRS
   ${CMAKE_SOURCE_DIR}/servatrice/src
   LABELS
@@ -358,6 +390,7 @@ cockatrice_add_test(
   ${VERSION_STRING_CPP}
   loader_local_matching_test.cpp
   LIBS
+  libcockatrice_network
   libcockatrice_settings
   INCLUDE_DIRS
   ${CMAKE_SOURCE_DIR}/cockatrice/src
@@ -394,6 +427,7 @@ if(TARGET Qt6::lrelease)
     libcockatrice_utility
     DEFINITIONS
     TRANSLATION_LOADER_TEST_DIR="${CMAKE_CURRENT_BINARY_DIR}"
+    COCKATRICE_TRANSLATIONS_DIR="${CMAKE_SOURCE_DIR}/cockatrice/translations"
   )
   add_dependencies(translation_loader_test translation_loader_test_qm)
 
@@ -422,6 +456,22 @@ if(WITH_CLIENT)
     ${CMAKE_SOURCE_DIR}/cockatrice/src
     ${CMAKE_SOURCE_DIR}/libcockatrice_utility
   )
+  # The installer's probe and the client build the socket name independently, and the
+  # command they exchange is spelled in both places. Compiling both ends into one test is
+  # what keeps them from drifting apart unnoticed: a mismatch would leave the installer
+  # unable to close an instance whose window it cannot reach.
+  cockatrice_add_test(
+    NAME
+    installer_close_server_test
+    SOURCES
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/installer_close_server.cpp
+    ${CMAKE_SOURCE_DIR}/tools/installer-holder-probe/installer_close_name.cpp
+    installer_close_server_test.cpp
+    INCLUDE_DIRS
+    ${CMAKE_SOURCE_DIR}/cockatrice/src
+    ${CMAKE_SOURCE_DIR}/libcockatrice_utility
+    ${CMAKE_SOURCE_DIR}/tools/installer-holder-probe
+  )
   # CrashReporter is client code; DEFINITIONS keeps the test hermetic by compiling the
   # no-op path (no sentry-native headers needed) regardless of WITH_CRASH_REPORTING.
   cockatrice_add_test(
@@ -447,6 +497,11 @@ add_subdirectory(loading_from_clipboard)
 add_subdirectory(movecard_tests)
 add_subdirectory(oracle)
 add_subdirectory(settings)
+
+# libcockatrice_game only exists when the client is built.
+if(WITH_CLIENT)
+  add_subdirectory(game)
+endif()
 
 # theme_migration_test compiles client sources, whose headers are only reachable from a client build.
 if(WITH_CLIENT)

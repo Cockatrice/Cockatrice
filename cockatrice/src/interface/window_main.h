@@ -194,7 +194,17 @@ private:
     LagMonitor lagMonitor;                        ///< watches the main thread for event loop stalls
     LatencyStatusWidget *latencyStatus = nullptr; ///< status bar widget with live round-trip stats and history graph
     bool bHasActivated, askedForDbUpdater;
-    bool bClosingDown = false; ///< guards closeEvent() against re-entrancy
+    /**
+     * How far a shutdown that was asked for has got. A close request that arrives while one is
+     * already asking the user something must not be accepted - see closeEvent().
+     */
+    enum class ShutdownState
+    {
+        Idle,       ///< no shutdown has been asked for
+        Confirming, ///< asking about a card database update, open games or an unsaved deck
+        Accepted,   ///< the close was accepted and the window is hiding
+    };
+    ShutdownState shutdownState = ShutdownState::Idle;
     bool skipStartupAutoConnect = false;
     bool startupAutoConnectAttempted = false;
     bool firstRunWizardActive = false;
@@ -244,6 +254,17 @@ public:
      *        false if the close was vetoed by the user or is already in progress.
      */
     bool closeForUpdate();
+
+    /**
+     * @brief Closes this instance because the installer asked it to over its local socket.
+     *
+     * The request reaches an instance hidden in the notification area or sitting on its own
+     * confirmation, which is exactly where a WM_CLOSE from the installer does not. The close
+     * is still the ordinary one: a clean client exits, one with unsaved work raises the same
+     * confirmation the close button does, and a confirmation already up is brought to the
+     * front instead of being left behind the installer.
+     */
+    void requestInstallerClose();
 
 protected:
     void closeEvent(QCloseEvent *event) override;

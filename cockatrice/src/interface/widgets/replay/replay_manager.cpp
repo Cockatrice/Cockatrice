@@ -1,13 +1,13 @@
 #include "replay_manager.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../../game/player/event_processing_options.h"
 #include "libcockatrice/protocol/pb/game_event.pb.h"
 #include "libcockatrice/protocol/pb/game_event_container.pb.h"
 #include "libcockatrice/protocol/pb/game_replay.pb.h"
 
 #include <QTimer>
 #include <algorithm>
+#include <libcockatrice/game/player/event_processing_options.h>
 #include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <qnumeric.h>
@@ -57,7 +57,7 @@ ReplayManager::ReplayManager(QObject *parent, GameReplay *replay)
 
     rewindBufferingTimer = new QTimer(this);
     rewindBufferingTimer->setSingleShot(true);
-    connect(rewindBufferingTimer, &QTimer::timeout, this, qOverload<>(&ReplayManager::processRewind));
+    connect(rewindBufferingTimer, &QTimer::timeout, this, [this] { processRewind(); });
 }
 
 ReplayManager::~ReplayManager()
@@ -109,11 +109,6 @@ void ReplayManager::handleBackwardsSkip(bool doRewindBuffering, bool includeEven
         // otherwise, process the rewind immediately
         processRewind(includeEventsAtTime);
     }
-}
-
-void ReplayManager::processRewind()
-{
-    processRewind(false);
 }
 
 void ReplayManager::processRewind(bool includeEventsAtTime)
@@ -245,10 +240,18 @@ void ReplayManager::setTime(int time)
     skipToTime(time, false);
 }
 
-void ReplayManager::setTimeForEvent(int eventIndex)
+void ReplayManager::setTimeToEvent(int eventIndex)
 {
     if (eventIndex < 0 || eventIndex >= replayTimeline.size()) {
         return;
+    }
+
+    // Flush a pending buffered rewind before seeking, otherwise its timer fires after this seek and rebuilds the
+    // replay state from an outdated currentVisualTime, dropping the event we seek to. Stopping the timer instead
+    // of processing it is not enough: playback ticks advance currentProcessedTime without rewinding currentEvent,
+    // so the board could still be ahead of the target.
+    if (rewindBufferingTimer->isActive()) {
+        processRewind();
     }
 
     // Unlike a timeline seek, jumping to an event should apply that event immediately.

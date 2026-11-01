@@ -21,3 +21,15 @@ cockatrice_add_test(
   libcockatrice_card
   libcockatrice_deck_list
 )
+
+cockatrice_add_test(
+  NAME
+  collator_sort_test
+  SOURCES
+  ${VERSION_STRING_CPP}
+  collator_sort_test.cpp
+  LIBS
+  libcockatrice_models
+  libcockatrice_card
+  libcockatrice_deck_list
+)

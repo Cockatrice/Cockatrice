@@ -1,11 +1,10 @@
 #ifndef COCKATRICE_REPLAY_MANAGER_H
 #define COCKATRICE_REPLAY_MANAGER_H
 
-#include "../../../game/player/event_processing_options.h"
-
 #include <QList>
 #include <QObject>
 #include <QtGlobal>
+#include <libcockatrice/game/player/event_processing_options.h>
 #include <qtmetamacros.h>
 
 class GameReplay;
@@ -43,8 +42,7 @@ class ReplayManager : public QObject
 
     void skipToTime(int newTime, bool doRewindBuffering, bool includeEventsAtTime = false);
     void handleBackwardsSkip(bool doRewindBuffering, bool includeEventsAtTime = false);
-    void processRewind();
-    void processRewind(bool includeEventsAtTime);
+    void processRewind(bool includeEventsAtTime = false);
     void processNewEvents(PlaybackMode playbackMode, bool includeEventsAtTime = false);
     void handleSkipEmptySection();
 
@@ -75,7 +73,7 @@ public slots:
     void startReplay();
     void stopReplay();
     void setTime(int time);
-    void setTimeForEvent(int eventIndex);
+    void setTimeToEvent(int eventIndex);
     void skipByAmount(int amount); // use a negative amount to skip backwards
 
 signals:

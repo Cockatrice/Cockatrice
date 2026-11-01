@@ -104,7 +104,7 @@ const QList<int> &ReplayWidget::getReplayTimeline() const
 
 void ReplayWidget::seekToEvent(int eventIndex)
 {
-    replayManager->setTimeForEvent(eventIndex);
+    replayManager->setTimeToEvent(eventIndex);
 }
 
 void ReplayWidget::replayFinished()

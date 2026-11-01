@@ -12,11 +12,9 @@ set(HEADERS
     token/token_edit_model.h
 )
 
-qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-
 add_library(
   libcockatrice_models_database STATIC
-  ${MOC_SOURCES}
+  ${HEADERS}
   card_database_model.cpp
   card_database_display_model.cpp
   card/card_completer_proxy_model.cpp

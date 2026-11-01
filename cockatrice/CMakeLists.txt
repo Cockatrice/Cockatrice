@@ -25,9 +25,7 @@ set(cockatrice_SOURCES
     src/client/settings/shortcut_treeview.cpp
     src/client/settings/shortcuts_settings.cpp
     src/interface/deck_loader/card_node_function.cpp
-    src/interface/deck_loader/deck_file_format.cpp
     src/interface/deck_loader/deck_loader.cpp
-    src/interface/deck_loader/loaded_deck.cpp
     src/interface/widgets/dialogs/dlg_connect.cpp
     src/interface/widgets/dialogs/dlg_convert_deck_to_cod_format.cpp
     src/interface/widgets/dialogs/dlg_create_game.cpp
@@ -71,36 +69,27 @@ set(cockatrice_SOURCES
     src/filters/filter_builder.cpp
     src/filters/filter_tree_model.cpp
     src/filters/syntax_help.cpp
-    src/game/abstract_game.cpp
-    src/game/arrow_registry.cpp
     src/game_graphics/board/abstract_card_drag_item.cpp
     src/game_graphics/board/abstract_card_item.cpp
     src/game_graphics/board/abstract_counter.cpp
-    src/game/board/arrow_data.cpp
     src/game_graphics/board/arrow_item.cpp
+    src/game_graphics/board/arrow_registry.cpp
     src/game_graphics/board/arrow_target.cpp
     src/game_graphics/board/card_drag_item.cpp
     src/game_graphics/board/card_item.cpp
-    src/game/board/card_list.cpp
-    src/game/board/card_state.cpp
     src/game_graphics/board/counter_general.cpp
-    src/game/board/counter_state.cpp
     src/game_graphics/board/translate_counter_name.cpp
     src/game_graphics/deckview/deck_view.cpp
     src/game_graphics/deckview/deck_view_container.cpp
     src/game_graphics/deckview/tabbed_deck_view_container.cpp
+    src/game_graphics/dialogs/dlg_annotation.cpp
     src/game_graphics/dialogs/dlg_create_token.cpp
     src/game_graphics/dialogs/dlg_move_top_cards_until.cpp
     src/game_graphics/dialogs/dlg_roll_dice.cpp
-    src/game/game.cpp
-    src/game/game_event_handler.cpp
-    src/game/game_meta_info.cpp
     src/game_graphics/game_scene.cpp
-    src/game/game_state.cpp
     src/game_graphics/game_view.cpp
     src/game_graphics/hand_counter.cpp
     src/game_graphics/log/message_log_widget.cpp
-    src/game/phase.cpp
     src/game_graphics/phases_toolbar.cpp
     src/game_graphics/player/menu/card_menu.cpp
     src/game_graphics/player/menu/custom_zone_menu.cpp
@@ -118,23 +107,11 @@ set(cockatrice_SOURCES
     src/game_graphics/tally/stats_tally.cpp
     src/game_graphics/tally/subtype_tally.cpp
     src/game_graphics/tally/tally.cpp
-    src/game/player/player_actions.cpp
     src/game_graphics/player/player_area.cpp
     src/game_graphics/player/player_dialogs.cpp
-    src/game/player/player_event_handler.cpp
     src/game_graphics/player/player_graphics_item.cpp
-    src/game/player/player_info.cpp
     src/game_graphics/player/player_list_widget.cpp
-    src/game/player/player_logic.cpp
-    src/game/player/player_manager.cpp
     src/game_graphics/player/player_target.cpp
-    src/game/replay.cpp
-    src/game/zones/card_zone_logic.cpp
-    src/game/zones/hand_zone_logic.cpp
-    src/game/zones/pile_zone_logic.cpp
-    src/game/zones/stack_zone_logic.cpp
-    src/game/zones/table_zone_logic.cpp
-    src/game/zones/view_zone_logic.cpp
     src/game_graphics/zones/card_zone.cpp
     src/game_graphics/zones/hand_zone.cpp
     src/game_graphics/zones/pile_zone.cpp
@@ -347,6 +324,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/visual_deck_storage/visual_deck_storage_tag_filter_widget.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_widget.cpp
     src/interface/window_main.cpp
+    src/installer_close_server.cpp
     src/main.cpp
     src/single_instance_manager.cpp
     src/interface/widgets/tabs/abstract_tab_deck_editor.cpp
@@ -452,6 +430,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.h
     src/interface/widgets/utility/compact_push_button.cpp
     src/interface/widgets/utility/compact_push_button.h
+    src/installer_close_server.h
     src/single_instance_manager.h
     src/client/url_scheme_event_filter.h
     src/interface/intents/intent_connect_to_server.cpp
@@ -513,7 +492,7 @@ if(APPLE)
   set(cockatrice_SOURCES ${cockatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 endif(APPLE)
 
-qt6_add_resources(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
+qt_add_resources(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
 
 # Declare path variables
 set(ICONDIR
@@ -534,7 +513,7 @@ set(COCKATRICE_MAC_QM_INSTALL_DIR "cockatrice.app/Contents/Resources/translation
 set(COCKATRICE_UNIX_QM_INSTALL_DIR "share/cockatrice/translations")
 set(COCKATRICE_WIN32_QM_INSTALL_DIR "translations")
 
-qt6_add_executable(
+qt_add_executable(
   cockatrice
   WIN32
   MACOSX_BUNDLE
@@ -546,7 +525,7 @@ qt6_add_executable(
 
 target_precompile_headers(cockatrice PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtwidgets_pch.h")
 
-qt6_add_shaders(
+qt_add_shaders(
   cockatrice
   "onboarding_shaders"
   PREFIX
@@ -558,7 +537,7 @@ qt6_add_shaders(
   src/interface/widgets/onboarding/shaders/brand_plate.frag
 )
 
-qt6_add_resources(
+qt_add_resources(
   cockatrice
   "onboarding_qml"
   PREFIX
@@ -574,6 +553,7 @@ target_link_libraries(
   PUBLIC libcockatrice_card
          libcockatrice_deck_list
          libcockatrice_filters
+         libcockatrice_game
          libcockatrice_utility
          libcockatrice_network
          libcockatrice_models
@@ -790,7 +770,7 @@ endif()
 if(Qt6LinguistTools_FOUND)
   #Qt6 Translations happen after the executable is built up
   if(UPDATE_TRANSLATIONS)
-    qt6_add_translations(
+    qt_add_translations(
       cockatrice
       TS_FILES
       ${cockatrice_TS}
@@ -800,7 +780,7 @@ if(Qt6LinguistTools_FOUND)
       cockatrice_QM
     )
   else()
-    qt6_add_translations(cockatrice TS_FILES ${cockatrice_TS} QM_FILES_OUTPUT_VARIABLE cockatrice_QM)
+    qt_add_translations(cockatrice TS_FILES ${cockatrice_TS} QM_FILES_OUTPUT_VARIABLE cockatrice_QM)
   endif()
 
   if(UNIX)
@@ -826,4 +806,4 @@ if(Qt6LinguistTools_FOUND)
   endforeach()
 endif()
 
-qt6_finalize_target(cockatrice)
+qt_finalize_target(cockatrice)

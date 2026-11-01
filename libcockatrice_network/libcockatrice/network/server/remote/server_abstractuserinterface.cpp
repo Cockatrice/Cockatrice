@@ -84,6 +84,18 @@ void Server_AbstractUserInterface::onLogin(ResponseContainer &)
 {
 }
 
+bool Server_AbstractUserInterface::getGameInfo(int gameId, int &roomId, int &playerId) const
+{
+    QMutexLocker locker(&gameListMutex);
+    const auto it = games.constFind(gameId);
+    if (it == games.constEnd()) {
+        return false;
+    }
+    roomId = it.value().first;
+    playerId = it.value().second;
+    return true;
+}
+
 void Server_AbstractUserInterface::playerRemovedFromGame(Server_Game *game)
 {
     qDebug() << "Server_AbstractUserInterface::playerRemovedFromGame(): gameId =" << game->getGameId();

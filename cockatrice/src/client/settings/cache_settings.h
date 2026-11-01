@@ -19,7 +19,6 @@ inline Q_LOGGING_CATEGORY(SettingsCacheLog, "settings_cache");
 
 class ReleaseChannel;
 
-#define DEFAULT_LANG_NAME "English"
 #define CLIENT_INFO_NOT_SET "notset"
 
 #define DEFAULT_FONT_SIZE 12

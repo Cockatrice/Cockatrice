@@ -126,6 +126,7 @@
 #include <libcockatrice/protocol/pb/event_user_message.pb.h>
 #include <libcockatrice/protocol/pb/response_ban_history.pb.h>
 #include <libcockatrice/protocol/pb/response_card_art_rule_entry.pb.h>
+#include <libcockatrice/protocol/pb/response_clear_blacklisted_banners.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_download.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_list.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_share_create.pb.h>
@@ -140,6 +141,7 @@
 #include <libcockatrice/protocol/pb/response_password_salt.pb.h>
 #include <libcockatrice/protocol/pb/response_register.pb.h>
 #include <libcockatrice/protocol/pb/response_remove_user_avatar.pb.h>
+#include <libcockatrice/protocol/pb/response_remove_user_banner.pb.h>
 #include <libcockatrice/protocol/pb/response_replay_download.pb.h>
 #include <libcockatrice/protocol/pb/response_replay_download_by_game_id.pb.h>
 #include <libcockatrice/protocol/pb/response_replay_get_code.pb.h>
@@ -263,6 +265,11 @@ void AbstractServerSocketInterface::transmitProtocolItem(const ServerMessage &it
 void AbstractServerSocketInterface::logDebugMessage(const QString &message)
 {
     logger->logMessage(message, this);
+}
+
+bool AbstractServerSocketInterface::logsDebugMessages() const
+{
+    return logger != nullptr && logger->isLoggingEnabled();
 }
 
 void AbstractServerSocketInterface::processCommandContainer(const CommandContainer &cont)
@@ -479,6 +486,10 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedModeratorCo
             return cmdGetModeratorLastLogins(cmd.GetExtension(Command_GetModeratorLastLogins::ext), rc);
         case ModeratorCommand::REMOVE_USER_AVATAR:
             return cmdRemoveUserAvatar(cmd.GetExtension(Command_RemoveUserAvatar::ext), rc);
+        case ModeratorCommand::REMOVE_USER_BANNER:
+            return cmdRemoveUserBanner(cmd.GetExtension(Command_RemoveUserBanner::ext), rc);
+        case ModeratorCommand::CLEAR_BLACKLISTED_BANNERS:
+            return cmdClearBlacklistedBanners(cmd.GetExtension(Command_ClearBlacklistedBanners::ext), rc);
         default:
             return Response::RespFunctionNotAllowed;
     }
@@ -2686,6 +2697,67 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveUserAvatar(const 
     return Response::RespOk;
 }
 
+Response::ResponseCode AbstractServerSocketInterface::cmdRemoveUserBanner(const Command_RemoveUserBanner &cmd,
+                                                                          ResponseContainer &rc)
+{
+    if (!sqlInterface->checkSql()) {
+        return Response::RespInternalError;
+    }
+
+    const QString userName = nameFromStdString(cmd.user_name()).simplified();
+    if (userName.isEmpty()) {
+        return Response::RespContextError;
+    }
+
+    bool hadBanner = true;
+    switch (sqlInterface->removeUserBanner(userName)) {
+        case Servatrice_DatabaseInterface::RemoveUserBannerResult::Removed:
+            break;
+        case Servatrice_DatabaseInterface::RemoveUserBannerResult::NothingToRemove:
+            hadBanner = false;
+            break;
+        case Servatrice_DatabaseInterface::RemoveUserBannerResult::NoSuchUser:
+            return Response::RespNameNotFound;
+        case Servatrice_DatabaseInterface::RemoveUserBannerResult::DatabaseError:
+        default:
+            return Response::RespInternalError;
+    }
+
+    if (hadBanner) {
+        sqlInterface->addAuditRecord(userName, this->getAddress(), QString::fromStdString(userInfo->clientid()),
+                                     "REMOVE_USER_BANNER", "Moderator removed user banner card", true);
+    }
+
+    Response_RemoveUserBanner *re = new Response_RemoveUserBanner;
+    re->set_user_name(userName.toStdString());
+    re->set_had_banner(hadBanner);
+    rc.setResponseExtension(re);
+    return Response::RespOk;
+}
+
+Response::ResponseCode
+AbstractServerSocketInterface::cmdClearBlacklistedBanners(const Command_ClearBlacklistedBanners & /* cmd */,
+                                                          ResponseContainer &rc)
+{
+    if (!sqlInterface->checkSql()) {
+        return Response::RespInternalError;
+    }
+
+    const int cleared = sqlInterface->clearBlacklistedBanners();
+    if (cleared < 0) {
+        return Response::RespInternalError;
+    }
+
+    sqlInterface->addAuditRecord(QString::fromStdString(userInfo->name()), this->getAddress(),
+                                 QString::fromStdString(userInfo->clientid()), "CLEAR_BLACKLISTED_BANNERS",
+                                 QString("Moderator cleared %1 blacklisted banner(s)").arg(cleared), true);
+
+    Response_ClearBlacklistedBanners *re = new Response_ClearBlacklistedBanners;
+    re->set_cleared_count(static_cast<unsigned int>(cleared));
+    rc.setResponseExtension(re);
+    return Response::RespOk;
+}
+
 void AbstractServerSocketInterface::sendPendingReportNotifications(ResponseContainer &rc)
 {
     if (!sqlInterface->checkSql()) {
@@ -4431,13 +4503,17 @@ void TcpServerSocketInterface::readClient()
     servatrice->incRxBytes(data.size());
     inputBuffer.append(data);
 
-    do {
+    // Parse messages straight out of inputBuffer at readOffset. Removing each
+    // consumed message from the front would memmove the remaining bytes once
+    // per message; the consumed prefix is dropped once parsing stops.
+    qsizetype readOffset = 0;
+
+    while (true) {
         if (!messageInProgress) {
-            if (inputBuffer.size() >= 4) {
-                messageLength = (((quint32)(unsigned char)inputBuffer[0]) << 24) +
-                                (((quint32)(unsigned char)inputBuffer[1]) << 16) +
-                                (((quint32)(unsigned char)inputBuffer[2]) << 8) +
-                                ((quint32)(unsigned char)inputBuffer[3]);
+            if (inputBuffer.size() - readOffset >= 4) {
+                const auto *header = reinterpret_cast<const unsigned char *>(inputBuffer.constData() + readOffset);
+                messageLength = (static_cast<quint32>(header[0]) << 24) + (static_cast<quint32>(header[1]) << 16) +
+                                (static_cast<quint32>(header[2]) << 8) + static_cast<quint32>(header[3]);
                 // Reject implausible lengths instead of buffering until they arrive.
                 // This also handles lengths that overflow into negative int values.
                 if (messageLength < 0 || messageLength > MAX_TCP_MESSAGE_SIZE) {
@@ -4446,32 +4522,33 @@ void TcpServerSocketInterface::readClient()
                     prepareDestroy();
                     return;
                 }
-                inputBuffer.remove(0, 4);
+                readOffset += 4;
                 messageInProgress = true;
             } else {
-                return;
+                break;
             }
         }
-        if (inputBuffer.size() < messageLength) {
-            return;
+        if (inputBuffer.size() - readOffset < messageLength) {
+            break;
         }
 
         CommandContainer newCommandContainer;
-        bool ok;
+        bool ok = false;
         try {
-            ok = newCommandContainer.ParseFromArray(inputBuffer.data(), messageLength);
+            ok = newCommandContainer.ParseFromArray(inputBuffer.constData() + readOffset, messageLength);
         } catch (std::exception &e) {
-            qCWarning(TcpServerSocketInterfaceLog) << "Caught std::exception in" << __FILE__ << __LINE__ <<
+            qCWarning(TcpServerSocketInterfaceLog)
+                << "Caught std::exception in" << __FILE__ << __LINE__ <<
 #ifdef _MSC_VER // Visual Studio
                 __FUNCTION__
 #else
                 __PRETTY_FUNCTION__
 #endif
-                                                   << Qt::endl
-                                                   << "Exception:" << e.what() << Qt::endl
-                                                   << "Message coming from:" << getAddress() << Qt::endl
-                                                   << "Message length:" << messageLength << Qt::endl
-                                                   << "Message content:" << inputBuffer.toHex();
+                << Qt::endl
+                << "Exception:" << e.what() << Qt::endl
+                << "Message coming from:" << getAddress() << Qt::endl
+                << "Message length:" << messageLength << Qt::endl
+                << "Message content:" << inputBuffer.mid(readOffset, messageLength).toHex();
         } catch (...) {
             qCWarning(TcpServerSocketInterfaceLog) << "Unhandled exception in" << __FILE__ << __LINE__ <<
 #ifdef _MSC_VER // Visual Studio
@@ -4482,7 +4559,7 @@ void TcpServerSocketInterface::readClient()
                                                    << Qt::endl
                                                    << "Message coming from:" << getAddress();
         }
-        inputBuffer.remove(0, messageLength);
+        readOffset += messageLength;
         messageInProgress = false;
 
         if (ok) {
@@ -4499,8 +4576,12 @@ void TcpServerSocketInterface::readClient()
         } else {
             qCWarning(TcpServerSocketInterfaceLog) << "parsing error!";
         }
+    }
 
-    } while (!inputBuffer.isEmpty());
+    // Drop the consumed prefix once, instead of shifting the buffer per message.
+    if (readOffset > 0) {
+        inputBuffer.remove(0, readOffset);
+    }
 }
 
 bool TcpServerSocketInterface::initTcpSession()
@@ -4570,8 +4651,15 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
 
     connect(socket, SIGNAL(binaryMessageReceived(const QByteArray &)), this,
             SLOT(binaryMessageReceived(const QByteArray &)));
+    // QWebSocket::errorOccurred was added in Qt 6.5 (error() is deprecated from 6.5 on),
+    // so a typed connect cannot compile against the 6.4 floor.
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    connect(socket, &QWebSocket::errorOccurred, this,
+            [this](QAbstractSocket::SocketError error) { catchSocketError(error); });
+#else
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this,
             SLOT(catchSocketError(QAbstractSocket::SocketError)));
+#endif
     connect(socket, SIGNAL(disconnected()), this, SLOT(catchSocketDisconnected()));
 
     // Add this object to the server's list of connections before it can receive socket events.

@@ -14,6 +14,7 @@
 #include <QString>
 #include <QVariant>
 #include <QtGlobal>
+#include <libcockatrice/utility/qt_utils.h>
 
 class TabSupervisor;
 template <class Key, class T> class QMap;
@@ -24,8 +25,7 @@ GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,
                                                                const QMap<int, QString> &allGameTypes)
     : QWidget(parent), tabSupervisor(_tabSupervisor), model(_model)
 {
-    mainLayout = new QHBoxLayout(this);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout = QtUtils::makeLayout<QHBoxLayout>(this);
     mainLayout->setSpacing(5);
 
     const GameFilterConfigs &filters = model->getFilters();

@@ -1,0 +1,370 @@
+#include "player_logic.h"
+
+#include "../abstract_game.h"
+#include "../board/arrow_data.h"
+#include "../board/card_list.h"
+#include "../board/card_state.h"
+#include "../board/counter_state.h"
+#include "../game_meta_info.h"
+#include "../zones/hand_zone_logic.h"
+#include "../zones/pile_zone_logic.h"
+#include "../zones/stack_zone_logic.h"
+#include "../zones/table_zone_logic.h"
+#include "libcockatrice/protocol/pb/serverinfo_card.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_counter.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h"
+#include "libcockatrice/utility/zone_names.h"
+#include "player_actions.h"
+#include "player_event_handler.h"
+#include "player_info.h"
+#include "player_manager.h"
+
+#include <QDebug>
+#include <QMapIterator>
+#include <QMessageLogger>
+#include <QMutableMapIterator>
+#include <QSet>
+#include <QSharedPointer>
+#include <QtGlobal>
+#include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_zone.pb.h>
+#include <libcockatrice/utility/card_ref.h>
+#include <libcockatrice/utility/color.h>
+#include <qalgorithms.h>
+#include <string>
+
+PlayerLogic::PlayerLogic(const ServerInfo_User &info,
+                         int _id,
+                         bool _local,
+                         bool _judge,
+                         AbstractGame *_parent,
+                         IInterfaceSettingsProvider *interfaceSettings,
+                         ICardPreferenceProvider *cardPreferences)
+    : QObject(_parent), game(_parent), playerInfo(new PlayerInfo(info, _id, _local, _judge)),
+      playerEventHandler(new PlayerEventHandler(this)),
+      playerActions(new PlayerActions(this, interfaceSettings, cardPreferences)), active(false), conceded(false),
+      zoneId(0), dialogSemaphore(false)
+{
+    initializeZones();
+}
+
+void PlayerLogic::initializeZones()
+{
+    addZone(new PileZoneLogic(this, ZoneNames::DECK, false, true, false, this));
+    addZone(new PileZoneLogic(this, ZoneNames::GRAVE, false, false, true, this));
+    addZone(new PileZoneLogic(this, ZoneNames::EXILE, false, false, true, this));
+    addZone(new PileZoneLogic(this, ZoneNames::SIDEBOARD, false, false, false, this));
+    addZone(new TableZoneLogic(this, ZoneNames::TABLE, true, false, true, this));
+    addZone(new StackZoneLogic(this, ZoneNames::STACK, true, false, true, this));
+    bool visibleHand = playerInfo->getLocalOrJudge() ||
+                       (game->getPlayerManager()->isSpectator() && game->getGameMetaInfo()->spectatorsOmniscient());
+    addZone(new HandZoneLogic(this, ZoneNames::HAND, false, false, visibleHand, this));
+}
+
+PlayerLogic::~PlayerLogic()
+{
+    qCInfo(PlayerLog) << "Player destructor:" << getPlayerInfo()->getName();
+
+    QMapIterator<QString, CardZoneLogic *> i(zones);
+    while (i.hasNext()) {
+        delete i.next().value();
+    }
+    zones.clear();
+
+    delete getPlayerInfo()->userInfo;
+}
+
+void PlayerLogic::clear()
+{
+    emit arrowsClearedLocally();
+
+    QMapIterator<QString, CardZoneLogic *> i(zones);
+    while (i.hasNext()) {
+        i.next().value()->clearContents();
+    }
+
+    clearCounters();
+}
+
+void PlayerLogic::setConceded(bool _conceded)
+{
+    if (conceded != _conceded) {
+        conceded = _conceded;
+
+        if (conceded) {
+            clear();
+        }
+        emit concededChanged(getPlayerInfo()->getId(), conceded);
+    }
+}
+
+void PlayerLogic::setZoneId(int _zoneId)
+{
+    if (zoneId != _zoneId) {
+        zoneId = _zoneId;
+        emit zoneIdChanged(zoneId);
+    }
+}
+
+void PlayerLogic::processPlayerInfo(const ServerInfo_Player &info)
+{
+    static QSet<QString> builtinZones{/* PileZones */
+                                      ZoneNames::DECK, ZoneNames::GRAVE, ZoneNames::EXILE, ZoneNames::SIDEBOARD,
+                                      /* TableZone */
+                                      ZoneNames::TABLE,
+                                      /* StackZone */
+                                      ZoneNames::STACK,
+                                      /* HandZone */
+                                      ZoneNames::HAND};
+    clearCounters();
+    emit arrowsClearedLocally();
+
+    QMutableMapIterator<QString, CardZoneLogic *> zoneIt(zones);
+    while (zoneIt.hasNext()) {
+        zoneIt.next().value()->clearContents();
+
+        if (!builtinZones.contains(zoneIt.key())) {
+            zoneIt.remove();
+        }
+    }
+
+    emit clearCustomZonesMenu();
+
+    const int zoneListSize = info.zone_list_size();
+    for (int i = 0; i < zoneListSize; ++i) {
+        const ServerInfo_Zone &zoneInfo = info.zone_list(i);
+
+        QString zoneName = QString::fromStdString(zoneInfo.name());
+        CardZoneLogic *zone = zones.value(zoneName, 0);
+        if (!zone) {
+            // Create a new CardZone if it doesn't exist
+
+            if (zoneInfo.with_coords()) {
+                // Visibility not currently supported for TableZone
+                zone = addZone(new TableZoneLogic(this, zoneName, true, false, true, this));
+            } else {
+                // Zones without coordinats are always treated as non-shufflable
+                // PileZones, although supporting alternate hand or stack zones
+                // might make sense in some scenarios.
+                bool contentsKnown;
+
+                switch (zoneInfo.type()) {
+                    case ServerInfo_Zone::PrivateZone:
+                        contentsKnown =
+                            playerInfo->getLocalOrJudge() || (game->getPlayerManager()->isSpectator() &&
+                                                              game->getGameMetaInfo()->spectatorsOmniscient());
+                        break;
+
+                    case ServerInfo_Zone::PublicZone:
+                        contentsKnown = true;
+                        break;
+
+                    case ServerInfo_Zone::HiddenZone:
+                        contentsKnown = false;
+                        break;
+                }
+
+                zone = addZone(new PileZoneLogic(this, zoneName, false, /* isShufflable */ false, contentsKnown, this));
+            }
+
+            // Non-builtin zones are hidden by default and can't be interacted
+            // with, except through menus.
+            emit zone->setGraphicsVisibility(false);
+
+            emit addViewCustomZoneActionToCustomZoneMenu(zoneName);
+
+            continue;
+        }
+
+        const int cardListSize = zoneInfo.card_list_size();
+        if (!cardListSize) {
+            for (int j = 0; j < zoneInfo.card_count(); ++j) {
+                emit zone->createCardRequested(ServerInfo_Card(), false);
+            }
+        } else {
+            for (int j = 0; j < cardListSize; ++j) {
+                ServerInfo_Card cardInfo = zoneInfo.card_list(j);
+                // Zones without coordinates (hand, piles, stack) preserve the order
+                // they arrive in on the server in the positions of their cards list.
+                // The x coordinate of such cards is always 0, so inserting at it
+                // would reverse the list on reconnect. Append instead.
+                if (!zoneInfo.with_coords()) {
+                    cardInfo.set_x(-1);
+                    cardInfo.set_y(-1);
+                }
+                emit zone->createCardRequested(cardInfo, false);
+            }
+        }
+        if (zoneInfo.has_always_reveal_top_card()) {
+            zone->setAlwaysRevealTopCard(zoneInfo.always_reveal_top_card());
+        }
+
+        zone->reorganizeCards();
+    }
+
+    const int counterListSize = info.counter_list_size();
+    for (int i = 0; i < counterListSize; ++i) {
+        addCounter(info.counter_list(i));
+    }
+
+    setConceded(info.properties().conceded());
+}
+
+void PlayerLogic::processCardAttachment(const ServerInfo_Player &info)
+{
+    const int zoneListSize = info.zone_list_size();
+    for (int i = 0; i < zoneListSize; ++i) {
+        const ServerInfo_Zone &zoneInfo = info.zone_list(i);
+        CardZoneLogic *zone = zones.value(QString::fromStdString(zoneInfo.name()), 0);
+        if (!zone) {
+            continue;
+        }
+
+        const int cardListSize = zoneInfo.card_list_size();
+        for (int j = 0; j < cardListSize; ++j) {
+            const ServerInfo_Card &cardInfo = zoneInfo.card_list(j);
+            if (cardInfo.has_attach_player_id()) {
+                CardState *startCard = zone->getCard(cardInfo.id());
+                CardState *targetCard =
+                    game->getCard(cardInfo.attach_player_id(), QString::fromStdString(cardInfo.attach_zone()),
+                                  cardInfo.attach_card_id());
+                if (!targetCard) {
+                    continue;
+                }
+
+                startCard->setAttachedTo(targetCard);
+            }
+        }
+    }
+
+    const int arrowListSize = info.arrow_list_size();
+    for (int i = 0; i < arrowListSize; ++i) {
+        emit arrowCreateRequested(QSharedPointer<ArrowData>::create(
+            ArrowData::fromProto(info.arrow_list(i), getPlayerInfo()->getId(), getPlayerInfo()->getLocal())));
+    }
+}
+
+void PlayerLogic::addCard(AbstractCardItem *card)
+{
+    emit newCardAdded(card);
+}
+
+void PlayerLogic::deleteCard(CardState *card)
+{
+    if (card == nullptr) {
+        return;
+    } else if (dialogSemaphore) {
+        cardsToDelete.append(card);
+    } else {
+        card->deleteView();
+    }
+}
+
+void PlayerLogic::setDeck(const DeckList &_deck)
+{
+    deck = _deck;
+
+    emit deckChanged();
+}
+
+void PlayerLogic::setPlaymatFromProperties(const ServerInfo_PlayerProperties &props)
+{
+    if (props.has_playmat_params() && !props.playmat_params().card_name().empty()) {
+        const auto &pp = props.playmat_params();
+        remotePlaymatCard = {QString::fromStdString(pp.card_name()), QString::fromStdString(pp.card_provider_id())};
+        remotePlaymatParams = {qBound(0.0, pp.margin_pct_l(), 0.95), qBound(0.0, pp.margin_pct_r(), 0.95),
+                               qBound(0.0, pp.vertical_offset(), 1.0), qBound(0.1, pp.zoom(), 4.0)};
+        hasRemotePlaymat = true;
+    } else {
+        remotePlaymatCard = CardRef{};
+        remotePlaymatParams = PlaymatParams{};
+        hasRemotePlaymat = false;
+    }
+    emit playmatChanged();
+}
+
+CounterState *PlayerLogic::addCounter(const ServerInfo_Counter &counter)
+{
+    return addCounter(counter.id(), QString::fromStdString(counter.name()),
+                      convertColorToQColor(counter.counter_color()), counter.radius(), counter.count());
+}
+
+CounterState *PlayerLogic::addCounter(int id, const QString &name, const QColor &color, int radius, int value)
+{
+    if (counters.contains(id)) {
+        return nullptr;
+    }
+    auto *state = new CounterState(id, name, color, radius, value, this);
+    counters.insert(id, state);
+    emit counterAdded(state);
+    return state;
+}
+
+void PlayerLogic::delCounter(int id)
+{
+    auto *state = counters.take(id);
+    if (!state) {
+        return;
+    }
+    emit counterRemoved(id);
+    state->deleteLater();
+}
+
+void PlayerLogic::clearCounters()
+{
+    for (int id : counters.keys()) {
+        emit counterRemoved(id);
+    }
+    qDeleteAll(counters);
+    counters.clear();
+}
+
+CounterState *PlayerLogic::getLifeCounter() const
+{
+    for (auto *s : counters.values()) {
+        if (s->getName() == "life") {
+            return s;
+        }
+    }
+    return nullptr;
+}
+
+bool PlayerLogic::clearCardsToDelete()
+{
+    if (cardsToDelete.isEmpty()) {
+        return false;
+    }
+
+    for (auto &i : cardsToDelete) {
+        if (i != nullptr) {
+            i->deleteView();
+        }
+    }
+    cardsToDelete.clear();
+
+    return true;
+}
+
+void PlayerLogic::setActive(bool _active)
+{
+    active = _active;
+    emit activeChanged(active);
+}
+void PlayerLogic::onRequestZoneViewToggle(const QString &zoneName, int numberCards, bool isReversed)
+{
+    emit requestZoneViewToggle(this, zoneName, numberCards, isReversed);
+}
+
+void PlayerLogic::updateZones()
+{
+    getTableZone()->reorganizeCards();
+}
+
+void PlayerLogic::setGameStarted()
+{
+    if (playerInfo->local) {
+        emit resetTopCardMenuActions();
+    }
+    setConceded(false);
+}

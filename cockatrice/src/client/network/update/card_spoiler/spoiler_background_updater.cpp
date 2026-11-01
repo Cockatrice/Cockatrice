@@ -27,6 +27,7 @@
 #include <functional>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/network/network_manager.h>
 #include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <tuple>
@@ -56,7 +57,7 @@ void SpoilerBackgroundUpdater::startSpoilerDownloadProcess(QString url, bool sav
 
 void SpoilerBackgroundUpdater::downloadFromURL(QUrl url, bool saveResults)
 {
-    auto *nam = new QNetworkAccessManager(this);
+    auto *nam = NetworkManagerFactory::create(this);
     auto request = QNetworkRequest(url);
     request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
     QNetworkReply *reply = nam->get(request);

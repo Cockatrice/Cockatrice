@@ -11,6 +11,7 @@
 
 class CompactPushButton;
 class QComboBox;
+class QEvent;
 class QHBoxLayout;
 class QLabel;
 class QListWidget;
@@ -57,6 +58,7 @@ public slots:
      * @brief Updates all UI text for retranslation/localization.
      *
      * Called when the application language changes.
+     * Also refreshes the layout toggle button text for the current display type.
      */
     void retranslateUi();
     void updateCompactMode(bool mode);
@@ -94,6 +96,10 @@ public:
         return activeSortCriteria;
     }
 
+protected:
+    /** @brief Retranslates on QEvent::LanguageChange. */
+    void changeEvent(QEvent *event) override;
+
 private slots:
     /**
      * @brief Slot triggered whenever the sort list is reordered.
@@ -110,6 +116,8 @@ private slots:
     void updateDisplayType();
 
 private:
+    /** @brief Updates the layout toggle button's text and icon for the current display type. */
+    void updateDisplayTypeButton();
     /** @brief Layout for grouping and sorting UI elements. */
     QHBoxLayout *groupAndSortLayout;
 

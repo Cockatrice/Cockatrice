@@ -7,7 +7,6 @@
 #ifndef ZONEVIEWERZONE_H
 #define ZONEVIEWERZONE_H
 
-#include "../../game/board/card_list.h"
 #include "select_zone.h"
 
 #include <QGraphicsLayoutItem>
@@ -17,6 +16,7 @@
 #include <QSizeF>
 #include <QString>
 #include <libcockatrice/filters/filter_string.h>
+#include <libcockatrice/game/board/card_list.h>
 #include <qnamespace.h>
 #include <qtmetamacros.h>
 

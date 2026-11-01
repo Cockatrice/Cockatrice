@@ -259,7 +259,14 @@ void ReplayEventSidebar::setCurrentRow(int row)
         row = -1;
     }
 
-    if (row == currentRow) {
+    if (row >= 0) {
+        // The view's current index also moves on mouse press and can be deselected by a ctrl-click,
+        // so the cached row alone cannot tell whether the view is already in the desired state.
+        const QListWidgetItem *item = eventList->item(row);
+        if (row == eventList->currentRow() && item && item->isSelected()) {
+            return;
+        }
+    } else if (row == currentRow) {
         return;
     }
 
@@ -268,7 +275,7 @@ void ReplayEventSidebar::setCurrentRow(int row)
 
     if (currentRow >= 0) {
         QListWidgetItem *item = eventList->item(currentRow);
-        if (!eventList->viewport()->rect().intersects(eventList->visualItemRect(item))) {
+        if (!eventList->viewport()->rect().contains(eventList->visualItemRect(item))) {
             eventList->scrollToItem(item, QAbstractItemView::PositionAtCenter);
         }
     }

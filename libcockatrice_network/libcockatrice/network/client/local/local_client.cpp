@@ -39,14 +39,18 @@ LocalClient::~LocalClient()
 
 void LocalClient::sendCommandContainer(const CommandContainer &cont)
 {
-    qCDebug(LocalClientLog).noquote() << userName << "OUT" << getSafeDebugString(cont);
+    if (LocalClientLog().isDebugEnabled()) {
+        qCDebug(LocalClientLog).noquote() << userName << "OUT" << getSafeDebugString(cont);
+    }
 
     lsi->itemFromClient(cont);
 }
 
 void LocalClient::itemFromServer(const ServerMessage &item)
 {
-    qCDebug(LocalClientLog).noquote() << userName << "IN" << getSafeDebugString(item);
+    if (LocalClientLog().isDebugEnabled()) {
+        qCDebug(LocalClientLog).noquote() << userName << "IN" << getSafeDebugString(item);
+    }
 
     processProtocolItem(item);
 }

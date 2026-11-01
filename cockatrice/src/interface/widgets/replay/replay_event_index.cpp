@@ -1,6 +1,5 @@
 #include "replay_event_index.h"
 
-#include "../../../game/phase.h"
 #include "libcockatrice/protocol/get_pb_extension.h"
 #include "libcockatrice/protocol/pb/card_attributes.pb.h"
 #include "libcockatrice/protocol/pb/context_concede.pb.h"
@@ -54,6 +53,7 @@
 #include <QStringList>
 #include <QtGlobal>
 #include <algorithm>
+#include <libcockatrice/game/phase.h>
 
 namespace
 {
@@ -274,32 +274,33 @@ private:
 
     QString formatCardList(const QStringList &names, int total) const
     {
-        QStringList uniqueNames;
+        // Keep repeats: each entry is a drawn/revealed card, so the list length must agree with the count.
+        QStringList listedNames;
         for (const QString &name : names) {
-            if (!name.isEmpty() && !uniqueNames.contains(name)) {
-                uniqueNames.append(name);
+            if (!name.isEmpty()) {
+                listedNames.append(name);
             }
         }
 
-        if (uniqueNames.isEmpty()) {
+        if (listedNames.isEmpty()) {
             if (total <= 0) {
                 return tr("no cards");
             }
             return total == 1 ? tr("1 card") : tr("%1 cards").arg(total);
         }
 
-        if (total <= 0) {
-            total = uniqueNames.size();
+        if (total < listedNames.size()) {
+            total = listedNames.size();
         }
 
-        if (uniqueNames.size() > 3) {
-            return tr("%1 and %2 more").arg(uniqueNames.mid(0, 3).join(QStringLiteral(", "))).arg(total - 3);
+        if (listedNames.size() > 3) {
+            return tr("%1 and %2 more").arg(listedNames.mid(0, 3).join(QStringLiteral(", "))).arg(total - 3);
         }
-        if (total > uniqueNames.size()) {
-            return tr("%1 and %2 more").arg(uniqueNames.join(QStringLiteral(", "))).arg(total - uniqueNames.size());
+        if (total > listedNames.size()) {
+            return tr("%1 and %2 more").arg(listedNames.join(QStringLiteral(", "))).arg(total - listedNames.size());
         }
 
-        return uniqueNames.join(QStringLiteral(", "));
+        return listedNames.join(QStringLiteral(", "));
     }
 
     void updateGameState(const Event_GameStateChanged &event)
@@ -452,18 +453,7 @@ private:
         }
 
         const QString finalText = forcedByJudge ? tr("%1 (judge)").arg(text) : text;
-        for (const PendingDetail &detail : details) {
-            if (detail.text == finalText) {
-                return;
-            }
-        }
-
-        PendingDetail detail;
-        detail.text = finalText;
-        detail.badge = badge;
-        detail.kind = kind;
-        detail.actor = actorName(actorId);
-        details.append(detail);
+        details.append(PendingDetail{.text = finalText, .badge = badge, .kind = kind, .actor = actorName(actorId)});
     }
 
     QList<PendingDetail> describeContainer(const GameEventContainer &container)
@@ -495,15 +485,16 @@ private:
                 case GameEvent::PLAYER_PROPERTIES_CHANGED: {
                     const Event_PlayerPropertiesChanged &propertiesEvent =
                         event.GetExtension(Event_PlayerPropertiesChanged::ext);
-                    const int playerId =
-                        propertiesEvent.has_player_properties() && propertiesEvent.player_properties().player_id() >= 0
-                            ? propertiesEvent.player_properties().player_id()
-                            : eventPlayerId;
-                    if (propertiesEvent.has_player_properties()) {
-                        rememberPlayer(propertiesEvent.player_properties());
+                    const bool hasProperties = propertiesEvent.has_player_properties();
+                    const ServerInfo_PlayerProperties &properties = propertiesEvent.player_properties();
+                    // The server only fills in the field that changed, so player_id is absent from these events
+                    // unless they are about a specific player; fall back to the event's own player id.
+                    const bool describesPlayer = hasProperties && properties.has_player_id();
+                    const int playerId = describesPlayer ? properties.player_id() : eventPlayerId;
+                    if (describesPlayer) {
+                        rememberPlayer(properties);
                     }
 
-                    const ServerInfo_PlayerProperties &properties = propertiesEvent.player_properties();
                     switch (contextType) {
                         case GameEventContext::READY_START:
                             addDetail(details,
@@ -519,7 +510,7 @@ private:
                                       playerId, forcedByJudge);
                             break;
                         case GameEventContext::DECK_SELECT: {
-                            const Context_DeckSelect deckSelect = context.GetExtension(Context_DeckSelect::ext);
+                            const Context_DeckSelect &deckSelect = context.GetExtension(Context_DeckSelect::ext);
                             const int sideboardSize = deckSelect.sideboard_size();
                             addDetail(details,
                                       sideboardSize >= 0
@@ -529,7 +520,7 @@ private:
                             break;
                         }
                         case GameEventContext::MULLIGAN: {
-                            const Context_Mulligan mulligan = context.GetExtension(Context_Mulligan::ext);
+                            const Context_Mulligan &mulligan = context.GetExtension(Context_Mulligan::ext);
                             addDetail(details,
                                       mulligan.number() > 0 ? tr("took a mulligan (%1).").arg(mulligan.number())
                                                             : tr("took a mulligan."),
@@ -731,16 +722,22 @@ private:
                 case GameEvent::ATTACH_CARD: {
                     const Event_AttachCard &attachCard = event.GetExtension(Event_AttachCard::ext);
                     const QString startZone = QString::fromStdString(attachCard.start_zone());
+                    const QString source = cardName(eventPlayerId, startZone, attachCard.card_id());
+                    const QString sourceText = source.isEmpty() ? tr("a card") : source;
+                    // An unattach event carries no target at all, so the target fields default to player 0 / no zone
+                    // / card 0; only a present target_player_id means the card was attached to something.
+                    if (!attachCard.has_target_player_id()) {
+                        addDetail(details, tr("unattached %1.").arg(sourceText), tr("ATTACH"), ReplayEventKind::Action,
+                                  eventPlayerId, forcedByJudge);
+                        break;
+                    }
                     const QString targetZone = QString::fromStdString(attachCard.target_zone());
                     const int targetPlayerId =
                         attachCard.target_player_id() >= 0 ? attachCard.target_player_id() : eventPlayerId;
-                    const QString source = cardName(eventPlayerId, startZone, attachCard.card_id());
                     const QString target = cardName(targetPlayerId, targetZone, attachCard.target_card_id());
-                    addDetail(
-                        details,
-                        tr("attached %1 to %2.")
-                            .arg(source.isEmpty() ? tr("a card") : source, target.isEmpty() ? tr("a card") : target),
-                        tr("ATTACH"), ReplayEventKind::Action, eventPlayerId, forcedByJudge);
+                    addDetail(details,
+                              tr("attached %1 to %2.").arg(sourceText, target.isEmpty() ? tr("a card") : target),
+                              tr("ATTACH"), ReplayEventKind::Action, eventPlayerId, forcedByJudge);
                     break;
                 }
                 case GameEvent::CREATE_TOKEN: {

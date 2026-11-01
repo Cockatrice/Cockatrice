@@ -21,12 +21,15 @@ set(UTILITY_HEADERS
     libcockatrice/utility/card_ref.h
     libcockatrice/utility/color.h
     libcockatrice/utility/cryptoutil.h
+    libcockatrice/utility/debouncer.h
     libcockatrice/utility/expression.h
+    libcockatrice/utility/installer_close_protocol.h
     libcockatrice/utility/levenshtein.h
     libcockatrice/utility/local_server_name.h
     libcockatrice/utility/macros.h
     libcockatrice/utility/passwordhasher.h
     libcockatrice/utility/playmat_params.h
+    libcockatrice/utility/qt_utils.h
     libcockatrice/utility/report_categories.h
     libcockatrice/utility/string_limits.h
     libcockatrice/utility/dice_limits.h

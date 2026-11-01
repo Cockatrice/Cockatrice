@@ -2,16 +2,10 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
-#include "../../../game/abstract_game.h"
-#include "../../../game/game_event_handler.h"
-#include "../../../game/game_meta_info.h"
-#include "../../../game/game_state.h"
-#include "../../../game/player/player_info.h"
-#include "../../../game/player/player_manager.h"
+#include "../../../database/interface/settings_card_preference_provider.h"
 #include "../../../game_graphics/board/abstract_card_item.h"
-#include "../game/game.h"
-#include "../game/player/player_logic.h"
-#include "../game/replay.h"
+#include "../game_graphics/board/arrow_item.h"
+#include "../game_graphics/board/card_item.h"
 #include "../game_graphics/deckview/deck_view_container.h"
 #include "../game_graphics/deckview/tabbed_deck_view_container.h"
 #include "../game_graphics/game_scene.h"
@@ -72,6 +66,15 @@
 #include <QWidget>
 #include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/game.h>
+#include <libcockatrice/game/game_event_handler.h>
+#include <libcockatrice/game/game_meta_info.h>
+#include <libcockatrice/game/game_state.h>
+#include <libcockatrice/game/player/player_info.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/player/player_manager.h>
+#include <libcockatrice/game/replay.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
@@ -79,6 +82,7 @@
 #include <libcockatrice/settings/debug_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/layouts_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <qnamespace.h>
 #include <qobjectdefs.h>
@@ -94,10 +98,11 @@ class Message;
 } // namespace google
 
 TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
-    : Tab(_tabSupervisor), sayLabel(nullptr), sayEdit(nullptr), replayDock(nullptr), historyDock(nullptr)
+    : Tab(_tabSupervisor), sayLabel(nullptr), sayEdit(nullptr)
 {
     // THIS CTOR IS USED ON REPLAY
-    game = new Replay(this, _replay, tabSupervisor->getIsLocalGame());
+    game = new Replay(this, _replay, tabSupervisor->getIsLocalGame(), &SettingsCache::instance().userInterface(),
+                      new SettingsCardPreferenceProvider(this));
 
     createCardInfoDock(true);
     createPlayerListDock(true);
@@ -142,7 +147,8 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     : Tab(_tabSupervisor), userListProxy(_tabSupervisor->getUserListManager())
 {
     // THIS CTOR IS USED ON GAMES
-    game = new Game(this, tabSupervisor->getIsLocalGame(), _clients, event, _roomGameTypes);
+    game = new Game(this, tabSupervisor->getIsLocalGame(), _clients, event, _roomGameTypes,
+                    &SettingsCache::instance().userInterface(), new SettingsCardPreferenceProvider(this));
 
     createCardInfoDock();
     createPlayerListDock();
@@ -614,15 +620,14 @@ void TabGame::actConcede()
         return;
     }
     if (!player->getConceded()) {
-        if (QMessageBox::question(this, tr("Concede"), tr("Are you sure you want to concede this game?"),
-                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes) {
+        if (!QtUtils::confirm(this, tr("Concede"), tr("Are you sure you want to concede this game?"),
+                              QMessageBox::No)) {
             return;
         }
         emit game->getPlayerManager()->activeLocalPlayerConceded();
     } else {
-        if (QMessageBox::question(this, tr("Unconcede"),
-                                  tr("You have already conceded.  Do you want to return to this game?"),
-                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes) {
+        if (!QtUtils::confirm(this, tr("Unconcede"),
+                              tr("You have already conceded.  Do you want to return to this game?"), QMessageBox::No)) {
             return;
         }
         emit game->getPlayerManager()->activeLocalPlayerUnconceded();
@@ -639,8 +644,8 @@ bool TabGame::leaveGame()
     if (!game->getGameState()->isGameClosed()) {
         if (!game->getPlayerManager()->isSpectator()) {
             tabSupervisor->setCurrentWidget(this);
-            if (QMessageBox::question(this, tr("Leave game"), tr("Are you sure you want to leave this game?"),
-                                      QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes) {
+            if (!QtUtils::confirm(this, tr("Leave game"), tr("Are you sure you want to leave this game?"),
+                                  QMessageBox::No)) {
                 return false;
             }
         }
@@ -1298,8 +1303,14 @@ void TabGame::createPlayAreaWidget(bool bReplay)
 {
     phasesToolbar = new PhasesToolbar;
     if (!bReplay) {
-        connect(phasesToolbar, &PhasesToolbar::sendGameCommand, game->getGameEventHandler(),
-                qOverload<const ::google::protobuf::Message &, int>(&GameEventHandler::sendGameCommand));
+        connect(phasesToolbar, &PhasesToolbar::setActivePhaseRequested, game->getGameEventHandler(),
+                &GameEventHandler::handleActivePhaseChanged);
+        connect(phasesToolbar, &PhasesToolbar::nextTurnRequested, game->getGameEventHandler(),
+                &GameEventHandler::handleNextTurn);
+        connect(phasesToolbar, &PhasesToolbar::untapAllRequested, game->getGameEventHandler(),
+                &GameEventHandler::handleUntapAll);
+        connect(phasesToolbar, &PhasesToolbar::drawCardRequested, game->getGameEventHandler(),
+                &GameEventHandler::handleDrawCard);
     }
     scene = new GameScene(phasesToolbar, this);
     connect(game->getPlayerManager(), &PlayerManager::playerConceded, scene, &GameScene::rearrange);
@@ -1309,8 +1320,7 @@ void TabGame::createPlayAreaWidget(bool bReplay)
     connect(game->getGameEventHandler(), &GameEventHandler::arrowDeleted, scene, &GameScene::deleteArrow);
     gameView = new GameView(scene);
 
-    auto gamePlayAreaVBox = new QVBoxLayout;
-    gamePlayAreaVBox->setContentsMargins(0, 0, 0, 0);
+    auto gamePlayAreaVBox = QtUtils::makeLayout<QVBoxLayout>();
     gamePlayAreaVBox->addWidget(gameView);
 
     gamePlayAreaWidget = new QWidget;
@@ -1356,8 +1366,7 @@ void TabGame::createDeckViewContainerWidget(bool bReplay)
 
     deckViewContainerWidget = new QWidget();
     deckViewContainerWidget->setObjectName("deckViewContainerWidget");
-    deckViewContainerLayout = new QVBoxLayout;
-    deckViewContainerLayout->setContentsMargins(0, 0, 0, 0);
+    deckViewContainerLayout = QtUtils::makeLayout<QVBoxLayout>();
     deckViewContainerWidget->setLayout(deckViewContainerLayout);
 }
 
@@ -1372,8 +1381,7 @@ void TabGame::createCardInfoDock(bool bReplay)
 
     cardInfoFrameWidget = new CardInfoFrameWidget();
     auto cardHInfoLayout = new QHBoxLayout;
-    auto cardVInfoLayout = new QVBoxLayout;
-    cardVInfoLayout->setContentsMargins(0, 0, 0, 0);
+    auto cardVInfoLayout = QtUtils::makeLayout<QVBoxLayout>();
     cardVInfoLayout->addWidget(cardInfoFrameWidget);
     cardVInfoLayout->addLayout(cardHInfoLayout);
 
@@ -1400,9 +1408,7 @@ void TabGame::createPlayerListDock(bool bReplay)
     playerListWidget->setFocusPolicy(Qt::NoFocus);
 
     auto *playerListBox = new QWidget(this);
-    auto *vbox = new QVBoxLayout(playerListBox);
-    vbox->setContentsMargins(0, 0, 0, 0);
-    vbox->setSpacing(0);
+    auto *vbox = QtUtils::makeLayout<QVBoxLayout>(playerListBox, 0);
 
     vbox->addWidget(playerListWidget);
 
@@ -1427,8 +1433,7 @@ void TabGame::createPlayerListDock(bool bReplay)
 
 void TabGame::createMessageDock(bool bReplay)
 {
-    auto messageLogLayout = new QVBoxLayout;
-    messageLogLayout->setContentsMargins(0, 0, 0, 0);
+    auto messageLogLayout = QtUtils::makeLayout<QVBoxLayout>();
 
     // clock
     if (!bReplay) {
