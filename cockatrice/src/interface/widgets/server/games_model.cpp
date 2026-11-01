@@ -1,6 +1,7 @@
 #include "games_model.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../theme_icon.h"
 #include "../interface/pixel_map_generator.h"
 #include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 #include "user/user_list_proxy.h"
@@ -85,7 +86,8 @@ const QString GamesModel::getGameCreatedString(const int secs)
 }
 
 GamesModel::GamesModel(const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QObject *parent)
-    : QAbstractTableModel(parent), rooms(_rooms), gameTypes(_gameTypes)
+    : QAbstractTableModel(parent), rooms(_rooms), gameTypes(_gameTypes),
+      lockIcon(loadThemedIcon(QStringLiteral("icons/lock")))
 {
 }
 
@@ -191,7 +193,9 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
                     return result.join(", ");
                 }
                 case Qt::DecorationRole: {
-                    return gameentry.with_password() ? QIcon(LockPixmapGenerator::generatePixmap(13)) : QVariant();
+                    // One engine per model: it is palette- and theme-aware and
+                    // invalidates itself, so a repaint must not build a new one.
+                    return gameentry.with_password() ? lockIcon : QVariant();
                     case Qt::TextAlignmentRole:
                         return Qt::AlignLeft;
                     default:
