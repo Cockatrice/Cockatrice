@@ -26,6 +26,7 @@ set(cockatrice_SOURCES
     src/client/settings/shortcuts_settings.cpp
     src/interface/deck_loader/card_node_function.cpp
     src/interface/deck_loader/deck_loader.cpp
+    src/interface/deck_loader/remote_deck_download.cpp
     src/interface/widgets/dialogs/dlg_connect.cpp
     src/interface/widgets/dialogs/dlg_convert_deck_to_cod_format.cpp
     src/interface/widgets/dialogs/dlg_create_game.cpp

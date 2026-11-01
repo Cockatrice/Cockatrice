@@ -157,7 +157,7 @@ DeckLoader::saveToFile(const DeckList &deck, const QString &fileName, DeckFileFo
 {
     // Use QSaveFile so that a failed write (e.g. a full disk) leaves the existing deck untouched
     // instead of truncating it to a 0-byte file. The target is only replaced once every byte has
-    // been flushed successfully in commit().
+    // been explicitly flushed and committed successfully.
     QSaveFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qCWarning(DeckLoaderLog) << "Could not create or open file:" << fileName;
@@ -174,7 +174,7 @@ DeckLoader::saveToFile(const DeckList &deck, const QString &fileName, DeckFileFo
             break;
     }
 
-    if (!success) {
+    if (!success || !file.flush()) {
         file.cancelWriting();
         qCWarning(DeckLoaderLog) << "Failed to serialize deck for file:" << fileName;
         return std::nullopt;
@@ -237,12 +237,22 @@ bool DeckLoader::updateLastLoadedTimestamp(LoadedDeck &deck)
         return false;
     }
 
-    // Perform file modifications
-    deck.deckList.setLastLoadedTimestamp(QDateTime::currentDateTime().toString());
+    // Keep the loaded deck unchanged until both its content and original filesystem
+    // timestamp have been published. A failed automatic timestamp update must not
+    // replace the previous deck with a partial file or dirty the in-memory metadata.
+    const QString loadedTimestamp = QDateTime::currentDateTime().toString();
+    DeckList updatedDeck = deck.deckList;
+    updatedDeck.setLastLoadedTimestamp(loadedTimestamp);
 
-    if (!deck.deckList.saveToFile_Native(&file)) {
+    if (!updatedDeck.saveToFile_Native(&file) || !file.flush()) {
         file.cancelWriting();
         qCWarning(DeckLoaderLog) << "Failed to serialize deck for file:" << fileName;
+        return false;
+    }
+
+    if (!file.setFileTime(originalTimestamp, QFileDevice::FileModificationTime)) {
+        file.cancelWriting();
+        qCWarning(DeckLoaderLog) << "Failed to set modification time for file:" << fileName;
         return false;
     }
 
@@ -251,21 +261,7 @@ bool DeckLoader::updateLastLoadedTimestamp(LoadedDeck &deck)
         return false;
     }
 
-    // Re-open the file and restore the original timestamp, so that updating the lastLoadedTimestamp
-    // does not change the file's modification time.
-    QFile timestampFile(fileName);
-    if (!timestampFile.open(QIODevice::ReadWrite)) {
-        qCWarning(DeckLoaderLog) << "Failed to re-open file to set timestamp:" << fileName;
-        return false;
-    }
-
-    if (!timestampFile.setFileTime(originalTimestamp, QFileDevice::FileModificationTime)) {
-        qCWarning(DeckLoaderLog) << "Failed to set modification time for file:" << fileName;
-        timestampFile.close();
-        return false;
-    }
-
-    timestampFile.close();
+    deck.deckList.setLastLoadedTimestamp(loadedTimestamp);
     return true;
 }
 
@@ -530,7 +526,7 @@ bool DeckLoader::convertToCockatriceFormat(LoadedDeck &deck)
         return false;
     }
 
-    if (!deck.deckList.saveToFile_Native(&file)) {
+    if (!deck.deckList.saveToFile_Native(&file) || !file.flush()) {
         file.cancelWriting();
         qCWarning(DeckLoaderLog) << "Failed to serialize deck for file:" << newFileName;
         return false;

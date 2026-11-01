@@ -64,7 +64,7 @@ private:
     void uploadDeck(const QString &filePath, const QString &targetPath);
     void deleteRemoteDeck(const RemoteDeckList_TreeModel::Node *node);
 
-    void downloadNodeAtIndex(const QModelIndex &curLeft, const QModelIndex &curRight);
+    void downloadNodeAtIndex(const QString &directoryPath, const QModelIndex &curRight);
 
 private slots:
     void handleConnected(const ServerInfo_User &userInfo);
