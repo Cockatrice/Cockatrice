@@ -132,6 +132,9 @@ public:
     // theme directory when it is absent from the resolved (user) directory.
     static PaletteConfig
     loadDefaultPaletteConfig(const QString &themeDirPath, const QString &themeName, const QString &colorScheme);
+    // Load the theme's shipped default fonts, falling back to the system theme
+    // directory when fonts.toml is absent from the resolved (user) directory.
+    static FontConfig loadDefaultFontConfig(const QString &themeDirPath, const QString &themeName);
     /** @brief Writes cfg to disk as the theme's palette-<scheme>.toml and updates the
      *         theme's stored colour scheme to match. Shared by PaletteEditorDialog::onSave
      *         and FirstRunWizard's theme step so the two "generate + keep" paths can't drift. */
@@ -149,6 +152,11 @@ public:
     /** @brief Resolves an application font role: the theme's stored [Fonts]
      *         value when present, otherwise the application font. */
     QFont appFont(AppFont::Role role) const;
+    /** @brief Resolves an application font role against the startup font only,
+     *         ignoring any previewed config in currentFonts. Editors that show
+     *         "what this role resolves to" must use this, because appFont()
+     *         reflects a live preview while the editor is open. */
+    QFont defaultAppFont(AppFont::Role role) const;
 
     QBrush &getBgBrush(Role zone);
     QBrush getExtraBgBrush(Role zone, int zoneId = 0);
