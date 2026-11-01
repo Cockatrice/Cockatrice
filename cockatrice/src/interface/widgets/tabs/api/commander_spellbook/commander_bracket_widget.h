@@ -1,6 +1,7 @@
 #ifndef COCKATRICE_COMMANDER_BRACKET_WIDGET_H
 #define COCKATRICE_COMMANDER_BRACKET_WIDGET_H
 
+#include "commander_bracket_service.h"
 #include "commander_spellbook_bracket_explainer.h"
 
 #include <QSharedPointer>
@@ -11,6 +12,7 @@
 
 class QLabel;
 class QToolButton;
+class QTimer;
 struct CommanderBracketEstimate;
 class DeckList;
 class QObject;
@@ -22,6 +24,7 @@ class CommanderBracketWidget : public QWidget
 
 public:
     explicit CommanderBracketWidget(QWidget *parent = nullptr);
+    ~CommanderBracketWidget() override;
 
     void setDeck(const QSharedPointer<DeckList> &_deck);
     void retranslateUi();
@@ -35,10 +38,15 @@ private slots:
 private:
     bool promptCommanderSpellbookIntegration();
     void updateBracketVisibility(bool visible);
+    void cancelEstimate();
+    void displayEstimate();
 
     QSharedPointer<DeckList> deck;
     bool prompting = false;
     quint64 requestId = 0;
+    QTimer *autoEstimateTimer;
+    bool hasEstimate = false;
+    CommanderBracketEstimate lastEstimate;
 
     QLabel *bracketLabel;
     QLabel *bracketValueLabel;

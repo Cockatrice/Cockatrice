@@ -28,9 +28,18 @@ template <class T> class QSharedPointer;
 
 CommanderBracketWidget::CommanderBracketWidget(QWidget *parent) : QWidget(parent)
 {
+    autoEstimateTimer = new QTimer(this);
+    autoEstimateTimer->setSingleShot(true);
+    connect(autoEstimateTimer, &QTimer::timeout, this, [this]() {
+        if (SettingsCache::instance().deckEditor().getCommanderSpellbookIntegrationEnabled() ==
+            commanderSpellbookIntegrationEnabledIndexAutomatic) {
+            requestBracketEstimate();
+        }
+    });
     bracketLabel = new QLabel(tr("Bracket:"), this);
 
     bracketValueLabel = new QLabel(this);
+    bracketValueLabel->setTextFormat(Qt::PlainText);
     bracketValueLabel->setText("-");
     bracketValueLabel->setObjectName("bracketValueLabel");
 
@@ -65,18 +74,38 @@ CommanderBracketWidget::CommanderBracketWidget(QWidget *parent) : QWidget(parent
             this, &CommanderBracketWidget::maybeAutoEstimateBracket);
     connect(&SettingsCache::instance().deckEditor(),
             &DeckEditorSettings::commanderSpellbookIntegrationUseOfficialBracketNamesChanged, this,
-            &CommanderBracketWidget::maybeAutoEstimateBracket);
+            &CommanderBracketWidget::displayEstimate);
 
     setVisible(false);
 }
 
+CommanderBracketWidget::~CommanderBracketWidget()
+{
+    cancelEstimate();
+}
+
+void CommanderBracketWidget::cancelEstimate()
+{
+    autoEstimateTimer->stop();
+    const quint64 canceledRequest = requestId;
+    requestId = 0;
+    CommanderBracketService::instance().cancelEstimate(canceledRequest);
+    bracketRefreshButton->setEnabled(true);
+    if (canceledRequest) {
+        bracketValueLabel->setText("-");
+        bracketValueLabel->setToolTip({});
+    }
+}
+
 void CommanderBracketWidget::setDeck(const QSharedPointer<DeckList> &_deck)
 {
+    cancelEstimate();
     deck = _deck;
-    requestId = 0; // invalidate any in-flight estimate for the previous deck
+    hasEstimate = false;
 
     // Reset the displayed bracket
     bracketValueLabel->setText("-");
+    bracketValueLabel->setToolTip({});
     bracketInfoButton->setToolTip({});
     bracketInfoButton->setEnabled(false);
     bracketRefreshButton->setEnabled(true);
@@ -144,7 +173,7 @@ bool CommanderBracketWidget::promptCommanderSpellbookIntegration()
     dialog.exec();
 
     // Persist naming choice (if not disabled)
-    if (clickedButton != disableBtn) {
+    if (clickedButton == enableBtn || clickedButton == automaticBtn) {
         bool useOfficial = namingCombo->currentIndex() == 1;
         SettingsCache::instance().deckEditor().setCommanderSpellbookIntegrationUseOfficialBracketNames(useOfficial);
     }
@@ -176,9 +205,20 @@ void CommanderBracketWidget::updateBracketVisibility(bool visible)
 
 void CommanderBracketWidget::requestBracketEstimate()
 {
+    const int mode = SettingsCache::instance().deckEditor().getCommanderSpellbookIntegrationEnabled();
+    if (!deck || deck->getGameFormat().compare("commander", Qt::CaseInsensitive) != 0 || requestId ||
+        (mode != commanderSpellbookIntegrationEnabledIndexEnabled &&
+         mode != commanderSpellbookIntegrationEnabledIndexAutomatic)) {
+        return;
+    }
+
+    autoEstimateTimer->stop();
+    hasEstimate = false;
     bracketRefreshButton->setEnabled(false);
     bracketInfoButton->setEnabled(false);
+    bracketInfoButton->setToolTip({});
     bracketValueLabel->setText(tr("Calculating…"));
+    bracketValueLabel->setToolTip({});
 
     requestId = CommanderBracketService::instance().estimateBracket(*deck, this);
 }
@@ -191,22 +231,34 @@ void CommanderBracketWidget::onEstimateBracketFinished(quint64 id,
         return;
     }
 
+    requestId = 0;
+    hasEstimate = true;
+    lastEstimate = result;
+    displayEstimate();
+    bracketRefreshButton->setEnabled(true);
+}
+
+void CommanderBracketWidget::displayEstimate()
+{
+    if (!hasEstimate) {
+        return;
+    }
+
     BracketExplainer explainer;
-    lastBracketExplanation = explainer.explain(result.rawResult);
+    lastBracketExplanation = explainer.explain(lastEstimate.rawResult);
 
     // Display bracket
     bracketValueLabel->setText(
         SettingsCache::instance().deckEditor().getCommanderSpellbookIntegrationUseOfficialBracketNames()
-            ? result.officialName
-            : result.displayName);
-    bracketRefreshButton->setEnabled(true);
+            ? lastEstimate.officialName
+            : lastEstimate.displayName);
 
     // Build tooltip
     QString tooltip;
     for (const auto &section : lastBracketExplanation.sections) {
-        tooltip += "<b>" + section.title + "</b><br>";
+        tooltip += "<b>" + section.title.toHtmlEscaped() + "</b><br>";
         for (const auto &line : section.bulletPoints) {
-            tooltip += "• " + line + "<br>";
+            tooltip += "• " + line.toHtmlEscaped() + "<br>";
         }
         tooltip += "<br>";
     }
@@ -215,13 +267,17 @@ void CommanderBracketWidget::onEstimateBracketFinished(quint64 id,
     bracketInfoButton->setEnabled(!tooltip.isEmpty());
 }
 
-void CommanderBracketWidget::onEstimateBracketError(quint64 id, QObject *requester, const QString & /*error*/)
+void CommanderBracketWidget::onEstimateBracketError(quint64 id, QObject *requester, const QString &error)
 {
     if (requester != this || id != requestId) {
         return;
     }
 
+    requestId = 0;
+    hasEstimate = false;
     bracketValueLabel->setText("-");
+    bracketValueLabel->setToolTip(
+        QStringLiteral("<qt>%1</qt>").arg(tr("Unable to estimate bracket: %1").arg(error).toHtmlEscaped()));
     bracketRefreshButton->setEnabled(true);
     bracketInfoButton->setToolTip({});
     bracketInfoButton->setEnabled(false);
@@ -229,6 +285,15 @@ void CommanderBracketWidget::onEstimateBracketError(quint64 id, QObject *request
 
 void CommanderBracketWidget::maybeAutoEstimateBracket()
 {
+    if (prompting) {
+        return;
+    }
+    autoEstimateTimer->stop();
+    if (!deck) {
+        cancelEstimate();
+        updateBracketVisibility(false);
+        return;
+    }
     const QString formatKey = deck->getGameFormat();
 
     const bool isCommander = (formatKey.compare("commander", Qt::CaseInsensitive) == 0);
@@ -236,17 +301,20 @@ void CommanderBracketWidget::maybeAutoEstimateBracket()
     int mode = SettingsCache::instance().deckEditor().getCommanderSpellbookIntegrationEnabled();
 
     if (!isCommander || mode == commanderSpellbookIntegrationEnabledIndexDisabled) {
+        cancelEstimate();
         updateBracketVisibility(false);
         return;
     }
 
     if (mode == commanderSpellbookIntegrationEnabledIndexUnprompted) {
-        if (prompting) {
-            return;
-        }
+        const auto promptedDeck = deck;
         prompting = true;
         const bool accepted = promptCommanderSpellbookIntegration();
         prompting = false;
+        if (deck != promptedDeck || !deck || deck->getGameFormat().compare("commander", Qt::CaseInsensitive) != 0) {
+            maybeAutoEstimateBracket();
+            return;
+        }
         if (!accepted) {
             updateBracketVisibility(false);
             return;
@@ -261,17 +329,17 @@ void CommanderBracketWidget::maybeAutoEstimateBracket()
     }
 
     // Avoid firing if we already have a result or a request in flight
-    if (!bracketRefreshButton->isEnabled()) {
+    if (requestId || hasEstimate) {
         return;
     }
 
     // Defer to avoid races during init / model rebuild
-    QTimer::singleShot(0, this, &CommanderBracketWidget::requestBracketEstimate);
+    autoEstimateTimer->start(0);
 }
 
 void CommanderBracketWidget::retranslateUi()
 {
     bracketLabel->setText(tr("Bracket:"));
-    bracketInfoButton->setToolTip(tr("Why this bracket?"));
+    displayEstimate();
     bracketRefreshButton->setToolTip(tr("Recalculate bracket"));
 }
