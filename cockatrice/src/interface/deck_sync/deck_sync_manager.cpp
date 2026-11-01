@@ -261,7 +261,7 @@ void DeckSyncManager::cancelFirstSync()
     failSync(tr("Sync cancelled."));
 }
 
-void DeckSyncManager::classify(const QMap<QString, ServerFile> &serverFiles)
+void DeckSyncManager::classify(const QMap<int, ServerFile> &serverFiles)
 {
     emit statusMessage(tr("Comparing %1 local and %2 server decks...").arg(localFiles.size()).arg(serverFiles.size()));
 
@@ -374,20 +374,22 @@ void DeckSyncManager::classify(const QMap<QString, ServerFile> &serverFiles)
         }
         const DeckSyncRecord baseRecord = sidecar.get(it.key());
         const bool localChanged = baseRecord.baseHash.isEmpty() || baseRecord.baseHash != it.value().hash;
-        const bool serverChanged = baseRecord.baseHash.isEmpty() || baseRecord.baseHash != serverIt.value().hash;
+        // A server row without a hash predates sync: treat it as unknown rather than changed,
+        // otherwise every sync re-downloads the deck.
+        const bool serverChanged =
+            !server.hash.isEmpty() && (baseRecord.baseHash.isEmpty() || baseRecord.baseHash != server.hash);
         if (localChanged && !serverChanged) {
             if (syncMode == DeckSyncMode::DownloadOnly) {
                 continue;
             }
-            applyUpload(it.key(), serverPath, serverIt.value().id, serverIt.value().guid);
+            applyUpload(it.key(), server.path, server.id, server.guid);
             continue;
         }
         if (!localChanged && serverChanged) {
             if (syncMode == DeckSyncMode::UploadOnly) {
                 continue;
             }
-            applyDownload(it.key(), serverIt.value().id, serverIt.value().guid, serverIt.value().hash,
-                          serverIt.value().lastModifiedSecs);
+            applyDownload(it.key(), server.id, server.guid, server.hash, server.lastModifiedSecs);
             continue;
         }
         const qint64 localSecs = it.value().modified.toSecsSinceEpoch();
