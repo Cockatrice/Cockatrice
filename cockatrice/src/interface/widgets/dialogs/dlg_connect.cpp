@@ -290,11 +290,13 @@ void DlgConnect::updateDisplayInfo(const QString &saveName)
     playernameEdit->setFocus();
     savePasswordCheckBox->setChecked(savePasswordStatus);
     storedVerifier.clear();
+    savedVerifier.clear();
 
     if (savePasswordStatus) {
         const QString stored = _data.at(4);
         if (stored.startsWith("$")) {
             storedVerifier = stored;
+            savedVerifier = stored;
             passwordEdit->clear();
             passwordEdit->setPlaceholderText(tr("Password saved"));
         } else {
@@ -331,6 +333,7 @@ void DlgConnect::newHostSelected(bool state)
         passwordEdit->clear();
         passwordEdit->setPlaceholderText(QString());
         storedVerifier.clear();
+        savedVerifier.clear();
         saveEdit->clear();
         saveEdit->setPlaceholderText(tr("Unique Server Name"));
         saveEdit->setDisabled(false);
@@ -346,9 +349,19 @@ void DlgConnect::passwordSaved(QT_STATE_CHANGED_T state)
     Q_UNUSED(state);
     if (savePasswordCheckBox->isChecked()) {
         autoConnectCheckBox->setEnabled(true);
+        // Re-ticking keeps a password the user has started typing; otherwise restore the saved
+        // login this dialog was opened with, so unticking and changing your mind is harmless.
+        if (passwordEdit->text().isEmpty()) {
+            storedVerifier = savedVerifier;
+            passwordEdit->setPlaceholderText(savedVerifier.isEmpty() ? QString() : tr("Password saved"));
+        }
     } else {
         autoConnectCheckBox->setChecked(false);
         autoConnectCheckBox->setEnabled(false);
+        // Unticking means the password typed below is sent for this connection: stop sending the
+        // saved verifier instead, and stop claiming a password is saved.
+        storedVerifier.clear();
+        passwordEdit->setPlaceholderText(QString());
     }
 }
 
