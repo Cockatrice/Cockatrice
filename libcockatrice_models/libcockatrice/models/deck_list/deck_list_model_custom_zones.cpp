@@ -8,6 +8,8 @@
 #include <QHash>
 #include <QSharedPointer>
 #include <QVector>
+#include <algorithm>
+#include <cmath>
 #include <utility>
 
 namespace DeckListModelCustomZones
@@ -111,7 +113,7 @@ QList<QPair<int, int>> plainSort(InnerDecklistNode *node, Qt::SortOrder order)
  *
  * @return The (preSortRow, finalRow) mapping covering both the sort and the shift.
  */
-QList<QPair<int, int>> boardSort(InnerDecklistNode *node, Qt::SortOrder order)
+QList<QPair<int, int>> boardSort(InnerDecklistNode *node, Qt::SortOrder order, bool numericGroups)
 {
     const QVector<QPair<int, int>> sortResult = node->sort(order);
 
@@ -132,6 +134,27 @@ QList<QPair<int, int>> boardSort(InnerDecklistNode *node, Qt::SortOrder order)
         }
     }
 
+    if (numericGroups) {
+        // Only criteria groups are numeric. Mixing numeric and lexical fallback
+        // comparisons with custom zone names would not define a strict ordering.
+        std::sort(groups.begin(), groups.end(), [order](const auto *left, const auto *right) {
+            const QString leftName = left->getName();
+            const QString rightName = right->getName();
+            bool leftIsNumber, rightIsNumber;
+            const double leftValue = leftName.toDouble(&leftIsNumber);
+            const double rightValue = rightName.toDouble(&rightIsNumber);
+            leftIsNumber = leftIsNumber && std::isfinite(leftValue);
+            rightIsNumber = rightIsNumber && std::isfinite(rightValue);
+            if (leftIsNumber != rightIsNumber) {
+                return leftIsNumber;
+            }
+            if (leftIsNumber && leftValue != rightValue) {
+                return order == Qt::AscendingOrder ? leftValue < rightValue : leftValue > rightValue;
+            }
+            return order == Qt::AscendingOrder ? leftName < rightName : leftName > rightName;
+        });
+    }
+
     QVector<AbstractDecklistNode *> ordered = groups + customZones;
     for (int i = 0; i < ordered.size(); ++i) {
         node->replace(i, ordered[i]);
@@ -147,10 +170,11 @@ QList<QPair<int, int>> boardSort(InnerDecklistNode *node, Qt::SortOrder order)
 
 } // namespace
 
-QList<QPair<int, int>> sortWithCustomZonesLast(InnerDecklistNode *root, InnerDecklistNode *node, Qt::SortOrder order)
+QList<QPair<int, int>>
+sortWithCustomZonesLast(InnerDecklistNode *root, InnerDecklistNode *node, Qt::SortOrder order, bool numericGroups)
 {
     const bool isBoardZone = (node != root) && (node->getParent() == root);
-    return isBoardZone ? boardSort(node, order) : plainSort(node, order);
+    return isBoardZone ? boardSort(node, order, numericGroups) : plainSort(node, order);
 }
 
 } // namespace DeckListModelCustomZones

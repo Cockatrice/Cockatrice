@@ -283,3 +283,34 @@ int main(int argc, char **argv)
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
+
+TEST(DeckListModelCustomZones, ManaGroupsUseNumericOrderWithoutChangingOtherNodes)
+{
+    InnerDecklistNode root;
+    auto *board = new InnerDecklistNode(DECK_ZONE_MAIN, &root);
+    const QStringList original = {"10", "2", "0.5", "1000000", "1", "unknown", "nan"};
+    for (const auto &name : original) {
+        new InnerDecklistNode(name, board);
+    }
+    auto *custom = new DecklistModelSubZoneNode("1x", board);
+    new InnerDecklistNode("10", custom);
+    new InnerDecklistNode("2", custom);
+    root.setSortMethod(DeckSortMethod::ByName);
+
+    const auto mapping = DeckListModelCustomZones::sortWithCustomZonesLast(&root, board, Qt::AscendingOrder, true);
+    EXPECT_EQ(childNames(board), (QStringList{"0.5", "1", "2", "10", "1000000", "nan", "unknown", "1x"}));
+    QStringList before = original;
+    before.append("1x");
+    for (const auto &move : mapping) {
+        EXPECT_EQ(board->at(move.second)->getName(), before.at(move.first));
+    }
+
+    (void)DeckListModelCustomZones::sortWithCustomZonesLast(&root, board, Qt::DescendingOrder, true);
+    EXPECT_EQ(childNames(board), (QStringList{"1000000", "10", "2", "1", "0.5", "unknown", "nan", "1x"}));
+
+    // The numeric flag only affects groups directly under a board.
+    (void)DeckListModelCustomZones::sortWithCustomZonesLast(&root, custom, Qt::AscendingOrder, true);
+    EXPECT_EQ(childNames(custom), (QStringList{"10", "2"}));
+    (void)DeckListModelCustomZones::sortWithCustomZonesLast(&root, board, Qt::AscendingOrder);
+    EXPECT_EQ(childNames(board), (QStringList{"0.5", "1", "10", "1000000", "2", "nan", "unknown", "1x"}));
+}
