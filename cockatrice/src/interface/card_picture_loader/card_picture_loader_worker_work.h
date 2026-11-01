@@ -7,6 +7,9 @@
 #include <QLoggingCategory>
 #include <QObject>
 #include <QString>
+#include <QSet>
+#include <QTimer>
+#include <QUrl>
 #include <qtmetamacros.h>
 
 class ExactCard;
@@ -47,6 +50,9 @@ public:
     /** @brief Shared per-server 429 backoff state. */
     static const ServerRateLimiter &rateLimiter();
 
+    /** @brief A corrupt cached response gets one network retry per URL and work item. */
+    [[nodiscard]] bool shouldBypassCache(const QUrl &url) const;
+
     /**
      * @brief Starts downloading the next URL for this card.
      *
@@ -75,6 +81,11 @@ public slots:
 
 private:
     bool picDownload; ///< Whether network downloading is enabled
+    QTimer *deferredRetry = nullptr; ///< Owned retry, cancellable when downloads are disabled
+    QSet<QUrl> retriedCacheUrls;
+
+    bool retryCachedUrl(const QUrl &url);
+    QSet<QUrl> redirectVisited; ///< Redirect chain for the current source URL
 
     static ServerRateLimiter s_rateLimiter; ///< Shared per-server 429 backoff state
 
@@ -86,13 +97,6 @@ private:
 
     /** @brief Processes a successful network reply. */
     void handleSuccessfulReply(QNetworkReply *reply);
-
-    /**
-     * @brief Attempts to read an image from a network reply.
-     * @param reply The network reply
-     * @return The loaded QImage or an empty image if reading failed
-     */
-    QImage tryLoadImageFromReply(QNetworkReply *reply);
 
     /**
      * @brief Finalizes the image loading process.
@@ -116,14 +120,14 @@ signals:
      */
     void imageLoaded(const ExactCard &card, const QImage &image);
 
-    /** @brief Emitted when a network request completes successfully. */
-    void requestSucceeded(const QUrl &url);
-
     /** @brief Request that a URL be downloaded. */
     void requestImageDownload(const QUrl &url, CardPictureLoaderWorkerWork *instance);
 
     /** @brief Emitted when a URL has been redirected. */
     void urlRedirected(const QUrl &originalUrl, const QUrl &redirectUrl);
+
+    /** @brief A redirect mapping is unsafe and should be removed. */
+    void redirectInvalidated(const QUrl &url);
 
     /** @brief Emitted when a server returned HTTP 429. */
     void rateLimited(const QString &host);

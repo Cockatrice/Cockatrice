@@ -1,22 +1,20 @@
 #include "card_picture_loader_worker_work.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "card_picture_loader_image_formats.h"
 #include "card_picture_loader_worker.h"
 #include "card_picture_to_load.h"
 #include "libcockatrice/card/card_info.h"
 #include "libcockatrice/card/printing/exact_card.h"
 #include "libcockatrice/utility/server_rate_limiter.h"
 
-#include <QBuffer>
 #include <QByteArray>
 #include <QCryptographicHash>
 #include <QDateTime>
 #include <QDebug>
-#include <QImageReader>
 #include <QList>
 #include <QLoggingCategory>
 #include <QMessageLogger>
-#include <QMovie>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QRandomGenerator>
@@ -25,6 +23,8 @@
 #include <QTimer>
 #include <QUrl>
 #include <QVariant>
+#include <limits>
+#include <utility>
 
 ServerRateLimiter CardPictureLoaderWorkerWork::s_rateLimiter;
 #include <QtGlobal>
@@ -50,23 +50,32 @@ CardPictureLoaderWorkerWork::CardPictureLoaderWorkerWork(CardPictureLoaderWorker
     // Hook up signals to the orchestrator
     connect(this, &CardPictureLoaderWorkerWork::requestImageDownload, worker, &CardPictureLoaderWorker::queueRequest);
     connect(this, &CardPictureLoaderWorkerWork::urlRedirected, worker, &CardPictureLoaderWorker::cacheRedirect);
+    connect(this, &CardPictureLoaderWorkerWork::redirectInvalidated, worker,
+            &CardPictureLoaderWorker::invalidateRedirect);
     connect(this, &CardPictureLoaderWorkerWork::cachedUrlInvalidated, worker,
             &CardPictureLoaderWorker::removedCachedUrl);
     connect(this, &CardPictureLoaderWorkerWork::imageLoaded, worker, &CardPictureLoaderWorker::handleImageLoaded);
-    connect(this, &CardPictureLoaderWorkerWork::requestSucceeded, worker,
-            &CardPictureLoaderWorker::imageRequestSucceeded);
     connect(this, &CardPictureLoaderWorkerWork::rateLimited, worker, &CardPictureLoaderWorker::onHostRateLimited);
 
     // Hook up signals to settings
     connect(&SettingsCache::instance().downloads(), SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
+
+    deferredRetry = new QTimer(this);
+    deferredRetry->setSingleShot(true);
+    connect(deferredRetry, &QTimer::timeout, this, [this] {
+        s_rateLimiter.clearExpired(QDateTime::currentDateTime());
+        cardToDownload.resetIndices();
+        startNextPicDownload();
+    });
 
     startNextPicDownload();
 }
 
 void CardPictureLoaderWorkerWork::startNextPicDownload()
 {
+    redirectVisited.clear();
     QDateTime now = QDateTime::currentDateTime();
-    while (!cardToDownload.getCurrentUrl().isEmpty() &&
+    while (picDownload && !cardToDownload.getCurrentUrl().isEmpty() &&
            s_rateLimiter.isRateLimited(QUrl(cardToDownload.getCurrentUrl()).host(), now)) {
         QString host = QUrl(cardToDownload.getCurrentUrl()).host();
         if (s_rateLimiter.rounds(host) == 1) {
@@ -96,7 +105,11 @@ void CardPictureLoaderWorkerWork::startNextPicDownload()
     QString picUrl = cardToDownload.getCurrentUrl();
 
     if (picUrl.isEmpty()) {
-        scheduleDeferredRetry();
+        if (picDownload) {
+            scheduleDeferredRetry();
+        } else {
+            concludeImageLoad(QImage());
+        }
     } else {
         QUrl url(picUrl);
         qCDebug(CardPictureLoaderWorkerWorkLog).nospace()
@@ -127,27 +140,38 @@ void CardPictureLoaderWorkerWork::picDownloadFailed()
 
 void CardPictureLoaderWorkerWork::handleNetworkReply(QNetworkReply *reply)
 {
-    QVariant redirectTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
-    bool redirectFailure = false;
+    const QVariant redirectTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+    const int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    const bool isRedirect = statusCode == 301 || statusCode == 302 || statusCode == 303 || statusCode == 305 ||
+                            statusCode == 307 || statusCode == 308;
+    bool redirectFailure = isRedirect && !redirectTarget.isValid();
     if (redirectTarget.isValid()) {
-        QUrl url = reply->request().url();
-        QUrl redirectUrl = redirectTarget.toUrl();
-        if (redirectUrl.isRelative()) {
-            redirectUrl = url.resolved(redirectUrl);
-        }
-        if (url == redirectUrl) {
-            qCWarning(CardPictureLoaderWorkerWorkLog) << "recursive redirect detected!";
+        const QUrl url = reply->url();
+        const QUrl redirectUrl = url.resolved(redirectTarget.toUrl());
+        redirectVisited.insert(url);
+        if (!redirectUrl.isValid() || redirectUrl.isEmpty() || redirectVisited.contains(redirectUrl) ||
+            redirectVisited.size() > 10) {
+            qCWarning(CardPictureLoaderWorkerWorkLog) << "Invalid, cyclic or overlong redirect from" << url;
             redirectFailure = true;
         } else {
             emit urlRedirected(url, redirectUrl);
         }
     }
 
-    if (redirectFailure || reply->error()) {
+    if (redirectFailure) {
+        for (const QUrl &visited : std::as_const(redirectVisited)) {
+            emit redirectInvalidated(visited);
+        }
+        // Do not retry a cached cyclic redirect as a corrupt image: advance to
+        // the next configured source, just as for an ordinary failed response.
+        if (reply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool()) {
+            emit cachedUrlInvalidated(reply->url());
+        }
+        picDownloadFailed();
+    } else if (reply->error()) {
         handleFailedReply(reply);
     } else {
         handleSuccessfulReply(reply);
-        emit requestSucceeded(reply->url());
     }
 
     reply->deleteLater();
@@ -184,6 +208,15 @@ void CardPictureLoaderWorkerWork::handleFailedReply(const QNetworkReply *reply)
         QDateTime backoffUntil = s_rateLimiter.on429(host, now, retryAfterMs);
         emit rateLimited(host);
 
+        // Downloads may have been disabled while this request was in flight.
+        // Record the server's limit for future online requests, but resume the
+        // cache-only search now instead of scheduling a new network backoff.
+        if (!picDownload) {
+            cardToDownload.resetIndices();
+            startNextPicDownload();
+            return;
+        }
+
         if (s_rateLimiter.rounds(host) == 1) {
             qCWarning(CardPictureLoaderWorkerWorkLog).nospace()
                 << "PictureLoader: [card: " << cardToDownload.getCard().getName()
@@ -208,7 +241,9 @@ void CardPictureLoaderWorkerWork::handleFailedReply(const QNetworkReply *reply)
 
             emit cachedUrlInvalidated(reply->url());
 
-            emit requestImageDownload(reply->url(), this);
+            if (!retryCachedUrl(reply->url())) {
+                picDownloadFailed();
+            }
         } else {
             qCDebug(CardPictureLoaderWorkerWorkLog).nospace()
                 << "PictureLoader: [card: " << cardToDownload.getCard().getName()
@@ -228,7 +263,8 @@ void CardPictureLoaderWorkerWork::handleSuccessfulReply(QNetworkReply *reply)
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     if (statusCode == 301 || statusCode == 302 || statusCode == 303 || statusCode == 305 || statusCode == 307 ||
         statusCode == 308) {
-        QUrl redirectUrl = reply->header(QNetworkRequest::LocationHeader).toUrl();
+        QUrl redirectUrl = reply->url().resolved(
+            reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl());
         qCDebug(CardPictureLoaderWorkerWorkLog).nospace()
             << "PictureLoader: [card: " << cardToDownload.getCard().getName() << " set: " << cardToDownload.getSetName()
             << "]: following " << (isFromCache ? "cached redirect" : "redirect") << " to "
@@ -252,15 +288,23 @@ void CardPictureLoaderWorkerWork::handleSuccessfulReply(QNetworkReply *reply)
         return;
     }
 
-    QImage image = tryLoadImageFromReply(reply);
+    const auto decoded = CardPictureLoaderImageFormats::readImage(reply);
+    const QImage &image = decoded.image;
 
     if (image.isNull()) {
         qCDebug(CardPictureLoaderWorkerWorkLog).nospace()
             << "PictureLoader: [card: " << cardToDownload.getCard().getName() << " set: " << cardToDownload.getSetName()
             << "]: Possible " << (isFromCache ? "cached" : "downloaded") << " picture at "
-            << reply->url().toDisplayString() << " could not be loaded: " << reply->errorString();
+            << reply->url().toDisplayString() << " could not be loaded: " << decoded.error;
 
-        picDownloadFailed();
+        // HTTP success can still contain an invalid or unsupported image. Remove
+        // that cache entry so future loads do not keep selecting the same bytes.
+        emit cachedUrlInvalidated(reply->url());
+        if (!isFromCache || !retryCachedUrl(reply->url())) {
+            // Fresh bad responses advance to the next source; cached-only mode
+            // must never turn a decoder failure into a network download.
+            picDownloadFailed();
+        }
     } else {
         qCDebug(CardPictureLoaderWorkerWorkLog).nospace()
             << "PictureLoader: [card: " << cardToDownload.getCard().getName() << " set: " << cardToDownload.getSetName()
@@ -271,27 +315,21 @@ void CardPictureLoaderWorkerWork::handleSuccessfulReply(QNetworkReply *reply)
     }
 }
 
-QImage CardPictureLoaderWorkerWork::tryLoadImageFromReply(QNetworkReply *reply)
+bool CardPictureLoaderWorkerWork::shouldBypassCache(const QUrl &url) const
 {
-    static constexpr int riffHeaderSize = 12; // RIFF_HEADER_SIZE from webp/format_constants.h
-    auto replyHeader = reply->peek(riffHeaderSize);
+    return picDownload && retriedCacheUrls.contains(url);
+}
 
-    if (replyHeader.startsWith("RIFF") && replyHeader.endsWith("WEBP")) {
-        auto imgBuf = QBuffer(this);
-        imgBuf.setData(reply->readAll());
-
-        auto movie = QMovie(&imgBuf);
-        movie.start();
-        movie.stop();
-
-        return movie.currentImage();
+bool CardPictureLoaderWorkerWork::retryCachedUrl(const QUrl &url)
+{
+    if (!picDownload || retriedCacheUrls.contains(url)) {
+        return false;
     }
-
-    QImageReader imgReader;
-    imgReader.setDecideFormatFromContent(true);
-    imgReader.setDevice(reply);
-
-    return imgReader.read();
+    // Record before emitting: the queue can dispatch synchronously, and removing
+    // an unreadable cache entry can fail. The retry must bypass that entry.
+    retriedCacheUrls.insert(url);
+    emit requestImageDownload(url, this);
+    return true;
 }
 
 void CardPictureLoaderWorkerWork::scheduleDeferredRetry(const QString &preferredHost)
@@ -324,12 +362,7 @@ void CardPictureLoaderWorkerWork::scheduleDeferredRetry(const QString &preferred
         << " set: " << cardToDownload.getSetName() << "]: All URLs exhausted, scheduling deferred retry in " << waitMs
         << "ms";
 
-    QTimer::singleShot(waitMs, this, [this] {
-        s_rateLimiter.clearExpired(QDateTime::currentDateTime());
-
-        cardToDownload.resetIndices();
-        startNextPicDownload();
-    });
+    deferredRetry->start(static_cast<int>(qMin<qint64>(waitMs, std::numeric_limits<int>::max())));
 }
 
 void CardPictureLoaderWorkerWork::concludeImageLoad(const QImage &image)
@@ -341,4 +374,9 @@ void CardPictureLoaderWorkerWork::concludeImageLoad(const QImage &image)
 void CardPictureLoaderWorkerWork::picDownloadChanged()
 {
     picDownload = SettingsCache::instance().downloads().getPicDownload();
+    if (!picDownload && deferredRetry->isActive()) {
+        deferredRetry->stop();
+        cardToDownload.resetIndices();
+        startNextPicDownload();
+    }
 }
