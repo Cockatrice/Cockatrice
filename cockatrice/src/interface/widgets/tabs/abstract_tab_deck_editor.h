@@ -16,6 +16,8 @@
 #include <QSize>
 #include <QString>
 #include <qtmetamacros.h>
+#include <functional>
+#include <optional>
 
 class DeckStateManager;
 class CardDatabaseModel;
@@ -239,9 +241,6 @@ protected slots:
     /** @brief Analyzes the deck using tappedout.net. */
     void actAnalyzeDeckTappedout();
 
-    /** @brief Callback when a remote deck save finishes. */
-    void saveDeckRemoteFinished(const Response &r);
-
     // UI Layout Management
     virtual void loadLayout() = 0;
     virtual void restartLayout() = 0;
@@ -256,6 +255,29 @@ protected slots:
     virtual void setDeck(const LoadedDeck &_deck);
 
 private:
+    struct RemoteSave
+    {
+        quint64 revision;
+        LoadedDeck::LoadInfo destination;
+        QString deckString;
+        QString colorIdentity;
+        std::function<void()> afterSave;
+    };
+
+    quint64 deckRevision = 0;
+    quint64 remoteSaveId = 0;
+    quint64 leaveIntent = 0;
+    std::optional<RemoteSave> activeRemoteSave;
+    std::optional<RemoteSave> queuedRemoteSave;
+
+    bool saveDeck(std::function<void()> afterSave = {});
+    void startRemoteSave(RemoteSave request);
+    void finishRemoteSave(quint64 requestId, bool succeeded);
+    bool matchesCurrentDeck(const RemoteSave &request) const;
+    bool matchesCurrentDeck(quint64 revision, const LoadedDeck::LoadInfo &destination) const;
+    void cancelPendingLeave();
+    bool confirmCloseWithContinuation(std::function<void()> afterSave);
+
     /** @brief Helper for editing decks from the clipboard. */
     void editDeckInClipboard(bool annotated);
 
@@ -294,7 +316,7 @@ protected:
      *  @param openInSameTabIfBlank Whether to reuse same tab if blank.
      *  @return Selected DeckOpenLocation.
      */
-    DeckOpenLocation confirmOpen(bool openInSameTabIfBlank = true);
+    DeckOpenLocation confirmOpen(bool openInSameTabIfBlank = true, std::function<void()> afterSave = {});
 
     /** @brief Creates a save confirmation message box.
      *  @return Pointer to a QMessageBox.

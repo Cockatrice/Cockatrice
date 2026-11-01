@@ -46,10 +46,12 @@
 #include <QMainWindow>
 #include <QMenu>
 #include <QMessageBox>
+#include <QPointer>
 #include <QPrintPreviewDialog>
 #include <QPrinter>
 #include <QPushButton>
 #include <QSharedPointer>
+#include <QTimer>
 #include <QUrl>
 #include <google/protobuf/stubs/port.h>
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -86,6 +88,11 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
     cardInfoDockWidget = new DeckEditorCardInfoDockWidget(this);
     filterDockWidget = new DeckEditorFilterDockWidget(this);
     printingSelectorDockWidget = new DeckEditorPrintingSelectorDockWidget(this);
+
+    // A save acknowledgment only belongs to the revision that was uploaded. Replacements
+    // include undo/redo, so returning to identical text does not revive an old leave intent.
+    connect(deckStateManager, &DeckStateManager::deckModified, this, [this] { ++deckRevision; });
+    connect(deckStateManager, &DeckStateManager::deckReplaced, this, [this] { ++deckRevision; });
 
     // Connect deck signals to this tab
     connect(deckStateManager, &DeckStateManager::isModifiedChanged, this, &AbstractTabDeckEditor::onDeckModified);
@@ -194,7 +201,7 @@ void AbstractTabDeckEditor::setDeck(const LoadedDeck &_deck)
 /** @brief Creates a new deck. Handles opening in new tab if needed. */
 void AbstractTabDeckEditor::actNewDeck()
 {
-    auto deckOpenLocation = confirmOpen(false);
+    auto deckOpenLocation = confirmOpen(false, [this] { actNewDeck(); });
     if (deckOpenLocation == CANCELLED) {
         return;
     }
@@ -219,8 +226,10 @@ void AbstractTabDeckEditor::cleanDeckAndResetModified()
  * @param openInSameTabIfBlank Open in same tab if current tab is blank.
  * @return DeckOpenLocation enum indicating where to open the deck.
  */
-AbstractTabDeckEditor::DeckOpenLocation AbstractTabDeckEditor::confirmOpen(const bool openInSameTabIfBlank)
+AbstractTabDeckEditor::DeckOpenLocation AbstractTabDeckEditor::confirmOpen(const bool openInSameTabIfBlank,
+                                                                         std::function<void()> afterSave)
 {
+    cancelPendingLeave();
     if (SettingsCache::instance().deckEditor().getOpenDeckInNewTab()) {
         if (openInSameTabIfBlank && deckStateManager->isBlankNewDeck()) {
             return SAME_TAB;
@@ -236,15 +245,26 @@ AbstractTabDeckEditor::DeckOpenLocation AbstractTabDeckEditor::confirmOpen(const
     tabSupervisor->setCurrentWidget(this);
     QMessageBox *msgBox = createSaveConfirmationWindow();
     QPushButton *newTabButton = msgBox->addButton(tr("Open in new tab"), QMessageBox::ApplyRole);
+    QPointer<AbstractTabDeckEditor> guard(this);
+    const quint64 revision = deckRevision;
+    const quint64 intent = leaveIntent;
     int ret = msgBox->exec();
+    if (!guard) {
+        return CANCELLED;
+    }
+    const bool openNewTab = msgBox->clickedButton() == newTabButton;
+    msgBox->deleteLater();
+    if (revision != deckRevision || intent != leaveIntent) {
+        return CANCELLED;
+    }
 
-    if (msgBox->clickedButton() == newTabButton) {
+    if (openNewTab) {
         return NEW_TAB;
     }
 
     switch (ret) {
         case QMessageBox::Save:
-            return actSaveDeck() ? SAME_TAB : CANCELLED;
+            return saveDeck(std::move(afterSave)) ? SAME_TAB : CANCELLED;
         case QMessageBox::Discard:
             return SAME_TAB;
         default:
@@ -272,7 +292,7 @@ QMessageBox *AbstractTabDeckEditor::createSaveConfirmationWindow()
  */
 void AbstractTabDeckEditor::actLoadDeck()
 {
-    auto deckOpenLocation = confirmOpen();
+    auto deckOpenLocation = confirmOpen(true, [this] { actLoadDeck(); });
     if (deckOpenLocation == CANCELLED) {
         return;
     }
@@ -292,7 +312,7 @@ void AbstractTabDeckEditor::actLoadDeck()
  */
 void AbstractTabDeckEditor::actOpenRecent(const QString &fileName)
 {
-    auto deckOpenLocation = confirmOpen();
+    auto deckOpenLocation = confirmOpen(true, [this, fileName] { actOpenRecent(fileName); });
     if (deckOpenLocation == CANCELLED) {
         return;
     }
@@ -330,6 +350,14 @@ void AbstractTabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLo
  */
 bool AbstractTabDeckEditor::actSaveDeck()
 {
+    return saveDeck();
+}
+
+bool AbstractTabDeckEditor::saveDeck(std::function<void()> afterSave)
+{
+    QPointer<AbstractTabDeckEditor> guard(this);
+    const quint64 revision = deckRevision;
+    const quint64 intent = leaveIntent;
     const auto loadedDeck = deckStateManager->toLoadedDeck();
     if (loadedDeck.lastLoadInfo.remoteDeckId != LoadedDeck::LoadInfo::NON_REMOTE_ID) {
         QString deckString = loadedDeck.deckList.writeToString_Native();
@@ -338,24 +366,44 @@ bool AbstractTabDeckEditor::actSaveDeck()
             return false;
         }
 
-        Command_DeckUpload cmd;
-        cmd.set_deck_id(static_cast<google::protobuf::uint32>(loadedDeck.lastLoadInfo.remoteDeckId));
-        cmd.set_deck_list(deckString.toStdString());
-        cmd.set_color_identity(getDeckColorIdentity(loadedDeck.deckList, CardDatabaseManager::query()).toStdString());
-
-        PendingCommand *pend = AbstractClient::prepareSessionCommand(cmd);
-        connect(pend, &PendingCommand::finished, this, &AbstractTabDeckEditor::saveDeckRemoteFinished);
-        tabSupervisor->getClient()->sendCommand(pend);
-
-        return true;
+        RemoteSave request{deckRevision, loadedDeck.lastLoadInfo, deckString,
+                           getDeckColorIdentity(loadedDeck.deckList, CardDatabaseManager::query()), std::move(afterSave)};
+        if (activeRemoteSave) {
+            // Coalesce identical saves and serialize newer snapshots. Only the newest
+            // explicitly requested snapshot needs another upload.
+            if (matchesCurrentDeck(*activeRemoteSave)) {
+                if (request.afterSave) {
+                    activeRemoteSave->afterSave = std::move(request.afterSave);
+                }
+            } else if (queuedRemoteSave && matchesCurrentDeck(*queuedRemoteSave)) {
+                if (request.afterSave) {
+                    queuedRemoteSave->afterSave = std::move(request.afterSave);
+                }
+            } else {
+                queuedRemoteSave = std::move(request);
+            }
+        } else {
+            startRemoteSave(std::move(request));
+        }
+        // Enqueueing a command is not a successful save. The matching acknowledgment
+        // will resume an explicitly requested open/close operation, if still current.
+        return false;
     }
     if (loadedDeck.lastLoadInfo.fileName.isEmpty()) {
         return actSaveDeckAs();
     }
 
-    if (DeckLoader::saveToFile(loadedDeck)) {
+    const bool saved = DeckLoader::saveToFile(loadedDeck);
+    if (!guard) {
+        return false;
+    }
+    if (saved) {
+        if (intent != leaveIntent || !matchesCurrentDeck(revision, loadedDeck.lastLoadInfo)) {
+            return false;
+        }
         deckStateManager->setModified(false);
-        return true;
+        return guard && intent == leaveIntent && matchesCurrentDeck(revision, loadedDeck.lastLoadInfo) &&
+               !deckStateManager->isModified();
     }
 
     QMessageBox::critical(
@@ -370,23 +418,43 @@ bool AbstractTabDeckEditor::actSaveDeck()
  */
 bool AbstractTabDeckEditor::actSaveDeckAs()
 {
-    DeckList deckList = deckStateManager->getDeckList();
+    cancelPendingLeave();
+    const quint64 revision = deckRevision;
+    const quint64 intent = leaveIntent;
+    const auto loadedDeck = deckStateManager->toLoadedDeck();
+    QPointer<AbstractTabDeckEditor> guard(this);
+    QPointer<QFileDialog> dialog = new QFileDialog(this, tr("Save deck"));
+    dialog->setDirectory(SettingsCache::instance().paths().getDeckPath());
+    dialog->setAcceptMode(QFileDialog::AcceptSave);
+    dialog->setDefaultSuffix("cod");
+    dialog->setNameFilters(DeckLoader::FILE_NAME_FILTERS);
+    dialog->selectFile(loadedDeck.deckList.getName().trimmed());
 
-    QFileDialog dialog(this, tr("Save deck"));
-    dialog.setDirectory(SettingsCache::instance().paths().getDeckPath());
-    dialog.setAcceptMode(QFileDialog::AcceptSave);
-    dialog.setDefaultSuffix("cod");
-    dialog.setNameFilters(DeckLoader::FILE_NAME_FILTERS);
-    dialog.selectFile(deckList.getName().trimmed());
-
-    if (!dialog.exec()) {
+    const int result = dialog->exec();
+    if (!guard || !dialog) {
+        return false;
+    }
+    const QStringList selectedFiles = dialog->selectedFiles();
+    dialog->deleteLater();
+    if (result != QDialog::Accepted || selectedFiles.isEmpty()) {
+        return false;
+    }
+    const QString fileName = selectedFiles.first();
+    if (intent != leaveIntent || !matchesCurrentDeck(revision, loadedDeck.lastLoadInfo)) {
+        auto *message = new QMessageBox(QMessageBox::Warning, tr("Deck changed"),
+                                       tr("The deck changed while choosing a save location. Nothing was written to %1. "
+                                          "Save the current deck again.").arg(fileName),
+                                       QMessageBox::Ok, this);
+        message->setAttribute(Qt::WA_DeleteOnClose);
+        message->open();
         return false;
     }
 
-    QString fileName = dialog.selectedFiles().at(0);
     DeckFileFormat::Format fmt = DeckFileFormat::getFormatFromName(fileName);
-
-    std::optional<LoadedDeck::LoadInfo> infoOpt = DeckLoader::saveToFile(deckList, fileName, fmt);
+    std::optional<LoadedDeck::LoadInfo> infoOpt = DeckLoader::saveToFile(loadedDeck.deckList, fileName, fmt);
+    if (!guard) {
+        return false;
+    }
     if (!infoOpt) {
         QMessageBox::critical(
             this, tr("Error"),
@@ -394,11 +462,14 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
         return false;
     }
 
+    if (!guard || intent != leaveIntent || !matchesCurrentDeck(revision, loadedDeck.lastLoadInfo)) {
+        return false;
+    }
     deckStateManager->setLastLoadInfo(infoOpt.value());
-
     deckStateManager->setModified(false);
     SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
-    return true;
+    return guard && intent == leaveIntent && matchesCurrentDeck(revision, infoOpt.value()) &&
+           !deckStateManager->isModified();
 }
 
 /**
@@ -422,16 +493,91 @@ void AbstractTabDeckEditor::actShareDeck()
     shareDialog.exec();
 }
 
-/**
- * @brief Callback for remote deck save completion.
- * @param response Server response.
- */
-void AbstractTabDeckEditor::saveDeckRemoteFinished(const Response &response)
+bool AbstractTabDeckEditor::matchesCurrentDeck(const RemoteSave &request) const
 {
-    if (response.response_code() != Response::RespOk) {
-        QMessageBox::critical(this, tr("Error"), tr("The deck could not be saved."));
-    } else {
+    return matchesCurrentDeck(request.revision, request.destination);
+}
+
+bool AbstractTabDeckEditor::matchesCurrentDeck(quint64 revision, const LoadedDeck::LoadInfo &destination) const
+{
+    const auto current = deckStateManager->toLoadedDeck().lastLoadInfo;
+    return revision == deckRevision && destination.remoteDeckId == current.remoteDeckId &&
+           destination.fileName == current.fileName && destination.fileFormat == current.fileFormat;
+}
+
+void AbstractTabDeckEditor::cancelPendingLeave()
+{
+    ++leaveIntent;
+    if (activeRemoteSave) {
+        activeRemoteSave->afterSave = {};
+    }
+    if (queuedRemoteSave) {
+        queuedRemoteSave->afterSave = {};
+    }
+}
+
+void AbstractTabDeckEditor::startRemoteSave(RemoteSave request)
+{
+    const quint64 requestId = ++remoteSaveId;
+    activeRemoteSave = std::move(request);
+    AbstractClient *client = tabSupervisor->getServerClient();
+    if (!client || client->getStatus() != StatusLoggedIn) {
+        finishRemoteSave(requestId, false);
+        return;
+    }
+
+    Command_DeckUpload cmd;
+    cmd.set_deck_id(static_cast<google::protobuf::uint32>(activeRemoteSave->destination.remoteDeckId));
+    cmd.set_deck_list(activeRemoteSave->deckString.toStdString());
+    cmd.set_color_identity(activeRemoteSave->colorIdentity.toStdString());
+    PendingCommand *pending = AbstractClient::prepareSessionCommand(cmd);
+    connect(pending, &PendingCommand::finished, this, [this, requestId](const Response &response) {
+        finishRemoteSave(requestId, response.response_code() == Response::RespOk);
+    });
+    // A discarded command must release the queue too. A normal response consumes its
+    // request first, so the following destruction notification cannot finish it twice.
+    connect(pending, &QObject::destroyed, this, [this, requestId] { finishRemoteSave(requestId, false); });
+    client->sendCommand(pending);
+}
+
+void AbstractTabDeckEditor::finishRemoteSave(quint64 requestId, bool succeeded)
+{
+    if (!activeRemoteSave || requestId != remoteSaveId) {
+        return;
+    }
+    RemoteSave completed = std::move(*activeRemoteSave);
+    activeRemoteSave.reset();
+    auto next = std::move(queuedRemoteSave);
+    queuedRemoteSave.reset();
+
+    if (!succeeded) {
+        auto *message = new QMessageBox(QMessageBox::Critical, tr("Error"),
+                                       tr("The remote deck could not be saved. Please check your connection and try again."),
+                                       QMessageBox::Ok, this);
+        message->setAttribute(Qt::WA_DeleteOnClose);
+        message->open();
+        return;
+    }
+
+    QPointer<AbstractTabDeckEditor> guard(this);
+    const quint64 intent = leaveIntent;
+    if (matchesCurrentDeck(completed)) {
         deckStateManager->setModified(false);
+        if (!guard) {
+            return;
+        }
+        if (completed.afterSave) {
+            // Leave the command callback before closing the tab or opening a modal
+            // dialog. Check again after the queued turn and after modified listeners.
+            QTimer::singleShot(0, this, [this, intent, completed = std::move(completed)] {
+                if (intent == leaveIntent && matchesCurrentDeck(completed) && !deckStateManager->isModified()) {
+                    completed.afterSave();
+                }
+            });
+        }
+    }
+    if (next && !activeRemoteSave) {
+        startRemoteSave(std::move(*next));
     }
 }
 
@@ -441,7 +587,7 @@ void AbstractTabDeckEditor::saveDeckRemoteFinished(const Response &response)
  */
 void AbstractTabDeckEditor::actLoadDeckFromClipboard()
 {
-    auto deckOpenLocation = confirmOpen();
+    auto deckOpenLocation = confirmOpen(true, [this] { actLoadDeckFromClipboard(); });
     if (deckOpenLocation == CANCELLED) {
         return;
     }
@@ -528,7 +674,7 @@ void AbstractTabDeckEditor::actPrintDeck()
  */
 void AbstractTabDeckEditor::actLoadDeckFromWebsite()
 {
-    auto deckOpenLocation = confirmOpen();
+    auto deckOpenLocation = confirmOpen(true, [this] { actLoadDeckFromWebsite(); });
     if (deckOpenLocation == CANCELLED) {
         return;
     }
@@ -616,12 +762,29 @@ void AbstractTabDeckEditor::closeEvent(QCloseEvent *event)
 /** @brief Shows a confirmation dialog before closing. */
 bool AbstractTabDeckEditor::confirmClose()
 {
+    return confirmCloseWithContinuation({});
+}
+
+bool AbstractTabDeckEditor::confirmCloseWithContinuation(std::function<void()> afterSave)
+{
+    cancelPendingLeave();
     if (deckStateManager->isModified()) {
         tabSupervisor->setCurrentWidget(this);
-        int ret = createSaveConfirmationWindow()->exec();
+        QPointer<AbstractTabDeckEditor> guard(this);
+        const quint64 revision = deckRevision;
+        const quint64 intent = leaveIntent;
+        auto *message = createSaveConfirmationWindow();
+        int ret = message->exec();
+        if (!guard) {
+            return false;
+        }
+        message->deleteLater();
+        if (revision != deckRevision || intent != leaveIntent) {
+            return false;
+        }
         if (ret == QMessageBox::Save) {
-            return actSaveDeck();
-        } else if (ret == QMessageBox::Cancel) {
+            return saveDeck(std::move(afterSave));
+        } else if (ret != QMessageBox::Discard) {
             return false;
         }
     }
@@ -631,7 +794,7 @@ bool AbstractTabDeckEditor::confirmClose()
 /** @brief Handles close requests from outside (tab manager). */
 bool AbstractTabDeckEditor::closeRequest()
 {
-    if (!confirmClose()) {
+    if (!confirmCloseWithContinuation([this] { closeRequest(); })) {
         return false;
     }
     return close();
