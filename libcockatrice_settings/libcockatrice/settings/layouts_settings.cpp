@@ -14,6 +14,9 @@ const static QString GROUP_MAIN_WINDOW = "mainWindow";
 const static QString GROUP_DECK_EDITOR = "deckEditor";
 const static QString GROUP_VISUAL_DECK_EDITOR = "visualDeckEditor";
 const static QString GROUP_DECK_EDITOR_DB = "deckEditorDb";
+const static QString GROUP_ROOM_GAMES = "roomGames";
+const static QString GROUP_ALL_GAMES = "allGames";
+const static QString GROUP_ROOM_SELECTOR = "roomSelector";
 const static QString GROUP_SETS_DIALOG = "setsDialog";
 const static QString GROUP_TOKEN_DIALOG = "tokenDialog";
 const static QString GROUP_GAME_PLAY_AREA = "gamePlayArea";
@@ -82,6 +85,42 @@ QByteArray LayoutsSettings::getDeckEditorDbHeaderState() const
 void LayoutsSettings::setDeckEditorDbHeaderState(const QByteArray &value)
 {
     setValue(value, STATE_PROP, GROUP_DECK_EDITOR_DB, "header");
+}
+
+QByteArray LayoutsSettings::getGameSelectorHeaderState(bool roomGames) const
+{
+    return getValue(STATE_PROP, roomGames ? GROUP_ROOM_GAMES : GROUP_ALL_GAMES, "header").toByteArray();
+}
+
+void LayoutsSettings::setGameSelectorHeaderState(const QByteArray &value, bool roomGames)
+{
+    setValue(value, STATE_PROP, roomGames ? GROUP_ROOM_GAMES : GROUP_ALL_GAMES, "header");
+    if (value.isEmpty()) {
+        beginGameSelectorHeaderStateChange(roomGames);
+    }
+}
+
+QByteArray LayoutsSettings::getRoomSelectorHeaderState() const
+{
+    return getValue(STATE_PROP, GROUP_ROOM_SELECTOR, "header").toByteArray();
+}
+
+void LayoutsSettings::setRoomSelectorHeaderState(const QByteArray &value)
+{
+    setValue(value, STATE_PROP, GROUP_ROOM_SELECTOR, "header");
+    if (value.isEmpty()) {
+        beginRoomSelectorHeaderStateChange();
+    }
+}
+
+void LayoutsSettings::beginGameSelectorHeaderStateChange(bool roomGames)
+{
+    emit gameSelectorHeaderStateChangeStarted(roomGames);
+}
+
+void LayoutsSettings::beginRoomSelectorHeaderStateChange()
+{
+    emit roomSelectorHeaderStateChangeStarted();
 }
 
 QByteArray LayoutsSettings::getSetsDialogHeaderState() const

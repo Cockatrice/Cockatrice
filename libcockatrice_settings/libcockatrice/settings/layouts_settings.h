@@ -30,6 +30,12 @@ public:
     void setVisualDeckEditorGeometry(const QByteArray &value);
 
     void setDeckEditorDbHeaderState(const QByteArray &value);
+    void setGameSelectorHeaderState(const QByteArray &value, bool roomGames);
+    void setRoomSelectorHeaderState(const QByteArray &value);
+    // Invalidate older debounced saves in other open views of the same kind.
+    void beginGameSelectorHeaderStateChange(bool roomGames);
+    void beginRoomSelectorHeaderStateChange();
+
     void setSetsDialogHeaderState(const QByteArray &value);
     void setSetsDialogGeometry(const QByteArray &value);
     void setTokenDialogGeometry(const QByteArray &value);
@@ -49,6 +55,9 @@ public:
     QByteArray getVisualDeckEditorGeometry() const;
 
     QByteArray getDeckEditorDbHeaderState() const;
+    QByteArray getGameSelectorHeaderState(bool roomGames) const;
+    QByteArray getRoomSelectorHeaderState() const;
+
     QByteArray getSetsDialogHeaderState() const;
     QByteArray getSetsDialogGeometry() const;
     QByteArray getTokenDialogGeometry() const;
@@ -59,6 +68,8 @@ public:
     QByteArray getReplayPlayAreaLayoutState() const;
     QByteArray getReplayPlayAreaGeometry() const;
 signals:
+    void gameSelectorHeaderStateChangeStarted(bool roomGames);
+    void roomSelectorHeaderStateChangeStarted();
 
 public slots:
 
