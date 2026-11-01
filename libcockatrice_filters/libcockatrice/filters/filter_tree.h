@@ -243,7 +243,9 @@ public:
     [[nodiscard]] bool acceptType(const CardInfoPtr &info) const;
     [[nodiscard]] bool acceptMainType(const CardInfoPtr &info) const;
     [[nodiscard]] bool acceptSubType(const CardInfoPtr &info) const;
+    [[nodiscard]] bool matchesColor(const QString &colors) const;
     [[nodiscard]] bool acceptColor(const CardInfoPtr &info) const;
+    [[nodiscard]] bool acceptColorIdentity(const CardInfoPtr &info) const;
     [[nodiscard]] bool acceptText(const CardInfoPtr &info, const CardSearchLanguage &searchLanguage) const;
     [[nodiscard]] bool acceptSet(const CardInfoPtr &info) const;
     [[nodiscard]] bool acceptManaCost(const CardInfoPtr &info) const;
@@ -254,6 +256,7 @@ public:
     [[nodiscard]] bool
     acceptCardAttr(const CardInfoPtr &info, CardFilter::Attr attr, const CardSearchLanguage &searchLanguage) const;
     [[nodiscard]] bool acceptFormat(const CardInfoPtr &info) const;
+    [[nodiscard]] bool acceptTag(const CardInfoPtr &info) const;
     [[nodiscard]] bool relationCheck(int cardInfo) const;
 };
 

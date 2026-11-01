@@ -69,6 +69,8 @@ const QString CardFilter::attrName(Attr a)
             return tr("Type");
         case AttrColor:
             return tr("Color");
+        case AttrColorIdentity:
+            return tr("Color Identity");
         case AttrText:
             return tr("Text");
         case AttrSet:
@@ -87,6 +89,8 @@ const QString CardFilter::attrName(Attr a)
             return tr("Loyalty");
         case AttrFormat:
             return tr("Format");
+        case AttrTag:
+            return tr("Tag");
         case AttrMainType:
             return tr("Main Type");
         case AttrSubType:

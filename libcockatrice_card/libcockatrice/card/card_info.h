@@ -469,6 +469,7 @@ public:
     [[nodiscard]] QString getCmc() const;
     [[nodiscard]] QString getColors() const;
     void setColors(const QString &value);
+    [[nodiscard]] QString getColorIdentity() const;
     [[nodiscard]] QString getLoyalty() const;
     [[nodiscard]] QString getMainCardType() const;
     [[nodiscard]] QString getManaCost() const;

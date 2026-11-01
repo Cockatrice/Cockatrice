@@ -35,6 +35,16 @@ if(WITH_ORACLE OR WITH_CLIENT)
     LIBS
     libcockatrice_filters
   )
+  cockatrice_add_test(
+    NAME
+    filter_tree_test
+    SOURCES
+    ${VERSION_STRING_CPP}
+    filter_tree_test.cpp
+    mocks.cpp
+    LIBS
+    libcockatrice_filters
+  )
 endif()
 
 # ------------------------

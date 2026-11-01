@@ -2,6 +2,8 @@
 
 #include <QFlags>
 #include <QFont>
+#include <QPointer>
+#include <QSignalBlocker>
 #include <QString>
 #include <QVariant>
 #include <functional>
@@ -362,4 +364,26 @@ void FilterTreeModel::clear()
     emit layoutAboutToBeChanged();
     fTree->clear();
     emit layoutChanged();
+}
+
+void FilterTreeModel::replaceFilters(const QList<const CardFilter *> &filters)
+{
+    // Keep the existing tree (and its observers), but invalidate old model
+    // indexes once and expose only the complete replacement to consumers.
+    QPointer<FilterTreeModel> guard(this);
+    beginResetModel();
+    if (!guard) {
+        return;
+    }
+    {
+        const QSignalBlocker blocker(fTree);
+        fTree->clear();
+        for (const CardFilter *filter : filters) {
+            fTree->termNode(filter);
+        }
+    }
+    endResetModel();
+    if (guard) {
+        emit fTree->changed();
+    }
 }

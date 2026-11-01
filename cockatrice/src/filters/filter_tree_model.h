@@ -31,6 +31,10 @@ public slots:
     [[nodiscard]] QList<const CardFilter *> getFiltersOfType(CardFilter::Attr filterType) const;
     [[nodiscard]] QList<const CardFilter *> allFilters() const;
 
+signals:
+    // Emitted after a saved filter file has replaced the tree.
+    void filtersLoaded(const QString &colorMode);
+
 private slots:
     void proxyBeginInsertRow(const FilterTreeNode *, int);
     void proxyEndInsertRow(const FilterTreeNode *, int);
@@ -56,6 +60,7 @@ public:
     [[nodiscard]] QModelIndex parent(const QModelIndex &ind) const override;
     [[nodiscard]] QModelIndex index(int row, int column, const QModelIndex &parent) const override;
     bool removeRows(int row, int count, const QModelIndex &parent) override;
+    void replaceFilters(const QList<const CardFilter *> &filters);
     void clear();
 };
 

@@ -5,6 +5,7 @@
 
 #include <qtmetamacros.h>
 
+class VisualDatabaseDisplayTagFilterWidget;
 class VisualDatabaseDisplayWidget;
 class DeckListModel;
 class QComboBox;
@@ -54,6 +55,8 @@ private:
     VisualDatabaseDisplaySetFilterWidget *setFilterWidget;
     SettingsButtonWidget *quickFilterFormatLegalityWidget;
     VisualDatabaseDisplayFormatLegalityFilterWidget *formatLegalityWidget;
+    SettingsButtonWidget *quickFilterTagWidget;
+    VisualDatabaseDisplayTagFilterWidget *tagFilterWidget;
 
     int fullWidthHint = 0;
     void updateCompactMode(int availableWidth);
