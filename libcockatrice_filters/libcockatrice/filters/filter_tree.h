@@ -244,6 +244,7 @@ public:
     [[nodiscard]] bool acceptMainType(const CardInfoPtr &info) const;
     [[nodiscard]] bool acceptSubType(const CardInfoPtr &info) const;
     [[nodiscard]] bool acceptColor(const CardInfoPtr &info) const;
+    [[nodiscard]] bool acceptColorIdentity(const CardInfoPtr &info) const;
     [[nodiscard]] bool acceptText(const CardInfoPtr &info, const CardSearchLanguage &searchLanguage) const;
     [[nodiscard]] bool acceptSet(const CardInfoPtr &info) const;
     [[nodiscard]] bool acceptManaCost(const CardInfoPtr &info) const;

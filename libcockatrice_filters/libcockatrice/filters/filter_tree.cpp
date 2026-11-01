@@ -176,23 +176,24 @@ FilterItem::FilterItem(QString trm, FilterItemList *parent) : p(parent), term(st
     lowercaseTerm = term.toLower();
 
     switch (attr()) {
-        case CardFilter::AttrColor: {
-            QString converted = term.trimmed();
+        case CardFilter::AttrColor:
+        case CardFilter::AttrColorIdentity: {
+            QString converted = term.trimmed().toLower();
 
-            converted.replace("green", "g", Qt::CaseInsensitive);
-            converted.replace("grn", "g", Qt::CaseInsensitive);
-            converted.replace("blue", "u", Qt::CaseInsensitive);
-            converted.replace("blu", "u", Qt::CaseInsensitive);
-            converted.replace("black", "b", Qt::CaseInsensitive);
-            converted.replace("blk", "b", Qt::CaseInsensitive);
-            converted.replace("red", "r", Qt::CaseInsensitive);
-            converted.replace("white", "w", Qt::CaseInsensitive);
-            converted.replace("wht", "w", Qt::CaseInsensitive);
-            converted.replace("colorless", "c", Qt::CaseInsensitive);
-            converted.replace("colourless", "c", Qt::CaseInsensitive);
-            converted.replace("none", "c", Qt::CaseInsensitive);
+            converted.replace("green", "g");
+            converted.replace("grn", "g");
+            converted.replace("blue", "u");
+            converted.replace("blu", "u");
+            converted.replace("black", "b");
+            converted.replace("blk", "b");
+            converted.replace("red", "r");
+            converted.replace("white", "w");
+            converted.replace("wht", "w");
+            converted.replace("colorless", "c");
+            converted.replace("colourless", "c");
+            converted.replace("none", "c");
 
-            converted.replace(QString(" "), QString(""), Qt::CaseInsensitive);
+            converted.replace(QString(" "), QString(""));
 
             convertedColorTerm = converted;
             break;
@@ -358,12 +359,17 @@ bool FilterItem::acceptSubType(const CardInfoPtr &info) const
     return subType.contains(term, Qt::CaseInsensitive);
 }
 
-bool FilterItem::acceptColor(const CardInfoPtr &info) const
+/**
+ * @brief Return true when every letter of the given term appears in the given colors string.
+ * If the term is equal to "c", then only return true if the color string is empty.
+ *
+ * @param term The letters which should be included, or "c"
+ * @param colors The string to check for letters in
+ */
+static bool matchesColor(const QString &term, const QString &colors)
 {
-    const QString colors = info->getColors();
-
     // Colorless card filter
-    if (convertedColorTerm.toLower() == "c" && colors.length() < 1) {
+    if (term == "c" && colors.length() < 1) {
         return true;
     }
 
@@ -372,13 +378,23 @@ bool FilterItem::acceptColor(const CardInfoPtr &info) const
      * then we should match all of them to the card's colors
      */
     int match_count = 0;
-    for (const QChar &color : convertedColorTerm) {
+    for (const QChar &color : term) {
         if (colors.contains(color, Qt::CaseInsensitive)) {
             match_count++;
         }
     }
 
-    return match_count == convertedColorTerm.length();
+    return match_count == term.length();
+}
+
+bool FilterItem::acceptColor(const CardInfoPtr &info) const
+{
+    return matchesColor(convertedColorTerm, info->getColors());
+}
+
+bool FilterItem::acceptColorIdentity(const CardInfoPtr &info) const
+{
+    return matchesColor(convertedColorTerm, info->getColorIdentity());
 }
 
 bool FilterItem::acceptText(const CardInfoPtr &info, const CardSearchLanguage &searchLanguage) const
@@ -540,6 +556,8 @@ bool FilterItem::acceptCardAttr(const CardInfoPtr &info,
             return acceptType(info);
         case CardFilter::AttrColor:
             return acceptColor(info);
+        case CardFilter::AttrColorIdentity:
+            return acceptColorIdentity(info);
         case CardFilter::AttrText:
             return acceptText(info, searchLanguage);
         case CardFilter::AttrSet:
