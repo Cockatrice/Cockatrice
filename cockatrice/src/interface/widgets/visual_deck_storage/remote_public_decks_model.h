@@ -21,7 +21,6 @@
 
 class AbstractClient;
 class CommandContainer;
-class QTimer;
 class Response;
 class ServerInfo_DeckStorage_Folder;
 class ServerInfo_DeckStorage_TreeItem;
@@ -93,7 +92,7 @@ public:
         return decks.size();
     }
 
-    /** @brief True while a refresh request is in flight and the grid has no data yet. */
+    /** @brief True while the newest refresh request is still pending. */
     [[nodiscard]] bool isLoading() const
     {
         return loading;
@@ -105,7 +104,7 @@ signals:
     /** @brief Emitted when a refresh starts, completes, or fails (see loading()). */
     void loadingChanged(bool loading);
 
-    /** @brief Emitted when the last refresh failed; contains a user-facing message. */
+    /** @brief Emitted when the active refresh failed; contains a user-facing message. */
     void loadFailed(const QString &message);
 
 private slots:
@@ -119,7 +118,6 @@ private:
     void setLoading(bool value);
 
     AbstractClient *client;
-    QTimer *loadingTimeoutTimer;
     QList<DeckEntry> decks;
     QList<int> visibleIndices; ///< Row indices into `decks` that pass the current filters.
     bool loading = false;
