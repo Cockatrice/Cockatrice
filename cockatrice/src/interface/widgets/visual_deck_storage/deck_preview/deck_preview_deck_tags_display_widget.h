@@ -20,6 +20,7 @@ class DeckPreviewDeckTagsDisplayWidget : public QWidget
     Q_OBJECT
 
     QStringList currentTags;
+    quint64 editGeneration = 0;
     FlowWidget *flowWidget;
     std::function<QStringList()> knownTagsProvider;
     std::function<bool()> conversionPromptHandler;
@@ -27,6 +28,8 @@ class DeckPreviewDeckTagsDisplayWidget : public QWidget
 public:
     explicit DeckPreviewDeckTagsDisplayWidget(QWidget *_parent, const QStringList &_tags = {});
     void setTags(const QStringList &_tags);
+    // Cancel the result of an open editor when its original deck is replaced or renamed.
+    void invalidatePendingEdits();
     void refreshTags();
 
     /**

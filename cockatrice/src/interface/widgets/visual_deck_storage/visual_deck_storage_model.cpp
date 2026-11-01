@@ -524,7 +524,11 @@ bool VisualDeckStorageModel::deleteFile(int row)
         return false;
     }
 
+    const QPointer<VisualDeckStorageModel> guard(this);
     beginRemoveRows(QModelIndex(), row, row);
+    if (!guard) {
+        return true; // The file was removed before a receiver destroyed the model.
+    }
     rowByFilePath.remove(filePath);
     decks.removeAt(row);
     // Rows after the deleted one shift down by one.

@@ -127,7 +127,10 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
             // A structural change only moves this row; rebuilding its banner,
             // printing choices and tag widgets would repeat work for every deck.
             const auto &data = model->dataForRow(previewIndex.row());
-            filePath = data.filePath;
+            if (filePath != data.filePath) {
+                deckTagsDisplayWidget->invalidatePendingEdits();
+                filePath = data.filePath;
+            }
             if (lastSyncedRevision != data.revision) {
                 syncFromModel();
             }
@@ -141,6 +144,7 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
     connect(model, &QAbstractItemModel::rowsMoved, this, syncCurrentRow);
     connect(model, &QAbstractItemModel::layoutChanged, this, syncCurrentRow);
     connect(model, &QAbstractItemModel::modelAboutToBeReset, this, [this] {
+        deckTagsDisplayWidget->invalidatePendingEdits();
         if (previewIndex.isValid()) {
             filePath = model->dataForRow(previewIndex.row()).filePath;
             awaitingResetRow = true;
@@ -627,23 +631,23 @@ void DeckPreviewWidget::actRenameDeck()
     const QPointer<DeckPreviewWidget> self(this);
     const QPointer<VisualDeckStorageModel> deckModel(model);
     const QString originalFilePath = filePath;
-    const int r = row();
-    if (r == -1) {
+    const QPersistentModelIndex requestedRow = previewIndex;
+    if (!requestedRow.isValid()) {
         return;
     }
 
-    const QString oldName = deckModel->dataForRow(r).deckName;
+    const QString oldName = deckModel->dataForRow(requestedRow.row()).deckName;
     const auto newName = QtUtils::promptText(this, tr("Rename deck"), tr("New name:"), oldName);
     if (!self || !deckModel || !newName || *newName == oldName || filePath != originalFilePath) {
         return;
     }
 
-    // Rows can move while the prompt runs; resolve this same preview again.
-    const int currentRow = row();
-    if (currentRow == -1) {
+    // A reset can rebind this preview to a new row at the same path. The old
+    // dialog still belongs to the original row, which must survive unchanged.
+    if (!requestedRow.isValid() || deckModel->dataForRow(requestedRow.row()).filePath != originalFilePath) {
         return;
     }
-    deckModel->renameDeck(currentRow, *newName);
+    deckModel->renameDeck(requestedRow.row(), *newName);
     // The banner card text updates via the model's dataChanged signal.
 }
 
@@ -652,7 +656,8 @@ void DeckPreviewWidget::actRenameFile()
     const QPointer<DeckPreviewWidget> self(this);
     const QPointer<VisualDeckStorageModel> deckModel(model);
     const QString originalFilePath = filePath;
-    if (row() == -1) {
+    const QPersistentModelIndex requestedRow = previewIndex;
+    if (!requestedRow.isValid()) {
         return;
     }
 
@@ -662,11 +667,10 @@ void DeckPreviewWidget::actRenameFile()
         return;
     }
 
-    const int currentRow = row();
-    if (currentRow == -1) {
+    if (!requestedRow.isValid() || deckModel->dataForRow(requestedRow.row()).filePath != originalFilePath) {
         return;
     }
-    const bool renamed = deckModel->renameFile(currentRow, *newName);
+    const bool renamed = deckModel->renameFile(requestedRow.row(), *newName);
     if (!self || !deckModel) {
         return;
     }
@@ -681,7 +685,8 @@ void DeckPreviewWidget::actDeleteFile()
     const QPointer<DeckPreviewWidget> self(this);
     const QPointer<VisualDeckStorageModel> deckModel(model);
     const QString originalFilePath = filePath;
-    if (row() == -1) {
+    const QPersistentModelIndex requestedRow = previewIndex;
+    if (!requestedRow.isValid()) {
         return;
     }
 
@@ -692,11 +697,10 @@ void DeckPreviewWidget::actDeleteFile()
         return;
     }
 
-    const int currentRow = row();
-    if (currentRow == -1) {
+    if (!requestedRow.isValid() || deckModel->dataForRow(requestedRow.row()).filePath != originalFilePath) {
         return;
     }
-    const bool deleted = deckModel->deleteFile(currentRow);
+    const bool deleted = deckModel->deleteFile(requestedRow.row());
     if (!self || !deckModel) {
         return;
     }

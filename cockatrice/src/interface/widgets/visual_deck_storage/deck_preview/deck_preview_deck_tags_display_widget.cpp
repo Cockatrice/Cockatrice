@@ -41,8 +41,17 @@ DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_par
 
 void DeckPreviewDeckTagsDisplayWidget::setTags(const QStringList &_tags)
 {
+    if (currentTags == _tags) {
+        return;
+    }
+    invalidatePendingEdits();
     currentTags = _tags;
     refreshTags();
+}
+
+void DeckPreviewDeckTagsDisplayWidget::invalidatePendingEdits()
+{
+    ++editGeneration;
 }
 
 void DeckPreviewDeckTagsDisplayWidget::refreshTags()
@@ -130,16 +139,20 @@ void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
 void DeckPreviewDeckTagsDisplayWidget::execTagDialog(const QStringList &knownTags)
 {
     QPointer<DeckPreviewDeckTagsDisplayWidget> self(this);
+    const quint64 generation = editGeneration;
     DeckPreviewTagDialog dialog(knownTags, currentTags);
     if (dialog.exec() == QDialog::Accepted) {
-        // Guard against the widget being destroyed during dialog.exec()'s nested event loop.
-        if (!self) {
+        // A refresh, rename or external tag update can supersede this dialog
+        // while its nested event loop keeps the display widget alive.
+        if (!self || generation != editGeneration) {
             return;
         }
         QStringList updatedTags = dialog.getActiveTags();
         if (updatedTags != currentTags) {
             setTags(updatedTags);
-            emit tagsChanged(updatedTags);
+            if (self) {
+                emit tagsChanged(updatedTags);
+            }
         }
     }
 }
