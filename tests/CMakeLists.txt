@@ -178,6 +178,15 @@ cockatrice_add_test(NAME user_data_backup_test SOURCES user_data_backup_test.cpp
 cockatrice_add_test(NAME password_hash_test SOURCES password_hash_test.cpp LIBS libcockatrice_utility)
 cockatrice_add_test(NAME report_categories_test SOURCES report_categories_test.cpp LIBS libcockatrice_utility)
 cockatrice_add_test(NAME warning_categories_test SOURCES warning_categories_test.cpp LIBS libcockatrice_utility)
+cockatrice_add_test(
+  NAME
+  spoiler_file_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network/update/card_spoiler/spoiler_file.cpp
+  spoiler_file_test.cpp
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src
+)
 # The installer's holder probe is Windows-only, but the wording it produces and the
 # question which programs are the payload's own are plain C++ and are what a stuck user
 # has to act on, so they are tested everywhere.

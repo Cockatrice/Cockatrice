@@ -2,253 +2,304 @@
 
 #include "../../../../main.h"
 #include "../../../settings/cache_settings.h"
+#include "spoiler_file.h"
 
-#include <QChar>
-#include <QCryptographicHash>
-#include <QDateTime>
+#include <QCoreApplication>
 #include <QDebug>
-#include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QFutureWatcher>
-#include <QIODevice>
-#include <QList>
-#include <QLocale>
-#include <QMessageLogger>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QSharedPointer>
 #include <QSystemTrayIcon>
-#include <QTimeZone>
+#include <QTimer>
 #include <QUrl>
 #include <QtConcurrentRun>
-#include <QtGlobal>
-#include <functional>
+#include <exception>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/network_manager.h>
 #include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
-#include <tuple>
-#include <utility>
 #include <version_string.h>
 
-#define SPOILERS_STATUS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Spoiler/files/SpoilerSeasonEnabled"
-#define SPOILERS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Spoiler/files/spoiler.xml"
-
-SpoilerBackgroundUpdater::SpoilerBackgroundUpdater(QObject *apParent) : QObject(apParent), cardUpdateProcess(nullptr)
+namespace
 {
-    isSpoilerDownloadEnabled = SettingsCache::instance().downloads().getDownloadSpoilersStatus();
-    if (isSpoilerDownloadEnabled) {
-        // Start the process of checking if we're in spoiler season
-        // File exists means we're in spoiler season
-        startSpoilerDownloadProcess(SPOILERS_STATUS_URL, false);
+const QUrl SPOILERS_STATUS_URL(
+    QStringLiteral("https://raw.githubusercontent.com/Cockatrice/Magic-Spoiler/files/SpoilerSeasonEnabled"));
+const QUrl SPOILERS_URL(QStringLiteral("https://raw.githubusercontent.com/Cockatrice/Magic-Spoiler/files/spoiler.xml"));
+// Request coordination stays on the GUI thread; reload workers never access it.
+QPointer<SpoilerBackgroundUpdater> currentUpdater;
+QPointer<QFutureWatcher<bool>> activeReload;
+quint64 newestOperation = 0;
+
+bool removeSpoilerFile(const QString &path)
+{
+    QFile file(path);
+    if (!file.exists()) {
+        return false;
+    }
+    if (!file.remove()) {
+        qCWarning(SpoilerBackgroundUpdaterLog) << "Could not remove spoiler database" << path << file.errorString();
+        return false;
+    }
+    return true;
+}
+} // namespace
+
+SpoilerBackgroundUpdater::SpoilerBackgroundUpdater(QObject *parent, bool forceReload)
+    : QObject(parent), enabledAtStart(SettingsCache::instance().downloads().getDownloadSpoilersStatus()),
+      forceReload(forceReload), targetPath(SettingsCache::instance().paths().getSpoilerCardDatabasePath()),
+      operationId(++newestOperation), manager(NetworkManagerFactory::create(this)), notificationIcon(trayIcon)
+{
+    connect(&SettingsCache::instance().downloads(), &DownloadSettings::downloadSpoilerStatusChanged, this,
+            &SpoilerBackgroundUpdater::cancelIfSettingsChanged);
+    connect(&SettingsCache::instance().paths(), &PathsSettings::cardDatabasePathChanged, this,
+            &SpoilerBackgroundUpdater::cancelIfSettingsChanged);
+    // Even a disabled/no-op operation completes after its caller can connect signals.
+    QTimer::singleShot(0, this, &SpoilerBackgroundUpdater::begin);
+}
+
+void SpoilerBackgroundUpdater::begin()
+{
+    if (completed) {
+        return;
+    }
+    if (cancelled || operationId != newestOperation ||
+        (reloadOnly ? SettingsCache::instance().downloads().getDownloadSpoilersStatus()
+                    : (!enabledAtStart || !SettingsCache::instance().downloads().getDownloadSpoilersStatus())) ||
+        targetPath != SettingsCache::instance().paths().getSpoilerCardDatabasePath()) {
+        finish();
+        return;
+    }
+    const auto previous = currentUpdater;
+    if (activeReload) {
+        // The existing database API stores its final load status after its parser
+        // mutex is released. Do not overlap updater-owned calls to that API.
+        connect(activeReload, &QFutureWatcher<bool>::finished, this, &SpoilerBackgroundUpdater::begin,
+                static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::SingleShotConnection));
+        if (previous && previous != this) {
+            previous->cancel();
+        }
+        return;
+    }
+    currentUpdater = this;
+    QPointer<SpoilerBackgroundUpdater> guard(this);
+    if (previous && previous != this) {
+        previous->cancel();
+    }
+    if (!guard) {
+        return;
+    }
+    if (!isCurrent()) {
+        finish();
+    } else if (reloadOnly) {
+        if (QFileInfo::exists(targetPath) && !removeSpoilerFile(targetPath)) {
+            finish(tr("The spoiler database could not be removed. Check its file permissions and use Reload Card "
+                      "Database to retry."));
+            return;
+        }
+        reloadDatabase(false);
     } else {
-        qCInfo(SpoilerBackgroundUpdaterLog) << "Spoilers Disabled";
+        downloadFromURL(SPOILERS_STATUS_URL, false);
     }
 }
 
-void SpoilerBackgroundUpdater::startSpoilerDownloadProcess(QString url, bool saveResults)
+bool SpoilerBackgroundUpdater::isCurrent() const
 {
-    auto spoilerURL = QUrl(url);
-    downloadFromURL(spoilerURL, saveResults);
+    return !completed && !cancelled && currentUpdater == this && operationId == newestOperation &&
+           (reloadOnly != SettingsCache::instance().downloads().getDownloadSpoilersStatus()) &&
+           targetPath == SettingsCache::instance().paths().getSpoilerCardDatabasePath();
 }
 
-void SpoilerBackgroundUpdater::downloadFromURL(QUrl url, bool saveResults)
+void SpoilerBackgroundUpdater::cancelIfSettingsChanged()
 {
-    auto *nam = NetworkManagerFactory::create(this);
-    auto request = QNetworkRequest(url);
-    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
-    QNetworkReply *reply = nam->get(request);
+    if (reloadOnly == SettingsCache::instance().downloads().getDownloadSpoilersStatus() ||
+        targetPath != SettingsCache::instance().paths().getSpoilerCardDatabasePath()) {
+        cancel();
+    }
+}
 
+void SpoilerBackgroundUpdater::cancel()
+{
+    if (completed) {
+        return;
+    }
+    cancelled = true;
+    const auto reply = activeReply;
+    activeReply.clear();
+    QPointer<SpoilerBackgroundUpdater> guard(this);
+    if (reply) {
+        reply->abort();
+        if (reply) {
+            reply->deleteLater();
+        }
+    }
+    // A running reload owns no updater state. Allow its completion to retire its
+    // watcher before a heap-owned updater is released by the caller.
+    if (guard && !reloading) {
+        finish();
+    }
+}
+
+void SpoilerBackgroundUpdater::downloadFromURL(const QUrl &url, bool saveResults)
+{
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
+    request.setTransferTimeout(60000);
+    activeReply = manager->get(request);
     if (saveResults) {
-        // This will write out to the file (used for spoiler.xml)
-        connect(reply, &QNetworkReply::finished, this, &SpoilerBackgroundUpdater::actDownloadFinishedSpoilersFile);
+        connect(activeReply, &QNetworkReply::finished, this,
+                &SpoilerBackgroundUpdater::actDownloadFinishedSpoilersFile);
     } else {
-        // This will check the status (used to see if we're in spoiler season or not)
-        connect(reply, &QNetworkReply::finished, this, &SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled);
+        connect(activeReply, &QNetworkReply::finished, this, &SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled);
+    }
+}
+
+void SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled()
+{
+    auto *reply = qobject_cast<QNetworkReply *>(sender());
+    if (!reply || reply != activeReply) {
+        return;
+    }
+    activeReply.clear();
+    reply->deleteLater();
+    if (!isCurrent()) {
+        finish();
+        return;
+    }
+    if (reply->error() == QNetworkReply::NoError) {
+        downloadFromURL(SPOILERS_URL, true);
+    } else if (reply->error() == QNetworkReply::ContentNotFoundError) {
+        const bool existed = QFileInfo::exists(targetPath);
+        seasonEnded = existed;
+        if (existed && !removeSpoilerFile(targetPath)) {
+            finish(tr("The spoiler season has ended, but the old spoiler database could not be removed."));
+            return;
+        }
+        if (existed || forceReload) {
+            reloadDatabase(false);
+        } else {
+            finish();
+        }
+    } else {
+        finish(tr("Could not check spoiler availability: %1").arg(reply->errorString()));
     }
 }
 
 void SpoilerBackgroundUpdater::actDownloadFinishedSpoilersFile()
 {
-    // Check for server reply
-    auto *reply = dynamic_cast<QNetworkReply *>(sender());
-    QNetworkReply::NetworkError errorCode = reply->error();
-
-    if (errorCode == QNetworkReply::NoError) {
-        spoilerData = reply->readAll();
-
-        // Save the spoiler.xml file to the disk
-        saveDownloadedFile(spoilerData);
-
-        reply->deleteLater();
-        emit spoilerCheckerDone();
+    auto *reply = qobject_cast<QNetworkReply *>(sender());
+    if (!reply || reply != activeReply) {
+        return;
+    }
+    activeReply.clear();
+    reply->deleteLater();
+    if (!isCurrent()) {
+        finish();
+        return;
+    }
+    if (reply->error() != QNetworkReply::NoError) {
+        finish(tr("Could not download spoilers: %1").arg(reply->errorString()));
+        return;
+    }
+    spoilerData = reply->readAll();
+    QString error;
+    const auto result = SpoilerFile::save(targetPath, spoilerData, [this] { return isCurrent(); }, error);
+    if (result == SpoilerFile::SaveResult::Failed) {
+        finish(isCurrent() ? error : QString());
+    } else if (result == SpoilerFile::SaveResult::Written || forceReload) {
+        reloadDatabase(result == SpoilerFile::SaveResult::Written);
     } else {
-        qCWarning(SpoilerBackgroundUpdaterLog) << "Error downloading spoilers file" << errorCode;
-        emit spoilerCheckerDone();
+        finish();
     }
 }
 
-bool SpoilerBackgroundUpdater::deleteSpoilerFile()
+void SpoilerBackgroundUpdater::reloadDatabase(bool updated)
 {
-    QString fileName = SettingsCache::instance().paths().getSpoilerCardDatabasePath();
-    QFileInfo fi(fileName);
-    QDir fileDir(fi.path());
-    QFile file(fileName);
-
-    // Delete the spoiler.xml file
-    if (file.exists() && file.remove()) {
-        qCInfo(SpoilerBackgroundUpdaterLog) << "Deleting spoiler.xml";
-        return true;
-    }
-
-    qCInfo(SpoilerBackgroundUpdaterLog) << "Error: Spoiler.xml not found or not deleted";
-    return false;
-}
-
-void SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled()
-{
-    auto *response = dynamic_cast<QNetworkReply *>(sender());
-    QNetworkReply::NetworkError errorCode = response->error();
-
-    if (errorCode == QNetworkReply::ContentNotFoundError) {
-        // Spoiler season is offline at this point, so the spoiler.xml file can be safely deleted
-        // The user should run Oracle to get the latest card information
-        if (deleteSpoilerFile() && trayIcon) {
-            trayIcon->showMessage(tr("Spoilers season has ended"), tr("Deleting spoiler.xml. Please run Oracle"));
+    reloading = true;
+    auto *database = CardDatabaseManager::getInstance();
+    // The job outlives an individual request, so destroying that request cannot
+    // let a newer updater overlap the worker that is still completing.
+    auto *watcher = new QFutureWatcher<bool>(QCoreApplication::instance());
+    activeReload = watcher;
+    connect(watcher, &QFutureWatcher<bool>::finished, watcher, [watcher] {
+        if (activeReload == watcher) {
+            activeReload.clear();
         }
-
-        qCInfo(SpoilerBackgroundUpdaterLog) << "Spoiler Season Offline";
-        emit spoilerCheckerDone();
-    } else if (errorCode == QNetworkReply::NoError) {
-        qCInfo(SpoilerBackgroundUpdaterLog) << "Spoiler Service Online";
-        startSpoilerDownloadProcess(SPOILERS_URL, true);
-    } else if (errorCode == QNetworkReply::HostNotFoundError) {
-        if (trayIcon) {
-            trayIcon->showMessage(tr("Spoilers download failed"), tr("No internet connection"));
-        }
-
-        qCWarning(SpoilerBackgroundUpdaterLog) << "Spoiler download failed due to no internet connection";
-        emit spoilerCheckerDone();
-    } else {
-        if (trayIcon) {
-            trayIcon->showMessage(tr("Spoilers download failed"), tr("Error") + " " + (short)errorCode);
-        }
-
-        qCWarning(SpoilerBackgroundUpdaterLog) << "Spoiler download failed with reason" << errorCode;
-        emit spoilerCheckerDone();
-    }
-}
-
-bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
-{
-    QString fileName = SettingsCache::instance().paths().getSpoilerCardDatabasePath();
-    QFileInfo fi(fileName);
-    QDir fileDir(fi.path());
-
-    if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath())) {
-        return false;
-    }
-
-    // Check if the data matches. If it does, then spoilers are up to date.
-    if (getHash(fileName) == getHash(data)) {
-        if (trayIcon) {
-            trayIcon->showMessage(tr("Spoilers already up to date"), tr("No new spoilers added"));
-        }
-
-        qCInfo(SpoilerBackgroundUpdaterLog) << "Spoilers Up to Date";
-        return false;
-    }
-
-    QFile file(fileName);
-    if (!file.open(QIODevice::WriteOnly)) {
-        qCWarning(SpoilerBackgroundUpdaterLog) << "Spoiler Service Error: File open (w) failed for" << fileName;
-        file.close();
-        return false;
-    }
-
-    if (file.write(data) == -1) {
-        qCWarning(SpoilerBackgroundUpdaterLog) << "Spoiler Service Error: File write (w) failed for" << fileName;
-        file.close();
-        return false;
-    }
-
-    file.close();
-
-    // Data written, so reload the card database
-    qCInfo(SpoilerBackgroundUpdaterLog) << "Spoiler Service Data Written";
-    // Spoilers can introduce sets the config has never seen; the loader never
-    // runs checkUnknownSets() itself, so run it once the finished snapshot has
-    // been swapped in.
-    auto *watcher = new QFutureWatcher<void>(this);
-    connect(watcher, &QFutureWatcher<void>::finished, this, [watcher] {
         watcher->deleteLater();
-        CardDatabaseManager::getInstance()->checkUnknownSets();
     });
-    watcher->setFuture(QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); }));
-
-    // If the user has notifications enabled, let them know
-    // when the database was last updated
-    if (trayIcon) {
-        QList<QByteArray> lines = data.split('\n');
-
-        for (const QByteArray &line : lines) {
-            if (line.contains("Created At:")) {
-                QString timeStamp = QString(line).replace("Created At:", "").trimmed();
-                timeStamp.chop(6); // Remove " (UTC)"
-
-                auto utcTime = QLocale().toDateTime(timeStamp, "ddd, MMM dd yyyy, hh:mm:ss");
-#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
-                utcTime.setTimeZone(QTimeZone::UTC);
-#else
-                utcTime.setTimeSpec(Qt::UTC);
-#endif
-
-                QString localTime = utcTime.toLocalTime().toString("MMM d, hh:mm");
-
-                trayIcon->showMessage(tr("Spoilers have been updated!"), tr("Last change:") + " " + localTime);
-                emit spoilersUpdatedSuccessfully();
-                return true;
-            }
+    connect(watcher, &QFutureWatcher<bool>::finished, this, [this, watcher, database, updated] {
+        bool loaded = false;
+        try {
+            loaded = watcher->result() && database->getLoadStatus() == Ok;
+        } catch (const std::exception &error) {
+            qCWarning(SpoilerBackgroundUpdaterLog) << "Spoiler database reload failed:" << error.what();
         }
-    }
-
-    return true;
+        reloading = false;
+        if (!isCurrent()) {
+            finish();
+        } else if (!loaded) {
+            finish(reloadOnly
+                       ? tr("Could not reload card data after disabling spoilers. Use Reload Card Database to retry.")
+                       : tr("Could not reload card data after updating spoilers. Use Update Spoilers to retry the "
+                            "reload."));
+        } else {
+            finish({}, updated);
+        }
+    });
+    watcher->setFuture(QtConcurrent::run([database] {
+        database->reloadCardDatabasesAndNotify();
+        return true;
+    }));
 }
 
-QByteArray SpoilerBackgroundUpdater::getHash(const QString fileName)
+void SpoilerBackgroundUpdater::finish(const QString &error, bool updated)
 {
-    QFile file(fileName);
-
-    if (file.open(QFile::ReadOnly)) {
-        // Only read the first 512 bytes (enough to get the "created" tag)
-        const QByteArray bytes = file.read(512);
-
-        QCryptographicHash hash(QCryptographicHash::Algorithm::Md5);
-        hash.addData(bytes);
-
-        qCInfo(SpoilerBackgroundUpdaterLog) << "File Hash =" << hash.result();
-
-        file.close();
-        return hash.result();
-    } else {
-        qCWarning(SpoilerBackgroundUpdaterLog) << "getHash ReadOnly failed!";
-        file.close();
-        return QByteArray();
+    if (completed) {
+        return;
+    }
+    completed = true;
+    spoilerData = QByteArray();
+    if (currentUpdater == this) {
+        currentUpdater.clear();
+    }
+    QPointer<SpoilerBackgroundUpdater> guard(this);
+    if (!error.isEmpty() && !cancelled) {
+        qCWarning(SpoilerBackgroundUpdaterLog) << error;
+        if (notificationIcon) {
+            notificationIcon->showMessage(tr("Spoiler update failed"), error);
+        }
+        if (!guard) {
+            return;
+        }
+        emit spoilerUpdateFailed(error);
+    } else if (updated && !cancelled) {
+        if (notificationIcon) {
+            notificationIcon->showMessage(tr("Spoilers have been updated!"),
+                                          tr("The card database now includes the downloaded spoilers."));
+        }
+        if (!guard) {
+            return;
+        }
+        emit spoilersUpdatedSuccessfully();
+    } else if (seasonEnded && !cancelled && notificationIcon) {
+        notificationIcon->showMessage(tr("Spoiler season has ended"),
+                                      tr("The spoiler database was removed. Please run Oracle to get released cards."));
+    }
+    if (guard) {
+        emit spoilerCheckerDone();
     }
 }
 
-QByteArray SpoilerBackgroundUpdater::getHash(QByteArray data)
+SpoilerBackgroundUpdater *SpoilerBackgroundUpdater::deleteSpoilerFile()
 {
-    // Only read the first 512 bytes (enough to get the "created" tag)
-    const QByteArray bytes = data.left(512);
-
-    QCryptographicHash hash(QCryptographicHash::Algorithm::Md5);
-    hash.addData(bytes);
-
-    qCInfo(SpoilerBackgroundUpdaterLog) << "Data Hash =" << hash.result();
-
-    return hash.result();
+    // Deletion and the following reload share the operation lifetime. Callers can
+    // observe either failure before the queued operation starts, and an explicit
+    // retry still reloads when the file has already been removed.
+    auto *updater = new SpoilerBackgroundUpdater(QCoreApplication::instance(), true);
+    updater->reloadOnly = true;
+    connect(updater, &SpoilerBackgroundUpdater::spoilerCheckerDone, updater, &QObject::deleteLater);
+    return updater;
 }
