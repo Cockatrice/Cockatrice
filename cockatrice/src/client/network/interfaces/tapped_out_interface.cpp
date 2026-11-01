@@ -38,9 +38,8 @@ bool normalizeAnalysisUrl(QUrl &url, const QString &serviceHost)
     const QString host = url.host().toLower();
     const bool legacyHttp = url.scheme() == QStringLiteral("http");
     const int defaultPort = legacyHttp ? 80 : 443;
-    if (!url.isValid() || (!legacyHttp && url.scheme() != QStringLiteral("https")) ||
-        !url.userInfo().isEmpty() || !url.path().startsWith('/') ||
-        (url.port() != -1 && url.port() != defaultPort) ||
+    if (!url.isValid() || (!legacyHttp && url.scheme() != QStringLiteral("https")) || !url.userInfo().isEmpty() ||
+        !url.path().startsWith('/') || (url.port() != -1 && url.port() != defaultPort) ||
         (host != serviceHost && host != QStringLiteral("www.") + serviceHost)) {
         return false;
     }
@@ -106,8 +105,8 @@ void TappedOutInterface::queryFinished(QNetworkReply *reply)
 
     const QString data = QString::fromUtf8(reply->readAll());
     QStringList errorMessageList = {tr("Unable to analyze the deck on TappedOut.")};
-    static const QRegularExpression errorsRx(
-        "<div class=\"alert alert-danger.*?<ul>(.*?)</ul>", QRegularExpression::DotMatchesEverythingOption);
+    static const QRegularExpression errorsRx("<div class=\"alert alert-danger.*?<ul>(.*?)</ul>",
+                                             QRegularExpression::DotMatchesEverythingOption);
     const auto match = errorsRx.match(data);
     if (match.hasMatch()) {
         static const QRegularExpression itemRx("<li>(.*?)</li>", QRegularExpression::DotMatchesEverythingOption);
@@ -155,7 +154,9 @@ void TappedOutInterface::copyDeckSplitMainAndSide(const DeckList &source, DeckLi
 {
     auto copyMainOrSide = [&mainboard, &sideboard](const auto node, const auto card) {
         CardInfoPtr dbCard = CardDatabaseManager::query()->getCardInfo(card->getName());
-        if (!dbCard || dbCard->getIsToken() || node->getName() == DECK_ZONE_MAYBEBOARD) {
+        // Exclude confirmed tokens, but preserve cards missing from the local
+        // database, including newly released cards in an imported deck.
+        if ((dbCard && dbCard->getIsToken()) || node->getName() == DECK_ZONE_MAYBEBOARD) {
             return;
         }
 

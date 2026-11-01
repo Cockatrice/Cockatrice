@@ -32,9 +32,8 @@ bool normalizeAnalysisUrl(QUrl &url, const QString &serviceHost)
     const QString host = url.host().toLower();
     const bool legacyHttp = url.scheme() == QStringLiteral("http");
     const int defaultPort = legacyHttp ? 80 : 443;
-    if (!url.isValid() || (!legacyHttp && url.scheme() != QStringLiteral("https")) ||
-        !url.userInfo().isEmpty() || !url.path().startsWith('/') ||
-        (url.port() != -1 && url.port() != defaultPort) ||
+    if (!url.isValid() || (!legacyHttp && url.scheme() != QStringLiteral("https")) || !url.userInfo().isEmpty() ||
+        !url.path().startsWith('/') || (url.port() != -1 && url.port() != defaultPort) ||
         (host != serviceHost && host != QStringLiteral("www.") + serviceHost)) {
         return false;
     }
@@ -135,7 +134,9 @@ void DeckStatsInterface::copyDeckWithoutTokens(const DeckList &source, DeckList 
 {
     auto copyIfNotAToken = [&destination](const auto node, const auto card) {
         CardInfoPtr dbCard = CardDatabaseManager::query()->getCardInfo(card->getName());
-        if (dbCard && !dbCard->getIsToken() && node->getName() != DECK_ZONE_MAYBEBOARD) {
+        // Missing local card data is not evidence that a card is a token. Keep
+        // its original name and quantity so the service analyzes the whole deck.
+        if ((!dbCard || !dbCard->getIsToken()) && node->getName() != DECK_ZONE_MAYBEBOARD) {
             DecklistCardNode *addedCard = destination.addCard(card->getName(), node->getName(), -1);
             addedCard->setNumber(card->getNumber());
         }
