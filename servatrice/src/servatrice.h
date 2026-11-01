@@ -182,6 +182,7 @@ private:
     QTimer *pingClock, *statusUpdateClock;
     QTimer *deckShareCleanupClock;
     QTimer *legacyBackupSweepClock;
+    QTimer *deckTombstoneClock;
     Servatrice_GameServer *gameServer;
     Servatrice_WebsocketGameServer *websocketGameServer;
     Servatrice_IslServer *islServer;
@@ -323,6 +324,7 @@ public:
     int getDeckShareMaxSharesPerDay() const;
     int getDeckSyncMaxVersions() const;
     int getDeckSyncTombstoneDays() const;
+    int getDeckSyncPurgeInterval() const;
     int getMaxUsersPerAddress() const;
     /// Raw security/trusted_sources list; match addresses against it with isTrustedSource().
     QString getTrustedSources() const;
