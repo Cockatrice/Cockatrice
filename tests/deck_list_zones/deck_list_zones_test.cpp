@@ -398,3 +398,25 @@ int main(int argc, char **argv)
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
+
+TEST(DeckListZones, PlainExportPutsMainFirstWithoutReorderingSavedZones)
+{
+    DeckList deck;
+    auto *tree = deck.getTree();
+    ASSERT_NE(tree->addCustomZone(DECK_ZONE_SIDE, "Side Tech"), nullptr);
+    tree->addCard("Side Card", 2, "Side Tech", -1);
+    tree->addCard("Token Card", 1, DECK_ZONE_TOKENS, -1);
+    ASSERT_NE(tree->addCustomZone(DECK_ZONE_MAIN, "Removal"), nullptr);
+    tree->addCard("Main Card", 3, "Removal", -1);
+    ASSERT_NE(tree->addCustomZone(DECK_ZONE_MAYBEBOARD, "Candidates"), nullptr);
+    tree->addCard("Maybe Card", 4, "Candidates", -1);
+
+    const QString native = deck.writeToString_Native();
+    EXPECT_EQ(deck.writeToString_Plain(true, false), QString("3 Main Card\nSB: 2 Side Card\n1 Token Card\n"));
+    EXPECT_EQ(deck.writeToString_Plain(false, false), QString("3 Main Card\n2 Side Card\n1 Token Card\n"));
+    EXPECT_EQ(deck.writeToString_Native(), native);
+
+    DeckList reopened(native);
+    EXPECT_EQ(reopened.getZoneNodes().first()->getName(), DECK_ZONE_SIDE);
+    EXPECT_EQ(reopened.writeToString_Plain(true, false), deck.writeToString_Plain(true, false));
+}

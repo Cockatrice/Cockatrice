@@ -739,7 +739,8 @@ QModelIndex DeckListModel::nodeToIndex(AbstractDecklistNode *node) const
 void DeckListModel::sortShadowTree(InnerDecklistNode *node, Qt::SortOrder order)
 {
     // The mapping is not needed: fresh shadow nodes have no persistent indices yet.
-    (void)DeckListModelCustomZones::sortWithCustomZonesLast(root, node, order);
+    (void)DeckListModelCustomZones::sortWithCustomZonesLast(
+        root, node, order, activeGroupCriteria == DeckListModelGroupCriteria::MANA_COST && lastKnownColumn != 0);
 
     for (int i = node->size() - 1; i >= 0; --i) {
         if (auto *subNode = dynamic_cast<InnerDecklistNode *>(node->at(i))) {
@@ -752,7 +753,8 @@ void DeckListModel::sortHelper(InnerDecklistNode *node, Qt::SortOrder order)
 {
     // Sort children (custom zones always sorted after groups within a board) and
     // use the movement mapping to update the list of persistent indices.
-    const auto mapping = DeckListModelCustomZones::sortWithCustomZonesLast(root, node, order);
+    const auto mapping = DeckListModelCustomZones::sortWithCustomZonesLast(
+        root, node, order, activeGroupCriteria == DeckListModelGroupCriteria::MANA_COST && lastKnownColumn != 0);
 
     QModelIndexList from, to;
     int columns = columnCount();
