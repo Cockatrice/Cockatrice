@@ -10,7 +10,7 @@
 #include <QElapsedTimer>
 #include <QFile>
 #include <QFileInfo>
-#include <QFutureWatcher>
+#include <QFuture>
 #include <QMetaObject>
 #include <QMetaType>
 #include <QSet>
@@ -137,39 +137,6 @@ VisualDeckStorageModel::VisualDeckStorageModel(QObject *parent) : QAbstractListM
 {
 }
 
-VisualDeckStorageModel::~VisualDeckStorageModel()
-{
-    // Invalidate every outstanding result and drop queued work.
-    ++scanGeneration;
-    pendingLoads.clear();
-    drainScheduled = false;
-
-    // Detach and destroy the watchers of still-running futures explicitly, before
-    // QObject teardown, so none of their finished() lambdas (which capture this)
-    // can fire into a half-destroyed model. Futures that have not started yet are
-    // cancelled; ones already running finish on the pool and their result is dropped.
-    const QList<QPointer<QFutureWatcherBase>> watchers = std::exchange(activeWatchers, {});
-    for (const QPointer<QFutureWatcherBase> &watcher : watchers) {
-        if (!watcher) {
-            continue;
-        }
-        disconnect(watcher, nullptr, this, nullptr);
-        watcher->cancel();
-        delete watcher.data();
-    }
-}
-
-void VisualDeckStorageModel::trackWatcher(QFutureWatcherBase *watcher)
-{
-    activeWatchers.append(QPointer<QFutureWatcherBase>(watcher));
-}
-
-void VisualDeckStorageModel::forgetWatcher(QFutureWatcherBase *watcher)
-{
-    activeWatchers.removeIf(
-        [watcher](const QPointer<QFutureWatcherBase> &tracked) { return !tracked || tracked.data() == watcher; });
-}
-
 int VisualDeckStorageModel::rowCount(const QModelIndex &parent) const
 {
     return parent.isValid() ? 0 : decks.size();
@@ -277,17 +244,15 @@ void VisualDeckStorageModel::startScan()
 
     // The scan (directory walk + one stat per file) runs on a worker thread so that
     // constructing the widget never stalls the UI thread on a large deck folder.
-    auto *watcher = new QFutureWatcher<DeckScanResult>(this);
-    trackWatcher(watcher);
-    connect(watcher, &QFutureWatcher<DeckScanResult>::finished, this, [this, watcher, generation] {
-        forgetWatcher(watcher);
-        watcher->deleteLater();
-
+    // The continuation is bound to this model as its context object: it runs on the UI thread,
+    // and Qt drops it if the model is destroyed first, so no result is delivered to a dead model.
+    QFuture<DeckScanResult> scan =
+        QtConcurrent::run([currentDeckPath]() -> DeckScanResult { return scanDeckDirectory(currentDeckPath); });
+    scan.then(this, [this, generation](const DeckScanResult &result) {
         if (generation != scanGeneration) {
             return; // A newer scan started while this one was running; drop the stale result.
         }
 
-        const DeckScanResult result = watcher->result();
         folderPaths = result.folderPaths;
 
         if (result.decks.isEmpty()) {
@@ -303,9 +268,6 @@ void VisualDeckStorageModel::startScan()
             beginLoad(row);
         }
     });
-
-    watcher->setFuture(
-        QtConcurrent::run([currentDeckPath]() -> DeckScanResult { return scanDeckDirectory(currentDeckPath); }));
 }
 
 void VisualDeckStorageModel::beginLoad(int row)
@@ -321,34 +283,7 @@ void VisualDeckStorageModel::beginLoad(int row)
     const DeckFileFormat::Format fmt = DeckFileFormat::getFormatFromName(filePath);
     const int generation = scanGeneration;
 
-    auto *watcher = new QFutureWatcher<std::optional<DeckLoadResult>>(this);
-    trackWatcher(watcher);
-    connect(watcher, &QFutureWatcher<std::optional<DeckLoadResult>>::finished, this,
-            [this, watcher, filePath, generation] {
-                forgetWatcher(watcher);
-                watcher->deleteLater();
-
-                if (generation != scanGeneration) {
-                    return; // The deck list was re-scanned while this load was running; drop the stale result.
-                }
-
-                // Queue the result and apply a bounded number per event loop turn so that
-                // finishing hundreds of loads at once cannot stall the UI thread.
-                const std::optional<DeckLoadResult> result = watcher->result();
-                PendingDeckLoad pending;
-                pending.filePath = filePath;
-                pending.generation = generation;
-                if (result) {
-                    pending.ok = true;
-                    pending.deck = std::move(result->deck);
-                    pending.lastModified = result->lastModified;
-                    pending.colorIdentity = std::move(result->colorIdentity);
-                }
-                pendingLoads.append(std::move(pending));
-                schedulePendingLoadDrain();
-            });
-
-    watcher->setFuture(QtConcurrent::run([filePath, fmt]() -> std::optional<DeckLoadResult> {
+    auto load = QtConcurrent::run([filePath, fmt]() -> std::optional<DeckLoadResult> {
         std::optional<LoadedDeck> deck = DeckLoader::loadFromFile(filePath, fmt, false);
         if (!deck) {
             return std::nullopt;
@@ -357,7 +292,28 @@ void VisualDeckStorageModel::beginLoad(int row)
         // keep the completion handler on the UI thread cheap.
         const QString colorIdentity = getDeckColorIdentity(deck->deckList, CardDatabaseManager::query());
         return DeckLoadResult{std::move(*deck), QFileInfo(filePath).lastModified(), colorIdentity};
-    }));
+    });
+
+    // Bound to this model as context: runs on the UI thread and is dropped if the model is destroyed first.
+    load.then(this, [this, filePath, generation](std::optional<DeckLoadResult> result) {
+        if (generation != scanGeneration) {
+            return; // The deck list was re-scanned while this load was running; drop the stale result.
+        }
+
+        // Queue the result and apply a bounded number per event loop turn so that
+        // finishing hundreds of loads at once cannot stall the UI thread.
+        PendingDeckLoad pending;
+        pending.filePath = filePath;
+        pending.generation = generation;
+        if (result) {
+            pending.ok = true;
+            pending.deck = std::move(result->deck);
+            pending.lastModified = result->lastModified;
+            pending.colorIdentity = std::move(result->colorIdentity);
+        }
+        pendingLoads.append(std::move(pending));
+        schedulePendingLoadDrain();
+    });
 }
 
 void VisualDeckStorageModel::schedulePendingLoadDrain()

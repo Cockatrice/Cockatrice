@@ -157,36 +157,6 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     }
 }
 
-VisualDeckStorageWidget::~VisualDeckStorageWidget()
-{
-    // Tear down in dependency order instead of relying on QObject child creation order,
-    // which would destroy the model first while the proxy and the deck preview widgets
-    // (which hold raw VisualDeckStorageModel pointers) are still alive.
-    if (refreshTimer) {
-        refreshTimer->stop();
-    }
-
-    // 1. Views: folder and deck preview widgets live inside the scroll area.
-    delete scrollArea;
-    scrollArea = nullptr;
-    folderWidget = nullptr;
-
-    // 2. Proxy: detach it from the model before either is destroyed.
-    if (storageProxyModel) {
-        disconnect(storageProxyModel, nullptr, this, nullptr);
-        storageProxyModel->setSourceModel(nullptr);
-        delete storageProxyModel;
-        storageProxyModel = nullptr;
-    }
-
-    // 3. Model last; its destructor cancels and detaches in-flight background loads.
-    if (storageModel) {
-        disconnect(storageModel, nullptr, this, nullptr);
-        delete storageModel;
-        storageModel = nullptr;
-    }
-}
-
 void VisualDeckStorageWidget::refreshIfPossible()
 {
     if (scrollArea->widget() != databaseLoadIndicator) {
