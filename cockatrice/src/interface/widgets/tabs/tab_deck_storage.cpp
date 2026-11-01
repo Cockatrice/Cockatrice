@@ -515,8 +515,8 @@ void TabDeckStorage::uploadFinished(const Response &r, const CommandContainer &c
     // The listing may have refreshed or lost this parent while the upload was
     // pending. Recover the authoritative listing instead of inserting a stale
     // or duplicate node, or inventing one from an incomplete response.
-    if (!resp.has_new_file() || !file.has_id() || !file.has_name() || !file.has_file() || file.has_folder() || !parent ||
-        serverDirView->getNodeById(file.id())) {
+    if (!resp.has_new_file() || !file.has_id() || !file.has_name() || !file.has_file() || file.has_folder() ||
+        !parent || serverDirView->getNodeById(file.id())) {
         serverDirView->refreshTree();
         return;
     }
@@ -642,61 +642,58 @@ void TabDeckStorage::actDownload()
     }
     const QString directoryPath = curLeft.isValid() ? localDirModel->filePath(curLeft) : localDirModel->rootPath();
 
-    QList<QPersistentModelIndex> selectedDecks;
-    for (const auto &index : serverDirView->selectionModel()->selectedRows()) {
-        selectedDecks.append(index);
+    // Resolve the whole selection before sending requests: a synchronous reply
+    // can refresh the remote tree or close this tab while dispatch is running.
+    QList<DeckDownloadTask> downloads;
+    QStringList errors;
+    const auto roots = RemoteDeckDownload::selectionRoots(serverDirView->selectionModel()->selectedRows());
+    for (const auto &index : roots) {
+        collectDeckDownloads(directoryPath, index, downloads, errors);
     }
+
     const QPointer<TabDeckStorage> alive(this);
-    for (const auto &curRight : selectedDecks) {
-        if (!curRight.isValid()) {
-            continue;
+    const auto session = remoteSessionRevision;
+    for (const auto &download : downloads) {
+        if (!alive || session != remoteSessionRevision || client->getStatus() != StatusLoggedIn) {
+            return;
         }
-        downloadNodeAtIndex(directoryPath, curRight);
+        Command_DeckDownload cmd;
+        cmd.set_deck_id(download.deckId);
+        PendingCommand *pend = client->prepareSessionCommand(cmd);
+        pend->setExtraData(download.filePath);
+        connect(pend, &PendingCommand::finished, this, &TabDeckStorage::downloadFinished);
+        client->sendCommand(pend);
+    }
+    for (const auto &error : errors) {
         if (!alive) {
             return;
         }
+        reportDownloadFailure(error);
     }
 }
 
-void TabDeckStorage::downloadNodeAtIndex(const QString &directoryPath, const QModelIndex &curRight)
+void TabDeckStorage::collectDeckDownloads(const QString &directoryPath,
+                                          const QModelIndex &curRight,
+                                          QList<DeckDownloadTask> &downloads,
+                                          QStringList &errors)
 {
     auto node = serverDirView->getNode(curRight);
     if (const auto dirNode = dynamic_cast<RemoteDeckList_TreeModel::DirectoryNode *>(node)) {
         QString error;
         const QString childDirectory = RemoteDeckDownload::prepareDirectory(directoryPath, dirNode->getName(), error);
         if (childDirectory.isEmpty()) {
-            QMessageBox::critical(this, tr("Download deck"), error);
+            errors.append(error);
             return;
         }
 
-        QList<QPersistentModelIndex> children;
         const int rows = serverDirView->model()->rowCount(curRight);
         for (int i = 0; i < rows; i++) {
-            children.append(serverDirView->model()->index(i, 0, curRight));
-        }
-        const QPointer<TabDeckStorage> alive(this);
-        for (const auto &childIndex : children) {
-            if (!childIndex.isValid()) {
-                continue;
-            }
-            downloadNodeAtIndex(childDirectory, childIndex);
-            if (!alive) {
-                return;
-            }
+            collectDeckDownloads(childDirectory, serverDirView->model()->index(i, 0, curRight), downloads, errors);
         }
     } else if (const auto fileNode = dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(node)) {
-        // node at index is a deck
-        const QString filePath = QDir(directoryPath).filePath(QStringLiteral("deck_%1.cod").arg(fileNode->getId()));
-
-        Command_DeckDownload cmd;
-        cmd.set_deck_id(fileNode->getId());
-
-        PendingCommand *pend = client->prepareSessionCommand(cmd);
-        pend->setExtraData(filePath);
-        connect(pend, &PendingCommand::finished, this, &TabDeckStorage::downloadFinished);
-        client->sendCommand(pend);
+        downloads.append(
+            {fileNode->getId(), QDir(directoryPath).filePath(QStringLiteral("deck_%1.cod").arg(fileNode->getId()))});
     }
-    // node at index is invalid
 }
 
 void TabDeckStorage::downloadFinished(const Response &r,
@@ -704,24 +701,55 @@ void TabDeckStorage::downloadFinished(const Response &r,
                                       const QVariant &extraData)
 {
     if (r.response_code() != Response::RespOk) {
-        QMessageBox::critical(this, tr("Download deck"), tr("The server could not provide the requested deck."));
+        reportDownloadFailure(tr("The server could not provide the requested deck."));
         return;
     }
 
     if (!r.HasExtension(Response_DeckDownload::ext)) {
-        QMessageBox::critical(this, tr("Download deck"), tr("The server did not provide deck data."));
+        reportDownloadFailure(tr("The server did not provide deck data."));
         return;
     }
     QString error;
     const auto deck =
         RemoteDeckDownload::parse(QString::fromStdString(r.GetExtension(Response_DeckDownload::ext).deck()), error);
     if (!deck) {
-        QMessageBox::critical(this, tr("Download deck"), error);
+        reportDownloadFailure(error);
         return;
     }
     const QString filePath = extraData.toString();
     if (!DeckLoader::saveToFile(*deck, filePath, DeckFileFormat::Cockatrice)) {
-        QMessageBox::critical(this, tr("Download deck"), tr("Could not save deck to %1.").arg(filePath));
+        reportDownloadFailure(tr("Could not save deck to %1.").arg(filePath));
+    }
+}
+
+void TabDeckStorage::reportDownloadFailure(const QString &message)
+{
+    // Replies keep arriving while an error notice is visible. Reuse one
+    // nonblocking dialog instead of nesting a modal event loop for each reply.
+    const bool createNotice = !downloadFailureNotice;
+    if (createNotice) {
+        downloadFailureCount = 0;
+        downloadFailureDetails.clear();
+        downloadFailureNotice = new QMessageBox(QMessageBox::Critical, tr("Download deck"), {}, QMessageBox::Ok, this);
+        downloadFailureNotice->setAttribute(Qt::WA_DeleteOnClose);
+        downloadFailureNotice->setTextFormat(Qt::PlainText);
+        connect(downloadFailureNotice, &QDialog::finished, this, [this] {
+            // Closing hides the notice before deferred deletion. A later failure
+            // must open a new notice instead of updating the hidden one.
+            downloadFailureNotice.clear();
+        });
+    }
+
+    ++downloadFailureCount;
+    // Bound the diagnostic list even if a large folder contains many failures.
+    if (downloadFailureDetails.size() < 20) {
+        downloadFailureDetails.append(message);
+    }
+    downloadFailureNotice->setText(
+        downloadFailureCount == 1 ? message : tr("%n deck download operation(s) failed.", "", downloadFailureCount));
+    downloadFailureNotice->setDetailedText(downloadFailureDetails.join(QStringLiteral("\n\n")));
+    if (createNotice) {
+        downloadFailureNotice->open();
     }
 }
 
@@ -785,9 +813,9 @@ void TabDeckStorage::actDeleteRemoteDeck()
     }
 
     const QPointer<TabDeckStorage> alive(this);
-    const auto answer = QMessageBox::warning(this, tr("Delete remote decks"),
-                                             tr("Are you sure you want to delete the selected decks?"),
-                                             QMessageBox::Yes | QMessageBox::No);
+    const auto answer =
+        QMessageBox::warning(this, tr("Delete remote decks"), tr("Are you sure you want to delete the selected decks?"),
+                             QMessageBox::Yes | QMessageBox::No);
     if (!alive || answer != QMessageBox::Yes) {
         return;
     }

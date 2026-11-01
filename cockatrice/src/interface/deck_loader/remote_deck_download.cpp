@@ -3,10 +3,39 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QFileInfo>
+#include <QSet>
 #include <QXmlStreamReader>
 
 namespace RemoteDeckDownload
 {
+QModelIndexList selectionRoots(const QModelIndexList &selection)
+{
+    QSet<QModelIndex> selectedRows;
+    for (const auto &index : selection) {
+        if (index.isValid()) {
+            selectedRows.insert(index.siblingAtColumn(0));
+        }
+    }
+
+    QModelIndexList roots;
+    QSet<QModelIndex> added;
+    for (const auto &index : selection) {
+        if (!index.isValid()) {
+            continue;
+        }
+        const auto row = index.siblingAtColumn(0);
+        auto ancestor = row.parent();
+        while (ancestor.isValid() && !selectedRows.contains(ancestor)) {
+            ancestor = ancestor.parent();
+        }
+        if (!ancestor.isValid() && !added.contains(row)) {
+            roots.append(row);
+            added.insert(row);
+        }
+    }
+    return roots;
+}
+
 QString prepareDirectory(const QString &parentPath, const QString &name, QString &error)
 {
     error.clear();
