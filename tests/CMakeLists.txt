@@ -418,6 +418,15 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  deck_content_hash_test
+  SOURCES
+  deck_content_hash_test.cpp
+  LIBS
+  libcockatrice_deck_list
+  libcockatrice_utility
+)
+cockatrice_add_test(
+  NAME
   deck_sync_profile_test
   SOURCES
   ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/deck_sync/deck_sync_profile.cpp
