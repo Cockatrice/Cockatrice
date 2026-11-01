@@ -8,6 +8,7 @@
 #include <QAbstractItemModel>
 #include <QAbstractItemView>
 #include <QAction>
+#include <QCoreApplication>
 #include <QDateTime>
 #include <QDebug>
 #include <QDir>
@@ -332,16 +333,33 @@ void DeckEditorSettingsPage::updateSpoilers()
     updateNowButton->setDisabled(true);
     updateNowButton->setText(tr("Updating..."));
 
-    // Create a new SBU that will act as if the client was just reloaded
-    auto *sbu = new SpoilerBackgroundUpdater();
-    connect(sbu, &SpoilerBackgroundUpdater::spoilerCheckerDone, this, &DeckEditorSettingsPage::unlockSettings);
-    connect(sbu, &SpoilerBackgroundUpdater::spoilersUpdatedSuccessfully, this, &DeckEditorSettingsPage::unlockSettings);
+    // The explicit update also retries a previous reload of an unchanged file.
+    // Application ownership lets it finish if the settings page is closed.
+    auto *sbu = new SpoilerBackgroundUpdater(QCoreApplication::instance(), true);
+    spoilerUpdater = sbu;
+    connect(sbu, &SpoilerBackgroundUpdater::spoilerCheckerDone, this, [this, sbu] {
+        if (spoilerUpdater == sbu) {
+            spoilerUpdater.clear();
+            unlockSettings();
+        }
+    });
+    connect(sbu, &SpoilerBackgroundUpdater::spoilerCheckerDone, sbu, &QObject::deleteLater);
+    connect(sbu, &SpoilerBackgroundUpdater::spoilerUpdateFailed, this, [this, sbu](const QString &message) {
+        if (spoilerUpdater != sbu) {
+            return;
+        }
+        auto *notice = new QMessageBox(QMessageBox::Warning, tr("Spoiler update"), message, QMessageBox::Ok, this);
+        notice->setTextFormat(Qt::PlainText);
+        notice->setAttribute(Qt::WA_DeleteOnClose);
+        notice->open();
+    });
 }
 
 void DeckEditorSettingsPage::unlockSettings()
 {
-    updateNowButton->setDisabled(false);
+    updateNowButton->setEnabled(SettingsCache::instance().downloads().getDownloadSpoilersStatus());
     updateNowButton->setText(tr("Update Spoilers"));
+    lastUpdatedLabel.setText(tr("Last Change") + ": " + getLastUpdateTime());
 }
 
 QString DeckEditorSettingsPage::getLastUpdateTime()
@@ -379,12 +397,22 @@ void DeckEditorSettingsPage::setSpoilersEnabled(bool anInput)
     mpSpoilerSavePathLineEdit->setEnabled(anInput);
     mpSpoilerPathButton->setEnabled(anInput);
     lastUpdatedLabel.setEnabled(anInput);
-    updateNowButton->setEnabled(anInput);
+    updateNowButton->setEnabled(anInput && !spoilerUpdater);
     infoOnSpoilersLabel.setEnabled(anInput);
 
-    if (!anInput) {
-        SpoilerBackgroundUpdater::deleteSpoilerFile();
+    if (!anInput && (sender() == &mcDownloadSpoilersCheckBox ||
+                     QFileInfo::exists(SettingsCache::instance().paths().getSpoilerCardDatabasePath()))) {
+        if (!SpoilerBackgroundUpdater::deleteSpoilerFile()) {
+            auto *notice = new QMessageBox(QMessageBox::Warning, tr("Spoiler update"),
+                                          tr("The spoiler database could not be removed. Check its file permissions "
+                                             "and try disabling spoilers again."),
+                                          QMessageBox::Ok, this);
+            notice->setTextFormat(Qt::PlainText);
+            notice->setAttribute(Qt::WA_DeleteOnClose);
+            notice->open();
+        }
     }
+    lastUpdatedLabel.setText(tr("Last Change") + ": " + getLastUpdateTime());
 }
 
 void DeckEditorSettingsPage::retranslateUi()
@@ -396,7 +424,7 @@ void DeckEditorSettingsPage::retranslateUi()
     lastUpdatedLabel.setText(tr("Last Change") + ": " + getLastUpdateTime());
     infoOnSpoilersLabel.setText(tr("Spoilers download automatically on launch") + "\n" +
                                 tr("Press the button to manually update without relaunching") + "\n\n" +
-                                tr("Do not close settings until manual update is complete"));
+                                tr("Updates continue if you close settings"));
     picDownloadCheckBox.setText(tr("Download card pictures on the fly"));
     urlLinkLabel.setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_PIC_URL).arg(tr("How to add a custom URL")));
     resetDownloadURLs.setText(tr("Reset Download URLs"));
