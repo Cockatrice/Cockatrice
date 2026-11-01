@@ -302,6 +302,7 @@ QString TabDeckStorage::getTargetPath() const
 
 void TabDeckStorage::handleConnected(const ServerInfo_User &userInfo)
 {
+    ++remoteSessionRevision;
     setRemoteEnabled(userInfo.user_level() & ServerInfo_User::IsRegistered);
 }
 
@@ -310,6 +311,7 @@ void TabDeckStorage::handleConnected(const ServerInfo_User &userInfo)
  */
 void TabDeckStorage::handleConnectionChanged(ClientStatus status)
 {
+    ++remoteSessionRevision;
     if (status == StatusDisconnected) {
         visibilityRefreshTimer->stop();
         visibilityRefreshStarted = false;
@@ -344,23 +346,30 @@ void TabDeckStorage::actLocalDoubleClick(const QModelIndex &curLeft)
 
 void TabDeckStorage::actOpenLocalDeck()
 {
-    QModelIndexList curLefts = localDirView->selectionModel()->selectedRows();
-    for (const auto &curLeft : curLefts) {
+    QStringList filePaths;
+    for (const auto &curLeft : localDirView->selectionModel()->selectedRows()) {
         if (localDirModel->isDir(curLeft)) {
             continue;
         }
-        QString filePath = localDirModel->filePath(curLeft);
+        const QString filePath = localDirModel->filePath(curLeft);
 
         if (!isSupportedDeckFile(filePath)) {
             continue;
         }
+        filePaths.append(filePath);
+    }
 
+    const QPointer<TabDeckStorage> alive(this);
+    for (const auto &filePath : filePaths) {
         std::optional<LoadedDeck> deckOpt = DeckLoader::loadFromFile(filePath, DeckFileFormat::Cockatrice, true);
         if (!deckOpt) {
             continue;
         }
 
         emit openDeckEditor(deckOpt.value());
+        if (!alive) {
+            return;
+        }
     }
 }
 
@@ -407,8 +416,13 @@ void TabDeckStorage::actRenameLocal()
 
 void TabDeckStorage::actUpload()
 {
-    QModelIndexList curLefts = localDirView->selectionModel()->selectedRows();
-    if (curLefts.isEmpty()) {
+    QStringList filePaths;
+    for (const auto &index : localDirView->selectionModel()->selectedRows()) {
+        if (!localDirModel->isDir(index)) {
+            filePaths.append(localDirModel->filePath(index));
+        }
+    }
+    if (filePaths.isEmpty() || client->getStatus() != StatusLoggedIn) {
         return;
     }
 
@@ -418,18 +432,20 @@ void TabDeckStorage::actUpload()
         return;
     }
 
-    for (const auto &curLeft : curLefts) {
-        if (localDirModel->isDir(curLeft)) {
-            continue;
-        }
-
-        QString filePath = localDirModel->filePath(curLeft);
+    const QPointer<TabDeckStorage> alive(this);
+    const auto session = remoteSessionRevision;
+    for (const auto &filePath : filePaths) {
         uploadDeck(filePath, targetPath);
+        if (!alive || session != remoteSessionRevision || client->getStatus() != StatusLoggedIn) {
+            return;
+        }
     }
 }
 
 void TabDeckStorage::uploadDeck(const QString &filePath, const QString &targetPath)
 {
+    const QPointer<TabDeckStorage> alive(this);
+    const auto session = remoteSessionRevision;
     if (!isSupportedDeckFile(filePath)) {
         QMessageBox::critical(this, tr("Error"), tr("Invalid deck file"));
         return;
@@ -451,7 +467,7 @@ void TabDeckStorage::uploadDeck(const QString &filePath, const QString &targetPa
         QString deckName =
             getTextWithMax(this, tr("Enter deck name"), tr("This decklist does not have a name.\nPlease enter a name:"),
                            QLineEdit::Normal, deckFileInfo.completeBaseName(), &ok);
-        if (!ok) {
+        if (!alive || !ok || session != remoteSessionRevision || client->getStatus() != StatusLoggedIn) {
             return;
         }
         if (deckName.isEmpty()) {
@@ -487,10 +503,24 @@ void TabDeckStorage::uploadFinished(const Response &r, const CommandContainer &c
         return;
     }
 
+    if (!r.HasExtension(Response_DeckUpload::ext)) {
+        serverDirView->refreshTree();
+        return;
+    }
     const Response_DeckUpload &resp = r.GetExtension(Response_DeckUpload::ext);
     const Command_DeckUpload &cmd = commandContainer.session_command(0).GetExtension(Command_DeckUpload::ext);
 
-    serverDirView->addFileToTree(resp.new_file(), serverDirView->getNodeByPath(QString::fromStdString(cmd.path())));
+    const auto &file = resp.new_file();
+    auto *parent = serverDirView->getNodeByPath(QString::fromStdString(cmd.path()));
+    // The listing may have refreshed or lost this parent while the upload was
+    // pending. Recover the authoritative listing instead of inserting a stale
+    // or duplicate node, or inventing one from an incomplete response.
+    if (!resp.has_new_file() || !file.has_id() || !file.has_name() || !file.has_file() || file.has_folder() || !parent ||
+        serverDirView->getNodeById(file.id())) {
+        serverDirView->refreshTree();
+        return;
+    }
+    serverDirView->addFileToTree(file, parent);
 }
 
 void TabDeckStorage::actNewLocalFolder()
@@ -704,8 +734,10 @@ void TabDeckStorage::actNewFolder()
         return;
     }
 
+    const QPointer<TabDeckStorage> alive(this);
+    const auto session = remoteSessionRevision;
     QString folderName = getTextWithMax(this, tr("New folder"), tr("Name of new folder:"), max_length);
-    if (folderName.isEmpty()) {
+    if (!alive || folderName.isEmpty() || session != remoteSessionRevision || client->getStatus() != StatusLoggedIn) {
         return;
     }
 
@@ -730,8 +762,15 @@ void TabDeckStorage::newFolderFinished(const Response &response, const CommandCo
     }
 
     const Command_DeckNewDir &cmd = commandContainer.session_command(0).GetExtension(Command_DeckNewDir::ext);
-    serverDirView->addFolderToTree(QString::fromStdString(cmd.dir_name()),
-                                   serverDirView->getNodeByPath(QString::fromStdString(cmd.path())));
+    const QString parentPath = QString::fromStdString(cmd.path());
+    const QString folderName = QString::fromStdString(cmd.dir_name());
+    const QString folderPath = parentPath.isEmpty() ? folderName : parentPath + QLatin1Char('/') + folderName;
+    auto *parent = serverDirView->getNodeByPath(parentPath);
+    if (!parent || serverDirView->getNodeByPath(folderPath)) {
+        serverDirView->refreshTree();
+        return;
+    }
+    serverDirView->addFolderToTree(folderName, parent);
 }
 
 void TabDeckStorage::actDeleteRemoteDeck()
@@ -947,8 +986,8 @@ void TabDeckStorage::actShareSelection()
                 shareInFlightSeq = 0;
                 shareFromTreeFinished(response, commandContainer);
             });
-    client->sendCommand(pend);
     shareTimeoutTimer->start();
+    client->sendCommand(pend);
 }
 
 void TabDeckStorage::shareFromTreeFinished(const Response &response, const CommandContainer & /*commandContainer*/)
@@ -962,18 +1001,30 @@ void TabDeckStorage::shareFromTreeFinished(const Response &response, const Comma
                         true);
         return;
     }
+    const QPointer<TabDeckStorage> alive(this);
+    // Finish this share before clipboard observers or the notice can start
+    // another interaction. A late notice must not close a newer share mode.
+    setShareModeEnabled(false);
+    if (!alive) {
+        return;
+    }
     const DeckShareUtils::ShareResponse share = DeckShareUtils::handleShareResponse(client, response);
+    if (!alive) {
+        return;
+    }
 
     showShareNotice(
         tr("Share link copied to the clipboard.\nExpires on %1.").arg(DeckShareUtils::formatShareExpiry(share.expiry)));
-    setShareModeEnabled(false);
 }
 
 void TabDeckStorage::showShareNotice(const QString &message, bool warning)
 {
-    QMessageBox box(warning ? QMessageBox::Warning : QMessageBox::Information, tr("Share link"), message,
-                    QMessageBox::Ok, this);
-    box.exec();
+    QPointer<QMessageBox> box = new QMessageBox(warning ? QMessageBox::Warning : QMessageBox::Information,
+                                                tr("Share link"), message, QMessageBox::Ok, this);
+    box->exec();
+    if (box) {
+        delete box;
+    }
 }
 
 void TabDeckStorage::onShareFromTreeTimeout()
@@ -1050,11 +1101,17 @@ void TabDeckStorage::setVisibilityFinished(const Response &r, const CommandConta
 void TabDeckStorage::onVisibilityRefreshTimeout()
 {
     visibilityRefreshStarted = false;
-    if (!visibilityFailures.isEmpty()) {
-        QMessageBox::critical(
-            this, tr("Error"),
-            tr("Failed to change the visibility of %n selected deck(s).", "", visibilityFailures.size()));
-        visibilityFailures.clear();
+    const auto failureCount = visibilityFailures.size();
+    visibilityFailures.clear();
+    const QPointer<TabDeckStorage> alive(this);
+    if (client->getStatus() == StatusLoggedIn) {
+        serverDirView->refreshTree();
     }
-    serverDirView->refreshTree();
+    if (!alive) {
+        return;
+    }
+    if (failureCount > 0) {
+        QMessageBox::critical(this, tr("Error"),
+                              tr("Failed to change the visibility of %n selected deck(s).", "", failureCount));
+    }
 }

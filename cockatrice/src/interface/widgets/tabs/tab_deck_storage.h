@@ -46,6 +46,7 @@ private:
     QTimer *shareTimeoutTimer;
     int shareRequestSeq = 0;
     int shareInFlightSeq = 0;
+    quint64 remoteSessionRevision = 0;
 
     QAction *aOpenLocalDeck, *aRenameLocal, *aUpload, *aNewLocalFolder, *aDeleteLocalDeck;
     QAction *aOpenDecksFolder;
