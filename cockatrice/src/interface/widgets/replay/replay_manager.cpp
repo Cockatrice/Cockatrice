@@ -75,6 +75,9 @@ void ReplayManager::skipToTime(int newTime, bool doRewindBuffering, bool include
         newTime = maxTime;
     }
 
+    // Seeking to the end must apply the final event, even between playback ticks.
+    // Ordinary timeline seeks retain their existing interval rounding.
+    includeEventsAtTime = includeEventsAtTime || newTime == maxTime;
     if (!includeEventsAtTime) {
         newTime -= newTime % TIMER_INTERVAL_MS; // Time should always be a multiple of the interval
     }
