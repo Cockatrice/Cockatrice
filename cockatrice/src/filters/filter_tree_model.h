@@ -46,6 +46,25 @@ private:
     QModelIndex nodeIndex(const FilterTreeNode *node, int row, int column) const;
 
 public:
+    struct TermSnapshot
+    {
+        QString term;
+        bool enabled;
+    };
+    struct TypeSnapshot
+    {
+        CardFilter::Type type;
+        bool enabled;
+        QList<TermSnapshot> terms;
+    };
+    struct AttributeSnapshot
+    {
+        CardFilter::Attr attr;
+        bool enabled;
+        QList<TypeSnapshot> types;
+    };
+    using Snapshot = QList<AttributeSnapshot>;
+
     FilterTreeModel(QObject *parent = nullptr);
     ~FilterTreeModel() override;
     [[nodiscard]] FilterTree *filterTree() const
@@ -61,6 +80,9 @@ public:
     [[nodiscard]] QModelIndex index(int row, int column, const QModelIndex &parent) const override;
     bool removeRows(int row, int count, const QModelIndex &parent) override;
     void replaceFilters(const QList<const CardFilter *> &filters);
+    // Value-owned snapshots preserve each checkbox independently of its parents.
+    [[nodiscard]] Snapshot snapshot() const;
+    void replaceSnapshot(const Snapshot &snapshot);
     void clear();
 };
 

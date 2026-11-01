@@ -272,7 +272,6 @@ signals:
     void changed() const;
 
 private:
-    LogicMap *attrLogicMap(CardFilter::Attr attr);
     FilterItemList *attrTypeList(CardFilter::Attr attr, CardFilter::Type type);
 
     bool testAttr(const CardInfoPtr &info, const LogicMap *lm, const CardSearchLanguage &searchLanguage) const;
@@ -302,6 +301,8 @@ public:
     FilterTree();
     ~FilterTree() override;
 
+    // Find or create an attribute group, including empty groups retained in presets.
+    LogicMap *attrLogicMap(CardFilter::Attr attr);
     FilterTreeNode *termNode(CardFilter::Attr attr, CardFilter::Type type, const QString &term);
     FilterTreeNode *termNode(const CardFilter *f);
 

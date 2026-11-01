@@ -18,19 +18,20 @@
 #include <QJsonValue>
 #include <QJsonValueRef>
 #include <QLineEdit>
+#include <QMap>
 #include <QMessageBox>
-#include <QPushButton>
 #include <QPointer>
-#include <QVariant>
+#include <QPushButton>
 #include <QRegularExpression>
 #include <QSaveFile>
 #include <QVBoxLayout>
-#include <QtAlgorithms>
-#include <memory>
-#include <vector>
+#include <QVariant>
 #include <libcockatrice/filters/filter_tree.h>
 #include <libcockatrice/settings/paths_settings.h>
+#include <memory>
+#include <optional>
 #include <qnamespace.h>
+#include <utility>
 
 namespace
 {
@@ -47,6 +48,124 @@ void showFilterError(QWidget *parent, const QString &title, const QString &messa
     auto *dialog = new QMessageBox(QMessageBox::Warning, title, message, QMessageBox::Ok, parent);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
+}
+
+QJsonObject serializeSnapshot(const FilterTreeModel::Snapshot &snapshot)
+{
+    QJsonArray filters;
+    QJsonArray groups;
+    for (const auto &attribute : snapshot) {
+        const CardFilter attrIdentity(QString(), CardFilter::TypeAnd, attribute.attr);
+        QJsonArray types;
+        for (const auto &group : attribute.types) {
+            const CardFilter typeIdentity(QString(), group.type, attribute.attr);
+            types.append(QJsonObject{{"typeId", typeIdentity.toJson()["typeId"]}, {"enabled", group.enabled}});
+            for (const auto &term : group.terms) {
+                const CardFilter filter(term.term, group.type, attribute.attr);
+                QJsonObject object = filter.toJson();
+                object["enabled"] = term.enabled;
+                filters.append(object);
+            }
+        }
+        groups.append(
+            QJsonObject{{"attrId", attrIdentity.toJson()["attrId"]}, {"enabled", attribute.enabled}, {"types", types}});
+    }
+    // Keep the original flat array and display fields for legacy readers. Group
+    // metadata also represents empty groups, which have no entry in that array.
+    return QJsonObject{{"filters", filters}, {"filterStateVersion", 1}, {"filterGroups", groups}};
+}
+
+std::optional<FilterTreeModel::Snapshot> parseSnapshot(const QJsonObject &root)
+{
+    if (!root.value("filters").isArray()) {
+        return std::nullopt;
+    }
+    FilterTreeModel::Snapshot snapshot;
+    QMap<CardFilter::Attr, qsizetype> attributes;
+    QMap<QPair<CardFilter::Attr, CardFilter::Type>, qsizetype> types;
+    const bool hasGroups = root.contains("filterGroups") || root.contains("filterStateVersion");
+    if (hasGroups) {
+        if (!root.value("filterStateVersion").isDouble() || root.value("filterStateVersion").toDouble() != 1 ||
+            !root.value("filterGroups").isArray()) {
+            return std::nullopt;
+        }
+        for (const auto &value : root.value("filterGroups").toArray()) {
+            const QJsonObject group = value.toObject();
+            if (!value.isObject() || !group.value("enabled").isBool() || !group.value("types").isArray()) {
+                return std::nullopt;
+            }
+            std::unique_ptr<CardFilter> identity(
+                CardFilter::fromJson(QJsonObject{{"term", ""}, {"typeId", "and"}, {"attrId", group.value("attrId")}}));
+            if (!identity || attributes.contains(identity->attr())) {
+                return std::nullopt;
+            }
+            const auto attr = identity->attr();
+            attributes.insert(attr, snapshot.size());
+            FilterTreeModel::AttributeSnapshot attribute{attr, group.value("enabled").toBool(), {}};
+            for (const auto &typeValue : group.value("types").toArray()) {
+                const QJsonObject type = typeValue.toObject();
+                if (!typeValue.isObject() || !type.value("enabled").isBool()) {
+                    return std::nullopt;
+                }
+                identity.reset(CardFilter::fromJson(
+                    QJsonObject{{"term", ""}, {"typeId", type.value("typeId")}, {"attrId", group.value("attrId")}}));
+                if (!identity) {
+                    return std::nullopt;
+                }
+                const auto key = qMakePair(attr, identity->type());
+                if (types.contains(key)) {
+                    return std::nullopt;
+                }
+                types.insert(key, attribute.types.size());
+                attribute.types.append({identity->type(), type.value("enabled").toBool(), {}});
+            }
+            snapshot.append(std::move(attribute));
+        }
+    }
+
+    for (const auto &value : root.value("filters").toArray()) {
+        const QJsonObject object = value.toObject();
+        if (!value.isObject() || !object.value("term").isString() || !object.value("type").isString() ||
+            !object.value("attr").isString() ||
+            ((hasGroups || object.contains("enabled")) && !object.value("enabled").isBool())) {
+            return std::nullopt;
+        }
+        std::unique_ptr<CardFilter> filter(CardFilter::fromJson(object));
+        if (!filter) {
+            return std::nullopt;
+        }
+        const auto attr = filter->attr();
+        const auto key = qMakePair(attr, filter->type());
+        if (hasGroups && (!attributes.contains(attr) || !types.contains(key))) {
+            return std::nullopt;
+        }
+        // Files predating enabled-state metadata retain their all-enabled behavior.
+        if (!attributes.contains(attr)) {
+            attributes.insert(attr, snapshot.size());
+            snapshot.append({attr, true, {}});
+        }
+        auto &attribute = snapshot[attributes.value(attr)];
+        if (!types.contains(key)) {
+            types.insert(key, attribute.types.size());
+            attribute.types.append({filter->type(), true, {}});
+        }
+        auto &terms = attribute.types[types.value(key)].terms;
+        const bool enabled = object.value("enabled").toBool(true);
+        bool duplicate = false;
+        for (const auto &term : terms) {
+            if (term.term == filter->term()) {
+                if (term.enabled != enabled) {
+                    return std::nullopt;
+                }
+                duplicate = true;
+                break;
+            }
+        }
+        if (!duplicate) {
+            terms.append({filter->term(), enabled});
+        }
+    }
+    return snapshot;
 }
 } // namespace
 
@@ -109,17 +228,7 @@ void VisualDatabaseDisplayFilterSaveLoadWidget::saveFilter()
 
     QString filePath = SettingsCache::instance().paths().getFiltersPath() + QDir::separator() + filename + ".json";
 
-    // Serialize the filter model to JSON
-    QJsonArray filtersArray;
-    QList<const CardFilter *> cardFilters = filterModel->allFilters();
-
-    for (const CardFilter *filter : cardFilters) {
-        filtersArray.append(filter->toJson());
-    }
-    qDeleteAll(cardFilters);
-
-    QJsonObject root;
-    root["filters"] = filtersArray;
+    QJsonObject root = serializeSnapshot(filterModel->snapshot());
     const QVariant colorMode = filterModel->property("visualDatabaseColorMode");
     if (colorMode.isValid()) {
         root["colorMode"] = QJsonValue::fromVariant(colorMode);
@@ -177,32 +286,20 @@ void VisualDatabaseDisplayFilterSaveLoadWidget::loadFilter(const QString &filena
         return;
     }
 
-    QJsonArray filtersArray = root["filters"].toArray();
-
-    std::vector<std::unique_ptr<CardFilter>> parsedFilters;
-    QList<const CardFilter *> filters;
-    for (const QJsonValue &value : filtersArray) {
-        const QJsonObject filterObj = value.toObject();
-        std::unique_ptr<CardFilter> filter;
-        if (value.isObject() && filterObj["term"].isString() && filterObj["type"].isString() &&
-            filterObj["attr"].isString()) {
-            filter.reset(CardFilter::fromJson(filterObj));
-        }
-        if (!filter || filter->type() < 0 || filter->type() >= CardFilter::TypeEnd || filter->attr() < 0 ||
-            filter->attr() >= CardFilter::AttrEnd) {
-            showFilterError(this, tr("Load Failed"),
-                            tr("Filter '%1' contains an unsupported filter. The current filters were kept.").arg(filename));
-            return;
-        }
-        filters.append(filter.get());
-        parsedFilters.push_back(std::move(filter));
+    const auto snapshot = parseSnapshot(root);
+    if (!snapshot) {
+        showFilterError(this, tr("Load Failed"),
+                        tr("Filter '%1' contains an unsupported filter. The current filters were kept.").arg(filename));
+        return;
     }
     const QString colorMode = root.value("colorMode").toString();
     QPointer<FilterTreeModel> model(filterModel);
-    model->replaceFilters(filters);
+    model->replaceSnapshot(*snapshot);
     // Reset/changed observers can destroy the view and its model synchronously.
     // The accepted document owns this metadata, so notify only a surviving model.
-    if (model) emit model->filtersLoaded(colorMode);
+    if (model) {
+        emit model->filtersLoaded(colorMode);
+    }
 }
 
 void VisualDatabaseDisplayFilterSaveLoadWidget::applySearchFilter(const QString &text)

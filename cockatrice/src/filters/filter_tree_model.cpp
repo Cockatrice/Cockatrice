@@ -10,6 +10,7 @@
 #include <libcockatrice/filters/filter_card.h>
 #include <libcockatrice/filters/filter_tree.h>
 #include <stddef.h>
+#include <utility>
 
 class QObject;
 
@@ -380,6 +381,63 @@ void FilterTreeModel::replaceFilters(const QList<const CardFilter *> &filters)
         fTree->clear();
         for (const CardFilter *filter : filters) {
             fTree->termNode(filter);
+        }
+    }
+    endResetModel();
+    if (guard) {
+        emit fTree->changed();
+    }
+}
+
+FilterTreeModel::Snapshot FilterTreeModel::snapshot() const
+{
+    Snapshot result;
+    for (int a = 0; a < fTree->childCount(); ++a) {
+        const auto *attr = static_cast<const LogicMap *>(fTree->nodeAt(a));
+        AttributeSnapshot attribute{attr->attr, attr->isEnabled(), {}};
+        for (int t = 0; t < attr->childCount(); ++t) {
+            const auto *type = static_cast<const FilterItemList *>(attr->nodeAt(t));
+            TypeSnapshot group{type->type, type->isEnabled(), {}};
+            for (int i = 0; i < type->childCount(); ++i) {
+                const auto *item = static_cast<const FilterItem *>(type->nodeAt(i));
+                group.terms.append({item->term, item->isEnabled()});
+            }
+            attribute.types.append(std::move(group));
+        }
+        result.append(std::move(attribute));
+    }
+    return result;
+}
+
+void FilterTreeModel::replaceSnapshot(const Snapshot &snapshot)
+{
+    // Preserve the tree and its observers while publishing the complete state
+    // in one reset. No row/change callbacks observe partially restored flags.
+    QPointer<FilterTreeModel> guard(this);
+    beginResetModel();
+    if (!guard) {
+        return;
+    }
+    {
+        const QSignalBlocker blocker(fTree);
+        fTree->clear();
+        for (const auto &attribute : snapshot) {
+            auto *attr = fTree->attrLogicMap(attribute.attr);
+            if (!attribute.enabled) {
+                attr->disable();
+            }
+            for (const auto &group : attribute.types) {
+                auto *type = attr->typeList(group.type);
+                if (!group.enabled) {
+                    type->disable();
+                }
+                for (const auto &term : group.terms) {
+                    auto *item = type->termNode(term.term);
+                    if (!term.enabled) {
+                        item->disable();
+                    }
+                }
+            }
         }
     }
     endResetModel();

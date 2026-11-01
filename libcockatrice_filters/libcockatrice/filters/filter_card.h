@@ -74,6 +74,7 @@ public:
     }
 
     [[nodiscard]] QJsonObject toJson() const;
+    // Caller owns the result. Invalid or unknown identifiers return nullptr.
     static CardFilter *fromJson(const QJsonObject &json);
     static const QString typeName(Type t);
     static const QString attrName(Attr a);
