@@ -109,6 +109,14 @@ DeckSyncManager::DeckSyncManager(AbstractClient *_client, ColorIdentityProvider 
             if (status == StatusDisconnected) {
                 offline = true;
                 debounceTimer->stop();
+                // A run cannot survive the session it was started on: the in-flight
+                // command comes back RespNotConnected, the remaining queue would be
+                // sent on a dead client, and a re-login as another account would
+                // receive this profile's uploads and deletes.
+                if (syncing) {
+                    activeConflict = ActiveConflict();
+                    failSync(tr("Disconnected."));
+                }
             }
         },
         Qt::UniqueConnection);
@@ -201,7 +209,7 @@ void DeckSyncManager::onDebounceTimeout()
         return;
     }
     if (canAutoRun()) {
-        syncNow();
+        startSync(true);
     }
 }
 
@@ -234,9 +242,15 @@ bool DeckSyncManager::isSyncing() const
 
 void DeckSyncManager::syncNow()
 {
+    startSync(false);
+}
+
+void DeckSyncManager::startSync(bool _autoRun)
+{
     if (syncing) {
         return;
     }
+    autoRun = _autoRun;
     const DeckSyncProfile runProfile = buildProfile();
     if (client == nullptr || !runProfile.isValid() || deckPath.isEmpty()) {
         emit syncFinished(SyncSummary{}, tr("Not connected to a server."));
@@ -253,6 +267,7 @@ void DeckSyncManager::syncNow()
     downloadedCount = 0;
     unchangedCount = 0;
     skippedCount = 0;
+    conflictCount = 0;
     pendingUploads.clear();
     pendingDownloads.clear();
     pendingDeletes.clear();
@@ -746,6 +761,16 @@ void DeckSyncManager::queueConflict(const QString &relativePath,
 void DeckSyncManager::handleConflictDownload(const QString &relativePath, const QString &serverDeckString)
 {
     const ConflictDownload ctx = pendingConflicts.take(relativePath);
+    if (autoRun) {
+        // An auto run has no user in front of it: opening the modal conflict
+        // dialog from a timer or a file-watcher event would pop up mid-game.
+        // Leave the path untouched so the next manual sync classifies it again
+        // and asks.
+        ++conflictCount;
+        ++skippedCount;
+        processNext();
+        return;
+    }
     if (sessionDefault == DeckSyncConflictKeepMine) {
         applyUpload(relativePath, ctx.serverPath, ctx.deckId, ctx.guid);
         processNext();
@@ -1245,6 +1270,9 @@ void DeckSyncManager::finishSync()
                            .arg(summary.downloaded)
                            .arg(summary.unchanged)
                            .arg(summary.skipped));
+    if (conflictCount > 0) {
+        emit statusMessage(tr("%1 conflicting decks skipped. Press Sync now to resolve them.").arg(conflictCount));
+    }
     emit syncFinished(summary, QString());
 }
 

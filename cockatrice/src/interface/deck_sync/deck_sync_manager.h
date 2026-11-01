@@ -159,6 +159,7 @@ private:
         qint64 lastModifiedSecs = 0;
     };
 
+    void startSync(bool autoRun);
     void failSync(const QString &error);
     void finishSync();
     [[nodiscard]] SyncSummary currentSummary() const;
@@ -240,6 +241,8 @@ private:
     int downloadedCount = 0;
     int unchangedCount = 0;
     int skippedCount = 0;
+    int conflictCount = 0;
+    bool autoRun = false;
 };
 
 #endif // DECK_SYNC_MANAGER_H
