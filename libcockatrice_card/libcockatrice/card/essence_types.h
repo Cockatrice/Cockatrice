@@ -50,6 +50,18 @@ inline QStringList parseCost(const QString &cost)
             const QString token = match.captured(1);
             if (token.size() == 1 && isSymbol(token.at(0))) {
                 result.append(token);
+            } else {
+                // Numeric quantities may also be written in braces: {2}{N}.
+                bool isNumber = !token.isEmpty();
+                for (const QChar ch : token) {
+                    if (!ch.isDigit()) {
+                        isNumber = false;
+                        break;
+                    }
+                }
+                if (isNumber) {
+                    result.append(token);
+                }
             }
         } else if (!match.captured(2).isEmpty()) {
             result.append(match.captured(2));
