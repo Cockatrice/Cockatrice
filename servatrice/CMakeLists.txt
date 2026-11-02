@@ -135,7 +135,7 @@ if(UNIX)
   else()
     # Assume linux
     install(TARGETS continuum-servatrice RUNTIME DESTINATION bin/)
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/continuum-servatrice.ini.example DESTINATION share/continuum-servatrice/ )
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/continuum-servatrice.ini.example DESTINATION share/continuum-servatrice/)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/continuum-servatrice.sql DESTINATION share/continuum-servatrice/)
 
     # No upstream Servatrice desktop/icon registration; it would collide with
@@ -143,8 +143,8 @@ if(UNIX)
   endif()
 elseif(WIN32)
   install(TARGETS continuum-servatrice RUNTIME DESTINATION ./)
-  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.ini.example DESTINATION ./)
-  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.sql DESTINATION ./)
+  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/continuum-servatrice.ini.example DESTINATION ./)
+  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/continuum-servatrice.sql DESTINATION ./)
 endif()
 
 if(APPLE)
