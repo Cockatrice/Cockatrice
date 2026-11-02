@@ -36,9 +36,9 @@
 
 // Executable that, when it sits next to the downloaded update installer, is installed instead of
 // it. A packager shipping a custom build - or someone testing one - can drop the file there and
-// have Cockatrice run it rather than the official installer, without the release channel having to
+// have Continuumatrice run it rather than the official installer, without the release channel having to
 // host an installer for that build. It is a drop-in and is run with the same arguments.
-static const QString UPDATE_INSTALLER_OVERRIDE = "Cockatrice-Update-Override.exe";
+static const QString UPDATE_INSTALLER_OVERRIDE = "Continuumatrice-Update-Override.exe";
 
 DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent)
 {
@@ -87,7 +87,7 @@ DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent)
     if (!QSslSocket::supportsSsl()) {
         enableUpdateButton(false);
         QMessageBox::critical(this, tr("Error"),
-                              tr("Cockatrice was not built with SSL support, therefore you cannot download updates "
+                              tr("Continuumatrice was not built with SSL support, therefore you cannot download updates "
                                  "automatically! \nPlease visit the download page to update manually."));
     }
 
@@ -161,7 +161,7 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
         // downloader themselves if there's a compatible build
         QMessageBox::information(
             window(), tr("No Update Available"),
-            tr("Cockatrice is up to date!") + "<br><br>" +
+            tr("Continuumatrice is up to date!") + "<br><br>" +
                 tr("You are already running the latest version available in the chosen release channel.") + "<br>" +
                 "<b>" + tr("Current version") + QString(":</b> %1<br>").arg(VERSION_STRING) + "<b>" +
                 tr("Selected release channel") +
@@ -171,7 +171,7 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
 
     publishDate = release->getPublishDate().toString(QLocale().dateFormat(QLocale::LongFormat));
     if (isCompatible) {
-        const QString message = tr("A new version of Cockatrice is available!") + "<br><br>" + "<b>" +
+        const QString message = tr("A new version of Continuumatrice is available!") + "<br><br>" + "<b>" +
                                 tr("New version") + QString(":</b> %1<br>").arg(release->getName()) + "<b>" +
                                 tr("Released") +
                                 QString(":</b> %1 (<a href=\"%2\">").arg(publishDate, release->getDescriptionUrl()) +
@@ -185,7 +185,7 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
     } else {
         QMessageBox::information(
             window(), tr("Update Available"),
-            tr("A new version of Cockatrice is available!") + "<br><br>" + "<b>" + tr("New version") +
+            tr("A new version of Continuumatrice is available!") + "<br><br>" + "<b>" + tr("New version") +
                 QString(":</b> %1<br>").arg(release->getName()) + "<b>" + tr("Released") +
                 QString(":</b> %1 (<a href=\"%2\">").arg(publishDate, release->getDescriptionUrl()) + tr("Changelog") +
                 "</a>)<br><br>" +
@@ -235,7 +235,7 @@ void DlgUpdate::warnInstallerIsWaiting()
     // would therefore swallow the installer's one and only request for the rest of its wait.
     auto *notification = new QMessageBox(QMessageBox::Warning, tr("Update"),
                                          tr("The update installer is already running and waits about a "
-                                            "minute for Cockatrice to close. Cockatrice is still busy, so "
+                                            "minute for Continuumatrice to close. Continuumatrice is still busy, so "
                                             "save your work and close it before then. Otherwise the "
                                             "installer gives up and the update is cancelled."),
                                          QMessageBox::Ok, parentWidget());
@@ -293,9 +293,9 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
     process.setArguments({"/R", QString("/D=%1").arg(appDir)});
 #endif
 
-    // Try to open the installer. If it opens, quit Cockatrice
+    // Try to open the installer. If it opens, quit Continuumatrice
     if (process.startDetached()) {
-        qCInfo(DlgUpdateLog) << "Opened update installer successfully - closing Cockatrice";
+        qCInfo(DlgUpdateLog) << "Opened update installer successfully - closing Continuumatrice";
         // Close the main window synchronously so file locks are released before the NSIS installer
         // (already launched) starts replacing files. This also flushes settings and shuts down the
         // tabs, but only when the close is actually accepted: MainWindow may veto it for a running
@@ -324,8 +324,8 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
     } else {
         setLabel(tr("Error"));
         QMessageBox::critical(this, tr("Update Error"),
-                              tr("Cockatrice is unable to open the installer.") + "<br><br>" +
-                                  tr("Try to update manually by closing Cockatrice and running the installer.") +
+                              tr("Continuumatrice is unable to open the installer.") + "<br><br>" +
+                                  tr("Try to update manually by closing Continuumatrice and running the installer.") +
                                   "<br>" + tr("Download location") + QString(": %1").arg(filepath.toLocalFile()));
     }
 }
