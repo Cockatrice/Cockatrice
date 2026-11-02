@@ -1,6 +1,7 @@
 #include "card_info.h"
 
 #include "game_specific_terms.h"
+#include "essence_types.h"
 #include "libcockatrice/card/lazy_properties_hash.h"
 #include "printing/printing_info.h"
 #include "relation/card_relation.h"
@@ -304,17 +305,34 @@ void CardInfo::setCardType(const QString &value)
 {
     setProperty(Mtg::CardType, value);
 }
+QString CardInfo::getEssenceValue() const
+{
+    return hasProperty(EssenceProperties::Value) ? getProperty(EssenceProperties::Value)
+                                                : getProperty(Mtg::ConvertedManaCost);
+}
+QString CardInfo::getEssenceTypes() const
+{
+    const QString value = hasProperty(EssenceProperties::Types)
+                              ? getProperty(EssenceProperties::Types)
+                              : getProperty(Mtg::Colors);
+    return Essence::normalizeIdentity(value);
+}
+QString CardInfo::getEssenceCost() const
+{
+    return hasProperty(EssenceProperties::Cost) ? getProperty(EssenceProperties::Cost)
+                                               : getProperty(Mtg::ManaCost);
+}
 QString CardInfo::getCmc() const
 {
-    return getProperty(Mtg::ConvertedManaCost);
+    return getEssenceValue();
 }
 QString CardInfo::getColors() const
 {
-    return getProperty(Mtg::Colors);
+    return getEssenceTypes();
 }
 void CardInfo::setColors(const QString &value)
 {
-    setProperty(Mtg::Colors, value);
+    setProperty(EssenceProperties::Types, Essence::normalizeIdentity(value));
 }
 QString CardInfo::getLoyalty() const
 {
@@ -326,7 +344,7 @@ QString CardInfo::getMainCardType() const
 }
 QString CardInfo::getManaCost() const
 {
-    return getProperty(Mtg::ManaCost);
+    return getEssenceCost();
 }
 QString CardInfo::getPowTough() const
 {
