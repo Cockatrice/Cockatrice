@@ -1,10 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 project(Utility VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
-
 set(UTILITY_SOURCES
     libcockatrice/utility/cryptoutil.cpp
     libcockatrice/utility/expression.cpp

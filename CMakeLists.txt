@@ -259,7 +259,13 @@ else()
   add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060400)
 endif()
 
+# Set once here for every target: these variables are inherited by the
+# subdirectories, so the per-directory copies were redundant. Only the
+# variables are set; qt_standard_project_setup would also change the runtime
+# output directories and the install RPATH.
 set(CMAKE_AUTOMOC TRUE)
+set(CMAKE_AUTOUIC TRUE)
+set(CMAKE_AUTORCC TRUE)
 
 # Find other needed libraries
 find_package(Protobuf CONFIG)

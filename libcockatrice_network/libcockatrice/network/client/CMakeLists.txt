@@ -1,7 +1,3 @@
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
-
 add_subdirectory(abstract)
 add_subdirectory(local)
 add_subdirectory(remote)
