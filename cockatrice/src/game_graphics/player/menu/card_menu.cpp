@@ -178,7 +178,10 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, CardItem *_card, bool _shortcuts
             } else if (card->getZone()->getName() == ZoneNames::STACK) {
                 createStackMenu(writeableCard);
             } else if (card->getZone()->getName() == ZoneNames::EXILE ||
-                       card->getZone()->getName() == ZoneNames::GRAVE) {
+                       card->getZone()->getName() == ZoneNames::GRAVE ||
+                       card->getZone()->getName() == ZoneNames::LIMBO ||
+                       card->getZone()->getName() == ZoneNames::REFUGE ||
+                       card->getZone()->getName() == ZoneNames::OBLIVION) {
                 createGraveyardOrExileMenu(writeableCard);
             } else {
                 createHandOrCustomZoneMenu(writeableCard);
