@@ -22,7 +22,7 @@ if(WITH_ORACLE)
   message(FATAL_ERROR "The upstream Oracle importer fetches Magic data and cannot be distributed as Continuumatrice. Build with -DWITH_ORACLE=OFF; use your own card XML.")
 endif()
 # Compile Servatrice
-option(WITH_SERVER "Build Continuumatrice-compatible server" OFF)
+option(WITH_SERVER "Build Continuum-Servatrice dedicated multiplayer server" ON)
 # Compile tests
 option(TEST "Build tests" OFF)
 # Build with AddressSanitizer and UndefinedBehaviorSanitizer
@@ -443,12 +443,15 @@ if(WITH_CLIENT)
 endif()
 
 if(WITH_SERVER)
-  add_subdirectory(servatrice)
-  set(CPACK_INSTALL_CMAKE_PROJECTS "Servatrice;Servatrice;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
+  # Keep the inherited source tree stable while generating the native product
+  # build directory. The compiled program is build/continuum-servatrice/continuum-servatrice.
+  add_subdirectory(servatrice "${CMAKE_BINARY_DIR}/continuum-servatrice")
+  set(CPACK_INSTALL_CMAKE_PROJECTS "ContinuumServatrice;ContinuumServatrice;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
 endif()
 
 if(WITH_CLIENT)
-  add_subdirectory(cockatrice)
+  # Source directory keeps its history; output no longer inherits "cockatrice".
+  add_subdirectory(cockatrice "${CMAKE_BINARY_DIR}/continuumatrice")
   set(CPACK_INSTALL_CMAKE_PROJECTS "Continuumatrice;Continuumatrice;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
 endif()
 
