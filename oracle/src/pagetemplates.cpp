@@ -1,5 +1,6 @@
 #include "pagetemplates.h"
 
+#include "database_writer.h"
 #include "oraclewizard.h"
 
 #include <QCheckBox>
@@ -218,6 +219,15 @@ void SimpleDownloadFilePage::actDownloadFinished()
 
 bool SimpleDownloadFilePage::saveToFile()
 {
+    const auto failSave = [this](const QString &message) {
+        qWarning() << message;
+        if (wizard()->backgroundMode) {
+            wizard()->reject();
+        } else {
+            QMessageBox::critical(this, tr("Error"), message);
+        }
+        return false;
+    };
     QString defaultPath = getDefaultSavePath();
     QString windowName = getWindowTitle();
     QString fileType = getFileType();
@@ -236,12 +246,11 @@ bool SimpleDownloadFilePage::saveToFile()
     QFileInfo fi(fileName);
     QDir fileDir(fi.path());
     if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath())) {
-        return false;
+        return failSave(tr("The database directory could not be created: %1").arg(fileDir.absolutePath()));
     }
 
     if (!internalSaveToFile(fileName)) {
-        QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to %1").arg(fileName));
-        return false;
+        return failSave(tr("The file could not be saved to %1").arg(fileName));
     }
 
     // clean saved downloadData
@@ -252,17 +261,10 @@ bool SimpleDownloadFilePage::saveToFile()
 
 bool SimpleDownloadFilePage::internalSaveToFile(const QString &fileName)
 {
-    QFile file(fileName);
-    if (!file.open(QIODevice::WriteOnly)) {
-        qDebug() << "File open (w) failed for" << fileName;
+    QString error;
+    if (!OracleDatabase::saveXml(fileName, downloadData, &error)) {
+        qWarning() << error;
         return false;
     }
-
-    if (file.write(downloadData) == -1) {
-        qDebug() << "File write (w) failed for" << fileName;
-        return false;
-    }
-
-    file.close();
     return true;
 }

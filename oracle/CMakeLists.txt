@@ -17,6 +17,7 @@ set(ORACLE_WIN32_QM_INSTALL_DIR "translations")
 # Sources
 # ------------------------
 set(oracle_SOURCES
+    src/database_writer.cpp
     src/main.cpp
     src/oraclewizard.cpp
     src/oracleimporter.cpp

@@ -9,6 +9,7 @@ cockatrice_add_test(
   ../../oracle/src/oracleimporter.cpp
   ../../oracle/src/parsehelpers.cpp
   ../../oracle/src/raw_json_scanner.cpp
+  ../../oracle/src/database_writer.cpp
   oracle_importer_test.cpp
   LIBS
   libcockatrice_card
