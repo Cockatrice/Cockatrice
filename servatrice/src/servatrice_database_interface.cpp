@@ -755,6 +755,20 @@ QString Servatrice_DatabaseInterface::getUserPasswordData(const QString &user)
     return query->value(0).toString();
 }
 
+QString Servatrice_DatabaseInterface::sealLegacyBackup(const QString &storedName, const QString &credential)
+{
+    const QByteArray key = server->getLegacyBackupKey();
+    if (key.isEmpty()) {
+        return {};
+    }
+    const QByteArray aad = storedName.simplified().toUtf8();
+    const QString sealed = CryptoUtil::encryptSecret(credential.toUtf8(), key, aad);
+    if (sealed.isEmpty() || sealed.length() > MAX_LEGACY_BACKUP_LENGTH) {
+        return {};
+    }
+    return sealed;
+}
+
 bool Servatrice_DatabaseInterface::submitPasswordVerifier(const QString &user, const QString &passwordVerifier)
 {
     if (server->getAuthenticationMethod() != Servatrice::AuthenticationSql) {
@@ -779,18 +793,13 @@ bool Servatrice_DatabaseInterface::submitPasswordVerifier(const QString &user, c
 
     QString sealedBackup;
     QDateTime backupUsedAt;
-    if (PasswordHasher::isLegacyFormat(currentCredential)) {
-        const QByteArray key = server->getLegacyBackupKey();
-        if (!key.isEmpty()) {
-            const QByteArray aad = storedName.simplified().toUtf8();
-            sealedBackup = CryptoUtil::encryptSecret(currentCredential.toUtf8(), key, aad);
-            if (sealedBackup.isEmpty() || sealedBackup.length() > MAX_LEGACY_BACKUP_LENGTH) {
-                qCWarning(DatabaseInterfaceLog)
-                    << "Failed to seal legacy backup for user" << user << "- account migrates without a downgrade path";
-                sealedBackup.clear();
-            } else {
-                backupUsedAt = QDateTime::currentDateTimeUtc();
-            }
+    if (PasswordHasher::isLegacyFormat(currentCredential) && !server->getLegacyBackupKey().isEmpty()) {
+        sealedBackup = sealLegacyBackup(storedName, currentCredential);
+        if (sealedBackup.isEmpty()) {
+            qCWarning(DatabaseInterfaceLog)
+                << "Failed to seal legacy backup for user" << user << "- account migrates without a downgrade path";
+        } else {
+            backupUsedAt = QDateTime::currentDateTimeUtc();
         }
     }
 
@@ -1642,6 +1651,54 @@ bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user,
         return false;
     }
     return passwordQuery->numRowsAffected() > 0;
+}
+
+bool Servatrice_DatabaseInterface::changeUserPasswordWithLegacyBackup(const QString &user,
+                                                                      const QString &passwordVerifier,
+                                                                      const QString &legacyCredential)
+{
+    if (server->getAuthenticationMethod() != Servatrice::AuthenticationSql) {
+        return false;
+    }
+
+    if (!checkSql()) {
+        return false;
+    }
+
+    // Seal against the stored row name, not the caller-supplied one: the name column is
+    // case-insensitive, so a differently-cased name would fail the tag check on open.
+    QSqlQuery *nameQuery = prepareQuery("SELECT name FROM {prefix}_users WHERE name = :name");
+    nameQuery->bindValue(":name", user);
+    if (!execSqlQuery(nameQuery) || !nameQuery->next()) {
+        return false;
+    }
+    const QString storedName = nameQuery->value(0).toString();
+
+    const QString sealedBackup = sealLegacyBackup(storedName, legacyCredential);
+    const QDateTime backupUsedAt = sealedBackup.isEmpty() ? QDateTime() : QDateTime::currentDateTimeUtc();
+    if (sealedBackup.isEmpty()) {
+        // Without a backup a pre-challenge client has nothing to authenticate against: the
+        // row holds a verifier and the legacy hash it would send cannot match it. Say so,
+        // because the symptom - the temporary password appearing not to work - shows up on
+        // a different machine from the one that reset it.
+        qCWarning(DatabaseInterfaceLog) << "Stored a verifier without a legacy backup for user" << user
+                                        << "- pre-challenge clients cannot use this password"
+                                        << "- check security/legacy_backup_key";
+    }
+
+    QSqlQuery *query = prepareQuery("update {prefix}_users set password_sha512=:password, "
+                                    "password_legacy_backup=:backup, password_legacy_backup_used_at=:used_at, "
+                                    "passwordLastChangedDate = NOW() where name = :name");
+    query->bindValue(":password", passwordVerifier);
+    query->bindValue(":backup", sealedBackup);
+    query->bindValue(":used_at", backupUsedAt.isValid()
+                                     ? QVariant(backupUsedAt.toString(QStringLiteral("yyyy-MM-dd HH:mm:ss")))
+                                     : QVariant());
+    query->bindValue(":name", storedName);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+    return query->numRowsAffected() > 0;
 }
 
 void Servatrice_DatabaseInterface::setForcePasswordChange(const QString &user, bool force)

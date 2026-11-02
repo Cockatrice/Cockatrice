@@ -62,6 +62,9 @@ private:
     bool checkUserIsIpBanned(const QString &ipAddress, QString &banReason, int &banSecondsRemaining);
     /** Must be called after checkSql and server is known to be in auth mode. */
     bool checkUserIsNameBanned(QString const &userName, QString &banReason, int &banSecondsRemaining);
+    /** Seal a legacy credential for the account's downgrade backup; empty when the
+     *  backup key is unset or the sealed value does not fit the column. */
+    QString sealLegacyBackup(const QString &storedName, const QString &credential);
     bool isStrictModeEnabled(bool &ok) const;
 
 protected:
@@ -192,6 +195,11 @@ public:
                     const QString &targetName,
                     const QString &channel = QString()) override;
     bool changeUserPassword(const QString &user, const QString &password, bool passwordNeedsHash) override;
+    /** Replace a credential with an already-derived verifier, keeping a sealed legacy hash of the
+     *  same password as the downgrade backup for pre-challenge clients. */
+    bool changeUserPasswordWithLegacyBackup(const QString &user,
+                                            const QString &passwordVerifier,
+                                            const QString &legacyCredential);
     bool changeUserPassword(const QString &user,
                             const QString &oldPassword,
                             bool oldPasswordNeedsHash,
