@@ -808,3 +808,7 @@ if(Qt6LinguistTools_FOUND)
 endif()
 
 qt_finalize_target(continuumatrice)
+
+# Compatibility with existing CI scripts calling --target cockatrice. No
+# executable named cockatrice is created by this target.
+add_custom_target(cockatrice DEPENDS continuumatrice)
