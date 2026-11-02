@@ -16,6 +16,7 @@ class ExactCard;
 class QEvent;
 class QMouseEvent;
 class QPoint;
+class QWheelEvent;
 
 /**
  * @brief A wrapping grid of card pictures.
@@ -49,11 +50,16 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void leaveEvent(QEvent *event) override;
     bool viewportEvent(QEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
 
 private:
     void updateHoveredRow(const QPoint &position);
+    /// Pixels one wheel notch moves, scaled to the grid and the OS line count.
+    [[nodiscard]] int wheelStep() const;
 
     CardDatabaseVisualDisplayModel *model;
+    /// Fraction of a line left over from a wheel event smaller than one notch.
+    qreal wheelRemainder = 0.0;
     int cardSizeFactor = 100;
     int hoveredRow = -1;
 };

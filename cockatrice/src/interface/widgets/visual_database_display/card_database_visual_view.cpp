@@ -9,6 +9,7 @@
 
 #include <QAbstractItemModel>
 #include <QAbstractItemView>
+#include <QApplication>
 #include <QCursor>
 #include <QEvent>
 #include <QFrame>
@@ -16,6 +17,7 @@
 #include <QMouseEvent>
 #include <QScrollBar>
 #include <QSize>
+#include <QWheelEvent>
 #include <QWidget>
 #include <QtGlobal>
 #include <qnamespace.h>
@@ -38,6 +40,13 @@ CardDatabaseVisualView::CardDatabaseVisualView(CardDatabaseVisualDisplayModel *_
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setFrameShape(QFrame::NoFrame);
     setWordWrap(false);
+
+    // QListView hands the delegate's item height to the scroll bar as its single
+    // step under ScrollPerPixel, so one wheel notch would jump wheelScrollLines()
+    // whole card rows. Give the bar a text line instead; the wheel handler below
+    // scales that line to the grid. A positive step also stops Qt from taking the
+    // item height back on the next layout.
+    verticalScrollBar()->setSingleStep(qMax(1, fontMetrics().height()));
 
     // The grid is a read-only surface: clicks are actions on a card, not a
     // selection, and they must not steal focus from the search field.
@@ -110,6 +119,57 @@ bool CardDatabaseVisualView::viewportEvent(QEvent *event)
     }
 
     return QListView::viewportEvent(event);
+}
+
+void CardDatabaseVisualView::wheelEvent(QWheelEvent *event)
+{
+    // Ctrl+wheel is the card-size gesture and is filtered out before it reaches
+    // the view; any other modifier keeps QAbstractSlider's own page scrolling.
+    if (event->modifiers() != Qt::NoModifier) {
+        QListView::wheelEvent(event);
+        return;
+    }
+
+    QScrollBar *bar = verticalScrollBar();
+    if (!bar->isVisible()) {
+        event->ignore();
+        return;
+    }
+
+    // Touchpads and high-resolution wheels already report pixels: follow them.
+    if (!event->pixelDelta().isNull()) {
+        bar->setValue(bar->value() - event->pixelDelta().y());
+        event->accept();
+        return;
+    }
+
+    if (event->angleDelta().y() == 0) {
+        QListView::wheelEvent(event);
+        return;
+    }
+
+    // Accumulate wheel deltas smaller than a notch, like QAbstractSlider does, so
+    // a fine-grained wheel still moves.
+    wheelRemainder += static_cast<qreal>(event->angleDelta().y()) / 120.0;
+    const int notches = static_cast<int>(wheelRemainder);
+    if (notches == 0) {
+        event->accept();
+        return;
+    }
+    wheelRemainder -= notches;
+
+    const int pixels = -notches * wheelStep();
+    bar->setValue(qBound(bar->minimum(), bar->value() + pixels, bar->maximum()));
+    event->accept();
+}
+
+int CardDatabaseVisualView::wheelStep() const
+{
+    // A card row is far too coarse for one wheel line, and a text line is too
+    // fine, so a line is an eighth of the grid cell. A notch then moves about a
+    // third of a card row at any card size, and the OS line count still applies.
+    const int lineHeight = qMax(1, gridSize().height() / 8);
+    return qMax(1, QApplication::wheelScrollLines()) * lineHeight;
 }
 
 void CardDatabaseVisualView::updateHoveredRow(const QPoint &position)
