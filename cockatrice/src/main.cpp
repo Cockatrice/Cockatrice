@@ -69,6 +69,7 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/rng/rng_sfmt.h>
 #include <libcockatrice/settings/card_database_settings.h>
+#include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/network_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
@@ -415,6 +416,24 @@ int main(int argc, char *argv[])
     CardDatabaseManager::setCardPreferenceProvider(new SettingsCardPreferenceProvider());
     CardDatabaseManager::setCardDatabasePathProvider(&SettingsCache::instance());
     CardDatabaseManager::setCardSetPriorityController(&SettingsCache::instance().cardDatabase());
+
+    // Existing early fork profiles may still contain the upstream Scryfall /
+    // Gatherer defaults saved by older builds. Migrate only known MTG provider
+    // URLs, leaving user-authored Continuum Universes endpoints untouched.
+    auto &downloadSettings = SettingsCache::instance().downloads();
+    const QStringList savedImageUrls = downloadSettings.getAllURLs();
+    QStringList compatibleImageUrls;
+    for (const QString &url : savedImageUrls) {
+        if (!url.contains(QStringLiteral("scryfall.com"), Qt::CaseInsensitive) &&
+            !url.contains(QStringLiteral("scryfall.io"), Qt::CaseInsensitive) &&
+            !url.contains(QStringLiteral("gatherer.wizards.com"), Qt::CaseInsensitive)) {
+            compatibleImageUrls.append(url);
+        }
+    }
+    if (compatibleImageUrls != savedImageUrls) {
+        downloadSettings.setDownloadUrls(compatibleImageUrls);
+        qCInfo(MainLog) << "Removed inherited MTG image sources from Continuumatrice profile.";
+    }
 
     qCInfo(MainLog) << "Starting main program";
 
