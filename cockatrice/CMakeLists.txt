@@ -2,7 +2,7 @@
 #
 # provides the cockatrice binary
 
-project(Cockatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
+project(Continuumatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 set(cockatrice_SOURCES
     ${VERSION_STRING_CPP}
@@ -507,12 +507,12 @@ set(MIMEDIR
     CACHE STRING "mime file destination"
 )
 
-set(COCKATRICE_MAC_QM_INSTALL_DIR "cockatrice.app/Contents/Resources/translations")
+set(COCKATRICE_MAC_QM_INSTALL_DIR "continuumatrice.app/Contents/Resources/translations")
 set(COCKATRICE_UNIX_QM_INSTALL_DIR "share/continuumatrice/translations")
 set(COCKATRICE_WIN32_QM_INSTALL_DIR "translations")
 
 qt_add_executable(
-  cockatrice
+  continuumatrice
   WIN32
   MACOSX_BUNDLE
   ${cockatrice_SOURCES}
@@ -521,16 +521,12 @@ qt_add_executable(
   MANUAL_FINALIZATION
 )
 
-# Keep the CMake target name for existing build dependencies and scripts while
-# installing an independently named Linux application alongside MTG Cockatrice.
-if(UNIX AND NOT APPLE)
-  set_target_properties(cockatrice PROPERTIES OUTPUT_NAME continuumatrice)
-endif()
-
-target_precompile_headers(cockatrice PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtwidgets_pch.h")
+# Product target is Continuumatrice on every platform. The source directory and
+# upstream libcockatrice_* library names remain internal implementation details.
+target_precompile_headers(continuumatrice PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtwidgets_pch.h")
 
 qt_add_shaders(
-  cockatrice
+  continuumatrice
   "onboarding_shaders"
   PREFIX
   "/onboarding/shaders"
@@ -542,7 +538,7 @@ qt_add_shaders(
 )
 
 qt_add_resources(
-  cockatrice
+  continuumatrice
   "onboarding_qml"
   PREFIX
   "/onboarding/qml"
@@ -553,7 +549,7 @@ qt_add_resources(
 )
 
 target_link_libraries(
-  cockatrice
+  continuumatrice
   PUBLIC libcockatrice_card
          libcockatrice_deck_list
          libcockatrice_filters
@@ -566,29 +562,27 @@ target_link_libraries(
          ${COCKATRICE_QT_MODULES}
 )
 
-cockatrice_target_enable_crash_reporting(cockatrice)
+cockatrice_target_enable_crash_reporting(continuumatrice)
 
 if(UNIX)
   if(APPLE)
     set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME}")
-    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.cockatrice.${PROJECT_NAME}")
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.continuum-universes.continuumatrice")
     set(MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_NAME}-${PROJECT_VERSION}")
     set(MACOSX_BUNDLE_BUNDLE_NAME "${PROJECT_NAME}")
     set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
     set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
 
-    set_target_properties(cockatrice PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/cmake/Info.plist)
+    set_target_properties(continuumatrice PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/cmake/Info.plist)
 
-    install(TARGETS cockatrice BUNDLE DESTINATION ./)
+    install(TARGETS continuumatrice BUNDLE DESTINATION ./)
   else()
     # Assume linux
-    install(TARGETS cockatrice RUNTIME DESTINATION bin/)
+    install(TARGETS continuumatrice RUNTIME DESTINATION bin/)
     # Install using distinct names so the normal MTG client keeps its .desktop,
     # icon and .cod / cockatrice:// file associations unchanged.
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.png
-            DESTINATION ${ICONDIR}/hicolor/48x48/apps RENAME continuumatrice.png)
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.svg
-            DESTINATION ${ICONDIR}/hicolor/scalable/apps RENAME continuumatrice.svg)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/continuumatrice.svg
+            DESTINATION ${ICONDIR}/hicolor/scalable/apps)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/continuumatrice.desktop DESTINATION ${DESKTOPDIR})
 
     # Refresh the freedesktop databases so the file associations and scheme
@@ -608,13 +602,13 @@ if(UNIX)
     endif()
   endif()
 elseif(WIN32)
-  install(TARGETS cockatrice RUNTIME DESTINATION ./)
+  install(TARGETS continuumatrice RUNTIME DESTINATION ./)
 endif()
 
 if(APPLE)
   # these needs to be relative to CMAKE_INSTALL_PREFIX
-  set(plugin_dest_dir cockatrice.app/Contents/Plugins)
-  set(qtconf_dest_dir cockatrice.app/Contents/Resources)
+  set(plugin_dest_dir continuumatrice.app/Contents/Plugins)
+  set(qtconf_dest_dir continuumatrice.app/Contents/Resources)
 
   # Qt plugins: audio, iconengines, imageformats, multimedia, platforms, printsupport, styles, tls
   install(
@@ -657,7 +651,7 @@ Data = Resources\")
             \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dylib\")
         set(BU_CHMOD_BUNDLE_ITEMS ON)
         include(BundleUtilities)
-        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/cockatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
+        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/continuumatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
         "
     COMPONENT Runtime
   )
@@ -768,7 +762,7 @@ Data = Resources\")
             \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dll\")
         set(BU_CHMOD_BUNDLE_ITEMS ON)
         include(BundleUtilities)
-        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/Cockatrice.exe\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
+        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/continuumatrice.exe\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
         "
     COMPONENT Runtime
   )
@@ -778,7 +772,7 @@ if(Qt6LinguistTools_FOUND)
   #Qt6 Translations happen after the executable is built up
   if(UPDATE_TRANSLATIONS)
     qt_add_translations(
-      cockatrice
+      continuumatrice
       TS_FILES
       ${cockatrice_TS}
       SOURCES
@@ -787,7 +781,7 @@ if(Qt6LinguistTools_FOUND)
       cockatrice_QM
     )
   else()
-    qt_add_translations(cockatrice TS_FILES ${cockatrice_TS} QM_FILES_OUTPUT_VARIABLE cockatrice_QM)
+    qt_add_translations(continuumatrice TS_FILES ${cockatrice_TS} QM_FILES_OUTPUT_VARIABLE cockatrice_QM)
   endif()
 
   if(UNIX)
@@ -808,9 +802,9 @@ if(Qt6LinguistTools_FOUND)
   # error on Xcode. Older Qt versions already add this dependency themselves.
   foreach(_lrelease_target Cockatrice_lrelease cockatrice_lrelease)
     if(TARGET ${_lrelease_target})
-      add_dependencies(cockatrice ${_lrelease_target})
+      add_dependencies(continuumatrice ${_lrelease_target})
     endif()
   endforeach()
 endif()
 
-qt_finalize_target(cockatrice)
+qt_finalize_target(continuumatrice)
