@@ -130,8 +130,13 @@ void CardDatabaseVisualView::wheelEvent(QWheelEvent *event)
         return;
     }
 
+    // Whether the scroll bar is shown says nothing about whether the grid can
+    // scroll: macOS uses transient (overlay) scroll bars that hide themselves
+    // once they fade out, and Qt hides the widget for good when that happens.
+    // The range is the real answer; ignoring the wheel when there is nothing to
+    // scroll still lets an enclosing scroll area take over.
     QScrollBar *bar = verticalScrollBar();
-    if (!bar->isVisible()) {
+    if (bar->maximum() <= bar->minimum()) {
         event->ignore();
         return;
     }
