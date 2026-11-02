@@ -12,6 +12,7 @@ set(cockatrice_SOURCES
     src/client/network/interfaces/deck_stats_interface.cpp
     src/client/network/interfaces/tapped_out_interface.cpp
     src/client/network/parsers/deck_link_to_api_transformer.cpp
+    src/client/network/parsers/manabox_json_deck_parser.cpp
     src/client/network/update/client/client_update_checker.cpp
     src/client/network/update/client/release_channel.cpp
     src/client/network/update/card_spoiler/spoiler_background_updater.cpp

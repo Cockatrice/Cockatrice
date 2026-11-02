@@ -2,6 +2,7 @@
 
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
+#include <QUrl>
 
 namespace DeckLinkToApiTransformer
 {
@@ -23,6 +24,25 @@ bool parseDeckUrl(const QString &url, ParsedDeckInfo &outInfo)
     static QRegularExpression rxArchidekt("archidekt\\.com/decks/(\\d+)");
     static QRegularExpression rxMoxfield("moxfield\\.com/decks/([a-zA-Z0-9_-]+)");
     static QRegularExpression rxDeckstats("deckstats\\.net/decks/(\\d+/[a-zA-Z0-9_-]+)");
+
+    // Parse the host separately so a URL merely mentioning manabox.app cannot
+    // trigger an import. Share IDs are URL-safe base64 strings.
+    const QUrl parsedUrl(url.trimmed());
+    const QString host = parsedUrl.host().toLower();
+    if (host == "manabox.app" || host == "www.manabox.app") {
+        static const QRegularExpression rxManaBox("^/decks/([a-zA-Z0-9_-]+)/?$");
+        const auto manaBoxMatch = rxManaBox.match(parsedUrl.path());
+        if (!parsedUrl.isValid() || (parsedUrl.scheme() != "https" && parsedUrl.scheme() != "http") ||
+            !parsedUrl.userInfo().isEmpty() || !manaBoxMatch.hasMatch()) {
+            return false;
+        }
+        const QString deckID = manaBoxMatch.captured(1);
+        outInfo = ParsedDeckInfo{.baseUrl = "https://cloud.manabox.app/decks/",
+                                 .deckID = deckID,
+                                 .fullUrl = "https://cloud.manabox.app/decks/" + deckID,
+                                 .provider = DeckProvider::ManaBox};
+        return true;
+    }
 
     QRegularExpressionMatch match;
 

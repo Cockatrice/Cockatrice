@@ -14,6 +14,7 @@ enum class DeckProvider
     TappedOut,
     Archidekt,
     Moxfield,
+    ManaBox,
     Deckstats,
     Unknown
 };

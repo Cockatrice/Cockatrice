@@ -65,9 +65,23 @@ To load a deck from an online service, select the "Load deck from online service
 Visual Deck Editor" menu in the application menu bar at the top of the screen.
 
 Selecting this action will open a dialog containing the contents of your clipboard pasted into it. If your clipboard
-currently contains a supported URL, the dialog will accept it and close on its own, otherwise you may adjust the URL and
-confirm.
+currently contains a supported URL, the download starts automatically; otherwise you may adjust the URL and confirm.
+The dialog remains available while downloading, and Cancel stops the request. If the download fails or returns no
+playable cards, you can correct the URL or retry without changing your current deck.
 
 The action will automatically import the deck from the online service without any other required user action.
 
-Currently supported services are Archidekt, Deckstats, Moxfield, and TappedOut.
+Currently supported services are Archidekt, Deckstats, ManaBox, Moxfield, and TappedOut.
+
+### ManaBox
+
+In ManaBox, open a deck, select the three-dot menu, then **Share** and **Link**. Paste the public share link
+(`https://manabox.app/decks/<share-id>`) into the online import dialog.
+
+The import preserves the deck name, card quantities, set codes, collector numbers, and Scryfall printing IDs.
+Mainboard cards and commanders go into the main deck; sideboard cards go into the sideboard. Partner commanders are
+all included, and the first commander becomes the deck banner. Maybeboard cards are not part of the playable deck
+and are excluded.
+
+After changing the deck in ManaBox, use **Update link** there before importing again. ManaBox share links contain
+the last published version of the deck. This imports a shared deck, not a private collection or binder.

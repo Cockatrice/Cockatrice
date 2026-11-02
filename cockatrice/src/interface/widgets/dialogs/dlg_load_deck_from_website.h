@@ -11,11 +11,14 @@
 #include "../client/network/parsers/interface_json_deck_parser.h"
 #include "libcockatrice/deck_list/deck_list.h"
 
+#include <QByteArray>
 #include <QDialog>
 #include <QLoggingCategory>
 #include <QSharedPointer>
 #include <qtmetamacros.h>
 
+class QDialogButtonBox;
+class QNetworkReply;
 class QLabel;
 class QLineEdit;
 class QNetworkAccessManager;
@@ -45,9 +48,17 @@ private:
     QVBoxLayout *layout;
     QLabel *instructionLabel;
     QLineEdit *urlEdit;
+    QDialogButtonBox *buttonBox;
+    QNetworkReply *activeReply = nullptr;
+    QByteArray downloadData;
+
+    void setLoading(bool loading);
+    void showImportError(const QString &message);
+    void finishImport(QNetworkReply *reply, DeckProvider provider);
 
 public slots:
     void accept() override;
+    void reject() override;
     QSharedPointer<IJsonDeckParser> createParserForProvider(DeckProvider provider);
 };
 

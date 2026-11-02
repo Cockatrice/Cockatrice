@@ -448,6 +448,20 @@ endif()
 if(WITH_CLIENT)
   cockatrice_add_test(
     NAME
+    manabox_import_test
+    SOURCES
+    ${VERSION_STRING_CPP}
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network/parsers/deck_link_to_api_transformer.cpp
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network/parsers/manabox_json_deck_parser.cpp
+    manabox_import_test.cpp
+    LIBS
+    libcockatrice_card
+    libcockatrice_deck_list
+    INCLUDE_DIRS
+    ${CMAKE_SOURCE_DIR}/cockatrice/src
+  )
+  cockatrice_add_test(
+    NAME
     moxfield_signature_spells_test
     SOURCES
     ${VERSION_STRING_CPP}
