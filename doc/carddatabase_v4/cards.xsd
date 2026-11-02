@@ -73,7 +73,7 @@
             <xs:element type="xs:boolean" name="landscapeOrientation" minOccurs="0" maxOccurs="1" />
         </xs:sequence>
     </xs:complexType>
-    <xs:element name="cockatrice_carddatabase">
+    <xs:element name="continuumatrice_carddatabase">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="info" minOccurs="0" maxOccurs="1">
