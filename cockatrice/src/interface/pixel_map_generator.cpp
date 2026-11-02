@@ -488,7 +488,10 @@ const QPixmap &ManaSymbolPixmapGenerator::masterIcon(const QString &symbol)
         return it.value();
     }
 
-    QImageReader reader("theme:icons/mana/" + symbol);
+    // Essence uses its own artwork namespace, including codes shared with MTG.
+    // Theme overrides are supported through icons/essence/<symbol>.svg/png.
+    const QString asset = themeManager->assetPath(QStringLiteral("icons/essence/") + symbol);
+    QImageReader reader(QStringLiteral("theme:") + asset);
     QSize sourceSize = reader.size();
     if (!sourceSize.isEmpty()) {
         sourceSize.scale(QSize(MASTER_ICON_SIZE, MASTER_ICON_SIZE), Qt::KeepAspectRatio);
