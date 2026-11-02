@@ -418,12 +418,10 @@ void IntentUrlParser::restoreToPreviousServer(const PendingIntentChain &chain)
 
         ServersSettings &servers = SettingsCache::instance().servers();
         const int index = servers.findServerIndex(chain.previousServerHost, chain.previousServerPort);
-        if (index >= 0 && servers.hasLoginData(chain.previousServerHost, chain.previousServerPort)) {
-            const QString username =
-                servers.getValue(QString("username%1").arg(index), "server", "server_details").toString();
-            const QString password =
-                servers.getValue(QString("password%1").arg(index), "server", "server_details").toString();
-            client->connectToServer(chain.previousServerHost, chain.previousServerPort.toUInt(), username, password);
+        const auto server = servers.getServer(index);
+        if (server && servers.hasLoginData(chain.previousServerHost, chain.previousServerPort)) {
+            client->connectToServer(chain.previousServerHost, chain.previousServerPort.toUInt(), server->username,
+                                    server->password);
             return;
         }
         client->disconnectFromServer();
@@ -438,11 +436,9 @@ void IntentUrlParser::restoreToPreviousServer(const PendingIntentChain &chain)
     // when credentials are saved, otherwise stay offline.
     ServersSettings &servers = SettingsCache::instance().servers();
     const int index = servers.findServerIndex(chain.previousServerHost, chain.previousServerPort);
-    if (index >= 0 && servers.hasLoginData(chain.previousServerHost, chain.previousServerPort)) {
-        const QString username =
-            servers.getValue(QString("username%1").arg(index), "server", "server_details").toString();
-        const QString password =
-            servers.getValue(QString("password%1").arg(index), "server", "server_details").toString();
-        client->connectToServer(chain.previousServerHost, chain.previousServerPort.toUInt(), username, password);
+    const auto server = servers.getServer(index);
+    if (server && servers.hasLoginData(chain.previousServerHost, chain.previousServerPort)) {
+        client->connectToServer(chain.previousServerHost, chain.previousServerPort.toUInt(), server->username,
+                                server->password);
     }
 }
