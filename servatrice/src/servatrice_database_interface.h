@@ -53,6 +53,8 @@ class Servatrice_DatabaseInterface : public Server_DatabaseInterface
 private:
     int instanceId;
     QSqlDatabase sqlDatabase;
+    bool databaseReady = false;
+    bool reconnectPending = false;
     QHash<QString, QSqlQuery *> preparedStatements;
     Servatrice *server;
     ServerInfo_User evalUserQueryResult(const QSqlQuery *query, bool complete, bool withId = false);
@@ -62,6 +64,8 @@ private:
     bool checkUserIsIpBanned(const QString &ipAddress, QString &banReason, int &banSecondsRemaining);
     /** Must be called after checkSql and server is known to be in auth mode. */
     bool checkUserIsNameBanned(QString const &userName, QString &banReason, int &banSecondsRemaining);
+    bool validateDatabase();
+    void queueReconnect();
     bool isStrictModeEnabled(bool &ok) const;
 
 protected:
@@ -84,9 +88,12 @@ public:
                       const QString &databaseName,
                       const QString &userName,
                       const QString &password);
+    /** Reopens and validates the connection; invalidates cached query pointers. */
     bool openDatabase();
+    /** Checks a command boundary; a reconnect invalidates cached query pointers. */
     bool checkSql();
     QSqlQuery *prepareQuery(const QString &queryText);
+    /** Executes once. Failure preserves the query object until the next reconnect. */
     bool execSqlQuery(QSqlQuery *query);
     const QSqlDatabase &getDatabase()
     {

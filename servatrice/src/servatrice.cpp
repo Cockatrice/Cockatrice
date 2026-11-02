@@ -172,9 +172,9 @@ Servatrice_WebsocketGameServer::Servatrice_WebsocketGameServer(Servatrice *_serv
                                   Q_ARG(QSqlDatabase, _sqlDatabase));
 
         connectionPools.append(newPool);
-
-        connect(this, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
     }
+
+    connect(this, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
 }
 
 Servatrice_WebsocketGameServer::~Servatrice_WebsocketGameServer()
@@ -190,18 +190,26 @@ Servatrice_WebsocketGameServer::~Servatrice_WebsocketGameServer()
 
 void Servatrice_WebsocketGameServer::onNewConnection()
 {
-    Servatrice_ConnectionPool *pool = findLeastUsedConnectionPool();
+    auto *pendingSocket = nextPendingConnection();
+    if (!pendingSocket) {
+        return;
+    }
 
-    auto ssi = new WebsocketServerSocketInterface(server, pool->getDatabaseInterface());
-    /*
-     * Due to a Qt limitation, websockets can't be moved to another thread.
-     * This will hopefully change in Qt6 if QtWebSocket will be integrated in QtNetwork
-     */
-    // ssi->moveToThread(pool->thread());
+    // WebSocket handlers stay on the server thread. Their SQL connection must
+    // belong to that thread too, including queued recovery after query failures.
+    auto *databaseInterface = static_cast<Servatrice_DatabaseInterface *>(server->getDatabaseInterface());
+    if (!databaseInterface) {
+        pendingSocket->close();
+        pendingSocket->deleteLater();
+        return;
+    }
+
+    Servatrice_ConnectionPool *pool = findLeastUsedConnectionPool();
+    auto ssi = new WebsocketServerSocketInterface(server, databaseInterface);
     pool->addClient();
     connect(ssi, SIGNAL(destroyed()), pool, SLOT(removeClient()));
 
-    QMetaObject::invokeMethod(ssi, "initConnection", Qt::QueuedConnection, Q_ARG(void *, nextPendingConnection()));
+    QMetaObject::invokeMethod(ssi, "initConnection", Qt::QueuedConnection, Q_ARG(void *, pendingSocket));
 }
 
 Servatrice_ConnectionPool *Servatrice_WebsocketGameServer::findLeastUsedConnectionPool()
