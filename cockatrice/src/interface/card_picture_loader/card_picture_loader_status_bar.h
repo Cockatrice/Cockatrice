@@ -1,10 +1,13 @@
 #ifndef PICTURE_LOADER_STATUS_BAR_H
 #define PICTURE_LOADER_STATUS_BAR_H
 
+#include <QHash>
+#include <QList>
 #include <QString>
 #include <QWidget>
 #include <qtmetamacros.h>
 
+class CardPictureLoaderRequestStatusDisplayWidget;
 class ExactCard;
 class QHBoxLayout;
 class QProgressBar;
@@ -21,11 +24,20 @@ class SettingsButtonWidget;
  * - Shows overall progress of image downloads.
  * - Maintains a log of individual requests via a popup (SettingsButtonWidget).
  * - Cleans up finished request entries automatically after a delay.
+ *
+ * The log is a diagnostic view, not a queue: it keeps at most MAX_LOG_ENTRIES
+ * entries and indexes them by URL, so a burst of requests stays O(1) per event
+ * instead of scanning every entry the popup holds.
  */
 class CardPictureLoaderStatusBar : public QWidget
 {
     Q_OBJECT
 public:
+    /** Entries kept in the log; older ones are evicted as new requests arrive. */
+    static constexpr int MAX_LOG_ENTRIES = 50;
+    /** Seconds a finished entry stays in the log before it is cleaned up. */
+    static constexpr int LOG_ENTRY_LIFETIME_SECS = 10;
+
     /**
      * @brief Constructs a status bar with progress bar and log button.
      * @param parent Parent widget
@@ -55,10 +67,26 @@ public slots:
     void cleanOldEntries();
 
 private:
+    /**
+     * @brief Evicts the oldest finished entry (or the oldest entry if none finished)
+     *        until the log fits within MAX_LOG_ENTRIES.
+     */
+    void trimLog();
+
+    /**
+     * @brief Removes one entry from the log, its URL index and the popup, and keeps
+     *        the progress bar counters in step with the entries that remain.
+     * @param entry Entry to remove
+     */
+    void removeLogEntry(CardPictureLoaderRequestStatusDisplayWidget *entry);
+
     QHBoxLayout *layout;           ///< Horizontal layout containing progress bar and log button
     QProgressBar *progressBar;     ///< Progress bar showing overall download progress
     SettingsButtonWidget *loadLog; ///< Popup log showing individual request statuses
     QTimer *cleaner;               ///< Timer for periodically cleaning old log entries
+    QList<CardPictureLoaderRequestStatusDisplayWidget *> logEntries; ///< Logged requests, oldest first
+    QHash<QString, QList<CardPictureLoaderRequestStatusDisplayWidget *>>
+        entriesByUrl; ///< Log entries indexed by their URL for O(1) completion lookup
 };
 
 #endif // PICTURE_LOADER_STATUS_BAR_H
