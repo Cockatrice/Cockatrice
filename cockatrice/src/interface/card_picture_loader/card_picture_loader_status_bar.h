@@ -1,8 +1,8 @@
 #ifndef PICTURE_LOADER_STATUS_BAR_H
 #define PICTURE_LOADER_STATUS_BAR_H
 
-#include <QHash>
 #include <QList>
+#include <QMultiHash>
 #include <QString>
 #include <QWidget>
 #include <qtmetamacros.h>
@@ -85,7 +85,9 @@ private:
     SettingsButtonWidget *loadLog; ///< Popup log showing individual request statuses
     QTimer *cleaner;               ///< Timer for periodically cleaning old log entries
     QList<CardPictureLoaderRequestStatusDisplayWidget *> logEntries; ///< Logged requests, oldest first
-    QHash<QString, QList<CardPictureLoaderRequestStatusDisplayWidget *>>
+    // A URL can back several live entries: a request parked for a deferred retry is re-queued while
+    // its first entry is still pending, so a completion must finish every entry for that URL.
+    QMultiHash<QString, CardPictureLoaderRequestStatusDisplayWidget *>
         entriesByUrl; ///< Log entries indexed by their URL for O(1) completion lookup
 };
 

@@ -63,21 +63,21 @@ void CardPictureLoaderStatusBar::addQueuedImageLoad(const QUrl &url, const Exact
     auto *entry = new CardPictureLoaderRequestStatusDisplayWidget(loadLog, url, card, setName);
     loadLog->addSettingsWidget(entry);
     logEntries.append(entry);
-    entriesByUrl[entry->getUrl()].append(entry);
+    entriesByUrl.insert(entry->getUrl(), entry);
     progressBar->setMaximum(progressBar->maximum() + 1);
 }
 
 void CardPictureLoaderStatusBar::addSuccessfulImageLoad(const QUrl &url)
 {
-    const auto entries = entriesByUrl.constFind(url.toString());
-    if (entries == entriesByUrl.constEnd()) {
+    const QList<CardPictureLoaderRequestStatusDisplayWidget *> entries = entriesByUrl.values(url.toString());
+    if (entries.isEmpty()) {
         // The entry may already have been dropped from the log; the download
         // itself still succeeded, there is just nothing left to mark.
         return;
     }
 
     int finishedEntries = 0;
-    for (CardPictureLoaderRequestStatusDisplayWidget *statusDisplayWidget : entries.value()) {
+    for (CardPictureLoaderRequestStatusDisplayWidget *statusDisplayWidget : entries) {
         if (statusDisplayWidget->getFinished()) {
             continue;
         }
@@ -116,16 +116,8 @@ void CardPictureLoaderStatusBar::removeLogEntry(CardPictureLoaderRequestStatusDi
         return;
     }
 
-    const QString entryUrl = entry->getUrl();
     logEntries.removeOne(entry);
-
-    auto entries = entriesByUrl.find(entryUrl);
-    if (entries != entriesByUrl.end()) {
-        entries.value().removeOne(entry);
-        if (entries.value().isEmpty()) {
-            entriesByUrl.erase(entries);
-        }
-    }
+    entriesByUrl.remove(entry->getUrl(), entry);
 
     // The progress bar's maximum counts the entries currently in the log and
     // its value the finished ones, so dropping an entry moves both counters back.
