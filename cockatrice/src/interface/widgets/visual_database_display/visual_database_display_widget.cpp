@@ -131,7 +131,6 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     databaseView = new CardDatabaseView(this, databaseDisplayModel);
     databaseView->setObjectName("databaseView");
     databaseView->setFocusProxy(searchEdit);
-    databaseView->setItemDelegate(nullptr);
     databaseView->setVisible(false);
 
     // Without a deck model there is nothing to add cards to, so the zone menu stays hidden.
@@ -291,7 +290,6 @@ void VisualDatabaseDisplayWidget::onDisplayModeChanged(bool checked)
         // Table mode
         flowWidget->setVisible(false);
         cardSizeWidget->setVisible(false);
-        databaseView->setItemDelegate(new QStyledItemDelegate(databaseView));
         databaseView->setVisible(true);
     } else {
         // Visual mode
@@ -300,10 +298,17 @@ void VisualDatabaseDisplayWidget::onDisplayModeChanged(bool checked)
         databaseView->setVisible(false);
         populateCards();
     }
+    emit displayModeChanged();
+    if (checked) {
+        onSelectedCardChanged(databaseView->currentCardName());
+    }
 }
 
 void VisualDatabaseDisplayWidget::onClick(QMouseEvent *event, const ExactCard &card)
 {
+    if (event->button() == Qt::LeftButton) {
+        emit cardSelectedDatabaseDisplay(card);
+    }
     emit cardClickedDatabaseDisplay(event, card);
 }
 
@@ -347,7 +352,11 @@ void VisualDatabaseDisplayWidget::onSearchModelChanged()
 
 void VisualDatabaseDisplayWidget::onSelectedCardChanged(const QString &cardName)
 {
-    emit cardHoveredDatabaseDisplay(CardDatabaseManager::query()->getPreferredCard(cardName));
+    const auto card = CardDatabaseManager::query()->getPreferredCard(cardName);
+    if (!isVisualDisplayMode() || searchEdit->hasFocus()) {
+        emit cardSelectedDatabaseDisplay(card);
+    }
+    emit cardHoveredDatabaseDisplay(card);
 }
 
 void VisualDatabaseDisplayWidget::actAddCard(const QString &cardName, const QString &zoneName)

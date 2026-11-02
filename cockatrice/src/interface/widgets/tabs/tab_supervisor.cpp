@@ -479,12 +479,12 @@ void TabSupervisor::resetTabsMenu()
     tabsMenu->clear();
     tabsMenu->addAction(aTabDeckEditor);
     tabsMenu->addAction(aTabVisualDeckEditor);
+    tabsMenu->addAction(aTabVisualDatabaseDisplay);
     tabsMenu->addAction(aTabEdhRec);
     tabsMenu->addAction(aTabArchidekt);
     tabsMenu->addSeparator();
     tabsMenu->addAction(aTabHome);
     tabsMenu->addAction(aTabVisualDeckStorage);
-    tabsMenu->addAction(aTabVisualDatabaseDisplay);
     tabsMenu->addAction(aTabDeckStorage);
     tabsMenu->addAction(aTabReplays);
 }

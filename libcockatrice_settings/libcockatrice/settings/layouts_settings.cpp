@@ -74,6 +74,16 @@ void LayoutsSettings::setVisualDeckEditorGeometry(const QByteArray &value)
     setValue(value, GEOMETRY_PROP, GROUP_VISUAL_DECK_EDITOR);
 }
 
+void LayoutsSettings::setVisualDatabaseDisplayLayoutState(const QByteArray &value)
+{
+    setValue(value, STATE_PROP, "visualDatabaseDisplay");
+}
+
+QByteArray LayoutsSettings::getVisualDatabaseDisplayLayoutState() const
+{
+    return getValue(STATE_PROP, "visualDatabaseDisplay").toByteArray();
+}
+
 QByteArray LayoutsSettings::getDeckEditorDbHeaderState() const
 {
     return getValue(STATE_PROP, GROUP_DECK_EDITOR_DB, "header").toByteArray();

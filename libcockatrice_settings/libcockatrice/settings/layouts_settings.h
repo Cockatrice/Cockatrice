@@ -29,6 +29,9 @@ public:
     void setVisualDeckEditorLayoutState(const QByteArray &value);
     void setVisualDeckEditorGeometry(const QByteArray &value);
 
+    void setVisualDatabaseDisplayLayoutState(const QByteArray &value);
+    QByteArray getVisualDatabaseDisplayLayoutState() const;
+
     void setDeckEditorDbHeaderState(const QByteArray &value);
     void setSetsDialogHeaderState(const QByteArray &value);
     void setSetsDialogGeometry(const QByteArray &value);

@@ -15,6 +15,12 @@
 #include <qtmetamacros.h>
 
 class TabSupervisor;
+class CardInfoFrameWidget;
+class QDockWidget;
+class QMenu;
+class QAction;
+class QLabel;
+class QHideEvent;
 
 class TabVisualDatabaseDisplay : public Tab
 {
@@ -22,6 +28,17 @@ class TabVisualDatabaseDisplay : public Tab
 
 private:
     VisualDatabaseDisplayWidget *visualDatabaseDisplayWidget;
+    CardInfoFrameWidget *cardInfo;
+    QDockWidget *cardInfoDock;
+    QMenu *viewMenu;
+    QAction *resetLayoutAction;
+    QLabel *selectionHint;
+
+    void inspectCard(const ExactCard &card);
+    void resetLayout();
+
+protected:
+    void hideEvent(QHideEvent *event) override;
 
 private slots:
     void openEdhrecTab(const CardInfoPtr &info, bool isCommander) const;

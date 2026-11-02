@@ -91,6 +91,8 @@ public slots:
 
 signals:
     void cardClickedDatabaseDisplay(QMouseEvent *event, const ExactCard &card);
+    void cardSelectedDatabaseDisplay(const ExactCard &card);
+    void displayModeChanged();
     void cardHoveredDatabaseDisplay(const ExactCard &hoveredCard);
 
     void cardAdded(const ExactCard &card, const QString &zoneName);
