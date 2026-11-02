@@ -12,6 +12,7 @@
 #include <QChar>
 #include <QMetaObject>
 #include <QPointer>
+#include <QPixmapCache>
 #include <QRect>
 #include <QSize>
 #include <QStringList>
@@ -109,6 +110,7 @@ void UserCardArtProvider::processQueue()
         return;
     }
 
+    QPointer<UserCardArtProvider> self(this);
     while (!queue.isEmpty()) {
         const QString key = queue.dequeue();
 
@@ -138,17 +140,33 @@ void UserCardArtProvider::processQueue()
             pending.remove(key);
 
             emit cardArtUpdated(userName);
+            if (!self) {
+                return;
+            }
+            continue;
+        }
+
+        // A failed image is cached as a null pixmap. While that failure is
+        // fresh, getPixmap neither starts a new load nor emits an update.
+        // Do not wait for a signal that cannot arrive and block other users.
+        QPixmap cached;
+        if (QPixmapCache::find(card.getPixmapCacheKey(), &cached) && cached.isNull()) {
+            pending.remove(key);
             continue;
         }
 
         // Async load required.
-        QPointer<UserCardArtProvider> self(this);
-
         auto conn = std::make_shared<QMetaObject::Connection>();
 
         *conn = connect(card.getCardPtr().data(), &CardInfo::pixmapUpdated, this,
-                        [self, key, userName, card, conn]() mutable {
+                        [self, key, userName, card, conn](const PrintingInfo &printing) mutable {
                             if (!self) {
+                                return;
+                            }
+
+                            // A CardInfo can own many printings. Another
+                            // printing finishing does not finish this request.
+                            if (printing != card.getPrinting()) {
                                 return;
                             }
 
@@ -166,7 +184,9 @@ void UserCardArtProvider::processQueue()
                             emit self->cardArtUpdated(userName);
 
                             // Resume processing remaining queued items.
-                            self->processQueue();
+                            if (self) {
+                                self->processQueue();
+                            }
                         });
 
         // Stop here. We'll continue when the async load finishes.

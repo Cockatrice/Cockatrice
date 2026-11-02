@@ -13,6 +13,7 @@
 
 UserAvatarProvider::UserAvatarProvider(AbstractClient *client, QObject *parent) : QObject(parent), client(client)
 {
+    retryClock.start();
 }
 
 const QMap<QString, QPixmap> &UserAvatarProvider::cache() const
@@ -25,6 +26,12 @@ void UserAvatarProvider::requestAvatar(const QString &userName)
     if (avatarCache.contains(userName) || pending.contains(userName)) {
         return;
     }
+    if (const qint64 *deadline = retryAfter.object(userName)) {
+        if (retryClock.elapsed() < *deadline) {
+            return;
+        }
+        retryAfter.remove(userName);
+    }
 
     pending.insert(userName);
 
@@ -36,17 +43,29 @@ void UserAvatarProvider::requestAvatar(const QString &userName)
     connect(pend, &PendingCommand::finished, this, [this, userName](const Response &r) {
         pending.remove(userName);
 
+        // A transport or server error is not evidence that the user has no
+        // avatar. Leave it uncached so a later request can try again.
+        if (r.response_code() != Response::RespOk || !r.HasExtension(Response_GetUserInfo::ext)) {
+            retryAfter.insert(userName, new qint64(retryClock.elapsed() + RetryDelayMs));
+            return;
+        }
         const auto &response = r.GetExtension(Response_GetUserInfo::ext);
+        if (!response.has_user_info()) {
+            retryAfter.insert(userName, new qint64(retryClock.elapsed() + RetryDelayMs));
+            return;
+        }
+        retryAfter.remove(userName);
         const auto &user = response.user_info();
         const std::string &bmp = user.avatar_bmp();
 
         QPixmap avatar;
         if (!bmp.empty() &&
-            avatar.loadFromData(reinterpret_cast<const uchar *>(bmp.data()), static_cast<uint>(bmp.size()))) {
-            avatarCache.insert(userName, avatar);
-        } else {
-            avatarCache.insert(userName, QPixmap());
+            !avatar.loadFromData(reinterpret_cast<const uchar *>(bmp.data()), static_cast<uint>(bmp.size()))) {
+            retryAfter.insert(userName, new qint64(retryClock.elapsed() + RetryDelayMs));
+            return;
         }
+        // An empty avatar in a valid response is a real negative result.
+        avatarCache.insert(userName, avatar);
 
         emit avatarUpdated(userName);
     });
