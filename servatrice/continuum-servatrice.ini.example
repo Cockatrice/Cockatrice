@@ -20,7 +20,7 @@ id=1
 
 host=any
 
-; The TCP port number Continuum-Servatrice will listen on for clients; default is 4747;
+; The TCP port number Continuum-Servatrice will listen on for clients; default is 4757;
 ; Will be removed in the future, use websocket connection instead
 port=4757
 
@@ -38,7 +38,7 @@ websocket_number_pools=1
 ; The IP address continuum-servatrice will listen on for websockets clients; defaults to "any"
 websocket_host=any
 
-; The TCP port number continuum-servatrice will listen on for websockets clients; default is 4748
+; The TCP port number continuum-servatrice will listen on for websockets clients; default is 4758
 websocket_port=4758
 
 ; If websockets are served through a reverse proxy (e.g. nginx), the real client address can be
@@ -277,7 +277,7 @@ body="Hi %username, thank our for registering on our Continuumatrice server\r\nH
 ; * mysql: mysql or compatible database;
 type=none
 
-; Prefix used in he database for table names; default is cockatrice
+; Prefix used in he database for table names; default is continuum_servatrice
 prefix=continuum_servatrice
 
 ; Database connection parameter: server hostname or IP
@@ -562,7 +562,7 @@ enable_forgotpassword_audit=true
 ; "servers" table of the database. Default is 0 (disabled)
 active=0
 
-; The TCP port number Continuum-Servatrice will listen on for other servers; default is 14747
+; The TCP port number Continuum-Servatrice will listen on for other servers; default is 14757
 port=14757
 
 ; Server-to-server communication needs a valid certificate in PEM format. Enter its filename in this setting
