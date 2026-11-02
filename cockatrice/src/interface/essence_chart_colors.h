@@ -20,7 +20,13 @@ inline QColor colorFor(const QString &code)
     }
     const int index = Essence::symbols().indexOf(code);
     if (index < 0) {
-        return QColor(145, 149, 156);
+        // These charts are also reused for card types/categories. Retain
+        // distinct readable visualization colors without assigning Essence lore.
+        const QColor recognizedColor(code);
+        if (recognizedColor.isValid()) {
+            return recognizedColor;
+        }
+        return QColor::fromHsv(static_cast<int>(qHash(code) % 360u), 110, 195);
     }
     return QColor::fromHsv((index * 137) % 360, 125, 210);
 }
