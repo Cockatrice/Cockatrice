@@ -22,13 +22,13 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QString>
+#include <QStringList>
 #include <QTextStream>
 #include <QUrl>
 #include <QVBoxLayout>
 #include <functional>
 #include <libcockatrice/card/import/card_name_normalizer.h>
 #include <libcockatrice/network/network_manager.h>
-#include <qcontainerfwd.h>
 #include <qnamespace.h>
 #include <version_string.h>
 
@@ -43,6 +43,7 @@ DlgLoadDeckFromWebsite::DlgLoadDeckFromWebsite(QWidget *parent) : QDialog(parent
     setLayout(layout);
 
     instructionLabel = new QLabel(this);
+    instructionLabel->setWordWrap(true);
     layout->addWidget(instructionLabel);
 
     urlEdit = new QLineEdit(this);
@@ -66,7 +67,7 @@ DlgLoadDeckFromWebsite::DlgLoadDeckFromWebsite(QWidget *parent) : QDialog(parent
 
 void DlgLoadDeckFromWebsite::retranslateUi()
 {
-    instructionLabel->setText(tr("Paste a link to a decklist site here to import it") + "\n" +
+    instructionLabel->setText(tr("Paste a link to a decklist site here to import it.") + "\n" +
                               tr("Supported services: %1").arg(SUPPORTED_PROVIDERS.join(", ")));
 }
 
@@ -86,7 +87,7 @@ void DlgLoadDeckFromWebsite::accept()
         if (!jsonParser && info.provider != DeckProvider::Deckstats && info.provider != DeckProvider::TappedOut) {
             qCWarning(DlgLoadDeckFromWebsiteLog) << "No parser found for provider";
             QMessageBox::warning(this, tr("Load Deck from Website"),
-                                 tr("No parser available for this deck provider") + "\n" +
+                                 tr("No parser available for this deck provider.") + "\n" +
                                      tr("Supported services: %1").arg(SUPPORTED_PROVIDERS.join(", ")));
             QDialog::reject();
             return;

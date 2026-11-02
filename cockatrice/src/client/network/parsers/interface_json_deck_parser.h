@@ -13,11 +13,11 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QList>
+#include <QLoggingCategory>
 #include <QString>
 #include <QTextStream>
 #include <libcockatrice/card/import/card_name_normalizer.h>
 #include <libcockatrice/deck_list/deck_list.h>
-#include <qobject.h>
 
 inline Q_LOGGING_CATEGORY(InterfaceJsonDeckParserLog, "interface_json_deck_parser");
 
@@ -175,7 +175,8 @@ public:
                     commanderList.append(card);
                     break;
                 default:
-                    qCWarning(InterfaceJsonDeckParserLog) << "Unknown ManaBox Zone";
+                    qCWarning(InterfaceJsonDeckParserLog)
+                        << "Unknown ManaBox Zone" << card.value("boardCategory").toInt() << "for" << cardName;
                     break;
             }
         }
@@ -186,30 +187,25 @@ public:
         deckList.setName(deckName);
         deckList.forEachCard(CardNodeFunction::ResolveProviderId());
 
-        if (!maybeboardList.isEmpty()) {
-            for (const auto &maybeboardCard : maybeboardList) {
-                QString cardName = maybeboardCard.value("name").toString();
-                QString setName = maybeboardCard.value("setId").toString().toUpper();
-                QString collectorNumber = maybeboardCard.value("collectorNumber").toString();
-                QString providerId = maybeboardCard.value("scryfallId").toString();
-                auto quantity = maybeboardCard.value("quantity").toInt();
+        for (const auto &maybeboardCard : maybeboardList) {
+            QString cardName = maybeboardCard.value("name").toString();
+            QString setName = maybeboardCard.value("setId").toString().toUpper();
+            QString collectorNumber = maybeboardCard.value("collectorNumber").toString();
+            QString providerId = maybeboardCard.value("scryfallId").toString();
 
-                for (int x = 0; x < quantity; x++) {
-                    deckList.addCard(cardName, DECK_ZONE_MAYBEBOARD, -1, setName, collectorNumber, providerId);
-                }
+            for (int x = 0; x < maybeboardCard.value("quantity").toInt(); x++) {
+                deckList.addCard(cardName, DECK_ZONE_MAYBEBOARD, -1, setName, collectorNumber, providerId);
             }
         }
-        if (!commanderList.isEmpty()) {
-            for (const auto &commanderCard : commanderList) {
+        for (const auto &commanderCard : commanderList) {
 
-                QString commanderName = commanderCard.value("name").toString();
-                QString setName = commanderCard.value("setId").toString().toUpper();
-                QString collectorNumber = commanderCard.value("collectorNumber").toString();
-                QString providerId = commanderCard.value("scryfallId").toString();
+            QString commanderName = commanderCard.value("name").toString();
+            QString setName = commanderCard.value("setId").toString().toUpper();
+            QString collectorNumber = commanderCard.value("collectorNumber").toString();
+            QString providerId = commanderCard.value("scryfallId").toString();
 
-                deckList.setBannerCard({commanderName, providerId});
-                deckList.addCard(commanderName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
-            }
+            deckList.setBannerCard({commanderName, providerId});
+            deckList.addCard(commanderName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
         }
 
         return deckList;
