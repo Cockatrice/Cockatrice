@@ -371,7 +371,7 @@ elseif(WIN32)
   # All three applications are packaged into the same directory on Windows, so
   # this is the union of their Qt module lists, not just the client's: Servatrice
   # contributes Qt6Sql.dll and Oracle contributes nothing the client lacks, and a
-  # client-only manifest leaves Qt6Sql.dll unasserted even though servatrice.exe
+  # client-only manifest leaves Qt6Sql.dll unasserted even though continuum-servatrice.exe
   # is installed next to cockatrice.exe and cannot start without it.
   #
   # A statically linked Qt module ships no runtime DLL, so requiring one would
