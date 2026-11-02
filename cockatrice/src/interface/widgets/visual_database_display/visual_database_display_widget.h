@@ -9,8 +9,6 @@
 
 #include "libcockatrice/card/card_info.h"
 
-#include <QLoggingCategory>
-#include <QMouseEvent>
 #include <QString>
 #include <QStringList>
 #include <QWidget>
@@ -21,26 +19,21 @@
 class CardDatabaseDisplayModel;
 class CardDatabaseModel;
 class CardDatabaseView;
+class CardDatabaseVisualDisplayModel;
+class CardDatabaseVisualView;
 class CardSizeWidget;
-class DeckList;
 class DeckListModel;
 class ExactCard;
 class FilterTreeModel;
 class FlowWidget;
-class OverlapControlWidget;
 class QLabel;
-class QModelIndex;
+class QMouseEvent;
 class QPushButton;
-class QScrollArea;
-class QTimer;
 class QToolButton;
 class QVBoxLayout;
 class SearchLineEdit;
 class VisualDatabaseDisplayColorFilterWidget;
 class VisualDatabaseDisplayFilterToolbarWidget;
-template <typename T> class QList;
-
-inline Q_LOGGING_CATEGORY(VisualDatabaseDisplayLog, "visual_database_display");
 
 class VisualDatabaseDisplayWidget : public QWidget
 {
@@ -51,14 +44,6 @@ public:
                                          CardDatabaseModel *database_model,
                                          DeckListModel *deckListModel = nullptr);
     void retranslateUi();
-
-    void adjustCardsPerPage();
-    void populateCards();
-    void loadPage(int start, int end);
-    void loadNextPage();
-    void loadCurrentPage();
-    void sortCardList(const QStringList &properties, Qt::SortOrder order) const;
-    void setDeckList(const DeckList &new_deck_list_model);
 
     /**
      * @brief Sets the callback used to create a custom zone from the add-to-zone menu.
@@ -87,6 +72,13 @@ public:
     bool isVisualDisplayMode() const;
 
 public slots:
+    /**
+     * @brief Pushes the active set filters to the visual grid.
+     *
+     * The grid's rows follow the display model's filter and sort signals on their
+     * own; this only forwards the set filters, which decide which printings the
+     * grid shows.
+     */
     void onSearchModelChanged();
 
 signals:
@@ -101,11 +93,6 @@ signals:
 
 protected slots:
     void initialize();
-    void onClick(QMouseEvent *event, const ExactCard &card);
-    void onHover(const ExactCard &hoveredCard);
-    void addCardToDisplay(const ExactCard &cardToAdd);
-    void databaseDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
-    void modelDirty() const;
     void onDisplayModeChanged(bool checked);
 
     void onSelectedCardChanged(const QString &cardName);
@@ -125,31 +112,21 @@ private:
     QToolButton *clearFilterWidget;
     VisualDatabaseDisplayFilterToolbarWidget *filterContainer;
     CardDatabaseDisplayModel *databaseDisplayModel;
+    CardDatabaseVisualDisplayModel *visualDisplayModel;
     CardDatabaseView *databaseView;
+    CardDatabaseVisualView *cardView;
     std::function<QString()> newZoneCreator;
-    QList<ExactCard> *cards;
     QVBoxLayout *mainLayout;
-    QScrollArea *scrollArea;
-    FlowWidget *flowWidget;
-    QWidget *overlapCategories;
-    QVBoxLayout *overlapCategoriesLayout;
-    OverlapControlWidget *overlapControlWidget;
     CardSizeWidget *cardSizeWidget;
-    QTimer *debounceTimer;
 
-    int debounceTime = 300; // in Ms
-    int currentPage = 0;    // Current page index
-    int cardsPerPage = 100; // Number of cards per page
     bool filtersInitialized = false;
-    bool initialLoadScheduled = false;
 
     void initializeFilters();
     void highlightAllSearchEdit();
     void updateDisplayModeButton();
-    bool nearEndOfPage() const;
+    [[nodiscard]] QStringList collectSetFilterTerms() const;
 
 protected:
-    void resizeEvent(QResizeEvent *event) override;
     void showEvent(QShowEvent *event) override;
 };
 

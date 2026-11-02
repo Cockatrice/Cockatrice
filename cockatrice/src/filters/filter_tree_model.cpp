@@ -11,6 +11,27 @@
 
 class QObject;
 
+namespace
+{
+/**
+ * @brief Visits every filter item below @p node, depth first.
+ */
+template <typename Callback> void forEachFilter(const FilterTreeNode *node, const Callback &callback)
+{
+    if (node == nullptr) {
+        return;
+    }
+
+    if (const auto *filterItem = dynamic_cast<const FilterItem *>(node)) {
+        callback(filterItem);
+    }
+
+    for (int i = 0; i < node->childCount(); ++i) {
+        forEachFilter(node->nodeAt(i), callback);
+    }
+}
+} // namespace
+
 FilterTreeModel::FilterTreeModel(QObject *parent) : QAbstractItemModel(parent)
 {
     fTree = new FilterTree;
@@ -110,46 +131,31 @@ void FilterTreeModel::clearFiltersOfType(CardFilter::Attr filterType)
 QList<const CardFilter *> FilterTreeModel::getFiltersOfType(CardFilter::Attr filterType) const
 {
     QList<const CardFilter *> filters;
-    if (!fTree) {
-        return filters;
-    }
-
-    std::function<void(const FilterTreeNode *)> traverse;
-    traverse = [&](const FilterTreeNode *node) {
-        if (const auto *filterItem = dynamic_cast<const FilterItem *>(node)) {
-            if (filterItem->attr() == filterType) {
-                QString text = filterItem->text();
-                filters.append(new CardFilter(text, filterItem->type(), filterItem->attr()));
-            }
+    forEachFilter(fTree, [&](const FilterItem *filterItem) {
+        if (filterItem->attr() == filterType) {
+            filters.append(new CardFilter(filterItem->text(), filterItem->type(), filterItem->attr()));
         }
-        for (int i = 0; i < node->childCount(); ++i) {
-            traverse(node->nodeAt(i));
-        }
-    };
-
-    traverse(fTree);
+    });
     return filters;
+}
+
+QStringList FilterTreeModel::getFilterTermsOfType(CardFilter::Attr filterType) const
+{
+    QStringList terms;
+    forEachFilter(fTree, [&](const FilterItem *filterItem) {
+        if (filterItem->attr() == filterType) {
+            terms.append(filterItem->text());
+        }
+    });
+    return terms;
 }
 
 QList<const CardFilter *> FilterTreeModel::allFilters() const
 {
     QList<const CardFilter *> filters;
-    if (!fTree) {
-        return filters;
-    }
-
-    std::function<void(const FilterTreeNode *)> traverse;
-    traverse = [&](const FilterTreeNode *node) {
-        if (const auto *filterItem = dynamic_cast<const FilterItem *>(node)) {
-            QString text = filterItem->text();
-            filters.append(new CardFilter(text, filterItem->type(), filterItem->attr()));
-        }
-        for (int i = 0; i < node->childCount(); ++i) {
-            traverse(node->nodeAt(i));
-        }
-    };
-
-    traverse(fTree);
+    forEachFilter(fTree, [&](const FilterItem *filterItem) {
+        filters.append(new CardFilter(filterItem->text(), filterItem->type(), filterItem->attr()));
+    });
     return filters;
 }
 
