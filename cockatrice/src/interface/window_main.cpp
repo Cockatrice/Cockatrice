@@ -120,17 +120,17 @@
 
 class LocalServerInterface;
 
-#define GITHUB_PAGES_URL "https://cockatrice.github.io"
+#define GITHUB_PAGES_URL "https://github.com/Continuum-Universes-Studio/Continuumatrice"
 #define GITHUB_CONTRIBUTORS_URL "https://github.com/Cockatrice/Cockatrice/graphs/contributors"
 #define GITHUB_CONTRIBUTE_URL "https://github.com/Cockatrice/Cockatrice#"
 #define GITHUB_TRANSIFEX_TRANSLATORS_URL "https://github.com/Cockatrice/Cockatrice/wiki/Translator-Hall-of-Fame"
 #define GITHUB_TRANSLATOR_FAQ_URL "https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ"
-#define GITHUB_ISSUES_URL "https://github.com/Cockatrice/Cockatrice/issues"
+#define GITHUB_ISSUES_URL "https://github.com/Continuum-Universes-Studio/Continuumatrice/issues"
 #define GITHUB_TROUBLESHOOTING_URL "https://github.com/Cockatrice/Cockatrice/wiki/Troubleshooting"
 #define GITHUB_FAQ_URL "https://github.com/Cockatrice/Cockatrice/wiki/Frequently-Asked-Questions"
 
 const QString MainWindow::appName = "Continuumatrice";
-const QStringList MainWindow::fileNameFilters = QStringList() << QObject::tr("Cockatrice card database (*.xml)")
+const QStringList MainWindow::fileNameFilters = QStringList() << QObject::tr("Continuumatrice card database (*.xml)")
                                                               << QObject::tr("All files (*.*)");
 inline Q_LOGGING_CATEGORY(MainWindowLog, "main_window");
 
@@ -291,7 +291,7 @@ void MainWindow::actAbout()
         QMessageBox::NoIcon, tr("About Continuumatrice"),
         QString("<font size=\"8\"><b>Continuumatrice</b></font> (" + QString::fromStdString(BUILD_ARCHITECTURE) + ")<br>" +
                 tr("Version") + QString(" %1").arg(VERSION_STRING) + "<br><br><b><a href='" + GITHUB_PAGES_URL + "'>" +
-                tr("Cockatrice Webpage") + "</a></b><br>" + "<br><b>" + tr("Project Manager:") +
+                tr("Continuumatrice Repository") + "</a></b><br>" + "<br><b>" + tr("Project Manager:") +
                 "</b><br>Zach Halpern<br><br>" + "<b>" + tr("Past Project Managers:") +
                 "</b><br>Gavin Bisesi<br>Max-Wilhelm Bruker<br>Marcus Schütz<br><br>" + "<b>" + tr("Developers:") +
                 "</b><br>" + "<a href='" + GITHUB_CONTRIBUTORS_URL + "'>" + tr("Our Developers") + "</a><br>" +
@@ -304,7 +304,7 @@ void MainWindow::actAbout()
                 "'>" + tr("F.A.Q.") + "</a><br>"),
         QMessageBox::Ok, this);
     mb.setIconPixmap(
-        themePixmap(QStringLiteral("cockatrice")).scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        themePixmap(QStringLiteral("continuumatrice")).scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     mb.setTextInteractionFlags(Qt::TextBrowserInteraction);
     mb.exec();
 }
