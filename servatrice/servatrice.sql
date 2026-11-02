@@ -20,8 +20,6 @@ CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   PRIMARY KEY  (`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
-INSERT INTO cockatrice_schema_version VALUES(41);
-
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
@@ -429,3 +427,6 @@ CREATE TABLE IF NOT EXISTS `cockatrice_card_art_name_rules` (
   ON DELETE SET NULL
   ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Publish the fresh schema version only after every table was created.
+INSERT INTO cockatrice_schema_version VALUES(41);
