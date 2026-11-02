@@ -21,11 +21,12 @@
 #include <qnamespace.h>
 #include <stddef.h>
 #include <string>
+#include <string_view>
 #include <vector>
 
 static peg::parser search(R"(
 Start <- QueryPartList
-~ws <- [ ]+
+~ws <- [ \t\r\n]+
 QueryPartList <- ComplexQueryPart ( ws ("AND" ws)? ComplexQueryPart)* ws*
 
 ComplexQueryPart <- SomewhatComplexQueryPart ws "OR" ws ComplexQueryPart / SomewhatComplexQueryPart
@@ -49,23 +50,26 @@ GenericQuery <- String
 
 NonDoubleQuoteUnlessEscaped <- '\\\"'. / !["].
 NonSingleQuoteUnlessEscaped <- "\\\'". / !['].
-UnescapedStringListPart <- !['":<>()=! ].
+UnescapedStringListPart <- !['":<>()=! \t\r\n].
 SingleApostropheString <- (UnescapedStringListPart+ ws*)* ['] (UnescapedStringListPart+ ws*)*
 
 String <- SingleApostropheString / UnescapedStringListPart+ / ["] <NonDoubleQuoteUnlessEscaped*> ["] / ['] <NonSingleQuoteUnlessEscaped*> [']
 
 NumericExpression <- NumericOperator ws? NumericValue
-NumericOperator <- [=:] / <[><!][=]?>
+NumericOperator <- '!=' / '>=' / '<=' / [><=:]
 NumericValue <- [0-9]+
 )");
 
 static std::once_flag init;
 
-// The peglib parser is a single permanent object, so the rule actions below cannot see
-// per-instance state. The card language that the nested [[card name]] search matches
-// against is passed through this thread-local context, which is live only while a
-// DeckFilterString is being parsed, and copied into the nested FilterString closures.
-thread_local CardSearchLanguage deckSearchLanguageContext;
+// Semantic actions receive per-parse data so a rejected nested query cannot be hidden by NOT or OR.
+struct DeckFilterParseContext
+{
+    CardSearchLanguage searchLanguage;
+    QString error;
+};
+
+using DeckNumberMatcher = std::function<bool(qint64)>;
 
 static void setupParserRules()
 {
@@ -102,36 +106,41 @@ static void setupParserRules()
         return QString::fromStdString(std::string(sv.token(0)));
     };
 
-    search["NumericExpression"] = [](const peg::SemanticValues &sv) -> NumberMatcher {
-        const auto arg = std::any_cast<int>(sv[1]);
+    search["NumericExpression"] = [](const peg::SemanticValues &sv) -> DeckNumberMatcher {
+        const auto arg = std::any_cast<qint64>(sv[1]);
         const auto op = std::any_cast<QString>(sv[0]);
 
         if (op == ">") {
-            return [=](const int s) { return s > arg; };
+            return [=](const qint64 s) { return s > arg; };
         }
         if (op == ">=") {
-            return [=](const int s) { return s >= arg; };
+            return [=](const qint64 s) { return s >= arg; };
         }
         if (op == "<") {
-            return [=](const int s) { return s < arg; };
+            return [=](const qint64 s) { return s < arg; };
         }
         if (op == "<=") {
-            return [=](const int s) { return s <= arg; };
+            return [=](const qint64 s) { return s <= arg; };
         }
         if (op == "=") {
-            return [=](const int s) { return s == arg; };
+            return [=](const qint64 s) { return s == arg; };
         }
         if (op == ":") {
-            return [=](const int s) { return s == arg; };
+            return [=](const qint64 s) { return s == arg; };
         }
         if (op == "!=") {
-            return [=](const int s) { return s != arg; };
+            return [=](const qint64 s) { return s != arg; };
         }
-        return [](int) { return false; };
+        return [](qint64) { return false; };
     };
 
-    search["NumericValue"] = [](const peg::SemanticValues &sv) -> int {
-        return QString::fromStdString(std::string(sv.sv())).toInt();
+    search["NumericValue"] = [](const peg::SemanticValues &sv, std::any &data) -> qint64 {
+        bool valid = false;
+        const auto number = QString::fromStdString(std::string(sv.sv())).toLongLong(&valid);
+        if (!valid) {
+            std::any_cast<DeckFilterParseContext &>(data).error = "Card count is outside the supported integer range.";
+        }
+        return number;
     };
 
     search["NumericOperator"] = [](const peg::SemanticValues &sv) -> QString {
@@ -139,16 +148,21 @@ static void setupParserRules()
     };
 
     // actual functionality
-    search["DeckContentQuery"] = [](const peg::SemanticValues &sv) -> DeckFilter {
-        auto cardFilter = FilterString(std::any_cast<QString>(sv[0]), deckSearchLanguageContext);
-        auto numberMatcher = sv.size() > 1 ? std::any_cast<NumberMatcher>(sv[1]) : [](int count) { return count > 0; };
+    search["DeckContentQuery"] = [](const peg::SemanticValues &sv, std::any &parseData) -> DeckFilter {
+        auto &context = std::any_cast<DeckFilterParseContext &>(parseData);
+        auto cardFilter = FilterString(std::any_cast<QString>(sv[0]), context.searchLanguage);
+        if (!cardFilter.valid()) {
+            context.error = QString("Invalid card query: %1").arg(cardFilter.error());
+        }
+        auto numberMatcher =
+            sv.size() > 1 ? std::any_cast<DeckNumberMatcher>(sv[1]) : [](qint64 count) { return count > 0; };
 
         return [=](const DeckSearchData &data) -> bool {
-            int count = 0;
+            qint64 count = 0;
             auto cardNodes = data.deck->deckList.getCardNodes();
             for (auto node : cardNodes) {
                 auto cardInfoPtr = CardDatabaseManager::query()->getCardInfo(node->getName());
-                if (!cardInfoPtr.isNull() && cardFilter.check(cardInfoPtr)) {
+                if (node->getNumber() > 0 && !cardInfoPtr.isNull() && cardFilter.check(cardInfoPtr)) {
                     count += node->getNumber();
                 }
             }
@@ -212,7 +226,8 @@ DeckFilterString::DeckFilterString()
 
 DeckFilterString::DeckFilterString(const QString &expr, const CardSearchLanguage &searchLanguage)
 {
-    QByteArray ba = expr.simplified().toUtf8();
+    // Trim only the query boundary: repeated spaces inside quoted names, paths and comments are significant.
+    QByteArray ba = expr.trimmed().toUtf8();
 
     std::call_once(init, setupParserRules);
 
@@ -223,13 +238,20 @@ DeckFilterString::DeckFilterString(const QString &expr, const CardSearchLanguage
         return;
     }
 
-    deckSearchLanguageContext = searchLanguage;
+    std::any parseData = DeckFilterParseContext{searchLanguage, {}};
 
     search.set_logger([&](size_t /*ln*/, size_t col, const std::string &msg) {
         _error = QString("Error at position %1: %2").arg(col).arg(QString::fromStdString(msg));
     });
 
-    if (!search.parse(ba.data(), filter)) {
+    const bool parsed = search.parse(std::string_view(ba.constData(), ba.size()), parseData, filter);
+    // The parser keeps its logger between calls; do not leave a callback referring to this object behind.
+    search.set_logger(peg::Log{});
+    const auto &semanticError = std::any_cast<const DeckFilterParseContext &>(parseData).error;
+    if (!semanticError.isEmpty()) {
+        _error = semanticError;
+    }
+    if (!parsed || !_error.isEmpty()) {
         qCInfo(DeckFilterStringLog).nospace() << "DeckFilterString error for " << expr << "; " << qPrintable(_error);
         filter = [](const DeckSearchData &) { return false; };
     }

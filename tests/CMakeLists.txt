@@ -171,6 +171,22 @@ endfunction()
 
 # --- Unit tests ------------------------------------------------------------------
 
+if(WITH_ORACLE OR WITH_CLIENT)
+  cockatrice_add_test(
+    NAME
+    deck_filter_string_test
+    SOURCES
+    ${VERSION_STRING_CPP}
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/filters/deck_filter_string.cpp
+    deck_filter_string_test.cpp
+    LIBS
+    libcockatrice_filters
+    libcockatrice_deck_list
+    INCLUDE_DIRS
+    ${CMAKE_SOURCE_DIR}/cockatrice/src
+  )
+endif()
+
 cockatrice_add_test(NAME expression_test SOURCES expression_test.cpp LIBS libcockatrice_utility)
 cockatrice_add_test(NAME clamped_arithmetic_test SOURCES clamped_arithmetic_test.cpp LIBS libcockatrice_utility)
 cockatrice_add_test(NAME test_age_formatting SOURCES test_age_formatting.cpp LIBS libcockatrice_utility)
