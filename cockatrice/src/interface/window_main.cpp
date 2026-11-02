@@ -231,7 +231,7 @@ void MainWindow::actWatchReplay()
 {
     QFileDialog dlg(this, tr("Load replay"));
     dlg.setDirectory(SettingsCache::instance().paths().getReplaysPath());
-    dlg.setNameFilters(QStringList() << QObject::tr("Cockatrice replays (*.cor)"));
+    dlg.setNameFilters(QStringList() << QObject::tr("Continuumatrice replays (*.cor)"));
     if (!dlg.exec()) {
         return;
     }
@@ -291,7 +291,7 @@ void MainWindow::actAbout()
         QMessageBox::NoIcon, tr("About Continuumatrice"),
         QStringLiteral("<font size=\"8\"><b>Continuumatrice</b></font><br>") +
             tr("Continuum Universes Studio") + QStringLiteral(" — ") + tr("Version") +
-            QStringLiteral(" ") + QStringLiteral(VERSION_STRING) +
+            QStringLiteral(" ") + QString(VERSION_STRING) +
             QStringLiteral("<br><br>") +
             tr("Continuumatrice is a standalone Continuum Universes card-game client.") +
             QStringLiteral("<br><a href='https://github.com/Continuum-Universes-Studio/Continuumatrice'>") +
