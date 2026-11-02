@@ -284,10 +284,10 @@ prefix=continuum_servatrice
 hostname=localhost
 
 ; Database connection parameter: database name
-database=continuum-servatrice
+database=continuum_servatrice
 
 ; Database connection parameter: database user
-user=continuum-servatrice
+user=continuum_servatrice
 
 ; Database connection parameter: database user's password
 password=foobar
@@ -563,7 +563,7 @@ enable_forgotpassword_audit=true
 active=0
 
 ; The TCP port number Continuum-Servatrice will listen on for other servers; default is 14747
-port=14747
+port=14757
 
 ; Server-to-server communication needs a valid certificate in PEM format. Enter its filename in this setting
 ssl_cert=ssl_cert.pem
