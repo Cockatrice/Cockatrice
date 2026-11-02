@@ -62,6 +62,7 @@ class Message;
 } // namespace protobuf
 } // namespace google
 struct GameConfig;
+struct RoleInfo;
 
 class Server_Game : public QObject
 {
@@ -109,6 +110,7 @@ private:
                                      bool omniscient,
                                      bool withUserInfo);
     void storeGameInformation();
+    bool canSeePrivateEventsFor(const Server_AbstractParticipant *participant, int privatePlayerId) const;
 signals:
     void sigStartGameIfReady(bool override);
     void gameInfoChanged(ServerInfo_Game gameInfo);
@@ -188,12 +190,11 @@ public:
         return shareDecklistsOnLoad;
     }
     Response::ResponseCode
-    checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions, bool asJudge);
+    checkJoin(ServerInfo_User *user, const QString &_password, const RoleInfo &roleInfo, bool overrideRestrictions);
     bool containsUser(const QString &userName) const;
     void addPlayer(Server_AbstractUserInterface *userInterface,
                    ResponseContainer &rc,
-                   bool spectator,
-                   bool judge,
+                   const RoleInfo &roleInfo,
                    bool broadcastUpdate = true);
     void removeParticipant(Server_AbstractParticipant *participant, Event_Leave::LeaveReason reason);
     void removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_AbstractPlayer *player);
