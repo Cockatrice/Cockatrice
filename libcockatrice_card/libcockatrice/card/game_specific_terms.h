@@ -16,6 +16,14 @@
  * Note: Mtg = "Maybe that game"
  */
 
+// These remain only for reading older Cockatrice XML. New cards use Essence.
+namespace EssenceProperties
+{
+inline const QString Cost = QStringLiteral("essencecost");
+inline const QString Types = QStringLiteral("essence");
+inline const QString Value = QStringLiteral("essencevalue");
+}
+
 namespace Mtg
 {
 QString const CardType("type");
@@ -31,23 +39,23 @@ QString const ColorIdentity("coloridentity");
 
 inline static const QString getNicePropertyName(QString key)
 {
+    if (key == EssenceProperties::Cost || key == ManaCost) {
+        return QCoreApplication::translate("Essence", "Essence Cost");
+    }
+    if (key == EssenceProperties::Types || key == Colors || key == ColorIdentity) {
+        return QCoreApplication::translate("Essence", "Essence");
+    }
+    if (key == EssenceProperties::Value || key == ConvertedManaCost) {
+        return QCoreApplication::translate("Essence", "Essence Value");
+    }
     if (key == CardType) {
         return QCoreApplication::translate("Mtg", "Card Type");
-    }
-    if (key == ConvertedManaCost) {
-        return QCoreApplication::translate("Mtg", "Mana Value");
-    }
-    if (key == Colors) {
-        return QCoreApplication::translate("Mtg", "Color(s)");
     }
     if (key == Loyalty) {
         return QCoreApplication::translate("Mtg", "Loyalty");
     }
     if (key == MainCardType) {
         return QCoreApplication::translate("Mtg", "Main Card Type");
-    }
-    if (key == ManaCost) {
-        return QCoreApplication::translate("Mtg", "Mana Cost");
     }
     if (key == PowTough) {
         return QCoreApplication::translate("Mtg", "P/T");
@@ -57,9 +65,6 @@ inline static const QString getNicePropertyName(QString key)
     }
     if (key == Layout) {
         return QCoreApplication::translate("Mtg", "Layout");
-    }
-    if (key == ColorIdentity) {
-        return QCoreApplication::translate("Mtg", "Color Identity");
     }
     return key;
 }
