@@ -84,7 +84,7 @@ SoundEngine *soundEngine;
 QSystemTrayIcon *trayIcon;
 ThemeManager *themeManager;
 
-const QString translationPrefix = "cockatrice";
+const QString translationPrefix = "cockatrice"; // Keep inherited translation catalogue until retranslated.
 QString translationPath;
 
 static void CockatriceLogger(QtMsgType type, const QMessageLogContext &ctx, const QString &message)
