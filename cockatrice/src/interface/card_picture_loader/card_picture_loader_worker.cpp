@@ -6,9 +6,9 @@
 #include "card_picture_loader_local.h"
 #include "card_picture_loader_worker_work.h"
 #include "card_picture_to_load.h"
-#include "redirect_chain.h"
 #include "libcockatrice/card/printing/exact_card.h"
 #include "libcockatrice/utility/server_rate_limiter.h"
+#include "redirect_chain.h"
 
 #include <QAbstractNetworkCache>
 #include <QByteArray>
@@ -102,23 +102,22 @@ CardPictureLoaderWorker::CardPictureLoaderWorker()
 
     connect(&SettingsCache::instance().downloads(), &DownloadSettings::hostRequestLimitsChanged, this,
             [this] { hostRequestLimits = SettingsCache::instance().downloads().getHostRequestLimits(); });
-    connect(&SettingsCache::instance().downloads(), &DownloadSettings::picDownloadChanged, this,
-            [this] {
-                picDownload = SettingsCache::instance().downloads().getPicDownload();
-                if (!picDownload) {
-                    // Waiting for network quota or 429 recovery cannot help a cache-only lookup.
-                    // Retire cancelled status entries just as the normal dispatcher does.
-                    while (!requestLoadQueue.isEmpty()) {
-                        const auto entry = requestLoadQueue.takeFirst();
-                        if (entry.second) {
-                            makeRequest(entry.first, entry.second);
-                        } else {
-                            emit imageRequestSucceeded(entry.first);
-                        }
-                    }
-                    updateTimerState();
+    connect(&SettingsCache::instance().downloads(), &DownloadSettings::picDownloadChanged, this, [this] {
+        picDownload = SettingsCache::instance().downloads().getPicDownload();
+        if (!picDownload) {
+            // Waiting for network quota or 429 recovery cannot help a cache-only lookup.
+            // Retire cancelled status entries just as the normal dispatcher does.
+            while (!requestLoadQueue.isEmpty()) {
+                const auto entry = requestLoadQueue.takeFirst();
+                if (entry.second) {
+                    makeRequest(entry.first, entry.second);
+                } else {
+                    emit imageRequestSucceeded(entry.first);
                 }
-            });
+            }
+            updateTimerState();
+        }
+    });
 }
 
 CardPictureLoaderWorker::~CardPictureLoaderWorker()
@@ -157,9 +156,9 @@ void CardPictureLoaderWorker::queueRequest(const QUrl &url, CardPictureLoaderWor
 {
     const QUrl resolvedUrl = resolveCachedRedirect(url);
     if (!picDownload || (static_cast<CardPictureLoaderCacheMethod::CacheMethod>(
-            SettingsCache::instance().cacheStorage().getCardPictureLoaderCacheMethod()) ==
-            CardPictureLoaderCacheMethod::CacheMethod::NETWORK_CACHE &&
-        cache->metaData(resolvedUrl).isValid() && !worker->shouldBypassCache(resolvedUrl))) {
+                             SettingsCache::instance().cacheStorage().getCardPictureLoaderCacheMethod()) ==
+                             CardPictureLoaderCacheMethod::CacheMethod::NETWORK_CACHE &&
+                         cache->metaData(resolvedUrl).isValid() && !worker->shouldBypassCache(resolvedUrl))) {
         // A request that will be served from the disk cache never touches the network and therefore
         // doesn't use up any of the rate limit, so it gets to skip the queue.
         // Every reply retires a status, including online cache hits and deferred
@@ -180,9 +179,8 @@ QNetworkReply *CardPictureLoaderWorker::makeRequest(const QUrl &url, CardPicture
     const QUrl resolvedUrl = resolveCachedRedirect(url);
     if (resolvedUrl != url) {
         emit imageRequestSucceeded(url);
-        if (requestTouchesNetwork(resolvedUrl, worker) &&
-            CardPictureLoaderWorkerWork::rateLimiter().isRateLimited(resolvedUrl.host(),
-                                                                     QDateTime::currentDateTime())) {
+        if (requestTouchesNetwork(resolvedUrl, worker) && CardPictureLoaderWorkerWork::rateLimiter().isRateLimited(
+                                                              resolvedUrl.host(), QDateTime::currentDateTime())) {
             worker->scheduleDeferredRetry(resolvedUrl.host());
             return nullptr;
         }
@@ -443,8 +441,7 @@ bool CardPictureLoaderWorker::processSingleRequest()
     return false;
 }
 
-bool CardPictureLoaderWorker::requestTouchesNetwork(const QUrl &url,
-                                                  const CardPictureLoaderWorkerWork *worker) const
+bool CardPictureLoaderWorker::requestTouchesNetwork(const QUrl &url, const CardPictureLoaderWorkerWork *worker) const
 {
     if (!picDownload) {
         return false;

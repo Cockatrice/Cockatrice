@@ -4,9 +4,9 @@
 #include <QBuffer>
 #include <QByteArray>
 #include <QByteArrayList>
+#include <QIODevice>
 #include <QImage>
 #include <QImageReader>
-#include <QIODevice>
 #include <QMovie>
 #include <QString>
 

@@ -6,8 +6,8 @@
 #include <QImage>
 #include <QLoggingCategory>
 #include <QObject>
-#include <QString>
 #include <QSet>
+#include <QString>
 #include <QTimer>
 #include <QUrl>
 #include <qtmetamacros.h>
@@ -80,7 +80,7 @@ public slots:
     void handleNetworkReply(QNetworkReply *reply);
 
 private:
-    bool picDownload; ///< Whether network downloading is enabled
+    bool picDownload;                ///< Whether network downloading is enabled
     QTimer *deferredRetry = nullptr; ///< Owned retry, cancellable when downloads are disabled
     QSet<QUrl> retriedCacheUrls;
 

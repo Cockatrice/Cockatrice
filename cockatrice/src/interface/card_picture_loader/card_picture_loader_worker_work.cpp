@@ -263,8 +263,7 @@ void CardPictureLoaderWorkerWork::handleSuccessfulReply(QNetworkReply *reply)
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     if (statusCode == 301 || statusCode == 302 || statusCode == 303 || statusCode == 305 || statusCode == 307 ||
         statusCode == 308) {
-        QUrl redirectUrl = reply->url().resolved(
-            reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl());
+        QUrl redirectUrl = reply->url().resolved(reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl());
         qCDebug(CardPictureLoaderWorkerWorkLog).nospace()
             << "PictureLoader: [card: " << cardToDownload.getCard().getName() << " set: " << cardToDownload.getSetName()
             << "]: following " << (isFromCache ? "cached redirect" : "redirect") << " to "
