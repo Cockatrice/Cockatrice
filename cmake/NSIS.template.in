@@ -2348,8 +2348,8 @@ ${AndIf} ${FileExists} "$INSTDIR\portable.dat"
 	StrCpy $DllPurgeRan 1
 	Delete "$INSTDIR\qt.conf"
 	Delete "$INSTDIR\qdebug.txt"
-	Delete "$INSTDIR\servatrice.sql"
-	Delete "$INSTDIR\servatrice.ini.example"
+	Delete "$INSTDIR\continuum-servatrice.sql"
+	Delete "$INSTDIR\continuum-servatrice.ini.example"
 	RMDir "$INSTDIR"
 	!insertmacro CockLogListing "after-portable-purge" "*.dll"
 ${EndIf}
