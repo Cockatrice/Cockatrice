@@ -238,11 +238,13 @@ int main(int argc, char *argv[])
     app.addLibraryPath(app.applicationDirPath() + "/plugins");
 #endif
 
-    // These values are only used by the settings loader/saver
-    // Wrong or outdated values are kept to not break things
-    QCoreApplication::setOrganizationName("Cockatrice");
-    QCoreApplication::setOrganizationDomain("cockatrice.github.io");
-    QCoreApplication::setApplicationName("Cockatrice");
+    // Continuumatrice must never use Cockatrice's profile. These identifiers are
+    // set before SettingsCache is initialized, so Qt's AppLocalDataLocation,
+    // CacheLocation and legacy QSettings migration use independent paths.
+    // Keep the application name stable: changing it again would move profiles.
+    QCoreApplication::setOrganizationName("Continuum Universes Studio");
+    QCoreApplication::setOrganizationDomain("continuum-universes.com");
+    QCoreApplication::setApplicationName("Continuumatrice");
     QCoreApplication::setApplicationVersion(VERSION_STRING);
 
 #ifdef Q_OS_MAC
@@ -336,7 +338,7 @@ int main(int argc, char *argv[])
 
     // Command-line parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Cockatrice Client");
+    parser.setApplicationDescription("Continuumatrice Client");
     parser.addHelpOption();
     parser.addVersionOption();
 
