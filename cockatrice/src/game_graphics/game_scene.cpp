@@ -719,6 +719,9 @@ void GameScene::updateHover(const QPointF &scenePos)
 
 void GameScene::updateHoveredCard(CardItem *newCard)
 {
+    if (newCard == hoveredCard) {
+        return;
+    }
     if (hoveredCard && (newCard != hoveredCard)) {
         endCardHover(hoveredCard);
     }
@@ -726,6 +729,7 @@ void GameScene::updateHoveredCard(CardItem *newCard)
         beginCardHover(newCard);
     }
     hoveredCard = newCard;
+    emit hoveredCardChanged(newCard);
 }
 
 void GameScene::beginCardHover(CardItem *card)

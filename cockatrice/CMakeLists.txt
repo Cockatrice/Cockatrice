@@ -166,6 +166,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/cards/card_group_display_widgets/overlapped_card_group_display_widget.cpp
     src/interface/widgets/cards/card_info_display_widget.cpp
     src/interface/widgets/cards/card_info_frame_widget.cpp
+    src/interface/widgets/cards/game_card_info_controller.cpp
     src/interface/widgets/cards/card_info_picture_art_crop_widget.cpp
     src/interface/widgets/cards/card_info_picture_enlarged_widget.cpp
     src/interface/widgets/cards/card_info_picture_widget.cpp

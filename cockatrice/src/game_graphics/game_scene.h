@@ -301,6 +301,7 @@ protected:
     void timerEvent(QTimerEvent *event) override;
 
 signals:
+    void hoveredCardChanged(CardItem *card);
     void sigStartRubberBand(const QPointF &selectionOrigin);
     void sigResizeRubberBand(const QPointF &cursorPoint, int selectedCount);
     void sigStopRubberBand();

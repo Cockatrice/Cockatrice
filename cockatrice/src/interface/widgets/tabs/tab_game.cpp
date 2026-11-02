@@ -18,6 +18,7 @@
 #include "../game_graphics/player/player_list_widget.h"
 #include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../interface/widgets/cards/card_info_frame_widget.h"
+#include "../interface/widgets/cards/game_card_info_controller.h"
 #include "../interface/widgets/dialogs/dlg_create_game.h"
 #include "../interface/widgets/dialogs/dlg_invite_to_game.h"
 #include "../interface/widgets/server/game_link.h"
@@ -1013,8 +1014,7 @@ void TabGame::newCardAdded(AbstractCardItem *card)
     connect(card, &AbstractCardItem::playSelected, scene, &GameScene::playSelected);
     connect(card, &AbstractCardItem::playSelectedFaceDown, scene, &GameScene::playSelectedFaceDown);
     connect(card, &AbstractCardItem::hideSelected, scene, &GameScene::hideSelected);
-    connect(card, &AbstractCardItem::hovered, cardInfoFrameWidget,
-            qOverload<AbstractCardItem *>(&CardInfoFrameWidget::setCard));
+    cardInfoController->registerCard(card);
     connect(card, &AbstractCardItem::selectionChanged, scene, &GameScene::onCardSelectionChanged);
     connect(card, &AbstractCardItem::showCardInfoPopup, this, &TabGame::showCardInfoPopup);
     connect(card, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
@@ -1291,6 +1291,7 @@ void TabGame::createPlayAreaWidget(bool bReplay)
                 &GameEventHandler::handleDrawCard);
     }
     scene = new GameScene(phasesToolbar, this);
+    cardInfoController = new GameCardInfoController(scene, cardInfoFrameWidget, cardInfoFrameWidget);
     connect(game->getPlayerManager(), &PlayerManager::playerConceded, scene, &GameScene::rearrange);
     connect(game->getPlayerManager(), &PlayerManager::playerCountChanged, scene, &GameScene::rearrange);
     connect(scene, &GameScene::arrowDeletionRequested, game->getGameEventHandler(),

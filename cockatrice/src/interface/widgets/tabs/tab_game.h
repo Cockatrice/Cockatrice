@@ -51,6 +51,7 @@ class GameView;
 class GameScene;
 class ReplayWidget;
 class CardInfoFrameWidget;
+class GameCardInfoController;
 class QLabel;
 class QPushButton;
 class QMenu;
@@ -77,6 +78,7 @@ private:
     QStackedWidget *mainWidget;
 
     CardInfoFrameWidget *cardInfoFrameWidget;
+    GameCardInfoController *cardInfoController;
     PlayerListWidget *playerListWidget;
     QPushButton *inviteButton = nullptr;
     QLabel *timeElapsedLabel;
