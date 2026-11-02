@@ -18,6 +18,9 @@ option(UPDATE_TRANSLATIONS "Update translations on compile" OFF)
 option(WITH_CLIENT "Build Continuumatrice client" ON)
 # Compile Oracle
 option(WITH_ORACLE "Build legacy upstream Magic-card Oracle importer (not Continuumatrice data)" OFF)
+if(WITH_ORACLE)
+  message(FATAL_ERROR "The upstream Oracle importer fetches Magic data and cannot be distributed as Continuumatrice. Build with -DWITH_ORACLE=OFF; use your own card XML.")
+endif()
 # Compile Servatrice
 option(WITH_SERVER "Build Continuumatrice-compatible server" OFF)
 # Compile tests
