@@ -683,7 +683,17 @@ void GameScene::onCardViewRefreshRequested(CardState *card, bool zoneChanged, Pl
     item->deleteDragItem();
     if (zoneChanged) {
         item->setBeingPointedAt(false);
-        item->setHovered(false);
+        if (hoveredCard == item) {
+            // End the scene-owned hover as well as the item's visual hover so
+            // observers can restore the selected card after the move.
+            QPointer<CardItem> movingItem(item);
+            updateHoveredCard(nullptr);
+            if (!movingItem) {
+                return;
+            }
+        } else {
+            item->setHovered(false);
+        }
     }
     if (newOwner) {
         item->setOwner(newOwner);
@@ -715,6 +725,11 @@ void GameScene::updateHover(const QPointF &scenePos)
     CardZone *zone = findTopmostZone(itemList);
     CardItem *topCard = zone ? findTopmostCardInZone(itemList, zone) : nullptr;
     updateHoveredCard(topCard);
+}
+
+void GameScene::clearHoveredCard()
+{
+    updateHoveredCard(nullptr);
 }
 
 void GameScene::updateHoveredCard(CardItem *newCard)

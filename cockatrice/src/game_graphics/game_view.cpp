@@ -113,6 +113,20 @@ void GameView::resizeEvent(QResizeEvent *event)
     updateTotalSelectionCount(event->size());
 }
 
+bool GameView::viewportEvent(QEvent *event)
+{
+    // Let QGraphicsView deliver item hover-leave events first (including pile
+    // previews), then clear the scene's independent game-card hover state.
+    const bool leaving = event->type() == QEvent::Leave;
+    const bool handled = QGraphicsView::viewportEvent(event);
+    if (leaving) {
+        if (auto *gameScene = qobject_cast<GameScene *>(scene())) {
+            gameScene->clearHoveredCard();
+        }
+    }
+    return handled;
+}
+
 void GameView::updateSceneRect(const QRectF &rect)
 {
     fitInView(rect, Qt::KeepAspectRatio);

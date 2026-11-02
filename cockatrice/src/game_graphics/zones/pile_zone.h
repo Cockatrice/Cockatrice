@@ -9,6 +9,7 @@
 
 #include "card_zone.h"
 
+#include <QPointer>
 #include <qtmetamacros.h>
 
 class PileZoneLogic;
@@ -21,6 +22,11 @@ class QGraphicsItem;
 class PileZone : public CardZone
 {
     Q_OBJECT
+private:
+    QPointer<CardItem> previewedCard;
+    bool pointerInside = false;
+    void updatePreviewCard();
+
 private slots:
     void callUpdate()
     {
@@ -42,6 +48,7 @@ protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 };
 
 #endif

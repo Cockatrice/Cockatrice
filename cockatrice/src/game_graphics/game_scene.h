@@ -111,6 +111,9 @@ public:
     /** @brief Updates UI text for all zone views. */
     void retranslateUi();
 
+    /** @brief Ends the current game-card hover when the view is left. */
+    void clearHoveredCard();
+
     /** @brief Gets all selected CardItems. */
     QList<CardItem *> selectedCards() const;
     QList<CardState *> selectedCardStates() const;

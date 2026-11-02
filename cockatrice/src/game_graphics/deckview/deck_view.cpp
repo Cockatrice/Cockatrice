@@ -221,6 +221,12 @@ void DeckViewCard::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
     processHoverEvent();
 }
 
+void DeckViewCard::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+    event->accept();
+    processHoverLeaveEvent();
+}
+
 DeckViewCardContainer::DeckViewCardContainer(const QString &_name) : QGraphicsItem(), name(_name), width(0), height(0)
 {
     setCacheMode(DeviceCoordinateCache);

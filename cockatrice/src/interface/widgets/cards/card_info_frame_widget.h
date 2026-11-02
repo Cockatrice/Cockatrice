@@ -52,6 +52,9 @@ public:
     }
     void retranslateUi();
 
+signals:
+    void cardChanged();
+
 public slots:
     void setCard(const ExactCard &card);
     void setCard(const QString &cardName);

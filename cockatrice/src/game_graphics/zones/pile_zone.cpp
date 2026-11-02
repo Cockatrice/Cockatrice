@@ -33,6 +33,8 @@ PileZone::PileZone(PileZoneLogic *_logic, QGraphicsItem *parent) : CardZone(_log
     setCacheMode(DeviceCoordinateCache); // Do not move this line to the parent constructor!
     setAcceptHoverEvents(true);
     setCursor(Qt::OpenHandCursor);
+    connect(_logic, &CardZoneLogic::cardCountChanged, this, &PileZone::updatePreviewCard);
+    connect(_logic, &CardZoneLogic::reorganizeCards, this, &PileZone::updatePreviewCard);
 
     setTransform(QTransform()
                      .translate(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F)
@@ -144,8 +146,36 @@ void PileZone::mouseReleaseEvent(QGraphicsSceneMouseEvent * /*event*/)
 
 void PileZone::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
-    if (!cardItems().isEmpty()) {
-        cardItems()[0]->processHoverEvent();
-    }
+    pointerInside = true;
+    updatePreviewCard();
     QGraphicsItem::hoverEnterEvent(event);
+}
+
+void PileZone::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+    pointerInside = false;
+    updatePreviewCard();
+    QGraphicsItem::hoverLeaveEvent(event);
+}
+
+void PileZone::updatePreviewCard()
+{
+    QPointer<CardItem> nextCard;
+    if (pointerInside && !cardItems().isEmpty()) {
+        nextCard = cardItems().first();
+    }
+    if (nextCard == previewedCard) {
+        return;
+    }
+
+    const auto previousCard = previewedCard;
+    previewedCard = nextCard;
+    if (previousCard) {
+        previousCard->processHoverLeaveEvent();
+    }
+    // A pile can change while the pointer stays still, for example when its
+    // top card moves. Follow the new top without retaining the removed card.
+    if (nextCard && previewedCard == nextCard) {
+        nextCard->processHoverEvent();
+    }
 }

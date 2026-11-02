@@ -48,6 +48,7 @@ public slots:
 
 signals:
     void hovered(AbstractCardItem *card);
+    void hoverEnded(AbstractCardItem *card);
     void showCardInfoPopup(const QPoint &pos, const CardRef &cardRef);
     void deleteCardInfoPopup(QString cardName);
     void sigPixmapUpdated();
@@ -142,6 +143,10 @@ public:
         state->setFaceDown(_facedown);
     }
     void processHoverEvent();
+    void processHoverLeaveEvent()
+    {
+        emit hoverEnded(this);
+    }
     /** @brief Drop a pending collapse and disarm any deferred collapse timer. */
     void cancelPendingSelectionCollapse();
     void deleteCardInfoPopup()

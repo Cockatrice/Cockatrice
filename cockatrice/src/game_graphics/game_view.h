@@ -43,6 +43,7 @@ private:
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
+    bool viewportEvent(QEvent *event) override;
 private slots:
     void startRubberBand(const QPointF &selectionOrigin);
     void resizeRubberBand(const QPointF &cursorPoint, int selectedCount);

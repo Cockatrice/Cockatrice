@@ -166,6 +166,7 @@ void CardInfoFrameWidget::setCard(const ExactCard &card)
 
     text->setCard(exactCard);
     pic->setCard(exactCard);
+    emit cardChanged();
 }
 
 void CardInfoFrameWidget::setCard(const QString &cardName)

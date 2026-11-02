@@ -5,6 +5,7 @@
 #include "../../../game_graphics/game_scene.h"
 #include "card_info_frame_widget.h"
 
+#include <QScopedValueRollback>
 #include <QTimer>
 #include <algorithm>
 
@@ -23,27 +24,35 @@ GameCardInfoController::GameCardInfoController(GameScene *_scene, CardInfoFrameW
             restoreSelection();
         }
     });
+    // Message links, /card, and the transformation button can independently
+    // replace the preview. Stop following the previous game item's identity.
+    connect(frame, &CardInfoFrameWidget::cardChanged, this, [this] {
+        if (!settingFrame) {
+            displayedCard = nullptr;
+            ++displayRevision;
+            disconnect(displayDestruction);
+        }
+    });
 }
 
 void GameCardInfoController::registerCard(AbstractCardItem *card)
 {
     // Piles and pre-game deck views also request previews directly, without a
     // GameScene hover transition.
-    connect(card, &AbstractCardItem::hovered, this, [this](AbstractCardItem *item) { showCard(item); });
+    connect(card, &AbstractCardItem::hovered, this, [this](AbstractCardItem *item) {
+        hoveredCard = item;
+        showCard(item);
+    });
+    connect(card, &AbstractCardItem::hoverEnded, this, [this](AbstractCardItem *item) {
+        if (hoveredCard == item) {
+            hoveredCard = nullptr;
+            restoreSelection();
+        }
+    });
     connect(card->getState(), &CardState::cardInfoChanged, this, [this, card] {
         if (displayedCard == card) {
             showCard(card);
         }
-    });
-    connect(card, &QObject::destroyed, this, [this] {
-        QTimer::singleShot(0, this, [this] {
-            updateSelection();
-            if (!hoveredCard && selectedCard) {
-                restoreSelection();
-            } else if (!displayedCard && frame) {
-                frame->clearCard();
-            }
-        });
     });
 }
 
@@ -93,11 +102,34 @@ void GameCardInfoController::showCard(AbstractCardItem *card)
         return;
     }
 
-    displayedCard = card;
+    if (displayedCard != card) {
+        displayedCard = card;
+        const auto revision = ++displayRevision;
+        disconnect(displayDestruction);
+        displayDestruction = connect(card, &QObject::destroyed, this, [this, revision] {
+            QTimer::singleShot(0, this, [this, revision] {
+                // A newer game preview or an independent frame action wins.
+                if (revision != displayRevision) {
+                    return;
+                }
+                updateSelection();
+                if (hoveredCard) {
+                    showCard(hoveredCard);
+                } else if (selectedCard) {
+                    showCard(selectedCard);
+                } else if (frame) {
+                    ++displayRevision;
+                    QScopedValueRollback<bool> guard(settingFrame, true);
+                    frame->clearCard();
+                }
+            });
+        });
+    }
     const auto exactCard = card->getCard();
     // Repeated selection/hover signals must not reset the description scroll or
     // recreate the transformation button when the displayed printing is unchanged.
     if (frame->getCard() != exactCard) {
+        QScopedValueRollback<bool> guard(settingFrame, true);
         frame->setCard(exactCard);
     }
 }

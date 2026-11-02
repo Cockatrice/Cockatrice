@@ -19,6 +19,9 @@ private:
     QPointer<AbstractCardItem> selectedCard;
     QPointer<AbstractCardItem> hoveredCard;
     QPointer<AbstractCardItem> displayedCard;
+    QMetaObject::Connection displayDestruction;
+    quint64 displayRevision = 0;
+    bool settingFrame = false;
 
     void updateSelection();
     void restoreSelection();
