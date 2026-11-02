@@ -333,7 +333,7 @@ int main(int argc, char *argv[])
 #elif defined(Q_OS_WIN)
     translationPath = qApp->applicationDirPath() + "/translations";
 #else // linux
-    translationPath = qApp->applicationDirPath() + "/../share/cockatrice/translations";
+    translationPath = qApp->applicationDirPath() + "/../share/continuumatrice/translations";
 #endif
 
     // Command-line parser
@@ -492,7 +492,7 @@ int main(int argc, char *argv[])
     // extension. Wayland reads the window icon from it, and xdg-desktop-portal looks up
     // org.freedesktop.host.portal.Registry by this app ID, so it has to match the file name
     // exactly, down to the case.
-    QGuiApplication::setDesktopFileName("cockatrice");
+    QGuiApplication::setDesktopFileName("continuumatrice");
 
     SettingsCache::instance().network().setClientID(generateClientID());
 
