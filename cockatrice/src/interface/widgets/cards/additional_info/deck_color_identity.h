@@ -7,8 +7,9 @@ class CardDatabaseQuerier;
 class DeckList;
 
 /**
- * @brief Computes the color identity of a deck (e.g. "WUBRG") from the color
- *        symbols of all cards in the main deck and sideboard, ordered WUBRG.
+ * @brief Computes the Essence identity of a deck from the defined Essence
+ *        symbols (M,S,O,G,E,A,Q,C,B,R,L,V,T,P,N) of cards in main/sideboard.
+ *        N denotes colorless.
  *
  * Shared as a free function so the deck storage previews and the deck share
  * dialog compute identities identically.
