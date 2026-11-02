@@ -360,13 +360,14 @@ bool AbstractTabDeckEditor::saveDeck(std::function<void()> afterSave)
     const quint64 intent = leaveIntent;
     const auto loadedDeck = deckStateManager->toLoadedDeck();
     if (loadedDeck.lastLoadInfo.remoteDeckId != LoadedDeck::LoadInfo::NON_REMOTE_ID) {
-        QString deckString = loadedDeck.deckList.writeToString_Native();
+        const auto savePoint = deckStateManager->createSavePoint();
+        const QString &deckString = savePoint.contents;
         if (deckString.length() > MAX_FILE_LENGTH) {
             QMessageBox::critical(this, tr("Error"), tr("Could not save remote deck"));
             return false;
         }
 
-        RemoteSave request{deckRevision, loadedDeck.lastLoadInfo, deckString,
+        RemoteSave request{savePoint, deckRevision, loadedDeck.lastLoadInfo, deckString,
                            getDeckColorIdentity(loadedDeck.deckList, CardDatabaseManager::query()), std::move(afterSave)};
         if (activeRemoteSave) {
             // Coalesce identical saves and serialize newer snapshots. Only the newest
@@ -574,11 +575,19 @@ void AbstractTabDeckEditor::finishRemoteSave(quint64 requestId, bool succeeded)
     queuedRemoteSave.reset();
     QPointer<AbstractTabDeckEditor> guard(this);
     const quint64 intent = leaveIntent;
-    if (matchesCurrentDeck(completed)) {
-        deckStateManager->setModified(false);
+    // A completed upload changes the saved state even if newer edits are visible.
+    // Keep leave intents revision-bound, but let undo return to the actual saved
+    // snapshot. The checkpoint rejects acknowledgments for replaced documents.
+    const auto destination = deckStateManager->toLoadedDeck().lastLoadInfo;
+    if (completed.destination.remoteDeckId == destination.remoteDeckId &&
+        completed.destination.fileName == destination.fileName &&
+        completed.destination.fileFormat == destination.fileFormat) {
+        deckStateManager->markSaved(completed.savePoint);
         if (!guard) {
             return;
         }
+    }
+    if (matchesCurrentDeck(completed)) {
         if (completed.afterSave) {
             // Leave the command callback before closing the tab or opening a modal
             // dialog. Check again after the queued turn and after modified listeners.

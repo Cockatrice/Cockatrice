@@ -10,10 +10,10 @@
 #include <QStringList>
 #include <functional>
 #include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/deck_list/deck_list_history_manager.h>
 #include <libcockatrice/deck_list/loaded_deck.h>
 #include <qtmetamacros.h>
 
-class DeckListHistoryManager;
 class DeckListModel;
 class DecklistNodeTree;
 class ExactCard;
@@ -39,6 +39,8 @@ class DeckStateManager : public QObject
     DeckListHistoryManager *historyManager;
 
     bool modified = false;
+
+    void updateModifiedState();
 
 public:
     explicit DeckStateManager(QObject *parent = nullptr);
@@ -107,9 +109,16 @@ public:
      * @brief Sets the new isModified state, emitting a signal if the state changed.
      * This class will automatically update its isModified state, but you may need to set it manually to handle, for
      * example, saving.
+     * Passing true marks an imported deck as unsaved; passing false records the current saved snapshot.
      * @param state The state
      */
     void setModified(bool state);
+
+    /** Capture the exact document state submitted to a save operation. */
+    [[nodiscard]] DeckListHistoryManager::SavePoint createSavePoint() const;
+
+    /** Record a successful save without losing edits made while it was pending. */
+    bool markSaved(const DeckListHistoryManager::SavePoint &point);
 
     /**
      * @brief Checks if the deck state is as if it was a new deck

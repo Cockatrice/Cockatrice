@@ -5,6 +5,32 @@
 
 #include <QString>
 
+DeckListHistoryManager::SavePoint DeckListHistoryManager::createSavePoint(const DeckList &deck) const
+{
+    return {documentId, deck.writeToString_Native()};
+}
+
+bool DeckListHistoryManager::markSaved(const SavePoint &point)
+{
+    if (point.documentId != documentId) {
+        return false;
+    }
+    savedContents = point.contents;
+    return true;
+}
+
+void DeckListHistoryManager::invalidateSavedState()
+{
+    savedContents.reset();
+}
+
+bool DeckListHistoryManager::isModified(const DeckList &deck) const
+{
+    // The deck hash intentionally omits metadata, printings, and custom zones.
+    // Only the complete native representation can describe a saved editor state.
+    return !savedContents || *savedContents != deck.writeToString_Native();
+}
+
 void DeckListHistoryManager::save(const DeckListMemento &memento)
 {
     undoStack.push(memento);
@@ -14,6 +40,8 @@ void DeckListHistoryManager::save(const DeckListMemento &memento)
 
 void DeckListHistoryManager::clear()
 {
+    ++documentId;
+    invalidateSavedState();
     undoStack.clear();
     redoStack.clear();
     emit undoRedoStateChanged();

@@ -6,6 +6,7 @@
 #include <QObject>
 #include <QStack>
 #include <qtmetamacros.h>
+#include <optional>
 
 class DeckList;
 
@@ -20,6 +21,19 @@ public:
     explicit DeckListHistoryManager(QObject *parent = nullptr) : QObject(parent)
     {
     }
+
+    // A saved snapshot belongs to one loaded document, even when another document
+    // later has identical contents. Undo/redo never changes this identity.
+    struct SavePoint
+    {
+        quint64 documentId;
+        QString contents;
+    };
+
+    [[nodiscard]] SavePoint createSavePoint(const DeckList &deck) const;
+    bool markSaved(const SavePoint &point);
+    void invalidateSavedState();
+    [[nodiscard]] bool isModified(const DeckList &deck) const;
 
     void save(const DeckListMemento &memento);
 
@@ -56,6 +70,8 @@ private:
      */
     void restoreAndSwap(QStack<DeckListMemento> &source, QStack<DeckListMemento> &target, DeckList *deck);
 
+    quint64 documentId = 0;
+    std::optional<QString> savedContents;
     QStack<DeckListMemento> undoStack;
     QStack<DeckListMemento> redoStack;
 };

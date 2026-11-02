@@ -28,12 +28,13 @@ DeckStateManager::DeckStateManager(QObject *parent)
     : QObject(parent), deckList(QSharedPointer<DeckList>(new DeckList)),
       deckListModel(new DeckListModel(this, deckList)), historyManager(new DeckListHistoryManager(this))
 {
+    historyManager->markSaved(createSavePoint());
     deckListModel->setDisplayLanguage(SettingsCache::instance().cardsDisplay().getCardLang());
     connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::cardLangChanged, deckListModel,
             [this](const QString &lang) { deckListModel->setDisplayLanguage(lang); });
 
     connect(historyManager, &DeckListHistoryManager::undoRedoStateChanged, this, [this] {
-        setModified(true);
+        updateModifiedState();
         emit historyChanged();
     });
     connect(deckListModel, &DeckListModel::cardNodesChanged, this, &DeckStateManager::uniqueCardsChanged);
@@ -69,8 +70,33 @@ bool DeckStateManager::isModified() const
     return modified;
 }
 
+DeckListHistoryManager::SavePoint DeckStateManager::createSavePoint() const
+{
+    return historyManager->createSavePoint(*deckList);
+}
+
+bool DeckStateManager::markSaved(const DeckListHistoryManager::SavePoint &point)
+{
+    if (!historyManager->markSaved(point)) {
+        return false;
+    }
+    updateModifiedState();
+    return true;
+}
+
 void DeckStateManager::setModified(bool state)
 {
+    if (state) {
+        historyManager->invalidateSavedState();
+    } else {
+        historyManager->markSaved(createSavePoint());
+    }
+    updateModifiedState();
+}
+
+void DeckStateManager::updateModifiedState()
+{
+    const bool state = historyManager->isModified(*deckList);
     if (state == modified) {
         return;
     }
@@ -582,7 +608,7 @@ bool DeckStateManager::modifyTree(const QString &reason, const std::function<boo
  */
 void DeckStateManager::doCardModified()
 {
-    setModified(true);
+    updateModifiedState();
     emit cardModified();
     emit deckModified();
 }
@@ -592,7 +618,7 @@ void DeckStateManager::doCardModified()
  */
 void DeckStateManager::doMetadataModified()
 {
-    setModified(true);
+    updateModifiedState();
     emit metadataModified();
     emit deckModified();
 }
