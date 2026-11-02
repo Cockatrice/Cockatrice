@@ -137,9 +137,9 @@ QString const generateClientID()
 static QString redactActivationUrl(const QString &url)
 {
     // Activation URLs carry secrets in their query string (e.g. the deck share
-    // token); log only the scheme and the action (cockatrice://opendeck), never
+    // token); log only the scheme and the action (continuumatrice://opendeck), never
     // the parameters.
-    if (!url.startsWith(QStringLiteral("cockatrice://"))) {
+    if (!url.startsWith(QStringLiteral("continuumatrice://"))) {
         return url;
     }
     const QUrl parsed(url);
@@ -219,7 +219,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
 #ifdef Q_OS_MAC
-    UrlSchemeEventFilter cockatriceFilter(QStringList{QStringLiteral("cockatrice")});
+    UrlSchemeEventFilter cockatriceFilter(QStringList{QStringLiteral("continuumatrice")});
 
     QStringList pendingMacUrls;
 
@@ -448,7 +448,7 @@ int main(int argc, char *argv[])
     // auto-connect must not race against it (two connectToServer calls tear
     // each other down via doDisconnectFromServer).
     bool hasUrlActivation = std::any_of(startupFiles.begin(), startupFiles.end(), [](const QString &file) {
-        return file.startsWith(QStringLiteral("cockatrice://"));
+        return file.startsWith(QStringLiteral("continuumatrice://"));
     });
 #ifdef Q_OS_MAC
     // On macOS the launch can arrive through the URL scheme instead of as a
@@ -456,12 +456,12 @@ int main(int argc, char *argv[])
     // window would auto-connect into the link's own connection attempt.
     hasUrlActivation = hasUrlActivation ||
                        std::any_of(pendingMacUrls.cbegin(), pendingMacUrls.cend(),
-                                   [](const QString &url) { return url.startsWith(QStringLiteral("cockatrice://")); });
+                                   [](const QString &url) { return url.startsWith(QStringLiteral("continuumatrice://")); });
 #endif
     ui.setSkipStartupAutoConnect(hasUrlActivation);
 
     auto handleActivation = [&ui](const QString &file) {
-        if (file.startsWith("cockatrice://")) {
+        if (file.startsWith("continuumatrice://")) {
             qCInfo(MainLog) << "Handling URL activation:" << redactActivationUrl(file);
             // Route through the window's persistent url parser: it serializes
             // link chains so activations handed over while another chain is
