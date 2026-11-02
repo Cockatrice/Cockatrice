@@ -10,12 +10,9 @@
 
 class QObject;
 
-const QStringList DownloadSettings::DEFAULT_DOWNLOAD_URLS = {
-    "https://cards.scryfall.io/large/!prop:side!/!set:uuid_substr_0_1!/!set:uuid_substr_1_1!/!set:uuid!.jpg",
-    "https://api.scryfall.com/cards/!set:uuid!?format=image&face=!prop:side!&lang=!sflang!",
-    "https://api.scryfall.com/cards/multiverse/!set:muid!?format=image&lang=!sflang!",
-    "https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!set:muid!&type=card",
-    "https://gatherer.wizards.com/Handlers/Image.ashx?name=!name!&type=card"};
+// Continuumatrice has no MTG card image providers by default. Only explicit
+// user-configured URLs or local card art belong in its profile.
+const QStringList DownloadSettings::DEFAULT_DOWNLOAD_URLS = {};
 
 const QString DownloadSettings::SCRYFALL_NAMED_LOCALIZED_URL =
     "https://api.scryfall.com/cards/named?fuzzy=!localizedName!&lang=!sflang!&format=image&face=!prop:side!";
