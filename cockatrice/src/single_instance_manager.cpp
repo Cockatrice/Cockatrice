@@ -27,7 +27,7 @@ bool SingleInstanceManager::tryRun(const QStringList &filesToSend)
 {
     // Scope the socket name to the current user so one user's instance cannot
     // hijack another user's session.
-    serverName = scopedLocalServerName(QStringLiteral("CockatriceSingleInstance"));
+    serverName = scopedLocalServerName(QStringLiteral("ContinuumatriceSingleInstance"));
 
     // Hand off to an already-running primary instance if one exists. Never steal
     // the socket of a busy primary: it is alive and will act on the payload.
