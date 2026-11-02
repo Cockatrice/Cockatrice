@@ -11,33 +11,51 @@
 
 #include <QChar>
 #include <QMetaObject>
-#include <QPointer>
 #include <QPixmapCache>
+#include <QPointer>
 #include <QRect>
 #include <QSize>
-#include <QStringList>
+#include <QTimer>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/utility/card_ref.h>
-#include <memory>
 
-static QString makeKey(const QString &user, const QString &card, const QString &providerId)
+QString UserCardArtProvider::cacheKey(const QString &userName, const QString &cardName, const QString &providerId)
 {
-    return user + u'|' + card + u'|' + providerId;
+    // Length prefixes distinguish identities even when a component contains '|'.
+    return QString::number(userName.size()) + u':' + userName + QString::number(cardName.size()) + u':' + cardName +
+           providerId;
 }
 
 UserCardArtProvider::UserCardArtProvider(QObject *parent) : QObject(parent)
 {
-    dbReady = (CardDatabaseManager::getInstance()->getLoadStatus() == LoadStatus::Ok);
-
-    if (!dbReady) {
-        connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
-                &UserCardArtProvider::onDatabaseReady);
-    }
+    auto *database = CardDatabaseManager::getInstance();
+    dbReady = (database->getLoadStatus() == LoadStatus::Ok);
+    connect(database, &CardDatabase::cardDatabaseReset, this, &UserCardArtProvider::onDatabaseReady);
 }
 
 void UserCardArtProvider::onDatabaseReady()
 {
-    dbReady = true;
+    // Connections capture exact printings from the old snapshot. Invalidate their
+    // ownership before rebuilding; late completions must not populate the new cache.
+    for (auto *context : activeRequests) {
+        context->deleteLater();
+    }
+    activeRequests.clear();
+    cardArtCache.clear();
+    cacheInsertionOrder.clear();
+    queue.clear();
+    for (auto it = requests.cbegin(); it != requests.cend(); ++it) {
+        queue.enqueue(it.key());
+    }
+    dbReady = (CardDatabaseManager::getInstance()->getLoadStatus() == LoadStatus::Ok);
+    const auto users = currentKeys.keys();
+    QPointer<UserCardArtProvider> self(this);
+    for (const auto &user : users) {
+        emit cardArtUpdated(user);
+        if (!self) {
+            return;
+        }
+    }
     processQueue();
 }
 
@@ -48,22 +66,22 @@ const QMap<QString, QPixmap> &UserCardArtProvider::cache() const
 
 void UserCardArtProvider::requestCardArt(const QString &userName, const QString &cardName, const QString &providerId)
 {
+    const QString key = cacheKey(userName, cardName, providerId);
+    const QString previousKey = currentKeys.value(userName);
+    if (previousKey == key) {
+        return;
+    }
+    if (!previousKey.isEmpty()) {
+        forgetRequest(previousKey);
+    }
     if (cardName.isEmpty()) {
+        emit cardArtUpdated(userName);
         return;
     }
 
-    const QString key = makeKey(userName, cardName, providerId);
-
-    if (pending.contains(key)) {
-        return;
-    }
-    if (cardArtCache.contains(key) && !cardArtCache.value(key).isNull()) {
-        return;
-    }
-
-    pending.insert(key);
+    currentKeys.insert(userName, key);
+    requests.insert(key, {userName, cardName, providerId});
     queue.enqueue(key);
-
     processQueue();
 }
 
@@ -99,97 +117,106 @@ void UserCardArtProvider::insertIntoCache(const QString &key, const QPixmap &pix
         while (cacheInsertionOrder.size() > MaxCacheEntries) {
             const QString evicted = cacheInsertionOrder.takeFirst();
             cardArtCache.remove(evicted);
+            currentKeys.remove(requests.value(evicted).userName);
+            requests.remove(evicted);
         }
     }
     cardArtCache.insert(key, pixmap);
 }
 
+void UserCardArtProvider::forgetRequest(const QString &key)
+{
+    if (auto *context = activeRequests.take(key)) {
+        context->deleteLater();
+    }
+    currentKeys.remove(requests.value(key).userName);
+    requests.remove(key);
+    cardArtCache.remove(key);
+    cacheInsertionOrder.removeAll(key);
+}
+
+void UserCardArtProvider::finishRequest(const QString &key, QObject *context, const QPixmap &pixmap)
+{
+    if (activeRequests.value(key) != context) {
+        return;
+    }
+    const QString userName = requests.value(key).userName;
+    activeRequests.remove(key);
+    context->deleteLater();
+    if (pixmap.isNull()) {
+        // A cached loader failure may not emit another pixmapUpdated signal.
+        // Release the request so a later hover/refresh can try again.
+        currentKeys.remove(userName);
+        requests.remove(key);
+    } else {
+        insertIntoCache(key, pixmap);
+    }
+    emit cardArtUpdated(userName);
+}
+
 void UserCardArtProvider::processQueue()
 {
-    if (!dbReady) {
+    dbReady = (CardDatabaseManager::getInstance()->getLoadStatus() == LoadStatus::Ok);
+    if (!dbReady || processingQueue) {
         return;
     }
 
+    processingQueue = true;
     QPointer<UserCardArtProvider> self(this);
-    while (!queue.isEmpty()) {
+    while (dbReady && !queue.isEmpty()) {
         const QString key = queue.dequeue();
-
-        const QStringList parts = key.split(u'|');
-        if (parts.size() != 3) {
-            pending.remove(key);
+        if (!requests.contains(key) || activeRequests.contains(key) || cardArtCache.contains(key)) {
             continue;
         }
-
-        const QString userName = parts.at(0);
-        const QString cardName = parts.at(1);
-        const QString providerId = parts.at(2);
-
-        ExactCard card = CardDatabaseManager::query()->getCard({cardName, providerId});
-
+        const Request request = requests.value(key);
+        const ExactCard card = CardDatabaseManager::query()->getCard({request.cardName, request.providerId});
         if (!card) {
-            pending.remove(key);
+            forgetRequest(key);
             continue;
         }
+
+        auto *context = new QObject(this);
+        activeRequests.insert(key, context);
+        // Connect before requesting: a synchronous completion must not be lost.
+        connect(card.getCardPtr().data(), &CardInfo::pixmapUpdated, context,
+                [this, key, card, context](const PrintingInfo &printing) {
+                    // Other printings share CardInfo and emit the same signal.
+                    if (activeRequests.value(key) != context || !(printing == card.getPrinting())) {
+                        return;
+                    }
+                    QPixmap fullRes;
+                    CardPictureLoader::getPixmap(fullRes, card, QSize(745, 1040));
+                    finishRequest(key, context, fullRes.isNull() ? QPixmap{} : cropCardArt(fullRes, card));
+                });
+
+        auto *deadline = new QTimer(context);
+        deadline->setSingleShot(true);
+        connect(deadline, &QTimer::timeout, context, [this, key, context] { finishRequest(key, context, {}); });
+        deadline->start(30000);
 
         QPixmap fullRes;
         CardPictureLoader::getPixmap(fullRes, card, QSize(745, 1040));
-
-        // Synchronous hit (already loaded/on disk)
+        if (!self) {
+            return;
+        }
+        if (activeRequests.value(key) != context) {
+            continue;
+        }
+        // The loader suppresses retries for a recently failed image. Such a
+        // cached null result will not emit a completion, so release it now.
+        QPixmap cached;
+        if (fullRes.isNull() && QPixmapCache::find(card.getPixmapCacheKey(), &cached) && cached.isNull()) {
+            forgetRequest(key);
+            continue;
+        }
         if (!fullRes.isNull()) {
-            insertIntoCache(key, cropCardArt(fullRes, card));
-            pending.remove(key);
-
-            emit cardArtUpdated(userName);
+            finishRequest(key, context, cropCardArt(fullRes, card));
             if (!self) {
                 return;
             }
-            continue;
         }
-
-        // A failed image is cached as a null pixmap. While that failure is
-        // fresh, getPixmap neither starts a new load nor emits an update.
-        // Do not wait for a signal that cannot arrive and block other users.
-        QPixmap cached;
-        if (QPixmapCache::find(card.getPixmapCacheKey(), &cached) && cached.isNull()) {
-            pending.remove(key);
-            continue;
-        }
-
-        // Async load required.
-        auto conn = std::make_shared<QMetaObject::Connection>();
-
-        *conn = connect(card.getCardPtr().data(), &CardInfo::pixmapUpdated, this,
-                        [self, key, userName, card, conn](const PrintingInfo &printing) mutable {
-                            if (!self) {
-                                return;
-                            }
-
-                            // A CardInfo can own many printings. Another
-                            // printing finishing does not finish this request.
-                            if (printing != card.getPrinting()) {
-                                return;
-                            }
-
-                            QObject::disconnect(*conn);
-
-                            QPixmap fullRes;
-                            CardPictureLoader::getPixmap(fullRes, card, QSize(745, 1040));
-
-                            if (!fullRes.isNull()) {
-                                self->insertIntoCache(key, self->cropCardArt(fullRes, card));
-                            }
-
-                            self->pending.remove(key);
-
-                            emit self->cardArtUpdated(userName);
-
-                            // Resume processing remaining queued items.
-                            if (self) {
-                                self->processQueue();
-                            }
-                        });
-
-        // Stop here. We'll continue when the async load finishes.
-        return;
+        // Start the next banner independently. A failed or suppressed picture
+        // request must not hold up the rest of the users queued before DB load.
     }
+    processingQueue = false;
 }

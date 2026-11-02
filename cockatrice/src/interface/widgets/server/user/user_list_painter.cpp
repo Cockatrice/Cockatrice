@@ -1,5 +1,7 @@
 #include "user_list_painter.h"
 
+#include "user_card_art_provider.h"
+
 #include "../../interface/pixel_map_generator.h"
 #include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 
@@ -141,11 +143,6 @@ void UserListPainter::drawBackground(QPainter *painter,
     painter->drawRoundedRect(QRectF(cardRect.left(), cardRect.top(), 3, cardRect.height()), 2, 2);
 }
 
-static QString makeKey(const QString &user, const QString &card, const QString &providerId)
-{
-    return user + u'|' + card + u'|' + providerId;
-}
-
 void UserListPainter::drawCardArt(QPainter *painter,
                                   const QRect &rect,
                                   int cardRight,
@@ -163,7 +160,7 @@ void UserListPainter::drawCardArt(QPainter *painter,
             return;
         }
 
-        const QString key = makeKey(userName, params.cardName, params.cardProviderId);
+        const QString key = UserCardArtProvider::cacheKey(userName, params.cardName, params.cardProviderId);
 
         if (!cardArtCache->contains(key)) {
             return;

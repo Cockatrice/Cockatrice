@@ -513,3 +513,16 @@ endif()
 if(WITH_ORACLE OR WITH_CLIENT)
   add_subdirectory(picture_loader_benchmark)
 endif()
+
+# User-banner request lifetimes use a deterministic picture-loader boundary.
+cockatrice_add_test(
+  NAME user_card_art_provider_test
+  SOURCES
+  user_card_art_provider_test.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/server/user/user_card_art_provider.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/cards/card_art_utils.cpp
+  ${VERSION_STRING_CPP}
+  LIBS libcockatrice_card
+  INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/cockatrice/src
+  DEFINITIONS CARDDB_DATADIR="${CMAKE_CURRENT_SOURCE_DIR}/carddatabase/data/"
+)

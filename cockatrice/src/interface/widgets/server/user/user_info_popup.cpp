@@ -1,5 +1,7 @@
 #include "user_info_popup.h"
 
+#include "user_card_art_provider.h"
+
 #include "../../cards/art_crop_attribution.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../../interface/theme_manager.h"
@@ -702,7 +704,7 @@ void UserInfoPopup::refreshHeader()
     const CardArtParams params = (cardArtParamsMap && cardArtParamsMap->contains(currentUser))
                                      ? cardArtParamsMap->value(currentUser)
                                      : CardArtParams{};
-    const QString artKey = currentUser + u'|' + params.cardName + u'|' + params.cardProviderId;
+    const QString artKey = UserCardArtProvider::cacheKey(currentUser, params.cardName, params.cardProviderId);
     const QPixmap cardArt = (cardArtCache && !params.cardName.isEmpty()) ? cardArtCache->value(artKey) : QPixmap{};
     header->setUserData(currentUserInfo, currentOnline, avatar, cardArt, params);
 }
