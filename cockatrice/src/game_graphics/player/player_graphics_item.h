@@ -114,6 +114,18 @@ public:
     {
         return rfgZoneGraphicsItem;
     }
+    [[nodiscard]] PileZone *getLimboZoneGraphicsItem() const
+    {
+        return limboZoneGraphicsItem;
+    }
+    [[nodiscard]] PileZone *getRefugeZoneGraphicsItem() const
+    {
+        return refugeZoneGraphicsItem;
+    }
+    [[nodiscard]] PileZone *getOblivionZoneGraphicsItem() const
+    {
+        return oblivionZoneGraphicsItem;
+    }
     [[nodiscard]] TableZone *getTableZoneGraphicsItem() const
     {
         return tableZoneGraphicsItem;
@@ -154,6 +166,9 @@ private:
     PileZone *sideboardGraphicsItem;
     PileZone *graveyardZoneGraphicsItem;
     PileZone *rfgZoneGraphicsItem;
+    PileZone *limboZoneGraphicsItem;
+    PileZone *refugeZoneGraphicsItem;
+    PileZone *oblivionZoneGraphicsItem;
     TableZone *tableZoneGraphicsItem;
     StackZone *stackZoneGraphicsItem;
     HandZone *handZoneGraphicsItem;
