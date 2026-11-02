@@ -101,6 +101,7 @@ set(PROTO_FILES
     event_game_log_notice.proto
     event_game_say.proto
     event_game_state_changed.proto
+    event_ignore_visibility_changed.proto
     event_join.proto
     event_join_room.proto
     event_kicked.proto
@@ -111,6 +112,7 @@ set(PROTO_FILES
     event_move_card.proto
     event_notify_user.proto
     event_player_properties_changed.proto
+    event_remote_game_left.proto
     event_remove_from_list.proto
     event_remove_messages.proto
     event_replay_added.proto

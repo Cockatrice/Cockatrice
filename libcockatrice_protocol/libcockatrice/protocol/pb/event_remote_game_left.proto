@@ -1,0 +1,11 @@
+syntax = "proto2";
+import "session_event.proto";
+
+// Internal notification to the participant's home server.
+message Event_RemoteGameLeft {
+    extend SessionEvent {
+        optional Event_RemoteGameLeft ext = 1012;
+    }
+    optional sint32 room_id = 1;
+    optional sint32 game_id = 2;
+}

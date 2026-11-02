@@ -1,18 +1,22 @@
 #ifndef SERVER_ROOM_H
 #define SERVER_ROOM_H
 
+#include <QHash>
 #include <QList>
 #include <QMap>
 #include <QObject>
 #include <QReadWriteLock>
+#include <QSet>
 #include <QString>
 #include <QStringList>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_chat_message.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_room_channel.pb.h>
 #include <qtmetamacros.h>
 
 class Server_ProtocolHandler;
+class Server_DatabaseInterface;
 class RoomEvent;
 class ServerInfo_User;
 class ServerInfo_Room;
@@ -53,6 +57,23 @@ private:
     QMap<int, ServerInfo_Game> externalGames;
     QMap<QString, Server_ProtocolHandler *> users;
     QMap<QString, ServerInfo_User_Container> externalUsers;
+    struct GameVisibility
+    {
+        bool joining = true;
+        QSet<int> visible;
+        QMap<int, ServerInfo_Game> pending;
+    };
+    QHash<Server_ProtocolHandler *, GameVisibility> gameVisibility;
+    QMap<int, ServerInfo_Game> knownGames;
+    using IgnoreCache = QHash<QString, QSet<QString>>;
+    bool maySeeGame(Server_ProtocolHandler *viewer,
+                    const ServerInfo_Game &game,
+                    IgnoreCache &cache,
+                    Server_DatabaseInterface *database) const;
+    void applyGameVisibility(Server_ProtocolHandler *viewer,
+                             const ServerInfo_Game &game,
+                             IgnoreCache &cache,
+                             Server_DatabaseInterface *database);
     QMap<QString, QList<ServerInfo_ChatMessage>> channelChatHistory;
 private slots:
     void broadcastGameListUpdate(const ServerInfo_Game &gameInfo, bool sendToIsl = true);
@@ -157,6 +178,9 @@ public:
 
     void addClient(Server_ProtocolHandler *client);
     void removeClient(Server_ProtocolHandler *client);
+    void filterInitialGames(ServerInfo_Room &info, Server_ProtocolHandler *client);
+    void finishClientJoin(Server_ProtocolHandler *client);
+    void refreshGameVisibility(const QString &viewer, const QString &creator = QString(), int gameId = -1);
 
     void addExternalUser(const ServerInfo_User &userInfo);
     void removeExternalUser(const QString &_name);

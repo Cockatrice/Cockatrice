@@ -14,6 +14,8 @@ message SessionEvent {
         USER_LEFT = 1008;
         GAME_JOINED = 1009;
         NOTIFY_USER = 1010;
+        IGNORE_VISIBILITY_CHANGED = 1011;
+        REMOTE_GAME_LEFT = 1012;
         REPLAY_ADDED = 1100;
     }
     extensions 100 to max;

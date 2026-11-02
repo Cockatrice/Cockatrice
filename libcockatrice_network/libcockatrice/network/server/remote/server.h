@@ -235,6 +235,9 @@ public:
 
     void sendIsl_Response(const Response &item, int serverId = -1, qint64 sessionId = -1);
     void sendIsl_SessionEvent(const SessionEvent &item, int serverId = -1, qint64 sessionId = -1);
+    void refreshIgnoreVisibility(const QString &creator, const QString &viewer);
+    void notifyIgnoreVisibilityChanged(const QString &creator, const QString &viewer);
+    void refreshViewerGameVisibility(const QString &viewer, int roomId, int gameId);
     void sendIsl_GameEventContainer(const GameEventContainer &item, int serverId = -1, qint64 sessionId = -1);
     void sendIsl_RoomEvent(const RoomEvent &item, int serverId = -1, qint64 sessionId = -1);
     void sendIsl_GameCommand(const CommandContainer &item, int serverId, qint64 sessionId, int roomId, int playerId);

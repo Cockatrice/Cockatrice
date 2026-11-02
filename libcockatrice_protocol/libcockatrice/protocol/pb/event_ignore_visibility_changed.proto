@@ -1,0 +1,11 @@
+syntax = "proto2";
+import "session_event.proto";
+
+// Internal server-to-server invalidation; peers reread their shared ignore list.
+message Event_IgnoreVisibilityChanged {
+    extend SessionEvent {
+        optional Event_IgnoreVisibilityChanged ext = 1011;
+    }
+    optional string owner = 1;
+    optional string viewer = 2;
+}

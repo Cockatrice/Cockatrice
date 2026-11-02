@@ -51,6 +51,7 @@
 #include <google/protobuf/stubs/port.h>
 #include <libcockatrice/protocol/debug_pb_message.h>
 #include <libcockatrice/protocol/pb/event_connection_closed.pb.h>
+#include <libcockatrice/protocol/pb/event_ignore_visibility_changed.pb.h>
 #include <libcockatrice/protocol/pb/event_list_rooms.pb.h>
 #include <libcockatrice/protocol/pb/event_user_joined.pb.h>
 #include <libcockatrice/protocol/pb/event_user_left.pb.h>
@@ -678,6 +679,33 @@ void Server::sendIsl_Response(const Response &item, int serverId, qint64 session
     msg.mutable_response()->CopyFrom(item);
 
     emit sigSendIslMessage(msg, serverId);
+}
+
+void Server::refreshIgnoreVisibility(const QString &creator, const QString &viewer)
+{
+    QReadLocker locker(&roomsLock);
+    for (auto *room : rooms) {
+        room->refreshGameVisibility(viewer, creator);
+    }
+}
+
+void Server::notifyIgnoreVisibilityChanged(const QString &creator, const QString &viewer)
+{
+    refreshIgnoreVisibility(creator, viewer);
+    Event_IgnoreVisibilityChanged event;
+    event.set_owner(creator.toStdString());
+    event.set_viewer(viewer.toStdString());
+    SessionEvent *sessionEvent = Server_ProtocolHandler::prepareSessionEvent(event);
+    sendIsl_SessionEvent(*sessionEvent);
+    delete sessionEvent;
+}
+
+void Server::refreshViewerGameVisibility(const QString &viewer, int roomId, int gameId)
+{
+    QReadLocker locker(&roomsLock);
+    if (auto *room = rooms.value(roomId, nullptr)) {
+        room->refreshGameVisibility(viewer, QString(), gameId);
+    }
 }
 
 void Server::sendIsl_SessionEvent(const SessionEvent &item, int serverId, qint64 sessionId)

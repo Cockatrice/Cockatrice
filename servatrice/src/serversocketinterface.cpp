@@ -575,6 +575,13 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAddToList(const Command
         return Response::RespInternalError;
     }
 
+    if (list == "ignore") {
+        const QString creator = QString::fromStdString(userInfo->name());
+        QMetaObject::invokeMethod(
+            server, [server = server, creator, user] { server->notifyIgnoreVisibilityChanged(creator, user); },
+            Qt::QueuedConnection);
+    }
+
     Event_AddToList event;
     event.set_list_name(cmd.list());
     event.mutable_user_info()->CopyFrom(databaseInterface->getUserData(user));
@@ -624,6 +631,13 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveFromList(const Co
     query->bindValue(":id2", id2);
     if (!sqlInterface->execSqlQuery(query)) {
         return Response::RespInternalError;
+    }
+
+    if (list == "ignore") {
+        const QString creator = QString::fromStdString(userInfo->name());
+        QMetaObject::invokeMethod(
+            server, [server = server, creator, user] { server->notifyIgnoreVisibilityChanged(creator, user); },
+            Qt::QueuedConnection);
     }
 
     Event_RemoveFromList event;

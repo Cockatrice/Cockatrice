@@ -8,6 +8,7 @@
 #include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 #include "server.h"
 #include "server_abstractuserinterface.h"
+#include "server_database_interface.h"
 #include "server_protocolhandler.h"
 #include "server_response_containers.h"
 #include "serverinfo_user_container.h"
@@ -248,6 +249,7 @@ void Server_Room::addClient(Server_ProtocolHandler *client)
 
     usersLock.lockForWrite();
     users.insert(QString::fromStdString(client->getUserInfo()->name()), client);
+    gameVisibility.insert(client, GameVisibility{});
     roomInfo.set_player_count(users.size() + externalUsers.size());
     usersLock.unlock();
 
@@ -264,6 +266,7 @@ void Server_Room::removeClient(Server_ProtocolHandler *client)
 {
     usersLock.lockForWrite();
     users.remove(QString::fromStdString(client->getUserInfo()->name()));
+    gameVisibility.remove(client);
 
     ServerInfo_Room roomInfo;
     roomInfo.set_room_id(id);
@@ -329,9 +332,19 @@ void Server_Room::updateExternalGameList(const ServerInfo_Game &gameInfo)
     roomInfo.set_room_id(id);
 
     gamesLock.lockForWrite();
-    if (!gameInfo.has_player_count() && externalGames.contains(gameInfo.game_id())) {
+    if (gameInfo.closed()) {
         externalGames.remove(gameInfo.game_id());
-    } else {
+    } else if (externalGames.contains(gameInfo.game_id())) {
+        ServerInfo_Game &current = externalGames[gameInfo.game_id()];
+        if (gameInfo.has_creator_info()) {
+            current.CopyFrom(gameInfo);
+        } else {
+            if (gameInfo.game_types_size()) {
+                current.clear_game_types();
+            }
+            current.MergeFrom(gameInfo);
+        }
+    } else if (gameInfo.has_creator_info()) {
         externalGames.insert(gameInfo.game_id(), gameInfo);
     }
     roomInfo.set_game_count(games.size() + externalGames.size());
@@ -483,11 +496,170 @@ void Server_Room::sendRoomEvent(RoomEvent *event, bool sendToIsl, ServerInfo_Roo
     delete event;
 }
 
+bool Server_Room::maySeeGame(Server_ProtocolHandler *viewer,
+                             const ServerInfo_Game &game,
+                             IgnoreCache &cache,
+                             Server_DatabaseInterface *database) const
+{
+    const auto *info = viewer->getUserInfo();
+    if (!info) {
+        return false;
+    }
+    if (info->user_level() & (ServerInfo_User::IsAdmin | ServerInfo_User::IsModerator | ServerInfo_User::IsJudge)) {
+        return true;
+    }
+    int roomId, playerId;
+    if (viewer->getGameInfo(game.game_id(), roomId, playerId) && roomId == id) {
+        return true;
+    }
+    const QString creator = QString::fromStdString(game.creator_info().name());
+    if (!game.has_creator_info() || creator.isEmpty() || !database) {
+        return false;
+    }
+    if (!cache.contains(creator)) {
+        QSet<QString> ignored;
+        const auto entries = database->getIgnoreList(creator);
+        for (auto it = entries.cbegin(); it != entries.cend(); ++it) {
+            ignored.insert(it.key().toCaseFolded());
+        }
+        cache.insert(creator, ignored);
+    }
+    return !cache.value(creator).contains(QString::fromStdString(info->name()).toCaseFolded());
+}
+
+// Called with usersLock held; never acquire gamesLock here.
+void Server_Room::applyGameVisibility(Server_ProtocolHandler *viewer,
+                                      const ServerInfo_Game &game,
+                                      IgnoreCache &cache,
+                                      Server_DatabaseInterface *database)
+{
+    auto it = gameVisibility.find(viewer);
+    if (it == gameVisibility.end()) {
+        return;
+    }
+    GameVisibility &state = it.value();
+    const int gameId = game.game_id();
+    if (state.joining) {
+        state.pending.insert(gameId, game);
+        return;
+    }
+    ServerInfo_Game outgoing;
+    if (game.closed() || !maySeeGame(viewer, game, cache, database)) {
+        if (!state.visible.remove(gameId)) {
+            return;
+        }
+        outgoing.set_room_id(id);
+        outgoing.set_game_id(gameId);
+        outgoing.set_closed(true);
+    } else {
+        state.visible.insert(gameId);
+        outgoing = game;
+    }
+    Event_ListGames event;
+    event.add_game_list()->CopyFrom(outgoing);
+    RoomEvent *roomEvent = prepareRoomEvent(event);
+    viewer->sendProtocolItem(*roomEvent);
+    delete roomEvent;
+}
+
+void Server_Room::filterInitialGames(ServerInfo_Room &info, Server_ProtocolHandler *client)
+{
+    QWriteLocker locker(&usersLock);
+    auto it = gameVisibility.find(client);
+    if (it == gameVisibility.end()) {
+        return;
+    }
+    IgnoreCache cache;
+    for (int i = info.game_list_size() - 1; i >= 0; --i) {
+        const ServerInfo_Game &game = info.game_list(i);
+        if (maySeeGame(client, game, cache, getServer()->getDatabaseInterface())) {
+            it->visible.insert(game.game_id());
+        } else {
+            info.mutable_game_list()->DeleteSubrange(i, 1);
+        }
+    }
+}
+
+void Server_Room::finishClientJoin(Server_ProtocolHandler *client)
+{
+    QWriteLocker locker(&usersLock);
+    auto it = gameVisibility.find(client);
+    if (it == gameVisibility.end() || !it->joining) {
+        return;
+    }
+    it->joining = false;
+    const auto pending = it->pending;
+    it->pending.clear();
+    IgnoreCache cache;
+    for (const auto &game : pending) {
+        applyGameVisibility(client, game, cache, getServer()->getDatabaseInterface());
+    }
+}
+
+void Server_Room::refreshGameVisibility(const QString &viewer, const QString &creator, int gameId)
+{
+    // Broadcasts and refreshes must observe the same serialized game state.
+    // A separate gamesLock snapshot could race with a close and reinsert it.
+    QWriteLocker locker(&usersLock);
+    Server_ProtocolHandler *client = nullptr;
+    for (auto it = users.cbegin(); it != users.cend(); ++it) {
+        if (it.key().compare(viewer, Qt::CaseInsensitive) == 0) {
+            client = it.value();
+            break;
+        }
+    }
+    if (!client) {
+        return;
+    }
+    IgnoreCache cache;
+    for (auto it = knownGames.cbegin(); it != knownGames.cend(); ++it) {
+        const ServerInfo_Game &game = it.value();
+        if (gameId >= 0 && gameId != it.key()) {
+            continue;
+        }
+        if (!game.has_creator_info() ||
+            (!creator.isEmpty() &&
+             QString::fromStdString(game.creator_info().name()).compare(creator, Qt::CaseInsensitive) != 0)) {
+            continue;
+        }
+        applyGameVisibility(client, game, cache, getServer()->getDatabaseInterface());
+    }
+}
+
 void Server_Room::broadcastGameListUpdate(const ServerInfo_Game &gameInfo, bool sendToIsl)
 {
-    Event_ListGames event;
-    event.add_game_list()->CopyFrom(gameInfo);
-    sendRoomEvent(prepareRoomEvent(event), sendToIsl);
+    // Keep a complete record: start/stop events carry only a few fields.
+    QWriteLocker locker(&usersLock);
+    ServerInfo_Game complete;
+    if (gameInfo.closed()) {
+        complete = gameInfo;
+        knownGames.remove(gameInfo.game_id());
+    } else {
+        ServerInfo_Game &known = knownGames[gameInfo.game_id()];
+        if (gameInfo.has_creator_info()) {
+            known.CopyFrom(gameInfo);
+        } else {
+            if (gameInfo.game_types_size()) {
+                known.clear_game_types();
+            }
+            known.MergeFrom(gameInfo);
+        }
+        complete = known;
+    }
+    IgnoreCache cache;
+    if (complete.closed() || complete.has_creator_info()) {
+        for (auto it = users.cbegin(); it != users.cend(); ++it) {
+            applyGameVisibility(it.value(), complete, cache, getServer()->getDatabaseInterface());
+        }
+    }
+    locker.unlock();
+    if (sendToIsl) {
+        Event_ListGames event;
+        event.add_game_list()->CopyFrom(gameInfo);
+        RoomEvent *roomEvent = prepareRoomEvent(event);
+        getServer()->sendIsl_RoomEvent(*roomEvent);
+        delete roomEvent;
+    }
 }
 
 void Server_Room::addGame(Server_Game *game)

@@ -307,6 +307,9 @@ void GamesModel::updateGameList(const ServerInfo_Game &game)
             return;
         }
     }
+    if (game.closed()) {
+        return;
+    }
     beginInsertRows(QModelIndex(), gameList.size(), gameList.size());
     gameList.append(game);
     endInsertRows();

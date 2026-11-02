@@ -63,9 +63,10 @@ static constexpr qint64 kAuthNonceLifetimeSeconds = 60;
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server,
                                                Server_DatabaseInterface *_databaseInterface,
                                                QObject *parent)
-    : QObject(parent), Server_AbstractUserInterface(_server), deleted(false), databaseInterface(_databaseInterface),
-      authState(NotLoggedIn), usingRealPassword(false), acceptsUserListChanges(false), acceptsRoomListChanges(false),
-      idleClientWarningSent(false), timeRunning(0), lastDataReceived(0), lastActionReceived(0)
+    : QObject(parent), Server_AbstractUserInterface(_server), deleted(false), pendingRoomJoin(false),
+      databaseInterface(_databaseInterface), authState(NotLoggedIn), usingRealPassword(false),
+      acceptsUserListChanges(false), acceptsRoomListChanges(false), idleClientWarningSent(false), timeRunning(0),
+      lastDataReceived(0), lastActionReceived(0)
 
 {
     connect(server, &Server::pingClockTimeout, this, &Server_ProtocolHandler::pingClockTimeout);
@@ -510,6 +511,15 @@ void Server_ProtocolHandler::processCommandContainer(const CommandContainer &con
 
     if ((finalResponseCode != Response::RespNothing)) {
         sendResponseContainer(responseContainer, finalResponseCode);
+        if (pendingRoomJoin) {
+            QReadLocker locker(&server->roomsLock);
+            for (auto it = rooms.cbegin(); it != rooms.cend(); ++it) {
+                if (server->getRooms().value(it.key(), nullptr) == it.value()) {
+                    it.value()->finishClientJoin(this);
+                }
+            }
+            pendingRoomJoin = false;
+        }
     }
 }
 
@@ -907,6 +917,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
 
     room->addClient(this);
     rooms.insert(room->getId(), room);
+    pendingRoomJoin = true;
 
     QReadLocker chatHistoryLocker(&room->historyLock);
     const QList<ServerInfo_ChatMessage> mainChatHistory = room->getChatHistory(Server_Room::MAIN_CHANNEL_KEY);
@@ -944,6 +955,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
 
     auto *re = new Response_JoinRoom;
     room->getInfo(*re->mutable_room_info(), true, false, true, userInfo);
+    room->filterInitialGames(*re->mutable_room_info(), this);
 
     rc.setResponseExtension(re);
     return Response::RespOk;

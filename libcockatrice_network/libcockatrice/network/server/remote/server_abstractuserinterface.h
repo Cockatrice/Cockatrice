@@ -48,6 +48,7 @@ public:
     virtual bool addSaidMessageSize(int size) = 0;
 
     void playerRemovedFromGame(Server_Game *game);
+    void remotePlayerRemovedFromGame(int gameId, int roomId);
     void playerAddedToGame(int gameId, int roomId, int playerId);
     void joinPersistentGames(ResponseContainer &rc);
     virtual void onLogin(ResponseContainer &rc);

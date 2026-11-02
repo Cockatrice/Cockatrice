@@ -32,9 +32,11 @@
 #include <libcockatrice/protocol/debug_pb_message.h>
 #include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/event_game_joined.pb.h>
+#include <libcockatrice/protocol/pb/event_ignore_visibility_changed.pb.h>
 #include <libcockatrice/protocol/pb/event_join_room.pb.h>
 #include <libcockatrice/protocol/pb/event_leave_room.pb.h>
 #include <libcockatrice/protocol/pb/event_list_games.pb.h>
+#include <libcockatrice/protocol/pb/event_remote_game_left.pb.h>
 #include <libcockatrice/protocol/pb/event_remove_messages.pb.h>
 #include <libcockatrice/protocol/pb/event_room_channel_say.pb.h>
 #include <libcockatrice/protocol/pb/event_room_say.pb.h>
@@ -444,6 +446,24 @@ void IslInterface::processSessionEvent(const SessionEvent &event, qint64 session
             client->playerAddedToGame(gameJoined.game_info().game_id(), gameJoined.game_info().room_id(),
                                       gameJoined.player_id());
             client->sendProtocolItem(event);
+            break;
+        }
+        case SessionEvent::REMOTE_GAME_LEFT: {
+            QReadLocker clientsLocker(&server->clientsLock);
+            auto *client = server->getUsersBySessionId().value(sessionId);
+            if (client) {
+                const auto &left = event.GetExtension(Event_RemoteGameLeft::ext);
+                client->remotePlayerRemovedFromGame(left.game_id(), left.room_id());
+            }
+            break;
+        }
+        case SessionEvent::IGNORE_VISIBILITY_CHANGED: {
+            const auto &change = event.GetExtension(Event_IgnoreVisibilityChanged::ext);
+            const QString creator = QString::fromStdString(change.owner());
+            const QString viewer = QString::fromStdString(change.viewer());
+            QMetaObject::invokeMethod(
+                server, [server = server, creator, viewer] { server->refreshIgnoreVisibility(creator, viewer); },
+                Qt::QueuedConnection);
             break;
         }
         case SessionEvent::USER_MESSAGE:

@@ -43,6 +43,7 @@ protected:
     QMap<int, Server_Room *> rooms;
 
     bool deleted;
+    bool pendingRoomJoin;
     Server_DatabaseInterface *databaseInterface;
     AuthenticationResult authState;
     bool usingRealPassword;

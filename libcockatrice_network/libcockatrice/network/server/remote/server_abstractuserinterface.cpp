@@ -10,6 +10,7 @@
 #include "libcockatrice/protocol/pb/session_event.pb.h"
 #include "server.h"
 #include "server_player_reference.h"
+#include "server_remoteuserinterface.h"
 #include "server_response_containers.h"
 #include "server_room.h"
 
@@ -20,6 +21,7 @@
 #include <QString>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
+#include <libcockatrice/protocol/pb/event_remote_game_left.pb.h>
 #include <qlogging.h>
 #include <utility>
 
@@ -100,16 +102,62 @@ void Server_AbstractUserInterface::playerRemovedFromGame(Server_Game *game)
 {
     qDebug() << "Server_AbstractUserInterface::playerRemovedFromGame(): gameId =" << game->getGameId();
 
-    QMutexLocker locker(&gameListMutex);
-    games.remove(game->getGameId());
+    const int gameId = game->getGameId();
+    const int roomId = game->getRoom()->getId();
+    {
+        QMutexLocker locker(&gameListMutex);
+        games.remove(gameId);
+    }
+    if (dynamic_cast<Server_RemoteUserInterface *>(this)) {
+        Event_RemoteGameLeft event;
+        event.set_game_id(gameId);
+        event.set_room_id(roomId);
+        SessionEvent *sessionEvent = prepareSessionEvent(event);
+        sendProtocolItem(*sessionEvent);
+        delete sessionEvent;
+    } else if (userInfo) {
+        const QString viewer = QString::fromStdString(userInfo->name());
+        QMetaObject::invokeMethod(
+            server,
+            [server = server, viewer, roomId, gameId] { server->refreshViewerGameVisibility(viewer, roomId, gameId); },
+            Qt::QueuedConnection);
+    }
+}
+
+void Server_AbstractUserInterface::remotePlayerRemovedFromGame(int gameId, int roomId)
+{
+    {
+        QMutexLocker locker(&gameListMutex);
+        auto it = games.find(gameId);
+        if (it == games.end() || it.value().first != roomId) {
+            return;
+        }
+        games.erase(it);
+    }
+    if (userInfo) {
+        const QString viewer = QString::fromStdString(userInfo->name());
+        QMetaObject::invokeMethod(
+            server,
+            [server = server, viewer, roomId, gameId] { server->refreshViewerGameVisibility(viewer, roomId, gameId); },
+            Qt::QueuedConnection);
+    }
 }
 
 void Server_AbstractUserInterface::playerAddedToGame(int gameId, int roomId, int playerId)
 {
     qDebug() << "Server_AbstractUserInterface::playerAddedToGame(): gameId =" << gameId;
 
-    QMutexLocker locker(&gameListMutex);
-    games.insert(gameId, QPair<int, int>(roomId, playerId));
+    {
+        QMutexLocker locker(&gameListMutex);
+        games.insert(gameId, QPair<int, int>(roomId, playerId));
+    }
+    if (userInfo) {
+        const QString viewer = QString::fromStdString(userInfo->name());
+        QMetaObject::invokeMethod(
+            server,
+            [server = server, viewer, roomId, gameId] { server->refreshViewerGameVisibility(viewer, roomId, gameId); },
+            Qt::QueuedConnection);
+    }
 }
 
 void Server_AbstractUserInterface::joinPersistentGames(ResponseContainer &rc)
