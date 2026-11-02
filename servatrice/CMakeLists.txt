@@ -107,6 +107,8 @@ set(DESKTOPDIR
 
 # Build servatrice binary and link it
 add_executable(servatrice MACOSX_BUNDLE ${servatrice_MOC_SRCS} ${servatrice_RESOURCES_RCC} ${servatrice_SOURCES})
+# Preserve the inherited internal target while exporting a distinct server executable.
+set_target_properties(servatrice PROPERTIES OUTPUT_NAME "continuumatrice-server")
 
 target_precompile_headers(servatrice PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtcore_pch.h")
 
@@ -125,7 +127,7 @@ endif()
 if(UNIX)
   if(APPLE)
     set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME}")
-    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.cockatrice.${PROJECT_NAME}")
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.continuum-universes.continuumatrice-server")
     set(MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_NAME}-${PROJECT_VERSION}")
     set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
     set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
@@ -137,12 +139,11 @@ if(UNIX)
   else()
     # Assume linux
     install(TARGETS servatrice RUNTIME DESTINATION bin/)
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.ini.example DESTINATION share/servatrice/)
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.sql DESTINATION share/servatrice/)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.ini.example DESTINATION share/continuumatrice-server/ RENAME continuumatrice-server.ini.example)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.sql DESTINATION share/continuumatrice-server/)
 
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/servatrice.png DESTINATION ${ICONDIR}/hicolor/48x48/apps)
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/servatrice.svg DESTINATION ${ICONDIR}/hicolor/scalable/apps)
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.desktop DESTINATION ${DESKTOPDIR})
+    # No upstream Servatrice desktop/icon registration; it would collide with
+    # a separate MTG server installation. The server is managed via CLI.
   endif()
 elseif(WIN32)
   install(TARGETS servatrice RUNTIME DESTINATION ./)
