@@ -54,7 +54,7 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
 
     visualDatabaseDisplay = new VisualDatabaseDisplayWidget(this, _cardDatabaseModel, deckModel);
     visualDatabaseDisplay->setObjectName("visualDatabaseView");
-    connect(visualDatabaseDisplay, &VisualDatabaseDisplayWidget::cardHoveredDatabaseDisplay, this,
+    connect(visualDatabaseDisplay, &VisualDatabaseDisplayWidget::cardSelectedDatabaseDisplay, this,
             &TabDeckEditorVisualTabWidget::onCardChangedDatabaseDisplay);
     connect(visualDatabaseDisplay, &VisualDatabaseDisplayWidget::cardClickedDatabaseDisplay, this,
             &TabDeckEditorVisualTabWidget::onCardClickedDatabaseDisplay);
@@ -95,8 +95,8 @@ void TabDeckEditorVisualTabWidget::onCardChanged(const ExactCard &activeCard)
 }
 
 /**
- * @brief Emits the cardChangedDatabaseDisplay signal when a card is hovered in the database display.
- * @param activeCard The card that was hovered.
+ * @brief Emits the cardChangedDatabaseDisplay signal when a card is selected in the database display.
+ * @param activeCard The selected card.
  */
 void TabDeckEditorVisualTabWidget::onCardChangedDatabaseDisplay(const ExactCard &activeCard)
 {

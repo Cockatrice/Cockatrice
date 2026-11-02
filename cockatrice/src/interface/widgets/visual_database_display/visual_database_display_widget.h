@@ -8,6 +8,7 @@
 #define VISUAL_DATABASE_DISPLAY_WIDGET_H
 
 #include "libcockatrice/card/card_info.h"
+#include "libcockatrice/card/printing/exact_card.h"
 
 #include <QLoggingCategory>
 #include <QMouseEvent>
@@ -91,6 +92,8 @@ public slots:
 
 signals:
     void cardClickedDatabaseDisplay(QMouseEvent *event, const ExactCard &card);
+    void cardSelectedDatabaseDisplay(const ExactCard &card);
+    void displayModeChanged();
     void cardHoveredDatabaseDisplay(const ExactCard &hoveredCard);
 
     void cardAdded(const ExactCard &card, const QString &zoneName);
@@ -142,7 +145,9 @@ private:
     int cardsPerPage = 100; // Number of cards per page
     bool filtersInitialized = false;
     bool initialLoadScheduled = false;
+    ExactCard selectedCard;
 
+    void selectCard(const ExactCard &card);
     void initializeFilters();
     void highlightAllSearchEdit();
     void updateDisplayModeButton();

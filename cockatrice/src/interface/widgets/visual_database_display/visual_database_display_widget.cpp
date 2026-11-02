@@ -28,7 +28,9 @@
 #include <QAction>
 #include <QDebug>
 #include <QIcon>
+#include <QItemSelectionModel>
 #include <QLabel>
+#include <QLayoutItem>
 #include <QLineEdit>
 #include <QList>
 #include <QMessageLogger>
@@ -39,6 +41,7 @@
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QSharedPointer>
+#include <QSignalBlocker>
 #include <QSizePolicy>
 #include <QSlider>
 #include <QStringLiteral>
@@ -131,7 +134,6 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     databaseView = new CardDatabaseView(this, databaseDisplayModel);
     databaseView->setObjectName("databaseView");
     databaseView->setFocusProxy(searchEdit);
-    databaseView->setItemDelegate(nullptr);
     databaseView->setVisible(false);
 
     // Without a deck model there is nothing to add cards to, so the zone menu stays hidden.
@@ -151,6 +153,14 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     searchEdit->installEventFilter(databaseView->getKeySignals());
 
     connect(databaseView, &CardDatabaseView::cardChanged, this, &VisualDatabaseDisplayWidget::onSelectedCardChanged);
+    connect(databaseView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
+            [this](const QModelIndex &current) {
+                if (!isVisualDisplayMode() && !current.isValid()) {
+                    selectCard(ExactCard());
+                }
+            });
+    connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseReset, this,
+            [this] { selectCard(ExactCard()); });
     connect(databaseView, &CardDatabaseView::cardAdded, this, &VisualDatabaseDisplayWidget::actAddCard);
     connect(databaseView, &CardDatabaseView::cardDecremented, this, &VisualDatabaseDisplayWidget::actDecrementCard);
     connect(databaseView, &CardDatabaseView::edhrecClicked, this, &VisualDatabaseDisplayWidget::edhrecRequested);
@@ -291,7 +301,6 @@ void VisualDatabaseDisplayWidget::onDisplayModeChanged(bool checked)
         // Table mode
         flowWidget->setVisible(false);
         cardSizeWidget->setVisible(false);
-        databaseView->setItemDelegate(new QStyledItemDelegate(databaseView));
         databaseView->setVisible(true);
     } else {
         // Visual mode
@@ -300,11 +309,45 @@ void VisualDatabaseDisplayWidget::onDisplayModeChanged(bool checked)
         databaseView->setVisible(false);
         populateCards();
     }
+    emit displayModeChanged();
+    if (checked) {
+        onSelectedCardChanged(databaseView->currentCardName());
+    }
 }
 
 void VisualDatabaseDisplayWidget::onClick(QMouseEvent *event, const ExactCard &card)
 {
+    if (event->button() == Qt::LeftButton) {
+        selectCard(card);
+    }
     emit cardClickedDatabaseDisplay(event, card);
+}
+
+void VisualDatabaseDisplayWidget::selectCard(const ExactCard &card)
+{
+    const bool changed = !(selectedCard == card);
+    selectedCard = card;
+
+    // Keep keyboard actions, printing selection and the table view on the same card
+    // as the picture selection, without replacing its exact printing with a preferred one.
+    const QSignalBlocker blocker(databaseView->selectionModel());
+    const auto matches = databaseDisplayModel->match(databaseDisplayModel->index(0, CardDatabaseModel::NameColumn),
+                                                     Qt::DisplayRole, card.getName(), 1, Qt::MatchExactly);
+    if (card.isEmpty() || matches.isEmpty()) {
+        databaseView->selectionModel()->clear();
+    } else {
+        databaseView->setCurrentIndex(matches.first());
+    }
+
+    for (int i = 0; i < flowWidget->count(); ++i) {
+        auto *display = qobject_cast<CardInfoPictureWithTextOverlayWidget *>(flowWidget->itemAt(i)->widget());
+        if (display) {
+            display->setHighlighted(!card.isEmpty() && display->getCard() == card);
+        }
+    }
+    if (changed) {
+        emit cardSelectedDatabaseDisplay(card);
+    }
 }
 
 void VisualDatabaseDisplayWidget::onHover(const ExactCard &hoveredCard)
@@ -318,6 +361,7 @@ void VisualDatabaseDisplayWidget::addCardToDisplay(const ExactCard &cardToAdd)
     auto *display = new CardInfoPictureWithTextOverlayWidget(flowWidget, false);
     display->setScaleFactor(cardSizeWidget->getSlider()->value());
     display->setCard(cardToAdd);
+    display->setHighlighted(!selectedCard.isEmpty() && cardToAdd == selectedCard);
     flowWidget->addWidget(display);
     connect(display, &CardInfoPictureWithTextOverlayWidget::cardClicked, this, &VisualDatabaseDisplayWidget::onClick);
     connect(display, &CardInfoPictureWithTextOverlayWidget::hoveredOnCard, this, &VisualDatabaseDisplayWidget::onHover);
@@ -331,6 +375,12 @@ bool VisualDatabaseDisplayWidget::isVisualDisplayMode() const
 
 void VisualDatabaseDisplayWidget::onSearchModelChanged()
 {
+    if (!selectedCard.isEmpty() && databaseDisplayModel
+                                       ->match(databaseDisplayModel->index(0, CardDatabaseModel::NameColumn),
+                                               Qt::DisplayRole, selectedCard.getName(), 1, Qt::MatchExactly)
+                                       .isEmpty()) {
+        selectCard(ExactCard());
+    }
     if (flowWidget->isVisible()) {
         // Clear the current page and prepare for new data
         flowWidget->clearLayout(); // Clear existing cards
@@ -347,7 +397,12 @@ void VisualDatabaseDisplayWidget::onSearchModelChanged()
 
 void VisualDatabaseDisplayWidget::onSelectedCardChanged(const QString &cardName)
 {
-    emit cardHoveredDatabaseDisplay(CardDatabaseManager::query()->getPreferredCard(cardName));
+    const auto card =
+        selectedCard.getName() == cardName ? selectedCard : CardDatabaseManager::query()->getPreferredCard(cardName);
+    if (!isVisualDisplayMode() || searchEdit->hasFocus()) {
+        selectCard(card);
+    }
+    emit cardHoveredDatabaseDisplay(card);
 }
 
 void VisualDatabaseDisplayWidget::actAddCard(const QString &cardName, const QString &zoneName)
@@ -406,7 +461,10 @@ void VisualDatabaseDisplayWidget::loadCurrentPage()
 
 void VisualDatabaseDisplayWidget::populateCards()
 {
+    // Switching back from the table is a rebuild, not another page append.
+    flowWidget->clearLayout();
     cards->clear();
+    currentPage = 0;
     loadNextPage();
 }
 

@@ -18,7 +18,13 @@ This widget allows editing:
 # Adding Cards
 
 Adding cards is done by either using the "Quick search and add card" search bar at the top of the "Visual Deck View" tab
-or by clicking on a picture of a card in the "Visual Database Display" tab.
+or by double-clicking on a picture of a card in the "Visual Database Display" tab.
+
+A single click selects a card for the Card Info and printing panels without changing the deck.
+Moving the pointer over other pictures leaves that selection in place, so rules text can be read
+and printing controls used. Double-clicking adds one copy, matching the table database view.
+Hold Ctrl (Command on macOS) to add to the sideboard, or Shift to add to the maybeboard.
+Right-clicking a picture removes one copy from the same modifier-selected zone.
 
 See @ref visual_database_display for more information on how to utilize the visual database display.
 

@@ -20,7 +20,6 @@
 #include "tab_deck_editor_visual_tab_widget.h"
 
 #include <QAction>
-#include <QApplication>
 #include <QByteArray>
 #include <QDebug>
 #include <QDockWidget>
@@ -264,14 +263,17 @@ void TabDeckEditorVisual::processMainboardCardClick(const QMouseEvent *event,
 /** @brief Handles clicks on cards in the database display. */
 void TabDeckEditorVisual::processDatabaseCardClick(const QMouseEvent *event, const ExactCard &card)
 {
+    const QString zone = event->modifiers().testFlag(Qt::ControlModifier) ? DECK_ZONE_SIDE
+                         : event->modifiers().testFlag(Qt::ShiftModifier) ? DECK_ZONE_MAYBEBOARD
+                                                                          : DECK_ZONE_MAIN;
     if (event->button() == Qt::LeftButton) {
-        if (QApplication::keyboardModifiers() & Qt::ControlModifier) {
-            addCard(card, DECK_ZONE_SIDE);
-        } else {
-            addCard(card, DECK_ZONE_MAIN);
+        // A single click only selects the card for inspection. The second press
+        // of a double click adds exactly one copy, as in the table database view.
+        if (event->type() == QEvent::MouseButtonDblClick) {
+            addCard(card, zone);
         }
     } else if (event->button() == Qt::RightButton) {
-        decrementCard(card, DECK_ZONE_MAIN);
+        decrementCard(card, zone);
     } else if (event->button() == Qt::MiddleButton) {
         deckDockWidget->actRemoveCard();
     }
