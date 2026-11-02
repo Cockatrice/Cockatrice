@@ -624,10 +624,10 @@ Function RemoveOldPayloadLeftovers
     rop_loop:
     SetFileAttributes "$INSTDIR\continuumatrice.exe" NORMAL
     SetFileAttributes "$INSTDIR\continuumatrice-legacy-oracle.exe" NORMAL
-    SetFileAttributes "$INSTDIR\continuumatrice-server.exe" NORMAL
+    SetFileAttributes "$INSTDIR\continuum-servatrice.exe" NORMAL
     Delete "$INSTDIR\continuumatrice.exe"
     Delete "$INSTDIR\continuumatrice-legacy-oracle.exe"
-    Delete "$INSTDIR\continuumatrice-server.exe"
+    Delete "$INSTDIR\continuum-servatrice.exe"
     Delete "$INSTDIR\qt.conf"
     Call RetryDllPurge
     ; $R0 is RetryDllPurge's verdict (1 = a DLL or the Plugins directory survived).
@@ -635,7 +635,7 @@ Function RemoveOldPayloadLeftovers
     ; servatrice.exe is just as fatal to the install that follows as continuumatrice.exe.
     IfFileExists "$INSTDIR\continuumatrice.exe" rop_retry
     IfFileExists "$INSTDIR\continuumatrice-legacy-oracle.exe" rop_retry
-    IfFileExists "$INSTDIR\continuumatrice-server.exe" rop_retry
+    IfFileExists "$INSTDIR\continuum-servatrice.exe" rop_retry
     ${If} $R0 == 0
         Goto rop_done
     ${EndIf}
@@ -1641,7 +1641,7 @@ Function IsExistingContinuumatriceInstall
     ${If} ${FileExists} "$INSTDIR\continuumatrice-legacy-oracle.exe"
         StrCpy $R0 1
     ${EndIf}
-    ${If} ${FileExists} "$INSTDIR\continuumatrice-server.exe"
+    ${If} ${FileExists} "$INSTDIR\continuum-servatrice.exe"
         StrCpy $R0 1
     ${EndIf}
     ${If} ${FileExists} "$INSTDIR\uninstall.exe"
@@ -2334,7 +2334,7 @@ ${AndIf} ${FileExists} "$INSTDIR\portable.dat"
 	Delete "$INSTDIR\uninstall.exe"
 	Delete "$INSTDIR\continuumatrice.exe"
 	Delete "$INSTDIR\continuumatrice-legacy-oracle.exe"
-	Delete "$INSTDIR\continuumatrice-server.exe"
+	Delete "$INSTDIR\continuum-servatrice.exe"
 	; Every top-level DLL, not a list of expected ones. The payload is written
 	; after this block, so a DLL the new build still needs is put straight back;
 	; what this has to guarantee is that nothing from the previous build is left
@@ -2522,9 +2522,9 @@ ${If} $PortableMode = 0
 	; an independent Cockatrice MTG installation.
 
 	; --- Register custom URI protocol ---
-	WriteRegStr HKCR "cockatrice" "" "URL: Continuumatrice Protocol"
-	WriteRegStr HKCR "cockatrice" "URL Protocol" ""
-	WriteRegStr HKCR "cockatrice\shell\open\command" "" '"$INSTDIR\continuumatrice.exe" "%1"'
+	WriteRegStr HKCR "continuumatrice" "" "URL: Continuumatrice Protocol"
+	WriteRegStr HKCR "continuumatrice" "URL Protocol" ""
+	WriteRegStr HKCR "continuumatrice\shell\open\command" "" '"$INSTDIR\continuumatrice.exe" "%1"'
 
 	IfFileExists "$INSTDIR\vc_redist.x86.exe" VcRedist86Exists PastVcRedist86Check
 	VcRedist86Exists:
