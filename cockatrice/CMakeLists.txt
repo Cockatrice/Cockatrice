@@ -663,7 +663,7 @@ if(WIN32)
   set(qtconf_dest_dir .)
 
   install(
-    DIRECTORY "$<TARGET_FILE_DIR:cockatrice>/"
+    DIRECTORY "$<TARGET_FILE_DIR:continuumatrice>/"
     DESTINATION ./
     FILES_MATCHING
     PATTERN "*.dll"
