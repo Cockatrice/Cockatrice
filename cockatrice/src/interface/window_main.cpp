@@ -129,7 +129,7 @@ class LocalServerInterface;
 #define GITHUB_TROUBLESHOOTING_URL "https://github.com/Cockatrice/Cockatrice/wiki/Troubleshooting"
 #define GITHUB_FAQ_URL "https://github.com/Cockatrice/Cockatrice/wiki/Frequently-Asked-Questions"
 
-const QString MainWindow::appName = "Cockatrice";
+const QString MainWindow::appName = "Continuumatrice";
 const QStringList MainWindow::fileNameFilters = QStringList() << QObject::tr("Cockatrice card database (*.xml)")
                                                               << QObject::tr("All files (*.*)");
 inline Q_LOGGING_CATEGORY(MainWindowLog, "main_window");
@@ -292,8 +292,8 @@ void MainWindow::actExit()
 void MainWindow::actAbout()
 {
     QMessageBox mb(
-        QMessageBox::NoIcon, tr("About Cockatrice"),
-        QString("<font size=\"8\"><b>Cockatrice</b></font> (" + QString::fromStdString(BUILD_ARCHITECTURE) + ")<br>" +
+        QMessageBox::NoIcon, tr("About Continuumatrice"),
+        QString("<font size=\"8\"><b>Continuumatrice</b></font> (" + QString::fromStdString(BUILD_ARCHITECTURE) + ")<br>" +
                 tr("Version") + QString(" %1").arg(VERSION_STRING) + "<br><br><b><a href='" + GITHUB_PAGES_URL + "'>" +
                 tr("Cockatrice Webpage") + "</a></b><br>" + "<br><b>" + tr("Project Manager:") +
                 "</b><br>Zach Halpern<br><br>" + "<b>" + tr("Past Project Managers:") +
@@ -369,7 +369,7 @@ void MainWindow::retranslateUi()
 #if defined(__APPLE__) /* For OSX */
     cockatriceMenu->setTitle(tr("A&ctions"));
 #else
-    cockatriceMenu->setTitle(tr("&Cockatrice"));
+    cockatriceMenu->setTitle(tr("&Continuumatrice"));
 #endif
 
     dbMenu->setTitle(tr("C&ard Database"));
@@ -383,7 +383,7 @@ void MainWindow::retranslateUi()
     tabsMenu->setTitle(tr("Tabs"));
 
     helpMenu->setTitle(tr("&Help"));
-    aAbout->setText(tr("&About Cockatrice"));
+    aAbout->setText(tr("&About Continuumatrice"));
     aTips->setText(tr("&Tip of the Day"));
     aUpdate->setText(tr("Check for Client Updates"));
     aCheckCardUpdates->setText(tr("Check for Card Updates..."));
