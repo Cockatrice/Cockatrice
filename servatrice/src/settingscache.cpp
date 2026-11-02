@@ -27,7 +27,7 @@ SettingsCache::SettingsCache(const QString &fileName, QSettings::Format format, 
 
 QString SettingsCache::guessConfigurationPath()
 {
-    const QString fileName = "servatrice.ini";
+    const QString fileName = "continuumatrice-server.ini";
     if (QFile::exists(qApp->applicationDirPath() + "/portable.dat")) {
         qDebug() << "Portable mode enabled";
         return fileName;
@@ -43,7 +43,7 @@ QString SettingsCache::guessConfigurationPath()
 
 #ifdef Q_OS_UNIX
     // /etc
-    guessFileName = "/etc/servatrice/" + fileName;
+    guessFileName = "/etc/continuumatrice-server/" + fileName;
     if (QFile::exists(guessFileName)) {
         return guessFileName;
     }
