@@ -18,6 +18,8 @@ class QCheckBox;
 class QHBoxLayout;
 class QString;
 class QTimer;
+class QShowEvent;
+class QHideEvent;
 class QVBoxLayout;
 class SettingsButtonWidget;
 template <class Key, class T> class QMap;
@@ -46,6 +48,10 @@ public:
 
     void setCard(const CardInfoPtr &newCard);
     void getAllSetsForCurrentCard();
+
+protected:
+    void showEvent(QShowEvent *event) override;
+    void hideEvent(QHideEvent *event) override;
 
 public slots:
     void retranslateUi();
@@ -88,6 +94,8 @@ private:
     DeckStateManager *deckStateManager;
     CardInfoPtr selectedCard;
     QTimer *widgetLoadingBufferTimer;
+    QTimer *deckChangeTimer;
+    bool displayDirty = false;
     int currentIndex = 0;
 };
 

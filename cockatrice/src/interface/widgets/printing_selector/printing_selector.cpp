@@ -21,12 +21,14 @@
 #include <QCheckBox>
 #include <QDebug>
 #include <QHBoxLayout>
+#include <QHideEvent>
 #include <QList>
 #include <QMap>
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QSharedPointer>
 #include <QSizePolicy>
+#include <QShowEvent>
 #include <QString>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -54,6 +56,9 @@ PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deck
     setLayout(layout);
 
     widgetLoadingBufferTimer = new QTimer(this);
+    deckChangeTimer = new QTimer(this);
+    deckChangeTimer->setSingleShot(true);
+    connect(deckChangeTimer, &QTimer::timeout, this, &PrintingSelector::updateDisplay);
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
 
@@ -122,9 +127,34 @@ void PrintingSelector::retranslateUi()
 void PrintingSelector::printingsInDeckChanged()
 {
     if (SettingsCache::instance().cardsDisplay().getBumpSetsWithCardsInDeckToTop()) {
-        // Delay the update to avoid race conditions
-        QTimer::singleShot(100, this, &PrintingSelector::updateDisplay);
+        displayDirty = true;
+        if (isVisible()) {
+            // Coalesce deck changes while the model settles.
+            deckChangeTimer->start(100);
+        } else {
+            widgetLoadingBufferTimer->stop();
+        }
     }
+}
+
+void PrintingSelector::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    if (displayDirty) {
+        updateDisplay();
+    }
+}
+
+void PrintingSelector::hideEvent(QHideEvent *event)
+{
+    // A partially built batch must be rebuilt on reveal, not resumed with
+    // stale printing data after the selected card or deck changes.
+    if (widgetLoadingBufferTimer->isActive() || deckChangeTimer->isActive()) {
+        widgetLoadingBufferTimer->stop();
+        deckChangeTimer->stop();
+        displayDirty = true;
+    }
+    QWidget::hideEvent(event);
 }
 
 /**
@@ -173,6 +203,8 @@ void PrintingSelector::updateCardAmounts()
  */
 void PrintingSelector::updateDisplay()
 {
+    deckChangeTimer->stop();
+    displayDirty = false;
     widgetLoadingBufferTimer->stop();
     widgetLoadingBufferTimer->deleteLater();
     widgetLoadingBufferTimer = new QTimer(this);
@@ -199,20 +231,18 @@ void PrintingSelector::updateDisplay()
  */
 void PrintingSelector::setCard(const CardInfoPtr &newCard)
 {
-    if (newCard.isNull()) {
-        selectedCard = newCard;
-        updateDisplay();
+    // Same-name cards may be different database snapshots after a reload.
+    if (selectedCard == newCard) {
         return;
     }
 
-    // we don't need to redraw the widget if the card is the same
-    if (!selectedCard.isNull() && selectedCard->getName() == newCard->getName()) {
-        return;
-    }
-
+    widgetLoadingBufferTimer->stop();
+    deckChangeTimer->stop();
     selectedCard = newCard;
     if (isVisible()) {
         updateDisplay();
+    } else {
+        displayDirty = true;
     }
     flowWidget->setMinimumSizeToMaxSizeHint();
     flowWidget->scrollArea->verticalScrollBar()->setValue(0);
