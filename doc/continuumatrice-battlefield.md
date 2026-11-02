@@ -19,7 +19,7 @@ Support = #A0286981
 Command = #A05E428C
 ```
 
-The Qt color notation is `#AARRGGBB`, including transparency. Without this file, built-in red, teal, and purple shades are used. Reload the theme to apply changes. The row order follows the player's mirrored/inverted layout, so Front always faces the battlefield center.
+The Qt color notation is `#AARRGGBB`, including transparency. Without this file, built-in red, teal, and purple shades are used. Reload the theme to apply changes. The default layout places Front closest to the opposing player's battlefield and Command closest to each player's hand. As in Cockatrice, the **Invert vertical coordinate** setting reverses the row placement (and its labels) when enabled.
 
 ## Font
 
@@ -29,4 +29,4 @@ The font is also detected if already installed as "Continuumorphous Regular" or 
 
 ## Compatibility
 
-The existing drag/drop, row mapping, stacking, card counters, playmats, and multiplayer protocols are preserved. This does **not** enforce gameplay placement restrictions.
+The existing drag/drop, stacking, card counters, playmats, and multiplayer protocols are preserved. The automatic `tablerow` placement is explicitly mapped `0 -> Front`, `1 -> Support`, `2 -> Command` (not Cockatrice's reversed Magic-oriented mapping). This does **not** enforce gameplay placement restrictions.
