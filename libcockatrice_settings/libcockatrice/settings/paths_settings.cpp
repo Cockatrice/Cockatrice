@@ -92,6 +92,7 @@ void PathsSettings::setPicsPath(const QString &_picsPath)
 void PathsSettings::setCustomPicsPath(const QString &_customPicsPath)
 {
     setValue(_customPicsPath, "customPics");
+    emit picsPathChanged();
 }
 
 void PathsSettings::setThemesPath(const QString &_themesPath)

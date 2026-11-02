@@ -4,6 +4,7 @@
 #include "../pixel_map_generator.h"
 #include "card_picture_loader_cache_method.h"
 #include "card_picture_loader_local_schemes.h"
+#include "card_picture_loader_local.h"
 #include "card_picture_loader_status_bar.h"
 #include "card_picture_loader_worker.h"
 #include "libcockatrice/card/card_info.h"
@@ -62,6 +63,7 @@ CardPictureLoader::CardPictureLoader() : QObject(nullptr)
 
     qRegisterMetaType<ExactCard>("ExactCard");
     connect(worker, &CardPictureLoaderWorker::imageLoaded, this, &CardPictureLoader::imageLoaded);
+    connect(worker, &CardPictureLoaderWorker::localImagesChanged, this, &CardPictureLoader::localImagesChanged);
     connect(worker, &CardPictureLoaderWorker::networkCacheCleared, this, &CardPictureLoader::networkCacheCleared);
 
     statusBar = new CardPictureLoaderStatusBar(nullptr);
@@ -155,6 +157,105 @@ void CardPictureLoader::getCardBackLoadingFailedPixmap(QPixmap &pixmap, QSize si
     }
 }
 
+void CardPictureLoader::trackCard(const ExactCard &card, const QString &scaledKey)
+{
+    const QString key = card.getPixmapCacheKey();
+    auto &entries = trackedCards[key];
+    for (auto it = entries.begin(); it != entries.end();) {
+        const auto existing = it->card.toStrongRef();
+        if (!existing) {
+            it = entries.erase(it);
+            continue;
+        }
+        if (existing == card.getCardPtr() && it->printing == card.getPrinting()) {
+            if (!scaledKey.isEmpty()) {
+                it->scaledKeys.insert(scaledKey);
+            }
+            return;
+        }
+        ++it;
+    }
+    TrackedCard entry{card.getCardPtr().toWeakRef(), card.getPrinting(), {}};
+    if (!scaledKey.isEmpty()) {
+        entry.scaledKeys.insert(scaledKey);
+    }
+    entries.append(entry);
+    // Do not keep card objects alive just because their pictures were shown.
+    connect(card.getCardPtr().data(), &QObject::destroyed, this, [this, key] {
+        auto it = trackedCards.find(key);
+        if (it == trackedCards.end()) {
+            return;
+        }
+        auto &cards = it.value();
+        for (auto cardIt = cards.begin(); cardIt != cards.end();) {
+            if (cardIt->card.isNull()) {
+                for (const QString &scaled : cardIt->scaledKeys) {
+                    QPixmapCache::remove(scaled);
+                }
+                cardIt = cards.erase(cardIt);
+            } else {
+                ++cardIt;
+            }
+        }
+        if (cards.isEmpty()) {
+            trackedCards.erase(it);
+            QPixmapCache::remove(key);
+            failedAt.remove(key);
+        }
+    });
+}
+
+void CardPictureLoader::localImagesChanged(const QStringList &names, bool all, const QStringList &fulfilledKeys)
+{
+    const QSet<QString> fulfilled(fulfilledKeys.cbegin(), fulfilledKeys.cend());
+    const QSet<QString> changedNames(names.cbegin(), names.cend());
+    // Select whole cache keys, so distinct live observers sharing a key are
+    // invalidated and notified together even when only one printing matched.
+    const auto snapshot = trackedCards;
+    QSet<QString> affectedKeys;
+    for (auto it = snapshot.cbegin(); it != snapshot.cend(); ++it) {
+        for (const TrackedCard &entry : it.value()) {
+            if (const auto card = entry.card.toStrongRef()) {
+                if (all || CardPictureLoaderLocal::matchesNames(ExactCard(card, entry.printing), changedNames)) {
+                    affectedKeys.insert(it.key());
+                    break;
+                }
+            }
+        }
+    }
+    for (const QString &key : affectedKeys) {
+        QPixmapCache::remove(key);
+        failedAt.remove(key);
+        for (const TrackedCard &entry : snapshot.value(key)) {
+            for (const QString &scaled : entry.scaledKeys) {
+                QPixmapCache::remove(scaled);
+            }
+        }
+        auto tracked = trackedCards.find(key);
+        if (tracked != trackedCards.end()) {
+            for (TrackedCard &entry : tracked.value()) {
+                entry.scaledKeys.clear();
+            }
+        }
+        if (fulfilled.contains(key)) {
+            pendingLoads.insert(key);
+            continue; // The worker will deliver this key immediately after invalidation.
+        }
+        for (const TrackedCard &entry : snapshot.value(key)) {
+            if (const auto card = entry.card.toStrongRef()) {
+                const ExactCard exact(card, entry.printing);
+                if (all || CardPictureLoaderLocal::matchesNames(exact, changedNames)) {
+                    // Select one matching observer for this shared key.
+                    // Completion, not invalidation, drives the override flow.
+                    pendingLoads.insert(key);
+                    worker->refreshImageLoad(exact);
+                    break;
+                }
+            }
+        }
+    }
+}
+
 void CardPictureLoader::getPixmap(QPixmap &pixmap, const ExactCard &card, QSize size)
 {
     if (!card) {
@@ -164,6 +265,7 @@ void CardPictureLoader::getPixmap(QPixmap &pixmap, const ExactCard &card, QSize 
 
     QString key = card.getPixmapCacheKey();
     QString sizeKey = key + QLatin1Char('_') + QString::number(size.width()) + "x" + QString::number(size.height());
+    getInstance().trackCard(card, sizeKey);
 
     if (QPixmapCache::find(sizeKey, &pixmap)) {
         return; // Use cached version
@@ -180,7 +282,10 @@ void CardPictureLoader::getPixmap(QPixmap &pixmap, const ExactCard &card, QSize 
                 failedAtTime.addSecs(RETRY_FAILED_CARDS_SECS) < QDateTime::currentDateTime()) {
                 getInstance().failedAt.remove(key);
                 QPixmapCache::remove(key);
-                getInstance().worker->enqueueImageLoad(card);
+                if (!getInstance().pendingLoads.contains(key)) {
+                    getInstance().pendingLoads.insert(key);
+                    getInstance().worker->enqueueImageLoad(card);
+                }
             }
             return;
         }
@@ -196,12 +301,17 @@ void CardPictureLoader::getPixmap(QPixmap &pixmap, const ExactCard &card, QSize 
     }
 
     // add the card to the load queue
-    qCDebug(CardPictureLoaderLog) << "Enqueuing " << card.getName() << " for " << card.getPixmapCacheKey();
-    getInstance().worker->enqueueImageLoad(card);
+    if (!getInstance().pendingLoads.contains(key)) {
+        qCDebug(CardPictureLoaderLog) << "Enqueuing " << card.getName() << " for " << key;
+        getInstance().pendingLoads.insert(key);
+        getInstance().worker->enqueueImageLoad(card);
+    }
 }
 
 void CardPictureLoader::imageLoaded(const ExactCard &card, const QImage &image)
 {
+    pendingLoads.remove(card.getPixmapCacheKey());
+    trackCard(card);
     QPixmap finalPixmap;
 
     if (image.isNull()) {
@@ -229,15 +339,15 @@ void CardPictureLoader::imageLoaded(const ExactCard &card, const QImage &image)
         saveCardImageToLocalStorage(card, finalPixmap);
     }
 
-    // imageLoaded should only be reached if the exactCard isn't already in cache.
-    // (plus there's a deduplication mechanism in CardPictureLoaderWorker)
-    // It should be safe to connect the CardInfo here without worrying about redundant connections.
-    connect(card.getCardPtr().data(), &QObject::destroyed, this, [cacheKey = card.getPixmapCacheKey()] {
-        QPixmapCache::remove(cacheKey);
-        getInstance().failedAt.remove(cacheKey);
-    });
-
-    card.emitPixmapUpdated();
+    // Several live CardInfo objects can share one pixmap key. The worker
+    // deduplicates their request, so notify every tracked observer when that
+    // shared image arrives, without retaining any card object.
+    const auto observers = trackedCards.value(card.getPixmapCacheKey());
+    for (const TrackedCard &entry : observers) {
+        if (const auto observed = entry.card.toStrongRef()) {
+            ExactCard(observed, entry.printing).emitPixmapUpdated();
+        }
+    }
 }
 
 void CardPictureLoader::deleteAllLocalOverrides(const ExactCard &card)
@@ -418,6 +528,7 @@ void CardPictureLoader::installPrintingOverrideOnLoad(const ExactCard &originalC
 
     // Now enqueue; if the image is already loading (deduplicated in the worker),
     // the signal will still fire when it completes
+    CardPictureLoader::getInstance().pendingLoads.insert(overrideCard.getPixmapCacheKey());
     CardPictureLoader::getInstance().worker->enqueueImageLoad(overrideCard);
 }
 
@@ -516,7 +627,10 @@ void CardPictureLoader::cacheCardPixmaps(const QList<ExactCard> &cards)
             continue;
         }
 
-        getInstance().worker->enqueueImageLoad(card);
+        if (!getInstance().pendingLoads.contains(key)) {
+            getInstance().pendingLoads.insert(key);
+            getInstance().worker->enqueueImageLoad(card);
+        }
     }
 }
 

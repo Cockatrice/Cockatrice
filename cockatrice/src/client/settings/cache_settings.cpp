@@ -265,6 +265,7 @@ void SettingsCache::resetPaths()
     QStringList databasePaths{pathsSettings->getCustomCardDatabasePath(), pathsSettings->getCardDatabasePath(),
                               pathsSettings->getSpoilerCardDatabasePath(), pathsSettings->getTokenDatabasePath()};
     QString picsPath_ = pathsSettings->getPicsPath();
+    QString customPicsPath_ = pathsSettings->getCustomPicsPath();
 
     QSettings pathsIni(getSettingsPath() + "paths.ini", QSettings::IniFormat);
     pathsIni.remove("paths");
@@ -276,7 +277,7 @@ void SettingsCache::resetPaths()
                                      pathsSettings->getTokenDatabasePath()}) {
         emit cardDatabasePathChanged();
     }
-    if (picsPath_ != pathsSettings->getPicsPath()) {
+    if (picsPath_ != pathsSettings->getPicsPath() || customPicsPath_ != pathsSettings->getCustomPicsPath()) {
         emit pathsSettings->picsPathChanged();
     }
 }

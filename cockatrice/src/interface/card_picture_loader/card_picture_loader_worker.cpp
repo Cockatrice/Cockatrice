@@ -79,6 +79,48 @@ CardPictureLoaderWorker::CardPictureLoaderWorker()
             &CardPictureLoaderWorker::saveRedirectCache);
 
     localLoader = new CardPictureLoaderLocal(this);
+    connect(localLoader, &CardPictureLoaderLocal::imagesChanged, this, [this](const QStringList &names, bool all) {
+        QList<QPair<ExactCard, QImage>> immediatelyLoaded;
+        QStringList fulfilledKeys;
+        const QSet<QString> changedNames(names.cbegin(), names.cend());
+
+        // If a custom image appeared while its network request was pending,
+        // display it immediately rather than waiting for that request to time out.
+        const auto pending = activeWork;
+        for (auto it = pending.cbegin(); it != pending.cend(); ++it) {
+            CardPictureLoaderWorkerWork *work = it.value();
+            if (!work) {
+                continue;
+            }
+            const ExactCard card = work->cardToDownload.getCard();
+            const bool exactMatch = all || CardPictureLoaderLocal::matchesNames(card, changedNames);
+            if (!exactMatch && !CardPictureLoaderLocal::mayMatchSharedKey(card, changedNames)) {
+                continue;
+            }
+            staleLoads.insert(it.key());
+            // A different printing sharing this key may be the true match. Let
+            // the facade select it rather than publishing this printing's art.
+            if (!exactMatch) {
+                continue;
+            }
+            const QImage image = localLoader->tryLoad(card);
+            if (image.isNull()) {
+                continue;
+            }
+            activeWork.remove(it.key());
+            staleLoads.remove(it.key());
+            currentlyLoading.remove(it.key());
+            delete work; // Cancels an outstanding reply via the guarded D05 path.
+            fulfilledKeys.append(it.key());
+            immediatelyLoaded.append(qMakePair(card, image));
+        }
+        // The facade must invalidate first, but must not schedule a duplicate
+        // reload for keys whose fresh local result is already on its way.
+        emit localImagesChanged(names, all, fulfilledKeys);
+        for (const auto &loaded : immediatelyLoaded) {
+            emit imageLoaded(loaded.first, loaded.second);
+        }
+    });
 
     pictureLoaderThread = new QThread;
     // The worker object frees itself once its thread finishes, so no event loop is left
@@ -93,6 +135,8 @@ CardPictureLoaderWorker::CardPictureLoaderWorker()
     dispatchTimer.moveToThread(pictureLoaderThread);
 
     connect(this, &CardPictureLoaderWorker::imageLoadEnqueued, this, &CardPictureLoaderWorker::handleImageLoadEnqueued);
+    connect(this, &CardPictureLoaderWorker::imageRefreshEnqueued, this,
+            &CardPictureLoaderWorker::handleImageRefreshEnqueued);
 
     connect(&requestTimer, &QTimer::timeout, this, &CardPictureLoaderWorker::resetRequestQuota);
     requestTimer.setInterval(static_cast<int>(QUOTA_RESET_INTERVAL_MS));
@@ -492,6 +536,26 @@ void CardPictureLoaderWorker::enqueueImageLoad(const ExactCard &card)
     emit imageLoadEnqueued(card);
 }
 
+void CardPictureLoaderWorker::refreshImageLoad(const ExactCard &card)
+{
+    emit imageRefreshEnqueued(card);
+}
+
+void CardPictureLoaderWorker::handleImageRefreshEnqueued(const ExactCard &card)
+{
+    const QString key = card.getPixmapCacheKey();
+    CardPictureLoaderWorkerWork *work = activeWork.value(key);
+    if (work && work->cardToDownload.getCard() != card) {
+        // The facade selected a matching observer, but an older request for a
+        // different printing shares its cache key. Replace that request.
+        activeWork.remove(key);
+        currentlyLoading.remove(key);
+        staleLoads.remove(key);
+        delete work;
+    }
+    handleImageLoadEnqueued(card);
+}
+
 void CardPictureLoaderWorker::handleImageLoadEnqueued(const ExactCard &card)
 {
     // deduplicate loads for the same card
@@ -501,6 +565,7 @@ void CardPictureLoaderWorker::handleImageLoadEnqueued(const ExactCard &card)
         return;
     }
     currentlyLoading.insert(card.getPixmapCacheKey());
+    staleLoads.remove(card.getPixmapCacheKey());
 
     // try to load image from local first
     QImage image = localLoader->tryLoad(card);
@@ -508,7 +573,11 @@ void CardPictureLoaderWorker::handleImageLoadEnqueued(const ExactCard &card)
         handleImageLoaded(card, image);
     } else {
         // queue up to load image from remote only after local loading failed
-        new CardPictureLoaderWorkerWork(this, card);
+        auto *work = new CardPictureLoaderWorkerWork(this, card);
+        // Construction may finish synchronously when no source is available.
+        if (currentlyLoading.contains(card.getPixmapCacheKey())) {
+            activeWork.insert(card.getPixmapCacheKey(), work);
+        }
     }
 }
 
@@ -517,7 +586,16 @@ void CardPictureLoaderWorker::handleImageLoadEnqueued(const ExactCard &card)
  */
 void CardPictureLoaderWorker::handleImageLoaded(const ExactCard &card, const QImage &image)
 {
-    currentlyLoading.remove(card.getPixmapCacheKey());
+    const QString key = card.getPixmapCacheKey();
+    const bool stale = staleLoads.remove(key);
+    activeWork.remove(key);
+    currentlyLoading.remove(key);
+    if (stale) {
+        // A local change raced this request. Re-evaluate it before publishing
+        // anything to the GUI, so an old network result cannot replace new art.
+        handleImageLoadEnqueued(card);
+        return;
+    }
     emit imageLoaded(card, image);
 }
 

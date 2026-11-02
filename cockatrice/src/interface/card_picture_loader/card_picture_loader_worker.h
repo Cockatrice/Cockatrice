@@ -65,6 +65,7 @@ public:
      * This will first try to load the image locally; if that fails, it will enqueue a network request.
      */
     void enqueueImageLoad(const ExactCard &card);
+    void refreshImageLoad(const ExactCard &card);
 
     /**
      * @brief Queues a network request for a given URL and worker thread.
@@ -172,6 +173,8 @@ private:
 
     CardPictureLoaderLocal *localLoader; ///< Loader for local images
     QSet<QString> currentlyLoading;      ///< Deduplication: contains pixmapCacheKey currently being loaded
+    QSet<QString> staleLoads; ///< A relevant local image changed during this in-flight request
+    QHash<QString, QPointer<CardPictureLoaderWorkerWork>> activeWork; ///< Network-backed loads
 
     /**
      * @brief Effective per-host allowance ceiling for a host.
@@ -221,10 +224,12 @@ private slots:
 
     /** @brief Handles image load requests enqueued on this worker. */
     void handleImageLoadEnqueued(const ExactCard &card);
+    void handleImageRefreshEnqueued(const ExactCard &card);
 
 signals:
     /** @brief Emitted when an image load is enqueued. */
     void imageLoadEnqueued(const ExactCard &card);
+    void imageRefreshEnqueued(const ExactCard &card);
 
     /** @brief Emitted when an image has finished loading. */
     void imageLoaded(const ExactCard &card, const QImage &image);
@@ -234,6 +239,9 @@ signals:
 
     /** @brief Emitted when a network request successfully completes. */
     void imageRequestSucceeded(const QUrl &url);
+
+    /** @brief Emitted after local image changes have been indexed. */
+    void localImagesChanged(const QStringList &names, bool all, const QStringList &fulfilledKeys);
 
     /** @brief Emitted after clearNetworkCache() has finished clearing both caches. */
     void networkCacheCleared();

@@ -9,7 +9,10 @@
 #include <QColor>
 #include <QCoreApplication>
 #include <QDir>
+#include <QElapsedTimer>
+#include <QFile>
 #include <QFileInfo>
+#include <QFileSystemWatcher>
 #include <QImage>
 #include <QImageWriter>
 #include <QLoggingCategory>
@@ -18,6 +21,8 @@
 #include <QStandardPaths>
 #include <QString>
 #include <QTemporaryDir>
+#include <QThread>
+#include <QTimer>
 #include <QtGlobal>
 #include <libcockatrice/card/lazy_properties_hash.h>
 #include <libcockatrice/card/printing/exact_card.h>
@@ -204,6 +209,102 @@ TEST_F(LocalMatcherTest, CustomSubfolderIgnoresSuffixedFiles)
     const QImage image = loader->tryLoad(cardFor("TestCard", "", ""));
 
     EXPECT_TRUE(image.isNull()) << "A suffixed CUSTOM-folder file must not satisfy an exact name lookup";
+}
+
+TEST(LocalWatchRecoveryTest, DiscoversNewRootAndReinstallsDroppedWatch)
+{
+    QTemporaryDir temp;
+    ASSERT_TRUE(temp.isValid());
+    const QString custom = temp.path() + "/pics/CUSTOM";
+    CardPictureLoaderLocal loader(nullptr, temp.path() + "/pics", custom + "/");
+    auto *watcher = loader.findChild<QFileSystemWatcher *>();
+    ASSERT_NE(watcher, nullptr);
+    ASSERT_TRUE(watcher->directories().contains(temp.path()));
+
+    auto waitFor = [](const auto &predicate) {
+        QElapsedTimer clock;
+        clock.start();
+        while (!predicate() && clock.elapsed() < 5000) {
+            QCoreApplication::processEvents();
+            QThread::msleep(10);
+        }
+        return predicate();
+    };
+    ASSERT_TRUE(QDir().mkpath(custom));
+    QFile first(custom + "/first.png");
+    ASSERT_TRUE(first.open(QIODevice::WriteOnly));
+    first.close();
+    ASSERT_TRUE(waitFor([&] { return !loader.indexedPaths("first").isEmpty() &&
+                                   watcher->directories().contains(custom); }));
+
+    // Simulate a watch the OS removed, then trigger the existing fallback tick.
+    ASSERT_TRUE(watcher->removePath(custom));
+    QTimer *fallback = nullptr;
+    for (auto *timer : loader.findChildren<QTimer *>()) {
+        if (timer->interval() == 5 * 60 * 1000) {
+            fallback = timer;
+        }
+    }
+    ASSERT_NE(fallback, nullptr);
+    ASSERT_TRUE(QMetaObject::invokeMethod(fallback, "timeout", Qt::DirectConnection));
+    ASSERT_TRUE(watcher->directories().contains(custom));
+    QFile second(custom + "/second.png");
+    ASSERT_TRUE(second.open(QIODevice::WriteOnly));
+    second.close();
+    EXPECT_TRUE(waitFor([&] { return !loader.indexedPaths("second").isEmpty(); }));
+}
+
+TEST(LocalWatchRecoveryTest, CapsFileWatchesAndPollsEvictedAndFailedPaths)
+{
+    QTemporaryDir temp;
+    ASSERT_TRUE(temp.isValid());
+    const QString custom = temp.path() + "/CUSTOM";
+    ASSERT_TRUE(QDir().mkpath(custom));
+    QImage image(1, 1, QImage::Format_RGB32);
+    image.fill(Qt::red);
+    for (int i = 0; i < 140; ++i) {
+        const QString name = QString("Art%1").arg(i, 3, 10, QLatin1Char('0'));
+        ASSERT_TRUE(image.save(custom + "/" + name + ".png", "PNG"));
+    }
+    CardPictureLoaderLocal loader(nullptr, temp.path(), custom);
+    auto *watcher = loader.findChild<QFileSystemWatcher *>();
+    ASSERT_NE(watcher, nullptr);
+    for (int i = 0; i < 140; ++i) {
+        const QString name = QString("Art%1").arg(i, 3, 10, QLatin1Char('0'));
+        ASSERT_FALSE(loader.tryLoad(cardFor(name, "", "")).isNull());
+        ASSERT_LE(watcher->files().size(), 128);
+    }
+    const QString oldest = custom + "/Art000.png";
+    const QString newest = custom + "/Art139.png";
+    EXPECT_FALSE(watcher->files().contains(oldest));
+    ASSERT_TRUE(watcher->files().contains(newest));
+
+    QStringList changed;
+    QObject::connect(&loader, &CardPictureLoaderLocal::imagesChanged, &loader,
+                     [&](const QStringList &names, bool) { changed.append(names); });
+    QTimer *fallback = nullptr;
+    for (auto *timer : loader.findChildren<QTimer *>()) {
+        if (timer->interval() == 5 * 60 * 1000) {
+            fallback = timer;
+        }
+    }
+    ASSERT_NE(fallback, nullptr);
+    QFile edited(oldest);
+    ASSERT_TRUE(edited.open(QIODevice::Append));
+    ASSERT_EQ(edited.write("x"), 1);
+    edited.close();
+    ASSERT_TRUE(QMetaObject::invokeMethod(fallback, "timeout", Qt::DirectConnection));
+    EXPECT_TRUE(changed.contains("Art000"));
+
+    ASSERT_TRUE(watcher->removePath(newest));
+    ASSERT_TRUE(QFile::remove(newest));
+    EXPECT_TRUE(loader.tryLoad(cardFor("Art139", "", "")).isNull());
+    ASSERT_TRUE(image.save(newest, "PNG"));
+    ASSERT_FALSE(loader.tryLoad(cardFor("Art139", "", "")).isNull());
+    EXPECT_FALSE(watcher->files().contains(newest)); // No immediate retry storm.
+    ASSERT_TRUE(QMetaObject::invokeMethod(fallback, "timeout", Qt::DirectConnection));
+    EXPECT_TRUE(watcher->files().contains(newest));
+    EXPECT_LE(watcher->files().size(), 128);
 }
 
 } // namespace

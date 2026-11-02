@@ -2,10 +2,15 @@
 #define CARD_PICTURE_LOADER_H
 
 #include <QHash>
+#include <QList>
+#include <QSet>
+#include <QWeakPointer>
+#include <libcockatrice/card/printing/printing_info.h>
 #include <QLoggingCategory>
 #include <QObject>
 #include <qtmetamacros.h>
 
+class CardInfo;
 class CardPictureLoaderStatusBar;
 class CardPictureLoaderWorker;
 class ExactCard;
@@ -67,6 +72,16 @@ private:
     CardPictureLoaderWorker *worker;       ///< Worker thread for async image loading
     CardPictureLoaderStatusBar *statusBar; ///< Status bar widget showing load progress
     QHash<QString, QDateTime> failedAt;    ///< Timestamp of the last failed load attempt per pixmap cache key
+    QSet<QString> pendingLoads; ///< Requests remain pending until their result reaches the GUI thread
+
+    struct TrackedCard {
+        QWeakPointer<CardInfo> card;
+        PrintingInfo printing;
+        QSet<QString> scaledKeys;
+    };
+    QHash<QString, QList<TrackedCard>> trackedCards; ///< Weak references to cards whose pictures were requested
+    void trackCard(const ExactCard &card, const QString &scaledKey = {});
+    void localImagesChanged(const QStringList &names, bool all, const QStringList &fulfilledKeys);
 
 public:
     /**
