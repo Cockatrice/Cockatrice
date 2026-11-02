@@ -28,10 +28,10 @@ git clone https://github.com/Continuum-Universes-Studio/Continuumatrice.git
 cd Continuumatrice
 
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
-  -DWITH_CLIENT=ON -DWITH_SERVER=OFF -DWITH_ORACLE=OFF
+  -DWITH_CLIENT=ON -DWITH_SERVER=ON -DWITH_ORACLE=OFF
 
-cmake --build build --target continuumatrice --parallel 16
-./build/cockatrice/continuumatrice
+cmake --build build --target continuumatrice continuum-servatrice --parallel 16
+./build/continuumatrice/continuumatrice
 ```
 
 The `cockatrice` CMake target is a backwards-compatible **build alias**, not the generated executable. An old `build/cockatrice/cockatrice` binary may still exist if you compiled an earlier version: it is stale, not Continuumatrice.
@@ -66,3 +66,9 @@ Legacy class names, the `cockatrice/` source directory, `libcockatrice_*` intern
 Continuumatrice is derived from [Cockatrice](https://github.com/Cockatrice/Cockatrice), originally developed by the Cockatrice contributors. Existing copyright headers, contribution history and upstream license obligations are retained. See [LICENSE](LICENSE). The Continuumatrice modifications are maintained by Continuum Universes Studio.
 
 This is an independent fork, **not** an official Cockatrice release.
+
+## Host Continuum-Servatrice
+
+This repository includes the full dedicated multiplayer server, **Continuum-Servatrice**, built with the `continuum-servatrice` CMake target (default `WITH_SERVER=ON`). Its build output is `build/continuum-servatrice/continuum-servatrice`. Use the standalone `continuum_servatrice` MySQL database and the provided server-specific SQL schema/config; do not reuse MTG Servatrice's database or tables.
+
+[Dedicated server hosting and database instructions](doc/continuum-servatrice-hosting.md)
