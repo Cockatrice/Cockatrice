@@ -706,35 +706,8 @@ void MainWindow::startupConfigCheck()
         // previous config from this version found
         qCInfo(WindowMainStartupVersionLog) << "Startup: found config with current version";
 
-        if (false && SettingsCache::instance().updates().getCardUpdateCheckRequired()) {
-            if (SettingsCache::instance().updates().getStartupCardUpdateCheckPromptForUpdate()) {
-                auto startupCardCheckDialog = new DlgStartupCardCheck(this);
+        // No automatic upstream card database downloads in Continuumatrice.
 
-                if (startupCardCheckDialog->exec() == QDialog::Accepted) {
-                    switch (startupCardCheckDialog->group->checkedId()) {
-                        case 0: // foreground
-                            actCheckCardUpdates();
-                            break;
-                        case 1: // background
-                            actCheckCardUpdatesBackground();
-                            break;
-                        case 2: // background + always
-                            SettingsCache::instance().updates().setStartupCardUpdateCheckPromptForUpdate(false);
-                            SettingsCache::instance().updates().setStartupCardUpdateCheckAlwaysUpdate(true);
-                            actCheckCardUpdatesBackground();
-                            break;
-                        case 3: // don't prompt again + don't run
-                            SettingsCache::instance().updates().setStartupCardUpdateCheckPromptForUpdate(false);
-                            SettingsCache::instance().updates().setStartupCardUpdateCheckAlwaysUpdate(false);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            } else if (SettingsCache::instance().updates().getStartupCardUpdateCheckAlwaysUpdate()) {
-                actCheckCardUpdatesBackground();
-            }
-        }
 
         // Run the tips dialog only on subsequent startups.
         // On the first run after an install/update the startup is already crowded enough
