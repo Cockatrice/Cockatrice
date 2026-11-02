@@ -1,7 +1,7 @@
 #include "mana_curve_total_widget.h"
 
 #include "../../../general/display/charts/bars/bar_chart_widget.h"
-#include "libcockatrice/utility/color.h"
+#include "../../../../essence_chart_colors.h"
 #include "mana_curve_config.h"
 
 #include <QHBoxLayout>
@@ -71,7 +71,7 @@ void ManaCurveTotalWidget::updateDisplay(const QString &categoryName,
                     cards = catIt->value(cmc);
                 }
 
-                segments.push_back({category, value, cards, GameSpecificColors::MTG::colorHelper(category)});
+                segments.push_back({category, value, cards, EssenceCharts::colorFor(category)});
             }
         }
 
