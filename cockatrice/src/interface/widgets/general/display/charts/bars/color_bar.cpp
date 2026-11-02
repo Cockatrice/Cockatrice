@@ -1,6 +1,6 @@
 #include "color_bar.h"
 
-#include "libcockatrice/utility/color.h"
+#include "../../../../../essence_chart_colors.h"
 
 #include <QBrush>
 #include <QLinearGradient>
@@ -19,14 +19,14 @@
 #include <utility>
 
 ColorBar::ColorBar(const QMap<QString, int> &_colors, QWidget *parent)
-    : QWidget(parent), colors(GameSpecificColors::MTG::sortManaMapWUBRGCFirst(_colors))
+    : QWidget(parent), colors(EssenceCharts::ordered(_colors))
 {
     setMouseTracking(true);
 }
 
 void ColorBar::setColors(const QMap<QString, int> &_colors)
 {
-    colors = GameSpecificColors::MTG::sortManaMapWUBRGCFirst(_colors);
+    colors = EssenceCharts::ordered(_colors);
     update();
 }
 
@@ -150,19 +150,5 @@ QString ColorBar::tooltipForPosition(int x) const
 
 QColor ColorBar::colorFromName(const QString &name) const
 {
-    static QMap<QString, QColor> map = {
-        {"R", QColor(220, 30, 30)},   {"G", QColor(40, 170, 40)}, {"U", QColor(40, 90, 200)},
-        {"W", QColor(235, 235, 230)}, {"B", QColor(30, 30, 30)},
-    };
-
-    if (map.contains(name)) {
-        return map[name];
-    }
-
-    QColor c(name);
-    if (!c.isValid()) {
-        c = Qt::gray;
-    }
-
-    return c;
+    return EssenceCharts::colorFor(name);
 }
