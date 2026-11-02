@@ -9,6 +9,9 @@ namespace ZoneNames
 constexpr const char *TABLE = "table";
 constexpr const char *GRAVE = "grave";
 constexpr const char *EXILE = "rfg"; // "removed from game"
+constexpr const char *LIMBO = "limbo";
+constexpr const char *REFUGE = "refuge";
+constexpr const char *OBLIVION = "oblivion";
 constexpr const char *HAND = "hand";
 constexpr const char *DECK = "deck";
 constexpr const char *SIDEBOARD = "sb";
