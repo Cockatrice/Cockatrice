@@ -290,7 +290,7 @@ void PlayerGraphicsItem::processSceneSizeChange(int newPlayerWidth)
 {
     // Extend table (and hand, if horizontal) to accommodate the new player width.
     qreal tableWidth = newPlayerWidth - CardDimensions::HEIGHT_F - 15 - counterAreaWidth -
-                       stackZoneGraphicsItem->boundingRect().width();
+                       EXTRA_PILE_COLUMN_WIDTH - stackZoneGraphicsItem->boundingRect().width();
     if (!SettingsCache::instance().userInterface().getHorizontalHand()) {
         tableWidth -= handZoneGraphicsItem->boundingRect().width();
     }
