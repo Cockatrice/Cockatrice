@@ -82,13 +82,13 @@ QVariant CardDatabaseModel::headerData(int section, Qt::Orientation orientation,
         case SetListColumn:
             return QString(tr("Sets"));
         case ManaCostColumn:
-            return QString(tr("Mana cost"));
+            return QString(tr("Essence Cost"));
         case CardTypeColumn:
             return QString(tr("Card type"));
         case PTColumn:
             return QString(tr("P/T"));
         case ColorColumn:
-            return QString(tr("Color(s)"));
+            return QString(tr("Essence"));
         default:
             return QVariant();
     }
