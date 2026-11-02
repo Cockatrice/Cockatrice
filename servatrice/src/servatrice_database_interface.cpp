@@ -482,6 +482,10 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
                     const QByteArray expected = PasswordHasher::computeResponse(key, nonce);
                     handler->clearAuthNonce();
                     if (PasswordHasher::constantTimeEquals(expected, response)) {
+                        if (forceChange) {
+                            qCDebug(DatabaseInterfaceLog) << "Login accepted but password change required";
+                            return PasswordChangeRequired;
+                        }
                         qCDebug(DatabaseInterfaceLog) << "Login accepted: challenge-response password right";
                         return PasswordRight;
                     }

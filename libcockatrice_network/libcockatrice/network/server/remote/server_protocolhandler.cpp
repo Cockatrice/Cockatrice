@@ -64,8 +64,9 @@ Server_ProtocolHandler::Server_ProtocolHandler(Server *_server,
                                                Server_DatabaseInterface *_databaseInterface,
                                                QObject *parent)
     : QObject(parent), Server_AbstractUserInterface(_server), deleted(false), databaseInterface(_databaseInterface),
-      authState(NotLoggedIn), usingRealPassword(false), acceptsUserListChanges(false), acceptsRoomListChanges(false),
-      idleClientWarningSent(false), timeRunning(0), lastDataReceived(0), lastActionReceived(0)
+      authState(NotLoggedIn), usingRealPassword(false), passwordChangePending(false), acceptsUserListChanges(false),
+      acceptsRoomListChanges(false), idleClientWarningSent(false), timeRunning(0), lastDataReceived(0),
+      lastActionReceived(0)
 
 {
     connect(server, &Server::pingClockTimeout, this, &Server_ProtocolHandler::pingClockTimeout);
@@ -212,7 +213,10 @@ Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(co
             logDebugMessage(getSafeDebugString(sc));
         }
         const auto commandType = static_cast<SessionCommand::SessionCommandType>(num);
-        if (authState == NotLoggedIn && !isPreAuthSessionCommand(commandType)) {
+        if (passwordChangePending && commandType != SessionCommand::PING &&
+            commandType != SessionCommand::ACCOUNT_PASSWORD) {
+            resp = Response::RespFunctionNotAllowed;
+        } else if (authState == NotLoggedIn && !isPreAuthSessionCommand(commandType)) {
             resp = Response::RespLoginNeeded;
         } else {
             switch (commandType) {
@@ -489,6 +493,19 @@ void Server_ProtocolHandler::processCommandContainer(const CommandContainer &con
 
     lastDataReceived = timeRunning;
 
+    // A session that still owes a forced password change may only reach the session family,
+    // where processSessionCommandContainer narrows it further to ping and the change itself.
+    // Every other family is rejected here, including a container that also carries a session
+    // command: the dispatch below prefers game/room over session, so testing only for the
+    // absence of a session command would let such a container through.
+    if (passwordChangePending &&
+        (cont.game_command_size() || cont.room_command_size() || cont.moderator_command_size() ||
+         cont.admin_command_size() || cont.developer_command_size())) {
+        sendResponseContainer(ResponseContainer(cont.has_cmd_id() ? cont.cmd_id() : -1),
+                              Response::RespFunctionNotAllowed);
+        return;
+    }
+
     ResponseContainer responseContainer(cont.has_cmd_id() ? cont.cmd_id() : -1);
     Response::ResponseCode finalResponseCode;
 
@@ -696,6 +713,11 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
             server->recordFailedLogin(getAddress(), userName);
             return Response::RespAccountNotActivated;
         case PasswordChangeRequired:
+            // The credentials were right, but the account must choose a new password first.
+            // Keep the session authenticated just far enough for the client to do that:
+            // processCommandContainer refuses everything except the change itself.
+            authState = PasswordRight;
+            passwordChangePending = true;
             return Response::RespPasswordChangeRequired;
         default:
             server->clearFailedLogins(getAddress(), userName);
