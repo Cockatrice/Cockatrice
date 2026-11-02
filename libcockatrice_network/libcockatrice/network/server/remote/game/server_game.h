@@ -115,6 +115,7 @@ private:
                                      Server_AbstractParticipant *recipient,
                                      bool omniscient,
                                      bool withUserInfo);
+    QList<Server_AbstractParticipant *> getParticipantsInSeatOrder() const;
     void reseatPlayers(const QList<Server_AbstractParticipant *> &orderedParticipants, bool randomized);
     void storeGameInformation();
     bool canSeePrivateEventsFor(const Server_AbstractParticipant *participant, int privatePlayerId) const;
