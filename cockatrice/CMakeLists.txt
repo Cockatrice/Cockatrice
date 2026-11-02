@@ -454,7 +454,7 @@ set(cockatrice_SOURCES
 add_subdirectory(sounds)
 add_subdirectory(themes)
 configure_file(
-  ${CMAKE_SOURCE_DIR}/cockatrice/resources/config/qtlogging.ini ${CMAKE_BINARY_DIR}/cockatrice/qtlogging.ini COPYONLY
+  ${CMAKE_CURRENT_SOURCE_DIR}/resources/config/qtlogging.ini ${CMAKE_CURRENT_BINARY_DIR}/qtlogging.ini COPYONLY
 )
 
 set(cockatrice_RESOURCES cockatrice.qrc)
@@ -629,7 +629,7 @@ if(APPLE)
   )
 
   install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/cockatrice/"
+    DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/"
     DESTINATION ${qtconf_dest_dir}/
     FILES_MATCHING
     PATTERN "*.ini"
@@ -697,7 +697,7 @@ if(WIN32)
   endforeach()
 
   install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/cockatrice/"
+    DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/"
     DESTINATION ./
     FILES_MATCHING
     PATTERN "*.ini"
