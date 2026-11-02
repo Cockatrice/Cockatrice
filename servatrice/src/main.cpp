@@ -130,8 +130,8 @@ void myMessageOutput2(QtMsgType /*type*/, const QMessageLogContext &, const QStr
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
-    QCoreApplication::setOrganizationName("Cockatrice");
-    QCoreApplication::setApplicationName("Servatrice");
+    QCoreApplication::setOrganizationName("Continuum Universes Studio");
+    QCoreApplication::setApplicationName("Continuumatrice Server");
     QCoreApplication::setApplicationVersion(VERSION_STRING);
 
     QCommandLineParser parser;
@@ -188,7 +188,7 @@ int main(int argc, char *argv[])
 
     rng = new RNG_SFMT(CryptoUtil::randomUInt64());
 
-    std::cerr << "Servatrice " << VERSION_STRING << " starting." << std::endl;
+    std::cerr << "Continuumatrice Server " << VERSION_STRING << " starting." << std::endl;
     std::cerr << "-------------------------" << std::endl;
 
     if (testRandom) {
