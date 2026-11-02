@@ -30,7 +30,7 @@
  * Captures every command the game logic sends, instead of writing it to a socket.
  *
  * AbstractClient::sendCommand uses a direct signal/slot connection in the same
- * thread, so a command is in sent as soon as sendCommand returns.
+ * thread, so a command is in `sent` as soon as sendCommand returns.
  */
 class RecordingClient : public AbstractClient
 {
