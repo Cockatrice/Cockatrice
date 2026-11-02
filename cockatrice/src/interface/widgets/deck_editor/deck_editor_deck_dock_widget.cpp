@@ -13,6 +13,7 @@
 #include "deck_list_history_manager_widget.h"
 #include "deck_list_model.h"
 #include "deck_list_style_proxy.h"
+#include "deck_list_tree_view.h"
 #include "deck_state_manager.h"
 #include "deck_zone_dialog.h"
 #include "libcockatrice/card/card_info.h"
@@ -125,7 +126,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
     connect(deckStateManager, &DeckStateManager::deckReplaced, this,
             &DeckEditorDeckDockWidget::applyActiveGroupCriteria);
 
-    deckView = new QTreeView();
+    deckView = new DeckListTreeView();
     deckView->setObjectName("deckView");
     deckView->setModel(proxy);
     deckView->setUniformRowHeights(true);
