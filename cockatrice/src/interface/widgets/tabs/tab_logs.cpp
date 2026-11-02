@@ -74,6 +74,10 @@ TabLog::TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool _can
     connect(roomTable->verticalScrollBar(), &QScrollBar::valueChanged, this, &TabLog::checkFetchMore);
     connect(gameTable->verticalScrollBar(), &QScrollBar::valueChanged, this, &TabLog::checkFetchMore);
     connect(chatTable->verticalScrollBar(), &QScrollBar::valueChanged, this, &TabLog::checkFetchMore);
+    // A tab that gains only a few rows has nothing to scroll, so its scrollbar never fires:
+    // switching to it would leave its next page unfetched until the moderator scrolled
+    // another tab. Re-check on every tab switch so the visible table can continue the browse.
+    connect(tabManager, &QTabWidget::currentChanged, this, &TabLog::checkFetchMore);
 
     createDock();
     restartLayout();
