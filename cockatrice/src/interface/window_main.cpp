@@ -289,26 +289,23 @@ void MainWindow::actAbout()
 {
     QMessageBox mb(
         QMessageBox::NoIcon, tr("About Continuumatrice"),
-        QString("<font size=\"8\"><b>Continuumatrice</b></font> (" + QString::fromStdString(BUILD_ARCHITECTURE) + ")<br>" +
-                tr("Version") + QString(" %1").arg(VERSION_STRING) + "<br><br><b><a href='" + GITHUB_PAGES_URL + "'>" +
-                tr("Continuumatrice Repository") + "</a></b><br>" + "<br><b>" + tr("Project Manager:") +
-                "</b><br>Zach Halpern<br><br>" + "<b>" + tr("Past Project Managers:") +
-                "</b><br>Gavin Bisesi<br>Max-Wilhelm Bruker<br>Marcus Schütz<br><br>" + "<b>" + tr("Developers:") +
-                "</b><br>" + "<a href='" + GITHUB_CONTRIBUTORS_URL + "'>" + tr("Our Developers") + "</a><br>" +
-                "<a href='" + GITHUB_CONTRIBUTE_URL + "'>" + tr("Help Develop!") + "</a><br><br>" + "<b>" +
-                tr("Translators:") + "</b><br>" + "<a href='" + GITHUB_TRANSIFEX_TRANSLATORS_URL + "'>" +
-                tr("Our Translators") + "</a><br>" + "<a href='" + GITHUB_TRANSLATOR_FAQ_URL + "'>" +
-                tr("Help Translate!") + "</a><br><br>" + "<b>" + tr("Support:") + "</b><br>" + "<a href='" +
-                GITHUB_ISSUES_URL + "'>" + tr("Report an Issue") + "</a><br>" + "<a href='" +
-                GITHUB_TROUBLESHOOTING_URL + "'>" + tr("Troubleshooting") + "</a><br>" + "<a href='" + GITHUB_FAQ_URL +
-                "'>" + tr("F.A.Q.") + "</a><br>"),
+        QStringLiteral("<font size=\"8\"><b>Continuumatrice</b></font><br>") +
+            tr("Continuum Universes Studio") + QStringLiteral(" — ") + tr("Version") +
+            QStringLiteral(" ") + QStringLiteral(VERSION_STRING) +
+            QStringLiteral("<br><br>") +
+            tr("Continuumatrice is a standalone Continuum Universes card-game client.") +
+            QStringLiteral("<br><a href='https://github.com/Continuum-Universes-Studio/Continuumatrice'>") +
+            tr("Source code and issues") + QStringLiteral("</a><br><br>") +
+            tr("Based on the open-source Cockatrice project. The original developers and contributors "
+               "retain credit for their work, and the applicable open-source license remains in force.") +
+            QStringLiteral("<br><a href='https://github.com/Cockatrice/Cockatrice'>") +
+            tr("Upstream Cockatrice project") + QStringLiteral("</a>"),
         QMessageBox::Ok, this);
     mb.setIconPixmap(
         themePixmap(QStringLiteral("continuumatrice")).scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     mb.setTextInteractionFlags(Qt::TextBrowserInteraction);
     mb.exec();
 }
-
 void MainWindow::actTips()
 {
     if (tip != nullptr) {
@@ -835,12 +832,12 @@ void MainWindow::alertForcedOracleRun(const QString &version, bool isUpdate)
 {
     if (isUpdate) {
         QMessageBox::information(this, tr("New Version"),
-                                 tr("Congratulations on updating to Cockatrice %1!\n"
+                                 tr("Congratulations on updating to Continuumatrice %1!\n"
                                     "Oracle will now launch to update your card database.")
                                      .arg(version));
     } else {
-        QMessageBox::information(this, tr("Cockatrice installed"),
-                                 tr("Congratulations on installing Cockatrice %1!\n"
+        QMessageBox::information(this, tr("Continuumatrice installed"),
+                                 tr("Congratulations on installing Continuumatrice %1!\n"
                                     "Oracle will now launch to install the initial card database.")
                                      .arg(version));
     }
@@ -1085,7 +1082,7 @@ void MainWindow::cardDatabaseLoadingFailed()
     QMessageBox msgBox;
     msgBox.setWindowTitle(tr("Card database"));
     msgBox.setIcon(QMessageBox::Question);
-    msgBox.setText(tr("Cockatrice is unable to load the card database.\n"
+    msgBox.setText(tr("Continuumatrice is unable to load the card database.\n"
                       "Do you want to update your card database now?\n"
                       "If unsure or first time user, choose \"Yes\""));
 
@@ -1296,7 +1293,7 @@ void MainWindow::createCardUpdateProcess(bool background)
         statusBar()->showMessage(tr("Card database update running."));
         if (trayIcon && SettingsCache::instance().updates().getCardDatabaseUpdateTrayNotification()) {
             trayIcon->showMessage(tr("Card database update started"),
-                                  tr("Cockatrice is updating the card database in the background."));
+                                  tr("Continuumatrice is updating the card database in the background."));
         }
     }
 }
@@ -1456,7 +1453,7 @@ void MainWindow::announceCardUpdateRunning()
         statusBar()->showMessage(tr("Card database update running."));
     } else if (trayIcon && SettingsCache::instance().updates().getCardDatabaseUpdateTrayNotification()) {
         trayIcon->showMessage(tr("Card database update running"),
-                              tr("Cockatrice is updating the card database in the background."));
+                              tr("Continuumatrice is updating the card database in the background."));
     }
 }
 
