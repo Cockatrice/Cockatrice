@@ -33,13 +33,13 @@ inline QList<QPair<QString, int>> ordered(const QMap<QString, int> &values)
         const QString key(code);
         auto it = values.constFind(key);
         if (it != values.cend()) {
-            result.append(qMakePair(it.key(), it.value()));
+            result.append({it.key(), it.value()});
             used.insert(key);
         }
     }
     for (auto it = values.cbegin(); it != values.cend(); ++it) {
         if (!used.contains(it.key())) {
-            result.append(qMakePair(it.key(), it.value()));
+            result.append({it.key(), it.value()});
         }
     }
     return result;
