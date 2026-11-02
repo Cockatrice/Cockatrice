@@ -326,7 +326,7 @@ static QString systemThemesBasePath()
 #elif defined(Q_OS_WIN)
     base += "/themes";
 #else // linux
-    base += "/../share/cockatrice/themes";
+    base += "/../share/continuumatrice/themes";
 #endif
     return base;
 }
