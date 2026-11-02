@@ -105,6 +105,9 @@ void Server_Player::setupZones()
     addZone(new Server_CardZone(this, ZoneNames::STACK, false, ServerInfo_Zone::PublicZone));
     addZone(new Server_CardZone(this, ZoneNames::GRAVE, false, ServerInfo_Zone::PublicZone));
     addZone(new Server_CardZone(this, ZoneNames::EXILE, false, ServerInfo_Zone::PublicZone));
+    addZone(new Server_CardZone(this, ZoneNames::LIMBO, false, ServerInfo_Zone::PublicZone));
+    addZone(new Server_CardZone(this, ZoneNames::REFUGE, false, ServerInfo_Zone::PublicZone));
+    addZone(new Server_CardZone(this, ZoneNames::OBLIVION, false, ServerInfo_Zone::PublicZone));
 
     addCounter(new Server_Counter(0, "life", makeColor(255, 255, 255), 25, game->getStartingLifeTotal()));
     addCounter(new Server_Counter(1, "w", makeColor(255, 255, 150), 20, 0));
