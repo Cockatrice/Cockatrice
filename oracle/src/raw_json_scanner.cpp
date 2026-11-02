@@ -586,7 +586,11 @@ QList<SetRange> scanSetRanges(const QByteArray &json, ScanError *error, const Sc
     scan.step = std::max<qsizetype>(1, scan.size / 100);
     scan.callback = progress;
 
-    const char *p = skipWhitespace(begin, end);
+    const char *p = begin;
+    if (end - p >= 3 && memcmp(p, "\xEF\xBB\xBF", 3) == 0) {
+        p += 3;
+    }
+    p = skipWhitespace(p, end);
     if (p >= end || *p != '{') {
         return fail(QStringLiteral("top-level JSON must be an object"));
     }

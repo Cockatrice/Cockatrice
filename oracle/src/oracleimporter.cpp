@@ -5,6 +5,7 @@
 #include "libcockatrice/card/lazy_properties_hash.h"
 #include "libcockatrice/card/relation/card_relation_type.h"
 #include "libcockatrice/interfaces/noop_card_set_priority_controller.h"
+#include "oracle_source_data.h"
 #include "parsehelpers.h"
 
 #include <QChar>
@@ -100,12 +101,22 @@ static CardSet::Priority getSetPriority(const QString &setType, const QString &s
 
 bool OracleImporter::readSetsFromByteArray(QByteArray data)
 {
+    return readSets(std::move(data), {});
+}
+
+bool OracleImporter::readSetsFromSource(QSharedPointer<OracleSourceData> source, QString &error)
+{
+    if (!source || !source->map(error)) {
+        return false;
+    }
+    return readSets(source->bytes(), source);
+}
+
+bool OracleImporter::readSets(QByteArray data, QSharedPointer<OracleSourceData> source)
+{
     const RawJson::ScanProgressCallback progress =
         progressReporting
-            ? [this](
-                  qsizetype bytesRead,
-                  qsizetype
-                      totalBytes) { emit dataReadProgress(static_cast<int>(bytesRead), static_cast<int>(totalBytes)); }
+            ? [this](qsizetype bytesRead, qsizetype totalBytes) { emit dataReadProgress(bytesRead, totalBytes); }
             : RawJson::ScanProgressCallback{};
 
     RawJson::ScanError error;
@@ -154,6 +165,7 @@ bool OracleImporter::readSetsFromByteArray(QByteArray data)
     }
     allSets = newSetList;
     rawSetsData = std::move(data);
+    rawSetsSource = std::move(source);
     return true;
 }
 
@@ -798,8 +810,8 @@ int OracleImporter::startImport()
         // parse only this set's slice of the raw document so the whole JSON tree is
         // never kept in memory at once
         const RawJson::SetDataRange &rawRange = curSetToParse.getRawRange();
-        const qsizetype rangeEnd = rawRange.start + rawRange.length;
-        if (rawRange.start < 0 || rawRange.length <= 0 || rangeEnd > rawSetsData.size()) {
+        if (rawRange.start < 0 || rawRange.length <= 0 || rawRange.start > rawSetsData.size() ||
+            rawRange.length > rawSetsData.size() - rawRange.start) {
             // rawSetsData is cleared by releaseSetData() while SetToDownload copies
             // taken from getSets() keep their ranges, and nothing else enforces the
             // pairing — so never index past the buffer on stale/mismatched ranges.
@@ -808,9 +820,9 @@ int OracleImporter::startImport()
             emit setIndexChanged(0, setIndex, curSetToParse.getLongName());
             continue;
         }
-        // sliced() shares the buffer instead of deep-copying the slice; the largest
-        // sets in AllPrintings are tens of MB, so the copy is worth avoiding here.
-        const QByteArray setBytes = rawSetsData.sliced(rawRange.start, rawRange.length);
+        // The source owner outlives parsing. A non-owning view avoids copying a
+        // large set out of the mapped file before QJsonDocument parses it.
+        const QByteArray setBytes = QByteArray::fromRawData(rawSetsData.constData() + rawRange.start, rawRange.length);
         QJsonParseError parseError;
         const QJsonDocument setDoc = QJsonDocument::fromJson(setBytes, &parseError);
         if (parseError.error != QJsonParseError::NoError) {
@@ -857,6 +869,7 @@ void OracleImporter::releaseSetData()
 {
     allSets.clear();
     rawSetsData.clear();
+    rawSetsSource.clear();
 }
 
 void OracleImporter::clear()
@@ -865,6 +878,7 @@ void OracleImporter::clear()
     cards.clear();
     allSets.clear();
     rawSetsData.clear();
+    rawSetsSource.clear();
     localizedEntries.clear();
     splitLocalizedTexts.clear();
 }

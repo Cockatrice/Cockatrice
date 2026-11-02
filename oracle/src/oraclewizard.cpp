@@ -17,6 +17,7 @@
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <QNetworkAccessManager>
+#include <QNetworkReply>
 #include <QSettings>
 #include <QVariant>
 #include <QWindow>
@@ -122,6 +123,9 @@ void OracleWizard::retranslateUi()
 void OracleWizard::accept()
 {
     QDialog::accept();
+    if (backgroundMode) {
+        QCoreApplication::quit();
+    }
 }
 
 void OracleWizard::reject()
@@ -141,6 +145,9 @@ void OracleWizard::reject()
     }
 
     QWizard::reject();
+    if (backgroundMode) {
+        QCoreApplication::quit();
+    }
 }
 
 void OracleWizard::runInBackground()

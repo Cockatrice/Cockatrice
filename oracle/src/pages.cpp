@@ -2,6 +2,7 @@
 
 #include "client/settings/cache_settings.h"
 #include "main.h"
+#include "oracle_source_data.h"
 #include "oracleimporter.h"
 #include "oraclewizard.h"
 #include "pagetemplates.h"
@@ -32,6 +33,7 @@
 #include <QProgressBar>
 #include <QPushButton>
 #include <QRadioButton>
+#include <QSaveFile>
 #include <QScrollBar>
 #include <QSettings>
 #include <QSharedPointer>
@@ -47,6 +49,7 @@
 #include <functional>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/utility/translation_loader.h>
+#include <new>
 #include <qlogging.h>
 #include <qnamespace.h>
 #include <qnumeric.h>
@@ -96,46 +99,70 @@ namespace
 {
 
 /**
- * @brief Decompresses and dispatches a sets-file payload on a worker thread.
- *
- * Iteratively unwraps xz/zip compression, then either hands the JSON to the
- * importer (which reports scan progress via dataReadProgress) or returns the raw
- * XML for the plain-XML path. Must never touch the wizard or the page: the caller
- * consumes the returned LoadSetsResult on the UI thread in importFinished().
+ * Unwraps compression into temporary files, then maps only the final JSON.
+ * Both compressed and expanded inputs stay out of the process heap. The source
+ * object owns its temporary file through scanning and the lazy set import.
  */
-LoadSetsResult loadSetsData(const QPointer<OracleImporter> &importer, QByteArray data)
-{
+LoadSetsResult loadSetsData(const QPointer<OracleImporter> &importer, QSharedPointer<OracleSourceData> source)
+try {
     LoadSetsResult result;
+    // A bounded nesting count prevents custom inputs from creating an endless
+    // chain of compression layers. Normal Oracle downloads have one layer.
+    for (int layer = 0; layer <= 8; ++layer) {
+        if (!source->rewind(result.errorMessage)) {
+            return result;
+        }
+        const QByteArray header = source->device().peek(6);
+        const bool xzCompressed = header.startsWith(XZ_SIGNATURE);
+        const bool zipCompressed = header.startsWith(ZIP_SIGNATURE);
+        if (!xzCompressed && !zipCompressed) {
+            // JSON and XML may start with whitespace or a UTF-8 byte-order mark.
+            if (header.startsWith("\xEF\xBB\xBF")) {
+                source->device().seek(3);
+            }
+            char first = 0;
+            while (source->device().getChar(&first) &&
+                   (first == ' ' || first == '\t' || first == '\r' || first == '\n')) {
+            }
+            if (first == '<') {
+                result.ok = true;
+                result.plainXml = true;
+                result.xmlSource = source;
+            } else if (first == '{') {
+                result.ok = importer && importer->readSetsFromSource(source, result.errorMessage);
+            } else {
+                result.errorMessage = LoadSetsPage::tr("Failed to interpret downloaded data.");
+            }
+            return result;
+        }
+        if (layer == 8) {
+            result.errorMessage = LoadSetsPage::tr("The card data contains too many compression layers.");
+            return result;
+        }
 
-    while (true) {
-        if (data.startsWith(XZ_SIGNATURE)) {
+        auto expanded = QSharedPointer<OracleSourceData>::create();
+        if (!expanded->open(result.errorMessage)) {
+            return result;
+        }
+        if (xzCompressed) {
 #ifdef HAS_LZMA
-            QBuffer inBuffer(&data);
-            QByteArray decompressed;
-            QBuffer outBuffer(&decompressed);
-            inBuffer.open(QBuffer::ReadOnly);
-            outBuffer.open(QBuffer::WriteOnly);
             XzDecompressor xz;
-            if (!xz.decompress(&inBuffer, &outBuffer)) {
-                result.errorMessage = LoadSetsPage::tr("Xz extraction failed.");
-                result.offerUncompressedFallback = true;
+            if (!xz.decompress(&source->device(), &expanded->device())) {
+                result.errorMessage = LoadSetsPage::tr("Xz extraction failed. Check the available temporary disk space "
+                                                       "and the input file.");
+                result.offerUncompressedFallback = expanded->device().error() == QFileDevice::NoError;
                 return result;
             }
-            data = decompressed;
-            continue;
 #else
             result.errorMessage =
                 LoadSetsPage::tr("Sorry, this version of Oracle does not support xz compressed files.");
             result.offerUncompressedFallback = true;
             return result;
 #endif
-        }
-
-        if (data.startsWith(ZIP_SIGNATURE)) {
+        } else {
 #ifdef HAS_ZLIB
-            QBuffer inBuffer(&data);
             UnZip uz;
-            const UnZip::ErrorCode openEc = uz.openArchive(&inBuffer);
+            const UnZip::ErrorCode openEc = uz.openArchive(&source->device());
             if (openEc != UnZip::Ok) {
                 result.errorMessage = LoadSetsPage::tr("Failed to open Zip archive: %1.").arg(uz.formatError(openEc));
                 result.offerUncompressedFallback = true;
@@ -147,41 +174,28 @@ LoadSetsResult loadSetsData(const QPointer<OracleImporter> &importer, QByteArray
                 result.offerUncompressedFallback = true;
                 return result;
             }
-            const QString fileName = uz.fileList().at(0);
-            QByteArray decompressed;
-            QBuffer outBuffer(&decompressed);
-            outBuffer.open(QBuffer::ReadWrite);
-            const UnZip::ErrorCode ec = uz.extractFile(fileName, &outBuffer);
+            const UnZip::ErrorCode ec = uz.extractFile(uz.fileList().at(0), &expanded->device());
             uz.closeArchive();
             if (ec != UnZip::Ok) {
                 result.errorMessage = LoadSetsPage::tr("Zip extraction failed: %1.").arg(uz.formatError(ec));
-                result.offerUncompressedFallback = true;
+                result.offerUncompressedFallback = expanded->device().error() == QFileDevice::NoError;
                 return result;
             }
-            data = decompressed;
-            continue;
 #else
             result.errorMessage = LoadSetsPage::tr("Sorry, this version of Oracle does not support zipped files.");
             result.offerUncompressedFallback = true;
             return result;
 #endif
         }
-        break;
+        source = std::move(expanded);
     }
-
-    if (data.startsWith("<")) {
-        result.ok = true;
-        result.plainXml = true;
-        result.xmlData = std::move(data);
-        return result;
-    }
-
-    if (data.startsWith("{")) {
-        result.ok = importer && importer->readSetsFromByteArray(std::move(data));
-        return result;
-    }
-
-    result.errorMessage = LoadSetsPage::tr("Failed to interpret downloaded data.");
+    return result;
+} catch (const std::bad_alloc &) {
+    LoadSetsResult result;
+    result.errorMessage =
+        LoadSetsPage::tr("There is not enough memory to read this card data. Close other applications "
+                         "and try again, or select a smaller JSON file or a ready-made Cockatrice "
+                         "XML database.");
     return result;
 }
 
@@ -270,7 +284,6 @@ void OutroPage::initializePage()
 {
     if (wizard()->backgroundMode) {
         wizard()->accept();
-        exit(0);
     }
 }
 
@@ -432,7 +445,7 @@ void LoadSetsPage::downloadSetsFile(const QUrl &url)
         QNetworkRequest request = QNetworkRequest(versionUrl);
         request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
         auto *versionReply = wizard()->nam->get(request);
-        connect(versionReply, &QNetworkReply::finished, [this, versionReply]() {
+        connect(versionReply, &QNetworkReply::finished, this, [this, versionReply]() {
             if (versionReply->error() == QNetworkReply::NoError) {
                 auto data = versionReply->readAll();
                 QJsonParseError jsonError{};
@@ -457,9 +470,34 @@ void LoadSetsPage::downloadSetsFile(const QUrl &url)
 
     QNetworkRequest request = QNetworkRequest(url);
     request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
+    auto source = QSharedPointer<OracleSourceData>::create();
+    auto writeError = QSharedPointer<QString>::create();
+    if (!source->open(*writeError)) {
+        progressLabel->hide();
+        progressBar->hide();
+        wizard()->enableButtons();
+        setEnabled(true);
+        if (wizard()->backgroundMode) {
+            qWarning() << *writeError;
+            wizard()->reject();
+        } else {
+            QMessageBox::critical(this, tr("Error"), *writeError);
+        }
+        return;
+    }
     auto *reply = wizard()->nam->get(request);
-
-    connect(reply, &QNetworkReply::finished, this, &LoadSetsPage::actDownloadFinishedSetsFile);
+    reply->setReadBufferSize(256 * 1024);
+    connect(reply, &QIODevice::readyRead, this, [reply, source, writeError] {
+        if (writeError->isEmpty() && !source->append(*reply, *writeError)) {
+            reply->abort();
+        }
+    });
+    connect(reply, &QNetworkReply::finished, this, [this, reply, source, writeError] {
+        if (writeError->isEmpty() && reply->error() == QNetworkReply::NoError) {
+            source->append(*reply, *writeError);
+        }
+        actDownloadFinishedSetsFile(reply, source, *writeError);
+    });
     connect(reply, &QNetworkReply::downloadProgress, this, &LoadSetsPage::actDownloadProgressSetsFile);
 }
 
@@ -467,34 +505,41 @@ void LoadSetsPage::actDownloadProgressSetsFile(qint64 received, qint64 total)
 {
     emitProgress("download", received, total);
     if (total > 0) {
-        progressBar->setMaximum(static_cast<int>(total));
-        progressBar->setValue(static_cast<int>(received));
+        progressBar->setRange(0, 1000);
+        progressBar->setValue(static_cast<int>(1000.0 * received / total));
     }
-    progressLabel->setText(tr("Downloading (%1 MB)").arg((int)received / (1024 * 1024)));
+    progressLabel->setText(tr("Downloading (%1 MB)").arg(received / (1024 * 1024)));
 }
 
-void LoadSetsPage::actDownloadFinishedSetsFile()
+void LoadSetsPage::actDownloadFinishedSetsFile(QNetworkReply *reply,
+                                               QSharedPointer<OracleSourceData> source,
+                                               const QString &writeError)
 {
-    // check for a reply
-    auto *reply = dynamic_cast<QNetworkReply *>(sender());
     if (wizard()->wasCancelled()) {
         reply->deleteLater();
         return;
     }
     auto errorCode = reply->error();
-    if (errorCode != QNetworkReply::NoError) {
-        QMessageBox::critical(this, tr("Error"), tr("Network error: %1.").arg(reply->errorString()));
-
+    if (!writeError.isEmpty() || errorCode != QNetworkReply::NoError) {
+        const QString message = writeError.isEmpty() ? tr("Network error: %1.").arg(reply->errorString()) : writeError;
+        progressLabel->hide();
+        progressBar->hide();
         wizard()->enableButtons();
         setEnabled(true);
-
         reply->deleteLater();
+        if (wizard()->backgroundMode) {
+            qWarning() << message;
+            wizard()->reject();
+        } else {
+            QMessageBox::critical(this, tr("Error"), message);
+        }
         return;
     }
 
     auto statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     if (statusCode == 301 || statusCode == 302) {
-        const auto redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
+        const auto redirectUrl =
+            reply->url().resolved(reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl());
         qDebug() << "following redirect url:" << redirectUrl.toString();
         downloadSetsFile(redirectUrl);
         reply->deleteLater();
@@ -511,22 +556,22 @@ void LoadSetsPage::actDownloadFinishedSetsFile()
         wizard()->settings->remove("allsetsurl");
     }
 
-    readSetsFromByteArray(reply->readAll());
+    readSetsFromSource(std::move(source));
     reply->deleteLater();
 }
 
-void LoadSetsPage::updateParsingProgress(int bytesRead, int totalBytes)
+void LoadSetsPage::updateParsingProgress(qint64 bytesRead, qint64 totalBytes)
 {
     if (totalBytes <= 0) {
         return;
     }
-    progressBar->setRange(0, totalBytes);
-    progressBar->setValue(bytesRead);
+    progressBar->setRange(0, 1000);
+    progressBar->setValue(static_cast<int>(1000.0 * bytesRead / totalBytes));
     const int percent = static_cast<int>((100.0 * bytesRead) / totalBytes);
     progressLabel->setText(tr("Parsing file (%1%)").arg(percent));
 }
 
-void LoadSetsPage::scanProgressToStdout(int bytesRead, int totalBytes)
+void LoadSetsPage::scanProgressToStdout(qint64 bytesRead, qint64 totalBytes)
 {
     emitProgress("scan", bytesRead, totalBytes);
 }
@@ -548,7 +593,7 @@ void LoadSetsPage::beginLoadSets(bool compressedFile)
     emit completeChanged();
 
     wizard()->downloadedPlainXml = false;
-    wizard()->xmlData.clear();
+    wizard()->xmlSource.clear();
 
     if (wizard()->backgroundMode) {
         connect(wizard()->importer, &OracleImporter::dataReadProgress, this, &LoadSetsPage::scanProgressToStdout,
@@ -559,15 +604,15 @@ void LoadSetsPage::beginLoadSets(bool compressedFile)
     }
 }
 
-void LoadSetsPage::readSetsFromByteArray(QByteArray _data)
+void LoadSetsPage::readSetsFromSource(QSharedPointer<OracleSourceData> source)
 {
-    const bool compressed = _data.startsWith(XZ_SIGNATURE) || _data.startsWith(ZIP_SIGNATURE);
-    beginLoadSets(compressed);
+    QString error;
+    source->rewind(error);
+    const QByteArray header = source->device().peek(6);
+    beginLoadSets(header.startsWith(XZ_SIGNATURE) || header.startsWith(ZIP_SIGNATURE));
 
-    // Decompress and scan off the UI thread so a large download can't freeze the window.
     const QPointer<OracleImporter> importer = wizard()->importer;
-    future = QtConcurrent::run(
-        [importer, data = std::move(_data)]() mutable { return loadSetsData(importer, std::move(data)); });
+    future = QtConcurrent::run([importer, source = std::move(source)] { return loadSetsData(importer, source); });
     watcher.setFuture(future);
 }
 
@@ -593,7 +638,12 @@ void LoadSetsPage::readSetsFromFile(const QString &fileName)
             readError.errorMessage = LoadSetsPage::tr("Cannot open file '%1'.").arg(fileName);
             return readError;
         }
-        return loadSetsData(importer, file.readAll());
+        auto source = QSharedPointer<OracleSourceData>::create();
+        LoadSetsResult result;
+        if (!source->open(result.errorMessage) || !source->append(file, result.errorMessage)) {
+            return result;
+        }
+        return loadSetsData(importer, std::move(source));
     });
     watcher.setFuture(future);
 }
@@ -631,6 +681,9 @@ void LoadSetsPage::zipDownloadFailed(const QString &message)
 
 void LoadSetsPage::importFinished()
 {
+    if (wizard()->wasCancelled() || watcher.isCanceled()) {
+        return;
+    }
     loadActive = false;
     emit completeChanged();
     wizard()->enableButtons();
@@ -640,16 +693,18 @@ void LoadSetsPage::importFinished()
 
     if (result.plainXml) {
         wizard()->downloadedPlainXml = true;
-        wizard()->xmlData = result.xmlData;
+        wizard()->xmlSource = result.xmlSource;
     }
 
     if (wizard()->backgroundMode) {
         progressLabel->hide();
         progressBar->hide();
-        if (!result.errorMessage.isEmpty()) {
-            qWarning() << result.errorMessage;
-        } else if (!result.ok && !result.plainXml) {
-            qWarning() << tr("The file was retrieved successfully, but it does not contain any sets data.");
+        if (!result.ok) {
+            qWarning() << (result.errorMessage.isEmpty()
+                               ? tr("The file was retrieved successfully, but it does not contain any sets data.")
+                               : result.errorMessage);
+            wizard()->reject();
+            return;
         }
         emit readyToContinue();
         return;
@@ -717,7 +772,7 @@ SaveSetsPage::SaveSetsPage(QWidget *parent) : OracleWizardPage(parent)
 
 bool SaveSetsPage::isComplete() const
 {
-    return !importActive;
+    return !importActive && !importFailed;
 }
 
 void SaveSetsPage::cleanupPage()
@@ -730,6 +785,7 @@ void SaveSetsPage::cleanupPage()
 
 void SaveSetsPage::initializePage()
 {
+    importFailed = false;
     retranslateUi();
     if (wizard()->downloadedPlainXml) {
         messageLog->hide();
@@ -757,7 +813,13 @@ void SaveSetsPage::initializePage()
     emit completeChanged();
 
     const QPointer<OracleImporter> importer = wizard()->importer;
-    importFuture = QtConcurrent::run([importer] { return importer ? importer->startImport() : 0; });
+    importFuture = QtConcurrent::run([importer] {
+        try {
+            return importer ? importer->startImport() : 0;
+        } catch (const std::bad_alloc &) {
+            return -1;
+        }
+    });
     importWatcher.setFuture(importFuture);
 }
 
@@ -781,30 +843,42 @@ void SaveSetsPage::importFinished()
     if (!importActive) {
         return;
     }
+    const int setsImported = importWatcher.result();
     importActive = false;
+    importFailed = setsImported <= 0;
     emit completeChanged();
-
     wizard()->enableButtons();
 
-    const int setsImported = importWatcher.result();
     const QPointer<OracleImporter> importer = wizard()->importer;
     if (importer) {
         importer->releaseSetData();
     }
 
-    if (wizard()->backgroundMode) {
-        if (setsImported == 0) {
-            qWarning() << tr("No set has been imported.");
+    if (importFailed) {
+        if (importer) {
+            importer->clear();
         }
-        emit readyToContinue();
+        const QString message = setsImported < 0
+                                    ? tr("There is not enough memory to import this card data. Your existing database "
+                                         "has not been changed. Go back and select a smaller JSON file or a ready-made "
+                                         "Cockatrice XML database, or close other applications and try again.")
+                                    : tr("No set has been imported.");
+        progressBar->hide();
+        if (wizard()->backgroundMode) {
+            qWarning() << message;
+            wizard()->reject();
+        } else {
+            messageLog->setPlainText(message);
+            QMessageBox::critical(this, tr("Error"), message);
+        }
         return;
     }
 
-    progressBar->setValue(progressBar->maximum());
-
-    if (setsImported == 0) {
-        QMessageBox::critical(this, tr("Error"), tr("No set has been imported."));
+    if (wizard()->backgroundMode) {
+        emit readyToContinue();
+        return;
     }
+    progressBar->setValue(progressBar->maximum());
 }
 
 void SaveSetsPage::retranslateUi()
@@ -812,7 +886,7 @@ void SaveSetsPage::retranslateUi()
     setTitle(tr("Sets imported"));
     if (wizard()->downloadedPlainXml) {
         setSubTitle(tr("A Cockatrice card database file of %1 MB has been downloaded.")
-                        .arg(qRound(wizard()->xmlData.size() / 1000000.0)));
+                        .arg(qRound(wizard()->xmlSource->size() / 1000000.0)));
     } else {
         setSubTitle(tr("The following sets have been found:"));
     }
@@ -854,6 +928,9 @@ void SaveSetsPage::updateTotalProgress(int cardsImported, int setIndex, const QS
 
 bool SaveSetsPage::validatePage()
 {
+    if (importActive || importFailed) {
+        return false;
+    }
     QString defaultPath = SettingsCache::instance().getCardDatabasePath();
     QString windowName = tr("Save card database");
     QString fileType = tr("XML; card database (*.xml)");
@@ -869,26 +946,33 @@ bool SaveSetsPage::validatePage()
         return false;
     }
 
+    const auto reportSaveError = [this](const QString &message) {
+        if (wizard()->backgroundMode) {
+            qWarning() << message;
+            wizard()->reject();
+        } else {
+            QMessageBox::critical(this, tr("Error"), message);
+        }
+    };
     QFileInfo fi(fileName);
     QDir fileDir(fi.path());
     if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath())) {
+        reportSaveError(tr("The directory could not be created: %1").arg(fileDir.absolutePath()));
         return false;
     }
 
     if (wizard()->downloadedPlainXml) {
-        QFile file(fileName);
-        if (!file.open(QIODevice::WriteOnly)) {
-            qDebug() << "File write (w) failed for" << fileName;
+        QSaveFile file(fileName);
+        QString error;
+        if (!file.open(QIODevice::WriteOnly) || !wizard()->xmlSource || !wizard()->xmlSource->copyTo(file, error) ||
+            !file.commit()) {
+            reportSaveError(tr("The file could not be saved to %1: %2")
+                                .arg(fileName, error.isEmpty() ? file.errorString() : error));
             return false;
         }
-        if (file.write(wizard()->xmlData) < 1) {
-            qDebug() << "File write (w) failed for" << fileName;
-            return false;
-        }
-        wizard()->xmlData.clear();
     } else if (!wizard()->importer->saveToFile(fileName, wizard()->getCardSourceUrl(),
                                                wizard()->getCardSourceVersion())) {
-        QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to %1").arg(fileName));
+        reportSaveError(tr("The file could not be saved to %1").arg(fileName));
         return false;
     }
 

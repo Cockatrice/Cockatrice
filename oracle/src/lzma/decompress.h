@@ -2,7 +2,7 @@
 #define XZ_DECOMPRESS_H
 
 #include <lzma.h>
-#include <QBuffer>
+#include <QIODevice>
 
 class XzDecompressor : public QObject
 {
@@ -10,10 +10,10 @@ class XzDecompressor : public QObject
 public:
     XzDecompressor(QObject *parent = 0);
     ~XzDecompressor() { };
-    bool decompress(QBuffer *in, QBuffer *out);
+    bool decompress(QIODevice *in, QIODevice *out);
 private:
     bool init_decoder(lzma_stream *strm);
-    bool internal_decompress(lzma_stream *strm, QBuffer *in, QBuffer *out);
+    bool internal_decompress(lzma_stream *strm, QIODevice *in, QIODevice *out);
 };
 
 #endif

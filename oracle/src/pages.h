@@ -6,12 +6,15 @@
 #include <QByteArray>
 #include <QFuture>
 #include <QFutureWatcher>
+#include <QSharedPointer>
 #include <QString>
 #include <QStringList>
 #include <QtGlobal>
 #include <qtmetamacros.h>
 
 class QCheckBox;
+class QNetworkReply;
+class OracleSourceData;
 class QComboBox;
 class QLabel;
 class QLineEdit;
@@ -59,11 +62,11 @@ protected:
 /** @brief Result of a worker-thread sets-file load (read + decompress + dispatch). */
 struct LoadSetsResult
 {
-    bool ok = false;                        ///< JSON scan produced set data (or plain XML was handled)
-    bool plainXml = false;                  ///< input was a plain Cockatrice XML database
-    QByteArray xmlData;                     ///< raw XML for the plain-XML path
-    QString errorMessage;                   ///< set when the input could not be processed
-    bool offerUncompressedFallback = false; ///< decompression-only failure: offer the uncompressed URL
+    bool ok = false;                            ///< JSON scan produced set data (or plain XML was handled)
+    bool plainXml = false;                      ///< input was a plain Cockatrice XML database
+    QSharedPointer<OracleSourceData> xmlSource; ///< source for the plain-XML path
+    QString errorMessage;                       ///< set when the input could not be processed
+    bool offerUncompressedFallback = false;     ///< decompression-only failure: offer the uncompressed URL
 };
 
 class LoadSetsPage : public OracleWizardPage
@@ -77,7 +80,7 @@ public:
 protected:
     void initializePage() override;
     bool validatePage() override;
-    void readSetsFromByteArray(QByteArray _data);
+    void readSetsFromSource(QSharedPointer<OracleSourceData> source);
     void readSetsFromFile(const QString &fileName);
     void downloadSetsFile(const QUrl &url);
     void cancelWork() override;
@@ -102,9 +105,11 @@ private slots:
     void actLoadSetsFile();
     void actRestoreDefaultUrl();
     void actDownloadProgressSetsFile(qint64 received, qint64 total);
-    void actDownloadFinishedSetsFile();
-    void updateParsingProgress(int bytesRead, int totalBytes);
-    void scanProgressToStdout(int bytesRead, int totalBytes);
+    void actDownloadFinishedSetsFile(QNetworkReply *reply,
+                                     QSharedPointer<OracleSourceData> source,
+                                     const QString &writeError);
+    void updateParsingProgress(qint64 bytesRead, qint64 totalBytes);
+    void scanProgressToStdout(qint64 bytesRead, qint64 totalBytes);
     void importFinished();
     void zipDownloadFailed(const QString &message);
 };
@@ -128,6 +133,7 @@ private:
     QFuture<int> importFuture;
     int totalSets = 0;
     bool importActive = false;
+    bool importFailed = false;
 
 protected:
     void initializePage() override;

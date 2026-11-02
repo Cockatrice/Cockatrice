@@ -14,6 +14,7 @@
 #include <QList>
 #include <QMap>
 #include <QObject>
+#include <QSharedPointer>
 #include <QString>
 #include <QStringList>
 #include <libcockatrice/card/card_info.h>
@@ -22,6 +23,7 @@
 #include <utility>
 
 class CardRelation;
+class OracleSourceData;
 class QRegularExpression;
 
 // many users prefer not to see these sets with non english arts
@@ -178,10 +180,13 @@ private:
     QList<SetToDownload> allSets;
 
     /**
-     * The raw JSON text of the source document, retained for lazy per-set
-     * parsing during startImport(). Frees the card data as each set is imported.
+     * Source ownership precedes its byte view so the mapping stays alive through
+     * lazy per-set parsing. The byte-array API also supports owned in-memory data.
      */
+    QSharedPointer<OracleSourceData> rawSetsSource;
     QByteArray rawSetsData;
+
+    bool readSets(QByteArray data, QSharedPointer<OracleSourceData> source);
 
     /**
      * Whether readSetsFromByteArray() should report scan progress via
@@ -248,7 +253,7 @@ private:
                             bool collectText = true);
 signals:
     void setIndexChanged(int cardsImported, int setIndex, const QString &setName);
-    void dataReadProgress(int bytesRead, int totalBytes);
+    void dataReadProgress(qint64 bytesRead, qint64 totalBytes);
 
 public:
     explicit OracleImporter(QObject *parent = nullptr);
@@ -278,6 +283,7 @@ public:
      * the wizard can hand over its decompressed buffer without copying it.
      */
     bool readSetsFromByteArray(QByteArray data);
+    bool readSetsFromSource(QSharedPointer<OracleSourceData> source, QString &error);
     int startImport();
     /**
      * @brief Requests an in-flight startImport() to stop at the next set boundary.

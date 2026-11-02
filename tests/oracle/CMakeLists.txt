@@ -9,6 +9,7 @@ cockatrice_add_test(
   ../../oracle/src/oracleimporter.cpp
   ../../oracle/src/parsehelpers.cpp
   ../../oracle/src/raw_json_scanner.cpp
+  ../../oracle/src/oracle_source_data.cpp
   oracle_importer_test.cpp
   LIBS
   libcockatrice_card
@@ -53,6 +54,7 @@ cockatrice_add_manual_test(
   ../../oracle/src/oracleimporter.cpp
   ../../oracle/src/parsehelpers.cpp
   ../../oracle/src/raw_json_scanner.cpp
+  ../../oracle/src/oracle_source_data.cpp
   oracle_importer_benchmark_test.cpp
   ${_ORACLE_BENCH_EXTRA_SOURCES}
   LIBS

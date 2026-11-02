@@ -2,6 +2,7 @@
 #define ORACLEWIZARD_H
 
 #include <QByteArray>
+#include <QSharedPointer>
 #include <QString>
 #include <QWizard>
 #include <qtmetamacros.h>
@@ -9,6 +10,7 @@
 
 class QNetworkAccessManager;
 class OracleImporter;
+class OracleSourceData;
 class QLocalServer;
 class QSettings;
 class QWidget;
@@ -69,7 +71,7 @@ public:
     QSettings *settings;
     QNetworkAccessManager *nam;
     bool downloadedPlainXml = false;
-    QByteArray xmlData;
+    QSharedPointer<OracleSourceData> xmlSource;
     bool backgroundMode = false;
 
 private slots:
