@@ -129,33 +129,15 @@ void CardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     QPointF sp = pos();
     sc->removeItem(this);
 
-    // The source card may have been destroyed while it was being dragged; nothing to drop then.
-    if (item.isNull()) {
-        for (auto *child : childDrags) {
-            if (child->scene()) {
-                child->scene()->removeItem(child);
-            }
-        }
-        event->accept();
-        return;
-    }
-
     QList<CardDragItem *> dragItemList;
     CardZoneLogic *startZone = static_cast<CardItem *>(item.data())->getZone();
-    if (currentZone && !(static_cast<CardItem *>(item)->getAttachedTo() && (startZone == currentZone->getLogic()))) {
+    if (currentZone && !(static_cast<CardItem *>(item.data())->getAttachedTo() && (startZone == currentZone->getLogic()))) {
         if (!occupied) {
             dragItemList.append(this);
         }
 
         for (int i = 0; i < childDrags.size(); i++) {
             CardDragItem *c = static_cast<CardDragItem *>(childDrags[i]);
-            if (c->item.isNull()) {
-                // Child card was destroyed mid-drag; skip it.
-                if (c->scene()) {
-                    c->scene()->removeItem(c);
-                }
-                continue;
-            }
             if (!occupied &&
                 !(static_cast<CardItem *>(c->item.data())->getAttachedTo() && (startZone == currentZone->getLogic())) &&
                 !c->occupied) {
