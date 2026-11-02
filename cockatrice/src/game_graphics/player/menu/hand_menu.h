@@ -42,6 +42,8 @@ private slots:
     void populateRevealRandomHandCardMenuWithActivePlayers();
     void onRevealHandTriggered();
     void onRevealRandomHandCardTriggered();
+    void populateRevealRandomHandCardsMenuWithActivePlayers();
+    void onRevealRandomHandCardsTriggered();
 
 private:
     PlayerGraphicsItem *player;
@@ -61,6 +63,9 @@ private:
 
     QMenu *mRevealRandomHandCard = nullptr;
     QAction *aRevealRandomHandCardToAll = nullptr;
+
+    QMenu *mRevealRandomHandCards = nullptr;
+    QAction *aRevealRandomHandCardsToAll = nullptr;
 
     QMenu *mMoveHandMenu = nullptr;
     QAction *aMoveHandToTopLibrary = nullptr;

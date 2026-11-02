@@ -6,11 +6,14 @@
 #include "../player_graphics_item.h"
 
 #include <QAction>
+#include <QInputDialog>
 #include <QKeySequence>
 #include <QList>
 #include <QMap>
 #include <QMenu>
+#include <QMessageBox>
 #include <QObject>
+#include <QPointer>
 #include <QString>
 #include <QVariant>
 #include <libcockatrice/game/abstract_game.h>
@@ -20,6 +23,9 @@
 #include <libcockatrice/game/player/player_logic.h>
 #include <libcockatrice/game/player/player_manager.h>
 #include <libcockatrice/game/zones/hand_zone_logic.h>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
+#include <libcockatrice/protocol/pb/response.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/zone_names.h>
 
 class QWidget;
@@ -66,6 +72,15 @@ HandMenu::HandMenu(PlayerGraphicsItem *_player, QWidget *parent) : TearOffMenu(p
     aRevealRandomHandCardToAll = new QAction(this);
     aRevealRandomHandCardToAll->setData(-1);
     connect(aRevealRandomHandCardToAll, &QAction::triggered, this, &HandMenu::onRevealRandomHandCardTriggered);
+
+    mRevealRandomHandCards = addMenu(QString());
+    mRevealRandomHandCards->setObjectName("revealRandomHandCardsMenu");
+    connect(mRevealRandomHandCards, &QMenu::aboutToShow, this,
+            &HandMenu::populateRevealRandomHandCardsMenuWithActivePlayers);
+    aRevealRandomHandCardsToAll = new QAction(this);
+    aRevealRandomHandCardsToAll->setData(-1);
+    connect(aRevealRandomHandCardsToAll, &QAction::triggered, this, &HandMenu::onRevealRandomHandCardsTriggered);
+    mRevealRandomHandCards->addAction(aRevealRandomHandCardsToAll);
 
     // We still need to add these actions to menu here so that the shortcuts are active right away
     mRevealHand->addAction(aRevealHandToAll);
@@ -146,6 +161,8 @@ void HandMenu::retranslateUi()
 
         mRevealRandomHandCard->setTitle(tr("Reveal r&andom card to..."));
         aRevealRandomHandCardToAll->setText(tr("All players"));
+        mRevealRandomHandCards->setTitle(tr("Reveal random cards to..."));
+        aRevealRandomHandCardsToAll->setText(tr("All players"));
     }
 }
 
@@ -232,4 +249,67 @@ void HandMenu::onRevealRandomHandCardTriggered()
 
     const int targetId = action->data().toInt();
     player->getLogic()->getPlayerActions()->actRevealRandomHandCard(targetId);
+}
+
+void HandMenu::populateRevealRandomHandCardsMenuWithActivePlayers()
+{
+    mRevealRandomHandCards->clear();
+    mRevealRandomHandCards->addAction(aRevealRandomHandCardsToAll);
+    mRevealRandomHandCards->addSeparator();
+    for (auto *other : player->getLogic()->getGame()->getPlayerManager()->getPlayers()) {
+        if (other == player->getLogic()) {
+            continue;
+        }
+        auto *action = mRevealRandomHandCards->addAction(other->getPlayerInfo()->getName());
+        action->setData(other->getPlayerInfo()->getId());
+        connect(action, &QAction::triggered, this, &HandMenu::onRevealRandomHandCardsTriggered);
+    }
+}
+
+void HandMenu::onRevealRandomHandCardsTriggered()
+{
+    const auto *action = qobject_cast<QAction *>(sender());
+    const int handSize = player->getLogic()->getHandZone()->getCards().size();
+    if (!action || handSize == 0) {
+        return;
+    }
+    const int targetId = action->data().toInt();
+    QPointer<PlayerActions> actions = player->getLogic()->getPlayerActions();
+    QPointer<AbstractClient> client =
+        player->getLogic()->getGame()->getClientForPlayer(player->getLogic()->getPlayerInfo()->getId());
+    if (!client) {
+        return;
+    }
+    auto *dialog = new QInputDialog(this);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->setWindowTitle(tr("Reveal Random Hand Cards"));
+    dialog->setLabelText(tr("Number of distinct random cards to reveal:"));
+    dialog->setInputMode(QInputDialog::IntInput);
+    dialog->setIntRange(1, handSize);
+    dialog->setIntValue(qMin(2, handSize));
+    connect(client, &QObject::destroyed, dialog, &QDialog::reject);
+    connect(actions, &QObject::destroyed, dialog, &QDialog::reject);
+    connect(dialog, &QDialog::accepted, this, [this, dialog, actions, client, targetId] {
+        if (!actions || !client) {
+            return;
+        }
+        auto *pending = actions->prepareRandomHandReveal(targetId, dialog->intValue());
+        connect(pending, &PendingCommand::finished, this, [this, actions, client](const Response &response) {
+            if (!actions || !client || response.response_code() == Response::RespOk) {
+                return;
+            }
+            const QString text =
+                response.response_code() == Response::RespInvalidCommand
+                    ? tr("This server does not support revealing multiple random cards. No cards were revealed.")
+                    : tr("The random reveal could not be completed. The hand or recipient may have changed.");
+            auto *message =
+                new QMessageBox(QMessageBox::Warning, tr("Reveal Random Hand Cards"), text, QMessageBox::Ok, this);
+            message->setAttribute(Qt::WA_DeleteOnClose);
+            connect(actions, &QObject::destroyed, message, &QDialog::reject);
+            connect(client, &QObject::destroyed, message, &QDialog::reject);
+            message->open();
+        });
+        actions->sendGameCommand(pending);
+    });
+    dialog->open();
 }

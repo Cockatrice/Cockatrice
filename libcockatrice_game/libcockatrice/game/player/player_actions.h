@@ -83,6 +83,7 @@ public:
      * @param numberCards How many cards to dump, -1 for all.
      */
     PendingCommand *prepareZoneDump(CardZoneLogic *zone, int numberCards);
+    PendingCommand *prepareRandomHandReveal(int revealToPlayerId, int amount);
 
     /**
      * @brief Sets the tapped state of the cards that do not already have it.

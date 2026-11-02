@@ -399,7 +399,8 @@ Response::ResponseCode Server_AbstractParticipant::cmdDumpZone(const Command_Dum
 
 Response::ResponseCode Server_AbstractParticipant::cmdRevealCards(const Command_RevealCards & /*cmd*/,
                                                                   ResponseContainer & /*rc*/,
-                                                                  GameEventStorage & /*ges*/)
+                                                                  GameEventStorage & /*ges*/,
+                                                                  int /*randomCount*/)
 {
     return Response::RespFunctionNotAllowed;
 }
@@ -516,6 +517,20 @@ Server_AbstractParticipant::processGameCommand(const GameCommand &command, Respo
         case GameCommand::REVEAL_CARDS:
             return cmdRevealCards(command.GetExtension(Command_RevealCards::ext), rc, ges);
             break;
+        case GameCommand::REVEAL_RANDOM_CARDS: {
+            const auto &random = command.GetExtension(Command_RevealRandomCards::ext);
+            if (random.number_of_cards() <= 0) {
+                return Response::RespInvalidData;
+            }
+            // Reuse the existing player/judge authorization and private reveal delivery.
+            Command_RevealCards reveal;
+            reveal.set_zone_name(random.zone_name());
+            reveal.add_card_id(-2);
+            if (random.has_player_id()) {
+                reveal.set_player_id(random.player_id());
+            }
+            return cmdRevealCards(reveal, rc, ges, random.number_of_cards());
+        }
         case GameCommand::MOVE_CARD:
             return cmdMoveCard(command.GetExtension(Command_MoveCard::ext), rc, ges);
             break;

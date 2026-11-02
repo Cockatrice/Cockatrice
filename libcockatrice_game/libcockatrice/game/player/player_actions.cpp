@@ -1756,6 +1756,17 @@ void PlayerActions::actRevealRandomHandCard(int revealToPlayerId)
     sendGameCommand(cmd);
 }
 
+PendingCommand *PlayerActions::prepareRandomHandReveal(int revealToPlayerId, int amount)
+{
+    Command_RevealRandomCards cmd;
+    if (revealToPlayerId != -1) {
+        cmd.set_player_id(revealToPlayerId);
+    }
+    cmd.set_zone_name(ZoneNames::HAND);
+    cmd.set_number_of_cards(amount);
+    return prepareGameCommand(cmd);
+}
+
 void PlayerActions::actRevealLibrary(int revealToPlayerId)
 {
     Command_RevealCards cmd;

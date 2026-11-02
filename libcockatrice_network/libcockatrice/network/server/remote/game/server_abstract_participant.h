@@ -169,7 +169,7 @@ public:
     virtual Response::ResponseCode
     cmdDumpZone(const Command_DumpZone &cmd, ResponseContainer &rc, GameEventStorage &ges);
     virtual Response::ResponseCode
-    cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer &rc, GameEventStorage &ges);
+    cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer &rc, GameEventStorage &ges, int randomCount = 1);
     virtual Response::ResponseCode
     cmdReverseTurn(const Command_ReverseTurn & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage &ges);
     virtual Response::ResponseCode
