@@ -6,29 +6,17 @@
 #include "../deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "deck_list_model.h"
-#include "libcockatrice/card/card_info.h"
-#include "libcockatrice/card/database/card_database_querier.h"
-#include "libcockatrice/deck_list/tree/deck_list_card_node.h"
-#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
+#include "sample_hand_generator.h"
 
-#include <QDebug>
 #include <QHBoxLayout>
 #include <QPushButton>
-#include <QSharedPointer>
 #include <QSlider>
 #include <QSpinBox>
 #include <QSplitter>
-#include <QString>
 #include <QVBoxLayout>
-#include <QtGlobal>
-#include <algorithm>
-#include <compare>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
-#include <qlogging.h>
-#include <qnamespace.h>
-#include <qobjectdefs.h>
 #include <random>
 
 class DeckListStatisticsAnalyzer;
@@ -54,8 +42,8 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
     resetAndHandSizeLayout->addWidget(resetButton);
 
     handSizeSpinBox = new QSpinBox(this);
-    handSizeSpinBox->setValue(SettingsCache::instance().cardsDisplay().getSampleHandSize());
     handSizeSpinBox->setMinimum(1);
+    handSizeSpinBox->setValue(SettingsCache::instance().cardsDisplay().getSampleHandSize());
     connect(handSizeSpinBox, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance().cardsDisplay(),
             &CardsDisplaySettings::setSampleHandSize);
     connect(handSizeSpinBox, qOverload<int>(&QSpinBox::valueChanged), this,
@@ -97,7 +85,6 @@ void VisualDeckEditorSampleHandWidget::retranslateUi()
 void VisualDeckEditorSampleHandWidget::setDeckModel(DeckListModel *deckModel)
 {
     deckListModel = deckModel;
-    // connect(deckListModel, &DeckListModel::dataChanged, this, &VisualDeckEditorSampleHandWidget::updateDisplay);
     updateDisplay();
 }
 
@@ -107,6 +94,8 @@ void VisualDeckEditorSampleHandWidget::updateDisplay()
     for (const ExactCard &card : getRandomCards(handSizeSpinBox->value())) {
         auto displayWidget = new CardInfoPictureWidget(this);
         displayWidget->setCard(card);
+        displayWidget->setToolTip(card.getName());
+        displayWidget->setAccessibleName(card.getName());
         displayWidget->setScaleFactor(cardSizeWidget->getSlider()->value());
         connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, displayWidget,
                 &CardInfoPictureWidget::setScaleFactor);
@@ -114,49 +103,13 @@ void VisualDeckEditorSampleHandWidget::updateDisplay()
     }
 }
 
-static QList<ExactCard> cardNodesToExactCards(QList<const DecklistCardNode *> nodes)
-{
-    QList<ExactCard> cards;
-    for (auto node : nodes) {
-        ExactCard card = CardDatabaseManager::query()->getCard(node->toCardRef());
-        if (card) {
-            for (int k = 0; k < node->getNumber(); ++k) {
-                cards.append(card);
-            }
-        } else {
-            qDebug() << "Card not found in database!";
-        }
-    }
-
-    return cards;
-}
-
 QList<ExactCard> VisualDeckEditorSampleHandWidget::getRandomCards(int amountToGet)
 {
-    QList<ExactCard> randomCards;
-    if (!deckListModel) {
-        return randomCards;
+    if (!deckListModel || !deckListModel->getDeckList()) {
+        return {};
     }
 
-    QList<ExactCard> mainDeckCards = cardNodesToExactCards(deckListModel->getCardNodesForZone(DECK_ZONE_MAIN));
-
-    if (mainDeckCards.isEmpty()) {
-        return randomCards;
-    }
-
-    // Shuffle the deck
-    std::random_device rd;
-    std::mt19937 rng(rd());
-    std::shuffle(mainDeckCards.begin(), mainDeckCards.end(), rng);
-
-    // Select amountToGet cards
-
-    for (int i = 0; i < qMin(amountToGet, mainDeckCards.size()); ++i) {
-        randomCards.append(mainDeckCards.at(i));
-    }
-
-    std::sort(randomCards.begin(), randomCards.end(),
-              [](const ExactCard &a, const ExactCard &b) { return a.getInfo().getCmc() < b.getInfo().getCmc(); });
-
-    return randomCards;
+    std::random_device seed;
+    std::mt19937 random(seed());
+    return generateSampleHand(*deckListModel->getDeckList(), *CardDatabaseManager::query(), amountToGet, random);
 }
