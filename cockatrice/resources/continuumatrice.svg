@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <title>Continuumatrice</title>
+  <defs>
+    <linearGradient id="background" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#181B37"/>
+      <stop offset="1" stop-color="#090B17"/>
+    </linearGradient>
+    <linearGradient id="orbit" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#80D6DA"/>
+      <stop offset="0.5" stop-color="#B69CFA"/>
+      <stop offset="1" stop-color="#E487A6"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="52" fill="url(#background)"/>
+  <circle cx="128" cy="128" r="90" fill="none" stroke="#44466D" stroke-width="3"/>
+  <path d="M178 69C163 57 145 51 126 51A77 77 0 1 0 178 186" fill="none" stroke="url(#orbit)" stroke-width="18" stroke-linecap="round"/>
+  <path d="M85 93h96M78 128h103M85 163h96" stroke-linecap="round" stroke-width="11" fill="none"/>
+  <path d="M85 93h96" stroke="#B65A79" stroke-width="12" stroke-linecap="round"/>
+  <path d="M78 128h103" stroke="#4FA7B8" stroke-width="12" stroke-linecap="round"/>
+  <path d="M85 163h96" stroke="#8E76C7" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="192" cy="60" r="9" fill="#EAC0FF"/>
+</svg>
