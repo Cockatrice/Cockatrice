@@ -66,6 +66,21 @@
         <file>resources/icons/mana/R.svg</file>
         <file>resources/icons/mana/U.svg</file>
         <file>resources/icons/mana/W.svg</file>
+        <file>resources/icons/essence/M.svg</file>
+        <file>resources/icons/essence/S.svg</file>
+        <file>resources/icons/essence/O.svg</file>
+        <file>resources/icons/essence/G.svg</file>
+        <file>resources/icons/essence/E.svg</file>
+        <file>resources/icons/essence/A.svg</file>
+        <file>resources/icons/essence/Q.svg</file>
+        <file>resources/icons/essence/C.svg</file>
+        <file>resources/icons/essence/B.svg</file>
+        <file>resources/icons/essence/R.svg</file>
+        <file>resources/icons/essence/L.svg</file>
+        <file>resources/icons/essence/V.svg</file>
+        <file>resources/icons/essence/T.svg</file>
+        <file>resources/icons/essence/P.svg</file>
+        <file>resources/icons/essence/N.svg</file>
 
         <file>resources/backgrounds/home.jpg</file>
         <file>resources/backgrounds/home-dark.jpg</file>
