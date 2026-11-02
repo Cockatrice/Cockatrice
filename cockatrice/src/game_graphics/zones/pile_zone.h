@@ -9,6 +9,8 @@
 
 #include "card_zone.h"
 
+#include <QPixmap>
+#include <QString>
 #include <qtmetamacros.h>
 
 class PileZoneLogic;
@@ -21,6 +23,11 @@ class QGraphicsItem;
 class PileZone : public CardZone
 {
     Q_OBJECT
+private:
+    QString customDisplayName;
+    QString customIconAsset;
+    QPixmap customIconPixmap;
+    void reloadCustomIcon();
 private slots:
     void callUpdate()
     {
@@ -28,7 +35,8 @@ private slots:
     }
 
 public:
-    PileZone(PileZoneLogic *_logic, QGraphicsItem *parent);
+    PileZone(PileZoneLogic *_logic, QGraphicsItem *parent,
+             const QString &displayName = {}, const QString &iconAsset = {});
     [[nodiscard]] QRectF boundingRect() const override;
     [[nodiscard]] QPainterPath shape() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

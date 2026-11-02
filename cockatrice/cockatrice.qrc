@@ -5,6 +5,9 @@
         <file>resources/cockatrice-logo-white.svg</file>
         <file>resources/hand.svg</file>
         <file>resources/hr.jpg</file>
+        <file>resources/piles/limbo.svg</file>
+        <file>resources/piles/refuge.svg</file>
+        <file>resources/piles/oblivion.svg</file>
 
         <file>resources/icons/arrow_bottom_green.svg</file>
         <file>resources/icons/arrow_down_green.svg</file>

@@ -49,6 +49,11 @@
 #include <qnamespace.h>
 #include <qnumeric.h>
 
+namespace
+{
+constexpr qreal EXTRA_PILE_COLUMN_WIDTH = CardDimensions::HEIGHT_F + 24;
+} // namespace
+
 PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
 {
     connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::horizontalHandChanged, this,
@@ -152,6 +157,16 @@ void PlayerGraphicsItem::initializeZones()
     rfgZoneGraphicsItem = new PileZone(player->getRfgZone(), this);
     rfgZoneGraphicsItem->setPos(base + QPointF(0, 2 * h + h2 + 10));
 
+    // Three public piles in a second column, beside the legacy piles.
+    const qreal extraPileX = CardDimensions::HEIGHT_F + counterAreaWidth + 15 + 8;
+    limboZoneGraphicsItem = new PileZone(player->getLimboZone(), this, tr("Limbo"), QStringLiteral("limbo"));
+    limboZoneGraphicsItem->setPos(QPointF(extraPileX, base.y()));
+    refugeZoneGraphicsItem = new PileZone(player->getRefugeZone(), this, tr("Refuge"), QStringLiteral("refuge"));
+    refugeZoneGraphicsItem->setPos(QPointF(extraPileX, base.y() + h + h2 + 10));
+    oblivionZoneGraphicsItem = new PileZone(player->getOblivionZone(), this, tr("Oblivion"),
+                                           QStringLiteral("oblivion"));
+    oblivionZoneGraphicsItem->setPos(QPointF(extraPileX, base.y() + 2 * h + h2 + 10));
+
     tableZoneGraphicsItem = new TableZone(player->getTableZone(), mirrored, this);
     connect(this, &PlayerGraphicsItem::mirroredChanged, tableZoneGraphicsItem, &TableZone::setMirrored);
 
@@ -169,6 +184,9 @@ void PlayerGraphicsItem::initializeZones()
     zoneGraphicsItems.insert(player->getDeckZone()->getName(), deckZoneGraphicsItem);
     zoneGraphicsItems.insert(player->getGraveZone()->getName(), graveyardZoneGraphicsItem);
     zoneGraphicsItems.insert(player->getRfgZone()->getName(), rfgZoneGraphicsItem);
+    zoneGraphicsItems.insert(player->getLimboZone()->getName(), limboZoneGraphicsItem);
+    zoneGraphicsItems.insert(player->getRefugeZone()->getName(), refugeZoneGraphicsItem);
+    zoneGraphicsItems.insert(player->getOblivionZone()->getName(), oblivionZoneGraphicsItem);
     zoneGraphicsItems.insert(player->getSideboardZone()->getName(), sideboardGraphicsItem);
     zoneGraphicsItems.insert(player->getTableZone()->getName(), tableZoneGraphicsItem);
     zoneGraphicsItems.insert(player->getStackZone()->getName(), stackZoneGraphicsItem);
@@ -203,7 +221,7 @@ QRectF PlayerGraphicsItem::boundingRect() const
 
 qreal PlayerGraphicsItem::getMinimumWidth() const
 {
-    qreal result = tableZoneGraphicsItem->getMinimumWidth() + CardDimensions::HEIGHT_F + 15 + counterAreaWidth +
+    qreal result = tableZoneGraphicsItem->getMinimumWidth() + CardDimensions::HEIGHT_F + 15 + counterAreaWidth + EXTRA_PILE_COLUMN_WIDTH +
                    stackZoneGraphicsItem->boundingRect().width();
     if (!SettingsCache::instance().userInterface().getHorizontalHand()) {
         result += handZoneGraphicsItem->boundingRect().width();
@@ -272,7 +290,7 @@ void PlayerGraphicsItem::processSceneSizeChange(int newPlayerWidth)
 {
     // Extend table (and hand, if horizontal) to accommodate the new player width.
     qreal tableWidth = newPlayerWidth - CardDimensions::HEIGHT_F - 15 - counterAreaWidth -
-                       stackZoneGraphicsItem->boundingRect().width();
+                       EXTRA_PILE_COLUMN_WIDTH - stackZoneGraphicsItem->boundingRect().width();
     if (!SettingsCache::instance().userInterface().getHorizontalHand()) {
         tableWidth -= handZoneGraphicsItem->boundingRect().width();
     }
@@ -345,7 +363,7 @@ void PlayerGraphicsItem::rearrangeCounters()
 
 void PlayerGraphicsItem::rearrangeZones()
 {
-    auto base = QPointF(CardDimensions::HEIGHT_F + counterAreaWidth + 15, 0);
+    auto base = QPointF(CardDimensions::HEIGHT_F + counterAreaWidth + 15 + EXTRA_PILE_COLUMN_WIDTH, 0);
     if (SettingsCache::instance().userInterface().getHorizontalHand()) {
         if (mirrored) {
             if (player->getHandZone()->contentsKnown()) {
@@ -396,7 +414,7 @@ void PlayerGraphicsItem::rearrangeZones()
 void PlayerGraphicsItem::updateBoundingRect()
 {
     prepareGeometryChange();
-    qreal width = CardDimensions::HEIGHT_F + 15 + counterAreaWidth + stackZoneGraphicsItem->boundingRect().width();
+    qreal width = CardDimensions::HEIGHT_F + 15 + counterAreaWidth + EXTRA_PILE_COLUMN_WIDTH + stackZoneGraphicsItem->boundingRect().width();
     if (SettingsCache::instance().userInterface().getHorizontalHand()) {
         qreal handHeight = handVisible ? handZoneGraphicsItem->boundingRect().height() : 0;
         bRect = QRectF(0, 0, width + tableZoneGraphicsItem->boundingRect().width(),

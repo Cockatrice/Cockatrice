@@ -92,6 +92,9 @@ private:
     SideboardMenu *sideboardMenu;
     GraveyardMenu *graveMenu;
     RfgMenu *rfgMenu;
+    QMenu *limboMenu = nullptr;
+    QMenu *refugeMenu = nullptr;
+    QMenu *oblivionMenu = nullptr;
     UtilityMenu *utilityMenu;
     TallyMenu *tallyMenu;
     SayMenu *sayMenu;

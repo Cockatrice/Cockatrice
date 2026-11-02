@@ -1974,6 +1974,23 @@ void PlayerActions::cardMenuAction(QList<CardState *> selectedCards, CardMenuAct
                 commandList.append(cmd);
                 break;
             }
+            case cmMoveToLimbo:
+            case cmMoveToRefuge:
+            case cmMoveToOblivion: {
+                auto *cmd = new Command_MoveCard;
+                cmd->set_start_player_id(startPlayerId);
+                cmd->set_start_zone(startZone.toStdString());
+                cmd->mutable_cards_to_move()->CopyFrom(idList);
+                cmd->set_target_player_id(player->getPlayerInfo()->getId());
+                const char *targetZone = type == cmMoveToLimbo   ? ZoneNames::LIMBO
+                                         : type == cmMoveToRefuge ? ZoneNames::REFUGE
+                                                                  : ZoneNames::OBLIVION;
+                cmd->set_target_zone(targetZone);
+                cmd->set_x(0);
+                cmd->set_y(0);
+                commandList.append(cmd);
+                break;
+            }
             case cmMoveToTable: {
                 // Each card needs its own command because table row, pt, and cipt vary per card
                 for (const auto &card : cardList) {

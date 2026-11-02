@@ -206,23 +206,23 @@ void TableZone::paintBattlefieldRows(QPainter *painter)
     painter->setFont(font);
 
     for (int visualRow = 0; visualRow < TableZoneLogic::ROW_COUNT; ++visualRow) {
-        // Table logical grid Y: 0 = Command, 1 = Support, 2 = Front.
+        // Logical grid Y: 0 = Front, 1 = Support, 2 = Command.
         const int row = inverted ? TableZoneLogic::ROW_COUNT - 1 - visualRow : visualRow;
         QString label;
         QColor color;
 
         switch (row) {
             case 0:
-                label = tr("COMMAND ZONE");
-                color = commandZoneColor;
+                label = tr("FRONT ZONE");
+                color = frontZoneColor;
                 break;
             case 1:
                 label = tr("SUPPORT ZONE");
                 color = supportZoneColor;
                 break;
             default:
-                label = tr("FRONT ZONE");
-                color = frontZoneColor;
+                label = tr("COMMAND ZONE");
+                color = commandZoneColor;
                 break;
         }
 

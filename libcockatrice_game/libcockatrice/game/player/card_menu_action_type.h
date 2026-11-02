@@ -22,7 +22,11 @@ enum CardMenuActionType
     cmMoveToHand,
     cmMoveToGraveyard,
     cmMoveToExile,
-    cmMoveToTable
+    cmMoveToTable,
+    // Continuumatrice piles: append to preserve existing action values.
+    cmMoveToLimbo,
+    cmMoveToRefuge,
+    cmMoveToOblivion
 };
 
 #endif // COCKATRICE_CARD_MENU_ACTION_TYPE_H

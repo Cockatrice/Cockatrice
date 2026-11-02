@@ -20,12 +20,14 @@
 #include "tally_menu.h"
 #include "utility_menu.h"
 
+#include <QAction>
 #include <QMenu>
 #include <QString>
 #include <libcockatrice/game/abstract_game.h>
 #include <libcockatrice/game/player/player_info.h>
 #include <libcockatrice/game/player/player_logic.h>
 #include <libcockatrice/game/player/player_manager.h>
+#include <libcockatrice/utility/zone_names.h>
 
 PlayerMenu::PlayerMenu(PlayerGraphicsItem *_player) : QObject(_player), player(_player)
 {
@@ -44,6 +46,19 @@ PlayerMenu::PlayerMenu(PlayerGraphicsItem *_player) : QObject(_player), player(_
 
     graveMenu = addManagedMenu<GraveyardMenu>(player, playerMenu);
     rfgMenu = addManagedMenu<RfgMenu>(player, playerMenu);
+
+    // Context menus with double-click view action, following Exile's pattern.
+    const auto addPublicPileMenu = [this, _player](const QString &title, const QString &zone) {
+        auto *menu = playerMenu->addMenu(title);
+        auto *view = menu->addAction(tr("View %1").arg(title));
+        connect(view, &QAction::triggered, this, [_player, zone]() {
+            _player->getLogic()->onRequestZoneViewToggle(zone, -1, false);
+        });
+        return menu;
+    };
+    limboMenu = addPublicPileMenu(tr("Limbo"), QString::fromLatin1(ZoneNames::LIMBO));
+    refugeMenu = addPublicPileMenu(tr("Refuge"), QString::fromLatin1(ZoneNames::REFUGE));
+    oblivionMenu = addPublicPileMenu(tr("Oblivion"), QString::fromLatin1(ZoneNames::OBLIVION));
 
     if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
         sideboardMenu = addManagedMenu<SideboardMenu>(player, playerMenu);
@@ -80,6 +95,9 @@ void PlayerMenu::setMenusForGraphicItems()
     player->getTableZoneGraphicsItem()->setMenu(playerMenu);
     player->getGraveyardZoneGraphicsItem()->setMenu(graveMenu, graveMenu->aViewGraveyard);
     player->getRfgZoneGraphicsItem()->setMenu(rfgMenu, rfgMenu->aViewRfg);
+    player->getLimboZoneGraphicsItem()->setMenu(limboMenu, limboMenu->actions().constFirst());
+    player->getRefugeZoneGraphicsItem()->setMenu(refugeMenu, refugeMenu->actions().constFirst());
+    player->getOblivionZoneGraphicsItem()->setMenu(oblivionMenu, oblivionMenu->actions().constFirst());
     if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
         player->getHandZoneGraphicsItem()->setMenu(handMenu);
         player->getDeckZoneGraphicsItem()->setMenu(libraryMenu, libraryMenu->aDrawCard);

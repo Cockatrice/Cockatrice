@@ -52,5 +52,6 @@ int TableZoneLogic::tableRowToGridY(int tableRow)
     if (tableRow > 2) {
         tableRow = 1;
     }
-    return clampValidTableRow(2 - tableRow);
+    // Continuumatrice rows are ordered Front (0), Support (1), Command (2).
+    return clampValidTableRow(tableRow);
 }

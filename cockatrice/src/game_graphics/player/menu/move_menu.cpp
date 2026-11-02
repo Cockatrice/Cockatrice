@@ -25,6 +25,12 @@ MoveMenu::MoveMenu(PlayerGraphicsItem *player) : QMenu(tr("Move to"))
     aMoveToGraveyard->setData(cmMoveToGraveyard);
     aMoveToExile = new QAction(this);
     aMoveToExile->setData(cmMoveToExile);
+    aMoveToLimbo = new QAction(this);
+    aMoveToLimbo->setData(cmMoveToLimbo);
+    aMoveToRefuge = new QAction(this);
+    aMoveToRefuge->setData(cmMoveToRefuge);
+    aMoveToOblivion = new QAction(this);
+    aMoveToOblivion->setData(cmMoveToOblivion);
 
     auto *actions = player->getLogic()->getPlayerActions();
 
@@ -42,6 +48,9 @@ MoveMenu::MoveMenu(PlayerGraphicsItem *player) : QMenu(tr("Move to"))
     connect(aMoveToHand, &QAction::triggered, actions, invoke(cmMoveToHand));
     connect(aMoveToGraveyard, &QAction::triggered, actions, invoke(cmMoveToGraveyard));
     connect(aMoveToExile, &QAction::triggered, actions, invoke(cmMoveToExile));
+    connect(aMoveToLimbo, &QAction::triggered, actions, invoke(cmMoveToLimbo));
+    connect(aMoveToRefuge, &QAction::triggered, actions, invoke(cmMoveToRefuge));
+    connect(aMoveToOblivion, &QAction::triggered, actions, invoke(cmMoveToOblivion));
 
     addAction(aMoveToTopLibrary);
     addAction(aMoveToXfromTopOfLibrary);
@@ -54,6 +63,10 @@ MoveMenu::MoveMenu(PlayerGraphicsItem *player) : QMenu(tr("Move to"))
     addAction(aMoveToGraveyard);
     addSeparator();
     addAction(aMoveToExile);
+    addSeparator();
+    addAction(aMoveToLimbo);
+    addAction(aMoveToRefuge);
+    addAction(aMoveToOblivion);
 
     setShortcutsActive();
 
@@ -81,4 +94,7 @@ void MoveMenu::retranslateUi()
     aMoveToHand->setText(tr("&Hand"));
     aMoveToGraveyard->setText(tr("&Graveyard"));
     aMoveToExile->setText(tr("&Exile"));
+    aMoveToLimbo->setText(tr("Limbo"));
+    aMoveToRefuge->setText(tr("Refuge"));
+    aMoveToOblivion->setText(tr("Oblivion"));
 }

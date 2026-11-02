@@ -29,7 +29,7 @@ public:
                    bool _contentsKnown,
                    QObject *parent = nullptr);
 
-    /** @brief Number of rows in the table zone grid (0=creatures, 1=noncreatures, 2=lands). */
+    /** @brief Number of rows in the table zone grid (0=Front, 1=Support, 2=Command). */
     static const int ROW_COUNT = 3;
 
     /**
@@ -38,9 +38,9 @@ public:
     static int clampValidTableRow(const int row);
 
     /**
-     * Converts a card's logical table row (0=creatures, 1=noncreatures, 2=lands)
-     * to the corresponding grid Y coordinate. Cards with tableRow > 2 (e.g.,
-     * instants/sorceries) default to the noncreatures row.
+     * Converts a card's logical table row (0=Front, 1=Support, 2=Command)
+     * to the corresponding grid Y coordinate. Rows greater than 2
+     * fall back to the middle (Support) row.
      */
     static int tableRowToGridY(int tableRow);
 
