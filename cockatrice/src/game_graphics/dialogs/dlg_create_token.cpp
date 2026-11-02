@@ -1,9 +1,9 @@
 #include "dlg_create_token.h"
 
 #include "../../client/settings/cache_settings.h"
-#include "../../interface/widgets/cards/card_info_picture_widget.h"
 #include "libcockatrice/card/card_info.h"
 #include "libcockatrice/card/database/card_database_querier.h"
+#include "token_preview_widget.h"
 
 #include <QByteArray>
 #include <QChar>
@@ -20,6 +20,7 @@
 #include <QModelIndex>
 #include <QRadioButton>
 #include <QSet>
+#include <QSignalBlocker>
 #include <QTimer>
 #include <QTreeView>
 #include <QVBoxLayout>
@@ -41,11 +42,12 @@ class QWidget;
 DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent)
     : QDialog(parent), predefinedTokens(_predefinedTokens)
 {
-    pic = new CardInfoPictureWidget();
+    pic = new TokenPreviewWidget();
     pic->setObjectName("pic");
 
     nameLabel = new QLabel(tr("&Name:"));
     nameEdit = new QLineEdit(tr("Token"));
+    nameEdit->setObjectName("tokenName");
     nameEdit->setMaxLength(MAX_NAME_LENGTH);
     QTimer::singleShot(100, this, [=, this]() {
         nameEdit->selectAll();
@@ -57,6 +59,7 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
 
     colorLabel = new QLabel(tr("C&olor:"));
     colorEdit = new QComboBox;
+    colorEdit->setObjectName("tokenColor");
     colorEdit->addItem(tr("white"), QChar('w'));
     colorEdit->addItem(tr("blue"), QChar('u'));
     colorEdit->addItem(tr("black"), QChar('b'));
@@ -68,11 +71,13 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
 
     ptLabel = new QLabel(tr("&P/T:"));
     ptEdit = new QLineEdit;
+    ptEdit->setObjectName("tokenPT");
     ptEdit->setMaxLength(MAX_NAME_LENGTH);
     ptLabel->setBuddy(ptEdit);
 
     annotationLabel = new QLabel(tr("&Annotation:"));
     annotationEdit = new QLineEdit;
+    annotationEdit->setObjectName("tokenAnnotation");
     annotationEdit->setMaxLength(MAX_NAME_LENGTH);
     annotationLabel->setBuddy(annotationEdit);
 
@@ -80,6 +85,7 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     destroyCheckBox->setChecked(true);
 
     faceDownCheckBox = new QCheckBox(tr("Create face-down (Only hides name)"));
+    faceDownCheckBox->setObjectName("tokenFaceDown");
     connect(faceDownCheckBox, &QCheckBox::toggled, this, &DlgCreateToken::faceDownCheckBoxToggled);
 
     auto *grid = new QGridLayout;
@@ -173,6 +179,12 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
 
     setWindowTitle(tr("Create token"));
 
+    connect(nameEdit, &QLineEdit::textChanged, this, &DlgCreateToken::updatePreview);
+    connect(colorEdit, qOverload<int>(&QComboBox::currentIndexChanged), this, &DlgCreateToken::updatePreview);
+    connect(ptEdit, &QLineEdit::textChanged, this, &DlgCreateToken::updatePreview);
+    connect(annotationEdit, &QLineEdit::textChanged, this, &DlgCreateToken::updatePreview);
+    updatePreview();
+
     resize(600, 500);
     restoreGeometry(SettingsCache::instance().layouts().getTokenDialogGeometry());
 }
@@ -185,17 +197,14 @@ void DlgCreateToken::closeEvent(QCloseEvent *event)
 
 void DlgCreateToken::faceDownCheckBoxToggled(bool checked)
 {
+    // Keep the face-up draft so toggling this option is reversible. The outgoing
+    // TokenInfo and preview apply the same face-down color/P/T restrictions.
+    colorEdit->setEnabled(!checked);
+    ptEdit->setEnabled(!checked);
     if (checked) {
-        colorEdit->setCurrentIndex(6);
-        colorEdit->setEnabled(false);
-        ptEdit->clear();
         ptEdit->clearFocus();
-        ptEdit->setEnabled(false);
-    } else {
-        colorEdit->setEnabled(true);
-        ptEdit->setEnabled(true);
-        annotationEdit->setEnabled(true);
     }
+    updatePreview();
 }
 
 void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QModelIndex & /*previous*/)
@@ -204,11 +213,14 @@ void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QMo
 
     CardInfoPtr cardInfo;
 
-    if (current.row() >= 0) {
+    if (realIndex.isValid()) {
         cardInfo = cardDatabaseModel->getCard(realIndex.row());
     }
 
     if (cardInfo) {
+        const QSignalBlocker colorBlocker(colorEdit);
+        const QSignalBlocker ptBlocker(ptEdit);
+        const QSignalBlocker annotationBlocker(annotationEdit);
         updateSearchFieldWithoutUpdatingFilter(cardInfo->getName());
         const QChar cardColor = cardInfo->getColorChar();
         colorEdit->setCurrentIndex(colorEdit->findData(cardColor, Qt::UserRole, Qt::MatchFixedString));
@@ -216,21 +228,22 @@ void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QMo
         if (SettingsCache::instance().userInterface().getAnnotateTokens()) {
             annotationEdit->setText(cardInfo->getText());
         }
-    } else {
-        nameEdit->setText("");
-        colorEdit->setCurrentIndex(colorEdit->findData(QString(), Qt::UserRole, Qt::MatchFixedString));
-        ptEdit->setText("");
-        annotationEdit->setText("");
     }
 
-    pic->setCard(CardDatabaseManager::query()->getPreferredCard(cardInfo));
+    // Filtering, changing the deck/all scope, or reloading the database can
+    // invalidate the current row. None of these actions discard the token draft.
+    updatePreview();
 }
 
 void DlgCreateToken::updateSearchFieldWithoutUpdatingFilter(const QString &newValue) const
 {
-    nameEdit->blockSignals(true);
+    const QSignalBlocker blocker(nameEdit);
     nameEdit->setText(newValue);
-    nameEdit->blockSignals(false);
+}
+
+void DlgCreateToken::updatePreview()
+{
+    pic->setToken(getTokenInfo());
 }
 
 void DlgCreateToken::updateSearch(const QString &search)
@@ -266,11 +279,24 @@ void DlgCreateToken::actReject()
 
 TokenInfo DlgCreateToken::getTokenInfo() const
 {
-    return {.name = nameEdit->text(),
-            .color = colorEdit->itemData(colorEdit->currentIndex()).toString(),
-            .pt = ptEdit->text(),
-            .annotation = annotationEdit->text(),
-            .destroy = destroyCheckBox->isChecked(),
-            .faceDown = faceDownCheckBox->isChecked(),
-            .providerId = SettingsCache::instance().cardOverrides().getCardPreferenceOverride(nameEdit->text())};
+    TokenInfo token = {
+        .name = nameEdit->text(),
+        .color = faceDownCheckBox->isChecked() ? QString(QChar())
+                                               : colorEdit->itemData(colorEdit->currentIndex()).toString(),
+        .pt = faceDownCheckBox->isChecked() ? QString() : ptEdit->text(),
+        .annotation = annotationEdit->text(),
+        .destroy = destroyCheckBox->isChecked(),
+        .faceDown = faceDownCheckBox->isChecked(),
+        .providerId = SettingsCache::instance().cardOverrides().getCardPreferenceOverride(nameEdit->text())};
+
+    // Match the normalization applied when the player creates the token, so
+    // manually typed aliases and the default P/T preview the actual result.
+    const ExactCard correctedCard = CardDatabaseManager::query()->guessCard({token.name, token.providerId});
+    if (correctedCard) {
+        token.name = correctedCard.getName();
+        if (!token.faceDown && token.pt.isEmpty()) {
+            token.pt = correctedCard.getInfo().getPowTough();
+        }
+    }
+    return token;
 }

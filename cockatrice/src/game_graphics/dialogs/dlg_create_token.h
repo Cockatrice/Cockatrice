@@ -22,7 +22,7 @@ class QRadioButton;
 class QTreeView;
 class CardDatabaseModel;
 class TokenDisplayModel;
-class CardInfoPictureWidget;
+class TokenPreviewWidget;
 class QModelIndex;
 class QWidget;
 
@@ -39,6 +39,7 @@ private slots:
     void faceDownCheckBoxToggled(bool checked);
     void tokenSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
     void updateSearch(const QString &search);
+    void updatePreview();
     void actChooseTokenFromAll(bool checked);
     void actChooseTokenFromDeck(bool checked);
     void actOk();
@@ -54,7 +55,7 @@ private:
     QCheckBox *destroyCheckBox;
     QCheckBox *faceDownCheckBox;
     QRadioButton *chooseTokenFromAllRadioButton, *chooseTokenFromDeckRadioButton;
-    CardInfoPictureWidget *pic;
+    TokenPreviewWidget *pic;
     QTreeView *chooseTokenView;
 
     void updateSearchFieldWithoutUpdatingFilter(const QString &newValue) const;
