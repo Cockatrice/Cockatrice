@@ -1026,14 +1026,22 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckDel(const Command_D
 
 namespace
 {
-/** @brief Keeps only the WUBRG colors from a color identity string, deduplicated. */
+/** @brief Keeps WUBRG colors, or a standalone C for an explicitly colorless deck. */
 QString sanitizeColorIdentity(const QString &colorIdentity)
 {
+    const QString normalized = colorIdentity.trimmed().toUpper();
+    if (normalized == QStringLiteral("C")) {
+        return QStringLiteral("C");
+    }
+    for (const QChar &color : normalized) {
+        if (!QStringLiteral("WUBRG").contains(color)) {
+            return {};
+        }
+    }
     QString sanitized;
-    for (const QChar &color : colorIdentity) {
-        const QChar upper = color.toUpper();
-        if (QStringLiteral("WUBRG").contains(upper) && !sanitized.contains(upper)) {
-            sanitized.append(upper);
+    for (const QChar &color : QStringLiteral("WUBRG")) {
+        if (normalized.contains(color)) {
+            sanitized.append(color);
         }
     }
     return sanitized;

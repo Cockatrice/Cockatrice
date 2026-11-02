@@ -16,6 +16,7 @@
 
 class QHBoxLayout;
 class QPushButton;
+class ManaSymbolWidget;
 
 class DeckPreviewColorIdentityFilterWidget : public QWidget
 {
@@ -58,6 +59,7 @@ private:
     QHBoxLayout *layout;
     QPushButton *toggleButton;
     QMap<QChar, bool> activeColors;
+    QMap<QChar, ManaSymbolWidget *> colorButtons;
     VisualDeckStorageSortFilterProxyModel::FilterMode filterMode = VisualDeckStorageSortFilterProxyModel::Includes;
 };
 

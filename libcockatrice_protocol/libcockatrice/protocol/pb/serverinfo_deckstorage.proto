@@ -7,6 +7,7 @@ message ServerInfo_DeckStorage_File {
     // full deck list. Empty for decks uploaded before the metadata columns.
     optional string banner_card_name = 3;
     optional string banner_card_provider = 4;
+    // WUBRG colors, "C" for explicitly colorless, or empty when unknown.
     optional string color_identity = 5;
     // Tag names associated with the deck. Empty for decks uploaded before the
     // tags column existed.

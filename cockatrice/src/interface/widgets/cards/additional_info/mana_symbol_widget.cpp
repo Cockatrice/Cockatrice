@@ -4,10 +4,15 @@
 #include "../../../pixel_map_generator.h"
 
 #include <QGraphicsOpacityEffect>
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QPainter>
 #include <QPixmap>
 #include <QResizeEvent>
 #include <QSharedPointer>
 #include <QSize>
+#include <QStyle>
+#include <QStyleOptionFocusRect>
 #include <QtGlobal>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
 #include <utility>
@@ -19,6 +24,10 @@ ManaSymbolWidget::ManaSymbolWidget(QWidget *parent, QString _symbol, bool _isAct
 {
     setPixmap(ManaSymbolPixmapGenerator::generatePixmap(symbol, QSize(50, 50)));
     setMaximumWidth(50);
+    if (mayBeToggled) {
+        setFocusPolicy(Qt::StrongFocus);
+        setCursor(Qt::PointingHandCursor);
+    }
 
     // Initialize opacity effect
     opacityEffect = new QGraphicsOpacityEffect(this);
@@ -59,14 +68,57 @@ void ManaSymbolWidget::updateOpacity()
                       100.0;
     }
     opacityEffect->setOpacity(opacity);
+    if (mayBeToggled) {
+        setAccessibleDescription(isActive ? tr("Selected") : tr("Not selected"));
+    }
 }
 
 void ManaSymbolWidget::mousePressEvent(QMouseEvent *event)
 {
-    Q_UNUSED(event);
-    if (mayBeToggled) {
+    if (mayBeToggled && event->button() == Qt::LeftButton) {
         toggleSymbol();
+        event->accept();
+        return;
     }
+    QLabel::mousePressEvent(event);
+}
+
+void ManaSymbolWidget::keyPressEvent(QKeyEvent *event)
+{
+    if (mayBeToggled &&
+        (event->key() == Qt::Key_Space || event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)) {
+        if (!event->isAutoRepeat()) {
+            toggleSymbol();
+        }
+        event->accept();
+        return;
+    }
+    QLabel::keyPressEvent(event);
+}
+
+void ManaSymbolWidget::paintEvent(QPaintEvent *event)
+{
+    QLabel::paintEvent(event);
+    if (mayBeToggled && hasFocus()) {
+        QPainter painter(this);
+        QStyleOptionFocusRect option;
+        option.initFrom(this);
+        option.rect = rect().adjusted(1, 1, -1, -1);
+        option.backgroundColor = palette().color(QPalette::Window);
+        style()->drawPrimitive(QStyle::PE_FrameFocusRect, &option, &painter, this);
+    }
+}
+
+void ManaSymbolWidget::focusInEvent(QFocusEvent *event)
+{
+    QLabel::focusInEvent(event);
+    update();
+}
+
+void ManaSymbolWidget::focusOutEvent(QFocusEvent *event)
+{
+    QLabel::focusOutEvent(event);
+    update();
 }
 
 void ManaSymbolWidget::resizeEvent(QResizeEvent *event)

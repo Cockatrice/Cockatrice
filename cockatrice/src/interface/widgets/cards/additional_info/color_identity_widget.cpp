@@ -44,6 +44,9 @@ void ColorIdentityWidget::populateManaSymbolWidgets()
     // Define the full WUBRG set (White, Blue, Black, Red, Green)
     QString fullColorIdentity = "WUBRG";
     QStringList symbols = parseColorIdentity(colorIdentity); // Parse mana cost string
+    if (symbols == QStringList{QStringLiteral("C")}) {
+        fullColorIdentity.append(QLatin1Char('C'));
+    }
 
     // clear old layout
     QtUtils::clearLayoutRec(layout);

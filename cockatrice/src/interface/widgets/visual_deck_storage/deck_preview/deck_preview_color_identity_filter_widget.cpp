@@ -8,6 +8,7 @@
 #include <QSet>
 #include <QSharedPointer>
 #include <QString>
+#include <QStringList>
 
 DeckPreviewColorIdentityFilterWidget::DeckPreviewColorIdentityFilterWidget(QWidget *parent)
     : QWidget(parent), layout(new QHBoxLayout(this))
@@ -16,7 +17,7 @@ DeckPreviewColorIdentityFilterWidget::DeckPreviewColorIdentityFilterWidget(QWidg
     layout->setSpacing(5);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    QString fullColorIdentity = "WUBRG";
+    QString fullColorIdentity = "WUBRGC";
     for (const QChar &color : fullColorIdentity) {
         auto *manaSymbol = new ManaSymbolWidget(this, color, false, true);
         manaSymbol->setFixedWidth(25);
@@ -25,6 +26,7 @@ DeckPreviewColorIdentityFilterWidget::DeckPreviewColorIdentityFilterWidget(QWidg
 
         // Initialize the activeColors map
         activeColors[color] = false;
+        colorButtons[color] = manaSymbol;
 
         // Connect the color toggled signal
         connect(manaSymbol, &ManaSymbolWidget::colorToggled, this,
@@ -55,7 +57,19 @@ void DeckPreviewColorIdentityFilterWidget::retranslateUi()
             toggleButton->setText(tr("Mode: Excludes"));
             break;
     }
-    toggleButton->setToolTip(tr("Color identity filter mode (AND/OR/NOT conjunctions of filters)"));
+    toggleButton->setToolTip(
+        tr("Exact Match requires exactly the selected colors. Includes requires all selected "
+           "colors. Excludes hides decks containing any selected color. Select Colorless by itself "
+           "to find or exclude decks with no colors. Decks with unknown identity are hidden while "
+           "a color filter is active."));
+
+    const QStringList names = {tr("White"), tr("Blue"), tr("Black"), tr("Red"), tr("Green"), tr("Colorless")};
+    const QString colors = QStringLiteral("WUBRGC");
+    for (int i = 0; i < colors.size(); ++i) {
+        auto *button = colorButtons.value(colors.at(i));
+        button->setToolTip(names.at(i));
+        button->setAccessibleName(names.at(i));
+    }
 }
 
 /**
@@ -75,6 +89,15 @@ QSet<QChar> DeckPreviewColorIdentityFilterWidget::getActiveColors() const
 void DeckPreviewColorIdentityFilterWidget::handleColorToggled(QChar color, bool active)
 {
     activeColors[color] = active;
+    if (active) {
+        // Colorless is the absence of all five colors, not a sixth deck color.
+        for (auto it = colorButtons.cbegin(); it != colorButtons.cend(); ++it) {
+            if (it.key() != color && (color == QLatin1Char('C') || it.key() == QLatin1Char('C'))) {
+                activeColors[it.key()] = false;
+                it.value()->setColorActive(false);
+            }
+        }
+    }
     emit activeColorsChanged();
 }
 
