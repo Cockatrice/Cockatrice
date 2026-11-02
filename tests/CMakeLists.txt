@@ -222,6 +222,18 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  card_art_crop_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/cards/card_art_utils.cpp
+  ${VERSION_STRING_CPP}
+  card_art_crop_test.cpp
+  LIBS
+  libcockatrice_card
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src
+)
+cockatrice_add_test(
+  NAME
   server_rate_limiter_test
   SOURCES
   server_rate_limiter_test.cpp
