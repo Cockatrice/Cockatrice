@@ -2,6 +2,7 @@
 
 #include <QJsonValue>
 #include <QJsonValueRef>
+#include <algorithm>
 
 QJsonObject DrawProbabilityConfig::toJson() const
 {
@@ -16,16 +17,19 @@ DrawProbabilityConfig DrawProbabilityConfig::fromJson(const QJsonObject &o)
 {
     DrawProbabilityConfig cfg;
     if (o.contains("criteria")) {
-        cfg.criteria = o["criteria"].toString();
+        const QString criteria = o["criteria"].toString();
+        if (criteria == "name" || criteria == "type" || criteria == "subtype" || criteria == "cmc") {
+            cfg.criteria = criteria;
+        }
     }
     if (o.contains("atLeast")) {
         cfg.atLeast = o["atLeast"].toBool(true);
     }
     if (o.contains("quantity")) {
-        cfg.quantity = o["quantity"].toInt(1);
+        cfg.quantity = std::clamp(o["quantity"].toInt(1), 0, 60);
     }
     if (o.contains("drawn")) {
-        cfg.drawn = o["drawn"].toInt(7);
+        cfg.drawn = std::clamp(o["drawn"].toInt(7), 0, 60);
     }
     return cfg;
 }

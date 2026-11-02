@@ -181,6 +181,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/deck_analytics/deck_analytics_widget.cpp
     src/interface/widgets/deck_analytics/deck_list_statistics_analyzer.cpp
     src/interface/widgets/deck_analytics/resizable_panel.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_calculator.cpp
     src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config.cpp
     src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp
     src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp

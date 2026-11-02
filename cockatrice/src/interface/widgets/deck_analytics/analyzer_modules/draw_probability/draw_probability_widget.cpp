@@ -5,34 +5,22 @@
 #include "../../abstract_analytics_panel_widget.h"
 #include "../../deck_list_statistics_analyzer.h"
 #include "deck_list_model.h"
+#include "draw_probability_calculator.h"
 #include "draw_probability_config_dialog.h"
-#include "libcockatrice/card/database/card_database_querier.h"
-#include "libcockatrice/deck_list/tree/deck_list_card_node.h"
 
 #include <QAbstractItemView>
-#include <QChar>
 #include <QComboBox>
 #include <QDialog>
 #include <QHeaderView>
 #include <QJsonObject>
 #include <QLabel>
-#include <QList>
-#include <QMap>
-#include <QObject>
-#include <QSharedPointer>
+#include <QSignalBlocker>
 #include <QSizePolicy>
 #include <QSpinBox>
-#include <QString>
-#include <QStringList>
 #include <QTableWidget>
-#include <QTableWidgetItem>
 #include <QVBoxLayout>
 #include <QVariant>
-#include <QtGlobal>
-#include <QtMath>
-#include <libcockatrice/card/card_info.h>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <qnamespace.h>
 
 class QWidget;
 
@@ -59,14 +47,14 @@ DrawProbabilityWidget::DrawProbabilityWidget(QWidget *parent, DeckListStatistics
     controls->addWidget(exactnessCombo);
 
     quantitySpin = new QSpinBox(this);
-    quantitySpin->setRange(1, 60);
+    quantitySpin->setRange(0, 60);
     controls->addWidget(quantitySpin);
 
     labelMiddle = new QLabel(this);
     controls->addWidget(labelMiddle);
 
     drawnSpin = new QSpinBox(this);
-    drawnSpin->setRange(1, 60);
+    drawnSpin->setRange(0, 60);
     drawnSpin->setValue(7);
     controls->addWidget(drawnSpin);
 
@@ -78,6 +66,10 @@ DrawProbabilityWidget::DrawProbabilityWidget(QWidget *parent, DeckListStatistics
     labelSuffix->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
     layout->addWidget(controls);
+
+    populationLabel = new QLabel(this);
+    populationLabel->setWordWrap(true);
+    layout->addWidget(populationLabel);
 
     // Table
     resultTable = new QTableWidget(this);
@@ -126,10 +118,11 @@ void DrawProbabilityWidget::retranslateUi()
     exactnessCombo->setItemText(0, tr("At least"));
     exactnessCombo->setItemText(1, tr("Exactly"));
 
-    labelMiddle->setText(tr("card(s) having drawn at least"));
+    labelMiddle->setText(tr("card(s) in a draw of"));
     labelSuffix->setText(tr("cards"));
 
     resultTable->setHorizontalHeaderLabels({tr("Category"), tr("Qty"), tr("Odds (%)")});
+    updateFilterOptions();
 }
 
 QDialog *DrawProbabilityWidget::createConfigDialog(QWidget *parent)
@@ -147,6 +140,11 @@ QJsonObject DrawProbabilityWidget::extractConfigFromDialog(QDialog *dlg) const
 
 void DrawProbabilityWidget::applyConfigToToolbar()
 {
+    // Apply the complete configuration before calculating; each control normally triggers a refresh.
+    const QSignalBlocker criteriaBlocker(criteriaCombo);
+    const QSignalBlocker exactnessBlocker(exactnessCombo);
+    const QSignalBlocker quantityBlocker(quantitySpin);
+    const QSignalBlocker drawnBlocker(drawnSpin);
     auto setComboByData = [](QComboBox *combo, const QVariant &value) {
         int idx = combo->findData(value);
         if (idx >= 0) {
@@ -175,81 +173,35 @@ void DrawProbabilityWidget::loadConfig(const QJsonObject &cfg)
 
 void DrawProbabilityWidget::updateFilterOptions()
 {
-    if (!analyzer->getModel()->getDeckList()) {
+    resultTable->setRowCount(0);
+    populationLabel->clear();
+    if (!analyzer || !analyzer->getModel() || !analyzer->getModel()->getDeckList()) {
         return;
     }
 
-    const QString criteria = config.criteria;
-    const bool atLeast = config.atLeast;
-    const int quantity = config.quantity;
-    const int drawn = config.drawn;
-
-    QMap<QString, int> categoryCounts;
-    int totalDeckCards = 0;
-
-    const auto nodes = analyzer->getModel()->getCardNodes();
-    for (auto *node : nodes) {
-        CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(node->getName());
-        if (!info) {
-            continue;
-        }
-
-        totalDeckCards += node->getNumber();
-
-        QStringList categories;
-        if (criteria == "name") {
-            categories << info->getName();
-        } else if (criteria == "type") {
-            categories = info->getMainCardType().split(' ', Qt::SkipEmptyParts);
-        } else if (criteria == "subtype") {
-            categories = info->getCardType().split(' ', Qt::SkipEmptyParts);
-        } else if (criteria == "cmc") {
-            categories << QString::number(info->getCmc().toInt());
-        }
-
-        for (const QString &cat : categories) {
-            categoryCounts[cat] += node->getNumber();
-        }
+    const auto population = collectDrawProbabilityPopulation(*analyzer->getModel()->getDeckList(),
+                                                             *CardDatabaseManager::query(), config.criteria);
+    QString unavailableReason;
+    if (population.unclassifiedCards > 0) {
+        unavailableReason = tr("Card data is missing for %1 main-deck cards. Odds for this category are unavailable.")
+                                .arg(population.unclassifiedCards);
+    } else if (config.drawn > population.totalCards) {
+        unavailableReason = tr("Choose a draw size no larger than the main deck to calculate odds.");
     }
+    populationLabel->setText(tr("Main deck: %1 cards.").arg(population.totalCards) +
+                             (unavailableReason.isEmpty() ? QString() : " " + unavailableReason));
 
-    resultTable->setRowCount(categoryCounts.size());
-
+    resultTable->setRowCount(population.categoryCounts.size());
     int row = 0;
-    for (auto it = categoryCounts.cbegin(); it != categoryCounts.cend(); ++it, ++row) {
-        const QString &cat = it.key();
-        const int copies = it.value();
-
-        double probability = 0.0;
-        if (atLeast) {
-            for (int k = quantity; k <= drawn && k <= copies; ++k) {
-                probability += hypergeometricProbability(totalDeckCards, copies, drawn, k);
-            }
-        } else {
-            probability = hypergeometricProbability(totalDeckCards, copies, drawn, quantity);
-        }
-
-        resultTable->setItem(row, 0, new QTableWidgetItem(cat));
-        resultTable->setItem(row, 1, new QTableWidgetItem(QString::number(copies)));
-        resultTable->setItem(row, 2, new QTableWidgetItem(QString::number(probability * 100.0, 'f', 2)));
+    for (auto it = population.categoryCounts.cbegin(); it != population.categoryCounts.cend(); ++it, ++row) {
+        const auto probability = unavailableReason.isEmpty()
+                                     ? calculateDrawProbability(population.totalCards, it.value(), config.drawn,
+                                                                config.quantity, config.atLeast)
+                                     : std::nullopt;
+        resultTable->setItem(row, 0, new QTableWidgetItem(it.key()));
+        resultTable->setItem(row, 1, new QTableWidgetItem(QString::number(it.value())));
+        auto *odds = new QTableWidgetItem(probability ? QString::number(*probability * 100.0, 'f', 2) : tr("N/A"));
+        odds->setToolTip(unavailableReason);
+        resultTable->setItem(row, 2, odds);
     }
-}
-
-double DrawProbabilityWidget::hypergeometricProbability(int N, int K, int n, int k)
-{
-    if (k < 0 || k > n || K > N || n > N) {
-        return 0.0;
-    }
-
-    double logP = 0.0;
-    for (int i = 1; i <= k; ++i) {
-        logP += qLn(double(K - k + i) / i);
-    }
-    for (int i = 1; i <= n - k; ++i) {
-        logP += qLn(double(N - K - (n - k) + i) / i);
-    }
-    for (int i = 1; i <= n; ++i) {
-        logP -= qLn(double(N - n + i) / i);
-    }
-
-    return qExp(logP);
 }

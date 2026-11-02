@@ -33,13 +33,13 @@ DrawProbabilityConfigDialog::DrawProbabilityConfigDialog(QWidget *parent) : QDia
     // Quantity
     labelQuantity = new QLabel(this);
     quantity = new QSpinBox(this);
-    quantity->setRange(1, 60);
+    quantity->setRange(0, 60);
     form->addRow(labelQuantity, quantity);
 
     // Drawn
     labelDrawn = new QLabel(this);
     drawn = new QSpinBox(this);
-    drawn->setRange(1, 60);
+    drawn->setRange(0, 60);
     drawn->setValue(7);
     form->addRow(labelDrawn, drawn);
 
