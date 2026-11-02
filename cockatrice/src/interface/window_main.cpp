@@ -650,8 +650,7 @@ void MainWindow::startupConfigCheck()
     // release is published, do not auto-check or run upstream Cockatrice updates.
     SettingsCache::instance().updates().setCheckUpdatesOnStartup(false);
 
-    actCheckCommanderBracketDefinitionUpdates();
-
+    // No MTG Commander-bracket network requests in Continuumatrice.
     if (isCleanInstall) {
         // no config found, 99% new clean install
         qCInfo(WindowMainStartupVersionLog)
@@ -1469,9 +1468,8 @@ void MainWindow::notifyCardUpdateFinishedFromTray(bool success)
 
 void MainWindow::actCheckServerUpdates()
 {
-    auto hps = new HandlePublicServers(this);
-    hps->downloadPublicServers();
-    connect(hps, &HandlePublicServers::sigPublicServersDownloadedSuccessfully, [=]() { hps->deleteLater(); });
+    // Upstream Cockatrice public servers are not Continuumatrice game servers.
+    qCInfo(MainWindowLog) << "Upstream public server discovery disabled in Continuumatrice.";
 }
 
 void MainWindow::actCheckClientUpdates()
@@ -1491,12 +1489,8 @@ void MainWindow::checkClientUpdatesFinished(bool needToUpdate, bool /* isCompati
 
 void MainWindow::actCheckCommanderBracketDefinitionUpdates()
 {
-    auto *handler = new HandleCommanderBrackets(this);
-
-    connect(handler, &HandleCommanderBrackets::sigBracketDefinitionsDownloaded, this,
-            []() { qDebug() << "Bracket definitions loaded"; });
-
-    handler->downloadBracketDefinitions();
+    // Commander brackets are a Magic: The Gathering system, not Continuum Universes.
+    qCInfo(MainWindowLog) << "Upstream Commander bracket updates disabled in Continuumatrice.";
 }
 
 void MainWindow::refreshShortcuts()
