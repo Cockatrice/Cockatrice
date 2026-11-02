@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Continuumatrice
+GenericName=Continuum Universes Card Game Client
+Comment=Play Continuum Universes card games
+Exec=continuumatrice %F
+Icon=continuumatrice
+Terminal=false
+Categories=Game;CardGame;
+StartupNotify=true
