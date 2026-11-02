@@ -350,6 +350,18 @@ cockatrice_add_test(
   LABELS
   ci
 )
+# The local game runs one client and one server in the same process.
+# Either of them can be destroyed first; the survivor has to stay usable.
+cockatrice_add_test(
+  NAME
+  local_client_lifetime_test
+  SOURCES
+  local_client_lifetime_test.cpp
+  LIBS
+  libcockatrice_network
+  LABELS
+  ci
+)
 cockatrice_add_test(
   NAME
   server_room_channels_test
