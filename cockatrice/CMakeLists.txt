@@ -171,6 +171,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/cards/card_info_picture_widget.cpp
     src/interface/widgets/cards/card_info_picture_with_text_overlay_widget.cpp
     src/interface/widgets/cards/card_info_text_widget.cpp
+    src/interface/widgets/cards/card_picture_delegate.cpp
     src/interface/widgets/cards/card_size_widget.cpp
     src/interface/widgets/cards/deck_card_zone_display_widget.cpp
     src/interface/widgets/cards/deck_preview_card_picture_widget.cpp
@@ -290,6 +291,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/utility/sequence_edit.cpp
     src/interface/widgets/utility/visibility_change_listener.cpp
     src/interface/widgets/utility/visibility_change_listener.h
+    src/interface/widgets/visual_database_display/card_database_visual_view.cpp
     src/interface/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_filter_save_load_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp

@@ -77,7 +77,7 @@ void DeckViewCardDragItem::updatePosition(const QPointF &cursorScenePos)
 
 void DeckViewCardDragItem::handleDrop(DeckViewCardContainer *target)
 {
-    auto *card = static_cast<DeckViewCard *>(item);
+    auto *card = static_cast<DeckViewCard *>(item.data());
     auto *start = static_cast<DeckViewCardContainer *>(item->parentItem());
     start->removeCard(card);
     target->addCard(card);

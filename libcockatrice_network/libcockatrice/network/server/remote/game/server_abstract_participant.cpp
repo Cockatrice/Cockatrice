@@ -61,10 +61,10 @@
 Server_AbstractParticipant::Server_AbstractParticipant(Server_Game *_game,
                                                        int _playerId,
                                                        const ServerInfo_User &_userInfo,
-                                                       bool _judge,
+                                                       const RoleInfo &_roleInfo,
                                                        Server_AbstractUserInterface *_userInterface)
     : ServerInfo_User_Container(_userInfo), game(_game), userInterface(_userInterface), pingTime(0),
-      playerId(_playerId), judge(_judge)
+      playerId(_playerId), roleInfo(_roleInfo)
 {
 }
 
@@ -98,8 +98,8 @@ void Server_AbstractParticipant::getProperties(ServerInfo_PlayerProperties &resu
     if (withUserInfo) {
         copyUserInfo(*(result.mutable_user_info()), true);
     }
-    result.set_spectator(spectator);
-    result.set_judge(judge);
+    result.set_spectator(isSpectator());
+    result.set_judge(isJudge());
     result.set_ping_seconds(pingTime);
     getPlayerProperties(result);
 }
@@ -176,7 +176,7 @@ Response::ResponseCode Server_AbstractParticipant::cmdUnconcede(const Command_Un
 Response::ResponseCode
 Server_AbstractParticipant::cmdJudge(const Command_Judge &cmd, ResponseContainer &rc, GameEventStorage &ges)
 {
-    if (!judge) {
+    if (!isJudge()) {
         return Response::RespFunctionNotAllowed;
     }
 
@@ -204,7 +204,7 @@ Response::ResponseCode Server_AbstractParticipant::cmdReadyStart(const Command_R
 Response::ResponseCode
 Server_AbstractParticipant::cmdGameSay(const Command_GameSay &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (spectator) {
+    if (isSpectator()) {
         /* Spectators can only talk if:
          * (a) the game creator allows it
          * (b) the spectator is a moderator/administrator
@@ -365,7 +365,7 @@ Response::ResponseCode Server_AbstractParticipant::cmdNextTurn(const Command_Nex
         return Response::RespGameNotStarted;
     }
 
-    if (!judge) {
+    if (!isJudge()) {
         return Response::RespFunctionNotAllowed;
     }
 
@@ -381,7 +381,7 @@ Response::ResponseCode Server_AbstractParticipant::cmdSetActivePhase(const Comma
         return Response::RespGameNotStarted;
     }
 
-    if (!judge) {
+    if (!isJudge()) {
         return Response::RespFunctionNotAllowed;
     }
 
@@ -415,8 +415,8 @@ Response::ResponseCode Server_AbstractParticipant::cmdReverseTurn(const Command_
                                                                   ResponseContainer & /*rc*/,
                                                                   GameEventStorage &ges)
 {
-    if (!judge) {
-        if (spectator) {
+    if (!isJudge()) {
+        if (isSpectator()) {
             return Response::RespFunctionNotAllowed;
         }
 
@@ -577,7 +577,7 @@ void Server_AbstractParticipant::setUserInterface(Server_AbstractUserInterface *
 void Server_AbstractParticipant::disconnectClient()
 {
     bool isRegistered = userInfo->user_level() & ServerInfo_User::IsRegistered;
-    if (!isRegistered || spectator) {
+    if (!isRegistered || isSpectator()) {
         game->removeParticipant(this, Event_Leave::USER_DISCONNECTED);
     } else {
         setUserInterface(nullptr);
