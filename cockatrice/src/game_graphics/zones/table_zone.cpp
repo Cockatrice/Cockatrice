@@ -283,7 +283,7 @@ void TableZone::reloadBattlefieldAppearance()
     static QHash<QString, QString> loadedFamilies;
     zoneLabelFontFamily.clear();
     for (const QString &path : fontPaths) {
-        if (!QFileInfo::isFile(path)) {
+        if (!QFileInfo(path).isFile()) {
             continue;
         }
         if (loadedFamilies.contains(path)) {
