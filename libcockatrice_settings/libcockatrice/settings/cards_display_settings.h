@@ -22,7 +22,9 @@ public:
         HoverPanelTriggerHover = 0,
         HoverPanelTriggerRightClick = 1,
         HoverPanelTriggerWheel = 2,
-        HoverPanelTriggerShortcut = 3
+        HoverPanelTriggerShortcut = 3,
+        /// Never fires. The hover zoom and panel are opt-in, so this is their default.
+        HoverPanelTriggerOff = 4
     };
 
     [[nodiscard]] bool getDisplayCardNames() const override;

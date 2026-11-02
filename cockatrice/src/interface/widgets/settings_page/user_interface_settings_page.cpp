@@ -33,7 +33,7 @@ enum visualDeckStoragePromptForConversionIndex
 static int clampHoverTrigger(int trigger)
 {
     return qBound(static_cast<int>(CardsDisplaySettings::HoverPanelTriggerHover), trigger,
-                  static_cast<int>(CardsDisplaySettings::HoverPanelTriggerShortcut));
+                  static_cast<int>(CardsDisplaySettings::HoverPanelTriggerOff));
 }
 
 UserInterfaceSettingsPage::UserInterfaceSettingsPage()
@@ -167,11 +167,13 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     hoverZoomTriggerSelector.addItem(QString());
     hoverZoomTriggerSelector.addItem(QString());
     hoverZoomTriggerSelector.addItem(QString());
+    hoverZoomTriggerSelector.addItem(QString());
     hoverZoomTriggerSelector.setCurrentIndex(
         clampHoverTrigger(SettingsCache::instance().cardsDisplay().getHoverZoomTrigger()));
     connect(&hoverZoomTriggerSelector, &QComboBox::currentIndexChanged, &SettingsCache::instance().cardsDisplay(),
             &CardsDisplaySettings::setHoverZoomTrigger);
 
+    hoverPanelTriggerSelector.addItem(QString());
     hoverPanelTriggerSelector.addItem(QString());
     hoverPanelTriggerSelector.addItem(QString());
     hoverPanelTriggerSelector.addItem(QString());
@@ -426,9 +428,13 @@ void UserInterfaceSettingsPage::updateHoverPanelUiState()
     // both phases share one trigger (repeating it).
     const auto hoverTrigger = CardsDisplaySettings::HoverPanelTriggerHover;
     const auto wheelTrigger = CardsDisplaySettings::HoverPanelTriggerWheel;
+    const auto offTrigger = CardsDisplaySettings::HoverPanelTriggerOff;
     const bool zoomOnHover = hoverZoomTriggerSelector.currentIndex() == hoverTrigger;
     const bool panelOnHover = hoverPanelTriggerSelector.currentIndex() == hoverTrigger;
-    const bool sharedTrigger = hoverZoomTriggerSelector.currentIndex() == hoverPanelTriggerSelector.currentIndex();
+    const bool anyOff =
+        hoverZoomTriggerSelector.currentIndex() == offTrigger || hoverPanelTriggerSelector.currentIndex() == offTrigger;
+    const bool sharedTrigger =
+        !anyOff && hoverZoomTriggerSelector.currentIndex() == hoverPanelTriggerSelector.currentIndex();
     hoverZoomDelayLabel.setVisible(zoomOnHover);
     hoverZoomDelayBox.setVisible(zoomOnHover);
     hoverPanelDelayLabel.setVisible(panelOnHover);
@@ -480,6 +486,7 @@ void UserInterfaceSettingsPage::retranslateUi()
         selector->setItemText(CardsDisplaySettings::HoverPanelTriggerRightClick, tr("Right-click"));
         selector->setItemText(CardsDisplaySettings::HoverPanelTriggerWheel, tr("Mouse wheel"));
         selector->setItemText(CardsDisplaySettings::HoverPanelTriggerShortcut, tr("Keyboard shortcut"));
+        selector->setItemText(CardsDisplaySettings::HoverPanelTriggerOff, tr("Off"));
     }
     hoverPanelDoubleConfirmCheckBox.setText(tr("Zoom first; repeat the action to show the panel"));
     hoverZoomDelayLabel.setText(tr("Time before the zoom kicks in:"));

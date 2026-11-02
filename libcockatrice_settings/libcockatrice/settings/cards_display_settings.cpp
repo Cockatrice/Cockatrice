@@ -70,12 +70,16 @@ bool CardsDisplaySettings::getScaleCards() const
 
 int CardsDisplaySettings::getHoverPanelTrigger() const
 {
-    return getValue("hoverPanelTrigger", QString(), QString(), 0).toInt();
+    // Off by default: the panel is new, so it is opt-in.
+    return getValue("hoverPanelTrigger", QString(), QString(), static_cast<int>(HoverPanelTriggerOff)).toInt();
 }
 
 int CardsDisplaySettings::getHoverZoomTrigger() const
 {
-    return getValue("hoverZoomTrigger", QString(), QString(), 0).toInt();
+    // Off by default: the smooth hover zoom is opt-in. With no trigger configured,
+    // hovering keeps the historical 1.1x scale (AbstractCardItem::setHoverHighlighted)
+    // instead of the smooth zoom to the hover panel size.
+    return getValue("hoverZoomTrigger", QString(), QString(), static_cast<int>(HoverPanelTriggerOff)).toInt();
 }
 
 bool CardsDisplaySettings::getHoverPanelDoubleConfirm() const

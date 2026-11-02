@@ -37,6 +37,7 @@ protected:
 
 private:
     bool isHovered;
+    bool isHoverHighlighted;
     qreal realZValue;
     bool pendingSelectionCollapse;
     int selectionCollapseGeneration = 0; ///< Guards the deferred collapse timer against stale firings
@@ -134,6 +135,16 @@ public:
     }
     void setRealZValue(qreal _zValue);
     void setHovered(bool _hovered);
+    /**
+     * @brief Shows the hover outline and stacking lift, plus the historical 1.1x hover
+     * scale whenever no zoom trigger is configured.
+     *
+     * The board zoom is trigger-gated; the hover feedback (card info, outline, raised
+     * stacking) still follows the cursor immediately on contact. With the zoom trigger
+     * off and the panel not on hover, the old 1.1x enlargement (gated by scaleCards)
+     * stays in effect so upgrading does not silently drop it.
+     */
+    void setHoverHighlighted(bool highlighted);
     qreal getCardScale() const;
     void setCardScale(qreal scale);
     qreal getCardOpacity() const;
