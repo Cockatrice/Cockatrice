@@ -265,6 +265,13 @@ void TabAlts::investigate(const QString &userName)
     if (userName.isEmpty() || userName == currentUser) {
         return;
     }
+    // Alt matches are symmetric, so revisiting an earlier account is a normal
+    // double-click. Truncate there instead of pushing it again, so the trail
+    // stays a single path.
+    if (backStack.contains(userName)) {
+        goToTrailEntry(userName);
+        return;
+    }
     if (!currentUser.isEmpty()) {
         backStack << currentUser;
         backButton->setEnabled(true);
