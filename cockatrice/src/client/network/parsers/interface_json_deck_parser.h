@@ -32,9 +32,6 @@ public:
         QString deckName = obj.value("name").toString();
         QString deckDescription = obj.value("description").toString();
 
-        deckList.setName(deckName);
-        deckList.setComments(deckDescription);
-
         QString outputText;
         QTextStream outStream(&outputText);
 
@@ -50,7 +47,11 @@ public:
             outStream << quantity << ' ' << cardName << " (" << setName << ") " << collectorNumber << '\n';
         }
 
+        outStream.flush();
+        outStream.seek(0);
         deckList.loadFromStream_Plain(outStream, false, CardNameNormalizer());
+        deckList.setName(deckName);
+        deckList.setComments(deckDescription);
         deckList.forEachCard(CardNodeFunction::ResolveProviderId());
 
         return deckList;
@@ -66,9 +67,6 @@ public:
 
         QString deckName = obj.value("name").toString();
         QString deckDescription = obj.value("description").toString();
-
-        deckList.setName(deckName);
-        deckList.setComments(deckDescription);
 
         QString outputText;
         QTextStream outStream(&outputText);
@@ -97,7 +95,11 @@ public:
             outStream << quantity << ' ' << cardName << " (" << setName << ") " << collectorNumber << '\n';
         }
 
+        outStream.flush();
+        outStream.seek(0);
         deckList.loadFromStream_Plain(outStream, false, CardNameNormalizer());
+        deckList.setName(deckName);
+        deckList.setComments(deckDescription);
         deckList.forEachCard(CardNodeFunction::ResolveProviderId());
 
         QJsonObject commandersObj = obj.value("commanders").toObject();
@@ -112,6 +114,24 @@ public:
                 deckList.setBannerCard({commanderName, providerId});
                 deckList.addCard(commanderName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
             }
+        }
+
+        // Moxfield stores Oathbreaker signature spells in their own board,
+        // separate from both mainboard and commanders. They are playable deck
+        // cards, but must not replace the Oathbreaker as the banner card.
+        const QJsonObject signatureSpells = obj.value("signatureSpells").toObject();
+        for (auto it = signatureSpells.begin(); it != signatureSpells.end(); ++it) {
+            const QJsonObject entry = it.value().toObject();
+            const QJsonObject card = entry.value("card").toObject();
+            const QString name = card.value("name").toString();
+            const int quantity = entry.value("quantity").toInt();
+            if (name.isEmpty() || quantity <= 0) {
+                continue;
+            }
+            const QString set = card.value("set").toString().toUpper();
+            const QString collectorNumber = card.value("cn").toString();
+            const QString providerId = card.value("scryfall_id").toString();
+            deckList.addCards(name, quantity, DECK_ZONE_MAIN, -1, set, collectorNumber, providerId);
         }
 
         return deckList;
