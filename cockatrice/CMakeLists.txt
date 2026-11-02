@@ -508,7 +508,7 @@ set(MIMEDIR
 )
 
 set(COCKATRICE_MAC_QM_INSTALL_DIR "cockatrice.app/Contents/Resources/translations")
-set(COCKATRICE_UNIX_QM_INSTALL_DIR "share/cockatrice/translations")
+set(COCKATRICE_UNIX_QM_INSTALL_DIR "share/continuumatrice/translations")
 set(COCKATRICE_WIN32_QM_INSTALL_DIR "translations")
 
 qt_add_executable(
@@ -520,6 +520,12 @@ qt_add_executable(
   ${cockatrice_MOC_SRCS}
   MANUAL_FINALIZATION
 )
+
+# Keep the CMake target name for existing build dependencies and scripts while
+# installing an independently named Linux application alongside MTG Cockatrice.
+if(UNIX AND NOT APPLE)
+  set_target_properties(cockatrice PROPERTIES OUTPUT_NAME continuumatrice)
+endif()
 
 target_precompile_headers(cockatrice PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtwidgets_pch.h")
 
@@ -577,10 +583,13 @@ if(UNIX)
   else()
     # Assume linux
     install(TARGETS cockatrice RUNTIME DESTINATION bin/)
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.png DESTINATION ${ICONDIR}/hicolor/48x48/apps)
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.svg DESTINATION ${ICONDIR}/hicolor/scalable/apps)
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cockatrice.desktop DESTINATION ${DESKTOPDIR})
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cockatrice-cod.xml DESTINATION ${MIMEDIR})
+    # Install using distinct names so the normal MTG client keeps its .desktop,
+    # icon and .cod / cockatrice:// file associations unchanged.
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.png
+            DESTINATION ${ICONDIR}/hicolor/48x48/apps RENAME continuumatrice.png)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.svg
+            DESTINATION ${ICONDIR}/hicolor/scalable/apps RENAME continuumatrice.svg)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/continuumatrice.desktop DESTINATION ${DESKTOPDIR})
 
     # Refresh the freedesktop databases so the file associations and scheme
     # handler register without requiring the user to run them manually. The
