@@ -13,6 +13,7 @@
 #include "libcockatrice/card/printing/exact_card.h"
 #include "libcockatrice/utility/card_ref.h"
 
+#include <QAbstractAnimation>
 #include <QApplication>
 #include <QBrush>
 #include <QChar>
@@ -53,7 +54,7 @@ static constexpr int FADE_DURATION_MS = 140;
 
 AbstractCardItem::AbstractCardItem(QGraphicsItem *parent, const CardRef &cardRef, PlayerLogic *_owner, int _id)
     : ArrowTarget(_owner, parent), state(new CardState(this, nullptr, cardRef, _id)), tapAngle(0),
-      bgColor(Qt::transparent), isHovered(false), realZValue(0)
+      bgColor(Qt::transparent), isHovered(false), isHoverHighlighted(false), realZValue(0)
 {
     setCursor(Qt::OpenHandCursor);
     setFlag(ItemIsSelectable);
@@ -79,7 +80,9 @@ AbstractCardItem::AbstractCardItem(QGraphicsItem *parent, const CardRef &cardRef
     // so siblings and the clip container cannot cut through the shrinking card.
     connect(hoverZoom, &QPropertyAnimation::finished, this, [this] {
         if (!isHovered) {
-            setZValue(realZValue);
+            // The cursor may still rest on the card (e.g. wheel-up reverts the zoom),
+            // in which case the highlight keeps it raised.
+            setZValue(isHoverHighlighted ? ZValues::HOVERED_CARD : realZValue);
             // Final repaint at the settled footprint: with no scale delta the animation
             // emits no per-frame updates, and zones would keep a stale clip hole behind.
             if (scene()) {
@@ -164,7 +167,7 @@ void AbstractCardItem::setRealZValue(qreal _zValue)
     // During hover, zValue is overridden to HOVERED_CARD. Layout operations
     // like reorganizeCards() call setRealZValue() on all cards including the
     // hovered one — skip setZValue() here to avoid clobbering the override.
-    if (!isHovered) {
+    if (!isHovered && !isHoverHighlighted) {
         setZValue(_zValue);
     }
 }
@@ -262,9 +265,9 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     painter->setRenderHint(QPainter::Antialiasing, false);
 
-    if (isSelected() || isHovered) {
+    if (isSelected() || isHovered || isHoverHighlighted) {
         QPen pen;
-        if (isHovered) {
+        if (isHovered || isHoverHighlighted) {
             pen.setColor(Qt::yellow);
         }
         if (isSelected()) {
@@ -331,6 +334,28 @@ void AbstractCardItem::setHovered(bool _hovered)
     hoverZoom->setEndValue(target);
     hoverZoom->setDuration(_hovered ? HOVER_ZOOM_IN_MS : HOVER_ZOOM_OUT_MS);
     hoverZoom->start();
+    update();
+}
+
+void AbstractCardItem::setHoverHighlighted(bool highlighted)
+{
+    if (isHoverHighlighted == highlighted) {
+        return;
+    }
+
+    if (highlighted) {
+        // The card-info widget listens for this: hovering still updates it right away.
+        processHoverEvent();
+    }
+
+    isHoverHighlighted = highlighted;
+    if (highlighted) {
+        setZValue(ZValues::HOVERED_CARD);
+    } else if (!isHovered && hoverZoom->state() != QAbstractAnimation::Running) {
+        // A zoomed card keeps its raised z until the shrink-out finishes (its finished
+        // handler restores it); a highlight-only card has nothing to unwind.
+        setZValue(realZValue);
+    }
     update();
 }
 

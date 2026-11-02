@@ -686,7 +686,8 @@ TEST_F(SettingsDefaultsTest, CardsDisplay_ArrowDrawAnimation_Default)
 TEST_F(SettingsDefaultsTest, CardsDisplay_HoverPanelTrigger_Default)
 {
     CardsDisplaySettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getHoverPanelTrigger(), 0);
+    // Off by default: the panel is opt-in on upgrade.
+    ASSERT_EQ(s.getHoverPanelTrigger(), CardsDisplaySettings::HoverPanelTriggerOff);
 }
 
 TEST_F(SettingsDefaultsTest, CardsDisplay_HoverPanelTrigger_SetAndGet)
@@ -701,7 +702,8 @@ TEST_F(SettingsDefaultsTest, CardsDisplay_HoverPanelTrigger_SetAndGet)
 TEST_F(SettingsDefaultsTest, CardsDisplay_HoverZoomTrigger_Default)
 {
     CardsDisplaySettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getHoverZoomTrigger(), 0);
+    // Off by default: the smooth hover zoom is opt-in on upgrade.
+    ASSERT_EQ(s.getHoverZoomTrigger(), CardsDisplaySettings::HoverPanelTriggerOff);
 }
 
 TEST_F(SettingsDefaultsTest, CardsDisplay_HoverZoomTrigger_SetAndGet)

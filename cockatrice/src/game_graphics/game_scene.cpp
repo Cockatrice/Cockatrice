@@ -268,15 +268,17 @@ void GameScene::onCardRightClicked(AbstractCardItem *abstractCard, QPoint screen
     }
 
     // The zoom and panel triggers are independently bindable: a right-click fires
-    // whichever phases listen to it. Once right-click drives either phase the context
-    // menu stays suppressed — popping it would steal the flow (and the panel already
-    // carries every action when it is the panel trigger).
+    // whichever phases listen to it. When the panel is the trigger it carries every
+    // action itself, so the context menu stays suppressed; when right-click only zooms,
+    // the menu still opens, since nothing else would summon it.
     auto &display = SettingsCache::instance().cardsDisplay();
     const bool zoomFired = display.getHoverZoomTrigger() == CardsDisplaySettings::HoverPanelTriggerRightClick;
     const bool panelFired = display.getHoverPanelTrigger() == CardsDisplaySettings::HoverPanelTriggerRightClick;
     if (zoomFired || panelFired) {
         fireTriggers(card, zoomFired, panelFired);
-        return;
+        if (panelFired) {
+            return;
+        }
     }
 
     // Hide the hover popup when the context menu opens
@@ -841,6 +843,17 @@ void GameScene::updateHoveredCard(CardItem *newCard)
     if (hoveredCard && (newCard != hoveredCard)) {
         endCardHover(hoveredCard);
         hoveredCard = nullptr;
+    }
+
+    // The hover outline and the card info follow the cursor on contact: only the board
+    // zoom and the panel wait for their trigger. A highlight-only card has no zoom to
+    // unwind, so it is dropped directly instead of through endCardHover().
+    if (hoverHighlightCard && hoverHighlightCard != newCard) {
+        hoverHighlightCard->setHoverHighlighted(false);
+    }
+    hoverHighlightCard = newCard;
+    if (newCard) {
+        newCard->setHoverHighlighted(true);
     }
 
     auto &display = SettingsCache::instance().cardsDisplay();

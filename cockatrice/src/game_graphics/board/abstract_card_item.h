@@ -37,6 +37,7 @@ protected:
 
 private:
     bool isHovered;
+    bool isHoverHighlighted;
     qreal realZValue;
     bool pendingSelectionCollapse;
     int selectionCollapseGeneration = 0; ///< Guards the deferred collapse timer against stale firings
@@ -134,6 +135,13 @@ public:
     }
     void setRealZValue(qreal _zValue);
     void setHovered(bool _hovered);
+    /**
+     * @brief Shows the hover outline and stacking lift without starting the zoom.
+     *
+     * The board zoom is trigger-gated; the hover feedback (card info, outline, raised
+     * stacking) still follows the cursor immediately on contact.
+     */
+    void setHoverHighlighted(bool highlighted);
     qreal getCardScale() const;
     void setCardScale(qreal scale);
     qreal getCardOpacity() const;

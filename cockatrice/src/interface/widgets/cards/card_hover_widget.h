@@ -174,6 +174,8 @@ private:
     void scheduleRefresh();
 
     void rebuildActionsForZone();
+    /** @brief Whether the local player may edit the current card (own card, judge, writable zone). */
+    bool canModifyCurrentCard() const;
     void buildMainTab(const QList<CardState *> &cardList, const QString &zoneName, bool canModify);
     void buildMoveTab(const QList<CardState *> &cardList, const QString &zoneName, bool canModify);
     void buildCounterTab(const QList<CardState *> &cardList, const QString &zoneName, bool canModify);

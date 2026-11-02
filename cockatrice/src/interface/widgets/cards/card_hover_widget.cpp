@@ -284,9 +284,8 @@ void CardHoverWidget::createNameBarOverlay()
         if (!nameEdit->isVisible()) {
             return;
         }
-        if (currentCard && currentCard->getOwner()) {
-            auto *actions = currentCard->getOwner()->getPlayerActions();
-            if (actions) {
+        if (canModifyCurrentCard()) {
+            if (auto *actions = currentCard->getOwner()->getPlayerActions()) {
                 QList<CardState *> cardList{currentCard->getState()};
                 actions->actSetAnnotation(cardList, nameEdit->text());
             }
@@ -771,6 +770,23 @@ void CardHoverWidget::onCardDestroyed()
 
 // ---------- Grouped action builders (mirror CardMenu per zone) ----------
 
+bool CardHoverWidget::canModifyCurrentCard() const
+{
+    if (!currentCard || !currentCard->getOwner() || !currentPlayer) {
+        return false;
+    }
+    if (!currentPlayer->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
+        return false;
+    }
+    // A revealed zone we cannot write to is read-only even for its owner.
+    if (auto *view = qobject_cast<ZoneViewZoneLogic *>(currentCard->getZone())) {
+        if (view->getRevealZone() && !view->getWriteableRevealZone()) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void CardHoverWidget::rebuildActionsForZone()
 {
     clearLayout(mainPageLayout);
@@ -785,12 +801,7 @@ void CardHoverWidget::rebuildActionsForZone()
     auto *card = currentCard.data();
     QList<CardState *> cardList{card->getState()};
 
-    bool canModify = currentPlayer->getLogic()->getPlayerInfo()->getLocalOrJudge();
-    if (auto *view = qobject_cast<ZoneViewZoneLogic *>(card->getZone())) {
-        if (view->getRevealZone() && !view->getWriteableRevealZone()) {
-            canModify = false;
-        }
-    }
+    const bool canModify = canModifyCurrentCard();
 
     QString zoneName = card->getZone() ? card->getZone()->getName() : QString();
 
@@ -1173,6 +1184,11 @@ void CardHoverWidget::setPTExpanded(bool expanded)
     }
     // Nothing to expand into when the card has no P/T.
     if (expanded && (!currentCard || currentCard->getPT().isEmpty())) {
+        expanded = false;
+    }
+    // The buttons act on our own copy of the card by id, so on another player's card they
+    // would edit our zone. Offer them only where the action tabs allow edits.
+    if (expanded && !canModifyCurrentCard()) {
         expanded = false;
     }
     // Mouse movement drives this on every event; only apply a real state change.
@@ -1558,8 +1574,9 @@ bool CardHoverWidget::isClosing() const
 
 bool CardHoverWidget::eventFilter(QObject *obj, QEvent *event)
 {
-    // Handle double-click on name label to start editing annotation
-    if (obj == nameLabel && event->type() == QEvent::MouseButtonDblClick) {
+    // Handle double-click on name label to start editing annotation. Annotations are set
+    // by card id on our own zone, so another player's card must not open the editor.
+    if (obj == nameLabel && event->type() == QEvent::MouseButtonDblClick && canModifyCurrentCard()) {
         nameLabel->setVisible(false);
         annotationLabel->setVisible(false);
         nameEdit->setVisible(true);

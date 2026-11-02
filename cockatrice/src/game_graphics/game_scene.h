@@ -78,8 +78,11 @@ private:
     ArrowRegistry arrowRegistry;                        ///< ID registry for arrow graphics items
     QList<ZoneViewWidget *> zoneViews;                  ///< Active zone view widgets
     QSize viewSize;                                     ///< Current view size
-    QPointer<CardItem> hoveredCard;                     ///< Currently hovered card
-    QPointer<CardItem> activeCard;                      ///< Card the currently open context menu targets
+    QPointer<CardItem> hoveredCard;                     ///< Currently hovered card (zoomed)
+    /// Card the cursor is resting on. It carries the hover outline and the card-info
+    /// update immediately, independently of the zoom/panel triggers.
+    QPointer<CardItem> hoverHighlightCard;
+    QPointer<CardItem> activeCard; ///< Card the currently open context menu targets
     /// Card armed for double-confirm panel summon (first trigger zooms, repeat shows).
     QPointer<CardItem> confirmArmedCard;
     /// Ancestor chain of the hovered card with pre-hover Z-values. Lifted while hovering
