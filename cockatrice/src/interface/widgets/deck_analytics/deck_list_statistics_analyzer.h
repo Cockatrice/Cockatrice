@@ -152,7 +152,7 @@ private:
     std::unordered_map<int, int> manaCurveMap;
     std::unordered_map<char, int> manaDevotionMap;
 
-    QHash<QString, int> devotionPipCount;  // W/U/B/R/G total symbols
+    QHash<QString, int> devotionPipCount;  // Counts for the fifteen Continuum Universes Essence codes
     QHash<QString, int> devotionCardCount; // how many cards provide devotion
 
     QHash<QString, int> productionPipCount;  // mana produced by cards
