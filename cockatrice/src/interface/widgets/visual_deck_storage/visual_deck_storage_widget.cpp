@@ -17,9 +17,15 @@
 #include <QAbstractItemModel>
 #include <QChar>
 #include <QDebug>
+#include <QDialog>
+#include <QDialogButtonBox>
 #include <QHBoxLayout>
+#include <QInputDialog>
 #include <QLabel>
+#include <QLineEdit>
 #include <QList>
+#include <QListWidget>
+#include <QMessageBox>
 #include <QModelIndex>
 #include <QPushButton>
 #include <QScrollArea>
@@ -28,6 +34,7 @@
 #include <QToolButton>
 #include <QVBoxLayout>
 #include <QVariant>
+#include <algorithm>
 #include <functional>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/cards_display_settings.h>
@@ -72,6 +79,9 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     shareButton->setVisible(false);
     connect(shareButton, &QPushButton::clicked, this, &VisualDeckStorageWidget::shareRequested);
 
+    manageTagsButton = new QToolButton(this);
+    connect(manageTagsButton, &QToolButton::clicked, this, &VisualDeckStorageWidget::manageTags);
+
     quickSettingsWidget = new VisualDeckStorageQuickSettingsWidget(this);
     connect(quickSettingsWidget, &VisualDeckStorageQuickSettingsWidget::showFoldersChanged, this,
             &VisualDeckStorageWidget::updateShowFolders);
@@ -83,6 +93,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     searchAndSortLayout->addWidget(searchWidget);
     searchAndSortLayout->addWidget(refreshButton);
     searchAndSortLayout->addWidget(shareButton);
+    searchAndSortLayout->addWidget(manageTagsButton);
     searchAndSortLayout->addWidget(quickSettingsWidget);
 
     // tag filter box
@@ -164,6 +175,172 @@ void VisualDeckStorageWidget::refreshIfPossible()
     }
 }
 
+void VisualDeckStorageWidget::manageTags()
+{
+    // An incomplete scan would make a bulk edit silently miss decks.
+    if (storageModel->getDeckPath().isEmpty() || storageModel->isScanning()) {
+        QMessageBox::information(this, tr("Manage tags"), tr("Wait for the deck folder scan to finish first."));
+        return;
+    }
+    for (int row = 0; row < storageModel->rowCount(); ++row) {
+        const auto &deck = storageModel->dataForRow(row);
+        if (!deck.loadSucceeded) {
+            QMessageBox::warning(this, tr("Manage tags"),
+                                 tr("Some decks are still loading or could not be read. Refresh the deck folder and "
+                                    "resolve any unreadable files before changing tags across decks."));
+            return;
+        }
+    }
+    const QString folderPath = storageModel->getDeckPath();
+
+    QDialog dialog(this);
+    dialog.setWindowTitle(tr("Manage deck tags"));
+    auto *dialogLayout = new QVBoxLayout(&dialog);
+    auto *explanation =
+        new QLabel(tr("Rename or remove a tag from every deck in this folder and its subfolders."), &dialog);
+    explanation->setWordWrap(true);
+    dialogLayout->addWidget(explanation);
+    auto *tags = new QListWidget(&dialog);
+    dialogLayout->addWidget(tags);
+    auto *buttons = new QHBoxLayout;
+    auto *renameButton = new QPushButton(tr("Rename"), &dialog);
+    auto *deleteButton = new QPushButton(tr("Remove"), &dialog);
+    buttons->addWidget(renameButton);
+    buttons->addWidget(deleteButton);
+    buttons->addStretch();
+    dialogLayout->addLayout(buttons);
+    auto *closeButton = new QDialogButtonBox(QDialogButtonBox::Close, &dialog);
+    connect(closeButton, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    dialogLayout->addWidget(closeButton);
+
+    auto rebuildTags = [this, tags] {
+        QStringList all = SettingsCache::instance().visualDeckStorage().getVisualDeckStorageDefaultTagsList();
+        for (int row = 0; row < storageModel->rowCount(); ++row) {
+            all.append(storageModel->dataForRow(row).tags);
+        }
+        all.removeDuplicates();
+        all.removeAll(QString());
+        // Default tags often begin with an emoji. Sort by the readable name,
+        // not by the symbol prefix, so the catalogue is actually alphabetical.
+        const auto sortKey = [](const QString &tag) {
+            qsizetype first = 0;
+            while (first < tag.size() && !tag.at(first).isLetterOrNumber()) {
+                ++first;
+            }
+            return tag.mid(first).toCaseFolded();
+        };
+        std::sort(all.begin(), all.end(), [&sortKey](const QString &a, const QString &b) {
+            const int nameOrder = QString::compare(sortKey(a), sortKey(b));
+            return nameOrder == 0 ? a < b : nameOrder < 0;
+        });
+        tags->clear();
+        tags->addItems(all);
+    };
+    rebuildTags();
+
+    auto applyTag = [this, &dialog, tags, rebuildTags, folderPath](bool remove) {
+        if (!tags->currentItem()) {
+            return;
+        }
+        const QString oldTag = tags->currentItem()->text();
+        QString replacement;
+        if (remove) {
+            if (QMessageBox::question(
+                    &dialog, tr("Remove tag"),
+                    tr("Remove '%1' from all decks in this folder and its subfolders?").arg(oldTag)) !=
+                QMessageBox::Yes) {
+                return;
+            }
+        } else {
+            bool accepted = false;
+            replacement = QInputDialog::getText(&dialog, tr("Rename tag"), tr("New tag name:"), QLineEdit::Normal,
+                                                oldTag, &accepted)
+                              .trimmed();
+            if (!accepted || replacement == oldTag) {
+                return;
+            }
+            if (replacement.isEmpty()) {
+                QMessageBox::warning(&dialog, tr("Rename tag"), tr("A tag name cannot be empty."));
+                return;
+            }
+        }
+
+        if (storageModel->getDeckPath() != folderPath || storageModel->isScanning()) {
+            QMessageBox::warning(&dialog, tr("Manage tags"),
+                                 tr("The deck folder is being refreshed. Try again when it finishes."));
+            return;
+        }
+        QStringList paths;
+        for (int row = 0; row < storageModel->rowCount(); ++row) {
+            const auto &deck = storageModel->dataForRow(row);
+            if (!deck.loadSucceeded) {
+                QMessageBox::warning(&dialog, tr("Manage tags"),
+                                     tr("A deck is still loading or could not be read. Refresh and try again."));
+                return;
+            }
+            if (deck.tags.contains(oldTag)) {
+                paths.append(deck.filePath);
+            }
+        }
+
+        QStringList failures;
+        int changed = 0;
+        QPointer<VisualDeckStorageModel> model(storageModel);
+        for (const QString &path : paths) {
+            if (!model) {
+                return;
+            }
+            const int row = model->rowForFilePath(path);
+            if (row < 0 || !model->dataForRow(row).loadSucceeded) {
+                failures.append(path);
+                continue;
+            }
+            QStringList updated = model->dataForRow(row).tags;
+            for (QString &tag : updated) {
+                if (tag == oldTag) {
+                    tag = replacement;
+                }
+            }
+            updated.removeAll(QString());
+            updated.removeDuplicates();
+            if (model->setTags(row, updated)) {
+                ++changed;
+            } else {
+                failures.append(path);
+            }
+        }
+        if (!model) {
+            return;
+        }
+        if (failures.isEmpty()) {
+            auto &settings = SettingsCache::instance().visualDeckStorage();
+            QStringList defaults = settings.getVisualDeckStorageDefaultTagsList();
+            for (QString &tag : defaults) {
+                if (tag == oldTag) {
+                    tag = replacement;
+                }
+            }
+            defaults.removeAll(QString());
+            defaults.removeDuplicates();
+            settings.setVisualDeckStorageDefaultTagsList(defaults);
+        }
+        rebuildTags();
+        if (failures.isEmpty()) {
+            QMessageBox::information(&dialog, tr("Manage tags"), tr("Updated %n deck(s).", "", changed));
+        } else {
+            QMessageBox::warning(&dialog, tr("Manage tags"),
+                                 tr("Updated %1 deck(s). These files were not changed; they may have been modified "
+                                    "elsewhere or could not be saved:\n\n%2")
+                                     .arg(changed)
+                                     .arg(failures.join('\n')));
+        }
+    };
+    connect(renameButton, &QPushButton::clicked, &dialog, [applyTag] { applyTag(false); });
+    connect(deleteButton, &QPushButton::clicked, &dialog, [applyTag] { applyTag(true); });
+    dialog.resize(480, 520);
+    dialog.exec();
+}
+
 void VisualDeckStorageWidget::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
@@ -190,6 +367,8 @@ void VisualDeckStorageWidget::retranslateUi()
 
     refreshButton->setToolTip(tr("Refresh loaded files"));
     shareButton->setToolTip(tr("Select decks to share"));
+    manageTagsButton->setText(tr("Manage tags"));
+    manageTagsButton->setToolTip(tr("Rename or remove tags across your decks"));
     quickSettingsWidget->setToolTip(tr("Visual Deck Storage Settings"));
 
     sortWidget->retranslateUi();

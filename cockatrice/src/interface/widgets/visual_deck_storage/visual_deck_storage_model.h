@@ -144,6 +144,10 @@ public:
     [[nodiscard]] const DeckPreviewData &dataForRow(int row) const;
     [[nodiscard]] const LoadedDeck &deckForRow(int row) const;
     [[nodiscard]] int rowForFilePath(const QString &filePath) const;
+    [[nodiscard]] bool isScanning() const
+    {
+        return scanning;
+    }
     ///@}
 
     /// @name Mutations (persist to disk and update the row)
@@ -191,6 +195,7 @@ private:
     int scanGeneration = 0;                ///< Bumped on every scan so stale results are ignored.
     QVector<PendingDeckLoad> pendingLoads; ///< Finished background loads waiting to be applied.
     bool drainScheduled = false;           ///< Whether a queued drain pass is already pending.
+    bool scanning = false;
 };
 
 #endif // VISUAL_DECK_STORAGE_MODEL_H

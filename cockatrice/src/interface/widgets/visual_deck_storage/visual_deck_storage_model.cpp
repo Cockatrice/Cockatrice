@@ -228,6 +228,7 @@ void VisualDeckStorageModel::reindexFilePaths()
 void VisualDeckStorageModel::startScan()
 {
     ++scanGeneration;
+    scanning = !deckPath.isEmpty();
     beginResetModel();
     decks.clear();
     rowByFilePath.clear();
@@ -251,6 +252,8 @@ void VisualDeckStorageModel::startScan()
         if (generation != scanGeneration) {
             return; // A newer scan started while this one was running; drop the stale result.
         }
+
+        scanning = false;
 
         const DeckScanResult result = watcher->result();
         folderPaths = result.folderPaths;
@@ -424,6 +427,7 @@ bool VisualDeckStorageModel::renameDeck(int row, const QString &newName)
         return false;
     }
 
+    data.lastModified = QFileInfo(data.filePath).lastModified();
     recomputeDeckMetadata(data);
     emit dataChanged(index(row), index(row), {VisualDeckStorageRoles::DisplayNameRole});
     return true;
@@ -492,12 +496,19 @@ bool VisualDeckStorageModel::setTags(int row, const QStringList &tags)
     }
 
     DeckPreviewData &data = decks[row];
+    // Refuse to overwrite changes made in another editor since this snapshot.
+    if (QFileInfo(data.filePath).lastModified() != data.lastModified) {
+        return false;
+    }
+    const QStringList previousTags = data.deck.deckList.getTags();
     data.deck.deckList.setTags(tags);
     if (!DeckLoader::saveToFile(data.deck)) {
+        data.deck.deckList.setTags(previousTags);
         return false;
     }
 
     data.tags = tags;
+    data.lastModified = QFileInfo(data.filePath).lastModified();
     emit dataChanged(index(row), index(row), {VisualDeckStorageRoles::TagsRole});
     return true;
 }
@@ -515,6 +526,7 @@ bool VisualDeckStorageModel::setBannerCard(int row, const CardRef &cardRef)
     }
 
     data.bannerCard = cardRef;
+    data.lastModified = QFileInfo(data.filePath).lastModified();
     emit dataChanged(index(row), index(row),
                      {VisualDeckStorageRoles::BannerCardNameRole, VisualDeckStorageRoles::BannerCardProviderIdRole});
     return true;

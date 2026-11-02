@@ -82,6 +82,7 @@ protected:
 
 private:
     void reapplySortAndFilters();
+    void manageTags();
     [[nodiscard]] QSet<QString> gatherVisibleTags() const;
 
 private:
@@ -94,6 +95,7 @@ private:
     DeckPreviewColorIdentityFilterWidget *deckPreviewColorIdentityFilterWidget;
     QToolButton *refreshButton;
     QToolButton *shareButton;
+    QToolButton *manageTagsButton;
     VisualDeckStorageQuickSettingsWidget *quickSettingsWidget;
     QScrollArea *scrollArea;
     VisualDeckStorageFolderDisplayWidget *folderWidget = nullptr;
