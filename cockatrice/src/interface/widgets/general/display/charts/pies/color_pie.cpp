@@ -1,6 +1,6 @@
 #include "color_pie.h"
 
-#include "libcockatrice/utility/color.h"
+#include "../../../../../essence_chart_colors.h"
 
 #include <QBrush>
 #include <QFontMetrics>
@@ -20,14 +20,14 @@
 #include <utility>
 
 ColorPie::ColorPie(const QMap<QString, int> &_colors, QWidget *parent)
-    : QWidget(parent), colors(GameSpecificColors::MTG::sortManaMapWUBRGCFirst(_colors))
+    : QWidget(parent), colors(EssenceCharts::ordered(_colors))
 {
     setMouseTracking(true);
 }
 
 void ColorPie::setColors(const QMap<QString, int> &_colors)
 {
-    colors = GameSpecificColors::MTG::sortManaMapWUBRGCFirst(_colors);
+    colors = EssenceCharts::ordered(_colors);
     update();
 }
 
@@ -184,19 +184,5 @@ QString ColorPie::tooltipForPoint(const QPoint &pt) const
 
 QColor ColorPie::colorFromName(const QString &name) const
 {
-    static QMap<QString, QColor> map = {
-        {"R", QColor(220, 30, 30)},   {"G", QColor(40, 170, 40)}, {"U", QColor(40, 90, 200)},
-        {"W", QColor(235, 235, 230)}, {"B", QColor(30, 30, 30)},
-    };
-
-    if (map.contains(name)) {
-        return map[name];
-    }
-
-    QColor c(name);
-    if (!c.isValid()) {
-        c = Qt::gray;
-    }
-
-    return c;
+    return EssenceCharts::colorFor(name);
 }
