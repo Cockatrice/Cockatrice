@@ -12,6 +12,15 @@
 
 #include <QBrush>
 #include <QColor>
+#include <QCoreApplication>
+#include <QDir>
+#include <QFileInfo>
+#include <QFont>
+#include <QFontDatabase>
+#include <QHash>
+#include <QPen>
+#include <QSettings>
+#include <QStringList>
 #include <QGradient>
 #include <QGraphicsItem>
 #include <QGraphicsScene>
@@ -71,6 +80,7 @@ TableZone::TableZone(TableZoneLogic *_logic, bool _mirrored, QGraphicsItem *pare
 
 void TableZone::updateBg()
 {
+    reloadBattlefieldAppearance();
     update();
 }
 
@@ -126,6 +136,8 @@ void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
         painter->fillRect(boundingRect(), brush);
     }
 
+    paintBattlefieldRows(painter);
+
     if (active) {
         paintZoneOutline(painter);
     } else {
@@ -141,7 +153,6 @@ void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
         painter->fillRect(boundingRect(), shimmerColor);
     }
 
-    paintLandDivider(painter);
 }
 
 void TableZone::onPlaymatChanged(bool active)
@@ -179,21 +190,127 @@ void TableZone::paintZoneOutline(QPainter *painter)
     painter->fillRect(QRectF(width - BOX_LINE_WIDTH, 0, BOX_LINE_WIDTH, height), QBrush(grad1));
 }
 
-/**
-   Render a division line for land placement
 
-   @painter QPainter object
+/**
+ * Draw Front, Support, and Command on Cockatrice's existing three-row table.
+ * This changes presentation only, not gameplay or network-zone identifiers.
  */
-void TableZone::paintLandDivider(QPainter *painter)
+void TableZone::paintBattlefieldRows(QPainter *painter)
 {
-    // Place the line 2 grid heights down then back it off just enough to allow
-    // some space between a 3-card stack and the land area.
-    qreal separatorY = MARGIN_TOP + 2 * (CardDimensions::HEIGHT + PADDING_Y) - STACKED_CARD_OFFSET_Y / 2;
-    if (isInverted()) {
-        separatorY = height - separatorY;
+    painter->save();
+
+    const qreal rowStride = CardDimensions::HEIGHT + PADDING_Y;
+    const bool inverted = isInverted();
+    QFont font(zoneLabelFontFamily);
+    font.setPixelSize(18);
+    painter->setFont(font);
+
+    for (int visualRow = 0; visualRow < TableZoneLogic::ROW_COUNT; ++visualRow) {
+        // Table logical grid Y: 0 = Command, 1 = Support, 2 = Front.
+        const int row = inverted ? TableZoneLogic::ROW_COUNT - 1 - visualRow : visualRow;
+        QString label;
+        QColor color;
+
+        switch (row) {
+            case 0:
+                label = tr("COMMAND ZONE");
+                color = commandZoneColor;
+                break;
+            case 1:
+                label = tr("SUPPORT ZONE");
+                color = supportZoneColor;
+                break;
+            default:
+                label = tr("FRONT ZONE");
+                color = frontZoneColor;
+                break;
+        }
+
+        const qreal top = visualRow * rowStride;
+        const qreal bottom = visualRow == TableZoneLogic::ROW_COUNT - 1 ? height : top + rowStride;
+        painter->fillRect(QRectF(0, top, width, bottom - top), color);
+
+        const QRectF labelRect(16, top + 3, qMax(0, width - 32), 24);
+        painter->setPen(QColor(0, 0, 0, 210));
+        painter->drawText(labelRect.translated(1, 1), Qt::AlignHCenter | Qt::AlignVCenter, label);
+        painter->setPen(QColor(250, 248, 244));
+        painter->drawText(labelRect, Qt::AlignHCenter | Qt::AlignVCenter, label);
+
+        if (visualRow > 0) {
+            painter->setPen(QPen(QColor(255, 255, 255, 95), 2));
+            painter->drawLine(QPointF(0, top), QPointF(width, top));
+        }
     }
-    painter->setPen(QColor(255, 255, 255, 40));
-    painter->drawLine(QPointF(0, separatorY), QPointF(width, separatorY));
+
+    painter->restore();
+}
+
+/**
+ * Each theme may provide a battlefield.ini and/or Continuumorphous font file.
+ * Optional assets avoid build failures when the proprietary font is absent.
+ */
+void TableZone::reloadBattlefieldAppearance()
+{
+    frontZoneColor = QColor(142, 52, 61, 128);
+    supportZoneColor = QColor(40, 105, 129, 128);
+    commandZoneColor = QColor(94, 66, 140, 128);
+
+    const QString themePath = themeManager->getCurrentThemePath();
+    if (!themePath.isEmpty()) {
+        const QString iniPath = QDir(themePath).filePath(QStringLiteral("battlefield.ini"));
+        if (QFileInfo::exists(iniPath)) {
+            QSettings settings(iniPath, QSettings::IniFormat);
+            const auto readColor = [&settings](const QString &key, const QColor &fallback) {
+                const QColor parsed(settings.value(key, fallback.name(QColor::HexArgb)).toString());
+                return parsed.isValid() ? parsed : fallback;
+            };
+            frontZoneColor = readColor(QStringLiteral("Zones/Front"), frontZoneColor);
+            supportZoneColor = readColor(QStringLiteral("Zones/Support"), supportZoneColor);
+            commandZoneColor = readColor(QStringLiteral("Zones/Command"), commandZoneColor);
+        }
+    }
+
+    QStringList fontPaths;
+    if (!themePath.isEmpty()) {
+        const QDir themeDir(themePath);
+        fontPaths << themeDir.filePath(QStringLiteral("fonts/Continuumorphous-Regular.ttf"))
+                  << themeDir.filePath(QStringLiteral("fonts/Continuumorphous-Regular.otf"));
+    }
+    const QDir binaryDir(QCoreApplication::applicationDirPath());
+    fontPaths << binaryDir.filePath(QStringLiteral("fonts/Continuumorphous-Regular.ttf"))
+              << binaryDir.filePath(QStringLiteral("fonts/Continuumorphous-Regular.otf"));
+
+    static QHash<QString, QString> loadedFamilies;
+    zoneLabelFontFamily.clear();
+    for (const QString &path : fontPaths) {
+        if (!QFileInfo::isFile(path)) {
+            continue;
+        }
+        if (loadedFamilies.contains(path)) {
+            zoneLabelFontFamily = loadedFamilies.value(path);
+        } else {
+            const int id = QFontDatabase::addApplicationFont(path);
+            const QStringList families = QFontDatabase::applicationFontFamilies(id);
+            if (!families.isEmpty()) {
+                zoneLabelFontFamily = families.constFirst();
+                loadedFamilies.insert(path, zoneLabelFontFamily);
+            }
+        }
+        if (!zoneLabelFontFamily.isEmpty()) {
+            break;
+        }
+    }
+
+    if (zoneLabelFontFamily.isEmpty()) {
+        const QStringList installed = QFontDatabase::families();
+        if (installed.contains(QStringLiteral("Continuumorphous Regular"), Qt::CaseInsensitive)) {
+            zoneLabelFontFamily = QStringLiteral("Continuumorphous Regular");
+        } else if (installed.contains(QStringLiteral("Continuumorphous"), Qt::CaseInsensitive)) {
+            zoneLabelFontFamily = QStringLiteral("Continuumorphous");
+        } else {
+            zoneLabelFontFamily = QFont().family();
+        }
+    }
 }
 
 void TableZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
