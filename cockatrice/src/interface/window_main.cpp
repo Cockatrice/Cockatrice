@@ -382,8 +382,10 @@ void MainWindow::retranslateUi()
     aAbout->setText(tr("&About Continuumatrice"));
     aTips->setText(tr("&Tip of the Day"));
     aUpdate->setText(tr("Check for Client Updates"));
-    aCheckCardUpdates->setText(tr("Check for Card Updates..."));
-    aCheckCardUpdatesBackground->setText(tr("Check for Card Updates (Automatic)"));
+    aCheckCardUpdates->setText(tr("Legacy MTG Oracle importer (disabled)"));
+    aCheckCardUpdates->setEnabled(false);
+    aCheckCardUpdatesBackground->setText(tr("Automatic MTG card updates (disabled)"));
+    aCheckCardUpdatesBackground->setEnabled(false);
     aStatusBar->setText(tr("Show Status Bar"));
     aViewLog->setText(tr("View &Debug Log"));
     aOpenSettingsFolder->setText(tr("Open Settings Folder"));
@@ -647,9 +649,9 @@ void MainWindow::startupConfigCheck()
         startLocalGame(options);
     }
 
-    if (SettingsCache::instance().updates().getCheckUpdatesOnStartup()) {
-        actCheckClientUpdates();
-    }
+    // The fork has independent release channels. Until a Continuumatrice
+    // release is published, do not auto-check or run upstream Cockatrice updates.
+    SettingsCache::instance().updates().setCheckUpdatesOnStartup(false);
 
     actCheckCommanderBracketDefinitionUpdates();
 
@@ -657,10 +659,14 @@ void MainWindow::startupConfigCheck()
         // no config found, 99% new clean install
         qCInfo(WindowMainStartupVersionLog)
             << "Startup: old client version empty, assuming first start after clean install";
-        SettingsCache::instance().downloads().resetToDefaultURLs(); // populate the download urls
+        SettingsCache::instance().downloads().resetToDefaultURLs(); // Empty in Continuumatrice: no MTG providers
         SettingsCache::instance().network().setClientVersion(VERSION_STRING);
-        actCheckServerUpdates();
-        runFirstRunWizard(true);
+        // No upstream Cockatrice first-run wizard, Magic importer, or default
+        // server discovery. Cards are loaded from this application's own XML.
+        QMessageBox::information(this, tr("Welcome to Continuumatrice"),
+                                 tr("Continuumatrice uses its own card database. "
+                                    "Add your card XML files using Card Database > Add custom sets/cards "
+                                    "or place them in the Continuumatrice customsets directory."));
 
         if (QString(VERSION_STRING).contains("custom", Qt::CaseInsensitive)) {
             SettingsCache::instance().updates().setCheckUpdatesOnStartup(false);
@@ -673,7 +679,7 @@ void MainWindow::startupConfigCheck()
             << "Startup: old client version" << SettingsCache::instance().network().getClientVersion()
             << "differs, assuming first start after update";
         if (SettingsCache::instance().updates().getNotifyAboutNewVersion()) {
-            alertForcedOracleRun(VERSION_STRING, true);
+            // Do not automatically launch the upstream Magic-card Oracle importer.
         }
 
         qCInfo(WindowMainStartupShortcutsLog) << "Migrating shortcuts after update detected.";
@@ -700,7 +706,7 @@ void MainWindow::startupConfigCheck()
         // previous config from this version found
         qCInfo(WindowMainStartupVersionLog) << "Startup: found config with current version";
 
-        if (SettingsCache::instance().updates().getCardUpdateCheckRequired()) {
+        if (false && SettingsCache::instance().updates().getCardUpdateCheckRequired()) {
             if (SettingsCache::instance().updates().getStartupCardUpdateCheckPromptForUpdate()) {
                 auto startupCardCheckDialog = new DlgStartupCardCheck(this);
 
@@ -1189,7 +1195,7 @@ void MainWindow::cardDatabaseAllNewSetsEnabled()
         }
         QMessageBox::information(
             this, tr("Welcome"),
-            tr("Hi! It seems like you're running this version of Cockatrice for the first time.\nAll the sets in the "
+            tr("This is the first time you've loaded this card database in Continuumatrice.\nAll the sets in the "
                "card "
                "database have been enabled.\nRead more about changing the set order or disabling specific sets and "
                "consequent effects in the \"Manage Sets\" dialog."));
@@ -1203,16 +1209,28 @@ void MainWindow::cardDatabaseAllNewSetsEnabled()
 /* CARD UPDATER */
 void MainWindow::actCheckCardUpdates()
 {
-    createCardUpdateProcess();
+    QMessageBox::information(this, tr("Continuumatrice card data"),
+                             tr("The upstream Oracle importer downloads Magic card data and is disabled "
+                                "in Continuumatrice. Import Continuum Universes XML cards using "
+                                "Card Database > Add custom sets/cards instead."));
 }
 
 void MainWindow::actCheckCardUpdatesBackground()
 {
-    createCardUpdateProcess(true);
+    // Never run the upstream Oracle MTG importer unattended.
+    qCInfo(CardDatabaseUpdateLog) << "The legacy Magic Oracle importer is disabled in Continuumatrice";
 }
 
 void MainWindow::createCardUpdateProcess(bool background)
 {
+    Q_UNUSED(background);
+    // Direct callers must also be unable to launch the upstream MTG importer.
+    QMessageBox::information(this, tr("Importer unavailable"),
+                             tr("Continuumatrice does not run the upstream Magic Oracle importer. "
+                                "Import Continuum Universes XML sets directly."));
+    return;
+
+    // Legacy importer implementation retained for upstream reference only.
     if (cardUpdateProcess) {
         qCDebug(CardDatabaseUpdateLog) << "A card database update is already running; asking it to come to the front";
         if (requestCardUpdateRaise()) {
@@ -1447,7 +1465,7 @@ void MainWindow::cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatu
 
 bool MainWindow::requestCardUpdateRaise()
 {
-    const QString serverName = scopedLocalServerName(QStringLiteral("CockatriceOracleRaise"));
+    const QString serverName = scopedLocalServerName(QStringLiteral("ContinuumatriceOracleRaise"));
     QLocalSocket socket;
     socket.connectToServer(serverName);
     if (!socket.waitForConnected(250)) {
