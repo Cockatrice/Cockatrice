@@ -21,8 +21,8 @@ class QWidget;
 HomeStyledButton::HomeStyledButton(const QString &text, QPair<QColor, QColor> _gradientColors, QWidget *parent)
     : QPushButton(text, parent), gradientColors(_gradientColors)
 {
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    setMinimumHeight(25);
+    // Keep the font/style-derived height even when the home page has ample space.
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     setStyleSheet(generateButtonStylesheet(gradientColors));
     applyInterfaceDefaultFont();
     connect(themeManager, &ThemeManager::fontsChanged, this, &HomeStyledButton::applyInterfaceDefaultFont);

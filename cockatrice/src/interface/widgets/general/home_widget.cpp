@@ -27,10 +27,11 @@
 #include <QFlags>
 #include <QFont>
 #include <QFontMetrics>
-#include <QGridLayout>
+#include <QFrame>
 #include <QGroupBox>
 #include <QImage>
 #include <QLabel>
+#include <QLayout>
 #include <QLinearGradient>
 #include <QList>
 #include <QMap>
@@ -44,9 +45,9 @@
 #include <QRect>
 #include <QRectF>
 #include <QRgb>
+#include <QScrollArea>
 #include <QSharedPointer>
 #include <QSize>
-#include <QSizePolicy>
 #include <QString>
 #include <QStringLiteral>
 #include <QTimer>
@@ -60,6 +61,7 @@
 #include <libcockatrice/network/client/remote/remote_client.h>
 #include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <optional>
 #include <qlogging.h>
 #include <qnamespace.h>
@@ -69,20 +71,25 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     : QWidget(parent), tabSupervisor(_tabSupervisor), background(themePixmap(QStringLiteral("backgrounds/home")))
 {
     setObjectName("homeWidget");
-    layout = new QGridLayout(this);
 
     backgroundSourceCard = new CardInfoPictureArtCropWidget(this);
 
     gradientColors = determineButtonColor();
 
-    layout->addWidget(createButtons(), 1, 1, Qt::AlignVCenter | Qt::AlignHCenter);
+    // The launcher keeps its natural size on a large display and stays centred in the
+    // viewport. On a small window it scrolls, instead of its combined minimum height
+    // becoming the minimum height of the entire application.
+    auto *scrollArea = QtUtils::makeScrollArea(this, Qt::ScrollBarAsNeeded, Qt::ScrollBarAsNeeded);
+    scrollArea->setObjectName("homeActionsScrollArea");
+    scrollArea->setFrameShape(QFrame::NoFrame);
+    scrollArea->setWidgetResizable(false);
+    scrollArea->setAlignment(Qt::AlignCenter);
+    // The home background is painted by this widget, so let it show through the viewport.
+    scrollArea->viewport()->setAutoFillBackground(false);
+    scrollArea->setWidget(createButtons());
 
-    layout->setRowStretch(0, 1);
-    layout->setRowStretch(2, 1);
-    layout->setColumnStretch(0, 1);
-    layout->setColumnStretch(2, 1);
-
-    setLayout(layout);
+    auto *layout = new QVBoxLayout(this);
+    layout->addWidget(scrollArea);
 
     cardChangeTimer = new QTimer(this);
     connect(cardChangeTimer, &QTimer::timeout, this, &HomeWidget::updateRandomCard);
@@ -289,18 +296,10 @@ QGroupBox *HomeWidget::createButtons()
 {
     QGroupBox *box = new QGroupBox(this);
     box->setObjectName("homeButtonsBox");
-    box->setStyleSheet(R"(
-    QGroupBox {
-        color: white;         /* Title text color */
-        background: transparent;
-    }
-
-    QGroupBox::title {
-        color: white;
-        subcontrol-origin: margin;
-        subcontrol-position: top center;  /* or top left / right */
-    }
-)");
+    // The box only stacks the logo and the actions: no frame, and no background of its
+    // own, so the home background art stays visible. It never shows a title. The rule is
+    // load-bearing: QScrollArea::setWidget() turns autoFillBackground on for its widget.
+    box->setStyleSheet("QGroupBox { background: transparent; border: none; }");
     // Family comes from the InterfaceDefault theme role; the 20px size stays caller-side.
     auto applyBoxFont = [box]() {
         QFont boxFont = themeManager->appFont(AppFont::InterfaceDefault);
@@ -309,9 +308,12 @@ QGroupBox *HomeWidget::createButtons()
     };
     applyBoxFont();
     connect(themeManager, &ThemeManager::fontsChanged, this, applyBoxFont);
-    box->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     QVBoxLayout *boxLayout = new QVBoxLayout;
     boxLayout->setAlignment(Qt::AlignHCenter);
+    // The scroll area is not resizable, so the box has to size itself: SetFixedSize keeps
+    // it at its content size and re-fixes it whenever the labels or fonts change, which is
+    // what makes the scroll area's scroll bars follow the content.
+    boxLayout->setSizeConstraint(QLayout::SetFixedSize);
 
     logoLabel = new QLabel;
     logoLabel->setAlignment(Qt::AlignCenter);

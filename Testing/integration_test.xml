@@ -36,7 +36,7 @@
   <event widget="MainWindow/settingsDialog/settingsOkButton" command="activate" arguments="" />
 
   <!-- Tier 3: Open deck editor from home and type in search -->
-  <event widget="MainWindow/tabSupervisor/stackedWidget/TabHome/homeWidget/homeButtonsBox/homeCreateNewDeckButton" command="activate" arguments="" />
+  <event widget="MainWindow/tabSupervisor/stackedWidget/TabHome/homeWidget/homeActionsScrollArea/qt_scrollarea_viewport/homeButtonsBox/homeCreateNewDeckButton" command="activate" arguments="" />
   <event widget="MainWindow/tabSupervisor/stackedWidget/TabDeckEditorVisual/databaseDisplayDock/databaseDisplayDockContents/databaseDisplayWidget/searchEdit" command="key" arguments="76" />
   <event widget="MainWindow/tabSupervisor/stackedWidget/TabDeckEditorVisual/databaseDisplayDock/databaseDisplayDockContents/databaseDisplayWidget/searchEdit" command="key" arguments="105" />
   <event widget="MainWindow/tabSupervisor/stackedWidget/TabDeckEditorVisual/databaseDisplayDock/databaseDisplayDockContents/databaseDisplayWidget/searchEdit" command="key" arguments="103" />
