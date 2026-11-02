@@ -178,6 +178,21 @@ public:
         return qobject_cast<PileZoneLogic *>(zones.value(ZoneNames::EXILE));
     }
 
+    PileZoneLogic *getLimboZone()
+    {
+        return qobject_cast<PileZoneLogic *>(zones.value(ZoneNames::LIMBO));
+    }
+
+    PileZoneLogic *getRefugeZone()
+    {
+        return qobject_cast<PileZoneLogic *>(zones.value(ZoneNames::REFUGE));
+    }
+
+    PileZoneLogic *getOblivionZone()
+    {
+        return qobject_cast<PileZoneLogic *>(zones.value(ZoneNames::OBLIVION));
+    }
+
     PileZoneLogic *getSideboardZone()
     {
         return qobject_cast<PileZoneLogic *>(zones.value(ZoneNames::SIDEBOARD));
