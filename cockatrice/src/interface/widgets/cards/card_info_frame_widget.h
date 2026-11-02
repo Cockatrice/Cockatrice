@@ -12,12 +12,14 @@
 #include <libcockatrice/card/printing/exact_card.h>
 #include <qtmetamacros.h>
 
+class QAction;
 class AbstractCardItem;
 class CardInfoPictureWidget;
 class CardInfoTextWidget;
 class QVBoxLayout;
 class QSplitter;
 class QPushButton;
+class QToolButton;
 class QWidget;
 struct CardRef;
 
@@ -30,12 +32,21 @@ private:
     CardInfoTextWidget *text;
     QPushButton *viewTransformationButton;
     bool cardTextOnly;
+    QWidget *cardPageActions;
+    QPushButton *openCardPageButton;
+    QToolButton *cardPageOptionsButton;
+    QAction *configureCardPageAction;
+    QAction *resetCardPageAction;
     QWidget *tab1, *tab2, *tab3;
     QVBoxLayout *tab1Layout, *tab2Layout, *tab3Layout;
     QSplitter *splitter;
 
     void setViewTransformationButtonVisibility(bool visible);
     void refreshLayout();
+    void updateCardPageAction();
+    void openCardPage();
+    void configureCardPage();
+    QString cardPageUrl() const;
 
 public:
     enum ViewMode

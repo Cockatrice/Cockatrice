@@ -28,6 +28,8 @@ public:
     [[nodiscard]] bool getScaleCards() const override;
     [[nodiscard]] int getStackCardOverlapPercent() const override;
     [[nodiscard]] int getCardInfoViewMode() const override;
+    [[nodiscard]] QString getCardInfoUrlTemplate() const;
+    static QString defaultCardInfoUrlTemplate();
     [[nodiscard]] int getVisualDeckStorageCardSize() const override;
     [[nodiscard]] int getVisualDatabaseDisplayCardSize() const override;
     [[nodiscard]] int getVisualDeckEditorCardSize() const override;
@@ -51,6 +53,7 @@ public:
     void setCardScaling(bool _scaleCards);
     void setStackCardOverlapPercent(int _verticalCardOverlapPercent);
     void setCardInfoViewMode(int _viewMode);
+    void setCardInfoUrlTemplate(const QString &urlTemplate);
     void setVisualDeckStorageCardSize(int _cardSize);
     void setVisualDatabaseDisplayCardSize(int _cardSize);
     void setVisualDeckEditorCardSize(int _cardSize);
@@ -62,6 +65,7 @@ public:
     void setCardSearchLanguage(int _cardSearchLanguage);
 
 signals:
+    void cardInfoUrlTemplateChanged();
     void displayCardNamesChanged();
     void roundCardCornersChanged(bool roundCardCorners);
     void overrideAllCardArtWithPersonalPreferenceChanged(bool _overrideAllCardArtWithPersonalPreference);

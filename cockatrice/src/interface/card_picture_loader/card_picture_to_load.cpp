@@ -257,17 +257,16 @@ static int parse(const QString &urlTemplate,
     return 0;
 }
 
-QString CardPictureToLoad::transformUrl(const QString &urlTemplate) const
+static QString
+transformCardUrl(const QString &urlTemplate, const ExactCard &card, const CardSetPtr &set, const PrintingInfo &printing)
 {
     /* This function takes Url templates and substitutes actual card details
        into the url.  This is used for making Urls with follow a predictable format
        for downloading images.  If information is requested by the template that is
        not populated for this specific card/set combination, an empty string is returned.*/
 
-    CardSetPtr set = getCurrentSet();
-
     QMap<QString, QString> transformMap = QMap<QString, QString>();
-    QString setName = getSetName();
+    QString setName = set ? set->getCorrectedShortName() : QString();
 
     // name
     QString cardName = card.getName();
@@ -290,8 +289,7 @@ QString CardPictureToLoad::transformUrl(const QString &urlTemplate) const
         transformMap["!setname_lower!"] = set->getLongName().toLower();
 
         if (parse(
-                urlTemplate, "set", cardName, setName,
-                [&](const QString &name) { return findPrintingForSet(card, set->getShortName()).getProperty(name); },
+                urlTemplate, "set", cardName, setName, [&](const QString &name) { return printing.getProperty(name); },
                 transformMap)) {
             return QString();
         }
@@ -327,4 +325,15 @@ QString CardPictureToLoad::transformUrl(const QString &urlTemplate) const
     }
 
     return transformedUrl;
+}
+
+QString CardPictureToLoad::transformUrl(const QString &urlTemplate) const
+{
+    const auto printing = currentSet ? findPrintingForSet(card, currentSet->getShortName()) : PrintingInfo();
+    return transformCardUrl(urlTemplate, card, currentSet, printing);
+}
+
+QString CardPictureToLoad::transformUrlForCard(const QString &urlTemplate, const ExactCard &card)
+{
+    return transformCardUrl(urlTemplate, card, card.getPrinting().getSet(), card.getPrinting());
 }

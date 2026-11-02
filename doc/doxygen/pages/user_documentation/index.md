@@ -14,6 +14,7 @@
 ## Settings
 
 - @subpage settings_folder
+- @subpage card_info_links
 
 ## Card Pictures
 

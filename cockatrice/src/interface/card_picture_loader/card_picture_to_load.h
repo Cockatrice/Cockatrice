@@ -74,6 +74,9 @@ public:
      */
     QString transformUrl(const QString &urlTemplate) const;
 
+    /** Expand the same URL syntax using the selected printing, without image-art preferences or set fallback. */
+    static QString transformUrlForCard(const QString &urlTemplate, const ExactCard &card);
+
     /**
      * @brief Advance to the next set in the list.
      * @return True if a next set exists and was selected, false if at the end.

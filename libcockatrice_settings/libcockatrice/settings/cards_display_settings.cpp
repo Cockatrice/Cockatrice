@@ -264,3 +264,19 @@ void CardsDisplaySettings::setCardSearchLanguage(int _cardSearchLanguage)
     setValue(_cardSearchLanguage, "cardSearchLanguage");
     emit cardSearchLanguageChanged(_cardSearchLanguage);
 }
+
+QString CardsDisplaySettings::defaultCardInfoUrlTemplate()
+{
+    return QStringLiteral("https://scryfall.com/search?q=%21%22!name!%22+lang%3A!sflang!");
+}
+
+QString CardsDisplaySettings::getCardInfoUrlTemplate() const
+{
+    return getValue("cardInfoUrlTemplate", QString(), QString(), defaultCardInfoUrlTemplate()).toString();
+}
+
+void CardsDisplaySettings::setCardInfoUrlTemplate(const QString &urlTemplate)
+{
+    setValue(urlTemplate, "cardInfoUrlTemplate");
+    emit cardInfoUrlTemplateChanged();
+}
