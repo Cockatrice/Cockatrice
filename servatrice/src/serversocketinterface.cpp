@@ -1917,25 +1917,35 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
     }
 
     int amountRemove = cmd.remove_messages();
-    if (amountRemove != 0) {
-        removeSaidMessages(userName, amountRemove);
-    }
     int minutes = cmd.minutes();
     if (isTrustedSource(servatrice->getTrustedSources(), address)) {
         address = "";
     }
+    if (userName.isEmpty() && address.isEmpty() && clientId.isEmpty()) {
+        return Response::RespOk;
+    }
 
     QSqlQuery *query = sqlInterface->prepareQuery(
-        "insert into {prefix}_bans (user_name, ip_address, id_admin, time_from, minutes, reason, visible_reason, "
-        "clientid) values(:user_name, :ip_address, :id_admin, NOW(), :minutes, :reason, :visible_reason, :client_id)");
+        "insert into {prefix}_bans (user_id, user_name, ip_address, id_admin, time_from, minutes, reason, "
+        "visible_reason, clientid) values((select id from {prefix}_users where name = :account_name), "
+        ":user_name, :ip_address, :id_admin, NOW(), :minutes, :reason, :visible_reason, :client_id)");
+    query->bindValue(":account_name", userName);
     query->bindValue(":user_name", userName);
     query->bindValue(":ip_address", address);
     query->bindValue(":id_admin", userInfo->id());
     query->bindValue(":minutes", minutes);
     query->bindValue(":reason", textFromStdString(cmd.reason()));
     query->bindValue(":visible_reason", visibleReason);
-    query->bindValue(":client_id", nameFromStdString(cmd.clientid()));
-    sqlInterface->execSqlQuery(query);
+    query->bindValue(":client_id", clientId);
+    if (!sqlInterface->execSqlQuery(query)) {
+        return Response::RespInternalError;
+    }
+
+    // Do not remove messages, disconnect users, or announce a ban that the
+    // database rejected.
+    if (amountRemove != 0) {
+        removeSaidMessages(userName, amountRemove);
+    }
 
     servatrice->clientsLock.lockForRead();
     QList<QString> moderatorList = server->getOnlineModeratorList();
@@ -1952,15 +1962,14 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
     if (userName.isEmpty() && address.isEmpty() && (!clientId.isEmpty())) {
         QSqlQuery *clientIdQuery =
             sqlInterface->prepareQuery("select name from {prefix}_users where clientid = :client_id");
-        clientIdQuery->bindValue(":client_id", nameFromStdString(cmd.clientid()));
-        sqlInterface->execSqlQuery(clientIdQuery);
+        clientIdQuery->bindValue(":client_id", clientId);
         if (!sqlInterface->execSqlQuery(clientIdQuery)) {
             qCWarning(AbstractServerSocketInterfaceLog) << "ClientID username ban lookup failed: SQL Error";
         } else {
             while (clientIdQuery->next()) {
-                userName = clientIdQuery->value(0).toString();
+                const QString matchedUserName = clientIdQuery->value(0).toString();
                 AbstractServerSocketInterface *user =
-                    static_cast<AbstractServerSocketInterface *>(server->getUsers().value(userName));
+                    static_cast<AbstractServerSocketInterface *>(server->getUsers().value(matchedUserName));
                 if (user && !userList.contains(user)) {
                     userList.append(user);
                 }
@@ -1976,7 +1985,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
             event.set_reason_str(visibleReason.toStdString());
         }
         if (minutes) {
-            event.set_end_time(QDateTime::currentDateTime().addSecs(60 * minutes).toSecsSinceEpoch());
+            event.set_end_time(QDateTime::currentDateTime().addSecs(qint64(minutes) * 60).toSecsSinceEpoch());
         }
         for (int i = 0; i < userList.size(); ++i) {
             SessionEvent *se = userList[i]->prepareSessionEvent(event);
@@ -2304,20 +2313,28 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportUserInfo(const Co
     }
 
     QSqlQuery *reportCountQuery =
-        sqlInterface->prepareQuery("SELECT COUNT(*) FROM {prefix}_reports WHERE reported_user_name = :name");
-    reportCountQuery->bindValue(":name", userName);
+        sqlInterface->prepareQuery("SELECT COUNT(*) FROM {prefix}_reports r WHERE "
+                                    "r.reported_user_id = (SELECT id FROM {prefix}_users WHERE name = :account_name) "
+                                    "OR (r.reported_user_id IS NULL AND r.reported_user_name = :guest_name)");
+    reportCountQuery->bindValue(":account_name", userName);
+    reportCountQuery->bindValue(":guest_name", userName);
     if (sqlInterface->execSqlQuery(reportCountQuery) && reportCountQuery->next()) {
         re->set_total_reports(reportCountQuery->value(0).toInt());
     }
 
-    QSqlQuery *banCountQuery = sqlInterface->prepareQuery("SELECT COUNT(*) FROM {prefix}_bans WHERE user_name = :name");
-    banCountQuery->bindValue(":name", userName);
+    QSqlQuery *banCountQuery =
+        sqlInterface->prepareQuery("SELECT COUNT(*) FROM {prefix}_bans b WHERE "
+                                    "b.user_id = (SELECT id FROM {prefix}_users WHERE name = :account_name) "
+                                    "OR (b.user_id IS NULL AND b.user_name = :guest_name)");
+    banCountQuery->bindValue(":account_name", userName);
+    banCountQuery->bindValue(":guest_name", userName);
     if (sqlInterface->execSqlQuery(banCountQuery) && banCountQuery->next()) {
         re->set_total_bans(banCountQuery->value(0).toInt());
     }
 
     QSqlQuery *warnCountQuery =
-        sqlInterface->prepareQuery("SELECT COUNT(*) FROM {prefix}_warnings WHERE user_name = :name");
+        sqlInterface->prepareQuery("SELECT COUNT(*) FROM {prefix}_warnings WHERE "
+                                    "user_id = (SELECT id FROM {prefix}_users WHERE name = :name)");
     warnCountQuery->bindValue(":name", userName);
     if (sqlInterface->execSqlQuery(warnCountQuery) && warnCountQuery->next()) {
         re->set_total_warns(warnCountQuery->value(0).toInt());
@@ -2338,9 +2355,12 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportUserInfo(const Co
                                    "r.resolution_note, ru.name AS assigned_mod_name "
                                    "FROM {prefix}_reports r "
                                    "LEFT JOIN {prefix}_users ru ON r.assigned_to = ru.id "
-                                   "WHERE r.reported_user_name = :name "
+                                   "WHERE r.reported_user_id = "
+                                   "(SELECT id FROM {prefix}_users WHERE name = :account_name) "
+                                   "OR (r.reported_user_id IS NULL AND r.reported_user_name = :guest_name) "
                                    "ORDER BY r.created_at DESC LIMIT 10");
-    recentQuery->bindValue(":name", userName);
+    recentQuery->bindValue(":account_name", userName);
+    recentQuery->bindValue(":guest_name", userName);
 
     if (sqlInterface->execSqlQuery(recentQuery)) {
         while (recentQuery->next()) {

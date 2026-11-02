@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   PRIMARY KEY  (`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
-INSERT INTO cockatrice_schema_version VALUES(40);
+INSERT INTO cockatrice_schema_version VALUES(41);
 
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
@@ -264,6 +264,11 @@ CREATE TABLE IF NOT EXISTS `cockatrice_sessions` (
 
 -- server moderation
 CREATE TABLE IF NOT EXISTS `cockatrice_bans` (
+ `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+ -- Registered accounts retain their bans after a rename. Keep user_name as
+ -- the original moderation record and as the key for unregistered names.
+ -- No foreign key: deleting an account must not turn its bans into name bans.
+ `user_id` int(7) unsigned NULL,
  `user_name` varchar(35) NOT NULL,
  `ip_address` varchar(45) NOT NULL,
  `id_admin` int(7) unsigned zerofill NOT NULL,
@@ -272,7 +277,9 @@ CREATE TABLE IF NOT EXISTS `cockatrice_bans` (
  `reason` text NOT NULL,
  `visible_reason` text NOT NULL,
  `clientid` varchar(15) NOT NULL,
-  PRIMARY KEY (`user_name`,`time_from`),
+  PRIMARY KEY (`id`),
+  KEY `user_name_time_from` (`user_name`,`time_from`),
+  KEY `user_id_time_from` (`user_id`,`time_from`),
   KEY `time_from` (`time_from`,`ip_address`),
   KEY `ip_address` (`ip_address`),
   INDEX `idx_user_name` (`user_name`),

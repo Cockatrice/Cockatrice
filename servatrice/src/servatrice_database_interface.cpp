@@ -592,16 +592,12 @@ bool Servatrice_DatabaseInterface::checkUserIsIdBanned(const QString &clientId,
                      " b.minutes <=> 0,"
                      " b.visible_reason"
                      " from {prefix}_bans b"
-                     " where"
-                     " b.time_from = (select max(c.time_from)"
-                     " from {prefix}_bans c"
-                     " where c.clientid = :id)"
-                     " and b.clientid = :id2");
+                     " where b.clientid = :id"
+                     " order by b.time_from desc, b.id desc limit 1");
 
     idBanQuery->bindValue(":id", clientId);
-    idBanQuery->bindValue(":id2", clientId);
     if (!execSqlQuery(idBanQuery)) {
-        qCWarning(DatabaseInterfaceLog) << "Id ban check failed: SQL error." << idBanQuery->lastError();
+        qCWarning(DatabaseInterfaceLog) << "Id ban check failed: SQL error.";
         return false;
     }
 
@@ -622,14 +618,18 @@ bool Servatrice_DatabaseInterface::checkUserIsNameBanned(const QString &userName
                                                          QString &banReason,
                                                          int &banSecondsRemaining)
 {
+    // A registered ban follows the account, even when its original name is
+    // reused. Unregistered names keep the existing name-based behavior.
     QSqlQuery *nameBanQuery =
         prepareQuery("select timestampdiff(second, now(), date_add(b.time_from, interval b.minutes minute)), b.minutes "
-                     "<=> 0, b.visible_reason from {prefix}_bans b where b.time_from = (select max(c.time_from) from "
-                     "{prefix}_bans c where c.user_name = :name2) and b.user_name = :name1");
-    nameBanQuery->bindValue(":name1", userName);
-    nameBanQuery->bindValue(":name2", userName);
+                     "<=> 0, b.visible_reason from {prefix}_bans b where "
+                     "b.user_id = (select id from {prefix}_users where name = :account_name) "
+                     "or (b.user_id is null and b.user_name = :guest_name) "
+                     "order by b.time_from desc, b.id desc limit 1");
+    nameBanQuery->bindValue(":account_name", userName);
+    nameBanQuery->bindValue(":guest_name", userName);
     if (!execSqlQuery(nameBanQuery)) {
-        qCWarning(DatabaseInterfaceLog) << "Name ban check failed: SQL error" << nameBanQuery->lastError();
+        qCWarning(DatabaseInterfaceLog) << "Name ban check failed: SQL error";
         return false;
     }
 
@@ -656,16 +656,12 @@ bool Servatrice_DatabaseInterface::checkUserIsIpBanned(const QString &ipAddress,
                      " b.minutes <=> 0,"
                      " b.visible_reason"
                      " from {prefix}_bans b"
-                     " where"
-                     " b.time_from = (select max(c.time_from)"
-                     " from {prefix}_bans c"
-                     " where c.ip_address = :address)"
-                     " and b.ip_address = :address2");
+                     " where b.ip_address = :address"
+                     " order by b.time_from desc, b.id desc limit 1");
 
     ipBanQuery->bindValue(":address", ipAddress);
-    ipBanQuery->bindValue(":address2", ipAddress);
     if (!execSqlQuery(ipBanQuery)) {
-        qCWarning(DatabaseInterfaceLog) << "IP ban check failed: SQL error." << ipBanQuery->lastError();
+        qCWarning(DatabaseInterfaceLog) << "IP ban check failed: SQL error.";
         return false;
     }
 
@@ -1802,8 +1798,11 @@ QList<ServerInfo_Ban> Servatrice_DatabaseInterface::getUserBanHistory(const QStr
 
     QSqlQuery *query =
         prepareQuery("SELECT A.id_admin, A.time_from, A.minutes, A.reason, A.visible_reason, B.name AS name_admin FROM "
-                     "{prefix}_bans A LEFT JOIN {prefix}_users B ON A.id_admin=B.id WHERE A.user_name = :user_name");
-    query->bindValue(":user_name", userName);
+                     "{prefix}_bans A LEFT JOIN {prefix}_users B ON A.id_admin=B.id WHERE "
+                     "A.user_id = (SELECT id FROM {prefix}_users WHERE name = :account_name) "
+                     "OR (A.user_id IS NULL AND A.user_name = :guest_name) ORDER BY A.time_from DESC, A.id DESC");
+    query->bindValue(":account_name", userName);
+    query->bindValue(":guest_name", userName);
 
     if (!execSqlQuery(query)) {
         qCWarning(DatabaseInterfaceLog) << "Failed to collect ban history information: SQL Error";
@@ -1935,7 +1934,8 @@ QList<ServerInfo_UserAlt> Servatrice_DatabaseInterface::getUserAlts(const QStrin
     QString queryString = "SELECT u.name, u.email, u.clientid, UNIX_TIMESTAMP(u.registrationDate), "
                           "UNIX_TIMESTAMP(a.last_login), "
                           "(SELECT COUNT(*) FROM {prefix}_warnings w WHERE w.user_id = u.id), "
-                          "(SELECT COUNT(*) FROM {prefix}_bans b WHERE b.user_name = u.name), "
+                          "(SELECT COUNT(*) FROM {prefix}_bans b WHERE b.user_id = u.id "
+                          "OR (b.user_id IS NULL AND b.user_name = u.name)), "
                           "u.active "
                           "FROM {prefix}_users u "
                           "LEFT JOIN {prefix}_user_analytics a ON a.id = u.id "
