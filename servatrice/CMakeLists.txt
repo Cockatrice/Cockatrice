@@ -2,7 +2,7 @@
 #
 # provides the servatrice binary
 
-project(Servatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
+project(ContinuumServatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 set(servatrice_SOURCES
     src/email_parser.cpp
@@ -49,11 +49,7 @@ if(CMAKE_HOST_SYSTEM MATCHES "FreeBSD")
 endif()
 
 if(APPLE)
-  set(MACOSX_BUNDLE_ICON_FILE appicon.icns)
-  set_source_files_properties(
-    ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources
-  )
-  set(servatrice_SOURCES ${servatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
+  # Headless server: no inherited Cockatrice .icns bundle branding. 
 endif(APPLE)
 
 qt_add_resources(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
@@ -84,7 +80,7 @@ if(${MYSQL_CLIENT_LIBRARIES} MATCHES "NOTFOUND")
       FALSE
       CACHE INTERNAL ""
   )
-  message(STATUS "MySQL connector NOT FOUND: Servatrice won't be able to connect to a MySQL server")
+  message(STATUS "MySQL connector NOT FOUND: Continuum-Servatrice won't be able to connect to a MySQL server")
   unset(MYSQL_CLIENT_LIBRARIES)
 else()
   set(MYSQLCLIENT_FOUND
@@ -106,20 +102,20 @@ set(DESKTOPDIR
 )
 
 # Build servatrice binary and link it
-add_executable(servatrice MACOSX_BUNDLE ${servatrice_MOC_SRCS} ${servatrice_RESOURCES_RCC} ${servatrice_SOURCES})
-# Preserve the inherited internal target while exporting a distinct server executable.
-set_target_properties(servatrice PROPERTIES OUTPUT_NAME "continuumatrice-server")
+add_executable(continuum-servatrice MACOSX_BUNDLE ${servatrice_MOC_SRCS} ${servatrice_RESOURCES_RCC} ${servatrice_SOURCES})
+# Internally keep the original source tree and Source/Protocol type names.
+# This target produces only the native Continuum-Servatrice executable.
 
-target_precompile_headers(servatrice PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtcore_pch.h")
+target_precompile_headers(continuum-servatrice PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtcore_pch.h")
 
 if(CMAKE_HOST_SYSTEM MATCHES "FreeBSD")
   target_link_libraries(
-    servatrice libcockatrice_deck_list libcockatrice_network_server_remote Threads::Threads ${SERVATRICE_QT_MODULES}
+    continuum-servatrice libcockatrice_deck_list libcockatrice_network_server_remote Threads::Threads ${SERVATRICE_QT_MODULES}
     ${LIBEXECINFO_LIBRARY}
   )
 else()
   target_link_libraries(
-    servatrice libcockatrice_deck_list libcockatrice_network_server_remote Threads::Threads ${SERVATRICE_QT_MODULES}
+    continuum-servatrice libcockatrice_deck_list libcockatrice_network_server_remote Threads::Threads ${SERVATRICE_QT_MODULES}
   )
 endif()
 
@@ -127,34 +123,34 @@ endif()
 if(UNIX)
   if(APPLE)
     set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME}")
-    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.continuum-universes.continuumatrice-server")
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.continuum-universes.continuum-servatrice")
     set(MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_NAME}-${PROJECT_VERSION}")
     set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
     set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
     set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
 
-    install(TARGETS servatrice BUNDLE DESTINATION ./)
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.ini.example DESTINATION ./servatrice.app/Contents/Resources/)
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.sql DESTINATION ./servatrice.app/Contents/Resources/)
+    install(TARGETS continuum-servatrice BUNDLE DESTINATION ./)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/continuum-servatrice.ini.example DESTINATION ./continuum-servatrice.app/Contents/Resources/)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/continuum-servatrice.sql DESTINATION ./continuum-servatrice.app/Contents/Resources/)
   else()
     # Assume linux
-    install(TARGETS servatrice RUNTIME DESTINATION bin/)
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.ini.example DESTINATION share/continuumatrice-server/ RENAME continuumatrice-server.ini.example)
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.sql DESTINATION share/continuumatrice-server/)
+    install(TARGETS continuum-servatrice RUNTIME DESTINATION bin/)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/continuum-servatrice.ini.example DESTINATION share/continuum-servatrice/ )
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/continuum-servatrice.sql DESTINATION share/continuum-servatrice/)
 
     # No upstream Servatrice desktop/icon registration; it would collide with
     # a separate MTG server installation. The server is managed via CLI.
   endif()
 elseif(WIN32)
-  install(TARGETS servatrice RUNTIME DESTINATION ./)
+  install(TARGETS continuum-servatrice RUNTIME DESTINATION ./)
   install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.ini.example DESTINATION ./)
   install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.sql DESTINATION ./)
 endif()
 
 if(APPLE)
   # these needs to be relative to CMAKE_INSTALL_PREFIX
-  set(plugin_dest_dir servatrice.app/Contents/Plugins)
-  set(qtconf_dest_dir servatrice.app/Contents/Resources)
+  set(plugin_dest_dir continuum-servatrice.app/Contents/Plugins)
+  set(qtconf_dest_dir continuum-servatrice.app/Contents/Resources)
 
   # Qt plugins: platforms, sqldrivers/mysql, tls (Qt6)
   install(
@@ -184,7 +180,7 @@ Translations = Resources/translations\")
         \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dylib\")
     set(BU_CHMOD_BUNDLE_ITEMS ON)
     include(BundleUtilities)
-    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/servatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR};${MYSQLCLIENT_LIBRARY_DIR}\")
+    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/continuum-servatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR};${MYSQLCLIENT_LIBRARY_DIR}\")
     "
     COMPONENT Runtime
   )
@@ -196,7 +192,7 @@ if(WIN32)
   set(qtconf_dest_dir .)
 
   install(
-    DIRECTORY "$<TARGET_FILE_DIR:servatrice>/"
+    DIRECTORY "$<TARGET_FILE_DIR:continuum-servatrice>/"
     DESTINATION ./
     FILES_MATCHING
     PATTERN "*.dll"
@@ -244,8 +240,11 @@ Translations = Resources/translations\")
         \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dll\")
     set(BU_CHMOD_BUNDLE_ITEMS ON)
     include(BundleUtilities)
-    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/Servatrice.exe\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR};${MYSQLCLIENT_LIBRARY_DIR}\")
+    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/continuum-servatrice.exe\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR};${MYSQLCLIENT_LIBRARY_DIR}\")
     "
     COMPONENT Runtime
   )
 endif()
+
+# Compatibility build target for existing CI commands. No 'servatrice' executable is emitted.
+add_custom_target(servatrice DEPENDS continuum-servatrice)
