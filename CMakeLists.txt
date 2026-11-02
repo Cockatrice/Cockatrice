@@ -15,11 +15,11 @@ option(WARNING_AS_ERROR "Treat warnings as errors in debug builds" ON)
 # Check for translation updates
 option(UPDATE_TRANSLATIONS "Update translations on compile" OFF)
 # Compile Cockatrice
-option(WITH_CLIENT "Build Cockatrice client" ON)
+option(WITH_CLIENT "Build Continuumatrice client" ON)
 # Compile Oracle
-option(WITH_ORACLE "Build Cockatrice card database tool (Oracle)" ON)
+option(WITH_ORACLE "Build legacy upstream Magic-card Oracle importer (not Continuumatrice data)" OFF)
 # Compile Servatrice
-option(WITH_SERVER "Build Cockatrice server (Servatrice)" OFF)
+option(WITH_SERVER "Build Continuumatrice-compatible server" OFF)
 # Compile tests
 option(TEST "Build tests" OFF)
 # Build with AddressSanitizer and UndefinedBehaviorSanitizer
@@ -446,7 +446,7 @@ endif()
 
 if(WITH_CLIENT)
   add_subdirectory(cockatrice)
-  set(CPACK_INSTALL_CMAKE_PROJECTS "Cockatrice;Cockatrice;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
+  set(CPACK_INSTALL_CMAKE_PROJECTS "Continuumatrice;Continuumatrice;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
 endif()
 
 if(WIN32 AND WITH_CLIENT)
