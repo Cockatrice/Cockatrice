@@ -1,11 +1,16 @@
 #include "pile_zone.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "../../interface/theme_manager.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
 #include "../card_dimensions.h"
 
 #include <QApplication>
+#include <QColor>
+#include <QFont>
+#include <QPixmap>
+#include <QString>
 #include <QCursor>
 #include <QGraphicsItem>
 #include <QGraphicsSceneMouseEvent>
@@ -28,11 +33,18 @@
 #include <qnamespace.h>
 #include <string>
 
-PileZone::PileZone(PileZoneLogic *_logic, QGraphicsItem *parent) : CardZone(_logic, parent)
+PileZone::PileZone(PileZoneLogic *_logic, QGraphicsItem *parent,
+                   const QString &displayName, const QString &iconAsset)
+    : CardZone(_logic, parent), customDisplayName(displayName), customIconAsset(iconAsset)
 {
     setCacheMode(DeviceCoordinateCache); // Do not move this line to the parent constructor!
     setAcceptHoverEvents(true);
     setCursor(Qt::OpenHandCursor);
+
+    if (!customIconAsset.isEmpty()) {
+        connect(themeManager, &ThemeManager::themeChanged, this, &PileZone::reloadCustomIcon);
+        reloadCustomIcon();
+    }
 
     setTransform(QTransform()
                      .translate(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F)
@@ -46,6 +58,18 @@ PileZone::PileZone(PileZoneLogic *_logic, QGraphicsItem *parent) : CardZone(_log
                 prepareGeometryChange();
                 update();
             });
+}
+
+void PileZone::reloadCustomIcon()
+{
+    // Try the active theme's piles/<name> asset first, then the bundled SVG.
+    const QString path = QStringLiteral("piles/") + customIconAsset;
+    customIconPixmap = QPixmap(QStringLiteral("theme:") + themeManager->assetPath(path));
+    if (customIconPixmap.isNull()) {
+        customIconPixmap =
+            QPixmap(QStringLiteral(":/resources/piles/") + customIconAsset + QStringLiteral(".svg"));
+    }
+    update();
 }
 
 QRectF PileZone::boundingRect() const
@@ -74,6 +98,28 @@ void PileZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
     painter->rotate(-90);
     painter->translate(-CardDimensions::WIDTH_HALF_F, -CardDimensions::HEIGHT_HALF_F);
     paintNumberEllipse(cardItems().size(), 28, Qt::white, -1, -1, painter);
+
+    if (!customDisplayName.isEmpty()) {
+        painter->save();
+        // Undo the pile's 90-degree scene rotation to make the badge readable.
+        painter->translate(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F);
+        painter->rotate(-90);
+        painter->translate(-CardDimensions::HEIGHT_HALF_F, -CardDimensions::WIDTH_HALF_F);
+
+        const qreal labelWidth = CardDimensions::HEIGHT_F;
+        painter->fillRect(QRectF(2, 2, labelWidth - 4, 29), QColor(16, 18, 28, 220));
+        if (!customIconPixmap.isNull()) {
+            painter->drawPixmap(QRect(7, 6, 21, 21), customIconPixmap);
+        }
+        QFont font = painter->font();
+        font.setPixelSize(12);
+        font.setBold(true);
+        painter->setFont(font);
+        painter->setPen(Qt::white);
+        painter->drawText(QRectF(31, 3, labelWidth - 34, 26), Qt::AlignLeft | Qt::AlignVCenter,
+                          customDisplayName.toUpper());
+        painter->restore();
+    }
 }
 
 void PileZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZoneLogic *startZone, const QPoint &)
