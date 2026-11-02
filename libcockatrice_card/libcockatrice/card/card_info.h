@@ -466,6 +466,11 @@ public:
     /** @name Legacy/Convenience Property Accessors */ //@{
     [[nodiscard]] QString getCardType() const;
     void setCardType(const QString &value);
+    // Native Continuumatrice card properties; older MTG getter names below
+    // remain compatibility wrappers used by the inherited model/analytics API.
+    [[nodiscard]] QString getEssenceCost() const;
+    [[nodiscard]] QString getEssenceTypes() const;
+    [[nodiscard]] QString getEssenceValue() const;
     [[nodiscard]] QString getCmc() const;
     [[nodiscard]] QString getColors() const;
     void setColors(const QString &value);
