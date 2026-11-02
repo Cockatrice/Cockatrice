@@ -43,7 +43,7 @@ private:
     AbstractClient *client;
     bool fullAdmin;
     QPushButton *updateServerMessageButton, *shutdownServerButton, *reloadConfigButton, *grantReplayAccessButton,
-        *activateUserButton;
+        *activateUserButton, *announceButton;
     QGroupBox *adminGroupBox, *moderatorGroupBox;
     QPushButton *unlockButton, *lockButton;
     QLineEdit *replayIdToGrant, *userToActivate;
@@ -51,6 +51,7 @@ signals:
     void adminLockChanged(bool lock);
 private slots:
     void actUpdateServerMessage();
+    void actAnnounce();
     void actShutdownServer();
     void actReloadConfig();
     void actGrantReplayAccess();

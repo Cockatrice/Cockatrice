@@ -6,6 +6,7 @@ message AdminCommand {
         RELOAD_CONFIG = 1002;
         ADJUST_MOD = 1003;
         RESET_USER_PASSWORD = 1016;
+        ANNOUNCE = 1017;
     }
     extensions 100 to max;
 }
@@ -45,4 +46,12 @@ message Command_ResetUserPassword {
         optional Command_ResetUserPassword ext = 1016;
     }
     optional string user_name = 1;
+}
+
+// A one-off server announcement, not a change to the persistent login message.
+message Command_Announce {
+    extend AdminCommand {
+        optional Command_Announce ext = 1017;
+    }
+    optional string message = 1;
 }

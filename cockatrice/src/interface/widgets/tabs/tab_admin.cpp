@@ -5,10 +5,12 @@
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QGroupBox>
+#include <QInputDialog>
 #include <QIntValidator>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QPointer>
 #include <QPushButton>
 #include <QSpinBox>
 #include <QVBoxLayout>
@@ -70,6 +72,8 @@ TabAdmin::TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool 
 {
     updateServerMessageButton = new QPushButton;
     connect(updateServerMessageButton, &QPushButton::clicked, this, &TabAdmin::actUpdateServerMessage);
+    announceButton = new QPushButton;
+    connect(announceButton, &QPushButton::clicked, this, &TabAdmin::actAnnounce);
     shutdownServerButton = new QPushButton;
     connect(shutdownServerButton, &QPushButton::clicked, this, &TabAdmin::actShutdownServer);
     reloadConfigButton = new QPushButton;
@@ -100,6 +104,7 @@ TabAdmin::TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool 
 
     auto *adminVBox = new QVBoxLayout;
     adminVBox->addWidget(updateServerMessageButton);
+    adminVBox->addWidget(announceButton);
     adminVBox->addWidget(shutdownServerButton);
     adminVBox->addWidget(reloadConfigButton);
 
@@ -140,6 +145,7 @@ TabAdmin::TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool 
 void TabAdmin::retranslateUi()
 {
     updateServerMessageButton->setText(tr("Update server &message"));
+    announceButton->setText(tr("Send &announcement"));
     shutdownServerButton->setText(tr("&Shut down server"));
     reloadConfigButton->setText(tr("&Reload configuration"));
     adminGroupBox->setTitle(tr("Server administration functions"));
@@ -158,6 +164,49 @@ void TabAdmin::retranslateUi()
 void TabAdmin::actUpdateServerMessage()
 {
     client->sendCommand(client->prepareAdminCommand(Command_UpdateServerMessage()));
+}
+
+void TabAdmin::actAnnounce()
+{
+    auto *dialog = new QInputDialog(this);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->setWindowTitle(tr("Server announcement"));
+    dialog->setLabelText(tr("Message to users connected to this server instance:"));
+    dialog->setInputMode(QInputDialog::TextInput);
+    QPointer<AbstractClient> clientGuard(client);
+    connect(dialog, &QInputDialog::textValueSelected, this, [this, clientGuard](const QString &text) {
+        if (!clientGuard) {
+            return;
+        }
+        const QString message = text.simplified();
+        if (message.isEmpty() || message.toUtf8().size() > MAX_TEXT_LENGTH) {
+            auto *box =
+                new QMessageBox(QMessageBox::Warning, tr("Invalid announcement"),
+                                tr("Enter a nonempty message no longer than %1 UTF-8 bytes.").arg(MAX_TEXT_LENGTH),
+                                QMessageBox::Ok, this);
+            box->setAttribute(Qt::WA_DeleteOnClose);
+            box->open();
+            return;
+        }
+
+        Command_Announce cmd;
+        cmd.set_message(message.toStdString());
+        auto *pending = clientGuard->prepareAdminCommand(cmd);
+        connect(pending, &PendingCommand::finished, this, [this](const Response &response) {
+            const bool accepted = response.response_code() == Response::RespOk;
+            const QString title = accepted ? tr("Announcement") : tr("Announcement not sent");
+            const QString text = accepted ? tr("The server accepted the announcement.")
+                                          : tr("The server did not accept the announcement (response %1). "
+                                               "It may not support announcements or your account may lack permission.")
+                                                .arg(response.response_code());
+            auto *box = new QMessageBox(accepted ? QMessageBox::Information : QMessageBox::Warning, title, text,
+                                        QMessageBox::Ok, this);
+            box->setAttribute(Qt::WA_DeleteOnClose);
+            box->open();
+        });
+        clientGuard->sendCommand(pending);
+    });
+    dialog->open();
 }
 
 void TabAdmin::actShutdownServer()

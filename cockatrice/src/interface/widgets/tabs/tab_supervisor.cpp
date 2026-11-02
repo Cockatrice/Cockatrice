@@ -1540,9 +1540,8 @@ void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
                 msgBox.setWindowFlags(Qt::Dialog);
                 msgBox.setIcon(QMessageBox::Information);
                 msgBox.setWindowTitle(QString::fromStdString(event.custom_title()).simplified());
-                msgBox.setText(tr("You have received the following message from the server.\n(custom messages like "
-                                  "these could be untranslated)"));
-                msgBox.setDetailedText(QString::fromStdString(event.custom_content()).simplified());
+                msgBox.setTextFormat(Qt::PlainText);
+                msgBox.setText(QString::fromStdString(event.custom_content()).simplified());
                 msgBox.setMinimumWidth(200);
                 msgBox.exec();
             }

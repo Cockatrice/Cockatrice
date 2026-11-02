@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "servatrice.h"
 
+#include "announcement_utils.h"
 #include "email_parser.h"
 #include "event_loop_watchdog.h"
 #include "isl_interface.h"
@@ -66,9 +67,11 @@
 #include <google/protobuf/stubs/port.h>
 #include <libcockatrice/protocol/featureset.h>
 #include <libcockatrice/protocol/pb/event_connection_closed.pb.h>
+#include <libcockatrice/protocol/pb/event_notify_user.pb.h>
 #include <libcockatrice/protocol/pb/event_server_message.pb.h>
 #include <libcockatrice/protocol/pb/event_server_shutdown.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_room_channel.pb.h>
+#include <memory>
 #include <new>
 #include <optional>
 #include <qlogging.h>
@@ -805,6 +808,16 @@ QList<AbstractServerSocketInterface *> Servatrice::getUsersWithAddressAsList(con
         }
     }
     return result;
+}
+
+void Servatrice::broadcastAnnouncement(const QString &message)
+{
+    const Event_NotifyUser event = makeServerAnnouncementEvent(message);
+    const auto sessionEvent = std::unique_ptr<SessionEvent>(Server_ProtocolHandler::prepareSessionEvent(event));
+    QReadLocker locker(&clientsLock);
+    for (auto *user : users) {
+        user->sendProtocolItem(*sessionEvent);
+    }
 }
 
 void Servatrice::updateLoginMessage()

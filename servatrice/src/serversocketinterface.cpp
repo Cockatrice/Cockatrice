@@ -20,6 +20,7 @@
 
 #include "serversocketinterface.h"
 
+#include "announcement_utils.h"
 #include "deck_tag_serialization.h"
 #include "email_parser.h"
 #include "forwarded_address.h"
@@ -503,6 +504,8 @@ AbstractServerSocketInterface::processExtendedAdminCommand(int cmdType, const Ad
             return cmdShutdownServer(cmd.GetExtension(Command_ShutdownServer::ext), rc);
         case AdminCommand::UPDATE_SERVER_MESSAGE:
             return cmdUpdateServerMessage(cmd.GetExtension(Command_UpdateServerMessage::ext), rc);
+        case AdminCommand::ANNOUNCE:
+            return cmdAnnounce(cmd.GetExtension(Command_Announce::ext), rc);
         case AdminCommand::RELOAD_CONFIG:
             return cmdReloadConfig(cmd.GetExtension(Command_ReloadConfig::ext), rc);
         case AdminCommand::ADJUST_MOD:
@@ -4182,6 +4185,18 @@ AbstractServerSocketInterface::cmdUpdateServerMessage(const Command_UpdateServer
 {
     QMetaObject::invokeMethod(server, "updateLoginMessage");
     return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdAnnounce(const Command_Announce &cmd,
+                                                                  ResponseContainer & /*rc*/)
+{
+    QString message;
+    if (!cmd.has_message() || !normalizeServerAnnouncement(cmd.message(), message)) {
+        return Response::RespInvalidData;
+    }
+    return QMetaObject::invokeMethod(server, "broadcastAnnouncement", Q_ARG(QString, message))
+               ? Response::RespOk
+               : Response::RespContextError;
 }
 
 Response::ResponseCode AbstractServerSocketInterface::cmdShutdownServer(const Command_ShutdownServer &cmd,

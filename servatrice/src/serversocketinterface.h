@@ -64,6 +64,7 @@ class Command_ReplayGetCode;
 class Command_ReplaySubmitCode;
 class Command_BanFromServer;
 class Command_UpdateServerMessage;
+class Command_Announce;
 class Command_ShutdownServer;
 class Command_ReloadConfig;
 class Command_ReplayDownloadByGameId;
@@ -185,6 +186,7 @@ private:
     Response::ResponseCode cmdGetWarnHistory(const Command_GetWarnHistory &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdShutdownServer(const Command_ShutdownServer &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdUpdateServerMessage(const Command_UpdateServerMessage &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdAnnounce(const Command_Announce &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReportAssign(const Command_ReportAssign &cmd, ResponseContainer &);
     Response::ResponseCode cmdReportResolve(const Command_ReportResolve &cmd, ResponseContainer &);
     Response::ResponseCode cmdReportReopen(const Command_ReportReopen &cmd, ResponseContainer &);

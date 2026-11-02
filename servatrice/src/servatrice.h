@@ -243,6 +243,7 @@ private:
 public slots:
     void scheduleShutdown(const QString &reason, int minutes);
     void updateLoginMessage();
+    void broadcastAnnouncement(const QString &message);
     void setRequiredFeatures(const QString &featureList);
     void onEmailDelivered(const QString &userName, EmailType type, const QString &token, qint64 rowId);
     void onEmailPermanentlyFailed(const QString &userName,
