@@ -18,6 +18,8 @@ The top section of the VisualDatabaseDisplay can be used to filter cards based o
 
 When the VisualDatabaseDisplay is opened as part of the visual deck editor, clicking on cards adds or removes them to and from your deck.
 
-Left-clicking on a card will add that card to the main board of your deck, while right-clicking will remove that printing of the card if it exists on the main board. When clicking cards, modifier keys can be used to add (or remove) the card to zones other than the main board. Holding a Ctrl key on Windows and Linux or a Command key on MacOS adds/removes cards to the sideboard, while the Shift keys add/remove cards to the maybeboard.
+In the picture view, left-clicking on a card will add that card to the main board of your deck, while right-clicking will remove that printing of the card from the main board, if it exists. When clicking cards, modifier keys can be used to add (or remove) the card to zones other than the main board. Holding a Ctrl key on Windows and Linux or a Command key on MacOS adds/removes cards to the sideboard, while the Shift keys add/remove cards to the maybeboard.
 
-Tokens are always added to the token zone, regardless of which modifier key is pressed.
+In the table view, double-clicking on a card adds that card to the main board of your deck, while right-click opens the card menu. Holding the Ctrl key on Windows and Linux or the Command key on MacOS when double-clicking adds the card to the sideboard instead.
+
+Tokens are always added to the token zone, regardless of which view is open or which modifier key is pressed.
