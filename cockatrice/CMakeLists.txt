@@ -490,7 +490,15 @@ if(APPLE)
   set(cockatrice_SOURCES ${cockatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 endif(APPLE)
 
-qt_add_resources(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
+# The fonts and card artwork produce a large C++ byte array with qt_add_resources.
+# Embed the data in the compiled resource object instead, keeping compiler memory
+# independent of that payload. Qt's two-pass resource build is unsupported on iOS.
+if(IOS)
+  qt_add_resources(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
+else()
+  qt_add_big_resources(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
+endif()
+set_source_files_properties(${cockatrice_RESOURCES} PROPERTIES SKIP_AUTORCC ON)
 
 # Declare path variables
 set(ICONDIR
@@ -516,6 +524,7 @@ qt_add_executable(
   WIN32
   MACOSX_BUNDLE
   ${cockatrice_SOURCES}
+  ${cockatrice_RESOURCES}
   ${cockatrice_RESOURCES_RCC}
   ${cockatrice_MOC_SRCS}
   MANUAL_FINALIZATION
