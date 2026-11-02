@@ -257,7 +257,7 @@ int main(int argc, char *argv[])
     // Declared before crash-reporter init: the startup attach below needs the log tail while the
     // file still holds the crashed session's lines.
     const QString persistentLogPath =
-        SettingsCache::instance().getSettingsPath() + QStringLiteral("logs/cockatrice.log");
+        SettingsCache::instance().getSettingsPath() + QStringLiteral("logs/continuumatrice.log");
     Logger::getInstance().setPersistentLogPath(persistentLogPath);
 
     // Crash reporting: init the SDK early so a crash anywhere below is captured into the
@@ -487,7 +487,7 @@ int main(int argc, char *argv[])
     }
     qCInfo(MainLog) << "MainWindow constructor finished";
 
-    ui.setWindowIcon(themePixmap(QStringLiteral("cockatrice")));
+    ui.setWindowIcon(themePixmap(QStringLiteral("continuumatrice")));
     // Base name of the desktop file installed next to the binary, without the ".desktop"
     // extension. Wayland reads the window icon from it, and xdg-desktop-portal looks up
     // org.freedesktop.host.portal.Registry by this app ID, so it has to match the file name
