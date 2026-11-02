@@ -90,7 +90,7 @@ endif()
 
 # A project name is needed for CPack
 # Version can be overriden by git tags, see cmake/getversion.cmake
-project("Cockatrice" VERSION 3.2.0)
+project("Continuumatrice" VERSION 3.2.0)
 
 # Set release name if not provided via env/cmake var
 if(NOT DEFINED GIT_TAG_RELEASENAME)
@@ -291,11 +291,11 @@ if(MSVC)
 endif()
 
 # Package builder
-set(CPACK_PACKAGE_CONTACT "Zach Halpern <zach@cockatrice.us>")
+set(CPACK_PACKAGE_CONTACT "Continuum Universes Studio")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_NAME}")
-set(CPACK_PACKAGE_VENDOR "Cockatrice Development Team")
+set(CPACK_PACKAGE_VENDOR "Continuum Universes Studio")
 set(CPACK_PACKAGE_DESCRIPTION
-    "Cockatrice is an open-source, multiplatform application for playing tabletop card games over a network. The program's server design prevents users from manipulating the game for unfair advantage. The client also provides a single-player mode, which allows users to brew while offline."
+    "Continuumatrice is the Continuum Universes card-game client, independently packaged from the upstream Cockatrice project. It supports local games and compatible multiplayer servers."
 )
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
@@ -318,10 +318,10 @@ if(UNIX)
     # linux
     if(CPACK_GENERATOR STREQUAL "RPM")
       set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
-      set(CPACK_RPM_MAIN_COMPONENT "cockatrice")
+      set(CPACK_RPM_MAIN_COMPONENT "continuumatrice")
       set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt6-qtimageformats, qt6-qtmultimedia, qt6-qtsvg, qt6-qttools")
       set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
-      set(CPACK_RPM_PACKAGE_URL "http://github.com/Cockatrice/Cockatrice")
+      set(CPACK_RPM_PACKAGE_URL "https://github.com/Continuum-Universes-Studio/Continuumatrice")
       # stop directories from making package conflicts
       set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
           /usr/share/applications
@@ -336,7 +336,7 @@ if(UNIX)
       set(CPACK_GENERATOR DEB)
       set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
       set(CPACK_DEBIAN_PACKAGE_SECTION "games")
-      set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/Cockatrice/Cockatrice")
+      set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/Continuum-Universes-Studio/Continuumatrice")
       set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6, libqt6svg6, qt6-image-formats-plugins, qt6-qpa-plugins")
       set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "libqt6sql6-mysql") # for connecting servatrice to a mysql db
     endif()
