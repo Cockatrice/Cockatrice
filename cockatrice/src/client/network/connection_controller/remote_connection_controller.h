@@ -6,6 +6,7 @@
 
 #include <QMessageBox>
 #include <QObject>
+#include <QPointer>
 #include <QString>
 #include <QtGlobal>
 #include <qtmetamacros.h>
@@ -13,6 +14,7 @@
 class RemoteClient;
 class ServerInfo_User;
 class DlgConnect;
+class DlgRegister;
 class Event_ConnectionClosed;
 class Event_ServerShutdown;
 class QThread;
@@ -97,6 +99,7 @@ private slots:
 private:
     void wireClientSignals();
     void updateWindowTitle();
+    void retireRegistration();
 
     /** Parse the server's pipe-delimited username-rule string into HTML. */
     static QString extractInvalidUsernameMessage(QString &in);
@@ -110,6 +113,10 @@ private:
 
     // Kept as a member so the forgot-password signal can be wired to it
     DlgConnect *dlgConnect{nullptr};
+
+    // Retained only for the current registration flow, including rejected attempts.
+    QPointer<DlgRegister> dlgRegister;
+    bool registrationPending{false};
 
     // Captured from the connect dialog when a connection is initiated
     QString pendingSaveName;

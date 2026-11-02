@@ -18,6 +18,7 @@
 #include <QPushButton>
 #include <QRadioButton>
 #include <QSharedPointer>
+#include <QSignalBlocker>
 #include <QStringList>
 #include <QStringLiteral>
 #include <QVBoxLayout>
@@ -412,7 +413,7 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
 
     connect(previousHostButton, &QRadioButton::toggled, this, &DlgRegister::previousHostSelected);
     connect(newHostButton, &QRadioButton::toggled, this, &DlgRegister::newHostSelected);
-    connect(previousHosts, &QComboBox::currentTextChanged, this, &DlgRegister::updateDisplayInfo);
+    connect(previousHosts, &QComboBox::textActivated, this, &DlgRegister::updateDisplayInfo);
 
     previousHostButton->setChecked(true);
 
@@ -423,9 +424,12 @@ DlgRegister::~DlgRegister() = default;
 
 void DlgRegister::downloadThePublicServers()
 {
+    if (downloadingServers) {
+        return;
+    }
+    downloadingServers = true;
     btnRefreshServers->setDisabled(true);
-    previousHosts->clear();
-    previousHosts->addItem(placeHolderText);
+    // Keep the current choice and form while the request is in flight.
     hps->downloadPublicServers();
 }
 
@@ -445,61 +449,70 @@ void DlgRegister::rebuildComboBoxList(int failure)
 {
     Q_UNUSED(failure);
 
+    const QString previousHostName = previousHosts->currentText().isEmpty()
+                                         ? SettingsCache::instance().servers().getPrevioushostName()
+                                         : previousHosts->currentText();
+    const QSignalBlocker blocker(previousHosts);
     previousHosts->clear();
 
     UserConnection_Information uci;
     savedHostList = uci.getServerInfo();
-
-    auto &servers = SettingsCache::instance().servers();
-    QString previousHostName = servers.getPrevioushostName();
-
+    int matchingDestination = -1;
     for (const auto &pair : savedHostList) {
-        const auto &tmp = pair.second;
-        QString saveName = tmp.getSaveName();
-        if (saveName.size()) {
-            previousHosts->addItem(saveName);
-            if (saveName.compare(previousHostName) == 0) {
-                previousHosts->setCurrentIndex(previousHosts->count() - 1);
+        const auto &server = pair.second;
+        if (!server.getSaveName().isEmpty()) {
+            previousHosts->addItem(server.getSaveName());
+            if (server.getServer() == hostEdit->text() && server.getPort() == portEdit->text()) {
+                matchingDestination = previousHosts->count() - 1;
             }
         }
     }
+    const int previousIndex = previousHosts->findText(previousHostName);
+    previousHosts->setCurrentIndex(previousIndex >= 0 ? previousIndex : matchingDestination);
+    downloadingServers = false;
+    previousHostButton->setEnabled(previousHosts->count() > 0);
 
-    btnRefreshServers->setDisabled(false);
+    // A removed or changed saved destination must not silently redirect a
+    // registration. Keep it as an editable custom destination instead.
+    if (previousHostButton->isChecked()) {
+        const auto selected = uci.getServerInfo(previousHosts->currentText());
+        if (selected.size() < 3 || selected.at(1) != hostEdit->text() || selected.at(2) != portEdit->text()) {
+            newHostButton->setChecked(true);
+        }
+    }
+    btnRefreshServers->setEnabled(true);
+    btnDeleteServer->setEnabled(previousHostButton->isChecked() && previousHosts->currentIndex() >= 0);
 }
 
 void DlgRegister::previousHostSelected(bool state)
 {
     if (state) {
-        previousHosts->setDisabled(false);
-        btnRefreshServers->setDisabled(false);
-        hostEdit->setDisabled(true);
-        portEdit->setDisabled(true);
+        previousHosts->setEnabled(true);
+        btnRefreshServers->setEnabled(!downloadingServers);
+        btnDeleteServer->setEnabled(previousHosts->currentIndex() >= 0);
+        hostEdit->setEnabled(false);
+        portEdit->setEnabled(false);
+        updateDisplayInfo(previousHosts->currentText());
     }
 }
 
 void DlgRegister::newHostSelected(bool state)
 {
     if (state) {
-        previousHosts->setDisabled(true);
-        btnRefreshServers->setDisabled(true);
-        hostEdit->setDisabled(false);
-        hostEdit->clear();
+        previousHosts->setEnabled(false);
+        btnRefreshServers->setEnabled(!downloadingServers);
+        btnDeleteServer->setEnabled(false);
+        hostEdit->setEnabled(true);
         hostEdit->setPlaceholderText(tr("Server URL"));
-        portEdit->setDisabled(false);
-        portEdit->clear();
+        portEdit->setEnabled(true);
         portEdit->setPlaceholderText(tr("Communication Port"));
-        playernameEdit->setDisabled(false);
-        playernameEdit->clear();
-    } else {
-        // Rebuild the list so the previously selected host's details are
-        // repopulated (mirrors DlgConnect::newHostSelected).
-        preRebuildComboBoxList();
+        playernameEdit->setEnabled(true);
     }
 }
 
 void DlgRegister::updateDisplayInfo(const QString &saveName)
 {
-    if (saveName.isEmpty() || saveName == placeHolderText) {
+    if (saveName.isEmpty()) {
         return;
     }
 
@@ -536,17 +549,25 @@ void DlgRegister::actOk()
     ServersSettings &servers = SettingsCache::instance().servers();
 
     if (newHostButton->isChecked()) {
-        // Persist the new host so it shows up in the Connect dialog later.
-        // The password is never stored: the account is not verified yet.
         const QString host = hostEdit->text().trimmed();
+        const QString port = portEdit->text().trimmed();
         if (!host.isEmpty()) {
-            servers.addNewServer(host, host, portEdit->text().trimmed(), playernameEdit->text().trimmed(), QString(),
-                                 false);
-            servers.setPrevioushostName(host);
+            const int existingIndex = servers.findServerIndex(host, port);
+            if (existingIndex >= 0) {
+                // Custom mode can retain a saved destination. Registration must
+                // not rename its profile or replace its existing account data.
+                servers.setPrevioushostName(
+                    servers.getValue(QString("saveName%1").arg(existingIndex), "server", "server_details").toString());
+            } else {
+                // Make a new destination available in Connect without saving
+                // credentials for an account that has not been verified yet.
+                servers.addNewServer(host, host, port, playernameEdit->text().trimmed(), QString(), false);
+                servers.setPrevioushostName(host);
+            }
         }
     } else {
         const QString saveName = previousHosts->currentText();
-        if (!saveName.isEmpty() && saveName != placeHolderText) {
+        if (!saveName.isEmpty()) {
             servers.setPrevioushostName(saveName);
         }
     }
@@ -557,5 +578,5 @@ void DlgRegister::actOk()
 void DlgRegister::actRemoveSavedServer()
 {
     SettingsCache::instance().servers().removeServer(hostEdit->text());
-    previousHosts->removeItem(previousHosts->currentIndex());
+    rebuildComboBoxList();
 }

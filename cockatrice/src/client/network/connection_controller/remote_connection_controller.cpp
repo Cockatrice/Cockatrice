@@ -43,6 +43,7 @@ ConnectionController::ConnectionController(QWidget *dialogParent, QObject *paren
 
 ConnectionController::~ConnectionController()
 {
+    delete dlgRegister.data();
     remoteClient->deleteLater();
     clientThread->wait();
 }
@@ -103,6 +104,7 @@ void ConnectionController::wireClientSignals()
 
 void ConnectionController::connectToServer()
 {
+    retireRegistration();
     dlgConnect = new DlgConnect(dialogParent);
     connect(dlgConnect, &DlgConnect::sigStartForgotPasswordRequest, this, &ConnectionController::forgotPasswordRequest);
 
@@ -130,6 +132,7 @@ void ConnectionController::connectToServerDirect(const QString &host,
                                                  const QString &saveName,
                                                  bool savePassword)
 {
+    retireRegistration();
     pendingSaveName = saveName;
     pendingSavePassword = savePassword;
     remoteClient->setStoredVerifier(storedVerifier);
@@ -138,15 +141,51 @@ void ConnectionController::connectToServerDirect(const QString &host,
 
 void ConnectionController::disconnectFromServer()
 {
+    retireRegistration();
     remoteClient->disconnectFromServer();
 }
 
 void ConnectionController::registerToServer()
 {
-    DlgRegister dlg(dialogParent);
-    if (dlg.exec()) {
-        remoteClient->registerToServer(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()), dlg.getPlayerName(),
-                                       dlg.getPassword(), dlg.getEmail(), dlg.getCountry(), dlg.getRealName());
+    if (registrationPending) {
+        return;
+    }
+
+    if (!dlgRegister) {
+        dlgRegister = new DlgRegister(dialogParent);
+        connect(dlgRegister, &QDialog::accepted, this, [this] {
+            if (!dlgRegister || registrationPending) {
+                return;
+            }
+            registrationPending = true;
+            // Registration starts a new account context. Its automatic login
+            // must not read or overwrite credentials from an earlier login.
+            pendingSaveName.clear();
+            pendingSavePassword = false;
+            remoteClient->setStoredVerifier(QString());
+            remoteClient->registerToServer(dlgRegister->getHost(), static_cast<unsigned int>(dlgRegister->getPort()),
+                                           dlgRegister->getPlayerName(), dlgRegister->getPassword(),
+                                           dlgRegister->getEmail(), dlgRegister->getCountry(), dlgRegister->getRealName());
+        });
+        connect(dlgRegister, &QDialog::rejected, this, &ConnectionController::retireRegistration);
+    }
+
+    // Keep the form alive after acceptance so a rejected registration can be
+    // corrected without reentering the password, email or other valid fields.
+    if (!dlgRegister->isVisible()) {
+        dlgRegister->open();
+    }
+    dlgRegister->raise();
+    dlgRegister->activateWindow();
+}
+
+void ConnectionController::retireRegistration()
+{
+    registrationPending = false;
+    if (dlgRegister) {
+        dlgRegister->hide();
+        dlgRegister->deleteLater();
+        dlgRegister.clear();
     }
 }
 
@@ -161,6 +200,10 @@ void ConnectionController::forgotPasswordRequest()
 
 void ConnectionController::onConnectionClosedEvent(const Event_ConnectionClosed &event)
 {
+    const bool registering = dlgRegister && registrationPending;
+    if (registering) {
+        registrationPending = false;
+    }
     remoteClient->disconnectFromServer();
 
     QString reasonStr;
@@ -204,6 +247,9 @@ void ConnectionController::onConnectionClosedEvent(const Event_ConnectionClosed 
 
     QMessageBox::critical(dialogParent, tr("Connection closed"),
                           tr("The server has terminated your connection.\nReason: %1").arg(reasonStr));
+    if (registering && dlgRegister) {
+        registerToServer();
+    }
 }
 
 void ConnectionController::onServerShutdownEvent(const Event_ServerShutdown &event)
@@ -380,6 +426,11 @@ void ConnectionController::onLoginError(int r,
 
 void ConnectionController::onRegisterError(int r, QString reasonStr, quint32 endTime)
 {
+    if (!dlgRegister || !registrationPending) {
+        return;
+    }
+    registrationPending = false;
+
     switch (static_cast<Response::ResponseCode>(r)) {
         case Response::RespRegistrationDisabled: {
             QMessageBox::critical(dialogParent, tr("Registration denied"),
@@ -452,7 +503,9 @@ void ConnectionController::onRegisterError(int r, QString reasonStr, quint32 end
         }
     }
 
-    registerToServer();
+    if (dlgRegister) {
+        registerToServer();
+    }
 }
 
 void ConnectionController::onActivateError()
@@ -464,18 +517,40 @@ void ConnectionController::onActivateError()
 
 void ConnectionController::onSocketError(const QString &errorStr)
 {
+    // Disconnecting can also produce a registerError. Handle only the first
+    // error while retaining the form, rather than replacing it with login.
+    if (dlgRegister && !registrationPending) {
+        return;
+    }
+    registrationPending = false;
     QMessageBox::critical(dialogParent, tr("Error"), tr("Socket error: %1").arg(errorStr));
-    connectToServer();
+    if (dlgRegister) {
+        registerToServer();
+    } else {
+        connectToServer();
+    }
 }
 
 void ConnectionController::onServerTimeout()
 {
+    if (dlgRegister && !registrationPending) {
+        return;
+    }
+    registrationPending = false;
     QMessageBox::critical(dialogParent, tr("Error"), tr("Server timeout"));
-    connectToServer();
+    if (dlgRegister) {
+        registerToServer();
+    } else {
+        connectToServer();
+    }
 }
 
 void ConnectionController::onProtocolVersionMismatch(int localVersion, int remoteVersion)
 {
+    const bool registering = dlgRegister && registrationPending;
+    if (registering) {
+        registrationPending = false;
+    }
     if (localVersion > remoteVersion) {
         QMessageBox::critical(dialogParent, tr("Error"),
                               tr("You are trying to connect to an obsolete server. Please downgrade your Cockatrice "
@@ -490,15 +565,26 @@ void ConnectionController::onProtocolVersionMismatch(int localVersion, int remot
                                   .arg(localVersion)
                                   .arg(remoteVersion));
     }
+    if (registering && dlgRegister) {
+        registerToServer();
+    }
 }
 
 void ConnectionController::onRegisterAccepted()
 {
+    if (!dlgRegister || !registrationPending) {
+        return;
+    }
+    retireRegistration();
     QMessageBox::information(dialogParent, tr("Success"), tr("Registration accepted.\nWill now login."));
 }
 
 void ConnectionController::onRegisterAcceptedNeedsActivate()
 {
+    if (!dlgRegister || !registrationPending) {
+        return;
+    }
+    retireRegistration();
     // Server will send activation email; nothing to display here.
 }
 

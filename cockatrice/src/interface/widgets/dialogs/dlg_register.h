@@ -71,6 +71,7 @@ private:
     QPushButton *btnDeleteServer;
     QPushButton *btnRefreshServers;
     HandlePublicServers *hps;
+    bool downloadingServers{false};
 
     QLabel *infoLabel, *hostLabel, *portLabel, *playernameLabel, *passwordLabel, *passwordConfirmationLabel,
         *emailLabel, *emailConfirmationLabel, *countryLabel, *realnameLabel;
@@ -79,7 +80,6 @@ private:
     QComboBox *countryEdit;
 
     QMap<QString, std::pair<QString, UserConnection_Information>> savedHostList;
-    const QString placeHolderText = tr("Downloading...");
 };
 
 #endif // DLG_REGISTER_H
