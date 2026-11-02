@@ -94,10 +94,12 @@ void PileZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
         cardItems().at(0)->paintPicture(painter, cardItems().at(0)->getTranslatedSize(painter), 90);
     }
 
+    painter->save();
     painter->translate(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F);
     painter->rotate(-90);
     painter->translate(-CardDimensions::WIDTH_HALF_F, -CardDimensions::HEIGHT_HALF_F);
     paintNumberEllipse(cardItems().size(), 28, Qt::white, -1, -1, painter);
+    painter->restore();
 
     if (!customDisplayName.isEmpty()) {
         painter->save();
