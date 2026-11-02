@@ -30,13 +30,13 @@
 #include <sys/types.h>
 #endif
 
-#define STABLERELEASE_URL "https://api.github.com/repos/Cockatrice/Cockatrice/releases/latest"
-#define STABLEMANUALDOWNLOAD_URL "https://github.com/Cockatrice/Cockatrice/releases/latest"
-#define STABLETAG_URL "https://api.github.com/repos/Cockatrice/Cockatrice/git/refs/tags/"
+#define STABLERELEASE_URL "https://api.github.com/repos/Continuum-Universes-Studio/Continuumatrice/releases/latest"
+#define STABLEMANUALDOWNLOAD_URL "https://github.com/Continuum-Universes-Studio/Continuumatrice/releases/latest"
+#define STABLETAG_URL "https://api.github.com/repos/Continuum-Universes-Studio/Continuumatrice/git/refs/tags/"
 
-#define BETARELEASE_URL "https://api.github.com/repos/Cockatrice/Cockatrice/releases"
-#define BETAMANUALDOWNLOAD_URL "https://github.com/Cockatrice/Cockatrice/releases/"
-#define BETARELEASE_CHANGESURL "https://github.com/Cockatrice/Cockatrice/compare/%1...%2"
+#define BETARELEASE_URL "https://api.github.com/repos/Continuum-Universes-Studio/Continuumatrice/releases"
+#define BETAMANUALDOWNLOAD_URL "https://github.com/Continuum-Universes-Studio/Continuumatrice/releases/"
+#define BETARELEASE_CHANGESURL "https://github.com/Continuum-Universes-Studio/Continuumatrice/compare/%1...%2"
 
 #define GIT_SHORT_HASH_LEN 7
 
