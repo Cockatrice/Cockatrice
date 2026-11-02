@@ -1,6 +1,5 @@
 #include "tournament_tab_game_extension.h"
 
-#include "../../../game/game_event_handler.h"
 #include "../../widgets/draft/tournament_widget.h"
 #include "tab_game.h"
 #include "tab_supervisor.h"
@@ -10,6 +9,10 @@
 #include <QPushButton>
 #include <QStackedWidget>
 #include <QVBoxLayout>
+#include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/game_event_handler.h>
+#include <libcockatrice/game/game_meta_info.h>
+#include <libcockatrice/game/player/player_manager.h>
 #include <libcockatrice/protocol/pb/event_tournament_state.pb.h>
 
 TournamentTabGameExtension::TournamentTabGameExtension(TabGame *parent) : QObject(parent), tabGame(parent)
