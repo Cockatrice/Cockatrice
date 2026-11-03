@@ -47,10 +47,16 @@ EssenceFilterPicker::EssenceFilterPicker(QWidget *parent) : QToolButton(parent)
         button->setFixedSize(42, 42);
         button->setIcon(QIcon(ManaSymbolPixmapGenerator::generatePixmap(symbol, QSize(32, 32))));
         button->setIconSize(QSize(30, 30));
-        button->setToolTip(essence == QChar('N') ? tr("N — Colorless Essence")
-                                               : tr("Essence %1").arg(symbol));
-        button->setAccessibleName(essence == QChar('N') ? tr("Colorless Essence N")
-                                                       : tr("Essence %1").arg(symbol));
+        if (essence == QChar('N')) {
+            button->setToolTip(tr("N — Colorless Essence"));
+            button->setAccessibleName(tr("Colorless Essence N"));
+        } else if (essence == QChar('J')) {
+            button->setToolTip(tr("J — Jasper Essence"));
+            button->setAccessibleName(tr("Jasper Essence J"));
+        } else {
+            button->setToolTip(tr("Essence %1").arg(symbol));
+            button->setAccessibleName(tr("Essence %1").arg(symbol));
+        }
         button->setProperty("essenceCode", symbol);
         connect(button, &QToolButton::toggled, this, [this, essence](bool checked) {
             updateSummary();
