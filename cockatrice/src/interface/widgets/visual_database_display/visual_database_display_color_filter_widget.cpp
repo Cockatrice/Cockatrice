@@ -3,6 +3,7 @@
 #include "../cards/additional_info/mana_symbol_widget.h"
 #include "filter_tree_model.h"
 #include "libcockatrice/filters/filter_card.h"
+#include <libcockatrice/card/essence_types.h>
 
 #include <QAbstractItemModel>
 #include <QComboBox>
@@ -26,13 +27,16 @@ VisualDatabaseDisplayColorFilterWidget::VisualDatabaseDisplayColorFilterWidget(Q
     : QWidget(parent), filterModel(_filterModel), layout(new QHBoxLayout(this))
 {
     setLayout(layout);
-    layout->setSpacing(5);
+    layout->setSpacing(3);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    QString fullColorIdentity = "WUBRG";
-    for (const QChar &color : fullColorIdentity) {
-        auto *manaSymbol = new ManaSymbolWidget(this, color, false, true);
-        manaSymbol->setFixedWidth(25);
+    // All fifteen Continuum Universes Essence types are filterable.
+    // Never fall back to MTG's five-color WUBRG control. N is colorless.
+    for (const QChar essence : Essence::symbols()) {
+        auto *manaSymbol = new ManaSymbolWidget(this, QString(essence), false, true);
+        manaSymbol->setFixedSize(22, 22);
+        manaSymbol->setToolTip(essence == QChar('N') ? tr("N — Colorless Essence")
+                                                   : tr("Essence %1").arg(essence));
 
         layout->addWidget(manaSymbol);
 
@@ -63,7 +67,7 @@ void VisualDatabaseDisplayColorFilterWidget::retranslateUi()
     modeComboBox->addItem(tr("Includes"), QVariant::fromValue(FilterMode::Includes));
     modeComboBox->addItem(tr("Include / Exclude"), QVariant::fromValue(FilterMode::IncludeExclude));
 
-    modeComboBox->setToolTip(tr("How selected and unselected colors are combined in the filter"));
+    modeComboBox->setToolTip(tr("How selected and unselected Essence types are combined in the filter"));
 
     // Restore current mode
     const int index = modeComboBox->findData(QVariant::fromValue(currentMode));
