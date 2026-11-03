@@ -1,12 +1,11 @@
 #include "deck_preview_color_identity_filter_widget.h"
 
-#include "../../cards/additional_info/mana_symbol_widget.h"
+#include "../../cards/additional_info/essence_filter_picker.h"
 #include "../visual_deck_storage_sort_filter_proxy_model.h"
 
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QSet>
-#include <QSharedPointer>
 #include <QString>
 
 DeckPreviewColorIdentityFilterWidget::DeckPreviewColorIdentityFilterWidget(QWidget *parent)
@@ -16,34 +15,26 @@ DeckPreviewColorIdentityFilterWidget::DeckPreviewColorIdentityFilterWidget(QWidg
     layout->setSpacing(5);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    QString fullColorIdentity = "WUBRG";
-    for (const QChar &color : fullColorIdentity) {
-        auto *manaSymbol = new ManaSymbolWidget(this, color, false, true);
-        manaSymbol->setFixedWidth(25);
+    // Fifteen Essence codes don't fit as inline buttons beside sorting and
+    // search. The popup keeps all codes selectable without expanding the row.
+    essencePicker = new EssenceFilterPicker(this);
+    layout->addWidget(essencePicker);
 
-        layout->addWidget(manaSymbol);
-
-        // Initialize the activeColors map
-        activeColors[color] = false;
-
-        // Connect the color toggled signal
-        connect(manaSymbol, &ManaSymbolWidget::colorToggled, this,
-                &DeckPreviewColorIdentityFilterWidget::handleColorToggled);
-    }
+    connect(essencePicker, &EssenceFilterPicker::essenceToggled, this,
+            [this](QChar /*essence*/, bool /*active*/) { emit activeColorsChanged(); });
 
     toggleButton = new QPushButton(this);
     layout->addWidget(toggleButton);
-
-    // Connect the button's clicked signal
     connect(toggleButton, &QPushButton::clicked, this, &DeckPreviewColorIdentityFilterWidget::updateFilterMode);
 
-    // Call retranslateUi to set the initial text
     retranslateUi();
 }
 
 void DeckPreviewColorIdentityFilterWidget::retranslateUi()
 {
-    // Set the toggle button text based on the current mode
+    essencePicker->retranslateUi();
+
+    // Preserve existing Exact / Includes / Excludes filter semantics.
     switch (filterMode) {
         case VisualDeckStorageSortFilterProxyModel::FilterMode::ExactMatch:
             toggleButton->setText(tr("Mode: Exact Match"));
@@ -55,32 +46,21 @@ void DeckPreviewColorIdentityFilterWidget::retranslateUi()
             toggleButton->setText(tr("Mode: Excludes"));
             break;
     }
-    toggleButton->setToolTip(tr("Color identity filter mode (AND/OR/NOT conjunctions of filters)"));
+    toggleButton->setToolTip(tr("Essence filter mode (exact match, includes, or excludes)"));
 }
 
-/**
- * @brief The colors that are currently toggled on.
- */
 QSet<QChar> DeckPreviewColorIdentityFilterWidget::getActiveColors() const
 {
-    QSet<QChar> activeColorSet;
-    for (auto it = activeColors.constBegin(); it != activeColors.constEnd(); ++it) {
-        if (it.value()) {
-            activeColorSet.insert(it.key());
-        }
-    }
-    return activeColorSet;
+    return essencePicker->activeEssences();
 }
 
-void DeckPreviewColorIdentityFilterWidget::handleColorToggled(QChar color, bool active)
+void DeckPreviewColorIdentityFilterWidget::handleColorToggled(QChar /*essence*/, bool /*active*/)
 {
-    activeColors[color] = active;
     emit activeColorsChanged();
 }
 
 void DeckPreviewColorIdentityFilterWidget::updateFilterMode()
 {
-    // Cycle through the modes
     switch (filterMode) {
         case VisualDeckStorageSortFilterProxyModel::FilterMode::ExactMatch:
             filterMode = VisualDeckStorageSortFilterProxyModel::FilterMode::Includes;
@@ -93,6 +73,6 @@ void DeckPreviewColorIdentityFilterWidget::updateFilterMode()
             break;
     }
 
-    retranslateUi(); // Update the button text
+    retranslateUi();
     emit filterModeChanged(filterMode);
 }
