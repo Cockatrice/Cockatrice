@@ -1,6 +1,6 @@
 @page revealing_cards Revealing Cards
 
-The **Hand** menu offers **Reveal random cards to...**. Choose **All players** or a specific player, then choose how many cards to reveal.
+The **Hand** menu offers **Reveal a chosen number of random cards to...**. Choose **All players** or a specific player, then choose how many cards to reveal. The count dialog displays the chosen recipient.
 
 The server chooses distinct cards without replacement. Two copies of the same card are separate physical cards and can both be chosen. The operation does not reorder, move, or otherwise change the hand.
 

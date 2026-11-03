@@ -83,7 +83,6 @@ public:
      * @param numberCards How many cards to dump, -1 for all.
      */
     PendingCommand *prepareZoneDump(CardZoneLogic *zone, int numberCards);
-    PendingCommand *prepareRandomHandReveal(int revealToPlayerId, int amount);
 
     /**
      * @brief Sets the tapped state of the cards that do not already have it.
@@ -121,6 +120,7 @@ public:
     }
 
 signals:
+    void randomHandRevealFailed(bool unsupported);
     void requestViewTopCardsDialog(int defaultNumberTopCards, int deckSize);
     void requestViewBottomCardsDialog(int defaultNumberBottomCards, int deckSize);
     void requestShuffleTopDialog(int defaultNumberTopCards, int maxCards);
@@ -280,6 +280,7 @@ public slots:
     void actReveal(QList<CardState *> selectedCards, QAction *action);
     void actRevealHand(int revealToPlayerId);
     void actRevealRandomHandCard(int revealToPlayerId);
+    void actRevealRandomHandCards(int revealToPlayerId, int amount);
     void actRevealLibrary(int revealToPlayerId);
 
     void actSortHand();

@@ -32,6 +32,7 @@
 #include <QMetaType>
 #include <QPoint>
 #include <QPointF>
+#include <QPointer>
 #include <QSharedPointer>
 #include <QTimer>
 #include <QVariant>
@@ -47,6 +48,7 @@
 #include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/interfaces/interface_card_preference_provider.h>
 #include <libcockatrice/interfaces/interface_interface_settings_provider.h>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/command_change_zone_properties.pb.h>
 #include <libcockatrice/protocol/pb/command_create_arrow.pb.h>
@@ -66,6 +68,8 @@
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
 #include <libcockatrice/protocol/pb/command_undo_draw.pb.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
+#include <libcockatrice/protocol/pb/response.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/clamped_arithmetic.h>
 #include <libcockatrice/utility/color.h>
 #include <libcockatrice/utility/counter_limits.h>
@@ -1756,15 +1760,25 @@ void PlayerActions::actRevealRandomHandCard(int revealToPlayerId)
     sendGameCommand(cmd);
 }
 
-PendingCommand *PlayerActions::prepareRandomHandReveal(int revealToPlayerId, int amount)
+void PlayerActions::actRevealRandomHandCards(int revealToPlayerId, int amount)
 {
+    QPointer<AbstractClient> client = player->getGame()->getClientForPlayer(player->getPlayerInfo()->getId());
+    if (!client) {
+        return;
+    }
     Command_RevealRandomCards cmd;
     if (revealToPlayerId != -1) {
         cmd.set_player_id(revealToPlayerId);
     }
     cmd.set_zone_name(ZoneNames::HAND);
     cmd.set_number_of_cards(amount);
-    return prepareGameCommand(cmd);
+    auto *pending = prepareGameCommand(cmd);
+    connect(pending, &PendingCommand::finished, this, [this, client](const Response &response) {
+        if (client && response.response_code() != Response::RespOk) {
+            emit randomHandRevealFailed(response.response_code() == Response::RespInvalidCommand);
+        }
+    });
+    sendGameCommand(pending);
 }
 
 void PlayerActions::actRevealLibrary(int revealToPlayerId)
