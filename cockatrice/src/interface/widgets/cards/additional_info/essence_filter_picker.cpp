@@ -2,6 +2,7 @@
 
 #include "../../../pixel_map_generator.h"
 
+#include <QFontMetrics>
 #include <QGridLayout>
 #include <QIcon>
 #include <QLabel>
