@@ -173,8 +173,8 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
     // Quote the server-supplied strings in the log and limit their size.
     const QString serverName = QString::fromStdString(event.server_name()).left(256);
     const QString serverVersion = QString::fromStdString(event.server_version()).left(256);
-    qCInfo(RemoteClientLog) << "Server identification:" << serverName
-                            << "version" << serverVersion << "protocol version" << event.protocol_version();
+    qCInfo(RemoteClientLog) << "Server identification:" << serverName << "version" << serverVersion
+                            << "protocol version" << event.protocol_version();
     if (event.protocol_version() != protocolVersion) {
         emit protocolVersionMismatch(protocolVersion, event.protocol_version());
         setStatus(StatusDisconnecting);
