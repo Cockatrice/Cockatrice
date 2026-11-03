@@ -60,12 +60,6 @@
         <file>resources/icons/update.png</file>
         <file>resources/icons/view.svg</file>
 
-        <file>resources/icons/mana/B.svg</file>
-        <file>resources/icons/mana/C.svg</file>
-        <file>resources/icons/mana/G.svg</file>
-        <file>resources/icons/mana/R.svg</file>
-        <file>resources/icons/mana/U.svg</file>
-        <file>resources/icons/mana/W.svg</file>
         <file>resources/icons/essence/M.svg</file>
         <file>resources/icons/essence/S.svg</file>
         <file>resources/icons/essence/O.svg</file>
