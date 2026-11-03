@@ -23,7 +23,7 @@ EssenceFilterPicker::EssenceFilterPicker(QWidget *parent) : QToolButton(parent)
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     // Force a stable toolbar footprint independent of popup and font sizing.
     // Modes and all 15 Essence icons are contained inside the popup.
-    setFixedWidth(144);
+    setFixedWidth(qMax(156, fontMetrics().horizontalAdvance(tr("Essence: Any")) + 42));
 
     popupMenu = new QMenu(this);
     auto *panel = new QWidget(popupMenu);
@@ -138,10 +138,11 @@ void EssenceFilterPicker::updateSummary()
     if (selected.isEmpty()) {
         setText(tr("Essence: Any"));
         setToolTip(tr("Filter by Essence (none selected)"));
-    } else if (selected.size() <= 3) {
-        setText(tr("Essence: %1").arg(selected.join(QStringLiteral(", "))));
-        setToolTip(tr("Selected Essence: %1").arg(selected.join(QStringLiteral(", "))));
+    } else if (selected.size() == 1) {
+        setText(tr("Essence: %1").arg(selected.first()));
+        setToolTip(tr("Selected Essence: %1").arg(selected.first()));
     } else {
+        // Keep the toolbar label short; the tooltip lists the exact types.
         setText(tr("Essence (%1)").arg(selected.size()));
         setToolTip(tr("Selected Essence: %1").arg(selected.join(QStringLiteral(", "))));
     }
