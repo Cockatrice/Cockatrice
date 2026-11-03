@@ -23,7 +23,7 @@ EssenceFilterPicker::EssenceFilterPicker(QWidget *parent) : QToolButton(parent)
     setToolButtonStyle(Qt::ToolButtonTextOnly); // Keep the summary visible even without a button icon.
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     // Force a stable toolbar footprint independent of popup and font sizing.
-    // Modes and all 15 Essence icons are contained inside the popup.
+    // Modes and all 16 Essence icons are contained inside the popup.
     setFixedWidth(qMax(156, fontMetrics().horizontalAdvance(tr("Essence: Any")) + 42));
 
     popupMenu = new QMenu(this);
@@ -57,7 +57,8 @@ EssenceFilterPicker::EssenceFilterPicker(QWidget *parent) : QToolButton(parent)
             emit essenceToggled(essence, checked);
         });
 
-        grid->addWidget(button, index / 5, index % 5);
+        // Sixteen Essences form a compact 4x4 grid.
+        grid->addWidget(button, index / 4, index % 4);
         buttons.insert(essence, button);
         ++index;
     }
