@@ -5,11 +5,12 @@
 #include <QHash>
 #include <QString>
 
-TEST(EssenceTypesTest, HasExactlyFifteenCanonicalSymbols)
+TEST(EssenceTypesTest, HasExactlySixteenCanonicalSymbols)
 {
-    EXPECT_EQ(Essence::symbols(), QStringLiteral("MSOGEAQCBRLVTPN"));
-    EXPECT_EQ(Essence::symbols().size(), 15);
+    EXPECT_EQ(Essence::symbols(), QStringLiteral("MSOGEAQCJBRLVTPN"));
+    EXPECT_EQ(Essence::symbols().size(), 16);
     EXPECT_TRUE(Essence::isSymbol(QChar('N'))); // N is colorless.
+    EXPECT_TRUE(Essence::isSymbol(QChar('J'))); // J is Jasper, between C and B.
     EXPECT_FALSE(Essence::isSymbol(QChar('W'))); // MTG white is not Essence.
     EXPECT_FALSE(Essence::isSymbol(QChar('U'))); // MTG blue is not Essence.
 }
@@ -19,6 +20,7 @@ TEST(EssenceTypesTest, ParsesAllBracedAndUnbracedTypes)
     const QString raw = QStringLiteral("{M}{S}{O}{G}{E}{A}{Q}{C}{B}{R}{L}{V}{T}{P}{N}");
     EXPECT_EQ(Essence::parseCost(raw).join(QString()), Essence::symbols());
     EXPECT_EQ(Essence::parseCost(QStringLiteral("MSN")).join(QString()), QStringLiteral("MSN"));
+    EXPECT_EQ(Essence::parseCost(QStringLiteral("{C}{J}{B}{N}")).join(QString()), QStringLiteral("CJBN"));
     EXPECT_EQ(Essence::parseCost(QStringLiteral("{2}{N}{M}")).join(QStringLiteral("|")),
               QStringLiteral("2|N|M"));
 }
@@ -33,6 +35,7 @@ TEST(EssenceTypesTest, NormalizesUniqueIdentityInCanonicalOrder)
 {
     EXPECT_EQ(Essence::normalizeIdentity(QStringLiteral("NSSMMO")), QStringLiteral("MSON"));
     EXPECT_EQ(Essence::normalizeIdentity(QStringLiteral("N")), QStringLiteral("N"));
+    EXPECT_EQ(Essence::normalizeIdentity(QStringLiteral("BJNJC")), QStringLiteral("CJBN"));
     EXPECT_EQ(Essence::normalizeIdentity(QStringLiteral("WU")), QString());
 }
 
