@@ -24,6 +24,18 @@ inline const QString Types = QStringLiteral("essence");
 inline const QString Value = QStringLiteral("essencevalue");
 }
 
+// Continuum Universes CCG card-definition fields, not mutable match stats.
+namespace ContinuumCardProperties
+{
+inline const QString Identity = QStringLiteral("identity");
+inline const QString Alias = QStringLiteral("alias"); // Earlier exports may use this name.
+inline const QString Attack = QStringLiteral("attack");
+inline const QString Strength = QStringLiteral("strength"); // Legacy MSE field ID.
+inline const QString Armour = QStringLiteral("armour");
+inline const QString Armor = QStringLiteral("armor"); // Legacy American spelling.
+inline const QString Health = QStringLiteral("health");
+}
+
 namespace Mtg
 {
 QString const CardType("type");
@@ -48,6 +60,18 @@ inline static const QString getNicePropertyName(QString key)
     if (key == EssenceProperties::Value || key == ConvertedManaCost) {
         return QCoreApplication::translate("Essence", "Essence Value");
     }
+    if (key == ContinuumCardProperties::Identity || key == ContinuumCardProperties::Alias) {
+        return QCoreApplication::translate("Continuum", "Identity");
+    }
+    if (key == ContinuumCardProperties::Attack || key == ContinuumCardProperties::Strength) {
+        return QCoreApplication::translate("Continuum", "Attack");
+    }
+    if (key == ContinuumCardProperties::Armour || key == ContinuumCardProperties::Armor) {
+        return QCoreApplication::translate("Continuum", "Armour");
+    }
+    if (key == ContinuumCardProperties::Health) {
+        return QCoreApplication::translate("Continuum", "Health");
+    }
     if (key == CardType) {
         return QCoreApplication::translate("Mtg", "Card Type");
     }
@@ -58,7 +82,7 @@ inline static const QString getNicePropertyName(QString key)
         return QCoreApplication::translate("Mtg", "Main Card Type");
     }
     if (key == PowTough) {
-        return QCoreApplication::translate("Mtg", "P/T");
+        return QCoreApplication::translate("Continuum", "ATK/HP");
     }
     if (key == Side) {
         return QCoreApplication::translate("Mtg", "Side");
