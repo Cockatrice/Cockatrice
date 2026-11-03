@@ -137,7 +137,7 @@ QHash<QString, int> DeckListStatisticsAnalyzer::determineManaProduction(const QS
     // tap/mana rules would invent Continuum Universes gameplay semantics.
     // E.g. "Add {M}" / "add {N}" both work.
     static const QRegularExpression grantedEssence(
-        QStringLiteral(R"(\badd\s*\{([MSOGEAQCBRLVTPN])\})"),
+        QStringLiteral(R"(\badd\s*\{([MSOGEAQCJBRLVTPN])\})"),
         QRegularExpression::CaseInsensitiveOption);
 
     auto matches = grantedEssence.globalMatch(rulesText);
