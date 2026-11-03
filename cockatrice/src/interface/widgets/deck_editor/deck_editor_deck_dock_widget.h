@@ -110,6 +110,7 @@ private:
     DeckListModel *getModel() const;
     [[nodiscard]] QModelIndexList getSelectedCardNodeSourceIndices() const;
     void offsetCountAtIndex(const QModelIndex &idx, bool isIncrement);
+    void syncFormatSelection();
 
     void addMoveToZoneMenu(QMenu *menu, const QModelIndex &sourceCardIndex, const QString &currentBoardName);
     void addChangeBoardMenu(QMenu *menu, const QString &zoneName);
