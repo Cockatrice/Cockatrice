@@ -423,8 +423,23 @@ DecklistCardNode *DeckList::addCard(const QString &cardName,
                                     const QString &cardProviderId,
                                     bool formatLegal)
 {
-    auto node =
-        tree.addCard(cardName, 1, zoneName, position, cardSetName, cardSetCollectorNumber, cardProviderId, formatLegal);
+    return addCards(cardName, 1, zoneName, position, cardSetName, cardSetCollectorNumber, cardProviderId, formatLegal);
+}
+
+DecklistCardNode *DeckList::addCards(const QString &cardName,
+                                     int amount,
+                                     const QString &zoneName,
+                                     int position,
+                                     const QString &cardSetName,
+                                     const QString &cardSetCollectorNumber,
+                                     const QString &cardProviderId,
+                                     bool formatLegal)
+{
+    if (amount <= 0) {
+        return nullptr;
+    }
+    auto node = tree.addCard(cardName, amount, zoneName, position, cardSetName, cardSetCollectorNumber, cardProviderId,
+                             formatLegal);
     refreshDeckHash();
     return node;
 }

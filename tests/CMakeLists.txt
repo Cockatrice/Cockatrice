@@ -465,6 +465,19 @@ endif()
 if(WITH_CLIENT)
   cockatrice_add_test(
     NAME
+    moxfield_signature_spells_test
+    SOURCES
+    ${VERSION_STRING_CPP}
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/deck_loader/card_node_function.cpp
+    moxfield_signature_spells_test.cpp
+    LIBS
+    libcockatrice_card
+    libcockatrice_deck_list
+    INCLUDE_DIRS
+    ${CMAKE_SOURCE_DIR}/cockatrice/src
+  )
+  cockatrice_add_test(
+    NAME
     single_instance_manager_test
     SOURCES
     ${CMAKE_SOURCE_DIR}/cockatrice/src/single_instance_manager.cpp
