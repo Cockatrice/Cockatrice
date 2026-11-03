@@ -71,12 +71,20 @@ The current bundled placeholders show just the letter. `N` is neutral gray; the 
 
 - Card database properties: native Essence cost, identity and optional value, with fallbacks for older XML.
 - Card information display and deck editor column headers: `Essence`, `Essence Cost`, `Essence Value`.
+- Visual Deck Storage and Visual Database filters share a compact `Essence: Any` dropdown with a 5×3 grid of all 15 icons. Select multiple icons without closing the popup, clear selections within the popup, and use the existing filtering mode control beside it. The dropdown summarizes selected Essence codes and supports N independently from C.
 - Cost parser: single Essence symbols in bare form (`MSN`) or braces (`{M}{S}{N}`); numeric tokens may be preserved as generic amounts.
 - Deck identity: unique, ordered Essence codes (including `N`).
 - Search filters: filter for specific Essence codes, or `colorless` meaning `N`. An empty identity is not automatically `N`.
 - Analytics: counts all 15 Essence cost symbols. Production counts only literal `Add {M}`-style grants to avoid guessing any resource rules.
 
 Hybrid, phyrexian, and other MTG-specific mana-cost syntax are **not** introduced as Essence mechanics. Nor is automatic calculation of resource costs, card affordability, or game turn rules included.
+
+## Compact Essence filter UI
+
+The former five-button MTG `WUBRG` filters are replaced in both Visual Deck Storage and Visual Database. On either screen, click `Essence: Any` to open a **5-column × 3-row** grid of the complete Essence set. Each icon can be toggled independently and the menu stays open for multiple selections. Use **Clear Essence selection** to reset. The button summarizes your selection, and the original mode control still chooses Exact Match / Includes / Excludes (or Include / Exclude in the database).
+
+The picker is a single reusable Qt widget (`essence_filter_picker.h/.cpp`). This keeps both screens synchronized with `Essence::symbols()` without repeating a hand-maintained UI list. The UI uses SVG assets from `icons/essence/`, never old MTG `icons/mana/` assets.
+
 
 ## Build and verification
 
