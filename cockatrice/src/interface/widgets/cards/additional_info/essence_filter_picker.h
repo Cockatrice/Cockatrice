@@ -7,6 +7,8 @@
 #include <QToolButton>
 
 class QMenu;
+class QVBoxLayout;
+class QWidget;
 
 /**
  * Compact, reusable multi-select Essence picker for the deck and card database
@@ -23,16 +25,23 @@ public:
 
     [[nodiscard]] QSet<QChar> activeEssences() const;
     void setEssenceActive(QChar essence, bool active);
+    // Put the host's filtering mode selector inside this popup too:
+    // neither toolbar should require a separate cramped control.
+    void addPopupControl(QWidget *control);
     void retranslateUi();
 
 signals:
     void essenceToggled(QChar essence, bool active);
+    // A clear request removes ALL Essence filters, including exclusions,
+    // rather than creating fifteen negative filters in Exact/Exclude mode.
+    void selectionCleared();
 
 private:
     void updateSummary();
 
     QHash<QChar, QToolButton *> buttons;
     QMenu *popupMenu = nullptr;
+    QVBoxLayout *panelLayout = nullptr;
 };
 
 #endif // CONTINUUMATRICE_ESSENCE_FILTER_PICKER_H
