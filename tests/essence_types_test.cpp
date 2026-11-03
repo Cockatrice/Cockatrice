@@ -17,7 +17,7 @@ TEST(EssenceTypesTest, HasExactlySixteenCanonicalSymbols)
 
 TEST(EssenceTypesTest, ParsesAllBracedAndUnbracedTypes)
 {
-    const QString raw = QStringLiteral("{M}{S}{O}{G}{E}{A}{Q}{C}{B}{R}{L}{V}{T}{P}{N}");
+    const QString raw = QStringLiteral("{M}{S}{O}{G}{E}{A}{Q}{C}{J}{B}{R}{L}{V}{T}{P}{N}");
     EXPECT_EQ(Essence::parseCost(raw).join(QString()), Essence::symbols());
     EXPECT_EQ(Essence::parseCost(QStringLiteral("MSN")).join(QString()), QStringLiteral("MSN"));
     EXPECT_EQ(Essence::parseCost(QStringLiteral("{C}{J}{B}{N}")).join(QString()), QStringLiteral("CJBN"));
