@@ -21,16 +21,18 @@ EssenceFilterPicker::EssenceFilterPicker(QWidget *parent) : QToolButton(parent)
     setPopupMode(QToolButton::InstantPopup);
     setToolButtonStyle(Qt::ToolButtonTextOnly); // Keep the summary visible even without a button icon.
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    setMinimumWidth(130);
+    // Force a stable toolbar footprint independent of popup and font sizing.
+    // Modes and all 15 Essence icons are contained inside the popup.
+    setFixedWidth(144);
 
     popupMenu = new QMenu(this);
     auto *panel = new QWidget(popupMenu);
-    auto *vertical = new QVBoxLayout(panel);
-    vertical->setContentsMargins(10, 10, 10, 10);
-    vertical->setSpacing(7);
+    panelLayout = new QVBoxLayout(panel);
+    panelLayout->setContentsMargins(10, 10, 10, 10);
+    panelLayout->setSpacing(7);
 
     auto *heading = new QLabel(tr("Filter by Essence"), panel);
-    vertical->addWidget(heading);
+    panelLayout->addWidget(heading);
 
     auto *grid = new QGridLayout();
     grid->setSpacing(5);
@@ -58,19 +60,22 @@ EssenceFilterPicker::EssenceFilterPicker(QWidget *parent) : QToolButton(parent)
         buttons.insert(essence, button);
         ++index;
     }
-    vertical->addLayout(grid);
+    panelLayout->addLayout(grid);
 
     auto *clearButton = new QPushButton(tr("Clear Essence selection"), panel);
     connect(clearButton, &QPushButton::clicked, this, [this]() {
-        // The popup remains open while changing several Essence types.
-        // Emit only for entries that actually changed.
+        // Clear as ONE model operation, so Exact Match and Include/Exclude
+        // don't retain stale "not this Essence" predicates.
         for (const QChar essence : Essence::symbols()) {
             if (auto *button = buttons.value(essence); button && button->isChecked()) {
+                const QSignalBlocker blocker(button);
                 button->setChecked(false);
             }
         }
+        updateSummary();
+        emit selectionCleared();
     });
-    vertical->addWidget(clearButton);
+    panelLayout->addWidget(clearButton);
 
     auto *panelAction = new QWidgetAction(popupMenu);
     panelAction->setDefaultWidget(panel);
@@ -78,6 +83,17 @@ EssenceFilterPicker::EssenceFilterPicker(QWidget *parent) : QToolButton(parent)
     setMenu(popupMenu);
 
     retranslateUi();
+}
+
+void EssenceFilterPicker::addPopupControl(QWidget *control)
+{
+    if (!control || !panelLayout) {
+        return;
+    }
+
+    // Insert above the Clear button, keeping the entire configuration in one
+    // popup rather than competing for horizontal space in the main toolbar.
+    panelLayout->insertWidget(panelLayout->count() - 1, control);
 }
 
 QSet<QChar> EssenceFilterPicker::activeEssences() const
