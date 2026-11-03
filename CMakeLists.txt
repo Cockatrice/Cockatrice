@@ -71,6 +71,8 @@ if(WIN32 OR USE_VCPKG)
   )
   # Qt path set by user or env var
   if(QTDIR
+     OR QTDIR32
+     OR QTDIR64
      OR DEFINED ENV{QTDIR}
      OR DEFINED ENV{QTDIR32}
      OR DEFINED ENV{QTDIR64}
@@ -236,13 +238,13 @@ else()
   set(_lib_suffix 32)
 endif()
 
-if(DEFINED QTDIR${_lib_suffix})
+if(NOT "${QTDIR${_lib_suffix}}" STREQUAL "")
   list(APPEND CMAKE_PREFIX_PATH "${QTDIR${_lib_suffix}}")
-elseif(DEFINED QTDIR)
+elseif(NOT "${QTDIR}" STREQUAL "")
   list(APPEND CMAKE_PREFIX_PATH "${QTDIR}")
-elseif(DEFINED ENV{QTDIR${_lib_suffix}})
+elseif(NOT "$ENV{QTDIR${_lib_suffix}}" STREQUAL "")
   list(APPEND CMAKE_PREFIX_PATH "$ENV{QTDIR${_lib_suffix}}")
-elseif(DEFINED ENV{QTDIR})
+elseif(NOT "$ENV{QTDIR}" STREQUAL "")
   list(APPEND CMAKE_PREFIX_PATH "$ENV{QTDIR}")
 endif()
 

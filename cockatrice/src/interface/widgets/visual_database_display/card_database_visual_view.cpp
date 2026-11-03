@@ -130,8 +130,11 @@ void CardDatabaseVisualView::wheelEvent(QWheelEvent *event)
         return;
     }
 
+    // macOS uses transient (overlay) scroll bars that hide themselves
+    // once they fade out, so we need to use the range to determine if we ignore the wheel when there is nothing to
+    // scroll. This lets an enclosing scroll area take over.
     QScrollBar *bar = verticalScrollBar();
-    if (!bar->isVisible()) {
+    if (bar->maximum() <= bar->minimum()) {
         event->ignore();
         return;
     }

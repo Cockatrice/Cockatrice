@@ -101,6 +101,36 @@ jobs:
             --title "$release_name" \
             --notes-file "$body_path"
 
+  vcpkg-baseline:
+    name: vcpkg baseline
+    runs-on: ubuntu-slim
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v7
+
+      # vcpkg-tool reads versions/baseline.json out of the commit named by
+      # `builtin-baseline`, through the `vcpkg` submodule's git history. A submodule
+      # pointer that lags the manifest - e.g. a stale `vcpkg/` worktree captured by
+      # `git add` in a PR - makes every vcpkg leg fail in configure with "failed to
+      # `git show` versions/baseline.json". That reads like a baseline or network
+      # problem, when the pointer is what has to move. Check the two agree here in
+      # seconds instead of on five build legs.
+      - name: "Check the submodule pointer against the manifest baseline"
+        shell: bash
+        run: |
+          pointer="$(git rev-parse HEAD:vcpkg 2>/dev/null || true)"
+          baseline="$(sed -nE 's/.*"builtin-baseline"[[:space:]]*:[[:space:]]*"([0-9a-f]{40})".*/\1/p' vcpkg.json)"
+          if [[ -z "$pointer" || -z "$baseline" ]]; then
+            echo "::error file=vcpkg.json::could not read the vcpkg submodule pointer or the builtin-baseline"
+            exit 1
+          fi
+          if [[ "$pointer" != "$baseline" ]]; then
+            echo "::error file=vcpkg.json::vcpkg submodule is at $pointer but builtin-baseline is $baseline"
+            echo "Move them together: git -C vcpkg checkout $baseline && git add vcpkg"
+            exit 1
+          fi
+          echo "vcpkg submodule and builtin-baseline agree on $baseline"
+
   build-linux:
     strategy:
       fail-fast: false
@@ -466,7 +496,7 @@ jobs:
             vcpkg_upload: 1    # only one leg per vcpkg_scope hands its archives over
 
     name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
-    needs: configure
+    needs: [configure, vcpkg-baseline]
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 100
     env:
