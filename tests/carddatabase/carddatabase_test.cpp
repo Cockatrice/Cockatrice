@@ -65,6 +65,27 @@ TEST(CardDatabaseTest, LoadXml)
     ASSERT_EQ(NotLoaded, db->getLoadStatus()) << "Incorrect status after clear";
 }
 
+TEST(CardDatabaseTest, EmptyLoadedSnapshotIsReadyNotLoading)
+{
+    NoopCardPreferenceProvider prefs;
+    TestCardDatabasePathProvider pathProvider;
+    NoopCardSetPriorityController controller;
+    CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
+
+    EXPECT_EQ(NotLoaded, db.getLoadStatus());
+
+    // A newly bootstrapped Continuumatrice profile contains a valid, but empty,
+    // XML v4 catalogue. Successful swap must not trap the visual browser on
+    // "Loading database..." when there are zero cards.
+    CardDatabaseData emptySnapshot;
+    db.swapInDatabaseData(std::move(emptySnapshot));
+    EXPECT_TRUE(db.getCardList().isEmpty());
+    EXPECT_EQ(Ok, db.getLoadStatus());
+
+    db.clear();
+    EXPECT_EQ(NotLoaded, db.getLoadStatus());
+}
+
 TEST(CardDatabaseTest, LazyPropertiesHashStreamsBlobAccessors)
 {
     QHash<QString, QString> props;
