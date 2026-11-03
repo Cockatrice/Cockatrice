@@ -131,11 +131,11 @@ TEST(ModelContract, ContinuumCardStatsAreSortableAndLabeled)
 
     ASSERT_EQ(source.columnCount(), CardDatabaseModel::ColumnCount);
     ASSERT_EQ(display.rowCount(), 2);
-    EXPECT_EQ(source.headerData(CardDatabaseModel::AtkHpColumn, Qt::Horizontal), "ATK/HP");
-    EXPECT_EQ(source.headerData(CardDatabaseModel::IdentityColumn, Qt::Horizontal), "Identity");
-    EXPECT_EQ(source.headerData(CardDatabaseModel::AttackColumn, Qt::Horizontal), "Attack");
-    EXPECT_EQ(source.headerData(CardDatabaseModel::ArmourColumn, Qt::Horizontal), "Armour");
-    EXPECT_EQ(source.headerData(CardDatabaseModel::HealthColumn, Qt::Horizontal), "Health");
+    EXPECT_EQ(source.headerData(CardDatabaseModel::AtkHpColumn, Qt::Horizontal).toString(), "ATK/HP");
+    EXPECT_EQ(source.headerData(CardDatabaseModel::IdentityColumn, Qt::Horizontal).toString(), "Identity");
+    EXPECT_EQ(source.headerData(CardDatabaseModel::AttackColumn, Qt::Horizontal).toString(), "Attack");
+    EXPECT_EQ(source.headerData(CardDatabaseModel::ArmourColumn, Qt::Horizontal).toString(), "Armour");
+    EXPECT_EQ(source.headerData(CardDatabaseModel::HealthColumn, Qt::Horizontal).toString(), "Health");
 
     const auto firstName = [&display] { return display.index(0, CardDatabaseModel::NameColumn).data().toString(); };
 
