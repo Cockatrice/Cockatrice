@@ -70,7 +70,6 @@ public slots:
     void syncDisplayWidgetsToModel();
     void actAddCard(const ExactCard &card, const QString &zoneName);
     void actIncrementSelection();
-    void actDecrementCard(const ExactCard &card, QString zoneName);
     void actDecrementSelection();
     void actSwapCard(const ExactCard &card, const QString &zoneName);
     void actSwapSelection();
