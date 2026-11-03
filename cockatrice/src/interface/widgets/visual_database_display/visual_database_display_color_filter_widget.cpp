@@ -7,6 +7,7 @@
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QSharedPointer>
+#include <QSizePolicy>
 #include <QString>
 #include <QVariant>
 #include <libcockatrice/card/essence_types.h>
@@ -24,12 +25,20 @@ VisualDatabaseDisplayColorFilterWidget::VisualDatabaseDisplayColorFilterWidget(Q
     // A 15-icon horizontal row cannot fit the database filter toolbar.
     essencePicker = new EssenceFilterPicker(this);
     layout->addWidget(essencePicker);
+    // FlowWidget measures THIS parent widget, not its nested button. Give it
+    // an explicit size hint that cannot clip the picker.
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    setMinimumWidth(essencePicker->width());
 
     connect(essencePicker, &EssenceFilterPicker::essenceToggled, this,
             &VisualDatabaseDisplayColorFilterWidget::handleColorToggled);
 
+    connect(essencePicker, &EssenceFilterPicker::selectionCleared, this, [this]() {
+        filterModel->clearFiltersOfType(CardFilter::Attr::AttrColor);
+    });
+
     modeComboBox = new QComboBox(this);
-    layout->addWidget(modeComboBox);
+    essencePicker->addPopupControl(modeComboBox);
 
     connect(modeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             &VisualDatabaseDisplayColorFilterWidget::updateFilterMode);
