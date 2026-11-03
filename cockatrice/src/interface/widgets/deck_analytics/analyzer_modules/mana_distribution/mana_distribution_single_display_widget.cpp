@@ -48,5 +48,5 @@ void ManaDistributionSingleDisplayWidget::setDevotion(int pips, int cards, int p
 void ManaDistributionSingleDisplayWidget::setProduction(int pips, int cards, int percent)
 {
     productionBar->setValue(percent);
-    productionLabel->setText(QString(tr("%1 mana (%2 cards)")).arg(pips).arg(cards));
+    productionLabel->setText(QString(tr("%1 Essence (%2 cards)")).arg(pips).arg(cards));
 }

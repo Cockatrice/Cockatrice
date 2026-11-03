@@ -251,9 +251,11 @@ void TableZone::paintBattlefieldRows(QPainter *painter)
  */
 void TableZone::reloadBattlefieldAppearance()
 {
-    frontZoneColor = QColor(142, 52, 61, 128);
-    supportZoneColor = QColor(40, 105, 129, 128);
-    commandZoneColor = QColor(94, 66, 140, 128);
+    // Canonical default battlefield palette. Theme battlefield.ini can override
+    // these with #RRGGBB (opaque) or #AARRGGBB (alpha) values.
+    frontZoneColor = QColor(QStringLiteral("#dc143c"));
+    supportZoneColor = QColor(QStringLiteral("#c3b091"));
+    commandZoneColor = QColor(QStringLiteral("#0a0e3f"));
 
     const QString themePath = themeManager->getCurrentThemePath();
     if (!themePath.isEmpty()) {

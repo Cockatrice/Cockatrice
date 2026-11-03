@@ -2,6 +2,7 @@
 
 #include "../../../../client/settings/cache_settings.h"
 #include "libcockatrice/card/card_info.h"
+#include <libcockatrice/card/essence_types.h>
 #include "mana_symbol_widget.h"
 
 #include <QChar>
@@ -41,9 +42,9 @@ ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, const CardInfoPtr &car
 
 void ColorIdentityWidget::populateManaSymbolWidgets()
 {
-    // Define the full WUBRG set (White, Blue, Black, Red, Green)
-    QString fullColorIdentity = "WUBRG";
-    QStringList symbols = parseColorIdentity(colorIdentity); // Parse mana cost string
+    // Continuum Universes supports fourteen named Essence codes plus N (colorless).
+    const QString &allEssences = Essence::symbols();
+    QStringList symbols = parseColorIdentity(colorIdentity);
 
     // clear old layout
     QtUtils::clearLayoutRec(layout);
@@ -55,7 +56,8 @@ void ColorIdentityWidget::populateManaSymbolWidgets()
 
     // populate mana symbols
     if (SettingsCache::instance().visualDeckStorage().getVisualDeckStorageDrawUnusedColorIdentities()) {
-        for (const QString symbol : fullColorIdentity) {
+        for (const QChar code : allEssences) {
+            const QString symbol(code);
             auto *manaSymbol = new ManaSymbolWidget(this, symbol, symbols.contains(symbol));
             layout->addWidget(manaSymbol);
         }
@@ -120,28 +122,11 @@ void ColorIdentityWidget::resizeEvent(QResizeEvent *event)
     }
 }
 
-QStringList ColorIdentityWidget::parseColorIdentity(const QString &manaString)
+QStringList ColorIdentityWidget::parseColorIdentity(const QString &essenceIdentity)
 {
     QStringList symbols;
-
-    // Handle split costs (e.g., "3U // 4UU")
-    QStringList splitCosts = manaString.split(" // ");
-    for (const QString &part : splitCosts) {
-        QRegularExpression regex(R"(\{([^}]+)\}|(\d+)|([WUBRGCSPX]))");
-        QRegularExpressionMatchIterator matches = regex.globalMatch(part);
-        while (matches.hasNext()) {
-            QRegularExpressionMatch match = matches.next();
-            if (match.captured(1).isEmpty()) { // If no `{}` group was captured, check other groups
-                if (!match.captured(2).isEmpty()) {
-                    symbols.append(match.captured(2)); // Number match
-                } else {
-                    symbols.append(match.captured(3)); // Single mana letter match
-                }
-            } else {
-                symbols.append(match.captured(1)); // `{}` enclosed match
-            }
-        }
+    for (const QChar code : Essence::normalizeIdentity(essenceIdentity)) {
+        symbols.append(QString(code));
     }
-
     return symbols;
 }
