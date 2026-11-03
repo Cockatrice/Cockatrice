@@ -157,6 +157,7 @@ set(cockatrice_SOURCES
     src/interface/palette_editor/palette_editor_dialog.cpp
     src/interface/widgets/cards/additional_info/color_identity_widget.cpp
     src/interface/widgets/cards/additional_info/deck_color_identity.cpp
+    src/interface/widgets/cards/additional_info/essence_filter_picker.cpp
     src/interface/widgets/cards/additional_info/mana_cost_widget.cpp
     src/interface/widgets/cards/additional_info/mana_symbol_widget.cpp
     src/interface/widgets/cards/art_crop_attribution.cpp
