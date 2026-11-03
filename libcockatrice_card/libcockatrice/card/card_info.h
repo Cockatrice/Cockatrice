@@ -477,6 +477,13 @@ public:
     [[nodiscard]] QString getLoyalty() const;
     [[nodiscard]] QString getMainCardType() const;
     [[nodiscard]] QString getManaCost() const;
+    // Native static card-definition stats and identity. The database exporter
+    // writes identity/attack/armour/health, while older XML keys are readable.
+    [[nodiscard]] QString getIdentity() const;
+    [[nodiscard]] QString getAttack() const;
+    [[nodiscard]] QString getArmour() const;
+    [[nodiscard]] QString getHealth() const;
+    [[nodiscard]] QString getAtkHp() const;
     [[nodiscard]] QString getPowTough() const;
     void setPowTough(const QString &value);
     //@}
