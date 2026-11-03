@@ -110,6 +110,12 @@ void VisualDatabaseDisplayColorFilterWidget::removeFilter(QChar essence)
         }
     }
 
+    // The empty selection means "Any Essence", not "exclude everything".
+    if (essencePicker->activeEssences().isEmpty()) {
+        filterModel->clearFiltersOfType(CardFilter::Attr::AttrColor);
+        return;
+    }
+
     switch (currentMode) {
         case FilterMode::ExactMatch:
         case FilterMode::IncludeExclude:
@@ -136,8 +142,11 @@ void VisualDatabaseDisplayColorFilterWidget::updateFilterMode()
     filterModel->clearFiltersOfType(CardFilter::Attr::AttrColor);
 
     const QSet<QChar> selected = essencePicker->activeEssences();
-    for (const QChar essence : Essence::symbols()) {
-        handleColorToggled(essence, selected.contains(essence));
+    // No selections should never generate 15 mutually excluding filters.
+    if (!selected.isEmpty()) {
+        for (const QChar essence : Essence::symbols()) {
+            handleColorToggled(essence, selected.contains(essence));
+        }
     }
 
     filterModel->blockSignals(false);
