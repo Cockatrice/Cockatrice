@@ -13,7 +13,7 @@ namespace Essence
 // The other codes have no names, colors or game mechanics assigned here.
 inline const QString &symbols()
 {
-    static const QString value = QStringLiteral("MSOGEAQCBRLVTPN");
+    static const QString value = QStringLiteral("MSOGEAQCJBRLVTPN");
     return value;
 }
 
@@ -41,7 +41,7 @@ inline QString normalizeIdentity(const QString &input)
 // Hybrid/phrexian/other MTG-specific syntax is NOT defined as Essence.
 inline QStringList parseCost(const QString &cost)
 {
-    static const QRegularExpression regex(QStringLiteral(R"(\{([^}]+)\}|(\d+)|([MSOGEAQCBRLVTPN]))"));
+    static const QRegularExpression regex(QStringLiteral(R"(\{([^}]+)\}|(\d+)|([MSOGEAQCJBRLVTPN]))"));
     QStringList result;
     auto matches = regex.globalMatch(cost);
     while (matches.hasNext()) {
