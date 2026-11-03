@@ -70,7 +70,7 @@ void VisualDatabaseDisplayColorFilterWidget::handleColorToggled(QChar essence, b
 
 void VisualDatabaseDisplayColorFilterWidget::addFilter(QChar essence)
 {
-    const QString essenceString(essence);
+    QString essenceString(essence);
     const QList<const CardFilter *> filters = filterModel->getFiltersOfType(CardFilter::Attr::AttrColor);
     for (const CardFilter *filter : filters) {
         if (filter->term() == essenceString) {
@@ -93,7 +93,7 @@ void VisualDatabaseDisplayColorFilterWidget::addFilter(QChar essence)
 
 void VisualDatabaseDisplayColorFilterWidget::removeFilter(QChar essence)
 {
-    const QString essenceString(essence);
+    QString essenceString(essence);
     const QList<const CardFilter *> filters = filterModel->getFiltersOfType(CardFilter::Attr::AttrColor);
     for (const CardFilter *filter : filters) {
         if (filter->term() == essenceString) {
