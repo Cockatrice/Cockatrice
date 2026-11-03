@@ -5,6 +5,7 @@
 
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QSizePolicy>
 #include <QSet>
 #include <QString>
 
@@ -19,12 +20,16 @@ DeckPreviewColorIdentityFilterWidget::DeckPreviewColorIdentityFilterWidget(QWidg
     // search. The popup keeps all codes selectable without expanding the row.
     essencePicker = new EssenceFilterPicker(this);
     layout->addWidget(essencePicker);
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    setMinimumWidth(essencePicker->width());
 
     connect(essencePicker, &EssenceFilterPicker::essenceToggled, this,
             [this](QChar /*essence*/, bool /*active*/) { emit activeColorsChanged(); });
+    connect(essencePicker, &EssenceFilterPicker::selectionCleared, this,
+            [this]() { emit activeColorsChanged(); });
 
     toggleButton = new QPushButton(this);
-    layout->addWidget(toggleButton);
+    essencePicker->addPopupControl(toggleButton);
     connect(toggleButton, &QPushButton::clicked, this, &DeckPreviewColorIdentityFilterWidget::updateFilterMode);
 
     retranslateUi();
