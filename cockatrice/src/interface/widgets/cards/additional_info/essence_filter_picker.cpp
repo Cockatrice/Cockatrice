@@ -19,6 +19,7 @@
 EssenceFilterPicker::EssenceFilterPicker(QWidget *parent) : QToolButton(parent)
 {
     setPopupMode(QToolButton::InstantPopup);
+    setToolButtonStyle(Qt::ToolButtonTextOnly); // Keep the summary visible even without a button icon.
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setMinimumWidth(130);
 
