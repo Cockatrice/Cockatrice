@@ -57,6 +57,7 @@
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/utility/color.h>
+#include <libcockatrice/utility/essence_counter.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <qalgorithms.h>
@@ -110,13 +111,16 @@ void Server_Player::setupZones()
     addZone(new Server_CardZone(this, ZoneNames::OBLIVION, false, ServerInfo_Zone::PublicZone));
 
     addCounter(new Server_Counter(0, "life", makeColor(255, 255, 255), 25, game->getStartingLifeTotal()));
-    addCounter(new Server_Counter(1, "w", makeColor(255, 255, 150), 20, 0));
-    addCounter(new Server_Counter(2, "u", makeColor(150, 150, 255), 20, 0));
-    addCounter(new Server_Counter(3, "b", makeColor(150, 150, 150), 20, 0));
-    addCounter(new Server_Counter(4, "r", makeColor(250, 150, 150), 20, 0));
-    addCounter(new Server_Counter(5, "g", makeColor(150, 255, 150), 20, 0));
-    addCounter(new Server_Counter(6, "x", makeColor(255, 255, 255), 20, 0));
-    addCounter(new Server_Counter(7, "storm", makeColor(255, 150, 30), 20, 0));
+    // Continuum Universes CCG: every player has an independent sixteen-type
+    // Essence pool. It starts at zero and can change without drawing lands.
+    // These counters are the authoritative game-state source: the existing
+    // counter protocol automatically handles spectators, replays and reconnect.
+    // Stable ids 1..16 correspond to M,S,O,G,E,A,Q,C,J,B,R,L,V,T,P,N.
+    int essenceId = 1;
+    for (const QChar code : EssenceCounter::symbols()) {
+        addCounter(new Server_Counter(essenceId++, EssenceCounter::name(code),
+                                      makeColor(168, 172, 189), 18, 0));
+    }
 
     // ------------------------------------------------------------------
 
@@ -480,7 +484,14 @@ Server_Player::cmdIncCounter(const Command_IncCounter &cmd, ResponseContainer & 
         return Response::RespNameNotFound;
     }
 
-    bool didChange = c->incrementCount(cmd.delta());
+    const int oldValue = c->getCount();
+    // Essence is an available-resource balance, never a debt counter.
+    // Leave ordinary player counters unchanged.
+    (void)c->incrementCount(cmd.delta());
+    if (EssenceCounter::isEssenceCounter(c->getName()) && c->getCount() < 0) {
+        (void)c->setCount(EssenceCounter::clampBalance(c->getCount()));
+    }
+    const bool didChange = c->getCount() != oldValue;
     if (didChange) {
         Event_SetCounter event;
         event.set_counter_id(c->getId());
@@ -501,7 +512,13 @@ Server_Player::cmdCreateCounter(const Command_CreateCounter &cmd, ResponseContai
         return Response::RespContextError;
     }
 
-    auto *c = new Server_Counter(newCounterId(), nameFromStdString(cmd.counter_name()), cmd.counter_color(),
+    const QString requestedName = nameFromStdString(cmd.counter_name());
+    // The canonical pool is unique, present for every player, and may not
+    // be forged or replaced using a generic "create counter" command.
+    if (EssenceCounter::isEssenceCounter(requestedName)) {
+        return Response::RespContextError;
+    }
+    auto *c = new Server_Counter(newCounterId(), requestedName, cmd.counter_color(),
                                  cmd.radius(), cmd.value());
     addCounter(c);
 
@@ -533,7 +550,8 @@ Server_Player::cmdSetCounter(const Command_SetCounter &cmd, ResponseContainer & 
         return Response::RespNameNotFound;
     }
 
-    bool didChange = c->setCount(cmd.value());
+    const int newValue = EssenceCounter::isEssenceCounter(c->getName()) ? EssenceCounter::clampBalance(cmd.value()) : cmd.value();
+    const bool didChange = c->setCount(newValue);
     if (didChange) {
         Event_SetCounter event;
         event.set_counter_id(c->getId());
@@ -558,6 +576,10 @@ Server_Player::cmdDelCounter(const Command_DelCounter &cmd, ResponseContainer & 
     Server_Counter *counter = counters.value(counterId, nullptr);
     if (!counter) {
         return Response::RespNameNotFound;
+    }
+    // Canonical Essence counters are permanent for the duration of a match.
+    if (EssenceCounter::isEssenceCounter(counter->getName())) {
+        return Response::RespContextError;
     }
     counters.remove(counterId);
     delete counter;

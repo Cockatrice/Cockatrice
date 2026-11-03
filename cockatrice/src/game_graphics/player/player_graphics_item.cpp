@@ -20,6 +20,7 @@
 #include "libcockatrice/utility/card_ref.h"
 #include "menu/player_menu.h"
 #include "player_area.h"
+#include "essence_pool_item.h"
 #include "player_dialogs.h"
 #include "player_target.h"
 
@@ -40,6 +41,7 @@
 #include <libcockatrice/game/player/player_actions.h>
 #include <libcockatrice/game/player/player_info.h>
 #include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/utility/essence_counter.h>
 #include <libcockatrice/game/zones/card_zone_logic.h>
 #include <libcockatrice/game/zones/hand_zone_logic.h>
 #include <libcockatrice/game/zones/pile_zone_logic.h>
@@ -51,7 +53,10 @@
 
 namespace
 {
-constexpr qreal EXTRA_PILE_COLUMN_WIDTH = CardDimensions::HEIGHT_F + 24;
+// Reserve a third, compact column for the synchronized 4x4 Essence pool.
+// This keeps the 16 resource balances visible without obscuring the table.
+constexpr qreal EXTRA_PILE_COLUMN_WIDTH =
+    CardDimensions::HEIGHT_F + 24 + EssencePoolItem::Width + 16;
 } // namespace
 
 PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
@@ -102,6 +107,13 @@ PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
     playerTarget->setPos(QPointF(avatarMargin, avatarMargin));
 
     initializeZones();
+
+    // Board-owned renderer only. All Essence balances live in player runtime
+    // CounterState and are sent/validated by the server.
+    essencePool = new EssencePoolItem(player, this);
+    const qreal essenceLeft = CardDimensions::HEIGHT_F + counterAreaWidth + 15 + 8 +
+                              CardDimensions::HEIGHT_F + 14;
+    essencePool->setPos(essenceLeft, 14);
 
     connect(player, &PlayerLogic::addViewCustomZoneActionToCustomZoneMenu, this,
             &PlayerGraphicsItem::onCustomZoneAdded);
@@ -310,6 +322,11 @@ void PlayerGraphicsItem::setMirrored(bool _mirrored)
 
 void PlayerGraphicsItem::onCounterAdded(CounterState *state)
 {
+    // The Essence pool owns its own compact 4x4 display. Never add sixteen
+    // full-size generic counters down the narrow life-counter column.
+    if (EssenceCounter::isEssenceCounter(state->getName())) {
+        return;
+    }
     AbstractCounter *widget;
     if (state->getName() == "life") {
         widget = playerTarget->addCounter(state);

@@ -107,6 +107,7 @@ set(cockatrice_SOURCES
     src/game_graphics/tally/stats_tally.cpp
     src/game_graphics/tally/subtype_tally.cpp
     src/game_graphics/tally/tally.cpp
+    src/game_graphics/player/essence_pool_item.cpp
     src/game_graphics/player/player_area.cpp
     src/game_graphics/player/player_dialogs.cpp
     src/game_graphics/player/player_graphics_item.cpp

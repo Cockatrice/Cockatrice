@@ -19,6 +19,7 @@ set(UTILITY_HEADERS
     libcockatrice/utility/cryptoutil.h
     libcockatrice/utility/debouncer.h
     libcockatrice/utility/expression.h
+    libcockatrice/utility/essence_counter.h
     libcockatrice/utility/installer_close_protocol.h
     libcockatrice/utility/levenshtein.h
     libcockatrice/utility/local_server_name.h

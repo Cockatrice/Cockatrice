@@ -31,6 +31,7 @@ class TableZone;
 class AbstractCounter;
 class CardZone;
 class CounterState;
+class EssencePoolItem;
 class PlayerArea;
 class PlayerLogic;
 struct CardRef;
@@ -160,6 +161,7 @@ private:
     PlayerDialogs *playerDialogs;
     PlayerArea *playerArea;
     PlayerTarget *playerTarget;
+    EssencePoolItem *essencePool = nullptr;
     QMap<int, AbstractCounter *> counterWidgets;
     QMap<QString, CardZone *> zoneGraphicsItems;
     PileZone *deckZoneGraphicsItem;
