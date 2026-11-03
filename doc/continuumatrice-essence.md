@@ -6,7 +6,7 @@ Continuumatrice uses **Essence** for card resources, not Magic: The Gathering ma
 M S O G E A Q C J B R L V T P N
 ```
 
-These are **16 distinct symbols**. `N` is explicitly **colorless Essence**. The other 15 codes currently have **no names, canonical colors or game rules assigned in the client**. Do not infer them from the corresponding MTG letters. All Essence codes are uppercase.
+These are **16 distinct symbols**. `N` is explicitly **colorless Essence**. The non-colorless codes use the existing MSE gemstone mappings (including **J = Jasper**), but the client does not assign their final artwork, gameplay rules or resource behavior. Do not infer anything from similarly named MTG mana letters. All Essence codes are uppercase.
 
 ## Native Continuumatrice XML v4
 
