@@ -35,6 +35,7 @@
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 #include <libcockatrice/utility/card_ref.h>
 #include <string>
+#include <utility>
 
 namespace
 {
