@@ -11,7 +11,6 @@
 
 class QObject;
 
-#define CARDDBMODEL_COLUMNS 6
 
 CardDatabaseModel::CardDatabaseModel(CardDatabase *_db, bool _showOnlyCardsFromEnabledSets, QObject *parent)
     : QAbstractListModel(parent), db(_db), showOnlyCardsFromEnabledSets(_showOnlyCardsFromEnabledSets)
@@ -38,12 +37,12 @@ int CardDatabaseModel::columnCount(const QModelIndex &parent) const
 {
     // Card rows are leaves, so a valid parent holds no columns. Reporting the
     // row width for a card index would claim child cells that do not exist.
-    return parent.isValid() ? 0 : CARDDBMODEL_COLUMNS;
+    return parent.isValid() ? 0 : ColumnCount;
 }
 
 QVariant CardDatabaseModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || index.row() >= cardList.size() || index.column() >= CARDDBMODEL_COLUMNS ||
+    if (!index.isValid() || index.row() >= cardList.size() || index.column() >= ColumnCount ||
         (role != Qt::DisplayRole && role != SortRole)) {
         return QVariant();
     }
@@ -59,10 +58,18 @@ QVariant CardDatabaseModel::data(const QModelIndex &index, int role) const
                                     : card->getManaCost();
         case CardTypeColumn:
             return card->getCardType();
-        case PTColumn:
-            return card->getPowTough();
+        case AtkHpColumn:
+            return card->getAtkHp();
         case ColorColumn:
             return card->getColors();
+        case IdentityColumn:
+            return card->getIdentity();
+        case AttackColumn:
+            return card->getAttack();
+        case ArmourColumn:
+            return card->getArmour();
+        case HealthColumn:
+            return card->getHealth();
         default:
             return QVariant();
     }
@@ -85,10 +92,18 @@ QVariant CardDatabaseModel::headerData(int section, Qt::Orientation orientation,
             return QString(tr("Essence Cost"));
         case CardTypeColumn:
             return QString(tr("Card type"));
-        case PTColumn:
-            return QString(tr("P/T"));
+        case AtkHpColumn:
+            return QString(tr("ATK/HP"));
         case ColorColumn:
             return QString(tr("Essence"));
+        case IdentityColumn:
+            return QString(tr("Identity"));
+        case AttackColumn:
+            return QString(tr("Attack"));
+        case ArmourColumn:
+            return QString(tr("Armour"));
+        case HealthColumn:
+            return QString(tr("Health"));
         default:
             return QVariant();
     }
@@ -101,7 +116,7 @@ void CardDatabaseModel::cardInfoChanged(const CardInfoPtr &card)
         return;
     }
 
-    emit dataChanged(index(row, 0), index(row, CARDDBMODEL_COLUMNS - 1));
+    emit dataChanged(index(row, 0), index(row, ColumnCount - 1));
 }
 
 bool CardDatabaseModel::checkCardHasAtLeastOneEnabledSet(const CardInfoPtr &card) const
