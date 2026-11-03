@@ -71,7 +71,7 @@ The current bundled placeholders show just the letter. `N` is neutral gray; the 
 
 - Card database properties: native Essence cost, identity and optional value, with fallbacks for older XML.
 - Card information display and deck editor column headers: `Essence`, `Essence Cost`, `Essence Value`.
-- Visual Deck Storage and Visual Database filters share a compact `Essence: Any` dropdown with a 5×3 grid of all 15 icons. Select multiple icons without closing the popup, clear selections within the popup, and use the existing filtering mode control beside it. The dropdown summarizes selected Essence codes and supports N independently from C.
+- Visual Deck Storage and Visual Database filters share a compact `Essence: Any` dropdown with a 5×3 grid of all 15 icons. Select multiple icons without closing the popup, clear selections within the popup, and change filtering mode **inside that same popup**. Only one compact control occupies the toolbar. The dropdown summarizes selected Essence codes and supports N independently from C.
 - Cost parser: single Essence symbols in bare form (`MSN`) or braces (`{M}{S}{N}`); numeric tokens may be preserved as generic amounts.
 - Deck identity: unique, ordered Essence codes (including `N`).
 - Search filters: filter for specific Essence codes, or `colorless` meaning `N`. An empty identity is not automatically `N`.
@@ -81,7 +81,7 @@ Hybrid, phyrexian, and other MTG-specific mana-cost syntax are **not** introduce
 
 ## Compact Essence filter UI
 
-The former five-button MTG `WUBRG` filters are replaced in both Visual Deck Storage and Visual Database. On either screen, click `Essence: Any` to open a **5-column × 3-row** grid of the complete Essence set. Each icon can be toggled independently and the menu stays open for multiple selections. Use **Clear Essence selection** to reset. The button summarizes your selection, and the original mode control still chooses Exact Match / Includes / Excludes (or Include / Exclude in the database).
+The former five-button MTG `WUBRG` filters are replaced in both Visual Deck Storage and Visual Database. On either screen, click `Essence: Any` to open a **5-column × 3-row** grid of the complete Essence set. Each icon can be toggled independently and the menu stays open for multiple selections. Use **Clear Essence selection** to reset. The button summarizes your selection, and the filtering mode remains available **inside** the popup (Exact Match / Includes / Excludes in deck storage, or Include / Exclude in the database).
 
 The picker is a single reusable Qt widget (`essence_filter_picker.h/.cpp`). This keeps both screens synchronized with `Essence::symbols()` without repeating a hand-maintained UI list. The UI uses SVG assets from `icons/essence/`, never old MTG `icons/mana/` assets.
 
@@ -101,3 +101,11 @@ ctest --test-dir build -R EssenceTypesTest --output-on-failure
 Verify that all fifteen icons render, `N` loads and filters separately from `C`, the XML importer accepts `essencecost` and `essence`, and the analytics show no WUBRG assumptions.
 
 **Status:** Source-level implementation committed. User-side Qt compilation and visual/runtime testing remain required.
+
+## November UI stability fixes
+
+The database toolbar now keeps its Essence filtering mode **inside** the picker popup, rather than forcing two separate controls into a wrapping flow layout. Both Visual Deck Storage and Visual Database use one compact toolbar button with a selection summary and tooltip. The popup grid is unchanged (15 icons, five columns × three rows).
+
+When the final selected Essence is cleared, the filter becomes **Any**, including in Exact Match / Include-Exclude mode; it must not leave behind exclusions for all fifteen symbols.
+
+A new Continuumatrice profile starts with a valid, deliberately empty XML card catalogue. The in-memory database now treats a successful empty snapshot as `LoadStatus::Ok`, not `NotLoaded`. This allows the card browser and toolbar to initialize even before the user's first MSE card import. `carddatabase_test` covers this distinction.
