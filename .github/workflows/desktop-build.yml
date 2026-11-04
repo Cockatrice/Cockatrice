@@ -149,7 +149,7 @@ jobs:
 
             allow-failure: yes
             package: skip    # We are packaged in Arch already
-            debug_test: yes    # see the note on Fedora 44 below
+            debug_test: yes    # see the note on Fedora 45 below
 
           - distro: Servatrice_Debian
             version: 12
@@ -166,10 +166,10 @@ jobs:
             ccache_size: 850M    # the Release build plus the suite it runs
 
           - distro: Fedora
-            version: 44
+            version: 45
 
             package: RPM
-            # Arch and Fedora 44 are the two newest toolchains, and the -Wno-error= exceptions
+            # Arch and Fedora 45 are the two newest toolchains, and the -Wno-error= exceptions
             # in CMakeLists.txt exist for exactly their warnings. They keep compiling Debug:
             # only the Debug configuration passes -Werror, so these two are the legs where a
             # new warning in either compiler still fails the build.
@@ -183,7 +183,7 @@ jobs:
             test: skip    # The sanitizer leg below runs this distro's suite
 
           # The one leg that runs the suite under AddressSanitizer and
-          # UndefinedBehaviorSanitizer. Debian 13 and Fedora 44 keep covering the
+          # UndefinedBehaviorSanitizer. Debian 13 and Fedora 45 keep covering the
           # uninstrumented suite, so nothing is lost by instrumenting this one.
           #
           # It packages nothing. A sanitized Debug build is not something to ship, and
@@ -223,7 +223,7 @@ jobs:
       # A configuration needs roughly 500-850 MB on Linux, so the old uniform 600M bound sat
       # below what a leg writes: ccache spent each build deleting the entries the next run
       # asked for (measured: 2624-3720 cleanup passes per build, 8% of calls served). Each
-      # leg states the size it needs instead: one configuration for most, two for Fedora 44
+      # leg states the size it needs instead: one configuration for most, two for Fedora 45
       # (Debug for the suite, Release for the package), the server alone for Servatrice.
       # Raising these further means caching fewer legs, since GitHub evicts a whole entry
       # when the total is exceeded.
@@ -466,7 +466,7 @@ jobs:
             test: skip    # Running tests on all distros is superfluous
 
           - distro: Fedora
-            version: 43    # previous release, still covered by the nightly
+            version: 44    # previous release, still covered by the nightly
 
             package: RPM
             test: skip    # Running tests on all distros is superfluous
@@ -1161,7 +1161,7 @@ jobs:
           # (PERSIST_CCACHE in build-linux and build-vcpkg), or a live entry is deleted.
           # The nightly legs keep none, so their leftover entries are reclaimed here
           # instead of waiting out the age rule.
-          LIVE_CCACHE_KEYS: 'ccache-Arch ccache-Servatrice_Debian12 ccache-Debian13 ccache-Fedora44 ccache-Ubuntu26.04 ccache-Ubuntu26.04sanitize ccache-macOS14-xcode-27 ccache-macOS15-xcode-27 ccache-macOS-xcode-27'
+          LIVE_CCACHE_KEYS: 'ccache-Arch ccache-Servatrice_Debian12 ccache-Debian13 ccache-Fedora45 ccache-Ubuntu26.04 ccache-Ubuntu26.04sanitize ccache-macOS14-xcode-27 ccache-macOS15-xcode-27 ccache-macOS-xcode-27'
         run: |
           gh api --paginate "repos/$GITHUB_REPOSITORY/actions/caches?per_page=100" \
             --jq '.actions_caches[] | [.id, .ref, .key, .last_accessed_at] | @tsv' >"$RUNNER_TEMP/caches.tsv"
