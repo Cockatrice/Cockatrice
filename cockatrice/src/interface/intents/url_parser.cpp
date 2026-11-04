@@ -44,7 +44,7 @@ void IntentUrlParser::handle(const QString &urlStr)
 {
     QUrl url(urlStr);
 
-    if (url.scheme() != "cockatrice") {
+    if (url.scheme() != "continuumatrice") {
         return;
     }
 

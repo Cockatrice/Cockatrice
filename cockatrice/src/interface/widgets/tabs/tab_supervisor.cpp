@@ -1511,7 +1511,7 @@ void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
             QMessageBox::information(
                 this, tr("Unknown Event"),
                 tr("The server has sent you a message that your client does not understand.\nThis message might mean "
-                   "there is a new version of Cockatrice available or this server is running a custom or pre-release "
+                   "there is a new version of Continuumatrice available or this server is running a custom or pre-release "
                    "version.\n\nTo update your client, go to Help -> Check for Updates."));
             break;
         case Event_NotifyUser::IDLEWARNING:

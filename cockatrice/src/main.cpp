@@ -69,6 +69,7 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/rng/rng_sfmt.h>
 #include <libcockatrice/settings/card_database_settings.h>
+#include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/network_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
@@ -84,7 +85,7 @@ SoundEngine *soundEngine;
 QSystemTrayIcon *trayIcon;
 ThemeManager *themeManager;
 
-const QString translationPrefix = "cockatrice";
+const QString translationPrefix = "cockatrice"; // Keep inherited translation catalogue until retranslated.
 QString translationPath;
 
 static void CockatriceLogger(QtMsgType type, const QMessageLogContext &ctx, const QString &message)
@@ -137,9 +138,9 @@ QString const generateClientID()
 static QString redactActivationUrl(const QString &url)
 {
     // Activation URLs carry secrets in their query string (e.g. the deck share
-    // token); log only the scheme and the action (cockatrice://opendeck), never
+    // token); log only the scheme and the action (continuumatrice://opendeck), never
     // the parameters.
-    if (!url.startsWith(QStringLiteral("cockatrice://"))) {
+    if (!url.startsWith(QStringLiteral("continuumatrice://"))) {
         return url;
     }
     const QUrl parsed(url);
@@ -219,7 +220,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
 #ifdef Q_OS_MAC
-    UrlSchemeEventFilter cockatriceFilter(QStringList{QStringLiteral("cockatrice")});
+    UrlSchemeEventFilter cockatriceFilter(QStringList{QStringLiteral("continuumatrice")});
 
     QStringList pendingMacUrls;
 
@@ -257,7 +258,7 @@ int main(int argc, char *argv[])
     // Declared before crash-reporter init: the startup attach below needs the log tail while the
     // file still holds the crashed session's lines.
     const QString persistentLogPath =
-        SettingsCache::instance().getSettingsPath() + QStringLiteral("logs/cockatrice.log");
+        SettingsCache::instance().getSettingsPath() + QStringLiteral("logs/continuumatrice.log");
     Logger::getInstance().setPersistentLogPath(persistentLogPath);
 
     // Crash reporting: init the SDK early so a crash anywhere below is captured into the
@@ -333,7 +334,7 @@ int main(int argc, char *argv[])
 #elif defined(Q_OS_WIN)
     translationPath = qApp->applicationDirPath() + "/translations";
 #else // linux
-    translationPath = qApp->applicationDirPath() + "/../share/cockatrice/translations";
+    translationPath = qApp->applicationDirPath() + "/../share/continuumatrice/translations";
 #endif
 
     // Command-line parser
@@ -416,6 +417,24 @@ int main(int argc, char *argv[])
     CardDatabaseManager::setCardDatabasePathProvider(&SettingsCache::instance());
     CardDatabaseManager::setCardSetPriorityController(&SettingsCache::instance().cardDatabase());
 
+    // Existing early fork profiles may still contain the upstream Scryfall /
+    // Gatherer defaults saved by older builds. Migrate only known MTG provider
+    // URLs, leaving user-authored Continuum Universes endpoints untouched.
+    auto &downloadSettings = SettingsCache::instance().downloads();
+    const QStringList savedImageUrls = downloadSettings.getAllURLs();
+    QStringList compatibleImageUrls;
+    for (const QString &url : savedImageUrls) {
+        if (!url.contains(QStringLiteral("scryfall.com"), Qt::CaseInsensitive) &&
+            !url.contains(QStringLiteral("scryfall.io"), Qt::CaseInsensitive) &&
+            !url.contains(QStringLiteral("gatherer.wizards.com"), Qt::CaseInsensitive)) {
+            compatibleImageUrls.append(url);
+        }
+    }
+    if (compatibleImageUrls != savedImageUrls) {
+        downloadSettings.setDownloadUrls(compatibleImageUrls);
+        qCInfo(MainLog) << "Removed inherited MTG image sources from Continuumatrice profile.";
+    }
+
     qCInfo(MainLog) << "Starting main program";
 
     // Front-load the card database before constructing the main window. The
@@ -448,7 +467,7 @@ int main(int argc, char *argv[])
     // auto-connect must not race against it (two connectToServer calls tear
     // each other down via doDisconnectFromServer).
     bool hasUrlActivation = std::any_of(startupFiles.begin(), startupFiles.end(), [](const QString &file) {
-        return file.startsWith(QStringLiteral("cockatrice://"));
+        return file.startsWith(QStringLiteral("continuumatrice://"));
     });
 #ifdef Q_OS_MAC
     // On macOS the launch can arrive through the URL scheme instead of as a
@@ -456,12 +475,12 @@ int main(int argc, char *argv[])
     // window would auto-connect into the link's own connection attempt.
     hasUrlActivation = hasUrlActivation ||
                        std::any_of(pendingMacUrls.cbegin(), pendingMacUrls.cend(),
-                                   [](const QString &url) { return url.startsWith(QStringLiteral("cockatrice://")); });
+                                   [](const QString &url) { return url.startsWith(QStringLiteral("continuumatrice://")); });
 #endif
     ui.setSkipStartupAutoConnect(hasUrlActivation);
 
     auto handleActivation = [&ui](const QString &file) {
-        if (file.startsWith("cockatrice://")) {
+        if (file.startsWith("continuumatrice://")) {
             qCInfo(MainLog) << "Handling URL activation:" << redactActivationUrl(file);
             // Route through the window's persistent url parser: it serializes
             // link chains so activations handed over while another chain is
@@ -487,12 +506,12 @@ int main(int argc, char *argv[])
     }
     qCInfo(MainLog) << "MainWindow constructor finished";
 
-    ui.setWindowIcon(themePixmap(QStringLiteral("cockatrice")));
+    ui.setWindowIcon(themePixmap(QStringLiteral("continuumatrice")));
     // Base name of the desktop file installed next to the binary, without the ".desktop"
     // extension. Wayland reads the window icon from it, and xdg-desktop-portal looks up
     // org.freedesktop.host.portal.Registry by this app ID, so it has to match the file name
     // exactly, down to the case.
-    QGuiApplication::setDesktopFileName("cockatrice");
+    QGuiApplication::setDesktopFileName("continuumatrice");
 
     SettingsCache::instance().network().setClientID(generateClientID());
 

@@ -10,16 +10,18 @@ Cockatrice's three visual table rows are reused as **Front**, **Support**, and *
 
 ## Optional color customization
 
-Create `battlefield.ini` in the active Cockatrice theme directory:
+The default zone colors are **Front `#dc143c` (Crimson)**, **Support `#c3b091`**, and **Command `#0a0e3f`**.
+
+To override the defaults, create `battlefield.ini` in your active **Continuumatrice** theme directory:
 
 ```ini
 [Zones]
-Front = #A08E343D
-Support = #A0286981
-Command = #A05E428C
+Front = #dc143c
+Support = #c3b091
+Command = #0a0e3f
 ```
 
-The Qt color notation is `#AARRGGBB`, including transparency. Without this file, built-in red, teal, and purple shades are used. Reload the theme to apply changes. The default layout places Front closest to the opposing player's battlefield and Command closest to each player's hand. As in Cockatrice, the **Invert vertical coordinate** setting reverses the row placement (and its labels) when enabled.
+Qt accepts `#RRGGBB` for opaque colors and `#AARRGGBB` to specify transparency. The built-in defaults above are opaque; a theme can set translucent overrides explicitly. An existing `battlefield.ini` still takes precedence over these defaults. Reload the theme to apply changes. The default layout places Front closest to the opposing player's battlefield and Command closest to each player's hand. As in Cockatrice, the **Invert vertical coordinate** setting reverses the row placement (and its labels) when enabled.
 
 ## Font
 

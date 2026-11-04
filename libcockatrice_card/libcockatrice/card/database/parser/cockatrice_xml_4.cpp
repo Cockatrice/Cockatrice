@@ -32,10 +32,11 @@
 
 class ICardSetPriorityController;
 
-#define COCKATRICE_XML4_TAGNAME "cockatrice_carddatabase"
+#define CONTINUUMATRICE_XML4_TAGNAME "continuumatrice_carddatabase"
+#define COCKATRICE_XML4_TAGNAME "cockatrice_carddatabase" // Accepted legacy XML input
 #define COCKATRICE_XML4_TAGVER 4
 #define COCKATRICE_XML4_SCHEMALOCATION                                                                                 \
-    "https://raw.githubusercontent.com/Cockatrice/Cockatrice/master/doc/carddatabase_v4/cards.xsd"
+    "https://raw.githubusercontent.com/Continuum-Universes-Studio/Continuumatrice/master/doc/carddatabase_v4/cards.xsd"
 
 CockatriceXml4Parser::CockatriceXml4Parser(ICardSetPriorityController *_cardSetPriorityController)
     : ICardDatabaseParser(_cardSetPriorityController)
@@ -54,7 +55,8 @@ bool CockatriceXml4Parser::getCanParseFile(const QString &fileName, QIODevice &d
     QXmlStreamReader xml(&device);
     while (!xml.atEnd()) {
         if (xml.readNext() == QXmlStreamReader::StartElement) {
-            if (xml.name().toString() == COCKATRICE_XML4_TAGNAME) {
+            if (xml.name().toString() == CONTINUUMATRICE_XML4_TAGNAME ||
+                xml.name().toString() == COCKATRICE_XML4_TAGNAME) {
                 int version = xml.attributes().value("version").toString().toInt();
                 if (version == COCKATRICE_XML4_TAGVER) {
                     return true;
@@ -691,7 +693,7 @@ bool CockatriceXml4Parser::saveToFile(FormatRulesNameMap _formats,
 
     xml.setAutoFormatting(true);
     xml.writeStartDocument();
-    xml.writeStartElement(COCKATRICE_XML4_TAGNAME);
+    xml.writeStartElement(CONTINUUMATRICE_XML4_TAGNAME);
     xml.writeAttribute("version", QString::number(COCKATRICE_XML4_TAGVER));
     xml.writeAttribute("xmlns:xsi", COCKATRICE_XML_XSI_NAMESPACE);
     xml.writeAttribute("xsi:schemaLocation", COCKATRICE_XML4_SCHEMALOCATION);
@@ -727,7 +729,7 @@ bool CockatriceXml4Parser::saveToFile(FormatRulesNameMap _formats,
         xml.writeEndElement();
     }
 
-    xml.writeEndElement(); // cockatrice_carddatabase
+    xml.writeEndElement(); // continuumatrice_carddatabase
     xml.writeEndDocument();
 
     return true;

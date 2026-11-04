@@ -294,7 +294,7 @@ QString ThemeManager::assetPath(QStringView prefix) const
 // on Windows where UAC VirtualStore can make a system dir appear writable).
 bool ThemeManager::isDirReallyWritable(const QString &dirPath)
 {
-    const QString probe = QDir(dirPath).absoluteFilePath(".cockatrice_write_test");
+    const QString probe = QDir(dirPath).absoluteFilePath(".continuumatrice_write_test");
     QFile f(probe);
     if (!f.open(QIODevice::WriteOnly)) {
         return false;
@@ -326,7 +326,7 @@ static QString systemThemesBasePath()
 #elif defined(Q_OS_WIN)
     base += "/themes";
 #else // linux
-    base += "/../share/cockatrice/themes";
+    base += "/../share/continuumatrice/themes";
 #endif
     return base;
 }

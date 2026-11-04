@@ -120,17 +120,17 @@
 
 class LocalServerInterface;
 
-#define GITHUB_PAGES_URL "https://cockatrice.github.io"
+#define GITHUB_PAGES_URL "https://github.com/Continuum-Universes-Studio/Continuumatrice"
 #define GITHUB_CONTRIBUTORS_URL "https://github.com/Cockatrice/Cockatrice/graphs/contributors"
 #define GITHUB_CONTRIBUTE_URL "https://github.com/Cockatrice/Cockatrice#"
 #define GITHUB_TRANSIFEX_TRANSLATORS_URL "https://github.com/Cockatrice/Cockatrice/wiki/Translator-Hall-of-Fame"
 #define GITHUB_TRANSLATOR_FAQ_URL "https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ"
-#define GITHUB_ISSUES_URL "https://github.com/Cockatrice/Cockatrice/issues"
+#define GITHUB_ISSUES_URL "https://github.com/Continuum-Universes-Studio/Continuumatrice/issues"
 #define GITHUB_TROUBLESHOOTING_URL "https://github.com/Cockatrice/Cockatrice/wiki/Troubleshooting"
 #define GITHUB_FAQ_URL "https://github.com/Cockatrice/Cockatrice/wiki/Frequently-Asked-Questions"
 
-const QString MainWindow::appName = "Cockatrice";
-const QStringList MainWindow::fileNameFilters = QStringList() << QObject::tr("Cockatrice card database (*.xml)")
+const QString MainWindow::appName = "Continuumatrice";
+const QStringList MainWindow::fileNameFilters = QStringList() << QObject::tr("Continuumatrice card database (*.xml)")
                                                               << QObject::tr("All files (*.*)");
 inline Q_LOGGING_CATEGORY(MainWindowLog, "main_window");
 
@@ -231,7 +231,7 @@ void MainWindow::actWatchReplay()
 {
     QFileDialog dlg(this, tr("Load replay"));
     dlg.setDirectory(SettingsCache::instance().paths().getReplaysPath());
-    dlg.setNameFilters(QStringList() << QObject::tr("Cockatrice replays (*.cor)"));
+    dlg.setNameFilters(QStringList() << QObject::tr("Continuumatrice replays (*.cor)"));
     if (!dlg.exec()) {
         return;
     }
@@ -292,27 +292,24 @@ void MainWindow::actExit()
 void MainWindow::actAbout()
 {
     QMessageBox mb(
-        QMessageBox::NoIcon, tr("About Cockatrice"),
-        QString("<font size=\"8\"><b>Cockatrice</b></font> (" + QString::fromStdString(BUILD_ARCHITECTURE) + ")<br>" +
-                tr("Version") + QString(" %1").arg(VERSION_STRING) + "<br><br><b><a href='" + GITHUB_PAGES_URL + "'>" +
-                tr("Cockatrice Webpage") + "</a></b><br>" + "<br><b>" + tr("Project Manager:") +
-                "</b><br>Zach Halpern<br><br>" + "<b>" + tr("Past Project Managers:") +
-                "</b><br>Gavin Bisesi<br>Max-Wilhelm Bruker<br>Marcus Schütz<br><br>" + "<b>" + tr("Developers:") +
-                "</b><br>" + "<a href='" + GITHUB_CONTRIBUTORS_URL + "'>" + tr("Our Developers") + "</a><br>" +
-                "<a href='" + GITHUB_CONTRIBUTE_URL + "'>" + tr("Help Develop!") + "</a><br><br>" + "<b>" +
-                tr("Translators:") + "</b><br>" + "<a href='" + GITHUB_TRANSIFEX_TRANSLATORS_URL + "'>" +
-                tr("Our Translators") + "</a><br>" + "<a href='" + GITHUB_TRANSLATOR_FAQ_URL + "'>" +
-                tr("Help Translate!") + "</a><br><br>" + "<b>" + tr("Support:") + "</b><br>" + "<a href='" +
-                GITHUB_ISSUES_URL + "'>" + tr("Report an Issue") + "</a><br>" + "<a href='" +
-                GITHUB_TROUBLESHOOTING_URL + "'>" + tr("Troubleshooting") + "</a><br>" + "<a href='" + GITHUB_FAQ_URL +
-                "'>" + tr("F.A.Q.") + "</a><br>"),
+        QMessageBox::NoIcon, tr("About Continuumatrice"),
+        QStringLiteral("<font size=\"8\"><b>Continuumatrice</b></font><br>") +
+            tr("Continuum Universes Studio") + QStringLiteral(" — ") + tr("Version") +
+            QStringLiteral(" ") + QString(VERSION_STRING) +
+            QStringLiteral("<br><br>") +
+            tr("Continuumatrice is a standalone Continuum Universes card-game client.") +
+            QStringLiteral("<br><a href='https://github.com/Continuum-Universes-Studio/Continuumatrice'>") +
+            tr("Source code and issues") + QStringLiteral("</a><br><br>") +
+            tr("Based on the open-source Cockatrice project. The original developers and contributors "
+               "retain credit for their work, and the applicable open-source license remains in force.") +
+            QStringLiteral("<br><a href='https://github.com/Cockatrice/Cockatrice'>") +
+            tr("Upstream Cockatrice project") + QStringLiteral("</a>"),
         QMessageBox::Ok, this);
     mb.setIconPixmap(
-        themePixmap(QStringLiteral("cockatrice")).scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        themePixmap(QStringLiteral("continuumatrice")).scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     mb.setTextInteractionFlags(Qt::TextBrowserInteraction);
     mb.exec();
 }
-
 void MainWindow::actTips()
 {
     if (tip != nullptr) {
@@ -369,7 +366,7 @@ void MainWindow::retranslateUi()
 #if defined(__APPLE__) /* For OSX */
     cockatriceMenu->setTitle(tr("A&ctions"));
 #else
-    cockatriceMenu->setTitle(tr("&Cockatrice"));
+    cockatriceMenu->setTitle(tr("&Continuumatrice"));
 #endif
 
     dbMenu->setTitle(tr("C&ard Database"));
@@ -383,11 +380,13 @@ void MainWindow::retranslateUi()
     tabsMenu->setTitle(tr("Tabs"));
 
     helpMenu->setTitle(tr("&Help"));
-    aAbout->setText(tr("&About Cockatrice"));
+    aAbout->setText(tr("&About Continuumatrice"));
     aTips->setText(tr("&Tip of the Day"));
     aUpdate->setText(tr("Check for Client Updates"));
-    aCheckCardUpdates->setText(tr("Check for Card Updates..."));
-    aCheckCardUpdatesBackground->setText(tr("Check for Card Updates (Automatic)"));
+    aCheckCardUpdates->setText(tr("Legacy MTG Oracle importer (disabled)"));
+    aCheckCardUpdates->setEnabled(false);
+    aCheckCardUpdatesBackground->setText(tr("Automatic MTG card updates (disabled)"));
+    aCheckCardUpdatesBackground->setEnabled(false);
     aStatusBar->setText(tr("Show Status Bar"));
     aViewLog->setText(tr("View &Debug Log"));
     aOpenSettingsFolder->setText(tr("Open Settings Folder"));
@@ -651,20 +650,23 @@ void MainWindow::startupConfigCheck()
         startLocalGame(options);
     }
 
-    if (SettingsCache::instance().updates().getCheckUpdatesOnStartup()) {
-        actCheckClientUpdates();
-    }
+    // The fork has independent release channels. Until a Continuumatrice
+    // release is published, do not auto-check or run upstream Cockatrice updates.
+    SettingsCache::instance().updates().setCheckUpdatesOnStartup(false);
 
-    actCheckCommanderBracketDefinitionUpdates();
-
+    // No MTG Commander-bracket network requests in Continuumatrice.
     if (isCleanInstall) {
         // no config found, 99% new clean install
         qCInfo(WindowMainStartupVersionLog)
             << "Startup: old client version empty, assuming first start after clean install";
-        SettingsCache::instance().downloads().resetToDefaultURLs(); // populate the download urls
+        SettingsCache::instance().downloads().resetToDefaultURLs(); // Empty in Continuumatrice: no MTG providers
         SettingsCache::instance().network().setClientVersion(VERSION_STRING);
-        actCheckServerUpdates();
-        runFirstRunWizard(true);
+        // No upstream Cockatrice first-run wizard, Magic importer, or default
+        // server discovery. Cards are loaded from this application's own XML.
+        QMessageBox::information(this, tr("Welcome to Continuumatrice"),
+                                 tr("Continuumatrice uses its own card database. "
+                                    "Add your card XML files using Card Database > Add custom sets/cards "
+                                    "or place them in the Continuumatrice customsets directory."));
 
         if (QString(VERSION_STRING).contains("custom", Qt::CaseInsensitive)) {
             SettingsCache::instance().updates().setCheckUpdatesOnStartup(false);
@@ -677,7 +679,7 @@ void MainWindow::startupConfigCheck()
             << "Startup: old client version" << SettingsCache::instance().network().getClientVersion()
             << "differs, assuming first start after update";
         if (SettingsCache::instance().updates().getNotifyAboutNewVersion()) {
-            alertForcedOracleRun(VERSION_STRING, true);
+            // Do not automatically launch the upstream Magic-card Oracle importer.
         }
 
         qCInfo(WindowMainStartupShortcutsLog) << "Migrating shortcuts after update detected.";
@@ -704,35 +706,8 @@ void MainWindow::startupConfigCheck()
         // previous config from this version found
         qCInfo(WindowMainStartupVersionLog) << "Startup: found config with current version";
 
-        if (SettingsCache::instance().updates().getCardUpdateCheckRequired()) {
-            if (SettingsCache::instance().updates().getStartupCardUpdateCheckPromptForUpdate()) {
-                auto startupCardCheckDialog = new DlgStartupCardCheck(this);
+        // No automatic upstream card database downloads in Continuumatrice.
 
-                if (startupCardCheckDialog->exec() == QDialog::Accepted) {
-                    switch (startupCardCheckDialog->group->checkedId()) {
-                        case 0: // foreground
-                            actCheckCardUpdates();
-                            break;
-                        case 1: // background
-                            actCheckCardUpdatesBackground();
-                            break;
-                        case 2: // background + always
-                            SettingsCache::instance().updates().setStartupCardUpdateCheckPromptForUpdate(false);
-                            SettingsCache::instance().updates().setStartupCardUpdateCheckAlwaysUpdate(true);
-                            actCheckCardUpdatesBackground();
-                            break;
-                        case 3: // don't prompt again + don't run
-                            SettingsCache::instance().updates().setStartupCardUpdateCheckPromptForUpdate(false);
-                            SettingsCache::instance().updates().setStartupCardUpdateCheckAlwaysUpdate(false);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            } else if (SettingsCache::instance().updates().getStartupCardUpdateCheckAlwaysUpdate()) {
-                actCheckCardUpdatesBackground();
-            }
-        }
 
         // Run the tips dialog only on subsequent startups.
         // On the first run after an install/update the startup is already crowded enough
@@ -860,12 +835,12 @@ void MainWindow::alertForcedOracleRun(const QString &version, bool isUpdate)
 {
     if (isUpdate) {
         QMessageBox::information(this, tr("New Version"),
-                                 tr("Congratulations on updating to Cockatrice %1!\n"
+                                 tr("Congratulations on updating to Continuumatrice %1!\n"
                                     "Oracle will now launch to update your card database.")
                                      .arg(version));
     } else {
-        QMessageBox::information(this, tr("Cockatrice installed"),
-                                 tr("Congratulations on installing Cockatrice %1!\n"
+        QMessageBox::information(this, tr("Continuumatrice installed"),
+                                 tr("Congratulations on installing Continuumatrice %1!\n"
                                     "Oracle will now launch to install the initial card database.")
                                      .arg(version));
     }
@@ -1110,7 +1085,7 @@ void MainWindow::cardDatabaseLoadingFailed()
     QMessageBox msgBox;
     msgBox.setWindowTitle(tr("Card database"));
     msgBox.setIcon(QMessageBox::Question);
-    msgBox.setText(tr("Cockatrice is unable to load the card database.\n"
+    msgBox.setText(tr("Continuumatrice is unable to load the card database.\n"
                       "Do you want to update your card database now?\n"
                       "If unsure or first time user, choose \"Yes\""));
 
@@ -1193,7 +1168,7 @@ void MainWindow::cardDatabaseAllNewSetsEnabled()
         }
         QMessageBox::information(
             this, tr("Welcome"),
-            tr("Hi! It seems like you're running this version of Cockatrice for the first time.\nAll the sets in the "
+            tr("This is the first time you've loaded this card database in Continuumatrice.\nAll the sets in the "
                "card "
                "database have been enabled.\nRead more about changing the set order or disabling specific sets and "
                "consequent effects in the \"Manage Sets\" dialog."));
@@ -1207,16 +1182,28 @@ void MainWindow::cardDatabaseAllNewSetsEnabled()
 /* CARD UPDATER */
 void MainWindow::actCheckCardUpdates()
 {
-    createCardUpdateProcess();
+    QMessageBox::information(this, tr("Continuumatrice card data"),
+                             tr("The upstream Oracle importer downloads Magic card data and is disabled "
+                                "in Continuumatrice. Import Continuum Universes XML cards using "
+                                "Card Database > Add custom sets/cards instead."));
 }
 
 void MainWindow::actCheckCardUpdatesBackground()
 {
-    createCardUpdateProcess(true);
+    // Never run the upstream Oracle MTG importer unattended.
+    qCInfo(CardDatabaseUpdateLog) << "The legacy Magic Oracle importer is disabled in Continuumatrice";
 }
 
 void MainWindow::createCardUpdateProcess(bool background)
 {
+    Q_UNUSED(background);
+    // Direct callers must also be unable to launch the upstream MTG importer.
+    QMessageBox::information(this, tr("Importer unavailable"),
+                             tr("Continuumatrice does not run the upstream Magic Oracle importer. "
+                                "Import Continuum Universes XML sets directly."));
+    return;
+
+    // Legacy importer implementation retained for upstream reference only.
     if (cardUpdateProcess) {
         qCDebug(CardDatabaseUpdateLog) << "A card database update is already running; asking it to come to the front";
         if (requestCardUpdateRaise()) {
@@ -1309,7 +1296,7 @@ void MainWindow::createCardUpdateProcess(bool background)
         statusBar()->showMessage(tr("Card database update running."));
         if (trayIcon && SettingsCache::instance().updates().getCardDatabaseUpdateTrayNotification()) {
             trayIcon->showMessage(tr("Card database update started"),
-                                  tr("Cockatrice is updating the card database in the background."));
+                                  tr("Continuumatrice is updating the card database in the background."));
         }
     }
 }
@@ -1451,7 +1438,7 @@ void MainWindow::cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatu
 
 bool MainWindow::requestCardUpdateRaise()
 {
-    const QString serverName = scopedLocalServerName(QStringLiteral("CockatriceOracleRaise"));
+    const QString serverName = scopedLocalServerName(QStringLiteral("ContinuumatriceOracleRaise"));
     QLocalSocket socket;
     socket.connectToServer(serverName);
     if (!socket.waitForConnected(250)) {
@@ -1469,7 +1456,7 @@ void MainWindow::announceCardUpdateRunning()
         statusBar()->showMessage(tr("Card database update running."));
     } else if (trayIcon && SettingsCache::instance().updates().getCardDatabaseUpdateTrayNotification()) {
         trayIcon->showMessage(tr("Card database update running"),
-                              tr("Cockatrice is updating the card database in the background."));
+                              tr("Continuumatrice is updating the card database in the background."));
     }
 }
 
@@ -1485,9 +1472,8 @@ void MainWindow::notifyCardUpdateFinishedFromTray(bool success)
 
 void MainWindow::actCheckServerUpdates()
 {
-    auto hps = new HandlePublicServers(this);
-    hps->downloadPublicServers();
-    connect(hps, &HandlePublicServers::sigPublicServersDownloadedSuccessfully, [=]() { hps->deleteLater(); });
+    // Upstream Cockatrice public servers are not Continuumatrice game servers.
+    qCInfo(MainWindowLog) << "Upstream public server discovery disabled in Continuumatrice.";
 }
 
 void MainWindow::actCheckClientUpdates()
@@ -1507,12 +1493,8 @@ void MainWindow::checkClientUpdatesFinished(bool needToUpdate, bool /* isCompati
 
 void MainWindow::actCheckCommanderBracketDefinitionUpdates()
 {
-    auto *handler = new HandleCommanderBrackets(this);
-
-    connect(handler, &HandleCommanderBrackets::sigBracketDefinitionsDownloaded, this,
-            []() { qDebug() << "Bracket definitions loaded"; });
-
-    handler->downloadBracketDefinitions();
+    // Commander brackets are a Magic: The Gathering system, not Continuum Universes.
+    qCInfo(MainWindowLog) << "Upstream Commander bracket updates disabled in Continuumatrice.";
 }
 
 void MainWindow::refreshShortcuts()

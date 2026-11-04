@@ -6,10 +6,10 @@ set(defsounds Default Legacy)
 
 if(UNIX)
   if(APPLE)
-    install(DIRECTORY ${defsounds} DESTINATION Cockatrice.app/Contents/Resources/sounds/)
+    install(DIRECTORY ${defsounds} DESTINATION continuumatrice.app/Contents/Resources/sounds/)
   else()
     # Assume linux
-    install(DIRECTORY ${defsounds} DESTINATION share/cockatrice/sounds/)
+    install(DIRECTORY ${defsounds} DESTINATION share/continuumatrice/sounds/)
   endif()
 elseif(WIN32)
   install(DIRECTORY ${defsounds} DESTINATION sounds/)

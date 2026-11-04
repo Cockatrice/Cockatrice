@@ -2,6 +2,7 @@
 
 #include "deck_list_model.h"
 #include "libcockatrice/card/card_info.h"
+#include <libcockatrice/card/essence_types.h>
 #include "libcockatrice/card/database/card_database_querier.h"
 #include "libcockatrice/deck_list/tree/deck_list_card_node.h"
 #include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
@@ -127,68 +128,39 @@ void DeckListStatisticsAnalyzer::analyze()
 
 QHash<QString, int> DeckListStatisticsAnalyzer::determineManaProduction(const QString &rulesText)
 {
-    QHash<QString, int> manaCounts = {{"W", 0}, {"U", 0}, {"B", 0}, {"R", 0}, {"G", 0}, {"C", 0}};
-
-    QString text = rulesText.toLower(); // Normalize case for matching
-
-    // Quick keyword-based checks for any color and colorless mana
-    if (text.contains("{t}: add one mana of any color") || text.contains("add one mana of any color")) {
-        for (const auto &color : {QStringLiteral("W"), QStringLiteral("U"), QStringLiteral("B"), QStringLiteral("R"),
-                                  QStringLiteral("G")}) {
-            manaCounts[color]++;
-        }
-    }
-    if (text.contains("{t}: add {c}") || text.contains("add one colorless mana")) {
-        manaCounts["C"]++;
+    QHash<QString, int> result;
+    for (const QChar code : Essence::symbols()) {
+        result.insert(QString(code), 0);
     }
 
-    // Optimized regex for specific mana symbols
-    static const QRegularExpression specificColorRegex(R"(\{T\}:\s*Add\s*\{([WUBRG])\})");
-    QRegularExpressionMatch match = specificColorRegex.match(rulesText);
-    if (match.hasMatch()) {
-        manaCounts[match.captured(1)]++;
-    }
+    // Explicit Essence grants only. Inferring additional resources from MTG
+    // tap/mana rules would invent Continuum Universes gameplay semantics.
+    // E.g. "Add {M}" / "add {N}" both work.
+    static const QRegularExpression grantedEssence(
+        QStringLiteral(R"(\badd\s*\{([MSOGEAQCJBRLVTPN])\})"),
+        QRegularExpression::CaseInsensitiveOption);
 
-    return manaCounts;
+    auto matches = grantedEssence.globalMatch(rulesText);
+    while (matches.hasNext()) {
+        const QString code = matches.next().captured(1).toUpper();
+        result[code]++;
+    }
+    return result;
 }
 
-std::unordered_map<char, int> DeckListStatisticsAnalyzer::countManaSymbols(const QString &manaString)
+std::unordered_map<char, int> DeckListStatisticsAnalyzer::countManaSymbols(const QString &essenceCost)
 {
-    std::unordered_map<char, int> manaCounts = {{'W', 0}, {'U', 0}, {'B', 0}, {'R', 0}, {'G', 0}};
-
-    int len = manaString.length();
-    for (int i = 0; i < len; ++i) {
-        if (manaString[i] == '{') {
-            ++i; // Move past '{'
-            if (i < len && manaCounts.find(manaString[i].toLatin1()) != manaCounts.end()) {
-                char mana1 = manaString[i].toLatin1();
-                ++i; // Move to next character
-                if (i < len && manaString[i] == '/') {
-                    ++i; // Move past '/'
-                    if (i < len && manaCounts.find(manaString[i].toLatin1()) != manaCounts.end()) {
-                        char mana2 = manaString[i].toLatin1();
-                        manaCounts[mana1]++;
-                        manaCounts[mana2]++;
-                    } else {
-                        // Handle cases like "{W/}" where second part is invalid
-                        manaCounts[mana1]++;
-                    }
-                } else {
-                    manaCounts[mana1]++;
-                }
-            }
-            // Ensure we always skip to the closing '}'
-            while (i < len && manaString[i] != '}') {
-                ++i;
-            }
-        }
-        // Check if the character is a standalone mana symbol (not inside {})
-        else if (manaCounts.find(manaString[i].toLatin1()) != manaCounts.end()) {
-            manaCounts[manaString[i].toLatin1()]++;
-        }
+    std::unordered_map<char, int> result;
+    for (const QChar code : Essence::symbols()) {
+        result.emplace(code.toLatin1(), 0);
     }
 
-    return manaCounts;
+    for (const QString &token : Essence::parseCost(essenceCost)) {
+        if (token.size() == 1 && Essence::isSymbol(token.at(0))) {
+            result[token.at(0).toLatin1()]++;
+        }
+    }
+    return result;
 }
 
 // Hypergeometric probability: P(X=k)

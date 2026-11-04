@@ -213,7 +213,7 @@ void FirstRunWizard::changeEvent(QEvent *event)
 
 void FirstRunWizard::retranslateUi()
 {
-    setWindowTitle(tr("Welcome to Cockatrice"));
+    setWindowTitle(tr("Welcome to Continuumatrice"));
     backButton->setText(tr("Back"));
     skipButton->setText(tr("Skip"));
     for (FirstRunWizardPage *page : std::as_const(pages)) {

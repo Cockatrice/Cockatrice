@@ -103,6 +103,54 @@ TEST(ModelContract, CardDatabaseModelAndDisplayProxyKeepContract)
     EXPECT_LT(display.rowCount(), source.rowCount());
 }
 
+TEST(ModelContract, ContinuumCardStatsAreSortableAndLabeled)
+{
+    NoopCardPreferenceProvider prefs;
+    TestCardDatabasePathProvider paths;
+    NoopCardSetPriorityController setPriority;
+    CardDatabase database(nullptr, &prefs, &paths, &setPriority);
+
+    auto swift = CardInfo::newInstance("Swift");
+    swift->setProperty("identity", "Astra");
+    swift->setProperty("attack", "9");
+    swift->setProperty("armour", "10");
+    swift->setProperty("health", "2");
+
+    auto sturdy = CardInfo::newInstance("Sturdy");
+    sturdy->setProperty("identity", "Zephyr");
+    sturdy->setProperty("attack", "10");
+    sturdy->setProperty("armour", "2");
+    sturdy->setProperty("health", "12");
+
+    database.addCard(swift);
+    database.addCard(sturdy);
+
+    CardDatabaseModel source(&database, false);
+    CardDatabaseDisplayModel display;
+    display.setSourceModel(&source);
+
+    ASSERT_EQ(source.columnCount(), CardDatabaseModel::ColumnCount);
+    ASSERT_EQ(display.rowCount(), 2);
+    EXPECT_EQ(source.headerData(CardDatabaseModel::AtkHpColumn, Qt::Horizontal).toString(), "ATK/HP");
+    EXPECT_EQ(source.headerData(CardDatabaseModel::IdentityColumn, Qt::Horizontal).toString(), "Identity");
+    EXPECT_EQ(source.headerData(CardDatabaseModel::AttackColumn, Qt::Horizontal).toString(), "Attack");
+    EXPECT_EQ(source.headerData(CardDatabaseModel::ArmourColumn, Qt::Horizontal).toString(), "Armour");
+    EXPECT_EQ(source.headerData(CardDatabaseModel::HealthColumn, Qt::Horizontal).toString(), "Health");
+
+    const auto firstName = [&display] { return display.index(0, CardDatabaseModel::NameColumn).data().toString(); };
+
+    display.sort(CardDatabaseModel::AttackColumn, Qt::AscendingOrder);
+    EXPECT_EQ(firstName(), "Swift") << "9 ATK should precede 10 ATK";
+    display.sort(CardDatabaseModel::ArmourColumn, Qt::AscendingOrder);
+    EXPECT_EQ(firstName(), "Sturdy") << "2 Armour should precede 10 Armour";
+    display.sort(CardDatabaseModel::HealthColumn, Qt::AscendingOrder);
+    EXPECT_EQ(firstName(), "Swift") << "2 HP should precede 12 HP";
+    display.sort(CardDatabaseModel::AtkHpColumn, Qt::AscendingOrder);
+    EXPECT_EQ(firstName(), "Swift") << "ATK/HP should sort attack and health numerically";
+    display.sort(CardDatabaseModel::IdentityColumn, Qt::DescendingOrder);
+    EXPECT_EQ(firstName(), "Sturdy") << "Identity should sort text from the alias/identity property";
+}
+
 TEST(ModelContract, SetsModelKeepsContract)
 {
     CardDatabase database(nullptr, new NoopCardPreferenceProvider(), new TestCardDatabasePathProvider(),
