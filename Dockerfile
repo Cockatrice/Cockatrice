@@ -50,7 +50,7 @@ RUN apt-get update \
 # Only copy installed binaries, not source
 COPY --from=build /usr/local /usr/local
 
-WORKDIR /home/servatrice
+WORKDIR /home/continuum-servatrice
 
 EXPOSE 4748
-ENTRYPOINT [ "servatrice", "--log-to-console" ]
+ENTRYPOINT [ "continuum-servatrice", "--log-to-console" ]
