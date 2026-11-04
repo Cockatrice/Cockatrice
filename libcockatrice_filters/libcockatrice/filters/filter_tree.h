@@ -254,6 +254,7 @@ public:
     [[nodiscard]] bool
     acceptCardAttr(const CardInfoPtr &info, CardFilter::Attr attr, const CardSearchLanguage &searchLanguage) const;
     [[nodiscard]] bool acceptFormat(const CardInfoPtr &info) const;
+    [[nodiscard]] bool acceptTag(const CardInfoPtr &info) const;
     [[nodiscard]] bool relationCheck(int cardInfo) const;
 };
 
