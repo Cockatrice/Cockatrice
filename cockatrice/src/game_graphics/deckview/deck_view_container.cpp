@@ -71,6 +71,8 @@ void ToggleButton::setState(bool _state)
 DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     : QWidget(nullptr), visualDeckStorageWidget(nullptr), parentGame(parent), playerId(_playerId)
 {
+    setObjectName("deckViewContainer");
+
     loadLocalButton = new QPushButton;
     loadRemoteButton = new QPushButton;
     loadFromClipboardButton = new QPushButton;
@@ -79,6 +81,14 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     readyStartButton = new ToggleButton;
     forceStartGameButton = new QPushButton;
     sideboardLockButton = new ToggleButton;
+
+    loadLocalButton->setObjectName("loadLocalButton");
+    loadRemoteButton->setObjectName("loadRemoteButton");
+    loadFromClipboardButton->setObjectName("loadFromClipboardButton");
+    readyStartButton->setObjectName("readyStartButton");
+    forceStartGameButton->setObjectName("forceStartGameButton");
+    unloadDeckButton->setObjectName("unloadDeckButton");
+    sideboardLockButton->setObjectName("sideboardLockButton");
 
     connect(loadLocalButton, &QPushButton::clicked, this, &DeckViewContainer::loadLocalDeck);
     connect(loadRemoteButton, &QPushButton::clicked, this, &DeckViewContainer::loadRemoteDeck);

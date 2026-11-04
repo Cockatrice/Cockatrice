@@ -1,0 +1,178 @@
+<events>
+    <!--
+        Tier 6: Local Game Lifecycle (Extended)
+        Tests: create game -> load decks -> ready up -> game starts
+              -> play through turns using menu activate commands
+
+        Phase actions triggered via activate on phasesMenu:
+          aNextPhaseAction advances phase + triggers phase action (e.g., draw at draw step)
+          aNextTurn in gameMenu triggers next turn
+
+        This avoids keyboard shortcut issues in offscreen/test environments.
+    -->
+
+    <!-- ===== Phase 1: Start a local game via main menu ===== -->
+    <event widget="MainWindow/menubar/cockatriceMenu" command="activate" arguments="Start &amp;local game..." />
+    <!-- Force two players so both deck views exist, independent of the user's settings -->
+    <event widget="MainWindow/localGameDialog/generalGroupBox/numberPlayersEdit" command="set_int" arguments="2" />
+    <event widget="MainWindow/localGameDialog" command="key" arguments="16777220" />
+
+    <!-- ===== Phase 2: Player 1 loads deck from clipboard ===== -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_0/qt_tabwidget_stackedwidget/deckViewContainer/loadFromClipboardButton" command="activate" arguments="" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_0/qt_tabwidget_stackedwidget/deckViewContainer/dlgDeckTextEdit/contentsEdit" command="keyEvent" arguments="6,65,67108864,,0,1" />
+    <!-- 1 Lightning Bolt -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_0/qt_tabwidget_stackedwidget/deckViewContainer/dlgDeckTextEdit/contentsEdit" command="typeText" arguments="1 Lightning Bolt" />
+    <!-- Ctrl+Return to accept clipboard dialog -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_0/qt_tabwidget_stackedwidget/deckViewContainer/dlgDeckTextEdit" command="keyEvent" arguments="6,16777220,67108864,,0,1" />
+    <!-- Delay -->
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <!-- Player 1 ready up -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_0/qt_tabwidget_stackedwidget/deckViewContainer/readyStartButton" command="activate" arguments="" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+
+    <!-- ===== Phase 3: Player 2 loads deck from clipboard ===== -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_1/qt_tabwidget_stackedwidget/deckViewContainer/loadFromClipboardButton" command="activate" arguments="" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_1/qt_tabwidget_stackedwidget/deckViewContainer/dlgDeckTextEdit/contentsEdit" command="keyEvent" arguments="6,65,67108864,,0,1" />
+    <!-- 1 Lightning Bolt -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_1/qt_tabwidget_stackedwidget/deckViewContainer/dlgDeckTextEdit/contentsEdit" command="typeText" arguments="1 Lightning Bolt" />
+    <!-- Ctrl+Return to accept clipboard dialog -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_1/qt_tabwidget_stackedwidget/deckViewContainer/dlgDeckTextEdit" command="keyEvent" arguments="6,16777220,67108864,,0,1" />
+    <!-- Delay -->
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <!-- Player 2 ready up -> game auto-starts -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_1/qt_tabwidget_stackedwidget/deckViewContainer/readyStartButton" command="activate" arguments="" />
+    <!-- Delay for game to start -->
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+
+    <!-- ===== Phase 4: Advance through all 11 phases via phasesMenu activate ===== -->
+    <!-- Using activate on phasesMenu triggers aNextPhaseAction which:
+         - advances the phase by 1
+         - calls triggerPhaseAction (e.g., draw card at draw step, untap all at untap) -->
+
+    <!-- Phase 0 (Untap) → 1 (Upkeep) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <!-- Phase 1 (Upkeep) → 2 (Draw): TRIGGERS DRAW — Player 1 draws 1 card -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+    <!-- Phase 2 (Draw) → 3 (Main 1) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+
+    <!-- ===== Main 1: Play a card from hand by double-click ===== -->
+    <!-- clickCard resolves card by name in the scene, maps to viewport coords at current window size. -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/gamePlayAreaWidget/gameView" command="clickCard" arguments="Lightning Bolt,hand" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+
+    <!-- Phase 3 → 4 (Begin Combat) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="300" />
+    <!-- Phase 4 → 5 (Declare Attackers) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <!-- Phase 5 → 6 (Declare Blockers) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <!-- Phase 6 → 7 (Combat Damage) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <!-- Phase 7 → 8 (End Combat) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <!-- Phase 8 → 9 (Main 2) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <!-- Phase 9 → 10 (Cleanup) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <!-- Phase 10 → 0 (Untap): TRIGGERS NEXT TURN + UNTAP ALL — now Player 2's turn -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <!-- Delay for turn transition -->
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+
+    <!-- ===== Phase 5: Player 2's turn — advance through all 11 phases ===== -->
+    <!-- Phase 0 (Untap) → 1 (Upkeep) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <!-- Phase 1 (Upkeep) → 2 (Draw): TRIGGERS DRAW — Player 2 draws 1 card -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <!-- Phase 2 (Draw) → 3 (Main 1) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <!-- Phase 3 → 4 (Begin Combat) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <!-- Phase 4 → 5 (Declare Attackers) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <!-- Phase 5 → 6 (Declare Blockers) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <!-- Phase 6 → 7 (Combat Damage) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <!-- Phase 7 → 8 (End Combat) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <!-- Phase 8 → 9 (Main 2) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <!-- Phase 9 → 10 (Cleanup) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <!-- Phase 10 → 0 (Untap): TRIGGERS NEXT TURN — back to Player 1 -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <!-- Delay -->
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+
+    <!-- ===== Phase 6: Player 1 turn 2 — advance to draw again ===== -->
+    <!-- Phase 0 (Untap) → 1 (Upkeep) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <!-- Phase 1 (Upkeep) → 2 (Draw): TRIGGERS DRAW — Player 1 draws again -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="key" arguments="32" />
+    <event widget="MainWindow" command="key" arguments="32" />
+
+</events>
