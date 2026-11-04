@@ -33,6 +33,7 @@
 #include <QStringList>
 #include <QVariant>
 #include <QVariantList>
+#include <QtGlobal>
 #include <google/protobuf/stubs/common.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
@@ -482,6 +483,10 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
                     const QByteArray expected = PasswordHasher::computeResponse(key, nonce);
                     handler->clearAuthNonce();
                     if (PasswordHasher::constantTimeEquals(expected, response)) {
+                        if (forceChange) {
+                            qCDebug(DatabaseInterfaceLog) << "Login accepted but password change required";
+                            return PasswordChangeRequired;
+                        }
                         qCDebug(DatabaseInterfaceLog) << "Login accepted: challenge-response password right";
                         return PasswordRight;
                     }
@@ -755,6 +760,20 @@ QString Servatrice_DatabaseInterface::getUserPasswordData(const QString &user)
     return query->value(0).toString();
 }
 
+QString Servatrice_DatabaseInterface::sealLegacyBackup(const QString &storedName, const QString &credential)
+{
+    const QByteArray key = server->getLegacyBackupKey();
+    if (key.isEmpty()) {
+        return {};
+    }
+    const QByteArray aad = storedName.simplified().toUtf8();
+    const QString sealed = CryptoUtil::encryptSecret(credential.toUtf8(), key, aad);
+    if (sealed.isEmpty() || sealed.length() > MAX_LEGACY_BACKUP_LENGTH) {
+        return {};
+    }
+    return sealed;
+}
+
 bool Servatrice_DatabaseInterface::submitPasswordVerifier(const QString &user, const QString &passwordVerifier)
 {
     if (server->getAuthenticationMethod() != Servatrice::AuthenticationSql) {
@@ -779,18 +798,13 @@ bool Servatrice_DatabaseInterface::submitPasswordVerifier(const QString &user, c
 
     QString sealedBackup;
     QDateTime backupUsedAt;
-    if (PasswordHasher::isLegacyFormat(currentCredential)) {
-        const QByteArray key = server->getLegacyBackupKey();
-        if (!key.isEmpty()) {
-            const QByteArray aad = storedName.simplified().toUtf8();
-            sealedBackup = CryptoUtil::encryptSecret(currentCredential.toUtf8(), key, aad);
-            if (sealedBackup.isEmpty() || sealedBackup.length() > MAX_LEGACY_BACKUP_LENGTH) {
-                qCWarning(DatabaseInterfaceLog)
-                    << "Failed to seal legacy backup for user" << user << "- account migrates without a downgrade path";
-                sealedBackup.clear();
-            } else {
-                backupUsedAt = QDateTime::currentDateTimeUtc();
-            }
+    if (PasswordHasher::isLegacyFormat(currentCredential) && !server->getLegacyBackupKey().isEmpty()) {
+        sealedBackup = sealLegacyBackup(storedName, currentCredential);
+        if (sealedBackup.isEmpty()) {
+            qCWarning(DatabaseInterfaceLog)
+                << "Failed to seal legacy backup for user" << user << "- account migrates without a downgrade path";
+        } else {
+            backupUsedAt = QDateTime::currentDateTimeUtc();
         }
     }
 
@@ -1644,6 +1658,54 @@ bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user,
     return passwordQuery->numRowsAffected() > 0;
 }
 
+bool Servatrice_DatabaseInterface::changeUserPasswordWithLegacyBackup(const QString &user,
+                                                                      const QString &passwordVerifier,
+                                                                      const QString &legacyCredential)
+{
+    if (server->getAuthenticationMethod() != Servatrice::AuthenticationSql) {
+        return false;
+    }
+
+    if (!checkSql()) {
+        return false;
+    }
+
+    // Seal against the stored row name, not the caller-supplied one: the name column is
+    // case-insensitive, so a differently-cased name would fail the tag check on open.
+    QSqlQuery *nameQuery = prepareQuery("SELECT name FROM {prefix}_users WHERE name = :name");
+    nameQuery->bindValue(":name", user);
+    if (!execSqlQuery(nameQuery) || !nameQuery->next()) {
+        return false;
+    }
+    const QString storedName = nameQuery->value(0).toString();
+
+    const QString sealedBackup = sealLegacyBackup(storedName, legacyCredential);
+    const QDateTime backupUsedAt = sealedBackup.isEmpty() ? QDateTime() : QDateTime::currentDateTimeUtc();
+    if (sealedBackup.isEmpty()) {
+        // Without a backup a pre-challenge client has nothing to authenticate against: the
+        // row holds a verifier and the legacy hash it would send cannot match it. Say so,
+        // because the symptom - the temporary password appearing not to work - shows up on
+        // a different machine from the one that reset it.
+        qCWarning(DatabaseInterfaceLog) << "Stored a verifier without a legacy backup for user" << user
+                                        << "- pre-challenge clients cannot use this password"
+                                        << "- check security/legacy_backup_key";
+    }
+
+    QSqlQuery *query = prepareQuery("update {prefix}_users set password_sha512=:password, "
+                                    "password_legacy_backup=:backup, password_legacy_backup_used_at=:used_at, "
+                                    "passwordLastChangedDate = NOW() where name = :name");
+    query->bindValue(":password", passwordVerifier);
+    query->bindValue(":backup", sealedBackup);
+    query->bindValue(":used_at", backupUsedAt.isValid()
+                                     ? QVariant(backupUsedAt.toString(QStringLiteral("yyyy-MM-dd HH:mm:ss")))
+                                     : QVariant());
+    query->bindValue(":name", storedName);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+    return query->numRowsAffected() > 0;
+}
+
 void Servatrice_DatabaseInterface::setForcePasswordChange(const QString &user, bool force)
 {
     if (!checkSql()) {
@@ -2188,8 +2250,14 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
                                                                                  bool &game,
                                                                                  bool &room,
                                                                                  int &range,
-                                                                                 int &maxresults)
+                                                                                 int &maxresults,
+                                                                                 int offset,
+                                                                                 const QString &beforeTime,
+                                                                                 bool *hasMore)
 {
+    if (hasMore != nullptr) {
+        *hasMore = false;
+    }
 
     QList<ServerInfo_ChatMessage> results;
     ServerInfo_ChatMessage chatMessage;
@@ -2198,8 +2266,31 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
         return results;
     }
 
-    if (user.isEmpty() && ipaddress.isEmpty() && gameid.isEmpty() && gamename.isEmpty()) {
-        // To ensure quick results and minimal lag, require an indexed field
+    // Page size guard: always bound the scan so a filter-less browse of room
+    // history cannot become a 50M-row fetch. Zero means "client did not set a
+    // size", so fall back to one smooth-scroll page.
+    const int pageSize = maxresults <= 0 ? 200 : qBound(1, maxresults, 1000);
+    maxresults = pageSize;
+    const int safeOffset = qMax(0, offset);
+
+    const bool hasIndexedFilter = !user.isEmpty() || !ipaddress.isEmpty() || !gameid.isEmpty() || !gamename.isEmpty();
+    const bool hasLocationFilter = chat || game || room;
+    if (!hasLocationFilter) {
+        // No target_type restriction would mix private chat into a room/game
+        // browse, so refuse rather than leak.
+        return results;
+    }
+    // A browse narrowed only by a message substring has no index to serve it, and `range`
+    // has no upper bound on the wire: the client offers 20 days, but a hand-built command
+    // can ask for any value and every LIKE candidate in it is a row the server examines.
+    // Clamping here keeps the guard independent of what the client happens to send.
+    constexpr int maxFilterlessRangeHours = 20 * 24;
+    if (!hasIndexedFilter && range > maxFilterlessRangeHours) {
+        range = maxFilterlessRangeHours;
+    }
+    if (!hasIndexedFilter && range <= 0) {
+        // Filter-less browse must stay time-bounded (idx_log_time) so the
+        // query stays an index range scan instead of a full table scan.
         return results;
     }
 
@@ -2254,9 +2345,22 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
         queryString.append(" AND log_time >= DATE_SUB(now(), INTERVAL :range_time HOUR)");
     }
 
-    if (maxresults) {
-        queryString.append(" LIMIT :limit_size");
+    if (!beforeTime.isEmpty()) {
+        // Pages after the first run against the snapshot fixed by the first one, so rows
+        // logged while the moderator scrolls can no longer push the OFFSET window down and
+        // repeat a row already on screen.
+        queryString.append(" AND log_time <= :before_time");
     }
+
+    // Newest-first keeps "going back from today" stable across pages and lets
+    // the client append older rows at the bottom for smooth infinite scroll.
+    queryString.append(" ORDER BY log_time DESC");
+
+    // Fetch one extra row when the caller wants a has_more cursor so a full
+    // page does not need a second empty round-trip to prove exhaustion.
+    const bool detectMore = (hasMore != nullptr);
+    const int fetchSize = detectMore ? pageSize + 1 : pageSize;
+    queryString.append(" LIMIT :limit_size OFFSET :offset_size");
 
     QSqlQuery *query = prepareQuery(queryString);
     if (!user.isEmpty()) {
@@ -2277,9 +2381,11 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
     if (range) {
         query->bindValue(":range_time", range);
     }
-    if (maxresults) {
-        query->bindValue(":limit_size", maxresults);
+    if (!beforeTime.isEmpty()) {
+        query->bindValue(":before_time", beforeTime);
     }
+    query->bindValue(":limit_size", fetchSize);
+    query->bindValue(":offset_size", safeOffset);
 
     if (!execSqlQuery(query)) {
         qCWarning(DatabaseInterfaceLog) << "Failed to collect log history information: SQL Error";
@@ -2297,6 +2403,11 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
         chatMessage.set_target_name(QString(query->value(7).toString()).toStdString());
         chatMessage.set_channel(QString(query->value(8).toString()).toStdString());
         results << chatMessage;
+    }
+
+    if (detectMore && results.size() > pageSize) {
+        results.removeLast();
+        *hasMore = true;
     }
 
     return results;

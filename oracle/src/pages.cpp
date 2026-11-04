@@ -1,6 +1,7 @@
 #include "pages.h"
 
 #include "client/settings/cache_settings.h"
+#include "database_writer.h"
 #include "main.h"
 #include "oracleimporter.h"
 #include "oraclewizard.h"
@@ -43,6 +44,7 @@
 #include <QWizard>
 #include <QtConcurrentRun>
 #include <QtGlobal>
+#include <algorithm>
 #include <cstdio>
 #include <functional>
 #include <libcockatrice/settings/personal_settings.h>
@@ -169,7 +171,16 @@ LoadSetsResult loadSetsData(const QPointer<OracleImporter> &importer, QByteArray
         break;
     }
 
-    if (data.startsWith("<")) {
+    // Test the first non-space byte in place: trimmed() would duplicate the whole
+    // payload, which on the plain-XML path is the largest download we handle.
+    const auto firstNonSpace = std::find_if_not(data.cbegin(), data.cend(),
+                                                [](char c) { return c == ' ' || c == '\t' || c == '\n' || c == '\r'; });
+    const bool looksLikeXml = firstNonSpace != data.cend() && *firstNonSpace == '<';
+    if (looksLikeXml) {
+        result.errorMessage = OracleDatabase::validateXml(data);
+        if (!result.errorMessage.isEmpty()) {
+            return result;
+        }
         result.ok = true;
         result.plainXml = true;
         result.xmlData = std::move(data);
@@ -651,6 +662,10 @@ void LoadSetsPage::importFinished()
         } else if (!result.ok && !result.plainXml) {
             qWarning() << tr("The file was retrieved successfully, but it does not contain any sets data.");
         }
+        if (!result.ok) {
+            wizard()->reject();
+            return;
+        }
         emit readyToContinue();
         return;
     }
@@ -717,7 +732,7 @@ SaveSetsPage::SaveSetsPage(QWidget *parent) : OracleWizardPage(parent)
 
 bool SaveSetsPage::isComplete() const
 {
-    return !importActive;
+    return !importActive && importReady;
 }
 
 void SaveSetsPage::cleanupPage()
@@ -730,8 +745,11 @@ void SaveSetsPage::cleanupPage()
 
 void SaveSetsPage::initializePage()
 {
+    importReady = false;
     retranslateUi();
     if (wizard()->downloadedPlainXml) {
+        importReady = true;
+        emit completeChanged();
         messageLog->hide();
         progressBar->hide();
         if (wizard()->backgroundMode) {
@@ -757,6 +775,9 @@ void SaveSetsPage::initializePage()
     emit completeChanged();
 
     const QPointer<OracleImporter> importer = wizard()->importer;
+    if (auto *activeImporter = importer.data()) {
+        activeImporter->prepareImport();
+    }
     importFuture = QtConcurrent::run([importer] { return importer ? importer->startImport() : 0; });
     importWatcher.setFuture(importFuture);
 }
@@ -788,22 +809,28 @@ void SaveSetsPage::importFinished()
 
     const int setsImported = importWatcher.result();
     const QPointer<OracleImporter> importer = wizard()->importer;
+    importReady = importer && importer->hasSuccessfulImport() && setsImported == totalSets;
+    const QString error = importer ? importer->getImportError() : tr("The card database importer is unavailable.");
     if (importer) {
         importer->releaseSetData();
     }
+    wizard()->button(QWizard::NextButton)->setEnabled(importReady);
+    emit completeChanged();
 
-    if (wizard()->backgroundMode) {
-        if (setsImported == 0) {
-            qWarning() << tr("No set has been imported.");
+    if (!importReady) {
+        const QString message = error.isEmpty() ? tr("No set has been imported.") : error;
+        if (wizard()->backgroundMode) {
+            qWarning() << message;
+            wizard()->reject();
+        } else {
+            QMessageBox::critical(this, tr("Error"), message);
         }
-        emit readyToContinue();
         return;
     }
 
     progressBar->setValue(progressBar->maximum());
-
-    if (setsImported == 0) {
-        QMessageBox::critical(this, tr("Error"), tr("No set has been imported."));
+    if (wizard()->backgroundMode) {
+        emit readyToContinue();
     }
 }
 
@@ -854,6 +881,18 @@ void SaveSetsPage::updateTotalProgress(int cardsImported, int setIndex, const QS
 
 bool SaveSetsPage::validatePage()
 {
+    if (!isComplete()) {
+        return false;
+    }
+    const auto failSave = [this](const QString &message) {
+        qWarning() << message;
+        if (wizard()->backgroundMode) {
+            wizard()->reject();
+        } else {
+            QMessageBox::critical(this, tr("Error"), message);
+        }
+        return false;
+    };
     QString defaultPath = SettingsCache::instance().getCardDatabasePath();
     QString windowName = tr("Save card database");
     QString fileType = tr("XML; card database (*.xml)");
@@ -872,24 +911,21 @@ bool SaveSetsPage::validatePage()
     QFileInfo fi(fileName);
     QDir fileDir(fi.path());
     if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath())) {
-        return false;
+        return failSave(tr("The database directory could not be created: %1").arg(fileDir.absolutePath()));
     }
 
     if (wizard()->downloadedPlainXml) {
-        QFile file(fileName);
-        if (!file.open(QIODevice::WriteOnly)) {
-            qDebug() << "File write (w) failed for" << fileName;
-            return false;
-        }
-        if (file.write(wizard()->xmlData) < 1) {
-            qDebug() << "File write (w) failed for" << fileName;
-            return false;
+        QString error;
+        if (!OracleDatabase::saveXml(fileName, wizard()->xmlData, &error)) {
+            return failSave(tr("The file could not be saved to %1: %2").arg(fileName, error));
         }
         wizard()->xmlData.clear();
     } else if (!wizard()->importer->saveToFile(fileName, wizard()->getCardSourceUrl(),
                                                wizard()->getCardSourceVersion())) {
-        QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to %1").arg(fileName));
-        return false;
+        // The importer refuses to write a database whose import did not finish, and
+        // reports the reason there; do not dress an import failure up as a disk failure.
+        const QString importError = wizard()->importer->getImportError();
+        return failSave(importError.isEmpty() ? tr("The file could not be saved to %1").arg(fileName) : importError);
     }
 
     wizard()->markDatabaseSaved();

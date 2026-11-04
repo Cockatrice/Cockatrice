@@ -76,6 +76,18 @@ PaletteGridWidget::PaletteGridWidget(QWidget *parent) : QWidget(parent)
 
     layout = QtUtils::makeLayout<QVBoxLayout>(this);
     layout->addWidget(scroll);
+
+    connect(themeManager, &ThemeManager::fontsChanged, this, &PaletteGridWidget::applyInterfaceDefaultFont);
+}
+
+void PaletteGridWidget::applyInterfaceDefaultFont()
+{
+    // The editor's own chrome follows the InterfaceDefault theme role; bold stays caller-side.
+    for (auto *label : headerLabels) {
+        QFont headerFont = themeManager->appFont(AppFont::InterfaceDefault);
+        headerFont.setBold(true);
+        label->setFont(headerFont);
+    }
 }
 
 void PaletteGridWidget::buildGrid(QWidget *host)
@@ -101,7 +113,8 @@ void PaletteGridWidget::buildGrid(QWidget *host)
         auto *label = new QLabel(groupHeaders[col], host);
         label->setAlignment(Qt::AlignCenter);
         label->setToolTip(groupTips[col]);
-        label->setFont(QtUtils::boldFont(label->font()));
+        // Family comes from the InterfaceDefault theme role; bold stays caller-side.
+        label->setFont(QtUtils::boldFont(themeManager->appFont(AppFont::InterfaceDefault)));
         label->setAutoFillBackground(true);
         label->setContentsMargins(4, 4, 4, 4);
         grid->addWidget(label, 0, col + 1);
@@ -146,7 +159,7 @@ void PaletteGridWidget::buildGrid(QWidget *host)
 
     auto *appHeader = new QLabel(tr("App colors"), host);
     appHeader->setToolTip(tr("Application-specific colors layered on top of the Qt palette"));
-    appHeader->setFont(QtUtils::boldFont(appHeader->font()));
+    appHeader->setFont(QtUtils::boldFont(themeManager->appFont(AppFont::InterfaceDefault)));
     appHeader->setAutoFillBackground(true);
     appHeader->setContentsMargins(4, 4, 4, 4);
     grid->addWidget(appHeader, appHeaderRow, 0, 1, 4);

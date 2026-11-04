@@ -1,6 +1,6 @@
 #include "deck_list_history_manager_widget.h"
 
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 #include "../quick_settings/settings_button_widget.h"
 #include "deck_state_manager.h"
 #include "libcockatrice/deck_list/deck_list_history_manager.h"
@@ -32,7 +32,7 @@ DeckListHistoryManagerWidget::DeckListHistoryManagerWidget(DeckStateManager *_de
     layout = new QHBoxLayout(this);
 
     aUndo = new QAction(QString(), this);
-    aUndo->setIcon(themePixmap(QStringLiteral("icons/arrow_undo")));
+    aUndo->setIcon(loadThemedIcon(QStringLiteral("icons/arrow_undo")));
     aUndo->setShortcut(QKeySequence::Undo);
     aUndo->setShortcutContext(Qt::ApplicationShortcut);
     connect(aUndo, &QAction::triggered, this, &DeckListHistoryManagerWidget::doUndo);
@@ -41,7 +41,7 @@ DeckListHistoryManagerWidget::DeckListHistoryManagerWidget(DeckStateManager *_de
     undoButton->setDefaultAction(aUndo);
 
     aRedo = new QAction(QString(), this);
-    aRedo->setIcon(themePixmap(QStringLiteral("icons/arrow_redo")));
+    aRedo->setIcon(loadThemedIcon(QStringLiteral("icons/arrow_redo")));
     aRedo->setShortcut(QKeySequence::Redo);
     aRedo->setShortcutContext(Qt::ApplicationShortcut);
     connect(aRedo, &QAction::triggered, this, &DeckListHistoryManagerWidget::doRedo);
@@ -53,7 +53,7 @@ DeckListHistoryManagerWidget::DeckListHistoryManagerWidget(DeckStateManager *_de
     layout->addWidget(redoButton);
 
     historyButton = new SettingsButtonWidget(this);
-    historyButton->setButtonIcon(themePixmap(QStringLiteral("icons/arrow_history")));
+    historyButton->setButtonIcon(loadThemedIcon(QStringLiteral("icons/arrow_history")));
 
     historyLabel = new QLabel(this);
 

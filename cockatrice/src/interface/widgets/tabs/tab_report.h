@@ -62,6 +62,7 @@ private slots:
     void statsResponse(const Response &response);
     void reopenReport();
     void reopenResponse(const Response &response);
+    void applyChatLogFont();
 
 private:
     int selectedReportId() const;

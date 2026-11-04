@@ -28,6 +28,7 @@
 
 DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
 {
+    setObjectName("tipOfTheDayDialog");
     successfulInit = false;
     QString xmlPath = "theme:tips/tips_of_the_day.xml";
     tipDatabase = new TipsOfTheDay(xmlPath, this);

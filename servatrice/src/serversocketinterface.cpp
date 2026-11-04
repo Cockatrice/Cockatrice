@@ -199,7 +199,8 @@ AbstractServerSocketInterface::AbstractServerSocketInterface(Servatrice *_server
     // Never call flushOutputQueue directly from outputQueueChanged. In case of a socket error,
     // it could lead to this object being destroyed while another function is still on the call stack. -> mutex
     // deadlocks etc.
-    connect(this, SIGNAL(outputQueueChanged()), this, SLOT(flushOutputQueue()), Qt::QueuedConnection);
+    connect(this, &AbstractServerSocketInterface::outputQueueChanged, this,
+            &AbstractServerSocketInterface::flushOutputQueue, Qt::QueuedConnection);
 }
 
 bool AbstractServerSocketInterface::initSession()
@@ -1742,12 +1743,17 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetLogHistory(const Com
 
     int dateRange = cmd.date_range();
     int maximumResults = cmd.maximum_results();
+    const int offset = cmd.has_offset() ? static_cast<int>(cmd.offset()) : 0;
+    const QString beforeTime = cmd.has_before_time() ? QString::fromStdString(cmd.before_time()) : QString();
 
     Response_ViewLogHistory *re = new Response_ViewLogHistory;
 
     if (servatrice->getEnableLogQuery()) {
-        QListIterator<ServerInfo_ChatMessage> messageIterator(sqlInterface->getMessageLogHistory(
-            userName, ipAddress, gameName, gameID, message, chatType, gameType, roomType, dateRange, maximumResults));
+        bool hasMore = false;
+        QList<ServerInfo_ChatMessage> history =
+            sqlInterface->getMessageLogHistory(userName, ipAddress, gameName, gameID, message, chatType, gameType,
+                                               roomType, dateRange, maximumResults, offset, beforeTime, &hasMore);
+        QListIterator<ServerInfo_ChatMessage> messageIterator(history);
         while (messageIterator.hasNext()) {
             ServerInfo_ChatMessage chatMessage = messageIterator.next();
             if (!allowPrivateChat) {
@@ -1755,6 +1761,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetLogHistory(const Com
             }
             re->add_log_message()->CopyFrom(chatMessage);
         }
+        re->set_has_more(hasMore);
     } else {
         ServerInfo_ChatMessage chatMessage;
 
@@ -1982,7 +1989,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
             SessionEvent *se = userList[i]->prepareSessionEvent(event);
             userList[i]->sendProtocolItem(*se);
             delete se;
-            QMetaObject::invokeMethod(userList[i], "prepareDestroy", Qt::QueuedConnection);
+            QMetaObject::invokeMethod(
+                userList[i], [user = userList[i]] { user->prepareDestroy(); }, Qt::QueuedConnection);
         }
     }
 
@@ -2641,7 +2649,15 @@ Response::ResponseCode AbstractServerSocketInterface::cmdResetUserPassword(const
     }
 
     const QString tempPassword = PasswordHasher::generateRandomSalt();
-    if (!sqlInterface->changeUserPassword(userName, tempPassword, true)) {
+    // Store a scrypt verifier rather than a legacy salt+hash: a legacy row makes the next
+    // login look like an authentication downgrade, which modern clients refuse when they
+    // still hold a verifier for the account. Where security/legacy_backup_key is configured,
+    // keep a sealed legacy hash of the same temporary password as the downgrade backup so
+    // pre-challenge clients keep the path the reset used to provide; without the key they
+    // have none, which changeUserPasswordWithLegacyBackup warns about.
+    const QString verifier = PasswordHasher::generatePasswordVerifier(tempPassword);
+    const QString legacyCredential = PasswordHasher::computeHash(tempPassword, PasswordHasher::generateRandomSalt());
+    if (!sqlInterface->changeUserPasswordWithLegacyBackup(userName, verifier, legacyCredential)) {
         return Response::RespInternalError;
     }
     sqlInterface->setForcePasswordChange(userName, true);
@@ -3779,6 +3795,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountPassword(const C
     }
 
     databaseInterface->setForcePasswordChange(userName, false);
+    // The forced change is done, but this session never completed login (see
+    // Server_ProtocolHandler::cmdLogin). It stays restricted to ping and another password
+    // change; the client reconnects with the new password to actually enter the server.
 
     return Response::RespOk;
 }
@@ -4180,15 +4199,15 @@ Response::ResponseCode
 AbstractServerSocketInterface::cmdUpdateServerMessage(const Command_UpdateServerMessage & /*cmd*/,
                                                       ResponseContainer & /*rc*/)
 {
-    QMetaObject::invokeMethod(server, "updateLoginMessage");
+    QMetaObject::invokeMethod(servatrice, [srv = servatrice] { srv->updateLoginMessage(); });
     return Response::RespOk;
 }
 
 Response::ResponseCode AbstractServerSocketInterface::cmdShutdownServer(const Command_ShutdownServer &cmd,
                                                                         ResponseContainer & /*rc*/)
 {
-    QMetaObject::invokeMethod(server, "scheduleShutdown", Q_ARG(QString, textFromStdString(cmd.reason())),
-                              Q_ARG(int, cmd.minutes()));
+    QMetaObject::invokeMethod(servatrice, [srv = servatrice, reason = textFromStdString(cmd.reason()),
+                                           minutes = cmd.minutes()] { srv->scheduleShutdown(reason, minutes); });
     return Response::RespOk;
 }
 
@@ -4197,7 +4216,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReloadConfig(const Comm
 {
     logDebugMessage("Received admin command: reloading configuration");
     settingsCache->sync();
-    QMetaObject::invokeMethod(server, "setRequiredFeatures", Q_ARG(QString, server->getRequiredFeatures()));
+    QMetaObject::invokeMethod(servatrice, [srv = servatrice, features = servatrice->getRequiredFeatures()] {
+        srv->setRequiredFeatures(features);
+    });
     return Response::RespOk;
 }
 
@@ -4249,7 +4270,7 @@ bool AbstractServerSocketInterface::removeAdminFlagFromUser(const QString &userN
         delete se;
     }
 
-    QMetaObject::invokeMethod(user, "prepareDestroy", Qt::QueuedConnection);
+    QMetaObject::invokeMethod(user, [user] { user->prepareDestroy(); }, Qt::QueuedConnection);
     return true;
 }
 
@@ -4424,10 +4445,10 @@ TcpServerSocketInterface::TcpServerSocketInterface(Servatrice *_server,
 {
     socket = new QTcpSocket(this);
     socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
-    connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()));
-    connect(socket, SIGNAL(disconnected()), this, SLOT(catchSocketDisconnected()));
-    connect(socket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this,
-            SLOT(catchSocketError(QAbstractSocket::SocketError)));
+    connect(socket, &QTcpSocket::readyRead, this, [this] { readClient(); });
+    connect(socket, &QTcpSocket::disconnected, this, [this] { catchSocketDisconnected(); });
+    connect(socket, &QTcpSocket::errorOccurred, this,
+            [this](QAbstractSocket::SocketError error) { catchSocketError(error); });
 }
 
 TcpServerSocketInterface::~TcpServerSocketInterface()
@@ -4649,8 +4670,7 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
         }
     }
 
-    connect(socket, SIGNAL(binaryMessageReceived(const QByteArray &)), this,
-            SLOT(binaryMessageReceived(const QByteArray &)));
+    connect(socket, &QWebSocket::binaryMessageReceived, this, &WebsocketServerSocketInterface::binaryMessageReceived);
     // QWebSocket::errorOccurred was added in Qt 6.5 (error() is deprecated from 6.5 on),
     // so a typed connect cannot compile against the 6.4 floor.
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
@@ -4660,7 +4680,7 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this,
             SLOT(catchSocketError(QAbstractSocket::SocketError)));
 #endif
-    connect(socket, SIGNAL(disconnected()), this, SLOT(catchSocketDisconnected()));
+    connect(socket, &QWebSocket::disconnected, this, [this] { catchSocketDisconnected(); });
 
     // Add this object to the server's list of connections before it can receive socket events.
     // Otherwise, in case of a socket error, it could be removed from the list before it is added.

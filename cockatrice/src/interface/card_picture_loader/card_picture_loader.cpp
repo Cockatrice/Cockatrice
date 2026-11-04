@@ -238,6 +238,7 @@ void CardPictureLoader::imageLoaded(const ExactCard &card, const QImage &image)
     });
 
     card.emitPixmapUpdated();
+    emit getInstance().pixmapLoaded(card);
 }
 
 void CardPictureLoader::deleteAllLocalOverrides(const ExactCard &card)

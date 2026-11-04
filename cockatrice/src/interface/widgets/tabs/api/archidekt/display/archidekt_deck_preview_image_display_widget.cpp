@@ -1,5 +1,6 @@
 #include "archidekt_deck_preview_image_display_widget.h"
 
+#include "../../../../../theme_manager.h"
 #include "../../../../general/display/shadow_background_label.h"
 
 #include <QFont>
@@ -17,19 +18,27 @@ ArchidektDeckPreviewImageDisplayWidget::ArchidektDeckPreviewImageDisplayWidget(Q
     bottomLeftLabel = new ShadowBackgroundLabel(this, "");
     bottomRightLabel = new ShadowBackgroundLabel(this, "");
 
-    QFont f;
-    f.setBold(true);
-    f.setPointSize(16);
-    topLeftLabel->setFont(f);
-    topRightLabel->setFont(f);
-    bottomLeftLabel->setFont(f);
-    bottomRightLabel->setFont(f);
+    applyCardTextFont();
+    connect(themeManager, &ThemeManager::fontsChanged, this,
+            &ArchidektDeckPreviewImageDisplayWidget::applyCardTextFont);
 
     // Raise so labels appear above image
     topLeftLabel->raise();
     topRightLabel->raise();
     bottomLeftLabel->raise();
     bottomRightLabel->raise();
+}
+
+void ArchidektDeckPreviewImageDisplayWidget::applyCardTextFont()
+{
+    // Family comes from the CardText theme role; size and weight stay caller-side as before.
+    QFont f = themeManager->appFont(AppFont::CardText);
+    f.setBold(true);
+    f.setPointSize(16);
+    topLeftLabel->setFont(f);
+    topRightLabel->setFont(f);
+    bottomLeftLabel->setFont(f);
+    bottomRightLabel->setFont(f);
 }
 
 void ArchidektDeckPreviewImageDisplayWidget::setAspectRatio(float ratio)

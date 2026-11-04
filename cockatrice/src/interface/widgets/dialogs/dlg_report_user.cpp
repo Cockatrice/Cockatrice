@@ -1,10 +1,13 @@
 #include "dlg_report_user.h"
 
+#include "../interface/theme_manager.h"
+#include "../utility/report_utils.h"
 #include "abstract_client.h"
 #include "libcockatrice/protocol/pb/response.pb.h"
 
 #include <QComboBox>
 #include <QDialogButtonBox>
+#include <QFont>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QLabel>
@@ -91,7 +94,8 @@ DlgReportUser::DlgReportUser(AbstractClient *_client,
     auto *chatLayout = new QVBoxLayout(chatGroup);
     chatLogEdit = new QTextEdit;
     chatLogEdit->setReadOnly(true);
-    chatLogEdit->setFont(QtUtils::monospaceFont());
+    applyChatLogFont();
+    connect(themeManager, &ThemeManager::fontsChanged, this, &DlgReportUser::applyChatLogFont);
     if (!_autoChatLog.isEmpty()) {
         chatLogEdit->setPlainText(_autoChatLog);
     } else {
@@ -118,6 +122,11 @@ DlgReportUser::DlgReportUser(AbstractClient *_client,
     layout->addWidget(descGroup);
     layout->addWidget(chatGroup);
     layout->addWidget(buttonBox);
+}
+
+void DlgReportUser::applyChatLogFont()
+{
+    chatLogEdit->setFont(report_utils::reportLogFont());
 }
 
 void DlgReportUser::actSubmit()

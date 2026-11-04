@@ -135,6 +135,13 @@ void DeckListModel::rebuildTree()
 
 int DeckListModel::rowCount(const QModelIndex &parent) const
 {
+    // Only column 0 carries children. Column 1 and later indexes are siblings
+    // used by views for the remaining cells of a row, and a model that hangs
+    // children off them breaks QAbstractItemModelTester and proxy models.
+    if (parent.isValid() && parent.column() != 0) {
+        return 0;
+    }
+
     // debugIndexInfo("rowCount", parent);
     auto *node = getNode<InnerDecklistNode *>(parent);
     if (node) {
@@ -283,7 +290,7 @@ QVariant DeckListModel::headerData(const int section, const Qt::Orientation orie
 QModelIndex DeckListModel::index(int row, int column, const QModelIndex &parent) const
 {
     // debugIndexInfo("index", parent);
-    if (!hasIndex(row, column, parent)) {
+    if ((parent.isValid() && parent.column() != 0) || !hasIndex(row, column, parent)) {
         return {};
     }
 
@@ -741,7 +748,8 @@ QModelIndex DeckListModel::nodeToIndex(AbstractDecklistNode *node) const
 void DeckListModel::sortShadowTree(InnerDecklistNode *node, Qt::SortOrder order)
 {
     // The mapping is not needed: fresh shadow nodes have no persistent indices yet.
-    (void)DeckListModelCustomZones::sortWithCustomZonesLast(root, node, order);
+    (void)DeckListModelCustomZones::sortWithCustomZonesLast(
+        root, node, order, activeGroupCriteria == DeckListModelGroupCriteria::MANA_COST && lastKnownColumn != 0);
 
     for (int i = node->size() - 1; i >= 0; --i) {
         if (auto *subNode = dynamic_cast<InnerDecklistNode *>(node->at(i))) {
@@ -754,7 +762,8 @@ void DeckListModel::sortHelper(InnerDecklistNode *node, Qt::SortOrder order)
 {
     // Sort children (custom zones always sorted after groups within a board) and
     // use the movement mapping to update the list of persistent indices.
-    const auto mapping = DeckListModelCustomZones::sortWithCustomZonesLast(root, node, order);
+    const auto mapping = DeckListModelCustomZones::sortWithCustomZonesLast(
+        root, node, order, activeGroupCriteria == DeckListModelGroupCriteria::MANA_COST && lastKnownColumn != 0);
 
     QModelIndexList from, to;
     int columns = columnCount();

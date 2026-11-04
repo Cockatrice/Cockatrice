@@ -1,5 +1,7 @@
 #include "segmented_bar_widget.h"
 
+#include "../../interface/theme_manager.h"
+
 #include <QBrush>
 #include <QFont>
 #include <QLinearGradient>
@@ -22,6 +24,10 @@ SegmentedBarWidget::SegmentedBarWidget(QString label, QVector<Segment> segments,
     setMinimumWidth(36);
     setMaximumWidth(50);
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+
+    // The label reads the InterfaceDefault role at paint time, so a font
+    // change only needs a repaint.
+    connect(themeManager, &ThemeManager::fontsChanged, this, [this] { update(); });
 }
 
 QSize SegmentedBarWidget::sizeHint() const
@@ -95,7 +101,8 @@ void SegmentedBarWidget::paintEvent(QPaintEvent *)
 
     // draw label
     QRect labelRect(0, h - LABEL_H, w, LABEL_H);
-    QFont f = p.font();
+    // Family comes from the InterfaceDefault theme role; bold stays caller-side.
+    QFont f = themeManager->appFont(AppFont::InterfaceDefault);
     f.setBold(true);
     p.setFont(f);
     p.setPen(Qt::black);

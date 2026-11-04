@@ -39,8 +39,10 @@ private:
 
     MessageContext currentContext;
     QString messagePrefix, messageSuffix;
+    QString contextJudgeName;
 
     static QPair<QString, QString> getFromStr(CardZoneLogic *zone, QString cardName, int position, bool ownerChange);
+    void refreshJudgeSuffix();
 
 public:
     void connectToPlayerEventHandler(PlayerEventHandler *player);
@@ -94,6 +96,7 @@ public slots:
                         int amount,
                         bool isLentToAnotherPlayer);
     void logReverseTurn(PlayerLogic *player, bool reversed);
+    void logTurnOrderChanged(QStringList playerNames, bool randomized);
     void logRollDie(PlayerLogic *player, int sides, const QList<uint> &rolls);
     void logSay(PlayerLogic *player, QString message);
     void logSetActivePhase(int phase);

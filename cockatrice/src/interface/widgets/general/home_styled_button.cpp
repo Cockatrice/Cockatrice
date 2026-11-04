@@ -1,6 +1,9 @@
 #include "home_styled_button.h"
 
+#include "../../theme_manager.h"
+
 #include <QBrush>
+#include <QFont>
 #include <QFontMetrics>
 #include <QPainter>
 #include <QPainterPath>
@@ -18,9 +21,21 @@ class QWidget;
 HomeStyledButton::HomeStyledButton(const QString &text, QPair<QColor, QColor> _gradientColors, QWidget *parent)
     : QPushButton(text, parent), gradientColors(_gradientColors)
 {
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    setMinimumHeight(25);
+    // Keep the font/style-derived height even when the home page has ample space.
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     setStyleSheet(generateButtonStylesheet(gradientColors));
+    applyInterfaceDefaultFont();
+    connect(themeManager, &ThemeManager::fontsChanged, this, &HomeStyledButton::applyInterfaceDefaultFont);
+}
+
+void HomeStyledButton::applyInterfaceDefaultFont()
+{
+    // Family comes from the InterfaceDefault theme role; the 34px size and
+    // bold weight previously carried by the stylesheet stay caller-side.
+    QFont buttonFont = themeManager->appFont(AppFont::InterfaceDefault);
+    buttonFont.setPixelSize(34);
+    buttonFont.setWeight(QFont::Bold);
+    setFont(buttonFont);
 }
 
 void HomeStyledButton::updateStylesheet(const QPair<QColor, QColor> &colors)
@@ -50,9 +65,6 @@ QString HomeStyledButton::generateButtonStylesheet(const QPair<QColor, QColor> &
 
     return QString(R"(
         QPushButton {
-            font-size: 34px;
-            font-weight: bold;
-            font-family: sans-serif, "Segoe UI", "Helvetica Neue";
             padding: 30px;
             color: white;
             border: 2px solid %1;

@@ -6,7 +6,8 @@
 #include "settings_view.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
+#include "../interface/theme_manager.h"
 #include "../settings_page/abstract_settings_page.h"
 #include "../settings_page/appearance_settings_page.h"
 #include "../settings_page/deck_editor_settings_page.h"
@@ -119,6 +120,8 @@ QWidget *fromWidgetId(WidgetId id)
 
 SettingsView::SettingsView(QWidget *parent) : QWidget(parent), currentTabIndex(0), searchActive(false)
 {
+    setObjectName("settingsView");
+
     setupUi();
 
     connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this, &SettingsView::retranslateUi);
@@ -132,15 +135,17 @@ void SettingsView::setupUi()
     // Search bar
     searchEdit = new QLineEdit;
     searchEdit->setClearButtonEnabled(true);
-    searchEdit->addAction(themePixmap(QStringLiteral("icons/search")), QLineEdit::LeadingPosition);
+    searchEdit->addAction(loadThemedIcon(QStringLiteral("icons/search")), QLineEdit::LeadingPosition);
     searchEdit->installEventFilter(this);
     connect(searchEdit, &QLineEdit::textChanged, this, &SettingsView::onSearchTextChanged);
+    searchEdit->setObjectName("settingsSearchEdit");
 
     auto *searchLayout = new QHBoxLayout;
     searchLayout->addWidget(searchEdit);
 
     // Pages stacked widget
     pagesWidget = new QStackedWidget;
+    pagesWidget->setObjectName("pagesWidget");
 
     auto *generalPage = new GeneralSettingsPage;
     auto *appearancePage = new AppearanceSettingsPage;
@@ -199,12 +204,17 @@ void SettingsView::setupUi()
         searchDelegate->setPageIcons(icons);
         searchResultsView->viewport()->update();
     });
+    // The search delegate reads the InterfaceDefault role at paint time, so a
+    // font change only needs a repaint, mirroring the theme change above.
+    connect(themeManager, &ThemeManager::fontsChanged, searchResultsView,
+            [this] { searchResultsView->viewport()->update(); });
 
     // Build search index after pages are created
     buildSearchIndex();
 
     // Pages container (stacked widget + search results overlay)
     pagesContainer = new QWidget;
+    pagesContainer->setObjectName("pagesContainer");
     auto *containerLayout = new QStackedLayout;
     containerLayout->setStackingMode(QStackedLayout::StackAll);
     containerLayout->addWidget(pagesWidget);
@@ -244,6 +254,7 @@ void SettingsView::setupUi()
 void SettingsView::setupNavTree()
 {
     navTree = new QTreeWidget;
+    navTree->setObjectName("navTree");
     navTree->setHeaderHidden(true);
     navTree->setRootIsDecorated(true);
     navTree->setIconSize(QSize(24, 24));

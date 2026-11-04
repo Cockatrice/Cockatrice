@@ -1,3 +1,4 @@
+#include "../../oracle/src/database_writer.h"
 #include "../../oracle/src/oracleimporter.h"
 #include "../../oracle/src/parsehelpers.h"
 #include "../../oracle/src/raw_json_scanner.h"
@@ -35,6 +36,12 @@
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 #include <string>
 #include <utility>
+
+#ifdef Q_OS_UNIX
+#include <csignal>
+#include <sys/resource.h>
+#include <unistd.h>
+#endif
 
 class OracleImporterTest : public ::testing::Test
 {
@@ -1301,6 +1308,212 @@ TEST_F(OracleImporterTest, StartImportAppliesLocalizedData)
     ASSERT_EQ(result->getLocalizedName("pt"), "Raio");
     ASSERT_EQ(result->getLocalizedText("pt"), "Raio causa 3 de dano a qualquer alvo.");
 }
+
+namespace
+{
+QByteArray refreshSource(const QString &name = "New Card")
+{
+    QJsonObject card{{"name", name},       {"text", "Rules text."}, {"layout", "normal"},
+                     {"type", "Artifact"}, {"number", "1"},         {"rarity", "common"}};
+    QJsonObject set{{"code", "TST"}, {"name", "Test Set"}, {"type", "expansion"}, {"cards", QJsonArray{card}}};
+    return QJsonDocument(QJsonObject{{"data", QJsonObject{{"TST", set}}}}).toJson(QJsonDocument::Compact);
+}
+} // namespace
+
+TEST_F(OracleImporterTest, FailedLazyParseKeepsInstalledDatabase)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    const QString path = dir.filePath("cards.xml");
+    QFile original(path);
+    ASSERT_TRUE(original.open(QIODevice::WriteOnly));
+    ASSERT_EQ(original.write("existing database"), 17);
+    original.close();
+
+    // The metadata scanner skips numeric values without converting them. Qt's
+    // per-set parser rejects an overflowing number after selection succeeds.
+    auto badSet = QJsonDocument::fromJson(refreshSource()).object().value("data").toObject().value("TST").toObject();
+    auto goodSet = badSet;
+    goodSet["code"] = "AAA";
+    goodSet["name"] = "A successful first set";
+    auto badCard = badSet.value("cards").toArray().first().toObject();
+    badCard["number"] = "overflow";
+    badSet["cards"] = QJsonArray{badCard};
+    QByteArray data = QJsonDocument(QJsonObject{{"data", QJsonObject{{"AAA", goodSet}, {"TST", badSet}}}})
+                          .toJson(QJsonDocument::Compact);
+    data.replace("\"number\":\"overflow\"", "\"number\":1e9999");
+    ASSERT_TRUE(importer->readSetsFromByteArray(data));
+    EXPECT_EQ(importer->startImport(), 0);
+    EXPECT_FALSE(importer->hasSuccessfulImport());
+    EXPECT_TRUE(importer->getImportError().contains("TST"));
+    EXPECT_TRUE(importer->getCardList().isEmpty());
+    EXPECT_FALSE(importer->saveToFile(path, {}, {}));
+    ASSERT_TRUE(original.open(QIODevice::ReadOnly));
+    EXPECT_EQ(original.readAll(), "existing database");
+}
+
+TEST_F(OracleImporterTest, EmptyImportCannotReplaceInstalledCards)
+{
+    const QByteArray source = R"({"data":{"TST":{"code":"TST","name":"Test","type":"expansion","cards":[]}}})";
+    ASSERT_TRUE(importer->readSetsFromByteArray(source));
+    EXPECT_EQ(importer->startImport(), 0);
+    EXPECT_FALSE(importer->hasSuccessfulImport());
+    EXPECT_FALSE(importer->getImportError().isEmpty());
+}
+
+TEST_F(OracleImporterTest, MissingSourceBytesCannotProduceSuccessfulImport)
+{
+    ASSERT_TRUE(importer->readSetsFromByteArray(refreshSource()));
+    const auto selected = importer->getSets();
+    importer->releaseSetData();
+    importer->getSets() = selected;
+    EXPECT_EQ(importer->startImport(), 0);
+    EXPECT_FALSE(importer->hasSuccessfulImport());
+    EXPECT_TRUE(importer->getImportError().contains("TST"));
+}
+
+TEST_F(OracleImporterTest, CancellationDuringFinalSetCannotSavePartialDatabase)
+{
+    ASSERT_TRUE(importer->readSetsFromByteArray(refreshSource()));
+    QObject::connect(
+        importer, &OracleImporter::setIndexChanged, importer,
+        [this](int, int, const QString &name) {
+            if (!name.isEmpty()) {
+                importer->cancelImport();
+            }
+        },
+        Qt::DirectConnection);
+    EXPECT_EQ(importer->startImport(), 0);
+    EXPECT_FALSE(importer->hasSuccessfulImport());
+    EXPECT_TRUE(importer->getCardList().isEmpty());
+}
+
+TEST_F(OracleImporterTest, CancellationBeforeWorkerStartsIsNotLost)
+{
+    ASSERT_TRUE(importer->readSetsFromByteArray(refreshSource()));
+    importer->prepareImport();
+    importer->cancelImport();
+    EXPECT_EQ(importer->startImport(), 0);
+    EXPECT_FALSE(importer->hasSuccessfulImport());
+    importer->prepareImport();
+    EXPECT_EQ(importer->startImport(), 1);
+    EXPECT_TRUE(importer->hasSuccessfulImport());
+}
+
+TEST_F(OracleImporterTest, NewImportReplacesPreviousInMemoryCards)
+{
+    ASSERT_TRUE(importer->readSetsFromByteArray(refreshSource("Old Card")));
+    ASSERT_EQ(importer->startImport(), 1);
+    ASSERT_TRUE(importer->readSetsFromByteArray(refreshSource("New Card")));
+    EXPECT_FALSE(importer->hasSuccessfulImport());
+    ASSERT_EQ(importer->startImport(), 1);
+    EXPECT_EQ(importer->getCardList().size(), 1);
+    EXPECT_FALSE(importer->getCardList().contains("Old Card"));
+    EXPECT_TRUE(importer->getCardList().contains("New Card"));
+}
+
+TEST_F(OracleImporterTest, FailedSourceLoadCannotReusePreviousSuccessfulImport)
+{
+    ASSERT_TRUE(importer->readSetsFromByteArray(refreshSource()));
+    ASSERT_EQ(importer->startImport(), 1);
+    ASSERT_FALSE(importer->readSetsFromByteArray("invalid JSON"));
+    EXPECT_FALSE(importer->hasSuccessfulImport());
+    EXPECT_EQ(importer->startImport(), 0);
+}
+
+TEST_F(OracleImporterTest, SuccessfulRefreshCommitsCompleteXml)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    const QString path = dir.filePath("cards.xml");
+    ASSERT_TRUE(importer->readSetsFromByteArray(refreshSource()));
+    ASSERT_EQ(importer->startImport(), 1);
+    importer->releaseSetData();
+    ASSERT_TRUE(importer->saveToFile(path, "test-source", "v1"));
+    QFile file(path);
+    ASSERT_TRUE(file.open(QIODevice::ReadOnly));
+    const QByteArray xml = file.readAll();
+    EXPECT_TRUE(xml.contains("New Card"));
+    EXPECT_TRUE(xml.contains("test-source"));
+    EXPECT_TRUE(xml.contains("</cockatrice_carddatabase>"));
+}
+
+TEST(OracleDatabaseWriter, AcceptsCompleteSupportedVersions)
+{
+    EXPECT_TRUE(OracleDatabase::validateXml(
+                    "<?xml version=\"1.0\"?><cockatrice_carddatabase version=\"3\"><cards/></cockatrice_carddatabase>")
+                    .isEmpty());
+    EXPECT_TRUE(OracleDatabase::validateXml("<cockatrice_carddatabase version=\"4\"><cards/></cockatrice_carddatabase>")
+                    .isEmpty());
+    EXPECT_FALSE(
+        OracleDatabase::validateXml("<cockatrice_carddatabase version=\"5\"><cards/></cockatrice_carddatabase>")
+            .isEmpty());
+}
+
+TEST(OracleDatabaseWriter, InvalidDownloadPreservesInstalledBytes)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    const QString path = dir.filePath("tokens.xml");
+    QFile original(path);
+    ASSERT_TRUE(original.open(QIODevice::WriteOnly));
+    ASSERT_EQ(original.write("installed tokens"), 16);
+    original.close();
+    for (const QByteArray &payload : {QByteArray("<html>server error</html>"),
+                                      QByteArray("<cockatrice_carddatabase version=\"4\"><cards>"), QByteArray()}) {
+        QString error;
+        EXPECT_FALSE(OracleDatabase::saveXml(path, payload, &error));
+        EXPECT_FALSE(error.isEmpty());
+        ASSERT_TRUE(original.open(QIODevice::ReadOnly));
+        EXPECT_EQ(original.readAll(), "installed tokens");
+        original.close();
+    }
+}
+
+TEST(OracleDatabaseWriter, CompleteDownloadReplacesInstalledBytes)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    const QString path = dir.filePath("cards.xml");
+    const QByteArray data("<cockatrice_carddatabase version=\"4\"><cards/></cockatrice_carddatabase>");
+    QString error = "previous failure";
+    ASSERT_TRUE(OracleDatabase::saveXml(path, data, &error));
+    EXPECT_TRUE(error.isEmpty());
+    QFile file(path);
+    ASSERT_TRUE(file.open(QIODevice::ReadOnly));
+    EXPECT_EQ(file.readAll(), data);
+}
+
+#ifdef Q_OS_UNIX
+TEST(OracleDatabaseWriter, ShortWriteKeepsPreviouslyInstalledDatabase)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    const QString path = dir.filePath("cards.xml");
+    QFile original(path);
+    ASSERT_TRUE(original.open(QIODevice::WriteOnly));
+    ASSERT_EQ(original.write("installed database"), 18);
+    original.close();
+    const QByteArray data = "<cockatrice_carddatabase version=\"4\"><!--" + QByteArray(16384, 'x') +
+                            "--><cards/></cockatrice_carddatabase>";
+    // A real filesystem write failure, isolated in the death-test child so the
+    // process-wide file limit never affects other cases or the parent runner.
+    ASSERT_EXIT(
+        {
+            std::signal(SIGXFSZ, SIG_IGN);
+            struct rlimit limit;
+            limit.rlim_cur = 128;
+            limit.rlim_max = 128;
+            if (setrlimit(RLIMIT_FSIZE, &limit) != 0) {
+                _exit(2);
+            }
+            _exit(OracleDatabase::saveXml(path, data) ? 1 : 0);
+        },
+        ::testing::ExitedWithCode(0), "");
+    ASSERT_TRUE(original.open(QIODevice::ReadOnly));
+    EXPECT_EQ(original.readAll(), "installed database");
+}
+#endif
 
 int main(int argc, char **argv)
 {

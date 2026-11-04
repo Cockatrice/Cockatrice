@@ -573,7 +573,7 @@ Server_Player::cmdNextTurn(const Command_NextTurn & /*cmd*/, ResponseContainer &
         return Response::RespGameNotStarted;
     }
 
-    if (conceded && !judge) {
+    if (conceded && !isJudge()) {
         return Response::RespContextError;
     }
 
@@ -589,7 +589,7 @@ Response::ResponseCode Server_Player::cmdSetActivePhase(const Command_SetActiveP
         return Response::RespGameNotStarted;
     }
 
-    if (!judge) {
+    if (!isJudge()) {
         if (conceded) {
             return Response::RespContextError;
         }
@@ -623,7 +623,7 @@ Response::ResponseCode
 Server_Player::cmdReverseTurn(const Command_ReverseTurn &cmd, ResponseContainer &rc, GameEventStorage &ges)
 {
 
-    if (!judge && conceded) {
+    if (!isJudge() && conceded) {
         return Response::RespContextError;
     }
     return Server_AbstractParticipant::cmdReverseTurn(cmd, rc, ges);

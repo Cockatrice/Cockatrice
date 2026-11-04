@@ -455,9 +455,11 @@ authentication_strictness=mixed
 ; the scrypt verifier, so old clients can still log in during the window below without
 ; the database holding a fast-crackable hash in the clear.
 ; Generate with: openssl rand -hex 32
-; If unset, migrated accounts have no downgrade window: old clients must use a password
-; reset to get back in. Rotating the key invalidates existing backups (they become
-; unusable immediately; expired ones are still purged).
+; If unset there is no downgrade path at all: a migrated account keeps only a scrypt
+; verifier, and an administrator's password reset stores a verifier too, so pre-challenge
+; clients cannot log in with the temporary password either. Set the key if you still serve
+; them. Rotating the key invalidates existing backups (they become unusable immediately;
+; expired ones are still purged).
 legacy_backup_key=
 
 ; Days a legacy password backup may go unused before it is purged from the database.
