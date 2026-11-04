@@ -51,65 +51,18 @@
     <true/>
 
     <!-- ========================= -->
-    <!-- FILE TYPE (.cod) SUPPORT -->
-    <!-- ========================= -->
-
-    <key>UTExportedTypeDeclarations</key>
-    <array>
-        <dict>
-            <key>UTTypeIdentifier</key>
-            <string>org.cockatrice.deck</string>
-
-            <key>UTTypeDescription</key>
-            <string>Cockatrice Deck</string>
-
-            <key>UTTypeConformsTo</key>
-            <array>
-                <string>public.data</string>
-            </array>
-
-            <key>UTTypeTagSpecification</key>
-            <dict>
-                <key>public.filename-extension</key>
-                <array>
-                    <string>cod</string>
-                </array>
-            </dict>
-        </dict>
-    </array>
-
-    <key>CFBundleDocumentTypes</key>
-    <array>
-        <dict>
-            <key>CFBundleTypeName</key>
-            <string>Cockatrice Deck</string>
-
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-
-            <key>LSHandlerRank</key>
-            <string>Default</string>
-
-            <key>LSItemContentTypes</key>
-            <array>
-                <string>org.cockatrice.deck</string>
-            </array>
-        </dict>
-    </array>
-
-    <!-- ========================= -->
-    <!-- URL SCHEME (cockatrice://) -->
+    <!-- URL SCHEME (continuumatrice://) -->
     <!-- ========================= -->
 
     <key>CFBundleURLTypes</key>
     <array>
         <dict>
             <key>CFBundleURLName</key>
-            <string>Cockatrice URL Scheme</string>
+            <string>Continuumatrice URL Scheme</string>
 
             <key>CFBundleURLSchemes</key>
             <array>
-                <string>cockatrice</string>
+                <string>continuumatrice</string>
             </array>
         </dict>
     </array>
