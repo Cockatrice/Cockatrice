@@ -39,6 +39,7 @@
 #include <QTextTableFormat>
 #include <QVector>
 #include <QtConcurrentRun>
+#include <algorithm>
 #include <functional>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/import/card_name_normalizer.h>
@@ -372,8 +373,12 @@ bool DeckLoader::saveToStream_Plain(QTextStream &out,
         saveToStream_DeckHeader(out, deckList);
     }
 
-    // loop zones
-    for (auto zoneNode : deckList.getZoneNodes()) {
+    // Plain deck readers expect the main deck before the sideboard. Reorder a
+    // copy so native saves and the relative order of other zones stay intact.
+    auto zones = deckList.getZoneNodes();
+    std::stable_partition(zones.begin(), zones.end(),
+                          [](const auto *zone) { return zone->getName() == DECK_ZONE_MAIN; });
+    for (auto zoneNode : zones) {
         saveToStream_DeckZone(out, zoneNode, addComments, addSetNameAndNumber);
 
         // end of zone
