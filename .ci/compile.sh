@@ -163,6 +163,12 @@ export CMAKE_POLICY_VERSION_MINIMUM=3.10
 
 # Add cmake flags
 flags=("-DCMAKE_BUILD_TYPE=$BUILDTYPE")
+# PROBE ONLY (throwaway ccache diagnostic, see .github/workflows/ccache-probe.yml): extra
+# -D flags from the environment, because this script has no generic passthrough.
+if [[ ${PROBE_CMAKE_ARGS:-} ]]; then
+  # shellcheck disable=SC2206
+  flags+=($PROBE_CMAKE_ARGS)
+fi
 if [[ $MAKE_SERVER ]]; then
   flags+=("-DWITH_SERVER=1")
 fi

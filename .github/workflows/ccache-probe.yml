@@ -2,20 +2,21 @@
 # Throwaway diagnostic: why does master's ccache serve only ~14% of calls when a
 # whole pull-request cache is restored?
 #
-# It builds the Arch leg's real command (`--server --debug --test`, the same as
-# .github/workflows/desktop-build.yml) three times, with no Actions cache at all,
-# so the repository's 10 GB quota is untouched:
+# Result so far (run 41818008344): one Arch configuration costs 1.2 GB with the
+# default flags, and a cache bigger than that serves 1058 of 1059 calls. The 700M
+# bound therefore cannot hold one build, and a cache just under the working set
+# evicts exactly what the next build asks for.
 #
-#   1. cold, with a 6G bound that cannot be the limit: `du` and the ccache stats
-#      give the true working set of one configuration.
-#   2. again from a deleted build directory with the same image, sources and
-#      flags: anything below ~95% hits means the hash inputs differ, not the size.
-#   3. again after `ccache --recompress 1`, which is the candidate fix if one
-#      configuration turns out to be larger than a per-leg bound: it measures what
-#      the same configuration costs when the objects are compressed.
+# This run measures the only lever that can make one configuration fit a bound:
+# less debug info. Every leg's objects carry full DWARF (Debug uses -ggdb, and
+# CrashReporting adds -g to Release whenever the SDK is on), and debug info
+# dominates the compressed object.
 #
-# Two runs of this workflow also compare the image id and the compiler's mtime,
-# which is what ccache hashes by default (compiler_check = mtime).
+# Two jobs, two cold builds each, no Actions cache, so the repository quota is
+# untouched:
+#   -g0  no debug info at all: the lower bound of what a cache could cost
+#   -g1  file and line only: what a backtrace needs, and the candidate default
+# `du` of each cache dir is the number to compare against 1.2 GB.
 name: ccache probe
 
 on:
@@ -32,17 +33,28 @@ concurrency:
 
 jobs:
   probe:
-    name: Arch probe
+    name: ${{ matrix.label }} debug info
     runs-on: ubuntu-latest
     timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # The debug leg: -ggdb on every object.
+          - label: Arch
+            name: Arch
+            leg: --server --debug --test --cmake-generator Ninja
+            run_env: ''
+          # The release leg that packages: CrashReporting adds -g on top of -O2.
+          - label: Debian 13
+            name: Debian13
+            leg: --server --release --test --cmake-generator Ninja
+            run_env: '-e WITH_CRASH_REPORTING=ON'
     env:
-      NAME: Arch
-      CACHE: ${{ github.workspace }}/.cache/Arch
+      NAME: ${{ matrix.name }}
+      CACHE: ${{ github.workspace }}/.cache/${{ matrix.name }}
       # Far above any candidate working set: a cache that evicts cannot be measured.
       CCACHE_BOUND: 6G
-      # The leg's own invocation, so the probe cannot measure a configuration the
-      # workflow does not build.
-      LEG_ARGS: --server --debug --test --cmake-generator Ninja
 
     steps:
       - name: "Checkout"
@@ -52,59 +64,36 @@ jobs:
         shell: bash
         run: |
           source .ci/docker.sh --build
-          echo "=== disk available to the build"
-          df -h / | sed 's/^/  /'
-          echo "=== image"
           docker image inspect --format 'image id: {{.Id}}' "$IMAGE_NAME"
-          docker image inspect --format 'created: {{.Created}}' "$IMAGE_NAME"
           echo "=== compiler as ccache sees it (compiler_check = mtime hashes mtime and size)"
           docker run --rm "$IMAGE_NAME" bash -c 'for c in c++ cc gcc g++; do p="$(command -v $c)"; [ -n "$p" ] && stat -c "%n size=%s mtime=%Y" "$p"; done; c++ --version | head -1'
 
-      - name: "Build 1 cold, 6G bound"
-        shell: bash
-        run: |
-          source .ci/docker.sh
-          RUN $LEG_ARGS --ccache "$CCACHE_BOUND"
-
-      # du cannot see a size the cache was not allowed to keep, which is why the
-      # bound is 6G here. The stats travel inside the cache directory, so the
-      # numbers below are this run's, not a restored history.
-      - name: "Working set of one configuration, uncompressed"
-        shell: bash
-        run: |
-          source .ci/docker.sh
-          echo "=== ccache dir on the host"
-          du -sh "$CCACHE_DIR"
-          find "$CCACHE_DIR" -type f -name '*.result' | wc -l | sed 's/^/result files: /'
-          find "$CCACHE_DIR" -type f -name '*.manifest' | wc -l | sed 's/^/manifest files: /'
-          echo "=== config in effect"
-          docker run --rm --mount "type=bind,source=$CCACHE_DIR,target=/.ccache" \
-            --env CCACHE_DIR=/.ccache "$IMAGE_NAME" ccache --show-config | grep -E 'compiler_check|hash_dir|compression|direct_mode|depend_mode'
-
-      - name: "Build 2, same image, same sources, deleted build directory"
+      - name: "Cold build with -g0"
         shell: bash
         run: |
           rm -rf build
           source .ci/docker.sh
-          RUN $LEG_ARGS --ccache "$CCACHE_BOUND"
-
-      # A compressed cache is the only way one configuration can fit a per-leg
-      # bound, so measure it on the cache build 2 just used.
-      - name: "Working set after recompressing to level 1"
-        shell: bash
-        run: |
-          source .ci/docker.sh
-          docker run --rm --mount "type=bind,source=$CCACHE_DIR,target=/.ccache" \
-            --env CCACHE_DIR=/.ccache "$IMAGE_NAME" ccache --recompress 1
+          export RUN_ARGS="$RUN_ARGS ${{ matrix.run_env }}"
+          # One cache directory per measurement: a shared one would mix the two results.
+          export CCACHE_DIR="$CACHE/.ccache-g0"
+          export RUN_ARGS="$RUN_ARGS -e PROBE_CMAKE_ARGS=-DCOCKATRICE_DEBUG_INFO_LEVEL=0"
+          RUN ${{ matrix.leg }} --ccache "$CCACHE_BOUND"
+          echo "=== cache for -g0"
           du -sh "$CCACHE_DIR"
 
-      - name: "Build 3, compressed cache, deleted build directory"
+      - name: "Cold build with -g1"
         shell: bash
         run: |
           rm -rf build
           source .ci/docker.sh
-          # Writes stay compressed, so this is the configuration a fix would ship.
-          export RUN_ARGS="$RUN_ARGS -e CCACHE_COMPRESS=1"
-          RUN $LEG_ARGS --ccache "$CCACHE_BOUND"
-          echo "=== cache after build 3"
+          export RUN_ARGS="$RUN_ARGS ${{ matrix.run_env }}"
+          export CCACHE_DIR="$CACHE/.ccache-g1"
+          export RUN_ARGS="$RUN_ARGS -e PROBE_CMAKE_ARGS=-DCOCKATRICE_DEBUG_INFO_LEVEL=1"
+          RUN ${{ matrix.leg }} --ccache "$CCACHE_BOUND"
+          echo "=== cache for -g1"
           du -sh "$CCACHE_DIR"
+
+      - name: "Both measurements"
+        shell: bash
+        run: |
+          du -sh "$CACHE"/.ccache-* | sed 's/^/  /'
