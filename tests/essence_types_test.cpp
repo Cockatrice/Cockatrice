@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/card/essence_types.h>
+#include <libcockatrice/utility/essence_counter.h>
 
 #include <QHash>
 #include <QString>
@@ -13,6 +14,28 @@ TEST(EssenceTypesTest, HasExactlySixteenCanonicalSymbols)
     EXPECT_TRUE(Essence::isSymbol(QChar('J'))); // J is Jasper, between C and B.
     EXPECT_FALSE(Essence::isSymbol(QChar('W'))); // MTG white is not Essence.
     EXPECT_FALSE(Essence::isSymbol(QChar('U'))); // MTG blue is not Essence.
+}
+
+TEST(EssenceTypesTest, NetworkCounterNamesHaveStableRoundTrip)
+{
+    EXPECT_EQ(Essence::symbols(), EssenceCounter::symbols());
+    int position = 1; // Counter id 0 is the existing life counter.
+    for (const QChar code : EssenceCounter::symbols()) {
+        const QString networkName = EssenceCounter::name(code);
+        EXPECT_TRUE(networkName.startsWith(QStringLiteral("essence:")));
+        EXPECT_EQ(EssenceCounter::codeFromName(networkName), code);
+        EXPECT_TRUE(EssenceCounter::isEssenceCounter(networkName));
+        ++position;
+    }
+    EXPECT_EQ(position, 17);
+    EXPECT_TRUE(EssenceCounter::name(QChar('W')).isEmpty());
+    EXPECT_FALSE(EssenceCounter::isEssenceCounter(QStringLiteral("essence:W")));
+    EXPECT_FALSE(EssenceCounter::isEssenceCounter(QStringLiteral("essence:MM")));
+    EXPECT_FALSE(EssenceCounter::isEssenceCounter(QStringLiteral("life")));
+    EXPECT_EQ(EssenceCounter::clampBalance(-1), 0);
+    EXPECT_EQ(EssenceCounter::clampBalance(-900), 0);
+    EXPECT_EQ(EssenceCounter::clampBalance(0), 0);
+    EXPECT_EQ(EssenceCounter::clampBalance(19), 19);
 }
 
 TEST(EssenceTypesTest, ParsesAllBracedAndUnbracedTypes)

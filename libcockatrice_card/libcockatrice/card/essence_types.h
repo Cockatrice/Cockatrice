@@ -6,6 +6,7 @@
 #include <QRegularExpressionMatchIterator>
 #include <QString>
 #include <QStringList>
+#include <libcockatrice/utility/essence_counter.h>
 
 namespace Essence
 {
@@ -13,8 +14,7 @@ namespace Essence
 // The other codes have no names, colors or game mechanics assigned here.
 inline const QString &symbols()
 {
-    static const QString value = QStringLiteral("MSOGEAQCJBRLVTPN");
-    return value;
+    return EssenceCounter::symbols();
 }
 
 inline bool isSymbol(const QChar symbol)
