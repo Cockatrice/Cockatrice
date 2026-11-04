@@ -39,9 +39,8 @@ tell disk image_name
       set statusbar visible to false
       set toolbar visible to false
       set the bounds to { 400, 100, 1400, 922 }
-      set position of item "Cockatrice.app" to { 139, 214 }
-      set position of item "Oracle.app" to { 139, 414 }
-      set position of item "Servatrice.app" to { 139, 614 }
+      set position of item "continuumatrice.app" to { 139, 214 }
+      set position of item "continuum-servatrice.app" to { 139, 614 }
       set position of item "Applications" to { 861, 414 }
     end tell
     update without registering applications
