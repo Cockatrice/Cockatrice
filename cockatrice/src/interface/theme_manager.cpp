@@ -660,21 +660,26 @@ QFont ThemeManager::appFont(AppFont::Role role) const
     }
 
     // Role fallbacks preserve the pre-theme defaults when no fonts.toml is
-    // present: card text starts from a serif basis, everything else from the
-    // application font. The report dialogs that used to hardcode monospace ask
-    // for it explicitly (report_utils::reportLogFont).
-    if (role == AppFont::CardText) {
-        return QFont(QStringLiteral("Serif"));
-    }
-
-    // No per-role scaling: every other unset role resolves to the application
-    // font, so with no fonts.toml present the result is identical to before.
+    // present: an unset role resolves to the application font, so the result is
+    // identical to before. The report dialogs that used to hardcode monospace
+    // ask for it explicitly (report_utils::reportLogFont), and the counter
+    // painters that used to hardcode Serif ask for it through cardTextFont().
     return qApp->font();
 }
 
 bool ThemeManager::hasAppFont(AppFont::Role role) const
 {
     return currentFonts.fonts.contains(role);
+}
+
+QFont ThemeManager::cardTextFont() const
+{
+    if (hasAppFont(AppFont::CardText)) {
+        return appFont(AppFont::CardText);
+    }
+    QFont serifFont(QStringLiteral("Serif"));
+    serifFont.setStyleHint(QFont::Serif);
+    return serifFont;
 }
 
 QFont ThemeManager::defaultAppFont(AppFont::Role /*role*/) const
