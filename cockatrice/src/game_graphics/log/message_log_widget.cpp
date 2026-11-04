@@ -26,6 +26,7 @@
 #include <libcockatrice/game/zones/card_zone_logic.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/protocol/pb/context_mulligan.pb.h>
+#include <libcockatrice/protocol/pb/context_transform_card.pb.h>
 #include <libcockatrice/settings/chat_settings.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <optional>
@@ -117,9 +118,32 @@ MessageLogWidget::getFromStr(CardZoneLogic *zone, QString cardName, int position
     return {cardName, fromStr};
 }
 
+void MessageLogWidget::logTransformIntoCard(const QString &playerName,
+                                            QString oldCardName,
+                                            QString newCardName,
+                                            QString pt,
+                                            bool faceDown)
+{
+    if (faceDown) {
+        appendHtmlServerMessage(
+            tr("%1 transforms %2 into a face down card.").arg(playerName).arg(cardLink(std::move(oldCardName))));
+    } else {
+        appendHtmlServerMessage(tr("%1 transforms %2 into %3%4.")
+                                    .arg(playerName)
+                                    .arg(cardLink(std::move(oldCardName)))
+                                    .arg(cardLink(std::move(newCardName)))
+                                    .arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
+    }
+}
+
 void MessageLogWidget::containerProcessingDone()
 {
+    for (const auto &[playerName, cardName] : deferredDestroyCardNames) {
+        appendHtmlServerMessage(tr("%1 destroys %2.").arg(playerName).arg(cardLink(cardName)));
+    }
+    deferredDestroyCardNames.clear();
     currentContext = MessageContext_None;
+    transformOldCardName.clear();
     messageSuffix = messagePrefix = QString();
 }
 
@@ -129,6 +153,8 @@ void MessageLogWidget::containerProcessingStarted(const GameEventContext &contex
         currentContext = MessageContext_MoveCard;
     } else if (context.HasExtension(Context_Mulligan::ext)) {
         currentContext = MessageContext_Mulligan;
+    } else if (context.HasExtension(Context_TransformCard::ext)) {
+        currentContext = MessageContext_TransformCard;
     }
 }
 
@@ -252,6 +278,27 @@ void MessageLogWidget::logCreateArrow(PlayerLogic *player,
 
 void MessageLogWidget::logCreateToken(PlayerLogic *player, QString cardName, QString pt, bool faceDown)
 {
+    if (currentContext == MessageContext_TransformCard) {
+        if (transformOldCardName.isEmpty()) {
+            appendHtmlServerMessage(tr("%1 creates token: %2%3.")
+                                        .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
+                                        .arg(cardLink(std::move(cardName)))
+                                        .arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
+        } else {
+            logTransformIntoCard(sanitizeHtml(player->getPlayerInfo()->getName()), std::move(transformOldCardName),
+                                 std::move(cardName), pt, faceDown);
+        }
+        transformOldCardName.clear();
+        return;
+    }
+
+    if (currentContext == MessageContext_MoveCard && !deferredDestroyCardNames.isEmpty()) {
+        const auto deferredDestroy = deferredDestroyCardNames.takeLast();
+        logTransformIntoCard(deferredDestroy.first, std::move(deferredDestroy.second), std::move(cardName), pt,
+                             faceDown);
+        return;
+    }
+
     if (faceDown) {
         appendHtmlServerMessage(
             tr("%1 creates a face down token.").arg(sanitizeHtml(player->getPlayerInfo()->getName())));
@@ -278,6 +325,16 @@ void MessageLogWidget::logDeckSelect(PlayerLogic *player, QString deckHash, int 
 
 void MessageLogWidget::logDestroyCard(PlayerLogic *player, QString cardName)
 {
+    if (currentContext == MessageContext_TransformCard) {
+        transformOldCardName = cardName;
+        return;
+    }
+
+    if (currentContext == MessageContext_MoveCard) {
+        deferredDestroyCardNames.append({sanitizeHtml(player->getPlayerInfo()->getName()), std::move(cardName)});
+        return;
+    }
+
     appendHtmlServerMessage(
         tr("%1 destroys %2.").arg(sanitizeHtml(player->getPlayerInfo()->getName())).arg(cardLink(std::move(cardName))));
 }
@@ -289,6 +346,14 @@ void MessageLogWidget::logMoveCard(PlayerLogic *player,
                                    CardZoneLogic *targetZone,
                                    int newX)
 {
+    // A destroyed card that was not replaced by a re-created card has no
+    // following move event, so flush any pending destroy logs before logging
+    // the next move within this batch.
+    for (const auto &[playerName, cardName] : deferredDestroyCardNames) {
+        appendHtmlServerMessage(tr("%1 destroys %2.").arg(playerName).arg(cardLink(cardName)));
+    }
+    deferredDestroyCardNames.clear();
+
     if (currentContext == MessageContext_Mulligan) {
         return;
     }
@@ -817,6 +882,10 @@ void MessageLogWidget::logSpectatorSay(const ServerInfo_User &spectator, QString
 
 void MessageLogWidget::logUnattachCard(PlayerLogic *player, QString cardName)
 {
+    if (currentContext == MessageContext_TransformCard) {
+        return;
+    }
+
     appendHtmlServerMessage(tr("%1 unattaches %2.")
                                 .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                 .arg(cardLink(std::move(cardName))));
