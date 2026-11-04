@@ -45,6 +45,7 @@ public:
         AttrMainType,
         AttrSubType,
         AttrFormat,
+        AttrGender,
         AttrEnd,
     };
 

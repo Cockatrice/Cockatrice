@@ -295,6 +295,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/visual_database_display/visual_database_display_filter_save_load_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_format_legality_filter_widget.cpp
+    src/interface/widgets/visual_database_display/visual_database_display_gender_filter_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp

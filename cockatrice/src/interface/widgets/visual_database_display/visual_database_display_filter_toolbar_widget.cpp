@@ -6,6 +6,7 @@
 #include "card_database_display_model.h"
 #include "visual_database_display_filter_save_load_widget.h"
 #include "visual_database_display_format_legality_filter_widget.h"
+#include "visual_database_display_gender_filter_widget.h"
 #include "visual_database_display_main_type_filter_widget.h"
 #include "visual_database_display_name_filter_widget.h"
 #include "visual_database_display_set_filter_widget.h"
@@ -103,6 +104,9 @@ VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidg
     quickFilterSetWidget = new SettingsButtonWidget(this);
     quickFilterSetWidget->setButtonIcon(themePixmap(QStringLiteral("icons/scroll")));
 
+    quickFilterGenderWidget = new SettingsButtonWidget(this);
+    quickFilterGenderWidget->setButtonIcon(themePixmap(QStringLiteral("icons/filter")));
+
     quickFilterFormatLegalityWidget = new SettingsButtonWidget(this);
     quickFilterFormatLegalityWidget->setButtonIcon(themePixmap(QStringLiteral("icons/scale_balanced")));
 
@@ -126,12 +130,14 @@ void VisualDatabaseDisplayFilterToolbarWidget::initialize()
     formatLegalityWidget = new VisualDatabaseDisplayFormatLegalityFilterWidget(this, filterModel);
     subTypeFilterWidget = new VisualDatabaseDisplaySubTypeFilterWidget(this, filterModel);
     setFilterWidget = new VisualDatabaseDisplaySetFilterWidget(this, filterModel);
+    genderFilterWidget = new VisualDatabaseDisplayGenderFilterWidget(this, filterModel);
 
     quickFilterSaveLoadWidget->addSettingsWidget(saveLoadWidget);
     quickFilterNameWidget->addSettingsWidget(nameFilterWidget);
     quickFilterMainTypeWidget->addSettingsWidget(mainTypeFilterWidget);
     quickFilterSubTypeWidget->addSettingsWidget(subTypeFilterWidget);
     quickFilterSetWidget->addSettingsWidget(setFilterWidget);
+    quickFilterGenderWidget->addSettingsWidget(genderFilterWidget);
     quickFilterFormatLegalityWidget->addSettingsWidget(formatLegalityWidget);
 
     // fill groupbox layouts
@@ -144,6 +150,7 @@ void VisualDatabaseDisplayFilterToolbarWidget::initialize()
     filterLayout->addWidget(quickFilterMainTypeWidget);
     filterLayout->addWidget(quickFilterSubTypeWidget);
     filterLayout->addWidget(quickFilterSetWidget);
+    filterLayout->addWidget(quickFilterGenderWidget);
     filterLayout->addWidget(quickFilterFormatLegalityWidget);
 
     // put everything into main layout
@@ -171,6 +178,7 @@ void VisualDatabaseDisplayFilterToolbarWidget::retranslateUi()
     quickFilterMainTypeWidget->setToolTip(tr("Filter by card main-type"));
     quickFilterSubTypeWidget->setToolTip(tr("Filter by card sub-type"));
     quickFilterSetWidget->setToolTip(tr("Filter by set"));
+    quickFilterGenderWidget->setToolTip(tr("Filter by card gender"));
     quickFilterFormatLegalityWidget->setToolTip(tr("Filter by format legality"));
 
     quickFilterSaveLoadWidget->setButtonText(tr("Save/Load"));
@@ -178,6 +186,7 @@ void VisualDatabaseDisplayFilterToolbarWidget::retranslateUi()
     quickFilterMainTypeWidget->setButtonText(tr("Main Type"));
     quickFilterSubTypeWidget->setButtonText(tr("Sub Type"));
     quickFilterSetWidget->setButtonText(tr("Sets"));
+    quickFilterGenderWidget->setButtonText(tr("Gender"));
     quickFilterFormatLegalityWidget->setButtonText(tr("Formats"));
 }
 
@@ -193,7 +202,8 @@ void VisualDatabaseDisplayFilterToolbarWidget::updateCompactMode(int availableWi
 
     const QList<SettingsButtonWidget *> filterButtons = {
         quickFilterSaveLoadWidget, quickFilterNameWidget, quickFilterMainTypeWidget,
-        quickFilterSubTypeWidget,  quickFilterSetWidget,  quickFilterFormatLegalityWidget,
+        quickFilterSubTypeWidget,  quickFilterSetWidget,  quickFilterGenderWidget,
+        quickFilterFormatLegalityWidget,
     };
 
     for (auto *btn : filterButtons) {

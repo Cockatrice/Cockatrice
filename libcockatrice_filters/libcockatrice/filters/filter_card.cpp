@@ -91,6 +91,8 @@ const QString CardFilter::attrName(Attr a)
             return tr("Main Type");
         case AttrSubType:
             return tr("Sub Type");
+        case AttrGender:
+            return tr("Gender");
         default:
             return QString("");
     }
