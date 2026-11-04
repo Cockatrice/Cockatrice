@@ -285,6 +285,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/settings_page/storage_settings_page.cpp
     src/interface/widgets/settings_page/user_interface_settings_page.cpp
     src/interface/widgets/utility/custom_line_edit.cpp
+    src/interface/widgets/utility/epoch_format.h
     src/interface/widgets/utility/get_text_with_max.cpp
     src/interface/widgets/utility/report_utils.cpp
     src/interface/widgets/utility/report_utils.h
@@ -378,6 +379,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/tab.cpp
     src/interface/widgets/tabs/tab_account.cpp
     src/interface/widgets/tabs/tab_admin.cpp
+    src/interface/widgets/tabs/tab_alts.cpp
     src/interface/widgets/tabs/tab_card_art_rules.cpp
     src/interface/widgets/tabs/tab_deck_editor.cpp
     src/interface/widgets/tabs/tab_deck_storage.cpp
