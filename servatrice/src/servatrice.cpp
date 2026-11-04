@@ -1270,9 +1270,9 @@ QString Servatrice::getDBTypeString() const
 QString Servatrice::getDBPrefixString() const
 {
     if (QProcessEnvironment::systemEnvironment().contains("DATABASE_URL")) {
-        return {"cockatrice"};
+        return {"continuum_servatrice"};
     }
-    return settingsCache->value("database/prefix").toString();
+    return settingsCache->value("database/prefix", "continuum_servatrice").toString();
 }
 
 QString Servatrice::getDBHostNameString() const
@@ -1419,7 +1419,7 @@ QHostAddress Servatrice::getServerTCPHost() const
 
 int Servatrice::getServerTCPPort() const
 {
-    return settingsCache->value("server/port", 4747).toInt();
+    return settingsCache->value("server/port", 4757).toInt();
 }
 
 int Servatrice::getNumberOfWebSocketPools() const
@@ -1442,7 +1442,7 @@ int Servatrice::getServerWebSocketPort() const
     if (QProcessEnvironment::systemEnvironment().contains("PORT")) {
         return QProcessEnvironment::systemEnvironment().value("PORT").toInt();
     }
-    return settingsCache->value("server/websocket_port", 4748).toInt();
+    return settingsCache->value("server/websocket_port", 4758).toInt();
 }
 
 bool Servatrice::getISLNetworkEnabled() const
