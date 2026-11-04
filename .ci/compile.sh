@@ -162,7 +162,7 @@ cd "$BUILD_DIR"
 export CMAKE_POLICY_VERSION_MINIMUM=3.10
 
 # Add cmake flags
-flags=("-DCMAKE_BUILD_TYPE=$BUILDTYPE")
+flags=("-DCMAKE_BUILD_TYPE=$BUILDTYPE" "-DWITH_ORACLE=OFF")
 if [[ $MAKE_SERVER ]]; then
   flags+=("-DWITH_SERVER=1")
 fi
@@ -407,7 +407,7 @@ fi
 
 if [[ $RUNNER_OS == macOS ]]; then
   echo "::group::Inspect Mach-O binaries"
-  for app in cockatrice oracle servatrice; do
+  for app in continuumatrice continuum-servatrice; do
     binary="$GITHUB_WORKSPACE/build/$app/$app.app/Contents/MacOS/$app"
     echo "Inspecting $app..."
     vtool -show-build "$binary"
@@ -575,7 +575,7 @@ Start-Sleep -Seconds 120
     # that it cannot be named - the answer has to be "could not name it", never "nothing is
     # holding it", which is what sent an update into an uninstall that could only fail
     # halfway. Exit 3 is the code the guard answers by asking the user to close it and retry.
-    $image = Join-Path $dir "oracle.exe"
+    $image = Join-Path $dir "continuumatrice-legacy-oracle.exe"
     [IO.File]::WriteAllText($image, "x")
     $handle = [IO.File]::Open($image, "Open", "ReadWrite", "None")
     try {
@@ -600,7 +600,7 @@ Start-Sleep -Seconds 120
     # warning with no offer to close and try again. The image is a copy of a native
     # Windows program, so it starts without its usual directory next to it, and it carries
     # one of the payload's own names because that is what the lookup names.
-    $copy = Join-Path $dir "cockatrice.exe"
+    $copy = Join-Path $dir "continuumatrice.exe"
     Copy-Item -LiteralPath (Join-Path $env:SystemRoot "System32\cmd.exe") -Destination $copy
     $running = Start-Process -FilePath $copy -ArgumentList "/c", "ping -n 20 127.0.0.1 >nul" -PassThru
     try {
@@ -624,7 +624,7 @@ Start-Sleep -Seconds 120
     # named, by the Restart Manager lookup exercised above.
     $nested = Join-Path $dir "other"
     New-Item -ItemType Directory -Force $nested | Out-Null
-    $nestedImage = Join-Path $nested "cockatrice.exe"
+    $nestedImage = Join-Path $nested "continuumatrice.exe"
     Copy-Item -LiteralPath (Join-Path $env:SystemRoot "System32\cmd.exe") -Destination $nestedImage
     $nestedRunning = Start-Process -FilePath $nestedImage -ArgumentList "/c", "ping -n 20 127.0.0.1 >nul" -PassThru
     try {
@@ -688,7 +688,7 @@ if [[ $MAKE_PACKAGE ]]; then
   if [[ $RUNNER_OS == Windows ]]; then
     echo "::group::Check installer for build-tree artifacts"
     cd "$BUILD_DIR"
-    package="$(find . -maxdepth 1 -type f -name 'Cockatrice-*.exe' -print -quit)"
+    package="$(find . -maxdepth 1 -type f -name 'Continuumatrice-*.exe' -print -quit)"
     if [[ ! $package ]]; then
       echo "::error file=$0::Could not find installer to inspect"
       exit 1
