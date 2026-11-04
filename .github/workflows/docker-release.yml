@@ -84,12 +84,18 @@ jobs:
           password: ${{ github.token }}
 
       # Don't push for non-publishing triggers
+      #
+      # The layer cache shares the repository's 10 GB Actions cache quota with the compiler
+      # caches (see CCACHE_SIZE in desktop-build.yml). mode=min keeps only the final image
+      # stage: the build stage sits behind `COPY . .`, so its compile layer is invalidated by
+      # every source change and was never read back, yet it was the bulk of the ~2 GB this
+      # cache held. The final runtime stage is the part that still pays off.
       - name: "Build image"
         if: steps.login.outcome != 'success'
         uses: docker/build-push-action@v7
         with:
           cache-from: type=gha,scope=${{ env.CACHE_SCOPE }}
-          cache-to: ${{ case(github.ref == 'refs/heads/master', format('type=gha,mode=max,scope={0}', env.CACHE_SCOPE), '') }}
+          cache-to: ${{ case(github.ref == 'refs/heads/master', format('type=gha,mode=min,scope={0}', env.CACHE_SCOPE), '') }}
           context: .
           platforms: ${{ matrix.platform }}
           push: false
@@ -101,7 +107,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           cache-from: type=gha,scope=${{ env.CACHE_SCOPE }}
-          cache-to: type=gha,mode=max,scope=${{ env.CACHE_SCOPE }}
+          cache-to: type=gha,mode=min,scope=${{ env.CACHE_SCOPE }}
           context: .
           labels: |
             org.opencontainers.image.description=${{ env.OCI_DESCRIPTION }}
