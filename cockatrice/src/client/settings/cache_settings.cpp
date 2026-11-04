@@ -113,6 +113,16 @@ SettingsCache::SettingsCache()
 
     QString settingsPath = getSettingsPath();
 
+    // Decide once, before any migration writes new files, whether this is an
+    // existing install. Fresh installs have no *.ini files and no legacy
+    // NativeFormat keys; upgrades have one or the other. Fallbacks are disabled
+    // so that on macOS the global preferences domain (AppleLanguages etc.) is
+    // not mistaken for existing Cockatrice settings on a fresh install.
+    QSettings legacy;
+    legacy.setFallbacksEnabled(false);
+    const bool hadExistingSettings =
+        !QDir(settingsPath).entryList({"*.ini"}, QDir::Files).isEmpty() || !legacy.allKeys().isEmpty();
+
     settings = new QSettings(settingsPath + "global.ini", QSettings::IniFormat, this);
 
     // Both migrations below overwrite per-domain files in place, so snapshot the whole settings
@@ -158,6 +168,12 @@ SettingsCache::SettingsCache()
     personalSettings = new PersonalSettings(settingsPath, this);
     cardsDisplaySettings = new CardsDisplaySettings(settingsPath, this);
     interfaceSettings = new InterfaceSettings(settingsPath, this);
+    if (hadExistingSettings) {
+        QSettings iface(settingsPath + "interface.ini", QSettings::IniFormat);
+        if (!iface.contains("interface/tutorialCompleted")) {
+            interfaceSettings->setTutorialCompleted(true);
+        }
+    }
     deckEditorSettings = new DeckEditorSettings(settingsPath, this);
     pathsSettings = new PathsSettings(settingsPath, this);
     visualDeckStorageSettings = new VisualDeckStorageSettings(settingsPath, this);

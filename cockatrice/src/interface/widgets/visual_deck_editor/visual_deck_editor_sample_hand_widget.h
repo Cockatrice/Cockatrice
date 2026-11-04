@@ -7,6 +7,7 @@
 #ifndef VISUAL_DECK_EDITOR_SAMPLE_HAND_WIDGET_H
 #define VISUAL_DECK_EDITOR_SAMPLE_HAND_WIDGET_H
 
+#include "../general/tutorial/tutorial_controller.h"
 #include "libcockatrice/card/printing/exact_card.h"
 
 #include <QList>
@@ -31,6 +32,7 @@ public:
                                      DeckListModel *deckListModel,
                                      DeckListStatisticsAnalyzer *statsAnalyzer);
     QList<ExactCard> getRandomCards(int amountToGet);
+    TutorialSequence generateTutorialSequence();
 
 public slots:
     void updateDisplay();

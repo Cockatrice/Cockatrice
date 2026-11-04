@@ -7,6 +7,8 @@
 #ifndef VISUAL_DECK_EDITOR_H
 #define VISUAL_DECK_EDITOR_H
 
+#include "../general/tutorial/tutorial_controller.h"
+
 #include <QHash>
 #include <QMouseEvent>
 #include <QPersistentModelIndex>
@@ -59,6 +61,7 @@ public:
 
     void setSelectionModel(QItemSelectionModel *model);
     void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+    TutorialSequence addTutorialSteps();
     void updatePlaceholderVisibility();
     QItemSelectionModel *getSelectionModel() const
     {

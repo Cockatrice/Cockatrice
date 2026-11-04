@@ -24,6 +24,11 @@ TabbedDeckViewContainer::TabbedDeckViewContainer(int _playerId, TabGame *parent)
     updateTabBarVisibility();
 }
 
+TutorialSequence TabbedDeckViewContainer::generateTutorialSequence()
+{
+    return playerDeckView->generateTutorialSequence();
+}
+
 void TabbedDeckViewContainer::addOpponentDeckView(const DeckList &opponentDeck, int opponentId, QString opponentName)
 {
     if (opponentDeckViews.contains(opponentId)) {

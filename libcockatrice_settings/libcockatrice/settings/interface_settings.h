@@ -57,6 +57,7 @@ public:
     [[nodiscard]] bool getLifeCounterAnimationsEnabled() const override;
     [[nodiscard]] bool getBattlefieldFlashEnabled() const override;
     [[nodiscard]] QStringList getUserListExpandedSections() const override;
+    [[nodiscard]] bool getTutorialCompleted() const;
 
     void setUseTearOffMenus(bool _useTearOffMenus);
     void setCardViewInitialRowsMax(int _cardViewInitialRowsMax);
@@ -96,6 +97,7 @@ public:
     void setLifeCounterAnimationsEnabled(bool _lifeCounterAnimationsEnabled);
     void setBattlefieldFlashEnabled(bool _battlefieldFlashEnabled);
     void setUserListExpandedSections(const QStringList &sections);
+    void setTutorialCompleted(bool value);
 
 signals:
     void useTearOffMenusChanged(bool state);

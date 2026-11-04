@@ -5,6 +5,8 @@
 #include "libcockatrice/utility/playmat_params.h"
 
 #include <QChar>
+#include <QDir>
+#include <QFileInfo>
 #include <QList>
 #include <QVariant>
 #include <QtGlobal>
@@ -246,6 +248,11 @@ QStringList InterfaceSettings::getUserListExpandedSections() const
         .toStringList();
 }
 
+bool InterfaceSettings::getTutorialCompleted() const
+{
+    return getValue("tutorialCompleted", QString(), QString(), false).toBool();
+}
+
 void InterfaceSettings::setUseTearOffMenus(bool _useTearOffMenus)
 {
     setValue(_useTearOffMenus, "useTearOffMenus");
@@ -468,4 +475,9 @@ void InterfaceSettings::setBattlefieldFlashEnabled(bool _battlefieldFlashEnabled
 void InterfaceSettings::setUserListExpandedSections(const QStringList &sections)
 {
     setValue(sections, "userListExpandedSections");
+}
+
+void InterfaceSettings::setTutorialCompleted(bool value)
+{
+    setValue(value, "tutorialCompleted");
 }

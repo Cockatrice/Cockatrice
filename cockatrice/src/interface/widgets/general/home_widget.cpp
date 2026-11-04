@@ -21,6 +21,7 @@
 #include "libcockatrice/card/printing/printing_info.h"
 #include "libcockatrice/card/set/card_set.h"
 #include "libcockatrice/utility/card_ref.h"
+#include "tutorial/tutorial_controller.h"
 
 #include <QBrush>
 #include <QDebug>
@@ -60,6 +61,7 @@
 #include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/network/client/remote/remote_client.h>
 #include <libcockatrice/settings/appearance_settings.h>
+#include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
 #include <optional>
@@ -103,6 +105,33 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
             &HomeWidget::initializeBackgroundFromSource);
     connect(&SettingsCache::instance().appearance(), &AppearanceSettings::homeTabBackgroundShuffleFrequencyChanged,
             this, &HomeWidget::onBackgroundShuffleFrequencyChanged);
+
+    tutorialController = new TutorialController(this);
+    auto sequence = TutorialSequence();
+    sequence.addStep({connectButton, "Connect to a server to play here!"});
+    auto vdeStep = TutorialStep{visualDeckEditorButton, "Create a new deck from cards in the database here!"};
+    vdeStep.requiresInteraction = true;
+    vdeStep.allowClickThrough = true;
+    vdeStep.validationHint = "Open the deck editor to try it out!";
+    vdeStep.validationTiming = ValidationTiming::OnSignal;
+    vdeStep.autoAdvanceOnValid = true;
+    vdeStep.validator = []() { return true; };
+    vdeStep.signalHook = [this](TutorialController *controller) {
+        return connect(visualDeckEditorButton, &QAbstractButton::clicked, controller,
+                       &TutorialController::checkValidation);
+    };
+
+    sequence.addStep(vdeStep);
+    sequence.addStep({visualDeckStorageButton, "Browse the decks in your local collection."});
+    sequence.addStep({visualDatabaseDisplayButton, "View the card database here."});
+    sequence.addStep(
+        {edhrecButton, "Browse EDHRec, an external service designed to provide card recommendations for decks."});
+    sequence.addStep({archidektButton, "Browse Archidekt, an external service that allows users to store "
+                                       "decklists and import them to your local collection."});
+    sequence.addStep({replayButton, "View replays of your past games here."});
+    sequence.addStep({exitButton, "Exit the application."});
+    tutorialController->addSequence(sequence);
+
     // Lambda is cleaner to read than overloading this
     connect(&SettingsCache::instance().appearance(), &AppearanceSettings::homeTabDisplayCardNameChanged, this,
             [this] { repaint(); });
@@ -144,6 +173,16 @@ void HomeWidget::retranslateUi()
             // Connecting, registering, activating, logging in, etc.
             connectButton->setText(tr("Connecting..."));
             break;
+    }
+}
+
+void HomeWidget::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    if (!tutorialStarted && !SettingsCache::instance().userInterface().getTutorialCompleted()) {
+        tutorialStarted = true;
+        // Start on next event loop iteration so everything is fully painted
+        QTimer::singleShot(3, tutorialController, [this] { tutorialController->start(); });
     }
 }
 

@@ -6,6 +6,8 @@
 #ifndef VISUAL_DECK_STORAGE_WIDGET_H
 #define VISUAL_DECK_STORAGE_WIDGET_H
 
+#include "../general/tutorial/tutorial_controller.h"
+
 #include <QPointer>
 #include <QSet>
 #include <QString>
@@ -42,6 +44,7 @@ public:
     void setShareSelectedFiles(const QStringList &paths);
     void clearShareSelection();
     void setShareAvailable(bool available);
+    void generateTutorialSequence(TutorialSequence &vdsSequence);
 
     VisualDeckStorageTagFilterWidget *tagFilterWidget;
     bool deckPreviewSelectionAnimationEnabled;
