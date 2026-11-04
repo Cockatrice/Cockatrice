@@ -50,11 +50,12 @@ namespace
 // The server warns that this account still uses the legacy password hash while this client
 // holds a scrypt verifier. Sending the verifier would downgrade the proof, so the client
 // stops; the login only succeeds after the saved verifier is gone and the user types the
-// password, which also upgrades the account.
+// password, which also upgrades the account. Unticking "Save password" drops the verifier
+// for the next connection.
 constexpr const char *const LOGIN_ABORT_AUTH_DOWNGRADE = QT_TRANSLATE_NOOP(
     "RemoteClient",
     "The server still uses an old password format for this account, so the saved login on this computer cannot be "
-    "used. Untick 'Save password' in the Connect window and connect; when it opens again, type your password.");
+    "used. Untick 'Save password' in the Connect window and log in with your password.");
 // The account is still on the legacy hash and only the plaintext password can produce it.
 constexpr const char *const LOGIN_ABORT_PASSWORD_REQUIRED =
     QT_TRANSLATE_NOOP("RemoteClient",
@@ -125,6 +126,7 @@ RemoteClient::RemoteClient(QObject *parent, INetworkSettingsProvider *_networkSe
             &RemoteClient::doSubmitForgotPasswordResetToServer);
     connect(this, &RemoteClient::sigSubmitForgotPasswordChallengeToServer, this,
             &RemoteClient::doSubmitForgotPasswordChallengeToServer);
+    connect(this, &RemoteClient::sigChangePasswordToServer, this, &RemoteClient::doChangePasswordToServer);
 }
 
 RemoteClient::~RemoteClient()
@@ -136,6 +138,7 @@ RemoteClient::~RemoteClient()
 void RemoteClient::slotSocketError(QAbstractSocket::SocketError /*error*/)
 {
     QString errorString = socket->errorString();
+    qCWarning(RemoteClientLog) << "Server connection error:" << errorString;
     doDisconnectFromServer();
     emit socketError(errorString);
 }
@@ -145,6 +148,7 @@ void RemoteClient::slotWebSocketError(QAbstractSocket::SocketError /*error*/)
 
     QString errorString = websocket->errorString();
     if (getStatus() != ClientStatus::StatusDisconnected) {
+        qCWarning(RemoteClientLog) << "Server connection error:" << errorString;
         doDisconnectFromServer();
         emit socketError(errorString);
     }
@@ -152,6 +156,7 @@ void RemoteClient::slotWebSocketError(QAbstractSocket::SocketError /*error*/)
 
 void RemoteClient::slotConnected()
 {
+    qCInfo(RemoteClientLog) << "Server transport connected";
     timeRunning = lastDataReceived = 0;
     timer->start();
 
@@ -165,6 +170,12 @@ void RemoteClient::slotConnected()
 
 void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentification &event)
 {
+    // Identification arrives before login, including when protocol versions differ.
+    // Quote the server-supplied strings in the log and limit their size.
+    const QString serverName = QString::fromStdString(event.server_name()).left(256);
+    const QString serverVersion = QString::fromStdString(event.server_version()).left(256);
+    qCInfo(RemoteClientLog) << "Server identification:" << serverName << "version" << serverVersion
+                            << "protocol version" << event.protocol_version();
     if (event.protocol_version() != protocolVersion) {
         emit protocolVersionMismatch(protocolVersion, event.protocol_version());
         setStatus(StatusDisconnecting);
@@ -354,6 +365,29 @@ void RemoteClient::submitPasswordVerifierResponse(const Response &response)
     }
 }
 
+void RemoteClient::changePasswordToServer(const QString &oldPassword, const QString &newPassword)
+{
+    emit sigChangePasswordToServer(oldPassword, newPassword);
+}
+
+void RemoteClient::doChangePasswordToServer(const QString &oldPassword, const QString &newPassword)
+{
+    const Command_AccountPassword cmd = makeAccountPasswordCommand(oldPassword, newPassword);
+
+    PendingCommand *pend = prepareSessionCommand(cmd);
+    connect(pend, &PendingCommand::finished, this, &RemoteClient::accountPasswordResponse);
+    sendCommand(pend);
+}
+
+void RemoteClient::accountPasswordResponse(const Response &response)
+{
+    if (response.response_code() == Response::RespOk) {
+        emit sigPasswordChangeSuccess();
+    } else {
+        emit sigPasswordChangeError(response.response_code());
+    }
+}
+
 void RemoteClient::processConnectionClosedEvent(const Event_ConnectionClosed & /*event*/)
 {
     doDisconnectFromServer();
@@ -475,6 +509,23 @@ void RemoteClient::loginResponse(const Response &response)
             emit notifyUserAboutUpdate();
         }
 
+    } else if (response.response_code() == Response::RespPasswordChangeRequired) {
+        // The credentials were accepted: the server keeps this session open and serves
+        // nothing but ping and Command_AccountPassword until the password is replaced.
+        // Treating it as a failed login would disconnect before the dialog that collects
+        // the new password (queued to the UI thread behind this slot) can send anything:
+        // the command would sit in pendingCommands forever, because the ping timer that
+        // times it out stops with the connection. Keep the session and let the controller
+        // report the outcome through accountPasswordResponse().
+        QList<QString> missingFeatures;
+        if (resp.missing_features_size() > 0) {
+            for (int i = 0; i < resp.missing_features_size(); ++i) {
+                missingFeatures << QString::fromStdString(resp.missing_features(i));
+            }
+        }
+        setStatus(StatusPasswordChangeRequired);
+        emit loginError(response.response_code(), QString::fromStdString(resp.denied_reason_str()),
+                        static_cast<quint32>(resp.denied_end_time()), missingFeatures);
     } else if (response.response_code() != Response::RespNotConnected) {
         QList<QString> missingFeatures;
         if (resp.missing_features_size() > 0) {
@@ -657,6 +708,8 @@ void RemoteClient::sendCommandContainer(const CommandContainer &cont)
 void RemoteClient::connectToHost(const QString &hostname, unsigned int port)
 {
     usingWebSocket = port == 443 || port == 80 || port == 4748 || port == 8080;
+    qCInfo(RemoteClientLog) << "Connecting to server" << hostname << "port" << port
+                            << (usingWebSocket ? "using WebSocket" : "using TCP");
     if (usingWebSocket) {
         QUrl url(QString("%1://%2:%3/servatrice").arg(port == 443 ? "wss" : "ws").arg(hostname).arg(port));
         websocket->open(url);

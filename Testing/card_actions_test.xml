@@ -1,0 +1,69 @@
+<events>
+    <!--
+        Card actions (custom commands of pqCockatriceEventPlayer).
+
+        Exercises the context menu path (tap, counters in a submenu, flip),
+        arrow drawing, and dragging a card between zones. All of it through
+        mouse events on the game view, so the same file runs at any resolution.
+    -->
+
+    <!-- ===== Two-player local game ===== -->
+    <event widget="MainWindow/menubar/cockatriceMenu" command="activate" arguments="Start &amp;local game..." />
+    <event widget="MainWindow/localGameDialog/generalGroupBox/numberPlayersEdit" command="set_int" arguments="2" />
+    <event widget="MainWindow/localGameDialog" command="key" arguments="16777220" />
+    <event widget="MainWindow" command="pause" arguments="1000" />
+
+    <!-- ===== Player 1 loads a one-card deck ===== -->
+    <!-- (No tab-count assertion: the restored workspace state decides how many other
+         tabs exist, and the paths below already prove the game tab is there.) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_0/qt_tabwidget_stackedwidget/deckViewContainer/loadFromClipboardButton" command="activate" arguments="" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_0/qt_tabwidget_stackedwidget/deckViewContainer/dlgDeckTextEdit/contentsEdit" command="typeText" arguments="1 Lightning Bolt" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_0/qt_tabwidget_stackedwidget/deckViewContainer/dlgDeckTextEdit" command="keyEvent" arguments="6,16777220,67108864,,0,1" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_0/qt_tabwidget_stackedwidget/deckViewContainer/readyStartButton" command="activate" arguments="" />
+    <event widget="MainWindow" command="pause" arguments="300" />
+
+    <!-- ===== Player 2 loads the same deck and readies up ===== -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_1/qt_tabwidget_stackedwidget/deckViewContainer/loadFromClipboardButton" command="activate" arguments="" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_1/qt_tabwidget_stackedwidget/deckViewContainer/dlgDeckTextEdit/contentsEdit" command="typeText" arguments="1 Lightning Bolt" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_1/qt_tabwidget_stackedwidget/deckViewContainer/dlgDeckTextEdit" command="keyEvent" arguments="6,16777220,67108864,,0,1" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_1/qt_tabwidget_stackedwidget/deckViewContainer/readyStartButton" command="activate" arguments="" />
+    <event widget="MainWindow" command="pause" arguments="1000" />
+
+    <!-- ===== Player 1, precombat main ===== -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="300" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="300" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+
+    <!-- ===== A token to interact with ===== -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/gamePlayAreaWidget/gameView" command="createToken" arguments="Goblin,r,1/1" />
+    <event widget="MainWindow" command="pause" arguments="1000" />
+
+    <!-- Tap it through the context menu -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/gamePlayAreaWidget/gameView" command="cardAction" arguments="Goblin,table,Tap / Untap" />
+    <event widget="MainWindow" command="pause" arguments="300" />
+
+    <!-- Add a counter: the entry lives in the "Card counters" submenu -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/gamePlayAreaWidget/gameView" command="cardAction" arguments="Goblin,table,Add counter (A)" />
+    <event widget="MainWindow" command="pause" arguments="300" />
+
+    <!-- Flip it face down -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/gamePlayAreaWidget/gameView" command="flipCard" arguments="Goblin,table" />
+    <event widget="MainWindow" command="pause" arguments="300" />
+
+    <!-- ===== An arrow from a second token to the Goblin ===== -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/gamePlayAreaWidget/gameView" command="createToken" arguments="Elf,w,1/1" />
+    <event widget="MainWindow" command="pause" arguments="1000" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/gamePlayAreaWidget/gameView" command="drawArrow" arguments="Elf,table,Goblin,table" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+
+    <!-- ===== Drag the Goblin into the graveyard ===== -->
+    <!-- A token that leaves the battlefield is destroyed rather than moved, so
+         there is nothing to drag back afterwards. -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/gamePlayAreaWidget/gameView" command="moveCard" arguments="Goblin,table,grave" />
+    <event widget="MainWindow" command="pause" arguments="1000" />
+</events>

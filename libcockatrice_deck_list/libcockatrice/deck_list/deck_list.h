@@ -284,6 +284,14 @@ public:
                               const QString &cardSetCollectorNumber = QString(),
                               const QString &cardProviderId = QString(),
                               const bool formatLegal = true);
+    DecklistCardNode *addCards(const QString &cardName,
+                               int amount,
+                               const QString &zoneName,
+                               int position = -1,
+                               const QString &cardSetName = QString(),
+                               const QString &cardSetCollectorNumber = QString(),
+                               const QString &cardProviderId = QString(),
+                               const bool formatLegal = true);
     ///@}
 
     /** @name Deck identity */

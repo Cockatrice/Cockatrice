@@ -20,6 +20,8 @@ option(WITH_CLIENT "Build Cockatrice client" ON)
 option(WITH_ORACLE "Build Cockatrice card database tool (Oracle)" ON)
 # Compile Servatrice
 option(WITH_SERVER "Build Cockatrice server (Servatrice)" OFF)
+# Compile GUI tests (QtTesting widget-level playback)
+option(WITH_GUI_TEST "Build the QtTesting-based GUI test harness" OFF)
 # Compile tests
 option(TEST "Build tests" OFF)
 # Build with AddressSanitizer and UndefinedBehaviorSanitizer
@@ -28,6 +30,14 @@ option(ENABLE_SANITIZERS "Build with AddressSanitizer and UndefinedBehaviorSanit
 option(ENABLE_COVERAGE "Build instrumented for GCC line coverage" OFF)
 # Use vcpkg regardless of OS
 option(USE_VCPKG "Use vcpkg regardless of OS" OFF)
+
+# The GUI test harness lives in a submodule; a checkout without it must still configure.
+if(WITH_GUI_TEST AND NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/qttesting/CMakeLists.txt")
+  message(WARNING "WITH_GUI_TEST is ON but external/qttesting is missing, so GUI tests are disabled.\n"
+                  "Run 'git submodule update --init external/qttesting' to enable them."
+  )
+  set(WITH_GUI_TEST OFF)
+endif()
 
 # Default to "Release" build type
 # User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
@@ -55,6 +65,10 @@ if(USE_CCACHE AND NOT WIN32)
     # PCH-aware caching, matching .ci/compile.sh: without this ccache refuses
     # to cache any TU that consumes a precompiled header, so every PCH-backed
     # target recompiles from scratch on each build.
+    # The include_file_mtime/include_file_ctime entries that CI also sets are
+    # deliberately not set here: --set-config writes the user's global
+    # ccache.conf, and those two would turn off the modified-during-compile
+    # check for every project on the machine, not just this one.
     execute_process(COMMAND ${CCACHE_PROGRAM} --set-config sloppiness=pch_defines,time_macros)
     message(STATUS "Found CCache ${CCACHE_PROGRAM}")
   endif()
@@ -71,6 +85,8 @@ if(WIN32 OR USE_VCPKG)
   )
   # Qt path set by user or env var
   if(QTDIR
+     OR QTDIR32
+     OR QTDIR64
      OR DEFINED ENV{QTDIR}
      OR DEFINED ENV{QTDIR32}
      OR DEFINED ENV{QTDIR64}
@@ -90,7 +106,7 @@ endif()
 
 # A project name is needed for CPack
 # Version can be overriden by git tags, see cmake/getversion.cmake
-project("Cockatrice" VERSION 3.1.2)
+project("Cockatrice" VERSION 3.2.0)
 
 # Set release name if not provided via env/cmake var
 if(NOT DEFINED GIT_TAG_RELEASENAME)
@@ -236,13 +252,13 @@ else()
   set(_lib_suffix 32)
 endif()
 
-if(DEFINED QTDIR${_lib_suffix})
+if(NOT "${QTDIR${_lib_suffix}}" STREQUAL "")
   list(APPEND CMAKE_PREFIX_PATH "${QTDIR${_lib_suffix}}")
-elseif(DEFINED QTDIR)
+elseif(NOT "${QTDIR}" STREQUAL "")
   list(APPEND CMAKE_PREFIX_PATH "${QTDIR}")
-elseif(DEFINED ENV{QTDIR${_lib_suffix}})
+elseif(NOT "$ENV{QTDIR${_lib_suffix}}" STREQUAL "")
   list(APPEND CMAKE_PREFIX_PATH "$ENV{QTDIR${_lib_suffix}}")
-elseif(DEFINED ENV{QTDIR})
+elseif(NOT "$ENV{QTDIR}" STREQUAL "")
   list(APPEND CMAKE_PREFIX_PATH "$ENV{QTDIR}")
 endif()
 
@@ -259,7 +275,13 @@ else()
   add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060400)
 endif()
 
+# Set once here for every target: these variables are inherited by the
+# subdirectories, so the per-directory copies were redundant. Only the
+# variables are set; qt_standard_project_setup would also change the runtime
+# output directories and the install RPATH.
 set(CMAKE_AUTOMOC TRUE)
+set(CMAKE_AUTOUIC TRUE)
+set(CMAKE_AUTORCC TRUE)
 
 # Find other needed libraries
 find_package(Protobuf CONFIG)
@@ -453,6 +475,34 @@ endif()
 if(WITH_ORACLE)
   add_subdirectory(oracle)
   set(CPACK_INSTALL_CMAKE_PROJECTS "Oracle;Oracle;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
+endif()
+
+if(WITH_GUI_TEST)
+  set(QtTesting_QT_VERSION "6")
+  # QtTesting registers its own unit tests when BUILD_TESTING is on. They target the
+  # Qt version the harness was written for and fail on Qt 6.11 (toolbutton
+  # long-press recording), and they are not Cockatrice's tests, so suppress them
+  # for the duration of the subdirectory instead of painting ctest red.
+  if(DEFINED BUILD_TESTING)
+    set(_cockatrice_saved_build_testing ${BUILD_TESTING})
+  endif()
+  set(BUILD_TESTING
+      OFF
+      CACHE BOOL "Build the testing tree." FORCE
+  )
+  add_subdirectory(external/qttesting)
+  if(DEFINED _cockatrice_saved_build_testing)
+    set(BUILD_TESTING
+        ${_cockatrice_saved_build_testing}
+        CACHE BOOL "Build the testing tree." FORCE
+    )
+  else()
+    unset(BUILD_TESTING CACHE)
+  endif()
+  # cl.exe has no warnings-as-errors here, and it rejects -Wno-error with D8021.
+  if(NOT MSVC)
+    target_compile_options(qttesting PRIVATE -Wno-error)
+  endif()
 endif()
 
 if(TEST)

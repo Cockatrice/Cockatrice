@@ -36,6 +36,12 @@
 #include <libcockatrice/utility/card_ref.h>
 #include <string>
 
+#ifdef Q_OS_UNIX
+#include <csignal>
+#include <sys/resource.h>
+#include <unistd.h>
+#endif
+
 namespace
 {
 
@@ -203,6 +209,64 @@ TEST(CardDatabaseTest, Xml4LocalizedDataRoundTrip)
     ASSERT_FALSE(printings.isEmpty());
     ASSERT_EQ(printings.first().getProperty("manacost"), "1R");
 }
+
+#ifdef Q_OS_UNIX
+/**
+ * @brief A failed write keeps the previously installed card database intact.
+ *
+ * This is the writer Oracle uses to install a refreshed database, so the truncation
+ * bug has to be covered here and not only through OracleDatabase::saveXml.
+ */
+TEST(CardDatabaseTest, Xml4ShortWriteKeepsInstalledFile)
+{
+    NoopCardSetPriorityController controller;
+    CardSetPtr set =
+        CardSet::newInstance(&controller, "TST", "Test Set", "expansion", QDate(), CardSet::PriorityPrimary);
+
+    QHash<QString, QString> props;
+    props["manacost"] = "1R";
+    PrintingInfo printing(set, LazyPropertiesHash(props));
+    SetToPrintingsMap setsInfo;
+    setsInfo["TST"].append(printing);
+
+    CardInfo::UiAttributes attributes = {.tableRow = 1};
+    CardInfoPtr card =
+        CardInfo::newInstance("Lightning Bolt", QString(1024, 'x'), false, {}, {}, {}, setsInfo, attributes);
+
+    SetNameMap sets;
+    sets.insert("TST", set);
+    CardNameMap cards;
+    cards.insert("Lightning Bolt", card);
+
+    QTemporaryDir tempDir;
+    ASSERT_TRUE(tempDir.isValid());
+    const QString fileName = tempDir.filePath("cards.xml");
+
+    QFile installed(fileName);
+    ASSERT_TRUE(installed.open(QIODevice::WriteOnly));
+    ASSERT_EQ(installed.write("installed database"), 18);
+    installed.close();
+
+    // A real filesystem write failure, isolated in the death-test child so the
+    // process-wide file limit never affects other cases or the parent runner.
+    ASSERT_EXIT(
+        {
+            std::signal(SIGXFSZ, SIG_IGN);
+            struct rlimit limit;
+            limit.rlim_cur = 128;
+            limit.rlim_max = 128;
+            if (setrlimit(RLIMIT_FSIZE, &limit) != 0) {
+                _exit(2);
+            }
+            CockatriceXml4Parser writer(&controller);
+            _exit(writer.saveToFile({}, sets, cards, fileName) ? 1 : 0);
+        },
+        ::testing::ExitedWithCode(0), "");
+
+    ASSERT_TRUE(installed.open(QIODevice::ReadOnly));
+    EXPECT_EQ(installed.readAll(), "installed database");
+}
+#endif
 
 /**
  * @brief Path provider serving a sandboxed copy of the test card database.

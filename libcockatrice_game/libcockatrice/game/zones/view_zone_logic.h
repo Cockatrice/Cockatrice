@@ -88,14 +88,21 @@ public:
     }
 
     /**
-     * @brief Prepares and sends the zone-dump command for this view.
+     * @brief Builds the zone-dump command for this view without sending it.
      * @return The pending command, or nullptr when there is no zone to dump.
      *
      * Keeps command construction in game/ so graphics views don't reach
-     * through the player into PlayerActions to set it up. The command is sent
-     * asynchronously, so callers connect to finished() after calling this.
+     * through the player into PlayerActions to set it up. The response can
+     * arrive synchronously (local games), so callers must connect to
+     * PendingCommand::finished before calling sendZoneDump().
      */
-    PendingCommand *requestZoneDump();
+    PendingCommand *prepareZoneDump();
+
+    /**
+     * @brief Sends a command returned by prepareZoneDump().
+     * @param pendingCommand The prepared command; nullptr is ignored.
+     */
+    void sendZoneDump(PendingCommand *pendingCommand);
 
 protected:
     void addCardImpl(CardState *card, int x, int y) override;

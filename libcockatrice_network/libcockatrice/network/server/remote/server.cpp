@@ -131,6 +131,16 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session,
         return authState;
     }
 
+    if (authState == PasswordChangeRequired) {
+        // The credentials were right, but the account must choose a new password before it may
+        // use the server. Give the session an identity so it can complete that change, without
+        // registering a user session or announcing the user as logged in.
+        ServerInfo_User pendingData = databaseInterface->getUserData(name, true);
+        pendingData.set_address(session->getAddress().toStdString());
+        session->setUserInfo(pendingData);
+        return authState;
+    }
+
     ServerInfo_User data = databaseInterface->getUserData(name, true);
     data.set_address(session->getAddress().toStdString());
     name = QString::fromStdString(data.name()); // Compensate for case indifference
@@ -296,7 +306,9 @@ void Server::removeClient(Server_ProtocolHandler *client)
     QWriteLocker locker(&clientsLock);
     clients.removeAt(clientIndex);
     ServerInfo_User *data = client->getUserInfo();
-    if (data) {
+    // A session that never completed login (for example one that still owes a password change)
+    // has no session id: it was never announced as joined, so it must not be announced as leaving.
+    if (data && data->has_session_id()) {
         Event_UserLeft event;
         event.set_name(data->name());
         SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
@@ -311,12 +323,10 @@ void Server::removeClient(Server_ProtocolHandler *client)
         users.remove(QString::fromStdString(data->name()));
         qDebug() << "Server::removeClient: name=" << QString::fromStdString(data->name());
 
-        if (data->has_session_id()) {
-            const qint64 sessionId = data->session_id();
-            usersBySessionId.remove(sessionId);
-            emit endSession(sessionId);
-            qDebug() << "closed session id:" << sessionId;
-        }
+        const qint64 sessionId = data->session_id();
+        usersBySessionId.remove(sessionId);
+        emit endSession(sessionId);
+        qDebug() << "closed session id:" << sessionId;
     }
     qDebug() << "Server::removeClient: removed" << (void *)client << ";" << clients.size() << "clients; "
              << users.size() << "users left";
@@ -330,7 +340,9 @@ QList<QString> Server::getOnlineModeratorList() const
         ServerInfo_User *data = client->getUserInfo();
 
         //! \todo This line should be updated in the event there is any type of new user level created.
-        if (data &&
+        // A session that still owes a forced password change has user info but no session id:
+        // it never joined, so it must not be reported as an online moderator either.
+        if (data && data->has_session_id() &&
             (data->user_level() & ServerInfo_User::IsModerator || data->user_level() & ServerInfo_User::IsAdmin)) {
             results << QString::fromStdString(data->name()).simplified();
         }

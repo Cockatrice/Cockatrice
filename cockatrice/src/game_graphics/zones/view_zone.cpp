@@ -99,9 +99,13 @@ void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardLis
         }
         reorganizeCards();
     } else if (!qobject_cast<ZoneViewZoneLogic *>(getLogic())->getOriginalZone()->contentsKnown()) {
-        PendingCommand *pend = qobject_cast<ZoneViewZoneLogic *>(getLogic())->requestZoneDump();
+        auto *viewLogic = qobject_cast<ZoneViewZoneLogic *>(getLogic());
+        PendingCommand *pend = viewLogic->prepareZoneDump();
         if (pend != nullptr) {
+            // A local game answers synchronously, so the handler has to be connected before the
+            // command is sent or the response would be delivered to nobody.
             connect(pend, &PendingCommand::finished, this, &ZoneViewZone::zoneDumpReceived);
+            viewLogic->sendZoneDump(pend);
         }
     } else {
         const CardList &c = qobject_cast<ZoneViewZoneLogic *>(getLogic())->getOriginalZone()->getCards();

@@ -24,6 +24,10 @@ class CardSizeWidget : public QWidget
     Q_OBJECT
 
 public:
+    /// Range of the card size slider, as a percentage of the base card width.
+    static constexpr int MIN_CARD_SIZE = 50;
+    static constexpr int MAX_CARD_SIZE = 250;
+
     explicit CardSizeWidget(QWidget *parent, FlowWidget *flowWidget = nullptr, int defaultValue = 100);
     [[nodiscard]] QSlider *getSlider() const;
 
@@ -31,8 +35,9 @@ public:
      * @brief Resizes the cards when the user Ctrl + scrolls over @p host or any of its descendants.
      *
      * Installs this widget as an event filter on the given host widget. If the host contains a
-     * scroll area the filter is also installed on the scroll area's content widget, so the resize
-     * intercepts the wheel event before the scroll area would scroll the view.
+     * scroll area the filter is also installed on the scroll area's content widget, and on the
+     * viewport of every scroll area base (QListView, QTableView, ...), so the resize intercepts
+     * the wheel event before the scroll area would scroll the view.
      */
     void enableCtrlScrollResize(QWidget *host);
 

@@ -28,6 +28,11 @@ class CardInfoPictureWidget : public QWidget
     Q_OBJECT
 
 public:
+    /// Width of a card picture at 100 % scale, in pixels.
+    static constexpr int BASE_WIDTH = 200;
+    /// Height / width of a card picture.
+    static constexpr qreal ASPECT_RATIO = 1.396;
+
     explicit CardInfoPictureWidget(QWidget *parent = nullptr,
                                    bool hoverToZoomEnabled = false,
                                    bool raiseOnEnter = false);
@@ -36,6 +41,12 @@ public:
         return exactCard;
     }
     [[nodiscard]] QSize sizeHint() const override;
+
+    /**
+     * @brief The size a card picture has at @p scaleFactor percent.
+     * @param scaleFactor Percentage of BASE_WIDTH, as set by the card size slider.
+     */
+    [[nodiscard]] static QSize sizeForScaleFactor(int scaleFactor);
 
 public slots:
     void setCard(const ExactCard &card);

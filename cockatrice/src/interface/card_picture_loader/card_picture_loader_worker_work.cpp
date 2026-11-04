@@ -142,8 +142,8 @@ void CardPictureLoaderWorkerWork::handleNetworkReply(QNetworkReply *reply)
 {
     const QVariant redirectTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
     const int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    const bool isRedirect = statusCode == 301 || statusCode == 302 || statusCode == 303 || statusCode == 305 ||
-                            statusCode == 307 || statusCode == 308;
+    const bool isRedirect =
+        statusCode == 301 || statusCode == 302 || statusCode == 303 || statusCode == 307 || statusCode == 308;
     bool redirectFailure = isRedirect && !redirectTarget.isValid();
     if (redirectTarget.isValid()) {
         const QUrl url = reply->url();
@@ -261,8 +261,7 @@ void CardPictureLoaderWorkerWork::handleSuccessfulReply(QNetworkReply *reply)
 
     // List of status codes from https://doc.qt.io/qt-6/qnetworkreply.html#redirected
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    if (statusCode == 301 || statusCode == 302 || statusCode == 303 || statusCode == 305 || statusCode == 307 ||
-        statusCode == 308) {
+    if (statusCode == 301 || statusCode == 302 || statusCode == 303 || statusCode == 307 || statusCode == 308) {
         QUrl redirectUrl = reply->url().resolved(reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl());
         qCDebug(CardPictureLoaderWorkerWorkLog).nospace()
             << "PictureLoader: [card: " << cardToDownload.getCard().getName() << " set: " << cardToDownload.getSetName()

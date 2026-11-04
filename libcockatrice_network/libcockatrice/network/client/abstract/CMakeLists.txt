@@ -1,7 +1,3 @@
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
-
 set(HEADERS abstract_client.h latency_tracker.h)
 
 set(SOURCES abstract_client.cpp latency_tracker.cpp)
@@ -15,7 +11,7 @@ target_include_directories(libcockatrice_network_client_abstract PUBLIC .)
 target_link_libraries(
   libcockatrice_network_client_abstract
   PUBLIC ${COCKATRICE_QT_VERSION_NAME}::Network ${COCKATRICE_QT_VERSION_NAME}::WebSockets libcockatrice_protocol
-         libcockatrice_network_server_remote
+         libcockatrice_network_server_remote libcockatrice_utility
 )
 
 target_precompile_headers(libcockatrice_network_client_abstract PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtcore_pch.h")

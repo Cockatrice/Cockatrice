@@ -1,7 +1,3 @@
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
-
 set(HEADERS
     libcockatrice/settings/appearance_settings.h
     libcockatrice/settings/cache_storage_settings.h

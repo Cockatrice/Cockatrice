@@ -28,7 +28,9 @@ public:
     QVariant getValue(const QString &name, const QString &group, const QString &subGroup = QString()) const;
     QVariant
     getValue(const QString &name, const QString &group, const QString &subGroup, const QVariant &defaultValue) const;
-    void batchWrite(std::function<void(QSettings &)> batchWriteFunction);
+    //! \brief Runs \a batchWriteFunction on a temporary QSettings and syncs once.
+    //! \return the status of the underlying file after the final sync.
+    QSettings::Status batchWrite(std::function<void(QSettings &)> batchWriteFunction);
 
     void sync();
 

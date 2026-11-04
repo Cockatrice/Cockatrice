@@ -50,11 +50,20 @@
 #include "latency_tracker.h"
 #include "logger.h"
 #include "pixel_map_generator.h"
+#include "theme_icon.h"
 #include "version_string.h"
 #include "widgets/dialogs/dlg_connect.h"
 #include "widgets/server/handle_public_servers.h"
 #include "widgets/settings_page/abstract_settings_page.h"
 #include "widgets/tabs/api/commander_spellbook/handle_commander_brackets.h"
+#ifdef WITH_GUI_TEST
+#include "../game_graphics/pq_cockatrice_event_player.h"
+#include "pqEventObserver.h"
+#include "pqEventSource.h"
+#include "pqEventTypes.h"
+#include "pqTestUtility.h"
+#include "recording.h"
+#endif
 
 #include <QAction>
 #include <QApplication>
@@ -254,7 +263,11 @@ void MainWindow::actWatchReplay()
 
 void MainWindow::localGameEnded()
 {
-    delete localServer;
+    // Defer deletion so the LocalClients (already scheduled with deleteLater() in TabSupervisor::stop)
+    // and any queued commands are processed before the server and its interfaces are destroyed.
+    if (localServer) {
+        localServer->deleteLater();
+    }
     localServer = nullptr;
 
     aConnect->setEnabled(true);
@@ -306,6 +319,7 @@ void MainWindow::actAbout()
     mb.setIconPixmap(
         themePixmap(QStringLiteral("cockatrice")).scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     mb.setTextInteractionFlags(Qt::TextBrowserInteraction);
+    mb.setObjectName("aboutDialog");
     mb.exec();
 }
 
@@ -344,6 +358,24 @@ void MainWindow::actOpenSettingsFolder()
     QtUtils::openPathInFileManager(dir);
 }
 
+#ifdef WITH_GUI_TEST
+void MainWindow::actRecord()
+{
+    QString filename = QFileDialog::getSaveFileName(this, tr("Test File Name"), QString(), tr("XML Files (*.xml)"));
+    if (!filename.isEmpty()) {
+        testUtility->recordTests(filename);
+    }
+}
+
+void MainWindow::actPlayRecording()
+{
+    QString filename = QFileDialog::getOpenFileName(this, tr("Test File Name"), QString(), tr("XML Files (*.xml)"));
+    if (!filename.isEmpty()) {
+        testUtility->playTests(filename);
+    }
+}
+#endif
+
 void MainWindow::retranslateUi()
 {
     connectionController->refreshWindowTitle();
@@ -356,10 +388,10 @@ void MainWindow::retranslateUi()
     aRegister->setText(tr("&Register to server..."));
     aForgotPassword->setText(tr("&Restore password..."));
     aSettings->setText(tr("&Settings..."));
-    aSettings->setIcon(themePixmap(QStringLiteral("icons/settings")));
+    aSettings->setIcon(loadThemedIcon(QStringLiteral("icons/settings")));
     settingsButton->setToolTip(tr("Settings"));
     settingsButton->setAccessibleName(tr("Settings"));
-    settingsButton->setIcon(themePixmap(QStringLiteral("icons/cogwheel")));
+    settingsButton->setIcon(loadThemedIcon(QStringLiteral("icons/settings")));
     aExit->setText(tr("&Exit"));
 
 #if defined(__APPLE__) /* For OSX */
@@ -388,6 +420,10 @@ void MainWindow::retranslateUi()
     aViewLog->setText(tr("View &Debug Log"));
     aOpenSettingsFolder->setText(tr("Open Settings Folder"));
     aFirstRunWizard->setText(tr("Re-run Onboarding Wizard..."));
+#ifdef WITH_GUI_TEST
+    aRecord->setText(tr("&Record Test..."));
+    aPlayRecording->setText(tr("&Play Test..."));
+#endif
 
     aShow->setText(tr("Show/Hide"));
 
@@ -397,24 +433,33 @@ void MainWindow::retranslateUi()
 void MainWindow::createActions()
 {
     aConnect = new QAction(this);
+    aConnect->setObjectName("actionConnect");
     connect(aConnect, &QAction::triggered, this, &MainWindow::actConnect);
     aDisconnect = new QAction(this);
+    aDisconnect->setObjectName("actionDisconnect");
     aDisconnect->setEnabled(false);
     connect(aDisconnect, &QAction::triggered, this, &MainWindow::actDisconnect);
     aSinglePlayer = new QAction(this);
+    aSinglePlayer->setObjectName("actionSinglePlayer");
     connect(aSinglePlayer, &QAction::triggered, this, &MainWindow::actSinglePlayer);
     aWatchReplay = new QAction(this);
+    aWatchReplay->setObjectName("actionWatchReplay");
     connect(aWatchReplay, &QAction::triggered, this, &MainWindow::actWatchReplay);
     aFullScreen = new QAction(this);
+    aFullScreen->setObjectName("actionFullScreen");
     aFullScreen->setCheckable(true);
     connect(aFullScreen, &QAction::toggled, this, &MainWindow::actFullScreen);
     aRegister = new QAction(this);
+    aRegister->setObjectName("actionRegister");
     connect(aRegister, &QAction::triggered, connectionController, &ConnectionController::registerToServer);
     aForgotPassword = new QAction(this);
+    aForgotPassword->setObjectName("actionForgotPassword");
     connect(aForgotPassword, &QAction::triggered, connectionController, &ConnectionController::forgotPasswordRequest);
     aSettings = new QAction(this);
+    aSettings->setObjectName("actionSettings");
     connect(aSettings, &QAction::triggered, this, &MainWindow::actSettings);
     aExit = new QAction(this);
+    aExit->setObjectName("actionExit");
     connect(aExit, &QAction::triggered, this, &MainWindow::actExit);
 
     aManageSets = new QAction(QString(), this);
@@ -451,6 +496,12 @@ void MainWindow::createActions()
     connect(aOpenSettingsFolder, &QAction::triggered, this, &MainWindow::actOpenSettingsFolder);
     aFirstRunWizard = new QAction(this);
     connect(aFirstRunWizard, &QAction::triggered, this, [this] { runFirstRunWizard(); });
+#ifdef WITH_GUI_TEST
+    aRecord = new QAction(this);
+    connect(aRecord, &QAction::triggered, this, &MainWindow::actRecord);
+    aPlayRecording = new QAction(this);
+    connect(aPlayRecording, &QAction::triggered, this, &MainWindow::actPlayRecording);
+#endif
 
     aShow = new QAction(this);
     connect(aShow, &QAction::triggered, this, &MainWindow::actShow);
@@ -491,7 +542,9 @@ void MainWindow::createActions()
 
 void MainWindow::createMenus()
 {
+    menuBar()->setObjectName("menubar");
     cockatriceMenu = menuBar()->addMenu(QString());
+    cockatriceMenu->setObjectName("cockatriceMenu");
     cockatriceMenu->addAction(aConnect);
     cockatriceMenu->addAction(aDisconnect);
     cockatriceMenu->addAction(aRegister);
@@ -507,6 +560,7 @@ void MainWindow::createMenus()
     cockatriceMenu->addAction(aExit);
 
     dbMenu = menuBar()->addMenu(QString());
+    dbMenu->setObjectName("dbMenu");
     dbMenu->addAction(aManageSets);
     dbMenu->addAction(aEditTokens);
     dbMenu->addSeparator();
@@ -517,8 +571,10 @@ void MainWindow::createMenus()
     dbMenu->addAction(aReloadCardDatabase);
 
     tabsMenu = menuBar()->addMenu(QString());
+    tabsMenu->setObjectName("tabsMenu");
 
     helpMenu = menuBar()->addMenu(QString());
+    helpMenu->setObjectName("helpMenu");
     helpMenu->addAction(aAbout);
     helpMenu->addAction(aTips);
     helpMenu->addSeparator();
@@ -531,12 +587,19 @@ void MainWindow::createMenus()
     helpMenu->addAction(aOpenSettingsFolder);
     helpMenu->addSeparator();
     helpMenu->addAction(aFirstRunWizard);
+#ifdef WITH_GUI_TEST
+    helpMenu->addSeparator();
+    helpMenu->addAction(aRecord);
+    helpMenu->addAction(aPlayRecording);
+#endif
 }
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), localServer(nullptr), bHasActivated(false), askedForDbUpdater(false),
+    : QMainWindow(parent), localServer(nullptr), bHasActivated(false), askedForDbUpdater(false), noConnect(false),
       cardUpdateProcess(nullptr), logviewDialog(nullptr)
 {
+    setObjectName("MainWindow");
+
     connect(&SettingsCache::instance().cacheStorage(), &CacheStorageSettings::pixmapCacheSizeChanged, this,
             &MainWindow::pixmapCacheSizeChanged);
     pixmapCacheSizeChanged(SettingsCache::instance().cacheStorage().getPixmapCacheSize());
@@ -622,6 +685,14 @@ MainWindow::MainWindow(QWidget *parent)
     // run startup check async
     QTimer::singleShot(0, this, &MainWindow::startupConfigCheck);
     QTimer::singleShot(0, this, &MainWindow::applyStartupDestination);
+
+#ifdef WITH_GUI_TEST
+    testUtility = new pqTestUtility(this);
+    testUtility->setRecordWithDialog(true);
+    testUtility->addEventObserver("xml", new XMLEventObserver(this));
+    testUtility->addEventSource("xml", new XMLEventSource(this));
+    testUtility->eventPlayer()->addWidgetEventPlayer(new pqCockatriceEventPlayer(this));
+#endif
 }
 
 void MainWindow::startupConfigCheck()
@@ -776,6 +847,11 @@ void MainWindow::runFirstRunWizard(bool firstRun)
  */
 void MainWindow::applyStartupDestination()
 {
+    if (noConnect) {
+        qCInfo(WindowMainStartupAutoconnectLog) << "Startup destination suppressed (--no-connect)";
+        return;
+    }
+
     // An explicit command-line connect takes precedence over the startup destination.
     if (!connectTo.isEmpty()) {
         return;
@@ -1045,6 +1121,10 @@ void MainWindow::handleCockatriceLink(const QString &url)
 
 void MainWindow::attemptStartupAutoConnect()
 {
+    if (noConnect) {
+        qCInfo(WindowMainStartupAutoconnectLog) << "Auto-connect suppressed (--no-connect)";
+        return;
+    }
     if (startupAutoConnectAttempted || skipStartupAutoConnect) {
         return;
     }

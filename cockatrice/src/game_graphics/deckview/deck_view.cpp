@@ -77,7 +77,7 @@ void DeckViewCardDragItem::updatePosition(const QPointF &cursorScenePos)
 
 void DeckViewCardDragItem::handleDrop(DeckViewCardContainer *target)
 {
-    auto *card = static_cast<DeckViewCard *>(item);
+    auto *card = static_cast<DeckViewCard *>(item.data());
     auto *start = static_cast<DeckViewCardContainer *>(item->parentItem());
     start->removeCard(card);
     target->addCard(card);
@@ -240,8 +240,8 @@ void DeckViewCardContainer::paint(QPainter *painter, const QStyleOptionGraphicsI
     painter->drawLine(QPointF(0, separatorY), QPointF(width, separatorY));
 
     painter->setPen(QColor(Qt::white));
-    QFont f("Serif");
-    f.setStyleHint(QFont::Serif);
+    // Family comes from the DeckList theme role; pixel sizes/weights unchanged.
+    QFont f = themeManager->deckListFont();
     f.setPixelSize(24);
     f.setWeight(QFont::Bold);
     painter->setFont(f);
@@ -292,8 +292,8 @@ QList<QPair<int, int>> DeckViewCardContainer::getRowsAndCols() const
 
 int DeckViewCardContainer::getCardTypeTextWidth() const
 {
-    QFont f("Serif");
-    f.setStyleHint(QFont::Serif);
+    // Family comes from the DeckList theme role; pixel size/weight unchanged.
+    QFont f = themeManager->deckListFont();
     f.setPixelSize(16);
     f.setWeight(QFont::Bold);
     QFontMetrics fm(f);
@@ -366,6 +366,15 @@ void DeckViewCardContainer::setWidth(qreal _width)
 
 DeckViewScene::DeckViewScene(QObject *parent) : QGraphicsScene(parent), locked(true), deck(0), optimalAspectRatio(1.0)
 {
+    // Zone headers read the DeckList role at paint time and cache their
+    // rendering, so touch every item to invalidate the caches and pick up the
+    // new family on font changes (containers cannot connect this themselves:
+    // QGraphicsItem is not a QObject).
+    connect(themeManager, &ThemeManager::fontsChanged, this, [this] {
+        for (auto *item : items()) {
+            item->update();
+        }
+    });
 }
 
 DeckViewScene::~DeckViewScene()

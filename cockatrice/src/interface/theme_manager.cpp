@@ -12,6 +12,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QFlags>
+#include <QFontDatabase>
 #include <QGuiApplication>
 #include <QIODevice>
 #include <QLatin1Char>
@@ -127,8 +128,10 @@ static QString usableDefaultStyle(const QString &style)
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 {
     defaultStyleName = usableDefaultStyle(qApp->style()->objectName());
-    // Capture the untouched application palette before any theme is applied.
+    // Capture the untouched application palette and font before any theme is
+    // applied.
     defaultPalette = qApp->palette();
+    defaultFont = qApp->font();
     ensureThemeDirectoryExists();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
     connect(QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged, this, [this] {
@@ -440,6 +443,46 @@ PaletteConfig ThemeManager::loadDefaultPaletteConfig(const QString &themeDirPath
     return cfg;
 }
 
+FontConfig ThemeManager::loadFontConfig(const QString &themeDirPath)
+{
+    if (themeDirPath.isEmpty()) {
+        return {};
+    }
+    return FontConfig::fromThemeDir(themeDirPath);
+}
+
+FontConfig ThemeManager::loadDefaultFontConfig(const QString &themeDirPath, const QString &themeName)
+{
+    FontConfig cfg = FontConfig::fromThemeDir(themeDirPath);
+    if (!cfg.hasFonts()) {
+        // The shipped fonts.toml may live in the system theme directory rather
+        // than the resolved (user) theme directory, so built-in themes still
+        // get their curated fonts.
+        cfg = FontConfig::fromThemeDir(QDir(systemThemesBasePath()).absoluteFilePath(themeName));
+    }
+    return cfg;
+}
+
+bool ThemeManager::saveFontConfig(const QString &themeDirPath, const FontConfig &cfg)
+{
+    if (themeDirPath.isEmpty()) {
+        return false;
+    }
+
+    QDir dir(themeDirPath);
+    if (!dir.exists()) {
+        dir.mkpath(".");
+    }
+
+    QFile f(dir.absoluteFilePath(FontConfig::fileName()));
+    if (!f.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+        return false;
+    }
+
+    QTextStream(&f) << cfg.toToml();
+    return true;
+}
+
 bool ThemeManager::commitPalette(const QString &themeDirPath, const QString &colorScheme, const PaletteConfig &cfg)
 {
     if (!savePaletteConfig(themeDirPath, colorScheme, cfg)) {
@@ -486,6 +529,24 @@ void ThemeManager::previewPalette(const PaletteConfig &cfg, const QString &schem
     const QString dirPath = getAvailableThemes().value(themeName);
     const ThemeConfig themeCfg = ThemeConfig::fromThemeDir(dirPath);
     applyStyleAndPalette(themeName, themeCfg, cfg, scheme);
+}
+
+void ThemeManager::previewFonts(const FontConfig &cfg)
+{
+    currentFonts = cfg;
+
+    // QApplication::setFont already sends a font change to every widget, so a
+    // repolish pass is not needed for fonts (unlike the palette path).
+    const auto it = cfg.fonts.constFind(AppFont::InterfaceDefault);
+    if (it != cfg.fonts.constEnd()) {
+        qApp->setFont(it.value());
+    } else {
+        // A config without InterfaceDefault means "no override": restore the
+        // startup font instead of leaving the last preview applied.
+        qApp->setFont(defaultFont);
+    }
+
+    emit fontsChanged();
 }
 
 void ThemeManager::applyStyleAndPalette(const QString &themeName,
@@ -591,6 +652,56 @@ QColor ThemeManager::appColor(AppColor::Role role) const
     return accent;
 }
 
+QFont ThemeManager::appFont(AppFont::Role role) const
+{
+    const auto it = currentFonts.fonts.constFind(role);
+    if (it != currentFonts.fonts.constEnd()) {
+        return it.value();
+    }
+
+    // Role fallbacks preserve the pre-theme defaults when no fonts.toml is
+    // present: an unset role resolves to the application font. Surfaces that
+    // hardcoded a different family ask for it explicitly: counter painters
+    // through cardTextFont(), the deck view headers and printed deck list
+    // through deckListFont(), the report dialogs through
+    // report_utils::reportLogFont(). Only the family basis is fixed there;
+    // sizes stay caller-side.
+    return qApp->font();
+}
+
+bool ThemeManager::hasAppFont(AppFont::Role role) const
+{
+    return currentFonts.fonts.contains(role);
+}
+
+QFont ThemeManager::cardTextFont() const
+{
+    if (hasAppFont(AppFont::CardText)) {
+        return appFont(AppFont::CardText);
+    }
+    QFont serifFont(QStringLiteral("Serif"));
+    serifFont.setStyleHint(QFont::Serif);
+    return serifFont;
+}
+
+QFont ThemeManager::deckListFont() const
+{
+    if (hasAppFont(AppFont::DeckList)) {
+        return appFont(AppFont::DeckList);
+    }
+    QFont serifFont(QStringLiteral("Serif"));
+    serifFont.setStyleHint(QFont::Serif);
+    return serifFont;
+}
+
+QFont ThemeManager::defaultAppFont(AppFont::Role /*role*/) const
+{
+    // No per-role scaling and no preview: an unset role resolves to the font
+    // captured at startup, which is what the theme falls back to once the
+    // editor closes.
+    return defaultFont;
+}
+
 void ThemeManager::themeChangedSlot()
 {
     QString themeName = SettingsCache::instance().getThemeName();
@@ -641,6 +752,19 @@ void ThemeManager::themeChangedSlot()
     }
 
     applyStyleAndPalette(themeName, themeCfg, palette, activeScheme);
+
+    // ── Load fonts: shared per theme, no light/dark split ───────────────────
+    FontConfig fonts = loadDefaultFontConfig(dirPath, themeName);
+    currentFonts = fonts;
+    const auto fontIt = currentFonts.fonts.constFind(AppFont::InterfaceDefault);
+    if (fontIt != currentFonts.fonts.constEnd()) {
+        qApp->setFont(fontIt.value());
+    } else {
+        // No theme font: restore the pristine application font captured at
+        // startup, so a reverted preview cannot leak into the live theme.
+        qApp->setFont(defaultFont);
+    }
+    emit fontsChanged();
 
     QStringList resources;
     if (!dirPath.isEmpty()) {

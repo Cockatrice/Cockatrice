@@ -14,15 +14,18 @@ inline QUrl resolveImageRedirects(const QUrl &url, QHash<QUrl, QPair<QUrl, QDate
 {
     QUrl resolved = url;
     QSet<QUrl> visited;
-    for (int depth = 0; depth < maxHops; ++depth) {
+    for (int depth = 0; depth <= maxHops; ++depth) {
         if (visited.contains(resolved)) {
             break;
         }
-        visited.insert(resolved);
         const auto it = cache.constFind(resolved);
         if (it == cache.cend() || it.value().first.isEmpty()) {
             return resolved;
         }
+        if (depth == maxHops) {
+            break;
+        }
+        visited.insert(resolved);
         resolved = it.value().first;
     }
     for (const QUrl &entry : std::as_const(visited)) {

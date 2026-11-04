@@ -21,6 +21,7 @@
 #include <QMap>
 #include <QMapIterator>
 #include <QMessageLogger>
+#include <QSet>
 #include <QSharedPointer>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
@@ -38,6 +39,7 @@
 #include <libcockatrice/protocol/pb/command_reverse_turn.pb.h>
 #include <libcockatrice/protocol/pb/command_set_active_phase.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
+#include <libcockatrice/protocol/pb/command_set_player_order.pb.h>
 #include <libcockatrice/protocol/pb/command_set_playmat.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_lock.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_plan.pb.h>
@@ -50,6 +52,7 @@
 #include <libcockatrice/protocol/pb/event_join.pb.h>
 #include <libcockatrice/protocol/pb/event_kicked.pb.h>
 #include <libcockatrice/protocol/pb/event_leave.pb.h>
+#include <libcockatrice/protocol/pb/event_player_order_changed.pb.h>
 #include <libcockatrice/protocol/pb/event_player_properties_changed.pb.h>
 #include <libcockatrice/protocol/pb/event_reverse_turn.pb.h>
 #include <libcockatrice/protocol/pb/event_set_active_phase.pb.h>
@@ -189,6 +192,9 @@ void GameEventHandler::processGameEventContainer(const GameEventContainer &cont,
                 case GameEvent::REVERSE_TURN:
                     eventReverseTurn(event.GetExtension(Event_ReverseTurn::ext), playerId, context);
                     break;
+                case GameEvent::PLAYER_ORDER_CHANGED:
+                    eventPlayerOrderChanged(event.GetExtension(Event_PlayerOrderChanged::ext), playerId, context);
+                    break;
 
                 default: {
                     PlayerLogic *player = game->getPlayerManager()->getPlayers().value(playerId, 0);
@@ -213,6 +219,16 @@ void GameEventHandler::handleNextTurn()
 void GameEventHandler::handleReverseTurn()
 {
     sendGameCommand(Command_ReverseTurn());
+}
+
+void GameEventHandler::handleSetPlayerOrder(const QList<QString> &playerNames, bool randomize)
+{
+    Command_SetPlayerOrder command;
+    command.set_randomize(randomize);
+    for (const QString &name : playerNames) {
+        command.add_player_names(name.toStdString());
+    }
+    sendGameCommand(command);
 }
 
 void GameEventHandler::handleActiveLocalPlayerConceded()
@@ -377,6 +393,27 @@ void GameEventHandler::eventGameStateChanged(const Event_GameStateChanged &event
 {
     const int playerListSize = event.player_list_size();
 
+    if (event.has_local_player_id()) {
+        game->getPlayerManager()->setLocalPlayerId(event.local_player_id());
+    }
+
+    QSet<int> authoritativePlayerIds;
+    for (int i = 0; i < playerListSize; ++i) {
+        const ServerInfo_PlayerProperties &prop = event.player_list(i).properties();
+        if (!prop.spectator()) {
+            authoritativePlayerIds.insert(prop.player_id());
+        }
+    }
+
+    // Players whose seats were shuffled away from the previous game are no longer
+    // part of the authoritative list and must be removed.
+    for (int stalePlayerId : game->getPlayerManager()->getPlayers().keys()) {
+        if (!authoritativePlayerIds.contains(stalePlayerId)) {
+            game->getPlayerManager()->removePlayer(stalePlayerId);
+            emit playerLeft(stalePlayerId);
+        }
+    }
+
     QVector<QPair<int, QPair<QString, QString>>> opponentDecksToDisplay;
 
     for (int i = 0; i < playerListSize; ++i) {
@@ -420,6 +457,19 @@ void GameEventHandler::eventGameStateChanged(const Event_GameStateChanged &event
     processCardAttachmentsForPlayers(event);
 
     emit remotePlayersDecksSelected(opponentDecksToDisplay);
+
+    // The server emits player_list in seat order, so record it to lay out the
+    // table by seating rather than by player id.
+    QList<int> seatOrder;
+    for (int i = 0; i < playerListSize; ++i) {
+        const ServerInfo_PlayerProperties &prop = event.player_list(i).properties();
+        if (!prop.spectator()) {
+            seatOrder.append(prop.player_id());
+        }
+    }
+    if (!seatOrder.isEmpty()) {
+        game->getGameState()->setSeatOrder(seatOrder);
+    }
 
     game->getGameState()->setGameTime(event.seconds_elapsed());
 
@@ -623,6 +673,33 @@ void GameEventHandler::eventReverseTurn(const Event_ReverseTurn &event,
     }
 
     emit logTurnReversed(player, event.reversed());
+}
+
+void GameEventHandler::eventPlayerOrderChanged(const Event_PlayerOrderChanged &event,
+                                               int /*eventPlayerId*/,
+                                               const GameEventContext & /*context*/)
+{
+    QStringList playerNames;
+    for (const auto &name : event.player_names()) {
+        playerNames.append(QString::fromStdString(name));
+    }
+
+    // Track the seating by stable player id so the table layout and the turn
+    // order dialog follow the shuffled order instead of id order.
+    QList<int> seatOrder;
+    const auto &players = game->getPlayerManager()->getPlayers();
+    for (const QString &name : playerNames) {
+        for (auto it = players.constBegin(); it != players.constEnd(); ++it) {
+            if (it.value() && it.value()->getPlayerInfo()->getName() == name) {
+                seatOrder.append(it.key());
+                break;
+            }
+        }
+    }
+    if (!seatOrder.isEmpty()) {
+        game->getGameState()->setSeatOrder(seatOrder);
+    }
+    emit logTurnOrderChanged(playerNames, event.randomized());
 }
 
 void GameEventHandler::eventGameHostChanged(const Event_GameHostChanged & /*event*/,
