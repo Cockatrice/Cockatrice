@@ -44,6 +44,7 @@
 #include <QWizard>
 #include <QtConcurrentRun>
 #include <QtGlobal>
+#include <algorithm>
 #include <cstdio>
 #include <functional>
 #include <libcockatrice/settings/personal_settings.h>
@@ -170,7 +171,12 @@ LoadSetsResult loadSetsData(const QPointer<OracleImporter> &importer, QByteArray
         break;
     }
 
-    if (data.trimmed().startsWith("<")) {
+    // Test the first non-space byte in place: trimmed() would duplicate the whole
+    // payload, which on the plain-XML path is the largest download we handle.
+    const auto firstNonSpace = std::find_if_not(data.cbegin(), data.cend(),
+                                                [](char c) { return c == ' ' || c == '\t' || c == '\n' || c == '\r'; });
+    const bool looksLikeXml = firstNonSpace != data.cend() && *firstNonSpace == '<';
+    if (looksLikeXml) {
         result.errorMessage = OracleDatabase::validateXml(data);
         if (!result.errorMessage.isEmpty()) {
             return result;
@@ -916,7 +922,10 @@ bool SaveSetsPage::validatePage()
         wizard()->xmlData.clear();
     } else if (!wizard()->importer->saveToFile(fileName, wizard()->getCardSourceUrl(),
                                                wizard()->getCardSourceVersion())) {
-        return failSave(tr("The file could not be saved to %1").arg(fileName));
+        // The importer refuses to write a database whose import did not finish, and
+        // reports the reason there; do not dress an import failure up as a disk failure.
+        const QString importError = wizard()->importer->getImportError();
+        return failSave(importError.isEmpty() ? tr("The file could not be saved to %1").arg(fileName) : importError);
     }
 
     wizard()->markDatabaseSaved();

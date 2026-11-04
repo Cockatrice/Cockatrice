@@ -185,9 +185,17 @@ void SimpleDownloadFilePage::actDownloadFinished()
     }
     QNetworkReply::NetworkError errorCode = reply->error();
     if (errorCode != QNetworkReply::NoError) {
-        QMessageBox::critical(this, tr("Error"), tr("Network error: %1.").arg(reply->errorString()));
-        wizard()->enableButtons();
+        const QString message = tr("Network error: %1.").arg(reply->errorString());
         reply->deleteLater();
+        // A hidden wizard cannot show a modal box: without an explicit stop it would sit
+        // here forever and the hosting client would wait with no timeout.
+        if (wizard()->backgroundMode) {
+            qWarning() << message;
+            wizard()->reject();
+            return;
+        }
+        QMessageBox::critical(this, tr("Error"), message);
+        wizard()->enableButtons();
         return;
     }
 

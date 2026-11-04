@@ -143,9 +143,11 @@ void OracleWizard::reject()
 
     QWizard::reject();
     // A hidden wizard does not close the application's last visible window.
-    // Stop background refreshes explicitly so the hosting client receives failure.
+    // Stop background refreshes explicitly so the hosting client receives a verdict,
+    // using the same rule as main(): a reject after the database was written is still
+    // a successful update, only a reject that wrote nothing counts as a failure.
     if (backgroundMode) {
-        QCoreApplication::exit(1);
+        QCoreApplication::exit(hasSavedDatabase() ? 0 : 1);
     }
 }
 
