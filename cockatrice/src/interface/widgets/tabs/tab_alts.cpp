@@ -6,6 +6,7 @@
 #include "alt_table_delegate.h"
 #include "libcockatrice/protocol/pb/response.pb.h"
 #include "libcockatrice/protocol/pb/response_user_alts.pb.h"
+#include "moderation_header_style.h"
 
 #include <QAbstractItemView>
 #include <QDateTime>
@@ -78,6 +79,7 @@ void configureAltTable(QTableWidget *table)
     table->setAlternatingRowColors(true);
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     table->horizontalHeader()->setStretchLastSection(true);
+    table->horizontalHeader()->setStyle(new ModerationHeaderStyle(table->horizontalHeader()->style()));
 }
 } // namespace
 
