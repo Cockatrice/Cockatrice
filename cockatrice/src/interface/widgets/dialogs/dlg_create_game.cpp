@@ -116,7 +116,7 @@ void DlgCreateGame::sharedCtor()
 
     shareDecklistsOnLoadCheckBox = new QCheckBox(tr("Open decklists in lobby"));
 
-    shufflePlayersCheckBox = new QCheckBox(tr("Shuffle players at start"));
+    shufflePlayersCheckBox = new QCheckBox(tr("Randomize turn order (seats) on each game start"));
 
     createGameAsJudgeCheckBox = new QCheckBox(tr("Create game as judge"));
 
