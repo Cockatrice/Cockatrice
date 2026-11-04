@@ -89,7 +89,8 @@ void VisualDatabaseDisplayGenderFilterWidget::updateGenderFilter()
         for (auto it = genderButtons.cbegin(); it != genderButtons.cend(); ++it) {
             if (it.value()->isChecked()) {
                 QString gender = it.key();
-                filterModel->addFilter(new CardFilter(gender, CardFilter::TypeOr, CardFilter::AttrGender));
+                CardFilter filter(gender, CardFilter::TypeOr, CardFilter::AttrGender);
+                filterModel->addFilter(&filter);
             }
         }
     }
