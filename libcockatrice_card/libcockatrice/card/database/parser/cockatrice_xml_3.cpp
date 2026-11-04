@@ -18,6 +18,7 @@
 #include <QIODevice>
 #include <QList>
 #include <QMessageLogger>
+#include <QSaveFile>
 #include <QSharedPointer>
 #include <QStringView>
 #include <QXmlStreamAttributes>
@@ -499,7 +500,7 @@ bool CockatriceXml3Parser::saveToFile(FormatRulesNameMap _formats,
 {
     Q_UNUSED(_formats);
 
-    QFile file(fileName);
+    QSaveFile file(fileName);
     if (!file.open(QIODevice::WriteOnly)) {
         return false;
     }
@@ -539,5 +540,5 @@ bool CockatriceXml3Parser::saveToFile(FormatRulesNameMap _formats,
     xml.writeEndElement(); // cockatrice_carddatabase
     xml.writeEndDocument();
 
-    return true;
+    return !xml.hasError() && file.commit();
 }
