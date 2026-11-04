@@ -325,7 +325,7 @@ jobs:
           # whole build tree, where it finds (and uploads) object files and other fragments
           # that can never match a stack frame. The packaged copy is split and stripped by
           # cpack, but keeps this binary's GNU build-id, which is how Sentry matches it.
-          for app in cockatrice oracle servatrice; do
+          for app in continuumatrice continuum-servatrice; do
             binary="build/$app/$app"
             [[ -f $binary ]] && paths+=("$binary")
           done
@@ -702,7 +702,7 @@ jobs:
             # PE and its PDB together: only then does it associate the PE's code
             # identifier with the PDB's debug identifier.
             shopt -s nullglob
-            for target in cockatrice oracle servatrice; do
+            for target in continuumatrice continuum-servatrice; do
               paths+=("build/$target"/*.exe "build/$target"/*.pdb)
             done
             shopt -u nullglob
@@ -753,7 +753,7 @@ jobs:
           else
             # Release builds carry DWARF (-g, kept by CrashReporting.cmake); macOS keeps its
             # debug info in dSYM bundles, so materialize them before uploading.
-            for app in cockatrice oracle servatrice; do
+            for app in continuumatrice continuum-servatrice; do
               binary="build/$app/$app.app/Contents/MacOS/$app"
               if [[ -f $binary ]]; then
                 if [[ '${{ matrix.os }}' == 'macOS' ]]; then
@@ -955,12 +955,11 @@ jobs:
           if-no-files-found: error
           name: ${{ steps.build.outputs.name }}-Symbols
           path: |
-            build/cockatrice/*.exe
-            build/cockatrice/*.pdb
-            build/oracle/*.exe
-            build/oracle/*.pdb
-            build/servatrice/*.exe
-            build/servatrice/*.pdb
+            build/continuumatrice/*.exe
+            build/continuumatrice/*.pdb
+
+            build/continuum-servatrice/*.exe
+            build/continuum-servatrice/*.pdb
 
       - name: "Attest binary provenance"
         if: steps.upload_release.outcome == 'success'
