@@ -450,6 +450,18 @@ FontConfig ThemeManager::loadFontConfig(const QString &themeDirPath)
     return FontConfig::fromThemeDir(themeDirPath);
 }
 
+FontConfig ThemeManager::loadDefaultFontConfig(const QString &themeDirPath, const QString &themeName)
+{
+    FontConfig cfg = FontConfig::fromThemeDir(themeDirPath);
+    if (!cfg.hasFonts()) {
+        // The shipped fonts.toml may live in the system theme directory rather
+        // than the resolved (user) theme directory, so built-in themes still
+        // get their curated fonts.
+        cfg = FontConfig::fromThemeDir(QDir(systemThemesBasePath()).absoluteFilePath(themeName));
+    }
+    return cfg;
+}
+
 bool ThemeManager::saveFontConfig(const QString &themeDirPath, const FontConfig &cfg)
 {
     if (themeDirPath.isEmpty()) {
@@ -651,6 +663,14 @@ QFont ThemeManager::appFont(AppFont::Role role) const
     return qApp->font();
 }
 
+QFont ThemeManager::defaultAppFont(AppFont::Role /*role*/) const
+{
+    // No per-role scaling and no preview: an unset role resolves to the font
+    // captured at startup, which is what the theme falls back to once the
+    // editor closes.
+    return defaultFont;
+}
+
 void ThemeManager::themeChangedSlot()
 {
     QString themeName = SettingsCache::instance().getThemeName();
@@ -717,6 +737,10 @@ void ThemeManager::themeChangedSlot()
     const auto fontIt = currentFonts.fonts.constFind(AppFont::InterfaceDefault);
     if (fontIt != currentFonts.fonts.constEnd()) {
         qApp->setFont(fontIt.value());
+    } else {
+        // No theme font: restore the pristine application font captured at
+        // startup, so a reverted preview cannot leak into the live theme.
+        qApp->setFont(defaultFont);
     }
     emit fontsChanged();
 
