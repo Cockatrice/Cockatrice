@@ -38,7 +38,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     previousHosts = new QComboBox(this);
 
     btnDeleteServer = new QPushButton(this);
-    btnDeleteServer->setIcon(loadThemedIcon(QStringLiteral("icons/remove_row")));
+    btnDeleteServer->setIcon(loadThemedIcon(QStringLiteral("icons/remove_row"), AppColor::Negative));
     btnDeleteServer->setToolTip(tr("Delete the currently selected saved server"));
     btnDeleteServer->setFixedWidth(30);
 

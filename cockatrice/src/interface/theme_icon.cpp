@@ -23,19 +23,74 @@
 #include <QStyle>
 #include <QSvgRenderer>
 #include <QtGlobal>
+#include <cmath>
 #include <utility>
 
 namespace
 {
 /**
- * @brief Palette color that replaces `currentColor`, following the icon mode.
+ * @brief WCAG relative luminance, used to test a tint against a background.
  */
-QByteArray sentinelColor(QIcon::Mode mode, QPalette::ColorRole role)
+double relativeLuminance(const QColor &color)
 {
+    const auto linear = [](double channel) {
+        channel /= 255.0;
+        return channel <= 0.03928 ? channel / 12.92 : std::pow((channel + 0.055) / 1.055, 2.4);
+    };
+    return 0.2126 * linear(color.red()) + 0.7152 * linear(color.green()) + 0.0722 * linear(color.blue());
+}
+
+double contrastRatio(const QColor &first, const QColor &second)
+{
+    const double a = relativeLuminance(first);
+    const double b = relativeLuminance(second);
+    return (qMax(a, b) + 0.05) / (qMin(a, b) + 0.05);
+}
+} // namespace
+
+IconTint::IconTint(QPalette::ColorRole role) : paletteRole(role)
+{
+}
+
+IconTint::IconTint(AppColor::Role role) : source(Source::AppColor), appRole(role)
+{
+}
+
+QColor IconTint::resolve(QIcon::Mode mode) const
+{
+    if (source == Source::AppColor) {
+        // A disabled control must not keep signalling its semantic color.
+        if (mode == QIcon::Disabled) {
+            return qApp->palette().color(QPalette::Disabled, QPalette::WindowText);
+        }
+        const QColor color = themeManager->appColor(appRole);
+        if (mode != QIcon::Selected) {
+            return color;
+        }
+        // Selected rows paint their icon on the highlight colour. Keep the
+        // semantic tint when it stays legible there; otherwise the glyph would
+        // vanish into the selection.
+        constexpr double MIN_SELECTED_CONTRAST = 3.0;
+        const QColor highlight = qApp->palette().color(QPalette::Active, QPalette::Highlight);
+        return contrastRatio(color, highlight) >= MIN_SELECTED_CONTRAST
+                   ? color
+                   : qApp->palette().color(QPalette::Active, QPalette::HighlightedText);
+    }
+
     const QPalette::ColorGroup group = mode == QIcon::Disabled ? QPalette::Disabled : QPalette::Active;
     const QPalette::ColorRole effective =
-        mode == QIcon::Selected && role == QPalette::WindowText ? QPalette::HighlightedText : role;
-    return qApp->palette().color(group, effective).name(QColor::HexRgb).toLatin1();
+        mode == QIcon::Selected && paletteRole == QPalette::WindowText ? QPalette::HighlightedText : paletteRole;
+    return qApp->palette().color(group, effective);
+}
+
+namespace
+{
+/**
+ * @brief Color that replaces `currentColor`, following the icon mode.
+ */
+QByteArray sentinelColor(QIcon::Mode mode, const IconTint &tint)
+{
+    return tint.resolve(mode).name(QColor::HexRgb).toLatin1();
 }
 
 /**
@@ -106,7 +161,7 @@ QString cacheKey(const QString &path, const QByteArray &variant, const QSize &si
 class ThemeSvgIconEngine final : public QObject, public QIconEngine
 {
 public:
-    ThemeSvgIconEngine(QString _prefix, QPalette::ColorRole _role) : prefix(std::move(_prefix)), role(_role)
+    ThemeSvgIconEngine(QString _prefix, IconTint _tint) : prefix(std::move(_prefix)), tint(_tint)
     {
         if (themeManager) {
             // A theme switch changes the resolved asset (scheme-qualified
@@ -120,7 +175,7 @@ public:
 
     QIconEngine *clone() const override
     {
-        return new ThemeSvgIconEngine(prefix, role);
+        return new ThemeSvgIconEngine(prefix, tint);
     }
 
     void paint(QPainter *painter, const QRect &rect, QIcon::Mode mode, QIcon::State) override
@@ -238,7 +293,7 @@ private:
         // with its own colors varies by mode (Disabled is generated). A color
         // variant is never a bare digit, so the two key spaces cannot collide.
         const QByteArray variant =
-            resolvedHasSentinel ? sentinelColor(mode, role) : QByteArray::number(static_cast<int>(mode));
+            resolvedHasSentinel ? sentinelColor(mode, tint) : QByteArray::number(static_cast<int>(mode));
         const QString key = cacheKey(resolvedPath, variant, pixelSize, devicePixelRatio);
         const auto cached = cache.constFind(key);
         if (cached != cache.constEnd()) {
@@ -266,7 +321,7 @@ private:
     }
 
     QString prefix;
-    QPalette::ColorRole role;
+    IconTint tint;
     mutable QHash<QString, QPixmap> cache;
     mutable QString resolvedPath;
     mutable QString resolvedThemePath;
@@ -279,12 +334,12 @@ private:
 };
 } // namespace
 
-QIcon loadThemedIcon(QStringView prefix, QPalette::ColorRole role)
+QIcon loadThemedIcon(QStringView prefix, IconTint tint)
 {
-    return QIcon(new ThemeSvgIconEngine(prefix.toString(), role));
+    return QIcon(new ThemeSvgIconEngine(prefix.toString(), tint));
 }
 
-QPixmap loadSentinelSvgPixmap(const QString &resolvedPath, QPalette::ColorRole role, const QSize &size)
+QPixmap loadSentinelSvgPixmap(const QString &resolvedPath, IconTint tint, const QSize &size)
 {
     if (!resolvedPath.endsWith(QStringLiteral(".svg"), Qt::CaseInsensitive)) {
         return {};
@@ -295,6 +350,6 @@ QPixmap loadSentinelSvgPixmap(const QString &resolvedPath, QPalette::ColorRole r
         return {};
     }
 
-    const QByteArray color = qApp->palette().color(role).name(QColor::HexRgb).toLatin1();
+    const QByteArray color = tint.resolve(QIcon::Normal).name(QColor::HexRgb).toLatin1();
     return renderSvg(resolveSvgColorSentinel(svg, color), size, 1.0);
 }

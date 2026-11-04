@@ -639,14 +639,23 @@ QColor ThemeManager::appColor(AppColor::Role role) const
     // unconditionally keeps every Qt version rendering identically.
     const QColor accent = qApp->palette().color(QPalette::Active, QPalette::Highlight);
 
-    if (role == AppColor::AccentSoft) {
-        constexpr int SOFT_SATURATION_PERCENT = 70;
-        constexpr int SOFT_LIGHTNESS_OFFSET = 60;
+    switch (role) {
+        case AppColor::AccentStrong:
+            return accent;
+        case AppColor::AccentSoft: {
+            constexpr int SOFT_SATURATION_PERCENT = 70;
+            constexpr int SOFT_LIGHTNESS_OFFSET = 60;
 
-        // Light end of the gradient: same hue, softened and lightened
-        return QColor::fromHsl(qMax(0, accent.hslHue()),
-                               qBound(0, qRound(accent.hslSaturation() * SOFT_SATURATION_PERCENT / 100.0), 255),
-                               qBound(0, accent.lightness() + SOFT_LIGHTNESS_OFFSET, 255));
+            // Light end of the gradient: same hue, softened and lightened
+            return QColor::fromHsl(qMax(0, accent.hslHue()),
+                                   qBound(0, qRound(accent.hslSaturation() * SOFT_SATURATION_PERCENT / 100.0), 255),
+                                   qBound(0, accent.lightness() + SOFT_LIGHTNESS_OFFSET, 255));
+        }
+        case AppColor::Positive:
+        case AppColor::Negative:
+            // Semantic colors are independent of the accent: a missing role must
+            // not silently paint "remove" in the theme's highlight color.
+            return defaultAppColor(role, isDarkModeActive());
     }
 
     return accent;
