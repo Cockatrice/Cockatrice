@@ -13,6 +13,7 @@ class QLabel;
 class SettingsButtonWidget;
 class VisualDatabaseDisplayFilterSaveLoadWidget;
 class VisualDatabaseDisplayFormatLegalityFilterWidget;
+class VisualDatabaseDisplayGenderFilterWidget;
 class VisualDatabaseDisplayMainTypeFilterWidget;
 class VisualDatabaseDisplayNameFilterWidget;
 class VisualDatabaseDisplaySetFilterWidget;
@@ -52,6 +53,8 @@ private:
     VisualDatabaseDisplaySubTypeFilterWidget *subTypeFilterWidget;
     SettingsButtonWidget *quickFilterSetWidget;
     VisualDatabaseDisplaySetFilterWidget *setFilterWidget;
+    SettingsButtonWidget *quickFilterGenderWidget;
+    VisualDatabaseDisplayGenderFilterWidget *genderFilterWidget;
     SettingsButtonWidget *quickFilterFormatLegalityWidget;
     VisualDatabaseDisplayFormatLegalityFilterWidget *formatLegalityWidget;
 

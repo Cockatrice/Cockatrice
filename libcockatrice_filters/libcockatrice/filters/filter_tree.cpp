@@ -351,6 +351,13 @@ bool FilterItem::acceptSubType(const CardInfoPtr &info) const
     return subType.contains(term, Qt::CaseInsensitive);
 }
 
+bool FilterItem::acceptGender(const CardInfoPtr &info) const
+{
+    // MSE exports the full option value (e.g. "sex male", "duos siblings").
+    // Do not substring-match "male" against "artificial masculine".
+    return info->getProperty(QStringLiteral("gender")).trimmed().compare(term.trimmed(), Qt::CaseInsensitive) == 0;
+}
+
 bool FilterItem::acceptColor(const CardInfoPtr &info) const
 {
     if (convertedColorTerm.isEmpty()) {
@@ -545,6 +552,8 @@ bool FilterItem::acceptCardAttr(const CardInfoPtr &info,
             return acceptMainType(info);
         case CardFilter::AttrSubType:
             return acceptSubType(info);
+        case CardFilter::AttrGender:
+            return acceptGender(info);
         default:
             return true; /* ignore this attribute */
     }
