@@ -30,6 +30,7 @@ public:
     static CommanderBracketService &instance();
 
     quint64 estimateBracket(const DeckList &deck, QObject *requester);
+    void cancelEstimate(quint64 requestId);
 
 signals:
     void estimateFinished(quint64 requestId, QObject *requester, const CommanderBracketEstimate &estimate);
