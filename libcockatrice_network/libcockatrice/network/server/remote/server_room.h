@@ -176,6 +176,8 @@ public:
     void addGame(Server_Game *game);
     void removeGame(Server_Game *game);
 
+    Server_AbstractUserInterface *getUserInterfaceByName(const QString &name) const;
+
     void sendRoomEvent(RoomEvent *event,
                        bool sendToIsl = true,
                        ServerInfo_RoomChannel::AccessLevel accessLevel = ServerInfo_RoomChannel::Public);
