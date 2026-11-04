@@ -11,6 +11,7 @@
 
 #include <QBrush>
 #include <QColor>
+#include <QFont>
 #include <QLoggingCategory>
 #include <QMap>
 #include <QObject>
@@ -47,10 +48,15 @@ private:
     // palette is applied. Used as the base when a theme supplies no palette, so
     // switching away from a custom palette restores the original colours.
     QPalette defaultPalette;
+    // Pristine application font captured at startup, before any theme font is
+    // applied. Restored when a theme (or a preview) supplies no InterfaceDefault
+    // font, so switching away from a themed font cannot leave it behind.
+    QFont defaultFont;
     QString currentThemePath;
     std::array<QBrush, Role::MaxRole + 1> brushes;
     QStringMap availableThemes;
     QMap<AppColor::Role, QColor> currentAppColors;
+    FontConfig currentFonts;
     /*
       Internal cache for multiple backgrounds
     */
@@ -105,6 +111,9 @@ public:
     // Load/save per-scheme palette colors
     static PaletteConfig loadPaletteConfig(const QString &themeDirPath, const QString &colorScheme);
     static bool savePaletteConfig(const QString &themeDirPath, const QString &colorScheme, const PaletteConfig &cfg);
+    // Load/save shared per-theme fonts (fonts.toml, not split by scheme)
+    static FontConfig loadFontConfig(const QString &themeDirPath);
+    static bool saveFontConfig(const QString &themeDirPath, const FontConfig &cfg);
     // Resolve prefix to a scheme-qualified "theme:" path. Existence is probed
     // internally across the formats themes may ship (.png/.jpg/.svg), so
     // callers load the returned path directly. Prefers "<prefix>-<dark|light>"
@@ -132,10 +141,14 @@ public:
 
     void reloadCurrentTheme();
     void previewPalette(const PaletteConfig &cfg, const QString &scheme);
+    void previewFonts(const FontConfig &cfg);
 
     // Resolves an application color role: the theme's stored [AppColors] value
     // when present, otherwise a palette-accent-derived fallback.
     QColor appColor(AppColor::Role role) const;
+    /** @brief Resolves an application font role: the theme's stored [Fonts]
+     *         value when present, otherwise the application font. */
+    QFont appFont(AppFont::Role role) const;
 
     QBrush &getBgBrush(Role zone);
     QBrush getExtraBgBrush(Role zone, int zoneId = 0);
@@ -144,6 +157,7 @@ protected slots:
 signals:
     void themeChanged();
     void paletteChanged();
+    void fontsChanged();
 };
 
 extern ThemeManager *themeManager;
