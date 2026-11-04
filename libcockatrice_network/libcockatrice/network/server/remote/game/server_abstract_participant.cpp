@@ -457,8 +457,8 @@ Response::ResponseCode Server_AbstractParticipant::cmdSetPlayerOrder(const Comma
         game->reorderPlayerSeats(playerNames);
     }
 
-    game->sendGameStateToPlayers();
-
+    // Clients learn the new seating from the Event_PlayerOrderChanged that
+    // reseatPlayers broadcasts; no full game state resend is needed for it.
     return Response::RespOk;
 }
 
