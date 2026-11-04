@@ -76,6 +76,9 @@ jobs:
           export RUN_ARGS="$RUN_ARGS ${{ matrix.run_env }}"
           # One cache directory per measurement: a shared one would mix the two results.
           export CCACHE_DIR="$CACHE/.ccache-g0"
+          # --mount type=bind refuses a source that does not exist, and docker.sh only
+          # creates its default cache directory.
+          mkdir -p "$CCACHE_DIR"
           export RUN_ARGS="$RUN_ARGS -e PROBE_CMAKE_ARGS=-DCOCKATRICE_DEBUG_INFO_LEVEL=0"
           RUN ${{ matrix.leg }} --ccache "$CCACHE_BOUND"
           echo "=== cache for -g0"
@@ -88,6 +91,7 @@ jobs:
           source .ci/docker.sh
           export RUN_ARGS="$RUN_ARGS ${{ matrix.run_env }}"
           export CCACHE_DIR="$CACHE/.ccache-g1"
+          mkdir -p "$CCACHE_DIR"
           export RUN_ARGS="$RUN_ARGS -e PROBE_CMAKE_ARGS=-DCOCKATRICE_DEBUG_INFO_LEVEL=1"
           RUN ${{ matrix.leg }} --ccache "$CCACHE_BOUND"
           echo "=== cache for -g1"
