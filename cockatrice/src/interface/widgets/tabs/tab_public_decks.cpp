@@ -2,8 +2,10 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../deck_loader/deck_loader.h"
+#include "../../theme_icon.h"
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
+#include "../interface/theme_manager.h"
 #include "../visual_deck_storage/deck_preview/deck_preview_color_identity_filter_widget.h"
 #include "../visual_deck_storage/deck_preview/public_deck_preview_widget.h"
 #include "../visual_deck_storage/remote_public_decks_model.h"
@@ -45,15 +47,25 @@ TabPublicDecks::TabPublicDecks(TabSupervisor *_tabSupervisor, AbstractClient *_c
     cardSize = SettingsCache::instance().cardsDisplay().getVisualDeckStorageCardSize();
 
     titleLabel = new QLabel(tr("Public decks of %1").arg(userName.toHtmlEscaped()), this);
-    titleLabel->setFont(QtUtils::boldFont(titleLabel->font()));
+    // Family comes from the InterfaceDefault theme role; bold stays caller-side.
+    auto applyTitleFont = [this]() {
+        titleLabel->setFont(QtUtils::boldFont(themeManager->appFont(AppFont::InterfaceDefault)));
+    };
+    applyTitleFont();
+    connect(themeManager, &ThemeManager::fontsChanged, this, [this, applyTitleFont] {
+        applyTitleFont();
+        // Preview cells paint with the live role font; repaint the grid so the
+        // new family shows without waiting for a scroll or hover.
+        flowWidget->update();
+    });
 
     auto *headerLayout = new QHBoxLayout;
     headerLayout->addWidget(titleLabel);
     headerLayout->addStretch(1);
 
     // Filter/toolbar row, matching the Visual Deck Storage: color identity filter
-    // first, the search bar stretching in the middle, and the quick settings
-    // cogwheel at the end. The card size slider lives inside the cogwheel popup.
+    // first, the search bar stretching in the middle, and the quick-settings button
+    // at the end. The card size slider lives inside its popup.
     emptyLabel = new QLabel(tr("This user has not published any decks."), this);
     emptyLabel->setAlignment(Qt::AlignCenter);
     emptyLabel->setVisible(false);
@@ -68,7 +80,7 @@ TabPublicDecks::TabPublicDecks(TabSupervisor *_tabSupervisor, AbstractClient *_c
     colorIdentityFilter = new DeckPreviewColorIdentityFilterWidget(this);
     searchWidget = new VisualDeckStorageSearchWidget(this);
     refreshButton = new QToolButton(this);
-    refreshButton->setIcon(QPixmap("theme:icons/reload"));
+    refreshButton->setIcon(loadThemedIcon(QStringLiteral("icons/reload")));
     refreshButton->setFixedSize(32, 32);
     quickSettingsWidget = new VisualDeckStorageQuickSettingsWidget(this);
     quickSettingsWidget->setPublicDecksMode(true);

@@ -1,0 +1,17 @@
+cockatrice_add_test(
+  NAME
+  model_contract_test
+  SOURCES
+  ${VERSION_STRING_CPP}
+  model_contract_test.cpp
+  LIBS
+  libcockatrice_models
+  libcockatrice_card
+  libcockatrice_deck_list
+  libcockatrice_settings
+  INCLUDE_DIRS
+  ${CMAKE_CURRENT_SOURCE_DIR}/../support
+  ${CMAKE_CURRENT_SOURCE_DIR}/../carddatabase
+  DEFINITIONS
+  CARDDB_DATADIR="${CMAKE_SOURCE_DIR}/tests/carddatabase/data/"
+)

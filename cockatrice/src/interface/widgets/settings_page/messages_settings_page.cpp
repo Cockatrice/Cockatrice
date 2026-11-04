@@ -1,7 +1,7 @@
 #include "messages_settings_page.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 #include "../interface/widgets/utility/get_text_with_max.h"
 #include "libcockatrice/utility/macros.h"
 
@@ -146,15 +146,15 @@ MessagesSettingsPage::MessagesSettingsPage()
     }
 
     aAdd = new QAction(this);
-    aAdd->setIcon(themePixmap(QStringLiteral("icons/increment")));
+    aAdd->setIcon(loadThemedIcon(QStringLiteral("icons/increment")));
     connect(aAdd, &QAction::triggered, this, &MessagesSettingsPage::actAdd);
 
     aEdit = new QAction(this);
-    aEdit->setIcon(themePixmap(QStringLiteral("icons/pencil")));
+    aEdit->setIcon(loadThemedIcon(QStringLiteral("icons/pencil")));
     connect(aEdit, &QAction::triggered, this, &MessagesSettingsPage::actEdit);
 
     aRemove = new QAction(this);
-    aRemove->setIcon(themePixmap(QStringLiteral("icons/decrement")));
+    aRemove->setIcon(loadThemedIcon(QStringLiteral("icons/decrement")));
     connect(aRemove, &QAction::triggered, this, &MessagesSettingsPage::actRemove);
 
     auto *messageToolBar = new QToolBar;

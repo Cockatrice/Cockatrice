@@ -9,3 +9,15 @@ cockatrice_add_test(
   LABELS
   server
 )
+
+cockatrice_add_test(
+  NAME
+  player_order_test
+  SOURCES
+  player_order_test.cpp
+  LIBS
+  libcockatrice_network_server_remote
+  libcockatrice_rng
+  LABELS
+  server
+)

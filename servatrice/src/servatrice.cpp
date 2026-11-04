@@ -100,8 +100,10 @@ Servatrice_GameServer::Servatrice_GameServer(Servatrice *_server,
 
         newThread->start();
         server->watchWorkerThread(newThread);
-        QMetaObject::invokeMethod(newDatabaseInterface, "initDatabase", Qt::BlockingQueuedConnection,
-                                  Q_ARG(QSqlDatabase, _sqlDatabase));
+        QMetaObject::invokeMethod(
+            newDatabaseInterface,
+            [newDatabaseInterface, _sqlDatabase] { newDatabaseInterface->initDatabase(_sqlDatabase); },
+            Qt::BlockingQueuedConnection);
 
         connectionPools.append(newPool);
     }
@@ -125,9 +127,10 @@ void Servatrice_GameServer::incomingConnection(qintptr socketDescriptor)
     auto ssi = new TcpServerSocketInterface(server, pool->getDatabaseInterface());
     ssi->moveToThread(pool->thread());
     pool->addClient();
-    connect(ssi, SIGNAL(destroyed()), pool, SLOT(removeClient()));
+    connect(ssi, &QObject::destroyed, pool, &Servatrice_ConnectionPool::removeClient);
 
-    QMetaObject::invokeMethod(ssi, "initConnection", Qt::QueuedConnection, Q_ARG(int, socketDescriptor));
+    QMetaObject::invokeMethod(
+        ssi, [ssi, socketDescriptor] { ssi->initConnection(socketDescriptor); }, Qt::QueuedConnection);
 }
 
 Servatrice_ConnectionPool *Servatrice_GameServer::findLeastUsedConnectionPool()
@@ -168,13 +171,15 @@ Servatrice_WebsocketGameServer::Servatrice_WebsocketGameServer(Servatrice *_serv
 
         newThread->start();
         server->watchWorkerThread(newThread);
-        QMetaObject::invokeMethod(newDatabaseInterface, "initDatabase", Qt::BlockingQueuedConnection,
-                                  Q_ARG(QSqlDatabase, _sqlDatabase));
+        QMetaObject::invokeMethod(
+            newDatabaseInterface,
+            [newDatabaseInterface, _sqlDatabase] { newDatabaseInterface->initDatabase(_sqlDatabase); },
+            Qt::BlockingQueuedConnection);
 
         connectionPools.append(newPool);
-
-        connect(this, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
     }
+
+    connect(this, &QWebSocketServer::newConnection, this, &Servatrice_WebsocketGameServer::onNewConnection);
 }
 
 Servatrice_WebsocketGameServer::~Servatrice_WebsocketGameServer()
@@ -199,9 +204,10 @@ void Servatrice_WebsocketGameServer::onNewConnection()
      */
     // ssi->moveToThread(pool->thread());
     pool->addClient();
-    connect(ssi, SIGNAL(destroyed()), pool, SLOT(removeClient()));
+    connect(ssi, &QObject::destroyed, pool, &Servatrice_ConnectionPool::removeClient);
 
-    QMetaObject::invokeMethod(ssi, "initConnection", Qt::QueuedConnection, Q_ARG(void *, nextPendingConnection()));
+    void *socket = nextPendingConnection();
+    QMetaObject::invokeMethod(ssi, [ssi, socket] { ssi->initConnection(socket); }, Qt::QueuedConnection);
 }
 
 Servatrice_ConnectionPool *Servatrice_WebsocketGameServer::findLeastUsedConnectionPool()
@@ -224,14 +230,14 @@ Servatrice_ConnectionPool *Servatrice_WebsocketGameServer::findLeastUsedConnecti
 void Servatrice_IslServer::incomingConnection(qintptr socketDescriptor)
 {
     auto thread = new QThread;
-    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    connect(thread, &QThread::finished, thread, &QObject::deleteLater);
 
     auto interface = new IslInterface(static_cast<int>(socketDescriptor), cert, privateKey, server);
     interface->moveToThread(thread);
-    connect(interface, SIGNAL(destroyed()), thread, SLOT(quit()));
+    connect(interface, &QObject::destroyed, thread, &QThread::quit);
 
     thread->start();
-    QMetaObject::invokeMethod(interface, "initServer", Qt::QueuedConnection);
+    QMetaObject::invokeMethod(interface, [interface] { interface->initServer(); }, Qt::QueuedConnection);
 }
 
 Servatrice::Servatrice(QObject *parent)
@@ -585,15 +591,16 @@ bool Servatrice::initServer()
 
                 auto *thread = new QThread;
                 thread->setObjectName("isl_" + QString::number(prop.id));
-                connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+                connect(thread, &QThread::finished, thread, &QObject::deleteLater);
 
                 IslInterface *interface = new IslInterface(prop.id, prop.hostname, prop.address.toString(),
                                                            prop.controlPort, prop.cert, cert, key, this);
                 interface->moveToThread(thread);
-                connect(interface, SIGNAL(destroyed()), thread, SLOT(quit()));
+                connect(interface, &QObject::destroyed, thread, &QThread::quit);
 
                 thread->start();
-                QMetaObject::invokeMethod(interface, "initClient", Qt::BlockingQueuedConnection);
+                QMetaObject::invokeMethod(
+                    interface, [interface] { interface->initClient(); }, Qt::BlockingQueuedConnection);
             }
 
             qDebug() << "Starting ISL server on port" << getISLNetworkPort();
@@ -610,18 +617,18 @@ bool Servatrice::initServer()
     }
 
     pingClock = new QTimer(this);
-    connect(pingClock, SIGNAL(timeout()), this, SIGNAL(pingClockTimeout()));
+    connect(pingClock, &QTimer::timeout, this, &Servatrice::pingClockTimeout);
     pingClock->start(getClientKeepAlive() * 1000);
 
     statusUpdateClock = new QTimer(this);
-    connect(statusUpdateClock, SIGNAL(timeout()), this, SLOT(statusUpdate()));
+    connect(statusUpdateClock, &QTimer::timeout, this, &Servatrice::statusUpdate);
     if (getServerStatusUpdateTime() != 0) {
         qDebug() << "Starting status update clock, interval" << getServerStatusUpdateTime() << "ms";
         statusUpdateClock->start(getServerStatusUpdateTime());
     }
 
     deckShareCleanupClock = new QTimer(this);
-    connect(deckShareCleanupClock, SIGNAL(timeout()), this, SLOT(cleanupExpiredDeckShares()));
+    connect(deckShareCleanupClock, &QTimer::timeout, this, &Servatrice::cleanupExpiredDeckShares);
     const int deckShareCleanupInterval = getDeckShareCleanupInterval();
     if (deckShareCleanupInterval > 0) {
         qDebug() << "Starting deck share cleanup clock, interval" << deckShareCleanupInterval << "ms";
@@ -1038,7 +1045,7 @@ void Servatrice::scheduleShutdown(const QString &reason, int minutes)
     nextShutdownMessageMinutes = shutdownMinutes;
     if (minutes > 0) {
         shutdownTimer = new QTimer;
-        connect(shutdownTimer, SIGNAL(timeout()), this, SLOT(shutdownTimeout()));
+        connect(shutdownTimer, &QTimer::timeout, this, &Servatrice::shutdownTimeout);
         shutdownTimer->start(60000);
     }
     shutdownStateMutex.unlock();
@@ -1101,25 +1108,19 @@ void Servatrice::addIslInterface(int _serverId, IslInterface *interface)
 {
     // Only call with islLock locked for writing
     islInterfaces.insert(_serverId, interface);
-    connect(interface, SIGNAL(externalUserJoined(ServerInfo_User)), this, SLOT(externalUserJoined(ServerInfo_User)));
-    connect(interface, SIGNAL(externalUserLeft(QString)), this, SLOT(externalUserLeft(QString)));
-    connect(interface, SIGNAL(externalRoomUserJoined(int, ServerInfo_User)), this,
-            SLOT(externalRoomUserJoined(int, ServerInfo_User)));
-    connect(interface, SIGNAL(externalRoomUserLeft(int, QString)), this, SLOT(externalRoomUserLeft(int, QString)));
-    connect(interface, SIGNAL(externalRoomSay(int, QString, QString, QString)), this,
-            SLOT(externalRoomSay(int, QString, QString, QString)));
-    connect(interface, SIGNAL(externalRoomRemoveMessages(int, QString, int)), this,
-            SLOT(externalRoomRemoveMessages(int, QString, int)));
-    connect(interface, SIGNAL(externalRoomGameListChanged(int, ServerInfo_Game)), this,
-            SLOT(externalRoomGameListChanged(int, ServerInfo_Game)));
-    connect(interface, SIGNAL(joinGameCommandReceived(Command_JoinGame, int, int, int, qint64)), this,
-            SLOT(externalJoinGameCommandReceived(Command_JoinGame, int, int, int, qint64)));
-    connect(interface, SIGNAL(gameCommandContainerReceived(CommandContainer, int, int, qint64)), this,
-            SLOT(externalGameCommandContainerReceived(CommandContainer, int, int, qint64)));
-    connect(interface, SIGNAL(responseReceived(Response, qint64)), this,
-            SLOT(externalResponseReceived(Response, qint64)));
-    connect(interface, SIGNAL(gameEventContainerReceived(GameEventContainer, qint64)), this,
-            SLOT(externalGameEventContainerReceived(GameEventContainer, qint64)));
+    connect(interface, &IslInterface::externalUserJoined, this, &Servatrice::externalUserJoined);
+    connect(interface, &IslInterface::externalUserLeft, this, &Servatrice::externalUserLeft);
+    connect(interface, &IslInterface::externalRoomUserJoined, this, &Servatrice::externalRoomUserJoined);
+    connect(interface, &IslInterface::externalRoomUserLeft, this, &Servatrice::externalRoomUserLeft);
+    connect(interface, &IslInterface::externalRoomSay, this, &Servatrice::externalRoomSay);
+    connect(interface, &IslInterface::externalRoomRemoveMessages, this, &Servatrice::externalRoomRemoveMessages);
+    connect(interface, &IslInterface::externalRoomGameListChanged, this, &Servatrice::externalRoomGameListChanged);
+    connect(interface, &IslInterface::joinGameCommandReceived, this, &Servatrice::externalJoinGameCommandReceived);
+    connect(interface, &IslInterface::gameCommandContainerReceived, this,
+            &Servatrice::externalGameCommandContainerReceived);
+    connect(interface, &IslInterface::responseReceived, this, &Servatrice::externalResponseReceived);
+    connect(interface, &IslInterface::gameEventContainerReceived, this,
+            &Servatrice::externalGameEventContainerReceived);
 }
 
 void Servatrice::removeIslInterface(int _serverId)

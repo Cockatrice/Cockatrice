@@ -1,7 +1,3 @@
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
-
 add_subdirectory(libcockatrice/models/database)
 add_subdirectory(libcockatrice/models/deck_list)
 

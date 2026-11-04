@@ -1,0 +1,6 @@
+<events>
+  <!-- Open Settings dialog via Cockatrice menu, then close with Escape -->
+  <event widget="MainWindow/menubar" command="activate" arguments="cockatriceMenu" />
+  <event widget="MainWindow/menubar/cockatriceMenu" command="activate" arguments="actionSettings" />
+  <event widget="MainWindow/settingsDialog" command="key" arguments="16777216" />
+</events>

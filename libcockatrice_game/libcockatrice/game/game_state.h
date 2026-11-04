@@ -33,7 +33,11 @@ public:
 
     void setHostId(int _hostId)
     {
+        if (hostId == _hostId) {
+            return;
+        }
         hostId = _hostId;
+        emit hostChanged(hostId);
     }
 
     QList<AbstractClient *> getClients() const
@@ -112,6 +116,19 @@ public:
         return hostId;
     }
 
+    void setSeatOrder(const QList<int> &order)
+    {
+        if (seatOrder != order) {
+            seatOrder = order;
+            emit seatOrderChanged(seatOrder);
+        }
+    }
+
+    QList<int> getSeatOrder() const
+    {
+        return seatOrder;
+    }
+
     int getSecondsElapsed() const
     {
         return secondsElapsed;
@@ -123,6 +140,8 @@ signals:
     void gameStopped();
     void activePhaseChanged(int activePhase);
     void activePlayerChanged(int playerId);
+    void hostChanged(int hostId);
+    void seatOrderChanged(const QList<int> &seatOrder);
 
 public slots:
     void incrementGameTime();
@@ -142,6 +161,9 @@ private:
     int currentPhase;
     int activePlayer;
     bool gameClosed;
+    //! Player ids in seating (turn) order, first to play first. Empty until the
+    //! server sends an order, in which case players are laid out in id order.
+    QList<int> seatOrder;
 };
 
 #endif // COCKATRICE_GAME_STATE_H

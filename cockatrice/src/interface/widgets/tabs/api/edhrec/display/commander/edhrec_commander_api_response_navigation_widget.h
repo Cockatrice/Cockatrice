@@ -35,6 +35,9 @@ public slots:
 signals:
     void requestUrl(QString url);
 
+private slots:
+    void applyInterfaceDefaultFont();
+
 private:
     QGridLayout *layout;
 

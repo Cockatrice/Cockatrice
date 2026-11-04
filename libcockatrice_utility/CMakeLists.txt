@@ -1,10 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 project(Utility VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
-
 set(UTILITY_SOURCES
     libcockatrice/utility/cryptoutil.cpp
     libcockatrice/utility/expression.cpp
@@ -12,6 +8,7 @@ set(UTILITY_SOURCES
     libcockatrice/utility/passwordhasher.cpp
     libcockatrice/utility/report_categories.cpp
     libcockatrice/utility/server_rate_limiter.cpp
+    libcockatrice/utility/svg_recolor.cpp
     libcockatrice/utility/translation_loader.cpp
     libcockatrice/utility/user_data_backup.cpp
     libcockatrice/utility/warning_categories.cpp
@@ -38,6 +35,7 @@ set(UTILITY_HEADERS
     libcockatrice/utility/zone_names.h
     libcockatrice/utility/days_years_between.h
     libcockatrice/utility/server_rate_limiter.h
+    libcockatrice/utility/svg_recolor.h
     libcockatrice/utility/translation_loader.h
     libcockatrice/utility/user_data_backup.h
     libcockatrice/utility/warning_categories.h

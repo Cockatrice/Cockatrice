@@ -21,7 +21,7 @@
 class QObject;
 
 CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)
-    : QSortFilterProxyModel(parent), isToken(ShowAll), filterString(nullptr),
+    : QSortFilterProxyModel(parent), isToken(ShowAll), filterString(nullptr), cardModel(nullptr),
       collator(NaturalSort::makeNaturalSortCollator())
 {
     filterTree = nullptr;
@@ -33,54 +33,43 @@ CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)
         invalidate();
         emit modelDirty();
     });
-
-    loadedRowCount = 0;
 }
 
 void CardDatabaseDisplayModel::setSourceModel(QAbstractItemModel *model)
 {
+    cardModel = qobject_cast<CardDatabaseModel *>(model);
     QSortFilterProxyModel::setSourceModel(model);
 
     connect(model, &QAbstractItemModel::rowsInserted, this, [this]() { dirty(); });
 
     connect(model, &QAbstractItemModel::rowsRemoved, this, [this]() { dirty(); });
 
-    connect(model, &QAbstractItemModel::modelReset, this, [this]() {
-        loadedRowCount = 0;
-        dirty();
-    });
+    connect(model, &QAbstractItemModel::modelReset, this, [this]() { dirty(); });
+}
+
+QVariant CardDatabaseDisplayModel::data(const QModelIndex &index, int role) const
+{
+    if (role == CardInfoRole) {
+        return QVariant::fromValue(cardInfoAt(index));
+    }
+
+    return QSortFilterProxyModel::data(index, role);
+}
+
+CardInfoPtr CardDatabaseDisplayModel::cardInfoAt(const QModelIndex &index) const
+{
+    if (!index.isValid() || cardModel == nullptr) {
+        return {};
+    }
+
+    const QModelIndex sourceIndex = mapToSource(index);
+    return sourceIndex.isValid() ? cardModel->getCard(sourceIndex.row()) : CardInfoPtr();
 }
 
 QMap<wchar_t, wchar_t> CardDatabaseDisplayModel::characterTranslation = {{L'“', L'\"'},
                                                                          {L'”', L'\"'},
                                                                          {L'‘', L'\''},
                                                                          {L'’', L'\''}};
-
-bool CardDatabaseDisplayModel::canFetchMore(const QModelIndex &index) const
-{
-    return loadedRowCount < sourceModel()->rowCount(index);
-}
-
-void CardDatabaseDisplayModel::fetchMore(const QModelIndex &index)
-{
-    int remainder = sourceModel()->rowCount(index) - loadedRowCount;
-    int itemsToFetch = qMin(100, remainder);
-
-    if (itemsToFetch == 0) {
-        return;
-    }
-
-    const auto startIndex = qMin(rowCount(QModelIndex()), loadedRowCount);
-    beginInsertRows(QModelIndex(), startIndex, startIndex + itemsToFetch - 1);
-
-    loadedRowCount += itemsToFetch;
-    endInsertRows();
-}
-
-int CardDatabaseDisplayModel::rowCount(const QModelIndex &parent) const
-{
-    return QSortFilterProxyModel::rowCount(parent);
-}
 
 bool CardDatabaseDisplayModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
 {

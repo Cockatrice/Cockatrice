@@ -14,6 +14,7 @@ class TabGame;
 TabbedDeckViewContainer::TabbedDeckViewContainer(int _playerId, TabGame *parent)
     : QTabWidget(nullptr), playerId(_playerId), parentGame(parent)
 {
+    setObjectName(QString("tabbedDeckView_%1").arg(_playerId));
     setTabsClosable(true);
     connect(this, &QTabWidget::tabCloseRequested, this, &TabbedDeckViewContainer::closeTab);
 

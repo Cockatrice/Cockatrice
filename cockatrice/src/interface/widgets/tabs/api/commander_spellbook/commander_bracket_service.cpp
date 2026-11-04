@@ -26,6 +26,11 @@ quint64 CommanderBracketService::estimateBracket(const DeckList &deck, QObject *
     return CommanderSpellbookApiAccessor::instance().estimateBracket(deck, requester);
 }
 
+void CommanderBracketService::cancelEstimate(quint64 requestId)
+{
+    CommanderSpellbookApiAccessor::instance().cancelEstimate(requestId);
+}
+
 void CommanderBracketService::onEstimateBracketFinished(CommanderSpellbookApiAccessor::RequestId id,
                                                         QObject *requester,
                                                         const EstimateBracketResult &result)

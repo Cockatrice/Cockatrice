@@ -71,6 +71,11 @@ signals:
     //! should only store it for the connection it is currently negotiating, so
     //! the hostname and user name are intentionally not part of the signal.
     void sigPasswordVerifierReady(const QString &verifier);
+    //! \brief Outcome of the password change the server demanded at login.
+    void sigPasswordChangeSuccess();
+    void sigPasswordChangeError(int responseCode);
+    //! \brief Request a password change; queued to the client thread like the other requests.
+    void sigChangePasswordToServer(const QString &oldPassword, const QString &newPassword);
 private slots:
     void slotConnected();
     void readData();
@@ -99,6 +104,8 @@ private slots:
     Command_Login generateCommandLogin();
     void doSubmitPasswordVerifier();
     void submitPasswordVerifierResponse(const Response &response);
+    void accountPasswordResponse(const Response &response);
+    void doChangePasswordToServer(const QString &oldPassword, const QString &newPassword);
     void doDisconnectFromServer();
     void doActivateToServer(const QString &_token);
     void doRequestForgotPasswordToServer(const QString &hostname, unsigned int port, const QString &_userName);
@@ -201,6 +208,10 @@ public:
                                                unsigned int port,
                                                const QString &_userName,
                                                const QString &_email);
+    //! \brief Change the password of the account that just logged in, following the
+    //! server's forced-password-change reply. Emits sigPasswordChangeSuccess or
+    //! sigPasswordChangeError when the server answers.
+    void changePasswordToServer(const QString &oldPassword, const QString &newPassword);
 };
 
 #endif

@@ -28,12 +28,16 @@ class QWidget;
  */
 AbstractDlgDeckTextEdit::AbstractDlgDeckTextEdit(QWidget *parent) : QDialog(parent)
 {
+    setObjectName("dlgDeckTextEdit");
+
     contentsEdit = new QPlainTextEdit;
+    contentsEdit->setObjectName("contentsEdit");
 
     refreshButton = new QPushButton(tr("&Refresh"));
     connect(refreshButton, &QPushButton::clicked, this, &AbstractDlgDeckTextEdit::actRefresh);
 
     auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    buttonBox->setObjectName("buttonBox");
     buttonBox->addButton(refreshButton, QDialogButtonBox::ActionRole);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &AbstractDlgDeckTextEdit::actOK);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &AbstractDlgDeckTextEdit::reject);

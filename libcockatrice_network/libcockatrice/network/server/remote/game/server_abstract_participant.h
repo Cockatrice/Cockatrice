@@ -2,6 +2,7 @@
 #define ABSTRACT_PARTICIPANT_H
 
 #include "../serverinfo_user_container.h"
+#include "role_info.h"
 #include "server_arrowtarget.h"
 
 #include <QMutex>
@@ -52,6 +53,7 @@ class Command_DeckSelect;
 class Command_SetSideboardLock;
 class Command_ChangeZoneProperties;
 class Command_SetPlaymat;
+class Command_SetPlayerOrder;
 
 class Server_AbstractParticipant : public Server_ArrowTarget, public ServerInfo_User_Container
 {
@@ -61,8 +63,7 @@ protected:
     Server_AbstractUserInterface *userInterface;
     int pingTime;
     int playerId;
-    bool spectator;
-    bool judge;
+    RoleInfo roleInfo;
     virtual void getPlayerProperties(ServerInfo_PlayerProperties &result);
     mutable QMutex playerMutex;
 
@@ -70,7 +71,7 @@ public:
     Server_AbstractParticipant(Server_Game *_game,
                                int _playerId,
                                const ServerInfo_User &_userInfo,
-                               bool _judge,
+                               const RoleInfo &_roleInfo,
                                Server_AbstractUserInterface *_handler);
     ~Server_AbstractParticipant() override;
     virtual void prepareDestroy()
@@ -89,13 +90,17 @@ public:
     {
         return playerId;
     }
+    void setPlayerId(int _playerId)
+    {
+        playerId = _playerId;
+    }
     bool isSpectator() const
     {
-        return spectator;
+        return roleInfo.isSpectator;
     }
     bool isJudge() const
     {
-        return judge;
+        return roleInfo.isJudge;
     }
     Server_Game *getGame() const
     {
@@ -172,6 +177,8 @@ public:
     cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer &rc, GameEventStorage &ges, int randomCount = 1);
     virtual Response::ResponseCode
     cmdReverseTurn(const Command_ReverseTurn & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage &ges);
+    virtual Response::ResponseCode
+    cmdSetPlayerOrder(const Command_SetPlayerOrder &cmd, ResponseContainer &rc, GameEventStorage &ges);
     virtual Response::ResponseCode
     cmdChangeZoneProperties(const Command_ChangeZoneProperties &cmd, ResponseContainer &rc, GameEventStorage &ges);
 

@@ -1,7 +1,3 @@
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
-
 set(HEADERS
     game/dump_zone_range.h
     game/server_abstract_participant.h
@@ -12,6 +8,7 @@ set(HEADERS
     game/server_cardzone.h
     game/server_counter.h
     game/game_config.h
+    game/role_info.h
     game/server_deck_validation_strategy.h
     game/server_game.h
     game/server_game_lifecycle_strategy.h

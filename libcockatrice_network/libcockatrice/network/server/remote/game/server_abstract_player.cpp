@@ -81,10 +81,9 @@ Server_AbstractPlayer::Server_AbstractPlayer(Server_Game *_game,
                                              const ServerInfo_User &_userInfo,
                                              bool _judge,
                                              Server_AbstractUserInterface *_userInterface)
-    : Server_AbstractParticipant(_game, _playerId, _userInfo, _judge, _userInterface), conceded(false), deck(nullptr),
-      sideboardLocked(true), readyStart(false), nextCardId(0)
+    : Server_AbstractParticipant(_game, _playerId, _userInfo, {.isJudge = _judge}, _userInterface), conceded(false),
+      deck(nullptr), sideboardLocked(true), readyStart(false), nextCardId(0)
 {
-    spectator = false;
 }
 
 Server_AbstractPlayer::~Server_AbstractPlayer() = default;
@@ -295,7 +294,7 @@ Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
 {
     // Disallow controller change to other zones than the table.
     if (((targetzone->getType() != ServerInfo_Zone::PublicZone) || !targetzone->hasCoords()) &&
-        (startzone->getPlayer() != targetzone->getPlayer()) && !judge) {
+        (startzone->getPlayer() != targetzone->getPlayer()) && !isJudge()) {
         return Response::RespContextError;
     }
 
@@ -808,7 +807,7 @@ Server_AbstractPlayer::cmdMoveCard(const Command_MoveCard &cmd, ResponseContaine
         return Response::RespNameNotFound;
     }
 
-    if ((startPlayer != this) && (!startZone->getPlayersWithWritePermission().contains(playerId)) && !judge) {
+    if ((startPlayer != this) && (!startZone->getPlayersWithWritePermission().contains(playerId)) && !isJudge()) {
         return Response::RespContextError;
     }
 
@@ -821,7 +820,7 @@ Server_AbstractPlayer::cmdMoveCard(const Command_MoveCard &cmd, ResponseContaine
         return Response::RespNameNotFound;
     }
 
-    if ((startPlayer != this) && (targetPlayer != this) && !judge) {
+    if ((startPlayer != this) && (targetPlayer != this) && !isJudge()) {
         return Response::RespContextError;
     }
 
@@ -1607,7 +1606,7 @@ Response::ResponseCode Server_AbstractPlayer::cmdRevealCards(const Command_Revea
             zone->addWritePermission(cmd.player_id());
         }
 
-        if (judge) {
+        if (isJudge()) {
             ges.setOverwriteOwnership(true);
         }
 
