@@ -99,7 +99,6 @@ void TabArchidekt::startRequest(QUrl url, RequestKind kind, int page)
     requestUrl = url;
     requestKind = kind;
     requestedPage = page;
-    isListMode = kind != RequestKind::Deck;
     isLoadingMore = true;
     retryButton->hide();
     requestStatusLabel->setText(kind == RequestKind::Deck ? tr("Loading deck…") : tr("Loading decks…"));
@@ -580,7 +579,6 @@ void TabArchidekt::doSearchImmediate()
 {
     searchDebounceTimer->stop();
     currentPage = 1;
-    nextPageUrl.clear();
     startRequest(QUrl(buildSearchUrl()), RequestKind::Search);
 }
 
@@ -598,7 +596,6 @@ void TabArchidekt::loadNextPage()
 void TabArchidekt::actNavigatePage(QString url)
 {
     searchDebounceTimer->stop();
-    nextPageUrl.clear();
     startRequest(QUrl(url), RequestKind::Deck);
 }
 
@@ -670,6 +667,9 @@ void TabArchidekt::processTopDecksResponse(QJsonObject reply)
     ArchidektDeckListingApiResponse deckData;
     deckData.fromJson(reply);
 
+    // An accepted listing restores list mode; a failed deck navigation leaves the listing usable.
+    isListMode = true;
+
     // New search → clear everything
     if (requestKind == RequestKind::Search) {
         listingsWidget = nullptr;
@@ -697,6 +697,7 @@ void TabArchidekt::processDeckResponse(QJsonObject reply)
 
     // We're in single deck mode - disable infinite scroll
     isListMode = false;
+    nextPageUrl.clear();
 
     // Clear existing results for single deck view
     listingsWidget = nullptr;
