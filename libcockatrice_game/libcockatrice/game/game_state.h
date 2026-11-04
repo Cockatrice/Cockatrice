@@ -33,7 +33,11 @@ public:
 
     void setHostId(int _hostId)
     {
+        if (hostId == _hostId) {
+            return;
+        }
         hostId = _hostId;
+        emit hostChanged(hostId);
     }
 
     QList<AbstractClient *> getClients() const
@@ -136,6 +140,7 @@ signals:
     void gameStopped();
     void activePhaseChanged(int activePhase);
     void activePlayerChanged(int playerId);
+    void hostChanged(int hostId);
     void seatOrderChanged(const QList<int> &seatOrder);
 
 public slots:
@@ -156,6 +161,8 @@ private:
     int currentPhase;
     int activePlayer;
     bool gameClosed;
+    //! Player ids in seating (turn) order, first to play first. Empty until the
+    //! server sends an order, in which case players are laid out in id order.
     QList<int> seatOrder;
 };
 

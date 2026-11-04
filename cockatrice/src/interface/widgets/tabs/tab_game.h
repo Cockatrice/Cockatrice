@@ -164,6 +164,7 @@ private slots:
     void actConcede();
     void actCopyGameLink();
     void actTurnOrder();
+    void updateTurnOrderAction();
     void actRemoveLocalArrows();
     void actRotateViewCW();
     void actRotateViewCCW();

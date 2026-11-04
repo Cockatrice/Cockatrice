@@ -192,6 +192,7 @@ void TabGame::connectToGameState()
 {
     connect(game->getGameState(), &GameState::gameStarted, this, &TabGame::startGame);
     connect(game->getGameState(), &GameState::gameStopped, this, &TabGame::stopGame);
+    connect(game->getGameState(), &GameState::hostChanged, this, &TabGame::updateTurnOrderAction);
     connect(game->getGameState(), &GameState::activePhaseChanged, this, &TabGame::setActivePhase);
     connect(game->getGameState(), &GameState::activePlayerChanged, this, &TabGame::setActivePlayer);
 }
@@ -664,7 +665,20 @@ void TabGame::actTurnOrder()
         return;
     }
 
-    game->getGameEventHandler()->handleSetPlayerOrder(dlg.order(), dlg.randomize());
+    game->getGameEventHandler()->handleSetPlayerOrder(dlg.order(), dlg.isRandomizeRequested());
+}
+
+/**
+ * Shows the turn order action only when it can actually change anything: the
+ * player must be host and the game must not have started yet. Called whenever
+ * either condition may have changed (game start/stop, host change).
+ */
+void TabGame::updateTurnOrderAction()
+{
+    if (aTurnOrder == nullptr) {
+        return;
+    }
+    aTurnOrder->setVisible(game->isHost() && !game->getGameMetaInfo()->started());
 }
 
 /**
@@ -995,6 +1009,7 @@ void TabGame::startGame(bool _resuming)
         aConcede->setText(tr("&Concede"));
         aConcede->setEnabled(true);
     }
+    updateTurnOrderAction();
 }
 
 void TabGame::stopGame()
@@ -1017,6 +1032,7 @@ void TabGame::stopGame()
         aConcede->setText(tr("&Concede"));
         aConcede->setEnabled(false);
     }
+    updateTurnOrderAction();
 }
 
 void TabGame::closeGame()
@@ -1143,9 +1159,7 @@ void TabGame::createMenuItems()
     connect(aReverseTurn, &QAction::triggered, game->getGameEventHandler(), &GameEventHandler::handleReverseTurn);
     aTurnOrder = new QAction(this);
     connect(aTurnOrder, &QAction::triggered, this, &TabGame::actTurnOrder);
-    if (!game->isHost() || game->getGameMetaInfo()->started()) {
-        aTurnOrder->setVisible(false);
-    }
+    updateTurnOrderAction();
     aRemoveLocalArrows = new QAction(this);
     connect(aRemoveLocalArrows, &QAction::triggered, this, &TabGame::actRemoveLocalArrows);
     aRotateViewCW = new QAction(this);

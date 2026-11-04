@@ -123,10 +123,10 @@ void DlgCreateGame::sharedCtor()
     auto *gameSetupOptionsLayout = new QGridLayout;
     gameSetupOptionsLayout->addWidget(startingLifeTotalLabel, 0, 0);
     gameSetupOptionsLayout->addWidget(startingLifeTotalEdit, 0, 1);
-    gameSetupOptionsLayout->addWidget(shareDecklistsOnLoadCheckBox, 1, 0);
-    gameSetupOptionsLayout->addWidget(shufflePlayersCheckBox, 1, 1);
+    gameSetupOptionsLayout->addWidget(shareDecklistsOnLoadCheckBox, 1, 0, 1, 2);
+    gameSetupOptionsLayout->addWidget(shufflePlayersCheckBox, 2, 0, 1, 2);
     if (room && room->getUserInfo()->user_level() & ServerInfo_User::IsJudge) {
-        gameSetupOptionsLayout->addWidget(createGameAsJudgeCheckBox, 2, 0);
+        gameSetupOptionsLayout->addWidget(createGameAsJudgeCheckBox, 3, 0, 1, 2);
     } else {
         createGameAsJudgeCheckBox->setChecked(false);
         createGameAsJudgeCheckBox->setHidden(true);

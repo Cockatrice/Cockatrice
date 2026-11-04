@@ -38,7 +38,7 @@ public:
 
     void retranslateUi();
 
-    [[nodiscard]] bool randomize() const
+    [[nodiscard]] bool isRandomizeRequested() const
     {
         return randomizeRequested;
     }
