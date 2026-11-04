@@ -1,6 +1,7 @@
 #include "game_scene.h"
 
 #include "../client/settings/cache_settings.h"
+#include "../interface/theme_manager.h"
 #include "animated_item.h"
 #include "board/abstract_card_item.h"
 #include "board/arrow_item.h"
@@ -35,6 +36,7 @@
 #include <functional>
 #include <libcockatrice/game/abstract_game.h>
 #include <libcockatrice/game/board/arrow_data.h>
+#include <libcockatrice/game/game_state.h>
 #include <libcockatrice/game/player/player_actions.h>
 #include <libcockatrice/game/player/player_event_handler.h>
 #include <libcockatrice/game/player/player_info.h>
@@ -64,6 +66,14 @@ GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
     addItem(phasesToolbar);
     connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::minPlayersForMultiColumnLayoutChanged, this,
             &GameScene::rearrange);
+    // CardText items (P/T boxes, counters, player names) read the role at
+    // paint time and cache their rendering, so touch every item to invalidate
+    // the caches and pick up the new family on font changes.
+    connect(themeManager, &ThemeManager::fontsChanged, this, [this] {
+        for (auto *item : items()) {
+            item->update();
+        }
+    });
 
     rearrange();
 }
@@ -429,6 +439,37 @@ QList<PlayerLogic *> GameScene::collectActivePlayers(int &firstPlayerIndex) cons
             if (!firstPlayerFound && p->getPlayerInfo()->getLocal()) {
                 firstPlayerIndex = activePlayers.size() - 1;
                 firstPlayerFound = true;
+            }
+        }
+    }
+
+    // Lay out the table in seat order rather than id order. Players missing
+    // from the tracked order keep id order at the end.
+    QList<int> seatOrder;
+    for (auto *pgItem : playerViews.values()) {
+        if (PlayerLogic *p = pgItem->getLogic()) {
+            seatOrder = p->getGame()->getGameState()->getSeatOrder();
+            break;
+        }
+    }
+    if (!seatOrder.isEmpty()) {
+        std::sort(activePlayers.begin(), activePlayers.end(), [&](PlayerLogic *a, PlayerLogic *b) {
+            int indexA = seatOrder.indexOf(a->getPlayerInfo()->getId());
+            int indexB = seatOrder.indexOf(b->getPlayerInfo()->getId());
+            if (indexA == -1) {
+                indexA = seatOrder.size() + a->getPlayerInfo()->getId();
+            }
+            if (indexB == -1) {
+                indexB = seatOrder.size() + b->getPlayerInfo()->getId();
+            }
+            return indexA < indexB;
+        });
+        // Recompute the local-player index after sorting.
+        firstPlayerIndex = 0;
+        for (int i = 0; i < activePlayers.size(); ++i) {
+            if (activePlayers[i]->getPlayerInfo()->getLocal()) {
+                firstPlayerIndex = i;
+                break;
             }
         }
     }

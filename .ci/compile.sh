@@ -175,9 +175,9 @@ fi
 if [[ $MAKE_SANITIZE ]]; then
   flags+=("-DENABLE_SANITIZERS=ON")
 else
-  # The release-package step re-runs cmake in the same build dir, so an
-  # ENABLE_SANITIZERS=ON left over from the debug step would otherwise leak
-  # into the shipped binaries (libasan/libubsan Depends in the DEB).
+  # Every leg states the flag explicitly rather than relying on the CMake
+  # default, so a build directory reused from a sanitized configuration can
+  # never leak libasan/libubsan into a shipped binary.
   flags+=("-DENABLE_SANITIZERS=OFF")
 fi
 if [[ $MAKE_COVERAGE ]]; then
@@ -185,9 +185,6 @@ if [[ $MAKE_COVERAGE ]]; then
 fi
 if [[ $USE_CCACHE ]]; then
   flags+=("-DUSE_CCACHE=1")
-  # PCH-aware caching is required or ccache refuses to cache any TU that
-  # consumes a precompiled header, silently recompiling everything on every run.
-  ccache --set-config sloppiness=pch_defines,time_macros
   if [[ $CCACHE_SIZE ]]; then
     # note, this setting persists after running the script
     ccache --max-size "$CCACHE_SIZE"
@@ -377,6 +374,21 @@ cmake --version
 echo "Running cmake with flags: ${flags[*]}"
 cmake .. "${flags[@]}"
 echo "::endgroup::"
+
+if [[ $USE_CCACHE ]]; then
+  # PCH-aware caching is required or ccache refuses to cache any TU that consumes a
+  # precompiled header, silently recompiling everything on every run. The mtime and ctime
+  # entries cover files created during the build itself: the moc/uic/rcc output and the
+  # protobuf headers are generated after ccache starts, so without them every TU including
+  # one is read as a race and never cached. Checked-out sources are older than the compile
+  # that follows them and do not trip the check.
+  #
+  # This has to run after configure: CMakeLists.txt sets sloppiness=pch_defines,time_macros
+  # at configure time, and --set-config replaces the whole list rather than extending it, so
+  # setting it earlier would leave the build below with two entries. Re-asserting all four
+  # here is what actually reaches the compiler; the order is the point.
+  ccache --set-config sloppiness=pch_defines,time_macros,include_file_mtime,include_file_ctime
+fi
 
 echo "::group::Build project"
 cpuinfo

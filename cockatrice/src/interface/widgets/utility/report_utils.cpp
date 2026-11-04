@@ -1,5 +1,6 @@
 #include "report_utils.h"
 
+#include "../../theme_manager.h"
 #include "libcockatrice/protocol/pb/serverinfo_report.pb.h"
 
 #include <QApplication>
@@ -7,6 +8,7 @@
 #include <QChar>
 #include <QColor>
 #include <QDateTime>
+#include <QFontDatabase>
 #include <QPalette>
 #include <QSharedPointer>
 #include <QTableWidget>
@@ -18,6 +20,20 @@
 
 namespace report_utils
 {
+
+QFont reportLogFont()
+{
+    if (themeManager->hasAppFont(AppFont::ChatLog)) {
+        return themeManager->appFont(AppFont::ChatLog);
+    }
+    QFont monoFont(QStringLiteral("monospace"));
+    monoFont.setStyleHint(QFont::Monospace);
+    const int systemPointSize = QFontDatabase::systemFont(QFontDatabase::GeneralFont).pointSize();
+    if (systemPointSize > 0) {
+        monoFont.setPointSize(systemPointSize);
+    }
+    return monoFont;
+}
 
 namespace
 {

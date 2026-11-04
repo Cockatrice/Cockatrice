@@ -1,6 +1,6 @@
 #include "visual_deck_display_options_widget.h"
 
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 #include "../deck_editor/deck_editor_deck_dock_widget.h"
 #include "../quick_settings/settings_button_widget.h"
 #include "../tabs/visual_deck_editor/tab_deck_editor_visual.h"
@@ -65,7 +65,7 @@ VisualDeckDisplayOptionsWidget::VisualDeckDisplayOptionsWidget(QWidget *parent) 
     sortByLabel = new QLabel(this);
 
     sortCriteriaButton = new SettingsButtonWidget(this);
-    sortCriteriaButton->setButtonIcon(themePixmap(QStringLiteral("icons/sort_arrow_down")));
+    sortCriteriaButton->setButtonIcon(loadThemedIcon(QStringLiteral("icons/sort_arrow_down")));
 
     sortLabel = new QLabel(sortCriteriaButton);
     sortLabel->setWordWrap(true);
@@ -119,11 +119,11 @@ void VisualDeckDisplayOptionsWidget::updateDisplayTypeButton()
     switch (currentDisplayType) {
         case DisplayType::Flat:
             displayTypeButton->setButtonText(tr("Toggle Layout: Flat"));
-            displayTypeButton->setButtonIcon(themePixmap(QStringLiteral("icons/scroll")));
+            displayTypeButton->setButtonIcon(loadThemedIcon(QStringLiteral("icons/scroll")));
             break;
         case DisplayType::Overlap:
             displayTypeButton->setButtonText(tr("Toggle Layout: Overlap"));
-            displayTypeButton->setButtonIcon(themePixmap(QStringLiteral("icons/scales")));
+            displayTypeButton->setButtonIcon(loadThemedIcon(QStringLiteral("icons/scales")));
             break;
     }
 }

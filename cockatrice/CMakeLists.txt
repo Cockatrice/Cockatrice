@@ -15,6 +15,7 @@ set(cockatrice_SOURCES
     src/client/network/update/client/client_update_checker.cpp
     src/client/network/update/client/release_channel.cpp
     src/client/network/update/card_spoiler/spoiler_background_updater.cpp
+    src/client/network/update/card_spoiler/spoiler_file.cpp
     src/client/crash/crash_reporter.cpp
     src/client/latency_graph_widget.cpp
     src/client/latency_status_widget.cpp
@@ -56,6 +57,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/dlg_settings.cpp
     src/interface/widgets/dialogs/dlg_startup_card_check.cpp
     src/interface/widgets/dialogs/dlg_tip_of_the_day.cpp
+    src/interface/widgets/dialogs/dlg_turn_order.cpp
     src/interface/widgets/dialogs/dlg_update.cpp
     src/interface/widgets/dialogs/dlg_view_log.cpp
     src/interface/widgets/dialogs/override_printing_warning.cpp
@@ -150,11 +152,13 @@ set(cockatrice_SOURCES
     src/interface/widgets/utility/reversed_completer_model.cpp
     src/interface/pixel_map_generator.cpp
     src/interface/theme_config.cpp
+    src/interface/theme_icon.cpp
     src/interface/theme_manager.cpp
     src/interface/palette_editor/color_button.cpp
     src/interface/palette_editor/palette_generator.cpp
     src/interface/palette_editor/quick_setup_panel.cpp
     src/interface/palette_editor/palette_grid_widget.cpp
+    src/interface/palette_editor/font_grid_widget.cpp
     src/interface/palette_editor/palette_editor_dialog.cpp
     src/interface/widgets/cards/additional_info/color_identity_widget.cpp
     src/interface/widgets/cards/additional_info/deck_color_identity.cpp
@@ -250,6 +254,8 @@ set(cockatrice_SOURCES
     src/interface/widgets/playmat/playmat_settings_dialog.cpp
     src/interface/widgets/quick_settings/settings_button_widget.cpp
     src/interface/widgets/quick_settings/settings_popup_widget.cpp
+    src/interface/widgets/replay/replay_event_index.cpp
+    src/interface/widgets/replay/replay_event_sidebar.cpp
     src/interface/widgets/replay/replay_manager.cpp
     src/interface/widgets/replay/replay_quick_settings_widget.cpp
     src/interface/widgets/replay/replay_timeline_widget.cpp
@@ -450,6 +456,8 @@ set(cockatrice_SOURCES
     src/interface/intents/intent_open_shared_deck.h
     src/interface/intents/url_parser.cpp
     src/interface/intents/url_parser.h
+    src/interface/widgets/server/user/user_games_model.cpp
+    src/interface/widgets/server/user/user_games_model.h
     src/interface/widgets/server/user/user_info_popup.cpp
     src/interface/widgets/server/user/user_info_popup.h
 )
@@ -493,7 +501,15 @@ if(APPLE)
   set(cockatrice_SOURCES ${cockatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 endif(APPLE)
 
-qt_add_resources(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
+# The fonts and card artwork produce a large C++ byte array with qt_add_resources.
+# Embed the data in the compiled resource object instead, keeping compiler memory
+# independent of that payload. Qt's two-pass resource build is unsupported on iOS.
+if(IOS)
+  qt_add_resources(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
+else()
+  qt_add_big_resources(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
+endif()
+set_source_files_properties(${cockatrice_RESOURCES} PROPERTIES SKIP_AUTORCC ON)
 
 # Declare path variables
 set(ICONDIR
@@ -519,6 +535,7 @@ qt_add_executable(
   WIN32
   MACOSX_BUNDLE
   ${cockatrice_SOURCES}
+  ${cockatrice_RESOURCES}
   ${cockatrice_RESOURCES_RCC}
   ${cockatrice_MOC_SRCS}
   MANUAL_FINALIZATION
@@ -564,6 +581,14 @@ target_link_libraries(
 )
 
 cockatrice_target_enable_crash_reporting(cockatrice)
+
+if(WITH_GUI_TEST)
+  # These two translate between XML test files and the QtTesting event pipeline;
+  # they need the QtTesting headers, so they only exist with the harness.
+  target_sources(cockatrice PRIVATE src/game_graphics/pq_cockatrice_event_player.cpp src/interface/recording.cpp)
+  target_link_libraries(cockatrice PRIVATE QtTesting)
+  target_compile_definitions(cockatrice PRIVATE WITH_GUI_TEST)
+endif()
 
 if(UNIX)
   if(APPLE)

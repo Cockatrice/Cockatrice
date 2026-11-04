@@ -177,7 +177,29 @@ cockatrice_add_test(NAME test_age_formatting SOURCES test_age_formatting.cpp LIB
 cockatrice_add_test(NAME user_data_backup_test SOURCES user_data_backup_test.cpp LIBS libcockatrice_utility)
 cockatrice_add_test(NAME password_hash_test SOURCES password_hash_test.cpp LIBS libcockatrice_utility)
 cockatrice_add_test(NAME report_categories_test SOURCES report_categories_test.cpp LIBS libcockatrice_utility)
+cockatrice_add_test(NAME svg_recolor_test SOURCES svg_recolor_test.cpp LIBS libcockatrice_utility)
 cockatrice_add_test(NAME warning_categories_test SOURCES warning_categories_test.cpp LIBS libcockatrice_utility)
+cockatrice_add_test(
+  NAME
+  user_games_model_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/server/user/user_games_model.cpp
+  user_games_model_test.cpp
+  LIBS
+  libcockatrice_network_client_abstract
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src
+  ${CMAKE_SOURCE_DIR}/libcockatrice_network
+)
+cockatrice_add_test(
+  NAME
+  spoiler_file_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network/update/card_spoiler/spoiler_file.cpp
+  spoiler_file_test.cpp
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src
+)
 # The installer's holder probe is Windows-only, but the wording it produces and the
 # question which programs are the payload's own are plain C++ and are what a stuck user
 # has to act on, so they are tested everywhere.
@@ -207,6 +229,18 @@ cockatrice_add_test(
   LIBS
   libcockatrice_deck_list
   libcockatrice_utility
+)
+cockatrice_add_test(
+  NAME
+  card_art_crop_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/cards/card_art_utils.cpp
+  ${VERSION_STRING_CPP}
+  card_art_crop_test.cpp
+  LIBS
+  libcockatrice_card
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src
 )
 cockatrice_add_test(
   NAME
@@ -414,6 +448,15 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  font_config_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/theme_config.cpp
+  font_config_test.cpp
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src
+)
+cockatrice_add_test(
+  NAME
   deck_hash_performance_test
   SOURCES
   deck_hash_performance_test.cpp
@@ -523,6 +566,7 @@ add_subdirectory(card_zone_algorithms)
 add_subdirectory(carddatabase)
 add_subdirectory(deck_list_model)
 add_subdirectory(deck_list_zones)
+add_subdirectory(icon_assets)
 add_subdirectory(loading_from_clipboard)
 add_subdirectory(model_contract)
 add_subdirectory(movecard_tests)

@@ -1,5 +1,7 @@
 #include "filter_tree_model.h"
 
+#include "../interface/theme_manager.h"
+
 #include <QFlags>
 #include <QFont>
 #include <QString>
@@ -39,6 +41,12 @@ FilterTreeModel::FilterTreeModel(QObject *parent) : QAbstractItemModel(parent)
     connect(fTree, &FilterTree::postInsertRow, this, &FilterTreeModel::proxyEndInsertRow);
     connect(fTree, &FilterTree::preRemoveRow, this, &FilterTreeModel::proxyBeginRemoveRow);
     connect(fTree, &FilterTree::postRemoveRow, this, &FilterTreeModel::proxyEndRemoveRow);
+    // FontRole data reads the DeckList role live; rebroadcast so attached
+    // views re-query instead of waiting for an incidental repaint.
+    connect(themeManager, &ThemeManager::fontsChanged, this, [this] {
+        emit layoutAboutToBeChanged();
+        emit layoutChanged();
+    });
 }
 
 FilterTreeModel::~FilterTreeModel()
@@ -202,7 +210,8 @@ QVariant FilterTreeModel::data(const QModelIndex &index, int role) const
     switch (role) {
         case Qt::FontRole:
             if (!node->isLeaf()) {
-                QFont f;
+                // Family comes from the DeckList theme role; bold stays caller-side.
+                QFont f = themeManager->appFont(AppFont::DeckList);
                 f.setBold(true);
                 return f;
             }

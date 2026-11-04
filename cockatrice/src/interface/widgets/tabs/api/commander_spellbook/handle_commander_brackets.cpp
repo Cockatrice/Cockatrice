@@ -3,11 +3,14 @@
 #include "../../../../../client/settings/cache_settings.h"
 
 #include <QByteArray>
+#include <QJsonArray>
 #include <QJsonDocument>
+#include <QJsonObject>
 #include <QJsonParseError>
 #include <QMap>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
+#include <QSet>
 #include <QString>
 #include <QStringLiteral>
 #include <QUrl>
@@ -20,6 +23,14 @@ static const QUrl COMMANDER_BRACKET_JSON_URL(QStringLiteral("https://cockatrice.
 HandleCommanderBrackets::HandleCommanderBrackets(QObject *parent)
     : QObject(parent), nam(NetworkManagerFactory::create(this)), reply(nullptr)
 {
+}
+
+HandleCommanderBrackets::~HandleCommanderBrackets()
+{
+    if (reply) {
+        disconnect(reply, nullptr, this, nullptr);
+        reply->abort();
+    }
 }
 
 void HandleCommanderBrackets::downloadBracketDefinitions()
@@ -35,31 +46,49 @@ void HandleCommanderBrackets::downloadBracketDefinitions()
 
 void HandleCommanderBrackets::actFinishParsingDownloadedData()
 {
-    reply = qobject_cast<QNetworkReply *>(sender());
+    auto *finishedReply = qobject_cast<QNetworkReply *>(sender());
+    if (!finishedReply || finishedReply != reply) {
+        return;
+    }
 
-    if (reply->error() != QNetworkReply::NoError) {
-        emit sigBracketDefinitionsDownloadFailed(reply->error());
+    // Clear the active request before notifying listeners, which may immediately retry.
+    reply = nullptr;
+    finishedReply->deleteLater();
 
-        reply->deleteLater();
+    if (finishedReply->error() != QNetworkReply::NoError) {
+        emit sigBracketDefinitionsDownloadFailed(finishedReply->error());
         return;
     }
 
     QJsonParseError parseError;
 
-    auto document = QJsonDocument::fromJson(reply->readAll(), &parseError);
+    auto document = QJsonDocument::fromJson(finishedReply->readAll(), &parseError);
 
-    if (parseError.error != QJsonParseError::NoError) {
+    if (parseError.error != QJsonParseError::NoError || !document.isObject() ||
+        !document.object().value("brackets").isArray() || document.object().value("brackets").toArray().isEmpty()) {
         emit sigBracketDefinitionsDownloadFailed(QNetworkReply::UnknownContentError);
-
-        reply->deleteLater();
         return;
+    }
+
+    // Validate the complete replacement before touching the last usable definitions.
+    // Tags are QSettings group names, so path separators must not create nested groups.
+    QSet<QString> tags;
+    for (const auto &value : document.object().value("brackets").toArray()) {
+        const auto definition = value.toObject();
+        const auto tag = definition.value("tag").toString();
+        if (!value.isObject() || tag.trimmed().isEmpty() || tag.contains('/') || tag.contains('\\') ||
+            tags.contains(tag) || definition.value("officialName").toString().trimmed().isEmpty() ||
+            definition.value("displayName").toString().trimmed().isEmpty() ||
+            !definition.value("explanation").isString()) {
+            emit sigBracketDefinitionsDownloadFailed(QNetworkReply::UnknownContentError);
+            return;
+        }
+        tags.insert(tag);
     }
 
     updateBracketDefinitions(document.toVariant().toMap());
 
     emit sigBracketDefinitionsDownloaded();
-
-    reply->deleteLater();
 }
 
 void HandleCommanderBrackets::updateBracketDefinitions(const QVariantMap &jsonMap)

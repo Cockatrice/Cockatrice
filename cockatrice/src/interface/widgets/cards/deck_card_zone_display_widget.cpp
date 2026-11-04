@@ -69,6 +69,7 @@ DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
     updateZoneCardCount();
 
     connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &DeckCardZoneDisplayWidget::onCategoryAddition);
+    connect(deckListModel, &QAbstractItemModel::layoutChanged, this, &DeckCardZoneDisplayWidget::displayCards);
     if (selectionModel) {
         connect(selectionModel, &QItemSelectionModel::selectionChanged, this,
                 &DeckCardZoneDisplayWidget::onSelectionChanged);
@@ -174,6 +175,9 @@ void DeckCardZoneDisplayWidget::displayCards()
 
     for (const QPersistentModelIndex &persistent : rows) {
         constructAppropriateWidget(persistent);
+        // Reuse existing widgets when a model sort moves their persistent rows.
+        // This preserves collapsed groups and card selection during live edits.
+        cardGroupLayout->insertWidget(persistent.row(), indexToWidgetMap.value(persistent));
     }
 }
 
