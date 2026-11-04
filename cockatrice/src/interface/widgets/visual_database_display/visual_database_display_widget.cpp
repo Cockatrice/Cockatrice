@@ -156,7 +156,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 
     clearFilterWidget = new QToolButton();
     clearFilterWidget->setFixedSize(32, 32);
-    clearFilterWidget->setIcon(loadThemedIcon(QStringLiteral("icons/delete")));
+    clearFilterWidget->setIcon(loadThemedIcon(QStringLiteral("icons/delete"), AppColor::Negative));
     connect(clearFilterWidget, &QToolButton::clicked, this, [this] {
         filterModel->blockSignals(true);
         filterModel->filterTree()->blockSignals(true);

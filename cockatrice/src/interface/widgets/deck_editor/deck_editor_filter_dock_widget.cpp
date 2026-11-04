@@ -64,7 +64,7 @@ void DeckEditorFilterDockWidget::createFiltersDock()
     connect(filterBuilder, &FilterBuilder::add, filterModel, &FilterTreeModel::addFilter);
 
     aClearFilterOne = new QAction(QString(), this);
-    aClearFilterOne->setIcon(loadThemedIcon(QStringLiteral("icons/decrement")));
+    aClearFilterOne->setIcon(loadThemedIcon(QStringLiteral("icons/decrement"), AppColor::Negative));
     connect(aClearFilterOne, &QAction::triggered, this, &DeckEditorFilterDockWidget::actClearFilterOne);
 
     aClearFilterAll = new QAction(QString(), this);

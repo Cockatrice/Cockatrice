@@ -187,3 +187,86 @@ TEST_F(ThemeIconRenderTest, LowercaseSentinelIsResolved)
     ASSERT_FALSE(pixmap.isNull());
     EXPECT_GT(countOpaquePixels(pixmap, QColor(QStringLiteral("#123456"))), 0);
 }
+
+/**
+ * @brief A semantic tint must paint its theme color, not the selection accent.
+ *
+ * A theme written before Positive/Negative existed has no stored value, so this
+ * also covers the fallback that used to return the highlight color.
+ */
+TEST_F(ThemeIconRenderTest, AppColorTintUsesSemanticColorNotTheAccent)
+{
+    QPalette palette = qApp->palette();
+    const QColor accent(QStringLiteral("#ff00ff"));
+    palette.setColor(QPalette::Active, QPalette::Highlight, accent);
+    qApp->setPalette(palette);
+
+    const QColor positive = themeManager->appColor(AppColor::Positive);
+    const QColor negative = themeManager->appColor(AppColor::Negative);
+    ASSERT_TRUE(positive.isValid());
+    ASSERT_TRUE(negative.isValid());
+    EXPECT_NE(positive, accent);
+    EXPECT_NE(negative, accent);
+
+    const QPixmap positivePixmap = loadSentinelSvgPixmap(QStringLiteral("icons/search.svg"), AppColor::Positive);
+    ASSERT_FALSE(positivePixmap.isNull());
+    EXPECT_GT(countOpaquePixels(positivePixmap, positive), 0);
+    EXPECT_EQ(countOpaquePixels(positivePixmap, accent), 0);
+
+    const QPixmap negativePixmap = loadSentinelSvgPixmap(QStringLiteral("icons/search.svg"), AppColor::Negative);
+    ASSERT_FALSE(negativePixmap.isNull());
+    EXPECT_GT(countOpaquePixels(negativePixmap, negative), 0);
+    EXPECT_EQ(countOpaquePixels(negativePixmap, accent), 0);
+}
+
+/** @brief A disabled control must not keep signalling its semantic color. */
+TEST_F(ThemeIconRenderTest, DisabledAppColorUsesDisabledForeground)
+{
+    QPalette palette = qApp->palette();
+    const QColor disabledText(QStringLiteral("#fedcba"));
+    palette.setColor(QPalette::Disabled, QPalette::WindowText, disabledText);
+    qApp->setPalette(palette);
+
+    const IconTint tint(AppColor::Negative);
+    EXPECT_EQ(tint.resolve(QIcon::Disabled), disabledText);
+    EXPECT_NE(tint.resolve(QIcon::Normal), disabledText);
+}
+
+/** @brief Palette tints keep the WindowText -> HighlightedText selected swap. */
+TEST_F(ThemeIconRenderTest, SelectedPaletteTintUsesHighlightedText)
+{
+    QPalette palette = qApp->palette();
+    const QColor activeText(QStringLiteral("#111111"));
+    const QColor selectedText(QStringLiteral("#222222"));
+    palette.setColor(QPalette::Active, QPalette::WindowText, activeText);
+    palette.setColor(QPalette::Active, QPalette::HighlightedText, selectedText);
+    qApp->setPalette(palette);
+
+    const IconTint tint(QPalette::WindowText);
+    EXPECT_EQ(tint.resolve(QIcon::Normal), activeText);
+    EXPECT_EQ(tint.resolve(QIcon::Selected), selectedText);
+}
+
+/** @brief A selected row falls back to HighlightedText when the tint vanishes. */
+TEST_F(ThemeIconRenderTest, SelectedAppColorFallsBackWhenItMatchesTheHighlight)
+{
+    const QColor semantic = themeManager->appColor(AppColor::Positive);
+    const QColor selectedText(QStringLiteral("#fedcba"));
+    QPalette palette = qApp->palette();
+    palette.setColor(QPalette::Active, QPalette::Highlight, semantic);
+    palette.setColor(QPalette::Active, QPalette::HighlightedText, selectedText);
+    qApp->setPalette(palette);
+
+    EXPECT_EQ(IconTint(AppColor::Positive).resolve(QIcon::Selected), selectedText);
+}
+
+/** @brief A selected row keeps a semantic tint that still contrasts enough. */
+TEST_F(ThemeIconRenderTest, SelectedAppColorKeepsAContrastingTint)
+{
+    QPalette palette = qApp->palette();
+    palette.setColor(QPalette::Active, QPalette::Highlight, QColor(Qt::black));
+    palette.setColor(QPalette::Active, QPalette::HighlightedText, QColor(Qt::white));
+    qApp->setPalette(palette);
+
+    EXPECT_EQ(IconTint(AppColor::Positive).resolve(QIcon::Selected), themeManager->appColor(AppColor::Positive));
+}

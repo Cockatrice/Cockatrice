@@ -68,8 +68,8 @@ PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor,
                                    QWidget *parent)
     : QTreeWidget(parent), tabSupervisor(_tabSupervisor), client(_client), game(_game), gameStarted(false)
 {
-    readyIcon = loadThemedIcon(QStringLiteral("icons/ready_start"));
-    notReadyIcon = loadThemedIcon(QStringLiteral("icons/not_ready_start"));
+    readyIcon = loadThemedIcon(QStringLiteral("icons/ready_start"), AppColor::Positive);
+    notReadyIcon = loadThemedIcon(QStringLiteral("icons/not_ready_start"), AppColor::Negative);
     concededIcon = loadThemedIcon(QStringLiteral("icons/conceded"));
     playerIcon = loadThemedIcon(QStringLiteral("icons/player"));
     judgeIcon = loadThemedIcon(QStringLiteral("icons/scales"));

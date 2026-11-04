@@ -83,12 +83,14 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent
             &DeckEditorDatabaseDisplayWidget::onRelatedCardClicked);
 
     aAddCard = new QAction(QString(), this);
-    aAddCard->setIcon(loadThemedIcon(QStringLiteral("icons/arrow_right")));
+    aAddCard->setIcon(loadThemedIcon(QStringLiteral("icons/arrow_right"), AppColor::Positive));
     connect(aAddCard, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
     auto *tbAddCard = new QToolButton(this);
     tbAddCard->setDefaultAction(aAddCard);
 
     aAddCardToSideboard = new QAction(QString(), this);
+    // Sideboard is a destination, not a positive state: its distinct glyph
+    // keeps the target legible without competing with the green main-deck add.
     aAddCardToSideboard->setIcon(loadThemedIcon(QStringLiteral("icons/arrow_right_sideboard")));
     connect(aAddCardToSideboard, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
     auto *tbAddCardToSideboard = new QToolButton(this);

@@ -199,7 +199,7 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     aNewLocalFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_FileDialogNewFolder));
     connect(aNewLocalFolder, &QAction::triggered, this, &TabDeckStorage::actNewLocalFolder);
     aDeleteLocalDeck = new QAction(this);
-    aDeleteLocalDeck->setIcon(loadThemedIcon(QStringLiteral("icons/remove_row")));
+    aDeleteLocalDeck->setIcon(loadThemedIcon(QStringLiteral("icons/remove_row"), AppColor::Negative));
     connect(aDeleteLocalDeck, &QAction::triggered, this, &TabDeckStorage::actDeleteLocalDeck);
 
     aOpenDecksFolder = new QAction(this);
@@ -217,7 +217,7 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     aNewFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_FileDialogNewFolder));
     connect(aNewFolder, &QAction::triggered, this, &TabDeckStorage::actNewFolder);
     aDeleteRemoteDeck = new QAction(this);
-    aDeleteRemoteDeck->setIcon(loadThemedIcon(QStringLiteral("icons/remove_row")));
+    aDeleteRemoteDeck->setIcon(loadThemedIcon(QStringLiteral("icons/remove_row"), AppColor::Negative));
     connect(aDeleteRemoteDeck, &QAction::triggered, this, &TabDeckStorage::actDeleteRemoteDeck);
 
     aShareDecks = new QAction(this);

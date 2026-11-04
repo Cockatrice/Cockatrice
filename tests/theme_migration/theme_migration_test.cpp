@@ -149,6 +149,41 @@ TEST_F(ThemeMigrationTest, IsIdempotent)
     EXPECT_EQ(readThemeFile(themesPath, CURRENT, "style.css").toStdString(), std::string("css"));
 }
 
+TEST(ThemeAppColorTest, SemanticDefaultsFollowTheScheme)
+{
+    EXPECT_EQ(defaultAppColor(AppColor::Positive, false), QColor(QStringLiteral("#1b7f3b")));
+    EXPECT_EQ(defaultAppColor(AppColor::Positive, true), QColor(QStringLiteral("#6dd58c")));
+    EXPECT_EQ(defaultAppColor(AppColor::Negative, false), QColor(QStringLiteral("#b3261e")));
+    EXPECT_EQ(defaultAppColor(AppColor::Negative, true), QColor(QStringLiteral("#ff8a80")));
+    // Accent roles are derived from the palette, so they have no static default.
+    EXPECT_FALSE(defaultAppColor(AppColor::AccentStrong, false).isValid());
+    EXPECT_FALSE(defaultAppColor(AppColor::AccentSoft, true).isValid());
+}
+
+TEST(ThemeAppColorTest, PaletteConfigRoundTripsSemanticRoles)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+
+    PaletteConfig config;
+    const QColor positive(QStringLiteral("#1b7f3b"));
+    const QColor negative(QStringLiteral("#b3261e"));
+    config.appColors[AppColor::Positive] = positive;
+    config.appColors[AppColor::Negative] = negative;
+
+    const QString path = QDir(dir.path()).absoluteFilePath(QStringLiteral("palette-light.toml"));
+    QFile file(path);
+    ASSERT_TRUE(file.open(QIODevice::WriteOnly | QIODevice::Text));
+    file.write(config.toToml().toUtf8());
+    file.close();
+
+    const PaletteConfig parsed = PaletteConfig::fromFile(path);
+    ASSERT_TRUE(parsed.appColors.contains(AppColor::Positive));
+    ASSERT_TRUE(parsed.appColors.contains(AppColor::Negative));
+    EXPECT_EQ(parsed.appColors.value(AppColor::Positive), positive);
+    EXPECT_EQ(parsed.appColors.value(AppColor::Negative), negative);
+}
+
 // Every test brings its own main(): GTest is not guaranteed to be found on the build machines, and
 // the fallback then links the bare gtest library without gtest_main.
 int main(int argc, char **argv)
