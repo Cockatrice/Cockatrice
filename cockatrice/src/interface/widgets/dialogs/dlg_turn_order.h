@@ -10,6 +10,7 @@
 #include <QDialog>
 #include <QStringList>
 
+class QLabel;
 class QListWidget;
 class QPushButton;
 
@@ -18,12 +19,14 @@ class DlgTurnOrder : public QDialog
     Q_OBJECT
 private:
     QListWidget *listWidget;
+    QLabel *hintLabel;
     QPushButton *moveUpButton;
     QPushButton *moveDownButton;
     QPushButton *randomizeButton;
     bool randomizeRequested;
 
     void moveSelected(int delta);
+    void updateMode();
     void updateButtons();
 
 private slots:

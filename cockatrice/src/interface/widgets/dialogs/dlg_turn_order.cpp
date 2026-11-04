@@ -2,10 +2,10 @@
 
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
+#include <QLabel>
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QPushButton>
-#include <QRandomGenerator>
 #include <QVBoxLayout>
 
 DlgTurnOrder::DlgTurnOrder(const QStringList &_playerNames, QWidget *parent)
@@ -23,6 +23,12 @@ DlgTurnOrder::DlgTurnOrder(const QStringList &_playerNames, QWidget *parent)
     randomizeButton = new QPushButton(this);
     connect(randomizeButton, &QPushButton::clicked, this, &DlgTurnOrder::actRandomize);
 
+    // Shown in place of the list while the server is asked to randomize: the
+    // order is chosen server side, so there is nothing to preview here.
+    hintLabel = new QLabel(this);
+    hintLabel->setWordWrap(true);
+    hintLabel->setAlignment(Qt::AlignCenter);
+
     auto *buttonColumn = new QVBoxLayout;
     buttonColumn->addWidget(moveUpButton);
     buttonColumn->addWidget(moveDownButton);
@@ -31,6 +37,7 @@ DlgTurnOrder::DlgTurnOrder(const QStringList &_playerNames, QWidget *parent)
 
     auto *listLayout = new QHBoxLayout;
     listLayout->addWidget(listWidget);
+    listLayout->addWidget(hintLabel, 1);
     listLayout->addLayout(buttonColumn);
 
     auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -44,7 +51,7 @@ DlgTurnOrder::DlgTurnOrder(const QStringList &_playerNames, QWidget *parent)
 
     updateButtons();
 
-    retranslateUi();
+    updateMode();
     setMinimumWidth(300);
 }
 
@@ -53,7 +60,8 @@ void DlgTurnOrder::retranslateUi()
     setWindowTitle(tr("Set turn order"));
     moveUpButton->setText(tr("Move up"));
     moveDownButton->setText(tr("Move down"));
-    randomizeButton->setText(tr("Randomize"));
+    randomizeButton->setText(randomizeRequested ? tr("Set order manually") : tr("Randomize"));
+    hintLabel->setText(tr("The server will randomize the turn order."));
 }
 
 QStringList DlgTurnOrder::order() const
@@ -76,16 +84,25 @@ void DlgTurnOrder::moveSelected(int delta)
     QListWidgetItem *item = listWidget->takeItem(row);
     listWidget->insertItem(newRow, item);
     listWidget->setCurrentRow(newRow);
-    randomizeRequested = false;
     updateButtons();
+}
+
+void DlgTurnOrder::updateMode()
+{
+    listWidget->setVisible(!randomizeRequested);
+    hintLabel->setVisible(randomizeRequested);
+    moveUpButton->setVisible(!randomizeRequested);
+    moveDownButton->setVisible(!randomizeRequested);
+    retranslateUi();
 }
 
 void DlgTurnOrder::updateButtons()
 {
     const int row = listWidget->currentRow();
     const int count = listWidget->count();
-    moveUpButton->setEnabled(row > 0);
-    moveDownButton->setEnabled(row >= 0 && row < count - 1);
+    const bool manualOrder = !randomizeRequested;
+    moveUpButton->setEnabled(manualOrder && row > 0);
+    moveDownButton->setEnabled(manualOrder && row >= 0 && row < count - 1);
 }
 
 void DlgTurnOrder::actMoveUp()
@@ -100,15 +117,11 @@ void DlgTurnOrder::actMoveDown()
 
 void DlgTurnOrder::actRandomize()
 {
-    QList<QListWidgetItem *> items;
-    while (listWidget->count() > 0) {
-        items.append(listWidget->takeItem(0));
-    }
-    while (!items.isEmpty()) {
-        const int index = QRandomGenerator::global()->bounded(items.size());
-        listWidget->addItem(items.takeAt(index));
-    }
-    randomizeRequested = true;
+    // Randomizing is a request to the server, not a local shuffle: showing a
+    // preview would let the host re-open the dialog until the order looks
+    // favourable for them.
+    randomizeRequested = !randomizeRequested;
+    updateMode();
     updateButtons();
 }
 
