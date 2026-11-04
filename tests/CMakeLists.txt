@@ -426,6 +426,15 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  font_config_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/theme_config.cpp
+  font_config_test.cpp
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src
+)
+cockatrice_add_test(
+  NAME
   deck_hash_performance_test
   SOURCES
   deck_hash_performance_test.cpp

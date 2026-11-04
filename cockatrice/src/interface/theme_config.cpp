@@ -305,3 +305,149 @@ QPalette PaletteConfig::apply(QPalette base) const
 
     return base;
 }
+
+bool FontConfig::hasFonts() const
+{
+    return !fonts.isEmpty();
+}
+
+QString FontConfig::toToml() const
+{
+    QMetaEnum roleEnum = QMetaEnum::fromType<AppFont::Role>();
+
+    QString entries;
+
+    for (auto it = fonts.cbegin(); it != fonts.cend(); ++it) {
+        const char *roleName = roleEnum.valueToKey(it.key());
+
+        if (!roleName) {
+            continue;
+        }
+
+        QString family = it.value().family().trimmed();
+        int pointSize = it.value().pointSize();
+
+        if (family.isEmpty() || pointSize <= 0) {
+            continue;
+        }
+
+        entries += QString("%1 = \"%2, %3\"\n").arg(QString(roleName), -20).arg(family).arg(pointSize);
+    }
+
+    if (entries.isEmpty()) {
+        return {};
+    }
+
+    return "[Fonts]\n" + entries + "\n";
+}
+
+QString FontConfig::fileName()
+{
+    return "fonts.toml";
+}
+
+FontConfig FontConfig::fromFile(const QString &filePath)
+{
+    FontConfig cfg;
+
+    QFile f(filePath);
+
+    if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return cfg;
+    }
+
+    QMetaEnum roleEnum = QMetaEnum::fromType<AppFont::Role>();
+
+    QString currentSection;
+
+    QTextStream in(&f);
+
+    while (!in.atEnd()) {
+        QString line = in.readLine().trimmed();
+
+        if (line.isEmpty() || line.startsWith('#') || line.startsWith(';')) {
+            continue;
+        }
+
+        if (line.startsWith('[') && line.endsWith(']')) {
+            currentSection = line.mid(1, line.length() - 2).trimmed();
+            continue;
+        }
+
+        if (currentSection.compare("Fonts", Qt::CaseInsensitive) != 0) {
+            continue;
+        }
+
+        int eq = line.indexOf('=');
+
+        if (eq < 0) {
+            continue;
+        }
+
+        QString key = line.left(eq).trimmed();
+        QString value = line.mid(eq + 1).trimmed();
+
+        // Strip inline comments if preceded by whitespace
+        for (int i = 1; i < value.size(); ++i) {
+            if ((value[i] == '#' || value[i] == ';') && value[i - 1].isSpace()) {
+                value = value.left(i).trimmed();
+                break;
+            }
+        }
+
+        // Strip surrounding quotes, if any
+        if (value.size() >= 2 &&
+            ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith('\'') && value.endsWith('\'')))) {
+            value = value.mid(1, value.size() - 2).trimmed();
+        }
+
+        int comma = value.lastIndexOf(',');
+
+        if (comma < 0) {
+            continue;
+        }
+
+        QString family = value.left(comma).trimmed();
+
+        // Tolerate a partially-quoted family, e.g. "Inter", 10
+        if (family.size() >= 2 &&
+            ((family.startsWith('"') && family.endsWith('"')) || (family.startsWith('\'') && family.endsWith('\'')))) {
+            family = family.mid(1, family.size() - 2).trimmed();
+        }
+
+        bool ok = false;
+        int pointSize = value.mid(comma + 1).trimmed().toInt(&ok);
+
+        if (!ok || family.isEmpty() || pointSize <= 0) {
+            continue;
+        }
+
+        if (key.startsWith("AppFont::")) {
+            key = key.mid(QStringLiteral("AppFont::").size());
+        }
+
+        int roleInt = roleEnum.keyToValue(key.toUtf8().constData());
+
+        if (roleInt < 0) {
+            continue;
+        }
+
+        // Canonical family + point size only: a fresh QFont carries default
+        // (non-bold, non-italic) weight/style, so nothing caller-side leaks in.
+        // No validation against installed fonts; Qt substitution applies.
+        QFont font(family);
+        font.setPointSize(pointSize);
+        cfg.fonts[static_cast<AppFont::Role>(roleInt)] = font;
+    }
+
+    return cfg;
+}
+
+FontConfig FontConfig::fromThemeDir(const QString &themeDirPath)
+{
+    if (themeDirPath.isEmpty()) {
+        return {};
+    }
+
+    return fromFile(QDir(themeDirPath).absoluteFilePath(fileName()));
+}
