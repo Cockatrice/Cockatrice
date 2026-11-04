@@ -409,8 +409,10 @@ void DeckEditorSettingsPage::setSpoilersEnabled(bool anInput)
     lastUpdatedLabel.setEnabled(anInput);
     infoOnSpoilersLabel.setEnabled(anInput);
 
-    if (!anInput && (sender() == &mcDownloadSpoilersCheckBox ||
-                     QFileInfo::exists(SettingsCache::instance().paths().getSpoilerCardDatabasePath()))) {
+    // Only react to the user disabling the setting. The constructor calls this to
+    // initialize the controls, and a leftover spoiler file is recovered through the
+    // Reload Card Database button rather than an unrequested reload on page open.
+    if (!anInput && sender() == &mcDownloadSpoilersCheckBox) {
         observeSpoilerUpdater(SpoilerBackgroundUpdater::deleteSpoilerFile());
     }
     unlockSettings();

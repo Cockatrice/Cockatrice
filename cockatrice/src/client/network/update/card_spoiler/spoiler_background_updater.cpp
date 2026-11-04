@@ -280,10 +280,6 @@ void SpoilerBackgroundUpdater::finish(const QString &error, bool updated)
             notificationIcon->showMessage(tr("Spoilers have been updated!"),
                                           tr("The card database now includes the downloaded spoilers."));
         }
-        if (!guard) {
-            return;
-        }
-        emit spoilersUpdatedSuccessfully();
     } else if (seasonEnded && !cancelled && notificationIcon) {
         notificationIcon->showMessage(tr("Spoiler season has ended"),
                                       tr("The spoiler database was removed. Please run Oracle to get released cards."));

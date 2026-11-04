@@ -61,7 +61,6 @@ private:
     void reloadDatabase(bool updated);
 
 signals:
-    void spoilersUpdatedSuccessfully();
     void spoilerCheckerDone();
     void spoilerUpdateFailed(const QString &message);
 };
