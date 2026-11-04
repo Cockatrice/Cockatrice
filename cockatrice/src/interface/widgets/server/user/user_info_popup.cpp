@@ -6,10 +6,9 @@
 #include "../../interface/widgets/tabs/tab_supervisor.h"
 #include "libcockatrice/card/database/card_database_querier.h"
 #include "libcockatrice/card/printing/exact_card.h"
-#include "libcockatrice/protocol/pb/response.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
-#include "libcockatrice/protocol/pb/session_commands.pb.h"
+#include "user_games_model.h"
 #include "user_level.h"
 #include "user_list_painter.h"
 
@@ -34,6 +33,7 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QPen>
+#include <QPersistentModelIndex>
 #include <QPoint>
 #include <QPushButton>
 #include <QRect>
@@ -41,8 +41,6 @@
 #include <QSharedPointer>
 #include <QSize>
 #include <QSizePolicy>
-#include <QStandardItem>
-#include <QStandardItemModel>
 #include <QStringLiteral>
 #include <QStyle>
 #include <QStyleOptionViewItem>
@@ -52,8 +50,6 @@
 #include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
-#include <libcockatrice/protocol/pb/response_get_games_of_user.pb.h>
-#include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/card_ref.h>
 #include <libcockatrice/utility/qt_utils.h>
 #include <qnumeric.h>
@@ -427,6 +423,7 @@ void UserInfoPopup::buildUi()
     refreshBtn = new QPushButton(QStringLiteral("↻"), this);
     refreshBtn->setFixedSize(20, 20);
     refreshBtn->setFlat(true);
+    refreshBtn->setToolTip(tr("Refresh games"));
     connect(refreshBtn, &QPushButton::clicked, this, &UserInfoPopup::refreshGames);
     gh->addWidget(refreshBtn);
     root->addLayout(gh);
@@ -437,7 +434,8 @@ void UserInfoPopup::buildUi()
     root->addWidget(gamesStatus);
 
     // Games list
-    gamesModel = new QStandardItemModel(this);
+    gamesModel = new UserGamesModel(client, UserGamesModel::DefaultRequestTimeoutMs, this);
+    connect(gamesModel, &UserGamesModel::stateChanged, this, &UserInfoPopup::updateGamesDisplay);
     gamesView = new QListView(this);
     gamesView->setModel(gamesModel);
     gamesView->setItemDelegate(new PopupGameDelegate(gamesView));
@@ -645,13 +643,21 @@ void UserInfoPopup::rebuildActionButtons(const ServerInfo_User &userInfo, bool o
 
 void UserInfoPopup::updateActionButtons(const ServerInfo_User &userInfo, bool online, bool isBuddy, bool isIgnored)
 {
-    rebuildActionButtons(userInfo, online, isBuddy, isIgnored);
-    adjustSize();
+    currentUserInfo = userInfo;
+    currentBuddy = isBuddy;
+    currentIgnored = isIgnored;
+    if (currentOnline != online) {
+        setOnline(online);
+    } else {
+        refreshHeader();
+        rebuildActionButtons(userInfo, online, isBuddy, isIgnored);
+        adjustSize();
+    }
 }
 
 void UserInfoPopup::onGamesContextMenu(const QPoint &pos)
 {
-    const QModelIndex idx = gamesView->indexAt(pos);
+    const QPersistentModelIndex idx = gamesView->indexAt(pos);
     if (!idx.isValid()) {
         return;
     }
@@ -679,7 +685,7 @@ void UserInfoPopup::onGamesContextMenu(const QPoint &pos)
     }
 
     const QAction *chosen = menu.exec(gamesView->viewport()->mapToGlobal(pos));
-    if (!chosen) {
+    if (!chosen || !idx.isValid()) {
         return;
     }
 
@@ -716,6 +722,8 @@ void UserInfoPopup::showForUser(const QString &userName,
     currentUser = userName;
     currentUserInfo = userInfo;
     currentOnline = online;
+    currentBuddy = isBuddy;
+    currentIgnored = isIgnored;
 
     // Header
     refreshHeader();
@@ -723,88 +731,71 @@ void UserInfoPopup::showForUser(const QString &userName,
     // Actions
     rebuildActionButtons(userInfo, online, isBuddy, isIgnored);
 
-    // Games list reset
-    gamesModel->clear();
-    gamesView->hide();
-    gamesStatus->setText(tr("Loading games…"));
-    gamesStatus->show();
-
     // Close button, top right corner, above everything
     closeBtn->move(PopupWidth - closeBtn->width() - 6, 6);
     closeBtn->raise();
 
+    gamesModel->setUser(currentUser, currentOnline);
     adjustSize();
-    fetchGames();
 }
 
 // ── Games fetch ───────────────────────────────────────────────────────────────
 
 void UserInfoPopup::fetchGames()
 {
-    if (!client || currentUser.isEmpty()) {
-        return;
-    }
-
-    Command_GetGamesOfUser cmd;
-    cmd.set_user_name(currentUser.toStdString());
-
-    const QString snapshot = currentUser;
-    PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, &PendingCommand::finished, this,
-            [this, snapshot](const Response &r) { onGamesReceived(r, snapshot); });
-    client->sendCommand(pend);
+    gamesModel->refresh();
 }
 
-void UserInfoPopup::onGamesReceived(const Response &r, const QString &forUser)
+void UserInfoPopup::setOnline(bool online)
 {
-    if (forUser != currentUser) {
-        return; // stale response, different user showing now
-    }
-
-    gamesModel->clear();
-
-    if (r.response_code() != Response::RespOk) {
-        gamesStatus->setText(tr("Could not load games."));
-        gamesStatus->show();
-        gamesView->hide();
+    if (currentOnline == online) {
         return;
     }
+    currentOnline = online;
+    refreshHeader();
+    rebuildActionButtons(currentUserInfo, online, currentBuddy, currentIgnored);
+    gamesModel->setUser(currentUser, online);
+}
 
-    const auto &resp = r.GetExtension(Response_GetGamesOfUser::ext);
-    if (resp.game_list_size() == 0) {
-        gamesStatus->setText(tr("No active games."));
-        gamesStatus->show();
-        gamesView->hide();
-        return;
+void UserInfoPopup::updateGamesDisplay()
+{
+    refreshBtn->setEnabled(gamesModel->canRefresh());
+    const auto state = gamesModel->getState();
+    const bool ready = state == UserGamesModel::State::Ready;
+    gamesView->setVisible(ready);
+    gamesStatus->setVisible(!ready);
+
+    switch (state) {
+        case UserGamesModel::State::Offline:
+            gamesStatus->setText(tr("User is offline."));
+            break;
+        case UserGamesModel::State::Disconnected:
+            gamesStatus->setText(tr("Not connected to the server."));
+            break;
+        case UserGamesModel::State::Loading:
+            gamesStatus->setText(tr("Loading games…"));
+            break;
+        case UserGamesModel::State::Empty:
+            gamesStatus->setText(tr("No active games."));
+            break;
+        case UserGamesModel::State::Error:
+            gamesStatus->setText(tr("Could not load games."));
+            break;
+        case UserGamesModel::State::Ready: {
+            // Fit exactly to the number of visible rows, scroll when more than 5.
+            constexpr int rowH = 38; // must match PopupGameDelegate::sizeHint
+            constexpr int maxRows = 5;
+            const int count = gamesModel->rowCount();
+            gamesView->setFixedHeight(qMin(count, maxRows) * rowH + 2);
+            gamesView->setVerticalScrollBarPolicy(count > maxRows ? Qt::ScrollBarAlwaysOn : Qt::ScrollBarAlwaysOff);
+            break;
+        }
     }
-
-    for (int i = 0; i < resp.game_list_size(); ++i) {
-        auto *item = new QStandardItem;
-        item->setData(QVariant::fromValue(resp.game_list(i)), PopupRoles::GameData);
-        item->setEditable(false);
-        gamesModel->appendRow(item);
-    }
-
-    gamesStatus->hide();
-    gamesView->show();
-
-    // Fit exactly to the number of visible rows, scroll when more than 5
-    constexpr int rowH = 38; // must match PopupGameDelegate::sizeHint
-    constexpr int maxRows = 5;
-    const int count = gamesModel->rowCount();
-    const int visible = qMin(count, maxRows);
-    gamesView->setFixedHeight(visible * rowH + 2);
-    gamesView->setVerticalScrollBarPolicy(count > maxRows ? Qt::ScrollBarAlwaysOn : Qt::ScrollBarAlwaysOff);
-
     adjustSize();
 }
 
 void UserInfoPopup::refreshGames()
 {
-    gamesModel->clear();
-    gamesView->hide();
-    gamesStatus->setText(tr("Loading games…"));
-    gamesStatus->show();
     fetchGames();
 }
 

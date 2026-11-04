@@ -617,7 +617,14 @@ void UserListWidget::bind(UserListManager *mgr)
     connect(manager, &UserListManager::addedToIgnoreList, this, refreshCurrentPopup);
     connect(manager, &UserListManager::removedFromIgnoreList, this, refreshIfPopupOpen);
     connect(manager, &UserListManager::userJoinedOnline, this, refreshCurrentPopup);
-    connect(manager, &UserListManager::userLeftOnline, this, refreshIfPopupOpen);
+    connect(manager, &UserListManager::userLeftOnline, this, [this, refreshIfPopupOpen](const QString &name) {
+        // The online row may already have been removed; the pinned popup must
+        // still invalidate its games request and display the offline state.
+        if (userInfoPopup && userInfoPopup->getCurrentUser() == name) {
+            userInfoPopup->setOnline(false);
+        }
+        refreshIfPopupOpen(name);
+    });
 
     rebuild();
 }
