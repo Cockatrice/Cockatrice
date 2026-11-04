@@ -2,24 +2,33 @@
 
 Continuumatrice is an independent application. You can keep normal upstream **Cockatrice for MTG** installed and run both without mixing profiles or overwriting executables.
 
-## Binary and build target
+## Native CMake targets and output paths
 
-The CMake target remains `cockatrice` to avoid breaking its internal dependencies, resource generators, translations, and existing build commands, but on **Linux** the target's output filename is `continuumatrice`.
+Continuumatrice and its dedicated server use their own CMake target and executable names on every platform:
+
+| Program | CMake target | Linux build output |
+| --- | --- | --- |
+| Continuumatrice | `continuumatrice` | `build/continuumatrice/continuumatrice` |
+| Continuum-Servatrice | `continuum-servatrice` | `build/continuum-servatrice/continuum-servatrice` |
+
+From the repository root on openSUSE:
 
 ```bash
-git pull --ff-only origin feature/continuumatrice-zone-bands
-cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DWITH_CLIENT=ON -DWITH_SERVER=OFF -DWITH_ORACLE=OFF
-cmake --build build --target cockatrice --parallel 16
-./build/cockatrice/continuumatrice
+git switch master
+git pull --ff-only
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
+    -DWITH_CLIENT=ON -DWITH_SERVER=ON -DWITH_ORACLE=OFF
+cmake --build build --target continuumatrice continuum-servatrice --parallel 16
+./build/continuumatrice/continuumatrice
 ```
 
-If you previously compiled the fork under the old name, `build/cockatrice/cockatrice` can remain as an **outdated, stale executable** in the build directory. Launch `build/cockatrice/continuumatrice` instead. Do not remove your system's normal `/usr/bin/cockatrice` application.
+The inherited source directories remain `cockatrice/` and `servatrice/`, but the build directories, targets and installed executable names are independent. The old `cockatrice` and `servatrice` **CMake aliases** remain available for existing build scripts; they do not generate upstream-named executables.
 
-The renamed executable on Linux installs as `bin/continuumatrice`. The new `continuumatrice.desktop` launcher installs alongside the normal `cockatrice.desktop`. Its application name and desktop-file ID are also `continuumatrice`, so Wayland and desktop launchers distinguish the applications.
+Reconfigure the existing build directory after pulling these changes so Ninja regenerates its target list. An old `build/cockatrice/continuumatrice` or `build/servatrice/servatrice` file may remain from an earlier build; do not use it to verify the current target.
 
-The fork installs its own `continuumatrice.svg` and `continuumatrice.png` **filenames** for icon lookup, currently reusing the existing Cockatrice artwork until a dedicated brand icon is designed. The launcher names are independent even when the graphics resemble one another.
+Linux installs `bin/continuumatrice` and `bin/continuum-servatrice`. The new `continuumatrice.desktop` launcher installs alongside normal MTG Cockatrice, rather than replacing `cockatrice.desktop`.
 
-This fork intentionally does **not** install Cockatrice's `cockatrice-cod.xml` MIME handler or register the `cockatrice://` URL scheme in the new Linux desktop file. The normal MTG client keeps its default deck file and URL associations.
+The app's Linux icon names are distinct from upstream's. The fork does **not** install Cockatrice's `cockatrice-cod.xml` MIME handler or register the `cockatrice://` URL scheme, so the two clients can coexist.
 
 ## Data isolation
 
@@ -50,4 +59,4 @@ For immediate testing, skip installation and run the executable directly from th
 
 ## Cross-platform status
 
-This Linux naming change is intentionally scoped to non-Apple Unix. Upstream packaging and installer flows for Windows/macOS still need separate renaming work before those platforms can claim fully isolated installations.
+The native CMake targets, executable paths and packaging references have been restored from the previous Continuumatrice product-migration branch. Linux is the primary development platform; Windows and macOS packaging changes still require CI verification.
