@@ -241,8 +241,7 @@ void DeckViewCardContainer::paint(QPainter *painter, const QStyleOptionGraphicsI
 
     painter->setPen(QColor(Qt::white));
     // Family comes from the DeckList theme role; pixel sizes/weights unchanged.
-    QFont f = themeManager->appFont(AppFont::DeckList);
-    f.setStyleHint(QFont::Serif);
+    QFont f = themeManager->deckListFont();
     f.setPixelSize(24);
     f.setWeight(QFont::Bold);
     painter->setFont(f);
@@ -294,8 +293,7 @@ QList<QPair<int, int>> DeckViewCardContainer::getRowsAndCols() const
 int DeckViewCardContainer::getCardTypeTextWidth() const
 {
     // Family comes from the DeckList theme role; pixel size/weight unchanged.
-    QFont f = themeManager->appFont(AppFont::DeckList);
-    f.setStyleHint(QFont::Serif);
+    QFont f = themeManager->deckListFont();
     f.setPixelSize(16);
     f.setWeight(QFont::Bold);
     QFontMetrics fm(f);
@@ -368,6 +366,15 @@ void DeckViewCardContainer::setWidth(qreal _width)
 
 DeckViewScene::DeckViewScene(QObject *parent) : QGraphicsScene(parent), locked(true), deck(0), optimalAspectRatio(1.0)
 {
+    // Zone headers read the DeckList role at paint time and cache their
+    // rendering, so touch every item to invalidate the caches and pick up the
+    // new family on font changes (containers cannot connect this themselves:
+    // QGraphicsItem is not a QObject).
+    connect(themeManager, &ThemeManager::fontsChanged, this, [this] {
+        for (auto *item : items()) {
+            item->update();
+        }
+    });
 }
 
 DeckViewScene::~DeckViewScene()

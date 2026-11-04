@@ -660,10 +660,12 @@ QFont ThemeManager::appFont(AppFont::Role role) const
     }
 
     // Role fallbacks preserve the pre-theme defaults when no fonts.toml is
-    // present: an unset role resolves to the application font, so the result is
-    // identical to before. The report dialogs that used to hardcode monospace
-    // ask for it explicitly (report_utils::reportLogFont), and the counter
-    // painters that used to hardcode Serif ask for it through cardTextFont().
+    // present: an unset role resolves to the application font. Surfaces that
+    // hardcoded a different family ask for it explicitly: counter painters
+    // through cardTextFont(), the deck view headers and printed deck list
+    // through deckListFont(), the report dialogs through
+    // report_utils::reportLogFont(). Only the family basis is fixed there;
+    // sizes stay caller-side.
     return qApp->font();
 }
 
@@ -676,6 +678,16 @@ QFont ThemeManager::cardTextFont() const
 {
     if (hasAppFont(AppFont::CardText)) {
         return appFont(AppFont::CardText);
+    }
+    QFont serifFont(QStringLiteral("Serif"));
+    serifFont.setStyleHint(QFont::Serif);
+    return serifFont;
+}
+
+QFont ThemeManager::deckListFont() const
+{
+    if (hasAppFont(AppFont::DeckList)) {
+        return appFont(AppFont::DeckList);
     }
     QFont serifFont(QStringLiteral("Serif"));
     serifFont.setStyleHint(QFont::Serif);

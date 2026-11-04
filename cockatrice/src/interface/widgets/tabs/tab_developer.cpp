@@ -101,6 +101,20 @@ TabDeveloper::TabDeveloper(TabSupervisor *_tabSupervisor, AbstractClient *_clien
     central->setLayout(mainLayout);
     setCentralWidget(central);
 
+    // Separator rows store their font on the item; re-apply the role family on
+    // font changes (value cells keep the default font and need only a repaint).
+    connect(themeManager, &ThemeManager::fontsChanged, this, [this] {
+        QFont separatorFont = themeManager->appFont(AppFont::InterfaceDefault);
+        separatorFont.setBold(true);
+        for (int row = 0; row < statsTable->rowCount(); ++row) {
+            auto *labelItem = statsTable->item(row, 0);
+            if (labelItem && !(labelItem->flags() & Qt::ItemIsSelectable)) {
+                labelItem->setFont(separatorFont);
+            }
+        }
+        statsTable->viewport()->update();
+    });
+
     retranslateUi();
 }
 

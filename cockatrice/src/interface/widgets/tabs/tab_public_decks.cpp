@@ -51,7 +51,12 @@ TabPublicDecks::TabPublicDecks(TabSupervisor *_tabSupervisor, AbstractClient *_c
         titleLabel->setFont(QtUtils::boldFont(themeManager->appFont(AppFont::InterfaceDefault)));
     };
     applyTitleFont();
-    connect(themeManager, &ThemeManager::fontsChanged, this, applyTitleFont);
+    connect(themeManager, &ThemeManager::fontsChanged, this, [this, applyTitleFont] {
+        applyTitleFont();
+        // Preview cells paint with the live role font; repaint the grid so the
+        // new family shows without waiting for a scroll or hover.
+        flowWidget->update();
+    });
 
     auto *headerLayout = new QHBoxLayout;
     headerLayout->addWidget(titleLabel);

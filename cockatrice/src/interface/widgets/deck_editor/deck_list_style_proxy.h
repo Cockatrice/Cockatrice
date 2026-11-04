@@ -8,7 +8,7 @@ class DeckListStyleProxy : public QIdentityProxyModel
 {
     Q_OBJECT
 public:
-    using QIdentityProxyModel::QIdentityProxyModel;
+    explicit DeckListStyleProxy(QObject *parent = nullptr);
 
     [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
 };

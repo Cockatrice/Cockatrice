@@ -21,6 +21,10 @@
 BarChartWidget::BarChartWidget(QWidget *parent) : QWidget(parent)
 {
     setMouseTracking(true);
+
+    // Labels read the InterfaceDefault role at paint time, so a font change
+    // only needs a repaint.
+    connect(themeManager, &ThemeManager::fontsChanged, this, [this] { update(); });
 }
 
 void BarChartWidget::setBars(const QVector<BarData> &newBars)
