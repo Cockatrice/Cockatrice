@@ -317,12 +317,13 @@ void HandMenu::onRandomHandRevealFailed(bool unsupported)
     const QString text =
         unsupported ? tr("This server does not support revealing multiple random cards. No cards were revealed.")
                     : tr("The random reveal could not be completed. The hand or recipient may have changed.");
-    auto *message = new QMessageBox(QMessageBox::Warning, tr("Reveal Random Hand Cards"), text, QMessageBox::Ok,
-                                   dialogParent());
+    auto *message =
+        new QMessageBox(QMessageBox::Warning, tr("Reveal Random Hand Cards"), text, QMessageBox::Ok, dialogParent());
     message->setAttribute(Qt::WA_DeleteOnClose);
     connect(this, &QObject::destroyed, message, &QDialog::reject);
     connect(player->getLogic()->getPlayerActions(), &QObject::destroyed, message, &QDialog::reject);
-    if (auto *client = player->getLogic()->getGame()->getClientForPlayer(player->getLogic()->getPlayerInfo()->getId())) {
+    if (auto *client =
+            player->getLogic()->getGame()->getClientForPlayer(player->getLogic()->getPlayerInfo()->getId())) {
         connect(client, &QObject::destroyed, message, &QDialog::reject);
     }
     message->open();
