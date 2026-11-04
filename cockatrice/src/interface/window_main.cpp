@@ -254,7 +254,11 @@ void MainWindow::actWatchReplay()
 
 void MainWindow::localGameEnded()
 {
-    delete localServer;
+    // Defer deletion so the LocalClients (already scheduled with deleteLater() in TabSupervisor::stop)
+    // and any queued commands are processed before the server and its interfaces are destroyed.
+    if (localServer) {
+        localServer->deleteLater();
+    }
     localServer = nullptr;
 
     aConnect->setEnabled(true);

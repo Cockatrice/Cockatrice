@@ -137,6 +137,7 @@ RemoteClient::~RemoteClient()
 void RemoteClient::slotSocketError(QAbstractSocket::SocketError /*error*/)
 {
     QString errorString = socket->errorString();
+    qCWarning(RemoteClientLog) << "Server connection error:" << errorString;
     doDisconnectFromServer();
     emit socketError(errorString);
 }
@@ -146,6 +147,7 @@ void RemoteClient::slotWebSocketError(QAbstractSocket::SocketError /*error*/)
 
     QString errorString = websocket->errorString();
     if (getStatus() != ClientStatus::StatusDisconnected) {
+        qCWarning(RemoteClientLog) << "Server connection error:" << errorString;
         doDisconnectFromServer();
         emit socketError(errorString);
     }
@@ -153,6 +155,7 @@ void RemoteClient::slotWebSocketError(QAbstractSocket::SocketError /*error*/)
 
 void RemoteClient::slotConnected()
 {
+    qCInfo(RemoteClientLog) << "Server transport connected";
     timeRunning = lastDataReceived = 0;
     timer->start();
 
@@ -166,6 +169,12 @@ void RemoteClient::slotConnected()
 
 void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentification &event)
 {
+    // Identification arrives before login, including when protocol versions differ.
+    // Quote the server-supplied strings in the log and limit their size.
+    const QString serverName = QString::fromStdString(event.server_name()).left(256);
+    const QString serverVersion = QString::fromStdString(event.server_version()).left(256);
+    qCInfo(RemoteClientLog) << "Server identification:" << serverName << "version" << serverVersion
+                            << "protocol version" << event.protocol_version();
     if (event.protocol_version() != protocolVersion) {
         emit protocolVersionMismatch(protocolVersion, event.protocol_version());
         setStatus(StatusDisconnecting);
@@ -698,6 +707,8 @@ void RemoteClient::sendCommandContainer(const CommandContainer &cont)
 void RemoteClient::connectToHost(const QString &hostname, unsigned int port)
 {
     usingWebSocket = port == 443 || port == 80 || port == 4748 || port == 8080;
+    qCInfo(RemoteClientLog) << "Connecting to server" << hostname << "port" << port
+                            << (usingWebSocket ? "using WebSocket" : "using TCP");
     if (usingWebSocket) {
         QUrl url(QString("%1://%2:%3/servatrice").arg(port == 443 ? "wss" : "ws").arg(hostname).arg(port));
         websocket->open(url);

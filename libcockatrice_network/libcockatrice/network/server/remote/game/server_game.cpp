@@ -41,6 +41,7 @@
 #include "libcockatrice/protocol/pb/serverinfo_replay_match.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 #include "libcockatrice/protocol/pb/session_event.pb.h"
+#include "role_info.h"
 #include "server_abstract_player.h"
 #include "server_abstractuserinterface.h"
 #include "server_arrow.h"
@@ -479,9 +480,8 @@ void Server_Game::stopGameIfFinished()
 
 Response::ResponseCode Server_Game::checkJoin(ServerInfo_User *user,
                                               const QString &_password,
-                                              bool spectator,
-                                              bool overrideRestrictions,
-                                              bool asJudge)
+                                              const RoleInfo &roleInfo,
+                                              bool overrideRestrictions)
 {
     Server_DatabaseInterface *databaseInterface = room->getServer()->getDatabaseInterface();
     for (auto *participant : participants.values()) {
@@ -490,11 +490,11 @@ Response::ResponseCode Server_Game::checkJoin(ServerInfo_User *user,
         }
     }
 
-    if (asJudge && !(user->user_level() & ServerInfo_User::IsJudge)) {
+    if (roleInfo.isJudge && !(user->user_level() & ServerInfo_User::IsJudge)) {
         return Response::RespUserLevelTooLow;
     }
     if (!(overrideRestrictions && (user->user_level() & (ServerInfo_User::IsModerator | ServerInfo_User::IsJudge)))) {
-        if ((_password != password) && !(spectator && !spectatorsNeedPassword)) {
+        if ((_password != password) && !(roleInfo.isSpectator && !spectatorsNeedPassword)) {
             return Response::RespWrongPassword;
         }
         if (!(user->user_level() & ServerInfo_User::IsRegistered) && onlyRegistered) {
@@ -510,13 +510,13 @@ Response::ResponseCode Server_Game::checkJoin(ServerInfo_User *user,
                                               QString::fromStdString(user->name()))) {
             return Response::RespInIgnoreList;
         }
-        if (spectator) {
+        if (roleInfo.isSpectator) {
             if (!spectatorsAllowed) {
                 return Response::RespSpectatorsNotAllowed;
             }
         }
     }
-    if (!spectator && (gameStarted || (getPlayerCount() >= getMaxPlayers()))) {
+    if (!roleInfo.isSpectator && (gameStarted || (getPlayerCount() >= getMaxPlayers()))) {
         return Response::RespGameFull;
     }
 
@@ -537,19 +537,18 @@ bool Server_Game::containsUser(const QString &userName) const
 
 void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface,
                             ResponseContainer &rc,
-                            bool spectator,
-                            bool judge,
+                            const RoleInfo &roleInfo,
                             bool broadcastUpdate)
 {
     QMutexLocker locker(&gameMutex);
 
     Server_AbstractParticipant *newParticipant;
-    if (spectator) {
+    if (roleInfo.isSpectator) {
         newParticipant = new Server_Spectator(this, nextPlayerId++, userInterface->copyUserInfo(true, true, true),
-                                              judge, userInterface);
+                                              roleInfo.isJudge, userInterface);
     } else {
-        newParticipant = new Server_Player(this, nextPlayerId++, userInterface->copyUserInfo(true, true, true), judge,
-                                           userInterface);
+        newParticipant = new Server_Player(this, nextPlayerId++, userInterface->copyUserInfo(true, true, true),
+                                           roleInfo.isJudge, userInterface);
     }
 
     newParticipant->moveToThread(thread());
@@ -560,7 +559,7 @@ void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface,
 
     const QString playerName = QString::fromStdString(newParticipant->getUserInfo()->name());
     participants.insert(newParticipant->getPlayerId(), newParticipant);
-    if (spectator) {
+    if (roleInfo.isSpectator) {
         allSpectatorsEver.insert(playerName);
     } else {
         allPlayersEver.insert(playerName);
@@ -579,7 +578,7 @@ void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface,
         emit gameInfoChanged(gameInfo);
     }
 
-    if ((newParticipant->getUserInfo()->user_level() & ServerInfo_User::IsRegistered) && !spectator) {
+    if ((newParticipant->getUserInfo()->user_level() & ServerInfo_User::IsRegistered) && !roleInfo.isSpectator) {
         room->getServer()->addPersistentPlayer(playerName, room->getId(), gameId, newParticipant->getPlayerId());
     }
 
@@ -871,6 +870,13 @@ void Server_Game::createGameJoinedEvent(Server_AbstractParticipant *joiningParti
     }
 }
 
+bool Server_Game::canSeePrivateEventsFor(const Server_AbstractParticipant *participant, int privatePlayerId) const
+{
+    return participant->getPlayerId() == privatePlayerId               // same player
+           || participant->isJudge()                                   // judges see everything
+           || (participant->isSpectator() && spectatorsSeeEverything); // spectators see everything
+}
+
 void Server_Game::sendGameEventContainer(GameEventContainer *cont,
                                          GameEventStorageItem::EventRecipients recipients,
                                          int privatePlayerId)
@@ -879,8 +885,7 @@ void Server_Game::sendGameEventContainer(GameEventContainer *cont,
 
     cont->set_game_id(gameId);
     for (auto *participant : participants.values()) {
-        const bool playerPrivate = (participant->getPlayerId() == privatePlayerId) || participant->isJudge() ||
-                                   (participant->isSpectator() && spectatorsSeeEverything);
+        const bool playerPrivate = canSeePrivateEventsFor(participant, privatePlayerId);
         if ((recipients.testFlag(GameEventStorageItem::SendToPrivate) && playerPrivate) ||
             (recipients.testFlag(GameEventStorageItem::SendToOthers) && !playerPrivate)) {
             participant->sendGameEvent(*cont);

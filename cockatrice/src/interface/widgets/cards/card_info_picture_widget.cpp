@@ -43,11 +43,6 @@
 #include <qlogging.h>
 #include <qnamespace.h>
 
-static constexpr qreal MTG_CARD_ASPECT_RATIO = 1.396;
-// static constexpr qreal YUGIOH_CARD_ASPECT_RATIO = 1.457;
-static constexpr qreal ASPECT_RATIO = MTG_CARD_ASPECT_RATIO;
-
-static constexpr int BASE_WIDTH = 200;
 static constexpr int BASE_HEIGHT = 200;
 
 static constexpr int ENLARGED_PIXMAP_OFFSET = 10;
@@ -162,12 +157,11 @@ void CardInfoPictureWidget::resizeEvent(QResizeEvent *event)
  */
 void CardInfoPictureWidget::setScaleFactor(const int scale)
 {
-    const int newWidth = BASE_WIDTH * scale / 100;
-    const int newHeight = static_cast<int>(newWidth * ASPECT_RATIO);
+    const QSize newSize = sizeForScaleFactor(scale);
 
     scaleFactor = scale;
 
-    setFixedSize(newWidth, newHeight);
+    setFixedSize(newSize);
     updatePixmap();
 
     emit cardScaleFactorChanged(scale);
@@ -266,8 +260,13 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
  */
 QSize CardInfoPictureWidget::sizeHint() const
 {
-    return {static_cast<int>(BASE_WIDTH * scaleFactor / 100.0),
-            static_cast<int>(BASE_WIDTH * scaleFactor / 100.0 * ASPECT_RATIO)};
+    return sizeForScaleFactor(scaleFactor);
+}
+
+QSize CardInfoPictureWidget::sizeForScaleFactor(int scaleFactor)
+{
+    const int width = BASE_WIDTH * scaleFactor / 100;
+    return {width, static_cast<int>(width * ASPECT_RATIO)};
 }
 
 /**

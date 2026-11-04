@@ -357,6 +357,18 @@ cockatrice_add_test(
   LABELS
   ci
 )
+# The local game runs one client and one server in the same process.
+# Either of them can be destroyed first; the survivor has to stay usable.
+cockatrice_add_test(
+  NAME
+  local_client_lifetime_test
+  SOURCES
+  local_client_lifetime_test.cpp
+  LIBS
+  libcockatrice_network
+  LABELS
+  ci
+)
 cockatrice_add_test(
   NAME
   server_room_channels_test
@@ -404,23 +416,6 @@ cockatrice_add_test(
   SOURCES
   ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/card_database_update/card_update_progress.cpp
   card_update_progress_test.cpp
-  INCLUDE_DIRS
-  ${CMAKE_SOURCE_DIR}/cockatrice/src
-)
-cockatrice_add_test(
-  NAME
-  loader_local_matching_test
-  SOURCES
-  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/card_picture_loader/card_picture_loader_local.cpp
-  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/cache_settings.cpp
-  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/card_counter_settings.cpp
-  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/shortcuts_settings.cpp
-  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network/update/client/release_channel.cpp
-  ${VERSION_STRING_CPP}
-  loader_local_matching_test.cpp
-  LIBS
-  libcockatrice_network
-  libcockatrice_settings
   INCLUDE_DIRS
   ${CMAKE_SOURCE_DIR}/cockatrice/src
 )
@@ -475,6 +470,19 @@ endif()
 
 # Guard must match the condition for src/single_instance_manager.cpp in cockatrice/CMakeLists.txt.
 if(WITH_CLIENT)
+  cockatrice_add_test(
+    NAME
+    moxfield_signature_spells_test
+    SOURCES
+    ${VERSION_STRING_CPP}
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/deck_loader/card_node_function.cpp
+    moxfield_signature_spells_test.cpp
+    LIBS
+    libcockatrice_card
+    libcockatrice_deck_list
+    INCLUDE_DIRS
+    ${CMAKE_SOURCE_DIR}/cockatrice/src
+  )
   cockatrice_add_test(
     NAME
     single_instance_manager_test
@@ -542,4 +550,47 @@ endif()
 # a client/UI-capable target is being built.
 if(WITH_ORACLE OR WITH_CLIENT)
   add_subdirectory(picture_loader_benchmark)
+endif()
+
+# loader_local_matching_test and deck_state_manager_test links libcockatrice_settings,
+# which only exists when a client/UI-capable target is being built.
+if(WITH_ORACLE OR WITH_CLIENT)
+  set(SETTINGS_SOURCES
+      ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network/update/client/release_channel.cpp
+      ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/cache_settings.cpp
+      ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/card_counter_settings.cpp
+      ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/shortcuts_settings.cpp
+      ${VERSION_STRING_CPP}
+  )
+  set(SETTINGS_LIBS libcockatrice_network libcockatrice_settings)
+  set(SETTINGS_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/cockatrice/src)
+
+  cockatrice_add_test(
+    NAME
+    loader_local_matching_test
+    SOURCES
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/card_picture_loader/card_picture_loader_local.cpp
+    ${SETTINGS_SOURCES}
+    loader_local_matching_test.cpp
+    LIBS
+    ${SETTINGS_LIBS}
+    INCLUDE_DIRS
+    ${SETTINGS_INCLUDE_DIRS}
+  )
+  cockatrice_add_test(
+    NAME
+    deck_state_manager_test
+    SOURCES
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/deck_editor/deck_state_manager.cpp
+    ${SETTINGS_SOURCES}
+    deck_state_manager_test.cpp
+    LIBS
+    libcockatrice_card
+    libcockatrice_deck_list
+    libcockatrice_models
+    libcockatrice_utility
+    ${SETTINGS_LIBS}
+    INCLUDE_DIRS
+    ${SETTINGS_INCLUDE_DIRS}
+  )
 endif()

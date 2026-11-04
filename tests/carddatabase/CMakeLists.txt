@@ -35,6 +35,21 @@ if(WITH_ORACLE OR WITH_CLIENT)
     LIBS
     libcockatrice_filters
   )
+
+  # ------------------------
+  # Visual Display Model Test
+  # ------------------------
+  cockatrice_add_test(
+    NAME
+    visual_display_model_test
+    SOURCES
+    ${VERSION_STRING_CPP}
+    visual_display_model_test.cpp
+    mocks.cpp
+    LIBS
+    libcockatrice_card
+    libcockatrice_models
+  )
 endif()
 
 # ------------------------
