@@ -32,6 +32,9 @@ public:
     // Queues removal and reload; the application owns the returned updater and
     // deletes it on completion. Callers can connect its failure/completion signals.
     static SpoilerBackgroundUpdater *deleteSpoilerFile();
+    // The operation currently running, if any. The updater outlives the page that
+    // started it, so a reopened page uses this to observe the in-flight update.
+    static SpoilerBackgroundUpdater *current();
 
 private slots:
     void begin();

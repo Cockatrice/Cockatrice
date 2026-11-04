@@ -289,6 +289,11 @@ void SpoilerBackgroundUpdater::finish(const QString &error, bool updated)
     }
 }
 
+SpoilerBackgroundUpdater *SpoilerBackgroundUpdater::current()
+{
+    return currentUpdater;
+}
+
 SpoilerBackgroundUpdater *SpoilerBackgroundUpdater::deleteSpoilerFile()
 {
     // Deletion and the following reload share the operation lifetime. Callers can

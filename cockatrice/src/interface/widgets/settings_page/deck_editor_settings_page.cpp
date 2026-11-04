@@ -121,11 +121,18 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     lpSpoilerGrid->addWidget(&lastUpdatedLabel, 2, 0);
     lpSpoilerGrid->addWidget(updateNowButton, 2, 1);
     lpSpoilerGrid->addWidget(&infoOnSpoilersLabel, 3, 0, 1, 3, Qt::AlignTop);
+    infoOnSpoilersLabel.setWordWrap(true);
 
     // On a change to the checkbox, hide/un-hide the other fields
     connect(&mcDownloadSpoilersCheckBox, &QCheckBox::toggled, &SettingsCache::instance().downloads(),
             &DownloadSettings::setDownloadSpoilerStatus);
     connect(&mcDownloadSpoilersCheckBox, &QCheckBox::toggled, this, &DeckEditorSettingsPage::setSpoilersEnabled);
+
+    // The updater is application-owned and outlives this page, so a Settings page
+    // reopened mid-update must observe the operation that is still running.
+    if (auto *runningUpdater = SpoilerBackgroundUpdater::current()) {
+        observeSpoilerUpdater(runningUpdater);
+    }
 
     mpGeneralGroupBox = new QGroupBox;
     mpGeneralGroupBox->setLayout(lpGeneralGrid);
@@ -334,9 +341,16 @@ void DeckEditorSettingsPage::updateSpoilers()
     }
     // Application ownership lets either operation finish after settings closes.
     // When disabled, the same button retries file removal and the local reload.
-    auto *sbu = SettingsCache::instance().downloads().getDownloadSpoilersStatus()
-                    ? new SpoilerBackgroundUpdater(QCoreApplication::instance(), true)
-                    : SpoilerBackgroundUpdater::deleteSpoilerFile();
+    SpoilerBackgroundUpdater *sbu;
+    if (SettingsCache::instance().downloads().getDownloadSpoilersStatus()) {
+        sbu = new SpoilerBackgroundUpdater(QCoreApplication::instance(), true);
+        // Only an updater this page creates is retired by deleteLater: observation
+        // may attach to the stack-allocated launch updater, which must not be deleted.
+        connect(sbu, &SpoilerBackgroundUpdater::spoilerCheckerDone, sbu, &QObject::deleteLater);
+    } else {
+        // deleteSpoilerFile() wires its own deleteLater.
+        sbu = SpoilerBackgroundUpdater::deleteSpoilerFile();
+    }
     observeSpoilerUpdater(sbu);
 }
 
@@ -350,7 +364,6 @@ void DeckEditorSettingsPage::observeSpoilerUpdater(SpoilerBackgroundUpdater *sbu
             unlockSettings();
         }
     });
-    connect(sbu, &SpoilerBackgroundUpdater::spoilerCheckerDone, sbu, &QObject::deleteLater, Qt::UniqueConnection);
     connect(sbu, &SpoilerBackgroundUpdater::spoilerUpdateFailed, this, [this, sbu](const QString &message) {
         if (spoilerUpdater != sbu) {
             return;
@@ -370,6 +383,13 @@ void DeckEditorSettingsPage::unlockSettings()
                                  ? tr("Update Spoilers")
                                  : tr("Reload Card Database"));
     lastUpdatedLabel.setText(tr("Last Change") + ": " + getLastUpdateTime());
+    infoOnSpoilersLabel.setText(
+        SettingsCache::instance().downloads().getDownloadSpoilersStatus()
+            ? tr("Spoilers download automatically on launch") + "\n" +
+                  tr("Press the button to manually update without relaunching") + "\n\n" +
+                  tr("Updates continue if you close settings")
+            : tr("Spoilers are off. Reload Card Database removes any downloaded spoiler file and reloads your "
+                 "card data."));
 }
 
 QString DeckEditorSettingsPage::getLastUpdateTime()
@@ -407,7 +427,9 @@ void DeckEditorSettingsPage::setSpoilersEnabled(bool anInput)
     mpSpoilerSavePathLineEdit->setEnabled(anInput);
     mpSpoilerPathButton->setEnabled(anInput);
     lastUpdatedLabel.setEnabled(anInput);
-    infoOnSpoilersLabel.setEnabled(anInput);
+    // The hint explains the button in both states, especially the disabled-state
+    // Reload Card Database action, so keep it readable while spoilers are off.
+    infoOnSpoilersLabel.setEnabled(true);
 
     // Only react to the user disabling the setting. The constructor calls this to
     // initialize the controls, and a leftover spoiler file is recovered through the
@@ -425,9 +447,6 @@ void DeckEditorSettingsPage::retranslateUi()
     mcDownloadSpoilersCheckBox.setText(tr("Download Spoilers Automatically"));
     mcSpoilerSaveLabel.setText(tr("Spoiler Location:"));
     lastUpdatedLabel.setText(tr("Last Change") + ": " + getLastUpdateTime());
-    infoOnSpoilersLabel.setText(tr("Spoilers download automatically on launch") + "\n" +
-                                tr("Press the button to manually update without relaunching") + "\n\n" +
-                                tr("Updates continue if you close settings"));
     picDownloadCheckBox.setText(tr("Download card pictures on the fly"));
     urlLinkLabel.setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_PIC_URL).arg(tr("How to add a custom URL")));
     resetDownloadURLs.setText(tr("Reset Download URLs"));
