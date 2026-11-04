@@ -1,5 +1,7 @@
 #include "deck_preview_tag_display_widget.h"
 
+#include "../../interface/theme_manager.h"
+
 #include <QBrush>
 #include <QColor>
 #include <QFlags>
@@ -117,8 +119,9 @@ void DeckPreviewTagDisplayWidget::paintEvent(QPaintEvent *event)
     painter.setPen(borderPen);
     painter.drawRect(rect().adjusted(0, 0, -1, -1));
 
-    // Calculate font size based on widget height
-    QFont font = painter.font();
+    // Calculate font size based on widget height. Family comes from the
+    // InterfaceDefault theme role; the height-derived size stays as before.
+    QFont font = themeManager->appFont(AppFont::InterfaceDefault);
     int fontSize = std::max(10, height() / 2); // Ensure a minimum font size of 10
     font.setPointSize(fontSize);
     painter.setFont(font);

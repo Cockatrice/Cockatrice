@@ -1,5 +1,6 @@
 #include "shortcut_treeview.h"
 
+#include "../../interface/theme_manager.h"
 #include "cache_settings.h"
 #include "shortcuts_settings.h"
 
@@ -93,7 +94,8 @@ void ShortcutTreeView::populateShortcutsModel()
             curParent = parentItems.value(group);
         } else {
             curParent = new QStandardItem(group);
-            static QFont font = curParent->font();
+            // Family comes from the InterfaceDefault theme role; bold stays caller-side.
+            QFont font = themeManager->appFont(AppFont::InterfaceDefault);
             font.setBold(true);
             curParent->setFont(font);
             parentItems.insert(group, curParent);

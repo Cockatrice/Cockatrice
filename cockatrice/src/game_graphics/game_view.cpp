@@ -2,12 +2,14 @@
 
 #include "../client/settings/cache_settings.h"
 #include "../client/settings/shortcuts_settings.h"
+#include "../interface/theme_manager.h"
 #include "game_scene.h"
 
 #include <QAction>
 #include <QBrush>
 #include <QColor>
 #include <QEvent>
+#include <QFont>
 #include <QGraphicsScene>
 #include <QGridLayout>
 #include <QLabel>
@@ -23,6 +25,21 @@
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
+
+namespace
+{
+QFont deckOverlayFont(int pixelSize, bool bold)
+{
+    // The drag/total counters and the tally columns are in-game overlays, not
+    // deck list text: keep the monospace family the stylesheets used to set so
+    // digit widths stay stable as counts tick and `white-space: pre` lines up.
+    QFont font(QStringLiteral("monospace"));
+    font.setStyleHint(QFont::Monospace);
+    font.setPixelSize(pixelSize);
+    font.setBold(bold);
+    return font;
+}
+} // namespace
 
 // QRubberBand calls raise() in showEvent() and changeEvent() to stay on top of siblings.
 // This subclass disables that behavior so dragCountLabel can appear above it.
@@ -76,15 +93,14 @@ GameView::GameView(GameScene *scene, QWidget *parent) : QGraphicsView(scene, par
     rubberBand = new SelectionRubberBand(QRubberBand::Rectangle, this);
 
     const QString baseProperties = "color: white; "
-                                   "font-family: monospace; "
                                    "background-color: rgba(0, 0, 0, 160); "
                                    "border-radius: 3px; "
                                    "padding: 1px 2px; "
                                    "white-space: pre;";
 
-    const QString dragCountLabelStyle = baseProperties + "font-size: 14px; font-weight: bold;";
-    const QString totalCountLabelStyle = baseProperties + "font-size: 16px; font-weight: bold;";
-    const QString subtypeTallyLabelStyle = baseProperties + "font-size: 12px;";
+    const QString dragCountLabelStyle = baseProperties;
+    const QString totalCountLabelStyle = baseProperties;
+    const QString subtypeTallyLabelStyle = baseProperties;
 
     dragCountLabel = new QLabel(this);
     dragCountLabel->setStyleSheet(dragCountLabelStyle);
@@ -101,6 +117,27 @@ GameView::GameView(GameScene *scene, QWidget *parent) : QGraphicsView(scene, par
     tallyLayout->setContentsMargins(2, 2, 2, 2);
     tallyLayout->setSpacing(2);
     tallyContainer->hide();
+
+    applyDeckOverlayFonts();
+}
+
+void GameView::applyDeckOverlayFonts()
+{
+    dragCountLabel->setFont(deckOverlayFont(14, true));
+    totalCountLabel->setFont(deckOverlayFont(16, true));
+    tallyContainer->setFont(deckOverlayFont(12, false));
+    for (int i = 0; i < tallyLayout->count(); ++i) {
+        if (auto *label = qobject_cast<QLabel *>(tallyLayout->itemAt(i)->widget())) {
+            // Count column (odd positions) keeps the bold emphasis.
+            const bool count = i % 2 == 1;
+            label->setFont(deckOverlayFont(count ? 14 : 12, count));
+        }
+    }
+
+    // The container keeps the size computed from the previous fonts, so force
+    // rebuildTallyLabels() to re-measure it instead of reusing cachedTallyRows.
+    cachedTallyRows.clear();
+    updateTotalSelectionCount();
 }
 
 void GameView::resizeEvent(QResizeEvent *event)
@@ -220,9 +257,8 @@ QSize GameView::rebuildTallyLabels(const QList<TallyRow> &entries)
 {
     clearTallyLabels();
 
-    const QString nameStyle = QStringLiteral("color: white; font-size: 12px; background: transparent;");
-    const QString countStyle =
-        QStringLiteral("color: white; font-size: 14px; font-weight: bold; background: transparent;");
+    const QString nameStyle = QStringLiteral("color: white; background: transparent;");
+    const QString countStyle = QStringLiteral("color: white; background: transparent;");
 
     int totalHeight = 0;
     int maxNameWidth = 0;
@@ -232,11 +268,13 @@ QSize GameView::rebuildTallyLabels(const QList<TallyRow> &entries)
     for (const TallyRow &entry : entries) {
         auto *nameLabel = new QLabel(entry.name, tallyContainer);
         nameLabel->setStyleSheet(nameStyle);
+        nameLabel->setFont(deckOverlayFont(12, false));
         nameLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
         tallyLayout->addWidget(nameLabel, row, 0);
 
         auto *countLabel = new QLabel(entry.value, tallyContainer);
         countLabel->setStyleSheet(countStyle);
+        countLabel->setFont(deckOverlayFont(14, true));
         countLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
         tallyLayout->addWidget(countLabel, row, 1);
 
