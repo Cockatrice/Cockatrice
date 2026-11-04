@@ -185,6 +185,9 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
                     if (gameentry.share_decklists_on_load()) {
                         result.append(tr("open decklists"));
                     }
+                    if (gameentry.shuffle_players()) {
+                        result.append(tr("random turn order"));
+                    }
                     return result.join(", ");
                 }
                 case Qt::DecorationRole: {

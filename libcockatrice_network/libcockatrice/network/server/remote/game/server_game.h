@@ -74,6 +74,11 @@ private:
     int hostId;
     ServerInfo_User *creatorInfo;
     QMap<int, Server_AbstractParticipant *> participants;
+    // Seating/turn order as an ordered list of player ids. Player ids themselves
+    // are stable for the lifetime of the participant; shuffling or reordering
+    // only permutes this list so old clients, ISL routes and persistent
+    // references (all keyed by player id) keep working.
+    QList<int> seatOrder;
     QSet<QString> allPlayersEver, allSpectatorsEver;
     bool gameStarted;
     bool gameClosed;
@@ -90,6 +95,7 @@ private:
     bool spectatorsSeeEverything;
     int startingLifeTotal;
     bool shareDecklistsOnLoad;
+    bool shufflePlayers;
     int inactivityCounter;
     int startTimeOfThisGame, secondsElapsed;
     bool firstGameStarted;
@@ -109,6 +115,8 @@ private:
                                      Server_AbstractParticipant *recipient,
                                      bool omniscient,
                                      bool withUserInfo);
+    QList<Server_AbstractParticipant *> getParticipantsInSeatOrder() const;
+    void reseatPlayers(const QList<Server_AbstractParticipant *> &orderedParticipants, bool randomized);
     void storeGameInformation();
     bool canSeePrivateEventsFor(const Server_AbstractParticipant *participant, int privatePlayerId) const;
 signals:
@@ -148,6 +156,10 @@ public:
     const QMap<int, Server_AbstractParticipant *> &getParticipants() const
     {
         return participants;
+    }
+    QList<int> getSeatOrder() const
+    {
+        return seatOrder;
     }
     int getGameId() const
     {
@@ -189,6 +201,10 @@ public:
     {
         return shareDecklistsOnLoad;
     }
+    bool getShufflePlayers() const
+    {
+        return shufflePlayers;
+    }
     Response::ResponseCode
     checkJoin(ServerInfo_User *user, const QString &_password, const RoleInfo &roleInfo, bool overrideRestrictions);
     bool containsUser(const QString &userName) const;
@@ -202,6 +218,8 @@ public:
     bool kickParticipant(int playerId);
     void startGameIfReady(bool forceStartGame);
     void stopGameIfFinished();
+    void shufflePlayerSeats();
+    void reorderPlayerSeats(const QList<QString> &orderedNames);
     int getActivePlayer() const
     {
         return activePlayer;

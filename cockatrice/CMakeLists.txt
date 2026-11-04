@@ -56,6 +56,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/dlg_settings.cpp
     src/interface/widgets/dialogs/dlg_startup_card_check.cpp
     src/interface/widgets/dialogs/dlg_tip_of_the_day.cpp
+    src/interface/widgets/dialogs/dlg_turn_order.cpp
     src/interface/widgets/dialogs/dlg_update.cpp
     src/interface/widgets/dialogs/dlg_view_log.cpp
     src/interface/widgets/dialogs/override_printing_warning.cpp
