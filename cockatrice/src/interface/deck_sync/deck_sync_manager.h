@@ -38,6 +38,10 @@ class ServerInfo_DeckStorage_Folder;
  *
  * Ownership: fire-and-forget per run, driven by PendingCommand round trips.
  * No watcher, no auto triggers, no conflict UI — those arrive in later layers.
+ *
+ * Deletes are tombstones, never silent: a locally deleted deck is pushed with
+ * Command_DeckDel, a server-side delete is applied locally only after copying
+ * the file to a .sync-backup, and resurrection reuses the stored deck id.
  */
 class DeckSyncManager : public QObject
 {
@@ -78,6 +82,8 @@ private slots:
     onUploadFinished(const Response &response, const CommandContainer &commandContainer, const QVariant &extraData);
     void
     onDownloadFinished(const Response &response, const CommandContainer &commandContainer, const QVariant &extraData);
+    void
+    onDeleteFinished(const Response &response, const CommandContainer &commandContainer, const QVariant &extraData);
 
 private:
     struct ServerFile
@@ -125,6 +131,8 @@ private:
     void sendMkDirFor(const QString &dir);
     void sendUpload(const UploadOp &op);
     void sendDownload(const DownloadOp &op);
+    void sendDelete(const QString &relativePath, int deckId);
+    void snapshotLocalFile(const QString &relativePath, const QString &guid);
     static QString parentDir(const QString &path);
     QString uniqueLocalPath(const QString &relativePath) const;
 
@@ -139,6 +147,7 @@ private:
     QSet<QString> ensuredDirs;
     QList<UploadOp> pendingUploads;
     QList<DownloadOp> pendingDownloads;
+    QList<QString> pendingDeletes;
     int uploadedCount = 0;
     int downloadedCount = 0;
     int unchangedCount = 0;
