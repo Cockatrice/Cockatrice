@@ -38,6 +38,11 @@ public:
 
     [[nodiscard]] const QList<int> &getReplayTimeline() const;
 
+    /**
+     * @brief Index of the last replay event the game state has processed, or -1 before the first event.
+     */
+    [[nodiscard]] int getLastProcessedEventIndex() const;
+
 public slots:
     void seekToEvent(int eventIndex);
 

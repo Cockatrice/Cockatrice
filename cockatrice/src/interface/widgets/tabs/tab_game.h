@@ -50,6 +50,7 @@ class AbstractClient;
 class GameView;
 class GameScene;
 class ReplayWidget;
+class ReplayEventSidebar;
 class CardInfoFrameWidget;
 class QLabel;
 class QPushButton;
@@ -89,7 +90,7 @@ private:
     QMap<int, TabbedDeckViewContainer *> deckViewContainers;
     QVBoxLayout *deckViewContainerLayout;
     QWidget *gamePlayAreaWidget, *deckViewContainerWidget;
-    QDockWidget *cardInfoDock, *messageLayoutDock, *playerListDock, *replayDock;
+    QDockWidget *cardInfoDock, *messageLayoutDock, *playerListDock, *replayDock, *historyDock;
     QAction *playersSeparator;
     QMenu *gameMenu, *viewMenu;
     TearOffMenu *phasesMenu;

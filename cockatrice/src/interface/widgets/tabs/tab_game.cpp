@@ -27,6 +27,7 @@
 #include "../interface/widgets/utility/line_edit_completer.h"
 #include "../main.h"
 #include "../menus/tearoff_menu.h"
+#include "../replay/replay_event_sidebar.h"
 #include "../replay/replay_widget.h"
 #include "../utility/visibility_change_listener.h"
 #include "card/card_completer_proxy_model.h"
@@ -98,7 +99,7 @@ class Message;
 } // namespace google
 
 TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
-    : Tab(_tabSupervisor), sayLabel(nullptr), sayEdit(nullptr)
+    : Tab(_tabSupervisor), sayLabel(nullptr), sayEdit(nullptr), replayDock(nullptr), historyDock(nullptr)
 {
     setObjectName("TabGame");
     // THIS CTOR IS USED ON REPLAY
@@ -115,6 +116,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     addDockWidget(Qt::RightDockWidgetArea, cardInfoDock);
     addDockWidget(Qt::RightDockWidgetArea, playerListDock);
     addDockWidget(Qt::RightDockWidgetArea, messageLayoutDock);
+    addDockWidget(Qt::LeftDockWidgetArea, historyDock);
     addDockWidget(Qt::BottomDockWidgetArea, replayDock);
 
     mainWidget = new QStackedWidget(this);
@@ -158,6 +160,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     createPlayAreaWidget();
     createDeckViewContainerWidget();
     replayDock = nullptr;
+    historyDock = nullptr;
 
     addDockWidget(Qt::RightDockWidgetArea, cardInfoDock);
     addDockWidget(Qt::RightDockWidgetArea, playerListDock);
@@ -353,6 +356,9 @@ void TabGame::retranslateUi()
     }
     cardInfoDock->setWindowTitle(tr("Card Info") + (cardInfoDock->isWindow() ? tabText : QString()));
     messageLayoutDock->setWindowTitle(tr("Messages") + (messageLayoutDock->isWindow() ? tabText : QString()));
+    if (historyDock) {
+        historyDock->setWindowTitle(tr("Game History") + (historyDock->isWindow() ? tabText : QString()));
+    }
     if (replayDock) {
         replayDock->setWindowTitle(tr("Replay Timeline") + (replayDock->isWindow() ? tabText : QString()));
     }
@@ -429,6 +435,9 @@ void TabGame::retranslateUi()
     dockToActions[messageLayoutDock].menu->setTitle(tr("Messages"));
     dockToActions[playerListDock].menu->setTitle(tr("Player List"));
 
+    if (historyDock) {
+        dockToActions[historyDock].menu->setTitle(tr("Game History"));
+    }
     if (replayDock) {
         dockToActions[replayDock].menu->setTitle(tr("Replay Timeline"));
     }
@@ -1291,6 +1300,10 @@ void TabGame::createViewMenuItems()
     registerDockWidget(viewMenu, messageLayoutDock, {250, 200});
     registerDockWidget(viewMenu, playerListDock, {250, 50});
 
+    if (historyDock) {
+        registerDockWidget(viewMenu, historyDock, {280, 400});
+    }
+
     if (replayDock) {
         registerDockWidget(viewMenu, replayDock, {900, 100});
     }
@@ -1360,6 +1373,12 @@ void TabGame::actResetLayout()
     addDockWidget(Qt::RightDockWidgetArea, playerListDock);
     addDockWidget(Qt::RightDockWidgetArea, messageLayoutDock);
 
+    if (historyDock) {
+        historyDock->setVisible(true);
+        historyDock->setFloating(false);
+        addDockWidget(Qt::LeftDockWidgetArea, historyDock);
+    }
+
     if (replayDock) {
         replayDock->setVisible(true);
         replayDock->setFloating(false);
@@ -1368,6 +1387,9 @@ void TabGame::actResetLayout()
         cardInfoDock->resize(250, 360);
         messageLayoutDock->resize(250, 200);
         playerListDock->resize(250, 50);
+        if (historyDock) {
+            historyDock->resize(280, 400);
+        }
         replayDock->resize(900, 100);
     } else {
         cardInfoDock->resize(250, 360);
@@ -1422,6 +1444,22 @@ void TabGame::createReplayDock(GameReplay *replay)
             [this](const auto &event, auto options) {
                 game->getGameEventHandler()->processGameEventContainer(event, nullptr, options);
             });
+
+    auto *historySidebar = new ReplayEventSidebar(nullptr, replay, replayWidget->getReplayTimeline());
+    historyDock = new QDockWidget(this);
+    historyDock->setObjectName("historyDock");
+    historyDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable |
+                             QDockWidget::DockWidgetMovable);
+    historyDock->setWidget(historySidebar);
+    historyDock->setFloating(false);
+
+    connect(historySidebar, &ReplayEventSidebar::eventSelected, replayWidget, &ReplayWidget::seekToEvent);
+    // The sidebar highlights events rather than times, so ask the manager which event the game state has reached.
+    connect(replayWidget, &ReplayWidget::timeChanged, historySidebar,
+            [this, historySidebar] { historySidebar->setCurrentEvent(replayWidget->getLastProcessedEventIndex()); });
+
+    // No event has been replayed yet when the sidebar is connected, so apply the initial state explicitly.
+    historySidebar->setCurrentEvent(replayWidget->getLastProcessedEventIndex());
 }
 
 void TabGame::createDeckViewContainerWidget(bool bReplay)
