@@ -84,6 +84,7 @@ set(cockatrice_SOURCES
     src/game_graphics/deckview/tabbed_deck_view_container.cpp
     src/game_graphics/dialogs/dlg_annotation.cpp
     src/game_graphics/dialogs/dlg_create_token.cpp
+    src/game_graphics/dialogs/token_preview_widget.cpp
     src/game_graphics/dialogs/dlg_move_top_cards_until.cpp
     src/game_graphics/dialogs/dlg_roll_dice.cpp
     src/game_graphics/game_scene.cpp
