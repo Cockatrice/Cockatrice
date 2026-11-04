@@ -119,6 +119,8 @@ QWidget *fromWidgetId(WidgetId id)
 
 SettingsView::SettingsView(QWidget *parent) : QWidget(parent), currentTabIndex(0), searchActive(false)
 {
+    setObjectName("settingsView");
+
     setupUi();
 
     connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this, &SettingsView::retranslateUi);
@@ -135,6 +137,7 @@ void SettingsView::setupUi()
     searchEdit->addAction(themePixmap(QStringLiteral("icons/search")), QLineEdit::LeadingPosition);
     searchEdit->installEventFilter(this);
     connect(searchEdit, &QLineEdit::textChanged, this, &SettingsView::onSearchTextChanged);
+    searchEdit->setObjectName("settingsSearchEdit");
 
     auto *searchLayout = new QHBoxLayout;
     searchLayout->addWidget(searchEdit);

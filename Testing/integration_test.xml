@@ -1,0 +1,45 @@
+<events>
+  <!-- Integration test: exercises multiple tiers in sequence -->
+
+  <!-- Tier 2: Open and close all menus -->
+  <event widget="MainWindow/menubar" command="activate" arguments="cockatriceMenu" />
+  <event widget="MainWindow" command="key" arguments="16777216" />
+  <event widget="MainWindow/menubar" command="activate" arguments="dbMenu" />
+  <event widget="MainWindow" command="key" arguments="16777216" />
+  <event widget="MainWindow/menubar" command="activate" arguments="tabsMenu" />
+  <event widget="MainWindow" command="key" arguments="16777216" />
+  <event widget="MainWindow/menubar" command="activate" arguments="helpMenu" />
+  <event widget="MainWindow" command="key" arguments="16777216" />
+
+  <!-- Tier 2: Open and close About (modal) -->
+  <event widget="MainWindow/menubar" command="activate" arguments="helpMenu" />
+  <event widget="MainWindow/menubar/helpMenu" command="activate" arguments="&amp;About Cockatrice" />
+  <event widget="MainWindow/aboutDialog" command="key" arguments="16777216" />
+
+  <!-- Tier 4: Open and close ViewLog (non-modal) -->
+  <event widget="MainWindow/menubar" command="activate" arguments="helpMenu" />
+  <event widget="MainWindow/menubar/helpMenu" command="activate" arguments="View &amp;Debug Log" />
+  <event widget="MainWindow/viewLogDialog" command="key" arguments="16777216" />
+
+  <!-- Tier 4: Open and close Tip of the Day (non-modal) -->
+  <event widget="MainWindow/menubar" command="activate" arguments="helpMenu" />
+  <event widget="MainWindow/menubar/helpMenu" command="activate" arguments="&amp;Tip of the Day" />
+  <event widget="MainWindow/tipOfTheDayDialog" command="key" arguments="16777216" />
+
+  <!-- Tier 5: Settings search (state interaction) -->
+  <event widget="MainWindow/menubar" command="activate" arguments="cockatriceMenu" />
+  <event widget="MainWindow/menubar/cockatriceMenu" command="activate" arguments="actionSettings" />
+  <event widget="MainWindow/settingsDialog/settingsView/settingsSearchEdit" command="key" arguments="100" />
+  <event widget="MainWindow/settingsDialog/settingsView/settingsSearchEdit" command="key" arguments="101" />
+  <event widget="MainWindow/settingsDialog/settingsView/settingsSearchEdit" command="key" arguments="98" />
+  <event widget="MainWindow/settingsDialog/settingsView/settingsSearchEdit" command="key" arguments="117" />
+  <event widget="MainWindow/settingsDialog/settingsOkButton" command="activate" arguments="" />
+
+  <!-- Tier 3: Open deck editor from home and type in search -->
+  <event widget="MainWindow/tabSupervisor/stackedWidget/TabHome/homeWidget/homeButtonsBox/homeCreateNewDeckButton" command="activate" arguments="" />
+  <event widget="MainWindow/tabSupervisor/stackedWidget/TabDeckEditorVisual/databaseDisplayDock/databaseDisplayDockContents/databaseDisplayWidget/searchEdit" command="key" arguments="76" />
+  <event widget="MainWindow/tabSupervisor/stackedWidget/TabDeckEditorVisual/databaseDisplayDock/databaseDisplayDockContents/databaseDisplayWidget/searchEdit" command="key" arguments="105" />
+  <event widget="MainWindow/tabSupervisor/stackedWidget/TabDeckEditorVisual/databaseDisplayDock/databaseDisplayDockContents/databaseDisplayWidget/searchEdit" command="key" arguments="103" />
+  <event widget="MainWindow/tabSupervisor/stackedWidget/TabDeckEditorVisual/databaseDisplayDock/databaseDisplayDockContents/databaseDisplayWidget/searchEdit" command="key" arguments="104" />
+  <event widget="MainWindow/tabSupervisor/stackedWidget/TabDeckEditorVisual/databaseDisplayDock/databaseDisplayDockContents/databaseDisplayWidget/searchEdit" command="key" arguments="116" />
+</events>
