@@ -175,9 +175,9 @@ fi
 if [[ $MAKE_SANITIZE ]]; then
   flags+=("-DENABLE_SANITIZERS=ON")
 else
-  # The release-package step re-runs cmake in the same build dir, so an
-  # ENABLE_SANITIZERS=ON left over from the debug step would otherwise leak
-  # into the shipped binaries (libasan/libubsan Depends in the DEB).
+  # Every leg states the flag explicitly rather than relying on the CMake
+  # default, so a build directory reused from a sanitized configuration can
+  # never leak libasan/libubsan into a shipped binary.
   flags+=("-DENABLE_SANITIZERS=OFF")
 fi
 if [[ $MAKE_COVERAGE ]]; then
