@@ -241,6 +241,7 @@ void CommanderBracketWidget::onEstimateBracketFinished(quint64 id,
 void CommanderBracketWidget::displayEstimate()
 {
     if (!hasEstimate) {
+        bracketInfoButton->setToolTip(tr("Why this bracket?"));
         return;
     }
 
