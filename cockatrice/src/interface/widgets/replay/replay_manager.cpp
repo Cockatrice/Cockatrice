@@ -57,7 +57,7 @@ ReplayManager::ReplayManager(QObject *parent, GameReplay *replay)
 
     rewindBufferingTimer = new QTimer(this);
     rewindBufferingTimer->setSingleShot(true);
-    connect(rewindBufferingTimer, &QTimer::timeout, this, &ReplayManager::processRewind);
+    connect(rewindBufferingTimer, &QTimer::timeout, this, [this] { processRewind(); });
 }
 
 ReplayManager::~ReplayManager()
@@ -65,7 +65,7 @@ ReplayManager::~ReplayManager()
     delete replay;
 }
 
-void ReplayManager::skipToTime(int newTime, bool doRewindBuffering)
+void ReplayManager::skipToTime(int newTime, bool doRewindBuffering, bool includeEventsAtTime)
 {
     // check boundary conditions
     if (newTime < 0) {
@@ -75,15 +75,17 @@ void ReplayManager::skipToTime(int newTime, bool doRewindBuffering)
         newTime = maxTime;
     }
 
-    newTime -= newTime % TIMER_INTERVAL_MS; // Time should always be a multiple of the interval
+    if (!includeEventsAtTime) {
+        newTime -= newTime % TIMER_INTERVAL_MS; // Time should always be a multiple of the interval
+    }
 
     const bool isBackwardsSkip = newTime < currentProcessedTime;
     currentVisualTime = newTime;
 
     if (isBackwardsSkip) {
-        handleBackwardsSkip(doRewindBuffering);
+        handleBackwardsSkip(doRewindBuffering, includeEventsAtTime);
     } else {
-        processNewEvents(FORWARD_SKIP);
+        processNewEvents(FORWARD_SKIP, includeEventsAtTime);
     }
 
     timeChanged(currentVisualTime);
@@ -95,7 +97,7 @@ void ReplayManager::skipToTime(int newTime, bool doRewindBuffering)
  * @param doRewindBuffering When true, if multiple backward skips are made in quick succession, only a single rewind
  * is processed at the end. When false, the backwards skip will always cause an immediate rewind.
  */
-void ReplayManager::handleBackwardsSkip(bool doRewindBuffering)
+void ReplayManager::handleBackwardsSkip(bool doRewindBuffering, bool includeEventsAtTime)
 {
     if (doRewindBuffering) {
         // We use a one-shot timer to implement the rewind buffering.
@@ -105,11 +107,11 @@ void ReplayManager::handleBackwardsSkip(bool doRewindBuffering)
         rewindBufferingTimer->start(SettingsCache::instance().userInterface().getRewindBufferingMs());
     } else {
         // otherwise, process the rewind immediately
-        processRewind();
+        processRewind(includeEventsAtTime);
     }
 }
 
-void ReplayManager::processRewind()
+void ReplayManager::processRewind(bool includeEventsAtTime)
 {
     // stop any queued-up rewinds
     rewindBufferingTimer->stop();
@@ -117,7 +119,7 @@ void ReplayManager::processRewind()
     // process the rewind
     currentEvent = 0;
     emit rewound();
-    processNewEvents(BACKWARD_SKIP);
+    processNewEvents(BACKWARD_SKIP, includeEventsAtTime);
 }
 
 void ReplayManager::replayTimerTimeout()
@@ -134,11 +136,13 @@ void ReplayManager::replayTimerTimeout()
 }
 
 /** @brief Processes all unprocessed events up to the current time. */
-void ReplayManager::processNewEvents(PlaybackMode playbackMode)
+void ReplayManager::processNewEvents(PlaybackMode playbackMode, bool includeEventsAtTime)
 {
     currentProcessedTime = currentVisualTime;
 
-    while (currentEvent < replayTimeline.size() && replayTimeline[currentEvent] < currentProcessedTime) {
+    while (currentEvent < replayTimeline.size() &&
+           (replayTimeline[currentEvent] < currentProcessedTime ||
+            (includeEventsAtTime && replayTimeline[currentEvent] == currentProcessedTime))) {
         EventProcessingOptions options;
 
         // backwards skip => always skip reveal windows
@@ -234,6 +238,24 @@ void ReplayManager::setTime(int time)
 {
     // don't buffer rewinds from clicks, since clicks usually don't happen fast enough to require buffering
     skipToTime(time, false);
+}
+
+void ReplayManager::setTimeToEvent(int eventIndex)
+{
+    if (eventIndex < 0 || eventIndex >= replayTimeline.size()) {
+        return;
+    }
+
+    // Flush a pending buffered rewind before seeking, otherwise its timer fires after this seek and rebuilds the
+    // replay state from an outdated currentVisualTime, dropping the event we seek to. Stopping the timer instead
+    // of processing it is not enough: playback ticks advance currentProcessedTime without rewinding currentEvent,
+    // so the board could still be ahead of the target.
+    if (rewindBufferingTimer->isActive()) {
+        processRewind();
+    }
+
+    // Unlike a timeline seek, jumping to an event should apply that event immediately.
+    skipToTime(replayTimeline.at(eventIndex), false, true);
 }
 
 void ReplayManager::skipByAmount(int amount)
