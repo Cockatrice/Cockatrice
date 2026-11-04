@@ -194,19 +194,6 @@ jobs:
             package: skip
             sanitize: yes
 
-          - distro: Ubuntu
-            version: 26.04
-            variant: cover    # separate image and ccache, same distro
-
-            # The one leg that runs instrumented for line coverage and publishes the report as
-            # a workflow artifact. It is a separate leg rather than a second flag on the
-            # sanitizer leg because the two instruments answer different questions: the
-            # sanitizer leg reports what the run did wrong, the coverage leg reports what the
-            # run never touched at all. Combining them would also slow both down. Packaging is
-            # skipped because the plain Ubuntu 26.04 leg publishes the DEB for this distro.
-            coverage: yes
-            package: skip
-
     name: ${{ matrix.distro }} ${{ matrix.version }}${{ matrix.variant && format(' {0}', matrix.variant) || '' }}
     needs: configure
     # The nightly legs live in build-linux-nightly below. A leg is in exactly one of the two
@@ -296,9 +283,8 @@ jobs:
       # gets packaged, so a packaging leg no longer pays for a full Debug compile it then
       # throws away. macOS and Windows have always tested their release build.
       #
-      # Instrumented and debug-test legs reach this step only when they package (the sanitizer
-      # leg currently does, the coverage leg does not); their suite already ran in the debug
-      # step above, so the tests are not repeated here.
+      # Instrumented and debug-test legs reach this step only when they also package; their
+      # suite already ran in the debug step above, so the tests are not repeated here.
       - name: "Build release, test and package"
         id: build
         if: matrix.package != 'skip' || env.RUN_TESTS == 'true'
@@ -461,9 +447,31 @@ jobs:
             package: DEB
             test: skip    # Running tests on all distros is superfluous
 
+          # The one leg that runs instrumented for line coverage and publishes the report as
+          # a workflow artifact. It stays a separate leg rather than a second flag on the
+          # sanitizer leg because the two instruments answer different questions: the
+          # sanitizer leg reports what the run did wrong, the coverage leg reports what the
+          # run never touched at all. Combining them would also slow both down.
+          #
+          # It moved here from build-linux: gcovr.cfg sets no fail_under, so the leg cannot
+          # fail a build, and nothing consumes the report per change, which made it an
+          # artifact nobody read on every pull request. On the default branch it becomes a
+          # trend instead. Image and ccache keys come from distro, version and variant, so
+          # they are unchanged and the warm cache that leg built still matches.
+          - distro: Ubuntu
+            version: 26.04
+            variant: cover    # separate image and ccache, same distro
+
+            coverage: yes
+            package: skip
+            # A report must not redden the nightly run: vcpkg-cache-import only imports the
+            # archives of a run whose conclusion is success.
+            allow-failure: yes
+
     name: ${{ matrix.distro }} ${{ matrix.version }}${{ matrix.variant && format(' {0}', matrix.variant) || '' }}
     needs: configure
-    # A nightly and a tag build cover the legs a pull request or a merge does not wait for.
+    # A nightly and a tag build cover the legs a pull request or a merge does not wait for:
+    # the previous release of each distro, and the one instrument that only reports.
     if: github.event_name == 'schedule' || github.ref_type == 'tag'
     runs-on: ubuntu-latest    # https://github.com/actions/runner-images
     continue-on-error: ${{ matrix.allow-failure == 'yes' }}
