@@ -634,7 +634,7 @@ void TabGame::actConcede()
 
 void TabGame::actTurnOrder()
 {
-    if (!game->isHost() || game->getGameMetaInfo()->started()) {
+    if (!canSetTurnOrder()) {
         return;
     }
 
@@ -669,16 +669,34 @@ void TabGame::actTurnOrder()
 }
 
 /**
+ * Whether the local user may change the seating order: only while the game has
+ * not started, and only as the host or a moderator - the server allows both
+ * (Server_AbstractParticipant::cmdSetPlayerOrder).
+ */
+bool TabGame::canSetTurnOrder() const
+{
+    if (game->getGameMetaInfo()->started()) {
+        return false;
+    }
+    if (game->isHost()) {
+        return true;
+    }
+    const ServerInfo_User *userInfo = tabSupervisor->getUserInfo();
+    return userInfo != nullptr && (userInfo->user_level() & ServerInfo_User::IsModerator);
+}
+
+/**
  * Shows the turn order action only when it can actually change anything: the
- * player must be host and the game must not have started yet. Called whenever
- * either condition may have changed (game start/stop, host change).
+ * player must be allowed to set the order and the game must not have started.
+ * Called whenever either condition may have changed (game start/stop, host
+ * change).
  */
 void TabGame::updateTurnOrderAction()
 {
     if (aTurnOrder == nullptr) {
         return;
     }
-    aTurnOrder->setVisible(game->isHost() && !game->getGameMetaInfo()->started());
+    aTurnOrder->setVisible(canSetTurnOrder());
 }
 
 /**

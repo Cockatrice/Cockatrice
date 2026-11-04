@@ -130,6 +130,7 @@ private:
 
     PlayerLogic *setActivePlayer(int id);
     void setActivePhase(int phase);
+    bool canSetTurnOrder() const;
     void createMenuItems();
     void createReplayMenuItems();
     void createViewMenuItems();
