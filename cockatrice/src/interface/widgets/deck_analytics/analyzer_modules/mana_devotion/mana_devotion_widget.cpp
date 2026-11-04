@@ -1,6 +1,5 @@
 #include "mana_devotion_widget.h"
 
-#include "../../../../essence_chart_colors.h"
 #include "../../../general/display/charts/bars/bar_widget.h"
 #include "../../../general/display/charts/bars/color_bar.h"
 #include "../../../general/display/charts/pies/color_pie.h"
@@ -30,7 +29,7 @@ namespace
 {
 
 AnalyticsPanelWidgetRegistrar registerManaDevotion{
-    "manaDevotion", ManaDevotionWidget::tr("Essence Cost Symbols"),
+    "manaDevotion", ManaDevotionWidget::tr("Mana Devotion"),
     [](QWidget *parent, DeckListStatisticsAnalyzer *analyzer) { return new ManaDevotionWidget(parent, analyzer); }};
 
 } // anonymous namespace
@@ -83,13 +82,18 @@ void ManaDevotionWidget::updateDisplay()
         mapSorted.insert(QString(it.key()), it.value());
     }
 
+    // Color map
+    QHash<QChar, QColor> colors = {{'W', QColor(248, 231, 185)}, {'U', QColor(14, 104, 171)},
+                                   {'B', QColor(21, 11, 0)},     {'R', QColor(211, 32, 42)},
+                                   {'G', QColor(0, 115, 62)},    {'C', QColor(150, 150, 150)}};
+
     // Choose display mode
     if (config.displayType == "bar") {
         // One BarWidget per devotion color
         for (auto c : devoMap.keys()) {
             QString label = QString("%1 %2 (%3)").arg(c).arg(devoMap[c]).arg(cardCount.value(QString(c)));
 
-            BarWidget *bar = new BarWidget(label, devoMap[c], highest, EssenceCharts::colorFor(QString(c)), this);
+            BarWidget *bar = new BarWidget(label, devoMap[c], highest, colors.value(c, Qt::gray), this);
 
             barLayout->addWidget(bar);
         }

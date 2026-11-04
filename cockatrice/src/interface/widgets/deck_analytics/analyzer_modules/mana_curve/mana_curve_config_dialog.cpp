@@ -64,7 +64,7 @@ void ManaCurveConfigDialog::retranslateUi()
 {
     labelGroupBy->setText(tr("Group By:"));
     groupBy->setItemText(0, tr("type"));
-    groupBy->setItemText(1, tr("Essence"));
+    groupBy->setItemText(1, tr("color"));
     groupBy->setItemText(2, tr("subtype"));
     groupBy->setItemText(3, tr("power"));
     groupBy->setItemText(4, tr("toughness"));

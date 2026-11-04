@@ -319,11 +319,7 @@ void CardDatabase::swapInDatabaseData(CardDatabaseData data)
     sets = std::move(data.sets);
     formats = std::move(data.formats);
 
-    // A successfully parsed card database may legitimately contain no cards.
-    // Continuumatrice starts with an intentionally empty catalogue, which is
-    // still LOADED. NotLoaded is reserved for before loading and clear().
-    // The UI uses this status to reveal its filters and empty results view.
-    loadStatus = Ok;
+    loadStatus = cards.isEmpty() ? NotLoaded : Ok;
 
     // inform listeners that the whole database was replaced; they should
     // rebuild from the live containers in a single batch instead of reacting

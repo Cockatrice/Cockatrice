@@ -1,6 +1,5 @@
 #include "mana_base_widget.h"
 
-#include "../../../../essence_chart_colors.h"
 #include "../../../general/display/charts/bars/bar_widget.h"
 #include "../../../general/display/charts/bars/color_bar.h"
 #include "../../../general/display/charts/pies/color_pie.h"
@@ -31,7 +30,7 @@ namespace
 {
 
 AnalyticsPanelWidgetRegistrar registerManaBase{
-    "manaBase", ManaBaseWidget::tr("Essence Production"),
+    "manaBase", ManaBaseWidget::tr("Mana Base"),
     [](QWidget *parent, DeckListStatisticsAnalyzer *analyzer) { return new ManaBaseWidget(parent, analyzer); }};
 
 } // anonymous namespace
@@ -84,12 +83,16 @@ void ManaBaseWidget::updateDisplay()
 
     // Choose display mode
     if (config.displayType == "bar") {
-        const QList<QPair<QString, int>> sortedColors = EssenceCharts::ordered(mapSorted);
+        const QList<QPair<QString, int>> sortedColors = GameSpecificColors::MTG::sortManaMapWUBRGCFirst(mapSorted);
+        static const QHash<QString, QColor> colorMap = {
+            {"W", QColor(248, 231, 185)}, {"U", QColor(14, 104, 171)}, {"B", QColor(21, 11, 0)},
+            {"R", QColor(211, 32, 42)},   {"G", QColor(0, 115, 62)},   {"C", QColor(150, 150, 150)},
+        };
 
         for (const auto &[color, count] : sortedColors) {
             QString label = QString("%1 %2 (%3)").arg(color).arg(count).arg(cardCount.value(color));
 
-            BarWidget *bar = new BarWidget(label, count, highest, EssenceCharts::colorFor(color), this);
+            BarWidget *bar = new BarWidget(label, count, highest, colorMap.value(color, Qt::gray), this);
 
             barLayout->addWidget(bar);
         }

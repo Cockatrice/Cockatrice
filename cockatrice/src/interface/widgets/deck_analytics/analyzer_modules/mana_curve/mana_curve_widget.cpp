@@ -23,7 +23,7 @@ namespace
 {
 
 AnalyticsPanelWidgetRegistrar registerManaCurve{
-    "manaCurve", ManaCurveWidget::tr("Essence Curve"),
+    "manaCurve", ManaCurveWidget::tr("Mana Curve"),
     [](QWidget *parent, DeckListStatisticsAnalyzer *analyzer) { return new ManaCurveWidget(parent, analyzer); }};
 
 } // anonymous namespace

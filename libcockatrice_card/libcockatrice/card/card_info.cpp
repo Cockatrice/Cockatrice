@@ -1,7 +1,6 @@
 #include "card_info.h"
 
 #include "game_specific_terms.h"
-#include "essence_types.h"
 #include "libcockatrice/card/lazy_properties_hash.h"
 #include "printing/printing_info.h"
 #include "relation/card_relation.h"
@@ -305,34 +304,17 @@ void CardInfo::setCardType(const QString &value)
 {
     setProperty(Mtg::CardType, value);
 }
-QString CardInfo::getEssenceValue() const
-{
-    return hasProperty(EssenceProperties::Value) ? getProperty(EssenceProperties::Value)
-                                                : getProperty(Mtg::ConvertedManaCost);
-}
-QString CardInfo::getEssenceTypes() const
-{
-    const QString value = hasProperty(EssenceProperties::Types)
-                              ? getProperty(EssenceProperties::Types)
-                              : getProperty(Mtg::Colors);
-    return Essence::normalizeIdentity(value);
-}
-QString CardInfo::getEssenceCost() const
-{
-    return hasProperty(EssenceProperties::Cost) ? getProperty(EssenceProperties::Cost)
-                                               : getProperty(Mtg::ManaCost);
-}
 QString CardInfo::getCmc() const
 {
-    return getEssenceValue();
+    return getProperty(Mtg::ConvertedManaCost);
 }
 QString CardInfo::getColors() const
 {
-    return getEssenceTypes();
+    return getProperty(Mtg::Colors);
 }
 void CardInfo::setColors(const QString &value)
 {
-    setProperty(EssenceProperties::Types, Essence::normalizeIdentity(value));
+    setProperty(Mtg::Colors, value);
 }
 QString CardInfo::getLoyalty() const
 {
@@ -344,53 +326,11 @@ QString CardInfo::getMainCardType() const
 }
 QString CardInfo::getManaCost() const
 {
-    return getEssenceCost();
-}
-QString CardInfo::getIdentity() const
-{
-    return hasProperty(ContinuumCardProperties::Identity) ? getProperty(ContinuumCardProperties::Identity)
-                                                          : getProperty(ContinuumCardProperties::Alias);
-}
-QString CardInfo::getAttack() const
-{
-    if (hasProperty(ContinuumCardProperties::Attack)) {
-        return getProperty(ContinuumCardProperties::Attack);
-    }
-    if (hasProperty(ContinuumCardProperties::Strength)) {
-        return getProperty(ContinuumCardProperties::Strength);
-    }
-    const QString legacyStats = getProperty(Mtg::PowTough);
-    const qsizetype slash = legacyStats.indexOf(QLatin1Char('/'));
-    return slash < 0 ? QString() : legacyStats.left(slash);
-}
-QString CardInfo::getArmour() const
-{
-    return hasProperty(ContinuumCardProperties::Armour) ? getProperty(ContinuumCardProperties::Armour)
-                                                        : getProperty(ContinuumCardProperties::Armor);
-}
-QString CardInfo::getHealth() const
-{
-    if (hasProperty(ContinuumCardProperties::Health)) {
-        return getProperty(ContinuumCardProperties::Health);
-    }
-    const QString legacyStats = getProperty(Mtg::PowTough);
-    const qsizetype slash = legacyStats.indexOf(QLatin1Char('/'));
-    return slash < 0 ? QString() : legacyStats.mid(slash + 1);
-}
-QString CardInfo::getAtkHp() const
-{
-    const QString attack = getAttack();
-    const QString health = getHealth();
-    if (attack.isEmpty() && health.isEmpty()) {
-        return QString();
-    }
-    return (attack.isEmpty() ? QStringLiteral("?") : attack) + QLatin1Char('/') +
-           (health.isEmpty() ? QStringLiteral("?") : health);
+    return getProperty(Mtg::ManaCost);
 }
 QString CardInfo::getPowTough() const
 {
-    // Compatibility accessor. Display terminology is always ATK/HP.
-    return getAtkHp();
+    return getProperty(Mtg::PowTough);
 }
 void CardInfo::setPowTough(const QString &value)
 {

@@ -1,7 +1,7 @@
 #include "mana_curve_category_widget.h"
 
 #include "../../../general/display/charts/bars/bar_chart_widget.h"
-#include "../../../../essence_chart_colors.h"
+#include "libcockatrice/utility/color.h"
 #include "libcockatrice/utility/qt_utils.h"
 #include "mana_curve_config.h"
 
@@ -110,7 +110,7 @@ void ManaCurveCategoryWidget::updateDisplay(int minCmc,
 
             QVector<BarSegment> segments;
             if (val > 0) {
-                segments.push_back({cat, val, cards, EssenceCharts::colorFor(cat)});
+                segments.push_back({cat, val, cards, GameSpecificColors::MTG::colorHelper(cat)});
             }
 
             catBars.push_back({QString::number(cmc), segments});

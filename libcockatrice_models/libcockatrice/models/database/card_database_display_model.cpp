@@ -90,18 +90,11 @@ bool CardDatabaseDisplayModel::lessThan(const QModelIndex &left, const QModelInd
         if (isRightType && (!isLeftType || rightString.size() == cardName.size())) {
             return false;
         }
-    } else if (left.column() == right.column() &&
-               (left.column() == CardDatabaseModel::AttackColumn ||
-                left.column() == CardDatabaseModel::ArmourColumn ||
-                left.column() == CardDatabaseModel::HealthColumn)) {
-        // Compare numeric card statistics as numbers: 9 sorts before 10.
-        // Values containing expressions retain the existing numeric-prefix
-        // comparator instead of being forced into an integer type.
-        return lessThanNumerically(leftString, rightString) < 0;
-    } else if (right.column() == CardDatabaseModel::AtkHpColumn &&
-               left.column() == CardDatabaseModel::AtkHpColumn) {
-        // ATK/HP sorts by Attack first, then Health, both numerically.
-        // Operate on views to avoid allocations during large database sorts.
+    } else if (right.column() == CardDatabaseModel::PTColumn && left.column() == CardDatabaseModel::PTColumn) {
+        // The comparator runs O(n log n) times while the view is sorted, so
+        // splitting every power/toughness string into a QStringList allocates
+        // a lot for data that has exactly one separator. Work on views and
+        // only split the two halves out when both strings are well formed.
         const QStringView leftPT = leftString;
         const QStringView rightPT = rightString;
         const qsizetype leftSlash = leftPT.indexOf(u'/');
@@ -110,11 +103,11 @@ bool CardDatabaseDisplayModel::lessThan(const QModelIndex &left, const QModelInd
         const bool rightIsWellFormed = rightSlash >= 0 && rightPT.indexOf(u'/', rightSlash + 1) < 0;
 
         if (leftIsWellFormed && rightIsWellFormed) {
-            const int attackComparison = lessThanNumerically(leftPT.left(leftSlash), rightPT.left(rightSlash));
-            if (attackComparison != 0) {
-                return attackComparison < 0;
+            const int powerComparison = lessThanNumerically(leftPT.left(leftSlash), rightPT.left(rightSlash));
+            if (powerComparison != 0) {
+                return powerComparison < 0;
             }
-            // Attack equal, compare Health
+            // power equal, check toughness
             return lessThanNumerically(leftPT.mid(leftSlash + 1), rightPT.mid(rightSlash + 1)) < 0;
         }
     }

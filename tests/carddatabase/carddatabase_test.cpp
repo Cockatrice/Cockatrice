@@ -26,7 +26,6 @@
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/card/database/card_database_data.h>
 #include <libcockatrice/card/database/parser/cockatrice_xml_4.h>
-#include <libcockatrice/card/game_specific_terms.h>
 #include <libcockatrice/card/lazy_properties_hash.h>
 #include <libcockatrice/card/printing/printing_info.h>
 #include <libcockatrice/card/relation/card_relation.h>
@@ -36,7 +35,6 @@
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 #include <libcockatrice/utility/card_ref.h>
 #include <string>
-#include <utility>
 
 namespace
 {
@@ -65,65 +63,6 @@ TEST(CardDatabaseTest, LoadXml)
     ASSERT_EQ(0, db->getSetList().size()) << "Sets not empty after clear";
     ASSERT_EQ(0, db->query()->getAllMainCardTypes().size()) << "Types not empty after clear";
     ASSERT_EQ(NotLoaded, db->getLoadStatus()) << "Incorrect status after clear";
-}
-
-TEST(CardDatabaseTest, EmptyLoadedSnapshotIsReadyNotLoading)
-{
-    NoopCardPreferenceProvider prefs;
-    TestCardDatabasePathProvider pathProvider;
-    NoopCardSetPriorityController controller;
-    CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
-
-    EXPECT_EQ(NotLoaded, db.getLoadStatus());
-
-    // A newly bootstrapped Continuumatrice profile contains a valid, but empty,
-    // XML v4 catalogue. Successful swap must not trap the visual browser on
-    // "Loading database..." when there are zero cards.
-    CardDatabaseData emptySnapshot;
-    db.swapInDatabaseData(std::move(emptySnapshot));
-    EXPECT_TRUE(db.getCardList().isEmpty());
-    EXPECT_EQ(Ok, db.getLoadStatus());
-
-    db.clear();
-    EXPECT_EQ(NotLoaded, db.getLoadStatus());
-}
-
-TEST(CardInfoTest, ContinuumIdentityAndStatsHaveNativeAndLegacyPropertyAccess)
-{
-    auto native = CardInfo::newInstance("Native Continuum Card");
-    native->setProperty("identity", "The Shadow Queen");
-    native->setProperty("attack", "10");
-    native->setProperty("armour", "3");
-    native->setProperty("health", "12");
-
-    EXPECT_EQ(native->getIdentity(), "The Shadow Queen");
-    EXPECT_EQ(native->getAttack(), "10");
-    EXPECT_EQ(native->getArmour(), "3");
-    EXPECT_EQ(native->getHealth(), "12");
-    EXPECT_EQ(native->getAtkHp(), "10/12");
-    EXPECT_EQ(native->getPowTough(), "10/12"); // Legacy accessor remains useful.
-
-    auto legacyMse = CardInfo::newInstance("Legacy Continuum Card");
-    legacyMse->setProperty("alias", "The Guardian");
-    legacyMse->setProperty("strength", "9");
-    legacyMse->setProperty("armor", "4");
-    legacyMse->setProperty("health", "8");
-    EXPECT_EQ(legacyMse->getIdentity(), "The Guardian");
-    EXPECT_EQ(legacyMse->getAttack(), "9");
-    EXPECT_EQ(legacyMse->getArmour(), "4");
-    EXPECT_EQ(legacyMse->getHealth(), "8");
-    EXPECT_EQ(legacyMse->getAtkHp(), "9/8");
-
-    auto oldPt = CardInfo::newInstance("Old Imported Card");
-    oldPt->setProperty(Mtg::PowTough, "2/7");
-    EXPECT_EQ(oldPt->getAttack(), "2");
-    EXPECT_EQ(oldPt->getHealth(), "7");
-    EXPECT_EQ(oldPt->getAtkHp(), "2/7");
-
-    // Missing values should not be represented as false zeroes.
-    auto blank = CardInfo::newInstance("No Stats");
-    EXPECT_TRUE(blank->getAtkHp().isEmpty());
-    EXPECT_TRUE(blank->getArmour().isEmpty());
 }
 
 TEST(CardDatabaseTest, LazyPropertiesHashStreamsBlobAccessors)

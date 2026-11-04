@@ -1,6 +1,5 @@
 set(HEADERS
     libcockatrice/card/card_info.h
-    libcockatrice/card/essence_types.h
     libcockatrice/card/card_info_comparator.h
     libcockatrice/card/card_localization.h
     libcockatrice/card/lazy_properties_hash.h

@@ -256,17 +256,6 @@ void SettingsCache::loadPaths()
 
     computePath("customSets", dataPath + "/customsets/");
     computeFilePath("cardDatabase", dataPath + "/cards.xml");
-
-    // On a new Continuumatrice profile create an empty, valid XML v4 database.
-    // Never download MTG data or copy the user's Cockatrice card database.
-    const QString initialCardDb = dataPath + "/cards.xml";
-    if (!QFile::exists(initialCardDb)) {
-        if (!QFile::copy(QStringLiteral(":/resources/continuumatrice-empty-carddatabase.xml"), initialCardDb)) {
-            qCWarning(SettingsCacheLog) << "Could not create Continuumatrice starter database:" << initialCardDb;
-        } else {
-            QFile::setPermissions(initialCardDb, QFile::ReadOwner | QFile::WriteOwner);
-        }
-    }
     computeFilePath("tokenDatabase", dataPath + "/tokens.xml");
     computeFilePath("spoilerDatabase", dataPath + "/spoiler.xml");
 }

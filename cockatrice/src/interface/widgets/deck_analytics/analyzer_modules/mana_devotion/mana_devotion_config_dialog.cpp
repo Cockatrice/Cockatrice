@@ -63,7 +63,7 @@ void ManaDevotionConfigDialog::retranslateUi()
     displayType->setItemText(1, tr("bar"));
     displayType->setItemText(2, tr("combinedBar"));
 
-    labelFilters->setText(tr("Filter Essence types (optional):"));
+    labelFilters->setText(tr("Filter Colors (optional):"));
 }
 
 void ManaDevotionConfigDialog::accept()

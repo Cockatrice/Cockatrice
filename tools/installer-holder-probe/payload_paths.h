@@ -13,7 +13,7 @@
  * running, which is what makes this list the evidence the two process lookups cannot
  * provide - see payloadExecutablesInUse().
  */
-inline constexpr const wchar_t *PAYLOAD_PROGRAMS[] = {L"continuumatrice.exe", L"continuumatrice-legacy-oracle.exe", L"continuum-servatrice.exe"};
+inline constexpr const wchar_t *PAYLOAD_PROGRAMS[] = {L"cockatrice.exe", L"oracle.exe", L"servatrice.exe"};
 
 /**
  * @brief The last name in @p path: what follows its last separator, or @p path itself when

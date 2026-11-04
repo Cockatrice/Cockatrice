@@ -28,15 +28,9 @@ public:
         NameColumn,
         SetListColumn,
         ManaCostColumn,
-        AtkHpColumn, // Formerly P/T; keep column index for saved table layouts.
+        PTColumn,
         CardTypeColumn,
-        ColorColumn,
-        IdentityColumn,
-        AttackColumn,
-        ArmourColumn,
-        HealthColumn,
-        ColumnCount,
-        PTColumn = AtkHpColumn // Compatibility alias for inherited callers.
+        ColorColumn
     };
     enum Role
     {

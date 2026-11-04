@@ -16,26 +16,6 @@
  * Note: Mtg = "Maybe that game"
  */
 
-// These remain only for reading older Cockatrice XML. New cards use Essence.
-namespace EssenceProperties
-{
-inline const QString Cost = QStringLiteral("essencecost");
-inline const QString Types = QStringLiteral("essence");
-inline const QString Value = QStringLiteral("essencevalue");
-}
-
-// Continuum Universes CCG card-definition fields, not mutable match stats.
-namespace ContinuumCardProperties
-{
-inline const QString Identity = QStringLiteral("identity");
-inline const QString Alias = QStringLiteral("alias"); // Earlier exports may use this name.
-inline const QString Attack = QStringLiteral("attack");
-inline const QString Strength = QStringLiteral("strength"); // Legacy MSE field ID.
-inline const QString Armour = QStringLiteral("armour");
-inline const QString Armor = QStringLiteral("armor"); // Legacy American spelling.
-inline const QString Health = QStringLiteral("health");
-}
-
 namespace Mtg
 {
 QString const CardType("type");
@@ -51,29 +31,14 @@ QString const ColorIdentity("coloridentity");
 
 inline static const QString getNicePropertyName(QString key)
 {
-    if (key == EssenceProperties::Cost || key == ManaCost) {
-        return QCoreApplication::translate("Essence", "Essence Cost");
-    }
-    if (key == EssenceProperties::Types || key == Colors || key == ColorIdentity) {
-        return QCoreApplication::translate("Essence", "Essence");
-    }
-    if (key == EssenceProperties::Value || key == ConvertedManaCost) {
-        return QCoreApplication::translate("Essence", "Essence Value");
-    }
-    if (key == ContinuumCardProperties::Identity || key == ContinuumCardProperties::Alias) {
-        return QCoreApplication::translate("Continuum", "Identity");
-    }
-    if (key == ContinuumCardProperties::Attack || key == ContinuumCardProperties::Strength) {
-        return QCoreApplication::translate("Continuum", "Attack");
-    }
-    if (key == ContinuumCardProperties::Armour || key == ContinuumCardProperties::Armor) {
-        return QCoreApplication::translate("Continuum", "Armour");
-    }
-    if (key == ContinuumCardProperties::Health) {
-        return QCoreApplication::translate("Continuum", "Health");
-    }
     if (key == CardType) {
         return QCoreApplication::translate("Mtg", "Card Type");
+    }
+    if (key == ConvertedManaCost) {
+        return QCoreApplication::translate("Mtg", "Mana Value");
+    }
+    if (key == Colors) {
+        return QCoreApplication::translate("Mtg", "Color(s)");
     }
     if (key == Loyalty) {
         return QCoreApplication::translate("Mtg", "Loyalty");
@@ -81,14 +46,20 @@ inline static const QString getNicePropertyName(QString key)
     if (key == MainCardType) {
         return QCoreApplication::translate("Mtg", "Main Card Type");
     }
+    if (key == ManaCost) {
+        return QCoreApplication::translate("Mtg", "Mana Cost");
+    }
     if (key == PowTough) {
-        return QCoreApplication::translate("Continuum", "ATK/HP");
+        return QCoreApplication::translate("Mtg", "P/T");
     }
     if (key == Side) {
         return QCoreApplication::translate("Mtg", "Side");
     }
     if (key == Layout) {
         return QCoreApplication::translate("Mtg", "Layout");
+    }
+    if (key == ColorIdentity) {
+        return QCoreApplication::translate("Mtg", "Color Identity");
     }
     return key;
 }

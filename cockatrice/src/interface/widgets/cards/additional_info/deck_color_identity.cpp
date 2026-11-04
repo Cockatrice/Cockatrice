@@ -1,7 +1,6 @@
 #include "deck_color_identity.h"
 
 #include "libcockatrice/card/card_info.h"
-#include <libcockatrice/card/essence_types.h>
 
 #include <QChar>
 #include <QList>
@@ -18,7 +17,7 @@ QString getDeckColorIdentity(const DeckList &deck, const CardDatabaseQuerier *db
         return {};
     }
 
-    QSet<QChar> colorSet; // Unique Essence symbols (including N for colorless).
+    QSet<QChar> colorSet; // A set to collect unique color symbols (e.g., W, U, B, R, G)
 
     for (const QString &cardName : cardList) {
         CardInfoPtr currentCard = db->getCardInfo(cardName);
@@ -30,9 +29,10 @@ QString getDeckColorIdentity(const DeckList &deck, const CardDatabaseQuerier *db
         }
     }
 
-    // Canonical Essence order is shared by the database and all widgets.
+    // Ensure the color identity is in WUBRG order
     QString colorIdentity;
-    for (const QChar &color : Essence::symbols()) {
+    const QString wubrgOrder = "WUBRG";
+    for (const QChar &color : wubrgOrder) {
         if (colorSet.contains(color)) {
             colorIdentity.append(color);
         }

@@ -4,7 +4,7 @@
 
 std::wstring installerCloseSocketName(unsigned long processId, const std::wstring &userName)
 {
-    std::wstring name = L"ContinuumatriceInstallerClose-";
+    std::wstring name = L"CockatriceInstallerClose-";
     name += std::to_wstring(processId);
     name += L"-";
     name += userName;

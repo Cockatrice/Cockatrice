@@ -118,7 +118,7 @@ QStringMap &SoundEngine::getAvailableThemes()
 #elif defined(Q_OS_WIN)
                 "/sounds"
 #else // linux
-                "/../share/continuumatrice/sounds"
+                "/../share/cockatrice/sounds"
 #endif
     );
 
