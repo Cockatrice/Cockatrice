@@ -1,5 +1,6 @@
 #include "deck_stats_interface.h"
 
+#include "deck_analysis_url.h"
 #include "libcockatrice/card/card_info.h"
 #include "libcockatrice/card/database/card_database_querier.h"
 #include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
@@ -24,28 +25,6 @@
 #include <libcockatrice/deck_list/tree/deck_list_card_node.h>
 #include <libcockatrice/network/network_manager.h>
 #include <version_string.h>
-
-namespace
-{
-bool normalizeAnalysisUrl(QUrl &url, const QString &serviceHost)
-{
-    const QString host = url.host().toLower();
-    const bool legacyHttp = url.scheme() == QStringLiteral("http");
-    const int defaultPort = legacyHttp ? 80 : 443;
-    if (!url.isValid() || (!legacyHttp && url.scheme() != QStringLiteral("https")) || !url.userInfo().isEmpty() ||
-        !url.path().startsWith('/') || (url.port() != -1 && url.port() != defaultPort) ||
-        (host != serviceHost && host != QStringLiteral("www.") + serviceHost)) {
-        return false;
-    }
-    // Both services accept HTTPS. Older public metadata may still identify the
-    // same deck with HTTP; retain its host/path/query while using HTTPS to open it.
-    if (legacyHttp) {
-        url.setScheme(QStringLiteral("https"));
-        url.setPort(-1);
-    }
-    return true;
-}
-} // namespace
 
 DeckStatsInterface::DeckStatsInterface(QObject *parent) : QObject(parent)
 {
@@ -116,10 +95,6 @@ void DeckStatsInterface::getAnalyzeRequestData(const DeckList &deck, QByteArray 
 
 void DeckStatsInterface::analyzeDeck(const DeckList &deck)
 {
-    if (analysisStarted) {
-        return;
-    }
-    analysisStarted = true;
     QByteArray data;
     getAnalyzeRequestData(deck, data);
 

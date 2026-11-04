@@ -30,7 +30,6 @@ class TappedOutInterface : public QObject
     Q_OBJECT
 private:
     QNetworkAccessManager *manager;
-    bool analysisStarted = false;
     bool replyHandled = false;
     void showError(const QString &message);
 
