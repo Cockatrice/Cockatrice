@@ -36,7 +36,7 @@ struct PendingIntentChain
 };
 
 /**
- * @brief Parses continuumatrice:// links and runs them as serialized intent chains.
+ * @brief Parses cockatrice:// links and runs them as serialized intent chains.
  *
  * Links are parsed by action (joingame/opendeck) and translated into an intent
  * chain. Chains are queued and run one at a time: a document can hand multiple

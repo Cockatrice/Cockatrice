@@ -14,25 +14,18 @@
 #include <QList>
 #include <QSharedPointer>
 #include <QStringList>
-#include <libcockatrice/card/essence_types.h>
 #include <QVBoxLayout>
 #include <QWidget>
 
 namespace
 {
 AnalyticsPanelWidgetRegistrar registerManaDistribution{
-    "manaProdDevotion", ManaDistributionWidget::tr("Essence Production + Costs"),
+    "manaProdDevotion", ManaDistributionWidget::tr("Mana Production + Devotion"),
     [](QWidget *parent, DeckListStatisticsAnalyzer *analyzer) { return new ManaDistributionWidget(parent, analyzer); }};
 
 } // anonymous namespace
 
-static const QStringList kEssences = [] {
-    QStringList codes;
-    for (const QChar symbol : Essence::symbols()) {
-        codes.append(QString(symbol));
-    }
-    return codes;
-}();
+static const QStringList kColors = {"W", "U", "B", "R", "G", "C"};
 
 ManaDistributionWidget::ManaDistributionWidget(QWidget *parent, DeckListStatisticsAnalyzer *analyzer)
     : AbstractAnalyticsPanelWidget(parent, analyzer)
@@ -56,7 +49,7 @@ ManaDistributionWidget::ManaDistributionWidget(QWidget *parent, DeckListStatisti
     row = new QHBoxLayout();
     containerLayout->addLayout(row);
 
-    for (const QString &c : kEssences) {
+    for (const QString &c : kColors) {
         auto *w = new ManaDistributionSingleDisplayWidget(c, this);
         row->addWidget(w);
         rows[c] = w;
@@ -72,7 +65,7 @@ void ManaDistributionWidget::updateDisplay()
     const auto &prodPips = analyzer->getProductionPipCount();
     const auto &prodCards = analyzer->getProductionCardCount();
 
-    QStringList filtered = config.filters.isEmpty() ? kEssences : config.filters;
+    QStringList filtered = config.filters.isEmpty() ? kColors : config.filters;
 
     QMap<QString, int> devMap, prodMap;
     for (const QString &c : filtered) {
@@ -96,7 +89,7 @@ void ManaDistributionWidget::updateDisplay()
         productionBarTop->setColors(prodMap);
     }
 
-    for (const QString &c : kEssences) {
+    for (const QString &c : kColors) {
         auto *w = rows.value(c);
 
         if (!w) {
@@ -133,7 +126,7 @@ void ManaDistributionWidget::updateDisplay()
 QDialog *ManaDistributionWidget::createConfigDialog(QWidget *parent)
 {
     auto *dlg = new ManaDistributionConfigDialog(analyzer, parent);
-    dlg->setWindowTitle(tr("Essence Distribution Settings"));
+    dlg->setWindowTitle(tr("Mana Distribution Settings"));
     dlg->setFromConfig(config);
 
     connect(dlg, &QDialog::accepted, [this, dlg]() {

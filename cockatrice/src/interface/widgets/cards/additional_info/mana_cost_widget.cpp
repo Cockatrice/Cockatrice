@@ -1,7 +1,6 @@
 #include "mana_cost_widget.h"
 
 #include "libcockatrice/card/card_info.h"
-#include <libcockatrice/card/essence_types.h>
 #include "mana_symbol_widget.h"
 
 #include <QHBoxLayout>
@@ -52,7 +51,28 @@ void ManaCostWidget::resizeEvent(QResizeEvent *event)
     }
 }
 
-QStringList ManaCostWidget::parseManaCost(const QString &essenceCost)
+QStringList ManaCostWidget::parseManaCost(const QString &cmc)
 {
-    return Essence::parseCost(essenceCost);
+    QStringList symbols;
+
+    // Handle split costs (e.g., "3U // 4UU")
+    QStringList splitCosts = cmc.split(" // ");
+    for (const QString &part : splitCosts) {
+        QRegularExpression regex(R"(\{([^}]+)\}|(\d+)|([WUBRGCSPX]))");
+        QRegularExpressionMatchIterator matches = regex.globalMatch(part);
+        while (matches.hasNext()) {
+            QRegularExpressionMatch match = matches.next();
+            if (match.captured(1).isEmpty()) { // If no `{}` group was captured, check other groups
+                if (!match.captured(2).isEmpty()) {
+                    symbols.append(match.captured(2)); // Number match
+                } else {
+                    symbols.append(match.captured(3)); // Single mana letter match
+                }
+            } else {
+                symbols.append(match.captured(1)); // `{}` enclosed match
+            }
+        }
+    }
+
+    return symbols;
 }

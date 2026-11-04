@@ -18,7 +18,6 @@
 class FilterTreeModel;
 class QComboBox;
 class QHBoxLayout;
-class EssenceFilterPicker;
 
 class VisualDatabaseDisplayColorFilterCircleWidget : public QWidget
 {
@@ -64,7 +63,7 @@ private slots:
     void addFilter(QChar color);
     void removeFilter(QChar color);
     void updateFilterMode();
-    void setEssenceActive(QChar essence, bool active);
+    void setManaSymbolActive(QChar color, bool active);
     QList<QChar> getActiveColors();
     void syncWithFilterModel();
 
@@ -72,7 +71,6 @@ private:
     FilterTreeModel *filterModel;
     QHBoxLayout *layout;
     QComboBox *modeComboBox;
-    EssenceFilterPicker *essencePicker = nullptr;
     FilterMode currentMode = FilterMode::Includes; // Default mode
     QtUtils::Debouncer syncDebouncer{100};
 };

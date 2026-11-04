@@ -10,18 +10,11 @@
 #include <QListWidgetItem>
 #include <QString>
 #include <QStringList>
-#include <libcockatrice/card/essence_types.h>
 #include <QVBoxLayout>
 
 class QWidget;
 
-static const QStringList kEssences = [] {
-    QStringList codes;
-    for (const QChar symbol : Essence::symbols()) {
-        codes.append(QString(symbol));
-    }
-    return codes;
-}();
+static const QStringList kColors = {"W", "U", "B", "R", "G", "C"};
 
 ManaDistributionConfigDialog::ManaDistributionConfigDialog(DeckListStatisticsAnalyzer *analyzer, QWidget *parent)
     : QDialog(parent), analyzer(analyzer)
@@ -40,7 +33,7 @@ ManaDistributionConfigDialog::ManaDistributionConfigDialog(DeckListStatisticsAna
 
     filterList = new QListWidget(this);
     filterList->setSelectionMode(QAbstractItemView::MultiSelection);
-    filterList->addItems(kEssences); // dynamic/fixed, no translation needed
+    filterList->addItems(kColors); // dynamic/fixed, no translation needed
     lay->addWidget(filterList);
 
     showColorRows = new QCheckBox(this);
@@ -63,9 +56,9 @@ void ManaDistributionConfigDialog::retranslateUi()
     displayType->setItemText(0, tr("pie"));
     displayType->setItemText(1, tr("bar"));
 
-    labelFilters->setText(tr("Essence types:"));
+    labelFilters->setText(tr("Colors:"));
 
-    showColorRows->setText(tr("Show per-Essence rows"));
+    showColorRows->setText(tr("Show per-color rows"));
 
     // QDialogButtonBox buttons are automatically translated
 }

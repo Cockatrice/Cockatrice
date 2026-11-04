@@ -466,24 +466,12 @@ public:
     /** @name Legacy/Convenience Property Accessors */ //@{
     [[nodiscard]] QString getCardType() const;
     void setCardType(const QString &value);
-    // Native Continuumatrice card properties; older MTG getter names below
-    // remain compatibility wrappers used by the inherited model/analytics API.
-    [[nodiscard]] QString getEssenceCost() const;
-    [[nodiscard]] QString getEssenceTypes() const;
-    [[nodiscard]] QString getEssenceValue() const;
     [[nodiscard]] QString getCmc() const;
     [[nodiscard]] QString getColors() const;
     void setColors(const QString &value);
     [[nodiscard]] QString getLoyalty() const;
     [[nodiscard]] QString getMainCardType() const;
     [[nodiscard]] QString getManaCost() const;
-    // Native static card-definition stats and identity. The database exporter
-    // writes identity/attack/armour/health, while older XML keys are readable.
-    [[nodiscard]] QString getIdentity() const;
-    [[nodiscard]] QString getAttack() const;
-    [[nodiscard]] QString getArmour() const;
-    [[nodiscard]] QString getHealth() const;
-    [[nodiscard]] QString getAtkHp() const;
     [[nodiscard]] QString getPowTough() const;
     void setPowTough(const QString &value);
     //@}

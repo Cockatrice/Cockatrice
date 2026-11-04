@@ -223,7 +223,7 @@ bool waitForExit(const std::vector<HANDLE> &processes, unsigned long waitMillise
 
 bool isCockatriceImage(const std::wstring &imageName)
 {
-    constexpr wchar_t COCKATRICE_IMAGE[] = L"continuumatrice.exe";
+    constexpr wchar_t COCKATRICE_IMAGE[] = L"cockatrice.exe";
     return CompareStringOrdinal(imageName.c_str(), -1, COCKATRICE_IMAGE, -1, TRUE) == CSTR_EQUAL;
 }
 

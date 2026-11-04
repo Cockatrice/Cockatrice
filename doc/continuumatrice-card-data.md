@@ -30,13 +30,13 @@ Qt follows the XDG environment variables if set; the paths above are defaults, n
 
 ## Card database format
 
-Continuumatrice reads its native **Continuumatrice XML v4**, and also accepts legacy Cockatrice XML v4 for import (schema `doc/carddatabase_v4/cards.xsd`). This is a database description and card list, not the rendered card images. You do not need to build new parsing logic to playtest your own cards.
+Continuumatrice currently reads **Cockatrice XML v4** (schema `doc/carddatabase_v4/cards.xsd`). This is a database description and card list, not the rendered card images. You do not need to build new parsing logic to playtest your own cards.
 
 A self-contained *test-only* main database `cards.xml` can look like:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<continuumatrice_carddatabase version="4">
+<cockatrice_carddatabase version="4">
   <sets>
     <set>
       <name>CTEST</name>
@@ -70,7 +70,7 @@ A self-contained *test-only* main database `cards.xml` can look like:
       <tablerow>2</tablerow>
     </card>
   </cards>
-</continuumatrice_carddatabase>
+</cockatrice_carddatabase>
 ```
 
 These names are examples, **not** Continuum Universes lore or playable canon.
@@ -103,7 +103,3 @@ For reliable matching across reprints, the importer also recognizes names incorp
 7. Check normal Cockatrice's profile is still intact and can open separately.
 
 **Magic Set Editor** is an editor for card layouts and card content, but its native project format is not Cockatrice XML v4. You will need a matching export script/template or a conversion pipeline that writes this XML and the image files.
-
-## Native XML root
-
-Continuumatrice generates and accepts `<continuumatrice_carddatabase version="4">`. Existing `<cockatrice_carddatabase version="4">` files are still accepted by the parser, so older set-export pipelines can be migrated safely rather than rewritten blindly.

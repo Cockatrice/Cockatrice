@@ -2,7 +2,6 @@
 
 #include "filter_card.h"
 #include "libcockatrice/card/card_localization.h"
-#include <libcockatrice/card/essence_types.h>
 #include "libcockatrice/card/printing/printing_info.h"
 #include "libcockatrice/card/set/card_set.h"
 
@@ -178,16 +177,23 @@ FilterItem::FilterItem(QString trm, FilterItemList *parent) : p(parent), term(st
 
     switch (attr()) {
         case CardFilter::AttrColor: {
-            // The old MTG color-name conversions are invalid for Essence.
-            // N is explicitly colorless; an unspecified identity is not N.
-            QString converted = term.trimmed().toUpper();
-            if (converted == QStringLiteral("COLORLESS") || converted == QStringLiteral("COLOURLESS")) {
-                converted = QStringLiteral("N");
-            }
-            converted.remove(QLatin1Char(' '));
-            converted.remove(QLatin1Char(','));
-            converted.remove(QLatin1Char('{'));
-            converted.remove(QLatin1Char('}'));
+            QString converted = term.trimmed();
+
+            converted.replace("green", "g", Qt::CaseInsensitive);
+            converted.replace("grn", "g", Qt::CaseInsensitive);
+            converted.replace("blue", "u", Qt::CaseInsensitive);
+            converted.replace("blu", "u", Qt::CaseInsensitive);
+            converted.replace("black", "b", Qt::CaseInsensitive);
+            converted.replace("blk", "b", Qt::CaseInsensitive);
+            converted.replace("red", "r", Qt::CaseInsensitive);
+            converted.replace("white", "w", Qt::CaseInsensitive);
+            converted.replace("wht", "w", Qt::CaseInsensitive);
+            converted.replace("colorless", "c", Qt::CaseInsensitive);
+            converted.replace("colourless", "c", Qt::CaseInsensitive);
+            converted.replace("none", "c", Qt::CaseInsensitive);
+
+            converted.replace(QString(" "), QString(""), Qt::CaseInsensitive);
+
             convertedColorTerm = converted;
             break;
         }
@@ -234,7 +240,8 @@ FilterItem::FilterItem(QString trm, FilterItemList *parent) : p(parent), term(st
             break;
         }
         case CardFilter::AttrManaCost:
-            sortedManaCostTerm = Essence::parseCost(term.toUpper()).join(QString());
+            sortedManaCostTerm = term.toUpper();
+            // Sort the mana cost so it will be easy to find
             std::sort(sortedManaCostTerm.begin(), sortedManaCostTerm.end());
             break;
         case CardFilter::AttrLoyalty:
@@ -353,16 +360,25 @@ bool FilterItem::acceptSubType(const CardInfoPtr &info) const
 
 bool FilterItem::acceptColor(const CardInfoPtr &info) const
 {
-    if (convertedColorTerm.isEmpty()) {
-        return false;
+    const QString colors = info->getColors();
+
+    // Colorless card filter
+    if (convertedColorTerm.toLower() == "c" && colors.length() < 1) {
+        return true;
     }
-    const QString essence = info->getEssenceTypes();
-    for (const QChar code : convertedColorTerm) {
-        if (!Essence::isSymbol(code) || !essence.contains(code)) {
-            return false;
+
+    /*
+     * This is a tricky part, if the filter has multiple colors in it, like UGW,
+     * then we should match all of them to the card's colors
+     */
+    int match_count = 0;
+    for (const QChar &color : convertedColorTerm) {
+        if (colors.contains(color, Qt::CaseInsensitive)) {
+            match_count++;
         }
     }
-    return true;
+
+    return match_count == convertedColorTerm.length();
 }
 
 bool FilterItem::acceptText(const CardInfoPtr &info, const CardSearchLanguage &searchLanguage) const
@@ -405,13 +421,14 @@ bool FilterItem::acceptSet(const CardInfoPtr &info) const
 
 bool FilterItem::acceptManaCost(const CardInfoPtr &info) const
 {
-    if (sortedManaCostTerm.isEmpty()) {
-        return false;
-    }
-    for (const QString &costPart : info->getManaCost().split(QStringLiteral("//"))) {
-        QString sortedCost = Essence::parseCost(costPart).join(QString());
-        std::sort(sortedCost.begin(), sortedCost.end());
-        if (sortedCost.contains(sortedManaCostTerm)) {
+    // Try to seperate the mana cost in case it's a split card
+    // if it's not a split card the loop will run only once
+    for (const QString &manaCostPart : info->getManaCost().split("//")) {
+        QString fullManaCost = manaCostPart;
+        std::sort(fullManaCost.begin(), fullManaCost.end());
+
+        // If the partial is found in the full, return true
+        if (fullManaCost.contains(sortedManaCostTerm)) {
             return true;
         }
     }

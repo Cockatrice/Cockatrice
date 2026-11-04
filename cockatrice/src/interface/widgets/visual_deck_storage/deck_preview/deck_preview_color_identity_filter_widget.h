@@ -9,13 +9,13 @@
 #include "../visual_deck_storage_sort_filter_proxy_model.h"
 
 #include <QChar>
+#include <QMap>
 #include <QSet>
 #include <QWidget>
 #include <qtmetamacros.h>
 
 class QHBoxLayout;
 class QPushButton;
-class EssenceFilterPicker;
 
 class DeckPreviewColorIdentityFilterWidget : public QWidget
 {
@@ -57,7 +57,7 @@ private slots:
 private:
     QHBoxLayout *layout;
     QPushButton *toggleButton;
-    EssenceFilterPicker *essencePicker = nullptr;
+    QMap<QChar, bool> activeColors;
     VisualDeckStorageSortFilterProxyModel::FilterMode filterMode = VisualDeckStorageSortFilterProxyModel::Includes;
 };
 

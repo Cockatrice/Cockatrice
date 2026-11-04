@@ -224,11 +224,11 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     void setConnectTo(QString url)
     {
-        connectTo = QUrl(QString("continuumatrice://%1").arg(url));
+        connectTo = QUrl(QString("cockatrice://%1").arg(url));
     }
     // When set, the window's own startup connection (--connect or auto-connect
     // on first activation) is skipped. Used for activation launches: the intent
-    // chain triggered by a continuumatrice:// URL owns the connection, and letting
+    // chain triggered by a cockatrice:// URL owns the connection, and letting
     // auto-connect race against it caused two connectToServer calls to tear
     // each other down. onUrlChainFinished() clears this and retries the startup
     // connection when the link's chain ended without connecting.

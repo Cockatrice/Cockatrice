@@ -15,14 +15,11 @@ option(WARNING_AS_ERROR "Treat warnings as errors in debug builds" ON)
 # Check for translation updates
 option(UPDATE_TRANSLATIONS "Update translations on compile" OFF)
 # Compile Cockatrice
-option(WITH_CLIENT "Build Continuumatrice client" ON)
+option(WITH_CLIENT "Build Cockatrice client" ON)
 # Compile Oracle
-option(WITH_ORACLE "Build legacy upstream Magic-card Oracle importer (not Continuumatrice data)" OFF)
-if(WITH_ORACLE)
-  message(FATAL_ERROR "The upstream Oracle importer fetches Magic data and cannot be distributed as Continuumatrice. Build with -DWITH_ORACLE=OFF; use your own card XML.")
-endif()
+option(WITH_ORACLE "Build Cockatrice card database tool (Oracle)" ON)
 # Compile Servatrice
-option(WITH_SERVER "Build Continuum-Servatrice dedicated multiplayer server" ON)
+option(WITH_SERVER "Build Cockatrice server (Servatrice)" OFF)
 # Compile tests
 option(TEST "Build tests" OFF)
 # Build with AddressSanitizer and UndefinedBehaviorSanitizer
@@ -95,7 +92,7 @@ endif()
 
 # A project name is needed for CPack
 # Version can be overriden by git tags, see cmake/getversion.cmake
-project("Continuumatrice" VERSION 3.2.0)
+project("Cockatrice" VERSION 3.2.0)
 
 # Set release name if not provided via env/cmake var
 if(NOT DEFINED GIT_TAG_RELEASENAME)
@@ -296,17 +293,17 @@ if(MSVC)
 endif()
 
 # Package builder
-set(CPACK_PACKAGE_CONTACT "Continuum Universes Studio")
+set(CPACK_PACKAGE_CONTACT "Zach Halpern <zach@cockatrice.us>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_NAME}")
-set(CPACK_PACKAGE_VENDOR "Continuum Universes Studio")
+set(CPACK_PACKAGE_VENDOR "Cockatrice Development Team")
 set(CPACK_PACKAGE_DESCRIPTION
-    "Continuumatrice is the Continuum Universes card-game client, independently packaged from the upstream Cockatrice project. It supports local games and compatible multiplayer servers."
+    "Cockatrice is an open-source, multiplatform application for playing tabletop card games over a network. The program's server design prevents users from manipulating the game for unfair advantage. The client also provides a single-player mode, which allows users to brew while offline."
 )
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
-set(CPACK_PACKAGE_FILE_NAME "Continuumatrice-${PROJECT_VERSION}-${CMAKE_SYSTEM_NAME}")
+set(CPACK_PACKAGE_FILE_NAME "${PROJECT_VERSION_FILENAME}")
 
 if(UNIX)
   if(APPLE)
@@ -323,10 +320,10 @@ if(UNIX)
     # linux
     if(CPACK_GENERATOR STREQUAL "RPM")
       set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
-      set(CPACK_RPM_MAIN_COMPONENT "continuumatrice")
+      set(CPACK_RPM_MAIN_COMPONENT "cockatrice")
       set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt6-qtimageformats, qt6-qtmultimedia, qt6-qtsvg, qt6-qttools")
       set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
-      set(CPACK_RPM_PACKAGE_URL "https://github.com/Continuum-Universes-Studio/Continuumatrice")
+      set(CPACK_RPM_PACKAGE_URL "http://github.com/Cockatrice/Cockatrice")
       # stop directories from making package conflicts
       set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
           /usr/share/applications
@@ -341,7 +338,7 @@ if(UNIX)
       set(CPACK_GENERATOR DEB)
       set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
       set(CPACK_DEBIAN_PACKAGE_SECTION "games")
-      set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/Continuum-Universes-Studio/Continuumatrice")
+      set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/Cockatrice/Cockatrice")
       set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6, libqt6svg6, qt6-image-formats-plugins, qt6-qpa-plugins")
       set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "libqt6sql6-mysql") # for connecting servatrice to a mysql db
     endif()
@@ -373,7 +370,7 @@ elseif(WIN32)
   # All three applications are packaged into the same directory on Windows, so
   # this is the union of their Qt module lists, not just the client's: Servatrice
   # contributes Qt6Sql.dll and Oracle contributes nothing the client lacks, and a
-  # client-only manifest leaves Qt6Sql.dll unasserted even though continuum-servatrice.exe
+  # client-only manifest leaves Qt6Sql.dll unasserted even though servatrice.exe
   # is installed next to cockatrice.exe and cannot start without it.
   #
   # A statically linked Qt module ships no runtime DLL, so requiring one would
@@ -445,16 +442,13 @@ if(WITH_CLIENT)
 endif()
 
 if(WITH_SERVER)
-  # Keep the inherited source tree stable while generating the native product
-  # build directory. The compiled program is build/continuum-servatrice/continuum-servatrice.
-  add_subdirectory(servatrice "${CMAKE_BINARY_DIR}/continuum-servatrice")
-  set(CPACK_INSTALL_CMAKE_PROJECTS "ContinuumServatrice;ContinuumServatrice;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
+  add_subdirectory(servatrice)
+  set(CPACK_INSTALL_CMAKE_PROJECTS "Servatrice;Servatrice;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
 endif()
 
 if(WITH_CLIENT)
-  # Source directory keeps its history; output no longer inherits "cockatrice".
-  add_subdirectory(cockatrice "${CMAKE_BINARY_DIR}/continuumatrice")
-  set(CPACK_INSTALL_CMAKE_PROJECTS "Continuumatrice;Continuumatrice;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
+  add_subdirectory(cockatrice)
+  set(CPACK_INSTALL_CMAKE_PROJECTS "Cockatrice;Cockatrice;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
 endif()
 
 if(WIN32 AND WITH_CLIENT)

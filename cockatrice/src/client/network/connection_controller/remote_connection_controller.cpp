@@ -13,7 +13,6 @@
 #include "libcockatrice/protocol/pb/event_server_shutdown.pb.h"
 
 #include <QChar>
-#include <QCoreApplication>
 #include <QDateTime>
 #include <QDebug>
 #include <QLineEdit>
@@ -218,7 +217,7 @@ void ConnectionController::onServerShutdownEvent(const Event_ServerShutdown &eve
                                                    "games will be lost.\nReason for shutdown: %1",
                                                    "", event.minutes())
                                                     .arg(QString::fromStdString(event.reason())));
-    serverShutdownMessageBox.setIconPixmap(themePixmap(QStringLiteral("continuumatrice")).scaled(64, 64));
+    serverShutdownMessageBox.setIconPixmap(themePixmap(QStringLiteral("cockatrice")).scaled(64, 64));
     serverShutdownMessageBox.setText(tr("Scheduled server shutdown"));
     serverShutdownMessageBox.setWindowModality(Qt::ApplicationModal);
     serverShutdownMessageBox.setVisible(true);
@@ -334,7 +333,7 @@ void ConnectionController::onLoginError(int r,
 
         case Response::RespContextError: {
             QMessageBox::critical(dialogParent, tr("Error"),
-                                  tr("An internal error has occurred, please close and reopen Continuumatrice before "
+                                  tr("An internal error has occurred, please close and reopen Cockatrice before "
                                      "trying again.\nIf the error persists, ensure you are running the latest "
                                      "version of the software and if needed contact the software developers."));
             break;
@@ -490,14 +489,14 @@ void ConnectionController::onProtocolVersionMismatch(int localVersion, int remot
 {
     if (localVersion > remoteVersion) {
         QMessageBox::critical(dialogParent, tr("Error"),
-                              tr("You are trying to connect to an obsolete server. Please downgrade your Continuumatrice "
+                              tr("You are trying to connect to an obsolete server. Please downgrade your Cockatrice "
                                  "version or connect to a suitable server.\n"
                                  "Local version is %1, remote version is %2.")
                                   .arg(localVersion)
                                   .arg(remoteVersion));
     } else {
         QMessageBox::critical(dialogParent, tr("Error"),
-                              tr("Your Continuumatrice client is obsolete. Please update your Continuumatrice version.\n"
+                              tr("Your Cockatrice client is obsolete. Please update your Cockatrice version.\n"
                                  "Local version is %1, remote version is %2.")
                                   .arg(localVersion)
                                   .arg(remoteVersion));
@@ -632,7 +631,7 @@ void ConnectionController::onPromptForgotPasswordChallenge()
 
 void ConnectionController::updateWindowTitle()
 {
-    const QString appName = QCoreApplication::applicationName();
+    const QString appName = QStringLiteral("Cockatrice");
     QString title;
 
     switch (remoteClient->getStatus()) {
@@ -654,7 +653,7 @@ void ConnectionController::updateWindowTitle()
             break;
         }
         case StatusLoggedIn: {
-            title = appName + " - " + remoteClient->getUserName() + "@" + remoteClient->peerName();
+            title = remoteClient->getUserName() + "@" + remoteClient->peerName();
             break;
         }
         case StatusRequestingForgotPassword:

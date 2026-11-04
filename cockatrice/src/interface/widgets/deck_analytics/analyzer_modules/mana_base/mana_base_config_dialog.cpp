@@ -57,14 +57,14 @@ ManaBaseConfigDialog::ManaBaseConfigDialog(DeckListStatisticsAnalyzer *analyzer,
 
 void ManaBaseConfigDialog::retranslateUi()
 {
-    setWindowTitle(tr("Essence Production Configuration"));
+    setWindowTitle(tr("Mana Base Configuration"));
 
     displayTypeLabel->setText(tr("Display type:"));
 
     displayType->clear();
     displayType->addItems({tr("pie"), tr("bar"), tr("combinedBar")});
 
-    filterLabel->setText(tr("Filter Essence types (optional):"));
+    filterLabel->setText(tr("Filter Colors (optional):"));
 
     buttons->button(QDialogButtonBox::Ok)->setText(tr("OK"));
     buttons->button(QDialogButtonBox::Cancel)->setText(tr("Cancel"));

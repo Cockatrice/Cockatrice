@@ -25,14 +25,14 @@ InstallerCloseServer::InstallerCloseServer(QObject *parent) : QObject(parent)
 
 QString InstallerCloseServer::socketNameForUser(qint64 processId, const QString &userName)
 {
-    return QStringLiteral("ContinuumatriceInstallerClose-%1-%2").arg(processId).arg(userName);
+    return QStringLiteral("CockatriceInstallerClose-%1-%2").arg(processId).arg(userName);
 }
 
 QString InstallerCloseServer::socketName(qint64 processId)
 {
     // The same scoping helper the single-instance socket uses, so the probe only has to
     // reproduce one rule (USER, then USERNAME, then the home directory name).
-    return scopedLocalServerName(QStringLiteral("ContinuumatriceInstallerClose-%1").arg(processId));
+    return scopedLocalServerName(QStringLiteral("CockatriceInstallerClose-%1").arg(processId));
 }
 
 bool InstallerCloseServer::listen()

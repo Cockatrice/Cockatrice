@@ -105,9 +105,9 @@ Var SentryOutput
 !define MUI_HEADERIMAGE
 !define MUI_HEADERIMAGE_BITMAP "${NSIS_SOURCE_PATH}\cmake\headerimage.bmp"
 !define MUI_HEADERIMAGE_UNBITMAP "${NSIS_SOURCE_PATH}\cmake\headerimage.bmp"
-!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of Continuumatrice.$\r$\n$\r$\nClick Next to continue."
-!define MUI_FINISHPAGE_RUN "$INSTDIR/continuumatrice.exe"
-!define MUI_FINISHPAGE_RUN_TEXT "Run 'Continuumatrice' now"
+!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of Cockatrice.$\r$\n$\r$\nClick Next to continue."
+!define MUI_FINISHPAGE_RUN "$INSTDIR/cockatrice.exe"
+!define MUI_FINISHPAGE_RUN_TEXT "Run 'Cockatrice' now"
 !define MUI_ICON "${NSIS_SOURCE_PATH}\cockatrice\resources\appicon.ico"
 
 !define MUI_PAGE_CUSTOMFUNCTION_PRE SkipIfReinstall
@@ -141,7 +141,7 @@ Page Custom PortableModePageCreate PortableModePageLeave
 ; user's machine can be diagnosed after the fact. Kept in $TEMP rather than in
 ; $INSTDIR because the previous version's uninstaller removes the whole install
 ; directory part-way through an upgrade. Read it back with:
-;   notepad %TEMP%\Continuumatrice-installer.log
+;   notepad %TEMP%\Cockatrice-installer.log
 !macro CockLog text
     Push "${text}"
     Call CockLogWrite
@@ -206,7 +206,7 @@ FunctionEnd
 
 Function .onInit
 
-StrCpy $InstallLogPath "$TEMP\Continuumatrice-installer.log"
+StrCpy $InstallLogPath "$TEMP\Cockatrice-installer.log"
 ; No backup has been taken yet; RestoreUserDataAfterUninstall must be a no-op
 ; until BackupUserDataBeforeUninstall sets this after actually copying something.
 StrCpy $DataBackupDir ""
@@ -232,22 +232,22 @@ FileClose $LogHandle
 
 ${If} ${NSIS_IS_64_BIT} == 1    #NSIS 64bit
     ${IfNot} ${RunningX64}
-        MessageBox MB_OK|MB_ICONSTOP "This version of Continuumatrice requires a 64-bit Windows system."
+        MessageBox MB_OK|MB_ICONSTOP "This version of Cockatrice requires a 64-bit Windows system."
         Abort
     ${EndIf}
-    StrCpy $NormalDestDir "$ProgramFiles64\Continuumatrice"
+    StrCpy $NormalDestDir "$ProgramFiles64\Cockatrice"
     SetRegView 64
 ${Else}    #NSIS 32bit
     ${If} ${RunningX64}
         MessageBox MB_OK|MB_ICONEXCLAMATION \
-        "You are about to install a 32-bit version of Continuumatrice on a 64-bit Windows system.$\n\
+        "You are about to install a 32-bit version of Cockatrice on a 64-bit Windows system.$\n\
         We advise you to use the correct 64-bit installer instead to get around potential issues.$\n$\n\
-        Download from our webpage: https://github.com/Continuum-Universes-Studio/Continuumatrice"
+        Download from our webpage: https://cockatrice.github.io"
     ${EndIf}
-    StrCpy $NormalDestDir "$ProgramFiles\Continuumatrice"
+    StrCpy $NormalDestDir "$ProgramFiles\Cockatrice"
 ${EndIf}
 
-StrCpy $PortableDestDir "$Desktop\ContinuumatricePortable"
+StrCpy $PortableDestDir "$Desktop\CockatricePortable"
 
 ${GetParameters} $9
 
@@ -337,7 +337,7 @@ ${EndIf}
 ; Then make sure no *other* application instance is still running (and holding
 ; file locks) before the previous version is uninstalled. The probe names them
 ; and the user is asked to close them; nothing is force-stopped without that
-; answer, because Continuumatrice may hold an unsaved deck and Oracle writes the card
+; answer, because Cockatrice may hold an unsaved deck and Oracle writes the card
 ; database in place. On /R the old version is about to be removed, so an answer
 ; the probe cannot give cancels the upgrade before it starts rather than after it.
 ; Only needed this early for /R, where AutoUninstallIfNeeded runs below; for
@@ -365,7 +365,7 @@ ${EndIf}
 
 ; The uninstaller logs to its own file: the installer truncates its log on every run, so
 ; sharing one would mean either side erasing the other's account of a failed upgrade.
-StrCpy $InstallLogPath "$TEMP\Continuumatrice-uninstaller.log"
+StrCpy $InstallLogPath "$TEMP\Cockatrice-uninstaller.log"
 FileOpen $LogHandle "$InstallLogPath" w
 FileClose $LogHandle
 !insertmacro CockLogUn "=================================================================="
@@ -380,7 +380,7 @@ Function RequireAdmin
 UserInfo::GetAccountType
 Pop $8
 ${If} $8 != "admin"
-    MessageBox MB_ICONSTOP "You need administrator rights to install Continuumatrice"
+    MessageBox MB_ICONSTOP "You need administrator rights to install Cockatrice"
     SetErrorLevel 740 ;ERROR_ELEVATION_REQUIRED
     Abort
 ${EndIf}
@@ -471,7 +471,7 @@ SetShellVarContext all
 ;
 ; --- 32-bit uninstall ---
 SetRegView 32
-ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Continuumatrice" "QuietUninstallString"
+ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "QuietUninstallString"
 
 ; On the /R path the updater passes /D=<appDir>, so $INSTDIR already is the old
 ; install dir. Publish it for the backup/restore pair below.
@@ -491,7 +491,7 @@ done32:
 ; --- 64-bit uninstall ---
 ${If} ${RunningX64}
     SetRegView 64
-    ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Continuumatrice" "QuietUninstallString"
+    ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "QuietUninstallString"
 
     StrCpy $OldInstallDir $INSTDIR
     !insertmacro CockLog "uninstall (64-bit): '$R0 _?=$OldInstallDir'"
@@ -516,7 +516,7 @@ FunctionEnd
 ; that did not get a usable _?= copies itself to %TEMP%, starts that copy and exits, so
 ; ExecWait returns at once while the copy keeps deleting - and it finishes after this
 ; window has closed, removing the version that was just installed. Waiting for
-; continuumatrice.exe to disappear covers both cases, and stops with a message instead of
+; cockatrice.exe to disappear covers both cases, and stops with a message instead of
 ;
 ; When the payload is still there after the wait, $OldUninstallExit decides: a non-zero
 ; code means the uninstaller was cancelled or failed, and the install aborts saying so.
@@ -552,10 +552,10 @@ ${OrIf} $OldUninstallExit == "launch-failed"
 ${EndIf}
 StrCpy $R2 0
 old_uninstall_wait:
-IfFileExists "$OldInstallDir\continuumatrice.exe" 0 old_uninstall_gone
+IfFileExists "$OldInstallDir\cockatrice.exe" 0 old_uninstall_gone
 IntOp $R2 $R2 + 1
 ${If} $R2 > 60
-    !insertmacro CockLog "old uninstall: $OldInstallDir still holds continuumatrice.exe after 30 s (uninstaller exit=$OldUninstallExit)"
+    !insertmacro CockLog "old uninstall: $OldInstallDir still holds cockatrice.exe after 30 s (uninstaller exit=$OldUninstallExit)"
     ; The uninstaller's own account of what it skipped or why it stopped lives in its
     ; separate log; copy it here so the report sent from AbortInstall carries it.
     Call AppendUninstallerLog
@@ -574,7 +574,7 @@ ${If} $R2 > 60
     ; them, which NSIS Delete passes over silently. Free them and remove what is left.
     Call RemoveOldPayloadLeftovers
     ; The removal reports success only when every payload executable is gone and the
-    ; DLL/Plugins purge came back clean; continuumatrice.exe alone would hide a locked
+    ; DLL/Plugins purge came back clean; cockatrice.exe alone would hide a locked
     ; oracle.exe or a stale DLL the new payload is about to be written over.
     ${If} $OldPayloadRemoved != "1"
         StrCpy $AbortReason \
@@ -594,7 +594,7 @@ old_uninstall_gone:
 ${If} $R2 > 0
     ; ExecWait returned while the old payload was still there: that uninstaller
     ; copied itself to %TEMP%, and the copy is still working through its file list.
-    ; continuumatrice.exe is gone before the rest of it, so let the copy settle before
+    ; cockatrice.exe is gone before the rest of it, so let the copy settle before
     ; the sections below start writing files it would otherwise remove.
     Sleep 1000
     !insertmacro CockLog "old uninstall: ExecWait returned early, settled 1 s after $R2 * 500 ms"
@@ -622,20 +622,20 @@ Function RemoveOldPayloadLeftovers
     StrCpy $INSTDIR $OldInstallDir
     StrCpy $R2 0
     rop_loop:
-    SetFileAttributes "$INSTDIR\continuumatrice.exe" NORMAL
-    SetFileAttributes "$INSTDIR\continuumatrice-legacy-oracle.exe" NORMAL
-    SetFileAttributes "$INSTDIR\continuum-servatrice.exe" NORMAL
-    Delete "$INSTDIR\continuumatrice.exe"
-    Delete "$INSTDIR\continuumatrice-legacy-oracle.exe"
-    Delete "$INSTDIR\continuum-servatrice.exe"
+    SetFileAttributes "$INSTDIR\cockatrice.exe" NORMAL
+    SetFileAttributes "$INSTDIR\oracle.exe" NORMAL
+    SetFileAttributes "$INSTDIR\servatrice.exe" NORMAL
+    Delete "$INSTDIR\cockatrice.exe"
+    Delete "$INSTDIR\oracle.exe"
+    Delete "$INSTDIR\servatrice.exe"
     Delete "$INSTDIR\qt.conf"
     Call RetryDllPurge
     ; $R0 is RetryDllPurge's verdict (1 = a DLL or the Plugins directory survived).
     ; Every payload executable has to be gone as well: a locked oracle.exe or
-    ; servatrice.exe is just as fatal to the install that follows as continuumatrice.exe.
-    IfFileExists "$INSTDIR\continuumatrice.exe" rop_retry
-    IfFileExists "$INSTDIR\continuumatrice-legacy-oracle.exe" rop_retry
-    IfFileExists "$INSTDIR\continuum-servatrice.exe" rop_retry
+    ; servatrice.exe is just as fatal to the install that follows as cockatrice.exe.
+    IfFileExists "$INSTDIR\cockatrice.exe" rop_retry
+    IfFileExists "$INSTDIR\oracle.exe" rop_retry
+    IfFileExists "$INSTDIR\servatrice.exe" rop_retry
     ${If} $R0 == 0
         Goto rop_done
     ${EndIf}
@@ -664,15 +664,15 @@ Function RemoveOldPayloadLeftovers
     Pop $INSTDIR
 FunctionEnd
 
-; Copies the old uninstaller's log ($TEMP\Continuumatrice-uninstaller.log) into this
+; Copies the old uninstaller's log ($TEMP\Cockatrice-uninstaller.log) into this
 ; installer's log, so the report AbortInstall sends shows what the uninstaller did.
 ; Uninstallers older than this log simply have no file; that is logged too.
 Function AppendUninstallerLog
     ClearErrors
-    FileOpen $UninstLogHandle "$TEMP\Continuumatrice-uninstaller.log" r
+    FileOpen $UninstLogHandle "$TEMP\Cockatrice-uninstaller.log" r
     ${If} ${Errors}
     ${OrIf} $UninstLogHandle == ""
-        !insertmacro CockLog "uninstaller log: not found at $TEMP\Continuumatrice-uninstaller.log"
+        !insertmacro CockLog "uninstaller log: not found at $TEMP\Cockatrice-uninstaller.log"
         Return
     ${EndIf}
     !insertmacro CockLog "uninstaller log begin ----------------------------------------"
@@ -712,7 +712,7 @@ FunctionEnd
 ; (warnAboutDataPathsInProgramDir), which only exists after the first launch of
 ; the new client.
 ;
-; The 32-bit and 64-bit uninstall blocks below share $TEMP\ContinuumatriceDataBackup.
+; The 32-bit and 64-bit uninstall blocks below share $TEMP\CockatriceDataBackup.
 ; When both are registered with different InstallLocations, backing up the second
 ; directory into the first one's backup would restore the first dir's files into
 ; the second one. BackupUserDataBeforeUninstall therefore starts over when
@@ -744,7 +744,7 @@ ${EndIf}
 ; installer run - $DataBackupDir is empty until the first backup of this run,
 ; so the second call in sequence (32-bit then 64-bit uninstall) still merges.
 ${If} $DataBackupDir == ""
-    RMDir /r "$TEMP\ContinuumatriceDataBackup"
+    RMDir /r "$TEMP\CockatriceDataBackup"
 ${EndIf}
 ; The 32-bit and 64-bit uninstall blocks share one backup dir. When the second
 ; block points at a different directory, merging would restore the first dir's
@@ -756,7 +756,7 @@ ${If} $DataBackupDir != ""
 ${AndIf} $DataBackupForDir != ""
 ${AndIf} $OldInstallDir != $DataBackupForDir
     !insertmacro CockLog "pre-uninstall backup: old dir changed ($DataBackupForDir -> $OldInstallDir), starting a fresh backup"
-    RMDir /r "$TEMP\ContinuumatriceDataBackup"
+    RMDir /r "$TEMP\CockatriceDataBackup"
     StrCpy $DataBackupDir ""
     StrCpy $DataBackupDone ""
     StrCpy $LooseDecksBackupDone ""
@@ -764,7 +764,7 @@ ${AndIf} $OldInstallDir != $DataBackupForDir
 ${EndIf}
 ${If} ${FileExists} "$OldInstallDir\portable.dat"
 ${AndIf} ${FileExists} "$OldInstallDir\data"
-    StrCpy $DataBackupDir "$TEMP\ContinuumatriceDataBackup"
+    StrCpy $DataBackupDir "$TEMP\CockatriceDataBackup"
     StrCpy $DataBackupDone "1"
     !insertmacro CockLog "pre-uninstall backup: copying $OldInstallDir\data (downloaded pics excluded)"
     DetailPrint "Backing up portable user data before removing previous version..."
@@ -805,7 +805,7 @@ ${OrIf} ${FileExists} "$OldInstallDir\*.dec"
 ${OrIf} ${FileExists} "$OldInstallDir\*.dek"
 ${OrIf} ${FileExists} "$OldInstallDir\*.mwDeck"
     ${If} $DataBackupDir == ""
-        StrCpy $DataBackupDir "$TEMP\ContinuumatriceDataBackup"
+        StrCpy $DataBackupDir "$TEMP\CockatriceDataBackup"
     ${EndIf}
     StrCpy $LooseDecksBackupDone "1"
     !insertmacro CockLog "pre-uninstall backup: copying loose deck files"
@@ -839,7 +839,7 @@ backup_subdirs_loop:
         ${EndIf}
         ${If} ${FileExists} "$OldInstallDir\$DataBackupFindName\*.*"
             ${If} $DataBackupDir == ""
-                StrCpy $DataBackupDir "$TEMP\ContinuumatriceDataBackup"
+                StrCpy $DataBackupDir "$TEMP\CockatriceDataBackup"
             ${EndIf}
             StrCpy $InstallSubdirsBackupDone "1"
             !insertmacro CockLog "pre-uninstall backup: copying subdir $OldInstallDir\$DataBackupFindName"
@@ -922,7 +922,7 @@ ${AndIf} $LooseDeckNoticeShown != "1"
     ${If} $LooseDecksBackupDone == "1"
     ${OrIf} $InstallSubdirsBackupDone == "1"
         StrCpy $LooseDeckNoticeShown "1"
-        MessageBox MB_OK|MB_ICONINFORMATION "Your decks or data folders were stored inside the Continuumatrice install folder ($OldInstallDir), which the previous version's uninstaller deletes.$\n$\nThey have been restored from a backup to that folder (loose deck files ending in .txt are not backed up - move those manually). If you install to a different folder, they are moved there automatically. Please move them out of the install folder afterwards (Settings -> General -> Paths) so a future uninstall cannot delete them again."
+        MessageBox MB_OK|MB_ICONINFORMATION "Your decks or data folders were stored inside the Cockatrice install folder ($OldInstallDir), which the previous version's uninstaller deletes.$\n$\nThey have been restored from a backup to that folder (loose deck files ending in .txt are not backed up - move those manually). If you install to a different folder, they are moved there automatically. Please move them out of the install folder afterwards (Settings -> General -> Paths) so a future uninstall cannot delete them again."
     ${EndIf}
 ${EndIf}
 done:
@@ -989,7 +989,7 @@ done:
 FunctionEnd
 
 ; --- Running instance handling ---
-; Continuumatrice, Oracle and Servatrice must not be running while files are
+; Cockatrice, Oracle and Servatrice must not be running while files are
 ; replaced or deleted. A still-running process holds locks on its .exe and
 ; Qt runtime DLLs, so a silent upgrade could otherwise end up with a mix of
 ; old and new Qt DLLs next to the new executable, failing with
@@ -1030,7 +1030,7 @@ FunctionEnd
 ; the image lookup matches on the directory a process runs from, so it does not
 ; widen that set.
 ;
-; Nothing is force-stopped without the user asking for it: Continuumatrice may be holding
+; Nothing is force-stopped without the user asking for it: Cockatrice may be holding
 ; an unsaved deck or showing a "really leave this game?" confirmation, Oracle writes
 ; the card database in place and can be killed mid-write, and Servatrice may be serving
 ; a game. A close is a request, made automatically because that is what the user started
@@ -1050,14 +1050,14 @@ FunctionEnd
 ; What the user does instead when they say no: the prompt's other answer stops the run, so they
 ; are told how to get past the same wall next time. Also used by the abort dialogs, which is
 ; where the answer to "why did it stop" ends up.
-!define AFTER_CLOSING_GUIDANCE "Answer the confirmation Continuumatrice may be showing - open it from the notification area if it is hidden there - and use Task Manager for a program that would not end."
+!define AFTER_CLOSING_GUIDANCE "Answer the confirmation Cockatrice may be showing - open it from the notification area if it is hidden there - and use Task Manager for a program that would not end."
 
 ; The escape hatch for a user who would rather not force-close anything: the same release,
-; downloaded and run by hand once Continuumatrice is closed. Every abort dialog shows this and
+; downloaded and run by hand once Cockatrice is closed. Every abort dialog shows this and
 ; offers to open the page, so an update that cannot free the files still leaves the user a
 ; way forward that does not end in Task Manager.
-!define LATEST_RELEASE_URL "https://github.com/Continuumatrice/Continuumatrice/releases/latest"
-!define MANUAL_UPDATE_GUIDANCE "To update safely instead, close Continuumatrice and download the latest installer from:$\r$\n${LATEST_RELEASE_URL}$\r$\nThen run it manually."
+!define LATEST_RELEASE_URL "https://github.com/Cockatrice/Cockatrice/releases/latest"
+!define MANUAL_UPDATE_GUIDANCE "To update safely instead, close Cockatrice and download the latest installer from:$\r$\n${LATEST_RELEASE_URL}$\r$\nThen run it manually."
 
 ; usage: set the variable named by the second argument to the probe's listing, then call
 ; this. Sets $GuardPrompt to the question the guard and the recovery path ask.
@@ -1082,7 +1082,7 @@ FunctionEnd
 ; @param cancelWord what No gives up, "installation" or "uninstallation"
 !macro CockEndPrompt header listing cancelWord
     StrCpy $GuardPrompt "${header}$\r$\n$\r$\n${listing}"
-    StrCpy $GuardPrompt "$GuardPrompt$\r$\n$\r$\nChoose Yes to force close the Continuumatrice, Oracle and Servatrice programs listed above. ${END_COST}$\r$\n$\r$\nChoose No to cancel the ${cancelWord}. ${AFTER_CLOSING_GUIDANCE}"
+    StrCpy $GuardPrompt "$GuardPrompt$\r$\n$\r$\nChoose Yes to force close the Cockatrice, Oracle and Servatrice programs listed above. ${END_COST}$\r$\n$\r$\nChoose No to cancel the ${cancelWord}. ${AFTER_CLOSING_GUIDANCE}"
 !macroend
 
 ; usage: like CockEndPrompt, for a MB_YESNOCANCEL question whose No checks again.
@@ -1104,7 +1104,7 @@ FunctionEnd
 ; @param cancelWord what Cancel gives up, "installation" or "uninstallation"
 !macro CockEndRecheckPrompt header listing cancelWord
     StrCpy $GuardPrompt "${header}$\r$\n$\r$\n${listing}"
-    StrCpy $GuardPrompt "$GuardPrompt$\r$\n$\r$\nChoose Yes to force close the Continuumatrice, Oracle and Servatrice programs listed above. ${END_COST}$\r$\n$\r$\nChoose No to close them yourself, then check again - answer the confirmation Continuumatrice may be showing, and open it from the notification area if it is hidden there.$\r$\n$\r$\nChoose Cancel to abort the ${cancelWord}."
+    StrCpy $GuardPrompt "$GuardPrompt$\r$\n$\r$\nChoose Yes to force close the Cockatrice, Oracle and Servatrice programs listed above. ${END_COST}$\r$\n$\r$\nChoose No to close them yourself, then check again - answer the confirmation Cockatrice may be showing, and open it from the notification area if it is hidden there.$\r$\n$\r$\nChoose Cancel to abort the ${cancelWord}."
 !macroend
 
 ; Emitted once for the installer and once for the uninstaller: the uninstaller
@@ -1140,19 +1140,19 @@ Function ${prefix}RunHolderProbe
 FunctionEnd
 
 ; usage: set $GuardDir to the directory being replaced, then call this. Asks the running
-; Continuumatrice to close, and waits for it to exit.
+; Cockatrice to close, and waits for it to exit.
 ;
 ; The set is what the probe names: the processes holding a file of the version being
 ; replaced, plus the payload programs running from the directory itself. The probe
 ; closes that set by pid, which is why nothing here has to match an executable path. Only
-; continuumatrice.exe is asked: Oracle writes the card database in place and Servatrice has no
+; cockatrice.exe is asked: Oracle writes the card database in place and Servatrice has no
 ; window to ask, so both are left alone here and only ended by the explicit answer.
 ;
 ; Each instance is asked to close over the local socket it listens on, which is the same
 ; request as clicking its close button and reaches one whose window is hidden in the
 ; notification area or is sitting on its own confirmation. A client from before that socket
 ; is asked with WM_CLOSE on its own window instead, and a visible window is brought forward
-; first. Either way the close is answered, not obeyed - Continuumatrice asks before it quits while
+; first. Either way the close is answered, not obeyed - Cockatrice asks before it quits while
 ; a card database update is running, a game is open or a deck is unsaved - and that question
 ; is only useful if it is in front of the installer instead of behind it.
 ;
@@ -1176,11 +1176,11 @@ Function ${prefix}CloseHolders
     ; Call un. functions, so the macro's two lines are spelled with the prefix here.
     Push "close-holders: probe exit=$R3 [$R4]"
     Call ${prefix}CockLogWrite
-    DetailPrint "Closing Continuumatrice: $R4"
+    DetailPrint "Closing Cockatrice: $R4"
 FunctionEnd
 
 ; usage: set $GuardDir to the directory being replaced, then call this. Ends the running
-; Continuumatrice, Oracle and Servatrice instances the probe names.
+; Cockatrice, Oracle and Servatrice instances the probe names.
 ;
 ; This is the only place anything is stopped without being asked to stop, so it is only
 ; reached after the user picked it from a prompt that says what it costs: a client that is
@@ -1198,7 +1198,7 @@ Function ${prefix}EndHolders
     Pop $R4
     Push "end-holders: probe exit=$R3 [$R4]"
     Call ${prefix}CockLogWrite
-    DetailPrint "Ending Continuumatrice, Oracle and Servatrice: $R4"
+    DetailPrint "Ending Cockatrice, Oracle and Servatrice: $R4"
 FunctionEnd
 !macroend
 
@@ -1207,7 +1207,7 @@ FunctionEnd
 
 ; usage: set $GuardDir to the directory to guard, then call this.
 ;
-; Asks Continuumatrice to close once, then asks one question with one answer that can free the
+; Asks Cockatrice to close once, then asks one question with one answer that can free the
 ; payload. The automatic close is the same request clicking the window's close button makes,
 ; so the common case - the client was still shutting down - never turns into a question. The
 ; prompt is what remains when the close cannot reach everything: Oracle writes the card
@@ -1232,7 +1232,7 @@ Function GuardAppsNotRunning
     Call RunHolderProbe
     ${If} $GuardExit == "0"
         !insertmacro CockLog "guard: nothing is holding the payload"
-        DetailPrint "No running Continuumatrice, Oracle or Servatrice instance was found."
+        DetailPrint "No running Cockatrice, Oracle or Servatrice instance was found."
         Return
     ${EndIf}
     ${If} $GuardExit == "1"
@@ -1258,7 +1258,7 @@ Function GuardAppsNotRunning
         ; update from the official download page. Without the middle answer a user who did
         ; not want anything killed had no way forward but to abandon the update.
         guard_ask:
-        !insertmacro CockEndRecheckPrompt "Continuumatrice, Oracle or Servatrice is still using files of the installation:" $GuardOutput "installation"
+        !insertmacro CockEndRecheckPrompt "Cockatrice, Oracle or Servatrice is still using files of the installation:" $GuardOutput "installation"
         MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON2 "$GuardPrompt" IDYES guard_end IDNO guard_recheck
         Goto guard_cancel
         guard_recheck:
@@ -1272,7 +1272,7 @@ Function GuardAppsNotRunning
         guard_cancel:
         !insertmacro CockLog "guard: cancelled by user after $GuardRecheckCount recheck(s)"
         StrCpy $AbortReason \
-            "The installation was cancelled because Continuumatrice, Oracle or Servatrice is still running and holding files of the previous version.$\r$\n$\r$\n${AFTER_CLOSING_GUIDANCE}$\r$\n$\r$\nClose them and run the installer again."
+            "The installation was cancelled because Cockatrice, Oracle or Servatrice is still running and holding files of the previous version.$\r$\n$\r$\n${AFTER_CLOSING_GUIDANCE}$\r$\n$\r$\nClose them and run the installer again."
         ; RemoveOldPayloadLeftovers runs with the pre-uninstall backup already taken;
         ; restoring here keeps this abort from stranding the only copy in %TEMP%.
         Call RestoreUserDataAfterUninstall
@@ -1296,7 +1296,7 @@ Function GuardAppsNotRunning
                 "The installation was cancelled because these programs still hold files of the previous version and could not be ended:$\r$\n$\r$\n$GuardOutput$\r$\n$\r$\n${AFTER_CLOSING_GUIDANCE}$\r$\n$\r$\nClose them and run the installer again."
         ${Else}
             StrCpy $AbortReason \
-                "The installation was cancelled because, after ending Continuumatrice, Oracle and Servatrice, the installer could not check whether they still hold files of the previous version.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nClose them and run the installer again."
+                "The installation was cancelled because, after ending Cockatrice, Oracle and Servatrice, the installer could not check whether they still hold files of the previous version.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nClose them and run the installer again."
         ${EndIf}
         Call RestoreUserDataAfterUninstall
         Call AbortInstall
@@ -1314,15 +1314,15 @@ Function GuardAppsNotRunning
     ; installs anyway, Abort cancels instead of writing a payload next to files
     ; the guard could not rule out.
     !insertmacro CockLog "guard: the holder probe could not answer ($GuardExit): $GuardOutput"
-    DetailPrint "Could not confirm whether Continuumatrice is still running: $GuardOutput"
+    DetailPrint "Could not confirm whether Cockatrice is still running: $GuardOutput"
     MessageBox MB_ABORTRETRYIGNORE|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
-        "This installer could not confirm whether Continuumatrice, Oracle or Servatrice is still running.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nClose them, then choose Retry to check again. Choose Ignore to install anyway, or Abort to cancel the installation." \
+        "This installer could not confirm whether Cockatrice, Oracle or Servatrice is still running.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nClose them, then choose Retry to check again. Choose Ignore to install anyway, or Abort to cancel the installation." \
         IDRETRY guard_check IDABORT guard_unknown_abort
     !insertmacro CockLog "guard: continuing without an answer from the probe"
     Return
     guard_unknown_abort:
     StrCpy $AbortReason \
-        "The installation was cancelled because it could not confirm whether Continuumatrice, Oracle or Servatrice is still running.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nPlease close them and run the installer again."
+        "The installation was cancelled because it could not confirm whether Cockatrice, Oracle or Servatrice is still running.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nPlease close them and run the installer again."
     ; Same reason as the cancel path above: this abort can be reached from the
     ; leftover-removal guard, after the backup was taken.
     Call RestoreUserDataAfterUninstall
@@ -1391,7 +1391,7 @@ Function AbortInstall
         ; forge extra lines into the artifact we send.
         !insertmacro CockLog "sentry send: result=$SentryResult output=$SentryOutput"
         ${If} $SentryResult == "0"
-            MessageBox MB_OK|MB_ICONINFORMATION "The installer log was sent. Thank you for helping improve Continuumatrice!"
+            MessageBox MB_OK|MB_ICONINFORMATION "The installer log was sent. Thank you for helping improve Cockatrice!"
         ${Else}
             MessageBox MB_OK|MB_ICONEXCLAMATION "The installer log could not be sent. You can still share it manually; it was written to:$\r$\n$InstallLogPath"
         ${EndIf}
@@ -1425,7 +1425,7 @@ Function CloseLauncher
     Pop $R4
     Push "close-launcher: probe exit=$R3 [$R4]"
     Call CockLogWrite
-    DetailPrint "Closing Continuumatrice: $R4"
+    DetailPrint "Closing Cockatrice: $R4"
 FunctionEnd
 
 ; Waits for the application that launched this installer to exit, using the /PID=
@@ -1479,7 +1479,7 @@ Function WaitForLauncherToExit
     ; under a second, so at ten seconds it is either flushing a card database or - far
     ; more often - sitting on its own "quit anyway?" confirmation with nobody looking at
     ; it. Silence for a minute is what makes that read as a hung installer. The full
-    ; grace is spent after the first question, so a user who answers Continuumatrice's
+    ; grace is spent after the first question, so a user who answers Cockatrice's
     ; confirmation is not asked again while they do it.
     StrCpy $WaitSlice 10000
     wait_launcher_open:
@@ -1570,11 +1570,11 @@ Function WaitForLauncherToExit
         ; exists to prevent. Yes ends the launcher, Cancel cancels, and No keeps waiting:
         ; the close and the bring-forward just happened above.
         MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
-            "Continuumatrice has not finished closing, so the installation is paused rather than replace files it is still using.$\r$\n$\r$\nIt may be waiting for you to answer its own question about an unsaved deck, an open game or a card database update.$\r$\n$\r$\nChoose Yes to end it now - an unsaved deck, a running game or an unwritten setting is lost.$\r$\n$\r$\nChoose No to keep waiting, or Cancel to cancel the installation." \
+            "Cockatrice has not finished closing, so the installation is paused rather than replace files it is still using.$\r$\n$\r$\nIt may be waiting for you to answer its own question about an unsaved deck, an open game or a card database update.$\r$\n$\r$\nChoose Yes to end it now - an unsaved deck, a running game or an unwritten setting is lost.$\r$\n$\r$\nChoose No to keep waiting, or Cancel to cancel the installation." \
             IDYES wait_launcher_end IDNO wait_launcher_retry
         !insertmacro CockLog "wait-launcher: cancelled by user"
         StrCpy $AbortReason \
-            "The application that started this update has not exited yet, so the installation was cancelled rather than replace files it is still using.$\r$\n$\r$\nPlease close Continuumatrice and run the installer again."
+            "The application that started this update has not exited yet, so the installation was cancelled rather than replace files it is still using.$\r$\n$\r$\nPlease close Cockatrice and run the installer again."
         Call AbortInstall
         ; Only reached through Yes or No: AbortInstall does not return.
         wait_launcher_end:
@@ -1618,7 +1618,7 @@ Function EnsureOldInstallNotRunning
     ; the directory the old install lives in. Every uninstaller shipped before
     ; this change had no running instance guard of its own, so the old one would
     ; delete files while an instance of the application is still holding them.
-    ReadRegStr $R3 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Continuumatrice" "InstallLocation"
+    ReadRegStr $R3 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "InstallLocation"
     ${If} $R3 == ""
         ; no usable record of where the old install is; $INSTDIR is the default
         ; install directory at this point, which is where it usually is anyway
@@ -1629,19 +1629,19 @@ Function EnsureOldInstallNotRunning
     Call GuardAppsNotRunning
 FunctionEnd
 
-; Sets $R0 to 1 if $INSTDIR looks like an existing Continuumatrice install. Used to
+; Sets $R0 to 1 if $INSTDIR looks like an existing Cockatrice install. Used to
 ; guard the stale-runtime-DLL purge so a first-time install into a pre-existing
 ; directory with an unrelated "Plugins" folder is never touched, while an
 ; install that only ever held e.g. servatrice.exe is still purged.
-Function IsExistingContinuumatriceInstall
+Function IsExistingCockatriceInstall
     StrCpy $R0 0
-    ${If} ${FileExists} "$INSTDIR\continuumatrice.exe"
+    ${If} ${FileExists} "$INSTDIR\cockatrice.exe"
         StrCpy $R0 1
     ${EndIf}
-    ${If} ${FileExists} "$INSTDIR\continuumatrice-legacy-oracle.exe"
+    ${If} ${FileExists} "$INSTDIR\oracle.exe"
         StrCpy $R0 1
     ${EndIf}
-    ${If} ${FileExists} "$INSTDIR\continuum-servatrice.exe"
+    ${If} ${FileExists} "$INSTDIR\servatrice.exe"
         StrCpy $R0 1
     ${EndIf}
     ${If} ${FileExists} "$INSTDIR\uninstall.exe"
@@ -1652,7 +1652,7 @@ Function IsExistingContinuumatriceInstall
     ; executables and uninstall.exe but silently skipped the DLLs its running
     ; instance had locked - which is exactly the broken install the purge is
     ; meant to heal, and without these markers none of the files above would be
-    ; there to prove that it is one. Every Qt module Continuumatrice links is part of
+    ; there to prove that it is one. Every Qt module Cockatrice links is part of
     ; the payload, so match them all: probing only Qt6Core.dll would miss a
     ; directory where that one file happened to be deletable and the others
     ; were not. Qt6*.dll rather than *.dll on purpose: this function decides
@@ -2028,7 +2028,7 @@ Function RecoverFromHolders
     ; One question, the same one the guard asks and with the same two answers. No retry loop:
     ; the purge has already been tried after the close, so the only thing that can still free
     ; the files is ending them, and the caller's abort names whatever survives that.
-    !insertmacro CockEndPrompt "Files of the previous version of Continuumatrice are still in use by:" $HolderOutput "installation"
+    !insertmacro CockEndPrompt "Files of the previous version of Cockatrice are still in use by:" $HolderOutput "installation"
     MessageBox MB_YESNO|MB_ICONEXCLAMATION|MB_DEFBUTTON2 "$GuardPrompt" IDYES rfh_end
     !insertmacro CockLog "recover-holders: cancelled by user"
     Return
@@ -2084,14 +2084,14 @@ Function un.GuardAppsNotRunning
         ; Same question and the same three answers as the installer's guard: force close,
         ; close by hand and check again, or abort. CockEndRecheckPrompt words it, so the two
         ; copies promise the same thing.
-        !insertmacro CockEndRecheckPrompt "Continuumatrice, Oracle or Servatrice is still using files of the installation:" $GuardOutput "uninstallation"
+        !insertmacro CockEndRecheckPrompt "Cockatrice, Oracle or Servatrice is still using files of the installation:" $GuardOutput "uninstallation"
         MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON2 "$GuardPrompt" IDYES un_guard_end IDNO un_guard_recheck
         !insertmacro CockLogUn "uninst-guard: cancelled by user after $GuardRecheckCount recheck(s)"
         ; The installer's Cancel lands in AbortInstall, which explains what to do next. The
         ; uninstaller has no such dialog, so say the same thing here: a bare Abort would
         ; close the window and leave the user with no reason and no next step.
         MessageBox MB_OK|MB_ICONEXCLAMATION \
-            "The uninstallation was cancelled because Continuumatrice, Oracle or Servatrice is still running and holding files of the installation.$\r$\n$\r$\n${AFTER_CLOSING_GUIDANCE}$\r$\n$\r$\nClose them and run the uninstaller again."
+            "The uninstallation was cancelled because Cockatrice, Oracle or Servatrice is still running and holding files of the installation.$\r$\n$\r$\n${AFTER_CLOSING_GUIDANCE}$\r$\n$\r$\nClose them and run the uninstaller again."
         SetErrorLevel 1
         Abort
         un_guard_recheck:
@@ -2122,9 +2122,9 @@ Function un.GuardAppsNotRunning
     ; uninstall that hits a Restart Manager that was busy, or a payload program the user has
     ; not closed yet, can simply be retried.
     !insertmacro CockLogUn "uninst-guard: the holder probe could not answer ($GuardExit): $GuardOutput"
-    DetailPrint "Could not confirm whether Continuumatrice is still running: $GuardOutput"
+    DetailPrint "Could not confirm whether Cockatrice is still running: $GuardOutput"
     MessageBox MB_ABORTRETRYIGNORE|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
-        "This uninstaller could not confirm whether Continuumatrice, Oracle or Servatrice is still running.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nClose them, then choose Retry to check again. Choose Ignore to uninstall anyway, or Abort to cancel the uninstallation." \
+        "This uninstaller could not confirm whether Cockatrice, Oracle or Servatrice is still running.$\r$\n$\r$\nThe check reported: $GuardOutput$\r$\n$\r$\nClose them, then choose Retry to check again. Choose Ignore to uninstall anyway, or Abort to cancel the uninstallation." \
         IDRETRY un_guard_check IDABORT un_guard_unknown_abort
     !insertmacro CockLogUn "uninst-guard: continuing without an answer from the probe"
     Return
@@ -2141,7 +2141,7 @@ ${If} $ReinstallMode = 1
 ${EndIf}
 
 Call SetModeDestinationFromInstdir ; If the user clicks BACK on the directory page we will remember their mode specific directory
-!insertmacro MUI_HEADER_TEXT "Install Mode" "Choose how you want to install Continuumatrice."
+!insertmacro MUI_HEADER_TEXT "Install Mode" "Choose how you want to install Cockatrice."
 nsDialogs::Create 1018
 Pop $0
 ${NSD_CreateLabel} 0 10u 100% 24u "Select install mode:"
@@ -2182,11 +2182,11 @@ ${If} $PortableMode = 0
     # uninstall 32bit version
     SetRegView 32
 
-    ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Continuumatrice" "UninstallString"
+    ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString"
     StrCmp $R0 "" done32
 
     ${If} $ReinstallMode = 0
-        MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Continuumatrice must be uninstalled before installing the new one." IDOK uninst32
+        MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Cockatrice must be uninstalled before installing the new one." IDOK uninst32
         ; Abort would only skip this page and install over the old version anyway;
         ; the message said the old one must go first, so Cancel means cancel.
         !insertmacro CockLog "componentsPagePre: cancelled at the previous-version prompt"
@@ -2213,7 +2213,7 @@ ${If} $PortableMode = 0
     ; the user clicks Next on it, the new version is installed, and the uninstaller
     ; removes everything once this window closes. /S leaves no window to be behind,
     ; so ExecWait is waiting for something that cannot outlive it.
-    ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Continuumatrice" "QuietUninstallString"
+    ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "QuietUninstallString"
     ${If} $R1 == ""
         StrCpy $OldUninstallString "$OldUninstallString /S"
     ${Else}
@@ -2233,11 +2233,11 @@ ${If} $PortableMode = 0
 	${If} ${NSIS_IS_64_BIT} == 1
 	    SetRegView 64
 
-	    ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Continuumatrice" "UninstallString"
+	    ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString"
 	    StrCmp $R0 "" done64
 
 	    ${If} $ReinstallMode = 0
-            MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Continuumatrice must be uninstalled before installing the new one." IDOK uninst64
+            MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Cockatrice must be uninstalled before installing the new one." IDOK uninst64
             !insertmacro CockLog "componentsPagePre: cancelled at the previous-version prompt"
             Quit
         ${Else}
@@ -2249,7 +2249,7 @@ ${If} $PortableMode = 0
 	    Call EnsureOldInstallNotRunning
 	    StrCpy $OldInstallDir $GuardDir
 	    ; Silent, for the reason given in the 32-bit branch above.
-	    ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Continuumatrice" "QuietUninstallString"
+	    ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "QuietUninstallString"
 	    ${If} $R1 == ""
 	        StrCpy $OldUninstallString "$OldUninstallString /S"
 	    ${Else}
@@ -2287,7 +2287,7 @@ SetOutPath "$INSTDIR"
 ; "abseil_dll.dll is either not designed to run on Windows or it contains an
 ; error" for the protobuf ones. So the check has to come before the first
 ; Delete/RMDir and not after it: an interactive install into an existing portable
-; directory with continuumatrice.exe still running would otherwise delete the old
+; directory with cockatrice.exe still running would otherwise delete the old
 ; files under its feet.
 ;
 ; It is skipped on the /R path: .onInit already ran it before
@@ -2301,20 +2301,20 @@ ${If} $ReinstallMode = 0
 ${EndIf}
 
 ; Measured before either purge block, because it has to describe the directory as
-; it arrived here and not what a purge left of it: IsExistingContinuumatriceInstall
-; looks for continuumatrice.exe, oracle.exe, servatrice.exe, uninstall.exe, Qt6*.dll
+; it arrived here and not what a purge left of it: IsExistingCockatriceInstall
+; looks for cockatrice.exe, oracle.exe, servatrice.exe, uninstall.exe, Qt6*.dll
 ; and qt.conf, and the portable purge below deletes exactly those. Taken after
 ; that purge it answered "not an install" as soon as the only survivor was a file
 ; it does not look for - a locked abseil_dll.dll or libssl-3-x64.dll, say - and
 ; the abort further down was then skipped for the very directory the purge had
 ; just failed in.
 ; Remembered because the stale-runtime check below must only ever fire for a
-; directory this installer recognised as a Continuumatrice install. Scanning for
+; directory this installer recognised as a Cockatrice install. Scanning for
 ; leftovers in an unrelated directory (a first-time install into a folder that
 ; happens to hold some Qt5 DLLs, say) would otherwise turn those files into an
 ; abort reason even though the payload is about to overwrite nothing of theirs.
-Call IsExistingContinuumatriceInstall
-!insertmacro CockLog "section: IsExistingContinuumatriceInstall=$R0"
+Call IsExistingCockatriceInstall
+!insertmacro CockLog "section: IsExistingCockatriceInstall=$R0"
 StrCpy $IsUpgrade $R0
 
 ${If} $PortableMode = 1
@@ -2332,9 +2332,9 @@ ${AndIf} ${FileExists} "$INSTDIR\portable.dat"
 	RMDir /r "$INSTDIR\plugins"
 	RMDir /r "$INSTDIR\translations"
 	Delete "$INSTDIR\uninstall.exe"
-	Delete "$INSTDIR\continuumatrice.exe"
-	Delete "$INSTDIR\continuumatrice-legacy-oracle.exe"
-	Delete "$INSTDIR\continuum-servatrice.exe"
+	Delete "$INSTDIR\cockatrice.exe"
+	Delete "$INSTDIR\oracle.exe"
+	Delete "$INSTDIR\servatrice.exe"
 	; Every top-level DLL, not a list of expected ones. The payload is written
 	; after this block, so a DLL the new build still needs is put straight back;
 	; what this has to guarantee is that nothing from the previous build is left
@@ -2348,8 +2348,8 @@ ${AndIf} ${FileExists} "$INSTDIR\portable.dat"
 	StrCpy $DllPurgeRan 1
 	Delete "$INSTDIR\qt.conf"
 	Delete "$INSTDIR\qdebug.txt"
-	Delete "$INSTDIR\continuum-servatrice.sql"
-	Delete "$INSTDIR\continuum-servatrice.ini.example"
+	Delete "$INSTDIR\servatrice.sql"
+	Delete "$INSTDIR\servatrice.ini.example"
 	RMDir "$INSTDIR"
 	!insertmacro CockLogListing "after-portable-purge" "*.dll"
 ${EndIf}
@@ -2427,7 +2427,7 @@ ${If} $StaleRuntimeAfterPurge = 1
     Call LogStaleRuntimeDiagnostics
     ${If} $HolderFound = 1
         ; On /R the previous version is already uninstalled at this point, so an abort
-        ; leaves the user with no working Continuumatrice. It closes once, then offers to end
+        ; leaves the user with no working Cockatrice. It closes once, then offers to end
         ; what is left; this updates $StaleRuntimeAfterPurge with the verdict after that
         ; close, or after the end when the user asked for one.
         Call RecoverFromHolders
@@ -2452,7 +2452,7 @@ ${If} $StaleRuntimeAfterPurge = 1
     ; so "most likely still running" is no longer a fair guess and would send the user
     ; to close programs that are already closed.
     StrCpy $AbortReason \
-        "The installation could not remove all files of a previous version of Continuumatrice, and was cancelled rather than leave a mismatched installation behind."
+        "The installation could not remove all files of a previous version of Cockatrice, and was cancelled rather than leave a mismatched installation behind."
     ${If} $HolderFound = 1
         StrCpy $AbortReason "$AbortReason$\r$\n$\r$\nStill using the install directory:$\r$\n$HolderOutput$\r$\n$\r$\nClose them and run the installer again."
     ${ElseIf} $HolderExit == "0"
@@ -2461,7 +2461,7 @@ ${If} $StaleRuntimeAfterPurge = 1
         ; The check itself failed, so "no running program was found" would be a claim this
         ; installer cannot make. Name the failure instead, and leave the per-file codes to
         ; the log, where they already are.
-        StrCpy $AbortReason "$AbortReason$\r$\n$\r$\nThe check for a running program could not be completed: $HolderOutput$\r$\n$\r$\nClose Continuumatrice, Oracle and Servatrice and run the installer again; the installer log records what Windows reported for each file."
+        StrCpy $AbortReason "$AbortReason$\r$\n$\r$\nThe check for a running program could not be completed: $HolderOutput$\r$\n$\r$\nClose Cockatrice, Oracle and Servatrice and run the installer again; the installer log records what Windows reported for each file."
     ${EndIf}
     ; "Run the installer again" is not enough on an in-app update: the old version
     ; was uninstalled before the purge, so point at the installer that was downloaded.
@@ -2494,37 +2494,39 @@ ${If} $PortableMode = 0
 	; dumps on user machines that nothing consumes.
 	; https://learn.microsoft.com/en-us/windows/win32/wer/collecting-user-mode-dumps
 
-	; Older installers did register continuumatrice.exe above (and the removed
+	; Older installers did register cockatrice.exe above (and the removed
 	; MiniDumpWithFullMemory writer filled that folder), and that key survives this
 	; install, so WER would keep writing full dumps. Remove it, and clear the
 	; legacy dumps nothing consumes anymore. $LOCALAPPDATA resolves per shell context:
 	; under "all" it points at ProgramData, so switch to "current" for the per-user
 	; dumps folder and back afterwards; the registry delete works in either context.
-	DeleteRegKey HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\continuumatrice.exe"
+	DeleteRegKey HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe"
 	SetShellVarContext current
-	RMDir /r "$LOCALAPPDATA\CrashDumps\Continuumatrice"
+	RMDir /r "$LOCALAPPDATA\CrashDumps\Cockatrice"
 	SetShellVarContext all
 
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Continuumatrice" "DisplayIcon" "$INSTDIR\continuumatrice.exe"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Continuumatrice" "DisplayName" "Continuumatrice"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Continuumatrice" "DisplayVersion" "@CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@"
-	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Continuumatrice" "EstimatedSize" "$0"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Continuumatrice" "InstallLocation" "$INSTDIR"
-	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Continuumatrice" "NoModify" "1"
-	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Continuumatrice" "NoRepair" "1"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Continuumatrice" "Publisher" "Continuum Universes Studio"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Continuumatrice" "QuietUninstallString" "$\"$INSTDIR\uninstall.exe$\" /S"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Continuumatrice" "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
-	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Continuumatrice" "VersionMajor" "@CPACK_PACKAGE_VERSION_MAJOR@"
-	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Continuumatrice" "VersionMinor" "@CPACK_PACKAGE_VERSION_MINOR@"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayIcon" "$INSTDIR\cockatrice.exe"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayName" "Cockatrice"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayVersion" "@CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@"
+	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "EstimatedSize" "$0"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "InstallLocation" "$INSTDIR"
+	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "NoModify" "1"
+	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "NoRepair" "1"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "Publisher" "Cockatrice team"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "QuietUninstallString" "$\"$INSTDIR\uninstall.exe$\" /S"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
+	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "VersionMajor" "@CPACK_PACKAGE_VERSION_MAJOR@"
+	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "VersionMinor" "@CPACK_PACKAGE_VERSION_MINOR@"
 
-	; Continuumatrice deliberately does not register .cod, which belongs to
-	; an independent Cockatrice MTG installation.
+	; --- Register .cod file type ---
+	WriteRegStr HKCR ".cod" "" "Cockatrice"
+	WriteRegStr HKCR "Cockatrice" "" "Cockatrice Deck File"
+	WriteRegStr HKCR "Cockatrice\shell\open\command" "" '"$INSTDIR\cockatrice.exe" "%1"'
 
 	; --- Register custom URI protocol ---
-	WriteRegStr HKCR "continuumatrice" "" "URL: Continuumatrice Protocol"
-	WriteRegStr HKCR "continuumatrice" "URL Protocol" ""
-	WriteRegStr HKCR "continuumatrice\shell\open\command" "" '"$INSTDIR\continuumatrice.exe" "%1"'
+	WriteRegStr HKCR "cockatrice" "" "URL: Cockatrice Protocol"
+	WriteRegStr HKCR "cockatrice" "URL Protocol" ""
+	WriteRegStr HKCR "cockatrice\shell\open\command" "" '"$INSTDIR\cockatrice.exe" "%1"'
 
 	IfFileExists "$INSTDIR\vc_redist.x86.exe" VcRedist86Exists PastVcRedist86Check
 	VcRedist86Exists:
@@ -2550,8 +2552,8 @@ ${Else}
 ${EndIf}
 
 ${If} $ReinstallMode = 1
-    IfFileExists "$INSTDIR\continuumatrice.exe" 0 +2
-        Exec '"$INSTDIR\continuumatrice.exe"'
+    IfFileExists "$INSTDIR\cockatrice.exe" 0 +2
+        Exec '"$INSTDIR\cockatrice.exe"'
 ${EndIf}
 
 !insertmacro CockLog "section: application install complete"
@@ -2560,8 +2562,10 @@ SectionEnd
 Section "Start menu item" SecStartMenu
 ${If} $PortableMode = 0
 	SetShellVarContext all
-	createDirectory "$SMPROGRAMS\Continuumatrice"
-	createShortCut "$SMPROGRAMS\Continuumatrice\Continuumatrice.lnk" "$INSTDIR\continuumatrice.exe"
+	createDirectory "$SMPROGRAMS\Cockatrice"
+	createShortCut "$SMPROGRAMS\Cockatrice\Cockatrice.lnk" "$INSTDIR\cockatrice.exe"
+	createShortCut "$SMPROGRAMS\Cockatrice\Oracle.lnk" "$INSTDIR\oracle.exe"
+	createShortCut "$SMPROGRAMS\Cockatrice\Servatrice.lnk" "$INSTDIR\servatrice.exe"
 ${EndIf}
 SectionEnd
 
@@ -2596,41 +2600,48 @@ Section "un.Application" UnSecApplication
 	; Succeeds only when no foreign files remain.
 	RMDir "$INSTDIR"
 
-	RMDir /r "$SMPROGRAMS\Continuumatrice"
+	RMDir /r "$SMPROGRAMS\Cockatrice"
 
-	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Continuumatrice"
+	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice"
 
 	; Leftover WER LocalDumps key from pre-Sentry installers (see the installer note
 	; above): removing it here covers machines that uninstall without reinstalling.
 	; The legacy full-memory dumps go with it; nothing consumes them anymore. Same shell
 	; context note as the installer: the per-user dumps folder needs "current".
-	DeleteRegKey HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\continuumatrice.exe"
+	DeleteRegKey HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe"
 	SetShellVarContext current
-	RMDir /r "$LOCALAPPDATA\CrashDumps\Continuumatrice"
+	RMDir /r "$LOCALAPPDATA\CrashDumps\Cockatrice"
 	SetShellVarContext all
 
-	; Remove only the Continuumatrice URI scheme. Never touch MTG .cod.
+	; Only remove the file/protocol associations if we registered them (i.e. the
+	; install was not portable) and .cod is still owned by Cockatrice, so we don't
+	; clobber a .cod association installed by another application.
 	${If} $R1 == 0
-		DeleteRegKey HKCR "continuumatrice"
+		ReadRegStr $0 HKCR ".cod" ""
+		${If} $0 == "Cockatrice"
+			DeleteRegKey HKCR ".cod"
+			DeleteRegKey HKCR "Cockatrice"
+			DeleteRegKey HKCR "cockatrice"
+		${EndIf}
 	${EndIf}
 SectionEnd
 
 ; unselected because it is /o
 Section /o "un.Configurations, decks, cards, pics" UnSecConfiguration
 	SetShellVarContext current
-	DeleteRegKey HKCU "Software\Continuumatrice"
+	DeleteRegKey HKCU "Software\Cockatrice"
 
-	RMDir /r "$LOCALAPPDATA\Continuumatrice"
+	RMDir /r "$LOCALAPPDATA\Cockatrice"
 SectionEnd
 
-LangString DESC_SecApplication ${LANG_ENGLISH} "Continuumatrice program files"
-LangString DESC_SecStartMenu ${LANG_ENGLISH} "Create start menu items for Continuumatrice and Oracle."
+LangString DESC_SecApplication ${LANG_ENGLISH} "Cockatrice program files"
+LangString DESC_SecStartMenu ${LANG_ENGLISH} "Create start menu items for Cockatrice and Oracle."
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
 	!insertmacro MUI_DESCRIPTION_TEXT ${SecApplication} $(DESC_SecApplication)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SecStartMenu} $(DESC_SecStartMenu)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
-LangString DESC_UnSecApplication ${LANG_ENGLISH} "Continuumatrice program files and start menu items"
+LangString DESC_UnSecApplication ${LANG_ENGLISH} "Cockatrice program files and start menu items"
 LangString DESC_UnSecConfiguration ${LANG_ENGLISH} "Configurations, decks, card database, pictures"
 !insertmacro MUI_UNFUNCTION_DESCRIPTION_BEGIN
 	!insertmacro MUI_DESCRIPTION_TEXT ${UnSecApplication} $(DESC_UnSecApplication)

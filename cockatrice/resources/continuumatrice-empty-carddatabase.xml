@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<continuumatrice_carddatabase version="4">
-  <!-- Empty, intentionally game-neutral starter database.
-       Continuumatrice uses the upstream Cockatrice XML v4 schema for now.
-       Add your own card sets in the Continuumatrice profile's customsets/. -->
-  <sets/>
-  <cards/>
-</continuumatrice_carddatabase>
