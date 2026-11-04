@@ -15,6 +15,8 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/printing/printing_info.h>
 #include <libcockatrice/filters/filter_string.h>
+#include <libcockatrice/filters/filter_card.h>
+#include <libcockatrice/filters/filter_tree.h>
 #include <libcockatrice/interfaces/noop_card_preference_provider.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 #include <string>
@@ -185,6 +187,58 @@ TEST_F(CardQuery, SearchLanguageIsBoundPerInstance)
 }
 
 } // namespace
+
+TEST(GenderFilter, MatchesMseValuesExactlyAndCaseInsensitively)
+{
+    auto male = CardInfo::newInstance("Guardian-m");
+    male->setProperty("gender", "sex male");
+    auto female = CardInfo::newInstance("Guardian-f");
+    female->setProperty("gender", "sex female");
+    auto artificial = CardInfo::newInstance("Automaton");
+    artificial->setProperty("gender", "artificial masculine");
+    auto missing = CardInfo::newInstance("Unknown");
+
+    FilterTree tree;
+    QString term = "SEX MALE";
+    CardFilter genderFilter(term, CardFilter::TypeOr, CardFilter::AttrGender);
+    tree.termNode(&genderFilter);
+
+    EXPECT_TRUE(tree.acceptsCard(male, CardSearchLanguage{}));
+    EXPECT_FALSE(tree.acceptsCard(female, CardSearchLanguage{}));
+    EXPECT_FALSE(tree.acceptsCard(artificial, CardSearchLanguage{}));
+    EXPECT_FALSE(tree.acceptsCard(missing, CardSearchLanguage{}));
+}
+
+TEST(GenderFilter, MultipleSelectionsUseOrAndClearingRestoresAllCards)
+{
+    auto male = CardInfo::newInstance("Guardian-m");
+    male->setProperty("gender", "sex male");
+    auto female = CardInfo::newInstance("Guardian-f");
+    female->setProperty("gender", "sex female");
+    auto neuter = CardInfo::newInstance("Guardian");
+    neuter->setProperty("gender", "sex neuter");
+    auto duo = CardInfo::newInstance("Sibling Heroes");
+    duo->setProperty("gender", "duos siblings");
+
+    FilterTree tree;
+    QString maleTerm = "sex male";
+    QString femaleTerm = "sex female";
+    CardFilter maleFilter(maleTerm, CardFilter::TypeOr, CardFilter::AttrGender);
+    CardFilter femaleFilter(femaleTerm, CardFilter::TypeOr, CardFilter::AttrGender);
+    tree.termNode(&maleFilter);
+    tree.termNode(&femaleFilter);
+
+    EXPECT_TRUE(tree.acceptsCard(male, CardSearchLanguage{}));
+    EXPECT_TRUE(tree.acceptsCard(female, CardSearchLanguage{}));
+    EXPECT_FALSE(tree.acceptsCard(neuter, CardSearchLanguage{}));
+    EXPECT_FALSE(tree.acceptsCard(duo, CardSearchLanguage{}));
+
+    tree.removeFiltersByAttr(CardFilter::AttrGender);
+    EXPECT_TRUE(tree.acceptsCard(male, CardSearchLanguage{}));
+    EXPECT_TRUE(tree.acceptsCard(female, CardSearchLanguage{}));
+    EXPECT_TRUE(tree.acceptsCard(neuter, CardSearchLanguage{}));
+    EXPECT_TRUE(tree.acceptsCard(duo, CardSearchLanguage{}));
+}
 
 class SetQuery : public ::testing::Test
 {
