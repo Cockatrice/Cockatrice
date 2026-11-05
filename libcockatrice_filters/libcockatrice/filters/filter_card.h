@@ -32,6 +32,7 @@ public:
     {
         AttrCmc = 0,
         AttrColor,
+        AttrColorIdentity,
         AttrLoyalty,
         AttrManaCost,
         AttrName,

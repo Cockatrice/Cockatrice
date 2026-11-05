@@ -409,7 +409,7 @@ static void setupParserRules()
         const bool identity = sv.tokens[0].empty() || sv.tokens[0][0] != 'i';
         if (sv.tokens[1][0] == ':') {
             return [=](const CardData &x) {
-                const QString match = identity ? x->getColors() : x->getProperty("coloridentity");
+                const QString match = identity ? x->getColors() : x->getColorIdentity();
                 if (parts.contains("m") && match.length() < 2) {
                     return false;
                 }
@@ -427,7 +427,7 @@ static void setupParserRules()
         }
 
         return [=](const CardData &x) {
-            const QString match = identity ? x->getColors() : x->getProperty("colorIdentity");
+            const QString match = identity ? x->getColors() : x->getColorIdentity();
             if (parts.contains("m") && match.length() < 2) {
                 return false;
             }
