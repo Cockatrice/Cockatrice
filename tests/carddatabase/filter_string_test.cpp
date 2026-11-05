@@ -123,6 +123,25 @@ CardInfoPtr greenIdentityCard()
     return CardInfo::newInstance("Identity Cat", "", false, {{"colors", "G"}, {"coloridentity", "G"}}, {}, {}, {}, {});
 }
 
+// A card whose color identity differs from its colors, so that a query reading the wrong one is visible.
+CardInfoPtr splitIdentityCard()
+{
+    return CardInfo::newInstance("Split Identity", "", false, {{"colors", "G"}, {"coloridentity", "W"}}, {}, {}, {},
+                                 {});
+}
+
+// "ci!" (exactly these color identities) used to read the camelCase "colorIdentity" property instead of the
+// lowercase "coloridentity" key, so it matched the empty string and rejected every card.
+TEST_F(CardQuery, ColorIdentityExactReadsTheColorIdentityProperty)
+{
+    const CardData card = splitIdentityCard();
+    ASSERT_TRUE(FilterString("ci!w").check(card));
+    ASSERT_FALSE(FilterString("ci!g").check(card));
+    // "c!" still reads colors, not identity.
+    ASSERT_TRUE(FilterString("c!g").check(card));
+    ASSERT_FALSE(FilterString("c!w").check(card));
+}
+
 // Whitespace belongs around the separator, never inside an operator token: "c i: g" must not
 // be read as the color-identity operator "ci" (it is a generic "c" AND a field query on "i").
 TEST_F(CardQuery, ColorIdentityOperatorIsNotSplitByWhitespace)
