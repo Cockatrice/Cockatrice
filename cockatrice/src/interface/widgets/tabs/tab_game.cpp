@@ -570,8 +570,10 @@ void TabGame::adminLockChanged(bool lock)
 
 void TabGame::actGameInfo()
 {
-    DlgCreateGame dlg(game->getGameMetaInfo()->proto(), game->getGameMetaInfo()->getRoomGameTypes(), this);
-    dlg.exec();
+    // Heap-allocated so that destroying this tab while the dialog is open cannot delete a stack object.
+    auto *dlg = new DlgCreateGame(game->getGameMetaInfo()->proto(), game->getGameMetaInfo()->getRoomGameTypes(), this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->open();
 }
 
 void TabGame::actCopyGameLink()

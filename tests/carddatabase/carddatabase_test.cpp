@@ -1,3 +1,4 @@
+#include "../support/scoped_file_size_limit.h"
 #include "libcockatrice/card/database/card_database.h"
 #include "libcockatrice/card/database/card_database_loader.h"
 #include "libcockatrice/card/database/card_database_querier.h"
@@ -35,12 +36,6 @@
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 #include <libcockatrice/utility/card_ref.h>
 #include <string>
-
-#ifdef Q_OS_UNIX
-#include <csignal>
-#include <sys/resource.h>
-#include <unistd.h>
-#endif
 
 namespace
 {
@@ -247,21 +242,14 @@ TEST(CardDatabaseTest, Xml4ShortWriteKeepsInstalledFile)
     ASSERT_EQ(installed.write("installed database"), 18);
     installed.close();
 
-    // A real filesystem write failure, isolated in the death-test child so the
-    // process-wide file limit never affects other cases or the parent runner.
-    ASSERT_EXIT(
-        {
-            std::signal(SIGXFSZ, SIG_IGN);
-            struct rlimit limit;
-            limit.rlim_cur = 128;
-            limit.rlim_max = 128;
-            if (setrlimit(RLIMIT_FSIZE, &limit) != 0) {
-                _exit(2);
-            }
-            CockatriceXml4Parser writer(&controller);
-            _exit(writer.saveToFile({}, sets, cards, fileName) ? 1 : 0);
-        },
-        ::testing::ExitedWithCode(0), "");
+    // A real filesystem write failure: the soft file-size cap makes the writer's own
+    // flush fail without filling a disk. The cap is scoped rather than forked, because a
+    // death-test child under RLIMIT_FSIZE is killed by SIGSEGV on macOS.
+    test_support::ScopedFileSizeLimit fileSizeCap(128);
+    ASSERT_TRUE(fileSizeCap.isValid());
+
+    CockatriceXml4Parser writer(&controller);
+    EXPECT_FALSE(writer.saveToFile({}, sets, cards, fileName));
 
     ASSERT_TRUE(installed.open(QIODevice::ReadOnly));
     EXPECT_EQ(installed.readAll(), "installed database");
