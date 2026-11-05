@@ -8,4 +8,4 @@ When you choose a specific player, that player receives the selected card identi
 
 If the hand becomes too small or the recipient leaves before the server processes the request, the request fails without a partial reveal. Cancelling the count dialog sends nothing.
 
-This operation requires a server that supports multiple random reveals. An older server rejects it without revealing any cards, and the client explains that it is unsupported. The existing **Reveal random card to...** action and its shortcut remain available for single-card reveals.
+This operation requires a server that supports multiple random reveals. An older server rejects it without revealing any cards. The existing **Reveal random card to...** action and its shortcut remain available for single-card reveals.

@@ -13,9 +13,7 @@
 #include <QList>
 #include <QMap>
 #include <QMenu>
-#include <QMessageBox>
 #include <QObject>
-#include <QPointer>
 #include <QString>
 #include <QVariant>
 #include <libcockatrice/game/abstract_game.h>
@@ -25,7 +23,6 @@
 #include <libcockatrice/game/player/player_logic.h>
 #include <libcockatrice/game/player/player_manager.h>
 #include <libcockatrice/game/zones/hand_zone_logic.h>
-#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/utility/zone_names.h>
 
 class QWidget;
@@ -33,7 +30,6 @@ class QWidget;
 HandMenu::HandMenu(PlayerGraphicsItem *_player, QWidget *parent) : TearOffMenu(parent), player(_player)
 {
     auto *actions = player->getLogic()->getPlayerActions();
-    connect(actions, &PlayerActions::randomHandRevealFailed, this, &HandMenu::onRandomHandRevealFailed);
 
     if (player->getLogic()->getPlayerInfo()->local || player->getLogic()->getPlayerInfo()->judge) {
         aViewHand = new QAction(this);
@@ -279,12 +275,7 @@ void HandMenu::onRevealRandomHandCardsTriggered()
         return;
     }
     const int targetId = action->data().toInt();
-    QPointer<PlayerActions> actions = player->getLogic()->getPlayerActions();
-    QPointer<AbstractClient> client =
-        player->getLogic()->getGame()->getClientForPlayer(player->getLogic()->getPlayerInfo()->getId());
-    if (!client) {
-        return;
-    }
+    auto *actions = player->getLogic()->getPlayerActions();
     auto *dialog = new QInputDialog(dialogParent());
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->setWindowTitle(tr("Reveal Random Hand Cards"));
@@ -292,15 +283,8 @@ void HandMenu::onRevealRandomHandCardsTriggered()
     dialog->setInputMode(QInputDialog::IntInput);
     dialog->setIntRange(1, handSize);
     dialog->setIntValue(qMin(2, handSize));
-    connect(this, &QObject::destroyed, dialog, &QDialog::reject);
-    connect(client, &QObject::destroyed, dialog, &QDialog::reject);
-    connect(actions, &QObject::destroyed, dialog, &QDialog::reject);
-    connect(dialog, &QDialog::accepted, this, [dialog, actions, client, targetId] {
-        if (!actions || !client) {
-            return;
-        }
-        actions->actRevealRandomHandCards(targetId, dialog->intValue());
-    });
+    connect(dialog, &QDialog::accepted, actions,
+            [dialog, actions, targetId] { actions->actRevealRandomHandCards(targetId, dialog->intValue()); });
     dialog->open();
 }
 
@@ -310,21 +294,4 @@ QWidget *HandMenu::dialogParent() const
         return view->window();
     }
     return nullptr;
-}
-
-void HandMenu::onRandomHandRevealFailed(bool unsupported)
-{
-    const QString text =
-        unsupported ? tr("This server does not support revealing multiple random cards. No cards were revealed.")
-                    : tr("The random reveal could not be completed. The hand or recipient may have changed.");
-    auto *message =
-        new QMessageBox(QMessageBox::Warning, tr("Reveal Random Hand Cards"), text, QMessageBox::Ok, dialogParent());
-    message->setAttribute(Qt::WA_DeleteOnClose);
-    connect(this, &QObject::destroyed, message, &QDialog::reject);
-    connect(player->getLogic()->getPlayerActions(), &QObject::destroyed, message, &QDialog::reject);
-    if (auto *client =
-            player->getLogic()->getGame()->getClientForPlayer(player->getLogic()->getPlayerInfo()->getId())) {
-        connect(client, &QObject::destroyed, message, &QDialog::reject);
-    }
-    message->open();
 }

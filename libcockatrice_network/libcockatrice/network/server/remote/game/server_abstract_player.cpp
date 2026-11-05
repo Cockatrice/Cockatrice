@@ -1494,6 +1494,22 @@ Server_AbstractPlayer::cmdDumpZone(const Command_DumpZone &cmd, ResponseContaine
     return Response::RespOk;
 }
 
+Response::ResponseCode Server_AbstractPlayer::cmdRevealRandomCards(const Command_RevealRandomCards &cmd,
+                                                                   ResponseContainer &rc,
+                                                                   GameEventStorage &ges)
+{
+    if (cmd.number_of_cards() <= 0) {
+        return Response::RespInvalidData;
+    }
+    Command_RevealCards reveal;
+    reveal.set_zone_name(cmd.zone_name());
+    reveal.add_card_id(-2);
+    if (cmd.has_player_id()) {
+        reveal.set_player_id(cmd.player_id());
+    }
+    return cmdRevealCards(reveal, rc, ges, cmd.number_of_cards());
+}
+
 Response::ResponseCode Server_AbstractPlayer::cmdRevealCards(const Command_RevealCards &cmd,
                                                              ResponseContainer & /*rc*/,
                                                              GameEventStorage &ges,

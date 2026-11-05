@@ -165,6 +165,8 @@ public:
                                                   ResponseContainer &rc,
                                                   GameEventStorage &ges,
                                                   int randomCount = 1) override;
+    Response::ResponseCode
+    cmdRevealRandomCards(const Command_RevealRandomCards &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
     virtual Response::ResponseCode cmdChangeZoneProperties(const Command_ChangeZoneProperties &cmd,
                                                            ResponseContainer &rc,
                                                            GameEventStorage &ges) override;

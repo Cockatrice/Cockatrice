@@ -46,6 +46,7 @@ class Command_NextTurn;
 class Command_SetActivePhase;
 class Command_DumpZone;
 class Command_RevealCards;
+class Command_RevealRandomCards;
 class Command_ReverseTurn;
 class Command_MoveCard;
 class Command_SetSideboardPlan;
@@ -175,6 +176,8 @@ public:
     cmdDumpZone(const Command_DumpZone &cmd, ResponseContainer &rc, GameEventStorage &ges);
     virtual Response::ResponseCode
     cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer &rc, GameEventStorage &ges, int randomCount = 1);
+    virtual Response::ResponseCode
+    cmdRevealRandomCards(const Command_RevealRandomCards &cmd, ResponseContainer &rc, GameEventStorage &ges);
     virtual Response::ResponseCode
     cmdReverseTurn(const Command_ReverseTurn & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage &ges);
     virtual Response::ResponseCode

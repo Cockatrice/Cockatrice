@@ -120,7 +120,6 @@ public:
     }
 
 signals:
-    void randomHandRevealFailed(bool unsupported);
     void requestViewTopCardsDialog(int defaultNumberTopCards, int deckSize);
     void requestViewBottomCardsDialog(int defaultNumberBottomCards, int deckSize);
     void requestShuffleTopDialog(int defaultNumberTopCards, int maxCards);
