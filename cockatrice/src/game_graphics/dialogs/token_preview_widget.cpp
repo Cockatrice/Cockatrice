@@ -52,6 +52,7 @@ TokenPreviewWidget::TokenPreviewWidget(QWidget *parent) : QGraphicsView(parent),
     setInteractive(false);
     setFocusPolicy(Qt::NoFocus);
     setFrameShape(QFrame::NoFrame);
+    viewport()->setBackgroundRole(QPalette::Window);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setMinimumSize(150, 200);
