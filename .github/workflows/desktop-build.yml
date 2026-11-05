@@ -518,6 +518,12 @@ jobs:
       CMAKE_GENERATOR: 'Ninja'
       NAME: ${{ matrix.distro }}${{ matrix.version }}
       IMAGE_SUFFIX: ${{ matrix.variant }}
+      # The shared steps below gate on these, so they have to be derived here too. Left
+      # undefined they silently skipped the build the leg exists for: the coverage leg
+      # found build/ empty and its report collection failed on every nightly and tag run.
+      # Same derivation as the pull request job above.
+      DEBUG_TEST: ${{ matrix.sanitize == 'yes' || matrix.coverage == 'yes' || matrix.debug_test == 'yes' }}
+      RUN_TESTS: ${{ matrix.test != 'skip' && !(matrix.sanitize == 'yes' || matrix.coverage == 'yes' || matrix.debug_test == 'yes') }}
     steps: *linux-steps
 
   build-vcpkg:
