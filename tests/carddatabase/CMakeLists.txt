@@ -53,6 +53,20 @@ if(WITH_ORACLE OR WITH_CLIENT)
   )
 
   # ------------------------
+  # Filter Mode Test
+  # ------------------------
+  cockatrice_add_test(
+    NAME
+    filter_mode_test
+    SOURCES
+    ${VERSION_STRING_CPP}
+    filter_mode_test.cpp
+    mocks.cpp
+    LIBS
+    libcockatrice_filters
+  )
+
+  # ------------------------
   # Visual Display Model Test
   # ------------------------
   cockatrice_add_test(

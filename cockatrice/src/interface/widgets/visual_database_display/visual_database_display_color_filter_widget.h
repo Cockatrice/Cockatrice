@@ -10,8 +10,8 @@
 #include <QByteArray>
 #include <QChar>
 #include <QList>
-#include <QMetaType>
 #include <QWidget>
+#include <libcockatrice/filters/filter_mode.h>
 #include <libcockatrice/utility/debouncer.h>
 #include <qtmetamacros.h>
 
@@ -37,20 +37,6 @@ private:
     bool isActive;
     int circleDiameter;
 };
-
-enum class FilterMode
-{
-    Includes = 0,   // Include selected colors (OR condition).
-    Excludes,       // Exclude selected colors (AND NOT).
-    IncludeExclude, // Include selected colors (OR) and exclude unselected colors (AND NOT).
-    ExactMatch,     // Only selected colors are included, all others are excluded.
-    ColorIdentity,  // Keep cards whose color identity is a subset of the selected colors (stored as AND NOT for each
-                    // unselected color).
-    Custom,         // The color filters do not match any of the above modes. Not included in the combo box.
-    End
-};
-
-Q_DECLARE_METATYPE(FilterMode)
 
 class VisualDatabaseDisplayColorFilterWidget : public QWidget
 {

@@ -17,41 +17,6 @@
 
 namespace
 {
-/**
- * @brief Information about the behaviour of a filter mode.
- */
-struct FilterModeInfo
-{
-    // When a color symbol is enabled, add filters of this type. Skipped if equal to CardFilter::Type::TypeEnd.
-    CardFilter::Type includeType;
-
-    // When a color symbol is disabled, add filters of this type. Skipped if equal to CardFilter::Type::TypeEnd.
-    CardFilter::Type excludeType;
-
-    // The attribute to filter for when adding the filters.
-    CardFilter::Attr attr;
-};
-
-/** @brief Return information about the given filter mode. */
-static FilterModeInfo getFilterModeInfo(FilterMode filterMode)
-{
-    switch (filterMode) {
-        case FilterMode::Includes:
-            return {CardFilter::Type::TypeOr, CardFilter::Type::TypeEnd, CardFilter::Attr::AttrColor};
-        case FilterMode::Excludes:
-            return {CardFilter::Type::TypeAndNot, CardFilter::Type::TypeEnd, CardFilter::Attr::AttrColor};
-        case FilterMode::IncludeExclude:
-            return {CardFilter::Type::TypeOr, CardFilter::Type::TypeAndNot, CardFilter::Attr::AttrColor};
-        case FilterMode::ExactMatch:
-            return {CardFilter::Type::TypeAnd, CardFilter::Type::TypeAndNot, CardFilter::Attr::AttrColor};
-        case FilterMode::ColorIdentity:
-            return {CardFilter::Type::TypeEnd, CardFilter::Type::TypeAndNot, CardFilter::Attr::AttrColorIdentity};
-        case FilterMode::Custom:
-        case FilterMode::End:
-            break;
-    }
-    return {CardFilter::Type::TypeEnd, CardFilter::Type::TypeEnd, CardFilter::Attr::AttrEnd};
-}
 
 /** @brief Remove the filters that apply to the given color and attribute from the given model. */
 static void removeFilters(FilterTreeModel *filterModel, QChar color, CardFilter::Attr attr)
@@ -247,54 +212,13 @@ QList<QChar> VisualDatabaseDisplayColorFilterWidget::getActiveColors()
 
 void VisualDatabaseDisplayColorFilterWidget::syncWithFilterModel()
 {
-    // Determine the correct currentMode from the filter model by finding which modes
-    // are not possible due to the model containing (a combination of) filters that
-    // that mode cannot add.
-    constexpr int modeCount = static_cast<int>(FilterMode::End);
-    bool modeImpossible[modeCount] = {};
-
     QList<const CardFilter *> filters;
     filters.append(filterModel->getFiltersOfType(CardFilter::Attr::AttrColor));
     filters.append(filterModel->getFiltersOfType(CardFilter::Attr::AttrColorIdentity));
 
-    for (int i = 0; i < modeCount; ++i) {
-        FilterModeInfo modeInfo = getFilterModeInfo(static_cast<FilterMode>(i));
-
-        // Remove the modes that cannot create one of the filters.
-        for (const CardFilter *filter : filters) {
-            if (filter->attr() != modeInfo.attr ||
-                (filter->type() != modeInfo.includeType && filter->type() != modeInfo.excludeType)) {
-                modeImpossible[i] = true;
-                break;
-            }
-        }
-
-        // Modes that have both an include and exclude filter should always have a filter for each color.
-        if (modeInfo.includeType != CardFilter::Type::TypeEnd && modeInfo.excludeType != CardFilter::Type::TypeEnd &&
-            !modeImpossible[i]) {
-            for (const QChar &color : QString("WUBRG")) {
-                int count = 0;
-                for (const CardFilter *filter : filters) {
-                    count += filter->term() == color;
-                }
-                if (count != 1) {
-                    modeImpossible[i] = true;
-                    break;
-                }
-            }
-        }
-    }
-
-    // If the current mode is not possible with the current filters, set it to the first
-    // one that is. Switching to and from the custom mode is always possible.
-    if (modeImpossible[static_cast<int>(currentMode)] || currentMode == FilterMode::Custom) {
-        for (int i = 0; i < modeCount; ++i) {
-            if (!modeImpossible[i] || i == static_cast<int>(FilterMode::Custom)) {
-                currentMode = static_cast<FilterMode>(i);
-                break;
-            }
-        }
-    }
+    // Re-derive the mode from the filters in the model, so that a loaded filter set selects the mode that
+    // produced it (or Custom when none could have).
+    currentMode = deriveFilterMode(filters, currentMode);
 
     // Update the combobox. Add a Custom item only if we have a custom filter mode.
     int customIndex = modeComboBox->findData(QVariant::fromValue(FilterMode::Custom));

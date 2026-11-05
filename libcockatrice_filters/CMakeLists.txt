@@ -1,10 +1,10 @@
-set(HEADERS libcockatrice/filters/filter_card.h libcockatrice/filters/filter_string.h
-            libcockatrice/filters/filter_tree.h
+set(HEADERS libcockatrice/filters/filter_card.h libcockatrice/filters/filter_mode.h
+            libcockatrice/filters/filter_string.h libcockatrice/filters/filter_tree.h
 )
 
 add_library(
-  libcockatrice_filters STATIC ${HEADERS} libcockatrice/filters/filter_card.cpp libcockatrice/filters/filter_string.cpp
-                               libcockatrice/filters/filter_tree.cpp
+  libcockatrice_filters STATIC ${HEADERS} libcockatrice/filters/filter_card.cpp libcockatrice/filters/filter_mode.cpp
+                               libcockatrice/filters/filter_string.cpp libcockatrice/filters/filter_tree.cpp
 )
 
 add_dependencies(libcockatrice_filters libcockatrice_card)
