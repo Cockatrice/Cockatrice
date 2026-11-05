@@ -1,16 +1,11 @@
 #include "client/network/update/card_spoiler/spoiler_file.h"
+#include "support/scoped_file_size_limit.h"
 
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QTemporaryDir>
 #include <gtest/gtest.h>
-
-#ifdef Q_OS_UNIX
-#include <csignal>
-#include <sys/resource.h>
-#include <unistd.h>
-#endif
 
 namespace
 {
@@ -123,25 +118,16 @@ TEST_F(SpoilerFileTest, FileInParentPathReportsFailureWithoutModifyingIt)
 #ifdef Q_OS_UNIX
 TEST_F(SpoilerFileTest, ShortWriteLeavesExistingFileIntact)
 {
-    // Limit only the child process: a real short write exercises QSaveFile's
-    // buffered flush failure without depending on disk capacity or file ownership.
     const QByteArray changed = "<cockatrice_carddatabase version=\"4\"><!--" + QByteArray(100000, 'x') +
                                "--><cards/></cockatrice_carddatabase>";
-    EXPECT_EXIT(
-        {
-            struct rlimit limit;
-            if (getrlimit(RLIMIT_FSIZE, &limit) != 0) {
-                _exit(2);
-            }
-            limit.rlim_cur = 128;
-            if (setrlimit(RLIMIT_FSIZE, &limit) != 0) {
-                _exit(3);
-            }
-            std::signal(SIGXFSZ, SIG_IGN);
-            const auto result = save(changed);
-            _exit(result == SpoilerFile::SaveResult::Failed && !error.isEmpty() ? 0 : 1);
-        },
-        ::testing::ExitedWithCode(0), "");
+    // A real short write exercises QSaveFile's buffered flush failure without depending
+    // on disk capacity. The cap is scoped rather than forked, because a death-test child
+    // under RLIMIT_FSIZE is killed by SIGSEGV on macOS.
+    test_support::ScopedFileSizeLimit fileSizeCap(128);
+    ASSERT_TRUE(fileSizeCap.isValid());
+
+    EXPECT_EQ(save(changed), SpoilerFile::SaveResult::Failed);
+    EXPECT_FALSE(error.isEmpty());
     EXPECT_EQ(read(), original);
     EXPECT_EQ(QDir(directory.path()).entryList(QDir::Files), QStringList{"spoiler.xml"});
 }
