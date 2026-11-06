@@ -256,9 +256,21 @@ private:
 
     QPixmap fromAsset(const QSize &pixelSize, QIcon::Mode mode) const
     {
-        QPixmap pixmap(QStringLiteral("theme:") + resolvedPath);
-        if (!pixelSize.isEmpty() && pixmap.size() != pixelSize) {
-            pixmap = pixmap.scaled(pixelSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        QPixmap pixmap;
+        if (resolvedAssetIsSvg) {
+            // Render authored SVG art through QSvgRenderer rather than QPixmap.
+            // Loading an `.svg` through QPixmap needs Qt's SVG *image-format*
+            // plugin, which is a separate package on Linux distributions and is
+            // absent from minimal installs and from CI (it is a Recommends of
+            // qt6-svg-dev, so `--no-install-recommends` drops it). Art a theme
+            // ships must not disappear because of a packaging choice, and the
+            // renderer is already linked for the sentinel path.
+            pixmap = renderSvg(resolvedSvg, pixelSize.isEmpty() ? intrinsicSize() : pixelSize, 1.0);
+        } else {
+            pixmap = QPixmap(QStringLiteral("theme:") + resolvedPath);
+            if (!pixelSize.isEmpty() && pixmap.size() != pixelSize) {
+                pixmap = pixmap.scaled(pixelSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            }
         }
         if (mode == QIcon::Disabled && !pixmap.isNull()) {
             pixmap = QApplication::style()->generatedIconPixmap(QIcon::Disabled, pixmap, nullptr);
