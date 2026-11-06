@@ -6,6 +6,8 @@
 #ifndef THEME_ICON_INK_H
 #define THEME_ICON_INK_H
 
+#include "theme_icon.h"
+
 #include <QColor>
 
 /**
@@ -93,6 +95,33 @@ QColor glyphInk(const QColor &text, const QColor &surface, const QColor &accent,
  * already ask for that when there is no visible label.
  */
 double labelContrastFloor();
+
+/**
+ * @brief Applies an emphasis level to an already-hued glyph color.
+ *
+ * Secondary keeps the hue untouched, so it is the no-op the default needs.
+ * Primary pushes the color to a higher floor than the default, because the
+ * accent is a mid-tone: on a light scheme it is lighter than the neutral ink and
+ * on a dark one darker, so only a stronger contrast target keeps the primary
+ * level above the secondary on both. Quiet
+ * blends the color toward the surface it sits on and stops at the non-text
+ * legibility floor, so a labelling glyph recedes without disappearing.
+ *
+ * @param color Hue-resolved glyph color.
+ * @param surface Surface the glyph is drawn on.
+ * @param emphasis How much attention the glyph claims.
+ * @return The emphasized color, as an RGB color.
+ */
+QColor forEmphasis(const QColor &color, const QColor &surface, IconEmphasis emphasis);
+
+/** @brief Contrast floor the primary level reaches, so it out-reads the default. */
+double primaryContrastFloor();
+
+/** @brief How far a quiet glyph is blended into its surface. */
+double quietBlend();
+
+/** @brief Contrast floor a quiet glyph keeps, the WCAG non-text minimum. */
+double quietContrastFloor();
 } // namespace ThemeIconInk
 
 #endif // THEME_ICON_INK_H

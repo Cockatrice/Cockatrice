@@ -14,6 +14,18 @@ namespace
 constexpr double ACCENT_MIX = 0.70;
 // An icon that labels a control is carrying text; see ui-assets.md.
 constexpr double LABEL_CONTRAST_FLOOR = 4.5;
+// A primary glyph has to out-read the default one on both schemes. The accent is
+// a mid-tone: on a light surface it is *lighter* than the neutral ink, and on a
+// dark surface it is *darker*, so neither "the accent as-is" nor "a contrast
+// floor shared with the default" keeps the primary above the secondary. A 7:1
+// target does: it darkens the accent on light schemes and lightens it on dark
+// ones, so the primary level always out-contrasts the default level.
+constexpr double PRIMARY_CONTRAST = 7.0;
+// A quiet glyph is blended this far into its surface. It has to stay findable
+// without competing with the actions beside it.
+constexpr double QUIET_BLEND = 0.55;
+// WCAG 2.2 SC 1.4.11, the floor for a non-text element that carries meaning.
+constexpr double QUIET_CONTRAST_FLOOR = 3.0;
 // Binary-search depth for reachContrast(). 24 halvings resolve to well under
 // one 8-bit channel step, so the result is stable across platforms.
 constexpr int CONTRAST_SEARCH_STEPS = 24;
@@ -86,5 +98,33 @@ double defaultAccentMix()
 double labelContrastFloor()
 {
     return LABEL_CONTRAST_FLOOR;
+}
+
+QColor forEmphasis(const QColor &color, const QColor &surface, IconEmphasis emphasis)
+{
+    switch (emphasis) {
+        case IconEmphasis::Primary:
+            return reachContrast(color, surface, PRIMARY_CONTRAST).toRgb();
+        case IconEmphasis::Quiet:
+            return reachContrast(blend(color, surface, QUIET_BLEND), surface, QUIET_CONTRAST_FLOOR).toRgb();
+        case IconEmphasis::Secondary:
+            break;
+    }
+    return color;
+}
+
+double primaryContrastFloor()
+{
+    return PRIMARY_CONTRAST;
+}
+
+double quietBlend()
+{
+    return QUIET_BLEND;
+}
+
+double quietContrastFloor()
+{
+    return QUIET_CONTRAST_FLOOR;
 }
 } // namespace ThemeIconInk

@@ -1348,3 +1348,206 @@ TEST(IconInkPreview, WritesPngsWhenRequested)
         ASSERT_TRUE(image.save(path)) << path.toStdString();
     }
 }
+
+namespace
+{
+/** @brief Applies a shipped palette file to the application for a test. */
+bool applyShippedPalette(const QString &theme, bool dark)
+{
+    const QString file =
+        QDir(QStringLiteral(COCKATRICE_SOURCE_DIR))
+            .absoluteFilePath(QStringLiteral("cockatrice/themes/%1/palette-default-%2.toml")
+                                  .arg(theme, dark ? QStringLiteral("dark") : QStringLiteral("light")));
+    const PaletteConfig config = PaletteConfig::fromFile(file);
+    if (!config.hasPalette()) {
+        return false;
+    }
+    qApp->setPalette(config.apply(QPalette()));
+    return true;
+}
+
+QColor surfaceColor()
+{
+    return qApp->palette().color(QPalette::Active, QPalette::Window);
+}
+} // namespace
+
+/**
+ * @brief The primary action of a surface takes the accent, not a darker gray.
+ *
+ * A glyph hierarchy cannot be built out of "dark" and "darker": at any usable
+ * contrast a neutral ink is already near the palette's pole, so the top level
+ * has to be a different color. The accent is the palette's own answer to "which
+ * color means action", so primary uses it instead of inventing a token.
+ */
+TEST_F(ThemeIconRenderTest, PrimaryEmphasisUsesTheAccent)
+{
+    ASSERT_TRUE(applyShippedPalette(QStringLiteral("Fabric"), false));
+
+    const QColor secondary = IconTint().resolve(QIcon::Normal);
+    const QColor primary = IconTint::primary().resolve(QIcon::Normal);
+
+    EXPECT_NE(primary, secondary);
+    EXPECT_GT(primary.blue(), primary.red()) << "the primary glyph did not take the accent's blue";
+    EXPECT_GE(ThemeIconInk::contrastRatio(primary, surfaceColor()), ThemeIconInk::primaryContrastFloor());
+    EXPECT_GE(ThemeIconInk::contrastRatio(primary, surfaceColor()),
+              ThemeIconInk::contrastRatio(secondary, surfaceColor()));
+}
+
+/**
+ * @brief The primary level out-reads the default one on both schemes.
+ *
+ * The default ink borrows enough accent to sit off the palette's pole (5.4:1 on
+ * light, 6.4:1 on dark), so the 7:1 primary floor is measurably above it in both
+ * schemes instead of being lost against a near-black or near-white default.
+ * Hue alone would not keep the order; the contrast target does.
+ */
+TEST_F(ThemeIconRenderTest, PrimaryOutReadsSecondaryOnBothSchemes)
+{
+    for (const bool dark : {false, true}) {
+        ASSERT_TRUE(applyShippedPalette(QStringLiteral("Fabric"), dark));
+        const QColor surface = surfaceColor();
+        const QColor secondary = IconTint().resolve(QIcon::Normal);
+        const QColor primary = IconTint::primary().resolve(QIcon::Normal);
+        EXPECT_NE(primary, secondary) << (dark ? "dark" : "light");
+        EXPECT_GT(ThemeIconInk::contrastRatio(primary, surface), ThemeIconInk::contrastRatio(secondary, surface))
+            << (dark ? "dark" : "light");
+        EXPECT_GE(ThemeIconInk::contrastRatio(primary, surface), ThemeIconInk::primaryContrastFloor())
+            << (dark ? "dark" : "light");
+    }
+}
+
+/** @brief A quiet glyph recedes toward its surface without dropping below 3:1. */
+TEST_F(ThemeIconRenderTest, QuietEmphasisRecedesButStaysLegible)
+{
+    ASSERT_TRUE(applyShippedPalette(QStringLiteral("Fabric"), false));
+
+    const QColor secondary = IconTint().resolve(QIcon::Normal);
+    const QColor quiet = IconTint::quiet().resolve(QIcon::Normal);
+
+    EXPECT_LT(ThemeIconInk::contrastRatio(quiet, surfaceColor()),
+              ThemeIconInk::contrastRatio(secondary, surfaceColor()))
+        << "the quiet glyph does not recede";
+    EXPECT_GE(ThemeIconInk::contrastRatio(quiet, surfaceColor()), ThemeIconInk::quietContrastFloor());
+}
+
+/** @brief Emphasis changes how loud a semantic color is, never which color it is. */
+TEST_F(ThemeIconRenderTest, EmphasisKeepsASemanticHue)
+{
+    ASSERT_TRUE(applyShippedPalette(QStringLiteral("Fabric"), false));
+
+    for (const IconEmphasis emphasis : {IconEmphasis::Primary, IconEmphasis::Secondary, IconEmphasis::Quiet}) {
+        const QColor ink = IconTint(AppColor::Positive, emphasis).resolve(QIcon::Normal);
+        EXPECT_GT(ink.green(), ink.red()) << static_cast<int>(emphasis);
+        EXPECT_GT(ink.green(), ink.blue()) << static_cast<int>(emphasis);
+    }
+}
+
+/** @brief Every emphasis keeps the selected-row swap to HighlightedText. */
+TEST_F(ThemeIconRenderTest, SelectedStillFallsBackToHighlightedText)
+{
+    QPalette palette = qApp->palette();
+    const QColor selectedText(QStringLiteral("#222222"));
+    palette.setColor(QPalette::Active, QPalette::Highlight, QColor(QStringLiteral("#000000")));
+    palette.setColor(QPalette::Active, QPalette::HighlightedText, selectedText);
+    qApp->setPalette(palette);
+
+    // Black ink on a black highlight is illegible, so the selection wins for
+    // both the default and the quiet level.
+    EXPECT_EQ(IconTint().resolve(QIcon::Selected), selectedText);
+    EXPECT_EQ(IconTint::quiet().resolve(QIcon::Selected), selectedText);
+}
+
+/**
+ * @brief Writes the emphasis ladder sheet when asked; skipped otherwise.
+ *
+ * One strip per scheme: a mock toolbar with body text, a quiet labelling glyph,
+ * secondary actions, the primary action, and the primary action on an
+ * accent-filled button. The point is the hierarchy at a glance, not the glyph.
+ */
+TEST_F(ThemeIconRenderTest, EmphasisPreviewWritesPngsWhenRequested)
+{
+    const QString outDir = qEnvironmentVariable("COCKATRICE_ICON_PREVIEW_DIR");
+    if (outDir.isEmpty()) {
+        GTEST_SKIP() << "set COCKATRICE_ICON_PREVIEW_DIR to write the preview PNGs";
+    }
+    ASSERT_TRUE(QDir().mkpath(outDir));
+
+    constexpr int MARGIN = 24;
+    constexpr int ROW_HEIGHT = 44;
+    constexpr int ICON_SIZE = 20;
+    constexpr qreal DPR = 2.0;
+    constexpr int WIDTH = 760;
+
+    struct Sample
+    {
+        const char *glyph;
+        const char *label;
+        IconTint tint;
+    };
+
+    for (const bool dark : {false, true}) {
+        const InkPalette palette = shippedPalette(QStringLiteral("Fabric"), dark);
+        ASSERT_TRUE(palette.text.isValid());
+        ASSERT_TRUE(applyShippedPalette(QStringLiteral("Fabric"), dark));
+
+        const QList<Sample> samples = {
+            {nullptr, "body text for comparison", {}},
+            {"search", "quiet hint", IconTint::quiet()},
+            {"settings", "secondary", IconTint()},
+            {"arrow_right", "primary", IconTint::primary()},
+            {"increment", "primary, positive", IconTint(AppColor::Positive, IconEmphasis::Primary)},
+        };
+
+        const int logicalHeight = MARGIN + 28 + static_cast<int>(samples.size()) * ROW_HEIGHT + ROW_HEIGHT + MARGIN;
+        QImage image(QSize(qRound(WIDTH * DPR), qRound(logicalHeight * DPR)), QImage::Format_ARGB32_Premultiplied);
+        image.fill(palette.window);
+        QPainter painter(&image);
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+        painter.scale(DPR, DPR);
+
+        qreal y = MARGIN;
+        painter.setPen(palette.text);
+        painter.setFont(QFont(QStringLiteral("Sans"), 10, QFont::DemiBold));
+        painter.drawText(QPointF(MARGIN, y), (dark ? QStringLiteral("Dark scheme") : QStringLiteral("Light scheme")) +
+                                                 QStringLiteral(" — emphasis ladder"));
+        y += 28;
+
+        for (const Sample &sample : samples) {
+            if (sample.glyph != nullptr) {
+                const QByteArray svg = readIconSvg(sample.glyph);
+                ASSERT_FALSE(svg.isEmpty()) << sample.glyph;
+                const QColor ink = sample.tint.resolve(QIcon::Normal);
+                QSvgRenderer renderer(resolveSvgColorSentinel(svg, ink.name(QColor::HexRgb).toLatin1()));
+                QPixmap glyph(QSize(ICON_SIZE, ICON_SIZE));
+                glyph.fill(Qt::transparent);
+                QPainter glyphPainter(&glyph);
+                glyphPainter.setRenderHint(QPainter::Antialiasing, true);
+                renderer.render(&glyphPainter);
+                glyphPainter.end();
+                painter.drawPixmap(QPointF(MARGIN, y - ICON_SIZE + 4), glyph);
+            }
+
+            painter.setPen(palette.text);
+            painter.setFont(QFont(QStringLiteral("Sans"), 10));
+            painter.drawText(QPointF(MARGIN + ICON_SIZE + 16, y), QString::fromLatin1(sample.label));
+            y += ROW_HEIGHT;
+        }
+
+        // The primary action on an accent-filled button: the container carries
+        // the emphasis, and the glyph has to switch to the on-accent ink.
+        const QRectF button(MARGIN, y - 28, 220, 34);
+        painter.setBrush(palette.accent);
+        painter.setPen(Qt::NoPen);
+        painter.drawRoundedRect(button, 6, 6);
+        painter.setPen(palette.text);
+        painter.setFont(QFont(QStringLiteral("Sans"), 10));
+        painter.drawText(QPointF(MARGIN + 12, y - 6), QStringLiteral("primary button: accent fill + on-accent glyph"));
+        painter.end();
+
+        const QString path = QDir(outDir).absoluteFilePath(dark ? QStringLiteral("emphasis-preview-dark.png")
+                                                                : QStringLiteral("emphasis-preview-light.png"));
+        ASSERT_TRUE(image.save(path)) << path.toStdString();
+    }
+}
