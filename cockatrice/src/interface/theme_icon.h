@@ -68,6 +68,12 @@ public:
      * color keeps the WindowText -> HighlightedText swap. Application colors go
      * through the saturation floor shared by the filled treatments, so a line
      * glyph, a badge disc and a sticker fill carry the same tone.
+     *
+     * Neutral label roles (WindowText, Text) resolve to icon ink rather than the
+     * raw palette color: ThemeIconInk::glyphInk borrows a little accent chroma
+     * and holds the glyph to a contrast floor, because a 2px glyph in body-text
+     * ink reads thinner than the text beside it. Semantic roles keep the hue the
+     * call site asked for.
      */
     QColor resolve(QIcon::Mode mode) const;
 
