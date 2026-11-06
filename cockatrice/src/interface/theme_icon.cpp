@@ -1,6 +1,7 @@
 #include "theme_icon.h"
 
 #include "libcockatrice/utility/svg_recolor.h"
+#include "theme_icon_badge.h"
 #include "theme_manager.h"
 
 #include <QApplication>
@@ -23,30 +24,7 @@
 #include <QStyle>
 #include <QSvgRenderer>
 #include <QtGlobal>
-#include <cmath>
 #include <utility>
-
-namespace
-{
-/**
- * @brief WCAG relative luminance, used to test a tint against a background.
- */
-double relativeLuminance(const QColor &color)
-{
-    const auto linear = [](double channel) {
-        channel /= 255.0;
-        return channel <= 0.03928 ? channel / 12.92 : std::pow((channel + 0.055) / 1.055, 2.4);
-    };
-    return 0.2126 * linear(color.red()) + 0.7152 * linear(color.green()) + 0.0722 * linear(color.blue());
-}
-
-double contrastRatio(const QColor &first, const QColor &second)
-{
-    const double a = relativeLuminance(first);
-    const double b = relativeLuminance(second);
-    return (qMax(a, b) + 0.05) / (qMin(a, b) + 0.05);
-}
-} // namespace
 
 IconTint::IconTint(QPalette::ColorRole role) : paletteRole(role)
 {
@@ -72,7 +50,7 @@ QColor IconTint::resolve(QIcon::Mode mode) const
         // vanish into the selection.
         constexpr double MIN_SELECTED_CONTRAST = 3.0;
         const QColor highlight = qApp->palette().color(QPalette::Active, QPalette::Highlight);
-        return contrastRatio(color, highlight) >= MIN_SELECTED_CONTRAST
+        return ThemeIconBadge::contrastRatio(color, highlight) >= MIN_SELECTED_CONTRAST
                    ? color
                    : qApp->palette().color(QPalette::Active, QPalette::HighlightedText);
     }
@@ -85,14 +63,6 @@ QColor IconTint::resolve(QIcon::Mode mode) const
 
 namespace
 {
-/**
- * @brief Color that replaces `currentColor`, following the icon mode.
- */
-QByteArray sentinelColor(QIcon::Mode mode, const IconTint &tint)
-{
-    return tint.resolve(mode).name(QColor::HexRgb).toLatin1();
-}
-
 /**
  * @brief Reads an SVG through the `theme:` search path.
  */
@@ -154,14 +124,19 @@ QString cacheKey(const QString &path, const QByteArray &variant, const QSize &si
  * and the intrinsic size are cached until the theme changes: a repaint then
  * does no file I/O at all. The render cache is keyed by resolved path and pixel
  * size plus a variant: the palette color for sentinel SVGs, the icon mode for
- * assets that carry their own colors. A palette change therefore produces new
- * keys instead of reusing art built under the previous palette, and the
- * non-sentinel path (raster overrides, plain SVGs) is cached like any other.
+ * assets that carry their own colors, and the tone plus glyph color for a badge.
+ * A palette change therefore produces new keys instead of reusing art built
+ * under the previous palette, and the non-sentinel path (raster overrides, plain
+ * SVGs) is cached like any other.
+ *
+ * The engine only resolves and caches. The badge shape itself is painted by
+ * ThemeIconBadge so the compositing stays out of the resolution path.
  */
 class ThemeSvgIconEngine final : public QObject, public QIconEngine
 {
 public:
-    ThemeSvgIconEngine(QString _prefix, IconTint _tint) : prefix(std::move(_prefix)), tint(_tint)
+    ThemeSvgIconEngine(QString _prefix, IconTint _tint, IconStyle _style)
+        : prefix(std::move(_prefix)), tint(_tint), style(_style)
     {
         if (themeManager) {
             // A theme switch changes the resolved asset (scheme-qualified
@@ -175,7 +150,7 @@ public:
 
     QIconEngine *clone() const override
     {
-        return new ThemeSvgIconEngine(prefix, tint);
+        return new ThemeSvgIconEngine(prefix, tint, style);
     }
 
     void paint(QPainter *painter, const QRect &rect, QIcon::Mode mode, QIcon::State) override
@@ -289,11 +264,27 @@ private:
     {
         ensureResolved();
 
-        // Same cache for both paths: sentinel art varies by palette color, art
+        // Badge is a shape treatment, so it only applies to sentinel art: an
+        // authored asset keeps its own drawing and follows the line/asset path.
+        // Disabled also drops back to the line glyph: a filled disc at full mass
+        // does not read as unavailable next to the thin line glyphs around it,
+        // and the tint already removes the semantic tone.
+        const bool badge = style == IconStyle::Badge && resolvedHasSentinel && mode != QIcon::Disabled;
+        // Same cache for all paths: sentinel art varies by palette color, art
         // with its own colors varies by mode (Disabled is generated). A color
-        // variant is never a bare digit, so the two key spaces cannot collide.
-        const QByteArray variant =
-            resolvedHasSentinel ? sentinelColor(mode, tint) : QByteArray::number(static_cast<int>(mode));
+        // variant is never a bare digit, so the key spaces cannot collide. A
+        // badge also varies by glyph color, because the same tone can switch
+        // between a white and a near-black glyph at different lightnesses.
+        const QColor tone = resolvedHasSentinel ? tint.resolve(mode) : QColor();
+        QByteArray variant;
+        if (badge) {
+            variant = QByteArrayLiteral("B|") + tone.name(QColor::HexRgb).toLatin1() + '|' +
+                      ThemeIconBadge::glyphColor(tone).name(QColor::HexRgb).toLatin1();
+        } else if (resolvedHasSentinel) {
+            variant = tone.name(QColor::HexRgb).toLatin1();
+        } else {
+            variant = QByteArray::number(static_cast<int>(mode));
+        }
         const QString key = cacheKey(resolvedPath, variant, pixelSize, devicePixelRatio);
         const auto cached = cache.constFind(key);
         if (cached != cache.constEnd()) {
@@ -301,7 +292,11 @@ private:
         }
 
         QPixmap pixmap;
-        if (resolvedHasSentinel) {
+        if (badge) {
+            // Geometry is computed from the device-pixel size, and the ratio is
+            // attached below like every other path.
+            pixmap = ThemeIconBadge::renderBadge(resolvedSvg, tone, pixelSize);
+        } else if (resolvedHasSentinel) {
             pixmap = renderSvg(resolveSvgColorSentinel(resolvedSvg, variant), pixelSize, devicePixelRatio);
         } else {
             // Authored art carries its own colors: use Qt's normal loader so
@@ -322,6 +317,7 @@ private:
 
     QString prefix;
     IconTint tint;
+    IconStyle style;
     mutable QHash<QString, QPixmap> cache;
     mutable QString resolvedPath;
     mutable QString resolvedThemePath;
@@ -334,12 +330,12 @@ private:
 };
 } // namespace
 
-QIcon loadThemedIcon(QStringView prefix, IconTint tint)
+QIcon loadThemedIcon(QStringView prefix, IconTint tint, IconStyle style)
 {
-    return QIcon(new ThemeSvgIconEngine(prefix.toString(), tint));
+    return QIcon(new ThemeSvgIconEngine(prefix.toString(), tint, style));
 }
 
-QPixmap loadSentinelSvgPixmap(const QString &resolvedPath, IconTint tint, const QSize &size)
+QPixmap loadSentinelSvgPixmap(const QString &resolvedPath, IconTint tint, const QSize &size, IconStyle style)
 {
     if (!resolvedPath.endsWith(QStringLiteral(".svg"), Qt::CaseInsensitive)) {
         return {};
@@ -350,6 +346,14 @@ QPixmap loadSentinelSvgPixmap(const QString &resolvedPath, IconTint tint, const 
         return {};
     }
 
-    const QByteArray color = tint.resolve(QIcon::Normal).name(QColor::HexRgb).toLatin1();
-    return renderSvg(resolveSvgColorSentinel(svg, color), size, 1.0);
+    const QColor tone = tint.resolve(QIcon::Normal);
+    if (style == IconStyle::Badge) {
+        QSize canvas = size;
+        if (canvas.isEmpty()) {
+            canvas = QSvgRenderer(svg).defaultSize();
+        }
+        return ThemeIconBadge::renderBadge(svg, tone, canvas);
+    }
+
+    return renderSvg(resolveSvgColorSentinel(svg, tone.name(QColor::HexRgb).toLatin1()), size, 1.0);
 }

@@ -6,6 +6,7 @@ cockatrice_add_test(
   ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/theme_config.cpp
   ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/pixel_map_generator.cpp
   ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/theme_icon.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/theme_icon_badge.cpp
   ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/cache_settings.cpp
   ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/card_counter_settings.cpp
   ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/shortcuts_settings.cpp
