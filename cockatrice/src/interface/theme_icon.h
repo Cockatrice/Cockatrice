@@ -47,18 +47,46 @@ enum class IconStyle
 };
 
 /**
+ * @brief Selects how much attention a glyph claims inside its surface.
+ *
+ * Tint says which hue, style says how much shape, emphasis says how loud. The
+ * three are independent: a primary action can be a line glyph in the theme
+ * accent, and a quiet one can be a sticker in a dimmed tone.
+ *
+ * Secondary is the default and the color every icon had before the axis
+ * existed, so existing call sites keep their look. Primary is for the one
+ * action a surface exists for: a neutral primary glyph takes the accent, and a
+ * tinted one is pushed to full contrast. Quiet is for glyphs that label rather
+ * than act, such as the magnifier inside a search field: legible, but never
+ * competing with the buttons next to it.
+ */
+enum class IconEmphasis
+{
+    Quiet,     // labels rather than acts
+    Secondary, // the default action weight
+    Primary,   // the action the surface exists for
+};
+
+/**
  * @brief Selects the color that replaces the `currentColor` sentinel.
  *
  * A palette role follows Qt's structural palette. An application color carries
  * meaning that QPalette cannot express, such as positive and negative states.
- * Callers choose the role. The active theme supplies the value.
+ * Callers pick the role by intent; the theme owns the concrete value. Emphasis
+ * is part of the same decision: both answer how the glyph is inked.
  */
 class IconTint
 {
 public:
     IconTint() = default;
-    IconTint(QPalette::ColorRole role); // implicit: existing palette-role callers
-    IconTint(AppColor::Role role);      // implicit: semantic callers
+    IconTint(QPalette::ColorRole role, IconEmphasis emphasis = IconEmphasis::Secondary); // implicit for role callers
+    IconTint(AppColor::Role role, IconEmphasis emphasis = IconEmphasis::Secondary); // implicit for semantic callers
+
+    /** @brief A neutral glyph in the accent tone, for the surface's primary action. */
+    static IconTint primary();
+
+    /** @brief A dimmed neutral glyph, for a control that labels rather than acts. */
+    static IconTint quiet();
 
     /**
      * @brief Resolves the concrete color for an icon mode.
@@ -74,8 +102,17 @@ public:
      * and holds the glyph to a contrast floor, because a 2px glyph in body-text
      * ink reads thinner than the text beside it. Semantic roles keep the hue the
      * call site asked for.
+     *
+     * Emphasis is applied after the hue: Primary lifts a neutral glyph to the
+     * accent and pushes a tinted one to full contrast; Quiet blends either
+     * toward the surface down to the non-text legibility floor.
      */
     QColor resolve(QIcon::Mode mode) const;
+
+    IconEmphasis getEmphasis() const
+    {
+        return emphasis;
+    }
 
 private:
     enum class Source
@@ -87,6 +124,7 @@ private:
     Source source = Source::Palette;
     QPalette::ColorRole paletteRole = QPalette::WindowText;
     AppColor::Role appRole = AppColor::AccentStrong;
+    IconEmphasis emphasis = IconEmphasis::Secondary;
 };
 
 /**
