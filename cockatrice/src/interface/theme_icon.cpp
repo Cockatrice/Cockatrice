@@ -3,6 +3,7 @@
 #include "libcockatrice/utility/svg_recolor.h"
 #include "theme_icon_badge.h"
 #include "theme_icon_fill.h"
+#include "theme_icon_ink.h"
 #include "theme_icon_sticker.h"
 #include "theme_manager.h"
 
@@ -56,15 +57,24 @@ QColor IconTint::resolve(QIcon::Mode mode) const
         // vanish into the selection.
         constexpr double MIN_SELECTED_CONTRAST = 3.0;
         const QColor highlight = qApp->palette().color(QPalette::Active, QPalette::Highlight);
-        return ThemeIconBadge::contrastRatio(color, highlight) >= MIN_SELECTED_CONTRAST
+        return ThemeIconInk::contrastRatio(color, highlight) >= MIN_SELECTED_CONTRAST
                    ? color
                    : qApp->palette().color(QPalette::Active, QPalette::HighlightedText);
     }
 
+    const QPalette &palette = qApp->palette();
     const QPalette::ColorGroup group = mode == QIcon::Disabled ? QPalette::Disabled : QPalette::Active;
     const QPalette::ColorRole effective =
         mode == QIcon::Selected && paletteRole == QPalette::WindowText ? QPalette::HighlightedText : paletteRole;
-    return qApp->palette().color(group, effective);
+    const QColor color = palette.color(group, effective);
+    // A neutral label role is inked as an icon, not as body text: it borrows a
+    // little accent chroma and is held to a contrast floor. Semantic roles and
+    // the selected-row swap keep the color the palette gave them.
+    if (group == QPalette::Active && (effective == QPalette::WindowText || effective == QPalette::Text)) {
+        return ThemeIconInk::glyphInk(color, palette.color(QPalette::Active, QPalette::Window),
+                                      palette.color(QPalette::Active, QPalette::Highlight));
+    }
+    return color;
 }
 
 namespace

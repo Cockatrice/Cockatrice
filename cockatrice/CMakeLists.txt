@@ -154,6 +154,7 @@ set(cockatrice_SOURCES
     src/interface/theme_icon.cpp
     src/interface/theme_icon_badge.cpp
     src/interface/theme_icon_fill.cpp
+    src/interface/theme_icon_ink.cpp
     src/interface/theme_icon_sticker.cpp
     src/interface/theme_manager.cpp
     src/interface/palette_editor/color_button.cpp

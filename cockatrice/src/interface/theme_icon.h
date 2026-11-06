@@ -70,6 +70,12 @@ public:
      * Application colors pass through the filled treatments' saturation floor,
      * so a line glyph, a badge disc and a sticker fill carry the same tone
      * instead of a pale line beside a saturated shape.
+     *
+     * The neutral label roles (WindowText, Text) resolve to icon ink rather than
+     * to the raw palette color: theme_icon_ink gives the glyph a share of the
+     * accent chroma and holds it to a contrast floor, because a 2px glyph
+     * painted in body-text ink reads thinner than the text beside it. Semantic
+     * roles keep the hue the call site asked for.
      */
     QColor resolve(QIcon::Mode mode) const;
 
