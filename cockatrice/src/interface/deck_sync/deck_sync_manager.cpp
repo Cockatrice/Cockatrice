@@ -8,6 +8,7 @@
 #include <QDirIterator>
 #include <QFile>
 #include <QFileInfo>
+#include <QLoggingCategory>
 #include <QSaveFile>
 #include <QStringList>
 #include <QUuid>
@@ -26,6 +27,8 @@
 #include <libcockatrice/protocol/pb/serverinfo_deckstorage.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/string_limits.h>
+
+inline Q_LOGGING_CATEGORY(DeckSyncLog, "deck_sync");
 
 namespace
 {
@@ -525,11 +528,11 @@ void DeckSyncManager::onUploadFinished(const Response &response,
         if (response.response_code() == Response::RespNameNotFound && deckId != -1) {
             // The server row is gone (purged tombstone or removed elsewhere):
             // upload the deck as new instead of updating a dead id.
-            UploadOp retry;
-            retry.relativePath = relativePath;
-            retry.serverPath = context.value("serverPath").toString();
-            retry.deckId = -1;
-            retry.guid = context.value("guid").toString();
+            const UploadOp retry{.relativePath = relativePath,
+                                 .serverPath = context.value("serverPath").toString(),
+                                 .serverDir = {},
+                                 .deckId = -1,
+                                 .guid = context.value("guid").toString()};
             pendingUploads.prepend(retry);
             processNext();
             return;
@@ -740,7 +743,7 @@ void DeckSyncManager::snapshotLocalFile(const QString &relativePath, const QStri
     }
     snapshot.write(source.readAll());
     if (!snapshot.commit()) {
-        qWarning() << "DeckSync: could not write the base snapshot for" << relativePath;
+        qCWarning(DeckSyncLog) << "DeckSync: could not write the base snapshot for" << relativePath;
     }
 }
 
