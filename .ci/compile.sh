@@ -203,6 +203,11 @@ if [[ ${WITH_CRASH_REPORTING:-} == "ON" ]]; then
   # developer builds never reach Sentry.
   flags+=("-DWITH_CRASH_REPORTING=ON")
 fi
+if [[ ${COCKATRICE_DEBUG_INFO_LEVEL:-} ]]; then
+  # CI lowers the DWARF level so one build configuration fits its compiler-cache bound;
+  # see the option in CMakeLists.txt. Empty keeps the built-in flags.
+  flags+=("-DCOCKATRICE_DEBUG_INFO_LEVEL=$COCKATRICE_DEBUG_INFO_LEVEL")
+fi
 if [[ ${BUILDTYPE:-Release} == "Release" && -n ${COCKATRICE_SENTRY_DSN:-} ]]; then
   # Release-only: Debug builds stay DSN-free so crashes from developer builds
   # never reach Sentry. Empty (local builds, forks without the secret, and non-tag

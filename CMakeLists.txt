@@ -238,6 +238,27 @@ include(Sanitizers)
 include(Coverage)
 include(CrashReporting)
 
+# Debug information is what makes a cached object large, and a build configuration needs more
+# room than a per-leg cache bound can spare when it carries full DWARF: ccache then fills to
+# its limit and evicts the entries the next build is about to ask for, so it serves a few
+# percent of calls while holding most of a build. CI sets a lower level so one whole
+# configuration fits; level 1 keeps file and line, which is what a failing test or a sanitizer
+# backtrace reports. Empty (the default) leaves local, distro and release builds exactly as
+# they were. This comes after CrashReporting, so the -g it adds for Sentry symbols cannot
+# raise the level again.
+set(COCKATRICE_DEBUG_INFO_LEVEL
+    ""
+    CACHE STRING "DWARF level for Debug and Release objects (empty keeps the built-in flags)"
+)
+if(NOT COCKATRICE_DEBUG_INFO_LEVEL STREQUAL "")
+  if(MSVC)
+    message(WARNING "COCKATRICE_DEBUG_INFO_LEVEL is ignored on MSVC")
+  else()
+    string(APPEND CMAKE_CXX_FLAGS_DEBUG " -g${COCKATRICE_DEBUG_INFO_LEVEL}")
+    string(APPEND CMAKE_CXX_FLAGS_RELEASE " -g${COCKATRICE_DEBUG_INFO_LEVEL}")
+  endif()
+endif()
+
 # GNU systems need to define the Mersenne exponent for the RNG to compile w/o warning
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   add_definitions("-DSFMT_MEXP=19937")

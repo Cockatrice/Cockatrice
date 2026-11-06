@@ -150,6 +150,7 @@ jobs:
             allow-failure: yes
             package: skip    # We are packaged in Arch already
             debug_test: yes    # see the note on Fedora 45 below
+            ccache_size: 850M    # Debug plus the suite: 660 MB of objects at -g1
 
           - distro: Servatrice_Debian
             version: 12
@@ -157,30 +158,46 @@ jobs:
             package: DEB
             server_only: yes
             test: skip
-            ccache_size: 400M    # server only, no client to compile
+            # 4.7 min and the server alone: nothing here for a compiler cache to save.
+            persist_ccache: 'false'
 
           - distro: Debian
             version: 13
 
             package: DEB
-            ccache_size: 850M    # the Release build plus the suite it runs
+            ccache_size: 800M    # Release plus the suite: 614 MB of objects at -g1
+
+          # The single Fedora leg used to build Debug for the suite and Release for the
+          # package in one job (measured on Fedora 44: 30.8 min, the only leg slower than
+          # Windows), so the package compile waited behind the Debug one. Two legs run in
+          # parallel and each keeps a cache that holds exactly one configuration.
+          #
+          # Arch and Fedora 45 are the two newest toolchains, and the -Wno-error= exceptions
+          # in CMakeLists.txt exist for exactly their warnings. This leg compiles Debug
+          # because only Debug passes -Werror, so it is where a new warning still fails.
+          - distro: Fedora
+            version: 45
+            variant: debug    # separate image and ccache from the release leg below
+
+            package: skip
+            debug_test: yes
+            ccache_size: 850M    # Debug plus the suite: 660 MB of objects at -g1
 
           - distro: Fedora
             version: 45
+            variant: release    # separate image and ccache from the debug leg above
 
             package: RPM
-            # Arch and Fedora 45 are the two newest toolchains, and the -Wno-error= exceptions
-            # in CMakeLists.txt exist for exactly their warnings. They keep compiling Debug:
-            # only the Debug configuration passes -Werror, so these two are the legs where a
-            # new warning in either compiler still fails the build.
-            debug_test: yes
-            ccache_size: 900M    # Debug for the suite and Release for the package
+            test: skip    # The debug leg above runs this distro's suite
+            ccache_size: 800M    # Release plus the package: 614 MB of objects at -g1
 
           - distro: Ubuntu
             version: 26.04
 
             package: DEB
             test: skip    # The sanitizer leg below runs this distro's suite
+            # 18.1 min, and the same distro as the sanitize leg below, which runs this suite.
+            persist_ccache: 'false'
 
           # The one leg that runs the suite under AddressSanitizer and
           # UndefinedBehaviorSanitizer. Debian 13 and Fedora 45 keep covering the
@@ -196,7 +213,7 @@ jobs:
 
             package: skip
             sanitize: yes
-            ccache_size: 800M    # instrumented objects are larger
+            ccache_size: 1200M    # instrumented objects are larger than the 614 MB measured; estimated
 
     name: ${{ matrix.distro }} ${{ matrix.version }}${{ matrix.variant && format(' {0}', matrix.variant) || '' }}
     needs: configure
@@ -211,25 +228,47 @@ jobs:
       CCACHE_EVICTION_AGE: 7d
       # The bound is sized against the repository's 10 GB cache quota
       # (https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy),
-      # not against what one leg would like. The quota currently holds about 1.1 GB of
-      # CodeQL trap, 1.1 GB of vcpkg, 0.7 GB of Qt and 2.1 GB of docker buildkit layers
-      # (mode=min in docker-release.yml, added here, brings the last one down to roughly
-      # 0.3 GB - the one input here that is an expectation rather than a measurement, since
-      # mode=min still writes one layer per pushed binary) plus the compiler caches of the nine legs a pull request runs. The five
-      # nightly-only legs keep no compiler cache (see PERSIST_CCACHE below), which is what
-      # makes these per-leg bounds affordable. Accounting for all of it: 6.45G of ccache
-      # bounds + 3.2G of the fixed entries = 9.65G against the 10G quota.
+      # not against what one leg would like: the quota also holds about 0.9 GB of buildkit
+      # layers (mode=min in docker-release.yml), 0.8 GB of vcpkg, 0.7 GB of Qt and the CodeQL
+      # trap caches (about 1 GB each, which prune-caches below does not manage).
       #
-      # A configuration needs roughly 500-850 MB on Linux, so the old uniform 600M bound sat
-      # below what a leg writes: ccache spent each build deleting the entries the next run
-      # asked for (measured: 2624-3720 cleanup passes per build, 8% of calls served). Each
-      # leg states the size it needs instead: one configuration for most, two for Fedora 45
-      # (Debug for the suite, Release for the package), the server alone for Servatrice.
-      # Raising these further means caching fewer legs, since GitHub evicts a whole entry
-      # when the total is exceeded.
+      # Measured 2026-11-04: one configuration costs 1.2 GB with full DWARF and 660 MB with
+      # -g1 (COCKATRICE_DEBUG_INFO_LEVEL below), and the size of the cache decides the hit
+      # rate far more sharply than its fill suggests. A 6G cache served 1059 of 1059 calls;
+      # the 700M bound on the same leg served 14%, because ccache fills to the limit and then
+      # evicts the entries the next build is about to ask for. A cache that cannot hold a
+      # whole configuration therefore buys almost nothing, and the quota goes to fewer legs
+      # at a size that holds one:
+      #
+      #   Arch                 Debug + suite       660 MB working set   850M
+      #   Debian 13            Release + suite     614 MB               800M
+      #   Fedora 45 debug      Debug + suite       660 MB               850M
+      #   Fedora 45 release    Release + package   614 MB               800M
+      #   Ubuntu 26.04 sanitize                     ~1.0 GB             1200M
+      #
+      # That is about 5.3 GB of bounds, and with the fixed entries above it puts the quota at
+      # roughly 9.8 GB of 10 - so only legs worth their share get one. A leg keeps no cache
+      # when it duplicates another leg's coverage (Ubuntu 26.04 behind the sanitize leg of
+      # the same distro; macOS 15 and macOS 27 Debug behind macOS 14; Servatrice covers the
+      # server alone and finishes in 4.7 min). Those four run cold: 4.7, 18.1, 16.5 and
+      # 15.8 min. The five that stay compile the client on the toolchains a change can break
+      # and are the ones a cache shortens by the most. Measured job totals on master
+      # 2026-11-04 also show the ceiling this leaves: Windows 10 is 29.5 min and compiles for
+      # 23.7 of it with no compiler cache at all, so Windows still sets the pull-request
+      # wall clock no matter how warm these legs are (see build-vcpkg).
+      #
+      # Re-add a leg only with a bound that holds its whole configuration: a smaller one is
+      # worse than none.
       #
       # Every key listed in LIVE_CCACHE_KEYS in prune-caches below must match this matrix.
       CCACHE_SIZE: ${{ matrix.ccache_size || '700M' }}
+      # Debug information dominates a cached object: with the built-in flags one
+      # configuration is 1.2 GB and no per-leg bound can hold it, so CI lowers the level to
+      # 1 (file and line, which is what a failing test or a sanitizer backtrace reports) and
+      # one configuration halves. Empty on tags and on the nightly legs, which ship binaries
+      # and keep full DWARF for the Sentry symbols; a tag restores a cache it cannot use and
+      # is slower, which is accepted because a tag is rare and only pull requests gate.
+      COCKATRICE_DEBUG_INFO_LEVEL: ${{ github.ref_type != 'tag' && '1' || '' }}
       CMAKE_GENERATOR: 'Ninja'
       NAME: ${{ matrix.distro }}${{ matrix.version }}
       IMAGE_SUFFIX: ${{ matrix.variant }}
@@ -242,11 +281,13 @@ jobs:
       #               also package, so testing and packaging cost one compile instead of two.
       DEBUG_TEST: ${{ matrix.sanitize == 'yes' || matrix.coverage == 'yes' || matrix.debug_test == 'yes' }}
       RUN_TESTS: ${{ matrix.test != 'skip' && !(matrix.sanitize == 'yes' || matrix.coverage == 'yes' || matrix.debug_test == 'yes') }}
-      # Whether this leg restores and saves its compiler cache. Every leg a pull request
-      # runs keeps one; the nightly-only legs do not, so that the quota is spent on the
-      # builds that review a change. A tag build runs both sets, and the nightly legs are
-      # cold there - accepted, because a tag is rare and only the pull-request legs gate.
-      PERSIST_CCACHE: 'true'
+      # Whether this leg restores and saves its compiler cache. Not every pull-request leg
+      # keeps one: a cache only pays for itself when its bound holds a whole configuration
+      # (see the sizing comment above), and a leg that duplicates another leg's coverage
+      # spends quota without adding any. The nightly-only legs keep none either. Fedora 45
+      # states it per leg: its two configurations have their own job and key, so neither
+      # bound is shared with a build whose objects it would evict.
+      PERSIST_CCACHE: ${{ matrix.persist_ccache || 'true' }}
 
     # Shared with build-linux-nightly so the two leg sets run the same steps.
     steps: &linux-steps
@@ -540,6 +581,7 @@ jobs:
             make_package: 1
             override_target: 14
             package_suffix: "-macOS14"
+            ccache_size: 800M    # one Release configuration plus the suite at -g1
             qt_version: 6.11.*
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Apple
@@ -558,6 +600,7 @@ jobs:
             make_package: 1
             override_target: 15
             package_suffix: "-macOS15"
+            persist_ccache: 'false'    # 16.5 min: shorter than the Windows leg
             qt_version: 6.11.*
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Apple
@@ -572,6 +615,7 @@ jobs:
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
+            persist_ccache: 'false'    # 15.8 min: shorter than the Windows leg
             qt_version: 6.11.*
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Apple
@@ -609,13 +653,17 @@ jobs:
     timeout-minutes: 100
     env:
       CCACHE_DIR: ${{ github.workspace }}/.cache/
-      # macOS configurations compile about twice the TUs of a Linux one, so each of these
-      # three legs gets a bound above what it has been measured to write. The four macOS
-      # legs used to be bounded at 600M from the same quota as the Linux ones; the three
-      # pull-request legs now get 700M each while the nightly Intel leg keeps none, and
-      # that is what fits (see CCACHE_SIZE in build-linux for the full arithmetic).
-      CCACHE_SIZE: 700M
-      PERSIST_CCACHE: 'true'
+      # One macOS configuration is about 600 MB of objects at -g1, so its bound needs to be
+      # 800M to hold one whole; a smaller cache serves a few percent and is worthless (see
+      # the sizing comment in build-linux). macOS 14 keeps the one macOS cache: it runs the
+      # suite against the shipping Release build and is the longest of the three at 24.2 min.
+      # macOS 15 (16.5) and macOS 27 Debug (15.8) duplicate its coverage and are shorter, so
+      # they run cold.
+      CCACHE_SIZE: ${{ matrix.ccache_size || '700M' }}
+      PERSIST_CCACHE: ${{ matrix.persist_ccache || 'true' }}
+      # MSVC has no -g level, so the Windows leg does not ask for one; it has no compiler
+      # cache to shrink anyway (see the sizing comment in build-linux).
+      COCKATRICE_DEBUG_INFO_LEVEL: ${{ matrix.os != 'Windows' && github.ref_type != 'tag' && '1' || '' }}
 
     # Shared with build-vcpkg-nightly so the two leg sets run the same steps.
     steps: &vcpkg-steps
@@ -1165,9 +1213,10 @@ jobs:
           LIVE_VCPKG_SCOPES: 'vcpkg/macos13-x64-xcode26.3/ vcpkg/macos14-arm64-xcode26.6/ vcpkg/windows10-x64-vs2026/'
           # Must list the ccache key of every leg that keeps a compiler cache
           # (PERSIST_CCACHE in build-linux and build-vcpkg), or a live entry is deleted.
-          # The nightly legs keep none, so their leftover entries are reclaimed here
-          # instead of waiting out the age rule.
-          LIVE_CCACHE_KEYS: 'ccache-Arch ccache-Servatrice_Debian12 ccache-Debian13 ccache-Fedora45 ccache-Ubuntu26.04 ccache-Ubuntu26.04sanitize ccache-macOS14-xcode-27 ccache-macOS15-xcode-27 ccache-macOS-xcode-27'
+          # The nightly legs and the pull-request legs that finish under the Windows leg
+          # keep none, so their leftover entries are reclaimed here instead of waiting out
+          # the age rule.
+          LIVE_CCACHE_KEYS: 'ccache-Arch ccache-Debian13 ccache-Fedora45debug ccache-Fedora45release ccache-Ubuntu26.04sanitize ccache-macOS14-xcode-27'
         run: |
           gh api --paginate "repos/$GITHUB_REPOSITORY/actions/caches?per_page=100" \
             --jq '.actions_caches[] | [.id, .ref, .key, .last_accessed_at] | @tsv' >"$RUNNER_TEMP/caches.tsv"
@@ -1191,8 +1240,9 @@ jobs:
             if [[ $ref != refs/heads/master ]]; then
               reason="scoped to $ref"
             elif [[ $key == ccache-* ]]; then
-              # An exact token compare: ccache-Ubuntu26.04 is a prefix of
-              # ccache-Ubuntu26.04sanitize, and both keys are live
+              # An exact token compare, because one key can be a prefix of another:
+              # ccache-Ubuntu26.04 is a prefix of ccache-Ubuntu26.04sanitize, and only
+              # the sanitize entry is live.
               if [[ $live_ccache != *" $key "* ]]; then
                 reason="no pull-request leg keeps it"
               fi
