@@ -1,6 +1,7 @@
 #include "theme_icon_badge.h"
 
 #include "libcockatrice/utility/svg_recolor.h"
+#include "theme_icon_fill.h"
 
 #include <QLinearGradient>
 #include <QPainter>
@@ -26,51 +27,8 @@ constexpr double GLYPH_DIAMETER_RATIO = 0.9;
 // band near a tenth of the disc diameter, so the badge decides the glyph weight
 // instead of inheriting the authored one.
 constexpr qreal GLYPH_STROKE_WIDTH = 3.0;
-constexpr int GRADIENT_TOP_LIGHTER = 112;
-constexpr int GRADIENT_BOTTOM_DARKER = 104;
 constexpr int RING_DARKER = 300;
 constexpr int GLYPH_DARKER = 400;
-
-/**
- * @brief Gives the engraved glyph the weight the badge needs.
- *
- * Inheritance cannot do this: the authored `stroke-width` is tuned for a 24px
- * line next to text, not for a mark sitting inside a 13px disc. Overriding every
- * stroke in the glyph keeps the check, cross and arrow readable at the sizes the
- * UI uses.
- *
- * Stays in bytes like resolveSvgColorSentinel(): the SVG is never decoded, so a
- * theme asset that is not valid UTF-8 survives the rewrite.
- */
-QByteArray withBadgeStrokeWeight(const QByteArray &svg)
-{
-    constexpr QByteArrayView ATTRIBUTE = "stroke-width";
-    constexpr QByteArrayView EQUALS = "=";
-    constexpr QByteArrayView QUOTE = "\"";
-    const QByteArray value = QByteArray::number(GLYPH_STROKE_WIDTH, 'f', 1);
-    QByteArray resolved;
-    resolved.reserve(svg.size());
-
-    qsizetype cursor = 0;
-    while (true) {
-        const qsizetype start = svg.indexOf(ATTRIBUTE, cursor);
-        if (start < 0) {
-            resolved.append(svg.sliced(cursor));
-            return resolved;
-        }
-        const qsizetype equals = svg.indexOf(EQUALS, start + ATTRIBUTE.size());
-        const qsizetype quote = equals < 0 ? -1 : svg.indexOf(QUOTE, equals);
-        const qsizetype close = quote < 0 ? -1 : svg.indexOf(QUOTE, quote + 1);
-        if (close < 0) {
-            // Not an attribute we understand: leave the rest untouched.
-            resolved.append(svg.sliced(cursor));
-            return resolved;
-        }
-        resolved.append(svg.sliced(cursor, quote + 1 - cursor));
-        resolved.append(value);
-        cursor = close;
-    }
-}
 } // namespace
 
 namespace ThemeIconBadge
@@ -134,8 +92,8 @@ QPixmap renderBadge(const QByteArray &svg, const QColor &tone, const QSize &pixe
     painter.setRenderHint(QPainter::Antialiasing, true);
 
     QLinearGradient gradient(discRect.topLeft(), discRect.bottomLeft());
-    gradient.setColorAt(0.0, tone.lighter(GRADIENT_TOP_LIGHTER));
-    gradient.setColorAt(1.0, tone.darker(GRADIENT_BOTTOM_DARKER));
+    gradient.setColorAt(0.0, ThemeIconFill::topColor(tone));
+    gradient.setColorAt(1.0, ThemeIconFill::bottomColor(tone));
     painter.setPen(Qt::NoPen);
     painter.setBrush(gradient);
     painter.drawEllipse(discRect);
@@ -143,12 +101,12 @@ QPixmap renderBadge(const QByteArray &svg, const QColor &tone, const QSize &pixe
     // The ring closes the disc: its outer edge touches the canvas, its inner
     // edge is the disc boundary, so the two meet without a seam.
     painter.setBrush(Qt::NoBrush);
-    painter.setPen(QPen(tone.darker(RING_DARKER), ringWidth));
+    painter.setPen(QPen(ThemeIconFill::saturated(tone).darker(RING_DARKER), ringWidth));
     const qreal ringRadius = (side - ringWidth) / 2.0;
     painter.drawEllipse(discRect.center(), ringRadius, ringRadius);
 
-    const QByteArray glyphSvg =
-        withBadgeStrokeWeight(resolveSvgColorSentinel(svg, glyphColor(tone).name(QColor::HexRgb).toLatin1()));
+    const QByteArray glyphSvg = resolveSvgStrokeWidth(
+        resolveSvgColorSentinel(svg, glyphColor(tone).name(QColor::HexRgb).toLatin1()), GLYPH_STROKE_WIDTH);
     QSvgRenderer renderer(glyphSvg);
     if (renderer.isValid()) {
         const QSize size = glyphSize(pixelSize);

@@ -1,5 +1,7 @@
 #include "interface/theme_icon.h"
 #include "interface/theme_icon_badge.h"
+#include "interface/theme_icon_fill.h"
+#include "interface/theme_icon_sticker.h"
 #include "interface/theme_manager.h"
 #include "libcockatrice/utility/svg_recolor.h"
 
@@ -57,6 +59,23 @@ int countOpaquePixels(const QPixmap &pixmap, const QColor &expected)
             const QColor pixel = image.pixelColor(x, y);
             if (pixel.alpha() > 200 && pixel.red() == expected.red() && pixel.green() == expected.green() &&
                 pixel.blue() == expected.blue()) {
+                ++count;
+            }
+        }
+    }
+    return count;
+}
+
+/** @brief Opaque pixels that are not the given rim color, i.e. the gradient fill. */
+int countOpaquePixelsOtherThan(const QPixmap &pixmap, const QColor &excluded)
+{
+    const QImage image = pixmap.toImage();
+    int count = 0;
+    for (int y = 0; y < image.height(); ++y) {
+        for (int x = 0; x < image.width(); ++x) {
+            const QColor pixel = image.pixelColor(x, y);
+            if (pixel.alpha() > 200 && (pixel.red() != excluded.red() || pixel.green() != excluded.green() ||
+                                        pixel.blue() != excluded.blue())) {
                 ++count;
             }
         }
@@ -295,8 +314,8 @@ TEST_F(ThemeIconRenderTest, BadgeHasDiscGradientAndRing)
     EXPECT_EQ(image.pixelColor(0, 0).alpha(), 0);
     EXPECT_GT(image.pixelColor(32, 32).alpha(), 200);
 
-    // The ring is the tone darkened, and it must actually be painted.
-    EXPECT_GT(countOpaquePixels(pixmap, tone.darker(300)), 0);
+    // The ring is the saturated tone darkened, and it must actually be painted.
+    EXPECT_GT(countOpaquePixels(pixmap, ThemeIconFill::saturated(tone).darker(300)), 0);
 
     // The fill runs from a lighter top to a darker bottom. Sample left of the
     // check, which now reaches almost to the disc edge.
@@ -355,7 +374,7 @@ TEST_F(ThemeIconRenderTest, SentinelSvgBadgeMatchesTheEngine)
                                                  QSize(48, 48), IconStyle::Badge);
     ASSERT_FALSE(pixmap.isNull());
     EXPECT_EQ(pixmap.size(), QSize(48, 48));
-    EXPECT_GT(countOpaquePixels(pixmap, tone.darker(300)), 0);
+    EXPECT_GT(countOpaquePixels(pixmap, ThemeIconFill::saturated(tone).darker(300)), 0);
     EXPECT_GT(countOpaquePixels(pixmap, ThemeIconBadge::glyphColor(tone)), 0);
 }
 
@@ -378,7 +397,7 @@ TEST_F(ThemeIconRenderTest, BadgeOnAuthoredArtUsesTheAssetPath)
     // The authored color survives; no disc tone and no ring are painted.
     EXPECT_GT(countOpaquePixels(pixmap, QColor(QStringLiteral("#336699"))), 0);
     EXPECT_EQ(countOpaquePixels(pixmap, tone), 0);
-    EXPECT_EQ(countOpaquePixels(pixmap, tone.darker(300)), 0);
+    EXPECT_EQ(countOpaquePixels(pixmap, ThemeIconFill::saturated(tone).darker(300)), 0);
 }
 
 /** @brief Disabled keeps the shape language but drops back to the line glyph. */
@@ -396,9 +415,123 @@ TEST_F(ThemeIconRenderTest, DisabledBadgeFallsBackToLineGlyph)
 
     // A filled disc at full mass would not read as unavailable, so Disabled
     // drops the badge: no ring, no disc, just the disabled line glyph.
-    EXPECT_EQ(countOpaquePixels(pixmap, tone.darker(300)), 0);
+    EXPECT_EQ(countOpaquePixels(pixmap, ThemeIconFill::saturated(tone).darker(300)), 0);
     EXPECT_EQ(countOpaquePixels(pixmap, disabledText.darker(300)), 0);
     EXPECT_EQ(pixmap.toImage().pixelColor(0, 0).alpha(), 0);
+    EXPECT_GT(countOpaquePixels(pixmap, disabledText), 0);
+}
+
+/**
+ * @brief Sticker fills the glyph with the tone and rims it with a dark outline.
+ *
+ * The old add/remove art was a filled shape with a black outline and no disc, so
+ * the sticker must show a solid tone interior, a dark rim, and transparent
+ * corners.
+ */
+TEST_F(ThemeIconRenderTest, StickerPaintsToneFillWithDarkOutline)
+{
+    const QColor tone = themeManager->appColor(AppColor::Positive);
+    const QIcon icon = loadThemedIcon(QStringLiteral("icons/increment"), AppColor::Positive, IconStyle::Sticker);
+    const QPixmap pixmap = icon.pixmap(QSize(64, 64));
+    ASSERT_FALSE(pixmap.isNull());
+    EXPECT_EQ(pixmap.size(), QSize(64, 64));
+
+    const QImage image = pixmap.toImage();
+    // No disc: the corners stay transparent, unlike the badge.
+    EXPECT_EQ(image.pixelColor(0, 0).alpha(), 0);
+    EXPECT_EQ(image.pixelColor(63, 63).alpha(), 0);
+
+    // The glyph is filled: the vertical arm carries a gradient, lighter at the
+    // top and darker at the bottom, with the rim painted in the darkened tone.
+    const QColor top = image.pixelColor(32, 12);
+    const QColor bottom = image.pixelColor(32, 52);
+    ASSERT_GT(top.alpha(), 200);
+    ASSERT_GT(bottom.alpha(), 200);
+    EXPECT_GT(top.lightness(), bottom.lightness());
+    EXPECT_GT(countOpaquePixels(pixmap, ThemeIconSticker::outlineColor(tone)), 20);
+}
+
+/** @brief The sticker is rendered at the device-pixel size, not upscaled later. */
+TEST_F(ThemeIconRenderTest, StickerHonoursDevicePixelRatio)
+{
+    const QIcon icon = loadThemedIcon(QStringLiteral("icons/remove_row"), AppColor::Negative, IconStyle::Sticker);
+    const QPixmap hidpi = icon.pixmap(QSize(32, 32), 2.0);
+
+    ASSERT_FALSE(hidpi.isNull());
+    EXPECT_EQ(hidpi.size(), QSize(64, 64));
+    EXPECT_DOUBLE_EQ(hidpi.devicePixelRatio(), 2.0);
+    EXPECT_EQ(hidpi.deviceIndependentSize(), QSizeF(32, 32));
+}
+
+/**
+ * @brief A sticker has to survive the 16px toolbar slot.
+ *
+ * A 15/16px canvas leaves a three-pixel band. The tone interior must still be
+ * solid ink rather than an antialiased smudge, and the icon must not turn into a
+ * disc.
+ */
+TEST_F(ThemeIconRenderTest, StickerStaysLegibleAtToolbarSize)
+{
+    const QColor tone = themeManager->appColor(AppColor::Negative);
+    const QIcon icon = loadThemedIcon(QStringLiteral("icons/remove_row"), AppColor::Negative, IconStyle::Sticker);
+    const QPixmap pixmap = icon.pixmap(QSize(16, 16));
+    ASSERT_FALSE(pixmap.isNull());
+    EXPECT_EQ(pixmap.size(), QSize(16, 16));
+
+    const QImage image = pixmap.toImage();
+    EXPECT_EQ(image.pixelColor(0, 0).alpha(), 0);
+    EXPECT_GT(countOpaquePixelsOtherThan(pixmap, ThemeIconSticker::outlineColor(tone)), 8);
+}
+
+/** @brief The pixmap API's sticker path agrees with the engine's. */
+TEST_F(ThemeIconRenderTest, SentinelSvgStickerMatchesTheEngine)
+{
+    const QColor tone = themeManager->appColor(AppColor::Negative);
+    const QPixmap pixmap = loadSentinelSvgPixmap(QStringLiteral("icons/remove_row.svg"), AppColor::Negative,
+                                                 QSize(48, 48), IconStyle::Sticker);
+    ASSERT_FALSE(pixmap.isNull());
+    EXPECT_EQ(pixmap.size(), QSize(48, 48));
+    EXPECT_GT(countOpaquePixelsOtherThan(pixmap, ThemeIconSticker::outlineColor(tone)), 0);
+    EXPECT_GT(countOpaquePixels(pixmap, ThemeIconSticker::outlineColor(tone)), 0);
+}
+
+/** @brief Sticker never paints authored art: the asset keeps its own colors. */
+TEST_F(ThemeIconRenderTest, StickerOnAuthoredArtUsesTheAssetPath)
+{
+    QTemporaryDir themeDir;
+    ASSERT_TRUE(themeDir.isValid());
+    QFile file(QDir(themeDir.path()).absoluteFilePath(QStringLiteral("plain.svg")));
+    ASSERT_TRUE(file.open(QIODevice::WriteOnly));
+    file.write(svgWith("#336699"));
+    file.close();
+    QDir::addSearchPath(QStringLiteral("theme"), themeDir.path());
+
+    const QColor tone = themeManager->appColor(AppColor::Negative);
+    const QIcon icon = loadThemedIcon(QStringLiteral("plain"), AppColor::Negative, IconStyle::Sticker);
+    const QPixmap pixmap = icon.pixmap(QSize(32, 32));
+    ASSERT_FALSE(pixmap.isNull());
+
+    EXPECT_GT(countOpaquePixels(pixmap, QColor(QStringLiteral("#336699"))), 0);
+    EXPECT_EQ(countOpaquePixels(pixmap, tone), 0);
+    EXPECT_EQ(countOpaquePixels(pixmap, ThemeIconSticker::outlineColor(tone)), 0);
+}
+
+/** @brief Disabled keeps the shape language but drops back to the line glyph. */
+TEST_F(ThemeIconRenderTest, DisabledStickerFallsBackToLineGlyph)
+{
+    QPalette palette = qApp->palette();
+    const QColor disabledText(QStringLiteral("#fedcba"));
+    palette.setColor(QPalette::Disabled, QPalette::WindowText, disabledText);
+    qApp->setPalette(palette);
+
+    const QColor tone = themeManager->appColor(AppColor::Negative);
+    const QIcon icon = loadThemedIcon(QStringLiteral("icons/remove_row"), AppColor::Negative, IconStyle::Sticker);
+    const QPixmap pixmap = icon.pixmap(QSize(64, 64), QIcon::Disabled);
+    ASSERT_FALSE(pixmap.isNull());
+
+    // No rim in the sticker tone: Disabled drops the treatment and paints the
+    // thin disabled line glyph instead.
+    EXPECT_EQ(countOpaquePixels(pixmap, ThemeIconSticker::outlineColor(tone)), 0);
     EXPECT_GT(countOpaquePixels(pixmap, disabledText), 0);
 }
 
@@ -410,8 +543,141 @@ TEST_F(ThemeIconRenderTest, LineStyleStillRendersGlyphAlone)
         loadThemedIcon(QStringLiteral("icons/ready_start"), AppColor::Positive).pixmap(QSize(64, 64));
     ASSERT_FALSE(pixmap.isNull());
 
-    EXPECT_EQ(countOpaquePixels(pixmap, tone.darker(300)), 0);
+    EXPECT_EQ(countOpaquePixels(pixmap, ThemeIconFill::saturated(tone).darker(300)), 0);
     EXPECT_GT(countOpaquePixels(pixmap, tone), 0);
+}
+
+/**
+ * @brief Writes the sticker preview sheet when asked; skipped otherwise.
+ *
+ * The sheet shows each add/remove/delete glyph as line and as sticker at the
+ * sizes the UI uses (15px in the player list and menus, 16px in toolbars, 24 and
+ * 48 for inspection), with the ready/not-ready badge for context. It lives in the
+ * test binary so the colors come from the same place the engine uses.
+ */
+TEST(IconStickerPreview, WritesPngsWhenRequested)
+{
+    qputenv("QT_QPA_PLATFORM", "offscreen");
+    ensureGuiApplication();
+
+    const QString outDir = qEnvironmentVariable("COCKATRICE_ICON_PREVIEW_DIR");
+    if (outDir.isEmpty()) {
+        GTEST_SKIP() << "set COCKATRICE_ICON_PREVIEW_DIR to write the preview PNGs";
+    }
+    ASSERT_TRUE(QDir().mkpath(outDir));
+
+    struct Glyph
+    {
+        const char *name;
+        AppColor::Role role;
+    };
+    constexpr Glyph stickered[] = {
+        {"increment", AppColor::Positive},
+        {"decrement", AppColor::Negative},
+        {"remove_row", AppColor::Negative},
+    };
+    constexpr int SIZES[] = {15, 16, 24, 48};
+    constexpr int CONTEXT_SIZE = 32;
+
+    const auto readSvg = [](const char *name) {
+        QFile file(
+            QDir(resourcesDir())
+                .absoluteFilePath(QStringLiteral("icons/") + QString::fromLatin1(name) + QStringLiteral(".svg")));
+        return file.open(QIODevice::ReadOnly) ? file.readAll() : QByteArray();
+    };
+    const auto renderLine = [](const QByteArray &svg, const QColor &tone, const QSize &size) {
+        QSvgRenderer renderer(resolveSvgColorSentinel(svg, tone.name(QColor::HexRgb).toLatin1()));
+        QPixmap pixmap(size);
+        pixmap.fill(Qt::transparent);
+        QPainter painter(&pixmap);
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        renderer.render(&painter);
+        return pixmap;
+    };
+
+    constexpr int MARGIN = 24;
+    constexpr int LABEL_WIDTH = 110;
+    constexpr int CELL_WIDTH = 120;
+    constexpr int ROW_HEIGHT = 58;
+    constexpr int GLYPH_BLOCK_HEIGHT = 22 + 2 * ROW_HEIGHT;
+    constexpr qreal DPR = 2.0;
+
+    const int logicalWidth = MARGIN + LABEL_WIDTH + static_cast<int>(std::size(SIZES)) * CELL_WIDTH + MARGIN;
+    const int logicalHeight = MARGIN + 24 + 24 + static_cast<int>(std::size(stickered)) * GLYPH_BLOCK_HEIGHT + 24 + 24 +
+                              CONTEXT_SIZE + 30 + 20 + MARGIN;
+    const QSize imageSize(qRound(logicalWidth * DPR), qRound(logicalHeight * DPR));
+
+    for (const bool dark : {false, true}) {
+        const QColor window(dark ? QStringLiteral("#1e1e1e") : QStringLiteral("#ffffff"));
+        const QColor text(dark ? QStringLiteral("#e8e8e8") : QStringLiteral("#1e1e1e"));
+
+        QImage image(imageSize, QImage::Format_ARGB32_Premultiplied);
+        image.fill(window);
+        QPainter painter(&image);
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+        painter.scale(DPR, DPR);
+        painter.setPen(text);
+        painter.setFont(QFont(QStringLiteral("Sans"), 9));
+
+        qreal y = MARGIN + 4;
+        painter.drawText(QPointF(MARGIN, y), dark ? QStringLiteral("Dark scheme") : QStringLiteral("Light scheme"));
+
+        y += 24;
+        painter.drawText(QPointF(MARGIN, y), QStringLiteral("Add / remove / delete (line above, sticker below)"));
+        for (const Glyph &glyph : stickered) {
+            y += GLYPH_BLOCK_HEIGHT;
+            const QByteArray svg = readSvg(glyph.name);
+            ASSERT_FALSE(svg.isEmpty()) << glyph.name;
+            const QColor tone = defaultAppColor(glyph.role, dark);
+
+            for (int row = 0; row < 2; ++row) {
+                const bool sticker = row == 1;
+                const qreal rowTop = y - GLYPH_BLOCK_HEIGHT + 22 + row * ROW_HEIGHT;
+                painter.drawText(QPointF(MARGIN, rowTop + 16),
+                                 (sticker ? QStringLiteral("sticker ") : QStringLiteral("line    ")) +
+                                     QString::fromLatin1(glyph.name));
+                for (std::size_t i = 0; i < std::size(SIZES); ++i) {
+                    const int side = SIZES[i];
+                    const QPixmap pixmap = sticker ? ThemeIconSticker::renderSticker(svg, tone, QSize(side, side))
+                                                   : renderLine(svg, tone, QSize(side, side));
+                    const qreal x = MARGIN + LABEL_WIDTH + static_cast<qreal>(i) * CELL_WIDTH;
+                    painter.drawPixmap(QPointF(x, rowTop + 36 - side), pixmap);
+                    if (row == 1) {
+                        painter.drawText(QPointF(x, rowTop + 54), QStringLiteral("%1px").arg(side));
+                    }
+                }
+            }
+        }
+
+        y += 24;
+        painter.drawText(QPointF(MARGIN, y),
+                         QStringLiteral("Ready / not ready keep the badge (%1px)").arg(CONTEXT_SIZE));
+        constexpr Glyph badgeContext[] = {
+            {"ready_start", AppColor::Positive},
+            {"not_ready_start", AppColor::Negative},
+        };
+        for (std::size_t i = 0; i < std::size(badgeContext); ++i) {
+            const QByteArray svg = readSvg(badgeContext[i].name);
+            ASSERT_FALSE(svg.isEmpty()) << badgeContext[i].name;
+            const QColor tone = defaultAppColor(badgeContext[i].role, dark);
+            const qreal x = MARGIN + LABEL_WIDTH + static_cast<qreal>(i) * CELL_WIDTH;
+            painter.drawPixmap(QPointF(x, y + 8),
+                               ThemeIconBadge::renderBadge(svg, tone, QSize(CONTEXT_SIZE, CONTEXT_SIZE)));
+            painter.drawText(QPointF(x, y + 8 + CONTEXT_SIZE + 12), QString::fromLatin1(badgeContext[i].name));
+        }
+
+        y += 24 + CONTEXT_SIZE + 30;
+        painter.drawText(
+            QPointF(MARGIN, y),
+            QStringLiteral(
+                "icons/delete (trash) has no pre-#7595 counterpart; the clear-filter button uses the old X."));
+
+        painter.end();
+        const QString path = QDir(outDir).absoluteFilePath(dark ? QStringLiteral("sticker-preview-dark.png")
+                                                                : QStringLiteral("sticker-preview-light.png"));
+        ASSERT_TRUE(image.save(path)) << path.toStdString();
+    }
 }
 
 /**
@@ -419,9 +685,9 @@ TEST_F(ThemeIconRenderTest, LineStyleStillRendersGlyphAlone)
  *
  * Two panels per scheme: ready/not-ready as line and badge at the sizes the UI
  * actually uses (15px in the player list, 16px in toolbars, 24 and 48 for
- * inspection), and the add/remove/delete glyphs, which stay line because the
- * old art was a filled glyph and not a disc. It lives in the test binary so the
- * colors come from the same place the engine uses.
+ * inspection). It lives in the test binary so the colors come from the same
+ * place the engine uses. The add/remove/delete glyphs and their sticker
+ * treatment have their own sheet (IconStickerPreview).
  */
 TEST(IconBadgePreview, WritesPngsWhenRequested)
 {
@@ -443,14 +709,7 @@ TEST(IconBadgePreview, WritesPngsWhenRequested)
         {"ready_start", AppColor::Positive},
         {"not_ready_start", AppColor::Negative},
     };
-    constexpr Glyph unchanged[] = {
-        {"increment", AppColor::Positive},
-        {"decrement", AppColor::Negative},
-        {"remove_row", AppColor::Negative},
-        {"delete", AppColor::Negative},
-    };
     constexpr int SIZES[] = {15, 16, 24, 48};
-    constexpr int LINE_GLYPH_SIZE = 32;
 
     const auto readSvg = [](const char *name) {
         QFile file(
@@ -476,8 +735,7 @@ TEST(IconBadgePreview, WritesPngsWhenRequested)
     constexpr qreal DPR = 2.0;
 
     const int logicalWidth = MARGIN + LABEL_WIDTH + static_cast<int>(std::size(SIZES)) * CELL_WIDTH + MARGIN;
-    const int logicalHeight = MARGIN + 24 + 24 + static_cast<int>(std::size(badged)) * GLYPH_BLOCK_HEIGHT + 24 + 24 +
-                              LINE_GLYPH_SIZE + 30 + MARGIN;
+    const int logicalHeight = MARGIN + 24 + 24 + static_cast<int>(std::size(badged)) * GLYPH_BLOCK_HEIGHT + 30 + MARGIN;
     const QSize imageSize(qRound(logicalWidth * DPR), qRound(logicalHeight * DPR));
 
     for (const bool dark : {false, true}) {
@@ -523,18 +781,6 @@ TEST(IconBadgePreview, WritesPngsWhenRequested)
                     }
                 }
             }
-        }
-
-        y += 24;
-        painter.drawText(QPointF(MARGIN, y),
-                         QStringLiteral("Add / remove / delete (unchanged line glyphs, %1px)").arg(LINE_GLYPH_SIZE));
-        for (std::size_t i = 0; i < std::size(unchanged); ++i) {
-            const QByteArray svg = readSvg(unchanged[i].name);
-            ASSERT_FALSE(svg.isEmpty()) << unchanged[i].name;
-            const QColor tone = defaultAppColor(unchanged[i].role, dark);
-            const qreal x = MARGIN + LABEL_WIDTH + static_cast<qreal>(i) * CELL_WIDTH;
-            painter.drawPixmap(QPointF(x, y + 8), renderLine(svg, tone, QSize(LINE_GLYPH_SIZE, LINE_GLYPH_SIZE)));
-            painter.drawText(QPointF(x, y + 8 + LINE_GLYPH_SIZE + 12), QString::fromLatin1(unchanged[i].name));
         }
 
         painter.end();
