@@ -171,6 +171,7 @@ endfunction()
 
 # --- Unit tests ------------------------------------------------------------------
 
+cockatrice_add_test(NAME image_redirect_chain_test SOURCES image_redirect_chain_test.cpp)
 cockatrice_add_test(NAME expression_test SOURCES expression_test.cpp LIBS libcockatrice_utility)
 cockatrice_add_test(NAME clamped_arithmetic_test SOURCES clamped_arithmetic_test.cpp LIBS libcockatrice_utility)
 cockatrice_add_test(NAME test_age_formatting SOURCES test_age_formatting.cpp LIBS libcockatrice_utility)

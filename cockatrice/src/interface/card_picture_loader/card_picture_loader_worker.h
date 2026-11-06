@@ -5,6 +5,7 @@
 #include <QLoggingCategory>
 #include <QObject>
 #include <QPair>
+#include <QPointer>
 #include <QQueue>
 #include <QSet>
 #include <QString>
@@ -139,6 +140,9 @@ public slots:
     /** @brief Caches a redirect mapping between original and redirected URL. */
     void cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl);
 
+    /** @brief Removes a stale redirect mapping. */
+    void invalidateRedirect(const QUrl &url);
+
     /** @brief Removes a URL from the network cache. */
     void removedCachedUrl(const QUrl &url);
 
@@ -150,7 +154,7 @@ private:
     QString cacheFilePath;                             ///< Path to persistent redirect cache file
     static constexpr int CacheTTLInDays = 30;          ///< Time-to-live for redirect cache entries (days)
     bool picDownload;                                  ///< Whether downloading images from network is enabled
-    QQueue<QPair<QUrl, CardPictureLoaderWorkerWork *>> requestLoadQueue; ///< Queue of pending network requests
+    QQueue<QPair<QUrl, QPointer<CardPictureLoaderWorkerWork>>> requestLoadQueue; ///< Queue of pending network requests
 
     QTimer requestTimer;                    ///< Timer to reset the request quota
     QTimer dispatchTimer;                   ///< Timer pacing individual network requests
@@ -185,12 +189,9 @@ private:
      */
     [[nodiscard]] bool isUnlockedHost(const QString &host) const;
 
-    /** @brief Returns cached redirect URL for the given original URL, if available. */
-    [[nodiscard]] QUrl getCachedRedirect(const QUrl &originalUrl) const;
-
     /** @brief Whether a request for this URL would actually touch the network, rather than being served from the disk
      * cache. */
-    [[nodiscard]] bool requestTouchesNetwork(const QUrl &url) const;
+    [[nodiscard]] bool requestTouchesNetwork(const QUrl &url, const CardPictureLoaderWorkerWork *worker) const;
 
     /**
      * @brief Follows the cached-redirect chain to the URL that will actually be requested.
@@ -200,7 +201,7 @@ private:
      * Dispatch decisions (unlocked-host fast path, 429 backoff, in-flight cap) must key on the host
      * a request really goes to, not the URL that merely redirects to it.
      */
-    [[nodiscard]] QUrl resolveCachedRedirect(const QUrl &url) const;
+    [[nodiscard]] QUrl resolveCachedRedirect(const QUrl &url);
 
     /** @brief Loads redirect cache from disk. */
     void loadRedirectCache();
