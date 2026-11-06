@@ -248,19 +248,19 @@ void DeckEditorDeckDockWidget::createDeckDock()
             &DeckEditorDeckDockWidget::applyActiveGroupCriteria);
 
     aIncrement = new QAction(QString(), this);
-    aIncrement->setIcon(loadThemedIcon(QStringLiteral("icons/increment"), AppColor::Positive));
+    aIncrement->setIcon(loadThemedIcon(QStringLiteral("icons/increment"), AppColor::Positive, IconStyle::Sticker));
     connect(aIncrement, &QAction::triggered, this, &DeckEditorDeckDockWidget::actIncrementSelection);
     auto *tbIncrement = new QToolButton(this);
     tbIncrement->setDefaultAction(aIncrement);
 
     aDecrement = new QAction(QString(), this);
-    aDecrement->setIcon(loadThemedIcon(QStringLiteral("icons/decrement"), AppColor::Negative));
+    aDecrement->setIcon(loadThemedIcon(QStringLiteral("icons/decrement"), AppColor::Negative, IconStyle::Sticker));
     connect(aDecrement, &QAction::triggered, this, &DeckEditorDeckDockWidget::actDecrementSelection);
     auto *tbDecrement = new QToolButton(this);
     tbDecrement->setDefaultAction(aDecrement);
 
     aRemoveCard = new QAction(QString(), this);
-    aRemoveCard->setIcon(loadThemedIcon(QStringLiteral("icons/remove_row"), AppColor::Negative));
+    aRemoveCard->setIcon(loadThemedIcon(QStringLiteral("icons/remove_row"), AppColor::Negative, IconStyle::Sticker));
     connect(aRemoveCard, &QAction::triggered, this, &DeckEditorDeckDockWidget::actRemoveCard);
     auto *tbRemoveCard = new QToolButton(this);
     tbRemoveCard->setDefaultAction(aRemoveCard);

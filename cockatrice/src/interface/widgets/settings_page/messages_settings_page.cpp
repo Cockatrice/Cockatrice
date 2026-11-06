@@ -150,7 +150,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     }
 
     aAdd = new QAction(this);
-    aAdd->setIcon(loadThemedIcon(QStringLiteral("icons/increment"), AppColor::Positive));
+    aAdd->setIcon(loadThemedIcon(QStringLiteral("icons/increment"), AppColor::Positive, IconStyle::Sticker));
     connect(aAdd, &QAction::triggered, this, &MessagesSettingsPage::actAdd);
 
     aEdit = new QAction(this);
@@ -158,7 +158,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     connect(aEdit, &QAction::triggered, this, &MessagesSettingsPage::actEdit);
 
     aRemove = new QAction(this);
-    aRemove->setIcon(loadThemedIcon(QStringLiteral("icons/decrement"), AppColor::Negative));
+    aRemove->setIcon(loadThemedIcon(QStringLiteral("icons/decrement"), AppColor::Negative, IconStyle::Sticker));
     connect(aRemove, &QAction::triggered, this, &MessagesSettingsPage::actRemove);
 
     auto *messageToolBar = new QToolBar;

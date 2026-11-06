@@ -24,9 +24,9 @@
  * The trade-off is fidelity against contrast. A badge is a small picture: it
  * survives a busy toolbar and a tinted row better than a hairline, and it can
  * carry a light or dark glyph independent of the surrounding text. In exchange
- * it costs more pixels of attention per control, and its glyph color is decided
- * from the disc it sits on rather than from the window, so it is deliberately
- * not the palette's text color.
+ * it costs more pixels of attention per control, and its glyph color follows the
+ * scheme it is drawn for rather than the window's text color, so it is
+ * deliberately not the palette's foreground.
  *
  * Everything here works in device pixels. The icon engine renders at the
  * device-pixel size it already computed and sets the pixmap's device pixel ratio
@@ -37,8 +37,7 @@ namespace ThemeIconBadge
 /**
  * @brief WCAG relative luminance, used to test a color against a background.
  *
- * Shared by the badge glyph choice and by IconTint::resolve()'s selected-row
- * contrast test, so both use the same definition of "legible".
+ * Used by IconTint::resolve()'s selected-row contrast test.
  */
 double relativeLuminance(const QColor &color);
 
@@ -48,10 +47,11 @@ double contrastRatio(const QColor &first, const QColor &second);
 /**
  * @brief Glyph color for a badge disc.
  *
- * The more legible of white and the tone darkened to an outline-dark ink. White
- * keeps the old light-scheme look; on a dark scheme the semantic tone is a light
- * green or red, where white sits near 1.7:1 and disappears, so the dark ink
- * wins instead. Both candidates derive from the theme, so no literal is needed.
+ * White on the light scheme, the saturated tone darkened to an outline-dark ink
+ * on the dark scheme. The dark-scheme tones fill the disc light enough that
+ * white would sit near 2.7:1 at its top, so that scheme keeps the darkened ink
+ * the badge had before the filled treatments shared a fill. The dark ink is
+ * derived from the tone, so the theme keeps control of both ends.
  */
 QColor glyphColor(const QColor &tone);
 
@@ -61,10 +61,11 @@ QSize glyphSize(const QSize &pixelSize);
 /**
  * @brief Renders a sentinel-carrying SVG as a badge.
  *
- * The disc fills the square canvas minus the ring, the ring darkens the tone,
- * and the sentinel is resolved to the contrast glyph. The SVG is scaled to
- * nearly the whole disc, because the sentinel paths are padded inside their
- * viewBox and a smaller box loses the stroke at 16px.
+ * The disc fills the square canvas minus the ring with the same gradient the
+ * sticker fill uses, the ring darkens the tone, and the sentinel is resolved to
+ * the contrast glyph. The SVG is scaled to nearly the whole disc, because the
+ * sentinel paths are padded inside their viewBox and a smaller box loses the
+ * stroke at 16px.
  *
  * This treatment reproduces the pre-#7595 ready/not-ready art, which was a
  * filled disc. It is not a generic replacement for every semantic glyph: the
