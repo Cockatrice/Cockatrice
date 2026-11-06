@@ -106,25 +106,32 @@ DeckSyncManager::DeckSyncManager(AbstractClient *_client, ColorIdentityProvider 
     if (client == nullptr) {
         return;
     }
-    connect(client, &AbstractClient::statusChanged, this, [this](ClientStatus status) {
-        if (status == StatusDisconnected) {
-            offline = true;
-            debounceTimer->stop();
-            // A run cannot survive the session it was started on: the in-flight
-            // command comes back RespNotConnected, the remaining queue would be
-            // sent on a dead client, and a re-login as another account would
-            // receive this profile's uploads and deletes.
-            if (syncing) {
-                activeConflict = ActiveConflict();
-                failSync(tr("Disconnected."));
-            }
-        }
-    });
-    connect(client, &AbstractClient::userInfoChanged, this, [this](const ServerInfo_User &userInfo) {
-        offline = false;
-        serverUsername = QString::fromStdString(userInfo.name());
-        autoSyncSoon();
-    });
+    connect(client, &AbstractClient::statusChanged, this, &DeckSyncManager::onClientStatusChanged);
+    connect(client, &AbstractClient::userInfoChanged, this, &DeckSyncManager::onUserInfoChanged);
+}
+
+void DeckSyncManager::onClientStatusChanged(ClientStatus status)
+{
+    if (status != StatusDisconnected) {
+        return;
+    }
+    offline = true;
+    debounceTimer->stop();
+    // A run cannot survive the session it was started on: the in-flight
+    // command comes back RespNotConnected, the remaining queue would be
+    // sent on a dead client, and a re-login as another account would
+    // receive this profile's uploads and deletes.
+    if (syncing) {
+        activeConflict = ActiveConflict();
+        failSync(tr("Disconnected."));
+    }
+}
+
+void DeckSyncManager::onUserInfoChanged(const ServerInfo_User &userInfo)
+{
+    offline = false;
+    serverUsername = QString::fromStdString(userInfo.name());
+    autoSyncSoon();
 }
 
 void DeckSyncManager::setServerIdentity(const QString &host, int port, const QString &username)
