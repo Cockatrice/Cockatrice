@@ -64,13 +64,13 @@ MessageLogWidget::getFromStr(CardZoneLogic *zone, QString cardName, int position
     QString zoneName = zone->getName();
 
     if (zoneName == ZoneNames::TABLE) {
-        fromStr = tr(" from play");
+        fromStr = tr("from play");
     } else if (zoneName == ZoneNames::GRAVE) {
-        fromStr = tr(" from their graveyard");
+        fromStr = tr("from their graveyard");
     } else if (zoneName == ZoneNames::EXILE) {
-        fromStr = tr(" from exile");
+        fromStr = tr("from exile");
     } else if (zoneName == ZoneNames::HAND) {
-        fromStr = tr(" from their hand");
+        fromStr = tr("from their hand");
     } else if (zoneName == ZoneNames::DECK) {
         if (position == 0) {
             if (cardName.isEmpty()) {
@@ -82,9 +82,9 @@ MessageLogWidget::getFromStr(CardZoneLogic *zone, QString cardName, int position
                 cardNameContainsStartZone = true;
             } else {
                 if (ownerChange) {
-                    fromStr = tr(" from the top of %1's library").arg(zone->getPlayer()->getPlayerInfo()->getName());
+                    fromStr = tr("from the top of %1's library").arg(zone->getPlayer()->getPlayerInfo()->getName());
                 } else {
-                    fromStr = tr(" from the top of their library");
+                    fromStr = tr("from the top of their library");
                 }
             }
         } else if (position == zone->getCards().size()) {
@@ -97,28 +97,33 @@ MessageLogWidget::getFromStr(CardZoneLogic *zone, QString cardName, int position
                 cardNameContainsStartZone = true;
             } else {
                 if (ownerChange) {
-                    fromStr = tr(" from the bottom of %1's library").arg(zone->getPlayer()->getPlayerInfo()->getName());
+                    fromStr = tr("from the bottom of %1's library").arg(zone->getPlayer()->getPlayerInfo()->getName());
                 } else {
-                    fromStr = tr(" from the bottom of their library");
+                    fromStr = tr("from the bottom of their library");
                 }
             }
         } else {
             if (ownerChange) {
-                fromStr = tr(" from %1's library").arg(zone->getPlayer()->getPlayerInfo()->getName());
+                fromStr = tr("from %1's library").arg(zone->getPlayer()->getPlayerInfo()->getName());
             } else {
-                fromStr = tr(" from their library");
+                fromStr = tr("from their library");
             }
         }
     } else if (zoneName == ZoneNames::SIDEBOARD) {
-        fromStr = tr(" from sideboard");
+        fromStr = tr("from sideboard");
     } else if (zoneName == ZoneNames::STACK) {
-        fromStr = tr(" from the stack");
+        fromStr = tr("from the stack");
     } else {
-        fromStr = tr(" from custom zone '%1'").arg(zoneName);
+        fromStr = tr("from custom zone '%1'").arg(zoneName);
     }
 
     if (!cardNameContainsStartZone) {
         cardName.clear();
+    }
+    // The separator space is added here rather than stored in the tr() string so
+    // translators never have to preserve an invisible leading blank.
+    if (!fromStr.isEmpty()) {
+        fromStr.prepend(' ');
     }
     return {cardName, fromStr};
 }
