@@ -17,15 +17,16 @@
 #include <QString>
 #include <QVariant>
 #include <functional>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/settings/deck_sync_settings.h>
 
-class AbstractClient;
 class CommandContainer;
 class DeckList;
 class QFileSystemWatcher;
 class QTimer;
 class Response;
 class ServerInfo_DeckStorage_Folder;
+class ServerInfo_User;
 
 /**
  * @class DeckSyncManager
@@ -175,6 +176,8 @@ private:
     [[nodiscard]] bool canAutoRun() const;
     void onDebounceTimeout();
     void onWatchedPathChanged(const QString &path);
+    void onClientStatusChanged(ClientStatus status);
+    void onUserInfoChanged(const ServerInfo_User &userInfo);
     void refreshWatcher();
     void refreshInterval();
     [[nodiscard]] DeckSyncProfile buildProfile() const;
