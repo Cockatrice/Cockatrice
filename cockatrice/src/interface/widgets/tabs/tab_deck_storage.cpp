@@ -583,15 +583,16 @@ void TabDeckStorage::onConflictRequest(const DeckSyncConflict &conflict)
     DlgSyncConflict dialog(conflict, this);
     if (dialog.exec() != QDialog::Accepted) {
         DeckSyncResolution skip;
-        skip.action = DeckSyncSkipConflict;
+        skip.action = DeckSyncResolutionAction::SkipConflict;
         syncManager->resolveConflict(skip);
         return;
     }
     const DeckSyncResolution resolution = dialog.resolution();
-    if (resolution.rememberAlways &&
-        (resolution.action == DeckSyncKeepMine || resolution.action == DeckSyncKeepServer)) {
-        SettingsCache::instance().deckSync().setConflictDefault(
-            resolution.action == DeckSyncKeepMine ? DeckSyncConflictKeepMine : DeckSyncConflictKeepServer);
+    if (resolution.rememberAlways && (resolution.action == DeckSyncResolutionAction::KeepMine ||
+                                      resolution.action == DeckSyncResolutionAction::KeepServer)) {
+        SettingsCache::instance().deckSync().setConflictDefault(resolution.action == DeckSyncResolutionAction::KeepMine
+                                                                    ? DeckSyncConflictKeepMine
+                                                                    : DeckSyncConflictKeepServer);
     }
     syncManager->resolveConflict(resolution);
 }

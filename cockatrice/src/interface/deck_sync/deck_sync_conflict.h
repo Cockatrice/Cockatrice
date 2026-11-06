@@ -9,13 +9,13 @@
 #include <QString>
 
 /** @brief How a both-sides-changed deck is resolved. */
-enum DeckSyncResolutionAction
+enum class DeckSyncResolutionAction
 {
-    DeckSyncKeepMine,     ///< Upload the local deck, discarding the server version.
-    DeckSyncKeepServer,   ///< Download the server deck, discarding local changes.
-    DeckSyncKeepBoth,     ///< Keep the local deck and store the server version aside.
-    DeckSyncUseMerge,     ///< Upload the auto-merged deck (only when mergeable).
-    DeckSyncSkipConflict, ///< Leave both sides untouched for this run.
+    KeepMine,     ///< Upload the local deck, discarding the server version.
+    KeepServer,   ///< Download the server deck, discarding local changes.
+    KeepBoth,     ///< Keep the local deck and store the server version aside.
+    UseMerge,     ///< Upload the auto-merged deck (only when mergeable).
+    SkipConflict, ///< Leave both sides untouched for this run.
 };
 
 /** @brief Sync direction for one run. */
@@ -42,7 +42,7 @@ struct DeckSyncConflict
 /** @brief The dialog verdict for one DeckSyncConflict. */
 struct DeckSyncResolution
 {
-    DeckSyncResolutionAction action = DeckSyncKeepMine;
+    DeckSyncResolutionAction action = DeckSyncResolutionAction::KeepMine;
     bool rememberSession = false; ///< Reuse this verdict for later conflicts this run.
     bool rememberAlways = false;  ///< Store this verdict as the conflict default setting.
 };

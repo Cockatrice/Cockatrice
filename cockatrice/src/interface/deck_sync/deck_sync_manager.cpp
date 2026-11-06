@@ -551,11 +551,8 @@ void DeckSyncManager::applyUpload(const QString &relativePath,
                                   int deckId,
                                   const QString &guid)
 {
-    UploadOp op;
-    op.relativePath = relativePath;
-    op.serverPath = serverPath;
-    op.deckId = deckId;
-    op.guid = guid;
+    const UploadOp op{
+        .relativePath = relativePath, .serverPath = serverPath, .serverDir = {}, .deckId = deckId, .guid = guid};
     pendingUploads.append(op);
 }
 
@@ -565,12 +562,11 @@ void DeckSyncManager::applyDownload(const QString &relativePath,
                                     const QString &hash,
                                     qint64 lastModifiedSecs)
 {
-    DownloadOp op;
-    op.relativePath = relativePath;
-    op.deckId = deckId;
-    op.guid = guid;
-    op.hash = hash;
-    op.lastModifiedSecs = lastModifiedSecs;
+    const DownloadOp op{.relativePath = relativePath,
+                        .deckId = deckId,
+                        .guid = guid,
+                        .hash = hash,
+                        .lastModifiedSecs = lastModifiedSecs};
     pendingDownloads.append(op);
 }
 
@@ -606,12 +602,11 @@ void DeckSyncManager::queueConflict(const QString &relativePath,
         }
         return;
     }
-    ConflictDownload ctx;
-    ctx.serverPath = serverPath;
-    ctx.deckId = deckId;
-    ctx.guid = serverGuid;
-    ctx.hash = serverHash;
-    ctx.lastModifiedSecs = serverLastModifiedSecs;
+    const ConflictDownload ctx{.serverPath = serverPath,
+                               .deckId = deckId,
+                               .guid = serverGuid,
+                               .hash = serverHash,
+                               .lastModifiedSecs = serverLastModifiedSecs};
     pendingConflicts.insert(relativePath, ctx);
     conflictPaths.insert(relativePath);
     applyDownload(relativePath, deckId, serverGuid, serverHash, serverLastModifiedSecs);
@@ -667,22 +662,23 @@ void DeckSyncManager::resolveConflict(const DeckSyncResolution &resolution)
     if (!syncing || !activeConflict.active) {
         return;
     }
-    if (resolution.rememberSession &&
-        (resolution.action == DeckSyncKeepMine || resolution.action == DeckSyncKeepServer)) {
-        sessionDefault = resolution.action == DeckSyncKeepMine ? DeckSyncConflictKeepMine : DeckSyncConflictKeepServer;
+    if (resolution.rememberSession && (resolution.action == DeckSyncResolutionAction::KeepMine ||
+                                       resolution.action == DeckSyncResolutionAction::KeepServer)) {
+        sessionDefault = resolution.action == DeckSyncResolutionAction::KeepMine ? DeckSyncConflictKeepMine
+                                                                                 : DeckSyncConflictKeepServer;
     }
     const ActiveConflict conflict = activeConflict;
     activeConflict.active = false;
 
     switch (resolution.action) {
-        case DeckSyncKeepMine:
+        case DeckSyncResolutionAction::KeepMine:
             applyUpload(conflict.relativePath, conflict.serverPath, conflict.deckId, conflict.serverGuid);
             break;
-        case DeckSyncKeepServer:
+        case DeckSyncResolutionAction::KeepServer:
             applyDownload(conflict.relativePath, conflict.deckId, conflict.serverGuid, conflict.serverHash,
                           conflict.serverLastModifiedSecs);
             break;
-        case DeckSyncKeepBoth: {
+        case DeckSyncResolutionAction::KeepBoth: {
             // Persist the already-fetched server bytes synchronously: queuing a
             // download here would race the upload below and fetch back Mine.
             // The aside copy is a new local file, so it gets a fresh guid and
@@ -716,7 +712,7 @@ void DeckSyncManager::resolveConflict(const DeckSyncResolution &resolution)
             applyUpload(conflict.relativePath, conflict.serverPath, conflict.deckId, conflict.serverGuid);
             break;
         }
-        case DeckSyncUseMerge: {
+        case DeckSyncResolutionAction::UseMerge: {
             DeckSyncSidecar sidecar(sidecarPath);
             sidecar.load();
             const QString guid =
@@ -753,7 +749,7 @@ void DeckSyncManager::resolveConflict(const DeckSyncResolution &resolution)
             applyUpload(conflict.relativePath, conflict.serverPath, conflict.deckId, conflict.serverGuid);
             break;
         }
-        case DeckSyncSkipConflict:
+        case DeckSyncResolutionAction::SkipConflict:
             ++skippedCount;
             break;
     }

@@ -157,15 +157,15 @@ void DlgSyncConflict::updateRememberBoxes()
 DeckSyncResolutionAction DlgSyncConflict::selectedAction() const
 {
     if (keepServerRadio->isChecked()) {
-        return DeckSyncKeepServer;
+        return DeckSyncResolutionAction::KeepServer;
     }
     if (keepBothRadio->isChecked()) {
-        return DeckSyncKeepBoth;
+        return DeckSyncResolutionAction::KeepBoth;
     }
     if (mergeRadio->isChecked()) {
-        return DeckSyncUseMerge;
+        return DeckSyncResolutionAction::UseMerge;
     }
-    return DeckSyncKeepMine;
+    return DeckSyncResolutionAction::KeepMine;
 }
 
 DeckSyncResolution DlgSyncConflict::resolution() const
