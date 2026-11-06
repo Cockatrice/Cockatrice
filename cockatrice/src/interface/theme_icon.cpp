@@ -2,6 +2,8 @@
 
 #include "libcockatrice/utility/svg_recolor.h"
 #include "theme_icon_badge.h"
+#include "theme_icon_fill.h"
+#include "theme_icon_sticker.h"
 #include "theme_manager.h"
 
 #include <QApplication>
@@ -41,7 +43,11 @@ QColor IconTint::resolve(QIcon::Mode mode) const
         if (mode == QIcon::Disabled) {
             return qApp->palette().color(QPalette::Disabled, QPalette::WindowText);
         }
-        const QColor color = themeManager->appColor(appRole);
+        // The three treatments paint the same tone: a line glyph, a badge disc
+        // and a sticker fill must not disagree on how saturated the role is.
+        // The fill treatments apply this floor themselves, so this only changes
+        // the line path, and only for the desaturated dark-scheme tones.
+        const QColor color = ThemeIconFill::saturated(themeManager->appColor(appRole));
         if (mode != QIcon::Selected) {
             return color;
         }
@@ -264,12 +270,14 @@ private:
     {
         ensureResolved();
 
-        // Badge is a shape treatment, so it only applies to sentinel art: an
-        // authored asset keeps its own drawing and follows the line/asset path.
-        // Disabled also drops back to the line glyph: a filled disc at full mass
-        // does not read as unavailable next to the thin line glyphs around it,
-        // and the tint already removes the semantic tone.
-        const bool badge = style == IconStyle::Badge && resolvedHasSentinel && mode != QIcon::Disabled;
+        // Badge and Sticker are shape treatments, so they only apply to sentinel
+        // art: an authored asset keeps its own drawing and follows the line/asset
+        // path. Disabled also drops back to the line glyph: a filled disc or
+        // sticker at full mass does not read as unavailable next to the thin line
+        // glyphs around it, and the tint already removes the semantic tone.
+        const bool treated = style != IconStyle::Line && resolvedHasSentinel && mode != QIcon::Disabled;
+        const bool badge = treated && style == IconStyle::Badge;
+        const bool sticker = treated && style == IconStyle::Sticker;
         // Same cache for all paths: sentinel art varies by palette color, art
         // with its own colors varies by mode (Disabled is generated). A color
         // variant is never a bare digit, so the key spaces cannot collide. A
@@ -280,6 +288,8 @@ private:
         if (badge) {
             variant = QByteArrayLiteral("B|") + tone.name(QColor::HexRgb).toLatin1() + '|' +
                       ThemeIconBadge::glyphColor(tone).name(QColor::HexRgb).toLatin1();
+        } else if (sticker) {
+            variant = QByteArrayLiteral("S|") + tone.name(QColor::HexRgb).toLatin1();
         } else if (resolvedHasSentinel) {
             variant = tone.name(QColor::HexRgb).toLatin1();
         } else {
@@ -296,6 +306,8 @@ private:
             // Geometry is computed from the device-pixel size, and the ratio is
             // attached below like every other path.
             pixmap = ThemeIconBadge::renderBadge(resolvedSvg, tone, pixelSize);
+        } else if (sticker) {
+            pixmap = ThemeIconSticker::renderSticker(resolvedSvg, tone, pixelSize);
         } else if (resolvedHasSentinel) {
             pixmap = renderSvg(resolveSvgColorSentinel(resolvedSvg, variant), pixelSize, devicePixelRatio);
         } else {
@@ -347,12 +359,13 @@ QPixmap loadSentinelSvgPixmap(const QString &resolvedPath, IconTint tint, const 
     }
 
     const QColor tone = tint.resolve(QIcon::Normal);
-    if (style == IconStyle::Badge) {
+    if (style == IconStyle::Badge || style == IconStyle::Sticker) {
         QSize canvas = size;
         if (canvas.isEmpty()) {
             canvas = QSvgRenderer(svg).defaultSize();
         }
-        return ThemeIconBadge::renderBadge(svg, tone, canvas);
+        return style == IconStyle::Badge ? ThemeIconBadge::renderBadge(svg, tone, canvas)
+                                         : ThemeIconSticker::renderSticker(svg, tone, canvas);
     }
 
     return renderSvg(resolveSvgColorSentinel(svg, tone.name(QColor::HexRgb).toLatin1()), size, 1.0);

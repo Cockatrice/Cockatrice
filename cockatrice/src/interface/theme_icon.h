@@ -35,11 +35,16 @@
  * that carries its own colors is never badged; it falls back to the asset path.
  * Disabled icons also fall back to the line glyph, because a filled disc at full
  * mass does not read as unavailable.
+ *
+ * Sticker reproduces the other half of the pre-#7595 set: the filled add, remove
+ * and delete glyphs, painted with a tone gradient and a dark outline and no
+ * disc. It shares the disabled fallback for the same reason.
  */
 enum class IconStyle
 {
-    Line,  // the recolored glyph alone
-    Badge, // filled disc + dark ring + contrast glyph
+    Line,    // the recolored glyph alone
+    Badge,   // filled disc + dark ring + contrast glyph
+    Sticker, // filled glyph + dark outline, no disc
 };
 
 /**
@@ -62,6 +67,9 @@ public:
      * Disabled application colors resolve to the disabled foreground so an
      * unavailable control does not keep signalling its semantic color. Selected
      * palette colors keep the existing WindowText -> HighlightedText swap.
+     * Application colors pass through the filled treatments' saturation floor,
+     * so a line glyph, a badge disc and a sticker fill carry the same tone
+     * instead of a pale line beside a saturated shape.
      */
     QColor resolve(QIcon::Mode mode) const;
 
@@ -90,8 +98,8 @@ private:
  *               extension (for example `icons/search`), matching themePixmap().
  * @param tint Color that replaces the sentinel: a palette role or a semantic
  *             application color. Defaults to WindowText.
- * @param style Treatment of the glyph: a line, or the badge shape that keeps
- *              the pre-migration filled-art reading. Defaults to Line.
+ * @param style Treatment of the glyph: a line, or one of the filled treatments
+ *              that keep the pre-migration art reading. Defaults to Line.
  * @return An icon that follows the application palette.
  */
 QIcon loadThemedIcon(QStringView prefix, IconTint tint = {}, IconStyle style = IconStyle::Line);
@@ -107,8 +115,9 @@ QIcon loadThemedIcon(QStringView prefix, IconTint tint = {}, IconStyle style = I
  * @param tint Color that replaces the sentinel: a palette role or a semantic
  *             application color. Defaults to WindowText.
  * @param size Pixel size to render at; an empty size uses the SVG's intrinsic size.
- * @param style Treatment of the glyph: a line, or a badge. A badge on a
- *              non-sentinel asset stays null, like the line path.
+ * @param style Treatment of the glyph: a line, or one of the filled treatments.
+ *              A treatment on a non-sentinel asset stays null, like the line
+ *              path.
  * @return The recolored pixmap, or a null pixmap when the asset is not a
  *         sentinel-carrying SVG.
  */
