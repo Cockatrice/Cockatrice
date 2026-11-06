@@ -1,4 +1,4 @@
-FROM fedora:43
+FROM fedora:45
 
 RUN dnf install -y \
         ca-certificates \
