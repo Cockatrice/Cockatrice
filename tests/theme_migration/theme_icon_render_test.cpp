@@ -8,6 +8,7 @@
 #include <QApplication>
 #include <QByteArray>
 #include <QColor>
+#include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QFont>
@@ -476,6 +477,61 @@ TEST_F(ThemeIconRenderTest, SentinelSvgBadgeMatchesTheEngine)
     EXPECT_EQ(pixmap.size(), QSize(48, 48));
     EXPECT_GT(countOpaquePixels(pixmap, ThemeIconFill::saturated(tone).darker(300)), 0);
     EXPECT_GT(countOpaquePixels(pixmap, ThemeIconBadge::glyphColor(tone)), 0);
+}
+
+/**
+ * @brief Hides Qt's plugin directories while it lives, then restores them.
+ *
+ * Only the image-format plugins matter here: the platform plugin the fixture
+ * needs is already loaded by the time a test runs.
+ */
+class ScopedPluginPathHiding
+{
+public:
+    ScopedPluginPathHiding() : saved(QCoreApplication::libraryPaths())
+    {
+        QCoreApplication::setLibraryPaths({});
+    }
+    ~ScopedPluginPathHiding()
+    {
+        QCoreApplication::setLibraryPaths(saved);
+    }
+    ScopedPluginPathHiding(const ScopedPluginPathHiding &) = delete;
+    ScopedPluginPathHiding &operator=(const ScopedPluginPathHiding &) = delete;
+
+private:
+    QStringList saved;
+};
+
+/**
+ * @brief Authored SVG art must not depend on Qt's SVG image-format plugin.
+ *
+ * Loading an `.svg` through QPixmap needs the separate `qsvg` image plugin.
+ * Distributions that build Qt with the plugin split out (Debian, and therefore
+ * CI) ship it in its own package, and a `--no-install-recommends` install does
+ * not have it, so authored theme art rendered blank there while working on a
+ * developer machine whose Qt bundles the format. Hiding the plugin directories
+ * reproduces that install.
+ */
+TEST_F(ThemeIconRenderTest, AuthoredArtDoesNotNeedTheSvgImagePlugin)
+{
+    QTemporaryDir themeDir;
+    ASSERT_TRUE(themeDir.isValid());
+    QFile file(QDir(themeDir.path()).absoluteFilePath(QStringLiteral("plain.svg")));
+    ASSERT_TRUE(file.open(QIODevice::WriteOnly));
+    file.write(svgWith("#336699"));
+    file.close();
+    QDir::addSearchPath(QStringLiteral("theme"), themeDir.path());
+
+    // The offscreen platform plugin is already loaded by the fixture, so an
+    // empty library path only removes the image-format plugins.
+    const ScopedPluginPathHiding hidePlugins;
+
+    const QIcon icon = loadThemedIcon(QStringLiteral("plain"));
+    const QPixmap pixmap = icon.pixmap(QSize(32, 32));
+
+    ASSERT_FALSE(pixmap.isNull()) << "authored SVG art went through the QPixmap loader";
+    EXPECT_GT(countOpaquePixels(pixmap, QColor(QStringLiteral("#336699"))), 0);
 }
 
 /** @brief Badge never paints authored art: the asset keeps its own colors. */
