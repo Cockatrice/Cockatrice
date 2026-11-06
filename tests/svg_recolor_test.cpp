@@ -63,4 +63,57 @@ TEST(SvgRecolor, NoSentinelIsANoOp)
     EXPECT_EQ(resolveSvgColorSentinel(svg, "#ffffff"), svg);
 }
 
+TEST(SvgStrokeWidth, RewritesEveryAttribute)
+{
+    const QByteArray svg = R"(<svg stroke-width="2"><path stroke-width="1.5"/><path stroke-width='3'/></svg>)";
+
+    const QByteArray result = resolveSvgStrokeWidth(svg, 4.25);
+
+    EXPECT_EQ(result.count(R"(stroke-width="4.25")"), 2);
+    EXPECT_EQ(result.count(R"(stroke-width='4.25')"), 1);
+    EXPECT_FALSE(result.contains("1.5"));
+    EXPECT_FALSE(result.contains("3'/"));
+}
+
+TEST(SvgStrokeWidth, LeavesCssDeclarationsAlone)
+{
+    const QByteArray svg = R"(<svg><path style="stroke-width:2"/><path stroke-width="2"/></svg>)";
+
+    const QByteArray result = resolveSvgStrokeWidth(svg, 3.0);
+
+    EXPECT_TRUE(result.contains(R"(style="stroke-width:2")"));
+    EXPECT_EQ(result.count(R"(stroke-width="3.00")"), 1);
+}
+
+TEST(SvgStrokeWidth, NoAttributeIsANoOp)
+{
+    const QByteArray svg = R"(<svg stroke-linecap="round"><path d="M0 0h24"/></svg>)";
+
+    EXPECT_EQ(resolveSvgStrokeWidth(svg, 3.0), svg);
+}
+
+TEST(SvgStrokeWidth, DoesNotModifyTheInputAndPreservesBytes)
+{
+    QByteArray svg = "<svg>";
+    svg.append("\xff\xfe");
+    svg.append(R"(<path stroke-width="2"/></svg>)");
+    const QByteArray original = svg;
+
+    const QByteArray result = resolveSvgStrokeWidth(svg, 3.5);
+
+    EXPECT_EQ(svg, original);
+    EXPECT_TRUE(result.contains("\xff\xfe"));
+    EXPECT_TRUE(result.contains(R"(stroke-width="3.50")"));
+}
+
+TEST(SvgStrokeWidth, TruncatedAttributeTerminates)
+{
+    // A quote that is never closed must not over-read or hang.
+    const QByteArray svg = R"(<svg><path stroke-width="2/></svg>)";
+
+    const QByteArray result = resolveSvgStrokeWidth(svg, 3.0);
+
+    EXPECT_TRUE(result.startsWith("<svg>"));
+}
+
 } // namespace
