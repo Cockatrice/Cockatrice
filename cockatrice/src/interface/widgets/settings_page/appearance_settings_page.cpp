@@ -676,7 +676,7 @@ void AppearanceSettingsPage::retranslateUi()
     }
 
     handGroupBox->setTitle(tr("Hand layout"));
-    horizontalHandCheckBox.setText(tr("Display hand horizontally (wastes space)"));
+    horizontalHandCheckBox.setText(tr("Display hand horizontally (requires more space)"));
     leftJustifiedHandCheckBox.setText(tr("Enable left justification"));
 
     tableGroupBox->setTitle(tr("Table grid layout"));
