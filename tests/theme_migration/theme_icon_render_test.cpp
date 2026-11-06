@@ -1,6 +1,7 @@
 #include "interface/theme_icon.h"
 #include "interface/theme_icon_badge.h"
 #include "interface/theme_icon_fill.h"
+#include "interface/theme_icon_ink.h"
 #include "interface/theme_icon_sticker.h"
 #include "interface/theme_manager.h"
 #include "libcockatrice/utility/svg_recolor.h"
@@ -75,8 +76,22 @@ int countOpaquePixels(const QPixmap &pixmap, const QColor &expected)
     return count;
 }
 
-/** @brief Opaque pixels that are not the given rim color, i.e. the gradient fill. */
-int countOpaquePixelsOtherThan(const QPixmap &pixmap, const QColor &excluded)
+/**
+ * @brief The ink the engine resolves a neutral glyph to, for @p palette.
+ *
+ * Neutral glyphs are not painted with WindowText verbatim: theme_icon_ink
+ * borrows accent chroma and holds the result to a contrast floor. Tests that
+ * pin the rendered color ask the rule instead of restating it.
+ */
+QColor expectedNeutralInk(const QPalette &palette)
+{
+    return ThemeIconInk::glyphInk(palette.color(QPalette::Active, QPalette::WindowText),
+                                  palette.color(QPalette::Active, QPalette::Window),
+                                  palette.color(QPalette::Active, QPalette::Highlight));
+}
+
+/** @brief Opaque pixels that are not the given rim color, i.e. the gradient fill. */ int
+countOpaquePixelsOtherThan(const QPixmap &pixmap, const QColor &excluded)
 {
     const QImage image = pixmap.toImage();
     int count = 0;
@@ -152,11 +167,12 @@ TEST_F(ThemeIconRenderTest, ThemedIconFollowsPaletteModeAndDpr)
     const QIcon icon = loadThemedIcon(QStringLiteral("icons/search"));
     ASSERT_FALSE(icon.isNull());
 
+    const QColor firstInk = expectedNeutralInk(qApp->palette());
     const QPixmap normal = icon.pixmap(QSize(24, 24), 1.0);
     ASSERT_FALSE(normal.isNull());
     EXPECT_EQ(normal.size(), QSize(24, 24));
     EXPECT_DOUBLE_EQ(normal.devicePixelRatio(), 1.0);
-    EXPECT_GT(countOpaquePixels(normal, QColor(QStringLiteral("#123456"))), 0);
+    EXPECT_GT(countOpaquePixels(normal, firstInk), 0);
 
     const QPixmap hidpi = icon.pixmap(QSize(24, 24), 2.0);
     ASSERT_FALSE(hidpi.isNull());
@@ -165,8 +181,10 @@ TEST_F(ThemeIconRenderTest, ThemedIconFollowsPaletteModeAndDpr)
 
     palette.setColor(QPalette::WindowText, QColor(QStringLiteral("#abcdef")));
     qApp->setPalette(palette);
+    const QColor secondInk = expectedNeutralInk(qApp->palette());
+    EXPECT_NE(firstInk, secondInk) << "the icon did not follow the palette";
     const QPixmap flipped = icon.pixmap(QSize(24, 24), 1.0);
-    EXPECT_GT(countOpaquePixels(flipped, QColor(QStringLiteral("#abcdef"))), 0);
+    EXPECT_GT(countOpaquePixels(flipped, secondInk), 0);
 
     QPalette selectedPalette = qApp->palette();
     selectedPalette.setColor(QPalette::HighlightedText, QColor(QStringLiteral("#00ff00")));
@@ -179,6 +197,7 @@ TEST_F(ThemeIconRenderTest, ThemedIconFollowsPaletteModeAndDpr)
 TEST_F(ThemeIconRenderTest, SentinelUsesPaletteColor)
 {
     QPalette palette;
+    palette.setColor(QPalette::Window, QColor(Qt::black));
     palette.setColor(QPalette::WindowText, QColor(Qt::white));
     qApp->setPalette(palette);
 
@@ -186,7 +205,7 @@ TEST_F(ThemeIconRenderTest, SentinelUsesPaletteColor)
 
     ASSERT_FALSE(pixmap.isNull());
     EXPECT_EQ(pixmap.size(), QSize(24, 24));
-    EXPECT_GT(countOpaquePixels(pixmap, Qt::white), 0);
+    EXPECT_GT(countOpaquePixels(pixmap, expectedNeutralInk(qApp->palette())), 0);
 }
 
 TEST_F(ThemeIconRenderTest, NonSentinelSvgReturnsNull)
@@ -221,7 +240,7 @@ TEST_F(ThemeIconRenderTest, LowercaseSentinelIsResolved)
     const QPixmap pixmap = loadSentinelSvgPixmap(QStringLiteral("lower.svg"));
 
     ASSERT_FALSE(pixmap.isNull());
-    EXPECT_GT(countOpaquePixels(pixmap, QColor(QStringLiteral("#123456"))), 0);
+    EXPECT_GT(countOpaquePixels(pixmap, expectedNeutralInk(qApp->palette())), 0);
 }
 
 /**
@@ -279,7 +298,12 @@ TEST_F(ThemeIconRenderTest, SelectedPaletteTintUsesHighlightedText)
     qApp->setPalette(palette);
 
     const IconTint tint(QPalette::WindowText);
-    EXPECT_EQ(tint.resolve(QIcon::Normal), activeText);
+    // The normal ink is derived from the active text color, but it is icon ink
+    // rather than the text color itself.
+    EXPECT_NE(tint.resolve(QIcon::Normal), activeText);
+    EXPECT_EQ(tint.resolve(QIcon::Normal), expectedNeutralInk(qApp->palette()));
+    // A selected row paints on the highlight, so the ink is the palette's
+    // highlighted text rather than the icon ink.
     EXPECT_EQ(tint.resolve(QIcon::Selected), selectedText);
 }
 
@@ -1094,6 +1118,233 @@ TEST(IconBadgePreview, WritesPngsWhenRequested)
         painter.end();
         const QString path = QDir(outDir).absoluteFilePath(dark ? QStringLiteral("badge-preview-dark.png")
                                                                 : QStringLiteral("badge-preview-light.png"));
+        ASSERT_TRUE(image.save(path)) << path.toStdString();
+    }
+}
+
+namespace
+{
+/** @brief Palette roles the ink rule reads, from one shipped theme file. */
+struct InkPalette
+{
+    QColor text;
+    QColor window;
+    QColor button;
+    QColor accent;
+};
+
+/**
+ * @brief Loads a shipped palette file, or returns a default-constructed palette.
+ *
+ * The theme files are the only place the shipped values live, so the rule is
+ * tested against them rather than against a copy of them.
+ */
+InkPalette shippedPalette(const QString &theme, bool dark)
+{
+    const QString file =
+        QDir(QStringLiteral(COCKATRICE_SOURCE_DIR))
+            .absoluteFilePath(QStringLiteral("cockatrice/themes/%1/palette-default-%2.toml")
+                                  .arg(theme, dark ? QStringLiteral("dark") : QStringLiteral("light")));
+    const PaletteConfig config = PaletteConfig::fromFile(file);
+    if (!config.hasPalette()) {
+        return {};
+    }
+    const QPalette palette = config.apply(QPalette());
+    return {palette.color(QPalette::Active, QPalette::WindowText), palette.color(QPalette::Active, QPalette::Window),
+            palette.color(QPalette::Active, QPalette::Button), palette.color(QPalette::Active, QPalette::Highlight)};
+}
+} // namespace
+
+TEST(IconInk, GivesNeutralGlyphsAccentChroma)
+{
+    const InkPalette palette = shippedPalette(QStringLiteral("Fabric"), false);
+    ASSERT_TRUE(palette.text.isValid());
+
+    const QColor ink = ThemeIconInk::glyphInk(palette.text, palette.window, palette.accent);
+    EXPECT_NE(ink, palette.text) << "a glyph must not be painted with body-text ink verbatim";
+    // The borrowed accent is a lighter color than the near-black text ink, so
+    // the glyph gets a little lighter as well as more chromatic. What must not
+    // change is its legibility, its blue cast, and the fact that it reads as a
+    // richer color than plain text.
+    EXPECT_GT(ink.hsvSaturation(), palette.text.hsvSaturation()) << "the glyph gained no chroma";
+    EXPECT_GT(ink.blue(), ink.red()) << "accent chroma did not reach the glyph";
+    EXPECT_GE(ThemeIconInk::contrastRatio(ink, palette.window), ThemeIconInk::labelContrastFloor());
+}
+
+TEST(IconInk, MeetsTheLabelFloorOnEveryShippedPalette)
+{
+    const QString themesRoot =
+        QDir(QStringLiteral(COCKATRICE_SOURCE_DIR)).absoluteFilePath(QStringLiteral("cockatrice/themes"));
+    const QStringList themes = QDir(themesRoot).entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+    ASSERT_FALSE(themes.isEmpty());
+
+    int checked = 0;
+    for (const QString &theme : themes) {
+        for (const bool dark : {false, true}) {
+            const InkPalette palette = shippedPalette(theme, dark);
+            if (!palette.text.isValid()) {
+                continue;
+            }
+            ++checked;
+            const QColor ink = ThemeIconInk::glyphInk(palette.text, palette.window, palette.accent);
+            EXPECT_GE(ThemeIconInk::contrastRatio(ink, palette.window), ThemeIconInk::labelContrastFloor())
+                << theme.toStdString() << (dark ? " dark" : " light");
+        }
+    }
+    EXPECT_GT(checked, 0) << "no shipped palette was loadable";
+}
+
+TEST(IconInk, KeepsADeliberateHueWhenTheTextColorIsWeak)
+{
+    // A theme whose text color is deliberately low-contrast still gets a glyph
+    // that clears the floor, and the hue survives the adjustment.
+    const QColor surface(QStringLiteral("#f4f4f4"));
+    const QColor weakText(QStringLiteral("#c9c9c9"));
+    const QColor ink = ThemeIconInk::glyphInk(weakText, surface, QColor(QStringLiteral("#c9c9c9")));
+    EXPECT_GE(ThemeIconInk::contrastRatio(ink, surface), ThemeIconInk::labelContrastFloor());
+    EXPECT_LT(ink.value(), weakText.value());
+}
+
+/**
+ * @brief Writes the glyph-ink comparison sheet when asked; skipped otherwise.
+ *
+ * One row per accent share, so the trade-off between "still neutral chrome" and
+ * "clearly an icon" can be judged against the body text drawn beside the glyph.
+ * Lives in the test binary so the colors come from the same rule the engine uses.
+ */
+TEST(IconInkPreview, WritesPngsWhenRequested)
+{
+    qputenv("QT_QPA_PLATFORM", "offscreen");
+    ensureGuiApplication();
+
+    const QString outDir = qEnvironmentVariable("COCKATRICE_ICON_PREVIEW_DIR");
+    if (outDir.isEmpty()) {
+        GTEST_SKIP() << "set COCKATRICE_ICON_PREVIEW_DIR to write the preview PNGs";
+    }
+    ASSERT_TRUE(QDir().mkpath(outDir));
+
+    constexpr const char *GLYPHS[] = {"search", "info", "settings", "filter", "increment"};
+    constexpr int SIZES[] = {15, 16, 24, 48};
+    constexpr int LAST_SIZE = SIZES[std::size(SIZES) - 1];
+    constexpr int CELL_GAP = 10;
+
+    const auto renderLine = [](const QByteArray &svg, const QColor &tone, const QSize &size) {
+        QSvgRenderer renderer(resolveSvgColorSentinel(svg, tone.name(QColor::HexRgb).toLatin1()));
+        QPixmap pixmap(size);
+        pixmap.fill(Qt::transparent);
+        QPainter painter(&pixmap);
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        renderer.render(&painter);
+        return pixmap;
+    };
+
+    constexpr int MARGIN = 20;
+    constexpr int SIZE_LABEL_WIDTH = 46;
+    constexpr int BODY_WIDTH = 46;
+    constexpr int COLUMN_GAP = 28;
+    constexpr int ROW_HEIGHT = 58;
+    constexpr qreal DPR = 2.0;
+
+    // The same five glyphs at the sizes the client actually draws them, so the
+    // comparison is one the reviewer can read rather than a color swatch.
+    const int glyphsWidth =
+        static_cast<int>(std::size(GLYPHS)) * LAST_SIZE + (static_cast<int>(std::size(GLYPHS)) - 1) * CELL_GAP;
+    const int oldX = MARGIN + SIZE_LABEL_WIDTH + BODY_WIDTH;
+    const int newX = oldX + glyphsWidth + COLUMN_GAP;
+    const int logicalWidth = newX + glyphsWidth + MARGIN;
+    const int blockHeight = 46 + static_cast<int>(std::size(SIZES)) * ROW_HEIGHT + 10;
+    const int logicalHeight = MARGIN + 24 + 20 + 26 + 2 * blockHeight + MARGIN;
+
+    for (const bool dark : {false, true}) {
+        const InkPalette palette = shippedPalette(QStringLiteral("Fabric"), dark);
+        ASSERT_TRUE(palette.text.isValid());
+
+        QImage image(QSize(qRound(logicalWidth * DPR), qRound(logicalHeight * DPR)),
+                     QImage::Format_ARGB32_Premultiplied);
+        image.fill(palette.window);
+        QPainter painter(&image);
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+        painter.scale(DPR, DPR);
+
+        const QFont bodyFont(QStringLiteral("Sans"), 10);
+        const QFont labelFont(QStringLiteral("Sans"), 8);
+        const QFont captionFont(QStringLiteral("Sans"), 9, QFont::DemiBold);
+
+        qreal y = MARGIN;
+        painter.setPen(palette.text);
+        painter.setFont(QFont(QStringLiteral("Sans"), 11, QFont::DemiBold));
+        painter.drawText(QPointF(MARGIN, y), (dark ? QStringLiteral("Dark scheme") : QStringLiteral("Light scheme")) +
+                                                 QStringLiteral(" — neutral glyph ink"));
+        y += 18;
+        painter.setFont(labelFont);
+        painter.drawText(QPointF(MARGIN, y),
+                         QStringLiteral("Body text is the same in both columns; only the glyph ink changes."));
+        y += 20;
+
+        // The two colors as filled swatches: at 15-24px the glyph difference is
+        // a hue shift, and the hex pair makes it measurable at a glance.
+        const QColor windowOld = ThemeIconInk::glyphInk(palette.text, palette.window, palette.accent, 0.0);
+        const QColor windowNew = ThemeIconInk::glyphInk(palette.text, palette.window, palette.accent);
+        qreal swatchX = MARGIN;
+        for (const auto &[ink, label] : {std::pair<QColor, QString>(windowOld, QStringLiteral("before")),
+                                         std::pair<QColor, QString>(windowNew, QStringLiteral("after"))}) {
+            painter.setPen(Qt::NoPen);
+            painter.setBrush(ink);
+            painter.drawRoundedRect(QRectF(swatchX, y - 10, 14, 14), 3, 3);
+            painter.setBrush(Qt::NoBrush);
+            painter.setPen(palette.text);
+            painter.drawText(QPointF(swatchX + 20, y), QStringLiteral("%1 %2").arg(label, ink.name(QColor::HexRgb)));
+            swatchX += 150;
+        }
+        y += 24;
+
+        for (const bool onButton : {false, true}) {
+            const QColor surface = onButton ? palette.button : palette.window;
+            const QColor oldInk = ThemeIconInk::glyphInk(palette.text, surface, palette.accent, 0.0);
+            const QColor newInk = ThemeIconInk::glyphInk(palette.text, surface, palette.accent);
+
+            const qreal blockTop = y;
+            if (onButton) {
+                painter.fillRect(QRectF(0, blockTop, logicalWidth, blockHeight), surface);
+            }
+
+            painter.setPen(palette.text);
+            painter.setFont(captionFont);
+            painter.drawText(QPointF(MARGIN, blockTop + 14),
+                             onButton ? QStringLiteral("Button surface") : QStringLiteral("Window surface"));
+            painter.setFont(labelFont);
+            painter.drawText(QPointF(MARGIN, blockTop + 34), QStringLiteral("size"));
+            painter.drawText(QPointF(MARGIN + SIZE_LABEL_WIDTH, blockTop + 34), QStringLiteral("body"));
+            painter.drawText(QPointF(oldX, blockTop + 34), QStringLiteral("before: WindowText"));
+            painter.drawText(
+                QPointF(newX, blockTop + 34),
+                QStringLiteral("after: %1% accent ink").arg(qRound(ThemeIconInk::defaultAccentMix() * 100)));
+
+            qreal rowY = blockTop + 46;
+            for (const int side : SIZES) {
+                const qreal baseline = rowY + ROW_HEIGHT / 2.0 + 3.5;
+                painter.setFont(labelFont);
+                painter.drawText(QPointF(MARGIN, baseline), QStringLiteral("%1 px").arg(side));
+                painter.setFont(bodyFont);
+                painter.drawText(QPointF(MARGIN + SIZE_LABEL_WIDTH, baseline), QStringLiteral("Aa"));
+
+                for (std::size_t i = 0; i < std::size(GLYPHS); ++i) {
+                    const QByteArray svg = readIconSvg(GLYPHS[i]);
+                    ASSERT_FALSE(svg.isEmpty()) << GLYPHS[i];
+                    const qreal cellOffset = static_cast<qreal>(i) * (side + CELL_GAP);
+                    const qreal glyphY = rowY + (ROW_HEIGHT - side) / 2.0;
+                    painter.drawPixmap(QPointF(oldX + cellOffset, glyphY), renderLine(svg, oldInk, QSize(side, side)));
+                    painter.drawPixmap(QPointF(newX + cellOffset, glyphY), renderLine(svg, newInk, QSize(side, side)));
+                }
+                rowY += ROW_HEIGHT;
+            }
+            y = blockTop + blockHeight;
+        }
+
+        painter.end();
+        const QString path = QDir(outDir).absoluteFilePath(dark ? QStringLiteral("ink-preview-dark.png")
+                                                                : QStringLiteral("ink-preview-light.png"));
         ASSERT_TRUE(image.save(path)) << path.toStdString();
     }
 }

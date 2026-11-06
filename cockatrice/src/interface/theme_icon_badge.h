@@ -32,16 +32,6 @@
 namespace ThemeIconBadge
 {
 /**
- * @brief WCAG relative luminance, used to test a color against a background.
- *
- * Used by IconTint::resolve()'s selected-row contrast test.
- */
-double relativeLuminance(const QColor &color);
-
-/** @brief WCAG contrast ratio between two opaque colors, from 1.0 to 21.0. */
-double contrastRatio(const QColor &first, const QColor &second);
-
-/**
  * @brief Glyph color for a badge disc.
  *
  * White on the light scheme, the saturated tone darkened to an outline-dark ink
