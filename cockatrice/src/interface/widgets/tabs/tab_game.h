@@ -101,6 +101,8 @@ private:
     QAction *aInviteToGame = nullptr;
     QList<QAction *> phaseActions;
     QAction *aCardMenu;
+    /** @brief Placeholder submenu shown when no card is selected; reused instead of reallocated. */
+    QMenu *emptyCardMenu = nullptr;
 
     /**
      * @brief The actions associated with managing a QDockWidget

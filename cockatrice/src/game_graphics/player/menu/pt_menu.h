@@ -18,7 +18,7 @@ class PtMenu : public QMenu
     Q_OBJECT
 
 public:
-    explicit PtMenu(PlayerGraphicsItem *player);
+    explicit PtMenu(PlayerGraphicsItem *player, QWidget *parent);
     void retranslateUi();
     void setShortcutsActive();
 

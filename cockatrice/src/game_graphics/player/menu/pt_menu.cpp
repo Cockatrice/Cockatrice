@@ -9,7 +9,7 @@
 #include <libcockatrice/game/player/player_actions.h>
 #include <libcockatrice/game/player/player_logic.h>
 
-PtMenu::PtMenu(PlayerGraphicsItem *player) : QMenu(tr("Power / toughness"))
+PtMenu::PtMenu(PlayerGraphicsItem *player, QWidget *parent) : QMenu(tr("Power / toughness"), parent)
 {
     PlayerActions *playerActions = player->getLogic()->getPlayerActions();
 
