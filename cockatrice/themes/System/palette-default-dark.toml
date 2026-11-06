@@ -3,8 +3,14 @@
 # overrides. Only the identity and semantic app colors are provided here, so
 # buttons keep their classic greens while the actual palette stays native to
 # the OS.
+# Icon, IconStrong and IconSoft are deliberately absent: a theme with no
+# palette of its own derives its icon ink from the platform palette.
 [AppColors]
-AccentStrong        = #ff148c3c
-AccentSoft          = #ff78c850
-Positive            = #ff6dd58c
-Negative            = #ffff8a80
+AccentStrong         = #ff148c3c
+AccentSoft           = #ff78c850
+Positive             = #ff6dd58c
+PositiveStrong       = #ff99e2ae
+PositiveSoft         = #ff5e8873
+Negative             = #ffff8a80
+NegativeStrong       = #ffffb3ac
+NegativeSoft         = #ff9b7678

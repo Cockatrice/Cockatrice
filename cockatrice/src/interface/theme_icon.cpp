@@ -2,7 +2,6 @@
 
 #include "libcockatrice/utility/svg_recolor.h"
 #include "theme_icon_badge.h"
-#include "theme_icon_fill.h"
 #include "theme_icon_ink.h"
 #include "theme_icon_sticker.h"
 #include "theme_manager.h"
@@ -318,6 +317,35 @@ private:
     mutable bool hasResolvedAsset = false;
     mutable bool hasIntrinsicSize = false;
 };
+
+/**
+ * @brief The role an emphasis level selects inside a base role's family.
+ *
+ * The theme authors all three levels, so emphasis is a lookup instead of a
+ * color computation. Naming a variant (`IconStrong`, `PositiveSoft`) is an
+ * explicit request and keeps that role at every emphasis; only the base roles
+ * take part in the mapping. Accent roles have no neutral middle member, so they
+ * are always used as named.
+ */
+AppColor::Role emphasisRole(AppColor::Role role, IconEmphasis emphasis)
+{
+    switch (role) {
+        case AppColor::Icon:
+            return emphasis == IconEmphasis::Primary ? AppColor::IconStrong
+                   : emphasis == IconEmphasis::Quiet ? AppColor::IconSoft
+                                                     : AppColor::Icon;
+        case AppColor::Positive:
+            return emphasis == IconEmphasis::Primary ? AppColor::PositiveStrong
+                   : emphasis == IconEmphasis::Quiet ? AppColor::PositiveSoft
+                                                     : AppColor::Positive;
+        case AppColor::Negative:
+            return emphasis == IconEmphasis::Primary ? AppColor::NegativeStrong
+                   : emphasis == IconEmphasis::Quiet ? AppColor::NegativeSoft
+                                                     : AppColor::Negative;
+        default:
+            return role;
+    }
+}
 } // namespace
 
 IconTint::IconTint(QPalette::ColorRole role, IconEmphasis _emphasis) : paletteRole(role), emphasis(_emphasis)
@@ -342,7 +370,6 @@ IconTint IconTint::quiet()
 QColor IconTint::resolve(QIcon::Mode mode) const
 {
     const QPalette &palette = qApp->palette();
-    const QColor surface = palette.color(QPalette::Active, QPalette::Window);
     const QColor accent = palette.color(QPalette::Active, QPalette::Highlight);
 
     if (source == Source::AppColor) {
@@ -350,13 +377,11 @@ QColor IconTint::resolve(QIcon::Mode mode) const
         if (mode == QIcon::Disabled) {
             return palette.color(QPalette::Disabled, QPalette::WindowText);
         }
-        // The three treatments paint the same tone: a line glyph, a badge disc
-        // and a sticker fill must not disagree on how saturated the role is.
-        // The fill treatments apply this floor themselves, so this only changes
-        // the line path, and only for the desaturated dark-scheme tones. The
-        // emphasis then decides how loud that tone is, without changing its hue.
-        const QColor color =
-            ThemeIconInk::forEmphasis(ThemeIconFill::saturated(themeManager->appColor(appRole)), surface, emphasis);
+        // The theme authors one color per emphasis level, so the paint path
+        // uses the resolved role verbatim. The filled treatments apply their
+        // own saturation floor when a disc or a fill needs mass; a line glyph
+        // keeps the color the author picked.
+        const QColor color = themeManager->appColor(emphasisRole(appRole, emphasis));
         if (mode != QIcon::Selected) {
             return color;
         }
@@ -373,14 +398,10 @@ QColor IconTint::resolve(QIcon::Mode mode) const
     const QPalette::ColorRole effective =
         mode == QIcon::Selected && paletteRole == QPalette::WindowText ? QPalette::HighlightedText : paletteRole;
     const QColor color = palette.color(group, effective);
-    // A neutral label role is inked as an icon, not as body text: it borrows a
-    // little accent chroma and is held to a contrast floor. Semantic roles and
-    // the selected-row swap keep the color the palette gave them.
+    // A neutral label role resolves to the theme's authored icon ink. Semantic
+    // roles and the selected-row swap keep the color the palette gave them.
     if (group == QPalette::Active && (effective == QPalette::WindowText || effective == QPalette::Text)) {
-        // The primary action of a surface takes the accent itself; the other
-        // levels stay neutral. Emphasis then sets the contrast the glyph pays.
-        const QColor base = emphasis == IconEmphasis::Primary ? accent : ThemeIconInk::glyphInk(color, surface, accent);
-        return ThemeIconInk::forEmphasis(base, surface, emphasis);
+        return themeManager->appColor(emphasisRole(AppColor::Icon, emphasis));
     }
     return color;
 }
