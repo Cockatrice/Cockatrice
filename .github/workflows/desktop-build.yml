@@ -230,18 +230,19 @@ jobs:
       #   Fedora 45 debug      Debug + suite       660 MB               850M
       #   Fedora 45 release    Release + package   614 MB               800M
       #
-      # That is about 3.9 GB of bounds, and with the fixed entries above it puts the quota at
-      # roughly 7.8 GB of 10 - so only legs worth their share get one. A leg keeps no cache
-      # when it duplicates another leg's coverage (Ubuntu 26.04 behind Debian 13's Release +
-      # suite; macOS 15 and macOS 27 Debug behind macOS 14) or finishes well inside the
-      # Windows leg (Servatrice covers the server alone in 4.7 min). All three macOS legs
-      # run cold: macOS 14's 800M cache served 42% and saved about 32s on a 20 min leg that
-      # is already shorter than Windows, so that bound is better spent here. The four Linux
-      # legs that stay compile the client on the toolchains a change can break and are the
-      # ones a cache shortens by the most. Measured job totals on master 2026-11-04 also show
-      # the ceiling this leaves: Windows 10 is 29.5 min and compiles for 23.7 of it with no
-      # compiler cache at all, so Windows still sets the pull-request wall clock no matter
-      # how warm these legs are (see build-vcpkg).
+      # That is about 3.9 GB of bounds, and with the fixed entries above (about 4.4 GB) it
+      # puts the quota at roughly 8.3 GB of 10 - so only legs worth their share get one. A
+      # leg keeps no cache when it duplicates another leg's coverage (Ubuntu 26.04 behind
+      # Debian 13's Release + suite; macOS 15 and macOS 27 Debug behind macOS 14) or
+      # finishes well inside the Windows leg (Servatrice covers the server alone in 4.7
+      # min). All three macOS legs run cold: macOS 14's 800M cache served 42% and saved
+      # about 32s on a 20 min leg that is already shorter than Windows, so that bound is
+      # better spent here. The four Linux legs that stay compile the client on the
+      # toolchains a change can break and are the ones a cache shortens by the most.
+      # Measured job totals on master 2026-11-04 also show the ceiling this leaves:
+      # Windows 10 is 29.5 min and compiles for 23.7 of it with no compiler cache at all, so
+      # Windows still sets the pull-request wall clock no matter how warm these legs are
+      # (see build-vcpkg).
       #
       # Measured on master 2026-11-06: Fedora 45 debug/release hit 99.5% at 80% full, while
       # Arch served 75% at 96% full and Debian 13 82% at 96% - both evict entries they need.
