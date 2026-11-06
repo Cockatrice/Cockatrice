@@ -458,12 +458,25 @@ QColor defaultAppColor(AppColor::Role role, bool dark)
     switch (role) {
         case AppColor::AccentStrong:
         case AppColor::AccentSoft:
-            // Derived from the palette highlight by ThemeManager::appColor().
+        // The neutral icon family is palette-derived like the accent, so a
+        // theme without a palette of its own (System) keeps following the
+        // platform instead of pinning one scheme's ink.
+        case AppColor::Icon:
+        case AppColor::IconStrong:
+        case AppColor::IconSoft:
             return {};
         case AppColor::Positive:
             return QColor(dark ? QStringLiteral("#6dd58c") : QStringLiteral("#1b7f3b"));
+        case AppColor::PositiveStrong:
+            return QColor(dark ? QStringLiteral("#99e2ae") : QStringLiteral("#104a22"));
+        case AppColor::PositiveSoft:
+            return QColor(dark ? QStringLiteral("#5e8873") : QStringLiteral("#5d7f6f"));
         case AppColor::Negative:
             return QColor(dark ? QStringLiteral("#ff8a80") : QStringLiteral("#b3261e"));
+        case AppColor::NegativeStrong:
+            return QColor(dark ? QStringLiteral("#ffb3ac") : QStringLiteral("#7c1b15"));
+        case AppColor::NegativeSoft:
+            return QColor(dark ? QStringLiteral("#9b7678") : QStringLiteral("#9a6c6f"));
     }
 
     return {};
