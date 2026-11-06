@@ -17,6 +17,32 @@
 #include <QStringView>
 
 /**
+ * @brief Selects how a `currentColor` glyph is painted.
+ *
+ * Style is a treatment, not a color: the tint still decides the tone, and the
+ * style decides how much shape carries that tone.
+ *
+ * Line is the default and the behavior every caller had before the axis
+ * existed: the recolored glyph alone, at the author's stroke weight. It stays
+ * the right choice for navigation, menu and toolbar glyphs, where a row of
+ * badges would outshout the content.
+ *
+ * Badge reproduces the pre-#7595 ready/not-ready art: a filled disc, a dark ring
+ * and a contrast glyph derived from the tone. It costs attention as a filled
+ * shape, so it is opt-in per call site and it is not a generic semantic
+ * treatment: the add/remove/delete icons were filled glyphs with an outline and
+ * no disc, so badging them would invent a look the UI never had. Authored art
+ * that carries its own colors is never badged; it falls back to the asset path.
+ * Disabled icons also fall back to the line glyph, because a filled disc at full
+ * mass does not read as unavailable.
+ */
+enum class IconStyle
+{
+    Line,  // the recolored glyph alone
+    Badge, // filled disc + dark ring + contrast glyph
+};
+
+/**
  * @brief Selects the color that replaces the `currentColor` sentinel.
  *
  * A palette role follows Qt's structural palette. An application color carries
@@ -64,9 +90,11 @@ private:
  *               extension (for example `icons/search`), matching themePixmap().
  * @param tint Color that replaces the sentinel: a palette role or a semantic
  *             application color. Defaults to WindowText.
+ * @param style Treatment of the glyph: a line, or the badge shape that keeps
+ *              the pre-migration filled-art reading. Defaults to Line.
  * @return An icon that follows the application palette.
  */
-QIcon loadThemedIcon(QStringView prefix, IconTint tint = {});
+QIcon loadThemedIcon(QStringView prefix, IconTint tint = {}, IconStyle style = IconStyle::Line);
 
 /**
  * @brief Renders a resolved theme SVG when it carries the `currentColor` sentinel.
@@ -79,9 +107,14 @@ QIcon loadThemedIcon(QStringView prefix, IconTint tint = {});
  * @param tint Color that replaces the sentinel: a palette role or a semantic
  *             application color. Defaults to WindowText.
  * @param size Pixel size to render at; an empty size uses the SVG's intrinsic size.
+ * @param style Treatment of the glyph: a line, or a badge. A badge on a
+ *              non-sentinel asset stays null, like the line path.
  * @return The recolored pixmap, or a null pixmap when the asset is not a
  *         sentinel-carrying SVG.
  */
-QPixmap loadSentinelSvgPixmap(const QString &resolvedPath, IconTint tint = {}, const QSize &size = {});
+QPixmap loadSentinelSvgPixmap(const QString &resolvedPath,
+                              IconTint tint = {},
+                              const QSize &size = {},
+                              IconStyle style = IconStyle::Line);
 
 #endif // THEME_ICON_H

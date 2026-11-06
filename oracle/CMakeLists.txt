@@ -32,6 +32,7 @@ set(oracle_SOURCES
     ../cockatrice/src/interface/pixel_map_generator.cpp
     ../cockatrice/src/interface/theme_config.cpp
     ../cockatrice/src/interface/theme_icon.cpp
+    ../cockatrice/src/interface/theme_icon_badge.cpp
     ../cockatrice/src/interface/theme_manager.cpp
     ${VERSION_STRING_CPP}
 )
