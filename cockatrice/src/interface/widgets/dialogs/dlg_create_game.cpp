@@ -1,337 +1,107 @@
 #include "dlg_create_game.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../interface/widgets/game_hosting/game_creation_options.h"
-#include "../interface/widgets/tabs/tab_room.h"
+#include "../game_hosting/create_game_form_widget.h"
+#include "../game_hosting/game_creation_options.h"
+#include "../tabs/tab_room.h"
 #include "libcockatrice/protocol/pb/response.pb.h"
 #include "libcockatrice/protocol/pb/room_commands.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
-#include "libcockatrice/utility/macros.h"
+#include "libcockatrice/protocol/pending_command.h"
+#include "libcockatrice/settings/game_settings.h"
 
-#include <QCheckBox>
-#include <QDebug>
 #include <QDialogButtonBox>
-#include <QGridLayout>
-#include <QGroupBox>
 #include <QLabel>
-#include <QLineEdit>
-#include <QMapIterator>
-#include <QMessageBox>
 #include <QPushButton>
-#include <QRadioButton>
-#include <QSet>
-#include <QSharedPointer>
-#include <QSize>
-#include <QSpinBox>
 #include <QVBoxLayout>
-#include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
-#include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/settings/game_settings.h>
-#include <libcockatrice/utility/string_limits.h>
-#include <qnamespace.h>
-#include <string>
-
-class QWidget;
-
-void DlgCreateGame::sharedCtor()
-{
-    rememberGameSettings = new QCheckBox(tr("Re&member settings"));
-    descriptionLabel = new QLabel(tr("&Description:"));
-    descriptionEdit = new QLineEdit;
-    descriptionEdit->setMaxLength(MAX_NAME_LENGTH);
-    descriptionLabel->setBuddy(descriptionEdit);
-
-    maxPlayersLabel = new QLabel(tr("P&layers:"));
-    maxPlayersEdit = new QSpinBox();
-    maxPlayersEdit->setMinimum(1);
-    maxPlayersEdit->setMaximum(100);
-    maxPlayersEdit->setValue(2);
-    maxPlayersLabel->setBuddy(maxPlayersEdit);
-
-    auto *generalGrid = new QGridLayout;
-    generalGrid->addWidget(descriptionLabel, 0, 0);
-    generalGrid->addWidget(descriptionEdit, 0, 1);
-    generalGrid->addWidget(maxPlayersLabel, 1, 0);
-    generalGrid->addWidget(maxPlayersEdit, 1, 1);
-    generalGroupBox = new QGroupBox(tr("General"));
-    generalGroupBox->setLayout(generalGrid);
-
-    auto *gameTypeLayout = new QVBoxLayout;
-    QMapIterator<int, QString> gameTypeIterator(gameTypes);
-    while (gameTypeIterator.hasNext()) {
-        gameTypeIterator.next();
-        auto *gameTypeRadioButton = new QRadioButton(gameTypeIterator.value(), this);
-        gameTypeLayout->addWidget(gameTypeRadioButton);
-        gameTypeCheckBoxes.insert(gameTypeIterator.key(), gameTypeRadioButton);
-        bool isChecked = SettingsCache::instance().game().getGameTypes().contains(gameTypeIterator.value() + ", ");
-        gameTypeCheckBoxes[gameTypeIterator.key()]->setChecked(isChecked);
-    }
-    auto *gameTypeGroupBox = new QGroupBox(tr("Game type"));
-    gameTypeGroupBox->setLayout(gameTypeLayout);
-
-    passwordLabel = new QLabel(tr("&Password:"));
-    passwordEdit = new QLineEdit;
-    passwordEdit->setMaxLength(MAX_NAME_LENGTH);
-    passwordLabel->setBuddy(passwordEdit);
-
-    onlyBuddiesCheckBox = new QCheckBox(tr("Only &buddies can join"));
-    onlyRegisteredCheckBox = new QCheckBox(tr("Only &registered users can join"));
-    if (room && room->getUserInfo()->user_level() & ServerInfo_User::IsRegistered) {
-        onlyRegisteredCheckBox->setChecked(true);
-    } else {
-        onlyBuddiesCheckBox->setEnabled(false);
-        onlyRegisteredCheckBox->setEnabled(false);
-    }
-
-    auto *joinRestrictionsLayout = new QGridLayout;
-    joinRestrictionsLayout->addWidget(passwordLabel, 0, 0);
-    joinRestrictionsLayout->addWidget(passwordEdit, 0, 1);
-    joinRestrictionsLayout->addWidget(onlyBuddiesCheckBox, 1, 0, 1, 2);
-    joinRestrictionsLayout->addWidget(onlyRegisteredCheckBox, 2, 0, 1, 2);
-
-    auto *joinRestrictionsGroupBox = new QGroupBox(tr("Joining restrictions"));
-    joinRestrictionsGroupBox->setLayout(joinRestrictionsLayout);
-
-    spectatorsAllowedCheckBox = new QCheckBox(tr("&Spectators can watch"));
-    spectatorsAllowedCheckBox->setChecked(true);
-    connect(spectatorsAllowedCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &DlgCreateGame::spectatorsAllowedChanged);
-    spectatorsNeedPasswordCheckBox = new QCheckBox(tr("Spectators &need a password to watch"));
-    spectatorsCanTalkCheckBox = new QCheckBox(tr("Spectators can &chat"));
-    spectatorsSeeEverythingCheckBox = new QCheckBox(tr("Spectators can see &hands"));
-    createGameAsSpectatorCheckBox = new QCheckBox(tr("Create game as spectator"));
-    auto *spectatorsLayout = new QVBoxLayout;
-    spectatorsLayout->addWidget(spectatorsAllowedCheckBox);
-    spectatorsLayout->addWidget(spectatorsNeedPasswordCheckBox);
-    spectatorsLayout->addWidget(spectatorsCanTalkCheckBox);
-    spectatorsLayout->addWidget(spectatorsSeeEverythingCheckBox);
-    spectatorsLayout->addWidget(createGameAsSpectatorCheckBox);
-    spectatorsGroupBox = new QGroupBox(tr("Spectators"));
-    spectatorsGroupBox->setLayout(spectatorsLayout);
-
-    startingLifeTotalLabel = new QLabel(tr("Starting life total:"));
-    startingLifeTotalEdit = new QSpinBox();
-    startingLifeTotalEdit->setMinimum(1);
-    startingLifeTotalEdit->setMaximum(99999); ///< Arbitrary but we can raise this when people start complaining.
-    startingLifeTotalEdit->setValue(20);
-    startingLifeTotalLabel->setBuddy(startingLifeTotalEdit);
-
-    shareDecklistsOnLoadCheckBox = new QCheckBox(tr("Open decklists in lobby"));
-
-    shufflePlayersCheckBox = new QCheckBox(tr("Randomize turn order (seats) on each game start"));
-
-    createGameAsJudgeCheckBox = new QCheckBox(tr("Create game as judge"));
-
-    auto *gameSetupOptionsLayout = new QGridLayout;
-    gameSetupOptionsLayout->addWidget(startingLifeTotalLabel, 0, 0);
-    gameSetupOptionsLayout->addWidget(startingLifeTotalEdit, 0, 1);
-    gameSetupOptionsLayout->addWidget(shareDecklistsOnLoadCheckBox, 1, 0, 1, 2);
-    gameSetupOptionsLayout->addWidget(shufflePlayersCheckBox, 2, 0, 1, 2);
-    if (room && room->getUserInfo()->user_level() & ServerInfo_User::IsJudge) {
-        gameSetupOptionsLayout->addWidget(createGameAsJudgeCheckBox, 3, 0, 1, 2);
-    } else {
-        createGameAsJudgeCheckBox->setChecked(false);
-        createGameAsJudgeCheckBox->setHidden(true);
-    }
-    gameSetupOptionsGroupBox = new QGroupBox(tr("Game setup options"));
-    gameSetupOptionsGroupBox->setLayout(gameSetupOptionsLayout);
-
-    auto *grid = new QGridLayout;
-
-    // Top row
-    grid->addWidget(generalGroupBox, 0, 0);
-    grid->addWidget(joinRestrictionsGroupBox, 0, 1);
-
-    // Middle row: left column
-    grid->addWidget(gameTypeGroupBox, 1, 0);
-
-    // Middle row: right column (game setup + spectators)
-    auto *rightLayout = new QVBoxLayout;
-    rightLayout->addWidget(spectatorsGroupBox, Qt::AlignTop); // top
-    rightLayout->addWidget(gameSetupOptionsGroupBox);         // bottom
-
-    grid->addLayout(rightLayout, 1, 1);
-
-    // Bottom row
-    grid->addWidget(rememberGameSettings, 3, 0, 1, 2); // span both columns if needed
-
-    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
-    connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgCreateGame::reject);
-
-    auto *mainLayout = new QVBoxLayout;
-    mainLayout->addLayout(grid);
-    mainLayout->addWidget(buttonBox);
-
-    setLayout(mainLayout);
-
-    setFixedHeight(sizeHint().height());
-}
 
 DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameTypes, QWidget *parent)
-    : QDialog(parent), room(_room), gameTypes(_gameTypes)
+    : QDialog(parent), room(_room)
 {
-    sharedCtor();
+    const bool registered = room && (room->getUserInfo()->user_level() & ServerInfo_User::IsRegistered);
+    const bool judge = room && (room->getUserInfo()->user_level() & ServerInfo_User::IsJudge);
 
-    rememberGameSettings->setChecked(SettingsCache::instance().game().getRememberGameSettings());
-    descriptionEdit->setText(SettingsCache::instance().game().getGameDescription());
-    maxPlayersEdit->setValue(SettingsCache::instance().game().getMaxPlayers());
-    if (room && room->getUserInfo()->user_level() & ServerInfo_User::IsRegistered) {
-        onlyBuddiesCheckBox->setChecked(SettingsCache::instance().game().getOnlyBuddies());
-        onlyRegisteredCheckBox->setChecked(SettingsCache::instance().game().getOnlyRegistered());
-    } else {
-        onlyBuddiesCheckBox->setEnabled(false);
-        onlyRegisteredCheckBox->setEnabled(false);
+    form = new CreateGameFormWidget(_gameTypes, registered, judge, this);
+    form->setRememberSettingsChecked(SettingsCache::instance().game().getRememberGameSettings());
+    form->setOptions(GameCreationOptions::fromSettings(SettingsCache::instance().game(), _gameTypes, registered));
+    if (!form->isRememberSettingsChecked()) {
+        form->resetToDefaults();
     }
-    spectatorsAllowedCheckBox->setChecked(SettingsCache::instance().game().getSpectatorsAllowed());
-    spectatorsNeedPasswordCheckBox->setChecked(SettingsCache::instance().game().getSpectatorsNeedPassword());
-    spectatorsCanTalkCheckBox->setChecked(SettingsCache::instance().game().getSpectatorsCanTalk());
-    spectatorsSeeEverythingCheckBox->setChecked(SettingsCache::instance().game().getSpectatorsCanSeeEverything());
-    createGameAsSpectatorCheckBox->setChecked(SettingsCache::instance().game().getCreateGameAsSpectator());
-    startingLifeTotalEdit->setValue(SettingsCache::instance().game().getDefaultStartingLifeTotal());
-    shareDecklistsOnLoadCheckBox->setChecked(SettingsCache::instance().game().getShareDecklistsOnLoad());
-    shufflePlayersCheckBox->setChecked(SettingsCache::instance().game().getShufflePlayers());
+    form->focusDescription();
 
-    if (!rememberGameSettings->isChecked()) {
-        actReset();
-    }
+    errorLabel = new QLabel(this);
+    errorLabel->setObjectName("createGameErrorLabel");
+    errorLabel->setWordWrap(true);
+    errorLabel->setVisible(false);
 
-    descriptionEdit->setFocus();
-    clearButton = new QPushButton(tr("&Clear"));
+    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, this);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgCreateGame::reject);
+    clearButton = new QPushButton(tr("&Clear"), this);
     buttonBox->addButton(QDialogButtonBox::Cancel);
     buttonBox->addButton(clearButton, QDialogButtonBox::ActionRole);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgCreateGame::actOK);
     connect(clearButton, &QPushButton::clicked, this, &DlgCreateGame::actReset);
 
+    auto *mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(form);
+    mainLayout->addWidget(errorLabel);
+    mainLayout->addWidget(buttonBox);
+
+    setLayout(mainLayout);
     setWindowTitle(tr("Create game"));
 }
 
 DlgCreateGame::DlgCreateGame(const ServerInfo_Game &gameInfo, const QMap<int, QString> &_gameTypes, QWidget *parent)
-    : QDialog(parent), room(0), gameTypes(_gameTypes)
+    : QDialog(parent), room(nullptr)
 {
-    sharedCtor();
+    form = new CreateGameFormWidget(_gameTypes, false, false, this);
+    form->setOptions(GameCreationOptions::fromGameInfo(gameInfo, _gameTypes));
+    form->setReadOnly(true);
 
-    rememberGameSettings->setEnabled(false);
-    descriptionEdit->setEnabled(false);
-    maxPlayersEdit->setEnabled(false);
-    passwordEdit->setEnabled(false);
-    onlyBuddiesCheckBox->setEnabled(false);
-    onlyRegisteredCheckBox->setEnabled(false);
-    spectatorsAllowedCheckBox->setEnabled(false);
-    spectatorsNeedPasswordCheckBox->setEnabled(false);
-    spectatorsCanTalkCheckBox->setEnabled(false);
-    spectatorsSeeEverythingCheckBox->setEnabled(false);
-    createGameAsSpectatorCheckBox->setEnabled(false);
-    startingLifeTotalEdit->setEnabled(false);
-    shareDecklistsOnLoadCheckBox->setEnabled(false);
-    shufflePlayersCheckBox->setEnabled(false);
-
-    descriptionEdit->setText(QString::fromStdString(gameInfo.description()));
-    maxPlayersEdit->setValue(gameInfo.max_players());
-    onlyBuddiesCheckBox->setChecked(gameInfo.only_buddies());
-    onlyRegisteredCheckBox->setChecked(gameInfo.only_registered());
-    spectatorsAllowedCheckBox->setChecked(gameInfo.spectators_allowed());
-    spectatorsNeedPasswordCheckBox->setChecked(gameInfo.spectators_need_password());
-    spectatorsCanTalkCheckBox->setChecked(gameInfo.spectators_can_chat());
-    spectatorsSeeEverythingCheckBox->setChecked(gameInfo.spectators_omniscient());
-    shareDecklistsOnLoadCheckBox->setChecked(gameInfo.share_decklists_on_load());
-    shufflePlayersCheckBox->setChecked(gameInfo.shuffle_players());
-
-    QSet<int> types;
-    for (int i = 0; i < gameInfo.game_types_size(); ++i) {
-        types.insert(gameInfo.game_types(i));
-    }
-
-    QMapIterator<int, QString> gameTypeIterator(gameTypes);
-    while (gameTypeIterator.hasNext()) {
-        gameTypeIterator.next();
-
-        QRadioButton *gameTypeCheckBox = gameTypeCheckBoxes.value(gameTypeIterator.key());
-        gameTypeCheckBox->setEnabled(false);
-        gameTypeCheckBox->setChecked(types.contains(gameTypeIterator.key()));
-    }
-
+    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, this);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgCreateGame::accept);
 
+    auto *mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(form);
+    mainLayout->addWidget(buttonBox);
+
+    setLayout(mainLayout);
     setWindowTitle(tr("Game information"));
 }
 
 void DlgCreateGame::actReset()
 {
-    descriptionEdit->setText("");
-    maxPlayersEdit->setValue(2);
-
-    passwordEdit->setText("");
-    onlyBuddiesCheckBox->setChecked(false);
-    onlyRegisteredCheckBox->setChecked(room && room->getUserInfo()->user_level() & ServerInfo_User::IsRegistered);
-
-    spectatorsAllowedCheckBox->setChecked(true);
-    spectatorsNeedPasswordCheckBox->setChecked(false);
-    spectatorsCanTalkCheckBox->setChecked(false);
-    spectatorsSeeEverythingCheckBox->setChecked(false);
-    createGameAsSpectatorCheckBox->setChecked(false);
-
-    startingLifeTotalEdit->setValue(20);
-    shareDecklistsOnLoadCheckBox->setChecked(false);
-    shufflePlayersCheckBox->setChecked(false);
-    createGameAsJudgeCheckBox->setChecked(false);
-
-    QMapIterator<int, QRadioButton *> gameTypeCheckBoxIterator(gameTypeCheckBoxes);
-    while (gameTypeCheckBoxIterator.hasNext()) {
-        gameTypeCheckBoxIterator.next();
-        // must set auto enclusive to false to be able to set the check to false
-        gameTypeCheckBoxIterator.value()->setAutoExclusive(false);
-        gameTypeCheckBoxIterator.value()->setChecked(false);
-        gameTypeCheckBoxIterator.value()->setAutoExclusive(true);
-    }
-
-    descriptionEdit->setFocus();
+    form->resetToDefaults();
+    clearError();
 }
 
 void DlgCreateGame::actOK()
 {
-    GameCreationOptions options;
-    options.description = descriptionEdit->text();
-    options.password = passwordEdit->text();
-    options.maxPlayers = maxPlayersEdit->value();
-    options.onlyBuddies = onlyBuddiesCheckBox->isChecked();
-    options.onlyRegistered = onlyRegisteredCheckBox->isChecked();
-    options.spectatorsAllowed = spectatorsAllowedCheckBox->isChecked();
-    options.spectatorsNeedPassword = spectatorsNeedPasswordCheckBox->isChecked();
-    options.spectatorsCanTalk = spectatorsCanTalkCheckBox->isChecked();
-    options.spectatorsSeeEverything = spectatorsSeeEverythingCheckBox->isChecked();
-    options.joinAsJudge = createGameAsJudgeCheckBox->isChecked();
-    options.joinAsSpectator = createGameAsSpectatorCheckBox->isChecked();
-    options.startingLifeTotal = startingLifeTotalEdit->value();
-    options.shareDecklistsOnLoad = shareDecklistsOnLoadCheckBox->isChecked();
-    options.shufflePlayers = shufflePlayersCheckBox->isChecked();
+    clearError();
 
-    auto _gameTypes = QString();
-    QMapIterator<int, QRadioButton *> gameTypeCheckBoxIterator(gameTypeCheckBoxes);
-    while (gameTypeCheckBoxIterator.hasNext()) {
-        gameTypeCheckBoxIterator.next();
-        if (gameTypeCheckBoxIterator.value()->isChecked()) {
-            options.gameTypeIds.append(gameTypeCheckBoxIterator.key());
-            _gameTypes += gameTypeCheckBoxIterator.value()->text() + ", ";
-        }
-    }
-
+    const GameCreationOptions options = form->options();
     Command_CreateGame cmd = options.toCreateGameCommand();
 
-    SettingsCache::instance().game().setRememberGameSettings(rememberGameSettings->isChecked());
-    if (rememberGameSettings->isChecked()) {
-        SettingsCache::instance().game().setGameDescription(descriptionEdit->text());
-        SettingsCache::instance().game().setMaxPlayers(maxPlayersEdit->value());
-        SettingsCache::instance().game().setOnlyBuddies(onlyBuddiesCheckBox->isChecked());
-        SettingsCache::instance().game().setOnlyRegistered(onlyRegisteredCheckBox->isChecked());
-        SettingsCache::instance().game().setSpectatorsAllowed(spectatorsAllowedCheckBox->isChecked());
-        SettingsCache::instance().game().setSpectatorsNeedPassword(spectatorsNeedPasswordCheckBox->isChecked());
-        SettingsCache::instance().game().setSpectatorsCanTalk(spectatorsCanTalkCheckBox->isChecked());
-        SettingsCache::instance().game().setSpectatorsCanSeeEverything(spectatorsSeeEverythingCheckBox->isChecked());
-        SettingsCache::instance().game().setCreateGameAsSpectator(createGameAsSpectatorCheckBox->isChecked());
-        SettingsCache::instance().game().setDefaultStartingLifeTotal(startingLifeTotalEdit->value());
-        SettingsCache::instance().game().setShareDecklistsOnLoad(shareDecklistsOnLoadCheckBox->isChecked());
-        SettingsCache::instance().game().setShufflePlayers(shufflePlayersCheckBox->isChecked());
-        SettingsCache::instance().game().setGameTypes(_gameTypes);
+    const bool rememberSettings = form->isRememberSettingsChecked();
+    auto &gameSettings = SettingsCache::instance().game();
+    gameSettings.setRememberGameSettings(rememberSettings);
+    if (rememberSettings) {
+        gameSettings.setGameDescription(options.description);
+        gameSettings.setMaxPlayers(options.maxPlayers);
+        gameSettings.setOnlyBuddies(options.onlyBuddies);
+        gameSettings.setOnlyRegistered(options.onlyRegistered);
+        gameSettings.setSpectatorsAllowed(options.spectatorsAllowed);
+        gameSettings.setSpectatorsNeedPassword(options.spectatorsNeedPassword);
+        gameSettings.setSpectatorsCanTalk(options.spectatorsCanTalk);
+        gameSettings.setSpectatorsCanSeeEverything(options.spectatorsSeeEverything);
+        gameSettings.setCreateGameAsSpectator(options.joinAsSpectator);
+        gameSettings.setDefaultStartingLifeTotal(options.startingLifeTotal);
+        gameSettings.setShareDecklistsOnLoad(options.shareDecklistsOnLoad);
+        gameSettings.setShufflePlayers(options.shufflePlayers);
+        gameSettings.setGameTypes(form->selectedGameTypesSettingString());
     }
+
     PendingCommand *pend = room->prepareRoomCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &DlgCreateGame::checkResponse);
     room->sendRoomCommand(pend);
@@ -346,14 +116,26 @@ void DlgCreateGame::checkResponse(const Response &response)
     if (response.response_code() == Response::RespOk) {
         accept();
     } else {
-        QMessageBox::critical(this, tr("Error"), tr("Server error."));
-        return;
+        showError(tr("Server error."));
     }
 }
 
-void DlgCreateGame::spectatorsAllowedChanged(QT_STATE_CHANGED_T state)
+void DlgCreateGame::showError(const QString &message)
 {
-    spectatorsNeedPasswordCheckBox->setEnabled(state);
-    spectatorsCanTalkCheckBox->setEnabled(state);
-    spectatorsSeeEverythingCheckBox->setEnabled(state);
+    if (!errorLabel) {
+        return;
+    }
+    errorLabel->setText(message);
+    errorLabel->setVisible(true);
+    adjustSize();
+}
+
+void DlgCreateGame::clearError()
+{
+    if (!errorLabel) {
+        return;
+    }
+    errorLabel->clear();
+    errorLabel->setVisible(false);
+    adjustSize();
 }

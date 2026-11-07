@@ -2,7 +2,6 @@
  * @file dlg_create_game.h
  * @ingroup RoomDialogs
  */
-//! \todo Document this file.
 
 #ifndef DLG_CREATEGAME_H
 #define DLG_CREATEGAME_H
@@ -10,21 +9,15 @@
 #include <QDialog>
 #include <QMap>
 #include <QString>
-#include <libcockatrice/utility/macros.h>
 #include <qtmetamacros.h>
 
-class QCheckBox;
+class CreateGameFormWidget;
 class QDialogButtonBox;
-class QGroupBox;
 class QLabel;
-class QLineEdit;
 class QPushButton;
-class QRadioButton;
-class QSpinBox;
 class Response;
 class ServerInfo_Game;
 class TabRoom;
-class QWidget;
 
 class DlgCreateGame : public QDialog
 {
@@ -36,27 +29,16 @@ private slots:
     void actOK();
     void actReset();
     void checkResponse(const Response &response);
-    void spectatorsAllowedChanged(QT_STATE_CHANGED_T state);
 
 private:
     TabRoom *room;
-    QMap<int, QString> gameTypes;
-    QMap<int, QRadioButton *> gameTypeCheckBoxes;
+    CreateGameFormWidget *form = nullptr;
+    QDialogButtonBox *buttonBox = nullptr;
+    QPushButton *clearButton = nullptr;
+    QLabel *errorLabel = nullptr;
 
-    QGroupBox *generalGroupBox, *spectatorsGroupBox, *gameSetupOptionsGroupBox;
-    QLabel *descriptionLabel, *passwordLabel, *maxPlayersLabel, *startingLifeTotalLabel, *shareDecklistsOnLoadLabel;
-    QLineEdit *descriptionEdit, *passwordEdit;
-    QSpinBox *maxPlayersEdit, *startingLifeTotalEdit;
-    QCheckBox *onlyBuddiesCheckBox, *onlyRegisteredCheckBox;
-    QCheckBox *spectatorsAllowedCheckBox, *spectatorsNeedPasswordCheckBox, *spectatorsCanTalkCheckBox,
-        *spectatorsSeeEverythingCheckBox, *createGameAsJudgeCheckBox, *createGameAsSpectatorCheckBox;
-    QCheckBox *shareDecklistsOnLoadCheckBox;
-    QCheckBox *shufflePlayersCheckBox;
-    QDialogButtonBox *buttonBox;
-    QPushButton *clearButton;
-    QCheckBox *rememberGameSettings;
-
-    void sharedCtor();
+    void showError(const QString &message);
+    void clearError();
 };
 
-#endif
+#endif // DLG_CREATEGAME_H

@@ -1,7 +1,99 @@
 #include "interface/widgets/game_hosting/game_creation_options.h"
 
 #include <gtest/gtest.h>
+#include <libcockatrice/interfaces/interface_game_settings_provider.h>
 #include <libcockatrice/protocol/pb/room_commands.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
+
+namespace
+{
+class FakeGameSettings : public IGameSettingsProvider
+{
+public:
+    [[nodiscard]] QString getGameDescription() const override
+    {
+        return description;
+    }
+    [[nodiscard]] int getMaxPlayers() const override
+    {
+        return maxPlayers;
+    }
+    [[nodiscard]] QString getGameTypes() const override
+    {
+        return gameTypes;
+    }
+    [[nodiscard]] bool getOnlyBuddies() const override
+    {
+        return onlyBuddies;
+    }
+    [[nodiscard]] bool getOnlyRegistered() const override
+    {
+        return onlyRegistered;
+    }
+    [[nodiscard]] bool getSpectatorsAllowed() const override
+    {
+        return spectatorsAllowed;
+    }
+    [[nodiscard]] bool getSpectatorsNeedPassword() const override
+    {
+        return spectatorsNeedPassword;
+    }
+    [[nodiscard]] bool getSpectatorsCanTalk() const override
+    {
+        return spectatorsCanTalk;
+    }
+    [[nodiscard]] bool getSpectatorsCanSeeEverything() const override
+    {
+        return spectatorsCanSeeEverything;
+    }
+    [[nodiscard]] bool getCreateGameAsSpectator() const override
+    {
+        return createGameAsSpectator;
+    }
+    [[nodiscard]] int getDefaultStartingLifeTotal() const override
+    {
+        return defaultStartingLifeTotal;
+    }
+    [[nodiscard]] bool getShareDecklistsOnLoad() const override
+    {
+        return shareDecklistsOnLoad;
+    }
+    [[nodiscard]] bool getShufflePlayers() const override
+    {
+        return shufflePlayers;
+    }
+    [[nodiscard]] bool getRememberGameSettings() const override
+    {
+        return false;
+    }
+    [[nodiscard]] bool getLocalGameRememberSettings() const override
+    {
+        return false;
+    }
+    [[nodiscard]] int getLocalGameMaxPlayers() const override
+    {
+        return 0;
+    }
+    [[nodiscard]] int getLocalGameStartingLifeTotal() const override
+    {
+        return 0;
+    }
+
+    QString description;
+    int maxPlayers = 2;
+    QString gameTypes;
+    bool onlyBuddies = false;
+    bool onlyRegistered = false;
+    bool spectatorsAllowed = true;
+    bool spectatorsNeedPassword = false;
+    bool spectatorsCanTalk = false;
+    bool spectatorsCanSeeEverything = false;
+    bool createGameAsSpectator = false;
+    int defaultStartingLifeTotal = 20;
+    bool shareDecklistsOnLoad = false;
+    bool shufflePlayers = false;
+};
+} // namespace
 
 TEST(GameCreationOptions, DefaultsMatchTheDialog)
 {
@@ -90,4 +182,126 @@ TEST(GameCreationOptions, DescriptionWhitespaceIsSimplified)
     const Command_CreateGame cmd = options.toCreateGameCommand();
 
     EXPECT_EQ(cmd.description(), "a b");
+}
+
+TEST(GameCreationOptions, FromSettingsCopiesEveryRememberedField)
+{
+    FakeGameSettings settings;
+    settings.description = "Remembered game";
+    settings.maxPlayers = 6;
+    settings.onlyBuddies = true;
+    settings.onlyRegistered = true;
+    settings.spectatorsAllowed = false;
+    settings.spectatorsNeedPassword = true;
+    settings.spectatorsCanTalk = true;
+    settings.spectatorsCanSeeEverything = true;
+    settings.createGameAsSpectator = true;
+    settings.defaultStartingLifeTotal = 40;
+    settings.shareDecklistsOnLoad = true;
+    settings.shufflePlayers = true;
+
+    const GameCreationOptions options = GameCreationOptions::fromSettings(settings, {}, true);
+
+    EXPECT_EQ(options.description, "Remembered game");
+    EXPECT_EQ(options.maxPlayers, 6);
+    EXPECT_TRUE(options.onlyBuddies);
+    EXPECT_TRUE(options.onlyRegistered);
+    EXPECT_FALSE(options.spectatorsAllowed);
+    EXPECT_TRUE(options.spectatorsNeedPassword);
+    EXPECT_TRUE(options.spectatorsCanTalk);
+    EXPECT_TRUE(options.spectatorsSeeEverything);
+    EXPECT_TRUE(options.joinAsSpectator);
+    EXPECT_EQ(options.startingLifeTotal, 40);
+    EXPECT_TRUE(options.shareDecklistsOnLoad);
+    EXPECT_TRUE(options.shufflePlayers);
+}
+
+TEST(GameCreationOptions, FromSettingsDropsJoinRestrictionsForUnregisteredHosts)
+{
+    FakeGameSettings settings;
+    settings.onlyBuddies = true;
+    settings.onlyRegistered = true;
+
+    const GameCreationOptions options = GameCreationOptions::fromSettings(settings, {}, false);
+
+    EXPECT_FALSE(options.onlyBuddies);
+    EXPECT_FALSE(options.onlyRegistered);
+}
+
+TEST(GameCreationOptions, FromSettingsMatchesGameTypesByTheLegacyNameList)
+{
+    FakeGameSettings settings;
+    settings.gameTypes = "Draft, Commander, ";
+    const QMap<int, QString> gameTypes{{1, "Draft"}, {2, "Commander"}, {3, "Standard"}};
+
+    const GameCreationOptions options = GameCreationOptions::fromSettings(settings, gameTypes, true);
+
+    EXPECT_EQ(options.gameTypeIds, QList<int>({1, 2}));
+}
+
+TEST(GameCreationOptions, FromSettingsDoesNotMatchGameTypesWithoutTheLegacySeparator)
+{
+    FakeGameSettings settings;
+    settings.gameTypes = "Draft Commander";
+    const QMap<int, QString> gameTypes{{1, "Draft"}, {2, "Commander"}};
+
+    const GameCreationOptions options = GameCreationOptions::fromSettings(settings, gameTypes, true);
+
+    EXPECT_TRUE(options.gameTypeIds.isEmpty());
+}
+
+TEST(GameCreationOptions, FromGameInfoCopiesTheVisibleFields)
+{
+    ServerInfo_Game gameInfo;
+    gameInfo.set_description("Some game");
+    gameInfo.set_max_players(4);
+    gameInfo.set_only_buddies(true);
+    gameInfo.set_only_registered(true);
+    gameInfo.set_spectators_allowed(false);
+    gameInfo.set_spectators_need_password(true);
+    gameInfo.set_spectators_can_chat(true);
+    gameInfo.set_spectators_omniscient(true);
+    gameInfo.set_share_decklists_on_load(true);
+    gameInfo.set_shuffle_players(true);
+    gameInfo.add_game_types(2);
+
+    const QMap<int, QString> gameTypes{{1, "Draft"}, {2, "Commander"}};
+    const GameCreationOptions options = GameCreationOptions::fromGameInfo(gameInfo, gameTypes);
+
+    EXPECT_EQ(options.description, "Some game");
+    EXPECT_EQ(options.maxPlayers, 4);
+    EXPECT_TRUE(options.onlyBuddies);
+    EXPECT_TRUE(options.onlyRegistered);
+    EXPECT_FALSE(options.spectatorsAllowed);
+    EXPECT_TRUE(options.spectatorsNeedPassword);
+    EXPECT_TRUE(options.spectatorsCanTalk);
+    EXPECT_TRUE(options.spectatorsSeeEverything);
+    EXPECT_TRUE(options.shareDecklistsOnLoad);
+    EXPECT_TRUE(options.shufflePlayers);
+    EXPECT_EQ(options.gameTypeIds, QList<int>({2}));
+}
+
+TEST(GameCreationOptions, FromGameInfoLeavesUnshownFieldsAtDefaults)
+{
+    ServerInfo_Game gameInfo;
+    gameInfo.set_max_players(3);
+
+    const GameCreationOptions options = GameCreationOptions::fromGameInfo(gameInfo, {});
+
+    EXPECT_TRUE(options.password.isEmpty());
+    EXPECT_EQ(options.startingLifeTotal, 20);
+    EXPECT_FALSE(options.joinAsJudge);
+    EXPECT_FALSE(options.joinAsSpectator);
+}
+
+TEST(GameCreationOptions, FromGameInfoIgnoresUnknownGameTypeIds)
+{
+    ServerInfo_Game gameInfo;
+    gameInfo.add_game_types(7);
+    gameInfo.add_game_types(9);
+
+    const QMap<int, QString> gameTypes{{1, "Draft"}, {7, "Commander"}};
+    const GameCreationOptions options = GameCreationOptions::fromGameInfo(gameInfo, gameTypes);
+
+    EXPECT_EQ(options.gameTypeIds, QList<int>({7}));
 }
