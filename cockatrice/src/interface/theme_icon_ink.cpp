@@ -14,13 +14,13 @@ namespace
 constexpr double ACCENT_MIX = 0.70;
 // An icon that labels a control is carrying text; see ui-assets.md.
 constexpr double LABEL_CONTRAST_FLOOR = 4.5;
-// A primary glyph has to out-read the default one on both schemes. The accent is
-// a mid-tone: on a light surface it is *lighter* than the neutral ink, and on a
-// dark surface it is *darker*, so neither "the accent as-is" nor "a contrast
-// floor shared with the default" keeps the primary above the secondary. A 7:1
-// target does: it darkens the accent on light schemes and lightens it on dark
-// ones, so the primary level always out-contrasts the default level.
-constexpr double PRIMARY_CONTRAST = 7.0;
+// A primary glyph is the most chromatic member of its family. Contrast cannot
+// order the ladder: on a dark surface the highest-contrast tone is the palest
+// one, so a contrast target makes the primary look like a washed-out secondary
+// and the ladder reads inverted. Primary instead raises the saturation by this
+// many HSV points over the secondary and then solves the value back to the text
+// floor, so it is louder in color at the same legibility.
+constexpr int PRIMARY_SATURATION_STEP = 64;
 // A quiet glyph is blended this far into its surface. It has to stay findable
 // without competing with the actions beside it.
 constexpr double QUIET_BLEND = 0.55;
@@ -105,11 +105,59 @@ double labelContrastFloor()
     return LABEL_CONTRAST_FLOOR;
 }
 
+namespace
+{
+/** @brief The luminance a color needs to reach @p ratio against @p surface. */
+double targetLuminance(const QColor &surface, double ratio)
+{
+    const double surfaceLuminance = ThemeIconInk::relativeLuminance(surface);
+    return surfaceLuminance > 0.5 ? (surfaceLuminance + 0.05) / ratio - 0.05 : (surfaceLuminance + 0.05) * ratio - 0.05;
+}
+
+/**
+ * @brief Raises a color's saturation, then solves its value for the floor.
+ *
+ * Saturation is raised before the value is solved, because reaching a contrast
+ * floor by adding white is what desaturates a tone in the first place. If the
+ * hue cannot reach the floor at the raised saturation inside the gamut, the step
+ * shrinks until it can, so an already-vivid tone keeps what it has. A gray has
+ * no saturation to raise and falls back to the contrast search.
+ */
+QColor chromaticStep(const QColor &color, const QColor &surface, double floor, int stepPoints)
+{
+    if (color.hue() < 0) {
+        return ThemeIconInk::reachContrast(color, surface, floor);
+    }
+
+    const double target = targetLuminance(surface, floor);
+    const int hue = color.hue();
+    const int secondary = color.hsvSaturation();
+    const int primary = qMin(255, secondary + stepPoints);
+    for (int saturation = primary; saturation > secondary; --saturation) {
+        if (ThemeIconInk::relativeLuminance(QColor::fromHsv(hue, saturation, 255)) < target) {
+            continue;
+        }
+        int low = 0;
+        int high = 255;
+        for (int search = 0; search < CONTRAST_SEARCH_STEPS; ++search) {
+            const int middle = (low + high) / 2;
+            if (ThemeIconInk::relativeLuminance(QColor::fromHsv(hue, saturation, middle)) >= target) {
+                high = middle;
+            } else {
+                low = middle;
+            }
+        }
+        return QColor::fromHsv(hue, saturation, high).toRgb();
+    }
+    return ThemeIconInk::reachContrast(color, surface, floor);
+}
+} // namespace
+
 QColor forEmphasis(const QColor &color, const QColor &surface, IconEmphasis emphasis)
 {
     switch (emphasis) {
         case IconEmphasis::Primary:
-            return reachContrast(color, surface, PRIMARY_CONTRAST).toRgb();
+            return chromaticStep(color, surface, LABEL_CONTRAST_FLOOR, PRIMARY_SATURATION_STEP).toRgb();
         case IconEmphasis::Quiet:
             return reachContrast(blend(color, surface, QUIET_BLEND), surface, QUIET_CONTRAST_FLOOR).toRgb();
         case IconEmphasis::Secondary:
@@ -120,7 +168,7 @@ QColor forEmphasis(const QColor &color, const QColor &surface, IconEmphasis emph
 
 double primaryContrastFloor()
 {
-    return PRIMARY_CONTRAST;
+    return LABEL_CONTRAST_FLOOR;
 }
 
 double quietBlend()
