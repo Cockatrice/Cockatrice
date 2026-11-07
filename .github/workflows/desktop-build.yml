@@ -603,17 +603,14 @@ jobs:
             target: 14    # EOL 2026-09-14
             runner: xcode-27    # https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md
 
-            ccache_eviction_age: 7d
             cmake_generator: Ninja
             make_package: 1
             override_target: 14
             package_suffix: "-macOS14"
-            persist_ccache: 'false'    # 42% hits saved ~32s on a 20 min leg already under Windows
             qt_version: 6.11.*
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Apple
             type: Release
-            use_ccache: 1
             vcpkg_deployment_target: 14
             vcpkg_scope: 'vcpkg/macos14-arm64-xcode26.6/'
             vcpkg_upload: 1    # only one leg per vcpkg_scope hands its archives over
@@ -622,17 +619,14 @@ jobs:
             target: 15    # EOL 2027-??
             runner: xcode-27    # https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md
 
-            ccache_eviction_age: 7d
             cmake_generator: Ninja
             make_package: 1
             override_target: 15
             package_suffix: "-macOS15"
-            persist_ccache: 'false'    # 16.5 min: shorter than the Windows leg
             qt_version: 6.11.*
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Apple
             type: Release
-            use_ccache: 1
             vcpkg_deployment_target: 14
             vcpkg_scope: 'vcpkg/macos14-arm64-xcode26.6/'
 
@@ -640,14 +634,11 @@ jobs:
             target: 27
             runner: xcode-27    # https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md
 
-            ccache_eviction_age: 7d
             cmake_generator: Ninja
-            persist_ccache: 'false'    # 15.8 min: shorter than the Windows leg
             qt_version: 6.11.*
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Apple
             type: Debug
-            use_ccache: 1
             vcpkg_deployment_target: 14
             vcpkg_scope: 'vcpkg/macos14-arm64-xcode26.6/'
 
@@ -679,17 +670,9 @@ jobs:
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 100
     env:
-      CCACHE_DIR: ${{ github.workspace }}/.cache/
-      # No macOS leg keeps a compiler cache. One configuration is about 600 MB of objects at
-      # -g1, so a useful bound is 800M, and the quota is better spent on the Linux legs whose
-      # bounds still miss (see the sizing comment in build-linux). Measured on master
-      # 2026-11-06, macOS 14's 800M cache served 42% of calls and saved about 32s on a 20 min
-      # job that is already shorter than the Windows leg; macOS 15 and macOS 27 Debug
-      # duplicate its coverage. All three run cold.
-      CCACHE_SIZE: ${{ matrix.ccache_size || '700M' }}
-      PERSIST_CCACHE: ${{ matrix.persist_ccache || 'true' }}
-      # MSVC has no -g level, so the Windows leg does not ask for one; it has no compiler
-      # cache to shrink anyway (see the sizing comment in build-linux).
+      # No leg in this job keeps a compiler cache: neither the macOS legs nor the Windows
+      # leg can fill one across runs. See the note on the removed macOS ccache steps below.
+      # MSVC has no -g level, so the Windows leg does not ask for one.
       COCKATRICE_DEBUG_INFO_LEVEL: ${{ matrix.os != 'Windows' && github.ref_type != 'tag' && '1' || '' }}
 
     # Shared with build-vcpkg-nightly so the two leg sets run the same steps.
@@ -705,17 +688,11 @@ jobs:
         with:
           msbuild-architecture: x64
 
-      - name: "[macOS] Setup ccache"
-        if: matrix.os == 'macOS' && matrix.use_ccache == 1
-        run: brew install ccache
-
-      - name: "[macOS] Restore compiler cache (ccache)"
-        if: matrix.os == 'macOS' && matrix.use_ccache == 1 && env.PERSIST_CCACHE == 'true'
-        id: restore_ccache
-        uses: actions/cache/restore@v6
-        with:
-          key: ccache-${{ matrix.os }}${{ matrix.override_target }}-${{ matrix.runner }}
-          path: ${{ env.CCACHE_DIR }}
+      # No macOS leg runs ccache. A restored macOS cache served 42% of calls and saved
+      # about 32s on a 20 min leg that is already shorter than the Windows leg, which did
+      # not pay for its 800M slice of the quota; with nothing restored, the remaining
+      # intra-run hits are 3% and the hashing is pure overhead on ~1160 compiles, so the
+      # steps that installed and restored ccache are gone rather than merely disabled.
 
       - name: "[macOS] Install aqtinstall"
         if: matrix.os == 'macOS'
@@ -822,7 +799,6 @@ jobs:
         shell: bash
         env:
           BUILDTYPE: '${{ matrix.type }}'
-          CCACHE_EVICTION_AGE: ${{ matrix.ccache_eviction_age }}
           CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
           # Tag builds only: artifacts from master pushes and PR branches must not report to
           # Sentry. Forks get no secrets on pull_request, so they keep the mock fallback either way.
@@ -837,7 +813,6 @@ jobs:
           MAKE_PACKAGE: '${{ matrix.make_package }}'
           PACKAGE_SUFFIX: '${{ matrix.package_suffix }}'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
-          USE_CCACHE: ${{ matrix.use_ccache }}
           # Only pushes to the default branch may write the shared binary cache: the
           # archives a run compiles are only as trustworthy as the code they were
           # built from, and only merged code may populate the scope that master and
@@ -1038,25 +1013,6 @@ jobs:
           path: ${{ runner.temp }}/vcpkg-new
           retention-days: 1
 
-      # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
-      - name: "[macOS] Delete remote compiler cache (ccache)"
-        if: matrix.os == 'macOS' && matrix.use_ccache == 1 && env.PERSIST_CCACHE == 'true' && github.ref == 'refs/heads/master' && steps.restore_ccache.outputs.cache-hit
-        continue-on-error: true
-        env:
-          CACHE_PRIMARY_KEY: ${{ steps.restore_ccache.outputs.cache-primary-key }}
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if gh cache delete --repo "$GITHUB_REPOSITORY" "$CACHE_PRIMARY_KEY"; then
-            echo "Cache deleted successfully"
-          fi
-
-      - name: "[macOS] Cache updated compiler cache (ccache)"
-        if: matrix.os == 'macOS' && matrix.use_ccache == 1 && env.PERSIST_CCACHE == 'true' && github.ref == 'refs/heads/master'
-        uses: actions/cache/save@v6
-        with:
-          key: ${{ steps.restore_ccache.outputs.cache-primary-key }}
-          path: ${{ env.CCACHE_DIR }}
-
       - name: "[macOS] Sign app bundle"
         if: matrix.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null
         id: sign_macos
@@ -1177,7 +1133,6 @@ jobs:
             runner: macos-15-intel    # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-Readme.md
                                       # macos-26-intel is very slow and fails in CPack during DMG config if not increasing Finder timeout
 
-            ccache_eviction_age: 7d
             cmake_generator: Ninja
             make_package: 1
             override_target: 13
@@ -1186,7 +1141,6 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Intel
             type: Release
-            use_ccache: 1
             vcpkg_scope: 'vcpkg/macos13-x64-xcode26.3/'
             vcpkg_upload: 1    # only one leg per vcpkg_scope hands its archives over
 
@@ -1197,12 +1151,6 @@ jobs:
     if: github.event_name == 'schedule' || github.ref_type == 'tag'
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 100
-    env:
-      CCACHE_DIR: ${{ github.workspace }}/.cache/
-      # Like build-linux-nightly: this leg keeps no compiler cache, so the quota stays with
-      # the pull-request legs (see PERSIST_CCACHE there).
-      PERSIST_CCACHE: 'false'
-      CCACHE_SIZE: 600M
     steps: *vcpkg-steps
 
   prune-caches:
