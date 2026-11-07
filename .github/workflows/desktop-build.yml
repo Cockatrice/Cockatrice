@@ -150,7 +150,7 @@ jobs:
             allow-failure: yes
             package: skip    # We are packaged in Arch already
             debug_test: yes    # see the note on Fedora 45 below
-            ccache_size: 1200M    # Debug plus the suite: measured 820 MB at -g1; 850M thrashed
+            ccache_size: 1200M    # Debug plus the suite: 680 MB working set at -g1; 850M thrashed
 
           - distro: Servatrice_Debian
             version: 12
@@ -165,7 +165,7 @@ jobs:
             version: 13
 
             package: DEB
-            ccache_size: 1050M    # Release plus the suite: measured 770 MB at -g1; 800M thrashed
+            ccache_size: 1050M    # Release plus the suite: 625 MB working set at -g1; 800M thrashed
 
           # The single Fedora leg used to build Debug for the suite and Release for the
           # package in one job (measured on Fedora 44: 30.8 min, the only leg slower than
@@ -225,8 +225,8 @@ jobs:
       # whole configuration therefore buys almost nothing, and the quota goes to fewer legs
       # at a size that holds one:
       #
-      #   Arch                 Debug + suite       820 MB working set   1200M
-      #   Debian 13            Release + suite     770 MB               1050M
+      #   Arch                 Debug + suite       680 MB working set   1200M
+      #   Debian 13            Release + suite     625 MB               1050M
       #   Fedora 45 debug      Debug + suite       660 MB               850M
       #   Fedora 45 release    Release + package   614 MB               800M
       #
@@ -246,8 +246,11 @@ jobs:
       #
       # Measured on master 2026-11-06: Fedora 45 debug/release hit 99.5% at 80% full, while
       # Arch served 75% at 96% full and Debian 13 82% at 96% - both evict entries they need.
-      # Their working sets measure 820 MB and 770 MB, so the bounds above hold one whole
-      # configuration with headroom instead of thrashing. The sanitize leg's 1.2G cache is
+      # A cold 3G run on 2026-11-07 measured one configuration at 680 MB (Arch) and 625 MB
+      # (Debian 13), so the old 850M/800M bounds already exceeded the working set. They
+      # thrashed because commit-to-commit churn filled the ~170 MB of slack and evicted live
+      # entries. The bounds above leave 520/425 MB for that churn, so the working set stays
+      # resident across compiler and image updates. The sanitize leg's 1.2G cache is
       # nightly-only now, and macOS 14's 800M is dropped; that is what funds the increase.
       #
       # Re-add a leg only with a bound that holds its whole configuration: a smaller one is
