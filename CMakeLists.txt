@@ -53,11 +53,12 @@ else()
   )
 endif()
 
-# ccache does not support MSVC and must not auto-engage on Windows
-# (it is installed unintentionally on the Windows CI runner).
-# NOTE: this keys off the target OS, so a mingw/Ninja configuration on Windows
-# also opts out of ccache even though the GNUCXX branch below supports it.
-if(USE_CCACHE AND NOT WIN32)
+# ccache drives MSVC too (since 4.7), but only when the compiler writes debug
+# information into the object file: /Zi and /ZI keep it in a shared PDB, and ccache
+# reports them as unsupported rather than risk a stale one. The MSVC flags below
+# therefore use /Z7. MSVC precompiled headers are cached as well, with the same
+# sloppiness the other toolchains need.
+if(USE_CCACHE)
   find_program(CCACHE_PROGRAM ccache)
   if(CCACHE_PROGRAM)
     # Support Unix Makefiles and Ninja
@@ -71,10 +72,10 @@ if(USE_CCACHE AND NOT WIN32)
     # check for every project on the machine, not just this one.
     execute_process(COMMAND ${CCACHE_PROGRAM} --set-config sloppiness=pch_defines,time_macros)
     message(STATUS "Found CCache ${CCACHE_PROGRAM}")
+  else()
+    # An explicit opt-in must not disappear silently.
+    message(STATUS "ccache requested but not found; building without a compiler cache")
   endif()
-elseif(USE_CCACHE AND WIN32)
-  # An explicit opt-in must not disappear silently on Windows.
-  message(STATUS "ccache disabled: not supported for the MSVC toolchain on Windows")
 endif()
 
 if(WIN32 OR USE_VCPKG)
@@ -173,7 +174,10 @@ endif()
 # Define proper compilation flags
 if(MSVC)
   # Disable Warning C4251, C++20 compatibility, Multi-threaded Builds, Warn Detection, Unwind Semantics, Debug Symbols
-  set(CMAKE_CXX_FLAGS "/wd4251 /Zc:__cplusplus /std:c++20 /permissive- /W4 /MP /EHsc /Zi")
+  # /Z7 rather than /Zi: it puts the debug information in each object file instead of a
+  # compiler-shared PDB, which is what ccache can cache (see the USE_CCACHE block above).
+  # The linker still merges it into the PDB that /DEBUG produces below.
+  set(CMAKE_CXX_FLAGS "/wd4251 /Zc:__cplusplus /std:c++20 /permissive- /W4 /MP /EHsc /Z7")
   # Visual Studio: Maximum Optimization, Multi-threaded DLL
   set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD")
   # Visual Studio: No Optimization, Multi-threaded Debug DLL

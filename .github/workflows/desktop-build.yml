@@ -229,9 +229,10 @@ jobs:
       #   Debian 13            Release + suite     625 MB               800M
       #   Fedora 45 debug      Debug + suite       660 MB               850M
       #   Fedora 45 release    Release + package   614 MB               800M
+      #   Windows 10           Release + package   1.2 GB working set   1300M
       #
-      # That is 3.3 GB of bounds, and with the fixed entries above (about 4.4 GB) it puts
-      # the quota at roughly 7.7 GB of 10 - so only legs worth their share get one. A leg
+      # That is 4.6 GB of bounds, and with the fixed entries above (about 4.4 GB) it puts
+      # the quota at roughly 9.0 GB of 10 - so only legs worth their share get one. A leg
       # keeps no cache when it duplicates another leg's coverage (Ubuntu 26.04 behind
       # Debian 13's Release + suite; the macOS legs behind the Linux ones) or finishes well
       # inside the Windows leg (Servatrice covers the server alone in 4.7 min). A macOS
@@ -240,9 +241,10 @@ jobs:
       # the client on the toolchains a change can break and are the ones a cache shortens
       # by the most.
       # Measured job totals on master 2026-11-04 also show the ceiling this leaves:
-      # Windows 10 is 29.5 min and compiles for 23.7 of it with no compiler cache at all, so
-      # Windows still sets the pull-request wall clock no matter how warm these legs are
-      # (see build-vcpkg).
+      # Windows 10 is 29.5 min and compiles for 23.7 of it, so Windows sets the
+      # pull-request wall clock no matter how warm these legs are. That is why the Windows
+      # leg is the one macOS's share went to (see build-vcpkg): MSVC has no -g level to
+      # shrink, and with /Z7 the whole configuration is cacheable, PCH included.
       #
       # Steady-state master data corrected this on 2026-11-07: Arch 90.1% and Debian 13
       # 96.75% per-run hits at the 850M/800M bounds, Fedora 45 debug 99.18% and release
@@ -657,6 +659,9 @@ jobs:
             qt_version: 6.11.*
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             type: Release
+            ccache_eviction_age: 7d
+            ccache_size: 1300M    # Release plus the package: 1.2 GB working set at /Z7
+            use_ccache: 1
             # Scope is named after the vs2026 toolchain, not the generator: the
             # ABI hash covers cl.exe, which is identical, so this leg keeps
             # restoring the warm archives. Renaming would orphan them.
@@ -670,8 +675,13 @@ jobs:
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 100
     env:
-      # No leg in this job keeps a compiler cache: neither the macOS legs nor the Windows
-      # leg can fill one across runs. See the note on the removed macOS ccache steps below.
+      # Only the Windows leg keeps a compiler cache; the macOS legs build without one
+      # (see the note where their ccache steps used to be). ccache drives MSVC as long as
+      # the compiler emits /Z7, which CMakeLists.txt sets for exactly this reason, and it
+      # caches the PCH-backed targets with the sloppiness that .ci/compile.sh re-asserts.
+      CCACHE_DIR: ${{ github.workspace }}/.cache/
+      CCACHE_SIZE: ${{ matrix.ccache_size || '700M' }}
+      PERSIST_CCACHE: ${{ matrix.persist_ccache || 'true' }}
       # MSVC has no -g level, so the Windows leg does not ask for one.
       COCKATRICE_DEBUG_INFO_LEVEL: ${{ matrix.os != 'Windows' && github.ref_type != 'tag' && '1' || '' }}
 
@@ -687,6 +697,19 @@ jobs:
         uses: microsoft/setup-msbuild@v3
         with:
           msbuild-architecture: x64
+
+      - name: "[Windows] Setup ccache"
+        if: matrix.os == 'Windows' && matrix.use_ccache == 1
+        shell: bash
+        run: choco install ccache --no-progress -y
+
+      - name: "[Windows] Restore compiler cache (ccache)"
+        if: matrix.os == 'Windows' && matrix.use_ccache == 1 && env.PERSIST_CCACHE == 'true'
+        id: restore_ccache
+        uses: actions/cache/restore@v6
+        with:
+          key: ccache-${{ matrix.os }}${{ matrix.target }}
+          path: ${{ env.CCACHE_DIR }}
 
       # No macOS leg runs ccache. A restored macOS cache served 42% of calls and saved
       # about 32s on a 20 min leg that is already shorter than the Windows leg, which did
@@ -799,6 +822,7 @@ jobs:
         shell: bash
         env:
           BUILDTYPE: '${{ matrix.type }}'
+          CCACHE_EVICTION_AGE: ${{ matrix.ccache_eviction_age }}
           CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
           # Tag builds only: artifacts from master pushes and PR branches must not report to
           # Sentry. Forks get no secrets on pull_request, so they keep the mock fallback either way.
@@ -813,6 +837,7 @@ jobs:
           MAKE_PACKAGE: '${{ matrix.make_package }}'
           PACKAGE_SUFFIX: '${{ matrix.package_suffix }}'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
+          USE_CCACHE: ${{ matrix.use_ccache }}
           # Only pushes to the default branch may write the shared binary cache: the
           # archives a run compiles are only as trustworthy as the code they were
           # built from, and only merged code may populate the scope that master and
@@ -1013,6 +1038,27 @@ jobs:
           path: ${{ runner.temp }}/vcpkg-new
           retention-days: 1
 
+      # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
+      - name: "[Windows] Delete remote compiler cache (ccache)"
+        if: matrix.os == 'Windows' && matrix.use_ccache == 1 && env.PERSIST_CCACHE == 'true' && github.ref == 'refs/heads/master' && steps.restore_ccache.outputs.cache-hit
+        continue-on-error: true
+        # Bash, not the runner's default pwsh, which cannot parse this `if`.
+        shell: bash
+        env:
+          CACHE_PRIMARY_KEY: ${{ steps.restore_ccache.outputs.cache-primary-key }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh cache delete --repo "$GITHUB_REPOSITORY" "$CACHE_PRIMARY_KEY"; then
+            echo "Cache deleted successfully"
+          fi
+
+      - name: "[Windows] Cache updated compiler cache (ccache)"
+        if: matrix.os == 'Windows' && matrix.use_ccache == 1 && env.PERSIST_CCACHE == 'true' && github.ref == 'refs/heads/master'
+        uses: actions/cache/save@v6
+        with:
+          key: ${{ steps.restore_ccache.outputs.cache-primary-key }}
+          path: ${{ env.CCACHE_DIR }}
+
       - name: "[macOS] Sign app bundle"
         if: matrix.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null
         id: sign_macos
@@ -1191,7 +1237,7 @@ jobs:
           # The nightly legs and the pull-request legs that finish under the Windows leg
           # keep none, so their leftover entries are reclaimed here instead of waiting out
           # the age rule.
-          LIVE_CCACHE_KEYS: 'ccache-Arch ccache-Debian13 ccache-Fedora45debug ccache-Fedora45release'
+          LIVE_CCACHE_KEYS: 'ccache-Arch ccache-Debian13 ccache-Fedora45debug ccache-Fedora45release ccache-Windows10'
         run: |
           gh api --paginate "repos/$GITHUB_REPOSITORY/actions/caches?per_page=100" \
             --jq '.actions_caches[] | [.id, .ref, .key, .last_accessed_at] | @tsv' >"$RUNNER_TEMP/caches.tsv"
