@@ -18,6 +18,7 @@
 #include <QPointF>
 #include <QtGlobal>
 #include <libcockatrice/game/zones/table_zone_logic.h>
+#include <optional>
 #include <qtmetamacros.h>
 
 class CardDragItem;
@@ -26,6 +27,7 @@ class CardZoneLogic;
 class QColor;
 class QGraphicsItem;
 class QPainter;
+class QPainterPath;
 template <typename T> class QList;
 
 /**
@@ -221,6 +223,13 @@ private:
 
     void paintZoneOutline(QPainter *painter);
     void paintLandDivider(QPainter *painter);
+    /**
+     * @brief This zone's paint area minus the hovered card's painted outline, in zone coordinates.
+     *
+     * @c std::nullopt when no card is hovered or it does not overlap this zone; an *empty* path when
+     * the hovered card covers this zone entirely, in which case nothing of the zone is visible.
+     */
+    [[nodiscard]] std::optional<QPainterPath> hoveredCardHole() const;
 
     /*
     Calculates card stack widths so mapping functions work properly

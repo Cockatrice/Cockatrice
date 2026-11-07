@@ -22,6 +22,7 @@ private slots:
     void enableAllAnimations();
     void disableAllAnimations();
     void updateCommanderSpellbookUiState();
+    void updateHoverPanelUiState();
 
 private:
     QCheckBox doubleClickToPlayCheckBox;
@@ -47,6 +48,17 @@ private:
     QCheckBox lifeCounterAnimationsCheckBox;
     QCheckBox battlefieldFlashCheckBox;
 
+    QLabel hoverPanelTriggerLabel;
+    QComboBox hoverPanelTriggerSelector;
+    QLabel hoverZoomTriggerLabel;
+    QComboBox hoverZoomTriggerSelector;
+    QCheckBox hoverPanelDoubleConfirmCheckBox;
+    QLabel hoverZoomDelayLabel;
+    QSpinBox hoverZoomDelayBox;
+    QLabel hoverPanelDelayLabel;
+    QSpinBox hoverPanelDelayBox;
+    QLabel hoverWheelNoteLabel;
+
     QCheckBox openDeckInNewTabCheckBox;
     QLabel visualDeckStoragePromptForConversionLabel;
     QComboBox visualDeckStoragePromptForConversionSelector;
@@ -69,6 +81,7 @@ private:
     QGroupBox *generalGroupBox;
     QGroupBox *notificationsGroupBox;
     QGroupBox *animationGroupBox;
+    QGroupBox *hoverPanelGroupBox;
     QGroupBox *deckEditorGroupBox;
     QGroupBox *replayGroupBox;
 
