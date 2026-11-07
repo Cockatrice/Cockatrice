@@ -14,7 +14,10 @@
 class QTreeView;
 class GamesModel;
 class GamesProxyModel;
+class QLabel;
 class QPushButton;
+class QToolButton;
+class QAction;
 class AbstractClient;
 class TabSupervisor;
 class TabRoom;
@@ -63,6 +66,17 @@ private slots:
      * @brief Opens the dialog to create a new game in the current room.
      */
     void actCreate();
+
+    /**
+     * @brief Creates a game immediately from the remembered settings, without a dialog.
+     */
+    void actQuickHost();
+
+    /**
+     * @brief Reports a failed quick-host request inline instead of as a modal box.
+     * @param response The server response to the create command.
+     */
+    void checkQuickHostResponse(const Response &response);
 
     /**
      * @brief Joins the currently selected game as a player.
@@ -140,7 +154,10 @@ private:
 
     QPushButton *filterButton;               /**< Button to open the filter dialog. */
     QPushButton *clearFilterButton;          /**< Button to clear active filters. */
-    QPushButton *createButton;               /**< Button to create a new game (only if room is set). */
+    QToolButton *hostGameButton;             /**< Split button: quick host, with the full form in its menu. */
+    QAction *hostGameAction;                 /**< Quick-host action, carrying the keyboard shortcut. */
+    QAction *reviewGameAction;               /**< Menu action that opens the full create dialog. */
+    QLabel *hostErrorLabel;                  /**< Inline failure message for a quick-host request. */
     QPushButton *joinButton;                 /**< Button to join the selected game. */
     QPushButton *joinAsJudgeButton;          /**< Button to join the selected game as a judge. */
     QPushButton *spectateButton;             /**< Button to spectate the selected game. */
@@ -151,6 +168,17 @@ private:
 
     QTimer filterSaveDebounceTimer; /**< Delays persisting quick-filter edits so typing does not rewrite the settings
                                        file on every keystroke. */
+
+    bool hostCommandPending = false; /**< True while a quick-host command is in flight. */
+
+    /** @brief Shows a quick-host failure above the game list. */
+    void showHostError(const QString &message);
+    /** @brief Hides the quick-host failure message. */
+    void clearHostError();
+    /** @brief Enables or disables the quick-host action while a command is in flight. */
+    void setHostCommandPending(bool pending);
+    /** @brief Keeps the quick-host button tooltip in sync with the current shortcut. */
+    void updateHostGameToolTip();
 
     /**
      * @brief Updates the widget title to reflect the current number of displayed games.
@@ -221,6 +249,11 @@ public:
      * @brief Updates UI text for translation/localization.
      */
     void retranslateUi();
+
+    /**
+     * @brief Re-reads the quick-host and review shortcuts after the user rebinds them.
+     */
+    void refreshShortcuts();
 
     /**
      * @brief Updates or adds a game entry in the list.

@@ -185,6 +185,26 @@ TEST(GameCreationOptions, DescriptionWhitespaceIsSimplified)
     EXPECT_EQ(cmd.description(), "a b");
 }
 
+TEST(GameCreationOptions, DefaultsForRegisteredHostEnforceRegistration)
+{
+    const GameCreationOptions registered = GameCreationOptions::defaultsFor(true);
+
+    EXPECT_TRUE(registered.onlyRegistered);
+    EXPECT_FALSE(registered.onlyBuddies);
+    EXPECT_EQ(registered.maxPlayers, 2);
+    EXPECT_TRUE(registered.spectatorsAllowed);
+    EXPECT_EQ(registered.startingLifeTotal, 20);
+    EXPECT_TRUE(registered.gameTypeIds.isEmpty());
+}
+
+TEST(GameCreationOptions, DefaultsForUnregisteredHostAllowOpenJoining)
+{
+    const GameCreationOptions unregistered = GameCreationOptions::defaultsFor(false);
+
+    EXPECT_FALSE(unregistered.onlyRegistered);
+    EXPECT_FALSE(unregistered.onlyBuddies);
+}
+
 TEST(GameCreationOptions, FromSettingsCopiesEveryRememberedField)
 {
     const FakeGameSettings settings{GameCreationOptions{.description = "Remembered game",

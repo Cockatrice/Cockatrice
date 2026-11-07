@@ -1,9 +1,11 @@
 #include "game_selector.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../../theme_icon.h"
 #include "../interface/widgets/dialogs/dlg_create_game.h"
 #include "../interface/widgets/dialogs/dlg_filter_games.h"
+#include "../interface/widgets/game_hosting/game_creation_options.h"
 #include "../interface/widgets/tabs/tab_room.h"
 #include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../interface/widgets/utility/get_text_with_max.h"
@@ -22,6 +24,7 @@
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QItemSelectionModel>
+#include <QLabel>
 #include <QLineEdit>
 #include <QMap>
 #include <QMenu>
@@ -31,6 +34,7 @@
 #include <QSize>
 #include <QString>
 #include <QStringLiteral>
+#include <QToolButton>
 #include <QTreeView>
 #include <QVBoxLayout>
 #include <QVariant>
@@ -40,6 +44,7 @@
 #include <libcockatrice/protocol/pb/room_commands.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/settings/game_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
 #include <qlogging.h>
@@ -139,11 +144,39 @@ GameSelector::GameSelector(AbstractClient *_client,
     connect(clearFilterButton, &QPushButton::clicked, this, &GameSelector::actClearFilter);
     connect(gameListProxyModel, &GamesProxyModel::filtersChanged, this, &GameSelector::checkClearFilterButtonState);
 
+    hostGameButton = nullptr;
+    hostGameAction = nullptr;
+    reviewGameAction = nullptr;
     if (room) {
-        createButton = new QPushButton;
-        connect(createButton, &QPushButton::clicked, this, &GameSelector::actCreate);
-    } else {
-        createButton = nullptr;
+        hostGameAction = new QAction(this);
+        hostGameAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
+        connect(hostGameAction, &QAction::triggered, this, &GameSelector::actQuickHost);
+
+        hostGameButton = new QToolButton(this);
+        hostGameButton->setObjectName("hostGameButton");
+        hostGameButton->setDefaultAction(hostGameAction);
+        hostGameButton->setPopupMode(QToolButton::MenuButtonPopup);
+        hostGameButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
+
+        auto *hostGameMenu = new QMenu(hostGameButton);
+        hostGameMenu->setObjectName("hostGameMenu");
+        reviewGameAction = hostGameMenu->addAction(QString());
+        reviewGameAction->setObjectName("reviewGameAction");
+        reviewGameAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
+        connect(reviewGameAction, &QAction::triggered, this, &GameSelector::actCreate);
+        hostGameButton->setMenu(hostGameMenu);
+
+        // The shortcuts belong to the whole room tab, not just the game list, so they also
+        // fire while the chat or the user list has focus. A QToolButton menu is mouse-only,
+        // so the review action needs its own shortcut for keyboard parity.
+        if (auto *roomTab = qobject_cast<TabRoom *>(parentWidget())) {
+            roomTab->addAction(hostGameAction);
+            roomTab->addAction(reviewGameAction);
+        } else {
+            addAction(hostGameAction);
+            addAction(reviewGameAction);
+        }
+        refreshShortcuts();
     }
     joinButton = new QPushButton;
     joinAsJudgeButton = new QPushButton;
@@ -157,7 +190,7 @@ GameSelector::GameSelector(AbstractClient *_client,
     }
     buttonLayout->addStretch();
     if (room) {
-        buttonLayout->addWidget(createButton);
+        buttonLayout->addWidget(hostGameButton);
     }
     buttonLayout->addWidget(joinButton);
     if (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsJudge) {
@@ -173,10 +206,16 @@ GameSelector::GameSelector(AbstractClient *_client,
     }
     buttonLayout->setAlignment(Qt::AlignTop);
 
+    hostErrorLabel = new QLabel(this);
+    hostErrorLabel->setObjectName("hostGameErrorLabel");
+    hostErrorLabel->setWordWrap(true);
+    hostErrorLabel->setVisible(false);
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
     if (showFilters && restoresettings) {
         mainLayout->addWidget(quickFilterToolBar);
     }
+    mainLayout->addWidget(hostErrorLabel);
     mainLayout->addWidget(gameListView);
     mainLayout->addLayout(buttonLayout);
 
@@ -266,6 +305,8 @@ void GameSelector::actCreate()
         return;
     }
 
+    clearHostError();
+
     // Heap-allocate the dialog: if this selector (or its room tab) is destroyed while the
     // dialog is open, e.g. on server disconnect, Qt deletes its children. A stack-allocated
     // child would then be deleted by Qt and crash.
@@ -273,6 +314,69 @@ void GameSelector::actCreate()
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     connect(dlg, &QDialog::finished, this, &GameSelector::updateTitle);
     dlg->exec();
+}
+
+void GameSelector::actQuickHost()
+{
+    if (room == nullptr) {
+        qWarning() << "Attempted to create a game, but the room was null";
+        return;
+    }
+
+    clearHostError();
+
+    auto &gameSettings = SettingsCache::instance().game();
+    const bool registered = tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsRegistered;
+    const GameCreationOptions options =
+        gameSettings.getRememberGameSettings()
+            ? GameCreationOptions::fromSettings(gameSettings, room->getGameTypes(), registered)
+            : GameCreationOptions::defaultsFor(registered);
+
+    PendingCommand *pend = room->prepareRoomCommand(options.toCreateGameCommand());
+    connect(pend, &PendingCommand::finished, this, &GameSelector::checkQuickHostResponse);
+    room->sendRoomCommand(pend);
+
+    setHostCommandPending(true);
+}
+
+void GameSelector::checkQuickHostResponse(const Response &response)
+{
+    setHostCommandPending(false);
+
+    switch (response.response_code()) {
+        case Response::RespOk:
+            clearHostError();
+            break;
+        case Response::RespContextError:
+            showHostError(tr("You already host the maximum number of games."));
+            break;
+        case Response::RespInternalError:
+            showHostError(tr("The server could not create the game."));
+            break;
+        default:
+            showHostError(tr("Could not create the game."));
+            break;
+    }
+}
+
+void GameSelector::showHostError(const QString &message)
+{
+    hostErrorLabel->setText(message);
+    hostErrorLabel->setVisible(true);
+}
+
+void GameSelector::clearHostError()
+{
+    hostErrorLabel->clear();
+    hostErrorLabel->setVisible(false);
+}
+
+void GameSelector::setHostCommandPending(bool pending)
+{
+    hostCommandPending = pending;
+    if (hostGameAction) {
+        hostGameAction->setEnabled(!pending);
+    }
 }
 
 void GameSelector::checkResponse(const Response &response)
@@ -486,8 +590,8 @@ bool GameSelector::joinGameById(const int gameId, const bool asSpectator)
 
 void GameSelector::disableButtons()
 {
-    if (createButton) {
-        createButton->setEnabled(false);
+    if (hostGameAction) {
+        hostGameAction->setEnabled(false);
     }
 
     joinButton->setEnabled(false);
@@ -496,8 +600,8 @@ void GameSelector::disableButtons()
 
 void GameSelector::enableButtons()
 {
-    if (createButton) {
-        createButton->setEnabled(true);
+    if (hostGameAction) {
+        hostGameAction->setEnabled(!hostCommandPending);
     }
 
     // Enable buttons for the currently selected game
@@ -521,8 +625,14 @@ void GameSelector::retranslateUi()
 {
     filterButton->setText(tr("&Filter games"));
     clearFilterButton->setText(tr("C&lear filter"));
-    if (createButton) {
-        createButton->setText(tr("C&reate"));
+    if (hostGameAction) {
+        // A QToolButton cannot draw a mnemonic from a default action; the shortcut is the
+        // keyboard path here.
+        hostGameAction->setText(tr("Host game"));
+        updateHostGameToolTip();
+    }
+    if (reviewGameAction) {
+        reviewGameAction->setText(tr("Review first…"));
     }
     joinButton->setText(tr("&Join"));
     joinAsJudgeButton->setText(tr("Join as judge"));
@@ -530,6 +640,24 @@ void GameSelector::retranslateUi()
     joinAsJudgeSpectatorButton->setText(tr("Join as judge spectator"));
 
     updateTitle();
+}
+
+void GameSelector::refreshShortcuts()
+{
+    if (hostGameAction) {
+        hostGameAction->setShortcuts(SettingsCache::instance().shortcuts().getShortcut("GameSelector/aQuickHostGame"));
+        updateHostGameToolTip();
+    }
+    if (reviewGameAction) {
+        reviewGameAction->setShortcuts(SettingsCache::instance().shortcuts().getShortcut("GameSelector/aReviewGame"));
+    }
+}
+
+void GameSelector::updateHostGameToolTip()
+{
+    const QString shortcut = SettingsCache::instance().shortcuts().getShortcutString("GameSelector/aQuickHostGame");
+    hostGameAction->setToolTip(shortcut.isEmpty() ? tr("Host a game with your last-used settings")
+                                                  : tr("Host a game with your last-used settings (%1)").arg(shortcut));
 }
 
 void GameSelector::processGameInfo(const ServerInfo_Game &info)
