@@ -84,7 +84,7 @@ public:
     IconTint(QPalette::ColorRole role, IconEmphasis emphasis = IconEmphasis::Secondary); // implicit for role callers
     IconTint(AppColor::Role role, IconEmphasis emphasis = IconEmphasis::Secondary); // implicit for semantic callers
 
-    /** @brief A neutral glyph in the accent tone, for the surface's primary action. */
+    /** @brief A neutral glyph at the family's primary level, for the surface's primary action. */
     static IconTint primary();
 
     /** @brief A dimmed neutral glyph, for a control that labels rather than acts. */
@@ -93,9 +93,10 @@ public:
     /**
      * @brief Resolves the concrete color for an icon mode.
      *
-     * A disabled application color resolves to the disabled foreground, so an
-     * unavailable control does not keep its semantic color. A selected palette
-     * color keeps the WindowText -> HighlightedText swap.
+     * A disabled application color resolves to the derived disabled ink, the
+     * quiet level receded toward the surface, so an unavailable control does not
+     * keep its semantic color. A selected palette color keeps the
+     * WindowText -> HighlightedText swap.
      *
      * Application colors are returned verbatim: the theme author stores one
      * value per emphasis level, so the paint path does not rewrite it. The
