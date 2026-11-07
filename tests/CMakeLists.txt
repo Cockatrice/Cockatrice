@@ -457,6 +457,17 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  game_creation_options_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/game_hosting/game_creation_options.cpp
+  game_creation_options_test.cpp
+  LIBS
+  libcockatrice_protocol
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src
+)
+cockatrice_add_test(
+  NAME
   deck_hash_performance_test
   SOURCES
   deck_hash_performance_test.cpp
