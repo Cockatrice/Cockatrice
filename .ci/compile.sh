@@ -20,6 +20,7 @@
 # --profile writes an MSBuild performance summary and binary log, Windows only
 # uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_NO_CLIENT MAKE_TEST USE_CCACHE CCACHE_SIZE CCACHE_EVICTION_AGE BUILD_DIR CMAKE_GENERATOR TARGET_MACOS_VERSION MAKE_SANITIZE MAKE_COVERAGE VCPKG_TARGET_MACOS_VERSION BUILD_PARALLEL_LEVEL BUILD_PROFILE
 # (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --sanitize --coverage --ccache <ccache_size> --dir <dir> --profile)
+# boolean env flags are enabled with the value 1 (e.g. MAKE_SERVER=1)
 # exitcode: 1 for failure, 3 for invalid arguments
 
 # Read arguments
@@ -138,17 +139,21 @@ done
 
 set -e
 
-# Setup
-./servatrice/check_schema_version.sh
-if [[ ! $BUILDTYPE ]]; then
+# Schema version consistency (only relevant to the server)
+if [[ ${MAKE_SERVER:-} == "1" ]]; then
+  ./servatrice/check_schema_version.sh
+fi
+
+# Use default values if unset
+if [[ -z $BUILDTYPE ]]; then
   BUILDTYPE=Release
 fi
-if [[ ! $BUILD_DIR ]]; then
+if [[ -z $BUILD_DIR ]]; then
   BUILD_DIR="build"
 fi
 mkdir -p "$BUILD_DIR"
 
-if [[ $MAKE_COVERAGE ]]; then
+if [[ ${MAKE_COVERAGE:-} == "1" ]]; then
   # Resolved while the working directory is still the source root. $0 is relative to the
   # directory the script was invoked from, so after the cd below it no longer resolves, and
   # under `set -e` the failed subshell would abort the build rather than just yielding an empty
@@ -163,16 +168,16 @@ export CMAKE_POLICY_VERSION_MINIMUM=3.10
 
 # Add cmake flags
 flags=("-DCMAKE_BUILD_TYPE=$BUILDTYPE")
-if [[ $MAKE_SERVER ]]; then
+if [[ ${MAKE_SERVER:-} == "1" ]]; then
   flags+=("-DWITH_SERVER=1")
 fi
-if [[ $MAKE_NO_CLIENT ]]; then
+if [[ ${MAKE_NO_CLIENT:-} == "1" ]]; then
   flags+=("-DWITH_CLIENT=0" "-DWITH_ORACLE=0")
 fi
-if [[ $MAKE_TEST ]]; then
+if [[ ${MAKE_TEST:-} == "1" ]]; then
   flags+=("-DTEST=1")
 fi
-if [[ $MAKE_SANITIZE ]]; then
+if [[ ${MAKE_SANITIZE:-} == "1" ]]; then
   flags+=("-DENABLE_SANITIZERS=ON")
 else
   # Every leg states the flag explicitly rather than relying on the CMake
@@ -180,20 +185,20 @@ else
   # never leak libasan/libubsan into a shipped binary.
   flags+=("-DENABLE_SANITIZERS=OFF")
 fi
-if [[ $MAKE_COVERAGE ]]; then
+if [[ ${MAKE_COVERAGE:-} == "1" ]]; then
   flags+=("-DENABLE_COVERAGE=ON")
 fi
-if [[ $USE_CCACHE ]]; then
+if [[ ${USE_CCACHE:-} == "1" ]]; then
   flags+=("-DUSE_CCACHE=1")
-  if [[ $CCACHE_SIZE ]]; then
-    # note, this setting persists after running the script
+  if [[ -n $CCACHE_SIZE ]]; then
+    # This setting persists after running the script
     ccache --max-size "$CCACHE_SIZE"
   fi
 fi
-if [[ $PACKAGE_TYPE ]]; then
+if [[ -n $PACKAGE_TYPE ]]; then
   flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
 fi
-if [[ $USE_VCPKG ]]; then
+if [[ ${USE_VCPKG:-} == "1" ]]; then
   flags+=("-DUSE_VCPKG=1")
   flags+=("-DVCPKG_INSTALL_OPTIONS=--x-abi-tools-use-exact-versions")
 fi
@@ -221,7 +226,8 @@ fi
 buildflags=(--config "$BUILDTYPE")
 
 function ccachestatsverbose() {
-  # note, verbose only works on newer ccache, discard the error
+  ccache --version
+  # Verbose only works on newer ccache, discard the error
   local got
   if got="$(ccache --show-stats --verbose 2>/dev/null)"; then
     echo "$got"
@@ -261,42 +267,44 @@ if [[ $RUNNER_OS == macOS ]]; then
   # this works independent of the qt version as there should be only one version installed on the runner at a time
   export QTDIR
 
-  if [[ $TARGET_MACOS_VERSION ]]; then
-    # CMAKE_OSX_DEPLOYMENT_TARGET is a vanilla cmake flag needed to compile to target macOS version
+  if [[ -n $TARGET_MACOS_VERSION ]]; then
+    # CMAKE_OSX_DEPLOYMENT_TARGET is a vanilla CMake flag needed to compile to the target macOS version
     flags+=("-DCMAKE_OSX_DEPLOYMENT_TARGET=$TARGET_MACOS_VERSION")
 
-    # vcpkg dependencies need a vcpkg triplet file to compile to the target macOS version
-    # an easy way is to copy the x64-osx.cmake file and modify it
-    triplets_dir="/tmp/cmake/triplets"
-    triplet_version="custom-triplet"
-    triplet_file="$triplets_dir/$triplet_version.cmake"
-    arch=$(uname -m)
-    if [[ $arch == x86_64 ]]; then
-      arch="x64"
+    if [[ ${USE_VCPKG:-} == "1" ]]; then
+      # vcpkg dependencies need a vcpkg triplet file to compile to the target macOS version
+      # An easy way is to copy the x64-osx.cmake file and modify it
+      triplets_dir="/tmp/cmake/triplets"
+      triplet_version="custom-triplet"
+      triplet_file="$triplets_dir/$triplet_version.cmake"
+      arch=$(uname -m)
+      if [[ $arch == x86_64 ]]; then
+        arch="x64"
+      fi
+      mkdir -p "$triplets_dir"
+      triplet_source="../vcpkg/triplets/$arch-osx.cmake"
+      if [[ ! -f "$triplet_source" ]]; then
+        triplet_source="../vcpkg/triplets/community/$arch-osx.cmake"
+      fi
+      cp "$triplet_source" "$triplet_file"
+      # The triplet is what vcpkg hashes into the ABI hash of every port, so two legs that
+      # agree here reuse each other's binary cache. Targets 14, 15 and 26 on the same Xcode
+      # produce identical binaries when they share the lowest deployment target, so they all
+      # build against 14 to keep one vcpkg cache scope instead of three.
+      # Keep in sync with "vcpkg_scope" and "vcpkg_deployment_target" in desktop-build.yml.
+      vcpkg_target="${VCPKG_TARGET_MACOS_VERSION:-$TARGET_MACOS_VERSION}"
+      echo "set(VCPKG_CMAKE_SYSTEM_VERSION $vcpkg_target)" >>"$triplet_file"
+      echo "set(VCPKG_OSX_DEPLOYMENT_TARGET $vcpkg_target)" >>"$triplet_file"
+      flags+=("-DVCPKG_OVERLAY_TRIPLETS=$triplets_dir")
+      flags+=("-DVCPKG_HOST_TRIPLET=$triplet_version")
+      flags+=("-DVCPKG_TARGET_TRIPLET=$triplet_version")
+      echo "::group::Generated triplet $triplet_file"
+      cat "$triplet_file"
+      echo "::endgroup::"
     fi
-    mkdir -p "$triplets_dir"
-    triplet_source="../vcpkg/triplets/$arch-osx.cmake"
-    if [[ ! -f "$triplet_source" ]]; then
-      triplet_source="../vcpkg/triplets/community/$arch-osx.cmake"
-    fi
-    cp "$triplet_source" "$triplet_file"
-    # The triplet is what vcpkg hashes into the ABI hash of every port, so two legs that
-    # agree here reuse each other's binary cache. Targets 14, 15 and 26 on the same Xcode
-    # produce identical binaries when they share the lowest deployment target, so they all
-    # build against 14 to keep one vcpkg cache scope instead of three.
-    # Keep in sync with "vcpkg_scope" and "vcpkg_deployment_target" in desktop-build.yml.
-    vcpkg_target="${VCPKG_TARGET_MACOS_VERSION:-$TARGET_MACOS_VERSION}"
-    echo "set(VCPKG_CMAKE_SYSTEM_VERSION $vcpkg_target)" >>"$triplet_file"
-    echo "set(VCPKG_OSX_DEPLOYMENT_TARGET $vcpkg_target)" >>"$triplet_file"
-    flags+=("-DVCPKG_OVERLAY_TRIPLETS=$triplets_dir")
-    flags+=("-DVCPKG_HOST_TRIPLET=$triplet_version")
-    flags+=("-DVCPKG_TARGET_TRIPLET=$triplet_version")
-    echo "::group::Generated triplet $triplet_file"
-    cat "$triplet_file"
-    echo "::endgroup::"
   fi
 
-  echo "::group::Signing Certificate"
+  echo "::group::Setup signing certificate"
   if [[ -n "$MACOS_CERTIFICATE_NAME" ]]; then
     echo "$MACOS_CERTIFICATE" | base64 --decode >"certificate.p12"
     security create-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
@@ -311,7 +319,7 @@ if [[ $RUNNER_OS == macOS ]]; then
   fi
   echo "::endgroup::"
 
-  if [[ $MAKE_PACKAGE ]]; then
+  if [[ ${MAKE_PACKAGE:-} == "1" ]]; then
     # Workaround https://github.com/actions/runner-images/issues/7522
     # have hdiutil repeat the command 10 times in hope of success.
     # The wrapper has to exit non-zero once it gives up: CPack reads that status to
@@ -342,7 +350,7 @@ elif [[ $RUNNER_OS == Windows ]]; then
     # cmake only hands MSBuild a job count when one is asked for, and without it
     # MSBuild builds a single node: one project at a time, whatever MTT does inside
     # it. Ask for a node per core.
-    if [[ ! $BUILD_PARALLEL_LEVEL ]]; then
+    if [[ -z $BUILD_PARALLEL_LEVEL ]]; then
       BUILD_PARALLEL_LEVEL="${NUMBER_OF_PROCESSORS:-1}"
     fi
     buildflags+=(--parallel "$BUILD_PARALLEL_LEVEL")
@@ -368,19 +376,20 @@ elif [[ $RUNNER_OS == Windows ]]; then
   fi
 fi
 
-if [[ $USE_CCACHE ]]; then
+if [[ ${USE_CCACHE:-} == "1" ]]; then
   echo "::group::Show ccache stats"
   ccachestatsverbose
   echo "::endgroup::"
 fi
 
-echo "::group::Configure cmake"
+# Configure CMake
+echo "::group::Generate build system"
 cmake --version
-echo "Running cmake with flags: ${flags[*]}"
+echo "Running CMake configuration with the following flags: ${flags[*]}"
 cmake .. "${flags[@]}"
 echo "::endgroup::"
 
-if [[ $USE_CCACHE ]]; then
+if [[ ${USE_CCACHE:-} == "1" ]]; then
   # PCH-aware caching is required or ccache refuses to cache any TU that consumes a
   # precompiled header, silently recompiling everything on every run. The mtime and ctime
   # entries cover files created during the build itself: the moc/uic/rcc output and the
@@ -395,9 +404,10 @@ if [[ $USE_CCACHE ]]; then
   ccache --set-config sloppiness=pch_defines,time_macros,include_file_mtime,include_file_ctime
 fi
 
+# Build
 echo "::group::Build project"
 cpuinfo
-echo "Running cmake --build with flags: ${buildflags[*]}"
+echo "Running CMake with the following build flags: ${buildflags[*]}"
 cmake --build . "${buildflags[@]}"
 echo "::endgroup::"
 
@@ -409,16 +419,16 @@ if [[ $BUILD_PROFILE && $RUNNER_OS == Windows && -f msbuild-perf.log ]]; then
   echo "::endgroup::"
 fi
 
-if [[ $USE_CCACHE ]]; then
-  if [[ $CCACHE_EVICTION_AGE ]]; then
-    echo "::group::evict ccache files older than $CCACHE_EVICTION_AGE"
+if [[ ${USE_CCACHE:-} == "1" ]]; then
+  if [[ -n $CCACHE_EVICTION_AGE ]]; then
+    echo "::group::Evict ccache files older than $CCACHE_EVICTION_AGE"
     ccache --evict-older-than "$CCACHE_EVICTION_AGE"
     echo "::endgroup::"
   fi
   echo "::group::Show ccache stats again"
   ccachestatsverbose
   echo "::endgroup::"
-elif [[ $CCACHE_EVICTION_AGE ]]; then
+elif [[ -n $CCACHE_EVICTION_AGE ]]; then
   echo "::error file=$0::ccache eviction is enabled while ccache is disabled!"
 fi
 
@@ -435,9 +445,9 @@ if [[ $RUNNER_OS == macOS ]]; then
   echo "::endgroup::"
 fi
 
-if [[ $MAKE_TEST ]]; then
+if [[ ${MAKE_TEST:-} == "1" ]]; then
   echo "::group::Run tests"
-  if [[ $MAKE_SANITIZE ]]; then
+  if [[ ${MAKE_SANITIZE:-} == "1" ]]; then
     # detect_leaks=0: Qt and the sanitizers' own runtimes both leak at exit by design, and
     # LeakSanitizer's default is aggressive enough to bury our real findings under hundreds
     # of process-teardown reports. Malloc/free misuse and use-after-free are what ASan is for
@@ -455,11 +465,12 @@ if [[ $MAKE_TEST ]]; then
   # bound and -j recovers nearly all of the per-process overhead. The test binaries are safe to
   # run concurrently: the only one that claims a fixed resource is single_instance_manager_test,
   # which already scopes its local socket name to its own pid so parallel copies cannot collide.
+  ctest --version
   ctest -C "$BUILDTYPE" --output-on-failure -j "${CTEST_JOBS:-4}"
   echo "::endgroup::"
 fi
 
-if [[ $MAKE_COVERAGE ]]; then
+if [[ ${MAKE_COVERAGE:-} == "1" ]]; then
   # gcovr is not a build dependency and is not available everywhere, so a missing one is reported
   # and skipped rather than failing an otherwise green build.
   echo "::group::Coverage report"
@@ -484,7 +495,7 @@ if [[ $MAKE_COVERAGE ]]; then
   echo "::endgroup::"
 fi
 
-if [[ $RUNNER_OS == Windows && ! $MAKE_NO_CLIENT ]]; then
+if [[ $RUNNER_OS == Windows && ${MAKE_NO_CLIENT:-} != "1" ]]; then
   echo "::group::Probe the installer's holder lookup"
   # The working directory is still the build dir here: the package steps below are what
   # leave and re-enter it, and that is what made a $BUILD_DIR-prefixed path name
@@ -684,18 +695,21 @@ POWERSHELL
   echo "::endgroup::"
 fi
 
-if [[ $MAKE_INSTALL ]]; then
+# Install
+if [[ ${MAKE_INSTALL:-} == "1" ]]; then
   echo "::group::Install"
   cmake --build . --target install --config "$BUILDTYPE"
   echo "::endgroup::"
 fi
 
-if [[ $MAKE_PACKAGE ]]; then
+# Package
+if [[ ${MAKE_PACKAGE:-} == "1" ]]; then
   echo "::group::Create package"
+  cpack --version
   cmake --build . --target package --config "$BUILDTYPE"
   echo "::endgroup::"
 
-  if [[ $PACKAGE_SUFFIX ]]; then
+  if [[ -n $PACKAGE_SUFFIX ]]; then
     echo "::group::Update package name"
     cd ..
     BUILD_DIR="$BUILD_DIR" .ci/name_build.sh "$PACKAGE_SUFFIX"
