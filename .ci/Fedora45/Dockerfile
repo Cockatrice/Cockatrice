@@ -1,11 +1,12 @@
 FROM fedora:45
 
-RUN dnf install -y \
+RUN dnf install -y --nodocs \
         ca-certificates \
         ccache \
         cmake \
         gcc-c++ \
         git \
+        gtest-devel \
         libcurl-devel \
         mariadb-devel \
         ninja-build \
