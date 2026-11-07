@@ -458,12 +458,29 @@ QColor defaultAppColor(AppColor::Role role, bool dark)
     switch (role) {
         case AppColor::AccentStrong:
         case AppColor::AccentSoft:
-            // Derived from the palette highlight by ThemeManager::appColor().
+        // The neutral icon family is palette-derived like the accent, so a
+        // theme without an authored icon family keeps following the platform
+        // instead of pinning one scheme's ink.
+        case AppColor::Icon:
+        case AppColor::IconStrong:
+        case AppColor::IconSoft:
             return {};
+        // The semantic family follows the same chroma ladder as the authored
+        // themes. A theme without stored values (System) has no per-surface
+        // palette to measure against, so these are authored against the
+        // representative platform surfaces the System theme runs on.
         case AppColor::Positive:
-            return QColor(dark ? QStringLiteral("#6dd58c") : QStringLiteral("#1b7f3b"));
+            return QColor(dark ? QStringLiteral("#6dd58c") : QStringLiteral("#1a7d3a"));
+        case AppColor::PositiveStrong:
+            return QColor(dark ? QStringLiteral("#32c05c") : QStringLiteral("#007e28"));
+        case AppColor::PositiveSoft:
+            return QColor(dark ? QStringLiteral("#8ab196") : QStringLiteral("#4c7659"));
         case AppColor::Negative:
             return QColor(dark ? QStringLiteral("#ff8a80") : QStringLiteral("#b3261e"));
+        case AppColor::NegativeStrong:
+            return QColor(dark ? QStringLiteral("#ff8378") : QStringLiteral("#da0b00"));
+        case AppColor::NegativeSoft:
+            return QColor(dark ? QStringLiteral("#c79e9b") : QStringLiteral("#935f5c"));
     }
 
     return {};

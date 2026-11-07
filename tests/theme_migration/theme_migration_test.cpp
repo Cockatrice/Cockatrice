@@ -151,13 +151,28 @@ TEST_F(ThemeMigrationTest, IsIdempotent)
 
 TEST(ThemeAppColorTest, SemanticDefaultsFollowTheScheme)
 {
-    EXPECT_EQ(defaultAppColor(AppColor::Positive, false), QColor(QStringLiteral("#1b7f3b")));
+    EXPECT_EQ(defaultAppColor(AppColor::Positive, false), QColor(QStringLiteral("#1a7d3a")));
     EXPECT_EQ(defaultAppColor(AppColor::Positive, true), QColor(QStringLiteral("#6dd58c")));
+    EXPECT_EQ(defaultAppColor(AppColor::PositiveStrong, false), QColor(QStringLiteral("#007e28")));
+    EXPECT_EQ(defaultAppColor(AppColor::PositiveStrong, true), QColor(QStringLiteral("#32c05c")));
+    EXPECT_EQ(defaultAppColor(AppColor::PositiveSoft, false), QColor(QStringLiteral("#4c7659")));
+    EXPECT_EQ(defaultAppColor(AppColor::PositiveSoft, true), QColor(QStringLiteral("#8ab196")));
     EXPECT_EQ(defaultAppColor(AppColor::Negative, false), QColor(QStringLiteral("#b3261e")));
     EXPECT_EQ(defaultAppColor(AppColor::Negative, true), QColor(QStringLiteral("#ff8a80")));
-    // Accent roles are derived from the palette, so they have no static default.
-    EXPECT_FALSE(defaultAppColor(AppColor::AccentStrong, false).isValid());
-    EXPECT_FALSE(defaultAppColor(AppColor::AccentSoft, true).isValid());
+    EXPECT_EQ(defaultAppColor(AppColor::NegativeStrong, false), QColor(QStringLiteral("#da0b00")));
+    EXPECT_EQ(defaultAppColor(AppColor::NegativeStrong, true), QColor(QStringLiteral("#ff8378")));
+    EXPECT_EQ(defaultAppColor(AppColor::NegativeSoft, false), QColor(QStringLiteral("#935f5c")));
+    EXPECT_EQ(defaultAppColor(AppColor::NegativeSoft, true), QColor(QStringLiteral("#c79e9b")));
+    // Accent and neutral icon roles have no static default: an older theme
+    // written before the roles existed falls back to deriving them from its
+    // palette rather than pinning one scheme's ink.
+    for (const bool dark : {false, true}) {
+        EXPECT_FALSE(defaultAppColor(AppColor::AccentStrong, dark).isValid());
+        EXPECT_FALSE(defaultAppColor(AppColor::AccentSoft, dark).isValid());
+        EXPECT_FALSE(defaultAppColor(AppColor::Icon, dark).isValid());
+        EXPECT_FALSE(defaultAppColor(AppColor::IconStrong, dark).isValid());
+        EXPECT_FALSE(defaultAppColor(AppColor::IconSoft, dark).isValid());
+    }
 }
 
 TEST(ThemeAppColorTest, PaletteConfigRoundTripsSemanticRoles)
@@ -166,10 +181,20 @@ TEST(ThemeAppColorTest, PaletteConfigRoundTripsSemanticRoles)
     ASSERT_TRUE(dir.isValid());
 
     PaletteConfig config;
-    const QColor positive(QStringLiteral("#1b7f3b"));
-    const QColor negative(QStringLiteral("#b3261e"));
-    config.appColors[AppColor::Positive] = positive;
-    config.appColors[AppColor::Negative] = negative;
+    const QMap<AppColor::Role, QColor> roles = {
+        {AppColor::Icon, QColor(QStringLiteral("#2f59ad"))},
+        {AppColor::IconStrong, QColor(QStringLiteral("#213e79"))},
+        {AppColor::IconSoft, QColor(QStringLiteral("#687899"))},
+        {AppColor::Positive, QColor(QStringLiteral("#1b7f3b"))},
+        {AppColor::PositiveStrong, QColor(QStringLiteral("#104a22"))},
+        {AppColor::PositiveSoft, QColor(QStringLiteral("#5d7f6f"))},
+        {AppColor::Negative, QColor(QStringLiteral("#b3261e"))},
+        {AppColor::NegativeStrong, QColor(QStringLiteral("#7c1b15"))},
+        {AppColor::NegativeSoft, QColor(QStringLiteral("#9a6c6f"))},
+    };
+    for (auto it = roles.cbegin(); it != roles.cend(); ++it) {
+        config.appColors[it.key()] = it.value();
+    }
 
     const QString path = QDir(dir.path()).absoluteFilePath(QStringLiteral("palette-light.toml"));
     QFile file(path);
@@ -178,10 +203,10 @@ TEST(ThemeAppColorTest, PaletteConfigRoundTripsSemanticRoles)
     file.close();
 
     const PaletteConfig parsed = PaletteConfig::fromFile(path);
-    ASSERT_TRUE(parsed.appColors.contains(AppColor::Positive));
-    ASSERT_TRUE(parsed.appColors.contains(AppColor::Negative));
-    EXPECT_EQ(parsed.appColors.value(AppColor::Positive), positive);
-    EXPECT_EQ(parsed.appColors.value(AppColor::Negative), negative);
+    for (auto it = roles.cbegin(); it != roles.cend(); ++it) {
+        ASSERT_TRUE(parsed.appColors.contains(it.key()));
+        EXPECT_EQ(parsed.appColors.value(it.key()), it.value());
+    }
 }
 
 // Every test brings its own main(): GTest is not guaranteed to be found on the build machines, and

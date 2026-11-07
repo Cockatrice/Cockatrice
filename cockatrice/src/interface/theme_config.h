@@ -13,6 +13,13 @@
 // set. Stored in the same palette-<scheme>.toml under an [AppColors] section
 // and editable from the palette editor, so theme authors can control colors
 // beyond what Qt's palette can express.
+//
+// The icon families carry one role per emphasis level. Icon is the neutral
+// glyph ink; IconStrong and IconSoft are its primary and quiet levels. Positive
+// and Negative follow the same pattern, so an emphasis never has to be computed
+// from a hue at paint time: the theme authors all three levels. Naming a variant
+// explicitly (`IconStrong`) pins that level; naming the family (`Icon`) lets the
+// caller's emphasis choose.
 namespace AppColor
 {
 Q_NAMESPACE
@@ -20,8 +27,15 @@ enum Role
 {
     AccentStrong,
     AccentSoft,
+    Icon,
+    IconStrong,
+    IconSoft,
     Positive,
+    PositiveStrong,
+    PositiveSoft,
     Negative,
+    NegativeStrong,
+    NegativeSoft,
 };
 Q_ENUM_NS(Role)
 } // namespace AppColor
@@ -47,9 +61,13 @@ Q_ENUM_NS(Role)
  * @brief Fallback for an application color role when the active theme does not
  *        define one.
  *
- * Accent roles return an invalid QColor because ThemeManager derives them from
- * the palette highlight. Semantic roles return an opaque default that suits the
- * scheme, so themes written before the role existed still render it.
+ * Accent roles and the neutral Icon family return an invalid QColor because
+ * ThemeManager derives them from the palette: the accent from the highlight,
+ * the icon ink from the neutral text color plus the highlight. Semantic roles
+ * return an opaque default that suits the scheme, so themes written before the
+ * role existed still render it. A theme with no authored icon family keeps
+ * deriving its icon ink from the platform palette instead of pinning one
+ * scheme's colors.
  */
 QColor defaultAppColor(AppColor::Role role, bool dark);
 

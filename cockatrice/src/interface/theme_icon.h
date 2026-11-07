@@ -47,18 +47,20 @@ enum class IconStyle
 };
 
 /**
- * @brief Selects how much attention a glyph claims inside its surface.
+ * @brief Selects which authored level of a color family a glyph uses.
  *
- * Tint says which hue, style says how much shape, emphasis says how loud. The
- * three are independent: a primary action can be a line glyph in the theme
- * accent, and a quiet one can be a sticker in a dimmed tone.
+ * Tint says which family, style says how much shape, emphasis says how loud.
+ * The three are independent: a primary action can be a line glyph in the
+ * theme's primary ink, and a quiet one can be a sticker in that family's quiet
+ * level.
  *
- * Secondary is the default and the color every icon had before the axis
- * existed, so existing call sites keep their look. Primary is for the one
- * action a surface exists for: a neutral primary glyph takes the accent, and a
- * tinted one is pushed to full contrast. Quiet is for glyphs that label rather
- * than act, such as the magnifier inside a search field: legible, but never
- * competing with the buttons next to it.
+ * Each family (neutral icon, positive, negative) stores one color per level, so
+ * emphasis is a lookup rather than a computation: the palette editor's rows are
+ * the whole source of truth. Secondary is the default and the color every icon
+ * had before the axis existed, so existing call sites keep their look. Primary
+ * is for the one action a surface exists for. Quiet is for glyphs that label
+ * rather than act, such as the magnifier inside a search field: legible, but
+ * never competing with the buttons next to it.
  */
 enum class IconEmphasis
 {
@@ -82,7 +84,7 @@ public:
     IconTint(QPalette::ColorRole role, IconEmphasis emphasis = IconEmphasis::Secondary); // implicit for role callers
     IconTint(AppColor::Role role, IconEmphasis emphasis = IconEmphasis::Secondary); // implicit for semantic callers
 
-    /** @brief A neutral glyph in the accent tone, for the surface's primary action. */
+    /** @brief A neutral glyph at the family's primary level, for the surface's primary action. */
     static IconTint primary();
 
     /** @brief A dimmed neutral glyph, for a control that labels rather than acts. */
@@ -91,21 +93,26 @@ public:
     /**
      * @brief Resolves the concrete color for an icon mode.
      *
-     * A disabled application color resolves to the disabled foreground, so an
-     * unavailable control does not keep its semantic color. A selected palette
-     * color keeps the WindowText -> HighlightedText swap. Application colors go
-     * through the saturation floor shared by the filled treatments, so a line
-     * glyph, a badge disc and a sticker fill carry the same tone.
+     * A disabled application color resolves to the derived disabled ink, the
+     * quiet level receded toward the surface, so an unavailable control does not
+     * keep its semantic color. A selected palette color keeps the
+     * WindowText -> HighlightedText swap.
+     *
+     * Application colors are returned verbatim: the theme author stores one
+     * value per emphasis level, so the paint path does not rewrite it. The
+     * filled treatments only shape that tone's value to give a shape depth; the
+     * hue and saturation stay the author's.
      *
      * Neutral label roles (WindowText, Text) resolve to icon ink rather than the
-     * raw palette color: ThemeIconInk::glyphInk borrows a little accent chroma
-     * and holds the glyph to a contrast floor, because a 2px glyph in body-text
-     * ink reads thinner than the text beside it. Semantic roles keep the hue the
-     * call site asked for.
+     * raw palette color: ThemeIconInk::glyphInk derives it from the accent and
+     * holds the glyph to a contrast floor, because a 2px glyph in body-text ink
+     * reads thinner than the text beside it. A theme that authors the neutral
+     * icon roles overrides that derivation. Semantic roles keep the hue the call
+     * site asked for.
      *
-     * Emphasis is applied after the hue: Primary lifts a neutral glyph to the
-     * accent and pushes a tinted one to full contrast; Quiet blends either
-     * toward the surface down to the non-text legibility floor.
+     * Emphasis selects the family's authored variant, so the palette editor's
+     * rows are the whole source of truth. A caller that names a variant
+     * explicitly (a strong or soft role) pins that level at every emphasis.
      */
     QColor resolve(QIcon::Mode mode) const;
 

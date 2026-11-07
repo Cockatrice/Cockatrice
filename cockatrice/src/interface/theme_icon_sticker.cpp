@@ -30,7 +30,7 @@ namespace ThemeIconSticker
 {
 QColor outlineColor(const QColor &tone)
 {
-    return ThemeIconFill::saturated(tone).darker(OUTLINE_DARKER);
+    return tone.darker(OUTLINE_DARKER);
 }
 
 QPixmap renderSticker(const QByteArray &svg, const QColor &tone, const QSize &pixelSize)

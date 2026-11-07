@@ -26,6 +26,7 @@
 #include <QTemporaryDir>
 #include <gtest/gtest.h>
 #include <iterator>
+#include <tuple>
 
 namespace
 {
@@ -85,9 +86,25 @@ int countOpaquePixels(const QPixmap &pixmap, const QColor &expected)
  */
 QColor expectedNeutralInk(const QPalette &palette)
 {
-    return ThemeIconInk::glyphInk(palette.color(QPalette::Active, QPalette::WindowText),
-                                  palette.color(QPalette::Active, QPalette::Window),
-                                  palette.color(QPalette::Active, QPalette::Highlight));
+    const QColor text = palette.color(QPalette::Active, QPalette::WindowText);
+    const QColor surface = ThemeIconInk::harderSurface(palette.color(QPalette::Active, QPalette::Window),
+                                                       palette.color(QPalette::Active, QPalette::Button), text);
+    return ThemeIconInk::glyphInk(text, surface, palette.color(QPalette::Active, QPalette::Highlight));
+}
+
+/**
+ * @brief Renders a glyph at the sheet's device pixel ratio.
+ *
+ * The preview sheets paint through a painter scaled by @p dpr, so a pixmap
+ * rendered at logical size would be upscaled on the way into the file and read
+ * as blurry. Rendering at device size and tagging the pixmap keeps one source
+ * pixel per device pixel.
+ */
+template <typename Render> QPixmap renderAtDpr(const QSize &logicalSize, qreal dpr, Render &&render)
+{
+    QPixmap pixmap = render(logicalSize * dpr);
+    pixmap.setDevicePixelRatio(dpr);
+    return pixmap;
 }
 
 /** @brief Opaque pixels that are not the given rim color, i.e. the gradient fill. */ int
@@ -274,17 +291,29 @@ TEST_F(ThemeIconRenderTest, AppColorTintUsesSemanticColorNotTheAccent)
     EXPECT_EQ(countOpaquePixels(negativePixmap, accent), 0);
 }
 
-/** @brief A disabled control must not keep signalling its semantic color. */
-TEST_F(ThemeIconRenderTest, DisabledAppColorUsesDisabledForeground)
+/**
+ * @brief A disabled glyph recedes past the quiet level, whatever the family.
+ *
+ * The palette's own disabled text is a fixed gray, so on the darkest themes it
+ * out-reads the quiet level and an enabled glyph looks more disabled than a
+ * disabled one. The disabled ink is derived from the quiet ink instead, and a
+ * semantic family loses its hue when disabled.
+ */
+TEST_F(ThemeIconRenderTest, DisabledGlyphRecedesPastTheQuietLevel)
 {
-    QPalette palette = qApp->palette();
-    const QColor disabledText(QStringLiteral("#fedcba"));
-    palette.setColor(QPalette::Disabled, QPalette::WindowText, disabledText);
-    qApp->setPalette(palette);
+    const QColor quiet = themeManager->appColor(AppColor::IconSoft);
+    ASSERT_TRUE(quiet.isValid());
+    const QPalette palette = qApp->palette();
+    const QColor surface = ThemeIconInk::harderSurface(palette.color(QPalette::Active, QPalette::Window),
+                                                       palette.color(QPalette::Active, QPalette::Button), quiet);
+    const QColor expected = ThemeIconInk::disabledInk(quiet, surface);
 
-    const IconTint tint(AppColor::Negative);
-    EXPECT_EQ(tint.resolve(QIcon::Disabled), disabledText);
-    EXPECT_NE(tint.resolve(QIcon::Normal), disabledText);
+    for (const AppColor::Role role : {AppColor::Icon, AppColor::Positive, AppColor::Negative}) {
+        const QColor disabled = IconTint(role).resolve(QIcon::Disabled);
+        EXPECT_EQ(disabled, expected) << static_cast<int>(role);
+        EXPECT_NE(disabled, themeManager->appColor(role)) << static_cast<int>(role);
+    }
+    EXPECT_GE(ThemeIconInk::contrastRatio(quiet, surface) - ThemeIconInk::contrastRatio(expected, surface), 1.0);
 }
 
 /** @brief Palette tints keep the WindowText -> HighlightedText selected swap. */
@@ -332,28 +361,24 @@ TEST_F(ThemeIconRenderTest, SelectedAppColorKeepsAContrastingTint)
 }
 
 /**
- * @brief Line glyphs share the filled treatments' saturation floor.
+ * @brief A line glyph renders the authored role verbatim.
  *
- * The dark-scheme semantic tones are the visible case, but `AccentSoft` is below
- * the floor in every shipped light palette, so the resolve path is exercised
- * without swapping the theme. A line glyph next to a badge or a sticker has to
- * carry the same tone; reverting the floor here would leave it pale beside them.
+ * The emphasis colors are authored data now, so the paint path must not
+ * rewrite them. A muted quiet role stays muted on a line glyph, and the badge
+ * and sticker only shape the value of that tone to give the shape depth.
  */
-TEST_F(ThemeIconRenderTest, LineTintAppliesTheFillSaturationFloor)
+TEST_F(ThemeIconRenderTest, LineTintRendersTheAuthoredRoleVerbatim)
 {
     const QColor raw = themeManager->appColor(AppColor::AccentSoft);
     ASSERT_TRUE(raw.isValid());
     ASSERT_LT(raw.hsvSaturation(), 170);
 
-    const QColor saturated = ThemeIconFill::saturated(raw);
-    EXPECT_NE(saturated, raw);
-    EXPECT_EQ(IconTint(AppColor::AccentSoft).resolve(QIcon::Normal), saturated);
+    EXPECT_EQ(IconTint(AppColor::AccentSoft).resolve(QIcon::Normal), raw);
 
     const QIcon icon = loadThemedIcon(QStringLiteral("icons/arrow_right"), AppColor::AccentSoft);
     const QPixmap pixmap = icon.pixmap(QSize(24, 24));
     ASSERT_FALSE(pixmap.isNull());
-    EXPECT_GT(countOpaquePixels(pixmap, saturated), 0);
-    EXPECT_EQ(countOpaquePixels(pixmap, raw), 0);
+    EXPECT_GT(countOpaquePixels(pixmap, raw), 0);
 }
 
 /** @brief A badge is a disc with a gradient fill, a dark ring and a contrast glyph. */
@@ -372,8 +397,8 @@ TEST_F(ThemeIconRenderTest, BadgeHasDiscGradientAndRing)
     EXPECT_EQ(image.pixelColor(0, 0).alpha(), 0);
     EXPECT_GT(image.pixelColor(32, 32).alpha(), 200);
 
-    // The ring is the saturated tone darkened, and it must actually be painted.
-    EXPECT_GT(countOpaquePixels(pixmap, ThemeIconFill::saturated(tone).darker(300)), 0);
+    // The ring is the authored tone darkened, and it must actually be painted.
+    EXPECT_GT(countOpaquePixels(pixmap, tone.darker(300)), 0);
 
     // The fill runs from a lighter top to a darker bottom. Sample left of the
     // check, which now reaches almost to the disc edge.
@@ -385,40 +410,45 @@ TEST_F(ThemeIconRenderTest, BadgeHasDiscGradientAndRing)
     EXPECT_GT(top.lightness(), bottom.lightness());
 
     // The glyph uses the contrast color chosen for this tone.
-    EXPECT_GT(countOpaquePixels(pixmap, ThemeIconBadge::glyphColor(tone)), 0);
+    EXPECT_GT(countOpaquePixels(pixmap, ThemeIconBadge::glyphColor(tone, ThemeIconFill::Scheme::Light)), 0);
 }
 
 /**
- * @brief The dark-scheme disc carries the same saturated fill as the sticker.
+ * @brief The dark-scheme disc keeps the authored tone and darkens it.
  *
- * The dark tones are tuned for text and read as pale mint or salmon once they
- * fill a disc, so the badge saturates its fill. The dark scheme keeps the
- * darkened ink the badge had before the fill moved to the sticker ramp.
+ * The authored tone is the top of the gradient, so the level the palette author
+ * picked survives the treatment; the shape only adds depth by darkening the
+ * bottom. It must not re-saturate the tone: the authored saturation is the theme
+ * author's choice. The dark scheme keeps the darkened ink the badge had before
+ * the fill moved to the sticker ramp.
  */
-TEST_F(ThemeIconRenderTest, BadgeDarkSchemeDiscUsesTheSaturatedFill)
+TEST_F(ThemeIconRenderTest, BadgeDarkSchemeKeepsTheAuthoredTone)
 {
     const QColor tone = defaultAppColor(AppColor::Positive, true);
     ASSERT_TRUE(tone.isValid());
     ASSERT_GE(tone.value(), 200);
 
-    const QPixmap pixmap = ThemeIconBadge::renderBadge(readIconSvg("ready_start"), tone, QSize(64, 64));
+    const QPixmap pixmap =
+        ThemeIconBadge::renderBadge(readIconSvg("ready_start"), tone, QSize(64, 64), ThemeIconFill::Scheme::Dark);
     ASSERT_FALSE(pixmap.isNull());
     const QImage image = pixmap.toImage();
 
-    // The disc neither keeps the pale raw tone nor the old unsaturating bottom.
-    EXPECT_EQ(countOpaquePixels(pixmap, tone), 0);
-    EXPECT_EQ(countOpaquePixels(pixmap, tone.darker(104)), 0);
     const QColor top = image.pixelColor(10, 16);
     const QColor bottom = image.pixelColor(10, 48);
     ASSERT_GT(top.alpha(), 200);
     ASSERT_GT(bottom.alpha(), 200);
-    // Antialiasing costs a point or two of saturation at the sample points.
-    EXPECT_GE(top.hsvSaturation(), 160);
-    EXPECT_GE(bottom.hsvSaturation(), 160);
+    // The top is a darkening of the authored tone, never a lift, and it keeps
+    // the authored saturation; the sample sits a little down the gradient.
+    EXPECT_LE(top.value(), tone.value());
+    EXPECT_GT(top.value(), bottom.value());
+    EXPECT_LT(bottom.value(), tone.value());
     EXPECT_GT(top.lightness(), bottom.lightness());
+    // Antialiasing costs a point or two of saturation at the sample points.
+    EXPECT_NEAR(top.hsvSaturation(), tone.hsvSaturation(), 24);
+    EXPECT_NEAR(bottom.hsvSaturation(), tone.hsvSaturation(), 24);
 
     // The dark scheme keeps the darkened ink, and it is actually painted.
-    const QColor ink = ThemeIconBadge::glyphColor(tone);
+    const QColor ink = ThemeIconBadge::glyphColor(tone, ThemeIconFill::Scheme::Dark);
     ASSERT_NE(ink, QColor(Qt::white));
     EXPECT_GT(countOpaquePixels(pixmap, ink), 0);
 }
@@ -427,8 +457,8 @@ TEST_F(ThemeIconRenderTest, BadgeDarkSchemeDiscUsesTheSaturatedFill)
  * @brief The badge ink follows the scheme.
  *
  * Light-scheme tones keep the white glyph of the old art; dark-scheme tones
- * keep the darkened ink, because the shared saturated disc is light enough that
- * white would sit near 2.7:1 at its top. Pinning both cases stops the glyph from
+ * keep the darkened ink, because the lifted disc is light enough that white
+ * would sit near 2.7:1 at its top. Pinning both cases stops the glyph from
  * silently flipping back to white when the fill or the palette changes.
  */
 TEST_F(ThemeIconRenderTest, BadgeInkFollowsTheScheme)
@@ -445,7 +475,8 @@ TEST_F(ThemeIconRenderTest, BadgeInkFollowsTheScheme)
     for (const auto &testCase : cases) {
         const QColor tone = defaultAppColor(testCase.role, testCase.dark);
         ASSERT_TRUE(tone.isValid());
-        const QColor ink = ThemeIconBadge::glyphColor(tone);
+        const QColor ink = ThemeIconBadge::glyphColor(tone, testCase.dark ? ThemeIconFill::Scheme::Dark
+                                                                          : ThemeIconFill::Scheme::Light);
         if (testCase.dark) {
             EXPECT_NE(ink, QColor(Qt::white));
             EXPECT_LT(ink.value(), 100);
@@ -488,7 +519,7 @@ TEST_F(ThemeIconRenderTest, BadgeStaysLegibleAtPlayerListSize)
     EXPECT_GT(image.pixelColor(7, 7).alpha(), 200);
     // A 1px ring on a 15px canvas antialiases into the disc and has no exact
     // color, so the glyph is what has to stay legible.
-    EXPECT_GT(countOpaquePixels(pixmap, ThemeIconBadge::glyphColor(tone)), 8);
+    EXPECT_GT(countOpaquePixels(pixmap, ThemeIconBadge::glyphColor(tone, ThemeIconFill::Scheme::Light)), 8);
 }
 
 /** @brief The pixmap API's badge path agrees with the engine's. */
@@ -499,8 +530,8 @@ TEST_F(ThemeIconRenderTest, SentinelSvgBadgeMatchesTheEngine)
                                                  QSize(48, 48), IconStyle::Badge);
     ASSERT_FALSE(pixmap.isNull());
     EXPECT_EQ(pixmap.size(), QSize(48, 48));
-    EXPECT_GT(countOpaquePixels(pixmap, ThemeIconFill::saturated(tone).darker(300)), 0);
-    EXPECT_GT(countOpaquePixels(pixmap, ThemeIconBadge::glyphColor(tone)), 0);
+    EXPECT_GT(countOpaquePixels(pixmap, tone.darker(300)), 0);
+    EXPECT_GT(countOpaquePixels(pixmap, ThemeIconBadge::glyphColor(tone, ThemeIconFill::Scheme::Light)), 0);
 }
 
 /**
@@ -577,16 +608,14 @@ TEST_F(ThemeIconRenderTest, BadgeOnAuthoredArtUsesTheAssetPath)
     // The authored color survives; no disc tone and no ring are painted.
     EXPECT_GT(countOpaquePixels(pixmap, QColor(QStringLiteral("#336699"))), 0);
     EXPECT_EQ(countOpaquePixels(pixmap, tone), 0);
-    EXPECT_EQ(countOpaquePixels(pixmap, ThemeIconFill::saturated(tone).darker(300)), 0);
+    EXPECT_EQ(countOpaquePixels(pixmap, tone.darker(300)), 0);
 }
 
 /** @brief Disabled keeps the shape language but drops back to the line glyph. */
 TEST_F(ThemeIconRenderTest, DisabledBadgeFallsBackToLineGlyph)
 {
-    QPalette palette = qApp->palette();
-    const QColor disabledText(QStringLiteral("#fedcba"));
-    palette.setColor(QPalette::Disabled, QPalette::WindowText, disabledText);
-    qApp->setPalette(palette);
+    const QColor disabled = IconTint(AppColor::Icon).resolve(QIcon::Disabled);
+    ASSERT_TRUE(disabled.isValid());
 
     const QColor tone = themeManager->appColor(AppColor::Positive);
     const QIcon icon = loadThemedIcon(QStringLiteral("icons/ready_start"), AppColor::Positive, IconStyle::Badge);
@@ -595,10 +624,10 @@ TEST_F(ThemeIconRenderTest, DisabledBadgeFallsBackToLineGlyph)
 
     // A filled disc at full mass would not read as unavailable, so Disabled
     // drops the badge: no ring, no disc, just the disabled line glyph.
-    EXPECT_EQ(countOpaquePixels(pixmap, ThemeIconFill::saturated(tone).darker(300)), 0);
-    EXPECT_EQ(countOpaquePixels(pixmap, disabledText.darker(300)), 0);
+    EXPECT_EQ(countOpaquePixels(pixmap, tone.darker(300)), 0);
+    EXPECT_EQ(countOpaquePixels(pixmap, disabled.darker(300)), 0);
     EXPECT_EQ(pixmap.toImage().pixelColor(0, 0).alpha(), 0);
-    EXPECT_GT(countOpaquePixels(pixmap, disabledText), 0);
+    EXPECT_GT(countOpaquePixels(pixmap, disabled), 0);
 }
 
 /**
@@ -632,13 +661,13 @@ TEST_F(ThemeIconRenderTest, StickerPaintsToneFillWithDarkOutline)
 }
 
 /**
- * @brief The dark-scheme fill is the branch the treatment exists for.
+ * @brief The dark-scheme fill keeps the authored tone and darkens it.
  *
- * That tone is light and deliberately desaturated, so a plain gradient paints a
- * pale mint shape. The fill has to raise its saturation and pull its value down
- * instead of up.
+ * The authored tone is the top of the gradient, so the level the palette author
+ * picked survives the treatment. The treatment only adds depth by darkening the
+ * bottom, without re-saturating the tone.
  */
-TEST_F(ThemeIconRenderTest, StickerDarkSchemeFillIsSaturatedAndDarkerThanTheTone)
+TEST_F(ThemeIconRenderTest, StickerDarkSchemeFillKeepsTheAuthoredTone)
 {
     const QColor tone = defaultAppColor(AppColor::Positive, true);
     ASSERT_TRUE(tone.isValid());
@@ -652,10 +681,14 @@ TEST_F(ThemeIconRenderTest, StickerDarkSchemeFillIsSaturatedAndDarkerThanTheTone
     const QColor bottom = image.pixelColor(32, 50);
     ASSERT_GT(top.alpha(), 200);
     ASSERT_GT(bottom.alpha(), 200);
-    EXPECT_LT(top.value(), tone.value());
+    // The top is a darkening of the authored tone, never a lift, and it keeps
+    // the authored saturation; the sample sits a little down the gradient.
+    EXPECT_LE(top.value(), tone.value());
+    EXPECT_GT(top.value(), bottom.value());
     EXPECT_LT(bottom.value(), tone.value());
     EXPECT_GT(top.lightness(), bottom.lightness());
-    EXPECT_GE(top.hsvSaturation(), 170);
+    EXPECT_NEAR(top.hsvSaturation(), tone.hsvSaturation(), 24);
+    EXPECT_NEAR(bottom.hsvSaturation(), tone.hsvSaturation(), 24);
 }
 
 /** @brief The sticker is rendered at the device-pixel size, not upscaled later. */
@@ -726,10 +759,8 @@ TEST_F(ThemeIconRenderTest, StickerOnAuthoredArtUsesTheAssetPath)
 /** @brief Disabled keeps the shape language but drops back to the line glyph. */
 TEST_F(ThemeIconRenderTest, DisabledStickerFallsBackToLineGlyph)
 {
-    QPalette palette = qApp->palette();
-    const QColor disabledText(QStringLiteral("#fedcba"));
-    palette.setColor(QPalette::Disabled, QPalette::WindowText, disabledText);
-    qApp->setPalette(palette);
+    const QColor disabled = IconTint(AppColor::Icon).resolve(QIcon::Disabled);
+    ASSERT_TRUE(disabled.isValid());
 
     const QColor tone = themeManager->appColor(AppColor::Negative);
     const QIcon icon = loadThemedIcon(QStringLiteral("icons/remove_row"), AppColor::Negative, IconStyle::Sticker);
@@ -739,7 +770,7 @@ TEST_F(ThemeIconRenderTest, DisabledStickerFallsBackToLineGlyph)
     // No rim in the sticker tone: Disabled drops the treatment and paints the
     // thin disabled line glyph instead.
     EXPECT_EQ(countOpaquePixels(pixmap, ThemeIconSticker::outlineColor(tone)), 0);
-    EXPECT_GT(countOpaquePixels(pixmap, disabledText), 0);
+    EXPECT_GT(countOpaquePixels(pixmap, disabled), 0);
 }
 
 /** @brief Line stays the default: no disc, no ring, just the recolored glyph. */
@@ -750,7 +781,7 @@ TEST_F(ThemeIconRenderTest, LineStyleStillRendersGlyphAlone)
         loadThemedIcon(QStringLiteral("icons/ready_start"), AppColor::Positive).pixmap(QSize(64, 64));
     ASSERT_FALSE(pixmap.isNull());
 
-    EXPECT_EQ(countOpaquePixels(pixmap, ThemeIconFill::saturated(tone).darker(300)), 0);
+    EXPECT_EQ(countOpaquePixels(pixmap, tone.darker(300)), 0);
     EXPECT_GT(countOpaquePixels(pixmap, tone), 0);
 }
 
@@ -836,7 +867,8 @@ TEST(IconTintPreview, WritesPngsWhenRequested)
             painter.drawText(QPointF(MARGIN, rowTop + 16), QString::fromLatin1(glyph.name));
             for (std::size_t i = 0; i < std::size(SIZES); ++i) {
                 const int side = SIZES[i];
-                const QPixmap pixmap = renderLine(svg, tone, QSize(side, side));
+                const QPixmap pixmap = renderAtDpr(
+                    QSize(side, side), DPR, [&](const QSize &pixelSize) { return renderLine(svg, tone, pixelSize); });
                 const qreal x = MARGIN + LABEL_WIDTH + static_cast<qreal>(i) * CELL_WIDTH;
                 // Bottom-align the sizes and put the caption below the 48px row.
                 painter.drawPixmap(QPointF(x, rowTop + 54 - side), pixmap);
@@ -939,8 +971,8 @@ TEST(IconStickerPreview, WritesPngsWhenRequested)
             const QByteArray svg = readSvg(glyph.name);
             ASSERT_FALSE(svg.isEmpty()) << glyph.name;
             // The preview must show the line glyph the engine paints, and the
-            // engine saturates AppColor tones before drawing them.
-            const QColor tone = ThemeIconFill::saturated(defaultAppColor(glyph.role, dark));
+            // engine renders an authored tone verbatim.
+            const QColor tone = defaultAppColor(glyph.role, dark);
 
             for (int row = 0; row < 2; ++row) {
                 const bool sticker = row == 1;
@@ -950,8 +982,10 @@ TEST(IconStickerPreview, WritesPngsWhenRequested)
                                      QString::fromLatin1(glyph.name));
                 for (std::size_t i = 0; i < std::size(SIZES); ++i) {
                     const int side = SIZES[i];
-                    const QPixmap pixmap = sticker ? ThemeIconSticker::renderSticker(svg, tone, QSize(side, side))
-                                                   : renderLine(svg, tone, QSize(side, side));
+                    const QPixmap pixmap = renderAtDpr(QSize(side, side), DPR, [&](const QSize &pixelSize) {
+                        return sticker ? ThemeIconSticker::renderSticker(svg, tone, pixelSize)
+                                       : renderLine(svg, tone, pixelSize);
+                    });
                     const qreal x = MARGIN + LABEL_WIDTH + static_cast<qreal>(i) * CELL_WIDTH;
                     painter.drawPixmap(QPointF(x, rowTop + 36 - side), pixmap);
                     if (row == 1) {
@@ -973,8 +1007,11 @@ TEST(IconStickerPreview, WritesPngsWhenRequested)
             ASSERT_FALSE(svg.isEmpty()) << badgeContext[i].name;
             const QColor tone = defaultAppColor(badgeContext[i].role, dark);
             const qreal x = MARGIN + LABEL_WIDTH + static_cast<qreal>(i) * CELL_WIDTH;
-            painter.drawPixmap(QPointF(x, y + 8),
-                               ThemeIconBadge::renderBadge(svg, tone, QSize(CONTEXT_SIZE, CONTEXT_SIZE)));
+            painter.drawPixmap(
+                QPointF(x, y + 8), renderAtDpr(QSize(CONTEXT_SIZE, CONTEXT_SIZE), DPR, [&](const QSize &pixelSize) {
+                    return ThemeIconBadge::renderBadge(
+                        svg, tone, pixelSize, dark ? ThemeIconFill::Scheme::Dark : ThemeIconFill::Scheme::Light);
+                }));
             painter.drawText(QPointF(x, y + 8 + CONTEXT_SIZE + 12), QString::fromLatin1(badgeContext[i].name));
         }
 
@@ -985,18 +1022,20 @@ TEST(IconStickerPreview, WritesPngsWhenRequested)
         for (std::size_t i = 0; i < std::size(badgeContext); ++i) {
             const QByteArray svg = readSvg(badgeContext[i].name);
             ASSERT_FALSE(svg.isEmpty()) << badgeContext[i].name;
-            const QColor tone = ThemeIconFill::saturated(defaultAppColor(badgeContext[i].role, dark));
+            const QColor tone = defaultAppColor(badgeContext[i].role, dark);
             const qreal x = MARGIN + LABEL_WIDTH + static_cast<qreal>(i) * CELL_WIDTH * 1.5;
             for (int j = 0; j < 3; ++j) {
                 const QSize side(CONTEXT_SIZE, CONTEXT_SIZE);
-                QPixmap pixmap;
-                if (j == 0) {
-                    pixmap = renderLine(svg, tone, side);
-                } else if (j == 1) {
-                    pixmap = ThemeIconBadge::renderBadge(svg, tone, side);
-                } else {
-                    pixmap = ThemeIconSticker::renderSticker(svg, tone, side);
-                }
+                const QPixmap pixmap = renderAtDpr(side, DPR, [&](const QSize &pixelSize) {
+                    if (j == 0) {
+                        return renderLine(svg, tone, pixelSize);
+                    }
+                    if (j == 1) {
+                        return ThemeIconBadge::renderBadge(
+                            svg, tone, pixelSize, dark ? ThemeIconFill::Scheme::Dark : ThemeIconFill::Scheme::Light);
+                    }
+                    return ThemeIconSticker::renderSticker(svg, tone, pixelSize);
+                });
                 const qreal px = x + j * (CONTEXT_SIZE + 16);
                 painter.drawPixmap(QPointF(px, y + 8), pixmap);
                 painter.drawText(QPointF(px, y + 8 + CONTEXT_SIZE + 12), QString::fromLatin1(FAMILY_LABELS[j]));
@@ -1091,8 +1130,8 @@ TEST(IconBadgePreview, WritesPngsWhenRequested)
             const QByteArray svg = readSvg(glyph.name);
             ASSERT_FALSE(svg.isEmpty()) << glyph.name;
             // The preview must show the line glyph the engine paints, and the
-            // engine saturates AppColor tones before drawing them.
-            const QColor tone = ThemeIconFill::saturated(defaultAppColor(glyph.role, dark));
+            // engine renders an authored tone verbatim.
+            const QColor tone = defaultAppColor(glyph.role, dark);
 
             for (int row = 0; row < 2; ++row) {
                 const bool badge = row == 1;
@@ -1102,8 +1141,12 @@ TEST(IconBadgePreview, WritesPngsWhenRequested)
                                      QString::fromLatin1(glyph.name));
                 for (std::size_t i = 0; i < std::size(SIZES); ++i) {
                     const int side = SIZES[i];
-                    const QPixmap pixmap = badge ? ThemeIconBadge::renderBadge(svg, tone, QSize(side, side))
-                                                 : renderLine(svg, tone, QSize(side, side));
+                    const QPixmap pixmap = renderAtDpr(QSize(side, side), DPR, [&](const QSize &pixelSize) {
+                        return badge ? ThemeIconBadge::renderBadge(svg, tone, pixelSize,
+                                                                   dark ? ThemeIconFill::Scheme::Dark
+                                                                        : ThemeIconFill::Scheme::Light)
+                                     : renderLine(svg, tone, pixelSize);
+                    });
                     const qreal x = MARGIN + LABEL_WIDTH + static_cast<qreal>(i) * CELL_WIDTH;
                     // Align all sizes on a common baseline so the weight
                     // difference between 15px and 48px is visible.
@@ -1128,9 +1171,11 @@ namespace
 struct InkPalette
 {
     QColor text;
+    QColor buttonText;
     QColor window;
     QColor button;
     QColor accent;
+    QMap<AppColor::Role, QColor> roles;
 };
 
 /**
@@ -1146,12 +1191,37 @@ InkPalette shippedPalette(const QString &theme, bool dark)
             .absoluteFilePath(QStringLiteral("cockatrice/themes/%1/palette-default-%2.toml")
                                   .arg(theme, dark ? QStringLiteral("dark") : QStringLiteral("light")));
     const PaletteConfig config = PaletteConfig::fromFile(file);
-    if (!config.hasPalette()) {
+    // A theme may author only [AppColors] (System does), so appColors alone do
+    // not mean it ships a palette: the keys have to be present. The authored
+    // neutral-family assertions therefore cover only themes with a palette;
+    // System's authored neutral family is checked for authorship and ordering
+    // by ShippedPalettesAuthorTheEmphasisLadder, and its semantic fallbacks
+    // against representative platform surfaces by
+    // DefaultSemanticFamilyMeetsTheLadderOnPlatformSurfaces.
+    if (config.colors.isEmpty()) {
         return {};
     }
     const QPalette palette = config.apply(QPalette());
-    return {palette.color(QPalette::Active, QPalette::WindowText), palette.color(QPalette::Active, QPalette::Window),
-            palette.color(QPalette::Active, QPalette::Button), palette.color(QPalette::Active, QPalette::Highlight)};
+    return {
+        palette.color(QPalette::Active, QPalette::WindowText), palette.color(QPalette::Active, QPalette::ButtonText),
+        palette.color(QPalette::Active, QPalette::Window),     palette.color(QPalette::Active, QPalette::Button),
+        palette.color(QPalette::Active, QPalette::Highlight),  config.appColors};
+}
+
+/**
+ * @brief The [AppColors] a shipped theme authors, even when it ships no palette.
+ *
+ * System deliberately has no palette of its own, but it still authors every
+ * app-color role, including the neutral icon family that used to be derived
+ * from the platform palette.
+ */
+QMap<AppColor::Role, QColor> shippedAppColors(const QString &theme, bool dark)
+{
+    const QString file =
+        QDir(QStringLiteral(COCKATRICE_SOURCE_DIR))
+            .absoluteFilePath(QStringLiteral("cockatrice/themes/%1/palette-default-%2.toml")
+                                  .arg(theme, dark ? QStringLiteral("dark") : QStringLiteral("light")));
+    return PaletteConfig::fromFile(file).appColors;
 }
 } // namespace
 
@@ -1169,6 +1239,44 @@ TEST(IconInk, GivesNeutralGlyphsAccentChroma)
     EXPECT_GT(ink.hsvSaturation(), palette.text.hsvSaturation()) << "the glyph gained no chroma";
     EXPECT_GT(ink.blue(), ink.red()) << "accent chroma did not reach the glyph";
     EXPECT_GE(ThemeIconInk::contrastRatio(ink, palette.window), ThemeIconInk::labelContrastFloor());
+}
+
+/**
+ * @brief A medium-light surface needs the pole that can actually reach the floor.
+ *
+ * #9a9a9a is lighter than mid-gray but still too light for white to reach a text
+ * ratio, so "light background means move toward black" is the wrong test.
+ */
+TEST(IconInk, ContrastFloorPicksThePoleItCanReach)
+{
+    const QColor background(QStringLiteral("#9a9a9a"));
+    ASSERT_LT(ThemeIconInk::contrastRatio(QColor(Qt::white), background), 4.5);
+    ASSERT_GE(ThemeIconInk::contrastRatio(QColor(Qt::black), background), 4.5);
+
+    const QColor solved = ThemeIconInk::reachContrast(QColor(QStringLiteral("#d0d0d0")), background, 4.5);
+    EXPECT_GE(ThemeIconInk::contrastRatio(solved, background), 4.5);
+}
+
+/**
+ * @brief A green or red accent must not tint neutral chrome.
+ *
+ * Positive owns green and Negative owns red, so a theme whose accent sits in
+ * either band would otherwise paint "settings" the same color as "add".
+ */
+TEST(IconInk, SemanticAccentDoesNotTintNeutralChrome)
+{
+    const QColor surface(QStringLiteral("#18202e"));
+    const QColor text = Qt::white;
+    const QColor green(QStringLiteral("#149740"));
+    const QColor blue(QStringLiteral("#2f6fd6"));
+
+    ASSERT_TRUE(ThemeIconInk::isSemanticHue(green.hue()));
+    ASSERT_FALSE(ThemeIconInk::isSemanticHue(blue.hue()));
+
+    const QColor greenInk = ThemeIconInk::glyphInk(text, surface, green);
+    EXPECT_NEAR(greenInk.hue(), ThemeIconInk::neutralChromeHue(), 2);
+    EXPECT_FALSE(ThemeIconInk::isSemanticHue(greenInk.hue()));
+    EXPECT_NEAR(ThemeIconInk::glyphInk(text, surface, blue).hue(), blue.hue(), 1);
 }
 
 TEST(IconInk, MeetsTheLabelFloorOnEveryShippedPalette)
@@ -1334,8 +1442,14 @@ TEST(IconInkPreview, WritesPngsWhenRequested)
                     ASSERT_FALSE(svg.isEmpty()) << GLYPHS[i];
                     const qreal cellOffset = static_cast<qreal>(i) * (side + CELL_GAP);
                     const qreal glyphY = rowY + (ROW_HEIGHT - side) / 2.0;
-                    painter.drawPixmap(QPointF(oldX + cellOffset, glyphY), renderLine(svg, oldInk, QSize(side, side)));
-                    painter.drawPixmap(QPointF(newX + cellOffset, glyphY), renderLine(svg, newInk, QSize(side, side)));
+                    painter.drawPixmap(QPointF(oldX + cellOffset, glyphY),
+                                       renderAtDpr(QSize(side, side), DPR, [&](const QSize &pixelSize) {
+                                           return renderLine(svg, oldInk, pixelSize);
+                                       }));
+                    painter.drawPixmap(QPointF(newX + cellOffset, glyphY),
+                                       renderAtDpr(QSize(side, side), DPR, [&](const QSize &pixelSize) {
+                                           return renderLine(svg, newInk, pixelSize);
+                                       }));
                 }
                 rowY += ROW_HEIGHT;
             }
@@ -1365,97 +1479,365 @@ bool applyShippedPalette(const QString &theme, bool dark)
     qApp->setPalette(config.apply(QPalette()));
     return true;
 }
-
-QColor surfaceColor()
-{
-    return qApp->palette().color(QPalette::Active, QPalette::Window);
-}
 } // namespace
 
 /**
- * @brief The primary action of a surface takes the accent, not a darker gray.
+ * @brief Emphasis selects the authored variant of a family, not a computed color.
  *
- * A glyph hierarchy cannot be built out of "dark" and "darker": at any usable
- * contrast a neutral ink is already near the palette's pole, so the top level
- * has to be a different color. The accent is the palette's own answer to "which
- * color means action", so primary uses it instead of inventing a token.
+ * The theme stores one color per level, so the mapping is a lookup: a base role
+ * follows the caller's emphasis, while naming a variant pins that level at every
+ * emphasis. This is the contract that makes the palette editor's rows the whole
+ * source of truth.
  */
-TEST_F(ThemeIconRenderTest, PrimaryEmphasisUsesTheAccent)
+TEST_F(ThemeIconRenderTest, EmphasisSelectsTheAuthoredVariant)
 {
-    ASSERT_TRUE(applyShippedPalette(QStringLiteral("Fabric"), false));
+    EXPECT_EQ(IconTint().resolve(QIcon::Normal), themeManager->appColor(AppColor::Icon));
+    EXPECT_EQ(IconTint::primary().resolve(QIcon::Normal), themeManager->appColor(AppColor::IconStrong));
+    EXPECT_EQ(IconTint::quiet().resolve(QIcon::Normal), themeManager->appColor(AppColor::IconSoft));
+    EXPECT_EQ(IconTint(QPalette::WindowText, IconEmphasis::Primary).resolve(QIcon::Normal),
+              themeManager->appColor(AppColor::IconStrong));
 
-    const QColor secondary = IconTint().resolve(QIcon::Normal);
-    const QColor primary = IconTint::primary().resolve(QIcon::Normal);
+    struct Family
+    {
+        AppColor::Role base;
+        AppColor::Role strong;
+        AppColor::Role soft;
+    };
 
-    EXPECT_NE(primary, secondary);
-    EXPECT_GT(primary.blue(), primary.red()) << "the primary glyph did not take the accent's blue";
-    EXPECT_GE(ThemeIconInk::contrastRatio(primary, surfaceColor()), ThemeIconInk::primaryContrastFloor());
-    EXPECT_GE(ThemeIconInk::contrastRatio(primary, surfaceColor()),
-              ThemeIconInk::contrastRatio(secondary, surfaceColor()));
+    for (const Family &family : {Family{AppColor::Icon, AppColor::IconStrong, AppColor::IconSoft},
+                                 Family{AppColor::Positive, AppColor::PositiveStrong, AppColor::PositiveSoft},
+                                 Family{AppColor::Negative, AppColor::NegativeStrong, AppColor::NegativeSoft}}) {
+        EXPECT_EQ(IconTint(family.base, IconEmphasis::Primary).resolve(QIcon::Normal),
+                  themeManager->appColor(family.strong));
+        EXPECT_EQ(IconTint(family.base).resolve(QIcon::Normal), themeManager->appColor(family.base));
+        EXPECT_EQ(IconTint(family.base, IconEmphasis::Quiet).resolve(QIcon::Normal),
+                  themeManager->appColor(family.soft));
+        // Naming a variant is explicit: emphasis does not rewrite it.
+        EXPECT_EQ(IconTint(family.strong, IconEmphasis::Quiet).resolve(QIcon::Normal),
+                  themeManager->appColor(family.strong));
+        EXPECT_EQ(IconTint(family.soft, IconEmphasis::Primary).resolve(QIcon::Normal),
+                  themeManager->appColor(family.soft));
+    }
 }
 
 /**
- * @brief The primary level out-reads the default one on both schemes.
+ * @brief The authored primary level is the most chromatic member of its family.
  *
- * The default ink borrows enough accent to sit off the palette's pole (5.4:1 on
- * light, 6.4:1 on dark), so the 7:1 primary floor is measurably above it in both
- * schemes instead of being lost against a near-black or near-white default.
- * Hue alone would not keep the order; the contrast target does.
+ * Contrast cannot order the ladder: on a dark surface the highest-contrast tone
+ * is the palest one, so a contrast target makes the primary read as a washed-out
+ * secondary. Chroma orders the levels instead; contrast only has to stay above
+ * the legibility floor on every surface the icon is drawn on.
  */
-TEST_F(ThemeIconRenderTest, PrimaryOutReadsSecondaryOnBothSchemes)
+TEST_F(ThemeIconRenderTest, PrimaryIsTheMostChromaticLevelOnBothSchemes)
 {
     for (const bool dark : {false, true}) {
-        ASSERT_TRUE(applyShippedPalette(QStringLiteral("Fabric"), dark));
-        const QColor surface = surfaceColor();
-        const QColor secondary = IconTint().resolve(QIcon::Normal);
-        const QColor primary = IconTint::primary().resolve(QIcon::Normal);
-        EXPECT_NE(primary, secondary) << (dark ? "dark" : "light");
-        EXPECT_GT(ThemeIconInk::contrastRatio(primary, surface), ThemeIconInk::contrastRatio(secondary, surface))
-            << (dark ? "dark" : "light");
-        EXPECT_GE(ThemeIconInk::contrastRatio(primary, surface), ThemeIconInk::primaryContrastFloor())
-            << (dark ? "dark" : "light");
+        const InkPalette palette = shippedPalette(QStringLiteral("Fabric"), dark);
+        ASSERT_TRUE(palette.text.isValid()) << (dark ? "dark" : "light");
+        const QColor secondary = palette.roles.value(AppColor::Icon);
+        const QColor primary = palette.roles.value(AppColor::IconStrong);
+        ASSERT_TRUE(secondary.isValid() && primary.isValid()) << (dark ? "dark" : "light");
+
+        EXPECT_GT(primary.hsvSaturation(), secondary.hsvSaturation()) << (dark ? "dark" : "light");
+        for (const QColor &surface : {palette.window, palette.button}) {
+            EXPECT_GE(ThemeIconInk::contrastRatio(primary, surface), ThemeIconInk::primaryContrastFloor())
+                << (dark ? "dark" : "light");
+        }
     }
 }
 
-/** @brief A quiet glyph recedes toward its surface without dropping below 3:1. */
-TEST_F(ThemeIconRenderTest, QuietEmphasisRecedesButStaysLegible)
+/**
+ * @brief Quiet is the least chromatic level; it shares the legibility floor.
+ *
+ * Ordering the ladder by contrast inverted it on dark schemes and pushed quiet
+ * under the disabled ink. Quiet now keeps the same floor as the other levels and
+ * recedes by carrying less of the family's chroma, which also leaves the
+ * disabled level the only one below the floor.
+ */
+TEST_F(ThemeIconRenderTest, QuietIsTheLeastChromaticLevel)
 {
-    ASSERT_TRUE(applyShippedPalette(QStringLiteral("Fabric"), false));
+    for (const bool dark : {false, true}) {
+        const InkPalette palette = shippedPalette(QStringLiteral("Fabric"), dark);
+        ASSERT_TRUE(palette.text.isValid()) << (dark ? "dark" : "light");
+        const QColor secondary = palette.roles.value(AppColor::Icon);
+        const QColor quiet = palette.roles.value(AppColor::IconSoft);
+        ASSERT_TRUE(secondary.isValid() && quiet.isValid()) << (dark ? "dark" : "light");
 
-    const QColor secondary = IconTint().resolve(QIcon::Normal);
-    const QColor quiet = IconTint::quiet().resolve(QIcon::Normal);
-
-    EXPECT_LT(ThemeIconInk::contrastRatio(quiet, surfaceColor()),
-              ThemeIconInk::contrastRatio(secondary, surfaceColor()))
-        << "the quiet glyph does not recede";
-    EXPECT_GE(ThemeIconInk::contrastRatio(quiet, surfaceColor()), ThemeIconInk::quietContrastFloor());
+        EXPECT_LT(quiet.hsvSaturation(), secondary.hsvSaturation()) << (dark ? "dark" : "light");
+        for (const QColor &surface : {palette.window, palette.button}) {
+            const double quietContrast = ThemeIconInk::contrastRatio(quiet, surface);
+            EXPECT_GE(quietContrast, ThemeIconInk::quietContrastFloor()) << (dark ? "dark" : "light");
+            EXPECT_GE(quietContrast - ThemeIconInk::contrastRatio(ThemeIconInk::disabledInk(quiet, surface), surface),
+                      1.0)
+                << (dark ? "dark" : "light");
+        }
+    }
 }
 
-/** @brief Emphasis changes how loud a semantic color is, never which color it is. */
+/** @brief Every authored emphasis level keeps a semantic family's hue. */
 TEST_F(ThemeIconRenderTest, EmphasisKeepsASemanticHue)
 {
-    ASSERT_TRUE(applyShippedPalette(QStringLiteral("Fabric"), false));
+    const QString themesRoot =
+        QDir(QStringLiteral(COCKATRICE_SOURCE_DIR)).absoluteFilePath(QStringLiteral("cockatrice/themes"));
+    const QStringList themes = QDir(themesRoot).entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+    ASSERT_FALSE(themes.isEmpty());
 
-    for (const IconEmphasis emphasis : {IconEmphasis::Primary, IconEmphasis::Secondary, IconEmphasis::Quiet}) {
-        const QColor ink = IconTint(AppColor::Positive, emphasis).resolve(QIcon::Normal);
-        EXPECT_GT(ink.green(), ink.red()) << static_cast<int>(emphasis);
-        EXPECT_GT(ink.green(), ink.blue()) << static_cast<int>(emphasis);
+    int checked = 0;
+    for (const QString &theme : themes) {
+        for (const bool dark : {false, true}) {
+            const QMap<AppColor::Role, QColor> roles = shippedAppColors(theme, dark);
+
+            for (const AppColor::Role role : {AppColor::Positive, AppColor::PositiveStrong, AppColor::PositiveSoft}) {
+                const QColor ink = roles.value(role);
+                if (!ink.isValid()) {
+                    continue;
+                }
+                ++checked;
+                EXPECT_GT(ink.green(), ink.red()) << theme.toStdString() << static_cast<int>(role);
+                EXPECT_GT(ink.green(), ink.blue()) << theme.toStdString() << static_cast<int>(role);
+            }
+
+            for (const AppColor::Role role : {AppColor::Negative, AppColor::NegativeStrong, AppColor::NegativeSoft}) {
+                const QColor ink = roles.value(role);
+                if (!ink.isValid()) {
+                    continue;
+                }
+                ++checked;
+                EXPECT_GT(ink.red(), ink.green()) << theme.toStdString() << static_cast<int>(role);
+                EXPECT_GT(ink.red(), ink.blue()) << theme.toStdString() << static_cast<int>(role);
+            }
+        }
+    }
+    EXPECT_GT(checked, 0) << "no shipped theme authored a semantic emphasis level";
+}
+
+/**
+ * @brief Every palette-shipping theme authors the whole emphasis ladder.
+ *
+ * The palette editor treats an unset role as "derive it", so a missing key is
+ * not a crash: it silently reintroduces the computed colors this change exists
+ * to remove. Treat a missing role as a test failure instead, and keep the same
+ * contrast contract the old computed levels had.
+ */
+TEST(IconInk, ShippedPalettesAuthorTheEmphasisLadder)
+{
+    const QString themesRoot =
+        QDir(QStringLiteral(COCKATRICE_SOURCE_DIR)).absoluteFilePath(QStringLiteral("cockatrice/themes"));
+    const QStringList themes = QDir(themesRoot).entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+    ASSERT_FALSE(themes.isEmpty());
+
+    int checked = 0;
+    for (const QString &theme : themes) {
+        for (const bool dark : {false, true}) {
+            const InkPalette palette = shippedPalette(theme, dark);
+            if (!palette.text.isValid()) {
+                continue; // System ships no palette, so it has no surfaces to measure.
+            }
+            ++checked;
+
+            for (const AppColor::Role role : {AppColor::Icon, AppColor::IconStrong, AppColor::IconSoft,
+                                              AppColor::Positive, AppColor::PositiveStrong, AppColor::PositiveSoft,
+                                              AppColor::Negative, AppColor::NegativeStrong, AppColor::NegativeSoft}) {
+                ASSERT_TRUE(palette.roles.contains(role))
+                    << theme.toStdString() << (dark ? " dark" : " light") << static_cast<int>(role);
+            }
+
+            for (const QColor &surface : {palette.window, palette.button}) {
+                const double secondary = ThemeIconInk::contrastRatio(palette.roles.value(AppColor::Icon), surface);
+                const double primary = ThemeIconInk::contrastRatio(palette.roles.value(AppColor::IconStrong), surface);
+                const double quiet = ThemeIconInk::contrastRatio(palette.roles.value(AppColor::IconSoft), surface);
+                EXPECT_GE(secondary, ThemeIconInk::labelContrastFloor())
+                    << theme.toStdString() << (dark ? " dark" : " light");
+                EXPECT_GE(primary, ThemeIconInk::primaryContrastFloor())
+                    << theme.toStdString() << (dark ? " dark" : " light");
+                EXPECT_GT(palette.roles.value(AppColor::IconStrong).hsvSaturation(),
+                          palette.roles.value(AppColor::Icon).hsvSaturation())
+                    << theme.toStdString() << (dark ? " dark" : " light");
+                EXPECT_GE(quiet, ThemeIconInk::quietContrastFloor())
+                    << theme.toStdString() << (dark ? " dark" : " light");
+                EXPECT_LT(palette.roles.value(AppColor::IconSoft).hsvSaturation(),
+                          palette.roles.value(AppColor::Icon).hsvSaturation())
+                    << theme.toStdString() << (dark ? " dark" : " light");
+
+                for (const auto &[base, strong, soft] :
+                     {std::tuple{AppColor::Positive, AppColor::PositiveStrong, AppColor::PositiveSoft},
+                      std::tuple{AppColor::Negative, AppColor::NegativeStrong, AppColor::NegativeSoft}}) {
+                    EXPECT_GE(ThemeIconInk::contrastRatio(palette.roles.value(soft), surface),
+                              ThemeIconInk::quietContrastFloor())
+                        << theme.toStdString() << (dark ? " dark" : " light");
+                    EXPECT_LT(palette.roles.value(soft).hsvSaturation(), palette.roles.value(base).hsvSaturation())
+                        << theme.toStdString() << (dark ? " dark" : " light");
+                    EXPECT_GT(palette.roles.value(strong).hsvSaturation(), palette.roles.value(base).hsvSaturation())
+                        << theme.toStdString() << (dark ? " dark" : " light");
+                }
+            }
+        }
+    }
+    EXPECT_GT(checked, 0) << "no shipped palette was loadable";
+
+    // The System theme ships no palette of its own, so its families have no
+    // authored surfaces to measure against. It still authors the neutral family
+    // instead of deriving it: deriving picked up the platform accent's chroma,
+    // which painted neutral chrome blue on a default Linux scheme.
+    for (const bool dark : {false, true}) {
+        const QMap<AppColor::Role, QColor> system = shippedAppColors(QStringLiteral("System"), dark);
+        EXPECT_TRUE(system.contains(AppColor::PositiveStrong));
+        EXPECT_TRUE(system.contains(AppColor::NegativeSoft));
+        for (const AppColor::Role role : {AppColor::Icon, AppColor::IconStrong, AppColor::IconSoft}) {
+            ASSERT_TRUE(system.contains(role)) << (dark ? "dark" : "light") << static_cast<int>(role);
+            EXPECT_EQ(system.value(role).hsvSaturation(), 0) << (dark ? "dark" : "light") << static_cast<int>(role);
+        }
+
+        // Strong is the loudest level a neutral family can reach: the darkest
+        // tone on the light scheme, the palest on the dark one. Quiet recedes
+        // toward the surface on both.
+        const double secondary = ThemeIconInk::relativeLuminance(system.value(AppColor::Icon));
+        const double primary = ThemeIconInk::relativeLuminance(system.value(AppColor::IconStrong));
+        const double quiet = ThemeIconInk::relativeLuminance(system.value(AppColor::IconSoft));
+        if (dark) {
+            EXPECT_GT(primary, secondary) << "dark";
+            EXPECT_GT(secondary, quiet) << "dark";
+        } else {
+            EXPECT_LT(primary, secondary) << "light";
+            EXPECT_LT(secondary, quiet) << "light";
+        }
     }
 }
 
-/** @brief Every emphasis keeps the selected-row swap to HighlightedText. */
+/**
+ * @brief Neutral chrome keeps a hue distance from the semantic families.
+ *
+ * Fusion's accent is green, so deriving neutral ink from it painted every menu
+ * and toolbar glyph the same color as the Positive family. The authored neutral
+ * family has to stay a hue a reader can tell apart from "add" and "remove".
+ */
+TEST(IconInk, NeutralFamilyKeepsItsDistanceFromTheSemanticFamilies)
+{
+    const QString themesRoot =
+        QDir(QStringLiteral(COCKATRICE_SOURCE_DIR)).absoluteFilePath(QStringLiteral("cockatrice/themes"));
+    const QStringList themes = QDir(themesRoot).entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+    ASSERT_FALSE(themes.isEmpty());
+
+    int checked = 0;
+    for (const QString &theme : themes) {
+        for (const bool dark : {false, true}) {
+            const InkPalette palette = shippedPalette(theme, dark);
+            if (!palette.text.isValid()) {
+                continue;
+            }
+            const QColor neutral = palette.roles.value(AppColor::Icon);
+            for (const AppColor::Role role : {AppColor::Positive, AppColor::Negative}) {
+                const QColor semantic = palette.roles.value(role);
+                ASSERT_TRUE(neutral.isValid() && semantic.isValid())
+                    << theme.toStdString() << (dark ? " dark" : " light");
+                const int distance = qAbs(neutral.hue() - semantic.hue());
+                EXPECT_GE(qMin(distance, 360 - distance), 30)
+                    << theme.toStdString() << (dark ? " dark" : " light") << static_cast<int>(role);
+                ++checked;
+            }
+        }
+    }
+    EXPECT_GT(checked, 0) << "no shipped palette was loadable";
+}
+
+/**
+ * @brief Every shipped theme keeps the disabled level below the quiet level.
+ *
+ * The palette's disabled text is a fixed gray, so this is the invariant the
+ * derived disabled ink exists to hold; a regression here makes an enabled quiet
+ * glyph look unavailable.
+ */
+TEST(IconInk, DisabledStaysBelowQuietOnEveryShippedTheme)
+{
+    const QString themesRoot =
+        QDir(QStringLiteral(COCKATRICE_SOURCE_DIR)).absoluteFilePath(QStringLiteral("cockatrice/themes"));
+    const QStringList themes = QDir(themesRoot).entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+    ASSERT_FALSE(themes.isEmpty());
+
+    int checked = 0;
+    for (const QString &theme : themes) {
+        for (const bool dark : {false, true}) {
+            const InkPalette palette = shippedPalette(theme, dark);
+            if (!palette.text.isValid()) {
+                continue;
+            }
+            const QColor quiet = palette.roles.value(AppColor::IconSoft);
+            ASSERT_TRUE(quiet.isValid()) << theme.toStdString() << (dark ? " dark" : " light");
+            const QColor surface = ThemeIconInk::harderSurface(palette.window, palette.button, quiet);
+            const QColor disabled = ThemeIconInk::disabledInk(quiet, surface);
+            EXPECT_GE(ThemeIconInk::contrastRatio(quiet, surface) - ThemeIconInk::contrastRatio(disabled, surface), 1.0)
+                << theme.toStdString() << (dark ? " dark" : " light");
+
+            for (const QColor &anySurface : {palette.window, palette.button}) {
+                EXPECT_LT(ThemeIconInk::contrastRatio(disabled, anySurface),
+                          ThemeIconInk::contrastRatio(quiet, anySurface))
+                    << theme.toStdString() << (dark ? " dark" : " light");
+            }
+            ++checked;
+        }
+    }
+    EXPECT_GT(checked, 0) << "no shipped palette was loadable";
+}
+
+/**
+ * @brief The System fallback family keeps the ladder on a platform palette.
+ *
+ * System authors no palette and follows the OS surfaces, so its families
+ * cannot be measured against its own window and button. These are the
+ * representative extremes of a platform palette, and the fixed values have to
+ * clear the same floor there that the five authored themes clear on their own
+ * surfaces.
+ */
+TEST(IconInk, DefaultSemanticFamilyMeetsTheLadderOnPlatformSurfaces)
+{
+    struct Scheme
+    {
+        bool dark;
+        QColor window;
+        QColor button;
+    };
+    const QList<Scheme> schemes = {
+        {false, QColor(QStringLiteral("#f0f0f0")), QColor(QStringLiteral("#f5f5f5"))},
+        {true, QColor(QStringLiteral("#2b2b2b")), QColor(QStringLiteral("#3c3c3c"))},
+    };
+
+    for (const Scheme &scheme : schemes) {
+        for (const auto &[base, strong, soft] :
+             {std::tuple{AppColor::Positive, AppColor::PositiveStrong, AppColor::PositiveSoft},
+              std::tuple{AppColor::Negative, AppColor::NegativeStrong, AppColor::NegativeSoft}}) {
+            const QColor secondary = defaultAppColor(base, scheme.dark);
+            const QColor primary = defaultAppColor(strong, scheme.dark);
+            const QColor quiet = defaultAppColor(soft, scheme.dark);
+            ASSERT_TRUE(secondary.isValid() && primary.isValid() && quiet.isValid());
+
+            for (const QColor &surface : {scheme.window, scheme.button}) {
+                EXPECT_GE(ThemeIconInk::contrastRatio(secondary, surface), ThemeIconInk::labelContrastFloor());
+                EXPECT_GE(ThemeIconInk::contrastRatio(primary, surface), ThemeIconInk::labelContrastFloor());
+                EXPECT_GE(ThemeIconInk::contrastRatio(quiet, surface), ThemeIconInk::labelContrastFloor());
+            }
+            EXPECT_LT(quiet.hsvSaturation(), secondary.hsvSaturation());
+            EXPECT_GT(primary.hsvSaturation(), secondary.hsvSaturation());
+        }
+    }
+}
+
+/**
+ * @brief Every emphasis keeps the selected-row swap to HighlightedText.
+ */
 TEST_F(ThemeIconRenderTest, SelectedStillFallsBackToHighlightedText)
 {
+    const QColor tone = IconTint(AppColor::AccentSoft).resolve(QIcon::Normal);
+    ASSERT_TRUE(tone.isValid());
+
     QPalette palette = qApp->palette();
     const QColor selectedText(QStringLiteral("#222222"));
-    palette.setColor(QPalette::Active, QPalette::Highlight, QColor(QStringLiteral("#000000")));
+    palette.setColor(QPalette::Active, QPalette::Highlight, tone);
     palette.setColor(QPalette::Active, QPalette::HighlightedText, selectedText);
     qApp->setPalette(palette);
 
-    // Black ink on a black highlight is illegible, so the selection wins for
-    // both the default and the quiet level.
+    // Tone on a highlight of the same color is illegible, so the selection wins
+    // for both the default and an explicitly tinted glyph.
     EXPECT_EQ(IconTint().resolve(QIcon::Selected), selectedText);
-    EXPECT_EQ(IconTint::quiet().resolve(QIcon::Selected), selectedText);
+    EXPECT_EQ(IconTint(AppColor::AccentSoft).resolve(QIcon::Selected), selectedText);
 }
 
 /**
@@ -1487,19 +1869,27 @@ TEST_F(ThemeIconRenderTest, EmphasisPreviewWritesPngsWhenRequested)
     constexpr int SIZES[] = {16, 24};
     constexpr const char *TREATMENTS[] = {"line", "sticker", "badge"};
     constexpr const char *LEVEL_NAMES[] = {"Quiet", "Secondary", "Primary"};
-    constexpr IconEmphasis LEVELS[] = {IconEmphasis::Quiet, IconEmphasis::Secondary, IconEmphasis::Primary};
 
     struct Family
     {
         const char *name;
         const char *glyphs[3];
-        AppColor::Role role;
-        bool neutral;
+        AppColor::Role quiet;
+        AppColor::Role secondary;
+        AppColor::Role primary;
     };
     const QList<Family> families = {
-        {"Neutral", {"settings", "info", "player"}, AppColor::Positive, true},
-        {"Positive", {"increment", "ready_start", "arrow_up"}, AppColor::Positive, false},
-        {"Negative", {"decrement", "not_ready_start", "remove_row"}, AppColor::Negative, false},
+        {"Neutral", {"settings", "info", "player"}, AppColor::IconSoft, AppColor::Icon, AppColor::IconStrong},
+        {"Positive",
+         {"increment", "ready_start", "arrow_up"},
+         AppColor::PositiveSoft,
+         AppColor::Positive,
+         AppColor::PositiveStrong},
+        {"Negative",
+         {"decrement", "not_ready_start", "remove_row"},
+         AppColor::NegativeSoft,
+         AppColor::Negative,
+         AppColor::NegativeStrong},
     };
     const QStringList themes = {
         QStringLiteral("Fabric"), QStringLiteral("Fusion"),       QStringLiteral("Leather"),
@@ -1531,16 +1921,14 @@ TEST_F(ThemeIconRenderTest, EmphasisPreviewWritesPngsWhenRequested)
             // before resolving tones for the sheet.
             ASSERT_TRUE(applyShippedPalette(theme, dark));
 
+            // The paint path is a lookup now, so the sheet shows the authored
+            // rows verbatim rather than a color recomputed from the accent.
             const auto toneFor = [&](const Family &family, int level) {
-                QColor base;
-                if (family.neutral) {
-                    base = level == 2 ? palette.accent
-                                      : ThemeIconInk::glyphInk(palette.text, palette.window, palette.accent);
-                } else {
-                    base = ThemeIconFill::saturated(defaultAppColor(family.role, dark));
-                }
-                return ThemeIconInk::forEmphasis(base, palette.window, LEVELS[level]);
+                return level == 0   ? palette.roles.value(family.quiet)
+                       : level == 1 ? palette.roles.value(family.secondary)
+                                    : palette.roles.value(family.primary);
             };
+            const auto scheme = dark ? ThemeIconFill::Scheme::Dark : ThemeIconFill::Scheme::Light;
 
             QImage image(QSize(qRound(logicalWidth * DPR), qRound(logicalHeight * DPR)),
                          QImage::Format_ARGB32_Premultiplied);
@@ -1609,14 +1997,15 @@ TEST_F(ThemeIconRenderTest, EmphasisPreviewWritesPngsWhenRequested)
                                 for (std::size_t glyphIndex = 0; glyphIndex < std::size(family.glyphs); ++glyphIndex) {
                                     const QByteArray svg = readIconSvg(family.glyphs[glyphIndex]);
                                     ASSERT_FALSE(svg.isEmpty()) << family.glyphs[glyphIndex];
-                                    QPixmap pixmap;
-                                    if (treatment == 0) {
-                                        pixmap = renderLine(svg, ink, size);
-                                    } else if (treatment == 1) {
-                                        pixmap = ThemeIconSticker::renderSticker(svg, ink, size);
-                                    } else {
-                                        pixmap = ThemeIconBadge::renderBadge(svg, ink, size);
-                                    }
+                                    const QPixmap pixmap = renderAtDpr(size, DPR, [&](const QSize &pixelSize) {
+                                        if (treatment == 0) {
+                                            return renderLine(svg, ink, pixelSize);
+                                        }
+                                        if (treatment == 1) {
+                                            return ThemeIconSticker::renderSticker(svg, ink, pixelSize);
+                                        }
+                                        return ThemeIconBadge::renderBadge(svg, ink, pixelSize, scheme);
+                                    });
                                     const qreal x = cellX + 6 + static_cast<qreal>(glyphIndex) * GLYPH_SLOT +
                                                     (GLYPH_SLOT - side) / 2.0;
                                     painter.drawPixmap(QPointF(x, rowTop + (GLYPH_SLOT - side) / 2.0), pixmap);
@@ -1632,6 +2021,202 @@ TEST_F(ThemeIconRenderTest, EmphasisPreviewWritesPngsWhenRequested)
             painter.end();
             const QString path = QDir(outDir).absoluteFilePath(
                 QStringLiteral("emphasis-preview-%1-%2.png")
+                    .arg(theme.toLower(), dark ? QStringLiteral("dark") : QStringLiteral("light")));
+            ASSERT_TRUE(image.save(path)) << path.toStdString();
+        }
+    }
+}
+
+/**
+ * @brief Writes the authored emphasis sheets for every shipped palette theme.
+ *
+ * The ladder is only useful if it survives the treatment a call site chooses, so
+ * each sheet renders the same three authored levels as line glyphs, as sticker
+ * fills and as badges, at the two sizes the UI uses, on the two surfaces the
+ * contrast targets are measured against. Each family carries three glyphs, so
+ * the sheet also proves the level, not just one lucky shape. A disabled row
+ * closes each family: it must read dimmer than quiet, and every treatment falls
+ * back to the line glyph there.
+ *
+ * The authored tone is the top of every filled gradient, so the sheet prints that
+ * tone and the darker bottom the shape actually carries.
+ */
+TEST_F(ThemeIconRenderTest, EmphasisTreatmentsPreviewWritesPngsWhenRequested)
+{
+    const QString outDir = qEnvironmentVariable("COCKATRICE_ICON_PREVIEW_DIR");
+    if (outDir.isEmpty()) {
+        GTEST_SKIP() << "set COCKATRICE_ICON_PREVIEW_DIR to write the preview PNGs";
+    }
+    ASSERT_TRUE(QDir().mkpath(outDir));
+
+    constexpr int MARGIN = 24;
+    constexpr int LABEL_WIDTH = 230;
+    constexpr int CELL_WIDTH = 166;
+    constexpr int ROW_HEIGHT = 58;
+    constexpr int PANEL_TITLE = 26;
+    constexpr int COLUMN_HEADER = 20;
+    constexpr int PANEL_PADDING = 12;
+    constexpr int GLYPH_SLOT = 32;
+    constexpr qreal DPR = 2.0;
+    constexpr int SIZES[] = {16, 24};
+    constexpr const char *TREATMENTS[] = {"line", "sticker", "badge"};
+    constexpr const char *LEVEL_NAMES[] = {"Quiet", "Secondary", "Primary"};
+
+    struct Family
+    {
+        const char *name;
+        const char *glyphs[3];
+        AppColor::Role quiet;
+        AppColor::Role secondary;
+        AppColor::Role primary;
+    };
+    const QList<Family> families = {
+        {"Neutral", {"settings", "info", "player"}, AppColor::IconSoft, AppColor::Icon, AppColor::IconStrong},
+        {"Positive",
+         {"increment", "ready_start", "arrow_up"},
+         AppColor::PositiveSoft,
+         AppColor::Positive,
+         AppColor::PositiveStrong},
+        {"Negative",
+         {"decrement", "not_ready_start", "remove_row"},
+         AppColor::NegativeSoft,
+         AppColor::Negative,
+         AppColor::NegativeStrong},
+    };
+    const QStringList themes = {
+        QStringLiteral("Fabric"), QStringLiteral("Fusion"),       QStringLiteral("Leather"),
+        QStringLiteral("Plasma"), QStringLiteral("VelvetMarble"),
+    };
+
+    const auto roleAt = [](const Family &family, int level) {
+        return level == 0 ? family.quiet : level == 1 ? family.secondary : family.primary;
+    };
+    const auto schemeFor = [](bool dark) { return dark ? ThemeIconFill::Scheme::Dark : ThemeIconFill::Scheme::Light; };
+    const auto renderLine = [](const QByteArray &svg, const QColor &ink, const QSize &size) {
+        QSvgRenderer renderer(resolveSvgColorSentinel(svg, ink.name(QColor::HexRgb).toLatin1()));
+        QPixmap pixmap(size);
+        pixmap.fill(Qt::transparent);
+        QPainter painter(&pixmap);
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        renderer.render(&painter);
+        return pixmap;
+    };
+
+    const int panelWidth = LABEL_WIDTH + static_cast<int>(std::size(TREATMENTS)) * CELL_WIDTH + PANEL_PADDING;
+    const int panelHeight =
+        PANEL_TITLE + COLUMN_HEADER + static_cast<int>(families.size()) * 4 * ROW_HEIGHT + PANEL_PADDING;
+    const int logicalWidth = 2 * MARGIN + panelWidth;
+    const int logicalHeight = MARGIN + 30 + 2 * (panelHeight + 24) + MARGIN;
+
+    for (const QString &theme : themes) {
+        for (const bool dark : {false, true}) {
+            const InkPalette palette = shippedPalette(theme, dark);
+            ASSERT_TRUE(palette.text.isValid()) << theme.toStdString();
+            const QColor quietTone = palette.roles.value(AppColor::IconSoft);
+            ASSERT_TRUE(quietTone.isValid()) << theme.toStdString();
+            // What the engine paints for `QIcon::Disabled`: the authored quiet
+            // level receded past its floor, measured on the harder surface.
+            const QColor disabledTone = ThemeIconInk::disabledInk(
+                quietTone, ThemeIconInk::harderSurface(palette.window, palette.button, quietTone));
+
+            QImage image(QSize(qRound(logicalWidth * DPR), qRound(logicalHeight * DPR)),
+                         QImage::Format_ARGB32_Premultiplied);
+            image.fill(palette.window);
+            QPainter painter(&image);
+            painter.setRenderHint(QPainter::Antialiasing, true);
+            painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+            painter.scale(DPR, DPR);
+
+            painter.setPen(palette.text);
+            painter.setFont(QFont(QStringLiteral("Sans"), 10, QFont::DemiBold));
+            painter.drawText(QPointF(MARGIN, MARGIN),
+                             QStringLiteral("%1 — %2 scheme, authored emphasis across treatments")
+                                 .arg(theme, dark ? QStringLiteral("dark") : QStringLiteral("light")));
+
+            struct Surface
+            {
+                const char *name;
+                QColor background;
+                QColor text;
+            };
+            const QList<Surface> surfaces = {
+                {"Window surface", palette.window, palette.text},
+                {"Button surface", palette.button, palette.buttonText},
+            };
+
+            qreal panelTop = MARGIN + 30;
+            for (const Surface &surface : surfaces) {
+                painter.setPen(Qt::NoPen);
+                painter.setBrush(surface.background);
+                painter.drawRoundedRect(QRectF(MARGIN, panelTop, panelWidth, panelHeight), 8, 8);
+
+                const qreal contentLeft = MARGIN + PANEL_PADDING;
+                painter.setPen(surface.text);
+                painter.setFont(QFont(QStringLiteral("Sans"), 9, QFont::DemiBold));
+                painter.drawText(QPointF(contentLeft, panelTop + 18), QString::fromLatin1(surface.name));
+
+                painter.setFont(QFont(QStringLiteral("Sans"), 8));
+                for (std::size_t treatment = 0; treatment < std::size(TREATMENTS); ++treatment) {
+                    const qreal x = contentLeft + LABEL_WIDTH + static_cast<qreal>(treatment) * CELL_WIDTH;
+                    painter.drawText(QPointF(x, panelTop + PANEL_TITLE + 14),
+                                     QString::fromLatin1(TREATMENTS[treatment]) + QStringLiteral("  16 / 24"));
+                }
+
+                qreal y = panelTop + PANEL_TITLE + COLUMN_HEADER;
+                for (const Family &family : families) {
+                    for (int level = 0; level < 4; ++level) {
+                        const bool disabled = level == 3;
+                        const QColor ink = disabled ? disabledTone : palette.roles.value(roleAt(family, level));
+                        const QString levelName =
+                            disabled ? QStringLiteral("Disabled") : QString::fromLatin1(LEVEL_NAMES[level]);
+                        ASSERT_TRUE(ink.isValid())
+                            << theme.toStdString() << " " << family.name << " " << levelName.toStdString();
+                        const QColor bottom = disabled ? ink : ThemeIconFill::bottomColor(ink);
+
+                        painter.setPen(surface.text);
+                        painter.setFont(QFont(QStringLiteral("Sans"), 8, QFont::DemiBold));
+                        painter.drawText(QPointF(contentLeft, y + 14),
+                                         QStringLiteral("%1 / %2").arg(QString::fromLatin1(family.name), levelName));
+                        painter.setFont(QFont(QStringLiteral("Mono"), 7));
+                        painter.drawText(QPointF(contentLeft, y + 28), ink.name(QColor::HexRgb));
+                        if (!disabled && bottom != ink) {
+                            painter.drawText(QPointF(contentLeft + 82, y + 28),
+                                             QStringLiteral("bottom ") + bottom.name(QColor::HexRgb));
+                        }
+
+                        for (std::size_t treatment = 0; treatment < std::size(TREATMENTS); ++treatment) {
+                            const qreal cellX = contentLeft + LABEL_WIDTH + static_cast<qreal>(treatment) * CELL_WIDTH;
+                            for (std::size_t sizeIndex = 0; sizeIndex < std::size(SIZES); ++sizeIndex) {
+                                const int side = SIZES[sizeIndex];
+                                const QSize size(side, side);
+                                const qreal rowTop = y + (sizeIndex == 0 ? 4 : 28);
+                                for (std::size_t glyphIndex = 0; glyphIndex < std::size(family.glyphs); ++glyphIndex) {
+                                    const QByteArray svg = readIconSvg(family.glyphs[glyphIndex]);
+                                    ASSERT_FALSE(svg.isEmpty()) << family.glyphs[glyphIndex];
+                                    const QPixmap pixmap = renderAtDpr(size, DPR, [&](const QSize &pixelSize) {
+                                        if (disabled || treatment == 0) {
+                                            return renderLine(svg, ink, pixelSize);
+                                        }
+                                        if (treatment == 1) {
+                                            return ThemeIconSticker::renderSticker(svg, ink, pixelSize);
+                                        }
+                                        return ThemeIconBadge::renderBadge(svg, ink, pixelSize, schemeFor(dark));
+                                    });
+                                    const qreal x = cellX + 6 + static_cast<qreal>(glyphIndex) * GLYPH_SLOT +
+                                                    (GLYPH_SLOT - side) / 2.0;
+                                    painter.drawPixmap(QPointF(x, rowTop + (GLYPH_SLOT - side) / 2.0), pixmap);
+                                }
+                            }
+                        }
+                        y += ROW_HEIGHT;
+                    }
+                }
+                panelTop += panelHeight + 24;
+            }
+
+            painter.end();
+            const QString path = QDir(outDir).absoluteFilePath(
+                QStringLiteral("emphasis-treatments-%1-%2.png")
                     .arg(theme.toLower(), dark ? QStringLiteral("dark") : QStringLiteral("light")));
             ASSERT_TRUE(image.save(path)) << path.toStdString();
         }
