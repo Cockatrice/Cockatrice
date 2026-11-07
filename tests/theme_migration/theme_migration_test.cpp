@@ -163,9 +163,9 @@ TEST(ThemeAppColorTest, SemanticDefaultsFollowTheScheme)
     EXPECT_EQ(defaultAppColor(AppColor::NegativeStrong, true), QColor(QStringLiteral("#ff8378")));
     EXPECT_EQ(defaultAppColor(AppColor::NegativeSoft, false), QColor(QStringLiteral("#935f5c")));
     EXPECT_EQ(defaultAppColor(AppColor::NegativeSoft, true), QColor(QStringLiteral("#c79e9b")));
-    // Accent and neutral icon roles are derived from the palette, so they have
-    // no static default. A theme with no palette (System) keeps following the
-    // platform instead of pinning one scheme's ink.
+    // Accent and neutral icon roles have no static default: an older theme
+    // written before the roles existed falls back to deriving them from its
+    // palette rather than pinning one scheme's ink.
     for (const bool dark : {false, true}) {
         EXPECT_FALSE(defaultAppColor(AppColor::AccentStrong, dark).isValid());
         EXPECT_FALSE(defaultAppColor(AppColor::AccentSoft, dark).isValid());

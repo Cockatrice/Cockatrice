@@ -459,8 +459,8 @@ QColor defaultAppColor(AppColor::Role role, bool dark)
         case AppColor::AccentStrong:
         case AppColor::AccentSoft:
         // The neutral icon family is palette-derived like the accent, so a
-        // theme without a palette of its own (System) keeps following the
-        // platform instead of pinning one scheme's ink.
+        // theme without an authored icon family keeps following the platform
+        // instead of pinning one scheme's ink.
         case AppColor::Icon:
         case AppColor::IconStrong:
         case AppColor::IconSoft:

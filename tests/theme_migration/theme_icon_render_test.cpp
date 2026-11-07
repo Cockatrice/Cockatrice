@@ -1194,8 +1194,10 @@ InkPalette shippedPalette(const QString &theme, bool dark)
     // A theme may author only [AppColors] (System does), so appColors alone do
     // not mean it ships a palette: the keys have to be present. The authored
     // neutral-family assertions therefore cover only themes with a palette;
-    // System's fixed semantic family is checked against representative
-    // platform surfaces by DefaultSemanticFamilyMeetsTheLadderOnPlatformSurfaces.
+    // System's authored neutral family is checked for authorship and ordering
+    // by ShippedPalettesAuthorTheEmphasisLadder, and its semantic fallbacks
+    // against representative platform surfaces by
+    // DefaultSemanticFamilyMeetsTheLadderOnPlatformSurfaces.
     if (config.colors.isEmpty()) {
         return {};
     }
@@ -1209,8 +1211,9 @@ InkPalette shippedPalette(const QString &theme, bool dark)
 /**
  * @brief The [AppColors] a shipped theme authors, even when it ships no palette.
  *
- * System deliberately has no palette of its own, but it still authors its
- * semantic roles; the icon roles stay unset there so they follow the platform.
+ * System deliberately has no palette of its own, but it still authors every
+ * app-color role, including the neutral icon family that used to be derived
+ * from the platform palette.
  */
 QMap<AppColor::Role, QColor> shippedAppColors(const QString &theme, bool dark)
 {
@@ -1627,7 +1630,7 @@ TEST(IconInk, ShippedPalettesAuthorTheEmphasisLadder)
         for (const bool dark : {false, true}) {
             const InkPalette palette = shippedPalette(theme, dark);
             if (!palette.text.isValid()) {
-                continue; // System ships no palette and derives its icon ink.
+                continue; // System ships no palette, so it has no surfaces to measure.
             }
             ++checked;
 
@@ -1671,14 +1674,33 @@ TEST(IconInk, ShippedPalettesAuthorTheEmphasisLadder)
     }
     EXPECT_GT(checked, 0) << "no shipped palette was loadable";
 
-    // The System theme is the deliberate exception: it authors its semantic
-    // levels but leaves the neutral family to the platform palette.
-    const QMap<AppColor::Role, QColor> system = shippedAppColors(QStringLiteral("System"), false);
-    EXPECT_TRUE(system.contains(AppColor::PositiveStrong));
-    EXPECT_TRUE(system.contains(AppColor::NegativeSoft));
-    EXPECT_FALSE(system.contains(AppColor::Icon));
-    EXPECT_FALSE(system.contains(AppColor::IconStrong));
-    EXPECT_FALSE(system.contains(AppColor::IconSoft));
+    // The System theme ships no palette of its own, so its families have no
+    // authored surfaces to measure against. It still authors the neutral family
+    // instead of deriving it: deriving picked up the platform accent's chroma,
+    // which painted neutral chrome blue on a default Linux scheme.
+    for (const bool dark : {false, true}) {
+        const QMap<AppColor::Role, QColor> system = shippedAppColors(QStringLiteral("System"), dark);
+        EXPECT_TRUE(system.contains(AppColor::PositiveStrong));
+        EXPECT_TRUE(system.contains(AppColor::NegativeSoft));
+        for (const AppColor::Role role : {AppColor::Icon, AppColor::IconStrong, AppColor::IconSoft}) {
+            ASSERT_TRUE(system.contains(role)) << (dark ? "dark" : "light") << static_cast<int>(role);
+            EXPECT_EQ(system.value(role).hsvSaturation(), 0) << (dark ? "dark" : "light") << static_cast<int>(role);
+        }
+
+        // Strong is the loudest level a neutral family can reach: the darkest
+        // tone on the light scheme, the palest on the dark one. Quiet recedes
+        // toward the surface on both.
+        const double secondary = ThemeIconInk::relativeLuminance(system.value(AppColor::Icon));
+        const double primary = ThemeIconInk::relativeLuminance(system.value(AppColor::IconStrong));
+        const double quiet = ThemeIconInk::relativeLuminance(system.value(AppColor::IconSoft));
+        if (dark) {
+            EXPECT_GT(primary, secondary) << "dark";
+            EXPECT_GT(secondary, quiet) << "dark";
+        } else {
+            EXPECT_LT(primary, secondary) << "light";
+            EXPECT_LT(secondary, quiet) << "light";
+        }
+    }
 }
 
 /**
@@ -1759,11 +1781,11 @@ TEST(IconInk, DisabledStaysBelowQuietOnEveryShippedTheme)
 /**
  * @brief The System fallback family keeps the ladder on a platform palette.
  *
- * System authors no neutral roles and follows the OS surfaces, so its semantic
- * family is the one shipped ladder that cannot be measured against its own
- * window and button. These are the representative extremes of a platform
- * palette, and the fixed values have to clear the same floor there that the
- * five authored themes clear on their own surfaces.
+ * System authors no palette and follows the OS surfaces, so its families
+ * cannot be measured against its own window and button. These are the
+ * representative extremes of a platform palette, and the fixed values have to
+ * clear the same floor there that the five authored themes clear on their own
+ * surfaces.
  */
 TEST(IconInk, DefaultSemanticFamilyMeetsTheLadderOnPlatformSurfaces)
 {

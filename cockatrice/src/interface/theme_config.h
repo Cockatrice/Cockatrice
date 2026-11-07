@@ -65,9 +65,9 @@ Q_ENUM_NS(Role)
  * ThemeManager derives them from the palette: the accent from the highlight,
  * the icon ink from the neutral text color plus the highlight. Semantic roles
  * return an opaque default that suits the scheme, so themes written before the
- * role existed still render it. A theme with no palette of its own (the System
- * theme) keeps deriving its icon ink from the platform palette instead of
- * pinning one scheme's colors.
+ * role existed still render it. A theme with no authored icon family keeps
+ * deriving its icon ink from the platform palette instead of pinning one
+ * scheme's colors.
  */
 QColor defaultAppColor(AppColor::Role role, bool dark);
 
