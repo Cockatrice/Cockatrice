@@ -1459,11 +1459,13 @@ TEST_F(ThemeIconRenderTest, SelectedStillFallsBackToHighlightedText)
 }
 
 /**
- * @brief Writes the emphasis ladder sheet when asked; skipped otherwise.
+ * @brief Writes the emphasis ladder sheets for every shipped palette theme.
  *
- * One strip per scheme: a mock toolbar with body text, a quiet labelling glyph,
- * secondary actions, the primary action, and the primary action on an
- * accent-filled button. The point is the hierarchy at a glance, not the glyph.
+ * One sheet per theme and scheme: the neutral, positive and negative families at
+ * their quiet, secondary and primary levels, each as a line glyph, a sticker and
+ * a badge, three glyphs per family, at 16 and 24 px, on the window and button
+ * surfaces. The tone is the one the emphasis rule resolves for that surface, so
+ * the sheet is what the engine paints rather than a hand-picked sample.
  */
 TEST_F(ThemeIconRenderTest, EmphasisPreviewWritesPngsWhenRequested)
 {
@@ -1474,80 +1476,164 @@ TEST_F(ThemeIconRenderTest, EmphasisPreviewWritesPngsWhenRequested)
     ASSERT_TRUE(QDir().mkpath(outDir));
 
     constexpr int MARGIN = 24;
-    constexpr int ROW_HEIGHT = 44;
-    constexpr int ICON_SIZE = 20;
+    constexpr int LABEL_WIDTH = 230;
+    constexpr int CELL_WIDTH = 166;
+    constexpr int ROW_HEIGHT = 58;
+    constexpr int PANEL_TITLE = 26;
+    constexpr int COLUMN_HEADER = 20;
+    constexpr int PANEL_PADDING = 12;
+    constexpr int GLYPH_SLOT = 32;
     constexpr qreal DPR = 2.0;
-    constexpr int WIDTH = 760;
+    constexpr int SIZES[] = {16, 24};
+    constexpr const char *TREATMENTS[] = {"line", "sticker", "badge"};
+    constexpr const char *LEVEL_NAMES[] = {"Quiet", "Secondary", "Primary"};
+    constexpr IconEmphasis LEVELS[] = {IconEmphasis::Quiet, IconEmphasis::Secondary, IconEmphasis::Primary};
 
-    struct Sample
+    struct Family
     {
-        const char *glyph;
-        const char *label;
-        IconTint tint;
+        const char *name;
+        const char *glyphs[3];
+        AppColor::Role role;
+        bool neutral;
+    };
+    const QList<Family> families = {
+        {"Neutral", {"settings", "info", "player"}, AppColor::Positive, true},
+        {"Positive", {"increment", "ready_start", "arrow_up"}, AppColor::Positive, false},
+        {"Negative", {"decrement", "not_ready_start", "remove_row"}, AppColor::Negative, false},
+    };
+    const QStringList themes = {
+        QStringLiteral("Fabric"), QStringLiteral("Fusion"),       QStringLiteral("Leather"),
+        QStringLiteral("Plasma"), QStringLiteral("VelvetMarble"),
     };
 
-    for (const bool dark : {false, true}) {
-        const InkPalette palette = shippedPalette(QStringLiteral("Fabric"), dark);
-        ASSERT_TRUE(palette.text.isValid());
-        ASSERT_TRUE(applyShippedPalette(QStringLiteral("Fabric"), dark));
-
-        const QList<Sample> samples = {
-            {nullptr, "body text for comparison", {}},
-            {"search", "quiet hint", IconTint::quiet()},
-            {"settings", "secondary", IconTint()},
-            {"arrow_right", "primary", IconTint::primary()},
-            {"increment", "primary, positive", IconTint(AppColor::Positive, IconEmphasis::Primary)},
-        };
-
-        const int logicalHeight = MARGIN + 28 + static_cast<int>(samples.size()) * ROW_HEIGHT + ROW_HEIGHT + MARGIN;
-        QImage image(QSize(qRound(WIDTH * DPR), qRound(logicalHeight * DPR)), QImage::Format_ARGB32_Premultiplied);
-        image.fill(palette.window);
-        QPainter painter(&image);
+    const auto renderLine = [](const QByteArray &svg, const QColor &ink, const QSize &size) {
+        QSvgRenderer renderer(resolveSvgColorSentinel(svg, ink.name(QColor::HexRgb).toLatin1()));
+        QPixmap pixmap(size);
+        pixmap.fill(Qt::transparent);
+        QPainter painter(&pixmap);
         painter.setRenderHint(QPainter::Antialiasing, true);
-        painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
-        painter.scale(DPR, DPR);
+        renderer.render(&painter);
+        return pixmap;
+    };
 
-        qreal y = MARGIN;
-        painter.setPen(palette.text);
-        painter.setFont(QFont(QStringLiteral("Sans"), 10, QFont::DemiBold));
-        painter.drawText(QPointF(MARGIN, y), (dark ? QStringLiteral("Dark scheme") : QStringLiteral("Light scheme")) +
-                                                 QStringLiteral(" — emphasis ladder"));
-        y += 28;
+    const int panelWidth = LABEL_WIDTH + static_cast<int>(std::size(TREATMENTS)) * CELL_WIDTH + PANEL_PADDING;
+    const int panelHeight =
+        PANEL_TITLE + COLUMN_HEADER + static_cast<int>(families.size()) * 3 * ROW_HEIGHT + PANEL_PADDING;
+    const int logicalWidth = 2 * MARGIN + panelWidth;
+    const int logicalHeight = MARGIN + 30 + 2 * (panelHeight + 24) + MARGIN;
 
-        for (const Sample &sample : samples) {
-            if (sample.glyph != nullptr) {
-                const QByteArray svg = readIconSvg(sample.glyph);
-                ASSERT_FALSE(svg.isEmpty()) << sample.glyph;
-                const QColor ink = sample.tint.resolve(QIcon::Normal);
-                QSvgRenderer renderer(resolveSvgColorSentinel(svg, ink.name(QColor::HexRgb).toLatin1()));
-                QPixmap glyph(QSize(ICON_SIZE, ICON_SIZE));
-                glyph.fill(Qt::transparent);
-                QPainter glyphPainter(&glyph);
-                glyphPainter.setRenderHint(QPainter::Antialiasing, true);
-                renderer.render(&glyphPainter);
-                glyphPainter.end();
-                painter.drawPixmap(QPointF(MARGIN, y - ICON_SIZE + 4), glyph);
-            }
+    for (const QString &theme : themes) {
+        for (const bool dark : {false, true}) {
+            const InkPalette palette = shippedPalette(theme, dark);
+            ASSERT_TRUE(palette.text.isValid()) << theme.toStdString();
+
+            // The emphasis rule reads the live palette, so apply the theme
+            // before resolving tones for the sheet.
+            ASSERT_TRUE(applyShippedPalette(theme, dark));
+
+            const auto toneFor = [&](const Family &family, int level) {
+                QColor base;
+                if (family.neutral) {
+                    base = level == 2 ? palette.accent
+                                      : ThemeIconInk::glyphInk(palette.text, palette.window, palette.accent);
+                } else {
+                    base = ThemeIconFill::saturated(defaultAppColor(family.role, dark));
+                }
+                return ThemeIconInk::forEmphasis(base, palette.window, LEVELS[level]);
+            };
+
+            QImage image(QSize(qRound(logicalWidth * DPR), qRound(logicalHeight * DPR)),
+                         QImage::Format_ARGB32_Premultiplied);
+            image.fill(palette.window);
+            QPainter painter(&image);
+            painter.setRenderHint(QPainter::Antialiasing, true);
+            painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+            painter.scale(DPR, DPR);
 
             painter.setPen(palette.text);
-            painter.setFont(QFont(QStringLiteral("Sans"), 10));
-            painter.drawText(QPointF(MARGIN + ICON_SIZE + 16, y), QString::fromLatin1(sample.label));
-            y += ROW_HEIGHT;
+            painter.setFont(QFont(QStringLiteral("Sans"), 10, QFont::DemiBold));
+            painter.drawText(QPointF(MARGIN, MARGIN),
+                             QStringLiteral("%1 — %2 scheme, emphasis across treatments")
+                                 .arg(theme, dark ? QStringLiteral("dark") : QStringLiteral("light")));
+
+            struct Surface
+            {
+                const char *name;
+                QColor background;
+                QColor text;
+            };
+            const QList<Surface> surfaces = {
+                {"Window surface", palette.window, palette.text},
+                {"Button surface", palette.button, palette.text},
+            };
+
+            qreal panelTop = MARGIN + 30;
+            for (const Surface &surface : surfaces) {
+                painter.setPen(Qt::NoPen);
+                painter.setBrush(surface.background);
+                painter.drawRoundedRect(QRectF(MARGIN, panelTop, panelWidth, panelHeight), 8, 8);
+
+                const qreal contentLeft = MARGIN + PANEL_PADDING;
+                painter.setPen(surface.text);
+                painter.setFont(QFont(QStringLiteral("Sans"), 9, QFont::DemiBold));
+                painter.drawText(QPointF(contentLeft, panelTop + 18), QString::fromLatin1(surface.name));
+
+                painter.setFont(QFont(QStringLiteral("Sans"), 8));
+                for (std::size_t treatment = 0; treatment < std::size(TREATMENTS); ++treatment) {
+                    const qreal x = contentLeft + LABEL_WIDTH + static_cast<qreal>(treatment) * CELL_WIDTH;
+                    painter.drawText(QPointF(x, panelTop + PANEL_TITLE + 14),
+                                     QString::fromLatin1(TREATMENTS[treatment]) + QStringLiteral("  16 / 24"));
+                }
+
+                qreal y = panelTop + PANEL_TITLE + COLUMN_HEADER;
+                for (const Family &family : families) {
+                    for (int level = 0; level < 3; ++level) {
+                        const QColor ink = toneFor(family, level);
+                        ASSERT_TRUE(ink.isValid())
+                            << theme.toStdString() << " " << family.name << " " << LEVEL_NAMES[level];
+
+                        painter.setPen(surface.text);
+                        painter.setFont(QFont(QStringLiteral("Sans"), 8, QFont::DemiBold));
+                        painter.drawText(QPointF(contentLeft, y + 14),
+                                         QStringLiteral("%1 / %2").arg(QString::fromLatin1(family.name),
+                                                                       QString::fromLatin1(LEVEL_NAMES[level])));
+                        painter.setFont(QFont(QStringLiteral("Mono"), 7));
+                        painter.drawText(QPointF(contentLeft, y + 28), ink.name(QColor::HexRgb));
+
+                        for (std::size_t treatment = 0; treatment < std::size(TREATMENTS); ++treatment) {
+                            const qreal cellX = contentLeft + LABEL_WIDTH + static_cast<qreal>(treatment) * CELL_WIDTH;
+                            for (std::size_t sizeIndex = 0; sizeIndex < std::size(SIZES); ++sizeIndex) {
+                                const int side = SIZES[sizeIndex];
+                                const QSize size(side, side);
+                                const qreal rowTop = y + (sizeIndex == 0 ? 4 : 28);
+                                for (std::size_t glyphIndex = 0; glyphIndex < std::size(family.glyphs); ++glyphIndex) {
+                                    const QByteArray svg = readIconSvg(family.glyphs[glyphIndex]);
+                                    ASSERT_FALSE(svg.isEmpty()) << family.glyphs[glyphIndex];
+                                    QPixmap pixmap;
+                                    if (treatment == 0) {
+                                        pixmap = renderLine(svg, ink, size);
+                                    } else if (treatment == 1) {
+                                        pixmap = ThemeIconSticker::renderSticker(svg, ink, size);
+                                    } else {
+                                        pixmap = ThemeIconBadge::renderBadge(svg, ink, size);
+                                    }
+                                    const qreal x = cellX + 6 + static_cast<qreal>(glyphIndex) * GLYPH_SLOT +
+                                                    (GLYPH_SLOT - side) / 2.0;
+                                    painter.drawPixmap(QPointF(x, rowTop + (GLYPH_SLOT - side) / 2.0), pixmap);
+                                }
+                            }
+                        }
+                        y += ROW_HEIGHT;
+                    }
+                }
+                panelTop += panelHeight + 24;
+            }
+
+            painter.end();
+            const QString path = QDir(outDir).absoluteFilePath(
+                QStringLiteral("emphasis-preview-%1-%2.png")
+                    .arg(theme.toLower(), dark ? QStringLiteral("dark") : QStringLiteral("light")));
+            ASSERT_TRUE(image.save(path)) << path.toStdString();
         }
-
-        // The primary action on an accent-filled button: the container carries
-        // the emphasis, and the glyph has to switch to the on-accent ink.
-        const QRectF button(MARGIN, y - 28, 220, 34);
-        painter.setBrush(palette.accent);
-        painter.setPen(Qt::NoPen);
-        painter.drawRoundedRect(button, 6, 6);
-        painter.setPen(palette.text);
-        painter.setFont(QFont(QStringLiteral("Sans"), 10));
-        painter.drawText(QPointF(MARGIN + 12, y - 6), QStringLiteral("primary button: accent fill + on-accent glyph"));
-        painter.end();
-
-        const QString path = QDir(outDir).absoluteFilePath(dark ? QStringLiteral("emphasis-preview-dark.png")
-                                                                : QStringLiteral("emphasis-preview-light.png"));
-        ASSERT_TRUE(image.save(path)) << path.toStdString();
     }
 }
