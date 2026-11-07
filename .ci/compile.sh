@@ -320,8 +320,12 @@ if [[ $RUNNER_OS == macOS ]]; then
   echo "::endgroup::"
 
   if [[ ${MAKE_PACKAGE:-} == "1" ]]; then
-    # Workaround https://github.com/actions/runner-images/issues/7522
-    # have hdiutil repeat the command 10 times in hope of success.
+    # Workaround https://github.com/actions/runner-images/issues/7522: XProtect holds a
+    # freshly written DMG for a moment ("Resource busy"), and a mount that outlived a
+    # failed detach stays busy for the rest of the job. Retry every hdiutil call through
+    # a wrapper that widens the delay so the scan can finish, retries a detach with
+    # -force, and kills a wedged DiskImages helper instead of letting it hold the job
+    # until the 100 minute timeout.
     # The wrapper has to exit non-zero once it gives up: CPack reads that status to
     # decide whether the disk image was created, so a zero exit turns a failed hdiutil
     # into a much later, misleading "Problem copying the package" error that hides
@@ -330,17 +334,74 @@ if [[ $RUNNER_OS == macOS ]]; then
     # shellcheck disable=SC2016
     echo '#!/bin/bash
     attempts=10
-    i=0
-    while true; do
-      hdiutil "$@" && exit 0
-      rc=$?
-      if (( ++i >= attempts )); then
-        echo "::error::hdiutil $1 failed $i times (last status $rc), giving up" >&2
-        exit "$rc"
+    timeout_seconds=${HDIUTIL_TIMEOUT:-300}
+    subcommand=$1
+    # CPACK_DMG_VOLUME_NAME in CMakeLists.txt; a -volname argument wins when there is one.
+    volume_name=Cockatrice
+    arg_count=$#
+    for (( i = 1; i < arg_count; i++ )); do
+      if [[ ${!i} == -volname ]] && (( i + 1 <= arg_count )); then
+        (( i++ ))
+        volume_name=${!i}
       fi
-      echo "hdiutil $1 attempt $i/$attempts failed (status $rc), retrying" >&2
-      sleep 1
-    done' >"$hdiutil_script"
+    done
+
+    # macOS ships no timeout(1), so a watchdog kills the supervised call. It writes to
+    # /dev/null because a process holding the output pipe open would make CPack wait for
+    # the watchdog instead of for hdiutil; it is killed once the call returns.
+    run_supervised() {
+      "$@" &
+      pid=$!
+      ( sleep "$timeout_seconds" && kill -9 "$pid" ) >/dev/null 2>&1 &
+      watchdog=$!
+      wait "$pid"
+      rc=$?
+      kill "$watchdog" 2>/dev/null
+      wait "$watchdog" 2>/dev/null
+      return "$rc"
+    }
+
+    force_detach_stale_mount() {
+      [[ -d /Volumes/$volume_name ]] || return 0
+      echo "hdiutil $subcommand: force-detaching stale /Volumes/$volume_name" >&2
+      run_supervised hdiutil detach -force "/Volumes/$volume_name" >/dev/null 2>&1
+      return 0
+    }
+
+    timeouts=0
+    attempt=0
+    delay=1
+    while (( attempt < attempts )); do
+      (( attempt++ ))
+      cmd=(hdiutil "$@")
+      # A busy volume is what a detach fails on, and -force is what clears it.
+      if (( attempt > 1 )) && [[ $subcommand == detach ]]; then
+        cmd=(hdiutil detach -force "${@:2}")
+      fi
+      run_supervised "${cmd[@]}"
+      rc=$?
+      (( rc == 0 )) && exit 0
+      if (( rc == 137 )); then
+        (( timeouts++ ))
+        echo "hdiutil $subcommand attempt $attempt/$attempts timed out after ${timeout_seconds}s" >&2
+        # A wedged DiskImages helper is not the busy-file flake: two kills are all the
+        # evidence the loop needs before failing is a better use of the job budget.
+        if (( timeouts >= 2 )); then
+          echo "::error::hdiutil $subcommand timed out $timeouts times, giving up" >&2
+          exit "$rc"
+        fi
+      else
+        echo "hdiutil $subcommand attempt $attempt/$attempts failed (status $rc), retrying" >&2
+      fi
+      (( attempt < attempts )) || break
+      if [[ $subcommand == create || $subcommand == attach ]]; then
+        force_detach_stale_mount
+      fi
+      sleep "$delay"
+      (( delay = delay * 2 > 30 ? 30 : delay * 2 ))
+    done
+    echo "::error::hdiutil $subcommand failed $attempt times (last status $rc), giving up" >&2
+    exit "$rc"' >"$hdiutil_script"
     chmod +x "$hdiutil_script"
     flags+=(-DCPACK_COMMAND_HDIUTIL="$hdiutil_script")
   fi
