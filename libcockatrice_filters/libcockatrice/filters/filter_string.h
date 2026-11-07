@@ -7,6 +7,7 @@
 #ifndef FILTER_STRING_H
 #define FILTER_STRING_H
 
+#include <QCoreApplication>
 #include <QLoggingCategory>
 #include <QString>
 #include <functional>
@@ -33,6 +34,8 @@ typedef AstBase<EmptyType> Ast;
 
 class FilterString
 {
+    Q_DECLARE_TR_FUNCTIONS(FilterString)
+
 public:
     FilterString();
     explicit FilterString(const QString &exp, const CardSearchLanguage &searchLanguage = {});
@@ -45,18 +48,18 @@ public:
         return result(card);
     }
 
-    bool valid()
+    [[nodiscard]] bool valid() const
     {
         return _error.isEmpty();
     }
 
-    QString error()
-    {
-        return _error;
-    }
+    [[nodiscard]] QString error() const;
 
 private:
+    // Untranslated parser message; error() adds the translated prefix, logging uses it as-is.
     QString _error;
+    // Column reported by the parser, or 0 when the message carries no position.
+    size_t _errorColumn = 0;
     Filter result;
 };
 
