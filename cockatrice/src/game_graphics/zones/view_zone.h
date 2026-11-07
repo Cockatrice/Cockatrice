@@ -9,9 +9,11 @@
 
 #include "select_zone.h"
 
+#include <QGraphicsItem>
 #include <QGraphicsLayoutItem>
 #include <QList>
 #include <QLoggingCategory>
+#include <QPointF>
 #include <QRectF>
 #include <QSizeF>
 #include <QString>
@@ -33,6 +35,30 @@ inline Q_LOGGING_CATEGORY(ViewZoneLog, "view_zone");
 class Response;
 class ServerInfo_Card;
 class QGraphicsSceneWheelEvent;
+class QPainter;
+class QStyleOptionGraphicsItem;
+class QWidget;
+
+/**
+ * A small chip drawn on the card at the edge of a viewed library.
+ *
+ * It is a sibling of the card items rather than part of the zone widget, so it
+ * stays attached to its card when the view reflows into several columns or is
+ * resized. ZoneViewZone owns and positions it.
+ */
+class LibraryEdgeMarker : public QGraphicsItem
+{
+public:
+    explicit LibraryEdgeMarker(QGraphicsItem *parent = nullptr);
+
+    void setLabel(const QString &label, const QString &toolTip);
+    [[nodiscard]] QRectF boundingRect() const override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
+private:
+    QRectF markerRect;
+    QString label;
+};
 
 /**
  * A CardZone that is a view into another CardZone.
@@ -56,6 +82,8 @@ private:
     FilterString filterString = FilterString("");
     CardList::SortOption groupBy, sortBy;
     bool pileView;
+    LibraryEdgeMarker *libraryEdgeMarker;
+    QPointF libraryEdgeMarkerAnchorPos;
 
     struct GridSize
     {
@@ -64,6 +92,9 @@ private:
     };
 
     GridSize positionCardsForDisplay(CardList &cards, CardList::SortOption pileOption = CardList::NoSort);
+    void updateLibraryEdgeMarker(const CardList &displayedCards);
+    void applyLibraryEdgeMarkerText();
+    void positionLibraryEdgeMarker();
 
     void
     handleDropEvent(const QList<CardDragItem *> &dragItems, CardZoneLogic *startZone, const QPoint &dropPoint) override;
@@ -79,6 +110,10 @@ public:
     {
         return optimumRect;
     }
+
+    /** @brief Re-applies the translated library edge marker text after a language change. */
+    void retranslateEdgeMarker();
+
 public slots:
     void addToViews();
     void removeFromViews();
