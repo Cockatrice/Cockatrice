@@ -656,8 +656,8 @@ QColor ThemeManager::appColor(AppColor::Role role) const
         case AppColor::IconStrong:
         case AppColor::IconSoft: {
             // Legacy fallback for a theme written before the icon roles
-            // existed, or one with no palette of its own (System). The three
-            // levels are the ink rule this series shipped, applied once here so
+            // existed, or one with no authored icon family. The three levels
+            // are the ink rule this series shipped, applied once here so
             // authored roles never get recomputed at paint time.
             const QPalette &palette = qApp->palette();
             const QColor text = palette.color(QPalette::Active, QPalette::WindowText);
