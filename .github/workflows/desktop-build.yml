@@ -150,7 +150,10 @@ jobs:
             allow-failure: yes
             package: skip    # We are packaged in Arch already
             debug_test: yes    # see the note on Fedora 45 below
-            ccache_size: 1200M    # Debug plus the suite: measured 820 MB at -g1; 850M thrashed
+            # MEASUREMENT ONLY: cold cache, no restore/save, oversized bound. The final
+            # "Cache size" is the whole Debug+suite working set at -g1. Do not merge.
+            ccache_size: 3G
+            persist_ccache: 'false'
 
           - distro: Servatrice_Debian
             version: 12
@@ -165,7 +168,10 @@ jobs:
             version: 13
 
             package: DEB
-            ccache_size: 1050M    # Release plus the suite: measured 770 MB at -g1; 800M thrashed
+            # MEASUREMENT ONLY: cold cache, no restore/save, oversized bound. The final
+            # "Cache size" is the whole Release+suite working set at -g1. Do not merge.
+            ccache_size: 3G
+            persist_ccache: 'false'
 
           # The single Fedora leg used to build Debug for the suite and Release for the
           # package in one job (measured on Fedora 44: 30.8 min, the only leg slower than
