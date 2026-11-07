@@ -1494,8 +1494,26 @@ Server_AbstractPlayer::cmdDumpZone(const Command_DumpZone &cmd, ResponseContaine
     return Response::RespOk;
 }
 
-Response::ResponseCode
-Server_AbstractPlayer::cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+Response::ResponseCode Server_AbstractPlayer::cmdRevealRandomCards(const Command_RevealRandomCards &cmd,
+                                                                   ResponseContainer &rc,
+                                                                   GameEventStorage &ges)
+{
+    if (cmd.number_of_cards() <= 0) {
+        return Response::RespInvalidData;
+    }
+    Command_RevealCards reveal;
+    reveal.set_zone_name(cmd.zone_name());
+    reveal.add_card_id(-2);
+    if (cmd.has_player_id()) {
+        reveal.set_player_id(cmd.player_id());
+    }
+    return cmdRevealCards(reveal, rc, ges, cmd.number_of_cards());
+}
+
+Response::ResponseCode Server_AbstractPlayer::cmdRevealCards(const Command_RevealCards &cmd,
+                                                             ResponseContainer & /*rc*/,
+                                                             GameEventStorage &ges,
+                                                             int randomCount)
 {
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
@@ -1532,11 +1550,18 @@ Server_AbstractPlayer::cmdRevealCards(const Command_RevealCards &cmd, ResponseCo
         //
         // This is to be compatible with clients supporting a single card_id
         // value, which send value -2 to request a random card.
-        if (zone->getCards().isEmpty()) {
+        if (randomCount <= 0 || randomCount > zone->getCards().size()) {
             return Response::RespContextError;
         }
 
-        cardsToReveal.append(zone->getCards().at(rng->rand(0, zone->getCards().size() - 1)));
+        // Partial Fisher-Yates on a copy: each physical card can appear only once,
+        // and the hand's order and contents stay unchanged. Legacy requests use one.
+        auto candidates = zone->getCards();
+        for (int i = 0; i < randomCount; ++i) {
+            const int selected = rng->rand(i, candidates.size() - 1);
+            candidates.swapItemsAt(i, selected);
+            cardsToReveal.append(candidates.at(i));
+        }
     } else {
         for (auto cardId : cmd.card_id()) {
             Server_Card *card = zone->getCard(cardId);

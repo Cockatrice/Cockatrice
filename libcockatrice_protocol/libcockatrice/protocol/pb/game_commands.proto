@@ -185,6 +185,11 @@ message GameCommand {
         /// Server: Server_AbstractParticipant::cmdSetPlayerOrder
         /// Client: reflected via Event_PlayerOrderChanged
         SET_PLAYER_ORDER = 1206;
+
+        /// Reveal a distinct random sample without exposing identities to other recipients.
+        /// Server: Server_AbstractPlayer::cmdRevealCards
+        /// Client: PlayerEventHandler::eventRevealCards
+        REVEAL_RANDOM_CARDS = 1036;
     }
 
     extensions 100 to max;

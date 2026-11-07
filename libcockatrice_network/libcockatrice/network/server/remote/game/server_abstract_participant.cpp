@@ -400,7 +400,15 @@ Response::ResponseCode Server_AbstractParticipant::cmdDumpZone(const Command_Dum
 
 Response::ResponseCode Server_AbstractParticipant::cmdRevealCards(const Command_RevealCards & /*cmd*/,
                                                                   ResponseContainer & /*rc*/,
-                                                                  GameEventStorage & /*ges*/)
+                                                                  GameEventStorage & /*ges*/,
+                                                                  int /*randomCount*/)
+{
+    return Response::RespFunctionNotAllowed;
+}
+
+Response::ResponseCode Server_AbstractParticipant::cmdRevealRandomCards(const Command_RevealRandomCards & /*cmd*/,
+                                                                        ResponseContainer & /*rc*/,
+                                                                        GameEventStorage & /*ges*/)
 {
     return Response::RespFunctionNotAllowed;
 }
@@ -543,6 +551,9 @@ Server_AbstractParticipant::processGameCommand(const GameCommand &command, Respo
             break;
         case GameCommand::REVEAL_CARDS:
             return cmdRevealCards(command.GetExtension(Command_RevealCards::ext), rc, ges);
+            break;
+        case GameCommand::REVEAL_RANDOM_CARDS:
+            return cmdRevealRandomCards(command.GetExtension(Command_RevealRandomCards::ext), rc, ges);
             break;
         case GameCommand::MOVE_CARD:
             return cmdMoveCard(command.GetExtension(Command_MoveCard::ext), rc, ges);
