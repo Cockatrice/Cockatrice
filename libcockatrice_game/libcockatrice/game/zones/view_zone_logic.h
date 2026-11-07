@@ -82,6 +82,27 @@ public:
         return isReversed;
     }
 
+    /**
+     * @brief Whether this view is a limited look at one end of a library.
+     *
+     * Only scry/surveil-style views of the top or bottom cards of a deck
+     * qualify. Full-zone views, revealed-card views and views of other zones
+     * do not, because their first and last cards have no library edge meaning.
+     */
+    [[nodiscard]] bool isLibraryEdgeView() const;
+
+    /** @brief Whether the first card in the view is the top card of the library. */
+    [[nodiscard]] bool showsTopOfLibrary() const
+    {
+        return isLibraryEdgeView() && !isReversed;
+    }
+
+    /** @brief Whether the last card in the view is the bottom card of the library. */
+    [[nodiscard]] bool showsBottomOfLibrary() const
+    {
+        return isLibraryEdgeView() && isReversed;
+    }
+
     CardZoneLogic *getOriginalZone() const
     {
         return origZone;
