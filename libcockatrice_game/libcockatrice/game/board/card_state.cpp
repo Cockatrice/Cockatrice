@@ -231,7 +231,7 @@ void CardState::setAttachedTo(CardState *_attachedTo)
             parentZone->reorganizeCards();
         }
     } else if (getZone() != nullptr) {
-        emit getZone() -> cardAdded(this);
+        emit getZone()->cardAdded(this);
     }
 
     if (getZone() != nullptr) {
