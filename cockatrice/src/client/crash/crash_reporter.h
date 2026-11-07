@@ -101,7 +101,7 @@ public:
      *
      * An envelope is a newline-separated stream of item-header-line + payload
      * pairs. The retry transport replays cached envelopes byte-for-byte
-     * (sentry-native 0.17.3 reads them raw and serializes raw envelopes back
+     * (sentry-native reads them raw and serializes raw envelopes back
      * verbatim), so appending well-formed items associates them with the event
      * already in the file; the first line (event id header) is never touched.
      *
