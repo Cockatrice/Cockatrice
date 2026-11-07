@@ -45,12 +45,23 @@ bool exceptionAppliesToCard(const CardInfo &card, const ExceptionRule &rule)
     return true;
 }
 
-bool cardHasAnyException(const CardInfo &card, const FormatRules &format)
+std::optional<int> cardCopyLimitException(const CardInfo &card, const FormatRules &format)
 {
+    std::optional<int> limit;
     for (const ExceptionRule &rule : format.exceptions) {
         if (exceptionAppliesToCard(card, rule)) {
-            return true;
+            if (rule.maxCopies == -1) {
+                return -1;
+            }
+            if (rule.maxCopies >= 0 && (!limit || rule.maxCopies > *limit)) {
+                limit = rule.maxCopies;
+            }
         }
     }
-    return false;
+    return limit;
+}
+
+bool cardHasAnyException(const CardInfo &card, const FormatRules &format)
+{
+    return cardCopyLimitException(card, format).has_value();
 }

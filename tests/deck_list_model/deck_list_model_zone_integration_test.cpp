@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/card/format/format_legality_rules.h>
 #include <libcockatrice/card/game_specific_terms.h>
 #include <libcockatrice/card/printing/exact_card.h>
 #include <libcockatrice/deck_list/deck_list.h>
@@ -287,6 +288,131 @@ TEST(DeckListModelZoneIntegration, AddCardToCustomZoneWithNestedSubZoneAppends)
     QModelIndex added = model.addCard(ExactCard(CardInfo::newInstance("Swords to Plowshares")), "Removal");
     ASSERT_TRUE(added.isValid());
     ASSERT_TRUE(added.parent().data(DeckRoles::IsCustomZoneRole).toBool());
+}
+
+class DeckListModelCopyLimits : public testing::Test
+{
+protected:
+    CardDatabase *database = CardDatabaseManager::getInstance();
+    FormatRulesPtr format;
+
+    void SetUp() override
+    {
+        database->clear();
+        format.reset(new FormatRules);
+        format->formatName = "copy-limit-test";
+        format->allowedCounts = {{4, "legal"}, {1, "restricted"}, {0, "banned"}};
+        database->addFormat(format);
+    }
+
+    void TearDown() override
+    {
+        database->clear();
+    }
+
+    CardInfoPtr addCard(const QString &name, const QString &legality = "legal")
+    {
+        auto card = CardInfo::newInstance(name);
+        card->setProperty("format-copy-limit-test", legality);
+        database->addCard(card);
+        return card;
+    }
+
+    QSharedPointer<DeckList> newDeck()
+    {
+        auto deck = QSharedPointer<DeckList>::create();
+        deck->setGameFormat(format->formatName);
+        return deck;
+    }
+};
+
+TEST_F(DeckListModelCopyLimits, FiniteExceptionHonorsItsLimitAndRetainsExplicitPrecedence)
+{
+    const QString name = "Seven Dwarves";
+    addCard(name, "banned"); // Explicit format exceptions retain the precedence established in #6535.
+    format->exceptions.append({{{"name", "equals", name}}, 7});
+    auto deck = newDeck();
+    auto *row = deck->getTree()->addCard(name, 7, DECK_ZONE_MAIN, -1);
+    DeckListModel model(nullptr, deck);
+    EXPECT_TRUE(row->getFormatLegality());
+    row->setNumber(8);
+    model.rebuildTree();
+    EXPECT_FALSE(row->getFormatLegality());
+}
+
+TEST_F(DeckListModelCopyLimits, CopiesAcrossPrintingsSideboardAndNestedZonesShareOneLimit)
+{
+    addCard("Same card");
+    auto deck = newDeck();
+    auto *tree = deck->getTree();
+    auto *first = tree->addCard("Same card", 2, DECK_ZONE_MAIN, -1, "ONE", "1", "printing-one");
+    auto *second = tree->addCard("Same card", 2, DECK_ZONE_SIDE, -1, "TWO", "2", "printing-two");
+    auto *custom = tree->addCustomZone(DECK_ZONE_MAIN, "Removal");
+    auto *nested = new InnerDecklistNode("Nested", custom);
+    auto *third = new DecklistCardNode("Same card", 1, nested, -1);
+    auto *token = tree->addCard("Same card", 100, DECK_ZONE_TOKENS, -1);
+    auto *maybe = tree->addCard("Same card", 4, DECK_ZONE_MAYBEBOARD, -1);
+    DeckListModel model(nullptr, deck);
+    EXPECT_FALSE(first->getFormatLegality());
+    EXPECT_FALSE(second->getFormatLegality());
+    EXPECT_FALSE(third->getFormatLegality());
+    EXPECT_TRUE(token->getFormatLegality());
+    EXPECT_TRUE(maybe->getFormatLegality());
+    third->setNumber(0);
+    model.rebuildTree();
+    EXPECT_TRUE(first->getFormatLegality());
+    EXPECT_TRUE(second->getFormatLegality());
+}
+
+TEST_F(DeckListModelCopyLimits, EditingOrRemovingOneRowRefreshesTheOtherRows)
+{
+    addCard("Same card");
+    auto deck = newDeck();
+    auto *first = deck->getTree()->addCard("Same card", 2, DECK_ZONE_MAIN, -1);
+    auto *second = deck->getTree()->addCard("Same card", 2, DECK_ZONE_SIDE, -1);
+    DeckListModel model(nullptr, deck);
+    const auto index = model.findCard("Same card", DECK_ZONE_SIDE);
+    ASSERT_TRUE(index.isValid());
+    ASSERT_TRUE(model.setData(index.siblingAtColumn(DeckListModelColumns::CARD_AMOUNT), 3, Qt::EditRole));
+    EXPECT_FALSE(first->getFormatLegality());
+    EXPECT_FALSE(second->getFormatLegality());
+    ASSERT_TRUE(model.removeRows(index.row(), 1, index.parent()));
+    EXPECT_TRUE(first->getFormatLegality());
+}
+
+TEST_F(DeckListModelCopyLimits, NegativeRowsCannotCancelCopiesElsewhere)
+{
+    addCard("Same card");
+    auto deck = newDeck();
+    auto *first = deck->getTree()->addCard("Same card", 5, DECK_ZONE_MAIN, -1);
+    auto *negative = deck->getTree()->addCard("Same card", -1, DECK_ZONE_SIDE, -1);
+    DeckListModel model(nullptr, deck);
+    EXPECT_FALSE(first->getFormatLegality());
+    EXPECT_FALSE(negative->getFormatLegality());
+}
+
+TEST_F(DeckListModelCopyLimits, UnlimitedCountIsDistinctFromUnknownLegality)
+{
+    addCard("Unlimited");
+    addCard("Unknown", "not-a-status");
+    format->allowedCounts = {{-1, "legal"}};
+    auto deck = newDeck();
+    auto *unlimited = deck->getTree()->addCard("Unlimited", 100, DECK_ZONE_MAIN, -1);
+    auto *unknown = deck->getTree()->addCard("Unknown", 1, DECK_ZONE_MAIN, -1);
+    DeckListModel model(nullptr, deck);
+    EXPECT_TRUE(unlimited->getFormatLegality());
+    EXPECT_FALSE(unknown->getFormatLegality());
+}
+
+TEST_F(DeckListModelCopyLimits, MostPermissiveExceptionWinsIncludingUnlimited)
+{
+    const auto card = addCard("Exception");
+    const QList<CardCondition> conditions{{"name", "equals", "Exception"}};
+    format->exceptions = {{conditions, 7}, {conditions, 9}};
+    EXPECT_EQ(cardCopyLimitException(*card, *format), 9);
+    format->exceptions.append({conditions, -1});
+    EXPECT_EQ(cardCopyLimitException(*card, *format), -1);
+    EXPECT_FALSE(cardCopyLimitException(*addCard("No exception"), *format));
 }
 
 int main(int argc, char **argv)
