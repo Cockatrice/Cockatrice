@@ -47,6 +47,20 @@ concurrency:
   group: "${{ github.workflow }} @ ${{ github.ref_name }} (${{ github.event_name }})"
   cancel-in-progress: ${{ github.ref_type != 'tag' }}
 
+# Qt's online installer ships its base package as separate archives. Installing only the
+# ones Cockatrice loads drops the full 25+ archive download to this handful (Windows Qt
+# cache: 440 MB → 180 MB, macOS thin Qt: ~200 MB → 60 MB). The addons Cockatrice also needs
+# (Multimedia, WebSockets, ShaderTools, ImageFormats) are not base archives: they stay in
+# each leg's qt_modules.
+#
+# The list mirrors what cmake/FindQtRuntime.cmake requires, so a component that is missing
+# here fails configure with "No suitable version of Qt was found" instead of at runtime:
+# qtbase supplies Core, Gui, Widgets, Network, Sql, Xml, Concurrent and PrintSupport;
+# qtdeclarative supplies Qml, Quick and QuickWidgets; qtsvg supplies Svg; qttools supplies
+# Linguist (lrelease/lupdate); qttranslations ships Qt's own catalogs.
+env:
+  QT_ARCHIVES: qtbase qtdeclarative qtsvg qttools qttranslations
+
 jobs:
   configure:
     name: Configure
@@ -717,7 +731,7 @@ jobs:
         id: restore_qt
         uses: actions/cache/restore@v6
         with:
-          key: Qt-${{ steps.resolve_qt_version.outputs.version }}-macOS-${{ matrix.soc }}-${{ matrix.qt_modules }}-thin
+          key: Qt-${{ steps.resolve_qt_version.outputs.version }}-macOS-${{ matrix.soc }}-${{ matrix.qt_modules }}-${{ env.QT_ARCHIVES }}-thin
           path: ${{ github.workspace }}/Qt
 
       # Using jurplel/install-qt-action to install Qt without using brew
@@ -726,6 +740,7 @@ jobs:
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         uses: jurplel/install-qt-action@v4
         with:
+          archives: ${{ env.QT_ARCHIVES }}
           cache: false
           # cache-key-prefix: Qt
           dir: ${{ github.workspace }}    # thinning script depends on this location
@@ -749,6 +764,7 @@ jobs:
         with:
           # Qt 6.11.0 only works with aqtinstall directly from git until aqtinstall 3.4 is released
           aqtsource: git+https://github.com/miurahr/aqtinstall.git
+          archives: ${{ env.QT_ARCHIVES }}
           cache: ${{ github.ref == 'refs/heads/master' }}
           cache-key-prefix: Qt
           modules: ${{ matrix.qt_modules }}
