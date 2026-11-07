@@ -532,23 +532,46 @@ static bool seedCardTextMaxIntoThemeDir(const QString &themeDirPath, int maxSize
     // for the whole board (names, player labels, the completer), which is not
     // what the retired maxFontSize setting meant. Let the family keep its
     // existing resolution and only constrain the size.
-    const QString entry = QString("%1 = %2\n").arg(QStringLiteral("CardTextMaxSize"), -20).arg(maxSize);
+    const QString entry = QString("%1 = %2").arg(QStringLiteral("CardTextMaxSize"), -20).arg(maxSize);
 
     QString out;
     if (existing.isEmpty()) {
         out = "[Fonts]\n" + entry + "\n";
-    } else if (existing.contains("[Fonts]", Qt::CaseInsensitive)) {
-        out = existing;
-        if (!out.endsWith('\n')) {
-            out += '\n';
-        }
-        out += entry;
     } else {
         out = existing;
         if (!out.endsWith('\n')) {
             out += '\n';
         }
-        out += "\n[Fonts]\n" + entry + "\n";
+
+        // Insert the key inside an existing [Fonts] section. Appending at EOF
+        // would land it in whatever section happens to follow, where the font
+        // parser never reads it. Tracking the last non-blank line of the
+        // section keeps the file's own comments, ordering and blank lines.
+        QStringList lines = out.split('\n');
+        int insertAt = -1;
+        for (int i = 0; i < lines.size(); ++i) {
+            const QString trimmed = lines[i].trimmed();
+            if (insertAt < 0) {
+                if (trimmed.startsWith('[') && trimmed.endsWith(']') &&
+                    trimmed.mid(1, trimmed.length() - 2).trimmed().compare("Fonts", Qt::CaseInsensitive) == 0) {
+                    insertAt = i + 1;
+                }
+                continue;
+            }
+            if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+                break;
+            }
+            if (!trimmed.isEmpty()) {
+                insertAt = i + 1;
+            }
+        }
+
+        if (insertAt < 0) {
+            out += "\n[Fonts]\n" + entry + "\n";
+        } else {
+            lines.insert(insertAt, entry);
+            out = lines.join('\n');
+        }
     }
 
     QFile f(filePath);

@@ -11,10 +11,6 @@
 #include <QSpinBox>
 #include <QtGlobal>
 
-static constexpr int MIN_FONT_SIZE = 6;
-static constexpr int MAX_FONT_SIZE = 72;
-static constexpr int CARD_TEXT_MIN_SIZE = 1;
-static constexpr int CARD_TEXT_MAX_SIZE = 12;
 static constexpr int FALLBACK_FONT_SIZE = 10;
 
 static const QMap<AppFont::Role, const char *> APP_FONT_DESCRIPTIONS = {
@@ -63,20 +59,23 @@ FontGridWidget::FontGridWidget(QWidget *parent) : QWidget(parent)
 
         if (role == AppFont::CardText) {
             auto *minSpin = new QSpinBox(this);
-            minSpin->setRange(CARD_TEXT_MIN_SIZE, MAX_FONT_SIZE);
+            minSpin->setRange(FontConfig::CARD_TEXT_MIN_SIZE, FontConfig::MAX_FONT_SIZE);
             grid->addWidget(minSpin, i, 2);
             connect(minSpin, &QSpinBox::valueChanged, this, [this] { emit fontsChanged(); });
 
             auto *maxSpin = new QSpinBox(this);
-            maxSpin->setRange(MIN_FONT_SIZE, MAX_FONT_SIZE);
+            maxSpin->setRange(FontConfig::MIN_FONT_SIZE, FontConfig::MAX_FONT_SIZE);
             grid->addWidget(maxSpin, i, 3);
             connect(maxSpin, &QSpinBox::valueChanged, this, [this] { emit fontsChanged(); });
 
             // Keep the range consistent: otherwise min 20 / max 12 saves as-is
             // and cardTextMaxSize() silently clamps the max up to the min, so
             // the max spin shows a size that is never used. Moving one spin
-            // pulls the other's bound along.
-            connect(minSpin, &QSpinBox::valueChanged, this, [maxSpin](int value) { maxSpin->setMinimum(value); });
+            // pulls the other's bound along, but never below the max control's
+            // own floor: the renderer resolves the max into the same range, so a
+            // smaller value here would be the same mismatch in reverse.
+            connect(minSpin, &QSpinBox::valueChanged, this,
+                    [maxSpin](int value) { maxSpin->setMinimum(qMax(value, FontConfig::MIN_FONT_SIZE)); });
             connect(maxSpin, &QSpinBox::valueChanged, this, [minSpin](int value) { minSpin->setMaximum(value); });
 
             label->setBuddy(familyCombo);
@@ -86,7 +85,7 @@ FontGridWidget::FontGridWidget(QWidget *parent) : QWidget(parent)
         }
 
         auto *sizeSpin = new QSpinBox(this);
-        sizeSpin->setRange(MIN_FONT_SIZE, MAX_FONT_SIZE);
+        sizeSpin->setRange(FontConfig::MIN_FONT_SIZE, FontConfig::MAX_FONT_SIZE);
         grid->addWidget(sizeSpin, i, 2);
         connect(sizeSpin, &QSpinBox::valueChanged, this, [this] { emit fontsChanged(); });
 
@@ -121,29 +120,17 @@ void FontGridWidget::loadFonts(const FontConfig &cfg)
             // max up to 20), which would clamp the values written below. Reset
             // both to the full range first; the valueChanged lambdas re-link
             // them as the values are set.
-            row.minSpin->setRange(CARD_TEXT_MIN_SIZE, MAX_FONT_SIZE);
-            row.sizeSpin->setRange(MIN_FONT_SIZE, MAX_FONT_SIZE);
+            row.minSpin->setRange(FontConfig::CARD_TEXT_MIN_SIZE, FontConfig::MAX_FONT_SIZE);
+            row.sizeSpin->setRange(FontConfig::MIN_FONT_SIZE, FontConfig::MAX_FONT_SIZE);
 
-            // The max spin is a size-only override. Without CardTextMaxSize it
-            // follows the CardText family size, and without CardText at all it
-            // must match cardTextMaxSize()'s default rather than the system
-            // startup size, which currentFontConfig() would otherwise bake in.
-            const int fallbackMax = cfg.fonts.contains(role) ? font.pointSize() : CARD_TEXT_MAX_SIZE;
-            int maxSize = cfg.cardTextMaxSize > 0 ? cfg.cardTextMaxSize : fallbackMax;
-            if (maxSize <= 0) {
-                maxSize = CARD_TEXT_MAX_SIZE;
-            }
-            int minSize = cfg.cardTextMinSize > 0 ? cfg.cardTextMinSize : themeManager->cardTextMinSize();
-            minSize = qBound(CARD_TEXT_MIN_SIZE, minSize, MAX_FONT_SIZE);
-            maxSize = qBound(MIN_FONT_SIZE, maxSize, MAX_FONT_SIZE);
-            if (maxSize < minSize) {
-                maxSize = minSize;
-            }
-
+            // Resolved by FontConfig, which the renderer reads through as well:
+            // a stored size the editor cannot represent (for example a migrated
+            // appearance/maxFontSize above 72) shows at the bound the board
+            // draws, so a save never rewrites a size that was in use.
             // Max first, then min: each value re-applies the linked bound, so
             // the pair ends up consistent instead of clamping the smaller one.
-            row.sizeSpin->setValue(maxSize);
-            row.minSpin->setValue(minSize);
+            row.sizeSpin->setValue(cfg.resolvedCardTextMaxSize());
+            row.minSpin->setValue(cfg.resolvedCardTextMinSize());
             continue;
         }
 
@@ -154,7 +141,7 @@ void FontGridWidget::loadFonts(const FontConfig &cfg)
         if (size <= 0) {
             size = FALLBACK_FONT_SIZE;
         }
-        row.sizeSpin->setValue(qBound(MIN_FONT_SIZE, size, MAX_FONT_SIZE));
+        row.sizeSpin->setValue(qBound(FontConfig::MIN_FONT_SIZE, size, FontConfig::MAX_FONT_SIZE));
     }
     blockSignals(false);
 }

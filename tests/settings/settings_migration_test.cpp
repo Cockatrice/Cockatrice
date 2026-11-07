@@ -1160,6 +1160,54 @@ TEST_F(SettingsMigrationTest, AppearanceMaxFontSize_MergesWithOtherRoles)
     EXPECT_TRUE(content.contains("20"));
 }
 
+TEST_F(SettingsMigrationTest, AppearanceMaxFontSize_InsertsIntoFontsSectionNotAfterIt)
+{
+    // A hand-edited fonts.toml may keep [Fonts] first and another section after
+    // it. Appending the seeded key at EOF would land it in that trailing
+    // section, where the font parser never reads it.
+    const QString themesPath = tempDir.path() + "/themes";
+    ASSERT_TRUE(QDir().mkpath(themesPath + "/MyTheme"));
+    {
+        QFile f(themesPath + "/MyTheme/fonts.toml");
+        ASSERT_TRUE(f.open(QIODevice::WriteOnly | QIODevice::Text));
+        QTextStream out(&f);
+        out << "[Fonts]\n"
+               "# keep this comment\n"
+               "InterfaceDefault = \"Inter, 10\"\n"
+               "\n"
+               "[Other]\n"
+               "Keep = \"me\"\n";
+    }
+    {
+        QSettings paths(settingsPath + "paths.ini", QSettings::IniFormat);
+        paths.setValue("paths/themes", themesPath);
+        paths.sync();
+    }
+    {
+        QSettings appearance(settingsPath + "appearance.ini", QSettings::IniFormat);
+        appearance.setValue("appearance/maxFontSize", 18);
+        appearance.sync();
+    }
+
+    ASSERT_TRUE(SettingsMigration::migrateAppearanceMaxFontSizeToTheme(settingsPath));
+
+    QFile f(themesPath + "/MyTheme/fonts.toml");
+    ASSERT_TRUE(f.open(QIODevice::ReadOnly | QIODevice::Text));
+    const QString content = QString::fromUtf8(f.readAll());
+    ASSERT_TRUE(content.contains("CardTextMaxSize"));
+    EXPECT_TRUE(content.contains("18"));
+    // The new key belongs to [Fonts], not to the section that follows it ...
+    const int keyPos = content.indexOf("CardTextMaxSize");
+    const int otherSectionPos = content.indexOf("[Other]");
+    ASSERT_GE(keyPos, 0);
+    ASSERT_GE(otherSectionPos, 0);
+    EXPECT_LT(keyPos, otherSectionPos);
+    // ... and the file keeps its own comment, ordering and trailing section.
+    EXPECT_TRUE(content.contains("# keep this comment"));
+    EXPECT_TRUE(content.contains("InterfaceDefault = \"Inter, 10\""));
+    EXPECT_TRUE(content.endsWith("[Other]\nKeep = \"me\"\n"));
+}
+
 TEST_F(SettingsMigrationTest, AppearanceMaxFontSize_AbsentKeyDoesNothing)
 {
     ASSERT_FALSE(SettingsMigration::migrateAppearanceMaxFontSizeToTheme(settingsPath));
