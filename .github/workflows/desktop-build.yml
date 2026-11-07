@@ -150,7 +150,7 @@ jobs:
             allow-failure: yes
             package: skip    # We are packaged in Arch already
             debug_test: yes    # see the note on Fedora 45 below
-            ccache_size: 850M    # Debug plus the suite: 660 MB of objects at -g1
+            ccache_size: 850M    # Debug plus the suite: 680 MB working set at -g1
 
           - distro: Servatrice_Debian
             version: 12
@@ -165,7 +165,7 @@ jobs:
             version: 13
 
             package: DEB
-            ccache_size: 800M    # Release plus the suite: 614 MB of objects at -g1
+            ccache_size: 800M    # Release plus the suite: 625 MB working set at -g1
 
           # The single Fedora leg used to build Debug for the suite and Release for the
           # package in one job (measured on Fedora 44: 30.8 min, the only leg slower than
@@ -225,27 +225,34 @@ jobs:
       # whole configuration therefore buys almost nothing, and the quota goes to fewer legs
       # at a size that holds one:
       #
-      #   Arch                 Debug + suite       660 MB working set   850M
-      #   Debian 13            Release + suite     614 MB               800M
+      #   Arch                 Debug + suite       680 MB working set   850M
+      #   Debian 13            Release + suite     625 MB               800M
       #   Fedora 45 debug      Debug + suite       660 MB               850M
       #   Fedora 45 release    Release + package   614 MB               800M
       #
-      # That is about 4.1 GB of bounds, and with the fixed entries above it puts the quota at
-      # roughly 8.6 GB of 10 - so only legs worth their share get one. A leg keeps no cache
-      # when it duplicates another leg's coverage (Ubuntu 26.04 behind Debian 13's Release +
-      # suite; macOS 15 and macOS 27 Debug behind macOS 14; Servatrice covers the server
-      # alone and finishes in 4.7 min). Those four run cold: 4.7, 18.1, 16.5 and 15.8 min.
-      # The five that stay compile the client on the toolchains a change can break and are
-      # the ones a cache shortens by the most. Measured job totals on master 2026-11-04 also
-      # show the ceiling this leaves: Windows 10 is 29.5 min and compiles for 23.7 of it
-      # with no compiler cache at all, so Windows still sets the pull-request wall clock no
-      # matter how warm these legs are (see build-vcpkg).
+      # That is 3.3 GB of bounds, and with the fixed entries above (about 4.4 GB) it puts
+      # the quota at roughly 7.7 GB of 10 - so only legs worth their share get one. A leg
+      # keeps no cache when it duplicates another leg's coverage (Ubuntu 26.04 behind
+      # Debian 13's Release + suite; the macOS legs behind the Linux ones) or finishes well
+      # inside the Windows leg (Servatrice covers the server alone in 4.7 min). A macOS
+      # cache served 42% and saved about 32s on a 20 min leg that is already shorter than
+      # Windows, so that bound is better spent here. The four Linux legs that stay compile
+      # the client on the toolchains a change can break and are the ones a cache shortens
+      # by the most.
+      # Measured job totals on master 2026-11-04 also show the ceiling this leaves:
+      # Windows 10 is 29.5 min and compiles for 23.7 of it with no compiler cache at all, so
+      # Windows still sets the pull-request wall clock no matter how warm these legs are
+      # (see build-vcpkg).
       #
-      # Measured on master 2026-11-06: Fedora 45 debug/release hit 99.5% at 80% full, while
-      # Arch (75% hits at 96% full), Debian 13 (82% at 96%) and macOS 14 (42% at 99.96%)
-      # still evict entries they need. The sanitize leg's 1.2G cache was the largest of the
-      # six and is now nightly-only; that is the budget a later re-sizing of those three
-      # spends.
+      # Steady-state master data corrected this on 2026-11-07: Arch 90.1% and Debian 13
+      # 96.75% per-run hits at the 850M/800M bounds, Fedora 45 debug 99.18% and release
+      # 99.2%. The 75%/82% seen the day before were warming runs - the -g1 switch had
+      # invalidated the cache one commit earlier - not thrashing at the bound. A cold 3G
+      # run on the same day measured one configuration at 680 MB (Arch) and 625 MB
+      # (Debian 13), so those bounds already hold the working set with ~170 MB of slack for
+      # commit-to-commit churn, and raising them buys hit rate the numbers do not show a
+      # need for. macOS 14's 800M entry is dropped because persistence buys 32s there; the
+      # quota stays free for the legs whose bounds would actually miss.
       #
       # Re-add a leg only with a bound that holds its whole configuration: a smaller one is
       # worse than none.
@@ -430,6 +437,14 @@ jobs:
           # comes from the client event itself (COCKATRICE_SENTRY_RELEASE).
           sentry-cli debug-files upload --org cockatrice --project cockatrice-desktop "${paths[@]}"
 
+      # Pull requests and tags only restore; only a push to refs/heads/master writes. A PR save
+      # would replace the objects the next master build restores, and a PR that compiles a
+      # different configuration would evict the warm set for everyone. Tags build with full
+      # DWARF (COCKATRICE_DEBUG_INFO_LEVEL is empty), so a tag's cache would poison the -g1
+      # set if it shared the master scope; it does not, because the save is master-only. The
+      # nightly legs persist nothing at all (PERSIST_CCACHE is false) for the same reason:
+      # a schedule shares refs/heads/master with the push.
+      #
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "Delete remote compiler cache (ccache)"
         if: github.ref == 'refs/heads/master' && env.PERSIST_CCACHE == 'true' && steps.restore_ccache.outputs.cache-hit
@@ -593,7 +608,7 @@ jobs:
             make_package: 1
             override_target: 14
             package_suffix: "-macOS14"
-            ccache_size: 800M    # one Release configuration plus the suite at -g1
+            persist_ccache: 'false'    # 42% hits saved ~32s on a 20 min leg already under Windows
             qt_version: 6.11.*
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Apple
@@ -665,12 +680,12 @@ jobs:
     timeout-minutes: 100
     env:
       CCACHE_DIR: ${{ github.workspace }}/.cache/
-      # One macOS configuration is about 600 MB of objects at -g1, so its bound needs to be
-      # 800M to hold one whole; a smaller cache serves a few percent and is worthless (see
-      # the sizing comment in build-linux). macOS 14 keeps the one macOS cache: it runs the
-      # suite against the shipping Release build and is the longest of the three at 24.2 min.
-      # macOS 15 (16.5) and macOS 27 Debug (15.8) duplicate its coverage and are shorter, so
-      # they run cold.
+      # No macOS leg keeps a compiler cache. One configuration is about 600 MB of objects at
+      # -g1, so a useful bound is 800M, and the quota is better spent on the Linux legs whose
+      # bounds still miss (see the sizing comment in build-linux). Measured on master
+      # 2026-11-06, macOS 14's 800M cache served 42% of calls and saved about 32s on a 20 min
+      # job that is already shorter than the Windows leg; macOS 15 and macOS 27 Debug
+      # duplicate its coverage. All three run cold.
       CCACHE_SIZE: ${{ matrix.ccache_size || '700M' }}
       PERSIST_CCACHE: ${{ matrix.persist_ccache || 'true' }}
       # MSVC has no -g level, so the Windows leg does not ask for one; it has no compiler
@@ -1228,7 +1243,7 @@ jobs:
           # The nightly legs and the pull-request legs that finish under the Windows leg
           # keep none, so their leftover entries are reclaimed here instead of waiting out
           # the age rule.
-          LIVE_CCACHE_KEYS: 'ccache-Arch ccache-Debian13 ccache-Fedora45debug ccache-Fedora45release ccache-macOS14-xcode-27'
+          LIVE_CCACHE_KEYS: 'ccache-Arch ccache-Debian13 ccache-Fedora45debug ccache-Fedora45release'
         run: |
           gh api --paginate "repos/$GITHUB_REPOSITORY/actions/caches?per_page=100" \
             --jq '.actions_caches[] | [.id, .ref, .key, .last_accessed_at] | @tsv' >"$RUNNER_TEMP/caches.tsv"
@@ -1253,8 +1268,8 @@ jobs:
               reason="scoped to $ref"
             elif [[ $key == ccache-* ]]; then
               # An exact token compare, because one key can be a prefix of another:
-              # ccache-Ubuntu26.04 is a prefix of ccache-Ubuntu26.04sanitize, and only
-              # the sanitize entry is live.
+              # ccache-Fedora45 is a prefix of ccache-Fedora45debug and
+              # ccache-Fedora45release, and only the latter two are live.
               if [[ $live_ccache != *" $key "* ]]; then
                 reason="no pull-request leg keeps it"
               fi
