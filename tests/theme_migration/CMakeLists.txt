@@ -17,6 +17,7 @@ cockatrice_add_test(
   theme_migration_test.cpp
   theme_icon_render_test.cpp
   icon_tint_preview_test.cpp
+  icon_treatment_preview_test.cpp
   LIBS
   libcockatrice_settings
   libcockatrice_network
