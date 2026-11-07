@@ -74,6 +74,22 @@ ThemeIconFill::Scheme activeScheme()
 }
 
 /**
+ * @brief The ink a disabled glyph is painted with.
+ *
+ * A disabled icon used to be the palette's disabled text, a fixed gray whose
+ * contrast swings with the surface: on the darkest themes it out-reads the quiet
+ * level, so an enabled quiet glyph looks more disabled than a disabled one.
+ * Deriving it from the theme's own quiet ink keeps the order structural.
+ */
+QColor disabledGlyphInk(const QPalette &palette)
+{
+    const QColor quiet = themeManager->appColor(AppColor::IconSoft);
+    const QColor surface = ThemeIconInk::harderSurface(palette.color(QPalette::Active, QPalette::Window),
+                                                       palette.color(QPalette::Active, QPalette::Button), quiet);
+    return ThemeIconInk::disabledInk(quiet, surface);
+}
+
+/**
  * @brief Reads an SVG through the `theme:` search path.
  */
 QByteArray readSvg(const QString &resolvedPath)
@@ -386,7 +402,7 @@ QColor IconTint::resolve(QIcon::Mode mode) const
     if (source == Source::AppColor) {
         // A disabled control must not keep signalling its semantic color.
         if (mode == QIcon::Disabled) {
-            return palette.color(QPalette::Disabled, QPalette::WindowText);
+            return disabledGlyphInk(palette);
         }
         // The theme authors one color per emphasis level, so the paint path
         // uses the resolved role verbatim. The filled treatments only shape the
@@ -408,13 +424,14 @@ QColor IconTint::resolve(QIcon::Mode mode) const
     const QPalette::ColorGroup group = mode == QIcon::Disabled ? QPalette::Disabled : QPalette::Active;
     const QPalette::ColorRole effective =
         mode == QIcon::Selected && paletteRole == QPalette::WindowText ? QPalette::HighlightedText : paletteRole;
-    const QColor color = palette.color(group, effective);
-    // A neutral label role resolves to the theme's authored icon ink. Semantic
-    // roles and the selected-row swap keep the color the palette gave them.
-    if (group == QPalette::Active && (effective == QPalette::WindowText || effective == QPalette::Text)) {
-        return themeManager->appColor(emphasisRole(AppColor::Icon, emphasis));
+    // A neutral label role resolves to the theme's authored icon ink. A disabled
+    // one uses the dimmed quiet ink so it always sits below the quiet level;
+    // semantic roles keep the color the palette gave them.
+    if (effective == QPalette::WindowText || effective == QPalette::Text) {
+        return group == QPalette::Disabled ? disabledGlyphInk(palette)
+                                           : themeManager->appColor(emphasisRole(AppColor::Icon, emphasis));
     }
-    return color;
+    return palette.color(group, effective);
 }
 
 QIcon loadThemedIcon(QStringView prefix, IconTint tint, IconStyle style)

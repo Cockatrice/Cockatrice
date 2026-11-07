@@ -73,11 +73,10 @@ AccentStrong         = #3a6fd6
 AccentSoft           = #8fb8f2
 Icon                 = #7ca0e5
 IconStrong           = #6a9dff
-IconSoft             = #70809d
+IconSoft             = #93a1ba
 Positive             = #5bb174
 PositiveStrong       = #30b758
-PositiveSoft         = #5e8873
+PositiveSoft         = #84a98f
 Negative             = #ed8077
 NegativeStrong       = #ff7367
-NegativeSoft         = #9b7678
-
+NegativeSoft         = #be9794
