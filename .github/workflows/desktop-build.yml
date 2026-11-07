@@ -213,9 +213,14 @@ jobs:
       CCACHE_EVICTION_AGE: 7d
       # The bound is sized against the repository's 10 GB cache quota
       # (https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy),
-      # not against what one leg would like: the quota also holds about 0.9 GB of buildkit
-      # layers (mode=min in docker-release.yml), 0.8 GB of vcpkg, 0.7 GB of Qt and the CodeQL
-      # trap caches (about 1 GB each, which prune-caches below does not manage).
+      # not against what one leg would like. Measured 2026-11-07, the quota holds 2.97 GB
+      # of these four ccache entries, 0.92 GB of Qt, 1.24 GB of vcpkg, 0.91 GB of buildkit
+      # layers (mode=min in docker-release.yml) and 4.26 GB of CodeQL trap caches: one entry
+      # per analyzed commit, about 1.07 GB each, of which every one but the newest is dead.
+      # That is 10.30 GB against the 10 GB quota, so every save past this point costs some
+      # other entry, and least-recently-used order reaches the buildkit layers before the
+      # trap caches. prune-caches below keeps only the newest trap cache; the live total is
+      # then 7.1 GB, which is what leaves room for a Windows compiler cache.
       #
       # Measured 2026-11-04: one configuration costs 1.2 GB with full DWARF and 660 MB with
       # -g1 (COCKATRICE_DEBUG_INFO_LEVEL below), and the size of the cache decides the hit
@@ -1230,6 +1235,16 @@ jobs:
       # age is the right test. Dropping a blob an index still lists costs the next image build
       # one rebuilt layer; docker-release gates nothing, so that is cheaper than keeping the
       # entries forever.
+      #
+      # codeql.yml's analyze job keeps its extracted database as one entry per analyzed commit,
+      # keyed codeql-trap-<schema>-<version>-<language>-<sha>, about 1.07 GB each. Each run
+      # restores the newest entry by prefix and saves its own, so every run that analyzes a new
+      # commit makes the previous entry dead, and the action never deletes them: four had
+      # accumulated by 2026-11-07 (4.26 GB, 40% of the quota). Retiring them cannot wait for
+      # the age rule, because they are not the oldest entries and so not what least-recently-
+      # used eviction reaches: the buildkit layers are. Only the newest can be restored again,
+      # and a miss costs one re-extraction in a job that reports rather than gates, so keeping
+      # exactly that one is safe.
       - name: "Delete unusable cache entries"
         shell: bash
         env:
@@ -1251,15 +1266,19 @@ jobs:
           cutoff="$(( $(date -u +%s) - 7 * 24 * 3600 ))"
           live=" ${LIVE_VCPKG_SCOPES} "
           live_ccache=" ${LIVE_CCACHE_KEYS} "
+          # The one trap cache a later run can still restore, by prefix. ISO-8601 sorts
+          # lexicographically, so this is a plain string compare. Entries scoped to another
+          # ref are deleted by the ref rule below whatever this says.
+          newest_trap="$(awk -F'\t' '$2 == "refs/heads/master" && $3 ~ /^codeql-trap-/ && $4 > m { m = $4; k = $3 } END { print k }' "$RUNNER_TEMP/caches.tsv")"
 
           deleted=0
           while IFS=$'\t' read -r id ref key accessed; do
             [[ -n $id ]] || continue
             # Only ever touch the key shapes our workflows create (buildkit-* and index-*
-            # come from docker-release.yml), so that an entry of some other workflow can
-            # never be deleted by accident
+            # come from docker-release.yml, codeql-trap-* from codeql-action in codeql.yml),
+            # so that an entry of some other workflow can never be deleted by accident
             case "$key" in
-              vcpkg/* | ccache-* | Qt* | buildkit-* | index-*) ;;
+              vcpkg/* | ccache-* | Qt* | buildkit-* | index-* | codeql-trap-*) ;;
               *) continue ;;
             esac
 
@@ -1279,6 +1298,10 @@ jobs:
               scope="${scope%/*}/"
               if [[ $live != *" $scope "* ]]; then
                 reason="no matrix leg uses $scope"
+              fi
+            elif [[ $key == codeql-trap-* ]]; then
+              if [[ $key != "$newest_trap" ]]; then
+                reason="superseded by the newest trap cache"
               fi
             fi
             if [[ -z $reason ]]; then
