@@ -10,6 +10,7 @@
 #include <QMetaEnum>
 #include <QPair>
 #include <QTextStream>
+#include <algorithm>
 #include <qnamespace.h>
 #include <utility>
 
@@ -308,7 +309,28 @@ QPalette PaletteConfig::apply(QPalette base) const
 
 bool FontConfig::hasFonts() const
 {
-    return !fonts.isEmpty() || cardTextMinSize != 1 || cardTextMaxSize > 0;
+    return !fonts.isEmpty() || cardTextMinSize != CARD_TEXT_MIN_SIZE || cardTextMaxSize > 0;
+}
+
+int FontConfig::resolvedCardTextMinSize() const
+{
+    const int size = cardTextMinSize > 0 ? cardTextMinSize : CARD_TEXT_MIN_SIZE;
+    return std::clamp(size, CARD_TEXT_MIN_SIZE, MAX_FONT_SIZE);
+}
+
+int FontConfig::resolvedCardTextMaxSize() const
+{
+    int size = cardTextMaxSize;
+    if (size <= 0) {
+        const auto it = fonts.constFind(AppFont::CardText);
+        size = it != fonts.constEnd() ? it.value().pointSize() : 0;
+    }
+    if (size <= 0) {
+        size = DEFAULT_CARD_TEXT_SIZE;
+    }
+    // Mirror the editor's resolution: clamp the max into its control range, then
+    // raise it to the (already clamped) min so the pair stays consistent.
+    return std::max(resolvedCardTextMinSize(), std::clamp(size, MIN_FONT_SIZE, MAX_FONT_SIZE));
 }
 
 QString FontConfig::toToml() const
@@ -334,7 +356,7 @@ QString FontConfig::toToml() const
         entries += QString("%1 = \"%2, %3\"\n").arg(QString(roleName), -20).arg(family).arg(pointSize);
     }
 
-    if (cardTextMinSize != 1) {
+    if (cardTextMinSize != CARD_TEXT_MIN_SIZE) {
         entries += QString("%1 = %2\n").arg(QStringLiteral("CardTextMinSize"), -20).arg(cardTextMinSize);
     }
 

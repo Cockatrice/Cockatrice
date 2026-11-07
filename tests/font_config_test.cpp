@@ -282,6 +282,42 @@ TEST(FontConfigTest, CardTextMaxSizeWithoutFamily)
     EXPECT_EQ(loaded, cfg);
 }
 
+TEST(FontConfigTest, MigratedCardTextMaxResolvesIntoTheEditorsRange)
+{
+    // appearance/maxFontSize came from a control that allowed values above 72
+    // and the migration seeds it verbatim, so fonts.toml can hold a size the
+    // font editor cannot show. 72 is what the editor displays and would save,
+    // so the board has to draw 72 too instead of rendering 100 until the next
+    // save silently rewrites the theme.
+    QTemporaryDir tmp;
+    ASSERT_TRUE(tmp.isValid());
+    const QString filePath = writeTempFile(tmp, "fonts.toml", "[Fonts]\nCardTextMaxSize = 100\n");
+
+    const FontConfig migrated = FontConfig::fromFile(filePath);
+    ASSERT_EQ(migrated.cardTextMaxSize, 100);
+    EXPECT_EQ(migrated.resolvedCardTextMaxSize(), 72);
+}
+
+TEST(FontConfigTest, CardTextSizesResolveIntoTheEditorsRange)
+{
+    // The same bound applies when the size comes from the CardText family, a
+    // stored size below the editor's control floor rises to it, and the max is
+    // never below the resolved shrink-to-fit floor.
+    FontConfig fromFamily;
+    fromFamily.fonts[AppFont::CardText] = makeFont("Noto Serif", 100);
+    EXPECT_EQ(fromFamily.resolvedCardTextMaxSize(), 72);
+
+    FontConfig belowFloor;
+    belowFloor.cardTextMaxSize = 3;
+    EXPECT_EQ(belowFloor.resolvedCardTextMaxSize(), 6);
+
+    FontConfig narrow;
+    narrow.cardTextMinSize = 20;
+    narrow.cardTextMaxSize = 12;
+    EXPECT_EQ(narrow.resolvedCardTextMinSize(), 20);
+    EXPECT_EQ(narrow.resolvedCardTextMaxSize(), 20);
+}
+
 TEST(FontConfigTest, CardTextMaxDefaultIsOmitted)
 {
     FontConfig cfg;
