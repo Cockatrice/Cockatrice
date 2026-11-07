@@ -15,6 +15,7 @@ class QTreeView;
 class GamesModel;
 class GamesProxyModel;
 class QLabel;
+class QMenu;
 class QPushButton;
 class QToolButton;
 class QAction;
@@ -141,6 +142,15 @@ signals:
      */
     void gameJoined(int gameId);
 
+protected:
+    /**
+     * @brief Rebuilds the host control when the application style changes.
+     *
+     * The appearance settings can switch between the native macOS style and a
+     * cross-platform style while the room is open, and the host control follows.
+     */
+    void changeEvent(QEvent *event) override;
+
 private:
     AbstractClient *client;       /**< The network client used to communicate with the server. */
     TabSupervisor *tabSupervisor; /**< Reference to TabSupervisor for managing tabs and rooms. */
@@ -154,7 +164,10 @@ private:
 
     QPushButton *filterButton;               /**< Button to open the filter dialog. */
     QPushButton *clearFilterButton;          /**< Button to clear active filters. */
-    QToolButton *hostGameButton;             /**< Split button: quick host, with the full form in its menu. */
+    QPushButton *hostGameButton;             /**< Host button, in the same family as the join buttons. */
+    QToolButton *hostGameMenuButton;         /**< Split arrow that opens the host menu (non-macOS styles only). */
+    QWidget *hostGameButtonWidget;           /**< Container that keeps the split button and its arrow together. */
+    QMenu *hostGameMenu;                     /**< Menu behind the arrow, or behind the pull-down button on macOS. */
     QAction *hostGameAction;                 /**< Quick-host action, carrying the keyboard shortcut. */
     QAction *reviewGameAction;               /**< Menu action that opens the full create dialog. */
     QLabel *hostErrorLabel;                  /**< Inline failure message for a quick-host request. */
@@ -170,12 +183,20 @@ private:
                                        file on every keystroke. */
 
     bool hostCommandPending = false; /**< True while a quick-host command is in flight. */
+    bool joinCommandPending = false; /**< True while a join/spectate command is in flight. */
 
     /** @brief Shows a quick-host failure above the game list. */
     void showHostError(const QString &message);
     /** @brief Hides the quick-host failure message. */
     void clearHostError();
-    /** @brief Enables or disables the quick-host action while a command is in flight. */
+    /**
+     * @brief Rebuilds the host control for the active style.
+     *
+     * The native macOS style draws a single pull-down button; every other style gets the
+     * split button, whose primary half quick-hosts and whose arrow opens the menu.
+     */
+    void applyHostGameStyle();
+    /** @brief Enables or disables the quick-host and review controls while a command is in flight. */
     void setHostCommandPending(bool pending);
     /** @brief Keeps the quick-host button tooltip in sync with the current shortcut. */
     void updateHostGameToolTip();
