@@ -279,6 +279,22 @@ TEST_F(SetQuery, ComparisonMatchesByReleaseDate)
     EXPECT_FALSE(FilterString("set<EOE").check(inBothSets));
 }
 
+TEST(FilterStringError, InvalidExpressionIsInvalidAndReportsAPosition)
+{
+    const FilterString filter("t:(");
+
+    EXPECT_FALSE(filter.valid());
+    EXPECT_TRUE(filter.error().contains("position")) << "unexpected error text: " << filter.error().toStdString();
+}
+
+TEST(FilterStringError, ValidExpressionHasNoError)
+{
+    const FilterString filter("t:creature");
+
+    EXPECT_TRUE(filter.valid());
+    EXPECT_TRUE(filter.error().isEmpty());
+}
+
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);

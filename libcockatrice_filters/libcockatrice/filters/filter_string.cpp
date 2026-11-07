@@ -506,6 +506,14 @@ FilterString::FilterString()
     _error = "Not initialized";
 }
 
+QString FilterString::error() const
+{
+    if (_errorColumn == 0) {
+        return _error;
+    }
+    return tr("Error at position %1: %2").arg(_errorColumn).arg(_error);
+}
+
 FilterString::FilterString(const QString &expr, const CardSearchLanguage &searchLanguage)
 {
     QByteArray ba = expr.simplified().toUtf8();
@@ -522,7 +530,8 @@ FilterString::FilterString(const QString &expr, const CardSearchLanguage &search
     searchLanguageContext = searchLanguage;
 
     search.set_logger([&](size_t /*ln*/, size_t col, const std::string &msg) {
-        _error = QString("Error at position %1: %2").arg(col).arg(QString::fromStdString(msg));
+        _error = QString::fromStdString(msg);
+        _errorColumn = col;
     });
 
     if (!search.parse(ba.data(), result)) {
