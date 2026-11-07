@@ -248,10 +248,10 @@ jobs:
       #   Debian 13            Release + suite     625 MB               800M
       #   Fedora 45 debug      Debug + suite       660 MB               850M
       #   Fedora 45 release    Release + package   614 MB               800M
-      #   Windows 10           Release + package   1.2 GB working set   1300M
+      #   Windows 10           Release + package   890 MB working set   950M
       #
-      # That is 4.6 GB of bounds; what lands in the quota is 4.3 GB of compiler cache,
-      # 2.97 GB stored by the Linux legs and 1.30 GB by Windows, for 8.4 GB of 10 in total.
+      # That is 4.25 GB of bounds; what lands in the quota is 3.9 GB of compiler cache,
+      # 2.97 GB stored by the Linux legs and 0.95 GB by Windows, for 8.1 GB of 10 in total.
       # So only legs worth their share get one. A leg keeps no cache when it duplicates
       # another leg's coverage (Ubuntu 26.04 behind Debian 13's Release + suite; the macOS
       # legs behind the Linux ones) or finishes well inside the Windows leg (Servatrice
@@ -680,7 +680,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             type: Release
             ccache_eviction_age: 7d
-            ccache_size: 1300M    # Release plus the package: 1.2 GB working set at /Z7
+            ccache_size: 950M    # Release plus the package: 890 MB working set without /Z7
             use_ccache: 1
             # Scope is named after the vs2026 toolchain, not the generator: the
             # ABI hash covers cl.exe, which is identical, so this leg keeps
@@ -702,8 +702,11 @@ jobs:
       CCACHE_DIR: ${{ github.workspace }}/.cache/
       CCACHE_SIZE: ${{ matrix.ccache_size || '700M' }}
       PERSIST_CCACHE: ${{ matrix.persist_ccache || 'true' }}
-      # MSVC has no -g level, so the Windows leg does not ask for one.
-      COCKATRICE_DEBUG_INFO_LEVEL: ${{ matrix.os != 'Windows' && github.ref_type != 'tag' && '1' || '' }}
+      # MSVC has no -g level, so there is nothing to ask for on Windows: level 0 is the one
+      # value with a meaning there, and it drops /Z7 rather than lowering a level. Pull-request
+      # builds carry no debug information, which is most of what a compiler cache stores; a
+      # tag is the build whose binary is shipped and symbolicated, so it keeps the full set.
+      COCKATRICE_DEBUG_INFO_LEVEL: ${{ github.ref_type != 'tag' && '0' || '' }}
 
     # Shared with build-vcpkg-nightly so the two leg sets run the same steps.
     steps: &vcpkg-steps
@@ -876,6 +879,21 @@ jobs:
           # Release legs compile the sentry-native SDK; Debug legs stay SDK-free.
           WITH_CRASH_REPORTING: ${{ matrix.type == 'Release' && 'ON' || '' }}
         run: .ci/compile.sh --server --test --vcpkg
+
+      # What the compiler cache has to hold for this leg. ccache stores the objects it
+      # compiles, so their total is the working set a bound has to fit, and the cache
+      # directory shows what this build actually wrote. Debug information dominates both,
+      # which is why the level above is reported next to them.
+      - name: "Report compiler cache footprint"
+        if: always()
+        shell: bash
+        run: |
+          echo "=== ccache directory"
+          du -sh "$CCACHE_DIR" 2>/dev/null || echo "(none)"
+          echo "=== objects and archives"
+          find build -type f \( -name '*.o' -o -name '*.obj' -o -name '*.a' -o -name '*.lib' \) -exec du -k {} + 2>/dev/null \
+            | awk '{n++; s+=$1} END {printf "%d files, %.2f GB\n", n, s/1048576}'
+          echo "=== debug info level in use: '${COCKATRICE_DEBUG_INFO_LEVEL}'"
 
       - name: "Install sentry-cli"
         if: needs.configure.outputs.tag != null && matrix.make_package == '1'

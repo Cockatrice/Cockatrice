@@ -279,7 +279,14 @@ set(COCKATRICE_DEBUG_INFO_LEVEL
 )
 if(NOT COCKATRICE_DEBUG_INFO_LEVEL STREQUAL "")
   if(MSVC)
-    message(WARNING "COCKATRICE_DEBUG_INFO_LEVEL is ignored on MSVC")
+    # MSVC has no -g level, so /Z7 is either there or it is not. Level 0 is the only value
+    # that means something here: without /Z7 the objects carry no debug information, which is
+    # what a cache that has to fit a bound holds. Anything else is the full debug info.
+    if(COCKATRICE_DEBUG_INFO_LEVEL STREQUAL "0")
+      string(REPLACE " /Z7" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    else()
+      message(WARNING "COCKATRICE_DEBUG_INFO_LEVEL is ignored on MSVC except 0")
+    endif()
   else()
     string(APPEND CMAKE_CXX_FLAGS_DEBUG " -g${COCKATRICE_DEBUG_INFO_LEVEL}")
     string(APPEND CMAKE_CXX_FLAGS_RELEASE " -g${COCKATRICE_DEBUG_INFO_LEVEL}")
