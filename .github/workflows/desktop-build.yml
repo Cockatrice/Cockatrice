@@ -234,7 +234,7 @@ jobs:
       # That is 10.30 GB against the 10 GB quota, so every save past this point costs some
       # other entry, and least-recently-used order reaches the buildkit layers before the
       # trap caches. prune-caches below keeps only the newest trap cache; the live total is
-      # then 7.1 GB, which is what leaves room for a Windows compiler cache.
+      # then 7.1 GB, which is what leaves room for the Windows and macOS compiler caches.
       #
       # Measured 2026-11-04: one configuration costs 1.2 GB with full DWARF and 660 MB with
       # -g1 (COCKATRICE_DEBUG_INFO_LEVEL below), and the size of the cache decides the hit
@@ -249,22 +249,25 @@ jobs:
       #   Fedora 45 debug      Debug + suite       660 MB               850M
       #   Fedora 45 release    Release + package   614 MB               800M
       #   Windows 10           Release + package   890 MB working set   950M
+      #   macOS 14/15          Release + package   0.5 GB ccache at -g1 700M
+      #   macOS 27 Debug       Debug + suite       0.5 GB ccache at -g1 700M
       #
-      # That is 4.25 GB of bounds; what lands in the quota is 3.9 GB of compiler cache,
-      # 2.97 GB stored by the Linux legs and 0.95 GB by Windows, for 8.1 GB of 10 in total.
+      # That is 6.35 GB of bounds; what lands in the quota is 5.15 GB of compiler cache,
+      # 2.97 GB stored by the Linux legs, 0.95 GB by Windows and 1.23 GB by the three macOS
+      # legs, for 9.3 GB of 10 in total.
       # So only legs worth their share get one. A leg keeps no cache when it duplicates
-      # another leg's coverage (Ubuntu 26.04 behind Debian 13's Release + suite; the macOS
-      # legs behind the Linux ones) or finishes well inside the Windows leg (Servatrice
-      # covers the server alone in 4.7 min). A macOS
-      # cache served 42% and saved about 32s on a 20 min leg that is already shorter than
-      # Windows, so that bound is better spent here. The four Linux legs that stay compile
-      # the client on the toolchains a change can break and are the ones a cache shortens
-      # by the most.
+      # another leg's coverage (Ubuntu 26.04 behind Debian 13's Release + suite) or finishes
+      # well inside the Windows leg (Servatrice covers the server alone in 4.7 min). The
+      # macOS legs compile the client with a different toolchain (Apple clang), and one
+      # configuration writes only ~0.5 GB, so all three fit beside the Windows entry even
+      # though a macOS cache served 42% and saved about 32s on a 20 min leg. The four Linux
+      # legs that stay compile the client on the toolchains a change can break and are the
+      # ones a cache shortens by the most.
       # Measured job totals on master 2026-11-04 also show the ceiling this leaves:
       # Windows 10 is 29.5 min and compiles for 23.7 of it, so Windows sets the
       # pull-request wall clock no matter how warm these legs are. That is why the Windows
-      # leg is the one macOS's share went to (see build-vcpkg): MSVC has no -g level to
-      # shrink, and with /Z7 the whole configuration is cacheable, PCH included.
+      # leg keeps the largest bound (see build-vcpkg): MSVC has no -g level to shrink, and
+      # with /Z7 the whole configuration is cacheable, PCH included.
       #
       # Steady-state master data corrected this on 2026-11-07: Arch 90.1% and Debian 13
       # 96.75% per-run hits at the 850M/800M bounds, Fedora 45 debug 99.18% and release
@@ -273,8 +276,9 @@ jobs:
       # run on the same day measured one configuration at 680 MB (Arch) and 625 MB
       # (Debian 13), so those bounds already hold the working set with ~170 MB of slack for
       # commit-to-commit churn, and raising them buys hit rate the numbers do not show a
-      # need for. macOS 14's 800M entry is dropped because persistence buys 32s there; the
-      # quota stays free for the legs whose bounds would actually miss.
+      # need for. The three macOS entries are 700M each because one configuration wrote a
+      # 0.5 GB ccache directory at -g1 and level 0 shrinks it further, so the bound holds the
+      # whole configuration with room to spare.
       #
       # Re-add a leg only with a bound that holds its whole configuration: a smaller one is
       # worse than none.
@@ -625,6 +629,8 @@ jobs:
             target: 14    # EOL 2026-09-14
             runner: xcode-27    # https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md
 
+            ccache_eviction_age: 7d
+            ccache_size: 700M    # Release + package: ~0.4 GB at level 0
             cmake_generator: Ninja
             make_package: 1
             override_target: 14
@@ -633,6 +639,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Apple
             type: Release
+            use_ccache: 1
             vcpkg_deployment_target: 14
             vcpkg_scope: 'vcpkg/macos14-arm64-xcode26.6/'
             vcpkg_upload: 1    # only one leg per vcpkg_scope hands its archives over
@@ -641,6 +648,8 @@ jobs:
             target: 15    # EOL 2027-??
             runner: xcode-27    # https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md
 
+            ccache_eviction_age: 7d
+            ccache_size: 700M    # Release + package: ~0.4 GB at level 0
             cmake_generator: Ninja
             make_package: 1
             override_target: 15
@@ -649,6 +658,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Apple
             type: Release
+            use_ccache: 1
             vcpkg_deployment_target: 14
             vcpkg_scope: 'vcpkg/macos14-arm64-xcode26.6/'
 
@@ -656,11 +666,14 @@ jobs:
             target: 27
             runner: xcode-27    # https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md
 
+            ccache_eviction_age: 7d
+            ccache_size: 700M    # Debug + suite: ~0.5 GB at level 0
             cmake_generator: Ninja
             qt_version: 6.11.*
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Apple
             type: Debug
+            use_ccache: 1
             vcpkg_deployment_target: 14
             vcpkg_scope: 'vcpkg/macos14-arm64-xcode26.6/'
 
@@ -695,10 +708,13 @@ jobs:
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 100
     env:
-      # Only the Windows leg keeps a compiler cache; the macOS legs build without one
-      # (see the note where their ccache steps used to be). ccache drives MSVC as long as
-      # the compiler emits /Z7, which CMakeLists.txt sets for exactly this reason, and it
-      # caches the PCH-backed targets with the sloppiness that .ci/compile.sh re-asserts.
+      # The Windows leg and all three pull-request macOS legs keep a compiler cache. ccache
+      # drives MSVC as long as the compiler emits /Z7, which CMakeLists.txt sets for exactly
+      # this reason, and it drives clang on macOS the same way; both cache the PCH-backed
+      # targets with the sloppiness that .ci/compile.sh re-asserts. Every leg builds without
+      # debug information on non-tag refs, so one macOS configuration writes ~0.4-0.5 GB and
+      # the 700M bound holds it with room for commit-to-commit churn (see build-linux for the
+      # quota arithmetic).
       CCACHE_DIR: ${{ github.workspace }}/.cache/
       CCACHE_SIZE: ${{ matrix.ccache_size || '700M' }}
       PERSIST_CCACHE: ${{ matrix.persist_ccache || 'true' }}
@@ -726,19 +742,25 @@ jobs:
         shell: bash
         run: choco install ccache --no-progress -y
 
-      - name: "[Windows] Restore compiler cache (ccache)"
-        if: matrix.os == 'Windows' && matrix.use_ccache == 1 && env.PERSIST_CCACHE == 'true'
+      - name: "[macOS] Setup ccache"
+        if: matrix.os == 'macOS' && matrix.use_ccache == 1
+        run: brew install ccache
+
+      - name: "Restore compiler cache (ccache)"
+        if: matrix.use_ccache == 1 && env.PERSIST_CCACHE == 'true'
         id: restore_ccache
         uses: actions/cache/restore@v6
         with:
           key: ccache-${{ matrix.os }}${{ matrix.target }}
           path: ${{ env.CCACHE_DIR }}
 
-      # No macOS leg runs ccache. A restored macOS cache served 42% of calls and saved
-      # about 32s on a 20 min leg that is already shorter than the Windows leg, which did
-      # not pay for its 800M slice of the quota; with nothing restored, the remaining
-      # intra-run hits are 3% and the hashing is pure overhead on ~1160 compiles, so the
-      # steps that installed and restored ccache are gone rather than merely disabled.
+      # Every macOS leg that keeps a cache restores the master entry for its own target.
+      # Measured on master 2026-11-07 (before the debug-information change), one macOS
+      # configuration wrote a 0.5 GB ccache directory at -g1 against the 700M bound, and the
+      # restored cache served 42% of calls. Level 0 shrinks that directory to ~0.4 GB, so the
+      # bound holds the whole configuration and the three entries fit the quota (see the
+      # sizing note in build-linux). macOS 14 and 15 build the same Release + package
+      # configuration for two deployment targets, but each is cheap enough to keep its own.
 
       - name: "[macOS] Install aqtinstall"
         if: matrix.os == 'macOS'
@@ -1079,10 +1101,10 @@ jobs:
           retention-days: 1
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
-      - name: "[Windows] Delete remote compiler cache (ccache)"
-        if: matrix.os == 'Windows' && matrix.use_ccache == 1 && env.PERSIST_CCACHE == 'true' && github.ref == 'refs/heads/master' && steps.restore_ccache.outputs.cache-hit
+      - name: "Delete remote compiler cache (ccache)"
+        if: matrix.use_ccache == 1 && env.PERSIST_CCACHE == 'true' && github.ref == 'refs/heads/master' && steps.restore_ccache.outputs.cache-hit
         continue-on-error: true
-        # Bash, not the runner's default pwsh, which cannot parse this `if`.
+        # Bash, not the Windows runner's default pwsh, which cannot parse this `if`.
         shell: bash
         env:
           CACHE_PRIMARY_KEY: ${{ steps.restore_ccache.outputs.cache-primary-key }}
@@ -1092,8 +1114,8 @@ jobs:
             echo "Cache deleted successfully"
           fi
 
-      - name: "[Windows] Cache updated compiler cache (ccache)"
-        if: matrix.os == 'Windows' && matrix.use_ccache == 1 && env.PERSIST_CCACHE == 'true' && github.ref == 'refs/heads/master'
+      - name: "Cache updated compiler cache (ccache)"
+        if: matrix.use_ccache == 1 && env.PERSIST_CCACHE == 'true' && github.ref == 'refs/heads/master'
         uses: actions/cache/save@v6
         with:
           key: ${{ steps.restore_ccache.outputs.cache-primary-key }}
@@ -1287,7 +1309,7 @@ jobs:
           # The nightly legs and the pull-request legs that finish under the Windows leg
           # keep none, so their leftover entries are reclaimed here instead of waiting out
           # the age rule.
-          LIVE_CCACHE_KEYS: 'ccache-Arch ccache-Debian13 ccache-Fedora45debug ccache-Fedora45release ccache-Windows10'
+          LIVE_CCACHE_KEYS: 'ccache-Arch ccache-Debian13 ccache-Fedora45debug ccache-Fedora45release ccache-Windows10 ccache-macOS14 ccache-macOS15 ccache-macOS27'
         run: |
           gh api --paginate "repos/$GITHUB_REPOSITORY/actions/caches?per_page=100" \
             --jq '.actions_caches[] | [.id, .ref, .key, .last_accessed_at] | @tsv' >"$RUNNER_TEMP/caches.tsv"
