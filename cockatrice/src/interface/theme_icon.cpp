@@ -3,6 +3,7 @@
 #include "libcockatrice/utility/svg_recolor.h"
 #include "theme_icon_badge.h"
 #include "theme_icon_fill.h"
+#include "theme_icon_ink.h"
 #include "theme_icon_sticker.h"
 #include "theme_manager.h"
 
@@ -315,26 +316,43 @@ private:
 };
 } // namespace
 
-IconTint::IconTint(QPalette::ColorRole role) : paletteRole(role)
+IconTint::IconTint(QPalette::ColorRole role, IconEmphasis _emphasis) : paletteRole(role), emphasis(_emphasis)
 {
 }
 
-IconTint::IconTint(AppColor::Role role) : source(Source::AppColor), appRole(role)
+IconTint::IconTint(AppColor::Role role, IconEmphasis _emphasis)
+    : source(Source::AppColor), appRole(role), emphasis(_emphasis)
 {
+}
+
+IconTint IconTint::primary()
+{
+    return IconTint(QPalette::WindowText, IconEmphasis::Primary);
+}
+
+IconTint IconTint::quiet()
+{
+    return IconTint(QPalette::WindowText, IconEmphasis::Quiet);
 }
 
 QColor IconTint::resolve(QIcon::Mode mode) const
 {
+    const QPalette &palette = qApp->palette();
+    const QColor surface = palette.color(QPalette::Active, QPalette::Window);
+    const QColor accent = palette.color(QPalette::Active, QPalette::Highlight);
+
     if (source == Source::AppColor) {
         // A disabled control must not keep signalling its semantic color.
         if (mode == QIcon::Disabled) {
-            return qApp->palette().color(QPalette::Disabled, QPalette::WindowText);
+            return palette.color(QPalette::Disabled, QPalette::WindowText);
         }
         // The three treatments paint the same tone: a line glyph, a badge disc
         // and a sticker fill must not disagree on how saturated the role is.
         // The fill treatments apply this floor themselves, so this only changes
-        // the line path, and only for the desaturated dark-scheme tones.
-        const QColor color = ThemeIconFill::saturated(themeManager->appColor(appRole));
+        // the line path, and only for the desaturated dark-scheme tones. The
+        // emphasis then decides how loud that tone is, without changing its hue.
+        const QColor color =
+            ThemeIconInk::forEmphasis(ThemeIconFill::saturated(themeManager->appColor(appRole)), surface, emphasis);
         if (mode != QIcon::Selected) {
             return color;
         }
@@ -342,16 +360,25 @@ QColor IconTint::resolve(QIcon::Mode mode) const
         // semantic tint when it stays legible there; otherwise the glyph would
         // vanish into the selection.
         constexpr double MIN_SELECTED_CONTRAST = 3.0;
-        const QColor highlight = qApp->palette().color(QPalette::Active, QPalette::Highlight);
-        return ThemeIconBadge::contrastRatio(color, highlight) >= MIN_SELECTED_CONTRAST
+        return ThemeIconInk::contrastRatio(color, accent) >= MIN_SELECTED_CONTRAST
                    ? color
-                   : qApp->palette().color(QPalette::Active, QPalette::HighlightedText);
+                   : palette.color(QPalette::Active, QPalette::HighlightedText);
     }
 
     const QPalette::ColorGroup group = mode == QIcon::Disabled ? QPalette::Disabled : QPalette::Active;
     const QPalette::ColorRole effective =
         mode == QIcon::Selected && paletteRole == QPalette::WindowText ? QPalette::HighlightedText : paletteRole;
-    return qApp->palette().color(group, effective);
+    const QColor color = palette.color(group, effective);
+    // A neutral label role is inked as an icon, not as body text: it borrows a
+    // little accent chroma and is held to a contrast floor. Semantic roles and
+    // the selected-row swap keep the color the palette gave them.
+    if (group == QPalette::Active && (effective == QPalette::WindowText || effective == QPalette::Text)) {
+        // The primary action of a surface takes the accent itself; the other
+        // levels stay neutral. Emphasis then sets the contrast the glyph pays.
+        const QColor base = emphasis == IconEmphasis::Primary ? accent : ThemeIconInk::glyphInk(color, surface, accent);
+        return ThemeIconInk::forEmphasis(base, surface, emphasis);
+    }
+    return color;
 }
 
 QIcon loadThemedIcon(QStringView prefix, IconTint tint, IconStyle style)
