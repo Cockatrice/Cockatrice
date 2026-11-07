@@ -47,13 +47,19 @@ class ThemeMigrationTest : public ::testing::Test
 {
 protected:
     QTemporaryDir tmp;
+    // Base of the per-user theme tree (<tmp>/themes).
     QString themesPath;
+    // Base of the shipped/install theme tree (<tmp>/system), deliberately
+    // separate from themesPath so a fallback cannot pass by reading a user file.
+    QString systemThemesPath;
 
     void SetUp() override
     {
         ASSERT_TRUE(tmp.isValid());
         themesPath = QDir(tmp.path()).absoluteFilePath("themes");
+        systemThemesPath = QDir(tmp.path()).absoluteFilePath("system");
         ASSERT_TRUE(QDir().mkpath(themesPath));
+        ASSERT_TRUE(QDir().mkpath(systemThemesPath));
     }
 };
 
@@ -147,6 +153,133 @@ TEST_F(ThemeMigrationTest, IsIdempotent)
     ThemeManager::migrateLegacyThemeDir(themesPath, LEGACY);
 
     EXPECT_EQ(readThemeFile(themesPath, CURRENT, "style.css").toStdString(), std::string("css"));
+}
+
+TEST_F(ThemeMigrationTest, ThemeConfigFallsBackToTheShippedThemeDir)
+{
+    // A user theme directory only holds what the user (or a migration) wrote.
+    // Reading theme.cfg from it alone would shadow the shipped theme and leave
+    // the board without its style and colour scheme.
+    const QString userDir = QDir(themesPath).absoluteFilePath("Leather");
+    ASSERT_TRUE(QDir().mkpath(userDir));
+    writeThemeFile(themesPath, "Leather", "fonts.toml", "[Fonts]\nCardTextMaxSize = 14\n");
+    writeThemeFile(systemThemesPath, "Leather", "theme.cfg",
+                   "[Appearance]\nColorScheme = Dark\n\n[Style]\nName = Leather\n");
+
+    const QString systemDir = QDir(systemThemesPath).absoluteFilePath("Leather");
+    const ThemeConfig cfg = ThemeManager::loadDefaultThemeConfig(userDir, systemDir);
+
+    EXPECT_EQ(cfg.colorScheme.toStdString(), std::string("Dark"));
+    EXPECT_EQ(cfg.styleName.toStdString(), std::string("Leather"));
+}
+
+TEST_F(ThemeMigrationTest, UserThemeConfigWinsOverTheShippedOne)
+{
+    writeThemeFile(themesPath, "Leather", "theme.cfg", "[Appearance]\nColorScheme = Light\n\n[Style]\nName = Custom\n");
+    writeThemeFile(systemThemesPath, "Leather", "theme.cfg",
+                   "[Appearance]\nColorScheme = Dark\n\n[Style]\nName = Leather\n");
+
+    const QString systemDir = QDir(systemThemesPath).absoluteFilePath("Leather");
+    const ThemeConfig cfg =
+        ThemeManager::loadDefaultThemeConfig(QDir(themesPath).absoluteFilePath("Leather"), systemDir);
+
+    EXPECT_EQ(cfg.colorScheme.toStdString(), std::string("Light"));
+    EXPECT_EQ(cfg.styleName.toStdString(), std::string("Custom"));
+}
+
+TEST_F(ThemeMigrationTest, ColorSchemeFollowsTheOsWhenTheResolvedThemeDirIsMissing)
+{
+    // getAvailableThemes() maps System/Fusion to a user directory that only
+    // appears on save, so a fresh profile has no resolved directory. Fusion
+    // ships ColorScheme = Dark; inheriting it there would force dark mode on
+    // every fresh profile regardless of the OS. Only an existing user directory
+    // is layered on the shipped theme.
+    const QString userDir = QDir(themesPath).absoluteFilePath("Fusion");
+    ASSERT_FALSE(QFileInfo::exists(userDir));
+    writeThemeFile(systemThemesPath, "Fusion", "theme.cfg",
+                   "[Appearance]\nColorScheme = Dark\n\n[Style]\nName = Fusion\n");
+
+    const QString systemDir = QDir(systemThemesPath).absoluteFilePath("Fusion");
+    const ThemeConfig cfg = ThemeManager::loadColorSchemeConfig(userDir, systemDir);
+
+    // Empty means isDarkMode() falls through to the OS color scheme.
+    EXPECT_TRUE(cfg.colorScheme.isEmpty());
+}
+
+TEST_F(ThemeMigrationTest, ColorSchemeInheritsTheShippedSchemeForAnExistingUserDir)
+{
+    // The migration seeds an existing user directory with fonts.toml only. Such
+    // a directory still belongs to the shipped theme and must keep its scheme
+    // instead of silently flipping to the OS one.
+    const QString userDir = QDir(themesPath).absoluteFilePath("Fusion");
+    ASSERT_TRUE(QDir().mkpath(userDir));
+    writeThemeFile(themesPath, "Fusion", "fonts.toml", "[Fonts]\nCardTextMaxSize = 14\n");
+    writeThemeFile(systemThemesPath, "Fusion", "theme.cfg",
+                   "[Appearance]\nColorScheme = Dark\n\n[Style]\nName = Fusion\n");
+
+    const QString systemDir = QDir(systemThemesPath).absoluteFilePath("Fusion");
+    const ThemeConfig cfg = ThemeManager::loadColorSchemeConfig(userDir, systemDir);
+
+    EXPECT_EQ(cfg.colorScheme.toStdString(), std::string("Dark"));
+}
+
+TEST_F(ThemeMigrationTest, DefaultThemeConfigStillCarriesTheShippedStyleWithoutAUserDir)
+{
+    // themeChangedSlot()/previewPalette() use the unconditional fallback: a
+    // stock theme with no user directory must still get its shipped styleName,
+    // even though its colour scheme follows the OS.
+    const QString userDir = QDir(themesPath).absoluteFilePath("Fusion");
+    ASSERT_FALSE(QFileInfo::exists(userDir));
+    writeThemeFile(systemThemesPath, "Fusion", "theme.cfg",
+                   "[Appearance]\nColorScheme = Dark\n\n[Style]\nName = Fusion\n");
+
+    const ThemeConfig cfg =
+        ThemeManager::loadDefaultThemeConfig(userDir, QDir(systemThemesPath).absoluteFilePath("Fusion"));
+
+    EXPECT_EQ(cfg.styleName.toStdString(), std::string("Fusion"));
+}
+
+TEST_F(ThemeMigrationTest, StyleSheetFallsBackToTheShippedThemeDir)
+{
+    const QString userDir = QDir(themesPath).absoluteFilePath("Leather");
+    ASSERT_TRUE(QDir().mkpath(userDir));
+    writeThemeFile(themesPath, "Leather", "fonts.toml", "[Fonts]\nCardTextMaxSize = 14\n");
+    writeThemeFile(systemThemesPath, "Leather", "style.css", "shipped-css");
+    writeThemeFile(systemThemesPath, "Leather", "style-dark.css", "shipped-dark-css");
+
+    const QString systemDir = QDir(systemThemesPath).absoluteFilePath("Leather");
+
+    // The scheme-qualified shipped stylesheet wins, else the plain one.
+    EXPECT_EQ(ThemeManager::themeStyleSheetPath(userDir, systemDir, true).toStdString(),
+              QDir(systemDir).absoluteFilePath("style-dark.css").toStdString());
+    EXPECT_EQ(ThemeManager::themeStyleSheetPath(userDir, systemDir, false).toStdString(),
+              QDir(systemDir).absoluteFilePath("style.css").toStdString());
+}
+
+TEST_F(ThemeMigrationTest, StyleSheetPrefersTheUserCopy)
+{
+    const QString userDir = QDir(themesPath).absoluteFilePath("Leather");
+    writeThemeFile(themesPath, "Leather", "style.css", "user-css");
+    writeThemeFile(systemThemesPath, "Leather", "style-dark.css", "shipped-dark-css");
+
+    const QString systemDir = QDir(systemThemesPath).absoluteFilePath("Leather");
+
+    // A user-authored stylesheet is never mixed with the shipped scheme variant.
+    EXPECT_EQ(ThemeManager::themeStyleSheetPath(userDir, systemDir, true).toStdString(),
+              QDir(userDir).absoluteFilePath("style.css").toStdString());
+}
+
+TEST_F(ThemeMigrationTest, StyleSheetIsEmptyWhenNeitherDirectoryHasOne)
+{
+    const QString userDir = QDir(themesPath).absoluteFilePath("Leather");
+    ASSERT_TRUE(QDir().mkpath(userDir));
+    writeThemeFile(themesPath, "Leather", "fonts.toml", "[Fonts]\nCardTextMaxSize = 14\n");
+    // Only the opposite scheme's stylesheet is shipped, so no fallback matches.
+    writeThemeFile(systemThemesPath, "Leather", "style-dark.css", "shipped-dark-css");
+
+    const QString systemDir = QDir(systemThemesPath).absoluteFilePath("Leather");
+
+    EXPECT_TRUE(ThemeManager::themeStyleSheetPath(userDir, systemDir, false).isEmpty());
 }
 
 // Every test brings its own main(): GTest is not guaranteed to be found on the build machines, and

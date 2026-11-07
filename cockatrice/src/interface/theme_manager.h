@@ -92,6 +92,8 @@ public:
     static bool isDirReallyWritable(const QString &dirPath);
     // Explicit color scheme of the theme: theme.cfg's ColorScheme setting
     // (Dark/Light), falling back to the OS color scheme when it is "System".
+    // A resolved directory that does not exist yet is an uncustomised stock
+    // theme, so it follows the OS rather than the shipped scheme.
     bool isDarkMode(const QString &themeDirPath) const;
     // The resolved scheme of the currently active theme.
     bool isDarkModeActive() const
@@ -107,6 +109,20 @@ public:
     // Load the global theme settings (style + color scheme preference)
     static ThemeConfig loadGlobalConfig(const QString &themeDirPath);
     static bool saveGlobalConfig(const QString &themeDirPath, const ThemeConfig &cfg);
+    // Load a theme's theme.cfg, falling back to the shipped (system) theme
+    // directory when the resolved user directory does not carry one. A user
+    // directory seeded with only fonts.toml would otherwise shadow the shipped
+    // theme and lose its style and colour scheme.
+    static ThemeConfig loadDefaultThemeConfig(const QString &themeDirPath, const QString &systemThemeDirPath);
+    // Load the theme.cfg that decides the active colour scheme. Unlike
+    // loadDefaultThemeConfig(), a resolved directory that does not exist yet is
+    // a stock theme with no user override: it returns an empty config so the
+    // caller follows the OS scheme instead of inheriting the shipped one.
+    static ThemeConfig loadColorSchemeConfig(const QString &themeDirPath, const QString &systemThemeDirPath);
+    // Resolve the theme stylesheet: the scheme-qualified style-<dark|light>.css
+    // when shipped, else style.css, preferring the resolved (user) directory
+    // over the shipped one. Empty when neither directory carries a stylesheet.
+    static QString themeStyleSheetPath(const QString &themeDirPath, const QString &systemThemeDirPath, bool dark);
 
     // Load/save per-scheme palette colors
     static PaletteConfig loadPaletteConfig(const QString &themeDirPath, const QString &colorScheme);
@@ -169,6 +185,12 @@ public:
      *         "what this role resolves to" must use this, because appFont()
      *         reflects a live preview while the editor is open. */
     QFont defaultAppFont(AppFont::Role role) const;
+    /** @brief CardText max size resolved the way the font editor shows it:
+     *         stored CardTextMaxSize, else the CardText point size, else 12,
+     *         clamped to the editor's representable range. */
+    int cardTextMaxSize() const;
+    /** @brief CardText shrink-to-fit floor resolved the same way. */
+    int cardTextMinSize() const;
 
     QBrush &getBgBrush(Role zone);
     QBrush getExtraBgBrush(Role zone, int zoneId = 0);
