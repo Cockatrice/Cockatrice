@@ -294,6 +294,13 @@ void CardItem::drawArrow(const QColor &arrowColor)
         return;
     }
 
+    // A held shortcut repeats the action before the previous arrow is placed.
+    // That arrow has lost the mouse grab to the new one, so it would never
+    // receive the release that deletes it; discard it (and its children).
+    if (pendingArrow) {
+        pendingArrow->cancel();
+    }
+
     auto *game = owner->getGame();
     PlayerLogic *arrowOwner = game->getPlayerManager()->getActiveLocalPlayer(game->getGameState()->getActivePlayer());
     int phase = 0; // 0 means to not set the phase
@@ -303,6 +310,7 @@ void CardItem::drawArrow(const QColor &arrowColor)
     }
     ArrowDragItem *arrow = new ArrowDragItem(arrowOwner, this, arrowColor, phase);
     scene()->addItem(arrow);
+    pendingArrow = arrow;
     arrow->grabMouse();
 
     for (const auto &item : scene()->selectedItems()) {
@@ -326,8 +334,14 @@ void CardItem::drawAttachArrow()
         return;
     }
 
+    // See drawArrow(): a repeated trigger must not orphan the previous arrow.
+    if (pendingArrow) {
+        pendingArrow->cancel();
+    }
+
     auto *arrow = new ArrowAttachItem(this);
     scene()->addItem(arrow);
+    pendingArrow = arrow;
     arrow->grabMouse();
 
     for (const auto &item : scene()->selectedItems()) {
