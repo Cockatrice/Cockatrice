@@ -1,11 +1,11 @@
 # Cockatrice's main CMakeLists.txt
 #
-# This is basically a wrapper to enable/disable the compilation
-# of the different projects: servatrice, cockatrice, test
+# This is basically a wrapper to enable/disable the compilation of the different projects:
+# Cockatrice, Oracle, Servatrice, Test
 # This file sets all the variables shared between the projects
 # like the installation path, compilation flags etc..
 
-# 3.16 required for Qt6 and target_precompile_headers()
+# CMake 3.16 is required for Qt6 and target_precompile_headers()
 cmake_minimum_required(VERSION 3.16)
 
 # Use compiler cache (ccache)
@@ -40,16 +40,11 @@ if(WITH_GUI_TEST AND NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/qttesting/
 endif()
 
 # Default to "Release" build type
-# User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
-if(DEFINED CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE
-      ${CMAKE_BUILD_TYPE}
-      CACHE STRING "Type of build"
-  )
-else()
+# A user-provided CMAKE_BUILD_TYPE must be checked before the PROJECT() call
+if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE
       Release
-      CACHE STRING "Type of build"
+      CACHE STRING "Build type"
   )
 endif()
 
@@ -108,20 +103,21 @@ endif()
 # Version can be overriden by git tags, see cmake/getversion.cmake
 project("Cockatrice" VERSION 3.2.0)
 
-# Set release name if not provided via env/cmake var
+# Set release name if not provided via ENV/CMake var
 if(NOT DEFINED GIT_TAG_RELEASENAME)
   set(GIT_TAG_RELEASENAME "Reality Check")
 endif()
 
-# Use c++20 for all targets
+# Use C++20 for all targets
 set(CMAKE_CXX_STANDARD
     20
     CACHE STRING "C++ ISO Standard"
 )
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Set conventional loops
-set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
+set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS ON)
 
 # Search path for cmake modules
 set(COCKATRICE_CMAKE_PATH "${PROJECT_SOURCE_DIR}/cmake")
@@ -134,31 +130,31 @@ include(createversionfile)
 
 # Define a proper install path
 if(UNIX)
-  if(APPLE)
-    # macOS
-    # Due to the special bundle structure ignore
-    # the prefix eventually set by the user.
+  if(APPLE) # macOS
+    # Due to the special bundle structure ignore the prefix eventually set by the user
     set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/release)
 
-    # Force ccache usage if available
-    get_property(RULE_LAUNCH_COMPILE GLOBAL PROPERTY RULE_LAUNCH_COMPILE)
-    if(RULE_LAUNCH_COMPILE)
-      message(STATUS "Force enabling CCache usage under macOS")
-      # Set up wrapper scripts
-      configure_file("${COCKATRICE_CMAKE_PATH}/launch-c.in" launch-c)
-      configure_file("${COCKATRICE_CMAKE_PATH}/launch-cxx.in" launch-cxx)
-      execute_process(COMMAND chmod a+rx "${CMAKE_BINARY_DIR}/launch-c" "${CMAKE_BINARY_DIR}/launch-cxx")
+    # Force ccache usage if requested and available
+    if(USE_CCACHE)
+      get_property(RULE_LAUNCH_COMPILE GLOBAL PROPERTY RULE_LAUNCH_COMPILE)
+      if(RULE_LAUNCH_COMPILE)
+        message(STATUS "Force enabling ccache usage under macOS")
 
-      # Set Xcode project attributes to route compilation through our scripts
-      set(CMAKE_XCODE_ATTRIBUTE_CC "${CMAKE_BINARY_DIR}/launch-c")
-      set(CMAKE_XCODE_ATTRIBUTE_CXX "${CMAKE_BINARY_DIR}/launch-cxx")
-      set(CMAKE_XCODE_ATTRIBUTE_LD "${CMAKE_BINARY_DIR}/launch-c")
-      set(CMAKE_XCODE_ATTRIBUTE_LDPLUSPLUS "${CMAKE_BINARY_DIR}/launch-cxx")
+        # Set up wrapper scripts
+        configure_file("${COCKATRICE_CMAKE_PATH}/launch-c.in" launch-c)
+        configure_file("${COCKATRICE_CMAKE_PATH}/launch-cxx.in" launch-cxx)
+        execute_process(COMMAND chmod a+rx "${CMAKE_BINARY_DIR}/launch-c" "${CMAKE_BINARY_DIR}/launch-cxx")
+
+        # Set Xcode project attributes to route compilation through our scripts
+        set(CMAKE_XCODE_ATTRIBUTE_CC "${CMAKE_BINARY_DIR}/launch-c")
+        set(CMAKE_XCODE_ATTRIBUTE_CXX "${CMAKE_BINARY_DIR}/launch-cxx")
+        set(CMAKE_XCODE_ATTRIBUTE_LD "${CMAKE_BINARY_DIR}/launch-c")
+        set(CMAKE_XCODE_ATTRIBUTE_LDPLUSPLUS "${CMAKE_BINARY_DIR}/launch-cxx")
+      endif()
     endif()
-  else()
-    # Linux / BSD
+  else() # Linux / BSD
     if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-      #fix package build
+      # Fix package build
       if(PREFIX)
         set(CMAKE_INSTALL_PREFIX ${PREFIX})
       else()
@@ -166,47 +162,67 @@ if(UNIX)
       endif()
     endif()
   endif()
-elseif(WIN32)
+elseif(WIN32) # Windows (including 64-bit)
   set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/rundir/${CMAKE_BUILD_TYPE})
 endif()
 
-# Define proper compilation flags
-if(MSVC)
-  # Disable Warning C4251, C++20 compatibility, Multi-threaded Builds, Warn Detection, Unwind Semantics, Debug Symbols
-  set(CMAKE_CXX_FLAGS "/wd4251 /Zc:__cplusplus /std:c++20 /permissive- /W4 /MP /EHsc /Zi")
-  # Visual Studio: Maximum Optimization, Multi-threaded DLL
-  set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD")
-  # Visual Studio: No Optimization, Multi-threaded Debug DLL
+# Define compiler flags
+if(MSVC) # Microsoft Visual C++ compiler
+  # /EHsc              Enable standard C++ exception handling
+  # /MP                Enable parallel compilation
+  # /permissive-       Enable more standards-conforming behavior
+  # /utf-8             Set source file encoding and execution character set to UTF-8
+  # /W4                Enable warning level 4
+  # /Zc:__cplusplus    Enable correct __cplusplus reporting
+  # /Zi                Generate debugging information (Program Database, PDB)
+  set(CMAKE_CXX_FLAGS "/EHsc /MP /permissive- /utf-8 /W4 /Zc:__cplusplus /Zi")
+  # /O2                Balanced optimization
+  # /MD                Link against the multi-threaded DLL runtime library (Release CRT)
+  set(CMAKE_CXX_FLAGS_RELEASE "/O2 /MD")
+  # /Od                Disable optimization
+  # /MDd               Link against the multi-threaded Debug DLL runtime library (Debug CRT)
   set(CMAKE_CXX_FLAGS_DEBUG "/Od /MDd")
 
-  # Generate PDB, even when in release (So developers can better analyze crash logs)
+  # Generate PDBs, even in release builds, so developers can better analyze crash logs
+  # /DEBUG             Enable debug symbols and PDB generation
+  # /OPT:REF           Remove unreferenced functions/data
+  # /OPT:ICF           Fold identical COMDAT functions/data
   set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
 
   add_compile_definitions(_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING)
-elseif(CMAKE_COMPILER_IS_GNUCXX)
-  # linux/gcc, bsd/gcc, windows/mingw
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU") # GCC compiler
   include(CheckCXXCompilerFlag)
 
-  set(CMAKE_CXX_FLAGS_RELEASE "-s -O2")
+  # -O2             Balanced optimization
+  # -s              Remove symbols from the executable
+  set(CMAKE_CXX_FLAGS_RELEASE "-O2 -s")
+
+  # -ggdb           Produce GDB debugging symbols
+  # -O0             Disable optimization
+  # -Wall           Enable a broad set of useful warnings
+  # -Wextra         Enable a set of extra warnings
+  # -Werror         Treat warnings as compilation errors
   if(WARNING_AS_ERROR)
     set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0 -Wall -Wextra -Werror")
   else()
     set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0 -Wall -Wextra")
   endif()
 
-  if(APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++20")
-  endif()
-
+  # -Wcast-align                          Catch unsafe pointer casts
+  # -Wmissing-declarations                Catch defined functions without a prior declaration
+  # -Wno-error=extra                      Downgrade some -Wextra warnings from errors to warnings
+  # -Wno-error=delete-non-virtual-dtor    Downgrade delete-non-virtual-dtor from error to warning
+  # -Wno-error=sign-compare               Downgrade signed/unsigned comparison from error to warning
+  # -Wno-error=missing-declarations       Downgrade -Wmissing-declarations from error to warning
+  # -Wno-error=sfinae-incomplete          GCC 16+: Qt MOC + protobuf forward decls trigger this
   set(ADDITIONAL_DEBUG_FLAGS
       -Wcast-align
       -Wmissing-declarations
-      -Wno-long-long
       -Wno-error=extra
       -Wno-error=delete-non-virtual-dtor
       -Wno-error=sign-compare
       -Wno-error=missing-declarations
-      -Wno-error=sfinae-incomplete # GCC 16+: Qt MOC + protobuf forward decls trigger this
+      -Wno-error=sfinae-incomplete
   )
 
   foreach(FLAG ${ADDITIONAL_DEBUG_FLAGS})
@@ -218,9 +234,16 @@ elseif(CMAKE_COMPILER_IS_GNUCXX)
 
   # Reduce compiler I/O by using pipes between stages instead of temp files
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe")
-else()
-  # other: osx/llvm, bsd/llvm
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang") # Clang and AppleClang compilers
+  # -O2                      Balanced optimization
   set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+
+  # -g                       Include debug information
+  # -O0                      Disable optimization
+  # -Wall                    Enable a broad set of useful warnings
+  # -Wextra                  Enable a set of extra warnings
+  # -Werror                  Treat warnings as compilation errors
+  # -Wno-unused-parameter    Suppress warnings about unused function parameters (common in Qt callbacks)
   if(WARNING_AS_ERROR)
     set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra -Werror -Wno-unused-parameter")
   else()
@@ -229,6 +252,8 @@ else()
 
   # Reduce compiler I/O by using pipes between stages instead of temp files
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe")
+else() # Unknown compiler
+  message(WARNING "Unknown C++ compiler: ${CMAKE_CXX_COMPILER_ID}")
 endif()
 
 # Always included, because they define cockatrice_disable_sanitizers_for() and
@@ -259,9 +284,9 @@ if(NOT COCKATRICE_DEBUG_INFO_LEVEL STREQUAL "")
   endif()
 endif()
 
-# GNU systems need to define the Mersenne exponent for the RNG to compile w/o warning
+# GNU systems need to define the Mersenne exponent for SFMT, so the RNG compiles without warnings
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-  add_definitions("-DSFMT_MEXP=19937")
+  add_compile_definitions(SFMT_MEXP=19937)
 endif()
 
 find_package(Threads REQUIRED)
@@ -314,15 +339,15 @@ if(${Protobuf_VERSION} VERSION_LESS "3.21.0.0" AND NOT EXISTS "${Protobuf_PROTOC
   message(FATAL_ERROR "No protoc command found!")
 endif()
 
-#Find OpenSSL
-if(WIN32)
+# Find OpenSSL
+if(WIN32) # Windows (including 64-bit)
   find_package(OpenSSL REQUIRED)
   if(OPENSSL_FOUND)
     include_directories(${OPENSSL_INCLUDE_DIRS})
   endif()
 endif()
 
-#Find VCredist
+# Find Visual C++ Redistributable
 if(MSVC)
   find_package(VCredistRuntime)
 endif()
@@ -535,3 +560,10 @@ if(Qt6_FOUND AND Qt6_VERSION_MINOR GREATER_EQUAL 3)
   # Qt6.3+ requires project finalization to support translations
   qt_finalize_project()
 endif()
+
+# Print compiler identification at configuration time
+message(STATUS "C++ compiler: ${CMAKE_CXX_COMPILER_ID}")
+message(STATUS "C++ compiler version: ${CMAKE_CXX_COMPILER_VERSION}")
+message(STATUS "C++ compiler path: ${CMAKE_CXX_COMPILER}")
+message(STATUS "C++ standard: ${CMAKE_CXX_STANDARD}")
+message(STATUS "C++ extensions: ${CMAKE_CXX_EXTENSIONS}")

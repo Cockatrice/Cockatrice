@@ -773,7 +773,7 @@ jobs:
       - name: "[Windows] Install NSIS"
         if: matrix.os == 'Windows'
         shell: bash
-        run: choco install nsis
+        run: choco install nsis --no-progress
 
       # Ninja invokes cl.exe directly and needs the MSVC environment on PATH.
       - name: "[Windows] Set up MSVC environment"
