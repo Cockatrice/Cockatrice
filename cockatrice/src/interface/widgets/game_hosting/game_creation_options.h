@@ -9,7 +9,11 @@
 #include "libcockatrice/protocol/pb/room_commands.pb.h"
 
 #include <QList>
+#include <QMap>
 #include <QString>
+
+class IGameSettingsProvider;
+class ServerInfo_Game;
 
 /**
  * @brief The values needed to create a game, independent of the widgets that edit them.
@@ -34,6 +38,22 @@ struct GameCreationOptions
     bool shareDecklistsOnLoad = false;
     bool shufflePlayers = false;
     QList<int> gameTypeIds;
+
+    /**
+     * @brief Reads the remembered create-game settings.
+     *
+     * Join restrictions are only meaningful for registered users, so they are left
+     * unset for an unregistered host. Game type ids are resolved from the room's map
+     * by matching the remembered names.
+     */
+    [[nodiscard]] static GameCreationOptions
+    fromSettings(const IGameSettingsProvider &settings, const QMap<int, QString> &gameTypes, bool registeredUser);
+
+    /**
+     * @brief Reads the read-only fields shown in the game information view.
+     */
+    [[nodiscard]] static GameCreationOptions fromGameInfo(const ServerInfo_Game &gameInfo,
+                                                          const QMap<int, QString> &gameTypes);
 
     /**
      * @brief Builds the room command, simplifying the description's whitespace.
