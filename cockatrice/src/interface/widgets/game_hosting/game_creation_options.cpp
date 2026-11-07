@@ -36,6 +36,13 @@ GameCreationOptions GameCreationOptions::fromSettings(const IGameSettingsProvide
     return options;
 }
 
+GameCreationOptions GameCreationOptions::defaultsFor(bool registeredUser)
+{
+    GameCreationOptions options;
+    options.onlyRegistered = registeredUser;
+    return options;
+}
+
 GameCreationOptions GameCreationOptions::fromGameInfo(const ServerInfo_Game &gameInfo,
                                                       const QMap<int, QString> &gameTypes)
 {

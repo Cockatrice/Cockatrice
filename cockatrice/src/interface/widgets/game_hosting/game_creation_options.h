@@ -50,6 +50,14 @@ struct GameCreationOptions
     fromSettings(const IGameSettingsProvider &settings, const QMap<int, QString> &gameTypes, bool registeredUser);
 
     /**
+     * @brief The options the host form shows when nothing is remembered.
+     *
+     * A registered host defaults to a registered-only game, matching the form's
+     * ``Clear`` action.
+     */
+    [[nodiscard]] static GameCreationOptions defaultsFor(bool registeredUser);
+
+    /**
      * @brief Reads the read-only fields shown in the game information view.
      */
     [[nodiscard]] static GameCreationOptions fromGameInfo(const ServerInfo_Game &gameInfo,
