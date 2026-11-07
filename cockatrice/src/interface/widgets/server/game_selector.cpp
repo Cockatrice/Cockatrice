@@ -272,7 +272,7 @@ void GameSelector::actCreate()
     auto *dlg = new DlgCreateGame(room, room->getGameTypes(), this);
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     connect(dlg, &QDialog::finished, this, &GameSelector::updateTitle);
-    dlg->open();
+    dlg->exec();
 }
 
 void GameSelector::checkResponse(const Response &response)
@@ -368,7 +368,7 @@ void GameSelector::customContextMenu(const QPoint &point)
 
         auto *dlg = new DlgCreateGame(gameInfo, gameTypes, this);
         dlg->setAttribute(Qt::WA_DeleteOnClose);
-        dlg->open();
+        dlg->exec();
     });
 
     QAction copyLink(tr("Cop&y game link"));

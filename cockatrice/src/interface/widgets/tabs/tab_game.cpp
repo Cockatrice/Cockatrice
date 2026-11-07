@@ -576,7 +576,7 @@ void TabGame::actGameInfo()
     // Heap-allocated so that destroying this tab while the dialog is open cannot delete a stack object.
     auto *dlg = new DlgCreateGame(game->getGameMetaInfo()->proto(), game->getGameMetaInfo()->getRoomGameTypes(), this);
     dlg->setAttribute(Qt::WA_DeleteOnClose);
-    dlg->open();
+    dlg->exec();
 }
 
 void TabGame::actCopyGameLink()
