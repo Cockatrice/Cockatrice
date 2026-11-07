@@ -465,18 +465,22 @@ QColor defaultAppColor(AppColor::Role role, bool dark)
         case AppColor::IconStrong:
         case AppColor::IconSoft:
             return {};
+        // The semantic family follows the same chroma ladder as the authored
+        // themes. A theme without stored values (System) has no per-surface
+        // palette to measure against, so these are authored against the
+        // representative platform surfaces the System theme runs on.
         case AppColor::Positive:
-            return QColor(dark ? QStringLiteral("#6dd58c") : QStringLiteral("#1b7f3b"));
+            return QColor(dark ? QStringLiteral("#6dd58c") : QStringLiteral("#1a7d3a"));
         case AppColor::PositiveStrong:
-            return QColor(dark ? QStringLiteral("#99e2ae") : QStringLiteral("#104a22"));
+            return QColor(dark ? QStringLiteral("#32c05c") : QStringLiteral("#007e28"));
         case AppColor::PositiveSoft:
-            return QColor(dark ? QStringLiteral("#5e8873") : QStringLiteral("#5d7f6f"));
+            return QColor(dark ? QStringLiteral("#8ab196") : QStringLiteral("#4c7659"));
         case AppColor::Negative:
             return QColor(dark ? QStringLiteral("#ff8a80") : QStringLiteral("#b3261e"));
         case AppColor::NegativeStrong:
-            return QColor(dark ? QStringLiteral("#ffb3ac") : QStringLiteral("#7c1b15"));
+            return QColor(dark ? QStringLiteral("#ff8378") : QStringLiteral("#da0b00"));
         case AppColor::NegativeSoft:
-            return QColor(dark ? QStringLiteral("#9b7678") : QStringLiteral("#9a6c6f"));
+            return QColor(dark ? QStringLiteral("#c79e9b") : QStringLiteral("#935f5c"));
     }
 
     return {};

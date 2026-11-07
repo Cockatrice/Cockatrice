@@ -151,18 +151,18 @@ TEST_F(ThemeMigrationTest, IsIdempotent)
 
 TEST(ThemeAppColorTest, SemanticDefaultsFollowTheScheme)
 {
-    EXPECT_EQ(defaultAppColor(AppColor::Positive, false), QColor(QStringLiteral("#1b7f3b")));
+    EXPECT_EQ(defaultAppColor(AppColor::Positive, false), QColor(QStringLiteral("#1a7d3a")));
     EXPECT_EQ(defaultAppColor(AppColor::Positive, true), QColor(QStringLiteral("#6dd58c")));
-    EXPECT_EQ(defaultAppColor(AppColor::PositiveStrong, false), QColor(QStringLiteral("#104a22")));
-    EXPECT_EQ(defaultAppColor(AppColor::PositiveStrong, true), QColor(QStringLiteral("#99e2ae")));
-    EXPECT_EQ(defaultAppColor(AppColor::PositiveSoft, false), QColor(QStringLiteral("#5d7f6f")));
-    EXPECT_EQ(defaultAppColor(AppColor::PositiveSoft, true), QColor(QStringLiteral("#5e8873")));
+    EXPECT_EQ(defaultAppColor(AppColor::PositiveStrong, false), QColor(QStringLiteral("#007e28")));
+    EXPECT_EQ(defaultAppColor(AppColor::PositiveStrong, true), QColor(QStringLiteral("#32c05c")));
+    EXPECT_EQ(defaultAppColor(AppColor::PositiveSoft, false), QColor(QStringLiteral("#4c7659")));
+    EXPECT_EQ(defaultAppColor(AppColor::PositiveSoft, true), QColor(QStringLiteral("#8ab196")));
     EXPECT_EQ(defaultAppColor(AppColor::Negative, false), QColor(QStringLiteral("#b3261e")));
     EXPECT_EQ(defaultAppColor(AppColor::Negative, true), QColor(QStringLiteral("#ff8a80")));
-    EXPECT_EQ(defaultAppColor(AppColor::NegativeStrong, false), QColor(QStringLiteral("#7c1b15")));
-    EXPECT_EQ(defaultAppColor(AppColor::NegativeStrong, true), QColor(QStringLiteral("#ffb3ac")));
-    EXPECT_EQ(defaultAppColor(AppColor::NegativeSoft, false), QColor(QStringLiteral("#9a6c6f")));
-    EXPECT_EQ(defaultAppColor(AppColor::NegativeSoft, true), QColor(QStringLiteral("#9b7678")));
+    EXPECT_EQ(defaultAppColor(AppColor::NegativeStrong, false), QColor(QStringLiteral("#da0b00")));
+    EXPECT_EQ(defaultAppColor(AppColor::NegativeStrong, true), QColor(QStringLiteral("#ff8378")));
+    EXPECT_EQ(defaultAppColor(AppColor::NegativeSoft, false), QColor(QStringLiteral("#935f5c")));
+    EXPECT_EQ(defaultAppColor(AppColor::NegativeSoft, true), QColor(QStringLiteral("#c79e9b")));
     // Accent and neutral icon roles are derived from the palette, so they have
     // no static default. A theme with no palette (System) keeps following the
     // platform instead of pinning one scheme's ink.

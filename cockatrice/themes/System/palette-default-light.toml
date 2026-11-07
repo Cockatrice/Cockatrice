@@ -8,9 +8,9 @@
 [AppColors]
 AccentStrong         = #ff148c3c
 AccentSoft           = #ff78c850
-Positive             = #ff1b7f3b
-PositiveStrong       = #ff104a22
-PositiveSoft         = #ff5d7f6f
+Positive             = #ff1a7d3a
+PositiveStrong       = #ff007e28
+PositiveSoft         = #ff4c7659
 Negative             = #ffb3261e
-NegativeStrong       = #ff7c1b15
-NegativeSoft         = #ff9a6c6f
+NegativeStrong       = #ffda0b00
+NegativeSoft         = #ff935f5c

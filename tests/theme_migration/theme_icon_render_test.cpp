@@ -1196,7 +1196,10 @@ InkPalette shippedPalette(const QString &theme, bool dark)
                                   .arg(theme, dark ? QStringLiteral("dark") : QStringLiteral("light")));
     const PaletteConfig config = PaletteConfig::fromFile(file);
     // A theme may author only [AppColors] (System does), so appColors alone do
-    // not mean it ships a palette: the keys have to be present.
+    // not mean it ships a palette: the keys have to be present. The authored
+    // neutral-family assertions therefore cover only themes with a palette;
+    // System's fixed semantic family is checked against representative
+    // platform surfaces by DefaultSemanticFamilyMeetsTheLadderOnPlatformSurfaces.
     if (config.colors.isEmpty()) {
         return {};
     }
@@ -1758,6 +1761,48 @@ TEST(IconInk, DisabledStaysBelowQuietOnEveryShippedTheme)
         }
     }
     EXPECT_GT(checked, 0) << "no shipped palette was loadable";
+}
+
+/**
+ * @brief The System fallback family keeps the ladder on a platform palette.
+ *
+ * System authors no neutral roles and follows the OS surfaces, so its semantic
+ * family is the one shipped ladder that cannot be measured against its own
+ * window and button. These are the representative extremes of a platform
+ * palette, and the fixed values have to clear the same floor there that the
+ * five authored themes clear on their own surfaces.
+ */
+TEST(IconInk, DefaultSemanticFamilyMeetsTheLadderOnPlatformSurfaces)
+{
+    struct Scheme
+    {
+        bool dark;
+        QColor window;
+        QColor button;
+    };
+    const QList<Scheme> schemes = {
+        {false, QColor(QStringLiteral("#f0f0f0")), QColor(QStringLiteral("#f5f5f5"))},
+        {true, QColor(QStringLiteral("#2b2b2b")), QColor(QStringLiteral("#3c3c3c"))},
+    };
+
+    for (const Scheme &scheme : schemes) {
+        for (const auto &[base, strong, soft] : {
+                 std::tuple{AppColor::Positive, AppColor::PositiveStrong, AppColor::PositiveSoft},
+                 std::tuple{AppColor::Negative, AppColor::NegativeStrong, AppColor::NegativeSoft}}) {
+            const QColor secondary = defaultAppColor(base, scheme.dark);
+            const QColor primary = defaultAppColor(strong, scheme.dark);
+            const QColor quiet = defaultAppColor(soft, scheme.dark);
+            ASSERT_TRUE(secondary.isValid() && primary.isValid() && quiet.isValid());
+
+            for (const QColor &surface : {scheme.window, scheme.button}) {
+                EXPECT_GE(ThemeIconInk::contrastRatio(secondary, surface), ThemeIconInk::labelContrastFloor());
+                EXPECT_GE(ThemeIconInk::contrastRatio(primary, surface), ThemeIconInk::labelContrastFloor());
+                EXPECT_GE(ThemeIconInk::contrastRatio(quiet, surface), ThemeIconInk::labelContrastFloor());
+            }
+            EXPECT_LT(quiet.hsvSaturation(), secondary.hsvSaturation());
+            EXPECT_GT(primary.hsvSaturation(), secondary.hsvSaturation());
+        }
+    }
 }
 
 /**
