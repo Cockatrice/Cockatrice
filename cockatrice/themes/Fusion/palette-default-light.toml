@@ -71,13 +71,13 @@ Accent               = #fff0f0f0
 [AppColors]
 AccentStrong         = #ff139740
 AccentSoft           = #ffc9fd62
-Icon                 = #107e36
-IconStrong           = #0b5826
+Icon                 = #107d36
+IconStrong           = #007e2c
 IconSoft             = #6c937a
-Positive             = #1b7f3b
-PositiveStrong       = #135929
+Positive             = #1b7d3a
+PositiveStrong       = #007e28
 PositiveSoft         = #70927b
-Negative             = #b3261e
-NegativeStrong       = #7d1b15
+Negative             = #cf2c23
+NegativeStrong       = #da0c00
 NegativeSoft         = #b37d7b
 

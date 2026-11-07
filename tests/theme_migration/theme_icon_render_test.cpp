@@ -1440,13 +1440,14 @@ TEST_F(ThemeIconRenderTest, EmphasisSelectsTheAuthoredVariant)
 }
 
 /**
- * @brief The authored primary level out-reads the default one on both schemes.
+ * @brief The authored primary level is the most chromatic member of its family.
  *
- * The three levels are authored against the window and button surfaces, so the
- * ordering has to be visible on both, not just on the window the palette is
- * usually previewed against.
+ * Contrast cannot order the ladder: on a dark surface the highest-contrast tone
+ * is the palest one, so a contrast target makes the primary read as a washed-out
+ * secondary. Chroma orders the levels instead; contrast only has to stay above
+ * the legibility floor on every surface the icon is drawn on.
  */
-TEST_F(ThemeIconRenderTest, PrimaryOutReadsSecondaryOnBothSchemes)
+TEST_F(ThemeIconRenderTest, PrimaryIsTheMostChromaticLevelOnBothSchemes)
 {
     for (const bool dark : {false, true}) {
         const InkPalette palette = shippedPalette(QStringLiteral("Fabric"), dark);
@@ -1455,9 +1456,8 @@ TEST_F(ThemeIconRenderTest, PrimaryOutReadsSecondaryOnBothSchemes)
         const QColor primary = palette.roles.value(AppColor::IconStrong);
         ASSERT_TRUE(secondary.isValid() && primary.isValid()) << (dark ? "dark" : "light");
 
+        EXPECT_GT(primary.hsvSaturation(), secondary.hsvSaturation()) << (dark ? "dark" : "light");
         for (const QColor &surface : {palette.window, palette.button}) {
-            EXPECT_GT(ThemeIconInk::contrastRatio(primary, surface), ThemeIconInk::contrastRatio(secondary, surface))
-                << (dark ? "dark" : "light");
             EXPECT_GE(ThemeIconInk::contrastRatio(primary, surface), ThemeIconInk::primaryContrastFloor())
                 << (dark ? "dark" : "light");
         }
@@ -1559,7 +1559,9 @@ TEST(IconInk, ShippedPalettesAuthorTheEmphasisLadder)
                     << theme.toStdString() << (dark ? " dark" : " light");
                 EXPECT_GE(primary, ThemeIconInk::primaryContrastFloor())
                     << theme.toStdString() << (dark ? " dark" : " light");
-                EXPECT_GT(primary, secondary) << theme.toStdString() << (dark ? " dark" : " light");
+                EXPECT_GT(palette.roles.value(AppColor::IconStrong).hsvSaturation(),
+                          palette.roles.value(AppColor::Icon).hsvSaturation())
+                    << theme.toStdString() << (dark ? " dark" : " light");
                 EXPECT_GE(quiet, ThemeIconInk::quietContrastFloor())
                     << theme.toStdString() << (dark ? " dark" : " light");
                 EXPECT_LT(quiet, secondary) << theme.toStdString() << (dark ? " dark" : " light");
@@ -1573,7 +1575,7 @@ TEST(IconInk, ShippedPalettesAuthorTheEmphasisLadder)
                         << theme.toStdString() << (dark ? " dark" : " light");
                     EXPECT_LT(ThemeIconInk::contrastRatio(palette.roles.value(soft), surface), baseContrast)
                         << theme.toStdString() << (dark ? " dark" : " light");
-                    EXPECT_GT(ThemeIconInk::contrastRatio(palette.roles.value(strong), surface), baseContrast)
+                    EXPECT_GT(palette.roles.value(strong).hsvSaturation(), palette.roles.value(base).hsvSaturation())
                         << theme.toStdString() << (dark ? " dark" : " light");
                 }
             }

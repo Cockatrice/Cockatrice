@@ -99,11 +99,12 @@ double labelContrastFloor();
 /**
  * @brief Applies an emphasis level to an already-hued glyph color.
  *
- * Secondary keeps the hue untouched, so it is the no-op the default needs.
- * Primary pushes the color to a higher floor than the default, because the
- * accent is a mid-tone: on a light scheme it is lighter than the neutral ink and
- * on a dark one darker, so only a stronger contrast target keeps the primary
- * level above the secondary on both. Quiet
+ * Secondary keeps the color untouched, so it is the no-op the default needs.
+ * Primary is the most chromatic member of its family: it raises the saturation
+ * to the most that still clears the text floor. Contrast alone cannot order the
+ * ladder, because on a dark surface the highest-contrast tone is the palest one;
+ * a primary that reads as a washed-out version of the secondary is exactly the
+ * inversion this rule removes. Quiet
  * blends the color toward the surface it sits on and stops at the non-text
  * legibility floor, so a labelling glyph recedes without disappearing.
  *
@@ -114,7 +115,7 @@ double labelContrastFloor();
  */
 QColor forEmphasis(const QColor &color, const QColor &surface, IconEmphasis emphasis);
 
-/** @brief Contrast floor the primary level reaches, so it out-reads the default. */
+/** @brief Contrast floor the primary level reaches, so it stays legible. */
 double primaryContrastFloor();
 
 /** @brief How far a quiet glyph is blended into its surface. */
