@@ -197,10 +197,10 @@ TEST(IconTreatmentPreview, WritesOneSheetPerShippedTheme)
 
                         painter.setPen(text);
                         painter.setFont(QFont(QStringLiteral("Sans"), 8, QFont::DemiBold));
-                        painter.drawText(QPointF(contentLeft, y + 14),
-                                         QStringLiteral("%1%2").arg(
-                                             QString::fromLatin1(family.name),
-                                             isDisabled ? QStringLiteral(" / disabled") : QString()));
+                        painter.drawText(
+                            QPointF(contentLeft, y + 14),
+                            QStringLiteral("%1%2").arg(QString::fromLatin1(family.name),
+                                                       isDisabled ? QStringLiteral(" / disabled") : QString()));
                         painter.setFont(QFont(QStringLiteral("Mono"), 7));
                         painter.drawText(QPointF(contentLeft, y + 28), ink.name(QColor::HexRgb));
 
@@ -223,8 +223,8 @@ TEST(IconTreatmentPreview, WritesOneSheetPerShippedTheme)
                                         }
                                         return ThemeIconBadge::renderBadge(svg, ink, pixelSize);
                                     });
-                                    const qreal x = cellX + 6 + static_cast<qreal>(glyphIndex) * SLOT +
-                                                    (SLOT - side) / 2.0;
+                                    const qreal x =
+                                        cellX + 6 + static_cast<qreal>(glyphIndex) * SLOT + (SLOT - side) / 2.0;
                                     painter.drawPixmap(QPointF(x, rowTop + (SLOT - side) / 2.0), pixmap);
                                 }
                             }
