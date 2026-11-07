@@ -100,8 +100,7 @@ QColor expectedNeutralInk(const QPalette &palette)
  * as blurry. Rendering at device size and tagging the pixmap keeps one source
  * pixel per device pixel.
  */
-template <typename Render>
-QPixmap renderAtDpr(const QSize &logicalSize, qreal dpr, Render &&render)
+template <typename Render> QPixmap renderAtDpr(const QSize &logicalSize, qreal dpr, Render &&render)
 {
     QPixmap pixmap = render(logicalSize * dpr);
     pixmap.setDevicePixelRatio(dpr);
@@ -868,8 +867,8 @@ TEST(IconTintPreview, WritesPngsWhenRequested)
             painter.drawText(QPointF(MARGIN, rowTop + 16), QString::fromLatin1(glyph.name));
             for (std::size_t i = 0; i < std::size(SIZES); ++i) {
                 const int side = SIZES[i];
-                const QPixmap pixmap = renderAtDpr(QSize(side, side), DPR,
-                                                   [&](const QSize &pixelSize) { return renderLine(svg, tone, pixelSize); });
+                const QPixmap pixmap = renderAtDpr(
+                    QSize(side, side), DPR, [&](const QSize &pixelSize) { return renderLine(svg, tone, pixelSize); });
                 const qreal x = MARGIN + LABEL_WIDTH + static_cast<qreal>(i) * CELL_WIDTH;
                 // Bottom-align the sizes and put the caption below the 48px row.
                 painter.drawPixmap(QPointF(x, rowTop + 54 - side), pixmap);
@@ -983,11 +982,10 @@ TEST(IconStickerPreview, WritesPngsWhenRequested)
                                      QString::fromLatin1(glyph.name));
                 for (std::size_t i = 0; i < std::size(SIZES); ++i) {
                     const int side = SIZES[i];
-                    const QPixmap pixmap = renderAtDpr(
-                        QSize(side, side), DPR, [&](const QSize &pixelSize) {
-                            return sticker ? ThemeIconSticker::renderSticker(svg, tone, pixelSize)
-                                           : renderLine(svg, tone, pixelSize);
-                        });
+                    const QPixmap pixmap = renderAtDpr(QSize(side, side), DPR, [&](const QSize &pixelSize) {
+                        return sticker ? ThemeIconSticker::renderSticker(svg, tone, pixelSize)
+                                       : renderLine(svg, tone, pixelSize);
+                    });
                     const qreal x = MARGIN + LABEL_WIDTH + static_cast<qreal>(i) * CELL_WIDTH;
                     painter.drawPixmap(QPointF(x, rowTop + 36 - side), pixmap);
                     if (row == 1) {
@@ -1010,8 +1008,7 @@ TEST(IconStickerPreview, WritesPngsWhenRequested)
             const QColor tone = defaultAppColor(badgeContext[i].role, dark);
             const qreal x = MARGIN + LABEL_WIDTH + static_cast<qreal>(i) * CELL_WIDTH;
             painter.drawPixmap(
-                QPointF(x, y + 8),
-                renderAtDpr(QSize(CONTEXT_SIZE, CONTEXT_SIZE), DPR, [&](const QSize &pixelSize) {
+                QPointF(x, y + 8), renderAtDpr(QSize(CONTEXT_SIZE, CONTEXT_SIZE), DPR, [&](const QSize &pixelSize) {
                     return ThemeIconBadge::renderBadge(
                         svg, tone, pixelSize, dark ? ThemeIconFill::Scheme::Dark : ThemeIconFill::Scheme::Light);
                 }));
@@ -1144,13 +1141,12 @@ TEST(IconBadgePreview, WritesPngsWhenRequested)
                                      QString::fromLatin1(glyph.name));
                 for (std::size_t i = 0; i < std::size(SIZES); ++i) {
                     const int side = SIZES[i];
-                    const QPixmap pixmap = renderAtDpr(
-                        QSize(side, side), DPR, [&](const QSize &pixelSize) {
-                            return badge ? ThemeIconBadge::renderBadge(
-                                               svg, tone, pixelSize,
-                                               dark ? ThemeIconFill::Scheme::Dark : ThemeIconFill::Scheme::Light)
-                                         : renderLine(svg, tone, pixelSize);
-                        });
+                    const QPixmap pixmap = renderAtDpr(QSize(side, side), DPR, [&](const QSize &pixelSize) {
+                        return badge ? ThemeIconBadge::renderBadge(svg, tone, pixelSize,
+                                                                   dark ? ThemeIconFill::Scheme::Dark
+                                                                        : ThemeIconFill::Scheme::Light)
+                                     : renderLine(svg, tone, pixelSize);
+                    });
                     const qreal x = MARGIN + LABEL_WIDTH + static_cast<qreal>(i) * CELL_WIDTH;
                     // Align all sizes on a common baseline so the weight
                     // difference between 15px and 48px is visible.
@@ -1665,8 +1661,7 @@ TEST(IconInk, ShippedPalettesAuthorTheEmphasisLadder)
                     EXPECT_GE(ThemeIconInk::contrastRatio(palette.roles.value(soft), surface),
                               ThemeIconInk::quietContrastFloor())
                         << theme.toStdString() << (dark ? " dark" : " light");
-                    EXPECT_LT(palette.roles.value(soft).hsvSaturation(),
-                              palette.roles.value(base).hsvSaturation())
+                    EXPECT_LT(palette.roles.value(soft).hsvSaturation(), palette.roles.value(base).hsvSaturation())
                         << theme.toStdString() << (dark ? " dark" : " light");
                     EXPECT_GT(palette.roles.value(strong).hsvSaturation(), palette.roles.value(base).hsvSaturation())
                         << theme.toStdString() << (dark ? " dark" : " light");
@@ -1747,9 +1742,7 @@ TEST(IconInk, DisabledStaysBelowQuietOnEveryShippedTheme)
             ASSERT_TRUE(quiet.isValid()) << theme.toStdString() << (dark ? " dark" : " light");
             const QColor surface = ThemeIconInk::harderSurface(palette.window, palette.button, quiet);
             const QColor disabled = ThemeIconInk::disabledInk(quiet, surface);
-            EXPECT_GE(ThemeIconInk::contrastRatio(quiet, surface) -
-                          ThemeIconInk::contrastRatio(disabled, surface),
-                      1.0)
+            EXPECT_GE(ThemeIconInk::contrastRatio(quiet, surface) - ThemeIconInk::contrastRatio(disabled, surface), 1.0)
                 << theme.toStdString() << (dark ? " dark" : " light");
 
             for (const QColor &anySurface : {palette.window, palette.button}) {
@@ -1786,9 +1779,9 @@ TEST(IconInk, DefaultSemanticFamilyMeetsTheLadderOnPlatformSurfaces)
     };
 
     for (const Scheme &scheme : schemes) {
-        for (const auto &[base, strong, soft] : {
-                 std::tuple{AppColor::Positive, AppColor::PositiveStrong, AppColor::PositiveSoft},
-                 std::tuple{AppColor::Negative, AppColor::NegativeStrong, AppColor::NegativeSoft}}) {
+        for (const auto &[base, strong, soft] :
+             {std::tuple{AppColor::Positive, AppColor::PositiveStrong, AppColor::PositiveSoft},
+              std::tuple{AppColor::Negative, AppColor::NegativeStrong, AppColor::NegativeSoft}}) {
             const QColor secondary = defaultAppColor(base, scheme.dark);
             const QColor primary = defaultAppColor(strong, scheme.dark);
             const QColor quiet = defaultAppColor(soft, scheme.dark);
@@ -1909,7 +1902,7 @@ TEST_F(ThemeIconRenderTest, EmphasisPreviewWritesPngsWhenRequested)
             // The paint path is a lookup now, so the sheet shows the authored
             // rows verbatim rather than a color recomputed from the accent.
             const auto toneFor = [&](const Family &family, int level) {
-                return level == 0 ? palette.roles.value(family.quiet)
+                return level == 0   ? palette.roles.value(family.quiet)
                        : level == 1 ? palette.roles.value(family.secondary)
                                     : palette.roles.value(family.primary);
             };
