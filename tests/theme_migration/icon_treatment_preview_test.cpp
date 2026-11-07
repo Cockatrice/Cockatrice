@@ -187,9 +187,10 @@ TEST(IconTreatmentPreview, WritesOneSheetPerShippedTheme)
 
                 qreal y = panelTop + PANEL_TITLE + COLUMN_HEADER;
                 for (const Family &family : families) {
-                    const QColor raw = config.appColors.value(family.role, defaultAppColor(family.role, dark));
-                    ASSERT_TRUE(raw.isValid()) << theme.toStdString() << " " << family.name;
-                    const QColor tone = ThemeIconFill::saturated(raw);
+                    // The authored role is the tone the filled shape carries; the
+                    // treatments apply their own fill rule from it.
+                    const QColor tone = config.appColors.value(family.role, defaultAppColor(family.role, dark));
+                    ASSERT_TRUE(tone.isValid()) << theme.toStdString() << " " << family.name;
 
                     for (int state = 0; state < 2; ++state) {
                         const bool isDisabled = state == 1;
@@ -221,7 +222,9 @@ TEST(IconTreatmentPreview, WritesOneSheetPerShippedTheme)
                                         if (treatment == 1) {
                                             return ThemeIconSticker::renderSticker(svg, ink, pixelSize);
                                         }
-                                        return ThemeIconBadge::renderBadge(svg, ink, pixelSize);
+                                        return ThemeIconBadge::renderBadge(svg, ink, pixelSize,
+                                                                           dark ? ThemeIconFill::Scheme::Dark
+                                                                                : ThemeIconFill::Scheme::Light);
                                     });
                                     const qreal x =
                                         cellX + 6 + static_cast<qreal>(glyphIndex) * SLOT + (SLOT - side) / 2.0;
