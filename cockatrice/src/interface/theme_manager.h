@@ -147,7 +147,8 @@ public:
     void previewFonts(const FontConfig &cfg);
 
     // Resolves an application color role: the theme's stored [AppColors] value
-    // when present, otherwise a palette-accent-derived fallback.
+    // when present, otherwise a palette-accent-derived fallback for accents and
+    // a scheme-appropriate semantic default for positive / negative.
     QColor appColor(AppColor::Role role) const;
     /** @brief Resolves an application font role: the theme's stored [Fonts]
      *         value when present, otherwise the application font. Roles that

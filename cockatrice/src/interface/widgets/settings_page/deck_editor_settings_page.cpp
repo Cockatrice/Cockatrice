@@ -80,7 +80,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     }
 
     aAdd = new QAction(this);
-    aAdd->setIcon(loadThemedIcon(QStringLiteral("icons/increment")));
+    aAdd->setIcon(loadThemedIcon(QStringLiteral("icons/increment"), AppColor::Positive, IconStyle::Sticker));
     connect(aAdd, &QAction::triggered, this, &DeckEditorSettingsPage::actAddURL);
 
     aEdit = new QAction(this);
@@ -88,7 +88,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     connect(aEdit, &QAction::triggered, this, &DeckEditorSettingsPage::actEditURL);
 
     aRemove = new QAction(this);
-    aRemove->setIcon(loadThemedIcon(QStringLiteral("icons/decrement")));
+    aRemove->setIcon(loadThemedIcon(QStringLiteral("icons/decrement"), AppColor::Negative, IconStyle::Sticker));
     connect(aRemove, &QAction::triggered, this, &DeckEditorSettingsPage::actRemoveURL);
 
     aRateLimit = new QAction(this);

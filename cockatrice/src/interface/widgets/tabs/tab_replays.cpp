@@ -155,7 +155,8 @@ QGroupBox *TabReplays::createLeftLayout()
     aNewLocalFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_FileDialogNewFolder));
     connect(aNewLocalFolder, &QAction::triggered, this, &TabReplays::actNewLocalFolder);
     aDeleteLocalReplay = new QAction(this);
-    aDeleteLocalReplay->setIcon(loadThemedIcon(QStringLiteral("icons/remove_row")));
+    aDeleteLocalReplay->setIcon(
+        loadThemedIcon(QStringLiteral("icons/remove_row"), AppColor::Negative, IconStyle::Sticker));
     connect(aDeleteLocalReplay, &QAction::triggered, this, &TabReplays::actDeleteLocalReplay);
 
     aOpenReplaysFolder = new QAction(this);
@@ -217,7 +218,8 @@ QGroupBox *TabReplays::createRightLayout()
     aKeep->setIcon(loadThemedIcon(QStringLiteral("icons/lock")));
     connect(aKeep, &QAction::triggered, this, &TabReplays::actKeepRemoteReplay);
     aDeleteRemoteReplay = new QAction(this);
-    aDeleteRemoteReplay->setIcon(loadThemedIcon(QStringLiteral("icons/remove_row")));
+    aDeleteRemoteReplay->setIcon(
+        loadThemedIcon(QStringLiteral("icons/remove_row"), AppColor::Negative, IconStyle::Sticker));
     connect(aDeleteRemoteReplay, &QAction::triggered, this, &TabReplays::actDeleteRemoteReplay);
     aGetReplayCode = new QAction(this);
     aGetReplayCode->setIcon(loadThemedIcon(QStringLiteral("icons/share")));

@@ -71,4 +71,6 @@ Accent               = #c9995a
 [AppColors]
 AccentStrong         = #b7823b
 AccentSoft           = #e4c58f
+Positive             = #6dd58c
+Negative             = #ff8a80
 

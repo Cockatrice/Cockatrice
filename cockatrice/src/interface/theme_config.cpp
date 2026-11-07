@@ -9,6 +9,7 @@
 #include <QList>
 #include <QMetaEnum>
 #include <QPair>
+#include <QStringLiteral>
 #include <QTextStream>
 #include <qnamespace.h>
 #include <utility>
@@ -450,4 +451,20 @@ FontConfig FontConfig::fromThemeDir(const QString &themeDirPath)
     }
 
     return fromFile(QDir(themeDirPath).absoluteFilePath(fileName()));
+}
+
+QColor defaultAppColor(AppColor::Role role, bool dark)
+{
+    switch (role) {
+        case AppColor::AccentStrong:
+        case AppColor::AccentSoft:
+            // Derived from the palette highlight by ThemeManager::appColor().
+            return {};
+        case AppColor::Positive:
+            return QColor(dark ? QStringLiteral("#6dd58c") : QStringLiteral("#1b7f3b"));
+        case AppColor::Negative:
+            return QColor(dark ? QStringLiteral("#ff8a80") : QStringLiteral("#b3261e"));
+    }
+
+    return {};
 }
