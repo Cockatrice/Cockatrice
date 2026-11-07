@@ -6,7 +6,7 @@ permissions:
 on:
   pull_request:
     paths:
-      - 'doc/doxygen/**'
+      - 'docs/**'
       - '.github/workflows/documentation-build.yml'
       - 'Doxyfile'
   release:
@@ -71,7 +71,7 @@ jobs:
           destination_dir: docs    # docs will be available at https://cockatrice.github.io/docs/
           external_repository: Cockatrice/cockatrice.github.io
           publish_branch: master
-          publish_dir: ./docs/html
+          publish_dir: ./docs-output/html
 
       - name: Link to Documentation Page
         if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
