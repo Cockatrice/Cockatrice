@@ -23,6 +23,7 @@
 #include <QMenu>
 #include <QString>
 #include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/game_meta_info.h>
 #include <libcockatrice/game/player/player_info.h>
 #include <libcockatrice/game/player/player_logic.h>
 #include <libcockatrice/game/player/player_manager.h>
@@ -70,6 +71,11 @@ PlayerMenu::PlayerMenu(PlayerGraphicsItem *_player) : QObject(_player), player(_
 
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &PlayerMenu::refreshShortcuts);
+
+    // Re-evaluate shortcuts when the game starts or ends, so the lobby only exposes the roll-die shortcut.
+    connect(player->getLogic()->getGame()->getGameMetaInfo(), &GameMetaInfo::startedChanged, this,
+            &PlayerMenu::refreshShortcuts);
+
     refreshShortcuts();
 
     retranslateUi();
@@ -144,6 +150,12 @@ void PlayerMenu::refreshShortcuts()
 void PlayerMenu::setShortcutsActive()
 {
     shortcutsActive = true;
+
+    if (!isGameStarted()) {
+        applyLobbyShortcuts();
+        return;
+    }
+
     for (auto *c : managedComponents) {
         c->setShortcutsActive();
     }
@@ -156,5 +168,24 @@ void PlayerMenu::setShortcutsInactive()
     for (auto *c : managedComponents) {
         c->setShortcutsInactive();
     }
+    emit shortcutsDeactivated();
+}
+
+bool PlayerMenu::isGameStarted() const
+{
+    return player->getLogic()->getGame()->getGameMetaInfo()->started();
+}
+
+void PlayerMenu::applyLobbyShortcuts()
+{
+    // Everything stays unbound until the game starts; only the roll-die shortcut is usable in the lobby.
+    for (auto *c : managedComponents) {
+        c->setShortcutsInactive();
+    }
+
+    if (utilityMenu) {
+        utilityMenu->setLobbyShortcutsActive();
+    }
+
     emit shortcutsDeactivated();
 }

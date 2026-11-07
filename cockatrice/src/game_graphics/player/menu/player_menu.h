@@ -73,17 +73,24 @@ public:
         return utilityMenu;
     }
 
+    /** @brief Whether this player currently holds its shortcuts and the game has started. */
     [[nodiscard]] bool getShortcutsActive() const
     {
-        return shortcutsActive;
+        return shortcutsActive && isGameStarted();
     }
 
-    /** @brief Bind keyboard shortcuts. Called when this player gains focus. */
+    /** @brief Bind keyboard shortcuts. Only the roll-die shortcut is bound before the game starts. */
     void setShortcutsActive();
     /** @brief Unbind keyboard shortcuts. Called when this player loses focus. */
     void setShortcutsInactive();
 
 private:
+    /** @brief True once the game has started; false while players are still in the deck-selection lobby. */
+    [[nodiscard]] bool isGameStarted() const;
+
+    /** @brief Unbinds everything except the shortcuts that remain usable before the game starts. */
+    void applyLobbyShortcuts();
+
     PlayerGraphicsItem *player;
     TearOffMenu *playerMenu;
     QMenu *countersMenu;
