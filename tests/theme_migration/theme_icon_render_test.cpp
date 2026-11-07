@@ -336,9 +336,8 @@ TEST_F(ThemeIconRenderTest, SelectedAppColorKeepsAContrastingTint)
  * @brief A line glyph renders the authored role verbatim.
  *
  * The emphasis colors are authored data now, so the paint path must not
- * rewrite them. A muted quiet role stays muted on a line glyph; a badge disc or
- * a sticker fill boosts its own fill, because carrying a whole shape is a
- * treatment concern rather than a role concern.
+ * rewrite them. A muted quiet role stays muted on a line glyph, and the badge
+ * and sticker only shape the value of that tone to give the shape depth.
  */
 TEST_F(ThemeIconRenderTest, LineTintRendersTheAuthoredRoleVerbatim)
 {
@@ -352,7 +351,6 @@ TEST_F(ThemeIconRenderTest, LineTintRendersTheAuthoredRoleVerbatim)
     const QPixmap pixmap = icon.pixmap(QSize(24, 24));
     ASSERT_FALSE(pixmap.isNull());
     EXPECT_GT(countOpaquePixels(pixmap, raw), 0);
-    EXPECT_EQ(countOpaquePixels(pixmap, ThemeIconFill::saturated(raw)), 0);
 }
 
 /** @brief A badge is a disc with a gradient fill, a dark ring and a contrast glyph. */
@@ -371,8 +369,8 @@ TEST_F(ThemeIconRenderTest, BadgeHasDiscGradientAndRing)
     EXPECT_EQ(image.pixelColor(0, 0).alpha(), 0);
     EXPECT_GT(image.pixelColor(32, 32).alpha(), 200);
 
-    // The ring is the saturated tone darkened, and it must actually be painted.
-    EXPECT_GT(countOpaquePixels(pixmap, ThemeIconFill::saturated(tone).darker(300)), 0);
+    // The ring is the authored tone darkened, and it must actually be painted.
+    EXPECT_GT(countOpaquePixels(pixmap, tone.darker(300)), 0);
 
     // The fill runs from a lighter top to a darker bottom. Sample left of the
     // check, which now reaches almost to the disc edge.
@@ -384,40 +382,45 @@ TEST_F(ThemeIconRenderTest, BadgeHasDiscGradientAndRing)
     EXPECT_GT(top.lightness(), bottom.lightness());
 
     // The glyph uses the contrast color chosen for this tone.
-    EXPECT_GT(countOpaquePixels(pixmap, ThemeIconBadge::glyphColor(tone)), 0);
+    EXPECT_GT(countOpaquePixels(pixmap, ThemeIconBadge::glyphColor(tone, ThemeIconFill::Scheme::Light)), 0);
 }
 
 /**
- * @brief The dark-scheme disc carries the same saturated fill as the sticker.
+ * @brief The dark-scheme disc keeps the authored tone and darkens it.
  *
- * The dark tones are tuned for text and read as pale mint or salmon once they
- * fill a disc, so the badge saturates its fill. The dark scheme keeps the
- * darkened ink the badge had before the fill moved to the sticker ramp.
+ * The authored tone is the top of the gradient, so the level the palette author
+ * picked survives the treatment; the shape only adds depth by darkening the
+ * bottom. It must not re-saturate the tone: the authored saturation is the theme
+ * author's choice. The dark scheme keeps the darkened ink the badge had before
+ * the fill moved to the sticker ramp.
  */
-TEST_F(ThemeIconRenderTest, BadgeDarkSchemeDiscUsesTheSaturatedFill)
+TEST_F(ThemeIconRenderTest, BadgeDarkSchemeKeepsTheAuthoredTone)
 {
     const QColor tone = defaultAppColor(AppColor::Positive, true);
     ASSERT_TRUE(tone.isValid());
     ASSERT_GE(tone.value(), 200);
 
-    const QPixmap pixmap = ThemeIconBadge::renderBadge(readIconSvg("ready_start"), tone, QSize(64, 64));
+    const QPixmap pixmap =
+        ThemeIconBadge::renderBadge(readIconSvg("ready_start"), tone, QSize(64, 64), ThemeIconFill::Scheme::Dark);
     ASSERT_FALSE(pixmap.isNull());
     const QImage image = pixmap.toImage();
 
-    // The disc neither keeps the pale raw tone nor the old unsaturating bottom.
-    EXPECT_EQ(countOpaquePixels(pixmap, tone), 0);
-    EXPECT_EQ(countOpaquePixels(pixmap, tone.darker(104)), 0);
     const QColor top = image.pixelColor(10, 16);
     const QColor bottom = image.pixelColor(10, 48);
     ASSERT_GT(top.alpha(), 200);
     ASSERT_GT(bottom.alpha(), 200);
-    // Antialiasing costs a point or two of saturation at the sample points.
-    EXPECT_GE(top.hsvSaturation(), 160);
-    EXPECT_GE(bottom.hsvSaturation(), 160);
+    // The top is a darkening of the authored tone, never a lift, and it keeps
+    // the authored saturation; the sample sits a little down the gradient.
+    EXPECT_LE(top.value(), tone.value());
+    EXPECT_GT(top.value(), bottom.value());
+    EXPECT_LT(bottom.value(), tone.value());
     EXPECT_GT(top.lightness(), bottom.lightness());
+    // Antialiasing costs a point or two of saturation at the sample points.
+    EXPECT_NEAR(top.hsvSaturation(), tone.hsvSaturation(), 24);
+    EXPECT_NEAR(bottom.hsvSaturation(), tone.hsvSaturation(), 24);
 
     // The dark scheme keeps the darkened ink, and it is actually painted.
-    const QColor ink = ThemeIconBadge::glyphColor(tone);
+    const QColor ink = ThemeIconBadge::glyphColor(tone, ThemeIconFill::Scheme::Dark);
     ASSERT_NE(ink, QColor(Qt::white));
     EXPECT_GT(countOpaquePixels(pixmap, ink), 0);
 }
@@ -426,8 +429,8 @@ TEST_F(ThemeIconRenderTest, BadgeDarkSchemeDiscUsesTheSaturatedFill)
  * @brief The badge ink follows the scheme.
  *
  * Light-scheme tones keep the white glyph of the old art; dark-scheme tones
- * keep the darkened ink, because the shared saturated disc is light enough that
- * white would sit near 2.7:1 at its top. Pinning both cases stops the glyph from
+ * keep the darkened ink, because the lifted disc is light enough that white
+ * would sit near 2.7:1 at its top. Pinning both cases stops the glyph from
  * silently flipping back to white when the fill or the palette changes.
  */
 TEST_F(ThemeIconRenderTest, BadgeInkFollowsTheScheme)
@@ -444,7 +447,8 @@ TEST_F(ThemeIconRenderTest, BadgeInkFollowsTheScheme)
     for (const auto &testCase : cases) {
         const QColor tone = defaultAppColor(testCase.role, testCase.dark);
         ASSERT_TRUE(tone.isValid());
-        const QColor ink = ThemeIconBadge::glyphColor(tone);
+        const QColor ink = ThemeIconBadge::glyphColor(tone, testCase.dark ? ThemeIconFill::Scheme::Dark
+                                                                          : ThemeIconFill::Scheme::Light);
         if (testCase.dark) {
             EXPECT_NE(ink, QColor(Qt::white));
             EXPECT_LT(ink.value(), 100);
@@ -487,7 +491,7 @@ TEST_F(ThemeIconRenderTest, BadgeStaysLegibleAtPlayerListSize)
     EXPECT_GT(image.pixelColor(7, 7).alpha(), 200);
     // A 1px ring on a 15px canvas antialiases into the disc and has no exact
     // color, so the glyph is what has to stay legible.
-    EXPECT_GT(countOpaquePixels(pixmap, ThemeIconBadge::glyphColor(tone)), 8);
+    EXPECT_GT(countOpaquePixels(pixmap, ThemeIconBadge::glyphColor(tone, ThemeIconFill::Scheme::Light)), 8);
 }
 
 /** @brief The pixmap API's badge path agrees with the engine's. */
@@ -498,8 +502,8 @@ TEST_F(ThemeIconRenderTest, SentinelSvgBadgeMatchesTheEngine)
                                                  QSize(48, 48), IconStyle::Badge);
     ASSERT_FALSE(pixmap.isNull());
     EXPECT_EQ(pixmap.size(), QSize(48, 48));
-    EXPECT_GT(countOpaquePixels(pixmap, ThemeIconFill::saturated(tone).darker(300)), 0);
-    EXPECT_GT(countOpaquePixels(pixmap, ThemeIconBadge::glyphColor(tone)), 0);
+    EXPECT_GT(countOpaquePixels(pixmap, tone.darker(300)), 0);
+    EXPECT_GT(countOpaquePixels(pixmap, ThemeIconBadge::glyphColor(tone, ThemeIconFill::Scheme::Light)), 0);
 }
 
 /**
@@ -576,7 +580,7 @@ TEST_F(ThemeIconRenderTest, BadgeOnAuthoredArtUsesTheAssetPath)
     // The authored color survives; no disc tone and no ring are painted.
     EXPECT_GT(countOpaquePixels(pixmap, QColor(QStringLiteral("#336699"))), 0);
     EXPECT_EQ(countOpaquePixels(pixmap, tone), 0);
-    EXPECT_EQ(countOpaquePixels(pixmap, ThemeIconFill::saturated(tone).darker(300)), 0);
+    EXPECT_EQ(countOpaquePixels(pixmap, tone.darker(300)), 0);
 }
 
 /** @brief Disabled keeps the shape language but drops back to the line glyph. */
@@ -594,7 +598,7 @@ TEST_F(ThemeIconRenderTest, DisabledBadgeFallsBackToLineGlyph)
 
     // A filled disc at full mass would not read as unavailable, so Disabled
     // drops the badge: no ring, no disc, just the disabled line glyph.
-    EXPECT_EQ(countOpaquePixels(pixmap, ThemeIconFill::saturated(tone).darker(300)), 0);
+    EXPECT_EQ(countOpaquePixels(pixmap, tone.darker(300)), 0);
     EXPECT_EQ(countOpaquePixels(pixmap, disabledText.darker(300)), 0);
     EXPECT_EQ(pixmap.toImage().pixelColor(0, 0).alpha(), 0);
     EXPECT_GT(countOpaquePixels(pixmap, disabledText), 0);
@@ -631,13 +635,13 @@ TEST_F(ThemeIconRenderTest, StickerPaintsToneFillWithDarkOutline)
 }
 
 /**
- * @brief The dark-scheme fill is the branch the treatment exists for.
+ * @brief The dark-scheme fill keeps the authored tone and darkens it.
  *
- * That tone is light and deliberately desaturated, so a plain gradient paints a
- * pale mint shape. The fill has to raise its saturation and pull its value down
- * instead of up.
+ * The authored tone is the top of the gradient, so the level the palette author
+ * picked survives the treatment. The treatment only adds depth by darkening the
+ * bottom, without re-saturating the tone.
  */
-TEST_F(ThemeIconRenderTest, StickerDarkSchemeFillIsSaturatedAndDarkerThanTheTone)
+TEST_F(ThemeIconRenderTest, StickerDarkSchemeFillKeepsTheAuthoredTone)
 {
     const QColor tone = defaultAppColor(AppColor::Positive, true);
     ASSERT_TRUE(tone.isValid());
@@ -651,10 +655,14 @@ TEST_F(ThemeIconRenderTest, StickerDarkSchemeFillIsSaturatedAndDarkerThanTheTone
     const QColor bottom = image.pixelColor(32, 50);
     ASSERT_GT(top.alpha(), 200);
     ASSERT_GT(bottom.alpha(), 200);
-    EXPECT_LT(top.value(), tone.value());
+    // The top is a darkening of the authored tone, never a lift, and it keeps
+    // the authored saturation; the sample sits a little down the gradient.
+    EXPECT_LE(top.value(), tone.value());
+    EXPECT_GT(top.value(), bottom.value());
     EXPECT_LT(bottom.value(), tone.value());
     EXPECT_GT(top.lightness(), bottom.lightness());
-    EXPECT_GE(top.hsvSaturation(), 170);
+    EXPECT_NEAR(top.hsvSaturation(), tone.hsvSaturation(), 24);
+    EXPECT_NEAR(bottom.hsvSaturation(), tone.hsvSaturation(), 24);
 }
 
 /** @brief The sticker is rendered at the device-pixel size, not upscaled later. */
@@ -749,7 +757,7 @@ TEST_F(ThemeIconRenderTest, LineStyleStillRendersGlyphAlone)
         loadThemedIcon(QStringLiteral("icons/ready_start"), AppColor::Positive).pixmap(QSize(64, 64));
     ASSERT_FALSE(pixmap.isNull());
 
-    EXPECT_EQ(countOpaquePixels(pixmap, ThemeIconFill::saturated(tone).darker(300)), 0);
+    EXPECT_EQ(countOpaquePixels(pixmap, tone.darker(300)), 0);
     EXPECT_GT(countOpaquePixels(pixmap, tone), 0);
 }
 
@@ -938,8 +946,8 @@ TEST(IconStickerPreview, WritesPngsWhenRequested)
             const QByteArray svg = readSvg(glyph.name);
             ASSERT_FALSE(svg.isEmpty()) << glyph.name;
             // The preview must show the line glyph the engine paints, and the
-            // engine saturates AppColor tones before drawing them.
-            const QColor tone = ThemeIconFill::saturated(defaultAppColor(glyph.role, dark));
+            // engine renders an authored tone verbatim.
+            const QColor tone = defaultAppColor(glyph.role, dark);
 
             for (int row = 0; row < 2; ++row) {
                 const bool sticker = row == 1;
@@ -972,8 +980,10 @@ TEST(IconStickerPreview, WritesPngsWhenRequested)
             ASSERT_FALSE(svg.isEmpty()) << badgeContext[i].name;
             const QColor tone = defaultAppColor(badgeContext[i].role, dark);
             const qreal x = MARGIN + LABEL_WIDTH + static_cast<qreal>(i) * CELL_WIDTH;
-            painter.drawPixmap(QPointF(x, y + 8),
-                               ThemeIconBadge::renderBadge(svg, tone, QSize(CONTEXT_SIZE, CONTEXT_SIZE)));
+            painter.drawPixmap(
+                QPointF(x, y + 8),
+                ThemeIconBadge::renderBadge(svg, tone, QSize(CONTEXT_SIZE, CONTEXT_SIZE),
+                                            dark ? ThemeIconFill::Scheme::Dark : ThemeIconFill::Scheme::Light));
             painter.drawText(QPointF(x, y + 8 + CONTEXT_SIZE + 12), QString::fromLatin1(badgeContext[i].name));
         }
 
@@ -984,7 +994,7 @@ TEST(IconStickerPreview, WritesPngsWhenRequested)
         for (std::size_t i = 0; i < std::size(badgeContext); ++i) {
             const QByteArray svg = readSvg(badgeContext[i].name);
             ASSERT_FALSE(svg.isEmpty()) << badgeContext[i].name;
-            const QColor tone = ThemeIconFill::saturated(defaultAppColor(badgeContext[i].role, dark));
+            const QColor tone = defaultAppColor(badgeContext[i].role, dark);
             const qreal x = MARGIN + LABEL_WIDTH + static_cast<qreal>(i) * CELL_WIDTH * 1.5;
             for (int j = 0; j < 3; ++j) {
                 const QSize side(CONTEXT_SIZE, CONTEXT_SIZE);
@@ -992,7 +1002,8 @@ TEST(IconStickerPreview, WritesPngsWhenRequested)
                 if (j == 0) {
                     pixmap = renderLine(svg, tone, side);
                 } else if (j == 1) {
-                    pixmap = ThemeIconBadge::renderBadge(svg, tone, side);
+                    pixmap = ThemeIconBadge::renderBadge(
+                        svg, tone, side, dark ? ThemeIconFill::Scheme::Dark : ThemeIconFill::Scheme::Light);
                 } else {
                     pixmap = ThemeIconSticker::renderSticker(svg, tone, side);
                 }
@@ -1090,8 +1101,8 @@ TEST(IconBadgePreview, WritesPngsWhenRequested)
             const QByteArray svg = readSvg(glyph.name);
             ASSERT_FALSE(svg.isEmpty()) << glyph.name;
             // The preview must show the line glyph the engine paints, and the
-            // engine saturates AppColor tones before drawing them.
-            const QColor tone = ThemeIconFill::saturated(defaultAppColor(glyph.role, dark));
+            // engine renders an authored tone verbatim.
+            const QColor tone = defaultAppColor(glyph.role, dark);
 
             for (int row = 0; row < 2; ++row) {
                 const bool badge = row == 1;
@@ -1101,7 +1112,9 @@ TEST(IconBadgePreview, WritesPngsWhenRequested)
                                      QString::fromLatin1(glyph.name));
                 for (std::size_t i = 0; i < std::size(SIZES); ++i) {
                     const int side = SIZES[i];
-                    const QPixmap pixmap = badge ? ThemeIconBadge::renderBadge(svg, tone, QSize(side, side))
+                    const QPixmap pixmap = badge ? ThemeIconBadge::renderBadge(svg, tone, QSize(side, side),
+                                                                               dark ? ThemeIconFill::Scheme::Dark
+                                                                                    : ThemeIconFill::Scheme::Light)
                                                  : renderLine(svg, tone, QSize(side, side));
                     const qreal x = MARGIN + LABEL_WIDTH + static_cast<qreal>(i) * CELL_WIDTH;
                     // Align all sizes on a common baseline so the weight
@@ -1127,6 +1140,7 @@ namespace
 struct InkPalette
 {
     QColor text;
+    QColor buttonText;
     QColor window;
     QColor button;
     QColor accent;
@@ -1152,9 +1166,10 @@ InkPalette shippedPalette(const QString &theme, bool dark)
         return {};
     }
     const QPalette palette = config.apply(QPalette());
-    return {palette.color(QPalette::Active, QPalette::WindowText), palette.color(QPalette::Active, QPalette::Window),
-            palette.color(QPalette::Active, QPalette::Button), palette.color(QPalette::Active, QPalette::Highlight),
-            config.appColors};
+    return {
+        palette.color(QPalette::Active, QPalette::WindowText), palette.color(QPalette::Active, QPalette::ButtonText),
+        palette.color(QPalette::Active, QPalette::Window),     palette.color(QPalette::Active, QPalette::Button),
+        palette.color(QPalette::Active, QPalette::Highlight),  config.appColors};
 }
 
 /**
@@ -1697,5 +1712,191 @@ TEST_F(ThemeIconRenderTest, EmphasisPreviewWritesPngsWhenRequested)
         const QString path = QDir(outDir).absoluteFilePath(dark ? QStringLiteral("emphasis-preview-dark.png")
                                                                 : QStringLiteral("emphasis-preview-light.png"));
         ASSERT_TRUE(image.save(path)) << path.toStdString();
+    }
+}
+
+/**
+ * @brief Writes the authored emphasis sheets for every shipped palette theme.
+ *
+ * The ladder is only useful if it survives the treatment a call site chooses, so
+ * each sheet renders the same three authored levels as line glyphs, as sticker
+ * fills and as badges, at the two sizes the UI uses, on the two surfaces the
+ * contrast targets are measured against. Each family carries three glyphs, so
+ * the sheet also proves the level, not just one lucky shape.
+ *
+ * The authored tone is the top of every filled gradient, so the sheet prints that
+ * tone and the darker bottom the shape actually carries.
+ */
+TEST_F(ThemeIconRenderTest, EmphasisTreatmentsPreviewWritesPngsWhenRequested)
+{
+    const QString outDir = qEnvironmentVariable("COCKATRICE_ICON_PREVIEW_DIR");
+    if (outDir.isEmpty()) {
+        GTEST_SKIP() << "set COCKATRICE_ICON_PREVIEW_DIR to write the preview PNGs";
+    }
+    ASSERT_TRUE(QDir().mkpath(outDir));
+
+    constexpr int MARGIN = 24;
+    constexpr int LABEL_WIDTH = 230;
+    constexpr int CELL_WIDTH = 166;
+    constexpr int ROW_HEIGHT = 58;
+    constexpr int PANEL_TITLE = 26;
+    constexpr int COLUMN_HEADER = 20;
+    constexpr int PANEL_PADDING = 12;
+    constexpr int GLYPH_SLOT = 32;
+    constexpr qreal DPR = 2.0;
+    constexpr int SIZES[] = {16, 24};
+    constexpr const char *TREATMENTS[] = {"line", "sticker", "badge"};
+    constexpr const char *LEVEL_NAMES[] = {"Quiet", "Secondary", "Primary"};
+
+    struct Family
+    {
+        const char *name;
+        const char *glyphs[3];
+        AppColor::Role quiet;
+        AppColor::Role secondary;
+        AppColor::Role primary;
+    };
+    const QList<Family> families = {
+        {"Neutral", {"settings", "info", "player"}, AppColor::IconSoft, AppColor::Icon, AppColor::IconStrong},
+        {"Positive",
+         {"increment", "ready_start", "arrow_up"},
+         AppColor::PositiveSoft,
+         AppColor::Positive,
+         AppColor::PositiveStrong},
+        {"Negative",
+         {"decrement", "not_ready_start", "remove_row"},
+         AppColor::NegativeSoft,
+         AppColor::Negative,
+         AppColor::NegativeStrong},
+    };
+    const QStringList themes = {
+        QStringLiteral("Fabric"), QStringLiteral("Fusion"),       QStringLiteral("Leather"),
+        QStringLiteral("Plasma"), QStringLiteral("VelvetMarble"),
+    };
+
+    const auto roleAt = [](const Family &family, int level) {
+        return level == 0 ? family.quiet : level == 1 ? family.secondary : family.primary;
+    };
+    const auto schemeFor = [](bool dark) { return dark ? ThemeIconFill::Scheme::Dark : ThemeIconFill::Scheme::Light; };
+    const auto renderLine = [](const QByteArray &svg, const QColor &ink, const QSize &size) {
+        QSvgRenderer renderer(resolveSvgColorSentinel(svg, ink.name(QColor::HexRgb).toLatin1()));
+        QPixmap pixmap(size);
+        pixmap.fill(Qt::transparent);
+        QPainter painter(&pixmap);
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        renderer.render(&painter);
+        return pixmap;
+    };
+
+    const int panelWidth = LABEL_WIDTH + static_cast<int>(std::size(TREATMENTS)) * CELL_WIDTH + PANEL_PADDING;
+    const int panelHeight =
+        PANEL_TITLE + COLUMN_HEADER + static_cast<int>(families.size()) * 3 * ROW_HEIGHT + PANEL_PADDING;
+    const int logicalWidth = 2 * MARGIN + panelWidth;
+    const int logicalHeight = MARGIN + 30 + 2 * (panelHeight + 24) + MARGIN;
+
+    for (const QString &theme : themes) {
+        for (const bool dark : {false, true}) {
+            const InkPalette palette = shippedPalette(theme, dark);
+            ASSERT_TRUE(palette.text.isValid()) << theme.toStdString();
+
+            QImage image(QSize(qRound(logicalWidth * DPR), qRound(logicalHeight * DPR)),
+                         QImage::Format_ARGB32_Premultiplied);
+            image.fill(palette.window);
+            QPainter painter(&image);
+            painter.setRenderHint(QPainter::Antialiasing, true);
+            painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+            painter.scale(DPR, DPR);
+
+            painter.setPen(palette.text);
+            painter.setFont(QFont(QStringLiteral("Sans"), 10, QFont::DemiBold));
+            painter.drawText(QPointF(MARGIN, MARGIN),
+                             QStringLiteral("%1 — %2 scheme, authored emphasis across treatments")
+                                 .arg(theme, dark ? QStringLiteral("dark") : QStringLiteral("light")));
+
+            struct Surface
+            {
+                const char *name;
+                QColor background;
+                QColor text;
+            };
+            const QList<Surface> surfaces = {
+                {"Window surface", palette.window, palette.text},
+                {"Button surface", palette.button, palette.buttonText},
+            };
+
+            qreal panelTop = MARGIN + 30;
+            for (const Surface &surface : surfaces) {
+                painter.setPen(Qt::NoPen);
+                painter.setBrush(surface.background);
+                painter.drawRoundedRect(QRectF(MARGIN, panelTop, panelWidth, panelHeight), 8, 8);
+
+                const qreal contentLeft = MARGIN + PANEL_PADDING;
+                painter.setPen(surface.text);
+                painter.setFont(QFont(QStringLiteral("Sans"), 9, QFont::DemiBold));
+                painter.drawText(QPointF(contentLeft, panelTop + 18), QString::fromLatin1(surface.name));
+
+                painter.setFont(QFont(QStringLiteral("Sans"), 8));
+                for (std::size_t treatment = 0; treatment < std::size(TREATMENTS); ++treatment) {
+                    const qreal x = contentLeft + LABEL_WIDTH + static_cast<qreal>(treatment) * CELL_WIDTH;
+                    painter.drawText(QPointF(x, panelTop + PANEL_TITLE + 14),
+                                     QString::fromLatin1(TREATMENTS[treatment]) + QStringLiteral("  16 / 24"));
+                }
+
+                qreal y = panelTop + PANEL_TITLE + COLUMN_HEADER;
+                for (const Family &family : families) {
+                    for (int level = 0; level < 3; ++level) {
+                        const AppColor::Role role = roleAt(family, level);
+                        const QColor ink = palette.roles.value(role);
+                        ASSERT_TRUE(ink.isValid())
+                            << theme.toStdString() << " " << family.name << " " << LEVEL_NAMES[level];
+                        const QColor bottom = ThemeIconFill::bottomColor(ink);
+
+                        painter.setPen(surface.text);
+                        painter.setFont(QFont(QStringLiteral("Sans"), 8, QFont::DemiBold));
+                        painter.drawText(QPointF(contentLeft, y + 14),
+                                         QStringLiteral("%1 / %2").arg(QString::fromLatin1(family.name),
+                                                                       QString::fromLatin1(LEVEL_NAMES[level])));
+                        painter.setFont(QFont(QStringLiteral("Mono"), 7));
+                        painter.drawText(QPointF(contentLeft, y + 28), ink.name(QColor::HexRgb));
+                        if (bottom != ink) {
+                            painter.drawText(QPointF(contentLeft + 82, y + 28),
+                                             QStringLiteral("bottom ") + bottom.name(QColor::HexRgb));
+                        }
+
+                        for (std::size_t treatment = 0; treatment < std::size(TREATMENTS); ++treatment) {
+                            const qreal cellX = contentLeft + LABEL_WIDTH + static_cast<qreal>(treatment) * CELL_WIDTH;
+                            for (std::size_t sizeIndex = 0; sizeIndex < std::size(SIZES); ++sizeIndex) {
+                                const int side = SIZES[sizeIndex];
+                                const QSize size(side, side);
+                                const qreal rowTop = y + (sizeIndex == 0 ? 4 : 28);
+                                for (std::size_t glyphIndex = 0; glyphIndex < std::size(family.glyphs); ++glyphIndex) {
+                                    const QByteArray svg = readIconSvg(family.glyphs[glyphIndex]);
+                                    ASSERT_FALSE(svg.isEmpty()) << family.glyphs[glyphIndex];
+                                    QPixmap pixmap;
+                                    if (treatment == 0) {
+                                        pixmap = renderLine(svg, ink, size);
+                                    } else if (treatment == 1) {
+                                        pixmap = ThemeIconSticker::renderSticker(svg, ink, size);
+                                    } else {
+                                        pixmap = ThemeIconBadge::renderBadge(svg, ink, size, schemeFor(dark));
+                                    }
+                                    const qreal x = cellX + 6 + static_cast<qreal>(glyphIndex) * GLYPH_SLOT +
+                                                    (GLYPH_SLOT - side) / 2.0;
+                                    painter.drawPixmap(QPointF(x, rowTop + (GLYPH_SLOT - side) / 2.0), pixmap);
+                                }
+                            }
+                        }
+                        y += ROW_HEIGHT;
+                    }
+                }
+                panelTop += panelHeight + 24;
+            }
+
+            painter.end();
+            const QString path = QDir(outDir).absoluteFilePath(
+                QStringLiteral("emphasis-treatments-%1-%2.png")
+                    .arg(theme.toLower(), dark ? QStringLiteral("dark") : QStringLiteral("light")));
+            ASSERT_TRUE(image.save(path)) << path.toStdString();
+        }
     }
 }

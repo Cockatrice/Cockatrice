@@ -46,16 +46,16 @@ DiscFill discFill(const QColor &tone)
 
 namespace ThemeIconBadge
 {
-QColor glyphColor(const QColor &tone)
+QColor glyphColor(const QColor &tone, ThemeIconFill::Scheme scheme)
 {
     // The badge carries the ink the pre-sticker badge did: white on the light
     // scheme, and the tone darkened to an outline-dark ink on the dark scheme.
-    // The shared saturated disc is light enough there that white sits near
-    // 2.7:1 at the top, so the dark ink is the deliberate choice rather than a
-    // contrast measurement that a palette tweak could flip. Deriving it from
-    // the tone keeps themes in control.
-    return ThemeIconFill::isDarkSchemeTone(tone) ? ThemeIconFill::saturated(tone).darker(GLYPH_DARKER)
-                                                 : QColor(Qt::white);
+    // The lifted disc is light enough there that white sits near 2.7:1 at the
+    // top, so the dark ink is the deliberate choice rather than a contrast
+    // measurement that a palette tweak could flip. Deriving it from the tone
+    // keeps themes in control, and the scheme is explicit because an authored
+    // quiet level is a dark tone on the dark scheme too.
+    return scheme == ThemeIconFill::Scheme::Dark ? tone.darker(GLYPH_DARKER) : QColor(Qt::white);
 }
 
 QSize glyphSize(const QSize &pixelSize)
@@ -70,7 +70,7 @@ QSize glyphSize(const QSize &pixelSize)
     return QSize(glyphSide, glyphSide);
 }
 
-QPixmap renderBadge(const QByteArray &svg, const QColor &tone, const QSize &pixelSize)
+QPixmap renderBadge(const QByteArray &svg, const QColor &tone, const QSize &pixelSize, ThemeIconFill::Scheme scheme)
 {
     if (svg.isEmpty() || !tone.isValid() || pixelSize.isEmpty()) {
         return {};
@@ -100,12 +100,12 @@ QPixmap renderBadge(const QByteArray &svg, const QColor &tone, const QSize &pixe
     // The ring closes the disc: its outer edge touches the canvas, its inner
     // edge is the disc boundary, so the two meet without a seam.
     painter.setBrush(Qt::NoBrush);
-    painter.setPen(QPen(ThemeIconFill::saturated(tone).darker(RING_DARKER), ringWidth));
+    painter.setPen(QPen(tone.darker(RING_DARKER), ringWidth));
     const qreal ringRadius = (side - ringWidth) / 2.0;
     painter.drawEllipse(discRect.center(), ringRadius, ringRadius);
 
     const QByteArray glyphSvg = resolveSvgStrokeWidth(
-        resolveSvgColorSentinel(svg, glyphColor(tone).name(QColor::HexRgb).toLatin1()), GLYPH_STROKE_WIDTH);
+        resolveSvgColorSentinel(svg, glyphColor(tone, scheme).name(QColor::HexRgb).toLatin1()), GLYPH_STROKE_WIDTH);
     QSvgRenderer renderer(glyphSvg);
     if (renderer.isValid()) {
         const QSize size = glyphSize(pixelSize);
