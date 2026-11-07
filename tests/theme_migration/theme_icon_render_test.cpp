@@ -92,6 +92,22 @@ QColor expectedNeutralInk(const QPalette &palette)
     return ThemeIconInk::glyphInk(text, surface, palette.color(QPalette::Active, QPalette::Highlight));
 }
 
+/**
+ * @brief Renders a glyph at the sheet's device pixel ratio.
+ *
+ * The preview sheets paint through a painter scaled by @p dpr, so a pixmap
+ * rendered at logical size would be upscaled on the way into the file and read
+ * as blurry. Rendering at device size and tagging the pixmap keeps one source
+ * pixel per device pixel.
+ */
+template <typename Render>
+QPixmap renderAtDpr(const QSize &logicalSize, qreal dpr, Render &&render)
+{
+    QPixmap pixmap = render(logicalSize * dpr);
+    pixmap.setDevicePixelRatio(dpr);
+    return pixmap;
+}
+
 /** @brief Opaque pixels that are not the given rim color, i.e. the gradient fill. */
 int countOpaquePixelsOtherThan(const QPixmap &pixmap, const QColor &excluded)
 {
@@ -852,7 +868,8 @@ TEST(IconTintPreview, WritesPngsWhenRequested)
             painter.drawText(QPointF(MARGIN, rowTop + 16), QString::fromLatin1(glyph.name));
             for (std::size_t i = 0; i < std::size(SIZES); ++i) {
                 const int side = SIZES[i];
-                const QPixmap pixmap = renderLine(svg, tone, QSize(side, side));
+                const QPixmap pixmap = renderAtDpr(QSize(side, side), DPR,
+                                                   [&](const QSize &pixelSize) { return renderLine(svg, tone, pixelSize); });
                 const qreal x = MARGIN + LABEL_WIDTH + static_cast<qreal>(i) * CELL_WIDTH;
                 // Bottom-align the sizes and put the caption below the 48px row.
                 painter.drawPixmap(QPointF(x, rowTop + 54 - side), pixmap);
@@ -966,8 +983,11 @@ TEST(IconStickerPreview, WritesPngsWhenRequested)
                                      QString::fromLatin1(glyph.name));
                 for (std::size_t i = 0; i < std::size(SIZES); ++i) {
                     const int side = SIZES[i];
-                    const QPixmap pixmap = sticker ? ThemeIconSticker::renderSticker(svg, tone, QSize(side, side))
-                                                   : renderLine(svg, tone, QSize(side, side));
+                    const QPixmap pixmap = renderAtDpr(
+                        QSize(side, side), DPR, [&](const QSize &pixelSize) {
+                            return sticker ? ThemeIconSticker::renderSticker(svg, tone, pixelSize)
+                                           : renderLine(svg, tone, pixelSize);
+                        });
                     const qreal x = MARGIN + LABEL_WIDTH + static_cast<qreal>(i) * CELL_WIDTH;
                     painter.drawPixmap(QPointF(x, rowTop + 36 - side), pixmap);
                     if (row == 1) {
@@ -991,8 +1011,10 @@ TEST(IconStickerPreview, WritesPngsWhenRequested)
             const qreal x = MARGIN + LABEL_WIDTH + static_cast<qreal>(i) * CELL_WIDTH;
             painter.drawPixmap(
                 QPointF(x, y + 8),
-                ThemeIconBadge::renderBadge(svg, tone, QSize(CONTEXT_SIZE, CONTEXT_SIZE),
-                                            dark ? ThemeIconFill::Scheme::Dark : ThemeIconFill::Scheme::Light));
+                renderAtDpr(QSize(CONTEXT_SIZE, CONTEXT_SIZE), DPR, [&](const QSize &pixelSize) {
+                    return ThemeIconBadge::renderBadge(
+                        svg, tone, pixelSize, dark ? ThemeIconFill::Scheme::Dark : ThemeIconFill::Scheme::Light);
+                }));
             painter.drawText(QPointF(x, y + 8 + CONTEXT_SIZE + 12), QString::fromLatin1(badgeContext[i].name));
         }
 
@@ -1007,15 +1029,16 @@ TEST(IconStickerPreview, WritesPngsWhenRequested)
             const qreal x = MARGIN + LABEL_WIDTH + static_cast<qreal>(i) * CELL_WIDTH * 1.5;
             for (int j = 0; j < 3; ++j) {
                 const QSize side(CONTEXT_SIZE, CONTEXT_SIZE);
-                QPixmap pixmap;
-                if (j == 0) {
-                    pixmap = renderLine(svg, tone, side);
-                } else if (j == 1) {
-                    pixmap = ThemeIconBadge::renderBadge(
-                        svg, tone, side, dark ? ThemeIconFill::Scheme::Dark : ThemeIconFill::Scheme::Light);
-                } else {
-                    pixmap = ThemeIconSticker::renderSticker(svg, tone, side);
-                }
+                const QPixmap pixmap = renderAtDpr(side, DPR, [&](const QSize &pixelSize) {
+                    if (j == 0) {
+                        return renderLine(svg, tone, pixelSize);
+                    }
+                    if (j == 1) {
+                        return ThemeIconBadge::renderBadge(
+                            svg, tone, pixelSize, dark ? ThemeIconFill::Scheme::Dark : ThemeIconFill::Scheme::Light);
+                    }
+                    return ThemeIconSticker::renderSticker(svg, tone, pixelSize);
+                });
                 const qreal px = x + j * (CONTEXT_SIZE + 16);
                 painter.drawPixmap(QPointF(px, y + 8), pixmap);
                 painter.drawText(QPointF(px, y + 8 + CONTEXT_SIZE + 12), QString::fromLatin1(FAMILY_LABELS[j]));
@@ -1121,10 +1144,13 @@ TEST(IconBadgePreview, WritesPngsWhenRequested)
                                      QString::fromLatin1(glyph.name));
                 for (std::size_t i = 0; i < std::size(SIZES); ++i) {
                     const int side = SIZES[i];
-                    const QPixmap pixmap = badge ? ThemeIconBadge::renderBadge(svg, tone, QSize(side, side),
-                                                                               dark ? ThemeIconFill::Scheme::Dark
-                                                                                    : ThemeIconFill::Scheme::Light)
-                                                 : renderLine(svg, tone, QSize(side, side));
+                    const QPixmap pixmap = renderAtDpr(
+                        QSize(side, side), DPR, [&](const QSize &pixelSize) {
+                            return badge ? ThemeIconBadge::renderBadge(
+                                               svg, tone, pixelSize,
+                                               dark ? ThemeIconFill::Scheme::Dark : ThemeIconFill::Scheme::Light)
+                                         : renderLine(svg, tone, pixelSize);
+                        });
                     const qreal x = MARGIN + LABEL_WIDTH + static_cast<qreal>(i) * CELL_WIDTH;
                     // Align all sizes on a common baseline so the weight
                     // difference between 15px and 48px is visible.
@@ -1414,8 +1440,14 @@ TEST(IconInkPreview, WritesPngsWhenRequested)
                     ASSERT_FALSE(svg.isEmpty()) << GLYPHS[i];
                     const qreal cellOffset = static_cast<qreal>(i) * (side + CELL_GAP);
                     const qreal glyphY = rowY + (ROW_HEIGHT - side) / 2.0;
-                    painter.drawPixmap(QPointF(oldX + cellOffset, glyphY), renderLine(svg, oldInk, QSize(side, side)));
-                    painter.drawPixmap(QPointF(newX + cellOffset, glyphY), renderLine(svg, newInk, QSize(side, side)));
+                    painter.drawPixmap(QPointF(oldX + cellOffset, glyphY),
+                                       renderAtDpr(QSize(side, side), DPR, [&](const QSize &pixelSize) {
+                                           return renderLine(svg, oldInk, pixelSize);
+                                       }));
+                    painter.drawPixmap(QPointF(newX + cellOffset, glyphY),
+                                       renderAtDpr(QSize(side, side), DPR, [&](const QSize &pixelSize) {
+                                           return renderLine(svg, newInk, pixelSize);
+                                       }));
                 }
                 rowY += ROW_HEIGHT;
             }
@@ -1905,14 +1937,15 @@ TEST_F(ThemeIconRenderTest, EmphasisPreviewWritesPngsWhenRequested)
                                 for (std::size_t glyphIndex = 0; glyphIndex < std::size(family.glyphs); ++glyphIndex) {
                                     const QByteArray svg = readIconSvg(family.glyphs[glyphIndex]);
                                     ASSERT_FALSE(svg.isEmpty()) << family.glyphs[glyphIndex];
-                                    QPixmap pixmap;
-                                    if (treatment == 0) {
-                                        pixmap = renderLine(svg, ink, size);
-                                    } else if (treatment == 1) {
-                                        pixmap = ThemeIconSticker::renderSticker(svg, ink, size);
-                                    } else {
-                                        pixmap = ThemeIconBadge::renderBadge(svg, ink, size, scheme);
-                                    }
+                                    const QPixmap pixmap = renderAtDpr(size, DPR, [&](const QSize &pixelSize) {
+                                        if (treatment == 0) {
+                                            return renderLine(svg, ink, pixelSize);
+                                        }
+                                        if (treatment == 1) {
+                                            return ThemeIconSticker::renderSticker(svg, ink, pixelSize);
+                                        }
+                                        return ThemeIconBadge::renderBadge(svg, ink, pixelSize, scheme);
+                                    });
                                     const qreal x = cellX + 6 + static_cast<qreal>(glyphIndex) * GLYPH_SLOT +
                                                     (GLYPH_SLOT - side) / 2.0;
                                     painter.drawPixmap(QPointF(x, rowTop + (GLYPH_SLOT - side) / 2.0), pixmap);
@@ -2100,14 +2133,15 @@ TEST_F(ThemeIconRenderTest, EmphasisTreatmentsPreviewWritesPngsWhenRequested)
                                 for (std::size_t glyphIndex = 0; glyphIndex < std::size(family.glyphs); ++glyphIndex) {
                                     const QByteArray svg = readIconSvg(family.glyphs[glyphIndex]);
                                     ASSERT_FALSE(svg.isEmpty()) << family.glyphs[glyphIndex];
-                                    QPixmap pixmap;
-                                    if (disabled || treatment == 0) {
-                                        pixmap = renderLine(svg, ink, size);
-                                    } else if (treatment == 1) {
-                                        pixmap = ThemeIconSticker::renderSticker(svg, ink, size);
-                                    } else {
-                                        pixmap = ThemeIconBadge::renderBadge(svg, ink, size, schemeFor(dark));
-                                    }
+                                    const QPixmap pixmap = renderAtDpr(size, DPR, [&](const QSize &pixelSize) {
+                                        if (disabled || treatment == 0) {
+                                            return renderLine(svg, ink, pixelSize);
+                                        }
+                                        if (treatment == 1) {
+                                            return ThemeIconSticker::renderSticker(svg, ink, pixelSize);
+                                        }
+                                        return ThemeIconBadge::renderBadge(svg, ink, pixelSize, schemeFor(dark));
+                                    });
                                     const qreal x = cellX + 6 + static_cast<qreal>(glyphIndex) * GLYPH_SLOT +
                                                     (GLYPH_SLOT - side) / 2.0;
                                     painter.drawPixmap(QPointF(x, rowTop + (GLYPH_SLOT - side) / 2.0), pixmap);
