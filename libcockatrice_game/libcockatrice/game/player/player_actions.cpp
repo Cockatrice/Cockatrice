@@ -946,7 +946,7 @@ void PlayerActions::actCreateToken(TokenInfo tokenToCreate)
 {
     lastTokenInfo = tokenToCreate;
 
-    ExactCard correctedCard = CardDatabaseManager::query()->guessCard({lastTokenInfo.name, lastTokenInfo.providerId});
+    ExactCard correctedCard = CardDatabaseManager::query().guessCard({lastTokenInfo.name, lastTokenInfo.providerId});
     if (correctedCard) {
         lastTokenInfo.name = correctedCard.getName();
         int tableRow = lastTokenInfo.faceDown ? 2 : correctedCard.getInfo().getUiAttributes().tableRow;
@@ -1011,7 +1011,7 @@ void PlayerActions::setLastTokenInfo(CardInfoPtr cardInfo)
 void PlayerActions::actCreatePredefinedToken()
 {
     auto *action = static_cast<QAction *>(sender());
-    CardInfoPtr cardInfo = CardDatabaseManager::query()->getCardInfo(action->text());
+    CardInfoPtr cardInfo = CardDatabaseManager::query().getCardInfo(action->text());
     if (!cardInfo) {
         return;
     }
@@ -1115,7 +1115,7 @@ void PlayerActions::actCreateAllRelatedCards(const CardState *sourceCard)
      * then assign the first to the "Create another" shortcut.
      */
     if (cardRelation != nullptr && cardRelation->getCanCreateAnother()) {
-        CardInfoPtr cardInfo = CardDatabaseManager::query()->getCardInfo(cardRelation->getName());
+        CardInfoPtr cardInfo = CardDatabaseManager::query().getCardInfo(cardRelation->getName());
         setLastToken(cardInfo);
     }
 }
@@ -1193,7 +1193,7 @@ void PlayerActions::onRelatedCardCreated(const CardState *sourceCard, const Card
     }
 
     ExactCard relatedCard =
-        CardDatabaseManager::query()->getCardFromSameSet(cardRelation->getName(), sourceCard->getCard().getPrinting());
+        CardDatabaseManager::query().getCardFromSameSet(cardRelation->getName(), sourceCard->getCard().getPrinting());
 
     setLastToken(relatedCard.getCardPtr());
 }
@@ -1204,7 +1204,7 @@ void PlayerActions::createCard(const CardState *sourceCard,
                                bool persistent,
                                bool faceDown)
 {
-    CardInfoPtr cardInfo = CardDatabaseManager::query()->getCardInfo(dbCardName);
+    CardInfoPtr cardInfo = CardDatabaseManager::query().getCardInfo(dbCardName);
 
     if (cardInfo == nullptr || sourceCard == nullptr) {
         return;
@@ -1240,7 +1240,7 @@ void PlayerActions::createCard(const CardState *sourceCard,
     cmd.set_face_down(faceDown);
 
     ExactCard relatedCard =
-        CardDatabaseManager::query()->getCardFromSameSet(cardInfo->getName(), sourceCard->getCard().getPrinting());
+        CardDatabaseManager::query().getCardFromSameSet(cardInfo->getName(), sourceCard->getCard().getPrinting());
 
     switch (attachType) {
         case CardRelationType::DoesNotAttach:

@@ -147,7 +147,7 @@ static void setupParserRules()
             int count = 0;
             auto cardNodes = data.deck->deckList.getCardNodes();
             for (auto node : cardNodes) {
-                auto cardInfoPtr = CardDatabaseManager::query()->getCardInfo(node->getName());
+                auto cardInfoPtr = CardDatabaseManager::query().getCardInfo(node->getName());
                 if (!cardInfoPtr.isNull() && cardFilter.check(cardInfoPtr)) {
                     count += node->getNumber();
                 }

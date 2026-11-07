@@ -48,21 +48,21 @@ TEST(CardDatabaseTest, LoadXml)
     // ensure the card database is empty at start
     ASSERT_EQ(0, db->getCardList().size()) << "Cards not empty at start";
     ASSERT_EQ(0, db->getSetList().size()) << "Sets not empty at start";
-    ASSERT_EQ(0, db->query()->getAllMainCardTypes().size()) << "Types not empty at start";
+    ASSERT_EQ(0, db->query().getAllMainCardTypes().size()) << "Types not empty at start";
     ASSERT_EQ(NotLoaded, db->getLoadStatus()) << "Incorrect status at start";
 
     // load dummy cards and test result
     db->loadCardDatabases();
     ASSERT_EQ(9, db->getCardList().size()) << "Wrong card count after load";
     ASSERT_EQ(5, db->getSetList().size()) << "Wrong sets count after load";
-    ASSERT_EQ(3, db->query()->getAllMainCardTypes().size()) << "Wrong types count after load";
+    ASSERT_EQ(3, db->query().getAllMainCardTypes().size()) << "Wrong types count after load";
     ASSERT_EQ(Ok, db->getLoadStatus()) << "Wrong status after load";
 
     // ensure the card database is empty after clear()
     db->clear();
     ASSERT_EQ(0, db->getCardList().size()) << "Cards not empty after clear";
     ASSERT_EQ(0, db->getSetList().size()) << "Sets not empty after clear";
-    ASSERT_EQ(0, db->query()->getAllMainCardTypes().size()) << "Types not empty after clear";
+    ASSERT_EQ(0, db->query().getAllMainCardTypes().size()) << "Types not empty after clear";
     ASSERT_EQ(NotLoaded, db->getLoadStatus()) << "Incorrect status after clear";
 }
 
@@ -112,7 +112,7 @@ TEST(CardDatabaseTest, GuessCardWithProviderIdOnUnknownCardReturnsEmpty)
     NoopCardSetPriorityController controller;
     CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
 
-    const ExactCard guessed = db.query()->guessCard({"Not a Card", "card_Not a Card_fixture"});
+    const ExactCard guessed = db.query().guessCard({"Not a Card", "card_Not a Card_fixture"});
 
     EXPECT_TRUE(guessed.isEmpty());
     EXPECT_FALSE(guessed);
@@ -125,7 +125,7 @@ TEST(CardDatabaseTest, FindPrintingWithIdOnNullCardInfoReturnsEmpty)
     NoopCardSetPriorityController controller;
     CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
 
-    EXPECT_TRUE(db.query()->findPrintingWithId(nullptr, "card_Not a Card_fixture").isEmpty());
+    EXPECT_TRUE(db.query().findPrintingWithId(nullptr, "card_Not a Card_fixture").isEmpty());
 }
 
 TEST(CardInfoTest, ClearDirectRelationsDropsRawPointers)

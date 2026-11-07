@@ -326,7 +326,7 @@ void CardCompleterStyler::updatePreview(const QModelIndex &index)
         preview->setWindowOpacity(0.0);
     }
 
-    const ExactCard exact = CardDatabaseManager::query()->getCard({card->getName()});
+    const ExactCard exact = CardDatabaseManager::query().getCard({card->getName()});
 
     if (!exact) {
         hidePreview();

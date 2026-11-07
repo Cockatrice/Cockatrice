@@ -108,7 +108,7 @@ void DeckStatsInterface::analyzeDeck(const DeckList &deck)
 void DeckStatsInterface::copyDeckWithoutTokens(const DeckList &source, DeckList &destination)
 {
     auto copyIfNotAToken = [&destination](const auto node, const auto card) {
-        CardInfoPtr dbCard = CardDatabaseManager::query()->getCardInfo(card->getName());
+        CardInfoPtr dbCard = CardDatabaseManager::query().getCardInfo(card->getName());
         // Missing local card data is not evidence that a card is a token. Keep
         // its original name and quantity so the service analyzes the whole deck.
         if ((!dbCard || !dbCard->getIsToken()) && node->getName() != DECK_ZONE_MAYBEBOARD) {

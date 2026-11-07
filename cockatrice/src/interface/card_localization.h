@@ -72,7 +72,7 @@ inline QString displayNameFor(const QString &cardName)
     if (cardName.isEmpty()) {
         return cardName;
     }
-    const QString localizedName = displayName(CardDatabaseManager::query()->getCardInfo(cardName));
+    const QString localizedName = displayName(CardDatabaseManager::query().getCardInfo(cardName));
     return localizedName.isEmpty() ? cardName : localizedName;
 }
 } // namespace CardLocalization

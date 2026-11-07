@@ -133,7 +133,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 
     // The visual grid is a real view on a flattened model: one row per displayed
     // card picture, painted on demand.
-    visualDisplayModel = new CardDatabaseVisualDisplayModel(databaseDisplayModel, CardDatabaseManager::query(), this);
+    visualDisplayModel = new CardDatabaseVisualDisplayModel(databaseDisplayModel, &CardDatabaseManager::query(), this);
 
     cardView = new CardDatabaseVisualView(visualDisplayModel, this);
     cardView->setObjectName("visualCardView");
@@ -300,24 +300,24 @@ void VisualDatabaseDisplayWidget::onSearchModelChanged()
 
 void VisualDatabaseDisplayWidget::onSelectedCardChanged(const QString &cardName)
 {
-    emit cardHoveredDatabaseDisplay(CardDatabaseManager::query()->getPreferredCard(cardName));
+    emit cardHoveredDatabaseDisplay(CardDatabaseManager::query().getPreferredCard(cardName));
 }
 
 void VisualDatabaseDisplayWidget::actAddCard(const QString &cardName, const QString &zoneName)
 {
     highlightAllSearchEdit();
-    ExactCard exactCard = CardDatabaseManager::query()->getPreferredCard(cardName);
+    ExactCard exactCard = CardDatabaseManager::query().getPreferredCard(cardName);
     emit cardAdded(exactCard, zoneName);
 }
 
 void VisualDatabaseDisplayWidget::actDecrementCard(const QString &cardName, const QString &zoneName)
 {
-    ExactCard exactCard = CardDatabaseManager::query()->getPreferredCard(cardName);
+    ExactCard exactCard = CardDatabaseManager::query().getPreferredCard(cardName);
     emit cardDecremented(exactCard, zoneName);
 }
 
 void VisualDatabaseDisplayWidget::onRelatedCardClicked(const QString &relatedCard)
 {
-    ExactCard exactCard = CardDatabaseManager::query()->guessCard({relatedCard});
+    ExactCard exactCard = CardDatabaseManager::query().guessCard({relatedCard});
     emit cardInfoRequested(exactCard);
 }

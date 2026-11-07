@@ -12,7 +12,7 @@
 static constexpr int REBUILD_COALESCE_MS = 30;
 
 CardDatabaseVisualDisplayModel::CardDatabaseVisualDisplayModel(CardDatabaseDisplayModel *_displayModel,
-                                                               CardDatabaseQuerier *_querier,
+                                                               const CardDatabaseQuerier *_querier,
                                                                QObject *parent)
     : QAbstractListModel(parent), displayModel(_displayModel), querier(_querier)
 {

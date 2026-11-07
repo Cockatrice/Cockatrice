@@ -246,7 +246,7 @@ void TabCardArtRules::populateProviderCombo(const QString &cardName)
 {
     providerComboBox->clear();
 
-    auto card = CardDatabaseManager::query()->getCard({cardName});
+    auto card = CardDatabaseManager::query().getCard({cardName});
 
     const auto &sets = card.getInfo().getSets();
 

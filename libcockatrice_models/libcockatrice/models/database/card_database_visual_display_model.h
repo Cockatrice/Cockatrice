@@ -39,7 +39,7 @@ public:
      * @param parent Parent object.
      */
     explicit CardDatabaseVisualDisplayModel(CardDatabaseDisplayModel *_displayModel,
-                                            CardDatabaseQuerier *_querier,
+                                            const CardDatabaseQuerier *_querier,
                                             QObject *parent = nullptr);
 
     /**
@@ -81,7 +81,7 @@ private:
     void appendPrintingsFor(const CardInfoPtr &info);
 
     QPointer<CardDatabaseDisplayModel> displayModel;
-    CardDatabaseQuerier *querier;
+    const CardDatabaseQuerier *querier;
     QStringList setFilterTerms;
     QList<Entry> entries;
     QTimer rebuildTimer;

@@ -280,7 +280,7 @@ static bool doSwapCard(DeckListModel *model,
         return false;
     }
 
-    if (ExactCard card = CardDatabaseManager::query()->getCard({cardName, providerId})) {
+    if (ExactCard card = CardDatabaseManager::query().getCard({cardName, providerId})) {
         model->addCard(card, otherZone);
     } else {
         // Third argument (true) says create the card no matter what, even if not in DB
@@ -367,7 +367,7 @@ bool DeckStateManager::moveCardToZone(const QModelIndex &idx, const QString &tar
     }
 
     // Tokens only live in the tokens zone and cannot be moved into decks.
-    CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(cardName);
+    CardInfoPtr info = CardDatabaseManager::query().getCardInfo(cardName);
     if (info && info->getIsToken()) {
         return false;
     }
@@ -398,7 +398,7 @@ bool DeckStateManager::moveCardToZone(const QModelIndex &idx, const QString &tar
             return false;
         }
 
-        if (ExactCard card = CardDatabaseManager::query()->getCard({cardName, providerId})) {
+        if (ExactCard card = CardDatabaseManager::query().getCard({cardName, providerId})) {
             for (int i = 0; i < copies; ++i) {
                 model->addCard(card, targetZoneName);
             }

@@ -170,7 +170,7 @@ void DlgEditTokens::actAddToken()
         if (name.isEmpty()) {
             return;
         }
-        if (databaseModel->getDatabase()->query()->getCardInfo(name)) {
+        if (databaseModel->getDatabase()->query().getCardInfo(name)) {
             QMessageBox::critical(this, tr("Error"),
                                   tr("The chosen name conflicts with an existing card or token.\nMake sure to enable "
                                      "the 'Token' set in the \"Manage sets\" dialog to display them correctly."));

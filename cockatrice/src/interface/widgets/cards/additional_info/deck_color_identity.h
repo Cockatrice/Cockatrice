@@ -15,6 +15,6 @@ class DeckList;
  *
  * @param db Card database used to look up card color symbols.
  */
-QString getDeckColorIdentity(const DeckList &deck, const CardDatabaseQuerier *db);
+QString getDeckColorIdentity(const DeckList &deck, const CardDatabaseQuerier &db);
 
 #endif // COCKATRICE_DECK_COLOR_IDENTITY_H

@@ -274,7 +274,7 @@ void DeckPreviewWidget::syncFromModel()
 
     const CardRef bannerCardRef = data.deck.deckList.getBannerCard();
     const ExactCard bannerCard =
-        bannerCardRef.name.isEmpty() ? ExactCard() : CardDatabaseManager::query()->getCard(bannerCardRef);
+        bannerCardRef.name.isEmpty() ? ExactCard() : CardDatabaseManager::query().getCard(bannerCardRef);
 
     bannerCardDisplayWidget->setCard(bannerCard);
     refreshBannerCardText();
@@ -419,7 +419,7 @@ void DeckPreviewWidget::setBannerCard(int /* changedIndex */)
         return;
     }
     model->setBannerCard(r, cardRef);
-    bannerCardDisplayWidget->setCard(CardDatabaseManager::query()->getCard(cardRef));
+    bannerCardDisplayWidget->setCard(CardDatabaseManager::query().getCard(cardRef));
 }
 
 void DeckPreviewWidget::imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance)

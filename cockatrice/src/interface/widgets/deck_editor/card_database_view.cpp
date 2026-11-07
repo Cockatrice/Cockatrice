@@ -150,7 +150,7 @@ void CardDatabaseView::saveDbHeaderState()
 
 void CardDatabaseView::openCustomMenu(QPoint point)
 {
-    CardInfoPtr card = CardDatabaseManager::query()->getCardInfo(currentCardName());
+    CardInfoPtr card = CardDatabaseManager::query().getCardInfo(currentCardName());
 
     if (!card) {
         return;

@@ -264,7 +264,7 @@ Intent *IntentUrlParser::createOpenDeckIntent(const QUrlQuery &query, PendingInt
     // The open deck intent owns the context and the credential lookup; once
     // the chain finishes (or fails) it deletes the whole tree.
     auto openDeckIntent =
-        new IntentOpenSharedDeck(mainWindow->getTabSupervisor(), client, CardDatabaseManager::query(), std::move(ctx));
+        new IntentOpenSharedDeck(mainWindow->getTabSupervisor(), client, &CardDatabaseManager::query(), std::move(ctx));
     openDeckIntent->setParent(this);
     chain.intents.append(openDeckIntent);
     connect(openDeckIntent, &Intent::failed, this, [showError](const QString &reason) { showError(reason); });

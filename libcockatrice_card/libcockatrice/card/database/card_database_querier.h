@@ -7,10 +7,8 @@
 
 #include <QList>
 #include <QMap>
-#include <QObject>
 #include <QString>
 #include <QStringList>
-#include <qtmetamacros.h>
 
 class CardDatabase;
 class ICardPreferenceProvider;
@@ -232,8 +230,9 @@ private:
     mutable QMap<QString, int> subCardTypeCountsCache;
     mutable QMap<QString, int> formatsCountCache;
 
-private slots:
     void invalidateCaches();
+
+    friend class CardDatabase;
 };
 
 #endif // COCKATRICE_CARD_DATABASE_QUERIER_H

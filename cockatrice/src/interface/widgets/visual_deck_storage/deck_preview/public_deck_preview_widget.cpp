@@ -95,7 +95,7 @@ void PublicDeckPreviewWidget::setEntry(const RemotePublicDecksModel::DeckEntry &
     const ExactCard bannerCard =
         entry.bannerCardName.isEmpty()
             ? ExactCard()
-            : CardDatabaseManager::query()->getCard(CardRef{entry.bannerCardName, entry.bannerCardProvider});
+            : CardDatabaseManager::query().getCard(CardRef{entry.bannerCardName, entry.bannerCardProvider});
     bannerCardDisplayWidget->setCard(bannerCard);
 
     // The deck name is the overlay text on the banner, like the local preview.

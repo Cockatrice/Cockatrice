@@ -3,6 +3,7 @@
 
 #include "../set/card_set_list.h"
 #include "card_database_loader.h"
+#include "card_database_querier.h"
 
 // IWYU pragma: keep
 // CardDatabaseData is passed by value to the swapInDatabaseData() slot, and
@@ -18,7 +19,6 @@
 #include <QStringList>
 #include <qtmetamacros.h>
 
-class CardDatabaseQuerier;
 class ICardDatabasePathProvider;
 class ICardPreferenceProvider;
 class ICardSetPriorityController;
@@ -62,6 +62,7 @@ protected:
     /** @brief Querier for higher-level card lookups. */
     CardDatabaseQuerier querier;
 
+private:
     /**
      * @brief Refreshes the cached reverse-related cards for all cards.
      */
@@ -93,6 +94,11 @@ protected:
     /** @brief Mutexes for thread safety. */
     QBasicMutex *clearDatabaseMutex = new QBasicMutex(), *addCardMutex = new QBasicMutex(),
                 *removeCardMutex = new QBasicMutex();
+
+    /**
+     * @brief Invalidates the querier's cached count maps after the database contents change.
+     */
+    void invalidateQuerierCaches();
 
 public:
     /**
@@ -142,7 +148,7 @@ public:
     }
 
     /** @brief Returns the querier for performing card lookups. */
-    [[nodiscard]] CardDatabaseQuerier const &query() const
+    [[nodiscard]] const CardDatabaseQuerier &query() const
     {
         return querier;
     }
