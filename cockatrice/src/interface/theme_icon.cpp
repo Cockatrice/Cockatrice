@@ -28,45 +28,6 @@
 #include <QtGlobal>
 #include <utility>
 
-IconTint::IconTint(QPalette::ColorRole role) : paletteRole(role)
-{
-}
-
-IconTint::IconTint(AppColor::Role role) : source(Source::AppColor), appRole(role)
-{
-}
-
-QColor IconTint::resolve(QIcon::Mode mode) const
-{
-    if (source == Source::AppColor) {
-        // A disabled control must not keep signalling its semantic color.
-        if (mode == QIcon::Disabled) {
-            return qApp->palette().color(QPalette::Disabled, QPalette::WindowText);
-        }
-        // The three treatments paint the same tone: a line glyph, a badge disc
-        // and a sticker fill must not disagree on how saturated the role is.
-        // The fill treatments apply this floor themselves, so this only changes
-        // the line path, and only for the desaturated dark-scheme tones.
-        const QColor color = ThemeIconFill::saturated(themeManager->appColor(appRole));
-        if (mode != QIcon::Selected) {
-            return color;
-        }
-        // Selected rows paint their icon on the highlight colour. Keep the
-        // semantic tint when it stays legible there; otherwise the glyph would
-        // vanish into the selection.
-        constexpr double MIN_SELECTED_CONTRAST = 3.0;
-        const QColor highlight = qApp->palette().color(QPalette::Active, QPalette::Highlight);
-        return ThemeIconBadge::contrastRatio(color, highlight) >= MIN_SELECTED_CONTRAST
-                   ? color
-                   : qApp->palette().color(QPalette::Active, QPalette::HighlightedText);
-    }
-
-    const QPalette::ColorGroup group = mode == QIcon::Disabled ? QPalette::Disabled : QPalette::Active;
-    const QPalette::ColorRole effective =
-        mode == QIcon::Selected && paletteRole == QPalette::WindowText ? QPalette::HighlightedText : paletteRole;
-    return qApp->palette().color(group, effective);
-}
-
 namespace
 {
 /**
@@ -353,6 +314,45 @@ private:
     mutable bool hasIntrinsicSize = false;
 };
 } // namespace
+
+IconTint::IconTint(QPalette::ColorRole role) : paletteRole(role)
+{
+}
+
+IconTint::IconTint(AppColor::Role role) : source(Source::AppColor), appRole(role)
+{
+}
+
+QColor IconTint::resolve(QIcon::Mode mode) const
+{
+    if (source == Source::AppColor) {
+        // A disabled control must not keep signalling its semantic color.
+        if (mode == QIcon::Disabled) {
+            return qApp->palette().color(QPalette::Disabled, QPalette::WindowText);
+        }
+        // The three treatments paint the same tone: a line glyph, a badge disc
+        // and a sticker fill must not disagree on how saturated the role is.
+        // The fill treatments apply this floor themselves, so this only changes
+        // the line path, and only for the desaturated dark-scheme tones.
+        const QColor color = ThemeIconFill::saturated(themeManager->appColor(appRole));
+        if (mode != QIcon::Selected) {
+            return color;
+        }
+        // Selected rows paint their icon on the highlight colour. Keep the
+        // semantic tint when it stays legible there; otherwise the glyph would
+        // vanish into the selection.
+        constexpr double MIN_SELECTED_CONTRAST = 3.0;
+        const QColor highlight = qApp->palette().color(QPalette::Active, QPalette::Highlight);
+        return ThemeIconBadge::contrastRatio(color, highlight) >= MIN_SELECTED_CONTRAST
+                   ? color
+                   : qApp->palette().color(QPalette::Active, QPalette::HighlightedText);
+    }
+
+    const QPalette::ColorGroup group = mode == QIcon::Disabled ? QPalette::Disabled : QPalette::Active;
+    const QPalette::ColorRole effective =
+        mode == QIcon::Selected && paletteRole == QPalette::WindowText ? QPalette::HighlightedText : paletteRole;
+    return qApp->palette().color(group, effective);
+}
 
 QIcon loadThemedIcon(QStringView prefix, IconTint tint, IconStyle style)
 {

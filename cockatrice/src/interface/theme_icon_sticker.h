@@ -15,15 +15,14 @@
  * @brief Paints the sticker treatment of a `currentColor` glyph.
  *
  * The pre-#7595 add, remove and delete icons were filled shapes with a black
- * outline, not discs. A tint alone cannot bring that back: it produces a
- * hairline, and a badge disc would be a different icon language. The sticker
+ * outline and no disc. A tint alone cannot reproduce that: it produces a
+ * hairline, and a badge disc is a different icon language. The sticker
  * treatment rebuilds the look from the same sentinel art by drawing the glyph
  * twice, once with a dark outline and once with a vertical tone gradient on top.
  *
- * The trade-off is weight against crispness. A sticker is louder than a line,
- * which is what an add or a destructive action wants, but it needs a size where
- * the tone band is at least two device pixels wide. Callers opt in; navigation
- * and menus keep the line treatment.
+ * A sticker is louder than a line, which suits an add or a destructive action.
+ * It needs a size where the tone band is at least two device pixels wide.
+ * Callers opt in. Navigation and menus keep the line treatment.
  *
  * Everything here works in device pixels, like the badge treatment: the engine
  * renders at the size it already computed and attaches the device pixel ratio

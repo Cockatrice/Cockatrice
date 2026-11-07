@@ -14,19 +14,16 @@
 /**
  * @brief Paints the badge treatment of a `currentColor` glyph.
  *
- * A tint alone can say "positive" or "negative", but a 2px line at 16px reads as
- * a different thing from the filled badge art the UI used before the one-glyph
- * cutover. The badge treatment keeps that shape: a filled disc, a dark ring, and
- * a contrast glyph, all derived from the one tone the tint resolves to. So the
- * theme still owns the color, and callers only choose between a line and a
- * badge.
+ * A tint alone changes the color of a 2px line, but the UI drew ready and
+ * not-ready states as a filled badge before the one-glyph cutover. The badge
+ * treatment keeps that shape: a filled disc, a dark ring and a contrast glyph,
+ * all derived from the tone the tint resolves to. The theme still owns the
+ * color. Callers only choose between a line and a badge.
  *
- * The trade-off is fidelity against contrast. A badge is a small picture: it
- * survives a busy toolbar and a tinted row better than a hairline, and it can
- * carry a light or dark glyph independent of the surrounding text. In exchange
- * it costs more pixels of attention per control, and its glyph color follows the
- * scheme it is drawn for rather than the window's text color, so it is
- * deliberately not the palette's foreground.
+ * A badge survives a busy toolbar and a tinted row better than a hairline, and
+ * its glyph can be light or dark regardless of the surrounding text. The cost is
+ * more attention per control, and the glyph color follows the scheme it is drawn
+ * for instead of the window's text color.
  *
  * Everything here works in device pixels. The icon engine renders at the
  * device-pixel size it already computed and sets the pixmap's device pixel ratio

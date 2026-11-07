@@ -11,16 +11,15 @@
 /**
  * @brief Picks the two colors of a filled treatment's vertical gradient.
  *
- * The pre-#7595 icons were filled with a lighter top over a darker bottom, and
- * the semantic tones are tuned for text rather than for filling a whole shape:
- * the dark-scheme tones especially are deliberately desaturated, which reads
- * washed out once a disc or a glyph carries them. The badge and the sticker
- * therefore share one fill rule, so the two sit next to each other with the same
- * green or red.
+ * The pre-#7595 icons were filled with a lighter top over a darker bottom. The
+ * semantic tones are tuned for text, not for filling a whole shape; the
+ * dark-scheme tones in particular are desaturated and read washed out once a
+ * disc or a glyph carries them. The badge and the sticker share one fill rule so
+ * they sit next to each other with the same green or red.
  *
- * The rule needs no scheme switch of its own: a tone whose value is already high
- * is a dark-scheme tone, and its gradient is pulled down instead of up, because
- * filling a shape with a tone that light is what reads pale.
+ * The rule needs no scheme switch: a tone whose value is already high is a
+ * dark-scheme tone, so its gradient is pulled down. Filling a shape with a tone
+ * that light is what reads pale.
  */
 namespace ThemeIconFill
 {

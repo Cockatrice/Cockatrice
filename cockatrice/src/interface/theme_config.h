@@ -48,8 +48,8 @@ Q_ENUM_NS(Role)
  *        define one.
  *
  * Accent roles return an invalid QColor because ThemeManager derives them from
- * the palette highlight. Semantic roles return an opaque, scheme-appropriate
- * default so a theme written before the role existed still renders it sensibly.
+ * the palette highlight. Semantic roles return an opaque default that suits the
+ * scheme, so themes written before the role existed still render it.
  */
 QColor defaultAppColor(AppColor::Role role, bool dark);
 

@@ -19,22 +19,21 @@
 /**
  * @brief Selects how a `currentColor` glyph is painted.
  *
- * Style is a treatment, not a color: the tint still decides the tone, and the
- * style decides how much shape carries that tone.
+ * The tint decides the tone. The style decides how much shape carries it.
  *
- * Line is the default and the behavior every caller had before the axis
- * existed: the recolored glyph alone, at the author's stroke weight. It stays
- * the right choice for navigation, menu and toolbar glyphs, where a row of
- * badges would outshout the content.
+ * Line is the default and matches what every caller did before this axis
+ * existed: the recolored glyph alone, at the author's stroke weight. Use it for
+ * navigation, menu and toolbar glyphs, where a row of badges would compete with
+ * the content.
  *
  * Badge reproduces the pre-#7595 ready/not-ready art: a filled disc, a dark ring
- * and a contrast glyph derived from the tone. It costs attention as a filled
- * shape, so it is opt-in per call site and it is not a generic semantic
- * treatment: the add/remove/delete icons were filled glyphs with an outline and
- * no disc, so badging them would invent a look the UI never had. Authored art
- * that carries its own colors is never badged; it falls back to the asset path.
- * Disabled icons also fall back to the line glyph, because a filled disc at full
- * mass does not read as unavailable.
+ * and a contrast glyph derived from the tone. A filled shape draws more
+ * attention than a line, so it is opt-in per call site. It was made for the
+ * ready/not-ready icons. The add/remove/delete icons were filled glyphs with an
+ * outline and no disc, so badging them would produce art the UI never had.
+ * Authored art that carries its own colors is never badged and falls back to the
+ * asset path. Disabled icons fall back to the line glyph too, because a filled
+ * disc at full mass does not read as unavailable.
  *
  * Sticker reproduces the other half of the pre-#7595 set: the filled add, remove
  * and delete glyphs, painted with a tone gradient and a dark outline and no
@@ -42,9 +41,9 @@
  */
 enum class IconStyle
 {
-    Line,    // the recolored glyph alone
-    Badge,   // filled disc + dark ring + contrast glyph
-    Sticker, // filled glyph + dark outline, no disc
+    Line,    ///< the recolored glyph alone
+    Badge,   ///< filled disc + dark ring + contrast glyph
+    Sticker, ///< filled glyph + dark outline, no disc
 };
 
 /**
@@ -52,7 +51,7 @@ enum class IconStyle
  *
  * A palette role follows Qt's structural palette. An application color carries
  * meaning that QPalette cannot express, such as positive and negative states.
- * Callers pick the role by intent; the theme owns the concrete value.
+ * Callers choose the role. The active theme supplies the value.
  */
 class IconTint
 {
@@ -64,12 +63,11 @@ public:
     /**
      * @brief Resolves the concrete color for an icon mode.
      *
-     * Disabled application colors resolve to the disabled foreground so an
-     * unavailable control does not keep signalling its semantic color. Selected
-     * palette colors keep the existing WindowText -> HighlightedText swap.
-     * Application colors pass through the filled treatments' saturation floor,
-     * so a line glyph, a badge disc and a sticker fill carry the same tone
-     * instead of a pale line beside a saturated shape.
+     * A disabled application color resolves to the disabled foreground, so an
+     * unavailable control does not keep its semantic color. A selected palette
+     * color keeps the WindowText -> HighlightedText swap. Application colors go
+     * through the saturation floor shared by the filled treatments, so a line
+     * glyph, a badge disc and a sticker fill carry the same tone.
      */
     QColor resolve(QIcon::Mode mode) const;
 
@@ -98,8 +96,7 @@ private:
  *               extension (for example `icons/search`), matching themePixmap().
  * @param tint Color that replaces the sentinel: a palette role or a semantic
  *             application color. Defaults to WindowText.
- * @param style Treatment of the glyph: a line, or one of the filled treatments
- *              that keep the pre-migration art reading. Defaults to Line.
+ * @param style Treatment of the glyph: Line, Badge or Sticker. Defaults to Line.
  * @return An icon that follows the application palette.
  */
 QIcon loadThemedIcon(QStringView prefix, IconTint tint = {}, IconStyle style = IconStyle::Line);
@@ -115,9 +112,8 @@ QIcon loadThemedIcon(QStringView prefix, IconTint tint = {}, IconStyle style = I
  * @param tint Color that replaces the sentinel: a palette role or a semantic
  *             application color. Defaults to WindowText.
  * @param size Pixel size to render at; an empty size uses the SVG's intrinsic size.
- * @param style Treatment of the glyph: a line, or one of the filled treatments.
- *              A treatment on a non-sentinel asset stays null, like the line
- *              path.
+ * @param style Treatment of the glyph: Line, Badge or Sticker. A treatment on a
+ *              non-sentinel asset stays null, like the line path.
  * @return The recolored pixmap, or a null pixmap when the asset is not a
  *         sentinel-carrying SVG.
  */
