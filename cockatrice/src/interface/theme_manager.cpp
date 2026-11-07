@@ -660,12 +660,13 @@ QColor ThemeManager::appColor(AppColor::Role role) const
             // levels are the ink rule this series shipped, applied once here so
             // authored roles never get recomputed at paint time.
             const QPalette &palette = qApp->palette();
-            const QColor surface = palette.color(QPalette::Active, QPalette::Window);
-            const QColor ink =
-                ThemeIconInk::glyphInk(palette.color(QPalette::Active, QPalette::WindowText), surface, accent);
+            const QColor text = palette.color(QPalette::Active, QPalette::WindowText);
+            const QColor surface = ThemeIconInk::harderSurface(palette.color(QPalette::Active, QPalette::Window),
+                                                               palette.color(QPalette::Active, QPalette::Button), text);
+            const QColor ink = ThemeIconInk::glyphInk(text, surface, accent);
             switch (role) {
                 case AppColor::IconStrong:
-                    return ThemeIconInk::forEmphasis(accent, surface, IconEmphasis::Primary);
+                    return ThemeIconInk::forEmphasis(ink, surface, IconEmphasis::Primary);
                 case AppColor::IconSoft:
                     return ThemeIconInk::forEmphasis(ink, surface, IconEmphasis::Quiet);
                 case AppColor::Icon:
