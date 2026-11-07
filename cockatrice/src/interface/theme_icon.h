@@ -99,8 +99,8 @@ public:
      *
      * Application colors are returned verbatim: the theme author stores one
      * value per emphasis level, so the paint path does not rewrite it. The
-     * filled treatments apply their own saturation floor to a fill they have to
-     * carry; a line glyph keeps the author's color.
+     * filled treatments only shape that tone's value to give a shape depth; the
+     * hue and saturation stay the author's.
      *
      * Neutral label roles (WindowText, Text) resolve to icon ink rather than the
      * raw palette color: ThemeIconInk::glyphInk derives it from the accent and

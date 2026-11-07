@@ -31,6 +31,49 @@
 namespace
 {
 /**
+ * @brief The role an emphasis level selects inside a base role's family.
+ *
+ * The theme authors all three levels, so emphasis is a lookup instead of a
+ * color computation. Naming a variant (`IconStrong`, `PositiveSoft`) is an
+ * explicit request and keeps that role at every emphasis; only the base roles
+ * take part in the mapping. Accent roles have no neutral middle member, so they
+ * are always used as named.
+ */
+AppColor::Role emphasisRole(AppColor::Role role, IconEmphasis emphasis)
+{
+    switch (role) {
+        case AppColor::Icon:
+            return emphasis == IconEmphasis::Primary ? AppColor::IconStrong
+                   : emphasis == IconEmphasis::Quiet ? AppColor::IconSoft
+                                                     : AppColor::Icon;
+        case AppColor::Positive:
+            return emphasis == IconEmphasis::Primary ? AppColor::PositiveStrong
+                   : emphasis == IconEmphasis::Quiet ? AppColor::PositiveSoft
+                                                     : AppColor::Positive;
+        case AppColor::Negative:
+            return emphasis == IconEmphasis::Primary ? AppColor::NegativeStrong
+                   : emphasis == IconEmphasis::Quiet ? AppColor::NegativeSoft
+                                                     : AppColor::Negative;
+        default:
+            return role;
+    }
+}
+
+/**
+ * @brief The scheme the active application palette is painting for.
+ *
+ * The fill needs the surface scheme to choose the badge glyph ink, and it cannot
+ * read it from the tone: an authored quiet level is a dark color on the dark
+ * scheme too.
+ */
+ThemeIconFill::Scheme activeScheme()
+{
+    const QPalette &palette = qApp->palette();
+    return palette.color(QPalette::Active, QPalette::Window).lightness() < 128 ? ThemeIconFill::Scheme::Dark
+                                                                               : ThemeIconFill::Scheme::Light;
+}
+
+/**
  * @brief Reads an SVG through the `theme:` search path.
  */
 QByteArray readSvg(const QString &resolvedPath)
@@ -260,7 +303,7 @@ private:
         QByteArray variant;
         if (badge) {
             variant = QByteArrayLiteral("B|") + tone.name(QColor::HexRgb).toLatin1() + '|' +
-                      ThemeIconBadge::glyphColor(tone).name(QColor::HexRgb).toLatin1();
+                      ThemeIconBadge::glyphColor(tone, activeScheme()).name(QColor::HexRgb).toLatin1();
         } else if (sticker) {
             variant = QByteArrayLiteral("S|") + tone.name(QColor::HexRgb).toLatin1();
         } else if (resolvedHasSentinel) {
@@ -278,7 +321,7 @@ private:
         if (badge) {
             // Geometry is computed from the device-pixel size, and the ratio is
             // attached below like every other path.
-            pixmap = ThemeIconBadge::renderBadge(resolvedSvg, tone, pixelSize);
+            pixmap = ThemeIconBadge::renderBadge(resolvedSvg, tone, pixelSize, activeScheme());
         } else if (sticker) {
             pixmap = ThemeIconSticker::renderSticker(resolvedSvg, tone, pixelSize);
         } else if (resolvedHasSentinel) {
@@ -314,34 +357,6 @@ private:
     mutable bool hasIntrinsicSize = false;
 };
 
-/**
- * @brief The role an emphasis level selects inside a base role's family.
- *
- * The theme authors all three levels, so emphasis is a lookup instead of a
- * color computation. Naming a variant (`IconStrong`, `PositiveSoft`) is an
- * explicit request and keeps that role at every emphasis; only the base roles
- * take part in the mapping. Accent roles have no neutral middle member, so they
- * are always used as named.
- */
-AppColor::Role emphasisRole(AppColor::Role role, IconEmphasis emphasis)
-{
-    switch (role) {
-        case AppColor::Icon:
-            return emphasis == IconEmphasis::Primary ? AppColor::IconStrong
-                   : emphasis == IconEmphasis::Quiet ? AppColor::IconSoft
-                                                     : AppColor::Icon;
-        case AppColor::Positive:
-            return emphasis == IconEmphasis::Primary ? AppColor::PositiveStrong
-                   : emphasis == IconEmphasis::Quiet ? AppColor::PositiveSoft
-                                                     : AppColor::Positive;
-        case AppColor::Negative:
-            return emphasis == IconEmphasis::Primary ? AppColor::NegativeStrong
-                   : emphasis == IconEmphasis::Quiet ? AppColor::NegativeSoft
-                                                     : AppColor::Negative;
-        default:
-            return role;
-    }
-}
 } // namespace
 
 IconTint::IconTint(QPalette::ColorRole role, IconEmphasis _emphasis) : paletteRole(role), emphasis(_emphasis)
@@ -374,9 +389,9 @@ QColor IconTint::resolve(QIcon::Mode mode) const
             return palette.color(QPalette::Disabled, QPalette::WindowText);
         }
         // The theme authors one color per emphasis level, so the paint path
-        // uses the resolved role verbatim. The filled treatments apply their
-        // own saturation floor when a disc or a fill needs mass; a line glyph
-        // keeps the color the author picked.
+        // uses the resolved role verbatim. The filled treatments only shape the
+        // tone's value to give a disc or a fill depth; hue and saturation stay
+        // the author's.
         const QColor color = themeManager->appColor(emphasisRole(appRole, emphasis));
         if (mode != QIcon::Selected) {
             return color;
@@ -424,7 +439,7 @@ QPixmap loadSentinelSvgPixmap(const QString &resolvedPath, IconTint tint, const 
         if (canvas.isEmpty()) {
             canvas = QSvgRenderer(svg).defaultSize();
         }
-        return style == IconStyle::Badge ? ThemeIconBadge::renderBadge(svg, tone, canvas)
+        return style == IconStyle::Badge ? ThemeIconBadge::renderBadge(svg, tone, canvas, activeScheme())
                                          : ThemeIconSticker::renderSticker(svg, tone, canvas);
     }
 

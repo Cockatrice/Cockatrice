@@ -6,6 +6,8 @@
 #ifndef THEME_ICON_BADGE_H
 #define THEME_ICON_BADGE_H
 
+#include "theme_icon_fill.h"
+
 #include <QByteArray>
 #include <QColor>
 #include <QPixmap>
@@ -34,13 +36,17 @@ namespace ThemeIconBadge
 /**
  * @brief Glyph color for a badge disc.
  *
- * White on the light scheme, the saturated tone darkened to an outline-dark ink
+ * White on the light scheme, the authored tone darkened to an outline-dark ink
  * on the dark scheme. The dark-scheme tones fill the disc light enough that
  * white would sit near 2.7:1 at its top, so that scheme keeps the darkened ink
- * the badge had before the filled treatments shared a fill. The dark ink is
- * derived from the tone, so the theme keeps control of both ends.
+ * the badge had before the filled treatments shared a fill. The scheme is passed
+ * in rather than inferred from the tone, because an authored quiet level is a
+ * dark color on the dark scheme as well.
+ *
+ * @param tone Disc color, already resolved for the icon mode.
+ * @param scheme Scheme the badge is painted for.
  */
-QColor glyphColor(const QColor &tone);
+QColor glyphColor(const QColor &tone, ThemeIconFill::Scheme scheme);
 
 /** @brief Size of the engraved glyph for a badge of @p pixelSize, in device pixels. */
 QSize glyphSize(const QSize &pixelSize);
@@ -63,9 +69,10 @@ QSize glyphSize(const QSize &pixelSize);
  * @param tone Disc color, already resolved for the icon mode.
  * @param pixelSize Canvas size in device pixels; a non-square canvas centers
  *                  the badge and leaves the remaining area transparent.
+ * @param scheme Scheme the badge is painted for; selects the glyph ink.
  * @return The composited badge, or a null pixmap for empty or invalid input.
  */
-QPixmap renderBadge(const QByteArray &svg, const QColor &tone, const QSize &pixelSize);
+QPixmap renderBadge(const QByteArray &svg, const QColor &tone, const QSize &pixelSize, ThemeIconFill::Scheme scheme);
 } // namespace ThemeIconBadge
 
 #endif // THEME_ICON_BADGE_H
