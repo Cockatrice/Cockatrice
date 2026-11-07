@@ -859,6 +859,7 @@ TEST(IconStickerPreview, WritesPngsWhenRequested)
         {"increment", AppColor::Positive},
         {"decrement", AppColor::Negative},
         {"remove_row", AppColor::Negative},
+        {"delete", AppColor::Negative},
     };
     constexpr int SIZES[] = {15, 16, 24, 48};
     constexpr int CONTEXT_SIZE = 32;
@@ -888,7 +889,7 @@ TEST(IconStickerPreview, WritesPngsWhenRequested)
 
     const int logicalWidth = MARGIN + LABEL_WIDTH + static_cast<int>(std::size(SIZES)) * CELL_WIDTH + MARGIN;
     const int logicalHeight = MARGIN + 24 + 24 + static_cast<int>(std::size(stickered)) * GLYPH_BLOCK_HEIGHT + 24 + 24 +
-                              CONTEXT_SIZE + 46 + CONTEXT_SIZE + 46 + 20 + MARGIN;
+                              CONTEXT_SIZE + 46 + CONTEXT_SIZE + 46 + MARGIN;
     const QSize imageSize(qRound(logicalWidth * DPR), qRound(logicalHeight * DPR));
 
     for (const bool dark : {false, true}) {
@@ -977,12 +978,6 @@ TEST(IconStickerPreview, WritesPngsWhenRequested)
                 painter.drawText(QPointF(px, y + 8 + CONTEXT_SIZE + 12), QString::fromLatin1(FAMILY_LABELS[j]));
             }
         }
-
-        y += CONTEXT_SIZE + 46;
-        painter.drawText(
-            QPointF(MARGIN, y),
-            QStringLiteral(
-                "The clear-filter trash can keeps the line treatment; a sticker rim closes its lid at toolbar sizes."));
 
         painter.end();
         const QString path = QDir(outDir).absoluteFilePath(dark ? QStringLiteral("sticker-preview-dark.png")
