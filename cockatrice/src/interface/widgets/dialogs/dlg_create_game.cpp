@@ -1,6 +1,7 @@
 #include "dlg_create_game.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../interface/widgets/game_hosting/game_creation_options.h"
 #include "../interface/widgets/tabs/tab_room.h"
 #include "libcockatrice/protocol/pb/response.pb.h"
 #include "libcockatrice/protocol/pb/room_commands.pb.h"
@@ -287,31 +288,33 @@ void DlgCreateGame::actReset()
 
 void DlgCreateGame::actOK()
 {
-    Command_CreateGame cmd;
-    cmd.set_description(descriptionEdit->text().simplified().toStdString());
-    cmd.set_password(passwordEdit->text().toStdString());
-    cmd.set_max_players(maxPlayersEdit->value());
-    cmd.set_only_buddies(onlyBuddiesCheckBox->isChecked());
-    cmd.set_only_registered(onlyRegisteredCheckBox->isChecked());
-    cmd.set_spectators_allowed(spectatorsAllowedCheckBox->isChecked());
-    cmd.set_spectators_need_password(spectatorsNeedPasswordCheckBox->isChecked());
-    cmd.set_spectators_can_talk(spectatorsCanTalkCheckBox->isChecked());
-    cmd.set_spectators_see_everything(spectatorsSeeEverythingCheckBox->isChecked());
-    cmd.set_join_as_judge(createGameAsJudgeCheckBox->isChecked());
-    cmd.set_join_as_spectator(createGameAsSpectatorCheckBox->isChecked());
-    cmd.set_starting_life_total(startingLifeTotalEdit->value());
-    cmd.set_share_decklists_on_load(shareDecklistsOnLoadCheckBox->isChecked());
-    cmd.set_shuffle_players(shufflePlayersCheckBox->isChecked());
+    GameCreationOptions options;
+    options.description = descriptionEdit->text();
+    options.password = passwordEdit->text();
+    options.maxPlayers = maxPlayersEdit->value();
+    options.onlyBuddies = onlyBuddiesCheckBox->isChecked();
+    options.onlyRegistered = onlyRegisteredCheckBox->isChecked();
+    options.spectatorsAllowed = spectatorsAllowedCheckBox->isChecked();
+    options.spectatorsNeedPassword = spectatorsNeedPasswordCheckBox->isChecked();
+    options.spectatorsCanTalk = spectatorsCanTalkCheckBox->isChecked();
+    options.spectatorsSeeEverything = spectatorsSeeEverythingCheckBox->isChecked();
+    options.joinAsJudge = createGameAsJudgeCheckBox->isChecked();
+    options.joinAsSpectator = createGameAsSpectatorCheckBox->isChecked();
+    options.startingLifeTotal = startingLifeTotalEdit->value();
+    options.shareDecklistsOnLoad = shareDecklistsOnLoadCheckBox->isChecked();
+    options.shufflePlayers = shufflePlayersCheckBox->isChecked();
 
     auto _gameTypes = QString();
     QMapIterator<int, QRadioButton *> gameTypeCheckBoxIterator(gameTypeCheckBoxes);
     while (gameTypeCheckBoxIterator.hasNext()) {
         gameTypeCheckBoxIterator.next();
         if (gameTypeCheckBoxIterator.value()->isChecked()) {
-            cmd.add_game_type_ids(gameTypeCheckBoxIterator.key());
+            options.gameTypeIds.append(gameTypeCheckBoxIterator.key());
             _gameTypes += gameTypeCheckBoxIterator.value()->text() + ", ";
         }
     }
+
+    Command_CreateGame cmd = options.toCreateGameCommand();
 
     SettingsCache::instance().game().setRememberGameSettings(rememberGameSettings->isChecked());
     if (rememberGameSettings->isChecked()) {
