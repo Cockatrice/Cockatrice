@@ -48,11 +48,12 @@ if(NOT CMAKE_BUILD_TYPE)
   )
 endif()
 
-# ccache does not support MSVC and must not auto-engage on Windows
-# (it is installed unintentionally on the Windows CI runner).
-# NOTE: this keys off the target OS, so a mingw/Ninja configuration on Windows
-# also opts out of ccache even though the GNUCXX branch below supports it.
-if(USE_CCACHE AND NOT WIN32)
+# ccache drives MSVC too (since 4.7), but only when the compiler writes debug
+# information into the object file: /Zi and /ZI keep it in a shared PDB, and ccache
+# reports them as unsupported rather than risk a stale one. The MSVC flags below
+# therefore use /Z7. MSVC precompiled headers are cached as well, with the same
+# sloppiness the other toolchains need.
+if(USE_CCACHE)
   find_program(CCACHE_PROGRAM ccache)
   if(CCACHE_PROGRAM)
     # Support Unix Makefiles and Ninja
@@ -66,10 +67,10 @@ if(USE_CCACHE AND NOT WIN32)
     # check for every project on the machine, not just this one.
     execute_process(COMMAND ${CCACHE_PROGRAM} --set-config sloppiness=pch_defines,time_macros)
     message(STATUS "Found CCache ${CCACHE_PROGRAM}")
+  else()
+    # An explicit opt-in must not disappear silently.
+    message(STATUS "ccache requested but not found; building without a compiler cache")
   endif()
-elseif(USE_CCACHE AND WIN32)
-  # An explicit opt-in must not disappear silently on Windows.
-  message(STATUS "ccache disabled: not supported for the MSVC toolchain on Windows")
 endif()
 
 if(WIN32 OR USE_VCPKG)
@@ -174,8 +175,9 @@ if(MSVC) # Microsoft Visual C++ compiler
   # /utf-8             Set source file encoding and execution character set to UTF-8
   # /W4                Enable warning level 4
   # /Zc:__cplusplus    Enable correct __cplusplus reporting
-  # /Zi                Generate debugging information (Program Database, PDB)
-  set(CMAKE_CXX_FLAGS "/EHsc /MP /permissive- /utf-8 /W4 /Zc:__cplusplus /Zi")
+  # /Z7                Generate debugging information in each object file (ccache-cacheable)
+  #                    instead of a compiler-shared PDB, which ccache rejects
+  set(CMAKE_CXX_FLAGS "/EHsc /MP /permissive- /utf-8 /W4 /Zc:__cplusplus /Z7")
   # /O2                Balanced optimization
   # /MD                Link against the multi-threaded DLL runtime library (Release CRT)
   set(CMAKE_CXX_FLAGS_RELEASE "/O2 /MD")
