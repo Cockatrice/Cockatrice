@@ -448,7 +448,8 @@ QPixmap DropdownIconPixmapGenerator::generatePixmap(int height, bool expanded)
     // handing a DPR-1 bitmap to a label that would upscale and blur it on a 2x
     // display.
     const QString prefix = QStringLiteral("icons/") + (expanded ? "dropdown_expanded" : "dropdown_collapsed");
-    const QPixmap pixmap = loadThemedIcon(prefix).pixmap(QSize(height, height), qApp->devicePixelRatio());
+    const QPixmap pixmap =
+        loadThemedIcon(prefix, IconTint::quiet()).pixmap(QSize(height, height), qApp->devicePixelRatio());
     pmCache.insert(key, pixmap);
     return pixmap;
 }

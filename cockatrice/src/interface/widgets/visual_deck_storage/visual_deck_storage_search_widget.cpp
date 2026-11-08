@@ -27,9 +27,10 @@ VisualDeckStorageSearchWidget::VisualDeckStorageSearchWidget(QWidget *parent) : 
     searchBar = new QLineEdit(this);
     searchBar->setPlaceholderText(tr("Search by filename (or search expression)"));
     searchBar->setClearButtonEnabled(true);
-    searchBar->addAction(loadThemedIcon(QStringLiteral("icons/search")), QLineEdit::LeadingPosition);
+    searchBar->addAction(loadThemedIcon(QStringLiteral("icons/search"), IconTint::quiet()), QLineEdit::LeadingPosition);
 
-    auto help = searchBar->addAction(loadThemedIcon(QStringLiteral("icons/info")), QLineEdit::TrailingPosition);
+    auto help = searchBar->addAction(loadThemedIcon(QStringLiteral("icons/info"), IconTint::quiet()),
+                                     QLineEdit::TrailingPosition);
     connect(help, &QAction::triggered, this, [this] { createDeckSearchSyntaxHelpWindow(searchBar); });
 
     layout->addWidget(searchBar);

@@ -135,7 +135,8 @@ void SettingsView::setupUi()
     // Search bar
     searchEdit = new QLineEdit;
     searchEdit->setClearButtonEnabled(true);
-    searchEdit->addAction(loadThemedIcon(QStringLiteral("icons/search")), QLineEdit::LeadingPosition);
+    searchEdit->addAction(loadThemedIcon(QStringLiteral("icons/search"), IconTint::quiet()),
+                          QLineEdit::LeadingPosition);
     searchEdit->installEventFilter(this);
     connect(searchEdit, &QLineEdit::textChanged, this, &SettingsView::onSearchTextChanged);
     searchEdit->setObjectName("settingsSearchEdit");
