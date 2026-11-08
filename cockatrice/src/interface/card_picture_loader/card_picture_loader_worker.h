@@ -1,6 +1,8 @@
 #ifndef PICTURE_LOADER_WORKER_H
 #define PICTURE_LOADER_WORKER_H
 
+#include "card_picture_loader_request_queue.h"
+
 #include <QHash>
 #include <QLoggingCategory>
 #include <QObject>
@@ -154,7 +156,7 @@ private:
     QString cacheFilePath;                             ///< Path to persistent redirect cache file
     static constexpr int CacheTTLInDays = 30;          ///< Time-to-live for redirect cache entries (days)
     bool picDownload;                                  ///< Whether downloading images from network is enabled
-    QQueue<QPair<QUrl, QPointer<CardPictureLoaderWorkerWork>>> requestLoadQueue; ///< Queue of pending network requests
+    QQueue<CardPictureLoaderRequest> requestLoadQueue; ///< Queue of pending network requests
 
     QTimer requestTimer;                    ///< Timer to reset the request quota
     QTimer dispatchTimer;                   ///< Timer pacing individual network requests

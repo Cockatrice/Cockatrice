@@ -296,13 +296,11 @@ void CardPictureLoaderWorker::dispatchQueuedRequest()
     // allowance: dispatch their queued requests back-to-back, bounded by their 429 backoff and the
     // per-host in-flight cap so a large burst can't queue replies that time out before Qt opens a
     // connection for them.
+    for (const QUrl &cancelled : takeCancelledRequests(requestLoadQueue)) {
+        emit imageRequestSucceeded(cancelled);
+    }
     for (int i = 0; i < requestLoadQueue.size();) {
         const auto &request = requestLoadQueue.at(i);
-        if (!request.second) {
-            const auto cancelled = requestLoadQueue.takeAt(i);
-            emit imageRequestSucceeded(cancelled.first);
-            continue;
-        }
         // Dispatch decisions must key on the host the request will actually go to, not the URL that
         // merely redirects to it: a redirect learned after this URL was queued would otherwise
         // bypass the in-flight cap and drain the whole queue onto the target host unchecked.
@@ -379,14 +377,12 @@ void CardPictureLoaderWorker::updateTimerState()
 bool CardPictureLoaderWorker::processSingleRequest()
 {
     QDateTime now = QDateTime::currentDateTime();
+    for (const QUrl &cancelled : takeCancelledRequests(requestLoadQueue)) {
+        emit imageRequestSucceeded(cancelled);
+    }
     for (int i = 0; i < requestLoadQueue.size(); ++i) {
         // Copy the entry: takeAt(i) below erases within the list this reference points into.
         const auto request = requestLoadQueue.at(i);
-        if (!request.second) {
-            requestLoadQueue.removeAt(i--);
-            emit imageRequestSucceeded(request.first);
-            continue;
-        }
         // Resolve cached redirects so the rate-limit and allowance arithmetic keys on the host the
         // request will actually hit (see resolveCachedRedirect).
         const QUrl resolvedUrl = resolveCachedRedirect(request.first);

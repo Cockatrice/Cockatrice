@@ -55,14 +55,14 @@ inline DecodedImage readImage(QIODevice *device)
         QMovie movie(&buffer);
         movie.start();
         movie.stop();
-        return {movie.currentImage(), movie.lastErrorString()};
+        return DecodedImage{.image = movie.currentImage(), .error = movie.lastErrorString()};
     }
 
     QImageReader reader;
     reader.setDecideFormatFromContent(true);
     reader.setDevice(device);
     QImage image = reader.read();
-    return {image, image.isNull() ? reader.errorString() : QString()};
+    return DecodedImage{.image = image, .error = image.isNull() ? reader.errorString() : QString()};
 }
 } // namespace CardPictureLoaderImageFormats
 
