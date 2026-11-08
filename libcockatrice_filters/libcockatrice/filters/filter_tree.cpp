@@ -2,6 +2,7 @@
 
 #include "filter_card.h"
 #include "libcockatrice/card/card_localization.h"
+#include "libcockatrice/card/game_specific_terms.h"
 #include "libcockatrice/card/printing/printing_info.h"
 #include "libcockatrice/card/set/card_set.h"
 
@@ -477,6 +478,16 @@ bool FilterItem::acceptFormat(const CardInfoPtr &info) const
     return info->getLegalityProp(lowercaseTerm) == "legal";
 }
 
+bool FilterItem::acceptTag(const CardInfoPtr &info) const
+{
+    const QString stored = info->getProperty(Mtg::Tags);
+    if (stored.isEmpty()) {
+        return false;
+    }
+    // Tags are stored space-separated; match whole slugs, not substrings.
+    return stored.split(" ", Qt::SkipEmptyParts).contains(term.trimmed(), Qt::CaseInsensitive);
+}
+
 bool FilterItem::acceptLoyalty(const CardInfoPtr &info) const
 {
     const QString loyaltyString = info->getLoyalty();
@@ -576,6 +587,8 @@ bool FilterItem::acceptCardAttr(const CardInfoPtr &info,
             return acceptLoyalty(info);
         case CardFilter::AttrFormat:
             return acceptFormat(info);
+        case CardFilter::AttrTag:
+            return acceptTag(info);
         case CardFilter::AttrMainType:
             return acceptMainType(info);
         case CardFilter::AttrSubType:

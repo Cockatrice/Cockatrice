@@ -57,7 +57,8 @@ OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
     QList<OracleWizardPage *> pages;
 
     if (!isSpoilersOnly) {
-        pages << new IntroPage << new LoadSetsPage << new SaveSetsPage << new LoadTokensPage << new OutroPage;
+        pages << new IntroPage << new LoadSetsPage << new TagsPage << new SaveSetsPage << new LoadTokensPage
+              << new OutroPage;
     } else {
         pages << new LoadSpoilersPage << new OutroPage;
     }

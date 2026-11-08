@@ -25,6 +25,7 @@ set(oracle_SOURCES
     src/pagetemplates.cpp
     src/parsehelpers.cpp
     src/raw_json_scanner.cpp
+    src/tag_database.cpp
     ../cockatrice/src/client/settings/cache_settings.cpp
     ../cockatrice/src/client/settings/card_counter_settings.cpp
     ../cockatrice/src/client/settings/shortcuts_settings.cpp

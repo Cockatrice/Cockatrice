@@ -6,6 +6,7 @@
 #include "libcockatrice/card/relation/card_relation_type.h"
 #include "libcockatrice/interfaces/noop_card_set_priority_controller.h"
 #include "parsehelpers.h"
+#include "tag_database.h"
 
 #include <QChar>
 #include <QDebug>
@@ -521,6 +522,31 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
             properties.insert("coloridentity", colorIdentity);
         }
 
+        // Card tags: the source's own `tags` array is used when present (MTGJson
+        // may ship one eventually), then the configured tag database is joined in
+        // while the card's identifiers are still available. Stored space-separated
+        // so `tags:` can match each slug as a discrete token; slugs never contain
+        // whitespace.
+        QStringList tags;
+        for (const QJsonValue &tag : card.value("tags").toArray()) {
+            const QString tagSlug = tag.toString().trimmed().toLower();
+            if (!tagSlug.isEmpty() && !tags.contains(tagSlug)) {
+                tags.append(tagSlug);
+            }
+        }
+        if (tagDatabase) {
+            const QString oracleId = getJsonString(identifiers, "scryfallOracleId");
+            for (const QString &tagSlug : tagDatabase->tagsForCard(oracleId, name)) {
+                if (!tags.contains(tagSlug)) {
+                    tags.append(tagSlug);
+                }
+            }
+        }
+        if (!tags.isEmpty()) {
+            tags.sort();
+            properties.insert("tags", tags.join(" "));
+        }
+
         const auto &mainCardType = getMainCardType(card.value("types").toVariant().toStringList());
         if (mainCardType.isEmpty()) {
             qDebug() << "warning: no mainCardType for card:" << name;
@@ -667,6 +693,14 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
                             if (newPriority >= 0 && (currentPriority < 0 || newPriority < currentPriority)) {
                                 properties.insert(prop, thisCardPropertyValue);
                             }
+                        } else if (prop == "tags") {
+                            // Tags are oracle-level: union both faces instead of
+                            // concatenating them with the split-card separator.
+                            QStringList merged =
+                                (originalPropertyValue + " " + thisCardPropertyValue).split(" ", Qt::SkipEmptyParts);
+                            merged.removeDuplicates();
+                            merged.sort();
+                            properties.insert(prop, merged.join(" "));
                         } else {
                             properties.insert(prop,
                                               originalPropertyValue + splitCardPropSeparator + thisCardPropertyValue);
