@@ -1494,26 +1494,10 @@ Server_AbstractPlayer::cmdDumpZone(const Command_DumpZone &cmd, ResponseContaine
     return Response::RespOk;
 }
 
-Response::ResponseCode Server_AbstractPlayer::cmdRevealRandomCards(const Command_RevealRandomCards &cmd,
-                                                                   ResponseContainer &rc,
-                                                                   GameEventStorage &ges)
-{
-    if (cmd.number_of_cards() <= 0) {
-        return Response::RespInvalidData;
-    }
-    Command_RevealCards reveal;
-    reveal.set_zone_name(cmd.zone_name());
-    reveal.add_card_id(-2);
-    if (cmd.has_player_id()) {
-        reveal.set_player_id(cmd.player_id());
-    }
-    return cmdRevealCards(reveal, rc, ges, cmd.number_of_cards());
-}
-
-Response::ResponseCode Server_AbstractPlayer::cmdRevealCards(const Command_RevealCards &cmd,
-                                                             ResponseContainer & /*rc*/,
-                                                             GameEventStorage &ges,
-                                                             int randomCount)
+Response::ResponseCode Server_AbstractPlayer::resolveRevealZone(const std::string &zoneName,
+                                                                bool hasRecipient,
+                                                                int recipientId,
+                                                                Server_CardZone *&zone)
 {
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
@@ -1522,15 +1506,59 @@ Response::ResponseCode Server_AbstractPlayer::cmdRevealCards(const Command_Revea
         return Response::RespContextError;
     }
 
-    if (cmd.has_player_id()) {
-        Server_AbstractPlayer *otherPlayer = game->getPlayer(cmd.player_id());
-        if (!otherPlayer) {
-            return Response::RespNameNotFound;
-        }
+    if (hasRecipient && !game->getPlayer(recipientId)) {
+        return Response::RespNameNotFound;
     }
-    Server_CardZone *zone = zones.value(nameFromStdString(cmd.zone_name()));
+
+    zone = zones.value(nameFromStdString(zoneName));
     if (!zone) {
         return Response::RespNameNotFound;
+    }
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode Server_AbstractPlayer::cmdRevealRandomCards(const Command_RevealRandomCards &cmd,
+                                                                   ResponseContainer & /*rc*/,
+                                                                   GameEventStorage &ges)
+{
+    if (cmd.number_of_cards() <= 0) {
+        return Response::RespInvalidData;
+    }
+
+    Server_CardZone *zone = nullptr;
+    const Response::ResponseCode result =
+        resolveRevealZone(cmd.zone_name(), cmd.has_player_id(), cmd.player_id(), zone);
+    if (result != Response::RespOk) {
+        return result;
+    }
+
+    auto candidates = zone->getCards();
+    if (cmd.number_of_cards() > candidates.size()) {
+        return Response::RespContextError;
+    }
+
+    // Partial Fisher-Yates on a copy: each physical card can appear only once,
+    // and the hand's order and contents stay unchanged.
+    QList<Server_Card *> cardsToReveal;
+    for (int i = 0; i < cmd.number_of_cards(); ++i) {
+        const int selected = rng->rand(i, candidates.size() - 1);
+        candidates.swapItemsAt(i, selected);
+        cardsToReveal.append(candidates.at(i));
+    }
+
+    // -2 in the public event tells other participants only how many cards were revealed.
+    return revealCards(zone, cardsToReveal, {-2}, cmd.has_player_id(), cmd.player_id(), false, ges);
+}
+
+Response::ResponseCode
+Server_AbstractPlayer::cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+{
+    Server_CardZone *zone = nullptr;
+    const Response::ResponseCode result =
+        resolveRevealZone(cmd.zone_name(), cmd.has_player_id(), cmd.player_id(), zone);
+    if (result != Response::RespOk) {
+        return result;
     }
 
     QList<Server_Card *> cardsToReveal;
@@ -1550,18 +1578,11 @@ Response::ResponseCode Server_AbstractPlayer::cmdRevealCards(const Command_Revea
         //
         // This is to be compatible with clients supporting a single card_id
         // value, which send value -2 to request a random card.
-        if (randomCount <= 0 || randomCount > zone->getCards().size()) {
+        if (zone->getCards().isEmpty()) {
             return Response::RespContextError;
         }
 
-        // Partial Fisher-Yates on a copy: each physical card can appear only once,
-        // and the hand's order and contents stay unchanged. Legacy requests use one.
-        auto candidates = zone->getCards();
-        for (int i = 0; i < randomCount; ++i) {
-            const int selected = rng->rand(i, candidates.size() - 1);
-            candidates.swapItemsAt(i, selected);
-            cardsToReveal.append(candidates.at(i));
-        }
+        cardsToReveal.append(zone->getCards().at(rng->rand(0, zone->getCards().size() - 1)));
     } else {
         for (auto cardId : cmd.card_id()) {
             Server_Card *card = zone->getCard(cardId);
@@ -1572,15 +1593,28 @@ Response::ResponseCode Server_AbstractPlayer::cmdRevealCards(const Command_Revea
         }
     }
 
+    const QList<int> cardIdsForOthers(cmd.card_id().begin(), cmd.card_id().end());
+    return revealCards(zone, cardsToReveal, cardIdsForOthers, cmd.has_player_id(), cmd.player_id(),
+                       cmd.grant_write_access(), ges);
+}
+
+Response::ResponseCode Server_AbstractPlayer::revealCards(Server_CardZone *zone,
+                                                          const QList<Server_Card *> &cardsToReveal,
+                                                          const QList<int> &cardIdsForOthers,
+                                                          bool hasRecipient,
+                                                          int recipientId,
+                                                          bool grantWriteAccess,
+                                                          GameEventStorage &ges)
+{
     Event_RevealCards eventOthers;
-    eventOthers.set_grant_write_access(cmd.grant_write_access());
+    eventOthers.set_grant_write_access(grantWriteAccess);
     eventOthers.set_zone_name(zone->getName().toStdString());
     eventOthers.set_number_of_cards(cardsToReveal.size());
-    for (auto cardId : cmd.card_id()) {
+    for (int cardId : cardIdsForOthers) {
         eventOthers.add_card_id(cardId);
     }
-    if (cmd.has_player_id()) {
-        eventOthers.set_other_player_id(cmd.player_id());
+    if (hasRecipient) {
+        eventOthers.set_other_player_id(recipientId);
     }
 
     Event_RevealCards eventPrivate(eventOthers);
@@ -1617,19 +1651,19 @@ Response::ResponseCode Server_AbstractPlayer::cmdRevealCards(const Command_Revea
         }
     }
 
-    if (cmd.has_player_id()) {
-        if (cmd.grant_write_access()) {
-            zone->addWritePermission(cmd.player_id());
+    if (hasRecipient) {
+        if (grantWriteAccess) {
+            zone->addWritePermission(recipientId);
         }
 
         if (isJudge()) {
             ges.setOverwriteOwnership(true);
         }
 
-        ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, cmd.player_id());
+        ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, recipientId);
         ges.enqueueGameEvent(eventOthers, playerId, GameEventStorageItem::SendToOthers);
     } else {
-        if (cmd.grant_write_access()) {
+        if (grantWriteAccess) {
             const QList<int> &participantIds = game->getParticipants().keys();
             for (int anyParticipantId : participantIds) {
                 zone->addWritePermission(anyParticipantId);

@@ -175,7 +175,7 @@ public:
     virtual Response::ResponseCode
     cmdDumpZone(const Command_DumpZone &cmd, ResponseContainer &rc, GameEventStorage &ges);
     virtual Response::ResponseCode
-    cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer &rc, GameEventStorage &ges, int randomCount = 1);
+    cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer &rc, GameEventStorage &ges);
     virtual Response::ResponseCode
     cmdRevealRandomCards(const Command_RevealRandomCards &cmd, ResponseContainer &rc, GameEventStorage &ges);
     virtual Response::ResponseCode

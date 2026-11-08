@@ -95,7 +95,8 @@ protected:
         player = game->getPlayer(0);
         hand = player->getZones().value(ZoneNames::HAND);
         for (int i = 0; i < 4; ++i) {
-            hand->insertCard(new Server_Card({"Twin", QString::number(i)}, player->newCardId(), i, 0), -1, 0);
+            hand->insertCard(
+                new Server_Card({.name = "Twin", .providerId = QString::number(i)}, player->newCardId(), i, 0), -1, 0);
         }
     }
 

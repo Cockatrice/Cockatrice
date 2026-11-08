@@ -400,8 +400,7 @@ Response::ResponseCode Server_AbstractParticipant::cmdDumpZone(const Command_Dum
 
 Response::ResponseCode Server_AbstractParticipant::cmdRevealCards(const Command_RevealCards & /*cmd*/,
                                                                   ResponseContainer & /*rc*/,
-                                                                  GameEventStorage & /*ges*/,
-                                                                  int /*randomCount*/)
+                                                                  GameEventStorage & /*ges*/)
 {
     return Response::RespFunctionNotAllowed;
 }
