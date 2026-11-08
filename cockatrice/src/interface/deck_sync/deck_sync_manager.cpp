@@ -321,6 +321,7 @@ void DeckSyncManager::startSync(bool _autoRun)
     sessionDefault = -1;
     firstSyncRun = false;
     pendingServerTime = -1;
+    serverChangeSkipped = false;
     emit syncStarted();
     emit statusMessage(tr("Scanning local decks..."));
 
@@ -426,7 +427,6 @@ void DeckSyncManager::onCheckFinished(const Response &response, const CommandCon
         return;
     }
 
-    pendingServerTime = status.has_server_time() ? static_cast<qint64>(status.server_time()) : -1;
     unchangedCount = localFiles.size();
     emit statusMessage(tr("Decks are already in sync."));
     finishSync();
@@ -641,6 +641,10 @@ void DeckSyncManager::classify(const QMap<int, ServerFile> &serverFiles)
                 const QString backupPath =
                     absolutePath + BACKUP_SUFFIX + QString::number(QDateTime::currentDateTime().toSecsSinceEpoch());
                 if (!QFile::copy(absolutePath, backupPath) || !QFile::remove(absolutePath)) {
+                    // The server row is gone but the local file could not be
+                    // removed. Keep the baseline so the next check still reports
+                    // the delete instead of hiding it behind a newer sync time.
+                    serverChangeSkipped = true;
                     ++skippedCount;
                     continue;
                 }
@@ -1249,6 +1253,7 @@ void DeckSyncManager::onDownloadFinished(const Response &response,
         return;
     }
     if (response.response_code() != Response::RespOk) {
+        serverChangeSkipped = true;
         ++skippedCount;
         processNext();
         return;
@@ -1275,6 +1280,7 @@ void DeckSyncManager::applyDownloadedDeck(const QString &relativePath,
 {
     DeckList deck;
     if (!deck.loadFromString_Native(deckString)) {
+        serverChangeSkipped = true;
         ++skippedCount;
         processNext();
         return;
@@ -1283,6 +1289,7 @@ void DeckSyncManager::applyDownloadedDeck(const QString &relativePath,
     const QString cleanDeckPath = QDir::cleanPath(deckPath);
     const QString absolutePath = QDir::cleanPath(deckPath + "/" + relativePath);
     if (absolutePath != cleanDeckPath && !absolutePath.startsWith(cleanDeckPath + "/")) {
+        serverChangeSkipped = true;
         ++skippedCount;
         processNext();
         return;
@@ -1291,6 +1298,7 @@ void DeckSyncManager::applyDownloadedDeck(const QString &relativePath,
         const QString backupPath =
             absolutePath + BACKUP_SUFFIX + QString::number(QDateTime::currentDateTime().toSecsSinceEpoch());
         if (!QFile::copy(absolutePath, backupPath)) {
+            serverChangeSkipped = true;
             ++skippedCount;
             processNext();
             return;
@@ -1298,6 +1306,7 @@ void DeckSyncManager::applyDownloadedDeck(const QString &relativePath,
     }
     QDir().mkpath(QFileInfo(absolutePath).absolutePath());
     if (!DeckLoader::saveToFile(deck, absolutePath, DeckFileFormat::Cockatrice)) {
+        serverChangeSkipped = true;
         ++skippedCount;
         processNext();
         return;
@@ -1406,7 +1415,10 @@ void DeckSyncManager::finishSync()
 {
     syncing = false;
     DeckSyncSidecar sidecar(sidecarPath);
-    if (sidecar.load()) {
+    if (sidecar.load() && !serverChangeSkipped) {
+        // Advance the baseline only when every server change was applied. If one
+        // was skipped, keep the previous baseline so the next check reports it
+        // again instead of hiding it behind a newer sync time.
         sidecar.lastSyncSecs =
             pendingServerTime >= 0 ? pendingServerTime : QDateTime::currentDateTime().toSecsSinceEpoch();
         sidecar.save();

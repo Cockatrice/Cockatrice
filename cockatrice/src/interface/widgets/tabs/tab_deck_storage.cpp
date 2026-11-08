@@ -283,6 +283,7 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     connect(&SettingsCache::instance().deckSync(), &DeckSyncSettings::syncIntervalMinutesChanged, syncManager,
             &DeckSyncManager::setSyncIntervalMinutes);
     connect(syncManager, &DeckSyncManager::statusMessage, this, &TabDeckStorage::onSyncStatusMessage);
+    connect(syncManager, &DeckSyncManager::syncStarted, this, &TabDeckStorage::onSyncStarted);
     connect(syncManager, &DeckSyncManager::syncFinished, this, &TabDeckStorage::onSyncFinished);
     connect(syncManager, &DeckSyncManager::firstSyncDetected, this, &TabDeckStorage::onFirstSyncDetected);
     connect(syncManager, &DeckSyncManager::conflictRequest, this, &TabDeckStorage::onConflictRequest);
@@ -656,9 +657,19 @@ void TabDeckStorage::onSyncStatusMessage(const QString &message)
     renderSyncStatus();
 }
 
+void TabDeckStorage::onSyncStarted()
+{
+    // An auto run starts from the watcher or the interval timer, so the button
+    // has to follow the manager: a click during a run would be dropped by
+    // syncNow() and leave the user pressing a button that looks live.
+    aSyncNow->setEnabled(false);
+    aSyncReset->setEnabled(false);
+}
+
 void TabDeckStorage::onSyncFinished(const SyncSummary &summary, const QString &error)
 {
     aSyncNow->setEnabled(remoteEnabled);
+    aSyncReset->setEnabled(remoteEnabled);
     if (!error.isEmpty()) {
         syncStatusType = SyncStatusType::Failed;
         syncStatusDetail = error;

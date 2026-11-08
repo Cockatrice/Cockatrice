@@ -255,6 +255,7 @@ private:
     int removedCount = 0;
     int unchangedCount = 0;
     int skippedCount = 0;
+    bool serverChangeSkipped = false; ///< A server change could not be applied; keep the sync baseline.
     int conflictCount = 0;
     bool autoRun = false;
 };
