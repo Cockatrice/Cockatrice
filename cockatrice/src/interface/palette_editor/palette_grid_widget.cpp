@@ -61,8 +61,10 @@ static const QMap<QPalette::ColorRole, const char *> ROLE_DESCRIPTIONS = {
 };
 
 static const QMap<AppColor::Role, const char *> APP_ROLE_DESCRIPTIONS = {
-    {AppColor::AccentStrong, QT_TR_NOOP("Vivid primary accent (e.g. home-tab button gradient start)")},
-    {AppColor::AccentSoft, QT_TR_NOOP("Lightened, desaturated accent (e.g. home-tab button gradient end)")},
+    {AppColor::AccentStrong,
+     QT_TRANSLATE_NOOP("PaletteGridWidget", "Vivid primary accent (e.g. home-tab button gradient start)")},
+    {AppColor::AccentSoft,
+     QT_TRANSLATE_NOOP("PaletteGridWidget", "Lightened, desaturated accent (e.g. home-tab button gradient end)")},
     {AppColor::Positive,
      QT_TRANSLATE_NOOP("PaletteGridWidget", "Positive state and additive actions (ready, add, increment)")},
     {AppColor::Negative,

@@ -256,7 +256,11 @@ private:
         // variant is never a bare digit, so the key spaces cannot collide. A
         // badge also varies by glyph color, because the same tone can switch
         // between a white and a near-black glyph at different lightnesses.
-        const QColor tone = resolvedHasSentinel ? tint.resolve(mode) : QColor();
+        // The selected-row contrast fallback exists for a thin glyph painted
+        // directly on the highlight. A badge or sticker brings its own ring and
+        // contrast glyph, so repainting its whole tone with HighlightedText
+        // would collapse every badge on a selected row into one gray disc.
+        const QColor tone = resolvedHasSentinel ? tint.resolve(treated ? QIcon::Normal : mode) : QColor();
         QByteArray variant;
         if (badge) {
             variant = QByteArrayLiteral("B|") + tone.name(QColor::HexRgb).toLatin1() + '|' +
