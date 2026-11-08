@@ -116,6 +116,7 @@ void DeckSyncManager::syncNow()
     skippedCount = 0;
     pendingUploads.clear();
     pendingDownloads.clear();
+    plannedLocalPaths.clear();
     ensuredDirs.clear();
     ensuredDirs.insert(QString());
     localFiles.clear();
@@ -188,6 +189,10 @@ void DeckSyncManager::onListFinished(const Response &response, const CommandCont
     if (!syncing) {
         return;
     }
+    if (response.response_code() == Response::RespNotConnected) {
+        failSync(tr("Server connection lost."));
+        return;
+    }
     if (response.response_code() != Response::RespOk) {
         failSync(tr("Could not read server decks."));
         return;
@@ -219,6 +224,24 @@ void DeckSyncManager::onListFinished(const Response &response, const CommandCont
         }
     }
     QSet<int> matchedServerIds;
+    QMap<QString, int> identityByLocal;
+
+    // Pass 1: claim every row a sidecar names before any guess runs. In a single
+    // pass a content or path match could take the row another local file still
+    // identifies by id or guid, turning an unchanged deck into a duplicate.
+    for (auto it = localFiles.begin(); it != localFiles.end(); ++it) {
+        const DeckSyncRecord sidecarRecord = sidecar.get(it.key());
+        int serverId = -1;
+        if (sidecarRecord.remoteId != -1 && serverFiles.contains(sidecarRecord.remoteId)) {
+            serverId = sidecarRecord.remoteId;
+        } else if (!sidecarRecord.guid.isEmpty() && serverIdByGuid.contains(sidecarRecord.guid)) {
+            serverId = serverIdByGuid.value(sidecarRecord.guid);
+        }
+        if (serverId != -1 && !matchedServerIds.contains(serverId)) {
+            matchedServerIds.insert(serverId);
+            identityByLocal.insert(it.key(), serverId);
+        }
+    }
 
     // A local file without a usable sidecar record still usually has a server
     // counterpart: rows are named after the deck, so compare content rather than
@@ -235,14 +258,10 @@ void DeckSyncManager::onListFinished(const Response &response, const CommandCont
         return -1;
     };
 
+    // Pass 2: resolve the remaining files by content, then path, and queue work.
     for (auto it = localFiles.begin(); it != localFiles.end(); ++it) {
-        const DeckSyncRecord sidecarRecord = sidecar.get(it.key());
-        int serverId = -1;
-        if (sidecarRecord.remoteId != -1 && serverFiles.contains(sidecarRecord.remoteId)) {
-            serverId = sidecarRecord.remoteId;
-        } else if (!sidecarRecord.guid.isEmpty() && serverIdByGuid.contains(sidecarRecord.guid)) {
-            serverId = serverIdByGuid.value(sidecarRecord.guid);
-        } else {
+        int serverId = identityByLocal.value(it.key(), -1);
+        if (serverId == -1) {
             // Content first: a row with the same deck is unambiguous, while a
             // matching file name may belong to a different deck entirely.
             serverId = unmatchedByHash(it.value().hash);
@@ -310,6 +329,7 @@ void DeckSyncManager::onListFinished(const Response &response, const CommandCont
             ++skippedCount;
             continue;
         }
+        plannedLocalPaths.insert(relativePath);
         pendingDownloads.append(DownloadOp{.relativePath = relativePath,
                                            .deckId = it.value().id,
                                            .guid = it.value().guid,
@@ -381,6 +401,10 @@ void DeckSyncManager::onEnsureDirFinished(const Response &response,
     if (!syncing) {
         return;
     }
+    if (response.response_code() == Response::RespNotConnected) {
+        failSync(tr("Server connection lost."));
+        return;
+    }
     if (response.response_code() != Response::RespOk) {
         failSync(tr("Could not create server folder."));
         return;
@@ -408,7 +432,9 @@ void DeckSyncManager::sendUpload(const UploadOp &op)
         processNext();
         return;
     }
-    const QString deckString = loaded->deckList.writeToString_Native();
+    // Collection sync compares and uploads the same timestamp-free string, so the
+    // server's contentHash() of what it stores matches getContentHash() locally.
+    const QString deckString = loaded->deckList.writeToString_Native(false);
     if (deckString.length() > MAX_FILE_LENGTH) {
         ++skippedCount;
         processNext();
@@ -437,6 +463,10 @@ void DeckSyncManager::onUploadFinished(const Response &response,
                                        const QVariant &extraData)
 {
     if (!syncing) {
+        return;
+    }
+    if (response.response_code() == Response::RespNotConnected) {
+        failSync(tr("Server connection lost."));
         return;
     }
     const QString relativePath = extraData.toString();
@@ -477,7 +507,12 @@ void DeckSyncManager::onUploadFinished(const Response &response,
 
 QString DeckSyncManager::uniqueLocalPath(const QString &relativePath) const
 {
-    if (!QFileInfo(deckPath + "/" + relativePath).exists()) {
+    // Planned paths are not on disk yet, so the set keeps two downloads from
+    // being queued into the same file during one run.
+    auto isTaken = [this](const QString &path) {
+        return plannedLocalPaths.contains(path) || QFileInfo(deckPath + "/" + path).exists();
+    };
+    if (!isTaken(relativePath)) {
         return relativePath;
     }
     QString base = relativePath;
@@ -486,7 +521,7 @@ QString DeckSyncManager::uniqueLocalPath(const QString &relativePath) const
     }
     for (int i = 2; i < 1000; ++i) {
         const QString candidate = base + " (" + QString::number(i) + ").cod";
-        if (!QFileInfo(deckPath + "/" + candidate).exists()) {
+        if (!isTaken(candidate)) {
             return candidate;
         }
     }
@@ -512,11 +547,17 @@ void DeckSyncManager::onDownloadFinished(const Response &response,
         return;
     }
     const QString relativePath = extraData.toString();
+    int deckId = -1;
     for (int i = 0; i < pendingDownloads.size(); ++i) {
         if (pendingDownloads.at(i).relativePath == relativePath) {
+            deckId = pendingDownloads.at(i).deckId;
             pendingDownloads.removeAt(i);
             break;
         }
+    }
+    if (response.response_code() == Response::RespNotConnected) {
+        failSync(tr("Server connection lost."));
+        return;
     }
     if (response.response_code() != Response::RespOk) {
         ++skippedCount;
@@ -558,6 +599,9 @@ void DeckSyncManager::onDownloadFinished(const Response &response,
     DeckSyncSidecar sidecar(sidecarPath);
     sidecar.load();
     DeckSyncRecord record = sidecar.get(relativePath);
+    if (deckId != -1) {
+        record.remoteId = deckId;
+    }
     if (!download.guid().empty()) {
         record.guid = QString::fromStdString(download.guid());
     }

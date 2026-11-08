@@ -95,8 +95,10 @@ public:
          * @brief Writes the deck metadata section of a Cockatrice deck XML file.
          *
          * @param xml Writer to append the metadata elements to.
+         * @param includeLastLoadedTimestamp Whether to write lastLoadedTimestamp. Collection sync
+         *        excludes it, since it changes every time a deck is opened.
          */
-        void write(QXmlStreamWriter *xml) const;
+        void write(QXmlStreamWriter *xml, bool includeLastLoadedTimestamp = true) const;
     };
 
 private:
@@ -244,10 +246,15 @@ public:
     /** @name Serialization (XML) */
     ///@{
     bool readElement(QXmlStreamReader *xml);
-    void write(QXmlStreamWriter *xml) const;
+    void write(QXmlStreamWriter *xml, bool includeLastLoadedTimestamp = true) const;
     bool loadFromXml(QXmlStreamReader *xml);
     bool loadFromString_Native(const QString &nativeString);
-    QString writeToString_Native() const;
+    /**
+     * @brief Serialises the deck to a Cockatrice native XML string.
+     * @param includeLastLoadedTimestamp Whether to write lastLoadedTimestamp. Pass false for
+     *        content comparisons, so opening a deck does not change its identity.
+     */
+    QString writeToString_Native(bool includeLastLoadedTimestamp = true) const;
     bool loadFromFile_Native(QIODevice *device);
     bool saveToFile_Native(QIODevice *device) const;
     ///@}
@@ -305,7 +312,12 @@ public:
      * peers compare the same bytes.
      */
     static QString contentHash(const QString &nativeDeck);
-    /** @brief contentHash() of this deck's native serialisation. */
+    /**
+     * @brief contentHash() of this deck's native serialisation, without lastLoadedTimestamp.
+     *
+     * Opening a deck rewrites that timestamp, so hashing it would make every played deck
+     * look modified to the server.
+     */
     QString getContentHash() const;
     void refreshDeckHash();
     ///@}

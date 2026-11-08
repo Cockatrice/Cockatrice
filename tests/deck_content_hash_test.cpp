@@ -19,7 +19,21 @@ TEST(DeckContentHashTest, MatchesNativeSerialisation)
 {
     DeckList deck;
     ASSERT_TRUE(deck.loadFromString_Native(deckWithName(QStringLiteral("Burn"))));
-    EXPECT_EQ(deck.getContentHash(), DeckList::contentHash(deck.writeToString_Native()));
+    // Content identity skips lastLoadedTimestamp: opening a deck rewrites it.
+    EXPECT_EQ(deck.getContentHash(), DeckList::contentHash(deck.writeToString_Native(false)));
+}
+
+TEST(DeckContentHashTest, IgnoresLastLoadedTimestamp)
+{
+    DeckList first;
+    DeckList second;
+    ASSERT_TRUE(first.loadFromString_Native(deckWithName(QStringLiteral("Burn"))));
+    ASSERT_TRUE(second.loadFromString_Native(deckWithName(QStringLiteral("Burn"))));
+    first.setLastLoadedTimestamp(QStringLiteral("2026-01-01T00:00:00"));
+    second.setLastLoadedTimestamp(QStringLiteral("2026-11-08T12:34:56"));
+
+    EXPECT_NE(first.writeToString_Native(), second.writeToString_Native());
+    EXPECT_EQ(first.getContentHash(), second.getContentHash());
 }
 
 TEST(DeckContentHashTest, IsStableAcrossLoads)

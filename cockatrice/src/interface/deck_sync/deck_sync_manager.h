@@ -137,6 +137,7 @@ private:
     QString sidecarPath;
     QMap<QString, LocalFile> localFiles;
     QSet<QString> ensuredDirs;
+    QSet<QString> plannedLocalPaths; ///< Download targets reserved during this run, not yet on disk.
     QList<UploadOp> pendingUploads;
     QList<DownloadOp> pendingDownloads;
     int uploadedCount = 0;
