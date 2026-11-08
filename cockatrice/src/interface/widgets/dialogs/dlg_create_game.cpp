@@ -15,6 +15,7 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QLineEdit>
+#include <QList>
 #include <QMapIterator>
 #include <QMessageBox>
 #include <QPushButton>
@@ -288,31 +289,34 @@ void DlgCreateGame::actReset()
 
 void DlgCreateGame::actOK()
 {
-    GameCreationOptions options;
-    options.description = descriptionEdit->text();
-    options.password = passwordEdit->text();
-    options.maxPlayers = maxPlayersEdit->value();
-    options.onlyBuddies = onlyBuddiesCheckBox->isChecked();
-    options.onlyRegistered = onlyRegisteredCheckBox->isChecked();
-    options.spectatorsAllowed = spectatorsAllowedCheckBox->isChecked();
-    options.spectatorsNeedPassword = spectatorsNeedPasswordCheckBox->isChecked();
-    options.spectatorsCanTalk = spectatorsCanTalkCheckBox->isChecked();
-    options.spectatorsSeeEverything = spectatorsSeeEverythingCheckBox->isChecked();
-    options.joinAsJudge = createGameAsJudgeCheckBox->isChecked();
-    options.joinAsSpectator = createGameAsSpectatorCheckBox->isChecked();
-    options.startingLifeTotal = startingLifeTotalEdit->value();
-    options.shareDecklistsOnLoad = shareDecklistsOnLoadCheckBox->isChecked();
-    options.shufflePlayers = shufflePlayersCheckBox->isChecked();
-
     auto _gameTypes = QString();
+    QList<int> gameTypeIds;
     QMapIterator<int, QRadioButton *> gameTypeCheckBoxIterator(gameTypeCheckBoxes);
     while (gameTypeCheckBoxIterator.hasNext()) {
         gameTypeCheckBoxIterator.next();
         if (gameTypeCheckBoxIterator.value()->isChecked()) {
-            options.gameTypeIds.append(gameTypeCheckBoxIterator.key());
+            gameTypeIds.append(gameTypeCheckBoxIterator.key());
             _gameTypes += gameTypeCheckBoxIterator.value()->text() + ", ";
         }
     }
+
+    GameCreationOptions options{
+        .description = descriptionEdit->text(),
+        .password = passwordEdit->text(),
+        .maxPlayers = maxPlayersEdit->value(),
+        .onlyBuddies = onlyBuddiesCheckBox->isChecked(),
+        .onlyRegistered = onlyRegisteredCheckBox->isChecked(),
+        .spectatorsAllowed = spectatorsAllowedCheckBox->isChecked(),
+        .spectatorsNeedPassword = spectatorsNeedPasswordCheckBox->isChecked(),
+        .spectatorsCanTalk = spectatorsCanTalkCheckBox->isChecked(),
+        .spectatorsSeeEverything = spectatorsSeeEverythingCheckBox->isChecked(),
+        .joinAsJudge = createGameAsJudgeCheckBox->isChecked(),
+        .joinAsSpectator = createGameAsSpectatorCheckBox->isChecked(),
+        .startingLifeTotal = startingLifeTotalEdit->value(),
+        .shareDecklistsOnLoad = shareDecklistsOnLoadCheckBox->isChecked(),
+        .shufflePlayers = shufflePlayersCheckBox->isChecked(),
+        .gameTypeIds = gameTypeIds,
+    };
 
     Command_CreateGame cmd = options.toCreateGameCommand();
 
