@@ -666,6 +666,13 @@ void DeckSyncManager::handleConflictDownload(const QString &relativePath, const 
         processNext();
         return;
     }
+    if (serverDeck.getContentHash() == localFiles.value(relativePath).hash) {
+        // Same deck, the row just predates hashes: upload once so the server stamps
+        // hash and last_modified instead of asking about identical content.
+        applyUpload(relativePath, ctx.serverPath, ctx.deckId, ctx.guid);
+        processNext();
+        return;
+    }
 
     DeckSyncSidecar sidecar(sidecarPath);
     sidecar.load();
