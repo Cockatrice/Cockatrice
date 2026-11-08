@@ -65,7 +65,7 @@ VisualDeckDisplayOptionsWidget::VisualDeckDisplayOptionsWidget(QWidget *parent) 
     sortByLabel = new QLabel(this);
 
     sortCriteriaButton = new SettingsButtonWidget(this);
-    sortCriteriaButton->setButtonIcon(loadThemedIcon(QStringLiteral("icons/sort_arrow_down")));
+    sortCriteriaButton->setButtonIcon(loadThemedIcon(QStringLiteral("icons/sort_arrow_down"), AppColor::Informational));
 
     sortLabel = new QLabel(sortCriteriaButton);
     sortLabel->setWordWrap(true);

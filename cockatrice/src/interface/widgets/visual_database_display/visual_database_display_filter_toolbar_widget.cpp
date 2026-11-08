@@ -50,7 +50,7 @@ VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidg
     };
 
     sortByLabel = new QLabel(this);
-    sortByLabel->setPixmap(scalePixmap("icons/sort_arrow_down"));
+    sortByLabel->setPixmap(scalePixmap("icons/sort_arrow_down", AppColor::Informational));
 
     filterByLabel = new QLabel(this);
     filterByLabel->setPixmap(scalePixmap("icons/filter", AppColor::Informational));
@@ -91,22 +91,23 @@ VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidg
     });
 
     quickFilterSaveLoadWidget = new SettingsButtonWidget(this);
-    quickFilterSaveLoadWidget->setButtonIcon(loadThemedIcon(QStringLiteral("icons/floppy_disk")));
+    quickFilterSaveLoadWidget->setButtonIcon(loadThemedIcon(QStringLiteral("icons/floppy_disk"), IconTint::primary()));
 
     quickFilterNameWidget = new SettingsButtonWidget(this);
-    quickFilterNameWidget->setButtonIcon(loadThemedIcon(QStringLiteral("icons/pen_to_square")));
+    quickFilterNameWidget->setButtonIcon(loadThemedIcon(QStringLiteral("icons/pen_to_square"), IconTint::primary()));
 
     quickFilterMainTypeWidget = new SettingsButtonWidget(this);
-    quickFilterMainTypeWidget->setButtonIcon(loadThemedIcon(QStringLiteral("icons/circle_half_stroke")));
+    quickFilterMainTypeWidget->setButtonIcon(
+        loadThemedIcon(QStringLiteral("icons/circle_half_stroke"), IconTint::primary()));
 
     quickFilterSubTypeWidget = new SettingsButtonWidget(this);
-    quickFilterSubTypeWidget->setButtonIcon(loadThemedIcon(QStringLiteral("icons/dragon")));
+    quickFilterSubTypeWidget->setButtonIcon(loadThemedIcon(QStringLiteral("icons/dragon"), IconTint::primary()));
 
     quickFilterSetWidget = new SettingsButtonWidget(this);
-    quickFilterSetWidget->setButtonIcon(loadThemedIcon(QStringLiteral("icons/scroll")));
+    quickFilterSetWidget->setButtonIcon(loadThemedIcon(QStringLiteral("icons/scroll"), IconTint::primary()));
 
     quickFilterFormatLegalityWidget = new SettingsButtonWidget(this);
-    quickFilterFormatLegalityWidget->setButtonIcon(loadThemedIcon(QStringLiteral("icons/scales")));
+    quickFilterFormatLegalityWidget->setButtonIcon(loadThemedIcon(QStringLiteral("icons/scales"), IconTint::primary()));
 
     retranslateUi();
 }
