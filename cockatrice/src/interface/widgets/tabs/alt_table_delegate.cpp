@@ -85,9 +85,7 @@ void AltTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
     }
 
     if (index.column() == activeColumn) {
-        const QVariant activeData = index.data(Qt::UserRole);
-        const bool active =
-            activeData.isValid() ? activeData.toBool() : text.compare(QStringLiteral("yes"), Qt::CaseInsensitive) == 0;
+        const bool active = index.data(Qt::UserRole).toBool();
         const QPalette::ColorRole tintRole = active ? QPalette::Highlight : QPalette::PlaceholderText;
         if (!pill_painter::paint(painter, opt, tintRole, emphasisRole, text)) {
             QStyledItemDelegate::paint(painter, opt, index);
