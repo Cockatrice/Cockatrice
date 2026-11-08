@@ -1982,8 +1982,7 @@ namespace
 {
 constexpr int MAX_USER_ALT_DEPTH = 3;
 constexpr int MAX_USER_ALTS_PER_LEVEL = 200;
-// Bounds per-level work and the prepared-statement cache (keyed by query text,
-// so every distinct IN-list size is a new entry on the long-lived server).
+// Bounds per-level work and the size of each dynamic IN-list.
 // Identifier-heavy frontiers, e.g. VPN users with hundreds of recent IPs, are
 // truncated: this tool is deliberately a first-pass sweep, not an audit.
 constexpr int MAX_USER_ALT_IDENTIFIERS = 200;
