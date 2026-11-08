@@ -189,7 +189,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
 
     QTimer::singleShot(0, this, &TabGame::loadLayout);
 
-    tutorialController = new TutorialController(this);
+    tutorialController = new TutorialController(TutorialId::Game, this);
 
     TutorialSequence lobbySequence;
 
@@ -202,7 +202,8 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
 void TabGame::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
-    if (!tutorialController || tutorialStarted || SettingsCache::instance().userInterface().getTutorialCompleted()) {
+    if (!tutorialController || tutorialStarted ||
+        SettingsCache::instance().userInterface().getGameTutorialCompleted()) {
         return;
     }
     // Only start once all sequences are registered so advancing can't run past the
@@ -223,7 +224,7 @@ void TabGame::finishTutorialInitialization()
     }
 
     // No sequence building (and no widget access) once the tutorial is done.
-    if (SettingsCache::instance().userInterface().getTutorialCompleted()) {
+    if (SettingsCache::instance().userInterface().getGameTutorialCompleted()) {
         return;
     }
 

@@ -76,7 +76,7 @@ TabDeckEditorVisual::TabDeckEditorVisual(TabSupervisor *_tabSupervisor) : Abstra
     loadLayout();
     filterDockWidget->setHidden(true);
     cardDatabaseDockWidget->setHidden(true);
-    tutorialController = new TutorialController(this);
+    tutorialController = new TutorialController(TutorialId::DeckEditor, this);
     createTutorialSequences();
 }
 
@@ -88,31 +88,31 @@ void TabDeckEditorVisual::createTutorialSequences()
 
     auto sequence = TutorialSequence();
 
-    sequence.addStep({tabContainer->tabBar(),
-                      "The Visual Deck Editor has multiple different functionalities.\n\nYou can cycle "
-                      "through them by using these tabs.\n\nLet's start with the Visual Deck View."});
+    sequence.addStep(
+        {tabContainer->tabBar(), tr("The Visual Deck Editor has multiple different functionalities.\n\nYou can cycle "
+                                    "through them by using these tabs.\n\nLet's start with the Visual Deck View.")});
     sequence.addStep({tabContainer->visualDeckView,
-                      "The cards in your deck will be displayed here, allowing for an easy overview.\n\nLet's try "
-                      "adding some now, so you can see it in action!",
+                      tr("The cards in your deck will be displayed here, allowing for an easy overview.\n\nLet's try "
+                         "adding some now, so you can see it in action!"),
                       [this]() { tabContainer->setCurrentWidget(tabContainer->visualDeckView); }});
 
     tutorialController->addSequence(sequence);
 
     auto vdeSequence = tabContainer->visualDeckView->addTutorialSteps();
-    vdeSequence.addStep({tabContainer->tabBar(), "Let's look at the database tab now."});
+    vdeSequence.addStep({tabContainer->tabBar(), tr("Let's look at the database tab now.")});
     tutorialController->addSequence(vdeSequence);
 
     auto vddSequence = tabContainer->visualDatabaseDisplay->addTutorialSteps();
     vddSequence.steps.prepend(
         {tabContainer->visualDatabaseDisplay,
-         "You can view the database here, either as card images or in the old table display "
-         "style.\n\nAdditionally, there are many powerful and easy to use filters available.\n\nLet's dive in!",
+         tr("You can view the database here, either as card images or in the old table display "
+            "style.\n\nAdditionally, there are many powerful and easy to use filters available.\n\nLet's dive in!"),
          [this]() { tabContainer->setCurrentWidget(tabContainer->visualDatabaseDisplay); }});
 
     tutorialController->addSequence(vddSequence);
 
     auto analyticsSequence = tabContainer->deckAnalytics->generateTutorialSequence();
-    analyticsSequence.steps.prepend({tabContainer->tabBar(), "Let's look at the analytics tab now."});
+    analyticsSequence.steps.prepend({tabContainer->tabBar(), tr("Let's look at the analytics tab now.")});
 
     TutorialStep analyticsConclusionStep;
     analyticsConclusionStep.targetWidget = tabContainer->tabBar();
@@ -150,7 +150,7 @@ void TabDeckEditorVisual::createTutorialSequences()
 void TabDeckEditorVisual::showEvent(QShowEvent *ev)
 {
     QWidget::showEvent(ev);
-    if (!tutorialStarted && !SettingsCache::instance().userInterface().getTutorialCompleted()) {
+    if (!tutorialStarted && !SettingsCache::instance().userInterface().getDeckEditorTutorialCompleted()) {
         tutorialStarted = true;
         // Start on next event loop iteration so everything is fully painted
         QTimer::singleShot(0, tutorialController, [this] { tutorialController->start(); });

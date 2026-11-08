@@ -169,9 +169,27 @@ SettingsCache::SettingsCache()
     cardsDisplaySettings = new CardsDisplaySettings(settingsPath, this);
     interfaceSettings = new InterfaceSettings(settingsPath, this);
     if (hadExistingSettings) {
+        // Installs that predate the tutorial have no tutorial keys at all. Seed each
+        // per-tutorial key from the legacy flag, but never overwrite a key that is already
+        // there. Fresh installs keep the false defaults so every tutorial runs.
         QSettings iface(settingsPath + "interface.ini", QSettings::IniFormat);
-        if (!iface.contains("interface/tutorialCompleted")) {
+        const bool hasLegacyCompleted = iface.contains("interface/tutorialCompleted");
+        const bool hasHomeCompleted = iface.contains("interface/tutorialHomeCompleted");
+        const bool hasDeckEditorCompleted = iface.contains("interface/tutorialDeckEditorCompleted");
+        const bool hasGameCompleted = iface.contains("interface/tutorialGameCompleted");
+        if (!hasLegacyCompleted) {
+            // No legacy key means an install from before the tutorial existed: treat it as done.
             interfaceSettings->setTutorialCompleted(true);
+        }
+        const bool legacyCompleted = interfaceSettings->getTutorialCompleted();
+        if (!hasHomeCompleted) {
+            interfaceSettings->setHomeTutorialCompleted(legacyCompleted);
+        }
+        if (!hasDeckEditorCompleted) {
+            interfaceSettings->setDeckEditorTutorialCompleted(legacyCompleted);
+        }
+        if (!hasGameCompleted) {
+            interfaceSettings->setGameTutorialCompleted(legacyCompleted);
         }
     }
     deckEditorSettings = new DeckEditorSettings(settingsPath, this);

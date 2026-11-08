@@ -464,20 +464,20 @@ void VisualDeckEditorWidget::onSelectionChanged(const QItemSelection &selected, 
 TutorialSequence VisualDeckEditorWidget::addTutorialSteps()
 {
     TutorialSequence sequence;
-    sequence.name = "Adding Cards to Your Deck";
+    sequence.name = tr("Adding Cards to Your Deck");
 
     TutorialStep introStep;
     introStep.targetWidget = displayOptionsAndSearch;
-    introStep.text = "There are two ways of adding cards to your deck:\n\n"
-                     "The first is by using the quick search bar in the deck view tab.\n"
-                     "This is helpful if you already know which card you would like to add "
-                     "and will provide name suggestions as you type.\n\n"
-                     "We'll look at the second way, through the database tab, later.";
+    introStep.text = tr("There are two ways of adding cards to your deck:\n\n"
+                        "The first is by using the quick search bar in the deck view tab.\n"
+                        "This is helpful if you already know which card you would like to add "
+                        "and will provide name suggestions as you type.\n\n"
+                        "We'll look at the second way, through the database tab, later.");
     sequence.addStep(introStep);
 
     TutorialStep searchStep;
     searchStep.targetWidget = searchBar;
-    searchStep.text = "Let's try it out now!\nType the name of a card into the search bar.";
+    searchStep.text = tr("Let's try it out now!\nType the name of a card into the search bar.");
     searchStep.allowClickThrough = true;
     searchStep.requiresInteraction = true;
     searchStep.autoAdvanceOnValid = true;
@@ -485,14 +485,14 @@ TutorialSequence VisualDeckEditorWidget::addTutorialSteps()
     searchStep.validator = [this]() {
         return CardDatabaseManager::query()->getCard({searchBar->text()}) != ExactCard();
     };
-    searchStep.validationHint = "Please enter a valid card name.";
-    searchStep.customInteractionHint = "✏️ Type a valid card name to continue";
+    searchStep.validationHint = tr("Please enter a valid card name.");
+    searchStep.customInteractionHint = tr("✏️ Type a valid card name to continue");
 
     sequence.addStep(searchStep);
 
     TutorialStep addStep;
     addStep.targetWidget = searchPushButton;
-    addStep.text = "Click this button to add the card to your deck.";
+    addStep.text = tr("Click this button to add the card to your deck.");
     addStep.allowClickThrough = true;
     addStep.requiresInteraction = true;
     addStep.autoAdvanceOnValid = true;
@@ -506,8 +506,8 @@ TutorialSequence VisualDeckEditorWidget::addTutorialSteps()
 
     TutorialStep organizationStep;
     organizationStep.targetWidget = this;
-    organizationStep.text = "Let's look at how cards are organized and displayed now.\n\nWe'll add some random cards "
-                            "from the database to your deck, so you can see it in action properly.";
+    organizationStep.text = tr("Let's look at how cards are organized and displayed now.\n\nWe'll add some random "
+                               "cards from the database to your deck, so you can see it in action properly.");
     organizationStep.onExit = [this]() {
         // getCardList() counts distinct card nodes, not copies, so once every random pick only bumps an
         // existing node's count the size never grows. With fewer than ~60 distinct cards in the database
@@ -524,11 +524,12 @@ TutorialSequence VisualDeckEditorWidget::addTutorialSteps()
 
     TutorialStep hoverStep;
     hoverStep.targetWidget = this;
-    hoverStep.text = "Great! Take some time to explore these new cards in the current display mode.\n\nYou can select "
-                     "a card by clicking on it with the left mouse button.\nYou can select multiple cards by holding "
-                     "down CTRL or Shift.\nYou can clear the current selection by clicking on an area without a "
-                     "card.\nDouble-clicking a card will move it between main and sideboard.\nRight-clicking a card "
-                     "will remove it from the deck.\n\nYou can hover over a card to see a zoomed version of it.";
+    hoverStep.text = tr("Great! Take some time to explore these new cards in the current display mode.\n\nYou can "
+                        "select a card by clicking on it with the left mouse button.\nYou can select multiple cards "
+                        "by holding down CTRL or Shift.\nYou can clear the current selection by clicking on an area "
+                        "without a card.\nDouble-clicking a card will move it between main and sideboard.\n"
+                        "Right-clicking a card will remove it from the deck.\n\nYou can hover over a card to see a "
+                        "zoomed version of it.");
     hoverStep.allowClickThrough = true;
 
     sequence.addStep(hoverStep);
@@ -538,9 +539,9 @@ TutorialSequence VisualDeckEditorWidget::addTutorialSteps()
     TutorialStep conclusionStep;
     conclusionStep.targetWidget = this;
     conclusionStep.text =
-        "Great!\n\nNow that you've learned about all the different ways of displaying the cards in "
-        "your deck, it's time to move on to searching for new cards for your deck in style and ease.\n\nYou can stay "
-        "on this screen to play around with the display options and advance when you are ready.";
+        tr("Great!\n\nNow that you've learned about all the different ways of displaying the cards in "
+           "your deck, it's time to move on to searching for new cards for your deck in style and ease.\n\nYou can "
+           "stay on this screen to play around with the display options and advance when you are ready.");
     conclusionStep.allowClickThrough = true;
 
     sequence.addStep(conclusionStep);

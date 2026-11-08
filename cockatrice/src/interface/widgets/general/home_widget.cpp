@@ -98,13 +98,13 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     connect(&SettingsCache::instance().appearance(), &AppearanceSettings::homeTabBackgroundShuffleFrequencyChanged,
             this, &HomeWidget::onBackgroundShuffleFrequencyChanged);
 
-    tutorialController = new TutorialController(this);
+    tutorialController = new TutorialController(TutorialId::Home, this);
     auto sequence = TutorialSequence();
-    sequence.addStep({connectButton, "Connect to a server to play here!"});
-    auto vdeStep = TutorialStep{visualDeckEditorButton, "Create a new deck from cards in the database here!"};
+    sequence.addStep({connectButton, tr("Connect to a server to play here!")});
+    auto vdeStep = TutorialStep{visualDeckEditorButton, tr("Create a new deck from cards in the database here!")};
     vdeStep.requiresInteraction = true;
     vdeStep.allowClickThrough = true;
-    vdeStep.validationHint = "Open the deck editor to try it out!";
+    vdeStep.validationHint = tr("Open the deck editor to try it out!");
     vdeStep.validationTiming = ValidationTiming::OnSignal;
     vdeStep.autoAdvanceOnValid = true;
     vdeStep.validator = []() { return true; };
@@ -114,14 +114,14 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     };
 
     sequence.addStep(vdeStep);
-    sequence.addStep({visualDeckStorageButton, "Browse the decks in your local collection."});
-    sequence.addStep({visualDatabaseDisplayButton, "View the card database here."});
+    sequence.addStep({visualDeckStorageButton, tr("Browse the decks in your local collection.")});
+    sequence.addStep({visualDatabaseDisplayButton, tr("View the card database here.")});
     sequence.addStep(
-        {edhrecButton, "Browse EDHRec, an external service designed to provide card recommendations for decks."});
-    sequence.addStep({archidektButton, "Browse Archidekt, an external service that allows users to store "
-                                       "decklists and import them to your local collection."});
-    sequence.addStep({replayButton, "View replays of your past games here."});
-    sequence.addStep({exitButton, "Exit the application."});
+        {edhrecButton, tr("Browse EDHRec, an external service designed to provide card recommendations for decks.")});
+    sequence.addStep({archidektButton, tr("Browse Archidekt, an external service that allows users to store "
+                                          "decklists and import them to your local collection.")});
+    sequence.addStep({replayButton, tr("View replays of your past games here.")});
+    sequence.addStep({exitButton, tr("Exit the application.")});
     tutorialController->addSequence(sequence);
 
     // Lambda is cleaner to read than overloading this
@@ -171,7 +171,7 @@ void HomeWidget::retranslateUi()
 void HomeWidget::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
-    if (!tutorialStarted && !SettingsCache::instance().userInterface().getTutorialCompleted()) {
+    if (!tutorialStarted && !SettingsCache::instance().userInterface().getHomeTutorialCompleted()) {
         tutorialStarted = true;
         // Start on next event loop iteration so everything is fully painted
         QTimer::singleShot(3, tutorialController, [this] { tutorialController->start(); });

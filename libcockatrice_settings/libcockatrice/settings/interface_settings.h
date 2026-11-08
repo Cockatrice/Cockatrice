@@ -58,6 +58,9 @@ public:
     [[nodiscard]] bool getBattlefieldFlashEnabled() const override;
     [[nodiscard]] QStringList getUserListExpandedSections() const override;
     [[nodiscard]] bool getTutorialCompleted() const;
+    [[nodiscard]] bool getHomeTutorialCompleted() const;
+    [[nodiscard]] bool getDeckEditorTutorialCompleted() const;
+    [[nodiscard]] bool getGameTutorialCompleted() const;
 
     void setUseTearOffMenus(bool _useTearOffMenus);
     void setCardViewInitialRowsMax(int _cardViewInitialRowsMax);
@@ -98,6 +101,9 @@ public:
     void setBattlefieldFlashEnabled(bool _battlefieldFlashEnabled);
     void setUserListExpandedSections(const QStringList &sections);
     void setTutorialCompleted(bool value);
+    void setHomeTutorialCompleted(bool value);
+    void setDeckEditorTutorialCompleted(bool value);
+    void setGameTutorialCompleted(bool value);
 
 signals:
     void useTearOffMenusChanged(bool state);

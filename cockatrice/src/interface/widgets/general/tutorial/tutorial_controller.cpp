@@ -10,9 +10,21 @@
 #include <QTimer>
 #include <libcockatrice/settings/interface_settings.h>
 
-TutorialController::TutorialController(QWidget *_tutorializedWidget)
-    : QObject(_tutorializedWidget), tutorializedWidget(_tutorializedWidget)
+namespace
 {
+/// Every controller that currently exists, across all screens, so the overlay's X can end
+/// all of them at once. Only touched from the GUI thread, which creates and destroys them.
+QList<TutorialController *> liveControllers;
+
+/// True while skipTutorials() closes the controllers, so a nested call is a no-op.
+bool skippingTutorials = false;
+} // namespace
+
+TutorialController::TutorialController(TutorialId _tutorialId, QWidget *_tutorializedWidget)
+    : QObject(_tutorializedWidget), tutorialId(_tutorialId), tutorializedWidget(_tutorializedWidget)
+{
+    liveControllers.append(this);
+
     tutorialOverlay = new TutorialOverlay(tutorializedWidget->window());
 
     tutorialOverlay->setWindowFlags(tutorialOverlay->windowFlags() | Qt::FramelessWindowHint);
@@ -22,12 +34,14 @@ TutorialController::TutorialController(QWidget *_tutorializedWidget)
     connect(tutorialOverlay, &TutorialOverlay::prevStep, this, &TutorialController::prevStep);
     connect(tutorialOverlay, &TutorialOverlay::nextSequence, this, &TutorialController::nextSequence);
     connect(tutorialOverlay, &TutorialOverlay::prevSequence, this, &TutorialController::prevSequence);
-    connect(tutorialOverlay, &TutorialOverlay::skipTutorial, this, &TutorialController::exitTutorial);
+    connect(tutorialOverlay, &TutorialOverlay::skipTutorial, this, &TutorialController::skipTutorials);
     connect(tutorialOverlay, &TutorialOverlay::targetClicked, this, &TutorialController::handleTargetClicked);
 }
 
 TutorialController::~TutorialController()
 {
+    liveControllers.removeAll(this);
+
     // The overlay is parented to the top-level window, which outlives the widget
     // this controller is attached to (e.g. a closed tab), so it must be cleaned
     // up explicitly when the controller goes away without exitTutorial().
@@ -185,6 +199,9 @@ void TutorialController::prevSequence()
 
 void TutorialController::exitTutorial()
 {
+    if (tutorialCompleted) {
+        return;
+    }
     cleanupValidationMonitoring();
     if (tutorialOverlay) {
         tutorialOverlay->hide();
@@ -194,8 +211,44 @@ void TutorialController::exitTutorial()
     currentSequence = -1;
     currentStep = -1;
     tutorialCompleted = true;
-    SettingsCache::instance().userInterface().setTutorialCompleted(true);
+
+    // Only this screen's tutorial is done; the others keep their own state.
+    auto &iface = SettingsCache::instance().userInterface();
+    switch (tutorialId) {
+        case TutorialId::Home:
+            iface.setHomeTutorialCompleted(true);
+            break;
+        case TutorialId::DeckEditor:
+            iface.setDeckEditorTutorialCompleted(true);
+            break;
+        case TutorialId::Game:
+            iface.setGameTutorialCompleted(true);
+            break;
+    }
     deleteLater();
+}
+
+void TutorialController::skipTutorials()
+{
+    if (skippingTutorials) {
+        return;
+    }
+    skippingTutorials = true;
+
+    // The X means "I am done with the tutorial", not "close this one window", so every
+    // screen is marked done — including screens with no live controller right now.
+    auto &iface = SettingsCache::instance().userInterface();
+    iface.setHomeTutorialCompleted(true);
+    iface.setDeckEditorTutorialCompleted(true);
+    iface.setGameTutorialCompleted(true);
+
+    // exitTutorial() only schedules deletion, so iterating a copy cannot dangle.
+    const QList<TutorialController *> controllers = liveControllers;
+    for (TutorialController *controller : controllers) {
+        controller->exitTutorial();
+    }
+
+    skippingTutorials = false;
 }
 
 void TutorialController::runExitForCurrentStep()
@@ -269,7 +322,7 @@ void TutorialController::showStep()
     if (!step.customInteractionHint.isEmpty()) {
         tutorialOverlay->setInteractionHint(step.customInteractionHint);
     } else if (step.requiresInteraction) {
-        tutorialOverlay->setInteractionHint("👆 Click the highlighted area to continue");
+        tutorialOverlay->setInteractionHint(tr("👆 Click the highlighted area to continue"));
     } else {
         tutorialOverlay->setInteractionHint("");
     }

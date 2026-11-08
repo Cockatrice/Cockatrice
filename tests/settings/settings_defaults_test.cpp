@@ -543,6 +543,51 @@ TEST_F(SettingsDefaultsTest, Interface_BuddyConnectNotificationsEnabled_Default)
     ASSERT_EQ(s.getBuddyConnectNotificationsEnabled(), true);
 }
 
+TEST_F(SettingsDefaultsTest, Interface_HomeTutorialCompleted_Default)
+{
+    InterfaceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getHomeTutorialCompleted(), false);
+}
+
+TEST_F(SettingsDefaultsTest, Interface_HomeTutorialCompleted_SetAndGet)
+{
+    InterfaceSettings s(settingsPath, nullptr);
+    s.setHomeTutorialCompleted(true);
+    ASSERT_EQ(s.getHomeTutorialCompleted(), true);
+    s.setHomeTutorialCompleted(false);
+    ASSERT_EQ(s.getHomeTutorialCompleted(), false);
+}
+
+TEST_F(SettingsDefaultsTest, Interface_DeckEditorTutorialCompleted_Default)
+{
+    InterfaceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getDeckEditorTutorialCompleted(), false);
+}
+
+TEST_F(SettingsDefaultsTest, Interface_DeckEditorTutorialCompleted_SetAndGet)
+{
+    InterfaceSettings s(settingsPath, nullptr);
+    s.setDeckEditorTutorialCompleted(true);
+    ASSERT_EQ(s.getDeckEditorTutorialCompleted(), true);
+    s.setDeckEditorTutorialCompleted(false);
+    ASSERT_EQ(s.getDeckEditorTutorialCompleted(), false);
+}
+
+TEST_F(SettingsDefaultsTest, Interface_GameTutorialCompleted_Default)
+{
+    InterfaceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getGameTutorialCompleted(), false);
+}
+
+TEST_F(SettingsDefaultsTest, Interface_GameTutorialCompleted_SetAndGet)
+{
+    InterfaceSettings s(settingsPath, nullptr);
+    s.setGameTutorialCompleted(true);
+    ASSERT_EQ(s.getGameTutorialCompleted(), true);
+    s.setGameTutorialCompleted(false);
+    ASSERT_EQ(s.getGameTutorialCompleted(), false);
+}
+
 // --- DeckEditorSettings ---
 
 TEST_F(SettingsDefaultsTest, DeckEditor_OpenDeckInNewTab_Default)

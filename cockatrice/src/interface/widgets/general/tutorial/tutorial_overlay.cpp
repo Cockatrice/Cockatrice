@@ -41,7 +41,7 @@ TutorialOverlay::TutorialOverlay(QWidget *parent) : QWidget(parent)
     QHBoxLayout *barLayout = new QHBoxLayout(controlBar);
     barLayout->setContentsMargins(8, 4, 8, 4);
 
-    titleLabel = new QLabel("Tutorial", controlBar);
+    titleLabel = new QLabel(tr("Tutorial"), controlBar);
     titleLabel->setStyleSheet("color:white; font-weight:bold;");
     barLayout->addWidget(titleLabel);
     barLayout->addStretch();
@@ -52,11 +52,11 @@ TutorialOverlay::TutorialOverlay(QWidget *parent) : QWidget(parent)
         return b;
     };
 
-    QPushButton *prevSeq = mkBtn("⏮", "Previous chapter");
-    QPushButton *prev = mkBtn("◀", "Previous step");
-    nextButton = mkBtn("▶", "Next step");
-    nextSeqButton = mkBtn("⏭", "Next chapter");
-    QPushButton *close = mkBtn("✕", "Exit tutorial");
+    QPushButton *prevSeq = mkBtn("⏮", tr("Previous chapter"));
+    QPushButton *prev = mkBtn("◀", tr("Previous step"));
+    nextButton = mkBtn("▶", tr("Next step"));
+    nextSeqButton = mkBtn("⏭", tr("Next chapter"));
+    QPushButton *close = mkBtn("✕", tr("Exit tutorial"));
 
     barLayout->addWidget(prevSeq);
     barLayout->addWidget(prev);
@@ -121,12 +121,12 @@ void TutorialOverlay::setInteractive(bool interactive, bool clickThrough)
 
     if (nextButton) {
         nextButton->setEnabled(!interactive);
-        nextButton->setToolTip(interactive ? "Complete the highlighted action to continue" : "Next step");
+        nextButton->setToolTip(interactive ? tr("Complete the highlighted action to continue") : tr("Next step"));
     }
 
     if (nextSeqButton) {
         nextSeqButton->setEnabled(!interactive);
-        nextSeqButton->setToolTip(interactive ? "Complete the highlighted action to continue" : "Next chapter");
+        nextSeqButton->setToolTip(interactive ? tr("Complete the highlighted action to continue") : tr("Next chapter"));
     }
 
     updateMask();

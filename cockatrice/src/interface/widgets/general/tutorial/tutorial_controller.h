@@ -16,6 +16,14 @@ enum class ValidationTiming
     Manual     // Only validate when explicitly triggered
 };
 
+/// Which screen a controller belongs to; each tutorial tracks its own completion flag.
+enum class TutorialId
+{
+    Home,
+    DeckEditor,
+    Game
+};
+
 class TutorialController;
 
 struct TutorialStep
@@ -67,7 +75,7 @@ class TutorialController : public QObject
     Q_OBJECT
 
 public:
-    explicit TutorialController(QWidget *_tutorializedWidget);
+    TutorialController(TutorialId _tutorialId, QWidget *_tutorializedWidget);
     ~TutorialController() override;
 
     void addSequence(const TutorialSequence &seq);
@@ -85,6 +93,7 @@ public slots:
     void prevSequence();
     void runExitForCurrentStep();
     void exitTutorial();
+    void skipTutorials();       // Close the tutorial on every live screen and mark all three done
     void handleTargetClicked(); // Handle clicks on highlighted widget
     void attemptAdvance();      // Try to advance with validation
     void checkValidation();     // Check validation for OnChange timing
@@ -96,6 +105,7 @@ private:
     void setupValidationMonitoring();   // Setup automatic validation checking
     void cleanupValidationMonitoring(); // Cleanup validation watchers
 
+    TutorialId tutorialId;
     QWidget *tutorializedWidget;
     TutorialOverlay *tutorialOverlay;
     QList<TutorialSequence> sequences;

@@ -194,13 +194,13 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 TutorialSequence VisualDatabaseDisplayWidget::addTutorialSteps()
 {
     auto sequence = TutorialSequence();
-    sequence.addStep({colorFilterWidget, "Filter the database by colors with these controls"});
+    sequence.addStep({colorFilterWidget, tr("Filter the database by colors with these controls")});
     TutorialStep displayModeStep;
     displayModeStep.targetWidget = displayModeButton;
     displayModeStep.text = tr("You can change back to the old table display-style with this button.");
     displayModeStep.allowClickThrough = true;
     sequence.addStep(displayModeStep);
-    sequence.addStep({filterContainer, "Use these controls for quick access to common filters."});
+    sequence.addStep({filterContainer, tr("Use these controls for quick access to common filters.")});
 
     TutorialStep setFilterStep;
     setFilterStep.targetWidget = filterContainer->getSetFilterWidget();

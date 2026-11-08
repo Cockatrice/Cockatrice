@@ -68,10 +68,10 @@ void BubbleWidget::setText(const QString &text)
 void BubbleWidget::setProgress(int stepNum, int totalSteps, int overallStep, int overallTotal)
 {
     // Per-sequence progress
-    counterLabel->setText(QString("Step %1 of %2").arg(stepNum).arg(totalSteps));
+    counterLabel->setText(tr("Step %1 of %2").arg(stepNum).arg(totalSteps));
 
     // Overall progress across all sequences
-    progressLabel->setText(QString("(%1 of %2 total)").arg(overallStep).arg(overallTotal));
+    progressLabel->setText(tr("(%1 of %2 total)").arg(overallStep).arg(overallTotal));
     progressLabel->show();
 }
 

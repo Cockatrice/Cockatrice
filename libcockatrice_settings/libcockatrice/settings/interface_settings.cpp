@@ -5,8 +5,6 @@
 #include "libcockatrice/utility/playmat_params.h"
 
 #include <QChar>
-#include <QDir>
-#include <QFileInfo>
 #include <QList>
 #include <QVariant>
 #include <QtGlobal>
@@ -253,6 +251,21 @@ bool InterfaceSettings::getTutorialCompleted() const
     return getValue("tutorialCompleted", QString(), QString(), false).toBool();
 }
 
+bool InterfaceSettings::getHomeTutorialCompleted() const
+{
+    return getValue("tutorialHomeCompleted", QString(), QString(), false).toBool();
+}
+
+bool InterfaceSettings::getDeckEditorTutorialCompleted() const
+{
+    return getValue("tutorialDeckEditorCompleted", QString(), QString(), false).toBool();
+}
+
+bool InterfaceSettings::getGameTutorialCompleted() const
+{
+    return getValue("tutorialGameCompleted", QString(), QString(), false).toBool();
+}
+
 void InterfaceSettings::setUseTearOffMenus(bool _useTearOffMenus)
 {
     setValue(_useTearOffMenus, "useTearOffMenus");
@@ -480,4 +493,19 @@ void InterfaceSettings::setUserListExpandedSections(const QStringList &sections)
 void InterfaceSettings::setTutorialCompleted(bool value)
 {
     setValue(value, "tutorialCompleted");
+}
+
+void InterfaceSettings::setHomeTutorialCompleted(bool value)
+{
+    setValue(value, "tutorialHomeCompleted");
+}
+
+void InterfaceSettings::setDeckEditorTutorialCompleted(bool value)
+{
+    setValue(value, "tutorialDeckEditorCompleted");
+}
+
+void InterfaceSettings::setGameTutorialCompleted(bool value)
+{
+    setValue(value, "tutorialGameCompleted");
 }
