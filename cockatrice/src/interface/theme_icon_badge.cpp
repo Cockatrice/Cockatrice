@@ -10,7 +10,6 @@
 #include <QRectF>
 #include <QSvgRenderer>
 #include <QtGlobal>
-#include <cmath>
 
 namespace
 {
@@ -47,22 +46,6 @@ DiscFill discFill(const QColor &tone)
 
 namespace ThemeIconBadge
 {
-double relativeLuminance(const QColor &color)
-{
-    const auto linear = [](double channel) {
-        channel /= 255.0;
-        return channel <= 0.03928 ? channel / 12.92 : std::pow((channel + 0.055) / 1.055, 2.4);
-    };
-    return 0.2126 * linear(color.red()) + 0.7152 * linear(color.green()) + 0.0722 * linear(color.blue());
-}
-
-double contrastRatio(const QColor &first, const QColor &second)
-{
-    const double a = relativeLuminance(first);
-    const double b = relativeLuminance(second);
-    return (qMax(a, b) + 0.05) / (qMin(a, b) + 0.05);
-}
-
 QColor glyphColor(const QColor &tone)
 {
     // The badge carries the ink the pre-sticker badge did: white on the light
