@@ -358,6 +358,17 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  random_reveal_test
+  SOURCES
+  random_reveal_test.cpp
+  LIBS
+  libcockatrice_network_server_remote
+  libcockatrice_rng
+  LABELS
+  server
+)
+cockatrice_add_test(
+  NAME
   server_game_join_test
   SOURCES
   server_game_join_test.cpp
