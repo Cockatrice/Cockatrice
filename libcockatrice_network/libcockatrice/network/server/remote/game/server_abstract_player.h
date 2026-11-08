@@ -32,6 +32,18 @@ private:
     void sendCreateTokenEvents(Server_CardZone *zone, Server_Card *card, int xCoord, int yCoord, GameEventStorage &ges);
     void getPlayerProperties(ServerInfo_PlayerProperties &result) override;
 
+    /// Validates the preconditions shared by every reveal and resolves the source zone.
+    Response::ResponseCode
+    resolveRevealZone(const std::string &zoneName, bool hasRecipient, int recipientId, Server_CardZone *&zone);
+    /// Builds the private and public reveal events for an already chosen set of cards and enqueues them.
+    Response::ResponseCode revealCards(Server_CardZone *zone,
+                                       const QList<Server_Card *> &cardsToReveal,
+                                       const QList<int> &cardIdsForOthers,
+                                       bool hasRecipient,
+                                       int recipientId,
+                                       bool grantWriteAccess,
+                                       GameEventStorage &ges);
+
 protected:
     bool conceded;
     DeckList *deck;
@@ -163,6 +175,8 @@ public:
     cmdDumpZone(const Command_DumpZone &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
     virtual Response::ResponseCode
     cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
+    Response::ResponseCode
+    cmdRevealRandomCards(const Command_RevealRandomCards &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
     virtual Response::ResponseCode cmdChangeZoneProperties(const Command_ChangeZoneProperties &cmd,
                                                            ResponseContainer &rc,
                                                            GameEventStorage &ges) override;

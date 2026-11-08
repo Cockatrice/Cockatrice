@@ -316,6 +316,10 @@ void CardInfo::setColors(const QString &value)
 {
     setProperty(Mtg::Colors, value);
 }
+QString CardInfo::getColorIdentity() const
+{
+    return getProperty(Mtg::ColorIdentity);
+}
 QString CardInfo::getLoyalty() const
 {
     return getProperty(Mtg::Loyalty);

@@ -88,7 +88,7 @@ void ArrowItem::onTargetDestroyed()
         // Drag and attach arrows are never inserted into the arrow registry and
         // have no server-side counterpart, so no deletion event can clean them
         // up. Delete them locally when either endpoint is destroyed.
-        delArrow();
+        cancel();
         return;
     }
 
@@ -101,6 +101,12 @@ void ArrowItem::delArrow()
         targetItem->setBeingPointedAt(false);
     }
     deleteLater();
+}
+
+void ArrowItem::cancel()
+{
+    ungrabMouse();
+    delArrow();
 }
 
 void ArrowItem::updatePath()
@@ -350,6 +356,17 @@ void ArrowDragItem::addChildArrow(ArrowDragItem *child)
     childArrows.append(child);
 }
 
+void ArrowDragItem::cancel()
+{
+    for (const auto &child : childArrows) {
+        if (child) {
+            child->cancel();
+        }
+    }
+    childArrows.clear();
+    ArrowItem::cancel();
+}
+
 void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     if (targetLocked || !startItem) {
@@ -393,8 +410,10 @@ void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     targetItem ? updatePath() : updatePath(endPos);
     update();
 
-    for (auto *child : childArrows) {
-        child->mouseMoveEvent(event);
+    for (const auto &child : childArrows) {
+        if (child) {
+            child->mouseMoveEvent(event);
+        }
     }
 }
 
@@ -403,10 +422,7 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     if (!startItem) {
         // The source card was destroyed while the arrow was being drawn.
         // Clean up the arrow and its children instead of leaking them.
-        delArrow();
-        for (auto *child : childArrows) {
-            child->mouseReleaseEvent(event);
-        }
+        cancel();
         return;
     }
 
@@ -415,7 +431,7 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         // For now, we can safely assume that the start item is always a card.
         // The target item can be a player as well.
         if (!startCard) {
-            delArrow();
+            cancel();
             return;
         }
 
@@ -435,7 +451,7 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         } else if (auto *targetPlayer = qgraphicsitem_cast<PlayerTarget *>(targetItem)) {
             arrow.targetPlayerId = targetPlayer->getOwner()->getPlayerInfo()->getId();
         } else {
-            delArrow();
+            cancel();
             return;
         }
 
@@ -448,9 +464,12 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     }
 
     delArrow();
-    for (auto *child : childArrows) {
-        child->mouseReleaseEvent(event);
+    for (const auto &child : childArrows) {
+        if (child) {
+            child->mouseReleaseEvent(event);
+        }
     }
+    childArrows.clear();
 }
 
 // ArrowAttachItem
@@ -469,6 +488,17 @@ ArrowAttachItem::ArrowAttachItem(ArrowTarget *_startItem)
 void ArrowAttachItem::addChildArrow(ArrowAttachItem *child)
 {
     childArrows.append(child);
+}
+
+void ArrowAttachItem::cancel()
+{
+    for (const auto &child : childArrows) {
+        if (child) {
+            child->cancel();
+        }
+    }
+    childArrows.clear();
+    ArrowItem::cancel();
 }
 
 void ArrowAttachItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
@@ -509,8 +539,10 @@ void ArrowAttachItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     targetItem ? updatePath() : updatePath(endPos);
     update();
 
-    for (auto *child : childArrows) {
-        child->mouseMoveEvent(event);
+    for (const auto &child : childArrows) {
+        if (child) {
+            child->mouseMoveEvent(event);
+        }
     }
 }
 
@@ -519,17 +551,16 @@ void ArrowAttachItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     if (!startItem) {
         // The source card was destroyed while the arrow was being drawn.
         // Clean up the arrow and its children instead of leaking them.
-        delArrow();
-        for (auto *child : childArrows) {
-            child->mouseReleaseEvent(event);
-        }
+        cancel();
         return;
     }
 
     // Attaching could move startItem under the current cursor position, causing all children to retarget to it right
     // before they are processed. Prevent that.
-    for (auto *child : childArrows) {
-        child->setTargetLocked(true);
+    for (const auto &child : childArrows) {
+        if (child) {
+            child->setTargetLocked(true);
+        }
     }
 
     if (targetItem && targetItem != startItem) {
@@ -541,7 +572,10 @@ void ArrowAttachItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     }
 
     delArrow();
-    for (auto *child : childArrows) {
-        child->mouseReleaseEvent(event);
+    for (const auto &child : childArrows) {
+        if (child) {
+            child->mouseReleaseEvent(event);
+        }
     }
+    childArrows.clear();
 }

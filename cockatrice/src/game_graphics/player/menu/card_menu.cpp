@@ -123,7 +123,7 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, CardItem *_card, bool _shortcuts
 
     aRevealToAll = new QAction(this);
 
-    mCardCounters = new QMenu;
+    mCardCounters = new QMenu(this);
 
     // Card counters
     for (int i = 0; i < 6; ++i) {
@@ -225,7 +225,7 @@ void CardMenu::createTableMenu(bool canModifyCard)
     }
     addSeparator();
     addAction(aClone);
-    addMenu(new MoveMenu(player));
+    addMenu(new MoveMenu(player, this));
     addSeparator();
     addAction(aAttach);
     if (card->getAttachedTo()) {
@@ -233,7 +233,7 @@ void CardMenu::createTableMenu(bool canModifyCard)
     }
     addAction(aDrawArrow);
     addSeparator();
-    addMenu(new PtMenu(player));
+    addMenu(new PtMenu(player, this));
     addAction(aSetAnnotation);
     addSeparator();
     addAction(aReduceLifeByPower);
@@ -275,7 +275,7 @@ void CardMenu::createStackMenu(bool canModifyCard)
     addAction(aPlayFacedown);
     addSeparator();
     addAction(aClone);
-    addMenu(new MoveMenu(player));
+    addMenu(new MoveMenu(player, this));
     addSeparator();
     addAction(aAttach);
     addAction(aDrawArrow);
@@ -304,7 +304,7 @@ void CardMenu::createGraveyardOrExileMenu(bool canModifyCard)
     addAction(aPlayFacedown);
     addSeparator();
     addAction(aClone);
-    addMenu(new MoveMenu(player));
+    addMenu(new MoveMenu(player, this));
     addSeparator();
     addAction(aAttach);
     addAction(aDrawArrow);
@@ -342,7 +342,7 @@ void CardMenu::createHandOrCustomZoneMenu(bool canModifyCard)
 
     addSeparator();
     addAction(aClone);
-    addMenu(new MoveMenu(player));
+    addMenu(new MoveMenu(player, this));
 
     // actions that are really wonky when done from deck or sideboard
     if (card->getZone()->getName() == ZoneNames::HAND) {
@@ -366,7 +366,7 @@ void CardMenu::createHandOrCustomZoneMenu(bool canModifyCard)
 void CardMenu::createZonelessMenu(bool canModifyCard)
 {
     if (canModifyCard) {
-        addMenu(new MoveMenu(player));
+        addMenu(new MoveMenu(player, this));
     }
 }
 
@@ -415,7 +415,7 @@ void CardMenu::addRelatedCardView()
     }
 
     addSeparator();
-    auto viewRelatedCards = new QMenu(tr("View related cards"));
+    auto viewRelatedCards = new QMenu(tr("View related cards"), this);
     addMenu(viewRelatedCards);
     for (const CardRelation *relatedCard : relatedCards) {
         QString relatedCardName = relatedCard->getName();
@@ -463,16 +463,16 @@ void CardMenu::addRelatedCardActions()
             relatedCardName = relatedCard.getName(); // "name"
         }
 
-        QString text = tr("Token: ");
+        QString text;
         if (cardRelation->getDoesAttach()) {
-            text +=
-                tr(cardRelation->getDoesTransform() ? "Transform into " : "Attach to ") + "\"" + relatedCardName + "\"";
+            text = cardRelation->getDoesTransform() ? tr("Token: Transform into \"%1\"").arg(relatedCardName)
+                                                    : tr("Token: Attach to \"%1\"").arg(relatedCardName);
         } else if (cardRelation->getIsVariable()) {
-            text += "X " + relatedCardName;
+            text = tr("Token: X %1").arg(relatedCardName);
         } else if (cardRelation->getDefaultCount() != 1) {
-            text += QString::number(cardRelation->getDefaultCount()) + "x " + relatedCardName;
+            text = tr("Token: %1x %2").arg(cardRelation->getDefaultCount()).arg(relatedCardName);
         } else {
-            text += relatedCardName;
+            text = tr("Token: %1").arg(relatedCardName);
         }
 
         if (createRelatedCards == nullptr) {

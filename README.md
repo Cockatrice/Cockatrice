@@ -84,7 +84,7 @@ Join our [Discord community](https://discord.gg/3Z9yzmA) to connect with other p
 
 ### Code
 
-To commit code to the project, please review our [Contribution Guidelines](https://github.com/Cockatrice/Cockatrice/blob/master/.github/CONTRIBUTING.md) first.<br>
+To commit code to the project, please review our [Contribution Guidelines](https://github.com/Cockatrice/Cockatrice/blob/master/docs/CONTRIBUTING.md) first.<br>
 We maintain two tags for contributors to easier find issues to potentially work on:
 - [![Good first issue](https://img.shields.io/github/issues/cockatrice/cockatrice/Good%20First%20Issue)](https://github.com/Cockatrice/Cockatrice/issues?utf8=%E2%9C%93&q=is%3Aopen%20is%3Aissue%20label%3A%22Good%20first%20issue%22%20)<br>
 Issues tagged in this way provide a simple way to get started. They don't require much experience to be worked on.
@@ -103,7 +103,7 @@ There are various places where useful information for different needs are mainta
 - [Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki) `Community supported`
 - [Official Webpage](https://cockatrice.github.io/)
 - [Official README](https://github.com/Cockatrice/Cockatrice/blob/master/README.md) `This file`
-- [Official CONTRIBUTING](https://github.com/Cockatrice/Cockatrice/blob/master/.github/CONTRIBUTING.md)
+- [Official CONTRIBUTING](https://github.com/Cockatrice/Cockatrice/blob/master/docs/CONTRIBUTING.md)
 
 Cockatrice tries to use the [Google Developer Documentation Style Guide](https://developers.google.com/style/) to ensure consistent documentation.  
 We encourage everybody to improve the documentation by suggesting edits based on this guide.
@@ -163,7 +163,7 @@ The following flags (with their non-default values) can be passed to `cmake`:
 | `-DTEST=1`                 | Enable regression tests<br> **Note:** `make test` to run tests, *googletest* will be downloaded if not available                              |
 
 > [!TIP]
-> Build code documentation ([Doxygen](https://www.doxygen.nl)) according to our [configuration](https://github.com/Cockatrice/Cockatrice/blob/master/Doxyfile) into `/docs`:
+> Build code documentation ([Doxygen](https://www.doxygen.nl)) according to our [configuration](https://github.com/Cockatrice/Cockatrice/blob/master/Doxyfile) into `/docs-output`:
 > ```bash
 > doxygen Doxyfile
 > ```

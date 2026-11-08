@@ -23,9 +23,13 @@
 #include <libcockatrice/card/printing/exact_card.h>
 #include <libcockatrice/card/set/card_set.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
+#include <libcockatrice/rng/rng_abstract.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <qnamespace.h>
 #include <string>
+
+// Referenced by other translation units in the server_remote library.
+RNG_Abstract *rng = nullptr;
 
 namespace
 {

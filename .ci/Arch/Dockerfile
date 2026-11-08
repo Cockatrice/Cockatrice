@@ -1,9 +1,9 @@
-from archlinux:latest
+FROM archlinux:latest
 
 RUN pacman --sync --refresh --sysupgrade --needed --noconfirm \
-        base-devel \
         ccache \
         cmake \
+        gcc \
         git \
         gtest \
         mariadb-libs \

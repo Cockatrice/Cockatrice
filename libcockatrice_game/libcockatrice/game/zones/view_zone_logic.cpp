@@ -7,6 +7,7 @@
 #include <QtGlobal>
 #include <libcockatrice/interfaces/interface_interface_settings_provider.h>
 #include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/utility/zone_names.h>
 
 class PlayerLogic;
 class QObject;
@@ -34,6 +35,11 @@ ZoneViewZoneLogic::ZoneViewZoneLogic(PlayerLogic *_player,
 bool ZoneViewZoneLogic::getCloseEmptyCardView() const
 {
     return interfaceSettings ? interfaceSettings->getCloseEmptyCardView() : true;
+}
+
+bool ZoneViewZoneLogic::isLibraryEdgeView() const
+{
+    return origZone != nullptr && numberCards > 0 && origZone->getName() == ZoneNames::DECK;
 }
 
 /**

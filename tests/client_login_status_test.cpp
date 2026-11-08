@@ -13,6 +13,10 @@
 #include <QMetaObject>
 #include <QString>
 #include <gtest/gtest.h>
+#include <libcockatrice/rng/rng_abstract.h>
+
+// Referenced by other translation units in the server_remote library.
+RNG_Abstract *rng = nullptr;
 
 namespace
 {

@@ -13,11 +13,13 @@
 #include <QList>
 #include <QPoint>
 #include <QPointF>
+#include <QPointer>
 #include <QString>
 #include <QVariantList>
 #include <libcockatrice/game/board/card_state.h>
 #include <qtmetamacros.h>
 
+class ArrowItem;
 class CardDragItem;
 class ServerInfo_Card;
 class PlayerLogic;
@@ -34,6 +36,7 @@ class CardItem : public AbstractCardItem
     Q_OBJECT
 private:
     CardDragItem *dragItem;
+    QPointer<ArrowItem> pendingArrow;
 
     void prepareDelete();
     void handleClickedToPlay(bool shiftHeld);

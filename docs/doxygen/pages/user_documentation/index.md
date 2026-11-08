@@ -7,6 +7,10 @@
 - @subpage editing_decks
 - @subpage exporting_decks
 
+## Gameplay
+
+- @subpage revealing_cards
+
 ## Release Channels
 
 - @subpage beta_release

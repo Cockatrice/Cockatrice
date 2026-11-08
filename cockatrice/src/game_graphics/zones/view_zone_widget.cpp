@@ -294,6 +294,7 @@ void ZoneViewWidget::retranslateUi()
 
     shuffleCheckBox.setText(tr("shuffle when closing"));
     pileViewCheckBox.setText(tr("pile view"));
+    zone->retranslateEdgeMarker();
 }
 
 void ZoneViewWidget::stopWindowDrag()

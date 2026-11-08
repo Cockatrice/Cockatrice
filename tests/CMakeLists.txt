@@ -301,6 +301,7 @@ cockatrice_add_test(
   NAME
   server_card_counter_test
   SOURCES
+  ${VERSION_STRING_CPP}
   server_card_counter_test.cpp
   LIBS
   libcockatrice_network
@@ -311,6 +312,7 @@ cockatrice_add_test(
   NAME
   server_dump_zone_test
   SOURCES
+  ${VERSION_STRING_CPP}
   server_dump_zone_test.cpp
   LIBS
   libcockatrice_rng
@@ -322,6 +324,7 @@ cockatrice_add_test(
   NAME
   server_counter_test
   SOURCES
+  ${VERSION_STRING_CPP}
   server_counter_test.cpp
   LIBS
   libcockatrice_network
@@ -333,6 +336,7 @@ cockatrice_add_test(
   server_developer_role_test
   NO_SANITIZE
   SOURCES
+  ${VERSION_STRING_CPP}
   server_developer_role_test.cpp
   LIBS
   libcockatrice_network
@@ -345,9 +349,21 @@ cockatrice_add_test(
   server_moderator_role_test
   NO_SANITIZE
   SOURCES
+  ${VERSION_STRING_CPP}
   server_moderator_role_test.cpp
   LIBS
   libcockatrice_network
+  libcockatrice_rng
+  LABELS
+  server
+)
+cockatrice_add_test(
+  NAME
+  random_reveal_test
+  SOURCES
+  random_reveal_test.cpp
+  LIBS
+  libcockatrice_network_server_remote
   libcockatrice_rng
   LABELS
   server
@@ -391,6 +407,7 @@ cockatrice_add_test(
   NAME
   local_client_lifetime_test
   SOURCES
+  ${VERSION_STRING_CPP}
   local_client_lifetime_test.cpp
   LIBS
   libcockatrice_network
@@ -412,6 +429,7 @@ cockatrice_add_test(
   NAME
   latency_tracker_test
   SOURCES
+  ${VERSION_STRING_CPP}
   latency_tracker_test.cpp
   LIBS
   libcockatrice_network
@@ -453,6 +471,31 @@ cockatrice_add_test(
   SOURCES
   ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/theme_config.cpp
   font_config_test.cpp
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src
+)
+cockatrice_add_test(
+  NAME
+  game_creation_options_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/game_hosting/game_creation_options.cpp
+  game_creation_options_test.cpp
+  LIBS
+  libcockatrice_interfaces
+  libcockatrice_protocol
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src
+)
+cockatrice_add_test(
+  NAME
+  create_game_form_widget_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/game_hosting/create_game_form_widget.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/game_hosting/game_creation_options.cpp
+  create_game_form_widget_test.cpp
+  LIBS
+  libcockatrice_interfaces
+  libcockatrice_protocol
   INCLUDE_DIRS
   ${CMAKE_SOURCE_DIR}/cockatrice/src
 )

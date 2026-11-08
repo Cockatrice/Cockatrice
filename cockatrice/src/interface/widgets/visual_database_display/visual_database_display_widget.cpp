@@ -160,6 +160,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     connect(clearFilterWidget, &QToolButton::clicked, this, [this] {
         filterModel->blockSignals(true);
         filterModel->filterTree()->blockSignals(true);
+        colorFilterWidget->setFilterMode(FilterMode::Includes);
         filterModel->clear();
         filterModel->blockSignals(false);
         filterModel->filterTree()->blockSignals(false);
