@@ -45,13 +45,15 @@ VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidg
     sortGroupBox = new QGroupBox(this);
     filterGroupBox = new QGroupBox(this);
 
-    auto scalePixmap = [](const QString &prefix) { return loadThemedIcon(prefix).pixmap({20, 20}); };
+    auto scalePixmap = [](const QString &prefix, const IconTint &tint = {}) {
+        return loadThemedIcon(prefix, tint).pixmap({20, 20});
+    };
 
     sortByLabel = new QLabel(this);
     sortByLabel->setPixmap(scalePixmap("icons/sort_arrow_down"));
 
     filterByLabel = new QLabel(this);
-    filterByLabel->setPixmap(scalePixmap("icons/filter"));
+    filterByLabel->setPixmap(scalePixmap("icons/filter", AppColor::Informational));
 
     sortColumnCombo = new QComboBox(this);
     sortColumnCombo->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);

@@ -83,7 +83,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     searchEdit->setClearButtonEnabled(true);
     searchEdit->addAction(loadThemedIcon(QStringLiteral("icons/search"), IconTint::quiet()),
                           QLineEdit::LeadingPosition);
-    auto help = searchEdit->addAction(loadThemedIcon(QStringLiteral("icons/info"), IconTint::quiet()),
+    auto help = searchEdit->addAction(loadThemedIcon(QStringLiteral("icons/info"), AppColor::Informational),
                                       QLineEdit::TrailingPosition);
     connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(searchEdit); });
 
