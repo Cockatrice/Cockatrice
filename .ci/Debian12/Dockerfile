@@ -1,16 +1,17 @@
-FROM debian:12
+FROM debian:12-slim
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        build-essential \
         ca-certificates \
         ccache \
         cmake \
+        dpkg-dev \
         file \
         g++ \
         git \
         libcurl4-openssl-dev \
         libgl-dev \
+        libgtest-dev \
         liblzma-dev \
         libmariadb-dev-compat \
         libprotobuf-dev \
