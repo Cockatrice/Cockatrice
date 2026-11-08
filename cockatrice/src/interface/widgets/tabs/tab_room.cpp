@@ -113,7 +113,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
 
     QMap<int, GameTypeMap> tempMap;
     tempMap.insert(info.room_id(), gameTypes);
-    gameSelector = new GameSelector(client, tabSupervisor, this, QMap<int, QString>(), tempMap, true, true);
+    gameSelector = new GameSelector(client, tabSupervisor, this, QMap<int, QString>(), tempMap, true, true, this);
 
     userListPanel = new UserListPanelWidget(tabSupervisor, client, this);
     userListPanel->bind(tabSupervisor->getUserListManager());
@@ -720,6 +720,7 @@ void TabRoom::processRemoveMessagesEvent(const Event_RemoveMessages &event)
 void TabRoom::refreshShortcuts()
 {
     aClearChat->setShortcuts(SettingsCache::instance().shortcuts().getShortcut("tab_room/aClearChat"));
+    gameSelector->refreshShortcuts();
 }
 
 void TabRoom::addMentionTag(QString mentionTag)
