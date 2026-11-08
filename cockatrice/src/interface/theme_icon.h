@@ -109,11 +109,6 @@ public:
      */
     QColor resolve(QIcon::Mode mode) const;
 
-    IconEmphasis getEmphasis() const
-    {
-        return emphasis;
-    }
-
 private:
     enum class Source
     {

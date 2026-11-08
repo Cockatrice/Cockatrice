@@ -90,8 +90,8 @@ QColor expectedNeutralInk(const QPalette &palette)
                                   palette.color(QPalette::Active, QPalette::Highlight));
 }
 
-/** @brief Opaque pixels that are not the given rim color, i.e. the gradient fill. */ int
-countOpaquePixelsOtherThan(const QPixmap &pixmap, const QColor &excluded)
+/** @brief Opaque pixels that are not the given rim color, i.e. the gradient fill. */
+int countOpaquePixelsOtherThan(const QPixmap &pixmap, const QColor &excluded)
 {
     const QImage image = pixmap.toImage();
     int count = 0;

@@ -62,9 +62,14 @@ QColor reachContrast(const QColor &color, const QColor &background, double minRa
     if (contrastRatio(color, background) >= minRatio) {
         return color;
     }
-    // Move away from the background: toward black on a light surface, toward
-    // white on a dark one. The hue is kept by interpolating, not by replacing.
-    const QColor pole = relativeLuminance(background) > 0.5 ? QColor(Qt::black) : QColor(Qt::white);
+    // Move away from the background: toward whichever pole actually reaches
+    // further. Black and white cross at a luminance of about 0.18, not 0.5, so
+    // the midpoint test would pick white on a surface where black is far more
+    // legible -- and could drag an ink that already cleared the floor to white.
+    // The hue is kept by interpolating, not by replacing.
+    const QColor black(Qt::black);
+    const QColor white(Qt::white);
+    const QColor pole = contrastRatio(black, background) >= contrastRatio(white, background) ? black : white;
     if (contrastRatio(pole, background) < minRatio) {
         return pole;
     }
