@@ -482,6 +482,42 @@ QColor defaultAppColor(AppColor::Role role, bool dark)
             return QColor(dark ? QStringLiteral("#ff8378") : QStringLiteral("#da0b00"));
         case AppColor::NegativeSoft:
             return QColor(dark ? QStringLiteral("#c79e9b") : QStringLiteral("#935f5c"));
+        // Informational is the third semantic family: a state that is neither a
+        // gain nor a loss (a face-down play, the exile zone). It carries the
+        // same three-level ladder so its emphasis is authored, not computed.
+        case AppColor::Informational:
+            return QColor(dark ? QStringLiteral("#7aa9f2") : QStringLiteral("#1c64c4"));
+        case AppColor::InformationalStrong:
+            return QColor(dark ? QStringLiteral("#69aeff") : QStringLiteral("#0a4fb5"));
+        case AppColor::InformationalSoft:
+            return QColor(dark ? QStringLiteral("#9db2cd") : QStringLiteral("#526a8a"));
+        // Hidden is the game's hidden-information cluster: a face-down play and
+        // peeking at a card face. Violet keeps it apart from the blue
+        // Informational family, which carries public information (reveal).
+        case AppColor::Hidden:
+            return QColor(dark ? QStringLiteral("#c6a5fa") : QStringLiteral("#6d28d9"));
+        case AppColor::HiddenStrong:
+            return QColor(dark ? QStringLiteral("#c99bff") : QStringLiteral("#4c0f9e"));
+        case AppColor::HiddenSoft:
+            return QColor(dark ? QStringLiteral("#b3a6c9") : QStringLiteral("#6a5a8c"));
+        // Marked is the marks a player leaves on a card: an annotation or a
+        // draw arrow. Amber names a persistent, removable mark rather than a
+        // gain or a loss, so annotation and arrow finally share a colour.
+        case AppColor::Marked:
+            return QColor(dark ? QStringLiteral("#e2a63a") : QStringLiteral("#9a5b05"));
+        case AppColor::MarkedStrong:
+            return QColor(dark ? QStringLiteral("#ffb020") : QStringLiteral("#8a4f02"));
+        case AppColor::MarkedSoft:
+            return QColor(dark ? QStringLiteral("#c2ab7d") : QStringLiteral("#7b6a4a"));
+        // Movement is a card changing position without a gain or a loss: the
+        // library placements (top, bottom, X from top). Teal keeps it apart
+        // from the green "into play" moves and the blue informational states.
+        case AppColor::Movement:
+            return QColor(dark ? QStringLiteral("#4cc2b5") : QStringLiteral("#0e7a72"));
+        case AppColor::MovementStrong:
+            return QColor(dark ? QStringLiteral("#2dd4bf") : QStringLiteral("#096b62"));
+        case AppColor::MovementSoft:
+            return QColor(dark ? QStringLiteral("#a3c1bc") : QStringLiteral("#4a6b67"));
     }
 
     return {};

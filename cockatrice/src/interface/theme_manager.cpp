@@ -683,6 +683,18 @@ QColor ThemeManager::appColor(AppColor::Role role) const
         case AppColor::Negative:
         case AppColor::NegativeStrong:
         case AppColor::NegativeSoft:
+        case AppColor::Informational:
+        case AppColor::InformationalStrong:
+        case AppColor::InformationalSoft:
+        case AppColor::Hidden:
+        case AppColor::HiddenStrong:
+        case AppColor::HiddenSoft:
+        case AppColor::Marked:
+        case AppColor::MarkedStrong:
+        case AppColor::MarkedSoft:
+        case AppColor::Movement:
+        case AppColor::MovementStrong:
+        case AppColor::MovementSoft:
             // Semantic colors are independent of the accent: a missing role must
             // not silently paint "remove" in the theme's highlight color.
             return defaultAppColor(role, isDarkModeActive());

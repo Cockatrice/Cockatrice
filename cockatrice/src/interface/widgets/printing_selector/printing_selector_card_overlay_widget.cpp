@@ -430,7 +430,8 @@ static QPixmap composePinBadgePixmap(const QSize &logicalSize, qreal devicePixel
     // Inset the glyph so the backdrop reads as a badge around it, not as a border.
     const int inset = qRound(logicalSize.width() * 0.16);
     const QSize glyphSize = logicalSize - QSize(inset * 2, inset * 2);
-    const QPixmap glyph = loadThemedIcon(QStringLiteral("icons/pin")).pixmap(glyphSize, devicePixelRatio);
+    const QPixmap glyph =
+        loadThemedIcon(QStringLiteral("icons/pin"), AppColor::Marked).pixmap(glyphSize, devicePixelRatio);
     if (glyph.isNull()) {
         // Let the caller fall back to the textual badge instead of drawing an empty panel.
         return QPixmap();

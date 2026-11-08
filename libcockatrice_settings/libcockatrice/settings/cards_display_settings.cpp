@@ -68,6 +68,35 @@ bool CardsDisplaySettings::getScaleCards() const
     return getValue("scaleCards", QString(), QString(), true).toBool();
 }
 
+int CardsDisplaySettings::getHoverPanelTrigger() const
+{
+    // Off by default: the panel is new, so it is opt-in.
+    return getValue("hoverPanelTrigger", QString(), QString(), static_cast<int>(HoverPanelTriggerOff)).toInt();
+}
+
+int CardsDisplaySettings::getHoverZoomTrigger() const
+{
+    // Off by default: the smooth hover zoom is opt-in. With no trigger configured,
+    // hovering keeps the historical 1.1x scale (AbstractCardItem::setHoverHighlighted)
+    // instead of the smooth zoom to the hover panel size.
+    return getValue("hoverZoomTrigger", QString(), QString(), static_cast<int>(HoverPanelTriggerOff)).toInt();
+}
+
+bool CardsDisplaySettings::getHoverPanelDoubleConfirm() const
+{
+    return getValue("hoverPanelDoubleConfirm", QString(), QString(), false).toBool();
+}
+
+int CardsDisplaySettings::getHoverZoomDelayMs() const
+{
+    return getValue("hoverZoomDelayMs", QString(), QString(), 400).toInt();
+}
+
+int CardsDisplaySettings::getHoverPanelDelayMs() const
+{
+    return getValue("hoverPanelDelayMs", QString(), QString(), 200).toInt();
+}
+
 int CardsDisplaySettings::getStackCardOverlapPercent() const
 {
     return getValue("verticalCardOverlapPercent", QString(), QString(), 33).toInt();
@@ -186,6 +215,36 @@ void CardsDisplaySettings::setAutoRotateSidewaysLayoutCards(bool _autoRotateSide
 void CardsDisplaySettings::setCardScaling(bool _scaleCards)
 {
     setValue(_scaleCards, "scaleCards");
+}
+
+void CardsDisplaySettings::setHoverPanelTrigger(int _trigger)
+{
+    setValue(_trigger, "hoverPanelTrigger");
+    emit hoverPanelTriggerChanged(_trigger);
+}
+
+void CardsDisplaySettings::setHoverZoomTrigger(int _trigger)
+{
+    setValue(_trigger, "hoverZoomTrigger");
+    emit hoverZoomTriggerChanged(_trigger);
+}
+
+void CardsDisplaySettings::setHoverPanelDoubleConfirm(bool _doubleConfirm)
+{
+    setValue(_doubleConfirm, "hoverPanelDoubleConfirm");
+    emit hoverPanelDoubleConfirmChanged(_doubleConfirm);
+}
+
+void CardsDisplaySettings::setHoverZoomDelayMs(int _ms)
+{
+    setValue(_ms, "hoverZoomDelayMs");
+    emit hoverZoomDelayMsChanged(_ms);
+}
+
+void CardsDisplaySettings::setHoverPanelDelayMs(int _ms)
+{
+    setValue(_ms, "hoverPanelDelayMs");
+    emit hoverPanelDelayMsChanged(_ms);
 }
 
 void CardsDisplaySettings::setStackCardOverlapPercent(int _verticalCardOverlapPercent)

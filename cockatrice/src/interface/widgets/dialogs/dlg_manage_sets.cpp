@@ -89,7 +89,8 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     searchField = new LineEditUnfocusable;
     searchField->setObjectName("searchEdit");
     searchField->setPlaceholderText(tr("Search by set name, code, type, or release date"));
-    searchField->addAction(loadThemedIcon(QStringLiteral("icons/search")), LineEditUnfocusable::LeadingPosition);
+    searchField->addAction(loadThemedIcon(QStringLiteral("icons/search"), IconTint::quiet()),
+                           LineEditUnfocusable::LeadingPosition);
     searchField->setClearButtonEnabled(true);
     setFocusProxy(searchField);
 

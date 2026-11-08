@@ -40,8 +40,10 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent
     searchEdit->setObjectName("searchEdit");
     searchEdit->setPlaceholderText(tr("Search by card name (or search expressions)"));
     searchEdit->setClearButtonEnabled(true);
-    searchEdit->addAction(loadThemedIcon(QStringLiteral("icons/search")), QLineEdit::LeadingPosition);
-    auto help = searchEdit->addAction(loadThemedIcon(QStringLiteral("icons/info")), QLineEdit::TrailingPosition);
+    searchEdit->addAction(loadThemedIcon(QStringLiteral("icons/search"), IconTint::quiet()),
+                          QLineEdit::LeadingPosition);
+    auto help = searchEdit->addAction(loadThemedIcon(QStringLiteral("icons/info"), IconTint::quiet()),
+                                      QLineEdit::TrailingPosition);
 
     setFocusProxy(searchEdit);
     setFocusPolicy(Qt::ClickFocus);
@@ -83,7 +85,8 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent
             &DeckEditorDatabaseDisplayWidget::onRelatedCardClicked);
 
     aAddCard = new QAction(QString(), this);
-    aAddCard->setIcon(loadThemedIcon(QStringLiteral("icons/arrow_right"), AppColor::Positive));
+    aAddCard->setIcon(loadThemedIcon(QStringLiteral("icons/arrow_right"),
+                                     IconTint(AppColor::Positive, IconEmphasis::Primary), IconStyle::Sticker));
     connect(aAddCard, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
     auto *tbAddCard = new QToolButton(this);
     tbAddCard->setDefaultAction(aAddCard);

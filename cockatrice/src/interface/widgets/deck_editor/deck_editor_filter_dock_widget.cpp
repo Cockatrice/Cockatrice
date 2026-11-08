@@ -68,7 +68,8 @@ void DeckEditorFilterDockWidget::createFiltersDock()
     connect(aClearFilterOne, &QAction::triggered, this, &DeckEditorFilterDockWidget::actClearFilterOne);
 
     aClearFilterAll = new QAction(QString(), this);
-    aClearFilterAll->setIcon(loadThemedIcon(QStringLiteral("icons/clearsearch")));
+    aClearFilterAll->setIcon(
+        loadThemedIcon(QStringLiteral("icons/clearsearch"), AppColor::Negative, IconStyle::Sticker));
     connect(aClearFilterAll, &QAction::triggered, this, &DeckEditorFilterDockWidget::actClearFilterAll);
 
     auto *filterDelOne = new QToolButton();

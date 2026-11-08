@@ -119,11 +119,11 @@ void VisualDeckDisplayOptionsWidget::updateDisplayTypeButton()
     switch (currentDisplayType) {
         case DisplayType::Flat:
             displayTypeButton->setButtonText(tr("Toggle Layout: Flat"));
-            displayTypeButton->setButtonIcon(loadThemedIcon(QStringLiteral("icons/scroll")));
+            displayTypeButton->setButtonIcon(loadThemedIcon(QStringLiteral("icons/scroll"), IconTint::primary()));
             break;
         case DisplayType::Overlap:
             displayTypeButton->setButtonText(tr("Toggle Layout: Overlap"));
-            displayTypeButton->setButtonIcon(loadThemedIcon(QStringLiteral("icons/scales")));
+            displayTypeButton->setButtonIcon(loadThemedIcon(QStringLiteral("icons/scales"), IconTint::primary()));
             break;
     }
 }
