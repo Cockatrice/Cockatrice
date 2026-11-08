@@ -762,8 +762,16 @@ void DeckSyncManager::onDeleteFinished(const Response &response,
     if (response.response_code() == Response::RespOk || response.response_code() == Response::RespNameNotFound) {
         DeckSyncSidecar sidecar(sidecarPath);
         sidecar.load();
+        const int deletedDeckId = sidecar.get(relativePath).remoteId;
         sidecar.remove(relativePath);
         sidecar.save();
+        if (deletedDeckId != -1) {
+            // The unmatched-server-rows pass queued a download for this row before
+            // the delete ran. The delete won, so drop the download instead of
+            // letting it fail with NameNotFound and count as a skipped deck. A
+            // failed delete leaves the download in place as the fallback.
+            pendingDownloads.removeIf([deletedDeckId](const DownloadOp &op) { return op.deckId == deletedDeckId; });
+        }
         ++removedCount;
     } else {
         ++skippedCount;
