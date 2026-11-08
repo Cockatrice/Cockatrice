@@ -91,7 +91,7 @@ jobs:
 
       - name: "Checkout"
         if: steps.configure.outputs.tag != null
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0    # fetch all history for all branches and tags
 
@@ -150,7 +150,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # vcpkg-tool reads versions/baseline.json out of the commit named by
       # `builtin-baseline`, through the `vcpkg` submodule's git history. A submodule
@@ -337,12 +337,12 @@ jobs:
     # Shared with build-linux-nightly so the two leg sets run the same steps.
     steps: &linux-steps
       - name: "Checkout"
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: "Restore compiler cache (ccache)"
         id: restore_ccache
         if: env.PERSIST_CCACHE == 'true'
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: ccache-${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}
           path: ${{ env.CACHE }}/.ccache
@@ -389,7 +389,7 @@ jobs:
 
       - name: "Upload coverage artifact"
         if: matrix.coverage == 'yes'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: coverage-report
           path: coverage/
@@ -507,7 +507,7 @@ jobs:
 
       - name: "Save updated compiler cache (ccache)"
         if: github.ref == 'refs/heads/master' && env.PERSIST_CCACHE == 'true'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: ${{ steps.restore_ccache.outputs.cache-primary-key }}
           path: ${{ env.CACHE }}/.ccache
@@ -515,7 +515,7 @@ jobs:
       - name: "Upload artifact"
         id: upload_artifact
         if: matrix.package != 'skip'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           archive: false
           if-no-files-found: error
@@ -535,7 +535,7 @@ jobs:
       - name: "Attest binary provenance"
         id: attestation
         if: steps.upload_release.outcome == 'success'
-        uses: actions/attest@v4
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
         with:
           show-summary: false
           subject-path: ${{ steps.build.outputs.path }}
@@ -749,13 +749,13 @@ jobs:
     # Shared with build-vcpkg-nightly so the two leg sets run the same steps.
     steps: &vcpkg-steps
       - name: "Checkout"
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: recursive
 
       - name: "[Windows] Add msbuild to PATH"
         if: matrix.os == 'Windows'
-        uses: microsoft/setup-msbuild@v3
+        uses: microsoft/setup-msbuild@30375c66a4eea26614e0d39710365f22f8b0af57 # v3.0.0
         with:
           msbuild-architecture: x64
 
@@ -771,7 +771,7 @@ jobs:
       - name: "Restore compiler cache (ccache)"
         if: matrix.use_ccache == 1 && env.PERSIST_CCACHE == 'true'
         id: restore_ccache
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: ccache-${{ matrix.os }}${{ matrix.target }}
           path: ${{ env.CCACHE_DIR }}
@@ -800,7 +800,7 @@ jobs:
       - name: "[macOS] Restore thin Qt ${{ steps.resolve_qt_version.outputs.version }}"
         if: matrix.os == 'macOS'
         id: restore_qt
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: Qt-${{ steps.resolve_qt_version.outputs.version }}-macOS-${{ matrix.soc }}-${{ matrix.qt_modules }}-${{ env.QT_ARCHIVES }}-thin
           path: ${{ github.workspace }}/Qt
@@ -809,7 +809,7 @@ jobs:
       # Qt build using vcpkg either just fails or takes too long to build
       - name: "[macOS] Install fat Qt ${{ matrix.qt_version }}"
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
-        uses: jurplel/install-qt-action@v4
+        uses: jurplel/install-qt-action@b344308e4483fc892e0d27b3cd1b173ebdd95f06 # v4.5.0
         with:
           archives: ${{ env.QT_ARCHIVES }}
           cache: false
@@ -824,14 +824,14 @@ jobs:
 
       - name: "[macOS] Cache thin Qt libraries"
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true' && github.ref == 'refs/heads/master'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: ${{ steps.restore_qt.outputs.cache-primary-key }}
           path: ${{ github.workspace }}/Qt
 
       - name: "[Windows] Install Qt ${{ matrix.qt_version }}"
         if: matrix.os == 'Windows'
-        uses: jurplel/install-qt-action@v4
+        uses: jurplel/install-qt-action@b344308e4483fc892e0d27b3cd1b173ebdd95f06 # v4.5.0
         with:
           # Qt 6.11.0 only works with aqtinstall directly from git until aqtinstall 3.4 is released
           aqtsource: git+https://github.com/miurahr/aqtinstall.git
@@ -855,7 +855,7 @@ jobs:
 
       - name: "Setup vcpkg cache"
         id: vcpkg-cache
-        uses: TAServers/vcpkg-cache@v3
+        uses: TAServers/vcpkg-cache@4f07be616a4604dd29f3c6885975cf2c04abee71 # v3.4.2
         with:
           # Every entry is keyed by vcpkg ABI hash, and one hash set exists per platform,
           # target and toolchain. The action restores every entry it finds under the
@@ -1115,7 +1115,7 @@ jobs:
       - name: "Upload new vcpkg entries"
         # An empty count means the step above did not run at all, on master and on forks
         if: steps.vcpkg_new.outputs.count != '' && steps.vcpkg_new.outputs.count != '0'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           if-no-files-found: error    # a count above zero with nothing staged is a bug
           name: vcpkg-new-${{ steps.vcpkg_new.outputs.slug }}
@@ -1138,7 +1138,7 @@ jobs:
 
       - name: "Cache updated compiler cache (ccache)"
         if: matrix.use_ccache == 1 && env.PERSIST_CCACHE == 'true' && github.ref == 'refs/heads/master'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: ${{ steps.restore_ccache.outputs.cache-primary-key }}
           path: ${{ env.CCACHE_DIR }}
@@ -1193,7 +1193,7 @@ jobs:
       - name: "Upload artifact"
         if: matrix.make_package
         id: upload_artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           archive: false
           if-no-files-found: error
@@ -1225,7 +1225,7 @@ jobs:
       # debug identifier, and the PE is what carries the unwind information.
       - name: "[Windows] Upload debug symbols (exe + pdb)"
         if: matrix.os == 'Windows' && needs.configure.outputs.tag != null
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           if-no-files-found: error
           name: ${{ steps.build.outputs.name }}-Symbols
@@ -1240,7 +1240,7 @@ jobs:
       - name: "Attest binary provenance"
         if: steps.upload_release.outcome == 'success'
         id: attestation
-        uses: actions/attest@v4
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
         with:
           show-summary: false
           subject-path: ${{ steps.build.outputs.path }}

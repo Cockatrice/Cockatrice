@@ -9,11 +9,15 @@
 #include <QStringLiteral>
 #include <QTemporaryDir>
 #include <gtest/gtest.h>
+#include <libcockatrice/rng/rng_abstract.h>
 #include <string>
 
 // Owned by main.cpp in the real application; pixel_map_generator.cpp references
 // it, so the test binary needs a definition even though it never renders.
 ThemeManager *themeManager = nullptr;
+
+// Referenced by other translation units in the server_remote library.
+RNG_Abstract *rng = nullptr;
 
 namespace
 {
