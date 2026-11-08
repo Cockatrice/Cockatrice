@@ -17,12 +17,14 @@
 #include <QString>
 #include <QStringList>
 #include <libcockatrice/card/card_info.h>
+#include <memory>
 #include <qnamespace.h>
 #include <qtmetamacros.h>
 #include <utility>
 
 class CardRelation;
 class QRegularExpression;
+class TagDatabase;
 
 // many users prefer not to see these sets with non english arts
 // they will given priority PriorityLowest
@@ -211,6 +213,12 @@ private:
     bool localizationEnabled = false;
 
     /**
+     * Optional tag lookup applied to every imported card. Owned by the wizard
+     * so it outlives the import worker; null when tags are disabled.
+     */
+    std::shared_ptr<const TagDatabase> tagDatabase;
+
+    /**
      * Localized name/text collected per imported card key while parsing sets,
      * applied to the CardInfo objects by applyLocalizedData() once all
      * printings have been seen so the best-priority one wins.
@@ -263,6 +271,16 @@ public:
     void setProgressReporting(bool enabled)
     {
         progressReporting = enabled;
+    }
+    /**
+     * @brief Supplies the tag database applied to every imported card.
+     *
+     * Pass nullptr to import without tags. The wizard keeps the database alive
+     * for the whole import, so the worker sees a stable pointer.
+     */
+    void setTagDatabase(std::shared_ptr<const TagDatabase> database)
+    {
+        tagDatabase = std::move(database);
     }
     /**
      * Selects the ISO-639 language code whose foreignData is imported.

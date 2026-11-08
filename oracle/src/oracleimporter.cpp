@@ -6,6 +6,7 @@
 #include "libcockatrice/card/relation/card_relation_type.h"
 #include "libcockatrice/interfaces/noop_card_set_priority_controller.h"
 #include "parsehelpers.h"
+#include "tag_database.h"
 
 #include <QChar>
 #include <QDebug>
@@ -517,14 +518,24 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
             properties.insert("coloridentity", colorIdentity);
         }
 
-        // Scryfall Tagger tags (resolved by MTGJSON into the `tags` array).
-        // Stored space-separated so the `tags:` search can match each slug as a
-        // discrete token; slugs never contain whitespace.
+        // Card tags: the source's own `tags` array is used when present (MTGJson
+        // may ship one eventually), then the configured tag database is joined in
+        // while the card's identifiers are still available. Stored space-separated
+        // so `tags:` can match each slug as a discrete token; slugs never contain
+        // whitespace.
         QStringList tags;
         for (const QJsonValue &tag : card.value("tags").toArray()) {
             const QString tagSlug = tag.toString().trimmed().toLower();
             if (!tagSlug.isEmpty() && !tags.contains(tagSlug)) {
                 tags.append(tagSlug);
+            }
+        }
+        if (tagDatabase) {
+            const QString oracleId = getJsonString(identifiers, "scryfallOracleId");
+            for (const QString &tagSlug : tagDatabase->tagsForCard(oracleId, name)) {
+                if (!tags.contains(tagSlug)) {
+                    tags.append(tagSlug);
+                }
             }
         }
         if (!tags.isEmpty()) {

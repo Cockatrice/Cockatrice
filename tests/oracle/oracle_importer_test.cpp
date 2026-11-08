@@ -1,5 +1,6 @@
 #include "../../oracle/src/oracleimporter.h"
 #include "../../oracle/src/raw_json_scanner.h"
+#include "../../oracle/src/tag_database.h"
 #include "libcockatrice/card/card_info.h"
 
 #include "gtest/gtest.h"
@@ -595,6 +596,100 @@ TEST_F(OracleImporterTest, SplitCardTagsAreUnioned)
     QJsonArray cards{face1, face2};
 
     importer->importCardsFromSet(set, cards);
+    auto result = importer->getCardList().value("Fire // Ice");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_EQ(result->getProperty("tags"), "card-advantage removal");
+}
+
+// ============================================================================
+// Tag database join tests
+// ============================================================================
+
+TEST_F(OracleImporterTest, AppliesTagDatabaseByOracleId)
+{
+    QJsonObject card = makeCard("Tagged By Id");
+    QJsonObject identifiers = card["identifiers"].toObject();
+    identifiers["scryfallOracleId"] = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+    card["identifiers"] = identifiers;
+
+    QString error;
+    const auto database = TagDatabase::loadFromData(
+        R"json({"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa": ["removal", "ramp"]})json", TagDatabase::LoadOptions{}, &error);
+    ASSERT_TRUE(database) << error.toStdString();
+    importer->setTagDatabase(database);
+
+    importer->importCardsFromSet(set, QJsonArray{card});
+
+    auto result = importer->getCardList().value("Tagged By Id");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_EQ(result->getProperty("tags"), "ramp removal");
+}
+
+TEST_F(OracleImporterTest, AppliesTagDatabaseByNameWhenOracleIdIsMissing)
+{
+    QJsonObject card = makeCard("Lightning Bolt");
+
+    QString error;
+    const auto database = TagDatabase::loadFromData(R"json({"Lightning Bolt": ["burn", "removal"]})json",
+                                                    TagDatabase::LoadOptions{}, &error);
+    ASSERT_TRUE(database) << error.toStdString();
+    importer->setTagDatabase(database);
+
+    importer->importCardsFromSet(set, QJsonArray{card});
+
+    auto result = importer->getCardList().value("Lightning Bolt");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_EQ(result->getProperty("tags"), "burn removal");
+}
+
+TEST_F(OracleImporterTest, TagDatabaseUnionsWithSourceTags)
+{
+    QJsonObject card = makeCard("Union Card");
+    QJsonObject identifiers = card["identifiers"].toObject();
+    identifiers["scryfallOracleId"] = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+    card["identifiers"] = identifiers;
+    card["tags"] = QJsonArray{"ramp"};
+
+    QString error;
+    const auto database = TagDatabase::loadFromData(
+        R"json({"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa": ["removal", "ramp"]})json", TagDatabase::LoadOptions{}, &error);
+    ASSERT_TRUE(database) << error.toStdString();
+    importer->setTagDatabase(database);
+
+    importer->importCardsFromSet(set, QJsonArray{card});
+
+    auto result = importer->getCardList().value("Union Card");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_EQ(result->getProperty("tags"), "ramp removal");
+}
+
+TEST_F(OracleImporterTest, TagDatabaseSplitFacesUnionTheirTags)
+{
+    QJsonObject face1 = makeCard("Fire // Ice");
+    face1["layout"] = "split";
+    face1["side"] = "a";
+    face1["faceName"] = "Fire";
+    QJsonObject identifiers1 = face1["identifiers"].toObject();
+    identifiers1["scryfallOracleId"] = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+    face1["identifiers"] = identifiers1;
+
+    QJsonObject face2 = makeCard("Fire // Ice");
+    face2["layout"] = "split";
+    face2["side"] = "b";
+    face2["faceName"] = "Ice";
+    QJsonObject identifiers2 = face2["identifiers"].toObject();
+    identifiers2["scryfallOracleId"] = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb";
+    face2["identifiers"] = identifiers2;
+
+    QString error;
+    const auto database = TagDatabase::loadFromData(
+        R"json({"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa": ["removal"], "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb": ["card-advantage"]})json",
+        TagDatabase::LoadOptions{}, &error);
+    ASSERT_TRUE(database) << error.toStdString();
+    importer->setTagDatabase(database);
+
+    importer->importCardsFromSet(set, QJsonArray{face1, face2});
+
     auto result = importer->getCardList().value("Fire // Ice");
     ASSERT_FALSE(result.isNull());
     ASSERT_EQ(result->getProperty("tags"), "card-advantage removal");
