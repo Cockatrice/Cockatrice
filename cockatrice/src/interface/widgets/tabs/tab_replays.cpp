@@ -222,7 +222,7 @@ QGroupBox *TabReplays::createRightLayout()
         loadThemedIcon(QStringLiteral("icons/remove_row"), AppColor::Negative, IconStyle::Sticker));
     connect(aDeleteRemoteReplay, &QAction::triggered, this, &TabReplays::actDeleteRemoteReplay);
     aGetReplayCode = new QAction(this);
-    aGetReplayCode->setIcon(loadThemedIcon(QStringLiteral("icons/share")));
+    aGetReplayCode->setIcon(loadThemedIcon(QStringLiteral("icons/share"), AppColor::Informational));
     connect(aGetReplayCode, &QAction::triggered, this, &TabReplays::actGetReplayCode);
 
     aSubmitReplayCode = new QAction(this);

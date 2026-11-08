@@ -223,7 +223,7 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     connect(aDeleteRemoteDeck, &QAction::triggered, this, &TabDeckStorage::actDeleteRemoteDeck);
 
     aShareDecks = new QAction(this);
-    aShareDecks->setIcon(loadThemedIcon(QStringLiteral("icons/share")));
+    aShareDecks->setIcon(loadThemedIcon(QStringLiteral("icons/share"), AppColor::Informational));
     connect(aShareDecks, &QAction::triggered, this, &TabDeckStorage::actShareDecks);
 
     aPublishDeck = new QAction(this);
