@@ -1,8 +1,8 @@
 #include "game_scene.h"
 
 #include "../client/settings/cache_settings.h"
-#include "../interface/widgets/cards/card_hover_widget.h"
 #include "../interface/theme_manager.h"
+#include "../interface/widgets/cards/card_hover_widget.h"
 #include "animated_item.h"
 #include "board/abstract_card_item.h"
 #include "board/arrow_item.h"
