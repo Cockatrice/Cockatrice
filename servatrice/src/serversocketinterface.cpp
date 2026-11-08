@@ -1115,9 +1115,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
     const QString bannerCardProvider = deck.getBannerCard().providerId.left(32);
     const QString tagsJson = serializeDeckTags(deck.getTags());
     const QString colorIdentity = sanitizeColorIdentity(nameFromStdString(cmd.color_identity()));
-    // Hash the exact bytes the client sent: both peers must compare the same
-    // string, not each side's re-serialisation of it.
-    const QString deckHash = DeckList::contentHash(deckStr);
+    // Hash the timestamp-free serialisation, the same way DeckSyncManager hashes
+    // local files, so uploads from any path or client version compare equal.
+    const QString deckHash = deck.getContentHash();
     QString guid = cmd.has_guid() ? nameFromStdString(cmd.guid()).left(36) : QString();
     if (QUuid::fromString(guid).isNull()) {
         guid = QUuid::createUuid().toString(QUuid::WithoutBraces);
