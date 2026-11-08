@@ -6,21 +6,25 @@
 #include <QByteArray>
 #include <QFuture>
 #include <QFutureWatcher>
+#include <QPointer>
 #include <QString>
 #include <QStringList>
 #include <QtGlobal>
+#include <memory>
 #include <qtmetamacros.h>
 
 class QCheckBox;
 class QComboBox;
 class QLabel;
 class QLineEdit;
+class QNetworkReply;
 class QRadioButton;
 class QProgressBar;
 class QTextEdit;
 class QPushButton;
 class QUrl;
 class QWidget;
+class TagDatabase;
 
 class IntroPage : public OracleWizardPage
 {
@@ -107,6 +111,71 @@ private slots:
     void scanProgressToStdout(int bytesRead, int totalBytes);
     void importFinished();
     void zipDownloadFailed(const QString &message);
+};
+
+/**
+ * @brief Optional wizard step that loads the tag database used by the importer.
+ *
+ * Reloading is skipped when the source and parent-tag setting are unchanged, so
+ * going back and forth through the wizard does not re-download the tag data.
+ */
+class TagsPage : public OracleWizardPage
+{
+    Q_OBJECT
+public:
+    explicit TagsPage(QWidget *parent = nullptr);
+    void retranslateUi() override;
+    bool isComplete() const override;
+
+protected:
+    void initializePage() override;
+    bool validatePage() override;
+    void cancelWork() override;
+
+private:
+    struct LoadResult
+    {
+        std::shared_ptr<TagDatabase> database;
+        QString errorMessage;
+    };
+
+    QCheckBox *enableCheckBox;
+    QRadioButton *urlRadioButton;
+    QRadioButton *fileRadioButton;
+    QLineEdit *urlLineEdit;
+    QLineEdit *fileLineEdit;
+    QPushButton *urlButton;
+    QPushButton *fileButton;
+    QCheckBox *parentsCheckBox;
+    QLabel *statusLabel;
+    QLabel *progressLabel;
+    QProgressBar *progressBar;
+
+    QFutureWatcher<LoadResult> watcher;
+    QFuture<LoadResult> future;
+    QPointer<QNetworkReply> activeReply;
+    bool loadActive = false;
+    QString loadedSource;
+    bool loadedParents = false;
+
+    [[nodiscard]] QString selectedSource() const;
+    void updateSourceEnabled();
+    void saveSettings();
+    void beginLoad(const QByteArray &data);
+    void loadFromFile(const QString &path);
+    void downloadMetadata(const QUrl &url);
+    void downloadTagFile(const QUrl &url);
+    void finishLoad();
+    void failLoad(const QString &message);
+    void advance();
+
+private slots:
+    void actChooseFile();
+    void actRestoreDefaultSource();
+    void actDownloadProgress(qint64 received, qint64 total);
+    void actMetadataFinished();
+    void actTagFileFinished();
+    void actLoadFinished();
 };
 
 class SaveSetsPage : public OracleWizardPage
