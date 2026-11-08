@@ -179,12 +179,13 @@ PaletteConfig fromAccent(const QColor &accent, int intensity, const QString &sch
     cfg.appColors[AppColor::IconSoft] = ThemeIconInk::forEmphasis(iconInk, iconSurface, IconEmphasis::Quiet);
     // Semantic roles stay independent of the accent: a generated palette must
     // still paint add/ready green, remove/not-ready red, information blue,
-    // hidden information violet and marks amber.
+    // hidden information violet, marks amber and movement teal.
     for (const AppColor::Role role :
          {AppColor::Positive, AppColor::PositiveStrong, AppColor::PositiveSoft, AppColor::Negative,
           AppColor::NegativeStrong, AppColor::NegativeSoft, AppColor::Informational, AppColor::InformationalStrong,
           AppColor::InformationalSoft, AppColor::Hidden, AppColor::HiddenStrong, AppColor::HiddenSoft, AppColor::Marked,
-          AppColor::MarkedStrong, AppColor::MarkedSoft}) {
+          AppColor::MarkedStrong, AppColor::MarkedSoft, AppColor::Movement, AppColor::MovementStrong,
+          AppColor::MovementSoft}) {
         cfg.appColors[role] = defaultAppColor(role, dark);
     }
 

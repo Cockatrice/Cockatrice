@@ -509,6 +509,15 @@ QColor defaultAppColor(AppColor::Role role, bool dark)
             return QColor(dark ? QStringLiteral("#ffb020") : QStringLiteral("#8a4f02"));
         case AppColor::MarkedSoft:
             return QColor(dark ? QStringLiteral("#c2ab7d") : QStringLiteral("#7b6a4a"));
+        // Movement is a card changing position without a gain or a loss: the
+        // library placements (top, bottom, X from top). Teal keeps it apart
+        // from the green "into play" moves and the blue informational states.
+        case AppColor::Movement:
+            return QColor(dark ? QStringLiteral("#4cc2b5") : QStringLiteral("#0e7a72"));
+        case AppColor::MovementStrong:
+            return QColor(dark ? QStringLiteral("#2dd4bf") : QStringLiteral("#096b62"));
+        case AppColor::MovementSoft:
+            return QColor(dark ? QStringLiteral("#a3c1bc") : QStringLiteral("#4a6b67"));
     }
 
     return {};

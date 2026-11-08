@@ -105,6 +105,7 @@ TEST(IconTintPreview, WritesOneSheetPerShippedTheme)
         {"Informational", AppColor::Informational, {"arrow_right", "view", "arrow_to_top"}},
         {"Hidden", AppColor::Hidden, {"view", "arrow_right", "swap"}},
         {"Marked", AppColor::Marked, {"pencil", "share", "pin"}},
+        {"Movement", AppColor::Movement, {"arrow_to_top", "arrow_to_bottom", "arrow_down"}},
     };
     const QStringList themes = {
         QStringLiteral("Fabric"), QStringLiteral("Fusion"),       QStringLiteral("Leather"),

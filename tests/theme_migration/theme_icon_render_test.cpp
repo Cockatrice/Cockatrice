@@ -1541,7 +1541,8 @@ TEST_F(ThemeIconRenderTest, EmphasisSelectsTheAuthoredVariant)
           Family{AppColor::Negative, AppColor::NegativeStrong, AppColor::NegativeSoft},
           Family{AppColor::Informational, AppColor::InformationalStrong, AppColor::InformationalSoft},
           Family{AppColor::Hidden, AppColor::HiddenStrong, AppColor::HiddenSoft},
-          Family{AppColor::Marked, AppColor::MarkedStrong, AppColor::MarkedSoft}}) {
+          Family{AppColor::Marked, AppColor::MarkedStrong, AppColor::MarkedSoft},
+          Family{AppColor::Movement, AppColor::MovementStrong, AppColor::MovementSoft}}) {
         EXPECT_EQ(IconTint(family.base, IconEmphasis::Primary).resolve(QIcon::Normal),
                   themeManager->appColor(family.strong));
         EXPECT_EQ(IconTint(family.base).resolve(QIcon::Normal), themeManager->appColor(family.base));
@@ -1674,6 +1675,17 @@ TEST_F(ThemeIconRenderTest, EmphasisKeepsASemanticHue)
                 ++checked;
                 EXPECT_GT(ink.red(), ink.green()) << theme.toStdString() << static_cast<int>(role);
                 EXPECT_GT(ink.green(), ink.blue()) << theme.toStdString() << static_cast<int>(role);
+            }
+
+            for (const AppColor::Role role : {AppColor::Movement, AppColor::MovementStrong, AppColor::MovementSoft}) {
+                // Movement is teal: green leads, then blue, then red.
+                const QColor ink = roles.value(role, defaultAppColor(role, dark));
+                if (!ink.isValid()) {
+                    continue;
+                }
+                ++checked;
+                EXPECT_GT(ink.green(), ink.blue()) << theme.toStdString() << static_cast<int>(role);
+                EXPECT_GT(ink.blue(), ink.red()) << theme.toStdString() << static_cast<int>(role);
             }
         }
     }
@@ -1863,7 +1875,8 @@ TEST(IconInk, DefaultSemanticFamilyMeetsTheLadderOnPlatformSurfaces)
               std::tuple{AppColor::Negative, AppColor::NegativeStrong, AppColor::NegativeSoft},
               std::tuple{AppColor::Informational, AppColor::InformationalStrong, AppColor::InformationalSoft},
               std::tuple{AppColor::Hidden, AppColor::HiddenStrong, AppColor::HiddenSoft},
-              std::tuple{AppColor::Marked, AppColor::MarkedStrong, AppColor::MarkedSoft}}) {
+              std::tuple{AppColor::Marked, AppColor::MarkedStrong, AppColor::MarkedSoft},
+              std::tuple{AppColor::Movement, AppColor::MovementStrong, AppColor::MovementSoft}}) {
             const QColor secondary = defaultAppColor(base, scheme.dark);
             const QColor primary = defaultAppColor(strong, scheme.dark);
             const QColor quiet = defaultAppColor(soft, scheme.dark);
@@ -1957,6 +1970,11 @@ TEST_F(ThemeIconRenderTest, EmphasisPreviewWritesPngsWhenRequested)
          AppColor::InformationalStrong},
         {"Hidden", {"view", "arrow_right", "swap"}, AppColor::HiddenSoft, AppColor::Hidden, AppColor::HiddenStrong},
         {"Marked", {"pencil", "share", "pin"}, AppColor::MarkedSoft, AppColor::Marked, AppColor::MarkedStrong},
+        {"Movement",
+         {"arrow_to_top", "arrow_to_bottom", "arrow_down"},
+         AppColor::MovementSoft,
+         AppColor::Movement,
+         AppColor::MovementStrong},
     };
     const QStringList themes = {
         QStringLiteral("Fabric"), QStringLiteral("Fusion"),       QStringLiteral("Leather"),
@@ -2157,6 +2175,11 @@ TEST_F(ThemeIconRenderTest, EmphasisTreatmentsPreviewWritesPngsWhenRequested)
          AppColor::InformationalStrong},
         {"Hidden", {"view", "arrow_right", "swap"}, AppColor::HiddenSoft, AppColor::Hidden, AppColor::HiddenStrong},
         {"Marked", {"pencil", "share", "pin"}, AppColor::MarkedSoft, AppColor::Marked, AppColor::MarkedStrong},
+        {"Movement",
+         {"arrow_to_top", "arrow_to_bottom", "arrow_down"},
+         AppColor::MovementSoft,
+         AppColor::Movement,
+         AppColor::MovementStrong},
     };
     const QStringList themes = {
         QStringLiteral("Fabric"), QStringLiteral("Fusion"),       QStringLiteral("Leather"),

@@ -185,6 +185,12 @@ TEST(ThemeAppColorTest, SemanticDefaultsFollowTheScheme)
     EXPECT_EQ(defaultAppColor(AppColor::MarkedStrong, true), QColor(QStringLiteral("#ffb020")));
     EXPECT_EQ(defaultAppColor(AppColor::MarkedSoft, false), QColor(QStringLiteral("#7b6a4a")));
     EXPECT_EQ(defaultAppColor(AppColor::MarkedSoft, true), QColor(QStringLiteral("#c2ab7d")));
+    EXPECT_EQ(defaultAppColor(AppColor::Movement, false), QColor(QStringLiteral("#0e7a72")));
+    EXPECT_EQ(defaultAppColor(AppColor::Movement, true), QColor(QStringLiteral("#4cc2b5")));
+    EXPECT_EQ(defaultAppColor(AppColor::MovementStrong, false), QColor(QStringLiteral("#096b62")));
+    EXPECT_EQ(defaultAppColor(AppColor::MovementStrong, true), QColor(QStringLiteral("#2dd4bf")));
+    EXPECT_EQ(defaultAppColor(AppColor::MovementSoft, false), QColor(QStringLiteral("#4a6b67")));
+    EXPECT_EQ(defaultAppColor(AppColor::MovementSoft, true), QColor(QStringLiteral("#a3c1bc")));
     // Accent and neutral icon roles have no static default: an older theme
     // written before the roles existed falls back to deriving them from its
     // palette rather than pinning one scheme's ink.

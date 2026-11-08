@@ -66,6 +66,10 @@ AppColor::Role emphasisRole(AppColor::Role role, IconEmphasis emphasis)
             return emphasis == IconEmphasis::Primary ? AppColor::MarkedStrong
                    : emphasis == IconEmphasis::Quiet ? AppColor::MarkedSoft
                                                      : AppColor::Marked;
+        case AppColor::Movement:
+            return emphasis == IconEmphasis::Primary ? AppColor::MovementStrong
+                   : emphasis == IconEmphasis::Quiet ? AppColor::MovementSoft
+                                                     : AppColor::Movement;
         default:
             return role;
     }

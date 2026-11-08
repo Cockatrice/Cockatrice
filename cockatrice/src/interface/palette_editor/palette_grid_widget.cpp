@@ -90,6 +90,10 @@ static const QMap<AppColor::Role, const char *> APP_ROLE_DESCRIPTIONS = {
     {AppColor::Marked, QT_TRANSLATE_NOOP("PaletteGridWidget", "Marks left on a card (annotation, draw arrow)")},
     {AppColor::MarkedStrong, QT_TRANSLATE_NOOP("PaletteGridWidget", "Marks on a card at primary emphasis")},
     {AppColor::MarkedSoft, QT_TRANSLATE_NOOP("PaletteGridWidget", "Marks on a card at quiet emphasis")},
+    {AppColor::Movement,
+     QT_TRANSLATE_NOOP("PaletteGridWidget", "Cards moving without a gain or a loss (library placements)")},
+    {AppColor::MovementStrong, QT_TRANSLATE_NOOP("PaletteGridWidget", "Movement at primary emphasis")},
+    {AppColor::MovementSoft, QT_TRANSLATE_NOOP("PaletteGridWidget", "Movement at quiet emphasis")},
 };
 
 PaletteGridWidget::PaletteGridWidget(QWidget *parent) : QWidget(parent)
