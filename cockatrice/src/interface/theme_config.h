@@ -16,10 +16,10 @@
 //
 // The icon families carry one role per emphasis level. Icon is the neutral
 // glyph ink; IconStrong and IconSoft are its primary and quiet levels. Positive,
-// Negative and Informational follow the same pattern, so an emphasis never has
-// to be computed from a hue at paint time: the theme authors all three levels.
-// Naming a variant explicitly (`IconStrong`) pins that level; naming the family
-// (`Icon`) lets the caller's emphasis choose.
+// Negative, Informational, Hidden and Marked follow the same pattern, so an
+// emphasis never has to be computed from a hue at paint time: the theme authors
+// all three levels. Naming a variant explicitly (`IconStrong`) pins that level;
+// naming the family (`Icon`) lets the caller's emphasis choose.
 namespace AppColor
 {
 Q_NAMESPACE
@@ -39,6 +39,12 @@ enum Role
     Informational,
     InformationalStrong,
     InformationalSoft,
+    Hidden,
+    HiddenStrong,
+    HiddenSoft,
+    Marked,
+    MarkedStrong,
+    MarkedSoft,
 };
 Q_ENUM_NS(Role)
 } // namespace AppColor

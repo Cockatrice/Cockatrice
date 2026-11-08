@@ -103,6 +103,8 @@ TEST(IconTintPreview, WritesOneSheetPerShippedTheme)
         {"Positive", AppColor::Positive, {"increment", "ready_start", "arrow_up"}},
         {"Negative", AppColor::Negative, {"decrement", "not_ready_start", "remove_row"}},
         {"Informational", AppColor::Informational, {"arrow_right", "view", "arrow_to_top"}},
+        {"Hidden", AppColor::Hidden, {"view", "arrow_right", "swap"}},
+        {"Marked", AppColor::Marked, {"pencil", "share", "pin"}},
     };
     const QStringList themes = {
         QStringLiteral("Fabric"), QStringLiteral("Fusion"),       QStringLiteral("Leather"),

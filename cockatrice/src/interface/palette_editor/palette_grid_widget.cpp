@@ -83,6 +83,13 @@ static const QMap<AppColor::Role, const char *> APP_ROLE_DESCRIPTIONS = {
                        "Informational state that is neither a gain nor a loss (face-down, exile)")},
     {AppColor::InformationalStrong, QT_TRANSLATE_NOOP("PaletteGridWidget", "Informational state at primary emphasis")},
     {AppColor::InformationalSoft, QT_TRANSLATE_NOOP("PaletteGridWidget", "Informational state at quiet emphasis")},
+    {AppColor::Hidden,
+     QT_TRANSLATE_NOOP("PaletteGridWidget", "Hidden information (face-down play, peek at the card face)")},
+    {AppColor::HiddenStrong, QT_TRANSLATE_NOOP("PaletteGridWidget", "Hidden information at primary emphasis")},
+    {AppColor::HiddenSoft, QT_TRANSLATE_NOOP("PaletteGridWidget", "Hidden information at quiet emphasis")},
+    {AppColor::Marked, QT_TRANSLATE_NOOP("PaletteGridWidget", "Marks left on a card (annotation, draw arrow)")},
+    {AppColor::MarkedStrong, QT_TRANSLATE_NOOP("PaletteGridWidget", "Marks on a card at primary emphasis")},
+    {AppColor::MarkedSoft, QT_TRANSLATE_NOOP("PaletteGridWidget", "Marks on a card at quiet emphasis")},
 };
 
 PaletteGridWidget::PaletteGridWidget(QWidget *parent) : QWidget(parent)

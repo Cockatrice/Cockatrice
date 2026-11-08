@@ -173,6 +173,18 @@ TEST(ThemeAppColorTest, SemanticDefaultsFollowTheScheme)
     EXPECT_EQ(defaultAppColor(AppColor::InformationalStrong, true), QColor(QStringLiteral("#69aeff")));
     EXPECT_EQ(defaultAppColor(AppColor::InformationalSoft, false), QColor(QStringLiteral("#526a8a")));
     EXPECT_EQ(defaultAppColor(AppColor::InformationalSoft, true), QColor(QStringLiteral("#9db2cd")));
+    EXPECT_EQ(defaultAppColor(AppColor::Hidden, false), QColor(QStringLiteral("#6d28d9")));
+    EXPECT_EQ(defaultAppColor(AppColor::Hidden, true), QColor(QStringLiteral("#c6a5fa")));
+    EXPECT_EQ(defaultAppColor(AppColor::HiddenStrong, false), QColor(QStringLiteral("#4c0f9e")));
+    EXPECT_EQ(defaultAppColor(AppColor::HiddenStrong, true), QColor(QStringLiteral("#c99bff")));
+    EXPECT_EQ(defaultAppColor(AppColor::HiddenSoft, false), QColor(QStringLiteral("#6a5a8c")));
+    EXPECT_EQ(defaultAppColor(AppColor::HiddenSoft, true), QColor(QStringLiteral("#b3a6c9")));
+    EXPECT_EQ(defaultAppColor(AppColor::Marked, false), QColor(QStringLiteral("#9a5b05")));
+    EXPECT_EQ(defaultAppColor(AppColor::Marked, true), QColor(QStringLiteral("#e2a63a")));
+    EXPECT_EQ(defaultAppColor(AppColor::MarkedStrong, false), QColor(QStringLiteral("#8a4f02")));
+    EXPECT_EQ(defaultAppColor(AppColor::MarkedStrong, true), QColor(QStringLiteral("#ffb020")));
+    EXPECT_EQ(defaultAppColor(AppColor::MarkedSoft, false), QColor(QStringLiteral("#7b6a4a")));
+    EXPECT_EQ(defaultAppColor(AppColor::MarkedSoft, true), QColor(QStringLiteral("#c2ab7d")));
     // Accent and neutral icon roles have no static default: an older theme
     // written before the roles existed falls back to deriving them from its
     // palette rather than pinning one scheme's ink.

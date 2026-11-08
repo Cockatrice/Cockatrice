@@ -491,6 +491,24 @@ QColor defaultAppColor(AppColor::Role role, bool dark)
             return QColor(dark ? QStringLiteral("#69aeff") : QStringLiteral("#0a4fb5"));
         case AppColor::InformationalSoft:
             return QColor(dark ? QStringLiteral("#9db2cd") : QStringLiteral("#526a8a"));
+        // Hidden is the game's hidden-information cluster: a face-down play and
+        // peeking at a card face. Violet keeps it apart from the blue
+        // Informational family, which carries public information (reveal).
+        case AppColor::Hidden:
+            return QColor(dark ? QStringLiteral("#c6a5fa") : QStringLiteral("#6d28d9"));
+        case AppColor::HiddenStrong:
+            return QColor(dark ? QStringLiteral("#c99bff") : QStringLiteral("#4c0f9e"));
+        case AppColor::HiddenSoft:
+            return QColor(dark ? QStringLiteral("#b3a6c9") : QStringLiteral("#6a5a8c"));
+        // Marked is the marks a player leaves on a card: an annotation or a
+        // draw arrow. Amber names a persistent, removable mark rather than a
+        // gain or a loss, so annotation and arrow finally share a colour.
+        case AppColor::Marked:
+            return QColor(dark ? QStringLiteral("#e2a63a") : QStringLiteral("#9a5b05"));
+        case AppColor::MarkedStrong:
+            return QColor(dark ? QStringLiteral("#ffb020") : QStringLiteral("#8a4f02"));
+        case AppColor::MarkedSoft:
+            return QColor(dark ? QStringLiteral("#c2ab7d") : QStringLiteral("#7b6a4a"));
     }
 
     return {};
