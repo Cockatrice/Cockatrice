@@ -20,6 +20,8 @@ enum Role
 {
     AccentStrong,
     AccentSoft,
+    Positive,
+    Negative,
 };
 Q_ENUM_NS(Role)
 } // namespace AppColor
@@ -40,6 +42,16 @@ enum Role
 };
 Q_ENUM_NS(Role)
 } // namespace AppFont
+
+/**
+ * @brief Fallback for an application color role when the active theme does not
+ *        define one.
+ *
+ * Accent roles return an invalid QColor because ThemeManager derives them from
+ * the palette highlight. Semantic roles return an opaque default that suits the
+ * scheme, so themes written before the role existed still render it.
+ */
+QColor defaultAppColor(AppColor::Role role, bool dark);
 
 struct ThemeConfig
 {

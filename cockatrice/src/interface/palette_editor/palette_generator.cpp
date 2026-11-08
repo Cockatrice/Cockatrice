@@ -167,6 +167,10 @@ PaletteConfig fromAccent(const QColor &accent, int intensity, const QString &sch
     // the lightened, desaturated companion used for button-gradient highlights.
     cfg.appColors[AppColor::AccentStrong] = hl;
     cfg.appColors[AppColor::AccentSoft] = hsl(accent.lightness() + 60, qRound(accent.hslSaturation() * 70 / 100.0));
+    // Semantic roles stay independent of the accent: a generated palette must
+    // still paint add/ready green and remove/not-ready red.
+    cfg.appColors[AppColor::Positive] = defaultAppColor(AppColor::Positive, dark);
+    cfg.appColors[AppColor::Negative] = defaultAppColor(AppColor::Negative, dark);
 
     // BrightText
     QColor bright;

@@ -6,6 +6,7 @@
 
 #include <QApplication>
 #include <QColor>
+#include <QCoreApplication>
 #include <QEvent>
 #include <QFont>
 #include <QFrame>
@@ -60,8 +61,14 @@ static const QMap<QPalette::ColorRole, const char *> ROLE_DESCRIPTIONS = {
 };
 
 static const QMap<AppColor::Role, const char *> APP_ROLE_DESCRIPTIONS = {
-    {AppColor::AccentStrong, QT_TR_NOOP("Vivid primary accent (e.g. home-tab button gradient start)")},
-    {AppColor::AccentSoft, QT_TR_NOOP("Lightened, desaturated accent (e.g. home-tab button gradient end)")},
+    {AppColor::AccentStrong,
+     QT_TRANSLATE_NOOP("PaletteGridWidget", "Vivid primary accent (e.g. home-tab button gradient start)")},
+    {AppColor::AccentSoft,
+     QT_TRANSLATE_NOOP("PaletteGridWidget", "Lightened, desaturated accent (e.g. home-tab button gradient end)")},
+    {AppColor::Positive,
+     QT_TRANSLATE_NOOP("PaletteGridWidget", "Positive state and additive actions (ready, add, increment)")},
+    {AppColor::Negative,
+     QT_TRANSLATE_NOOP("PaletteGridWidget", "Negative state and removal actions (not ready, remove, decrement)")},
 };
 
 PaletteGridWidget::PaletteGridWidget(QWidget *parent) : QWidget(parent)
@@ -179,7 +186,7 @@ void PaletteGridWidget::buildGrid(QWidget *host)
         }
 
         auto *label = new QLabel(QString(appEnum.valueToKey(role)), host);
-        label->setToolTip(APP_ROLE_DESCRIPTIONS.value(role, {}));
+        label->setToolTip(QCoreApplication::translate("PaletteGridWidget", APP_ROLE_DESCRIPTIONS.value(role, {})));
         label->setContentsMargins(4, 2, 8, 2);
         grid->addWidget(label, row, 0);
 

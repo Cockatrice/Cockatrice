@@ -6,12 +6,82 @@
 #ifndef THEME_ICON_H
 #define THEME_ICON_H
 
+#include "theme_config.h"
+
+#include <QColor>
 #include <QIcon>
 #include <QPalette>
 #include <QPixmap>
 #include <QSize>
 #include <QString>
 #include <QStringView>
+
+/**
+ * @brief Selects how a `currentColor` glyph is painted.
+ *
+ * The tint decides the tone. The style decides how much shape carries it.
+ *
+ * Line is the default and matches what every caller did before this axis
+ * existed: the recolored glyph alone, at the author's stroke weight. Use it for
+ * navigation, menu and toolbar glyphs, where a row of badges would compete with
+ * the content.
+ *
+ * Badge reproduces the pre-#7595 ready/not-ready art: a filled disc, a dark ring
+ * and a contrast glyph derived from the tone. A filled shape draws more
+ * attention than a line, so it is opt-in per call site. It was made for the
+ * ready/not-ready icons. The add/remove/delete icons were filled glyphs with an
+ * outline and no disc, so badging them would produce art the UI never had.
+ * Authored art that carries its own colors is never badged and falls back to the
+ * asset path. Disabled icons fall back to the line glyph too, because a filled
+ * disc at full mass does not read as unavailable.
+ *
+ * Sticker reproduces the other half of the pre-#7595 set: the filled add, remove
+ * and delete glyphs, painted with a tone gradient and a dark outline and no
+ * disc. It shares the disabled fallback for the same reason.
+ */
+enum class IconStyle
+{
+    Line,    ///< the recolored glyph alone
+    Badge,   ///< filled disc + dark ring + contrast glyph
+    Sticker, ///< filled glyph + dark outline, no disc
+};
+
+/**
+ * @brief Selects the color that replaces the `currentColor` sentinel.
+ *
+ * A palette role follows Qt's structural palette. An application color carries
+ * meaning that QPalette cannot express, such as positive and negative states.
+ * Callers choose the role. The active theme supplies the value.
+ */
+class IconTint
+{
+public:
+    IconTint() = default;
+    IconTint(QPalette::ColorRole role); // implicit: existing palette-role callers
+    IconTint(AppColor::Role role);      // implicit: semantic callers
+
+    /**
+     * @brief Resolves the concrete color for an icon mode.
+     *
+     * A disabled application color resolves to the disabled foreground, so an
+     * unavailable control does not keep its semantic color. A selected palette
+     * color keeps the WindowText -> HighlightedText swap. Application colors go
+     * through the saturation floor shared by the filled treatments, so a line
+     * glyph, a badge disc and a sticker fill carry the same tone.
+     */
+    QColor resolve(QIcon::Mode mode) const;
+
+private:
+    enum class Source
+    {
+        Palette,
+        AppColor,
+    };
+
+    Source source = Source::Palette;
+    QPalette::ColorRole paletteRole = QPalette::WindowText;
+    AppColor::Role appRole = AppColor::AccentStrong;
+};
 
 /**
  * @brief Builds a palette-aware icon from a `theme:` asset.
@@ -24,11 +94,12 @@
  *
  * @param prefix Asset prefix relative to the `theme:` search path, with no file
  *               extension (for example `icons/search`), matching themePixmap().
- * @param role Palette role whose color replaces the sentinel. Selected glyphs
- *             use HighlightedText unless a role other than WindowText is given.
+ * @param tint Color that replaces the sentinel: a palette role or a semantic
+ *             application color. Defaults to WindowText.
+ * @param style Treatment of the glyph: Line, Badge or Sticker. Defaults to Line.
  * @return An icon that follows the application palette.
  */
-QIcon loadThemedIcon(QStringView prefix, QPalette::ColorRole role = QPalette::WindowText);
+QIcon loadThemedIcon(QStringView prefix, IconTint tint = {}, IconStyle style = IconStyle::Line);
 
 /**
  * @brief Renders a resolved theme SVG when it carries the `currentColor` sentinel.
@@ -38,13 +109,17 @@ QIcon loadThemedIcon(QStringView prefix, QPalette::ColorRole role = QPalette::Wi
  *
  * @param resolvedPath Asset path relative to the `theme:` search path, as
  *                     returned by ThemeManager::assetPath (includes extension).
- * @param role Palette role whose color replaces the sentinel.
+ * @param tint Color that replaces the sentinel: a palette role or a semantic
+ *             application color. Defaults to WindowText.
  * @param size Pixel size to render at; an empty size uses the SVG's intrinsic size.
+ * @param style Treatment of the glyph: Line, Badge or Sticker. A treatment on a
+ *              non-sentinel asset stays null, like the line path.
  * @return The recolored pixmap, or a null pixmap when the asset is not a
  *         sentinel-carrying SVG.
  */
 QPixmap loadSentinelSvgPixmap(const QString &resolvedPath,
-                              QPalette::ColorRole role = QPalette::WindowText,
-                              const QSize &size = {});
+                              IconTint tint = {},
+                              const QSize &size = {},
+                              IconStyle style = IconStyle::Line);
 
 #endif // THEME_ICON_H
