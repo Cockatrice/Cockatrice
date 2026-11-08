@@ -751,7 +751,10 @@ TagsPage::TagsPage(QWidget *parent) : OracleWizardPage(parent)
 
     parentsExplainer = new QLabel(this);
     parentsExplainer->setWordWrap(true);
-    parentsExplainer->setContentsMargins(20, 0, 0, 0);
+    // Indent under the checkbox and give the wrapped text room above and below,
+    // so it reads as an explanation of the option rather than a caption glued
+    // to the controls around it.
+    parentsExplainer->setContentsMargins(24, 4, 0, 10);
 
     statusLabel = new QLabel(this);
     statusLabel->setWordWrap(true);
