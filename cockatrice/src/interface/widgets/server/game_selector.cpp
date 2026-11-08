@@ -184,26 +184,32 @@ GameSelector::GameSelector(AbstractClient *_client,
 
         // A plain QPushButton, so the quick host sits in the same control family as the
         // join buttons. A QPushButton does not take its text, tooltip or enabled state from
-        // an action, so those are mirrored by hand below and in setHostCommandPending().
+        // an action, so those are mirrored by hand below and in updateHostControlsEnabled().
         hostGameButton = new QPushButton(this);
         hostGameButton->setObjectName("hostGameButton");
+        connect(hostGameButton, &QPushButton::clicked, hostGameAction, &QAction::trigger);
 
         hostGameMenu = new QMenu(this);
         hostGameMenu->setObjectName("hostGameMenu");
         hostGameMenu->addAction(hostGameAction);
-        reviewGameAction = hostGameMenu->addAction(QString());
-        reviewGameAction->setObjectName("reviewGameAction");
-        reviewGameAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
-        connect(reviewGameAction, &QAction::triggered, this, &GameSelector::actCreate);
+        gameSettingsAction = hostGameMenu->addAction(QString());
+        gameSettingsAction->setObjectName("gameSettingsAction");
+        gameSettingsAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
+        connect(gameSettingsAction, &QAction::triggered, this, &GameSelector::actCreate);
 
-        // The secondary control: a flat arrow next to the primary button. It is hidden when
-        // the active style draws a native pull-down instead (see applyHostGameStyle()).
+        // The secondary control: a flat arrow next to the primary button on styles that
+        // support a split control. The native macOS style does not, so there it is a plain
+        // sibling button instead (see applyHostGameStyle()).
         hostGameMenuButton = new QToolButton(this);
         hostGameMenuButton->setObjectName("hostGameMenuButton");
         hostGameMenuButton->setArrowType(Qt::DownArrow);
         hostGameMenuButton->setAutoRaise(true);
         hostGameMenuButton->setPopupMode(QToolButton::InstantPopup);
         hostGameMenuButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+
+        hostGameSettingsButton = new QPushButton(this);
+        hostGameSettingsButton->setObjectName("hostGameSettingsButton");
+        connect(hostGameSettingsButton, &QPushButton::clicked, gameSettingsAction, &QAction::trigger);
 
         hostGameButtonWidget = new QWidget(this);
         auto *hostGameButtonLayout = new QHBoxLayout(hostGameButtonWidget);
@@ -216,13 +222,13 @@ GameSelector::GameSelector(AbstractClient *_client,
 
         // The shortcuts belong to the whole room tab, not just the game list, so they also
         // fire while the chat or the user list has focus. A QToolButton menu is mouse-only,
-        // so the review action needs its own shortcut for keyboard parity.
+        // so the settings action needs its own shortcut for keyboard parity.
         if (auto *roomTab = qobject_cast<TabRoom *>(parentWidget())) {
             roomTab->addAction(hostGameAction);
-            roomTab->addAction(reviewGameAction);
+            roomTab->addAction(gameSettingsAction);
         } else {
             addAction(hostGameAction);
-            addAction(reviewGameAction);
+            addAction(gameSettingsAction);
         }
         refreshShortcuts();
     }
@@ -239,6 +245,7 @@ GameSelector::GameSelector(AbstractClient *_client,
     buttonLayout->addStretch();
     if (room) {
         buttonLayout->addWidget(hostGameButtonWidget);
+        buttonLayout->addWidget(hostGameSettingsButton);
     }
     buttonLayout->addWidget(joinButton);
     if (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsJudge) {
@@ -428,31 +435,25 @@ void GameSelector::clearHostError()
 
 void GameSelector::applyHostGameStyle()
 {
-    if (hostGameButton == nullptr || hostGameMenu == nullptr) {
+    if (hostGameButton == nullptr || hostGameMenu == nullptr || hostGameMenuButton == nullptr ||
+        hostGameSettingsButton == nullptr) {
         return;
     }
 
-    // The appearance settings can switch the application style while the room is open, so
-    // the primary click is wired from scratch instead of once: disconnect first, otherwise
-    // a second pass would quick-host twice.
-    disconnect(hostGameButton, &QPushButton::clicked, hostGameAction, &QAction::trigger);
-
+    // The primary button always quick-hosts. The native macOS style has no split-button
+    // rendering (a QToolButton menu becomes a second square bezel), so the secondary
+    // action is a plain sibling button there; every other style gets the split arrow.
     if (usesMacStyle()) {
-        // A native pull-down: one bezel with the menu indicator inside it. The separate
-        // arrow is hidden because QMacStyle would draw it as a second square bezel.
-        hostGameButton->setMenu(hostGameMenu);
         hostGameMenuButton->setMenu(nullptr);
         hostGameMenuButton->setVisible(false);
+        hostGameSettingsButton->setVisible(true);
     } else {
-        // The split button: the primary half quick-hosts, the flat arrow opens the menu.
-        hostGameButton->setMenu(nullptr);
-        connect(hostGameButton, &QPushButton::clicked, hostGameAction, &QAction::trigger);
         hostGameMenuButton->setMenu(hostGameMenu);
         hostGameMenuButton->setVisible(true);
+        hostGameSettingsButton->setVisible(false);
     }
 
-    // The tooltip depends on the control type: on macOS a click opens the menu, elsewhere it
-    // quick-hosts, and the appearance settings can switch between the two while the room is open.
+    // The appearance settings can switch the style while the room is open.
     updateHostGameToolTip();
 }
 
@@ -484,8 +485,11 @@ void GameSelector::updateHostControlsEnabled()
     if (hostGameMenuButton) {
         hostGameMenuButton->setEnabled(hostControlsEnabled);
     }
-    if (reviewGameAction) {
-        reviewGameAction->setEnabled(hostControlsEnabled);
+    if (hostGameSettingsButton) {
+        hostGameSettingsButton->setEnabled(hostControlsEnabled);
+    }
+    if (gameSettingsAction) {
+        gameSettingsAction->setEnabled(hostControlsEnabled);
     }
 }
 
@@ -744,8 +748,13 @@ void GameSelector::retranslateUi()
         }
         updateHostGameToolTip();
     }
-    if (reviewGameAction) {
-        reviewGameAction->setText(tr("Review settings first…"));
+    if (gameSettingsAction) {
+        gameSettingsAction->setText(tr("Game settings…"));
+        if (hostGameSettingsButton) {
+            // A QPushButton does not draw text from an action; on macOS this button is the
+            // secondary action, so it carries the same label.
+            hostGameSettingsButton->setText(tr("Game settings…"));
+        }
         if (hostGameMenuButton) {
             // The split arrow has no text of its own; name it for the menu it opens.
             hostGameMenuButton->setToolTip(tr("More host options"));
@@ -766,8 +775,8 @@ void GameSelector::refreshShortcuts()
         hostGameAction->setShortcuts(SettingsCache::instance().shortcuts().getShortcut("GameSelector/aQuickHostGame"));
         updateHostGameToolTip();
     }
-    if (reviewGameAction) {
-        reviewGameAction->setShortcuts(SettingsCache::instance().shortcuts().getShortcut("GameSelector/aReviewGame"));
+    if (gameSettingsAction) {
+        gameSettingsAction->setShortcuts(SettingsCache::instance().shortcuts().getShortcut("GameSelector/aReviewGame"));
     }
 }
 
@@ -783,9 +792,10 @@ void GameSelector::updateHostGameToolTip()
         hostGameAction->setToolTip(quickHostTooltip);
     }
     if (hostGameButton) {
-        // Under the native macOS style the button is a pull-down, so a click opens the menu
-        // instead of quick-hosting and the tooltip names the menu rather than the quick host.
-        hostGameButton->setToolTip(usesMacStyle() ? tr("Open the host menu") : quickHostTooltip);
+        hostGameButton->setToolTip(quickHostTooltip);
+    }
+    if (hostGameSettingsButton) {
+        hostGameSettingsButton->setToolTip(tr("Open the game settings before hosting"));
     }
 }
 

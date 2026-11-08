@@ -316,7 +316,7 @@ private:
         {"GameSelector/aQuickHostGame", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Host Game"),
                                                     parseSequenceString("Ctrl+N"),
                                                     ShortcutGroup::Game_Lobby)},
-        {"GameSelector/aReviewGame", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Review Game Settings"),
+        {"GameSelector/aReviewGame", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Game Settings"),
                                                  parseSequenceString("Ctrl+Shift+N"),
                                                  ShortcutGroup::Game_Lobby)},
         {"Player/aCCMagenta", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Add Card Counter (F)"),

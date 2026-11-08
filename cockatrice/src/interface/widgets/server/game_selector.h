@@ -162,19 +162,20 @@ private:
 
     GameSelectorQuickFilterToolBar *quickFilterToolBar;
 
-    QPushButton *filterButton;                 /**< Button to open the filter dialog. */
-    QPushButton *clearFilterButton;            /**< Button to clear active filters. */
-    QPushButton *hostGameButton = nullptr;     /**< Host button, in the same family as the join buttons. */
-    QToolButton *hostGameMenuButton = nullptr; /**< Split arrow that opens the host menu (non-macOS styles only). */
-    QWidget *hostGameButtonWidget = nullptr;   /**< Container that keeps the split button and its arrow together. */
-    QMenu *hostGameMenu = nullptr;             /**< Menu behind the arrow, or behind the pull-down button on macOS. */
-    QAction *hostGameAction = nullptr;         /**< Quick-host action, carrying the keyboard shortcut. */
-    QAction *reviewGameAction = nullptr;       /**< Menu action that opens the full create dialog. */
-    QLabel *hostErrorLabel;                    /**< Inline failure message for a quick-host request. */
-    QPushButton *joinButton;                   /**< Button to join the selected game. */
-    QPushButton *joinAsJudgeButton;            /**< Button to join the selected game as a judge. */
-    QPushButton *spectateButton;               /**< Button to spectate the selected game. */
-    QPushButton *joinAsJudgeSpectatorButton;   /**< Button to join the selected game as a spectating judge. */
+    QPushButton *filterButton;                     /**< Button to open the filter dialog. */
+    QPushButton *clearFilterButton;                /**< Button to clear active filters. */
+    QPushButton *hostGameButton = nullptr;         /**< Host button, in the same family as the join buttons. */
+    QPushButton *hostGameSettingsButton = nullptr; /**< Opens the host form; a sibling button on macOS. */
+    QToolButton *hostGameMenuButton = nullptr;     /**< Split arrow that opens the host menu (non-macOS styles only). */
+    QWidget *hostGameButtonWidget = nullptr;       /**< Container that keeps the split button and its arrow together. */
+    QMenu *hostGameMenu = nullptr;                 /**< Menu behind the split arrow (non-macOS styles only). */
+    QAction *hostGameAction = nullptr;             /**< Quick-host action, carrying the keyboard shortcut. */
+    QAction *gameSettingsAction = nullptr;         /**< Opens the host form with the current settings. */
+    QLabel *hostErrorLabel;                        /**< Inline failure message for a quick-host request. */
+    QPushButton *joinButton;                       /**< Button to join the selected game. */
+    QPushButton *joinAsJudgeButton;                /**< Button to join the selected game as a judge. */
+    QPushButton *spectateButton;                   /**< Button to spectate the selected game. */
+    QPushButton *joinAsJudgeSpectatorButton;       /**< Button to join the selected game as a spectating judge. */
 
     const bool showFilters;  /**< Determines whether filter buttons are displayed. */
     GameTypeMap gameTypeMap; /**< Mapping of game types for the current room. */
@@ -192,15 +193,16 @@ private:
     /**
      * @brief Rebuilds the host control for the active style.
      *
-     * The native macOS style draws a single pull-down button; every other style gets the
-     * split button, whose primary half quick-hosts and whose arrow opens the menu.
+     * The primary button always quick-hosts. Every other style gets the split button,
+     * whose arrow opens the menu; the native macOS style has no split control, so it
+     * gets a plain sibling button for the secondary action instead.
      */
     void applyHostGameStyle();
-    /** @brief Enables or disables the quick-host and review controls while a command is in flight. */
+    /** @brief Marks a quick-host command as in flight or finished, then updates the host controls. */
     void setHostCommandPending(bool pending);
-    /** @brief Applies the in-flight state of both host and join commands to the quick-host and review controls. */
+    /** @brief Applies the in-flight state of both host and join commands to the host controls. */
     void updateHostControlsEnabled();
-    /** @brief Keeps the quick-host button tooltip in sync with the current shortcut. */
+    /** @brief Keeps the host control tooltips in sync with the current shortcut and style. */
     void updateHostGameToolTip();
 
     /**
