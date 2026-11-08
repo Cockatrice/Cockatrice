@@ -103,7 +103,7 @@ jobs:
           TAG: ${{ steps.configure.outputs.tag }}
         run: .ci/prep_release.sh
 
-      - name: "Create release"
+      - name: "Create or update draft release"
         if: steps.configure.outputs.tag != null
         id: create_release
         shell: bash
@@ -115,13 +115,35 @@ jobs:
           body_path: ${{ steps.prepare.outputs.body_path }}
           prerelease: ${{ steps.prepare.outputs.is_beta }}
         run: |
-          args=()
-          [[ $prerelease == yes ]] && args+=(--prerelease)
+          # A release for this tag may already exist: a maintainer can save a draft in
+          # the GitHub UI before pushing the tag, or an earlier run may have left one.
+          # Never touch a published release, and never overwrite a draft that already
+          # has a body (generated notes or a maintainer's edits) - only fill in an
+          # empty draft. Prints "<isDraft> <body length>"; empty when there is none.
+          release_state="$(gh release view "$tag_name" --json isDraft,body \
+            --template '{{.isDraft}} {{len (or .body "")}}' 2>/dev/null || true)"
 
-          gh release create "$tag_name" --verify-tag --draft "${args[@]}" \
-            --target "$target" \
-            --title "$release_name" \
-            --notes-file "$body_path"
+          if [[ -z "$release_state" ]]; then
+            args=()
+            [[ $prerelease == yes ]] && args+=(--prerelease)
+
+            gh release create "$tag_name" --verify-tag --draft "${args[@]}" \
+              --target "$target" \
+              --title "$release_name" \
+              --notes-file "$body_path"
+          elif [[ "$release_state" == "true 0" ]]; then
+            echo "Filling in the empty draft release $tag_name"
+            args=(--prerelease=false)
+            [[ $prerelease == yes ]] && args=(--prerelease)
+
+            gh release edit "$tag_name" "${args[@]}" \
+              --title "$release_name" \
+              --notes-file "$body_path"
+          elif [[ "$release_state" == true* ]]; then
+            echo "::warning::Draft release $tag_name already has a body, leaving it untouched"
+          else
+            echo "::warning::Release $tag_name is already published, leaving it untouched"
+          fi
 
   vcpkg-baseline:
     name: vcpkg baseline
