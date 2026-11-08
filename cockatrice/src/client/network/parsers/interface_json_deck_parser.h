@@ -8,11 +8,18 @@
 #define INTERFACE_JSON_DECK_PARSER_H
 
 #include "../../../interface/deck_loader/card_node_function.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
 
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QList>
+#include <QLoggingCategory>
+#include <QString>
+#include <QTextStream>
 #include <libcockatrice/card/import/card_name_normalizer.h>
 #include <libcockatrice/deck_list/deck_list.h>
+
+inline Q_LOGGING_CATEGORY(InterfaceJsonDeckParserLog, "interface_json_deck_parser");
 
 class IJsonDeckParser
 {
@@ -32,9 +39,6 @@ public:
         QString deckName = obj.value("name").toString();
         QString deckDescription = obj.value("description").toString();
 
-        deckList.setName(deckName);
-        deckList.setComments(deckDescription);
-
         QString outputText;
         QTextStream outStream(&outputText);
 
@@ -50,8 +54,14 @@ public:
             outStream << quantity << ' ' << cardName << " (" << setName << ") " << collectorNumber << '\n';
         }
 
+        outStream.flush();
+        outStream.seek(0);
         deckList.loadFromStream_Plain(outStream, false, CardNameNormalizer());
+        deckList.setName(deckName);
+        deckList.setComments(deckDescription);
         deckList.forEachCard(CardNodeFunction::ResolveProviderId());
+        deckList.setName(deckName);
+        deckList.setComments(deckDescription);
 
         return deckList;
     }
@@ -66,9 +76,6 @@ public:
 
         QString deckName = obj.value("name").toString();
         QString deckDescription = obj.value("description").toString();
-
-        deckList.setName(deckName);
-        deckList.setComments(deckDescription);
 
         QString outputText;
         QTextStream outStream(&outputText);
@@ -97,8 +104,14 @@ public:
             outStream << quantity << ' ' << cardName << " (" << setName << ") " << collectorNumber << '\n';
         }
 
+        outStream.flush();
+        outStream.seek(0);
         deckList.loadFromStream_Plain(outStream, false, CardNameNormalizer());
+        deckList.setName(deckName);
+        deckList.setComments(deckDescription);
         deckList.forEachCard(CardNodeFunction::ResolveProviderId());
+        deckList.setName(deckName);
+        deckList.setComments(deckDescription);
 
         QJsonObject commandersObj = obj.value("commanders").toObject();
         if (!commandersObj.isEmpty()) {
@@ -112,6 +125,113 @@ public:
                 deckList.setBannerCard({commanderName, providerId});
                 deckList.addCard(commanderName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
             }
+        }
+
+        // Moxfield stores Oathbreaker signature spells in their own board,
+        // separate from both mainboard and commanders. They are playable deck
+        // cards, but must not replace the Oathbreaker as the banner card.
+        const QJsonObject signatureSpells = obj.value("signatureSpells").toObject();
+        for (auto it = signatureSpells.begin(); it != signatureSpells.end(); ++it) {
+            const QJsonObject entry = it.value().toObject();
+            const QJsonObject card = entry.value("card").toObject();
+            const QString name = card.value("name").toString();
+            const int quantity = entry.value("quantity").toInt();
+            if (name.isEmpty() || quantity <= 0) {
+                continue;
+            }
+            const QString set = card.value("set").toString().toUpper();
+            const QString collectorNumber = card.value("cn").toString();
+            const QString providerId = card.value("scryfall_id").toString();
+            deckList.addCards(name, quantity, DECK_ZONE_MAIN, -1, set, collectorNumber, providerId);
+        }
+
+        return deckList;
+    }
+};
+
+class ManaboxJsonParser : public IJsonDeckParser
+{
+    enum BoardType : quint32
+    {
+        MainBoard = 0,
+        SideBoard = 1,
+        Commander = 2,
+        MaybeBoard = 3,
+    };
+
+public:
+    DeckList parse(const QJsonObject &obj) override
+    {
+        DeckList deckList;
+
+        QString deckName = obj.value("name").toString();
+
+        QString outputText;
+        QString mainboardText;
+        QString sideboardText;
+        QTextStream mainboardStream(&mainboardText);
+        QTextStream sideboardStream(&sideboardText);
+        QTextStream outStream(&outputText);
+
+        auto commanderList = QList<QJsonObject>();
+        auto maybeboardList = QList<QJsonObject>();
+        for (auto entry : obj.value("cards").toArray()) {
+            auto card = entry.toObject();
+
+            auto collectorNumber = card.value("collectorNumber").toString();
+            auto cardName = card.value("name").toString();
+            auto boardType = static_cast<BoardType>(card.value("boardCategory").toInt());
+            auto setName = card.value("setId").toString();
+            auto quantity = card.value("quantity").toInt();
+            auto providerId = card.value("scryfallId").toString();
+
+            switch (boardType) {
+                case MainBoard:
+                    mainboardStream << quantity << ' ' << cardName << " (" << setName << ") " << collectorNumber
+                                    << '\n';
+                    break;
+                case SideBoard:
+                    sideboardStream << "SB: " << quantity << ' ' << cardName << " (" << setName << ") "
+                                    << collectorNumber << '\n';
+                    break;
+                case MaybeBoard:
+                    maybeboardList.append(card);
+                    break;
+                case Commander:
+                    commanderList.append(card);
+                    break;
+                default:
+                    qCWarning(InterfaceJsonDeckParserLog)
+                        << "Unknown ManaBox Zone" << card.value("boardCategory").toInt() << "for" << cardName;
+                    break;
+            }
+        }
+
+        outStream << mainboardText << sideboardText;
+
+        deckList.loadFromStream_Plain(outStream, false, CardNameNormalizer());
+        deckList.setName(deckName);
+        deckList.forEachCard(CardNodeFunction::ResolveProviderId());
+
+        for (const auto &maybeboardCard : maybeboardList) {
+            QString cardName = maybeboardCard.value("name").toString();
+            QString setName = maybeboardCard.value("setId").toString().toUpper();
+            QString collectorNumber = maybeboardCard.value("collectorNumber").toString();
+            QString providerId = maybeboardCard.value("scryfallId").toString();
+
+            for (int x = 0; x < maybeboardCard.value("quantity").toInt(); x++) {
+                deckList.addCard(cardName, DECK_ZONE_MAYBEBOARD, -1, setName, collectorNumber, providerId);
+            }
+        }
+        for (const auto &commanderCard : commanderList) {
+
+            QString commanderName = commanderCard.value("name").toString();
+            QString setName = commanderCard.value("setId").toString().toUpper();
+            QString collectorNumber = commanderCard.value("collectorNumber").toString();
+            QString providerId = commanderCard.value("scryfallId").toString();
+
+            deckList.setBannerCard({commanderName, providerId});
+            deckList.addCard(commanderName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
         }
 
         return deckList;

@@ -3,7 +3,7 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../../key_signals.h"
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 #include "../playmat/playmat_settings_dialog.h"
 #include "../quick_settings/settings_button_widget.h"
 #include "../tabs/abstract_tab_deck_editor.h"
@@ -49,6 +49,7 @@
 #include <QPushButton>
 #include <QSet>
 #include <QSharedPointer>
+#include <QSignalBlocker>
 #include <QSize>
 #include <QSizePolicy>
 #include <QSplitter>
@@ -187,10 +188,17 @@ void DeckEditorDeckDockWidget::createDeckDock()
     formatLabel = new QLabel(this);
 
     formatComboBox = new QComboBox(this);
+    formatComboBox->setObjectName("deckFormatComboBox");
     formatComboBox->addItem(tr("Loading Database..."));
     formatComboBox->setEnabled(false); // Disable until loaded
 
     commanderBracketWidget = new CommanderBracketWidget(this);
+    connect(formatComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
+        formatComboBox->setPlaceholderText(QString());
+        formatComboBox->setToolTip(QString());
+        deckStateManager->setFormat(index >= 0 ? formatComboBox->itemData(index).toString() : QString());
+        commanderBracketWidget->setDeck(deckStateManager->getDeckListShared());
+    });
 
     commentsLabel = new QLabel();
     commentsLabel->setObjectName("commentsLabel");
@@ -240,25 +248,25 @@ void DeckEditorDeckDockWidget::createDeckDock()
             &DeckEditorDeckDockWidget::applyActiveGroupCriteria);
 
     aIncrement = new QAction(QString(), this);
-    aIncrement->setIcon(themePixmap(QStringLiteral("icons/increment")));
+    aIncrement->setIcon(loadThemedIcon(QStringLiteral("icons/increment"), AppColor::Positive, IconStyle::Sticker));
     connect(aIncrement, &QAction::triggered, this, &DeckEditorDeckDockWidget::actIncrementSelection);
     auto *tbIncrement = new QToolButton(this);
     tbIncrement->setDefaultAction(aIncrement);
 
     aDecrement = new QAction(QString(), this);
-    aDecrement->setIcon(themePixmap(QStringLiteral("icons/decrement")));
+    aDecrement->setIcon(loadThemedIcon(QStringLiteral("icons/decrement"), AppColor::Negative, IconStyle::Sticker));
     connect(aDecrement, &QAction::triggered, this, &DeckEditorDeckDockWidget::actDecrementSelection);
     auto *tbDecrement = new QToolButton(this);
     tbDecrement->setDefaultAction(aDecrement);
 
     aRemoveCard = new QAction(QString(), this);
-    aRemoveCard->setIcon(themePixmap(QStringLiteral("icons/remove_row")));
+    aRemoveCard->setIcon(loadThemedIcon(QStringLiteral("icons/remove_row"), AppColor::Negative, IconStyle::Sticker));
     connect(aRemoveCard, &QAction::triggered, this, &DeckEditorDeckDockWidget::actRemoveCard);
     auto *tbRemoveCard = new QToolButton(this);
     tbRemoveCard->setDefaultAction(aRemoveCard);
 
     aSwapCard = new QAction(QString(), this);
-    aSwapCard->setIcon(themePixmap(QStringLiteral("icons/swap")));
+    aSwapCard->setIcon(loadThemedIcon(QStringLiteral("icons/swap")));
     connect(aSwapCard, &QAction::triggered, this, &DeckEditorDeckDockWidget::actSwapSelection);
     auto *tbSwapCard = new QToolButton(this);
     tbSwapCard->setDefaultAction(aSwapCard);
@@ -355,6 +363,9 @@ void DeckEditorDeckDockWidget::initializeFormats()
 {
     QStringList allFormats = CardDatabaseManager::query()->getAllFormatsWithCount().keys();
 
+    // Rebuilding the list is a view update, not a user edit. In particular,
+    // clear() emits currentIndexChanged(-1), which must not clear the deck.
+    const QSignalBlocker blocker(formatComboBox);
     formatComboBox->clear(); // Remove "Loading Database..."
     formatComboBox->setEnabled(true);
 
@@ -364,26 +375,23 @@ void DeckEditorDeckDockWidget::initializeFormats()
         formatComboBox->addItem(formatName, formatName); // store the raw key in itemData
     }
 
-    QString format = deckStateManager->getMetadata().gameFormat;
-    if (!format.isEmpty()) {
-        formatComboBox->setCurrentIndex(formatComboBox->findData(format));
-    } else {
-        // Ensure no selection is visible initially
-        formatComboBox->setCurrentIndex(-1);
-    }
-    connect(formatComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
-        QString formatKey;
-        if (index >= 0) {
-            formatKey = formatComboBox->itemData(index).toString();
-            deckStateManager->setFormat(formatKey);
-        } else {
-            deckStateManager->setFormat(""); // clear format if deselected
-        }
-
-        commanderBracketWidget->setDeck(deckStateManager->getDeckListShared());
-    });
+    syncFormatSelection();
 
     commanderBracketWidget->setDeck(deckStateManager->getDeckListShared());
+}
+
+void DeckEditorDeckDockWidget::syncFormatSelection()
+{
+    if (!formatComboBox->isEnabled()) {
+        return;
+    }
+    const QSignalBlocker blocker(formatComboBox);
+    const QString format = deckStateManager->getMetadata().gameFormat;
+    const int index = format.isEmpty() ? -1 : formatComboBox->findData(format);
+    const QString unavailable = index < 0 && !format.isEmpty() ? tr("Unavailable: %1").arg(format) : QString();
+    formatComboBox->setPlaceholderText(unavailable);
+    formatComboBox->setToolTip(unavailable);
+    formatComboBox->setCurrentIndex(index);
 }
 
 ExactCard DeckEditorDeckDockWidget::getCurrentCard()
@@ -596,9 +604,7 @@ void DeckEditorDeckDockWidget::syncDisplayWidgetsToModel()
     updatePlaymatLabel();
     updateHash();
 
-    formatComboBox->blockSignals(true);
-    formatComboBox->setCurrentIndex(formatComboBox->findData(deckStateManager->getMetadata().gameFormat));
-    formatComboBox->blockSignals(false);
+    syncFormatSelection();
 
     commanderBracketWidget->setDeck(deckStateManager->getDeckListShared());
 
@@ -760,18 +766,6 @@ void DeckEditorDeckDockWidget::actSwapSelection()
     deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     update();
-}
-
-void DeckEditorDeckDockWidget::actDecrementCard(const ExactCard &card, QString zoneName)
-{
-    if (!card) {
-        return;
-    }
-    if (card.getInfo().getIsToken()) {
-        zoneName = DECK_ZONE_TOKENS;
-    }
-
-    deckStateManager->decrementCard(card, zoneName);
 }
 
 void DeckEditorDeckDockWidget::actDecrementSelection()
@@ -1054,6 +1048,7 @@ void DeckEditorDeckDockWidget::retranslateUi()
     commentsLabel->setText(tr("&Comments:"));
     activeGroupCriteriaLabel->setText(tr("Group by:"));
     formatLabel->setText(tr("Format:"));
+    syncFormatSelection();
     commanderBracketWidget->retranslateUi();
 
     hashLabel1->setText(tr("Hash:"));

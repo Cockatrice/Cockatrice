@@ -5,6 +5,7 @@
  */
 #include "settings_search_delegate.h"
 
+#include "../interface/theme_manager.h"
 #include "settings_search_model.h"
 
 #include <QBrush>
@@ -88,7 +89,8 @@ void SettingsSearchDelegate::paint(QPainter *painter,
     QRect textRect = contentRect.adjusted(iconOffset, 0, 0, 0);
 
     // Breadcrumb: "Page > Group"
-    QFont breadcrumbFont = option.font;
+    // Family comes from the InterfaceDefault theme role; the -1 size and bold stay caller-side.
+    QFont breadcrumbFont = themeManager->appFont(AppFont::InterfaceDefault);
     breadcrumbFont.setPointSize(breadcrumbFont.pointSize() - 1);
     breadcrumbFont.setBold(true);
 
@@ -113,7 +115,7 @@ void SettingsSearchDelegate::paint(QPainter *painter,
     yPos += 20;
 
     // Setting label
-    QFont labelFont = option.font;
+    QFont labelFont = themeManager->appFont(AppFont::InterfaceDefault);
     labelFont.setPointSize(labelFont.pointSize() + 1);
     labelFont.setBold(isSelected);
 

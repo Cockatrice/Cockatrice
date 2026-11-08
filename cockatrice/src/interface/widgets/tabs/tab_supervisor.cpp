@@ -7,6 +7,7 @@
 #include "../../intents/contexts/context_join_room.h"
 #include "../../intents/intent.h"
 #include "../../intents/intent_join_server_game.h"
+#include "../../theme_icon.h"
 #include "../interface/pixel_map_generator.h"
 #include "../interface/widgets/server/game_link.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
@@ -21,6 +22,7 @@
 #include "tab.h"
 #include "tab_account.h"
 #include "tab_admin.h"
+#include "tab_alts.h"
 #include "tab_card_art_rules.h"
 #include "tab_deck_editor.h"
 #include "tab_deck_storage.h"
@@ -54,6 +56,7 @@
 #include <QPainter>
 #include <QRect>
 #include <QSharedPointer>
+#include <QStackedWidget>
 #include <QStringLiteral>
 #include <QStyle>
 #include <QStyleOption>
@@ -155,8 +158,17 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     : QTabWidget(parent), userInfo(nullptr), client(_client), tabsMenu(tabsMenu), tabHome(nullptr),
       tabVisualDeckStorage(nullptr), tabServer(nullptr), tabAccount(nullptr), tabDeckStorage(nullptr),
       tabReplays(nullptr), tabAdmin(nullptr), tabCardArtRules(nullptr), tabLog(nullptr), tabReport(nullptr),
-      tabModeration(nullptr), tabDeveloper(nullptr), isLocalGame(false)
+      tabModeration(nullptr), tabAlts(nullptr), tabDeveloper(nullptr), isLocalGame(false)
 {
+    setObjectName("tabSupervisor");
+
+    // QTabWidget keeps tab pages in an internal stacked widget. Give it a stable
+    // name so the GUI tests can address the pages by a readable path
+    // (tabSupervisor/stackedWidget/<TabName>).
+    if (auto *stackedWidget = findChild<QStackedWidget *>()) {
+        stackedWidget->setObjectName("stackedWidget");
+    }
+
     setElideMode(Qt::ElideRight);
     setMovable(true);
     setIconSize(QSize(15, 15));
@@ -462,6 +474,9 @@ void TabSupervisor::addCloseButtonToTab(Tab *tab, int tabIndex, QAction *manager
     auto closeSide = static_cast<QTabBar::ButtonPosition>(
         tabBar()->style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, nullptr, tabBar()));
     auto *closeButton = new CloseButton(tab);
+    // No object name: the tab bar index shifts when tabs move or close, so an
+    // index-derived name would go stale (or collide). Callers find the button
+    // through the tab widget instead.
     if (manager) {
         // If managed, all close requests should go through the menu action
         connect(closeButton, &CloseButton::clicked, this, [manager] { checkAndTrigger(manager, false); });
@@ -561,6 +576,7 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
     tabLog = nullptr;
     tabReport = nullptr;
     tabModeration = nullptr;
+    tabAlts = nullptr;
     tabDeveloper = nullptr;
     isLocalGame = true;
     userInfo = new ServerInfo_User;
@@ -608,6 +624,9 @@ void TabSupervisor::stop()
         }
         if (tabModeration) {
             tabModeration->close();
+        }
+        if (tabAlts) {
+            tabAlts->close();
         }
         if (tabCardArtRules) {
             tabCardArtRules->close();
@@ -915,6 +934,21 @@ void TabSupervisor::openTabModeration(const QString &userName)
         aTabModeration->setChecked(false);
     });
     aTabModeration->setChecked(true);
+}
+
+void TabSupervisor::openTabAlts(const QString &userName)
+{
+    if (tabAlts) {
+        setCurrentWidget(tabAlts);
+        if (!userName.isEmpty()) {
+            tabAlts->investigate(userName);
+        }
+        return;
+    }
+    tabAlts = new TabAlts(this, client, userName);
+    myAddTab(tabAlts);
+    setCurrentWidget(tabAlts);
+    connect(tabAlts, &QObject::destroyed, this, [this] { tabAlts = nullptr; });
 }
 
 void TabSupervisor::actTabDeveloper(bool checked)
@@ -1347,7 +1381,7 @@ void TabSupervisor::tabUserEvent(bool globalEvent)
     auto *tab = static_cast<Tab *>(sender());
     if (tab != currentWidget()) {
         tab->setContentsChanged(true);
-        setTabIcon(indexOf(tab), themePixmap(QStringLiteral("icons/tab_changed")));
+        setTabIcon(indexOf(tab), loadThemedIcon(QStringLiteral("icons/tab_changed")));
     }
     if (globalEvent && SettingsCache::instance().userInterface().getNotificationsEnabled()) {
         QApplication::alert(this);

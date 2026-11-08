@@ -17,6 +17,7 @@ set(ORACLE_WIN32_QM_INSTALL_DIR "translations")
 # Sources
 # ------------------------
 set(oracle_SOURCES
+    src/database_writer.cpp
     src/main.cpp
     src/oraclewizard.cpp
     src/oracleimporter.cpp
@@ -31,6 +32,11 @@ set(oracle_SOURCES
     ../cockatrice/src/client/network/update/client/release_channel.cpp
     ../cockatrice/src/interface/pixel_map_generator.cpp
     ../cockatrice/src/interface/theme_config.cpp
+    ../cockatrice/src/interface/theme_icon.cpp
+    ../cockatrice/src/interface/theme_icon_badge.cpp
+    ../cockatrice/src/interface/theme_icon_fill.cpp
+    ../cockatrice/src/interface/theme_icon_ink.cpp
+    ../cockatrice/src/interface/theme_icon_sticker.cpp
     ../cockatrice/src/interface/theme_manager.cpp
     ${VERSION_STRING_CPP}
 )

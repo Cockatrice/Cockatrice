@@ -198,6 +198,7 @@ private:
     QFuture<int> importFuture;
     int totalSets = 0;
     bool importActive = false;
+    bool importReady = false;
 
 protected:
     void initializePage() override;

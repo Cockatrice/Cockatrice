@@ -50,6 +50,7 @@ class AbstractClient;
 class GameView;
 class GameScene;
 class ReplayWidget;
+class ReplayEventSidebar;
 class CardInfoFrameWidget;
 class QLabel;
 class QPushButton;
@@ -89,16 +90,19 @@ private:
     QMap<int, TabbedDeckViewContainer *> deckViewContainers;
     QVBoxLayout *deckViewContainerLayout;
     QWidget *gamePlayAreaWidget, *deckViewContainerWidget;
-    QDockWidget *cardInfoDock, *messageLayoutDock, *playerListDock, *replayDock;
+    QDockWidget *cardInfoDock, *messageLayoutDock, *playerListDock, *replayDock, *historyDock;
     QAction *playersSeparator;
     QMenu *gameMenu, *viewMenu;
     TearOffMenu *phasesMenu;
     QAction *aGameInfo, *aConcede, *aCopyGameLink, *aLeaveGame, *aNextPhase, *aNextPhaseAction, *aNextTurn,
-        *aReverseTurn, *aRemoveLocalArrows, *aRotateViewCW, *aRotateViewCCW, *aResetLayout, *aResetReplayLayout;
+        *aReverseTurn, *aTurnOrder, *aRemoveLocalArrows, *aRotateViewCW, *aRotateViewCCW, *aResetLayout,
+        *aResetReplayLayout;
     QAction *aFocusChat;
     QAction *aInviteToGame = nullptr;
     QList<QAction *> phaseActions;
     QAction *aCardMenu;
+    /** @brief Placeholder submenu shown when no card is selected; reused instead of reallocated. */
+    QMenu *emptyCardMenu = nullptr;
 
     /**
      * @brief The actions associated with managing a QDockWidget
@@ -129,6 +133,7 @@ private:
 
     PlayerLogic *setActivePlayer(int id);
     void setActivePhase(int phase);
+    bool canSetTurnOrder() const;
     void createMenuItems();
     void createReplayMenuItems();
     void createViewMenuItems();
@@ -162,6 +167,8 @@ private slots:
     void actInviteToGame();
     void actConcede();
     void actCopyGameLink();
+    void actTurnOrder();
+    void updateTurnOrderAction();
     void actRemoveLocalArrows();
     void actRotateViewCW();
     void actRotateViewCCW();

@@ -48,6 +48,7 @@
 class QAction;
 class QToolButton;
 class QWidget;
+class pqTestUtility;
 struct LocalGameOptions;
 
 inline Q_LOGGING_CATEGORY(WindowMainLog, "window_main");
@@ -104,6 +105,11 @@ private slots:
     void actUpdate();
     void actViewLog();
     void actOpenSettingsFolder();
+#ifdef WITH_GUI_TEST
+    void actRecord();
+    void actPlayRecording();
+#endif
+
     void actShow();
     void showWindowIfHidden();
     void onUrlChainFinished(bool connected);
@@ -185,6 +191,9 @@ private:
         *aReloadCardDatabase;
     QAction *aTips, *aUpdate, *aCheckCardUpdates, *aCheckCardUpdatesBackground, *aFirstRunWizard, *aStatusBar,
         *aViewLog, *aOpenSettingsFolder;
+#ifdef WITH_GUI_TEST
+    QAction *aRecord, *aPlayRecording;
+#endif
 
     TabSupervisor *tabSupervisor;
     IntentUrlParser *urlParser;
@@ -208,6 +217,7 @@ private:
     bool skipStartupAutoConnect = false;
     bool startupAutoConnectAttempted = false;
     bool firstRunWizardActive = false;
+    bool noConnect = false; ///< --no-connect: skip every startup connection
     QProcess *cardUpdateProcess;
     QByteArray cardUpdateOutputBuffer;
     QByteArray cardUpdateErrorOutput;  ///< diagnostic output collected from the updater's stderr
@@ -219,6 +229,9 @@ private:
     GameReplay *replay;
     DlgTipOfTheDay *tip;
     QUrl connectTo;
+#ifdef WITH_GUI_TEST
+    pqTestUtility *testUtility;
+#endif
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
@@ -226,6 +239,16 @@ public:
     {
         connectTo = QUrl(QString("cockatrice://%1").arg(url));
     }
+    /**
+     * @brief Suppresses every startup connection: --connect, auto-connect and the
+     *        configured startup destination. Used by the GUI test harness so a
+     *        playback run never dials out.
+     */
+    void setNoConnect(bool value)
+    {
+        noConnect = value;
+    }
+
     // When set, the window's own startup connection (--connect or auto-connect
     // on first activation) is skipped. Used for activation launches: the intent
     // chain triggered by a cockatrice:// URL owns the connection, and letting
@@ -265,6 +288,13 @@ public:
      * front instead of being left behind the installer.
      */
     void requestInstallerClose();
+
+#ifdef WITH_GUI_TEST
+    pqTestUtility *getTestUtility() const
+    {
+        return testUtility;
+    }
+#endif
 
 protected:
     void closeEvent(QCloseEvent *event) override;

@@ -1,6 +1,6 @@
 # Find a compatible Qt version
 # Inputs: WITH_SERVER, WITH_CLIENT, WITH_ORACLE
-# Optional Input: QT6_DIR -- Hint as to where Qt6 lives on the system
+# Optional Input: Qt6_DIR -- Directory containing Qt6Config.cmake
 # Output: COCKATRICE_QT_VERSION_NAME -- Example values: Qt6
 # Output: SERVATRICE_QT_MODULES
 # Output: COCKATRICE_QT_MODULES
@@ -57,7 +57,17 @@ find_package(
   QUIET HINTS ${Qt6_DIR}
 )
 if(NOT Qt6_FOUND)
-  message(FATAL_ERROR "No suitable version of Qt was found")
+  set(_QT_DIAGNOSTIC "")
+  if(Qt6_NOT_FOUND_MESSAGE)
+    set(_QT_DIAGNOSTIC "\nQt package diagnostic: ${Qt6_NOT_FOUND_MESSAGE}")
+  endif()
+  message(FATAL_ERROR
+          "No suitable version of Qt was found. Qt 6.4.2 or newer with these components is required: "
+          "${REQUIRED_QT_COMPONENTS};Linguist.\n"
+          "Set QTDIR or CMAKE_PREFIX_PATH to the Qt installation prefix, or Qt6_DIR to the directory "
+          "containing Qt6Config.cmake."
+          "${_QT_DIAGNOSTIC}"
+  )
 endif()
 set(COCKATRICE_QT_VERSION_NAME Qt6)
 

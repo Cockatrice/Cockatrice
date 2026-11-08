@@ -18,6 +18,7 @@
 #include <QIODevice>
 #include <QList>
 #include <QMessageLogger>
+#include <QSaveFile>
 #include <QSharedPointer>
 #include <QStringView>
 #include <QXmlStreamAttributes>
@@ -32,7 +33,7 @@ class ICardSetPriorityController;
 #define COCKATRICE_XML3_TAGNAME "cockatrice_carddatabase"
 #define COCKATRICE_XML3_TAGVER 3
 #define COCKATRICE_XML3_SCHEMALOCATION                                                                                 \
-    "https://raw.githubusercontent.com/Cockatrice/Cockatrice/master/doc/carddatabase_v3/cards.xsd"
+    "https://raw.githubusercontent.com/Cockatrice/Cockatrice/master/docs/xsd/cards_v3.xsd"
 
 CockatriceXml3Parser::CockatriceXml3Parser(ICardSetPriorityController *_cardSetPriorityController)
     : ICardDatabaseParser(_cardSetPriorityController)
@@ -499,7 +500,7 @@ bool CockatriceXml3Parser::saveToFile(FormatRulesNameMap _formats,
 {
     Q_UNUSED(_formats);
 
-    QFile file(fileName);
+    QSaveFile file(fileName);
     if (!file.open(QIODevice::WriteOnly)) {
         return false;
     }
@@ -539,5 +540,5 @@ bool CockatriceXml3Parser::saveToFile(FormatRulesNameMap _formats,
     xml.writeEndElement(); // cockatrice_carddatabase
     xml.writeEndDocument();
 
-    return true;
+    return !xml.hasError() && file.commit();
 }

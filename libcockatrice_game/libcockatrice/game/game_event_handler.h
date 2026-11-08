@@ -51,6 +51,7 @@ class Event_GameSay;
 class Event_Kicked;
 class Event_ReverseTurn;
 class Event_Ping;
+class Event_PlayerOrderChanged;
 class ServerInfo_PlayerProperties;
 namespace google
 {
@@ -112,6 +113,16 @@ public:
 
     /** @brief Request reversing the current turn order. */
     void handleReverseTurn();
+
+    /**
+     * @brief Request a new seating / turn order.
+     *
+     * Only the game host (or a moderator) may do this before the game starts.
+     *
+     * @param playerNames Ordered list of player names. Ignored when randomize is true.
+     * @param randomize Ask the server to shuffle the seats instead.
+     */
+    void handleSetPlayerOrder(const QList<QString> &playerNames, bool randomize);
 
     /** @brief Concede the game for the currently active local player. */
     void handleActiveLocalPlayerConceded();
@@ -316,6 +327,10 @@ public:
     /** @brief Handle a turn reversal event. */
     void eventReverseTurn(const Event_ReverseTurn &event, int eventPlayerId, const GameEventContext &context);
 
+    /** @brief Handle a change of the seating / turn order. */
+    void
+    eventPlayerOrderChanged(const Event_PlayerOrderChanged &event, int eventPlayerId, const GameEventContext &context);
+
     /** @brief Handle ping / latency updates. */
     void eventPing(const Event_Ping &event, int eventPlayerId, const GameEventContext &context);
 
@@ -443,6 +458,7 @@ signals:
     void logLeave(PlayerLogic *player, QString reason);
     void logKicked();
     void logTurnReversed(PlayerLogic *player, bool reversed);
+    void logTurnOrderChanged(QStringList playerNames, bool randomized);
     void logGameClosed();
     void logActivePlayer(PlayerLogic *activePlayer);
     void logActivePhaseChanged(int activePhase);

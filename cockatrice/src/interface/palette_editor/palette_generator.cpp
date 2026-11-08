@@ -1,6 +1,7 @@
 #include "palette_generator.h"
 
 #include "../theme_config.h"
+#include "../theme_icon_ink.h"
 
 #include <QColor>
 #include <QMap>
@@ -167,6 +168,21 @@ PaletteConfig fromAccent(const QColor &accent, int intensity, const QString &sch
     // the lightened, desaturated companion used for button-gradient highlights.
     cfg.appColors[AppColor::AccentStrong] = hl;
     cfg.appColors[AppColor::AccentSoft] = hsl(accent.lightness() + 60, qRound(accent.hslSaturation() * 70 / 100.0));
+    // Neutral icon ink follows the generated accent at the same three emphasis
+    // levels a hand-authored theme stores, so the preview matches what the icon
+    // engine renders before the palette is saved. The harder of the two surfaces
+    // is the one the floor has to be solved against.
+    const QColor iconSurface = ThemeIconInk::harderSurface(bg_win, bg_btn, winText);
+    const QColor iconInk = ThemeIconInk::glyphInk(winText, iconSurface, hl);
+    cfg.appColors[AppColor::Icon] = iconInk;
+    cfg.appColors[AppColor::IconStrong] = ThemeIconInk::forEmphasis(iconInk, iconSurface, IconEmphasis::Primary);
+    cfg.appColors[AppColor::IconSoft] = ThemeIconInk::forEmphasis(iconInk, iconSurface, IconEmphasis::Quiet);
+    // Semantic roles stay independent of the accent: a generated palette must
+    // still paint add/ready green and remove/not-ready red.
+    for (const AppColor::Role role : {AppColor::Positive, AppColor::PositiveStrong, AppColor::PositiveSoft,
+                                      AppColor::Negative, AppColor::NegativeStrong, AppColor::NegativeSoft}) {
+        cfg.appColors[role] = defaultAppColor(role, dark);
+    }
 
     // BrightText
     QColor bright;

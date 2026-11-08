@@ -43,6 +43,7 @@
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_set_counter.pb.h>
+#include <libcockatrice/protocol/pb/command_set_player_order.pb.h>
 #include <libcockatrice/protocol/pb/command_set_playmat.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_lock.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_plan.pb.h>
@@ -404,6 +405,13 @@ Response::ResponseCode Server_AbstractParticipant::cmdRevealCards(const Command_
     return Response::RespFunctionNotAllowed;
 }
 
+Response::ResponseCode Server_AbstractParticipant::cmdRevealRandomCards(const Command_RevealRandomCards & /*cmd*/,
+                                                                        ResponseContainer & /*rc*/,
+                                                                        GameEventStorage & /*ges*/)
+{
+    return Response::RespFunctionNotAllowed;
+}
+
 Response::ResponseCode Server_AbstractParticipant::cmdChangeZoneProperties(const Command_ChangeZoneProperties & /*cmd*/,
                                                                            ResponseContainer & /*rc*/,
                                                                            GameEventStorage & /*ges*/)
@@ -431,6 +439,33 @@ Response::ResponseCode Server_AbstractParticipant::cmdReverseTurn(const Command_
     event.set_reversed(reversedTurn);
     ges.enqueueGameEvent(event, playerId);
 
+    return Response::RespOk;
+}
+
+Response::ResponseCode Server_AbstractParticipant::cmdSetPlayerOrder(const Command_SetPlayerOrder &cmd,
+                                                                     ResponseContainer & /*rc*/,
+                                                                     GameEventStorage & /*ges*/)
+{
+    if ((game->getHostId() != playerId) && !(userInfo->user_level() & ServerInfo_User::IsModerator)) {
+        return Response::RespFunctionNotAllowed;
+    }
+
+    if (game->getGameStarted()) {
+        return Response::RespContextError;
+    }
+
+    if (cmd.randomize()) {
+        game->shufflePlayerSeats();
+    } else {
+        QList<QString> playerNames;
+        for (int i = 0; i < cmd.player_names_size(); ++i) {
+            playerNames.append(QString::fromStdString(cmd.player_names(i)));
+        }
+        game->reorderPlayerSeats(playerNames);
+    }
+
+    // Clients learn the new seating from the Event_PlayerOrderChanged that
+    // reseatPlayers broadcasts; no full game state resend is needed for it.
     return Response::RespOk;
 }
 
@@ -516,6 +551,9 @@ Server_AbstractParticipant::processGameCommand(const GameCommand &command, Respo
         case GameCommand::REVEAL_CARDS:
             return cmdRevealCards(command.GetExtension(Command_RevealCards::ext), rc, ges);
             break;
+        case GameCommand::REVEAL_RANDOM_CARDS:
+            return cmdRevealRandomCards(command.GetExtension(Command_RevealRandomCards::ext), rc, ges);
+            break;
         case GameCommand::MOVE_CARD:
             return cmdMoveCard(command.GetExtension(Command_MoveCard::ext), rc, ges);
             break;
@@ -542,6 +580,9 @@ Server_AbstractParticipant::processGameCommand(const GameCommand &command, Respo
             break;
         case GameCommand::SET_PLAYMAT:
             return cmdSetPlaymat(command.GetExtension(Command_SetPlaymat::ext), rc, ges);
+            break;
+        case GameCommand::SET_PLAYER_ORDER:
+            return cmdSetPlayerOrder(command.GetExtension(Command_SetPlayerOrder::ext), rc, ges);
             break;
         default:
             return Response::RespInvalidCommand;

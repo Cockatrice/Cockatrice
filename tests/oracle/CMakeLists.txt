@@ -42,6 +42,7 @@ cockatrice_add_test(
   ../../oracle/src/parsehelpers.cpp
   ../../oracle/src/raw_json_scanner.cpp
   ../../oracle/src/tag_database.cpp
+  ../../oracle/src/database_writer.cpp
   oracle_importer_test.cpp
   ${_ORACLE_COMPRESSION_SOURCES}
   LIBS

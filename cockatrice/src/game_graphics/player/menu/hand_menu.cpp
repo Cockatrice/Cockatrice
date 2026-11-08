@@ -6,6 +6,9 @@
 #include "../player_graphics_item.h"
 
 #include <QAction>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QInputDialog>
 #include <QKeySequence>
 #include <QList>
 #include <QMap>
@@ -66,6 +69,15 @@ HandMenu::HandMenu(PlayerGraphicsItem *_player, QWidget *parent) : TearOffMenu(p
     aRevealRandomHandCardToAll = new QAction(this);
     aRevealRandomHandCardToAll->setData(-1);
     connect(aRevealRandomHandCardToAll, &QAction::triggered, this, &HandMenu::onRevealRandomHandCardTriggered);
+
+    mRevealRandomHandCards = addMenu(QString());
+    mRevealRandomHandCards->setObjectName("revealRandomHandCardsMenu");
+    connect(mRevealRandomHandCards, &QMenu::aboutToShow, this,
+            &HandMenu::populateRevealRandomHandCardsMenuWithActivePlayers);
+    aRevealRandomHandCardsToAll = new QAction(this);
+    aRevealRandomHandCardsToAll->setData(-1);
+    connect(aRevealRandomHandCardsToAll, &QAction::triggered, this, &HandMenu::onRevealRandomHandCardsTriggered);
+    mRevealRandomHandCards->addAction(aRevealRandomHandCardsToAll);
 
     // We still need to add these actions to menu here so that the shortcuts are active right away
     mRevealHand->addAction(aRevealHandToAll);
@@ -146,6 +158,8 @@ void HandMenu::retranslateUi()
 
         mRevealRandomHandCard->setTitle(tr("Reveal r&andom card to..."));
         aRevealRandomHandCardToAll->setText(tr("All players"));
+        mRevealRandomHandCards->setTitle(tr("Reveal a chosen number of random cards to..."));
+        aRevealRandomHandCardsToAll->setText(tr("All players"));
     }
 }
 
@@ -232,4 +246,52 @@ void HandMenu::onRevealRandomHandCardTriggered()
 
     const int targetId = action->data().toInt();
     player->getLogic()->getPlayerActions()->actRevealRandomHandCard(targetId);
+}
+
+void HandMenu::populateRevealRandomHandCardsMenuWithActivePlayers()
+{
+    const bool hasCards = !player->getLogic()->getHandZone()->getCards().isEmpty();
+    mRevealRandomHandCards->clear();
+    aRevealRandomHandCardsToAll->setEnabled(hasCards);
+    mRevealRandomHandCards->addAction(aRevealRandomHandCardsToAll);
+    mRevealRandomHandCards->addSeparator();
+    const auto &players = player->getLogic()->getGame()->getPlayerManager()->getPlayers().values();
+    for (auto *other : players) {
+        if (other == player->getLogic()) {
+            continue;
+        }
+        auto *action = mRevealRandomHandCards->addAction(other->getPlayerInfo()->getName());
+        action->setData(other->getPlayerInfo()->getId());
+        action->setEnabled(hasCards);
+        connect(action, &QAction::triggered, this, &HandMenu::onRevealRandomHandCardsTriggered);
+    }
+}
+
+void HandMenu::onRevealRandomHandCardsTriggered()
+{
+    const auto *action = qobject_cast<QAction *>(sender());
+    const int handSize = player->getLogic()->getHandZone()->getCards().size();
+    if (!action || handSize == 0) {
+        return;
+    }
+    const int targetId = action->data().toInt();
+    auto *actions = player->getLogic()->getPlayerActions();
+    auto *dialog = new QInputDialog(dialogParent());
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->setWindowTitle(tr("Reveal Random Hand Cards"));
+    dialog->setLabelText(tr("Number of distinct random cards to reveal to %1:").arg(action->text()));
+    dialog->setInputMode(QInputDialog::IntInput);
+    dialog->setIntRange(1, handSize);
+    dialog->setIntValue(qMin(2, handSize));
+    connect(dialog, &QDialog::accepted, actions,
+            [dialog, actions, targetId] { actions->actRevealRandomHandCards(targetId, dialog->intValue()); });
+    dialog->open();
+}
+
+QWidget *HandMenu::dialogParent() const
+{
+    if (auto *view = player->scene() ? player->scene()->views().value(0) : nullptr) {
+        return view->window();
+    }
+    return nullptr;
 }

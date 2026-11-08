@@ -32,10 +32,13 @@ private:
     QUrl originalUrl;
     QNetworkAccessManager *netMan;
     QNetworkReply *response;
+    bool errorReported = false;
+    bool cancelRequested = false;
 private slots:
     void fileFinished();
     void downloadProgress(qint64 bytesRead, qint64 totalBytes);
     void downloadError(QNetworkReply::NetworkError);
+    void cancelDownload();
 };
 
 #endif // COCKATRICE_UPDATEDOWNLOADER_H

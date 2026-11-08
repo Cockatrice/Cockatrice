@@ -279,6 +279,7 @@ public slots:
     void actReveal(QList<CardState *> selectedCards, QAction *action);
     void actRevealHand(int revealToPlayerId);
     void actRevealRandomHandCard(int revealToPlayerId);
+    void actRevealRandomHandCards(int revealToPlayerId, int amount);
     void actRevealLibrary(int revealToPlayerId);
 
     void actSortHand();

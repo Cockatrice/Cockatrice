@@ -1,6 +1,6 @@
 #include "remote_replay_list_tree_widget.h"
 
-#include "../../../pixel_map_generator.h"
+#include "../../../theme_icon.h"
 #include "libcockatrice/protocol/pb/response.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_replay_match.pb.h"
 
@@ -50,7 +50,7 @@ RemoteReplayList_TreeModel::RemoteReplayList_TreeModel(AbstractClient *_client, 
     QFileIconProvider fip;
     dirIcon = fip.icon(QFileIconProvider::Folder);
     fileIcon = fip.icon(QFileIconProvider::File);
-    lockIcon = themePixmap(QStringLiteral("icons/lock"));
+    lockIcon = loadThemedIcon(QStringLiteral("icons/lock"));
 }
 
 RemoteReplayList_TreeModel::~RemoteReplayList_TreeModel()

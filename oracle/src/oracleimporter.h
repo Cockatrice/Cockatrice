@@ -200,6 +200,11 @@ private:
      * the whole import (or racing it).
      */
     QAtomicInt importCancelled;
+    bool importSuccessful = false;
+    QString importError;
+
+    // Discard the incomplete in-memory database; the installed file is untouched.
+    int failImport(const QString &message);
 
     /**
      * The ISO-639 language code whose foreignData is imported; "en" by default.
@@ -296,7 +301,24 @@ public:
      * the wizard can hand over its decompressed buffer without copying it.
      */
     bool readSetsFromByteArray(QByteArray data);
+    // Returns the complete selected-set count on success, zero on failure or cancellation.
     int startImport();
+    bool hasSuccessfulImport() const
+    {
+        return importSuccessful;
+    }
+    const QString &getImportError() const
+    {
+        return importError;
+    }
+    // Call on the owning thread before scheduling a worker, so a cancellation
+    // arriving before that worker starts is not lost.
+    void prepareImport()
+    {
+        importCancelled.storeRelease(0);
+        importSuccessful = false;
+        importError.clear();
+    }
     /**
      * @brief Requests an in-flight startImport() to stop at the next set boundary.
      *

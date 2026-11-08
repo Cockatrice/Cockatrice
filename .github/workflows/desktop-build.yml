@@ -15,7 +15,7 @@ on:
       - '!**.md'
       - '!.github/**'
       - '!.tx/**'
-      - '!doc/**'
+      - '!docs/**'
       - '.github/workflows/desktop-build.yml'
       - 'CMakeLists.txt'
       - 'vcpkg.json'
@@ -28,16 +28,38 @@ on:
       - '!**.md'
       - '!.github/**'
       - '!.tx/**'
-      - '!doc/**'
+      - '!docs/**'
       - '.github/workflows/desktop-build.yml'
       - 'CMakeLists.txt'
       - 'vcpkg.json'
       - 'vcpkg'    # needed to match submodule bumps (gitlink)
+  # The legs the pull-request matrix leaves out run here instead, so the legacy distros and
+  # the slow macOS runner stay covered without gating a pull request on them. Tags still
+  # build every leg, because a tag is what ships.
+  schedule:
+    - cron: '23 3 * * *'
 
 # Cancel earlier, unfinished runs of this workflow on the same branch (unless on tag --> release)
 concurrency:
-  group: "${{ github.workflow }} @ ${{ github.ref_name }}"
+  # The event name is part of the group because a nightly run and a push run on master share
+  # refs/heads/master but must not cancel each other: the nightly would drop the push's vcpkg
+  # import, and a merge landing during the nightly would drop that night's coverage.
+  group: "${{ github.workflow }} @ ${{ github.ref_name }} (${{ github.event_name }})"
   cancel-in-progress: ${{ github.ref_type != 'tag' }}
+
+# Qt's online installer ships its base package as separate archives. Installing only the
+# ones Cockatrice loads drops the full 25+ archive download to this handful (Windows Qt
+# cache: 440 MB → 180 MB, macOS thin Qt: ~200 MB → 60 MB). The addons Cockatrice also needs
+# (Multimedia, WebSockets, ShaderTools, ImageFormats) are not base archives: they stay in
+# each leg's qt_modules.
+#
+# The list mirrors what cmake/FindQtRuntime.cmake requires, so a component that is missing
+# here fails configure with "No suitable version of Qt was found" instead of at runtime:
+# qtbase supplies Core, Gui, Widgets, Network, Sql, Xml, Concurrent and PrintSupport;
+# qtdeclarative supplies Qml, Quick and QuickWidgets; qtsvg supplies Svg; qttools supplies
+# Linguist (lrelease/lupdate); qttranslations ships Qt's own catalogs.
+env:
+  QT_ARCHIVES: qtbase qtdeclarative qtsvg qttools qttranslations
 
 jobs:
   configure:
@@ -69,7 +91,7 @@ jobs:
 
       - name: "Checkout"
         if: steps.configure.outputs.tag != null
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0    # fetch all history for all branches and tags
 
@@ -81,7 +103,7 @@ jobs:
           TAG: ${{ steps.configure.outputs.tag }}
         run: .ci/prep_release.sh
 
-      - name: "Create release"
+      - name: "Create or update draft release"
         if: steps.configure.outputs.tag != null
         id: create_release
         shell: bash
@@ -93,20 +115,42 @@ jobs:
           body_path: ${{ steps.prepare.outputs.body_path }}
           prerelease: ${{ steps.prepare.outputs.is_beta }}
         run: |
-          args=()
-          [[ $prerelease == yes ]] && args+=(--prerelease)
+          # A release for this tag may already exist: a maintainer can save a draft in
+          # the GitHub UI before pushing the tag, or an earlier run may have left one.
+          # Never touch a published release, and never overwrite a draft that already
+          # has a body (generated notes or a maintainer's edits) - only fill in an
+          # empty draft. Prints "<isDraft> <body length>"; empty when there is none.
+          release_state="$(gh release view "$tag_name" --json isDraft,body \
+            --template '{{.isDraft}} {{len (or .body "")}}' 2>/dev/null || true)"
 
-          gh release create "$tag_name" --verify-tag --draft "${args[@]}" \
-            --target "$target" \
-            --title "$release_name" \
-            --notes-file "$body_path"
+          if [[ -z "$release_state" ]]; then
+            args=()
+            [[ $prerelease == yes ]] && args+=(--prerelease)
+
+            gh release create "$tag_name" --verify-tag --draft "${args[@]}" \
+              --target "$target" \
+              --title "$release_name" \
+              --notes-file "$body_path"
+          elif [[ "$release_state" == "true 0" ]]; then
+            echo "Filling in the empty draft release $tag_name"
+            args=(--prerelease=false)
+            [[ $prerelease == yes ]] && args=(--prerelease)
+
+            gh release edit "$tag_name" "${args[@]}" \
+              --title "$release_name" \
+              --notes-file "$body_path"
+          elif [[ "$release_state" == true* ]]; then
+            echo "::warning::Draft release $tag_name already has a body, leaving it untouched"
+          else
+            echo "::warning::Release $tag_name is already published, leaving it untouched"
+          fi
 
   vcpkg-baseline:
     name: vcpkg baseline
     runs-on: ubuntu-slim
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # vcpkg-tool reads versions/baseline.json out of the commit named by
       # `builtin-baseline`, through the `vcpkg` submodule's git history. A submodule
@@ -141,6 +185,8 @@ jobs:
 
             allow-failure: yes
             package: skip    # We are packaged in Arch already
+            debug_test: yes    # see the note on Fedora 45 below
+            ccache_size: 850M    # Debug plus the suite: 680 MB working set at -g1
 
           - distro: Servatrice_Debian
             version: 12
@@ -148,78 +194,155 @@ jobs:
             package: DEB
             server_only: yes
             test: skip
-
-          - distro: Debian
-            version: 12
-
-            package: DEB
-            test: skip    # Running tests on all distros is superfluous
+            # 4.7 min and the server alone: nothing here for a compiler cache to save.
+            persist_ccache: 'false'
 
           - distro: Debian
             version: 13
 
             package: DEB
+            ccache_size: 800M    # Release plus the suite: 625 MB working set at -g1
 
+          # The single Fedora leg used to build Debug for the suite and Release for the
+          # package in one job (measured on Fedora 44: 30.8 min, the only leg slower than
+          # Windows), so the package compile waited behind the Debug one. Two legs run in
+          # parallel and each keeps a cache that holds exactly one configuration.
+          #
+          # Arch and Fedora 45 are the two newest toolchains, and the -Wno-error= exceptions
+          # in CMakeLists.txt exist for exactly their warnings. This leg compiles Debug
+          # because only Debug passes -Werror, so it is where a new warning still fails.
           - distro: Fedora
-            version: 43
+            version: 45
+            variant: debug    # separate image and ccache from the release leg below
 
-            package: RPM
-            test: skip    # Running tests on all distros is superfluous
-
-          - distro: Fedora
-            version: 44
-
-            package: RPM
-
-          - distro: Ubuntu
-            version: 24.04
-
-            package: DEB
-            test: skip    # Running tests on all distros is superfluous
-
-          - distro: Ubuntu
-            version: 26.04
-
-            package: DEB
-
-            # The one leg that runs the suite under AddressSanitizer and
-            # UndefinedBehaviorSanitizer. Debian 13 and Fedora 44 keep covering the
-            # uninstrumented suite, so nothing is lost by instrumenting this one.
-            sanitize: yes
-
-          - distro: Ubuntu
-            version: 26.04
-            variant: cover    # separate image and ccache, same distro
-
-            # The one leg that runs instrumented for line coverage and publishes the report as
-            # a workflow artifact. It is a separate leg rather than a second flag on the
-            # sanitizer leg because the two instruments answer different questions: the
-            # sanitizer leg reports what the run did wrong, the coverage leg reports what the
-            # run never touched at all. Combining them would also slow both down. Packaging is
-            # skipped because the leg above already publishes the DEB for this distro.
-            coverage: yes
             package: skip
+            debug_test: yes
+            ccache_size: 850M    # Debug plus the suite: 660 MB of objects at -g1
+
+          - distro: Fedora
+            version: 45
+            variant: release    # separate image and ccache from the debug leg above
+
+            package: RPM
+            test: skip    # The debug leg above runs this distro's suite
+            ccache_size: 800M    # Release plus the package: 614 MB of objects at -g1
+
+          - distro: Ubuntu
+            version: 26.04
+
+            package: DEB
+            test: skip    # Debian 13 covers the uninstrumented suite on pull requests
+            # 18.1 min, shorter than the Windows leg. The sanitize leg in the nightly
+            # matrix runs this distro's instrumented suite.
+            persist_ccache: 'false'
 
     name: ${{ matrix.distro }} ${{ matrix.version }}${{ matrix.variant && format(' {0}', matrix.variant) || '' }}
     needs: configure
+    # The nightly legs live in build-linux-nightly below. A leg is in exactly one of the two
+    # matrices, so nothing that reviews a change waits for a distro nobody is changing for.
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest    # https://github.com/actions/runner-images
     continue-on-error: ${{ matrix.allow-failure == 'yes' }}
     timeout-minutes: 70
     env:
       CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}    # directory for caching docker image and ccache
       CCACHE_EVICTION_AGE: 7d
-      CCACHE_SIZE: 600M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
+      # The bound is sized against the repository's 10 GB cache quota
+      # (https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy),
+      # not against what one leg would like. Measured 2026-11-07, the quota holds 2.97 GB
+      # of these four ccache entries, 0.92 GB of Qt, 1.24 GB of vcpkg, 0.91 GB of buildkit
+      # layers (mode=min in docker-release.yml) and 4.26 GB of CodeQL trap caches: one entry
+      # per analyzed commit, about 1.07 GB each, of which every one but the newest is dead.
+      # That is 10.30 GB against the 10 GB quota, so every save past this point costs some
+      # other entry, and least-recently-used order reaches the buildkit layers before the
+      # trap caches. prune-caches below keeps only the newest trap cache; the live total is
+      # then 7.1 GB, which is what leaves room for the Windows and macOS compiler caches.
+      #
+      # Measured 2026-11-04: one configuration costs 1.2 GB with full DWARF and 660 MB with
+      # -g1 (COCKATRICE_DEBUG_INFO_LEVEL below), and the size of the cache decides the hit
+      # rate far more sharply than its fill suggests. A 6G cache served 1059 of 1059 calls;
+      # the 700M bound on the same leg served 14%, because ccache fills to the limit and then
+      # evicts the entries the next build is about to ask for. A cache that cannot hold a
+      # whole configuration therefore buys almost nothing, and the quota goes to fewer legs
+      # at a size that holds one:
+      #
+      #   Arch                 Debug + suite       680 MB working set   850M
+      #   Debian 13            Release + suite     625 MB               800M
+      #   Fedora 45 debug      Debug + suite       660 MB               850M
+      #   Fedora 45 release    Release + package   614 MB               800M
+      #   Windows 10           Release + package   890 MB working set   950M
+      #   macOS 14/15          Release + package   0.5 GB ccache at -g1 700M
+      #   macOS 27 Debug       Debug + suite       0.5 GB ccache at -g1 700M
+      #
+      # That is 6.35 GB of bounds; what lands in the quota is 5.15 GB of compiler cache,
+      # 2.97 GB stored by the Linux legs, 0.95 GB by Windows and 1.23 GB by the three macOS
+      # legs, for 9.3 GB of 10 in total.
+      # So only legs worth their share get one. A leg keeps no cache when it duplicates
+      # another leg's coverage (Ubuntu 26.04 behind Debian 13's Release + suite) or finishes
+      # well inside the Windows leg (Servatrice covers the server alone in 4.7 min). The
+      # macOS legs compile the client with a different toolchain (Apple clang), and one
+      # configuration writes only ~0.5 GB, so all three fit beside the Windows entry even
+      # though a macOS cache served 42% and saved about 32s on a 20 min leg. The four Linux
+      # legs that stay compile the client on the toolchains a change can break and are the
+      # ones a cache shortens by the most.
+      # Measured job totals on master 2026-11-04 also show the ceiling this leaves:
+      # Windows 10 is 29.5 min and compiles for 23.7 of it, so Windows sets the
+      # pull-request wall clock no matter how warm these legs are. That is why the Windows
+      # leg keeps the largest bound (see build-vcpkg): MSVC has no -g level to shrink, and
+      # with /Z7 the whole configuration is cacheable, PCH included.
+      #
+      # Steady-state master data corrected this on 2026-11-07: Arch 90.1% and Debian 13
+      # 96.75% per-run hits at the 850M/800M bounds, Fedora 45 debug 99.18% and release
+      # 99.2%. The 75%/82% seen the day before were warming runs - the -g1 switch had
+      # invalidated the cache one commit earlier - not thrashing at the bound. A cold 3G
+      # run on the same day measured one configuration at 680 MB (Arch) and 625 MB
+      # (Debian 13), so those bounds already hold the working set with ~170 MB of slack for
+      # commit-to-commit churn, and raising them buys hit rate the numbers do not show a
+      # need for. The three macOS entries are 700M each because one configuration wrote a
+      # 0.5 GB ccache directory at -g1 and level 0 shrinks it further, so the bound holds the
+      # whole configuration with room to spare.
+      #
+      # Re-add a leg only with a bound that holds its whole configuration: a smaller one is
+      # worse than none.
+      #
+      # Every key listed in LIVE_CCACHE_KEYS in prune-caches below must match this matrix.
+      CCACHE_SIZE: ${{ matrix.ccache_size || '700M' }}
+      # Debug information dominates a cached object: with the built-in flags one
+      # configuration is 1.2 GB and no per-leg bound can hold it, so CI lowers the level to
+      # 1 (file and line, which is what a failing test or a sanitizer backtrace reports) and
+      # one configuration halves. Empty on tags and on the nightly legs, which ship binaries
+      # and keep full DWARF for the Sentry symbols; a tag restores a cache it cannot use and
+      # is slower, which is accepted because a tag is rare and only pull requests gate.
+      COCKATRICE_DEBUG_INFO_LEVEL: ${{ github.ref_type != 'tag' && '1' || '' }}
       CMAKE_GENERATOR: 'Ninja'
       NAME: ${{ matrix.distro }}${{ matrix.version }}
       IMAGE_SUFFIX: ${{ matrix.variant }}
+      # Which build the suite runs in, decided once per leg here so the steps' if: conditions
+      # and their shells cannot drift apart. A step's own env is not visible to its if:, which
+      # is why these live at job level rather than on the release step.
+      #   DEBUG_TEST  the instrumented legs (symbols and instrumentation matter) and the two
+      #               newest distro toolchains, which only fail on a warning in Debug.
+      #   RUN_TESTS   every other leg that tests runs the suite against the release build it may
+      #               also package, so testing and packaging cost one compile instead of two.
+      DEBUG_TEST: ${{ matrix.sanitize == 'yes' || matrix.coverage == 'yes' || matrix.debug_test == 'yes' }}
+      RUN_TESTS: ${{ matrix.test != 'skip' && !(matrix.sanitize == 'yes' || matrix.coverage == 'yes' || matrix.debug_test == 'yes') }}
+      # Whether this leg restores and saves its compiler cache. Not every pull-request leg
+      # keeps one: a cache only pays for itself when its bound holds a whole configuration
+      # (see the sizing comment above), and a leg that duplicates another leg's coverage
+      # spends quota without adding any. The nightly-only legs keep none either. Fedora 45
+      # states it per leg: its two configurations have their own job and key, so neither
+      # bound is shared with a build whose objects it would evict.
+      PERSIST_CCACHE: ${{ matrix.persist_ccache || 'true' }}
 
-    steps:
+    # Shared with build-linux-nightly so the two leg sets run the same steps.
+    steps: &linux-steps
       - name: "Checkout"
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: "Restore compiler cache (ccache)"
         id: restore_ccache
-        uses: actions/cache/restore@v6
+        if: env.PERSIST_CCACHE == 'true'
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: ccache-${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}
           path: ${{ env.CACHE }}/.ccache
@@ -228,8 +351,11 @@ jobs:
         shell: bash
         run: source .ci/docker.sh --build
 
+      # The instrumented legs and the two newest distro toolchains build and test Debug; every
+      # other leg runs its suite against the release build below, so testing and packaging cost
+      # one compile instead of two.
       - name: "Build debug and test"
-        if: matrix.test != 'skip'
+        if: env.DEBUG_TEST == 'true'
         shell: bash
         env:
           sanitize: '${{ matrix.sanitize }}'
@@ -263,21 +389,29 @@ jobs:
 
       - name: "Upload coverage artifact"
         if: matrix.coverage == 'yes'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: coverage-report
           path: coverage/
           if-no-files-found: warn
 
-      - name: "Build release package"
+      # One build serves both purposes: the suite runs against the same configuration that
+      # gets packaged, so a packaging leg no longer pays for a full Debug compile it then
+      # throws away. macOS and Windows have always tested their release build.
+      #
+      # Instrumented and debug-test legs reach this step only when they also package; their
+      # suite already ran in the debug step above, so the tests are not repeated here.
+      - name: "Build release, test and package"
         id: build
-        if: matrix.package != 'skip'
+        if: matrix.package != 'skip' || env.RUN_TESTS == 'true'
         shell: bash
         env:
           SUFFIX: '-${{ matrix.distro }}${{ matrix.version }}'
           package: '${{ matrix.package }}'
           server_only: '${{ matrix.server_only }}'
-          WITH_CRASH_REPORTING: 'ON'
+          # Only a leg that packages builds the shipping configuration; a release build that
+          # only runs tests stays free of the crash reporting SDK.
+          WITH_CRASH_REPORTING: ${{ matrix.package != 'skip' && 'ON' || '' }}
           # Tag builds only: artifacts from master pushes and PR branches must not report to
           # Sentry. Forks get no secrets on pull_request, so they keep the mock fallback either way.
           # configure.outputs.tag is set for ANY tag, so beta (Development) tags get the DSN
@@ -287,6 +421,7 @@ jobs:
           source .ci/docker.sh
           args=()
           [[ $server_only == yes ]] && args+=(--no-client)
+          [[ $RUN_TESTS == true ]] && args+=(--test)
           [[ $GITHUB_REF == "refs/heads/master" ]] && args+=(--evict-ccache "$CCACHE_EVICTION_AGE")
           args+=(--ccache "$CCACHE_SIZE")
           args+=(--cmake-generator "$CMAKE_GENERATOR")
@@ -296,7 +431,14 @@ jobs:
           # configures, and empty keeps the mock fallback.
           export RUN_ARGS="${RUN_ARGS:-} -e COCKATRICE_SENTRY_DSN"
 
-          RUN --server --release --package "$package" "${args[@]}"
+          # --package takes an optional type, so the flag and its argument have to travel
+          # together or the type would become the next flag.
+          package_args=()
+          [[ -n $package && $package != skip ]] && package_args+=(--package "$package")
+
+          # compile.sh runs the tests before the package target, so a failing suite stops the
+          # leg before anything is built into an installer.
+          RUN --server --release "${package_args[@]}" "${args[@]}"
 
       - name: "Install sentry-cli"
         if: matrix.package != 'skip' && needs.configure.outputs.tag != null
@@ -343,9 +485,17 @@ jobs:
           # comes from the client event itself (COCKATRICE_SENTRY_RELEASE).
           sentry-cli debug-files upload --org cockatrice --project cockatrice-desktop "${paths[@]}"
 
+      # Pull requests and tags only restore; only a push to refs/heads/master writes. A PR save
+      # would replace the objects the next master build restores, and a PR that compiles a
+      # different configuration would evict the warm set for everyone. Tags build with full
+      # DWARF (COCKATRICE_DEBUG_INFO_LEVEL is empty), so a tag's cache would poison the -g1
+      # set if it shared the master scope; it does not, because the save is master-only. The
+      # nightly legs persist nothing at all (PERSIST_CCACHE is false) for the same reason:
+      # a schedule shares refs/heads/master with the push.
+      #
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "Delete remote compiler cache (ccache)"
-        if: github.ref == 'refs/heads/master' && steps.restore_ccache.outputs.cache-hit
+        if: github.ref == 'refs/heads/master' && env.PERSIST_CCACHE == 'true' && steps.restore_ccache.outputs.cache-hit
         continue-on-error: true
         env:
           CACHE_PRIMARY_KEY: ${{ steps.restore_ccache.outputs.cache-primary-key }}
@@ -356,8 +506,8 @@ jobs:
           fi
 
       - name: "Save updated compiler cache (ccache)"
-        if: github.ref == 'refs/heads/master'
-        uses: actions/cache/save@v6
+        if: github.ref == 'refs/heads/master' && env.PERSIST_CCACHE == 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: ${{ steps.restore_ccache.outputs.cache-primary-key }}
           path: ${{ env.CACHE }}/.ccache
@@ -365,7 +515,7 @@ jobs:
       - name: "Upload artifact"
         id: upload_artifact
         if: matrix.package != 'skip'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           archive: false
           if-no-files-found: error
@@ -385,7 +535,7 @@ jobs:
       - name: "Attest binary provenance"
         id: attestation
         if: steps.upload_release.outcome == 'success'
-        uses: actions/attest@v4
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
         with:
           show-summary: false
           subject-path: ${{ steps.build.outputs.path }}
@@ -398,35 +548,111 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh attestation verify "$BUILD_PATH" --repo Cockatrice/Cockatrice
 
+  build-linux-nightly:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - distro: Debian
+            version: 12    # previous stable, still covered by the nightly
+
+            package: DEB
+            test: skip    # Running tests on all distros is superfluous
+
+          - distro: Fedora
+            version: 44    # previous release, still covered by the nightly
+
+            package: RPM
+            test: skip    # Running tests on all distros is superfluous
+
+          - distro: Ubuntu
+            version: 24.04    # previous LTS, still covered by the nightly
+
+            package: DEB
+            test: skip    # Running tests on all distros is superfluous
+
+          # The one leg that runs the suite under AddressSanitizer and
+          # UndefinedBehaviorSanitizer. It runs nightly rather than on pull requests: it is
+          # not on the pull-request critical path (Windows sets that), and its 1.2G cache
+          # was the largest single entry in the 10 GB quota. Debian 13 and Fedora 45 keep
+          # covering the uninstrumented suite on pull requests, so nothing is lost there.
+          #
+          # It packages nothing. A sanitized Debug build is not something to ship; the
+          # pull-request Ubuntu 26.04 leg publishes this distro's DEB.
+          - distro: Ubuntu
+            version: 26.04
+            variant: sanitize    # separate image, same distro as the coverage leg below
+
+            package: skip
+            sanitize: yes
+            # A sanitizer finding must not redden the nightly run: vcpkg-cache-import only
+            # imports the archives of a run whose conclusion is success. The job itself
+            # still reports failure.
+            allow-failure: yes
+            # Scratch only (nightly legs persist no cache); sized so the instrumented
+            # objects, which are larger than the 614 MB measured, do not thrash mid-build.
+            ccache_size: 1200M
+
+          # The one leg that runs instrumented for line coverage and publishes the report as
+          # a workflow artifact. It stays a separate leg rather than a second flag on the
+          # sanitizer leg because the two instruments answer different questions: the
+          # sanitizer leg reports what the run did wrong, the coverage leg reports what the
+          # run never touched at all. Combining them would also slow both down.
+          #
+          # It moved here from build-linux: gcovr.cfg sets no fail_under, so the leg cannot
+          # fail a build, and nothing consumes the report per change, which made it an
+          # artifact nobody read on every pull request. On the default branch it becomes a
+          # trend instead. Image and ccache keys come from distro, version and variant, so
+          # they are unchanged and the warm cache that leg built still matches.
+          - distro: Ubuntu
+            version: 26.04
+            variant: cover    # separate image and ccache, same distro
+
+            coverage: yes
+            package: skip
+            # A report must not redden the nightly run: vcpkg-cache-import only imports the
+            # archives of a run whose conclusion is success.
+            allow-failure: yes
+
+    name: ${{ matrix.distro }} ${{ matrix.version }}${{ matrix.variant && format(' {0}', matrix.variant) || '' }}
+    needs: configure
+    # A nightly and a tag build cover the legs a pull request or a merge does not wait for:
+    # the previous release of each distro, and the instrumented legs.
+    if: github.event_name == 'schedule' || github.ref_type == 'tag'
+    runs-on: ubuntu-latest    # https://github.com/actions/runner-images
+    continue-on-error: ${{ matrix.allow-failure == 'yes' }}
+    timeout-minutes: 70
+    env:
+      CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}    # directory for caching docker image and ccache
+      CCACHE_EVICTION_AGE: 7d
+      # These legs do not keep a compiler cache: they run once a day (and on tags) and gate
+      # nothing, so their share of the 10 GB quota goes to the pull-request legs instead.
+      # A cold nightly build costs minutes on a runner nobody waits for; a cold pull request
+      # build costs a review. CCACHE_SIZE is still passed so ccache trims its scratch dir.
+      PERSIST_CCACHE: 'false'
+      CCACHE_SIZE: ${{ matrix.ccache_size || '600M' }}
+      CMAKE_GENERATOR: 'Ninja'
+      NAME: ${{ matrix.distro }}${{ matrix.version }}
+      IMAGE_SUFFIX: ${{ matrix.variant }}
+      # The shared steps below gate on these, so they have to be derived here too. Left
+      # undefined they silently skipped the build the leg exists for: the coverage leg
+      # found build/ empty and its report collection failed on every nightly and tag run.
+      # Same derivation as the pull request job above.
+      DEBUG_TEST: ${{ matrix.sanitize == 'yes' || matrix.coverage == 'yes' || matrix.debug_test == 'yes' }}
+      RUN_TESTS: ${{ matrix.test != 'skip' && !(matrix.sanitize == 'yes' || matrix.coverage == 'yes' || matrix.debug_test == 'yes') }}
+    steps: *linux-steps
+
   build-vcpkg:
     strategy:
       fail-fast: false
       matrix:
         include:
           - os: macOS
-            target: 13    # EOL 2025-09-15
-            runner: macos-15-intel    # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-Readme.md
-                                      # macos-26-intel is very slow and fails in CPack during DMG config if not increasing Finder timeout
+            target: 14    # EOL 2026-09-14
+            runner: xcode-27    # https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md
 
             ccache_eviction_age: 7d
-            cmake_generator: Ninja
-            make_package: 1
-            override_target: 13
-            package_suffix: "-macOS13_Intel"
-            qt_version: 6.11.*
-            qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
-            soc: Intel
-            type: Release
-            use_ccache: 1
-            vcpkg_scope: 'vcpkg/macos13-x64-xcode26.3/'
-            vcpkg_upload: 1    # only one leg per vcpkg_scope hands its archives over
-            xcode: "26.3"
-
-          - os: macOS
-            target: 14    # EOL 2026-??
-            runner: macos-26    # https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md
-
-            ccache_eviction_age: 7d
+            ccache_size: 700M    # Release + package: ~0.4 GB at level 0
             cmake_generator: Ninja
             make_package: 1
             override_target: 14
@@ -439,13 +665,13 @@ jobs:
             vcpkg_deployment_target: 14
             vcpkg_scope: 'vcpkg/macos14-arm64-xcode26.6/'
             vcpkg_upload: 1    # only one leg per vcpkg_scope hands its archives over
-            xcode: "26.6"
 
           - os: macOS
-            target: 15
-            runner: macos-26    # https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md
+            target: 15    # EOL 2027-??
+            runner: xcode-27    # https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md
 
             ccache_eviction_age: 7d
+            ccache_size: 700M    # Release + package: ~0.4 GB at level 0
             cmake_generator: Ninja
             make_package: 1
             override_target: 15
@@ -457,13 +683,13 @@ jobs:
             use_ccache: 1
             vcpkg_deployment_target: 14
             vcpkg_scope: 'vcpkg/macos14-arm64-xcode26.6/'
-            xcode: "26.6"
 
           - os: macOS
-            target: 26
-            runner: macos-26    # https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md
+            target: 27
+            runner: xcode-27    # https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md
 
             ccache_eviction_age: 7d
+            ccache_size: 700M    # Debug + suite: ~0.5 GB at level 0
             cmake_generator: Ninja
             qt_version: 6.11.*
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
@@ -472,7 +698,6 @@ jobs:
             use_ccache: 1
             vcpkg_deployment_target: 14
             vcpkg_scope: 'vcpkg/macos14-arm64-xcode26.6/'
-            xcode: "26.6"
 
           - os: Windows
             target: 10
@@ -489,6 +714,9 @@ jobs:
             qt_version: 6.11.*
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             type: Release
+            ccache_eviction_age: 7d
+            ccache_size: 950M    # Release plus the package: 890 MB working set without /Z7
+            use_ccache: 1
             # Scope is named after the vs2026 toolchain, not the generator: the
             # ABI hash covers cl.exe, which is identical, so this leg keeps
             # restoring the warm archives. Renaming would orphan them.
@@ -497,35 +725,64 @@ jobs:
 
     name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: [configure, vcpkg-baseline]
+    # The nightly leg lives in build-vcpkg-nightly below, next to the Linux nightly legs.
+    if: github.event_name != 'schedule'
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 100
     env:
+      # The Windows leg and all three pull-request macOS legs keep a compiler cache. ccache
+      # drives MSVC as long as the compiler emits /Z7, which CMakeLists.txt sets for exactly
+      # this reason, and it drives clang on macOS the same way; both cache the PCH-backed
+      # targets with the sloppiness that .ci/compile.sh re-asserts. Every leg builds without
+      # debug information on non-tag refs, so one macOS configuration writes ~0.4-0.5 GB and
+      # the 700M bound holds it with room for commit-to-commit churn (see build-linux for the
+      # quota arithmetic).
       CCACHE_DIR: ${{ github.workspace }}/.cache/
-      CCACHE_SIZE: 600M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
+      CCACHE_SIZE: ${{ matrix.ccache_size || '700M' }}
+      PERSIST_CCACHE: ${{ matrix.persist_ccache || 'true' }}
+      # MSVC has no -g level, so there is nothing to ask for on Windows: level 0 is the one
+      # value with a meaning there, and it drops /Z7 rather than lowering a level. Pull-request
+      # builds carry no debug information, which is most of what a compiler cache stores; a
+      # tag is the build whose binary is shipped and symbolicated, so it keeps the full set.
+      COCKATRICE_DEBUG_INFO_LEVEL: ${{ github.ref_type != 'tag' && '0' || '' }}
 
-    steps:
+    # Shared with build-vcpkg-nightly so the two leg sets run the same steps.
+    steps: &vcpkg-steps
       - name: "Checkout"
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: recursive
 
       - name: "[Windows] Add msbuild to PATH"
         if: matrix.os == 'Windows'
-        uses: microsoft/setup-msbuild@v3
+        uses: microsoft/setup-msbuild@30375c66a4eea26614e0d39710365f22f8b0af57 # v3.0.0
         with:
           msbuild-architecture: x64
+
+      - name: "[Windows] Setup ccache"
+        if: matrix.os == 'Windows' && matrix.use_ccache == 1
+        shell: bash
+        run: choco install ccache --no-progress -y
 
       - name: "[macOS] Setup ccache"
         if: matrix.os == 'macOS' && matrix.use_ccache == 1
         run: brew install ccache
 
-      - name: "[macOS] Restore compiler cache (ccache)"
-        if: matrix.os == 'macOS' && matrix.use_ccache == 1
+      - name: "Restore compiler cache (ccache)"
+        if: matrix.use_ccache == 1 && env.PERSIST_CCACHE == 'true'
         id: restore_ccache
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          key: ccache-${{ matrix.runner }}_${{ matrix.override_target }}-Xcode${{ matrix.xcode }}
+          key: ccache-${{ matrix.os }}${{ matrix.target }}
           path: ${{ env.CCACHE_DIR }}
+
+      # Every macOS leg that keeps a cache restores the master entry for its own target.
+      # Measured on master 2026-11-07 (before the debug-information change), one macOS
+      # configuration wrote a 0.5 GB ccache directory at -g1 against the 700M bound, and the
+      # restored cache served 42% of calls. Level 0 shrinks that directory to ~0.4 GB, so the
+      # bound holds the whole configuration and the three entries fit the quota (see the
+      # sizing note in build-linux). macOS 14 and 15 build the same Release + package
+      # configuration for two deployment targets, but each is cheap enough to keep its own.
 
       - name: "[macOS] Install aqtinstall"
         if: matrix.os == 'macOS'
@@ -543,17 +800,18 @@ jobs:
       - name: "[macOS] Restore thin Qt ${{ steps.resolve_qt_version.outputs.version }}"
         if: matrix.os == 'macOS'
         id: restore_qt
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          key: Qt-${{ steps.resolve_qt_version.outputs.version }}-macOS-${{ matrix.soc }}-${{ matrix.qt_modules }}-thin
+          key: Qt-${{ steps.resolve_qt_version.outputs.version }}-macOS-${{ matrix.soc }}-${{ matrix.qt_modules }}-${{ env.QT_ARCHIVES }}-thin
           path: ${{ github.workspace }}/Qt
 
       # Using jurplel/install-qt-action to install Qt without using brew
       # Qt build using vcpkg either just fails or takes too long to build
       - name: "[macOS] Install fat Qt ${{ matrix.qt_version }}"
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
-        uses: jurplel/install-qt-action@v4
+        uses: jurplel/install-qt-action@b344308e4483fc892e0d27b3cd1b173ebdd95f06 # v4.5.0
         with:
+          archives: ${{ env.QT_ARCHIVES }}
           cache: false
           # cache-key-prefix: Qt
           dir: ${{ github.workspace }}    # thinning script depends on this location
@@ -566,17 +824,18 @@ jobs:
 
       - name: "[macOS] Cache thin Qt libraries"
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true' && github.ref == 'refs/heads/master'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: ${{ steps.restore_qt.outputs.cache-primary-key }}
           path: ${{ github.workspace }}/Qt
 
       - name: "[Windows] Install Qt ${{ matrix.qt_version }}"
         if: matrix.os == 'Windows'
-        uses: jurplel/install-qt-action@v4
+        uses: jurplel/install-qt-action@b344308e4483fc892e0d27b3cd1b173ebdd95f06 # v4.5.0
         with:
           # Qt 6.11.0 only works with aqtinstall directly from git until aqtinstall 3.4 is released
           aqtsource: git+https://github.com/miurahr/aqtinstall.git
+          archives: ${{ env.QT_ARCHIVES }}
           cache: ${{ github.ref == 'refs/heads/master' }}
           cache-key-prefix: Qt
           modules: ${{ matrix.qt_modules }}
@@ -585,7 +844,7 @@ jobs:
       - name: "[Windows] Install NSIS"
         if: matrix.os == 'Windows'
         shell: bash
-        run: choco install nsis
+        run: choco install nsis --no-progress
 
       # Ninja invokes cl.exe directly and needs the MSVC environment on PATH.
       - name: "[Windows] Set up MSVC environment"
@@ -596,7 +855,7 @@ jobs:
 
       - name: "Setup vcpkg cache"
         id: vcpkg-cache
-        uses: TAServers/vcpkg-cache@v3
+        uses: TAServers/vcpkg-cache@4f07be616a4604dd29f3c6885975cf2c04abee71 # v3.4.2
         with:
           # Every entry is keyed by vcpkg ABI hash, and one hash set exists per platform,
           # target and toolchain. The action restores every entry it finds under the
@@ -639,7 +898,6 @@ jobs:
           # configure.outputs.tag is set for ANY tag, so beta (Development) tags get the DSN
           # and the symbol upload below just like full releases.
           COCKATRICE_SENTRY_DSN: ${{ needs.configure.outputs.tag != null && secrets.SENTRY_DSN || '' }}
-          DEVELOPER_DIR: '/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer'
           GITHUB_TOKEN: ${{ github.token }}    # needed for vcpkg dependency graph updates, see VCPKG_FEATURE_FLAGS
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
@@ -665,6 +923,21 @@ jobs:
           # Release legs compile the sentry-native SDK; Debug legs stay SDK-free.
           WITH_CRASH_REPORTING: ${{ matrix.type == 'Release' && 'ON' || '' }}
         run: .ci/compile.sh --server --test --vcpkg
+
+      # What the compiler cache has to hold for this leg. ccache stores the objects it
+      # compiles, so their total is the working set a bound has to fit, and the cache
+      # directory shows what this build actually wrote. Debug information dominates both,
+      # which is why the level above is reported next to them.
+      - name: "Report compiler cache footprint"
+        if: always()
+        shell: bash
+        run: |
+          echo "=== ccache directory"
+          du -sh "$CCACHE_DIR" 2>/dev/null || echo "(none)"
+          echo "=== objects and archives"
+          find build -type f \( -name '*.o' -o -name '*.obj' -o -name '*.a' -o -name '*.lib' \) -exec du -k {} + 2>/dev/null \
+            | awk '{n++; s+=$1} END {printf "%d files, %.2f GB\n", n, s/1048576}'
+          echo "=== debug info level in use: '${COCKATRICE_DEBUG_INFO_LEVEL}'"
 
       - name: "Install sentry-cli"
         if: needs.configure.outputs.tag != null && matrix.make_package == '1'
@@ -842,7 +1115,7 @@ jobs:
       - name: "Upload new vcpkg entries"
         # An empty count means the step above did not run at all, on master and on forks
         if: steps.vcpkg_new.outputs.count != '' && steps.vcpkg_new.outputs.count != '0'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           if-no-files-found: error    # a count above zero with nothing staged is a bug
           name: vcpkg-new-${{ steps.vcpkg_new.outputs.slug }}
@@ -850,9 +1123,11 @@ jobs:
           retention-days: 1
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
-      - name: "[macOS] Delete remote compiler cache (ccache)"
-        if: matrix.os == 'macOS' && matrix.use_ccache == 1 && github.ref == 'refs/heads/master' && steps.restore_ccache.outputs.cache-hit
+      - name: "Delete remote compiler cache (ccache)"
+        if: matrix.use_ccache == 1 && env.PERSIST_CCACHE == 'true' && github.ref == 'refs/heads/master' && steps.restore_ccache.outputs.cache-hit
         continue-on-error: true
+        # Bash, not the Windows runner's default pwsh, which cannot parse this `if`.
+        shell: bash
         env:
           CACHE_PRIMARY_KEY: ${{ steps.restore_ccache.outputs.cache-primary-key }}
           GH_TOKEN: ${{ github.token }}
@@ -861,9 +1136,9 @@ jobs:
             echo "Cache deleted successfully"
           fi
 
-      - name: "[macOS] Cache updated compiler cache (ccache)"
-        if: matrix.os == 'macOS' && matrix.use_ccache == 1 && github.ref == 'refs/heads/master'
-        uses: actions/cache/save@v6
+      - name: "Cache updated compiler cache (ccache)"
+        if: matrix.use_ccache == 1 && env.PERSIST_CCACHE == 'true' && github.ref == 'refs/heads/master'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: ${{ steps.restore_ccache.outputs.cache-primary-key }}
           path: ${{ env.CCACHE_DIR }}
@@ -918,7 +1193,7 @@ jobs:
       - name: "Upload artifact"
         if: matrix.make_package
         id: upload_artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           archive: false
           if-no-files-found: error
@@ -950,7 +1225,7 @@ jobs:
       # debug identifier, and the PE is what carries the unwind information.
       - name: "[Windows] Upload debug symbols (exe + pdb)"
         if: matrix.os == 'Windows' && needs.configure.outputs.tag != null
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           if-no-files-found: error
           name: ${{ steps.build.outputs.name }}-Symbols
@@ -965,7 +1240,7 @@ jobs:
       - name: "Attest binary provenance"
         if: steps.upload_release.outcome == 'success'
         id: attestation
-        uses: actions/attest@v4
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
         with:
           show-summary: false
           subject-path: ${{ steps.build.outputs.path }}
@@ -978,6 +1253,36 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh attestation verify "$BUILD_PATH" --repo Cockatrice/Cockatrice
 
+  build-vcpkg-nightly:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macOS
+            target: 13    # EOL 2025-09-15
+            runner: macos-15-intel    # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-Readme.md
+                                      # macos-26-intel is very slow and fails in CPack during DMG config if not increasing Finder timeout
+
+            cmake_generator: Ninja
+            make_package: 1
+            override_target: 13
+            package_suffix: "-macOS13_Intel"
+            qt_version: 6.11.*
+            qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
+            soc: Intel
+            type: Release
+            vcpkg_scope: 'vcpkg/macos13-x64-xcode26.3/'
+            vcpkg_upload: 1    # only one leg per vcpkg_scope hands its archives over
+
+    name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
+    needs: configure
+    # The EOL target on the slowest runner is too slow to gate a change, so it runs in the
+    # nightly and on tags only, where the vcpkg cache import also has to accept schedule runs.
+    if: github.event_name == 'schedule' || github.ref_type == 'tag'
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 100
+    steps: *vcpkg-steps
+
   prune-caches:
     name: Prune caches
     # Only master writes caches at all, so only master may clean them up too
@@ -986,44 +1291,90 @@ jobs:
     continue-on-error: true    # freeing space must never fail a build
 
     steps:
-      # The repository holds 10Gi of cache against entries that want more, and GitHub
-      # evicts the least recently used entry whenever that is exceeded. The vcpkg
-      # entries are the reason that never happens: the restore above touches every
-      # entry under the prefix on every run, so a dead ABI generation keeps its access
-      # date fresh forever and age based eviction can never reach it. Deleting by age
-      # alone cannot fix that, only knowing which scope an entry belongs to can.
+      # The repository holds 10 GB of cache against entries that want more, and GitHub evicts
+      # the least recently used entry whenever that is exceeded. The vcpkg entries are the
+      # reason that never happens: the restore above touches every entry under the prefix on
+      # every run, so a dead ABI generation keeps its access date fresh forever and age based
+      # eviction can never reach it. Deleting by age alone cannot fix that, only knowing which
+      # scope an entry belongs to can. The same is true of a compiler cache of a leg that no
+      # longer keeps one: its restore would keep touching it, so the live key list below is
+      # what retires it.
+      #
+      # docker-release's image builds keep their layer cache in the same quota: one blob per
+      # layer, keyed buildkit-blob-1-<digest>, plus one index-<scope>-1-<hash> entry per image
+      # scope that lists them. They are written with mode=min, so only the final image stage
+      # is kept and the set stays small. A layer a build actually needs is downloaded, which
+      # refreshes its access date, so an old date means the builds have stopped using it and
+      # age is the right test. Dropping a blob an index still lists costs the next image build
+      # one rebuilt layer; docker-release gates nothing, so that is cheaper than keeping the
+      # entries forever.
+      #
+      # codeql.yml's analyze job keeps its extracted database as one entry per analyzed commit,
+      # keyed codeql-trap-<schema>-<version>-<language>-<sha>, about 1.07 GB each. Each run
+      # restores the newest entry by prefix and saves its own, so every run that analyzes a new
+      # commit makes the previous entry dead, and the action never deletes them: four had
+      # accumulated by 2026-11-07 (4.26 GB, 40% of the quota). Retiring them cannot wait for
+      # the age rule, because they are not the oldest entries and so not what least-recently-
+      # used eviction reaches: the buildkit layers are. Only the newest can be restored again,
+      # and a miss costs one re-extraction in a job that reports rather than gates, so keeping
+      # exactly that one is safe.
       - name: "Delete unusable cache entries"
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          # Must list every vcpkg_scope of the build-vcpkg matrix above, or the entries of
-          # a scope that is still in use get deleted on the next run.
+          # Must list every vcpkg_scope of the build-vcpkg and build-vcpkg-nightly
+          # matrices above, or the entries of a scope that is still in use get deleted
+          # on the next run.
           LIVE_VCPKG_SCOPES: 'vcpkg/macos13-x64-xcode26.3/ vcpkg/macos14-arm64-xcode26.6/ vcpkg/windows10-x64-vs2026/'
+          # Must list the ccache key of every leg that keeps a compiler cache
+          # (PERSIST_CCACHE in build-linux and build-vcpkg), or a live entry is deleted.
+          # The nightly legs and the pull-request legs that finish under the Windows leg
+          # keep none, so their leftover entries are reclaimed here instead of waiting out
+          # the age rule.
+          LIVE_CCACHE_KEYS: 'ccache-Arch ccache-Debian13 ccache-Fedora45debug ccache-Fedora45release ccache-Windows10 ccache-macOS14 ccache-macOS15 ccache-macOS27'
         run: |
           gh api --paginate "repos/$GITHUB_REPOSITORY/actions/caches?per_page=100" \
             --jq '.actions_caches[] | [.id, .ref, .key, .last_accessed_at] | @tsv' >"$RUNNER_TEMP/caches.tsv"
 
           cutoff="$(( $(date -u +%s) - 7 * 24 * 3600 ))"
           live=" ${LIVE_VCPKG_SCOPES} "
+          live_ccache=" ${LIVE_CCACHE_KEYS} "
+          # The one trap cache a later run can still restore, by prefix. ISO-8601 sorts
+          # lexicographically, so this is a plain string compare. Entries scoped to another
+          # ref are deleted by the ref rule below whatever this says.
+          newest_trap="$(awk -F'\t' '$2 == "refs/heads/master" && $3 ~ /^codeql-trap-/ && $4 > m { m = $4; k = $3 } END { print k }' "$RUNNER_TEMP/caches.tsv")"
+
           deleted=0
           while IFS=$'\t' read -r id ref key accessed; do
             [[ -n $id ]] || continue
-            # Only ever touch the key shapes this workflow creates, so that an entry of
-            # some other workflow can never be deleted by accident
+            # Only ever touch the key shapes our workflows create (buildkit-* and index-*
+            # come from docker-release.yml, codeql-trap-* from codeql-action in codeql.yml),
+            # so that an entry of some other workflow can never be deleted by accident
             case "$key" in
-              vcpkg/* | ccache-* | Qt*) ;;
+              vcpkg/* | ccache-* | Qt* | buildkit-* | index-* | codeql-trap-*) ;;
               *) continue ;;
             esac
 
             reason=""
             if [[ $ref != refs/heads/master ]]; then
               reason="scoped to $ref"
+            elif [[ $key == ccache-* ]]; then
+              # An exact token compare, because one key can be a prefix of another:
+              # ccache-Fedora45 is a prefix of ccache-Fedora45debug and
+              # ccache-Fedora45release, and only the latter two are live.
+              if [[ $live_ccache != *" $key "* ]]; then
+                reason="no pull-request leg keeps it"
+              fi
             elif [[ $key == vcpkg/* ]]; then
               # "<scope>/<abi hash>", cut the hash off the end to get the scope
               scope="vcpkg/${key#vcpkg/}"
               scope="${scope%/*}/"
               if [[ $live != *" $scope "* ]]; then
                 reason="no matrix leg uses $scope"
+              fi
+            elif [[ $key == codeql-trap-* ]]; then
+              if [[ $key != "$newest_trap" ]]; then
+                reason="superseded by the newest trap cache"
               fi
             fi
             if [[ -z $reason ]]; then

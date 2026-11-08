@@ -1,7 +1,7 @@
 #include "game_selector.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 #include "../interface/widgets/dialogs/dlg_create_game.h"
 #include "../interface/widgets/dialogs/dlg_filter_games.h"
 #include "../interface/widgets/tabs/tab_room.h"
@@ -130,10 +130,10 @@ GameSelector::GameSelector(AbstractClient *_client,
     }
 
     filterButton = new QPushButton;
-    filterButton->setIcon(themePixmap(QStringLiteral("icons/search")));
+    filterButton->setIcon(loadThemedIcon(QStringLiteral("icons/search")));
     connect(filterButton, &QPushButton::clicked, this, &GameSelector::actSetFilter);
     clearFilterButton = new QPushButton;
-    clearFilterButton->setIcon(themePixmap(QStringLiteral("icons/clearsearch")));
+    clearFilterButton->setIcon(loadThemedIcon(QStringLiteral("icons/clearsearch")));
     bool filtersSetToDefault = showFilters && gameListProxyModel->areFilterParametersSetToDefaults();
     clearFilterButton->setEnabled(!filtersSetToDefault);
     connect(clearFilterButton, &QPushButton::clicked, this, &GameSelector::actClearFilter);
@@ -266,9 +266,13 @@ void GameSelector::actCreate()
         return;
     }
 
-    DlgCreateGame dlg(room, room->getGameTypes(), this);
-    dlg.exec();
-    updateTitle();
+    // Heap-allocate the dialog: if this selector (or its room tab) is destroyed while the
+    // dialog is open, e.g. on server disconnect, Qt deletes its children. A stack-allocated
+    // child would then be deleted by Qt and crash.
+    auto *dlg = new DlgCreateGame(room, room->getGameTypes(), this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    connect(dlg, &QDialog::finished, this, &GameSelector::updateTitle);
+    dlg->exec();
 }
 
 void GameSelector::checkResponse(const Response &response)
@@ -362,8 +366,9 @@ void GameSelector::customContextMenu(const QPoint &point)
         const ServerInfo_Game &gameInfo = gameListModel->getGame(index.data(Qt::UserRole).toInt());
         const QMap<int, QString> &gameTypes = gameListModel->getGameTypes().value(gameInfo.room_id());
 
-        DlgCreateGame dlg(gameInfo, gameTypes, this);
-        dlg.exec();
+        auto *dlg = new DlgCreateGame(gameInfo, gameTypes, this);
+        dlg->setAttribute(Qt::WA_DeleteOnClose);
+        dlg->exec();
     });
 
     QAction copyLink(tr("Cop&y game link"));

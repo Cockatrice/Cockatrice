@@ -5,6 +5,7 @@
 #include <libcockatrice/game/zones/hand_zone_logic.h>
 #include <libcockatrice/game/zones/view_zone_logic.h>
 #include <libcockatrice/utility/card_ref.h>
+#include <libcockatrice/utility/zone_names.h>
 
 namespace
 {
@@ -104,4 +105,31 @@ TEST(CardZoneLogicTest, ReorganizeSignalFiresOnAdd)
     zone.addCard(&card, true, 0);
 
     EXPECT_EQ(reorganizeSpy.count(), 1);
+}
+
+TEST(CardZoneLogicTest, LibraryEdgeViewIsLimitedToOneEndOfTheLibrary)
+{
+    HandZoneLogic deck(nullptr, QString::fromLatin1(ZoneNames::DECK), false, true, true);
+    HandZoneLogic grave(nullptr, QString::fromLatin1(ZoneNames::GRAVE), false, true, true);
+
+    ZoneViewZoneLogic fullDeckView(nullptr, &deck, -1, false, false, false);
+    EXPECT_FALSE(fullDeckView.isLibraryEdgeView());
+    EXPECT_FALSE(fullDeckView.showsTopOfLibrary());
+    EXPECT_FALSE(fullDeckView.showsBottomOfLibrary());
+
+    ZoneViewZoneLogic emptyDeckView(nullptr, &deck, 0, false, false, false);
+    EXPECT_FALSE(emptyDeckView.isLibraryEdgeView());
+
+    ZoneViewZoneLogic topView(nullptr, &deck, 3, false, false, false);
+    EXPECT_TRUE(topView.isLibraryEdgeView());
+    EXPECT_TRUE(topView.showsTopOfLibrary());
+    EXPECT_FALSE(topView.showsBottomOfLibrary());
+
+    ZoneViewZoneLogic bottomView(nullptr, &deck, 3, false, false, true);
+    EXPECT_TRUE(bottomView.isLibraryEdgeView());
+    EXPECT_FALSE(bottomView.showsTopOfLibrary());
+    EXPECT_TRUE(bottomView.showsBottomOfLibrary());
+
+    ZoneViewZoneLogic graveView(nullptr, &grave, 3, false, false, false);
+    EXPECT_FALSE(graveView.isLibraryEdgeView());
 }

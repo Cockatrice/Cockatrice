@@ -1,3 +1,4 @@
+#include "../support/scoped_file_size_limit.h"
 #include "libcockatrice/card/database/card_database.h"
 #include "libcockatrice/card/database/card_database_loader.h"
 #include "libcockatrice/card/database/card_database_querier.h"
@@ -203,6 +204,57 @@ TEST(CardDatabaseTest, Xml4LocalizedDataRoundTrip)
     ASSERT_FALSE(printings.isEmpty());
     ASSERT_EQ(printings.first().getProperty("manacost"), "1R");
 }
+
+#ifdef Q_OS_UNIX
+/**
+ * @brief A failed write keeps the previously installed card database intact.
+ *
+ * This is the writer Oracle uses to install a refreshed database, so the truncation
+ * bug has to be covered here and not only through OracleDatabase::saveXml.
+ */
+TEST(CardDatabaseTest, Xml4ShortWriteKeepsInstalledFile)
+{
+    NoopCardSetPriorityController controller;
+    CardSetPtr set =
+        CardSet::newInstance(&controller, "TST", "Test Set", "expansion", QDate(), CardSet::PriorityPrimary);
+
+    QHash<QString, QString> props;
+    props["manacost"] = "1R";
+    PrintingInfo printing(set, LazyPropertiesHash(props));
+    SetToPrintingsMap setsInfo;
+    setsInfo["TST"].append(printing);
+
+    CardInfo::UiAttributes attributes = {.tableRow = 1};
+    CardInfoPtr card =
+        CardInfo::newInstance("Lightning Bolt", QString(1024, 'x'), false, {}, {}, {}, setsInfo, attributes);
+
+    SetNameMap sets;
+    sets.insert("TST", set);
+    CardNameMap cards;
+    cards.insert("Lightning Bolt", card);
+
+    QTemporaryDir tempDir;
+    ASSERT_TRUE(tempDir.isValid());
+    const QString fileName = tempDir.filePath("cards.xml");
+
+    QFile installed(fileName);
+    ASSERT_TRUE(installed.open(QIODevice::WriteOnly));
+    ASSERT_EQ(installed.write("installed database"), 18);
+    installed.close();
+
+    // A real filesystem write failure: the soft file-size cap makes the writer's own
+    // flush fail without filling a disk. The cap is scoped rather than forked, because a
+    // death-test child under RLIMIT_FSIZE is killed by SIGSEGV on macOS.
+    test_support::ScopedFileSizeLimit fileSizeCap(128);
+    ASSERT_TRUE(fileSizeCap.isValid());
+
+    CockatriceXml4Parser writer(&controller);
+    EXPECT_FALSE(writer.saveToFile({}, sets, cards, fileName));
+
+    ASSERT_TRUE(installed.open(QIODevice::ReadOnly));
+    EXPECT_EQ(installed.readAll(), "installed database");
+}
+#endif
 
 /**
  * @brief Path provider serving a sandboxed copy of the test card database.

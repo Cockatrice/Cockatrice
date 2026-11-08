@@ -2,6 +2,7 @@
 #define COCKATRICE_THEME_CONFIG_H
 
 #include <QColor>
+#include <QFont>
 #include <QMap>
 #include <QPalette>
 #include <QSharedPointer>
@@ -12,6 +13,13 @@
 // set. Stored in the same palette-<scheme>.toml under an [AppColors] section
 // and editable from the palette editor, so theme authors can control colors
 // beyond what Qt's palette can express.
+//
+// The icon families carry one role per emphasis level. Icon is the neutral
+// glyph ink; IconStrong and IconSoft are its primary and quiet levels. Positive
+// and Negative follow the same pattern, so an emphasis never has to be computed
+// from a hue at paint time: the theme authors all three levels. Naming a variant
+// explicitly (`IconStrong`) pins that level; naming the family (`Icon`) lets the
+// caller's emphasis choose.
 namespace AppColor
 {
 Q_NAMESPACE
@@ -19,9 +27,51 @@ enum Role
 {
     AccentStrong,
     AccentSoft,
+    Icon,
+    IconStrong,
+    IconSoft,
+    Positive,
+    PositiveStrong,
+    PositiveSoft,
+    Negative,
+    NegativeStrong,
+    NegativeSoft,
 };
 Q_ENUM_NS(Role)
 } // namespace AppColor
+
+// Application-specific font roles, one configurable family + point size per
+// purpose. Stored in a shared fonts.toml under a [Fonts] section (one file per
+// theme, not split by light/dark). Only family and point size are stored;
+// weight/italic are stripped on load and stay caller-side concerns.
+namespace AppFont
+{
+Q_NAMESPACE
+enum Role
+{
+    InterfaceDefault,
+    ChatLog,
+    CardText,
+    DeckList,
+};
+Q_ENUM_NS(Role)
+} // namespace AppFont
+
+/**
+ * @brief Fallback for an application color role when the active theme does not
+ *        define one.
+ *
+ * Accent roles and the neutral Icon family return an invalid QColor because
+ * ThemeManager derives them from the palette: the accent from the highlight,
+ * the icon ink from the live WindowText held to the label floor. Semantic roles
+ * return an opaque default that suits the scheme, so themes written before the
+ * role existed still render it. The System theme deliberately leaves the
+ * neutral family unauthored: the palette file it picks cannot know the platform
+ * scheme, so a fixed ladder would be invisible on the other one. It derives
+ * neutral ink from the live platform palette instead of pinning one scheme's
+ * colors.
+ */
+QColor defaultAppColor(AppColor::Role role, bool dark);
 
 struct ThemeConfig
 {
@@ -58,6 +108,35 @@ struct PaletteConfig
     static PaletteConfig fromDefault(const QString &themeDirPath, const QString &colorScheme);
 
     QPalette apply(QPalette base) const;
+};
+
+/** @brief Per-purpose font configuration, stored as family + point size only.
+ *
+ * Serialized to a shared fonts.toml file with a [Fonts] section, e.g.
+ * @code
+ * [Fonts]
+ * InterfaceDefault = "Inter, 10"
+ * @endcode
+ */
+struct FontConfig
+{
+    QMap<AppFont::Role, QFont> fonts;
+
+    bool operator==(const FontConfig &rhs) const
+    {
+        return fonts == rhs.fonts;
+    }
+    bool operator!=(const FontConfig &rhs) const
+    {
+        return !(*this == rhs);
+    }
+    bool hasFonts() const;
+    QString toToml() const;
+
+    static QString fileName();
+
+    static FontConfig fromFile(const QString &filePath);
+    static FontConfig fromThemeDir(const QString &themeDirPath);
 };
 
 #endif // COCKATRICE_THEME_CONFIG_H
