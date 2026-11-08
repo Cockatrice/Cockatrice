@@ -5,7 +5,7 @@
 #include "../../../game_graphics/board/card_item.h"
 #include "../../../game_graphics/game_scene.h"
 #include "../../../game_graphics/player/player_graphics_item.h"
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 #include "card_info_picture_widget.h"
 #include "card_info_text_widget.h"
 
@@ -76,6 +76,18 @@ enum HoverPanelPage
     PAGE_COUNTER,
     PAGE_TOKEN
 };
+
+// Category tabs are the panel's wayfinding, so they carry the primary ink; the
+// action grid's glyphs label the button text beneath them and stay quiet.
+static QIcon categoryTabIcon(const QString &prefix)
+{
+    return loadThemedIcon(prefix, IconTint::primary());
+}
+
+static QIcon actionGridIcon(const QString &prefix)
+{
+    return loadThemedIcon(prefix, IconTint::quiet());
+}
 
 CardHoverWidget::CardHoverWidget(QWidget *parent) : QFrame(parent), currentCard(nullptr), currentPlayer(nullptr)
 {
@@ -465,11 +477,11 @@ void CardHoverWidget::createNavBar()
     navGroup = new QButtonGroup(sideBar);
     navGroup->setExclusive(true);
 
-    navInfoBtn = createNavButton(tr("Info"), QStringLiteral("icons/info"), PAGE_INFO);
-    navMainBtn = createNavButton(tr("Main"), QStringLiteral("icons/cogwheel"), PAGE_MAIN);
-    navMoveBtn = createNavButton(tr("Move"), QStringLiteral("icons/swap"), PAGE_MOVE);
-    navCounterBtn = createNavButton(tr("Counters"), QStringLiteral("icons/increment"), PAGE_COUNTER);
-    navTokenBtn = createNavButton(tr("Tokens"), QStringLiteral("icons/dragon"), PAGE_TOKEN);
+    navInfoBtn = createNavButton(tr("Info"), categoryTabIcon(QStringLiteral("icons/info")), PAGE_INFO);
+    navMainBtn = createNavButton(tr("Main"), categoryTabIcon(QStringLiteral("icons/settings")), PAGE_MAIN);
+    navMoveBtn = createNavButton(tr("Move"), categoryTabIcon(QStringLiteral("icons/swap")), PAGE_MOVE);
+    navCounterBtn = createNavButton(tr("Counters"), categoryTabIcon(QStringLiteral("icons/increment")), PAGE_COUNTER);
+    navTokenBtn = createNavButton(tr("Tokens"), categoryTabIcon(QStringLiteral("icons/dragon")), PAGE_TOKEN);
 
     connect(navGroup, &QButtonGroup::idClicked, this, [this](int id) { contentStack->setCurrentIndex(id); });
 
@@ -487,13 +499,13 @@ void CardHoverWidget::createNavBar()
     sideBar->setLayout(barLayout);
 }
 
-QToolButton *CardHoverWidget::createNavButton(const QString &title, const QString &iconName, int pageIndex)
+QToolButton *CardHoverWidget::createNavButton(const QString &title, const QIcon &icon, int pageIndex)
 {
     auto *btn = new QToolButton(sideBar);
     btn->setObjectName("cardHoverNavBtn");
     btn->setText(title);
     btn->setToolTip(title);
-    btn->setIcon(QIcon(themePixmap(iconName)));
+    btn->setIcon(icon);
     btn->setIconSize(QSize(NAV_ICON_SIZE, NAV_ICON_SIZE));
     btn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     btn->setCheckable(true);
@@ -622,7 +634,7 @@ private:
 };
 
 QToolButton *CardHoverWidget::createGridButton(const QString &text,
-                                               const QString &iconName,
+                                               const QIcon &icon,
                                                const std::function<void()> &slot,
                                                QWidget *parent,
                                                const QString &tooltip)
@@ -632,7 +644,7 @@ QToolButton *CardHoverWidget::createGridButton(const QString &text,
     btn->setText(text);
     // Short cell labels can clip; the full text is always one hover away.
     btn->setToolTip(tooltip.isEmpty() ? text : tooltip);
-    btn->setIcon(QIcon(themePixmap(iconName)));
+    btn->setIcon(icon);
     btn->setIconSize(QSize(22, 22));
     btn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     btn->setMinimumHeight(58);
@@ -828,15 +840,19 @@ void CardHoverWidget::buildMainTab(const QList<CardState *> &cardList, const QSt
         ButtonGrid grid(layout);
         grid.addSection(createSectionHeader(tr("Revealed"), mainPage));
         grid.addButton(createGridButton(
-            tr("Hide"), QStringLiteral("icons/arrow_left_green"), [actions, cardList]() { actions->actHide(cardList); },
-            mainPage));
-        grid.addButton(createGridButton(tr("Clone"), QStringLiteral("icons/increment"), invoke(cmClone), mainPage));
+            tr("Hide"), actionGridIcon(QStringLiteral("icons/arrow_left")),
+            [actions, cardList]() { actions->actHide(cardList); }, mainPage));
+        grid.addButton(
+            createGridButton(tr("Clone"),
+                             loadThemedIcon(QStringLiteral("icons/increment"),
+                                            IconTint(AppColor::Positive, IconEmphasis::Quiet), IconStyle::Sticker),
+                             invoke(cmClone), mainPage));
         grid.addSection(createSectionHeader(tr("Select"), mainPage));
         grid.addButton(createGridButton(
-            tr("Select All"), QStringLiteral("icons/search"), [gameScene, card]() { gameScene->selectAllInZone(card); },
-            mainPage));
+            tr("Select All"), actionGridIcon(QStringLiteral("icons/search")),
+            [gameScene, card]() { gameScene->selectAllInZone(card); }, mainPage));
         grid.addButton(createGridButton(
-            tr("Select Column"), QStringLiteral("icons/filter"),
+            tr("Select Column"), actionGridIcon(QStringLiteral("icons/filter")),
             [gameScene, card]() { gameScene->selectSameColumn(card); }, mainPage));
         layout->addStretch(1);
         return;
@@ -845,61 +861,77 @@ void CardHoverWidget::buildMainTab(const QList<CardState *> &cardList, const QSt
     if (zoneName == ZoneNames::TABLE) {
         ButtonGrid grid(layout);
         grid.addSection(createSectionHeader(tr("Battlefield"), mainPage));
-        grid.addButton(createGridButton(tr("Tap / Untap"), QStringLiteral("icons/sync"), invoke(cmTap), mainPage));
+        grid.addButton(
+            createGridButton(tr("Tap / Untap"), actionGridIcon(QStringLiteral("icons/sync")), invoke(cmTap), mainPage));
         auto *doesntUntap = createGridButton(
-            tr("Skip untapping"), QStringLiteral("icons/lock"),
+            tr("Skip untapping"), actionGridIcon(QStringLiteral("icons/lock")),
             [actions, cardList]() { actions->cardMenuAction(cardList, cmDoesntUntap); }, mainPage);
         doesntUntap->setCheckable(true);
         doesntUntap->setChecked(card->getDoesntUntap());
         grid.addButton(doesntUntap);
-        grid.addButton(createGridButton(tr("Turn Over"), QStringLiteral("icons/swap"), invoke(cmFlip), mainPage));
+        grid.addButton(
+            createGridButton(tr("Turn Over"), actionGridIcon(QStringLiteral("icons/swap")), invoke(cmFlip), mainPage));
         if (card->getFaceDown()) {
-            grid.addButton(
-                createGridButton(tr("Peek at card face"), QStringLiteral("icons/view"), invoke(cmPeek), mainPage));
+            grid.addButton(createGridButton(tr("Peek at card face"), actionGridIcon(QStringLiteral("icons/view")),
+                                            invoke(cmPeek), mainPage));
         }
-        grid.addButton(createGridButton(tr("Clone"), QStringLiteral("icons/increment"), invoke(cmClone), mainPage));
-        grid.addButton(createGridButton(tr("Attach to card..."), QStringLiteral("icons/pin"), attach, mainPage));
+        grid.addButton(
+            createGridButton(tr("Clone"),
+                             loadThemedIcon(QStringLiteral("icons/increment"),
+                                            IconTint(AppColor::Positive, IconEmphasis::Quiet), IconStyle::Sticker),
+                             invoke(cmClone), mainPage));
+        grid.addButton(
+            createGridButton(tr("Attach to card..."), actionGridIcon(QStringLiteral("icons/pin")), attach, mainPage));
         if (card->getAttachedTo()) {
             grid.addButton(createGridButton(
-                tr("Unattach"), QStringLiteral("icons/arrow_undo"),
+                tr("Unattach"), actionGridIcon(QStringLiteral("icons/arrow_undo")),
                 [actions, cardList]() { actions->actUnattach(cardList); }, mainPage));
         }
-        grid.addButton(createGridButton(tr("Draw arrow..."), QStringLiteral("icons/share"), drawArrow, mainPage));
+        grid.addButton(
+            createGridButton(tr("Draw arrow..."), actionGridIcon(QStringLiteral("icons/share")), drawArrow, mainPage));
         grid.addButton(createGridButton(
-            tr("Set annotation..."), QStringLiteral("icons/pencil"),
+            tr("Set annotation..."), actionGridIcon(QStringLiteral("icons/pencil")),
             [actions, cardList]() { actions->actRequestSetAnnotationDialog(cardList); }, mainPage));
         grid.addButton(createGridButton(
-            tr("Reduce life"), QStringLiteral("icons/arrow_down_green"),
+            tr("Reduce life"),
+            loadThemedIcon(QStringLiteral("icons/arrow_down"), IconTint(AppColor::Negative, IconEmphasis::Quiet)),
             [actions, cardList]() { actions->actReduceLifeByPower(cardList); }, mainPage));
         grid.addSection(createSectionHeader(tr("Select"), mainPage));
         grid.addButton(createGridButton(
-            tr("Select All"), QStringLiteral("icons/search"), [gameScene, card]() { gameScene->selectAllInZone(card); },
-            mainPage));
+            tr("Select All"), actionGridIcon(QStringLiteral("icons/search")),
+            [gameScene, card]() { gameScene->selectAllInZone(card); }, mainPage));
         grid.addButton(createGridButton(
-            tr("Select Row"), QStringLiteral("icons/filter"), [gameScene, card]() { gameScene->selectSameRow(card); },
-            mainPage));
+            tr("Select Row"), actionGridIcon(QStringLiteral("icons/filter")),
+            [gameScene, card]() { gameScene->selectSameRow(card); }, mainPage));
     } else if (!zoneName.isEmpty()) {
         ButtonGrid grid(layout);
         grid.addSection(createSectionHeader(tr("Zone"), mainPage));
         grid.addButton(createGridButton(
-            tr("Play"), QStringLiteral("icons/arrow_right_green"),
+            tr("Play"),
+            loadThemedIcon(QStringLiteral("icons/arrow_right"), IconTint(AppColor::Positive, IconEmphasis::Quiet)),
             [actions, cardList]() { actions->actPlay(cardList); }, mainPage));
         grid.addButton(createGridButton(
-            tr("Play Face Down"), QStringLiteral("icons/arrow_right_blue"),
+            tr("Play Face Down"), actionGridIcon(QStringLiteral("icons/arrow_right")),
             [actions, cardList]() { actions->actPlayFacedown(cardList); }, mainPage));
-        grid.addButton(createGridButton(tr("Clone"), QStringLiteral("icons/increment"), invoke(cmClone), mainPage));
+        grid.addButton(
+            createGridButton(tr("Clone"),
+                             loadThemedIcon(QStringLiteral("icons/increment"),
+                                            IconTint(AppColor::Positive, IconEmphasis::Quiet), IconStyle::Sticker),
+                             invoke(cmClone), mainPage));
         if (zoneName == ZoneNames::STACK || zoneName == ZoneNames::HAND || zoneName == ZoneNames::GRAVE ||
             zoneName == ZoneNames::EXILE) {
-            grid.addButton(createGridButton(tr("Attach to card..."), QStringLiteral("icons/pin"), attach, mainPage));
-            grid.addButton(createGridButton(tr("Draw arrow..."), QStringLiteral("icons/share"), drawArrow, mainPage));
+            grid.addButton(createGridButton(tr("Attach to card..."), actionGridIcon(QStringLiteral("icons/pin")),
+                                            attach, mainPage));
+            grid.addButton(createGridButton(tr("Draw arrow..."), actionGridIcon(QStringLiteral("icons/share")),
+                                            drawArrow, mainPage));
         }
         grid.addSection(createSectionHeader(tr("Select"), mainPage));
         grid.addButton(createGridButton(
-            tr("Select All"), QStringLiteral("icons/search"), [gameScene, card]() { gameScene->selectAllInZone(card); },
-            mainPage));
+            tr("Select All"), actionGridIcon(QStringLiteral("icons/search")),
+            [gameScene, card]() { gameScene->selectAllInZone(card); }, mainPage));
         if (qobject_cast<ZoneViewZoneLogic *>(card->getZone())) {
             grid.addButton(createGridButton(
-                tr("Select Column"), QStringLiteral("icons/filter"),
+                tr("Select Column"), actionGridIcon(QStringLiteral("icons/filter")),
                 [gameScene, card]() { gameScene->selectSameColumn(card); }, mainPage));
         }
     } else {
@@ -926,20 +958,21 @@ void CardHoverWidget::buildMoveTab(const QList<CardState *> &cardList, const QSt
 
     ButtonGrid grid(layout);
     grid.addSection(createSectionHeader(tr("Move to"), movePage));
-    grid.addButton(createGridButton(tr("Top of library"), QStringLiteral("icons/arrow_top_green"),
+    grid.addButton(createGridButton(tr("Top of library"), actionGridIcon(QStringLiteral("icons/arrow_to_top")),
                                     invoke(cmMoveToTopLibrary), movePage));
     grid.addButton(createGridButton(
-        tr("X from top..."), QStringLiteral("icons/search"),
+        tr("X from top..."), actionGridIcon(QStringLiteral("icons/search")),
         [actions]() { actions->actRequestMoveCardXCardsFromTopDialog(); }, movePage, tr("X from top of library...")));
-    grid.addButton(createGridButton(tr("Bottom of library"), QStringLiteral("icons/arrow_bottom_green"),
+    grid.addButton(createGridButton(tr("Bottom of library"), actionGridIcon(QStringLiteral("icons/arrow_to_bottom")),
                                     invoke(cmMoveToBottomLibrary), movePage));
-    grid.addButton(createGridButton(tr("Table"), QStringLiteral("icons/player"), invoke(cmMoveToTable), movePage));
     grid.addButton(
-        createGridButton(tr("Hand"), QStringLiteral("icons/arrow_left_green"), invoke(cmMoveToHand), movePage));
-    grid.addButton(createGridButton(tr("Graveyard"), QStringLiteral("icons/arrow_down_green"),
+        createGridButton(tr("Table"), actionGridIcon(QStringLiteral("icons/player")), invoke(cmMoveToTable), movePage));
+    grid.addButton(createGridButton(tr("Hand"), actionGridIcon(QStringLiteral("icons/arrow_left")),
+                                    invoke(cmMoveToHand), movePage));
+    grid.addButton(createGridButton(tr("Graveyard"), actionGridIcon(QStringLiteral("icons/arrow_down")),
                                     invoke(cmMoveToGraveyard), movePage));
-    grid.addButton(
-        createGridButton(tr("Exile"), QStringLiteral("icons/arrow_right_blue"), invoke(cmMoveToExile), movePage));
+    grid.addButton(createGridButton(tr("Exile"), actionGridIcon(QStringLiteral("icons/arrow_right")),
+                                    invoke(cmMoveToExile), movePage));
 
     // Reveal actions live on hand / custom zones in CardMenu
     if (!zoneName.isEmpty() && zoneName != ZoneNames::TABLE && zoneName != ZoneNames::STACK &&
@@ -948,7 +981,7 @@ void CardHoverWidget::buildMoveTab(const QList<CardState *> &cardList, const QSt
         if (game && game->getPlayerManager()) {
             grid.addSection(createSectionHeader(tr("Reveal to..."), movePage));
             grid.addButton(createGridButton(
-                tr("All players"), QStringLiteral("icons/share"),
+                tr("All players"), actionGridIcon(QStringLiteral("icons/share")),
                 [actions, cardList]() {
                     auto *fake = new QAction(nullptr);
                     fake->setData(-1);
@@ -964,7 +997,7 @@ void CardHoverWidget::buildMoveTab(const QList<CardState *> &cardList, const QSt
                 QString name = other->getPlayerInfo()->getName();
                 int id = other->getPlayerInfo()->getId();
                 grid.addButton(createGridButton(
-                    name, QStringLiteral("icons/player"),
+                    name, actionGridIcon(QStringLiteral("icons/player")),
                     [actions, cardList, id]() {
                         auto *fake = new QAction(nullptr);
                         fake->setData(id);

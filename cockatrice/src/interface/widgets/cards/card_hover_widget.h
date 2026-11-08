@@ -30,6 +30,7 @@ class QPushButton;
 class QToolButton;
 class QButtonGroup;
 class QStackedWidget;
+class QIcon;
 class QLabel;
 class QLineEdit;
 class QEnterEvent;
@@ -161,7 +162,7 @@ private:
     void createNameBarOverlay();
     void createPTOverlay();
     void createNavBar();
-    QToolButton *createNavButton(const QString &title, const QString &iconName, int pageIndex);
+    QToolButton *createNavButton(const QString &title, const QIcon &icon, int pageIndex);
     void createContentStack();
     QWidget *makeStackPage(QVBoxLayout *&layout);
     void showPage(int index);
@@ -204,7 +205,7 @@ private:
 
     QPushButton *createOverlayButton(const QString &text, const QString &tooltip, const std::function<void()> &slot);
     QToolButton *createGridButton(const QString &text,
-                                  const QString &iconName,
+                                  const QIcon &icon,
                                   const std::function<void()> &slot,
                                   QWidget *parent,
                                   const QString &tooltip = QString());
