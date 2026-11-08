@@ -54,6 +54,10 @@ AppColor::Role emphasisRole(AppColor::Role role, IconEmphasis emphasis)
             return emphasis == IconEmphasis::Primary ? AppColor::NegativeStrong
                    : emphasis == IconEmphasis::Quiet ? AppColor::NegativeSoft
                                                      : AppColor::Negative;
+        case AppColor::Informational:
+            return emphasis == IconEmphasis::Primary ? AppColor::InformationalStrong
+                   : emphasis == IconEmphasis::Quiet ? AppColor::InformationalSoft
+                                                     : AppColor::Informational;
         default:
             return role;
     }

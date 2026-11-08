@@ -78,6 +78,11 @@ static const QMap<AppColor::Role, const char *> APP_ROLE_DESCRIPTIONS = {
      QT_TRANSLATE_NOOP("PaletteGridWidget", "Negative state and removal actions (not ready, remove, decrement)")},
     {AppColor::NegativeStrong, QT_TRANSLATE_NOOP("PaletteGridWidget", "Negative state at primary emphasis")},
     {AppColor::NegativeSoft, QT_TRANSLATE_NOOP("PaletteGridWidget", "Negative state at quiet emphasis")},
+    {AppColor::Informational,
+     QT_TRANSLATE_NOOP("PaletteGridWidget",
+                       "Informational state that is neither a gain nor a loss (face-down, exile)")},
+    {AppColor::InformationalStrong, QT_TRANSLATE_NOOP("PaletteGridWidget", "Informational state at primary emphasis")},
+    {AppColor::InformationalSoft, QT_TRANSLATE_NOOP("PaletteGridWidget", "Informational state at quiet emphasis")},
 };
 
 PaletteGridWidget::PaletteGridWidget(QWidget *parent) : QWidget(parent)

@@ -482,6 +482,15 @@ QColor defaultAppColor(AppColor::Role role, bool dark)
             return QColor(dark ? QStringLiteral("#ff8378") : QStringLiteral("#da0b00"));
         case AppColor::NegativeSoft:
             return QColor(dark ? QStringLiteral("#c79e9b") : QStringLiteral("#935f5c"));
+        // Informational is the third semantic family: a state that is neither a
+        // gain nor a loss (a face-down play, the exile zone). It carries the
+        // same three-level ladder so its emphasis is authored, not computed.
+        case AppColor::Informational:
+            return QColor(dark ? QStringLiteral("#7aa9f2") : QStringLiteral("#1c64c4"));
+        case AppColor::InformationalStrong:
+            return QColor(dark ? QStringLiteral("#69aeff") : QStringLiteral("#0a4fb5"));
+        case AppColor::InformationalSoft:
+            return QColor(dark ? QStringLiteral("#9db2cd") : QStringLiteral("#526a8a"));
     }
 
     return {};

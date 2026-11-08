@@ -68,10 +68,12 @@ template <typename Render> QPixmap renderAtDpr(const QSize &logicalSize, qreal d
  * @brief Writes one semantic-tint sheet per shipped palette theme.
  *
  * The theme files are the only place the shipped tones live, so each sheet is
- * rendered from the palette the theme actually ships: both semantic families,
- * three glyphs each, at the two sizes the UI uses, on the window and button
- * surfaces the contrast is measured against. A disabled row closes each family
- * so the enabled/disabled order is visible next to the tone that carries it.
+ * rendered from the palette the theme actually ships: all three semantic
+ * families, three glyphs each, at the two sizes the UI uses, on the window and
+ * button surfaces the contrast is measured against. A disabled row closes each
+ * family so the enabled/disabled order is visible next to the tone that carries
+ * it. A theme that does not author Informational falls back to the scheme
+ * default, which is what the client paints.
  */
 TEST(IconTintPreview, WritesOneSheetPerShippedTheme)
 {
@@ -100,6 +102,7 @@ TEST(IconTintPreview, WritesOneSheetPerShippedTheme)
     const QList<Family> families = {
         {"Positive", AppColor::Positive, {"increment", "ready_start", "arrow_up"}},
         {"Negative", AppColor::Negative, {"decrement", "not_ready_start", "remove_row"}},
+        {"Informational", AppColor::Informational, {"arrow_right", "view", "arrow_to_top"}},
     };
     const QStringList themes = {
         QStringLiteral("Fabric"), QStringLiteral("Fusion"),       QStringLiteral("Leather"),

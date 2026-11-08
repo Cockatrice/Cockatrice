@@ -69,7 +69,7 @@ template <typename Render> QPixmap renderAtDpr(const QSize &logicalSize, qreal d
  * @brief Writes one badge/sticker sheet per shipped palette theme.
  *
  * The treatments are only useful if they read on every palette, so each sheet
- * is rendered from the palette the theme actually ships: both semantic
+ * is rendered from the palette the theme actually ships: all three semantic
  * families, three glyphs each, as line glyphs, stickers and badges, at the two
  * sizes the UI uses, on the window and button surfaces the contrast is measured
  * against. A disabled row closes each family: every treatment falls back to the
@@ -102,9 +102,14 @@ TEST(IconTreatmentPreview, WritesOneSheetPerShippedTheme)
         AppColor::Role role;
         const char *glyphs[3];
     };
+    // The hover panel's action grid is the first call site that puts a
+    // treatment on an action glyph, so the sheet renders the glyphs that grid
+    // actually uses: play/clone/hand (Positive), reduce life and graveyard
+    // (Negative), place face down and exile (Informational).
     const QList<Family> families = {
-        {"Positive", AppColor::Positive, {"increment", "ready_start", "arrow_up"}},
-        {"Negative", AppColor::Negative, {"decrement", "not_ready_start", "remove_row"}},
+        {"Positive", AppColor::Positive, {"arrow_right", "increment", "arrow_left"}},
+        {"Negative", AppColor::Negative, {"arrow_down", "decrement", "remove_row"}},
+        {"Informational", AppColor::Informational, {"arrow_right", "view", "arrow_to_top"}},
     };
     const QStringList themes = {
         QStringLiteral("Fabric"), QStringLiteral("Fusion"),       QStringLiteral("Leather"),

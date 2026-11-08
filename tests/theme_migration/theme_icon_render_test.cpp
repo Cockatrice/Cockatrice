@@ -1535,9 +1535,11 @@ TEST_F(ThemeIconRenderTest, EmphasisSelectsTheAuthoredVariant)
         AppColor::Role soft;
     };
 
-    for (const Family &family : {Family{AppColor::Icon, AppColor::IconStrong, AppColor::IconSoft},
-                                 Family{AppColor::Positive, AppColor::PositiveStrong, AppColor::PositiveSoft},
-                                 Family{AppColor::Negative, AppColor::NegativeStrong, AppColor::NegativeSoft}}) {
+    for (const Family &family :
+         {Family{AppColor::Icon, AppColor::IconStrong, AppColor::IconSoft},
+          Family{AppColor::Positive, AppColor::PositiveStrong, AppColor::PositiveSoft},
+          Family{AppColor::Negative, AppColor::NegativeStrong, AppColor::NegativeSoft},
+          Family{AppColor::Informational, AppColor::InformationalStrong, AppColor::InformationalSoft}}) {
         EXPECT_EQ(IconTint(family.base, IconEmphasis::Primary).resolve(QIcon::Normal),
                   themeManager->appColor(family.strong));
         EXPECT_EQ(IconTint(family.base).resolve(QIcon::Normal), themeManager->appColor(family.base));
@@ -1635,6 +1637,19 @@ TEST_F(ThemeIconRenderTest, EmphasisKeepsASemanticHue)
                 ++checked;
                 EXPECT_GT(ink.red(), ink.green()) << theme.toStdString() << static_cast<int>(role);
                 EXPECT_GT(ink.red(), ink.blue()) << theme.toStdString() << static_cast<int>(role);
+            }
+
+            for (const AppColor::Role role :
+                 {AppColor::Informational, AppColor::InformationalStrong, AppColor::InformationalSoft}) {
+                // Informational may come from the scheme default when the theme
+                // does not author it, so measure the value the client paints.
+                const QColor ink = roles.value(role, defaultAppColor(role, dark));
+                if (!ink.isValid()) {
+                    continue;
+                }
+                ++checked;
+                EXPECT_GT(ink.blue(), ink.red()) << theme.toStdString() << static_cast<int>(role);
+                EXPECT_GT(ink.blue(), ink.green()) << theme.toStdString() << static_cast<int>(role);
             }
         }
     }
@@ -1821,7 +1836,8 @@ TEST(IconInk, DefaultSemanticFamilyMeetsTheLadderOnPlatformSurfaces)
     for (const Scheme &scheme : schemes) {
         for (const auto &[base, strong, soft] :
              {std::tuple{AppColor::Positive, AppColor::PositiveStrong, AppColor::PositiveSoft},
-              std::tuple{AppColor::Negative, AppColor::NegativeStrong, AppColor::NegativeSoft}}) {
+              std::tuple{AppColor::Negative, AppColor::NegativeStrong, AppColor::NegativeSoft},
+              std::tuple{AppColor::Informational, AppColor::InformationalStrong, AppColor::InformationalSoft}}) {
             const QColor secondary = defaultAppColor(base, scheme.dark);
             const QColor primary = defaultAppColor(strong, scheme.dark);
             const QColor quiet = defaultAppColor(soft, scheme.dark);
@@ -1908,6 +1924,11 @@ TEST_F(ThemeIconRenderTest, EmphasisPreviewWritesPngsWhenRequested)
          AppColor::NegativeSoft,
          AppColor::Negative,
          AppColor::NegativeStrong},
+        {"Informational",
+         {"arrow_right", "view", "arrow_to_top"},
+         AppColor::InformationalSoft,
+         AppColor::Informational,
+         AppColor::InformationalStrong},
     };
     const QStringList themes = {
         QStringLiteral("Fabric"), QStringLiteral("Fusion"),       QStringLiteral("Leather"),
@@ -1942,9 +1963,10 @@ TEST_F(ThemeIconRenderTest, EmphasisPreviewWritesPngsWhenRequested)
             // The paint path is a lookup now, so the sheet shows the authored
             // rows verbatim rather than a color recomputed from the accent.
             const auto toneFor = [&](const Family &family, int level) {
-                return level == 0   ? palette.roles.value(family.quiet)
-                       : level == 1 ? palette.roles.value(family.secondary)
-                                    : palette.roles.value(family.primary);
+                const AppColor::Role role = level == 0 ? family.quiet : level == 1 ? family.secondary : family.primary;
+                // A theme written before the role existed does not author it;
+                // the client paints the scheme default, so the sheet does too.
+                return palette.roles.value(role, defaultAppColor(role, dark));
             };
             const auto scheme = dark ? ThemeIconFill::Scheme::Dark : ThemeIconFill::Scheme::Light;
 
@@ -2100,6 +2122,11 @@ TEST_F(ThemeIconRenderTest, EmphasisTreatmentsPreviewWritesPngsWhenRequested)
          AppColor::NegativeSoft,
          AppColor::Negative,
          AppColor::NegativeStrong},
+        {"Informational",
+         {"arrow_right", "view", "arrow_to_top"},
+         AppColor::InformationalSoft,
+         AppColor::Informational,
+         AppColor::InformationalStrong},
     };
     const QStringList themes = {
         QStringLiteral("Fabric"), QStringLiteral("Fusion"),       QStringLiteral("Leather"),
@@ -2184,7 +2211,9 @@ TEST_F(ThemeIconRenderTest, EmphasisTreatmentsPreviewWritesPngsWhenRequested)
                 for (const Family &family : families) {
                     for (int level = 0; level < 4; ++level) {
                         const bool disabled = level == 3;
-                        const QColor ink = disabled ? disabledTone : palette.roles.value(roleAt(family, level));
+                        const QColor ink = disabled ? disabledTone
+                                                    : palette.roles.value(roleAt(family, level),
+                                                                          defaultAppColor(roleAt(family, level), dark));
                         const QString levelName =
                             disabled ? QStringLiteral("Disabled") : QString::fromLatin1(LEVEL_NAMES[level]);
                         ASSERT_TRUE(ink.isValid())
