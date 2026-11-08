@@ -668,7 +668,9 @@ void TabDeckStorage::onSyncFinished(const SyncSummary &summary, const QString &e
         lastSyncSummary = summary;
     }
     renderSyncStatus();
-    if (error.isEmpty()) {
+    // An idle poll changes nothing: refreshing the tree there would send a
+    // fresh Command_DeckList every interval for every connected client.
+    if (error.isEmpty() && summary.uploaded + summary.downloaded + summary.removed > 0) {
         serverDirView->refreshTree();
     }
 }
@@ -689,6 +691,10 @@ void TabDeckStorage::renderSyncStatus()
                                .arg(lastSyncSummary.removed)
                                .arg(lastSyncSummary.unchanged)
                                .arg(lastSyncSummary.skipped);
+            if (lastSyncSummary.conflicts > 0) {
+                text += QStringLiteral(" ") + tr("%n conflicting deck(s) skipped. Press Sync now to resolve them.", "",
+                                                 lastSyncSummary.conflicts);
+            }
             if (!lastSyncSummary.note.isEmpty()) {
                 text += QStringLiteral("\n") + lastSyncSummary.note;
             }

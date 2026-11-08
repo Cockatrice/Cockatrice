@@ -858,6 +858,16 @@ void DeckSyncManager::queueConflict(const QString &relativePath,
                                .guid = serverGuid,
                                .hash = serverHash,
                                .lastModifiedSecs = serverLastModifiedSecs};
+    if (autoRun) {
+        // An auto run has no user in front of it: opening the modal conflict
+        // dialog from a timer or a file-watcher event would pop up mid-game.
+        // Leave the path untouched so the next manual sync classifies it again
+        // and asks — and skip the server fetch, which would only be discarded
+        // and repeated on every poll.
+        ++conflictCount;
+        ++skippedCount;
+        return;
+    }
     pendingConflicts.insert(relativePath, ctx);
     conflictPaths.insert(relativePath);
     applyDownload(relativePath, deckId, serverGuid, serverHash, serverLastModifiedSecs);
@@ -865,17 +875,10 @@ void DeckSyncManager::queueConflict(const QString &relativePath,
 
 void DeckSyncManager::handleConflictDownload(const QString &relativePath, const QString &serverDeckString)
 {
+    // Only a manual run fetches a conflicting server copy, so this point is
+    // never reached with autoRun set: queueConflict() records the conflict and
+    // leaves the path alone instead.
     const ConflictDownload ctx = pendingConflicts.take(relativePath);
-    if (autoRun) {
-        // An auto run has no user in front of it: opening the modal conflict
-        // dialog from a timer or a file-watcher event would pop up mid-game.
-        // Leave the path untouched so the next manual sync classifies it again
-        // and asks.
-        ++conflictCount;
-        ++skippedCount;
-        processNext();
-        return;
-    }
     if (sessionDefault == DeckSyncConflictKeepMine) {
         applyUpload(relativePath, ctx.serverPath, ctx.deckId, ctx.guid);
         processNext();
@@ -1349,7 +1352,8 @@ void DeckSyncManager::onDeleteFinished(const Response &response,
         }
     }
     // Both outcomes converge the record: pushed deletes and server-side
-    // deletes (already tombstoned, answering NameNotFound) are done.
+    // deletes (already tombstoned, answering NameNotFound) are done. Either
+    // way the server tree the client is showing is stale, so both count.
     if (response.response_code() == Response::RespOk || response.response_code() == Response::RespNameNotFound) {
         DeckSyncSidecar sidecar(sidecarPath);
         sidecar.load();
@@ -1418,10 +1422,9 @@ void DeckSyncManager::finishSync()
     if (!summary.note.isEmpty()) {
         message += QStringLiteral(" ") + summary.note;
     }
+    // The conflict count travels in the summary: a statusMessage here would be
+    // overwritten by the syncFinished() summary the tab renders next.
     emit statusMessage(message);
-    if (conflictCount > 0) {
-        emit statusMessage(tr("%1 conflicting decks skipped. Press Sync now to resolve them.").arg(conflictCount));
-    }
     emit syncFinished(summary, QString());
 }
 
@@ -1433,6 +1436,7 @@ DeckSyncManager::SyncSummary DeckSyncManager::currentSummary() const
         .removed = removedCount,
         .unchanged = unchangedCount,
         .skipped = skippedCount,
+        .conflicts = conflictCount,
         .note = syncNote,
     };
 }

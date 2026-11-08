@@ -70,6 +70,8 @@ public:
         int removed = 0; ///< Decks deleted on the server, or locally to mirror a server delete.
         int unchanged = 0;
         int skipped = 0;
+        /** @brief Both-sides-changed decks left untouched for a manual verdict. */
+        int conflicts = 0;
         QString note; ///< Non-error caveat about this run, empty when there is none.
     };
 

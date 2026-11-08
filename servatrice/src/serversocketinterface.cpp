@@ -905,7 +905,7 @@ bool AbstractServerSocketInterface::syncCheckHelper(int userId, qint64 sinceSecs
     // their files linger as tombstones, so walking the live folder tree would
     // miss deletes pointing at nonexistent folders. The client only checks
     // changed_files_size(), so folder paths are not reconstructed here.
-    // last_modified is backfilled by the 37 -> 38 migration, so a plain range
+    // last_modified is backfilled by the 0040 -> 0041 migration, so a plain range
     // check is enough.
     QSqlQuery *query = sqlInterface->prepareQuery("select id, guid, hash, last_modified, deleted from "
                                                   "{prefix}_decklist_files where id_user = :id_user "

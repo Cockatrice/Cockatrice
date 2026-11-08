@@ -40,7 +40,7 @@ public:
     /// keeps it out of sync, and the first-sync verdicts narrow it to one
     /// direction. An unrecognised value falls back to the two-way sync.
     QString mode = MODE_LINKED;
-    qint64 lastSyncSecs = 0;    ///< Last completed sync, seconds since epoch; 0 means never.
+    qint64 lastSyncSecs = 0; ///< Last completed sync, seconds since epoch; 0 means never.
 
     explicit DeckSyncSidecar(const QString &_filePath);
 
