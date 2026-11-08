@@ -118,8 +118,10 @@ void DeckSyncManager::syncNow()
     syncing = true;
     uploadedCount = 0;
     downloadedCount = 0;
+    removedCount = 0;
     unchangedCount = 0;
     skippedCount = 0;
+    syncNote.clear();
     pendingUploads.clear();
     pendingDownloads.clear();
     pendingDeletes.clear();
@@ -215,6 +217,22 @@ void DeckSyncManager::onListFinished(const Response &response, const CommandCont
     DeckSyncSidecar sidecar(sidecarPath);
     sidecar.load();
     const qint64 nowSecs = QDateTime::currentDateTime().toSecsSinceEpoch();
+    // A listing that comes back empty while the sidecar still remembers rows that
+    // were uploaded means the server lost its deck data (a purge, or an account
+    // that was re-created), not that every deck was just deleted. Obeying that
+    // listing would remove the whole collection, so removals are held back.
+    bool sidecarHasRemoteRows = false;
+    // The records as they were before this run starts mutating them; only used to
+    // judge whether an empty listing is credible.
+    const QMap<QString, DeckSyncRecord> sidecarAtStart = sidecar.records();
+    for (auto rit = sidecarAtStart.begin(); rit != sidecarAtStart.end(); ++rit) {
+        if (rit.value().remoteId != -1) {
+            sidecarHasRemoteRows = true;
+            break;
+        }
+    }
+    const bool remoteStateLost = serverFiles.isEmpty() && sidecarHasRemoteRows;
+    bool heldBackRemovals = false;
     // Reuse the sidecar's guid so the server keeps recognizing the row, and mint
     // one only for a deck that has never been synced.
     auto guidFor = [&sidecar](const QString &relativePath) {
@@ -292,6 +310,15 @@ void DeckSyncManager::onListFinished(const Response &response, const CommandCont
             const bool unchangedSinceSync =
                 !sidecarRecord.baseHash.isEmpty() && it.value().hash == sidecarRecord.baseHash;
             if (knownToServer && unchangedSinceSync) {
+                if (remoteStateLost) {
+                    // The listing is empty although this deck was uploaded, so the
+                    // row is not known to be deleted, only missing. Keep the file
+                    // and the record; re-uploading it blind could duplicate the
+                    // deck once the real listing returns.
+                    heldBackRemovals = true;
+                    ++skippedCount;
+                    continue;
+                }
                 const QString absolutePath = deckPath + "/" + it.key();
                 const QString backupPath =
                     absolutePath + BACKUP_SUFFIX + QString::number(QDateTime::currentDateTime().toSecsSinceEpoch());
@@ -300,7 +327,7 @@ void DeckSyncManager::onListFinished(const Response &response, const CommandCont
                     continue;
                 }
                 sidecar.remove(it.key());
-                ++downloadedCount;
+                ++removedCount;
                 continue;
             }
             const QString serverPath = serverPathFor(it.key());
@@ -373,10 +400,28 @@ void DeckSyncManager::onListFinished(const Response &response, const CommandCont
             continue;
         }
         if (it.value().remoteId == -1) {
+            // Never uploaded, so there is no server row to remove.
             sidecar.remove(it.key());
             continue;
         }
+        if (matchedServerIds.contains(it.value().remoteId)) {
+            // Another local file (a rename or a copy) now owns this row: drop the
+            // stale record, but never tombstone the row it took over.
+            sidecar.remove(it.key());
+            continue;
+        }
+        if (remoteStateLost) {
+            // The whole listing is missing, not this one deck: pushing the delete
+            // would purge rows that are probably still there.
+            heldBackRemovals = true;
+            continue;
+        }
         pendingDeletes.append(it.key());
+    }
+
+    if (heldBackRemovals) {
+        syncNote = tr("The server listed no decks although this collection was synced before. "
+                      "No deletions were applied this run; the decks were kept.");
     }
 
     sidecar.save();
@@ -530,7 +575,7 @@ void DeckSyncManager::onUploadFinished(const Response &response,
             // upload the deck as new instead of updating a dead id.
             const UploadOp retry{.relativePath = relativePath,
                                  .serverPath = context.value("serverPath").toString(),
-                                 .serverDir = {},
+                                 .serverDir = parentDir(context.value("serverPath").toString()),
                                  .deckId = -1,
                                  .guid = context.value("guid").toString()};
             pendingUploads.prepend(retry);
@@ -719,6 +764,7 @@ void DeckSyncManager::onDeleteFinished(const Response &response,
         sidecar.load();
         sidecar.remove(relativePath);
         sidecar.save();
+        ++removedCount;
     } else {
         ++skippedCount;
     }
@@ -757,11 +803,16 @@ void DeckSyncManager::finishSync()
 {
     syncing = false;
     const SyncSummary summary = currentSummary();
-    emit statusMessage(tr("Sync complete: %1 uploaded, %2 downloaded, %3 unchanged, %4 skipped.")
-                           .arg(summary.uploaded)
-                           .arg(summary.downloaded)
-                           .arg(summary.unchanged)
-                           .arg(summary.skipped));
+    QString message = tr("Sync complete: %1 uploaded, %2 downloaded, %3 removed, %4 unchanged, %5 skipped.")
+                          .arg(summary.uploaded)
+                          .arg(summary.downloaded)
+                          .arg(summary.removed)
+                          .arg(summary.unchanged)
+                          .arg(summary.skipped);
+    if (!summary.note.isEmpty()) {
+        message += QStringLiteral(" ") + summary.note;
+    }
+    emit statusMessage(message);
     emit syncFinished(summary, QString());
 }
 
@@ -770,7 +821,9 @@ DeckSyncManager::SyncSummary DeckSyncManager::currentSummary() const
     return SyncSummary{
         .uploaded = uploadedCount,
         .downloaded = downloadedCount,
+        .removed = removedCount,
         .unchanged = unchangedCount,
         .skipped = skippedCount,
+        .note = syncNote,
     };
 }

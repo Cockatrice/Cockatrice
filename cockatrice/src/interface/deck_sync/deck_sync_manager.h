@@ -41,7 +41,10 @@ class ServerInfo_DeckStorage_Folder;
  *
  * Deletes are tombstones, never silent: a locally deleted deck is pushed with
  * Command_DeckDel, a server-side delete is applied locally only after copying
- * the file to a .sync-backup, and resurrection reuses the stored deck id.
+ * the file to a .sync-backup, and resurrection reuses the stored deck id. A
+ * listing that comes back empty while the sidecar still remembers uploaded rows
+ * is treated as lost server state rather than a collection-wide delete, so that
+ * run applies no removals and says so in its summary.
  */
 class DeckSyncManager : public QObject
 {
@@ -55,8 +58,10 @@ public:
     {
         int uploaded = 0;
         int downloaded = 0;
+        int removed = 0; ///< Decks deleted on the server, or locally to mirror a server delete.
         int unchanged = 0;
         int skipped = 0;
+        QString note; ///< Non-error caveat about this run, empty when there is none.
     };
 
     explicit DeckSyncManager(QObject *parent = nullptr);
@@ -149,8 +154,10 @@ private:
     QList<UploadOp> pendingUploads;
     QList<DownloadOp> pendingDownloads;
     QList<QString> pendingDeletes;
+    QString syncNote;
     int uploadedCount = 0;
     int downloadedCount = 0;
+    int removedCount = 0;
     int unchangedCount = 0;
     int skippedCount = 0;
 };
