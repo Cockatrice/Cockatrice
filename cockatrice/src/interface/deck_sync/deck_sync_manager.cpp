@@ -73,6 +73,38 @@ QString localPathFor(const QString &dir, const QString &name)
     const QString path = segments.join('/');
     return path.endsWith(".cod", Qt::CaseInsensitive) ? path : path + QStringLiteral(".cod");
 }
+
+// The sidecar stores the first-sync verdict so the choice outlives the run that
+// asked for it. An absent or unknown value means the default two-way sync, which
+// keeps profiles written before the verdict was persisted usable.
+DeckSyncMode modeForSidecar(const QString &mode)
+{
+    if (mode == DeckSyncSidecar::MODE_UPLOAD_ONLY) {
+        return DeckSyncMode::UploadOnly;
+    }
+    if (mode == DeckSyncSidecar::MODE_DOWNLOAD_ONLY) {
+        return DeckSyncMode::DownloadOnly;
+    }
+    if (mode == DeckSyncSidecar::MODE_SEPARATE) {
+        return DeckSyncMode::Separate;
+    }
+    return DeckSyncMode::TwoWay;
+}
+
+const char *sidecarModeFor(DeckSyncMode mode)
+{
+    switch (mode) {
+        case DeckSyncMode::UploadOnly:
+            return DeckSyncSidecar::MODE_UPLOAD_ONLY;
+        case DeckSyncMode::DownloadOnly:
+            return DeckSyncSidecar::MODE_DOWNLOAD_ONLY;
+        case DeckSyncMode::Separate:
+            return DeckSyncSidecar::MODE_SEPARATE;
+        case DeckSyncMode::TwoWay:
+            break;
+    }
+    return DeckSyncSidecar::MODE_LINKED;
+}
 } // namespace
 
 DeckSyncManager::DeckSyncManager(QObject *parent) : QObject(parent)
@@ -99,11 +131,6 @@ void DeckSyncManager::setDeckPath(const QString &path)
 void DeckSyncManager::setConflictDefault(int _conflictDefault)
 {
     conflictDefault = _conflictDefault;
-}
-
-void DeckSyncManager::setSyncMode(DeckSyncMode mode)
-{
-    syncMode = mode;
 }
 
 bool DeckSyncManager::isSyncing() const
@@ -144,7 +171,6 @@ void DeckSyncManager::syncNow()
     ensuredDirs.insert(QString());
     localFiles.clear();
     sessionDefault = -1;
-    syncMode = DeckSyncMode::TwoWay;
     firstSyncRun = false;
     emit syncStarted();
     emit statusMessage(tr("Scanning local decks..."));
@@ -155,7 +181,10 @@ void DeckSyncManager::syncNow()
         failSync(tr("Could not read sync state."));
         return;
     }
-    if (sidecar.mode == DeckSyncSidecar::MODE_SEPARATE) {
+    // Apply the persisted first-sync verdict: the onboarding choice lasts beyond
+    // the run that asked for it, and a profile that never made one syncs both ways.
+    syncMode = modeForSidecar(sidecar.mode);
+    if (syncMode == DeckSyncMode::Separate) {
         failSync(tr("Sync is disabled for this server."));
         return;
     }
@@ -249,11 +278,16 @@ void DeckSyncManager::continueFirstSync(DeckSyncMode mode)
         return;
     }
     firstSyncRun = false;
+    DeckSyncSidecar sidecar(sidecarPath);
+    if (!sidecar.load()) {
+        failSync(tr("Could not read sync state."));
+        return;
+    }
+    // Persist the verdict next to the separate marker so a later syncNow() uses
+    // the same direction instead of silently reverting to two-way.
+    sidecar.mode = sidecarModeFor(mode);
+    sidecar.save();
     if (mode == DeckSyncMode::Separate) {
-        DeckSyncSidecar sidecar(sidecarPath);
-        sidecar.load();
-        sidecar.mode = DeckSyncSidecar::MODE_SEPARATE;
-        sidecar.save();
         stashedServerFiles.clear();
         failSync(tr("Sync is disabled for this server."));
         return;
@@ -444,6 +478,14 @@ void DeckSyncManager::classify(const QMap<int, ServerFile> &serverFiles)
             applyDownload(it.key(), server.id, server.guid, server.hash, server.lastModifiedSecs);
             continue;
         }
+        // Legacy row without a hash and an untouched local copy: upload once
+        // so the server stamps hash and last_modified.
+        if (!localChanged && !serverChanged) {
+            if (syncMode != DeckSyncMode::DownloadOnly) {
+                applyUpload(it.key(), server.path, server.id, server.guid);
+            }
+            continue;
+        }
         const qint64 localSecs = it.value().modified.toSecsSinceEpoch();
         const int effective = sessionDefault >= 0 ? sessionDefault : conflictDefault;
         // A server row without last_modified predates sync: the local file wins.
@@ -589,19 +631,9 @@ void DeckSyncManager::queueConflict(const QString &relativePath,
                                     const QString &serverHash,
                                     qint64 serverLastModifiedSecs)
 {
-    DeckSyncSidecar sidecar(sidecarPath);
-    sidecar.load();
-    const QString guid = !serverGuid.isEmpty() ? serverGuid : sidecar.get(relativePath).guid;
-    if (readBaseSnapshot(guid).isEmpty()) {
-        emit statusMessage(tr("No base snapshot for %1, keeping the newer version.").arg(relativePath));
-        const qint64 localSecs = localFiles.value(relativePath).modified.toSecsSinceEpoch();
-        if (serverLastModifiedSecs == 0 || localSecs > serverLastModifiedSecs) {
-            applyUpload(relativePath, serverPath, deckId, serverGuid);
-        } else {
-            applyDownload(relativePath, deckId, serverGuid, serverHash, serverLastModifiedSecs);
-        }
-        return;
-    }
+    // No base snapshot (the usual first two-way sync) is not a reason to pick a
+    // winner silently: the dialog handles hasBase == false by disabling merge,
+    // and Keep both still works, so queue the conflict like any other.
     const ConflictDownload ctx{.serverPath = serverPath,
                                .deckId = deckId,
                                .guid = serverGuid,
@@ -662,8 +694,11 @@ void DeckSyncManager::resolveConflict(const DeckSyncResolution &resolution)
     if (!syncing || !activeConflict.active) {
         return;
     }
-    if (resolution.rememberSession && (resolution.action == DeckSyncResolutionAction::KeepMine ||
-                                       resolution.action == DeckSyncResolutionAction::KeepServer)) {
+    // "Always use this rule" also settles the conflicts already queued for this
+    // run, not just the setting for future ones.
+    const bool remember = resolution.rememberSession || resolution.rememberAlways;
+    if (remember && (resolution.action == DeckSyncResolutionAction::KeepMine ||
+                     resolution.action == DeckSyncResolutionAction::KeepServer)) {
         sessionDefault = resolution.action == DeckSyncResolutionAction::KeepMine ? DeckSyncConflictKeepMine
                                                                                  : DeckSyncConflictKeepServer;
     }

@@ -31,18 +31,19 @@ class ServerInfo_DeckStorage_Folder;
  *
  * Each syncNow() run loads the profile sidecar, scans the deck folder, fetches
  * the server tree and mirrors both sides: unknown local decks upload, unknown
- * server decks download, and decks changed on both sides resolve newer-wins
- * (ties go to the server). A local file is matched to its server row by the
- * sidecar's row id, then guid, then the server path, and finally by content, so
- * renaming either side does not duplicate a deck. Before a download overwrites a
- * locally modified file, the local content is copied to a .sync-backup file next
- * to it.
+ * server decks download, and a deck changed on both sides pauses for a verdict,
+ * so nothing is overwritten silently. A local file is matched to its server row
+ * by the sidecar's row id, then guid, then the server path, and finally by
+ * content, so renaming either side does not duplicate a deck. Before a download
+ * overwrites a locally modified file, the local content is copied to a
+ * .sync-backup file next to it.
  *
  * Ownership: fire-and-forget per run, driven by PendingCommand round trips.
  * Both-sides-changed decks pause the queue for a verdict via conflictRequest /
  * resolveConflict (or the conflict default setting); the first sync of an
  * unknown profile pauses for an onboarding verdict via firstSyncDetected /
- * continueFirstSync. No watcher and no auto triggers — those arrive later.
+ * continueFirstSync, and that verdict is stored in the sidecar so later runs keep
+ * the chosen direction. No watcher and no auto triggers — those arrive later.
  *
  * Deletes are tombstones, never silent: a locally deleted deck is pushed with
  * Command_DeckDel, a server-side delete is applied locally only after copying
@@ -75,7 +76,6 @@ public:
     void setProfile(const DeckSyncProfile &_profile);
     void setDeckPath(const QString &path);
     void setConflictDefault(int conflictDefault);
-    void setSyncMode(DeckSyncMode mode);
     [[nodiscard]] bool isSyncing() const;
 
 public slots:
@@ -217,7 +217,7 @@ private:
     QMap<QString, ConflictDownload> pendingConflicts;
     QMap<int, ServerFile> stashedServerFiles;
     ActiveConflict activeConflict;
-    DeckSyncMode syncMode = DeckSyncMode::TwoWay;
+    DeckSyncMode syncMode = DeckSyncMode::TwoWay; ///< This run's direction, loaded from the sidecar.
     int conflictDefault = DeckSyncConflictAsk;
     int sessionDefault = -1;
     bool firstSyncRun = false;
