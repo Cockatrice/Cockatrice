@@ -12,7 +12,7 @@ on:
       - '!.ci/**'
       - '!.github/**'
       - '!.tx/**'
-      - '!doc/**'
+      - '!docs/**'
       - '.ci/lint_cpp.sh'
       - '.github/workflows/desktop-lint.yml'
       - '.clang-format'

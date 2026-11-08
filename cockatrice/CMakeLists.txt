@@ -291,9 +291,14 @@ set(cockatrice_SOURCES
     src/interface/widgets/settings_page/storage_settings_page.cpp
     src/interface/widgets/settings_page/user_interface_settings_page.cpp
     src/interface/widgets/utility/custom_line_edit.cpp
+    src/interface/widgets/utility/epoch_format.h
     src/interface/widgets/utility/get_text_with_max.cpp
+    src/interface/widgets/utility/pill_painter.cpp
+    src/interface/widgets/utility/pill_painter.h
     src/interface/widgets/utility/report_utils.cpp
     src/interface/widgets/utility/report_utils.h
+    src/interface/widgets/utility/table_activation.cpp
+    src/interface/widgets/utility/table_activation.h
     src/interface/widgets/utility/sequence_edit.cpp
     src/interface/widgets/utility/visibility_change_listener.cpp
     src/interface/widgets/utility/visibility_change_listener.h
@@ -381,9 +386,12 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/api/edhrec/display/top_tags/edhrec_top_tags_api_response_display_widget.cpp
     src/interface/widgets/tabs/api/edhrec/tab_edhrec.cpp
     src/interface/widgets/tabs/api/edhrec/tab_edhrec_main.cpp
+    src/interface/widgets/tabs/alt_table_delegate.cpp
+    src/interface/widgets/tabs/report_status_delegate.cpp
     src/interface/widgets/tabs/tab.cpp
     src/interface/widgets/tabs/tab_account.cpp
     src/interface/widgets/tabs/tab_admin.cpp
+    src/interface/widgets/tabs/tab_alts.cpp
     src/interface/widgets/tabs/tab_card_art_rules.cpp
     src/interface/widgets/tabs/tab_deck_editor.cpp
     src/interface/widgets/tabs/tab_deck_storage.cpp

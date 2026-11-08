@@ -146,6 +146,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     });
 
     homeTabBackgroundShuffleFrequencySpinBox.setRange(0, 3600);
+    //: Unit following a number of seconds. Keep the leading space unless your language writes number and unit flush.
     homeTabBackgroundShuffleFrequencySpinBox.setSuffix(tr(" seconds"));
     homeTabBackgroundShuffleFrequencySpinBox.setValue(settings.appearance().getHomeTabBackgroundShuffleFrequency());
     connect(&homeTabBackgroundShuffleFrequencySpinBox, qOverload<int>(&QSpinBox::valueChanged), &settings.appearance(),
@@ -675,7 +676,7 @@ void AppearanceSettingsPage::retranslateUi()
     }
 
     handGroupBox->setTitle(tr("Hand layout"));
-    horizontalHandCheckBox.setText(tr("Display hand horizontally (wastes space)"));
+    horizontalHandCheckBox.setText(tr("Display hand horizontally (requires more space)"));
     leftJustifiedHandCheckBox.setText(tr("Enable left justification"));
 
     tableGroupBox->setTitle(tr("Table grid layout"));

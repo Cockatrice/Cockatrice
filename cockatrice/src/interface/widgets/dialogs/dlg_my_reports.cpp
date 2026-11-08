@@ -230,7 +230,8 @@ void DlgMyReports::onSelectionChanged()
     connect(pend, &PendingCommand::finished, this, &DlgMyReports::reportDetailsResponse);
     client->sendCommand(pend);
 
-    QString status = table->item(row, COL_STATUS)->text();
+    // The cell text is the translated label; the raw status lives in UserRole.
+    const QString status = table->item(row, COL_STATUS)->data(Qt::UserRole).toString();
     bool canComment = (status == "open" || status == "assigned");
     commentButton->setEnabled(canComment);
     commentInput->setEnabled(canComment);

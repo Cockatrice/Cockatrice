@@ -22,6 +22,7 @@
 #include "tab.h"
 #include "tab_account.h"
 #include "tab_admin.h"
+#include "tab_alts.h"
 #include "tab_card_art_rules.h"
 #include "tab_deck_editor.h"
 #include "tab_deck_storage.h"
@@ -157,7 +158,7 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     : QTabWidget(parent), userInfo(nullptr), client(_client), tabsMenu(tabsMenu), tabHome(nullptr),
       tabVisualDeckStorage(nullptr), tabServer(nullptr), tabAccount(nullptr), tabDeckStorage(nullptr),
       tabReplays(nullptr), tabAdmin(nullptr), tabCardArtRules(nullptr), tabLog(nullptr), tabReport(nullptr),
-      tabModeration(nullptr), tabDeveloper(nullptr), isLocalGame(false)
+      tabModeration(nullptr), tabAlts(nullptr), tabDeveloper(nullptr), isLocalGame(false)
 {
     setObjectName("tabSupervisor");
 
@@ -575,6 +576,7 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
     tabLog = nullptr;
     tabReport = nullptr;
     tabModeration = nullptr;
+    tabAlts = nullptr;
     tabDeveloper = nullptr;
     isLocalGame = true;
     userInfo = new ServerInfo_User;
@@ -622,6 +624,9 @@ void TabSupervisor::stop()
         }
         if (tabModeration) {
             tabModeration->close();
+        }
+        if (tabAlts) {
+            tabAlts->close();
         }
         if (tabCardArtRules) {
             tabCardArtRules->close();
@@ -929,6 +934,21 @@ void TabSupervisor::openTabModeration(const QString &userName)
         aTabModeration->setChecked(false);
     });
     aTabModeration->setChecked(true);
+}
+
+void TabSupervisor::openTabAlts(const QString &userName)
+{
+    if (tabAlts) {
+        setCurrentWidget(tabAlts);
+        if (!userName.isEmpty()) {
+            tabAlts->investigate(userName);
+        }
+        return;
+    }
+    tabAlts = new TabAlts(this, client, userName);
+    myAddTab(tabAlts);
+    setCurrentWidget(tabAlts);
+    connect(tabAlts, &QObject::destroyed, this, [this] { tabAlts = nullptr; });
 }
 
 void TabSupervisor::actTabDeveloper(bool checked)

@@ -36,7 +36,7 @@ class ICardSetPriorityController;
 #define COCKATRICE_XML4_TAGNAME "cockatrice_carddatabase"
 #define COCKATRICE_XML4_TAGVER 4
 #define COCKATRICE_XML4_SCHEMALOCATION                                                                                 \
-    "https://raw.githubusercontent.com/Cockatrice/Cockatrice/master/doc/carddatabase_v4/cards.xsd"
+    "https://raw.githubusercontent.com/Cockatrice/Cockatrice/master/docs/xsd/cards.xsd"
 
 CockatriceXml4Parser::CockatriceXml4Parser(ICardSetPriorityController *_cardSetPriorityController)
     : ICardDatabaseParser(_cardSetPriorityController)

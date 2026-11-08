@@ -266,9 +266,13 @@ void GameSelector::actCreate()
         return;
     }
 
-    DlgCreateGame dlg(room, room->getGameTypes(), this);
-    dlg.exec();
-    updateTitle();
+    // Heap-allocate the dialog: if this selector (or its room tab) is destroyed while the
+    // dialog is open, e.g. on server disconnect, Qt deletes its children. A stack-allocated
+    // child would then be deleted by Qt and crash.
+    auto *dlg = new DlgCreateGame(room, room->getGameTypes(), this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    connect(dlg, &QDialog::finished, this, &GameSelector::updateTitle);
+    dlg->exec();
 }
 
 void GameSelector::checkResponse(const Response &response)
@@ -362,8 +366,9 @@ void GameSelector::customContextMenu(const QPoint &point)
         const ServerInfo_Game &gameInfo = gameListModel->getGame(index.data(Qt::UserRole).toInt());
         const QMap<int, QString> &gameTypes = gameListModel->getGameTypes().value(gameInfo.room_id());
 
-        DlgCreateGame dlg(gameInfo, gameTypes, this);
-        dlg.exec();
+        auto *dlg = new DlgCreateGame(gameInfo, gameTypes, this);
+        dlg->setAttribute(Qt::WA_DeleteOnClose);
+        dlg->exec();
     });
 
     QAction copyLink(tr("Cop&y game link"));

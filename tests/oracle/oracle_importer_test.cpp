@@ -1,6 +1,7 @@
 #include "../../oracle/src/database_writer.h"
 #include "../../oracle/src/oracleimporter.h"
 #include "../../oracle/src/raw_json_scanner.h"
+#include "../support/scoped_file_size_limit.h"
 #include "libcockatrice/card/card_info.h"
 
 #include "gtest/gtest.h"
@@ -32,12 +33,6 @@
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 #include <string>
 #include <utility>
-
-#ifdef Q_OS_UNIX
-#include <csignal>
-#include <sys/resource.h>
-#include <unistd.h>
-#endif
 
 class OracleImporterTest : public ::testing::Test
 {
@@ -1336,20 +1331,16 @@ TEST(OracleDatabaseWriter, ShortWriteKeepsPreviouslyInstalledDatabase)
     original.close();
     const QByteArray data = "<cockatrice_carddatabase version=\"4\"><!--" + QByteArray(16384, 'x') +
                             "--><cards/></cockatrice_carddatabase>";
-    // A real filesystem write failure, isolated in the death-test child so the
-    // process-wide file limit never affects other cases or the parent runner.
-    ASSERT_EXIT(
-        {
-            std::signal(SIGXFSZ, SIG_IGN);
-            struct rlimit limit;
-            limit.rlim_cur = 128;
-            limit.rlim_max = 128;
-            if (setrlimit(RLIMIT_FSIZE, &limit) != 0) {
-                _exit(2);
-            }
-            _exit(OracleDatabase::saveXml(path, data) ? 1 : 0);
-        },
-        ::testing::ExitedWithCode(0), "");
+    // A real filesystem write failure: the soft file-size cap makes the writer's own
+    // flush fail without filling a disk. The cap is scoped rather than forked, because a
+    // death-test child under RLIMIT_FSIZE is killed by SIGSEGV on macOS.
+    test_support::ScopedFileSizeLimit fileSizeCap(128);
+    ASSERT_TRUE(fileSizeCap.isValid());
+
+    QString error;
+    EXPECT_FALSE(OracleDatabase::saveXml(path, data, &error));
+    EXPECT_FALSE(error.isEmpty());
+
     ASSERT_TRUE(original.open(QIODevice::ReadOnly));
     EXPECT_EQ(original.readAll(), "installed database");
 }
