@@ -85,7 +85,8 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent
             &DeckEditorDatabaseDisplayWidget::onRelatedCardClicked);
 
     aAddCard = new QAction(QString(), this);
-    aAddCard->setIcon(loadThemedIcon(QStringLiteral("icons/arrow_right"), AppColor::Positive));
+    aAddCard->setIcon(loadThemedIcon(QStringLiteral("icons/arrow_right"),
+                                     IconTint(AppColor::Positive, IconEmphasis::Primary), IconStyle::Sticker));
     connect(aAddCard, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
     auto *tbAddCard = new QToolButton(this);
     tbAddCard->setDefaultAction(aAddCard);
