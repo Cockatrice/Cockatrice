@@ -164,10 +164,9 @@ private:
 
     QPushButton *filterButton;                     /**< Button to open the filter dialog. */
     QPushButton *clearFilterButton;                /**< Button to clear active filters. */
-    QPushButton *hostGameButton = nullptr;         /**< Host button, in the same family as the join buttons. */
+    QToolButton *hostGameSplitButton = nullptr;    /**< Split host button, on every style that can draw one. */
+    QPushButton *hostGameButton = nullptr;         /**< Primary quick-host button, on the native macOS style only. */
     QPushButton *hostGameSettingsButton = nullptr; /**< Opens the host form; a sibling button on macOS. */
-    QToolButton *hostGameMenuButton = nullptr;     /**< Split arrow that opens the host menu (non-macOS styles only). */
-    QWidget *hostGameButtonWidget = nullptr;       /**< Container that keeps the split button and its arrow together. */
     QMenu *hostGameMenu = nullptr;                 /**< Menu behind the split arrow (non-macOS styles only). */
     QAction *hostGameAction = nullptr;             /**< Quick-host action, carrying the keyboard shortcut. */
     QAction *gameSettingsAction = nullptr;         /**< Opens the host form with the current settings. */
@@ -193,9 +192,9 @@ private:
     /**
      * @brief Rebuilds the host control for the active style.
      *
-     * The primary button always quick-hosts. Every other style gets the split button,
-     * whose arrow opens the menu; the native macOS style has no split control, so it
-     * gets a plain sibling button for the secondary action instead.
+     * The primary button always quick-hosts. Every style that can draw a split control
+     * gets one, whose arrow opens the menu; the native macOS style has no split control,
+     * so it gets a plain sibling button for the secondary action instead.
      */
     void applyHostGameStyle();
     /** @brief Marks a quick-host command as in flight or finished, then updates the host controls. */

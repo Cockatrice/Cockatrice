@@ -1,5 +1,6 @@
 #include "tab_supervisor.h"
 
+#include "../../../client/crash/crash_reporter.h"
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../../intents/contexts/context_connect_to_server.h"
@@ -593,6 +594,7 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
  */
 void TabSupervisor::stop()
 {
+    CrashReporter::addBreadcrumb("tabs", "tab supervisor stopping");
     if ((!client) && localClients.isEmpty()) {
         return;
     }
@@ -1003,6 +1005,7 @@ void TabSupervisor::updateLatencyTooltip(const LatencyTracker::Stats &stats)
 
 void TabSupervisor::gameJoined(const Event_GameJoined &event)
 {
+    CrashReporter::addBreadcrumb("tabs", "game joined");
     QMap<int, QString> roomGameTypes;
     TabRoom *room = roomTabs.value(event.game_info().room_id());
     if (room) {
@@ -1055,6 +1058,7 @@ void TabSupervisor::gameLeft(TabGame *tab)
 
 void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
 {
+    CrashReporter::addBreadcrumb("tabs", "room tab added");
     auto *tab = new TabRoom(this, client, userInfo, info);
     connect(tab, &TabRoom::maximizeClient, this, &TabSupervisor::maximizeMainWindow);
     connect(tab, &TabRoom::roomClosing, this, &TabSupervisor::roomLeft);
@@ -1472,6 +1476,7 @@ void TabSupervisor::actShowPopup(const QString &message)
 
 void TabSupervisor::processUserLeft(const QString &userName)
 {
+    CrashReporter::addBreadcrumb("users", "user left");
     TabMessage *tab = messageTabs.value(userName);
     if (tab) {
         tab->processUserLeft();

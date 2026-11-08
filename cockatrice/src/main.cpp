@@ -427,6 +427,23 @@ int main(int argc, char *argv[])
     CardDatabaseManager::setCardDatabasePathProvider(&SettingsCache::instance());
     CardDatabaseManager::setCardSetPriorityController(&SettingsCache::instance().cardDatabase());
 
+    // Lifecycle breadcrumbs for native crash reports (see COCKATRICE-DESKTOP-1R): the live
+    // card maps are replaced wholesale on reset, so knowing whether a crash followed a reload
+    // narrows down which QMap was being read. Direct connections: the SDK call is thread-safe
+    // and loading signals may come from a QtConcurrent worker.
+    {
+        CardDatabase *crumbDb = CardDatabaseManager::getInstance();
+        QObject::connect(
+            crumbDb, &CardDatabase::cardDatabaseReset, crumbDb,
+            [] { CrashReporter::addBreadcrumb("card_db", "card database snapshot swapped in"); }, Qt::DirectConnection);
+        QObject::connect(
+            crumbDb, &CardDatabase::cardDatabaseLoadingFinished, crumbDb,
+            [] { CrashReporter::addBreadcrumb("card_db", "card database loading finished"); }, Qt::DirectConnection);
+        QObject::connect(
+            crumbDb, &CardDatabase::cardDatabaseLoadingFailed, crumbDb,
+            [] { CrashReporter::addBreadcrumb("card_db", "card database loading failed"); }, Qt::DirectConnection);
+    }
+
     qCInfo(MainLog) << "Starting main program";
 
     // Front-load the card database before constructing the main window. The

@@ -182,41 +182,34 @@ GameSelector::GameSelector(AbstractClient *_client,
         hostGameAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
         connect(hostGameAction, &QAction::triggered, this, &GameSelector::actQuickHost);
 
-        // A plain QPushButton, so the quick host sits in the same control family as the
-        // join buttons. A QPushButton does not take its text, tooltip or enabled state from
-        // an action, so those are mirrored by hand below and in updateHostControlsEnabled().
-        hostGameButton = new QPushButton(this);
-        hostGameButton->setObjectName("hostGameButton");
-        connect(hostGameButton, &QPushButton::clicked, hostGameAction, &QAction::trigger);
-
         hostGameMenu = new QMenu(this);
         hostGameMenu->setObjectName("hostGameMenu");
-        hostGameMenu->addAction(hostGameAction);
         gameSettingsAction = hostGameMenu->addAction(QString());
         gameSettingsAction->setObjectName("gameSettingsAction");
         gameSettingsAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
         connect(gameSettingsAction, &QAction::triggered, this, &GameSelector::actCreate);
 
-        // The secondary control: a flat arrow next to the primary button on styles that
-        // support a split control. The native macOS style does not, so there it is a plain
-        // sibling button instead (see applyHostGameStyle()).
-        hostGameMenuButton = new QToolButton(this);
-        hostGameMenuButton->setObjectName("hostGameMenuButton");
-        hostGameMenuButton->setArrowType(Qt::DownArrow);
-        hostGameMenuButton->setAutoRaise(true);
-        hostGameMenuButton->setPopupMode(QToolButton::InstantPopup);
-        hostGameMenuButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        // A split QToolButton in its native style: the primary half quick-hosts, and the
+        // arrow opens the menu with the full form. This is the control on every style that
+        // can draw one; QMacStyle draws the menu half as a second square bezel instead.
+        hostGameSplitButton = new QToolButton(this);
+        hostGameSplitButton->setObjectName("hostGameSplitButton");
+        hostGameSplitButton->setDefaultAction(hostGameAction);
+        hostGameSplitButton->setPopupMode(QToolButton::MenuButtonPopup);
+        hostGameSplitButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
+        hostGameSplitButton->setMenu(hostGameMenu);
+
+        // The native macOS style has no split rendering, so there the primary stays a plain
+        // QPushButton next to a plain settings button. A QPushButton does not take its text,
+        // tooltip or enabled state from an action, so those are mirrored by hand below and
+        // in updateHostControlsEnabled().
+        hostGameButton = new QPushButton(this);
+        hostGameButton->setObjectName("hostGameButton");
+        connect(hostGameButton, &QPushButton::clicked, hostGameAction, &QAction::trigger);
 
         hostGameSettingsButton = new QPushButton(this);
         hostGameSettingsButton->setObjectName("hostGameSettingsButton");
         connect(hostGameSettingsButton, &QPushButton::clicked, gameSettingsAction, &QAction::trigger);
-
-        hostGameButtonWidget = new QWidget(this);
-        auto *hostGameButtonLayout = new QHBoxLayout(hostGameButtonWidget);
-        hostGameButtonLayout->setContentsMargins(0, 0, 0, 0);
-        hostGameButtonLayout->setSpacing(0);
-        hostGameButtonLayout->addWidget(hostGameButton);
-        hostGameButtonLayout->addWidget(hostGameMenuButton);
 
         applyHostGameStyle();
 
@@ -244,7 +237,9 @@ GameSelector::GameSelector(AbstractClient *_client,
     }
     buttonLayout->addStretch();
     if (room) {
-        buttonLayout->addWidget(hostGameButtonWidget);
+        // Only the form that matches the active style is visible; hidden widgets take no room.
+        buttonLayout->addWidget(hostGameSplitButton);
+        buttonLayout->addWidget(hostGameButton);
         buttonLayout->addWidget(hostGameSettingsButton);
     }
     buttonLayout->addWidget(joinButton);
@@ -435,23 +430,17 @@ void GameSelector::clearHostError()
 
 void GameSelector::applyHostGameStyle()
 {
-    if (hostGameButton == nullptr || hostGameMenu == nullptr || hostGameMenuButton == nullptr ||
-        hostGameSettingsButton == nullptr) {
+    if (hostGameSplitButton == nullptr || hostGameButton == nullptr || hostGameSettingsButton == nullptr) {
         return;
     }
 
-    // The primary button always quick-hosts. The native macOS style has no split-button
-    // rendering (a QToolButton menu becomes a second square bezel), so the secondary
-    // action is a plain sibling button there; every other style gets the split arrow.
-    if (usesMacStyle()) {
-        hostGameMenuButton->setMenu(nullptr);
-        hostGameMenuButton->setVisible(false);
-        hostGameSettingsButton->setVisible(true);
-    } else {
-        hostGameMenuButton->setMenu(hostGameMenu);
-        hostGameMenuButton->setVisible(true);
-        hostGameSettingsButton->setVisible(false);
-    }
+    // Every style that can draw a split button gets one. The native macOS style cannot
+    // (QMacStyle draws the menu half as a second square bezel), so it gets the plain
+    // primary button and a sibling settings button instead.
+    const bool macStyle = usesMacStyle();
+    hostGameSplitButton->setVisible(!macStyle);
+    hostGameButton->setVisible(macStyle);
+    hostGameSettingsButton->setVisible(macStyle);
 
     // The appearance settings can switch the style while the room is open.
     updateHostGameToolTip();
@@ -482,8 +471,8 @@ void GameSelector::updateHostControlsEnabled()
     if (hostGameButton) {
         hostGameButton->setEnabled(hostControlsEnabled);
     }
-    if (hostGameMenuButton) {
-        hostGameMenuButton->setEnabled(hostControlsEnabled);
+    if (hostGameSplitButton) {
+        hostGameSplitButton->setEnabled(hostControlsEnabled);
     }
     if (hostGameSettingsButton) {
         hostGameSettingsButton->setEnabled(hostControlsEnabled);
@@ -740,10 +729,10 @@ void GameSelector::retranslateUi()
     filterButton->setText(tr("&Filter games"));
     clearFilterButton->setText(tr("C&lear filter"));
     if (hostGameAction) {
-        hostGameAction->setText(tr("Host with last settings"));
+        hostGameAction->setText(tr("Host game"));
         if (hostGameButton) {
-            // A QPushButton does not draw text from an action; the button keeps the short
-            // label while the menu item spells out what the remembered settings do.
+            // A QPushButton does not draw text from an action; on macOS this button is the
+            // primary action, so it carries the same label.
             hostGameButton->setText(tr("Host game"));
         }
         updateHostGameToolTip();
@@ -754,11 +743,6 @@ void GameSelector::retranslateUi()
             // A QPushButton does not draw text from an action; on macOS this button is the
             // secondary action, so it carries the same label.
             hostGameSettingsButton->setText(tr("Game settings…"));
-        }
-        if (hostGameMenuButton) {
-            // The split arrow has no text of its own; name it for the menu it opens.
-            hostGameMenuButton->setToolTip(tr("More host options"));
-            hostGameMenuButton->setAccessibleName(tr("More host options"));
         }
     }
     joinButton->setText(tr("&Join"));
@@ -793,6 +777,9 @@ void GameSelector::updateHostGameToolTip()
     }
     if (hostGameButton) {
         hostGameButton->setToolTip(quickHostTooltip);
+    }
+    if (hostGameSplitButton) {
+        hostGameSplitButton->setToolTip(quickHostTooltip);
     }
     if (hostGameSettingsButton) {
         hostGameSettingsButton->setToolTip(tr("Open the game settings before hosting"));

@@ -418,6 +418,16 @@ TEST(CrashReporterTest, BeginSessionEndSessionRoundTripReportsClean)
     reporter.endSession();
 }
 
+TEST(CrashReporterTest, AddBreadcrumbIsSafeWithoutInitAndWithNullArguments)
+{
+    // Breadcrumbs are emitted from GUI slots and QtConcurrent workers regardless of whether
+    // the SDK was initialised (empty DSN, Never consent, OFF builds); none of these may crash.
+    CrashReporter::addBreadcrumb("card_db", "card database snapshot swapped in");
+    CrashReporter::addBreadcrumb(nullptr, "message");
+    CrashReporter::addBreadcrumb("category", nullptr);
+    SUCCEED();
+}
+
 } // namespace
 
 int main(int argc, char **argv)

@@ -167,6 +167,17 @@ public:
     static QString sanitizeLogLine(const QString &line);
     static QString redactCockatriceUrls(const QString &line);
 
+    /**
+     * @brief Record a fixed-text lifecycle breadcrumb on the active Sentry scope.
+     *
+     * Native crashes whose stack walk loses the in-app frames (e.g. a QMap lookup
+     * that dies inside Qt's string comparison) otherwise arrive with no hint of
+     * what the client was doing. Only pass compile-time string literals: no user
+     * names, card names, paths or URLs, so no personal data can leak through this
+     * channel. Thread-safe; a no-op in OFF builds or before init().
+     */
+    static void addBreadcrumb(const char *category, const char *message);
+
 private:
     bool ready = false;
     QString sentryDatabasePath;
