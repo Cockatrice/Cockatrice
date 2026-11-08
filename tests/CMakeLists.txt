@@ -469,6 +469,20 @@ cockatrice_add_test(
   ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/game_hosting/game_creation_options.cpp
   game_creation_options_test.cpp
   LIBS
+  libcockatrice_interfaces
+  libcockatrice_protocol
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src
+)
+cockatrice_add_test(
+  NAME
+  create_game_form_widget_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/game_hosting/create_game_form_widget.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/widgets/game_hosting/game_creation_options.cpp
+  create_game_form_widget_test.cpp
+  LIBS
+  libcockatrice_interfaces
   libcockatrice_protocol
   INCLUDE_DIRS
   ${CMAKE_SOURCE_DIR}/cockatrice/src
