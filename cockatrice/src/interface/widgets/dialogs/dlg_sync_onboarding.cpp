@@ -35,12 +35,14 @@ DlgSyncOnboarding::DlgSyncOnboarding(int _localCount, int _serverCount, QWidget 
 void DlgSyncOnboarding::retranslateUi()
 {
     setWindowTitle(tr("Sync decks to this server"));
-    detailLabel->setText(tr("You have %1 local decks and %2 decks stored on this server. How should they be combined?")
-                             .arg(localCount)
-                             .arg(serverCount));
+    detailLabel->setText(
+        tr("You have %1 local decks and %2 decks stored on this server. This choice sets how decks sync with this "
+           "server from now on; you can reset it to two-way sync from the deck storage tab.")
+            .arg(localCount)
+            .arg(serverCount));
     mergeRadio->setText(tr("Merge: keep everything, sync both ways (recommended)"));
-    uploadRadio->setText(tr("Upload mine: push local decks to the server"));
-    downloadRadio->setText(tr("Download server: take the server decks"));
+    uploadRadio->setText(tr("Upload mine only: push local decks to the server, never download"));
+    downloadRadio->setText(tr("Download server only: take the server decks, never upload"));
     separateRadio->setText(tr("Keep separate: do not sync with this server"));
 }
 

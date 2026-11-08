@@ -17,8 +17,9 @@ class QRadioButton;
  * @class DlgSyncOnboarding
  * @brief Asks how to combine a non-empty local collection with a non-empty server collection.
  *
- * Merge (two-way) is the default. Upload and download restrict the run to one
- * direction; keeping separate records the profile as sync-disabled.
+ * Merge (two-way) is the default. Upload and download restrict sync to one
+ * direction for this server from then on; keeping separate records the profile
+ * as sync-disabled. The deck storage tab can reset the direction to two-way.
  * Rejected dialogs cancel the sync without recording anything.
  */
 class DlgSyncOnboarding : public QDialog
