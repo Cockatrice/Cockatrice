@@ -1,5 +1,6 @@
 #include "user_list_widget.h"
 
+#include "../../../../client/crash/crash_reporter.h"
 #include "../../../../client/settings/cache_settings.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../../interface/theme_manager.h"
@@ -1221,6 +1222,7 @@ void UserListWidget::processUserInfo(Section section, const ServerInfo_User &use
 
 bool UserListWidget::deleteUser(const QString &userName)
 {
+    CrashReporter::addBreadcrumb("users", "user list row removed");
     if (sectioned) {
         // The user may own several rows (one per section). Drop them all.
         bool removed = false;
