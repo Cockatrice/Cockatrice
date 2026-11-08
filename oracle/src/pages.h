@@ -147,6 +147,7 @@ private:
     QPushButton *urlButton;
     QPushButton *fileButton;
     QCheckBox *parentsCheckBox;
+    QLabel *parentsExplainer;
     QLabel *statusLabel;
     QLabel *progressLabel;
     QProgressBar *progressBar;

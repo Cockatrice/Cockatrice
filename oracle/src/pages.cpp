@@ -707,6 +707,23 @@ bool looksLikeTagFileUrl(const QUrl &url)
     return path.endsWith(".json") || path.endsWith(".jsonl") || path.endsWith(".gz") || path.endsWith(".xz") ||
            path.endsWith(".zip");
 }
+
+/**
+ * @brief Extends Qt's terse network error with a JSON error body.
+ *
+ * Scryfall explains a rejected request in the response body (for example a
+ * missing Accept header); QNetworkReply::errorString() only says "status code
+ * 400". Non-JSON bodies (CDN HTML pages) are ignored so the dialog stays short.
+ */
+QString networkErrorDetail(QNetworkReply *reply)
+{
+    QString detail = reply->errorString();
+    const QString body = QString::fromUtf8(reply->readAll()).trimmed();
+    if (body.startsWith('{') && body.size() <= 300) {
+        detail += QStringLiteral(" ") + body;
+    }
+    return detail;
+}
 } // namespace
 
 TagsPage::TagsPage(QWidget *parent) : OracleWizardPage(parent)
@@ -732,6 +749,10 @@ TagsPage::TagsPage(QWidget *parent) : OracleWizardPage(parent)
 
     parentsCheckBox = new QCheckBox(this);
 
+    parentsExplainer = new QLabel(this);
+    parentsExplainer->setWordWrap(true);
+    parentsExplainer->setContentsMargins(20, 0, 0, 0);
+
     statusLabel = new QLabel(this);
     statusLabel->setWordWrap(true);
     statusLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
@@ -750,10 +771,11 @@ TagsPage::TagsPage(QWidget *parent) : OracleWizardPage(parent)
     layout->addWidget(fileLineEdit, 3, 1);
     layout->addWidget(fileButton, 4, 1, Qt::AlignRight);
     layout->addWidget(parentsCheckBox, 5, 0, 1, 2);
-    layout->addWidget(statusLabel, 6, 0, 1, 2);
-    layout->addWidget(progressLabel, 7, 0);
-    layout->addWidget(progressBar, 7, 1);
-    layout->setRowStretch(8, 1);
+    layout->addWidget(parentsExplainer, 6, 0, 1, 2);
+    layout->addWidget(statusLabel, 7, 0, 1, 2);
+    layout->addWidget(progressLabel, 8, 0);
+    layout->addWidget(progressBar, 8, 1);
+    layout->setRowStretch(9, 1);
     setLayout(layout);
 
     connect(&watcher, &QFutureWatcher<LoadResult>::finished, this, &TagsPage::actLoadFinished);
@@ -776,8 +798,11 @@ void TagsPage::retranslateUi()
     fileRadioButton->setText(tr("Local file:"));
     fileButton->setText(tr("Choose file..."));
     parentsCheckBox->setText(tr("Include parent tags"));
-    parentsCheckBox->setToolTip(tr("Also add every parent tag. This makes broad tags like \"animal\" work, "
-                                   "but adds many tags to each card."));
+    parentsCheckBox->setToolTip(tr("Also apply the broader tags that this tag belongs to."));
+    parentsExplainer->setText(
+        tr("Tags form a hierarchy: \"tutor-creature-giant\" belongs to \"tutor-creature\", which belongs to "
+           "\"tutor\". With this on, a card tagged with the specific tag also matches searches for its broader "
+           "parent tags. It adds many more tags to each card."));
 }
 
 bool TagsPage::isComplete() const
@@ -833,6 +858,7 @@ void TagsPage::updateSourceEnabled()
     fileLineEdit->setEnabled(enabled && usingFile);
     fileButton->setEnabled(enabled && usingFile);
     parentsCheckBox->setEnabled(enabled);
+    parentsExplainer->setEnabled(enabled);
 }
 
 void TagsPage::saveSettings()
@@ -958,6 +984,9 @@ void TagsPage::downloadMetadata(const QUrl &url)
 {
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
+    // api.scryfall.com rejects requests without an Accept header (HTTP 400);
+    // QNetworkAccessManager does not add one on its own.
+    request.setRawHeader("Accept", "application/json");
     request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
 
     activeReply = wizard()->nam->get(request);
@@ -977,7 +1006,8 @@ void TagsPage::actMetadataFinished()
         return;
     }
     if (reply->error() != QNetworkReply::NoError) {
-        failLoad(tr("Network error while fetching tag metadata: %1.").arg(reply->errorString()));
+        failLoad(
+            tr("Could not fetch tag metadata from %1: %2").arg(reply->url().toString(), networkErrorDetail(reply)));
         return;
     }
 
@@ -1005,6 +1035,7 @@ void TagsPage::downloadTagFile(const QUrl &url)
 {
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
+    request.setRawHeader("Accept", "*/*");
     request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
 
     activeReply = wizard()->nam->get(request);
@@ -1035,7 +1066,7 @@ void TagsPage::actTagFileFinished()
         return;
     }
     if (reply->error() != QNetworkReply::NoError) {
-        failLoad(tr("Network error while downloading tag data: %1.").arg(reply->errorString()));
+        failLoad(tr("Could not download tag data from %1: %2").arg(reply->url().toString(), networkErrorDetail(reply)));
         return;
     }
 
@@ -1110,18 +1141,25 @@ void TagsPage::failLoad(const QString &message)
     setEnabled(true);
     progressLabel->hide();
     progressBar->hide();
-    statusLabel->setText(message);
     qWarning() << message;
 
+    // The failed load leaves no usable database; never keep tags from a
+    // previous, different source.
+    wizard()->tagDatabase.reset();
+
     if (wizard()->backgroundMode) {
-        wizard()->tagDatabase.reset();
+        statusLabel->setText(message);
         emit readyToContinue();
         return;
     }
 
-    QMessageBox::warning(this, tr("Tags not loaded"),
-                         message + "\n\n" + tr("The card database will be imported without tags."));
-    wizard()->next();
+    // Do not advance here. Advancing runs validatePage() again, which starts
+    // the same failing download and traps the user in an error loop. Staying
+    // on the page lets them fix the source, retry with Next, or opt out.
+    const QString guidance = tr("You can try again, choose another source, or untick \"Download card tags\" "
+                                "to import without tags.");
+    statusLabel->setText(message + "\n\n" + guidance);
+    QMessageBox::warning(this, tr("Tags not loaded"), message + "\n\n" + guidance);
 }
 
 void TagsPage::advance()
