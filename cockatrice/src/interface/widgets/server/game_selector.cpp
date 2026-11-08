@@ -177,12 +177,6 @@ GameSelector::GameSelector(AbstractClient *_client,
     connect(clearFilterButton, &QPushButton::clicked, this, &GameSelector::actClearFilter);
     connect(gameListProxyModel, &GamesProxyModel::filtersChanged, this, &GameSelector::checkClearFilterButtonState);
 
-    hostGameButton = nullptr;
-    hostGameMenuButton = nullptr;
-    hostGameButtonWidget = nullptr;
-    hostGameMenu = nullptr;
-    hostGameAction = nullptr;
-    reviewGameAction = nullptr;
     if (room) {
         hostGameAction = new QAction(this);
         hostGameAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
@@ -456,6 +450,10 @@ void GameSelector::applyHostGameStyle()
         hostGameMenuButton->setMenu(hostGameMenu);
         hostGameMenuButton->setVisible(true);
     }
+
+    // The tooltip depends on the control type: on macOS a click opens the menu, elsewhere it
+    // quick-hosts, and the appearance settings can switch between the two while the room is open.
+    updateHostGameToolTip();
 }
 
 void GameSelector::changeEvent(QEvent *event)
@@ -471,7 +469,12 @@ void GameSelector::setHostCommandPending(bool pending)
     hostCommandPending = pending;
     // A join may still be in flight: its response enables these controls again, so keep them
     // disabled until that response arrives instead of re-enabling on the host response alone.
-    const bool hostControlsEnabled = !pending && !joinCommandPending;
+    updateHostControlsEnabled();
+}
+
+void GameSelector::updateHostControlsEnabled()
+{
+    const bool hostControlsEnabled = !hostCommandPending && !joinCommandPending;
     if (hostGameAction) {
         hostGameAction->setEnabled(hostControlsEnabled);
     }
@@ -701,18 +704,7 @@ bool GameSelector::joinGameById(const int gameId, const bool asSpectator)
 void GameSelector::disableButtons()
 {
     joinCommandPending = true;
-    if (hostGameAction) {
-        hostGameAction->setEnabled(false);
-    }
-    if (hostGameButton) {
-        hostGameButton->setEnabled(false);
-    }
-    if (hostGameMenuButton) {
-        hostGameMenuButton->setEnabled(false);
-    }
-    if (reviewGameAction) {
-        reviewGameAction->setEnabled(false);
-    }
+    updateHostControlsEnabled();
 
     joinButton->setEnabled(false);
     spectateButton->setEnabled(false);
@@ -720,19 +712,7 @@ void GameSelector::disableButtons()
 
 void GameSelector::enableButtons()
 {
-    const bool hostControlsEnabled = !hostCommandPending && !joinCommandPending;
-    if (hostGameAction) {
-        hostGameAction->setEnabled(hostControlsEnabled);
-    }
-    if (hostGameButton) {
-        hostGameButton->setEnabled(hostControlsEnabled);
-    }
-    if (hostGameMenuButton) {
-        hostGameMenuButton->setEnabled(hostControlsEnabled);
-    }
-    if (reviewGameAction) {
-        reviewGameAction->setEnabled(hostControlsEnabled);
-    }
+    updateHostControlsEnabled();
 
     // Enable buttons for the currently selected game
     enableButtonsForIndex(gameListView->currentIndex());
@@ -794,15 +774,18 @@ void GameSelector::refreshShortcuts()
 void GameSelector::updateHostGameToolTip()
 {
     const QString shortcut = SettingsCache::instance().shortcuts().getShortcutString("GameSelector/aQuickHostGame");
-    const QString tooltip = shortcut.isEmpty() ? tr("Host a game with your last-used settings")
-                                               : tr("Host a game with your last-used settings (%1)").arg(shortcut);
+    const QString quickHostTooltip = shortcut.isEmpty()
+                                         ? tr("Host a game with your last-used settings")
+                                         : tr("Host a game with your last-used settings (%1)").arg(shortcut);
     // The tooltip lives on the action for the shortcut and on the button for the mouse,
     // since a QPushButton does not inherit an action's tooltip.
     if (hostGameAction) {
-        hostGameAction->setToolTip(tooltip);
+        hostGameAction->setToolTip(quickHostTooltip);
     }
     if (hostGameButton) {
-        hostGameButton->setToolTip(tooltip);
+        // Under the native macOS style the button is a pull-down, so a click opens the menu
+        // instead of quick-hosting and the tooltip names the menu rather than the quick host.
+        hostGameButton->setToolTip(usesMacStyle() ? tr("Open the host menu") : quickHostTooltip);
     }
 }
 

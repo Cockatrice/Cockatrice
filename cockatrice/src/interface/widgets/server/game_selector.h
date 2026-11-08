@@ -162,19 +162,19 @@ private:
 
     GameSelectorQuickFilterToolBar *quickFilterToolBar;
 
-    QPushButton *filterButton;               /**< Button to open the filter dialog. */
-    QPushButton *clearFilterButton;          /**< Button to clear active filters. */
-    QPushButton *hostGameButton;             /**< Host button, in the same family as the join buttons. */
-    QToolButton *hostGameMenuButton;         /**< Split arrow that opens the host menu (non-macOS styles only). */
-    QWidget *hostGameButtonWidget;           /**< Container that keeps the split button and its arrow together. */
-    QMenu *hostGameMenu;                     /**< Menu behind the arrow, or behind the pull-down button on macOS. */
-    QAction *hostGameAction;                 /**< Quick-host action, carrying the keyboard shortcut. */
-    QAction *reviewGameAction;               /**< Menu action that opens the full create dialog. */
-    QLabel *hostErrorLabel;                  /**< Inline failure message for a quick-host request. */
-    QPushButton *joinButton;                 /**< Button to join the selected game. */
-    QPushButton *joinAsJudgeButton;          /**< Button to join the selected game as a judge. */
-    QPushButton *spectateButton;             /**< Button to spectate the selected game. */
-    QPushButton *joinAsJudgeSpectatorButton; /**< Button to join the selected game as a spectating judge. */
+    QPushButton *filterButton;                 /**< Button to open the filter dialog. */
+    QPushButton *clearFilterButton;            /**< Button to clear active filters. */
+    QPushButton *hostGameButton = nullptr;     /**< Host button, in the same family as the join buttons. */
+    QToolButton *hostGameMenuButton = nullptr; /**< Split arrow that opens the host menu (non-macOS styles only). */
+    QWidget *hostGameButtonWidget = nullptr;   /**< Container that keeps the split button and its arrow together. */
+    QMenu *hostGameMenu = nullptr;             /**< Menu behind the arrow, or behind the pull-down button on macOS. */
+    QAction *hostGameAction = nullptr;         /**< Quick-host action, carrying the keyboard shortcut. */
+    QAction *reviewGameAction = nullptr;       /**< Menu action that opens the full create dialog. */
+    QLabel *hostErrorLabel;                    /**< Inline failure message for a quick-host request. */
+    QPushButton *joinButton;                   /**< Button to join the selected game. */
+    QPushButton *joinAsJudgeButton;            /**< Button to join the selected game as a judge. */
+    QPushButton *spectateButton;               /**< Button to spectate the selected game. */
+    QPushButton *joinAsJudgeSpectatorButton;   /**< Button to join the selected game as a spectating judge. */
 
     const bool showFilters;  /**< Determines whether filter buttons are displayed. */
     GameTypeMap gameTypeMap; /**< Mapping of game types for the current room. */
@@ -198,6 +198,8 @@ private:
     void applyHostGameStyle();
     /** @brief Enables or disables the quick-host and review controls while a command is in flight. */
     void setHostCommandPending(bool pending);
+    /** @brief Applies the in-flight state of both host and join commands to the quick-host and review controls. */
+    void updateHostControlsEnabled();
     /** @brief Keeps the quick-host button tooltip in sync with the current shortcut. */
     void updateHostGameToolTip();
 
