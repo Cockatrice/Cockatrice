@@ -65,10 +65,19 @@ static const QMap<AppColor::Role, const char *> APP_ROLE_DESCRIPTIONS = {
      QT_TRANSLATE_NOOP("PaletteGridWidget", "Vivid primary accent (e.g. home-tab button gradient start)")},
     {AppColor::AccentSoft,
      QT_TRANSLATE_NOOP("PaletteGridWidget", "Lightened, desaturated accent (e.g. home-tab button gradient end)")},
+    {AppColor::Icon, QT_TRANSLATE_NOOP("PaletteGridWidget", "Neutral icon ink at the default action weight")},
+    {AppColor::IconStrong,
+     QT_TRANSLATE_NOOP("PaletteGridWidget", "Neutral icon ink for the one action a surface exists for")},
+    {AppColor::IconSoft,
+     QT_TRANSLATE_NOOP("PaletteGridWidget", "Neutral icon ink for a glyph that labels rather than acts")},
     {AppColor::Positive,
      QT_TRANSLATE_NOOP("PaletteGridWidget", "Positive state and additive actions (ready, add, increment)")},
+    {AppColor::PositiveStrong, QT_TRANSLATE_NOOP("PaletteGridWidget", "Positive state at primary emphasis")},
+    {AppColor::PositiveSoft, QT_TRANSLATE_NOOP("PaletteGridWidget", "Positive state at quiet emphasis")},
     {AppColor::Negative,
      QT_TRANSLATE_NOOP("PaletteGridWidget", "Negative state and removal actions (not ready, remove, decrement)")},
+    {AppColor::NegativeStrong, QT_TRANSLATE_NOOP("PaletteGridWidget", "Negative state at primary emphasis")},
+    {AppColor::NegativeSoft, QT_TRANSLATE_NOOP("PaletteGridWidget", "Negative state at quiet emphasis")},
 };
 
 PaletteGridWidget::PaletteGridWidget(QWidget *parent) : QWidget(parent)

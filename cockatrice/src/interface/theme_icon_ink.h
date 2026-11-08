@@ -24,7 +24,9 @@
  * on. The chroma is what makes it read as an icon rather than as leftover text;
  * the floor keeps a theme with a weak text color from producing a glyph that is
  * not legible. Neither step invents a color: both are derived from the palette
- * the theme already ships.
+ * the theme already ships. An unauthored neutral family stops at the floor: the
+ * live platform palette is the only source that knows the actual scheme, so a
+ * chroma pinned in a palette file could belong to the other one.
  *
  * The rule only applies to the neutral label roles. A semantic tint
  * (`AppColor::Positive`, `QPalette::Highlight`, `QPalette::Link`) is a hue the
@@ -32,6 +34,27 @@
  */
 namespace ThemeIconInk
 {
+/**
+ * @brief Whether @p hue belongs to the band the Positive or Negative family owns.
+ *
+ * A green accent is a Positive color and a red accent is a Negative one, whether
+ * or not the theme means it that way. Neutral chrome must not borrow either hue,
+ * or "settings" and "add" are painted the same color.
+ */
+bool isSemanticHue(int hue);
+
+/** @brief The hue neutral chrome falls back to when the accent is semantic. */
+int neutralChromeHue();
+
+/**
+ * @brief The harder of two surfaces to keep an ink legible on.
+ *
+ * Contrast is monotone in the luminance distance between an ink and its
+ * surface, so the surface nearest @p ink is the one it reads worst on. Choosing
+ * that one keeps a single authored ink above the floor on both.
+ */
+QColor harderSurface(const QColor &first, const QColor &second, const QColor &ink);
+
 /**
  * @brief WCAG relative luminance of an opaque color.
  */
@@ -54,9 +77,10 @@ QColor blend(const QColor &color, const QColor &target, double amount);
 /**
  * @brief Pushes @p color away from @p background until it reaches @p minRatio.
  *
- * Moves @p color toward black on a light background and toward white on a dark
- * one, so the hue survives the adjustment. Returns @p color unchanged when it
- * already meets the floor, which is the common case for a shipped palette.
+ * Moves @p color toward whichever pole, black or white, actually reaches
+ * @p minRatio against @p background, so the hue survives the adjustment.
+ * Returns @p color unchanged when it already meets the floor, which is the
+ * common case for a shipped palette.
  *
  * @param color Color to adjust.
  * @param background Surface the color is drawn on.
@@ -82,7 +106,9 @@ double defaultAccentMix();
  * @param accent The theme accent, normally `QPalette::Highlight`.
  * @param accentMix How much of the accent color to borrow. Defaults to
  *                  defaultAccentMix(); previews and tests sweep it to compare
- *                  strengths, production callers do not pass it.
+ *                  strengths. Production passes 0 for an unauthored neutral
+ *                  family, where the live platform palette is the only source
+ *                  that knows the actual scheme.
  * @return The ink to resolve `currentColor` to, as an RGB color.
  */
 QColor glyphInk(const QColor &text, const QColor &surface, const QColor &accent, double accentMix = defaultAccentMix());
@@ -99,13 +125,12 @@ double labelContrastFloor();
 /**
  * @brief Applies an emphasis level to an already-hued glyph color.
  *
- * Secondary keeps the hue untouched, so it is the no-op the default needs.
- * Primary pushes the color to a higher floor than the default, because the
- * accent is a mid-tone: on a light scheme it is lighter than the neutral ink and
- * on a dark one darker, so only a stronger contrast target keeps the primary
- * level above the secondary on both. Quiet
- * blends the color toward the surface it sits on and stops at the non-text
- * legibility floor, so a labelling glyph recedes without disappearing.
+ * The three levels share one legibility floor and differ by chroma, because
+ * contrast cannot order them: on a dark surface the highest-contrast tone is the
+ * palest one, so a contrast target inverts the ladder. Primary is the most
+ * chromatic member of its family, secondary keeps the color untouched (the
+ * no-op the default needs), and quiet mutes the color to a fraction of its
+ * saturation before solving it back to the same floor.
  *
  * @param color Hue-resolved glyph color.
  * @param surface Surface the glyph is drawn on.
@@ -114,13 +139,27 @@ double labelContrastFloor();
  */
 QColor forEmphasis(const QColor &color, const QColor &surface, IconEmphasis emphasis);
 
-/** @brief Contrast floor the primary level reaches, so it out-reads the default. */
+/**
+ * @brief The ink a disabled glyph is painted with, given the quiet level.
+ *
+ * A disabled glyph is the quiet ink receded further toward the surface and held
+ * to a floor below the quiet one. The palette's own disabled text is a fixed
+ * gray whose contrast varies with the surface, so on the darkest themes it
+ * out-reads the quiet level and an enabled glyph looks more disabled than a
+ * disabled one. Deriving the disabled ink from the quiet ink makes that order
+ * structural instead of incidental.
+ */
+QColor disabledInk(const QColor &quiet, const QColor &surface);
+
+/**
+ * @brief Contrast floor the primary level reaches, so it stays legible.
+ *
+ * Primary is ordered by chroma, not contrast, so it shares the text floor
+ * rather than clearing a higher one.
+ */
 double primaryContrastFloor();
 
-/** @brief How far a quiet glyph is blended into its surface. */
-double quietBlend();
-
-/** @brief Contrast floor a quiet glyph keeps, the WCAG non-text minimum. */
+/** @brief Contrast floor the quiet level reaches, shared with the other levels. */
 double quietContrastFloor();
 } // namespace ThemeIconInk
 

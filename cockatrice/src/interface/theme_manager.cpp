@@ -3,6 +3,7 @@
 #include "../../client/settings/cache_settings.h"
 #include "pixel_map_generator.h"
 #include "theme_config.h"
+#include "theme_icon_ink.h"
 
 #include <QApplication>
 #include <QChar>
@@ -651,8 +652,37 @@ QColor ThemeManager::appColor(AppColor::Role role) const
                                    qBound(0, qRound(accent.hslSaturation() * SOFT_SATURATION_PERCENT / 100.0), 255),
                                    qBound(0, accent.lightness() + SOFT_LIGHTNESS_OFFSET, 255));
         }
+        case AppColor::Icon:
+        case AppColor::IconStrong:
+        case AppColor::IconSoft: {
+            // Legacy fallback for a theme written before the icon roles
+            // existed, or one that deliberately leaves the neutral family
+            // unauthored (System). No accent chroma is borrowed here: the
+            // palette file that would carry it cannot know the platform scheme,
+            // so neutral ink is the live WindowText held to the label floor.
+            // The three levels are the ink rule this series shipped, applied
+            // once here so authored roles never get recomputed at paint time.
+            const QPalette &palette = qApp->palette();
+            const QColor text = palette.color(QPalette::Active, QPalette::WindowText);
+            const QColor surface = ThemeIconInk::harderSurface(palette.color(QPalette::Active, QPalette::Window),
+                                                               palette.color(QPalette::Active, QPalette::Button), text);
+            const QColor ink = ThemeIconInk::glyphInk(text, surface, accent, 0.0);
+            switch (role) {
+                case AppColor::IconStrong:
+                    return ThemeIconInk::forEmphasis(ink, surface, IconEmphasis::Primary);
+                case AppColor::IconSoft:
+                    return ThemeIconInk::forEmphasis(ink, surface, IconEmphasis::Quiet);
+                case AppColor::Icon:
+                default:
+                    return ink;
+            }
+        }
         case AppColor::Positive:
+        case AppColor::PositiveStrong:
+        case AppColor::PositiveSoft:
         case AppColor::Negative:
+        case AppColor::NegativeStrong:
+        case AppColor::NegativeSoft:
             // Semantic colors are independent of the accent: a missing role must
             // not silently paint "remove" in the theme's highlight color.
             return defaultAppColor(role, isDarkModeActive());
