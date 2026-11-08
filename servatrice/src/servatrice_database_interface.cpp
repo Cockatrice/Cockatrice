@@ -2222,6 +2222,9 @@ QList<ServerInfo_UserAlt> Servatrice_DatabaseInterface::getUserAlts(const QStrin
             candidate.banCount = candidateQuery.value(6).toInt();
             candidate.isActive = candidateQuery.value(7).toBool();
             candidates << candidate;
+            if (candidates.size() >= MAX_USER_ALTS_PER_LEVEL) {
+                break;
+            }
         }
 
         // Resolve session-level evidence (shared IP or historic client id) for
