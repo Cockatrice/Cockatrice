@@ -651,14 +651,11 @@ jobs:
             target: 14    # EOL 2026-09-14
             runner: xcode-27    # https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md
 
-            ccache_eviction_age: 7d
             ccache_size: 700M    # Release + package: ~0.4 GB at level 0
             cmake_generator: Ninja
             make_package: 1
             override_target: 14
             package_suffix: "-macOS14"
-            qt_version: 6.11.*
-            qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Apple
             type: Release
             use_ccache: 1
@@ -670,14 +667,11 @@ jobs:
             target: 15    # EOL 2027-??
             runner: xcode-27    # https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md
 
-            ccache_eviction_age: 7d
             ccache_size: 700M    # Release + package: ~0.4 GB at level 0
             cmake_generator: Ninja
             make_package: 1
             override_target: 15
             package_suffix: "-macOS15"
-            qt_version: 6.11.*
-            qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Apple
             type: Release
             use_ccache: 1
@@ -688,11 +682,8 @@ jobs:
             target: 27
             runner: xcode-27    # https://github.com/actions/runner-images/blob/main/images/macos/xcode-27-arm64-Readme.md
 
-            ccache_eviction_age: 7d
             ccache_size: 700M    # Debug + suite: ~0.5 GB at level 0
             cmake_generator: Ninja
-            qt_version: 6.11.*
-            qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Apple
             type: Debug
             use_ccache: 1
@@ -711,10 +702,7 @@ jobs:
             cmake_generator: Ninja
             make_package: 1
             package_suffix: "-Win10"
-            qt_version: 6.11.*
-            qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             type: Release
-            ccache_eviction_age: 7d
             ccache_size: 950M    # Release plus the package: 890 MB working set without /Z7
             use_ccache: 1
             # Scope is named after the vs2026 toolchain, not the generator: the
@@ -739,7 +727,13 @@ jobs:
       # quota arithmetic).
       CCACHE_DIR: ${{ github.workspace }}/.cache/
       CCACHE_SIZE: ${{ matrix.ccache_size || '700M' }}
+      CCACHE_EVICTION_AGE: 7d
       PERSIST_CCACHE: ${{ matrix.persist_ccache || 'true' }}
+      # Every leg builds against the same Qt, and the same addons; the resolve step, the
+      # thin-Qt cache key and both install steps read them from here. Keep the wildcard:
+      # the resolve step and the version-suffixed cache keys depend on it.
+      QT_VERSION: 6.11.*
+      QT_MODULES: qtimageformats qtmultimedia qtshadertools qtwebsockets
       # MSVC has no -g level, so there is nothing to ask for on Windows: level 0 is the one
       # value with a meaning there, and it drops /Z7 rather than lowering a level. Pull-request
       # builds carry no debug information, which is most of what a compiler cache stores; a
@@ -754,18 +748,18 @@ jobs:
           submodules: recursive
 
       - name: "[Windows] Add msbuild to PATH"
-        if: matrix.os == 'Windows'
+        if: runner.os == 'Windows'
         uses: microsoft/setup-msbuild@30375c66a4eea26614e0d39710365f22f8b0af57 # v3.0.0
         with:
           msbuild-architecture: x64
 
       - name: "[Windows] Setup ccache"
-        if: matrix.os == 'Windows' && matrix.use_ccache == 1
+        if: runner.os == 'Windows' && matrix.use_ccache == 1
         shell: bash
         run: choco install ccache --no-progress -y
 
       - name: "[macOS] Setup ccache"
-        if: matrix.os == 'macOS' && matrix.use_ccache == 1
+        if: runner.os == 'macOS' && matrix.use_ccache == 1
         run: brew install ccache
 
       - name: "Restore compiler cache (ccache)"
@@ -785,52 +779,50 @@ jobs:
       # configuration for two deployment targets, but each is cheap enough to keep its own.
 
       - name: "[macOS] Install aqtinstall"
-        if: matrix.os == 'macOS'
+        if: runner.os == 'macOS'
         run: pipx install aqtinstall
 
       # Resolve given wildcard versions (e.g. Qt 6.6.*) to latest version via aqtinstall to avoid stale caches on new releases
-      - name: "[macOS] Resolve latest Qt from ${{ matrix.qt_version }} input"
-        if: matrix.os == 'macOS'
-        env:
-          QT_VERSION: ${{ matrix.qt_version }}
+      - name: "[macOS] Resolve latest Qt from ${{ env.QT_VERSION }} input"
+        if: runner.os == 'macOS'
         id: resolve_qt_version
         shell: bash
         run: .ci/resolve_latest_aqt_qt_version.sh "$QT_VERSION"
 
       - name: "[macOS] Restore thin Qt ${{ steps.resolve_qt_version.outputs.version }}"
-        if: matrix.os == 'macOS'
+        if: runner.os == 'macOS'
         id: restore_qt
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          key: Qt-${{ steps.resolve_qt_version.outputs.version }}-macOS-${{ matrix.soc }}-${{ matrix.qt_modules }}-${{ env.QT_ARCHIVES }}-thin
+          key: Qt-${{ steps.resolve_qt_version.outputs.version }}-macOS-${{ matrix.soc }}-${{ env.QT_MODULES }}-${{ env.QT_ARCHIVES }}-thin
           path: ${{ github.workspace }}/Qt
 
       # Using jurplel/install-qt-action to install Qt without using brew
       # Qt build using vcpkg either just fails or takes too long to build
-      - name: "[macOS] Install fat Qt ${{ matrix.qt_version }}"
-        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+      - name: "[macOS] Install fat Qt ${{ env.QT_VERSION }}"
+        if: runner.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         uses: jurplel/install-qt-action@b344308e4483fc892e0d27b3cd1b173ebdd95f06 # v4.5.0
         with:
           archives: ${{ env.QT_ARCHIVES }}
           cache: false
           # cache-key-prefix: Qt
           dir: ${{ github.workspace }}    # thinning script depends on this location
-          modules: ${{ matrix.qt_modules }}
-          version: ${{ matrix.qt_version }}
+          modules: ${{ env.QT_MODULES }}
+          version: ${{ env.QT_VERSION }}
 
       - name: "[macOS] Create thin Qt libraries"
-        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+        if: runner.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         run: .ci/thin_macos_qtlib.sh
 
       - name: "[macOS] Cache thin Qt libraries"
-        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true' && github.ref == 'refs/heads/master'
+        if: runner.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true' && github.ref == 'refs/heads/master'
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: ${{ steps.restore_qt.outputs.cache-primary-key }}
           path: ${{ github.workspace }}/Qt
 
-      - name: "[Windows] Install Qt ${{ matrix.qt_version }}"
-        if: matrix.os == 'Windows'
+      - name: "[Windows] Install Qt ${{ env.QT_VERSION }}"
+        if: runner.os == 'Windows'
         uses: jurplel/install-qt-action@b344308e4483fc892e0d27b3cd1b173ebdd95f06 # v4.5.0
         with:
           # Qt 6.11.0 only works with aqtinstall directly from git until aqtinstall 3.4 is released
@@ -838,17 +830,17 @@ jobs:
           archives: ${{ env.QT_ARCHIVES }}
           cache: ${{ github.ref == 'refs/heads/master' }}
           cache-key-prefix: Qt
-          modules: ${{ matrix.qt_modules }}
-          version: ${{ matrix.qt_version }}
+          modules: ${{ env.QT_MODULES }}
+          version: ${{ env.QT_VERSION }}
 
       - name: "[Windows] Install NSIS"
-        if: matrix.os == 'Windows'
+        if: runner.os == 'Windows'
         shell: bash
         run: choco install nsis --no-progress
 
       # Ninja invokes cl.exe directly and needs the MSVC environment on PATH.
       - name: "[Windows] Set up MSVC environment"
-        if: matrix.os == 'Windows'
+        if: runner.os == 'Windows'
         uses: TheMrMilchmann/setup-msvc-dev@368ef7d1ee4d1171b31d4a7f67f4d954f903f5a9 # v4.1.0
         with:
           arch: x64
@@ -891,7 +883,6 @@ jobs:
         shell: bash
         env:
           BUILDTYPE: '${{ matrix.type }}'
-          CCACHE_EVICTION_AGE: ${{ matrix.ccache_eviction_age }}
           CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
           # Tag builds only: artifacts from master pushes and PR branches must not report to
           # Sentry. Forks get no secrets on pull_request, so they keep the mock fallback either way.
@@ -1061,7 +1052,7 @@ jobs:
       # shell: bash matters here - the default pwsh resolves `find` to Windows'
       # text-search find.exe, which errors instead of searching.
       - name: "Dump NSIS compile log"
-        if: failure() && matrix.os == 'Windows'
+        if: failure() && runner.os == 'Windows'
         shell: bash
         run: find . -name NSISOutput.log -exec cat {} +
 
@@ -1144,7 +1135,7 @@ jobs:
           path: ${{ env.CCACHE_DIR }}
 
       - name: "[macOS] Sign app bundle"
-        if: matrix.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null
+        if: runner.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null
         id: sign_macos
         env:
           BUILD_PATH: ${{ steps.build.outputs.path }}
@@ -1158,7 +1149,7 @@ jobs:
           fi
 
       - name: "[macOS] Notarize app bundle"
-        if: matrix.os == 'macOS' && steps.sign_macos.outcome == 'success'
+        if: runner.os == 'macOS' && steps.sign_macos.outcome == 'success'
         env:
           BUILD_PATH: ${{ steps.build.outputs.path }}
           MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
@@ -1224,7 +1215,7 @@ jobs:
       # what lets sentry-cli associate the PE's code identifier with the PDB's
       # debug identifier, and the PE is what carries the unwind information.
       - name: "[Windows] Upload debug symbols (exe + pdb)"
-        if: matrix.os == 'Windows' && needs.configure.outputs.tag != null
+        if: runner.os == 'Windows' && needs.configure.outputs.tag != null
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           if-no-files-found: error
@@ -1267,8 +1258,6 @@ jobs:
             make_package: 1
             override_target: 13
             package_suffix: "-macOS13_Intel"
-            qt_version: 6.11.*
-            qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Intel
             type: Release
             vcpkg_scope: 'vcpkg/macos13-x64-xcode26.3/'
@@ -1281,6 +1270,10 @@ jobs:
     if: github.event_name == 'schedule' || github.ref_type == 'tag'
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 100
+    env:
+      # The steps below are shared with build-vcpkg and read these from the job env.
+      QT_VERSION: 6.11.*
+      QT_MODULES: qtimageformats qtmultimedia qtshadertools qtwebsockets
     steps: *vcpkg-steps
 
   prune-caches:
